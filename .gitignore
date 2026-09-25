@@ -17,8 +17,24 @@ adoption/hosts/*.json
 !adoption/hosts/example.json
 !adoption/hosts/macos-example.json
 
+# scripts/host_receipts.py review: a stable per-receipt flock anchor (never deleted, to
+# avoid the classic lockfile-deletion race) and the temp file its atomic os.replace() write
+# uses; process coordination artifacts, never evidence.
+evidence/hosts/**/*.json.lock
+evidence/hosts/**/*.json.tmp-*
+
 # Generated public explorer (scripts/build_ecosystem.py --write); rebuilt
 # locally or downloaded from the publish-catalog.yml release artifact/
 # attestation, never committed. See docs/decisions/2026-09-23-generated-
 # explorer-sorted-manifest.md.
 /docs/ecosystem/index.html
+
+# Credential-shaped files never belong in a checkout; secrets live under
+# ${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack (docs/secret-storage.md).
+*.env
+*.key
+*.pem
+.credentials.json
+auth.json
+hosts.yml
+.netrc

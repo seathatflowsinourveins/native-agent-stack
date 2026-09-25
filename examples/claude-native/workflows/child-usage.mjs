@@ -4,11 +4,18 @@
 // agent-<id>.meta.json, agent-<id>.jsonl) and changes nothing.
 //   node .claude/workflows/child-usage.mjs <transcriptDir>   (the "Transcript dir" the Workflow tool prints)
 //   node .claude/workflows/child-usage.mjs --latest          (newest run recorded for this working directory)
+//   add --require-effort max to also fail (exit 1) when any child ran at another effort
+//   (docs/tasks/2026-09-23-max-effort-default.md: a stage without effort inherits the
+//   coordinator's xhigh, and CLAUDE_CODE_EFFORT_LEVEL overrides every stage).
 // Streamed assistant lines repeat a message id, so usage is counted once per id
 // (largest output_tokens wins). Counters are provider-returned and kept per type;
 // they are not comparable to RTK/Context Mode/jCodeMunch/Headroom estimates.
-// Exit 1 when any child is incomplete (null result, no transcript, no usage, or a
-// resolved model outside the requested family).
+// Exit 1 when any child is incomplete (null result, no transcript, no usage, a resolved
+// model outside the requested family, a resolved model that changes within the child,
+// or a model older than the requested alias's documented resolution for the client
+// version that wrote the entry). The last two catch content-classifier fallback, which
+// re-runs a flagged request on an older model and continues the child there; the
+// family substring check alone accepts claude-opus-4-8 for a requested opus.
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { homedir } from 'node:os'
@@ -16,6 +23,34 @@ import { fileURLToPath } from 'node:url'
 
 const COUNTERS = ['input_tokens', 'output_tokens', 'cache_read_input_tokens', 'cache_creation_input_tokens']
 const lines = (file) => readFileSync(file, 'utf8').split('\n').filter((l) => l.trim()).map((l) => { try { return JSON.parse(l) } catch { return null } }).filter(Boolean)
+// Client-written rows (an API error such as a usage-limit notice) carry this model; the
+// family check still reports them, and the two fallback checks below ignore them.
+const SYNTHETIC = '<synthetic>'
+// Documented resolution of an alias on the Anthropic API by the client version that wrote the
+// transcript entry, as [first client version, model] rows in ascending order (model-config doc,
+// fetched 2026-09-24: opus is Opus 5.5 from v2.1.280, Opus 5 from v2.1.219, Opus 4.8 from v2.1.154).
+// An entry older than the first row, and an alias without rows (sonnet, haiku, fable), has no
+// expectation. An ANTHROPIC_DEFAULT_OPUS_MODEL pin to an older model would be flagged; none is set here.
+export const ALIAS_RESOLUTION = { opus: [['2.1.154', 'claude-opus-4-8'], ['2.1.219', 'claude-opus-5'], ['2.1.280', 'claude-opus-5-5']] }
+const semver = (v) => { const m = /^(\d+)\.(\d+)\.(\d+)/.exec(typeof v === 'string' ? v : ''); return m ? m.slice(1).map(Number) : null }
+const compareParts = (a, b) => { for (let i = 0; i < Math.max(a.length, b.length); i++) { const d = (a[i] || 0) - (b[i] || 0); if (d) return d < 0 ? -1 : 1 } return 0 }
+// claude-opus-5-5 -> { family: 'opus', version: [5, 5] }; a date suffix and a [1m] suffix are ignored; other shapes -> null.
+export function modelGeneration(model) {
+  const m = /^claude-([a-z]+)-(\d{1,2})(?:-(\d{1,2}))?(?:-\d{8})?(?:\[[^\]]*\])?$/.exec(String(model))
+  return m ? { family: m[1], version: [Number(m[2]), ...(m[3] ? [Number(m[3])] : [])] } : null
+}
+export function expectedModel(alias, clientVersion) {
+  const rows = ALIAS_RESOLUTION[String(alias).toLowerCase()], v = semver(clientVersion)
+  if (!rows || !v) return null
+  let hit = null
+  for (const [from, model] of rows) if (compareParts(v, semver(from)) >= 0) hit = model
+  return hit
+}
+// True when `model` cannot be shown to be at least as new as `expected` (a different family or an unparseable name fails closed).
+export function olderThan(model, expected) {
+  const got = modelGeneration(model), want = modelGeneration(expected)
+  return !got || !want || got.family !== want.family || compareParts(got.version, want.version) < 0
+}
 
 export function summarizeChild(started, result, meta, transcript) {
   const byId = new Map()
@@ -48,6 +83,20 @@ export function summarizeChild(started, result, meta, transcript) {
   if (unresolved) issues.push(unresolved + ' assistant message(s) without a resolved model')
   if (!requested) issues.push('model not requested explicitly (inherits the coordinator model)')
   else if (!resolved.length || resolved.some((m) => !m.toLowerCase().includes(requested.toLowerCase()))) issues.push('resolved model outside requested family: ' + (resolved.join(',') || '(none resolved)'))
+  // Classifier fallback (model-config doc, "Automatic model fallback"): after a flagged request the
+  // child continues on the fallback model, so a change of resolved model within the child, or a model
+  // older than the alias's documented resolution for the entry's client version, is a substitution.
+  const real = messages.filter((r) => r.message.model && r.message.model !== SYNTHETIC)
+  const runs = real.map((r) => r.message.model).filter((m, i, all) => i === 0 || m !== all[i - 1])
+  if (runs.length > 1) issues.push('resolved model changed within the child: ' + runs.join(' -> '))
+  if (requested) {
+    const older = new Set()
+    for (const r of real) {
+      const want = expectedModel(requested, r.version)
+      if (want && r.message.model.toLowerCase().includes(requested.toLowerCase()) && olderThan(r.message.model, want)) older.add(r.message.model + ' on ' + r.version + ' (documented ' + requested + ': ' + want + ')')
+    }
+    if (older.size) issues.push('resolved model older than the documented alias resolution: ' + [...older].join(', '))
+  }
   return {
     agent_id: started.agentId, label: started.label ?? null, phase: started.phase ?? null,
     agent_type: meta ? meta.agentType ?? null : null,
@@ -84,10 +133,15 @@ export function summarizeRun(dir) {
   const incomplete = children.filter((c) => !c.complete)
   return {
     status: !children.length ? 'incomplete' : incomplete.length ? 'incomplete' : 'complete',
-    reason: !children.length ? 'journal has no started children' : incomplete.length ? incomplete.length + ' child(ren) incomplete' : 'every child has an explicit requested model, a matching resolved model, returned usage and a non-null result',
+    reason: !children.length ? 'journal has no started children' : incomplete.length ? incomplete.length + ' child(ren) incomplete' : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result',
     multi_model_children: children.filter((c) => c.resolved_models.length > 1).map((c) => c.label || c.agent_id),
     children, by_resolved_model: byModel,
   }
+}
+
+// Children whose resolved efforts are not exactly [required] (none recorded counts as a mismatch).
+export function effortMismatches(run, required) {
+  return run.children.filter((c) => c.efforts.length !== 1 || c.efforts[0] !== required).map((c) => ({ child: c.label || c.agent_id, efforts: c.efforts }))
 }
 
 // Newest native Workflow transcript directory for a working directory. The projects
@@ -111,10 +165,17 @@ export function latestRunDir(cwd, configDir) {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
-  const dir = process.argv[2] === '--latest' ? latestRunDir(process.cwd(), process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')) : process.argv[2]
-  if (process.argv[2] === '--latest' && !dir) { console.error('no native Workflow run found for ' + process.cwd()); process.exit(2) }
-  if (!dir) { console.error('usage: child-usage.mjs <workflow transcript dir>'); process.exit(2) }
+  const argv = process.argv.slice(2)
+  const ri = argv.indexOf('--require-effort')
+  const required = ri >= 0 ? argv[ri + 1] : null
+  if (ri >= 0 && !['low', 'medium', 'high', 'xhigh', 'max'].includes(required)) { console.error('--require-effort needs one of low, medium, high, xhigh, max'); process.exit(2) }
+  if (argv.filter((a) => a === '--require-effort').length > 1) { console.error('--require-effort may be given once'); process.exit(2) }
+  const target = argv.filter((_, i) => i !== ri && i !== ri + 1 || ri < 0)[0]
+  const dir = target === '--latest' ? latestRunDir(process.cwd(), process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')) : target
+  if (target === '--latest' && !dir) { console.error('no native Workflow run found for ' + process.cwd()); process.exit(2) }
+  if (!dir) { console.error('usage: child-usage.mjs <workflow transcript dir> | --latest [--require-effort <level>]'); process.exit(2) }
   const out = { transcript_dir: dir, ...summarizeRun(dir) }
+  if (required) out.effort_mismatches = effortMismatches(out, required)
   console.log(JSON.stringify(out, null, 2))
-  process.exit(out.status === 'complete' ? 0 : 1)
+  process.exit(out.status === 'complete' && !(required && out.effort_mismatches.length) ? 0 : 1)
 }

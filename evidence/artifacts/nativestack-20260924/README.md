@@ -1,5 +1,18 @@
 # NativeStack workstation evidence — 2026-09-24
 
+**Historical record (landed 2026-09-25).** This folder records the 2026-09-24
+install at `v2026.09.23.1` on the same physical machine that
+`evidence/hosts/nativestack-5975wx-20260925/` records (#231). To avoid two
+host identities for one machine, the 66 receipts recorded here under host id
+`threadripper4090-nativestack-20260924` are kept unchanged, and still
+hash-registered, in [`host-receipts-20260924/`](host-receipts-20260924/)
+instead of `evidence/hosts/`, so `platform_status` and the component matrix
+do not count them. Its hardware-profile entry is dropped in favour of #231's
+measured profile. Component-stages proven here but not in #231 are being
+re-recorded under `nativestack-5975wx-20260925` on current pins, with
+independent review. `failure-register.md` and `execution-ledger.json` keep
+the failed attempts.
+
 This is a new Windows/WSL2 physical workstation running an independently installed Ubuntu24.04.5 distribution. Installation used catalog **v2026.09.23.1 / 40828dfea7bca910032e93b966bbdfdd729f9f44**. Evidence is contributed from a separate current-main clone. No winner, platform status, credentials, other distribution, or broker configuration is changed by this contribution.
 
 The host has ThreadripperPRO5975WX,128GB physical RAM and an RTX4090 with24GB VRAM. Existing shared WSL limits were preserved:104GB memory,48processors and24GB swap. All six selected profiles completed their bootstrap sequence and prerequisite report. Recipe-managed components outside bootstrap's hash set remain explicitly unpinned at that boundary, even where an exact source commit or package version was independently selected.

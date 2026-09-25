@@ -171,15 +171,46 @@ at `SessionStart` when the resolved effort for the active model is below
 `xhigh`, and at `SessionEnd` it self-heals a `modelSettings.<model>.effortLevel`
 save when the session ran below `xhigh` only because no level was ever saved
 for that model anywhere -- it never overwrites a level someone (or a prior
-run) deliberately saved, even a low one.
+run) deliberately saved, even a low one. Claude Code discards `SessionEnd`
+hook output, so a self-heal also leaves a one-line notice file in
+`~/.claude/effort-default-guard.notices/`. The next `SessionStart` that
+reports its model resolves its own warning first, then claims each notice with
+an atomic rename, prints it once and deletes it only after printing; a start
+that loses the claim prints nothing for that notice, and notices older than 7
+days are deleted unseen.
 
 Saved effort defaults apply to fresh sessions. Already-open sessions can retain
 their previous selection; Claude supports `/effort` for the current session.
 Do not interrupt active work to reload a default. [Codex worker settings](https://learn.chatgpt.com/docs/agent-configuration/subagents)
 and [Claude subagent frontmatter](https://code.claude.com/docs/en/sub-agents)
 can override effort/model inheritance, so do not claim all workers run at the
-coordinator's maximum. The short global instruction example makes task-based
+coordinator's effort. The short global instruction example makes task-based
 acceptance, original-source verification and independent review persistent.
+
+**2026-09-23: Claude children run at `max`; the coordinator stays at
+Ultracode.** Re-measured on Claude Code 2.1.281: a persisted `max` is still
+silently dropped. With `--settings '{"ultracode":false,"effortLevel":"max"}'`
+the session ran at `xhigh`, while the same key at `high` ran at `high` (probes
+Q1 and Q2); for `modelSettings.<model>.effortLevel` the installed schema and
+the docs reject `max` as well. A session started with `--effort max` or
+`CLAUDE_CODE_EFFORT_LEVEL=max` ran at `max` with Ultracode orchestration off.
+`/effort max` was not probed; the docs say Claude Code applies `max` to the
+current session only
+([model configuration](https://code.claude.com/docs/en/model-config), fetched
+2026-09-23). Never set `CLAUDE_CODE_EFFORT_LEVEL`: any value overrides every
+child's frontmatter and workflow-stage effort, and any value other than `xhigh`
+also turns Ultracode off. The shipped [agent definitions](../adoption/agents/claude/)
+therefore declare `effort: max` beside their task-matched models (Sonnet for
+`source-scout` and `isolated-builder`; Opus for `evidence-reviewer`,
+`semantic-evidence-reviewer` and `blind-judge`), and workflow stages pass
+`effort: 'max'` explicitly: a stage without its own effort inherits the
+coordinator's `xhigh` unless its agent's frontmatter sets one, and a stage's
+effort overrides the frontmatter (probe Q3). Verify each child's resolved
+effort in its transcript rather than inferring it from a definition. The
+[Ultracode recipe](claude-native-ultracode.md#child-effort-max-under-an-ultracode-coordinator)
+has the per-stage rule and the
+[decision record](../docs/decisions/2026-09-23-max-effort-default.md) has the
+probes, alternatives and overturn conditions.
 
 The [settings receipt](../evidence/receipts/native-quality-defaults-20260920.json)
 records supported values, effective configuration and preservation checks. More

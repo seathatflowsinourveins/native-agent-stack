@@ -1,0 +1,20 @@
+{
+ "kind": "adaptive_paper_stop_drill_trigger",
+ "stop_file": "~/.local/state/native-agent-stack/alpaca-paper/STOP",
+ "watcher_sha256": "e3856af86ebb9e311cda030f61530434300f6f6d80c529fdfa50ef7ec7c23675",
+ "deadline_seconds": 200.0,
+ "watch_started_at": "2026-09-24T14:30:02.158609+00:00",
+ "events_file_appeared_at": "2026-09-24T14:30:11.917510+00:00",
+ "trigger": "first_buy_intent",
+ "stop_created_at": "2026-09-24T14:31:02.605107+00:00",
+ "stop_created_epoch": 1790260262.6051068,
+ "intent": {
+  "client_id": "adp-mac-20260924b-stop-0000001",
+  "symbol": "CRWV",
+  "side": "buy",
+  "strategy": "ADAPTIVE-001-A",
+  "reason": "relative_strength"
+ },
+ "intent_journaled_at": "2026-09-24T14:31:02.592483+00:00",
+ "stop_after_intent_ms": 12.6
+}

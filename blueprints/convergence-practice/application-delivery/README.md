@@ -150,3 +150,20 @@ cluster. The [separate receipt](migration-rollback.json) records all10 command
 exits and exact schema names. The original application databases were unchanged.
 Downgrade drops both application tables; this proves schema reversal, not user-data
 recovery or production-safe rollback.
+
+## macOS re-qualification at the 2026-09-24 pins
+
+The 2026-09-24 catalog pin bumps (uv 0.12.18, pnpm 12.6.0) were re-qualified on the
+Mac host `macos-m5pro-20260924`. [experiment-macos-20260924.json](experiment-macos-20260924.json)
+records all 15 attempts, including the failed ones. pnpm 12 stores its own version in
+`pnpm-lock.yaml` as well as in `packageManager`, so this project keeps running pnpm
+12.4.2 whatever the global pin is. The qualifying run used a scratch copy with only that
+self-pin raised to 12.6.0. The two changed files are retained under
+[the variant evidence](../../../evidence/artifacts/macos-application-20260924/variant/), and the
+lockfile's project dependency section is byte-identical to the committed one. The
+committed recipe keeps its pnpm 12.4.2 self-pin so that [experiment.json](experiment.json)
+stays valid; moving the recipe itself needs a new frozen record.
+
+The sandbox-scope attempts show which steps the Claude Code Bash sandbox blocks:
+pnpm registry and store operations, PostgreSQL `initdb` shared memory and loopback
+database connections. Run the database and pnpm steps in the native shell.

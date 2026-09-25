@@ -2,11 +2,14 @@
 
 import hashlib
 from contextlib import ExitStack, redirect_stdout
+import errno
 import importlib.util
 import io
 import json
 import os
 from pathlib import Path
+import signal
+import subprocess
 import sys
 import tarfile
 import tempfile
@@ -106,6 +109,34 @@ class NativeTokenCIContracts(unittest.TestCase):
             self.assertNotEqual(result["commands"][0]["exit_code"], 0)
             self.assertNotIn(str(work), json.dumps(result))
             self.assertNotIn("private-test-value", json.dumps(result))
+
+    @unittest.skipUnless(hasattr(os, "waitid"), "needs os.waitid")
+    def test_timeout_signal_refused_by_an_exited_group_is_still_a_timeout(self):
+        # The command can finish between the timeout and the signal; macOS then answers killpg with EPERM.
+        def refuse_once_exited(pgid, signum):
+            os.waitid(os.P_PID, pgid, os.WEXITED | os.WNOWAIT)  # exited but not reaped
+            raise PermissionError(errno.EPERM, "Operation not permitted")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output, work = root / "result", root / "work"
+            output.mkdir()
+            work.mkdir()
+            run = ci.Run(output, work)
+            with patch.object(ci.os, "killpg", side_effect=refuse_once_exited) as killpg, \
+                    self.assertRaisesRegex(AssertionError, "timed out"):
+                run.command("exited-group", [sys.executable, "-c", "import time; time.sleep(0.3)"], timeout=0.05)
+            self.assertEqual([call.args[1] for call in killpg.call_args_list], [signal.SIGTERM])
+            self.assertTrue(json.loads((output / "receipt.json").read_text())["commands"][0]["timed_out"])
+
+    def test_signal_group_raises_a_refusal_while_the_leader_runs(self):
+        process = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"], start_new_session=True)
+        try:
+            with patch.object(ci.os, "killpg", side_effect=PermissionError(errno.EPERM, "Operation not permitted")):
+                with self.assertRaises(PermissionError):
+                    ci.signal_group(process, signal.SIGTERM)
+        finally:
+            process.kill()
+            process.wait()
 
 
 if __name__ == "__main__":

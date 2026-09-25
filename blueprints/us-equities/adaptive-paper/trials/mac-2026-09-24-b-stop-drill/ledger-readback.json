@@ -1,0 +1,67 @@
+{
+ "kind": "adaptive_paper_ledger_readback",
+ "source": "durable ledger.sqlite3 opened read-only (mode=ro); no broker request",
+ "trial_id": "mac-20260924b-stop",
+ "trial_started_at": "2026-09-24T14:30:11.477+00:00",
+ "next_trial_started_at": null,
+ "intents": [
+  {
+   "client_id": "adp-mac-20260924b-stop-0000001",
+   "symbol": "CRWV",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "87.82",
+   "status": "canceled",
+   "filled_qty": "0",
+   "average_price": null,
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:31:02.591+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:31:02.618+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:31:02.626+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:31:02.745+00:00",
+     "status": "canceled",
+     "filled_qty": "0",
+     "average_price": null
+    }
+   ]
+  }
+ ],
+ "request_reservations": {
+  "cancel": {
+   "count": 1,
+   "at": [
+    "2026-09-24T14:31:02.720+00:00"
+   ]
+  },
+  "submit": {
+   "count": 1,
+   "at": [
+    "2026-09-24T14:31:02.593+00:00"
+   ]
+  }
+ },
+ "round_trips": [],
+ "totals": {
+  "intents": 1,
+  "by_status": {
+   "canceled": 1
+  },
+  "filled_buys": 0,
+  "filled_sells": 0,
+  "round_trips": 0,
+  "unpaired_filled_buys": 0,
+  "round_trip_pnl_usd": "0"
+ }
+}

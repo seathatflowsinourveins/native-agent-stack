@@ -10,6 +10,11 @@ account flat with zero open orders, otherwise CLEANUP_REQUIRED is written.
 A write-ahead IN_FLIGHT marker (run id and client-id prefix) is written in the
 run directory before the first POST and removed only after cleanup proves
 flat; SIGKILL or a crash leaves it for manual recovery.
+The ledger is FaultLedger: the engine Ledger except that the single C04 client id
+may carry a sub-penny price to Alpaca, whose documented 422 refusal the engine
+records as broker_refused (see README.md, "C04 choice"). The default transport is
+FaultTransport, the engine transport with the same single-id exemption at its
+order-contract boundary.
 
 Usage: harness.py run --env-file PATH --state-root PATH --out PATH
 """
@@ -35,8 +40,11 @@ if str(ENGINE) not in sys.path:
     sys.path.insert(0, str(ENGINE))
 
 from runner import Controller, credentials, reconcile, save  # noqa: E402
-from safety import DEFAULT_STOP, TERMINAL as LEDGER_TERMINAL, Ledger, SafetyError, account_lock_fingerprint  # noqa: E402
-from transport import TERMINAL, AlpacaPaperTransport, TransportError, timestamp_ns  # noqa: E402
+from safety import (DEFAULT_STOP, DEFINITIVE_REFUSAL_STATUSES, SUB_PENNY_REFUSAL,  # noqa: E402
+                    TERMINAL as LEDGER_TERMINAL, Ledger, SafetyError, account_lock_fingerprint,
+                    price_increment_valid)
+from transport import (TERMINAL, AlpacaPaperTransport, TransportError, limit_order_request,  # noqa: E402
+                       order_envelope, timestamp_ns)
 
 PLAN_PATH = HERE / "plan.json"
 STATE_BASE = Path.home() / ".local/state/native-agent-stack"
@@ -45,12 +53,59 @@ LOCK_ROOT = None  # None keeps the engine's shared account-writer lock namespace
 CASE_IDS = ["C01", "C02", "C05", "C04"]
 OPEN = {"pending_new", "accepted", "new", "accepted_for_bidding"}
 CENT = Decimal("0.01")
-REFUSAL_STATUSES = (401, 403, 404)  # safety.Ledger.mark_broker_refused's definitive set.
+REFUSAL_STATUSES = DEFINITIVE_REFUSAL_STATUSES  # plus the documented sub-penny 422, judged from the ledger.
+CANCEL_ANSWERS = (204, 404, 422)  # DELETE answers the engine treats as data.
 EXIT = {"native_faults_passed": 0, "not_started": 2, "refused": 2, "cleanup_required": 3}
 
 
 class Refused(RuntimeError):
     """Pre-write refusal; no order has been submitted."""
+
+
+class FaultLedger(Ledger):
+    """The engine Ledger with one harness-only change: the single C04 client id
+    may carry a price outside the minimum price variance to the broker, so that
+    Alpaca itself answers the fault. Every other client id, including every
+    engine path, keeps the pre-send ``invalid_price_increment`` refusal."""
+
+    def __init__(self, db_path, *, sub_penny_client_id):
+        super().__init__(db_path)
+        self.sub_penny_client_id = sub_penny_client_id
+
+    def _check_price_increment(self, client_id, price):
+        if client_id == self.sub_penny_client_id and not price_increment_valid(price):
+            return
+        super()._check_price_increment(client_id, price)
+
+
+class FaultTransport(AlpacaPaperTransport):
+    """The engine transport with one harness-only change, mirroring FaultLedger:
+    the single C04 client id may carry its sub-penny limit price through the
+    order-contract boundary. Its other fields are validated by the contract as
+    usual (with the price truncated to the cent), and the serialized POST body
+    must still equal its envelope. Every other client id is validated exactly as
+    in the engine."""
+
+    sub_penny_client_id = None
+
+    def _validated_request(self, intent):
+        price = Decimal(intent["limit_price"])
+        if (self.sub_penny_client_id is None or intent["client_order_id"] != self.sub_penny_client_id
+                or price_increment_valid(price)):
+            return super()._validated_request(intent)
+        on_cent = dict(intent, limit_price=str(price.quantize(CENT, ROUND_DOWN)))
+        envelope = order_envelope(on_cent, extended_hours_allowed=self.extended_hours_allowed)
+        envelope["intent"]["limit_price"] = intent["limit_price"]
+        return envelope, limit_order_request(envelope)
+
+
+def fault_transport(sub_penny_client_id):
+    """Factory for FaultTransport exempting exactly one client id."""
+    def build(*args, **kwargs):
+        port = FaultTransport(*args, **kwargs)
+        port.sub_penny_client_id = sub_penny_client_id
+        return port
+    return build
 
 
 def sha256(path):
@@ -98,6 +153,16 @@ def ledger_effect(ledger):
             "cash_delta_usd": str(ledger.accounting().cash_delta_usd)}
 
 
+def refusal_record(ledger, cid):
+    """The ledger's own durable broker_refused event for ``cid`` (status and refusal)."""
+    row = ledger.db.execute("SELECT payload FROM events WHERE kind='broker_refused' AND client_id=? "
+                            "ORDER BY rowid DESC LIMIT 1", (cid,)).fetchone()
+    if row is None:
+        return None
+    payload = json.loads(row[0])
+    return {"http_status": payload.get("http_status"), "refusal": payload.get("refusal")}
+
+
 def unfilled(state):
     return state is not None and Decimal(state["filled_qty"]) == 0
 
@@ -117,24 +182,32 @@ def judge_c02(state, broker_status):
 def judge_c05(before, after, error, new_reasons, effect_before, effect_after, requests):
     cancels = [r for r in requests if r["kind"] == "cancel"]
     detail = {"delete_sent": bool(cancels), "cancel_http_statuses": [r["status"] for r in cancels],
-              "broker_refusal_observed": any(r["status"] == 422 for r in cancels),
+              "broker_refusal_observed": any(r["status"] in (404, 422) for r in cancels),
               "new_transport_freeze_reasons": sorted(new_reasons), "error": error}
     if not cancels:
-        detail["engine_path"] = "transport.cancel found the order terminal by client-id lookup; no DELETE sent"
+        detail["engine_path"] = "no DELETE reached the broker"
     ok = (error is None and not new_reasons and before == after and effect_before == effect_after
-          and after is not None and after["status"] == "canceled" and unfilled(after))
+          and after is not None and after["status"] == "canceled" and unfilled(after)
+          and all(r["status"] in CANCEL_ANSWERS for r in cancels))
     return ("passed" if ok else "failed"), detail
 
 
-def judge_c04(requests, state, error, effect_before, effect_after):
+def judge_c04(requests, state, error, effect_before, effect_after, refusal=None):
+    """Passed only when the ledger records broker_refused with no effect and the broker's
+    answer is a definitive refusal: 401/403/404, or the single documented sub-penny 422
+    that the ledger recorded with refusal SUB_PENNY_REFUSAL (any other 400/422/429/5xx
+    stays ambiguous and fails)."""
     submits = [r for r in requests if r["kind"] == "submit"]
-    detail = {"submit_http_statuses": [r["status"] for r in submits], "error": error}
+    statuses = [r["status"] for r in submits]
+    detail = {"submit_http_statuses": statuses, "error": error, "ledger_refusal": refusal}
     if not submits:
         reason = (error or {}).get("reason") or (error or {}).get("type") or "no_submit_request"
         detail["unobserved_reason"] = "engine_refused_before_send: " + reason
         return "unobserved", detail
+    definitive = (all(s in REFUSAL_STATUSES for s in statuses)
+                  or (statuses == [422] and refusal == {"http_status": 422, "refusal": SUB_PENNY_REFUSAL}))
     ok = (state is not None and state["status"] == "broker_refused" and unfilled(state)
-          and effect_before == effect_after and all(r["status"] in REFUSAL_STATUSES for r in submits))
+          and effect_before == effect_after and definitive)
     return ("passed" if ok else "failed"), detail
 
 
@@ -144,7 +217,7 @@ class Harness:
             raise ValueError("client_id_prefix_required")
         self.plan, self.plan_sha, self.run_dir, self.prefix = plan, plan_sha, run_dir, prefix
         self.symbol = plan["symbol"]
-        self.ledger = Ledger(run_dir / "ledger.sqlite3")
+        self.ledger = FaultLedger(run_dir / "ledger.sqlite3", sub_penny_client_id=prefix + "c04")
         # Fail-closed until the broker clock is read on the started transport.
         self.controller = Controller(self.ledger, 0.0, market_open=False)
         self.responses, self.cases = [], []
@@ -292,7 +365,8 @@ class Harness:
         except Exception as exc:
             error = describe(exc)
         state = intent_state(self.ledger, cid)
-        outcome, detail = judge_c04(self.responses[start:], state, error, effect_before, ledger_effect(self.ledger))
+        outcome, detail = judge_c04(self.responses[start:], state, error, effect_before, ledger_effect(self.ledger),
+                                    refusal_record(self.ledger, cid))
         detail.update(client_order_id=cid, limit_price=str(price), reference_bid=str(bid), ledger=state,
                       effect_before=effect_before, effect_after=ledger_effect(self.ledger))
         return outcome, detail
@@ -428,13 +502,17 @@ class Harness:
         return {"schema_version": 1, "kind": "native_fault_behaviour_receipt", "status": status,
                 "broker": "alpaca", "endpoint": "paper", "gate": "native-fault-behaviour",
                 "plan_sha256": self.plan_sha, "harness_sha256": sha256(__file__),
-                "engine_sources_sha256": {n: sha256(ENGINE / n) for n in ("transport.py", "safety.py", "runner.py")},
+                "engine_sources_sha256": {n: sha256(ENGINE / n) for n in ("transport.py", "safety.py", "runner.py",
+                                                                         "../order-contract/order_contract.py")},
                 "started_at": self.started_at, "finished_at": datetime.now(timezone.utc).isoformat(),
                 "client_id_prefix": self.prefix, "symbol": self.symbol, "transport_builds": self.builds,
                 "posts_reserved": self.posts, "max_posts": self.plan["max_posts"],
                 "submit_responses": sum(r["kind"] == "submit" for r in self.responses),
                 "interrupted": self.interrupted, "error": error, "stop_error": stop_error,
                 "cases": cases, "cleanup": cleanup,
+                "c04_pre_send_exemption": ("FaultLedger exempts only client id %sc04 from invalid_price_increment; "
+                                           "FaultTransport exempts only its limit price increment from the "
+                                           "order-contract boundary" % self.prefix),
                 "in_flight_marker_present": self.in_flight.exists(),
                 "evidence_note": ("native_paper marks a case only when the engine transport's request observer "
                                   "recorded a broker HTTP response inside that case and, for C05, only when "
@@ -467,7 +545,7 @@ def run(env_file, state_root, out, *, factory=None, plan_path=PLAN_PATH):
     handled = (signal.SIGINT, signal.SIGTERM)
     previous = {sig: signal.signal(sig, harness.on_signal) for sig in handled}  # before any transport exists
     try:
-        receipt = asyncio.run(harness.execute(factory or AlpacaPaperTransport, key, secret))
+        receipt = asyncio.run(harness.execute(factory or fault_transport(prefix + "c04"), key, secret))
     finally:
         for sig, handler in previous.items():
             signal.signal(sig, handler)

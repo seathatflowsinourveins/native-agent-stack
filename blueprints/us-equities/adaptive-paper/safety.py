@@ -37,6 +37,45 @@ RANK = {"reserved": 0, "pending_new": 1, "accepted": 2, "new": 2,
         "pending_cancel": 4, "done_for_day": 4,
         "filled": 5, "canceled": 5, "expired": 5, "rejected": 5, "not_sent": 5, "broker_refused": 5}
 DEFAULT_STOP = Path.home() / ".local/state/native-agent-stack/alpaca-paper/STOP"
+DEFINITIVE_REFUSAL_STATUSES = (401, 403, 404)
+# The one 422 treated as a definitive refusal: Alpaca states that orders in excess
+# of the minimum price variance "will be rejected" and documents the body code
+# 42210000 with "sub-penny increment does not fulfill minimum pricing criteria".
+# The page does not state the HTTP status; 422 is inferred from the code prefix and
+# the POST /v2/orders 422 entry, pending native confirmation. The message, not the
+# code, is the discriminator.
+# Every other 422 (for example "client_order_id must be unique", which proves an
+# order exists) stays ambiguous.
+SUB_PENNY_REFUSAL = "sub_penny_minimum_price_variance"
+# Alpaca reports an order's cumulative filled_avg_price rounded to 6 decimals, so
+# quantity x average is within 0.5e-6 per share of the true notional. A notional derived
+# from two such averages is checked against the limit only beyond that bound.
+AVERAGE_ROUNDING = D("0.0000005")
+EXECUTION_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9:_.\-]{0,127}")
+
+
+def execution_from_observation(row):
+    """The one broker execution an order observation carries (a trade_updates fill or
+    partial_fill with its execution_id, qty and price, as transport.py forwards it), or
+    None for a cumulative-only observation (REST reads, snapshots)."""
+    if not isinstance(row, dict) or row.get("event") not in ("fill", "partial_fill"):
+        return None
+    values = [row.get(key) for key in ("execution_id", "event_qty", "event_price")]
+    if any(value in (None, "") for value in values):
+        return None
+    return {"execution_id": str(values[0]), "qty": str(values[1]), "price": str(values[2])}
+
+
+def _canonical(value):
+    return format(value.normalize(), "f") if value else "0"
+
+
+def price_increment_valid(price):
+    """True when ``price`` (a Decimal) meets Alpaca's minimum price variance for limit
+    prices: two decimals at or above $1.00, four below
+    (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md, "Sub-penny increments").
+    reserve_intent refuses any other price before send."""
+    return price == price.quantize(D("0.01") if price >= 1 else D("0.0001"))
 
 
 class SafetyError(RuntimeError):
@@ -382,6 +421,9 @@ class Ledger:
                 CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, kind TEXT NOT NULL,
                     client_id TEXT, payload TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS trials(trial_id TEXT PRIMARY KEY, started_at REAL NOT NULL);
+                CREATE TABLE IF NOT EXISTS executions(client_id TEXT NOT NULL REFERENCES intents(client_id),
+                    cum_qty TEXT NOT NULL, qty TEXT NOT NULL, price TEXT NOT NULL, execution_id TEXT NOT NULL,
+                    at REAL, PRIMARY KEY(client_id, cum_qty));
             """)
             frozen = self.limits.frozen_json()
             with self._transaction():
@@ -711,6 +753,13 @@ class Ledger:
             self._event("risk_halt", reason=reason)
         return self._state()
 
+    def _check_price_increment(self, client_id, price):
+        """Pre-send refusal of a price outside the documented minimum price variance.
+        A method so that the native-fault harness alone can exempt its single C04
+        client id (native-faults/harness.py FaultLedger); the engine never does."""
+        if not price_increment_valid(price):
+            raise SafetyError("invalid_price_increment")
+
     def reserve_intent(self, client_id, symbol, side, qty, limit_price, *, quote,
                        now, market_open, session_close, stop_file=None):
         if type(client_id) is not str or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,47}", client_id):
@@ -719,8 +768,7 @@ class Ledger:
         if side not in ("buy", "sell"):
             raise SafetyError("invalid_order_side")
         qty, price, now, close = decimal(qty), decimal(limit_price), instant(now), instant(session_close)
-        if price != price.quantize(D("0.01") if price >= 1 else D("0.0001")):
-            raise SafetyError("invalid_price_increment")
+        self._check_price_increment(client_id, price)
         with self._transaction(keep_observations_on_refusal=True):
             previous = self.db.execute("SELECT * FROM intents WHERE client_id=?", (client_id,)).fetchone()
             if previous:
@@ -868,14 +916,22 @@ class Ledger:
             self._event("intent_not_sent", client_id, reason=reason)
             return True
 
-    def mark_broker_refused(self, client_id, http_status):
+    def mark_broker_refused(self, client_id, http_status, refusal=None):
         """Retire a proven HTTP refusal after transport's client-ID absence check.
 
         Only 401/403/404 plus a subsequent broker client-ID lookup returning 404
         qualify at the transport seam. Caller owns that evidence; this API never
-        infers refusal from absence alone. Timeout/400/422/429/5xx stay ambiguous.
+        infers refusal from absence alone. Timeout/400/422/429/5xx stay ambiguous,
+        with one documented exception: a 422 whose transport-classified ``refusal``
+        is SUB_PENNY_REFUSAL, for an intent whose own durable limit price really is
+        outside the minimum price variance.
         """
-        if type(http_status) is not int or http_status not in (401, 403, 404):
+        if type(http_status) is not int or type(http_status) is bool:
+            raise SafetyError("unsupported_broker_refusal_status")
+        if http_status == 422:
+            if refusal != SUB_PENNY_REFUSAL:
+                raise SafetyError("unsupported_broker_refusal_status")
+        elif http_status not in DEFINITIVE_REFUSAL_STATUSES or refusal is not None:
             raise SafetyError("unsupported_broker_refusal_status")
         with self._transaction():
             row = self.db.execute("SELECT * FROM intents WHERE client_id=?", (client_id,)).fetchone()
@@ -887,18 +943,77 @@ class Ledger:
             if (intent.status != "reserved" or not intent.submit_attempted
                     or intent.broker_id is not None or intent.filled_qty):
                 raise SafetyError("cannot_mark_order_broker_refused")
+            if refusal == SUB_PENNY_REFUSAL and price_increment_valid(intent.limit_price):
+                raise SafetyError("refusal_contradicts_intent_price")
             self.db.execute("UPDATE intents SET status='broker_refused' WHERE client_id=?", (client_id,))
+            extra = {} if refusal is None else {"refusal": refusal}
             self._event("broker_refused", client_id, http_status=http_status,
-                        evidence_required="submission_http_refusal_then_client_id_404")
+                        evidence_required="submission_http_refusal_then_client_id_404", **extra)
             return True
 
-    def record_order(self, client_id, broker_id, status, cumulative_qty, average_price, *, timestamp=None):
+    def _record_execution(self, old, cum_qty, execution_id, qty, price, at):
+        """Durably record one broker execution of ``old`` (the cumulative quantity after
+        it is its key, as for FILL activities). A repeat of a recorded execution is a
+        no-op; the same key or id with other values, an overlap, or a price beyond the
+        order's limit fails closed. The limit check uses the execution's own price."""
+        key = _canonical(cum_qty)
+        existing = self.db.execute("SELECT qty, price FROM executions WHERE client_id=? AND cum_qty=?",
+                                   (old.client_id, key)).fetchone()
+        if existing is not None:
+            if (D(existing["qty"]), D(existing["price"])) != (qty, price):
+                raise SafetyError("execution_conflict_requires_reconciliation")
+            return False
+        if self.db.execute("SELECT 1 FROM executions WHERE client_id=? AND execution_id=?",
+                           (old.client_id, execution_id)).fetchone():
+            raise SafetyError("execution_conflict_requires_reconciliation")
+        lower = cum_qty - qty
+        for other in self.db.execute("SELECT cum_qty, qty FROM executions WHERE client_id=?", (old.client_id,)):
+            if lower < D(other["cum_qty"]) and D(other["cum_qty"]) - D(other["qty"]) < cum_qty:
+                raise SafetyError("execution_overlap_requires_reconciliation")
+        if (old.side == "buy" and price > old.limit_price) or (old.side == "sell" and price < old.limit_price):
+            raise SafetyError("incremental_fill_violates_limit")
+        self.db.execute("INSERT INTO executions VALUES (?,?,?,?,?,?)",
+                        (old.client_id, key, _canonical(qty), _canonical(price), execution_id, at))
+        self._event("execution_recorded", old.client_id, execution_id=execution_id, cum_qty=cum_qty,
+                    qty=qty, price=price, at=at)
+        return True
+
+    def _executions_notional(self, client_id, low, high):
+        """The exact notional of the recorded executions that tile (low, high], or None
+        when they do not (an execution still missing or out of order)."""
+        rows = sorted((D(r["cum_qty"]), D(r["qty"]), D(r["price"])) for r in self.db.execute(
+            "SELECT cum_qty, qty, price FROM executions WHERE client_id=?", (client_id,)))
+        total, previous = ZERO, low
+        for cum, qty, price in rows:
+            if cum <= low or cum > high:
+                continue
+            if cum - qty != previous:
+                return None
+            total, previous = total + qty * price, cum
+        return total if previous == high else None
+
+    def record_order(self, client_id, broker_id, status, cumulative_qty, average_price, *, timestamp=None,
+                     execution=None):
+        """Apply one broker observation of an owned order. ``execution`` (see
+        execution_from_observation) is the single execution a stream fill carries; it is
+        recorded durably and, when the recorded executions tile the cumulative advance,
+        the advance is booked at their exact prices, each checked against the limit.
+        Otherwise (a REST read ahead of the stream, a missing or reordered execution) the
+        advance is booked from the cumulative averages, whose limit check allows Alpaca's
+        6-decimal average rounding."""
         if (type(broker_id) is not str or not broker_id or len(broker_id) > 128
                 or type(status) is not str or status not in RANK or status in ("reserved", "not_sent", "broker_refused")):
             raise SafetyError("invalid_broker_order_identity_or_status")
         filled = decimal(cumulative_qty, zero=True)
         average = decimal(average_price) if filled else None
         at = instant(timestamp) if timestamp is not None else None
+        if execution is not None:
+            if (not isinstance(execution, dict) or type(execution.get("execution_id")) is not str
+                    or not EXECUTION_ID.fullmatch(execution["execution_id"])):
+                raise SafetyError("invalid_execution_identity")
+            execution_qty, execution_price = decimal(execution.get("qty")), decimal(execution.get("price"))
+            if execution_qty > filled:
+                raise SafetyError("execution_exceeds_cumulative_quantity")
         with self._transaction():
             row = self.db.execute("SELECT * FROM intents WHERE client_id=?", (client_id,)).fetchone()
             if row is None:
@@ -912,6 +1027,9 @@ class Ledger:
                 raise SafetyError("broker_order_identity_changed")
             if filled > old.qty or (status == "filled" and filled != old.qty):
                 raise SafetyError("broker_filled_quantity_invalid")
+            if execution is not None:
+                # Recorded even when a REST read already advanced the cumulative quantity.
+                self._record_execution(old, filled, execution["execution_id"], execution_qty, execution_price, at)
             if filled < old.filled_qty:
                 return False  # Delayed cumulative snapshot, never subtract fills.
             if filled == old.filled_qty and old.average_price != average:
@@ -925,14 +1043,19 @@ class Ledger:
             if filled == old.filled_qty and status == old.status and old.broker_id == broker_id:
                 return False
             delta = filled - old.filled_qty
-            old_notional = old.filled_qty * (old.average_price or ZERO)
-            delta_notional = filled * (average or ZERO) - old_notional
+            delta_notional, booking = ZERO, None
             if delta:
-                incremental_price = delta_notional / delta
-                if (incremental_price <= 0 or
-                        (old.side == "buy" and incremental_price > old.limit_price) or
-                        (old.side == "sell" and incremental_price < old.limit_price)):
-                    raise SafetyError("incremental_fill_violates_limit")
+                exact = self._executions_notional(client_id, old.filled_qty, filled)
+                if exact is not None:
+                    delta_notional, booking = exact, "executions"
+                else:
+                    delta_notional, booking = (filled * (average or ZERO)
+                                               - old.filled_qty * (old.average_price or ZERO)), "cumulative_average"
+                    tolerance = AVERAGE_ROUNDING * (filled + old.filled_qty)
+                    if (delta_notional <= 0 or
+                            (old.side == "buy" and delta_notional > delta * old.limit_price + tolerance) or
+                            (old.side == "sell" and delta_notional < delta * old.limit_price - tolerance)):
+                        raise SafetyError("incremental_fill_violates_limit")
                 position = self._positions().get(old.symbol, Position(old.symbol, ZERO, ZERO))
                 realized = ZERO
                 if old.side == "buy":
@@ -957,7 +1080,8 @@ class Ledger:
             self.db.execute("UPDATE intents SET broker_id=?,status=?,filled_qty=?,average_price=?,updated_at=? WHERE client_id=?",
                             (broker_id, effective_status, str(filled), str(average) if average else None, at, client_id))
             self._event("order_observed", client_id, broker_id=broker_id, status=status, filled_qty=filled,
-                        average_price=average, at=at, delta_qty=delta, delta_notional=delta_notional)
+                        average_price=average, at=at, delta_qty=delta, delta_notional=delta_notional,
+                        booking=booking)
             self._refresh_risk(at)
             return True
 

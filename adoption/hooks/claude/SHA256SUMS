@@ -1,1 +1,2 @@
-97bc42148f372f07c843f88c5a0636cef20b599faf29c1ed100ed05f8a1249a0  effort-default-guard.py
+df3248659c191d8800dfd64a8c7d415fc13652cebee08c9437bf579862c2e561  effort-default-guard.py
+653a990deef23cfcda736a35079df079e420c34e5efd669dcd325be85f82e460  ../../../scripts/hooks/secret_path_guard.py

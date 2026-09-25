@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "id": "us-equities-gate-ladder-20260922",
-  "checked_at": "2026-09-23",
+  "checked_at": "2026-09-24",
   "scope": "The sim -> paper -> live gate ladder for the selected destination (NautilusTrader 2.0.0rc5 with IBKR primary and a separate Alpaca paper adapter; LEAN 985ef30 frozen oracle). Each gate names the receipt that establishes it and the machine-checkable condition that flips it. scripts/trading_gates.py --check verifies the ladder arithmetically; a status changes only by a dated commit after the checker lists the gate as a flip candidate; an exists condition proves only that a non-empty file is present, so gates using it carry a presence-only limitation in their note. Rung readiness = every required gate of that rung and every earlier rung established. Nothing here authorizes live configuration, paid hosting or orders.",
   "rungs": [
     "sim",
@@ -80,7 +80,7 @@
         "pointer": "/status",
         "equals": "pass"
       },
-      "note": "promotion_gate.py (pandera 0.33.1 in its own venv) passes the good fixture and fails closed on the bad and null-price fixtures (blueprints/us-equities/data/fixtures/*-gate-result.json); runner.validate_preflight refuses paper without a matching passing result. No real snapshot ingest exists yet, so a production paper run is not yet gated end-to-end."
+      "note": "promotion_gate.py (pandera 0.33.1 in its own venv) passes the good fixture and fails closed on the bad and null-price fixtures (blueprints/us-equities/data/fixtures/*-gate-result.json); runner.validate_preflight refuses paper without a matching passing result. Real ingest, recorded 2026-09-24 (status, evidence_class and receipt_path unchanged; the gate was already established and scripts/trading_gates.py lists no flip candidate): blueprints/us-equities/data/ingest_snapshot.py (#84) is a bounded read-only Alpaca daily-bar ingest for the adaptive-paper universe. Trial adaptive-20260923g (blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/, run by scheduled_trial.sh from a read-only archive of main 843dc8f) retained its ingest-receipt.json (24 symbols, 20 sessions 2026-08-25 to 2026-09-22, 480 rows, SIP raw 1Day, no coverage problems, snapshot_sha256 75e67c5dc345d67c...) and gate-result.json (status pass, 12 of 12 checks pass, row_count 480, input_sha256 equal to that snapshot hash), and the paper command given that result and snapshot passed (scheduled-trial.log). This is one real ingest gating one paper trial, not the full production ingest blueprints/us-equities/data/README.md describes (entitlements, corporate actions, symbol history, as-of universe); the snapshot CSV itself was not retained, and the gate that ran was 843dc8f's promotion_gate.py, whose bytes differ from the current file. Until 2026-09-23 no real snapshot ingest had gated a paper run."
     },
     {
       "id": "rc5-supply-chain-scan",
@@ -248,67 +248,247 @@
       "flip_condition": {
         "type": "exists"
       },
-      "note": "Decision recorded and enforced in runner.credentials() (0600, owner uid, outside any worktree) with unit tests (unit pr4-gate-credentials); market_research.py keeps its own credentials() unguarded (documented gap); openbao stays conditional. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit."
+      "note": "Decision recorded and enforced in runner.credentials() (0600, owner uid, outside any worktree) with unit tests (unit pr4-gate-credentials). 2026-09-24: the market_research.py gap is closed -- both loaders now call the shared credential_guard.open_verified(), so the rules cannot drift between them; runner.credentials() keeps resolving a symlink to its target (follow_symlinks=True) while market_research.credentials() keeps refusing a symlink outright (follow_symlinks=False, its prior O_NOFOLLOW behavior), and runner's asserted error-string prefix is unchanged. 2026-09-24 fix round 2 (independent Codex security review, 'not ready'): from '/', every ancestor directory opens as O_DIRECTORY|O_NOFOLLOW via dir_fd chaining (never a resolved-pathname re-open) and the final component opens O_RDONLY|O_NOFOLLOW|O_NONBLOCK|O_NOCTTY the same way, so a symlink substituted at any position fails closed with ELOOP/ENOTDIR; the final file must have exactly one hard link. 2026-09-24 fix round 3 (same Codex review returned 'not ready' again, plus an independent Claude real-mutation/attack run: 260 attack cases and a live RENAME_EXCHANGE race, all refused): every ancestor from '/' down through the immediate parent -- not only the immediate parent -- must be owned by root or the caller, and group/other-writable only if sticky (OpenSSH safe_path/secure_filename), closing a rename-an-already-checked-ancestor attack where only the immediate parent was checked; a symlink-loop RuntimeError (Python 3.12's Path.resolve(strict=True), not OSError) and an embedded-NUL ValueError are now caught, and every raised error is built outside the except block that caught the original failure so __context__ cannot carry it either; a '..' path component is refused outright for market_research's non-follow mode instead of lexically collapsed (which could skip an intermediate symlink); the verified descriptor is closed if fdopen() itself fails; GUARD_DENIED's single message is replaced with a small set of fixed credential_file_permissions:<code> reason codes (owner, mode, hardlink, worktree, ancestor, parent_owner, parent_mode, symlink, not_regular, missing, encoding, size); runner.credentials()'s read is now bounded the same way market_research's is (cap+1 bytes from the fd, not the whole file or an earlier fstat size). This is NOT a guarantee against a worktree configured purely through GIT_DIR/GIT_WORK_TREE or core.worktree with no .git entry in the file's own ancestor chain, nor against a bind-mounted repository subdirectory outside all visible .git ancestors in this process's own mount namespace (both undetectable by a file-local check), nor against a same-shaped replacement file an equally-privileged actor swaps in at the exact instant of the real open() (the fd read is whatever passed its own checks at that instant, by construction, not a TOCTOU gap -- runner's symlink-follow mode documents this same acceptance for a symlink whose target changes before the traversal). Covered by tests.test_adaptive_paper_runner.CredentialFilePermissions (existing, still passing, plus symlink/FIFO/hardlink/non-ASCII cases, FIFO cases now signal.alarm-deadline-bounded), tests.test_adaptive_paper_runner.SharedCredentialGuardParity, tests.test_adaptive_market_research.MarketResearchCredentialFilePermissions (wrong mode, wrong owner, symlink, inside a Git worktree, missing file, a deadline-bounded FIFO, hard link, a valid file), and tests/test_adaptive_paper_credential_race.py (the real filename -- an earlier note named a nonexistent tests/test_credential_guard_race.py): its HookInjectedRaces/AncestorRenameResistance/NoPathLeakInErrors/DotDotIsRejected/FdOpenFailureCleanup/FdLeakOnRefusal/RootMarkerIsChecked/ForeignFileOwnerAloneIsRejected/FstatNotPathnameStat/BoundedReadIsActuallyBounded classes exercise the round-3 findings (hook-injected mid-walk worktree marker; simulated foreign ownership via per-fd fstat faking, not a process-wide os.getuid() patch that would also fail the parent check and mask the result; __context__/__cause__ assertions; real /proc fd-count checks around success and every refusal; and the exact read() size argument each loader uses, not only the outcome, since a static oversized fixture rejects identically either way). Its RealMutationKills class replaces an earlier in-process MUTATION_KILLS meta-test (which asserted a hardcoded string-to-test-name mapping without ever running those tests, per the round-2 Codex review) with a driver (tests/_credential_mutation_driver.py) that copies the real source tree to a private temporary directory, applies one real exact-count textual mutation, and runs the actually-named test(s) against that copy in a subprocess; all twelve currently-declared mutations are killed this way. 2026-09-24 fix round 4 (both reviewers again found no access-rule bypass: 268 attack cases and a live rename-exchange race, about 600k swaps; 31 of 33 real mutations already killed): both loaders now check raw.isascii() on the bytes before ever decoding, so no UnicodeDecodeError (whose .object attribute holds the entire file, secret included) is ever constructed, closing a path where __context__ carried the whole credential file even though the message itself was clean; the mutation driver was corrected -- it counted any non-zero subprocess exit as a kill, so disable_worktree_check reported KILLED on completely unmutated code because the copy had no .git; it now git-inits every copy, runs the named tests on the pristine copy first (must pass), and counts a kill only on a genuine FAIL (never an ERROR, never a bare non-zero exit) -- all fourteen mutations (the original twelve plus two new ones below) are killed under the corrected rule, and MutationDriverSelfTests proves the driver itself does not report a false kill; the final os.fdopen(file_fd, 'rb') call was replaced with io.FileIO(file_fd, 'rb', closefd=True) built first and only that object (never the bare fd) closed if wrapping it later fails, avoiding a double-close/EBADF if FileIO's own constructor is what fails; two more mutations were added and killed (skipping root's own ownership/mode check; removing runner's size check, which previously silently truncated an oversized file at the cap and could pass its early lines through as an apparently-valid, truncated credential); the immediate parent is tightened back from round 3's relaxation -- owned by exactly the caller, never root, and never group/other-writable, with no sticky exception, so a bare /tmp/file or /file no longer loads, while a private directory under /tmp still does; a symlinked *directory* component (as opposed to the final file) is now reported as :symlink, not the generic :missing, via one extra failure-path-only lstat (Linux reports ENOTDIR, not ELOOP, for O_DIRECTORY|O_NOFOLLOW against a symlink); market_research's oversized-file rejection now raises the same credential_file_permissions:size code runner uses, closing the last reason-code inconsistency; and the decision doc no longer claims an atomic location guarantee for the worktree marker check -- it is a snapshot at each ancestor's own inspection time, and another uid permitted to write into a sticky ancestor (e.g. /tmp) can still create a new .git entry there afterward. 2026-09-24 fix round 5 (both reviewers again found no access-rule bypass: 288 attack cases and a live rename-exchange race, about 670k swaps; all 33 earlier mutations plus round 4's 14 killed, driver produced no false kills in 21 scenarios) -- the final small items: _is_symlink_component()'s failure-path lstat caught only OSError, so a NUL byte or a surrogate in an ancestor directory component escaped as a bare ValueError/UnicodeEncodeError instead of the sanitized code, now caught alongside OSError; the io.FileIO double-close fix's own comment was wrong (io.FileIO(fd, closefd=True) does NOT close fd itself on a failed construction, verified against CPython, so that specific failure was actually leaking the fd, not risking a double-close) and is now closed with a plain os.close(file_fd) only in that one case, with only the already-constructed raw object (never the bare fd) closed afterward; added tests that fail when the stricter immediate-parent rule (round 4) or the double-close fix is reverted, which previously passed the suite either way, plus a direct test that a symlinked directory component reports :symlink not :missing; and the mutation driver's skipped result, which fell through to survived, is now reported as inconclusive and fails the gate the same as a genuine survival. openbao stays conditional. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit."
     },
     {
       "id": "leverage-ladder-1x",
       "rung": "live",
       "layer": "portfolio-risk",
-      "title": "Paper leverage ladder rung 1x completes with zero needs_attention",
+      "title": "Paper leverage ladder rung 1x completes with zero needs_attention and achieved gross leverage above 0.5x",
       "status": "not_established",
       "owner": "peer:sota-workflow-resolution",
       "evidence_class": "none",
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/ladder/1x/receipt.json",
       "flip_condition": {
-        "type": "equals",
-        "pointer": "/needs_attention",
-        "equals": 0
+        "type": "all_of",
+        "conditions": [
+          {
+            "type": "equals",
+            "pointer": "/schema_version",
+            "equals": 1
+          },
+          {
+            "type": "equals",
+            "pointer": "/kind",
+            "equals": "leverage_ladder_rung_receipt"
+          },
+          {
+            "type": "equals",
+            "pointer": "/rung",
+            "equals": "1x"
+          },
+          {
+            "type": "equals",
+            "pointer": "/needs_attention",
+            "equals": 0
+          },
+          {
+            "type": "equals",
+            "pointer": "/source/certified_run_status",
+            "equals": "passed"
+          },
+          {
+            "type": "source_matches",
+            "path_pointer": "/source/paper_output_path",
+            "sha256_pointer": "/source/paper_output_sha256",
+            "pairs": [
+              [
+                "/leverage",
+                "/leverage"
+              ],
+              [
+                "/source/certified_run_status",
+                "/status"
+              ]
+            ]
+          },
+          {
+            "type": "equals",
+            "pointer": "/leverage/config_max_leverage",
+            "equals": "1"
+          },
+          {
+            "type": "equals",
+            "pointer": "/leverage/next_lower_rung_ceiling",
+            "equals": "0.5"
+          },
+          {
+            "type": "greater_than",
+            "pointer": "/leverage/peak_achieved_leverage",
+            "than": "0.5"
+          },
+          {
+            "type": "greater_than",
+            "pointer": "/leverage/seconds_above_next_lower_rung_ceiling",
+            "than": 0
+          }
+        ]
       },
-      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-1x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. No paper rung has run; the 1x adaptive trial comes first. leverage-schedule-v1-20260922 (agent-lab docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md): 1x -> 2x -> 4x, each with its own receipt and zero needs_attention before the next rung; paper stays at 200 requests/minute."
+      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-1x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. Required rung receipt schema, preregistered 2026-09-24 (audit gap #5; no ladder receipt exists yet): {\"schema_version\": 1, \"kind\": \"leverage_ladder_rung_receipt\", \"rung\": \"1x\", \"needs_attention\": <int count of runs that ended needs_attention>, \"source\": {\"paper_output_path\": <repository-relative path of the certified run's committed paper-output.json>, \"paper_output_sha256\": <that file's sha256>, \"certified_run_status\": <that file's top-level \"status\">}, \"leverage\": <that file's \"leverage\" block (runner.run_native's outcome), copied verbatim>}. flip_condition is an all_of: /schema_version == 1, /kind == \"leverage_ladder_rung_receipt\", /rung == \"1x\", /needs_attention == 0, /source/certified_run_status == \"passed\", a source_matches binding (scripts/trading_gates.py: the file at /source/paper_output_path must exist in the tree and hash to /source/paper_output_sha256, and its /leverage and /status must equal the receipt's /leverage and /source/certified_run_status exactly, so the leverage block and the certified run's passed status come from the one hashed run), /leverage/config_max_leverage == \"1\", /leverage/next_lower_rung_ceiling == \"0.5\" (leverage.next_lower_rung_ceiling for this rung -- the documented 0.5x minimum exposure, since 1x has no lower rung), /leverage/peak_achieved_leverage > 0.5 and /leverage/seconds_above_next_lower_rung_ceiling > 0 (scripts/trading_gates.py greater_than accepts the runner's decimal strings and JSON numbers). A trial that never exceeds 0.5x gross-to-equity leverage therefore cannot flip this gate (tests/test_trading_gates.py LeverageLadderFlipConditionTests). Limits: needs_attention counts every run at this rung and is not bound to the hashed file, so it is checked against the rung's trial directories at the manual qualification; seconds_above is a per-tick approximation (runner._leverage_achievement_step attributes the whole tick gap), and no minimum duration above 0.5x is set -- any positive time satisfies the condition, so how long the rung was used is read from the receipt and judged at the manual qualification before the dated flip commit. First paper attempt 2026-09-24 (trial ladder-1x-20260924a, blueprints/us-equities/adaptive-paper/trials/ladder-1x-20260924a-needs-attention/): needs_attention after 190 s of 300 on a false-positive fill-precision refusal (order_cumulative_fill_precision_requires_reconciliation, the defect class of PR #205; the broker's fill activities show on-grid executions), flat and reconciled, peak achieved leverage 0.151 with 0 s above 0.5x; a retained failed attempt, not a flip receipt. leverage-schedule-v1-20260922 (agent-lab docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md): 1x -> 2x -> 4x, each with its own receipt and zero needs_attention before the next rung; paper stays at 200 requests/minute."
     },
     {
       "id": "leverage-ladder-2x",
       "rung": "live",
       "layer": "portfolio-risk",
-      "title": "Paper leverage ladder rung 2x completes with zero needs_attention",
+      "title": "Paper leverage ladder rung 2x completes with zero needs_attention and achieved gross leverage above 1x",
       "status": "not_established",
       "owner": "peer:sota-workflow-resolution",
       "evidence_class": "none",
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/ladder/2x/receipt.json",
       "flip_condition": {
-        "type": "equals",
-        "pointer": "/needs_attention",
-        "equals": 0
+        "type": "all_of",
+        "conditions": [
+          {
+            "type": "equals",
+            "pointer": "/schema_version",
+            "equals": 1
+          },
+          {
+            "type": "equals",
+            "pointer": "/kind",
+            "equals": "leverage_ladder_rung_receipt"
+          },
+          {
+            "type": "equals",
+            "pointer": "/rung",
+            "equals": "2x"
+          },
+          {
+            "type": "equals",
+            "pointer": "/needs_attention",
+            "equals": 0
+          },
+          {
+            "type": "equals",
+            "pointer": "/source/certified_run_status",
+            "equals": "passed"
+          },
+          {
+            "type": "source_matches",
+            "path_pointer": "/source/paper_output_path",
+            "sha256_pointer": "/source/paper_output_sha256",
+            "pairs": [
+              [
+                "/leverage",
+                "/leverage"
+              ],
+              [
+                "/source/certified_run_status",
+                "/status"
+              ]
+            ]
+          },
+          {
+            "type": "equals",
+            "pointer": "/leverage/config_max_leverage",
+            "equals": "2"
+          },
+          {
+            "type": "equals",
+            "pointer": "/leverage/next_lower_rung_ceiling",
+            "equals": "1"
+          },
+          {
+            "type": "greater_than",
+            "pointer": "/leverage/peak_achieved_leverage",
+            "than": "1"
+          },
+          {
+            "type": "greater_than",
+            "pointer": "/leverage/seconds_above_next_lower_rung_ceiling",
+            "than": 0
+          }
+        ]
       },
-      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-2x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. No paper rung has run; the 1x adaptive trial comes first. Requires leverage-ladder-1x established first."
+      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-2x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. Required rung receipt schema, preregistered 2026-09-24 (audit gap #5; no ladder receipt exists yet): {\"schema_version\": 1, \"kind\": \"leverage_ladder_rung_receipt\", \"rung\": \"2x\", \"needs_attention\": <int count of runs that ended needs_attention>, \"source\": {\"paper_output_path\": <repository-relative path of the certified run's committed paper-output.json>, \"paper_output_sha256\": <that file's sha256>, \"certified_run_status\": <that file's top-level \"status\">}, \"leverage\": <that file's \"leverage\" block (runner.run_native's outcome), copied verbatim>}. flip_condition is an all_of: /schema_version == 1, /kind == \"leverage_ladder_rung_receipt\", /rung == \"2x\", /needs_attention == 0, /source/certified_run_status == \"passed\", a source_matches binding (scripts/trading_gates.py: the file at /source/paper_output_path must exist in the tree and hash to /source/paper_output_sha256, and its /leverage and /status must equal the receipt's /leverage and /source/certified_run_status exactly, so the leverage block and the certified run's passed status come from the one hashed run), /leverage/config_max_leverage == \"2\", /leverage/next_lower_rung_ceiling == \"1\" (leverage.next_lower_rung_ceiling for this rung -- the 1x rung's cap), /leverage/peak_achieved_leverage > 1 and /leverage/seconds_above_next_lower_rung_ceiling > 0 (scripts/trading_gates.py greater_than accepts the runner's decimal strings and JSON numbers). A trial that never exceeds 1x gross-to-equity leverage therefore cannot flip this gate (tests/test_trading_gates.py LeverageLadderFlipConditionTests). Limits: needs_attention counts every run at this rung and is not bound to the hashed file, so it is checked against the rung's trial directories at the manual qualification; seconds_above is a per-tick approximation (runner._leverage_achievement_step attributes the whole tick gap), and no minimum duration above 1x is set -- any positive time satisfies the condition, so how long the rung was used is read from the receipt and judged at the manual qualification before the dated flip commit. No paper rung has run; the 1x adaptive trial comes first. Requires leverage-ladder-1x established first."
     },
     {
       "id": "leverage-ladder-4x",
       "rung": "live",
       "layer": "portfolio-risk",
-      "title": "Paper leverage ladder rung 4x (intraday cap; 2x overnight) completes with zero needs_attention",
+      "title": "Paper leverage ladder rung 4x (intraday cap; 2x overnight) completes with zero needs_attention and achieved gross leverage above 2x",
       "status": "not_established",
       "owner": "peer:sota-workflow-resolution",
       "evidence_class": "none",
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/ladder/4x/receipt.json",
       "flip_condition": {
-        "type": "equals",
-        "pointer": "/needs_attention",
-        "equals": 0
+        "type": "all_of",
+        "conditions": [
+          {
+            "type": "equals",
+            "pointer": "/schema_version",
+            "equals": 1
+          },
+          {
+            "type": "equals",
+            "pointer": "/kind",
+            "equals": "leverage_ladder_rung_receipt"
+          },
+          {
+            "type": "equals",
+            "pointer": "/rung",
+            "equals": "4x"
+          },
+          {
+            "type": "equals",
+            "pointer": "/needs_attention",
+            "equals": 0
+          },
+          {
+            "type": "equals",
+            "pointer": "/source/certified_run_status",
+            "equals": "passed"
+          },
+          {
+            "type": "source_matches",
+            "path_pointer": "/source/paper_output_path",
+            "sha256_pointer": "/source/paper_output_sha256",
+            "pairs": [
+              [
+                "/leverage",
+                "/leverage"
+              ],
+              [
+                "/source/certified_run_status",
+                "/status"
+              ]
+            ]
+          },
+          {
+            "type": "equals",
+            "pointer": "/leverage/config_max_leverage",
+            "equals": "4"
+          },
+          {
+            "type": "equals",
+            "pointer": "/leverage/next_lower_rung_ceiling",
+            "equals": "2"
+          },
+          {
+            "type": "greater_than",
+            "pointer": "/leverage/peak_achieved_leverage",
+            "than": "2"
+          },
+          {
+            "type": "greater_than",
+            "pointer": "/leverage/seconds_above_next_lower_rung_ceiling",
+            "than": 0
+          }
+        ]
       },
-      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-4x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. No paper rung has run; the 1x adaptive trial comes first. Requires leverage-ladder-2x established first; kill switch => 0 leverage."
+      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-4x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. Required rung receipt schema, preregistered 2026-09-24 (audit gap #5; no ladder receipt exists yet): {\"schema_version\": 1, \"kind\": \"leverage_ladder_rung_receipt\", \"rung\": \"4x\", \"needs_attention\": <int count of runs that ended needs_attention>, \"source\": {\"paper_output_path\": <repository-relative path of the certified run's committed paper-output.json>, \"paper_output_sha256\": <that file's sha256>, \"certified_run_status\": <that file's top-level \"status\">}, \"leverage\": <that file's \"leverage\" block (runner.run_native's outcome), copied verbatim>}. flip_condition is an all_of: /schema_version == 1, /kind == \"leverage_ladder_rung_receipt\", /rung == \"4x\", /needs_attention == 0, /source/certified_run_status == \"passed\", a source_matches binding (scripts/trading_gates.py: the file at /source/paper_output_path must exist in the tree and hash to /source/paper_output_sha256, and its /leverage and /status must equal the receipt's /leverage and /source/certified_run_status exactly, so the leverage block and the certified run's passed status come from the one hashed run), /leverage/config_max_leverage == \"4\", /leverage/next_lower_rung_ceiling == \"2\" (leverage.next_lower_rung_ceiling for this rung -- the 2x rung's cap), /leverage/peak_achieved_leverage > 2 and /leverage/seconds_above_next_lower_rung_ceiling > 0 (scripts/trading_gates.py greater_than accepts the runner's decimal strings and JSON numbers). A trial that never exceeds 2x gross-to-equity leverage therefore cannot flip this gate (tests/test_trading_gates.py LeverageLadderFlipConditionTests). Limits: needs_attention counts every run at this rung and is not bound to the hashed file, so it is checked against the rung's trial directories at the manual qualification; seconds_above is a per-tick approximation (runner._leverage_achievement_step attributes the whole tick gap), and no minimum duration above 2x is set -- any positive time satisfies the condition, so how long the rung was used is read from the receipt and judged at the manual qualification before the dated flip commit. No paper rung has run; the 1x adaptive trial comes first. Requires leverage-ladder-2x established first; kill switch => 0 leverage."
     },
     {
       "id": "native-fault-behaviour",
       "rung": "live",
       "layer": "execution-broker",
       "title": "Broker-state failure handling exercised against native (non-synthetic) faults",
-      "status": "not_established",
+      "status": "established",
       "owner": "peer:sota-workflow-resolution",
-      "evidence_class": "none",
+      "evidence_class": "native_proven",
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
       "flip_condition": {
@@ -316,7 +496,7 @@
         "pointer": "/status",
         "equals": "native_faults_passed"
       },
-      "note": "Partial evidence, 2026-09-23 (status unchanged): blueprints/us-equities/adaptive-paper/native-faults/receipt.json, one live Alpaca paper run of the minimal harness at 14:20:24Z (status native_faults_incomplete). C01 accept resting buy and C02 cancel resting passed with native_paper evidence (submit 200 pending_new; cancel 204 canceled); C05 cancel again short-circuits in the engine without a DELETE (engine_short_circuit); C04 definitive rejection is unobserved because the Ledger refuses the sub-penny price before send (invalid_price_increment). Cleanup proved flat, 1 of 4 POSTs used. Reaching native_faults_passed needs an engine path that sends the C05 DELETE to the broker, and for C04 either an engine or plan change so a broker 422 on an invalid price counts as a definitive refusal (the Ledger accepts only 401, 403 and 404) or a fault Alpaca answers with 401, 403 or 404, besides sending the C04 order at all. The receipt is bound to the harness as run (harness_sha256 742fb666...); harness.py was hardened afterwards after review (cleanup exceptions still mark the run, an earlier IN_FLIGHT or CLEANUP_REQUIRED marker refuses a new start, the write-ahead marker is fsynced, a failed transport stop fails the run), so the next run binds a new hash. runtime-target.json next_acceptance broker-state-failures: bounded_alpaca_synthetic_cases_passed_native_faults_pending. Required receipt schema (preregistered before the first receipt, the 2026-09-23 native_faults_incomplete one, following the next_acceptance status-string convention already used in catalogs/us-equities/runtime-target.json): {\"schema_version\": 1, \"kind\": \"native_fault_behaviour_receipt\", \"status\": \"native_faults_passed\", \"broker\": \"alpaca\"}. The checker only verifies /status == \"native_faults_passed\"; that native (non-synthetic) faults were actually exercised, distinct from the 27 bounded synthetic cases already passed, is qualified manually before the dated commit that flips this gate."
+      "note": "Binding amendment, 2026-09-24 (status unchanged): the current receipt's engine_sources_sha256 (the 18:58Z run: runner.py 8bb8d577..., safety.py ad520fc4..., transport.py 34e6c4e6..., order-contract/order_contract.py 57405f75...) are the engine sources of main at 3b7ae710, before the 2026-09-24 adaptive-paper engine release (commit 0b492619 and its review follow-up 1cf633e4), which, once merged with main, changed runner.py, safety.py and transport.py, including the REST observation path, Ledger.record_order and the GuardedSession read allowlist the receipt exercised; they no longer equal adaptive-paper/source-hashes.json (the harness, plan and order_contract.py are unchanged by the release). This gate therefore qualifies that earlier engine: citing it for the released engine needs the native-faults plan (C01, C02, C05, C04) re-run on it, with a receipt bound to its source hashes. Established 2026-09-24 by this dated flip commit after manual qualification: the checker listed the gate as a flip candidate and the manual qualification that native (non-synthetic) faults were actually exercised rests on three records. (1) The receipt blueprints/us-equities/adaptive-paper/native-faults/receipt.json (status native_faults_passed, one live Alpaca paper run at 14:39:05Z bound to harness 3f01fb31..., plan f276b26c... and the engine sources in adaptive-paper/source-hashes.json): C01 submit 200, C02 cancel 204, C05 repeat DELETE sent and answered 204, C04 sub-penny submit answered 422 with Alpaca's documented body then client-id lookup 404, cleanup flat. Every case is native_paper in the receipt; the ladder's evidence_class vocabulary (scripts/trading_gates.py) has no native_paper value, so the gate records native_proven like the other paper-run gates (alpaca-paper-smoke, adaptive-paper-broker-trial). (2) The independent observation blueprints/us-equities/adaptive-paper/native-faults/evidence/independent-observation-20260924.json, made by the workflow coordinator at 15:01:47Z with a retained alpaca-py 0.44.0 script (observe-native-faults-20260924.py, sha256 6f4b1c19...; stdout observe-native-faults-20260924.stdout.json, sha256 420d762c...; stderr empty; exit 0), not the harness or the engine transport: for prefix nf-20260924t143905-29d7ec- one broker order (c01, canceled, filled 0), the c04 client-id lookup 404 (no order exists), 0 open orders and 0 positions, matching the receipt's counts. It uses the same broker and account, so it is independent of the harness and engine code, not of the broker. (3) The review: the Codex GitHub review of PR #169 at 8051464, the commit the run used, completed 2026-09-24T07:36:44Z with no review comments (its +1 reaction marks a review without findings). Limits that stay open: the plan exercised four cases (C01, C02, C05, C04) and the only native fault among them is the definitive-rejection class (one sub-penny submit answered 422); ambiguous or in-flight submit faults (timeouts, 429, 5xx, partial fills, restart during a submit) were not exercised natively and remain covered only by the 27 bounded synthetic cases and offline tests, so this status qualifies definitive-rejection and repeat-cancel behaviour only; C05's DELETE was answered 204, so the engine's handling of a 422 cancel refusal is offline-tested only; the C04 422 is one paper-endpoint observation from one host and account, not live-endpoint evidence and not a general rule that 422 is definitive; nothing here covers IBKR or authorizes live orders. Earlier history: Native receipt passed, 2026-09-24 (status unchanged; flip candidate awaiting manual qualification): blueprints/us-equities/adaptive-paper/native-faults/receipt.json is now one live Alpaca paper run at 14:39:05Z, from the WSL2 workstation against a paper account dedicated to that PC, bound to this tree's harness (3f01fb31...), plan (f276b26c...) and engine sources runner.py, safety.py and transport.py (equal to adaptive-paper/source-hashes.json), with status native_faults_passed. C01 submit 200 pending_new; C02 cancel 204 canceled; C05 DELETE sent and answered 204 plus read 200, native_paper, no freeze, ledger unchanged; C04 submit 422 carrying Alpaca's documented sub-penny body for limit 306.3601, then client-id lookup 404, ledger broker_refused {http_status 422, refusal sub_penny_minimum_price_variance}, no position or cash effect; 2 of 4 POSTs, cleanup flat (0 open orders, 0 positions, cash delta 0.00). Raw stdout private, sha256 1481924e43f2867e5e62338ab60bb5b60cbe9ff9df3f54c36f8fa348f082ecac. scripts/trading_gates.py lists this gate as a flip candidate. The status stays not_established because the ladder changes a status 'only by a dated commit after the checker lists the gate as a flip candidate' and this gate requires that native faults were actually exercised to be 'qualified manually before the dated commit that flips this gate'; docs/acceptance-evidence-policy.md does not accept a wrapper's own passed field as that confirmation, so the flip awaits an independent observation by a separate method (not the harness or engine transport) of prefix nf-20260924t143905-29d7ec-: C01 canceled with zero filled, no broker order for the C04 client id, zero open orders and positions. The C04 422 is one paper-endpoint observation, not live-endpoint evidence. The 2026-09-23 incomplete run is retained byte-identical as blueprints/us-equities/adaptive-paper/native-faults/receipt-20260923.json. Earlier history: Partial evidence, 2026-09-23 (status unchanged): blueprints/us-equities/adaptive-paper/native-faults/receipt.json (now retained as receipt-20260923.json), one live Alpaca paper run of the minimal harness at 14:20:24Z (status native_faults_incomplete). C01 accept resting buy and C02 cancel resting passed with native_paper evidence (submit 200 pending_new; cancel 204 canceled); C05 cancel again short-circuits in the engine without a DELETE (engine_short_circuit); C04 definitive rejection is unobserved because the Ledger refuses the sub-penny price before send (invalid_price_increment). Cleanup proved flat, 1 of 4 POSTs used. Reaching native_faults_passed needs an engine path that sends the C05 DELETE to the broker, and for C04 either an engine or plan change so a broker 422 on an invalid price counts as a definitive refusal (the Ledger accepts only 401, 403 and 404) or a fault Alpaca answers with 401, 403 or 404, besides sending the C04 order at all. Offline engine change, 2026-09-24 (status unchanged, no paper run, offline unit tests only): the transport now sends the C05 DELETE and treats Alpaca's 204/404/422 answer as data, and C04 takes the reclassification allowed above, counting as definitive only a 422 carrying Alpaca's documented sub-penny body (code 42210000, message 'sub-penny increment does not fulfill minimum pricing criteria'; the HTTP 422 is inferred and must be confirmed natively) for a price that violates the increment, with the harness FaultLedger exempting only its C04 client id from the pre-send check; blueprints/us-equities/adaptive-paper/native-faults/README.md states what the next native run must show. The receipt is bound to the harness as run (harness_sha256 742fb666...); harness.py was hardened afterwards after review (cleanup exceptions still mark the run, an earlier IN_FLIGHT or CLEANUP_REQUIRED marker refuses a new start, the write-ahead marker is fsynced, a failed transport stop fails the run), so the next run binds a new hash. runtime-target.json next_acceptance broker-state-failures (now bounded_alpaca_synthetic_cases_passed_native_fault_receipt_passed_independent_observation_pending). Required receipt schema (preregistered before the first receipt, the 2026-09-23 native_faults_incomplete one, following the next_acceptance status-string convention already used in catalogs/us-equities/runtime-target.json): {\"schema_version\": 1, \"kind\": \"native_fault_behaviour_receipt\", \"status\": \"native_faults_passed\", \"broker\": \"alpaca\"}. The checker only verifies /status == \"native_faults_passed\"; that native (non-synthetic) faults were actually exercised, distinct from the 27 bounded synthetic cases already passed, is qualified manually before the dated commit that flips this gate. Re-verified 2026-09-24 18:58Z on the order-contract engine (#198): receipt.json is now that run (native_faults_passed; it binds the harness, runner.py, safety.py, transport.py and order-contract/order_contract.py of main at 3b7ae710) with its own independent observation (native-faults/evidence/independent-observation-20260924t185811.json); the 14:39Z receipt cited above is retained byte-for-byte as native-faults/receipt-20260924t143905.json."
     },
     {
       "id": "ibkr-local-acceptance",
