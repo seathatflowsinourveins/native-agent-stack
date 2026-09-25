@@ -33,7 +33,7 @@ MANIFEST = REPO_ROOT / "blueprints/us-equities/adaptive-paper/source-hashes.json
 # (kept in sync deliberately: a key this test accepts as a real path must be
 # exactly the same shape gitleaks is told to trust as a content digest, and
 # vice versa).
-_KEY_RE = re.compile(r"^(?:blueprints/us-equities/adaptive-paper|tests)/[A-Za-z0-9_\-./]+\.(?:py|json|sh|txt)$")
+_KEY_RE = re.compile(r"^(?:blueprints/us-equities/adaptive-paper|tests)/(?:[A-Za-z0-9_\-][A-Za-z0-9_\-.]*/)*[A-Za-z0-9_\-][A-Za-z0-9_\-.]*\.(?:py|json|sh|txt)$")
 _HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -96,3 +96,20 @@ class SourceHashesManifestIsHonest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class KeyShapeRejectsDotSegments(unittest.TestCase):
+    """The accepted key shape (shared with .gitleaks.toml) refuses "." and ".." segments."""
+
+    def test_dot_and_dotdot_segments_are_refused(self):
+        for key in ("tests/../scripts/validate.py", "tests/./x.py",
+                    "blueprints/us-equities/adaptive-paper/../x.py", "tests/.hidden.py"):
+            with self.subTest(key=key):
+                self.assertIsNone(_KEY_RE.match(key))
+
+    def test_ordinary_repo_paths_are_accepted(self):
+        for key in ("tests/test_adaptive_paper_runner.py",
+                    "blueprints/us-equities/adaptive-paper/native-faults/harness.py",
+                    "blueprints/us-equities/adaptive-paper/config-leverage-1x.json"):
+            with self.subTest(key=key):
+                self.assertIsNotNone(_KEY_RE.match(key))

@@ -348,6 +348,21 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             self.assertIn(HEX64[::-1], secrets, f"a 'credential.key' value in the reviewed manifest must still be detected: {findings}")
             self.assertIn(HEX64, secrets, f"an 'api_key' value in the reviewed manifest must still be detected: {findings}")
 
+    def test_f2b_dot_segment_path_key_holding_a_digest_is_detected(self):
+        """The dedicated allowlist refuses path segments starting with ".", so a key that only
+        looks like an adaptive-paper/tests path through "." or ".." (and names a credential)
+        is not exempted and its 64-hex value is still detected in the reviewed manifest."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.SOURCE_HASHES_PATH, {
+                "tests/../credential_store.py": HEX64,
+                "blueprints/us-equities/adaptive-paper/./api_key.py": HEX64[::-1],
+            })
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(HEX64, secrets, f"a '..' path key must not be exempted: {findings}")
+            self.assertIn(HEX64[::-1], secrets, f"a '.' path key must not be exempted: {findings}")
+
     def test_f3_non_hex_value_under_a_path_shaped_key_is_detected(self):
         """The allowlist's value alternative is exactly `[0-9a-f]{64}`: a same-length value that is
         not lowercase hex (upper-case letters here) under an otherwise real path key does not match

@@ -3169,8 +3169,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "93f7d5a685e88f8a0b48d458375e10fd5a11ebe96d2113a267171fd6bebfa32c",
-      "bytes": 27136
+      "sha256": "3a51694ef40b0011450b912ab9e6e53ef0b2ea60f2452342a8fe036a23eb3856",
+      "bytes": 27326
     },
     {
       "path": ".gitleaksignore",
@@ -29235,8 +29235,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "169a3f73638d7c674d6ca8444ef8346faaeb750983e98f5c30528b7f9f848346",
-      "bytes": 43494
+      "sha256": "7ff31a6392556dd59b4efabb883aa8cae646c9139584ff6f388a4cb1a4813941",
+      "bytes": 44499
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",

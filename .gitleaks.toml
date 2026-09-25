@@ -234,12 +234,13 @@ regexes = [
 # such as "credential.key" in this same file (that allowlist's key alternative accepts
 # any filename-shaped key, not only a real repo path). This dedicated, rule-scoped
 # allowlist instead requires the ENTIRE key to be a repo path specifically under
-# blueprints/us-equities/adaptive-paper/ or tests/, ending in .py, .json, .sh, or .txt, mapped to
-# exactly 64 lowercase hex -- scripts/validate.py and
-# tests/test_adaptive_paper_source_hashes_manifest.py independently enforce that every
-# entry in this exact file really is that path's own sha256 and that no other keys
-# exist, so a secret can never sit in this manifest without failing CI's validate job
-# regardless of this allowlist. A credential-shaped key (api_key, credential.key, ...)
+# blueprints/us-equities/adaptive-paper/ or tests/ (no path segment may start with ".",
+# so "." and ".." segments are refused), ending in .py, .json, .sh, or .txt, mapped to
+# exactly 64 lowercase hex. tests/test_adaptive_paper_source_hashes_manifest.py (stdlib
+# only, run by CI's validate job) enforces that every entry in this exact file really is
+# that path's own sha256 and that no other key shape exists, so a secret cannot sit in
+# this manifest without failing that test regardless of this allowlist.
+# scripts/validate.py only pins this file's own hash, not each entry. A credential-shaped key (api_key, credential.key, ...)
 # in this same file, a non-hex value, a second secret on the same line, or this same
 # path-keyed shape in any other file, is still detected (tests/test_gitleaks_config.py).
 [[rules.allowlists]]
@@ -248,7 +249,7 @@ condition = "AND"
 paths = ['''^blueprints/us-equities/adaptive-paper/source-hashes\.json$''']
 regexTarget = "line"
 regexes = [
-  '''^\s*"(?:blueprints/us-equities/adaptive-paper|tests)/[A-Za-z0-9_\-./]+\.(?:py|json|sh|txt)":\s*"[0-9a-f]{64}",?\s*$''',
+  '''^\s*"(?:blueprints/us-equities/adaptive-paper|tests)/(?:[A-Za-z0-9_\-][A-Za-z0-9_\-.]*/)*[A-Za-z0-9_\-][A-Za-z0-9_\-.]*\.(?:py|json|sh|txt)":\s*"[0-9a-f]{64}",?\s*$''',
 ]
 
 # Opaque Alpaca pagination cursor retained in one historical-bars receipt. Anchored
