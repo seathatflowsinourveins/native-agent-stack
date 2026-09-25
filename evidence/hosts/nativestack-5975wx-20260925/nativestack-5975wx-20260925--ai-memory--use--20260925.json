@@ -78,6 +78,16 @@
         "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
         "model": "claude-opus-5-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (layer role: a scoped page was written, found by its random token, read back and deleted on a scratch server, then no longer found; controls: a never-written token and the post-delete search return no hits and read-page fails; the 2.3.2 install, the host service running the same wrapper and the pins are backed; bound to the durable-memory winner pin 2.3.2; recovery, embeddings, handoffs and cross-client capture not exercised, as stated) and re-ran all five commands via /bin/sh on this host with AI_MEMORY_SERVER_URL overridden to the scratch server exactly where the receipt does (inline for the command 2 status poll, exported in commands 3 and 4): commands 2-5 byte-identical, command 1 differing only in the host pages_latest (25 against 24, unchanged across the probe), no nsr-probe.md in the host wiki before or after, and ai-memory init succeeding against an unreachable server URL, so the unoverridden init and serve stay local.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:26:42Z",
+      "reviewer": {
+        "identity_sha256": "dc44f572d84ff27a310bfb9e9d3f1da90e1af9abcfe3babc077eab972bec355b",
+        "model": "claude headless reviewer"
+      }
     }
   ]
 }
