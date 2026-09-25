@@ -30,7 +30,7 @@
  "test_command": "uv run --no-project --managed-python --python 3.13.15 --with-requirements blueprints/us-equities/mover-v3/study/runtime-requirements.txt python -m unittest discover -s blueprints/us-equities/mover-v3/study/tests -t blueprints/us-equities/mover-v3/study",
  "run_command": "uv run --no-project --managed-python --python 3.13.15 --with-requirements blueprints/us-equities/mover-v3/study/runtime-requirements.txt python -I -B blueprints/us-equities/mover-v3/study/run.py",
  "resolved_by": "uv 0.12.17 on 2026-09-24 (linux x86_64); the evaluator refuses a run whose Python or any locked package version differs, or whose installed dist-info RECORD differs from record_sha256s (review round 10, L3)",
- "verified": "2026-09-24, review round 14 and its follow-up: uv 0.12.17 with uv-managed CPython 3.13.15 (cpython-3.13.15-linux-x86_64-gnu) and exactly the packages above from runtime-requirements.txt (their RECORD digests equal to record_sha256s), git 2.43.0 and GnuPG 2.4.4, run by test_command: 286 tests, 0 failures, 0 errors, 0 skips",
+ "verified": "2026-09-25, review round 15: uv 0.12.17 with uv-managed CPython 3.13.15 (cpython-3.13.15-linux-x86_64-gnu) and exactly the packages above from runtime-requirements.txt (their RECORD digests equal to record_sha256s, tests/test_runtime.py), git 2.43.0 and GnuPG 2.4.4, run by test_command; the counts are in protocol-core-draft.json run_discipline.study_code.test_record (round 14: 286 tests, 0 failures, 0 errors, 0 skips)",
  "system_tools": {
   "git": "2.43.0 or later (verify-commit --raw, ls-remote)",
   "gpg": "GnuPG 2.4.4 (verifies the pinned merge key, core/guards.py verified_merge; the synthetic suite also generates a throwaway key with it)"
