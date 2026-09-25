@@ -1,0 +1,10 @@
+[Unit]
+Description=Start the news-reversal forward paper runtime at 03:55 America/New_York on weekdays (it exits at 20:05 ET; holidays exit at once)
+
+[Timer]
+OnCalendar=Mon..Fri *-*-* 03:55:00 America/New_York
+AccuracySec=1s
+Unit=news-reversal.service
+
+[Install]
+WantedBy=timers.target

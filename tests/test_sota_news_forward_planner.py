@@ -517,13 +517,14 @@ class ReversalRule(unittest.TestCase):
 
     def test_against_the_label_at_the_touch(self):
         d, i = self.plan(self.ev("FAVORABLE"), self.q())
-        # 45,000 / 99.95 -> 450 shares = 44,977.50; no price buffer: the limit is the bid itself
+        # leg-balanced: min(45,000 section A, 0.10 E / 12 = 7,500) / 99.95 -> 75 shares = 7,496.25; the limit is the bid
         self.assertEqual((d["action"], d["leg"], i["side"], i["limit_price"], i["qty"], i["type"], i["time_in_force"]),
-                         ("enter", "short", "sell", "99.95", "450", "limit", "day"))
-        self.assertEqual((i["client_order_id"], d["est_notional"], d["arm"]), ("nf1r-20260925-rth-ACME-short", "44977.50", "rev"))
+                         ("enter", "short", "sell", "99.95", "75", "limit", "day"))
+        self.assertEqual((i["client_order_id"], d["est_notional"], d["arm"], d["target_notional"]),
+                         ("nf1r-20260925-rth-ACME-short", "7496.25", "rev", "7500.00"))
         self.assertNotIn("extended_hours", i)
         d, i = self.plan(self.ev("UNFAVORABLE"), self.q())
-        self.assertEqual((d["leg"], i["side"], i["limit_price"], i["qty"]), ("long", "buy", "100.05", "449"))
+        self.assertEqual((d["leg"], i["side"], i["limit_price"], i["qty"]), ("long", "buy", "100.05", "74"))
         self.assertEqual((d["quote_bid"], d["quote_ask"], d["quote_mid"]), ("99.95", "100.05", "100.00"))
         for label in ("UNCLEAR", "PARSE_FAIL"):
             d, i = self.plan(self.ev(label), self.q())
@@ -552,17 +553,21 @@ class ReversalRule(unittest.TestCase):
         self.assertEqual(self.plan(self.ev("UNFAVORABLE", ssr=True), self.q())[0]["action"], "enter")  # longs ignore Rule 201
         self.assertEqual(self.plan(self.ev(lane=sig.SMALL), self.q())[0]["action"], "shadow")
 
-    def test_caps_and_net_headroom_as_the_runner_has_them(self):
+    def test_leg_balanced_sizing_fills_each_leg_toward_12_without_the_net_cap_binding(self):
         x = planner.Exposure()
-        self.assertEqual(self.plan(self.ev(symbol="AAA"), self.q(), exposure=x)[0]["action"], "enter")
-        d2, _ = self.plan(self.ev(symbol="BBB"), self.q(), exposure=x)
-        self.assertEqual((d2["action"], d2["net_after"]), ("enter", "-89955.00"))
-        d3, i3 = self.plan(self.ev(symbol="CCC"), self.q(), exposure=x)  # 45 of headroom left: below one share
-        self.assertEqual((d3["reason"], i3), ("net_exposure_cap", None))
-        d4, i4 = self.plan(self.ev("UNFAVORABLE", symbol="DDD"), self.q(), exposure=x)  # a long reduces the net
-        self.assertEqual((d4["action"], i4["qty"]), ("enter", "449"))
-        self.assertEqual(self.plan(self.ev(symbol="AAA"), self.q(), exposure=x)[0]["reason"], "symbol_already_traded_today")
-        self.assertEqual(self.plan(self.ev(target="60000"), self.q())[0]["reason"], "per_order_notional_cap")
+        shorts = [self.plan(self.ev(symbol=f"S{i:02d}"), self.q(), exposure=x)[0] for i in range(12)]
+        self.assertEqual({d["action"] for d in shorts}, {"enter"})  # a whole one-sided leg fits the 0.10 E net cap
+        self.assertEqual(shorts[-1]["net_after"], "-89955.00")  # 12 x 7,496.25
+        d13, i13 = self.plan(self.ev(symbol="S12"), self.q(), exposure=x)
+        self.assertEqual((d13["reason"], i13), ("names_per_leg_cap", None))  # the 12-name cap, never the net cap
+        longs = [self.plan(self.ev("UNFAVORABLE", symbol=f"L{i:02d}"), self.q(), exposure=x)[0] for i in range(12)]
+        self.assertEqual({(d["action"], d["qty"]) for d in longs}, {("enter", 74)})
+        self.assertEqual(self.plan(self.ev(symbol="S00"), self.q(), exposure=planner.Exposure())[0]["action"], "enter")
+        self.assertEqual(self.plan(self.ev(symbol="S00"), self.q(), exposure=x)[0]["reason"], "names_per_leg_cap")
+        d, _ = self.plan(self.ev(target="60000"), self.q())
+        self.assertEqual((d["target_notional"], d["est_notional"]), ("7500.00", "7496.25"))  # capped, not refused
+        self.assertEqual(planner.leg_balanced_target(Decimal("5000"), REV_LIMITS), Decimal("5000"))  # a smaller size stays
+        self.assertIsNone(planner.leg_balanced_target(None, REV_LIMITS))
 
     def test_momentum_shadow_mirrors_the_same_event_and_quote(self):
         now = self.ENTRY + timedelta(seconds=3)

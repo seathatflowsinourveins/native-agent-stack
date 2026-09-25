@@ -74,6 +74,33 @@ class AccountRefusal(PrivateDir):
         trading = write_env(self.dir, "alpaca-paper-3.env", key="PKTRADEKEY001")
         self.assertEqual(ex.trading_credentials(trading, data), ("PKTRADEKEY001", "secretvalue000001"))
 
+    def test_paper_4_runtime_refuses_paper_2_and_paper_3(self):
+        p2 = write_env(self.dir, "alpaca-paper-2.env", key="PKPAPER2KEY01")
+        p3 = write_env(self.dir, "alpaca-paper-3.env", key="PKPAPER3KEY01")
+        refuse = [p2, p3]
+        with self.assertRaises(ex.AccountRefused) as ctx:  # the incentive engine's paper-3 file itself
+            ex.trading_credentials(p3, account="paper-4", refuse=refuse)
+        self.assertEqual(str(ctx.exception), "trading_env_not_paper_4")
+        with self.assertRaises(ex.AccountRefused) as ctx:
+            ex.trading_credentials(p2, account="paper-4", refuse=refuse)
+        self.assertEqual(str(ctx.exception), "trading_env_not_paper_4")
+        for key, code in (("PKPAPER3KEY01", "trading_key_is_paper_3"), ("PKPAPER2KEY01", "trading_key_is_paper_2")):
+            copied = write_env(self.dir, "alpaca-paper-4.env", key=key, secret="othersecret0001")
+            with self.assertRaises(ex.AccountRefused) as ctx:
+                ex.trading_credentials(copied, account="paper-4", refuse=refuse)
+            self.assertEqual(str(ctx.exception), code)
+        own = write_env(self.dir, "alpaca-paper-4.env", key="PKPAPER4KEY01")
+        self.assertEqual(ex.trading_credentials(own, account="paper-4", refuse=refuse), ("PKPAPER4KEY01", "secretvalue000001"))
+
+    def test_account_envs_from_the_runtime_config(self):
+        trading, refused, data = common.account_envs({"account": "paper-4"})
+        self.assertEqual((os.path.basename(trading), [os.path.basename(p) for p in refused], os.path.basename(data)),
+                         ("alpaca-paper-4.env", ["alpaca-paper-2.env", "alpaca-paper-3.env"], "alpaca-paper-4.env"))
+        trading, refused, data = common.account_envs({})
+        self.assertEqual((os.path.basename(trading), [os.path.basename(p) for p in refused]), ("alpaca-paper-3.env", ["alpaca-paper-2.env"]))
+        with self.assertRaises(ValueError):
+            common.account_envs({"account": "live"})
+
     def test_live_host_is_refused(self):
         with self.assertRaises(ex.AccountRefused):
             ex.AlpacaBroker(SimpleNamespace(_base_url="https://api.alpaca.markets"))

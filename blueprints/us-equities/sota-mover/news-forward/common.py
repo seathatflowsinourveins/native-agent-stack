@@ -30,6 +30,27 @@ TRADING_ENV = os.path.join(SECRETS_DIR, "alpaca-paper-3.env")
 DATA_ENV = TRADING_ENV
 # paper-2 belongs to other studies: never used here except to refuse a copied key id.
 PAPER2_ENV = os.path.join(SECRETS_DIR, "alpaca-paper-2.env")
+PAPER3_ENV = TRADING_ENV
+PAPER4_ENV = os.path.join(SECRETS_DIR, "alpaca-paper-4.env")
+# config.json "account": the one paper account a runtime may trade, and the accounts it must refuse (by file name
+# and by a copied key id). Since 2026-09-25 the incentive engine owns paper-3; the counted rth_reversal test runs
+# rev-only on its own paper-4 (coordinator runtime decision), which refuses paper-2 and paper-3.
+ACCOUNTS = {
+    "paper-3": {"env": "alpaca-paper-3.env", "refuse": ("alpaca-paper-2.env",)},
+    "paper-4": {"env": "alpaca-paper-4.env", "refuse": ("alpaca-paper-2.env", "alpaca-paper-3.env")},
+}
+DEFAULT_ACCOUNT = "paper-3"
+
+
+def account_envs(cfg):
+    """(trading env path, [refused env paths], data env path) for a config's "account" and "data_env"."""
+    name = (cfg or {}).get("account", DEFAULT_ACCOUNT)
+    if name not in ACCOUNTS:
+        raise ValueError(f"unknown account {name!r}")
+    spec = ACCOUNTS[name]
+    trading = os.path.join(SECRETS_DIR, spec["env"])
+    data = os.path.join(SECRETS_DIR, (cfg or {}).get("data_env") or spec["env"])
+    return trading, [os.path.join(SECRETS_DIR, r) for r in spec["refuse"]], data
 MODEL_STORAGE = os.path.expanduser("~/.local/share/native-agent-stack/models/chronogpt-instruct")
 
 NY = ZoneInfo("America/New_York")

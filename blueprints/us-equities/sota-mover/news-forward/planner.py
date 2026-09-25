@@ -1036,6 +1036,8 @@ def _marketable_entry(ev, quote, now, session_date, exposure, limits, *, arm, wi
     if bps > max_bps:
         return {**base, "action": "skip", "reason": f"spread_above_{max_bps}bps", "spread_bps": str(bps.quantize(Decimal('0.1')))}, None
     limit = ceil_cent(dec(quote["ap"]) * long_mult) if leg == LEG_LONG else floor_cent(dec(quote["bp"]) * short_mult)
+    if exposure.names.get((window_label, leg), 0) >= MAX_NAMES_PER_LEG:  # before the net-cap shrink: the true reason
+        return {**base, "action": "skip", "reason": "names_per_leg_cap"}, None
     qty, notional, why = sized_qty(ev.get("target_notional"), limit)
     if why:
         return {**base, "action": "skip", "reason": why, "target_notional": str(ev.get("target_notional"))}, None
@@ -1068,6 +1070,16 @@ def plan_rth_entry(ev, quote, now, session_date, exposure, limits, account=None)
                              short_mult=SHORT_LIMIT_MULT, extended=False, account=account)
 
 
+def leg_balanced_target(target, limits):
+    """rth_reversal sizing (review major 4): the section-A size capped at net_cap / 12 per name (0.10 E / 12),
+    so a full 12-name leg is at most the window's net cap and the net cap can never bind; both legs fill
+    toward 12 names at about equal notional (the equal-weight estimand's own weighting). None stays None."""
+    if target is None:
+        return None
+    cap = (limits.net_cap / MAX_NAMES_PER_LEG).quantize(Decimal("0.01"), rounding=ROUND_DOWN)
+    return min(dec(target), cap)
+
+
 def plan_rth_reversal_entry(ev, quote, now, session_date, exposure, limits, account=None):
     """(decision, intent|None) for the preregistered rth_reversal arm (forward-protocol.json rule).
 
@@ -1075,8 +1087,10 @@ def plan_rth_reversal_entry(ev, quote, now, session_date, exposure, limits, acco
     UNCLEAR and PARSE_FAIL -> no trade); at release + 15 min, on the first quote stamped in
     [entry, entry + 60 s]: a marketable day limit at its ask (buy) or bid (sell), skipped
     above a 50 bps spread; shorts need shortable, easy-to-borrow and no Rule 201 flag
-    (ev["ssr"]); section-A size, the rev arm's caps and its RTH window's net cap.
+    (ev["ssr"]); leg-balanced size (leg_balanced_target), the rev arm's caps and its RTH
+    window's net cap (which the leg-balanced size keeps from binding).
     """
+    ev = {**ev, "target_notional": leg_balanced_target(ev.get("target_notional"), limits)}
     return _marketable_entry(ev, quote, now, session_date, exposure, limits, arm=REV, window_label=RTH,
                              stage=SESSION_CODE[RTH], max_bps=MAX_SPREAD_BPS, long_mult=Decimal("1"),
                              short_mult=Decimal("1"), extended=False, account=account, leg_for=reversal_leg,
@@ -1087,9 +1101,10 @@ def plan_rth_momentum_shadow(ev, quote, now, session_date, exposure, limits):
     """The momentum decision on the same event and quote, for comparison only (never an order).
 
     Mirror of plan_rth_reversal_entry with the label's own direction (FAVORABLE -> long,
-    UNFAVORABLE -> short) at the same touch; the caller passes a shadow exposure so the
-    shadow never consumes the real arms' caps.
+    UNFAVORABLE -> short) at the same touch and the same leg-balanced size; the caller passes a
+    shadow exposure so the shadow never consumes the real arms' caps.
     """
+    ev = {**ev, "target_notional": leg_balanced_target(ev.get("target_notional"), limits)}
     return _marketable_entry(ev, quote, now, session_date, exposure, limits, arm=CORE, window_label=RTH,
                              stage=SESSION_CODE[RTH], max_bps=MAX_SPREAD_BPS, long_mult=Decimal("1"),
                              short_mult=Decimal("1"), extended=False, leg_for=side_for_label,

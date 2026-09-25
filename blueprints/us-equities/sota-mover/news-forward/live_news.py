@@ -238,8 +238,8 @@ class NewsPoller:
         self.first_received = dict(first_received or {})
 
     def poll(self):
-        received = self.clock()
         articles = self.client.news_since(self.watermark - self.OVERLAP)
+        received = self.clock()  # stamped on the response (all pages in hand), never before the request
         fresh = []
         for a in articles:
             aid = str(a.get("id"))

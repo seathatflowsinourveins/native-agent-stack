@@ -69,6 +69,7 @@ import shadow  # noqa: E402
 sig = planner.sig
 CORE, PM, AH, REV = planner.CORE, planner.PM, planner.AH, planner.REV
 SHADOW_ARM = "core_shadow"  # journal arm of the momentum RTH decisions once the reversal runs (no orders)
+BENCH = "benchmark"         # the news-day benchmark quote of every first-in-window liquid RTH event (no orders)
 HALT_REVERSAL = "HALT-rth_reversal"
 STALE_EVERY_REVERSAL = timedelta(seconds=5)  # rev entries live at most REV_ENTRY_TTL (60 s)
 CLOSE_MARK_TIMES = (timedelta(minutes=5), timedelta(minutes=20), timedelta(minutes=45))  # after the close
@@ -114,15 +115,30 @@ def reversal_active(cfg, day):
     return bool(rr.get("enabled", True)) and bool(start) and date.fromisoformat(start) <= day
 
 
+def arm_enabled(cfg, arm):
+    """config "arms_enabled": the arms this runtime plans at all (default: every arm). The rev-only
+    rth_reversal runtime lists ["rev"]: core, pm and ah plan and send nothing there; the momentum
+    shadow is journal-only whatever the configuration."""
+    enabled = cfg.get("arms_enabled")
+    return True if enabled is None else arm in enabled
+
+
 def arm_orders_enabled(cfg, arm, day):
     """An arm sends entries from its configured date on; the core arm always does; the rev arm
-    from rth_reversal.from."""
+    from rth_reversal.from; a disabled arm never does."""
+    if not arm_enabled(cfg, arm):
+        return False
     if arm == CORE:
         return True
     if arm == REV:
         return reversal_active(cfg, day)
     start = ((cfg.get("arms") or {}).get(arm) or {}).get("orders_from")
     return bool(start) and date.fromisoformat(start) <= day
+
+
+def resolve_env(name):
+    """A credential file name (resolved in the secrets directory) or a path, as given."""
+    return os.path.join(common.SECRETS_DIR, name) if os.path.basename(name) == name else name
 
 
 def protocol_sha256():
@@ -340,11 +356,14 @@ class Supervisor:
         self.schedule = planner.day_schedule(self.calendar, self.trade_date)
         self.prev_session = self.calendar.previous(self.trade_date)
         self.end = args.until or self.schedule.service_end
-        self.reversal = reversal_active(cfg, self.trade_date)
+        self.reversal = reversal_active(cfg, self.trade_date) and arm_enabled(cfg, REV)
+        self.account = cfg.get("account", common.DEFAULT_ACCOUNT)
+        self.trading_env, self.refused_envs, data_env = common.account_envs(cfg)
+        self.data_env = resolve_env(args.data_env) if getattr(args, "data_env", None) else data_env
         self.journal = common.Journal(self.state, self.trade_date, clock=clock,
                                       evidence_label=common.REVERSAL_RUN_LABEL if self.reversal else common.EVIDENCE_LABEL)
         self.ledger_epoch = sig.as_utc(cfg.get("ledger_epoch", DEFAULT_LEDGER_EPOCH))
-        key, secret = live_news.read_credentials(common.DATA_ENV)
+        key, secret = live_news.read_credentials(self.data_env)
         self.data = live_news.DataClient(key, secret, limiter=live_news.RateLimiter(args.rate))
         self._ca_keys = (key, secret)  # corporate-action lookups (alpaca-py data client)
         del key, secret
@@ -384,7 +403,12 @@ class Supervisor:
         self.code_sha256 = code_digests()
         self.refresh(now, force=True)  # M4/m4: exposure rebuilt from the broker's orders at start
         config_path = args.config
-        self.journal.write("lifecycle", event="start", trade_date=self.trade_date.isoformat(),
+        # a --reconcile-only backfill journals its own lifecycle event, never a second "start" row
+        start_event = "reconcile_only_start" if getattr(args, "reconcile_only", False) else "start"
+        self.journal.write("lifecycle", event=start_event, trade_date=self.trade_date.isoformat(),
+                           account=self.account, trading_env=os.path.basename(self.trading_env),
+                           data_env=os.path.basename(self.data_env),
+                           arms_enabled=cfg.get("arms_enabled") or sorted(planner.ARM_PREFIX),
                            requested_mode=self.requested_mode, mode=self.mode, account_verdict=self.account_verdict,
                            exit_only=self.executor.exit_only, killed=self.executor.killed, runstate=self.runstate.data,
                            end=common.iso(self.end), assets=len(assets),
@@ -420,6 +444,10 @@ class Supervisor:
         self.extra_scores_path = getattr(self, "extra_scores_path", None)
         self.reversal = getattr(self, "reversal", False)
         self.l_rev = getattr(self, "l_rev", autolev.L_FLOOR)
+        self.account = getattr(self, "account", common.DEFAULT_ACCOUNT)
+        self.trading_env = getattr(self, "trading_env", common.TRADING_ENV)
+        self.refused_envs = getattr(self, "refused_envs", [common.PAPER2_ENV])
+        self.data_env = getattr(self, "data_env", common.DATA_ENV)
         self.shadow_exposure = planner.Exposure()  # the momentum shadow's own caps (never the real arms')
         self.rev_state = {}           # event_id -> {"done": {arm, ...}, "asset", "target"} while an RTH event is evaluated
         self.rev_working_until = None  # rev entries may be working until then: stale checks every 5 s
@@ -464,7 +492,7 @@ class Supervisor:
         if self.requested_mode != "paper":
             return None, None, False, "dry-run", "not_checked"
         try:
-            k, s = ex.trading_credentials()
+            k, s = ex.trading_credentials(self.trading_env, account=self.account, refuse=self.refused_envs)
             broker = ex.AlpacaBroker(ex.make_trading_client(k, s))
             del k, s
         except ex.AccountRefused as error:
@@ -719,15 +747,17 @@ class Supervisor:
                 self.shadow.add(cand, reason, received)
             created_day = sig.as_utc(cand["created_at"]).astimezone(common.NY).date()
             arm = cand.get("arm_release")
-            if arm in (PM, AH) and created_day == self.trade_date and cand["lane"] == sig.LIQUID:
+            if arm in (PM, AH) and created_day == self.trade_date and cand["lane"] == sig.LIQUID and arm_enabled(self.cfg, arm):
                 entry = sig.as_utc(cand["created_at"]) + sig.RTH_ENTRY_DELAY
                 self.arm_pending[arm][eid] = {**cand, "entry_utc": common.iso(entry)}
             if cand["session"] != self.trade_date.isoformat():
                 continue  # the core trade belongs to the run for its own session
             if cand["session_label"] == planner.OPEN_AUCTION:
-                self.open_pool[eid] = cand
+                if arm_enabled(self.cfg, CORE):
+                    self.open_pool[eid] = cand
             elif cand["session_label"] == planner.RTH:
-                self.rth_pending[eid] = cand
+                if self.reversal or arm_enabled(self.cfg, CORE):
+                    self.rth_pending[eid] = cand
 
     def pending_scores(self):
         return len([e for e in self.queued if e not in self.scores])
@@ -937,9 +967,47 @@ class Supervisor:
             return self.schedule.cls_end + planner.REV_QUOTE_WINDOW
         return self.schedule.cls_start
 
+    def other_arm_holding(self, symbol):
+        """Arms other than rev that hold `symbol` or have an order working in it (cross-arm netting guard).
+
+        Uses the fill-based holdings of every arm and entry date (refreshed every 30 s) and the orders
+        this process submitted since, so a symbol another arm trades is never netted against by rev."""
+        arms = set()
+        for (arm, _day, sym), h in self.hs.items():
+            if sym == symbol and arm != REV and (h["qty"] or h["pending_qty"] or h["pending_unpriced"] or h["exit_live_qty"]):
+                arms.add(arm)
+        for cid, order in self.executor.submitted.items():
+            info = planner.parse_cid(cid)
+            if info and info["symbol"] == symbol and info["arm"] != REV and planner.is_live(order):
+                arms.add(info["arm"])
+        return sorted(arms)
+
+    def benchmark_step(self, c, quote, now, context):
+        """The news-day benchmark: the first quote stamped in the entry minute of every first-in-window
+        liquid RTH event, whatever its label (the forward analogue of NEWS-2B's benchmark). True when done."""
+        if c.get("lane") != sig.LIQUID:
+            return True
+        entry = sig.as_utc(c["entry_utc"])
+        fields = planner.quote_fields(quote)
+        stamped = None
+        if fields and (quote or {}).get("t"):
+            try:
+                stamped = sig.as_utc(quote["t"])
+            except (ValueError, TypeError):
+                stamped = None
+        valid = fields and sig.half_spread_fraction({"bp": float(quote["bp"]), "ap": float(quote["ap"])}) is not None
+        base = {"event_id": c["event_id"], "symbol": c["symbol"], "label": c.get("label"), **context}
+        if valid and stamped is not None and entry <= stamped <= entry + planner.REV_QUOTE_WINDOW:
+            self.journal.write("benchmark_quote", **base, **fields)
+            return True
+        if now > entry + planner.REV_QUOTE_WINDOW:
+            self.journal.write("benchmark_quote", **base, note="no_quote_in_entry_minute")
+            return True
+        return False
+
     def rth_reversal_step(self, c, snap, now):
-        """Evaluate one due RTH event under the preregistered rule; True once both the rev decision
-        and the momentum shadow are final (a quote stamped before the entry time waits for a fresher one)."""
+        """Evaluate one due RTH event under the preregistered rule; True once the rev decision, the momentum
+        shadow and the benchmark quote are final (a quote stamped before the entry time waits for a fresher one)."""
         eid = c["event_id"]
         quote = snap.get("latestQuote")
         st = self.rev_state.setdefault(eid, {"done": set()})
@@ -958,9 +1026,18 @@ class Supervisor:
         ssr = self.ssr_state_for(c, quote, self.session_low(snap))
         ev = {**c, "asset": st["asset"], "ssr": ssr["restricted"], "target_notional": st["target"]}
         if REV not in st["done"]:
+            held_by = self.other_arm_holding(c["symbol"])
             if os.path.exists(os.path.join(self.state, HALT_REVERSAL)):
                 decision, intent = {"event_id": eid, "symbol": c["symbol"], "session_label": planner.RTH, "lane": c.get("lane"),
                                     "label": c.get("label"), "arm": REV, "action": "skip", "reason": "harm_halt"}, None
+            elif held_by:
+                decision, intent = {"event_id": eid, "symbol": c["symbol"], "session_label": planner.RTH, "lane": c.get("lane"),
+                                    "label": c.get("label"), "arm": REV, "action": "skip",
+                                    "reason": "symbol_held_by_other_arm", "held_by": held_by}, None
+                self.journal.write("deviation", rule="rth_reversal", deviation="cross_arm_symbol_skip", event_id=eid,
+                                   symbol=c["symbol"], held_by=held_by,
+                                   note="forward-protocol.json#/deviations_from_frozen_study_rules: rev never trades a "
+                                        "symbol another arm holds or works, so arms cannot net inside one account")
             else:
                 decision, intent = planner.plan_rth_reversal_entry(ev, quote, now, self.trade_date, self.exposures[REV],
                                                                    self.limits[REV], self.account_gross())
@@ -988,7 +1065,9 @@ class Supervisor:
                 shadow.pop("client_order_id", None)  # never an order
                 self.journal.write("decision", **shadow, **context, ssr=ssr)
                 self.counts[f"decision:{SHADOW_ARM}:rth:{shadow['action']}"] += 1
-        return {REV, SHADOW_ARM} <= st["done"]
+        if BENCH not in st["done"] and self.benchmark_step(c, quote, now, context):
+            st["done"].add(BENCH)
+        return {REV, SHADOW_ARM, BENCH} <= st["done"]
 
     def run_rth_entries(self, now):
         due = [c for c in self.rth_pending.values() if sig.as_utc(c["entry_utc"]) <= now]
@@ -1237,7 +1316,8 @@ class Supervisor:
     def record_close_marks(self, now):
         """After the close (at +5, +20 and +45 min): the official closing auction price
         (news_signal.select_auction_price on GET /v2/stocks/auctions, the study's exit price rule)
-        of every symbol the rev arm entered or the momentum shadow would have entered today."""
+        of every symbol the rev arm entered, the momentum shadow would have entered, or the news-day
+        benchmark quoted today."""
         close = self.schedule.close_utc
         due = [i for i, t in enumerate(CLOSE_MARK_TIMES) if now >= close + t and f"close_marks:{i}" not in self.done_steps]
         if not due:
@@ -1248,6 +1328,8 @@ class Supervisor:
         wanted = {}
         for r in common.read_jsonl(self.journal.path):
             if r.get("kind") == "decision" and r.get("arm") in (REV, SHADOW_ARM) and r.get("action") in ("enter", "shadow_enter"):
+                wanted[r["symbol"]] = r.get("exchange")
+            elif r.get("kind") == "benchmark_quote" and r.get("quote_bid"):
                 wanted[r["symbol"]] = r.get("exchange")
         todo = sorted(s for s in wanted if s not in self.close_marks_done)
         if not todo:
@@ -1298,7 +1380,8 @@ class Supervisor:
             if arm == AH and day == self.trade_date and h["qty"]:
                 expected[sym] = expected.get(sym, Decimal("0")) + h["qty"]
         rec = planner.reconcile(self.sod["cash"], account["cash"], fills, broker.positions(), broker.orders("open"), expected)
-        self.journal.write("reconciliation", mode="paper", **rec)
+        # backfill: written by a --reconcile-only run from the broker's order history after a missed reconciliation
+        self.journal.write("reconciliation", mode="paper", backfill=bool(getattr(self.args, "reconcile_only", False)), **rec)
         core = [f for f in fills if (planner.parse_cid(f["client_order_id"]) or {}).get("arm") == CORE]
         flow, _ = planner.cash_flows(core)
         entries = [f for f in core if planner.is_entry(planner.parse_cid(f["client_order_id"]), f.get("side"))]
@@ -1413,14 +1496,15 @@ class Supervisor:
             self.executor.ref_prices = {}
             self.executor.gate.sync(self.exposures)
             self.journal.write("lifecycle", event="basket_preview_end")
-        if self.arm_pending[PM] and now < sch.basket_at:
+        if self.arm_pending[PM] and now < sch.basket_at and arm_enabled(self.cfg, PM):
             self.run_arm_entries(now, PM)
-        if "basket" not in self.done_steps and sch.basket_at <= now <= sch.opg_submit_by:
+        if ("basket" not in self.done_steps and sch.basket_at <= now <= sch.opg_submit_by
+                and arm_enabled(self.cfg, CORE)):
             if self.run_open_basket(now):
                 self.done_steps.add("basket")
         if sch.open_utc <= now < self.rth_entry_end():
             self.run_rth_entries(now)
-        if self.arm_pending[AH] and sch.close_utc <= now < sch.ext_end:
+        if self.arm_pending[AH] and sch.close_utc <= now < sch.ext_end and arm_enabled(self.cfg, AH):
             self.run_arm_entries(now, AH)
 
     def summary(self, final):
@@ -1496,6 +1580,13 @@ def main(argv=None):
                              "so 90 keeps the service plus one verification run within it)")
     parser.add_argument("--preview-basket", action="store_true",
                         help="dry-run verification only: build the open-auction basket early once the pool is scored")
+    parser.add_argument("--data-env",
+                        help="dry-run verification only: read market data (never trade) with this credential file "
+                             "(a name in the secrets directory), e.g. while the configured account's file does not exist")
+    parser.add_argument("--reconcile-only", action="store_true",
+                        help="backfill a missed reconciliation for --date from the paper broker's order history "
+                             "(read-only broker calls; writes the day's fill and reconciliation rows, backfill true) "
+                             "and exit; never enters or exits a position")
     args = parser.parse_args(argv)
     if args.dry_run:
         args.mode = "dry-run"
@@ -1503,9 +1594,13 @@ def main(argv=None):
         raise SystemExit("--scores-from is a dry-run verification option; use it with --dry-run")
     if args.scores_from and os.path.realpath(os.path.dirname(args.scores_from)) == os.path.realpath(args.state):
         raise SystemExit("--scores-from must name another state's scores file")
+    if args.data_env and args.mode != "dry-run":
+        raise SystemExit("--data-env is a dry-run verification option; use it with --dry-run")
+    cfg = load_config(args.config)
+    if args.reconcile_only:
+        return reconcile_only(args, cfg)
     signal.signal(signal.SIGTERM, _on_signal)
     signal.signal(signal.SIGINT, _on_signal)
-    cfg = load_config(args.config)
     day = args.date or common.utc_now().astimezone(common.NY).date()
     if not planner.is_session(common.load_calendar(), day):
         print(json.dumps({"event": "not_a_session", "date": day.isoformat()}))
@@ -1513,6 +1608,30 @@ def main(argv=None):
     args.until = parse_time(args.until, day) if args.until else None
     args.cpu_fallback_at = parse_time(args.cpu_fallback_at, day) if args.cpu_fallback_at else None
     return Supervisor(args, cfg).run()
+
+
+def reconcile_only(args, cfg, clock=common.utc_now):
+    """The preregistered backfill (forward-protocol.json#/counted_sessions/reconciliation_backfill): rebuild a
+    past session's fill rows and reconciliation from the paper broker's order history, then exit. Paper mode
+    only (the broker's history is the record); refused before that session's close + 10 min."""
+    if args.mode == "dry-run" or (args.mode or cfg["mode"]) != "paper":
+        raise SystemExit("--reconcile-only reads the paper broker's history: paper mode only")
+    if not args.date:
+        raise SystemExit("--reconcile-only needs --date")
+    calendar = common.load_calendar()
+    if not planner.is_session(calendar, args.date):
+        raise SystemExit(f"{args.date} is not an XNYS session")
+    if clock() < planner.day_schedule(calendar, args.date).close_utc + timedelta(minutes=10):
+        raise SystemExit("--reconcile-only runs only after that session's close + 10 min")
+    args.until = args.cpu_fallback_at = None
+    args.no_scorer = True
+    sup = Supervisor(args, cfg, clock=clock)
+    if sup.mode != "paper":
+        raise SystemExit(f"--reconcile-only needs a verified paper account ({sup.account_verdict})")
+    rec = sup.reconcile()
+    sup.journal.write("lifecycle", event="reconcile_only_done", ok=rec.get("ok"), problems=rec.get("problems"))
+    print(json.dumps({"event": "reconcile_only_done", "date": args.date.isoformat(), "ok": rec.get("ok")}))
+    return 0
 
 
 if __name__ == "__main__":

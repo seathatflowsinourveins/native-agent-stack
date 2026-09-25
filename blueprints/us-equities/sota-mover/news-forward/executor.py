@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Account binding and order submission for the news-forward paper runner.
 
-Orders are possible only with the dedicated account in
-~/.config/codex-ecosystem/secrets/alpaca-paper-3.env, through alpaca-py's paper
+Orders are possible only with the runtime's configured paper account (config "account":
+paper-3 by default, paper-4 for the rev-only rth_reversal runtime) in
+~/.config/codex-ecosystem/secrets/alpaca-paper-<n>.env, through alpaca-py's paper
 TradingClient, after:
   * the file exists and passes credential_guard.open_verified (0600, owner, no symlink,
     no Git worktree ancestor, ...);
-  * its key id differs from alpaca-paper-2.env's (paper-2 belongs to other studies and
-    is never used for orders);
+  * its key id differs from every refused account's (paper-2 always; paper-4 also refuses
+    paper-3, which the incentive engine owns);
   * the client's trading host is exactly https://paper-api.alpaca.markets;
   * at start, every open order and every position traces to a client_order_id with the
     nf1- prefix.
@@ -58,27 +59,37 @@ ACCOUNT_FIELDS = ("status", "equity", "last_equity", "cash", "buying_power", "mu
                   "account_blocked", "shorting_enabled", "pattern_day_trader")
 
 
-def trading_credentials(path=common.TRADING_ENV, paper2_env=common.PAPER2_ENV):
-    """(key_id, secret) of the dedicated paper-3 account, or AccountRefused.
+def _account_label(path):
+    """alpaca-paper-2.env -> paper_2 (for fixed refusal codes)."""
+    return os.path.basename(path).replace("alpaca-", "").replace(".env", "").replace("-", "_")
 
-    paper2_env is read only to refuse a paper-3 file that carries the paper-2 key id.
+
+def trading_credentials(path=common.TRADING_ENV, paper2_env=common.PAPER2_ENV, *, account=common.DEFAULT_ACCOUNT,
+                        refuse=None):
+    """(key_id, secret) of the configured paper account (common.ACCOUNTS), or AccountRefused.
+
+    The file must carry exactly the account's name (alpaca-paper-3.env for paper-3, alpaca-paper-4.env for
+    paper-4). Every refused account's file (paper-2; for paper-4 also paper-3) is read only to refuse a file
+    that carries its key id. paper2_env keeps the paper-3 default's positional form.
     """
+    expected = common.ACCOUNTS[account]["env"]
     name = os.path.basename(path)
-    if name != TRADING_ENV_NAME or "paper-2" in path or "live" in name:
-        raise AccountRefused("trading_env_not_paper_3")
+    if name != expected or "live" in name:
+        raise AccountRefused(f"trading_env_not_{account.replace('-', '_')}")
     if not os.path.lexists(path):
         raise AccountRefused("trading_env_missing")
     try:
         key_id, secret = live_news.read_credentials(path)
     except live_news.CredentialError as error:
         raise AccountRefused(f"trading_env_guard:{error}") from None
-    if os.path.lexists(paper2_env):
-        try:
-            other_key, _ = live_news.read_credentials(paper2_env)
-        except live_news.CredentialError:
-            other_key = None
-        if other_key is not None and other_key == key_id:
-            raise AccountRefused("trading_key_is_paper_2")
+    for other in (refuse if refuse is not None else [paper2_env]):
+        if os.path.lexists(other):
+            try:
+                other_key, _ = live_news.read_credentials(other)
+            except live_news.CredentialError:
+                other_key = None
+            if other_key is not None and other_key == key_id:
+                raise AccountRefused(f"trading_key_is_{_account_label(other)}")
     return key_id, secret
 
 
@@ -346,11 +357,13 @@ class Executor:
         return order
 
 
-def check_account_main():
-    """Read-only verdict for the paper-3 account (no order, cancel or position call)."""
-    report = {"trading_env": common.TRADING_ENV, "host": None, "verdict": None}
+def check_account_main(cfg=None):
+    """Read-only verdict for the configured account (default paper-3; no order, cancel or position write)."""
+    account = (cfg or {}).get("account", common.DEFAULT_ACCOUNT)
+    trading_env, refused, _ = common.account_envs(cfg or {})
+    report = {"account": account, "trading_env": os.path.basename(trading_env), "host": None, "verdict": None}
     try:
-        key_id, secret = trading_credentials()
+        key_id, secret = trading_credentials(trading_env, account=account, refuse=refused)
         client = make_trading_client(key_id, secret)
         report["host"] = PAPER_TRADING_HOST
         broker = AlpacaBroker(client)
@@ -369,8 +382,13 @@ def check_account_main():
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("command", choices=("check-account",))
-    parser.parse_args(argv)
-    return check_account_main()
+    parser.add_argument("--config", help="runtime config whose \"account\" to check (default: paper-3)")
+    a = parser.parse_args(argv)
+    cfg = None
+    if a.config:
+        with open(a.config, encoding="utf-8") as handle:
+            cfg = json.load(handle)
+    return check_account_main(cfg)
 
 
 if __name__ == "__main__":

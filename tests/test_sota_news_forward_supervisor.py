@@ -631,10 +631,13 @@ class ReversalFlow(Scenario):
         for i, (sym, label) in enumerate((("FAV", "FAVORABLE"), ("UNF", "UNFAVORABLE"), ("UNC", "UNCLEAR"))):
             self.rth(sup, sym, label, t0, 11 + i)
         sup.run_rth_entries(self.at_entry(sup, clock, t0))
-        # section A: min(0.0015 x 900k / 0.02, 0.5% x 50M, 5% x 900k) = 45,000 at the touch: 900 at 49.95, 899 at 50.05
+        # leg-balanced: min(section A 45,000, 0.10 E / 12 = 7,500) at the touch: 150 at 49.95, 149 at 50.05
         self.assertEqual({o["client_order_id"]: (o["side"], o["limit_price"], o["qty"]) for o in self.b.all},
-                         {"nf1r-20260925-rth-FAV-short": ("sell", "49.95", "900"),
-                          "nf1r-20260925-rth-UNF-long": ("buy", "50.05", "899")})
+                         {"nf1r-20260925-rth-FAV-short": ("sell", "49.95", "150"),
+                          "nf1r-20260925-rth-UNF-long": ("buy", "50.05", "149")})
+        bench = {r["symbol"]: r for r in self.rows(sup, "benchmark_quote")}
+        self.assertEqual(set(bench), {"FAV", "UNF", "UNC"})  # every first-in-window liquid event, whatever its label
+        self.assertEqual((bench["UNC"]["label"], bench["UNC"]["quote_ask"]), ("UNCLEAR", "50.05"))
         decisions = self.rows(sup, "decision")
         rev = {d["symbol"]: d for d in decisions if d["arm"] == "rev"}
         shadow = {d["symbol"]: d for d in decisions if d["arm"] == supervisor.SHADOW_ARM}
@@ -682,7 +685,7 @@ class ReversalFlow(Scenario):
         self.tick(sup, clock, ny(15, 44) + timedelta(seconds=30))
         cls = [o for o in self.b.all if "-cls" in o["client_order_id"]]
         self.assertEqual([(o["client_order_id"], o["time_in_force"], o["qty"]) for o in cls],
-                         [("nf1r-20260925-cls1-LAT-long", "cls", "899")])
+                         [("nf1r-20260925-cls1-LAT-long", "cls", "149")])
 
     def test_harm_halt_first_in_window_and_the_sweep(self):
         sup, clock = self.reversal_sup()
@@ -779,6 +782,107 @@ class ReversalFlow(Scenario):
         client.news_since.return_value = [{"id": 91, "created_at": "2026-09-25T14:00:00Z"}]
         poller = supervisor.live_news.NewsPoller(client, ny(9), clock=lambda: ny(11, 30), first_received=sup.first_received_today())
         self.assertEqual(poller.poll()[0]["received_at"], "2026-09-25T14:00:05Z")
+
+    def test_received_at_is_stamped_on_the_response(self):
+        now = {"t": ny(10, 0)}
+
+        def slow_fetch(since):  # the pages take 40 s to arrive
+            now["t"] = ny(10, 0) + timedelta(seconds=40)
+            return [{"id": 92, "created_at": "2026-09-25T13:59:50Z"}]
+
+        client = mock.Mock()
+        client.news_since.side_effect = slow_fetch
+        poller = supervisor.live_news.NewsPoller(client, ny(9), clock=lambda: now["t"])
+        self.assertEqual(poller.poll()[0]["received_at"], common.iso(ny(10, 0) + timedelta(seconds=40)))
+
+    def test_rev_only_runtime_plans_no_other_arm(self):
+        sup, clock = self.reversal_sup()
+        sup.cfg["arms_enabled"] = ["rev"]
+        base = {"lane": "liquid", "session": "2026-09-25", "sigma": 0.02, "prior_median_dollar_volume_20": 5e7, "prior_close": 50.0,
+                "label": None, "exchange": "NYSE", "news_id": "1"}
+        cands = {"1:OPG": {**base, "event_id": "1:OPG", "symbol": "OPG", "session_label": planner.OPEN_AUCTION, "window": "overnight",
+                           "created_at": common.iso(ny(6, 0)), "received_at": common.iso(ny(6, 0)), "ext_segment": "ext_pre",
+                           "arm_release": "pm"},
+                 "2:RTH": {**base, "event_id": "2:RTH", "symbol": "RTH", "session_label": planner.RTH, "window": "rth",
+                           "created_at": common.iso(ny(10, 0)), "received_at": common.iso(ny(10, 0)), "ext_segment": "closed",
+                           "arm_release": None, "entry_utc": common.iso(ny(10, 15))}}
+        sup.candidates.update(cands)
+        sup.scores_path = os.path.join(self.dir, "no-scores.jsonl")
+        for eid in cands:
+            sup.scores[eid] = {"event_id": eid, "raw_output": "FAVORABLE", "stop": "eos", "label": "FAVORABLE", "score": 1}
+        sup.read_scores(ny(10, 1))
+        self.assertEqual((sup.open_pool, sup.arm_pending[planner.PM], list(sup.rth_pending)), ({}, {}, ["2:RTH"]))
+        with mock.patch.object(sup, "run_open_basket") as basket:
+            sup.run_entries(ny(9, 20))
+        basket.assert_not_called()
+        self.assertEqual([supervisor.arm_orders_enabled(sup.cfg, a, FRIDAY) for a in ("core", "pm", "ah", "rev")],
+                         [False, False, False, True])
+        shipped = json.loads((ROOT / "blueprints/us-equities/sota-mover/news-reversal/runtime-config.json").read_text())
+        self.assertEqual((shipped["account"], shipped["arms_enabled"], shipped["mode"]), ("paper-4", ["rev"], "paper"))
+        self.assertGreaterEqual(shipped["rth_reversal"]["from"], "2026-09-28")
+
+    def test_rev_never_trades_a_symbol_another_arm_holds_or_works(self):
+        sup, clock = self.reversal_sup()
+        self.b.add("nf1-20260925-opg-XAR-long", "buy", 20, 20)  # a core holding (another arm in the same account)
+        self.b.add("nf1x-pm-20260925-ent-WRK-short", "sell", 5, 0, status="accepted", limit="50.00")  # a working pm order
+        sup.refresh(ny(10, 0), force=True)
+        t0 = ny(10, 0)
+        for i, sym in enumerate(("XAR", "WRK", "FREE")):
+            self.rth(sup, sym, "UNFAVORABLE", t0, 91 + i)
+        sup.run_rth_entries(self.at_entry(sup, clock, t0))
+        rev = {d["symbol"]: d for d in self.rows(sup, "decision") if d["arm"] == "rev"}
+        self.assertEqual({s: (d["reason"], d.get("held_by")) for s, d in rev.items()},
+                         {"XAR": ("symbol_held_by_other_arm", ["core"]), "WRK": ("symbol_held_by_other_arm", ["pm"]),
+                          "FREE": ("ok", None)})
+        deviations = self.rows(sup, "deviation")
+        self.assertEqual(sorted((d["deviation"], d["symbol"]) for d in deviations),
+                         [("cross_arm_symbol_skip", "WRK"), ("cross_arm_symbol_skip", "XAR")])
+        self.assertEqual([o["client_order_id"] for o in self.b.all if o["client_order_id"].startswith("nf1r-")],
+                         ["nf1r-20260925-rth-FREE-long"])
+        self.assertEqual(len([d for d in self.rows(sup, "decision") if d["arm"] == supervisor.SHADOW_ARM]), 3)  # descriptive
+
+    def race_at_the_last_entry_second(self, cancel_race):
+        sup, clock = self.reversal_sup()
+        t0 = ny(15, 29) + timedelta(seconds=59)  # release 15:29:59 -> entry 15:44:59, last decision second 15:45:59
+        self.rth(sup, "RCE", "UNFAVORABLE", t0, 97, entry_quote_delay=59)
+        now = t0 + timedelta(minutes=16)  # 15:45:59: exactly 60 s after the entry time
+        clock["now"] = self.b.now = now
+        sup.run_entries(now)
+        order = self.b.find("nf1r-20260925-rth-RCE-long")
+        self.assertEqual(order["qty"], "149")
+        self.b.now = now + timedelta(seconds=1)
+        order.update(filled_qty="60", status="partially_filled", filled_avg_price="50.05", filled_at=self.b.now)
+        if cancel_race:
+            self.b.cancel_race = {order["id"]}  # the cancel is overtaken by the remainder's fill
+        self.tick(sup, clock, now + timedelta(seconds=66))  # the 60 s cancel, then the CLS pass in the same step
+        cls = [o for o in self.b.all if "-cls" in o["client_order_id"]]
+        return order, cls
+
+    def test_partial_fill_at_1545_59_then_cancel_is_covered_by_the_close(self):
+        order, cls = self.race_at_the_last_entry_second(cancel_race=False)
+        self.assertEqual((order["status"], order["filled_qty"]), ("canceled", "60"))
+        self.assertEqual([(o["client_order_id"], o["qty"], o["time_in_force"]) for o in cls], [("nf1r-20260925-cls1-RCE-long", "60", "cls")])
+
+    def test_partial_fill_at_1545_59_whose_remainder_beats_the_cancel_is_covered_in_full(self):
+        order, cls = self.race_at_the_last_entry_second(cancel_race=True)
+        self.assertEqual((order["status"], order["filled_qty"]), ("filled", "149"))
+        self.assertEqual([(o["client_order_id"], o["qty"]) for o in cls], [("nf1r-20260925-cls1-RCE-long", "149")])  # no gap, no oversell
+
+    def test_reconciliation_backfill_guards(self):
+        cfg = {"mode": "paper"}
+        args = lambda **kw: SimpleNamespace(**{"mode": None, "date": None, "dry_run": False, **kw})  # noqa: E731
+        before_close = lambda: at(FRIDAY, 16, 5)  # noqa: E731
+        with self.assertRaises(SystemExit):
+            supervisor.reconcile_only(args(mode="dry-run", date=FRIDAY), cfg, clock=before_close)
+        with self.assertRaises(SystemExit):
+            supervisor.reconcile_only(args(), cfg, clock=before_close)  # needs --date
+        with self.assertRaises(SystemExit) as ctx:
+            supervisor.reconcile_only(args(date=FRIDAY), cfg, clock=before_close)
+        self.assertIn("close + 10 min", str(ctx.exception))
+        with self.assertRaises(SystemExit):
+            supervisor.reconcile_only(args(date=date(2026, 9, 26)), cfg, clock=before_close)  # a Saturday
+        with self.assertRaises(SystemExit):
+            supervisor.main(["--data-env", "alpaca-paper-3.env"])  # a data override only with --dry-run
 
     def test_config_switch_and_cli_guards(self):
         cfg = {"rth_reversal": {"from": "2026-09-28"}}

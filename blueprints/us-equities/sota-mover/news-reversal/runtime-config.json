@@ -1,0 +1,11 @@
+{
+ "mode": "paper",
+ "account": "paper-4",
+ "first_order_not_before": "2026-09-28T09:30:00-04:00",
+ "ledger_epoch": "2026-09-26T00:00:00Z",
+ "dry_run_equity": "100000",
+ "dry_run_multiplier": "4",
+ "arms_enabled": ["rev"],
+ "rth_reversal": {"enabled": true, "from": "2026-09-28"},
+ "note": "Runtime of the counted rth_reversal test (forward-protocol.json#/runtime): rev only, on the dedicated alpaca-paper-4.env (trading and market data); the runner refuses paper-2 and paper-3 by file name and by a copied key id. core, pm and ah plan and send nothing; the momentum shadow and the news-day benchmark are journal-only. State root ~/.local/state/native-agent-stack/research/sota-mover/news-reversal (systemd/news-reversal.service). Paper only; never live."
+}

@@ -1,0 +1,24 @@
+[Unit]
+Description=News-reversal forward paper runtime (rev-only rth_reversal on alpaca-paper-4; refuses paper-2 and paper-3; never live)
+After=network-online.target
+# Never stop restarting: a failed unit would leave open paper positions without exits or the kill switch.
+# Restarts back off from 30 s to 5 min; restarts never resend orders (client ids are idempotent).
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=%h/code/sota-news-reversal/blueprints/us-equities/sota-mover/news-forward
+Environment=PYTHONUNBUFFERED=1
+# WSL exposes nvidia-smi only under /usr/lib/wsl/lib, which the systemd user PATH lacks.
+Environment=PATH=/usr/lib/wsl/lib:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=%h/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python %h/code/sota-news-reversal/blueprints/us-equities/sota-mover/news-forward/supervisor.py --config %h/code/sota-news-reversal/blueprints/us-equities/sota-mover/news-reversal/runtime-config.json --state %h/.local/state/native-agent-stack/research/sota-mover/news-reversal --scorer-unit news-reversal-scorer --rate 90
+ExecStopPost=-/usr/bin/systemctl --user stop news-reversal-scorer.service
+Restart=on-failure
+RestartSec=30
+RestartSteps=6
+RestartMaxDelaySec=300
+MemoryHigh=6G
+MemoryMax=9G
+MemorySwapMax=0
+RuntimeMaxSec=19h
+TimeoutStopSec=90
