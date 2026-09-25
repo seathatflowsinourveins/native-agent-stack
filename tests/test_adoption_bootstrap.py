@@ -611,6 +611,62 @@ class NoLinkNpmUvResolutionTests(unittest.TestCase):
             self.assertEqual(calls, [f"STAGED {staged_node_bin / 'npm'}"],
                              f"expected only the staged npm to run, got {calls}")
 
+    def test_install_npm_under_no_link_finds_the_staged_node_interpreter_via_path(self):
+        # Minor finding (round 4): the fixture above writes npm as a bare "#!/bin/sh" stub, so it
+        # could never catch that a REAL npm's own bin/npm is npm-cli.js with a
+        # "#!/usr/bin/env node" shebang -- resolved through PATH at exec time, not relative to
+        # npm_cmd's own directory. Under --no-link, install_node never links node into bin_dir, so
+        # this call used to run with whatever "node" happened to be on the *ambient* PATH (a
+        # decoy/host copy below, or none at all on a fresh host: "env: node: No such file or
+        # directory") even though npm_cmd itself correctly pointed at the staged npm.
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            ecosystem_root = home / "eco"
+            cache_dir = ecosystem_root / "downloads"
+            bin_dir = ecosystem_root / "bin"
+            cache_dir.mkdir(parents=True)
+            bin_dir.mkdir(parents=True)
+            staged_node_bin = ecosystem_root / "tools" / "node-24.21.0" / "bin"
+            staged_node_bin.mkdir(parents=True)
+            log_path = home / "calls.log"
+            # A real npm's own bin/npm, reproduced here (instead of the plain "#!/bin/sh" stub
+            # above) so the interpreter lookup this finding is about is actually exercised.
+            npm_path = staged_node_bin / "npm"
+            npm_path.write_text("#!/usr/bin/env node\n")
+            npm_path.chmod(0o755)
+            self.write_stub(staged_node_bin / "node", log_path, label="STAGED-NODE")
+            # A decoy "node" earlier on the ambient PATH: if install_npm's PATH for this call ever
+            # omits staged_node_bin_dir, env resolves this one instead (or, on a fresh host with
+            # no node at all, the call fails outright).
+            decoy_bin = home / "decoy-path"
+            decoy_bin.mkdir()
+            self.write_stub(decoy_bin / "node", log_path, label="DECOY-NODE")
+            archive = cache_dir / "example-pkg-1.0.0.tgz"
+            archive.write_bytes(b"fixture archive; the stub npm above never actually reads it")
+            sha256 = hashlib.sha256(archive.read_bytes()).hexdigest()
+            harness = (
+                "set -euo pipefail\n"
+                f"cache_dir={shlex.quote(str(cache_dir))}\n"
+                f"ecosystem_root={shlex.quote(str(ecosystem_root))}\n"
+                f"bin_dir={shlex.quote(str(bin_dir))}\n"
+                "tools_suffix=''\nno_link=1\n"
+                f"staged_node_bin_dir={shlex.quote(str(staged_node_bin))}\n"
+                + self.extract("npm_package_name") + "\n"
+                + self.extract("fetch") + "\n"
+                + self.extract("atomic_link") + "\n"
+                + self.extract("install_npm") + "\n"
+                + "install_npm example-pkg 1.0.0 "
+                + "https://registry.npmjs.org/example-pkg/-/example-pkg-1.0.0.tgz " + sha256 + "\n"
+            )
+            env = {**os.environ, "PATH": f"{decoy_bin}{os.pathsep}{os.environ.get('PATH', '')}"}
+            result = subprocess.run(["bash", "-c", harness], capture_output=True, text=True, env=env, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(log_path.is_file(), "node was never invoked (env could not resolve it at all)")
+            calls = log_path.read_text().splitlines()
+            self.assertEqual(len(calls), 1, f"expected exactly one node invocation, got {calls}")
+            self.assertTrue(calls[0].startswith("STAGED-NODE "),
+                            f"expected env to resolve the staged node ahead of the decoy, got {calls}")
+
     def test_install_uv_tool_under_no_link_resolves_the_staged_uv_not_a_host_or_missing_uv(self):
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)

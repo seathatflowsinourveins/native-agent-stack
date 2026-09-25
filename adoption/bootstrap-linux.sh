@@ -357,7 +357,15 @@ install_npm() {
   mkdir -p "$prefix"
   local package
   package="$(npm_package_name "$url")"
-  "$npm_cmd" install --global --no-audit --no-fund --prefix "$prefix" "$archive" >/dev/null
+  # Minor finding: npm's own bin/npm is npm-cli.js, whose first line is "#!/usr/bin/env node" --
+  # resolved through PATH at exec time, not relative to npm_cmd's own directory. Under --no-link,
+  # install_node never links node into bin_dir at all, so this call used to run with whatever
+  # "node" happened to already be on the *ambient* PATH ($bin_dir:$PATH, line ~242, falls through
+  # to a pre-existing host node, or none on a fresh host: "env: node: No such file or directory")
+  # even though npm_cmd itself correctly pointed at the staged npm. Prepending staged_node_bin_dir
+  # here (only when set; a plain, unstaged run's bare "npm" needs no change) makes this one call
+  # always find THIS run's own staged node first, whether or not it is linked into bin_dir.
+  PATH="${staged_node_bin_dir:-}${staged_node_bin_dir:+:}$PATH" "$npm_cmd" install --global --no-audit --no-fund --prefix "$prefix" "$archive" >/dev/null
   local linked=0 executable
   if [[ -d "$prefix/bin" ]]; then
     for executable in "$prefix/bin"/*; do
