@@ -24,12 +24,12 @@ from pathlib import Path
 from core import chronology as CH
 from core import guards, logs
 from core.calendar import Calendar, check_study_reach, read_amendments
-from core.canon import atomic_write_results, sha256_bytes, sha256_file
+from core.canon import atomic_write_results, clean, sha256_bytes, sha256_file, sha256_obj
 from core.costs import Fees, load_table, monotone
 from core.coverage_rule import rule_sha256
 from core.evaluate import void_rate
-from core.params import (ACCESS_LOG, COST_TABLE, COUNT_ONLY_OUTPUT, DATA_DIR, DEVIATIONS, PROTOCOL_PATH, RESULTS_DIR,
-                         RUN_LOG, STUDY_PATH)
+from core.params import (ACCESS_LOG, COST_TABLE, COUNT_ONLY_OUTPUT, DATA_DIR, DATA_PINS, DEVIATIONS, PARAMETERS,
+                         PROTOCOL_PATH, RESULTS_DIR, RUN_LOG, STUDY_PATH)
 
 DATA_FILES = ("session-calendar.json", "fees-v3.json")
 AMENDMENT_FILES = ("session-calendar-amendments.jsonl", "fees-v3-amendments.jsonl")
@@ -42,9 +42,51 @@ class RunRefused(Exception):
 
 # ---------------------------------------------------------------- context
 
-def check_coverage_decision(repo, protocol: dict) -> dict:
+def count_only_dependencies(ctx: dict, protocol: dict, rate: dict) -> dict:
+    """Review round 15, F04: the dependency manifest the count-only output records: the study tree that computed it,
+    its runtime lock, the data files it ran against, the parameters, the coverage_rule and the rate limit. The freeze
+    binds each to the frozen protocol (check_coverage_decision)."""
+    return {"study_tree": ctx["tree"], "runtime_lock_sha256": ctx["runtime_lock_sha256"],
+            "data_file_sha256s": dict(sorted(ctx["data_file_sha256s"].items())),
+            "parameters_sha256": sha256_obj(PARAMETERS), "coverage_rule_sha256": rule_sha256(protocol),
+            "rate_limit": dict(rate)}
+
+
+def adopt_uncited_output(out_path, expected: dict, ignore=("code_revision",)) -> str:
+    """Review round 15, N02 (R14-open-2): a pre-freeze output that a hard kill left with no run-log line (the process
+    died between the output's rename and its line) is adopted, never fetched again: its content must equal the
+    output recomputed from its sealed inputs (expected) on every field but `ignore` (the commit the killed run ran
+    at). Returns its sha256; refuses any other content, which no run of this tree computed from those seals."""
+    body = json.loads(Path(out_path).read_text(encoding="utf-8"))
+    want = json.loads(json.dumps(clean(expected), sort_keys=True))
+    strip = lambda d: {k: v for k, v in d.items() if k not in ignore}   # noqa: E731
+    if strip(body) != strip(want):
+        raise RunRefused(f"{Path(out_path).name} has no run-log line and does not equal the output recomputed from "
+                         "its sealed inputs: it is not adopted")
+    return sha256_file(out_path)
+
+
+def governing_count_only_line(run_log: list, output_sha256: str) -> dict:
+    """Review round 15, F04 and N02 (R14-open-2): the first complete 'count_only' run-log line governs (the code runs
+    once), and it must cite the output by sha256."""
+    lines = [x for x in run_log if x.get("stage") == "pre_freeze" and x.get("purpose") == "count_only"
+             and x.get("status") == "complete" and x.get("results_sha256")]
+    if not lines:
+        raise guards.Refused("the count-only output has no complete 'count_only' run-log line")
+    if lines[0]["results_sha256"] != output_sha256:
+        raise guards.Refused("the governing 'count_only' run-log line cites another output")
+    return lines[0]
+
+
+def check_coverage_decision(repo, protocol: dict, run_log: list | None = None) -> dict:
     """Review round 9, F7: coverage_decision is typed and equals the item_rule of the committed count-only output
-    whose sha256 the frozen protocol records; the output's coverage_rule sha256 equals the frozen coverage_rule's."""
+    whose sha256 the frozen protocol records; the output's coverage_rule sha256 equals the frozen coverage_rule's.
+
+    Review round 15, F04: the output is also bound to its complete producer line and its dependency manifest: the
+    first complete 'count_only' run-log line cites it, and the tree, the data files, the parameters, the coverage_rule
+    and the rate limit it was computed under (the line's and the output's dependencies) equal the frozen protocol's
+    study_code.tree, data_file_sha256s, parameters, coverage_rule and rate_limit. A count-only output computed by
+    another tree, calendar or specification never decides the frozen coverage."""
     cd = protocol.get("coverage_decision")
     if not isinstance(cd, dict):
         raise guards.Refused("coverage_decision is missing from the frozen protocol")
@@ -80,6 +122,22 @@ def check_coverage_decision(repo, protocol: dict) -> dict:
     if out.get("rate_limit") != rate:
         raise guards.Refused("the count-only output was decided at a rate limit other than the frozen protocol's "
                              "pre_freeze_access_path.rate_limit")
+    line = governing_count_only_line(run_log or [], sha256_bytes(raw))
+    sc = protocol.get("run_discipline", {}).get("study_code") or {}
+    deps = out.get("dependencies") or {}
+    frozen = {"study_tree": sc.get("tree"), "data_file_sha256s": sc.get("data_file_sha256s"),
+              "parameters_sha256": sha256_obj(sc.get("parameters")), "coverage_rule_sha256": rule_sha256(protocol),
+              "rate_limit": rate}
+    got = {"study_tree": deps.get("study_tree"), "data_file_sha256s": deps.get("data_file_sha256s"),
+           "parameters_sha256": deps.get("parameters_sha256"), "coverage_rule_sha256": deps.get("coverage_rule_sha256"),
+           "rate_limit": deps.get("rate_limit")}
+    differ = sorted(k for k in frozen if got[k] != frozen[k])
+    if differ:
+        raise guards.Refused(f"the count-only output's dependencies differ from the frozen protocol's: {differ}")
+    if (line.get("study_tree"), line.get("data_file_sha256s"), line.get("coverage_rule_sha256"),
+            line.get("runtime_lock_sha256")) != (deps.get("study_tree"), deps.get("data_file_sha256s"),
+                                                 deps.get("coverage_rule_sha256"), deps.get("runtime_lock_sha256")):
+        raise guards.Refused("the governing 'count_only' line and the output name different dependencies")
     rate = (((out.get("years") or {}).get("2020") or {}).get("rates") or {}).get("identity_unreached_rate")
     return {"dropped_years": frozenset(dy), "items_tested": tested,
             "validation_identity_limited": bool(out.get("validation_identity_limited")),
@@ -144,7 +202,7 @@ def context(repo, *, versions=None, amend_pending_ok: bool = False, transport_ch
         raise guards.Refused("; ".join(refusals))
     cal = Calendar.from_files(cal_path, amend[AMENDMENT_FILES[0]], freeze_session=freeze_session)
     fees = Fees.from_files(fee_path, amend[AMENDMENT_FILES[1]], freeze_session=freeze_session, cal=cal)
-    coverage = check_coverage_decision(repo, protocol)
+    coverage = check_coverage_decision(repo, protocol, run_log)
     tip = guards.git(repo, "rev-parse", guards.MAIN)
     from datetime import datetime, timezone
     # review round 13, F1: a committed void applies only if it reached origin/main before the outcome it would void
@@ -263,12 +321,21 @@ def count_only_context(repo, *, versions=None) -> dict:
     guards.check_bytecode_isolated()
     tree = guards.running_tree(repo)
     guards.require_remote_main(repo)
-    guards.require_on_main(repo, (PROTOCOL_PATH, RUN_LOG))
+    data_paths = tuple(f"{DATA_DIR}/{n}" for n in DATA_FILES)
+    committed = (PROTOCOL_PATH, RUN_LOG, DATA_PINS) + data_paths
+    guards.require_on_main(repo, committed)
     guards.check_append_only_history(repo, (RUN_LOG,))
-    for p in (PROTOCOL_PATH, RUN_LOG):
+    for p in committed:
         local = repo / p
         if (local.read_bytes() if local.exists() else None) != guards.committed_bytes(repo, "HEAD", p):
             raise guards.Refused(f"{p} differs from HEAD: the count-only code runs from committed files")
+    # review round 15, F04: the pre-freeze runs read the reviewed data files (their data-pins.json pins), and each
+    # run records their sha256 so the freeze can bind the count-only output to the frozen data files
+    pins = {Path(e["path"]).name: e["sha256"] for e in json.loads((repo / DATA_PINS).read_text())["base_files"]}
+    data = {n: sha256_file(repo / DATA_DIR / n) for n in DATA_FILES}
+    if data != {n: pins.get(n) for n in DATA_FILES}:
+        raise guards.Refused("a data file differs from its data-pins.json pin: the pre-freeze runs read the reviewed "
+                             "data files only")
     lock_path = repo / STUDY_PATH / "runtime.lock"
     lock = guards.load_lock(lock_path)
     guards.check_runtime(lock, versions)
@@ -276,7 +343,8 @@ def count_only_context(repo, *, versions=None) -> dict:
     guards.check_parameters(json.loads(pbytes))        # review round 11, C4: study_code.rule, before any fetch
     return {"repo": repo, "protocol": json.loads(pbytes), "protocol_sha256": sha256_bytes(pbytes), "tree": tree,
             "commit": guards.git(repo, "rev-parse", "HEAD"), "runtime_lock_sha256": sha256_file(lock_path),
-            "runtime_environment_sha256": guards.environment_digest(lock), "run_log": logs.read_lines(repo / RUN_LOG)}
+            "runtime_environment_sha256": guards.environment_digest(lock), "run_log": logs.read_lines(repo / RUN_LOG),
+            "data_file_sha256s": data}
 
 
 # ---------------------------------------------------------------- run-log lines

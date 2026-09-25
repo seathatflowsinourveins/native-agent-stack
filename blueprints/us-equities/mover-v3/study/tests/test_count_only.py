@@ -376,6 +376,112 @@ class FailedRunRecord(unittest.TestCase):
                     run.main(argv)
 
 
+def _kill_before_the_line(purpose):
+    """A hard kill between an output's rename and its run-log line: the end line of `purpose` is never written
+    (a SIGKILL runs no 'finally'; here the append itself dies)."""
+    from core import logs
+    real = logs.append_line
+
+    def append(path, obj):
+        if obj.get("purpose") == purpose:
+            raise KeyboardInterrupt(f"killed before the {purpose} line")
+        real(path, obj)
+    return mock.patch.object(logs, "append_line", append)
+
+
+class OrphanOutputs(unittest.TestCase):
+    """Review round 15, N02 (R14-open-2): a count-only or dry-run output that a hard kill left with no run-log line is
+    adopted under the open start line once it equals the output recomputed from its sealed inputs; nothing is fetched
+    again, a tampered file is refused, and the adopted output governs. At e7529b47 both commands refused while the
+    output existed, so the study could only continue by deleting a file no line cited."""
+
+    def _setup(self, tmp, m):
+        import run
+        from core.params import COUNT_ONLY_OUTPUT, PROTOCOL_PATH
+        from tests import fixture_repo as FR
+        fx = FR.build(tmp, frozen=False)
+        repo = fx["repo"]
+        (repo / COUNT_ONLY_OUTPUT).unlink()
+        proto = json.loads((repo / PROTOCOL_PATH).read_text())
+        proto["exposure_registry"]["pre_freeze_access_path"]["rate_limit"].update(FR.RATE_LIMIT)
+        FR.write(repo / PROTOCOL_PATH, json.dumps(proto, indent=1) + "\n")
+        FR.commit_push(repo, "2026-09-25T12:00:00+00:00")
+        return fx, repo, run
+
+    def test_a_count_only_output_left_by_a_hard_kill_is_adopted_from_its_seals(self):
+        from core import logs, runner
+        from core.canon import sha256_file
+        from core.params import COUNT_ONLY_OUTPUT, RUN_LOG
+        from tests import fixture_repo as FR
+        cal = synth.calendar()
+        m = synth.FakeMarket(cal)
+        for i, sym in enumerate(("SA", "SB", "SC")):
+            daily, prints = issuer_data(cal, "2020-05-01", "2020-06-30", lambda d, i=i: 3.0 + i)
+            m.add(sym.lower(), [("2015-01-01", sym)], daily=daily, auctions=prints)
+        m.assets = [{"symbol": x, "status": "active", "class": "us_equity"} for x in ("SA", "SB", "SC")]
+        with tempfile.TemporaryDirectory() as tmp:
+            fx, repo, run = self._setup(tmp, m)
+            root = str(Path(tmp) / "snap")
+            argv = ["count-only", "--snapshot-root", root]
+            with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
+                    mock.patch.object(run, "transports", lambda *_: transports(m)), \
+                    mock.patch.object(run, "clock", fixed_clock), \
+                    mock.patch.object(CO, "PART1_RANGE", ("2020-06-01", "2020-06-03")):
+                self.assertEqual(run.main(argv), 0)                     # the start line
+                FR.commit_push(repo, "2026-09-25T12:05:00+00:00")
+                with _kill_before_the_line("count_only"), self.assertRaises(KeyboardInterrupt):
+                    run.main(argv)
+                out = repo / COUNT_ONLY_OUTPUT
+                self.assertTrue(out.exists())
+                self.assertEqual(logs.read_lines(repo / RUN_LOG)[-1]["purpose"], "count_only_start")
+                body, calls = out.read_bytes(), len(m.calls)
+                # a tampered orphan is not adopted
+                bad = json.loads(body)
+                bad["years"]["2020"]["counts"]["sampled_pairs"] = 10 ** 6
+                out.write_text(json.dumps(bad))
+                with self.assertRaisesRegex(runner.RunRefused, "not adopted"):
+                    run.main(argv)
+                out.write_bytes(body)
+                self.assertEqual(run.main(argv), 0)                     # adopted, nothing fetched again
+                self.assertEqual(len(m.calls), calls)
+                line = logs.read_lines(repo / RUN_LOG)[-1]
+                self.assertEqual((line["purpose"], line["status"], line["results_sha256"], line["adopted_uncited_output"]),
+                                 ("count_only", "complete", sha256_file(out), True))
+                self.assertEqual(line["sealed_parts"], ["part0", "part1", "part3"])
+                self.assertEqual(json.loads(body)["dependencies"]["study_tree"], fx["tree"])
+                FR.commit_push(repo, "2026-09-25T12:10:00+00:00")
+                with self.assertRaises(runner.RunRefused):                # it has run once
+                    run.main(argv)
+
+    def test_a_dry_run_output_left_by_a_hard_kill_is_adopted_from_its_seal(self):
+        from core import logs
+        from core.canon import sha256_file
+        from core.params import DRY_RUN_OUTPUT, RUN_LOG
+        from tests import fixture_repo as FR
+        cal = synth.calendar("2022-06-01", "2023-12-29")
+        s = "2023-05-15"
+        m = synth.FakeMarket(cal)
+        daily, prints = issuer_data(cal, cal.offset(s, -61), cal.offset(s, 12), lambda d: 3.0)
+        m.add("xx", [("2015-01-01", "XX")], daily=daily, auctions=prints)
+        with tempfile.TemporaryDirectory() as tmp:
+            fx, repo, run = self._setup(tmp, m)
+            root = str(Path(tmp) / "snap")
+            argv = ["dry-run", "--sessions", s, "--symbols", "XX", "--snapshot-root", root]
+            with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
+                    mock.patch.object(run, "transports", lambda *_: transports(m)), \
+                    mock.patch.object(run, "clock", fixed_clock):
+                self.assertEqual(run.main(argv), 0)
+                FR.commit_push(repo, "2026-09-25T12:05:00+00:00")
+                with _kill_before_the_line("dry_run"), self.assertRaises(KeyboardInterrupt):
+                    run.main(argv)
+                calls = len(m.calls)
+                self.assertEqual(run.main(argv), 0)
+                self.assertEqual(len(m.calls), calls)
+                line = logs.read_lines(repo / RUN_LOG)[-1]
+                self.assertEqual((line["purpose"], line["status"], line["results_sha256"], line["adopted_uncited_output"]),
+                                 ("dry_run", "complete", sha256_file(repo / DRY_RUN_OUTPUT), True))
+
+
 class Probe(unittest.TestCase):
     def test_probe_list_counts_and_reuse(self):
         cal = synth.calendar()

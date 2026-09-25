@@ -473,14 +473,21 @@ def dry_run(cal, sessions: list, symbols: list, transports: dict, snapshot_root,
     dry_run_requests(cal, sessions, symbols)            # refuses before any fetch (review round 11, C1)
     store = Store()
     root = Path(snapshot_root) / "dry-run"
-    res = driver.stage_fetch(lambda st: dry_run_requests(cal, sessions, symbols), transports, store, fetch_date,
-                             clock=clock)
+    driver.stage_fetch(lambda st: dry_run_requests(cal, sessions, symbols), transports, store, fetch_date,
+                       clock=clock)
     sha = store.write(root)
     if progress is not None:
         progress["dry-run"] = sha
+    return dry_run_output(snapshot_root, sha, sessions, symbols)
+
+
+def dry_run_output(snapshot_root, sha: str, sessions: list, symbols: list) -> dict:
+    """The dry-run output from its sealed snapshot alone (review round 15, N02 / R14-open-2: run.py dry-run
+    recomputes it to adopt an output that a hard kill left with no run-log line)."""
+    sealed = Store.read(Path(snapshot_root) / "dry-run", sha)
     return {"kind": "mover_v3_dry_run_output", "snapshot_sha256": sha, "sessions": list(sessions),
-            "symbols_count": len(symbols), "counts": dry_run_counts(Store.read(root, sha)),
-            "incomplete_by_kind": res["incomplete_by_kind"]}
+            "symbols_count": len(symbols), "counts": dry_run_counts(sealed),
+            "incomplete_by_kind": sealed.incomplete_by_kind()}
 
 
 def dry_run_counts(store) -> dict:
@@ -598,9 +605,29 @@ def run(protocol: dict, cal, transports: dict, snapshot_root, fetch_date: str, r
     enum_bytes = (dumps(enum) + "\n").encode("utf-8")
     (root / "enumeration.json").write_bytes(enum_bytes)
     sessions = sessions or cal.range(*PART1_RANGE)
-    s1, sha1 = sealed("part1", part1_planner(cal, sessions, enum["symbols"]))
+    _, sha1 = sealed("part1", part1_planner(cal, sessions, enum["symbols"]))
     probes = probe_list(cal, enum["actions"])
-    s3, sha3 = sealed("part3", lambda st: probe_requests(cal, probes))
+    _, sha3 = sealed("part3", lambda st: probe_requests(cal, probes))
+    return output_from_sealed(protocol, cal, root, {"part0": sha0, "part1": sha1, "part3": sha3},
+                              rate_per_minute, sessions)
+
+
+def output_from_sealed(protocol: dict, cal, snapshot_root, shas: dict, rate_per_minute: float,
+                       sessions: list | None = None) -> dict:
+    """The count-only output (counts, rates and decisions only) from the sealed parts alone, each read back from
+    <root>/<part> and checked against its sha256 (review round 15, N02 / R14-open-2): run() computes it this way after
+    sealing, and run.py count-only recomputes it from the same seals to adopt an output that a hard kill left with no
+    run-log line (the enumeration file must also be the one part 0 yields). No provider is called."""
+    checked_thresholds(protocol)
+    root = Path(snapshot_root)
+    s0, s1, s3 = (Store.read(root / name, shas[name]) for name in ("part0", "part1", "part3"))
+    enum = enumeration_from(s0)
+    enum_bytes = (dumps(enum) + "\n").encode("utf-8")
+    on_disk = root / "enumeration.json"
+    if not on_disk.exists() or on_disk.read_bytes() != enum_bytes:
+        raise ValueError("enumeration.json is not the enumeration that sealed part 0 yields")
+    sessions = sessions or cal.range(*PART1_RANGE)
+    probes = probe_list(cal, enum["actions"])
     c = part1_counts(s1, cal, sessions, enum["symbols"], enum["actions"])
     phase2_counts(s1, cal, sessions, enum["symbols"], c)
     part0 = {**part0_counts(enum), "enumeration_sha256": sha256_bytes(enum_bytes)}
@@ -608,5 +635,5 @@ def run(protocol: dict, cal, transports: dict, snapshot_root, fetch_date: str, r
                                                      for y in range(2016, 2021)}, rate_per_minute)
     out = outputs(protocol, c, probe_counts(s3, cal, probes), part0, est["estimate_seconds"])
     out["fetch_estimate"] = est
-    out["snapshots"] = {"part0": sha0, "part1": sha1, "part3": sha3}
+    out["snapshots"] = {name: shas[name] for name in ("part0", "part1", "part3")}
     return out

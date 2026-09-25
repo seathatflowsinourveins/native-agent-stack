@@ -78,14 +78,15 @@ class StageRunsOnce(unittest.TestCase):
                 # review round 11, F4: the first run appends only its start line; nothing is fetched before it is
                 # committed and pushed
                 self.assertEqual(run.main(fetch), 0)
-                self.assertEqual(logs.read_lines(repo / RUN_LOG)[0]["purpose"], "fetch_start")
+                # line 0 is the fixture's governing count-only line (review round 15, F04)
+                self.assertEqual(logs.read_lines(repo / RUN_LOG)[1]["purpose"], "fetch_start")
                 self.assertEqual(market.calls, [])
                 with self.assertRaises(guards.Refused):
                     run.main(fetch)
                 FR.commit_push(repo, "2026-11-30T01:00:00+00:00")
                 self.assertEqual(run.main(fetch), 0)
                 line = logs.read_lines(repo / RUN_LOG)[-1]
-                self.assertEqual(line["start_index"], 0)
+                self.assertEqual(line["start_index"], 1)
                 self.assertEqual((line["purpose"], line["status"], line["study_tree"]), ("fetch", "complete", fx["tree"]))
                 sha = line["input_snapshot_sha256s"][0]
                 # F2: the next run refuses until the fetch line is committed and pushed
@@ -119,7 +120,7 @@ class StageRunsOnce(unittest.TestCase):
                         run.main(evaluate)
                 self.assertFalse(results.exists())
                 self.assertEqual(logs.read_lines(repo / RUN_LOG)[-1]["status"], "failed")
-                self.assertEqual(logs.read_lines(repo / RUN_LOG)[-1]["start_index"], 2)
+                self.assertEqual(logs.read_lines(repo / RUN_LOG)[-1]["start_index"], 3)
                 FR.commit_push(repo, "2026-12-01T02:00:00+00:00")
                 self.assertEqual(run.main(evaluate), 0)        # the retry's own start line
                 FR.commit_push(repo, "2026-12-01T02:30:00+00:00")
@@ -437,6 +438,39 @@ class ContextRefusals(unittest.TestCase):
                 with self.assertRaisesRegex(guards.Refused, msg):
                     self.ctx(repo)
 
+    def test_the_coverage_output_is_bound_to_its_producer_line_and_the_frozen_dependencies(self):
+        """Review round 15, F04: at e7529b47 check_coverage_decision accepted the count-only output by its sha256 alone:
+        an output with no complete producer line, or one computed by another tree, calendar, fee file or parameter
+        set than the frozen protocol pins, still decided the frozen coverage. Each is refused now."""
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaisesRegex(guards.Refused, "no complete 'count_only' run-log line"):
+                self.ctx(FR.build(tmp, with_count_only_line=False)["repo"])
+        with tempfile.TemporaryDirectory() as tmp:
+            deps = json.loads((FR.build(tmp, frozen=False)["repo"] / runner.COUNT_ONLY_OUTPUT).read_text())[
+                "dependencies"]
+        for key, value in (("study_tree", "0" * 40), ("parameters_sha256", "0" * 64),
+                           ("data_file_sha256s", {**deps["data_file_sha256s"], "session-calendar.json": "0" * 64})):
+            with tempfile.TemporaryDirectory() as tmp:
+                repo = FR.build(tmp, output_overrides={"dependencies": {**deps, key: value}})["repo"]
+                with self.assertRaisesRegex(guards.Refused, "dependencies differ from the frozen protocol's"):
+                    self.ctx(repo)
+
+    def test_the_pre_freeze_runs_read_only_the_pinned_data_files(self):
+        """Review round 15, F04: the count-only and dry-run context refuses a data file that differs from its
+        data-pins.json pin before anything is fetched or logged, and records both data files' sha256 (at e7529b47 the
+        calendar bytes the count-only run read were unbound)."""
+        from core.params import DATA_DIR
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.build(tmp, frozen=False)["repo"]
+            with FR.isolated_bytecode():
+                ctx = runner.count_only_context(repo)
+            self.assertEqual(sorted(ctx["data_file_sha256s"]), ["fees-v3.json", "session-calendar.json"])
+            cal = repo / DATA_DIR / "session-calendar.json"
+            cal.write_text(json.dumps(json.loads(cal.read_text()), indent=2))       # same sessions, other bytes
+            FR.commit_push(repo, "2026-10-01T00:00:00+00:00")
+            with FR.isolated_bytecode(), self.assertRaisesRegex(guards.Refused, "data-pins.json pin"):
+                runner.count_only_context(repo)
+
     def test_transport_deviation_governs_only_with_its_logged_reproduction_check(self):
         """Review round 10, H1 and F6: a transport deviation governs only when it cites the committed output of a
         logged run.py transport-check run from its tree; a self-declared passes: true is refused."""
@@ -526,6 +560,54 @@ class ContextRefusals(unittest.TestCase):
             FR.commit_push(repo, "2027-01-04T07:00:00+00:00")
             with self.assertRaises(guards.Refused):           # a change outside study/fetch/ is an ordinary deviation
                 self.ctx(repo)
+
+    def test_a_transport_check_output_left_by_a_hard_kill_is_adopted_from_its_seals(self):
+        """Review round 15, N02 (R14-open-2): the live sample is sealed before the check is computed, so an output that
+        a hard kill left with no run-log line is adopted after the check is recomputed from the seals (no second
+        draw), and a tampered one is refused. At e7529b47 the command refused while the file existed."""
+        from tests.test_count_only import _kill_before_the_line
+        cal = synth.calendar()
+        market, symbols = build_market(cal)
+        enum = {"symbols": symbols, "actions": [], "active": symbols, "counts": {}}
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp, enumeration=enum)
+            repo, snap = fx["repo"], str(Path(tmp) / "snap")
+
+            def main(*argv):
+                with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
+                        mock.patch.object(run, "transports", lambda *_: transports(market)), \
+                        mock.patch.object(run, "clock", fixed_clock):
+                    return run.main(list(argv))
+            main("fetch", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot", snap)
+            FR.commit_push(repo, "2027-01-03T00:00:00+00:00")
+            main("fetch", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot", snap)
+            sha = logs.read_lines(repo / RUN_LOG)[-1]["input_snapshot_sha256s"][0]
+            FR.commit_push(repo, "2027-01-04T00:00:00+00:00")
+            FR.write(repo / STUDY_PATH / "fetch" / "transport.py", "HOST = 'fixture-v2'\n")
+            FR.commit_push(repo, "2027-01-04T01:00:00+00:00")
+            new_tree = FR.sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}")
+            check = ["transport-check", "--stage", "validation", "--enumeration", str(fx["enumeration"]),
+                     "--snapshot", snap, "--sha", sha]
+            with _kill_before_the_line("transport_check"), self.assertRaises(KeyboardInterrupt):
+                main(*check)
+            out = repo / RESULTS_DIR / f"transport-check-{new_tree[:12]}.json"
+            body, calls = out.read_bytes(), len(market.calls)
+            self.assertTrue(json.loads(body)["passes"])
+            self.assertEqual(sorted(json.loads(body)["live_snapshots"]), ["stage"])
+            tampered = json.loads(body)
+            tampered["live"]["by_kind"] = {}
+            out.write_text(json.dumps(tampered))
+            with self.assertRaisesRegex(runner.RunRefused, "not adopted"):
+                main(*check)
+            out.write_bytes(body)
+            self.assertEqual(main(*check), 0)
+            self.assertEqual(len(market.calls), calls)                    # nothing drawn again
+            line = logs.read_lines(repo / RUN_LOG)[-1]
+            self.assertEqual((line["purpose"], line["status"], line["results_sha256"], line["adopted_uncited_output"]),
+                             ("transport_check", "complete", canon.sha256_file(out), True))
+            FR.commit_push(repo, "2027-01-04T02:00:00+00:00")
+            with self.assertRaises(runner.RunRefused):                     # a tree's check runs once
+                main(*check)
 
     def test_a_void_deviation_scores_validation_p_one(self):
         """Review round 10, F4: a committed void deviation (a recorded pre-freeze read) makes every validation item

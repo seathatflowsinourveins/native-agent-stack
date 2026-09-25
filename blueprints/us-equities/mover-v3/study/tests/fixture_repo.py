@@ -18,10 +18,10 @@ from pathlib import Path
 from unittest import mock
 
 from core.calendar import build_calendar
-from core.canon import dumps, sha256_bytes, sha256_file
+from core.canon import dumps, sha256_bytes, sha256_file, sha256_obj
 from core.coverage_rule import rule_sha256
-from core.params import (ACCESS_LOG, COST_TABLE, COUNT_ONLY_OUTPUT, DATA_DIR, PROTOCOL_PATH, RESULTS_DIR, RUN_LOG,
-                         STUDY_PATH)
+from core.params import (ACCESS_LOG, COST_TABLE, COUNT_ONLY_OUTPUT, DATA_DIR, DATA_PINS, PARAMETERS, PROTOCOL_PATH,
+                         RESULTS_DIR, RUN_LOG, STUDY_PATH)
 
 REAL = Path(__file__).resolve().parents[5]
 # review round 15, N01: the fixture's fee file has data/fees-v3.json's schema (an open-ended last row included)
@@ -123,18 +123,34 @@ def write(path: Path, data) -> Path:
 RATE_LIMIT = {"per_minute": 10000.0, "source": "synthetic"}
 
 
-def count_only_output(protocol: dict, enumeration_sha256: str, dropped=(), tested=True, rate=0.01) -> dict:
+DATA_FILES = ("session-calendar.json", "fees-v3.json")
+
+
+def count_only_output(protocol: dict, enumeration_sha256: str, dropped=(), tested=True, rate=0.01, deps=None) -> dict:
+    """review round 15, F04: with the dependency manifest the freeze binds (runner.count_only_dependencies)."""
     return {"kind": "mover_v3_count_only_output", "coverage_rule_sha256": rule_sha256(protocol),
             "item_rule": {"items_tested": tested, "dropped_years": sorted(dropped)},
             "validation_identity_limited": rate > 0.02,
             "years": {"2020": {"rates": {"identity_unreached_rate": rate}}},
             "part0": {"enumeration_sha256": enumeration_sha256},
-            "identity_probe": {"passes": True}, "fetch_margin": {"passes": True}, "rate_limit": dict(RATE_LIMIT)}
+            "identity_probe": {"passes": True}, "fetch_margin": {"passes": True}, "rate_limit": dict(RATE_LIMIT),
+            **({"study_tree": deps["study_tree"], "dependencies": deps} if deps else {})}
+
+
+def count_only_line(deps: dict, output_sha256: str, protocol: dict) -> dict:
+    """The complete 'count_only' run-log line that produced the output (review round 15, F04 and N02)."""
+    return {"utc_start": "2026-09-30T12:30:00Z", "utc_end": "2026-09-30T12:40:00Z", "stage": "pre_freeze",
+            "purpose": "count_only", "commit": "fixture", "study_tree": deps["study_tree"],
+            "runtime_lock_sha256": deps["runtime_lock_sha256"], "protocol_sha256": "fixture-draft",
+            "data_file_sha256s": deps["data_file_sha256s"], "amendment_files": {}, "input_snapshot_sha256s": [],
+            "status": "complete", "results_sha256": output_sha256, "coverage_rule_sha256": rule_sha256(protocol),
+            "output_path": COUNT_ONLY_OUTPUT, "start_index": None, "sealed_parts": ["part0", "part1", "part3"]}
 
 
 def build(tmp, *, enumeration: dict | None = None, freeze_when: str = "2026-10-02T21:30:00+00:00",
           cal_first: str = "2015-09-01", cal_last: str = "2028-12-29", frozen: bool = True,
-          coverage_decision=None, output_overrides: dict | None = None, freeze_sign: bool = True) -> dict:
+          coverage_decision=None, output_overrides: dict | None = None, freeze_sign: bool = True,
+          with_count_only_line: bool = True) -> dict:
     """Returns {"repo", "enumeration" (path), "protocol" (parsed frozen), "tree"}."""
     repo = init_repo(Path(tmp) / "repo")
     write(repo / ".gitignore", (REAL / ".gitignore").read_text())
@@ -152,12 +168,23 @@ def build(tmp, *, enumeration: dict | None = None, freeze_when: str = "2026-10-0
     enum = enumeration or {"symbols": [], "actions": [], "active": [], "counts": {}}
     enum_path = write(Path(tmp) / "enumeration.json", dumps(enum) + "\n")
     protocol = json.loads((REAL / PROTOCOL_PATH).read_text())
-    out = count_only_output(protocol, sha256_file(enum_path))
-    out.update(output_overrides or {})
-    write(repo / COUNT_ONLY_OUTPUT, json.dumps(out, sort_keys=True, indent=1) + "\n")
+    data = {n: sha256_file(repo / DATA_DIR / n) for n in DATA_FILES}
+    write(repo / DATA_PINS, json.dumps({"base_files": [{"path": f"{DATA_DIR}/{n}", "sha256": data[n]}
+                                                      for n in DATA_FILES]}, indent=1) + "\n")
     write(repo / PROTOCOL_PATH, json.dumps(protocol, indent=1) + "\n")
     commit_push(repo, "2026-09-30T12:00:00+00:00", "study tree and draft protocol")
     tree = sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}")
+    # review round 15, F04: the governing count-only output names its dependencies, and its complete run-log line cites
+    # it; both are bound to the tree, the data files and the specification the freeze pins
+    deps = {"study_tree": tree, "runtime_lock_sha256": sha256_file(study / "runtime.lock"),
+            "data_file_sha256s": dict(sorted(data.items())), "parameters_sha256": sha256_obj(PARAMETERS),
+            "coverage_rule_sha256": rule_sha256(protocol), "rate_limit": {**RATE_LIMIT}}
+    out = count_only_output(protocol, sha256_file(enum_path), deps=deps)
+    out.update(output_overrides or {})
+    write(repo / COUNT_ONLY_OUTPUT, json.dumps(out, sort_keys=True, indent=1) + "\n")
+    if frozen and with_count_only_line:    # a draft fixture keeps an empty run log (pre-freeze command tests)
+        write(repo / RUN_LOG, dumps(count_only_line(deps, sha256_file(repo / COUNT_ONLY_OUTPUT), protocol)) + "\n")
+    commit_push(repo, "2026-09-30T13:00:00+00:00", "count-only output")
     if frozen:
         protocol["status"] = "frozen"
         protocol["frozen_before_outcomes"] = True

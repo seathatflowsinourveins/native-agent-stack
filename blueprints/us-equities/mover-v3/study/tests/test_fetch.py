@@ -301,6 +301,25 @@ class ReproductionCheck(unittest.TestCase):
         self.sealed.page_norm[key] = ["0" * 64]
         self.assertFalse(transport_check.check_reparse(self.sealed)["passes"])
 
+    def test_the_live_sample_is_sealed_and_the_check_recomputes_from_the_seals(self):
+        """Review round 15, N02 (R14-open-2): run.py transport-check seals each live sample before computing the check,
+        so the check can be recomputed from the seals (to adopt an output a hard kill left with no run-log line), and
+        a sample already sealed under the live root is read, never drawn again."""
+        changed = ["blueprints/us-equities/mover-v3/study/fetch/transport.py"]
+        prefix = "blueprints/us-equities/mover-v3/study/fetch"
+        with tempfile.TemporaryDirectory() as live_root:
+            res = transport_check.reproduction_check(self.planner, self.sealed, transports(self.m), changed, prefix,
+                                                     seed="s", live_root=live_root, clock=fixed_clock)
+            self.assertTrue(res["passes"], res)
+            self.assertEqual(sorted(res["live_snapshots"]), ["stage"])
+            again = transport_check.reproduction_from_sealed(self.planner, self.sealed, changed, prefix, "s", (),
+                                                             live_root, res["live_snapshots"])
+            self.assertEqual(again, res)
+            dead = {"data": None, "trading": None}           # no transport: a second draw would fail
+            reused = transport_check.reproduction_check(self.planner, self.sealed, dead, changed, prefix, seed="s",
+                                                        live_root=live_root, clock=fixed_clock)
+            self.assertEqual(reused, res)
+
     def test_live_sample_detects_different_rows(self):
         other = synth.FakeMarket(self.cal)
         daily, prints = issuer_data(self.cal, self.cal.offset(self.sess[0], -1), self.sess[-1], lambda d: 5.01)

@@ -77,8 +77,25 @@ def cmd_build_calendar(a) -> int:
     return 0
 
 
+def _uncited(run_log: list, out_path: Path):
+    """Review round 15, N02 (R14-open-2): the sha256 of an output file that no run-log line cites (a hard kill between
+    its rename and its line), or None when there is no file; a file a line cites is refused by the caller."""
+    from core import runner
+    from core.canon import sha256_file
+    if not out_path.exists():
+        return None
+    sha = sha256_file(out_path)
+    if any(x.get("results_sha256") == sha for x in run_log):
+        raise runner.RunRefused(f"{out_path.name} exists and its run-log line cites it: the run is done")
+    return sha
+
+
 def cmd_count_only(a) -> int:
-    """The pre-freeze count-only run (exposure_registry.pre_freeze_access_path; review round 9, M-2 and F8)."""
+    """The pre-freeze count-only run (exposure_registry.pre_freeze_access_path; review round 9, M-2 and F8).
+
+    Review round 15: the output records its dependency manifest (runner.count_only_dependencies; F04), and an output
+    that a hard kill left with no run-log line is adopted under the open start line once it equals the output
+    recomputed from its sealed parts; nothing is fetched again (N02, R14-open-2)."""
     from core import calendar as CAL
     from core import count_only, logs, runner
     from core.canon import atomic_write_results, sha256_file
@@ -90,8 +107,7 @@ def cmd_count_only(a) -> int:
     if any(x.get("purpose") == "count_only" and x.get("status") == "complete" for x in ctx["run_log"]):
         raise runner.RunRefused("the count-only code runs once; a rerun follows only a failed or incomplete run")
     out_path = REPO / COUNT_ONLY_OUTPUT
-    if out_path.exists():
-        raise runner.RunRefused(f"{COUNT_ONLY_OUTPUT} exists")
+    orphan = _uncited(ctx["run_log"], out_path)
     cal = CAL.Calendar.from_files(REPO / DATA_DIR / "session-calendar.json")
     CAL.check_study_reach(cal)                     # review round 15, N01
     # review round 12, F3: once a failed run has sealed part 1 (the rows its rates come from), a later run keeps its
@@ -101,17 +117,35 @@ def cmd_count_only(a) -> int:
                 x.get("coverage_rule_sha256") != rule_sha256(ctx["protocol"]):
             raise runner.RunRefused("an earlier count-only run sealed part 1 under another coverage_rule; the rule "
                                     "cannot change after its rates could have been read")
-    tr = transports(ctx["protocol"])
-    si = runner.begin_or_resume(ctx, "pre_freeze", "count_only",
-                                {"coverage_rule_sha256": rule_sha256(ctx["protocol"])}, clock)   # review round 11, F4
+    deps = runner.count_only_dependencies(ctx, ctx["protocol"], rate)
+    identity = {"coverage_rule_sha256": rule_sha256(ctx["protocol"]),       # review round 11, F4
+                "data_file_sha256s": deps["data_file_sha256s"]}               # review round 15, F04
+    si = runner.begin_or_resume(ctx, "pre_freeze", "count_only", identity, clock)
     if si is None:
         print(json.dumps({"started": True, "next": "commit and push the start line, then run again"}))
         return 0
+    extra = {"coverage_rule_sha256": rule_sha256(ctx["protocol"]), "output_path": COUNT_ONLY_OUTPUT, "start_index": si}
+    if orphan is not None:
+        body = json.loads(out_path.read_text(encoding="utf-8"))
+        shas = body.get("snapshots") or {}
+        start = clock()
+        expected = count_only.output_from_sealed(ctx["protocol"], cal, a.snapshot_root, shas, rate["per_minute"])
+        expected.update({"study_tree": ctx["tree"], "code_revision": body.get("code_revision"), "rate_limit": rate,
+                         "dependencies": deps})
+        digest = runner.adopt_uncited_output(out_path, expected)
+        logs.append_line(REPO / RUN_LOG, runner.run_line(
+            ctx, stage="pre_freeze", purpose="count_only", commit=ctx["commit"], utc_start=start, utc_end=clock(),
+            snapshots=[shas[k] for k in sorted(shas)], status="complete", results_sha256=digest,
+            extra={**extra, "sealed_parts": sorted(shas), "adopted_uncited_output": True}))
+        print(json.dumps({"output_sha256": digest, "adopted": True, "item_rule": body["item_rule"]}, sort_keys=True))
+        return 0
+    tr = transports(ctx["protocol"])
     start, status, digest, out, progress = clock(), "failed", None, None, {}
     try:
         out = count_only.run(ctx["protocol"], cal, tr, a.snapshot_root, start[:10], rate["per_minute"],
                              clock=clock, progress=progress)
-        out.update({"study_tree": ctx["tree"], "code_revision": ctx["commit"], "rate_limit": rate})
+        out.update({"study_tree": ctx["tree"], "code_revision": ctx["commit"], "rate_limit": rate,
+                    "dependencies": deps})
         digest = atomic_write_results(out_path, out)
         status = "complete"
     finally:
@@ -121,15 +155,15 @@ def cmd_count_only(a) -> int:
         logs.append_line(REPO / RUN_LOG, runner.run_line(
             ctx, stage="pre_freeze", purpose="count_only", commit=ctx["commit"], utc_start=start, utc_end=clock(),
             snapshots=list(progress.values()), status=status, results_sha256=digest,
-            extra={"coverage_rule_sha256": rule_sha256(ctx["protocol"]), "output_path": COUNT_ONLY_OUTPUT,
-                   "start_index": si, "sealed_parts": sorted(progress)}))
+            extra={**extra, "sealed_parts": sorted(progress)}))
     print(json.dumps({"output_sha256": digest, "item_rule": out["item_rule"]}, sort_keys=True))
     return 0
 
 
 def cmd_dry_run(a) -> int:
     """freeze_preconditions: the native dry run of the fetch plumbing on an already exposed window outside every v3
-    window, counts only, into results/dry-run-output.json with its run-log line (review round 10, F6)."""
+    window, counts only, into results/dry-run-output.json with its run-log line (review round 10, F6). Review round
+    15, N02 (R14-open-2): an output a hard kill left with no line is adopted from its sealed snapshot."""
     from core import count_only, logs, runner
     from core import calendar as CAL
     from core.canon import atomic_write_results, sha256_file
@@ -138,18 +172,32 @@ def cmd_dry_run(a) -> int:
     sessions, symbols = a.sessions.split(","), a.symbols.split(",")
     count_only.check_dry_run_window(sessions)
     out_path = REPO / DRY_RUN_OUTPUT
-    if out_path.exists() or any(x.get("purpose") == "dry_run" and x.get("status") == "complete" for x in ctx["run_log"]):
+    if any(x.get("purpose") == "dry_run" and x.get("status") == "complete" for x in ctx["run_log"]):
         raise runner.RunRefused("the native dry run has its output; it runs once")
+    orphan = _uncited(ctx["run_log"], out_path)
     cal = CAL.Calendar.from_files(REPO / DATA_DIR / "session-calendar.json")
     CAL.check_study_reach(cal)                     # review round 15, N01
     count_only.dry_run_requests(cal, sessions, symbols)   # every request's reach, before any fetch or log line (C1)
-    tr = transports(ctx["protocol"])                     # the pinned rate limit, before any fetch (C2)
     from core.canon import sha256_obj
     si = runner.begin_or_resume(ctx, "pre_freeze", "dry_run", {"sessions": sessions,
                                                                "symbols_sha256": sha256_obj(symbols)}, clock)  # F4
     if si is None:
         print(json.dumps({"started": True, "next": "commit and push the start line, then run again"}))
         return 0
+    extra = {"output_path": DRY_RUN_OUTPUT, "sessions": sessions, "symbols_count": len(symbols), "start_index": si}
+    if orphan is not None:
+        body = json.loads(out_path.read_text(encoding="utf-8"))
+        start = clock()
+        expected = count_only.dry_run_output(a.snapshot_root, body.get("snapshot_sha256"), sessions, symbols)
+        expected.update({"study_tree": ctx["tree"], "code_revision": body.get("code_revision")})
+        digest = runner.adopt_uncited_output(out_path, expected)
+        logs.append_line(REPO / RUN_LOG, runner.run_line(
+            ctx, stage="pre_freeze", purpose="dry_run", commit=ctx["commit"], utc_start=start, utc_end=clock(),
+            snapshots=[body["snapshot_sha256"]], status="complete", results_sha256=digest,
+            extra={**extra, "adopted_uncited_output": True}))
+        print(json.dumps({"output_sha256": digest, "adopted": True}, sort_keys=True))
+        return 0
+    tr = transports(ctx["protocol"])                     # the pinned rate limit, before any fetch (C2)
     start, status, digest, out, progress = clock(), "failed", None, None, {}
     try:
         out = count_only.dry_run(cal, sessions, symbols, tr, a.snapshot_root, start[:10], clock=clock,
@@ -162,9 +210,7 @@ def cmd_dry_run(a) -> int:
             status, digest = "complete", sha256_file(out_path)
         logs.append_line(REPO / RUN_LOG, runner.run_line(
             ctx, stage="pre_freeze", purpose="dry_run", commit=ctx["commit"], utc_start=start, utc_end=clock(),
-            snapshots=list(progress.values()), status=status, results_sha256=digest,
-            extra={"output_path": DRY_RUN_OUTPUT, "sessions": sessions, "symbols_count": len(symbols),
-                   "start_index": si}))
+            snapshots=list(progress.values()), status=status, results_sha256=digest, extra=extra))
     print(json.dumps({"output_sha256": digest}, sort_keys=True))
     return 0
 
@@ -184,8 +230,10 @@ def cmd_transport_check(a) -> int:
         raise runner.RunRefused(f"{a.sha} is not the snapshot sealed by {a.stage}'s logged fetch")
     rel = f"{RESULTS_DIR}/transport-check-{ctx['tree'][:12]}.json"
     out_path = REPO / rel
-    if out_path.exists():
-        raise runner.RunRefused(f"{rel} exists: a tree's reproduction check runs once")
+    # review round 15, N02 (R14-open-2): a file a line cites refuses a second check (a tree's check runs once); an
+    # uncited file (a hard kill after its rename) is adopted below if the check recomputed from its seals equals it
+    orphan = _uncited(ctx["run_log"], out_path)
+    live_root = Path(a.snapshot).parent / f"transport-check-{ctx['tree'][:12]}-live"
     store = Store.read(a.snapshot, a.sha)
     changed = guards.git(REPO, "diff-tree", "-r", "--name-only", ctx["pinned_tree"], ctx["tree"]).splitlines()
     # review round 11, F3: every sealed holdout snapshot is checked too, and the live sample is seeded by the first
@@ -200,14 +248,31 @@ def cmd_transport_check(a) -> int:
     seed = guards.first_commit_with_tree(REPO, ctx["tree"])
     if seed is None:
         raise runner.RunRefused("the new tree is not yet on origin/main: its first commit there seeds the sample")
+    meta = {"kind": "mover_v3_transport_check", "new_tree": ctx["tree"], "pinned_tree": ctx["pinned_tree"],
+            "new_fetch_tree": guards.git(REPO, "rev-parse", f"HEAD:{guards.STUDY_PATH}/fetch"),
+            "stage": a.stage, "snapshot_sha256": a.sha, "changed_paths": changed}
+    if orphan is not None:
+        body = json.loads(out_path.read_text(encoding="utf-8"))
+        start = clock()
+        expected = transport_check.reproduction_from_sealed(ST.planner(spec), store, changed, "fetch", seed, hstores,
+                                                            live_root, body.get("live_snapshots") or {})
+        expected.update(meta)
+        digest = runner.adopt_uncited_output(out_path, expected, ignore=())
+        logs.append_line(REPO / RUN_LOG, runner.run_line(
+            ctx, stage=a.stage, purpose="transport_check", commit=ctx["commit"], utc_start=start, utc_end=clock(),
+            snapshots=[a.sha], status="complete", results_sha256=digest,
+            extra={"output_path": rel, "live_snapshots": body.get("live_snapshots"), "adopted_uncited_output": True}))
+        print(json.dumps({"output_path": rel, "output_sha256": digest, "passes": body.get("passes"), "adopted": True},
+                         sort_keys=True))
+        return 0
     tr = transports(ctx["protocol"])
-    start, status, digest = clock(), "failed", None
+    start, status, digest, res = clock(), "failed", None, {}
     try:
+        # review round 15, N02 (R14-open-2): each live sample is sealed under live_root before the check is computed
+        # from the seals, and a sample sealed by a killed run is read, never drawn again
         res = transport_check.reproduction_check(ST.planner(spec), store, tr, changed, "fetch", seed=seed,
-                                                 holdout_stores=hstores)
-        res.update({"kind": "mover_v3_transport_check", "new_tree": ctx["tree"], "pinned_tree": ctx["pinned_tree"],
-                    "new_fetch_tree": guards.git(REPO, "rev-parse", f"HEAD:{guards.STUDY_PATH}/fetch"),
-                    "stage": a.stage, "snapshot_sha256": a.sha, "changed_paths": changed})
+                                                 holdout_stores=hstores, live_root=live_root, clock=clock)
+        res.update(meta)
         digest = atomic_write_results(out_path, res)
         status = "complete"
     finally:
@@ -215,7 +280,8 @@ def cmd_transport_check(a) -> int:
             status, digest = "complete", sha256_file(out_path)
         logs.append_line(REPO / RUN_LOG, runner.run_line(
             ctx, stage=a.stage, purpose="transport_check", commit=ctx["commit"], utc_start=start, utc_end=clock(),
-            snapshots=[a.sha], status=status, results_sha256=digest, extra={"output_path": rel}))
+            snapshots=[a.sha], status=status, results_sha256=digest,
+            extra={"output_path": rel, "live_snapshots": res.get("live_snapshots")}))
     print(json.dumps({"output_path": rel, "output_sha256": digest, "passes": res.get("passes")}, sort_keys=True))
     return 0
 

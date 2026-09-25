@@ -11,6 +11,9 @@ PROTOCOL_PATH = "blueprints/us-equities/mover-v3/protocol-core-draft.json"
 STUDY_PATH = "blueprints/us-equities/mover-v3/study"
 FETCH_PATH = "blueprints/us-equities/mover-v3/study/fetch"
 DATA_DIR = "blueprints/us-equities/mover-v3/data"
+# data-pins.json: the reviewed sha256 of each base data file as first committed (freeze_preconditions[2]); the
+# pre-freeze count-only and dry-run paths refuse data files that differ from it (review round 15, F04)
+DATA_PINS = "blueprints/us-equities/mover-v3/data-pins.json"
 RUN_LOG = "blueprints/us-equities/mover-v3/run-log.jsonl"
 ACCESS_LOG = "blueprints/us-equities/mover-v3/holdout-access-log.jsonl"
 DEVIATIONS = "blueprints/us-equities/mover-v3/deviations.json"
@@ -85,4 +88,4 @@ COST_TABLE = PARAMETERS["cost_table"]
 # The sha256 of coverage_rule (canonical JSON) that this count-only code was written against
 # (coverage_rule.decided_by_code). tests/test_params.py (test_coverage_rule_hash_is_recorded) recomputes it from
 # the protocol.
-COVERAGE_RULE_SHA256 = "a09c657f96d14e8d131e74666bc4ef0983f73d7c44d3165bae74a4215c2e1e7e"
+COVERAGE_RULE_SHA256 = "946958e69589c83df4e19698a57ea7fe1ed29e6c70fddcc2eb6c96adf3351c77"
