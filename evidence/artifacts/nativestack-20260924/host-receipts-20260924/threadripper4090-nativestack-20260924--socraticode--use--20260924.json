@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--socraticode--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "socraticode",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/checks.py socraticode",
+      "exit": 0,
+      "duration_s": 0.935,
+      "output_sha256": "08c8dc76bec867ff36b09798f1c33f9a7ea2c75f28df859693f192b55d3bfa19",
+      "output_excerpt": "Semantic search returned before.py with the exact greeting definition and return expression.\n"
+    }
+  ],
+  "tool_versions": {
+    "socraticode": "1.14.0"
+  },
+  "observed_at_utc": "2026-09-24T04:21:59Z",
+  "result": "pass",
+  "claim": "Live lookup returned a source-specific answer absent from the query; explicit content assertions passed.",
+  "limitations": [
+    "Retained metadata validation is not a fresh execution of the underlying component. Original commands, times, exits and stream digests are in execution-ledger.json; raw streams remain private. Prior failures and scope limitations remain."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:21:59Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}

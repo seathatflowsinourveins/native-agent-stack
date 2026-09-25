@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--llama-cpp--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "llama-cpp",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/checks.py llama-cpp",
+      "exit": 0,
+      "duration_s": 4.459,
+      "output_sha256": "a25f014fb9526d99a14d744454f85256823e410c62d3aa6d9ee178293f9d2886",
+      "output_excerpt": "{\"structured_answer\": 42, \"usage\": {\"completion_tokens\": 7, \"prompt_tokens\": 20, \"total_tokens\": 27, \"prompt_tokens_details\": {\"cached_tokens\": 0}}}\n"
+    }
+  ],
+  "tool_versions": {
+    "llama-cpp": "b11146 (0.5.0-dev)"
+  },
+  "observed_at_utc": "2026-09-24T04:18:53Z",
+  "result": "pass",
+  "claim": "Bounded native component check passed its explicit content assertion; see the checked-in check source and retained execution ledger.",
+  "limitations": [
+    "This receipt does not imply whole-platform acceptance, comparative quality, provider billing, untested repository coverage, or an off-host recovery guarantee. Historical failures remain in execution-ledger.json."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:18:53Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ],
+  "qualified_models": [
+    {
+      "model_id": "unsloth/Qwen3.8-27B-GGUF",
+      "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+      "runtime": "llama.cpp CUDA12.8; 36 GPU layers; 8192 context; one slot",
+      "runtime_version": "b11146 (0.5.0-dev)",
+      "bars": "Structured JSON, arithmetic reasoning, and tool-call fixtures passed; ~5 generated tokens/s under shared GPU offload. Text-only; no comparative benchmark.",
+      "result": "pass"
+    }
+  ]
+}

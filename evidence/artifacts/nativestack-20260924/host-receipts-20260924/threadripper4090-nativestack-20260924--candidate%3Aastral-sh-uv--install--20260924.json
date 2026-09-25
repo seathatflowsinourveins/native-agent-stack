@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--candidate:astral-sh-uv--install--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "candidate:astral-sh-uv",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/checks.py candidate:astral-sh-uv --version-only",
+      "exit": 0,
+      "duration_s": 0.058,
+      "output_sha256": "d283bf009a2e201b4e04e8daf74ffb50e511651240c4fd38e633cb7ebb439ce7",
+      "output_excerpt": "uv 0.12.17 (x86_64-unknown-linux-gnu)\n\n"
+    }
+  ],
+  "tool_versions": {
+    "candidate:astral-sh-uv": "0.12.17"
+  },
+  "observed_at_utc": "2026-09-24T04:18:45Z",
+  "result": "pass",
+  "claim": "Installed native command executed and reported its version. Functional acceptance is a separate observation.",
+  "limitations": [
+    "This receipt does not imply whole-platform acceptance, comparative quality, provider billing, untested repository coverage, or an off-host recovery guarantee. Historical failures remain in execution-ledger.json."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:18:45Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}
