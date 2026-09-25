@@ -299,6 +299,18 @@ def parse_cancel_request_ns(paper_output: dict) -> list[int]:
                   if r.get("kind") == "cancel")
 
 
+def named_cancel_request_ns(paper_output: dict) -> dict[str, int]:
+    """client_order_id -> host-clock time of the *first* cancel request that names it.
+    Runners since 2026-09-25 record `client_id` on each cancel request (the owned
+    order the DELETE was for); older ledgers have none, and this returns {}. A retried
+    cancel keeps its first request, the instant the cancel was initiated."""
+    named = {}
+    for request in sorted(paper_output.get("requests", []), key=lambda r: r["timestamp"]):
+        if request.get("kind") == "cancel" and request.get("client_id"):
+            named.setdefault(request["client_id"], epoch_seconds_to_ns(request["timestamp"]))
+    return named
+
+
 def resolve_order_timeout_seconds(ingest_receipt: dict) -> tuple[int, str]:
     """Find the adaptive-paper config file whose sha256 matches this trial's
     ingest-receipt config_sha256 and read its order_timeout_seconds, so the
@@ -345,9 +357,15 @@ def resolve_cancel_timestamps(paper_orders: list[dict], paper_output: dict, orde
     (1) does not hold. Both branches use a real, declared, non-negotiated cancel
     instant -- never a successor order's submit time.
 
-    `requests[]` carries no client_order_id and no symbol (adaptive-paper/runner.py's
-    `before_request()` records only `{"timestamp": ..., "kind": ...}`), so a cancel
-    request cannot be attributed to a specific order directly. The sound rule used
+    Exact path (runners since 2026-09-25): when any cancel request carries the
+    `client_id` of the owned order it was for (named_cancel_request_ns), each canceled
+    order resolves to its own first named request, and a canceled order with no named
+    request (for example one canceled broker-side) falls back to submit +
+    order_timeout_seconds with its own source marker. The inference below is not used.
+
+    Older ledgers: `requests[]` carries no client_order_id and no symbol (adaptive-paper/
+    runner.py's `before_request()` recorded only `{"timestamp": ..., "kind": ...}`), so a
+    cancel request cannot be attributed to a specific order directly. The sound rule used
     here: a cancel request at time T is attributed to order O only if O is the
     *unique* order that is open (submitted, and not yet terminal -- see
     `_is_open_at`) across the *entire trial* at T, and O is one of the trial's
@@ -391,6 +409,16 @@ def resolve_cancel_timestamps(paper_orders: list[dict], paper_output: dict, orde
     their mutual agreement is not established by this replay and is not assumed."""
     canceled = [o for o in paper_orders if o["status"] == "canceled"]
     canceled_ids = {o["client_order_id"] for o in canceled}
+    named = named_cancel_request_ns(paper_output)
+    if named:
+        # Runners since 2026-09-25 record the owned order each cancel request was for,
+        # so every canceled order resolves exactly, or declares its fallback per order.
+        return {order["client_order_id"]: (
+            {"cancel_ts_ns": named[order["client_order_id"]], "source": "recorded_cancel_request_client_id"}
+            if order["client_order_id"] in named else
+            {"cancel_ts_ns": order["submitted_at_ns"] + order_timeout_seconds * 10**9,
+             "source": "submit_plus_order_timeout_seconds_no_named_cancel_request"})
+            for order in canceled}
     cancel_reqs = parse_cancel_request_ns(paper_output)
     resolved = {}
     use_recorded = bool(canceled) and len(canceled) == len(cancel_reqs)
@@ -472,7 +500,9 @@ def clock_provenance(paper_orders: list[dict], paper_output: dict) -> dict:
     return {
         "submit_clock_source": "broker-reported (Alpaca order `submitted_at`)",
         "cancel_clock_source": "host clock, captured just before send in adaptive-paper/runner.py's "
-                                "before_request() (no client_order_id recorded alongside it)",
+                                "before_request() " + ("(with the owned order's client_order_id)"
+                                                       if named_cancel_request_ns(paper_output)
+                                                       else "(no client_order_id recorded alongside it)"),
         "sip_quote_clock_source": "Alpaca SIP feed timestamps, a third clock whose agreement with either "
                                    "the host clock or the broker clock is not established by this replay",
         "counts_match": counts_match,

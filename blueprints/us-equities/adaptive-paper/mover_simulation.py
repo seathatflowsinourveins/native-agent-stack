@@ -219,7 +219,7 @@ class MoverSimulatedPort:
         if client_id not in self._intents:
             from transport import TransportError
             raise TransportError("cancellation requires an owned durable intent")
-        await self.controller.before_request("cancel")
+        await self.controller.before_request("cancel", client_id=client_id)
         order = self.orders.get(client_id)
         if order is None:
             return None

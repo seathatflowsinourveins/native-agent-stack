@@ -264,6 +264,24 @@ class IntegratedRunner(unittest.TestCase):
                 reconcile(ledger, snapshot, "100000")
             ledger.close()
 
+    def test_cancel_requests_name_their_order_without_touching_the_durable_budget(self):
+        # Exact sim-to-paper cancel pairing reads the in-memory log (paper-output
+        # requests[]). The durable row stays unbound for a cancel: requests.client_id is a
+        # foreign key to intents, so an unknown id must not be able to fail the reservation.
+        now = time.time()
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db")
+            ledger.start_trial(now)
+            controller = Controller(ledger, now + 3600, market_open=True, clock=lambda: now)
+            asyncio.run(controller.before_request("cancel", client_id="not-a-durable-intent"))
+            asyncio.run(controller.before_request("read"))
+            self.assertEqual(controller.requests, [
+                {"timestamp": now, "kind": "cancel", "client_id": "not-a-durable-intent"},
+                {"timestamp": now, "kind": "read"}])
+            rows = ledger.db.execute("SELECT kind, client_id FROM requests ORDER BY id").fetchall()
+            self.assertEqual([tuple(row) for row in rows], [("cancel", None), ("read", None)])
+            ledger.close()
+
     def test_submission_rate_defers_without_waiting_or_selling_held_positions(self):
         from native_adapter import NativeOrderRejected
         from strategies import AdaptivePolicy

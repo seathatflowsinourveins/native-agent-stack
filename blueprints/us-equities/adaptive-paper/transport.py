@@ -737,6 +737,9 @@ class GuardedSession:
         # Every order POST must carry a body equal to an envelope registered by
         # submit_enveloped for that client id (order-contract boundary).
         self._envelopes = {}
+        # (broker order id, client order id) of the DELETE the owner is about to send, so
+        # the budget hook can record which order a cancel request was for.
+        self.cancel_expectation = None
 
     def expect_submission(self, envelope):
         self._envelopes[envelope["intent"]["client_order_id"]] = envelope
@@ -782,6 +785,10 @@ class GuardedSession:
                         self.before_send(kwargs.get("json", {}))
                 except Exception:
                     raise SubmissionNotSent("submission prevented before HTTP request") from None
+            elif kind == "cancel" and (expected := self.cancel_expectation) and \
+                    path[len("/v2/orders/"):].lower() == str(expected[0]).lower():
+                # Only the DELETE for the announced broker order carries its client id.
+                self.before_request(kind, client_id=expected[1])
             else:
                 self.before_request(kind)
             kwargs.update(timeout=(5, 5), allow_redirects=False, verify=True, proxies={})
@@ -1122,12 +1129,15 @@ class AlpacaPaperTransport:
             raise TransportError("owner callback exceeded bounded deadline") from None
 
     def _budget_sync(self, kind, client_id=None):
-        if client_id is not None:
+        if kind == "submit" and client_id is not None:
             # Never park a submission for an entire rolling window while it
             # holds locks needed by cancels. The supported hook reserves or
             # refuses immediately; this deadline also cancels accidental sleeps.
             return self._on_owner(self.before_request, kind, client_id=client_id,
                                   _owner_timeout=0.25, _freeze_timeout=False)
+        if client_id is not None:
+            # A cancel that names its order keeps the ordinary (waiting) budget path.
+            return self._on_owner(self.before_request, kind, client_id=client_id)
         return self._on_owner(self.before_request, kind)
 
     def _wire_guard(self, order):
@@ -1433,12 +1443,17 @@ class AlpacaPaperTransport:
                     return None
             self._assert_matches(order, self._intents[client_order_id])
             answer = 204
+            # The request log records which owned order this DELETE was for (exact
+            # sim-to-paper cancel pairing); the operation lock keeps it to one DELETE.
+            self._client._session.cancel_expectation = (order["id"], client_order_id)
             try:
                 await asyncio.to_thread(self._client.cancel_order_by_id, order["id"])
             except Exception as exc:
                 answer = getattr(exc, "status_code", None)
                 if answer not in (404, 422):
                     self.freeze_health("cancellation_unresolved")
+            finally:
+                self._client._session.cancel_expectation = None
             # A successful DELETE is only an acknowledgement; query cumulative state.
             final = await self._lookup(client_order_id)
             if final is None:
