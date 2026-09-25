@@ -42,6 +42,7 @@ MAX_NAME_FRACTION = Decimal("0.05")
 MIN_NAME_NOTIONAL = Decimal("1000")
 ARM_SIZE_FRACTION = Decimal("0.25")   # exploratory arms trade 25% of the section-A size
 ARM_GROSS_FRACTION = Decimal("0.25")  # and each has its own gross cap of 0.25 E
+NET_CAP_FRACTION = Decimal("0.10")    # per arm and window: |long - short notional| <= 0.10 E
 KILL_LOSS_FRACTION = Decimal("0.02")
 MAX_SPREAD_BPS = Decimal("50")
 EXT_MAX_SPREAD_BPS = Decimal("100")
@@ -487,10 +488,12 @@ def contract_envelope(intent):
 
 @dataclass(frozen=True)
 class Limits:
-    """Per-arm caps: gross = L x E (core) or 0.25 E (each arm); per order = 5% E."""
+    """Per-arm caps: gross = L x E (core) or 0.25 E (each arm); per order = 5% E;
+    net = |long - short| notional per window <= 0.10 E."""
     equity: Decimal
     gross_cap: Decimal
     per_order_cap: Decimal
+    net_cap: Decimal
 
     @classmethod
     def for_arm(cls, arm, equity, leverage, extra_cap=None):
@@ -498,14 +501,27 @@ class Limits:
         gross = dec(leverage) * e if arm == CORE else ARM_GROSS_FRACTION * e
         if extra_cap is not None:
             gross = min(gross, dec(extra_cap))
-        return cls(e, gross, MAX_NAME_FRACTION * e)
+        return cls(e, gross, MAX_NAME_FRACTION * e, NET_CAP_FRACTION * e)
 
 
 @dataclass
 class Exposure:
     gross: Decimal = Decimal("0")
-    names: dict = field(default_factory=dict)  # (window_label, leg) -> count
-    symbols: set = field(default_factory=set)  # symbols this arm holds or has pending today
+    names: dict = field(default_factory=dict)     # (window_label, leg) -> count
+    symbols: set = field(default_factory=set)     # symbols this arm holds or has pending today
+    notional: dict = field(default_factory=dict)  # (window_label, leg) -> committed entry notional
+
+
+def window_net(exposure, window_label):
+    """Committed long minus short entry notional of one arm's window."""
+    return (exposure.notional.get((window_label, LEG_LONG), Decimal("0"))
+            - exposure.notional.get((window_label, LEG_SHORT), Decimal("0")))
+
+
+def net_headroom(exposure, window_label, leg, limits):
+    """Largest new entry on `leg` that keeps |long - short| <= net_cap in this window."""
+    net = window_net(exposure, window_label)
+    return limits.net_cap - net if leg == LEG_LONG else limits.net_cap + net
 
 
 def entry_cap_violation(notional, window_label, leg, symbol, exposure, limits, account=None):
@@ -533,7 +549,71 @@ def commit_entry(exposure, notional, window_label, leg, symbol):
     exposure.gross += dec(notional)
     key = (window_label, leg)
     exposure.names[key] = exposure.names.get(key, 0) + 1
+    exposure.notional[key] = exposure.notional.get(key, Decimal("0")) + dec(notional)
     exposure.symbols.add(symbol)
+
+
+def apply_net_cap(rows, net_cap, fixed_long=Decimal("0"), fixed_short=Decimal("0"), max_rounds=10):
+    """Scale the larger leg's new names down pro rata until |long - short| <= net_cap.
+
+    rows: new names (dicts with symbol, leg, price, qty, notional). fixed_long/short:
+    notional already committed in this window (never rescaled). Each round multiplies
+    the larger leg's new names by (smaller total + net_cap - larger fixed) / larger new
+    total, floors to whole shares and drops a name that falls below one share or $1,000
+    (reason net_cap_below_min). Rounds repeat only if drops flip the imbalance; when
+    the larger leg has no new names left, the smaller leg's new names are kept (each
+    reduces the imbalance) and the loop stops. An imbalance still unresolved after
+    max_rounds drops every new name (fail closed). Returns (kept, dropped, record) with
+    the pre-cap and post-cap leg notionals for the journal.
+    """
+    rows = [dict(r) for r in rows]
+    fixed = {LEG_LONG: dec(fixed_long), LEG_SHORT: dec(fixed_short)}
+
+    def new_total(rs, leg):
+        return sum((r["notional"] for r in rs if r["leg"] == leg), Decimal("0"))
+
+    def totals(rs):
+        return fixed[LEG_LONG] + new_total(rs, LEG_LONG), fixed[LEG_SHORT] + new_total(rs, LEG_SHORT)
+
+    pre_long, pre_short = totals(rows)
+    dropped, factors = [], []
+    while True:
+        long_total, short_total = totals(rows)
+        if abs(long_total - short_total) <= net_cap:
+            break
+        big = LEG_LONG if long_total > short_total else LEG_SHORT
+        big_new = new_total(rows, big)
+        if big_new <= 0:
+            break  # the imbalance is already-committed exposure; new names only reduce it
+        if len(factors) >= max_rounds:
+            dropped.extend((r, "net_cap_unresolved") for r in rows)
+            rows = []
+            break
+        allowed = max(Decimal("0"), min(long_total, short_total) + net_cap - fixed[big])
+        factors.append(allowed / big_new)
+        kept = []
+        for r in rows:
+            if r["leg"] != big:
+                kept.append(r)
+                continue
+            # multiply before dividing so an exact pro-rata share is not floored a share short
+            qty = whole_qty(r["notional"] * allowed / big_new, r["price"])
+            notional = dec(qty) * dec(r["price"])
+            if qty < 1 or notional < MIN_NAME_NOTIONAL:
+                dropped.append((r, "net_cap_below_min"))
+                continue
+            kept.append({**r, "qty": qty, "notional": notional})
+        rows = kept
+    post_long, post_short = totals(rows)
+    record = {
+        "net_cap": str(net_cap),
+        "committed": {"long": str(fixed[LEG_LONG]), "short": str(fixed[LEG_SHORT])},
+        "pre_cap": {"long": str(pre_long), "short": str(pre_short), "net": str(pre_long - pre_short)},
+        "post_cap": {"long": str(post_long), "short": str(post_short), "net": str(post_long - post_short)},
+        "scale_factors": [str(f.quantize(Decimal("0.000001"))) for f in factors],
+        "dropped": [{"symbol": r["symbol"], "reason": why} for r, why in dropped],
+    }
+    return rows, dropped, record
 
 
 def kill_switch_triggered(start_equity, equity):
@@ -562,16 +642,19 @@ def sized_qty(target_notional, price):
 
 
 def build_open_basket(events, session_date, exposure, limits, account_gross=None, blocked=frozenset()):
-    """Decisions and OPG intents for scored overnight events of one session.
+    """(decisions, OPG intents, net-cap record) for scored overnight events of one session.
 
     events: dicts with symbol, created_at, news_id, lane, label, ref_price, asset, ssr and
     target_notional (section A size). Only the liquid lane trades; FAVORABLE goes long;
     UNFAVORABLE goes short only when shortable, easy to borrow and not under Rule 201.
-    Each leg takes its first 12 names by (created_at, news_id); a leg needs >= 2 names
-    (the study's portfolio rule); gross is filled in release order across both legs up
-    to the arm's cap. ``blocked``: symbols another arm holds (e.g. an overnight D2
-    position exiting in the same auction).
-    account_gross: optional [total gross of all arms, account cap], updated in place.
+    Each leg takes its first 12 names by (created_at, news_id); gross is filled in
+    release order across both legs up to the arm's cap; then the net cap
+    (|long - short| <= 0.10 E, apply_net_cap) scales the larger leg down pro rata. A leg
+    with fewer than 2 names may trade alone, but only inside the net cap (coordinator
+    amendment 2026-09-25; it replaces the study's 2-name leg minimum for execution).
+    ``blocked``: symbols another arm holds (e.g. an overnight ah position exiting in the
+    same auction). account_gross: optional [total gross of all arms, account cap],
+    updated in place.
     """
     decisions, legs = [], {LEG_LONG: [], LEG_SHORT: []}
     ordered = sorted(events, key=lambda e: (e["created_at"], int(e["news_id"]) if str(e["news_id"]).isdigit() else 0))
@@ -627,23 +710,32 @@ def build_open_basket(events, session_date, exposure, limits, account_gross=None
         if trial_account is not None:
             trial_account[0] = dec(trial_account[0]) + notional
         chosen[leg].append((ev, base, qty, notional))
+    rows = [{"symbol": ev["symbol"], "leg": leg, "price": dec(ev["ref_price"]), "qty": qty, "notional": notional,
+             "pre_cap_qty": qty, "pre_cap_notional": notional, "ev": ev, "base": base}
+            for leg in (LEG_LONG, LEG_SHORT) for ev, base, qty, notional in chosen[leg]]
+    # the window's already-committed entries (e.g. after a restart) count, unscaled, toward the net cap
+    kept, dropped, record = apply_net_cap(
+        rows, limits.net_cap,
+        fixed_long=exposure.notional.get((OPEN_AUCTION, LEG_LONG), Decimal("0")),
+        fixed_short=exposure.notional.get((OPEN_AUCTION, LEG_SHORT), Decimal("0")))
+    record = {**record, "arm": CORE, "window": OPEN_AUCTION}
+    for r, why in dropped:
+        decisions.append({**r["base"], "leg": r["leg"], "action": "skip", "reason": why,
+                          "pre_cap_notional": str(r["pre_cap_notional"])})
     intents = []
-    for leg, rows in chosen.items():
-        if 0 < len(rows) < sig.MIN_NAMES_PER_LEG:
-            for ev, base, qty, notional in rows:
-                decisions.append({**base, "leg": leg, "action": "skip", "reason": "leg_below_min_names"})
-            continue
-        for ev, base, qty, notional in rows:
-            intent = entry_intent(session_date, SESSION_CODE[OPEN_AUCTION], ev["symbol"], leg, qty, "opg")
-            decisions.append({**base, "leg": leg, "action": "enter", "reason": "ok", "qty": qty,
-                              "ref_price": str(ev["ref_price"]), "est_notional": str(notional),
-                              "target_notional": str(ev.get("target_notional")), "sigma": ev.get("sigma"),
-                              "client_order_id": intent["client_order_id"]})
-            intents.append(intent)
-            commit_entry(exposure, notional, OPEN_AUCTION, leg, ev["symbol"])
-            if account_gross is not None:
-                account_gross[0] = dec(account_gross[0]) + notional
-    return decisions, intents
+    for r in kept:
+        ev, base, leg, qty, notional = r["ev"], r["base"], r["leg"], r["qty"], r["notional"]
+        intent = entry_intent(session_date, SESSION_CODE[OPEN_AUCTION], ev["symbol"], leg, qty, "opg")
+        decisions.append({**base, "leg": leg, "action": "enter", "reason": "ok", "qty": qty,
+                          "ref_price": str(ev["ref_price"]), "pre_cap_qty": r["pre_cap_qty"],
+                          "pre_cap_notional": str(r["pre_cap_notional"]), "est_notional": str(notional),
+                          "target_notional": str(ev.get("target_notional")), "sigma": ev.get("sigma"),
+                          "client_order_id": intent["client_order_id"]})
+        intents.append(intent)
+        commit_entry(exposure, notional, OPEN_AUCTION, leg, ev["symbol"])
+        if account_gross is not None:
+            account_gross[0] = dec(account_gross[0]) + notional
+    return decisions, intents, record
 
 
 # ---------------------------------------------------------------------------------------
@@ -690,14 +782,26 @@ def _marketable_entry(ev, quote, now, session_date, exposure, limits, *, arm, wi
     qty, notional, why = sized_qty(ev.get("target_notional"), limit)
     if why:
         return {**base, "action": "skip", "reason": why, "target_notional": str(ev.get("target_notional"))}, None
+    pre_qty, pre_notional = qty, notional
+    headroom = net_headroom(exposure, window_label, leg, limits)
+    net_before = window_net(exposure, window_label)
+    if notional > headroom:  # the window's net cap: shrink to the headroom, keeping the minimums
+        qty = whole_qty(max(headroom, Decimal("0")), limit)
+        notional = dec(qty) * limit
+        if qty < 1 or notional < MIN_NAME_NOTIONAL:
+            return {**base, "action": "skip", "reason": "net_exposure_cap", "pre_cap_notional": str(pre_notional),
+                    "net_before": str(net_before), "net_cap": str(limits.net_cap)}, None
     why = entry_cap_violation(notional, window_label, leg, ev["symbol"], exposure, limits, account)
     if why:
         return {**base, "action": "skip", "reason": why}, None
     intent = entry_intent(session_date, stage, ev["symbol"], leg, qty, "day", limit, arm=arm, extended=extended)
     commit_entry(exposure, notional, window_label, leg, ev["symbol"])
     return {**base, "action": "enter", "reason": "ok", "qty": qty, "limit_price": str(limit),
-            "spread_bps": str(bps.quantize(Decimal("0.1"))), "est_notional": str(notional),
-            "target_notional": str(ev.get("target_notional")), "client_order_id": intent["client_order_id"]}, intent
+            "spread_bps": str(bps.quantize(Decimal("0.1"))), "pre_cap_qty": pre_qty,
+            "pre_cap_notional": str(pre_notional), "est_notional": str(notional),
+            "net_before": str(net_before), "net_after": str(window_net(exposure, window_label)),
+            "net_cap": str(limits.net_cap), "target_notional": str(ev.get("target_notional")),
+            "client_order_id": intent["client_order_id"]}, intent
 
 
 def plan_rth_entry(ev, quote, now, session_date, exposure, limits, account=None):
@@ -717,6 +821,22 @@ def plan_ext_entry(ev, quote, now, session_date, exposure, limits, arm, account=
     return _marketable_entry(ev, quote, now, session_date, exposure, limits, arm=arm, window_label=label,
                              stage="ent", max_bps=EXT_MAX_SPREAD_BPS, long_mult=EXT_LONG_LIMIT_MULT,
                              short_mult=EXT_SHORT_LIMIT_MULT, extended=True, account=account)
+
+
+def overnight_hold_allowed(calendar, day):
+    """True only when the next XNYS session is the next calendar day.
+
+    The ah arm holds one night at most: Fridays and days before an exchange holiday
+    (the next session is two or more days away) are refused, as is a non-session day,
+    so no position is held across a weekend or holiday.
+    """
+    try:
+        i = calendar.index_of(day)
+    except KeyError:
+        return False
+    if i + 1 >= len(calendar.sessions):
+        return False
+    return calendar.sessions[i + 1].session == day + timedelta(days=1)
 
 
 def arm_for_release(calendar, created_at):

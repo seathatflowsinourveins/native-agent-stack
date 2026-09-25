@@ -560,8 +560,9 @@ class Supervisor:
             asset = self.fresh_asset(c["symbol"]) if c.get("lane") == sig.LIQUID else None
             events.append({**c, "ref_price": ref, "asset": asset or {}, "ssr": self.ssr_for(c), "target_notional": self.target(c)})
         account = self.account_gross()
-        decisions, intents = planner.build_open_basket(events, self.trade_date, self.exposures[CORE], self.limits[CORE],
-                                                       account_gross=account, blocked=blocked)
+        decisions, intents, net_record = planner.build_open_basket(events, self.trade_date, self.exposures[CORE],
+                                                                   self.limits[CORE], account_gross=account, blocked=blocked)
+        self.journal.write("net_cap", **net_record)
         for d in decisions:
             self.journal.write("decision", **d)
             self.counts[f"decision:core:{d['session_label']}:{d['action']}"] += 1
@@ -616,6 +617,14 @@ class Supervisor:
         pending = self.arm_pending[arm]
         due = [c for c in pending.values() if sig.as_utc(c["entry_utc"]) <= now]
         if not due:
+            return
+        if arm == AH and not planner.overnight_hold_allowed(self.calendar, self.trade_date):
+            for c in due:  # Friday or the day before a holiday: no multi-day hold, no lookup, no order
+                del pending[c["event_id"]]
+                self.journal.write("decision", event_id=c["event_id"], symbol=c["symbol"], arm=AH, lane=c["lane"],
+                                   label=c.get("label"), session_label=planner.EXT_POST, action="skip",
+                                   reason="ah_next_session_not_next_day")
+                self.counts["decision:ah:skip"] += 1
             return
         snaps = self.data.snapshots(sorted({c["symbol"] for c in due}))
         guard = self.corporate_action_block([c["symbol"] for c in due]) if arm == AH else {}
@@ -899,8 +908,9 @@ def main(argv=None):
     parser.add_argument("--scorer-unit", default="news-forward-scorer")
     parser.add_argument("--no-scorer", action="store_true")
     parser.add_argument("--keep-scorer", action="store_true", help="leave the scorer unit running at exit")
-    parser.add_argument("--rate", type=int, default=150,
-                        help="data requests per minute for this process (max 300; 150 keeps two concurrent runs within 300)")
+    parser.add_argument("--rate", type=int, default=90,
+                        help="data requests per minute for this process (max 300; paper-3 allows 200/min per key, "
+                             "so 90 keeps the service plus one verification run within it)")
     parser.add_argument("--preview-basket", action="store_true",
                         help="dry-run verification only: build the open-auction basket early once the pool is scored")
     args = parser.parse_args(argv)

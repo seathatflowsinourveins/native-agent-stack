@@ -27,6 +27,10 @@ def ny(hh, mm=0):
     return datetime(2026, 9, 25, hh, mm, tzinfo=NY).astimezone(timezone.utc)
 
 
+def at(day, hh, mm=0):
+    return datetime(day.year, day.month, day.day, hh, mm, tzinfo=NY).astimezone(timezone.utc)
+
+
 class GpuGate(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.mkdtemp(prefix="nf-gpu-")
@@ -234,20 +238,39 @@ class ArmFlows(unittest.TestCase):
     def test_ah_entry_with_corporate_action_guard(self):
         ca = common.load_by_path("adaptive_paper_corporate_actions",
                                  os.path.join(common.REPO, "blueprints/us-equities/adaptive-paper/corporate_actions.py"))
+        thursday = date(2026, 9, 24)  # the next session (Friday) is the next day: one night only
+        self.sup.trade_date = thursday
+        self.sup.cfg["arms"]["ah"]["orders_from"] = "2026-09-24"
         for i, sym in enumerate(("AAA", "BBB", "CCC")):
-            ev = self.event(sym, ny(16, 5 + i), "2026-09-28", nid=10 + i)
+            ev = self.event(sym, at(thursday, 16, 5 + i), "2026-09-25", nid=10 + i)
             self.sup.arm_pending[planner.AH][ev["event_id"]] = ev
         guard = {"AAA": ca.GuardDecision("AAA", False, False, False, None),
                  "BBB": ca.GuardDecision("BBB", True, False, False, "corporate_action_split")}
         with mock.patch.object(self.sup, "corporate_action_block", return_value=guard):
-            self.sup.run_arm_entries(ny(16, 25), planner.AH)
+            self.sup.run_arm_entries(at(thursday, 16, 25), planner.AH)
         reasons = {d["symbol"]: d["reason"] for d in self.decisions()}
         self.assertEqual(reasons, {"AAA": "ok", "BBB": "corporate_action_split", "CCC": "corporate_action_lookup_failed"})
         sent = self.broker.all
         self.assertEqual(len(sent), 1)
         # 25% of min(0.0015 * 900k / 0.02, 0.5% * 50M, 5% * 900k) = 25% of 45,000 = 11,250 -> 224 shares at 50.21
         self.assertEqual((sent[0]["client_order_id"], sent[0]["extended_hours"], sent[0]["time_in_force"], sent[0]["limit_price"], sent[0]["qty"]),
-                         ("nf1x-ah-20260925-ent-AAA-long", True, "day", "50.21", "224"))
+                         ("nf1x-ah-20260924-ent-AAA-long", True, "day", "50.21", "224"))
+
+    def test_ah_skips_friday_and_pre_holiday_before_any_lookup(self):
+        cases = ((date(2026, 9, 25), "2026-09-28"),   # Friday -> Monday
+                 (date(2026, 11, 25), "2026-11-27"))  # Wednesday before Thanksgiving -> Friday
+        for n, (day, session) in enumerate(cases):
+            self.sup.trade_date = day
+            ev = self.event(f"X{n}", at(day, 16, 5), session, nid=20 + n)
+            self.sup.arm_pending[planner.AH] = {ev["event_id"]: ev}
+            with mock.patch.object(self.sup, "corporate_action_block") as ca_block:
+                self.sup.run_arm_entries(at(day, 16, 25), planner.AH)
+            ca_block.assert_not_called()
+            self.assertEqual(self.sup.arm_pending[planner.AH], {})
+        self.sup.data.snapshots.assert_not_called()
+        self.assertEqual([(d["symbol"], d["reason"]) for d in self.decisions()],
+                         [("X0", "ah_next_session_not_next_day"), ("X1", "ah_next_session_not_next_day")])
+        self.assertEqual(self.broker.all, [])
 
     def test_pm_is_gated_and_follows_core_first_event(self):
         first = self.event("AAA", ny(6, 0), "2026-09-25", nid=1)

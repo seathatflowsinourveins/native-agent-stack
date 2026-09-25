@@ -5,7 +5,7 @@
  "dry_run_multiplier": "4",
  "arms": {
   "pm": {"orders_from": "2026-09-28", "note": "pm entries fall before 09:15, and no order may precede 09:15 on 2026-09-25: intents are journaled only today"},
-  "ah": {"orders_from": "2026-09-25", "note": "enabled 2026-09-25 after the ah flow and corporate-action guard tests passed; entries from 16:15 ET, exits at the next session's OPG"}
+  "ah": {"orders_from": "2026-09-25", "note": "enabled 2026-09-25 after the ah flow and corporate-action guard tests passed; entries from 16:15 ET only when the next session is the next calendar day (never Fridays or pre-holiday days), exits at the next session's OPG"}
  },
  "note": "Set mode to paper only after `executor.py check-account` prints ready_for_paper for alpaca-paper-3.env; a paper start that fails any account check runs as dry-run and journals the refusal."
 }

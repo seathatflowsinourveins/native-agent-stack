@@ -71,6 +71,19 @@ replaced as follows.
   `leverage_decision`.
 - **Other caps.** Per order: 5%·E. Account gross (all arms): the leverage.py
   RTH ceiling × E. One symbol per arm per day.
+- **Net-exposure cap** (coordinator review, 2026-09-25). Per arm and per
+  window, |long notional − short notional| ≤ 0.10·E.
+  - The OPG basket (`planner.apply_net_cap`) scales the larger leg down pro
+    rata. It keeps whole shares and drops a name that falls under 1 share or
+    $1,000. Notional already committed in the window counts but is never
+    rescaled.
+  - Sequential entries (core RTH, pm, ah) are shrunk to the window's
+    remaining headroom, or skipped with `net_exposure_cap`.
+  - A leg with fewer than 2 names may trade alone, but only inside this cap.
+    This replaces the study's 2-name leg minimum for execution.
+  - Pre-cap and post-cap notionals are journaled: a `net_cap` record for the
+    basket, and `pre_cap_notional`, `est_notional` and `net_before`/`net_after`
+    on each decision.
 - **Kill switch at 2% of E.** It cancels our orders, flattens every arm and
   stops. `<state>/STOP` refuses every order.
 - **Exits** (core and pm):
@@ -97,14 +110,26 @@ re-runs the corporate-action guard on its holdings and flattens any
 `must_flatten` symbol. Reconciliation expects exactly the ah holdings to remain
 overnight.
 
-## Order contract gap
+The ah arm holds one night at most (`planner.overnight_hold_allowed`). It
+enters only when the next XNYS session is the next calendar day. On Fridays and
+on days before an exchange holiday, every ah entry is skipped with
+`ah_next_session_not_next_day`, before any quote or corporate-action lookup. No
+position is held across a weekend or holiday; on Friday 2026-09-25 the ah arm
+enters nothing.
 
-`order-contract/order_contract.py` v1 admits only `time_in_force: day`.
-`planner.contract_envelope` still validates OPG/CLS orders with
-`build_envelope`: it passes `day` for the check, then admits `opg`/`cls` only
-for plain market orders without extended hours. The envelope records this in a
-`local_extension` field. Adding `opg`/`cls` to the contract itself is an
-integration item outside this directory.
+## Limitations
+
+- **L-OC (order-contract bypass for auction orders).** Accepted for the pilot;
+  `order_contract.py` is not edited.
+  - `order-contract/order_contract.py` v1 admits only `time_in_force: day`.
+  - `planner.contract_envelope` validates every OPG/CLS order with
+    `build_envelope` using `day`, then admits `opg`/`cls` only for plain market
+    orders without extended hours and without a limit price.
+  - Each such envelope carries a `local_extension` field naming the
+    substitution.
+  - The contract's own checks therefore never see the auction TIF.
+  - Closing it requires adding `opg`/`cls` to `order_contract.py` and its
+    tests, outside this directory.
 
 ## GPU schedule
 
