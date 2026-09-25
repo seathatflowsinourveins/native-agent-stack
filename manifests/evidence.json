@@ -3411,8 +3411,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "e8cf599985565695f10b76ffd4637609f2866eaaeaaa537b8f5a3aad27fa3a5e",
-      "bytes": 3985
+      "sha256": "f748f72c02491716c6f3aeeee2479ba27325ee922ded0048cff4e4e28a75206b",
+      "bytes": 3965
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
@@ -10532,8 +10532,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "e960d359de2d750eea69acd3e3d1dd9e9b33bb82f8e06b3e30d6fa9ffa51b0e2",
-      "bytes": 157375
+      "sha256": "2336acccb3975b6fce1a00c8df06b6440313a05c7916f71654b9d154a369d5ec",
+      "bytes": 157327
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -10552,8 +10552,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "b4c1cbc0a978361c959e938781c579e6e0a0766e3e488c93098dabb70a037850",
-      "bytes": 35942
+      "sha256": "960a45a4ac3bb1e7854ad015398c5e01d28df06df08f2212baa193a73152d4ea",
+      "bytes": 35907
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -30217,8 +30217,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "a131f5515f3d02aaf7e2660723bb92dd418dc85d77f9aa0daecdb9ed6f035096",
-      "bytes": 61506
+      "sha256": "048dd1173af844d96b27c88af1d7ac438e25276463e7fd7a4295d862f761a714",
+      "bytes": 61471
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -31152,8 +31152,8 @@
     },
     {
       "path": "tools/token-report/test_token_manifest.py",
-      "sha256": "1283656ec58d2095b7915887c0d005e83dcf206dc275907cd20ed5a80507da91",
-      "bytes": 41324
+      "sha256": "893aee96f40d14be1094f96127f3785b7fc7358529b1317310197ed71f60d481",
+      "bytes": 41984
     },
     {
       "path": "tools/token-report/token_manifest.full.html.in",
@@ -31167,8 +31167,8 @@
     },
     {
       "path": "tools/token-report/token_manifest.py",
-      "sha256": "7b1c0511e9a56f587392309330e447bb190e5c819950892997a44065f2714e33",
-      "bytes": 50793
+      "sha256": "9bc183120d1069228bd136b9f8df498b394da3d1d932590fcb486c7d1f832649",
+      "bytes": 51152
     }
   ],
   "convergence_records": [

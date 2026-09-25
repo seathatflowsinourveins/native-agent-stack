@@ -82,7 +82,6 @@ enabled = true
 
 [features]
 hooks = true
-plugin_hooks = true
 
 # Local ecosystem observation; content is removed before collector persistence.
 [otel]

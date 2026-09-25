@@ -122,7 +122,6 @@ The reviewed native plugin revision below declares 1.0.169. Full plugin hooks an
 codex plugin marketplace add mksglu/context-mode --ref 6f0cc6841c687e754059f36714a11233fda1a02b --json
 codex plugin add context-mode@context-mode --json
 codex features enable hooks
-codex features enable plugin_hooks
 
 claude plugin marketplace add mksglu/context-mode --scope user   # a marketplace source takes no commit ref: this installs the default branch head
 claude plugin install context-mode@context-mode --scope user --json
