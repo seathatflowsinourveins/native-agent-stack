@@ -15,6 +15,22 @@ destination version (2.0.0rc5), so a passed receipt cannot flip
 `ibkr-local-acceptance` unless a dated version-selection record accepts 1.231.0
 for that gate.
 
+**Update, 2026-09-25** (supersedes the version-selection sentence above and the
+#4983 statement in "Why 1.231.0" below): the dated keep-but-compare record
+`docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md` now
+accepts 1.231.0 (official `ibapi` 10.45.1) for `ibkr-local-acceptance`, as the
+user decided that day, keep-but-compare against the first 2.0.x release that
+contains nautilus_trader#5041. The cases this harness does not cover (client-id
+ownership, reconnect with an open order, restart reconciliation and the kill
+switch) run through `../ibkr-acceptance/local_acceptance.py`, whose gate receipt
+needs a Gateway API message log corroboration record. nautilus_trader#4983 is
+reclassified as a stale v1.227.0 report for rc5: at tag `v2.0.0rc5` the IB
+execution client handles the order venue (source reading, not an rc5 order
+observation; `catalogs/us-equities/runtime-target.json`
+`rc5_reclassified_reports`). The rc5 obstacles on the recovery and risk paths
+are #5007, #5057, #5060 and #4946 (`rc5_blockers` there). The 1.231.0 routing
+explanation below still describes 1.231.0.
+
 ## Why 1.231.0
 
 The pinned 2.0.0rc5 Rust IB adapter denies every stock order locally: the

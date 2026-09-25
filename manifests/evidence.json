@@ -8007,8 +8007,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",
-      "sha256": "9ccf5b974c79fb94fe28e4968a9278f531ebc4054e67784f04eb58126bc8d5b3",
-      "bytes": 21207
+      "sha256": "3fbfa279152341f49bcd50658ebebe52dbfa8ed146565da3f1aa2725f889453b",
+      "bytes": 22315
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/frozen-c23525e6.SHA256SUMS",
@@ -9917,8 +9917,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "fd76d7fa6357188e1af15e0754baf14b637f12186ff7b4b5e8c1a5c79df462c4",
-      "bytes": 65817
+      "sha256": "01f4283dacee5a38dee06c25872d3b5ad7e1df1d12d9509e398e4326e2984266",
+      "bytes": 66052
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -9997,8 +9997,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "b101400b12841c389fa1e5706ad2328fc64aeafe7d2274e9417a06fda192210c",
-      "bytes": 20468
+      "sha256": "2b33d328e31cc50c902120f26706ae56109f57f94cdc9da0a37d560f5917cecb",
+      "bytes": 20784
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -10197,8 +10197,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md",
-      "sha256": "eec90233e17f2faf9e947df0746680f7b5551b9f19b62840353cb62c062ae42b",
-      "bytes": 10674
+      "sha256": "a16b3d576ba6619cd191b7075d8e7d31490d5de2a2f118f194bf6fac389dc570",
+      "bytes": 13611
     },
     {
       "path": "docs/direct-results.md",

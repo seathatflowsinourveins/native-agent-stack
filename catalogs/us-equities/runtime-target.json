@@ -49,7 +49,7 @@
       "selected_path": "Nautilus native IBKR socket adapter with signed-in TWS or IB Gateway",
       "upstream_supported": true,
       "local_broker_acceptance": "not_established",
-      "local_broker_acceptance_scope": "The 1.231.0 Python-adapter paper receipt below does not establish it: reconnect with an open order, restart reconciliation and the kill switch are not run. Since 2026-09-25 the keep-but-compare record docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md selects NautilusTrader 1.231.0's Python adapter to carry this gate's local acceptance (runner blueprints/us-equities/engine-nautilus/ibkr-acceptance/local_acceptance.py, not yet run; its gate receipt needs an independent corroboration record), with the 2.0.0rc5 Rust adapter as the comparison arm. The engine destination above is unchanged.",
+      "local_broker_acceptance_scope": "The 1.231.0 Python-adapter paper receipt below does not establish it: reconnect with an open order, restart reconciliation and the kill switch are not run. Since 2026-09-25 the keep-but-compare record docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md selects NautilusTrader 1.231.0's Python adapter on ibapi 10.45.1 to carry this gate's local acceptance, as the user decided on 2026-09-25 (runner blueprints/us-equities/engine-nautilus/ibkr-acceptance/local_acceptance.py, not yet run; its gate receipt needs a Gateway API message log corroboration record covering every run claim). The comparator is the first 2.0.x release (not a dev wheel) containing nautilus_trader#5041, which no release contains yet; the pinned 2.0.0rc5 Rust adapter is not an overturn arm. The engine destination above is unchanged.",
       "python_adapter_paper_evidence": {
         "status": "passed",
         "receipt": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json",
@@ -107,7 +107,7 @@
           "reported_effect": "The execution client venue IB never matches the SMART instrument venue, so every stock order is denied locally.",
           "classification": "stale for rc5",
           "reclassified_at": "2026-09-25",
-          "basis": "Source reading, not an rc5 order observation: at tag v2.0.0rc5 (1b0a49d2) crates/execution/src/engine/mod.rs:2222 denies an order only when client.handles_order_venue(order_venue) is false, and the IB execution client overrides it to return true (crates/adapters/interactive_brokers/src/execution/core.rs:491-496; #4129, merged 2026-05-25, after v1.227.0 of 2026-05-18). An rc5 stock-order probe is the named overturn comparison.",
+          "basis": "Source reading, not an rc5 order observation: at tag v2.0.0rc5 (1b0a49d2) crates/execution/src/engine/mod.rs:2222 denies an order only when client.handles_order_venue(order_venue) is false, and the IB execution client overrides it to return true (crates/adapters/interactive_brokers/src/execution/core.rs:491-496; #4129, merged 2026-05-25, after v1.227.0 of 2026-05-18). An rc5 stock-order probe is optional evidence that would confirm or refute this reading; it is not an overturn path for the local-acceptance version selection.",
           "decision_record": "docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md"
         }
       ],

@@ -1,8 +1,15 @@
-# Decision: NautilusTrader 1.231.0's Python IB adapter for IBKR local acceptance, keep-but-compare against 2.0.0rc5 (2026-09-25)
+# Decision: NautilusTrader 1.231.0's Python IB adapter for IBKR local acceptance, keep-but-compare against the first 2.0.x release containing nautilus_trader#5041 (2026-09-25)
 
 **Status:** keep-but-compare. Recorded on branch `claude/ibkr-acceptance-prep-20260925` (base
 `origin/main@ae3d3d37`) by the live-gates workflow under the user's standing paper authorization.
 It needs independent review before merge.
+
+**User decision, 2026-09-25 (binding; relayed verbatim by the live-gates coordinator as user
+decision 3, recorded here at 2026-09-25T23:21Z):** "NautilusTrader 1.231.0 + ibapi 10.45.1 for
+local acceptance, keep-but-compare against the first 2.0.x release containing nautilus_trader PR
+#5041". This record implements that decision. Where an earlier revision of this record named
+the pinned 2.0.0rc5 Rust adapter as the comparison arm, or let an rc5 result or another release
+overturn the selection, the decision governs (see the update of 2026-09-25T23:21Z below).
 
 **Scope:** which NautilusTrader version may carry the `ibkr-local-acceptance` gate
 (`catalogs/us-equities/gates-20260922.json`) through acceptance-plan section 5, steps 1-4.
@@ -16,9 +23,10 @@ Run IBKR local acceptance on **NautilusTrader 1.231.0's Python Interactive Broke
 (official `ibapi` 10.45.1) through
 `blueprints/us-equities/engine-nautilus/ibkr-acceptance/local_acceptance.py`. A passed receipt
 from that runner, together with the two prerequisite receipts it names, may be cited for the gate.
-Every such receipt is labelled with its engine version. The pinned 2.0.0rc5 Rust adapter stays
-the comparison arm until the comparison below runs. The gate still flips only through a manual,
-dated commit after qualification.
+Every such receipt is labelled with its engine version. The comparator is **the first 2.0.x
+release (a published release, not a dev wheel or a `develop` or PR-branch build) that contains
+nautilus_trader#5041**; no release contains it yet. The pinned 2.0.0rc5 Rust adapter is not an
+overturn arm. The gate still flips only through a manual, dated commit after qualification.
 
 ## Evidence
 
@@ -36,8 +44,9 @@ Upstream, checked with `gh api` at 2026-09-25T18:21Z:
   2026-05-25T21:45:27Z. v1.227.0 was published 2026-05-18, before that merge. So the
   engine-level denial described in #4983 may not apply at rc5. No rc5 stock order has been
   tried on this host. The repository's rc5 blocker entries (runtime-target.json `rc5_blockers`,
-  `ibkr-acceptance/README.md`, `evidence/receipts/ibkr-readonly-acceptance-20260923.json`) cite
-  the issue text, not an rc5 observation.
+  `ibkr-acceptance/README.md`, `ibkr-paper-orders/README.md` "Why 1.231.0",
+  `evidence/receipts/ibkr-readonly-acceptance-20260923.json`) cite the issue text, not an rc5
+  observation.
 - [PR #5041](https://github.com/nautechsystems/nautilus_trader/pull/5041) is open and not merged.
   It is not a draft; `mergeable_state` is `dirty`. It is one commit on `develop` (head
   `4b17ac3c`), +22,773/-11,740 across 123 files, updated 2026-09-25T10:28:06Z. The maintainer
@@ -87,7 +96,8 @@ Local evidence (label `native_paper` unless stated):
      covered. Running steps 3-4 there before a release carries those fixes would measure paths
      upstream reports as defective.
    - Its `ibapi =3.3.0` pin has the 2188 defect.
-   - It stays the comparison arm.
+   - It is not the comparison arm (user decision, 2026-09-25). An rc5 stock-order probe may
+     still run as optional evidence for the #4983 reclassification (below).
 2. **Wait for a release that contains #5041:** rejected as the only path. There is no date, the
    PR is still in review with a dirty merge state, and the gate would stay unmeasured meanwhile.
 3. **Build `develop` or the #5041 branch:** rejected. An unreleased, unreviewed build is no stable
@@ -99,23 +109,34 @@ Local evidence (label `native_paper` unless stated):
 
 ## Comparison that would overturn it
 
-1. **rc5 stock-order probe (can run now).** Through rc5's Rust adapter, place one resting SPY
-   LIMIT BUY of 1 share at half the bid on the same paper Gateway, cancel it, and confirm both
-   with the independent ibapi observer.
-   - If rc5 places and cancels natively, #4983 no longer blocks rc5, and the rc5 path becomes a
-     candidate for steps 2-4. It still needs the comparison in item 2.
-   - If rc5 denies the order locally, the #4983 blocker is confirmed for rc5.
-2. **Release comparison.** When a NautilusTrader release (not a dev wheel) contains #5041, or
-   otherwise closes #4983, #5057 and #5060, run the same frozen case set on its native IB
-   adapter against the same paper account, with the same observer: A1-A4, B1, B2 and C1 from
-   `local-acceptance-plan.json`, plus the C1-C4 order cases.
+The comparator is fixed by the user's decision of 2026-09-25: the first 2.0.x release (not a
+dev wheel) containing nautilus_trader#5041. Only items 2 and 3 can overturn the selection.
+
+1. **rc5 stock-order probe (optional evidence, not an overturn path).** Through rc5's Rust
+   adapter, place one resting SPY LIMIT BUY of 1 share at half the bid on the same paper
+   Gateway, cancel it, and confirm both with the independent ibapi observer. It bears only on
+   the #4983 reclassification in `runtime-target.json` (`rc5_reclassified_reports`):
+   - If rc5 places and cancels natively, the reclassification stands.
+   - If rc5 denies the order locally, #4983 goes back to `rc5_blockers`.
+   - Neither outcome changes this selection or its comparator.
+2. **Release comparison (the comparator).** When the first 2.0.x release (a published release,
+   not a dev wheel or a `develop` or PR-branch build) that contains nautilus_trader#5041 is out,
+   run the same frozen case set on its native IB adapter against the same paper account, with
+   the same observer: A1-A4, B1, B2 and C1 from `local-acceptance-plan.json`, plus the C1-C4
+   order cases.
    - If every case passes with zero duplicate submissions and zero unexplained differences, that
      release replaces 1.231.0 for this gate. The gate receipt is re-bound to it, and this record
      is superseded by a dated follow-up.
    - If the release fails a case that 1.231.0 passes, 1.231.0 stays and the failure is reported
      upstream.
-3. If 1.231.0 fails a case that the rc5 or release arm passes on the same plan, 1.231.0 is
+   - Whether that release also carries the #4946 fix (`develop` commit `ed6fc8bf`) and closes
+     #4983, #5007, #5057 and #5060 is recorded with the comparison; it does not change which
+     release is the comparator.
+3. If 1.231.0 fails a case that the release of item 2 passes on the same plan, 1.231.0 is
    overturned at once.
+4. Any other trigger needs a new user decision and does not overturn the selection: an rc5
+   result, a release that closes #4983, #5057, #5060 or #4946 without containing #5041, or a
+   later 1.x release.
 
 ## Limits
 
@@ -156,3 +177,21 @@ lock moved to one frozen per-account path, and the gate receipt is written only 
 `gate-receipt` builder after an independent corroboration record passes (the Gateway API
 message log or the next-day IBKR activity statement; `ibkr-acceptance/README.md`, "Independent
 corroboration").
+
+## Update, 2026-09-25T23:21Z (second independent review of PR #280)
+
+The selection is unchanged; its comparator now follows the user's decision quoted under
+**Status**. Nothing was re-checked upstream for this update.
+
+- The title, the Decision section, alternative 1 and the overturn comparisons now name the first
+  2.0.x release (not a dev wheel) containing nautilus_trader#5041 as the comparator. The rc5
+  stock-order probe stays only as optional evidence for the #4983 reclassification, and item 3
+  no longer has an rc5 arm. Any other trigger needs a new user decision (item 4).
+- This supersedes the 21:23Z statement that comparison 2 needs a release that also carries the
+  #4946 fix: the comparator is the first 2.0.x release containing #5041, and whether it carries
+  `ed6fc8bf` is recorded with the comparison.
+- The runner and plans moved to revision 3, still before any run: the gate receipt needs a
+  Gateway API message log record, so every run claim is corroborated by IB's own records and
+  none rests on the in-process observer alone (an activity statement is an optional additional
+  record); a record time later than the builder's clock plus 300 s is refused; and `preflight`
+  holds the run lock while it connects.
