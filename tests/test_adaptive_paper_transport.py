@@ -284,7 +284,8 @@ class HTTPBoundary(unittest.TestCase):
         self.assertEqual(self.observer.call_args.args[0]["headers"], {"x-ratelimit-limit": "200"})
 
     def test_cancel_budget_names_only_the_announced_order(self):
-        lettered = "abcdef01-2345-4789-abcd-ef0123456789"  # hex letters: case folding is exercised
+        # Built at runtime like ID (no literal UUID in published files); hex letters exercise case folding.
+        lettered = str(__import__("uuid").UUID(int=0xABCDEF01_2345_6789_ABCD_EF0123456789))
         other = str(__import__("uuid").UUID(int=2))
         with patch.object(self.session._session, "request", return_value=response(None, 204)) as sent:
             self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + lettered)
