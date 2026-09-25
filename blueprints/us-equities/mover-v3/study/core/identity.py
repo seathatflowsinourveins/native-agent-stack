@@ -61,7 +61,8 @@ def check_asof(request: dict) -> None:
     asof is refused by the second rule: the plan (core.plan) sets asof_session to the session that defines the
     request (s for a screen row, t for an event), never to the fetch date (review round 9, L-6: the former separate
     fetch-date clause could never fire)."""
-    if request["kind"] in ("assets", "corporate_actions") or request["kind"].startswith("count_default_asof"):
+    if request["kind"] in ("assets", "corporate_actions", "terminal_actions") or \
+            request["kind"].startswith("count_default_asof"):
         return  # enumeration, and the count-only identity_diagnostic copy at the provider default asof
     asof = request["params"].get("asof")
     if not asof:

@@ -529,8 +529,12 @@ def fetch_line_of(ctx: dict, purpose: str, auth: dict):
     return None
 
 
-def _planner(spec_for, mode, enum_date):
-    enum_reqs = plan.assets_requests() + [plan.corporate_actions_request("2016-01-01", enum_date)]
+def _planner(spec_for, mode, enum_date, terminal_date):
+    """The count's or read's plan: the enumeration requests (the first count's fetch date), the action's own
+    terminal-record request (its own fetch date; review round 15, N02 / R14-open-1), and then the stage plan, which
+    the terminal records can change (the in-hold split-record exclusion, the rename sensitivity windows)."""
+    enum_reqs = plan.assets_requests() + [plan.corporate_actions_request("2016-01-01", enum_date),
+                                          plan.terminal_actions_request(terminal_date)]
 
     def planner(store):
         if any(not store.has(r["key"]) for r in enum_reqs):
@@ -539,14 +543,22 @@ def _planner(spec_for, mode, enum_date):
     return planner
 
 
+def terminal_records(store, terminal_date) -> list:
+    """The records of the action's own terminal-record request, or [] when it is not held complete (its failure is
+    counted in the action's fetch-incomplete rate, populations.fetch_failures)."""
+    key = plan.terminal_actions_request(terminal_date)["key"]
+    return list(store.parsed(key)) if store.status(key) == "complete" else []
+
+
 def _fetch_step(ctx, purpose, auth, bases, snapshot_root, spec_for, mode, enum_date, transports, clock, now,
-                sessions, pins, span=None):
+                sessions, pins, span=None, terminal_date=None):
     """Step 1 of a count or read (review round 10, H2): fetch and seal the action's snapshot, and log a
     '<purpose>_fetch' run-log line with its sha256 and fetch-incomplete rate. No outcome is computed. The step
     that computes (step 2) runs only once this line is on origin/main, over this snapshot alone, so a discarded
     local attempt never yields a second draw of provider data after an outcome was seen."""
     start, status, sha, rate = iso_utc(now), "failed", None, None
-    planner = _planner(spec_for, mode, enum_date)
+    terminal_date = terminal_date or iso_utc(now)[:10]
+    planner = _planner(spec_for, mode, enum_date, terminal_date)
     # review round 14, F3: a sealed ledger in this action's directory with no committed '_fetch' line is a discarded
     # local attempt; fetching again would be a second draw after its data could have been opened. Deleting the
     # directory defeats this check (a recorded limitation, holdout_gate.access_log.rule)
@@ -567,6 +579,7 @@ def _fetch_step(ctx, purpose, auth, bases, snapshot_root, spec_for, mode, enum_d
             utc_end=iso_utc(now), snapshots=[sha] if sha else [], status=status, results_sha256=None,
             extra={"authorization_id": auth["authorization_id"], "sessions": sessions,
                    **({"fee_span": span} if span else {}), "enumeration_fetch_date": enum_date,
+                   "terminal_actions_fetch_date": terminal_date,
                    "snapshot_dir": f"{purpose}-{auth['authorization_id']}",
                    **pins,
                    **({"fetch_incomplete_rate": rate["rate"], "fetch_incomplete_by_kind": rate["by_kind"],
@@ -594,13 +607,24 @@ def _sealed(ctx, fetch_line, bases, snapshot_root):
     return HoldoutStore(bases, Store.read(Path(snapshot_root) / fetch_line["snapshot_dir"], sha), ctx["cal"]), sha
 
 
-def _spec_factory(ctx, n0, last, late, exposed, carried):
+def _spec_factory(ctx, n0, last, late, exposed, carried, terminal_date):
     def spec_for(store):
         enum = enumeration([*store.bases, store.live])
         return STG.StageSpec(stage="holdout", cal=ctx["cal"], symbols=enum["symbols"], actions=enum["actions"],
                              active=enum["active"], n0=n0, holdout_last=last, fees=ctx["fees"], cells=ctx["cells"],
-                             paper_exposed=exposed, late_sessions=late, carried=carried)
+                             paper_exposed=exposed, late_sessions=late, carried=carried,
+                             terminal_actions=terminal_records(store, terminal_date))
     return spec_for
+
+
+def _terminal_date(fl, now) -> str:
+    """The terminal-record date of a count or read: its own fetch date at the fetch step, the sealed '_fetch' line's
+    at the evaluation step (review round 15, N02 / R14-open-1)."""
+    if fl is None:
+        return iso_utc(now)[:10]
+    if not fl.get("terminal_actions_fetch_date"):
+        raise HoldoutRefused("the sealed '_fetch' line names no terminal_actions_fetch_date")
+    return fl["terminal_actions_fetch_date"]
 
 
 def _validation_reach_utc(ctx):
@@ -629,17 +653,18 @@ def count(ctx: dict, authorization_id: str, snapshot_root, transports, now: floa
         raise HoldoutRefused(f"the count of block {blocks} has its results file")
     # review round 14, Codex P2: a file no line cites (a run killed after its rename) is recomputed and replaced
     orphan = sha256_file(path) if path.exists() else None
-    spec_for = _spec_factory(ctx, n0, last, late, exposed, None)
+    terminal_date = _terminal_date(fl, now)
+    spec_for = _spec_factory(ctx, n0, last, late, exposed, None, terminal_date)
     if fl is None:
         require_fee_coverage(ctx, [n0, last])                                  # review round 14, F2
         return _fetch_step(ctx, "count", auth, bases, snapshot_root, spec_for, "count", enum_date, transports, clock,
-                           now, [n0, last], pins, charge_span(ctx, n0, last))
+                           now, [n0, last], pins, charge_span(ctx, n0, last), terminal_date)
     enum_date = fl["enumeration_fetch_date"]
     start, status, sha, digest, ext, void, rows = iso_utc(now), "failed", fl["input_snapshot_sha256s"][0], None, \
         None, None, 0
     try:
         sealed, sha = _sealed(ctx, fl, bases, snapshot_root)
-        rate = _rate(ctx, sealed, _planner(spec_for, "count", enum_date))
+        rate = _rate(ctx, sealed, _planner(spec_for, "count", enum_date, terminal_date))
         rows = sum(rows_in(st) for st in [*sealed.bases, sealed.live])
         counts = STG.count_stage(spec_for(sealed), sealed)
         if "needs" in counts:
@@ -861,11 +886,12 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
     start, status, sha, digest = iso_utc(now), "failed", None, None
     auth, blocks, n0, last, late, exposed, bases, enum_date, pins = _setup(ctx, "read", authorization_id,
                                                                            snapshot_root, fl)
-    spec_for = _spec_factory(ctx, n0, last, late, exposed, carried)
+    terminal_date = _terminal_date(fl, now)
+    spec_for = _spec_factory(ctx, n0, last, late, exposed, carried, terminal_date)
     if fl is None:
         require_fee_coverage(ctx, sale_sessions(ctx, n0, last))                # review round 14, F2
         return _fetch_step(ctx, "read", auth, bases, snapshot_root, spec_for, "plan", enum_date or iso_utc(now)[:10],
-                           transports, clock, now, [n0, last], pins, fee_span(ctx, n0, last))
+                           transports, clock, now, [n0, last], pins, fee_span(ctx, n0, last), terminal_date)
     # review round 14, Codex P1: the sign comes from the validation results bound to the authorization
     signs = {"H3-c": ((val or {}).get("items", {}).get("H3-c") or {}).get("estimate")}
     deviated = ctx["transport_deviation"] is not None or any(
@@ -880,7 +906,7 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
     orphan = _uncited(path)
     try:
         sealed, sha = _sealed(ctx, fl, bases, snapshot_root)
-        rate = _rate(ctx, sealed, _planner(spec_for, "plan", fl["enumeration_fetch_date"]))
+        rate = _rate(ctx, sealed, _planner(spec_for, "plan", fl["enumeration_fetch_date"], terminal_date))
         rows = sum(rows_in(st) for st in [*sealed.bases, sealed.live])
         if rate["void"]:
             res = not_read_results(ctx, carried, f"the read's fetch is void (rate {rate['rate']})")

@@ -722,6 +722,44 @@ class OpenList(unittest.TestCase):
             self.assertEqual((repo / ACCESS_LOG).read_text(), "")
 
 
+class TerminalRecords(unittest.TestCase):
+    """Review round 15, N02 (R14-open-1): a count and a read fetch their own terminal-record request (every corporate
+    action to their own fetch date) and the trade walk uses its records, while the enumeration, the screen and its
+    dedup keep the first count's. At e7529b47 the read reused the first count's enumeration_fetch_date as the only
+    corporate-action end date, so a merger or split effective after it (inside the extension blocks or the terminal
+    search windows through last + 5) was never fetched for the read and a merger exit booked terminal-zero."""
+
+    def test_the_plan_and_the_spec_carry_the_actions_own_terminal_records(self):
+        from core import plan as P
+        from core.records import MERGER_TYPES
+        cal = synth.calendar("2026-06-01", "2028-12-29")
+        ctx = {"cal": cal, "fees": None, "cells": {}}
+        merger = {"type": "cash_merger", "acquiree_symbol": "AAA", "acquirer_symbol": "BIGCO",
+                  "effective_date": "2028-06-05", "rate": 12.0}
+        enum_date, terminal_date = "2027-12-20", "2028-06-20"
+        live = Store()
+        for req, body in ((P.assets_requests()[0], [{"symbol": "AAA", "status": "active", "class": "us_equity"}]),
+                          (P.assets_requests()[1], []),
+                          (P.corporate_actions_request("2016-01-01", enum_date), {"corporate_actions": {}}),
+                          (P.terminal_actions_request(terminal_date),
+                           {"corporate_actions": {"cash_mergers": [{k: v for k, v in merger.items() if k != "type"}]}})):
+            synth.put_json(live, req, body)
+        store = holdout.HoldoutStore([], live, cal)
+        spec = holdout._spec_factory(ctx, "2027-01-04", "2027-12-31", frozenset(), frozenset(), ("H3-a",),
+                                     terminal_date)(store)
+        self.assertEqual(spec.actions, [])                              # the enumeration's records
+        self.assertEqual([r["type"] for r in spec.terminal_actions], ["cash_merger"])
+        self.assertEqual(spec.symbols, ["AAA"])                         # BIGCO is never enumerated
+        self.assertEqual(len(list(spec.ctx("read").records(MERGER_TYPES, acquiree_symbol="AAA"))), 1)
+        reqs = holdout._planner(lambda st: spec, "plan", enum_date, terminal_date)(Store())
+        ends = sorted((r["kind"], r["params"]["end"]) for r in reqs if r["endpoint"] == "/v1/corporate-actions")
+        self.assertEqual(ends, [("corporate_actions", enum_date), ("terminal_actions", terminal_date)])
+        self.assertEqual(holdout.enumeration([live])["actions"], [])     # never an enumeration input
+        self.assertEqual(holdout._terminal_date(None, cal.at("2028-06-20", "12:00")), "2028-06-20")   # UTC date
+        with self.assertRaises(holdout.HoldoutRefused):
+            holdout._terminal_date({"enumeration_fetch_date": enum_date}, 0.0)
+
+
 def _gap_fees(n0, cal):
     """Fee rows with an SEC Section 31 gap from the session after N0 (cost_model.fees)."""
     from core import costs
@@ -774,7 +812,7 @@ class FeeCoverageBeforeFetch(unittest.TestCase):
 class Step2Recovery(unittest.TestCase):
     """Step 2 of a count or read over a sealed snapshot, with the sealed inputs stubbed (review round 14, Codex P2)."""
     FL = {"stage": "holdout", "status": "complete", "input_snapshot_sha256s": ["a" * 64],
-          "enumeration_fetch_date": "2027-12-20"}
+          "enumeration_fetch_date": "2027-12-20", "terminal_actions_fetch_date": "2027-12-20"}
 
     def _mocks(self, setup, fl, sealed_error=None):
         from types import SimpleNamespace

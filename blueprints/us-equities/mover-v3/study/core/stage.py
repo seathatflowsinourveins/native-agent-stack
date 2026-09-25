@@ -37,6 +37,9 @@ class StageSpec:
     paper_exposed: frozenset = frozenset()
     late_sessions: frozenset = frozenset()
     carried: tuple | None = None
+    # review round 15, N02 (R14-open-1): a holdout count's or read's own corporate-action records (plan.
+    # terminal_actions_request), used by the trade walk only; the screen and its dedup use `actions`
+    terminal_actions: list = field(default_factory=list)
     extra: dict = field(default_factory=dict)
 
     def arms(self, mode: str) -> tuple:
@@ -75,9 +78,20 @@ class StageSpec:
             return TC.pool_validation(self.cal, self.dropped_years)
         return TC.pool_holdout(self.cal, self.n0, self.holdout_last)
 
+    def trade_actions(self) -> list:
+        """The records the trade walk uses: the enumeration's and the action's own terminal records, each once."""
+        from core.canon import dumps
+        seen, out = set(), []
+        for r in [*self.actions, *self.terminal_actions]:
+            k = dumps(r)
+            if k not in seen:
+                seen.add(k)
+                out.append(r)
+        return out
+
     def ctx(self, mode: str) -> Ctx:
         return Ctx(cal=self.cal, stage=self.stage, segs=self.segs, dropped_years=self.dropped_years,
-                   actions=self.actions, fees=self.fees, cells=self.cells, mode=mode,
+                   actions=self.trade_actions(), fees=self.fees, cells=self.cells, mode=mode,
                    paper_exposed=self.paper_exposed, late_sessions=self.late_sessions)
 
 

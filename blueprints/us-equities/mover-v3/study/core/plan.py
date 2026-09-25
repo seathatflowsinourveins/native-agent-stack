@@ -6,6 +6,8 @@ sealed snapshot and requires byte equality with the sealed request records.
 
 Request kinds and their shapes (universe_and_identity.request_shapes):
   assets, corporate_actions                   enumeration (no asof; the corporate-action end is the fetch date)
+  terminal_actions                            a holdout count's or read's own corporate actions, for the trade walk
+                                              only (no asof; the end is that action's fetch date)
   screen_daily_{raw,split,all}, screen_auctions  sessions s-1 and s for a batch of symbols, asof = s
   event_daily_{raw,split,all}                 as-known symbol, asof = t, t-60 (holdout: t-22) .. end session
   event_auctions                              asof = t, t-22 .. end session
@@ -64,6 +66,16 @@ def assets_requests() -> list:
 def corporate_actions_request(start: str, end: str) -> dict:
     return make("corporate_actions", DATA, "/v1/corporate-actions",
                 {"start": start, "end": end, "limit": 1000}, None, "corporate_actions")
+
+
+def terminal_actions_request(end: str) -> dict:
+    """Review round 15, N02 (R14-open-1): every corporate action from 2016-01-01 to a holdout count's or read's own
+    fetch date, for the trade walk only (terminal-merger booking, the in-hold split-record exclusion and the rename
+    sensitivity). A read is fetched after the last terminal-search window ends, so its records cover every hold and
+    search window; the enumeration keeps the first count's request (its kind is 'corporate_actions'), so this one
+    never changes the enumerated symbols, the screen or the dedup."""
+    return make("terminal_actions", DATA, "/v1/corporate-actions",
+                {"start": "2016-01-01", "end": end, "limit": 1000}, None, "corporate_actions")
 
 
 # ---------------------------------------------------------------- screen

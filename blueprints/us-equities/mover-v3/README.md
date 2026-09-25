@@ -514,8 +514,9 @@ review (1 P1, 2 P2), rejecting none: the validation file is bound by sha256 from
 the read refetches per-event data the count fetched too early, fee amendments supersede by precedence and a gap is
 refused before any fetch, dividend cash no longer moves with prices after the ex-date (and, after a follow-up Codex
 review, is never priced at an older close when a bar before the ex-date is missing), and a hard-killed results write
-is recovered. Two items that need a redesign are listed in the protocol's `open_before_first_holdout_count`, which
-must be empty before the first holdout count. The next steps are an
+is recovered. Round 14 deferred two items to the protocol's `open_before_first_holdout_count`; review round 15
+repaired both before the freeze (a count's and a read's own terminal-record request, and the adoption of an orphan
+pre-freeze output from its seals), so the list is empty, as the freeze requires. The next steps are an
 independent review of the draft and its study tree from a different model family, then the other preconditions, then
 the freeze. Until then every fetch and evaluation command refuses to run.
 
