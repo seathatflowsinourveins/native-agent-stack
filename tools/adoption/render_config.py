@@ -220,7 +220,10 @@ def cmd_verify(_args: argparse.Namespace) -> int:
     overall = 0
     for command in commands:
         try:
-            result = subprocess.run(command, capture_output=True, text=True, timeout=30, check=False)
+            # stdin closed like adoption's version probes: a CLI that falls
+            # back to reading stdin gets EOF instead of the caller's terminal.
+            result = subprocess.run(command, capture_output=True, text=True, timeout=30, check=False,
+                                    stdin=subprocess.DEVNULL)
             code = result.returncode
             output = (result.stdout or result.stderr or "").strip().splitlines()
             first_line = output[0] if output else ""

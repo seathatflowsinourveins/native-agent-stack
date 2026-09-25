@@ -116,7 +116,8 @@ match the Linux profile instead of floating with the tap.
 
 Homebrew formulae that remain float to whatever is current at install time. The
 bootstrap records `brew list --versions` into
-`$ECO_INSTALL_ROOT/installed-versions.txt`; copy it into the host receipt
+`$ECO_INSTALL_ROOT/installed-versions.txt`, above the checked version of each
+installed pin; copy it into the host receipt
 (`evidence/receipts/adoption-<host>-<date>.json`, schema in
 [`adoption/receipt.json`](../receipt.json)) so the exact installed versions are
 retained, not just the formula names above.
@@ -159,6 +160,18 @@ acceptance — remains unrun.
 | 2 | Usage error: missing `--profile`, an unknown argument, or a flag given without its value. |
 | 3 | A selected component has no pin at all in [`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json) and was not named in `--allow-unpinned`. Checked before anything is installed, and in `--plan` too; `--allow-unpinned <id,id,...>` skips the named ids instead and echoes them to the run log. |
 | 4 | A prerequisite (`curl`, `git`, `tar`, `shasum`, `unzip`, `jq`, `mktemp`) is still missing after the Homebrew step. With `--skip-system-packages` no `brew install` is attempted and the check lists what is missing. |
+| 5 | An installed pin's `version_probe` failed, timed out (30 s, or the longer `timeout_seconds` a pin declares: `llama-cpp` allows 180 s because its first launch on a fresh Mac takes over 30 s) or reported another version. `installed-versions.txt` is still written and nothing is removed; the run stops before its closing message and `--configure-claude-user-profile`. |
+
+The version report and exit 5 changed after `v2026.09.24.1`, in both
+[`adoption/bootstrap-macos.sh`](../bootstrap-macos.sh) and
+[`adoption/bootstrap-linux.sh`](../bootstrap-linux.sh), with a `version_probe`
+added to every entry of [`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json)
+and `adoption/pins-linux-x86_64.json`: at that release, and at every earlier
+one, both scripts run `--version` on every file in
+`$ECO_INSTALL_ROOT/bin` with the terminal's stdin, which blocks on
+`context-mode` and `socraticode` (both serve MCP on stdin), so run such a
+release's script with `</dev/null`.
+[`adoption/bootstrap.md`](../bootstrap.md) step 2 describes the report.
 
 Every selected `macos-arm64-foundation` component, including
 `socraticode` (below), has a pin, so the shipped profile needs no

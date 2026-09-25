@@ -457,11 +457,16 @@ class ScriptStructureTests(unittest.TestCase):
         self.assertIn(r'exec "\$llama_prefix/llama-server" "\$@"', self.text)
         self.assertNotIn('ln -sfn "$prefix/llama-server"', self.text)
 
-    def test_version_report_covers_every_placed_executable_and_brew(self):
-        self.assertIn('for installed_executable in "$bin_dir"/*', self.text)
-        self.assertIn('"$installed_executable" --version', self.text)
-        self.assertIn("brew list --versions", self.text)
-        self.assertIn('tee "$ecosystem_root/installed-versions.txt"', self.text)
+    def test_version_report_checks_installed_pins_lists_bin_dir_and_brew(self):
+        # Declared, bounded probes replaced `--version` on every placed
+        # executable, which blocked on socraticode and context-mode (both
+        # start an MCP stdio server); tests/test_adoption_version_probes.py
+        # runs this report step under bash 3.2 when one is available.
+        self.assertIn('for id in ${installed_pin_ids[@]+"${installed_pin_ids[@]}"}; do', self.text)
+        self.assertIn('for executable in "$bin_dir"/*; do', self.text)
+        self.assertNotIn('"$installed_executable" --version', self.text)
+        self.assertIn("brew list --versions </dev/null", self.text)
+        self.assertIn('version_report="$ecosystem_root/installed-versions.txt"', self.text)
 
     @unittest.skipUnless(SHELLCHECK, "native shellcheck unavailable; CI installs the pinned analyzer")
     def test_shellcheck_style_is_clean(self):

@@ -84,6 +84,12 @@ itself evidence the WSL UVA gap closed.
    (logging `Kept installed claude-code <version>`, with nothing downloaded
    or installed) and runs the checksum-verified install only when that
    launcher is missing, older or unreadable.
+   Its version report changed after `v2026.09.24.1`: that release, and
+   every earlier one, runs `--version` on every file in
+   `$ECO_INSTALL_ROOT/bin` and blocks on `context-mode`, which serves MCP on
+   stdin instead, so run such a release's script with `</dev/null` (step 2 of
+   [`adoption/bootstrap.md`](../bootstrap.md) has the details and the
+   `mcp-inspector` case).
 2. Recreate the SDK only for the `research-runtime` profile using
    [`adoption/sdk/README.md`](../sdk/README.md)'s transitive lock; retain the
    same exact-match and uncached-reinstall checks as

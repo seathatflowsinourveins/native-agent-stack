@@ -96,13 +96,34 @@ GitHub-hosted macOS runner; see
    default `$HOME/.local/share/codex-ecosystem`; writes
    `$ECO_INSTALL_ROOT/installed-versions.txt`; both scripts exit 2 usage,
    1 guard/refusal, 0 success, 3 when a selected component has no pin and was
-   not named in `--allow-unpinned`, and 4 when a prerequisite is still missing
+   not named in `--allow-unpinned`, 4 when a prerequisite is still missing
    after the system-package step — with `--skip-system-packages` no
    `apt-get`/`brew install` is attempted and the check lists what is missing;
    `--plan` resolves the profile's pins with no network and still exits 1 on a
-   null `sha256`) — installs the selected profile's components
-   using each entry's `recipe_map` path. Inspect the script before running it
-   on a new host; it installs only what the chosen `--profile` selects.
+   null `sha256` — and 5 when a version probe fails) — installs the selected
+   profile's components using each entry's `recipe_map` path. Inspect the
+   script before running it on a new host; it installs only what the chosen
+   `--profile` selects.
+
+   `installed-versions.txt` checks each pin the run installed with the
+   `version_probe` its pin entry declares: the declared command, run with
+   stdin from `/dev/null` in its own process group and killed after 30 s (or the
+   longer `timeout_seconds` its pin declares), must
+   report the pinned version (Claude Code's pin is a floor, so any later
+   version passes); `context-mode` and `socraticode` have no version flag and
+   start their MCP stdio server on any other argument, so npm reads their
+   package version instead (those probes run only `bin/npm`). Every other
+   executable in `$ECO_INSTALL_ROOT/bin` is listed with its link target and
+   not run. A probe that fails, times out or reports another version makes
+   the script exit 5 once the report is written, before its closing
+   next-steps message and `--configure-claude-user-profile`; nothing is
+   removed. This report changed after `v2026.09.24.1`: at that release, and at
+   every earlier one, both scripts run `--version` on every file in `$ECO_INSTALL_ROOT/bin` with the terminal's stdin and no
+   bound, so they
+   block on `context-mode` and `socraticode` (run them with `</dev/null` to
+   avoid that) and on a recipe-installed `mcp-inspector`, which has no version
+   flag and serves its web UI with `--version` as the server command; stop
+   that process if the report stops after `-- mcp-inspector --`.
 
    The scripts install only components that have a pin in
    [`pins-linux-x86_64.json`](pins-linux-x86_64.json) or
@@ -221,7 +242,8 @@ GitHub-hosted macOS runner; see
    Both platform bootstrap scripts also accept
    `--configure-claude-user-profile` to run this automatically as their own
    last step (still only meaningful after sign-in; run it manually
-   afterward otherwise, exactly as the script's own closing message says).
+   afterward otherwise, exactly as the script's own closing message says; a
+   run that exits 5 stops before that step and that message).
    Three idempotent sub-steps, each safe to re-run:
    - **guard hooks**: copies [`adoption/hooks/claude/effort-default-guard.py`](hooks/claude/effort-default-guard.py)
      to `~/.claude/hooks/effort-default-guard.py` and the secret guard

@@ -201,14 +201,18 @@ class ScriptBehaviorTests(unittest.TestCase):
         # tried (and possibly failed) to resolve command -v npm/uv.
         self.assertEqual(text.count('export PATH="$bin_dir:$PATH"'), 1)
 
-    def test_version_report_covers_every_symlinked_executable(self):
-        # Regression: the retained installed-versions.txt evidence log
-        # previously hardcoded five tools (git/node/npm/uv/gh) even though
-        # ten-plus pins are installed. Assert the report now iterates every
-        # actual symlink under bin_dir instead of a fixed subset.
+    def test_version_report_checks_every_installed_pin_and_lists_bin_dir(self):
+        # Regression: the retained installed-versions.txt evidence log once
+        # hardcoded five tools (git/node/npm/uv/gh); its replacement ran
+        # --version on every bin_dir entry, which blocked on servers without a
+        # version flag (MCP Inspector, context-mode, socraticode). The report
+        # now checks every pin this run installed with the probe its pin
+        # declares and lists all of bin_dir without running it;
+        # tests/test_adoption_version_probes.py exercises that behavior.
         text = SCRIPT_PATH.read_text()
-        self.assertIn('for installed_executable in "$bin_dir"/*', text)
-        self.assertIn('"$installed_executable" --version', text)
+        self.assertIn('for id in ${installed_pin_ids[@]+"${installed_pin_ids[@]}"}; do', text)
+        self.assertIn('for executable in "$bin_dir"/*; do', text)
+        self.assertNotIn('"$installed_executable" --version', text)
 
 
 class UnpinnedComponentFailClosedTests(unittest.TestCase):
