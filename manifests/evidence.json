@@ -9150,8 +9150,8 @@
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/receipt.json",
-      "sha256": "f9a38d26645546c12c0cdf5747daebf9c09e079bfae9e2051b49c122b3ce0f89",
-      "bytes": 41474
+      "sha256": "5c372a19f7f081f7d7158aada5900fb0b310cb7ebc20901063ee41a2e4d87791",
+      "bytes": 41739
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.in",
