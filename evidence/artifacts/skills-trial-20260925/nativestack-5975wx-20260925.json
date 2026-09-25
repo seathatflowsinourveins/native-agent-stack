@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "kind": "skills_trial_host_evidence",
+  "host_id": "nativestack-5975wx-20260925",
+  "platform": "linux-wsl2-x86_64",
+  "observed_at_utc": "2026-09-25T22:52:00Z",
+  "catalog_base": "0074a0c3276952bb1ab23a4a9fa455334ca1b78b",
+  "manifest": "adoption/skills/manifest.json",
+  "evidence_class": "native_proven for the install/status/read-back steps on this host; synthetic for the unit tests",
+  "steps": {
+    "skills_update": {
+      "command": "DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 update -g -y",
+      "observed_at_utc": "2026-09-25T21:16:42Z",
+      "output": [
+        "Checking for skill updates…",
+        "Checking skills from source: typesafe-ai/skills",
+        "Checking skills from source: openai/skills",
+        "✓ All global skills are up to date"
+      ],
+      "exit": 0,
+      "lock_unchanged": true
+    },
+    "cli_install": {
+      "command": "npm install --global --prefix <tools-root>/skills-1.7.0 skills-1.7.0.tgz",
+      "tarball_sha512_matches_npm_integrity": true,
+      "tarball_sha256": "8d1466f792baaee945dae88e05ee403d6f9e78a3ae8dcbf61496035ca274418d",
+      "version_output": "1.7.0"
+    },
+    "installer_dry_run": {
+      "command": "python3 tools/adoption/install_skills.py --skills-bin <pinned skills> --dry-run",
+      "already_ok": 3,
+      "planned": 23,
+      "summary": "install-skills: 26/26 ok"
+    },
+    "installer_apply": {
+      "command": "python3 tools/adoption/install_skills.py --skills-bin <pinned skills>",
+      "started_utc": "2026-09-25T22:50:42Z",
+      "finished_utc": "2026-09-25T22:51:21Z",
+      "results": [
+        "typesafe-ai: ok (pinned ref already installed and locked)",
+        "gh-fix-ci: ok (pinned ref already installed and locked)",
+        "security-best-practices: ok (pinned ref already installed and locked)",
+        "iterative-retrieval: installed and verified at tree 1f1e8d67cf41d72acf2315dc7e6edeac0fc231a6",
+        "search-first: installed and verified at tree 89e0ce14188958a85fbfc7ae0bdc30a0dc9681e1",
+        "diagnosing-bugs: installed and verified at tree 99bd56983e42bc752c52da67f1112e4121781cd1",
+        "tdd: installed and verified at tree 79288be15c67b849f22b6572056601090fd20913",
+        "codebase-design: installed and verified at tree 344e3efc88ee60663b2e989555c2efdb548fbd42",
+        "resolving-merge-conflicts: installed and verified at tree 77f0d7de3143abbf03e55a63522d30bff31ae908",
+        "grill-me: installed and verified at tree 3df14e2d3a89459bf300614be9247e3ce74798f8",
+        "improve-codebase-architecture: installed and verified at tree 3d35cd438f4067b03c8b3792e038960e4ac11526",
+        "verification-before-completion: installed and verified at tree a4cb0b69aaefeab540947a7f1642bdaad810e37a",
+        "security-threat-model: installed and verified at tree 455ed2d898ef7d1e8836898f07be3a7d2c3f38d2",
+        "gh-address-comments: installed and verified at tree 042316bece4a9f832145dcff7d5506e99fe3ecf1",
+        "semgrep: installed and verified at tree 7503c4bec67cbe758ee488a2bd4caaf618facbfb",
+        "codeql: installed and verified at tree 1490253d767cc2c5e48f1245a681ee59cc52eb4f",
+        "supply-chain-risk-auditor: installed and verified at tree 954cc68e05e24a2a14447b60d1e8946b53323b1b",
+        "agentic-actions-auditor: installed and verified at tree 3c07fa0b66ec665df1b17f5e09ab3e735f627029",
+        "property-based-testing: installed and verified at tree cf5e77d684180c80a2f3aa228c53d04b1fa1ba77",
+        "modern-python: installed and verified at tree e84fa2b3a076b4333e4cc6187510f2b180eed427",
+        "sarif-parsing: installed and verified at tree 4fe407da56e118c68fd9bcc16603a38cf6116562",
+        "fp-check: installed and verified at tree f3f830417667dc3a202b1cb40948bc26ce26ddbf",
+        "mcp-builder: installed and verified at tree b866bcfb57b780c10b587c7b543e871a91661ce0",
+        "frontend-design: installed and verified at tree d79e2a5bb4df4a386c2adcdd9ab8709bba28c3f6",
+        "agent-browser: installed and verified at tree 82def67855a0d2aad7794207951820fa5422fdb0",
+        "find-skills: installed and verified at tree 76a98a285cb0434f3d39e1a873823556330e398b",
+        "install-skills: 26/26 ok"
+      ],
+      "summary": "install-skills: 26/26 ok",
+      "exit": 0
+    },
+    "claude_settings": {
+      "command": "python3 tools/adoption/apply_claude_settings.py --template <skillOverrides-only template from adoption/templates/claude.settings.template.json>",
+      "dry_run_top_level_keys_changed": [
+        "skillOverrides"
+      ],
+      "entries": 26,
+      "backup_written": true
+    },
+    "codex_config": {
+      "command": "python3 tools/adoption/install_skills.py --print-codex-config >> ~/.codex/config.toml (after a backup)",
+      "skills_config_entries": 15,
+      "all_disabled": true,
+      "toml_parses": true,
+      "codex_listing_readback": "not run: Codex usage limit until 2026-09-30; a Codex session is needed to confirm the listing"
+    },
+    "skills_status": {
+      "command": "python3 scripts/skills_status.py --skills-bin <pinned skills> --json",
+      "exit": 0,
+      "result": "ok"
+    },
+    "skill_doctor_before": {
+      "command": "claude -p \"/skill-doctor\" --output-format json",
+      "claude_code": "2.1.282",
+      "total_cost_usd": 0,
+      "num_turns": 0,
+      "user_skill_rows": {
+        "gh-fix-ci": {
+          "context": "~110",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "iterative-retrieval": {
+          "context": "~70",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "search-first": {
+          "context": "~50",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "security-best-practices": {
+          "context": "~140",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "typesafe-ai": {
+          "context": "~230",
+          "uses": 0,
+          "last_used": "never"
+        }
+      },
+      "other_rows_by_source": {
+        "claude-hud": 2,
+        "codex": 11,
+        "context-mode": 8,
+        "claude.ai sync": 8
+      }
+    },
+    "skill_doctor_after": {
+      "command": "claude -p \"/skill-doctor\" --output-format json",
+      "claude_code": "2.1.282",
+      "total_cost_usd": 0,
+      "num_turns": 0,
+      "user_skill_rows": {
+        "agent-browser": {
+          "context": "< 20",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "agentic-actions-auditor": {
+          "context": "~200",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "codebase-design": {
+          "context": "~100",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "codeql": {
+          "context": "~250",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "diagnosing-bugs": {
+          "context": "~60",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "find-skills": {
+          "context": "-",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "fp-check": {
+          "context": "~120",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "frontend-design": {
+          "context": "~70",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "gh-address-comments": {
+          "context": "~60",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "gh-fix-ci": {
+          "context": "~110",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "grill-me": {
+          "context": "-",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "improve-codebase-architecture": {
+          "context": "-",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "iterative-retrieval": {
+          "context": "< 20",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "mcp-builder": {
+          "context": "~100",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "modern-python": {
+          "context": "~60",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "property-based-testing": {
+          "context": "~290",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "resolving-merge-conflicts": {
+          "context": "~30",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "sarif-parsing": {
+          "context": "~130",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "search-first": {
+          "context": "< 20",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "security-best-practices": {
+          "context": "~140",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "security-threat-model": {
+          "context": "~150",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "semgrep": {
+          "context": "~240",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "supply-chain-risk-auditor": {
+          "context": "~130",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "tdd": {
+          "context": "~50",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "typesafe-ai": {
+          "context": "< 20",
+          "uses": 0,
+          "last_used": "never"
+        },
+        "verification-before-completion": {
+          "context": "~90",
+          "uses": 0,
+          "last_used": "never"
+        }
+      },
+      "other_rows_by_source": {
+        "claude-hud": 2,
+        "codex": 11,
+        "context-mode": 8,
+        "claude.ai sync": 9
+      }
+    },
+    "usage_baseline": {
+      "command": "python3 tools/skill-usage/skill_usage.py --claude-skill-doctor <after.json> --codex-root <codex sessions> --json",
+      "codex": {
+        "files_scanned": 77,
+        "measured": true,
+        "parse_errors": 0,
+        "roots_count": 1
+      },
+      "prune_candidates": [],
+      "limits": "Claude 'uses' from /skill-doctor is not windowed by --window (only its '7d tokens' column is): the same lifetime count is reused for every window's zero-usage check, a documented gap, not a measured per-window value. Codex counts are windowed from each rollout line's own timestamp. A skill with no measured, enabled/listed client is excluded from prune_candidates and verdict_recheck, never read as zero usage. The measured listing cost (claude.context_tokens) is its own counter: never mix it into tools/token-report's token-efficiency ledger."
+    }
+  },
+  "listing_cost_counter": {
+    "unit": "approximate tokens per turn, from /skill-doctor context column (< 20 counted as 20, - as 0)",
+    "user_skills_before": 600,
+    "user_skills_after": 2460,
+    "note": "Its own counter; not part of token-efficiency receipts. Synced, plugin and bundled skills are separate rows and unchanged."
+  },
+  "limitations": [
+    "Invocation counts start at zero; the trial window runs to 2026-10-25 and only then can the prune rule act.",
+    "Claude /skill-doctor uses is a lifetime count on this machine, not windowed; Codex counts are windowed by rollout timestamps.",
+    "Codex listing of enabled skills was not read back in a Codex session (usage limit until 2026-09-30).",
+    "One host only; every other host must run the installer, status check and baseline itself."
+  ]
+}
