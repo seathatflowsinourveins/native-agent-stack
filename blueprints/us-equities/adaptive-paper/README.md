@@ -236,16 +236,29 @@ absent on a bad `--ledger` path or a permissions problem). **Not exported**
 `paper_reconciliation_last_success_timestamp_seconds` and
 `paper_request_budget_wait_exceeded_total`.
 
-The observability backend profile's Prometheus scrapes `127.0.0.1:18890` as
-job `adaptive-paper`, and its rules add the `equities-broker-path` alert
-group (`EquitiesOrderStateDivergence`, `EquitiesReconciliationFailed`,
+The observability backend profile's Prometheus scrapes job `adaptive-paper`
+only at exporters registered in its `file_sd` list,
+`<config-root>/adaptive-paper-targets.json`. `configure.py` ships that list
+as `[]`.
+
+Start the exporter with `--file-sd` pointing at that list:
+
+- It registers its own `127.0.0.1:<port>` target once it serves.
+- It removes that target only on a clean stop (SIGTERM or SIGINT) of a trial
+  that finished cleanly.
+- A crashed or killed exporter, or an unfinished or failed trial, stays
+  registered, so `EquitiesPaperMetricsMissing` fires. After recovering that
+  trial, remove the target with `metrics.py --deregister --port <port>
+  --file-sd <list>`.
+
+With nothing registered, the alert is silent. The profile's rules add the
+`equities-broker-path` alert group (`EquitiesOrderStateDivergence`, `EquitiesReconciliationFailed`,
 `EquitiesRequestBudgetExhausted`, `EquitiesLedgerFrozen`,
 `EquitiesPaperMetricsMissing`, `EquitiesLedgerUnreadable`), routed to the
 existing local ntfy receiver by `scope: equities-broker`. It also excludes
-this job from the pre-existing `EcosystemServiceUnavailable` rule, since this
-exporter is a separate process not started by `install.py`/`configure.py`
-and would otherwise leave that generic rule firing permanently whenever no
-paper trial is running. See
+this job from the generic `EcosystemServiceUnavailable` rule. A registered
+exporter that is down therefore alerts once, as `EquitiesPaperMetricsMissing`,
+with wording matched to the trial lifecycle. See
 [`observability/backends/README.md`](../../../observability/backends/README.md#adaptive-paper-broker-path-alerts)
 and the templates under `observability/backends/templates/`. Run `metrics.py`
 as its own process alongside a trial; it is not started by `runner.py` and

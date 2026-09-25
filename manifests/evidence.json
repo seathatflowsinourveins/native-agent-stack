@@ -6532,8 +6532,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "664a7a3b0371d7d47c3ebe575c8340be1556eb47e976e92553ae208d71c4aa7e",
-      "bytes": 19255
+      "sha256": "26671bcc07b1da26d30a51ce128ffe3a8996241c249308dff4c20b625629a848",
+      "bytes": 19839
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -6637,8 +6637,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/metrics.py",
-      "sha256": "7d6ef2dbdaaed3de1a0c1f65257d834c92b9b1027a4f8a206c5ed148c4cf0e6f",
-      "bytes": 19657
+      "sha256": "6ef06204566774021d17a6b4837942d0a889730d214ad40f996c27fecffeb4d5",
+      "bytes": 26244
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover.py",
@@ -29972,8 +29972,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "8f72fc88a1e80645a509f8671832cc748e6091000a22b8fca5b0fd5b9e2390f0",
-      "bytes": 15802
+      "sha256": "73c4d57c93dda1aa279b92a704ee96d65ad23df643c04251cff0f63bb1a38e39",
+      "bytes": 17684
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -29987,8 +29987,8 @@
     },
     {
       "path": "observability/backends/configure.py",
-      "sha256": "d5e3a92337fba097365a061d31ed35457b903d98ef2f3e088b0421420ea90b9e",
-      "bytes": 4049
+      "sha256": "c6c1d341724ea4330422b405d2f3703d3196bd0d5b42796cc68dd946ce07a4ac",
+      "bytes": 4289
     },
     {
       "path": "observability/backends/install.py",
@@ -30052,13 +30052,13 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
-      "sha256": "45c5ca5fcfd2575e398494f353289634056c0064e0b216045e5092f320d5a931",
-      "bytes": 9373
+      "sha256": "0b41a11afd638ebdc70781b3a4c80b23ed943a0ae80534171c9dd039379986df",
+      "bytes": 9754
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus.yml.example",
-      "sha256": "fdaae9c4934c33585f9cade2a38c77767958b648f358295ef8220302fb49bb7b",
-      "bytes": 1092
+      "sha256": "4c41e85e2cb3cc0aabed4776f19b6e7590625944d41fcd909124f9046b70ce25",
+      "bytes": 1147
     },
     {
       "path": "observability/collector/README.md",
@@ -30462,8 +30462,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_metrics.py",
-      "sha256": "8b0627f752ddf11c87005200e76d0ad4873261905ba073163476c66659d564f9",
-      "bytes": 20491
+      "sha256": "987524051732142b6284101f9c27063bb14110922ec70280f39b58ca44cd091e",
+      "bytes": 28239
     },
     {
       "path": "tests/test_adaptive_paper_mover.py",
@@ -30877,8 +30877,8 @@
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
-      "sha256": "c015775d7072829877361f358f79d560075e0d84c06c9155146aa0c58875ba90",
-      "bytes": 8168
+      "sha256": "5ef5f7b4ed58773c090401c9472162222b623a2973012560cae577d7a8f854a6",
+      "bytes": 13446
     },
     {
       "path": "tests/test_offhost_app_state.py",

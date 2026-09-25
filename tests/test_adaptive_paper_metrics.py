@@ -12,7 +12,9 @@ import json
 import os
 import re
 from pathlib import Path
+import signal
 import sqlite3
+import subprocess
 import sys
 import tempfile
 import threading
@@ -405,6 +407,159 @@ class SqliteReadOnlyUriTests(unittest.TestCase):
             self.assertEqual(
                 samples[("paper_ledger_frozen", (("reason", "live_wal_probe"),))], "1"
             )
+
+
+class FileSdRegistrationTests(unittest.TestCase):
+    """``metrics.py --file-sd`` end to end, with real exporter processes and a real file_sd list.
+
+    The backend profile scrapes job ``adaptive-paper`` only at registered targets, and
+    ``EquitiesPaperMetricsMissing`` fires for a registered target without ``paper_trial_active``. So an exporter must
+    register itself once it serves, and remove itself only on a clean stop of a finished trial: a crashed, killed or
+    unfinished trial has to stay registered for the alert to fire."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.ledger_path = self.root / "ledger.sqlite3"
+        self.trial_path = self.root / "trial.json"
+        ledger = Ledger(self.ledger_path, RiskLimits())
+        ledger.start_trial(time.time())
+        ledger.close()
+        self.targets = self.root / "config" / "adaptive-paper-targets.json"
+        self.targets.parent.mkdir()
+        self.targets.write_text("[]\n")  # as observability/backends/configure.py ships it
+        self.processes = []
+
+    def tearDown(self):
+        for process in self.processes:
+            if process.poll() is None:
+                process.kill()
+            process.wait(timeout=10)
+            process.stderr.close()
+        self.tmp.cleanup()
+
+    def write_phase(self, phase, **fields):
+        self.trial_path.write_text(json.dumps({"trial_id": "fixture", "phase": phase, **fields}))
+
+    def listed(self):
+        if not self.targets.exists():
+            return []
+        return [target for group in json.loads(self.targets.read_text()) for target in group["targets"]]
+
+    def run_metrics(self, *argv):
+        return subprocess.run([sys.executable, str(SOURCE / "metrics.py"), *argv],
+                              capture_output=True, text=True, timeout=60)
+
+    def start(self):
+        before = set(self.listed())
+        process = subprocess.Popen([sys.executable, str(SOURCE / "metrics.py"), "--ledger", str(self.ledger_path),
+                                    "--port", "0", "--file-sd", str(self.targets)], stderr=subprocess.PIPE, text=True)
+        self.processes.append(process)
+        deadline = time.monotonic() + 30
+        while time.monotonic() < deadline:
+            added = set(self.listed()) - before
+            if added:
+                return process, added.pop()
+            if process.poll() is not None:
+                self.fail(f"exporter exited {process.returncode} before registering: {process.stderr.read()}")
+            time.sleep(0.05)
+        self.fail("exporter never registered its target")
+
+    def stop(self, process, signum=signal.SIGTERM):
+        process.send_signal(signum)
+        return process.wait(timeout=30)
+
+    def test_a_running_exporter_is_registered_at_the_loopback_address_it_serves(self):
+        self.write_phase("starting")
+        _, target = self.start()
+        self.assertTrue(target.startswith("127.0.0.1:"), target)
+        with urllib.request.urlopen(f"http://{target}/metrics", timeout=5) as response:
+            samples = parse(response.read().decode("utf-8"))
+        self.assertEqual(samples[("paper_trial_active", ())], "1")
+
+    def test_a_clean_stop_of_a_finished_trial_deregisters_without_leaving_a_temporary_file(self):
+        self.write_phase("starting")
+        process, _ = self.start()
+        self.write_phase("finished", status="passed")
+        self.assertEqual(self.stop(process), 0)
+        self.assertEqual(json.loads(self.targets.read_text()), [])
+        self.assertEqual(sorted(path.name for path in self.targets.parent.iterdir()),
+                         ["adaptive-paper-targets.json", "adaptive-paper-targets.json.lock"])
+
+    def test_a_clean_stop_with_no_trial_json_deregisters(self):
+        process, target = self.start()
+        self.assertEqual(self.stop(process), 0)
+        self.assertNotIn(target, self.listed())
+
+    def test_a_clean_stop_of_an_unfinished_trial_stays_registered(self):
+        for phase, status in (("starting", None), ("needs_attention", "needs_attention"),
+                              ("held_overnight", "held_overnight"), ("finished", "needs_attention"),
+                              ("finished", "failed")):
+            with self.subTest(phase=phase, status=status):
+                self.write_phase(phase, status=status)
+                process, target = self.start()
+                self.assertEqual(self.stop(process), 0)
+                self.assertIn(target, self.listed())
+
+    def test_a_clean_stop_with_an_unreadable_trial_json_stays_registered(self):
+        self.trial_path.write_text("{not json")
+        process, target = self.start()
+        self.assertEqual(self.stop(process), 0)
+        self.assertIn(target, self.listed())
+
+    def test_a_killed_exporter_stays_registered_even_for_a_finished_trial(self):
+        self.write_phase("finished")
+        process, target = self.start()
+        self.assertEqual(self.stop(process, signal.SIGKILL), -signal.SIGKILL)
+        self.assertIn(target, self.listed())
+
+    def test_deregister_removes_the_target_a_stopped_exporter_left(self):
+        self.write_phase("needs_attention")
+        process, target = self.start()
+        self.stop(process)
+        result = self.run_metrics("--deregister", "--port", target.rsplit(":", 1)[1], "--file-sd", str(self.targets))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn(target, self.listed())
+
+    def test_other_groups_and_a_concurrent_exporter_are_kept(self):
+        other = {"targets": ["127.0.0.1:9"], "labels": {"note": "another writer"}}
+        self.targets.write_text(json.dumps([other]))
+        self.write_phase("finished")
+        first, _ = self.start()
+        second, second_target = self.start()
+        self.assertEqual(self.stop(first), 0)
+        self.assertEqual(json.loads(self.targets.read_text()),
+                         [other, {"targets": [second_target], "labels": {}}])
+        self.assertEqual(self.stop(second), 0)
+        self.assertEqual(json.loads(self.targets.read_text()), [other])
+
+    def test_a_missing_list_is_created_by_the_first_registration(self):
+        self.targets.unlink()
+        self.write_phase("starting")
+        _, target = self.start()
+        self.assertEqual(json.loads(self.targets.read_text()), [{"targets": [target], "labels": {}}])
+
+    def test_a_list_that_is_not_a_file_sd_target_list_refuses_to_start_and_is_left_alone(self):
+        for content in ('{"targets": ["127.0.0.1:1"]}', "[not json", '[{"targets": "127.0.0.1:1"}]',
+                        '[{"targets": [], "extra": 1}]', '[{"targets": [1]}]'):
+            with self.subTest(content=content):
+                self.targets.write_text(content)
+                result = self.run_metrics("--ledger", str(self.ledger_path), "--port", "0",
+                                          "--file-sd", str(self.targets))
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertIn("refused", result.stderr)
+                self.assertEqual(self.targets.read_text(), content)
+
+    def test_a_list_in_a_missing_directory_refuses_to_start(self):
+        result = self.run_metrics("--ledger", str(self.ledger_path), "--port", "0",
+                                  "--file-sd", str(self.root / "absent" / "adaptive-paper-targets.json"))
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("refused", result.stderr)
+
+    def test_deregister_needs_file_sd_and_serving_needs_a_ledger(self):
+        for argv in (["--deregister"], ["--port", "0"]):
+            with self.subTest(argv=argv):
+                self.assertEqual(self.run_metrics(*argv).returncode, 2)
 
 
 if __name__ == "__main__":

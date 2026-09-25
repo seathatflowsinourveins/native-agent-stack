@@ -1,13 +1,29 @@
 """Read-only Prometheus exporter for the adaptive-paper durable ledger.
 
 Runs as a separate process, bound to 127.0.0.1:18890 by default. It only ever
-opens two files, strictly read-only:
+opens two files of the trial, strictly read-only:
 
   * ``--ledger`` (the ``ledger.sqlite3`` SQLite file `safety.Ledger` writes,
     opened with ``file:...?mode=ro`` so a write attempt would raise instead of
     silently succeeding), and
   * ``<ledger dir>/trial.json`` (the durable run-metadata file `runner.py`
     writes next to the ledger; override with ``--trial-json``).
+
+The one file it writes is the Prometheus ``file_sd`` target list named by
+``--file-sd`` (the backend profile renders it as
+``<config-root>/adaptive-paper-targets.json``), plus that list's sibling
+``.lock`` file. Prometheus scrapes job ``adaptive-paper`` only at registered
+targets, so the ``EquitiesPaperMetricsMissing`` alert fires only while an
+exporter is registered but not answering:
+
+  * the exporter adds its own ``127.0.0.1:<port>`` target after its listener
+    binds, and refuses to start (exit 2) when the list is unreadable or is not
+    a ``file_sd`` target list, rather than serving unmonitored;
+  * it removes that target only on a clean stop (SIGTERM or SIGINT) of a trial
+    that finished (``trial.json`` phase ``finished``, or no ``trial.json``). A
+    crashed or killed exporter, or a trial left at ``starting``,
+    ``needs_attention`` or ``held_overnight``, stays registered, so the alert
+    fires until an operator recovers the trial and runs ``--deregister``.
 
 It never imports ``safety.Ledger`` (whose constructor opens the database for
 writes and mutates schema/pragmas), never reads an env file or any credentials
@@ -94,7 +110,10 @@ above and drop the corresponding gap comment.
 from __future__ import annotations
 
 import argparse
+import fcntl
 import json
+import os
+import signal
 import sqlite3
 import sys
 import time
@@ -364,25 +383,126 @@ def make_server(ledger_path: Path, trial_path: Path, *, host: str = HOST, port: 
     return ThreadingHTTPServer((host, port), handler)
 
 
+def _file_sd_groups(path: Path) -> list:
+    """The target groups in the file_sd list at ``path`` ([] when it does not exist yet). Anything that is not a
+    JSON list of ``{"targets": [str, ...], "labels": {...}}`` groups raises ValueError instead of being replaced."""
+    try:
+        groups = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"{path.name} is not JSON: {exc}") from None
+    if not isinstance(groups, list) or not all(
+            isinstance(group, dict) and set(group) <= {"targets", "labels"} and isinstance(group.get("targets"), list)
+            and all(isinstance(target, str) for target in group["targets"])
+            and isinstance(group.get("labels", {}), dict) for group in groups):
+        raise ValueError(f"{path.name} is not a file_sd target list")
+    return groups
+
+
+def update_file_sd(path: Path, target: str, *, registered: bool) -> None:
+    """Add (``registered``) or remove this exporter's own single-target group in the file_sd list at ``path``.
+
+    Groups written by anyone else are kept as they are. A sibling lock file serialises concurrent exporters, and
+    the new list is written to a temporary file in the same directory, flushed to disk and ``os.replace``-d over
+    the old one, so Prometheus, which re-reads the file on every change, never reads a partial list.
+    """
+    with open(path.with_name(path.name + ".lock"), "a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        groups = [group for group in _file_sd_groups(path) if group["targets"] != [target]]
+        if registered:
+            groups.append({"targets": [target], "labels": {}})
+        temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+        try:
+            with open(temporary, "w", encoding="utf-8") as handle:
+                handle.write(json.dumps(groups, indent=2) + "\n")
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(temporary, path)
+        except BaseException:
+            temporary.unlink(missing_ok=True)
+            raise
+
+
+def trial_finished(trial_path: Path) -> bool:
+    """True when nothing is left to watch: no trial.json (no trial ran on this ledger) or phase ``finished``
+    without a failed status. `runner.trial_phase_and_exit_code` records ``finished`` only for a passing status
+    that ended flat; a ``finished`` phase carrying ``needs_attention`` or ``failed`` (the recovered-flat case
+    ``EquitiesReconciliationFailed`` also covers) is still not clean. ``starting``, ``needs_attention``,
+    ``held_overnight`` and an unreadable file keep the exporter registered."""
+    try:
+        metadata = json.loads(trial_path.read_text())
+    except FileNotFoundError:
+        return True
+    except (OSError, json.JSONDecodeError):
+        return False
+    return (isinstance(metadata, dict) and metadata.get("phase") == "finished"
+            and metadata.get("status") not in ("needs_attention", "failed"))
+
+
+class _CleanStop(Exception):
+    """Raised by the SIGTERM handler so serve_forever() returns through the clean-stop path, as SIGINT does."""
+
+
+def _raise_clean_stop(signum, frame):
+    raise _CleanStop()
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=DEFAULT_PORT,
-                        help=f"Loopback-only listen port (default {DEFAULT_PORT}); host is always 127.0.0.1.")
-    parser.add_argument("--ledger", required=True, type=Path,
-                        help="Path to the adaptive-paper ledger.sqlite3 file, opened strictly read-only.")
+                        help=f"Loopback-only listen port (default {DEFAULT_PORT}; 0 picks a free one); host is "
+                             "always 127.0.0.1.")
+    parser.add_argument("--ledger", type=Path,
+                        help="Path to the adaptive-paper ledger.sqlite3 file, opened strictly read-only. Required "
+                             "unless --deregister.")
     parser.add_argument("--trial-json", type=Path, default=None,
                         help="Path to the sibling trial.json metadata file; defaults to <ledger dir>/trial.json.")
+    parser.add_argument("--file-sd", type=Path, default=None,
+                        help="Prometheus file_sd target list to register this exporter in (the rendered "
+                             "<config-root>/adaptive-paper-targets.json). Without it the exporter is not scraped.")
+    parser.add_argument("--deregister", action="store_true",
+                        help="Remove 127.0.0.1:--port from --file-sd and exit: after an operator has recovered a "
+                             "trial whose exporter stopped while registered.")
     args = parser.parse_args(argv)
+    if args.deregister:
+        if args.file_sd is None:
+            parser.error("--deregister needs --file-sd")
+        update_file_sd(args.file_sd, f"{HOST}:{args.port}", registered=False)
+        print(f"adaptive-paper metrics exporter {HOST}:{args.port} deregistered from {args.file_sd}", file=sys.stderr)
+        return 0
+    if args.ledger is None:
+        parser.error("--ledger is required")
     trial_path = args.trial_json or (args.ledger.parent / "trial.json")
     server = make_server(args.ledger, trial_path, port=args.port)
-    print(f"adaptive-paper metrics exporter listening on http://{HOST}:{args.port}/metrics "
-          f"(read-only; ledger={args.ledger})", file=sys.stderr)
+    target = f"{HOST}:{server.server_address[1]}"
+    # Installed before registering, so a SIGTERM at any point after the target is written takes the clean-stop path.
+    signal.signal(signal.SIGTERM, _raise_clean_stop)
+    clean_stop = False
     try:
+        if args.file_sd is not None:
+            try:
+                update_file_sd(args.file_sd, target, registered=True)
+            except (OSError, ValueError) as exc:
+                print(f"adaptive-paper metrics exporter refused: cannot register {target} in {args.file_sd}: {exc}",
+                      file=sys.stderr)
+                return 2
+        print(f"adaptive-paper metrics exporter listening on http://{target}/metrics "
+              f"(read-only; ledger={args.ledger}; file_sd={args.file_sd})", file=sys.stderr)
         server.serve_forever()
-    except KeyboardInterrupt:
-        pass
+    except (KeyboardInterrupt, _CleanStop):
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)  # a repeated SIGTERM must not cut the clean stop short
+        clean_stop = True
     finally:
         server.server_close()
+    # Only a clean stop of a finished trial deregisters; a crash propagates above and skips this entirely.
+    if clean_stop and args.file_sd is not None:
+        if trial_finished(trial_path):
+            update_file_sd(args.file_sd, target, registered=False)
+            print(f"adaptive-paper metrics exporter {target} deregistered", file=sys.stderr)
+        else:
+            print(f"adaptive-paper metrics exporter {target} stays registered: the trial has not finished",
+                  file=sys.stderr)
     return 0
 
 
