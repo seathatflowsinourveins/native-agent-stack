@@ -409,14 +409,70 @@ def rows_in(store) -> int:
     return n
 
 
+def _completion_fields(sha, rows, exposed) -> dict:
+    """Review round 15, N05: what a run-log line records so that its access-log completion can be rebuilt from it."""
+    return {"completion": {"snapshot_sha256": sha, "rows_read": rows, "exposed_symbol_sessions": list(exposed)}}
+
+
 def _finish(ctx, auth_id, start, now, status, sha, rows, digest, exposed, line_extra, snapshots):
+    """The action's run-log line, then its access-log completion. Review round 15, N05: the line carries every field of
+    the completion (_completion_fields), so a kill between the two writes is recovered by run.py complete
+    (complete_pending), bound to this line, its results sha256 and its snapshot."""
     from core.runner import run_line
     logs.append_line(Path(ctx["repo"]) / RUN_LOG, run_line(
         ctx, stage="holdout", purpose=line_extra.pop("purpose"), commit=ctx["commit"], utc_start=start,
         utc_end=iso_utc(now), snapshots=snapshots, status=status, results_sha256=digest,
-        extra={"authorization_id": auth_id, **line_extra}))
+        extra={"authorization_id": auth_id, **line_extra, **_completion_fields(sha, rows, exposed)}))
     logs.append_line(Path(ctx["repo"]) / ACCESS_LOG, gate.completion(auth_id, iso_utc(now), status, sha, rows, digest,
                                                                      exposed))
+
+
+FINAL_PURPOSES = ("collect", "count", "read")
+
+
+def complete_pending(ctx: dict, authorization_id: str, now: float) -> dict:
+    """Review round 15, N05: the recovery of a completion that a kill between the two log writes left unwritten (the
+    governing run-log line is on origin/main, the access log has no completion, so the action refuses to repeat and a
+    new authorization is refused while this one is open). The completion is rebuilt from the authorization's final
+    run-log line alone: a 'collect', 'count' or 'read' line, or a '_fetch' line that failed (its completion is
+    'failed'); it cites that line's status, results sha256, snapshot, rows and exposure, and a results file must still
+    have the sha256 the line names. A '_fetch' line that sealed a snapshot is not final (the action's second step is
+    due) and is refused. Idempotent: an authorization that already has its completion is left as it is."""
+    from core.runner import check_clock
+    check_clock(ctx, now)
+    seq = gate.sequence(ctx["access_log"])
+    if authorization_id in seq["completions"]:
+        return {"authorization_id": authorization_id, "already_complete": True}
+    auth = seq["granted"].get(authorization_id)
+    if auth is None:
+        raise gate.NoAuthorization(f"no committed granted authorization {authorization_id}")
+    lines = [(i, x) for i, x in enumerate(ctx["run_log"]) if x.get("stage") == "holdout"
+             and x.get("authorization_id") == authorization_id]
+    if not lines:
+        raise HoldoutRefused(f"{authorization_id} has no run-log line: the action has not run, nothing to complete")
+    idx, line = lines[-1]
+    purpose = line.get("purpose")
+    fetch_failed = purpose in ("count_fetch", "read_fetch") and line.get("status") != "complete"
+    if purpose not in FINAL_PURPOSES and not fetch_failed:
+        raise HoldoutRefused(f"{authorization_id}'s last run-log line ({purpose}) is not final: run the action's "
+                             "next step, not a completion")
+    fields = line.get("completion")
+    if fetch_failed:
+        fields = {"snapshot_sha256": None, "rows_read": 0, "exposed_symbol_sessions": []}
+    elif not isinstance(fields, dict):
+        raise HoldoutRefused(f"run-log line {idx} does not record its completion's fields")
+    digest = None if fetch_failed else line.get("results_sha256")
+    if digest is not None:
+        name = {"count": f"holdout-count-{line.get('block')}.json", "read": "holdout-read.json"}.get(purpose)
+        path = Path(ctx["repo"]) / RESULTS_DIR / name if name else None
+        if path is None or not path.exists() or sha256_file(path) != digest:
+            raise HoldoutRefused(f"the results file of run-log line {idx} is missing or differs from its sha256")
+    status = "failed" if fetch_failed else ("complete" if line.get("status") == "complete" else "failed")
+    rec = gate.completion(authorization_id, iso_utc(now), status, fields["snapshot_sha256"], fields["rows_read"],
+                          digest, fields["exposed_symbol_sessions"])
+    rec["recovered_from_run_log_index"] = idx
+    logs.append_line(Path(ctx["repo"]) / ACCESS_LOG, rec)
+    return rec
 
 
 # ---------------------------------------------------------------- amend (review round 10, F2)
@@ -594,6 +650,7 @@ def _fetch_step(ctx, purpose, auth, bases, snapshot_root, spec_for, mode, enum_d
             ctx, stage="holdout", purpose=f"{purpose}_fetch", commit=ctx["commit"], utc_start=start,
             utc_end=iso_utc(now), snapshots=[sha] if sha else [], status=status, results_sha256=None,
             extra={"authorization_id": auth["authorization_id"], "sessions": sessions,
+                   **_completion_fields(None, 0, []),
                    **({"fee_span": span} if span else {}), "enumeration_fetch_date": enum_date,
                    "terminal_actions_fetch_date": terminal_date,
                    "snapshot_dir": f"{purpose}-{auth['authorization_id']}",
@@ -844,6 +901,7 @@ def _write_not_read(ctx, auth, authorization_id, carried, reason, now) -> dict:
         ctx, stage="holdout", purpose="read", commit=ctx["commit"], utc_start=start, utc_end=iso_utc(now),
         snapshots=[], status="complete", results_sha256=digest,
         extra={"authorization_id": authorization_id, "not_read": reason, "decision": auth.get("decision"),
+               **_completion_fields(None, 0, []),
                **({"replaced_uncited_results_sha256": orphan} if orphan else {})}))
     if auth.get("decision") == "granted":
         logs.append_line(Path(ctx["repo"]) / ACCESS_LOG,

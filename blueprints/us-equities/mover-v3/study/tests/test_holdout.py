@@ -883,6 +883,71 @@ class Step2Recovery(unittest.TestCase):
                 self.assertEqual((done["record_kind"], done["status"]), ("completion", "failed"))
 
 
+class CompletionRecovery(unittest.TestCase):
+    """Review round 15, N05: a kill between an action's run-log line and its access-log completion left a completed
+    result with an open authorization: the action refuses to repeat and a new authorization is refused while one is
+    open. run.py complete (holdout.complete_pending) rebuilds the completion from the line, bound to its results
+    sha256 and snapshot. At e7529b47 nothing could append it, and the hard-kill test failed before the first write."""
+
+    def _kill_after_the_run_log_line(self, tmp):
+        repo, ctx, now, setup = _granted(tmp, "count", "count-001")
+        fl = {**Step2Recovery.FL, "purpose": "count_fetch", "authorization_id": "count-001",
+              "snapshot_dir": "count-count-001"}
+        real = logs.append_line
+
+        def die_on_the_access_log(path, obj):
+            if Path(path).name == Path(ACCESS_LOG).name:
+                raise KeyboardInterrupt("killed between the run-log line and the completion")
+            real(path, obj)
+        helper = Step2Recovery()
+        with mock.patch.object(logs, "append_line", die_on_the_access_log), self.assertRaises(KeyboardInterrupt):
+            helper._run(helper._mocks(setup, fl), lambda: holdout.count(ctx, "count-001", str(Path(tmp) / "snap"),
+                                                                         {}, now))
+        return repo, ctx, now
+
+    def test_a_completion_lost_to_a_kill_is_rebuilt_from_its_line(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo, ctx, now = self._kill_after_the_run_log_line(tmp)
+            line = logs.read_lines(repo / RUN_LOG)[-1]
+            self.assertEqual((line["purpose"], line["status"]), ("count", "complete"))
+            self.assertEqual(logs.read_lines(repo / ACCESS_LOG)[-1]["record_kind"], "authorization")
+            t = now + 120
+            FR.commit_push(repo, FR.git_date(t))
+            ctx = runner_ctx(repo)
+            self.assertEqual([x["block"] for x in holdout.count_lines(ctx["run_log"])], [0])  # stranded: its count
+            with self.assertRaises(holdout.HoldoutRefused):                                   # is never repeated
+                holdout.count(ctx, "count-001", str(Path(tmp) / "snap"), {}, t + 60)
+            self.assertEqual(gate.sequence(ctx["access_log"])["open"], "count-001")         # and no new authorization
+            rec = holdout.complete_pending(ctx, "count-001", t + 60)
+            self.assertEqual((rec["status"], rec["results_sha256"], rec["snapshot_sha256"]),
+                             ("complete", line["results_sha256"], "a" * 64))
+            self.assertEqual(rec["recovered_from_run_log_index"], len(logs.read_lines(repo / RUN_LOG)) - 1)
+            FR.commit_push(repo, FR.git_date(t + 120))
+            ctx = runner_ctx(repo)
+            self.assertIsNone(gate.sequence(ctx["access_log"])["open"])
+            self.assertEqual(gate.sequence(ctx["access_log"])["problems"], [])
+            self.assertEqual(holdout.complete_pending(ctx, "count-001", t + 180),        # idempotent
+                             {"authorization_id": "count-001", "already_complete": True})
+
+    def test_a_changed_result_or_a_pending_step_is_not_completed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo, ctx, now = self._kill_after_the_run_log_line(tmp)
+            t = now + 120
+            FR.commit_push(repo, FR.git_date(t))
+            ctx = runner_ctx(repo)
+            path = repo / RESULTS_DIR / "holdout-count-0.json"
+            body = path.read_bytes()
+            path.write_text("{}")
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "differs from its sha256"):
+                holdout.complete_pending(ctx, "count-001", t + 60)
+            path.write_bytes(body)
+            sealed = dict(ctx, run_log=[*ctx["run_log"], {"stage": "holdout", "purpose": "count_fetch",
+                                                          "authorization_id": "count-001", "status": "complete",
+                                                          "input_snapshot_sha256s": ["b" * 64]}])
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "not final"):
+                holdout.complete_pending(sealed, "count-001", t + 60)
+
+
 class SealedStoreCalendar(unittest.TestCase):
     def test_fetch_step_and_sealed_give_the_holdout_store_the_calendar(self):
         """Review round 14, F1 through its callers: _fetch_step's live store and the store its rate is taken over,

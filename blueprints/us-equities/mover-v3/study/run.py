@@ -12,6 +12,7 @@ core.runner.context (after the freeze) or core.runner.count_only_context (the pr
                   [--holdout-root DIR]   (required once a holdout snapshot is sealed)
   run.py authorize --purpose collect|amend|count|read [--retry-of ID]   (appends the authorization record)
   run.py amend --authorization ID --file calendar|fees --line N          (logs one amendment line)
+  run.py complete --authorization ID     (a completion a kill left unwritten, rebuilt from its run-log line)
   run.py collect --authorization ID --last YYYY-MM-DD --accrual-log FILE --snapshot-root DIR
   run.py count --authorization ID --snapshot-root DIR     (holdout count: first run fetches, second counts)
   run.py read --authorization ID --snapshot-root DIR      (the single holdout read: first run fetches, second reads)
@@ -351,6 +352,15 @@ def cmd_collect(a) -> int:
     return 0
 
 
+def cmd_complete(a) -> int:
+    """Review round 15, N05: append the access-log completion that a kill between an action's run-log line and its
+    completion left unwritten, rebuilt from that line (core.holdout.complete_pending)."""
+    from core import holdout, runner
+    rec = holdout.complete_pending(runner.context(REPO), a.authorization, now())
+    print(json.dumps(rec, sort_keys=True))
+    return 0
+
+
 def cmd_count(a) -> int:
     from core import holdout, runner
     ctx = runner.context(REPO)
@@ -392,6 +402,8 @@ def main(argv=None) -> int:
     z = sub.add_parser("authorize")
     z.add_argument("--purpose", choices=("collect", "amend", "count", "read"), required=True)
     z.add_argument("--retry-of", default=None)
+    k = sub.add_parser("complete")
+    k.add_argument("--authorization", required=True)
     m = sub.add_parser("amend")
     m.add_argument("--authorization", required=True)
     m.add_argument("--file", choices=("calendar", "fees"), required=True)
@@ -406,7 +418,8 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     return {"build-calendar": cmd_build_calendar, "count-only": cmd_count_only, "dry-run": cmd_dry_run,
             "fetch": cmd_fetch, "evaluate": cmd_evaluate, "transport-check": cmd_transport_check,
-            "authorize": cmd_authorize, "amend": cmd_amend, "collect": cmd_collect, "count": cmd_count,
+            "authorize": cmd_authorize, "amend": cmd_amend, "complete": cmd_complete, "collect": cmd_collect,
+            "count": cmd_count,
             "read": cmd_read}[a.cmd](a)
 
 

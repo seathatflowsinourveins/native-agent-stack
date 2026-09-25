@@ -8785,8 +8785,8 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/protocol-core-draft.json",
-      "sha256": "c1f79c14121276c62528588a44bb240a9a38a62a9fd40bb324ef9ecdf7d8b622",
-      "bytes": 277414
+      "sha256": "fd8532cdcce6cd60ca8df49d43781b9f52204007d11df5bd3df1b3f6daa1b815",
+      "bytes": 279824
     },
     {
       "path": "blueprints/us-equities/mover-v3/protocol-draft.json",
