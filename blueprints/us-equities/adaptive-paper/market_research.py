@@ -17,6 +17,8 @@ from urllib.parse import urlsplit
 
 from credential_guard import (CredentialGuardError, MAX_CREDENTIAL_BYTES as GUARD_MAX_CREDENTIAL_BYTES,
                               REASON_ENCODING, REASON_SIZE, open_verified)
+from credential_source import (BASE_URL_VARIABLE, SOURCE_ENV_FILE, SOURCES as CREDENTIAL_SOURCES,
+                               CredentialSourceError, paper_base_url_reason, select_credentials, selection_error)
 from feeds import DATA_FEEDS, is_qualified_feed
 
 SDK_VERSION = "0.44.0"
@@ -356,10 +358,15 @@ def collect(key, secret, symbols, *, now, lookback_hours=24, max_items=50,
 MAX_CREDENTIAL_BYTES = GUARD_MAX_CREDENTIAL_BYTES  # single source of truth: credential_guard.MAX_CREDENTIAL_BYTES
 
 
-def credentials(path):
+def credentials(path, *, paper_only=False):
     """Fail closed on a paper-credential env file with unsafe permissions,
     ownership, or location before any content is read; then parse only
     explicit Alpaca variables, never execute an environment file.
+
+    `paper_only=True` (what `main()` passes, through `paper_credentials()`)
+    also refuses the file when it carries an `APCA_API_BASE_URL` that is not
+    the paper endpoint, with a fixed `credential_source` reason code; a
+    second `APCA_API_BASE_URL` line is refused like any duplicate variable.
 
     The ownership/mode/worktree-location rules and their fd-traversal-bound
     open live in `credential_guard.open_verified()`, shared with
@@ -396,8 +403,16 @@ def credentials(path):
         raise ResearchError(REASON_ENCODING)
     lines = raw.decode("ascii").splitlines()
     found = {}
+    base_url = None
     for line in lines:
         name, separator, value = line.strip().removeprefix("export ").partition("=")
+        if separator and paper_only and name == BASE_URL_VARIABLE:
+            if base_url is not None:
+                raise ResearchError("duplicate_credential_variable")
+            value = value.strip()
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+                value = value[1:-1]
+            base_url = value
         if separator and name in {"APCA_API_KEY_ID", "APCA_API_SECRET_KEY"}:
             if name in found:
                 raise ResearchError("duplicate_credential_variable")
@@ -409,12 +424,40 @@ def credentials(path):
             found[name] = value
     if len(found) != 2:
         raise ResearchError("required_credentials_missing")
+    reason = paper_base_url_reason(base_url) if paper_only else None
+    if reason is not None:
+        raise ResearchError(reason)
     return found["APCA_API_KEY_ID"], found["APCA_API_SECRET_KEY"]
+
+
+def _paper_env_file_credentials(path):
+    return credentials(path, paper_only=True)
+
+
+def paper_credentials(source, env_file=None, *, environ=None):
+    """The CLI's credential source (`--credentials`), as in
+    `runner.paper_credentials()`: `env-file` through
+    `credentials(path, paper_only=True)`, `keychain-env` from the pair
+    `secret run` injected (then removed from this process's environment).
+    A refusal is a `ResearchError` carrying a fixed reason code, raised
+    outside any `except` block."""
+    reason = None
+    try:
+        return select_credentials(source, env_file, env_file_loader=_paper_env_file_credentials,
+                                  environ=environ)
+    except CredentialSourceError as error:
+        reason = str(error)
+    raise ResearchError(reason)
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--env-file", type=Path, required=True)
+    parser.add_argument("--credentials", choices=CREDENTIAL_SOURCES, default=SOURCE_ENV_FILE,
+                        help="env-file (default): the private 0600 file named by --env-file; "
+                             "keychain-env: APCA_API_KEY_ID and APCA_API_SECRET_KEY as injected by "
+                             "`secret run` from the macOS login Keychain. Paper endpoint only.")
+    parser.add_argument("--env-file", type=Path, default=None,
+                        help="private 0600 Alpaca paper env file; required with --credentials env-file")
     parser.add_argument("--symbols", required=True, help="Comma-separated explicit research universe")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--now", help="UTC request-window end; defaults to current UTC")
@@ -423,8 +466,11 @@ def main(argv=None):
     parser.add_argument("--no-snapshots", action="store_true")
     parser.add_argument("--feed", default="iex", choices=list(DATA_FEEDS))
     args = parser.parse_args(argv)
+    problem = selection_error(args.credentials, args.env_file)
+    if problem is not None:
+        parser.error(problem)
     try:
-        key, secret = credentials(args.env_file)
+        key, secret = paper_credentials(args.credentials, args.env_file)
         artifact = collect(key, secret, args.symbols.split(","), now=args.now or datetime.now(timezone.utc),
                            lookback_hours=args.lookback_hours, max_items=args.max_items,
                            include_snapshots=not args.no_snapshots, feed=args.feed)

@@ -1,6 +1,9 @@
 """Bounded paper lane: preflight, native strategy execution, durable reconciliation.
 
-CLI credentials are loaded only from the explicitly selected private env file.
+CLI credentials come from one explicitly selected source: the private env file
+(`--env-file`, the default) or, with `--credentials keychain-env`, the
+APCA_API_KEY_ID/APCA_API_SECRET_KEY pair `secret run` injects from the macOS
+login Keychain. Either way the Alpaca paper endpoint is the only one accepted.
 Default behavior never submits an order; `paper` is an explicit bounded trial.
 """
 from __future__ import annotations
@@ -23,6 +26,8 @@ import time
 
 from corporate_actions import AlpacaCorporateActionsSource, CorporateActionMonitor
 from credential_guard import CredentialGuardError, MAX_CREDENTIAL_BYTES, REASON_ENCODING, REASON_SIZE, open_verified
+from credential_source import (BASE_URL_VARIABLE, SOURCE_ENV_FILE, SOURCES as CREDENTIAL_SOURCES,
+                               CredentialSourceError, paper_base_url_reason, select_credentials, selection_error)
 from financing import MARGIN_RATES, overnight_financing_projection
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
 from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP,
@@ -78,10 +83,16 @@ def save(path, data):
         os.close(fd)
 
 
-def credentials(path):
+def credentials(path, *, paper_only=False):
     """Fail closed on a paper-credential env file with unsafe permissions,
     ownership, or location before any content is read. File contents are
     never included in a raised error or log.
+
+    `paper_only=True` (what `main()` passes, through `paper_credentials()`)
+    also refuses the file when it carries an `APCA_API_BASE_URL` that is not
+    the paper endpoint, with a fixed `credential_source` reason code. The
+    default leaves that line to callers with their own base-URL handling
+    (e.g. order-throughput's `capacity.py`), exactly as before.
 
     The ownership/mode/worktree-location rules and their fd-traversal-bound
     open live in `credential_guard.open_verified()`, shared with
@@ -119,6 +130,7 @@ def credentials(path):
         raise SafetyError(REASON_ENCODING)
     text = raw.decode("ascii")
     result = {}
+    base_url = None
     for line in text.splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
@@ -129,9 +141,35 @@ def credentials(path):
             if len(values) != 1:
                 raise ValueError("invalid_scoped_credential")
             result[name.strip()] = values[0]
+        elif paper_only and name.strip() == BASE_URL_VARIABLE:
+            values = shlex.split(value, comments=True)
+            base_url = values[0] if len(values) == 1 else ""
     if len(result) != 2 or not all(result.values()):
         raise ValueError("missing_paper_credentials")
+    reason = paper_base_url_reason(base_url) if paper_only else None
+    if reason is not None:
+        raise SafetyError(reason)
     return result["APCA_API_KEY_ID"], result["APCA_API_SECRET_KEY"]
+
+
+def _paper_env_file_credentials(path):
+    return credentials(path, paper_only=True)
+
+
+def paper_credentials(source, env_file=None, *, environ=None):
+    """The CLI's credential source (`--credentials`): `env-file` reads the
+    file through `credentials(path, paper_only=True)`; `keychain-env` reads
+    the pair `secret run` put in this process's environment and removes it
+    from that environment (see `credential_source`). Both refuse a
+    non-paper `APCA_API_BASE_URL`. A refusal is a `SafetyError` carrying a
+    fixed reason code, raised outside any `except` block."""
+    reason = None
+    try:
+        return select_credentials(source, env_file, env_file_loader=_paper_env_file_credentials,
+                                  environ=environ)
+    except CredentialSourceError as error:
+        reason = str(error)
+    raise SafetyError(reason)
 
 
 REGISTRY_REQUIRED_FIELDS = {"id", "module", "receipt_path", "receipt_sha256", "evidence_class", "sessions", "enabled"}
@@ -2153,7 +2191,12 @@ def main():
     global LAST_OUTPUT
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["preflight", "paper", "recover"])
-    parser.add_argument("--env-file", required=True, type=Path)
+    parser.add_argument("--credentials", choices=CREDENTIAL_SOURCES, default=SOURCE_ENV_FILE,
+                         help="env-file (default): the private 0600 file named by --env-file; "
+                              "keychain-env: APCA_API_KEY_ID and APCA_API_SECRET_KEY as injected by "
+                              "`secret run` from the macOS login Keychain. Paper endpoint only.")
+    parser.add_argument("--env-file", type=Path, default=None,
+                         help="private 0600 Alpaca paper env file; required with --credentials env-file")
     parser.add_argument("--config", type=Path, default=SOURCE / "config.json")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--trial", default="adaptive-20260921")
@@ -2171,6 +2214,9 @@ def main():
                               "(decisions and intents as they happen) and NautilusTrader's own "
                               "JSON log under nautilus/; observation only")
     args = parser.parse_args()
+    problem = selection_error(args.credentials, args.env_file)
+    if problem is not None:
+        parser.error(problem)
     LAST_OUTPUT = args.output
     if not re.fullmatch(r"[a-z0-9-]{1,24}", args.trial):
         raise ValueError("invalid_trial_id")
@@ -2184,15 +2230,15 @@ def main():
         save(args.output, result)
         print(json.dumps(result))
         return 2
-    key, secret = credentials(args.env_file)
+    key, secret = paper_credentials(args.credentials, args.env_file)
     # Trading-lane audit gap #8: the guard only ever acts when
     # session_policy["overnight_holds"] is enabled (see
     # _corporate_action_guard_for_strategy), so it is constructed only then.
     # Construction makes no network call, but AlpacaCorporateActionsSource
     # imports alpaca-py's data client; a regular-session run (every shipped
     # config) therefore never needs that import or the object. Never logs or
-    # stores key/secret beyond the client object; the same env-file
-    # credential path every other broker call in this file already uses.
+    # stores key/secret beyond the client object; the same selected
+    # credential source every other broker call in this file already uses.
     config["_corporate_action_guard"] = (
         CorporateActionMonitor(AlpacaCorporateActionsSource(key, secret))
         if session_policy["overnight_holds"] else None)

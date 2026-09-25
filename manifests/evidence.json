@@ -6475,8 +6475,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "07c9fbc3cff4c7b4c5ed598d519105c4c48bd173bc96f534373e48e00a4e7e3c",
-      "bytes": 18529
+      "sha256": "664a7a3b0371d7d47c3ebe575c8340be1556eb47e976e92553ae208d71c4aa7e",
+      "bytes": 19255
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -6534,6 +6534,11 @@
       "bytes": 22201
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/credential_source.py",
+      "sha256": "0bbe30aab4e665226e230e9927ef51e7f8875c53dda6527d19e6efe76bbaeacc",
+      "bytes": 9305
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/evidence-hashes.json",
       "sha256": "a38097f52aa89d7509e848bc244bc796bd6d96ad3314635e4b6f8b7cca6df5bf",
       "bytes": 869
@@ -6570,8 +6575,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/market_research.py",
-      "sha256": "1de0e88b9bdc3304e0e247bf4de2a0462e25717695016ad2dd7a4b114f64449f",
-      "bytes": 24083
+      "sha256": "bba9cf77c3c3c6dff32dec1cb01fa8c1957c6b012b7d5bd9693fcc268d557158",
+      "bytes": 26553
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/metrics.py",
@@ -6665,8 +6670,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "49f0433c066e6178c461818735f181e0bf2e27f3e81e5de0cb3199b8acb282b0",
-      "bytes": 148739
+      "sha256": "f157be180d0cf19393137e41871318476db24aea775d05a5b3b95ea8bd5dc1a6",
+      "bytes": 151392
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -6690,8 +6695,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "3ee9b19a236cf4921fbe3fbd24baef6be1fb8751271141118951e8e1f4ac5953",
-      "bytes": 6717
+      "sha256": "d14c8d7262357e39a562fe519b41ecc64ec555845f1107c28f1614908d3537b6",
+      "bytes": 6969
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -10075,8 +10080,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-broker-credential-handling.md",
-      "sha256": "2b16c53efcdc0dd1c06d82226e4f595d37133855217d718cfa021d16e7e02530",
-      "bytes": 23985
+      "sha256": "f3bfafc99ca8bbe7ef567fb2fbc59997112c8f07cdd9001739b4b911133351e7",
+      "bytes": 29940
     },
     {
       "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
@@ -29497,6 +29502,11 @@
       "path": "tests/test_adaptive_paper_credential_race.py",
       "sha256": "1b0b6521045858fc9c974fc9e50e390ac888c7091f5f92606feb1bf49f7ef022",
       "bytes": 66824
+    },
+    {
+      "path": "tests/test_adaptive_paper_credential_source.py",
+      "sha256": "32c3aa93e40392a2af60078dd4ba6c222e195a9a47b22a0bfc0f52a92814382a",
+      "bytes": 25425
     },
     {
       "path": "tests/test_adaptive_paper_financing.py",
