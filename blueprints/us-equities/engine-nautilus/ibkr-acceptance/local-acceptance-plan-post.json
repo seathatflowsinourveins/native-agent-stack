@@ -1,0 +1,263 @@
+{
+  "schema_version": 1,
+  "kind": "ibkr_local_acceptance_plan",
+  "frozen_at": "2026-09-25",
+  "frozen_before_first_run": true,
+  "revision": 1,
+  "revision_note": "After-hours variant of local-acceptance-plan.json, written on 2026-09-25 before any run: identical bounds, cases, phases, checkpoints, timeouts and kill-switch policy; only the session changes to 16:00-20:00 America/New_York with outsideRth on every order (IBOrderTags), today's window read from the contract's tradingHours, and use_regular_trading_hours off for the data client.",
+  "gate_id": "ibkr-local-acceptance",
+  "procedure": "blueprints/us-equities/engine-nautilus/acceptance-plan.md section 5 steps 2-4 (the cases the 2026-09-23 paper-order receipt did not run)",
+  "version_selection_record": "docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md",
+  "engine": {
+    "package": "nautilus_trader[ib]",
+    "version": "1.231.0",
+    "adapter": "Python InteractiveBrokers adapter on the official ibapi client",
+    "ibapi_version": "10.45.1",
+    "note": "Selected for local acceptance as keep-but-compare against the pinned 2.0.0rc5 destination; see version_selection_record."
+  },
+  "host": "127.0.0.1",
+  "paper_ports": [
+    4002,
+    7497
+  ],
+  "live_ports_refused": [
+    4001,
+    7496
+  ],
+  "default_port": 4002,
+  "account_prefix": "DU",
+  "require_single_managed_account": true,
+  "client_ids": {
+    "node": 93,
+    "check": 98,
+    "adapter_fallback_band": [
+      93,
+      97
+    ],
+    "reserved_elsewhere": [
+      71,
+      73,
+      76,
+      81,
+      82,
+      91,
+      92
+    ],
+    "note": "The node's data and execution clients share client id 93. After three consecutive IB 326 collisions the 1.231.0 adapter falls back to 94..97 (client/connection.py _next_client_id), so the check/observer id 98 and every reserved id lie outside 93..97. A node that ends on any id other than 93 fails client-id ownership."
+  },
+  "instrument": {
+    "symbol": "SPY",
+    "sec_type": "STK",
+    "exchange": "SMART",
+    "primary_exchange": "ARCA",
+    "currency": "USD",
+    "nautilus_instrument_id": "SPY.ARCA",
+    "expected_price_increment": "0.01"
+  },
+  "bounds": {
+    "max_orders": 4,
+    "order_ids": [
+      "R1",
+      "R2",
+      "P1",
+      "P2"
+    ],
+    "max_orders_reaching_ib": 2,
+    "max_quantity_per_order": 1,
+    "max_notional_per_order_usd": 1000,
+    "resting_fraction_of_bid": 0.5,
+    "resting_price_floor_usd": 1.0,
+    "order_side": "BUY",
+    "order_type": "LIMIT",
+    "time_in_force": "DAY",
+    "marketable_orders": false,
+    "max_order_submit_rate": "100/00:00:01",
+    "min_submit_spacing_seconds": 1.5,
+    "max_cancel_attempts_per_order": 3,
+    "fill_policy": "No fill is expected: every order rests at max(resting_price_floor_usd, floor_to_cent(resting_fraction_of_bid * bid)). Any fill fails the run as cleanup_required; the runner sends no marketable or flattening order and the position is left for a manual flatten."
+  },
+  "session": {
+    "timezone": "America/New_York",
+    "weekdays_only": true,
+    "open": "16:00",
+    "close": "20:00",
+    "close_buffer_minutes": 10,
+    "whole_run_inside_window": true,
+    "use_contract_liquid_hours": true,
+    "contract_hours_field": "tradingHours",
+    "outside_rth": true,
+    "note": "The run is refused unless [now, now + overall_deadline_seconds] lies inside [16:00, 20:00 - close_buffer], narrowed by today's SPY tradingHours; missing or unparseable hours for today refuse the run. Resting orders only, so thinner after-hours liquidity changes no case."
+  },
+  "data": {
+    "quote_source": "Nautilus quote ticks from IB tick-by-tick BidAsk (subscribe params batch_quotes=false), phase A only",
+    "market_data_type": "REALTIME",
+    "quote_max_age_seconds": 10,
+    "clock_resolution_tolerance_seconds": 2,
+    "note": "Only R1 and R2 are priced from a live quote. P1 and P2 reuse R2's resting price, so phases B and C need no market data."
+  },
+  "timeouts": {
+    "check_seconds": 30,
+    "node_start_seconds": 60,
+    "per_step_seconds": 45,
+    "probe_seconds": 30,
+    "reconnect_seconds": 60,
+    "cleanup_seconds": 45,
+    "recancel_interval_seconds": 5,
+    "node_stop_allowance_seconds": 15,
+    "post_stop_cancel_grace_seconds": 5,
+    "phase_deadline_seconds": {
+      "A": 360,
+      "B": 210,
+      "C": 180
+    },
+    "observer_attempts": 2,
+    "observer_retry_delay_seconds": 5,
+    "ibapi_cancel_attempts": 3,
+    "ibapi_cancel_wait_seconds": 10,
+    "overall_deadline_seconds": 1080
+  },
+  "exec_engine": {
+    "inflight_check_interval_ms": 2000,
+    "inflight_check_threshold_ms": 5000,
+    "inflight_check_retries": 100,
+    "note": "As in ibkr-paper-orders/plan.json: the engine's fabricated in-flight resolution (threshold x retries) lies beyond every phase deadline; venue queries still run."
+  },
+  "phases": {
+    "A": {
+      "process": "fresh process, node client id 93",
+      "cases": [
+        "A1",
+        "A2",
+        "A3",
+        "A4"
+      ],
+      "end_disposition": "R2 left working at IB; every other order of the run cancelled"
+    },
+    "B": {
+      "process": "fresh process (restart), node client id 93, StrategyConfig.external_order_claims=[SPY.ARCA]",
+      "cases": [
+        "B1",
+        "B2"
+      ],
+      "end_disposition": "no open order and no position; kill-switch latch engaged"
+    },
+    "C": {
+      "process": "fresh process (restart), node client id 93, risk engine HALTED from the latch before the node runs",
+      "cases": [
+        "C1"
+      ],
+      "end_disposition": "no open order and no position; latch still engaged"
+    }
+  },
+  "cases": [
+    {
+      "id": "A1",
+      "name": "accept_resting",
+      "phase": "A",
+      "order": "R1: LIMIT BUY 1 SPY DAY at max(resting_price_floor_usd, floor_to_cent(resting_fraction_of_bid * bid))",
+      "expect": "OrderAccepted from IB (not reconciliation)"
+    },
+    {
+      "id": "A2",
+      "name": "client_id_ownership",
+      "phase": "A",
+      "order": "none",
+      "expect": "A contender official-ibapi connection with the node's client id is refused with IB error 326 while the node is connected; the observer (client 98, reqAllOpenOrders) lists R1 with clientId 93, orderRef '<R1 client order id>:<orderId>' and a permId equal to the node's PERM-<permId> venue order id; the adapter's client id is 93"
+    },
+    {
+      "id": "A3",
+      "name": "reconnect_open_order",
+      "phase": "A",
+      "order": "cancel R1 after the reconnect",
+      "expect": "After the node's IB socket is shut down (SHUT_RDWR) with R1 working, the adapter detects the loss and reconnects on client id 93 within reconnect_seconds; R1 stays open in the cache with no terminal event; the observer lists R1 still working with the same permId and clientId 93; the node's cancel of R1 ends in an IB-confirmed OrderCanceled"
+    },
+    {
+      "id": "A4",
+      "name": "restart_setup",
+      "phase": "A",
+      "order": "R2: LIMIT BUY 1 SPY DAY at the A1 formula from a fresh quote",
+      "expect": "OrderAccepted from IB; phase A then stops with R2 working"
+    },
+    {
+      "id": "B1",
+      "name": "restart_reconciliation",
+      "phase": "B",
+      "order": "none",
+      "expect": "After a fresh-process restart on client id 93, startup reconciliation adopts R2 for this strategy (external_order_claims) with the same client order id, venue order id, side, quantity, limit price and time in force; exactly one order of this run is in the cache and it is open; no order of this run is resubmitted"
+    },
+    {
+      "id": "B2",
+      "name": "kill_switch",
+      "phase": "B",
+      "order": "P1: LIMIT BUY 1 SPY DAY at R2's price (expected to be denied locally); cancel R2",
+      "expect": "Engaging the kill switch writes the latch, sets the Nautilus RiskEngine to HALTED and records an alert; P1 is denied locally with reason TradingState.HALTED and never reaches IB; the kill-switch disposition cancels R2 with an IB-confirmed OrderCanceled"
+    },
+    {
+      "id": "C1",
+      "name": "kill_switch_persists",
+      "phase": "C",
+      "order": "P2: LIMIT BUY 1 SPY DAY at R2's price (expected to be denied locally)",
+      "expect": "A fresh-process restart finds the latch engaged, starts with the RiskEngine HALTED, adopts no open order of this run, and denies P2 locally with reason TradingState.HALTED"
+    }
+  ],
+  "checkpoints": {
+    "before": "Official-ibapi read-only check (client 98): paper port, every managed account starts with DU, exactly one account, zero positions, zero open orders, SPY contract hours; then a contender connection with client id 93 must connect (the id is free) and disconnect without requests.",
+    "after_A": "Observer: exactly one open order in the account, R2, with clientId 93 and phase A's permId; zero positions.",
+    "after_B": "Observer: zero open orders, zero positions; R1 and R2 appear among completed orders as cancelled; no order carrying P1's reference exists.",
+    "final": "Observer: zero open orders, zero positions, zero executions carrying this run's prefix, and no order carrying P1's or P2's reference among open or completed orders."
+  },
+  "kill_switch": {
+    "latch": "<state-dir>/kill-switch.json, written with fsync and mode 0600",
+    "on_engage": [
+      "write the latch",
+      "RiskEngine.set_trading_state(TradingState.HALTED)",
+      "record an alert (receipt and stderr)",
+      "cancel every open order of the run"
+    ],
+    "on_restart": "Before the node runs, an engaged latch sets the RiskEngine to HALTED. run refuses to start while the latch is engaged; only 'kill-switch clear --confirm' removes it, and it writes an audit record.",
+    "end_state": "The latch stays engaged after the run; clearing it is an explicit operator step."
+  },
+  "failure_disposition": "On any failure, timeout, exception or signal the phase strategy cancels every open order of this run (R2 included; nothing is carried over) and stops the node. After any phase that did not complete, the runner cancels leftover orders of this run through the official ibapi client on client id 93 (only orders whose orderRef carries the run prefix and whose clientId is 93, only after the phase process has exited), then runs the observer. A non-flat account afterwards is cleanup_required (exit 3). Foreign orders or positions are never touched.",
+  "receipt": {
+    "kind": "ibkr_local_acceptance_steps_2_4",
+    "never_record": [
+      "account ids",
+      "balances",
+      "credentials",
+      "home paths",
+      "host names"
+    ],
+    "redact_pattern": "\\b(?:D?[UF]|I)\\d{5,}\\b",
+    "gate_receipt": {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/receipt.json",
+      "schema": {
+        "schema_version": 1,
+        "kind": "native_ibkr_local_acceptance",
+        "broker": "ibkr"
+      },
+      "written_only_when": "every case passed, every checkpoint passed, the run status is passed, and each prerequisite below exists with status passed",
+      "prerequisites": [
+        {
+          "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20260923.json",
+          "status": "passed",
+          "covers": "step 1 read-only (official ibapi, paper Gateway)"
+        },
+        {
+          "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json",
+          "status": "passed",
+          "covers": "step 3 submit/acknowledge, cancel, fill and flatten on NautilusTrader 1.231.0"
+        }
+      ],
+      "qualification": "The checker only reads /status. That a signed-in paper Gateway accepted the adapter locally is qualified manually before the dated commit that flips the gate."
+    }
+  },
+  "evidence_class": "native_paper",
+  "exit_codes": {
+    "passed": 0,
+    "failed_or_incomplete": 1,
+    "not_connected": 2,
+    "refused_or_cleanup_required": 3
+  },
+  "unconfirmed_event_policy": "An OrderCanceled/OrderRejected/OrderExpired with reconciliation=True was produced by the execution engine, not by an IB status callback. It never passes a case.",
+  "duplicate_event_policy": "A second terminal event for an order already closed (IB reports a cancel as both error 202 and orderStatus Cancelled) is recorded as a duplicate and otherwise ignored."
+}

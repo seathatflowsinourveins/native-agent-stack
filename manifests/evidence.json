@@ -7862,8 +7862,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/README.md",
-      "sha256": "9efbc9a8e92990810234bb72395c2369e9ee850180b23c6d299fea45c9e5fb11",
-      "bytes": 5955
+      "sha256": "b94328f88f96966d61de38d4f750b4e09f235f67b3994c51df283a6603ff1d07",
+      "bytes": 14438
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131151Z-handrolled-protocol-probe.json",
@@ -7979,6 +7979,21 @@
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/ibapi_probe.py",
       "sha256": "01af076abb97adeece6041770141b59cd21453148475cf486c4ee12a1047f5ca",
       "bytes": 13001
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/local-acceptance-plan-post.json",
+      "sha256": "0aa271a978dcf15318d93dc036eac6b9426b5f25c20e490476dad01a98492d5d",
+      "bytes": 12234
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/local-acceptance-plan.json",
+      "sha256": "361f2c0ea3ce85433fed2ebf3ba65a9d58ea392f6e5aba5c3d53fae6d1718c4f",
+      "bytes": 11366
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/local_acceptance.py",
+      "sha256": "46a6d8e247bcdc73adf01d288343fd5f5a1068b89af7e594b7df175c91654266",
+      "bytes": 110007
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/nautilus_probe.py",
@@ -10179,6 +10194,11 @@
       "path": "docs/decisions/2026-09-24-secret-storage.md",
       "sha256": "fce32c03fe3dde94c76ea874e5e2327409f73eca65b51ce1297382416a350137",
       "bytes": 14083
+    },
+    {
+      "path": "docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md",
+      "sha256": "6c2cd09d1dabe1ecbf3857614b2070b6c81a40de783e1516b617d4c97b136aba",
+      "bytes": 8753
     },
     {
       "path": "docs/direct-results.md",
@@ -30749,6 +30769,11 @@
       "path": "tests/test_ibkr_acceptance.py",
       "sha256": "2c0f09c5fd86a0125e775fdcd5363a6d25a8f2ff521802a3c6b489b9b21492e7",
       "bytes": 15483
+    },
+    {
+      "path": "tests/test_ibkr_local_acceptance.py",
+      "sha256": "c77ac301063aaca928498435fd7f9d59936b0c74237130bbe367003598de99a0",
+      "bytes": 63279
     },
     {
       "path": "tests/test_ibkr_paper_orders.py",

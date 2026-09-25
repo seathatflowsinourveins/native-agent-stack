@@ -7,6 +7,10 @@ This is partial evidence: step 1 passed on both clients on 2026-09-23
 (`evidence/`, receipt `evidence/receipts/ibkr-readonly-acceptance-20260923.json`),
 but the gate stays `not_established` because steps 2-4 need NautilusTrader
 native paper stock orders, which are blocked upstream (see "Blockers").
+Since 2026-09-25 a dated keep-but-compare record
+(`docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md`) selects
+NautilusTrader 1.231.0's Python adapter for local acceptance. The remaining
+steps run through `local_acceptance.py` (see "Steps 2-4: local acceptance runner").
 
 ## Probes
 
@@ -97,6 +101,16 @@ orders (ibapi probe).
   paper session gets `10197 No market data during competing live session` and
   historical requests get error 162 (observed at 13:23:58Z).
 
+Update, 2026-09-25 (source check, not observed). #4983 was filed against
+v1.227.0. The pinned rc5 source already routes around the venue check the
+issue describes: the IB execution client's `handles_order_venue` returns
+`true`, added by #4129 on 2026-05-25. So the first blocker is unconfirmed for
+rc5 until an rc5 stock order is tried. PR #5041 now pins `=4.2.0`, not
+`=4.1.0`. It remains open and unreleased, and lists six open IB restart and
+reconnect issues as covered. Details and the comparison that would overturn the
+1.231.0 selection are in
+`docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md`.
+
 ## Tests
 
 ```
@@ -106,3 +120,151 @@ python3 -m unittest tests.test_ibkr_acceptance
 Offline and synthetic: no gateway, `ibapi` or NautilusTrader needed. A fake
 client drives the ibapi probe's refusal, not-connected, existing-state and
 incomplete-snapshot paths.
+
+## Steps 2-4: local acceptance runner
+
+`local_acceptance.py` runs the cases of acceptance-plan section 5 that the
+2026-09-23 paper-order receipt (`../ibkr-paper-orders/`) left open. It uses
+NautilusTrader 1.231.0's own IB execution engine, selected as keep-but-compare
+in `docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md`.
+The frozen plan is `local-acceptance-plan.json` (regular session). Its
+after-hours twin, `local-acceptance-plan-post.json`, changes only the session:
+16:00-20:00 with `outsideRth`.
+
+The run has three phases. Each phase is a fresh `TradingNode` process on client
+id 93. The runner's independent official-ibapi observer runs on client 98.
+
+| Case | Phase | What must happen |
+|---|---|---|
+| A1 accept_resting | A | R1, a resting BUY 1 SPY at half the bid, is accepted by IB |
+| A2 client_id_ownership | A | A contender connection on client id 93 is refused with IB 326. The observer lists R1 with clientId 93, an orderRef ending `:<orderId>`, and the permId behind the node's `PERM-` venue id |
+| A3 reconnect_open_order | A | The adapter's socket is shut down while R1 works. The adapter reconnects on id 93, R1 stays open with the same permId, and the node's cancel ends in an IB-confirmed `OrderCanceled` |
+| A4 restart_setup | A | R2, the same resting buy, is accepted. Phase A stops with R2 working |
+| B1 restart_reconciliation | B | After a fresh-process restart, reconciliation adopts R2 for the strategy (`external_order_claims`) with the same ids, side, quantity, price and time in force. Nothing is resubmitted |
+| B2 kill_switch | B | The latch is written, the risk engine is set `HALTED` and an alert is raised. P1 is denied locally (`TradingState.HALTED`) and R2 is cancelled at IB |
+| C1 kill_switch_persists | C | After another restart, the latch keeps the risk engine `HALTED` before the node runs, no order of the run is open, and P2 is denied locally |
+
+Checkpoints with the observer:
+
+- **Before the run:** a paper account (every managed account `DU`, exactly one),
+  zero positions, zero open orders, today's contract hours, and client id 93 free.
+- **After A:** only R2 works.
+- **After B:** nothing is open, and R1 and R2 are listed as cancelled.
+- **Final:** flat, no execution of the run, and neither probe order at IB.
+
+It refuses by default:
+
+- `run` connects nothing without `--enable-paper-orders`.
+- Live ports 4001 and 7496 are refused as `refused_live_port`, and any other
+  port except 4002 and 7497 as `refused_not_paper_port`, both before connecting.
+- A non-`DU` or multi-account Gateway, existing positions or orders, a busy
+  client id, an engaged kill-switch latch, a second concurrent run, missing
+  prerequisite receipts, an unpinned runtime (anything but 1.231.0 on
+  ibapi 10.45.1) and a start outside the session window are all refused.
+
+Every order is a non-marketable resting limit, with at most four orders per run
+and two of them reaching IB. The runner has no marketable or flattening order.
+A fill would end the run `cleanup_required`, with the position left for a
+manual flatten.
+
+On any failure the phase cancels its own orders. After the phase process has
+exited, the runner cancels leftovers of this run through ibapi on client 93: only
+orders whose `orderRef` carries the run prefix.
+
+The gate receipt `receipt.json` (preregistered schema
+`{"schema_version": 1, "kind": "native_ibkr_local_acceptance", "status": "passed", "broker": "ibkr"}`)
+is written only when:
+
+- every case and checkpoint passed, and
+- both prerequisite receipts (`evidence/ibapi-readonly-20260923.json` and
+  `../ibkr-paper-orders/evidence/receipt-20260923-passed.json`) exist with status
+  `passed`.
+
+That receipt makes the gate a flip candidate only. The flip itself stays a
+manual, dated commit after qualification.
+
+### What you do first (once per session)
+
+1. Start IB Gateway in paper mode. Either run `~/ibc/start-paper-gateway.sh`
+   (IBC 3.24.2 `gatewaystart.sh -inline`, `TradingMode=paper`, port 4002), or
+   start IB Gateway 10.50 from `~/Jts/ibgateway/1050` and choose **IB API** and
+   **Paper Trading**.
+2. Sign in with the **paper** username and approve the second factor (IBKR
+   Mobile). Confirm the window shows the paper/simulated-trading banner.
+3. In Gateway **Configure > Settings > API > Settings**:
+   - **Read-Only API: off.** IBC applies a non-empty `ReadOnlyApi` from
+     `~/ibc/config.ini` at every start. The 2026-09-22 setup record (agent-lab
+     grand-catalog handbook) lists `ReadOnlyApi=yes`, and the 2026-09-23 12:45 ET
+     paper-order run was refused with IB 321 (Read-Only). Set it to `no`, or leave
+     it empty and untick the box, so a restart does not re-tick it.
+   - **Socket port: 4002** (IBC `OverrideTwsApiPort=4002`).
+   - **Trusted IPs: 127.0.0.1.** Keep "Allow connections from localhost only"
+     on; the Gateway always admits 127.0.0.1.
+   - **Master API client ID: empty** (IBC `OverrideTwsMasterClientID=` empty), or
+     any id outside 93-98. The node must see only its own orders.
+4. Sign out of every other session of the same username (Client Portal, mobile
+   trading, another TWS). A competing session gets IB 10197, which means no
+   quotes, so A1 never submits and the run ends `incomplete`.
+
+### Then run (regular session, 09:30 to about 15:30 New York time)
+
+```sh
+ENV="$HOME/.local/share/codex-ecosystem/tools/nautilus-1.231.0-ib"
+RUNNER=blueprints/us-equities/engine-nautilus/ibkr-acceptance/local_acceptance.py
+"$ENV/bin/python" "$RUNNER" preflight --port 4002
+"$ENV/bin/python" "$RUNNER" run --port 4002 --enable-paper-orders \
+  --receipt blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/local-acceptance-$(date -u +%Y%m%dT%H%MZ).json
+```
+
+Run these from the repository root. `preflight` is read-only and prints
+`"status": "ready"` when `run` would start. The whole run must fit the session
+window, 1,080 s in the worst case, so a regular-session run starts by about
+15:32 ET. After 16:00 add `--plan local-acceptance-plan-post.json` to both
+commands; the window then ends at 19:50 ET.
+
+`--state-dir` (default `~/.local/state/native-agent-stack/ibkr-local-acceptance`,
+created 0700) holds the run lock, the phase files and the kill-switch latch.
+
+Exit codes:
+
+- `0` passed
+- `1` failed or incomplete
+- `2` not connected
+- `3` refused or `cleanup_required`
+
+Nautilus console output is **not** redacted and contains the account id, so do
+not save or commit it. The receipts never record account ids, balances, host
+names or home paths.
+
+### After the run
+
+The latch stays engaged by design, because a restart must not clear it. Any
+later `run` refuses until you clear it explicitly. The clear writes an audit line
+first:
+
+```sh
+"$ENV/bin/python" "$RUNNER" kill-switch status
+"$ENV/bin/python" "$RUNNER" kill-switch clear --confirm --reason "reviewed run <run_prefix>"
+```
+
+Then commit the steps receipt and, on a pass, `receipt.json`, for independent
+qualification.
+
+### Tests
+
+```
+python3 -m unittest tests.test_ibkr_local_acceptance
+"$ENV/bin/python" -m unittest tests.test_ibkr_local_acceptance
+```
+
+The tests are offline and synthetic.
+
+- With plain `python3` they cover plan validation, the refusals, the latch,
+  the verdicts, the phase handshake, receipts and the gate receipt, and source
+  checks.
+- Under the 1.231.0 environment, the strategy also runs in a `BacktestEngine`
+  against a simulated ARCA venue. That covers the phase A order flow with R2
+  left working, and the real 1.231.0 risk engine denying P1/P2 with
+  `TradingState.HALTED` while a cancel still passes.
+
+None of this is IBKR evidence.
