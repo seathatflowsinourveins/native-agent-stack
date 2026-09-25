@@ -1,10 +1,13 @@
 """Offline guards for the local metadata adapter, not native E2E acceptance."""
 import copy
+import errno
 import importlib.util
 import json
 import os
 from pathlib import Path
+import signal
 import stat
+import subprocess
 import sys
 import tempfile
 import time
@@ -287,6 +290,31 @@ class NativeDataTests(unittest.TestCase):
             self.assertIsNone(r.command("overflow", [sys.executable, "-c", "print('x'*100)"], directory))
             self.assertEqual(r.records[-1]["error"], "OverflowError")
             self.assertEqual(r.records[-1]["stdout"]["bytes"], 32)
+
+    def test_an_exited_group_that_refuses_the_kill_is_treated_as_gone(self):
+        # The overflow child usually exits before the kill; macOS then answers killpg with EPERM.
+        refusal = PermissionError(errno.EPERM, "Operation not permitted")
+        with tempfile.TemporaryDirectory() as directory, patch.object(M, "LIMIT", 32), \
+                patch.object(M.os, "killpg", side_effect=refusal) as killpg:
+            r = M.Recorder(Path(directory), 1)
+            self.assertIsNone(r.command("overflow", [sys.executable, "-c", "print('x'*100)"], directory))
+        killpg.assert_called_once()
+        self.assertEqual((r.records[-1]["error"], r.records[-1]["exit_code"]), ("OverflowError", 0))
+
+    @unittest.skipUnless(sys.platform in ("darwin", "linux") and hasattr(os, "waitid"), "needs os.waitid")
+    def test_the_kernel_answer_for_signalling_an_exited_unreaped_group(self):
+        # The premise of the handler: macOS refuses with EPERM (XNU killpg1 skips zombies), Linux signals.
+        process = subprocess.Popen([sys.executable, "-c", "pass"], start_new_session=True)
+        try:
+            os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOWAIT)
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+                outcome = "signalled"
+            except PermissionError:
+                outcome = "EPERM"
+        finally:
+            process.wait()
+        self.assertEqual(outcome, {"darwin": "EPERM", "linux": "signalled"}[sys.platform])
 
     def test_complete_generation_unknown_supersedes_prior_values(self):
         with tempfile.TemporaryDirectory() as directory:

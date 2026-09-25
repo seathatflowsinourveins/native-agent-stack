@@ -2,11 +2,13 @@
 
 import hashlib
 from contextlib import ExitStack, redirect_stdout
+import errno
 import importlib.util
 import io
 import json
 import os
 from pathlib import Path
+import signal
 import sys
 import tarfile
 import tempfile
@@ -106,6 +108,21 @@ class NativeTokenCIContracts(unittest.TestCase):
             self.assertNotEqual(result["commands"][0]["exit_code"], 0)
             self.assertNotIn(str(work), json.dumps(result))
             self.assertNotIn("private-test-value", json.dumps(result))
+
+    def test_timeout_signal_refused_by_an_exited_group_is_still_a_timeout(self):
+        # The command can finish between the timeout and the signal; macOS then answers killpg with EPERM.
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output, work = root / "result", root / "work"
+            output.mkdir()
+            work.mkdir()
+            run = ci.Run(output, work)
+            refusal = PermissionError(errno.EPERM, "Operation not permitted")
+            with patch.object(ci.os, "killpg", side_effect=refusal) as killpg, \
+                    self.assertRaisesRegex(AssertionError, "timed out"):
+                run.command("exited-group", [sys.executable, "-c", "import time; time.sleep(0.3)"], timeout=0.05)
+            self.assertEqual([call.args[1] for call in killpg.call_args_list], [signal.SIGTERM])
+            self.assertTrue(json.loads((output / "receipt.json").read_text())["commands"][0]["timed_out"])
 
 
 if __name__ == "__main__":

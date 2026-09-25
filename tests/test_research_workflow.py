@@ -1,3 +1,4 @@
+import errno
 import importlib.util
 import json
 import os
@@ -9,6 +10,7 @@ import signal
 import time
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 MODULE = Path(__file__).resolve().parents[1] / 'blueprints/us-equities/research-runtime/run_worker.py'
@@ -180,6 +182,16 @@ class ResearchWorkflowTests(unittest.TestCase):
                 if supervisor.poll() is None:
                     supervisor.kill()
                     supervisor.wait()
+
+    def test_retire_group_treats_a_refused_signal_as_an_exited_group(self):
+        # macOS answers killpg with EPERM once every member has exited but is not reaped yet.
+        m = self.implementation()
+        refusal = PermissionError(errno.EPERM, 'Operation not permitted')
+        for effects, calls in (([refusal], 1), ([None, refusal, refusal], 3)):
+            process = subprocess.Popen([sys.executable, '-c', 'pass'], start_new_session=True)
+            with patch.object(m.os, 'killpg', side_effect=effects) as killpg:
+                m.retire_group(process, grace=1)
+            self.assertEqual((killpg.call_count, process.returncode), (calls, 0))
 
     def assert_retired(self, pid):
         for _ in range(30):

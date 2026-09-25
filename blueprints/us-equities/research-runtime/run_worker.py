@@ -161,10 +161,13 @@ class WorkerInterrupted(Exception):
 
 
 def retire_group(process, grace=2):
-    """Retire the owned POSIX group even if its leader has already exited."""
+    """Retire the owned POSIX group even if its leader has already exited.
+
+    macOS reports EPERM, not ESRCH, for a group whose members have all exited but are not
+    reaped yet (XNU killpg1 skips zombies), so PermissionError also means nothing is left."""
     try:
         os.killpg(process.pid, signal.SIGTERM)
-    except ProcessLookupError:
+    except (ProcessLookupError, PermissionError):
         process.wait()
         return
     deadline = time.monotonic() + grace
@@ -172,12 +175,12 @@ def retire_group(process, grace=2):
         process.poll()
         try:
             os.killpg(process.pid, 0)
-        except ProcessLookupError:
+        except (ProcessLookupError, PermissionError):
             break
         time.sleep(0.05)
     try:
         os.killpg(process.pid, signal.SIGKILL)
-    except ProcessLookupError:
+    except (ProcessLookupError, PermissionError):
         pass
     process.wait(timeout=5)
 

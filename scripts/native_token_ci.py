@@ -37,6 +37,17 @@ def require(condition: bool, message: str) -> None:
         raise AssertionError(message)
 
 
+def signal_group(pid: int, signum: int) -> None:
+    """Signal a timed-out command's process group, if any member is still alive to receive it.
+
+    The group can finish between the timeout and the signal: Linux then reports ESRCH once it is
+    reaped, and macOS reports EPERM while its members are unreaped zombies (XNU killpg1 skips them)."""
+    try:
+        os.killpg(pid, signum)
+    except (ProcessLookupError, PermissionError):
+        pass
+
+
 def verify_archive(archive: Path, checksums: str) -> None:
     matches = [line.split()[0] for line in checksums.splitlines()
                if len(line.split()) == 2 and line.split()[1].lstrip("*") == archive.name]
@@ -150,11 +161,11 @@ class Run:
             stdout, stderr = process.communicate(timeout=timeout)
         except subprocess.TimeoutExpired:
             timed_out = True
-            os.killpg(process.pid, signal.SIGTERM)
+            signal_group(process.pid, signal.SIGTERM)
             try:
                 stdout, stderr = process.communicate(timeout=5)
             except subprocess.TimeoutExpired:
-                os.killpg(process.pid, signal.SIGKILL)
+                signal_group(process.pid, signal.SIGKILL)
                 stdout, stderr = process.communicate()
         entry = {"label": label, "argv": [self.clean(arg) for arg in argv],
                  "cwd": self.clean(str(cwd or self.work)), "exit_code": process.returncode,
