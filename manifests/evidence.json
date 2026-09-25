@@ -3091,6 +3091,46 @@
         "The 0.25.0 prefix is kept for rollback; the base unit still names it and only the drop-in points at 0.30.0."
       ],
       "path": "evidence/receipts/vllm-030-switch-20260925.json"
+    },
+    {
+      "id": "rtk-050-qualification-20260925",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "rtk"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-25, rtk 0.50.0 was qualified against the installed 0.49.0 on the Claude Code hook path and then switched into production. The rtk-ai/rtk v0.50.0 asset rtk-x86_64-unknown-linux-musl.tar.gz hashed to sha256 bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89, equal to its checksums.txt line (sha256sum --check --strict: OK) and to the GitHub API asset digest, and was installed into a new tools/rtk-0.50.0 prefix (binary sha256 23433a2a50bdeb12199cadd4b94b639238d6c38529fcba1c30c9295db5fa9517). Driving `rtk hook claude` with Claude PreToolUse JSON and scratch data directories, the hash-pinned acceptance scripts gave 42 PASS / 0 FAIL / 1 NOTE (v2, sha256 186dd891...) and 88 PASS / 0 FAIL / 4 NOTE (v3.1, sha256 3644a0dc...) for 0.50.0, against 34/8/1 and 79/9/4 for 0.49.0; v3.1 rejected two broken fake candidates (4/100/11 and 17/85/11), and `rtk verify` passed 154/154 on both versions. An independent verifier re-ran these, reproduced the outputs line for line and agreed. The coordinator then repointed bin/rtk to the new prefix (`rtk --version`: rtk 0.50.0) and created ~/.config/rtk/config.toml with `exclude_commands = [\"^git show [^ ]*:\", \"diff\"]`. v3.1 on the production binary gave 87 PASS / 1 FAIL / 3 NOTE with that config, the one FAIL ('blob not windowed/announced') being the exclusion taking effect, and 88 PASS / 0 FAIL / 4 NOTE with an empty XDG_CONFIG_HOME.",
+      "limitations": [
+        "0.50.0 blob-window defect: through the hook, `git show <rev>:<path> | tail -n K` returns lines from the ~8 KiB blob window plus a '[see remaining: rtk proxy git show ...]' hint instead of the end of the file (fixture: rows 1030-1033 plus the hint, where native git and 0.49.0 print rows 3996-4000). Neither acceptance script gates it; only the non-gating A2 differential caught it. This host mitigates it with ~/.config/rtk/config.toml `[hooks] exclude_commands = [\"^git show [^ ]*:\", \"diff\"]`, which also sends every `git show <rev>:<path>` and plain `diff` to the native command. adoption/bootstrap-linux.sh installs only the binary and does not render this file: a new host must create it (recipes/README.md), or the defect is live there.",
+        "Pre-existing defects persist in 0.50.0 exactly as in 0.49.0: `find <nonexistent-relative-dir> -name x` exits 0 with no output (native: exit 1, 'No such file or directory'); plain `git log` is silently capped at 10 commits and `--no-merges` is injected, so `git log --oneline` drops merge commits; `python3 -m pytest` is rewritten to `rtk pytest`, which runs `pytest` from PATH or `python -m pytest`, not the named interpreter. `diff` on a missing file still exits 1 instead of 2 in the binary; only the host exclusion avoids it.",
+        "Rollback hazard: 0.50.0 stores signed negative saved_tokens, and 0.49.0 reads them with an unchecked cast. With synthetic -500 rows, 0.49.0's `rtk gain --history` and `--all` (including `--all --format json|csv`) showed wrapped values such as 18446744073709551116, while plain `rtk gain` and `rtk gain --format json` showed none (out/negrow.out) and 0.50.0 clamps them to 0. The qualification corpus wrote 0 negative rows of 66 and production had 0 at qualification; the natural frequency is unmeasured. Before rolling back to 0.49.0, count `saved_tokens<0` rows read-only on a snapshot of history.db. tools/token-report's `rtk gain --format json` read showed no wrapped value, but the report also reads saved_tokens directly from history.db (tools/token-report/token_manifest.py).",
+        "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the token-efficiency winner pin rtk 0.49.0 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 0.50.0 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
+        "Linux x86_64 only: adoption/pins-macos-arm64.json has no rtk pin and is unchanged; nothing here is macOS evidence.",
+        "Local integration evidence with synthetic fixtures (fake pytest and ruff, generated git repositories, synthetic negative rows); the hook was driven directly with PreToolUse JSON. Upstream `cargo test` was not run on this host, and no fresh-session live Claude Code check after the switch is recorded.",
+        "Provenance rests on checksums.txt and the GitHub API digest, both from the same release workflow; no signature is published, the attestation lookup returned HTTP 404, and the binary was not rebuilt from source.",
+        "`rtk init` was not re-run. At 0.50.0, `rtk init --help` describes `--codex` as 'Target Codex CLI (uses PreToolUse hook + AGENTS.md + RTK.md)', so re-running the recipe's `rtk init --global --codex` would install a Codex hook that is not qualified; recipes/README.md now says so.",
+        "One host (NativeStack, WSL2) and a prefix-flip switch; tools/rtk-0.49.0 and its archive are kept for rollback. The verifier's three minor defects (an unrelated ~/.claude/settings.json change outside the fingerprint window, the ungated `| tail` case, scratch written outside the unit dir) are retained in the artifact."
+      ],
+      "path": "evidence/receipts/rtk-050-qualification-20260925.json"
+    },
+    {
+      "id": "markitdown-018-qualification-20260925",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "markitdown"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-25, markitdown 0.1.8 was qualified against the installed 0.1.7 and then switched into production. The PyPI wheel (sha256 de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab, 89,737 bytes) and sdist (sha256 17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed, 69,112 bytes) matched PyPI's JSON and Simple API digests before `uv tool install --python 3.13` put the base package into a new tools/markitdown-0.1.8 prefix (20 packages; 45 of 45 package files byte-identical to the verified wheel). The candidate passed all 10 legs of run_arm.py: `--version` 'markitdown 0.1.8', greeting.md, 8k.md and 8-K stdout hashes (the stdout equal to the retained a27f0f27...), the discriminator hashes, check_outputs.py 12 PASS, the PDF refusal naming markitdown[pdf], the 20-package set with no extras and the consumer document. 0.1.7 failed exactly the version leg, the four 0.1.8 discriminator checks (8 PASS / 4 FAIL) and the markitdown line of the package set; the fixture, 8-K and consumer outputs and all 19 committed HTML files at ae30f94b converted byte-identically under both, and the 19 other distributions were byte-identical. An independent verifier reproduced these and agreed. The coordinator then repointed bin/markitdown to the new prefix; `markitdown --version` printed 'markitdown 0.1.8' and run_arm.py against the production path passed 10 of 10 legs.",
+      "limitations": [
+        "Production runs the qualification prefix (a prefix flip), not install_pin's python-tools layout: its uv-receipt carries [tool.options] exclude-newer = \"2026-09-25T17:00:00Z\" and link-mode = \"copy\" and records python \"3.13\", which freezes `uv tool upgrade` inside that prefix. The refuter's primary promotion gate (install_pin's form without --exclude-newer, then production pip-list equality and an exclude-newer-free receipt) was not run. A new host's bootstrap runs `uv tool install --python 3.13 markitdown==0.1.8` without --exclude-newer, so its transitive set can differ from the qualified 20-package set once newer compatible dependency releases appear.",
+        "The 0.1.7 env python-tools/markitdown stays installed for rollback (re-point bin/markitdown), and its bookkeeping still reports 0.1.7. How a later install_pin run interacts with the flipped symlink was not tested.",
+        "0.1.8 changes output for <u> (kept as inline HTML), <strike> (~~text~~), %2F path escapes (preserved) and data-src images (preferred over a data: placeholder). These were shown only on the synthetic discriminator; the committed corpus has none of them in affected positions, real filings containing them were not tested, and a consumer that requires Markdown without raw HTML tags would now see <u>.",
+        "Local integration evidence (the reviewer-authored checker plus the refuter's legs), not the unchanged upstream suite: `hatch test` was not run on this host; the upstream CI pass on PR #2545 is research-reported. The [pdf]/[docx] extras were not exercised.",
+        "Integrity rests on PyPI's published digests and post-install byte equality with the verified wheel. The sha256 recorded in adoption/pins-linux-x86_64.json is not passed to uv (install_pin runs `uv tool install --python 3.13 markitdown==<version>`); whether uv verifies an index-provided digest itself was not established here. PyPI publishes no PEP 740 attestation for 0.1.8.",
+        "The no-extras grep leg misses some extras (an [az-doc-intel] addition passed it in the verifier's mutation test); only the exact 20-package equality leg gates the package set. Importing onnxruntime 1.30.0 writes $TMPDIR/.ses and an empty mat-debug-<pid>.log on every call, in both versions; the qualification runs left such files in /tmp.",
+        "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the document-retrieval winner pin markitdown 0.1.7 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 0.1.8 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
+        "Linux x86_64 only: adoption/pins-macos-arm64.json has no markitdown pin and is unchanged; nothing here is macOS evidence.",
+        "One host (NativeStack, WSL2). The first post-switch run aborted before any leg because its run directory already existed; the retained 10-of-10 result is the rerun into a new directory. This receipt, not the 2026-09-23 qualification in evidence/artifacts/sota-refresh-20260923/pins-mem/markitdown.json (another host, another install kind, a non-discriminating check), is the basis for the 0.1.8 pin."
+      ],
+      "path": "evidence/receipts/markitdown-018-qualification-20260925.json"
     }
   ],
   "files": [
@@ -3246,8 +3286,8 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "294d3cae5c882df47cce7ae744b5c3f6fa84858123a358aeae765ba071c3c79c",
-      "bytes": 30109
+      "sha256": "0d86c8ea7c16cbf2dbc32ae036a32076c3d97e1c0b670c4fb504fa0798f6444d",
+      "bytes": 30963
     },
     {
       "path": "adoption/bootstrap-macos.sh",
@@ -3256,8 +3296,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "e070c2d847e19b4cfeca7fab0f8544b797573343cfc25b8fb83119b0975e1d29",
-      "bytes": 28258
+      "sha256": "7ae823a619fe45cc0649bdea29db04f13751733d23521147c5c336b700f7fab5",
+      "bytes": 29211
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3351,8 +3391,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "c892e0ec8162ca51c66d5b03f735bbac3c36e8b80222d6d01fe2a4e86bd6e3d2",
-      "bytes": 15017
+      "sha256": "a27860663900ab944ef90e118acbf8b2307a775c46de06974ce0522f82cc3670",
+      "bytes": 15421
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -3361,13 +3401,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "83de16c5621ea08ec5d4ab32b24798e958055b1998278d8548a0f1003f24da80",
-      "bytes": 12677
+      "sha256": "d120d8c293c1ff1448fadb5ee05a2039a4716fafca0351d720600a3ff2a25fcf",
+      "bytes": 13027
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "253d461bb6143c29b27237dfce4f28d0bc827a413f0160cef20776e2d163dd94",
-      "bytes": 40071
+      "sha256": "21d9afbe452d4943b54be3a7a1ac9f6d118f1acc54d5ea76e938f18945e5b1dc",
+      "bytes": 40238
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -6527,8 +6567,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "bbe79ef2b3bdf86429af257bed5cba62c8ee43a0bd3ff2564b7d25e91ddeea52",
-      "bytes": 480084
+      "sha256": "ef6e3407a61b83ff32f83c1a4204ed82b1e16b3e32e3a98a1f1cd42e341cfa17",
+      "bytes": 480480
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -9732,7 +9772,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "745af2b10e4a9c1b7179381d37ecd0aef576e79bda4452725315f528c2866813",
+      "sha256": "d1ea271d4d4927a25f90e0bc946c1e36f56055d776392a7383885392767ff607",
       "bytes": 285723
     },
     {
@@ -9742,8 +9782,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "2232fa88eee4f9f0c66459b534d91440a87f0d3b7e08d9f6b724505df3022a77",
-      "bytes": 248571
+      "sha256": "40d0fc8f16b1af51995877b2990a4992e1542b3c2ec13028dfdee3f7ab105fa4",
+      "bytes": 248554
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -10472,7 +10512,7 @@
     },
     {
       "path": "docs/native-token-ci.md",
-      "sha256": "0697e77c25399b2053cef9637b9a2541629fc4adae1f216b9a937efdc714b9dd",
+      "sha256": "e6c32f859e0ecf4ac56fd9e4095ede51c020a4cfe1f36243b570fe7dd263e896",
       "bytes": 5504
     },
     {
@@ -10487,7 +10527,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "83a77106c6bcf574971b2b2f18c1e2e54295ef51e13263bd9eca0d9897fd0e19",
+      "sha256": "508b8aaac0986eb1995d7a23b0fea54e58197338a8036d959baade39e06ff724",
       "bytes": 17729
     },
     {
@@ -10587,8 +10627,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "2336acccb3975b6fce1a00c8df06b6440313a05c7916f71654b9d154a369d5ec",
-      "bytes": 157327
+      "sha256": "3d3a58da731d57e6ad3c990c860f25e2365353c4d51fe873db830e1a66464c58",
+      "bytes": 157406
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -10602,13 +10642,13 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "30233736cabc34105fc1c7a11063cfa61fa6006c3d37e21e5b7e360ba38d8938",
-      "bytes": 21989
+      "sha256": "de39875741740073a4493dab193afe6c768f5a641977007a09ae8104744b74aa",
+      "bytes": 22399
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "960a45a4ac3bb1e7854ad015398c5e01d28df06df08f2212baa193a73152d4ea",
-      "bytes": 35907
+      "sha256": "e8243ab217f7df77b16c26afeb129bbb1ac62e84f83f311090f2f472a7ccf38a",
+      "bytes": 36162
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -28236,6 +28276,401 @@
       "bytes": 2564
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/ab-compare.json",
+      "sha256": "2e1c587cdba41bcf55acdcfcfa255b0d8d580f6b1d7edd9580f5f9d18121d59d",
+      "bytes": 11224
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/check_outputs.py",
+      "sha256": "fd24e9d1b774e7af5251970c5facd8c48e41a047f3df9a6d576dbb81a8b3620b",
+      "bytes": 1833
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/install.log",
+      "sha256": "98299a10cee552c8c60ac6b3bf387269e9c462f48ef4c8750070765b6266a488",
+      "bytes": 919
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/postswitch-attempt1.log",
+      "sha256": "2a7b7e9c8caeb1f13c46f8e749d389de1113c9a00dc87bb786fcdcefcbdee58d",
+      "bytes": 220
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/postswitch.log",
+      "sha256": "8abcb49bd24fcde5504694e765035c16982640bffd2aebf9ee45cc7880bc85ec",
+      "bytes": 1868
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/readback.out",
+      "sha256": "4f8297abbe4b468b1c53d79ed70274e9e40ff0e7510507764687db26ca6d7fd1",
+      "bytes": 463
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/postswitch-out.json",
+      "sha256": "5d1de1a0c39eb90f4d70afef0995bbf09dceafeba499034c42058ee1c3a69bda",
+      "bytes": 4561
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/results.json",
+      "sha256": "1d16fd89b90fd0798b2ab85f561a2a537567881b8cdd4849adba2bf330b4f84a",
+      "bytes": 51951
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run_arm.py",
+      "sha256": "2fd719b4072648f24d902afdddfcbb247bc3e295e0699f4d0ea3c2c2547d36f6",
+      "bytes": 8277
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/steps-baseline.json",
+      "sha256": "4811aa664f44d5fb74cf374b690ce98ca0ddff131642b994b1c1143d698b44f1",
+      "bytes": 4585
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/steps-candidate.json",
+      "sha256": "c6f510ae62b6fecd900e8338c599243cc8c1f6985f92337a3275fefae26ab1b2",
+      "bytes": 4699
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/a2.py",
+      "sha256": "e7bb3550fa4db0a7cf90b6b17f0ad66708bbf63b655f51ab91bfc999eb390be1",
+      "bytes": 13017
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/mitigation.sh",
+      "sha256": "b4f68b559bfd9bb9d6ed3c6f2aa69cf8d7112a607e1c623638e651f319257d4f",
+      "bytes": 3798
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/native_token_ci_rtk_only.py",
+      "sha256": "4ade0a773af3bdac2da8ad67082adf187075b6169c7db9af1b831e0d4a4f7b5c",
+      "bytes": 840
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2.summary",
+      "sha256": "c878ee65bb4c2b1a58ede13407d0f764c5876fe33d7945cb3fd77bced31af335",
+      "bytes": 369
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/a2-report.json",
+      "sha256": "211f7e2e44df47e8543b9597d6239ce908f17fad3fb1fa5ea9ee01459c4150db",
+      "bytes": 28772
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/a2-table.txt",
+      "sha256": "719600a4f2867af1f53c09d3b904c606917f2700054ad72e3cae1b1eadaa3766",
+      "bytes": 7619
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/diff-missing.049.err",
+      "sha256": "3578cecb5e93285bf68cb2e5922621e608003676239689207814d24d7851d53a",
+      "bytes": 44
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/diff-missing.049.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/diff-missing.050.err",
+      "sha256": "3578cecb5e93285bf68cb2e5922621e608003676239689207814d24d7851d53a",
+      "bytes": 44
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/diff-missing.050.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/diff-missing.native.err",
+      "sha256": "e9a0041b1c4fe568cedb5c83d3a62f5adcd005fb96fc43d9606354ef913a7d41",
+      "bytes": 45
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/diff-missing.native.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/find-missing.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/find-missing.049.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/find-missing.050.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/find-missing.050.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/find-missing.native.err",
+      "sha256": "3401a947eb452bee599065ff1d1d4c9ec0a8ef82199386acab0848f204c13fa4",
+      "bytes": 47
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/find-missing.native.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-oneline.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-oneline.049.out",
+      "sha256": "fd7bdef04127a1da266a4f2958c9a6887f15417111c3ed44078d9c374878b57a",
+      "bytes": 158
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-oneline.050.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-oneline.050.out",
+      "sha256": "fd7bdef04127a1da266a4f2958c9a6887f15417111c3ed44078d9c374878b57a",
+      "bytes": 158
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-oneline.native.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-oneline.native.out",
+      "sha256": "414dc8921e19e40a4c1b02c023d4e48c40bb827fedbbea50c545349f921dbebb",
+      "bytes": 186
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-plain.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-plain.049.out",
+      "sha256": "fff1722ca268fd770bf2b95e0f32dbc74eb9e9deb6f9c1a5465c9afc7b214152",
+      "bytes": 324
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-plain.050.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-plain.050.out",
+      "sha256": "fff1722ca268fd770bf2b95e0f32dbc74eb9e9deb6f9c1a5465c9afc7b214152",
+      "bytes": 324
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-plain.native.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-plain.native.out",
+      "sha256": "005ac39188cc33754f1fb1e609c7e2233b68662ef774cf80e7769cac0265d212",
+      "bytes": 1863
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-show-blob-tail.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-show-blob-tail.049.out",
+      "sha256": "bb93ea3b86e6c08404d176f63449f982dfe130b492463716098fea3d49c7da3d",
+      "bytes": 45
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-show-blob-tail.050.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-show-blob-tail.050.out",
+      "sha256": "8da640e83e2f8c41dddc5e2d99ca684aac17752ef146e45aea21b7d4f0ff8c59",
+      "bytes": 121
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-show-blob-tail.native.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-show-blob-tail.native.out",
+      "sha256": "bb93ea3b86e6c08404d176f63449f982dfe130b492463716098fea3d49c7da3d",
+      "bytes": 45
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/python-m-pytest.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/python-m-pytest.049.out",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/python-m-pytest.050.err",
+      "sha256": "d79af70eaa4401456e680940c237b174a45e4043b2d302123609067731e1f917",
+      "bytes": 51
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/python-m-pytest.050.out",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/python-m-pytest.native.err",
+      "sha256": "388552e41b2d166e6c7226b80052afa6c69a6b71ed8c63a6e8002dc3c4817e78",
+      "bytes": 67
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/python-m-pytest.native.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/fetch.out",
+      "sha256": "8942f58ac4fd35cc09d739e69bd6fffd3c5cc117861579b07be9a996eb2a38a0",
+      "bytes": 2124
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/gain-0.49.0-gain---format-json.txt",
+      "sha256": "24db57f82e572fbc27360015bd175f3df962b87cd699e7b585deef6ff93ea817",
+      "bytes": 217
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/gain-0.50.0-gain---format-json.txt",
+      "sha256": "24db57f82e572fbc27360015bd175f3df962b87cd699e7b585deef6ff93ea817",
+      "bytes": 217
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/install.out",
+      "sha256": "99e97a66f8af15153f147ec8e7798c28878f5ea7e0dc0924333084936199a393",
+      "bytes": 793
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/mitigation.out",
+      "sha256": "8abab9a22d59ff3d775bb7e91e73d1862545f3e53b91031c4ba13b98c2ce6967",
+      "bytes": 2412
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/native-token-ci-rtk-only.json",
+      "sha256": "70753126a9e66dc489ead9ef478ffebdba7e26b5da7581bc7d0ff8b416cb0975",
+      "bytes": 14874
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/negrow-0.49.0-gain---all---format-json.txt",
+      "sha256": "d435ed226a9b0fd19f914fa8b5e96741945345896494afe8828a9e7c873f258d",
+      "bytes": 1577
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/negrow-0.50.0-gain---all---format-json.txt",
+      "sha256": "ebcc1edf7508503240be1abf68d5def9d70f51c7b408488f99957052015a14ba",
+      "bytes": 1504
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/negrow.out",
+      "sha256": "73b98af0ea745689b9845388c3640489419308f1ab0a224a05c216789b55a4e1",
+      "bytes": 1214
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/post-switch-v31-noconfig.txt",
+      "sha256": "5da7c4a21a6cd27ec1416aea3d623ae861608814ed56a60f47ab17493819e3de",
+      "bytes": 3466
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/post-switch-v31.txt",
+      "sha256": "5c213154377d977c618bff56251f6424fc09fa1010ac1efb5d09d945128f1e5f",
+      "bytes": 3330
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/pytest-resolve.out",
+      "sha256": "296cebfb64062a7566f82a98a9273a6711d36a45b7eec162895bfc5ff00b17a9",
+      "bytes": 531
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/readback.out",
+      "sha256": "3755880cd097828bdb3025f0e517843ac49f78561a9e05fd4a8b0611ccfcaa21",
+      "bytes": 973
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/run-acceptance.summary",
+      "sha256": "ad4283b3c9bcbb143f286b082a01ab34f8e1e96c56d5fbbe5a90f5555566225e",
+      "bytes": 908
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/run-v31.summary",
+      "sha256": "c651e72aa07a5cf5db98e4baf01a8ea34796e3c29bc6bc2f57c9aa19e8f164fe",
+      "bytes": 518
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/v2-049.out",
+      "sha256": "cb2f7a468e9764c76b2a93732765f6c6be1c9db08256e5dcd79f4a31ac5b7a0e",
+      "bytes": 1542
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/v2-050.out",
+      "sha256": "33b6f39989cd2b5bcf66d6765d3339dc4907fece5aba7b9e75ff309e11d53df4",
+      "bytes": 1374
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/v31-049.out",
+      "sha256": "19458daeaa7de3df2089360cf6612658e24487de4f99ea1d96c39c8ca1cee914",
+      "bytes": 3683
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/v31-050.out",
+      "sha256": "748e5e4219747d41d5c6341201a4f7b08e2f608b4b2806c2e13674500769bb8e",
+      "bytes": 3478
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/v31-fake-allow.out",
+      "sha256": "c37c9cd43550822a733a34286c03676e6a412413f8078c97102b5b0da5c5071e",
+      "bytes": 7838
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/v31-fake-block.out",
+      "sha256": "1c794c5f615fbfd484277b90d658c4513819ead2f59f5ceaf24b9aadb20f5a4a",
+      "bytes": 6925
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/verify-0.49.0.out",
+      "sha256": "66e5c69675089b206da056ae57e29ea99588a22642e611255c66c4071658aa9f",
+      "bytes": 163
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/verify-0.50.0.out",
+      "sha256": "66e5c69675089b206da056ae57e29ea99588a22642e611255c66c4071658aa9f",
+      "bytes": 163
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/results.json",
+      "sha256": "cbca93315306d5cf420182e94b30c9e87764e38f2526dad4e748828de80922a1",
+      "bytes": 71556
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/rtk-hook-acceptance-v2.sh",
+      "sha256": "186dd8914a6c18850261d3bf34a3fd2f2c8767d6696931a99c90f1eeb79c9376",
+      "bytes": 8696
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/rtk-hook-acceptance-v3.1.sh",
+      "sha256": "3644a0dc50e9bcb1f785e5cc5fe36fda233ca915dd731ab1aa4709932f5f7755",
+      "bytes": 15509
+    },
+    {
       "path": "evidence/artifacts/source-review-20260923/afrojuju1-nautilus_trader.json",
       "sha256": "76327812cf9c997eea46093a1dad1597cf66cf949d39fcb18b6fe736f857c99e",
       "bytes": 2989
@@ -29591,6 +30026,11 @@
       "bytes": 893
     },
     {
+      "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
+      "sha256": "04c4223b75c7007419773db9008e62e69358c51e6a39b9c0a72a58be396661a4",
+      "bytes": 9976
+    },
+    {
       "path": "evidence/receipts/memory-landscape-20260921.json",
       "sha256": "6a31608a721b3561ebf5daf59d0363cda7ef563777f47e3e2f64e16fca24a948",
       "bytes": 4059
@@ -29849,6 +30289,11 @@
       "path": "evidence/receipts/pre-2020-delisting-coverage.json",
       "sha256": "26b96da55760463aefc53bc400d41681019a20976e24756cd451646ed1094a69",
       "bytes": 1276550
+    },
+    {
+      "path": "evidence/receipts/rtk-050-qualification-20260925.json",
+      "sha256": "62f5e2b2ab3fb47fb072486da7c145be7398ba84b5cf6bfc1d69b025b2bcec8d",
+      "bytes": 23956
     },
     {
       "path": "evidence/receipts/runtime-tools.json",
@@ -30197,8 +30642,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "b3f3a28bd51fe699d4d6b42fdd45d51154e5e51d099146962c8483e1c1b0b665",
-      "bytes": 88395
+      "sha256": "f85c6c7435939a3dc7f9a26207db154c05201a201831fe68ae3bbee5818b8522",
+      "bytes": 89024
     },
     {
       "path": "observability/README.md",
@@ -30402,8 +30847,8 @@
     },
     {
       "path": "observability/native-data/README.md",
-      "sha256": "39d2a43ace58d34e679f401a742e1d2de831012a39b2aeedfac3758b9de436bd",
-      "bytes": 9829
+      "sha256": "613b656d2c0277e18dc9f2241f1d9ba6ef4ffd6ecda9a97cecb2b02a8c39855b",
+      "bytes": 9913
     },
     {
       "path": "observability/native-data/config.example.json",
@@ -30457,8 +30902,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "048dd1173af844d96b27c88af1d7ac438e25276463e7fd7a4295d862f761a714",
-      "bytes": 61471
+      "sha256": "989d474c5ebc96fd5b82749b4ce3c67bb3490534a379ecbed9de89a3e7d8ddf5",
+      "bytes": 64863
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -30552,7 +30997,7 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "55aab8847181259241d29bd39779ea4859d098d81e8d72e8424acac990862b2c",
+      "sha256": "0d5616afcf3fd97c7e1baaa55ff994e4c02c9eabf282b6b989679cc06c885504",
       "bytes": 20795
     },
     {
@@ -30752,8 +31197,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "39ea9a000943e07fdd4676326e1340cb664ce03070799aa7ad80dc3fd359b81f",
-      "bytes": 35792
+      "sha256": "48addad06c944bb41af532035bcec298a4edb72c91a6efbb25f49646157737b0",
+      "bytes": 42364
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
@@ -31372,7 +31817,7 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "62261258cf18514b713cf566c05f84163d6f11efa60c2eea8c15359b134dda46",
+      "sha256": "ba2942ccbe7ee31439e9f0bf7fd4c2a34aa4dfa9e36e608bbaaa16275a891e83",
       "bytes": 12439
     },
     {
