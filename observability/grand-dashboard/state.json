@@ -1,20 +1,20 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-25T07:42:53Z",
+  "recorded_at_utc": "2026-09-25T13:38:02Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
       "kind": "lane",
       "id": "simulation",
       "title": "Historical simulation / backtest",
-      "state": "sim capacity 859 to 882 fills per min elite budget (30 of 30 min) and 171 to 180 paper parity / quotes-only rc5 / infrastructure evidence only",
-      "evidence_ref": "blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json"
+      "state": "sim capacity 859 to 882 fills per min (30 of 30 min) / hftbacktest cross-check agrees within 0.36 pct after driver fix / infrastructure evidence only",
+      "evidence_ref": "blueprints/us-equities/sim-engine-crosscheck/receipts/20260925-crosscheck.json"
     },
     {
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "1x broker trial passed 2026-09-23 / 1x ladder attempt 2026-09-24 needs attention (fill precision) peak 0.15x / order contract and credential guard merged / flat",
+      "state": "engine P0 and exact cancel identity merged 2026-09-25 / fault rerun and 1x ladder blocked (stored paper keys rejected HTTP 401 - rotation needed) / flat",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
     },
     {
