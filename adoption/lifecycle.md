@@ -299,7 +299,11 @@ error if `recover`, below, already closed T that way itself) or whose live
 target no longer matches what this same rollback's own `link` operation last
 set it to (a compare-and-swap precondition, round 5: something else changed
 it since, e.g. an out-of-band relink or bootstrap re-run, and overwriting
-that unnoticed change is worse than refusing), and `confirm --txn T` refuses
+that unnoticed change is worse than refusing -- round 6: relaxed to also
+accept the live target already matching what THIS reversal would itself
+restore, so a rollback interrupted partway through, or run a second time
+after it already finished, is idempotent and resumable rather than refused
+as if something else had drifted it), and `confirm --txn T` refuses
 a txn that was already rolled back, whose post-apply verify already failed,
 that is still `in_progress` (a crashed or interrupted `apply` that never
 reached its own post-apply verify), or that `recover` has already closed as
@@ -325,7 +329,9 @@ fact: `ecosystem-switch recover` finds every transaction still `in_progress`
 and closes each one, either by rolling it back (the ordinary case -- nothing
 later touched its component) or, when a *later* transaction on the same
 component has since become that component's own current-setting change
-(provable from the ledger's own write-ahead entries, the identical check
+(provable from the ledger's own recorded entries -- each operation is
+ledgered only after it runs, never write-ahead, so this can only see a later
+change that already finished being ledgered itself; the identical check
 `rollback --txn` itself uses to refuse), by closing it as `superseded`
 without touching anything -- accepting that later, already-verified state as
 authoritative rather than clobbering it. Before this split existed
@@ -339,13 +345,23 @@ transaction it reconciled under `recovered_txns` (rolled back) or
 `superseded_txns` (closed without touching anything), and any genuine
 problem (e.g. a rollback's own compare-and-swap refusal above) under
 `rollback_problems` for the operator, while it keeps reconciling every other
-`in_progress` transaction in the same run.
+`in_progress` transaction in the same run. Round 6: `rollback`'s own reversal
+(the "rolling it back" branch above, also used directly by a manual
+`rollback`) is now idempotent and resumable -- an interrupted rollback (the
+process was killed partway through, not the apply/relink it is reversing)
+is resumed from whichever of its operations the ledger already shows
+reversed, rather than refusing on what used to look like drift; a second,
+redundant `rollback` of an already-finished one is a clean no-op the same
+way.
 
 **Prune.** `prune --list` reports which `tools/<name>-<version>` prefixes no
 `current/<id>` link points at, that are not the previous root of any
-not-yet-rolled-back transaction (a pending or already-applied transaction's
-own rollback target stays live until that transaction is actually rolled
-back, not merely superseded by a later one), and this tool's own
+transaction still eligible to be rolled back (a pending or already-applied
+transaction's own rollback target stays live until that transaction is
+actually rolled back OR closed as `superseded` by `recover` -- once
+superseded, that transaction itself can never be rolled back, so its own
+previous root is no longer a live target either, the same as an
+already-rolled-back transaction's), and this tool's own
 reduced-scope in-use check (PATH entries, `bin/` symlink targets, this
 user's own running processes' exe/cwd/cmdline, this user's `systemd --user`
 unit file text, and -- previously-unresolved finding -- the wrapper-script

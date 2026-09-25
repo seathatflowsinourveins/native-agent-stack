@@ -484,8 +484,9 @@ failed partway, or whose process crashed) or `pending_confirmation` (an
 open one first: `confirm --txn ID` (`pending_confirmation` only), `rollback
 --txn ID` or `rollback <component>` (either state), or, for an `in_progress`
 one left by a crash, `recover` -- which can now close it whether or not a
-later change has since superseded it (see `recover` below), so this refusal
-is never permanent. `adopt --baseline [--spec PATH]`
+later change has since superseded it (see `recover` below), and which (round
+6) also resumes an interrupted rollback of one rather than getting stuck on
+it, so this refusal is never permanent. `adopt --baseline [--spec PATH]`
 is the read-only counterpart: it snapshots the current, already-relinked
 state (or records that a component is not relinked yet) without changing
 anything, for `status`/`verify` to compare against later. `adopt --resync ID
@@ -571,26 +572,31 @@ always reversed only after its own `link` (never restarted while
 against that `link`'s own recorded old root, not the pre-restart MainPID
 string the ledger's `unit-restart` entry itself carries; a `link` reversal
 itself now refuses (compare-and-swap) rather than overwrites when the live
-target no longer matches what this same operation last set it to -- (
-`--if-unconfirmed` is a no-op once the transaction was already confirmed or
-already rolled back -- exactly what the scheduled timer above calls; every
-rollback also refuses a txn a later apply on the same component has since
-superseded (reports `already_superseded` if `recover` already closed it that
-way itself), and one with no reversible operation at all, e.g. a bare
-baseline/resync/prune record); `verify [--component ID] --json` re-checks
-live state against the ledger and the ledger's own hash chain, independent of
-any apply; `recover` reconciles every transaction still `in_progress` (a
-crash mid-`apply` or mid-`relink`), never completing one after the fact --
-each one is either rolled back (the ordinary case) or, when a *later*
-transaction on the same component has since superseded it, closed as
-`superseded` without touching anything (accepting that later, already-
-verified state rather than clobbering it -- see **At most one open
-transaction per component** above: this is what keeps that refusal from
-becoming permanent); `prune --list` reports `tools/<name>-<version>` roots no
-`current/<id>` link
-points at, that are not the previous root of any not-yet-rolled-back txn (a
-pending or already-applied txn's own rollback target stays live until that
-txn is actually rolled back), and that this tool's own reduced-scope in-use
+target no longer matches what this same operation last set it to -- or, round
+6, what rolling it back would itself restore, so an interrupted or repeated
+rollback is idempotent rather than refused as if something else had drifted
+it -- (`--if-unconfirmed` is a no-op once the transaction was already
+confirmed or already rolled back -- exactly what the scheduled timer above
+calls; every rollback also refuses a txn a later apply on the same component
+has since superseded (reports `already_superseded` if `recover` already
+closed it that way itself), and one with no reversible operation at all, e.g.
+a bare baseline/resync/prune record); `verify [--component ID] --json`
+re-checks live state against the ledger and the ledger's own hash chain,
+independent of any apply; `recover` reconciles every transaction still
+`in_progress` (a crash mid-`apply`, mid-`relink` or mid-`rollback`), never
+completing one after the fact -- each one is either rolled back (the ordinary
+case, resuming an interrupted rollback of it the same idempotent way a manual
+`rollback` would, round 6) or, when a *later* transaction on the same
+component has since superseded it, closed as `superseded` without touching
+anything (accepting that later, already-verified state rather than
+clobbering it -- see **At most one open transaction per component** above:
+this is what keeps that refusal from becoming permanent); `prune --list`
+reports `tools/<name>-<version>` roots no `current/<id>` link
+points at, that are not the previous root of any transaction still eligible
+to be rolled back (a pending or already-applied txn's own rollback target
+stays live until that txn is actually rolled back OR closed as `superseded`
+-- once superseded, it can never be rolled back, so its previous root is no
+longer a live target either), and that this tool's own reduced-scope in-use
 check -- `PATH` entries, `bin/` symlink targets, this user's own running
 processes' exe/cwd/cmdline, this user's `systemd --user` unit file text, and
 the wrapper-script text under `wrapper_scan_dirs()` (default
