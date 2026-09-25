@@ -182,10 +182,12 @@ The gate receipt `receipt.json` (preregistered schema
 `{"schema_version": 1, "kind": "native_ibkr_local_acceptance", "status": "passed", "broker": "ibkr"}`)
 is written only when:
 
-- every case and checkpoint passed, and
+- every case and checkpoint passed,
 - both prerequisite receipts (`evidence/ibapi-readonly-20260923.json` and
   `../ibkr-paper-orders/evidence/receipt-20260923-passed.json`) exist with status
-  `passed`.
+  `passed`,
+- the version-selection record exists, and
+- the steps receipt lies inside the repository.
 
 That receipt makes the gate a flip candidate only. The flip itself stays a
 manual, dated commit after qualification.

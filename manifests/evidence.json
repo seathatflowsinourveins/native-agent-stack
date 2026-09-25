@@ -7862,8 +7862,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/README.md",
-      "sha256": "acc6d40f4b82f03ca72a3a3018e7b4ff458fb2a0c77cbe0bc93a2cae5abc52eb",
-      "bytes": 15084
+      "sha256": "b95d69cc5897383d344406a4e6d62d60056fb3560cb304110fee43e0b1c51f85",
+      "bytes": 15171
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131151Z-handrolled-protocol-probe.json",
@@ -7982,13 +7982,13 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/local-acceptance-plan-post.json",
-      "sha256": "c5094bee2c30db59cdf977b02eb845704da370cbac0bdae5989d10b789718b5f",
-      "bytes": 12234
+      "sha256": "7702273101424b8c514cac00a4859149cbed06e4916dd04bb049f7bb25755a92",
+      "bytes": 12501
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/local-acceptance-plan.json",
-      "sha256": "af9e1dbd6a9d6da9bdb62e31b1a73037f22cb314c43090c71bc193899e9098f0",
-      "bytes": 11366
+      "sha256": "7bb5f881d425fa7ad3621860b823ae23c7a03357b0c07fcdc9898a4fcc061e28",
+      "bytes": 11633
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/local_acceptance.py",

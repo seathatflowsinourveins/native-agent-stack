@@ -112,15 +112,15 @@
     "before": "Official-ibapi read-only check (client 98): paper port, every managed account starts with DU, exactly one account, zero positions, zero open orders, SPY contract hours; then a contender connection with client id 93 must connect (the id is free) and disconnect without requests.",
     "after_A": "Observer: exactly one open order in the account, R2, with clientId 93 and phase A's permId; zero positions.",
     "after_B": "Observer: zero open orders, zero positions; R1 and R2 appear among completed orders as cancelled; no order carrying P1's reference exists.",
-    "final": "Observer: zero open orders, zero positions, zero executions carrying this run's prefix, and no order carrying P1's or P2's reference among open or completed orders."
+    "final": "Observer: zero open orders, zero positions, zero executions carrying this run's prefix; once a probe order was attempted, R1 and R2 appear among completed orders as cancelled and no attempted probe (P1, P2) appears among open or completed orders."
   },
   "kill_switch": {
     "latch": "<state-dir>/kill-switch.json, written with fsync and mode 0600",
     "on_engage": ["write the latch", "RiskEngine.set_trading_state(TradingState.HALTED)", "record an alert (receipt and stderr)", "cancel every open order of the run"],
-    "on_restart": "Before the node runs, an engaged latch sets the RiskEngine to HALTED. run refuses to start while the latch is engaged; only 'kill-switch clear --confirm' removes it, and it writes an audit record.",
+    "on_restart": "Before the node runs, an engaged latch sets the RiskEngine to HALTED. run refuses to start while the latch is engaged; only 'kill-switch clear --confirm --reason TEXT' removes it, and it writes an audit record first.",
     "end_state": "The latch stays engaged after the run; clearing it is an explicit operator step."
   },
-  "failure_disposition": "On any failure, timeout, exception or signal the phase strategy cancels every open order of this run (R2 included; nothing is carried over) and stops the node. After any phase that did not complete, the runner cancels leftover orders of this run through the official ibapi client on client id 93 (only orders whose orderRef carries the run prefix and whose clientId is 93, only after the phase process has exited), then runs the observer. A non-flat account afterwards is cleanup_required (exit 3). Foreign orders or positions are never touched.",
+  "failure_disposition": "On any failure, timeout, exception or signal the phase strategy cancels every open order of this run (R2 included; nothing is carried over) and stops the node. After any phase that did not complete, and only after the phase process has exited, the runner cancels leftover orders of this run through the official ibapi client: the observer (client 98) lists the client ids holding orders whose orderRef carries the run prefix, and each holder inside the adapter's fallback band (93-97) cancels its own; only a complete listing without an order of the run counts as clean. It then runs the final observer. A non-flat account afterwards is cleanup_required (exit 3). Foreign orders or positions are never touched.",
   "receipt": {
     "kind": "ibkr_local_acceptance_steps_2_4",
     "never_record": ["account ids", "balances", "credentials", "home paths", "host names"],
