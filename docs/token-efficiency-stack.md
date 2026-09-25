@@ -124,6 +124,60 @@ local telemetry viewer. Viewers are not savings engines. Their separate rows say
 whether they were active, tested on demand, or limited by the current UI/account
 state. Native Claude HUD is not a Codex Desktop panel.
 
+## Coverage check
+
+Any host (a WSL2 workstation, a Mac) runs one value-free command from its checkout
+to see whether the selected practice is installed and wired into both native clients:
+
+```sh
+python3 scripts/adoption_status.py --profile token-efficiency --client-wiring --json
+```
+
+Parsing the Codex TOML needs Python 3.11 or later; on an older `python3` use
+`uv run --no-project --python 3.13 python …`. The command runs none of the selected
+tools and reads no `~/.claude.json` or credential. It prints command presence plus
+`client_wiring` booleans, two hook-event counts, and `null` for a file it could not
+read or parse.
+
+The `token-efficiency` profile in [the adoption manifest](../adoption/manifest.json)
+is the selected set. It holds the context-and-usage layer's current choice (RTK,
+Context Mode, explicit-file Repomix, guarded Headroom and TOON, ccusage), the Serena,
+QMD, MarkItDown, SocratiCode, ai-memory and MCPorter layer winners, and both native
+clients. `client_wiring` checks three places:
+
+- `claude`, the user settings: a Bash `PreToolUse` hook runs `rtk hook claude`; the
+  number of hook events that run ai-memory; Context Mode is enabled and installed;
+  subagent spawn depth is 1; a workflow concurrency cap is set; and neither
+  `CLAUDE_CODE_EFFORT_LEVEL` nor the agent-teams opt-in appears in the settings or
+  the checker's environment;
+- `project`, this checkout: `.claude/settings.json` sets the depth and the cap, and
+  a project `.codex/config.toml` names the Serena, SocratiCode and ai-memory servers;
+- `codex`, the Codex home: `AGENTS.md` references `RTK.md` (RTK 0.49.0 gives Codex
+  instructions, not a hook); Context Mode is enabled and installed; `config.toml`
+  names the same three servers; and the number of `hooks.json` events that run
+  ai-memory.
+
+The practice is applied on a host when three things hold:
+
+- the profile's own `status` is `prerequisites_present` (the top-level `status`
+  stays `prerequisites_missing` on macOS, which the manifest does not list as
+  supported);
+- every `claude`, `project` and `codex` boolean is `true`, except that each Codex
+  server needs to be present in only one of the user or project `config.toml`;
+- both hook counts are above zero.
+
+The remaining rows of the [machine list](token-efficiency-stack.json) are optional
+references outside the selection: jCodeMunch (a per-project opt-in), ast-grep,
+codebase-memory-mcp, Context Hub, AgentsView, Claude HUD, otel-tui and OmniRoute.
+The Collector, Prometheus, Loki and Grafana rows belong to the `observability`
+profile. A missing optional row does not make the practice unapplied.
+
+The check reports configuration, not activation. Plugin revisions, hook and project
+trust, Claude MCP registrations (`/mcp`), MCP server startup and one useful call per
+tool remain each client's own checks. A host records its JSON as its own evidence
+through a PR ([contributing host evidence](contributing-evidence.md)); another
+host's result, the reference host's included, is not its acceptance.
+
 ## Reproduce on another PC
 
 1. Clone the canonical repository and open the offline HTML. Choose the relevant

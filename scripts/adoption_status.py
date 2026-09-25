@@ -2,17 +2,22 @@
 """Read-only adoption prerequisite report. No installation or runtime acceptance.
 
 Checks command presence with shutil.which; it never invokes those commands. The
-only subprocess is a bounded native Git revision query. No credentials, client
-configuration, service/process state, network endpoints, or model APIs are read.
+only subprocess is a bounded native Git revision query. No credentials, service/process
+state, network endpoints, or model APIs are read. Client configuration is read only
+with the opt-in --client-wiring, which parses fixed native client files in-process
+and reports fixed booleans and hook-event counts, never a value, command, path or
+environment value.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path, PurePosixPath
 import platform
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -24,12 +29,38 @@ NAME = re.compile(r"[a-zA-Z0-9][a-zA-Z0-9_.-]*\Z")
 # Grafana's Linux x86-64 archive keeps this basename after extraction:
 # https://grafana.com/docs/loki/latest/setup/install/local/
 COMMAND_ALIASES = {("loki", "linux", "x86_64"): ("loki-linux-amd64",)}
+NO_CLIENT_STATE = ("No credentials, client configuration, environment values, network endpoints, or running "
+                   "processes are inspected.")
 LIMITATIONS = [
     "Executable presence does not verify its version, installation integrity, activation, or E2E behavior.",
     "Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.",
     "Git comparison reports source identity only; changed worktree files are not inspected.",
-    "No credentials, client configuration, environment values, network endpoints, or running processes are inspected.",
+    NO_CLIENT_STATE,
 ]
+# --client-wiring replaces NO_CLIENT_STATE with these two statements.
+CLIENT_WIRING_LIMITATIONS = [
+    "--client-wiring parses the user Claude settings and plugin registry, the Codex config.toml, hooks.json and "
+    "AGENTS.md, and this checkout's .claude/settings.json and .codex/config.toml, and reports fixed booleans and "
+    "hook-event counts only. It never reads ~/.claude.json, credentials, network endpoints or running processes; "
+    "environment variables only locate the client homes, and two opt-ins are checked by name.",
+    "Configured wiring is not activation: managed, project or local Claude settings can override the user scope "
+    "read here, and plugin revisions, hook and project trust, Claude MCP registrations, MCP server startup and a "
+    "useful native call remain the clients' own checks (/mcp, /hooks, the plugin doctor).",
+]
+# The selected token practice's client wiring (docs/token-efficiency-stack.md, "Coverage check").
+CONTEXT_MODE_PLUGIN = "context-mode@context-mode"
+WIRED_MCP_SERVERS = ("serena", "socraticode", "ai-memory")
+DEPTH_VARIABLE = "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH"
+CONCURRENCY_VARIABLE = "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS"
+EFFORT_VARIABLE = "CLAUDE_CODE_EFFORT_LEVEL"  # any value overrides every child's effort
+AGENT_TEAMS_VARIABLE = "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"  # the agent-teams opt-in
+CLIENT_FILE_LIMIT = 1_048_576
+CLIENT_WIRING_KEYS = {
+    "claude": ("rtk_hook", "ai_memory_hook_events", "context_mode_plugin_enabled", "subagent_spawn_depth_1",
+               "workflow_concurrency_set", "effort_level_env_unset", "agent_teams_off"),
+    "project": ("settings_depth_and_concurrency", "codex_mcp_servers_present"),
+    "codex": ("rtk_instructions", "context_mode_plugin_enabled", "mcp_servers_present", "ai_memory_hook_events"),
+}
 
 
 class InvalidManifest(ValueError):
@@ -168,7 +199,171 @@ def command_present(name: str, host: dict) -> bool:
     return any(shutil.which(alias) is not None for alias in aliases)
 
 
-def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[str] | None = None) -> dict:
+def read_client_file(path: Path, kind: str):
+    """A client file parsed as "json", "toml" or "text": {} or "" when absent, None when unreadable,
+    oversized or malformed. Parsed content stays in this module; callers reduce it to booleans and counts."""
+    try:
+        if not os.path.lexists(path):
+            return "" if kind == "text" else {}
+        if not path.is_file() or path.stat().st_size > CLIENT_FILE_LIMIT:
+            return None
+        text = path.read_text(encoding="utf-8")
+        if kind == "text":
+            return text
+        if kind == "json":
+            data = json.loads(text)
+        else:
+            import tomllib  # standard library from Python 3.11; older interpreters report the file unreadable
+            data = tomllib.loads(text)
+    except (ImportError, OSError, UnicodeError, ValueError, RecursionError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def table(value) -> dict:
+    return value if isinstance(value, dict) else {}
+
+
+def hook_argvs(groups, tool: str | None = None):
+    """argv of each command hook in one event's matcher groups; with ``tool``, only groups whose
+    matcher covers it (absent, "" and "*" match every tool, anything else must match the whole name)."""
+    for group in groups if isinstance(groups, list) else []:
+        if not isinstance(group, dict):
+            continue
+        matcher = group.get("matcher")
+        if tool is not None and matcher not in (None, "", "*"):
+            try:
+                if not isinstance(matcher, str) or re.fullmatch(matcher, tool) is None:
+                    continue
+            except re.error:
+                continue
+        hooks = group.get("hooks")
+        for hook in hooks if isinstance(hooks, list) else []:
+            if isinstance(hook, dict) and hook.get("type") == "command" and isinstance(hook.get("command"), str):
+                try:
+                    yield shlex.split(hook["command"])
+                except ValueError:
+                    continue
+
+
+def runs(argv: list[str], program: str) -> bool:
+    return bool(argv) and PurePosixPath(argv[0]).name == program
+
+
+def ai_memory_hook_events(hooks) -> int:
+    """How many hook events run an ``ai-memory ... hook`` command (the command is never returned)."""
+    return sum(any(runs(argv, "ai-memory") and "hook" in argv[1:] for argv in hook_argvs(groups))
+               for groups in table(hooks).values())
+
+
+def settings_env_text(settings: dict, name: str) -> str | None:
+    """A settings ``env`` entry as text, compared inside this module and never returned by it."""
+    value = table(settings.get("env")).get(name)
+    return str(value).strip() if isinstance(value, (str, int)) and not isinstance(value, bool) else None
+
+
+def depth_and_concurrency(settings: dict) -> tuple[bool, bool]:
+    """Subagent spawn depth exactly 1; a workflow concurrency cap within the client's accepted 1-256."""
+    concurrency = settings_env_text(settings, CONCURRENCY_VARIABLE) or ""
+    return (settings_env_text(settings, DEPTH_VARIABLE) == "1",
+            re.fullmatch(r"[0-9]{1,3}", concurrency) is not None and 1 <= int(concurrency) <= 256)
+
+
+def mcp_servers_present(config) -> dict:
+    """Codex ``mcp_servers`` table names only (a table with ``enabled = false`` is not present)."""
+    if config is None:
+        return dict.fromkeys(WIRED_MCP_SERVERS)
+    servers = table(config.get("mcp_servers"))
+    return {name: isinstance(servers.get(name), dict) and servers[name].get("enabled") is not False
+            for name in WIRED_MCP_SERVERS}
+
+
+def claude_wiring(claude_dir: Path, env) -> dict:
+    settings = read_client_file(claude_dir / "settings.json", "json")
+    if settings is None:
+        return dict.fromkeys(CLIENT_WIRING_KEYS["claude"])
+    hooks = {} if settings.get("disableAllHooks") is True else table(settings.get("hooks"))
+    names = table(settings.get("env"))
+    plugin = table(settings.get("enabledPlugins")).get(CONTEXT_MODE_PLUGIN) is True
+    if plugin:  # enabled in settings and recorded in the native plugin registry
+        registry = read_client_file(claude_dir / "plugins" / "installed_plugins.json", "json")
+        installs = None if registry is None else table(registry.get("plugins")).get(CONTEXT_MODE_PLUGIN)
+        plugin = None if registry is None else isinstance(installs, list) and bool(installs)
+    depth, concurrency = depth_and_concurrency(settings)
+    return {
+        "rtk_hook": any(runs(argv, "rtk") and argv[1:3] == ["hook", "claude"]
+                        for argv in hook_argvs(hooks.get("PreToolUse"), "Bash")),
+        "ai_memory_hook_events": ai_memory_hook_events(hooks),
+        "context_mode_plugin_enabled": plugin,
+        "subagent_spawn_depth_1": depth,
+        "workflow_concurrency_set": concurrency,
+        "effort_level_env_unset": EFFORT_VARIABLE not in names and EFFORT_VARIABLE not in env,
+        "agent_teams_off": AGENT_TEAMS_VARIABLE not in names and AGENT_TEAMS_VARIABLE not in env,
+    }
+
+
+def codex_wiring(codex_dir: Path) -> dict:
+    config = read_client_file(codex_dir / "config.toml", "toml")
+    agents = read_client_file(codex_dir / "AGENTS.md", "text")
+    hooks = read_client_file(codex_dir / "hooks.json", "json")
+    entry = {} if config is None else table(table(config.get("plugins")).get(CONTEXT_MODE_PLUGIN))
+    plugin = None if config is None else entry.get("enabled") is True
+    if plugin:  # enabled in config.toml and present in the native plugin cache
+        try:
+            plugin = any(path.is_file() for path in
+                         codex_dir.glob("plugins/cache/context-mode/context-mode/*/.codex-plugin/plugin.json"))
+        except OSError:
+            plugin = None
+    return {
+        "rtk_instructions": None if agents is None else "RTK.md" in agents and (codex_dir / "RTK.md").is_file(),
+        "context_mode_plugin_enabled": plugin,
+        "mcp_servers_present": mcp_servers_present(config),
+        "ai_memory_hook_events": None if hooks is None else ai_memory_hook_events(hooks.get("hooks")),
+    }
+
+
+def project_wiring(root: Path) -> dict:
+    settings = read_client_file(root / ".claude" / "settings.json", "json")
+    return {"settings_depth_and_concurrency": None if settings is None else all(depth_and_concurrency(settings)),
+            "codex_mcp_servers_present": mcp_servers_present(read_client_file(root / ".codex" / "config.toml", "toml"))}
+
+
+def only_flags(value) -> bool:
+    """Booleans, counts, None (unreadable) and objects of them: never text read from a file."""
+    if value is None or isinstance(value, bool) or (isinstance(value, int) and value >= 0):
+        return True
+    return isinstance(value, dict) and all(isinstance(key, str) and only_flags(item) for key, item in value.items())
+
+
+def fixed_wiring(result) -> bool:
+    """The exact CLIENT_WIRING_KEYS shape, each server map naming WIRED_MCP_SERVERS, and only flags."""
+    if not isinstance(result, dict) or set(result) != set(CLIENT_WIRING_KEYS):
+        return False
+    if any(not isinstance(result[group], dict) or set(result[group]) != set(keys)
+           for group, keys in CLIENT_WIRING_KEYS.items()):
+        return False
+    servers = (result["project"]["codex_mcp_servers_present"], result["codex"]["mcp_servers_present"])
+    return (all(isinstance(item, dict) and set(item) == set(WIRED_MCP_SERVERS) for item in servers)
+            and only_flags(result))
+
+
+def client_wiring(root: Path, env=None) -> dict:
+    """Opt-in check that the selected token practice is wired into the native clients.
+
+    Reads the user Claude and Codex homes (CLAUDE_CONFIG_DIR and CODEX_HOME when set) and this
+    checkout's project files. Fixed keys only; None marks a file that is unreadable or malformed."""
+    env = os.environ if env is None else env
+    home = env.get("HOME") or str(Path.home())
+    result = {"claude": claude_wiring(Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude"), env),
+              "project": project_wiring(root),
+              "codex": codex_wiring(Path(env.get("CODEX_HOME") or f"{home}/.codex"))}
+    if not fixed_wiring(result):
+        raise AssertionError("client wiring must be the fixed keys with boolean or count values")
+    return result
+
+
+def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[str] | None = None,
+                     *, with_client_wiring: bool = False, env=None) -> dict:
     manifest = manifest.absolute()
     root = (root or manifest.parent.parent).resolve()
     host = {"os": platform.system().lower(), "architecture": platform.machine().lower(),
@@ -176,6 +371,9 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
     result = {"schema_version": 1, "status": "prerequisites_missing", "platform": host,
               "manifest": {"status": "invalid"}, "profiles": [], "errors": [],
               "runtime_acceptance_verified": False, "limitations": LIMITATIONS.copy()}
+    if with_client_wiring:
+        result["client_wiring"] = client_wiring(root, env)
+        result["limitations"] = [item for item in LIMITATIONS if item != NO_CLIENT_STATE] + CLIENT_WIRING_LIMITATIONS
     try:
         require(manifest.resolve().is_relative_to(root), "manifest must be inside the repository root")
         require(manifest.is_file(), "manifest must be a regular file")
@@ -219,8 +417,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--repo-root", type=Path, help="Defaults to the manifest's grandparent directory")
     parser.add_argument("--profile", action="append", help="Profile ID; repeat to check multiple profiles")
     parser.add_argument("--json", action="store_true", help="Emit the bounded report as JSON")
+    parser.add_argument("--client-wiring", action="store_true",
+                        help="Also report whether the selected token practice is wired into the native Claude Code "
+                             "and Codex clients (fixed booleans and hook-event counts only)")
     args = parser.parse_args(argv)
-    report = inspect_adoption(args.manifest, args.repo_root, args.profile)
+    report = inspect_adoption(args.manifest, args.repo_root, args.profile, with_client_wiring=args.client_wiring)
     if args.json:
         print(json.dumps(report, indent=2))
     else:
@@ -230,6 +431,8 @@ def main(argv: list[str] | None = None) -> int:
             missing = [item["name"] for item in profile["commands"] if not item["present"]]
             missing += [item["path"] for item in profile["recipes"] if not item["present"]]
             print(f"{profile['id']}: {profile['status']}" + (f" (missing: {', '.join(missing)})" if missing else ""))
+        if "client_wiring" in report:
+            print("Client wiring: " + json.dumps(report["client_wiring"], sort_keys=True))
         for error in report["errors"]:
             print(f"Error: {error}")
         for limitation in report["limitations"]:

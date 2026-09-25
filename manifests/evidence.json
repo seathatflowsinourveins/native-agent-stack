@@ -3241,8 +3241,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "d99a60fa03e673334440ec1bb73ab2735d88d6dcfb981be9af830971589cd41f",
-      "bytes": 15375
+      "sha256": "d778ad47fc88d53c095c33cf38baffe25367ae3da1e9c5301161cace33d0d5ab",
+      "bytes": 16282
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -3316,8 +3316,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "5d846771a38217897f55595dd8547e826422755e08c794fbeda8dc2ba9b7de39",
-      "bytes": 18283
+      "sha256": "c3dde56e7ac26e6e6e90754aeb5cf26fc7132790b3e19cded90e064d7d4e6c69",
+      "bytes": 19228
     },
     {
       "path": "adoption/paired/README.md",
@@ -9677,8 +9677,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "0f9e0495f820c1e6856367dd774fa1da2b18e73b21f6c22b29089a034deaaf38",
-      "bytes": 284651
+      "sha256": "727407c577b2077937d0f45c094efc524ba640d2f446d4d4829adb2277532cb7",
+      "bytes": 285667
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -10432,8 +10432,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "eaa9b07d892aeac50429b906c7eb3e4f9ab16d7d6cc7b1639c986fccd507fc01",
-      "bytes": 17128
+      "sha256": "06949c67c8caec4813d371bb8566f8505a05d54967250aa2cb3c98679886dd5e",
+      "bytes": 17673
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -10532,13 +10532,13 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "a351cca93e2eb079d52a92d8fb270c527d8ae92d6058f21928e4019b897331ed",
+      "sha256": "e960d359de2d750eea69acd3e3d1dd9e9b33bb82f8e06b3e30d6fa9ffa51b0e2",
       "bytes": 157375
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "336a56a1fc9f936fdfc69eb62fd6b57acf33ed31b3cb2b443d34004af1b76a8a",
-      "bytes": 12365
+      "sha256": "d535cecf183578eef9ca05eef68d408a96203335489b5934f4e7a1c609165e7d",
+      "bytes": 15384
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -30217,8 +30217,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "2a52657e7ca6ebf7b447257d9f84e0e3314bf245dc34bf3e6e02db0e4354f182",
-      "bytes": 12759
+      "sha256": "0569dfb9805bf56fee77a71273074441c9deb3ceba8f0117417d8c6ea384e6c8",
+      "bytes": 23773
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -30497,8 +30497,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "573445d0cd82e678460a080d0f0d6dd9fbf8b4d18ee189019a846e6d4c19db55",
-      "bytes": 12936
+      "sha256": "65d5e4b208461e04d08c933e7d83eedb81157573cf0b3135c425b947f847565f",
+      "bytes": 32963
     },
     {
       "path": "tests/test_adoption_version_probes.py",

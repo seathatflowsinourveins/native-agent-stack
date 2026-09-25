@@ -38,6 +38,7 @@ which you install through their recipes ([bootstrap step 2](bootstrap.md)).
 | --- | --- | --- | --- | --- |
 | `foundation-cpu` | Codex, Claude Code, Context Mode, RTK, QMD BM25, explicitly scoped ai-memory, MCPorter | all 7 | 5 of 7 | Native client setup; one useful context/document call and scoped memory retrieval. On macOS use `macos-arm64-foundation` |
 | `macos-arm64-foundation` | macOS only, drafted: Codex, Claude Code, Context Mode, ai-memory, MCPorter, llama.cpp Metal embedding, Qdrant, SocratiCode | 5 of 8 | all 8 | The macOS acceptance lane on [the macOS page](platforms/macos-arm64.md); not accepted |
+| `token-efficiency` | Drafted, not accepted: the selected token practice (RTK, Context Mode, explicit-file Repomix, guarded Headroom and TOON, ccusage, QMD, MarkItDown, Serena, SocratiCode, ai-memory, MCPorter) wired into both native clients | 8 of 14 | 6 of 14 | The [coverage check](../docs/token-efficiency-stack.md#coverage-check) for install and client wiring, then one useful native call per tool in each client, recorded through a PR. The bootstraps pin only part of it; install the rest through their recipes |
 | `research-runtime` | Historical hash-locked SDK/DuckDB, Dagu and LEAN comparison lane | 2 of 11 | 2 of 11 | Reproduce the retained comparison; this profile does not override the Nautilus destination |
 | `trading-nautilus` | Selected pinned Nautilus engine and separate Alpaca boundary | none of 2 | none of 2 | Reproduce the bounded engine check; qualify each broker independently |
 | `observability` | Collector, Prometheus, Loki, Grafana, Alertmanager, ntfy | none of 6 | none of 6 | Native config validation, actual task/event delivery, matching usage categories |
@@ -55,7 +56,7 @@ acceptance on a destination host and do not enable broker access.
 
 1. Clone this repository and check out the pinned release ([bootstrap step 0](bootstrap.md)); when a newer release is pinned later, follow [moving a host to a new release](update.md#moving-a-host-to-a-new-release). Read `AGENTS.md`; Claude's `CLAUDE.md` imports the same instructions. Record `git rev-parse HEAD` privately. Inspect upstream installers, version pins and checksums in the selected recipes.
 2. Run the two portable integrity validators below. Choose explicit installation/project paths. Install only the selected native tools through their recipe links, preserving existing client settings.
-3. Run the nonmutating prerequisite report. It reports executable presence, platform compatibility and recipe references. It never logs in, edits client configuration, starts services, executes catalog commands or certifies functional acceptance.
+3. Run the nonmutating prerequisite report. It reports executable presence, platform compatibility and recipe references. It never logs in, edits client configuration, starts services, executes catalog commands or certifies functional acceptance. Its opt-in `--client-wiring` also reads fixed Claude Code and Codex configuration files and reports, as booleans and counts only, whether the selected token practice is wired into both clients.
 4. Recreate the SDK only for the research profile using the [transitive lock](sdk/README.md). Run useful local fixtures before any model request. Base tests can skip DuckDB-dependent checks; the locked SDK acceptance must retain test and skip counts.
 5. Register selected plugins/MCP tools through each client's native commands. Resolve template placeholders deliberately. JSON/TOML strings do not generally expand shell variables. Select the memory workspace/project pair and explicit QMD/code-RAG project scope.
 6. Use native sign-in on the target host. Then verify the actual client's tool discovery and one bounded useful call. Treat Linux Codex, Linux Claude and Desktop as separate client scopes. No authentication store is copied.
@@ -69,6 +70,8 @@ python3 scripts/validate_catalogs.py
 "$PYTHON_BIN" scripts/adoption_status.py --profile foundation-cpu --json
 # Or select the supported interpreter through native uv:
 uv run --no-project --python 3.13 python scripts/adoption_status.py --profile foundation-cpu --json
+# The selected token practice: install coverage plus native client wiring (booleans and counts only):
+"$PYTHON_BIN" scripts/adoption_status.py --profile token-efficiency --client-wiring --json
 # After the SDK recipe, use that environment to check research prerequisites:
 "$SDK_ENV/bin/python" scripts/adoption_status.py --profile research-runtime --json
 ```
