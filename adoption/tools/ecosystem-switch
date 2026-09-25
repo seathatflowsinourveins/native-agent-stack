@@ -280,17 +280,53 @@ def available_memory_kib() -> int | None:
 # Locking
 # --------------------------------------------------------------------------------------
 
+LOCK_POLL_SECONDS = 0.2
+
+# Major finding (round 9): the confirm-or-revert timer's own `rollback --txn T --if-unconfirmed`
+# callback used to take switch_locks() the exact same non-blocking way every interactive/manual
+# command does -- Busy (EXIT_BUSY) instantly, with nothing left to retry it, whenever another
+# switch command or a bootstrap-linux.sh run (which holds bootstrap.lock for its own whole
+# duration, adoption/bootstrap-linux.sh:243-244) merely happened to be running at the exact
+# instant this one-shot systemd timer fired. Nothing else in the tool ever re-fires a lost
+# callback (cmd_recover deliberately skips a txn still pending_confirmation: see cmd_recover's own
+# docstring), so that single lost fire left the txn pending_confirmation forever -- silently
+# contradicting lifecycle.md's documented "automatic revert" promise until an operator happened to
+# notice and re-run the command by hand. `--if-unconfirmed` alone now waits out a busy lock, up to
+# this many seconds, before giving up (still EXIT_BUSY -- see schedule_confirm_or_revert's own
+# Restart=on-failure policy below, which is what actually retries a busy exit past this bound).
+# Overridable so a test can use a short, deterministic bound instead of the real production
+# default; loosening or tightening it is a resilience/latency trade-off, never a safety floor like
+# memory_gate_issue's DEFAULT_MIN_MEMORY_KIB, so this has no separate test-only-loosening variable.
+DEFAULT_IF_UNCONFIRMED_LOCK_WAIT_SECONDS = 300
+
+
+def if_unconfirmed_lock_wait_seconds() -> float:
+    override = os.environ.get("ECOSYSTEM_SWITCH_IF_UNCONFIRMED_LOCK_WAIT_SECONDS")
+    return float(override) if override is not None else float(DEFAULT_IF_UNCONFIRMED_LOCK_WAIT_SECONDS)
+
+
 @contextlib.contextmanager
-def held_lock(path: Path, busy_message: str):
+def held_lock(path: Path, busy_message: str, *, deadline: float | None = None):
+    """Exclusive flock on ``path``. Non-blocking (today's behaviour for every interactive/manual
+    command) when ``deadline`` is None: one attempt, Busy immediately on contention. When
+    ``deadline`` is given (a ``time.monotonic()`` value; round 9, used only by the
+    confirm-or-revert timer's own ``--if-unconfirmed`` call -- see ``switch_locks``), polls until
+    either the lock is acquired or ``deadline`` passes, then raises Busy the same way -- never
+    blocks forever, and never makes an interactive command (or apply's own automatic post-verify
+    rollback) wait, both of which must still fail fast."""
     path.parent.mkdir(parents=True, exist_ok=True)
     handle = open(path, "a+")
     try:
-        try:
-            fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except OSError as error:
-            if error.errno in (errno.EACCES, errno.EAGAIN):
-                raise Busy(busy_message) from None
-            raise
+        while True:
+            try:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except OSError as error:
+                if error.errno not in (errno.EACCES, errno.EAGAIN):
+                    raise
+                if deadline is None or time.monotonic() >= deadline:
+                    raise Busy(busy_message) from None
+                time.sleep(min(LOCK_POLL_SECONDS, max(0.0, deadline - time.monotonic())))
         yield
     finally:
         with contextlib.suppress(OSError):
@@ -299,11 +335,21 @@ def held_lock(path: Path, busy_message: str):
 
 
 @contextlib.contextmanager
-def switch_locks(root: Path):
+def switch_locks(root: Path, *, wait_seconds: float | None = None):
     """The tool's own lock, then the bootstrap lock bootstrap-linux.sh also takes
-    (root/bootstrap.lock), so a switch operation and a bootstrap run never interleave."""
-    with held_lock(root / "switch" / "switch.lock", "another ecosystem-switch operation is running"):
-        with held_lock(root / "bootstrap.lock", "an ecosystem bootstrap is running"):
+    (root/bootstrap.lock), so a switch operation and a bootstrap run never interleave.
+
+    ``wait_seconds`` (round 9): None (every command except the confirm-or-revert timer's own
+    ``--if-unconfirmed`` call -- see cmd_rollback) keeps today's behaviour, a single non-blocking
+    attempt on each lock. When given, both locks share ONE overall deadline
+    (``time.monotonic() + wait_seconds``, computed once here, not re-armed per lock): switch.lock
+    contention may not consume the whole budget and leave nothing for bootstrap.lock (or vice
+    versa) -- whichever lock is still busy once the shared deadline passes raises Busy
+    (EXIT_BUSY), same exit code as today, just possibly later."""
+    deadline = (time.monotonic() + wait_seconds) if wait_seconds is not None else None
+    with held_lock(root / "switch" / "switch.lock", "another ecosystem-switch operation is running",
+                    deadline=deadline):
+        with held_lock(root / "bootstrap.lock", "an ecosystem bootstrap is running", deadline=deadline):
             yield
 
 
@@ -1212,6 +1258,26 @@ def cmd_apply(args) -> int:
         return 0
 
 
+CONFIRM_OR_REVERT_RESTART_SEC = 30
+
+
+def _confirm_or_revert_start_limit(seconds: int) -> tuple[int, int]:
+    """(StartLimitIntervalSec, StartLimitBurst) for the transient unit's Restart=on-failure
+    policy (see schedule_confirm_or_revert): sized so a busy exit (EXIT_BUSY -- switch_locks'
+    own bounded wait for `--if-unconfirmed`, see held_lock, already exhausts one such wait before
+    ever exiting non-zero) keeps being retried, every CONFIRM_OR_REVERT_RESTART_SEC seconds, for
+    AT LEAST the same ``seconds`` the operator originally chose for --confirm-within: a reasonable
+    proxy for how long this rollout tolerates a transient lock hold (e.g. a bootstrap-linux.sh
+    run) before an operator must intervene by hand, verified per systemd.unit(5)'s own
+    StartLimitIntervalSec=/StartLimitBurst= semantics ("units started more than burst times within
+    an interval are not permitted to start any more"). Never shorter than a couple of
+    CONFIRM_OR_REVERT_RESTART_SEC cycles even for a very short --confirm-within (e.g. a test's
+    ``--confirm-within 1``), so a single unlucky retry is never the only one budgeted."""
+    interval = max(int(seconds), CONFIRM_OR_REVERT_RESTART_SEC * 2)
+    burst = max(2, (interval + CONFIRM_OR_REVERT_RESTART_SEC - 1) // CONFIRM_OR_REVERT_RESTART_SEC + 1)
+    return interval, burst
+
+
 def schedule_confirm_or_revert(root: Path, txn: str, seconds: int) -> None:
     """Ask systemd-run (or its test stub, ECOSYSTEM_SWITCH_SYSTEMD_RUN) to call this same
     executable back with `rollback --txn TXN --if-unconfirmed` after ``seconds``. If even
@@ -1219,17 +1285,37 @@ def schedule_confirm_or_revert(root: Path, txn: str, seconds: int) -> None:
     reverting immediately: fall back to an in-process rollback right away. ECO_INSTALL_ROOT and
     the test-stub variables are forwarded explicitly with --setenv=: a systemd --user unit does
     not inherit this process's environment on its own, so a non-default root (or a test's
-    systemctl/systemd-run stub) would otherwise act on the default root once the timer fires."""
+    systemctl/systemd-run stub) would otherwise act on the default root once the timer fires.
+
+    Major finding (round 9): the transient service used to have no Restart= policy at all -- one
+    failed callback (e.g. EXIT_BUSY from switch_locks, even past the round-9 bounded wait held_lock
+    now gives `--if-unconfirmed`) was never retried by systemd itself, so an operator had to
+    notice a stuck pending_confirmation txn and re-run `rollback --txn ... --if-unconfirmed` by
+    hand -- silently contradicting lifecycle.md's documented automatic-revert promise.
+    Restart=on-failure with RestartSec=CONFIRM_OR_REVERT_RESTART_SEC, plus a
+    StartLimitIntervalSec=/StartLimitBurst= pair sized by _confirm_or_revert_start_limit to keep
+    retrying for at least ``seconds``, makes systemd itself retry a busy exit automatically
+    (verified against `systemd-run --help`/systemd.service(5)/systemd.unit(5) on this host,
+    systemd 255: `-p/--property=NAME=VALUE` "[s]ets a property on the ... service unit", and
+    Restart=/RestartSec=/StartLimitIntervalSec=/StartLimitBurst= are exactly the documented
+    directive names -- not run end-to-end against a real systemd instance, since every test here
+    (and the real transient unit's own callback) only ever exercises the argv this function
+    builds, via ECOSYSTEM_SWITCH_SYSTEMD_RUN's stub)."""
     self_path = str(Path(sys.argv[0]).resolve())
     setenv_args = []
     for name in ("ECO_INSTALL_ROOT", "ECOSYSTEM_SWITCH_SYSTEMCTL", "ECOSYSTEM_SWITCH_SYSTEMD_RUN",
                  "ECOSYSTEM_SWITCH_ACTOR", "ECOSYSTEM_SWITCH_MIN_MEMORY_KIB",
-                 "ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB"):
+                 "ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB", "ECOSYSTEM_SWITCH_IF_UNCONFIRMED_LOCK_WAIT_SECONDS"):
         value = os.environ.get(name)
         if value is not None:
             setenv_args.append(f"--setenv={name}={value}")
+    start_limit_interval, start_limit_burst = _confirm_or_revert_start_limit(seconds)
     argv = [*systemd_run_argv(), "--user", f"--on-active={seconds}s",
-            f"--unit=ecosystem-switch-revert-{txn}", *setenv_args, "--", sys.executable, self_path,
+            f"--unit=ecosystem-switch-revert-{txn}",
+            "--property=Restart=on-failure", f"--property=RestartSec={CONFIRM_OR_REVERT_RESTART_SEC}",
+            f"--property=StartLimitIntervalSec={start_limit_interval}",
+            f"--property=StartLimitBurst={start_limit_burst}",
+            *setenv_args, "--", sys.executable, self_path,
             "rollback", "--txn", txn, "--if-unconfirmed"]
     try:
         result = run_captured(argv, env=dict(os.environ))
@@ -1272,6 +1358,19 @@ def cmd_confirm(args) -> int:
         record = state["txns"].get(args.txn)
         if record is None:
             raise SwitchError(f"no such txn {args.txn!r}")
+        if record.get("status") == "recorded":
+            # Minor finding (round 9): a baseline/resync/prune id is a single-shot, non-
+            # transactional record (recompute_state's own "recorded" status, reached immediately
+            # -- see that function's own comment) -- it never carries a confirm_target of
+            # "confirm_pending" (only apply's own verify_pass does) and never becomes STANDING,
+            # so there is nothing pending_confirmation about it to confirm. Before this check,
+            # `confirm --txn` on one of these exited 0 and recompute_state's own txn_confirm
+            # branch relabelled it "applied" in status/state.json regardless of its actual op kind
+            # -- harmless to rollback_txn/_superseding_txn (both filter forward entries to
+            # OPERATION_KINDS, which baseline/resync/prune never populate), but a misleading
+            # status/state.json entry for a record that was never an apply/relink at all.
+            raise SwitchError(f"txn {args.txn!r} is a baseline/resync/prune record, not a "
+                               "transactional apply/relink; nothing to confirm")
         if record.get("status") == "rolled_back":
             raise SwitchError(f"txn {args.txn!r} was already rolled back; cannot confirm it")
         if record.get("status") == "verify_failed":
@@ -1432,7 +1531,8 @@ def _link_reversal_issue(root: Path, entry: dict, *, live_target=_UNSET) -> str 
     return None
 
 
-def _rollback_precheck_issues(root: Path, non_restart_entries: list[dict]) -> list[str]:
+def _rollback_precheck_issues(root: Path, non_restart_entries: list[dict],
+                               already_reversed: frozenset[tuple[str, str | None]] = frozenset()) -> list[str]:
     """The all-entries pre-check ``rollback_txn`` runs before mutating anything (round 7),
     corrected (round 8 major-finding fix; see that function's own comment and invariant (c) in
     tests/test_adoption_switch_model.py) to walk ``non_restart_entries`` in the SAME
@@ -1459,20 +1559,29 @@ def _rollback_precheck_issues(root: Path, non_restart_entries: list[dict]) -> li
     also chain correctly), since both op kinds share the same ``pre_sha256``/``post_sha256`` fields
     and meaning.
 
-    An entry an earlier, interrupted rollback attempt already reversed for real needs no special
-    case here: seeding a surface's simulated value from the live filesystem/symlink on first touch
-    already reads back exactly what that real reversal left behind, which then matches this same
-    entry's own ``from``/``pre_sha256`` (the "already reverted" branch both underlying checks
-    already accept) -- so it flows through this same walk correctly with no separate
-    ``already_reversed`` lookup needed here, unlike the real reversal loop below, which still needs
-    that set to avoid re-mutating (and re-ledgering) work already done."""
+    ``already_reversed`` (minor finding, round 9; the caller's own set, keyed exactly like the
+    real reversal loop below keys it: (bare forward op, surface)) skips the CAS check entirely for
+    an entry an EARLIER, interrupted attempt already reversed for real, seeding the simulated
+    chain at exactly what that reversal set (``from``) instead. Round 8's own docstring here argued
+    this needed no special case, since seeding a surface's simulated value from a fresh live read
+    on first touch already reads back what that real reversal left behind -- true only until
+    something ELSE changes that SAME, already-settled surface afterwards (e.g. a bootstrap run
+    that bumps a pin and repoints bin/foo out from under it): a fresh read then disagrees with both
+    this entry's ``to`` and ``from``, and this all-entries pre-check refused the WHOLE resumed
+    rollback/recover over an entry the real reversal loop below would never even revisit (it skips
+    exactly this same key). Latent and narrow either way: it needs an interruption plus a later,
+    unrelated out-of-band change on the specific surface an earlier attempt already reversed."""
     simulated_links: dict[str, str | None] = {}
     simulated_content: dict[str, str | None] = {}
     issues: list[str] = []
     for entry in reversed(non_restart_entries):
         op = entry.get("op")
+        already = (op, entry.get("surface")) in already_reversed
         if op == "link":
             key = str(root / entry["surface"])
+            if already:
+                simulated_links[key] = entry.get("from")
+                continue
             if key not in simulated_links:
                 simulated_links[key] = read_link_target(Path(key))
             issue = _link_reversal_issue(root, entry, live_target=simulated_links[key])
@@ -1483,6 +1592,9 @@ def _rollback_precheck_issues(root: Path, non_restart_entries: list[dict]) -> li
         elif op in ("text-replace", "file-write"):
             target = resolve_surface_path(root, entry["surface"])
             key = str(target)
+            if already:
+                simulated_content[key] = entry.get("pre_sha256")
+                continue
             if key not in simulated_content:
                 simulated_content[key] = sha256_file(target)
             issue = _write_reversal_issue(target, entry, current=simulated_content[key])
@@ -1609,7 +1721,7 @@ def rollback_txn(root: Path, txn: str) -> list[str]:
     # rollback refuses whole instead of partway. data-backup/data-restore and unit-restart
     # (deliberately reversed last, and not a value-drift question in the same sense -- see below)
     # are unaffected.
-    precheck_issues = _rollback_precheck_issues(root, non_restart_entries)
+    precheck_issues = _rollback_precheck_issues(root, non_restart_entries, frozenset(already_reversed))
     if precheck_issues:
         if len(precheck_issues) == 1:
             raise SwitchError(precheck_issues[0])
@@ -1755,7 +1867,11 @@ def close_superseded_txn(root: Path, txn: str) -> bool:
 
 def cmd_rollback(args) -> int:
     root = eco_root()
-    with switch_locks(root):
+    # Major finding (round 9): only --if-unconfirmed (the confirm-or-revert timer's own callback;
+    # never an interactive/manual `rollback`) waits out a busy lock instead of failing fast -- see
+    # switch_locks/held_lock and DEFAULT_IF_UNCONFIRMED_LOCK_WAIT_SECONDS.
+    wait_seconds = if_unconfirmed_lock_wait_seconds() if args.if_unconfirmed else None
+    with switch_locks(root, wait_seconds=wait_seconds):
         ledger = Ledger(root)
         state = load_state(root)
         if args.txn:
@@ -1953,18 +2069,31 @@ def cmd_recover(args) -> int:
 
     Coordinator decision on the txn state machine (round 5): an in_progress txn (the first shape)
     is closed either by rolling it BACK (the ordinary case -- nothing later touched its component,
-    so reverse it exactly as a manual `rollback` would) or, when a later txn already became the
-    component's own updated_txn (provable from the ledger's own recorded entries -- each op is
-    ledgered only after it runs, never write-ahead, so this can only see a later change that
-    already finished being ledgered itself; a check that agrees with rollback_txn/cmd_rollback's
-    own for every txn this function ever evaluates, though it is not the identical code: see
-    close_superseded_txn), by rolling FORWARD -- closing it as `superseded` without touching
-    anything, since a physical reversal at that point would clobber the later, already-verified
-    apply/relink. Before this split existed, the superseded case was only ever refused (never
-    closed), which left the txn in_progress forever and, with it, `open_txn_for_component`'s guard
-    permanently refusing every later `apply`/`adopt --relink` on that component -- the major-finding
-    regression this closes. Never 'completes' an interrupted apply/relink as if it had itself
-    succeeded, either way.
+    so reverse it exactly as a manual `rollback` would) or, when a later txn already stands for
+    this component (provable from the ledger's own recorded order and status alone, never a live
+    value -- see `_superseding_txn`'s own docstring; round 8 made close_superseded_txn call that
+    SAME function directly, the identical code rollback_txn/cmd_rollback use to refuse a manual
+    rollback of a superseded txn, not merely a second read that happens to agree with it), by
+    rolling FORWARD -- closing it as `superseded` without touching anything, since a physical
+    reversal at that point would clobber the later, already-verified apply/relink. Before this
+    split existed, the superseded case was only ever refused (never closed), which left the txn
+    in_progress forever and, with it, `open_txn_for_component`'s guard permanently refusing every
+    later `apply`/`adopt --relink` on that component -- the major-finding regression this closes.
+    Never 'completes' an interrupted apply/relink as if it had itself succeeded, either way.
+    Minor finding (round 9, unresolved -- a real, narrow usability gap, not a correctness bug):
+    round 8 also removed the only in-tool way to close an in_progress txn superseded ONLY by a
+    later `adopt --resync` (never a real standing apply/relink) -- `_superseding_txn` deliberately
+    excludes resync (see its own docstring) so a same-value resync can never block a PENDING txn's
+    confirm-or-revert timer, but that same exclusion means close_superseded_txn can no longer treat
+    a resync-accepted, genuinely different out-of-band value as grounds to close a crashed
+    in_progress txn either -- it falls through to the ordinary rollback_txn reversal, which then
+    refuses on drift (the live value matches neither this txn's own `to` nor `from`), leaving the
+    component stuck (apply/relink also refuse, via open_txn_for_component, until the drift is
+    undone by hand). Not fixed this round: closing it safely needs a THIRD, narrower check
+    (distinct from both `_superseding_txn`'s pending-timer question and a plain live-value read)
+    that only `close_superseded_txn`'s own in_progress-only, never-itself-authoritative case could
+    use, plus new tests proving it does not reopen the round-8 regression above -- out of scope for
+    a fix round; see sota-rollout-20260925 round 9's own task record.
 
     Coordinator decision (round 6): the ordinary "roll it BACK" branch above calls rollback_txn,
     which is now itself idempotent and resumable -- so an in_progress txn whose OWN rollback was
@@ -2132,9 +2261,10 @@ def prune_candidates(root: Path) -> list[dict]:
         if record.get("status") in ("rolled_back", "superseded"):
             # A superseded txn (round 5: `recover` closes one this way rather than reversing it,
             # see close_superseded_txn) is never a live rollback target either -- both
-            # rollback_txn's own guard and cmd_rollback's pre-check permanently refuse rolling one
-            # back once a later txn has become its component's updated_txn, so its own "previous"
-            # root can be pruned the same as an already-rolled-back txn's.
+            # rollback_txn's own guard and cmd_rollback's pre-check (both call `_superseding_txn`
+            # directly as of round 8) permanently refuse rolling one back once a later, standing
+            # txn already moved its component on, so its own "previous" root can be pruned the
+            # same as an already-rolled-back txn's.
             continue
         for entry in ledger.for_txn(txn):
             # An unconfirmed or already-applied txn's *previous* root is a live rollback target

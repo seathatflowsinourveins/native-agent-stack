@@ -645,8 +645,11 @@ class TildeSurfaceRollbackTests(SwitchFixture):
         # current/<id> alone used to let every OTHER entry (this bar entrypoint link, the tilde
         # text-replace surface) actually reverse and get ledgered before the drifted link's own
         # compare-and-swap raised, leaving the relink half-reversed with no way to finish it (the
-        # advised "resync" only makes the drifted value permanent, which then supersedes this txn
-        # forever, and a superseded txn is never physically reversed either).
+        # advised "resync" makes the drifted value permanent; whether that then supersedes this
+        # txn forever depends on whether anything STANDING later moved the component on --
+        # `_superseding_txn` never treats a resync alone as standing as of round 8, precisely so a
+        # resync can unblock a merely-drifted, still-reachable txn like this one, rather than
+        # entombing it -- see ConfirmAndRevertTests' own same-value-resync test).
         self.relink("bar")
         after_relink_unit_text = self.home_unit.read_text()
         other_root = self.make_tool_root("bar-9.9.9", "v9")
@@ -663,11 +666,20 @@ class TildeSurfaceRollbackTests(SwitchFixture):
                          "an entry ordered BEFORE the drifted link in the reversal loop must also be left untouched")
         self.assertEqual(os.readlink(self.root / "bin" / "bar"), str(self.root / "current" / "bar" / "bin" / "bar"),
                          "the entrypoint link must also be left untouched by the refused rollback")
-        # "rollback:intent" itself is the expected audit marker (written before the pre-check, by
-        # design -- see rollback_txn) -- no ACTUAL reversal of any forward entry must follow it.
+        # Stale-comment fix (round 9): this used to say "rollback:intent" itself is the expected
+        # audit marker "written before the pre-check, by design" -- true of round 7's ordering,
+        # not round 8's: rollback:intent is now appended only AFTER this same drift pre-check
+        # already passed (see rollback_txn's own round-8 reordering and
+        # test_a_drifted_confirm_or_revert_refusal_never_leaves_an_intent_marker_that_would_wedge_
+        # the_txn above), so a refusal here must leave NEITHER it nor any real reversal entry
+        # behind -- the filter below excludes "rollback:intent" only defensively, so this
+        # assertion still catches a partial reversal specifically even if a future regression
+        # reintroduces the marker without also reintroducing a reversal.
         reversal_entries = [e for e in switch.Ledger(self.root).all()
                             if str(e.get("op", "")).startswith("rollback:") and e.get("op") != "rollback:intent"]
         self.assertEqual(reversal_entries, [], "a refused rollback must not ledger any partial reversal")
+        self.assertFalse(any(e.get("op") == "rollback:intent" for e in switch.Ledger(self.root).all()),
+                         "a refused rollback must not leave the rollback:intent marker behind either (round 8)")
 
 
 class ApplyGateTests(SwitchFixture):
@@ -1124,6 +1136,26 @@ class ApplyGateTests(SwitchFixture):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("rolled back", result.stderr.lower())
 
+    def test_confirm_refuses_a_resync_record_not_a_transactional_txn(self):
+        # Minor finding (round 9): confirm used to accept any txn id it did not explicitly
+        # refuse -- including a baseline/resync/prune id, a single-shot, non-transactional
+        # record (recompute_state's "recorded" status) that never carries a confirm_target of
+        # "confirm_pending" and never becomes STANDING. `confirm --txn` on one exited 0 and
+        # relabelled it "applied" in status/state.json regardless of its actual op kind.
+        resync = run(self.env, "adopt", "--resync", "foo", "--reason", "operator re-observed")
+        self.assertEqual(resync.returncode, 0, resync.stderr)
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        resync_txns = [txn for txn, record in state["txns"].items() if record.get("status") == "recorded"]
+        self.assertEqual(len(resync_txns), 1, state["txns"])
+        result = run(self.env, "confirm", "--txn", resync_txns[0])
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("not", result.stderr.lower())
+        self.assertIn("baseline/resync/prune", result.stderr)
+        # The record's own status must stay "recorded", never relabelled "applied" by a txn_confirm
+        # entry that should never have been allowed to append in the first place.
+        state_after = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state_after["txns"][resync_txns[0]]["status"], "recorded")
+
     def test_missing_receipt_refuses(self):
         result = self.apply("foo", self.root_v2, "does-not-exist")
         self.assertNotEqual(result.returncode, 0)
@@ -1318,6 +1350,55 @@ class ApplyGateTests(SwitchFixture):
         self.assertEqual(len([e for e in entries if e["op"] == "rollback:done"]), 1)
         self.assertEqual(len([e for e in entries if e["op"] == "rollback:intent"]), 1,
                          "the resumed call also writes its own rollback-intent marker")
+
+    def test_resumed_rollback_ignores_later_unrelated_drift_on_an_already_reversed_surface(self):
+        # Minor finding (round 9): the all-entries pre-check used to check EVERY forward entry's
+        # live value against its own to/from, including one an EARLIER, interrupted attempt had
+        # already reversed for real (a matching rollback:<op> entry already in the ledger, which
+        # the REAL reversal loop below already knows to skip via this same `already_reversed`
+        # set). If that already-settled surface drifted again afterwards, out-of-band, for an
+        # UNRELATED reason (e.g. a bootstrap run bumping a pin) -- narrow, but not synthetic-only:
+        # config.txt here stands in for exactly that -- the pre-check refused the WHOLE resumed
+        # rollback over an entry the reversal loop would never even revisit, even though every
+        # entry it actually still needed to reverse (the link below) was untouched and reversible.
+        self.write_receipt("R1", "foo", "2.0.0")
+        config = self.root / "config.txt"
+        config.write_text("old-value")
+        txn = "multi-2"
+        ledger = switch.Ledger(self.root)
+        ledger.append(txn=txn, op="txn_begin", component="foo", surface="_txn")
+        link_fields, _inverse = switch.op_link(self.root, "current/foo", str(self.root_v2.resolve()))
+        ledger.append(txn=txn, op="link", component="foo", surface="current/foo", **link_fields)
+        backup_dir = self.root / "switch" / "backups" / txn
+        text_fields, _inverse = switch.op_text_replace(self.root, "config.txt", "old-value", "new-value",
+                                                        backup_dir=backup_dir)
+        ledger.append(txn=txn, op="text-replace", component="foo", surface="config.txt", **text_fields)
+
+        # The interrupted rollback attempt got as far as reversing and ledgering config.txt, then
+        # died -- exactly like test_rollback_resumes_after_being_killed_partway_through_a_multi_
+        # surface_txn above.
+        reverse_text_fields, _inverse = switch.op_text_replace(self.root, "config.txt", "new-value", "old-value",
+                                                                backup_dir=backup_dir)
+        ledger.append(txn=txn, op="rollback:text-replace", component="foo", surface="config.txt",
+                      **reverse_text_fields)
+        self.assertEqual(config.read_text(), "old-value")
+
+        # Something ELSE, unrelated to this txn's own rollback, changes config.txt again after
+        # that -- it no longer matches EITHER this entry's `to` ("new-value") or `from`
+        # ("old-value"); a genuinely out-of-band drift on an already-settled surface.
+        config.write_text("drifted-out-of-band")
+
+        problems = switch.rollback_txn(self.root, txn)
+        self.assertEqual(problems, [], "the resumed rollback must complete despite the unrelated drift")
+        self.assertEqual(self.run_entrypoint(), "v1",
+                         "the resumed rollback must still reverse the link -- it was never refused")
+        self.assertEqual(config.read_text(), "drifted-out-of-band",
+                         "an already-reversed surface must never be re-touched, even when drifted since")
+        entries = switch.Ledger(self.root).for_txn(txn)
+        self.assertEqual(len([e for e in entries if e["op"] == "rollback:text-replace"]), 1,
+                         "the already-reverted surface must not be reversed (and re-ledgered) again")
+        self.assertEqual(len([e for e in entries if e["op"] == "rollback:link"]), 1)
+        self.assertEqual(len([e for e in entries if e["op"] == "rollback:done"]), 1)
 
     def test_rollback_txn_called_twice_is_idempotent(self):
         # Coordinator decision (round 6): a second `rollback_txn` call for an already fully
@@ -1796,6 +1877,63 @@ class ConfirmAndRevertTests(SwitchFixture):
         self.assertIn("could not run", str(ctx.exception))
         state = switch.load_state(self.root)
         self.assertEqual(state["txns"][txn]["status"], "rolled_back")
+
+    def test_schedule_confirm_or_revert_sets_a_restart_on_failure_policy_with_a_sized_start_limit(self):
+        # Major finding (round 9): the transient unit this schedules used to have no Restart=
+        # policy at all -- a busy (75) callback (see IfUnconfirmedLockWaitTests) was never
+        # retried by systemd itself, so an operator had to notice a stuck pending_confirmation
+        # txn and re-run `rollback --txn ... --if-unconfirmed` by hand. Restart=on-failure plus a
+        # StartLimitIntervalSec=/StartLimitBurst= pair sized to keep retrying for at least the
+        # confirm window (_confirm_or_revert_start_limit) closes that gap; verified here at the
+        # argv-construction level, the same way the two scheduling-failure tests above already
+        # test this function directly rather than through a real systemd.
+        real_current = os.readlink(self.root / "current" / "foo")
+        ledger = switch.Ledger(self.root)
+        txn = "foo-9997-1"
+        ledger.append(txn=txn, op="txn_begin", component="foo", surface="_txn")
+        ledger.append(txn=txn, op="link", component="foo", surface="current/foo",
+                      **{"from": real_current, "to": real_current})
+        ledger.append(txn=txn, op="verify_pass", component="foo", surface="_txn", to="confirm_pending")
+        switch.save_state(self.root)
+
+        captured = {}
+
+        def fake_run_captured(argv, **_kwargs):
+            captured["argv"] = argv
+            return subprocess.CompletedProcess(argv, 0, stdout="", stderr="")
+
+        with unittest.mock.patch.object(switch, "run_captured", side_effect=fake_run_captured):
+            switch.schedule_confirm_or_revert(self.root, txn, 300)
+
+        argv = captured["argv"]
+        self.assertIn("--property=Restart=on-failure", argv)
+        self.assertIn(f"--property=RestartSec={switch.CONFIRM_OR_REVERT_RESTART_SEC}", argv)
+        expected_interval, expected_burst = switch._confirm_or_revert_start_limit(300)
+        self.assertIn(f"--property=StartLimitIntervalSec={expected_interval}", argv)
+        self.assertIn(f"--property=StartLimitBurst={expected_burst}", argv)
+        # Every property flag is a systemd-run option, so it must land before the "--" separator,
+        # never mistaken for an argument to the callback command itself.
+        dashdash = argv.index("--")
+        for flag in argv:
+            if flag.startswith("--property="):
+                self.assertLess(argv.index(flag), dashdash, f"{flag} must precede the -- separator")
+
+    def test_start_limit_covers_at_least_the_confirm_window_for_a_very_short_one(self):
+        # A very short --confirm-within (e.g. a test's "1", as test_unconfirmed_timer_firing_
+        # reverts above uses) must still budget at least a couple of full RestartSec cycles, not
+        # a StartLimitIntervalSec so short the very first retry would already be denied by
+        # systemd's own start-rate limit (systemd.unit(5): "units started more than burst times
+        # within an interval are not permitted to start any more").
+        interval, burst = switch._confirm_or_revert_start_limit(1)
+        self.assertGreaterEqual(interval, switch.CONFIRM_OR_REVERT_RESTART_SEC * 2)
+        self.assertGreaterEqual(burst, 2)
+
+    def test_start_limit_scales_with_a_long_confirm_window(self):
+        interval, burst = switch._confirm_or_revert_start_limit(3600)
+        self.assertGreaterEqual(interval, 3600)
+        # burst must allow retrying roughly every RestartSec across the whole interval, not just
+        # a fixed small handful regardless of how long --confirm-within was.
+        self.assertGreaterEqual(burst * switch.CONFIRM_OR_REVERT_RESTART_SEC, interval)
 
     def test_confirm_succeeds_even_when_stopping_the_revert_timer_fails(self):
         # Minor finding (round 5): a best-effort stop of the now-irrelevant revert timer must
@@ -2408,6 +2546,111 @@ class LockTests(SwitchFixture):
             self.assertEqual(result.returncode, 75, result.stderr)
         finally:
             handle.close()
+
+
+class IfUnconfirmedLockWaitTests(SwitchFixture):
+    """Major finding (round 9): `rollback --txn T --if-unconfirmed` (the confirm-or-revert
+    timer's own callback -- never an interactive/manual invocation) used to take switch_locks()
+    exactly like every other command: one non-blocking attempt, Busy (exit 75) immediately on
+    contention. Since nothing else ever re-fires a lost callback (cmd_recover deliberately skips
+    a txn still pending_confirmation), a switch.lock or bootstrap.lock merely busy for a moment
+    at the exact instant the timer fired lost the revert for good, silently contradicting
+    lifecycle.md's documented automatic-revert promise. These hold a *separate* flock on the same
+    lock path (a second open() of it, in this same test process -- per flock(2), independent of
+    whatever ecosystem-switch's own subprocess later opens, exactly like the existing LockTests
+    above) and measure wall-clock time around the CLI call itself, so a fix that merely swallows
+    the busy error without actually waiting cannot pass either test below."""
+
+    def setUp(self):
+        super().setUp()
+        self.root_v1 = self.make_tool_root("foo-1.0.0", "v1")
+        self.link_entrypoint("foo", self.root_v1 / "bin" / "foo")
+        self.write_components({"foo": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-1.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}], "surfaces": [], "state_dirs": [],
+            "window": "default", "rollback_class": "safe",
+        }})
+
+    def _hold_lock(self, relative_path):
+        import fcntl
+        lock_path = self.root / relative_path
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        handle = open(lock_path, "a+")
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        return handle
+
+    @staticmethod
+    def _release_lock(handle):
+        import fcntl
+        fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+        handle.close()
+
+    def test_if_unconfirmed_waits_out_a_transient_switch_lock_then_proceeds(self):
+        import threading
+        handle = self._hold_lock("switch/switch.lock")
+        timer = threading.Timer(0.5, self._release_lock, args=(handle,))
+        timer.start()
+        try:
+            env = {**self.env, "ECOSYSTEM_SWITCH_IF_UNCONFIRMED_LOCK_WAIT_SECONDS": "10"}
+            started = time.monotonic()
+            result = run(env, "rollback", "--txn", "no-such-txn", "--if-unconfirmed")
+            elapsed = time.monotonic() - started
+        finally:
+            timer.join()
+        # The lock was released after ~0.5s; reaching the tool's own txn lookup (rather than a
+        # lock refusal) proves it waited instead of failing immediately, and the elapsed time
+        # confirms it was a real wait, not a fast path that happens to also succeed.
+        self.assertGreaterEqual(elapsed, 0.4, "must have actually waited for the lock, not returned instantly")
+        self.assertLess(elapsed, 5.0, "must not have waited far longer than the lock was actually held")
+        self.assertNotEqual(result.returncode, 75, result.stderr)
+        self.assertIn("has no reversible operations", result.stderr)
+
+    def test_if_unconfirmed_gives_up_with_75_after_the_bound_when_the_lock_stays_busy(self):
+        handle = self._hold_lock("switch/switch.lock")
+        try:
+            env = {**self.env, "ECOSYSTEM_SWITCH_IF_UNCONFIRMED_LOCK_WAIT_SECONDS": "1"}
+            started = time.monotonic()
+            result = run(env, "rollback", "--txn", "no-such-txn", "--if-unconfirmed")
+            elapsed = time.monotonic() - started
+        finally:
+            self._release_lock(handle)
+        self.assertEqual(result.returncode, 75, result.stderr)
+        self.assertGreaterEqual(elapsed, 0.9, "must have actually waited out the bound, not returned instantly")
+        self.assertLess(elapsed, 4.0, "must give up at roughly the configured bound, not hang well past it")
+
+    def test_if_unconfirmed_waits_out_a_transient_bootstrap_lock_too(self):
+        # switch_locks takes switch.lock THEN bootstrap.lock (the same lock bootstrap-linux.sh
+        # itself holds for its own whole run); the bounded wait must cover this second lock too,
+        # not just the tool's own switch.lock.
+        import threading
+        handle = self._hold_lock("bootstrap.lock")
+        timer = threading.Timer(0.5, self._release_lock, args=(handle,))
+        timer.start()
+        try:
+            env = {**self.env, "ECOSYSTEM_SWITCH_IF_UNCONFIRMED_LOCK_WAIT_SECONDS": "10"}
+            started = time.monotonic()
+            result = run(env, "rollback", "--txn", "no-such-txn", "--if-unconfirmed")
+            elapsed = time.monotonic() - started
+        finally:
+            timer.join()
+        self.assertGreaterEqual(elapsed, 0.4, "must have actually waited for bootstrap.lock too")
+        self.assertNotEqual(result.returncode, 75, result.stderr)
+
+    def test_a_manual_rollback_without_if_unconfirmed_still_fails_fast_on_a_busy_lock(self):
+        # Scope check: the bounded wait is for --if-unconfirmed only. An interactive/manual
+        # `rollback` (no --if-unconfirmed) must keep failing fast -- today's behaviour -- even
+        # with the wait env var set, so an operator's own command is never made to hang on a
+        # mechanism meant only for the unattended timer callback.
+        handle = self._hold_lock("switch/switch.lock")
+        try:
+            env = {**self.env, "ECOSYSTEM_SWITCH_IF_UNCONFIRMED_LOCK_WAIT_SECONDS": "10"}
+            started = time.monotonic()
+            result = run(env, "rollback", "foo")
+            elapsed = time.monotonic() - started
+        finally:
+            self._release_lock(handle)
+        self.assertEqual(result.returncode, 75, result.stderr)
+        self.assertLess(elapsed, 2.0, "a manual rollback must fail fast, not wait out the lock")
 
 
 class PruneTests(SwitchFixture):
