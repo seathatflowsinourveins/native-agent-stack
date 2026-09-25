@@ -442,11 +442,14 @@ The harness has no expected-account input. It takes the engine's account-writer
 lock for whichever account the env file names (`harness.py:296-301`) and refuses
 only a non-flat account (`harness.py:308-310`), so a flat env file of another
 lane would send the C01 and C04 POSTs to that lane's account. Follow these
-steps (added 2026-09-25 after the second review of PR #278). The 2026-09-25 run
-followed steps 1, 3, 4 and 5 (run record `get_checks`, `harness.argv_redacted`,
-`harness.exit_code`, `harness.receipt_copy`). Step 2 was not recorded
-separately: that run used a fresh state root, and its accepted C01 buy shows that
-no `STOP` file was present. Keep every account value private; none is committed.
+steps (added 2026-09-25 after the second review of PR #278). The run record
+shows that the 2026-09-25 run followed steps 1, 4 and 5 and step 3's private
+`--out` and retained exit code (`get_checks`, `harness.argv_redacted`,
+`harness.exit_code`, `harness.receipt_copy`). Step 2 and step 3's no-ladder
+condition were not recorded separately: that run used a fresh state root, its
+accepted C01 buy shows that no `STOP` file was present, and the run lane reported
+that no harness or engine process was running before it (a worker report, not
+part of the run record). Keep every account value private; none is committed.
 
 1. Confirm the account with GET requests only. Load the env file of the paper
    account assigned to this gate lane through `runner.credentials()` and read
