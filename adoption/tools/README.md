@@ -449,7 +449,7 @@ rather than assumed:
 | --- | --- |
 | (a) pid/cmdline | `/proc/<pid>/cmdline` still names `app-server-broker.mjs serve` with the exact recorded `--endpoint` (guards pid reuse, upstream #743) |
 | (b) no active jobs | no job in the workspace's `state.json` has a status outside `{completed, failed, cancelled}`; an unrecognized status blocks reaping rather than being treated as safe |
-| (c) workspace unused | the workspace directory (read from the broker's own live `/proc/<pid>/cwd`) no longer exists, or no live `claude`/`codex` process — excluding every live broker's own process subtree (e.g. each one's `codex app-server` child), not only the broker being evaluated, host-wide — has a cwd equal to or under it, under its nearest git checkout root, or under the *other* checkout a `git worktree` workspace belongs to (see the decision doc's "Known limitations" for what these checks do and do not cover) |
+| (c) workspace unused | the workspace's KEYING root — the ancestor whose own `sha256(realpath(...))[:16]` matches the plugin's own state-dir hash (falling back to the nearest git checkout root, then the broker's own raw live `/proc/<pid>/cwd`, when nothing matches) — no longer exists, or no live `claude`/`codex` process — excluding every live broker's own process subtree (e.g. each one's `codex app-server` child), not only the broker being evaluated, host-wide — has a cwd equal to or under the workspace root, under that keying root, or under the *other* checkout a `git worktree` workspace belongs to (see the decision doc's "Known limitations" for what these checks do and do not cover) |
 | (d) old enough | the broker process (from `/proc/<pid>/stat`'s `starttime`, not a file mtime) is older than `--min-age` (default 1800s) |
 | (e) job-idle | the workspace's most recent recorded job activity (`state.json` jobs[]' `updatedAt`/`completedAt`/`createdAt`/`startedAt`) is at least `--min-age` in the past too — not just the broker process's own age; a workspace that has never run a job has no signal here and this guard passes trivially |
 
@@ -483,15 +483,24 @@ look-alike (`comm` forced with `prctl(PR_SET_NAME)`, since a Python process
 run as `python3 script.py` reports `comm` == `python3`, the interpreter's own
 name, not the script's, simply because `python3` is the binary actually
 running — checked by hand against the real `claude` binary before writing
-the suite). No real broker, no
-real Claude Code or Codex session, and no plugin state directory on any host
-is read or touched by the tests. 43 tests as of the 2026-09-25 fix round
-(fourth pass): guard (e) job-idle timing, the worktree-to-parent check
-(a hand-written `.git` `gitdir:` pointer file, no real `git worktree`
-needed), `path_is_under`'s filesystem-root case, malformed broker.json/
-state.json (non-object JSON, non-UTF-8 bytes) evaluating to an ineligible
-record rather than crashing the run, and `broker.json` cleanup after a
-confirmed stop, in addition to the coverage described in the decision doc.
+the suite). No real broker, no real Claude Code or Codex session, and no
+plugin state directory on any host is ever stopped or otherwise acted on by
+the tests — every state/workspace directory a test evaluates is a fresh
+synthetic tempdir — but guard (c)'s live-session and live-broker scans do
+*read* every host process's `/proc/<pid>/comm`/`cwd` and every real
+broker's own `cmdline` while checking for a live session or another live
+broker (`LiveCwdGuardTests.setUp` restricts the live-broker exclusion
+result back down to the test's own spawned fixtures; the live-session scan
+itself is host-wide and unrestricted; see the test module's own docstring).
+58 tests as of the 2026-09-25 fix round (sixth pass): guard (e) job-idle
+timing, the worktree-to-parent check (a hand-written `.git` `gitdir:`
+pointer file, no real `git worktree` needed), `path_is_under`'s
+filesystem-root case, malformed broker.json/state.json (non-object JSON,
+non-UTF-8 bytes) evaluating to an ineligible record rather than crashing
+the run, `broker.json` cleanup after a confirmed stop, and the sixth
+pass's own hash-matched keying-root selection for a removed
+`.claude/worktrees/<name>` checkout, in addition to the coverage described
+in the decision doc.
 `--list` was run against this host's real
 `~/.claude/plugins/data/codex-openai-codex/state` on 2026-09-25 (read-only):
 every broker present had already exited (dead pid; guard (a) alone already
