@@ -1,0 +1,4 @@
+{
+ "mode": "dry-run",
+ "note": "Set mode to paper only after `executor.py check-account` prints ready_for_paper for alpaca-paper-3.env; a paper start that fails any account check runs as dry-run and journals the refusal."
+}

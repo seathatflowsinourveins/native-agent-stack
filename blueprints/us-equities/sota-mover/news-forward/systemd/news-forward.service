@@ -1,0 +1,17 @@
+[Unit]
+Description=News-LLM forward pilot supervisor (pilot label; dry-run unless config.json mode=paper and alpaca-paper-3.env verifies; never live)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/code/sota-news-forward/blueprints/us-equities/sota-mover/news-forward
+Environment=PYTHONUNBUFFERED=1
+ExecStart=%h/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python %h/code/sota-news-forward/blueprints/us-equities/sota-mover/news-forward/supervisor.py
+ExecStopPost=-/usr/bin/systemctl --user stop news-forward-scorer.service
+Restart=on-failure
+RestartSec=30
+MemoryHigh=6G
+MemoryMax=9G
+MemorySwapMax=0
+RuntimeMaxSec=19h
+TimeoutStopSec=90

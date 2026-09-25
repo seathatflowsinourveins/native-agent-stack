@@ -1,0 +1,129 @@
+"""Shared paths, module loading, clock helpers and the append-only journal.
+
+Standard library only. The study's pure rules (``news_signal.py``) are loaded by path
+from ``../news-llm`` so research and the live runner execute one code path; nothing in
+that directory is copied or modified here.
+"""
+
+import hashlib
+import importlib.util
+import json
+import os
+import sys
+import threading
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+NEWS_LLM = os.path.abspath(os.path.join(HERE, "..", "news-llm"))
+REPO = os.path.abspath(os.path.join(HERE, "..", "..", "..", ".."))
+CALENDAR_FILE = os.path.join(REPO, "blueprints/us-equities/mover-v3/data/session-calendar.json")
+CREDENTIAL_GUARD = os.path.join(REPO, "blueprints/us-equities/adaptive-paper/credential_guard.py")
+ORDER_CONTRACT = os.path.join(REPO, "blueprints/us-equities/order-contract/order_contract.py")
+
+STATE_ROOT = os.path.expanduser("~/.local/state/native-agent-stack/research/sota-mover/news-forward")
+SECRETS_DIR = os.path.expanduser("~/.config/codex-ecosystem/secrets")
+TRADING_ENV = os.path.join(SECRETS_DIR, "alpaca-paper-3.env")
+DATA_ENV = os.path.join(SECRETS_DIR, "alpaca-paper-2.env")
+MODEL_STORAGE = os.path.expanduser("~/.local/share/native-agent-stack/models/chronogpt-instruct")
+
+NY = ZoneInfo("America/New_York")
+UTC = timezone.utc
+EVIDENCE_LABEL = "pilot"  # execution shakedown; not counted as forward-study evidence
+STRATEGY_ID = "news-llm-forward-v0-pilot"
+
+
+def load_by_path(name, path):
+    """Import a module from an explicit file (idempotent per module name)."""
+    if name in sys.modules and getattr(sys.modules[name], "__file__", None) == path:
+        return sys.modules[name]
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def news_signal():
+    return load_by_path("news_signal", os.path.join(NEWS_LLM, "news_signal.py"))
+
+
+def order_contract():
+    return load_by_path("order_contract", ORDER_CONTRACT)
+
+
+def credential_guard():
+    return load_by_path("credential_guard", CREDENTIAL_GUARD)
+
+
+def load_calendar(path=CALENDAR_FILE):
+    sig = news_signal()
+    with open(path, encoding="utf-8") as handle:
+        return sig.Calendar.from_calendar_json(json.load(handle))
+
+
+def utc_now():
+    return datetime.now(UTC)
+
+
+def iso(dt):
+    return None if dt is None else dt.astimezone(UTC).isoformat().replace("+00:00", "Z")
+
+
+def sha256_file(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+class Journal:
+    """Append-only JSONL, one file per trade date; each line is fsynced.
+
+    Records never carry credentials. ``kind`` names the record type (news, eligibility,
+    score, decision, order_intent, order_submitted, order_refused, fill, shadow_quote,
+    reconciliation, risk, lifecycle).
+    """
+
+    def __init__(self, root, trade_date, clock=utc_now):
+        self.root = root
+        self.dir = os.path.join(root, "journal")
+        os.makedirs(self.dir, exist_ok=True)
+        self.path = os.path.join(self.dir, f"{trade_date.isoformat()}.jsonl")
+        self.clock = clock
+        self.lock = threading.Lock()
+        self.counts = {}
+
+    def write(self, kind, **fields):
+        row = {"kind": kind, "at": iso(self.clock()), "evidence_label": EVIDENCE_LABEL, **fields}
+        line = json.dumps(row, sort_keys=True, default=str)
+        with self.lock:
+            with open(self.path, "a", encoding="utf-8") as handle:
+                handle.write(line + "\n")
+                handle.flush()
+                os.fsync(handle.fileno())
+            self.counts[kind] = self.counts.get(kind, 0) + 1
+        return row
+
+
+def read_jsonl(path):
+    rows = []
+    if not os.path.exists(path):
+        return rows
+    with open(path, encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if line:
+                try:
+                    rows.append(json.loads(line))
+                except ValueError:
+                    continue  # a torn final line from a crash is skipped, never repaired
+    return rows
+
+
+def append_jsonl(path, row):
+    with open(path, "a", encoding="utf-8") as handle:
+        handle.write(json.dumps(row, sort_keys=True, default=str) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
