@@ -167,7 +167,11 @@ class HoldoutPath(unittest.TestCase):
             aid0, line0 = count(last0, check_redraw=True)
             self.assertEqual(line0["sessions"], [n0, last0])
             body0 = json.loads((repo / RESULTS_DIR / "holdout-count-0.json").read_text())
-            self.assertEqual(set(body0["counts"]), {"H1-D:high", "H1-D:low", "H1-D-b_lane-low", "H3-a", "H3-b", "H3-c"})
+            # review round 16, F06: each of the six trade-count keys has an occupied-session companion (:sessions)
+            self.assertEqual(set(body0["counts"]),
+                             {"H1-D:high", "H1-D:low", "H1-D-b_lane-low", "H3-a", "H3-b", "H3-c",
+                              "H1-D:high:sessions", "H1-D:low:sessions", "H1-D-b_lane-low:sessions",
+                              "H3-a:sessions", "H3-b:sessions", "H3-c:sessions"})
             self.assertEqual(body0["counts"]["H3-a"], 1)
             self.assertTrue(body0["extension"]["extend"])
             # M-6: CCC's screen rows of batch-1 sessions were fetched by the count (asof = s); NEWN's rename-day

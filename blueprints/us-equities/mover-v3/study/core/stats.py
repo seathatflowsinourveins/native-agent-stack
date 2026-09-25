@@ -8,7 +8,9 @@ jointly). Review round 8, R8-11: the null side is closed (stat_b <= 0 for 'great
 with an empty group or cell has no statistic and counts as a null-side draw (for both sides of H3-c). Percentile
 bounds and the normal-tail sd use the draws that have a statistic. Review round 15, F06: the MDE-exclusion bounds
 place an undefined draw on the side that cannot support an exclusion (conservative_bound), and inference_check decides
-whether the bootstrap supports any label (occupied-cluster eligibility and degenerate draws).
+whether the bootstrap supports any label (occupied-cluster eligibility and degenerate draws). Review round 16, F06:
+inference_check also applies a fixed floor of MIN_SAMPLE["min_occupied_sessions"] distinct occupied entry sessions,
+identically for every item and every H1-D group, alongside that bootstrap-implied rule.
 """
 from __future__ import annotations
 
@@ -18,6 +20,8 @@ import math
 import numpy as np
 
 from core.params import ALTERNATIVE, BOOT, ITEM_IDS, MDE, MIN_SAMPLE, TEST, TRADABLE
+
+MIN_OCCUPIED_SESSIONS = MIN_SAMPLE["min_occupied_sessions"]
 
 
 # ---------------------------------------------------------------- seeded streams
@@ -124,7 +128,9 @@ def conservative_bound(stats, q: float, upper: bool) -> float:
     placed beyond every defined one on the side that cannot support an exclusion (+inf for an upper bound, -inf for a
     lower one), as the p-value counts it on the null side (statistics.p_value). With no undefined draw it equals
     bound(). At e7529b47 the MDE bounds dropped undefined draws, so a group occupying one session gave a zero-width
-    interval and an unjustified 'not_supported_mde_excluded'."""
+    interval and an unjustified 'not_supported_mde_excluded'. Review round 16, F06: below the fixed occupied-session
+    floor (inference_check), the bound this function computes is never reached, because mde_excluded and item_label
+    gate on inference_check's 'valid' first."""
     stats = np.asarray(stats, dtype=float)
     nan = np.isnan(stats)
     k, defined = int(nan.sum()), np.sort(stats[~nan])
@@ -142,22 +148,40 @@ def tail_level(item: str) -> float:
     return TEST["alpha"] / (2 * TEST["m"]) if ALTERNATIVE[item] == "two-sided" else TEST["alpha"] / TEST["m"]
 
 
-def inference_check(item: str, stats) -> dict:
+def insufficient_occupied_sessions(occupied) -> bool:
+    """Review round 16, F06: whether `occupied` (an int for most items, {"high", "low"} for H1-D) is below the
+    fixed floor MIN_OCCUPIED_SESSIONS, applied identically to every item and every H1-D group. occupied=None (its
+    count not supplied) never triggers this: only evaluate.item_result, which always computes and passes it, gates
+    a real result on the floor."""
+    if occupied is None:
+        return False
+    if isinstance(occupied, dict):
+        return any(occupied.get(g, 0) < MIN_OCCUPIED_SESSIONS for g in ("high", "low"))
+    return occupied < MIN_OCCUPIED_SESSIONS
+
+
+def inference_check(item: str, stats, occupied=None) -> dict:
     """Review round 15, F06: whether the bootstrap supports a label at all, deciding both a pass and an MDE exclusion
     (item_label's inference_ok). Occupied-cluster eligibility: the draws in which the item (each H1-D group) has no
     trade have no statistic, and their share may not exceed the item's tail level, so that the tail bounds and the
     null side are decided by draws that hold data (with blocks of L sessions it needs the trades to span several
     blocks: G occupied sessions more than L apart leave about exp(-1)^G of the draws empty, about 5 sessions at the
     one-sided 0.01 and 6 at the two-sided 0.005). Degenerate inference: fewer than two defined draws, or defined draws
-    with no spread, support neither a pass nor an exclusion."""
+    with no spread, support neither a pass nor an exclusion. Review round 16, F06: `occupied` (evaluate.item_result's
+    occupied_sessions, per group for H1-D) must also meet the fixed floor MIN_OCCUPIED_SESSIONS, identically for
+    every item and every H1-D group, alongside this bootstrap-implied rule; below it the item is reported
+    insufficient_occupied_sessions and, like a degenerate bootstrap, can neither pass nor be MDE-excluded."""
     stats = np.asarray(stats, dtype=float)
     B = len(stats)
     undefined = int(np.isnan(stats).sum())
     defined = stats[~np.isnan(stats)]
     degenerate = len(defined) < 2 or float(np.max(defined) - np.min(defined)) == 0.0
     share = undefined / B if B else 1.0
+    insufficient = insufficient_occupied_sessions(occupied)
     return {"draws": B, "undefined_draws": undefined, "undefined_fraction": share, "tail_level": tail_level(item),
-            "degenerate": bool(degenerate), "valid": bool(B and share <= tail_level(item) and not degenerate)}
+            "degenerate": bool(degenerate), "min_occupied_sessions": MIN_OCCUPIED_SESSIONS,
+            "insufficient_occupied_sessions": bool(insufficient),
+            "valid": bool(B and share <= tail_level(item) and not degenerate and not insufficient)}
 
 
 # ---------------------------------------------------------------- Holm
@@ -243,10 +267,10 @@ def mde(item: str, n: int | None = None, n1: int | None = None, n2: int | None =
     return z * sigma * math.sqrt(MDE["design_effect_DEFF"]) * root
 
 
-def mde_excluded(item: str, stats, mde_value) -> bool:
+def mde_excluded(item: str, stats, mde_value, occupied=None) -> bool:
     """outcome_reporting.labels.not_supported_mde_excluded, with the conservative bounds (review round 15, F06) and
-    only when inference_check holds."""
-    if mde_value is None or not inference_check(item, stats)["valid"]:
+    only when inference_check holds, occupied-session floor included (review round 16, F06)."""
+    if mde_value is None or not inference_check(item, stats, occupied)["valid"]:
         return False
     alt, a = ALTERNATIVE[item], tail_level(item)
     if alt == "two-sided":

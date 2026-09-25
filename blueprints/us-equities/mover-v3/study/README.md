@@ -92,7 +92,9 @@ live samples). A count and a read fetch their own terminal records (`terminal_ac
 `open_before_first_holdout_count` is empty. Cost tiers use minute bars complete at the fill; the count and the read
 share record (split, spin-off) and accounting exclusions, and a delayed exit is checked through its exit session.
 Undefined or degenerate bootstrap draws gate both a pass and an MDE exclusion; item results report occupied sessions
-and units. Verdicts come from H1-D and H3-c alone, with the tradable cells under `profitability`. H3-a is embargoed with
+and units. Review round 16 adds a fixed floor of 20 occupied entry sessions, identical for every item and every
+H1-D group, alongside that bootstrap-implied rule; below it an item is `underpowered` with
+`insufficient_occupied_sessions` reported, and the holdout extension decision (`count_unit`) sees the floor too. Verdicts come from H1-D and H3-c alone, with the tradable cells under `profitability`. H3-a is embargoed with
 a 10-session block. Validation timeliness is dated by the governing bytes and line. `run.py complete --authorization
 ID` rebuilds a completion lost between an action's two log writes. Results carry `claims_scope` (retrospective
 reconstruction) and `input_vintage_range`. The fetch-time margin is priced in pages at the measured throughput with

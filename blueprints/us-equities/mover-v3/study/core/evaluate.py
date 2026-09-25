@@ -191,7 +191,8 @@ def item_result(item: str, stage: str, rows: list, sessions: list, protocol_id: 
     p = ST.p_value(boot, alt)
     p_n = ST.normal_tail_p(est, boot, alt) if est is not None else 1.0
     # review round 15, F06 and F14: occupied entry sessions (per group for H1-D) and the bootstrap's validity, which
-    # decides both a pass and an MDE exclusion (core.stats.inference_check)
+    # decides both a pass and an MDE exclusion (core.stats.inference_check); review round 16, F06: the same
+    # occupied_sessions value also gates inference_check's fixed occupied-session floor
     if item == "H1-D":
         occupied = {g: len({r["session"] for r in rows if r["group"] == g}) for g in ("high", "low")}
     else:
@@ -199,8 +200,9 @@ def item_result(item: str, stage: str, rows: list, sessions: list, protocol_id: 
     res = {"item": item, "alternative": alt, "estimate": est, "n": n, "n_high": n_hi, "n_low": n_lo,
            "occupied_sessions": occupied, "units": MDE_UNITS[item],
            "median": float(np.median([r["value"] for r in rows])) if rows else None,
-           "p": p, "p_normal_tail": p_n, "mde": mde_v, "mde_excluded": ST.mde_excluded(item, boot, mde_v),
-           "inference": ST.inference_check(item, boot),
+           "p": p, "p_normal_tail": p_n, "mde": mde_v,
+           "mde_excluded": ST.mde_excluded(item, boot, mde_v, occupied),
+           "inference": ST.inference_check(item, boot, occupied),
            "n_ok": ST.minimum_met(item, stage, n, n_hi, n_lo),
            "lineage_confirmed": ST.lineage_confirmed(p, p_n),
            # outcome_reporting.rule (review round 11, C12): the 95% percentile interval of the estimate, reported

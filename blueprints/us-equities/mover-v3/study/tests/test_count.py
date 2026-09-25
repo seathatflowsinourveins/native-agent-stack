@@ -1,5 +1,6 @@
-"""chronology.holdout.count_unit: exactly the six integer keys, no price or return function on the count path,
-and the extension decision (count_unit is used only for it, R8-8)."""
+"""chronology.holdout.count_unit: exactly the six trade-count keys plus their six :sessions companions (review
+round 16, F06), no price or return function on the count path, and the extension decision (count_unit is used
+only for it, R8-8)."""
 import unittest
 from unittest import mock
 
@@ -43,12 +44,17 @@ class CountUnit(unittest.TestCase):
             quotes[sym] = [book(cal, d1, "09:35"), book(cal, d1, "15:55")] if sym != "DDD" else []
         return out, terc, quotes
 
-    def test_keys_are_exactly_the_six_integers(self):
+    def test_keys_are_exactly_the_six_counts_and_their_six_session_companions(self):
         evs, terc, quotes = self._events()
         out, _ = serve_count(evs, self.ctx, terc, quotes)
-        self.assertEqual(set(out), set(count_unit.KEYS))
+        self.assertEqual(set(out), set(count_unit.KEYS) | set(count_unit.SESSION_KEYS))
         self.assertTrue(all(type(v) is int for v in out.values()))
-        self.assertEqual(out, {"H1-D:high": 1, "H1-D:low": 1, "H1-D-b_lane-low": 1, "H3-a": 3, "H3-b": 3, "H3-c": 4})
+        self.assertEqual({k: out[k] for k in count_unit.KEYS},
+                         {"H1-D:high": 1, "H1-D:low": 1, "H1-D-b_lane-low": 1, "H3-a": 3, "H3-b": 3, "H3-c": 4})
+        # AAA and BBB share their decision session (so their entry session too); CCC and DDD each add a distinct one
+        self.assertEqual({k: out[k] for k in count_unit.SESSION_KEYS},
+                         {"H1-D:high:sessions": 1, "H1-D:low:sessions": 1, "H1-D-b_lane-low:sessions": 1,
+                          "H3-a:sessions": 2, "H3-b:sessions": 2, "H3-c:sessions": 3})
 
     def test_count_path_calls_no_price_or_return_function(self):
         evs, terc, quotes = self._events()
@@ -66,12 +72,29 @@ class CountUnit(unittest.TestCase):
             count_unit.count([], Ctx(cal=self.cal, stage="holdout", segs=[], mode="read"), Store(), {})
 
     def test_extension_decision(self):
-        c = {"H1-D:high": 120, "H1-D:low": 90, "H1-D-b_lane-low": 90, "H3-a": 400, "H3-b": 149, "H3-c": 500}
+        c = {"H1-D:high": 120, "H1-D:low": 90, "H1-D-b_lane-low": 90, "H3-a": 400, "H3-b": 149, "H3-c": 500,
+             **{f"{k}:sessions": 50 for k in count_unit.KEYS}}          # every key well past the occupied-session floor
         self.assertEqual(count_unit.extension_decision(c, ("H3-a",), 0)["extend"], False)
         d = count_unit.extension_decision(c, ("H1-D", "H3-a", "H3-b"), 0)
         self.assertEqual((d["extend"], d["below_minimum"]), (True, ["H1-D", "H3-b"]))
         d = count_unit.extension_decision(c, ("H1-D",), 2)
         self.assertEqual((d["extend"], d["underpowered"]), (False, ["H1-D"]))
+
+    def test_below_minimum_also_checks_the_occupied_session_floor(self):
+        """Review round 16, F06: an item can meet its sample minimum and still be below_minimum on occupied
+        sessions alone, so it gets the same chance to extend as one short of the sample minimum. On the code before
+        this round, below_minimum reads only the six trade-count keys and KeyErrors, or (if given only those keys)
+        never extends for this reason at all."""
+        c = {**{k: 500 for k in count_unit.KEYS}, **{f"{k}:sessions": 50 for k in count_unit.KEYS}}
+        self.assertEqual(count_unit.below_minimum(c, ("H3-a",)), [])
+        c["H3-a:sessions"] = 19                                          # one below the floor; sample minimum unchanged
+        self.assertEqual(count_unit.below_minimum(c, ("H3-a",)), ["H3-a"])
+        c["H3-a:sessions"] = 20                                          # exactly at the floor
+        self.assertEqual(count_unit.below_minimum(c, ("H3-a",)), [])
+        c["H1-D:high:sessions"], c["H1-D:low:sessions"] = 50, 19         # either H1-D group below it is enough
+        self.assertEqual(count_unit.below_minimum(c, ("H1-D",)), ["H1-D"])
+        c["H1-D:low:sessions"] = 20
+        self.assertEqual(count_unit.below_minimum(c, ("H1-D",)), [])
 
 
 if __name__ == "__main__":

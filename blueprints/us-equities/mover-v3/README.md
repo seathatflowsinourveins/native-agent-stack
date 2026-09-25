@@ -532,7 +532,11 @@ pre-freeze output from its seals), so the list is empty, as the freeze requires.
 2026-09-24 cross-family review of #190 (Codex CLI, GPT-6): the prior findings F01-F15 it rechecked, a fee-date and an
 amendment-format item, and eight new findings N01-N08, each in a dated `review_record` entry; three input values stay
 open decisions for a reviewed pull request (a fixed occupied-session floor, the pipeline allowance values and the rate
-limits). The next steps are an
+limits). Review round 16 fixed the occupied-session floor at 20 (F06), reconciled the N01 entry with the committed
+2015-09-01 calendar start (the 60-session reach it needs is met, at 2015-10-07), and added the Federal Reserve's own
+holiday-schedule citation beside the SEC and FINRA sources for the bank-holiday settlement-day rule
+(`cost_model.fee_charge_dates`); two input values (the pipeline allowance values and the rate limits, F12) remain
+open. The next steps are an
 independent review of the draft and its study tree from a different model family, then the other preconditions, then
 the freeze. Until then every fetch and evaluation command refuses to run.
 

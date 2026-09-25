@@ -53,7 +53,10 @@ PARAMETERS = {
     "testing": {"alpha": 0.05, "m": 5, "development_alpha": 0.05, "lineage_trials": 1012 + 60 + 5,
                 "winsor_quantiles": [0.01, 0.99], "top_sessions_dropped": 5},
     "minimum_sample": {"tradable_cell": {"development": 300, "validation": 150, "holdout": 150},
-                       "difference_test_per_group": {"development": 150, "validation": 100, "holdout": 100}},
+                       "difference_test_per_group": {"development": 150, "validation": 100, "holdout": 100},
+                       # review round 16, F06: a fixed floor, identical at every stage, for every item and every
+                       # H1-D group, alongside the bootstrap-implied occupied-cluster rule (statistics.inference_validity)
+                       "min_occupied_sessions": 20},
     "mde": {"z_sum_one_sided": 3.168, "z_sum_two_sided": 3.4175, "design_effect_DEFF": 1.5,
             "sigma_by_item": {"H1-D": [0.35, "difference"], "H1-D-b_lane-low": [0.35, "cell"],
                               "H3-a": [0.25, "cell"], "H3-b": [0.15, "cell"], "H3-c": [0.1, "paired"]}},

@@ -173,7 +173,9 @@ class MDE(unittest.TestCase):
 
 
 class ConcentratedSessions(unittest.TestCase):
-    """Review round 15, F06: undefined and degenerate bootstrap draws control both support and exclusion."""
+    """Review round 15, F06: undefined and degenerate bootstrap draws control both support and exclusion. Review
+    round 16, F06: a fixed floor of 20 occupied entry sessions, identical for every item and every H1-D group,
+    controls them too, alongside that bootstrap-implied rule."""
 
     def _h1d(self, n_sessions, per_group=100, spread=0.0):
         """H1-D rows at validation: each group has per_group trades spread over n_sessions sessions (L = 10 apart),
@@ -205,10 +207,53 @@ class ConcentratedSessions(unittest.TestCase):
         self.assertEqual(label, "underpowered")
 
     def test_spread_sessions_restore_valid_inference(self):
-        res = self._h1d(12, spread=0.001)
+        # 30 sessions clears both the bootstrap-implied rule and the round-16 occupied-session floor of 20
+        res = self._h1d(30, spread=0.001)
         self.assertLessEqual(res["inference"]["undefined_fraction"], ST.tail_level("H1-D"))
+        self.assertFalse(res["inference"]["insufficient_occupied_sessions"])
         self.assertTrue(res["inference"]["valid"])
         self.assertTrue(res["mde_excluded"])
+
+    def test_occupied_session_floor_excludes_a_group_one_below_it(self):
+        """Review round 16, F06: 19 occupied sessions per group already clears the bootstrap-implied rule (row
+        spread far beyond the ~5-6 sessions it needs), but not the fixed floor of 20; the item can neither pass nor
+        be MDE-excluded. On the code before this round (no floor), this case is valid and mde_excluded."""
+        res = self._h1d(19, spread=0.001)
+        self.assertEqual(res["occupied_sessions"], {"high": 19, "low": 19})
+        self.assertLessEqual(res["inference"]["undefined_fraction"], ST.tail_level("H1-D"))  # the old rule alone passes
+        self.assertTrue(res["inference"]["insufficient_occupied_sessions"])
+        self.assertFalse(res["inference"]["valid"])
+        self.assertFalse(res["mde_excluded"])
+        label = ST.item_label("validation", "H1-D", p_stage=1.0, n_ok=True, robust_ok=True, mde_ok=res["mde_excluded"],
+                              inference_ok=res["inference"]["valid"])
+        self.assertEqual(label, "underpowered")
+
+    def test_occupied_session_floor_met_at_exactly_twenty(self):
+        """The boundary case: 20 occupied sessions per group meets the fixed floor exactly, and the old
+        bootstrap-implied rule too, so the item is valid and (with a coinciding-mean draw) MDE-excluded."""
+        res = self._h1d(20, spread=0.001)
+        self.assertEqual(res["occupied_sessions"], {"high": 20, "low": 20})
+        self.assertFalse(res["inference"]["insufficient_occupied_sessions"])
+        self.assertEqual(res["inference"]["min_occupied_sessions"], 20)
+        self.assertTrue(res["inference"]["valid"])
+        self.assertTrue(res["mde_excluded"])
+
+    def test_occupied_session_floor_is_reported_on_inference_check_and_mde_excluded_directly(self):
+        """The floor gate in isolation, apart from the bootstrap-spread mechanics above: occupied=None (no count
+        given) never triggers it, an int below core.stats.MIN_OCCUPIED_SESSIONS does for a cell or H3-c item, and
+        for H1-D either group's count below it is enough. On the code before this round, inference_check and
+        mde_excluded take no `occupied` argument at all and this call fails outright."""
+        stats = np.random.default_rng(11).normal(size=5001)                    # passes the bootstrap-implied rule
+        self.assertTrue(ST.inference_check("H3-a", stats)["valid"])
+        self.assertFalse(ST.inference_check("H3-a", stats, occupied=19)["valid"])
+        self.assertTrue(ST.inference_check("H3-a", stats, occupied=19)["insufficient_occupied_sessions"])
+        self.assertTrue(ST.inference_check("H3-a", stats, occupied=20)["valid"])
+        self.assertTrue(ST.inference_check("H1-D", stats, occupied={"high": 25, "low": 19})["insufficient_occupied_sessions"])
+        self.assertTrue(ST.inference_check("H1-D", stats, occupied={"high": 20, "low": 20})["valid"])
+        tight = np.linspace(-0.001, 0.001, 1001)                # ALTERNATIVE["H3-a"] == "greater"; bounds exclude 0.05
+        self.assertTrue(ST.mde_excluded("H3-a", tight, 0.05))
+        self.assertFalse(ST.mde_excluded("H3-a", tight, 0.05, occupied=19))
+        self.assertTrue(ST.mde_excluded("H3-a", tight, 0.05, occupied=20))
 
     def test_degenerate_draws_support_neither_a_pass_nor_an_exclusion(self):
         stats = np.full(1000, 0.02)                               # every draw the same positive mean
