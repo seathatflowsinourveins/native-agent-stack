@@ -53,7 +53,7 @@ $BR $PY orb_prepare.py or-table          # 09:30-09:34 range per symbol-day from
 $BR $PY orb_prepare.py candidates        # 14-day ATR, volume and RelVol from sessions before t; filters 1-3
 $PY orb_prepare.py select                # top 20 per session, direction, dojis, thin sessions
 $BR $PY orb_prepare.py triggers          # first trigger minute of each order (bar highs/lows only)
-$PY orb_prepare.py verify-or --n 300     # SQL range vs signal.opening_range on a sha-keyed sample
+$PY orb_prepare.py verify-or --n 300     # SQL range vs orb_signal.opening_range on a sha-keyed sample
 $PY collect_quotes.py sample             # 1-in-10 (2017-2023) / 1-in-5 (2024-2026) fired orders, 4 stamps each
 $BR $PY collect_quotes.py fetch --env-file ~/.config/codex-ecosystem/secrets/alpaca-paper-2.env --per-minute 1500
 $PY collect_quotes.py table              # half-spread cells per segment group -> private cost-table.json
@@ -83,7 +83,7 @@ It keeps every page, gzipped and hashed in a resumable ledger.
 | File | Role |
 | --- | --- |
 | `protocol.json` | preregistration: rules, deviations, items, gates, sample size, freeze discipline |
-| `signal.py` | pure rule functions (stdlib only); loaded by path because the name shadows the stdlib `signal` |
+| `orb_signal.py` | pure rule functions (stdlib only); not named `signal.py`, which would shadow the stdlib module |
 | `orb_common.py` | paths, calendar, the freeze guard `require_frozen` |
 | `orb_prepare.py` | pre-outcome data work: opening ranges, 14-day features, selection, trigger minutes, receipt |
 | `collect_quotes.py` | cost sample, SIP quote fetch, half-spread table |
@@ -96,7 +96,7 @@ counts receipt.
 
 ## Hook for a live-shadow stage
 
-If a verdict is supported, a separate prospective protocol would run the same `signal.py` and
+If a verdict is supported, a separate prospective protocol would run the same `orb_signal.py` and
 `orb_prepare.py` logic on live SIP data at 09:35 ET. It would record the would-be orders, trigger times and
 quotes without placing orders, then compare realised fills with F1 before any paper order. This study
 authorises no paper or live orders.

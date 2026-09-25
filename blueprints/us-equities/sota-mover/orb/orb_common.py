@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import hashlib
-import importlib.util
 import json
 import os
 import sys
@@ -18,18 +17,6 @@ MINUTE_PLAN = MINUTE_ROOT / "minute-plan-stage1.json"
 DAILY_PARQUET = Path.home() / "codex-ecosystem/state/broad-market-20260921/dataset/daily.parquet"
 PRIVATE = Path.home() / ".local/state/native-agent-stack/research/sota-mover/orb"
 FROZEN_STATUS = "frozen_before_outcomes"
-
-
-def load_signal():
-    """signal.py by path under a private module name (it shadows the stdlib ``signal``)."""
-    name = "orb_signal"
-    if name in sys.modules:
-        return sys.modules[name]
-    spec = importlib.util.spec_from_file_location(name, HERE / "signal.py")
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
-    return mod
 
 
 def sha256_file(path: Path) -> str:

@@ -9,20 +9,16 @@ freeze_discipline). Needs duckdb (the adaptive-paper tools Python).
   python orb_prepare.py candidates          # 14-day ATR / volume / RelVol per member symbol-day (pure Python)
   python orb_prepare.py select              # top-20 per session, directions, dojis, thin-session counts
   python orb_prepare.py triggers            # first trigger minute of each selected order (no prices kept)
-  python orb_prepare.py verify-or --n 300   # re-derive a sample of opening ranges from raw bars with signal.py
+  python orb_prepare.py verify-or --n 300   # re-derive a sample of opening ranges from raw bars with orb_signal.py
   python orb_prepare.py receipt             # counts and sha256 of every private artifact
 """
 from __future__ import annotations
 
-# signal.py in this directory shadows the stdlib module by name: cache the stdlib one before this
-# directory goes on sys.path, and load ours only by path (orb_common.load_signal).
 import os as _os
 import sys as _sys
 _HERE = _os.path.dirname(_os.path.abspath(__file__))
-if _sys.path and _os.path.abspath(_sys.path[0] or _os.curdir) == _HERE:
-    _sys.path.pop(0)
-import signal as _stdlib_signal  # noqa: E402,F401
-_sys.path.insert(0, _HERE)
+if _HERE not in _sys.path:
+    _sys.path.insert(0, _HERE)
 
 import argparse
 import csv
@@ -35,8 +31,8 @@ from collections import defaultdict
 from pathlib import Path
 
 import orb_common as C  # noqa: E402
+import orb_signal as S  # noqa: E402
 
-S = C.load_signal()
 BARS_GLOB = str(C.MINUTE_ROOT / "bars/symbol=*/year=*/full.parquet")
 
 
@@ -279,7 +275,7 @@ def cmd_triggers(a) -> int:
 # ------------------------------------------------------------------ verify-or
 
 def cmd_verify_or(a) -> int:
-    """Re-derive opening ranges for a sha256-keyed sample of candidate rows from raw bars with signal.py."""
+    """Re-derive opening ranges for a sha256-keyed sample of candidate rows from raw bars with orb_signal.py."""
     rows = [c for c in read_candidates()
             if int.from_bytes(hashlib.sha256(f"{c['symbol']}|{c['d']}".encode()).digest()[:8], "big") % 5000 == 0]
     rows = rows[: a.n]

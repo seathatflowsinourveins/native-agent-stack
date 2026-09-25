@@ -1,16 +1,15 @@
-"""SYN: synthetic tests for the Stocks-in-Play ORB rules (blueprints/us-equities/sota-mover/orb/signal.py).
+"""SYN: synthetic tests for the Stocks-in-Play ORB rules (blueprints/us-equities/sota-mover/orb/orb_signal.py).
 
 Made-up bars and daily rows only; no private data. Stdlib only (system python3).
 """
 import importlib.util
 import json
-import signal as _stdlib_signal  # noqa: F401  (cache the stdlib module; orb's signal.py is loaded by path)
 import sys
 import unittest
 from pathlib import Path
 
 ORB = Path(__file__).resolve().parents[1] / "blueprints/us-equities/sota-mover/orb"
-spec = importlib.util.spec_from_file_location("orb_signal_under_test", ORB / "signal.py")
+spec = importlib.util.spec_from_file_location("orb_signal_under_test", ORB / "orb_signal.py")
 S = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(S)
 FEES = json.loads((ORB.parents[1] / "mover-v3/data/fees-v3.json").read_text())

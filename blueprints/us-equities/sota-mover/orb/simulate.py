@@ -5,20 +5,16 @@
 ``selected`` simulates the top-20 orders (the items and the Table 2 analogue); ``base`` simulates every
 filter-1-3 name under F0 (the Fig. 4 and Table 1 descriptive analogues). The command refuses unless
 protocol.json is frozen and hashes to --protocol-sha256 (orb_common.require_frozen), because it reads prices
-after the decision time. The per-trade logic is signal.simulate_trade, the function the synthetic tests
+after the decision time. The per-trade logic is orb_signal.simulate_trade, the function the synthetic tests
 cover. Needs duckdb for reading the private minute corpus.
 """
 from __future__ import annotations
 
-# signal.py in this directory shadows the stdlib module by name: cache the stdlib one before this
-# directory goes on sys.path, and load ours only by path (orb_common.load_signal).
 import os as _os
 import sys as _sys
 _HERE = _os.path.dirname(_os.path.abspath(__file__))
-if _sys.path and _os.path.abspath(_sys.path[0] or _os.curdir) == _HERE:
-    _sys.path.pop(0)
-import signal as _stdlib_signal  # noqa: E402,F401
-_sys.path.insert(0, _HERE)
+if _HERE not in _sys.path:
+    _sys.path.insert(0, _HERE)
 
 import argparse
 import csv
@@ -30,8 +26,8 @@ from pathlib import Path
 
 import orb_common as C  # noqa: E402
 import collect_quotes as Q  # noqa: E402
+import orb_signal as S  # noqa: E402
 
-S = C.load_signal()
 MODELS = ("F0", "F1", "F2")
 TRADE_COLS = ["d", "segment", "symbol", "dirn", "rank", "relvol", "atr14", "slots", "model", "entry_minute",
               "entry_base", "entry_fill", "stop", "gap_entry", "exit_minute", "exit_base", "exit_fill",

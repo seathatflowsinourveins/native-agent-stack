@@ -1,9 +1,8 @@
 """Pure rule functions for the Stocks-in-Play 5-minute ORB replication (protocol.json).
 
 Stdlib only and free of I/O, so every rule can be exercised on synthetic fixtures by the system Python.
-This file shadows the stdlib ``signal`` module by name, so callers load it by path under another module
-name (``load_signal()`` in ``orb_common.py``). Each entry script imports the stdlib ``signal`` before it
-puts this directory on ``sys.path``, so a later ``import signal`` anywhere still gets the stdlib module.
+Named orb_signal (not signal) so it never shadows the stdlib ``signal`` module when this directory is
+on ``sys.path``; the entry scripts import it as ``import orb_signal as S``.
 
 Conventions
 - A minute bar is a tuple ``(minute, o, h, l, c, v)``; ``minute`` is minutes after midnight ET of the

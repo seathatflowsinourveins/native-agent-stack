@@ -6,7 +6,6 @@ protocol is opened). Stdlib only (system python3).
 import hashlib
 import importlib.util
 import json
-import signal as _stdlib_signal  # noqa: F401  (cache the stdlib module; orb's signal.py is loaded by path)
 import sys
 import tempfile
 import unittest

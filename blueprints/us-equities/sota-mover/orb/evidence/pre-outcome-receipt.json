@@ -1,7 +1,7 @@
 {
  "artifacts_sha256": {
-  "candidates.counts.json": "0e70f55c9ac65f6ad96d1e1e0f739fa922d96058be3611ad2d23f2a585bd2cb6",
-  "candidates.csv.gz": "a013ce9eed5c6f271260d15627114fb9947ce30fd07c5ff80133cd8edeb1f651",
+  "candidates.counts.json": "acebff1f025f17113514a6b9528be61aac3320c4bfa75f5d1ed59cd13280a85a",
+  "candidates.csv.gz": "ab26f20ea96883cac9431a85f4581fa160453b10d2df5c56a8a669007ae16eee",
   "cost-table.json": "44fffd2e1f3aa5e13c73fc84b4c8a21f78ef2b4ce053339620c0ff32ce4bc6b6",
   "or5.parquet": "e7e33f5f07415b0dfdf2991c115c6f1aebcabf432887633c48ab15e516465790",
   "power.json": "bbf9b3f0bcaa9dc7daff231dbda19f04c811a89c16dd051fb50ff89b843fd71e",
@@ -16,16 +16,16 @@
  "counts": {
   "candidates.counts.json": {
    "eligible_1_3": 992134,
-   "member_symbol_days": 1192531,
-   "not_member_year": 758583,
-   "or_symbol_days": 1951114,
-   "reason:daily_gap": 1189,
+   "member_symbol_days": 1185667,
+   "not_member_year": 755035,
+   "or_symbol_days": 1940702,
+   "reason:daily_gap": 1175,
    "reason:daily_today_missing": 6,
    "reason:eligible": 992134,
    "reason:filters_1_3": 191563,
-   "reason:relvol_window_invalid": 7639,
-   "sha256": "a013ce9eed5c6f271260d15627114fb9947ce30fd07c5ff80133cd8edeb1f651",
-   "split_adjusted_windows": 176
+   "reason:relvol_window_invalid": 789,
+   "sha256": "ab26f20ea96883cac9431a85f4581fa160453b10d2df5c56a8a669007ae16eee",
+   "split_adjusted_windows": 170
   },
   "cost-table.json": {
    "cell_key": "time_bucket|price_tier|liq_tier",

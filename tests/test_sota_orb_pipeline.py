@@ -9,7 +9,6 @@ import hashlib
 import importlib.util
 import json
 import random
-import signal as _stdlib_signal  # noqa: F401
 import sys
 import tempfile
 import unittest

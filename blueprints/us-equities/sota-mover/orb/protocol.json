@@ -117,7 +117,7 @@
   "max_drawdown": "max over t of 1 - equity_t / max_{s<=t} equity_s on the compounded daily equity"
  },
  "gates": {
-  "pre_outcome": ["verify-or: 0 mismatches between the SQL opening-range table and signal.opening_range on the sha-keyed sample", "every stamp of the cost sample complete (HTTP 200) or reported as incomplete; the table records its observation count", "post-publication fired trades >= sample_size.n_min_trades, otherwise every item is reported as inconclusive (not as a fail)"],
+  "pre_outcome": ["verify-or: 0 mismatches between the SQL opening-range table and orb_signal.opening_range on the sha-keyed sample", "every stamp of the cost sample complete (HTTP 200) or reported as incomplete; the table records its observation count", "post-publication fired trades >= sample_size.n_min_trades, otherwise every item is reported as inconclusive (not as a fail)"],
   "verdict": {
    "combined": "supported only if ORB-1 is rejected under Holm AND the F2 combined mean net R point estimate is > 0",
    "long_only": "supported only if ORB-2 is rejected under Holm AND the F2 long mean net R point estimate is > 0",
@@ -166,11 +166,11 @@
   "forbidden_before_freeze": "any fill price, stop, exit, return, P&L, R, hit rate or price change after a decision time, or anything derived from them, including sanity checks",
   "guard": "simulate.py run and evaluate.py run refuse unless status == frozen_before_outcomes, frozen_before_outcomes == true and the protocol file's sha256 equals --protocol-sha256"
  },
- "live_shadow_hook": "If any verdict is supported, a separate prospective protocol (new id, new freeze) runs the same prepare/signal code at 09:35 ET each session on live SIP data, records the would-be orders, trigger times and quotes without placing orders, and compares realised fills against F1 for a preregistered number of sessions before any paper order. Nothing in this study authorises paper or live orders.",
+ "live_shadow_hook": "If any verdict is supported, a separate prospective protocol (new id, new freeze) runs the same orb_prepare/orb_signal code at 09:35 ET each session on live SIP data, records the would-be orders, trigger times and quotes without placing orders, and compares realised fills against F1 for a preregistered number of sessions before any paper order. Nothing in this study authorises paper or live orders.",
  "runtime": {"python": "3.12.3", "duckdb": "1.5.5", "numpy": "not required", "tests": "system python3 3.12 (stdlib only)"},
  "pinned_artifacts": {
    "or5.parquet": "e7e33f5f07415b0dfdf2991c115c6f1aebcabf432887633c48ab15e516465790",
-   "candidates.csv.gz": "a013ce9eed5c6f271260d15627114fb9947ce30fd07c5ff80133cd8edeb1f651",
+   "candidates.csv.gz": "ab26f20ea96883cac9431a85f4581fa160453b10d2df5c56a8a669007ae16eee",
    "selected.csv": "2fdbeb90aa5383303a12160ad35618ab173b09118f079d8a47b28087602bb0c9",
    "triggers.csv": "90599376fe12a438f882b06666883cb9fe6844278634f8c300942c8e9dbd5c89",
    "quotes/sample.json": "ff2cb8a93140cdb971cfefbc4da8d14c219769b6448b3e823cf6d7528b2cdb74",
@@ -179,11 +179,11 @@
  "pinned_artifacts_rule": "simulate.py run refuses when a private file differs from its pin (orb_common.verify_pins)",
  "pre_freeze_computations": [
    "1. orb_prepare.py or-table: 09:30-09:34 open/high/low/close/volume and regular-hours bar count per symbol-day for the 926 universe-A symbols (1,957,885 rows).",
-   "2. orb_prepare.py candidates: ATR14, 14-day average volume, RelVol, split ratio and filters 1-3 per member symbol-day (1,192,531 member symbol-days; 992,134 pass filters 1-3). Run five times: the first run used the price-adjustment factor as a split detector and flagged 1,977 windows (ex-dividend and spin-off sessions); D8 moved detection to the share factor (176 windows). Runs 2-5 give the same counts; runs 2-3 differed in their gzip header timestamp, which is now fixed at 0, and runs 4-5 are byte-identical.",
+   "2. orb_prepare.py candidates: ATR14, 14-day average volume, RelVol, split ratio and filters 1-3 per member symbol-day (1,192,531 member symbol-days; 992,134 pass filters 1-3). Run five times: the first run used the price-adjustment factor as a split detector and flagged 1,977 windows (ex-dividend and spin-off sessions); D8 moved detection to the share factor (176 windows). Runs 2-5 give the same counts; runs 2-3 differed in their gzip header timestamp, which is now fixed at 0, and runs 4-5 are byte-identical. After the reproduction start moved to 2017-01-24 it was run twice more (byte-identical): 1,185,667 member symbol-days, the same 992,134 eligible, 170 split-adjusted windows.",
    "3. A distribution check of that split factor (pre-decision daily fields only), which prompted the D8 change.",
    "4. orb_prepare.py select: top 20 per session with direction and doji counts, and sessions with fewer than 20 selectable names (from 2017-01-03: reproduction 16 of 1,760, 14 of them the first 14 sessions of 2017 without RelVol history; from 2017-01-24: 2 of 1,746; post-publication 4 of 657). Rerun after step 2 and after the start moved to 2017-01-24; selected.csv stayed byte-identical.",
    "5. orb_prepare.py triggers: the first trigger minute of each non-doji order from bar highs and lows at or after 09:35 (reproduction 28,911 of 34,639 orders fired; post-publication 10,755 of 13,077). No price other than the level test was kept.",
-   "6. orb_prepare.py verify-or: 242 sha-keyed symbol-days re-derived from raw bars with signal.opening_range, 0 mismatches.",
+   "6. orb_prepare.py verify-or: 242 sha-keyed symbol-days re-derived from raw bars with orb_signal.opening_range, 0 mismatches.",
    "7. collect_quotes.py sample/fetch/table: 5,041 sampled fired orders, 20,091 stamps, 20,091 GET requests, all HTTP 200, 9 stamps without a valid quote; half-spread cells per group.",
    "8. evaluate.py power: MDE and minimum sample from the trigger counts only.",
    "No fill price, stop, exit, return, P&L, R, hit rate or post-decision price change was computed on real data. The only post-09:35 price data read were bar highs and lows for the trigger test (step 5) and SIP quotes at the signal stamps (step 7)."

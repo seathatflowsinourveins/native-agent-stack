@@ -12,15 +12,11 @@ ledger; the fetch is resumable and GET-only. Stdlib only.
 """
 from __future__ import annotations
 
-# signal.py in this directory shadows the stdlib module by name: cache the stdlib one before this
-# directory goes on sys.path, and load ours only by path (orb_common.load_signal).
 import os as _os
 import sys as _sys
 _HERE = _os.path.dirname(_os.path.abspath(__file__))
-if _sys.path and _os.path.abspath(_sys.path[0] or _os.curdir) == _HERE:
-    _sys.path.pop(0)
-import signal as _stdlib_signal  # noqa: E402,F401
-_sys.path.insert(0, _HERE)
+if _HERE not in _sys.path:
+    _sys.path.insert(0, _HERE)
 
 import argparse
 import csv
