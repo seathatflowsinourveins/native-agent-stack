@@ -9140,8 +9140,8 @@
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/README.md",
-      "sha256": "fef9f546cdae76f37ece09c4dc6eafb374a6a01ac65e5b3327e1b279cdbca367",
-      "bytes": 29992
+      "sha256": "038916faef0ebf657d1ea6b1f7d5a755c078d889fa4a9859189c1ac3f533acfd",
+      "bytes": 30772
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/l1_feasibility.py",
@@ -9150,8 +9150,8 @@
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/receipt.json",
-      "sha256": "de22ccf555e1a7dad3960cefd88f16dfc3805262d619f6398ffb1fe472206181",
-      "bytes": 41393
+      "sha256": "f9a38d26645546c12c0cdf5747daebf9c09e079bfae9e2051b49c122b3ce0f89",
+      "bytes": 41474
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.in",

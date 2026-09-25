@@ -331,6 +331,6 @@
     "IntpOrderLatency / per-symbol latency, FlatPerTradeFeeModel / TradingQtyFeeModel, L3FIFOQueueModel / RiskAdverseQueueModel -- moved to l1_feasibility_verdict.not_exercised",
     "Real-world accuracy of the EMO/Lee-Ready aggressor-side inference on actual Alpaca SIP data (only shown on hand-constructed synthetic tapes)",
     "Whether upstream is dormant-but-maintained or effectively abandoned -- the 2026-12-23 no-further-commits checkpoint is the concrete re-check point, not yet reached",
-    "'Quotes-only replay' on the sim-capacity branch (mentioned by the coordinator; this task's own read of runner.py at commit 0e0740e7 shows both QuoteTick and TradeTick in use, not confirmed as quotes-only)"
+    "sim-capacity engine feed: quotes-only from commit f47160b7 onward (trades are fetched and catalogued but not added to the engine, because rc5 L1 trade ticks overwrite both book sides); this task read 0e0740e7, before that change. The cross-check must use the merged sim-capacity commit"
   ]
 }

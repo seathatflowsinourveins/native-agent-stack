@@ -368,6 +368,18 @@ here). The older `sim-paper-compare` lane used
 `liquidity_consumption=False, queue_position=False`
 (`blueprints/us-equities/sim-paper-compare/replay_compare.py`).
 
+**Update (coordinator, 2026-09-25): the sim-capacity configuration changed
+after `0e0740e7`.** From `f47160b7` onward its runner feeds the matching
+engine **quotes only**. Trades are still fetched and written to its private
+catalog, but they are not added to the engine. The reason: in rc5 a trade
+tick on an L1 book overwrites both sides with the print's price and size, and
+a `NO_AGGRESSOR` trade leaves that locked book in place until the next quote.
+With trades in the feed, 41% of the exerciser's IOC fills beat the NBBO
+touch; with quotes only, none do. For its IOC-taker exerciser,
+`queue_position` and `trade_execution` had no measured effect. The
+cross-check below must use the sim-capacity commit that merges to `main`,
+and compare against its quotes-only engine feed.
+
 **A comparison that leaves these settings unmatched measures configuration,
 not engines.** hftbacktest has no single setting equivalent to Nautilus's
 `liquidity_consumption` -- neither exchange model actually depletes quoted
