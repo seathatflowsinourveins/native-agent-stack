@@ -174,12 +174,52 @@ config -- is repointed at `current/<id>` instead of the real
 one-time migration verifies this itself, `readlink -f` before and after,
 before it touches anything). From then on, moving that component to a
 different already-installed prefix (the vLLM 0.25.0/0.29.0 case above, for
-example, once vLLM is switch-adopted) is one `apply`, which flips only
-`current/<id>` and restarts only the units the component's own `surfaces[]`
-name -- never `adaptive-paper-rung1x-20260923-ladder2`,
+example, once vLLM is switch-adopted) is meant to be one `apply`, which flips
+only `current/<id>` and restarts only the units the component's own
+`surfaces[]` name -- never `adaptive-paper-rung1x-20260923-ladder2`,
 `ibkr-paper-post-20260923`, `incentive-forward@1330`,
 `mover-daily-scan-0925` or `mover-rth-trial-20260924`, which `apply` refuses
 to restart under any circumstance.
+
+**Not yet true for an interpreter-hosted service sharing a shared interpreter
+(minor finding).** The `unit-restart` health probe (`/proc/<MainPID>/exe`
+inside the new root: `apply` restarts the unit and requires the executable it
+lands on to resolve under `--to-root`) can never pass for a service whose
+entrypoint execs a Python interpreter it does not itself own. On this host
+every `tools/vllm-*/bin/python` is a symlink into one shared
+`python/cpython-3.13.15-linux-x86_64-gnu/bin/python3.13`, outside any single
+`tools/vllm-<version>` root, so `path_is_under(exe, expected_root)` fails no
+matter which vLLM version is live -- an `apply` would restart the model
+service twice (once forward, once on the automatic rollback its own failed
+probe triggers) and still exit non-zero. `UnitRestartTests`' own fixture
+works around exactly this by copying a real, separate interpreter binary into
+each versioned root rather than symlinking a shared one; vLLM's real install
+does not do that today. Until it does (a private interpreter per version) or
+this probe gains an alternative for that shape, vLLM stays a `pending`
+`candidates[]` entry rather than a switch-managed component, and this
+paragraph's "one apply" is the target design, not yet the demonstrated
+result.
+
+**Staging a new version for `ecosystem-switch` to adopt.**
+`bootstrap-linux.sh --tools-suffix -rDATE` installs beside an already-adopted
+version instead of over it (`tools/<id>-<version>-rDATE` rather than
+`tools/<id>-<version>`) without touching that component's `pin`/lock records,
+so the two prefixes coexist until `plan`/`apply` above flips `current/<id>`
+between them. `--tools-suffix` alone still repoints the *canonical* `bin/*`
+symlinks at the freshly staged prefix directly (every `install_*` function
+links into `bin_dir`, which defaults to `ECO_INSTALL_ROOT/bin`, unless told
+otherwise) -- it does **not** by itself keep a staged run from touching the
+canonical links; only `--no-link` (installs the versioned root only, creates
+no `bin/*` symlink for it at all -- a uv-tool-kind pin still lets uv manage
+its own isolated shim directory under that staged prefix) or `--link-dir DIR`
+(redirects the symlinks and the reported `installed-versions*.txt` to `DIR`
+instead) actually isolate a staged run from the live `bin/*`. Pair
+`--tools-suffix` with one of those two when the intent is exactly "stage a
+root beside the live one, for `ecosystem-switch` to adopt later" rather than
+"switch to the new version immediately by re-running bootstrap" -- the
+second is also a valid, simpler path for a component `ecosystem-switch` does
+not manage yet, but it is the old non-atomic, non-ledgered `ln -sfn`-by-hand
+replacement this tool exists to retire, not a mix of the two.
 
 **Ledger.** Every operation `apply`, `adopt --relink` or `rollback` performs
 appends one entry to `$ECO_INSTALL_ROOT/switch/ledger.jsonl`: a 0600,
@@ -281,8 +321,10 @@ schema_version 2 migration gave every one of its 14 existing pins the fields
 `surfaces[]`, `state_dirs[]`, `window`, `rollback_class`), but none of those
 14 is a live service with an external hard-coded root today, so none of their
 `surfaces[]` is populated yet. The actual hard-coded-root consumers this
-page's own Facts (see `docs/tasks/sota-rollout-20260925/briefs/switch.md`)
-named -- vLLM, the Gitleaks/mcp-inspector/serena-context guarded wrappers,
+page's own Facts (see the sota-rollout-20260925 `switch` track brief's Facts
+section, `docs/tasks/sota-rollout-20260925/briefs/switch.md` in the sibling
+`agent-lab-sota-rollout` checkout that planned this work -- not a path in
+this repository) named -- vLLM, the Gitleaks/mcp-inspector/serena-context guarded wrappers,
 Dagu, and the adaptive-paper `*/frozen/*` launchers -- are recorded as
 `pending` `candidates[]` in that same pins file rather than given fabricated
 `surfaces[]` entries; a later qualify wave should give each one a real pin

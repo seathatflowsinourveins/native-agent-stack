@@ -491,18 +491,22 @@ one hash-chained ledger entry per operation:
 - **Receipt gate.** `--receipt RID` names a
   `switch/receipts/<RID>.json` document shaped like
   `tools/sota-convergence/native-rollout-receipt.schema.json`. `apply` refuses
-  unless that receipt's overall `status` is `"passed"`, its `identity`
-  matches the component and the *full* target version derived from
-  `--to-root`'s basename after stripping the `<component>-` prefix (so
-  `tools/rtk-0.50.0-r20260925` is version `0.50.0-r20260925`, not just the
-  text after the last hyphen -- a receipt for one root never authorizes a
-  different root that happens to share a trailing segment), its
-  `install.root` (its `${STACK_HOME}` placeholder resolved against
-  `ECO_INSTALL_ROOT`) names that same `--to-root`, tiers `T0`, `T2` and `T4`
-  are all `"passed"`, and tier `T1` is either `"passed"` or explicitly
-  `"unavailable"` with a stated reason. (`install.marker_sha256` is not
-  cross-checked: no generic, per-component marker-file location is defined
-  yet for this tool to locate on its own.)
+  unless that receipt's overall `status` is `"passed"`, its `identity.version`
+  is *consistent with* the target version derived from `--to-root`'s basename
+  after stripping the `<component>-` prefix -- either equal to it outright, or
+  a prefix of it followed by `-<staging suffix>` (so a receipt for the clean
+  upstream version `2.0.0` authorizes a staged `tools/foo-2.0.0-r20260925`
+  root, but a receipt for `1.9.0` never does, whatever suffix follows) --
+  its `install.root` (its `${STACK_HOME}` placeholder resolved against
+  `ECO_INSTALL_ROOT`) names that exact same `--to-root` (the actual, stronger
+  binding to one specific staged root: `identity.version` deliberately never
+  has to carry the staging marker itself, since `record_native_rollout.py`
+  copies it verbatim into a landscape winner's pin, read downstream as the
+  plain upstream version a live host's own `--version` reports), tiers `T0`,
+  `T2` and `T4` are all `"passed"`, and tier `T1` is either `"passed"` or
+  explicitly `"unavailable"` with a stated reason. (`install.marker_sha256` is
+  not cross-checked: no generic, per-component marker-file location is
+  defined yet for this tool to locate on its own.)
 - **Window gate.** `--window NAME` names `switch/windows/<name>.json`
   (`{name, start_utc, end_utc, allowed_components}`); `apply` refuses outside
   that time range or when the component is not in `allowed_components`.
@@ -563,14 +567,17 @@ mid-`apply` or mid-`relink`) rather than ever completing one after the fact;
 `prune --list` reports `tools/<name>-<version>` roots no `current/<id>` link
 points at, that are not the previous root of any not-yet-rolled-back txn (a
 pending or already-applied txn's own rollback target stays live until that
-txn is actually rolled back), and that this tool's own (reduced-scope: `PATH`
-entries, `bin/` symlink targets, this user's own running processes'
-exe/cwd/cmdline and this user's `systemd --user` unit file text -- no mount/
-symlink-hop/citation scan, and no check of hard-coded roots inside wrapper
-scripts under `adoption/tools/` since this tool only ever reads
-`$ECO_INSTALL_ROOT`, never the catalog checkout -- `bin/ecosystem-wave-retention`
-on the host has the fuller technique this should grow into) in-use check
-does not find referenced; `prune --apply ROOT --reason TEXT` removes one such
+txn is actually rolled back), and that this tool's own reduced-scope in-use
+check -- `PATH` entries, `bin/` symlink targets, this user's own running
+processes' exe/cwd/cmdline, this user's `systemd --user` unit file text, and
+the wrapper-script text under `wrapper_scan_dirs()` (default
+`~/codex-ecosystem/bin`, override `ECOSYSTEM_SWITCH_WRAPPER_DIRS`) -- e.g.
+`gitleaks-guarded`, `mcp-inspector-2.7.0-guarded` -- does not find referenced
+elsewhere. No mount/symlink-hop scan, and no check of hard-coded roots inside
+`adoption/tools/`'s own tracked wrapper copies *in the catalog checkout*,
+since this tool only ever reads `$ECO_INSTALL_ROOT` and `wrapper_scan_dirs()`,
+never the catalog checkout itself; `bin/ecosystem-wave-retention` on the host
+has the fuller technique this should grow into. `prune --apply ROOT --reason TEXT` removes one such
 eligible root and records the reason; `write-installed-versions` regenerates
 an `installed-versions.txt`-style report from the switch state, independent
 of running a fresh bootstrap, backing up any file it is about to overwrite
