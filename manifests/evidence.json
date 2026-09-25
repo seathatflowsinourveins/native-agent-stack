@@ -9160,8 +9160,8 @@
     },
     {
       "path": "blueprints/us-equities/sim-capacity/experiment.json",
-      "sha256": "e48361fba7d46bbc1fc2d9424382e12ba144ceb35e87791bb4712de765ef634f",
-      "bytes": 15533
+      "sha256": "488259b7f5bd01a3be2d592e364259afab760f361ee4a80abb09c520c7a2d2be",
+      "bytes": 22520
     },
     {
       "path": "blueprints/us-equities/sim-capacity/fee_model.py",
@@ -9217,6 +9217,56 @@
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
       "sha256": "c6a3e11fef05209374aae054b303513246771663f8c69349fb0d93e4d8c4ff35",
       "bytes": 92438
+    },
+    {
+      "path": "blueprints/us-equities/sim-engine-crosscheck/README.md",
+      "sha256": "7ad248d6b7a9ae6fcb266fc498eea47701cc0abd67e46d1df56e67d9ba2baac1",
+      "bytes": 20360
+    },
+    {
+      "path": "blueprints/us-equities/sim-engine-crosscheck/crosscheck.py",
+      "sha256": "16d4df08317541c8883b6612c0c9fa7878cf98736698a387c02d7c1000906814",
+      "bytes": 10489
+    },
+    {
+      "path": "blueprints/us-equities/sim-engine-crosscheck/metrics.py",
+      "sha256": "e7371ef46207d450fc3372d1d68ab66d3cdf7723658cb5ac23e05a47c21374e3",
+      "bytes": 9623
+    },
+    {
+      "path": "blueprints/us-equities/sim-engine-crosscheck/oracle.py",
+      "sha256": "8760883cadd1d2f5b84071b0ec5886790e17bfa5a8951500c0b0ea54d3a7b5d0",
+      "bytes": 5001
+    },
+    {
+      "path": "blueprints/us-equities/sim-engine-crosscheck/order_stream.py",
+      "sha256": "9c84b90384d8462aa52500e29096532ce3332020ccd89793ca9c1bc30db4ff4e",
+      "bytes": 7825
+    },
+    {
+      "path": "blueprints/us-equities/sim-engine-crosscheck/receipts/20260925-crosscheck-superseded.json",
+      "sha256": "11f19ba59af01813bd0ed56508d4dad1dee21d529511d919592ae3f890467b07",
+      "bytes": 25215
+    },
+    {
+      "path": "blueprints/us-equities/sim-engine-crosscheck/receipts/20260925-crosscheck.json",
+      "sha256": "19eaf40b807d0ed69533d59007f36419c55c029727077ad3196451740cd34240",
+      "bytes": 24027
+    },
+    {
+      "path": "blueprints/us-equities/sim-engine-crosscheck/run_hftbacktest.py",
+      "sha256": "3838a982e528026212cf1663277b967a0a062623314d83d27b6791aca7a16d3d",
+      "bytes": 13744
+    },
+    {
+      "path": "blueprints/us-equities/sim-engine-crosscheck/run_nautilus.py",
+      "sha256": "5097f0b071d9fcbd337ad9f8a7286eebc876f4e3ab63ce80e63c829cb146fac7",
+      "bytes": 12126
+    },
+    {
+      "path": "blueprints/us-equities/sim-engine-crosscheck/sample.py",
+      "sha256": "441c35e063fbd842e2721fb94d7dfbbacad7ebd14895b0d26086bcaa2ab3556a",
+      "bytes": 4703
     },
     {
       "path": "blueprints/us-equities/sim-paper-compare/README.md",
@@ -29962,6 +30012,11 @@
       "path": "tests/test_sim_crosscheck_hftbacktest.py",
       "sha256": "0821717fb58e78424712c65b1c4e57ac71d12a97e7691da2e3be020dee9ef7cc",
       "bytes": 17763
+    },
+    {
+      "path": "tests/test_sim_engine_crosscheck.py",
+      "sha256": "249786689a512af9ab1708149dcaf8da54ea0f1ac1efc5fc80f3c03332f80b91",
+      "bytes": 31874
     },
     {
       "path": "tests/test_sim_paper_compare.py",
