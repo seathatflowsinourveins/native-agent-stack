@@ -3164,8 +3164,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "c70623eece257cf1a5b26694af88d0a6f5899f2ddb3e09dcb6c3abd30d737f37",
-      "bytes": 725
+      "sha256": "a06bdd91efe0b9609a85054847bb35485fcd2bf4603989269f600951aae08c84",
+      "bytes": 1023
     },
     {
       "path": ".gitleaks.toml",
@@ -9935,8 +9935,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "e476513db4b7e6b10906a97fe62863e69cc834bec2408b2e17e5ba7c656a6740",
-      "bytes": 27700
+      "sha256": "0a62cc90b087baf1dfac27dfad70220d56caa7cc35a8cb6ec2409ed8d5a0e52b",
+      "bytes": 28111
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -29220,8 +29220,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "a1633209e182e034d62af380b115cb07d991af7b3955b2b81bac4d47c56873ea",
-      "bytes": 69098
+      "sha256": "ad9e23a23e46300ddd9eae720266be6f1e4349c1657aa2c731d1c46b7e8c4a92",
+      "bytes": 74822
     },
     {
       "path": "scripts/landscape.py",
@@ -29625,8 +29625,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "d4563ddda6b7c53c81eab5e3b35752a12d691e7a06194a14ad4693d24508677b",
-      "bytes": 85236
+      "sha256": "70d3926e26c671f73b23676446a64695404c309c1ee653cd5a9698050098319f",
+      "bytes": 97117
     },
     {
       "path": "tests/test_ibkr_acceptance.py",

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import bisect
+import fcntl
 import getpass
 import hashlib
 import json
@@ -552,11 +553,28 @@ def existing_review_summary(path: Path) -> str:
     return ", ".join(entries) if entries else "no reviews"
 
 
-def refuse_overwrite_message(relative_path: str, target: Path, receipt_id: str) -> str:
+def refuse_overwrite_message(relative_path: str, target: Path, latest_id: str) -> str:
     return (f"error: refusing to overwrite existing receipt {relative_path!r} (existing reviews: "
-            f"{existing_review_summary(target)}); receipts are never edited or overwritten once written "
-            f"(docs/contributing-evidence.md) -- pass --supersedes {receipt_id!r} to record a new receipt "
+            f"{existing_review_summary(target)}); receipts are never overwritten once written "
+            f"(docs/contributing-evidence.md) -- pass --supersedes {latest_id!r} to record a new receipt "
             "that supersedes it without touching the original")
+
+
+def latest_generation_id(root: Path, host_id: str, base_id: str) -> str | None:
+    """The id of the highest-generation existing receipt in ``base_id``'s family: ``base_id``
+    itself (generation 1), or ``base_id-N`` for the largest existing N, or ``None`` if no
+    receipt in this family has been recorded yet. Generations are contiguous by construction
+    (``next_free_superseding_id`` always fills the lowest free slot), so a sequential scan
+    from N=2 stops at the first gap. ``record --supersedes`` requires naming exactly this id,
+    so an older generation can never be superseded while a newer one exists (which would hide
+    the newer one's own reviews)."""
+    host_dir = root / "evidence" / "hosts" / host_id
+    latest = base_id if (host_dir / f"{receipt_filename_stem(base_id)}.json").is_file() else None
+    generation = 2
+    while (host_dir / f"{receipt_filename_stem(f'{base_id}-{generation}')}.json").is_file():
+        latest = f"{base_id}-{generation}"
+        generation += 1
+    return latest
 
 
 def next_free_superseding_id(root: Path, host_id: str, base_id: str) -> str:
@@ -677,8 +695,8 @@ def cmd_record(args: argparse.Namespace) -> int:
 
     # Compute the receipt id/path and refuse a collision *before* any command below runs, so a
     # same-day rerun can never erase an existing file's appended independent reviews (the
-    # 2026-09-25 incident) -- receipts are never edited or overwritten once written. --supersedes
-    # is the reviewable way to record a new receipt for the same host/component/stage/date instead.
+    # 2026-09-25 incident) -- receipts are never overwritten once written. --supersedes is the
+    # reviewable way to record a new receipt for the same host/component/stage/date instead.
     base_id = f"{host_id}--{args.component_id}--{args.stage}--{date_stamp}"
     if args.supersedes is None:
         receipt_id = base_id
@@ -702,6 +720,15 @@ def cmd_record(args: argparse.Namespace) -> int:
             print(f"error: --supersedes names {superseded_relative!r}, which does not exist; --supersedes must "
                   "name an already-recorded receipt")
             return 2
+        # --supersedes must name the *latest* existing generation: superseding an older one
+        # while a newer generation already exists would silently drop the newer one's own
+        # reviews from the chain (nobody would ever be told to supersede it in turn).
+        latest = latest_generation_id(root, host_id, base_id)
+        if args.supersedes != latest:
+            print(f"error: --supersedes {args.supersedes!r} is not the latest receipt for this host/component/"
+                  f"stage/date; the latest is {latest!r} -- pass --supersedes {latest!r} instead (superseding an "
+                  "older generation while a newer one exists would hide the newer one's own reviews)")
+            return 2
         receipt_id = next_free_superseding_id(root, host_id, base_id)
 
     relative_path = f"evidence/hosts/{host_id}/{receipt_filename_stem(receipt_id)}.json"
@@ -711,7 +738,7 @@ def cmd_record(args: argparse.Namespace) -> int:
         print(f"error: cannot record a receipt at {relative_path!r}: {error}")
         return 2
     if target.exists():
-        print(refuse_overwrite_message(relative_path, target, receipt_id))
+        print(refuse_overwrite_message(relative_path, target, latest_generation_id(root, host_id, base_id)))
         return 2
 
     command_records = []
@@ -781,8 +808,10 @@ def cmd_record(args: argparse.Namespace) -> int:
         print("error: the receipt would not validate: " + "; ".join(shape_errors))
         return 2
 
-    # Validate (and register) before/around the final write, rolling back the file on any
-    # registration failure, so a crash here can never leave a written-but-unregistered
+    # The write below is an exclusive create (FileExistsError is defense in depth alongside
+    # the target.exists() check earlier -- both mean this call never overwrites). Any other
+    # failure while writing, or a failure to register afterward, deletes the file this run
+    # created, so a crash here can never leave a written-but-unregistered (or truncated)
     # receipt behind (the receipt file and manifests/evidence.json stay coherent together).
     target.parent.mkdir(parents=True, exist_ok=True)
     try:
@@ -791,8 +820,15 @@ def cmd_record(args: argparse.Namespace) -> int:
     except FileExistsError:
         # Defense in depth: the target.exists() check above already refused this exact path
         # once; this only catches a receipt another process created in the window since then.
-        print(refuse_overwrite_message(relative_path, target, receipt_id))
+        print(refuse_overwrite_message(relative_path, target, latest_generation_id(root, host_id, base_id)))
         return 2
+    except Exception:
+        # The exclusive create above means this run, and only this run, could have created
+        # target; a failure partway through writing it (for example ENOSPC) is safe to delete
+        # rather than leaving a truncated or empty receipt behind. Re-raise so the underlying
+        # error is not hidden.
+        target.unlink(missing_ok=True)
+        raise
     try:
         register_file(root, relative_path)
     except Exception as error:
@@ -835,7 +871,6 @@ def cmd_review(args: argparse.Namespace) -> int:
         print("error: --receipt must be inside the repository root")
         return 2
     path = safe_file(root, relative_path)
-    receipt = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
     if args.kind not in REVIEW_KINDS:
         print(f"error: --kind must be one of {sorted(REVIEW_KINDS)}")
         return 2
@@ -850,35 +885,58 @@ def cmd_review(args: argparse.Namespace) -> int:
     if reviewer is None:
         print(f"error: no reviewer identity: pass --identity NAME (only a Claude Code session exports {IDENTITY_ENV})")
         return 2
-    recorder = (receipt.get("recorded_by") or {}).get("identity_sha256") if isinstance(receipt.get("recorded_by"), dict) else None
-    if args.kind != "self":
-        if recorder is None:
-            print("error: this receipt has no recorded_by identity, so an independent review cannot be checked "
-                  "against its recorder; re-record it with the current scripts/host_receipts.py record")
+
+    # An exclusive lock on a stable file beside the receipt -- never the receipt path itself,
+    # which os.replace() swaps to a new inode below and so would stop protecting a second
+    # waiter still holding the old one -- serializes concurrent reviewers of the same receipt.
+    # Each re-reads the receipt only after acquiring the lock, so two reviews racing to append
+    # cannot silently lose one, and the write goes to a temp file that is os.replace()d into
+    # place, so a crash mid-write can never truncate the receipt that was there before.
+    lock_path = path.with_name(path.name + ".lock")
+    lock_handle = open(lock_path, "a+")
+    try:
+        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+        receipt = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
+        recorder = (receipt.get("recorded_by") or {}).get("identity_sha256") \
+            if isinstance(receipt.get("recorded_by"), dict) else None
+        if args.kind != "self":
+            if recorder is None:
+                print("error: this receipt has no recorded_by identity, so an independent review cannot be "
+                      "checked against its recorder; re-record it with the current scripts/host_receipts.py record")
+                return 2
+            if reviewer == recorder:
+                print(f"error: --kind {args.kind} review from the recorder's own identity; an independent review "
+                      "must come from a different session, lane or person")
+                return 2
+        now = utc_now()
+        observed_at = receipt.get("observed_at_utc")
+        if isinstance(observed_at, str) and now < observed_at:
+            print(f"error: this host's clock ({now}) is behind the receipt's observed_at_utc ({observed_at}); a "
+                  "review dated before the observation is refused by validate, so fix the clock and rerun")
             return 2
-        if reviewer == recorder:
-            print(f"error: --kind {args.kind} review from the recorder's own identity; an independent review must "
-                  "come from a different session, lane or person")
+        receipt.setdefault("reviews", []).append({
+            "kind": args.kind, "ref": args.ref, "verdict": args.verdict, "at_utc": now,
+            "reviewer": identity_record(reviewer, args.model),
+        })
+        shape_errors: list[str] = []
+        validate_receipt_shape(root, receipt, relative_path, shape_errors)
+        if shape_errors:
+            print("error: the reviewed receipt would not validate: " + "; ".join(shape_errors))
             return 2
-    now = utc_now()
-    observed_at = receipt.get("observed_at_utc")
-    if isinstance(observed_at, str) and now < observed_at:
-        print(f"error: this host's clock ({now}) is behind the receipt's observed_at_utc ({observed_at}); a review "
-              "dated before the observation is refused by validate, so fix the clock and rerun")
-        return 2
-    receipt.setdefault("reviews", []).append({
-        "kind": args.kind, "ref": args.ref, "verdict": args.verdict, "at_utc": now,
-        "reviewer": identity_record(reviewer, args.model),
-    })
-    shape_errors: list[str] = []
-    validate_receipt_shape(root, receipt, relative_path, shape_errors)
-    if shape_errors:
-        print("error: the reviewed receipt would not validate: " + "; ".join(shape_errors))
-        return 2
-    path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
-    register_file(root, relative_path)
-    print(relative_path)
-    return 0
+        temp_path = path.with_name(f"{path.name}.tmp-{os.getpid()}")
+        try:
+            temp_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+            os.replace(temp_path, path)
+        except Exception:
+            # temp_path was created exclusively by this run, under the lock; safe to delete.
+            temp_path.unlink(missing_ok=True)
+            raise
+        register_file(root, relative_path)
+        print(relative_path)
+        return 0
+    finally:
+        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
+        lock_handle.close()
 
 
 # ----------------------------------------------------------------------- validate
@@ -962,7 +1020,23 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
             _require(id_date == expected_date, errors,
                       f"{label}: id date segment {id_date!r} does not match observed_at_utc date {expected_date!r}")
 
+    # The id pattern and supersedes' own pattern (adoption/host-receipt.schema.json) cannot
+    # express this cross-field rule, so it is enforced here: a '-N' generation suffix on this
+    # receipt's own id requires a supersedes field, and a bare id (generation 1) must not
+    # carry one -- a receipt's generation and its supersedes link cannot drift apart.
     supersedes = receipt.get("supersedes")
+    supersedes_present = "supersedes" in receipt
+    id_generation = id_match.group("generation") if id_match is not None else None
+    if id_match is not None:
+        if id_generation is not None:
+            _require(supersedes_present, errors,
+                      f"{label}: id {receipt_id!r} has a '-{id_generation}' generation suffix, so it must carry "
+                      "a supersedes field naming the earlier receipt it supersedes")
+        else:
+            _require(not supersedes_present, errors,
+                      f"{label}: id {receipt_id!r} has no generation suffix (generation 1), so it must not carry "
+                      "a supersedes field")
+
     if isinstance(supersedes, str) and supersedes:
         supersedes_match = ID_PATTERN.fullmatch(supersedes)
         if supersedes_match is None:
@@ -978,6 +1052,17 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
                       f"{label}: supersedes stage segment {supersedes_match.group('stage')!r} does not match "
                       f"stage {receipt.get('stage')!r}")
             _require(supersedes != receipt_id, errors, f"{label}: supersedes must not equal this receipt's own id")
+            if id_match is not None:
+                # 'same day' is the UTC date segment carried in the id, not any other clock.
+                _require(supersedes_match.group("date") == id_match.group("date"), errors,
+                          f"{label}: supersedes date segment {supersedes_match.group('date')!r} does not match "
+                          f"this receipt's own id date segment {id_match.group('date')!r} ('same day' is the UTC "
+                          "date in the id)")
+                own_generation = int(id_generation or "1")
+                superseded_generation = int(supersedes_match.group("generation") or "1")
+                _require(superseded_generation < own_generation, errors,
+                          f"{label}: supersedes {supersedes!r} (generation {superseded_generation}) must be a "
+                          f"lower generation than this receipt's own id {receipt_id!r} (generation {own_generation})")
             superseded_relative = f"evidence/hosts/{host_id}/{receipt_filename_stem(supersedes)}.json"
             _require(superseded_relative in known_files, errors,
                       f"{label}: supersedes {supersedes!r} ({superseded_relative}) is not registered in "
@@ -1312,8 +1397,9 @@ def build_parser() -> argparse.ArgumentParser:
     record_parser.add_argument("--component-id", required=True)
     record_parser.add_argument("--stage", required=True, choices=sorted(STAGES))
     record_parser.add_argument("--supersedes", default=None,
-                               help="Existing receipt id for this same host/component/stage/date to supersede: "
-                                    "writes a new receipt at the next free '-N' generation, records this in its "
+                               help="The LATEST existing receipt id for this same host/component/stage/date to "
+                                    "supersede (an older generation is refused, naming the actual latest): writes "
+                                    "a new receipt at the next free '-N' generation, records this in its "
                                     "'supersedes' field, and leaves the original file untouched. Without this, "
                                     "record refuses (exit 2) when today's receipt for this host/component/stage "
                                     "already exists, instead of overwriting it.")

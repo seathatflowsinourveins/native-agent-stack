@@ -385,6 +385,79 @@ class ValidateFixtureTests(_ReceiptFixtureCase):
         exit_code, output = self._validate()
         self.assertEqual(exit_code, 0, output)
 
+    def test_supersedes_host_mismatch_is_rejected(self):
+        def substitute(data):
+            data["id"] = f"{data['id']}-2"
+            data["supersedes"] = "other-host-20260101--widget--use--20260101"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("supersedes host segment", output)
+
+    def test_supersedes_stage_mismatch_is_rejected(self):
+        def substitute(data):
+            data["id"] = f"{data['id']}-2"
+            data["supersedes"] = "fixture-host-20260101--widget--install--20260101"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("supersedes stage segment", output)
+
+    def test_supersedes_date_mismatch_is_rejected(self):
+        # 'same day' is the UTC date segment carried in the id itself.
+        def substitute(data):
+            data["id"] = f"{data['id']}-2"
+            data["supersedes"] = "fixture-host-20260101--widget--use--20260102"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("supersedes date segment", output)
+
+    def test_supersedes_self_reference_is_rejected(self):
+        def substitute(data):
+            data["id"] = f"{data['id']}-2"
+            data["supersedes"] = data["id"]
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("must not equal this receipt's own id", output)
+
+    def test_supersedes_higher_generation_is_rejected(self):
+        # supersedes must be a *lower* generation than this receipt's own id.
+        def substitute(data):
+            original_id = data["id"]
+            data["id"] = f"{original_id}-2"
+            data["supersedes"] = f"{original_id}-3"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("must be a lower generation", output)
+
+    def test_bare_id_with_supersedes_is_rejected(self):
+        # Generation 1 (no '-N' suffix) must not carry a supersedes field at all.
+        def substitute(data):
+            data["supersedes"] = "fixture-host-20260101--widget--use--20260100"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("must not carry a supersedes field", output)
+
+    def test_generation_suffixed_id_without_supersedes_is_rejected(self):
+        # A '-N' id must carry a supersedes field naming what it supersedes.
+        def substitute(data):
+            data["id"] = f"{data['id']}-2"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("must carry a supersedes field", output)
+
     def test_json_escaped_personal_home_path_in_value_is_rejected(self):
         # A JSON / escape decodes to '/', hiding a personal home path from a scan of
         # only the file's raw serialized bytes. Built from parts/escapes at runtime, never
@@ -942,21 +1015,26 @@ class RecorderRoundTripTests(unittest.TestCase):
         argv = ["record", "--root", str(self.root), "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
                 "--evidence-class", "synthetic", "--from-stack-commands", "--component-version", "2.0.0rc5"]
-        buffer = io.StringIO()
-        with contextlib.redirect_stdout(buffer):
-            self.assertEqual(self._run(argv), 2, buffer.getvalue())
-        self.assertIn("--allow-unbound-version", buffer.getvalue())
-        allow_buffer = io.StringIO()
-        with contextlib.redirect_stdout(allow_buffer):
-            self.assertEqual(self._run([*argv, "--allow-unbound-version"]), 0, allow_buffer.getvalue())
-        # Re-recording the same host/component/stage/date with the version written correctly
-        # (no --allow-unbound-version needed) must not silently overwrite the receipt just
-        # written above; --supersedes records it as the newer, corrected receipt instead.
-        superseded_id = json.loads((self.root / allow_buffer.getvalue().strip()).read_text(encoding="utf-8"))["id"]
-        buffer = io.StringIO()
-        with contextlib.redirect_stdout(buffer):
-            exit_code = self._run([*argv[:-1], "2.0.0rc5 (tag v2.0.0rc5)", "--supersedes", superseded_id])
-        self.assertEqual(exit_code, 0, buffer.getvalue())
+        # This test records twice for the same host/component/stage; pin the clock so both
+        # calls land on the same UTC date regardless of when the test happens to run.
+        with mock.patch.object(hr, "utc_now", return_value="2026-01-01T00:00:00Z"):
+            buffer = io.StringIO()
+            with contextlib.redirect_stdout(buffer):
+                self.assertEqual(self._run(argv), 2, buffer.getvalue())
+            self.assertIn("--allow-unbound-version", buffer.getvalue())
+            allow_buffer = io.StringIO()
+            with contextlib.redirect_stdout(allow_buffer):
+                self.assertEqual(self._run([*argv, "--allow-unbound-version"]), 0, allow_buffer.getvalue())
+            # Re-recording the same host/component/stage/date with the version written
+            # correctly (no --allow-unbound-version needed) must not silently overwrite the
+            # receipt just written above; --supersedes records it as the newer, corrected
+            # receipt instead.
+            superseded_id = json.loads(
+                (self.root / allow_buffer.getvalue().strip()).read_text(encoding="utf-8"))["id"]
+            buffer = io.StringIO()
+            with contextlib.redirect_stdout(buffer):
+                exit_code = self._run([*argv[:-1], "2.0.0rc5 (tag v2.0.0rc5)", "--supersedes", superseded_id])
+            self.assertEqual(exit_code, 0, buffer.getvalue())
 
     def test_overlong_model_is_refused_before_anything_is_written(self):
         # Codex review of #117: a --model over the schema's 100 characters used to write a receipt
@@ -1045,6 +1123,11 @@ class SupersedeRecordTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
         _init_support_tree(self.root)
+        # Every test here records more than once and relies on the calls landing on the same
+        # UTC date; pin the clock so a run that happens to straddle midnight UTC cannot flake.
+        patcher = mock.patch.object(hr, "utc_now", return_value="2026-01-01T00:00:00Z")
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def _run(self, argv: list[str]) -> int:
         return _run_cli(argv)
@@ -1127,17 +1210,75 @@ class SupersedeRecordTests(unittest.TestCase):
         # No reviews are inherited: the new receipt starts with only its own fresh 'self' entry.
         self.assertEqual([review["kind"] for review in superseding_receipt["reviews"]], ["self"])
 
-        # A third recording finds the next free generation rather than colliding with the second.
+        # A third recording must supersede the *latest* generation (the second, "-2"), not
+        # the original: --supersedes requires the latest, so it finds generation 3.
         third_buffer = io.StringIO()
         with contextlib.redirect_stdout(third_buffer):
-            third_exit = self._run(self._record_argv(["--supersedes", original_id]))
+            third_exit = self._run(self._record_argv(["--supersedes", f"{original_id}-2"]))
         self.assertEqual(third_exit, 0, third_buffer.getvalue())
         self.assertTrue(third_buffer.getvalue().strip().endswith(f"{original_id}-3.json"))
+        third_receipt = json.loads((self.root / third_buffer.getvalue().strip()).read_text(encoding="utf-8"))
+        self.assertEqual(third_receipt["supersedes"], f"{original_id}-2")
 
         validate_buffer = io.StringIO()
         with contextlib.redirect_stdout(validate_buffer):
             validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
         self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
+    def test_refusal_names_the_latest_generation_to_supersede(self):
+        # Generations 1 and 2 both exist; a plain re-record (no --supersedes) must name
+        # generation 2 (the latest), not generation 1, as the receipt to supersede.
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run(self._record_argv())
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        original_id = json.loads((self.root / buffer.getvalue().strip()).read_text(encoding="utf-8"))["id"]
+
+        second_buffer = io.StringIO()
+        with contextlib.redirect_stdout(second_buffer):
+            second_exit = self._run(self._record_argv(["--supersedes", original_id]))
+        self.assertEqual(second_exit, 0, second_buffer.getvalue())
+
+        third_buffer = io.StringIO()
+        with contextlib.redirect_stdout(third_buffer):
+            third_exit = self._run(self._record_argv())
+        self.assertEqual(third_exit, 2, third_buffer.getvalue())
+        self.assertIn(f"{original_id}-2", third_buffer.getvalue())
+
+    def test_supersedes_an_older_generation_while_a_newer_one_exists_is_refused(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run(self._record_argv())
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        original_id = json.loads((self.root / buffer.getvalue().strip()).read_text(encoding="utf-8"))["id"]
+
+        second_buffer = io.StringIO()
+        with contextlib.redirect_stdout(second_buffer):
+            second_exit = self._run(self._record_argv(["--supersedes", original_id]))
+        self.assertEqual(second_exit, 0, second_buffer.getvalue())
+
+        # Generation 2 now exists; superseding generation 1 (no longer the latest) is refused,
+        # naming generation 2 as the one to supersede instead.
+        third_buffer = io.StringIO()
+        with contextlib.redirect_stdout(third_buffer):
+            third_exit = self._run(self._record_argv(["--supersedes", original_id]))
+        self.assertEqual(third_exit, 2, third_buffer.getvalue())
+        self.assertIn(f"{original_id}-2", third_buffer.getvalue())
+        self.assertFalse((self.root / "evidence" / "hosts" / "test-host-20260101" /
+                          f"{original_id}-3.json").exists())
+
+    def test_record_deletes_the_file_it_created_and_reraises_on_a_write_failure(self):
+        # The exclusive-create write only ever creates a file this run itself made; a failure
+        # partway through (mocked here as json.dumps raising) must delete it and propagate the
+        # original error rather than leaving a truncated receipt or swallowing the failure.
+        with mock.patch.object(hr.json, "dumps", side_effect=ValueError("simulated write failure")):
+            with self.assertRaises(ValueError):
+                self._run(self._record_argv())
+        host_dir = self.root / "evidence" / "hosts" / "test-host-20260101"
+        leftover = list(host_dir.glob("*.json")) if host_dir.is_dir() else []
+        self.assertEqual(leftover, [], f"receipt file(s) left on disk after a failed write: {leftover}")
+        evidence = json.loads((self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"))
+        self.assertEqual(evidence["files"], [])
 
     def test_supersedes_rejects_an_id_for_a_different_host_component_stage_or_date(self):
         buffer = io.StringIO()
@@ -1176,6 +1317,86 @@ class SupersedeRecordTests(unittest.TestCase):
             exit_code = self._run(self._record_argv(["--supersedes", f"{real_id}-2"]))
         self.assertEqual(exit_code, 2, missing_buffer.getvalue())
         self.assertIn("does not exist", missing_buffer.getvalue())
+
+
+class ReviewAppendSafetyTests(unittest.TestCase):
+    """review takes an exclusive flock on a lock file beside the receipt, re-reads under the
+    lock, and writes via a temp file + os.replace() so concurrent reviews cannot lose one and
+    a crash mid-write cannot truncate the receipt that was there before."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_support_tree(self.root)
+
+    def _run(self, argv: list[str]) -> int:
+        return _run_cli(argv)
+
+    def _record(self) -> str:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands",
+            ])
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        return buffer.getvalue().strip()
+
+    def test_two_sequential_reviews_both_persist(self):
+        relative_path = self._record()
+
+        first_buffer = io.StringIO()
+        with contextlib.redirect_stdout(first_buffer):
+            first_exit = self._run(["review", "--root", str(self.root), "--receipt", relative_path,
+                                    "--kind", "independent_session", "--ref", "first", "--verdict", "agree",
+                                    "--identity", "reviewer-one"])
+        self.assertEqual(first_exit, 0, first_buffer.getvalue())
+
+        second_buffer = io.StringIO()
+        with contextlib.redirect_stdout(second_buffer):
+            second_exit = self._run(["review", "--root", str(self.root), "--receipt", relative_path,
+                                     "--kind", "independent_session", "--ref", "second",
+                                     "--verdict", "needs_changes", "--identity", "reviewer-two"])
+        self.assertEqual(second_exit, 0, second_buffer.getvalue())
+
+        receipt = json.loads((self.root / relative_path).read_text(encoding="utf-8"))
+        self.assertEqual([review["ref"] for review in receipt["reviews"]],
+                         ["scripts/host_receipts.py record", "first", "second"])
+
+        validate_buffer = io.StringIO()
+        with contextlib.redirect_stdout(validate_buffer):
+            validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
+        self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
+        # No lock or temp artifacts were left in a state that would block a later review.
+        host_dir = self.root / "evidence" / "hosts" / "test-host-20260101"
+        self.assertEqual(list(host_dir.glob("*.tmp-*")), [])
+
+    def test_a_write_failure_leaves_the_original_receipt_byte_identical(self):
+        relative_path = self._record()
+        path = self.root / relative_path
+        before = path.read_bytes()
+
+        with mock.patch.object(hr.os, "replace", side_effect=OSError("simulated replace failure")):
+            with self.assertRaises(OSError):
+                self._run(["review", "--root", str(self.root), "--receipt", relative_path,
+                          "--kind", "independent_session", "--ref", "t", "--verdict", "agree",
+                          "--identity", "reviewer"])
+
+        self.assertEqual(path.read_bytes(), before, "a failed atomic replace changed the original receipt")
+        leftover = list(path.parent.glob(f"{path.name}.tmp-*"))
+        self.assertEqual(leftover, [], f"temp file(s) left behind after a failed write: {leftover}")
+
+        # The lock was released despite the failure (via the finally block): a subsequent
+        # normal review still succeeds rather than deadlocking.
+        recover_buffer = io.StringIO()
+        with contextlib.redirect_stdout(recover_buffer):
+            recover_exit = self._run(["review", "--root", str(self.root), "--receipt", relative_path,
+                                      "--kind", "independent_session", "--ref", "t2", "--verdict", "agree",
+                                      "--identity", "reviewer"])
+        self.assertEqual(recover_exit, 0, recover_buffer.getvalue())
 
 
 class ReviewIndependenceTests(unittest.TestCase):
@@ -1466,14 +1687,17 @@ class UseStageLintTests(unittest.TestCase):
                          and list((self.root / "evidence" / "hosts").rglob("*.json")))
 
     def test_help_calls_record_as_install_and_a_functional_command_as_use(self):
-        self.assertEqual(self._record("install", ["true --help"])[0], 0)
-        use_exit, use_output = self._record("use", ["true --version", "echo hi"])
-        self.assertEqual(use_exit, 0, use_output)
-        # A second 'use' receipt for the same host/component/date must not silently overwrite
-        # the one just written; supersede it explicitly instead.
-        use_id = json.loads((self.root / use_output.strip()).read_text(encoding="utf-8"))["id"]
-        exit_code, output = self._record("use", ["du -h /dev/null"], extra=["--supersedes", use_id])
-        self.assertEqual(exit_code, 0, output)
+        # This test records twice at stage 'use'; pin the clock so both land on the same UTC
+        # date regardless of when the test happens to run.
+        with mock.patch.object(hr, "utc_now", return_value="2026-01-01T00:00:00Z"):
+            self.assertEqual(self._record("install", ["true --help"])[0], 0)
+            use_exit, use_output = self._record("use", ["true --version", "echo hi"])
+            self.assertEqual(use_exit, 0, use_output)
+            # A second 'use' receipt for the same host/component/date must not silently
+            # overwrite the one just written; supersede it explicitly instead.
+            use_id = json.loads((self.root / use_output.strip()).read_text(encoding="utf-8"))["id"]
+            exit_code, output = self._record("use", ["du -h /dev/null"], extra=["--supersedes", use_id])
+            self.assertEqual(exit_code, 0, output)
 
     def test_validate_derives_nothing_from_command_text(self):
         self.assertEqual(self._record("use", ["echo hi"])[0], 0)
