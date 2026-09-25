@@ -333,6 +333,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/us-equities/local-model-workloads-20260924.json",
+      "collection": "/repository_decisions",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
       "collection": "/repository_decisions",
       "repository_field": "repository",
@@ -383,16 +389,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 850,
+    "repositories": 857,
     "public_star_repositories": 357,
-    "beyond_public_stars": 493,
-    "references": 1999,
+    "beyond_public_stars": 500,
+    "references": 2008,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 69,
       "legacy_candidate": 20,
       "public_star": 357,
-      "research_supplement": 567,
+      "research_supplement": 575,
       "star_review": 357
     }
   },
@@ -2244,7 +2250,8 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
         {
@@ -2254,6 +2261,14 @@
           "id": "chronos",
           "decision": "conditional",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/local-model-workloads-20260924.json",
+          "pointer": "/repository_decisions/4",
+          "id": "local-workloads-chronos-forecasting",
+          "decision": "converged_trial",
+          "evidence_level": "discovery_web_research"
         }
       ]
     },
@@ -3793,6 +3808,24 @@
           "decision": "outside_north_star",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/blaizzy/mlx-audio",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/local-model-workloads-20260924.json",
+          "pointer": "/repository_decisions/2",
+          "id": "local-workloads-mlx-audio",
+          "decision": "converged_trial",
+          "evidence_level": "discovery_web_research"
         }
       ]
     },
@@ -7310,6 +7343,24 @@
       ]
     },
     {
+      "repository": "https://github.com/fastino-ai/gliner2",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/local-model-workloads-20260924.json",
+          "pointer": "/repository_decisions/0",
+          "id": "local-workloads-gliner2",
+          "decision": "converged_trial",
+          "evidence_level": "discovery_web_research"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/feast-dev/feast",
       "aliases": [],
       "public_star": false,
@@ -7553,6 +7604,24 @@
           "pointer": "/candidates/142",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/fluidinference/fluidaudio",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/local-model-workloads-20260924.json",
+          "pointer": "/repository_decisions/1",
+          "id": "local-workloads-fluidaudio",
+          "decision": "converged_trial",
+          "evidence_level": "discovery_web_research"
         }
       ]
     },
@@ -9583,6 +9652,24 @@
       ]
     },
     {
+      "repository": "https://github.com/ibm-granite/granite-tsfm",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/local-model-workloads-20260924.json",
+          "pointer": "/repository_decisions/5",
+          "id": "local-workloads-granite-tsfm",
+          "decision": "converged_trial",
+          "evidence_level": "discovery_web_research"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/ict-find-lab/alphagen",
       "aliases": [],
       "public_star": false,
@@ -11141,6 +11228,24 @@
           "pointer": "/candidates/223",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/leolee99/piguard",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/local-model-workloads-20260924.json",
+          "pointer": "/repository_decisions/6",
+          "id": "local-workloads-piguard",
+          "decision": "single_lane_lead",
+          "evidence_level": "discovery_web_research"
         }
       ]
     },
@@ -15333,6 +15438,14 @@
           "pointer": "/candidates/287",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/local-model-workloads-20260924.json",
+          "pointer": "/repository_decisions/3",
+          "id": "local-workloads-paddleocr",
+          "decision": "converged_trial",
+          "evidence_level": "discovery_web_research"
         }
       ]
     },
@@ -16104,6 +16217,24 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/priorlabs/tabpfn",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/local-model-workloads-20260924.json",
+          "pointer": "/repository_decisions/8",
+          "id": "local-workloads-tabpfn",
+          "decision": "adjudicated_skip",
+          "evidence_level": "discovery_web_research"
         }
       ]
     },
@@ -18835,6 +18966,24 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/soda-inria/tabicl",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/local-model-workloads-20260924.json",
+          "pointer": "/repository_decisions/7",
+          "id": "local-workloads-tabicl",
+          "decision": "adjudicated_skip",
+          "evidence_level": "discovery_web_research"
         }
       ]
     },
