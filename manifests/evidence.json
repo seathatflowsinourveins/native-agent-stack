@@ -3219,8 +3219,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "295eb57d751f981e700cc8a8310a2a8d65a2cf55c696dd6e61b58e3d4480ea3c",
-      "bytes": 23864
+      "sha256": "38a11a9a7316f481563cd10a7b19b9a318993002542151ed0c7693e0e6794202",
+      "bytes": 26100
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3319,13 +3319,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "6408e600375ae47e3909ac53c41b426f1cea8e907dbd6f9fee8f7e9da0c126f5",
-      "bytes": 10752
+      "sha256": "fa6f8af6476d9aef58fb34fdaa485dffce2b662e745f3302543643078e11bd17",
+      "bytes": 10868
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "57d947ee970d7080f11415e9a0c4844fa326c2807ed54d0cc18963cbc183233c",
-      "bytes": 38069
+      "sha256": "6e3810a4921c3ec7950ce2e004e88439028af30d4b861233311f381d546d0c08",
+      "bytes": 38227
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -29685,8 +29685,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "dad2d0c6f1fac75ec74e28e94a6e9b4938b5da6f3b04695b24b47234481e36c0",
-      "bytes": 20903
+      "sha256": "8f47f2fe0060808e186531a1daf6d64a8fe3431038e38b6390a3ceded786c977",
+      "bytes": 24069
     },
     {
       "path": "tests/test_job_recovery.py",

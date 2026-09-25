@@ -123,3 +123,86 @@ apply/install tooling (`tools/adoption/apply_claude_settings.py`,
   `effort: max` beside their task-matched models, and this repository commits a
   project `.claude/settings.json` that turns Ultracode on. Decision 3's coordinator
   (Opus 5.5 at `xhigh`) is unchanged.
+
+## Addendum (2026-09-25): jCodeMunch registers per project, not at user scope
+
+**Decided by:** unit `jcodemunch-project-scope`, branch
+`claude/jcodemunch-project-scope-20260925` (base `origin/main@b82b4e06`).
+
+**Decision.** [`adoption/mcp/claude-user.json`](../../adoption/mcp/claude-user.json) drops its
+`jcodemunch` entry, so `tools/adoption/install_claude_profile.py` registers only `ai-memory` and
+`serena` at user scope. [`adoption/bootstrap.md`](../../adoption/bootstrap.md) step 4a still
+installs `jcodemunch-mcp==1.108.319`. It now documents a per-project opt-in: `claude mcp add
+--scope local` for one user, or a checked-in `.mcp.json` entry for a whole project. This changes
+where the server is registered. No catalog verdict or component record changes.
+
+**Evidence** (2026-09-25, one WSL2 host, Claude Code 2.1.282):
+
+- **The instruction loads everywhere.** A registered jCodeMunch server sends this instruction
+  into the session: "This repo can be indexed by jcodemunch. Its whole tool catalog sits behind
+  a 3-verb front door. Prefer it over Read/Grep/Glob/Bash for code navigation." At user scope
+  that happens in every project. It contradicts agent-lab's lane routing (its `AGENTS.md`:
+  `rg` for discovery and focused text search, Serena for symbols and references). This
+  catalog's [handbook](../token-session-handbook.md) routes code symbols to "Serena or scoped
+  jCodeMunch", and a per-project registration fits that.
+- **Use.** Counted as unique `tool_use` ids on 2026-09-25, the host's 5,076 retained Claude Code
+  transcripts (the oldest from 2026-09-18) hold 15 jCodeMunch calls, against 33 for Serena and
+  7 for SocratiCode. The 5,059 of them modified since 2026-09-20 hold 15, 25 and 6.
+- **Retrieval quality.** agent-lab's executed retrieval comparison
+  (`docs/tasks/2026-09-22-executed-comparisons.md`) ran 20 sealed questions over a 30-file
+  corpus, 3 repeats. SocratiCode scored span hit@5 0.85 and MRR@10 0.742; jCodeMunch scored
+  0.25 and 0.148. jCodeMunch cannot index Markdown (8 of the 30 files). On the preregistered
+  coverage-parity subgroup SocratiCode still led, 1.00 to 0.40. Closure stays `unresolved`
+  only because SocratiCode's `restore_pass` was null, and the sealed rule treats a null on
+  either arm as unresolved. The comparison supports this change; it does not retire
+  jCodeMunch.
+- **Host change.** On 2026-09-25 the host ran `claude mcp remove jcodemunch -s user`, and its
+  `~/.claude.json` user-scope `mcpServers` now name only `ai-memory` and `serena`. It kept a
+  backup of the removed entry in its codex-ecosystem state
+  (`state/settings-audit-20260923/jcodemunch-user-scope-entry.json`). agent-lab keeps its
+  local-scope entry: `claude mcp get jcodemunch` there reported `Local config (private to you in
+  this project)` and `✔ Connected`.
+- **Both opt-in forms, measured** under a temporary `CLAUDE_CONFIG_DIR` and scratch
+  `CODE_INDEX_PATH`, so the host's config and jCodeMunch ledger were untouched:
+  - `claude mcp add --scope local jcodemunch -e ... -- <prefix>/bin/jcodemunch-mcp` exited 0.
+    `claude mcp get` reported `✔ Connected` in that project and `No MCP server named
+    "jcodemunch"` in another. One of three `get` runs crashed in Bun (segfault, exit 139); the
+    other two exited 0.
+  - The documented `.mcp.json` entry, with `${HOME}` in `command` and `env`, stayed `⏸ Pending
+    approval` until the scratch workspace was trusted and the server approved in
+    `.claude/settings.local.json`. It then reported `✔ Connected`, and the server wrote its
+    index state under the expanded `CODE_INDEX_PATH`.
+  - A nested default, `${ECO_INSTALL_ROOT:-${HOME}/...}`, did not expand: `✘ Failed to
+    connect`.
+  - The [MCP documentation](https://code.claude.com/docs/en/mcp) (fetched 2026-09-25) gives
+    `${VAR}` and `${VAR:-default}` expansion in `command`, `args`, `env`, `url` and `headers`,
+    the approval step for `.mcp.json` servers, and local > project > user precedence.
+
+**Alternatives considered:**
+
+- **Keep jCodeMunch at user scope.** Rejected. Its contradicting instruction reached every
+  session, yet 5,076 retained transcripts hold 15 calls to it. It also trailed SocratiCode in
+  the retrieval comparison.
+- **Drop the install step, or drop jCodeMunch from the catalog.** Rejected. The
+  [retained receipt](../../evidence/receipts/native-jcodemunch-20260920.json) shows byte-exact
+  symbol retrieval, the comparison above is unresolved, and an opted-in project needs the
+  pinned install.
+- **Also remove the `route` and `order` grants from the shipped `evidence-reviewer` and
+  `isolated-builder` agents.** Not done here. The grants resolve only where a project registers
+  the server, and a project without it still launches the agents
+  ([workflow examples](../../examples/claude-native/workflows/README.md)). That stays a
+  separate keep-but-compare choice, overturned by the condition below.
+
+**Overturn condition:** a measured task class where jCodeMunch beats `rg`, Serena and
+SocratiCode, or regular jCodeMunch use in projects beyond agent-lab. Either would put it back in
+the user-scope template.
+
+**Limitations:**
+
+- One host, one account and one Claude Code release.
+- The use counts are observational counts from local transcripts, not a controlled trial.
+- The comparison has n=20 on one corpus with no power calculation, and it compares retrieval
+  only. Serena was not an arm.
+- The installer only visits the servers the template names. A host registered from an earlier
+  template keeps its user-scope `jcodemunch` entry until `claude mcp remove jcodemunch -s user`
+  removes it.

@@ -22,6 +22,20 @@ sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 
 import install_claude_profile as icp  # noqa: E402
 
+# The jcodemunch entry adoption/mcp/claude-user.json carried until 2026-09-25, when jCodeMunch moved
+# to a per-project opt-in (adoption/bootstrap.md step 4a). It stays here, inline, as the fixture for
+# a stdio server with ${HOME} in an env value and env names to match: no template entry has either now.
+JCODEMUNCH_SPEC = {
+    "type": "stdio",
+    "command": "${ECO_ROOT}/bin/jcodemunch-mcp",
+    "args": [],
+    "env": {"CODE_INDEX_PATH": "${HOME}/.code-index", "JCODEMUNCH_SHARE_SAVINGS": "0"},
+}
+
+
+def template_server_names() -> list[str]:
+    return list(json.loads(icp.MCP_TEMPLATE.read_text())["mcpServers"])
+
 
 class GuardInstallTests(unittest.TestCase):
     def test_installs_when_absent(self):
@@ -228,12 +242,12 @@ class McpMatchTests(unittest.TestCase):
 
 
 class McpTemplateShapeTests(unittest.TestCase):
-    def test_template_names_the_three_expected_servers(self):
-        import json
+    def test_template_names_the_two_expected_servers(self):
+        # jcodemunch left the user-scope template on 2026-09-25 for a per-project opt-in.
         data = json.loads(icp.MCP_TEMPLATE.read_text())
-        self.assertEqual(set(data["mcpServers"].keys()), {"ai-memory", "jcodemunch", "serena"})
+        self.assertEqual(set(data["mcpServers"].keys()), {"ai-memory", "serena"})
         self.assertEqual(data["mcpServers"]["ai-memory"]["type"], "http")
-        self.assertEqual(data["mcpServers"]["jcodemunch"]["env"]["JCODEMUNCH_SHARE_SAVINGS"], "0")
+        self.assertEqual(data["mcpServers"]["serena"]["type"], "stdio")
         self.assertIn("--project-from-cwd", data["mcpServers"]["serena"]["args"])
 
 
@@ -241,9 +255,15 @@ class McpRenderAndCommandTests(unittest.TestCase):
     def test_placeholders_are_rendered_for_the_target_host(self):
         servers = icp.render_servers(json.loads(icp.MCP_TEMPLATE.read_text()),
                                      Path("/home/example"), Path("/opt/eco"))
-        self.assertEqual(servers["jcodemunch"]["command"], "/opt/eco/bin/jcodemunch-mcp")
-        self.assertEqual(servers["jcodemunch"]["env"]["CODE_INDEX_PATH"], "/home/example/.code-index")
         self.assertEqual(servers["serena"]["command"], "/opt/eco/bin/serena")
+        self.assertNotIn("${", json.dumps(servers))
+
+    def test_home_and_eco_root_are_rendered_in_command_and_env_values(self):
+        servers = icp.render_servers({"mcpServers": {"jcodemunch": JCODEMUNCH_SPEC}},
+                                     Path("/home/example"), Path("/opt/eco"))
+        self.assertEqual(servers["jcodemunch"]["command"], "/opt/eco/bin/jcodemunch-mcp")
+        self.assertEqual(servers["jcodemunch"]["env"],
+                         {"CODE_INDEX_PATH": "/home/example/.code-index", "JCODEMUNCH_SHARE_SAVINGS": "0"})
         self.assertNotIn("${", json.dumps(servers))
 
     def test_unknown_placeholder_fails(self):
@@ -267,14 +287,37 @@ class McpRenderAndCommandTests(unittest.TestCase):
         with mock.patch.object(icp, "claude_mcp_get", return_value="x:\n  Scope: User config\n  Type: stdio\n  Command: /other\n"), \
              mock.patch.object(icp.subprocess, "run", side_effect=lambda *a, **k: calls.append(a[0])):
             results = icp.install_mcp_servers("claude", False, Path("/h"), Path("/e"))
-        self.assertEqual(results, ["differs", "differs", "differs"])
+        self.assertEqual(results, ["differs"] * len(template_server_names()))
         self.assertEqual(calls, [])
+
+    def test_registers_only_the_servers_the_template_names(self):
+        # A jcodemunch registration left by an earlier template is neither re-added nor removed.
+        asked, ran = [], []
+
+        def fake_get(claude_bin, name):
+            asked.append(name)
+            return None
+
+        def fake_run(cmd, **kwargs):
+            ran.append(cmd)
+            return mock.Mock(returncode=0, stdout="", stderr="")
+        with mock.patch.object(icp, "claude_mcp_get", side_effect=fake_get), \
+             mock.patch.object(icp.subprocess, "run", side_effect=fake_run):
+            results = icp.install_mcp_servers("claude", False, Path("/home/example"), Path("/e"))
+        names = template_server_names()
+        rendered = icp.render_servers(json.loads(icp.MCP_TEMPLATE.read_text()), Path("/home/example"), Path("/e"))
+        self.assertEqual(asked, names)
+        self.assertEqual(results, ["installed"] * len(names))
+        self.assertEqual(ran, [icp.mcp_add_command("claude", name, rendered[name]) for name in names])
+        self.assertNotIn("jcodemunch", json.dumps(ran))
 
 
 class McpGetOutputTests(unittest.TestCase):
     # SERENA_CONTEXT_20260923, JCODEMUNCH and AI_MEMORY were recorded from `claude mcp get` (claude
     # 2.1.280, 2026-09-23) with the home path replaced. That day's serena entry ran the recording
-    # host's own `serena-context` wrapper, which nothing in this repository installs.
+    # host's own `serena-context` wrapper, which nothing in this repository installs. JCODEMUNCH is
+    # the user-scope entry the template carried until 2026-09-25; it stays the recorded fixture for
+    # a stdio server with empty args and env names, matched against JCODEMUNCH_SPEC.
     SERENA_CONTEXT_20260923 = (
         "serena:\n  Scope: User config (available in all your projects)\n  Status: \u2714 Connected\n"
         "  Type: stdio\n  Command: /home/example/.local/share/codex-ecosystem/bin/serena-context\n"
@@ -307,6 +350,10 @@ class McpGetOutputTests(unittest.TestCase):
         return icp.render_servers(json.loads(icp.MCP_TEMPLATE.read_text()),
                                   Path("/home/example"), Path("/home/example/.local/share/codex-ecosystem"))
 
+    def rendered_jcodemunch(self):
+        return icp.render_servers({"mcpServers": {"jcodemunch": JCODEMUNCH_SPEC}}, Path("/home/example"),
+                                  Path("/home/example/.local/share/codex-ecosystem"))["jcodemunch"]
+
     def matches(self, text, spec):
         kind = spec.get("type", "stdio")
         return icp.existing_config_matches(text, kind, spec["url"] if kind == "http" else spec["command"],
@@ -315,8 +362,18 @@ class McpGetOutputTests(unittest.TestCase):
     def test_recorded_outputs_match_the_rendered_template(self):
         servers = self.rendered()
         self.assertTrue(self.matches(self.SERENA, servers["serena"]))
-        self.assertTrue(self.matches(self.JCODEMUNCH, servers["jcodemunch"]))
         self.assertTrue(self.matches(self.AI_MEMORY, servers["ai-memory"]))
+
+    def test_recorded_env_output_matches_on_env_names(self):
+        spec = self.rendered_jcodemunch()
+        self.assertTrue(self.matches(self.JCODEMUNCH, spec))
+        # The running host owns env values: another value still matches, a missing name does not.
+        other_value = self.JCODEMUNCH.replace("=/home/example/.code-index", "=/srv/code-index")
+        missing_name = self.JCODEMUNCH.replace("    JCODEMUNCH_SHARE_SAVINGS=0\n", "")
+        self.assertNotEqual(other_value, self.JCODEMUNCH)
+        self.assertNotEqual(missing_name, self.JCODEMUNCH)
+        self.assertTrue(self.matches(other_value, spec))
+        self.assertFalse(self.matches(missing_name, spec))
 
     def test_the_earlier_wrapper_registration_differs(self):
         # A host registered from the 2026-09-23 template is reported as differing and left
@@ -340,7 +397,7 @@ class McpGetOutputTests(unittest.TestCase):
         with mock.patch.object(icp, "claude_mcp_get", return_value=managed), \
              mock.patch.object(icp.subprocess, "run") as run:
             results = icp.install_mcp_servers("claude", False, Path("/home/example"), Path("/e"), replace=True)
-        self.assertEqual(results, ["other-scope"] * 3)
+        self.assertEqual(results, ["other-scope"] * len(template_server_names()))
         run.assert_not_called()
 
     def test_missing_claude_binary_is_a_clean_failure(self):
