@@ -55,8 +55,11 @@ A test module belongs to the lane of the code or receipts it loads. At
   `test_memory_lifecycle.py`, `test_nanosecond_replay.py`,
   `test_native_faults_min.py`, `test_nautilus_equity_replay.py`,
   `test_pit_availability.py`, `test_point_in_time.py`,
-  `test_security_identity.py`, `test_spy_parity.py` and
-  `test_supply_chain_scan.py`.
+  `test_security_identity.py`, `test_spy_parity.py`,
+  `test_supply_chain_scan.py` and, added after `6d9a7a5`, the simulation
+  modules `test_sim_*.py` (`test_sim_capacity.py`,
+  `test_sim_engine_crosscheck.py`, `test_sim_crosscheck_hftbacktest.py` and
+  `test_sim_paper_compare.py`).
 
 Foundation tests that read trading files as data, such as `test_catalogs.py`,
 `test_landscape.py`, `test_lane_packets.py` and `test_stack_lifecycle.py`,
@@ -123,6 +126,13 @@ python3 scripts/validate.py
   `git rebase` at that point, `git add` the results and run
   `git rebase --continue`. Otherwise fold the results into the last commit
   with `git commit --amend`. Push with `git push --force-with-lease`.
+- Merging instead of rebasing is equally valid, and it is the path for a
+  session under a no-force-push rule: `git merge origin/main`, and on a
+  conflict in `manifests/evidence.json` run `git checkout --theirs
+  manifests/evidence.json` (the merge's "theirs" is `main`), then the same
+  registration and `--write` commands, `git add` the results, commit the
+  merge and push normally. The squash merge into `main` keeps its history
+  linear either way.
 - If the branch changed `evidence/hosts/`, also run
   `python3 scripts/host_receipts.py validate`.
 
