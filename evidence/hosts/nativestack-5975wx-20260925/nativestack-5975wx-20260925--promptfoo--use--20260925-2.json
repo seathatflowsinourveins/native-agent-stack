@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--promptfoo--use--20260925-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "5b6014eb6239751cc2bc23ec9a3cca5b05d413dd",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "promptfoo",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 -c \"\nimport json, glob\nd = json.load(open('manifests/stack.json'))\nstack_v = [c['version'] for c in d['components'] if c['id']=='promptfoo']\nwinner_pins = sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers', []) for w in (l.get('winners') or []) if w.get('component_id')=='promptfoo'})\nprint('stack', stack_v, '| winner pins', winner_pins)\nassert stack_v == ['0.123.1'] and winner_pins == ['0.123.1'], (stack_v, winner_pins)\n\" \\\n&& timeout 30 npm view promptfoo@0.123.1 dist.integrity dist.shasum --json | python3 -c \"\nimport json, sys\nr = json.load(sys.stdin)\nprint('npm registry dist.integrity', r['dist.integrity'], '| dist.shasum', r['dist.shasum'])\nassert r['dist.integrity'] == 'sha512-9WzFeH6L+5E49R6CTulBo/WzmVPNcMpvgUZAyEsNlaKgpfmF9vV82jKUG1rQ+QH79P7gYAaxeY3TvLDV+x0Cbg==', r\nassert r['dist.shasum'] == '96a901bcc5c43d0b52b42144a49b3d77b1699e25', r\nprint('promptfoo 0.123.1 (component_id promptfoo, the foundation/quality-evaluation winner pin) matches manifests/stack.json and every catalogs/landscape winner pin, and the npm registry tarball integrity for this exact version')\n\"\n",
+      "exit": 0,
+      "duration_s": 0.354,
+      "output_sha256": "b657c377938158efbbb23fc6b49dca25d618fff1d7ff086a0740676625055639",
+      "output_excerpt": "stack ['0.123.1'] | winner pins ['0.123.1']\nnpm registry dist.integrity sha512-9WzFeH6L+5E49R6CTulBo/WzmVPNcMpvgUZAyEsNlaKgpfmF9vV82jKUG1rQ+QH79P7gYAaxeY3TvLDV+x0Cbg== | dist.shasum 96a901bcc5c43d0b52b42144a49b3d77b1699e25\npromptfoo 0.123.1 (component_id promptfoo, the foundation/quality-evaluation winner pin) matches manifests/stack.json and every catalogs/landscape winner pin, and the npm regist"
+    },
+    {
+      "cmd": "set -u\nT=$(mktemp -d) || exit 1\ntrap 'rm -rf \"$T\"' EXIT\nSTABLE=\"$HOME/.local/share/codex-ecosystem/tools/promptfoo-0.123.1\"\nif [ -x \"$STABLE/node_modules/.bin/promptfoo\" ]; then\n  PF_BIN=\"$STABLE/node_modules/.bin/promptfoo\"\n  echo \"promptfoo source: existing stable install\"\nelse\n  timeout 180 npm install --prefix \"$T/promptfoo\" promptfoo@0.123.1 --no-audit --no-fund >\"$T/npm-install.log\" 2>&1\n  NPM_RC=$?\n  if [ \"$NPM_RC\" -ne 0 ]; then echo \"npm install failed rc=$NPM_RC\"; tail -20 \"$T/npm-install.log\"; exit 1; fi\n  PF_BIN=\"$T/promptfoo/node_modules/.bin/promptfoo\"\n  echo \"promptfoo source: ephemeral npm install (no stable install found)\"\nfi\ntest -x \"$PF_BIN\" || { echo \"promptfoo binary missing at $PF_BIN\"; exit 1; }\nPF_VERSION=$(PROMPTFOO_DISABLE_UPDATE=1 PROMPTFOO_DISABLE_TELEMETRY=1 timeout 20 \"$PF_BIN\" --version)\necho \"promptfoo --version: $PF_VERSION\"\nif [ \"$PF_VERSION\" != \"0.123.1\" ]; then echo \"version mismatch: got $PF_VERSION\"; exit 1; fi\n\ncat > \"$T/promptfooconfig.yaml\" <<'YAMLCFG'\ndescription: \"native-agent-stack promptfoo use receipt: local llama.cpp Qwen3.8-27B eval\"\nproviders:\n  - id: openai:chat:qwen3.8-27b-local\n    config:\n      apiBaseUrl: http://127.0.0.1:18232/v1\n      apiKeyEnvar: PF_LLAMA_KEY\n      temperature: 0\n      max_tokens: 32\n      passthrough:\n        chat_template_kwargs:\n          enable_thinking: false\nprompts:\n  - \"{{query}}\"\ntests:\n  - vars: { query: \"What is 2+2? Reply with only the digit, nothing else.\" }\n    assert:\n      - type: equals\n        value: \"4\"\n  - vars: { query: \"Name the capital of France. Reply with just the city name, nothing else.\" }\n    assert:\n      - type: contains\n        value: \"Paris\"\n  - vars: { query: \"Is 7 a prime number? Reply with only yes or no.\" }\n    assert:\n      - type: javascript\n        value: \"/\\\\byes\\\\b/i.test(output)\"\n  - vars: { query: \"Reply with exactly the single word: PONG\" }\n    assert:\n      - type: contains\n        value: \"PONG\"\n  - description: \"positive control: deliberately wrong assertion, must fail\"\n    vars: { query: \"Reply with exactly the single word: PONG\" }\n    assert:\n      - type: equals\n        value: \"DEFINITELY_WRONG_TOKEN_never_matches\"\nYAMLCFG\n\nPF_KEYFILE=$(timeout 10 systemctl --user cat nativestack-generation.service | grep -oP -- '--api-key-file\\s+\\K\\S+')\nif [ -z \"$PF_KEYFILE\" ]; then echo \"could not parse --api-key-file from nativestack-generation.service\"; exit 1; fi\nif [ ! -r \"$PF_KEYFILE\" ]; then echo \"parsed key file is not readable\"; exit 1; fi\nIFS= read -r PF_LLAMA_KEY < \"$PF_KEYFILE\"\nexport PF_LLAMA_KEY\n\nset +e\nPROMPTFOO_CONFIG_DIR=\"$T/pf-home\" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1 PROMPTFOO_DISABLE_REMOTE_GENERATION=1 PROMPTFOO_DISABLE_SHARING=1 \\\n  timeout 180 \"$PF_BIN\" eval -c \"$T/promptfooconfig.yaml\" -o \"$T/results.json\" -j 1 --no-table --no-progress-bar --no-share >\"$T/stdout.log\" 2>\"$T/stderr.log\"\nEVAL_RC=$?\nset -e\nunset PF_LLAMA_KEY\n\npython3 - \"$T/results.json\" \"$EVAL_RC\" <<'PYCHK'\nimport json, sys\npath, eval_rc = sys.argv[1], int(sys.argv[2])\nd = json.load(open(path))\nstats = d[\"results\"][\"stats\"]\nrows = d[\"results\"][\"results\"]\noutputs = [r.get(\"response\", {}).get(\"output\") for r in rows]\npasses = [bool(r.get(\"success\")) for r in rows]\nexpected_pass = [True, True, True, True, False]\nexpected_outputs = [\"4\", \"Paris\", \"yes\", \"PONG\", \"PONG\"]\nprovider_ids = {r.get(\"provider\", {}).get(\"id\") for r in rows}\nlive_requests = stats.get(\"incurredTokenUsage\", stats[\"tokenUsage\"])[\"numRequests\"]\nok = (\n    eval_rc == 100\n    and stats[\"successes\"] == 4\n    and stats[\"failures\"] == 1\n    and stats[\"errors\"] == 0\n    and 4 <= live_requests <= 5\n    and passes == expected_pass\n    and outputs == expected_outputs\n    and provider_ids == {\"openai:chat:qwen3.8-27b-local\"}\n)\nprint(\n    f\"promptfoo eval exit={eval_rc} | successes={stats['successes']} failures={stats['failures']} \"\n    f\"errors={stats['errors']} | live_model_requests={live_requests} | \"\n    f\"outputs={outputs} | per_row_pass={passes} | positive_control_caught={passes[4] is False}\"\n)\nsys.exit(0 if ok else 1)\nPYCHK\n",
+      "exit": 0,
+      "duration_s": 75.591,
+      "output_sha256": "244889a4e564d9713898c3c51c313ba896edccea27642a076845d944eb30754b",
+      "output_excerpt": "promptfoo source: ephemeral npm install (no stable install found)\npromptfoo --version: 0.123.1\npromptfoo eval exit=100 | successes=4 failures=1 errors=0 | live_model_requests=5 | outputs=['4', 'Paris', 'yes', 'PONG', 'PONG'] | per_row_pass=[True, True, True, True, False] | positive_control_caught=True\n"
+    },
+    {
+      "cmd": "u=nativestack-generation.service; e=$(systemctl --user show -p ExecStart \"$u\") && m=$(printf '%s' \"$e\" | grep -o -- '--model [^ ;]*' | head -1 | sed 's#.*/##') && a=$(printf '%s' \"$e\" | grep -o -- '--alias [^ ;]*' | head -1 | cut -d' ' -f2) && b=$(printf '%s' \"$e\" | grep -o 'llama-cpp-b[0-9]*' | head -1) && s=$(systemctl --user is-active \"$u\") && h=$(curl -fsS --max-time 5 http://127.0.0.1:18232/health) && echo \"served model file: $m | alias: $a | runtime: $b | unit: $s | /health: $h\" && test \"$m\" = \"Qwen3.8-27B-UD-Q4_K_M.gguf\" && test \"$a\" = \"qwen3.8-27b-local\" && test \"$s\" = \"active\"",
+      "exit": 0,
+      "duration_s": 0.052,
+      "output_sha256": "2a096b366033091e7a553a4f9599a6813094be055e62a77efc1d71501e7366bc",
+      "output_excerpt": "served model file: Qwen3.8-27B-UD-Q4_K_M.gguf | alias: qwen3.8-27b-local | runtime: llama-cpp-b11146 | unit: active | /health: {\"status\":\"ok\"}\n"
+    }
+  ],
+  "tool_versions": {
+    "promptfoo": "0.123.1"
+  },
+  "observed_at_utc": "2026-09-25T19:46:15Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), promptfoo 0.123.1, the quality-evaluation winner, evaluates this host's local model end to end. The npm registry's dist.integrity for promptfoo@0.123.1 is recorded, and the version equals the stack and winner pin. promptfoo eval runs five deterministic test cases (temperature 0, telemetry and update checks disabled) against the host's OpenAI-compatible llama.cpp server on loopback. That makes 5 live model requests, with outputs 4, Paris, yes, PONG and PONG. Four assertions pass. One deliberately wrong assertion is reported as a failure, and promptfoo exits 100 (positive control). A final read-only command shows the server's systemd unit is active, serves the model file Qwen3.8-27B-UD-Q4_K_M.gguf under alias qwen3.8-27b-local on the llama.cpp b11146 runtime, and answers /health. Every command exits 0 on its own assertions.",
+  "limitations": [
+    "Supersedes the same-day receipt, which the independent review held at needs_changes on point 3 (backed claims): the claim named the served model without a retained command. This generation adds a read-only readback of the unit's model file, alias and runtime, plus /health, and drops the word \"qualified\".",
+    "promptfoo is installed ephemerally from the npm registry for each run into a temporary prefix, not as a persistent host install.",
+    "Five tiny prompts measure harness behaviour, not model quality; the model server's API key is read from its private file inside the command and is never printed.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision); the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:46:15Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduce: re-ran cmd2's read-only model readback verbatim (systemctl --user show, is-active, curl /health): same output (Qwen3.8-27B-UD-Q4_K_M.gguf, alias qwen3.8-27b-local, llama-cpp-b11146, unit active, /health ok); also read the unit ExecStart (--host 127.0.0.1 --port 18232) and confirmed the unit's MainPID listens on 127.0.0.1:18232, the port the eval used. Re-ran the local part of cmd0 (stack pin and winner pin 0.123.1) and rebuilt its full output: sha256 equals recorded; the cmd1 and cmd2 excerpts are their full outputs (excerpt sha256 equals output_sha256). Did not re-run cmd0's npm view (network) or cmd1 (npm install, prompts the local model server). Adequacy-checked: (1) layer role passes: quality-evaluation requires verifying behaviour with bounded promptfoo assertions; a 5-case eval with real assertions runs against the local model, 5 live requests. (2) positive control passes: the deliberately wrong equals assertion fails and promptfoo exits 100. (3) the gap named in the superseded receipt's review is fixed: cmd2 retains the served model file, alias, runtime and /health, the word 'qualified' is dropped from the claim, and cmd1 takes the API key path from the same nativestack-generation.service while the eval targets 127.0.0.1:18232, tying the eval to that unit; every other claim clause has a retained command and output. Non-blocking: the boilerplate limitation 'existing install under ~/.local/share/codex-ecosystem' contradicts cmd1's 'ephemeral npm install (no stable install found)' output; reword in a later generation. (4) passes: component_id promptfoo is the quality-evaluation winner, tool_versions 0.123.1, pin_matches True.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:54:37Z",
+      "reviewer": {
+        "identity_sha256": "a90718ea66d62d8044adb44ee9593c75a88ff91c19671770f1f96bc1a8be7a73",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--promptfoo--use--20260925"
+}

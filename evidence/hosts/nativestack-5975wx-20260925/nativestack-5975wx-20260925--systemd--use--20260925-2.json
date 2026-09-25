@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--systemd--use--20260925-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "5b6014eb6239751cc2bc23ec9a3cca5b05d413dd",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "systemd",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "V=$(dpkg-query -W -f='${Version}' systemd) && C=$(systemctl --version | head -1) && python3 -c \"import json, glob, sys; v = sys.argv[1]; ctl = sys.argv[2]; comp = 'systemd'; stack_versions = sorted({x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id'] == comp}); winner_pins = sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers', []) for w in (l.get('winners') or []) if w.get('component_id') == comp}); assert v in stack_versions, ('stack mismatch', v, stack_versions); assert v in winner_pins, ('pin mismatch', v, winner_pins); assert v in ctl, ('systemctl mismatch', v, ctl); print('dpkg-query systemd version:', v); print('systemctl --version:', ctl); print('manifests/stack.json systemd version(s):', stack_versions); print('catalogs/landscape winner pins for systemd:', winner_pins); print('PIN_BINDING_OK')\" \"$V\" \"$C\"",
+      "exit": 0,
+      "duration_s": 0.045,
+      "output_sha256": "523949b70885e72e097d7ab53ec6a3bd152d61aff82192344a28a4902760db1c",
+      "output_excerpt": "dpkg-query systemd version: 255.4-1ubuntu8.17\nsystemctl --version: systemd 255 (255.4-1ubuntu8.17)\nmanifests/stack.json systemd version(s): ['255.4-1ubuntu8.17']\ncatalogs/landscape winner pins for systemd: ['255.4-1ubuntu8.17']\nPIN_BINDING_OK\n"
+    },
+    {
+      "cmd": "UNIT=\"nas-receipt-probe-$$-$(date +%s%N)\" && OUT=$(timeout 60 systemd-run --user --wait --pipe --collect --unit=\"$UNIT\" -p Type=exec -p RuntimeMaxSec=30s -p TimeoutStopSec=5s -p KillMode=control-group -p SendSIGKILL=yes -p MemoryAccounting=yes -p MemoryMax=256M -p CPUAccounting=yes -p TasksAccounting=yes -p TasksMax=32 -p NoNewPrivileges=yes --working-directory=\"$(pwd)\" /usr/bin/python3 scripts/validate_catalogs.py 2>&1); RC=$?; echo \"$OUT\"; echo \"systemd-run exit=$RC\"; echo \"$OUT\" | grep -q \"Catalog structure and evidence classes validated\" && echo \"$OUT\" | grep -q \"Finished with result: success\" && echo \"$OUT\" | grep -Eq \"Main processes terminated with: code=exited/status=0\" && test \"$RC\" -eq 0 && echo \"REAL_WORKLOAD_SUPERVISED_OK\"",
+      "exit": 0,
+      "duration_s": 0.256,
+      "output_sha256": "1968e62e4c62958041a4183eaf0e7d800db781bb801a4b3ebff0aec4de14b744",
+      "output_excerpt": "Running as unit: nas-receipt-probe-4139226-1790365696527763313.service; invocation ID: 2a5b4508e86947118ef6b0ae849f6ce0\n{\"beyond_star_catalog_repositories\": 102, \"models\": 20, \"public_stars\": 357, \"repository_entries\": 154, \"starred_catalog_repositories\": 46, \"unique_catalog_repositories\": 148}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun.\nFi"
+    },
+    {
+      "cmd": "UNIT=\"nas-receipt-badexit-$$-$(date +%s%N)\" && timeout 30 systemd-run --user --wait --unit=\"$UNIT\" -p Type=exec -p RuntimeMaxSec=10s /bin/sh -c \"exit 7\"; RC=$?; SHOW=$(systemctl --user show \"$UNIT.service\" --property=Result,ExecMainCode,ExecMainStatus,ActiveState,SubState); echo \"$SHOW\"; echo \"systemd-run exit=$RC\"; systemctl --user reset-failed \"$UNIT.service\" >/dev/null 2>&1; echo \"$SHOW\" | grep -q \"^Result=exit-code$\" && echo \"$SHOW\" | grep -q \"^ExecMainStatus=7$\" && echo \"$SHOW\" | grep -q \"^ActiveState=failed$\" && test \"$RC\" -ne 0 && echo \"POSITIVE_CONTROL_NONZERO_EXIT_CAUGHT_OK\"",
+      "exit": 0,
+      "duration_s": 0.102,
+      "output_sha256": "cba2a9da7294fe5629136a35ad7191a1ddfc6e5012c3edd3041ffe022c4541d6",
+      "output_excerpt": "Result=exit-code\nExecMainCode=1\nExecMainStatus=7\nActiveState=failed\nSubState=failed\nsystemd-run exit=7\nPOSITIVE_CONTROL_NONZERO_EXIT_CAUGHT_OK\nRunning as unit: nas-receipt-badexit-4139245-1790365696783891872.service; invocation ID: 00443b4dd8d54103afee20cf3c6d89ca\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=7\nService runtime: 2ms\nCPU time consumed: 2ms\n"
+    },
+    {
+      "cmd": "UNIT=\"nas-receipt-deadline-$$-$(date +%s%N)\" && timeout 30 systemd-run --user --wait --unit=\"$UNIT\" -p Type=exec -p RuntimeMaxSec=1s -p TimeoutStopSec=1s -p KillMode=control-group -p SendSIGKILL=yes /bin/sh -c \"sleep 10\"; RC=$?; SHOW=$(systemctl --user show \"$UNIT.service\" --property=Result,ExecMainCode,ExecMainStatus,ActiveState,SubState); echo \"$SHOW\"; echo \"systemd-run exit=$RC\"; systemctl --user reset-failed \"$UNIT.service\" >/dev/null 2>&1; echo \"$SHOW\" | grep -q \"^Result=timeout$\" && echo \"$SHOW\" | grep -q \"^ActiveState=failed$\" && test \"$RC\" -ne 0 && echo \"POSITIVE_CONTROL_RUNTIMEMAXSEC_CAUGHT_OK\"",
+      "exit": 0,
+      "duration_s": 1.136,
+      "output_sha256": "ef93c21abbc86c07c7e40a05899fb67e5528843ec6f22e449a791291a372faa3",
+      "output_excerpt": "Result=timeout\nExecMainCode=2\nExecMainStatus=15\nActiveState=failed\nSubState=failed\nsystemd-run exit=1\nPOSITIVE_CONTROL_RUNTIMEMAXSEC_CAUGHT_OK\nRunning as unit: nas-receipt-deadline-4139259-1790365696886128681.service; invocation ID: b064a695e5a24721b34363908cf654c2\nFinished with result: timeout\nMain processes terminated with: code=killed/status=TERM\nService runtime: 1.086s\nCPU time consumed: 6ms\nM"
+    },
+    {
+      "cmd": "UNIT=\"nas-receipt-timer-$$-$(date +%s%N)\" && MARK=\"nas_timer_probe_$$_ok\" && timeout 20 systemd-run --user --unit=\"$UNIT\" --on-active=2s --timer-property=AccuracySec=100ms -p Type=exec -p RuntimeMaxSec=10s --working-directory=\"$(pwd)\" /bin/sh -c \"test -f manifests/stack.json && test -f catalogs/landscape/foundation.json && echo $MARK\"; RC0=$?; echo \"systemd-run(schedule) exit=$RC0 marker=$MARK\"; LOG=\"\"; i=0; while [ \"$i\" -lt 15 ]; do LOG=$(journalctl --user -u \"$UNIT.service\" --no-pager -o cat 2>/dev/null); if printf '%s\\n' \"$LOG\" | grep -qx \"$MARK\"; then break; fi; i=$((i+1)); sleep 1; done; echo \"poll_iterations=$i\"; systemctl --user stop \"$UNIT.timer\" \"$UNIT.service\" >/dev/null 2>&1; systemctl --user reset-failed \"$UNIT.service\" \"$UNIT.timer\" >/dev/null 2>&1; printf '%s\\n' \"$LOG\" | grep -qx \"$MARK\" && echo \"TIMER_VARIANT_FIRED_AND_SUCCEEDED_OK\"",
+      "exit": 0,
+      "duration_s": 3.086,
+      "output_sha256": "189b0ce20d2f85fb06fb7f230d71771ae75d57ef01998a851c0429debd366a52",
+      "output_excerpt": "systemd-run(schedule) exit=0 marker=nas_timer_probe_4139349_ok\npoll_iterations=3\nTIMER_VARIANT_FIRED_AND_SUCCEEDED_OK\nRunning timer as unit: nas-receipt-timer-4139349-1790365698022653857.timer\nWill run service as unit: nas-receipt-timer-4139349-1790365698022653857.service\n"
+    }
+  ],
+  "tool_versions": {
+    "systemd": "255.4-1ubuntu8.17"
+  },
+  "observed_at_utc": "2026-09-25T19:48:16Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), systemd 255.4-1ubuntu8.17, the scheduling-supervision winner, supervises real bounded work as the user manager. dpkg-query and systemctl both report 255.4-1ubuntu8.17, which equals the stack and winner pin. A transient user service (systemd-run --user --wait with resource limits) runs a repository validator, and systemd reports a successful result with status 0. A unit that exits 7 is reported as Result=exit-code, ExecMainStatus=7, ActiveState=failed. A unit that exceeds RuntimeMaxSec is killed and reported as Result=timeout. A transient timer fires its service, which succeeds and leaves a marker. Every command exits 0 on its own assertions.",
+  "limitations": [
+    "Supersedes the same-day receipt, which the independent review held at needs_changes on point 3 (backed claims): the claim said systemd reported the validator unit's runtime, CPU time and peak memory, but the retained excerpt did not show them. This generation drops that clause.",
+    "Transient units only: no persistent unit, enablement, linger, reboot or power-loss behaviour is exercised; those remain the layer's open recovery gaps.",
+    "WSL2's systemd runs inside the WSL VM; host (Windows) restarts are out of scope.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision); the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:48:16Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduce: re-ran cmd0 (dpkg-query, systemctl --version, pin comparison): hash-identical to the recorded output. Re-ran cmd1 verbatim (transient user unit running scripts/validate_catalogs.py, which I checked has no network access or file writes): exit 0, printed 'Finished with result: success' and 'Main processes terminated with: code=exited/status=0', no leftover units, worktree status unchanged. Did not re-run cmd2-cmd4 (they create failing or timer transient units in the shared user manager); instead read the user journal for the recorded units: the badexit unit shows 'Main process exited, code=exited, status=7' and 'Failed with result exit-code'; the deadline unit shows 'Service reached runtime time limit' and 'Failed with result timeout'; the timer unit started its service and the marker line is in the journal. Adequacy-checked: (1) layer role passes: scheduling-supervision; a real repository validator runs as a resource-limited transient user service and systemd reports its outcome, and a timer fires a service. (2) positive controls pass: exit 7 is reported as Result=exit-code and a RuntimeMaxSec kill as Result=timeout. (3) the gap named in the superseded receipt's review is fixed: the runtime, CPU time and peak memory clause is dropped; the remaining claim (successful result, status 0) is what cmd1 asserts with grep and exit 0, and I reproduced it; every other clause has a retained command and output. Residual, non-blocking: the success lines sit beyond the 400-character excerpt cut, so they rest on the command assertions and exit 0; the timer service success is inferred from the marker, not read from systemd; the boilerplate 'existing install under ~/.local/share/codex-ecosystem' limitation does not fit a dpkg package. (4) passes: component_id systemd is the scheduling-supervision winner, tool_versions 255.4-1ubuntu8.17, pin_matches True.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:54:37Z",
+      "reviewer": {
+        "identity_sha256": "a90718ea66d62d8044adb44ee9593c75a88ff91c19671770f1f96bc1a8be7a73",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--systemd--use--20260925"
+}

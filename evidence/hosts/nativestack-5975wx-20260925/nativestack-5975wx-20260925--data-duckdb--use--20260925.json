@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--data-duckdb--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "7783682fe6c9f10675d930b021f125028f21d8f1",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "data-duckdb",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 -c \"import json,glob,sys;s,c=sys.argv[1],sys.argv[2];print('stack',s,[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==s],'| winner',c,'pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" duckdb data-duckdb && c=$(python3 -c \"import json,glob,re,sys;c=sys.argv[1];p={w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c};m={x for q in p for x in re.findall(r'[0-9a-f]{40}',q)};assert len(m)==1,p;print(m.pop())\" data-duckdb) && /usr/bin/timeout 180 bwrap --unshare-net --die-with-parent --ro-bind / / --dev /dev --proc /proc \"$HOME/.local/share/codex-ecosystem/sdk-py313/bin/python\" -s -c \"import duckdb,importlib.metadata as m,sys;v,s=duckdb.sql('select library_version, source_id from pragma_version()').fetchone();ok=m.version('duckdb')=='1.5.5' and v=='v1.5.5' and sys.argv[1].startswith(s);print('duckdb',m.version('duckdb'),'| pragma_version library_version',v,'source_id',s,'| source_id is a prefix of the winner pin commit',sys.argv[1][:12]+'...:',ok);raise SystemExit(0 if ok else 1)\" \"$c\"",
+      "exit": 0,
+      "duration_s": 0.18,
+      "output_sha256": "6cc57393968cbf275955326dff5527ba77f3ae46e174e7a923b81c13b8b19b79",
+      "output_excerpt": "stack duckdb ['1.5.5'] | winner data-duckdb pins ['v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa']\nduckdb 1.5.5 | pragma_version library_version v1.5.5 source_id d8cdaa33fd | source_id is a prefix of the winner pin commit d8cdaa33fda8...: True\n"
+    },
+    {
+      "cmd": "/usr/bin/timeout 120 bwrap --unshare-net --die-with-parent --ro-bind / / --dev /dev --proc /proc \"$HOME/.local/share/codex-ecosystem/sdk-py313/bin/python\" -s -c \"\nimport csv, duckdb\npath = 'blueprints/us-equities/data/fixtures/good.csv'\nrows = list(csv.DictReader(open(path)))\noracle_rows = len(rows)\noracle_total_volume = sum(int(r['volume']) for r in rows)\noracle_by_symbol = {}\nfor r in rows:\n    oracle_by_symbol[r['symbol']] = oracle_by_symbol.get(r['symbol'], 0) + int(r['volume'])\noracle_max_high = max(float(r['high']) for r in rows)\noracle_min_low = min(float(r['low']) for r in rows)\ncon = duckdb.connect()\ncon.read_csv(path, header=True, columns={'symbol':'VARCHAR','session':'DATE','open':'DOUBLE','high':'DOUBLE','low':'DOUBLE','close':'DOUBLE','volume':'BIGINT','observed_at':'TIMESTAMP'}).create_view('bars')\nn = con.sql('SELECT count(*) FROM bars').fetchone()[0]\ntotal_vol = con.sql('SELECT sum(volume) FROM bars').fetchone()[0]\nby_symbol = dict(con.sql('SELECT symbol, sum(volume) FROM bars GROUP BY symbol').fetchall())\nmax_high = con.sql('SELECT max(high) FROM bars').fetchone()[0]\nmin_low = con.sql('SELECT min(low) FROM bars').fetchone()[0]\nok = (n == oracle_rows == 4 and total_vol == oracle_total_volume == 146008800 and by_symbol == oracle_by_symbol and abs(max_high - oracle_max_high) < 1e-9 and abs(min_low - oracle_min_low) < 1e-9)\nprint('duckdb rows', n, 'oracle rows', oracle_rows, '| duckdb total_volume', total_vol, 'oracle total_volume', oracle_total_volume, '| duckdb by_symbol', by_symbol, 'oracle by_symbol', oracle_by_symbol, '| duckdb max_high', max_high, 'oracle max_high', oracle_max_high, '| duckdb min_low', min_low, 'oracle min_low', oracle_min_low, '| match', ok)\nraise SystemExit(0 if ok else 1)\n\"",
+      "exit": 0,
+      "duration_s": 0.149,
+      "output_sha256": "088eca587d055c7cde6c9c428c937b250381511bdf305c3dedda876d59e57adc",
+      "output_excerpt": "duckdb rows 4 oracle rows 4 | duckdb total_volume 146008800 oracle total_volume 146008800 | duckdb by_symbol {'SPY': 87120500, 'QQQ': 58888300} oracle by_symbol {'SPY': 87120500, 'QQQ': 58888300} | duckdb max_high 663.0 oracle max_high 663.0 | duckdb min_low 589.1 oracle min_low 589.1 | match True\n"
+    },
+    {
+      "cmd": "/usr/bin/timeout 120 bwrap --unshare-net --die-with-parent --ro-bind / / --dev /dev --proc /proc \"$HOME/.local/share/codex-ecosystem/sdk-py313/bin/python\" -s -c \"\nimport duckdb\ncon = duckdb.connect()\ncon.execute('CREATE TABLE bars (symbol VARCHAR, session DATE, open DOUBLE, high DOUBLE, low DOUBLE, close DOUBLE, volume BIGINT CHECK (volume >= 0), observed_at TIMESTAMP)')\npath = 'blueprints/us-equities/data/fixtures/bad.csv'\nrel = con.read_csv(path, header=True)\ncaught = False\nerr = ''\ntry:\n    rel.insert_into('bars')\nexcept duckdb.ConstraintException as e:\n    caught = True\n    err = str(e)\nexcept Exception as e:\n    err = 'WRONG EXCEPTION TYPE: ' + type(e).__name__ + ': ' + str(e)\nn = con.sql('SELECT count(*) FROM bars').fetchone()[0]\nprint('caught ConstraintException:', caught, '| rows committed after failed insert:', n, '| error:', err[:200])\nraise SystemExit(0 if (caught and n == 0) else 1)\n\"",
+      "exit": 0,
+      "duration_s": 0.137,
+      "output_sha256": "be7274d6cf9efb38c1133e52e60e47207cc553311547c8a974c848ef1489c67b",
+      "output_excerpt": "caught ConstraintException: True | rows committed after failed insert: 0 | error: Constraint Error: CHECK constraint failed on table bars with expression CHECK((volume >= 0))\n"
+    },
+    {
+      "cmd": "D=$(mktemp -d) && trap 'rm -rf \"$D\"' EXIT && /usr/bin/timeout 120 bwrap --unshare-net --die-with-parent --ro-bind / / --bind \"$D\" \"$D\" --dev /dev --proc /proc \"$HOME/.local/share/codex-ecosystem/sdk-py313/bin/python\" -s -c \"\nimport csv, duckdb, hashlib, os, sys\npath = 'blueprints/us-equities/data/fixtures/good.csv'\nout = os.path.join(sys.argv[1], 'bars.parquet')\nrows = list(csv.DictReader(open(path)))\noracle_rows = len(rows)\noracle_total_volume = sum(int(r['volume']) for r in rows)\ncon = duckdb.connect()\ncon.read_csv(path, header=True, columns={'symbol':'VARCHAR','session':'DATE','open':'DOUBLE','high':'DOUBLE','low':'DOUBLE','close':'DOUBLE','volume':'BIGINT','observed_at':'TIMESTAMP'}).write_parquet(out, compression='zstd')\nreread = con.read_parquet(out)\nreread.create_view('reread_bars')\nn = con.sql('SELECT count(*) FROM reread_bars').fetchone()[0]\ntotal_vol = con.sql('SELECT sum(volume) FROM reread_bars').fetchone()[0]\nparquet_sha256 = hashlib.sha256(open(out, 'rb').read()).hexdigest()\nok = n == oracle_rows == 4 and total_vol == oracle_total_volume == 146008800 and os.path.getsize(out) > 0\nprint('parquet round trip rows', n, 'oracle rows', oracle_rows, '| reread total_volume', total_vol, 'oracle total_volume', oracle_total_volume, '| parquet bytes', os.path.getsize(out), '| parquet_sha256', parquet_sha256, '| match', ok)\nraise SystemExit(0 if ok else 1)\n\" \"$D\"",
+      "exit": 0,
+      "duration_s": 0.15,
+      "output_sha256": "5ec8443139c39a0ecc0c09316b7e70e1b8fb18a8a28d047cfa505959c409df87",
+      "output_excerpt": "parquet round trip rows 4 oracle rows 4 | reread total_volume 146008800 oracle total_volume 146008800 | parquet bytes 1277 | parquet_sha256 1e27f31330539341386d25724582cd3dfcbfde275092d1356e01dc81a057e4a9 | match True\n"
+    }
+  ],
+  "tool_versions": {
+    "data-duckdb": "v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa"
+  },
+  "observed_at_utc": "2026-09-25T19:06:39Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), DuckDB 1.5.5, the storage-compute winner, does the layer's job on the repository's retained bar fixture. The engine's own pragma_version reports library v1.5.5 with a source_id that is a prefix of the winner pin commit d8cdaa33fda8df955cc76ef58a280f68f4cd43fa. With networking unshared, DuckDB loads blueprints/us-equities/data/fixtures/good.csv and computes the row count, total volume, per-symbol volume, max high and min low, all equal to an independent pure-Python computation. It writes the bars to Parquet and reads them back with identical totals. Loading bad.csv into a table with a CHECK (volume >= 0) constraint raises ConstraintException and commits 0 rows (positive control). Every command exits 0 on its own assertions.",
+  "limitations": [
+    "The fixtures are small retained files (4 rows each) built for the promotion gate, not a production-scale historical dataset; blueprints/us-equities/data/summarize_backtest.py, which needs an external LEAN fixture, is not exercised.",
+    "The Parquet round trip writes to a temporary directory that is removed on exit; no Parquet artifact is retained.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision); the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:06:39Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduce: re-ran all 4 commands from the repo root (pin readback, CSV-vs-pure-Python oracle, CHECK-constraint control, Parquet round trip); output identical incl. the Parquet sha256. Adequacy-checked: (1) layer role storage-compute: loads, aggregates and snapshots the retained bar fixture and reads it back, matched to an independent pure-Python oracle; (2) positive control: bad.csv carries volume -100 and is rejected by CHECK(volume>=0) with 0 rows committed; (3) backed: pragma_version v1.5.5 with source_id a prefix of the pin commit and importlib.metadata 1.5.5 are in the retained output, and every claim sentence has a retained command plus output; (4) bound: component_id data-duckdb is the storage-compute winner, tool_versions equals the pin string, pin_matches True. Residual (disclosed): 4-row fixtures only.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:44:43Z",
+      "reviewer": {
+        "identity_sha256": "739ff768866f471b76d2597625e6fdcdc20a33829e1c3b6df3b3c8aa754cc057",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

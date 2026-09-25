@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--data-pandera--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "7783682fe6c9f10675d930b021f125028f21d8f1",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "data-pandera",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "V=\"$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv/bin/python3\" && python3 -c \"import json,glob;print('winner data-pandera pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')=='data-pandera'}))\" && \"$V\" -s -c \"import importlib.metadata as m;print('pandera',m.version('pandera'))\" && c=$(python3 -c \"import json,glob,re;p={w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')=='data-pandera'};m={x for q in p for x in re.findall(r'[0-9a-f]{40}',q)};assert len(m)==1,p;print(m.pop())\") && t=$(timeout 30 git ls-remote https://github.com/unionai-oss/pandera 'refs/tags/v0.33.1' 'refs/tags/v0.33.1^{}' | awk '{print $1}' | tail -1) && echo \"upstream unionai-oss/pandera tag v0.33.1 -> $t | winner pin commit $c\" && test \"$t\" = \"$c\"",
+      "exit": 0,
+      "duration_s": 0.383,
+      "output_sha256": "1118b03d41be66d072c45876a03a2b7d5a37ca859d8af91ab2479473bc6122fa",
+      "output_excerpt": "winner data-pandera pins ['v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6']\npandera 0.33.1\nupstream unionai-oss/pandera tag v0.33.1 -> 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6 | winner pin commit 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6\n"
+    },
+    {
+      "cmd": "V=\"$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv/bin/python3\" && out=$(uv pip sync --dry-run --offline --python \"$V\" blueprints/us-equities/data/requirements.lock 2>&1) && printf '%s\\n' \"$out\" | tail -2 && printf '%s' \"$out\" | grep -q 'Would make no changes' && grep -A2 \"^pandera==\" blueprints/us-equities/data/requirements.lock | head -3 && echo \"the environment matches blueprints/us-equities/data/requirements.lock exactly (hash-pinned; uv pip sync --dry-run --offline would make no changes)\"",
+      "exit": 0,
+      "duration_s": 0.023,
+      "output_sha256": "7f32deffa5f5067aa2a02347bc1bf381886209b4e39baf6762be3d6e58b8e4a8",
+      "output_excerpt": "Checked 21 packages in 0.31ms\nWould make no changes\npandera==0.33.1 \\\n    --hash=sha256:8283bc12f7c85f0b429107d71b55150205f7e5ca59d68117aff971273a3bd2d8 \\\n    --hash=sha256:909e2e269a3f9c17d94c11268f92a5f48e889af633ea1414053993874d613626\nthe environment matches blueprints/us-equities/data/requirements.lock exactly (hash-pinned; uv pip sync --dry-run --offline would make no changes)\n"
+    },
+    {
+      "cmd": "export PYTHONDONTWRITEBYTECODE=1\nVENV=\"$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv\"\nD=$(mktemp -d) &&\ntimeout 60 \"$VENV/bin/python3\" blueprints/us-equities/data/promotion_gate.py --input blueprints/us-equities/data/fixtures/good.csv --out \"$D/gate-result.json\"\ncode=$?\ntimeout 30 python3 -c '\nimport json,hashlib,sys\nr=json.load(open(sys.argv[1]))\nexpect_sha=hashlib.sha256(open(sys.argv[2],\"rb\").read()).hexdigest()\nnames=sorted(c[\"name\"] for c in r[\"checks\"])\nwant=sorted([\"rows_present\",\"symbol_nonempty\",\"valid_trading_session\",\"open_positive\",\"high_positive\",\"low_positive\",\"close_positive\",\"volume_integral_non_negative\",\"observed_at_not_future\",\"high_ge_max_open_close\",\"low_le_min_open_close\",\"unique_symbol_session\"])\nok=(r[\"status\"]==\"pass\" and r[\"row_count\"]==4 and r[\"input_sha256\"]==expect_sha and names==want and all(c[\"status\"]==\"pass\" for c in r[\"checks\"]) and r[\"versions\"][\"pandera\"]==\"0.33.1\")\nprint(\"gate cli on real fixture good.csv: status\",r[\"status\"],\"row_count\",r[\"row_count\"],\"checks_pass\",sum(1 for c in r[\"checks\"] if c[\"status\"]==\"pass\"),\"/\",len(r[\"checks\"]),\"pandera\",r[\"versions\"][\"pandera\"],\"input_sha256_matches\",r[\"input_sha256\"]==expect_sha)\nraise SystemExit(0 if ok else 1)\n' \"$D/gate-result.json\" blueprints/us-equities/data/fixtures/good.csv\nrc=$?\nrm -rf \"$D\"\ntest $code -eq 0 && test $rc -eq 0",
+      "exit": 0,
+      "duration_s": 0.896,
+      "output_sha256": "0881e9f32fb52ef28808ef526b98a2c28ea81df7946168b2949dedacbe3d7d29",
+      "output_excerpt": "{\"status\": \"pass\", \"row_count\": 4}\ngate cli on real fixture good.csv: status pass row_count 4 checks_pass 12 / 12 pandera 0.33.1 input_sha256_matches True\n"
+    },
+    {
+      "cmd": "export PYTHONDONTWRITEBYTECODE=1\nVENV=\"$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv\"\nD=$(mktemp -d) &&\ntimeout 15 python3 -c '\nimport csv\nrows=list(csv.reader(open(\"blueprints/us-equities/data/fixtures/good.csv\")))\nheader,data=rows[0],rows[1:]\noi=header.index(\"open\")\ndata[0][oi]=\"-660.1\"\nwith open(\"'\"$D\"'/corrupted.csv\",\"w\",newline=\"\") as f:\n    w=csv.writer(f); w.writerow(header); w.writerows(data)\n'\nrc1=$?\ntimeout 30 \"$VENV/bin/python3\" -c '\nimport importlib.util, sys\nspec = importlib.util.spec_from_file_location(\"promotion_gate\", \"blueprints/us-equities/data/promotion_gate.py\")\ng = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)\nimport pandas as pd, pandera as pandera_pkg, exchange_calendars as xcal\ncalendar = xcal.get_calendar(\"XNYS\")\nnow = pd.Timestamp.now(tz=\"UTC\")\nschema = g._schema(calendar, now)\ngood = g._prepare(g._load_frame(\"blueprints/us-equities/data/fixtures/good.csv\"))\nschema.validate(good)\nprint(\"good fixture validated with no SchemaError (as expected)\")\nbad = g._prepare(g._load_frame(\"'\"$D\"'/corrupted.csv\"))\ntry:\n    schema.validate(bad)\n    print(\"UNEXPECTED: no SchemaError raised on corrupted copy\")\n    sys.exit(1)\nexcept pandera_pkg.errors.SchemaError as e:\n    print(\"corrupted copy correctly rejected with\", type(e).__name__, \"check:\", getattr(e, \"check\", None))\n'\nrc2=$?\nrm -rf \"$D\"\ntest $rc1 -eq 0 && test $rc2 -eq 0",
+      "exit": 0,
+      "duration_s": 0.943,
+      "output_sha256": "bc9c904ea3eedcd58cfd645aeaa709c68b41283df9193781b0503b24fc149fb1",
+      "output_excerpt": "good fixture validated with no SchemaError (as expected)\ncorrupted copy correctly rejected with SchemaError check: <Check open_positive: open_positive>\n"
+    }
+  ],
+  "tool_versions": {
+    "data-pandera": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6"
+  },
+  "observed_at_utc": "2026-09-25T19:06:40Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), pandera 0.33.1, the data-quality-orchestration winner, gates real repository data. The promotion-gate environment reports pandera 0.33.1. The upstream tag unionai-oss/pandera v0.33.1 resolves to the winner pin commit 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6. uv pip sync --dry-run --offline confirms the environment exactly matches the hash-pinned blueprints/us-equities/data/requirements.lock. The repository's promotion gate (blueprints/us-equities/data/promotion_gate.py) validates blueprints/us-equities/data/fixtures/good.csv with pandera, returning status pass with 12 of 12 checks passing and the input sha256 bound in its result. A copy with one negative open price is rejected by the same schema with a SchemaError from the open_positive check (positive control). Every command exits 0 on its own assertions.",
+  "limitations": [
+    "good.csv is the repository's bundled fixture of four SPY/QQQ bar rows, not live or full historical data.",
+    "Only the schema-validation half of the data-quality-orchestration layer is exercised; orchestration (scheduling or ingest runs) is not.",
+    "The tag-to-commit check calls GitHub over the network (git ls-remote); the other commands are offline.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision); the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:06:40Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduce: re-ran cmd1-cmd3 and the local part of cmd0 (skipped only the git ls-remote tag lookup: network; its output is retained). Extra probe: promotion_gate.py on the retained bad.csv returns status fail (5 checks fail). Adequacy-checked: (1) layer role data-quality-orchestration (data-quality half): the repo promotion gate validates the retained fixture with pandera, 12/12 checks, input sha256 bound; (2) positive control: a copy with one negative open price is rejected with SchemaError on open_positive; (3) backed: pandera 0.33.1 read from the gate venv, upstream tag v0.33.1 resolved to the pin commit, uv pip sync --dry-run --offline reports no changes against the hash-pinned lock, all in retained output; (4) bound: component_id data-pandera is the winner, tool_versions equals the pin, pin_matches True. Residual (disclosed): orchestration half not exercised.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:44:43Z",
+      "reviewer": {
+        "identity_sha256": "739ff768866f471b76d2597625e6fdcdc20a33829e1c3b6df3b3c8aa754cc057",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}
