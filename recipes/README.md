@@ -16,6 +16,7 @@ The examples target Linux/WSL x86_64. Use a current native Node.js 24, npm, Pyth
 | [Tavily](tavily.md) | Tavily CLI installation, sign-in and returned results |
 | [SOTA convergence practice](sota-convergence-practice.md) | Reproducible dated repository-convergence recipe (`tools/sota-convergence/`): when to rerun, the six commands, evidence classes, the never-promote rule, and the cross-family review/PR/CI step. |
 | [Saturation sweep](saturation-sweep.md) | A person-started landscape sweep scoped to the layers the weekly `saturation-tracking` issue lists as due, with the evidence it must keep and the append to `catalogs/saturation/ledger.json` |
+| [Host request lane](host-request-lane.md) | Other PCs ask the GPU workstation for memory, RAG, model hosting and qualification work through GitHub issues; the workstation lists, polls, claims and reports them with `scripts/host_requests.py`, and a coordinator session runs the work (drafted: unit tests and read-only runs only) |
 
 ## Paths, pins and installation conventions
 
