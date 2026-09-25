@@ -39,6 +39,7 @@ import tempfile
 import threading
 import time
 import unittest
+from datetime import datetime, timezone
 from io import StringIO
 from pathlib import Path
 from contextlib import redirect_stderr, redirect_stdout
@@ -161,6 +162,11 @@ def write_state_json(state_dir: Path, *, jobs: list) -> None:
     ))
 
 
+def iso(epoch: float) -> str:
+    """A `Date.prototype.toISOString()`-style string for `epoch`, matching plugin timestamps."""
+    return datetime.fromtimestamp(epoch, tz=timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
 class ReaperTestCase(unittest.TestCase):
     """Common synthetic-fixture plumbing; no production path is ever touched."""
 
@@ -239,6 +245,33 @@ class ReaperTestCase(unittest.TestCase):
             "fake session process never reported the forced comm",
         )
         return proc
+
+
+@LINUX_ONLY
+class PathIsUnderTests(ReaperTestCase):
+    """path_is_under(): used by guard (c) for the workspace root, its git toplevel, and its worktree parent."""
+
+    def test_normal_root_matches_itself_and_children_only(self):
+        # "/home/example/..." (not a real user, scripts/validate.py's own
+        # "personal home path" scan exempts "example"): plain string
+        # literals, not this test's own tmp fixtures.
+        self.assertTrue(module.path_is_under("/home/example/x", "/home/example/x"))
+        self.assertTrue(module.path_is_under("/home/example/x/sub", "/home/example/x"))
+        self.assertFalse(module.path_is_under("/home/example/y", "/home/example/x"))
+        # A sibling that merely shares a string prefix must not match: the
+        # separator-aware boundary check must not regress into a naive
+        # substring test.
+        self.assertFalse(module.path_is_under("/home/example/xylophone", "/home/example/x"))
+
+    def test_filesystem_root_workspace_is_not_a_safety_hole(self):
+        # Fix-round finding: with root "/", the old `root + os.sep` was
+        # "//", which only the literal string "/" ever starts with -- so
+        # path_is_under(anything, "/") returned False for every real
+        # absolute path. Improbable in practice (a broker's workspace root
+        # or nearest .git ancestor resolving to "/"), but wrong in the
+        # unsafe direction for a live-session safety check.
+        self.assertTrue(module.path_is_under("/", "/"))
+        self.assertTrue(module.path_is_under("/home/example/anything", "/"))
 
 
 @LINUX_ONLY
@@ -453,6 +486,56 @@ class LiveCwdGuardTests(ReaperTestCase):
         self.assertFalse(blocked["eligible"])
         self.assertIn(str(checkout), " ".join(blocked["reasons"]))
 
+    def test_a_live_session_at_the_worktrees_main_checkout_blocks_eligibility(self):
+        # Fix-round finding (major): a coordinator that dispatches into a
+        # worktree by prefixing every Bash command with `cd <worktree> &&`
+        # -- rather than changing its own OS process cwd -- never itself has
+        # a cwd under the worktree at all, so before this fix neither the
+        # workspace-root nor git-toplevel scan above could ever see it.
+        # Simulates a real `git worktree add` layout with plain directories
+        # and a hand-written `.git` pointer file (no real git needed, same
+        # style as the checkout-root test above): `main_checkout` stands in
+        # for the repository the coordinating session was launched from,
+        # `worktree` for the linked worktree the broker's own cwd is set to.
+        main_checkout = self.root / "main-checkout"
+        main_checkout.mkdir()
+        (main_checkout / ".git").mkdir()
+        worktree = self.root / "worktree"
+        worktree.mkdir()
+        (worktree / ".git").write_text(f"gitdir: {main_checkout}/.git/worktrees/demo\n")
+        state_dir = self.root / "workspace-slug-worktree"
+        state_dir.mkdir()
+        broker_proc, endpoint = self.spawn_fake_broker(cwd=worktree)
+        write_broker_json(state_dir, endpoint=endpoint, pid=broker_proc.pid)
+        write_state_json(state_dir, jobs=[])
+
+        # No session anywhere yet: the worktree looks unused, same as any
+        # other workspace with no live process under it.
+        record = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertTrue(record["eligible"])
+
+        # A live session at the worktree's MAIN checkout (not the worktree
+        # itself, and not reachable via find_git_toplevel(worktree), which
+        # only ever resolves back to the worktree's own root) must still
+        # block, via the worktree-to-parent check.
+        self.spawn_fake_session(name="claude", cwd=main_checkout)
+        blocked = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertFalse(blocked["guards"]["c_workspace_unused"])
+        self.assertFalse(blocked["eligible"])
+        self.assertIn(str(main_checkout), " ".join(blocked["reasons"]))
+
+    def test_read_worktree_parent_root_ignores_a_normal_checkout(self):
+        # A normal checkout's (or the repository's own main worktree's)
+        # `.git` is a directory, not a `gitdir:` pointer file; must not be
+        # misread as a linked worktree.
+        normal = self.root / "normal-checkout"
+        (normal / ".git").mkdir(parents=True)
+        self.assertIsNone(module.read_worktree_parent_root(str(normal)))
+        # No `.git` at all: also None, not an error.
+        no_git = self.root / "no-git"
+        no_git.mkdir()
+        self.assertIsNone(module.read_worktree_parent_root(str(no_git)))
+
 
 @LINUX_ONLY
 class MinAgeGuardTests(ReaperTestCase):
@@ -514,6 +597,177 @@ class MinAgeGuardTests(ReaperTestCase):
         # staleness bug of the kind alleged would shift this by ~3600s.
         self.assertGreaterEqual(record["age_seconds"], 0.0)
         self.assertLess(record["age_seconds"], 5.0)
+
+
+@LINUX_ONLY
+class JobIdleGuardTests(ReaperTestCase):
+    """Guard (e): time since the most recent recorded job activity, not just broker-process age."""
+
+    def _patch_process_start_epoch(self, epoch: float) -> None:
+        # Guard (d)'s age is deliberately independent of the caller's `now`
+        # (see MinAgeGuardTests.test_age_is_correct_even_with_an_
+        # artificially_stale_reference_time's algebra: `now` cancels out of
+        # process_start_epoch's own math), so a synthetic future `now` alone
+        # cannot make guard (d) see a large age in a fast unit test. Guard
+        # (e) must be isolated from guard (d) some other way: monkeypatch
+        # process_start_epoch directly, matching this file's established
+        # pattern for deterministic sub-second simulation of time-dependent
+        # guards (e.g. ApplyAndEscalationTests' os.getpgid/read_proc_cmdline
+        # monkeypatches above).
+        original = module.process_start_epoch
+        module.process_start_epoch = lambda pid, reference=None: epoch
+        self.addCleanup(setattr, module, "process_start_epoch", original)
+
+    def test_recent_job_activity_blocks_even_when_the_broker_process_looks_old(self):
+        # Fix-round finding (major): guard (d) alone only measures the
+        # broker PROCESS's own age, so a broker that has been running for
+        # hours but did a job a minute ago was already eligible once guard
+        # (d)'s min-age passed -- even though the workspace was plainly
+        # still in active use moments before.
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        state_dir = self.root / "workspace-slug-recent-job"
+        state_dir.mkdir()
+        proc, endpoint = self.spawn_fake_broker(cwd=workspace)
+        write_broker_json(state_dir, endpoint=endpoint, pid=proc.pid)
+        shutil.rmtree(workspace)  # guard c satisfied regardless of live-process scan timing
+        now = time.time()
+        write_state_json(state_dir, jobs=[
+            {"id": "fixture-job-recent", "status": "completed", "updatedAt": iso(now - 10.0)}
+        ])
+        self._patch_process_start_epoch(now - 7200.0)  # broker process looks 2h old
+
+        record = module.evaluate_broker(state_dir, min_age=3600.0, now=now)
+        self.assertTrue(record["guards"]["d_min_age"])         # broker process looks old enough
+        self.assertTrue(record["guards"]["b_no_active_jobs"])  # the job itself is "completed"
+        self.assertFalse(record["guards"]["e_job_idle"])       # but activity was 10s ago
+        self.assertFalse(record["eligible"])
+        self.assertIn("guard e failed", " ".join(record["reasons"]))
+
+    def test_old_job_activity_allows_once_past_min_age(self):
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        state_dir = self.root / "workspace-slug-old-job"
+        state_dir.mkdir()
+        proc, endpoint = self.spawn_fake_broker(cwd=workspace)
+        write_broker_json(state_dir, endpoint=endpoint, pid=proc.pid)
+        shutil.rmtree(workspace)
+        now = time.time()
+        write_state_json(state_dir, jobs=[
+            {"id": "fixture-job-old", "status": "completed", "updatedAt": iso(now - 9000.0)}
+        ])
+        self._patch_process_start_epoch(now - 7200.0)
+
+        record = module.evaluate_broker(state_dir, min_age=3600.0, now=now)
+        self.assertTrue(record["guards"]["d_min_age"])
+        self.assertTrue(record["guards"]["e_job_idle"])
+        self.assertTrue(record["eligible"])
+
+    def test_no_job_timestamp_leaves_guard_d_as_the_sole_age_signal(self):
+        # A broker that has never run a job (or whose job dicts predate this
+        # guard) has no activity timestamp at all; guard (e) must pass
+        # trivially rather than block forever, leaving guard (d) exactly as
+        # capable as before this guard existed (disclosed residual gap: see
+        # docs/decisions/2026-09-25-codex-broker-reaper.md).
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        state_dir = self.root / "workspace-slug-no-job-timestamp"
+        state_dir.mkdir()
+        proc, endpoint = self.spawn_fake_broker(cwd=workspace)
+        write_broker_json(state_dir, endpoint=endpoint, pid=proc.pid)
+        shutil.rmtree(workspace)
+        write_state_json(state_dir, jobs=[])  # never ran a job
+        now = time.time()
+        self._patch_process_start_epoch(now - 7200.0)
+
+        record = module.evaluate_broker(state_dir, min_age=3600.0, now=now)
+        self.assertTrue(record["guards"]["d_min_age"])
+        self.assertTrue(record["guards"]["e_job_idle"])
+        self.assertIn("no job activity timestamp recorded", " ".join(record["reasons"]))
+        self.assertTrue(record["eligible"])
+
+
+@LINUX_ONLY
+class MalformedStateTests(ReaperTestCase):
+    """One broker's malformed on-disk state must never crash evaluation of the rest."""
+
+    def test_broker_json_that_is_not_an_object_is_ineligible_not_a_crash(self):
+        # Fix-round finding: broker.json that parses as valid JSON but is
+        # not an object (e.g. a bare list) used to crash evaluate_broker at
+        # `broker.get(...)` with an uncaught AttributeError.
+        state_dir = self.root / "workspace-slug-non-object"
+        state_dir.mkdir()
+        (state_dir / "broker.json").write_text(json.dumps([1, 2, 3]))
+        record = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertFalse(record["eligible"])
+        self.assertIn("does not contain a JSON object", " ".join(record["reasons"]))
+
+    def test_non_utf8_broker_json_is_ineligible_not_a_crash(self):
+        # Fix-round finding: a non-UTF-8 broker.json used to raise an
+        # uncaught UnicodeDecodeError (not caught by the old `except
+        # (OSError, json.JSONDecodeError)`), crashing the whole evaluation.
+        state_dir = self.root / "workspace-slug-non-utf8"
+        state_dir.mkdir()
+        (state_dir / "broker.json").write_bytes(b"\xff\xfe\x00not valid utf-8")
+        record = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertFalse(record["eligible"])
+        self.assertIn("cannot read broker.json", " ".join(record["reasons"]))
+
+    def test_non_utf8_state_json_is_ineligible_not_a_crash(self):
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        state_dir = self.root / "workspace-slug-state-non-utf8"
+        state_dir.mkdir()
+        proc, endpoint = self.spawn_fake_broker(cwd=workspace)
+        write_broker_json(state_dir, endpoint=endpoint, pid=proc.pid)
+        (state_dir / "state.json").write_bytes(b"\xff\xfe\x00not valid utf-8")
+        record = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertFalse(record["guards"]["b_no_active_jobs"])
+        self.assertFalse(record["eligible"])
+        self.assertIn("cannot read state.json", " ".join(record["reasons"]))
+
+    def test_safe_evaluate_broker_never_raises_and_run_continues_past_a_broken_broker(self):
+        # The outer safety net: run()/main() must keep evaluating every
+        # OTHER broker even when one directory's state is broken in a way
+        # evaluate_broker() itself does not anticipate (simulated here via
+        # monkeypatching, deterministic rather than constructing a real
+        # never-anticipated failure mode).
+        state_root = self.root / "state"
+        broken_dir = state_root / "workspace-slug-broken"
+        broken_dir.mkdir(parents=True)
+        write_broker_json(broken_dir, endpoint="unix:/tmp/does-not-exist.sock", pid=999999999)
+        write_state_json(broken_dir, jobs=[])
+
+        healthy_dir = state_root / "workspace-slug-healthy"
+        healthy_dir.mkdir(parents=True)
+        write_broker_json(healthy_dir, endpoint="unix:/tmp/also-does-not-exist.sock", pid=999999998)
+        write_state_json(healthy_dir, jobs=[])
+
+        original_evaluate = module.evaluate_broker
+
+        def flaky_evaluate(broker_dir, *, min_age, now):
+            if broker_dir.name == "workspace-slug-broken":
+                raise RuntimeError("simulated unexpected failure")
+            return original_evaluate(broker_dir, min_age=min_age, now=now)
+
+        module.evaluate_broker = flaky_evaluate
+        self.addCleanup(setattr, module, "evaluate_broker", original_evaluate)
+
+        buffer = StringIO()
+        with redirect_stdout(buffer):
+            exit_code = module.main(["--list", "--state-root", str(state_root)])
+        self.assertEqual(exit_code, 0)
+        report = json.loads(buffer.getvalue())
+        self.assertEqual(report["summary"]["total"], 2)
+        by_dir = {record["state_dir"]: record for record in report["brokers"]}
+        broken_record = by_dir[str(broken_dir)]
+        self.assertFalse(broken_record["eligible"])
+        self.assertIn("unexpected error evaluating this broker", " ".join(broken_record["reasons"]))
+        # The healthy broker was still evaluated normally (both dead pids
+        # here, so both are ineligible at guard (a), but its own real reason
+        # -- not the broken one's fallback -- must show up).
+        healthy_record = by_dir[str(healthy_dir)]
+        self.assertIn("not running", " ".join(healthy_record["reasons"]))
 
 
 @LINUX_ONLY
@@ -634,6 +888,61 @@ class ApplyAndEscalationTests(ReaperTestCase):
         self.assertEqual(report["summary"]["failed_to_stop"], 0)
         self.assertIsInstance(report["mem_available_kib_before"], int)
         self.assertIsInstance(report["mem_available_kib_after"], int)
+
+    def test_apply_removes_broker_json_after_a_confirmed_stop(self):
+        # Fix-round finding: stop_broker() confirmed the broker PROCESS
+        # exited but never touched broker.json itself, so a workspace's
+        # plugin state kept pointing at the dead endpoint/pid until that
+        # workspace's own next SessionEnd ran.
+        state_root = self.root / "state"
+        state_dir = state_root / "workspace-slug-cleanup"
+        state_dir.mkdir(parents=True)
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        proc, endpoint = self.spawn_fake_broker(cwd=workspace)
+        write_broker_json(state_dir, endpoint=endpoint, pid=proc.pid)
+        write_state_json(state_dir, jobs=[])
+        shutil.rmtree(workspace)
+        broker_json_path = state_dir / "broker.json"
+        self.assertTrue(broker_json_path.exists())
+
+        buffer = StringIO()
+        with redirect_stdout(buffer):
+            exit_code = module.main(["--apply", "--min-age", "0", "--state-root", str(state_root)])
+        self.assertEqual(exit_code, 0)
+        self.assertTrue(wait_until(lambda: not module.process_exists(proc.pid), timeout=5.0))
+        self.assertFalse(broker_json_path.exists())
+
+    def test_apply_leaves_broker_json_when_it_now_names_a_different_broker(self):
+        # Race safety: clear_broker_json_if_stopped() must re-read
+        # broker.json and compare pid/endpoint rather than trusting the
+        # in-memory record, since a NEW broker could have started (and
+        # written its own broker.json) for the same workspace while this
+        # stop was waiting for the old one to exit.
+        state_root = self.root / "state"
+        state_dir = state_root / "workspace-slug-raced"
+        state_dir.mkdir(parents=True)
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        proc, endpoint = self.spawn_fake_broker(cwd=workspace)
+        write_broker_json(state_dir, endpoint=endpoint, pid=proc.pid)
+        write_state_json(state_dir, jobs=[])
+        shutil.rmtree(workspace)
+
+        record = {
+            "state_dir": str(state_dir), "broker_json": str(state_dir / "broker.json"),
+            "pid": proc.pid, "endpoint": endpoint, "reasons": [], "rpc_result": None,
+            "action": "none", "exit_observed": None,
+        }
+        module.stop_broker(record, escalate=False)
+        self.assertTrue(wait_until(lambda: not module.process_exists(proc.pid), timeout=5.0))
+        # Simulate a new broker's broker.json having been written for this
+        # same workspace, as if a fresh session attached during the wait.
+        write_broker_json(state_dir, endpoint="unix:/tmp/a-new-broker.sock", pid=424242)
+        module.clear_broker_json_if_stopped(record)
+        self.assertTrue((state_dir / "broker.json").exists())
+        on_disk = json.loads((state_dir / "broker.json").read_text())
+        self.assertEqual(on_disk["pid"], 424242)
 
     def test_escalate_sends_sigterm_only_after_rpc_gets_no_exit(self):
         state_root = self.root / "state"
@@ -819,10 +1128,28 @@ class PlatformGuardTests(ReaperTestCase):
         self.addCleanup(setattr, module, "proc_is_available", original)
 
         stderr_buffer = StringIO()
-        with redirect_stderr(stderr_buffer), self.assertRaises(SystemExit) as raised:
-            module.main(["--list"])
-        self.assertEqual(raised.exception.code, 2)
+        with redirect_stderr(stderr_buffer):
+            exit_code = module.main(["--list"])
+        # Exit 3, not 2 (fix round, 2026-09-25 second round): 2 is this
+        # tool's documented code for "an eligible broker was not confirmed
+        # stopped" (README, rollout brief); this platform refusal used to
+        # share it via parser.error(), which a monitor following the
+        # documented contract could not tell apart. main() now returns 3
+        # directly here rather than raising SystemExit through argparse,
+        # matching every other exit path in main() (a plain return, wrapped
+        # in SystemExit only by the `if __name__ == "__main__":` guard).
+        self.assertEqual(exit_code, 3)
         self.assertIn("/proc", stderr_buffer.getvalue())
+
+    def test_bad_usage_still_exits_2_via_argparse(self):
+        # Distinguishes the platform refusal (3) from an ordinary invalid
+        # invocation, which keeps argparse's own conventional exit code 2 --
+        # unlike the platform refusal, this genuinely is "bad usage", and
+        # every argparse-based CLI already treats 2 that way.
+        stderr_buffer = StringIO()
+        with redirect_stderr(stderr_buffer), self.assertRaises(SystemExit) as raised:
+            module.main(["--min-age", "-1"])
+        self.assertEqual(raised.exception.code, 2)
 
 
 if __name__ == "__main__":
