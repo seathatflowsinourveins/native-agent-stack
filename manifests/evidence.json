@@ -30012,8 +30012,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "a7e5a75756ad10ca2493c91c746c848fe477ac43953f8ae29f29d0dad53af639",
-      "bytes": 17942
+      "sha256": "35d4bf582ec9f0b1a01db383cf69dffe615ab0bff2da04c7fa56906165bb9bf7",
+      "bytes": 18248
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -30034,6 +30034,11 @@
       "path": "observability/backends/install.py",
       "sha256": "d87c47cfe1e728f3ca8b3eb5e3fa7031f553407b0ea9c649965c4fdaa6a3e8e6",
       "bytes": 3619
+    },
+    {
+      "path": "observability/backends/paper-alert-file-sd-host-20260925.json",
+      "sha256": "94b47cbb74916f0e7a14f3f97174d0d2f92eebcfa3db7aac7303a45732fb4191",
+      "bytes": 5365
     },
     {
       "path": "observability/backends/pins.json",

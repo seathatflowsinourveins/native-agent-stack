@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-25T21:02:18Z",
+  "kind": "host_rollout",
+  "evidence_class": "native_host_apply",
+  "host": "nativestack-5975wx-20260925",
+  "scope": "Post-merge host steps of #284 on the WSL workstation's running observability backend: apply the file_sd scrape job and the new EquitiesPaperMetricsMissing rule, confirm through the Prometheus API that the rule returns empty while no exporter is registered, then expire the host silence that had hidden the old rule's permanent false positive.",
+  "change": {
+    "pull_request": 284,
+    "merge_commit": "aa7e8944",
+    "templates_rendered_from": "main 0074a0c3"
+  },
+  "method": {
+    "summary": "Surgical apply of the #284 lines to the live files, not a configure.py re-render.",
+    "why": "The live WSL2 config is a host-adapted rendering. Its scrape targets and one HTTP check use shifted loopback ports because all WSL 2 distributions share one network namespace (adoption/platforms/linux-wsl2.md, Listeners and ports). configure.py has no host-override input and would reset them.",
+    "host_port_adaptations_preserved": {
+      "collector-native": "127.0.0.1:28889 (template 18889)",
+      "collector-health": "127.0.0.1:28888 (template 18888)",
+      "qdrant": "127.0.0.1:26333 (template 16333)",
+      "vllm": "127.0.0.1:18231 (template 8231)",
+      "httpcheck rule": "127.0.0.1:24333 (template 14333)"
+    },
+    "diff_before_apply": [
+      "main's templates rendered into a scratch directory, host paths substituted, then diffed against the live files: 8 of 12 config files identical; acceptance-targets.json differs (the renderer preserves an existing one); adaptive-paper-targets.json new.",
+      "ecosystem-prometheus-rules.yml was staged as that render with the host's one port substitution (14333 to 24333). It differs from the live file at lines 12 (EcosystemServiceUnavailable description), 124 (EquitiesPaperMetricsMissing expr) and 130-131 (its summary and description) only.",
+      "ecosystem-prometheus.yml was staged as the live file plus one 5-line job (adaptive-paper, file_sd_configs on <config-root>/adaptive-paper-targets.json, refresh_interval 30s) inserted before acceptance-fixture, in the live file's own YAML style. The live file had no adaptive-paper job, which is why absent(paper_trial_active) fired permanently here."
+    ],
+    "backup": "Both live files were copied, with modes, to a private timestamped directory before the change; they are not committed."
+  },
+  "steps": [
+    {
+      "step": "create the target list",
+      "result": "<config-root>/adaptive-paper-targets.json written as [] with mode 0644 (temporary file, then mv), as configure.py now ships it."
+    },
+    {
+      "step": "promtool 3.14.0 check rules (staged rules)",
+      "output_excerpt": "SUCCESS: 14 rules found"
+    },
+    {
+      "step": "promtool 3.14.0 check config (staged config pointing at the staged rules)",
+      "exit": 0,
+      "output_excerpt": "SUCCESS: 1 rule files found | SUCCESS: ... is valid prometheus config file syntax | SUCCESS: 14 rules found"
+    },
+    {
+      "step": "install both files (temporary file, chmod 0644, mv) and reload with SIGHUP to the unit's main process",
+      "read_back": "GET /api/v1/status/runtimeinfo: lastConfigTime 2026-09-25T06:09:42Z before, 2026-09-25T21:01:32Z after; reloadConfigSuccess true"
+    }
+  ],
+  "prometheus_read_back": {
+    "rule": {
+      "name": "EquitiesPaperMetricsMissing",
+      "query": "up{job=\"adaptive-paper\"} unless on (job, instance) paper_trial_active",
+      "state": "inactive",
+      "health": "ok",
+      "active_alerts": 0,
+      "last_evaluation_utc": "2026-09-25T21:01:52Z"
+    },
+    "generic_rule": "EcosystemServiceUnavailable keeps up{job!~\"acceptance-fixture|adaptive-paper\"} == 0; its loaded description names the metrics.py --file-sd registration.",
+    "adaptive_paper_targets": {"active": 0, "dropped": 0},
+    "loaded_config": "the adaptive-paper job uses file_sd_configs on adaptive-paper-targets.json and has no static target",
+    "rule_expression_result": [],
+    "alerts_query": "ALERTS{alertname=\"EquitiesPaperMetricsMissing\"} returned []"
+  },
+  "silence": {
+    "id_prefix": "87eabf8a",
+    "matchers": [{"name": "alertname", "value": "EquitiesPaperMetricsMissing", "isEqual": true, "isRegex": false}],
+    "before": {"state": "active", "starts_at": "2026-09-25T15:51:37Z", "ends_at": "2026-10-02T15:51:37Z"},
+    "action": "DELETE /api/v2/silence/<id> returned 200 (the full id is omitted: the publication validator treats a UUID as a possible local session identifier)",
+    "after": {"state": "expired", "ends_at": "2026-09-25T21:02:18Z"},
+    "alertmanager_alerts_for_alertname_after": 0
+  },
+  "limitations": [
+    "No exporter is registered: the stored Alpaca paper keys return HTTP 401 and no trial runs. The firing path on the live Prometheus (a registered exporter that is down or answered by another process) is not exercised here; #284's promtool test rules case and its real-process FileSdRegistrationTests cover it.",
+    "The live WSL2 config remains a hand-adapted rendering. The renderer has no host-override input, so a future configure.py run on this host would reset the shifted ports; this receipt records a manual surgical apply of #284's lines.",
+    "Host paths, scratch paths and the backup location are omitted."
+  ]
+}
