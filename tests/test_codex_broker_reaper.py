@@ -792,6 +792,82 @@ class LiveCwdGuardTests(ReaperTestCase):
         self.assertFalse(worktree_blocked["guards"]["c_workspace_unused"])
         self.assertFalse(worktree_blocked["eligible"])
 
+    def test_removed_dot_claude_worktree_state_dir_keys_off_the_worktree_not_the_main_checkout(self):
+        # Regression (major finding, sixth fix round, 2026-09-25): reported
+        # against exactly this layout -- Claude Code's own
+        # `.claude/worktrees/<name>` workflow-child worktree (the same
+        # shape test_two_orphaned_brokers_of_one_repository_do_not_block_each_other
+        # above uses). Before this fix, find_git_toplevel walked PAST the
+        # removed worktree -- its own directory no longer exists, so
+        # os.path.exists(worktree / ".git") is False -- and returned the
+        # enclosing main checkout instead, which never keyed this broker's
+        # state dir; a live session anywhere under the main checkout then
+        # wrongly kept this already-removed, genuinely orphaned worktree
+        # broker blocked (it was correctly eligible before the fifth fix
+        # round's own keying_root gating was introduced).
+        main_checkout = self.root / "main-checkout"
+        main_checkout.mkdir()
+        (main_checkout / ".git").mkdir()
+        worktree = main_checkout / ".claude" / "worktrees" / "demo"
+        worktree.mkdir(parents=True)
+        (worktree / ".git").write_text(f"gitdir: {main_checkout}/.git/worktrees/demo\n")
+
+        # The state dir's own name must hash-match the worktree root,
+        # exactly like the plugin's real state.mjs resolveStateDir --
+        # computed here via the tool's own hash_workspace_root, not
+        # hand-copied, so this test tracks the real algorithm rather than a
+        # value pasted in by hand.
+        state_dir = self.root / f"demo-{module.hash_workspace_root(str(worktree))}"
+        state_dir.mkdir()
+        broker_proc, endpoint = self.spawn_fake_broker(cwd=worktree)
+        write_broker_json(state_dir, endpoint=endpoint, pid=broker_proc.pid)
+        write_state_json(state_dir, jobs=[])
+
+        # A live session at the MAIN checkout, present before the worktree
+        # itself is removed below -- never inside the worktree, and (once
+        # removed) never reachable from it either.
+        self.spawn_fake_session(name="claude", cwd=main_checkout)
+
+        # The worktree is removed (`git worktree remove`, or a stray `rm`)
+        # while its own broker -- already detached/orphaned -- is still
+        # alive; the broker's own /proc/<pid>/cwd keeps reporting that
+        # now-deleted path (read_proc_cwd's own docstring).
+        shutil.rmtree(worktree)
+        self.assertFalse(os.path.isdir(str(worktree)))
+        self.assertTrue(os.path.isdir(str(main_checkout)))
+
+        # The pre-fix keying root: confirmed directly, not only asserted
+        # about, to be the wrong (enclosing) checkout this fix closes.
+        self.assertEqual(module.find_git_toplevel(str(worktree)), str(main_checkout))
+
+        record = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertTrue(record["guards"]["c_workspace_unused"], record["reasons"])
+        self.assertIn(str(worktree), " ".join(record["reasons"]))
+        self.assertTrue(record["eligible"], record["reasons"])
+
+    def test_worktree_still_exists_and_hash_matched_state_dir_still_detects_a_live_session_inside_it(self):
+        # Companion to the test above: proves hash-matching keying_root does
+        # not, by itself, make guard (c) treat a matched-but-still-existing
+        # root as unused -- the normal live-session scan still runs, and
+        # still finds a session genuinely inside the (still-existing)
+        # worktree.
+        main_checkout = self.root / "main-checkout"
+        main_checkout.mkdir()
+        (main_checkout / ".git").mkdir()
+        worktree = main_checkout / ".claude" / "worktrees" / "demo"
+        worktree.mkdir(parents=True)
+        (worktree / ".git").write_text(f"gitdir: {main_checkout}/.git/worktrees/demo\n")
+        state_dir = self.root / f"demo-{module.hash_workspace_root(str(worktree))}"
+        state_dir.mkdir()
+        broker_proc, endpoint = self.spawn_fake_broker(cwd=worktree)
+        write_broker_json(state_dir, endpoint=endpoint, pid=broker_proc.pid)
+        write_state_json(state_dir, jobs=[])
+
+        self.spawn_fake_session(name="claude", cwd=worktree)
+        record = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertFalse(record["guards"]["c_workspace_unused"])
+        self.assertFalse(record["eligible"])
+
     def test_read_worktree_parent_root_resolves_a_relative_gitdir(self):
         # Regression (minor finding, third fix round, 2026-09-25): git
         # writes a relative `gitdir:` line relative to the directory
@@ -823,6 +899,91 @@ class LiveCwdGuardTests(ReaperTestCase):
         no_git = self.root / "no-git"
         no_git.mkdir()
         self.assertIsNone(module.read_worktree_parent_root(str(no_git)))
+
+
+@LINUX_ONLY
+class KeyingRootTests(ReaperTestCase):
+    """find_keying_root()/hash_workspace_root()/state_dir_hash_suffix() in isolation.
+
+    No spawned broker or session here: these exercise the sixth-fix-round
+    guard (c) keying helpers directly and cheaply. See LiveCwdGuardTests'
+    test_removed_dot_claude_worktree_state_dir_keys_off_the_worktree_not_the_main_checkout
+    above for the end-to-end .claude/worktrees/<name> regression these
+    helpers were fixed for.
+    """
+
+    def test_hash_is_16_lowercase_hex_characters_and_path_sensitive(self):
+        # sha256(realpath(path)).hexdigest()[:16]: 16 lowercase hex chars,
+        # and sensitive to the exact path -- not, say, always returning the
+        # same value regardless of which directory is hashed.
+        one = self.root / "one"
+        two = self.root / "two"
+        one.mkdir()
+        two.mkdir()
+        hash_one = module.hash_workspace_root(str(one))
+        hash_two = module.hash_workspace_root(str(two))
+        self.assertRegex(hash_one, r"^[0-9a-f]{16}$")
+        self.assertNotEqual(hash_one, hash_two)
+        # Deterministic and independent of existence: os.path.realpath does
+        # not require the path to exist, so removing the directory must not
+        # change its own hash.
+        shutil.rmtree(one)
+        self.assertEqual(module.hash_workspace_root(str(one)), hash_one)
+
+    def test_state_dir_hash_suffix_reads_the_trailing_16_hex_characters(self):
+        matching = self.root / ("some-slug-with-dashes-" + "a" * 16)
+        self.assertEqual(module.state_dir_hash_suffix(matching), "a" * 16)
+        # A slug with no 16-hex-character suffix at all: None, not a false
+        # positive off a shorter or non-hex trailing run.
+        self.assertIsNone(module.state_dir_hash_suffix(self.root / "workspace-slug-live"))
+        too_short = self.root / ("slug-" + "a" * 15)
+        self.assertIsNone(module.state_dir_hash_suffix(too_short))
+
+    def test_matches_workspace_root_itself_before_walking_up(self):
+        # A removed git-worktree checkout: workspace_root itself IS the
+        # keying root (a linked worktree's own resolveWorkspaceRoot(cwd) is
+        # itself, since it holds its own .git pointer file) -- must be
+        # returned immediately, without walking into an enclosing directory
+        # that also happens to still exist (the exact major-finding shape:
+        # a removed worktree whose own path matches must not be replaced by
+        # the enclosing checkout).
+        enclosing = self.root / "enclosing"
+        enclosing.mkdir()
+        (enclosing / ".git").mkdir()  # an enclosing checkout that must NOT be picked
+        worktree = enclosing / "worktree"
+        worktree.mkdir()
+        expected_hash = module.hash_workspace_root(str(worktree))
+        shutil.rmtree(worktree)  # the worktree itself is gone; "enclosing" still exists
+        self.assertEqual(module.find_keying_root(str(worktree), expected_hash), str(worktree))
+
+    def test_walks_up_to_a_matching_ancestor(self):
+        checkout = self.root / "checkout"
+        nested = checkout / "sub" / "dir"
+        nested.mkdir(parents=True)
+        expected_hash = module.hash_workspace_root(str(checkout))
+        self.assertEqual(module.find_keying_root(str(nested), expected_hash), str(checkout))
+
+    def test_falls_back_to_git_toplevel_when_no_ancestor_matches(self):
+        checkout = self.root / "checkout"
+        checkout.mkdir()
+        (checkout / ".git").mkdir()
+        # A hash value that cannot match any real ancestor under self.root.
+        unmatched_hash = "0" * 16
+        self.assertEqual(
+            module.find_keying_root(str(checkout), unmatched_hash),
+            module.find_git_toplevel(str(checkout)),
+        )
+
+    def test_none_expected_hash_falls_back_immediately(self):
+        # Every pre-sixth-fix-round guard (c) test uses a synthetic
+        # state-dir name that does not end in 16 hex characters, so
+        # state_dir_hash_suffix returns None for all of them (proved
+        # directly in test_state_dir_hash_suffix_reads_the_trailing_16_hex_characters
+        # above) and they must all take this fallback path unchanged.
+        checkout = self.root / "checkout"
+        checkout.mkdir()
+        (checkout / ".git").mkdir()
+        self.assertEqual(module.find_keying_root(str(checkout), None), str(checkout))
 
 
 @LINUX_ONLY

@@ -65,7 +65,27 @@ recorded state rather than assumed --
       review-triggered, possibly-subdirectory) cwd failed to exist on disk,
       even when the checkout it belongs to -- the directory that actually
       keys the plugin's state dir, `resolveWorkspaceRoot(cwd)` in
-      `scripts/lib/workspace.mjs` -- was still there and still live. What it
+      `scripts/lib/workspace.mjs` -- was still there and still live. Fixed
+      further (major finding, sixth fix round, 2026-09-25): that checkout
+      root used to be found by walking upward for the nearest ancestor with
+      a currently EXISTING `.git` entry (`find_git_toplevel`), which walks
+      straight past a REMOVED `git worktree` checkout (Claude Code's own
+      `.claude/worktrees/<name>` layout, this project's own workflow-child
+      worktrees) into whichever ENCLOSING checkout still exists on disk --
+      a directory that never keyed this broker's state dir at all, so a
+      live session anywhere under that unrelated enclosing checkout wrongly
+      kept an already-removed, genuinely orphaned worktree broker blocked
+      (it was correctly eligible before this guard's own keying_root gating
+      immediately above was introduced). Fixed: the keying root guard (c)
+      uses (`find_keying_root`) now walks the same ancestor chain but
+      selects by IDENTITY, not existence -- which ancestor's own
+      `sha256(realpath(...))[:16]` (`hash_workspace_root`) matches this
+      broker's own state-dir name suffix (`state_dir_hash_suffix`), the
+      exact hash `state.mjs`'s `resolveStateDir` used to name that
+      directory in the first place -- so a removed worktree whose own path
+      still matches is returned immediately, before any enclosing checkout
+      is ever considered, and only falls back to the previous
+      `.git`-existence walk when no ancestor's hash matches at all. What it
       does not cover is a live session with no git relationship to the
       workspace's checkout at all (see
       docs/decisions/2026-09-25-codex-broker-reaper.md, "Known
@@ -167,8 +187,10 @@ apart).
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
+import re
 import signal
 import socket
 import sys
@@ -482,6 +504,103 @@ def read_worktree_parent_root(checkout_root: str) -> str | None:
     return parent or None
 
 
+def hash_workspace_root(path: str) -> str:
+    """sha256(realpath(path)).hexdigest()[:16], matching state.mjs's own resolveStateDir hash.
+
+    `scripts/lib/state.mjs` `resolveStateDir` (installed openai-codex 1.0.6,
+    checked directly): `hash = createHash("sha256").update(canonicalWorkspaceRoot)
+    .digest("hex").slice(0, 16)`, where `canonicalWorkspaceRoot` is
+    `fs.realpathSync.native(workspaceRoot)` when that succeeds (i.e. when
+    `workspaceRoot` still existed at the moment the plugin computed it),
+    else `workspaceRoot` itself unchanged. `os.path.realpath` (unlike
+    Node's `fs.realpathSync.native`) does not require `path` to exist: it
+    resolves symlinks in whichever leading components still exist and
+    passes the remainder through unresolved, which reproduces the same
+    string the plugin hashed as long as no component of the path is itself
+    a symlink -- true for every workspace root observed on this host (see
+    docs/decisions/2026-09-25-codex-broker-reaper.md, "Known
+    limitations"). `surrogateescape` avoids raising on a non-UTF-8 path
+    component (matching this module's other /proc-derived path handling)
+    rather than crashing guard (c) outright; Node's own `.update()` of a JS
+    string defaults to UTF-8 bytes too.
+    """
+    return hashlib.sha256(os.path.realpath(path).encode("utf-8", "surrogateescape")).hexdigest()[:16]
+
+
+STATE_DIR_HASH_RE = re.compile(r"-([0-9a-f]{16})$")
+
+
+def state_dir_hash_suffix(broker_dir: Path) -> str | None:
+    """The 16-hex-character keying hash from `broker_dir`'s own name, or None.
+
+    The plugin's state directory is named `<slug>-<hash>` (`state.mjs`
+    `resolveStateDir`): `slug` is a sanitized `path.basename(workspaceRoot)`
+    and can itself contain dashes, but `hash` is always exactly 16 lowercase
+    hex characters (a truncated sha256 hex digest) at the very END of the
+    name -- matched here anchored with `$` so a slug that happens to end in
+    hex-looking characters is never mistaken for the real hash. None when
+    `broker_dir`'s name does not end that way at all (not observed from the
+    plugin itself; `find_keying_root` falls back to the pre-hash-matching
+    heuristic in that case).
+    """
+    match = STATE_DIR_HASH_RE.search(broker_dir.name)
+    return match.group(1) if match else None
+
+
+def find_keying_root(workspace_root: str, expected_hash: str | None) -> str:
+    """The ancestor of `workspace_root` (inclusive) that keys the plugin's state dir.
+
+    Fixed (major finding, sixth fix round, 2026-09-25): the previous
+    `find_git_toplevel(workspace_root) or workspace_root` selected a keying
+    root by walking upward for the nearest ancestor with a currently
+    EXISTING `.git` entry -- the wrong test specifically for a REMOVED `git
+    worktree` checkout (Claude Code's own `.claude/worktrees/<name>`
+    layout, this project's own workflow-child worktrees): once the worktree
+    directory itself is gone, `os.path.exists(worktree/".git")` is False,
+    so the walk continued straight into the ENCLOSING main checkout -- a
+    directory the plugin's own `resolveStateDir` never hashed for this
+    broker at all -- and a live session anywhere under that unrelated
+    enclosing checkout then wrongly kept an already-removed, genuinely
+    orphaned worktree broker blocked (it was correctly eligible before this
+    same guard's fifth-fix-round keying_root gating was introduced).
+
+    Fixed by selecting the keying root by IDENTITY instead of existence:
+    `workspace_root` itself, then each successive parent, is hashed with
+    `hash_workspace_root` (mirroring `resolveStateDir`'s own
+    `sha256(realpath(...))[:16]`) and compared against `expected_hash` --
+    already sitting in this broker's own state-dir name
+    (`state_dir_hash_suffix`) -- returning the FIRST (nearest, i.e. most
+    specific) match. `workspace_root` is always checked before any parent,
+    so a removed worktree whose own path already matches the suffix is
+    returned immediately and is never superseded by an enclosing checkout
+    that merely happens to still exist on disk.
+
+    Falls back to the previous `find_git_toplevel(workspace_root) or
+    workspace_root` heuristic when `expected_hash` is None (a `broker_dir`
+    name that does not end in 16 hex characters -- not observed from the
+    plugin itself) or when no ancestor's hash matches it at all (e.g. a
+    `CLAUDE_PLUGIN_DATA`/slug shape this tool does not model), so a
+    hash-matching miss degrades to the prior, already-reviewed behavior
+    rather than to an unbounded or unsafe root. Every pre-sixth-fix-round
+    guard (c) test uses a synthetic state-dir name that does not itself end
+    in 16 hex characters, so `state_dir_hash_suffix` returns None for all
+    of them and they exercise exactly this fallback path unchanged; see
+    `KeyingRootTests` and `LiveCwdGuardTests` in
+    `tests/test_codex_broker_reaper.py` for both paths' own direct
+    coverage.
+    """
+    if expected_hash is not None:
+        current = os.path.normpath(workspace_root)
+        while True:
+            if hash_workspace_root(current) == expected_hash:
+                return current
+            parent = os.path.dirname(current)
+            if parent == current:
+                break
+            current = parent
+    return find_git_toplevel(workspace_root) or workspace_root
+
+
 def find_live_session_under(workspace_root: str, *, exclude_pids: frozenset[int] = frozenset()) -> int | None:
     """pid of a live claude/codex process whose cwd is under `workspace_root`, or None."""
     for pid in iter_pids():
@@ -773,7 +892,25 @@ def evaluate_broker(broker_dir: Path, *, min_age: float, now: float) -> dict:
         # removed. Skipping the scan and declaring the workspace unused
         # outright is therefore gated on the KEYING root's own existence,
         # never on the broker's raw /proc/<pid>/cwd alone.
-        keying_root = find_git_toplevel(workspace_root) or workspace_root
+        #
+        # Fixed further (major finding, sixth fix round, 2026-09-25):
+        # find_git_toplevel's own "nearest .git entry that currently
+        # EXISTS" walk is the wrong test for the KEYING root specifically --
+        # a REMOVED git-worktree checkout (this project's own
+        # .claude/worktrees/<name> layout) no longer satisfies
+        # os.path.exists(worktree/".git"), so the walk continued straight
+        # into the enclosing main checkout, which never keyed this broker's
+        # state dir at all (see find_keying_root's own docstring for the
+        # concrete case this was found against). find_keying_root replaces
+        # the plain find_git_toplevel call here: it walks the same ancestor
+        # chain but selects by IDENTITY -- which ancestor's own
+        # sha256(realpath(...))[:16] matches this broker's own state-dir
+        # name suffix, the same hash state.mjs's resolveStateDir used to
+        # name it -- so a removed worktree whose own path already matches
+        # is returned immediately and is never superseded by an enclosing
+        # checkout that merely happens to still exist on disk.
+        expected_hash = state_dir_hash_suffix(broker_dir)
+        keying_root = find_keying_root(workspace_root, expected_hash)
         if not os.path.isdir(keying_root):
             record["guards"]["c_workspace_unused"] = True
             record["reasons"].append(
