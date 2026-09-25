@@ -163,6 +163,19 @@ python runner.py recover --env-file "$PAPER_ENV_FILE" --output "$PRIVATE_OUTPUT/
 python benchmark.py --output "$PRIVATE_OUTPUT/synthetic-capacity.json"
 ```
 
+On macOS the key pair can live in the login Keychain instead (store it once with
+`secret set APCA_API_KEY_ID` and `secret set APCA_API_SECRET_KEY`). `secret run`
+hands it to that one command, which removes it from its own environment as it reads it:
+
+```sh
+secret run APCA_API_KEY_ID APCA_API_SECRET_KEY -- python runner.py preflight --credentials keychain-env --output "$PRIVATE_OUTPUT/preflight.json"
+```
+
+`market_research.py` takes the same `--credentials keychain-env`. Both sources are
+paper-only: an `APCA_API_BASE_URL` in the environment or env file that is not
+`https://paper-api.alpaca.markets` is refused before any request. See the
+2026-09-25 addendum to `docs/decisions/2026-09-22-broker-credential-handling.md`.
+
 `paper` is bounded and fails closed when the regular session, account, data,
 frozen configuration or durable state is not ready. No live endpoint is exposed.
 The benchmark imports the real native engine but uses a local fake broker port.

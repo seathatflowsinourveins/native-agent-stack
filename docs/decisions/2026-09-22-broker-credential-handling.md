@@ -259,3 +259,72 @@ call is made and no live credentials file is read or referenced.
   docstring at the top of `tests/_credential_mutation_driver.py` also now notes that a `"FAIL"` can come from
   `setUp()`, not only the named test method's own body -- this driver does not currently distinguish those
   two sources of a `"FAIL"`, only that `unittest` marked the named id `"FAIL"` and not `"ERROR"`.
+
+## Addendum (2026-09-25): macOS login Keychain through `secret run` as a second source
+
+**Change.** `runner.py` and `market_research.py` take `--credentials {env-file,keychain-env}`.
+`env-file` stays the default and is unchanged: the same `--env-file`, the same `open_verified()` rules and
+reason codes, and `credentials(path)` keeps its default behavior for every other caller (order-throughput's
+`capacity.py`, the native-faults harness, the sim fetchers). `keychain-env` reads `APCA_API_KEY_ID` and
+`APCA_API_SECRET_KEY` from the process environment that `secret run APCA_API_KEY_ID APCA_API_SECRET_KEY --
+python ... --credentials keychain-env` builds from the macOS login Keychain. The shared logic lives in
+`blueprints/us-equities/adaptive-paper/credential_source.py`.
+
+**Why.** The operator's hosts now include macOS, and the operator's standing rule keeps API keys in the login
+Keychain and gives each only to the command that needs it. The "OS keychain" alternative above was deferred
+"to a macOS-specific profile if one is adopted"; that condition now holds for this operator. Later sessions
+can run the paper lane without a plaintext key file and without anyone retyping keys; the operator stores
+them once with `secret set`. The env file stays because Linux/WSL hosts have no login Keychain, because it is
+the reviewed and mutation-tested path, and because `docs/secret-storage.md`, `scripts/credential_status.py`
+and the other `credentials(path)` callers depend on it.
+
+**The earlier objection to environment variables.** It was aimed at keys exported into the invoking shell.
+`secret run` exports nothing into the shell: it looks up each named item, exports it in its own process and
+`exec`s the command, so only that command and its children receive the pair. The loader then removes both
+names from its own `os.environ` as it reads them, so a child the runner starts afterwards does not inherit
+them. Accepted residual exposure: the process's initial environment block stays readable, for the life of the
+process, by processes of the same uid (`ps eww` on macOS, `/proc/<pid>/environ` on Linux) and by root. That
+uid can already read the Keychain item through `security` while the login Keychain is unlocked, so this does
+not widen access beyond it.
+
+**Refusals (`keychain-env`)**, each a fixed code with no value or path, raised outside any `except` block and
+checked in this order: a non-paper `APCA_API_BASE_URL` (below); neither name set (`keychain_env:missing`); only
+one set (`keychain_env:partial`); a set but empty value (`keychain_env:empty`); a value that is not one
+printable-ASCII token of at most 256 characters (`keychain_env:invalid_value`); an env-file loader marker
+(`DIRENV_FILE`, `DIRENV_DIR`, `UV_ENV_FILE`, `PIPENV_DOTENV_LOCATION`, `MISE_ENV_FILE`) that names a location
+inside a Git worktree, meaning a `.git` directory or file at it or at any ancestor, lexically or after
+resolving symlinks (`keychain_env:worktree`). A location that cannot be inspected counts as inside a
+worktree. `--env-file` together with `keychain-env`, or `env-file` without `--env-file`, is an argparse usage
+error.
+
+**Paper-only on both sources.** The base URL is pinned to `https://paper-api.alpaca.markets`, with an optional
+trailing `/`. An `APCA_API_BASE_URL` in the process environment (both sources) or in the env file
+(`env-file`, via `credentials(path, paper_only=True)`) with any other value is refused before any request:
+`alpaca_paper_only:live_host` for `api.alpaca.markets`, and `alpaca_paper_only:not_paper_host` for everything
+else, including an empty value, `http`, a port, userinfo, a path such as `/v2` and the paper URL in another
+letter case. The transport already sends every request to the paper host (`PAPER_URL`, `paper=True`) and
+`runner.load_config` already requires the paper endpoint. This rule makes a live setting in the shell or the file stop the run
+before any request, where it would otherwise be ignored without notice.
+
+**Limits.** A process-local check cannot tell a paper key from a live key. Because of the paper pin, a live key
+fails authentication at the paper host and cannot place a live order. Provenance is detected only through the
+markers listed above; `set -a; . ./.env`, `env $(cat .env)`, `uv run --env-file` given as a flag,
+`docker run --env-file`, mise's `[env] _.file` and a dotenv loader inside a wrapper leave no marker and are
+not detected. Like the file guard's worktree rule, the marker check runs once, at load time. A locked login
+Keychain makes `secret run` prompt or fail, so this source suits operator-started runs, not unattended
+hosting. `mover_runner.py` and the other `--env-file` consumers were not changed.
+
+**Evidence that would overturn this addendum:** a way for another uid, a log or a crash report to obtain the
+values from `secret run` or from this loader; unattended or multi-host hosting (see above); a second
+consumer that needs shared, access-controlled retrieval.
+
+**Evidence class:** `local_integration`. `tests/test_adaptive_paper_credential_source.py` (stdlib only, stand-in
+values, no Keychain access, no network, no broker call) covers every refusal branch and asserts that each
+error carries only its reason code with `__context__`/`__cause__` of `None`, that both names leave the
+process environment, that the env-file default and `credentials(path)`'s default behavior are unchanged,
+and that `runner.main()`/`market_research.main()` refuse before the first request (replaced by a stand-in).
+Sixteen hand-applied source mutations of the new rules (worktree check, removal from the environment,
+partial, empty, live-host code, process base URL for `env-file`, symlink resolution, fail-closed inspection,
+both loaders' `paper_only`, duplicate base URL, the usage check, the `DIRENV_DIR` prefix, `UV_ENV_FILE` splitting
+and the ASCII check) each failed this test module on a scratch copy. That run was ad hoc, and its output is
+not retained as a receipt.

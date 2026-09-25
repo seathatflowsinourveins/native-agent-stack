@@ -211,7 +211,8 @@ Every receipt also names one `stage`. Two decide a platform status:
    re-records. The
    recorder runs your commands with a bounded timeout,
    sanitizes `$HOME` to `~` and your username to `<user>` in the captured
-   excerpt, writes the receipt under `evidence/hosts/<host_id>/`, and
+   excerpt (the name only as a whole token, so a short one such as `ed` is
+   not cut out of `used`), writes the receipt under `evidence/hosts/<host_id>/`, and
    registers it in `manifests/evidence.json`. It never uploads anything over
    the network. A receipt is never overwritten: recording the same
    host/component/stage again on the same day -- "same day" means the same
