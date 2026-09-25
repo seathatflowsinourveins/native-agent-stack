@@ -424,11 +424,15 @@ The shellcheck structural test excludes `SC2317` (info: "command appears to be u
 
 ## `codex-broker-reaper` (2026-09-25)
 
-Python 3 stdlib, no third-party dependencies. Stops the openai-codex Claude
-Code plugin's leaked `app-server-broker.mjs` processes: a crashed session or
-an abandoned workflow-child worktree leaves its broker (and the `codex
-app-server` child it owns) running indefinitely, because only the main
-session's own `SessionEnd` hook ever shuts one down. See
+Python 3 stdlib, no third-party dependencies, **Linux-only**: every guard
+reads `/proc/<pid>/{cmdline,comm,cwd,stat}`, `/proc/uptime` and
+`/proc/meminfo` directly (`main()` fails closed with an explicit error on a
+host with no `/proc`, rather than silently reporting every broker as "not
+running"). Stops the openai-codex Claude Code plugin's leaked
+`app-server-broker.mjs` processes: a crashed session or an abandoned
+workflow-child worktree leaves its broker (and the `codex app-server` child
+it owns) running indefinitely, because only the main session's own
+`SessionEnd` hook ever shuts one down. See
 [`../../docs/decisions/2026-09-25-codex-broker-reaper.md`](../../docs/decisions/2026-09-25-codex-broker-reaper.md)
 for the upstream issue/PR evidence and the alternatives this rejected.
 
@@ -445,7 +449,7 @@ rather than assumed:
 | --- | --- |
 | (a) pid/cmdline | `/proc/<pid>/cmdline` still names `app-server-broker.mjs serve` with the exact recorded `--endpoint` (guards pid reuse, upstream #743) |
 | (b) no active jobs | no job in the workspace's `state.json` has a status outside `{completed, failed, cancelled}`; an unrecognized status blocks reaping rather than being treated as safe |
-| (c) workspace unused | the workspace directory (read from the broker's own live `/proc/<pid>/cwd`) no longer exists, or no live `claude`/`codex` process has a cwd equal to or under it |
+| (c) workspace unused | the workspace directory (read from the broker's own live `/proc/<pid>/cwd`) no longer exists, or no live `claude`/`codex` process — other than the broker's own descendants, e.g. its `codex app-server` child — has a cwd equal to or under it or under its nearest git checkout root (see the decision doc's "Known limitations" for what that second check does and does not cover) |
 | (d) old enough | the broker process (from `/proc/<pid>/stat`'s `starttime`, not a file mtime) is older than `--min-age` (default 1800s) |
 
 Action on an eligible broker is the `broker/shutdown` JSON-RPC over its unix
@@ -468,9 +472,11 @@ process: a small Python stand-in plays the broker (a real unix-socket server,
 started from a script file literally named `app-server-broker.mjs` so its
 real `/proc/<pid>/cmdline` matches guard (a), answering `broker/shutdown`
 exactly like the plugin's own broker) and, separately, a live `claude`/`codex`
-look-alike (`comm` forced with `prctl(PR_SET_NAME)`, since a Python-shebang
-script's own `comm` is the interpreter's, not the script's — checked by hand
-against the real `claude` binary before writing the suite). No real broker, no
+look-alike (`comm` forced with `prctl(PR_SET_NAME)`, since a Python process
+run as `python3 script.py` reports `comm` == `python3`, the interpreter's own
+name, not the script's, simply because `python3` is the binary actually
+running — checked by hand against the real `claude` binary before writing
+the suite). No real broker, no
 real Claude Code or Codex session, and no plugin state directory on any host
 is read or touched by the tests. `--list` was run against this host's real
 `~/.claude/plugins/data/codex-openai-codex/state` on 2026-09-25 (read-only):
