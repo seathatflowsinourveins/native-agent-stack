@@ -26735,8 +26735,8 @@
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/lean.json",
-      "sha256": "64c5f684069caa1b71d544ebc10c1e959f0846b8eec49dbdf8429766ee263ea1",
-      "bytes": 12481
+      "sha256": "e4398e36e45f116af75dda724288904f26f1a9453a569e49c469097ec2e49e05",
+      "bytes": 13182
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/nautilus.json",
