@@ -16,14 +16,17 @@ The one file it writes is the Prometheus ``file_sd`` target list named by
 targets, so the ``EquitiesPaperMetricsMissing`` alert fires only while an
 exporter is registered but not answering:
 
+  * serving requires ``--file-sd`` (exit 2 without it), unless ``--no-file-sd``
+    explicitly asks for an unscraped, unalerted exporter for local inspection;
   * the exporter adds its own ``127.0.0.1:<port>`` target after its listener
     binds, and refuses to start (exit 2) when the list is unreadable or is not
     a ``file_sd`` target list, rather than serving unmonitored;
   * it removes that target only on a clean stop (SIGTERM or SIGINT) of a trial
-    that finished (``trial.json`` phase ``finished``, or no ``trial.json``). A
-    crashed or killed exporter, or a trial left at ``starting``,
-    ``needs_attention`` or ``held_overnight``, stays registered, so the alert
-    fires until an operator recovers the trial and runs ``--deregister``.
+    that finished with a passing status (``trial.json`` phase ``finished`` and
+    status ``passed`` or ``completed_no_signals``), or when there is no
+    ``trial.json``. A crashed or killed exporter, or any other trial state,
+    stays registered, so the alert fires until an operator recovers the trial
+    and runs ``--deregister``.
 
 It never imports ``safety.Ledger`` (whose constructor opens the database for
 writes and mutates schema/pragmas), never reads an env file or any credentials
@@ -424,12 +427,16 @@ def update_file_sd(path: Path, target: str, *, registered: bool) -> None:
             raise
 
 
+# The passing statuses `runner.trial_phase_and_exit_code` documents for phase "finished" (with a flat end).
+PASSING_STATUSES = ("passed", "completed_no_signals")
+
+
 def trial_finished(trial_path: Path) -> bool:
-    """True when nothing is left to watch: no trial.json (no trial ran on this ledger) or phase ``finished``
-    without a failed status. `runner.trial_phase_and_exit_code` records ``finished`` only for a passing status
-    that ended flat; a ``finished`` phase carrying ``needs_attention`` or ``failed`` (the recovered-flat case
-    ``EquitiesReconciliationFailed`` also covers) is still not clean. ``starting``, ``needs_attention``,
-    ``held_overnight`` and an unreadable file keep the exporter registered."""
+    """True when nothing is left to watch: no trial.json (no trial ran on this ledger), or phase ``finished`` with a
+    passing status (``PASSING_STATUSES``). Everything else keeps the exporter registered: ``starting``,
+    ``needs_attention``, ``held_overnight``, a ``finished`` phase with any other or a missing status (the
+    recovered-flat ``needs_attention`` case ``EquitiesReconciliationFailed`` also covers, or a status this exporter
+    does not know), and an unreadable file."""
     try:
         metadata = json.loads(trial_path.read_text())
     except FileNotFoundError:
@@ -437,7 +444,7 @@ def trial_finished(trial_path: Path) -> bool:
     except (OSError, json.JSONDecodeError):
         return False
     return (isinstance(metadata, dict) and metadata.get("phase") == "finished"
-            and metadata.get("status") not in ("needs_attention", "failed"))
+            and metadata.get("status") in PASSING_STATUSES)
 
 
 class _CleanStop(Exception):
@@ -445,6 +452,7 @@ class _CleanStop(Exception):
 
 
 def _raise_clean_stop(signum, frame):
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)  # a second SIGTERM must not interrupt the clean stop
     raise _CleanStop()
 
 
@@ -458,9 +466,14 @@ def main(argv=None) -> int:
                              "unless --deregister.")
     parser.add_argument("--trial-json", type=Path, default=None,
                         help="Path to the sibling trial.json metadata file; defaults to <ledger dir>/trial.json.")
-    parser.add_argument("--file-sd", type=Path, default=None,
-                        help="Prometheus file_sd target list to register this exporter in (the rendered "
-                             "<config-root>/adaptive-paper-targets.json). Without it the exporter is not scraped.")
+    registration = parser.add_mutually_exclusive_group()
+    registration.add_argument("--file-sd", type=Path, default=None,
+                              help="Prometheus file_sd target list to register this exporter in (the rendered "
+                                   "<config-root>/adaptive-paper-targets.json). Required to serve, since the "
+                                   "backend scrapes only registered exporters.")
+    registration.add_argument("--no-file-sd", action="store_true",
+                              help="Serve without registering: never scraped and never alerted on. For local "
+                                   "inspection only.")
     parser.add_argument("--deregister", action="store_true",
                         help="Remove 127.0.0.1:--port from --file-sd and exit: after an operator has recovered a "
                              "trial whose exporter stopped while registered.")
@@ -473,6 +486,10 @@ def main(argv=None) -> int:
         return 0
     if args.ledger is None:
         parser.error("--ledger is required")
+    if args.file_sd is None and not args.no_file_sd:
+        # Fail closed: an unregistered exporter is never scraped, so nothing would notice it (or its trial) stop.
+        parser.error("--file-sd is required to serve (the backend scrapes only registered exporters); "
+                     "pass --no-file-sd to serve unscraped on purpose")
     trial_path = args.trial_json or (args.ledger.parent / "trial.json")
     server = make_server(args.ledger, trial_path, port=args.port)
     target = f"{HOST}:{server.server_address[1]}"
@@ -491,7 +508,9 @@ def main(argv=None) -> int:
               f"(read-only; ledger={args.ledger}; file_sd={args.file_sd})", file=sys.stderr)
         server.serve_forever()
     except (KeyboardInterrupt, _CleanStop):
-        signal.signal(signal.SIGTERM, signal.SIG_IGN)  # a repeated SIGTERM must not cut the clean stop short
+        # A repeated SIGTERM or SIGINT must not cut the clean stop short.
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
         clean_stop = True
     finally:
         server.server_close()

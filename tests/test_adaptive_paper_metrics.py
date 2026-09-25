@@ -478,13 +478,15 @@ class FileSdRegistrationTests(unittest.TestCase):
         self.assertEqual(samples[("paper_trial_active", ())], "1")
 
     def test_a_clean_stop_of_a_finished_trial_deregisters_without_leaving_a_temporary_file(self):
-        self.write_phase("starting")
-        process, _ = self.start()
-        self.write_phase("finished", status="passed")
-        self.assertEqual(self.stop(process), 0)
-        self.assertEqual(json.loads(self.targets.read_text()), [])
-        self.assertEqual(sorted(path.name for path in self.targets.parent.iterdir()),
-                         ["adaptive-paper-targets.json", "adaptive-paper-targets.json.lock"])
+        for status in ("passed", "completed_no_signals"):  # the runner's passing statuses for phase finished
+            with self.subTest(status=status):
+                self.write_phase("starting")
+                process, _ = self.start()
+                self.write_phase("finished", status=status)
+                self.assertEqual(self.stop(process), 0)
+                self.assertEqual(json.loads(self.targets.read_text()), [])
+                self.assertEqual(sorted(path.name for path in self.targets.parent.iterdir()),
+                                 ["adaptive-paper-targets.json", "adaptive-paper-targets.json.lock"])
 
     def test_a_clean_stop_with_no_trial_json_deregisters(self):
         process, target = self.start()
@@ -494,7 +496,8 @@ class FileSdRegistrationTests(unittest.TestCase):
     def test_a_clean_stop_of_an_unfinished_trial_stays_registered(self):
         for phase, status in (("starting", None), ("needs_attention", "needs_attention"),
                               ("held_overnight", "held_overnight"), ("finished", "needs_attention"),
-                              ("finished", "failed")):
+                              ("finished", "failed"), ("finished", None), ("finished", "not_ready"),
+                              ("finished", "a-status-this-exporter-does-not-know")):
             with self.subTest(phase=phase, status=status):
                 self.write_phase(phase, status=status)
                 process, target = self.start()
@@ -508,7 +511,7 @@ class FileSdRegistrationTests(unittest.TestCase):
         self.assertIn(target, self.listed())
 
     def test_a_killed_exporter_stays_registered_even_for_a_finished_trial(self):
-        self.write_phase("finished")
+        self.write_phase("finished", status="passed")
         process, target = self.start()
         self.assertEqual(self.stop(process, signal.SIGKILL), -signal.SIGKILL)
         self.assertIn(target, self.listed())
@@ -524,7 +527,7 @@ class FileSdRegistrationTests(unittest.TestCase):
     def test_other_groups_and_a_concurrent_exporter_are_kept(self):
         other = {"targets": ["127.0.0.1:9"], "labels": {"note": "another writer"}}
         self.targets.write_text(json.dumps([other]))
-        self.write_phase("finished")
+        self.write_phase("finished", status="passed")
         first, _ = self.start()
         second, second_target = self.start()
         self.assertEqual(self.stop(first), 0)
@@ -560,6 +563,30 @@ class FileSdRegistrationTests(unittest.TestCase):
         for argv in (["--deregister"], ["--port", "0"]):
             with self.subTest(argv=argv):
                 self.assertEqual(self.run_metrics(*argv).returncode, 2)
+
+    def test_serving_without_file_sd_is_refused_unless_explicitly_unscraped(self):
+        # Fail closed: an unregistered exporter is never scraped, so no alert would cover it.
+        result = self.run_metrics("--ledger", str(self.ledger_path), "--port", "0")
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("--file-sd is required", result.stderr)
+        both = self.run_metrics("--ledger", str(self.ledger_path), "--port", "0",
+                                "--file-sd", str(self.targets), "--no-file-sd")
+        self.assertEqual(both.returncode, 2, both.stderr)
+        self.assertEqual(self.targets.read_text(), "[]\n")
+
+    def test_no_file_sd_serves_without_touching_any_target_list(self):
+        self.write_phase("starting")
+        process = subprocess.Popen([sys.executable, str(SOURCE / "metrics.py"), "--ledger", str(self.ledger_path),
+                                    "--port", "0", "--no-file-sd"], stderr=subprocess.PIPE, text=True)
+        self.processes.append(process)
+        line = process.stderr.readline()
+        match = re.search(r"http://(127\.0\.0\.1:\d+)/metrics", line)
+        self.assertIsNotNone(match, line)
+        with urllib.request.urlopen(f"http://{match.group(1)}/metrics", timeout=5) as response:
+            self.assertEqual(parse(response.read().decode("utf-8"))[("paper_trial_active", ())], "1")
+        self.assertEqual(self.stop(process), 0)
+        self.assertEqual(self.targets.read_text(), "[]\n")
+        self.assertEqual(sorted(path.name for path in self.targets.parent.iterdir()), ["adaptive-paper-targets.json"])
 
 
 if __name__ == "__main__":

@@ -6532,8 +6532,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "26671bcc07b1da26d30a51ce128ffe3a8996241c249308dff4c20b625629a848",
-      "bytes": 19839
+      "sha256": "3cfecac5e77fc5b53a2aeefce73a290f2b3238d35a2e8cc078603b24d85f0eb1",
+      "bytes": 20256
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -6637,8 +6637,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/metrics.py",
-      "sha256": "6ef06204566774021d17a6b4837942d0a889730d214ad40f996c27fecffeb4d5",
-      "bytes": 26244
+      "sha256": "7ff02ea7feb7449573cd41cffd44faac98e16e4019d9739ba2e1e39dc48c740d",
+      "bytes": 27462
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover.py",
@@ -6752,7 +6752,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "b98e746136eb6d9ab0c020bbb4a68a9ff377e2e5b4e05bf08051154e8bd0fb8a",
+      "sha256": "075dab0e4f736fc78cc1ce2213ec007445da52bd8c9c9b45da248365ea18419a",
       "bytes": 6969
     },
     {
@@ -29972,8 +29972,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "73c4d57c93dda1aa279b92a704ee96d65ad23df643c04251cff0f63bb1a38e39",
-      "bytes": 17684
+      "sha256": "a7e5a75756ad10ca2493c91c746c848fe477ac43953f8ae29f29d0dad53af639",
+      "bytes": 17942
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -30052,8 +30052,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
-      "sha256": "0b41a11afd638ebdc70781b3a4c80b23ed943a0ae80534171c9dd039379986df",
-      "bytes": 9754
+      "sha256": "3791486b1bc1a006cb02ae4c894d4c61d5e97a238887a885cb9c45b3fcc88416",
+      "bytes": 9821
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus.yml.example",
@@ -30462,8 +30462,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_metrics.py",
-      "sha256": "987524051732142b6284101f9c27063bb14110922ec70280f39b58ca44cd091e",
-      "bytes": 28239
+      "sha256": "4e80ecdb3af5c5303b9dd6d2b3ea0f589e2bcb3ae6360fc0e19a80502340315b",
+      "bytes": 30222
     },
     {
       "path": "tests/test_adaptive_paper_mover.py",

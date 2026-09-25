@@ -214,11 +214,15 @@ The registration lifecycle:
 - Registration. The exporter adds its own `127.0.0.1:<port>` target once its
   listener binds. The write goes through a lock and an atomic replace. The
   exporter refuses to start if the list is not a `file_sd` target list.
+- Required. The exporter serves only with `--file-sd`. The explicit
+  `--no-file-sd` opts into an unscraped exporter for local inspection.
 - Clean removal. The exporter removes its target only on a clean stop
-  (SIGTERM or SIGINT) of a trial that finished cleanly.
-- Kept registered. A target stays registered if its exporter crashes or is
-  killed, or if its trial was left at `starting`, `needs_attention` or
-  `held_overnight`, or finished with a failed status.
+  (SIGTERM or SIGINT) of a trial that finished with a passing status: phase
+  `finished` with `passed` or `completed_no_signals`.
+- Kept registered. A target stays registered in every other case: its
+  exporter crashes or is killed, its trial was left at `starting`,
+  `needs_attention` or `held_overnight`, or its trial finished with any
+  other, missing or unknown status.
 - Recovery. After recovering such a trial, remove the target with
   `metrics.py --deregister --port <port> --file-sd <list>`.
 
