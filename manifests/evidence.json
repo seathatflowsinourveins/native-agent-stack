@@ -29190,8 +29190,8 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "3764227feeb48844f7f51052ea9bb5747f564354975835a9980b0f77944564ff",
-      "bytes": 40864
+      "sha256": "c8db8b668f3f75c2ef1e13a736223e05ffcdc747861062850aa9eac3049a5f14",
+      "bytes": 41460
     },
     {
       "path": "tests/test_adoption_launchd.py",
