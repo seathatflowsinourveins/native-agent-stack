@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--restic--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "restic",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v restic) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" restic",
+      "exit": 0,
+      "duration_s": 0.036,
+      "output_sha256": "8a144369c8cbd67ff318497a495547205b306d965c593d540c1e2911f505f1e2",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/restic -> ~/.local/share/codex-ecosystem/recovery/restic/0.19.1/restic\nstack ['0.19.1'] winner pins ['0.19.1']\n"
+    },
+    {
+      "cmd": "D=\"$HOME/.local/share/codex-ecosystem/recovery/restic/downloads\"; (cd \"$D\" && sha256sum --check --ignore-missing SHA256SUMS) && r=$(python3 -c \"import json;print([a['sha256'] for a in json.load(open('blueprints/convergence-practice/offhost-restore/attempt-1/installation.json'))['artifacts'] if a['name']=='restic_0.19.1_linux_amd64.bz2'][0])\") && a=$(sha256sum < \"$D/restic_0.19.1_linux_amd64.bz2\" | cut -c1-64) && m=$(bunzip2 -c \"$D/restic_0.19.1_linux_amd64.bz2\" | sha256sum | cut -c1-64) && i=$(sha256sum < \"$D/../0.19.1/restic\" | cut -c1-64) && echo \"archive $(echo $a | cut -c1-16)... | recorded in offhost-restore installation.json $(echo $r | cut -c1-16)... | decompressed $(echo $m | cut -c1-16)... | installed $(echo $i | cut -c1-16)...\" && test \"$a\" = \"$r\" && test \"$m\" = \"$i\" && echo \"installed restic is the decompressed, checksum-verified release archive\"",
+      "exit": 0,
+      "duration_s": 1.097,
+      "output_sha256": "be51edb7ec89db90dbb0d8e5ffb3d13885a6d78535a4ea9fd36e9666a7419fef",
+      "output_excerpt": "restic_0.19.1_linux_amd64.bz2: OK\narchive f415415624dcc452... | recorded in offhost-restore installation.json f415415624dcc452... | decompressed 20d4142678d0d95e... | installed 20d4142678d0d95e...\ninstalled restic is the decompressed, checksum-verified release archive\n"
+    },
+    {
+      "cmd": "K=\"${RR:?}/restic-install-gpg\"; D=\"$HOME/.local/share/codex-ecosystem/recovery/restic/downloads\"; mkdir -m 700 \"$K\" && gpg --batch --homedir \"$K\" --dearmor < \"$D/gpg-key-alex.asc\" > \"$K/restic.gpg\" 2>/dev/null && gpgv --keyring \"$K/restic.gpg\" \"$D/SHA256SUMS.asc\" \"$D/SHA256SUMS\" > \"$K/gpgv.log\" 2>&1; rc=$?; grep -E 'using|Good signature|BAD' \"$K/gpgv.log\"; rm -rf \"$K\"; echo \"gpgv exit=$rc (owned keyring removed)\"; test \"$rc\" -eq 0",
+      "exit": 0,
+      "duration_s": 0.01,
+      "output_sha256": "3608606d9774f47b33e07697c18252ece6037363c9a0383aa2338942541ec688",
+      "output_excerpt": "gpgv:                using RSA key CF8F18F2844575973F79D4E191A6868BD3F7A907\ngpgv: Good signature from \"Alexander Neumann <alexander@bumpern.de>\"\ngpgv exit=0 (owned keyring removed)\n"
+    },
+    {
+      "cmd": "restic version",
+      "exit": 0,
+      "duration_s": 0.01,
+      "output_sha256": "de8120f05e591368b1115ac5139ea3012c8752b87682bb64b1aeb5267c5e9aae",
+      "output_excerpt": "restic 0.19.1 compiled with go1.26.4 on linux/amd64\n"
+    }
+  ],
+  "tool_versions": {
+    "restic": "0.19.1"
+  },
+  "observed_at_utc": "2026-09-25T15:35:26Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), restic 0.19.1 (the catalog pin) is installed from the official release: restic resolves to ~/.local/share/codex-ecosystem/recovery/restic/0.19.1/restic; the retained restic_0.19.1_linux_amd64.bz2 passes sha256sum --check against the retained upstream SHA256SUMS, equals the sha256 recorded in blueprints/convergence-practice/offhost-restore/attempt-1/installation.json (f4154156...), and decompresses to a file byte-identical to the installed binary; gpgv with a throwaway keyring built from the retained release key reports a good signature on SHA256SUMS; restic version reports 0.19.1. Readiness only. All commands exit 0.",
+  "limitations": [
+    "Install stage: the resolved path, pin records, the listed integrity or identity comparisons and the version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "The release key (gpg-key-alex.asc), SHA256SUMS and its signature are the copies retained on this host, not re-fetched; the key's fingerprint is printed but trust in it rests on the retained copy. The host's configured recovery repository and its credential were not read.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:35:26Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

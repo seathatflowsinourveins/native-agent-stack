@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--rtk--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "rtk",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v rtk) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,sys;print('bootstrap pin (adoption/pins-linux-x86_64.json)',[t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']==sys.argv[1]])\" rtk && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" rtk && grep -A1 -- \"-- rtk --\" \"$HOME/.local/share/codex-ecosystem/installed-versions.txt\" | tail -1 | sed 's/^/bootstrap verified-versions record: /'",
+      "exit": 0,
+      "duration_s": 0.055,
+      "output_sha256": "4421f231bbf7c1c75172ad0bdf40cb87feee6acad6ba8e1283b3715234b89ce5",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/rtk -> ~/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk\nbootstrap pin (adoption/pins-linux-x86_64.json) ['0.49.0']\nstack ['0.49.0'] winner pins ['0.49.0']\nbootstrap verified-versions record: rtk 0.49.0\n"
+    },
+    {
+      "cmd": "A=\"$HOME/.local/share/codex-ecosystem/downloads/rtk-x86_64-unknown-linux-musl.tar.gz\"; e=$(python3 -c \"import json;print([t['sha256'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']=='rtk'][0])\"); a=$(sha256sum < \"$A\" | cut -c1-64); m=$(tar -xzOf \"$A\" rtk | sha256sum | cut -c1-64); i=$(sha256sum < \"$HOME/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk\" | cut -c1-64); echo \"bootstrap pin sha256 $(echo $e | cut -c1-16)... | retained archive $(echo $a | cut -c1-16)... | member rtk $(echo $m | cut -c1-16)... | installed $(echo $i | cut -c1-16)...\"; test \"$a\" = \"$e\" && test \"$m\" = \"$i\" && echo \"retained release archive matches the bootstrap pin; installed binary equals its member\"",
+      "exit": 0,
+      "duration_s": 0.106,
+      "output_sha256": "b38148b48a7a735563af976b1ebfa600f076c09ee7f2b89ab8f793df0868ad37",
+      "output_excerpt": "bootstrap pin sha256 7278231dfd7e6a73... | retained archive 7278231dfd7e6a73... | member rtk a051b22361c7cfa3... | installed a051b22361c7cfa3...\nretained release archive matches the bootstrap pin; installed binary equals its member\n"
+    },
+    {
+      "cmd": "rtk --version",
+      "exit": 0,
+      "duration_s": 0.003,
+      "output_sha256": "edaa9940d1075ff9ed8f007410d63b7d9de8fd70f7450b29c9566a01288b1c77",
+      "output_excerpt": "rtk 0.49.0\n"
+    }
+  ],
+  "tool_versions": {
+    "rtk": "0.49.0"
+  },
+  "observed_at_utc": "2026-09-25T15:35:21Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), rtk 0.49.0 (the catalog and bootstrap pin) is installed from the official release: rtk resolves to ~/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk; the retained rtk-x86_64-unknown-linux-musl.tar.gz has the sha256 in adoption/pins-linux-x86_64.json (7278231d...) and its rtk member is byte-identical to the installed binary; rtk --version reports rtk 0.49.0. Readiness only. All commands exit 0.",
+  "limitations": [
+    "Install stage: the resolved path, pin records, the listed integrity or identity comparisons and the version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "CLI proxy behavior is covered by the separate rtk use receipt on main; the Claude Code hook integration was not inspected.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:35:21Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

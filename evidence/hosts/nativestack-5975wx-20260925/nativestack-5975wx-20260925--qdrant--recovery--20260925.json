@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--qdrant--recovery--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "qdrant",
+  "stage": "recovery",
+  "commands": [
+    {
+      "cmd": "p=$(command -v qdrant) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && qdrant --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" qdrant",
+      "exit": 0,
+      "duration_s": 0.04,
+      "output_sha256": "bfb1156461d889cb2ba6b617e73bb203c7c28d2da2acb2ffed452e95e40691fc",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/qdrant -> ~/.local/share/codex-ecosystem/tools/qdrant-1.19.1/qdrant\nqdrant 1.19.1\nstack ['1.19.1'] winner pins ['1.19.1']\n"
+    },
+    {
+      "cmd": "mkdir \"${RR:?}/qdrant-recovery\" && python3 -c \"\nimport hashlib,json,os,socket,subprocess,sys,time,urllib.request as u\nR=sys.argv[1]\ns=socket.socket();s.bind(('127.0.0.1',0));port=s.getsockname()[1];s.close()\ncfg=R+'/config.yaml'\nopen(cfg,'w').write('storage:\\n  storage_path: '+R+'/storage\\n  snapshots_path: '+R+'/snapshots\\nservice:\\n  host: 127.0.0.1\\n  http_port: '+str(port)+'\\n  grpc_port: null\\n  enable_cors: false\\ncluster:\\n  enabled: false\\ntelemetry_disabled: true\\n')\nos.makedirs(R+'/cwd')\nlog=open(R+'/qdrant.log','w')\np=subprocess.Popen(['qdrant','--config-path',cfg,'--disable-telemetry'],cwd=R+'/cwd',stdout=log,stderr=log)\nQ='http://127.0.0.1:'+str(port)\ndef call(m,path,body=None):\n    q=u.Request(Q+path,method=m,data=None if body is None else json.dumps(body).encode(),headers={'Content-Type':'application/json'})\n    try:\n        with u.urlopen(q,timeout=60) as r: return r.status,json.load(r)\n    except u.HTTPError as e: return e.code,json.loads(e.read() or b'{}')\nok=False\ntry:\n    for _ in range(150):\n        try:\n            if call('GET','/readyz')[0]==200: break\n        except Exception: time.sleep(0.2)\n    v=call('GET','/')[1]\n    pts=[{'id':i+1,'vector':[round((i+1)*0.1,3),round(1-i*0.05,3),round((i%3)*0.25,3),0.5],'payload':{'doc':'nsr-'+str(i),'n':i}} for i in range(8)]\n    c=call('PUT','/collections/nsr_recovery',{'vectors':{'size':4,'distance':'Cosine'}})[0]\n    up=call('PUT','/collections/nsr_recovery/points?wait=true',{'points':pts})[1]['result']['status']\n    def dump():\n        d=call('POST','/collections/nsr_recovery/points/scroll',{'limit':100,'with_payload':True,'with_vector':True})[1]\n        return sorted((x['id'],tuple(x['vector']),json.dumps(x['payload'],sort_keys=True)) for x in d.get('result',{}).get('points',[]))\n    before=dump()\n    snap=call('POST','/collections/nsr_recovery/snapshots?wait=true')[1]['result']\n    path=R+'/snapshots/nsr_recovery/'+snap['name']\n    sha=hashlib.sha256(open(path,'rb').read()).hexdigest()\n    dele=call('DELETE','/collections/nsr_recovery')[1]['result'];gone=call('GET','/collections/nsr_recovery')[0]\n    bad=call('PUT','/collections/nsr_recovery/snapshots/recover?wait=true',{'location':'file://'+path,'checksum':'0'*64})[0];after_bad=call('GET','/collections/nsr_recovery')[0]\n    good=call('PUT','/collections/nsr_recovery/snapshots/recover?wait=true',{'location':'file://'+path,'checksum':sha})[0]\n    after=dump()\n    print('owned qdrant',v.get('version'),v.get('commit','')[:7],'| 8 points upserted',up,'| snapshot sha256',sha[:12],'| collection deleted',dele,'then GET',gone,'| recover with a wrong checksum: HTTP',bad,'then GET',after_bad,'| recover with the snapshot checksum: HTTP',good,'| restored',len(after),'points; ids, vectors and payloads identical to before the loss:',after==before)\n    ok=c==200 and up=='completed' and len(before)==8 and dele is True and gone==404 and bad>=400 and after_bad==404 and good==200 and after==before\nfinally:\n    p.terminate()\n    try: p.wait(timeout=30)\n    except Exception: p.kill()\nprint('owned qdrant process stopped, exit',p.returncode)\nraise SystemExit(0 if ok else 1)\n\" \"${RR:?}/qdrant-recovery\"",
+      "exit": 0,
+      "duration_s": 31.683,
+      "output_sha256": "938b2e25294e4c6a2ac56a330b7001415228e9cf5e6976adf727425a3d09fe2d",
+      "output_excerpt": "owned qdrant 1.19.1 6ab21ca | 8 points upserted completed | snapshot sha256 8455699c2f76 | collection deleted True then GET 404 | recover with a wrong checksum: HTTP 400 then GET 404 | recover with the snapshot checksum: HTTP 200 | restored 8 points; ids, vectors and payloads identical to before the loss: True\nowned qdrant process stopped, exit 0\n"
+    },
+    {
+      "cmd": "rm -rf \"${RR:?}/qdrant-recovery\" && test ! -e \"${RR:?}/qdrant-recovery\" && echo \"owned instance config, storage and snapshots removed\"",
+      "exit": 0,
+      "duration_s": 0.005,
+      "output_sha256": "771321009f6ebf309a3c43bd080334b8ed9247cf765231261c810fbdc3b3e024",
+      "output_excerpt": "owned instance config, storage and snapshots removed\n"
+    }
+  ],
+  "tool_versions": {
+    "qdrant": "1.19.1"
+  },
+  "observed_at_utc": "2026-09-25T15:34:44Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), Qdrant 1.19.1 (the catalog pin) recovered a collection from its own snapshot on an owned instance. A qdrant process started from the installed binary with an owned config (loopback, OS-assigned HTTP port, gRPC off, telemetry off, storage and snapshots under an owned scratch directory) created a collection, upserted 8 points with vectors and payloads, took a native snapshot and recorded its sha256, then deleted the collection (GET 404). A recover request carrying a wrong checksum was refused (HTTP 4xx) and left the collection absent; the recover request with the snapshot's checksum returned HTTP 200 and the restored ids, vectors and payloads equal the pre-loss scroll exactly. The owned process was stopped and its directory removed. The checking command exits 0 only when every condition holds; all commands exit 0.",
+  "limitations": [
+    "Owned, same-host, single-collection recovery from a local snapshot file: no restore into the production native-stack-qdrant service (127.0.0.1:26333), which was not contacted, and no off-host copy, cluster, large collection or payload-index coverage.",
+    "Scratch state lived in an owned directory under this session's scratchpad, referenced as $RR in the commands (the worker exported RR before recording); the last command removes it.",
+    "The same commands were rehearsed once while planning (under $RR); the rehearsal outputs are not part of this receipt. This receipt changes no platform_status.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the qdrant binary is this host's existing install under ~/.local/share/codex-ecosystem/tools/qdrant-1.19.1, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:34:44Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

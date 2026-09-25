@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--claude-code--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "claude-code",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v claude) && echo \"host client: $p -> native launcher $(readlink -f \"$HOME/.local/bin/claude\")\" && claude --version && python3 -c \"import json,sys;print('bootstrap pin (adoption/pins-linux-x86_64.json)',[t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']==sys.argv[1]])\" claude-code && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" claude-code",
+      "exit": 0,
+      "duration_s": 0.066,
+      "output_sha256": "f79cbad7cc69cd07f08596459692a93c2bbdbb1ed3e8ef31188d861755760562",
+      "output_excerpt": "host client: ~/.local/share/codex-ecosystem/bin/claude -> native launcher ~/.local/share/claude/versions/2.1.282\n2.1.282 (Claude Code)\nbootstrap pin (adoption/pins-linux-x86_64.json) ['2.1.280']\nstack ['2.1.278'] winner pins ['2.1.278']\n"
+    },
+    {
+      "cmd": "C=\"${RR:?}/claude-code-install\"; mkdir \"$C\" && curl -fsSL https://downloads.claude.ai/claude-code-releases/2.1.278/manifest.json -o \"$C/manifest.json\" && curl -fsSL https://downloads.claude.ai/claude-code-releases/2.1.278/linux-x64/claude -o \"$C/claude\" && a=$(sha256sum < \"$C/claude\" | cut -c1-64) && m=$(python3 -c \"import json,sys;d=json.load(open(sys.argv[1]));print(d['version'],d['platforms']['linux-x64']['checksum'])\" \"$C/manifest.json\") && r=$(python3 -c \"import json;print(json.load(open('evidence/receipts/portable-userspace-install-20260921.json'))['sources']['claude']['installed_binary_sha256'])\") && echo \"release manifest (version, linux-x64 checksum): $(echo $m | cut -c1-24)... | recorded in evidence/receipts/portable-userspace-install-20260921.json: $(echo $r | cut -c1-16)... | fetched binary: $(echo $a | cut -c1-16)...\" && test \"$m\" = \"2.1.278 $a\" && test \"$a\" = \"$r\" && chmod 700 \"$C/claude\" && echo \"fetched 2.1.278 linux-x64 binary matches both the release manifest and the repository record\"",
+      "exit": 0,
+      "duration_s": 1.331,
+      "output_sha256": "2a3644dc21d0c15fe5128cbd658c09359167b9d8b0e6dc688192b4e4775f43f1",
+      "output_excerpt": "release manifest (version, linux-x64 checksum): 2.1.278 5c4735937844e84f... | recorded in evidence/receipts/portable-userspace-install-20260921.json: 5c4735937844e84f... | fetched binary: 5c4735937844e84f...\nfetched 2.1.278 linux-x64 binary matches both the release manifest and the repository record\n"
+    },
+    {
+      "cmd": "/usr/bin/env -i HOME=\"$HOME\" PATH=/usr/bin:/bin DISABLE_AUTOUPDATER=1 \"${RR:?}/claude-code-install/claude\" --version",
+      "exit": 0,
+      "duration_s": 0.015,
+      "output_sha256": "f0d384f3abe85e8cb2f0366465826cc8232426881854235d3ad1150e4a76f689",
+      "output_excerpt": "2.1.278 (Claude Code)\n"
+    },
+    {
+      "cmd": "rm -rf \"${RR:?}/claude-code-install\" && test ! -e \"${RR:?}/claude-code-install\" && echo \"fetched pinned binary removed; host client untouched: $(claude --version)\"",
+      "exit": 0,
+      "duration_s": 0.051,
+      "output_sha256": "7b32ee3f2683d990750cf0351bb1708f99090e829f2ec110526b4da8f07feb0a",
+      "output_excerpt": "fetched pinned binary removed; host client untouched: 2.1.282 (Claude Code)\n"
+    }
+  ],
+  "tool_versions": {
+    "claude-code": "2.1.278"
+  },
+  "observed_at_utc": "2026-09-25T15:34:13Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), the Claude Code 2.1.278 native build (the catalog winner pin) starts on this host: the official linux-x64 binary fetched from the release path into an owned scratch directory has the sha256 listed for linux-x64 in the 2.1.278 release manifest and recorded in evidence/receipts/portable-userspace-install-20260921.json (5c473593...), and run with the auto-updater disabled and a cleared environment it reports 2.1.278 (Claude Code). The host's own client, the native auto-updating launcher, reports a newer build than the pin (the first command's output; adoption/pins-linux-x86_64.json treats 2.1.280 as a floor) and was left unchanged. Readiness only. All commands exit 0.",
+  "limitations": [
+    "Install stage: the resolved path, pin records, the listed integrity or identity comparisons and the version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "The pinned build ran only from the owned scratch directory with DISABLE_AUTOUPDATER=1 and was removed afterwards; it was not installed into ~/.local/share/claude. The host's daily client is the newer auto-updated build (first command), so this receipt does not show the installed client at the pin.",
+    "The fetch used the network (downloads.claude.ai); the manifest was fetched in the same run, while the repository record is an independent earlier observation.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the host client resolves through ~/.local/share/codex-ecosystem/bin/claude to the native launcher ~/.local/bin/claude, as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:34:13Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

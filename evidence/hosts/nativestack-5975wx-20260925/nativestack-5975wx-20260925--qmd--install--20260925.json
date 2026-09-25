@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--qmd--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "qmd",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v qmd) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,sys;print('bootstrap pin (adoption/pins-linux-x86_64.json)',[t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']==sys.argv[1]])\" qmd && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" qmd && grep -A1 -- \"-- qmd --\" \"$HOME/.local/share/codex-ecosystem/installed-versions.txt\" | tail -1 | sed 's/^/bootstrap verified-versions record: /'",
+      "exit": 0,
+      "duration_s": 0.055,
+      "output_sha256": "66452f6d6e6ed37ffe6b2a378af563d03d33570c09de3ff3d3f4e93e7c0070d8",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/qmd -> ~/.local/share/codex-ecosystem/tools/qmd-2.8.3/lib/node_modules/@tobilu/qmd/bin/qmd\nbootstrap pin (adoption/pins-linux-x86_64.json) ['2.8.3']\nstack ['2.8.3'] winner pins ['2.8.3']\nbootstrap verified-versions record: qmd 2.8.3 (facd35e)\n"
+    },
+    {
+      "cmd": "A=\"$HOME/.local/share/codex-ecosystem/downloads/qmd-2.8.3.tgz\"; e=$(python3 -c \"import json;print([t['sha256'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']=='qmd'][0])\"); a=$(sha256sum < \"$A\" | cut -c1-64); i=$(python3 -c \"import base64,hashlib,sys;print('sha512-'+base64.b64encode(hashlib.sha512(open(sys.argv[1],'rb').read()).digest()).decode())\" \"$A\"); v=$(python3 -c \"import json,sys;print(json.load(open(sys.argv[1]))['version'])\" \"$HOME/.local/share/codex-ecosystem/tools/qmd-2.8.3/lib/node_modules/@tobilu/qmd/package.json\"); echo \"bootstrap pin sha256 $(echo $e | cut -c1-16)... | retained qmd-2.8.3.tgz $(echo $a | cut -c1-16)... | its npm integrity $(echo $i | cut -c1-24)... | installed package.json $v\"; test \"$a\" = \"$e\" && test \"$v\" = 2.8.3 && grep -q -- \"$i\" adoption/pins-linux-x86_64.json && echo \"tarball matches the bootstrap pin hash and the npm dist.integrity recorded in its install_note\"",
+      "exit": 0,
+      "duration_s": 0.063,
+      "output_sha256": "90eccd65b34ca10117585f809e4b29bfd018f60e363ccd9f3e8b8adf8398fe32",
+      "output_excerpt": "bootstrap pin sha256 2e60829913a0c646... | retained qmd-2.8.3.tgz 2e60829913a0c646... | its npm integrity sha512-zjfVwrObPB618B6x8... | installed package.json 2.8.3\ntarball matches the bootstrap pin hash and the npm dist.integrity recorded in its install_note\n"
+    },
+    {
+      "cmd": "qmd --version",
+      "exit": 0,
+      "duration_s": 0.136,
+      "output_sha256": "f2fde0f2ce1957393ab2348fc31dae60a39e4684689ae9e95845a0ee5d8396ab",
+      "output_excerpt": "qmd 2.8.3 (facd35e)\n"
+    }
+  ],
+  "tool_versions": {
+    "qmd": "2.8.3"
+  },
+  "observed_at_utc": "2026-09-25T15:35:11Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), qmd 2.8.3 (the catalog and bootstrap pin) is installed: qmd resolves to ~/.local/share/codex-ecosystem/tools/qmd-2.8.3/lib/node_modules/@tobilu/qmd/bin/qmd; the retained qmd-2.8.3.tgz has the sha256 in adoption/pins-linux-x86_64.json and the npm dist.integrity recorded in its install_note; the installed package.json reads 2.8.3 and qmd --version reports qmd 2.8.3 (facd35e). Readiness only. All commands exit 0.",
+  "limitations": [
+    "Install stage: the resolved path, pin records, the listed integrity or identity comparisons and the version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "Search is covered by the separate qmd use receipt on main; no index was read or updated.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:35:11Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

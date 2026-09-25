@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--dagu--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "dagu",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v dagu) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" dagu",
+      "exit": 0,
+      "duration_s": 0.037,
+      "output_sha256": "81fd844b20d1983a06b1a13e5fa5f6d9c78042b8324208b4787fb46423160c85",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/dagu -> ~/.local/share/codex-ecosystem/dagu/2.16.6/dagu\nstack ['2.16.6'] winner pins ['2.16.6', 'v2.16.6']\n"
+    },
+    {
+      "cmd": "D=\"$HOME/.local/share/codex-ecosystem/dagu\"; (cd \"$D/downloads\" && sha256sum --check --ignore-missing checksums.txt) && a=$(tar -xzOf \"$D/downloads/dagu_2.16.6_linux_amd64.tar.gz\" dagu | sha256sum | cut -c1-64) && b=$(sha256sum < \"$D/2.16.6/dagu\" | cut -c1-64) && echo \"archive member dagu $a\" && echo \"installed 2.16.6/dagu $b\" && test \"$a\" = \"$b\" && echo \"installed binary is byte-identical to the member of the publisher-checksum-verified release archive\"",
+      "exit": 0,
+      "duration_s": 0.9,
+      "output_sha256": "bf0d84f705365b1b551d9be17dde82fa64836fbc472529c9b1eff9e07b0ad9ab",
+      "output_excerpt": "dagu_2.16.6_linux_amd64.tar.gz: OK\narchive member dagu 20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7\ninstalled 2.16.6/dagu 20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7\ninstalled binary is byte-identical to the member of the publisher-checksum-verified release archive\n"
+    },
+    {
+      "cmd": "dagu version",
+      "exit": 0,
+      "duration_s": 0.039,
+      "output_sha256": "7ee203ac73fca7d93c699ceefabb5bb5cdea2e02213de22ceea56908ff0945c5",
+      "output_excerpt": "2.16.6\n"
+    }
+  ],
+  "tool_versions": {
+    "dagu": "2.16.6"
+  },
+  "observed_at_utc": "2026-09-25T15:33:59Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), dagu 2.16.6 (the catalog pin in both catalogs, recorded here as 2.16.6) is installed from the official release: dagu resolves to ~/.local/share/codex-ecosystem/dagu/2.16.6/dagu; the retained dagu_2.16.6_linux_amd64.tar.gz passes sha256sum --check against the retained publisher checksums.txt and its dagu member is byte-identical to the installed binary; dagu version reports 2.16.6. Readiness only; a version call is not functional acceptance. All commands exit 0.",
+  "limitations": [
+    "Install stage: the resolved path, pin records, the listed integrity or identity comparisons and the version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "The publisher checksums.txt is the copy retained on this host with the archive, not re-fetched from GitHub by this receipt; no signature was checked. Functional DAG execution is covered by the separate dagu use receipt on main.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:33:59Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

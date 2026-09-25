@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--syft--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "syft",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v syft) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && SYFT_CHECK_FOR_APP_UPDATE=false syft version | head -2 && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" syft",
+      "exit": 0,
+      "duration_s": 0.093,
+      "output_sha256": "94fae0c90becd2e991e83c35a56652d3bd9ea4d8ad4bef200809747b268767a6",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/syft -> ~/.local/share/codex-ecosystem/tools/syft-1.52.0/payload/syft\nApplication:   syft\nVersion:       1.52.0\nstack ['1.52.0'] winner pins ['1.52.0', 'v1.52.0']\n"
+    },
+    {
+      "cmd": "Y=\"${RR:?}/syft-use\"; mkdir \"$Y\" && E=\"$HOME/.local/share/codex-ecosystem/sdk-py313\" && SYFT_CHECK_FOR_APP_UPDATE=false syft scan \"dir:$E\" --source-name sdk-py313 -q -o \"syft-json=$Y/sdk.syft.json\" -o \"cyclonedx-json=$Y/sdk.cdx.json\" && uv pip freeze --python \"$E/bin/python\" > \"$Y/freeze.txt\" && python3 -c \"\nimport json,re,sys\nn=lambda s:re.sub(r'[-_.]+','-',s).lower()\nd=json.load(open(sys.argv[1]));x=json.load(open(sys.argv[2]))\nsb={(n(a['name']),a['version']) for a in d['artifacts'] if a['type']=='python'}\nfr={(n(l.split('==')[0]),l.split('==')[1].strip()) for l in open(sys.argv[3]) if '==' in l}\ncx={(n(k['name']),k['version']) for k in x.get('components',[]) if k.get('type')=='library'}\np={a['name']:a.get('purl') for a in d['artifacts'] if a['name'] in ('alpaca-py','duckdb')}\nprint('syft-json python packages',len(sb),'| CycloneDX library components',len(cx),'| installed distributions (uv pip freeze)',len(fr),'| identical name/version sets:',sb==fr==cx,'| purls',p)\nraise SystemExit(0 if sb and sb==fr==cx else 1)\n\" \"$Y/sdk.syft.json\" \"$Y/sdk.cdx.json\" \"$Y/freeze.txt\"",
+      "exit": 0,
+      "duration_s": 1.886,
+      "output_sha256": "ae97df60adf436dc69577a19743833e497dfed7f13bbb795fdb53b6f75aa1e47",
+      "output_excerpt": "syft-json python packages 36 | CycloneDX library components 36 | installed distributions (uv pip freeze) 36 | identical name/version sets: True | purls {'alpaca-py': 'pkg:pypi/alpaca-py@0.44.0', 'duckdb': 'pkg:pypi/duckdb@1.5.5'}\nUsing Python 3.13.15 environment at: ~/.local/share/codex-ecosystem/sdk-py313\n"
+    },
+    {
+      "cmd": "Y=\"${RR:?}/syft-use\"; mkdir \"$Y/empty\" \"$Y/planted\" && SYFT_CHECK_FOR_APP_UPDATE=false syft scan \"dir:$Y/empty\" -q -o json > \"$Y/empty.json\" && D=\"$Y/planted/lib/python3.13/site-packages/nsr_planted_pkg-9.8.7.dist-info\" && mkdir -p \"$D\" && printf 'Metadata-Version: 2.1\\nName: nsr-planted-pkg\\nVersion: 9.8.7\\n' > \"$D/METADATA\" && printf 'nsr_planted_pkg-9.8.7.dist-info/METADATA,,\\n' > \"$D/RECORD\" && SYFT_CHECK_FOR_APP_UPDATE=false syft scan \"dir:$Y/planted\" -q -o json > \"$Y/planted.json\" && python3 -c \"\nimport json,sys\ne=json.load(open(sys.argv[1]))['artifacts'];p=[(a['name'],a['version'],a.get('purl')) for a in json.load(open(sys.argv[2]))['artifacts']]\nprint('empty directory artifacts',len(e),'| planted dist-info artifacts',p)\nraise SystemExit(0 if not e and p==[('nsr-planted-pkg','9.8.7','pkg:pypi/nsr-planted-pkg@9.8.7')] else 1)\n\" \"$Y/empty.json\" \"$Y/planted.json\"",
+      "exit": 0,
+      "duration_s": 1.892,
+      "output_sha256": "ce8e9a5ec2496d47de14eac6d0e683e05d24b0f3b87a52de14ad77687f75d923",
+      "output_excerpt": "empty directory artifacts 0 | planted dist-info artifacts [('nsr-planted-pkg', '9.8.7', 'pkg:pypi/nsr-planted-pkg@9.8.7')]\n"
+    },
+    {
+      "cmd": "rm -rf \"${RR:?}/syft-use\" && test ! -e \"${RR:?}/syft-use\" && echo \"SBOMs and fixtures removed\"",
+      "exit": 0,
+      "duration_s": 0.003,
+      "output_sha256": "0dc4e517cab88afaf8355182ab32f0c429656fbb1d04dd03a7c4a9f11db6f0a9",
+      "output_excerpt": "SBOMs and fixtures removed\n"
+    }
+  ],
+  "tool_versions": {
+    "syft": "1.52.0"
+  },
+  "observed_at_utc": "2026-09-25T15:35:18Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), syft 1.52.0 (the catalog pin) generated SBOMs that match ground truth. Scanning this host's SDK environment ~/.local/share/codex-ecosystem/sdk-py313 as a directory, its syft-json python packages and its CycloneDX library components are the same name/version set as uv pip freeze of that environment (every installed distribution, nothing extra), with purls such as pkg:pypi/alpaca-py@0.44.0. Positive control: an empty directory yielded no artifacts, and a directory holding one planted dist-info yielded exactly that package, nsr-planted-pkg 9.8.7 with purl pkg:pypi/nsr-planted-pkg@9.8.7. Each check exits 0 only when its sets match; all commands exit 0.",
+  "limitations": [
+    "Directory scans of one Python environment and two owned fixtures: container images, other ecosystems, file digests and license fields were not asserted, and syft's catalog is compared with installed metadata, not with a vulnerability database (grype was not run).",
+    "Scratch state lived in an owned directory under this session's scratchpad, referenced as $RR in the commands (the worker exported RR before recording); the last command removes it.",
+    "The same commands were rehearsed while planning. This receipt changes no platform_status.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:35:18Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

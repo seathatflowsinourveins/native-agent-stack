@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--opentelemetry-collector-contrib--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "opentelemetry-collector-contrib",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v otelcol-contrib) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" opentelemetry-collector-contrib",
+      "exit": 0,
+      "duration_s": 0.038,
+      "output_sha256": "b7673dbdd036f2a6fa44b0bf64ec22107e5bdabce346f0763991638e77e77a8c",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/otelcol-contrib -> ~/.local/share/codex-ecosystem/tools/otelcol-0.161.0/otelcol-contrib\nstack ['0.161.0'] winner pins ['0.161.0']\n"
+    },
+    {
+      "cmd": "A=\"$HOME/.local/share/codex-ecosystem/downloads/otelcol-0.161.0/otelcol-contrib_0.161.0_linux_amd64.tar.gz\"; a=$(sha256sum < \"$A\" | cut -c1-64); s=$(cut -c1-64 < \"$A.sha256\"); r=$(python3 -c \"import json;print([c for c in json.load(open('observability/receipt.json'))['components'] if c.get('asset')=='otelcol-contrib_0.161.0_linux_amd64.tar.gz'][0]['sha256'])\"); m=$(tar -xzOf \"$A\" otelcol-contrib | sha256sum | cut -c1-64); i=$(sha256sum < \"$HOME/.local/share/codex-ecosystem/tools/otelcol-0.161.0/otelcol-contrib\" | cut -c1-64); echo \"retained archive $(echo $a | cut -c1-16)... | publisher .sha256 $(echo $s | cut -c1-16)... | observability/receipt.json $(echo $r | cut -c1-16)...\"; echo \"archive member otelcol-contrib $(echo $m | cut -c1-16)... | installed $(echo $i | cut -c1-16)...\"; test \"$a\" = \"$s\" && test \"$a\" = \"$r\" && test \"$m\" = \"$i\" && echo \"archive matches both recorded checksums; installed binary equals its member\"",
+      "exit": 0,
+      "duration_s": 2.123,
+      "output_sha256": "c1ec969b753cc3e9827a405ce55b343bdc92de81d90435826f7f78f8459bedda",
+      "output_excerpt": "retained archive 778c689efa681ff6... | publisher .sha256 778c689efa681ff6... | observability/receipt.json 778c689efa681ff6...\narchive member otelcol-contrib 1e6629a05c0d3084... | installed 1e6629a05c0d3084...\narchive matches both recorded checksums; installed binary equals its member\n"
+    },
+    {
+      "cmd": "otelcol-contrib --version",
+      "exit": 0,
+      "duration_s": 0.098,
+      "output_sha256": "fa12a748bcf0b990f7e3eb766fd93016bbd9537452e09defa0e2f9230142ccf1",
+      "output_excerpt": "otelcol-contrib version 0.161.0\n"
+    }
+  ],
+  "tool_versions": {
+    "opentelemetry-collector-contrib": "0.161.0"
+  },
+  "observed_at_utc": "2026-09-25T15:34:16Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), the OpenTelemetry Collector contrib 0.161.0 (the catalog pin) is installed from the official release: otelcol-contrib resolves to ~/.local/share/codex-ecosystem/tools/otelcol-0.161.0/otelcol-contrib; the retained otelcol-contrib_0.161.0_linux_amd64.tar.gz has the sha256 in its retained publisher .sha256 file and in observability/receipt.json (778c689e...), its otelcol-contrib member is byte-identical to the installed binary, and otelcol-contrib --version reports 0.161.0. Readiness only. All commands exit 0.",
+  "limitations": [
+    "Install stage: the resolved path, pin records, the listed integrity or identity comparisons and the version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "The publisher .sha256 file is the copy retained with the archive on this host, not re-fetched; no signature was checked. Pipeline behavior is covered by the separate use receipt on main; the running ecosystem-otelcol unit was not touched.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:34:16Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

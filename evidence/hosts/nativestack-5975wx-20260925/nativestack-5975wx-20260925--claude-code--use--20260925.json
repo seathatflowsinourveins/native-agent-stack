@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--claude-code--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "claude-code",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "C=\"${RR:?}/claude-code-use\"; mkdir \"$C\" && curl -fsSL https://downloads.claude.ai/claude-code-releases/2.1.278/manifest.json -o \"$C/manifest.json\" && curl -fsSL https://downloads.claude.ai/claude-code-releases/2.1.278/linux-x64/claude -o \"$C/claude\" && a=$(sha256sum < \"$C/claude\" | cut -c1-64) && m=$(python3 -c \"import json,sys;d=json.load(open(sys.argv[1]));print(d['version'],d['platforms']['linux-x64']['checksum'])\" \"$C/manifest.json\") && r=$(python3 -c \"import json;print(json.load(open('evidence/receipts/portable-userspace-install-20260921.json'))['sources']['claude']['installed_binary_sha256'])\") && echo \"release manifest (version, linux-x64 checksum): $(echo $m | cut -c1-24)... | recorded in evidence/receipts/portable-userspace-install-20260921.json: $(echo $r | cut -c1-16)... | fetched binary: $(echo $a | cut -c1-16)...\" && test \"$m\" = \"2.1.278 $a\" && test \"$a\" = \"$r\" && chmod 700 \"$C/claude\" && echo \"fetched 2.1.278 linux-x64 binary matches both the release manifest and the repository record\"",
+      "exit": 0,
+      "duration_s": 1.833,
+      "output_sha256": "2a3644dc21d0c15fe5128cbd658c09359167b9d8b0e6dc688192b4e4775f43f1",
+      "output_excerpt": "release manifest (version, linux-x64 checksum): 2.1.278 5c4735937844e84f... | recorded in evidence/receipts/portable-userspace-install-20260921.json: 5c4735937844e84f... | fetched binary: 5c4735937844e84f...\nfetched 2.1.278 linux-x64 binary matches both the release manifest and the repository record\n"
+    },
+    {
+      "cmd": "C=\"${RR:?}/claude-code-use\"; mkdir \"$C/work\" && python3 -c \"import secrets;print('nsr-probe-'+secrets.token_hex(8))\" > \"$C/work/probe.txt\" && cd \"$C/work\" && /usr/bin/env -i HOME=\"$HOME\" PATH=/usr/bin:/bin LANG=C.UTF-8 DISABLE_AUTOUPDATER=1 \"$C/claude\" -p --safe-mode --setting-sources project --strict-mcp-config --no-session-persistence --tools Read --max-turns 4 --output-format stream-json --verbose \"Use the Read tool to read the file probe.txt in the current directory, then reply with its exact contents and nothing else.\" < /dev/null > \"$C/stream.jsonl\" 2> \"$C/stderr.txt\"; rc=$?; echo \"claude -p (pinned 2.1.278, safe mode, project settings only, no MCP, no session persistence, Read tool only) exit=$rc, stream $(wc -l < \"$C/stream.jsonl\") events\"; test \"$rc\" -eq 0",
+      "exit": 0,
+      "duration_s": 7.677,
+      "output_sha256": "2e1f73d8d84839f6b2b1a7d9d9cfb662edaa3ef449a275839c9123e7c67adfcd",
+      "output_excerpt": "claude -p (pinned 2.1.278, safe mode, project settings only, no MCP, no session persistence, Read tool only) exit=0, stream 7 events\n"
+    },
+    {
+      "cmd": "C=\"${RR:?}/claude-code-use\"; python3 -c \"\nimport json,sys\nev=[json.loads(l) for l in open(sys.argv[1]) if l.strip()];tok=open(sys.argv[2]).read().strip()\ninit=[e for e in ev if e.get('type')=='system' and e.get('subtype')=='init'][0];res=[e for e in ev if e.get('type')=='result'][-1]\nuses=[c.get('name') for e in ev if e.get('type')=='assistant' for c in e.get('message',{}).get('content',[]) if c.get('type')=='tool_use']\nok=init.get('claude_code_version')=='2.1.278' and not init.get('mcp_servers') and 'Read' in uses and res.get('subtype')=='success' and not res.get('is_error') and tok in (res.get('result') or '')\nprint('init: claude_code_version',init.get('claude_code_version'),'model',init.get('model'),'tools',init.get('tools'),'mcp_servers',init.get('mcp_servers'),'| tool uses',uses,'| result',res.get('subtype'),'turns',res.get('num_turns'),'| reply contains the random probe token (never in the prompt):',tok in (res.get('result') or ''))\nraise SystemExit(0 if ok else 1)\n\" \"$C/stream.jsonl\" \"$C/work/probe.txt\"",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_sha256": "e9b1a875de2d0491ae8878fad804548362e4cdf3b62928f6a3e9279b9f01fb3c",
+      "output_excerpt": "init: claude_code_version 2.1.278 model claude-opus-5[1m] tools ['Read'] mcp_servers [] | tool uses ['Read'] | result success turns 2 | reply contains the random probe token (never in the prompt): True\n"
+    },
+    {
+      "cmd": "rm -rf \"${RR:?}/claude-code-use\" && test ! -e \"${RR:?}/claude-code-use\" && echo \"pinned binary, probe and stream removed\"",
+      "exit": 0,
+      "duration_s": 0.042,
+      "output_sha256": "2d378367f6f0c4040e4d0dd96f3d8fd3559ec60ed9ca2c35654e210973da9dae",
+      "output_excerpt": "pinned binary, probe and stream removed\n"
+    }
+  ],
+  "tool_versions": {
+    "claude-code": "2.1.278"
+  },
+  "observed_at_utc": "2026-09-25T15:34:31Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), the pinned Claude Code 2.1.278 native build (fetched and verified as in the install receipt) completed a signed-in, non-interactive session that had to use a tool: run with a cleared environment, the auto-updater off, --safe-mode, --setting-sources project from an owned directory, --strict-mcp-config with no servers, --no-session-persistence and only the Read tool, its stream-json init reported claude_code_version 2.1.278 and no MCP servers, the assistant called Read, and the successful result contains a random token that existed only in the owned probe.txt, not in the prompt. The checking command exits 0 only when all of these hold; all commands exit 0.",
+  "limitations": [
+    "One print-mode session with the Read tool on the account's default model (reported in the output); provider capacity was consumed and is not reported as billing. Hooks, plugins, MCP, CLAUDE.md, subagents, workflows and interactive use were deliberately disabled, so they are not covered.",
+    "The pinned binary ran against the host's signed-in native state (it reads the existing sign-in and updates Claude Code's global state file like any client start); the host's daily client is the newer auto-updated build and was not used or changed. The user settings' OTel export and ai-memory hooks did not load (project-only settings, cleared environment), so no telemetry or memory write occurred.",
+    "The prompt and reply stay in the owned stream file, which the last command deletes; only the fields printed by the check are retained.",
+    "Scratch state lived in an owned directory under this session's scratchpad, referenced as $RR in the commands (the worker exported RR before recording); the last command removes it.",
+    "While planning, the fetch was rehearsed and the pinned binary parsed every flag of the session command (it stopped at the stream-json/--verbose argument check with --verbose omitted, before any model call); the model call itself was not rehearsed. This receipt changes no platform_status.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the pinned client binary was fetched into the owned directory, not the host's installed client.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:34:31Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

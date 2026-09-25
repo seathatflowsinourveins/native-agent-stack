@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--restic--recovery--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "restic",
+  "stage": "recovery",
+  "commands": [
+    {
+      "cmd": "p=$(command -v restic) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && restic version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" restic",
+      "exit": 0,
+      "duration_s": 0.046,
+      "output_sha256": "d6d064f99c653d005f1af8742ab9b9a6495c43d72badaf7df53265af02b99d52",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/restic -> ~/.local/share/codex-ecosystem/recovery/restic/0.19.1/restic\nrestic 0.19.1 compiled with go1.26.4 on linux/amd64\nstack ['0.19.1'] winner pins ['0.19.1']\n"
+    },
+    {
+      "cmd": "R=\"${RR:?}/restic-recovery\"; mkdir -m 700 \"$R\" && umask 077 && python3 -c \"import secrets;print(secrets.token_hex(24))\" > \"$R/pw\" && export RESTIC_REPOSITORY=\"$R/repo\" RESTIC_PASSWORD_FILE=\"$R/pw\" RESTIC_CACHE_DIR=\"$R/cache\" && restic init 2>&1 | grep -o 'created restic repository [0-9a-f]*' && cp -a adoption \"$R/src\" && (cd \"$R/src\" && find . -type f -print0 | sort -z | xargs -0 sha256sum) > \"$R/manifest-1\" && (cd \"$R\" && restic backup src --tag state1 --json --quiet) | tail -1 | python3 -c \"import json,sys;s=json.load(sys.stdin);print('state1 snapshot',s['snapshot_id'][:8],'files',s['total_files_processed'],'bytes',s['total_bytes_processed'])\"",
+      "exit": 0,
+      "duration_s": 3.496,
+      "output_sha256": "3275457d35b1fce96077fb92179bef8362228aee8b1dbbfb247a56ec2b5fdbd8",
+      "output_excerpt": "created restic repository 91592ec545\nstate1 snapshot 74b2ca19 files 54 bytes 663118\n"
+    },
+    {
+      "cmd": "R=\"${RR:?}/restic-recovery\"; export RESTIC_REPOSITORY=\"$R/repo\" RESTIC_PASSWORD_FILE=\"$R/pw\" RESTIC_CACHE_DIR=\"$R/cache\"; printf 'nsr state-2 appended line\\n' >> \"$R/src/README.md\" && rm \"$R/src/update.md\" && printf 'nsr state-2 new file\\n' > \"$R/src/nsr-state-2.txt\" && (cd \"$R/src\" && find . -type f -print0 | sort -z | xargs -0 sha256sum) > \"$R/manifest-2\" && ! cmp -s \"$R/manifest-1\" \"$R/manifest-2\" && (cd \"$R\" && restic backup src --tag state2 --json --quiet) | tail -1 | python3 -c \"import json,sys;s=json.load(sys.stdin);print('state2 snapshot',s['snapshot_id'][:8],'files new/changed/unmodified',s['files_new'],s['files_changed'],s['files_unmodified'])\"",
+      "exit": 0,
+      "duration_s": 0.763,
+      "output_sha256": "0e7f2fd2cb74efa26d38b9992c8601db962af76d9b6c5f13e6c322070513b9c5",
+      "output_excerpt": "state2 snapshot 1ed6d989 files new/changed/unmodified 1 1 52\n"
+    },
+    {
+      "cmd": "R=\"${RR:?}/restic-recovery\"; export RESTIC_REPOSITORY=\"$R/repo\" RESTIC_PASSWORD_FILE=\"$R/pw\" RESTIC_CACHE_DIR=\"$R/cache\"; rm -rf \"$R/src\" && test ! -e \"$R/src\" && echo \"simulated loss: src/ deleted\" && s1=$(restic snapshots --tag state1 --json | python3 -c \"import json,sys;d=json.load(sys.stdin);assert len(d)==1;print(d[0]['id'])\") && restic restore \"$s1\" --target \"$R/restore-1\" --verify > \"$R/restore-1.log\" 2>&1 && (cd \"$R/restore-1/src\" && find . -type f -print0 | sort -z | xargs -0 sha256sum) > \"$R/restored-1\" && cmp \"$R/manifest-1\" \"$R/restored-1\" && echo \"state1 restored by snapshot id $(echo $s1 | cut -c1-8) with --verify: $(wc -l < \"$R/restored-1\") files byte-identical to the state1 manifest\" && restic restore latest --target \"$R/restore-2\" --verify > \"$R/restore-2.log\" 2>&1 && (cd \"$R/restore-2/src\" && find . -type f -print0 | sort -z | xargs -0 sha256sum) > \"$R/restored-2\" && cmp \"$R/manifest-2\" \"$R/restored-2\" && ! cmp -s \"$R/restored-1\" \"$R/restored-2\" && echo \"latest (state2) restored with --verify: $(wc -l < \"$R/restored-2\") files byte-identical to the state2 manifest, and different from state1\"",
+      "exit": 0,
+      "duration_s": 2.141,
+      "output_sha256": "c9a81e9a31d7dfce7bd50e72193f3e104a7303b330d61004e9834d7bacbffb82",
+      "output_excerpt": "simulated loss: src/ deleted\nstate1 restored by snapshot id 74b2ca19 with --verify: 54 files byte-identical to the state1 manifest\nlatest (state2) restored with --verify: 54 files byte-identical to the state2 manifest, and different from state1\n"
+    },
+    {
+      "cmd": "R=\"${RR:?}/restic-recovery\"; export RESTIC_REPOSITORY=\"$R/repo\" RESTIC_CACHE_DIR=\"$R/cache\"; python3 -c \"import secrets;print(secrets.token_hex(24))\" > \"$R/wrong-pw\"; RESTIC_PASSWORD_FILE=\"$R/wrong-pw\" restic snapshots > \"$R/wrong.log\" 2>&1; rc=$?; echo \"wrong password: restic snapshots exit=$rc (expected 12): $(grep -o -m1 'wrong password[^.]*' \"$R/wrong.log\")\"; test \"$rc\" -eq 12 && RESTIC_PASSWORD_FILE=\"$R/pw\" restic check --read-data > \"$R/check.log\" 2>&1 && tail -1 \"$R/check.log\"",
+      "exit": 0,
+      "duration_s": 1.2,
+      "output_sha256": "79248f4413ce2a18988b373d455a2b6e04683dcebf273fb1f285b34ca7313e44",
+      "output_excerpt": "wrong password: restic snapshots exit=12 (expected 12): wrong password or no key found\nno errors were found\n"
+    },
+    {
+      "cmd": "rm -rf \"${RR:?}/restic-recovery\" && test ! -e \"${RR:?}/restic-recovery\" && echo \"owned repository, password files, manifests and restores removed\"",
+      "exit": 0,
+      "duration_s": 0.013,
+      "output_sha256": "90347fcd1367e0f68f4504366b904a0909537e708a368c966d7df4dac8d29353",
+      "output_excerpt": "owned repository, password files, manifests and restores removed\n"
+    }
+  ],
+  "tool_versions": {
+    "restic": "0.19.1"
+  },
+  "observed_at_utc": "2026-09-25T15:35:35Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), restic 0.19.1 (the catalog pin) recovered two distinct point-in-time states after a simulated loss in an owned, throwaway repository with run-time random passwords. It backed up a copy of this checkout's adoption/ as state1, changed the copy (one file appended, one removed, one added) and backed it up as state2, deleted the source copy, then restored state1 by snapshot id and the latest snapshot with restore --verify: each restored tree's sorted sha256 manifest equals the manifest taken before its backup, and the two restores differ. Opening the repository with a wrong password failed with restic's exit 12, and check --read-data found no errors. The owned repository is removed; all commands exit 0.",
+  "limitations": [
+    "An owned local repository under $RR, not this host's configured recovery repository (its data and credential were not read or used); no ai-memory or Qdrant application state, remote backend, forget/prune, schedule or large-data behavior. Same-host recovery only.",
+    "The backed-up adoption/ copy is this worktree at recording time. Corruption detection is covered by the separate restic use receipt on main.",
+    "Scratch state lived in an owned directory under this session's scratchpad, referenced as $RR in the commands (the worker exported RR before recording); the last command removes it.",
+    "The same commands were rehearsed once while planning; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:35:35Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

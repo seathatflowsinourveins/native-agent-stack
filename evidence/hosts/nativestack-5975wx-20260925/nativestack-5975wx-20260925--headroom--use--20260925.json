@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--headroom--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "headroom",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v headroom) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && headroom --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" headroom",
+      "exit": 0,
+      "duration_s": 0.271,
+      "output_sha256": "fa85efe2d19613f1e9344d313fc833c40bcf67828d95ab00ff2439ea485ad73f",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/headroom -> ~/.local/share/codex-ecosystem/python-tools/headroom-ai/bin/headroom\nheadroom, version 0.37.0\nstack ['0.37.0'] winner pins ['0.37.0']\n"
+    },
+    {
+      "cmd": "H=$(readlink -f \"$(command -v headroom)\"); W=\"${RR:?}/headroom-use\"; mkdir \"$W\" || exit 2; s0=$(stat -c '%n %Y %s' \"$HOME/.headroom/savings_events.jsonl\" \"$HOME/.headroom/session_stats.jsonl\" \"$HOME/.headroom/ccr_store.db\" 2>/dev/null | tr '\\n' ' '); \"$(dirname \"$H\")/python\" -s -c \"\nimport asyncio,json,os,sys\nfrom mcp import ClientSession,StdioServerParameters\nfrom mcp.client.stdio import stdio_client\nws,hbin=sys.argv[1],sys.argv[2]\nlines=['2026-09-25T10:%02d:%02dZ request=%d status=200 path=/api/items latency_ms=%d' % (i//60,i%60,i,20+i%7) for i in range(600)]\nlines[313]='2026-09-25T10:05:13Z request=313 status=503 path=/api/items latency_ms=30000 CRITICAL upstream timeout nsr-anomaly-7f3a'\ncontent='\\n'.join(lines)\nenv={'HOME':os.environ['HOME'],'PATH':'/usr/bin:/bin','HEADROOM_WORKSPACE_DIR':ws,'HEADROOM_OFFLINE':'1','HEADROOM_TELEMETRY':'off','HEADROOM_BEACON':'off','DO_NOT_TRACK':'1'}\ndef text(r): return ''.join(getattr(x,'text','') for x in r.content)\nasync def main():\n    async with stdio_client(StdioServerParameters(command=hbin,args=['mcp','serve','--proxy-url','http://127.0.0.1:1'],env=env)) as (r,w):\n        async with ClientSession(r,w) as s:\n            await s.initialize()\n            tools=sorted(t.name for t in (await s.list_tools()).tools)\n            c=json.loads(text(await s.call_tool('headroom_compress',{'content':content})))\n            o=json.loads(text(await s.call_tool('headroom_retrieve',{'hash':c['hash']})))\n            b=json.loads(text(await s.call_tool('headroom_retrieve',{'hash':'0123456789abcdef01234567'})))\n            st=json.loads(text(await s.call_tool('headroom_stats',{})))\n            exact=o.get('original_content')==content\n            print('tools',tools,'| compress',c['original_tokens'],'->',c['compressed_tokens'],'tokens',c.get('transforms'),'| retrieve by hash byte-identical:',exact,'| unknown hash:',b.get('error','')[:45],'| stats compressions',st.get('compressions'))\n            return tools==['headroom_compress','headroom_retrieve','headroom_stats'] and c['compressed_tokens']<c['original_tokens'] and exact and 'nsr-anomaly-7f3a' in o['original_content'] and 'Content not found' in b.get('error','') and st.get('compressions')==1\nraise SystemExit(0 if asyncio.run(main()) else 1)\n\" \"$W/workspace\" \"$H\" || exit 1; s1=$(stat -c '%n %Y %s' \"$HOME/.headroom/savings_events.jsonl\" \"$HOME/.headroom/session_stats.jsonl\" \"$HOME/.headroom/ccr_store.db\" 2>/dev/null | tr '\\n' ' '); test \"$s0\" = \"$s1\" && echo \"global ~/.headroom ledger and store files unchanged (state went to the owned workspace: $(ls \"$W/workspace\" | tr '\\n' ' '))\"",
+      "exit": 0,
+      "duration_s": 41.632,
+      "output_sha256": "a5045dbcbb6759c61c04614362b5931782220d1b78522fb65bf43b78511635fd",
+      "output_excerpt": "tools ['headroom_compress', 'headroom_retrieve', 'headroom_stats'] | compress 16820 -> 11429 tokens ['router:search:0.68'] | retrieve by hash byte-identical: True | unknown hash: Content not found. It may have expired or the | stats compressions 1\nglobal ~/.headroom ledger and store files unchanged (state went to the owned workspace: ccr_store.db savings_events.jsonl session_stats.jsonl )\nWARNING:"
+    },
+    {
+      "cmd": "rm -rf \"${RR:?}/headroom-use\" && test ! -e \"${RR:?}/headroom-use\" && echo \"owned headroom workspace removed\"",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "c919980f63ef3aabb214c408a19ac7d8b40af1b6cd399091b036ad63aca5d2d7",
+      "output_excerpt": "owned headroom workspace removed\n"
+    }
+  ],
+  "tool_versions": {
+    "headroom": "0.37.0"
+  },
+  "observed_at_utc": "2026-09-25T15:35:54Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), headroom 0.37.0 (the catalog pin) compressed and exactly restored content through its native MCP server. One MCP stdio session (Python mcp client from headroom's own environment) against headroom mcp serve with an unreachable loopback proxy URL, an owned HEADROOM_WORKSPACE_DIR, HEADROOM_OFFLINE=1 and telemetry off listed exactly headroom_compress, headroom_retrieve and headroom_stats; compressed a 600-line synthetic log to fewer tokens; returned the byte-identical original, including a planted 503 anomaly line, from headroom_retrieve by hash; answered an unknown hash with 'Content not found'; and reported one compression in headroom_stats. The global ~/.headroom ledger and store files kept their size and mtime. All commands exit 0.",
+  "limitations": [
+    "The MCP tool path with local compression only: no proxy, no model-traffic interception, no memory backend and no savings claim; token counts are headroom's own estimates, not provider billing.",
+    "The input is a synthetic log generated inside the command; compression ratio on other content is not measured.",
+    "Scratch state lived in an owned directory under this session's scratchpad, referenced as $RR in the commands (the worker exported RR before recording); the last command removes it.",
+    "The same commands were rehearsed while planning. This receipt changes no platform_status.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:35:54Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

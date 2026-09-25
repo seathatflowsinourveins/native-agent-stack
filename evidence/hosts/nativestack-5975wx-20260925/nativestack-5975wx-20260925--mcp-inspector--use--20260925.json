@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--mcp-inspector--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "19c16315bb383272ad545fd5f9700242f0b28999",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "mcp-inspector",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v mcp-inspector) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && T=\"$HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0\" && python3 -c \"import json,sys;print('installed package',json.load(open(sys.argv[1]))['version'])\" \"$T/lib/node_modules/@modelcontextprotocol/inspector/package.json\" && tar -xzOf \"$T/downloads/modelcontextprotocol-inspector-2.7.0.tgz\" package/package.json | python3 -c \"import json,sys;d=json.load(sys.stdin);print('retained npm pack',d['name'],d['version'])\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" mcp-inspector",
+      "exit": 0,
+      "duration_s": 0.08,
+      "output_sha256": "980d5638ad9d263e551863a5d470fa04ef1bf66d321203cf6b161c1d378ced42",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/mcp-inspector -> ~/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/lib/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js\ninstalled package 2.7.0\nretained npm pack @modelcontextprotocol/inspector 2.7.0\nstack ['2.7.0'] winner pins ['2.7.0']\n"
+    },
+    {
+      "cmd": "headroom --version",
+      "exit": 0,
+      "duration_s": 0.229,
+      "output_sha256": "c7de8da02118d954bbff5cd74e90f8488d0e945455384b057e495e13125330c2",
+      "output_excerpt": "headroom, version 0.37.0\n"
+    },
+    {
+      "cmd": "I=\"${RR:?}/mcp-inspector-use\"; export MCP_CLIENT_CONFIG_PATH=\"$I/client.json\"; mkdir \"$I\" && H=$(readlink -f \"$(command -v headroom)\") && python3 -c \"import json,sys;json.dump({'mcpServers':{'headroom':{'command':sys.argv[1],'args':['mcp','serve','--proxy-url','http://127.0.0.1:1'],'env':{'HEADROOM_WORKSPACE_DIR':sys.argv[2],'HEADROOM_OFFLINE':'1','HEADROOM_TELEMETRY':'off','HEADROOM_BEACON':'off','DO_NOT_TRACK':'1'}}}},open(sys.argv[3],'w'))\" \"$H\" \"$I/headroom-workspace\" \"$I/servers.json\" && mcp-inspector --cli --config \"$I/servers.json\" --server headroom --method tools/list --strict --format json --stored-auth-only > \"$I/list.json\" && python3 -c \"import json,sys;t=json.load(open(sys.argv[1]))['result']['tools'];print('tools/list --strict exit 0:',len(t),'tools',sorted(x['name'] for x in t),'| every tool has an inputSchema:',all('inputSchema' in x for x in t))\" \"$I/list.json\"",
+      "exit": 0,
+      "duration_s": 0.953,
+      "output_sha256": "5a5a94af795e506b529ec5818d5c25d97682c016b371f9cd447f8e2a11f5ac00",
+      "output_excerpt": "tools/list --strict exit 0: 3 tools ['headroom_compress', 'headroom_retrieve', 'headroom_stats'] | every tool has an inputSchema: True\n"
+    },
+    {
+      "cmd": "I=\"${RR:?}/mcp-inspector-strict-control\"; rm -rf \"$I\" && mkdir -p \"$I\" && cat > \"$I/fixture_server.py\" <<'PYEOF'\nimport json\nimport sys\n\n\ndef send(obj):\n    sys.stdout.write(json.dumps(obj) + \"\\n\")\n    sys.stdout.flush()\n\n\nfor line in sys.stdin:\n    line = line.strip()\n    if not line:\n        continue\n    try:\n        msg = json.loads(line)\n    except json.JSONDecodeError:\n        continue\n    method, msg_id = msg.get(\"method\"), msg.get(\"id\")\n    if method == \"initialize\":\n        send({\"jsonrpc\": \"2.0\", \"id\": msg_id, \"result\": {\n            \"protocolVersion\": (msg.get(\"params\") or {}).get(\"protocolVersion\", \"2025-06-18\"),\n            \"capabilities\": {\"tools\": {}},\n            \"serverInfo\": {\"name\": \"nsr-schema-unportable-fixture\", \"version\": \"0.1.0\"},\n        }})\n    elif method == \"tools/list\":\n        send({\"jsonrpc\": \"2.0\", \"id\": msg_id, \"result\": {\"tools\": [{\n            \"name\": \"nsr_bad_schema_tool\",\n            \"description\": \"Owned fixture tool with a bare boolean property schema.\",\n            \"inputSchema\": {\"type\": \"object\", \"properties\": {\"x\": True}},\n        }]}})\n    elif msg_id is not None:\n        send({\"jsonrpc\": \"2.0\", \"id\": msg_id, \"error\": {\"code\": -32601, \"message\": \"method not found\"}})\nPYEOF\npython3 -c \"import json,sys;json.dump({'mcpServers':{'nsrfixture':{'command':'python3','args':[sys.argv[1]]}}},open(sys.argv[2],'w'))\" \"$I/fixture_server.py\" \"$I/servers.json\" && MCP_CLIENT_CONFIG_PATH=\"$I/client.json\" mcp-inspector --cli --config \"$I/servers.json\" --server nsrfixture --method tools/list --strict --format json --stored-auth-only > \"$I/list.json\" 2> \"$I/list.err\"; rc=$?; echo \"owned fixture MCP server with one tool whose inputSchema is type object properties x true (bare boolean property schema): tools/list --strict exit=$rc, expected 6 (schema_unportable)\"; grep -o '\"code\":\"schema_unportable\"[^}]*}' \"$I/list.err\"; rm -rf \"$I\"; test \"$rc\" -eq 6",
+      "exit": 0,
+      "duration_s": 0.293,
+      "output_sha256": "ff0bb26e3f206c53ce7baff2fb59839ea0112647936aa3747fbc478104f934d2",
+      "output_excerpt": "owned fixture MCP server with one tool whose inputSchema is type object properties x true (bare boolean property schema): tools/list --strict exit=6, expected 6 (schema_unportable)\n\"code\":\"schema_unportable\",\"message\":\"1 tool schema portability error found (--strict).\"}\n"
+    },
+    {
+      "cmd": "I=\"${RR:?}/mcp-inspector-use\"; export MCP_CLIENT_CONFIG_PATH=\"$I/client.json\"; python3 -c \"import json;print(json.dumps({'content':'\\n'.join('line %d status=200 ok' % i for i in range(300))+'\\nline 300 status=503 CRITICAL nsr-probe-9c1'}))\" > \"$I/args.json\" && mcp-inspector --cli --config \"$I/servers.json\" --server headroom --method tools/call --tool-name headroom_compress --tool-args-json \"$(cat \"$I/args.json\")\" --format json --stored-auth-only > \"$I/compress.json\" && python3 -c \"import json,sys;r=json.load(open(sys.argv[1]))['result'];t=json.loads(r['content'][0]['text']);open(sys.argv[2],'w').write(t['hash']);print('tools/call headroom_compress: isError',r.get('isError'),'| hash',t['hash'],'| original tokens',t['original_tokens']);raise SystemExit(1 if r.get('isError') else 0)\" \"$I/compress.json\" \"$I/hash\"",
+      "exit": 0,
+      "duration_s": 6.458,
+      "output_sha256": "5715761d7e7215113f764809c6b20c00a6298af5ab9f099cd374b2131d921424",
+      "output_excerpt": "tools/call headroom_compress: isError False | hash c9adf8162b26b950c8fdcb7b | original tokens 2423\nWARNING: Native content detection requires ONNX Runtime 1.24+; using pure-Python detection for this process.\n"
+    },
+    {
+      "cmd": "I=\"${RR:?}/mcp-inspector-use\"; export MCP_CLIENT_CONFIG_PATH=\"$I/client.json\"; h=$(cat \"$I/hash\") && mcp-inspector --cli --config \"$I/servers.json\" --server headroom --method tools/call --tool-name headroom_retrieve --tool-args-json \"{\\\"hash\\\":\\\"$h\\\"}\" --format json --stored-auth-only > \"$I/retrieve.json\" && python3 -c \"import json,sys;a=json.load(open(sys.argv[2]))['content'];r=json.load(open(sys.argv[1]))['result'];t=json.loads(r['content'][0]['text']);ok=t.get('original_content')==a;print('tools/call headroom_retrieve from a new inspector and server process: source',t.get('source'),'| original byte-identical to the compressed input:',ok);raise SystemExit(0 if ok else 1)\" \"$I/retrieve.json\" \"$I/args.json\"",
+      "exit": 0,
+      "duration_s": 0.958,
+      "output_sha256": "ac5134e6b9351d2e2c810453bc39ff28659abdd874fef7442c3f6f0d7f09b1e0",
+      "output_excerpt": "tools/call headroom_retrieve from a new inspector and server process: source local | original byte-identical to the compressed input: True\n"
+    },
+    {
+      "cmd": "I=\"${RR:?}/mcp-inspector-use\"; export MCP_CLIENT_CONFIG_PATH=\"$I/client.json\"; mcp-inspector --cli --config \"$I/servers.json\" --server headroom --method tools/call --tool-name nsr_no_such_tool --tool-args-json '{}' --format json --stored-auth-only > \"$I/bad.json\" 2>&1; rc=$?; echo \"tools/call of an absent tool: exit=$rc (expected non-zero): $(cat \"$I/bad.json\")\"; test \"$rc\" -ne 0 && grep -q tool_not_found \"$I/bad.json\"",
+      "exit": 0,
+      "duration_s": 0.875,
+      "output_sha256": "4b2682e82420bbe446460265a1bc47f999eb8d8afcfd87ca3cf98e8c2f8ccbc3",
+      "output_excerpt": "tools/call of an absent tool: exit=5 (expected non-zero): {\"error\":{\"code\":\"tool_not_found\",\"message\":\"Tool 'nsr_no_such_tool' not found on server.\"}}\n"
+    },
+    {
+      "cmd": "rm -rf \"${RR:?}/mcp-inspector-use\" && test ! -e \"${RR:?}/mcp-inspector-use\" && echo \"owned config, client state and headroom workspace removed\" && if test -e \"$HOME/.mcp-inspector\"; then echo \"note: ~/.mcp-inspector exists\"; else echo \"no ~/.mcp-inspector catalog or storage was created\"; fi",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "39705a048c8cf4eaf1fd95620dbe57f9ff9beacd6c7eb777a340921a0e6f8e19",
+      "output_excerpt": "owned config, client state and headroom workspace removed\nno ~/.mcp-inspector catalog or storage was created\n"
+    }
+  ],
+  "tool_versions": {
+    "mcp-inspector": "2.7.0"
+  },
+  "observed_at_utc": "2026-09-25T16:11:58Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), MCP Inspector 2.7.0 (the catalog pin; installed package.json and the retained npm pack both read 2.7.0) inspected two owned stdio MCP servers with --cli. Against an owned headroom 0.37.0 server (headroom --version retained; session config passed with --config, isolated workspace, offline): tools/list --strict exited 0 with three tools, each with an inputSchema; tools/call headroom_compress returned a hash; a second inspector process (a new server process) called headroom_retrieve with that hash and got the original input back byte-identical; tools/call of an absent tool exited non-zero with error code tool_not_found. Against a second, owned, synthetic fixture server built for this receipt whose one tool declares inputSchema {\"type\":\"object\",\"properties\":{\"x\":true}} (a bare boolean property schema): tools/list --strict exited 6 with error code schema_unportable, the deliberate-fault negative control for the --strict pass above, run immediately next to it. Every retained receipt command exits 0 (the fixture command's own assertion is that mcp-inspector's exit was 6, not that the command itself failed).",
+  "limitations": [
+    "Two local stdio servers: an owned headroom 0.37.0 server (three tools; no HTTP/SSE transport, OAuth, resources, prompts or skills methods were exercised) and a second owned, synthetic fixture server built only for this receipt with exactly one tool and a deliberately invalid inputSchema, used only as the --strict schema-portability negative control; --strict reports schema portability only for the tools these two servers declare.",
+    "The target servers are owned instances with their own workspace; no live service or session-loaded MCP server was contacted.",
+    "Scratch state (headroom's session config/workspace and the fixture server's owned directory) lived under this session's scratchpad, referenced as $RR in the commands (the worker exported RR before recording); each owned directory is removed by its own command, the fixture's immediately after its run and headroom's at the end.",
+    "The same commands were rehearsed while planning. This receipt changes no platform_status.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:11:58Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}
