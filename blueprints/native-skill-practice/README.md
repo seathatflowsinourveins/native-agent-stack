@@ -9,19 +9,47 @@ review, installation, returned native results and remaining limits.
 
 ## Install only the selected skills
 
-Use the upstream `skills` installer for both clients; do not additionally install
-the TypeSafe marketplace plugin for the same skill:
+[`adoption/skills/manifest.json`](../../adoption/skills/manifest.json) is the single source of
+truth for which skills are installed, at which upstream revision, and at which listing state
+(`kept`/`trial`, `claude_listing`, `codex_enabled`); its
+[2026-09-25 trial record](../../docs/decisions/2026-09-25-skills-trial-and-usage.md) is the
+decision record. Two scripts read that manifest instead of a hand-run upstream installer:
+
+```sh
+python3 tools/adoption/install_skills.py --check   # dry run: prints what would change, changes nothing
+python3 tools/adoption/install_skills.py --write   # installs/updates every manifest entry at its pinned ref
+python3 scripts/skills_status.py                   # per-skill installed ref, listing state and lock currency
+claude -p "/skill-doctor" --output-format json      # native per-skill use count and last-used time, 0 tokens
+```
+
+`install_skills.py` installs the pinned `skills` CLI (the manifest's `cli.version`) into an
+isolated npm prefix (`cli.install`), never a global or bare `npx` install, and runs every
+invocation with `DISABLE_TELEMETRY=1` so neither the telemetry event nor the add-time audit call
+fires. It installs each skill at the manifest's exact 40-hex `ref`, for both Claude and Codex in
+one command (`skills add <tree URL> --skill <name> -g -y -a claude-code codex`), and checks the
+manifest's `tree_sha`/`skill_md_sha256` against the installed copy rather than trusting the
+installer's own exit code. Do not additionally install the TypeSafe marketplace plugin for the
+same skill, and do not run the bare upstream `skills` CLI by hand against manifest entries: that
+installs outside the pinned prefix and without the telemetry guard. Preserve existing skills,
+native sign-in and configuration. The recorded source commits and file hashes in the manifest
+identify the reviewed versions; a later installer result requires a fresh source comparison.
+Installer risk badges (skills.sh's Gen Agent Trust Hub, Socket, Snyk) are not native acceptance
+or a security certification.
+
+### Historical: the pre-manifest three-skill install (superseded 2026-09-25)
+
+Before the manifest and its two scripts existed, the three then-selected skills were installed
+by hand with the bare upstream installer, with no pinned CLI version and no telemetry guard:
 
 ```sh
 npx skills add typesafe-ai/skills --skill typesafe-ai --agent codex claude-code --global
 npx skills add openai/skills --skill gh-fix-ci security-best-practices --agent codex claude-code --global
 ```
 
-For a project-owned copy, omit `--global` and use `--copy`. Preserve existing
-skills, native sign-in and configuration. The recorded source commits and file
-hashes in the manifest identify the reviewed versions; a later installer result
-requires a fresh source comparison. Installer risk badges are not native
-acceptance or a security certification.
+For a project-owned copy instead of a global one, that installer took `--copy` in place of
+`--global`. These three skills are unchanged `kept` winners in the current manifest, so a host
+that already ran these two commands does not need to re-run them; a new host uses
+`install_skills.py` instead, which also covers the manifest's other 23 skills.
 
 Use the [Claude role](../../examples/claude-native/agents/semantic-evidence-reviewer.md)
 or [Codex role](../../examples/codex-native/agents/semantic-evidence-reviewer.toml)

@@ -85,11 +85,31 @@ workflow size guideline. Keep project-specific tests, memory scope and domain po
 that project's `CLAUDE.md`/`AGENTS.md`. Do not preload this catalog or duplicate
 the installed tool inventory in every worker.
 
-ECC's requested `everything-claude-code` URL resolves to `affaan-m/ECC`. Select
-only `skills/search-first` and `skills/iterative-retrieval` at revision
-`2b6e839771e53096d8451a213d40dc64ec8acac0`. They were already installed in the
-starter project; this adoption makes them available to other projects too.
-Use the official Codex skill-installer when present:
+ECC's requested `everything-claude-code` URL resolves to `affaan-m/ECC`. The two selected
+skills, `skills/search-first` and `skills/iterative-retrieval`, install at the same reviewed
+revision as before, `2b6e839771e53096d8451a213d40dc64ec8acac0`, but now through the pinned
+`skills` CLI declared in [`adoption/skills/manifest.json`](../adoption/skills/manifest.json)
+(see [the 2026-09-25 trial record](../docs/decisions/2026-09-25-skills-trial-and-usage.md)),
+not the superseded Codex-only installer route below:
+
+```sh
+python3 tools/adoption/install_skills.py --write   # installs every manifest entry, including both ECC skills
+python3 scripts/skills_status.py                   # confirms both are installed at 2b6e839...
+```
+
+This puts both skills in the global lock (`~/.agents/.skill-lock.json`, or
+`$XDG_STATE_HOME/skills/.skill-lock.json` when that variable is set), with the canonical copy at
+`~/.agents/skills/search-first/` and `~/.agents/skills/iterative-retrieval/`. Claude gets a
+**relative** symlink, `~/.claude/skills/<name> -> ../../.agents/skills/<name>`, created
+automatically; Codex reads `~/.agents/skills` directly with no separate link, and neither client
+needs a manual linking step any more. Compare the lock's `skillFolderHash` for each skill against
+the manifest's `tree_sha`; a mismatch means a later, uncompared install moved the copy off the
+reviewed revision.
+
+### Superseded history: the Codex-only installer route (pre-2026-09-25)
+
+Before the pinned `skills` CLI, Codex's own installer script populated a shared skills
+directory, and Claude's copy had to be linked to it by hand:
 
 ```sh
 python3 /absolute/codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
@@ -98,14 +118,13 @@ python3 /absolute/codex/skills/.system/skill-installer/scripts/install-skill-fro
   --dest "$HOME/.agents/skills"
 ```
 
-Resolve the installer's actual path; it refuses an existing destination. Preserve
-project customizations instead of replacing them. Claude's official
-[skill directory](https://code.claude.com/docs/en/skills) is `~/.claude/skills`.
-On Linux/WSL, link each missing Claude skill directory to the installed shared
-directory, or install directly there if Codex sharing is not needed. Check an
-existing destination before creating a link. Compare the installed files with
-the recorded source hashes in the candidate review. Claude loads the skill body
-when it is invoked; available skill names/descriptions still have context cost.
+Resolving the installer's actual path was required, since it refused an existing destination and
+would not preserve project customizations by overwriting them. Claude's official
+[skill directory](https://code.claude.com/docs/en/skills) is `~/.claude/skills`; on Linux/WSL,
+the missing Claude skill directory then had to be linked to the installed shared directory by
+hand, checking for an existing destination first, and the installed files compared against the
+recorded source hashes in the candidate review. Claude still loads the skill body only when
+invoked; available skill names/descriptions still have context cost either way.
 
 Do not install the full ECC hooks/rules/plugin collection over the existing
 RTK, Context Mode and ai-memory lifecycle handlers. The selected reference
