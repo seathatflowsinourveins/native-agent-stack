@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--socraticode--use--20260925-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "720e294b5c10211d8f75a939bc478af734279d74",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "socraticode",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" && echo \"mcporter $(mcporter --version)\" && mcporter --config \"$C\" list socraticode --json --no-oauth | python3 -c 'import glob,json,os,sys;d=json.load(sys.stdin);t=d[\"transport\"];e=[x for x in t.split() if x.endswith(\"/dist/index.js\")][0];v=json.load(open(os.path.join(os.path.dirname(os.path.dirname(e)),\"package.json\")))[\"version\"];s=[x[\"version\"] for x in json.load(open(\"manifests/stack.json\"))[\"components\"] if x[\"id\"]==\"socraticode\"];w=sorted({y[\"pin\"] for f in glob.glob(\"catalogs/landscape/*.json\") for l in json.load(open(f)).get(\"layers\",[]) for y in (l.get(\"winners\") or []) if y.get(\"component_id\")==\"socraticode\"});print(\"server\",d[\"name\"],\"status\",d[\"status\"]);print(\"transport\",t);print(\"package.json beside that entry point:\",v,\"| stack\",s,\"| winner pins\",w);sys.exit(0 if d[\"status\"]==\"ok\" and v in w else 1)'",
+      "exit": 0,
+      "duration_s": 0.458,
+      "output_sha256": "69d843774c782d1fe1f4945e6aaa2f30861d83cd5e71015b8332f8a48ec2e165",
+      "output_excerpt": "mcporter 0.13.13\nserver socraticode status ok\ntransport STDIO ~/.local/share/codex-ecosystem/bin/node ~/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js\npackage.json beside that entry point: 1.14.0 | stack ['1.14.0'] | winner pins ['1.14.0']\n"
+    },
+    {
+      "cmd": "C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" && h=$(mcporter --config \"$C\" call socraticode.codebase_health --args '{}' --output text --no-oauth) && s=$(mcporter --config \"$C\" call socraticode.codebase_status --args \"{\\\"projectPath\\\":\\\"$HOME/code/native-agent-stack-live\\\"}\" --output text --no-oauth) && printf '%s\\n' \"$h\" | grep '^\\[' && printf '%s\\n' \"$s\" | grep -E '^(Project|Collection|Status|Indexed chunks):' && curl -sS --max-time 10 http://127.0.0.1:18231/v1/models | python3 -c 'import json,sys;print(\"embedding endpoint:\",\", \".join(m[\"id\"]+\" owned_by \"+m[\"owned_by\"] for m in json.load(sys.stdin)[\"data\"]))' && test \"$(printf '%s\\n' \"$h\" | grep -c '^\\[OK\\]')\" -ge 3 && ! printf '%s\\n' \"$h\" | grep '^\\[' | grep -vq '^\\[OK\\]' && printf '%s\\n' \"$s\" | grep -q '^Status: green$'",
+      "exit": 0,
+      "duration_s": 0.728,
+      "output_sha256": "4e5653f7e6bbce3871630538b0a304b504249329b0f9303d01fc1f1576b53547",
+      "output_excerpt": "[OK] External Qdrant (http://127.0.0.1:26333): Reachable\n[OK] LM Studio: Reachable at http://127.0.0.1:18231/v1\n[OK] Embedding model (nvidia/Nemotron-3-Embed-1B-BF16): Loaded\nProject: ~/code/native-agent-stack-live\nCollection: codebase_9c518b2ee5c8\nStatus: green\nIndexed chunks: 67217\nembedding endpoint: nvidia/Nemotron-3-Embed-1B-BF16 owned_by vllm\n"
+    },
+    {
+      "cmd": "C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" && mcporter --config \"$C\" call socraticode.codebase_search --args \"{\\\"projectPath\\\":\\\"$HOME/code/native-agent-stack-live\\\",\\\"query\\\":\\\"where is the trading gate ladder checked and which gates can flip\\\",\\\"limit\\\":8}\" --output text --no-oauth | python3 -c 'import re,sys;h=re.findall(r\"^--- (\\S+) \\(lines (\\d+-\\d+)\\) \\[\\w+\\] score: ([0-9.]+) ---$\",sys.stdin.read(),re.M);want=[\"catalogs/us-equities/gates-20260922.json\",\"scripts/trading_gates.py\"];r={w:next((i+1 for i,x in enumerate(h) if x[0]==w),None) for w in want};print(len(h),\"results; oracle ranks\",r);[print(i+1,x[0]+\":\"+x[1],x[2]) for i,x in enumerate(h[:5])];sys.exit(0 if len(h)>0 and all(r.values()) else 1)'",
+      "exit": 0,
+      "duration_s": 0.47,
+      "output_sha256": "d32e4dd25269b505546145f0b85dea2a9c7f170a196da6fe3dfad214d2747c4e",
+      "output_excerpt": "8 results; oracle ranks {'catalogs/us-equities/gates-20260922.json': 1, 'scripts/trading_gates.py': 2}\n1 catalogs/us-equities/gates-20260922.json:1-31 0.6250\n2 scripts/trading_gates.py:1-38 0.6250\n3 docs/grand-catalog-handbook.md:332-361 0.5333\n4 tests/test_trading_gates.py:488-529 0.5000\n5 scripts/trading_gates.py:270-310 0.3333\n"
+    },
+    {
+      "cmd": "C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" && mcporter --config \"$C\" call socraticode.codebase_search --args \"{\\\"projectPath\\\":\\\"$HOME/code/native-agent-stack-live\\\",\\\"query\\\":\\\"Grafana anonymous viewer access on loopback\\\",\\\"limit\\\":8}\" --output text --no-oauth | python3 -c 'import re,sys;h=re.findall(r\"^--- (\\S+) \\(lines (\\d+-\\d+)\\) \\[\\w+\\] score: ([0-9.]+) ---$\",sys.stdin.read(),re.M);want=[\"catalogs/us-equities/gates-20260922.json\",\"scripts/trading_gates.py\"];r={w:next((i+1 for i,x in enumerate(h) if x[0]==w),None) for w in want};print(\"control (unrelated query):\",len(h),\"results; oracle ranks\",r,\"(both must be absent)\");[print(i+1,x[0]+\":\"+x[1],x[2]) for i,x in enumerate(h[:3])];sys.exit(0 if len(h)>0 and not any(r.values()) else 1)'",
+      "exit": 0,
+      "duration_s": 0.366,
+      "output_sha256": "c6d9434cda5a1d69363efed1b98810368ee0a5cd44c8c9e5735be0edd4a16233",
+      "output_excerpt": "control (unrelated query): 8 results; oracle ranks {'catalogs/us-equities/gates-20260922.json': None, 'scripts/trading_gates.py': None} (both must be absent)\n1 observability/grand-dashboard/passwordless.md:1-46 0.8333\n2 observability/grand-dashboard/passwordless.json:67-97 0.7500\n3 observability/grand-dashboard/passwordless.json:1-66 0.4583\n"
+    }
+  ],
+  "tool_versions": {
+    "socraticode": "1.14.0"
+  },
+  "observed_at_utc": "2026-09-25T14:40:04Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5), SocratiCode 1.14.0 (the semantic-rag winner pin: mcporter 0.13.13 lists this host's configured stdio server as ok, and the package.json beside the entry point it launches reads 1.14.0, which the first command checks against the winner pin) answered a conceptual code question from a scoped local index through the stack's native CLI bridge. Its health check reported the external Qdrant reachable and the embedding model nvidia/Nemotron-3-Embed-1B-BF16 loaded, served by this host's vLLM endpoint (owned_by vllm); its status for a separate clone of this repository (~/code/native-agent-stack-live) reported collection codebase_9c518b2ee5c8 green, with its chunk count in the output. codebase_search for 'where is the trading gate ladder checked and which gates can flip' returned both gate-ladder sources, scripts/trading_gates.py and catalogs/us-equities/gates-20260922.json, among its eight results; the same check on an unrelated control query (Grafana anonymous viewer access) found neither file, as required. Each command exits 0 only when its check holds; all commands exit 0.",
+  "limitations": [
+    "Supersedes nativestack-5975wx-20260925--socraticode--use--20260925, recorded minutes earlier in this session with the same health, status, search and control commands, which all passed. Its claim called the indexed clone read-only, which none of its commands established (they only read from the clone); this generation drops that wording and makes the first command assert that the launched package's version equals the winner pin.",
+    "One real conceptual question with a fixed two-file oracle plus one unrelated control query: useful retrieval on this question, not a recall benchmark. The question uses this repository's own terms (gate ladder, flip). Before recording, three paraphrases without the words gate or ladder returned neither oracle file in their top eight (one returned docs/grand-catalog-handbook.md lines 332-361, which describes the ladder), and the two oracle files, tied at score 0.6250, swapped ranks 1 and 2 between runs.",
+    "The index already existed on this host and is kept by other processes; this receipt did not index, update, watch, prune or remove anything, so the requirement's recoverable-state part (update, removal, recovery after a restart) and the code-graph tools were not exercised. The chunk count changed between rehearsal runs (67,208 and 67,217), consistent with the index following the clone.",
+    "The client is mcporter with this host's mcporter configuration, which is machine-specific client configuration and is not reproduced here; the commands print only the configured server's name, status and stdio command line. No native Claude or Codex MCP call is part of this receipt.",
+    "SocratiCode's health check names its embedding provider LM Studio; the endpoint it reaches, 127.0.0.1:18231, answers /v1/models with the model owned_by vllm, that is, this host's vLLM server. Qdrant and vLLM have their own use receipts for this host; this receipt does not requalify them.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main 720e294b (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T14:40:04Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--socraticode--use--20260925"
+}

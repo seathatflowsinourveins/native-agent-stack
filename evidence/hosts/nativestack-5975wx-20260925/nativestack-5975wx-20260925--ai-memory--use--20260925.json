@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--ai-memory--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "720e294b5c10211d8f75a939bc478af734279d74",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "ai-memory",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v ai-memory) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && ai-memory status --json 2>/dev/null | python3 -c 'import json,sys;d=json.load(sys.stdin);c=d[\"counts\"];x=d[\"derived\"];e=d[\"providers\"][\"embedding\"];print(\"host memory service, read-only status: version\",d[\"version\"],\"| pages_latest\",c[\"pages_latest\"],\"| page and observation FTS rows match\",x[\"pages_fts_rows\"]==x[\"pages_rows\"] and x[\"observations_fts_rows\"]==x[\"observations_rows\"],\"| embedding\",e[\"status\"],e[\"provider\"],e[\"model\"])' && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" ai-memory",
+      "exit": 0,
+      "duration_s": 0.066,
+      "output_sha256": "420378f274f45b5918f3e51c84868ad83c13a4387dca7ebd2a3139419c6a86b6",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/ai-memory -> ~/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory\nhost memory service, read-only status: version 2.3.2 | pages_latest 24 | page and observation FTS rows match True | embedding ok local all-MiniLM-L6-v2\nstack ['2.3.2'] winner pins ['2.3.2']\n"
+    },
+    {
+      "cmd": "mkdir /tmp/nsr-aimem && ai-memory init --data-dir /tmp/nsr-aimem/data >/tmp/nsr-aimem/init.log 2>&1 && python3 -c 'import socket;s=socket.socket();s.bind((\"127.0.0.1\",0));print(s.getsockname()[1])' >/tmp/nsr-aimem/port && P=$(cat /tmp/nsr-aimem/port) && { AI_MEMORY_EMBEDDING_PROVIDER=none ai-memory serve --data-dir /tmp/nsr-aimem/data --transport http --bind \"127.0.0.1:$P\" --no-watcher >/tmp/nsr-aimem/serve.log 2>&1 & echo $! >/tmp/nsr-aimem/pid; } && i=0 && until AI_MEMORY_SERVER_URL=\"http://127.0.0.1:$P\" ai-memory status --data-dir /tmp/nsr-aimem/data --json >/tmp/nsr-aimem/status0.json 2>/dev/null; do i=$((i+1)); if [ \"$i\" -ge 60 ]; then break; fi; sleep 0.5; done; python3 -c 'import json,sys;d=json.load(open(\"/tmp/nsr-aimem/status0.json\"));e=d[\"providers\"][\"embedding\"];print(\"scratch server answered status: version\",d[\"version\"],\"| data_dir\",d[\"data_dir\"],\"| embedding\",e[\"status\"],e[\"provider\"],\"| counts\",d[\"counts\"]);sys.exit(0 if d[\"data_dir\"]==\"/tmp/nsr-aimem/data\" and d[\"counts\"][\"pages_latest\"]==0 else 1)'",
+      "exit": 0,
+      "duration_s": 0.602,
+      "output_sha256": "8447e455291c77c204ef1a54042dd80a162c2a4e1dc7f3b0964ae1c064166035",
+      "output_excerpt": "scratch server answered status: version 2.3.2 | data_dir /tmp/nsr-aimem/data | embedding disabled None | counts {'pages_latest': 0, 'pages_all': 0, 'sessions': 0, 'observations': 0}\n"
+    },
+    {
+      "cmd": "P=$(cat /tmp/nsr-aimem/port) && export AI_MEMORY_SERVER_URL=\"http://127.0.0.1:$P\" && S=\"--data-dir /tmp/nsr-aimem/data --workspace nsr-probe --project nsr-probe\" && N=nsrprobe$(python3 -c 'import secrets;print(secrets.token_hex(6))') && echo \"$N\" >/tmp/nsr-aimem/nonce && ai-memory write-page $S --path notes/nsr-probe.md --title 'NSR probe' --kind fact --body \"Disposable host-receipt probe page; token $N.\" >/tmp/nsr-aimem/write.log 2>&1 && ai-memory search $S --json \"$N\" >/tmp/nsr-aimem/hit.json 2>/dev/null && ai-memory search $S --json nsrneverwritten0 >/tmp/nsr-aimem/miss.json 2>/dev/null && ai-memory read-page $S --path notes/nsr-probe.md >/tmp/nsr-aimem/read.txt 2>/dev/null && ai-memory status --data-dir /tmp/nsr-aimem/data --json >/tmp/nsr-aimem/status1.json 2>/dev/null && python3 -c 'import json,os,sys;n=open(\"/tmp/nsr-aimem/nonce\").read().strip();h=json.load(open(\"/tmp/nsr-aimem/hit.json\"));m=json.load(open(\"/tmp/nsr-aimem/miss.json\"));b=n in open(\"/tmp/nsr-aimem/read.txt\").read();c=json.load(open(\"/tmp/nsr-aimem/status1.json\"))[\"counts\"][\"pages_latest\"];f=sum(1 for r,ds,fs in os.walk(\"/tmp/nsr-aimem/data/wiki\") if \".git\" not in r for x in fs if x==\"nsr-probe.md\");print(\"write-page ok | search(token):\",len(h),\"hit(s)\",[x[\"path\"] for x in h],\"| search(never-written token):\",len(m),\"hits | read-page body has token:\",b,\"| pages_latest\",c,\"| probe files in scratch wiki\",f);sys.exit(0 if len(h)==1 and h[0][\"path\"]==\"notes/nsr-probe.md\" and len(m)==0 and b and c==1 and f==1 else 1)'",
+      "exit": 0,
+      "duration_s": 0.18,
+      "output_sha256": "54613842a8e225602dab136fd10b411f06a05524eb5f9b79534d1c3f860d41a2",
+      "output_excerpt": "write-page ok | search(token): 1 hit(s) ['notes/nsr-probe.md'] | search(never-written token): 0 hits | read-page body has token: True | pages_latest 1 | probe files in scratch wiki 1\n"
+    },
+    {
+      "cmd": "P=$(cat /tmp/nsr-aimem/port) && export AI_MEMORY_SERVER_URL=\"http://127.0.0.1:$P\" && S=\"--data-dir /tmp/nsr-aimem/data --workspace nsr-probe --project nsr-probe\" && N=$(cat /tmp/nsr-aimem/nonce) && ai-memory delete-page $S --path notes/nsr-probe.md >/tmp/nsr-aimem/delete.log 2>&1; d=$?; ai-memory search $S --json \"$N\" >/tmp/nsr-aimem/hit2.json 2>/dev/null; ai-memory read-page $S --path notes/nsr-probe.md >/dev/null 2>&1; r=$?; ai-memory status --data-dir /tmp/nsr-aimem/data --json >/tmp/nsr-aimem/status2.json 2>/dev/null; python3 -c 'import json,os,sys;d,r=int(sys.argv[1]),int(sys.argv[2]);h=json.load(open(\"/tmp/nsr-aimem/hit2.json\"));c=json.load(open(\"/tmp/nsr-aimem/status2.json\"))[\"counts\"][\"pages_latest\"];f=sum(1 for q,ds,fs in os.walk(\"/tmp/nsr-aimem/data/wiki\") if \".git\" not in q for x in fs if x==\"nsr-probe.md\");print(\"delete-page exit\",d,\"| same search(token) after delete:\",len(h),\"hits | read-page exit after delete:\",r,\"(non-zero expected) | pages_latest\",c,\"| probe files in scratch wiki\",f);sys.exit(0 if d==0 and len(h)==0 and r!=0 and c==0 and f==0 else 1)' \"$d\" \"$r\"",
+      "exit": 0,
+      "duration_s": 0.117,
+      "output_sha256": "7a6aac71cd5f364aec07efa32126b150260c74e02f79708eeccbf401dfe42754",
+      "output_excerpt": "delete-page exit 0 | same search(token) after delete: 0 hits | read-page exit after delete: 1 (non-zero expected) | pages_latest 0 | probe files in scratch wiki 0\n"
+    },
+    {
+      "cmd": "pid=$(cat /tmp/nsr-aimem/pid); kill \"$pid\"; i=0; while kill -0 \"$pid\" 2>/dev/null && [ \"$i\" -lt 50 ]; do i=$((i+1)); sleep 0.2; done; if kill -0 \"$pid\" 2>/dev/null; then echo \"scratch server still running\"; exit 1; fi; echo \"scratch server stopped\"; rm -rf /tmp/nsr-aimem && test ! -e /tmp/nsr-aimem && echo \"scratch data dir removed\"",
+      "exit": 0,
+      "duration_s": 0.207,
+      "output_sha256": "0f161a19ed90fb1001e008b1f18a099bbc7e40b528d00ce83e52fb91f7ca5cb3",
+      "output_excerpt": "scratch server stopped\nscratch data dir removed\n"
+    }
+  ],
+  "tool_versions": {
+    "ai-memory": "2.3.2"
+  },
+  "observed_at_utc": "2026-09-25T14:37:15Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5), ai-memory 2.3.2 (the durable-memory winner pin; the binary resolves to this host's 2.3.2 install) stored, found, read back and deleted a scoped page in a disposable store, and the host's running memory service answered a read-only status. The host service reported version 2.3.2 with its page and observation FTS row counts matching their tables; only counts and flags were printed. A scratch ai-memory server started on a fresh data directory under /tmp on a free loopback port with embeddings disabled, and its status reported that directory and zero pages. Through it, write-page stored notes/nsr-probe.md in workspace and project nsr-probe with a random token; a search for the token returned exactly that page, a never-written token returned no hits, read-page returned a body containing the token, and the page file appeared in the scratch wiki. delete-page then removed it: the same search returned no hits, read-page failed, pages_latest returned to 0 and the file was gone. The scratch server was stopped and its directory removed. Each command exits 0 only when its checks hold; all commands exit 0.",
+  "limitations": [
+    "Isolation: on this host AI_MEMORY_SERVER_URL points the ai-memory CLI at the host's service, so --data-dir alone does not isolate a probe (during preparation, status with only --data-dir reported the host service's store). Every probe command therefore sets AI_MEMORY_SERVER_URL to the scratch server and --data-dir to its directory, and the scratch status reports that directory. Of this receipt's commands only the first reaches the host's service, with a read-only status call; no page, session or observation content was printed.",
+    "Scope: FTS5 search on a scratch store with embeddings disabled (AI_MEMORY_EMBEDDING_PROVIDER=none). Hybrid retrieval with the host service's all-MiniLM-L6-v2 embeddings, the MCP tools, native Claude and Codex lifecycle capture, consolidation, handoffs, backup, restore and recovery were not exercised. The host service's counts are reported, not asserted, and change as sessions are captured.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main 720e294b (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T14:37:15Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}
