@@ -136,7 +136,7 @@ uv run --no-project --python 3.13 python scripts/adoption_status.py --profile to
 The manifest supports Python 3.13 only. A `python3` of another version (Ubuntu
 24.04's is 3.12) still prints the report but keeps the top-level `status` at
 `prerequisites_missing` with exit 2, and one older than 3.11 cannot parse the Codex
-TOML. This check changed after `v2026.09.24.1`: that release's `adoption_status.py`
+TOML. This check changed after `v2026.09.25.1`: that release's `adoption_status.py`
 has no `--client-wiring` and its manifest has no `token-efficiency` profile, so run it
 from a default-branch clone until the next release. The command runs none of the
 selected tools. It parses the client files named below whole and in-process, emits no
