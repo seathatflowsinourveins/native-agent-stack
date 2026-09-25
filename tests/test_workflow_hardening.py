@@ -12,11 +12,12 @@ a full commit SHA.
 from datetime import date
 from pathlib import Path
 import hashlib
-import os
 import re
 import subprocess
 import tempfile
 import unittest
+
+import tests
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github/workflows"
@@ -511,7 +512,8 @@ class VerdictReviewGateTests(unittest.TestCase):
         stub = scratch / "bin" / "python3"
         stub.write_text('#!/bin/sh\necho "gate-invoked $*"\n')
         stub.chmod(0o755)
-        environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+        # Drops inherited GIT_* but keeps the package's hermetic config (no global hooks or auto maintenance).
+        environment = tests.hermetic_git_environment()
         environment.update(PATH=f"{scratch / 'bin'}:{environment['PATH']}", EVENT_NAME=event,
                            PR_BASE_SHA=self.commits["base"], PR_HEAD_SHA=pr_head, PUSH_BEFORE_SHA="",
                            PR_BASE_REF=base_ref,
