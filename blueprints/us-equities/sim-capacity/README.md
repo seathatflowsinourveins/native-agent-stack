@@ -54,9 +54,11 @@ Trade ticks are still fetched, normalized and written to the private
 queue position against real trade prints would matter; they are simply never
 replayed into *this* engine. Measured after the fix: **0 of 26,145** (elite)
 and **0 of 5,255** (paper) exerciser fills beat the NBBO touch in force at
-fill time (`fill_vs_nbbo_touch.violation_count`, asserted by `cmd_run`, and
-independently re-verified with the reviewer's own harness). See
-"Quotes-only vs with-trades" below for the side-by-side comparison.
+fill time (`fill_vs_nbbo_touch.violation_count`, asserted by `cmd_run`). The
+builder additionally ran the independent reviewer's own harness (`analyze.py`)
+against this code as a cross-check before commit; the reviewer separately
+verifies independently. See "Quotes-only vs with-trades" below for the
+side-by-side comparison.
 
 **`queue_position` and `trade_execution` have no measured effect in this
 setup.** With trade ticks excluded and every order an all-or-nothing IOC,
@@ -179,12 +181,14 @@ not currently do so, and does not claim to.
   effective 2026-04-04) and FINRA TAF ($0.000195/share, capped at $9.79/trade,
   in force through 2026-09-30 -- covers the session date).
 - **Elite Smart Router commission** (elite-tier profile only, both sides):
-  the `all_in` plan by default, $0.0040/share (<=200,000 monthly shares
-  tier). The `cost_plus` plan ($0.0025/share at the same tier) is also
+  the `all_in` plan by default, a flat $0.0040/share at every monthly-volume
+  tier (Alpaca's fee schedule lists one all-in rate across all five listed
+  volume rows; only the `cost_plus` rate is actually tiered). The `cost_plus`
+  plan ($0.0025/share at this lane's -- lowest -- volume tier) is also
   implemented but not the default, since it additionally passes through
   actual per-venue exchange fees/rebates that this model does not have data
-  for (**partial/UNVERIFIED**). paper-parity always uses `commission_plan="none"`
-  (retail routing: $0 commission, CAT/SEC/TAF only).
+  for (**partial**, not modeled). paper-parity always uses
+  `commission_plan="none"` (retail routing: $0 commission, CAT/SEC/TAF only).
 
 Sources:
 
@@ -197,26 +201,37 @@ Sources:
   (`https://files.alpaca.markets/disclosures/library/BrokFeeSched.pdf`),
   "Revised on September 17, 2026", retrieved 2026-09-25, sha256
   `7bc75e3cd86f5c1950f8ce1292049965280340a3cebe727ca7aee4a7d2d71b12`.
+- **TAF cap scope is settled**: per **execution**, not per order (FINRA TAF
+  FAQ [A200.17](https://www.finra.org/rules-guidance/guidance/faqs/trading-activity-fee):
+  "each street-side execution represents a separate sale" -- its own example
+  bills ten 100,000-share executions of one order as ten separately capped
+  sales; Alpaca's schedule's "per trade" wording is consistent with this
+  reading). This model already applies the cap per fill, which is the
+  settled, sourced behavior.
 
-**UNVERIFIED**: whether the FINRA TAF cap applies per order or per execution
-(fill); this model applies it per fill. **Partial**: the `cost_plus`
-commission plan excludes its exchange-fee/rebate pass-through component.
+**Partial**: the `cost_plus` commission plan excludes its exchange-fee/rebate
+pass-through component (not modeled).
 
 **Rounding.** Alpaca aggregates each fee type per day, per account, and
 rounds the day's total **up** to the cent. This model instead rounds each
-fill's total fee **half-up**. The difference is small at this run's scale
-(well under a dollar across a 30-minute run) and is reported in the receipt's
-`fee_model.rounding_note`, not hidden.
+fill's total fee **half-up**. `runner.alpaca_rounding_delta` recomputes both
+totals directly from a run's actual fills and reports the measured
+difference in that run's receipt (`runs[].fee_rounding`) -- not a fixed
+dollar claim here, since it depends on the run's actual fill counts/sizes.
+Measured on the current committed receipts: elite-tier model total is
+$4.19 lower than Alpaca's aggregate-then-round-up method; paper-parity is
+$0.88 lower.
 
 ## Latency -- a primary reference point, not a calibration
 
 `PRIMARY_LATENCY_MS = 70` is **not calibrated**. It is a primary-reference
-point chosen because it sits inside the retained sim-to-paper receipt's
-observed paper submit-to-fill range (0.65-1.09s) and near that receipt's own
-latency-sensitivity flip point (~69.2ms) -- and that receipt explicitly says
-of its own sweep, "Sensitivity check, not a calibration"
-(`sim-paper-compare/receipts/20260923g-main-passed.json`). This lane inherits
-that caveat rather than upgrading it to "calibrated."
+point chosen near the retained sim-to-paper receipt's own latency-sensitivity
+flip point (~69.2ms) -- it sits **far below** that receipt's observed paper
+submit-to-fill range (0.65-1.09s), not inside it. Of this lane's own
+0/70/250/1000ms sweep points, 1000ms is the closest to that observed range.
+That receipt explicitly says of its own sweep, "Sensitivity check, not a
+calibration" (`sim-paper-compare/receipts/20260923g-main-passed.json`). This
+lane inherits that caveat rather than upgrading it to "calibrated."
 
 On the pinned rc5 engine, a deferred (latency-delayed) order is released at
 the first of: (a) the next quote tick on its own instrument, or (b) **any**

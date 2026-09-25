@@ -312,19 +312,23 @@
     "finra_cat_usd_per_share": "0.000003 (buys and sells)",
     "finra_taf_cap_usd_per_trade": "9.79",
     "finra_taf_usd_per_share": "0.000195",
-    "rounding_note": "Alpaca aggregates each fee type per day, per account, and rounds the day's total UP to the cent. This model instead rounds each fill's total fee half-up. The difference is small at this run's scale (well under a dollar across a 30-minute run) and is reported, not hidden.",
+    "partial": [
+      "The cost_plus commission plan's exchange-fee/rebate pass-through component is not modeled."
+    ],
+    "rounding_method_note": "Alpaca aggregates each fee type per day, per account, and rounds the day's total UP to the cent; this model instead rounds each fill's total fee half-up. See each run's fee_rounding for the measured difference on this run's actual fills.",
     "sec_section31_usd_per_dollar": "20.60/1000000 (effective 2026-04-04, open-ended at retrieval)",
     "source_cat_and_elite": "https://files.alpaca.markets/disclosures/library/BrokFeeSched.pdf (Revised on September 17, 2026; retrieved 2026-09-25; sha256 7bc75e3cd86f5c1950f8ce1292049965280340a3cebe727ca7aee4a7d2d71b12)",
     "source_sec_taf": "blueprints/us-equities/mover-v3/data/fees-v3.json (retrieved_at 2026-09-24)",
-    "unverified": [
-      "Whether the FINRA TAF cap applies per order or per execution/fill; this model applies it per fill (see fee_model.py module docstring).",
-      "The cost_plus commission plan's exchange-fee/rebate pass-through component is not modeled (partial)."
-    ]
+    "taf_cap_scope": "Per execution, not per order (settled): FINRA TAF FAQ A200.17 -- https://www.finra.org/rules-guidance/guidance/faqs/trading-activity-fee -- each street-side execution is a separate sale (its own example: ten 100,000-share executions of one order are ten separately capped sales); Alpaca's schedule's 'per trade' wording is consistent with this reading."
   },
-  "generated_at_utc": "2026-09-25T05:33:42.775451+00:00",
-  "latency_note": "PRIMARY_LATENCY_MS=70 is a primary-reference point (inside the retained sim-to-paper receipt's observed 0.65-1.09s paper submit-to-fill range and near its own sensitivity-check flip point, ~69.2ms) -- it is explicitly NOT a calibration (that receipt itself says 'Sensitivity check, not a calibration'). On rc5 a deferred order is released at the first of its own next quote or ANY due clock timer, so the exerciser's own tick cadence mixes into the measured submit-to-fill distribution alongside the configured latency; the sweep below therefore varies configured latency together with that timer-cadence effect, not latency alone. See each run's submit_to_fill_latency_ms for the measured distribution.",
+  "generated_at_utc": "2026-09-25T06:22:20.960566+00:00",
+  "latency_note": "PRIMARY_LATENCY_MS=70 is a primary-reference point, chosen near the retained sim-to-paper receipt's own sensitivity-check flip point (~69.2ms) -- it is far BELOW that receipt's observed paper submit-to-fill range (0.65-1.09s), not inside it; of this lane's own 0/70/250/1000ms sweep points, 1000ms is the closest to that observed range. It is explicitly NOT a calibration (that receipt itself says 'Sensitivity check, not a calibration'). On rc5 a deferred order is released at the first of its own next quote or ANY due clock timer, so the exerciser's own tick cadence mixes into the measured submit-to-fill distribution alongside the configured latency; the sweep below therefore varies configured latency together with that timer-cadence effect, not latency alone. See each run's submit_to_fill_latency_ms for the measured distribution.",
   "latency_sensitivity_elite_tier": [
     {
+      "denied_reasons": {
+        "RATE_LIMIT_EXCEEDED": 2995
+      },
+      "fill_vs_nbbo_touch_violations": 0,
       "fills_per_minute_stats": {
         "full_minutes_at_or_above_180": 30,
         "max": 900,
@@ -365,9 +369,14 @@
         "total_full_minutes": 30
       },
       "latency_ms": 0,
-      "recount_agrees": true
+      "recount_agrees": true,
+      "reject_reasons": {}
     },
     {
+      "denied_reasons": {
+        "RATE_LIMIT_EXCEEDED": 2995
+      },
+      "fill_vs_nbbo_touch_violations": 0,
       "fills_per_minute_stats": {
         "full_minutes_at_or_above_180": 30,
         "max": 882,
@@ -408,9 +417,14 @@
         "total_full_minutes": 30
       },
       "latency_ms": 70,
-      "recount_agrees": true
+      "recount_agrees": true,
+      "reject_reasons": {}
     },
     {
+      "denied_reasons": {
+        "RATE_LIMIT_EXCEEDED": 2995
+      },
+      "fill_vs_nbbo_touch_violations": 0,
       "fills_per_minute_stats": {
         "full_minutes_at_or_above_180": 30,
         "max": 852,
@@ -451,61 +465,67 @@
         "total_full_minutes": 30
       },
       "latency_ms": 250,
-      "recount_agrees": true
+      "recount_agrees": true,
+      "reject_reasons": {}
     },
     {
+      "denied_reasons": {
+        "RATE_LIMIT_EXCEEDED": 2995
+      },
+      "fill_vs_nbbo_touch_violations": 0,
       "fills_per_minute_stats": {
         "full_minutes_at_or_above_180": 30,
-        "max": 758,
-        "median": 724.5,
-        "min": 655,
+        "max": 757,
+        "median": 728.0,
+        "min": 670,
         "per_minute": [
-          655,
-          687,
-          699,
-          731,
-          744,
-          743,
+          670,
+          694,
+          703,
+          732,
+          750,
+          733,
           699,
           726,
-          709,
-          758,
-          701,
-          698,
-          722,
-          723,
-          712,
-          703,
-          721,
-          735,
-          697,
-          697,
-          736,
-          732,
-          741,
-          738,
-          721,
-          728,
-          752,
+          720,
+          757,
+          700,
+          702,
           734,
-          746,
-          733
+          722,
+          713,
+          711,
+          726,
+          730,
+          697,
+          699,
+          736,
+          730,
+          739,
+          738,
+          732,
+          721,
+          754,
+          731,
+          747,
+          730
         ],
         "total_full_minutes": 30
       },
       "latency_ms": 1000,
-      "recount_agrees": true
+      "recount_agrees": true,
+      "reject_reasons": {}
     }
   ],
   "profiles": {
     "elite-tier": {
       "commission_plan": "all_in",
       "max_order_submit_rate": "900/00:01:00",
-      "note": "Alpaca Elite / non-retail tier: 1000 req/min x 0.9 = 900/min. Must sustain >=180 fills/min in every full simulated minute. ~1000 submits/min attempted against a 900/min budget so the native limiter actually binds here too (a prior cadence of exactly 15/s = 900/min never triggered a single denial); denials are counted.",
+      "note": "Alpaca Elite / non-retail tier: 0.9x the advertised 1000 req/min REQUEST-RATE entitlement (a request budget, not a fill-throughput figure) = 900/min. Must sustain >=180 fills/min in every full simulated minute. ~1000 submits/min attempted against a 900/min budget so the native limiter actually binds here too (a prior cadence of exactly 15/s = 900/min never triggered a single denial); denials are counted.",
       "submits_per_sec": 16.666666666666668
     }
   },
-  "runner_sha256": "f1e400395e85b2a0b652161fb11a0e2dc52bac708b1373ceb32de72c8ee3ff80",
+  "runner_sha256": "29c1de966c8b4bcb4507a477df0792739b50a025de79d2f0288d9c19a3f3c728",
   "runs": [
     {
       "counters": {
@@ -520,8 +540,19 @@
       "denied_reasons": {
         "RATE_LIMIT_EXCEEDED": 2995
       },
-      "events_per_second": 265181.31816379086,
+      "events_per_second": 270115.4733424378,
       "execution_cost_vs_mid_usd": "6126.600",
+      "fee_rounding": {
+        "alpaca_method_by_type_usd": {
+          "cat": "0.40",
+          "commission": "524.32",
+          "sec": "643.47",
+          "taf": "12.79"
+        },
+        "alpaca_method_total_usd": "1180.98",
+        "model_minus_alpaca_usd": "-4.19",
+        "model_total_usd": "1176.79"
+      },
       "fees_usd": "1176.79",
       "fill_vs_nbbo_touch": {
         "checked": 26145,
@@ -815,7 +846,7 @@
         "p50_ms": 120.0,
         "p90_ms": 120.0
       },
-      "wall_seconds": 5.132050814980175
+      "wall_seconds": 5.038304482004605
     }
   ],
   "symbols": [

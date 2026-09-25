@@ -30,6 +30,17 @@ def full_minutes(window_ns: int) -> int:
     return window_ns // NS_PER_MIN
 
 
+def clamp_sell_quantity(desired_qty: int, sellable_position: int) -> int:
+    """Never ask to sell more than the currently unreserved long position
+    (which may itself already be reduced below the raw filled position by
+    other SELL orders for the same symbol still in flight -- see
+    `exerciser.CapacityExerciser._on_tick`'s `sellable_position` computation).
+    A standalone pure function specifically so this exact clamp arithmetic is
+    unit-testable without a running engine or a registered Strategy (whose
+    `cache`/`portfolio`/`clock` attributes are not writable outside one)."""
+    return max(0, min(desired_qty, sellable_position))
+
+
 class RoundRobin:
     """Deterministic round-robin symbol/side picker with a per-symbol position
     cap, inventory-aware so it never proposes a short sale.

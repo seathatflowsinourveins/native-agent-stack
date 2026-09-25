@@ -7,6 +7,7 @@ pattern.
 """
 import importlib.metadata
 import importlib.util
+import json
 import sys
 import unittest
 from datetime import datetime, timezone
@@ -136,6 +137,22 @@ class ScheduleMathTests(unittest.TestCase):
         self.assertEqual(SCH.full_minutes(1800 * SCH.NS_PER_SEC), 30)
         self.assertEqual(SCH.full_minutes(1799 * SCH.NS_PER_SEC), 29)
 
+    def test_clamp_sell_quantity_respects_reserved_in_flight(self):
+        # M3 regression (concurrent in-flight sells): a desired sell of 5
+        # shares against an actual position of 5, but with 3 already
+        # reserved by another in-flight SELL for the same symbol (sellable
+        # position = 5 - 3 = 2), must clamp to 2, not 5.
+        self.assertEqual(SCH.clamp_sell_quantity(desired_qty=5, sellable_position=2), 2)
+
+    def test_clamp_sell_quantity_never_negative(self):
+        # Fully reserved (sellable_position <= 0): clamp to 0, not a negative
+        # "sell" quantity.
+        self.assertEqual(SCH.clamp_sell_quantity(desired_qty=5, sellable_position=0), 0)
+        self.assertEqual(SCH.clamp_sell_quantity(desired_qty=5, sellable_position=-2), 0)
+
+    def test_clamp_sell_quantity_is_a_noop_when_ample(self):
+        self.assertEqual(SCH.clamp_sell_quantity(desired_qty=3, sellable_position=100), 3)
+
 
 class RoundRobinTests(unittest.TestCase):
     def test_round_robin_cycles_symbols(self):
@@ -168,9 +185,15 @@ class RoundRobinTests(unittest.TestCase):
         # A CASH account rejects any sell that would take a position negative
         # ("Short selling not permitted on a CASH account"); next_side must
         # never propose SELL at position <= 0, regardless of alternation state.
+        # Forcing _last_side="BUY" is the discriminating case: plain
+        # alternation (BUY -> SELL) would propose SELL here, so this only
+        # passes because the inventory rule overrides alternation at
+        # position <= 0. (Forcing _last_side="SELL" instead would make plain
+        # alternation itself return BUY too, which would pass even with the
+        # inventory rule reverted -- proving nothing about the rule.)
         rr = SCH.RoundRobin(["A"], position_cap=50)
         for position in (0, -1, -5):
-            rr._last_side["A"] = "SELL"  # would normally alternate to BUY anyway; force it
+            rr._last_side["A"] = "BUY"
             self.assertEqual(rr.next_side("A", position), "BUY")
 
     def test_never_returns_none(self):
@@ -356,6 +379,20 @@ class RunnerPureLogicTests(unittest.TestCase):
         summary = self.runner.summarize_run(result, self._synthetic_quotes())
         self.assertTrue(summary["recount"]["agrees"])
 
+    def test_summarize_run_recount_detects_a_10s_start_shift(self):
+        # A fill at 55s past start_ns=0 is minute 0 both by the strategy's
+        # events and a correctly-anchored report row -- but shifting the
+        # recount's start_ns by only 10s (55 + 10 = 65s) already crosses the
+        # 60s minute boundary into minute 1, unlike the 40s fill used by
+        # test_summarize_run_recount_uses_the_events_own_start_ns (which a
+        # 10s shift does not move into a different minute, only a 30s+
+        # shift). This is the case that actually distinguishes a 10s
+        # regression from a 30s one.
+        result = self._synthetic_result(submit_ts_ns=50_000_000_000, fill_ts_ns=55_000_000_000,
+                                         report_ts_ns=55_000_000_000)
+        summary = self.runner.summarize_run(result, self._synthetic_quotes())
+        self.assertTrue(summary["recount"]["agrees"])
+
     def test_fills_per_minute_stats(self):
         stats = self.runner.fills_per_minute_stats({0: 180, 1: 200, 2: 100}, total_full_minutes=3)
         self.assertEqual(stats["min"], 100)
@@ -474,7 +511,8 @@ class RealVenueRunOneTests(unittest.TestCase):
                              "bid_size": cls.DISPLAYED_SIZE, "ask_size": cls.DISPLAYED_SIZE})
             quotes[s] = rows
         cls.quotes = quotes
-        cls.result = cls.runner.run_one(quotes, {}, profile_name="paper-parity", latency_ms=70, run_seconds=20.0)
+        cls.result = cls.runner.run_one(quotes, {}, profile_name="paper-parity",
+                                         latency_ms=cls.runner.PRIMARY_LATENCY_MS, run_seconds=20.0)
 
     def test_fill_qty_never_exceeds_displayed_size(self):
         fills = [e for e in self.result["events"] if e["kind"] == "fill"]
@@ -541,6 +579,227 @@ class RealVenueRunOneTests(unittest.TestCase):
         self.assertGreater(len(fills), 0)
         for f in fills:
             self.assertGreaterEqual(f["ts_ns"] - submits[f["client_order_id"]], 100_000_000)
+
+    def test_run_one_excludes_trade_ticks_even_when_provided(self):
+        # H1 regression guard: build a trades_by_symbol input containing a
+        # sub-penny print (rounding to 100.00, the current bid) injected
+        # *mid-gap* between sparse quotes -- exactly the condition under which
+        # the rc5 book-overwrite bug persists long enough to be the book state
+        # an order actually matches against (a dense, every-20ms quote
+        # schedule "heals" the corruption before any latency-delayed order can
+        # land in it, which is why RealVenueRunOneTests' shared dense fixture
+        # alone would not reproduce H1 even with trades reintroduced) -- and
+        # confirm the production run_one still excludes it entirely: every
+        # fill is at its clean touch, with zero NBBO-touch violations. This
+        # reproduces a real violation when the anchor mutation (mutate.py's
+        # X1: trade ticks fed back into run_one) is manually applied (43 of
+        # 174 fills beat the touch), and passes cleanly against the real,
+        # unmutated run_one.
+        symbols = ["AAPL", "MSFT"]
+        quotes, trades = {}, {}
+        gap_ns = 2_000_000_000  # 2s between quotes: long enough for a mid-gap
+        for s in symbols:                                        # trade's corruption to persist past a 70ms latency
+            rows, trows = [], []
+            for i in range(20):  # 40s of sparse quotes
+                ts = i * gap_ns
+                rows.append({"symbol": s, "ts_ns": ts, "bid": "100.00", "ask": "100.02",
+                             "bid_size": 500, "ask_size": 500})
+                trows.append({"symbol": s, "ts_ns": ts + 1_000_000_000, "price": "100.0001",
+                              "size": 500, "trade_id": f"{s}-{i}"})
+            quotes[s], trades[s] = rows, trows
+        result = self.runner.run_one(quotes, trades, profile_name="paper-parity",
+                                      latency_ms=self.runner.PRIMARY_LATENCY_MS, run_seconds=35.0)
+        fills = [e for e in result["events"] if e["kind"] == "fill"]
+        self.assertGreater(len(fills), 20)
+        check = self.runner.check_no_fill_beats_nbbo_touch(fills, quotes)
+        self.assertEqual(check["checked"], len(fills))
+        self.assertEqual(check["violation_count"], 0, check["violations"])
+
+    def test_touch_guard_detects_an_injected_violation(self):
+        # The guard itself must actually flag a genuine violation, not just
+        # stay silent on real (clean) data. A single BUY fill priced strictly
+        # below the ask in force is exactly the H1 artifact this guard exists
+        # to catch.
+        quotes = {"AAPL": [{"symbol": "AAPL", "ts_ns": 0, "bid": "100.00", "ask": "100.02",
+                            "bid_size": 100, "ask_size": 100}]}
+        events = [{"ts_ns": 0, "kind": "fill", "client_order_id": "CAP-1", "side": "BUY",
+                   "price": "100.01", "instrument_id": "AAPL.SIM", "qty": 1}]  # better than the 100.02 ask
+        check = self.runner.check_no_fill_beats_nbbo_touch(events, quotes)
+        self.assertEqual(check["checked"], 1)
+        self.assertEqual(check["violation_count"], 1)
+
+    def test_touch_guard_same_ns_quotes_are_not_a_false_positive(self):
+        # M1 regression: two quotes can legitimately share one nanosecond
+        # timestamp (1,342 such pairs measured in the real fetched data). A
+        # fill that is at-or-through the touch of EITHER same-ns quote must
+        # not be flagged, even though it beats the OTHER same-ns quote's touch
+        # (the guard cannot observe which of the two the engine actually
+        # matched against).
+        quotes = {"AAPL": [{"symbol": "AAPL", "ts_ns": 1000, "bid": "100.00", "ask": "100.05"},
+                           {"symbol": "AAPL", "ts_ns": 1000, "bid": "100.00", "ask": "100.02"}]}
+        # A BUY fill at 100.02 beats the first quote's 100.05 ask, but is
+        # exactly at-touch for the second quote sharing the same timestamp.
+        events = [{"ts_ns": 1000, "kind": "fill", "client_order_id": "CAP-1", "side": "BUY",
+                   "price": "100.02", "instrument_id": "AAPL.SIM", "qty": 1}]
+        check = self.runner.check_no_fill_beats_nbbo_touch(events, quotes)
+        self.assertEqual(check["checked"], 1)
+        self.assertEqual(check["violation_count"], 0, check["violations"])
+
+    def test_elite_commission_is_applied_to_fills(self):
+        # commission_plan="all_in" for elite-tier applies to BOTH sides (not
+        # sells-only like SEC/TAF): a BUY fill's fee must be nonzero here,
+        # unlike the paper-parity ("none" plan) case above.
+        result = self.runner.run_one(self.quotes, {}, profile_name="elite-tier",
+                                      latency_ms=self.runner.PRIMARY_LATENCY_MS, run_seconds=15.0)
+        buys = [e for e in result["events"] if e["kind"] == "fill" and e["side"] == "BUY"]
+        self.assertGreater(len(buys), 0)
+        self.assertTrue(all(f["fee_usd"] != "0.00" for f in buys))
+
+    def test_paper_parity_denial_count_matches_the_180_per_minute_budget(self):
+        # Behavioral pin of the actual configured budget (replacing a bare
+        # constant-equality check where a real run's outcome can serve the
+        # same purpose). The native limiter is a token bucket that starts
+        # FULL at the configured limit (not prorated to elapsed time), so no
+        # denial can occur until cumulative submits exceed the 180 budget:
+        # at 5 submits/sec for 45s (~225 attempts), ~180 should be admitted
+        # and ~45 denied. A materially different default budget (mutate.py's
+        # X4: RiskEngineConfig() with run_one's profile-budget wiring
+        # dropped) would miss this band by a wide margin.
+        result = self.runner.run_one(self.quotes, {}, profile_name="paper-parity",
+                                      latency_ms=self.runner.PRIMARY_LATENCY_MS, run_seconds=45.0)
+        denied = result["counters"].get("rate_limit_denied", 0)
+        submits = result["counters"].get("submits", 0)
+        self.assertGreater(submits, 200)
+        self.assertTrue(25 <= denied <= 65, f"submits={submits} denied={denied}")
+
+    def test_no_short_sale_rejects_with_concurrent_sells_in_flight(self):
+        # M3 regression: at a higher cadence (elite-tier), several sells for
+        # the same symbol can be in flight at once; the reservation-based
+        # clamp (not just the plain position clamp) must still prevent every
+        # short-sale reject.
+        result = self.runner.run_one(self.quotes, {}, profile_name="elite-tier",
+                                      latency_ms=1000, run_seconds=20.0)
+        reject_reasons = {}
+        for ev in result["events"]:
+            if ev["kind"] == "reject":
+                reject_reasons[ev["reason"]] = reject_reasons.get(ev["reason"], 0) + 1
+        self.assertEqual(result["counters"].get("rejects", 0), 0, reject_reasons)
+        self.assertNotIn("Short selling not permitted on a CASH account", reject_reasons)
+
+
+@unittest.skipUnless(_pinned_runtime_active(), "requires the pinned nautilus_trader==2.0.0rc5 runtime")
+class CmdRunIntegrationTests(unittest.TestCase):
+    """End-to-end `runner.cmd_run` calls against a small synthetic private
+    catalog (a temp dir with quotes/trades JSON and a fetch-manifest.json),
+    written and read exactly like the real CLI path. Catches regressions in
+    cmd_run's own wiring that a call to run_one alone cannot -- e.g.
+    mutate.py's X3 (cmd_run's primary run hardcoded to latency_ms=0 instead of
+    using PRIMARY_LATENCY_MS)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.runner = _load("sim_capacity_runner_cmdrun", "runner.py")
+        import tempfile
+        symbols = ["AAPL", "MSFT"]
+        quotes = {}
+        for s in symbols:
+            rows = []
+            for i in range(420):  # every 5s for 2100s: covers a 30min run plus its flatten pad
+                ts = i * 5_000_000_000
+                rows.append({"symbol": s, "ts_ns": ts, "bid": "100.00", "ask": "100.02",
+                             "bid_size": 500, "ask_size": 500})
+            quotes[s] = rows
+        trades = {s: [] for s in symbols}
+        cls.tmp = Path(tempfile.mkdtemp())
+        (cls.tmp / "quotes.private.json").write_text(json.dumps(quotes))
+        (cls.tmp / "trades.private.json").write_text(json.dumps(trades))
+        manifest = {
+            "window": {"start": "2026-09-24T14:00:00Z", "end": "2026-09-24T14:30:00Z"}, "symbols": symbols,
+            "quote_counts": {s: len(quotes[s]) for s in symbols}, "trade_counts": {s: 0 for s in symbols},
+            "quote_drop_counts": {s: {"one_sided_or_nonpositive": 0, "crossed": 0} for s in symbols},
+            "trade_drop_counts": {s: {"nonpositive": 0} for s in symbols},
+            "page_events": {"this_run_page_count": 0, "this_run_page_hashes": [], "this_run_page_hashes_digest": "x"},
+        }
+        (cls.tmp / "fetch-manifest.json").write_text(json.dumps(manifest))
+
+    def _run(self, profile: str):
+        import argparse
+        receipt_path = self.tmp / f"receipt-{profile}.json"
+        args = argparse.Namespace(command="run", catalog=self.tmp, receipt=receipt_path, profile=profile,
+                                  env_file=None, pages=None, out=None, replay=False, latency_ms=None)
+        self.runner.cmd_run(args)
+        return json.loads(receipt_path.read_text())
+
+    def test_primary_run_uses_the_configured_primary_latency(self):
+        receipt = self._run("paper-parity")
+        self.assertEqual(receipt["runs"][0]["latency_ms"], self.runner.PRIMARY_LATENCY_MS)
+        self.assertNotEqual(receipt["runs"][0]["latency_ms"], 0)
+
+
+@unittest.skipUnless(_pinned_runtime_active(), "requires the pinned nautilus_trader==2.0.0rc5 runtime")
+class SellReservationBookkeepingTests(unittest.TestCase):
+    """Pure bookkeeping tests for CapacityExerciser's in-flight-sell
+    reservation tracking (`_reserved_sell_qty`/`_sell_reservations`), which
+    needs no engine or cache access -- only the exerciser module import
+    (hence still pinned-runtime-gated)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.exerciser_module = _load("sim_capacity_exerciser_reservation", "exerciser.py")
+        cls.CapacityExerciser = cls.exerciser_module.CapacityExerciser
+        cls.RoundRobin = SCH.RoundRobin
+
+    def _bare_exerciser(self):
+        # Bypass __init__ (which needs a registered Strategy/trader) since the
+        # reservation dicts and their release logic touch no cache/portfolio
+        # state at all.
+        ex = self.CapacityExerciser.__new__(self.CapacityExerciser)
+        from collections import defaultdict
+        ex._reserved_sell_qty = defaultdict(int)
+        ex._sell_reservations = {}
+        return ex
+
+    def test_reservation_accumulates_and_releases_per_order(self):
+        ex = self._bare_exerciser()
+        ex._reserved_sell_qty["AAPL"] += 3
+        ex._sell_reservations["CAP-1"] = ("AAPL", 3)
+        ex._reserved_sell_qty["AAPL"] += 2
+        ex._sell_reservations["CAP-2"] = ("AAPL", 2)
+        self.assertEqual(ex._reserved_sell_qty["AAPL"], 5)
+        ex._release_sell_reservation("CAP-1")
+        self.assertEqual(ex._reserved_sell_qty["AAPL"], 2)
+        ex._release_sell_reservation("CAP-2")
+        self.assertEqual(ex._reserved_sell_qty["AAPL"], 0)
+
+    def test_release_is_idempotent(self):
+        ex = self._bare_exerciser()
+        ex._reserved_sell_qty["AAPL"] += 4
+        ex._sell_reservations["CAP-1"] = ("AAPL", 4)
+        ex._release_sell_reservation("CAP-1")
+        ex._release_sell_reservation("CAP-1")  # second release: harmless no-op
+        self.assertEqual(ex._reserved_sell_qty["AAPL"], 0)
+
+    def test_release_is_scoped_per_symbol(self):
+        ex = self._bare_exerciser()
+        ex._reserved_sell_qty["AAPL"] += 3
+        ex._sell_reservations["CAP-1"] = ("AAPL", 3)
+        ex._reserved_sell_qty["MSFT"] += 5
+        ex._sell_reservations["CAP-2"] = ("MSFT", 5)
+        ex._release_sell_reservation("CAP-1")
+        self.assertEqual(ex._reserved_sell_qty["AAPL"], 0)
+        self.assertEqual(ex._reserved_sell_qty["MSFT"], 5)
+
+    def test_on_tick_uses_clamp_sell_quantity_for_the_sell_branch(self):
+        # Source-contract companion to SCH.clamp_sell_quantity's own direct
+        # unit tests (ScheduleMathTests): confirms _on_tick's SELL branch
+        # actually calls the shared pure clamp function, rather than some
+        # unclamped or differently-computed quantity. Strategy's cache/
+        # portfolio/clock attributes are not writable outside a registered
+        # engine (verified directly), which is why the clamp arithmetic
+        # itself is factored out and unit-tested as a pure function instead
+        # of by driving _on_tick with a faked self.
+        source = (SIM_CAPACITY / "exerciser.py").read_text()
+        self.assertIn("qty = clamp_sell_quantity(qty, sellable_position)", source)
 
 
 if __name__ == "__main__":

@@ -10,6 +10,20 @@ a plain Alpaca CASH account, which rejects any short sale outright ("Short
 selling not permitted on a CASH account" -- measured directly before this
 fix: 162/163 elite rejects and 112/113 paper rejects in one run were exactly
 this reason, consuming rate-limit budget and understating true throughput).
+
+The clamp is against a *reserved* sellable quantity
+(`_reserved_sell_qty`/`_sell_reservations`), not the raw filled position: at
+high cadence, several SELL orders for the same symbol can be in flight
+(submitted but not yet resolved) at once, and `portfolio.net_position` only
+updates once a fill actually processes -- clamping each new SELL against the
+same stale, not-yet-reduced position let multiple in-flight sells each
+individually look legal while collectively asking to sell more than was ever
+held (measured directly before this fix: 58 unreported short-sale rejects in
+the 1000ms-latency sweep run, where the longer settlement delay left more
+sells in flight at once). Each SELL's quantity is reserved against the
+symbol at submit time and released exactly once the order reaches a terminal
+outcome (full fill, or any cancel/expiry/reject/denial).
+
 Its only purpose is to measure sustained fills/minute under a native rate
 limiter and realistic latency/fee/queue models -- infrastructure evidence
 (`evidence_class: sim_capacity_infrastructure`), never strategy evidence. No
@@ -23,7 +37,7 @@ from nautilus_trader.model import ClientOrderId, InstrumentId, OrderSide, Price,
 from nautilus_trader.config import StrategyConfig
 from nautilus_trader.trading import Strategy
 
-from schedule import RoundRobin, tick_interval_ns
+from schedule import RoundRobin, clamp_sell_quantity, tick_interval_ns
 
 RATE_LIMIT_REASON_MARKERS = ("RATE_LIMIT", "rate limit", "RiskEngine", "throttle")
 
@@ -69,6 +83,8 @@ class CapacityExerciser(Strategy):
         self.filled_notional = Decimal("0")
         self._order_side = {}  # client_order_id -> side, for on_order_filled bookkeeping
         self._client_order_seq = 0
+        self._reserved_sell_qty: dict[str, int] = defaultdict(int)  # symbol -> qty reserved by in-flight sells
+        self._sell_reservations: dict[str, tuple[str, int]] = {}  # client_order_id -> (symbol, qty)
 
     # -- lifecycle ---------------------------------------------------------
     def on_start(self):
@@ -122,7 +138,12 @@ class CapacityExerciser(Strategy):
             self.counters["skipped_no_quote"] += 1
             return
         position = int(self.portfolio.net_position(iid))
-        side = self.rr.next_side(symbol, position)  # always BUY or SELL now; never None
+        # Sellable position, not raw filled position: subtract whatever is
+        # already reserved by other SELL orders for this symbol still in
+        # flight (submitted but not yet filled/canceled/rejected/denied). See
+        # the module docstring for why the raw position alone is not enough.
+        sellable_position = position - self._reserved_sell_qty.get(symbol, 0)
+        side = self.rr.next_side(symbol, sellable_position)  # always BUY or SELL now; never None
         collar = Decimal(self.params.collar)
         if side == "BUY":
             limit_price = Price(quote.ask_price.as_decimal() + collar, quote.ask_price.precision)
@@ -132,10 +153,13 @@ class CapacityExerciser(Strategy):
             available = int(quote.bid_size)
         qty = max(self.params.qty_min, min(self.params.qty_max, available))
         if side == "SELL":
-            # Never ask to sell more than is actually held: a CASH account has
-            # no short-selling capacity at all, so this clamp (not a skip) is
-            # what actually keeps every SELL legal.
-            qty = min(qty, position)
+            # Never ask to sell more than is actually sellable right now: a
+            # CASH account has no short-selling capacity at all, so this
+            # clamp (not a skip) is what actually keeps every SELL legal, even
+            # with several sells for the same symbol in flight at once. A
+            # standalone pure function (schedule.clamp_sell_quantity) so this
+            # exact arithmetic is unit-testable without an engine.
+            qty = clamp_sell_quantity(qty, sellable_position)
         if qty <= 0:
             self.counters["skipped_no_size"] += 1
             return
@@ -144,11 +168,26 @@ class CapacityExerciser(Strategy):
                                           quantity=Quantity.from_int(qty), price=limit_price,
                                           time_in_force=TimeInForce.IOC, client_order_id=client_order_id)
         self._order_side[str(client_order_id)] = side
+        if side == "SELL":
+            self._reserved_sell_qty[symbol] += qty
+            self._sell_reservations[str(client_order_id)] = (symbol, qty)
         self.counters["submits"] += 1
         self.events.append({"ts_ns": self.clock.timestamp_ns(), "kind": "submit", "symbol": symbol,
                              "side": side, "qty": qty, "client_order_id": str(client_order_id),
                              "limit_price": str(limit_price.as_decimal())})
         self.submit_order(order)
+
+    def _release_sell_reservation(self, client_order_id) -> None:
+        """Release a SELL order's reserved quantity exactly once (pop-based,
+        so a second call for the same order -- e.g. a fill event followed by
+        a cancel event for a partial fill's remainder -- is a harmless no-op).
+        Called from every terminal outcome: full fill, cancel, expiry, reject
+        or denial."""
+        entry = self._sell_reservations.pop(str(client_order_id), None)
+        if entry is None:
+            return
+        symbol, qty = entry
+        self._reserved_sell_qty[symbol] = max(0, self._reserved_sell_qty.get(symbol, 0) - qty)
 
     def _on_flatten(self, event):
         self.counters["flatten_started"] += 1
@@ -172,6 +211,14 @@ class CapacityExerciser(Strategy):
                              "client_order_id": str(event.client_order_id), "qty": qty, "price": str(px),
                              "side": side, "fee_usd": str(fee), "instrument_id": str(event.instrument_id),
                              "mid_at_fill": str(mid) if mid is not None else None})
+        if side == "SELL":
+            # Only release once this fill fully closes the order (no
+            # remainder left to be canceled separately) -- a partial fill's
+            # reservation is instead released by the cancel/expiry event that
+            # follows for its unfilled remainder.
+            order = self.cache.order(event.client_order_id)
+            if order is not None and int(order.filled_qty) >= int(order.quantity):
+                self._release_sell_reservation(event.client_order_id)
 
     def on_order_rejected(self, event):
         reason = str(getattr(event, "reason", ""))
@@ -179,6 +226,7 @@ class CapacityExerciser(Strategy):
             self.counters["rate_limit_denied"] += 1
         else:
             self.counters["rejects"] += 1
+        self._release_sell_reservation(event.client_order_id)
         self.events.append({"ts_ns": int(event.ts_event), "kind": "reject", "reason": reason})
 
     def on_order_denied(self, event):
@@ -196,6 +244,7 @@ class CapacityExerciser(Strategy):
             self.counters["rate_limit_denied"] += 1
         else:
             self.counters["other_denied"] += 1
+        self._release_sell_reservation(event.client_order_id)
         self.events.append({"ts_ns": int(event.ts_event), "kind": "denied", "reason": reason})
 
     def _order_filled_qty(self, client_order_id) -> int:
@@ -212,11 +261,13 @@ class CapacityExerciser(Strategy):
         # outcome (partial execution) from "nothing filled at all."
         kind = "ioc_partial_then_canceled" if self._order_filled_qty(event.client_order_id) > 0 else "ioc_expiry"
         self.counters[kind] += 1
+        self._release_sell_reservation(event.client_order_id)
         self.events.append({"ts_ns": int(event.ts_event), "kind": kind,
                              "client_order_id": str(event.client_order_id)})
 
     def on_order_expired(self, event):
         kind = "ioc_partial_then_canceled" if self._order_filled_qty(event.client_order_id) > 0 else "ioc_expiry"
         self.counters[kind] += 1
+        self._release_sell_reservation(event.client_order_id)
         self.events.append({"ts_ns": int(event.ts_event), "kind": kind,
                              "client_order_id": str(event.client_order_id)})

@@ -20,37 +20,47 @@ default). Rates are cited from two primary sources:
         executed equivalent share)".
       * "Equities - Elite Smart Router ... Monthly Shares Traded* | All-in
         (Fixed) | Cost Plus (Tiered) || Up to 200,000 | $0.0040 | $0.0025"
-        (the All-in column bundles exchange fees/rebates into the flat rate;
-        the Cost Plus column separately passes through "Exchange Fees or
-        Rebates" on top of its lower per-share rate -- unmodeled here, see
-        `commission_plan="cost_plus"`'s docstring note below).
+        -- the **All-in rate is a single flat $0.0040/share at every listed
+        monthly-volume tier** (the PDF's "All-in (Fixed)" column has one
+        value spanning all five volume rows; only the "Cost Plus (Tiered)"
+        column actually varies by tier, from $0.0025/share down to
+        $0.0005/share at higher monthly volume). This model always uses the
+        single flat all-in rate; the tiered `cost_plus` rate below is fixed
+        at its lowest-volume value ($0.0025/share), since this lane's fill
+        volume never approaches the next tier. The All-in column bundles
+        exchange fees/rebates into the flat rate; the Cost Plus column
+        separately passes through "Exchange Fees or Rebates" on top of its
+        lower per-share rate -- unmodeled here, see `commission_plan=
+        "cost_plus"`'s docstring note below.
       * "Fees are calculated on the exact executed quantity ... Each fee type
         is aggregated separately at the daily, per-account level. After
         aggregation, each fee total is rounded up to the nearest cent." This
         model instead rounds **per fill**, half-up, not per day, per-fee-type,
-        rounded up -- a known, disclosed simplification. The difference is
-        small at this run's fill counts (a handful of cents at most across a
-        30-minute run) and is reported, not hidden (see
-        `runner.summarize_run`'s `fee_rounding_note`).
+        rounded up -- a known, disclosed simplification. The measured
+        difference for one full run is computed by `runner.alpaca_rounding_delta`
+        and reported per-receipt as `fee_rounding.model_minus_alpaca_usd`
+        (not a fixed claim here, since it depends on the run's actual fills).
 
 FINRA CAT applies to every Alpaca equity trade (not Elite-specific); the Elite
 Smart Router commission applies only when trading through the Elite offering
 (the elite-tier profile here), never on paper-parity, matching "Commissions
 apply to ... use of the Elite Smart Router under the Alpaca Elite offering."
 
-UNVERIFIED: whether the FINRA TAF cap applies per *order* or per *execution*
-(fill); the fee-schedule PDF's own footnote ("capped at 50,205 shares or
-more") describes the cap in per-transaction terms consistent with either
-reading. This model applies the cap per fill (the conservative, i.e. more
-fee-generating, choice for a high-fill-rate capacity run) and exposes it as
-`taf_cap` for anyone who wants the alternative. This is a cost-accounting
-nuance in a synthetic capacity run, not a strategy claim.
+**TAF cap is per execution, not per order** (FINRA TAF FAQ A200.17,
+https://www.finra.org/rules-guidance/guidance/faqs/trading-activity-fee:
+"each street-side execution represents a separate sale" -- its own example
+is ten 100,000-share executions of one order billed as "ten sales" each
+separately capped, not one order-level cap; Alpaca's schedule's own "per
+trade" wording is consistent with this reading, where "trade" means
+execution/fill, not the parent order). This model already applies the cap
+per fill, which is therefore the settled, sourced behavior, not a
+conservative guess.
 
-UNVERIFIED (partial): the `cost_plus` commission plan's per-share rate
-($0.0025/share at this run's volume tier) is exact, but its additional
-"Exchange Fees or Rebates" pass-through component is not modeled (no
-per-venue maker/taker schedule is available to this lane) -- `cost_plus`
-therefore understates true cost and is not the default for elite-tier.
+**Partial**: the `cost_plus` commission plan's per-share rate is exact at
+this lane's (lowest) volume tier, but its additional "Exchange Fees or
+Rebates" pass-through component is not modeled (no per-venue maker/taker
+schedule is available to this lane) -- `cost_plus` therefore understates
+true cost and is not the default for elite-tier.
 """
 from __future__ import annotations
 
@@ -61,8 +71,8 @@ FINRA_TAF_USD_PER_SHARE = Decimal("0.000195")
 FINRA_TAF_MAX_USD_PER_TRADE = Decimal("9.79")
 FINRA_CAT_USD_PER_SHARE = Decimal("0.000003")  # buys and sells, NMS equities
 ALPACA_COMMISSION_USD = Decimal("0")  # retail routing (paper-parity): no commission
-ELITE_ALL_IN_USD_PER_SHARE = Decimal("0.0040")  # <=200,000 monthly shares tier
-ELITE_COST_PLUS_USD_PER_SHARE = Decimal("0.0025")  # <=200,000 monthly shares tier; partial (see module docstring)
+ELITE_ALL_IN_USD_PER_SHARE = Decimal("0.0040")  # flat at every monthly-volume tier (not tiered)
+ELITE_COST_PLUS_USD_PER_SHARE = Decimal("0.0025")  # lowest (<=200,000 shares/month) tier; partial (see module docstring)
 FEE_RATE_SOURCE = "blueprints/us-equities/mover-v3/data/fees-v3.json (retrieved_at 2026-09-24)"
 BROKER_FEE_SCHEDULE_SOURCE = ("https://files.alpaca.markets/disclosures/library/BrokFeeSched.pdf "
                               "(Revised on September 17, 2026; retrieved 2026-09-25; sha256 "

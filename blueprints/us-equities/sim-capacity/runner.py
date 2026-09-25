@@ -30,7 +30,7 @@ import sys
 import time
 from dataclasses import asdict
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import ROUND_CEILING, Decimal
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -67,7 +67,9 @@ PROFILES = {
                               "and denials are expected and counted."},
     "elite-tier": {"max_order_submit_rate": "900/00:01:00", "submits_per_sec": 1000.0 / 60.0,
                     "commission_plan": "all_in",
-                    "note": "Alpaca Elite / non-retail tier: 1000 req/min x 0.9 = 900/min. "
+                    "note": "Alpaca Elite / non-retail tier: 0.9x the advertised 1000 req/min "
+                            "REQUEST-RATE entitlement (a request budget, not a fill-throughput figure) "
+                            "= 900/min. "
                             "Must sustain >=180 fills/min in every full simulated minute. "
                             "~1000 submits/min attempted against a 900/min budget so the native "
                             "limiter actually binds here too (a prior cadence of exactly 15/s = "
@@ -371,13 +373,23 @@ def fills_per_minute_stats(bucket_fill_counts: dict[int, int], total_full_minute
             "total_full_minutes": total_full_minutes, "per_minute": values}
 
 
-def _quote_in_force(rows: list[dict], ts_ns: int) -> dict | None:
-    """Last quote row at or before `ts_ns`, via bisection (rows are already
-    time-sorted)."""
+def _quotes_in_force(rows: list[dict], ts_list: list[int], ts_ns: int) -> list[dict]:
+    """Every quote row sharing the same timestamp as the last quote at or
+    before `ts_ns` (rows/ts_list are already time-sorted). Two SIP quotes can
+    legitimately share one nanosecond timestamp (1,342 such pairs measured in
+    this data); the engine's actual processing order between same-ns rows is
+    not observable from the retained data, so every row at that exact
+    timestamp is a candidate the fill could plausibly have matched against --
+    not just whichever one happens to sort last. Returns an empty list if
+    `ts_ns` precedes every retained quote."""
     import bisect
-    ts_list = [r["ts_ns"] for r in rows]
     i = bisect.bisect_right(ts_list, ts_ns) - 1
-    return rows[i] if i >= 0 else None
+    if i < 0:
+        return []
+    tie_ts = ts_list[i]
+    lo = bisect.bisect_left(ts_list, tie_ts)
+    hi = bisect.bisect_right(ts_list, tie_ts)
+    return rows[lo:hi]
 
 
 def check_no_fill_beats_nbbo_touch(events: list[dict], quotes_by_symbol: dict) -> dict:
@@ -391,7 +403,13 @@ def check_no_fill_beats_nbbo_touch(events: list[dict], quotes_by_symbol: dict) -
     crossing the market a little -- is expected and fine; the opposite,
     "better than the touch", is exactly the on-rc5-only artifact from a trade
     print locking the L1 book that motivated excluding trade ticks from the
-    engine feed (see run_one's H1 docstring))."""
+    engine feed (see run_one's H1 docstring)).
+
+    A fill is flagged only if it beats the touch of **every** quote sharing
+    the in-force timestamp (see `_quotes_in_force`) -- if it is legitimately
+    at-or-through even one of several same-ns candidates, it is not counted
+    as a violation, since that candidate could be the one the engine actually
+    matched against."""
     quote_ts = {s: [r["ts_ns"] for r in rows] for s, rows in quotes_by_symbol.items()}
     violations = []
     checked = 0
@@ -401,19 +419,23 @@ def check_no_fill_beats_nbbo_touch(events: list[dict], quotes_by_symbol: dict) -
         symbol = ev["instrument_id"].split(".")[0]
         rows = quotes_by_symbol.get(symbol, [])
         ts_list = quote_ts.get(symbol, [])
-        if not ts_list:
+        candidates = _quotes_in_force(rows, ts_list, ev["ts_ns"])
+        if not candidates:
             continue
-        import bisect
-        i = bisect.bisect_right(ts_list, ev["ts_ns"]) - 1
-        if i < 0:
-            continue
-        q = rows[i]
         checked += 1
-        bid, ask, px = Decimal(q["bid"]), Decimal(q["ask"]), Decimal(ev["price"])
-        beats_touch = (px < ask) if ev["side"] == "BUY" else (px > bid)
-        if beats_touch:
+        px = Decimal(ev["price"])
+        touches = []
+        beats_every_candidate = True
+        for q in candidates:
+            bid, ask = Decimal(q["bid"]), Decimal(q["ask"])
+            touch = ask if ev["side"] == "BUY" else bid
+            touches.append(str(touch))
+            beats_this_one = (px < ask) if ev["side"] == "BUY" else (px > bid)
+            if not beats_this_one:
+                beats_every_candidate = False
+        if beats_every_candidate:
             violations.append({"client_order_id": ev["client_order_id"], "symbol": symbol, "side": ev["side"],
-                                "fill_price": ev["price"], "touch": str(ask if ev["side"] == "BUY" else bid)})
+                                "fill_price": ev["price"], "candidate_touches": touches})
     return {"checked": checked, "violations": violations[:20], "violation_count": len(violations)}
 
 
@@ -436,6 +458,34 @@ def submit_to_fill_latency_ms(events: list[dict]) -> dict:
         return deltas_ms[min(n - 1, int(q * (n - 1)))]
 
     return {"n": n, "min_ms": deltas_ms[0], "p50_ms": pct(0.5), "p90_ms": pct(0.9), "max_ms": deltas_ms[-1]}
+
+
+def alpaca_rounding_delta(fills: list[dict], commission_plan: str) -> dict:
+    """Measured difference between this model's per-fill, half-up rounding and
+    Alpaca's actual documented method: aggregate each fee TYPE separately
+    across every fill, then round each type's total UP to the cent (per the
+    Brokerage Fee Schedule PDF: "Each fee type is aggregated separately at the
+    daily, per-account level. After aggregation, each fee total is rounded up
+    to the nearest cent."). This recomputes both totals directly from the
+    fills rather than asserting a fixed dollar figure, since the difference
+    depends on the actual run's fill counts/sizes."""
+    import fee_model as fm
+
+    sums = {"cat": Decimal("0"), "commission": Decimal("0"), "sec": Decimal("0"), "taf": Decimal("0")}
+    model_total = Decimal("0")
+    for f in fills:
+        qty, px, side = f["qty"], Decimal(f["price"]), f["side"]
+        model_total += Decimal(f["fee_usd"])
+        sums["cat"] += fm.cat_fee(quantity=qty)
+        sums["commission"] += fm.elite_commission(quantity=qty, plan=commission_plan)
+        if side == "SELL":
+            sums["sec"] += px * qty * fm.SEC_SECTION31_RATE_USD_PER_DOLLAR
+            sums["taf"] += min(Decimal(qty) * fm.FINRA_TAF_USD_PER_SHARE, fm.FINRA_TAF_MAX_USD_PER_TRADE)
+    alpaca_by_type = {k: v.quantize(fm.CENT, rounding=ROUND_CEILING) for k, v in sums.items()}
+    alpaca_total = sum(alpaca_by_type.values(), Decimal("0"))
+    return {"model_total_usd": str(model_total), "alpaca_method_total_usd": str(alpaca_total),
+            "model_minus_alpaca_usd": str(model_total - alpaca_total),
+            "alpaca_method_by_type_usd": {k: str(v) for k, v in alpaca_by_type.items()}}
 
 
 # ---------------------------------------------------------------------------
@@ -482,6 +532,9 @@ def summarize_run(result: dict, quotes_by_symbol: dict) -> dict:
         elif ev["kind"] == "denied":
             denied_reasons[ev["reason"]] = denied_reasons.get(ev["reason"], 0) + 1
 
+    commission_plan = PROFILES.get(result["profile"], {}).get("commission_plan", "none")
+    fee_rounding = alpaca_rounding_delta(fills, commission_plan)
+
     return {
         "profile": result["profile"], "latency_ms": result["latency_ms"],
         "per_minute": {"submits": {m: buckets[m].get("submits", 0) for m in sorted(buckets)},
@@ -491,6 +544,7 @@ def summarize_run(result: dict, quotes_by_symbol: dict) -> dict:
         "fills_per_minute_stats": strategy_stats,
         "counters": result["counters"],
         "reject_reasons": reject_reasons, "denied_reasons": denied_reasons,
+        "fee_rounding": fee_rounding,
         "filled_qty": result["filled_qty"], "filled_notional_usd": result["filled_notional"],
         "fees_usd": str(total_fees), "execution_cost_vs_mid_usd": str(execution_cost_vs_mid),
         "simulated_cost_per_minute_usd": simulated_cost_per_minute,
@@ -518,6 +572,12 @@ def cmd_run(args) -> int:
     trades = json.loads((args.catalog / "trades.private.json").read_text())
     fetch_manifest = json.loads((args.catalog / "fetch-manifest.json").read_text())
 
+    def _sweep_entry(latency_ms, summary):
+        return {"latency_ms": latency_ms, "fills_per_minute_stats": summary["fills_per_minute_stats"],
+                "recount_agrees": summary["recount"]["agrees"],
+                "fill_vs_nbbo_touch_violations": summary["fill_vs_nbbo_touch"]["violation_count"],
+                "reject_reasons": summary["reject_reasons"], "denied_reasons": summary["denied_reasons"]}
+
     profiles = list(PROFILES) if args.profile == "all" else [args.profile]
     summaries = []
     latency_sensitivity = []
@@ -533,28 +593,30 @@ def cmd_run(args) -> int:
             continue
         for latency_ms in LATENCY_SWEEP_MS:
             if latency_ms == PRIMARY_LATENCY_MS:
-                latency_sensitivity.append({"latency_ms": latency_ms,
-                                             "fills_per_minute_stats": primary_summary["fills_per_minute_stats"],
-                                             "recount_agrees": primary_summary["recount"]["agrees"]})
+                latency_sensitivity.append(_sweep_entry(latency_ms, primary_summary))
                 continue
             result = run_one(quotes, trades, profile_name=profile_name, latency_ms=latency_ms)
             summary = summarize_run(result, quotes)
-            latency_sensitivity.append({"latency_ms": latency_ms,
-                                         "fills_per_minute_stats": summary["fills_per_minute_stats"],
-                                         "recount_agrees": summary["recount"]["agrees"]})
+            latency_sensitivity.append(_sweep_entry(latency_ms, summary))
 
-    # cmd_run asserts the recount, rather than merely computing and reporting
-    # it: an unhandled AssertionError here is the intended failure mode if a
-    # future change ever makes NautilusTrader's own fills report disagree with
-    # the strategy's own counters.
+    # cmd_run raises explicit errors on these checks, rather than merely
+    # computing and reporting them, and rather than using `assert` (which
+    # Python's -O flag silently disables): an unhandled RuntimeError here is
+    # the intended failure mode if a future change ever makes NautilusTrader's
+    # own fills report disagree with the strategy's own counters, or lets a
+    # fill beat the NBBO touch, in ANY run -- primary or latency-sweep alike.
     for s in summaries:
-        assert s["recount"]["agrees"], f"recount disagreement in profile {s['profile']}"
+        if not s["recount"]["agrees"]:
+            raise RuntimeError(f"recount disagreement in profile {s['profile']}")
+        if s["fill_vs_nbbo_touch"]["violation_count"] != 0:
+            raise RuntimeError(f"{s['fill_vs_nbbo_touch']['violation_count']} exerciser fill(s) beat the "
+                               f"NBBO touch in profile {s['profile']} (see H1 in README.md)")
     for row in latency_sensitivity:
-        assert row["recount_agrees"], f"recount disagreement at latency {row['latency_ms']}ms"
-    for s in summaries:
-        assert s["fill_vs_nbbo_touch"]["violation_count"] == 0, (
-            f"{s['fill_vs_nbbo_touch']['violation_count']} exerciser fill(s) beat the NBBO touch "
-            f"in profile {s['profile']} (see H1 in README.md)")
+        if not row["recount_agrees"]:
+            raise RuntimeError(f"recount disagreement at latency {row['latency_ms']}ms")
+        if row["fill_vs_nbbo_touch_violations"] != 0:
+            raise RuntimeError(f"{row['fill_vs_nbbo_touch_violations']} exerciser fill(s) beat the NBBO "
+                               f"touch at latency {row['latency_ms']}ms (see H1 in README.md)")
 
     runner_sha256 = fetcher.rc.digest_bytes(Path(__file__).read_bytes())
     engine_versions = {"nautilus_trader": importlib.metadata.version("nautilus_trader"),
@@ -595,10 +657,12 @@ def cmd_run(args) -> int:
         "profiles": {name: PROFILES[name] for name in profiles},
         "runs": summaries,
         "latency_sensitivity_elite_tier": latency_sensitivity,
-        "latency_note": ("PRIMARY_LATENCY_MS=70 is a primary-reference point (inside the retained "
-                         "sim-to-paper receipt's observed 0.65-1.09s paper submit-to-fill range and near "
-                         "its own sensitivity-check flip point, ~69.2ms) -- it is explicitly NOT a "
-                         "calibration (that receipt itself says 'Sensitivity check, not a calibration'). "
+        "latency_note": ("PRIMARY_LATENCY_MS=70 is a primary-reference point, chosen near the retained "
+                         "sim-to-paper receipt's own sensitivity-check flip point (~69.2ms) -- it is far "
+                         "BELOW that receipt's observed paper submit-to-fill range (0.65-1.09s), not "
+                         "inside it; of this lane's own 0/70/250/1000ms sweep points, 1000ms is the "
+                         "closest to that observed range. It is explicitly NOT a calibration (that "
+                         "receipt itself says 'Sensitivity check, not a calibration'). "
                          "On rc5 a deferred order is released at the first of its own next quote or ANY "
                          "due clock timer, so the exerciser's own tick cadence mixes into the measured "
                          "submit-to-fill distribution alongside the configured latency; the sweep below "
@@ -616,14 +680,17 @@ def cmd_run(args) -> int:
             "source_cat_and_elite": ("https://files.alpaca.markets/disclosures/library/BrokFeeSched.pdf "
                                      "(Revised on September 17, 2026; retrieved 2026-09-25; sha256 "
                                      "7bc75e3cd86f5c1950f8ce1292049965280340a3cebe727ca7aee4a7d2d71b12)"),
-            "unverified": ["Whether the FINRA TAF cap applies per order or per execution/fill; this model "
-                           "applies it per fill (see fee_model.py module docstring).",
-                           "The cost_plus commission plan's exchange-fee/rebate pass-through component "
-                           "is not modeled (partial)."],
-            "rounding_note": ("Alpaca aggregates each fee type per day, per account, and rounds the "
-                              "day's total UP to the cent. This model instead rounds each fill's total "
-                              "fee half-up. The difference is small at this run's scale (well under a "
-                              "dollar across a 30-minute run) and is reported, not hidden."),
+            "taf_cap_scope": ("Per execution, not per order (settled): FINRA TAF FAQ A200.17 -- "
+                             "https://www.finra.org/rules-guidance/guidance/faqs/trading-activity-fee -- "
+                             "each street-side execution is a separate sale (its own example: ten "
+                             "100,000-share executions of one order are ten separately capped sales); "
+                             "Alpaca's schedule's 'per trade' wording is consistent with this reading."),
+            "partial": ["The cost_plus commission plan's exchange-fee/rebate pass-through component "
+                        "is not modeled."],
+            "rounding_method_note": ("Alpaca aggregates each fee type per day, per account, and rounds "
+                                     "the day's total UP to the cent; this model instead rounds each "
+                                     "fill's total fee half-up. See each run's fee_rounding for the "
+                                     "measured difference on this run's actual fills."),
         },
         "engine_and_runtime": engine_versions,
         "runner_sha256": runner_sha256,
