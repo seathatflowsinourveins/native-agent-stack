@@ -38,7 +38,8 @@
           {"context": "dependency-review", "integration_id": 15368},
           {"context": "osv-scanner", "integration_id": 15368},
           {"context": "verdict-review-gate", "integration_id": 15368},
-          {"context": "validate-macos", "integration_id": 15368}
+          {"context": "validate-macos", "integration_id": 15368},
+          {"context": "sota-sources", "integration_id": 15368}
         ]
       }
     },

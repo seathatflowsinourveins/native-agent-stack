@@ -3116,8 +3116,8 @@
     },
     {
       "path": ".github/main-ruleset.json",
-      "sha256": "7760b633919767f6e0851e7af284471f81fb820a6b736323142f543adb5b0d8a",
-      "bytes": 1699
+      "sha256": "5b6a1543053c995222fb0b6de9e213fa9446aa86e20aaa6086e6289bf1e97013",
+      "bytes": 1763
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
@@ -3126,8 +3126,8 @@
     },
     {
       "path": ".github/pull_request_template.md",
-      "sha256": "414a6890b079dde81f3ba595eabb6727907bd9bea223d310015e901a34424262",
-      "bytes": 2024
+      "sha256": "3cf7addac4078f976d74be98f02f72cb30bf35b9b642061fd2563115c3cfa6ab",
+      "bytes": 2346
     },
     {
       "path": ".github/requirements-ci.txt",
@@ -3196,8 +3196,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "fc67d96ca3fb4ff8d6a6f399676aa2d09cb1a1d12500bbe9d93dc1f744fd57fb",
-      "bytes": 18132
+      "sha256": "8c00e1b8fa7a8ebc49491f95d54133b2fcfa4c42e3c7e2e286fdcae98618b485",
+      "bytes": 19787
     },
     {
       "path": ".gitignore",
@@ -3216,8 +3216,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "90318145bbe7c91931729138e6e540b180783997183466049f06e9ab87802c15",
-      "bytes": 11142
+      "sha256": "044c15be75192905cc5debe0a55d24612656f97a72dfa06ce6f309ec9b771685",
+      "bytes": 11708
     },
     {
       "path": "CLAUDE.md",
@@ -29892,8 +29892,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "5d35e43cdd675535e492c1b56e89c0acbd88202aa676ece3b8f65941e0c00bec",
-      "bytes": 5771
+      "sha256": "41893a5f18340f5529e1b95d1e0f860adf5cf607f5aebddda1b391f1615f7a1c",
+      "bytes": 6337
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
