@@ -1502,20 +1502,30 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
   (it mirrors three GET endpoints plus this record's own explanatory fields
   for readability, so it is applied field-by-field below, not passed to
   `gh api --input` against a single endpoint the way `.github/main-ruleset.json`
-  is). The coordinator applies it after merge, the same as the main ruleset
-  (section 10) and the fork-approval PUT below:
+  is). The coordinator applied it on 2026-09-25, before this record merged,
+  from the committed `.github/actions-permissions.json` (every PUT sends
+  `sha_pinning_required=true` so the enforcement is never reset):
   ```sh
   gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/actions/permissions \
-    -f allowed_actions=selected -F enabled=true
+    -f allowed_actions=selected -F enabled=true -F sha_pinning_required=true
   gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/actions/permissions/selected-actions \
     -F github_owned_allowed=true -F verified_allowed=false \
     -f 'patterns_allowed[]=step-security/harden-runner@*' \
     -f 'patterns_allowed[]=ossf/scorecard-action@*'
   gh api repos/seathatflowsinourveins/native-agent-stack/actions/permissions
   ```
-  `After-GET: pending coordinator`. **Rollback:** the same first PUT with
-  `allowed_actions=all`:
-  `gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/actions/permissions -f allowed_actions=all -F enabled=true`.
+  After-GET (2026-09-25T22:56:29Z): `actions/permissions` returned
+  `{"enabled":true,"allowed_actions":"selected","sha_pinning_required":true}`;
+  `actions/permissions/selected-actions` returned
+  `{"github_owned_allowed":true,"patterns_allowed":["step-security/harden-runner@*","ossf/scorecard-action@*"],"verified_allowed":false}`;
+  `actions/permissions/workflow` returned `default_workflow_permissions: read`,
+  `can_approve_pull_request_reviews: true`. Before-GET at 22:56:28Z:
+  `allowed_actions: all` (selected-actions answered 409). Confirmation runs on
+  `main` after the change: `token-report` (harden-runner) and `scorecard`
+  (harden-runner and ossf/scorecard-action), both `workflow_dispatch`; their
+  run URLs and conclusions are in this record's PR. **Rollback:** the same
+  first PUT with `allowed_actions=all`:
+  `gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/actions/permissions -f allowed_actions=all -F enabled=true -F sha_pinning_required=true`.
 - **Fork-approval after-GET (closes the pending step above).** "GitHub
   hardening follow-up (2026-09-25)" decided `all_external_contributors` and
   left "record the dated after-GET here" open. A live, read-only GET of
