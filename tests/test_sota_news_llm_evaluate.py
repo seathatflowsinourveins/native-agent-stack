@@ -265,6 +265,31 @@ class PureEvaluation(unittest.TestCase):
         self.assertAlmostEqual(empty(events[3]), 0.0005)
 
 
+@unittest.skipUnless(importlib.util.find_spec("duckdb"), "duckdb not installed (run under the data runtime)")
+class RthMinuteLoader(unittest.TestCase):
+    def test_first_bar_at_or_after_entry_within_five_minutes(self):
+        import duckdb
+
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        d = Path(tmp.name) / "symbol=AAA" / "year=2023"
+        d.mkdir(parents=True)
+        con = duckdb.connect()
+        con.execute("""CREATE TABLE b AS SELECT * FROM (VALUES
+            ('AAA', DATE '2023-03-01', 614::SMALLINT, 49.0),
+            ('AAA', DATE '2023-03-01', 616::SMALLINT, 50.0),
+            ('AAA', DATE '2023-03-02', 600::SMALLINT, 60.0)) t(symbol, et_date, et_minute, o)""")
+        con.execute(f"COPY b TO '{d / 'full.parquet'}' (FORMAT parquet)")
+        events = [
+            {"event_id": "1:AAA", "symbol": "AAA", "window": "rth", "entry_utc": "2023-03-01T15:15:00Z"},  # 615 missing -> 616
+            {"event_id": "2:AAA", "symbol": "AAA", "window": "rth", "entry_utc": "2023-03-02T15:00:00Z"},
+            {"event_id": "3:AAA", "symbol": "AAA", "window": "rth", "entry_utc": "2023-03-02T16:00:00Z"},  # no bar in 5 min
+            {"event_id": "4:BBB", "symbol": "BBB", "window": "rth", "entry_utc": "2023-03-02T16:00:00Z"},  # no file
+            {"event_id": "5:AAA", "symbol": "AAA", "window": "overnight", "entry_utc": "2023-03-02T14:30:00Z"},
+        ]
+        self.assertEqual(ev_mod.load_rth_entries(events, tmp.name), {"1:AAA": 50.0, "2:AAA": 60.0})
+
+
 class EndToEnd(unittest.TestCase):
     def test_main_on_a_synthetic_frozen_study(self):
         tmp = tempfile.TemporaryDirectory()
