@@ -246,23 +246,23 @@ class GenericStringScanning(unittest.TestCase):
 
     def test_skillmd_hits_through_a_json_encoded_string_field(self):
         payload = {"type": "function_call", "name": "Read",
-                   "arguments": json.dumps({"file_path": "/home/x/.agents/skills/gh-fix-ci/SKILL.md"})}
+                   "arguments": json.dumps({"file_path": "/home/example/.agents/skills/gh-fix-ci/SKILL.md"})}
         self.assertEqual(S.skillmd_hits(payload, ["gh-fix-ci", "tdd"]), {"gh-fix-ci"})
 
     def test_skillmd_hits_through_an_already_nested_object_field(self):
         payload = {"type": "tool_search_call", "execution": "search",
-                   "arguments": {"query": "read /home/x/.agents/skills/tdd/SKILL.md"}}
+                   "arguments": {"query": "read /home/example/.agents/skills/tdd/SKILL.md"}}
         self.assertEqual(S.skillmd_hits(payload, ["gh-fix-ci", "tdd"]), {"tdd"})
 
     def test_skillmd_hits_through_a_command_argv_array(self):
         payload = {"type": "local_shell_call", "action": {
-            "type": "exec", "command": ["cat", "/home/x/.agents/skills/tdd/SKILL.md"]}}
+            "type": "exec", "command": ["cat", "/home/example/.agents/skills/tdd/SKILL.md"]}}
         self.assertEqual(S.skillmd_hits(payload, ["gh-fix-ci", "tdd"]), {"tdd"})
 
     def test_skillmd_hits_requires_the_slash_delimited_suffix(self):
         # "other-tdd-extra/SKILL.md" must not match the manifest skill "tdd".
         payload = {"type": "function_call", "arguments": json.dumps(
-            {"file_path": "/home/x/.agents/skills/other-tdd-extra/SKILL.md"})}
+            {"file_path": "/home/example/.agents/skills/other-tdd-extra/SKILL.md"})}
         self.assertEqual(S.skillmd_hits(payload, ["tdd"]), set())
 
     def test_mention_hits_word_boundary(self):
@@ -286,16 +286,16 @@ class ManifestAndLock(unittest.TestCase):
                 S.load_manifest(bad)
 
     def test_skill_lock_path_xdg_state_home_takes_precedence(self):
-        path = S.skill_lock_path(home="/home/x", environment={"XDG_STATE_HOME": "/xdg-state"})
+        path = S.skill_lock_path(home="/home/example", environment={"XDG_STATE_HOME": "/xdg-state"})
         self.assertEqual(path, Path("/xdg-state/skills/.skill-lock.json"))
 
     def test_skill_lock_path_relative_xdg_state_home_is_ignored(self):
-        path = S.skill_lock_path(home="/home/x", environment={"XDG_STATE_HOME": "relative/dir"})
-        self.assertEqual(path, Path("/home/x/.agents/.skill-lock.json"))
+        path = S.skill_lock_path(home="/home/example", environment={"XDG_STATE_HOME": "relative/dir"})
+        self.assertEqual(path, Path("/home/example/.agents/.skill-lock.json"))
 
     def test_skill_lock_path_home_fallback(self):
-        path = S.skill_lock_path(home="/home/x", environment={})
-        self.assertEqual(path, Path("/home/x/.agents/.skill-lock.json"))
+        path = S.skill_lock_path(home="/home/example", environment={})
+        self.assertEqual(path, Path("/home/example/.agents/.skill-lock.json"))
 
     def test_load_lock_installed_at_from_fixture(self):
         installed = S.load_lock_installed_at(FIXTURES / "home" / ".agents" / ".skill-lock.json")
@@ -440,6 +440,23 @@ class BuildReportPruneLogic(unittest.TestCase):
         self.assertNotIn("codex", tdd["evaluated_clients"])
         self.assertIn("claude", tdd["evaluated_clients"])
         self.assertTrue(tdd["prune_eligible"])  # still eligible through Claude alone
+
+    def test_a_listed_skill_missing_from_the_table_reads_as_unmeasured_not_a_fake_zero(self):
+        # Same principle as the Codex window case above, on the Claude side: a manifest skill
+        # that IS listed (claude_listing != "off") but has no row in this particular captured
+        # table (e.g. it scrolled out of a truncated capture) must never be reported as an
+        # observed 0 -- that would claim a measurement that was never taken.
+        empty_claude = {"rows": {}, "format": "json", "total_cost_usd": 0, "num_turns": 0}
+        report = self.build(claude=empty_claude)
+        gh = self.entry(report, "gh-fix-ci")  # claude_listing == "on" in the fixture manifest
+        self.assertFalse(gh["claude"]["in_table"])
+        self.assertIsNone(gh["claude"]["uses"])
+        self.assertNotIn("claude", gh["evaluated_clients"])
+        # tdd, also listed "on", falls back to Codex alone for its zero-check.
+        tdd = self.entry(report, "tdd")
+        self.assertIsNone(tdd["claude"]["uses"])
+        self.assertNotIn("claude", tdd["evaluated_clients"])
+        self.assertIn("codex", tdd["evaluated_clients"])
 
     def test_report_contains_no_transcript_or_path_text(self):
         report = self.build()

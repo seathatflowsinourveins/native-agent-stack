@@ -103,7 +103,11 @@ native output, it is not an unchanged upstream test and not a synthetic fixture 
   manifest's own `trial.window_days`, the report still adds it internally (see above) and scans
   Codex at that window; but a per-skill Codex count is only ever a real zero when its window was
   actually scanned. This mirrors `tools/token-report/README.md`'s "an absent ledger is not read as
-  a measured zero" rule.
+  a measured zero" rule. The same rule applies on the Claude side: a manifest skill with no row in
+  the captured `/skill-doctor` table gets `claude.uses: null` and is dropped from
+  `evaluated_clients`, even when it is listed (`claude_listing != "off"`) — a listed skill can
+  still be missing from one particular capture (e.g. it scrolled out of a truncated table), and
+  that absence is never reported as an observed zero.
 - **`prune_candidates` requires an actual evaluated client.** The rule is: installed age
   `>= trial.window_days`, and zero uses in that window on *every measured client where the skill
   is enabled/listed*. A skill with `claude_listing: "off"` and `codex_enabled: false` has no

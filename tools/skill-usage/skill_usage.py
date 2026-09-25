@@ -408,8 +408,13 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
         else:
             row = claude["rows"].get(name)
             if row is None:
+                # Absent from this capture is unmeasured, never a fabricated zero -- the same
+                # "never scanned reads as unmeasured" rule applied to Codex windows above. This
+                # holds even when claude_listed is True: a captured /skill-doctor table can miss a
+                # listed skill (e.g. it scrolled out of a truncated capture), and reporting 0 would
+                # claim an observation that was never made.
                 claude_out = {"listing": claude_listing, "in_table": False, "context_tokens": None,
-                              "uses": 0 if claude_listed else None, "last_used": None}
+                              "uses": None, "last_used": None}
             else:
                 claude_out = {"listing": claude_listing, "in_table": True,
                               "context_tokens": row["context_tokens"], "uses": row["uses"],
