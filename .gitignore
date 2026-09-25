@@ -43,3 +43,10 @@ evidence/hosts/**/*.json.tmp-*
 auth.json
 hosts.yml
 .netrc
+stored_tokens
+
+# Hugging Face's other file, the active token, has the bare basename `token`.
+# That name is deliberately not listed here: it is too generic to ignore
+# repository-wide (it would silently hide an unrelated tracked file with that
+# exact name). scripts/credential_status.py's SENSITIVE_BASENAME makes the
+# same choice (docs/secret-storage.md "Threat model").

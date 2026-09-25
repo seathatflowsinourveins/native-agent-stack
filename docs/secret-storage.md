@@ -265,15 +265,15 @@ It creates both files with mode `0600` and sets their directory to `0700`.
 The inventory rows `huggingface-native` and `huggingface-native-stored` use
 the same default, so `scripts/credential_status.py` checks the files `hf`
 uses. These facts were checked on 2026-09-25 against the installed
-`huggingface_hub` 1.32.0 source (`constants.py`, `utils/_auth.py`, `_login.py`,
-`cli/auth.py`) and the same files at the upstream `v2.0.0` tag.
+`huggingface_hub` 1.32.0 source (`constants.py`, `utils/_auth.py`, `utils/_headers.py`,
+`_login.py`, `cli/auth.py`) and the same files at the upstream `v2.0.0` tag.
 
 - Nothing goes in your shell startup file for Hugging Face. Never export
   `HF_TOKEN` or `HUGGING_FACE_HUB_TOKEN`: either one takes precedence over the
   stored token and reaches every child process.
 - Leave `HF_TOKEN_PATH` unset. It moves both files. The checker and the deny
-  rules do not follow it, and the guard catches only commands that spell
-  `$HF_TOKEN_PATH`, not the path it holds.
+  rules do not follow it, and the guard catches only a reader, copy or input
+  redirect that spells `$HF_TOKEN_PATH`, not the path it holds.
 - Put model files elsewhere with `--local-dir` or `HF_HUB_CACHE`, not by
   pointing `HF_HOME` somewhere else. A process with another `HF_HOME` does not
   see the sign-in.
@@ -325,9 +325,9 @@ hf cache ls
 
 Agents never run `hf auth token`, which prints the token to stdout. The guard
 blocks it, `huggingface-cli ... token`, any command that names either token
-file (also as `$HF_HOME/token` or through `$HF_TOKEN_PATH`), and a reader or
-copy of the whole Hugging Face home. The deny rules keep the Read tool off
-both default paths. `hf auth list` shows the first three and last four
+file directly (also as `$HF_HOME/token`), a reader, copy or input redirect on
+`$HF_TOKEN_PATH`, and a reader or copy of the whole Hugging Face home. The
+deny rules keep the Read tool off both default paths. `hf auth list` shows the first three and last four
 characters of each saved token. The guard does not block it, but an agent has
 no need for it.
 
@@ -343,10 +343,13 @@ no need for it.
   holds one.
 - A worker that needs no gated or private repository sets
   `HF_HUB_DISABLE_IMPLICIT_TOKEN=1`, and one that downloads nothing also sets
-  `HF_HUB_OFFLINE=1`. With the first, `huggingface_hub` sends the token only
-  for write calls or when code asks for it with `token=True`. This prevents
-  accidental use of the token. It does not stop a deliberate read, because
-  the worker runs as your user and can still read the file.
+  `HF_HUB_OFFLINE=1`. With the variable set, `huggingface_hub` 1.32.0 sends
+  the token only when code passes it explicitly (`token=True` or a token
+  string); implicit use — the default when calling code passes no `token`
+  argument — is off for every call, writes included
+  (`utils/_headers.py` `get_token_to_send`). This prevents accidental use of
+  the token. It does not stop a deliberate read, because the worker runs as
+  your user and can still read the file.
 - A gated download happens in a signed-in run (your shell, or an agent
   running `hf download` as above). Serving then runs offline from the
   result.
@@ -361,11 +364,11 @@ example by `hf auth token`, and follow
 
 | Layer | Stops | Does not stop |
 | --- | --- | --- |
-| Store outside every worktree, plus `.gitignore` for `.env*`, `*.env`, `*.key`, `*.pem` and native-store names | committing a credential by accident | a value pasted into a tracked file |
+| Store outside every worktree, plus `.gitignore` for `.env*`, `*.env`, `*.key`, `*.pem`, `stored_tokens` and other native-store names (the generic `token` basename is deliberately not listed: it is too broad to ignore repository-wide, and `scripts/credential_status.py`'s `SENSITIVE_BASENAME` makes the same choice) | committing a credential by accident | a value pasted into a tracked file, or a tracked file literally named `token` |
 | `scripts/git-hooks/pre-commit` (gitleaks on staged changes) | known secret shapes in a commit, before it is made | `--no-verify`; clones where `core.hooksPath` is not set; values with no recognizable shape |
 | CI gitleaks (`validate.yml`), GitHub secret scanning and push protection (public repo) | pushes and history that contain known provider patterns | anything not yet pushed; custom formats. This layer only reacts after the fact |
 | Project `.claude/settings.json` deny rules | Claude's Read/Edit tools on the listed paths (including both Hugging Face token files at their default location); `printenv`, `env`, `gh auth token`, `hf auth token`, `git credential fill`, `gh auth git-credential` | Python or other subprocesses that open the files themselves; forms that do not match the rule text; a moved `HF_HOME`; sessions started outside this repository |
-| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...`, `$XDG_CACHE_HOME/huggingface/...` or through `$HF_TOKEN_PATH`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable, a `.env`/`*.env` file or a secret variable **name**; redirect a pointer variable into a command; turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one | a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an archiver such as `tar` on the Hugging Face home, obfuscated or renamed paths, a script file that sources and traces on its own, and anything else that is not literal text in the command |
+| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file or a secret variable **name**; redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one | a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, obfuscated or renamed paths, a script file that sources and traces on its own, and anything else that is not literal text in the command |
 | Codex `[shell_environment_policy] inherit = "none"` | credential and broker variables in the launcher environment reaching Codex shells (measured, see below) | file reads. The setting controls which environment variables a Codex shell inherits, not which files it can open. A Codex shell can still `cat` a store file. The file-level mitigations are the store's location outside every workspace and the Codex sandbox; Codex 0.155.1 has no documented per-path read deny |
 
 In plain terms: an agent running as your user in `bypassPermissions` mode can

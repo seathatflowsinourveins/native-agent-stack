@@ -277,6 +277,23 @@ EXPECTED_PASS_THROUGH = [
     # huggingface_hub's own loader, and an archiver on the whole Hugging Face home.
     "python3 -c 'from huggingface_hub import get_token; print(get_token())'",
     "tar czf /tmp/hf.tgz -C ~/.cache huggingface",
+    # An inline interpreter that opens $HF_TOKEN_PATH itself never spells a literal
+    # `$HF_TOKEN_PATH`, so POINTER_VARIABLE never sees it.
+    "python3 -c \"import os; print(open(os.environ['HF_TOKEN_PATH']).read())\"",
+    # A recursive read or copy of an ancestor of the Hugging Face home (~, $HOME, ~/.cache,
+    # $XDG_CACHE_HOME with a trailing / or /*) reaches it without ever naming it, so
+    # HF_HOME_ROOT never matches the operand.
+    "cp -r ~ /tmp/exfil",
+    "cp -r \"$HOME\" /tmp/exfil",
+    "cp -r ~/.cache /tmp/exfil",
+    "cp -r \"$XDG_CACHE_HOME/\" /tmp/exfil",
+    "cp -r \"$XDG_CACHE_HOME\"/* /tmp/exfil",
+    # A relative read after `cd` into the Hugging Face home never spells the path in the
+    # reader's own segment.
+    "cd ~/.cache/huggingface && cat token",
+    # A trailing `/.` on $HF_HOME copies its contents but does not match HF_HOME_ROOT's
+    # anchored `(?:/\\**)?$` suffix.
+    "cp -r \"$HF_HOME/.\" /tmp/exfil",
 ]
 
 

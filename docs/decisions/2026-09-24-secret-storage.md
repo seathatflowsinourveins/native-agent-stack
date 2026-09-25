@@ -206,8 +206,12 @@ revision-pinned downloads and checksum verification. The runbook section is
 [Hugging Face sign-in](../secret-storage.md#hugging-face-sign-in).
 
 **Verified** from the installed huggingface_hub 1.32.0 source and the same
-files at the upstream `v2.0.0` tag. Token precedence is OIDC, then `HF_TOKEN`,
-then `HUGGING_FACE_HUB_TOKEN`, then the file. Both files are written `0600`
+files at the upstream `v2.0.0` tag, commit
+`97c5f5f2030c2df01b60548f7d357970a106cd7d` (the annotated tag object
+`90b2aaf9889bb098d8fca575687ec8be02508959` dereferenced to that commit; read
+only, via `gh api repos/huggingface/huggingface_hub/git/ref/tags/v2.0.0` then
+`git/tags/<that object sha>`, both fetched 2026-09-25). Token precedence is
+OIDC, then `HF_TOKEN`, then `HUGGING_FACE_HUB_TOKEN`, then the file. Both files are written `0600`
 and their directory is set to `0700`. `hf auth token` prints the token. The
 paste login reads the token with `getpass` and never writes a git credential;
 only an explicit `--add-to-git-credential` (with `--token`, or on

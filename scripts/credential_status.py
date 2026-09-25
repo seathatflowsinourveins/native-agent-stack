@@ -53,9 +53,12 @@ ENTRY_KEYS = {"id", "label", "class", "status", "lane", "store", "variables",
 
 # Tracked basenames that should never exist in a checkout. Basename/extension
 # matching keeps evidence folders such as .../secrets-credentials/ out of scope.
+# Hugging Face's other file, the bare `token` basename, is deliberately not
+# listed: it is too generic to flag repository-wide (.gitignore makes the same
+# choice; docs/secret-storage.md "Threat model").
 SENSITIVE_BASENAME = re.compile(
     r"^(?:\.env|\.env\..+|.+\.env|.+\.key|.+\.pem|credentials\.json|\.credentials\.json"
-    r"|auth\.json|hosts\.yml|\.netrc|id_rsa|id_ecdsa|id_ed25519)$")
+    r"|auth\.json|hosts\.yml|\.netrc|id_rsa|id_ecdsa|id_ed25519|stored_tokens)$")
 
 
 def inventory_errors(inventory, root: Path | None = None) -> list[str]:

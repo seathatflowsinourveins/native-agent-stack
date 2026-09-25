@@ -317,12 +317,18 @@ class CredentialStatusTests(unittest.TestCase):
         repo = self.home / "repo"
         (repo / "evidence/secrets-credentials").mkdir(parents=True)
         (repo / "docs").mkdir()
+        (repo / "cache/huggingface").mkdir(parents=True)
         for name in ("leak.env", "evidence/secrets-credentials/receipt.json",
-                     "docs/alpaca-paper.env.example", "service.key"):
+                     "docs/alpaca-paper.env.example", "service.key",
+                     "cache/huggingface/stored_tokens", "cache/huggingface/token"):
             (repo / name).write_text("placeholder\n")
         git(repo, "init", "-q")
         git(repo, "add", "-f", ".")
-        self.assertEqual(cs.tracked_sensitive_names(repo), ["leak.env", "service.key"])
+        # stored_tokens is caught like the other credential-shaped basenames; the bare
+        # `token` basename is deliberately not in SENSITIVE_BASENAME (too generic to flag
+        # repo-wide, matching .gitignore's own choice), so it is not reported.
+        self.assertEqual(cs.tracked_sensitive_names(repo),
+                         ["cache/huggingface/stored_tokens", "leak.env", "service.key"])
 
     def test_repository_has_no_tracked_sensitive_names(self):
         self.assertEqual(cs.tracked_sensitive_names(ROOT), [])

@@ -3201,8 +3201,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "0935c67dcace46c5d3e0e2b124a63362b07036993a828ad254cbca5a192776ec",
-      "bytes": 1190
+      "sha256": "08d0e785ba3bf2ac21f4babf9053de8eb84ec18ab12ef74f59342dda358d5209",
+      "bytes": 1564
     },
     {
       "path": ".gitleaks.toml",
@@ -10177,8 +10177,8 @@
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
-      "sha256": "e1156e5e03cd84a59860a0777f86ae19bb4def16c5f800f678e06c715c0251b0",
-      "bytes": 13796
+      "sha256": "fce32c03fe3dde94c76ea874e5e2327409f73eca65b51ce1297382416a350137",
+      "bytes": 14083
     },
     {
       "path": "docs/direct-results.md",
@@ -10472,8 +10472,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "10a07761ecc2ed882a50f4daff4ab24dae5631ae813fa0a8bcb9fd4f780d9135",
-      "bytes": 39823
+      "sha256": "bcd0c1823333f017f586c4bee610650fd7cb39fbd5471d129e429761b674d229",
+      "bytes": 40833
     },
     {
       "path": "docs/stack.md",
@@ -29772,8 +29772,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "bbec35133b8fe7349062e50b18aa7af710f85d45f7b506a331625b42f4f06fd5",
-      "bytes": 21469
+      "sha256": "8b024716f36edebfbd2d5051fb2070a8551eab2b81d543330b7509ab7b39960a",
+      "bytes": 21688
     },
     {
       "path": "scripts/env_freshness.py",
@@ -30132,8 +30132,8 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "653f66619c14c6ebe45b85459f0186c827394a691b5e9a1c5c30badb486a43c5",
-      "bytes": 24875
+      "sha256": "fa2d01be3f7c87d53319cf7c87e239c783a0a130334cdaddb6f9c94ac4608b77",
+      "bytes": 25331
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -30462,8 +30462,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "45aaf80d8196bc46580d727ef1aee764d962e7658967b6916e172f0916ce4ba7",
-      "bytes": 20537
+      "sha256": "e59e369b49b9476d1a6dfa983a29bc862424686ca2a3d914336393ef71ed250e",
+      "bytes": 21493
     },
     {
       "path": "tests/test_security_identity.py",
