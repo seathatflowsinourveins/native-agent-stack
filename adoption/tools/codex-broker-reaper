@@ -55,8 +55,19 @@ recorded state rather than assumed --
       than the broker's own workspace cwd, not only when the live
       session's own cwd is the checkout root exactly (corrected here,
       fourth fix round, 2026-09-25: an earlier version of this docstring
-      understated this coverage). What it does not cover is a live session
-      with no git relationship to the workspace's checkout at all (see
+      understated this coverage). Fixed (major finding, fifth fix round,
+      2026-09-25): the *first* half of guard (c) -- "the broker's workspace
+      directory no longer exists" -- is decided against that same git
+      checkout root (or the raw cwd, when it has no git relationship at
+      all), never against the broker's raw `/proc/<pid>/cwd` alone; an
+      earlier version declared the workspace unused, skipping the
+      live-session scan entirely, the instant the broker's own (possibly
+      review-triggered, possibly-subdirectory) cwd failed to exist on disk,
+      even when the checkout it belongs to -- the directory that actually
+      keys the plugin's state dir, `resolveWorkspaceRoot(cwd)` in
+      `scripts/lib/workspace.mjs` -- was still there and still live. What it
+      does not cover is a live session with no git relationship to the
+      workspace's checkout at all (see
       docs/decisions/2026-09-25-codex-broker-reaper.md, "Known
       limitations"). Also checks
       the *other* checkout a `git worktree` workspace belongs to (fix
@@ -232,7 +243,16 @@ def read_proc_cmdline(pid: int) -> list[str] | None:
 def read_proc_comm(pid: int) -> str | None:
     try:
         return Path(f"/proc/{pid}/comm").read_text().strip()
-    except OSError:
+    except (OSError, ValueError):
+        # ValueError also catches UnicodeDecodeError (fix round, 2026-09-25,
+        # minor finding): read_text() raises it, not OSError, for a comm set
+        # to non-UTF-8 bytes (e.g. via prctl(PR_SET_NAME) with a truncated
+        # multibyte name), which used to escape every "never raises" caller
+        # -- including collect_child_pids() -> process_parent_pid() from
+        # stop_broker(), outside safe_evaluate_broker's own exception net --
+        # and crash --apply with a traceback, exit 1, and no receipt even
+        # after earlier brokers had already been stopped. Matches
+        # process_start_epoch's existing (OSError, ValueError, IndexError).
         return None
 
 
@@ -285,7 +305,14 @@ def process_start_epoch(pid: int, *, reference: float | None = None) -> float | 
 def process_parent_pid(pid: int) -> int | None:
     try:
         stat_raw = Path(f"/proc/{pid}/stat").read_text()
-    except OSError:
+    except (OSError, ValueError):
+        # ValueError also catches UnicodeDecodeError (fix round, 2026-09-25,
+        # minor finding): /proc/<pid>/stat embeds the process's raw comm
+        # between its first "(" and last ")", so a non-UTF-8 comm makes
+        # read_text() raise here too -- see read_proc_comm's matching
+        # comment for the uncaught-crash chain this closes (collect_child_pids
+        # -> process_parent_pid, reached from stop_broker outside
+        # safe_evaluate_broker's exception net).
         return None
     close = stat_raw.rfind(")")
     if close == -1:
@@ -721,57 +748,90 @@ def evaluate_broker(broker_dir: Path, *, min_age: float, now: float) -> dict:
     if workspace_root is None:
         record["guards"]["c_workspace_unused"] = False
         record["reasons"].append("guard c failed: could not read the broker's /proc/<pid>/cwd")
-    elif not os.path.isdir(workspace_root):
-        record["guards"]["c_workspace_unused"] = True
-        record["reasons"].append(f"guard c: workspace directory {workspace_root} no longer exists")
     else:
-        # Exclude every live broker's own descendants, not just this
-        # broker's own (fix round, 2026-09-25, find_live_broker_pids; see
-        # the module docstring's guard (c) entry for the mutual-blocking
-        # bug this closes). `pid` itself is seeded directly too: guard (a)
-        # above already confirmed its cmdline matches this broker, so it is
-        # certain to appear in find_live_broker_pids() as well, but seeding
-        # it costs nothing and stays correct even if that pid's cmdline
-        # became unreadable in the instant between the two /proc reads.
-        exclude_pids = {pid}
-        for broker_pid in find_live_broker_pids():
-            exclude_pids.add(broker_pid)
-            exclude_pids.update(collect_descendant_pids(broker_pid))
-        exclude_pids = frozenset(exclude_pids)
-        blocker_pid = find_live_session_under(workspace_root, exclude_pids=exclude_pids)
-        blocking_root = workspace_root
-        checked_roots = [workspace_root]
-        toplevel = None
-        if blocker_pid is None:
-            # Also check the workspace's own git checkout root, if any and
-            # different from workspace_root: a review-triggered broker's OS
-            # cwd can be a subdirectory of the checkout the live session
-            # actually started from (see the module docstring's guard (c)
-            # entry and docs/decisions/2026-09-25-codex-broker-reaper.md,
-            # "Known limitations").
-            toplevel = find_git_toplevel(workspace_root)
-            if toplevel and toplevel not in checked_roots:
-                blocker_pid = find_live_session_under(toplevel, exclude_pids=exclude_pids)
-                blocking_root = toplevel
-                checked_roots.append(toplevel)
-        if blocker_pid is None:
-            # Also check the *other* checkout a `git worktree` workspace
-            # belongs to (fix round, 2026-09-25): see the module docstring's
-            # guard (c) entry for why the live coordinating process for a
-            # worktree-scoped broker is sometimes only findable there.
-            worktree_parent = read_worktree_parent_root(toplevel or workspace_root)
-            if worktree_parent and worktree_parent not in checked_roots:
-                blocker_pid = find_live_session_under(worktree_parent, exclude_pids=exclude_pids)
-                blocking_root = worktree_parent
-                checked_roots.append(worktree_parent)
-        if blocker_pid is None:
+        # The directory that actually KEYS the plugin's per-workspace state
+        # dir is resolveWorkspaceRoot(cwd) (scripts/lib/workspace.mjs ->
+        # resolveStateDir, state.mjs L29-43): the git toplevel of the
+        # broker's own recorded cwd when it sits inside a git checkout, else
+        # that raw cwd itself (resolveWorkspaceRoot falls back to cwd on any
+        # ensureGitRepository failure -- checked directly against the
+        # plugin's own scripts/lib/workspace.mjs and git.mjs). find_git_toplevel
+        # mirrors that git lookup with pure stdlib. Fixed (major finding,
+        # fifth fix round, 2026-09-25): a review-triggered broker's OS cwd
+        # can be a SUBDIRECTORY of the checkout it was launched from (see
+        # this docstring's guard (c) entry above); deleting only that
+        # subdirectory (rm, git clean, a branch switch) while a live session
+        # stays at the checkout root must never look like "workspace gone"
+        # -- the plugin keys this broker's state dir off the checkout root,
+        # which still exists, not off the now-missing subdirectory. The
+        # previous version of this guard declared the workspace unused --
+        # skipping the live-session scan entirely -- as soon as
+        # `workspace_root` itself failed `os.path.isdir`, without ever
+        # consulting the checkout root; that let --apply stop a live
+        # session's broker whenever only its own incidental subdirectory
+        # cwd, not the workspace the plugin actually tracks, had been
+        # removed. Skipping the scan and declaring the workspace unused
+        # outright is therefore gated on the KEYING root's own existence,
+        # never on the broker's raw /proc/<pid>/cwd alone.
+        keying_root = find_git_toplevel(workspace_root) or workspace_root
+        if not os.path.isdir(keying_root):
             record["guards"]["c_workspace_unused"] = True
             record["reasons"].append(
-                "guard c: no live claude/codex process has a cwd under " + " or under ".join(checked_roots)
+                f"guard c: workspace root {keying_root} (keys the plugin's state dir) no longer exists"
             )
         else:
-            record["guards"]["c_workspace_unused"] = False
-            record["reasons"].append(f"guard c failed: live pid {blocker_pid} has a cwd under {blocking_root}")
+            # Exclude every live broker's own descendants, not just this
+            # broker's own (fix round, 2026-09-25, find_live_broker_pids; see
+            # the module docstring's guard (c) entry for the mutual-blocking
+            # bug this closes). `pid` itself is seeded directly too: guard (a)
+            # above already confirmed its cmdline matches this broker, so it is
+            # certain to appear in find_live_broker_pids() as well, but seeding
+            # it costs nothing and stays correct even if that pid's cmdline
+            # became unreadable in the instant between the two /proc reads.
+            exclude_pids = {pid}
+            for broker_pid in find_live_broker_pids():
+                exclude_pids.add(broker_pid)
+                exclude_pids.update(collect_descendant_pids(broker_pid))
+            exclude_pids = frozenset(exclude_pids)
+            # Checked even when workspace_root itself no longer exists: a
+            # directory removed while a live process still holds it open
+            # keeps reporting that exact (deleted) path from its own
+            # /proc/<pid>/cwd (see read_proc_cwd's own docstring), so this
+            # can still find a genuinely live session even though
+            # os.path.isdir(workspace_root) is False.
+            blocker_pid = find_live_session_under(workspace_root, exclude_pids=exclude_pids)
+            blocking_root = workspace_root
+            checked_roots = [workspace_root]
+            if blocker_pid is None and keying_root not in checked_roots:
+                # Also check the workspace's own git checkout root -- the
+                # same directory computed as keying_root above, since that is
+                # what keys the plugin's state dir -- when different from
+                # workspace_root: a review-triggered broker's OS cwd can be a
+                # subdirectory of the checkout the live session actually
+                # started from (see the module docstring's guard (c) entry
+                # and docs/decisions/2026-09-25-codex-broker-reaper.md,
+                # "Known limitations").
+                blocker_pid = find_live_session_under(keying_root, exclude_pids=exclude_pids)
+                blocking_root = keying_root
+                checked_roots.append(keying_root)
+            if blocker_pid is None:
+                # Also check the *other* checkout a `git worktree` workspace
+                # belongs to (fix round, 2026-09-25): see the module docstring's
+                # guard (c) entry for why the live coordinating process for a
+                # worktree-scoped broker is sometimes only findable there.
+                worktree_parent = read_worktree_parent_root(keying_root)
+                if worktree_parent and worktree_parent not in checked_roots:
+                    blocker_pid = find_live_session_under(worktree_parent, exclude_pids=exclude_pids)
+                    blocking_root = worktree_parent
+                    checked_roots.append(worktree_parent)
+            if blocker_pid is None:
+                record["guards"]["c_workspace_unused"] = True
+                record["reasons"].append(
+                    "guard c: no live claude/codex process has a cwd under " + " or under ".join(checked_roots)
+                )
+            else:
+                record["guards"]["c_workspace_unused"] = False
+                record["reasons"].append(f"guard c failed: live pid {blocker_pid} has a cwd under {blocking_root}")
 
     # Guard (d): process age.
     started = process_start_epoch(pid, reference=now)

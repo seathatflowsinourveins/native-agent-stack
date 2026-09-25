@@ -148,6 +148,23 @@ while True:
     time.sleep(0.2)
 '''
 
+# A live process whose comm is not valid UTF-8 (minor finding, fifth fix
+# round, 2026-09-25): prctl(PR_SET_NAME) accepts any <=15-byte string, not
+# only valid UTF-8. b"ab\xe6\x97" is a truncated 3-byte UTF-8 sequence
+# (0xE6 wants two continuation bytes; only one follows) -- the same shape
+# the review reproduced this finding with. Embedded here as a bytes literal
+# in the CHILD script's own source (not via argv) so no argv encode/decode
+# round trip is needed to carry the invalid bytes.
+NON_UTF8_COMM_SOURCE = '''
+import ctypes
+import time
+
+name = b"ab\\xe6\\x97"
+ctypes.CDLL(None, use_errno=True).prctl(15, name, 0, 0, 0)  # PR_SET_NAME
+while True:
+    time.sleep(0.2)
+'''
+
 
 def load_module():
     # TOOL_PATH has no .py suffix (matching every other adoption/tools/*
@@ -265,6 +282,22 @@ class ReaperTestCase(unittest.TestCase):
         self.assertTrue(
             wait_until(lambda: module.read_proc_comm(proc.pid) == name),
             "fake session process never reported the forced comm",
+        )
+        return proc
+
+    def spawn_non_utf8_comm_process(self, *, cwd: Path) -> subprocess.Popen:
+        """A live process whose comm is not valid UTF-8 (see NON_UTF8_COMM_SOURCE).
+
+        Readiness is polled via a raw `read_bytes()` on `/proc/<pid>/comm`,
+        not `module.read_proc_comm` (which, after the fix this fixture
+        exists to prove, returns None both before AND after prctl actually
+        takes effect -- indistinguishable as a readiness signal).
+        """
+        proc = self.spawn(NON_UTF8_COMM_SOURCE, "non-utf8-comm.py", [], cwd=cwd)
+        target = b"ab\xe6\x97"
+        self.assertTrue(
+            wait_until(lambda: Path(f"/proc/{proc.pid}/comm").read_bytes().strip() == target),
+            "fixture process never reported the forced non-UTF-8 comm",
         )
         return proc
 
@@ -580,6 +613,82 @@ class LiveCwdGuardTests(ReaperTestCase):
         self.assertFalse(blocked["guards"]["c_workspace_unused"])
         self.assertFalse(blocked["eligible"])
         self.assertIn(str(checkout), " ".join(blocked["reasons"]))
+
+    def test_deleted_review_subdirectory_does_not_hide_a_live_session_at_the_checkout_root(self):
+        # Regression (major finding, fifth fix round, 2026-09-25). Before
+        # this fix, guard (c) declared the workspace unused -- skipping the
+        # live-session scan (including the git-toplevel check the previous
+        # test above proves) entirely -- the instant
+        # os.path.isdir(workspace_root) went False, which happens here as
+        # soon as the review broker's own SUBdirectory cwd is removed (rm,
+        # git clean, a branch switch), even though the checkout root is what
+        # the plugin's own resolveWorkspaceRoot actually keys this broker's
+        # state dir on (state.mjs), and it is still there with a live
+        # session.
+        checkout = self.root / "checkout"
+        subdir = checkout / "sub" / "dir"
+        subdir.mkdir(parents=True)
+        (checkout / ".git").mkdir()
+        state_dir = self.root / "workspace-slug-deleted-subdir"
+        state_dir.mkdir()
+        broker_proc, endpoint = self.spawn_fake_broker(cwd=subdir)
+        write_broker_json(state_dir, endpoint=endpoint, pid=broker_proc.pid)
+        write_state_json(state_dir, jobs=[])
+
+        # A live session at the checkout root, present before the review
+        # broker's own subdirectory cwd is removed.
+        self.spawn_fake_session(name="claude", cwd=checkout)
+
+        shutil.rmtree(subdir)
+        self.assertFalse(os.path.isdir(str(subdir)))
+        self.assertTrue(os.path.isdir(str(checkout)))
+
+        record = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertFalse(record["guards"]["c_workspace_unused"])
+        self.assertFalse(record["eligible"])
+        self.assertIn(str(checkout), " ".join(record["reasons"]))
+
+    def test_deleted_review_subdirectory_with_an_idle_checkout_root_is_still_correctly_unused(self):
+        # Companion to the test above: proves the fix does not simply make
+        # guard (c) fail closed whenever workspace_root alone is gone -- the
+        # checkout-root scan still runs, and still correctly reports
+        # "unused" once nothing live is under the checkout either.
+        checkout = self.root / "checkout"
+        subdir = checkout / "sub" / "dir"
+        subdir.mkdir(parents=True)
+        (checkout / ".git").mkdir()
+        state_dir = self.root / "workspace-slug-deleted-subdir-idle"
+        state_dir.mkdir()
+        broker_proc, endpoint = self.spawn_fake_broker(cwd=subdir)
+        write_broker_json(state_dir, endpoint=endpoint, pid=broker_proc.pid)
+        write_state_json(state_dir, jobs=[])
+
+        shutil.rmtree(subdir)
+        record = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertTrue(record["guards"]["c_workspace_unused"])
+        self.assertTrue(record["eligible"])
+
+    def test_deleted_review_subdirectory_and_deleted_checkout_root_is_unused(self):
+        # The KEYING root itself gone too (the whole checkout removed, not
+        # only the review subdirectory): guard (c) must still skip the scan
+        # and declare the workspace unused outright, the same shape as
+        # test_deleted_workspace_directory_is_unused_without_scanning_for_sessions
+        # above for the no-git case.
+        checkout = self.root / "checkout"
+        subdir = checkout / "sub" / "dir"
+        subdir.mkdir(parents=True)
+        (checkout / ".git").mkdir()
+        state_dir = self.root / "workspace-slug-deleted-checkout"
+        state_dir.mkdir()
+        broker_proc, endpoint = self.spawn_fake_broker(cwd=subdir)
+        write_broker_json(state_dir, endpoint=endpoint, pid=broker_proc.pid)
+        write_state_json(state_dir, jobs=[])
+
+        shutil.rmtree(checkout)
+        record = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertTrue(record["guards"]["c_workspace_unused"])
+        self.assertIn("no longer exists", " ".join(record["reasons"]))
+        self.assertTrue(record["eligible"])
 
     def test_a_live_session_at_the_worktrees_main_checkout_blocks_eligibility(self):
         # Fix-round finding (major): a coordinator that dispatches into a
@@ -947,6 +1056,80 @@ class MalformedStateTests(ReaperTestCase):
         # -- not the broken one's fallback -- must show up).
         healthy_record = by_dir[str(healthy_dir)]
         self.assertIn("not running", " ".join(healthy_record["reasons"]))
+
+
+@LINUX_ONLY
+class NonUtf8ProcFieldTests(ReaperTestCase):
+    """/proc readers must never raise for a process with a non-UTF-8 comm.
+
+    Regression (minor finding, fifth fix round, 2026-09-25): read_proc_comm
+    and process_parent_pid used to catch only OSError. Path.read_text()
+    raises UnicodeDecodeError (a ValueError subclass, not an OSError) for a
+    process whose comm -- settable to any <=15-byte string via
+    prctl(PR_SET_NAME), not only valid UTF-8 -- is not valid UTF-8.
+    safe_evaluate_broker's own try/except Exception net covers every
+    evaluate_broker() call site, but stop_broker()'s own
+    collect_child_pids(pid) -> process_parent_pid() runs OUTSIDE that net
+    (reached directly from run()'s --apply loop), so a single such process
+    anywhere on the host -- unrelated to whichever broker is being stopped
+    -- crashed --apply with an uncaught traceback, exit 1, and no receipt at
+    all, even after earlier brokers in the same run had already been
+    stopped successfully. This breaks the module docstring's documented
+    "never raises" contract and its 0/2/3 exit code contract alike.
+    """
+
+    def test_read_proc_comm_returns_none_instead_of_raising(self):
+        proc = self.spawn_non_utf8_comm_process(cwd=self.root)
+        # Must not raise UnicodeDecodeError; must return None (unknown),
+        # exactly like a dead pid -- never crash the caller over one
+        # process's own unreadable comm.
+        self.assertIsNone(module.read_proc_comm(proc.pid))
+
+    def test_process_parent_pid_returns_none_instead_of_raising(self):
+        proc = self.spawn_non_utf8_comm_process(cwd=self.root)
+        # /proc/<pid>/stat embeds the raw (non-UTF-8) comm between its first
+        # "(" and last ")", so this read fails to decode the same way.
+        self.assertIsNone(module.process_parent_pid(proc.pid))
+
+    def test_collect_child_pids_does_not_raise_when_the_host_has_a_non_utf8_comm_process(self):
+        # The exact path stop_broker() reaches OUTSIDE safe_evaluate_broker's
+        # exception net: collect_child_pids() scans every host pid via
+        # iter_pids(), calling process_parent_pid() on each -- including
+        # this fixture, regardless of which broker is being stopped.
+        self.spawn_non_utf8_comm_process(cwd=self.root)
+        result = module.collect_child_pids(os.getpid())
+        self.assertIsInstance(result, list)
+
+    def test_apply_still_stops_an_eligible_broker_and_writes_a_receipt(self):
+        # End-to-end: a non-UTF-8-comm process anywhere on the host must not
+        # abort --apply before it reaches the receipt write (module
+        # docstring's documented 0/2/3 exit contract; rollout brief: "keep
+        # --apply's exit contract with a receipt"). Reproduces the review's
+        # own scenario directly through main(), not just the unit-level
+        # reader functions above.
+        self.spawn_non_utf8_comm_process(cwd=self.root)
+
+        state_root = self.root / "state"
+        state_dir = state_root / "workspace-slug-non-utf8-host"
+        state_dir.mkdir(parents=True)
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        proc, endpoint = self.spawn_fake_broker(cwd=workspace)
+        write_broker_json(state_dir, endpoint=endpoint, pid=proc.pid)
+        write_state_json(state_dir, jobs=[])
+        shutil.rmtree(workspace)  # guard c satisfied without depending on process-scan timing
+        receipt_path = self.root / "receipt.json"
+
+        buffer = StringIO()
+        with redirect_stdout(buffer):
+            exit_code = module.main([
+                "--apply", "--min-age", "0", "--state-root", str(state_root), "--receipt", str(receipt_path),
+            ])
+        self.assertEqual(exit_code, 0)
+        self.assertTrue(wait_until(lambda: not module.process_exists(proc.pid), timeout=5.0))
+        report = json.loads(receipt_path.read_text())
+        self.assertEqual(report["summary"]["stopped"], 1)
+        self.assertEqual(report["summary"]["failed_to_stop"], 0)
 
 
 @LINUX_ONLY
