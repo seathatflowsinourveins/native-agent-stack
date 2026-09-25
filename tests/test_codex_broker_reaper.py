@@ -524,6 +524,90 @@ class LiveCwdGuardTests(ReaperTestCase):
         self.assertFalse(blocked["eligible"])
         self.assertIn(str(main_checkout), " ".join(blocked["reasons"]))
 
+    def test_two_orphaned_brokers_of_one_repository_do_not_block_each_other(self):
+        # Regression (major finding, third fix round, 2026-09-25): guard (c)
+        # excluded only the EVALUATED broker's own descendants. Once guard
+        # (c) also scans a worktree's main-checkout parent
+        # (read_worktree_parent_root, second fix round above), that left
+        # every OTHER live broker's own `codex app-server` child looking
+        # like a live session. Two orphaned brokers of one repository then
+        # permanently blocked each other: a main-checkout broker and a
+        # worktree broker nested under it (Claude Code's own
+        # `.claude/worktrees/<name>/` layout -- reproduced here with a
+        # hand-written `.git` pointer file, no real `git worktree` needed,
+        # same style as the tests above) each found the OTHER's app-server
+        # child as a "live" pid -- the main broker's child's cwd IS the
+        # main checkout (found directly by the worktree broker's own
+        # worktree-parent scan), and the worktree broker's child's cwd is
+        # nested under the main checkout (found by the main broker's own
+        # plain workspace-root scan).
+        main_checkout = self.root / "main-checkout"
+        main_checkout.mkdir()
+        (main_checkout / ".git").mkdir()
+        worktree = main_checkout / ".claude" / "worktrees" / "demo"
+        worktree.mkdir(parents=True)
+        (worktree / ".git").write_text(f"gitdir: {main_checkout}/.git/worktrees/demo\n")
+
+        main_state_dir = self.root / "workspace-slug-main-checkout"
+        main_state_dir.mkdir()
+        main_broker, main_endpoint = self.spawn_fake_broker(cwd=main_checkout, spawn_child_named="codex")
+        write_broker_json(main_state_dir, endpoint=main_endpoint, pid=main_broker.pid)
+        write_state_json(main_state_dir, jobs=[])
+
+        worktree_state_dir = self.root / "workspace-slug-worktree"
+        worktree_state_dir.mkdir()
+        worktree_broker, worktree_endpoint = self.spawn_fake_broker(cwd=worktree, spawn_child_named="codex")
+        write_broker_json(worktree_state_dir, endpoint=worktree_endpoint, pid=worktree_broker.pid)
+        write_state_json(worktree_state_dir, jobs=[])
+
+        def child_is_alive(broker_proc):
+            return any(
+                module.read_proc_comm(candidate) == "codex"
+                for candidate in module.collect_child_pids(broker_proc.pid)
+            )
+
+        self.assertTrue(wait_until(lambda: child_is_alive(main_broker)), "main-checkout broker never spawned its fake codex child")
+        self.assertTrue(wait_until(lambda: child_is_alive(worktree_broker)), "worktree broker never spawned its fake codex child")
+
+        # Neither broker is blocked by the OTHER's own app-server child.
+        main_record = module.evaluate_broker(main_state_dir, min_age=0.0, now=time.time())
+        worktree_record = module.evaluate_broker(worktree_state_dir, min_age=0.0, now=time.time())
+        self.assertTrue(main_record["guards"]["c_workspace_unused"])
+        self.assertTrue(main_record["eligible"])
+        self.assertTrue(worktree_record["guards"]["c_workspace_unused"])
+        self.assertTrue(worktree_record["eligible"])
+
+        # A genuine live session (not a broker) at the shared main checkout
+        # must still block BOTH brokers -- proves the fix excludes only
+        # live brokers' own descendants, not every codex-named process.
+        self.spawn_fake_session(name="claude", cwd=main_checkout)
+        main_blocked = module.evaluate_broker(main_state_dir, min_age=0.0, now=time.time())
+        worktree_blocked = module.evaluate_broker(worktree_state_dir, min_age=0.0, now=time.time())
+        self.assertFalse(main_blocked["guards"]["c_workspace_unused"])
+        self.assertFalse(main_blocked["eligible"])
+        self.assertFalse(worktree_blocked["guards"]["c_workspace_unused"])
+        self.assertFalse(worktree_blocked["eligible"])
+
+    def test_read_worktree_parent_root_resolves_a_relative_gitdir(self):
+        # Regression (minor finding, third fix round, 2026-09-25): git
+        # writes a relative `gitdir:` line relative to the directory
+        # holding the `.git` FILE itself (git 2.48+'s
+        # worktree.useRelativePaths / `git worktree add --relative-paths`),
+        # not relative to this process's own cwd. Unresolved, the returned
+        # parent stayed relative and never matched an absolute /proc cwd in
+        # path_is_under(), silently dropping the worktree-parent protection
+        # for such a worktree.
+        main_checkout = self.root / "main-checkout"
+        main_checkout.mkdir()
+        (main_checkout / ".git").mkdir()
+        worktree = self.root / "nested" / "worktree"
+        worktree.mkdir(parents=True)
+        relative_gitdir = os.path.relpath(main_checkout / ".git" / "worktrees" / "demo", start=worktree)
+        (worktree / ".git").write_text(f"gitdir: {relative_gitdir}\n")
+
+        resolved = module.read_worktree_parent_root(str(worktree))
+        self.assertEqual(resolved, str(main_checkout))
+
     def test_read_worktree_parent_root_ignores_a_normal_checkout(self):
         # A normal checkout's (or the repository's own main worktree's)
         # `.git` is a directory, not a `gitdir:` pointer file; must not be

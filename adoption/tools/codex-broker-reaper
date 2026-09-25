@@ -69,7 +69,27 @@ recorded state rather than assumed --
       this tool's own live process during this fix round) has no cwd-based
       signal here whatsoever; guard (e) is this tool's mitigation for that
       case, and docs/decisions/2026-09-25-codex-broker-reaper.md, "Known
-      limitations" discloses what guard (e) does not itself cover;
+      limitations" discloses what guard (e) does not itself cover. Also
+      excludes every OTHER live broker's own descendants, not just the
+      evaluated broker's own (fix round, 2026-09-25, `find_live_broker_pids`):
+      once this guard also scans a workspace's git-toplevel and
+      worktree-parent roots (the two checks just above), excluding only the
+      evaluated broker's own descendants left every OTHER live broker's own
+      `codex app-server` child -- the same shape as this broker's, just for
+      a different workspace -- looking like a live session whenever that
+      other workspace's root sat at or under one of the roots this scan
+      checks. Concretely: two orphaned brokers of one repository (the main
+      checkout plus a `git worktree` nested under it, Claude Code's own
+      `.claude/worktrees/<name>/` layout, or two such worktrees) each found
+      the OTHER's app-server child under their shared main checkout, so
+      neither ever became eligible -- permanent mutual blocking, not a
+      one-sided gap; verified against this rollout's own live worktree
+      layout, not only reasoned about. `find_live_broker_pids` identifies
+      every live broker by `/proc/<pid>/cmdline` alone (the same match
+      guard (a) already applies to the evaluated broker, minus the
+      endpoint check tying it to one specific `broker.json`), so it catches
+      every live broker regardless of which workspace it belongs to or
+      whether its own evaluation has run yet in this pass;
   (d) the broker process is older than `--min-age` (default 1800s), computed
       from `/proc/<pid>/stat` field 22 (starttime, in clock ticks since
       boot) plus `/proc/uptime`, not a filesystem mtime;
@@ -382,9 +402,12 @@ def read_worktree_parent_root(checkout_root: str) -> str | None:
     docstring's guard (c) entry for why the live coordinating process for a
     worktree-scoped broker is sometimes only findable at that other
     checkout. Pure stdlib, no `git` binary dependency, matching
-    `find_git_toplevel`. Returns None for a normal checkout (including the
-    repository's own main worktree), or if the pointer file is missing or
-    does not parse as expected.
+    `find_git_toplevel`. A relative `gitdir:` line (git 2.48+'s
+    `worktree.useRelativePaths`) is resolved against `checkout_root` before
+    being searched (fix round, 2026-09-25), so the returned parent is
+    always absolute like `checkout_root` itself. Returns None for a normal
+    checkout (including the repository's own main worktree), or if the
+    pointer file is missing or does not parse as expected.
     """
     git_path = os.path.join(checkout_root, ".git")
     if os.path.isdir(git_path):
@@ -398,6 +421,19 @@ def read_worktree_parent_root(checkout_root: str) -> str | None:
     if not line.startswith(prefix):
         return None
     gitdir = line[len(prefix):].strip()
+    # Resolved against checkout_root -- the directory HOLDING the .git file
+    # itself -- before the marker search (fix round, 2026-09-25): git
+    # writes a relative gitdir: line relative to that directory, not to
+    # this process's own cwd (git 2.48+'s worktree.useRelativePaths / `git
+    # worktree add --relative-paths` can write one). os.path.join already
+    # discards checkout_root when gitdir is already absolute (every case
+    # observed on this host, git 2.43.0), so this is safe either way.
+    # Unresolved, a relative gitdir: still passed the marker search below,
+    # but the returned parent stayed relative -- path_is_under() then
+    # compared it against an absolute /proc cwd and never matched, silently
+    # dropping the worktree-parent protection for such a worktree (unsafe
+    # direction for a live-session safety check).
+    gitdir = os.path.normpath(os.path.join(checkout_root, gitdir))
     marker = f"{os.sep}.git{os.sep}worktrees{os.sep}"
     index = gitdir.find(marker)
     if index == -1:
@@ -460,18 +496,47 @@ def discover_brokers(state_roots: list[Path]) -> list[Path]:
     return brokers
 
 
-def broker_cmdline_matches(argv: list[str] | None, endpoint: str) -> bool:
-    """Guard (a): still an app-server-broker.mjs serving this exact endpoint."""
+def is_broker_serve_cmdline(argv: list[str] | None) -> bool:
+    """True when `argv` still names an `app-server-broker.mjs serve` invocation, any endpoint.
+
+    Factored out of `broker_cmdline_matches` (fix round, 2026-09-25) so
+    `find_live_broker_pids` can identify every live broker on the host by
+    cmdline alone, without the `--endpoint` match that ties
+    `broker_cmdline_matches` to one specific `broker.json` record.
+    """
     if not argv:
         return False
     if not any("app-server-broker.mjs" in part for part in argv):
         return False
-    if "serve" not in argv:
+    return "serve" in argv
+
+
+def broker_cmdline_matches(argv: list[str] | None, endpoint: str) -> bool:
+    """Guard (a): still an app-server-broker.mjs serving this exact endpoint."""
+    if not is_broker_serve_cmdline(argv):
         return False
     for index, part in enumerate(argv):
         if part == "--endpoint":
             return index + 1 < len(argv) and argv[index + 1] == endpoint
     return False
+
+
+def find_live_broker_pids() -> list[int]:
+    """pid of every live process whose cmdline still names app-server-broker.mjs serve, any endpoint.
+
+    Fix round, 2026-09-25 (major finding): guard (c) must exclude every
+    live broker's own descendant processes from its live-session scan, not
+    only the one broker currently being evaluated -- otherwise two orphaned
+    brokers of the same repository can each find the OTHER's own `codex
+    app-server` child and permanently block each other. See the module
+    docstring's guard (c) entry for the mutual-blocking shape this closes
+    and how it was verified. Scans by `/proc/<pid>/cmdline` (the same match
+    guard (a) already applies to the evaluated broker, minus the
+    `--endpoint` check), not by parentage, so it finds every live broker
+    regardless of which workspace it belongs to or whether its own
+    evaluation has run yet in this pass.
+    """
+    return [pid for pid in iter_pids() if is_broker_serve_cmdline(read_proc_cmdline(pid))]
 
 
 def blocking_jobs(jobs: list) -> list[dict]:
@@ -647,7 +712,19 @@ def evaluate_broker(broker_dir: Path, *, min_age: float, now: float) -> dict:
         record["guards"]["c_workspace_unused"] = True
         record["reasons"].append(f"guard c: workspace directory {workspace_root} no longer exists")
     else:
-        exclude_pids = frozenset({pid, *collect_descendant_pids(pid)})
+        # Exclude every live broker's own descendants, not just this
+        # broker's own (fix round, 2026-09-25, find_live_broker_pids; see
+        # the module docstring's guard (c) entry for the mutual-blocking
+        # bug this closes). `pid` itself is seeded directly too: guard (a)
+        # above already confirmed its cmdline matches this broker, so it is
+        # certain to appear in find_live_broker_pids() as well, but seeding
+        # it costs nothing and stays correct even if that pid's cmdline
+        # became unreadable in the instant between the two /proc reads.
+        exclude_pids = {pid}
+        for broker_pid in find_live_broker_pids():
+            exclude_pids.add(broker_pid)
+            exclude_pids.update(collect_descendant_pids(broker_pid))
+        exclude_pids = frozenset(exclude_pids)
         blocker_pid = find_live_session_under(workspace_root, exclude_pids=exclude_pids)
         blocking_root = workspace_root
         checked_roots = [workspace_root]
