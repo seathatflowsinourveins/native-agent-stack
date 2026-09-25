@@ -701,8 +701,8 @@ def refresh(config,context_file=None):
                         preview_chars=client_limit(config,"client_preview_chars",CLIENT_PREVIEW_CHARS,1,inline_chars-1)
                         view=rtk_client_visible(config["rtk_database"],inline_chars,preview_chars)
                         gain_rows=parsed["summary"].get("total_commands")
-                        # Allow 1% fewer rows than rtk gain counted, for retention pruning between the two reads;
-                        # a different database is flagged.
+                        # Allow 1% fewer rows than rtk gain counted, for retention pruning between the two reads.
+                        # Only a database with more than 1% fewer rows is flagged; a larger database is not detected.
                         if view and type(gain_rows) is int and view["rows"]*100<gain_rows*99:
                             issues.append("RTK client-visible view: the configured rtk_database holds "+str(view["rows"])+
                                           " rows but rtk gain reported "+str(gain_rows)+" commands, so the view was omitted")

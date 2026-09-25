@@ -735,6 +735,11 @@ class LedgerContract(unittest.TestCase):
         latest=[r["latest"] for r in json.loads(Path(config["output_json"]).read_text())["native"]
                 if r["scope"]=="Native / all retained projects"][0]
         self.assertEqual(latest["metrics"]["client_visible"]["rows"],99)
+        # One row more than 1% short is flagged: 98 rows against 100 counted.
+        config["rtk_database"]=str(self.rtk_history([(10+i,0) for i in range(98)],"pruned.db"))
+        with patch.object(m,"capture",side_effect=returned):
+            issues=m.refresh(config)["issues"]
+        self.assertTrue(any("holds 98 rows but rtk gain reported 100" in i for i in issues),issues)
 
     def test_rtk_client_view_problems_are_issues_not_counter_failures(self):
         from unittest.mock import patch
