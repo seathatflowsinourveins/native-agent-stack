@@ -1125,6 +1125,56 @@ class UnitRestartTests(SwitchFixture):
         self.assertEqual(json.loads(recover_result.stdout)["recovered_txns"], [])
 
 
+@REQUIRES_PROCFS
+class UnitRestartTimeoutTests(unittest.TestCase):
+    """Minor finding: a systemctl restart (or the post-restart status show) that exceeds
+    run_captured's 60s timeout raised subprocess.TimeoutExpired, which is not a SwitchError --
+    cmd_apply's step loop only catches UnitRestartAttempted/SwitchError, so it used to escape as
+    an uncaught traceback and skip both this step's ledger entry and the automatic rollback.
+    Exercised by mocking run_captured directly (no real 60s wait, no real systemctl).
+    op_unit_restart itself reads /proc/meminfo first (memory_gate_issue): gated the same as
+    UnitRestartTests (whole class, matching that class's own comment on why: no macOS
+    equivalent to fake, so skip the platform-specific class rather than special-casing each
+    assertion) rather than only its own two op_unit_restart-calling tests, even though the third
+    (main()'s generic safety net) does not itself touch procfs."""
+
+    def test_a_restart_command_timeout_is_reported_as_unit_restart_attempted_not_a_bare_timeout(self):
+        def fake_run_captured(argv, **_kwargs):
+            if argv[-2:] == ["restart", "svc.service"]:
+                raise subprocess.TimeoutExpired(cmd=argv, timeout=60)
+            return subprocess.CompletedProcess(argv, 0, stdout="1111\n", stderr="")
+        with unittest.mock.patch.object(switch, "run_captured", side_effect=fake_run_captured):
+            with self.assertRaises(switch.UnitRestartAttempted) as ctx:
+                switch.op_unit_restart("svc.service", window_component_ok=True, expected_root="/nonexistent")
+        self.assertIn("timed out", str(ctx.exception))
+        self.assertIsInstance(ctx.exception.fields, dict)
+
+    def test_a_post_restart_status_check_timeout_is_reported_as_unit_restart_attempted(self):
+        show_calls = []
+
+        def fake_run_captured(argv, **_kwargs):
+            if argv[-2:] == ["restart", "svc.service"]:
+                return subprocess.CompletedProcess(argv, 0, stdout="", stderr="")
+            if "show" in argv:
+                show_calls.append(argv)
+                if len(show_calls) == 1:  # the pre-restart MainPID probe succeeds normally
+                    return subprocess.CompletedProcess(argv, 0, stdout="1111\n", stderr="")
+                raise subprocess.TimeoutExpired(cmd=argv, timeout=60)  # the post-restart one hangs
+            return subprocess.CompletedProcess(argv, 0, stdout="", stderr="")
+        with unittest.mock.patch.object(switch, "run_captured", side_effect=fake_run_captured):
+            with self.assertRaises(switch.UnitRestartAttempted) as ctx:
+                switch.op_unit_restart("svc.service", window_component_ok=True, expected_root="/nonexistent")
+        self.assertIn("post-restart", str(ctx.exception))
+        self.assertIn("timed out", str(ctx.exception))
+
+    def test_main_reports_an_uncaught_subprocess_timeout_instead_of_a_bare_traceback(self):
+        # Defense-in-depth safety net in main(), beyond op_unit_restart's own two catches above.
+        with unittest.mock.patch.object(switch, "cmd_status",
+                                        side_effect=subprocess.TimeoutExpired(cmd=["x"], timeout=1)):
+            code = switch.main(["status"])
+        self.assertEqual(code, 1)
+
+
 class LockTests(SwitchFixture):
     def test_concurrent_apply_is_refused_with_75(self):
         self.root_v1 = self.make_tool_root("foo-1.0.0", "v1")

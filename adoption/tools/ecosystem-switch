@@ -734,7 +734,20 @@ def op_unit_restart(unit: str, *, window_component_ok: bool, expected_root: str)
     before = run_captured([*systemctl_argv(), "--user", "show", "--property=MainPID", "--value", unit])
     before_fields = {"from": (before.stdout or "").strip(), "pre_sha256": sha256_text(before.stdout or "")}
     run_captured([*systemctl_argv(), "--user", "daemon-reload"])
-    restart = run_captured([*systemctl_argv(), "--user", "restart", unit])
+    try:
+        restart = run_captured([*systemctl_argv(), "--user", "restart", unit])
+    except subprocess.TimeoutExpired as error:
+        # Minor finding: a bare subprocess.TimeoutExpired is not a SwitchError, so cmd_apply's
+        # step loop (which only catches UnitRestartAttempted/SwitchError) used to let it escape as
+        # an uncaught traceback -- skipping both this step's ledger entry and the automatic
+        # rollback. Treated the same as a real side effect (UnitRestartAttempted, not re-raised
+        # as-is): the systemctl *client* timed out, but systemd itself completes the queued
+        # restart job independent of that client (its default TimeoutStopSec, 90s, already exceeds
+        # run_captured's 60s), so the unit may no longer be running the old build either way.
+        raise UnitRestartAttempted(
+            f"systemctl --user restart {unit} timed out after {error.timeout}s; systemd may have "
+            "completed the restart after the client that requested it was abandoned",
+            {**before_fields, "to": None, "post_sha256": sha256_text("")}) from error
     if restart.returncode != 0:
         # A real side effect (systemctl restart was actually invoked) even though it failed: the
         # unit may no longer be running the old build. UnitRestartAttempted carries what little
@@ -743,7 +756,14 @@ def op_unit_restart(unit: str, *, window_component_ok: bool, expected_root: str)
         raise UnitRestartAttempted(
             f"systemctl --user restart {unit} exited {restart.returncode}: {restart.stderr.strip()[:400]}",
             {**before_fields, "to": None, "post_sha256": sha256_text("")})
-    after_pid = run_captured([*systemctl_argv(), "--user", "show", "--property=MainPID", "--value", unit])
+    try:
+        after_pid = run_captured([*systemctl_argv(), "--user", "show", "--property=MainPID", "--value", unit])
+    except subprocess.TimeoutExpired as error:
+        # Same reasoning as the restart timeout above: the restart itself already succeeded, so
+        # this is purely a health-probe failure, not an unattempted restart.
+        raise UnitRestartAttempted(
+            f"post-restart status check for {unit} timed out after {error.timeout}s",
+            {**before_fields, "to": None, "post_sha256": sha256_text("")}) from error
     pid = (after_pid.stdout or "").strip()
     exe = None
     if pid.isdigit() and pid != "0":
@@ -1745,6 +1765,13 @@ def main(argv: list[str] | None = None) -> int:
     except SwitchError as error:
         print(f"ecosystem-switch: {error}", file=sys.stderr)
         return error.exit_code
+    except subprocess.TimeoutExpired as error:
+        # Defense in depth alongside op_unit_restart's own two TimeoutExpired catches (minor
+        # finding): SwitchError's own docstring promise ("never a bare traceback") should hold for
+        # every subprocess call this tool makes (op_native_cli, the confirm-or-revert scheduler,
+        # confirm's best-effort timer stop), not only the two paths known to matter today.
+        print(f"ecosystem-switch: a subprocess call timed out: {error}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
