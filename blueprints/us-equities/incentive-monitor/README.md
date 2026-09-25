@@ -179,6 +179,28 @@ frozen bridge, so copying it into the study's deployed directory cannot make v1-
 Under the protocol's own stop rule a code change starts a new protocol version: keep the running study on its deployed
 copy until it is retired or a version 2 protocol is approved, and run this monitor beside it only as a follower.
 
+**Engine binding gap (trading lane, 2026-09-25).** Each decision record hashes only the engine files listed in
+`board_scan.ENGINE_FILES`: `mover.py`, `mover_runner.py`, `mover_strategy.py`, `safety.py`, `runner.py`,
+`native_adapter.py`, `transport.py` and `mover-early-entry/rules.py`.
+
+Measured on `main` after #187, the transitive import closure of `mover_runner.py` within `adaptive-paper/` has 14
+further modules that the list omits:
+- existed when v1 froze (05c28491) and have changed since: `leverage`, `mover_simulation`, `native_strategy` and
+  `sessions`;
+- existed then, unchanged since: `exits`, `feeds`, `recovery`, `selector`, `strategies` and `strategies_v1`;
+- added after the freeze: `corporate_actions`, `credential_guard`, `credential_source` and `financing`.
+
+A v1 record therefore cannot show which code of those modules ran. The v1 bridge is frozen, so the gap stays in v1 as
+a recorded limitation.
+
+No v1 order has been placed. Because the engine changed after v1 froze, a v1 start on the P0 engine would be a new
+engine under the frozen label. Protocol v2, which pairs board v2 with the P0 engine, should close the gap before its
+pre-outcome review. It can bind the whole engine, for example:
+- the sha256 of every `*.py` in `blueprints/us-equities/adaptive-paper/` plus `mover-early-entry/rules.py`; or
+- the git tree hash of those directories, taken from a clean checkout;
+
+together with the pinned runtime lock.
+
 ## Checks
 
 `python3 -m unittest tests.test_incentive_monitor tests.test_incentive_forward` (synthetic fixtures, no network: whole
