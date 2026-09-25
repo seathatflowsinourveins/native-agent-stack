@@ -31,21 +31,42 @@ import time
 import unittest
 from io import StringIO
 from pathlib import Path
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL_PATH = ROOT / "adoption/tools/codex-broker-reaper"
+
+# This suite needs /proc (cmdline, comm, cwd, stat, uptime) and
+# prctl(PR_SET_NAME); both are Linux-only, like the tool under test. Without
+# this guard the *required* validate-macos CI check (.github/workflows/
+# adoption-bootstrap.yml, gated by .github/main-ruleset.json) would run this
+# whole module's `python3 -m unittest -v` on macos-15 and fail every class.
+LINUX_ONLY = unittest.skipUnless(
+    sys.platform.startswith("linux"),
+    "codex-broker-reaper and this suite read /proc directly and are Linux-only",
+)
 
 FAKE_BROKER_SOURCE = '''
 import json
 import os
 import socket
+import subprocess
 import sys
 
 def main():
     argv = sys.argv[1:]
     endpoint = argv[argv.index("--endpoint") + 1]
     ignore_shutdown = "--ignore-shutdown" in argv
+    child_proc = None
+    if "--spawn-child" in argv:
+        index = argv.index("--spawn-child")
+        child_script, child_name = argv[index + 1], argv[index + 2]
+        # Mimics app-server-broker.mjs's own non-detached `codex app-server`
+        # child (app-server.mjs SpawnedCodexAppServerClient.initialize():
+        # spawn("codex", ["app-server"], {cwd: this.cwd})): a direct child
+        # of the broker, inheriting its cwd (no cwd= override here), alive
+        # for the broker's whole lifetime.
+        child_proc = subprocess.Popen([sys.executable, child_script, child_name])
     path = endpoint[len("unix:"):]
     if os.path.exists(path):
         os.unlink(path)
@@ -69,6 +90,8 @@ def main():
             conn.sendall((json.dumps({"id": message.get("id"), "result": {}}) + "\\n").encode("utf-8"))
             conn.close()
             if not ignore_shutdown:
+                if child_proc is not None:
+                    child_proc.kill()
                 try:
                     os.unlink(path)
                 except OSError:
@@ -142,8 +165,16 @@ class ReaperTestCase(unittest.TestCase):
         for proc in self._procs:
             if proc.poll() is None:
                 try:
-                    proc.kill()
-                except ProcessLookupError:
+                    # start_new_session=True in spawn() makes each fixture
+                    # its own process-group leader (mirroring Node's
+                    # detached:true for the real broker); killing the whole
+                    # group also cleans up any child the fixture spawned
+                    # itself (spawn_fake_broker's spawn_child_named mimics
+                    # the broker's own non-detached `codex app-server`
+                    # child) without touching any other fixture's separate
+                    # group or this test process's own group.
+                    os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+                except (ProcessLookupError, PermissionError, OSError):
                     pass
                 try:
                     proc.wait(timeout=5)
@@ -172,16 +203,22 @@ class ReaperTestCase(unittest.TestCase):
         threading.Thread(target=proc.wait, daemon=True).start()
         return proc
 
-    def spawn_fake_broker(self, *, cwd: Path, extra_args: list[str] | None = None) -> tuple[subprocess.Popen, str]:
+    def spawn_fake_broker(self, *, cwd: Path, extra_args: list[str] | None = None,
+                           spawn_child_named: str | None = None) -> tuple[subprocess.Popen, str]:
         sock_dir = tempfile.mkdtemp()  # short path: AF_UNIX sun_path is capped near 108 bytes
         self.addCleanup(lambda: shutil.rmtree(sock_dir, ignore_errors=True))
         sock_path = os.path.join(sock_dir, "broker.sock")
         endpoint = f"unix:{sock_path}"
-        proc = self.spawn(
-            FAKE_BROKER_SOURCE, "app-server-broker.mjs",
-            ["serve", "--endpoint", endpoint, *(extra_args or [])],
-            cwd=cwd,
-        )
+        args = ["serve", "--endpoint", endpoint, *(extra_args or [])]
+        if spawn_child_named:
+            # A real broker's own `codex app-server` child (guard (c)'s
+            # 2026-09-25 fix round target); written once per test (root is
+            # per-test, from setUp's TemporaryDirectory).
+            child_script = self.root / "fake-broker-child.py"
+            if not child_script.exists():
+                child_script.write_text(FAKE_SESSION_SOURCE)
+            args += ["--spawn-child", str(child_script), spawn_child_named]
+        proc = self.spawn(FAKE_BROKER_SOURCE, "app-server-broker.mjs", args, cwd=cwd)
         self.assertTrue(wait_until(lambda: os.path.exists(sock_path)), "fake broker never bound its socket")
         return proc, endpoint
 
@@ -322,7 +359,89 @@ class LiveCwdGuardTests(ReaperTestCase):
         self.assertIn("no longer exists", " ".join(record["reasons"]))
         self.assertTrue(record["eligible"])
 
+    def test_brokers_own_codex_app_server_child_does_not_block_its_own_eligibility(self):
+        # Regression (fix round, 2026-09-25): guard (c) must exclude the
+        # broker's own descendants, not just its own pid, from the live-
+        # session scan. The real plugin's broker always has exactly such a
+        # child for its whole lifetime (app-server-broker.mjs ->
+        # CodexAppServerClient.connect -> a non-detached `codex app-server`,
+        # spawned with the broker's own cwd -- app-server.mjs
+        # SpawnedCodexAppServerClient.initialize()); before the fix, that
+        # child's cwd == the workspace root always looked like a live
+        # session, so a live orphan whose workspace directory still exists
+        # (the common retained-worktree case) could never become eligible.
+        # The other guard (c) tests' fake broker spawns no child at all,
+        # which is why this needs its own test with spawn_child_named.
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        state_dir = self.root / "workspace-slug-own-child"
+        state_dir.mkdir()
+        broker_proc, endpoint = self.spawn_fake_broker(cwd=workspace, spawn_child_named="codex")
+        write_broker_json(state_dir, endpoint=endpoint, pid=broker_proc.pid)
+        write_state_json(state_dir, jobs=[])
 
+        def child_is_alive():
+            return any(
+                module.read_proc_comm(candidate) == "codex"
+                for candidate in module.collect_child_pids(broker_proc.pid)
+            )
+
+        self.assertTrue(wait_until(child_is_alive), "fake broker never spawned its own fake codex child")
+        record = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertTrue(record["guards"]["c_workspace_unused"])
+        self.assertTrue(record["eligible"])
+
+        # An unrelated live session elsewhere must still not block (proves
+        # the fix excludes only the broker's own descendants, not every
+        # codex-named process).
+        elsewhere = self.root / "elsewhere"
+        elsewhere.mkdir()
+        self.spawn_fake_session(name="codex", cwd=elsewhere)
+        still_unused = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertTrue(still_unused["eligible"])
+
+        # A genuine live session under the SAME workspace must still block
+        # (proves the fix does not over-exclude: this session is a child of
+        # the *test process*, not of the broker, so collect_descendant_pids
+        # must not sweep it in).
+        self.spawn_fake_session(name="claude", cwd=workspace)
+        blocked = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertFalse(blocked["guards"]["c_workspace_unused"])
+        self.assertFalse(blocked["eligible"])
+
+    def test_review_broker_in_a_git_subdirectory_is_blocked_by_a_session_at_the_checkout_root(self):
+        # Disclosed, fix-round-mitigated gap (docs/decisions/2026-09-25-
+        # codex-broker-reaper.md, "Known limitations"): a *review* command's
+        # broker is spawned with the raw command cwd (codex-companion.mjs
+        # resolveCommandCwd), which can be a subdirectory of the git
+        # checkout a live session actually started from, rather than that
+        # checkout root (only task-run brokers get resolveWorkspaceRoot's
+        # git-toplevel cwd). Guard (c) also checks the workspace root's
+        # nearest .git-bearing ancestor for a live session to cover this.
+        checkout = self.root / "checkout"
+        subdir = checkout / "sub" / "dir"
+        subdir.mkdir(parents=True)
+        (checkout / ".git").mkdir()  # enough for find_git_toplevel; no real git needed
+        state_dir = self.root / "workspace-slug-subdir-broker"
+        state_dir.mkdir()
+        broker_proc, endpoint = self.spawn_fake_broker(cwd=subdir)
+        write_broker_json(state_dir, endpoint=endpoint, pid=broker_proc.pid)
+        write_state_json(state_dir, jobs=[])
+
+        # No session anywhere yet: the subdirectory workspace looks unused.
+        record = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertTrue(record["eligible"])
+
+        # A live session at the checkout ROOT (not the broker's own
+        # subdirectory cwd) must still block, via the git-toplevel check.
+        self.spawn_fake_session(name="claude", cwd=checkout)
+        blocked = module.evaluate_broker(state_dir, min_age=0.0, now=time.time())
+        self.assertFalse(blocked["guards"]["c_workspace_unused"])
+        self.assertFalse(blocked["eligible"])
+        self.assertIn(str(checkout), " ".join(blocked["reasons"]))
+
+
+@LINUX_ONLY
 class MinAgeGuardTests(ReaperTestCase):
     """Guard (d): broker process age, from /proc/<pid>/stat, not a file mtime."""
 

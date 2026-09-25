@@ -28,13 +28,31 @@ recorded state rather than assumed --
       non-terminal so an unrecognized future status blocks reaping instead
       of being reaped by default;
   (c) the broker's workspace directory no longer exists, or no live
-      `claude`/`codex` process has a cwd equal to or under it. The
-      workspace root is read from the *broker's own* `/proc/<pid>/cwd`
-      (the OS's live ground truth for the directory `app-server-broker.mjs`
-      was spawned with -- see `spawnBrokerProcess` in `broker-lifecycle.mjs`,
-      which sets the child's OS cwd to the workspace), not reconstructed
-      from `state.json`, which can be empty for a broker that started but
-      never ran a job;
+      `claude`/`codex` process has a cwd equal to or under it -- excluding
+      the broker's own descendants (fix round, 2026-09-25): every live
+      broker owns a non-detached `codex app-server` child for its whole
+      lifetime, spawned with the broker's own cwd (`app-server.mjs`
+      `SpawnedCodexAppServerClient.initialize()`:
+      `spawn("codex", ["app-server"], {cwd: this.cwd})`), so without
+      excluding descendants a live broker's own child would always look
+      like a live *session* under its own workspace, and a live orphan
+      whose workspace directory still exists (the common retained-worktree
+      case) could never become eligible. The workspace root is read from
+      the *broker's own* `/proc/<pid>/cwd` (the OS's live ground truth for
+      the directory `app-server-broker.mjs` was spawned with -- see
+      `spawnBrokerProcess` in `broker-lifecycle.mjs`, which sets the
+      child's OS cwd to the workspace), not reconstructed from
+      `state.json`, which can be empty for a broker that started but never
+      ran a job. Disclosed gap, not guessed at a fix: a *review* command's
+      broker (unlike a task run) is spawned with the raw command cwd
+      (`codex-companion.mjs` `resolveCommandCwd`), which can be a
+      subdirectory of the actual live session's own cwd rather than the
+      git checkout root that session started from; this guard also checks
+      the workspace root's nearest `.git`-bearing ancestor (if any) for a
+      live session, which covers that case when the live session's own cwd
+      is that checkout root, but not every possible cwd a live session
+      could have relative to the workspace (see docs/decisions/
+      2026-09-25-codex-broker-reaper.md, "Known limitations");
   (d) the broker process is older than `--min-age` (default 1800s), computed
       from `/proc/<pid>/stat` field 22 (starttime, in clock ticks since
       boot) plus `/proc/uptime`, not a filesystem mtime.
@@ -188,16 +206,48 @@ def collect_child_pids(pid: int) -> list[int]:
     return [candidate for candidate in iter_pids() if process_parent_pid(candidate) == pid]
 
 
+def collect_descendant_pids(pid: int) -> list[int]:
+    """Every descendant of `pid` (children, grandchildren, ...), via a live /proc scan.
+
+    Guard (c) must not mistake the broker's own descendants for a live
+    session: every live broker owns a non-detached `codex app-server` child
+    for its whole lifetime (see the module docstring's guard (c) entry),
+    which can itself spawn further children (e.g. an MCP server). Its comm
+    is "codex" and its cwd equals the broker's own workspace root, so
+    excluding only the broker's own pid -- not its descendants -- would
+    make guard (c) treat that child as if it were a live claude/codex
+    *session* under its own workspace.
+    """
+    descendants: list[int] = []
+    frontier = [pid]
+    seen = {pid}
+    while frontier:
+        parent = frontier.pop()
+        for child in collect_child_pids(parent):
+            if child not in seen:
+                seen.add(child)
+                descendants.append(child)
+                frontier.append(child)
+    return descendants
+
+
 def is_claude_or_codex_process(pid: int) -> bool:
     """True when `pid` looks like a live `claude` or `codex` process.
 
     Checked on this host: the native Claude Code binary (~/.local/bin/claude,
     an ELF executable, not a wrapper script) reports comm == "claude" and
     argv[0]'s basename == "claude"; the packaged codex CLI binary is native
-    too. A Python-shebang script does NOT get its own name as comm (the
-    kernel rewrites comm to the interpreter's own basename for a script), so
-    tests simulating a live session set comm directly (see
-    tests/test_codex_broker_reaper.py) rather than relying on a script name.
+    too. Corrected (fix round, 2026-09-25): a Python process run as
+    `python3 script.py` -- what this tool's own tests do to spawn a live-
+    session stand-in -- reports comm == "python3", the *interpreter's* own
+    name, simply because `python3` is the binary actually running, not
+    because of any shebang rewriting. (A *direct* shebang, e.g.
+    `#!/usr/bin/python3`, executed as the script's own file, actually
+    reports the *script's* basename as comm, not the interpreter's --
+    checked directly on this host.) So tests simulating a live session set
+    comm directly with prctl(PR_SET_NAME) (see
+    tests/test_codex_broker_reaper.py) rather than relying on any script's
+    filename.
     """
     comm = read_proc_comm(pid)
     if comm in CLAUDE_OR_CODEX_NAMES:
@@ -214,6 +264,30 @@ def path_is_under(candidate: str, root: str) -> bool:
     candidate = os.path.normpath(candidate)
     root = os.path.normpath(root)
     return candidate == root or candidate.startswith(root + os.sep)
+
+
+def find_git_toplevel(path: str) -> str | None:
+    """The nearest ancestor of `path` (inclusive) holding a `.git` entry, or None.
+
+    Pure stdlib, no `git` binary dependency (this tool has none): walks
+    upward checking for `.git` as either a directory (a normal checkout) or
+    a file (a `git worktree` checkout, whose `.git` is a `gitdir:` pointer
+    file), matching what the plugin's own `resolveWorkspaceRoot` resolves
+    with `git rev-parse --show-toplevel` (scripts/lib/workspace.mjs,
+    scripts/lib/git.mjs) closely enough for guard (c)'s purposes -- see
+    evaluate_broker's guard (c), which also checks this directory for a
+    live session, since a review-triggered broker's own OS cwd can be a
+    subdirectory of it rather than this same root (docs/decisions/
+    2026-09-25-codex-broker-reaper.md, "Known limitations").
+    """
+    current = os.path.normpath(path)
+    while True:
+        if os.path.exists(os.path.join(current, ".git")):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            return None
+        current = parent
 
 
 def find_live_session_under(workspace_root: str, *, exclude_pids: frozenset[int] = frozenset()) -> int | None:
@@ -382,13 +456,26 @@ def evaluate_broker(broker_dir: Path, *, min_age: float, now: float) -> dict:
         record["guards"]["c_workspace_unused"] = True
         record["reasons"].append(f"guard c: workspace directory {workspace_root} no longer exists")
     else:
-        blocker_pid = find_live_session_under(workspace_root, exclude_pids=frozenset({pid}))
+        exclude_pids = frozenset({pid, *collect_descendant_pids(pid)})
+        blocker_pid = find_live_session_under(workspace_root, exclude_pids=exclude_pids)
+        blocking_root = workspace_root
+        if blocker_pid is None:
+            # Also check the workspace's own git checkout root, if any and
+            # different from workspace_root: a review-triggered broker's OS
+            # cwd can be a subdirectory of the checkout the live session
+            # actually started from (see the module docstring's guard (c)
+            # entry and docs/decisions/2026-09-25-codex-broker-reaper.md,
+            # "Known limitations").
+            toplevel = find_git_toplevel(workspace_root)
+            if toplevel and toplevel != workspace_root:
+                blocker_pid = find_live_session_under(toplevel, exclude_pids=exclude_pids)
+                blocking_root = toplevel
         if blocker_pid is None:
             record["guards"]["c_workspace_unused"] = True
             record["reasons"].append(f"guard c: no live claude/codex process has a cwd under {workspace_root}")
         else:
             record["guards"]["c_workspace_unused"] = False
-            record["reasons"].append(f"guard c failed: live pid {blocker_pid} has a cwd under {workspace_root}")
+            record["reasons"].append(f"guard c failed: live pid {blocker_pid} has a cwd under {blocking_root}")
 
     # Guard (d): process age.
     started = process_start_epoch(pid, reference=now)
