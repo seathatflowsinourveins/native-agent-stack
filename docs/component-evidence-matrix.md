@@ -23,27 +23,27 @@ Each winner shows, for linux-wsl2-x86_64 / macos-arm64, its `e2e_state` and host
 | `foundation/agent-sdks` | dual_lane_same_winner | codex (accepted [1/0/1/0] / untested [0/0/0/0]) |
 | `foundation/ci-supply-chain` | dual_lane_same_winner | zizmor (host_verified [2/0/2/0] / untested [0/0/0/0]); syft (host_verified [2/0/2/0] / untested [0/0/0/0]); candidate:actions-attest (accepted [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/code-navigation` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-code-navigation-20260922.json`) | serena (host_verified [3/0/2/0] dissented 1 / untested [0/0/0/0]) |
-| `foundation/document-retrieval` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-document-retrieval-20260922.json`) | qmd (host_verified [2/0/2/0] / untested [1/0/0/0]); markitdown (host_verified [2/0/2/0] / untested [0/0/0/0]); poppler (conditional [1/0/1/0] / untested [0/0/0/0]) |
+| `foundation/document-retrieval` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-document-retrieval-20260922.json`) | qmd (host_verified [2/0/2/0] / untested [1/0/0/0]); markitdown (host_verified [2/0/2/0] / untested [0/0/0/0]); poppler (host_verified [3/0/3/0] / untested [0/0/0/0]) |
 | `foundation/durable-memory` | dual_lane_same_winner | ai-memory (host_verified [2/0/2/0] / untested [1/0/0/0]) |
 | `foundation/git-github-automation` | dual_lane_same_winner | worktrunk (host_verified [2/0/2/0] / host_verified [1/0/1/0]); candidate:cli-cli (not_established [0/0/0/0] / untested [0/0/0/0]); difftastic (host_verified [2/1/2/0] / untested [0/0/0/0]) |
-| `foundation/hosting-services` | dual_lane_same_winner | fastapi (accepted [0/0/0/0] / untested [1/0/0/0] dissented 1); nextjs (accepted [0/0/0/0] / untested [1/0/0/0] dissented 1); postgresql (accepted [0/0/0/0] / untested [1/0/0/0] dissented 1) |
+| `foundation/hosting-services` | dual_lane_same_winner | fastapi (host_verified [2/0/1/0] dissented 1 / untested [1/0/0/0] dissented 1); nextjs (accepted [0/0/0/0] / untested [1/0/0/0] dissented 1); postgresql (accepted [0/0/0/0] / untested [1/0/0/0] dissented 1) |
 | `foundation/instructions-skills` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-instructions-skills-20260922.json`) | affaan-m/ECC (conditional [0/0/0/0] / untested [0/0/0/0]); candidate:typesafe-ai-skills (conditional [0/0/0/0] / untested [0/0/0/0]); candidate:openai-skills (conditional [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/isolation` | dual_lane_same_winner | worktrunk (host_verified [2/0/2/0] / host_verified [1/0/1/0]); sandbox-runtime (host_verified [1/0/1/0] / untested [0/0/0/0]) |
-| `foundation/mcp-surfaces` | dual_lane_same_winner | mcporter (host_verified [4/0/3/0] dissented 1 / untested [0/0/0/0]); mcp-inspector (accepted [0/0/0/0] / untested [0/0/0/0]) |
+| `foundation/mcp-surfaces` | dual_lane_same_winner | mcporter (host_verified [4/0/3/0] dissented 1 / untested [0/0/0/0]); mcp-inspector (host_verified [2/0/1/0] dissented 1 / untested [0/0/0/0]) |
 | `foundation/native-clients` | dual_lane_same_winner | claude-code (accepted [1/0/1/0] / untested [0/0/0/0]); codex (accepted [1/0/1/0] / untested [0/0/0/0]) |
 | `foundation/observation-inference` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-observation-inference-20260922.json`) | opentelemetry-collector-contrib (host_verified [2/0/2/0] / untested [0/0/0/0]); prometheus (host_verified [2/0/2/0] / untested [0/0/0/0]); loki (host_verified [2/0/2/0] / untested [0/0/0/0]) |
-| `foundation/quality-evaluation` | dual_lane_same_winner | promptfoo (conditional [0/0/0/0] / untested [0/0/0/0]); playwright-test (conditional [0/0/0/0] / untested [1/0/0/0] dissented 1) |
+| `foundation/quality-evaluation` | dual_lane_same_winner | promptfoo (host_verified [2/0/1/0] dissented 1 / untested [0/0/0/0]); playwright-test (conditional [0/0/0/0] / untested [1/0/0/0] dissented 1) |
 | `foundation/recovery-portability` | dual_lane_same_winner | restic (host_verified [3/0/3/0] / untested [1/0/0/0]); candidate:astral-sh-uv (conditional [0/0/0/0] / untested [0/0/0/0]) |
-| `foundation/scheduling-supervision` | dual_lane_same_winner | dagu (host_verified [2/0/2/0] / untested [0/0/0/0]); systemd (conditional [2/0/1/0] dissented 1 / untested [0/0/0/0]) |
+| `foundation/scheduling-supervision` | dual_lane_same_winner | dagu (host_verified [2/0/2/0] / untested [0/0/0/0]); systemd (host_verified [4/0/2/0] dissented 2 / untested [0/0/0/0]) |
 | `foundation/secrets-credentials` | dual_lane_same_winner | gitleaks (host_verified [2/0/2/0] / host_verified [1/0/1/0]) |
 | `foundation/semantic-rag` | dual_lane_same_winner | socraticode (host_verified [3/0/2/0] dissented 1 / untested [1/0/0/0]); qdrant (host_verified [3/0/3/0] / untested [1/0/0/0]); vllm (host_verified [6/0/3/0] dissented 2 / untested [0/0/0/0]) |
 | `foundation/token-efficiency` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-token-efficiency-20260922.json`) | rtk (host_verified [7/0/4/0] dissented 2 / host_verified [1/0/1/0]); headroom (host_verified [4/0/3/0] dissented 1 / untested [0/0/0/0]); ccusage (host_verified [2/0/2/0] / untested [0/0/0/0]) |
 | `foundation/web-research` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-web-research-20260922.json`) | tavily-cli (conditional [0/0/0/0] / untested [0/0/0/0]); agent-browser (conditional [0/0/0/0] / untested [0/0/0/0]); openresearch (conditional [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/workers` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-workers-20260922.json`) | claude-code (conditional [1/0/1/0] / untested [0/0/0/0]); worktrunk (host_verified [2/0/2/0] / host_verified [1/0/1/0]) |
 | `us-equities/agents-models-workers` | dual_lane_same_winner | codex-native-sdk (accepted [0/0/0/0] / untested [0/0/0/0]); foundation-ai-memory (accepted [0/0/0/0] / untested [0/0/0/0]); foundation-socraticode (accepted [0/0/0/0] / untested [0/0/0/0]) |
-| `us-equities/backtesting-engine` | dual_lane_same_winner | nautilustrader (host_verified [1/0/1/0] / untested [0/0/0/0] +1 alias receipt(s), not counted); lean (accepted [0/0/0/0] / untested [0/0/0/0]) |
-| `us-equities/data-quality-orchestration` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-data-quality-orchestration-20260922.json`) | dagu (host_verified [2/0/2/0] / untested [0/0/0/0]); data-pandera (conditional [0/0/0/0] / untested [0/0/0/0]) |
-| `us-equities/evaluation-experiments` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-evaluation-experiments-20260922.json`) | foundation-agent-retrieval-bench (not_established [0/0/0/0] / untested [0/0/0/0]); inspect-ai (not_established [0/0/0/0] / untested [0/0/0/0]); data-mlflow (not_established [0/0/0/0] / untested [0/0/0/0]) |
+| `us-equities/backtesting-engine` | dual_lane_same_winner | nautilustrader (host_verified [1/0/1/0] / untested [0/0/0/0] +1 alias receipt(s), not counted); lean (host_verified [1/0/1/0] / untested [0/0/0/0]) |
+| `us-equities/data-quality-orchestration` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-data-quality-orchestration-20260922.json`) | dagu (host_verified [2/0/2/0] / untested [0/0/0/0]); data-pandera (host_verified [1/0/1/0] / untested [0/0/0/0]) |
+| `us-equities/evaluation-experiments` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-evaluation-experiments-20260922.json`) | foundation-agent-retrieval-bench (not_established [0/0/0/0] / untested [0/0/0/0]); inspect-ai (host_verified [2/0/1/0] dissented 1 / untested [0/0/0/0]); data-mlflow (not_established [0/0/0/0] / untested [0/0/0/0]) |
 | `us-equities/execution-broker` | pending_lanes (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json`) | - |
 | `us-equities/identity-provenance` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-identity-provenance-20260922.json`) | data-dvc (not_established [0/0/0/0] / untested [0/0/0/0]) |
 | `us-equities/market-data-reference` | dual_lane_same_winner | data-alpaca-py (accepted [1/0/1/0] / untested [0/0/0/0] +1 alias receipt(s), not counted); data-edgartools (host_verified [1/0/1/0] / untested [0/0/0/0]); data-exchange-calendars (host_verified [1/0/1/0] / untested [0/0/0/0]) |
@@ -51,7 +51,7 @@ Each winner shows, for linux-wsl2-x86_64 / macos-arm64, its `e2e_state` and host
 | `us-equities/portfolio-risk` | dual_lane_same_winner | skfolio (host_verified [1/0/1/0] / untested [0/0/0/0]) |
 | `us-equities/research-factors-ml` | dual_lane_same_winner | skfolio (host_verified [1/0/1/0] / untested [0/0/0/0]); data-edgartools (host_verified [1/0/1/0] / untested [0/0/0/0]) |
 | `us-equities/security-supply-chain` | dual_lane_same_winner | grype (accepted [0/0/0/0] / untested [0/0/0/0]); syft (host_verified [2/0/2/0] / untested [0/0/0/0]); gitleaks (host_verified [2/0/2/0] / host_verified [1/0/1/0]) |
-| `us-equities/storage-compute` | dual_lane_same_winner | data-duckdb (accepted [1/0/1/0] / untested [0/0/0/0] +1 alias receipt(s), not counted) |
+| `us-equities/storage-compute` | dual_lane_same_winner | data-duckdb (host_verified [2/0/2/0] / untested [0/0/0/0] +1 alias receipt(s), not counted) |
 
 ## Alias receipts (listed, never counted)
 
@@ -67,23 +67,18 @@ Winners whose per-platform `e2e_state` is neither `accepted` nor `host_verified`
 
 ### linux-wsl2-x86_64
 
-- `foundation/document-retrieval`: `poppler` (catalog/e2e state: conditional)
 - `foundation/git-github-automation`: `candidate:cli-cli` (catalog/e2e state: not_established)
 - `foundation/instructions-skills`: `affaan-m/ECC` (catalog/e2e state: conditional)
 - `foundation/instructions-skills`: `candidate:openai-skills` (catalog/e2e state: conditional)
 - `foundation/instructions-skills`: `candidate:typesafe-ai-skills` (catalog/e2e state: conditional)
 - `foundation/quality-evaluation`: `playwright-test` (catalog/e2e state: conditional)
-- `foundation/quality-evaluation`: `promptfoo` (catalog/e2e state: conditional)
 - `foundation/recovery-portability`: `candidate:astral-sh-uv` (catalog/e2e state: conditional)
-- `foundation/scheduling-supervision`: `systemd` (catalog/e2e state: conditional)
 - `foundation/web-research`: `agent-browser` (catalog/e2e state: conditional)
 - `foundation/web-research`: `openresearch` (catalog/e2e state: conditional)
 - `foundation/web-research`: `tavily-cli` (catalog/e2e state: conditional)
 - `foundation/workers`: `claude-code` (catalog/e2e state: conditional)
-- `us-equities/data-quality-orchestration`: `data-pandera` (catalog/e2e state: conditional)
 - `us-equities/evaluation-experiments`: `data-mlflow` (catalog/e2e state: not_established)
 - `us-equities/evaluation-experiments`: `foundation-agent-retrieval-bench` (catalog/e2e state: not_established)
-- `us-equities/evaluation-experiments`: `inspect-ai` (catalog/e2e state: not_established)
 - `us-equities/identity-provenance`: `data-dvc` (catalog/e2e state: not_established)
 
 ### macos-arm64

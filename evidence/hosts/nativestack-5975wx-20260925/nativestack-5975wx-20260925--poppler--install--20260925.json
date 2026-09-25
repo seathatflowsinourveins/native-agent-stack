@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--poppler--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "7783682fe6c9f10675d930b021f125028f21d8f1",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "poppler",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v pdftotext) && rp=$(readlink -f \"$p\") && echo \"resolves: $p -> $rp\" && python3 -c \"import json,glob;c=[x for x in json.load(open('manifests/stack.json'))['components'] if x['id']=='poppler'][0];print('stack version', c['version'], 'source_pin_hexlen', len(c['source_pin']));winners=sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers', []) for w in (l.get('winners') or []) if w.get('component_id')=='poppler'});print('winner pins', winners);assert c['version']=='26.09.0' and winners==['26.09.0']\" && case \"$rp\" in \"$HOME\"/.local/share/codex-ecosystem/poppler-26.09.0/*) echo \"path is under this host's codex-ecosystem poppler-26.09.0 build prefix\" ;; *) exit 1 ;; esac && ! dpkg -s poppler-utils >/dev/null 2>&1 && echo \"confirmed not the apt build: dpkg -s poppler-utils reports not installed on this host\"",
+      "exit": 0,
+      "duration_s": 0.044,
+      "output_sha256": "808755c08b49c3175b7ce842e054b8e5f7c314cb3ddab06f65aa08cc7b856607",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/pdftotext -> ~/.local/share/codex-ecosystem/poppler-26.09.0/prefix/bin/pdftotext\nstack version 26.09.0 source_pin_hexlen 64\nwinner pins ['26.09.0']\npath is under this host's codex-ecosystem poppler-26.09.0 build prefix\nconfirmed not the apt build: dpkg -s poppler-utils reports not installed on this host\n"
+    },
+    {
+      "cmd": "A=\"$HOME/.local/share/codex-ecosystem/poppler-26.09.0/downloads/poppler-26.09.0.tar.xz\" && SIG=\"$A.sig\" && KEY=\"$HOME/.local/share/codex-ecosystem/poppler-26.09.0/downloads/poppler-key.asc\" && test -f \"$A\" && test -f \"$SIG\" && test -f \"$KEY\" && a=$(sha256sum < \"$A\" | cut -d' ' -f1) && stackpin=$(python3 -c \"import json;print([x['source_pin'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']=='poppler'][0])\") && srcpin=$(python3 -c \"import json;print(json.load(open('blueprints/convergence-practice/wsl-document-ingestion/sources.json'))['poppler']['archive_sha256'])\") && echo \"archive sha256=$a manifests/stack.json source_pin=$stackpin sources.json archive_sha256=$srcpin (64-hex SHA-256 digest of the poppler-26.09.0.tar.xz release archive, not a git commit id; see docs/landscape-freshness-notes.md)\" && test \"$a\" = \"$stackpin\" && test \"$a\" = \"$srcpin\" && D=$(mktemp -d) && trap 'rm -rf \"$D\"' EXIT && GNUPGHOME=\"$D\" timeout 15 gpg --batch --no-default-keyring --import \"$KEY\" >/dev/null 2>&1 && GNUPGHOME=\"$D\" timeout 15 gpg --batch --no-default-keyring --status-fd 1 --verify \"$SIG\" \"$A\" >\"$D/status.log\" 2>\"$D/err.log\" && grep -q \"^\\[GNUPG:\\] GOODSIG \" \"$D/status.log\" && grep -q \"^\\[GNUPG:\\] VALIDSIG CA262C6C83DE4D2FB28A332A3A6A4DB839EAA6D7 \" \"$D/status.log\" && echo \"gpg --verify exit 0; GOODSIG+VALIDSIG for publisher fingerprint CA262C6C83DE4D2FB28A332A3A6A4DB839EAA6D7 (Albert Astals Cid); archive integrity and signature both confirmed\"",
+      "exit": 0,
+      "duration_s": 0.098,
+      "output_sha256": "e626d1268cec12965bd942533ab051fc612c1a027b46b59c389a5b363845b5ae",
+      "output_excerpt": "archive sha256=8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e manifests/stack.json source_pin=8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e sources.json archive_sha256=8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e (64-hex SHA-256 digest of the poppler-26.09.0.tar.xz release archive, not a git commit id; see docs/landscape-freshness-notes.md)\n"
+    },
+    {
+      "cmd": "v=$(timeout 10 pdftotext -v 2>&1 | head -1) && echo \"$v\" && echo \"$v\" | grep -q \"pdftotext version 26.09.0\"",
+      "exit": 0,
+      "duration_s": 0.006,
+      "output_sha256": "df5cc6084ac6f0b45f1fc061ca3353a6b50c654f6b19a3f539a1149381d7b9a8",
+      "output_excerpt": "pdftotext version 26.09.0\n"
+    }
+  ],
+  "tool_versions": {
+    "poppler": "26.09.0"
+  },
+  "observed_at_utc": "2026-09-25T19:33:34Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), Poppler 26.09.0, the document-retrieval winner, is installed as a local source build, not the apt package (dpkg reports poppler-utils not installed). pdftotext resolves into this host's poppler-26.09.0 build prefix. The retained release archive's sha256 8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e equals the manifests/stack.json source_pin and the sources record, and gpg --verify of its detached signature reports GOODSIG and VALIDSIG for the publisher fingerprint CA262C6C83DE4D2FB28A332A3A6A4DB839EAA6D7. pdftotext reports version 26.09.0. Every command exits 0.",
+  "limitations": [
+    "The source_pin is the sha256 of the release tarball, not a git commit. The installed binaries were built on this host from that verified archive, so their own hashes are build outputs and are not compared with any other host's binaries.",
+    "Install stage: a resolved path, pin records, an integrity check and a version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision); the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:33:34Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduce: re-ran cmd0-cmd2 including the offline gpg verification with a temp keyring; output identical. Adequacy-checked (install receipt: points 3 and 4 plus readiness-only): (3) backed: dpkg reports poppler-utils not installed, pdftotext resolves into the local poppler-26.09.0 prefix, archive sha256 equals stack source_pin and sources.json, pdftotext -v prints 26.09.0; the retained excerpt is cut before the gpg line, but the command asserts GOODSIG and VALIDSIG for the fingerprint, which is pinned in blueprints/convergence-practice/wsl-document-ingestion/sources.json, and I reproduced it; (4) bound: component_id poppler is the document-retrieval winner, tool_versions 26.09.0, pin_matches True; readiness only: the claim asserts presence, integrity and version only and limitation 2 states this is readiness evidence supporting conditional at most.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:44:44Z",
+      "reviewer": {
+        "identity_sha256": "739ff768866f471b76d2597625e6fdcdc20a33829e1c3b6df3b3c8aa754cc057",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}
