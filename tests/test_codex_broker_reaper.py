@@ -179,6 +179,21 @@ def load_module():
 
 module = load_module()
 
+# An AF_UNIX path must fit sun_path (108 bytes on Linux, including the NUL).
+# Claude Code scratchpads set a TMPDIR long enough to overflow it, so the fake
+# broker's socket lives under the short system /tmp, not tempfile's default.
+SUN_PATH_MAX = 108
+
+
+def short_socket_path(test: unittest.TestCase, name: str) -> str:
+    base = "/tmp" if os.path.isdir("/tmp") and os.access("/tmp", os.W_OK | os.X_OK) else None
+    sock_dir = tempfile.mkdtemp(prefix="cbr-", dir=base)
+    test.addCleanup(lambda: shutil.rmtree(sock_dir, ignore_errors=True))
+    sock_path = os.path.join(sock_dir, name)
+    if len(os.fsencode(sock_path)) >= SUN_PATH_MAX:
+        test.skipTest(f"no temp directory short enough for an AF_UNIX socket path ({sock_path!r})")
+    return sock_path
+
 
 def wait_until(predicate, timeout=5.0, interval=0.02):
     deadline = time.monotonic() + timeout
@@ -260,9 +275,7 @@ class ReaperTestCase(unittest.TestCase):
 
     def spawn_fake_broker(self, *, cwd: Path, extra_args: list[str] | None = None,
                            spawn_child_named: str | None = None) -> tuple[subprocess.Popen, str]:
-        sock_dir = tempfile.mkdtemp()  # short path: AF_UNIX sun_path is capped near 108 bytes
-        self.addCleanup(lambda: shutil.rmtree(sock_dir, ignore_errors=True))
-        sock_path = os.path.join(sock_dir, "broker.sock")
+        sock_path = short_socket_path(self, "broker.sock")
         endpoint = f"unix:{sock_path}"
         args = ["serve", "--endpoint", endpoint, *(extra_args or [])]
         if spawn_child_named:
@@ -1627,10 +1640,28 @@ class ApplyAndEscalationTests(ReaperTestCase):
         self.assertTrue(module.process_exists(proc.pid))
 
 
+class ShortSocketPathTests(unittest.TestCase):
+    def test_a_long_tmpdir_still_yields_a_bindable_socket_path(self):
+        # Regression: under a Claude Code scratchpad TMPDIR (over 100 bytes),
+        # 36 of 58 tests failed with "fake broker never bound its socket".
+        long_root = tempfile.mkdtemp()
+        self.addCleanup(lambda: shutil.rmtree(long_root, ignore_errors=True))
+        long_tmp = os.path.join(long_root, "x" * max(1, SUN_PATH_MAX - len(long_root)))
+        os.makedirs(long_tmp)
+        with mock.patch.object(tempfile, "tempdir", long_tmp):
+            self.assertGreaterEqual(len(os.fsencode(os.path.join(tempfile.mkdtemp(), "broker.sock"))), SUN_PATH_MAX)
+            path = short_socket_path(self, "broker.sock")
+        self.assertLess(len(os.fsencode(path)), SUN_PATH_MAX)
+        server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.addCleanup(server.close)
+        server.bind(path)
+        self.assertTrue(os.path.exists(path))
+
+
 @LINUX_ONLY
 class RpcTransportTests(ReaperTestCase):
     def test_send_shutdown_rpc_reports_socket_missing_for_a_stale_endpoint(self):
-        result = module.send_shutdown_rpc(f"unix:{self.root}/nonexistent.sock")
+        result = module.send_shutdown_rpc(f"unix:{short_socket_path(self, 'nonexistent.sock')}")
         self.assertEqual(result, "socket_missing")
 
     def test_send_shutdown_rpc_reports_unsupported_endpoint_for_non_unix_schemes(self):
