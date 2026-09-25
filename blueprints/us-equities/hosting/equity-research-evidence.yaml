@@ -1,9 +1,12 @@
-name: equity-research-evidence
 description: Summarize a local LEAN simulation and validate its evidence catalog.
 type: graph
 working_dir: ${STACK_REPO}
 timeout_sec: 180
 max_active_runs: 1
+# Dagu stores artifacts by default and serves them without auth under auth none. This DAG writes none, so
+# turn storage off here: base.yaml does not pass this key on (checked natively on 2.16.6 and 2.17.2).
+artifacts:
+  enabled: false
 steps:
   - id: summarize
     run: '"${SDK_ENV}/bin/python" "${STACK_REPO}/blueprints/us-equities/data/summarize_backtest.py" "${LEAN_EVENTS}" "${RESEARCH_OUTPUT}/order-events.parquet"'

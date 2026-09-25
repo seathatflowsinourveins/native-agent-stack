@@ -8,7 +8,7 @@ encrypted backup and byte-identical restore of 22 selected public reference file
 Neither adds a scheduled broker service or off-host durability.
 
 Dagu 2.16.6 now hosts local research run history on loopback port 18525. Its
-upstream CLI completed the three-step [workflow](research-evidence.yaml): DuckDB
+upstream CLI completed the three-step [workflow](equity-research-evidence.yaml): DuckDB
 summarized six LEAN simulated events into three orders, then both evidence
 validators passed. The native history retained successful, failed and cancelled
 runs after a service restart. This is local research hosting, not broker recovery
@@ -41,7 +41,7 @@ env -i HOME="$HOME" PATH=/usr/bin:/bin \
   STACK_REPO="$STACK_REPO" SDK_ENV="$SDK_ENV" \
   LEAN_EVENTS="$LEAN_EVENTS" RESEARCH_OUTPUT="$RESEARCH_OUTPUT" \
   "$DAGU" start --context local --dagu-home "$RESEARCH_HOME" \
-  --run-id "$RUN_ID" "$STACK_REPO/blueprints/us-equities/hosting/research-evidence.yaml"
+  --run-id "$RUN_ID" "$STACK_REPO/blueprints/us-equities/hosting/equity-research-evidence.yaml"
 "$DAGU" history --context local --dagu-home "$RESEARCH_HOME" --format json
 ```
 
@@ -61,6 +61,19 @@ cancelled an intentionally long local step; `history` reported `aborted` even
 though that cancelled CLI process returned zero. Consumers must inspect native
 status, not only process exit codes. A separate exit-23 fixture recorded `failed`
 and aborted its dependent step.
+
+**DAG name (2026-09-25).** The workflow file was renamed from
+`research-evidence.yaml` to `equity-research-evidence.yaml`, and its top-level
+`name:` was removed. Dagu now derives the DAG name, `equity-research-evidence`,
+from the filename. That is the same name the 2026-09-19 runs used.
+
+The old file failed `dagu validate` under its own name on both 2.16.6 and
+2.17.2, with "entrypoint document must not define name". Only a copy whose
+filename matched `name:` passed.
+
+The renamed file validates on both versions. `dagu dry` reports
+`equity-research-evidence` on both. The [receipt](receipt.json) keeps the old
+path and its sha256 as historical evidence.
 
 ## Service boundary
 
@@ -86,6 +99,28 @@ available to trusted local users without authentication. Keep this configuration
 on loopback. Use upstream builtin/OIDC authentication for access beyond this PC.
 Manual native CLI commands remain the workflow execution lane. Private
 configuration and history are stored beneath the user's local application data.
+
+**Anonymous reads under `auth.mode: none` (2026-09-25).** Every read route is
+anonymous under `none`, not only the DAG list and status. On 2.16.6 that
+includes the per-run artifact file tree, preview and download.
+
+Two things keep observation to DAG list and status today:
+- the loopback-only listener;
+- no deployed DAG writing artifacts.
+
+Dagu does not enforce it. Artifact storage is on by default. On both 2.16.6 and
+2.17.2, native scratch runs showed:
+- a DAG with no `artifacts` key stored the file its step wrote;
+- a DAG-level `artifacts: {enabled: false}` stored nothing;
+- `base.yaml` did not pass that key on, although its `env` did reach the step.
+
+The research workflow therefore disables artifacts itself.
+
+Dagu 2.17.2 also adds an anonymous cross-run `GET /api/v1/artifacts`, which
+cannot be disabled under `none`. The host stays on 2.16.6 until a need for
+2.17.2 justifies that surface. The first-run example DAGs Dagu creates are
+never run here (`run_dags: false`); `example-05` writes artifacts if anything
+runs it.
 
 `systemctl --user disable --now dagu-equities.service` stops and disables it
 without deleting evidence. The service restarts on process failure; the accepted
