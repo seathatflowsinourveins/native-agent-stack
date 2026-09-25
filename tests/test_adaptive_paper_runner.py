@@ -8,11 +8,34 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import signal
 import sys
 import tempfile
 import time
 import unittest
 from unittest.mock import patch
+
+
+class _DeadlineExceeded(Exception):
+    """Raised by a SIGALRM handler; never a real timeout the OS enforces."""
+
+
+@contextlib.contextmanager
+def _deadline(seconds):
+    """Hard wall-clock bound for one call, via signal.alarm: a blocking
+    syscall (e.g. open() on a FIFO without O_NONBLOCK) is interrupted with
+    EINTR and, since the handler raises rather than returning, Python does
+    not auto-retry it (PEP 475) -- so a real hang fails this test fast
+    instead of freezing the suite."""
+    def _on_alarm(signum, frame):
+        raise _DeadlineExceeded(f"exceeded {seconds}s deadline")
+    previous = signal.signal(signal.SIGALRM, _on_alarm)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
 
 SOURCE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/adaptive-paper"
 sys.path.insert(0, str(SOURCE))
@@ -1711,6 +1734,71 @@ class CredentialFilePermissions(unittest.TestCase):
         with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
             credentials(self.root / "does-not-exist.env")
 
+    def test_symlink_to_a_valid_target_is_resolved_and_accepted(self):
+        # runner.credentials() keeps its prior symlink-tolerant behavior (unlike
+        # market_research.credentials(), which refuses a symlink outright): the
+        # shared guard resolves the path first when follow_symlinks=True, then
+        # applies every rule to the resolved target.
+        target = self._write_env(self.root, name="real.env")
+        link = self.root / "linked.env"
+        link.symlink_to(target)
+        self.assertEqual(credentials(link), ("fixture-key", "fixture-secret"))
+
+    def test_fifo_is_rejected_and_does_not_hang(self):
+        fifo = self.root / "fifo.env"
+        os.mkfifo(fifo, mode=0o600)
+        try:
+            with _deadline(10):
+                with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+                    credentials(fifo)
+        except _DeadlineExceeded:
+            # A genuine assertion failure (self.fail), not an uncaught
+            # exception: unittest -- and the real mutation driver in
+            # tests/_credential_mutation_driver.py, which only counts a
+            # "FAIL", never an "ERROR", as a kill -- must see this as the
+            # test actively catching the regression, not merely erroring.
+            self.fail("credentials(fifo) hung past the 10s deadline instead of raising")
+
+    def test_hard_link_is_rejected(self):
+        # G-fix-round item 2: a second name for the same inode (e.g. one outside a
+        # worktree, one inside) must not pass because the checked name alone looks
+        # compliant -- credential_guard checks st_nlink on the opened fd.
+        target = self._write_env(self.root, name="real.env")
+        other_name = self.root / "second-name.env"
+        os.link(target, other_name)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+            credentials(target)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+            credentials(other_name)
+
+    def test_group_writable_parent_directory_is_rejected(self):
+        path = self._write_env(self.root, mode=0o600)
+        os.chmod(self.root, 0o770)
+        try:
+            with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+                credentials(path)
+        finally:
+            os.chmod(self.root, 0o700)
+
+    def test_world_writable_parent_directory_is_rejected(self):
+        path = self._write_env(self.root, mode=0o600)
+        os.chmod(self.root, 0o707)
+        try:
+            with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+                credentials(path)
+        finally:
+            os.chmod(self.root, 0o700)
+
+    def test_0700_and_0755_owned_parent_directories_still_pass(self):
+        # Coordinator requirement: runner's accepted configurations are unchanged.
+        for mode in (0o700, 0o755):
+            with self.subTest(mode=oct(mode)):
+                directory = self.root / oct(mode)
+                directory.mkdir(mode=mode)
+                os.chmod(directory, mode)  # mkdir's mode is subject to umask; force the exact bits
+                path = self._write_env(directory)
+                self.assertEqual(credentials(path), ("fixture-key", "fixture-secret"))
+
     def test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials(self):
         path = self._write_env(self.root)
         self.assertEqual(credentials(path), ("fixture-key", "fixture-secret"))
@@ -1721,6 +1809,82 @@ class CredentialFilePermissions(unittest.TestCase):
             credentials(path)
         self.assertNotIn("fixture-key", str(ctx.exception))
         self.assertNotIn("fixture-secret", str(ctx.exception))
+
+    def test_error_never_includes_path_or_basename(self):
+        path = self._write_env(self.root, name="tell-tale-name.env", mode=0o644)
+        with self.assertRaises(SafetyErrorAlways) as ctx:
+            credentials(path)
+        self.assertNotIn("tell-tale-name", str(ctx.exception))
+        self.assertNotIn(str(self.root), str(ctx.exception))
+
+    def test_non_ascii_content_is_rejected(self):
+        path = self.root / "paper.env"
+        path.write_bytes("APCA_API_KEY_ID=fixturé-key\nAPCA_API_SECRET_KEY=fixture-secret\n".encode("utf-8"))
+        os.chmod(path, 0o600)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions:encoding") as ctx:
+            credentials(path)
+        # G-round-4 item 1: `raw.isascii()` is checked before any `.decode()`
+        # call, so no UnicodeDecodeError (whose `.object` attribute holds the
+        # *entire* input, secret included) is ever constructed at all --
+        # confirmed here on the exception itself, not only on its message.
+        error = ctx.exception
+        self.assertIsNone(error.__context__)
+        self.assertIsNone(error.__cause__)
+        for attr in ("object", "args"):
+            value = repr(getattr(error, attr, None))
+            self.assertNotIn("fixtur", value)
+            self.assertNotIn("fixture-secret", value)
+
+    def test_oversized_file_is_rejected_not_silently_truncated_and_accepted(self):
+        # G-round-4 item 4: proves the size check itself is what rejects an
+        # over-cap file, not merely that some other check happens to reject
+        # it too. Both real KEY/SECRET lines sit well inside the first
+        # MAX_CREDENTIAL_BYTES + 1 bytes, followed by a huge trailing
+        # comment line that pushes the file itself past the cap; a
+        # truncated *comment* still starts with "#" and parses as a no-op,
+        # so if the size check were ever removed, the bounded read alone
+        # would silently hand back a "valid"-looking (but truncated-file)
+        # credential pair instead of raising -- that specific failure mode
+        # (a clean pass, not merely a different exception) is what this
+        # test's assertRaisesRegex would then correctly flag as a FAIL.
+        path = self.root / "paper.env"
+        filler = "k" * 70000  # far past runner_module.MAX_CREDENTIAL_BYTES (64 KiB)
+        path.write_text(f"APCA_API_KEY_ID=shortkey\nAPCA_API_SECRET_KEY=shortsecret\n# {filler}\n")
+        os.chmod(path, 0o600)
+        self.assertGreater(len(path.read_bytes()), runner_module.MAX_CREDENTIAL_BYTES)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions:size"):
+            credentials(path)
+
+
+class SharedCredentialGuardParity(unittest.TestCase):
+    """runner.credentials() and market_research.credentials() cannot silently
+    drift: both import the same credential_guard.open_verified(), and a
+    permission violation that fails one fails the other the same way."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("market_research_parity", SOURCE / "market_research.py")
+        self.market_research = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.market_research)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_both_loaders_share_the_same_guard_function(self):
+        import credential_guard
+        self.assertIs(runner_module.open_verified, credential_guard.open_verified)
+        self.assertIs(self.market_research.open_verified, credential_guard.open_verified)
+
+    def test_wrong_mode_rejected_by_both_loaders(self):
+        path = self.root / "paper.env"
+        path.write_text("APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
+        os.chmod(path, 0o644)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+            credentials(path)
+        with self.assertRaisesRegex(self.market_research.ResearchError, "credential_file_permissions"):
+            self.market_research.credentials(path)
 
 
 def _scratch_registry(root):

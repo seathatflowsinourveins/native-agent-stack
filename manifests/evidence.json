@@ -3169,8 +3169,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "35a3e985b43c6a869718cb2d7373de5b977913fc18812a33a9bbc282f2aa2e69",
-      "bytes": 25402
+      "sha256": "3a51694ef40b0011450b912ab9e6e53ef0b2ea60f2452342a8fe036a23eb3856",
+      "bytes": 27326
     },
     {
       "path": ".gitleaksignore",
@@ -6524,6 +6524,16 @@
       "bytes": 9640
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/corporate_actions.py",
+      "sha256": "f4afc9eef377d407b3a4d8df29cd7d71d43b09cb18768d911324bdd433d6d5e7",
+      "bytes": 49424
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/credential_guard.py",
+      "sha256": "f5a3d0d038ed3f01d486493ce416395039fb260762232785bb0a9073c777da7e",
+      "bytes": 22201
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/evidence-hashes.json",
       "sha256": "a38097f52aa89d7509e848bc244bc796bd6d96ad3314635e4b6f8b7cca6df5bf",
       "bytes": 869
@@ -6555,8 +6565,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/market_research.py",
-      "sha256": "692f0f16f56709204002d587d2e4da8045f0ffe8249294055cf36b51e29abe68",
-      "bytes": 22176
+      "sha256": "1de0e88b9bdc3304e0e247bf4de2a0462e25717695016ad2dd7a4b114f64449f",
+      "bytes": 24083
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/metrics.py",
@@ -6650,8 +6660,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "d783e4ef687a439c4ea09a5675406660e169106e5600d98e5c4955fef02c9497",
-      "bytes": 130287
+      "sha256": "4a77b3e0a6c8835a69751fd85dfea1449a52435801b3d0c3f9096df784d3b137",
+      "bytes": 130962
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -6675,8 +6685,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "cebf971439966e23b4169e9c90375fb5b68137bd83ef09d5d11125eb95ff82d2",
-      "bytes": 6122
+      "sha256": "7e1c52c89dde91a93d5d681e672991fd952c6e1ce8d39fe37aed02eb513ade9f",
+      "bytes": 6481
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -9670,8 +9680,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "dad95bed78301ada006413595fad1b37a191c70b077d42fdfe3cf8b57b458fc3",
-      "bytes": 54671
+      "sha256": "874803c6efefb24466d273a7815392288d2c411a38198bab9fe23c52545bf56d",
+      "bytes": 63018
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -9925,8 +9935,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-broker-credential-handling.md",
-      "sha256": "4e32f464b3466e03be4122471fec9cc46886238f602a7ec3d128bfe2eac4e9e7",
-      "bytes": 4241
+      "sha256": "2b16c53efcdc0dd1c06d82226e4f595d37133855217d718cfa021d16e7e02530",
+      "bytes": 23985
     },
     {
       "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
@@ -28940,8 +28950,8 @@
     },
     {
       "path": "tests/adaptive_paper_hermetic.py",
-      "sha256": "34f2d5b07f42cb60d415abf24e4feef64b9088d1071163ab8427f0d958ebf7ee",
-      "bytes": 4061
+      "sha256": "0f41601cd10abf10ccba4f17d9c35716bb766a5e9951a4390649d6c9387fc1da",
+      "bytes": 5384
     },
     {
       "path": "tests/fixtures/host-receipts/home-path-in-excerpt.json",
@@ -28990,8 +29000,18 @@
     },
     {
       "path": "tests/test_adaptive_market_research.py",
-      "sha256": "dfd7a09380a7b1b10633c2edf05daf5a35bfcb48498fff130a2d84ff7190e395",
-      "bytes": 18284
+      "sha256": "772b4fd467d4405bd098a440c54de4bfd61f91bbb80693c052077b867f9e2fd6",
+      "bytes": 27215
+    },
+    {
+      "path": "tests/test_adaptive_paper_corporate_actions.py",
+      "sha256": "460599fcce943a949af4dbfd4bc818463e95a6e85e7e0aea1f573b55724ffd3b",
+      "bytes": 78981
+    },
+    {
+      "path": "tests/test_adaptive_paper_credential_race.py",
+      "sha256": "1b0b6521045858fc9c974fc9e50e390ac888c7091f5f92606feb1bf49f7ef022",
+      "bytes": 66824
     },
     {
       "path": "tests/test_adaptive_paper_leverage.py",
@@ -29030,8 +29050,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "00df9ba014a13674f596498049d19984c260df62586e0563d276ac9069b893df",
-      "bytes": 231571
+      "sha256": "d5f17594eda9b482cc2874e19c68f711eb38c83a423d58f194a41b54b6a7ba33",
+      "bytes": 239822
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -29230,8 +29250,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "7ae277702e707230df21041df67d9fb212463bf8c560b3a018c617863d9a185f",
-      "bytes": 37816
+      "sha256": "7ff31a6392556dd59b4efabb883aa8cae646c9139584ff6f388a4cb1a4813941",
+      "bytes": 44499
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
