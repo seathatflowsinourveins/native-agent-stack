@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adoption/pins-schema-v2.json",
+  "title": "Platform tool-pin catalog, schema_version 2",
+  "description": "Documents adoption/pins-linux-x86_64.json (and any later adoption/pins-<platform>.json migrated to schema_version 2). This is a documentation/reference schema only: adoption/bootstrap-linux.sh reads pins with jq and does not validate against this file; adoption/tools/ecosystem-switch reads the per-tool switch fields (root_name, current_link, entrypoints, surfaces, state_dirs, window, rollback_class) as its component spec when given --pins/--spec pointing at a file shaped like this. scripts/validate.py's pins-v2 parity check (validate_pins_v2) implements the cross-file rules below directly in stdlib Python, not by loading this file with a JSON Schema library; tests/test_pins_v2.py keeps the two in sync structurally. A component whose real value could not be independently verified during migration carries a nested {\"status\": \"pending\", ...} object instead of a fabricated value for that one field; validate_pins_v2 treats those report-only, never a hard failure, per switch.md's 'unknown fields for other winners can be filled later by the qualify wave (mark pending)'.",
+  "type": "object",
+  "required": ["schema_version", "platform", "tools"],
+  "properties": {
+    "schema_version": {
+      "const": 2,
+      "description": "adoption/pins-<platform>.json files not yet migrated from schema_version 1 have no candidates/supersedes/divergence sections and only the legacy per-tool fields (id, version, kind, url, sha256, install_note)."
+    },
+    "reviewed_at": {"type": "string", "format": "date"},
+    "platform": {"type": "string", "minLength": 1},
+    "source": {"type": "string"},
+    "schema_v2_note": {"type": "string", "description": "Free-text migration provenance; not read by any script."},
+    "tools": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/toolPinV2"}
+    },
+    "candidates": {
+      "type": "array",
+      "description": "Installable winners named elsewhere in the catalog (a layer's winners[] or a Facts section naming a hard-coded root) that have no url/sha256 pin in this file yet. Never a hard-failure source for scripts/validate.py; always report-only.",
+      "items": {
+        "type": "object",
+        "required": ["id", "status", "note"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "status": {"const": "pending"},
+          "note": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "supersedes": {
+      "type": "array",
+      "description": "Other, out-of-repository version records this file is now the reference over (switch.md Facts: 'Version records disagree'). Each entry is provenance (a path and a sha256 read once, for the record) and is never edited to match -- the host files themselves are outside every worktree.",
+      "items": {
+        "type": "object",
+        "required": ["kind", "path", "reviewed_at", "sha256", "note"],
+        "properties": {
+          "kind": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1},
+          "reviewed_at": {"type": "string", "format": "date"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "note": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "divergence": {
+      "type": "array",
+      "description": "Declared, intentional mismatches between this file's install pin and the version another manifest (manifests/stack.json, a catalogs/landscape/*.json winner) cites as evidence -- for example a self-updating native binary whose install floor keeps moving ahead of the version any recorded task actually ran against. scripts/validate.py's parity check reads this array by id and does not fail that one id's mismatch while it stays declared here.",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "note"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1, "description": "Must match a tools[].id in this same file."},
+          "kind": {"type": "string", "minLength": 1},
+          "pinned_floor": {"type": "string"},
+          "current_evidence_pin": {"type": "string"},
+          "note": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "pendingField": {
+      "description": "In place of any field below, an object {\"status\": \"pending\", \"note\": text} defers that one value to a later qualify wave instead of guessing it.",
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {"const": "pending"},
+        "note": {"type": "string"}
+      }
+    },
+    "entrypoint": {
+      "type": "object",
+      "required": ["bin"],
+      "properties": {
+        "bin": {
+          "type": "string",
+          "description": "ECO_INSTALL_ROOT-relative path of the symlink or launcher that resolves this executable today, e.g. \"bin/node\"."
+        },
+        "in_root": {
+          "description": "Path of the real executable relative to this tool's root_name (tools/<root_name>/<in_root>), or null when the component has no switch-managed root (see rollback_class not_applicable).",
+          "type": ["string", "null"]
+        },
+        "status": {"const": "pending"},
+        "note": {"type": "string"}
+      }
+    },
+    "surface": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {"enum": ["link", "text-replace", "file-write", "native-cli", "unit-restart", "data-backup", "data-restore"]},
+        "path": {"type": "string"},
+        "status": {"const": "pending"},
+        "note": {"type": "string"}
+      }
+    },
+    "stateDir": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": {"type": "string"},
+        "status": {"const": "pending"},
+        "note": {"type": "string"},
+        "old": {"type": "string", "description": "text-replace only: the literal old substring adopt --relink looks for (defaults to this tool's real, resolved root_name path). Refused unless it occurs exactly expected_count times; refused outright when path contains '/frozen/'."},
+        "expected_count": {"type": "integer", "minimum": 1, "description": "text-replace only; default 1."},
+        "content_utf8": {"type": "string", "description": "file-write only: the UTF-8 text adopt --relink writes at path, backing up any pre-existing file first."}
+      }
+    },
+    "toolPinV2": {
+      "type": "object",
+      "required": [
+        "id", "version", "kind", "url", "install_note",
+        "root_name", "current_link", "entrypoints", "surfaces", "state_dirs", "window", "rollback_class"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1, "description": "Stable component id; matches manifests/stack.json components[].id where the component is also catalog-tracked."},
+        "version": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["tarball", "npm", "pip", "uv-tool", "native"]},
+        "url": {"type": "string", "format": "uri"},
+        "sha256": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Exactly one of sha256 or lock_ref must be present and non-null; adoption/bootstrap-linux.sh's install_pin refuses a null sha256 (fail closed)."
+        },
+        "lock_ref": {
+          "type": "string",
+          "description": "Alternative to sha256 for a pin whose upstream installer resolves and verifies its own lock (e.g. a uv-tool kind resolved from PyPI by uv itself); names the lock mechanism instead of duplicating a hash uv does not check."
+        },
+        "install_note": {"type": "string", "minLength": 1},
+        "bin": {"type": "string", "description": "native kind only: the command name the self-installing binary's own installer creates."},
+        "root_name": {
+          "description": "tools/<root_name> under ECO_INSTALL_ROOT holds this version's real, immutable install; null (with rollback_class not_applicable) when the kind has no such discrete root (native, or a uv-tool kind whose environment uv itself owns).",
+          "oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]
+        },
+        "current_link": {
+          "description": "The current/<id> switch point ecosystem-switch flips to change this component's active root_name; null exactly when root_name is null.",
+          "oneOf": [{"type": "string", "pattern": "^current/[A-Za-z0-9][A-Za-z0-9._-]*$"}, {"type": "null"}]
+        },
+        "entrypoints": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/entrypoint"}
+        },
+        "surfaces": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/surface"}
+        },
+        "state_dirs": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/stateDir"}
+        },
+        "window": {"type": "string", "minLength": 1, "description": "Name of a switch/windows/<name>.json this component's apply/unit-restart operations are gated by."},
+        "rollback_class": {"enum": ["safe", "restart_required", "manual_required", "not_applicable"]},
+        "divergence_ref": {"type": "string", "description": "id of a divergence[] entry (usually this same tool's id) that documents why this pin intentionally differs from another manifest's cited version."}
+      }
+    }
+  }
+}
