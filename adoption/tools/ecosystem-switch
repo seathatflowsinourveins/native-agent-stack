@@ -432,6 +432,28 @@ def save_state(root: Path) -> dict:
     return state
 
 
+def in_progress_txn_for_component(root: Path, component_id: str) -> str | None:
+    """The txn id of a transaction already recorded for ``component_id`` whose status is still
+    ``in_progress``, or None. Major finding: neither `adopt --relink` nor `apply` refused to start
+    while an earlier txn for the same component was still in_progress (a relink that failed
+    partway through its surfaces after current/<id> and every entrypoint were already migrated, or
+    a crashed/interrupted apply). A second attempt could reach its own terminal state without ever
+    re-touching current/<id> itself: relink links it only when absent, and a retried apply with the
+    same --to-root would collide the same way if the first attempt already flipped the link before
+    crashing. Since recompute_state's own updated_txn tracking only follows a link entry whose
+    surface starts with "current/", the second attempt then leaves updated_txn still naming the
+    stale first txn -- and a later `recover` reversing that stale in_progress txn (the only thing
+    that still names it) could unlink current/<id> or revert entrypoints/surfaces out from under
+    the second attempt's own, already-terminal work, while both commands themselves kept exiting 0.
+    Refusing outright here forces an operator to run `recover` (which fully, safely reverts the
+    stale txn) before any retry, so there is never more than one live transaction per component."""
+    state = load_state(root)
+    for txn, record in state["txns"].items():
+        if record.get("component") == component_id and record.get("status") == "in_progress":
+            return txn
+    return None
+
+
 # --------------------------------------------------------------------------------------
 # Component spec ("adopted" registry) -- see adoption/pins-schema-v2.json for the shape
 # --------------------------------------------------------------------------------------
@@ -911,6 +933,16 @@ def cmd_apply(args) -> int:
     with switch_locks(root):
         spec = load_spec(root, args.spec)
         entry = component_entry(spec, args.component)
+        # Deliberately NOT the same in_progress-txn guard `adopt --relink` gets below (deviation
+        # from switch.md round-4 review's literal "refuse relink/apply" phrasing, evidence in the
+        # round-4 fix task record): build_apply_plan (below) always includes exactly one
+        # unconditional `link` step, unlike relink's "link current/<id> only when absent" -- so an
+        # apply that reaches its own link step and completes always re-claims updated_txn for
+        # itself, regardless of any earlier, still in_progress (crashed) txn for the same
+        # component. That already-existing, already-tested design is exactly what lets `recover`
+        # correctly refuse to reverse a superseded crashed txn once a later, real apply has moved
+        # the component on again (test_recover_refuses_to_clobber_a_txn_a_later_apply_already_superseded);
+        # a blanket refusal here would instead block that legitimate recovery path outright.
         steps = build_apply_plan(spec, args.component, args.to_root, root=root)
         digest = plan_sha256(steps)
         if digest != args.plan_sha256:
@@ -1548,6 +1580,15 @@ def cmd_adopt(args) -> int:
                 if not entry.get("root_name") or not entry.get("current_link"):
                     results[component_id] = "skipped (no switch-managed root; see divergence)"
                     continue
+                stale_txn = in_progress_txn_for_component(root, component_id)
+                if stale_txn:
+                    raise SwitchError(
+                        f"component {component_id!r} has an in_progress transaction {stale_txn!r} left "
+                        "over from an earlier relink/apply (it failed partway, or the process crashed); "
+                        "run 'recover' to reconcile it before retrying, rather than layering a second "
+                        "relink on top -- a retry that never re-touches current/<id> (relink links it "
+                        "only when absent) could leave 'recover' able to unwind the stale txn's own "
+                        "current/<id> link or entrypoints out from under this retry's later work")
                 # os.getpid(), the same as apply's own txn id (cmd_apply above): two separate
                 # `adopt --relink` invocations for the same component within the same wall-clock
                 # second (int(time.time())'s own resolution) would otherwise collide onto one

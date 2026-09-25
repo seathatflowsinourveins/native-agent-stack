@@ -323,6 +323,55 @@ class RelinkTests(SwitchFixture):
         self.assertEqual(result.returncode, 1)
         self.assertFalse(json.loads(result.stdout)["_ledger"]["ok"])
 
+    def test_relink_refuses_while_an_earlier_txn_for_the_component_is_in_progress(self):
+        # Major finding (round 4): nothing blocked a second relink attempt while an earlier one
+        # for the same component was still in_progress. Relink only (re-)links current/<id> when
+        # it is absent, so a second, "fixed" attempt never re-ledgers its own current/<id> link --
+        # recompute_state's updated_txn still names the FIRST (stale) txn -- and a later `recover`
+        # reversing that stale in_progress txn could then unlink current/<id> or revert
+        # entrypoints out from under the second attempt's own (already-terminal) work, while every
+        # command involved kept exiting 0. Refusing outright while the earlier txn is still
+        # in_progress forces `recover` to run first, fully reverting it before a clean retry.
+        frozen = self.root / "frozen" / "thing.txt"
+        frozen.parent.mkdir()
+        frozen.write_text("do not touch")
+        self.write_components({"foo": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-1.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}],
+            "surfaces": [{"kind": "text-replace", "path": str(frozen), "expected_count": 1}],
+            "state_dirs": [], "window": "default", "rollback_class": "safe",
+        }})
+        first = run(self.env, "adopt", "--relink")
+        self.assertNotEqual(first.returncode, 0)
+        self.assertIn("frozen", first.stderr)
+        self.assertTrue((self.root / "current" / "foo").exists(),
+                        "current/foo must have been created before the frozen surface aborted the relink")
+
+        second = run(self.env, "adopt", "--relink")
+        self.assertNotEqual(second.returncode, 0, "a retry must not proceed while the first attempt is in_progress")
+        self.assertIn("in_progress", second.stderr)
+        self.assertIn("recover", second.stderr)
+        # The refusal must itself be a pure pre-check: no new txn/ledger entries from this attempt.
+        state_before_recover = json.loads(run(self.env, "status", "--json").stdout)
+        in_progress_txns = [t for t, r in state_before_recover["txns"].items() if r.get("status") == "in_progress"]
+        self.assertEqual(len(in_progress_txns), 1, state_before_recover["txns"])
+
+        recover_result = run(self.env, "recover")
+        self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
+        self.assertEqual(len(json.loads(recover_result.stdout)["recovered_txns"]), 1)
+        self.assertFalse((self.root / "current" / "foo").exists(), "recover must fully revert the stale relink")
+
+        # A clean retry (spec fixed, surface removed) now succeeds from scratch.
+        self.write_components({"foo": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-1.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}], "surfaces": [], "state_dirs": [],
+            "window": "default", "rollback_class": "safe",
+        }})
+        third = run(self.env, "adopt", "--relink")
+        self.assertEqual(third.returncode, 0, third.stderr)
+        self.assertTrue((self.root / "current" / "foo").exists())
+        self.assertEqual(os.readlink(self.root / "bin" / "foo"), str(self.root / "current" / "foo" / "bin" / "foo"))
+
 
 class TextReplaceAndFrozenTests(SwitchFixture):
     def setUp(self):
