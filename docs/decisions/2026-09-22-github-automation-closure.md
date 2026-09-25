@@ -143,6 +143,29 @@ locally with `GH_TOKEN` set and no `--offline`, using
   test on that path, and a reason without "fixture" failed the exclusion
   test. **Overturn:** the fixture becomes an installed dependency, or a second
   exclusion is proposed for a file that is not a test fixture.
+  **Superseded (2026-09-25):** the fixture was renamed to
+  `requirements.txt.fixture` because Scorecard v5.5.0's own vulnerabilities
+  check runs OSV-Scanner (osv-scalibr) directly over repository files
+  (`clients/osv.go:73-87`, `checks/raw/vulnerabilities.go:32-36`), and
+  osv-scalibr's Python cataloger matches any `*requirements*.txt` name
+  (`requirements.go:113`) -- it never reads GitHub's dependency graph and does
+  not honor this repo's own `osv-scanner-lockfiles.json`/`dependabot.yml`
+  exclusions, which is why alert #19 stayed open despite them. Renaming past
+  that `*.txt` match makes the fixture invisible to Scorecard's scan too, so
+  it is no longer a tracked manifest name and this `excluded` entry was
+  removed rather than kept; the test's exclusion path itself is unchanged.
+  **Alternatives considered:** an `osv-scanner.toml` ignore scoped to the
+  fixture directory (rejected: Scorecard's embedded OSV-Scanner run does not
+  read this repo's config, so it would not stop the alert); generating the
+  fixture at test time instead of committing it (matches the pattern in
+  `blueprints/gap-wave2-20260923/us-equities__security-supply-chain/scanner_comparison.sh:47`,
+  which writes its positive-control `requirements.txt` into an output
+  directory at run time; not taken here to keep the retained file
+  byte-identical and hash-registered for reproducibility). **Overturn:**
+  Scorecard or OSV-Scanner starts matching `.fixture`-suffixed files, or
+  alert #19 does not close after the next main-branch Scorecard run (verify
+  with `gh api repos/seathatflowsinourveins/native-agent-stack/code-scanning/alerts/19 --jq .state`,
+  expected `fixed`).
 - **`--no-resolve` (measured).** With transitive resolution, three unlocked
   manifests reported versions that no lockfile installs. OSV's resolver picked
   `httpx2`/`httpcore2` 2.9.1 (PyPI latest 2.13.0) and `six` 1.9.0 (latest
@@ -246,6 +269,10 @@ locally with `GH_TOKEN` set and no `--offline`, using
   installed tool) uploads it, per the "Token split" evidence above.
 - **Overturn.** An online-only finding class (impostor commit, known-vulnerable
   action, ref-version mismatch) appears. Then it becomes a PR gate.
+- **Superseded (2026-09-25).** The rejected "online PR gate" alternative is now
+  adopted in `validate.yml` without waiting for that trigger, which could only
+  fire after a merge. See "GitHub hardening follow-up (2026-09-25)" below. The
+  two-job SARIF split above is unchanged.
 
 ## 5. Scorecard SARIF
 
@@ -369,6 +396,25 @@ locally with `GH_TOKEN` set and no `--offline`, using
   and the PR limit apply to version updates only. New advisories still raise
   alerts on the fixture; those are dismissed `not_used`. Requested by the
   gap-resolution session that owns the fixture.
+  **Superseded (2026-09-25):** the fixture was renamed to
+  `requirements.txt.fixture`; that rename, not this Dependabot entry, is what
+  is expected to close code-scanning alert #19, because alert #19 comes from
+  Scorecard v5.5.0's own vulnerabilities check running OSV-Scanner
+  (osv-scalibr) directly over repository files -- it matches any
+  `*requirements*.txt` name and does not read GitHub's dependency graph or
+  honor either scanner's own exclusion lists (see the section-3 note for the
+  source references). With the fixture no longer named `requirements.txt`,
+  Dependabot's pip manifest discovery also no longer finds it in that
+  directory, so this dedicated `pip` entry was removed from
+  `.github/dependabot.yml` as redundant rather than kept.
+  **Alternatives and overturn:** same as the section-3 superseded note (an
+  `osv-scanner.toml` ignore does not reach Scorecard's embedded scan;
+  generating the fixture at test time was not taken, to keep the retained
+  file hash-registered). **Overturn:** verify with
+  `gh api repos/seathatflowsinourveins/native-agent-stack/code-scanning/alerts/19 --jq .state`
+  (expected `fixed` after the next main-branch Scorecard run); if it is not,
+  or Dependabot/Scorecard begins reading `.fixture` files, this rename does
+  not resolve the alert and the dedicated `pip` entry should be restored.
 - **Security updates stay on.** Dependabot security updates are free, gave the
   fastest signal here (#97/#98 within minutes of enabling), and auto-close
   their alerts when a fix lands (alerts 1-6 closed on #99's merge). The cost is
@@ -378,6 +424,70 @@ locally with `GH_TOKEN` set and no `--offline`, using
   a fixture).
 - **Overturn.** A Dependabot pip or uv PR passes the recompile-and-diff check on
   a real lock.
+- **CI lock renamed (2026-09-25); pip version updates stay off.** A read-only
+  `gh api repos/seathatflowsinourveins/native-agent-stack/dependency-graph/sbom`
+  on 2026-09-25 listed no `zizmor` package: the dependency graph does not parse
+  `.github/requirements-ci.lock`, so neither alerts nor security updates covered
+  the analyzer the required `validate` job installs. The file is now
+  `.github/requirements-ci.txt`, byte-identical (SHA-256 `e4759645...`, 283
+  bytes). The graph lists pip `requirements.txt` files
+  ([supported ecosystems](https://docs.github.com/en/code-security/reference/supply-chain-security/dependency-graph-supported-package-ecosystems)),
+  and Dependabot pip "supports updates to any `.txt` file"
+  ([supported ecosystems and repositories](https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories)).
+  No pip version-update entry is added, so "pip stays off" holds. Expected cost:
+  a zizmor security-update PR fails `test_zizmor_pin_matches_requirements_lock`
+  and the evidence-hash check; the maintainer does the reviewed relock and closes
+  the bot PR, as with #97/#98 -> #99. The dated mentions of the old name in
+  sections 3 and 4 and in `qualified-workflow.yml.txt` (a hash-bound experiment
+  input) stay as history. Side effect: Scorecard's embedded OSV scan matches
+  `*requirements*.txt`, so it now scans this file too.
+  **Post-merge acceptance:**
+  `gh api repos/seathatflowsinourveins/native-agent-stack/dependency-graph/sbom --jq '[.sbom.packages[]|select(.name=="zizmor")|.versionInfo]'`
+  returns `["1.30.1"]`, and a `dynamic/dependabot/update-graph` run named
+  `Graph Update: pip in /.github` appears. **Fallback:** if it does not appear,
+  add a `package-ecosystem: pip` entry for `directory: /.github` with
+  `open-pull-requests-limit: 0` (version updates only; security updates are not
+  subject to the limit, per the options reference) and record it here.
+- **Ecosystems without a version-update entry (2026-09-25).** `.github/dependabot.yml`
+  keeps one version-update entry, `github-actions`. The others are left out on
+  purpose, and the file's header now says why:
+  - *npm/pnpm and uv.* The only manifests are
+    `blueprints/convergence-practice/application-delivery` (`package.json`,
+    `pnpm-lock.yaml`, `pyproject.toml`, `uv.lock`),
+    `blueprints/convergence-practice/wsl-retrieval` (`package.json`,
+    `package-lock.json`) and `evidence/artifacts/macos-application-20260924/variant`.
+    All are frozen experiment or evidence artifacts: their lock hashes are
+    registered in `manifests/evidence.json` (`scripts/validate.py` fails on a
+    changed hash) and cited by receipts, so a version bump would break `validate`
+    and detach the receipts. `application-delivery` also pins `pnpm@12.4.2`,
+    outside the pnpm versions Dependabot lists. Security updates stay on for
+    them; a security PR against a frozen lock gets a reviewed relock or is
+    closed, as with #97/#98.
+  - *NuGet.* The 23 `packages.lock.json` files
+    (`blueprints/us-equities/engine/patches/alpaca.packages.lock.json` and 22
+    under `patches/lean-locks`) are overlays copied into an upstream LEAN checkout
+    (`blueprints/us-equities/engine/resolution.md`); the repository has no
+    `.csproj` or `.sln`. The dependency graph's NuGet formats do not include
+    `packages.lock.json`, so neither version nor security updates can see them.
+  - *OSV-Scanner is the only alert path* for files outside the dependency graph:
+    the NuGet locks above and the `.lock`-named pip locks
+    (`adoption/sdk/requirements-linux-x86_64-py313.lock`,
+    `adoption/sdk/accepted-constraints.txt`, the us-equities
+    `requirements.lock` files, gap-wave2's `requirements-libs.lock` and the
+    macos-syn-e2e lock). They pin reproducible installs, and a single-package
+    security PR against a uv-compiled lock fails the relock diff (#97/#98).
+    `security-scan.yml`'s `osv-scanner` job is a required PR check with a weekly
+    run and a SARIF upload (category `osv-scanner`).
+  - This closes the open finding in
+    `evidence/artifacts/gap-wave2-20260923/ci-supply-chain/lockfile-audit.json`
+    that no audited manifest has an updater: the omission is now a recorded
+    decision (the artifact itself stays as retained evidence).
+  - **Overturn.** An actively maintained, non-frozen npm, uv or .NET project
+    with a Dependabot-discoverable manifest is added. It gets an entry like
+    `github-actions`: `cooldown: default-days: 7`, one minor/patch group and
+    `open-pull-requests-limit: 2`. For a graph-invisible lock that needs
+    Dependabot alerts, rename it to `*requirements*.txt` or submit it through
+    the dependency submission API.
 
 - **Stale lane text, recorded here only.** The lane-sourced Dependabot
   alternative in `catalogs/landscape/foundation.json` (rendered into
@@ -1093,3 +1203,233 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   its wave registers, while this check was required (the gate checks consistency; the
   self-attestation residual above bounds what that shows). The other trigger is a second maintainer joining, which would
   make required approvals possible. The accepted residual above has its own overturn.
+
+## validate-macos required (2026-09-25)
+
+- **Evidence.** PR #219's shared fail-closed credential guard did run `validate-macos` (the PR
+  touched `manifests/evidence.json`, which was already in the `pull_request` `paths:` filter) and
+  failed there: 5 failures and 13 errors, because `/var` and `/tmp` are OS-level symlinks on macOS
+  and the guard's no-follow check refused them. But nothing required that job: it was not in
+  `main-ruleset.json`'s `required_status_checks`, so its failure would not have blocked the merge
+  on its own. It failed on #219's earlier heads (72a15b89: 5 failures and 13 errors; 1bd4e2f7)
+  and passed only at the merged head 04c867b2 after a follow-up fix; had that fix been skipped,
+  a red macOS run would not have blocked the merge. A PR that touches no path in the filter (`adoption/**`,
+  `tools/adoption/**`, `manifests/evidence.json` and the others) does not run `validate-macos` at
+  all, so a macOS-only regression in code outside those paths (`adaptive-paper`, for one) would
+  have gone completely unseen, required or not.
+- **Alternatives.**
+  - *Keep it optional (status quo before this change).* Rejected: an optional check that already
+    exists and already caught a real macOS-only failure (#219) is exactly the evidence for making
+    it required; keeping it optional leaves every future macOS-only regression unguarded, whether
+    or not the PR happens to touch a filtered path.
+  - *Require it but keep the `paths:` filter.* Rejected: a required status check that GitHub never
+    receives a run for is not "passing", it is "Expected -- Waiting for status" forever on any PR
+    outside the filtered paths, and such a PR can never merge (GitHub's own required-status-check
+    behavior, linked above). This is the failure mode the brief specifically warns against.
+  - *Move `validate-macos` into `validate.yml`.* Considered and rejected in favor of keeping it in
+    `adoption-bootstrap.yml`. `tests/test_workflow_hardening.py`'s `MACOS_JOBS_OWNED_ELSEWHERE`
+    exemption and `test_adoption_bootstrap_macos_jobs_are_not_exempt` already name
+    `adoption-bootstrap.yml:validate-macos` as this project's own macOS job (not an
+    externally-owned one), and the job's own comment records it as covering the repository's Python
+    tooling on Darwin alongside the other three bootstrap jobs it shares fixture and pin files
+    with (`adoption/pins-macos-arm64.json`, the launchd agents, the embedding-model cache). Moving
+    it would split that shared context across two workflow files for no gain: the job id and check
+    name (`validate-macos`) are what the ruleset and the tests key on, not the file it lives in.
+- **Decision.** `adoption-bootstrap.yml`'s `pull_request` trigger drops its `paths:` filter
+  entirely, so every job in the workflow is at least evaluated on every PR. A new `changes` job
+  (ubuntu-24.04, harden-runner first step, `contents: read`, no new third-party action) diffs the
+  PR's base and head with plain `git diff -z --name-only` against the same path list the `push:`
+  trigger still carries, and its `bootstrap` output keeps `bootstrap-linux`, `bootstrap-macos` and
+  `bootstrap-macos-brew` path-gated on `pull_request` via `needs: changes` plus
+  `if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.bootstrap != 'false') }}`.
+  `push` keeps exactly the `push:` trigger's own pre-existing `paths:` filter (unedited) for the
+  three bootstrap-* jobs, and `schedule` and `workflow_dispatch` are not path-filtered and run
+  every job; `!cancelled()` is required precisely
+  because a plain `if:` on a job with `needs: changes` applies an implicit `success()`, which would
+  skip these jobs on every event where `changes` itself does not run (see "Measured" below for the
+  dispatch run that demonstrated this before the fix). `validate-macos` itself gets no `needs:` and
+  no `if:` of its own, so it is reachable on every PR regardless of which paths it touches.
+  `.github/main-ruleset.json` adds `{"context": "validate-macos", "integration_id": 15368}` to
+  `required_status_checks`, keeping `strict_required_status_checks_policy: false` unchanged. The
+  coordinator applies the ruleset with the PUT above after this change merges, as with every other
+  required check added to the target file in this record. The `changes` job also fails safe: a
+  missing payload SHA or a failed `git diff` writes `bootstrap=true` and exits 0, rather than
+  failing the job and skipping the three bootstrap-* jobs through `needs:`.
+- **Cost.** One additional macOS full-test-suite run per pull request, measured at 8.2-13.4
+  minutes (median 10.9 minutes) over the last 36 `validate-macos` runs, at no monetary cost: GitHub
+  Actions minutes for macOS runners on a public repository are free. This is on top of the
+  `bootstrap-macos`/`bootstrap-macos-brew` real-install jobs, which stay path-gated and do not run
+  on most PRs.
+- **Strict up-to-date stays off.** This change does not revisit that standing choice. Its recorded
+  overturn condition ("Ruleset upgrade, 2026-09-22" / "Automation closure, 2026-09-22" above: a
+  `main` failure traced to two PRs merging close together, i.e. merge skew) has not occurred as of
+  2026-09-25; `strict_required_status_checks_policy: false` remains asserted by
+  `tests/test_workflow_hardening.py`'s `TargetRulesetTests`.
+- **Overturn (this decision).** Either a measured `validate-macos` flake rate above 10% of runs
+  over a rolling 20-run window (tracked the same way `catalog-freshness.yml`'s drift report is
+  read, by inspecting run history for the job), or a sustained macOS runner queue delay above 15
+  minutes median over a week, both of which would make the required check itself the bottleneck
+  rather than a signal. Either observed condition is grounds to move `validate-macos` back to a
+  `paths:`-filtered, non-required lane while keeping the `bootstrap-*` jobs' existing gating.
+- **Rollout.** Applying the ruleset makes `validate-macos` required from that moment on GitHub's
+  side, but it does not retroactively re-run anything: an already-open PR whose most recent run
+  predates the ruleset PUT, and whose last push happened while the old `paths:` filter was still in
+  place, has no `validate-macos` status recorded at all until it receives a new push (including a
+  rebase/merge commit) or is closed and reopened. Until then GitHub reports that PR as "Expected --
+  Waiting for status" on the newly-required check, the same symptom the "keep it path-gated"
+  alternative above was rejected for, but here it is transient and self-resolving on the PR's own
+  next push rather than a standing gap.
+- **Measured (before the fix).** Independent review found that `bootstrap-linux`/`bootstrap-macos`/
+  `bootstrap-macos-brew`'s original `if: github.event_name != 'pull_request' || ...` (no
+  `!cancelled()`) combined with `needs: changes` and `changes`' own
+  `if: github.event_name == 'pull_request'` meant `needs: changes` applied an implicit `success()`
+  on every non-`pull_request` event: with `changes` skipped, `success()` was false and all three
+  bootstrap-* jobs were skipped too. The coordinator's dispatch run
+  [36085789483](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36085789483)
+  (`gh workflow run adoption-bootstrap.yml --ref claude/require-validate-macos-20260925` at
+  `f0bea733`) confirmed this directly: `changes` reported skipped, `bootstrap-linux`,
+  `bootstrap-macos` and `bootstrap-macos-brew` all completed as skipped, and `validate-macos` ran
+  normally (it has no `needs:`). This would have silently stopped the weekly pinned-download
+  re-check and the post-merge/dispatch install smoke.
+- **Measured (after the fix).** The coordinator's dispatch run
+  [36086815267](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36086815267)
+  (same command, at `8ec88c1c`) reported `changes` skipped, as intended, since it runs only on
+  `pull_request`. `bootstrap-linux`, `bootstrap-macos`, `bootstrap-macos-brew` and
+  `validate-macos` all ran and completed with `success`. The PR's own `pull_request` runs at
+  `f0bea733` and `8ec88c1c` ran `changes` (bootstrap-relevant paths changed), all three
+  bootstrap jobs and `validate-macos`, and passed.
+- **Static checks.** `tests/test_workflow_hardening.py`'s new `AdoptionBootstrapMacosRequiredTests`
+  asserts the `pull_request` trigger carries no `paths:` key, that `validate-macos` has no
+  `needs:` and no job-level `if:`, that `bootstrap-linux`/`bootstrap-macos`/`bootstrap-macos-brew`
+  keep `needs: changes` with an `if:` that both uses `!cancelled()` (or `always()`) and compares
+  `needs.changes.outputs.bootstrap` with `!= 'false'` (not `== 'true'`, which is exactly what
+  reintroduces the skip-on-push/schedule/dispatch bug -- the test fails against the pre-fix text),
+  and that the `changes` job's own path patterns match the `push:` trigger's `paths:` list once
+  both are normalized to the same glob spelling (a case pattern's single `*` is a wider match than
+  `paths:`'s `**`, always in the safe, over-matching direction; the test compares the normalized
+  text, not GitHub's exact `paths:` matching semantics). `TargetRulesetTests` extends its existing
+  loop to also assert `validate-macos` at `integration_id: 15368` and that
+  `strict_required_status_checks_policy` stays `false`. actionlint 1.7.12 (with shellcheck on
+  `PATH`) and zizmor's offline strict pass report no findings on the changed workflow. The full
+  pre-existing hardening, security-coverage, adoption-bootstrap and adoption-docs-consistency
+  suites still pass unchanged.
+
+## GitHub hardening follow-up (2026-09-25)
+
+**Decided by:** branch `claude/gh-hardening-20260925`, cut from `origin/main`
+`6568f47`, implementing the verified gaps of the 2026-09-25 GitHub audit for this
+repository. This unit changed files only; it changed no live repository setting.
+Read-only `gh api` GETs are dated below.
+
+- **Online zizmor PR gate (overturns section 4's rejected alternative).**
+  - *Evidence.* The required `validate` job ran `zizmor --offline`, and
+    `security-scan.yml`'s `zizmor-online` skips pull requests and runs with
+    `--no-exit-codes`. Ruleset 23739774's `code_scanning` rule lists only CodeQL
+    (GET 2026-09-25, no bypass actors). So impostor-commit, known-vulnerable-actions,
+    ref-confusion and ref-version-mismatch never blocked a merge: a PR pinning a SHA
+    that exists only in a fork, with a matching `# vX.Y.Z` comment, passed both
+    actionlint and the offline gate, and was found only after the push-triggered
+    workflows on `main` had already run it. zizmor 1.30.1 with `--offline -v` logs
+    that it skips those audits without a token, and in a local probe a pin with a
+    wrong version comment exited 0. Section 4's overturn trigger could only fire
+    after a merge. The noise concern has evidence against it: `gh api
+    'repos/seathatflowsinourveins/native-agent-stack/code-scanning/analyses?tool_name=zizmor'`
+    on 2026-09-25 returned 90 analyses, all on `refs/heads/main`
+    (2026-09-23T05:41:56Z to 2026-09-25T06:15:53Z), with 0 results in total; the
+    online analyzer step takes about 2 s. GitHub's
+    [secure-use reference](https://docs.github.com/en/actions/reference/security/secure-use)
+    says to verify that a pinned SHA "is from the action's repository and not a
+    repository fork".
+  - *Decision.* `validate.yml`'s zizmor step now has
+    `GH_TOKEN: ${{ github.token }}`, drops `--offline`, and keeps `--no-config
+    --no-ignores --persona regular --strict-collection` with the default exit codes,
+    so findings exit 11-14 and fail the required `validate` check
+    ([usage](https://docs.zizmor.sh/usage/)). No scope is added: the workflow stays
+    `contents: read`, and fork and Dependabot PRs get a read-only token
+    ([events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)),
+    which is all zizmor's API reads need. The gate adds impostor-commit,
+    known-vulnerable-actions and ref-confusion (online-only in the `regular`
+    persona, [audits](https://docs.zizmor.sh/audits/)) and ref-version-mismatch
+    (documented as offline-capable, but skipped offline by 1.30.1).
+    stale-action-refs is pedantic-only and is not added. The SARIF split in
+    section 4 is unchanged.
+  - *Fail-open guard.* With no token, zizmor 1.30.1 silently falls back to offline
+    mode and exits 0. `tests/test_workflow_hardening.py`'s `ValidateZizmorGateTests`
+    requires the token line and forbids `--offline`, `--no-exit-codes`, SARIF output
+    and `continue-on-error` in that step. An empty `GH_TOKEN` exits 2 (fails closed).
+  - *Residuals.* A PR can edit its own `validate.yml` and re-add `--offline`; as
+    with `verdict-review-gate`, the admin's diff review stays the last line.
+    `GITHUB_TOKEN` is limited to 1,000 requests per hour per repository
+    ([rate limits](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api));
+    a rate-limit error fails `validate` closed and a rerun fixes it. A new advisory
+    against a pinned action turns every PR red until the pin is bumped, as
+    `osv-scanner` already does. An impostor action still runs in the PR's own CI;
+    the gate blocks only the merge.
+  - *Overturn.* Online-audit infrastructure failures (rate limits, API errors),
+    not findings, fail more than 2 of any 20 consecutive `validate` runs. Then move
+    the online audits to a separate non-required job and restore the offline gate.
+- **zizmor audits the repository root.** Both CI zizmor runs passed
+  `.github/workflows`, which never collects `.github/dependabot.yml`, so the
+  dependabot-cooldown and dependabot-execution audits
+  ([audits](https://docs.zizmor.sh/audits/#dependabot-cooldown)) never ran in CI
+  and a change that dropped `cooldown` or added
+  `insecure-external-code-execution: allow` passed the required gate. Both runs now
+  pass `.`, as zizmor's documented CI setup does
+  ([integrations](https://docs.zizmor.sh/integrations/)). Local zizmor 1.30.1
+  (`--offline --no-config --no-ignores --persona regular --strict-collection .`) on
+  this branch collected the 18 workflows and `dependabot.yml`, exit 0, no findings.
+  A copy with `cooldown` removed exits 13 with `dependabot-cooldown`; that pass and
+  that control are now `DependabotConfigSecurityCoverageTests` in
+  `tests/test_workflow_security_coverage.py`. Collection honors `.gitignore`, and
+  the repository has no `action.yml`. **Overturn:** root collection picks up an
+  input that is not this repository's own configuration (such as a vendored
+  `action.yml` fixture); then pass `.github/workflows .github/dependabot.yml`.
+- **Fork PR workflow approval (decided; the owner applies it).** The repository is
+  public and allows forking. A read-only GET of
+  `repos/seathatflowsinourveins/native-agent-stack/actions/permissions/fork-pr-contributor-approval`
+  at 2026-09-25T06:34:07Z returned `{"approval_policy":"first_time_contributors"}`.
+  GitHub's
+  [Actions settings page](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#controlling-changes-from-forks-to-workflows-in-public-repositories)
+  warns that under the first-time options "a malicious user could meet this
+  requirement by getting a simple typo or other innocuous change accepted". After
+  that, their fork PRs run every `pull_request` workflow here (`validate`, the
+  tests, node scripts, `macos-15` jobs) with no approval. Those runs get a read-only
+  token and no secrets, so the exposure is untrusted compute and noise, not a
+  credential. **Decision:** require approval for all external contributors
+  (`all_external_contributors`, [REST](https://docs.github.com/en/rest/actions/permissions)).
+  This repository's settings are not managed as code (agent-ecosystem's
+  `config/github-settings.json` lists it in `observe` mode, with no Actions
+  approval key), so the owner applies it:
+  `gh api -X PUT repos/seathatflowsinourveins/native-agent-stack/actions/permissions/fork-pr-contributor-approval -f approval_policy=all_external_contributors`
+  (HTTP 204), then
+  `gh api repos/seathatflowsinourveins/native-agent-stack/actions/permissions/fork-pr-contributor-approval --jq .approval_policy`
+  (expect `all_external_contributors`); record the dated after-GET here.
+  Unaffected: owner, same-repository and Dependabot PRs; the catalog-freshness bot
+  PR already needs approval because `GITHUB_TOKEN` opens it. **Rollback:** the same
+  PUT with `approval_policy=first_time_contributors`. **Overturn:** regular outside
+  contributors make approval toil outweigh the risk.
+- **Job-level permission comments.** zizmor 1.30.1 at `--persona pedantic` reported
+  `undocumented-permissions` for 5 grants in 4 job blocks: `catalog-freshness.yml`
+  `propose` (`contents: write`, `pull-requests: write`, from #95) and
+  `saturation-tracking.yml` `report` (`actions: read`), `plan` (`issues: read`) and
+  `issue` (`issues: write`, from #166). The scopes were already least privilege;
+  the gap was this repository's own comment convention ("Workflow review,
+  2026-09-21" in `docs/github-automation.md`). Each grant now carries a same-line
+  `# why` comment, and `tests/test_saturation_ledger.py` compares scopes through
+  `scopes()`, which strips the comment. Pedantic `undocumented-permissions`: 4
+  findings on `6568f47`, 0 on this branch; the remaining pedantic findings
+  (`anonymous-definition`, `concurrency-limits`) are unchanged.
+- **Workflows cannot approve PRs, but the setting stays on.** See "Approval guard
+  (2026-09-25)" in
+  [`2026-09-23-bot-pr-dispatch.md`](2026-09-23-bot-pr-dispatch.md).
+- **CI lock rename and Dependabot ecosystem coverage.** Section 8, "CI lock renamed
+  (2026-09-25)" and "Ecosystems without a version-update entry (2026-09-25)".
+- **Kept as history.** `blueprints/convergence-practice/ci-security/qualified-workflow.yml.txt`
+  keeps `requirements-ci.lock` and the offline command: it is a hash-bound input of
+  that experiment (`experiment.json`). The recorded commands in
+  `docs/github-automation-evidence.json` stay as run. Sealed lane text in
+  `catalogs/landscape/foundation.json`,
+  `catalogs/sota-convergence/layer-verdicts-20260922.json` and
+  `docs/grand-catalog-handbook.md` still says `requirements-ci.lock` is a name
+  Dependabot does not discover; lane outputs are not edited by hand, so this bullet
+  corrects it until the next recorded lane run for that layer.

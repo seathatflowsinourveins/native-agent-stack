@@ -19,11 +19,13 @@ Inputs (repository-relative, overridable):
   catalogs/us-equities/star-audit.json
   catalogs/us-equities/coverage.json
   catalogs/sota-convergence/manifest-20260922.json  - source of the 12-layer taxonomy only
+  the source records named in TRADING_PIN_SOURCES (trading pins outside the cards)
 
 Outputs (written under --out):
   foundation-layers.json  {checked_at, layers:[{layer_id,title,summary,decisions,components}], top_gaps}
   trading-catalog.json    {entries:[fine-grained entries + catalog_file], layer_index:{tag:[entry ids]}}
   trading-by-layer.json   {taxonomy:{layer_id:[tags]}, layers:{layer_id:[entries]}}
+  trading-pins.json       {entries:[{id, layer, repository, pin, pin_source, repository_source}]}
   star-candidates.json    {star_candidates, beyond_stars, star_count}
   models.json             {entries:[...]}
 
@@ -167,6 +169,122 @@ def build_trading_by_layer(trading_catalog: dict, taxonomy: dict) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Trading pins that no selected catalog card carries
+# ---------------------------------------------------------------------------
+
+# Trading upstreams that a blueprint or runtime record pins but that no
+# selected (default/conditional) catalogs/us-equities card carries. The
+# card-based trading baseline never reaches them, so without this list
+# github_freshness.py would not fetch them and the catalog-freshness report
+# would not list them. Each pin (and the repository, where the record carries
+# one) is read from its source record at extraction time, never copied here, so
+# a pin bump in that record reaches the report without editing this list. A
+# pointer that no longer resolves raises (resolve_trading_pins) instead of
+# silently dropping the component; tests/test_catalog_freshness_trading.py
+# resolves every entry against the checked-in repository.
+TRADING_PIN_SOURCES = (
+    {
+        # Simulation-lane cross-check engine. Its only catalog mention is a
+        # backtesting-engine alternative with disposition out_of_scope
+        # (catalogs/landscape/us-equities.json); it has no us-equities card.
+        "id": "hftbacktest",
+        "layer": "backtesting-engine",
+        "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/receipt.json",
+        "repository_pointer": "/upstream/source_url",
+        "pin_pointer": "/upstream/pinned_version",
+    },
+    {
+        # The PyPI TWS API client used by the accepted NautilusTrader IB paper run
+        # (runtime-target.json broker_boundaries ibkr python_adapter_paper_evidence).
+        # The PyPI project URL is IB's tws-api site, which is not on GitHub. The
+        # GitHub source used here is the one named in
+        # catalogs/landscape/claude-independent-discovery.json.
+        "id": "nautilus-ibapi",
+        "layer": "execution-broker",
+        "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json",
+        "repository": "https://github.com/nautechsystems/nautilus_ibapi",
+        "pin_pointer": "/ibapi_version",
+    },
+    {
+        # The Rust ibapi crate pinned by the selected NautilusTrader 2.0.0rc5 Rust IB
+        # adapter. runtime-target.json upstream_ibapi_pin records the upstream
+        # fix and pin-update dependency on this crate.
+        "id": "rust-ibapi",
+        "layer": "execution-broker",
+        "path": "catalogs/us-equities/runtime-target.json",
+        "repository": "https://github.com/wboayue/rust-ibapi",
+        "pin_pointer": "/broker_boundaries/0/upstream_ibapi_pin/rc5_pin",
+    },
+)
+
+
+def resolve_json_pointer(doc, pointer: str):
+    """RFC 6901 lookup. Raises KeyError when any segment is absent."""
+    if pointer == "":
+        return doc
+    if not pointer.startswith("/"):
+        raise KeyError(f"not a JSON pointer: {pointer!r}")
+    node = doc
+    for raw in pointer[1:].split("/"):
+        token = raw.replace("~1", "/").replace("~0", "~")
+        if isinstance(node, list) and token.isdigit() and int(token) < len(node):
+            node = node[int(token)]
+        elif isinstance(node, dict) and token in node:
+            node = node[token]
+        else:
+            raise KeyError(f"{pointer!r} does not resolve at segment {token!r}")
+    return node
+
+
+def _source_file(repo_root: Path, relative: str) -> Path:
+    parts = Path(relative).parts
+    if Path(relative).is_absolute() or ".." in parts:
+        raise ValueError(f"pin source path must be repository-relative: {relative!r}")
+    return repo_root / relative
+
+
+def resolve_trading_pins(repo_root: Path, sources=TRADING_PIN_SOURCES, taxonomy=None,
+                         card_ids=()) -> dict:
+    """Resolve each declared off-card trading pin against its source record.
+
+    Raises ValueError naming the entry when a source file is missing, a pointer
+    does not resolve to a non-empty string, a layer is not a taxonomy layer
+    (when ``taxonomy`` is given), or an id collides with a catalog card id or
+    another declared pin. Each of these would otherwise drop the component or
+    make its report row ambiguous."""
+    entries, seen = [], set(card_ids)
+    for source in sources:
+        entry_id = source["id"]
+        if entry_id in seen:
+            raise ValueError(f"trading pin id {entry_id!r} duplicates a catalog card or another pin")
+        seen.add(entry_id)
+        if taxonomy is not None and source["layer"] not in taxonomy:
+            raise ValueError(f"trading pin {entry_id!r}: layer {source['layer']!r} is not a taxonomy layer")
+        path = _source_file(repo_root, source["path"])
+        try:
+            doc = load_json(path)
+            pin = resolve_json_pointer(doc, source["pin_pointer"])
+            repository = (resolve_json_pointer(doc, source["repository_pointer"])
+                          if source.get("repository_pointer") else source.get("repository"))
+        except (OSError, ValueError, KeyError) as error:
+            raise ValueError(f"trading pin {entry_id!r} does not resolve from {source['path']}: {error}") from error
+        for field, value in (("pin", pin), ("repository", repository)):
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"trading pin {entry_id!r}: {field} is not a non-empty string")
+        entries.append({
+            "id": entry_id,
+            "layer": source["layer"],
+            "repository": repository,
+            "pin": pin,
+            "pin_source": {"path": source["path"], "pointer": source["pin_pointer"]},
+            "repository_source": ({"path": source["path"], "pointer": source["repository_pointer"]}
+                                  if source.get("repository_pointer") else None),
+        })
+    entries.sort(key=lambda e: e["id"])
+    return {"entries": entries}
+
+
+# ---------------------------------------------------------------------------
 # Beyond the stars: catalogs/us-equities/{star-audit,coverage}.json
 # ---------------------------------------------------------------------------
 
@@ -225,6 +343,9 @@ def main(argv=None) -> int:
     taxonomy = load_taxonomy(taxonomy_source)
     trading_by_layer = build_trading_by_layer(trading_catalog, taxonomy)
     unmapped = unmapped_tags(trading_catalog["entries"], tag_to_layers_map(taxonomy))
+    trading_pins = resolve_trading_pins(
+        root, taxonomy=taxonomy, card_ids={entry.get("id") for entry in trading_catalog["entries"]},
+    )
 
     star_audit = load_json(us_equities_dir / "star-audit.json")
     coverage = load_json(us_equities_dir / "coverage.json")
@@ -237,6 +358,7 @@ def main(argv=None) -> int:
     write_json(out / "foundation-layers.json", foundation_layers)
     write_json(out / "trading-catalog.json", trading_catalog)
     write_json(out / "trading-by-layer.json", trading_by_layer)
+    write_json(out / "trading-pins.json", trading_pins)
     write_json(out / "star-candidates.json", star_candidates)
     write_json(out / "models.json", models_out)
 
@@ -245,6 +367,7 @@ def main(argv=None) -> int:
         "trading_entries": len(trading_catalog["entries"]),
         "trading_layers": len(trading_by_layer["layers"]),
         "unmapped_tags": unmapped,
+        "trading_pins": [entry["id"] for entry in trading_pins["entries"]],
         "star_candidates": len(star_candidates["star_candidates"]),
         "beyond_stars": len(star_candidates["beyond_stars"]),
         "models": len(models_out["entries"]),

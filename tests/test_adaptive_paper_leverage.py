@@ -332,8 +332,19 @@ class NextLowerRungCeilingTests(unittest.TestCase):
     achieved-leverage receipt uses to know what "the next rung down" means
     for a given config's max_leverage."""
 
-    def test_1x_has_no_lower_rung(self):
-        self.assertIsNone(L.next_lower_rung_ceiling(D("1")))
+    def test_1x_threshold_is_the_documented_minimum_exposure(self):
+        # Audit gap #5 (2026-09-24): the 1x rung has no lower rung, so its
+        # achieved-leverage receipt is compared against the documented 0.5x
+        # minimum exposure instead of never accumulating time above anything.
+        self.assertEqual(L.ONE_X_MINIMUM_EXPOSURE, D("0.5"))
+        self.assertEqual(L.next_lower_rung_ceiling(D("1")), D("0.5"))
+
+    def test_every_rung_threshold_is_below_its_own_cap(self):
+        for rung in L.RUNGS:
+            with self.subTest(rung=rung):
+                threshold = L.next_lower_rung_ceiling(rung)
+                self.assertIsNotNone(threshold)
+                self.assertLess(threshold, rung)
 
     def test_2x_next_lower_is_1x(self):
         self.assertEqual(L.next_lower_rung_ceiling(D("2")), D("1"))
@@ -341,7 +352,7 @@ class NextLowerRungCeilingTests(unittest.TestCase):
     def test_4x_next_lower_is_2x(self):
         self.assertEqual(L.next_lower_rung_ceiling(D("4")), D("2"))
 
-    def test_below_lowest_rung_has_no_lower_rung(self):
+    def test_below_lowest_rung_has_no_threshold(self):
         self.assertIsNone(L.next_lower_rung_ceiling(D("0.5")))
         self.assertIsNone(L.next_lower_rung_ceiling(D("0")))
 

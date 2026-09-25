@@ -101,6 +101,8 @@ class AlpacaCapacityPort:
         value, error, status = None, None, None
         try:
             value = fn(client)
+        except transport.OrderContractRefused:  # local boundary refusal, distinct from a broker answer
+            return Response(None, not_sent=True, error="OrderContractRefused"), None
         except transport.SubmissionNotSent:
             return Response(None, not_sent=True, error="SubmissionNotSent"), None
         except Exception as exc:  # sanitized: only the class name and HTTP status survive
@@ -175,11 +177,17 @@ class AlpacaCapacityPort:
         return {"bid": quote["bid"], "ask": quote["ask"], "ts_ns": quote["ts_ns"]}
 
     def submit(self, client_order_id, symbol, qty, limit_price, extended_hours):
-        from alpaca.trading.requests import LimitOrderRequest
-        request = LimitOrderRequest(client_order_id=client_order_id, symbol=symbol, side="buy",
-                                    qty=str(qty), limit_price=str(limit_price), time_in_force="day",
-                                    extended_hours=bool(extended_hours))
-        response, raw = self._call(lambda client: client.submit_order(request))
+        # The engine's pre-submission order-contract boundary: a refused envelope
+        # never reaches a client, and GuardedSession admits only this envelope's body.
+        try:
+            envelope = transport.order_envelope(
+                {"client_order_id": client_order_id, "symbol": symbol, "side": "buy", "qty": str(qty),
+                 "limit_price": str(limit_price), "extended_hours": bool(extended_hours)},
+                extended_hours_allowed=True)
+            request = transport.limit_order_request(envelope)
+        except transport.OrderContractRefused:
+            return Response(None, not_sent=True, error="OrderContractRefused")
+        response, raw = self._call(lambda client: transport.submit_enveloped(client, envelope, request))
         if raw is not None and response.status is not None and 200 <= response.status < 300:
             response.order = _order_view(raw)
         return response

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--data-duckdb--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "data-duckdb",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "python3 -c \"import json,glob,sys;s,c=sys.argv[1],sys.argv[2];print('stack',s,[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==s],'| winner',c,'pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" duckdb data-duckdb",
+      "exit": 0,
+      "duration_s": 0.036,
+      "output_sha256": "725edb1d9e1f45cd9b59fc7f039927d3a29acdef540dfcfe73702e6c8fbb455d",
+      "output_excerpt": "stack duckdb ['1.5.5'] | winner data-duckdb pins ['v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa']\n"
+    },
+    {
+      "cmd": "c=$(python3 -c \"import json,glob,re,sys;c=sys.argv[1];p={w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c};m={x for q in p for x in re.findall(r'[0-9a-f]{40}',q)};assert len(m)==1,p;print(m.pop())\" data-duckdb) && /usr/bin/timeout 180 bwrap --unshare-net --die-with-parent --ro-bind / / --dev /dev --proc /proc \"$HOME/.local/share/codex-ecosystem/sdk-py313/bin/python\" -s -c \"import duckdb,importlib.metadata as m,sys;v,s=duckdb.sql('select library_version, source_id from pragma_version()').fetchone();ok=m.version('duckdb')=='1.5.5' and v=='v1.5.5' and sys.argv[1].startswith(s);print('duckdb',m.version('duckdb'),'| pragma_version library_version',v,'source_id',s,'| source_id is a prefix of the winner pin commit',sys.argv[1][:12]+'...:',ok);raise SystemExit(0 if ok else 1)\" \"$c\"",
+      "exit": 0,
+      "duration_s": 0.14,
+      "output_sha256": "96afe7040f8c112e010d2b979b2fe54bff7510514f66c902b2c450e0801cff51",
+      "output_excerpt": "duckdb 1.5.5 | pragma_version library_version v1.5.5 source_id d8cdaa33fd | source_id is a prefix of the winner pin commit d8cdaa33fda8...: True\n"
+    },
+    {
+      "cmd": "out=$(uv pip sync --dry-run --offline --python \"$HOME/.local/share/codex-ecosystem/sdk-py313/bin/python\" adoption/sdk/requirements-linux-x86_64-py313.lock 2>&1) && printf '%s\\n' \"$out\" | tail -2 && printf '%s' \"$out\" | grep -q 'Would make no changes' && grep -A1 \"^duckdb==\" adoption/sdk/requirements-linux-x86_64-py313.lock | head -2 && echo \"the environment matches adoption/sdk/requirements-linux-x86_64-py313.lock exactly (uv pip sync --dry-run --offline would make no changes)\"",
+      "exit": 0,
+      "duration_s": 0.024,
+      "output_sha256": "798c84a6d0b9b3ad217c241a20ecf7c7676646806f308c88856a15dcf40a7841",
+      "output_excerpt": "Checked 36 packages in 0.38ms\nWould make no changes\nduckdb==1.5.5 \\\n    --hash=sha256:078e6a60dd8eedde5832f45422ca5c4a6b8c837aeabd8a56ca0b7d933f588053 \\\nthe environment matches adoption/sdk/requirements-linux-x86_64-py313.lock exactly (uv pip sync --dry-run --offline would make no changes)\n"
+    },
+    {
+      "cmd": "c=$(python3 -c \"import json,glob,re,sys;c=sys.argv[1];p={w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c};m={x for q in p for x in re.findall(r'[0-9a-f]{40}',q)};assert len(m)==1,p;print(m.pop())\" data-duckdb) && t=$(git ls-remote https://github.com/duckdb/duckdb 'refs/tags/v1.5.5' 'refs/tags/v1.5.5^{}' | tail -1 | cut -f1) && echo \"upstream duckdb/duckdb tag v1.5.5 -> $t | winner pin commit $c\" && test \"$t\" = \"$c\"",
+      "exit": 0,
+      "duration_s": 0.352,
+      "output_sha256": "ac5c8386c79496b0aad86365250e6ecf359264734a510d7a310885448903f370",
+      "output_excerpt": "upstream duckdb/duckdb tag v1.5.5 -> d8cdaa33fda8df955cc76ef58a280f68f4cd43fa | winner pin commit d8cdaa33fda8df955cc76ef58a280f68f4cd43fa\n"
+    }
+  ],
+  "tool_versions": {
+    "data-duckdb": "v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa"
+  },
+  "observed_at_utc": "2026-09-25T15:36:28Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), DuckDB 1.5.5 is installed at the data-duckdb winner pin 'v1.5.5; source d8cdaa33...': in ~/.local/share/codex-ecosystem/sdk-py313 the duckdb package reports 1.5.5 and the engine's own pragma_version() returns library_version v1.5.5 with source_id d8cdaa33fd, a prefix of the pinned commit (run in a network-less bubblewrap namespace); the environment matches the hash-locked adoption/sdk lock exactly; and upstream tag v1.5.5 resolves to d8cdaa33fda8df955cc76ef58a280f68f4cd43fa. Readiness only. All commands exit 0.",
+  "limitations": [
+    "Install stage: the resolved path, pin records, the listed integrity or identity comparisons and the version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "Recorded under the landscape winner id data-duckdb; manifests/stack.json names it duckdb. No Parquet or research query workload was run.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the package is this host's existing SDK environment ~/.local/share/codex-ecosystem/sdk-py313.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:36:28Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "kind": "blind_ab_adjudication",
+  "question_id": "q3-reranker",
+  "question": "Which reranker or rerankers should be trialled, in priority order, if any? Say whether any should be adopted given that neither system accepts them as shipped. Weigh evidence on memory data, licence, runtime support and size.\n\nJudge only from this brief. Do not browse or search. Answer in under 500 words, ending with one line: PREFERRED: A | B | SPLIT | NEITHER, and one line: RANKING: <comma-separated candidate names>.",
+  "shared_context": "Role: a reranker over the top 50 candidates for conversational memory retrieval, running locally. Neither memory system accepts an arbitrary cross-encoder as shipped: ai-memory reranks only with its LLM, and agentmemory bundles ms-marco-MiniLM-L-6-v2 (2021), which is off by default. Use ONLY section 2 (reranking) of each return; ignore sections 1 and 3. The trading lane may be commercial, so licence matters.",
+  "items": [
+    {
+      "name": "MemReranker-4B",
+      "url": "https://huggingface.co/IAAR-Shanghai/MemReranker-4B"
+    },
+    {
+      "name": "KaLM-Reranker-V1-Small",
+      "url": "https://huggingface.co/KaLM-Embedding/KaLM-Reranker-V1-Small"
+    },
+    {
+      "name": "ettin-reranker-400m-v1",
+      "url": "https://huggingface.co/cross-encoder/ettin-reranker-400m-v1"
+    }
+  ],
+  "method": "Blind A/B adjudication by one judge model (gpt-6-sol through codex exec with a read-only sandbox; the effort was not recorded) in three presentation orders defined by the key: a (Codex return as A, listed first), b (Claude return as A, listed first) and c (Codex return as A, Claude return as B listed first). The brief told the judge to judge only from the brief, not to browse or search, to answer in under 500 words, and to end with a PREFERRED line (A, B, SPLIT or NEITHER) and a RANKING line. Each run's event stream shows one command, a read of its own brief (exit 0), and no web search. The runs were launched from agents of the coordinator's convergence workflow, outside the Claude sandbox so that codex could reach its provider; no refuter was run, so refuting_votes 0 is not a survived refutation.",
+  "judgments": [
+    {
+      "packet_order": "a",
+      "order_definition": "original: Return A = first lane listed in the brief spec (codex); Return A listed first",
+      "run_label": "adjudicator-q3-reranker-a",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-a.json",
+      "original_input_sha256": "daa4178b5a7bd45885ddc0eac970f9055bde60241d8d6e05d0085858a045b3f6",
+      "claude_position": "B",
+      "claude_listed": "second",
+      "preferred_position": "SPLIT",
+      "preferred_lane": null,
+      "ranking": [
+        "MemReranker-4B",
+        "ettin-reranker-400m-v1",
+        "KaLM-Reranker-V1-Small"
+      ],
+      "judge": {
+        "model": "gpt-6-sol",
+        "family": "openai",
+        "effort": null
+      },
+      "why": "Trial **MemReranker-4B first**. Its reported LongMemEval result uses a fixed top-50 candidate set, the closest match to this workload. It has a commercial-compatible Apache-2.0 licence, though its 4B size and community MLX build make local latency and integration uncertain.\n\nTrial **ettin-reranker-400m-v1 second** as the smaller runtime candidate: it has Apache-2.0 licensing and an official quantized Arm64 ONNX export, but no memory-specific result. Trial **KaLM-Reranker-V1-Small third** for its strong reported memory result; that evidence comes from its own team, and its documented route requires PyTorch with remote code. The scores come from different evaluations and should not be compared directly.\n\nDo **not adopt any yet**. Neither memory system accepts these rerankers as shipped; an adapter, ranking quality on the local top 50, and complete-request latency still need to be measured. Exclude Jina v3.5 because its noncommercial licence conflicts with the possible commercial use. Qwen3-Reranker-4B has weaker reported memory evidence and a classifier-head runtime caveat.",
+      "why_words": 153,
+      "returned_words": 159,
+      "within_word_limit": true,
+      "ends_with_required_lines": true,
+      "votes": 1,
+      "refuting_votes": 0,
+      "refuters_run": 0,
+      "exit_code_reported": 0,
+      "returned_text": "Trial **MemReranker-4B first**. Its reported LongMemEval result uses a fixed top-50 candidate set, the closest match to this workload. It has a commercial-compatible Apache-2.0 licence, though its 4B size and community MLX build make local latency and integration uncertain.\n\nTrial **ettin-reranker-400m-v1 second** as the smaller runtime candidate: it has Apache-2.0 licensing and an official quantized Arm64 ONNX export, but no memory-specific result. Trial **KaLM-Reranker-V1-Small third** for its strong reported memory result; that evidence comes from its own team, and its documented route requires PyTorch with remote code. The scores come from different evaluations and should not be compared directly.\n\nDo **not adopt any yet**. Neither memory system accepts these rerankers as shipped; an adapter, ranking quality on the local top 50, and complete-request latency still need to be measured. Exclude Jina v3.5 because its noncommercial licence conflicts with the possible commercial use. Qwen3-Reranker-4B has weaker reported memory evidence and a classifier-head runtime caveat.\n\nPREFERRED: SPLIT  \nRANKING: MemReranker-4B, ettin-reranker-400m-v1, KaLM-Reranker-V1-Small",
+      "returned_sha256": "56d1527ae8d9bc7a170a1fd7ff19a6c0e135095ca7bcfdaaf144fc4984d03efa",
+      "native_usage": {
+        "input_tokens": 39755,
+        "cached_input_tokens": 17152,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1831,
+        "reasoning_output_tokens": 1454
+      }
+    },
+    {
+      "packet_order": "b",
+      "order_definition": "label-swapped: the other lane (claude) is labelled Return A; Return A listed first",
+      "run_label": "adjudicator-q3-reranker-b",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-b.json",
+      "original_input_sha256": "d6d32c9d80e282a880661553ecab56a9c190ca48fe82313863d766e6c0903422",
+      "claude_position": "A",
+      "claude_listed": "first",
+      "preferred_position": "SPLIT",
+      "preferred_lane": null,
+      "ranking": [
+        "MemReranker-4B",
+        "KaLM-Reranker-V1-Small",
+        "ettin-reranker-400m-v1"
+      ],
+      "judge": {
+        "model": "gpt-6-sol",
+        "family": "openai",
+        "effort": null
+      },
+      "why": "Trial **MemReranker-4B first**: its reported LongMemEval result uses a fixed top-50 set, the closest match to this workload. It is Apache-2.0, but its 4B size and community MLX runtime need local validation.\n\nTrial **KaLM-Reranker-V1-Small second**: it has strong reported memory results with 1B active parameters and an Apache-2.0 licence. The evidence comes from its own team, and its documented path requires PyTorch on MPS. Trial **ettin-reranker-400m-v1 third** as the smaller option with an official ONNX export; it lacks memory-specific results, and integration of its scoring head remains unverified.\n\nDo **not adopt any yet**. Neither memory system accepts these rerankers as shipped. First build an adapter, then measure ranking quality and complete-request latency locally. Jina’s noncommercial licence rules it out for the potentially commercial lane; Qwen3-Reranker-4B has weaker reported dialogue evidence and a known classifier-head runtime risk.",
+      "why_words": 136,
+      "returned_words": 142,
+      "within_word_limit": true,
+      "ends_with_required_lines": true,
+      "votes": 1,
+      "refuting_votes": 0,
+      "refuters_run": 0,
+      "exit_code_reported": 0,
+      "returned_text": "Trial **MemReranker-4B first**: its reported LongMemEval result uses a fixed top-50 set, the closest match to this workload. It is Apache-2.0, but its 4B size and community MLX runtime need local validation.\n\nTrial **KaLM-Reranker-V1-Small second**: it has strong reported memory results with 1B active parameters and an Apache-2.0 licence. The evidence comes from its own team, and its documented path requires PyTorch on MPS. Trial **ettin-reranker-400m-v1 third** as the smaller option with an official ONNX export; it lacks memory-specific results, and integration of its scoring head remains unverified.\n\nDo **not adopt any yet**. Neither memory system accepts these rerankers as shipped. First build an adapter, then measure ranking quality and complete-request latency locally. Jina’s noncommercial licence rules it out for the potentially commercial lane; Qwen3-Reranker-4B has weaker reported dialogue evidence and a known classifier-head runtime risk.\n\nPREFERRED: SPLIT  \nRANKING: MemReranker-4B, KaLM-Reranker-V1-Small, ettin-reranker-400m-v1",
+      "returned_sha256": "a128fa1824b69dd51cd2586df974f2f4b662f0fb8a4a51a4b661bd9228533270",
+      "native_usage": {
+        "input_tokens": 39730,
+        "cached_input_tokens": 24192,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1347,
+        "reasoning_output_tokens": 993
+      }
+    },
+    {
+      "packet_order": "c",
+      "order_definition": "reversed listing: labels as in order a (A = codex); Return B listed first",
+      "run_label": "adjudicator-q3-reranker-c",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-c.json",
+      "original_input_sha256": "d7dbf218d428e7105e53646e6ea27dc0ce9e16f57539a80f12350fb40b81eeaa",
+      "claude_position": "B",
+      "claude_listed": "first",
+      "preferred_position": "SPLIT",
+      "preferred_lane": null,
+      "ranking": [
+        "MemReranker-4B",
+        "KaLM-Reranker-V1-Small",
+        "ettin-reranker-400m-v1"
+      ],
+      "judge": {
+        "model": "gpt-6-sol",
+        "family": "openai",
+        "effort": null
+      },
+      "why": "Trial **MemReranker-4B first**. Its reported LongMemEval result uses a fixed top-50 candidate set, the closest match to this workload. It is Apache-2.0, but its 4B size and community MLX runtime make latency and adapter work material risks.\n\nTrial **KaLM-Reranker-V1-Small second**. Its reported memory score is strong and it uses 1B active parameters, but the evaluation comes from its own team and the documented path requires PyTorch on MPS with custom code. Trial **Ettin Reranker 400M v1 third** as a small Apache-2.0 option with official arm64 ONNX; it has no memory-specific result here, and integration of its scoring head is unverified. The reported scores use different protocols, so they should not be compared directly.\n\nDo **not adopt any yet**. Neither memory system accepts these models as shipped. Validate an adapter, memory retrieval quality, and complete-request latency first. Exclude Jina’s noncommercial license for the potentially commercial lane; Qwen3-Reranker-4B has weaker reported memory evidence despite its better documented llama.cpp path.",
+      "why_words": 157,
+      "returned_words": 163,
+      "within_word_limit": true,
+      "ends_with_required_lines": true,
+      "votes": 1,
+      "refuting_votes": 0,
+      "refuters_run": 0,
+      "exit_code_reported": 0,
+      "returned_text": "Trial **MemReranker-4B first**. Its reported LongMemEval result uses a fixed top-50 candidate set, the closest match to this workload. It is Apache-2.0, but its 4B size and community MLX runtime make latency and adapter work material risks.\n\nTrial **KaLM-Reranker-V1-Small second**. Its reported memory score is strong and it uses 1B active parameters, but the evaluation comes from its own team and the documented path requires PyTorch on MPS with custom code. Trial **Ettin Reranker 400M v1 third** as a small Apache-2.0 option with official arm64 ONNX; it has no memory-specific result here, and integration of its scoring head is unverified. The reported scores use different protocols, so they should not be compared directly.\n\nDo **not adopt any yet**. Neither memory system accepts these models as shipped. Validate an adapter, memory retrieval quality, and complete-request latency first. Exclude Jina’s noncommercial license for the potentially commercial lane; Qwen3-Reranker-4B has weaker reported memory evidence despite its better documented llama.cpp path.\n\nPREFERRED: SPLIT  \nRANKING: MemReranker-4B, KaLM-Reranker-V1-Small, ettin-reranker-400m-v1",
+      "returned_sha256": "26bf571202c665f1bbd052252800d15944bfb9116eeec22b8c8bbaea318af873",
+      "native_usage": {
+        "input_tokens": 39775,
+        "cached_input_tokens": 24192,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1691,
+        "reasoning_output_tokens": 1315
+      }
+    }
+  ],
+  "lane_preference_counts": {
+    "SPLIT": 3
+  },
+  "convergence_table_row": {
+    "question": "q3 reranker",
+    "order_a": "SPLIT. MemReranker-4B > ettin > KaLM",
+    "order_b": "SPLIT. MemReranker-4B > KaLM > ettin",
+    "order_c": "SPLIT. MemReranker-4B > KaLM > ettin",
+    "lane_preference_across_orders": "**SPLIT 3/3**",
+    "holds_in_all_orders": "MemReranker-4B #1. Adopt none. Jina excluded. Qwen3-Reranker-4B lower. KaLM (Claude lane only) ranks #2 only in b and c, where the Claude return was listed first."
+  },
+  "adjudicated_outcome": "MemReranker-4B first in all three orders; trial the three rerankers and adopt none; Jina Reranker v3.5 excluded for its non-commercial licence; Qwen3-Reranker-4B lower. KaLM-Reranker-V1-Small and ettin-reranker-400m-v1 swap places with the listing order.",
+  "evidence_refs": [
+    "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-a.json",
+    "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-b.json",
+    "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-c.json",
+    "evidence/artifacts/memory-stack-20260925/adjudication-inputs/adjudication-key.json",
+    "evidence/artifacts/memory-stack-20260925/convergence.json"
+  ],
+  "votes": 3,
+  "refuting_votes": 0,
+  "limitations": [
+    "One judge model (gpt-6-sol), from the same model family as the Codex lanes: three runs of one model are not independent judges, and varying the presentation does not remove family bias.",
+    "The judge never preferred the Codex return. Its only non-SPLIT answers came in order b, where the Claude return held letter A and was listed first; in order a the Codex return held that position and got SPLIT, so the order-b preference cannot be separated from a position or label effect.",
+    "The judge worked from the brief alone: it did not check the lanes' cited sources, so its reading of the evidence is only as good as the returns.",
+    "The judge effort, the Codex CLI version and the exact prompt were not retained; the exit status 0 is as the workflow's runner agents reported it.",
+    "Discovery-level evidence: no model was installed, downloaded or executed for any candidate named here."
+  ]
+}

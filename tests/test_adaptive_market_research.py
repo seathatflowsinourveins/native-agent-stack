@@ -1,12 +1,43 @@
 """Synthetic native SDK research integration; no real credentials or network."""
+import contextlib
 from datetime import datetime, timedelta, timezone
 import importlib.util
 import json
+import os
 from pathlib import Path
+import signal
 import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+
+
+class _DeadlineExceeded(Exception):
+    """Raised by a SIGALRM handler; never a real timeout the OS enforces."""
+
+
+@contextlib.contextmanager
+def _deadline(seconds):
+    """Hard wall-clock bound for one call, via signal.alarm: a blocking
+    syscall (e.g. open() on a FIFO without O_NONBLOCK) is interrupted with
+    EINTR and, since the handler raises rather than returning, Python does
+    not auto-retry it (PEP 475) -- so a real hang fails this test fast
+    instead of freezing the suite."""
+    def _on_alarm(signum, frame):
+        raise _DeadlineExceeded(f"exceeded {seconds}s deadline")
+    previous = signal.signal(signal.SIGALRM, _on_alarm)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
+
+
+try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
+    from .adaptive_paper_hermetic import real_tmp_root
+except ImportError:
+    from adaptive_paper_hermetic import real_tmp_root  # noqa: E402
 
 SOURCE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/adaptive-paper"
 sys.path.insert(0, str(SOURCE))
@@ -138,12 +169,175 @@ class NewsNormalization(unittest.TestCase):
 
     def test_env_file_only_parses_selected_literals(self):
         with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / "fixture.env"
+            path = real_tmp_root(tmp) / "fixture.env"
             path.write_text("UNRELATED=ignored\nexport APCA_API_KEY_ID='fixture-key'\nAPCA_API_SECRET_KEY=fixture-secret\n")
+            os.chmod(path, 0o600)
             self.assertEqual(m.credentials(path), ("fixture-key", "fixture-secret"))
             path.write_text("APCA_API_KEY_ID=$(echo nope)\nAPCA_API_SECRET_KEY=fixture-secret\n")
+            os.chmod(path, 0o600)
             with self.assertRaises(m.ResearchError):
                 m.credentials(path)
+
+
+class MarketResearchCredentialFilePermissions(unittest.TestCase):
+    """market_research.credentials() fails closed on env-file mode, ownership,
+    symlinks, and Git-worktree location before any line of the file is
+    parsed -- the gap closed by sharing runner.credentials()'s rules via
+    credential_guard.open_verified() (catalogs/us-equities/gates-20260922.json,
+    docs/decisions/2026-09-22-broker-credential-handling.md)."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = real_tmp_root(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _write_env(self, directory, name="paper.env", mode=0o600):
+        path = directory / name
+        path.write_text("APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
+        os.chmod(path, mode)
+        return path
+
+    def test_wrong_mode_is_rejected(self):
+        path = self._write_env(self.root, mode=0o644)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(path)
+
+    def test_group_or_other_readable_mode_is_rejected(self):
+        path = self._write_env(self.root, mode=0o640)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(path)
+
+    def test_wrong_owner_is_rejected(self):
+        path = self._write_env(self.root)
+        with patch.object(m.os, "getuid", return_value=os.getuid() + 1):
+            with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+                m.credentials(path)
+
+    def test_symlink_is_rejected(self):
+        target = self._write_env(self.root, name="real.env")
+        link = self.root / "linked.env"
+        link.symlink_to(target)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(link)
+
+    def test_inside_git_worktree_is_rejected(self):
+        repo_root = Path(__file__).resolve().parents[1]
+        self.assertTrue((repo_root / ".git").exists(), "test assumes this checkout is a Git worktree")
+        with tempfile.TemporaryDirectory(dir=repo_root) as inside:
+            path = self._write_env(Path(inside))
+            with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+                m.credentials(path)
+
+    def test_missing_file_is_rejected(self):
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(self.root / "does-not-exist.env")
+
+    def test_fifo_is_rejected_and_does_not_hang(self):
+        fifo = self.root / "fifo.env"
+        os.mkfifo(fifo, mode=0o600)
+        try:
+            with _deadline(10):
+                with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+                    m.credentials(fifo)
+        except _DeadlineExceeded:
+            # A genuine assertion failure (self.fail), not an uncaught
+            # exception: unittest -- and the real mutation driver in
+            # tests/_credential_mutation_driver.py, which only counts a
+            # "FAIL", never an "ERROR", as a kill -- must see this as the
+            # test actively catching the regression, not merely erroring.
+            self.fail("credentials(fifo) hung past the 10s deadline instead of raising")
+
+    def test_hard_link_is_rejected(self):
+        target = self._write_env(self.root, name="real.env")
+        other_name = self.root / "second-name.env"
+        os.link(target, other_name)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(target)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(other_name)
+
+    def test_group_writable_parent_directory_is_rejected(self):
+        path = self._write_env(self.root, mode=0o600)
+        os.chmod(self.root, 0o770)
+        try:
+            with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+                m.credentials(path)
+        finally:
+            os.chmod(self.root, 0o700)
+
+    def test_world_writable_parent_directory_is_rejected(self):
+        path = self._write_env(self.root, mode=0o600)
+        os.chmod(self.root, 0o707)
+        try:
+            with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+                m.credentials(path)
+        finally:
+            os.chmod(self.root, 0o700)
+
+    def test_0700_and_0755_owned_parent_directories_still_pass(self):
+        for mode in (0o700, 0o755):
+            with self.subTest(mode=oct(mode)):
+                directory = self.root / oct(mode)
+                directory.mkdir(mode=mode)
+                os.chmod(directory, mode)  # mkdir's mode is subject to umask; force the exact bits
+                path = self._write_env(directory)
+                self.assertEqual(m.credentials(path), ("fixture-key", "fixture-secret"))
+
+    def test_content_over_the_size_cap_is_rejected_by_a_bounded_read(self):
+        # G-fix-round item 7: the cap is enforced by reading MAX+1 bytes from the
+        # opened fd, not by trusting an earlier fstat-reported size.
+        path = self.root / "paper.env"
+        oversized = "APCA_API_KEY_ID=" + ("k" * (m.MAX_CREDENTIAL_BYTES + 64)) + "\nAPCA_API_SECRET_KEY=s\n"
+        path.write_text(oversized)
+        os.chmod(path, 0o600)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions:size"):
+            m.credentials(path)
+
+    def test_content_at_the_size_cap_is_accepted(self):
+        path = self.root / "paper.env"
+        filler = "k" * (m.MAX_CREDENTIAL_BYTES - len("APCA_API_KEY_ID=\nAPCA_API_SECRET_KEY=s\n"))
+        path.write_text(f"APCA_API_KEY_ID={filler}\nAPCA_API_SECRET_KEY=s\n")
+        os.chmod(path, 0o600)
+        self.assertEqual(len(path.read_bytes()), m.MAX_CREDENTIAL_BYTES)
+        self.assertEqual(m.credentials(path), (filler, "s"))
+
+    def test_non_ascii_content_is_rejected(self):
+        path = self.root / "paper.env"
+        path.write_bytes("APCA_API_KEY_ID=fixturé-key\nAPCA_API_SECRET_KEY=fixture-secret\n".encode("utf-8"))
+        os.chmod(path, 0o600)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions:encoding") as ctx:
+            m.credentials(path)
+        # G-round-4 item 1: `raw.isascii()` is checked before any `.decode()`
+        # call, so no UnicodeDecodeError (whose `.object` attribute holds the
+        # *entire* input, secret included) is ever constructed at all --
+        # confirmed here on the exception itself, not only on its message.
+        error = ctx.exception
+        self.assertIsNone(error.__context__)
+        self.assertIsNone(error.__cause__)
+        for attr in ("object", "args"):
+            value = repr(getattr(error, attr, None))
+            self.assertNotIn("fixtur", value)
+            self.assertNotIn("fixture-secret", value)
+
+    def test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials(self):
+        path = self._write_env(self.root)
+        self.assertEqual(m.credentials(path), ("fixture-key", "fixture-secret"))
+
+    def test_error_never_includes_file_contents(self):
+        path = self._write_env(self.root, mode=0o644)
+        with self.assertRaises(m.ResearchError) as ctx:
+            m.credentials(path)
+        self.assertNotIn("fixture-key", str(ctx.exception))
+        self.assertNotIn("fixture-secret", str(ctx.exception))
+
+    def test_error_never_includes_path_or_basename(self):
+        path = self._write_env(self.root, name="tell-tale-name.env", mode=0o644)
+        with self.assertRaises(m.ResearchError) as ctx:
+            m.credentials(path)
+        self.assertNotIn("tell-tale-name", str(ctx.exception))
+        self.assertNotIn(str(self.root), str(ctx.exception))
 
 
 class ResearchFeedSelection(unittest.TestCase):

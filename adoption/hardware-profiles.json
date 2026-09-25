@@ -182,6 +182,27 @@
           "peak_memory_gb": 0.288
         }
       }
+    },
+    {
+      "id": "macos-m5pro-20260924",
+      "label": "macOS arm64, Apple M5 Pro, 18 cores, 24 GB unified memory (measured)",
+      "evidence_class": "native_proven",
+      "evidence": "evidence/artifacts/hw-profiles/macos-m5pro-20260924/profile.json",
+      "note": "Actual scripts/hardware_profile.py output for this host, written by scripts/hardware_profile.py --record-host."
+    },
+    {
+      "id": "nativestack-5975wx-20260925",
+      "label": "WSL2 x86_64 workstation, AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, RTX 4090 24 GB (measured)",
+      "evidence_class": "native_proven",
+      "evidence": "evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json",
+      "note": "Actual scripts/hardware_profile.py output for this host, written by scripts/hardware_profile.py --record-host."
+    },
+    {
+      "id": "mac-coordinator-64gb-20260925",
+      "label": "macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory (measured)",
+      "evidence_class": "native_proven",
+      "evidence": "evidence/artifacts/hw-profiles/mac-coordinator-64gb-20260925/profile.json",
+      "note": "Actual scripts/hardware_profile.py output for this host, written by scripts/hardware_profile.py --record-host."
     }
   ]
 }

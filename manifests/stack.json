@@ -1014,7 +1014,7 @@
     {
       "id": "vllm",
       "repository": "https://github.com/vllm-project/vllm",
-      "version": "0.25.0",
+      "version": "0.30.0",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Native GPU serving for pinned recent local embeddings",
@@ -1032,13 +1032,14 @@
         "hf-memory-models-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "vllm-030-switch-20260925"
       ],
       "upstream_sources": [
         "https://github.com/vllm-project/vllm"
       ],
-      "source_pin": "702f4814fe54fabff350d43cb753ae3e47c0c276",
-      "freshness": "Latest upstream0.29.0 tested but WSL GPU startup failed; supported0.25.0 retained with explicit compatibility evidence."
+      "source_pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+      "freshness": "0.30.0 serves production embeddings on the WSL2 RTX 4090 host since 2026-09-25 after an owned-instance qualification against 0.25.0 (identical embeddings and code-index results); 0.30.0 carries the WSL pinned-memory fallback that 0.29.0 lacked and closes GHSA-25q3-v2hm-8vpf and GHSA-5fj9-pfhr-6j48. 0.25.0 is kept for rollback."
     },
     {
       "id": "worktrunk",
@@ -1552,7 +1553,7 @@
       "profile": "supporting",
       "role": "Offline GitHub workflow security analysis with failing fixtures",
       "commands": [
-        "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\"",
+        "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\" \"$PROJECT_ROOT/.github/dependabot.yml\"",
         "python3 -m unittest -v tests.test_workflow_security"
       ],
       "evidence_ids": [
@@ -1697,10 +1698,10 @@
     {
       "id": "nextjs",
       "repository": "https://github.com/vercel/next.js",
-      "version": "16.3.5",
+      "version": "16.3.6",
       "license": "MIT",
       "role": "Typed production application UI with native build and browser acceptance",
-      "source_pin": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
+      "source_pin": "a758ffcf501f6f1ddb03175bd1033508424c261e",
       "commands": [
         "pnpm typecheck",
         "pnpm build",
@@ -1712,9 +1713,11 @@
       ],
       "profile": "supporting",
       "upstream_sources": [
-        "https://registry.npmjs.org/next/16.3.5"
+        "https://registry.npmjs.org/next/16.3.6",
+        "https://github.com/vercel/next.js/releases/tag/v16.3.6",
+        "https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j"
       ],
-      "freshness": "Primary-source checked September20,2026; acceptance is scoped to the dated host/task receipt. Compatibility can justify a supported older dependency."
+      "freshness": "Primary-source checked September 25, 2026: 16.3.6 (tag commit a758ffc, not a prerelease) fixes the critical GHSA-vcvr-r3jv-pc5j next/og ImageResponse RCE, an urgent fix outside the 7-day cooldown. The application-delivery lock moved from 16.3.5 (history/recipe-revisions.json); its locked install, typecheck and production build pass at 16.3.6. The listed receipts ran 16.3.5 and do not qualify 16.3.6."
     },
     {
       "id": "react",

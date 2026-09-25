@@ -3,7 +3,7 @@ name: blind-judge
 description: Judge or refute one stripped comparison packet on its preregistered metrics only; never sees arm identities, repository names or paths.
 tools: Read
 model: opus
-effort: high
+effort: max
 maxTurns: 30
 omitClaudeMd: true
 ---

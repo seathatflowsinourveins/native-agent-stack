@@ -1,0 +1,221 @@
+{
+  "lean": {
+    "checks": [
+      {
+        "id": "agent-research-lean-build",
+        "expected_exit": 0
+      },
+      {
+        "id": "agent-research-lean-backtest",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Built source and bundled simulated backtest; 7730 build warnings; three simulated orders."
+  },
+  "skfolio": {
+    "checks": [
+      {
+        "id": "agent-research-eval-run",
+        "expected_exit": 0
+      },
+      {
+        "id": "agent-research-eval-tests",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Frozen 20-fold price-label study and12 boundary tests; not P&L."
+  },
+  "edgartools": {
+    "checks": [
+      {
+        "id": "agent-research-edgar-document",
+        "expected_exit": 0
+      },
+      {
+        "id": "agent-research-edgar-tests",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Offline upstream document fixture and21 provenance tests; no SEC request."
+  },
+  "nautilus-trader": {
+    "checks": [
+      {
+        "id": "agent-research-nautilus-run-three",
+        "expected_exit": 0
+      },
+      {
+        "id": "agent-research-nautilus-run-four",
+        "expected_exit": 0
+      },
+      {
+        "id": "agent-research-nautilus-verify-corrected",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Two isolated synthetic engine runs; no broker/network/order placement."
+  },
+  "dagu": {
+    "checks": [
+      {
+        "id": "agent-research-dagu-run2",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Owned DAG copy timeout900seconds after original180second timeout; no scheduler service."
+  },
+  "restic": {
+    "checks": [
+      {
+        "id": "agent-recovery-public-drill",
+        "expected_exit": 0
+      },
+      {
+        "id": "agent-recovery-memory-restic",
+        "expected_exit": 0
+      },
+      {
+        "id": "agent-recovery-memory-restore",
+        "expected_exit": 0
+      },
+      {
+        "id": "agent-recovery-memory-verify",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Encrypted isolated same-host reference and memory restores; no off-host recovery."
+  },
+  "poppler": {
+    "checks": [
+      {
+        "id": "agent-poppler-qualify2",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Frozen born-digital ingestion:3pages24tablecells; not OCR or general PDF acceptance."
+  },
+  "worktrunk": {
+    "checks": [
+      {
+        "id": "agent-gap-wt-accept",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Owned ext4 fixture create/list/remove worktree lifecycle."
+  },
+  "zizmor": {
+    "checks": [
+      {
+        "id": "agent-gap-zizmor-workflows",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Offline17-workflow scan; malicious fixture expected diagnostics separately retained."
+  },
+  "syft": {
+    "checks": [
+      {
+        "id": "agent-gap-syft-scan",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "SDK-only native SBOM scan; no whole-host guarantee."
+  },
+  "sandbox-runtime": {
+    "checks": [
+      {
+        "id": "agent-gap-srt-accept",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "File-policy fixture; network policy unqualified. CLI fallback version1.0.0, npm package0.0.77."
+  },
+  "mcp-inspector": {
+    "checks": [
+      {
+        "id": "agent-gap-inspector-tools-list",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Live loopback MCP handshake,23tools,0schemaerrors94portabilitywarnings; no tool invocation."
+  },
+  "codex": {
+    "checks": [
+      {
+        "id": "codex-native-trust-check",
+        "expected_exit": 0
+      },
+      {
+        "id": "codex-hooks-active-session",
+        "expected_exit": 0
+      },
+      {
+        "id": "native-hooks-database-proof",
+        "expected_exit": 0
+      },
+      {
+        "id": "sdk-worker-native-use",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Native Astra sessions,13trustedhooks and actual ContextMode SDK call; raw payloads private."
+  },
+  "claude-code": {
+    "checks": [
+      {
+        "id": "claude-native-session",
+        "expected_exit": 0
+      },
+      {
+        "id": "claude-socraticode-native-retry",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Native Opus5.5 sessions with RTK/ContextMode and SocratiCode calls; preserved selected Opus[1m]xhigh."
+  },
+  "qdrant": {
+    "checks": [
+      {
+        "id": "qdrant-isolated-restore",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Native snapshot isolated restore matched all8point/vector/payload values; same-host onecollection."
+  },
+  "grafana": {
+    "checks": [
+      {
+        "id": "observability-persistence",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Real backend restart/persistence check across installed monitoring services."
+  },
+  "alertmanager": {
+    "checks": [
+      {
+        "id": "observability-persistence",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Restart preserved test silence; owned test silence removed afterward."
+  },
+  "ntfy": {
+    "checks": [
+      {
+        "id": "observability-persistence",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Restart preserved local test notification; no external notification sent."
+  },
+  "ccusage": {
+    "checks": [
+      {
+        "id": "usage-native-report",
+        "expected_exit": 0
+      }
+    ],
+    "scope": "Local retained client log aggregation; ephemeral SDK worker absent; unpriced Opus omitted cost; not billing."
+  }
+}

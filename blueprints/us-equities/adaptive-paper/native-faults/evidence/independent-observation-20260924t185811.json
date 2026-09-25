@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "kind": "independent_observation",
+  "evidence_class": "independent_observation",
+  "observed_on": "2026-09-24",
+  "observed_at": "2026-09-24T18:58:28Z",
+  "observer": "workflow coordinator session (not the harness process)",
+  "method": "alpaca-py SDK order and position listing against the paper account, run separately from the harness code path (not native-faults/harness.py and not the adaptive-paper engine transport): TradingClient.get_orders(status=all, after=receipt.started_at) filtered by the receipt's client_id_prefix; get_order_by_client_id for the C01 and C04 client ids; get_all_positions; open orders",
+  "subject_receipt": "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
+  "subject_gate": "native-fault-behaviour",
+  "client_order_id_prefix": "nf-20260924t185811-6ddd39-",
+  "listing_since": "2026-09-24T18:58:11.489117+00:00 (the receipt's started_at)",
+  "observed": {
+    "orders_listed_since_start": 1,
+    "orders_with_prefix": 1,
+    "by_suffix": {
+      "c01": {
+        "status": "canceled",
+        "filled_qty": "0"
+      }
+    },
+    "lookup_c01": {
+      "found": true,
+      "status": "canceled",
+      "filled_qty": "0"
+    },
+    "lookup_c04": {
+      "found": false,
+      "http_status": 404,
+      "meaning": "no broker order exists for client id nf-20260924t185811-6ddd39-c04"
+    },
+    "open_orders": 0,
+    "positions": 0
+  },
+  "compared_with_receipt": {
+    "receipt_status": "native_faults_passed",
+    "receipt_submit_responses": 2,
+    "receipt_submits_accepted": 1,
+    "receipt_submits_refused_422": 1,
+    "receipt_c01_final_status": "canceled (C02 and C05 ledger, zero filled)",
+    "receipt_c04_ledger": "broker_refused {http_status 422, refusal sub_penny_minimum_price_variance}, broker_id_recorded false, client-id read 404",
+    "receipt_cleanup": "0 open orders, 0 positions, cash delta 0.00",
+    "expected_broker_orders_with_prefix": 1,
+    "observed_broker_orders_with_prefix": 1,
+    "c01_matches": true,
+    "c04_absent_matches": true,
+    "flat_matches": true,
+    "counts_match": true
+  },
+  "claim_boundary": "Confirms only the listed broker-side facts: one order with this prefix since started_at (c01), canceled with filled quantity 0; no broker order for the c04 client id (lookup 404); and no open orders or positions at observation time. It uses the same broker API and account, so it is independent of the harness and engine code, not of the broker. It does not observe HTTP statuses of the run's own requests (C04's 422 body, C05's 204 DELETE answer), request ordering, the order-contract envelope or wire check, ledger contents or the engine's handling of a 422 cancel refusal, which C05 did not receive; it is not live-endpoint evidence and not a strategy result.",
+  "retained": {
+    "script": {
+      "path": "observe-native-faults-20260924.py",
+      "sha256": "6f4b1c192245c4df859d08c4b5b15196c54bd1b0533206a3969c7f6f8a5fe64c"
+    },
+    "stdout": {
+      "path": "observe-native-faults-20260924t185811.stdout.json",
+      "sha256": "0c047ba015f609b0d56a5c90469b9f36c1111e7aff6a68c7fc3d6565f26bf04a"
+    },
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (empty)",
+    "argv_redacted": "<pinned adaptive-paper runtime python> observe-native-faults-20260924.py --env-file <private>/alpaca-paper.env --receipt <this run's receipt.json>",
+    "exit_code": null,
+    "runtime": "alpaca-py 0.44.0, Python 3.12.3 (the versions of the pinned adaptive-paper runtime)",
+    "note": "The same script as the 14:39Z observation, run once more against this run's receipt. The stdout is a byte-identical copy of the coordinator's private file; the exit code was not retained (stdout is complete JSON and stderr is empty). The retained files contain no credential, account id or host path. The stdout's observed_at is local time (2026-09-24T14:58:28-04:00 = 18:58:28Z)."
+  }
+}

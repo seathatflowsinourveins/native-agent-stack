@@ -5,7 +5,11 @@ wheel and analyzes workflows offline. It adds no persistent service or account.
 The Linux x86_64 wheel passed the [exact-head CI run](ci-acceptance.json),
 including all 404 tests with 40 explicit optional-profile skips. It is isolated
 to GitHub's disposable Ubuntu runner; its
-[lock](../../../.github/requirements-ci.lock) is not a portable Mac install recipe.
+[lock](../../../.github/requirements-ci.txt) is not a portable Mac install recipe.
+(Since 2026-09-25 the lock is named `requirements-ci.txt`, and the required
+`validate` gate also runs zizmor's online audits over the repository root; the
+retained, hash-bound `qualified-workflow.yml.txt` keeps the original
+`requirements-ci.lock` name and offline command.)
 
 The [source review](../../../catalogs/convergence-practice/architecture-wave/zizmorcore__zizmor.json)
 records the release commit, README and MIT license identity. The

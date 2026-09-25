@@ -73,30 +73,45 @@ CANONICAL_V1_BLOCK = {
 # The discrete leverage rungs this schedule ships pre-registered configs for
 # (config-leverage-1x/2x/4x.json). Pure/static; used only by the runner's
 # achieved-leverage receipt (F2, 2026-09-22 residual review finding:
-# reachability) -- this receipt exists so a rung's gate row's flip to
-# established can eventually be checked against evidence that achieved
-# exposure actually exceeded the next-lower rung's own ceiling, since
-# strategies_v1._decide_core's budget/allocation math means a higher
-# max_leverage does not by itself force higher achieved exposure. As of
-# 2026-09-22 leverage fix round 2 (N1-1) no gate row in
-# catalogs/us-equities/gates-20260922.json reads this receipt yet, so a
-# rung's gate row can still flip on a receipt that never showed it -- see
-# README-safety.md's Leverage schedule section. Not consulted by
-# ceiling()/envelope() and does not change the schedule/ladder
+# reachability) -- this receipt exists because strategies_v1._decide_core's
+# budget/allocation math means a higher max_leverage does not by itself force
+# higher achieved exposure. Since 2026-09-24 (audit gap #5) the
+# leverage-ladder-1x/2x/4x gate rows in catalogs/us-equities/gates-20260922.json
+# read it: each flips only when needs_attention == 0 AND the rung receipt's
+# recorded peak_achieved_leverage and seconds_above_next_lower_rung_ceiling
+# show achieved exposure above the threshold next_lower_rung_ceiling returns
+# for that rung (see README-safety.md's Leverage schedule section). Not
+# consulted by ceiling()/envelope() and does not change the schedule/ladder
 # CANONICAL_V1_BLOCK enforces.
 RUNGS = (D("1"), D("2"), D("4"))
 
+# The documented minimum exposure the lowest (1x) rung must show, since it has
+# no lower rung of its own to exceed (audit gap #5, 2026-09-24): half of the 1x
+# rung's cap. Without it the 1x receipt's seconds_above_next_lower_rung_ceiling
+# could never accumulate, so a 1x trial that held almost nothing could not be
+# told apart from one that used the rung. It is a comparison threshold for the
+# receipt only -- not a sizing target, not a registered rung and not a config
+# value; config-leverage-1x.json's entry budget (min(gross_cap,
+# capital*leverage) - max_order_notional = 10000 - 1000) allows up to 0.9x.
+ONE_X_MINIMUM_EXPOSURE = D("0.5")
+
 
 def next_lower_rung_ceiling(max_leverage: Decimal) -> Decimal | None:
-    """The largest pre-registered rung strictly below `max_leverage`, or
-    None when there is none (the 1x rung itself, or any value <= the lowest
-    rung). Used to compute how long a run spent with achieved (gross
-    exposure / equity) leverage above the ceiling the next rung down would
-    have imposed -- evidence the run actually needed this rung's higher
-    ceiling rather than merely staying inside a lower one's proportional
-    room the whole time."""
+    """The threshold a run at `max_leverage` must exceed to show it used its
+    rung: the largest pre-registered rung strictly below `max_leverage`
+    (2x -> 1, 4x -> 2), or ONE_X_MINIMUM_EXPOSURE (0.5) for the lowest (1x)
+    rung itself, which has no lower rung. None only for a value below the
+    lowest rung (never a valid config: validate_leverage_policy refuses
+    max_leverage < 1). The runner accumulates the time a run's achieved
+    (gross exposure / equity) leverage spent above this threshold -- evidence
+    the run actually needed this rung's ceiling rather than merely staying
+    inside a lower one's proportional room the whole time."""
     lower = [r for r in RUNGS if r < max_leverage]
-    return max(lower) if lower else None
+    if lower:
+        return max(lower)
+    if max_leverage >= RUNGS[0]:
+        return ONE_X_MINIMUM_EXPOSURE
+    return None
 
 
 class LeveragePolicyError(ValueError):

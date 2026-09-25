@@ -356,7 +356,6 @@
           "codex plugin marketplace add mksglu/context-mode --ref 6f0cc6841c687e754059f36714a11233fda1a02b --json",
           "codex plugin add context-mode@context-mode --json",
           "codex features enable hooks",
-          "codex features enable plugin_hooks",
           "claude plugin marketplace add mksglu/context-mode --scope user",
           "claude plugin install context-mode@context-mode --scope user --json"
         ],
@@ -1097,14 +1096,14 @@
       "purpose": "Explicit repository packing and structural compression",
       "upstream_commands": {
         "install": [
-          "npm install --global --prefix \"$STACK_HOME/tools/repomix-1.18.0\" repomix@1.18.0"
+          "npm install --global --prefix \"$STACK_HOME/tools/repomix-1.18.1\" repomix@1.18.1"
         ],
         "use": [
           "repomix \"$PROJECT_ROOT\" --include \"fixtures/before.py,fixtures/after.py\" --style xml --parsable-style --compress --token-count-encoding o200k_base --output \"$STACK_HOME/output/selected-code.xml\""
         ],
         "statistics": [],
         "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
-        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/repomix-1.18.0\" repomix@1.18.0`",
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/repomix-1.18.1\" repomix@1.18.1`",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
       "returned_result_summary": "Retained native command exited 0 and output contained the explicitly selected paths. Exact outline comparison 3697\u2192663 tokens is lossy; restore/read original implementation before editing or correctness decisions.",
@@ -1536,7 +1535,7 @@
       "purpose": "Read existing native provider usage logs",
       "upstream_commands": {
         "install": [
-          "npm install --global --prefix \"$STACK_HOME/tools/ccusage-20.0.23\" ccusage@20.0.23"
+          "npm install --global --prefix \"$STACK_HOME/tools/ccusage-20.0.24\" ccusage@20.0.24"
         ],
         "use": [
           "ccusage daily --offline --no-cost --by-agent --since 20260919 --until 20260920 --timezone UTC --json",
@@ -1546,7 +1545,7 @@
           "ccusage daily --offline --no-cost --by-agent --since 20260919 --until 20260920 --timezone UTC --json",
           "ccusage codex daily --offline --no-cost --since 2026-09-19 --until 2026-09-20 --timezone UTC --json"
         ],
-        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/ccusage-20.0.23\" ccusage@20.0.23`",
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/ccusage-20.0.24\" ccusage@20.0.24`",
         "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
       },
       "returned_result_summary": "2026-09-20 scoped offline two-date report returned 2, 573, 385 total usage tokens across selected native homes; Codex subset 819, 530 already included. These are native parser consumption categories, not saved tokens or an invoice. CLI available on demand; no continuous observer established.",

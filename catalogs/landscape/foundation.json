@@ -1902,18 +1902,26 @@
       "requirement": "Keep scoped decisions, handoffs and useful learning available across native Codex and Claude with inspectable capture, deletion and recovery.",
       "current_choice": "One ai-memory store as the cross-client memory of record; retain separate code, document and transient-context retrieval layers.",
       "decision": "keep_but_compare",
-      "rationale": "ai-memory already contains adopted project knowledge and has actual cross-client capture/query, consolidation and recovery evidence. Candidate memory systems offer distinct capabilities, but published scores do not demonstrate better retrieval or learning on this project.",
+      "rationale": "ai-memory is retained as the production control, not as a measured best. It already holds the adopted project knowledge and is the only candidate with retained native cross-client evidence: capture and query from both Claude Code and Codex, consolidation and maintenance (evidence/receipts/memory-landscape-lifecycle-20260921.json and docs/memory-landscape-maintenance.md). The WSL2 workstation's host receipts (evidence/hosts/nativestack-5975wx-20260925/) cover only its install and a scoped page write, search, read and delete. Its measured retrieval is weaker: in the matched 2026-09-25 LongMemEval-S run on the Mac (descriptive, n = 470), C3, the Mac's 19b6429 build with qwen3-embedding:4b and the reranker off, scored 0.570 recall_all@5, and four arms scored 0.170 to 0.251 higher: agentmemory with MiniLM, dense Qwen3-Embedding-4B and two BM25 arms. Under amendment A14 the production arm is C4, with the LLM reranker, which has not run, and the workstation's 2.3.2 pin with MiniLM was not measured. The layer verdict changes through this row's verdict_overturn_when; the memory-stack record's own replacement rule governs the Mac production setup.",
       "evidence_refs": [
         "docs/memory-landscape-maintenance.md",
         "docs/native-memory-rag-lifecycle.md",
         "evidence/artifacts/memory-landscape-20260921/sources.json",
         "catalogs/landscape/candidate-quality-review.json",
-        "docs/candidate-quality-review-20260921.md"
+        "docs/candidate-quality-review-20260921.md",
+        "evidence/artifacts/memory-stack-20260925/README.md",
+        "evidence/artifacts/memory-stack-20260925/convergence.json",
+        "catalogs/foundation/memory-stack-20260925.json"
       ],
       "limitations": [
         "Scheduler admission does not establish learned-write quality; the retained model review rejected insufficient evidence.",
         "Bounded sanitized assistant excerpts are not complete transcripts, and exact lifetime memory token savings are unknown.",
-        "Current primary-source review corrects manual-only, Claude-only and cloud-only exclusions. No matched memory benchmark or new installation was run; automatic capture, local providers and published scores remain source claims until exercised on the selected profile."
+        "Current primary-source review (2026-09-21) corrects manual-only, Claude-only and cloud-only exclusions. No matched memory benchmark or new installation was run in that review; automatic capture, local providers and published scores remain source claims until exercised on the selected profile.",
+        "The 2026-09-25 memory-stack convergence (catalogs/foundation/memory-stack-20260925.json) keeps ai-memory as the production control and adopts no challenger. Its only measurements are Mac runs in the LongMemEval-S harness, descriptive under amendment A15.2 (full track, n = 470, recall_all@5): C3, ai-memory with its production embedder and the reranker off, scores 0.570, and am-minilm (+0.251, 95% CI [+0.203, +0.299]), dense Qwen3-Embedding-4B (+0.183), BM25 (+0.177) and the official BM25 (+0.170) exceed it with Holm p 0.0001, while ai-memory with MiniLM (0.496) and with FTS only (0.400) trail it. The layer decision still needs C4, production with the LLM reranker (A14), which did not run on the Mac, and confirmatory decisions come only from the VelaNext rerun under A15, A15.2 and A16.",
+        "Its trial rows (three memory systems, plus the named embedders, rerankers and memory LLMs) rest on discovery and vendor evidence and blind cross-family judgments by one judge model; a trial changes production only through the preregistered comparison against both C3 and C4 and the memory-lane acceptance.",
+        "Production now runs ai-memory 19b6429, a local cargo build of release/2.5 that reports 2.4.0 and is ahead of official v2.4.0; the retained native evidence covers the 2.3.2 pin only and does not transfer to that build.",
+        "2026-09-25: the 19b6429 build above is the Mac coordinator's production control; the WSL2 workstation nativestack-5975wx-20260925 runs the official 2.3.2 release. VelaNext, named above as the host of the confirmatory rerun, was retired on 2026-09-25 (docs/decisions/2026-09-25-retire-vela-velanext.md), and no rerun or C4 result was recorded in this repository before then. Amendment A15 fixed VelaNext as the one platform per comparison, so C4 and the confirmatory rerun need another host, such as the workstation's RTX 4090, a new preregistration amendment naming it, and the harness used for the Mac runs committed; until then the layer decision stays open.",
+        "2026-09-25: open_gaps[0] (no matched semantic-recall or usefulness benchmark) is superseded only in part. The Mac run measured session retrieval (recall_all@5) on the 19b6429 build, not usefulness and not the 2.3.2 pin, so the representative recall and usefulness gap in open_gaps still stands. open_gaps is a verdict field, so its text changes only at the next lane re-record."
       ],
       "overturn_when": "An isolated representative corpus and question set shows better source-grounded recall/usefulness and acceptable complete provider use, latency, capture/deletion and restore behavior without ambiguous memory ownership.",
       "candidates": [

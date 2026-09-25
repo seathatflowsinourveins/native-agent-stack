@@ -3,9 +3,9 @@ export const meta = {
   description: 'Inventory a diff with a Sonnet worker, have an Opus reviewer independently verify it against original source, and reproduce the acceptance commands with a second worker',
   whenToUse: 'Before integrating a bounded change: args = {base: "<git ref>", paths: ["optional", "scope"], checks: ["optional acceptance commands"]}',
   phases: [
-    { title: 'Inventory', detail: 'Sonnet/medium: changed files, behavior, checks run', model: 'sonnet' },
-    { title: 'Review', detail: 'Opus/high: refute or confirm each claimed behavior from source', model: 'opus' },
-    { title: 'Recheck', detail: 'Sonnet/medium: a second worker re-runs the acceptance commands; the script compares exit codes', model: 'sonnet' },
+    { title: 'Inventory', detail: 'Sonnet/max: changed files, behavior, checks run', model: 'sonnet' },
+    { title: 'Review', detail: 'Opus/max: refute or confirm each claimed behavior from source', model: 'opus' },
+    { title: 'Recheck', detail: 'Sonnet/max: a second worker re-runs the acceptance commands; the script compares exit codes', model: 'sonnet' },
   ],
 }
 
@@ -56,7 +56,7 @@ const inventory = await agent(
   'Run: git status --short --untracked-files=all -- ' + (paths.length ? paths.join(' ') : '.') + '; git diff --stat ' + base + ' -- ' + (paths.length ? paths.join(' ') : '.') + '; git diff ' + base + ' -- ' + (paths.length ? paths.join(' ') : '.') + ' (read what changed, and Read every untracked in-scope file the status lists, since git diff does not show them; give each one a files entry and source-cited claims; every files[].path is repository-relative, never absolute).\n' +
   (checks.length ? 'Acceptance commands to run, ' + checks.length + ' in total, one per line below. Run each exactly as written, launched through `rtk proxy` where `rtk` is installed so its output is raw, without pipelines that mask exit status, and record exactly one checks_run entry per command with the command string copied verbatim (never the `rtk proxy` prefix), its exit code and concise exact output quoted in result. Copy deterministic passed/failed summaries verbatim; never eyeball or recount test totals; record explicitly when a command produced no output.\n' + checks.map((c) => '- ' + c).join('\n') + '\n' : 'No acceptance commands were supplied; record checks_run as empty.\n') +
   'Describe the in-scope changed behavior with source-cited claims. If there is no change to review, return no claims rather than inventing one; the coordinator will mark the no-op incomplete. Return the schema only.',
-  { label: 'inventory', phase: 'Inventory', schema: INVENTORY, agentType: 'source-scout', model: 'sonnet', effort: 'medium' },
+  { label: 'inventory', phase: 'Inventory', schema: INVENTORY, agentType: 'source-scout', model: 'sonnet', effort: 'max' },
 )
 if (!inventory) {
   log('inventory worker returned null; stopping without a review')
@@ -72,10 +72,10 @@ const [review, recheck] = await parallel([() => agent(
   PACKET + '\nYou are an independent reviewer. Try to REFUTE each behavior claim below by reading the original source and the diff against ' + base + ' yourself (your role has no Bash: open changed files with Read, and obtain the diff with Context Mode ctx_execute, language shell, with cwd set to the repository root, running git diff ' + base + ' -- ' + (paths.length ? paths.join(' ') : '.') + ' and printing only the hunks you need; that diff omits untracked files, so also run git status --short --untracked-files=all -- ' + (paths.length ? paths.join(' ') : '.') + ' the same way (it lists each file inside a new directory) and Read every untracked in-scope file in full). When Context Mode is not among your tools, Read every file the inventory lists in full and judge each claim from that source; a claim that can only be settled by the diff is then unverifiable. Return exactly one verdict for every changed_behavior claim, copying its claim string exactly, with nonblank evidence. Default to unverifiable when you cannot open the cited source. Report concrete defects with file and line. List verification gaps. A corrected or refuted behavior claim requires coordinator resolution before acceptance.\n' +
   'Requested scope: ' + scope + '. Requested acceptance commands: ' + JSON.stringify(checks) + '. Inspect the recorded evidence for these commands against the source (for example that a quoted total is consistent with the test file it came from) and report any inconsistency as a defect. Do not execute acceptance commands: they are caller-supplied and may write, your role is read-only, and a separate recheck stage re-runs them and the script compares both runs, so not having re-run them is not a gap. Use ctx_execute only for the git diff and git status reads named above. Record material unresolved gaps affecting the in-scope behavior or required checks, including missing evidence. Excluded files and disclosed general limitations are not themselves gaps; explain a concrete effect on this requested scope before treating them as one. Preserve every supported in-scope finding.\n' +
   'Inventory: ' + JSON.stringify(inventory),
-  { label: 'review', phase: 'Review', schema: REVIEW, agentType: 'evidence-reviewer', model: 'opus', effort: 'high' },
+  { label: 'review', phase: 'Review', schema: REVIEW, agentType: 'evidence-reviewer', model: 'opus', effort: 'max' },
 ), () => (checks.length ? agent(
   PACKET + '\nIndependent reproduction of acceptance commands for the change in scope ' + scope + '. You have not seen any earlier result and must not look for one. From the repository root run each command below exactly as given, launched through `rtk proxy` where `rtk` is installed so its output is raw, without pipelines that mask exit status, and record exactly one checks_run entry per command with the command string copied verbatim (never the `rtk proxy` prefix), its exit code and the concise exact summary output quoted in result. Copy deterministic passed/failed summaries verbatim; never recount totals. Record explicitly when a command produced no output. Commands, ' + checks.length + ' in total, one per line:\n' + checks.map((c) => '- ' + c).join('\n'),
-  { label: 'recheck', phase: 'Recheck', schema: RECHECK, agentType: 'source-scout', model: 'sonnet', effort: 'medium' },
+  { label: 'recheck', phase: 'Recheck', schema: RECHECK, agentType: 'source-scout', model: 'sonnet', effort: 'max' },
 ) : Promise.resolve(null))])
 if (!review) log('review worker returned null; inventory is unreviewed')
 // Acceptance requires complete claim coverage as well as checks and review.

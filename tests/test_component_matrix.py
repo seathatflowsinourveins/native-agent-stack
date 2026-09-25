@@ -11,6 +11,7 @@ import io
 import json
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from scripts import component_matrix as cm
@@ -446,7 +447,9 @@ class AlternativeHostVerifiedTests(unittest.TestCase):
         summary = {"components": {"widget": {"platforms": {"linux-wsl2-x86_64": {
             "independently_reviewed_native_proven_pass_stages": stages}}}}}
         return cm.build_alternative({"name": "Widget", "repository": "https://github.com/acme/widget"},
-                                    {"https://github.com/acme/widget": "widget"}, summary)["e2e_state"]
+                                    cm.repository_to_component_id({"components": [
+                                        {"id": "widget", "repository": "https://github.com/acme/widget"}]}),
+                                    summary)["e2e_state"]
 
     def test_install_only_is_recorded_and_use_is_verified(self):
         self.assertEqual(self._state(["install"]), "receipts_recorded")
@@ -503,6 +506,141 @@ class QualifiedModelsSurfacingTests(unittest.TestCase):
             document, _flip = cm.build_document(root)
             winner = document["rows"][0]["winners"][0]
             self.assertEqual(winner["platforms"]["linux-wsl2-x86_64"]["qualified_models"], [])
+
+
+
+class AliasReceiptTests(unittest.TestCase):
+    """Receipts recorded under a manifests/stack.json id sharing the winner's repository are
+    listed per winner x platform and never counted (status, counts, flip rule, e2e_state)."""
+
+    def _root(self, root: Path, *, with_alias_receipt: bool, version="1.0.0") -> None:
+        layer = _layer(winners=[_winner(component_id="widget-winner", macos="untested")])
+        _init_root(root, [layer])
+        _write_json(root / "manifests" / "stack.json", {"schema_version": 1, "components": [
+            {"id": "widget", "repository": "https://github.com/Example/widget.git", "version": "1.0.0"}]})
+        if with_alias_receipt:
+            _write_receipt(root, _receipt("widget", "macos-arm64", version=version))
+
+    @staticmethod
+    def _without_alias_lists(document: dict) -> dict:
+        document = json.loads(json.dumps(document))
+        for row in document["rows"]:
+            for winner in row["winners"]:
+                for entry in winner["platforms"].values():
+                    entry.pop("alias_receipts")
+        return document
+
+    def test_alias_receipt_is_listed_and_never_counted(self):
+        with tempfile.TemporaryDirectory() as with_tmp, tempfile.TemporaryDirectory() as without_tmp:
+            self._root(Path(with_tmp), with_alias_receipt=True)
+            self._root(Path(without_tmp), with_alias_receipt=False)
+            with_doc, with_flip = cm.build_document(Path(with_tmp))
+            without_doc, without_flip = cm.build_document(Path(without_tmp))
+            self.assertEqual(self._without_alias_lists(with_doc), self._without_alias_lists(without_doc))
+            self.assertEqual(with_flip, without_flip)
+            macos = with_doc["rows"][0]["winners"][0]["platforms"]["macos-arm64"]
+            self.assertEqual(macos["derived_status"], "untested")
+            self.assertEqual(macos["host_receipts"]["pass"], 0)
+            self.assertEqual(macos["e2e_state"], "untested")
+            [alias] = macos["alias_receipts"]
+            self.assertEqual(alias["recorded_component_id"], "widget")
+            self.assertEqual(alias["recorded_version"], "1.0.0")
+            self.assertEqual((alias["evidence_class"], alias["stage"], alias["result"]), ("native_proven", "use", "pass"))
+            self.assertIs(alias["binds"], False)
+            self.assertIs(alias["version_matches_pin"], True)
+            self.assertTrue(alias["path"].startswith("evidence/hosts/test-host-20260922/"))
+            self.assertEqual(with_doc["rows"][0]["winners"][0]["platforms"]["linux-wsl2-x86_64"]["alias_receipts"], [])
+            self.assertIn(alias["path"], cm.render_markdown(with_doc))
+            self.assertIn("never counted", cm.render_markdown(with_doc))
+
+    def test_alias_reason_names_a_version_that_is_not_the_pin(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self._root(Path(tmp), with_alias_receipt=True, version="0.9.0")
+            document, _flip = cm.build_document(Path(tmp))
+            [alias] = document["rows"][0]["winners"][0]["platforms"]["macos-arm64"]["alias_receipts"]
+            self.assertIs(alias["version_matches_pin"], False)
+            self.assertIn("not the winner pin in full", alias["reason"])
+
+    def test_no_alias_receipts_render_none(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self._root(Path(tmp), with_alias_receipt=False)
+            document, _flip = cm.build_document(Path(tmp))
+            markdown = cm.render_markdown(document)
+            self.assertIn("## Alias receipts (listed, never counted)", markdown)
+            self.assertNotIn("Listed:", markdown)
+            self.assertIn("\n\nNone.\n", markdown)
+
+    def test_alias_prose_is_derived_from_the_listed_receipts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._root(root, with_alias_receipt=True)
+            document, _flip = cm.build_document(root)
+            [alias] = document["rows"][0]["winners"][0]["platforms"]["macos-arm64"]["alias_receipts"]
+            self.assertEqual((alias["host_id"], alias["observed_at_utc"], alias["grandfathered"]),
+                             ("test-host-20260922", "2026-09-22T01:00:00Z", False))
+            markdown = cm.render_markdown(document)
+            self.assertIn("Listed: 1 alias receipt(s) from host(s) `test-host-20260922`, observed 2026-09-22; "
+                          "0 of 1 grandfathered.", markdown)
+            self.assertNotIn("two Mac receipts", markdown)
+            # Grandfathering that exact recorded claim (path and claim_sha256) is reflected in the entry and the prose.
+            entry = {"canonical_component_id": "widget-winner", "date": "2026-09-22", "reason": "test",
+                     "claim_sha256": hr.receipt_claim_sha256(
+                         json.loads((root / alias["path"]).read_text(encoding="utf-8")))}
+            with mock.patch.object(hr, "GRANDFATHERED_ALIAS_RECEIPTS", {alias["path"]: entry}):
+                document, _flip = cm.build_document(root)
+            [alias] = document["rows"][0]["winners"][0]["platforms"]["macos-arm64"]["alias_receipts"]
+            self.assertIs(alias["grandfathered"], True)
+            markdown = cm.render_markdown(document)
+            self.assertIn("1 of 1 grandfathered.", markdown)
+            self.assertIn("the pin in full; grandfathered)", markdown)
+
+    def test_alias_summary_sentence_counts_hosts_and_dates(self):
+        self.assertEqual(cm.alias_summary_sentence([]), "")
+        sentence = cm.alias_summary_sentence([
+            {"host_id": "b-20260102", "observed_at_utc": "2026-01-02T00:00:00Z", "grandfathered": True},
+            {"host_id": "a-20260101", "observed_at_utc": "2026-01-01T00:00:00Z", "grandfathered": False},
+            {"host_id": "a-20260101", "observed_at_utc": "2026-01-01T05:00:00Z"}])
+        self.assertEqual(sentence, " Listed: 3 alias receipt(s) from host(s) `a-20260101`, `b-20260102`, "
+                                   "observed 2026-01-01, 2026-01-02; 1 of 3 grandfathered.")
+
+    def test_alias_summary_counts_a_multi_layer_winner_receipt_once(self):
+        # The same winner selected in two layers lists its alias receipt under both rows,
+        # but the summary sentence counts that receipt (and its grandfathering) once.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            layers = [_layer(layer_id, winners=[_winner(component_id="widget-winner", macos="untested")])
+                      for layer_id in ("layer-a", "layer-b")]
+            _init_root(root, layers)
+            _write_json(root / "manifests" / "stack.json", {"schema_version": 1, "components": [
+                {"id": "widget", "repository": "https://github.com/Example/widget.git", "version": "1.0.0"}]})
+            _write_receipt(root, _receipt("widget", "macos-arm64"))
+            document, _flip = cm.build_document(root)
+            paths = [alias["path"] for row in document["rows"] for winner in row["winners"]
+                     for alias in winner["platforms"]["macos-arm64"]["alias_receipts"]]
+            self.assertEqual(len(paths), 2)
+            self.assertEqual(len(set(paths)), 1)
+            entry = {"canonical_component_id": "widget-winner", "date": "2026-09-22", "reason": "test",
+                     "claim_sha256": hr.receipt_claim_sha256(json.loads((root / paths[0]).read_text(encoding="utf-8")))}
+            with mock.patch.object(hr, "GRANDFATHERED_ALIAS_RECEIPTS", {paths[0]: entry}):
+                document, _flip = cm.build_document(root)
+            markdown = cm.render_markdown(document)
+            self.assertIn("Listed: 1 alias receipt(s) from host(s) `test-host-20260922`, observed 2026-09-22; "
+                          "1 of 1 grandfathered.", markdown)
+            # The per-row listing keeps one line per row.
+            self.assertEqual(markdown.count(paths[0]), 2)
+
+    def test_repository_crosswalk_uses_the_shared_normalization(self):
+        mapping = cm.repository_to_component_id({"components": [
+            {"id": "widget", "repository": "https://github.com/Example/widget.git/"},
+            # manifests/stack.json records some repositories as release URLs (rtk, shellcheck, difftastic)
+            {"id": "gadget", "repository": "https://github.com/example/gadget/releases/tag/v1.0.0"}]})
+        self.assertEqual(mapping, {"github.com/example/widget": "widget", "github.com/example/gadget": "gadget"})
+        summary = {"components": {"widget": {"platforms": {"macos-arm64": {}}},
+                                  "gadget": {"platforms": {"linux-wsl2-x86_64": {}}}}}
+        for repository in ("https://github.com/example/widget", "https://github.com/example/gadget"):
+            with self.subTest(repository=repository):
+                built = cm.build_alternative({"repository": repository}, mapping, summary)
+                self.assertEqual(built["e2e_state"], "receipts_recorded")
 
 
 if __name__ == "__main__":

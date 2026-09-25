@@ -5,6 +5,15 @@ Codex/Claude integrations. No competing memory daemon or replacement agent
 harness was installed. The [memory landscape review](memory-landscape-maintenance.md)
 records nine repository sources and their selection rationale.
 
+The [September 23 scheduled observation](../observability/memory-scheduled-20260923.json)
+now records an actual daily heartbeat and returned native checks. The existing
+hourly learning scheduler applied two pages at 10:04:49 UTC; journal, proposal
+records and scoped MCP reads agree. A later 11:05 response-decoding failure has
+no persisted learning run and remains unresolved. The latest completed native
+session's consolidation finished on attempt 1. No learning run was triggered
+manually for this observation. These outcomes establish lifecycle execution,
+not improved answer quality or token savings.
+
 ## Installed selection
 
 | Layer | Accepted upstream | Current qualification |
@@ -58,8 +67,8 @@ outcomes remain separate evidence.
 | --- | --- | --- |
 | Every two minutes | systemd native-data timer; upstream memory/QMD commands and Qdrant API; Loki publication | Fresh inventory and returned metadata. Actual timer invocations and HTTP 204 publication were observed. The oneshot service is normally inactive between successful runs. |
 | Continuous scrape | Existing Prometheus, Collector and Grafana | Configured service/transport alerts and native runtime counters; not retrieval correctness. |
-| Hourly | ai-memory native learning and embedding-backfill configuration | Prior actual scheduler admission is retained. A later hourly tick is still unproved in this receipt; no new learned-write quality claim. |
-| Daily, existing 09:00 schedule | Native Codex task follow-up | Updated to check scoped memory retrieval, real completed-session/learning outcomes, source agreement and selected RAG freshness. Updated configuration is verified; its next scheduler-triggered execution is not claimed. |
+| Hourly | ai-memory native learning and embedding-backfill configuration | September 23 journal and scoped store/MCP readback confirm two applied pages. A later response-decoding failure is retained; write completion does not establish improved learning quality. |
+| Daily, existing 09:00 schedule | Native Codex task follow-up | September 23 heartbeat received at 13:01:02.931 UTC, with bounded current retrieval, source comparison and lifecycle checks. Trigger provenance is the native task envelope; independent scheduler dispatch metadata and restart persistence remain unknown. |
 
 The daily follow-up reuses valid upstream tests and historical add/change/delete,
 client-use and recovery evidence while their inputs match. A changed source,

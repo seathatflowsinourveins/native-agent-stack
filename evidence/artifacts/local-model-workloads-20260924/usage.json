@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "kind": "native_usage_by_run",
+  "counter_policy": "Native counters exactly as each client reported them, then mapped to the convergence contract's disjoint categories only where the native scope is known. Unknown stays null; nothing is inferred, converted to zero or summed across runs.",
+  "runs": [
+    {
+      "run_label": "claude-lane",
+      "source": "Claude Code subagent completion report, as relayed by the coordinator",
+      "native": {
+        "total_tokens": 289352,
+        "tool_uses": 120,
+        "duration_seconds": 1725
+      },
+      "scope_note": "The report gives no categories. Whether total_tokens is cumulative across the 120 tool calls or the final turn's context was not established, so it is not mapped to the contract total.",
+      "contract_usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "codex-lane",
+      "source": "codex exec --json event stream, turn.completed usage (one turn)",
+      "native": {
+        "input_tokens": 1132798,
+        "cached_input_tokens": 1015680,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 5130,
+        "reasoning_output_tokens": 1311
+      },
+      "event_items_completed": {
+        "agent_message": 4,
+        "command_execution": 1,
+        "web_search": 14
+      },
+      "scope_note": "Codex input includes cached input; output includes reasoning. Uncached input is 1132798 - 1015680 = 117118; total is input plus output.",
+      "contract_usage": {
+        "uncached_input": 117118,
+        "cache_creation": 0,
+        "cache_read": 1015680,
+        "output": 5130,
+        "reasoning_in_output": 1311,
+        "total": 1137928,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "adjudicator-original",
+      "source": "codex exec run log, final 'tokens used' line",
+      "native": {
+        "tokens_used": 45165
+      },
+      "scope_note": "The log does not show the figure's composition (for example whether cached input is counted), so it is not mapped to the contract total.",
+      "contract_usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "adjudicator-swapped",
+      "source": "codex exec run log, final 'tokens used' line",
+      "native": {
+        "tokens_used": 40307
+      },
+      "scope_note": "As for adjudicator-original.",
+      "contract_usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "adjudicator-reversed",
+      "source": "codex exec run log, final 'tokens used' line",
+      "native": {
+        "tokens_used": 61883
+      },
+      "scope_note": "As for adjudicator-original. This run used a different ChatGPT account from the first two judgments.",
+      "contract_usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "coordinator-convergence",
+      "source": "not measured",
+      "native": {},
+      "scope_note": "The coordinator's packet, adjudication inputs and convergence table were written in the coordinator session; its usage is unknown.",
+      "contract_usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "coordinator-artifact-check",
+      "source": "not measured",
+      "native": {},
+      "scope_note": "Assembly of this evidence, the catalog supplement and the offline checks ran in a coordinator-owned worker whose usage is unknown; the checks themselves call no model.",
+      "contract_usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "whole_task_usage": null,
+  "whole_task_note": "Unknown: the Claude lane, the three judge runs and the coordinator lack complete categories."
+}

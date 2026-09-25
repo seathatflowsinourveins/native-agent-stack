@@ -406,13 +406,30 @@ class RecordHostTests(unittest.TestCase):
         self.assertEqual(exit_code, 2, output)
 
     def test_rejects_a_host_id_containing_the_local_user_name(self):
-        # The id is published as is; one carrying the user name is refused up front with
-        # a clear reason, and nothing is written.
-        with mock.patch.dict(os.environ, {"USER": "ram", "LOGNAME": "ram"}):
-            exit_code, output = self._record(host_id="ramstation-20260101")
-        self.assertEqual(exit_code, 2, output)
-        self.assertIn("local user name", output)
-        self.assertFalse((self.root / "evidence" / "artifacts" / "hw-profiles" / "ramstation-20260101").exists())
+        # The id is published as is; one carrying the user name as a whole token is refused
+        # up front with a clear reason, and nothing is written.
+        for user, host_id in (("ram", "ram-station-20260101"), ("ed", "ed-mbp-20260101"),
+                              ("ed", "mbp-ed-20260101")):
+            with self.subTest(user=user, host_id=host_id):
+                with mock.patch.dict(os.environ, {"USER": user, "LOGNAME": user}):
+                    exit_code, output = self._record(host_id=host_id)
+                self.assertEqual(exit_code, 2, output)
+                self.assertIn("local user name", output)
+                self.assertFalse((self.root / "evidence" / "artifacts" / "hw-profiles" / host_id).exists())
+
+    def test_accepts_a_host_id_with_a_two_letter_user_name_inside_a_word(self):
+        # A two-letter account name is often part of an ordinary word ("ed" in "recorded").
+        # Matched as a substring it refused this id and would have rewritten the entry's label
+        # and evidence path to "record<user>-host-20260101".
+        with mock.patch.dict(os.environ, {"USER": "ed", "LOGNAME": "ed"}):
+            exit_code, output = self._record(host_id="recorded-host-20260101")
+        self.assertEqual(exit_code, 0, output)
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        entry = next(h for h in profiles["hosts"] if h["id"] == "recorded-host-20260101")
+        self.assertEqual(entry["label"], "recorded-host-20260101 (measured)")
+        self.assertEqual(entry["evidence"], "evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json")
+        self.assertNotIn("<user>", json.dumps(entry))
+        self.assertTrue((self.root / entry["evidence"]).is_file())
 
     def test_writes_registered_evidence_and_hosts_entry(self):
         exit_code, output = self._record()

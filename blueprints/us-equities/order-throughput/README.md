@@ -316,7 +316,7 @@ IDs.
 |---|---|
 | `capacity.py` | Engine (`CapacityRun`), configuration and bounds, cancel-all guard, journal and `recover`/`audit`, receipt, CLI |
 | `rate_governor.py` | Token bucket + rolling window + remaining/reset + 429 backoff |
-| `alpaca_capacity_port.py` | Native paper port; reuses adaptive-paper `transport` read-only |
+| `alpaca_capacity_port.py` | Native paper port; reuses adaptive-paper `transport` read-only. Every submit first passes the order-contract boundary (`transport.order_envelope`); a refusal is `not_sent` with error `OrderContractRefused` and reaches no client. Added after the 2026-09-24 native runs, whose receipts bind the older port (`e4c7bd0b...`) |
 | `capacity_fixture.py` | Offline fake clock, broker and `trade_updates` stream |
 | `rate-limit-evidence-20260924.json` | Cited limits, repository-measured header counts, round-trip arithmetic |
 | `rate_limit_evidence.py` | Rebuilds or `--check`s that JSON from the committed trial receipts |
@@ -327,7 +327,7 @@ IDs.
 | Status | What |
 |---|---|
 | Measured (offline fixture) | The governor and engine under 200 and 1000 headers, a header rise, 429 freeze/backoff (including during cleanup), refusals, cleanup, and reconciliation, including a lost response for a created order. Also: per-page listing admission, several in-flight calls completing out of order, the real `ThreadPoolExecutor` path, failing in-flight port calls, and crash then journal recovery. See `tests/test_order_throughput.py`. |
-| Measured (repository files) | 419 trading-origin `x-ratelimit-limit: 200` and 9 data-origin `10000` headers in the retained adaptive-paper trial outputs. |
+| Measured (repository files) | 705 trading-origin `x-ratelimit-limit: 200` and 14 data-origin `10000` headers in the retained adaptive-paper trial outputs. The 2026-09-24 WSL leverage-ladder 1x attempt (`trials/ladder-1x-20260924a-needs-attention`) added 64 and 1, from 641 and 13. Before that, the 2026-09-24 macOS trials (`trials/mac-2026-09-24-*`) added 222 and 4, from 419 and 9. |
 | Measured (native paper, 2026-09-24) | One run at a 200/min trading limit met the frozen capacity criteria, and a coordinator-reported SDK listing (no retained artifact) matches its order counts. One pre-market refusal and one frozen opening-auction run are retained. See "Native paper evidence 2026-09-24". `alpaca_capacity_port.py` ran with alpaca-py 0.44.0 at revision `4911baf`. |
 | Not yet measured | 1000 order actions/min (the account reports `x-ratelimit-limit: 200`), any run with `--stream-timeout` raised, and any other host. |
 | Unverified assumptions | Whether the paper endpoint honours `after_order_id` pagination in practice (it is documented on the Trading API "Get All Orders" reference, updated 2026-05-27, as exclusive and not to be combined with `after`/`until`; adaptive-paper uses the same cursor), exact `trade_updates` event names under load, and Alpaca price-collar behavior for far-from-market limits. |

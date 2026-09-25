@@ -82,7 +82,6 @@ enabled = true
 
 [features]
 hooks = true
-plugin_hooks = true
 
 # Local ecosystem observation; content is removed before collector persistence.
 [otel]
@@ -103,3 +102,4 @@ enabled = true
 [shell_environment_policy.set]
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 RTK_TELEMETRY_DISABLED = "1"
+MCP_AUTO_OPEN_ENABLED = "false"

@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "id": "wsl-authoring-20260923--context-mode--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "wsl-authoring-20260923",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "ae3d3d37377022fe63112dcb10c93c765d6d2601",
+  "recorded_by": {
+    "identity_sha256": "a62650d0061c27ffda78d57ce0387b635234cde41a78ff2b34f0f36a7b2f77c2",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "context-mode",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v context-mode) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c 'import json,sys;print(\"package version:\",json.load(open(sys.argv[1]))[\"version\"])' \"$(dirname \"$(readlink -f \"$p\")\")/package.json\"",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_sha256": "16ee9ba99ba3dfacbc82e4ca8e71549bceafa66e7a2d61def4f9640282c189cf",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/context-mode -> ~/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs\npackage version: 1.0.169\n"
+    },
+    {
+      "cmd": "echo '{}' | context-mode statusline",
+      "exit": 0,
+      "duration_s": 0.253,
+      "output_sha256": "c8bc3ed70c5a497f5b544f345f92ad94a0e7d2ecdfc3be7f3d94802187fbeed7",
+      "output_excerpt": "context-mode  \u25cf  80.0 MB kept out  \u00b7  11.4 MB/day  \u00b7  across 2 tools  \u00b7  preserved across compact, restart & upgrade"
+    },
+    {
+      "cmd": "python3 -c 'import json,glob,os,sys;u=os.environ[\"USER\"];h=os.environ[\"HOME\"];roots=[(\"Native Claude\",h+\"/.claude/context-mode/sessions\"),(\"Native Codex\",h+\"/.codex/context-mode/sessions\"),(\"Desktop WSL\",\"/mnt/c/Users/\"+u+\"/.codex/context-mode/sessions\")];ok=True\nfor n,r in roots:\n  f=max(glob.glob(r+\"/stats-*.json\"),key=os.path.getmtime);d=json.load(open(f));t=d[\"tokens_saved_lifetime\"];ok&=d[\"version\"]==\"1.0.169\" and t>0 and t%256==0;print(n,\"v\"+d[\"version\"],\"tokens_saved_lifetime\",t,\"= events\",t//256,\"x 256\")\nassert ok;print(\"asserted: each newest persisted stats file is v1.0.169, positive, and an exact multiple of 256\")'",
+      "exit": 0,
+      "duration_s": 0.029,
+      "output_sha256": "39b04f69b52e28834b2a5b3e9d725917d3d1636ade8417f4e77ce254892c922c",
+      "output_excerpt": "Native Claude v1.0.169 tokens_saved_lifetime 5422080 = events 21180 x 256\nNative Codex v1.0.169 tokens_saved_lifetime 3558912 = events 13902 x 256\nDesktop WSL v1.0.169 tokens_saved_lifetime 6779136 = events 26481 x 256\nasserted: each newest persisted stats file is v1.0.169, positive, and an exact multiple of 256\n"
+    },
+    {
+      "cmd": "d=$(dirname \"$(readlink -f \"$(command -v context-mode)\")\")/build; grep -n -E '^const TOKENS_PER_EVENT = 256;|lifetimeTokens = \\(life\\?\\.totalEvents \\?\\? 0\\) \\* TOKENS_PER_EVENT;' \"$d/server.js\" && echo \"asserted: installed server computes tokens_saved_lifetime as lifetime totalEvents x 256\"",
+      "exit": 0,
+      "duration_s": 0.003,
+      "output_sha256": "179f840ae26860a8cacdd787ab47cc12d0a913c00226e0a8e6f7df05d8b6be55",
+      "output_excerpt": "905:const TOKENS_PER_EVENT = 256;\n957:                lifetimeTokens = (life?.totalEvents ?? 0) * TOKENS_PER_EVENT;\nasserted: installed server computes tokens_saved_lifetime as lifetime totalEvents x 256\n"
+    }
+  ],
+  "tool_versions": {
+    "context-mode": "1.0.169"
+  },
+  "observed_at_utc": "2026-09-25T18:31:59Z",
+  "result": "pass",
+  "claim": "On host wsl-authoring-20260923 (WSL2 x86_64: Intel Core Ultra 9 275HX, NVIDIA RTX 5090 Laptop GPU; the catalog's WSL authoring laptop), context-mode 1.0.169 (the catalog pin), resolved from the ecosystem PATH, printed its own status line, which reports bytes kept out of context, a per-day rate and a tool count. The newest persisted stats file in each of three runtime roots (native Claude and native Codex on WSL, and the Windows Codex Desktop root read through /mnt/c) is version 1.0.169 with a positive tokens_saved_lifetime that is an exact multiple of 256 (asserted), and the installed server computes that field as lifetime totalEvents times TOKENS_PER_EVENT = 256 (asserted by grep of build/server.js). The lifetime token field therefore counts retained session events at a fixed 256 tokens each; it is not a measurement of bytes kept out of context. All commands exit 0.",
+  "limitations": [
+    "No model session ran and no MCP tool was called. Both figures are upstream estimates, not provider token measurements. The status line's bytes-kept-out figure and the per-root tokens_saved_lifetime use different bases and are not reconciled here, and the three roots are separate scopes that must not be summed.",
+    "The Windows root was read from WSL through /mnt/c; the Windows Codex Desktop client itself was not exercised. The newest file per root is chosen by modification time, and a live session can rewrite it between reads.",
+    "Recorded from a Claude Code session in a git worktree of this repository at catalog_revision (origin/main when this branch started), not a pinned install checkout. The tools are this host's existing installs under ~/.local/share/codex-ecosystem (and, for the client check, the native Claude Code install under ~/.local/share/claude/versions), resolved as the commands show."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T18:31:59Z",
+      "reviewer": {
+        "identity_sha256": "a62650d0061c27ffda78d57ce0387b635234cde41a78ff2b34f0f36a7b2f77c2",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #270 independent session review",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-25T18:49:43Z",
+      "reviewer": {
+        "identity_sha256": "770fed978e9b0044b40247f768fdbb8b35da160b45d4175260e0ecac31999f16",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

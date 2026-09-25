@@ -143,7 +143,7 @@ Every receipt also names one `stage`. Two decide a platform status:
    python3 scripts/host_receipts.py record \
      --host-id <your-host-id-yyyymmdd> \
      --platform-id <linux-wsl2-x86_64|macos-arm64> \
-     --component-id <a manifests/stack.json component id> \
+     --component-id <the winner component_id from docs/component-evidence-matrix.md> \
      --stage use \
      --evidence-class native_proven \
      --cmd "<a command that makes the component do its job>"
@@ -157,7 +157,7 @@ Every receipt also names one `stage`. Two decide a platform status:
    python3 scripts/host_receipts.py record \
      --host-id <your-host-id-yyyymmdd> \
      --platform-id <linux-wsl2-x86_64|macos-arm64> \
-     --component-id <a manifests/stack.json component id> \
+     --component-id <the winner component_id from docs/component-evidence-matrix.md> \
      --stage use \
      --evidence-class native_proven \
      --identity "$identity" \
@@ -166,16 +166,37 @@ Every receipt also names one `stage`. Two decide a platform status:
 
    `--host-id` must match `^[a-z0-9-]+-[0-9]{8}$` (lowercase, digits,
    hyphens, ending in an eight-digit date, for example
-   `my-macbook-20261015`). `--component-id` accepts a `manifests/stack.json`
-   id or a `catalogs/landscape/*.json` `winners[]`/`alternatives[]`
-   `component_id`, including a repository-style id containing `/` (for
-   example `affaan-m/ECC`) or a `candidate:*` alternative id containing `:`
-   (for example `candidate:cli-cli`); `/` and `:` are each percent-escaped to
+   `my-macbook-20261015`). For a component that is a landscape layer winner,
+   pass the winner's `component_id` exactly as the needs-host list in
+   [`docs/component-evidence-matrix.md`](component-evidence-matrix.md) names
+   it (for example `data-alpaca-py`, not `alpaca-py`); use a
+   `manifests/stack.json` id only for a component no layer selects. A receipt
+   binds to a winner only through the winner's own `component_id`, so the
+   recorder refuses (exit 2) a `manifests/stack.json` id whose repository is a
+   winner's repository, naming the winner id and its current pin, and
+   `validate` rejects such a receipt. Receipts recorded under such an alias
+   before that refusal existed stay unchanged: each is grandfathered in
+   `scripts/host_receipts.py` `GRANDFATHERED_ALIAS_RECEIPTS` by path and
+   recorded-claim digest (`claim_sha256`: the receipt without its
+   append-only `reviews`, in canonical JSON; an appended review keeps the
+   exemption, an edited claim loses it and fails `validate`), listed as uncounted alias receipts in the matrix (and reported
+   as informational `stack_alias_grandfathered`, never bound and not flagged,
+   by `scripts/receipt_staleness.py`), and the winner gains that host's
+   evidence only once the host re-records under the winner's `component_id`
+   with the full pin. `--component-id` accepts a `manifests/stack.json` id
+   that is not such an alias, or a `catalogs/landscape/*.json` `winners[]`
+   `component_id`; an id that appears only under a layer's `alternatives[]` is
+   not accepted (`validate` rejects the receipt). An accepted id may be a
+   repository-style id containing `/` (for example `affaan-m/ECC`) or a
+   `candidate:*` winner id containing `:` (for example `candidate:cli-cli`);
+   `/` and `:` are each percent-escaped to
    a distinct, reversible filename token (`/` -> `%2F`, `:` -> `%3A`) only in
    the receipt's filename, never in the `id` field itself, so it stays a flat
    file under `evidence/hosts/<host_id>/` instead of crashing on a `:` a
    filesystem path segment cannot contain. `--from-stack-commands` reuses the
-   component's own documented command(s) from `manifests/stack.json`; add
+   component's own documented command(s) from `manifests/stack.json` (for a
+   winner with no stack entry of its own, such as `data-alpaca-py`, those of
+   the one stack id sharing its repository, here `alpaca-py`); add
    explicit `--cmd "<shell command>"` flags (repeatable) instead or in
    addition when you need a different check. Those documented commands are
    often only `--help` or `--version` checks (for example `ccusage --help`):
@@ -211,9 +232,23 @@ Every receipt also names one `stage`. Two decide a platform status:
    re-records. The
    recorder runs your commands with a bounded timeout,
    sanitizes `$HOME` to `~` and your username to `<user>` in the captured
-   excerpt, writes the receipt under `evidence/hosts/<host_id>/`, and
+   excerpt (the name only as a whole token, so a short one such as `ed` is
+   not cut out of `used`), writes the receipt under `evidence/hosts/<host_id>/`, and
    registers it in `manifests/evidence.json`. It never uploads anything over
-   the network. `--os`/`--architecture` default to the actual host's values
+   the network. A receipt is never overwritten: recording the same
+   host/component/stage again on the same day -- "same day" means the same
+   `yyyymmdd` carried in the receipt's own `id`, not any other clock --
+   refuses (exit 2, naming the existing file and its review kinds/verdicts,
+   and the latest existing generation to supersede) instead of silently
+   erasing it and any appended independent review. Pass `--supersedes
+   <existing-receipt-id>` to record a new receipt for that same
+   host/component/stage/date instead: `--supersedes` must name the *latest*
+   existing generation (superseding an older one while a newer one already
+   exists is refused, naming the actual latest), writes the next free `-N`
+   generation of the base id (for example, once `X-2` exists, superseding it
+   writes `X-3`, not another `X-2`), records `supersedes` in the new
+   receipt, and leaves the original file byte-identical.
+   `--os`/`--architecture` default to the actual host's values
    but can be overridden; nothing in this repository can verify from the
    receipt's JSON alone that a claimed `platform_id`,
    `second_physical_machine` or `os`/`architecture` combination is honest —
@@ -271,11 +306,39 @@ Every receipt also names one `stage`. Two decide a platform status:
 8. **Independent review.** Someone other than the recorder — another agent
    session, the Codex review lane, or a human — reviews the receipt (reads
    the commands and output excerpt, and if practical reproduces at least one
-   command) and appends a review. For a `use` receipt, the reviewer checks
-   that the commands make the component do its job. A help or version call,
-   including one wrapped in a shell, `&&` or a subcommand (`sh -c 'x
-   --version'`, `true && x -V`, `x help sub`), is not use: record
-   `--verdict needs_changes`, which withholds `accepted` (Section 5).
+   command) and appends a review. For a `use` receipt, an `agree` needs all
+   four of these points. #185's receipts met them:
+
+   1. **Layer role.** The commands make the component do the job its layer
+      names, not just run. A server is observed serving, through a query or
+      a request. A build's output is served or used. A verifier's verdict is
+      read.
+   2. **Positive control.** Where a clean result proves nothing (a scanner,
+      a test runner, a linter, a gate), the receipt also shows the component
+      failing on a deliberate fault, as #185's gitleaks fixture does.
+   3. **Backed claims.** Every install, version and pin claim in the receipt
+      has a retained command and its output. A claim with no retained
+      command is unbacked.
+   4. **Bound to the winner.** The receipt's `component_id` is the layer
+      winner's id, and its `tool_versions` match the winner's pin as
+      `scripts/host_receipts.py` `pin_matches` compares them. That comparison
+      normalises first (`v1.5.5` matches `1.5.5`), and it accepts an
+      abbreviation of a full commit id that is 7 or more hex characters
+      long. A receipt recorded under another id binds to nothing.
+
+   A help or version call, including one wrapped in a shell, `&&` or a
+   subcommand (`sh -c 'x --version'`, `true && x -V`, `x help sub`), is not
+   use. Re-running the commands shows that they reproduce, not that they meet
+   the four points, so a reproduce-only check is not an `agree`. When any
+   point fails, record `--verdict needs_changes`, which withholds `accepted`
+   (Section 5), and name the missing point. State in `--ref` what the review
+   itself did:
+   - which commands you re-ran (reproduce-only);
+   - which of the four points you checked (adequacy-checked).
+
+   A later reader can then tell the two apart. #201's seven receipts were
+   agreed after reproduction alone, and were then held at `needs_changes`
+   against these four points (#209).
 
    ```sh
    python3 scripts/host_receipts.py review \

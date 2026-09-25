@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "host-roles-20260925",
+  "description": "Which physical host owns which kind of requested work, and which hosts may ask. Every host signs in as the same GitHub owner account, so a request names its requesting host inside the issue body; that name is routing data, never trust. scripts/host_requests.py reads this file, the issue form .github/ISSUE_TEMPLATE/workstation-request.yml applies the workstation's request_label, and tests/test_host_requests.py keeps every host_id equal to a native_proven hosts[] entry of adoption/hardware-profiles.json. Decision: docs/decisions/2026-09-25-host-request-lane.md.",
+  "roles": {
+    "workstation": {
+      "host_id": "nativestack-5975wx-20260925",
+      "request_label": "host:workstation",
+      "owns": [
+        "memory-e2e",
+        "rag-e2e",
+        "model-hosting",
+        "model-qualification",
+        "gpu-runtime-qualification",
+        "independent-review"
+      ],
+      "credentials": [
+        "huggingface-native"
+      ],
+      "note": "The RTX 4090 and the native Hugging Face sign-in live on this host. credentials[] names status-row ids of adoption/credential-inventory.json (huggingface-native is added by a separate change); it never holds a value or a path."
+    },
+    "mac-coordinator": {
+      "host_id": "mac-coordinator-64gb-20260925",
+      "request_label": "host:mac-coordinator",
+      "owns": [
+        "macos-acceptance",
+        "coordination"
+      ],
+      "credentials": [],
+      "note": "The replacement coordinator Mac."
+    }
+  },
+  "peers": [
+    {
+      "host_id": "nativestack-5975wx-20260925"
+    },
+    {
+      "host_id": "mac-coordinator-64gb-20260925"
+    },
+    {
+      "host_id": "macos-m5pro-20260924",
+      "superseded_by": "mac-coordinator-64gb-20260925",
+      "source": "PR #253 body: 'the replacement coordinator Mac'"
+    }
+  ]
+}

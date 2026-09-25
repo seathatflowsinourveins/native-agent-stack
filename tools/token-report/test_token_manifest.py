@@ -566,6 +566,17 @@ class LedgerContract(unittest.TestCase):
         self.assertEqual(self.db.event_totals()[0]["estimated_saved"],256)
         self.assertEqual(issues,[])
 
+    def test_codex_hook_engine_follows_the_stable_hooks_flag_not_removed_plugin_hooks(self):
+        cases=[({},True),({"features":{}},True),({"features":{"hooks":True}},True),
+               ({"features":{"hooks":False,"plugin_hooks":True}},False),
+               ({"features":{"hooks":True,"plugin_hooks":False}},True),
+               ({"features":{"plugin_hooks":True}},True),({"features":{"codex_hooks":False}},False),
+               ({"features":{"hooks":True,"codex_hooks":False}},True),
+               ({"features":{"hooks":"true"}},False),({"features":"hooks"},True)]
+        for config,expected in cases:
+            with self.subTest(config=config):
+                self.assertIs(m.codex_hooks_enabled(config),expected)
+
     @contextmanager
     def assert_connections_closed(self):
         from unittest.mock import patch

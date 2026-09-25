@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "id": "mover-v3-data-pins",
+  "purpose": "sha256 and byte length of the mover v3 data files as first committed (protocol-core-draft.json freeze_preconditions[2]). This record is not the protocol: the resolution/freeze pull request copies the base-file pins into the protocol (run_discipline.data_files).",
+  "protocol_fields": [
+    "blueprints/us-equities/mover-v3/protocol-core-draft.json#/freeze_preconditions/2",
+    "blueprints/us-equities/mover-v3/protocol-core-draft.json#/run_discipline/data_files",
+    "blueprints/us-equities/mover-v3/protocol-core-draft.json#/populations/session_calendar",
+    "blueprints/us-equities/mover-v3/protocol-core-draft.json#/cost_model/fees"
+  ],
+  "base_files": [
+    {
+      "path": "blueprints/us-equities/mover-v3/data/session-calendar.json",
+      "sha256": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c",
+      "bytes": 514006
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/data/fees-v3.json",
+      "sha256": "f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a",
+      "bytes": 59794
+    }
+  ],
+  "amendment_files": [
+    {
+      "path": "blueprints/us-equities/mover-v3/data/session-calendar-amendments.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/data/fees-v3-amendments.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "amendment_rule": "Append-only: the content pinned here stays a byte prefix of each file (run_discipline.data_files). Both files are empty at this commit. Their line format is the versioned schema at protocol-core-draft.json run_discipline.amendment_format (schema_version 1, validated by study/core/amendments.py; review round 15, amendment-format item). They are not hash-listed in manifests/evidence.json, so appending a line needs no manifest change.",
+  "calendar_generator": {
+    "files": [
+      {
+        "path": "blueprints/us-equities/mover-v3/data-tools/generate_session_calendar.py",
+        "sha256": "c646bcd8deda457e6009e62c3eb507f3295ca9a69cfea209ec19068447923b04"
+      },
+      {
+        "path": "blueprints/us-equities/mover-v3/data-tools/requirements.in",
+        "sha256": "ace5be25b5fc38723a2d5e2ffe6d03b2fa88682e7bcf5306326e169ec68bba24"
+      },
+      {
+        "path": "blueprints/us-equities/mover-v3/data-tools/requirements.lock",
+        "sha256": "96aed792d953c079fd29ed10d711c38c945dd03f240b31cf7b6255d528d3d2a6"
+      }
+    ],
+    "regenerate": "cd blueprints/us-equities/mover-v3/data-tools && uv venv --python 3.12 .venv && uv pip sync --python .venv/bin/python --require-hashes requirements.lock && .venv/bin/python generate_session_calendar.py --check",
+    "byte_identical_runs_2026_09_24": [
+      "macOS arm64, CPython 3.13.15 with data-tools/requirements.lock",
+      "macOS arm64, CPython 3.14.7 with data-tools/requirements.lock",
+      "macOS arm64, CPython 3.13.15 with blueprints/us-equities/data/requirements.lock (same versions and hashes for every package the generator imports)"
+    ]
+  },
+  "calendar_summary": {
+    "calendar": "XNYS",
+    "exchange_calendars": "4.13.2",
+    "tzdata": "2026.4 (IANA 2026d)",
+    "requested_range": [
+      "2015-09-01",
+      "2030-12-31"
+    ],
+    "first_session": "2015-09-01",
+    "last_session": "2030-12-31",
+    "session_count": 3854,
+    "early_close_count": 34,
+    "early_closes_2016_2020": [
+      "2016-11-25",
+      "2017-07-03",
+      "2017-11-24",
+      "2018-07-03",
+      "2018-11-23",
+      "2018-12-24",
+      "2019-07-03",
+      "2019-11-29",
+      "2019-12-24",
+      "2020-11-27",
+      "2020-12-24"
+    ]
+  },
+  "holdout_reach": {
+    "sessions_needed_after_freeze_session": 432,
+    "derivation": "N0 is the 40th session after the freeze session; the holdout is 252 sessions from N0 plus at most two 63-session extension blocks, so its last possible session is the freeze session + 417; the mandatory read is due within 15 sessions after that (chronology.holdout.read_timing): freeze session + 432.",
+    "latest_freeze_session_covered": "2029-04-12",
+    "note": "A freeze after this session needs the calendar regenerated with a later end before the freeze. Each session removed by an amendment moves the needed end one session later."
+  },
+  "fees_summary": {
+    "coverage_from": "2017-01-01",
+    "retrieved_at": "2026-09-24",
+    "sec_section31_rows": 11,
+    "finra_taf_rows": 10,
+    "unverified_periods": []
+  }
+}

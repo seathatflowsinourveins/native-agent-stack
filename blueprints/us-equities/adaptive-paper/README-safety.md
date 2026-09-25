@@ -62,18 +62,46 @@ limit-order mechanism guarantees a flat finish.
   that no HTTP request was sent; a timeout or other ambiguous send must remain
   unresolved and be queried by its existing client ID. Observed orders cannot
   be marked not sent, and a later broker observation of such an ID fails closed.
-- `mark_broker_refused(client_id, http_status)` records distinct local terminal
+  The transport's pre-submission order-contract boundary (`README-transport.md`)
+  is one such definitive pre-send refusal: `Controller.bind` passes its reason
+  `order_contract_refused`, so the ledger records a local `not_sent`, never
+  `broker_refused`. Other not-sent refusals seen by `bind` keep `transport_proven_not_sent`.
+- `mark_broker_refused(client_id, http_status, refusal=None)` records distinct local terminal
   status `broker_refused` for an attempted zero-fill order without broker ID.
   Only HTTP 401/403/404 qualify, and transport must first establish that the
   subsequent client-ID lookup returned 404. It retains the HTTP status and budget.
-  Timeout, 400, 422, 429 and 5xx remain ambiguous. Neither local terminal status is
+  Timeout, 400, 422, 429 and 5xx remain ambiguous, with one exception that Alpaca's
+  documentation proves definitive: a 422 whose `refusal` is `SUB_PENNY_REFUSAL`
+  (`"sub_penny_minimum_price_variance"`), which the transport assigns only to the
+  documented body code 42210000 with "sub-penny increment does not fulfill minimum
+  pricing criteria" (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md: such
+  orders "will be rejected"). That page documents the body, not the HTTP status;
+  the 422 was inferred from the code prefix and the POST /v2/orders 422 entry. It
+  was observed once on the paper endpoint in the 2026-09-24 native-fault run
+  (`native-faults/receipt.json`, C04: submit 422, then lookup 404). The same body
+  under any other status still stays ambiguous. The message, not the code, is the discriminator. The ledger also requires the intent's own durable
+  limit price to violate the minimum price variance (`refusal_contradicts_intent_price`
+  otherwise). Any other 422, including "client_order_id must be unique", stays
+  ambiguous. `reserve_intent` still refuses such a price before send
+  (`invalid_price_increment`, via the overridable `_check_price_increment`); only
+  the native-fault harness's `FaultLedger` exempts its single C04 client ID (its
+  `FaultTransport` exempts the same ID, and only its price increment, from the
+  transport's order-contract boundary, which otherwise refuses such a price too).
+  Neither local terminal status is
   adopted or looked up as a broker order on restart; any later broker observation
   of the identity fails closed.
 - `record_order(client_id, broker_id, status, cumulative_qty, average_price, *,
-  timestamp=None)` applies owned broker observations and returns whether state
-  changed. Cumulative quantity decreases are stale and ignored. Duplicate fills
-  are idempotent; contradictory identity, average price or terminal state fails.
-  Later partial fills cannot reverse an observed pending-cancel status.
+  timestamp=None, execution=None)` applies owned broker observations and returns
+  whether state changed. Cumulative quantity decreases are stale and ignored. Duplicate
+  fills are idempotent; contradictory identity, average price or terminal state fails.
+  Later partial fills cannot reverse an observed pending-cancel status. `execution`
+  (`execution_from_observation`: the one execution a stream fill carries, its
+  `execution_id`, `qty` and `price`) is recorded durably in the `executions` table,
+  keyed by the cumulative quantity after it, even when a REST read already advanced the
+  cumulative quantity. A repeat is a no-op; the same key or id with other values, an
+  overlapping execution, or an execution price beyond the order's limit fails
+  (`execution_conflict_requires_reconciliation`, `execution_overlap_requires_reconciliation`,
+  `incremental_fill_violates_limit`).
 - `request_budget(now, kind, client_id=None)` supports `submit`, `read`, `cancel`
   and `data_read`. Zero means an attempt was durably reserved. A positive delay
   means nothing was reserved: wait within the caller's remaining deadline, then
@@ -109,8 +137,15 @@ are created privately; journal directory metadata is fsynced at initialization.
 No account IDs, keys or secret headers are stored. Retain the account database
 across process restarts; a new database would lose budget and risk continuity.
 
-Fill cost uses `new cumulative quantity * new average - old cumulative quantity *
-old average`, not the latest average multiplied by the fill delta. Cost basis uses weighted
+Fill cost uses the recorded executions' own prices whenever they tile the cumulative
+advance (`booking: executions` on the `order_observed` event), each checked against
+the limit. Otherwise (a REST read ahead of the stream, a missing or reordered
+execution) it uses `new cumulative quantity * new average - old cumulative quantity *
+old average` (`booking: cumulative_average`), not the latest average multiplied by the
+fill delta; that derived notional is checked against the limit only beyond Alpaca's
+6-decimal average rounding (0.5e-6 USD per share of both quantities), so a rounded
+average at the limit no longer freezes, and the booked notional then differs from the
+executions' by at most that rounding. Cost basis uses weighted
 average inventory accounting. `cash_delta_usd` is the exact sum of observed gross
 buy/sell cash flows; broker fees and other account activity require independent
 reconciliation. `cumulative_realized_loss_usd` accumulates losing realized deltas;
@@ -166,8 +201,9 @@ schedule/ladder contract and
 for the design record. Leverage above 1x is paper-only, requires a
 preflight-proven account multiplier at least equal to the requested
 leverage (`runner._check_margin_entitlement`), and remains unqualified
-until each rung's `leverage-ladder-1x/2x/4x` gate row shows
-`needs_attention == 0`.
+until each rung's `leverage-ladder-1x/2x/4x` gate row's flip condition holds:
+`needs_attention == 0` and achieved exposure above the rung's threshold (see
+the gate-condition paragraph below).
 
 F2 (2026-09-22 residual review, reachability): a rung's `max_leverage`,
 schedule cells and drawdown ladder establish the safety **envelope** in
@@ -199,11 +235,52 @@ sizing math, which stay a ceiling, not a target, per
 `agent-lab/docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md`.
 A rung's gate row is not, by itself, evidence that the rung's exposure was
 ever achieved -- that evidence is this recorded achieved-leverage receipt.
-No gate row in `catalogs/us-equities/gates-20260922.json` currently reads
-`peak_achieved_leverage`/`seconds_above_next_lower_rung_ceiling`, so a gate
-row can still flip to established on a receipt whose achieved exposure never
-exceeded a lower rung's own ceiling; the rung configs' `notes` have been
-corrected to say so instead of claiming the opposite.
+
+Gate condition (2026-09-24, audit gap #5): until this date no gate row read
+`peak_achieved_leverage`/`seconds_above_next_lower_rung_ceiling`, so a rung
+could flip on `needs_attention == 0` alone from a trial whose achieved
+exposure never exceeded the next-lower rung's cap. Each
+`leverage-ladder-1x/2x/4x` row's `flip_condition` is now an `all_of`
+(`scripts/trading_gates.py` gained `all_of` and a `greater_than` comparison
+that reads the runner's decimal strings and JSON numbers exactly) over the
+rung receipt preregistered in the gate note -- `{"schema_version": 1,
+"kind": "leverage_ladder_rung_receipt", "rung", "needs_attention",
+"source": {"paper_output_path", "paper_output_sha256",
+"certified_run_status"}, "leverage"}`, where `leverage` is the certified
+run's `paper-output.json` `leverage` block copied verbatim: the receipt's
+`schema_version`, `kind` and `rung`, `/needs_attention == 0`,
+`/source/certified_run_status == "passed"`, a `source_matches` binding (the
+named in-tree `paper-output.json` must hash to the recorded sha256 and its
+`/leverage` and `/status` must equal the receipt's `/leverage` and
+`/source/certified_run_status` exactly, so the leverage block and the passed
+status come from one hashed run; fix round 2026-09-24),
+`/leverage/config_max_leverage` equal to the rung, `/leverage/
+next_lower_rung_ceiling` equal to the rung's threshold,
+`/leverage/peak_achieved_leverage` greater than it and
+`/leverage/seconds_above_next_lower_rung_ceiling` greater than 0. The
+thresholds are 1x for the 2x rung and 2x for the 4x rung; the 1x rung has no
+lower rung, so `leverage.next_lower_rung_ceiling(1)` now returns the
+documented minimum exposure `leverage.ONE_X_MINIMUM_EXPOSURE` (0.5x; the 1x
+config's entry budget permits up to 0.9x) instead of `None`, and the 1x
+receipt's `seconds_above_next_lower_rung_ceiling` accumulates above 0.5x. It
+is a receipt threshold, not a sizing target. `tests/test_trading_gates.py`
+(`LeverageLadderFlipConditionTests`) and `tests/test_adaptive_paper_runner.py`
+(`AchievedLeverageGateTraceTests`, which folds per-tick traces through
+`runner._leverage_achievement_step`) show that a clean trial that never
+exceeds the lower cap does not satisfy its rung. These are offline unit tests
+(synthetic receipts and traces); no paper trial was run for this change and no
+rung receipt exists yet. Limits: `seconds_above_next_lower_rung_ceiling` is a
+per-tick approximation, and no minimum duration above the threshold is set --
+any positive time satisfies the checker, so how long the rung was used is
+judged at the manual qualification before a dated flip commit.
+`needs_attention` counts every run at the rung and is not bound to the
+hashed file, so it too is checked against the rung's trial directories at
+that qualification. The binding needs the certified `paper-output.json`
+committed in the tree; it proves the receipt matches those bytes, not that
+the bytes came from a real broker session. `runner.py`
+was left byte-identical so the native-fault receipt's engine-source binding
+still holds; its inline comments that say the 1x threshold is `None` and that
+no gate row reads these fields predate this change and are superseded here.
 
 2026-09-22 leverage fix round 1 (LEV-RI-A/CX-P1/EH-1/CX-P2, all `major`/
 `blocker` findings against G-e/F2): `strategies_v1._decide_core`'s
@@ -239,3 +316,57 @@ Run `python3 -m unittest discover -s tests -p test_adaptive_paper_safety.py -v` 
 the synthetic local failure cases. These checks establish local state invariants,
 not native broker throughput, fault behavior, order fills, or strategy quality.
 `tests/test_adaptive_paper_leverage.py` covers `leverage.py` itself.
+
+## Financing costs (modeled)
+
+`financing.py` (pure, Decimal, no I/O, same style as `leverage.py`) models the
+margin-interest cost of an overnight hold. Sources (fetched 2026-09-25):
+
+* Alpaca, "Margin and Short Selling"
+  (https://docs.alpaca.markets/docs/margin-and-short-selling): annual margin
+  interest rate 5.00% for Elite users, 6.50% for non-Elite (`financing.
+  MARGIN_RATES`, a frozen snapshot -- check the "Alpaca Securities Brokerage
+  Fee Schedule" for the current rate); charged only on the end-of-day
+  (overnight) **settlement-date** debit balance: `daily_margin_interest_charge
+  = settlement_date_debit_balance * rate / 360`; accrues daily, posts at
+  month end. A settlement-date debit balance at the end of day Friday incurs 3
+  days of interest (Fri, Sat, Sun), since no trade settles over the weekend.
+* Alpaca, "Paper Trading" (https://docs.alpaca.markets/docs/paper-trading):
+  paper does not simulate regulatory fees or dividends; its "Paper vs Live"
+  table marks Borrow Fees "Coming Soon"; it does not say whether paper posts
+  margin interest at all.
+
+**Settlement convention:** `financing.settlement_date` is T+1, the next NYSE
+*trading* day (`sessions.next_trading_day`) -- not the separate SIFMA
+bank/securities-settlement calendar, so a bank holiday on which NYSE is open
+(e.g. Columbus Day, Veterans Day) is treated as a normal settlement day here,
+though real DTCC settlement does not occur on those days. `financing.
+overnight_financing_projection` projects the cost of holding the *current*
+book until it is sold at the next trading session: the buys settle T+1, that
+next-session sale settles T+2, and the financed days are the calendar days
+between those two settlement dates. `settled_cash_usd` is the settled cash
+available *before* buying the current book (e.g. the trial's starting
+capital), not a post-buy running-cash figure -- kept deliberately simple and
+documented in the function's own docstring rather than reconstructing an
+intraday settled-cash trajectory.
+
+**Not modelled:** borrow/short-locate fees, dividends, and (per the
+settlement-convention paragraph above) bank-holiday settlement gaps.
+
+**Not reconciled against paper.** Alpaca's paper-trading docs do not confirm
+whether paper posts margin interest at all, so every figure this module
+produces is a projection, never a broker read. `runner.py`'s `run_native` adds
+an outcome `"modeled_financing"` block (`"evidence_class": "modeled"`, with an
+explicit "not reconciled" note) only when a run ends `"held_overnight"` under
+`session_policy["overnight_holds"]` -- every shipped config leaves
+`overnight_holds` `False`, so no existing config's outcome gains this key; see
+`runner._finalize_status_and_financing`/`_modeled_financing_block`. The
+optional top-level config key `"financing_plan"` (`"standard"` or `"elite"`,
+default `"standard"`) selects the rate plan and is validated in
+`runner.load_config` exactly like the other opt-in feature keys above -- any
+other value is refused.
+
+`tests/test_adaptive_paper_financing.py` covers `financing.py` itself
+(stdlib only, runs on system Python); the "no key when `overnight_holds` is
+False" integration case lives in `tests/test_adaptive_paper_runner.py`
+alongside the other `_run_native_status`/`_honest_overnight_hold` tests.

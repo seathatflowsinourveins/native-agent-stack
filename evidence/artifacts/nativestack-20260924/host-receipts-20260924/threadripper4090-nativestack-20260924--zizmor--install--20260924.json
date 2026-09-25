@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--zizmor--install--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "7c211addc2b53b0532f64de8910730601b2fde7a",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "zizmor",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "zizmor --version",
+      "exit": 0,
+      "duration_s": 0.019,
+      "output_sha256": "8cfc3f0c3c0ae916a8a78253f6057469baa07a95c8bc6fa7a0589bad2bfd3c53",
+      "output_excerpt": "zizmor 1.30.1\n"
+    }
+  ],
+  "tool_versions": {
+    "zizmor": "1.30.1"
+  },
+  "observed_at_utc": "2026-09-24T04:27:53Z",
+  "result": "pass",
+  "claim": "Installed native Zizmor version.",
+  "limitations": [
+    "A version or metadata check does not establish functional acceptance. Separate native command evidence and failures are retained."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:27:53Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}
