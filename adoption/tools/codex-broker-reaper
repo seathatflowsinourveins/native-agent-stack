@@ -49,10 +49,16 @@ recorded state rather than assumed --
       subdirectory of the actual live session's own cwd rather than the
       git checkout root that session started from; this guard also checks
       the workspace root's nearest `.git`-bearing ancestor (if any) for a
-      live session, which covers that case when the live session's own cwd
-      is that checkout root, but not every possible cwd a live session
-      could have relative to the workspace (see docs/decisions/
-      2026-09-25-codex-broker-reaper.md, "Known limitations"). Also checks
+      live session, with the same "equal to or under" test this guard
+      already applies to the plain workspace root -- so it finds a live
+      session anywhere in that checkout, including some OTHER subdirectory
+      than the broker's own workspace cwd, not only when the live
+      session's own cwd is the checkout root exactly (corrected here,
+      fourth fix round, 2026-09-25: an earlier version of this docstring
+      understated this coverage). What it does not cover is a live session
+      with no git relationship to the workspace's checkout at all (see
+      docs/decisions/2026-09-25-codex-broker-reaper.md, "Known
+      limitations"). Also checks
       the *other* checkout a `git worktree` workspace belongs to (fix
       round, 2026-09-25, `read_worktree_parent_root`): a workflow-child
       worktree's broker is spawned with the worktree itself as its cwd, but
@@ -104,9 +110,16 @@ recorded state rather than assumed --
       other way. A workspace with no job carrying any parseable timestamp
       (never ran a job at all) has no signal here and this guard passes
       trivially, leaving guard (d) as the sole age signal for that case --
-      exactly guard (d)'s own pre-fix-round behavior, and still the
-      residual gap for a live session whose worktree broker has not yet
-      run its first job (see "Known limitations").
+      exactly guard (d)'s own pre-fix-round behavior. Stated generally
+      (corrected here, fourth fix round, 2026-09-25: an earlier version of
+      this docstring scoped the residual gap only to a broker that has
+      never run a job): once no live claude/codex process has a cwd under
+      guard (c)'s three scanned roots, ANY broker -- not only one that has
+      never run a job -- becomes eligible as soon as `--min-age` has
+      elapsed since its own newest job activity (or since process start,
+      for one that never ran a job); a broker that ran one job and then
+      went quiet for `--min-age` reaches this guard the same way one that
+      never ran a job reaches guard (d) alone (see "Known limitations").
 
 Action on an eligible broker: send the `broker/shutdown` JSON-RPC
 (`{"id":1,"method":"broker/shutdown","params":{}}\n`) over its unix socket

@@ -449,7 +449,7 @@ rather than assumed:
 | --- | --- |
 | (a) pid/cmdline | `/proc/<pid>/cmdline` still names `app-server-broker.mjs serve` with the exact recorded `--endpoint` (guards pid reuse, upstream #743) |
 | (b) no active jobs | no job in the workspace's `state.json` has a status outside `{completed, failed, cancelled}`; an unrecognized status blocks reaping rather than being treated as safe |
-| (c) workspace unused | the workspace directory (read from the broker's own live `/proc/<pid>/cwd`) no longer exists, or no live `claude`/`codex` process — other than the broker's own descendants, e.g. its `codex app-server` child — has a cwd equal to or under it, under its nearest git checkout root, or under the *other* checkout a `git worktree` workspace belongs to (see the decision doc's "Known limitations" for what these checks do and do not cover) |
+| (c) workspace unused | the workspace directory (read from the broker's own live `/proc/<pid>/cwd`) no longer exists, or no live `claude`/`codex` process — excluding every live broker's own process subtree (e.g. each one's `codex app-server` child), not only the broker being evaluated, host-wide — has a cwd equal to or under it, under its nearest git checkout root, or under the *other* checkout a `git worktree` workspace belongs to (see the decision doc's "Known limitations" for what these checks do and do not cover) |
 | (d) old enough | the broker process (from `/proc/<pid>/stat`'s `starttime`, not a file mtime) is older than `--min-age` (default 1800s) |
 | (e) job-idle | the workspace's most recent recorded job activity (`state.json` jobs[]' `updatedAt`/`completedAt`/`createdAt`/`startedAt`) is at least `--min-age` in the past too — not just the broker process's own age; a workspace that has never run a job has no signal here and this guard passes trivially |
 
@@ -485,8 +485,8 @@ name, not the script's, simply because `python3` is the binary actually
 running — checked by hand against the real `claude` binary before writing
 the suite). No real broker, no
 real Claude Code or Codex session, and no plugin state directory on any host
-is read or touched by the tests. 40 tests as of the 2026-09-25 fix round
-(second pass): guard (e) job-idle timing, the worktree-to-parent check
+is read or touched by the tests. 43 tests as of the 2026-09-25 fix round
+(fourth pass): guard (e) job-idle timing, the worktree-to-parent check
 (a hand-written `.git` `gitdir:` pointer file, no real `git worktree`
 needed), `path_is_under`'s filesystem-root case, malformed broker.json/
 state.json (non-object JSON, non-UTF-8 bytes) evaluating to an ineligible

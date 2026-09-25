@@ -4,11 +4,26 @@
 Claude Code plugin (installed under `~/.claude/plugins/cache/openai-codex/`)
 leaves running after a crashed session or an abandoned workflow-child
 worktree. This is not an unconditional guarantee that no broker a live
-session owns is ever touched: "Known limitations" below discloses one
-residual gap (a worktree broker that has never yet run a single job, whose
-only live coordinator is a separate driver repository with no git
-relationship to the worktree at all, is protected only by guard (d)'s plain
-process age). The tool is
+session owns is ever touched: stated precisely (corrected here, fourth fix
+round, 2026-09-25 — an earlier version of this line scoped the residual gap
+only to a broker that has never run a job), any broker becomes eligible once
+its newest recorded job activity is at least `--min-age` old (guard (e); a
+broker that has never run a job at all has only guard (d)'s plain process
+age as a signal), PROVIDED no live `claude`/`codex` process has a cwd under
+its workspace root, that workspace's git toplevel, or that toplevel's
+worktree parent — guard (c)'s three scanned roots. This is a real gap, not
+only a "never ran a job" edge case: e.g. a coordinator whose own OS process
+cwd was never under any of those three roots at all (a separate driver
+repository with no git relationship to the checkout, or one that only ever
+dispatches into a worktree via `cd <worktree> &&` without changing its own
+cwd) started outside the checkout 30 minutes after triggering a
+`/codex:review` leaves that review's broker eligible once the review's job
+reaches a terminal status and `--min-age` passes with no further job
+activity, even though the coordinator itself is still live. A session in
+some OTHER subdirectory of the SAME checkout, by contrast, IS covered:
+guard (c)'s git-toplevel check scans for a live cwd anywhere under that
+checkout root, not only at the root itself. "Known limitations" below has
+the full detail. The tool is
 [`../../adoption/tools/codex-broker-reaper`](../../adoption/tools/codex-broker-reaper),
 its tests are
 [`../../tests/test_codex_broker_reaper.py`](../../tests/test_codex_broker_reaper.py),
@@ -164,11 +179,20 @@ hand over the `broker/shutdown` RPC, which worked cleanly.
   cwd (`executeTaskRun`, `codex-companion.mjs`). Mitigated (fix round,
   2026-09-25): guard (c) also checks the workspace root's nearest
   `.git`-bearing ancestor (walked with pure stdlib `os.path`, no `git`
-  binary dependency) for a live session, which covers the case where that
-  live session's own cwd is the checkout root. It does not cover every
-  possible cwd a live session could have relative to the workspace (e.g. a
-  session itself running from some other subdirectory of the same
-  checkout); regression test:
+  binary dependency) for a live session. Corrected here (fourth fix round,
+  2026-09-25): an earlier version of this bullet understated that
+  mitigation, claiming it covers only a live session whose own cwd IS the
+  checkout root exactly. `find_live_session_under` applies the same "equal
+  to or under" test to the checkout root that guard (c) already applies to
+  the plain workspace root (`path_is_under`), so it finds a live session
+  anywhere in that checkout — including some OTHER subdirectory than the
+  broker's own workspace cwd, not only the root itself. What this check
+  does NOT cover is a live session with no git relationship to the
+  workspace's checkout (its main checkout or any of its worktrees) at all —
+  see the "coordinator with no git relationship" and "one live session in a
+  main checkout" bullets below, and the Scope line above for the general
+  condition under which that residual gap actually makes a broker eligible.
+  Regression test:
   `LiveCwdGuardTests.test_review_broker_in_a_git_subdirectory_is_blocked_by_a_session_at_the_checkout_root`
   in `tests/test_codex_broker_reaper.py`.
 - **Guard (b), crash-orphaned jobs:** a job's status only ever leaves
@@ -197,14 +221,19 @@ hand over the `broker/shutdown` RPC, which worked cleanly.
   launched from a *separate* driver repository (this rollout's own
   `agent-lab`, unrelated by git ancestry to the `codex-broker-reaper`
   worktree it was dispatching this very fix into) has no cwd-based signal
-  under any of guard (c)'s checks at all. Mitigated, not fully closed, by
-  guard (e) (below): a session that periodically runs *codex jobs* in that
-  workspace keeps resetting the job-activity clock even though no live
-  process's cwd is ever under the workspace itself. A worktree broker that
-  has never yet run a single job (empty `jobs[]`, so guard (e) has no
-  timestamp signal either) and whose only live coordinator is entirely
-  git-unrelated to it is not reliably protected by any guard here beyond
-  guard (d)'s plain process age — this is the same shape of gap as the
+  under any of guard (c)'s checks at all. Mitigated, but only ever a delay,
+  not a fix, by guard (e) (below): a session that keeps running *codex jobs*
+  in that workspace at least once every `--min-age` resets the job-activity
+  clock each time, even though no live process's cwd is ever under the
+  workspace itself. Stated generally (corrected here, fourth fix round,
+  2026-09-25 — an earlier version of this bullet scoped the residual gap
+  only to a broker that has never run a job): once its coordinator is
+  entirely git-unrelated to it, ANY broker whose most recent job activity is
+  at least `--min-age` in the past becomes eligible, whether or not that
+  broker ever ran a job at all — a broker that ran one job and then went
+  quiet for `--min-age` reaches this guard the same way one that never ran a
+  job reaches guard (d) alone; only a job cadence *inside* `--min-age` keeps
+  guard (e) failing indefinitely. This is the same shape of gap as the
   subdirectory case above, disclosed rather than guessed at a further fix.
 - **Guard (c), one live session in a main checkout blocks every worktree
   broker of that repository.** The worktree-to-parent check
@@ -661,3 +690,88 @@ summarizes.
   only the four commands above, and this round's diff is confined to
   `adoption/tools/codex-broker-reaper`, `tests/test_codex_broker_reaper.py`,
   and this decision record.
+
+## Fix round (2026-09-25, fourth pass)
+
+A review of c039da1b (the post-rebase HEAD) found three minor findings,
+resolved here; see the tool's own docstring, `tests/test_codex_broker_reaper.py`,
+and `adoption/tools/README.md` for the code-level detail this section
+summarizes. No guard's evaluation logic changed in this round -- every fix
+here is a documentation, test-hermeticity, or evidence-pin correction.
+
+- **Minor — Scope and two "Known limitations" bullets understated the
+  live-session-protection gap.** The Scope line (top of this record) scoped
+  the residual live-session gap narrowly to "a worktree broker that has
+  never yet run a single job", and the guard (c) coordinator-with-no-git-
+  relationship bullet made the same narrow claim; separately, the guard (c)
+  review-triggered-brokers-in-a-subdirectory bullet understated its own
+  mitigation as covering only a live session whose own cwd IS the checkout
+  root exactly. Neither was accurate: guard (e) only requires `--min-age`
+  since the most *recent* job, not since the workspace was first used, so
+  ANY broker -- not only one that never ran a job -- becomes eligible once
+  its coordinator has no cwd under any of guard (c)'s three scanned roots
+  (workspace root, git toplevel, worktree parent) and `--min-age` has
+  passed since that broker's own newest job activity (guard (d) alone
+  governs only the never-ran-a-job case); and the git-toplevel check's
+  `find_live_session_under` already applies the same "equal to or under"
+  test to the checkout root that the plain workspace-root check applies, so
+  it finds a live session anywhere in that checkout, not only exactly at
+  the root. Fixed: Scope now states the general condition directly, with
+  the concrete example this round's own brief named (a coordinator started
+  outside the checkout 30 minutes after triggering a `/codex:review`); both
+  "Known limitations" bullets are corrected to match; and the tool's own
+  module docstring (guard (c)'s and guard (e)'s entries) is corrected the
+  same way, so the two documents stay consistent.
+- **Minor — guard (c) tests depended on this host's own real broker
+  population.** Every `LiveCwdGuardTests` test that reaches guard (c) calls
+  `evaluate_broker()`, which calls the tool's own real
+  `find_live_broker_pids()` -- a scan of this HOST's actual `/proc` for
+  every live `app-server-broker.mjs`, not only that test's own fixtures.
+  This host already runs real openai-codex brokers (17, per the Context
+  section above), and this rollout's own coordinator dispatches through
+  `/codex:review`, so this very test process can itself be a live
+  descendant of one of them; a real ancestor broker's own descendant set
+  would then be excluded from guard (c)'s scan too, which can include this
+  suite's own spawned fixtures, silently hiding a fixture a test means to
+  prove BLOCKS eligibility. Fixed: `LiveCwdGuardTests.setUp` now patches
+  `find_live_broker_pids` to filter its real result down to that test's own
+  spawned pids (`self._procs`) before guard (c) ever sees it. Regression
+  test:
+  `LiveCwdGuardTests.test_find_live_broker_pids_is_restricted_to_this_tests_own_fixtures`
+  (a second fake broker, deliberately dropped from `self._procs` to stand
+  in for an unrelated real host broker, is confirmed found by the
+  unpatched scan and confirmed absent from the patched one). The test
+  module's own docstring is corrected to disclose this real-host `/proc`
+  read (never a write) rather than claim no real broker is ever read by the
+  suite.
+- **Minor — `adoption/tools/README.md`'s guard (c) row and test count had
+  fallen behind the tool and the suite.** The guard (c) table row still
+  said the evaluated broker's own descendants alone were excluded, stale
+  since the third fix round's major finding (above) made this exclusion
+  host-wide, across every live broker, not only the one being evaluated;
+  and the "40 tests... (second pass)" figure had not been updated for the
+  third pass's two new tests or this round's own new one. Fixed: the guard
+  (c) row now says every live broker's own process subtree is excluded
+  host-wide; the count now reads "43 tests... (fourth pass)", matching
+  `grep -c "def test_" tests/test_codex_broker_reaper.py` exactly.
+  `manifests/evidence.json` re-pinned for this file alone (sha256 + bytes
+  only -- `git diff` confirmed no other entry or line changed, so
+  `json.dumps(..., indent=2)`'s default `ensure_ascii=True` escaping
+  elsewhere in the file is untouched).
+- **Re-measured (fourth pass):** `python3 -m unittest
+  tests.test_codex_broker_reaper -v` (43 tests, all passing -- 42 before
+  this round's 1 new regression test); `python3
+  adoption/tools/codex-broker-reaper --list` against this host's real
+  plugin state (still 17 found, 0 eligible, all refused at guard (a) before
+  guard (c) is reached -- unchanged from every earlier round, since this
+  round touches no guard-evaluation code); `python3 scripts/validate.py`
+  (`{"components": 69, "hashed_files": 5402, "profiles": 4, "receipts":
+  145, "status": "passed"}`, exit 0 -- confirms the `manifests/evidence.json`
+  re-pin above matches the edited README exactly) and `python3
+  scripts/validate_foundation.py` (`FOUNDATION catalog valid: layers=20,
+  decisions=54, foundation_components=61, domain_components=7,
+  evidence_receipts=84, candidates=3`, exit 0), both re-run directly
+  against this round's own commits. This round's diff is confined to this
+  decision record, the tool's own module docstring,
+  `tests/test_codex_broker_reaper.py`, `adoption/tools/README.md`, and the
+  `manifests/evidence.json` re-pin named above.

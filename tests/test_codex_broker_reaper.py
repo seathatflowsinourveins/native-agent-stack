@@ -11,9 +11,9 @@ checked by hand against the real ~/.local/bin/claude binary before writing
 this suite; corrected in the 2026-09-25 fix round, see the tool's own
 `is_claude_or_codex_process` docstring for why -- it is not shebang
 rewriting). No real broker, no real Claude Code or Codex session, and no
-plugin state directory on this host is read or touched: every
-state/workspace directory is a fresh tempfile.mkdtemp(), and
-`--state-root`/direct function calls always point at that synthetic tree.
+plugin state directory on this host is ever acted on: every state/workspace
+directory is a fresh tempfile.mkdtemp(), and `--state-root`/direct function
+calls always point at that synthetic tree.
 
 This suite spawns real processes and reads their live /proc/<pid> state
 (cmdline, comm, cwd, stat, uptime) plus sets a process's name with
@@ -22,6 +22,27 @@ LINUX_ONLY below (precedent: tests/test_adoption_bootstrap.py's
 LINUX_X86_64_ONLY, applied there per-method since only some of that file's
 tests are platform-specific -- applied here per-class since this whole
 suite is).
+
+Disclosed, fixed exception (fourth fix round, 2026-09-25), not hidden: every
+`LiveCwdGuardTests` test that reaches guard (c) calls `evaluate_broker()`,
+which calls the tool's own real `find_live_broker_pids()` -- a scan of this
+HOST's actual `/proc` for every live `app-server-broker.mjs`, not only this
+test's own fixtures. An earlier version of this suite left that scan
+unrestricted, so a real broker already running on this host (this rollout's
+own host was, 17 found, docs/decisions/2026-09-25-codex-broker-reaper.md),
+or, worse, a live ancestor of this very test process (a coordinator
+dispatching through `/codex:review` is itself a live broker's ancestor;
+verified directly against this rollout's own process during review, not
+only reasoned about), would have that real broker's own descendant set --
+which can include this test process itself, and so every fixture it
+spawned -- excluded from guard (c)'s live-session scan too, silently
+swallowing a fixture a test means to prove BLOCKS eligibility. Fixed:
+`LiveCwdGuardTests.setUp` patches `find_live_broker_pids` to filter its real
+result down to this test's own spawned pids (`self._procs`) before guard
+(c) ever sees it, so every test in that class stays hermetic regardless of
+what else this host, or this test process's own ancestry, happens to be
+running; see `test_find_live_broker_pids_is_restricted_to_this_tests_own_fixtures`
+for a direct proof the patch itself does what it claims.
 """
 from __future__ import annotations
 
@@ -43,6 +64,7 @@ from datetime import datetime, timezone
 from io import StringIO
 from pathlib import Path
 from contextlib import redirect_stderr, redirect_stdout
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL_PATH = ROOT / "adoption/tools/codex-broker-reaper"
@@ -353,6 +375,79 @@ class RunningJobGuardTests(ReaperTestCase):
 @LINUX_ONLY
 class LiveCwdGuardTests(ReaperTestCase):
     """Guard (c): workspace gone, or no live claude/codex process is under it."""
+
+    def setUp(self):
+        # Fourth fix round, 2026-09-25 (minor finding): every test below that
+        # reaches guard (c) calls evaluate_broker() -> the tool's own real
+        # find_live_broker_pids(), which scans this HOST's actual /proc for
+        # every live app-server-broker.mjs, not only this test's own
+        # fixtures -- see the module docstring above for the contamination
+        # this can cause (a real host broker, or a live ancestor of this
+        # very test process, swallowing this suite's own fixtures into that
+        # broker's excluded descendant set). Patched here, not in the base
+        # ReaperTestCase, since only this class's tests reach guard (c) with
+        # a workspace directory that still exists (the branch that calls
+        # find_live_broker_pids() at all). `fixture_pids` is read fresh on
+        # every call, not captured once at patch time, so it reflects
+        # whatever this test has spawned (via self._procs) by the time each
+        # evaluate_broker() call actually runs, not only what existed when
+        # setUp ran.
+        super().setUp()
+        real_find_live_broker_pids = module.find_live_broker_pids
+
+        def fixture_only_find_live_broker_pids():
+            fixture_pids = frozenset(proc.pid for proc in self._procs)
+            return [pid for pid in real_find_live_broker_pids() if pid in fixture_pids]
+
+        patcher = mock.patch.object(module, "find_live_broker_pids", fixture_only_find_live_broker_pids)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_find_live_broker_pids_is_restricted_to_this_tests_own_fixtures(self):
+        # Direct proof the setUp patch above does what it claims, rather
+        # than only reasoning about it: a second fake broker, deliberately
+        # dropped from self._procs right after spawning, stands in for "a
+        # real broker this test did not itself mean to exercise" (a real
+        # host broker, or one reached only via a live ancestor of this test
+        # process -- see the module docstring). The patched
+        # find_live_broker_pids() must not return it, even though it is a
+        # real, live process whose cmdline genuinely matches
+        # is_broker_serve_cmdline (the UNPATCHED function, called directly
+        # below, does find it).
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        owned_proc, _ = self.spawn_fake_broker(cwd=workspace)
+
+        other_workspace = self.root / "other-workspace"
+        other_workspace.mkdir()
+        other_proc, _ = self.spawn_fake_broker(cwd=other_workspace)
+        self._procs.remove(other_proc)  # stand-in for a real, unrelated host broker
+
+        def kill_other_proc():
+            # Mirrors ReaperTestCase._reap_all's own tolerance for the
+            # process already being gone by cleanup time; other_proc is no
+            # longer in self._procs, so _reap_all itself will not reach it.
+            try:
+                os.killpg(os.getpgid(other_proc.pid), signal.SIGKILL)
+            except (ProcessLookupError, PermissionError, OSError):
+                pass
+
+        self.addCleanup(kill_other_proc)
+
+        # The UNPATCHED scan (reimplemented from iter_pids + is_broker_serve_cmdline,
+        # exactly what the real find_live_broker_pids() does, rather than calling
+        # module.find_live_broker_pids() itself, which setUp has already patched)
+        # must still see other_proc: it is a real, live process whose cmdline
+        # genuinely matches. This confirms the assertNotIn below is because of
+        # the patch, not because other_proc was never really running.
+        unpatched_result = [
+            pid for pid in module.iter_pids() if module.is_broker_serve_cmdline(module.read_proc_cmdline(pid))
+        ]
+        self.assertIn(other_proc.pid, unpatched_result)
+
+        patched_result = module.find_live_broker_pids()
+        self.assertIn(owned_proc.pid, patched_result)
+        self.assertNotIn(other_proc.pid, patched_result)
 
     def test_live_claude_session_under_workspace_blocks_eligibility(self):
         workspace = self.root / "workspace"
