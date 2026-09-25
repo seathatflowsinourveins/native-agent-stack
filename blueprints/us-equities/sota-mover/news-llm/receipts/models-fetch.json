@@ -1,0 +1,479 @@
+{
+ "bytes_downloaded_total": 74343113148,
+ "evidence_label": "HIST",
+ "jobs": [
+  {
+   "bytes_downloaded": 22302921840,
+   "bytes_verified": 22304437751,
+   "files": [
+    {
+     "bytes": 1519,
+     "file": ".gitattributes",
+     "status": "present",
+     "year": 2015
+    },
+    {
+     "bytes": 12098,
+     "file": "ChronoGPT_instruct.py",
+     "status": "present",
+     "year": 2015
+    },
+    {
+     "bytes": 2676,
+     "file": "README.md",
+     "status": "present",
+     "year": 2015
+    },
+    {
+     "bytes": 75,
+     "file": "config.json",
+     "status": "present",
+     "year": 2015
+    },
+    {
+     "bytes": 924,
+     "file": "config.pt",
+     "status": "present",
+     "year": 2015
+    },
+    {
+     "bytes": 7434295614,
+     "file": "pytorch_model.bin",
+     "status": "downloaded",
+     "year": 2015
+    },
+    {
+     "bytes": 138,
+     "file": "requirements.txt",
+     "status": "downloaded",
+     "year": 2015
+    },
+    {
+     "bytes": 1519,
+     "file": ".gitattributes",
+     "status": "downloaded",
+     "year": 2016
+    },
+    {
+     "bytes": 12098,
+     "file": "ChronoGPT_instruct.py",
+     "status": "downloaded",
+     "year": 2016
+    },
+    {
+     "bytes": 2676,
+     "file": "README.md",
+     "status": "downloaded",
+     "year": 2016
+    },
+    {
+     "bytes": 75,
+     "file": "config.json",
+     "status": "downloaded",
+     "year": 2016
+    },
+    {
+     "bytes": 924,
+     "file": "config.pt",
+     "status": "downloaded",
+     "year": 2016
+    },
+    {
+     "bytes": 7434295614,
+     "file": "pytorch_model.bin",
+     "status": "downloaded",
+     "year": 2016
+    },
+    {
+     "bytes": 138,
+     "file": "requirements.txt",
+     "status": "downloaded",
+     "year": 2016
+    },
+    {
+     "bytes": 1519,
+     "file": ".gitattributes",
+     "status": "downloaded",
+     "year": 2017
+    },
+    {
+     "bytes": 12098,
+     "file": "ChronoGPT_instruct.py",
+     "status": "downloaded",
+     "year": 2017
+    },
+    {
+     "bytes": 2676,
+     "file": "README.md",
+     "status": "downloaded",
+     "year": 2017
+    },
+    {
+     "bytes": 75,
+     "file": "config.json",
+     "status": "downloaded",
+     "year": 2017
+    },
+    {
+     "bytes": 924,
+     "file": "config.pt",
+     "status": "downloaded",
+     "year": 2017
+    },
+    {
+     "bytes": 7434295614,
+     "file": "pytorch_model.bin",
+     "status": "downloaded",
+     "year": 2017
+    },
+    {
+     "bytes": 138,
+     "file": "requirements.txt",
+     "status": "downloaded",
+     "year": 2017
+    }
+   ],
+   "finished_at": "2026-09-25T03:29:36+00:00",
+   "seconds": 905.7,
+   "years": [
+    2015,
+    2016,
+    2017
+   ]
+  },
+  {
+   "bytes_downloaded": 22302939132,
+   "bytes_verified": 22304437751,
+   "files": [
+    {
+     "bytes": 1519,
+     "file": ".gitattributes",
+     "status": "downloaded",
+     "year": 2018
+    },
+    {
+     "bytes": 12098,
+     "file": "ChronoGPT_instruct.py",
+     "status": "downloaded",
+     "year": 2018
+    },
+    {
+     "bytes": 2676,
+     "file": "README.md",
+     "status": "downloaded",
+     "year": 2018
+    },
+    {
+     "bytes": 75,
+     "file": "config.json",
+     "status": "downloaded",
+     "year": 2018
+    },
+    {
+     "bytes": 924,
+     "file": "config.pt",
+     "status": "downloaded",
+     "year": 2018
+    },
+    {
+     "bytes": 7434295614,
+     "file": "pytorch_model.bin",
+     "status": "downloaded",
+     "year": 2018
+    },
+    {
+     "bytes": 138,
+     "file": "requirements.txt",
+     "status": "downloaded",
+     "year": 2018
+    },
+    {
+     "bytes": 1519,
+     "file": ".gitattributes",
+     "status": "downloaded",
+     "year": 2019
+    },
+    {
+     "bytes": 12098,
+     "file": "ChronoGPT_instruct.py",
+     "status": "downloaded",
+     "year": 2019
+    },
+    {
+     "bytes": 2676,
+     "file": "README.md",
+     "status": "downloaded",
+     "year": 2019
+    },
+    {
+     "bytes": 75,
+     "file": "config.json",
+     "status": "downloaded",
+     "year": 2019
+    },
+    {
+     "bytes": 924,
+     "file": "config.pt",
+     "status": "downloaded",
+     "year": 2019
+    },
+    {
+     "bytes": 7434295614,
+     "file": "pytorch_model.bin",
+     "status": "downloaded",
+     "year": 2019
+    },
+    {
+     "bytes": 138,
+     "file": "requirements.txt",
+     "status": "downloaded",
+     "year": 2019
+    },
+    {
+     "bytes": 1519,
+     "file": ".gitattributes",
+     "status": "downloaded",
+     "year": 2020
+    },
+    {
+     "bytes": 12098,
+     "file": "ChronoGPT_instruct.py",
+     "status": "downloaded",
+     "year": 2020
+    },
+    {
+     "bytes": 2676,
+     "file": "README.md",
+     "status": "downloaded",
+     "year": 2020
+    },
+    {
+     "bytes": 75,
+     "file": "config.json",
+     "status": "downloaded",
+     "year": 2020
+    },
+    {
+     "bytes": 924,
+     "file": "config.pt",
+     "status": "downloaded",
+     "year": 2020
+    },
+    {
+     "bytes": 7434295614,
+     "file": "pytorch_model.bin",
+     "status": "downloaded",
+     "year": 2020
+    },
+    {
+     "bytes": 138,
+     "file": "requirements.txt",
+     "status": "downloaded",
+     "year": 2020
+    }
+   ],
+   "finished_at": "2026-09-25T03:33:58+00:00",
+   "seconds": 1167.6,
+   "years": [
+    2018,
+    2019,
+    2020
+   ]
+  },
+  {
+   "bytes_downloaded": 14868626088,
+   "bytes_verified": 14870124707,
+   "files": [
+    {
+     "bytes": 1519,
+     "file": ".gitattributes",
+     "status": "downloaded",
+     "year": 2021
+    },
+    {
+     "bytes": 12098,
+     "file": "ChronoGPT_instruct.py",
+     "status": "downloaded",
+     "year": 2021
+    },
+    {
+     "bytes": 2676,
+     "file": "README.md",
+     "status": "downloaded",
+     "year": 2021
+    },
+    {
+     "bytes": 75,
+     "file": "config.json",
+     "status": "downloaded",
+     "year": 2021
+    },
+    {
+     "bytes": 924,
+     "file": "config.pt",
+     "status": "downloaded",
+     "year": 2021
+    },
+    {
+     "bytes": 7434295614,
+     "file": "pytorch_model.bin",
+     "status": "downloaded",
+     "year": 2021
+    },
+    {
+     "bytes": 138,
+     "file": "requirements.txt",
+     "status": "downloaded",
+     "year": 2021
+    },
+    {
+     "bytes": 1519,
+     "file": ".gitattributes",
+     "status": "downloaded",
+     "year": 2022
+    },
+    {
+     "bytes": 12098,
+     "file": "ChronoGPT_instruct.py",
+     "status": "downloaded",
+     "year": 2022
+    },
+    {
+     "bytes": 2676,
+     "file": "README.md",
+     "status": "downloaded",
+     "year": 2022
+    },
+    {
+     "bytes": 75,
+     "file": "config.json",
+     "status": "downloaded",
+     "year": 2022
+    },
+    {
+     "bytes": 924,
+     "file": "config.pt",
+     "status": "downloaded",
+     "year": 2022
+    },
+    {
+     "bytes": 7434295614,
+     "file": "pytorch_model.bin",
+     "status": "downloaded",
+     "year": 2022
+    },
+    {
+     "bytes": 138,
+     "file": "requirements.txt",
+     "status": "downloaded",
+     "year": 2022
+    }
+   ],
+   "finished_at": "2026-09-25T03:25:53+00:00",
+   "seconds": 682.5,
+   "years": [
+    2021,
+    2022
+   ]
+  },
+  {
+   "bytes_downloaded": 14868626088,
+   "bytes_verified": 14870124707,
+   "files": [
+    {
+     "bytes": 1519,
+     "file": ".gitattributes",
+     "status": "downloaded",
+     "year": 2023
+    },
+    {
+     "bytes": 12098,
+     "file": "ChronoGPT_instruct.py",
+     "status": "downloaded",
+     "year": 2023
+    },
+    {
+     "bytes": 2676,
+     "file": "README.md",
+     "status": "downloaded",
+     "year": 2023
+    },
+    {
+     "bytes": 75,
+     "file": "config.json",
+     "status": "downloaded",
+     "year": 2023
+    },
+    {
+     "bytes": 924,
+     "file": "config.pt",
+     "status": "downloaded",
+     "year": 2023
+    },
+    {
+     "bytes": 7434295614,
+     "file": "pytorch_model.bin",
+     "status": "downloaded",
+     "year": 2023
+    },
+    {
+     "bytes": 138,
+     "file": "requirements.txt",
+     "status": "downloaded",
+     "year": 2023
+    },
+    {
+     "bytes": 1519,
+     "file": ".gitattributes",
+     "status": "downloaded",
+     "year": 2024
+    },
+    {
+     "bytes": 12098,
+     "file": "ChronoGPT_instruct.py",
+     "status": "downloaded",
+     "year": 2024
+    },
+    {
+     "bytes": 2676,
+     "file": "README.md",
+     "status": "downloaded",
+     "year": 2024
+    },
+    {
+     "bytes": 75,
+     "file": "config.json",
+     "status": "downloaded",
+     "year": 2024
+    },
+    {
+     "bytes": 924,
+     "file": "config.pt",
+     "status": "downloaded",
+     "year": 2024
+    },
+    {
+     "bytes": 7434295614,
+     "file": "pytorch_model.bin",
+     "status": "downloaded",
+     "year": 2024
+    },
+    {
+     "bytes": 138,
+     "file": "requirements.txt",
+     "status": "downloaded",
+     "year": 2024
+    }
+   ],
+   "finished_at": "2026-09-25T03:29:45+00:00",
+   "seconds": 915.3,
+   "years": [
+    2023,
+    2024
+   ]
+  }
+ ],
+ "kind": "model-fetch",
+ "note": "every file sha256-verified against checkpoints.json at download",
+ "schema": "sota-news-llm-receipt/1"
+}

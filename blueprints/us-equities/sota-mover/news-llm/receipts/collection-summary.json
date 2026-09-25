@@ -1,0 +1,25 @@
+{
+ "auctions": {
+  "coverage": {
+   "both_available": 408576,
+   "close_via_fallback_6": 8363,
+   "close_via_fallback_M": 101,
+   "close_via_listing_print": 400603,
+   "no_auction_record": 28,
+   "official_close_available": 409067,
+   "official_open_available": 408818,
+   "open_via_fallback_O": 7781,
+   "open_via_fallback_Q": 126,
+   "open_via_listing_print": 400911,
+   "symbol_sessions_wanted": 410140
+  },
+  "ledger_requests_failed": 0,
+  "ledger_requests_ok": 5347,
+  "rows": 410112,
+  "sha256": "fe8ce248094dd88b7ab5788b5616cee5204ae42652acfbffb9a5412de3c112dd"
+ },
+ "evidence_label": "HIST",
+ "http_tallies": [],
+ "kind": "collection",
+ "schema": "sota-news-llm-receipt/1"
+}

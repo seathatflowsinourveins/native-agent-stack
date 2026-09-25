@@ -1,0 +1,159 @@
+{
+ "asset_master": {
+  "symbols_ambiguous": 20,
+  "symbols_resolved": 33257
+ },
+ "diagnostics": {
+  "file_day_differs_from_created_at_utc_date": 8173,
+  "guard": {
+   "overnight:ok": 624102,
+   "overnight:updated_after_cutoff": 2713,
+   "rth:ok": 405120,
+   "rth:updated_after_cutoff": 2347
+  },
+  "id_order_consistency": {
+   "n_with_numeric_id": 2217341,
+   "vs_median_of_5_lower_ids": {
+    "created_1h_1d_before_predecessors": 22246,
+    "created_gt_1d_before_predecessors": 1643
+   }
+  },
+  "updated_minus_created_seconds": {
+   "buckets": {
+    "gt_1d": 2014,
+    "le_15min": 13326,
+    "le_1d": 7398,
+    "le_1h": 4644,
+    "le_60s": 835434,
+    "negative": 3,
+    "zero": 898769
+   },
+   "n": 1761588,
+   "quantiles": {
+    "p50.0": 0.0,
+    "p90.0": 1.0,
+    "p95.0": 1.0,
+    "p99.0": 337.0,
+    "p99.9": 118612.0
+   }
+  },
+  "windows_after_instrument_filter": {
+   "excluded_0900_0930": 70500,
+   "excluded_last_30min": 13379,
+   "outside_calendar": 36169,
+   "overnight": 638031,
+   "rth": 412184
+  }
+ },
+ "eligible_by_window_lane": {
+  "overnight:liquid": 354098,
+  "overnight:small": 132782,
+  "rth:liquid": 173239
+ },
+ "events_file": {
+  "path": "events.jsonl.gz",
+  "rows": 449718,
+  "sha256": "103187845992933dc1716e6bb26aea3332db8caa3939aefef4c77c1dc74bb0cb"
+ },
+ "evidence_label": "HIST",
+ "finished_at": "2026-09-25T03:53:16+00:00",
+ "funnel": {
+  "articles": 2217343,
+  "drop_duplicate_24h": 1204,
+  "drop_empty_headline": 3,
+  "drop_guard_id_order": 6114,
+  "drop_guard_updated_after_cutoff": 5060,
+  "drop_headline_year_before_2016": 2,
+  "drop_movement_headline": 74542,
+  "drop_no_symbols": 100631,
+  "drop_not_eligible_lane": 142964,
+  "drop_not_first_in_window": 210401,
+  "drop_not_primary_operating_company": 254278,
+  "drop_repeated_id": 2,
+  "drop_rth_no_minute_bars": 93618,
+  "drop_rth_not_liquid": 49719,
+  "drop_session_outside_study": 15933,
+  "drop_symbol_ambiguous_in_asset_master": 269,
+  "drop_symbol_count_not_1": 355122,
+  "drop_symbol_not_in_asset_master": 336778,
+  "drop_symbol_not_in_daily_dataset": 937,
+  "drop_window_excluded_0900_0930": 70500,
+  "drop_window_excluded_last_30min": 13379,
+  "drop_window_outside_calendar": 36169,
+  "eligible_before_first_per_window": 660119,
+  "pre_eligibility_candidates": 947357,
+  "selected_events": 449718,
+  "single_symbol": 1761588
+ },
+ "inputs": {
+  "asset_files_sha256": {
+   "entitlement-probe-assets-active.json": "571d908c991ebed47810818a23a02c2cc759a90ff7f1a6829fbd0791dd22558a",
+   "entitlement-probe-assets-inactive.json": "056b4c6f1d0e891cfc15a6f474b787bf2c72fd1f896262cf171c0b314f15b13c"
+  },
+  "calendar_sha256": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c",
+  "daily_parquet_sha256": "f7584f24519367e03e0a4ac0fc57f9b410c047991b001bb0259ebdfc09b31105",
+  "news_manifest_sha256": "45e5ab7973d0b6b4eac8b232ecd74fd80f81230ba84943c6bab1db0cdfa9efb6",
+  "news_run_header_sha256": "f5b5edd6a2018f302ad35b292b20bc08358cea99be3ae7a40d590a48a506c310",
+  "news_signal_py_sha256": "83d503c0ef46bd77b324769d9f33bf447aa2a2fe71e660de25fdc2859011209f",
+  "prepare_py_sha256": "ff7534249f975f817f5a431de3cd317ec24aa1e6588746bf65c3a168bf7feab5"
+ },
+ "kind": "prepare",
+ "schema": "sota-news-llm-receipt/1",
+ "selected_by_checkpoint": {
+  "2015": 18437,
+  "2016": 22881,
+  "2017": 26750,
+  "2018": 29015,
+  "2019": 39197,
+  "2020": 45055,
+  "2021": 51923,
+  "2022": 53970,
+  "2023": 57880,
+  "2024": 104610
+ },
+ "selected_by_session_year": {
+  "2016:overnight:liquid": 12395,
+  "2016:overnight:small": 6038,
+  "2017:overnight:liquid": 12269,
+  "2017:overnight:small": 6543,
+  "2017:rth:liquid": 4073,
+  "2018:overnight:liquid": 15351,
+  "2018:overnight:small": 6704,
+  "2018:rth:liquid": 4691,
+  "2019:overnight:liquid": 16135,
+  "2019:overnight:small": 7177,
+  "2019:rth:liquid": 5706,
+  "2020:overnight:liquid": 21068,
+  "2020:overnight:small": 8877,
+  "2020:rth:liquid": 9251,
+  "2021:overnight:liquid": 22303,
+  "2021:overnight:small": 9981,
+  "2021:rth:liquid": 12771,
+  "2022:overnight:liquid": 25371,
+  "2022:overnight:small": 10024,
+  "2022:rth:liquid": 16527,
+  "2023:overnight:liquid": 25965,
+  "2023:overnight:small": 10923,
+  "2023:rth:liquid": 17078,
+  "2024:overnight:liquid": 26194,
+  "2024:overnight:small": 11334,
+  "2024:rth:liquid": 20354,
+  "2025:overnight:liquid": 30663,
+  "2025:overnight:small": 11341,
+  "2025:rth:liquid": 20172,
+  "2026:overnight:liquid": 23182,
+  "2026:overnight:small": 8009,
+  "2026:rth:liquid": 11248
+ },
+ "selected_by_window_lane": {
+  "overnight:liquid": 230896,
+  "overnight:small": 96951,
+  "rth:liquid": 121871
+ },
+ "selected_sessions_by_window_lane": {
+  "overnight:liquid": 2673,
+  "overnight:small": 2673,
+  "rth:liquid": 2417
+ },
+ "started_at": "2026-09-25T03:48:30+00:00"
+}

@@ -1,0 +1,51 @@
+{
+ "by_checkpoint": {
+  "2015": {
+   "labels": {
+    "FAVORABLE": 1626,
+    "PARSE_FAIL": 10,
+    "UNFAVORABLE": 1903
+   },
+   "load_seconds": 12.7,
+   "overflow": 0,
+   "revision": "5a7f3439fd5d782b3780c366160c43177e6f5eba",
+   "scored": 3539,
+   "stops": {
+    "eos": 3529,
+    "label_decided": 10
+   },
+   "to_score": 12398
+  }
+ },
+ "evidence_label": "HIST",
+ "files": {
+  "scores-20151231.jsonl": {
+   "rows": 3539
+  }
+ },
+ "kind": "scoring-status",
+ "labels_total_this_run": {
+  "FAVORABLE": 1626,
+  "PARSE_FAIL": 10,
+  "UNFAVORABLE": 1903
+ },
+ "progress": {
+  "already_scored": 0,
+  "batch_size": 32,
+  "dtype": "float32",
+  "elapsed_seconds": 102.1,
+  "eta_seconds": 10076.0,
+  "events_in_file": 449718,
+  "events_per_second": 34.66,
+  "finished_at": null,
+  "matmul": "highest",
+  "max_gpu_memory_allocated_gib": 10.17,
+  "scored_this_run": 3539,
+  "started_at": "2026-09-25T04:19:43+00:00",
+  "template_sha256": "9ee4590bbe7d71190864d1b0331ce95848bcfb7977f48b3a50a0b24478401c8a",
+  "to_score": 352767,
+  "updated_at": "2026-09-25T04:21:25+00:00",
+  "variant": "hlmw_alpaca"
+ },
+ "schema": "sota-news-llm-receipt/1"
+}

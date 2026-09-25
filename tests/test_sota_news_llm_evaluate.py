@@ -57,6 +57,27 @@ def frozen(protocol=None, **overrides):
     return p
 
 
+class ProtocolConsistency(unittest.TestCase):
+    def test_draft_matches_code_and_pins(self):
+        p = DRAFT
+        self.assertEqual(p["status"], "draft_pending_independent_pre_outcome_review")
+        self.assertIs(p["frozen_before_outcomes"], False)
+        self.assertEqual(p["scoring"]["operative_variant"], sig.OPERATIVE_VARIANT)
+        self.assertEqual(p["scoring"]["template_sha256"], sig.template_sha256(sig.OPERATIVE_VARIANT))
+        pins = json.loads((BLUEPRINT / "checkpoints.json").read_text())
+        self.assertEqual(p["models"]["revisions"], {y: e["revision"] for y, e in pins["checkpoints"].items()})
+        self.assertEqual(p["models"]["code_sha256"], pins["reviewed_code"]["sha256"])
+        self.assertEqual(p["models"]["pins_file_sha256"], sha((BLUEPRINT / "checkpoints.json").read_bytes()))
+        self.assertEqual(p["costs"]["fees"]["sha256"], sha((ROOT / p["costs"]["fees"]["file"]).read_bytes()))
+        cal = ROOT / "blueprints/us-equities/mover-v3/data/session-calendar.json"
+        self.assertIn(sha(cal.read_bytes()), p["timing"]["calendar"])
+        self.assertEqual(len(p["items"]), 4)
+        for item in p["items"]:
+            self.assertIn(item["segment"], p["segments"])
+            self.assertIn(item["leg"], ("long", "short", "long_short"))
+        self.assertTrue(all(v is None for v in p["frozen_inputs"].values()))
+
+
 class RefusalGuard(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

@@ -53,8 +53,10 @@ ecosystem-bounded-run ~/.local/share/codex-ecosystem/tools/adaptive-paper-202609
 
 # checkpoints and scores (read-only vLLM runtime: torch + tiktoken)
 python3 score.py fetch
-~/.local/share/codex-ecosystem/tools/vllm-0.30.0/bin/python score.py run \
-  --events <root>/events.jsonl.gz --out <root>/scores --lanes liquid     # then --lanes small
+systemd-run --user --unit=sota-news-score-<ts> -p MemoryHigh=3G -p MemoryMax=4G -p RuntimeMaxSec=28800 \
+  ~/.local/share/codex-ecosystem/tools/vllm-0.30.0/bin/python score.py run \
+  --events <root>/events.jsonl.gz --out <root>/scores --decoder cached --batch-size 32 \
+  --max-batch-tokens 3072 --check-batch1 16 --lanes liquid     # then --lanes small (resumable)
 
 # prices (Alpaca data API, <= 2,000 requests/min before 03:30 ET, 500 after)
 python3 collect_auctions.py auctions
@@ -63,6 +65,23 @@ python3 collect_auctions.py spreads
 # after the freeze only
 python3 evaluate.py --protocol-sha256 <sha256 of the frozen protocol.json>
 ```
+
+## Scoring decisions made before the freeze (label counts only)
+
+- **Prompt.** ChronoGPT-Instruct (1.55B) does not answer the Lopez-Lira & Tang prompt in its YES/NO format: in the
+  upstream `extract_response` wrapper it echoed a "Headline: ..." line for 248 of 256 headlines. Three variants were
+  compared on the same 500-event label-agnostic sample. The operative prompt is the model authors' own headline
+  classification prompt (He, Lv, Manela & Wu, arXiv 2510.11677, section 3.3): FAVORABLE / UNFAVORABLE / UNCLEAR ->
+  +1 / -1 / 0, in their Alpaca format. The float32 probe gave 474/500 directional labels, against 56/500 for the paper
+  prompt in the same format and 29/500 in the upstream wrapper. The paper's prompt stays verbatim in the protocol.
+- **Numerics.** In bfloat16 (the upstream casts) a prompt's logits moved by 0.6-0.9 with batch shape or padding, more
+  than typical label margins, and batch-32 labels agreed with batch-1 labels on only 160/200. Scoring therefore runs
+  in float32 (TF32 off), where batch 1, batch 32 and padded rows give identical logits.
+- **Decoder.** A key/value-cached greedy decoder matched full recompute on 700/700 real prompts (second-step logit
+  difference <= 8.6e-5) at about 3.4x the speed. Every checkpoint in the full run also rescored 16 events at batch 1.
+- **Prior evidence.** The model authors report an H-L Sharpe of 0.95 (about 3 bps/day gross, next-day close-to-close,
+  2007-2023) for this prompt. With about 9 bps/day of modelled long-short costs, a net pass needs a much larger
+  same-session effect.
 
 ## Security of the model path
 
