@@ -43,6 +43,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Model | Revision | Runtime | Version | Host | Platform | Result | Receipt |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Qwen/Qwen3-8B-AWQ | 4da05a8e | vllm | 0.29.0 | rtx5090-laptop-20260923 | linux-wsl2-x86_64 | pass | evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json |
+| nvidia/Nemotron-3-Embed-1B-BF16 | c0c9fea93ea424587517f2c59e20db9f1d6bf615 | vllm | 0.25.0 | nativestack-5975wx-20260925 | linux-wsl2-x86_64 | pass | evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vllm--use--20260925-2.json |
 | nvidia/Nemotron-3-Embed-1B-BF16 | c0c9fea93ea424587517f2c59e20db9f1d6bf615 | vllm | 0.25.0 | rtx5090-laptop-20260923 | linux-wsl2-x86_64 | pass | evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json |
 
 ## Foundation layers
