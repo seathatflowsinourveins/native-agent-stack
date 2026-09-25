@@ -419,6 +419,22 @@ class PinnedVersionProbeTests(unittest.TestCase):
         self.assertFalse(version_output_matches("2.1.281", "minimum", "claude-code 2.1.100\n"))
         self.assertFalse(version_output_matches("2.1.281", "minimum", "no version here\n"))
 
+    def test_exact_is_bounded_by_non_version_characters_like_the_bootstrap(self):
+        # bootstrap-linux.sh anchors "exact" with (^|[^0-9.])...([^0-9.]|$); a bare substring would match these.
+        self.assertFalse(version_output_matches("2.10", "exact", "v12.10.0\n"))
+        self.assertFalse(version_output_matches("1.0.0", "exact", "tool 21.0.0\n"))
+        self.assertFalse(version_output_matches("0.49.0", "exact", "rtk 0.49.0.1\n"))
+        self.assertTrue(version_output_matches("2.8.3", "exact", "qmd 2.8.3 (facd35e)"))
+        self.assertTrue(version_output_matches("0.49.0", "exact", "first line\nrtk 0.49.0\n"))
+
+    def test_minimum_with_a_non_numeric_part_is_not_a_match_and_never_raises(self):
+        # bootstrap-linux.sh version_at_least returns 1 for a non-numeric part instead of failing.
+        self.assertFalse(version_output_matches("2.0.0.dev0", "minimum", "Serena 2.0.0\n"))
+        # As in the bootstrap, the observed version is the first dotted number, so ".dev0" is not part of it.
+        self.assertTrue(version_output_matches("2.0.0", "minimum", "Serena 2.0.0.dev0\n"))
+        self.assertTrue(version_output_matches("1.2", "minimum", "tool 1.2.0\n"))
+        self.assertFalse(version_output_matches("1.0", "unknown-rule", "tool 1.0\n"))
+
 
 class PinnedVersionsCheckTests(unittest.TestCase):
     """--pinned-versions end to end: opt-in, value-free JSON shape, and the swapped limitation."""
@@ -483,6 +499,15 @@ class PinnedVersionsCheckTests(unittest.TestCase):
         result = inspect_adoption(self.path, self.root, with_pinned_versions=True)
         self.assertTrue(all(item["checked"] is False and item["matches_pin"] is None
                             for item in result["profiles"][0]["pinned_versions"]))
+
+    def test_a_malformed_pins_file_reports_every_component_unchecked_not_an_error(self):
+        for body in ("{not json", "[]", '{"tools": {}}', '{"tools": [1, "x", null]}',
+                     '{"tools": [{"version": "1.0"}]}', '{"tools": [{"id": "rtk"}]}'):
+            with self.subTest(body=body):
+                self.pins.write_text(body, encoding="utf-8")
+                result = inspect_adoption(self.path, self.root, with_pinned_versions=True)
+                self.assertTrue(all(item["checked"] is False and item["matches_pin"] is None
+                                    for item in result["profiles"][0]["pinned_versions"]))
 
     def test_client_wiring_and_pinned_versions_compose(self):
         canned = {"claude": {"rtk_hook": True}, "complete": False}

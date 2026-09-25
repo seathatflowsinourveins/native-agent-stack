@@ -100,7 +100,7 @@ named but not fixed here).
    platform's `adoption/pins-<os>-<arch>.json`, and for a pin whose `version_probe.method` is
    exactly `"exec"`, resolve its declared `command` via `PATH` only and run it with its declared
    `args`, `stdin` from `/dev/null`, a bounded timeout (the pin's own `timeout_seconds` or 30s),
-   and compare stdout+stderr against the pinned version using the same `"exact"`/`"minimum"` rule
+   and compare stdout+stderr against the pinned version using the same bounded `"exact"` and numeric `"minimum"` rules
    `adoption/bootstrap-linux.sh`'s `version_output_matches` already uses. A component with no pin
    for this platform, or whose declared method is not `"exec"` (`"npm-metadata"`, or any future
    undeclared method), is reported **unchecked** and is never executed — this is the same

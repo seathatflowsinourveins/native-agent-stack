@@ -449,17 +449,31 @@ def read_pins(path: Path) -> dict:
             if isinstance(entry, dict) and isinstance(entry.get("id"), str) and isinstance(entry.get("version"), str)}
 
 
+def version_at_least(observed: str, floor: str) -> bool:
+    """adoption/bootstrap-linux.sh version_at_least: compare dotted parts numerically, padding the
+    shorter with 0; any non-numeric part (e.g. "dev0") is not a match rather than an error."""
+    observed_parts, floor_parts = observed.split("."), floor.split(".")
+    for index in range(max(len(observed_parts), len(floor_parts))):
+        observed_part = observed_parts[index] if index < len(observed_parts) else "0"
+        floor_part = floor_parts[index] if index < len(floor_parts) else "0"
+        if not (observed_part.isdigit() and floor_part.isdigit()):
+            return False
+        if int(observed_part) != int(floor_part):
+            return int(observed_part) > int(floor_part)
+    return True
+
+
 def version_output_matches(expected: str, match: str, output: str) -> bool:
     """The bootstrap scripts' own two match rules (adoption/bootstrap-linux.sh version_output_matches):
-    "exact" text containment, "minimum" a parsed dotted-number floor (a later version also passes)."""
+    "exact" is the expected text bounded by no adjacent digit or dot (so "2.10" does not match
+    "12.10.0"), "minimum" the first dotted number in the output against a numeric floor (a later
+    version also passes). Any other rule is not a match."""
+    if match == "exact":
+        return re.search(r"(^|[^0-9.])" + re.escape(expected) + r"([^0-9.]|$)", output, re.MULTILINE) is not None
     if match == "minimum":
         found = re.search(r"[0-9]+(?:\.[0-9]+)+", output)
-        if found is None:
-            return False
-        observed = tuple(int(part) for part in found.group().split("."))
-        floor = tuple(int(part) for part in expected.split("."))
-        return observed >= floor
-    return expected in output
+        return found is not None and version_at_least(found.group(), expected)
+    return False
 
 
 def probe_pinned_version(entry: dict) -> dict:

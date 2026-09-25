@@ -30257,8 +30257,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "598c09f1a951843eaf985857655c047b35ec8bb9284e12a887b8612792fa5098",
-      "bytes": 33966
+      "sha256": "9da040c4f73eb7c87e972b04a79125a1964bd6a945243fefca480aa5b8c532a4",
+      "bytes": 34868
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -30537,8 +30537,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "57afc2adb7166d8fff304d2250193a0396ba121c43218a1b24a1544210dd13a8",
-      "bytes": 47819
+      "sha256": "b68795021ce92542ccce28c42a8d8d79accd35b83828fec79b06807571362bd1",
+      "bytes": 49735
     },
     {
       "path": "tests/test_adoption_version_probes.py",
