@@ -691,6 +691,7 @@ class NativeInstallFloorTests(unittest.TestCase):
                          shell_functions((ROOT / "adoption/bootstrap-macos.sh").read_text(), "install_native"))
 
 
+@LINUX_X86_64_ONLY
 class RtkConfigReminderTests(unittest.TestCase):
     """2026-09-25: rtk 0.50.0's Claude hook needs `[hooks] exclude_commands = ["^git show [^ ]*:",
     "diff"]` in rtk's own config (recipes/README.md#native-context-mode-and-hooks), which the
