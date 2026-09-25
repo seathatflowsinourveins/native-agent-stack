@@ -8,7 +8,7 @@
   "evidence_class": "HIST local historical replay on retained bundled LEAN sample bytes, run on a second physical host (CPU only); a reproduction of the published v2 result, not a qualifying replay, an unchanged upstream test, a point-in-time dataset or broker execution",
   "question": "Does the SPY/LEAN parity harness (gate G-a, case one_zero), run on this workstation as its README documents, reproduce the published v2 economic ledger and comparator verdict?",
   "harness": {
-    "checkout": "worktree at 156d9cc7 (origin/main 720e294b plus one host-receipt commit that touches no spy-parity file)",
+    "checkout": "worktree at 720e294b (origin/main at the time) plus one local host-receipt commit that touches no spy-parity file",
     "reviewed_harness_files_equal_cc4503f": true,
     "local_source_sha256": {
       "compare.py": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
@@ -22,7 +22,7 @@
   "preregistration": {
     "file": "raw/preregistration.txt",
     "written_utc": "2026-09-25T14:27:07Z",
-    "note": "Written before command A. The amendment in the same file was appended after commands B and C ran and before C2 and B2; the C prediction (PASS under --bars) was wrong and is kept as written."
+    "note": "Written before command A. The amendment in the same file was appended after commands B and C ran and before C2 and B2. Two predictions were wrong and are kept as written: C predicted PASS under --bars, and C2 predicted verdict bytes equal to verdict-v2.json (1816835f...) but produced 9decd956..., which differs at replay_history_at_comparison."
   },
   "deviations_from_the_readme": [
     "Interpreter root: this host's NautilusTrader 2.0.0rc5 environment is ~/.local/share/codex-ecosystem/nautilus-py312, not the README's ~/.local/share/codex-ecosystem/tools/nautilus-2.0.0rc5. It was bound read-only at its own path, as the README's command does.",
@@ -98,8 +98,8 @@
       }
     },
     "comparator": {
-      "C2_committed_receipt_lean_data": "exit 0, PASS, complete true, failed 0, 0 skipped, case one_zero, 136 checks, execution 106/106, preregistration_qualifying true; verdict bytes equal verdict-v2.json except one check value: replay_history_at_comparison observed 'extended by 1' instead of the history sha256, because the qualifying run's own entry was appended after it ran (the check accepts an append-only extension and passes)",
-      "B2_fresh_receipt_lean_data": "exit 1, FAIL, complete true, 132 checks, execution 106/106, failed 2, 0 skipped, preregistration_qualifying false. The two failures are precondition_review.retained_record_before_run (no review preceded this run) and precondition_review.no_prior_replay_ran_the_reviewed_harness (observed ['bwrap-cc4503f-qualifying']). These are by design: the accepted deviation lets only the first replay of the reviewed harness qualify, and no retry from cc4503f can.",
+      "C2_committed_receipt_lean_data": "exit 0, PASS, complete true, failed 0, 0 skipped, case one_zero, 136 checks, execution 106/106, preregistration_qualifying true; verdict bytes equal verdict-v2.json except one check value: replay_history_at_comparison observed 'extended by 1' instead of the history sha256, because the qualifying run's own entry was appended after it ran (the check accepts an append-only extension and passes). The preregistered prediction was bytes equal to verdict-v2.json (sha256 1816835f...); this verdict's sha256 is 9decd956..., so that prediction was wrong and is kept as written.",
+      "B2_fresh_receipt_lean_data": "exit 1, FAIL, complete true, 132 checks, execution 106/106, failed 2, 0 skipped, preregistration_qualifying false. The two failures are precondition_review.retained_record_before_run and precondition_review.no_prior_replay_ran_the_reviewed_harness (observed ['bwrap-cc4503f-qualifying']). Only the second is by design: the accepted deviation lets only the first replay of the reviewed harness qualify, and no retry from cc4503f can. The first failed because the README's run.py command, run as documented, omits --review-record, so the receipt has no preconditions.review (compare.py lines 702-704), although review-record-v2-cc4503f.json exists in the blueprint directory.",
       "C_committed_receipt_bars": "exit 1, FAIL, complete false, failed 0, 1 skipped (precondition_hashes.inputs_at_comparison: only --lean-data re-hashes the five inputs at comparison time); v2 counts a skipped check as FAIL (the harness's declared deviation bars_mode_cannot_rehash_inputs). Predicted PASS; the prediction was wrong.",
       "B_fresh_receipt_bars": "exit 1, FAIL, complete false, failed 2 (the same two precondition_review checks as B2) and the same 1 skipped",
       "E_tampered_bars": "exit 1, ValueError converted_rows_sha256_mismatch, no verdict written",
@@ -108,15 +108,19 @@
   },
   "acceptance": {
     "run_py_exit_0_with_frozen_input_hashes": "met (negative control F refused an altered input)",
-    "compare_exit_0_complete_failed_0_case_one_zero": "met for the committed receipt-v2.json re-derived from this host's frozen inputs (C2). Not met for this host's own fresh receipt (B2, exit 1): its execution checks all pass, and its two failed checks are the harness's by-design refusal to let a retry of the reviewed harness qualify.",
+    "compare_exit_0_complete_failed_0_case_one_zero": "met for the committed receipt-v2.json re-derived from this host's frozen inputs (C2). Not met for this host's own fresh receipt (B2, exit 1): its execution checks all pass. Of its two failed checks, no_prior_replay_ran_the_reviewed_harness is the harness's by-design refusal to let a retry of the reviewed harness qualify, and retained_record_before_run follows from the README command omitting --review-record.",
     "economic_ledger_equals_receipt_v2": "met: every economic field and both normalized economic hashes are equal"
   },
   "recording_decision": "Recorded the blueprint's way: the fresh receipt and verdicts in this directory, and an appended entry in blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json, whose note requires every v2 execution on the frozen inputs to be listed. No host receipt was recorded: the nautilustrader use receipt for this host (evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--nautilustrader--use--20260925.json, the upstream quickstart) has an independent agree and makes a different claim, so it is not superseded.",
+  "corrections": [
+    "2026-09-25, after independent review and before merge: harness.checkout named the worktree's local commit, which is not on GitHub; it now names its origin/main base, 720e294b. The C2 prediction is now recorded as wrong. The B2 attribution now says only no_prior_replay_ran_the_reviewed_harness fails by design, and retained_record_before_run fails because the README command omits --review-record. The results themselves and the raw files are unchanged."
+  ],
   "limitations": [
     "One case (one_zero), one replay pair, one host; CPU only.",
     "A reproduction of a published result, not a new qualification: gate G-a and every catalog status are unchanged, and receipt-v2.json and verdict-v2.json stay the published v2 result.",
     "The converted rows and the raw engine reports and logs stay private in the scratch run directory, as the README directs; their sha256 values are in the fresh receipt.",
     "Only one input was altered for the negative control; each of the five inputs is checked by the same verify_inputs loop in convert.py.",
+    "The README's --bars example (under 'Reproduce verdict.json') exits 1 on both v2 receipts here (C on receipt-v2.json, B on this host's receipt): --bars cannot re-hash the five inputs, and v2 counts that skipped check as FAIL. Only --lean-data passed (C2).",
     "Sanitization: in preregistration.txt and negative-tampered-bars.stderr.txt the scratch directory is written as <scratch>/spy-parity-run and the home directory as ~. The other raw files are byte-identical to the run outputs."
   ]
 }
