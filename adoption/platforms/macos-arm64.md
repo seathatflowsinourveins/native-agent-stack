@@ -213,8 +213,14 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 `socraticode` is installed with `--ignore-scripts` (the pin's own
 `ignore_scripts: true` field, read by the script's `install_npm`), the same
 convention [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions)
-documents for the Linux recipe; it has no `adoption/pins-linux-x86_64.json`
-entry of its own there, only that documented manual recipe. Not in this table:
+documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.25.2`,
+adding the identical entry there too (same version,
+url, sha256 and `--ignore-scripts`), completing the token-efficiency profile's Linux pin
+coverage alongside new `repomix`, `toon`, `headroom`, `ccusage` and `serena`
+entries (the last through a new `uv-tool-from-git` pin kind, since Serena
+has no released version to pin a sha256 against); at that tag and every
+earlier one, the Linux pins file had no `socraticode` entry, only that
+documented manual recipe. Not in this table:
 `gitleaks`, `syft` and `dagu`, which are not in the `macos-arm64-foundation`
 component list.
 

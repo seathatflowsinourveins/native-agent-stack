@@ -213,6 +213,99 @@
           "--version"
         ]
       }
+    },
+    {
+      "id": "repomix",
+      "version": "1.18.1",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/repomix/-/repomix-1.18.1.tgz",
+      "sha256": "d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f",
+      "install_note": "2026-09-25 fetch to complete the `token-efficiency` profile's Linux pin coverage (previously 8 of 14; see adoption/README.md). npm registry tarball for repomix@1.18.1 (687798 bytes unpacked) downloaded fresh and independently sha256-hashed; npm dist.integrity sha512-XtV1qD6akJSigQ3fBRex5v+rWcGa4i9cm2FL/M/PEtzO3u1uDiso3CtNbhlZiMIqJstAdy8mj2m1ynOzNnNB3g== matches a fresh openssl sha512/base64 digest of the same download exactly. `npm install --global --prefix tools/repomix-1.18.1 repomix@1.18.1`, the npm alternative recipes/README.md documents (recipes/native-upgrades-20260921.md#installation) and the exact version manifests/stack.json already pins. `repomix --version` prints only `1.18.1` and exits; confirmed 2026-09-25 in an isolated `npm --prefix` scratch install, not the shared host copy.",
+      "version_probe": {
+        "method": "exec",
+        "command": "repomix",
+        "args": [
+          "--version"
+        ]
+      }
+    },
+    {
+      "id": "toon",
+      "version": "4.1.1",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/@toon-format/cli/-/cli-4.1.1.tgz",
+      "sha256": "93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6",
+      "install_note": "2026-09-25 fetch to complete the `token-efficiency` profile's Linux pin coverage. The `@toon-format/cli` npm package (repository toon-format/toon, upstream tag v4.1.1) downloaded fresh from the npm registry tarball above and independently sha256-hashed; npm dist.integrity sha512-64wRbxe8C8k0D70gAdYZkiv0Atp/I4D0VlKQkc+IJ591hX8D54+///l/+4QM/Ato9+RJ1xJbNdfCaylcmpaLvQ== matches a fresh openssl sha512/base64 digest of the same download exactly. `npm install --global --prefix tools/toon-4.1.1 @toon-format/cli@4.1.1`, matching recipes/README.md and the exact version manifests/stack.json already pins. `toon --version` prints only `4.1.1` and exits; confirmed 2026-09-25 in an isolated `npm --prefix` scratch install, not the shared host copy.",
+      "version_probe": {
+        "method": "exec",
+        "command": "toon",
+        "args": [
+          "--version"
+        ]
+      }
+    },
+    {
+      "id": "ccusage",
+      "version": "20.0.24",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/ccusage/-/ccusage-20.0.24.tgz",
+      "sha256": "69787a0aa2269cd14f3d0f41d179b80744d5384e912ee11852897ecd0bf91183",
+      "install_note": "2026-09-25 fetch to complete the `token-efficiency` profile's Linux pin coverage. npm registry tarball for ccusage@20.0.24 downloaded fresh and independently sha256-hashed; npm dist.integrity sha512-sHq7axM0ucbFS4m5xFzS7NxYSmOP1+PSDup3nVb+pitI3eEuwEiGObhsXvu47DSvB2hHpEts/quA3/0EE5i1Zw== matches a fresh openssl sha512/base64 digest of the same download exactly. `npm install --global --prefix tools/ccusage-20.0.24 ccusage@20.0.24`, the npm form recipes/native-upgrades-20260921.md's isolated-prefix installation documents, and the exact version manifests/stack.json already pins. `ccusage --version` prints `ccusage 20.0.24` and exits; confirmed 2026-09-25 in an isolated `npm --prefix` scratch install, not the shared host copy.",
+      "version_probe": {
+        "method": "exec",
+        "command": "ccusage",
+        "args": [
+          "--version"
+        ]
+      }
+    },
+    {
+      "id": "headroom",
+      "version": "0.37.0",
+      "kind": "uv-tool",
+      "package": "headroom-ai[mcp]",
+      "url": "https://files.pythonhosted.org/packages/72/b8/16878cf4fe6fc390a0d22025b671468619db690ff14c1b103ace4b5e35f9/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+      "sha256": "2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46",
+      "install_note": "2026-09-25 fetch to complete the `token-efficiency` profile's Linux pin coverage. PyPI package `headroom-ai` (repository headroomlabs-ai/headroom) 0.37.0 with the `[mcp]` extra recipes/README.md's upstream-MCP recipe installs (`headroom mcp serve`). url/sha256 above are the `manylinux_2_28_x86_64` wheel this exact platform resolves (PyPI JSON https://pypi.org/pypi/headroom-ai/0.37.0/json urls[].digests.sha256, read 2026-09-25); the wheel was independently downloaded and re-hashed and matches exactly. `install_uv_tool` now takes an optional `package` (this entry's `headroom-ai[mcp]`; every other uv-tool pin keeps falling back to its own `.id`, unchanged) so the installed spec is `uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'`, exactly recipes/README.md's command and the version manifests/stack.json already pins. `headroom --version` prints `headroom, version 0.37.0` and exits; confirmed 2026-09-25 in an isolated `UV_TOOL_DIR`/`UV_TOOL_BIN_DIR` scratch install, not the shared host copy.",
+      "version_probe": {
+        "method": "exec",
+        "command": "headroom",
+        "args": [
+          "--version"
+        ]
+      }
+    },
+    {
+      "id": "serena",
+      "version": "2.0.0.dev0",
+      "kind": "uv-tool-from-git",
+      "package": "serena-agent",
+      "url": "https://github.com/oraios/serena",
+      "commit": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "sha256": null,
+      "install_note": "2026-09-25 addition to complete the `token-efficiency` profile's Linux pin coverage. Upstream's pyproject.toml declares `version = \"2.0.0.dev0\"` with no corresponding PyPI release of that dev version (confirmed reading it at this commit, and the PyPI distribution name is `serena-agent`, not `serena`), so this pin is a source pin: an exact 40-hex commit on oraios/serena (confirmed present with `git cat-file -e c6fbd1c5932df2494ffa0020af5a9fbe80b82143^{commit}` and via the GitHub commits API, both 2026-09-25), not a downloaded-archive sha256. `sha256` is null; `tests/test_adoption_bootstrap.py`'s pin-hash test accepts a null sha256 here only because `kind` is `uv-tool-from-git` and `commit` is a verified 40-hex string -- every other kind still fails closed on a null sha256 exactly as before. The new `uv-tool-from-git` kind's `install_uv_tool_from_git` runs `uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143` -- the same commit and command already in adoption/bootstrap.md step 4a and recipes/README.md's `serena` row -- into the same `UV_TOOL_DIR`/`UV_TOOL_BIN_DIR` layout `install_uv_tool` uses, then reads back the resulting `uv-receipt.toml` and refuses (exit 1) unless it records this exact commit, so a stale prior install of a different revision can never pass silently. `serena --version` (a Click `is_eager` option that exits before any subcommand runs, confirmed reading src/serena/cli.py at this commit) printed exactly `Serena 2.0.0.dev0` with no `-<commit>` suffix from a fresh, non-editable install (its version helper in src/serena/__init__.py appends one only when its own installed directory is itself a git checkout, which a `uv tool install` from a git source is not); confirmed directly 2026-09-25 in an isolated `UV_TOOL_DIR`/`UV_TOOL_BIN_DIR` scratch install, not the shared host copy.",
+      "version_probe": {
+        "method": "exec",
+        "command": "serena",
+        "args": [
+          "--version"
+        ]
+      }
+    },
+    {
+      "id": "socraticode",
+      "version": "1.14.0",
+      "kind": "npm",
+      "ignore_scripts": true,
+      "url": "https://registry.npmjs.org/socraticode/-/socraticode-1.14.0.tgz",
+      "sha256": "3dbb106c876be4214048289cef31094eb0e48e97007fb90180270edc4eed7c46",
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "npm view socraticode@1.14.0 dist.integrity read 2026-09-25; the tarball was downloaded to a scratch directory and independently sha256- and sha512-hashed, both matching, and the sha256 also matches adoption/pins-macos-arm64.json's existing socraticode pin exactly",
+      "install_note": "2026-09-25 addition to complete the `token-efficiency` profile's Linux pin coverage: mirrors adoption/pins-macos-arm64.json's existing `socraticode` entry (same version, url, sha256 and `--ignore-scripts`). AGPL-3.0-only; upstream commercial alternative. `npm install --global --prefix tools/socraticode-1.14.0 --ignore-scripts socraticode@1.14.0`, exactly recipes/README.md's documented recipe, which this pin now also drives through the bootstrap script instead of only a manual install. `--ignore-scripts` (this pin's own `ignore_scripts: true` field, read by `install_npm`) skips native postinstall/build steps. Only a reviewed archive hash, not a claim of a working native codebase-index handshake on this host.",
+      "version_probe": {
+        "method": "npm-metadata",
+        "note": "No argument parsing at all: every invocation, --help and --version included, starts its MCP stdio server (dist/index.js never reads process.argv; observed 2026-09-25 with socraticode 1.14.0, matching the macOS pin's own note), so the package version is read from npm metadata instead. Never run `socraticode --version` or with no arguments on a real install -- it starts the server."
+      }
     }
   ]
 }

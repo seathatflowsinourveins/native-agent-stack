@@ -3281,13 +3281,13 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "d8268a9e26e5eb443812f02e95f75d1d34b6b35ccd1ab0f81a4867805369097c",
-      "bytes": 16729
+      "sha256": "14d361f249250e74b4bb74184e2e3a7ee70425137d91bb4807f0979b2c7b496f",
+      "bytes": 16859
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "0d86c8ea7c16cbf2dbc32ae036a32076c3d97e1c0b670c4fb504fa0798f6444d",
-      "bytes": 30963
+      "sha256": "3616b329e91fa37cdfd3d9d35d7158d202227a2bbe1261789bac8c831387e59c",
+      "bytes": 33544
     },
     {
       "path": "adoption/bootstrap-macos.sh",
@@ -3296,8 +3296,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "7ae823a619fe45cc0649bdea29db04f13751733d23521147c5c336b700f7fab5",
-      "bytes": 29211
+      "sha256": "fee60f155ffe12599dd18112f849e4d4bc26e6d60e2532000e786268bd8121e4",
+      "bytes": 30190
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3391,8 +3391,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "a27860663900ab944ef90e118acbf8b2307a775c46de06974ce0522f82cc3670",
-      "bytes": 15421
+      "sha256": "14395538823ee79dba6246c078a086a79ef067acd87910ea00283ce69758fd10",
+      "bytes": 24622
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -3401,13 +3401,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "d120d8c293c1ff1448fadb5ee05a2039a4716fafca0351d720600a3ff2a25fcf",
-      "bytes": 13027
+      "sha256": "47429e237a464f3d5f73e4165747e6b4078732e0685611998cf37b304b0cf517",
+      "bytes": 13347
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "21d9afbe452d4943b54be3a7a1ac9f6d118f1acc54d5ea76e938f18945e5b1dc",
-      "bytes": 40238
+      "sha256": "cd6007da211981327ea57d315cef6b19320b3e9947a6389800ee1b4f964ada03",
+      "bytes": 40660
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -9772,8 +9772,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "d1ea271d4d4927a25f90e0bc946c1e36f56055d776392a7383885392767ff607",
-      "bytes": 285723
+      "sha256": "83add79ece787b353bc4e1e09b3418beae3b4fa23c60d923e9663a906d947c52",
+      "bytes": 285857
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -10527,8 +10527,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "508b8aaac0986eb1995d7a23b0fea54e58197338a8036d959baade39e06ff724",
-      "bytes": 17729
+      "sha256": "20c4dae57d28a20fd35ea6e9fe5f50b22d427980ca1350963d4fc3fbd8450e1a",
+      "bytes": 17824
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -31197,8 +31197,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "48addad06c944bb41af532035bcec298a4edb72c91a6efbb25f49646157737b0",
-      "bytes": 42364
+      "sha256": "2533ef6ac5cf3e5ca9a6582a6c904534c8dd2c07afd0d8a3c5890d1a1b386856",
+      "bytes": 48679
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",

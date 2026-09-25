@@ -533,8 +533,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "2.0.0.dev0"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -1712,8 +1712,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "1.14.0"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -1858,8 +1858,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "0.37.0"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -1890,8 +1890,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "20.0.24"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -2213,8 +2213,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "1.14.0"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -3075,14 +3075,19 @@
         "ai-memory",
         "candidate:astral-sh-uv",
         "candidate:cli-cli",
+        "ccusage",
         "claude-code",
         "codex",
         "foundation-ai-memory",
+        "foundation-socraticode",
+        "headroom",
         "markitdown",
         "mcporter",
         "openresearch",
         "qmd",
         "rtk",
+        "serena",
+        "socraticode",
         "tavily-cli"
       ],
       "macos-arm64": [

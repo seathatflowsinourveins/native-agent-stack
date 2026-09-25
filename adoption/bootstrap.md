@@ -151,6 +151,20 @@ GitHub-hosted macOS runner; see
    config in [the RTK hook recipe](../recipes/README.md#native-context-mode-and-hooks),
    which the script does not write.
 
+   `pins-linux-x86_64.json` and `adoption/bootstrap-linux.sh` changed after `v2026.09.25.2`.
+   The Linux pins file gained `repomix`, `toon`,
+   `headroom`, `ccusage`, `serena` and `socraticode`, taking the `token-efficiency` row's
+   "Linux pins" column from 8 of 14 to all 14 (the "macOS pins" column stays
+   partly unpinned; see [the profile table](README.md#choose-a-small-starting-profile)).
+   `install_pin`'s `*-uv-tool` case now reads an optional pin `package` field
+   (falling back to its own `id` for every other uv-tool pin, unchanged) so a
+   PyPI distribution name that differs from the component id, like headroom's
+   `headroom-ai[mcp]`, installs correctly; a new `uv-tool-from-git` kind
+   installs Serena from its exact pinned commit (no released version exists
+   to pin a sha256 against) and re-verifies that commit against the
+   resulting `uv-receipt.toml`. At that tag and every earlier one, the Linux
+   pins file has no entry for any of those six ids.
+
    Both scripts and both claude-code pins changed after `v2026.09.24.1`: at
    that tag the pins are 2.1.280 and `adoption/bootstrap-linux.sh` and
    `adoption/bootstrap-macos.sh` reinstall the pin even over a newer Claude
