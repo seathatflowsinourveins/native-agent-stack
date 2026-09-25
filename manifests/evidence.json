@@ -6585,8 +6585,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_simulation.py",
-      "sha256": "65510deb73f89413120fff66e3fec01613b3d0beed03bd83249eef263d630407",
-      "bytes": 13461
+      "sha256": "8ac5955de1e814bb26fbfbca068a5719b9033b2bae0d8e50e78d7a78a546761e",
+      "bytes": 13482
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_strategy.py",
@@ -6660,8 +6660,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "b9c2eb7d71deadc84493b2343346a20db433efaef5c5c5ac166447d2c481cdc0",
-      "bytes": 144526
+      "sha256": "a8afef994b1c4d6373d4bba1e075605651ea30c939d55b4569ab8ba88ee1be84",
+      "bytes": 145079
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -6680,12 +6680,12 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/simulation.py",
-      "sha256": "a477660f071fadc917d823f34460854fc1be9400b5cb6cea76d9ce0e3f0375ac",
-      "bytes": 4820
+      "sha256": "ae7bdc2b9ca3bfe3a0d91098b836da65dd96b34d9a91f8d407f7add6bf196199",
+      "bytes": 4841
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "4c0892ebd040d4e3927b14a6298aae7784f5361df2bba816a998ca4241f5d50f",
+      "sha256": "937c979cb5a0d38b132fe49ad1161958c59b33c787fb29b9c8a912ffd380ffe5",
       "bytes": 6481
     },
     {
@@ -6700,8 +6700,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "365acb314adc823826bcdb7789d564f589653722bbc0085131703c2dd5094539",
-      "bytes": 80551
+      "sha256": "2653682b325f3349465abe1f7d324c49e89e8ae48697c1f4d8802a6cc55d86dc",
+      "bytes": 82257
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -9155,8 +9155,8 @@
     },
     {
       "path": "blueprints/us-equities/sim-capacity/experiment.json",
-      "sha256": "278c64891e2a5c1f75f7da462237b44e56e534b9320e2d634eb977b663758216",
-      "bytes": 14958
+      "sha256": "e48361fba7d46bbc1fc2d9424382e12ba144ceb35e87791bb4712de765ef634f",
+      "bytes": 15533
     },
     {
       "path": "blueprints/us-equities/sim-capacity/fee_model.py",
@@ -9215,18 +9215,18 @@
     },
     {
       "path": "blueprints/us-equities/sim-paper-compare/README.md",
-      "sha256": "5b6065ba0fe6b143a34221e2678a4cd18abca4d855224be1059cd05571e67570",
-      "bytes": 35911
+      "sha256": "c45cd475ac01ba5997b6b484028793fa7ca20d36a6729feed05595d31a997015",
+      "bytes": 36716
     },
     {
       "path": "blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json",
-      "sha256": "e87278b1e0fe062f2d665e3db63ad9eb71bc48814662b24e73cb012938122f75",
+      "sha256": "bfae3b9a08a8223bdc36b6cb7476360413fb22d7ce6153f8cef1af90cb0dc0d6",
       "bytes": 55327
     },
     {
       "path": "blueprints/us-equities/sim-paper-compare/replay_compare.py",
-      "sha256": "fab6a7c490828527f9dc67f0fcb7543ae34e73f2be844f92624576cbfe376037",
-      "bytes": 69113
+      "sha256": "3d5b4e9d1188709d11127609265a027de9f96d18ade8ae81966fd771f4cc7f11",
+      "bytes": 72280
     },
     {
       "path": "blueprints/us-equities/simulation-research/README.md",
@@ -29440,8 +29440,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "5ca49ff9d7a18aeeea10d2acc5d846317e62e9a7301eaa082eaf3f5e49fcf39b",
-      "bytes": 255662
+      "sha256": "d3179f86e597ce55ac48a6ba92882e8470c1282dfd488c660168117b48292a30",
+      "bytes": 258104
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -29460,8 +29460,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "c3db1080cda6acf83e26b7d4d1907b2f350ca6851056869bf6d19494f0f9740d",
-      "bytes": 89561
+      "sha256": "92cc3171370c449d361c6517b3652bc2880cea5c307615b65a2107cb62adc03b",
+      "bytes": 93175
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
@@ -29915,8 +29915,8 @@
     },
     {
       "path": "tests/test_sim_paper_compare.py",
-      "sha256": "8202b8f9524b26d1d6ced7bd6cae36477cc4801c8cc0ca14d403242e52ef9247",
-      "bytes": 97855
+      "sha256": "593ae7f23e9ad1327e25af964a80abbe524e44d08b00aadbd00ea56f9e5d3699",
+      "bytes": 100792
     },
     {
       "path": "tests/test_sota_convergence.py",

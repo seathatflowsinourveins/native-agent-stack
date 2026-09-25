@@ -800,9 +800,17 @@ class Controller:
                                              market_open=self.market_open, session_close=self.close)
                 if intent.side == "buy" and (self.stop or not self.port.ready):
                     raise SafetyError("admissions_not_ready")
-            wait = self.ledger.request_budget(self.clock(), kind, client_id=client_id)
+            # The durable row binds only a submit to its intent (requests.client_id is a
+            # foreign key), so naming a cancel can never make its budget reservation fail.
+            wait = self.ledger.request_budget(self.clock(), kind,
+                                              client_id=client_id if kind == "submit" else None)
             if not wait:
-                self.requests.append({"timestamp": self.clock(), "kind": kind})
+                entry = {"timestamp": self.clock(), "kind": kind}
+                if client_id is not None:
+                    # Submits and cancels name their order, so a sim-to-paper comparison
+                    # pairs each cancel exactly instead of inferring it from timing.
+                    entry["client_id"] = client_id
+                self.requests.append(entry)
                 return
             if kind == "submit":
                 self.defer_until = max(self.defer_until, self.clock() + wait)

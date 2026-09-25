@@ -95,7 +95,7 @@ class SimulatedPort:
         return [dict(row) for row in self.executions.get(order_id, [])]
 
     async def cancel(self, client_id):
-        await self.controller.before_request("cancel")
+        await self.controller.before_request("cancel", client_id=client_id)
         return self.orders.get(client_id)
 
     async def snapshot(self):
