@@ -3084,8 +3084,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "a46c942a1e1b32c61ca2393e22daa607103ba182c0a43cfcd2d822deda7c59a9",
-      "bytes": 9044
+      "sha256": "cfdc1cf9bad1fa20e37547656a5e509ffd62cb08dec993f6722f1328f1fad828",
+      "bytes": 9336
     },
     {
       "path": ".github/pull_request_template.md",

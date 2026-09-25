@@ -139,6 +139,10 @@
       "parser": "requirements.txt"
     },
     {
+      "path": "blueprints/us-equities/mover-v3/study/runtime-requirements.txt",
+      "parser": "requirements.txt"
+    },
+    {
       "path": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"
     },
     {
@@ -166,6 +170,10 @@
     {
       "path": "blueprints/us-equities/mover-v3/data-tools/requirements.in",
       "lockfile": "blueprints/us-equities/mover-v3/data-tools/requirements.lock"
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/study/runtime.lock",
+      "lockfile": "blueprints/us-equities/mover-v3/study/runtime-requirements.txt"
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.in",
