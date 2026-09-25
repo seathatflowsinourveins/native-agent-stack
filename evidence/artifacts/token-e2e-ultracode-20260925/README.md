@@ -78,7 +78,7 @@ Headroom's own estimate (+183,904) and the exact tokenizer (180,752 removed) agr
 
 ### Fresh native session
 
-A fresh `claude -p` session on Sonnet 5 listed these MCP servers as `connected` at start: context-mode, ai-memory, serena, jcodemunch, headroom and qmd. codebase-memory was `pending` at start and connected before its call. `headroom_stats`, `qmd status` and codebase-memory `list_projects` all returned. So a new session and its subagents load the new servers without extra steps. SocratiCode is registered for this project only, and the probe ran from `/tmp`.
+A fresh `claude -p` session on Sonnet 5 listed these MCP servers as `connected` at start: context-mode, ai-memory, serena, jcodemunch, headroom, qmd and the claude.ai Claude Docs connector. codebase-memory was `pending` at start and connected before its call. `headroom_stats`, `qmd status` and codebase-memory `list_projects` all returned. So a new session and its subagents load the new servers without extra steps. SocratiCode is registered for this project only, and the probe ran from `/tmp`.
 
 ## Retained failures and gaps
 
