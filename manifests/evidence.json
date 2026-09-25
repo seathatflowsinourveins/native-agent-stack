@@ -3121,8 +3121,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "a46c942a1e1b32c61ca2393e22daa607103ba182c0a43cfcd2d822deda7c59a9",
-      "bytes": 9044
+      "sha256": "cfdc1cf9bad1fa20e37547656a5e509ffd62cb08dec993f6722f1328f1fad828",
+      "bytes": 9336
     },
     {
       "path": ".github/pull_request_template.md",
@@ -3201,8 +3201,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "08d0e785ba3bf2ac21f4babf9053de8eb84ec18ab12ef74f59342dda358d5209",
-      "bytes": 1564
+      "sha256": "82f0346e4cbb1256995d327e08883ebd8d235a3ac4db11c7c980e40b00c88060",
+      "bytes": 1867
     },
     {
       "path": ".gitleaks.toml",
@@ -8817,13 +8817,13 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/README.md",
-      "sha256": "af4403163bd8571920dbbba35d508d2c001100d9449c1ff2b3203d797144cb59",
-      "bytes": 52178
+      "sha256": "b99bf498a9969f8a97ec743e3e213af93646c7d581a7d0f4061818e67bc73694",
+      "bytes": 60556
     },
     {
       "path": "blueprints/us-equities/mover-v3/data-pins.json",
-      "sha256": "a17c7c0af288d5af175a6f26b6ca9a6078f63c19527bddc97636cf452661e02c",
-      "bytes": 4425
+      "sha256": "01c442d6af65466406125132a5d800b9c94ae25c5d854ab7df3d66ff2991ff45",
+      "bytes": 4572
     },
     {
       "path": "blueprints/us-equities/mover-v3/data-tools/generate_session_calendar.py",
@@ -8862,8 +8862,8 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/protocol-core-draft.json",
-      "sha256": "7274c29ed1f902cbf9605e049bfafd1856f2fe7d76d5fbb6962c4ba38a757af4",
-      "bytes": 113618
+      "sha256": "29d529f2bd4ad7592ac55d3427f46aac6837b0fa631814209b98e9548e41981f",
+      "bytes": 309781
     },
     {
       "path": "blueprints/us-equities/mover-v3/protocol-draft.json",

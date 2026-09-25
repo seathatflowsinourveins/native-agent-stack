@@ -32,7 +32,7 @@
       "bytes": 0
     }
   ],
-  "amendment_rule": "Append-only: the content pinned here stays a byte prefix of each file (run_discipline.data_files). Both files are empty at this commit. Their line format is left to the freeze pull request. They are not hash-listed in manifests/evidence.json, so appending a line needs no manifest change.",
+  "amendment_rule": "Append-only: the content pinned here stays a byte prefix of each file (run_discipline.data_files). Both files are empty at this commit. Their line format is the versioned schema at protocol-core-draft.json run_discipline.amendment_format (schema_version 1, validated by study/core/amendments.py; review round 15, amendment-format item). They are not hash-listed in manifests/evidence.json, so appending a line needs no manifest change.",
   "calendar_generator": {
     "files": [
       {

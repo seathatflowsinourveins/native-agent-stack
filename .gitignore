@@ -13,6 +13,10 @@ node_modules/
 *.sqlite*
 *.db
 *.jsonl
+# The mover v3 run log, holdout access log and amendment files are append-only records that every run requires to be
+# committed and pushed (blueprints/us-equities/mover-v3/protocol-core-draft.json, run_discipline).
+!blueprints/us-equities/mover-v3/*.jsonl
+!blueprints/us-equities/mover-v3/data/*.jsonl
 adoption/hosts/*.json
 !adoption/hosts/example.json
 !adoption/hosts/macos-example.json
