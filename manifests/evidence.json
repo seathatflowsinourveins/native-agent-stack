@@ -3406,8 +3406,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "3909b624dd03741f888d5f5d4495aa4b130638caf8b62b441687bc18c9030dcd",
-      "bytes": 7604
+      "sha256": "e06ca5d1102a8f78c7a2d26e603de20a6706a9563258be39ee8019c52b6350b5",
+      "bytes": 7684
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -29747,8 +29747,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "fdb21dc1aa910ff68f2b558a02cdf98c9d836307b85dc8ecdb57aedfa3de4291",
-      "bytes": 5324
+      "sha256": "5d35e43cdd675535e492c1b56e89c0acbd88202aa676ece3b8f65941e0c00bec",
+      "bytes": 5771
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
