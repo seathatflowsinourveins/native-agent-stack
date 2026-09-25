@@ -31152,8 +31152,8 @@
     },
     {
       "path": "tools/token-report/test_token_manifest.py",
-      "sha256": "893aee96f40d14be1094f96127f3785b7fc7358529b1317310197ed71f60d481",
-      "bytes": 41984
+      "sha256": "31f3f034285fc30dbc6681418642be8295fdc101eddef228a51800708b005668",
+      "bytes": 42055
     },
     {
       "path": "tools/token-report/token_manifest.full.html.in",

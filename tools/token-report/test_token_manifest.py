@@ -571,6 +571,7 @@ class LedgerContract(unittest.TestCase):
                ({"features":{"hooks":False,"plugin_hooks":True}},False),
                ({"features":{"hooks":True,"plugin_hooks":False}},True),
                ({"features":{"plugin_hooks":True}},True),({"features":{"codex_hooks":False}},False),
+               ({"features":{"hooks":True,"codex_hooks":False}},True),
                ({"features":{"hooks":"true"}},False),({"features":"hooks"},True)]
         for config,expected in cases:
             with self.subTest(config=config):
