@@ -3241,8 +3241,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "d778ad47fc88d53c095c33cf38baffe25367ae3da1e9c5301161cace33d0d5ab",
-      "bytes": 16282
+      "sha256": "38f6b6795df6ed452b8abe9a7acf1832e8970f94d4673f6d3f55dcc76e4b3a7f",
+      "bytes": 16733
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -10537,8 +10537,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "d535cecf183578eef9ca05eef68d408a96203335489b5934f4e7a1c609165e7d",
-      "bytes": 15384
+      "sha256": "5011ad0bf7098323264c6cbd5b3a50ad49c219f424d24b1b1fa963172a2af179",
+      "bytes": 17268
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -30217,8 +30217,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "0569dfb9805bf56fee77a71273074441c9deb3ceba8f0117417d8c6ea384e6c8",
-      "bytes": 23773
+      "sha256": "c274575a6b3297e187f99cddb7eef62688532c8cc50eb525ed7c0a0df532d6b8",
+      "bytes": 26327
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -30497,8 +30497,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "65d5e4b208461e04d08c933e7d83eedb81157573cf0b3135c425b947f847565f",
-      "bytes": 32963
+      "sha256": "4f46a8e3871479ba55929a9cd0ed813c87c2dc33e30363b78f4d0e0ffd38ded3",
+      "bytes": 36665
     },
     {
       "path": "tests/test_adoption_version_probes.py",

@@ -127,17 +127,23 @@ state. Native Claude HUD is not a Codex Desktop panel.
 ## Coverage check
 
 Any host (a WSL2 workstation, a Mac) runs one value-free command from its checkout
-to see whether the selected practice is installed and wired into both native clients:
+to see whether the selected practice is present and wired into both native clients:
 
 ```sh
-python3 scripts/adoption_status.py --profile token-efficiency --client-wiring --json
+uv run --no-project --python 3.13 python scripts/adoption_status.py --profile token-efficiency --client-wiring --json
 ```
 
-Parsing the Codex TOML needs Python 3.11 or later; on an older `python3` use
-`uv run --no-project --python 3.13 python …`. The command runs none of the selected
-tools and reads no `~/.claude.json` or credential. It prints command presence plus
-`client_wiring` booleans, two hook-event counts, and `null` for a file it could not
-read or parse.
+The manifest supports Python 3.13 only. A `python3` of another version (Ubuntu
+24.04's is 3.12) still prints the report but keeps the top-level `status` at
+`prerequisites_missing` with exit 2, and one older than 3.11 cannot parse the Codex
+TOML. This check changed after `v2026.09.24.1`: that release's `adoption_status.py`
+has no `--client-wiring` and its manifest has no `token-efficiency` profile, so run it
+from a default-branch clone until the next release. The command runs none of the
+selected tools. It parses the client files named below whole and in-process, emits no
+value from them, and opens no credential store (`~/.claude.json`,
+`~/.claude/.credentials.json`, `~/.codex/auth.json`). It prints command presence plus
+`client_wiring`: booleans, two hook-event counts, `null` for a file it could not read
+or parse, and the computed `complete`.
 
 The `token-efficiency` profile in [the adoption manifest](../adoption/manifest.json)
 is the selected set. It holds the context-and-usage layer's current choice (RTK,
@@ -154,23 +160,38 @@ clients. `client_wiring` checks three places:
   a project `.codex/config.toml` names the Serena, SocratiCode and ai-memory servers;
 - `codex`, the Codex home: `AGENTS.md` references `RTK.md` (RTK 0.49.0 gives Codex
   instructions, not a hook); Context Mode is enabled and installed; `config.toml`
-  names the same three servers; and the number of `hooks.json` events that run
-  ai-memory.
+  names the same three servers; hooks are on (`hooks_feature_enabled`); and the
+  number of `hooks.json` events that run ai-memory. Codex 0.155.1 ships its hooks
+  feature stable and on by default, and the recipe's `codex features enable hooks`
+  writes `[features] hooks = true`. Setting `hooks = false`, or the legacy
+  `codex_hooks = false` without a `hooks` key, turns off `hooks.json` and Context
+  Mode's bundled hooks together, so the count is then zero.
 
-The practice is applied on a host when three things hold:
+The practice is applied on a host when all of these hold:
 
-- the profile's own `status` is `prerequisites_present` (the top-level `status`
-  stays `prerequisites_missing` on macOS, which the manifest does not list as
-  supported);
-- every `claude`, `project` and `codex` boolean is `true`, except that each Codex
-  server needs to be present in only one of the user or project `config.toml`;
-- both hook counts are above zero.
+- the profile's own `status` is `prerequisites_present`: every selected command is on
+  `PATH` and every recipe is present. The top-level `status`, and the exit code with
+  it, also need a platform and Python the manifest supports, so on macOS, which it
+  does not list, and under any interpreter other than 3.13 they stay
+  `prerequisites_missing` with exit 2. Neither includes `client_wiring`;
+- `client_wiring.complete` is `true`. It computes the wiring rule: every file parsed,
+  every `claude`, `project` and `codex` boolean is `true` (each Codex server named in
+  the user or the project `config.toml`), and both hook counts are above zero;
+- each selected tool reports its pinned version. This command checks presence on
+  `PATH` only and does not establish the pins. For the tools a bootstrap installs,
+  `installed-versions.txt` from [bootstrap step 2](../adoption/bootstrap.md) runs each
+  pin's declared `version_probe` (Claude Code's pin is a floor); for the rest, compare
+  each recipe's version command with the `manifests/stack.json` version.
 
-The remaining rows of the [machine list](token-efficiency-stack.json) are optional
-references outside the selection: jCodeMunch (a per-project opt-in), ast-grep,
-codebase-memory-mcp, Context Hub, AgentsView, Claude HUD, otel-tui and OmniRoute.
-The Collector, Prometheus, Loki and Grafana rows belong to the `observability`
-profile. A missing optional row does not make the practice unapplied.
+The other rows of the [machine list](token-efficiency-stack.json) are not in the
+profile, so this check treats them as optional: a host without them still follows
+the selected practice. jCodeMunch (a per-project opt-in), ast-grep and
+codebase-memory-mcp are task-selected options in the code-navigation layer's current
+choice, and Context Hub is the document-retrieval current choice's option for
+selected developer docs; none of the four is a layer winner or in the
+context-and-usage current choice. AgentsView, Claude HUD and otel-tui are viewers, and
+OmniRoute is an optional runtime. The Collector, Prometheus, Loki and Grafana rows
+belong to the `observability` profile.
 
 The check reports configuration, not activation. Plugin revisions, hook and project
 trust, Claude MCP registrations (`/mcp`), MCP server startup and one useful call per

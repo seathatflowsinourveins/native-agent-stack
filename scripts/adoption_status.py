@@ -2,11 +2,12 @@
 """Read-only adoption prerequisite report. No installation or runtime acceptance.
 
 Checks command presence with shutil.which; it never invokes those commands. The
-only subprocess is a bounded native Git revision query. No credentials, service/process
-state, network endpoints, or model APIs are read. Client configuration is read only
-with the opt-in --client-wiring, which parses fixed native client files in-process
-and reports fixed booleans and hook-event counts, never a value, command, path or
-environment value.
+only subprocess is a bounded native Git revision query. It opens no credential store
+(~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json) and reads no
+service/process state, network endpoint or model API. Client configuration is read
+only with the opt-in --client-wiring, which parses fixed native client files whole and
+in-process and emits no value from them: fixed booleans and hook-event counts only,
+never a value, command, path or environment value.
 """
 
 from __future__ import annotations
@@ -40,12 +41,14 @@ LIMITATIONS = [
 # --client-wiring replaces NO_CLIENT_STATE with these two statements.
 CLIENT_WIRING_LIMITATIONS = [
     "--client-wiring parses the user Claude settings and plugin registry, the Codex config.toml, hooks.json and "
-    "AGENTS.md, and this checkout's .claude/settings.json and .codex/config.toml, and reports fixed booleans and "
-    "hook-event counts only. It never reads ~/.claude.json, credentials, network endpoints or running processes; "
-    "environment variables only locate the client homes, and two opt-ins are checked by name.",
-    "Configured wiring is not activation: managed, project or local Claude settings can override the user scope "
-    "read here, and plugin revisions, hook and project trust, Claude MCP registrations, MCP server startup and a "
-    "useful native call remain the clients' own checks (/mcp, /hooks, the plugin doctor).",
+    "AGENTS.md, and this checkout's .claude/settings.json and .codex/config.toml whole and in-process, and emits no "
+    "value from them: fixed booleans and hook-event counts only. It opens no credential store (~/.claude.json, "
+    "~/.claude/.credentials.json, ~/.codex/auth.json), network endpoint or running process; environment variables "
+    "only locate the client homes, and two opt-ins are checked by name.",
+    "Configured wiring is not activation: managed, project or local Claude settings, and Codex profiles, project "
+    "config.toml features and command-line overrides, can override the user scope read here; plugin revisions, hook "
+    "and project trust, Claude MCP registrations, MCP server startup and a useful native call remain the clients' "
+    "own checks (/mcp, /hooks, the plugin doctor).",
 ]
 # The selected token practice's client wiring (docs/token-efficiency-stack.md, "Coverage check").
 CONTEXT_MODE_PLUGIN = "context-mode@context-mode"
@@ -54,12 +57,16 @@ DEPTH_VARIABLE = "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH"
 CONCURRENCY_VARIABLE = "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS"
 EFFORT_VARIABLE = "CLAUDE_CODE_EFFORT_LEVEL"  # any value overrides every child's effort
 AGENT_TEAMS_VARIABLE = "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"  # the agent-teams opt-in
+# Codex 0.155.1's lifecycle-hook feature keys (codex-rs/features: the legacy alias, then the key), in the sorted
+# order Codex applies them, so "hooks" wins when both are set.
+CODEX_HOOK_FEATURES = ("codex_hooks", "hooks")
 CLIENT_FILE_LIMIT = 1_048_576
 CLIENT_WIRING_KEYS = {
     "claude": ("rtk_hook", "ai_memory_hook_events", "context_mode_plugin_enabled", "subagent_spawn_depth_1",
                "workflow_concurrency_set", "effort_level_env_unset", "agent_teams_off"),
     "project": ("settings_depth_and_concurrency", "codex_mcp_servers_present"),
-    "codex": ("rtk_instructions", "context_mode_plugin_enabled", "mcp_servers_present", "ai_memory_hook_events"),
+    "codex": ("rtk_instructions", "context_mode_plugin_enabled", "mcp_servers_present", "hooks_feature_enabled",
+              "ai_memory_hook_events"),
 }
 
 
@@ -302,6 +309,23 @@ def claude_wiring(claude_dir: Path, env) -> dict:
     }
 
 
+def codex_hooks_enabled(config) -> bool | None:
+    """Codex's lifecycle-hook feature, stable and on by default in 0.155.1. False turns off hooks.json and
+    plugin-bundled hooks alike, as disableAllHooks does for Claude; a non-boolean fails Codex's own parse."""
+    if config is None:
+        return None
+    features = config.get("features", {})
+    if not isinstance(features, dict):
+        return False
+    enabled = True
+    for key in CODEX_HOOK_FEATURES:
+        if key in features:
+            if not isinstance(features[key], bool):
+                return False
+            enabled = features[key]
+    return enabled
+
+
 def codex_wiring(codex_dir: Path) -> dict:
     config = read_client_file(codex_dir / "config.toml", "toml")
     agents = read_client_file(codex_dir / "AGENTS.md", "text")
@@ -314,11 +338,14 @@ def codex_wiring(codex_dir: Path) -> dict:
                          codex_dir.glob("plugins/cache/context-mode/context-mode/*/.codex-plugin/plugin.json"))
         except OSError:
             plugin = None
+    engine = codex_hooks_enabled(config)
     return {
         "rtk_instructions": None if agents is None else "RTK.md" in agents and (codex_dir / "RTK.md").is_file(),
         "context_mode_plugin_enabled": plugin,
         "mcp_servers_present": mcp_servers_present(config),
-        "ai_memory_hook_events": None if hooks is None else ai_memory_hook_events(hooks.get("hooks")),
+        "hooks_feature_enabled": engine,
+        "ai_memory_hook_events": None if hooks is None or engine is None else
+                                 ai_memory_hook_events(hooks.get("hooks")) if engine else 0,
     }
 
 
@@ -347,19 +374,36 @@ def fixed_wiring(result) -> bool:
             and only_flags(result))
 
 
+def leaves(value) -> list:
+    return [leaf for item in value.values() for leaf in leaves(item)] if isinstance(value, dict) else [value]
+
+
+def wiring_complete(groups: dict) -> bool:
+    """The documented rule (docs/token-efficiency-stack.md, "Coverage check"): every file parsed, every boolean
+    true with each Codex server named in the user or the project config.toml, and both hook counts above zero."""
+    if None in leaves(groups):
+        return False
+    claude, project, codex = groups["claude"], groups["project"], groups["codex"]
+    servers = all(codex["mcp_servers_present"][name] or project["codex_mcp_servers_present"][name]
+                  for name in WIRED_MCP_SERVERS)
+    flags = all(value for group in groups.values() for value in group.values() if isinstance(value, bool))
+    return servers and flags and claude["ai_memory_hook_events"] > 0 and codex["ai_memory_hook_events"] > 0
+
+
 def client_wiring(root: Path, env=None) -> dict:
     """Opt-in check that the selected token practice is wired into the native clients.
 
     Reads the user Claude and Codex homes (CLAUDE_CONFIG_DIR and CODEX_HOME when set) and this
-    checkout's project files. Fixed keys only; None marks a file that is unreadable or malformed."""
+    checkout's project files. Fixed keys only; None marks a file that is unreadable or malformed,
+    and "complete" applies the documented rule to the three groups."""
     env = os.environ if env is None else env
     home = env.get("HOME") or str(Path.home())
-    result = {"claude": claude_wiring(Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude"), env),
+    groups = {"claude": claude_wiring(Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude"), env),
               "project": project_wiring(root),
               "codex": codex_wiring(Path(env.get("CODEX_HOME") or f"{home}/.codex"))}
-    if not fixed_wiring(result):
+    if not fixed_wiring(groups):
         raise AssertionError("client wiring must be the fixed keys with boolean or count values")
-    return result
+    return {**groups, "complete": wiring_complete(groups)}
 
 
 def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[str] | None = None,
@@ -419,7 +463,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", action="store_true", help="Emit the bounded report as JSON")
     parser.add_argument("--client-wiring", action="store_true",
                         help="Also report whether the selected token practice is wired into the native Claude Code "
-                             "and Codex clients (fixed booleans and hook-event counts only)")
+                             "and Codex clients (fixed booleans, hook-event counts and a computed 'complete' only; "
+                             "the exit code is unchanged)")
     args = parser.parse_args(argv)
     report = inspect_adoption(args.manifest, args.repo_root, args.profile, with_client_wiring=args.client_wiring)
     if args.json:
@@ -432,7 +477,9 @@ def main(argv: list[str] | None = None) -> int:
             missing += [item["path"] for item in profile["recipes"] if not item["present"]]
             print(f"{profile['id']}: {profile['status']}" + (f" (missing: {', '.join(missing)})" if missing else ""))
         if "client_wiring" in report:
-            print("Client wiring: " + json.dumps(report["client_wiring"], sort_keys=True))
+            wiring = dict(report["client_wiring"])
+            print(f"Client wiring complete: {json.dumps(wiring.pop('complete', None))}")
+            print("Client wiring: " + json.dumps(wiring, sort_keys=True))
         for error in report["errors"]:
             print(f"Error: {error}")
         for limitation in report["limitations"]:
