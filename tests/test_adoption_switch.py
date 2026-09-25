@@ -1298,6 +1298,17 @@ class UnitRestartTimeoutTests(unittest.TestCase):
     assertion) rather than only its own two op_unit_restart-calling tests, even though the third
     (main()'s generic safety net) does not itself touch procfs."""
 
+    def setUp(self):
+        # Minor finding (round 4): op_unit_restart's memory_gate_issue() runs before any of the
+        # mocked run_captured calls below, so without this override these op_unit_restart-calling
+        # tests depended on the real host clearing DEFAULT_MIN_MEMORY_KIB (6 GiB) MemAvailable --
+        # exactly the dependency 75f9be59 removed from UnitRestartTests' own env, brought back by
+        # this newer, unittest.TestCase-based (not SwitchFixture-based) class. 0 always passes the
+        # gate regardless of real host memory (see memory_gate_issue's own docstring).
+        patcher = unittest.mock.patch.dict(os.environ, {"ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB": "0"})
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_a_restart_command_timeout_is_reported_as_unit_restart_attempted_not_a_bare_timeout(self):
         def fake_run_captured(argv, **_kwargs):
             if argv[-2:] == ["restart", "svc.service"]:
