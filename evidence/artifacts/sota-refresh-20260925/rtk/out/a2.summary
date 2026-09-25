@@ -1,0 +1,5 @@
+corpus=76 executed=73 differing=11: git-log-p, git-diff-stat, git-show-blob, git-show-blob-tail, head-3, head-bare, head-n-3, wc-missing, pytest-fake, python-m-pytest, ruff-fake
+hook rc nonzero: []
+rc != native (049): ['find-missing', 'diff-missing', 'python-m-pytest']
+rc != native (050): ['find-missing', 'diff-missing', 'python-m-pytest']
+permissionDecision set: []

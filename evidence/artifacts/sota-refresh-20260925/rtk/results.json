@@ -1,0 +1,889 @@
+{
+  "schema_version": 1,
+  "id": "sota-refresh-20260925-rtk",
+  "unit": "rtk",
+  "host": "nativestack-5975wx-20260925",
+  "date_utc": "2026-09-25",
+  "baseline_version": "0.49.0",
+  "candidate_version": "0.50.0",
+  "upstream": {
+    "repository": "https://github.com/rtk-ai/rtk",
+    "release": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+    "tag_commit": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+    "published_at": "2026-09-24T10:02:31Z",
+    "asset": "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz",
+    "checksums": "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/checksums.txt"
+  },
+  "roles": {
+    "implementer": "Qualification unit of the 2026-09-25 SOTA-refresh workflow: installed the candidate into a new prefix and ran every step below for both arms without touching production.",
+    "verifier": "A separate agent that re-ran the implementer's steps from byte-identical copies of the scripts, checked integrity independently and returned the verdict and defects below.",
+    "coordinator": "The coordinating session that performed the production switch and the post-switch runs (coordinator observations).",
+    "writing_worker": "The session that assembled this directory; it performed only the read-only production read-back in out/readback.out."
+  },
+  "sanitization": "Session scratch paths are replaced by <impl>/$IMPL (the unit's scratch directory), <scratchpad> and <session-tmp>; the home directory by ~ and the account name by <user>. Session identifiers and tokens are not present. Files marked byte_identical_to_run_copy are the exact bytes that ran; for the others run_copy_sha256 is the digest of the unsanitized run copy, which stays in session scratch.",
+  "files": [
+    {
+      "path": "rtk-hook-acceptance-v2.sh",
+      "sha256": "186dd8914a6c18850261d3bf34a3fd2f2c8767d6696931a99c90f1eeb79c9376",
+      "bytes": 8696,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<impl>/rtk-hook-acceptance-v2.sh"
+    },
+    {
+      "path": "rtk-hook-acceptance-v3.1.sh",
+      "sha256": "3644a0dc50e9bcb1f785e5cc5fe36fda233ca915dd731ab1aa4709932f5f7755",
+      "bytes": 15509,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<impl>/rtk-hook-acceptance-v3.1.sh"
+    },
+    {
+      "path": "a2.py",
+      "sha256": "e7bb3550fa4db0a7cf90b6b17f0ad66708bbf63b655f51ab91bfc999eb390be1",
+      "bytes": 13017,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<impl>/a2.py"
+    },
+    {
+      "path": "mitigation.sh",
+      "sha256": "b4f68b559bfd9bb9d6ed3c6f2aa69cf8d7112a607e1c623638e651f319257d4f",
+      "bytes": 3798,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<impl>/mitigation.sh"
+    },
+    {
+      "path": "out/fetch.out",
+      "sha256": "8942f58ac4fd35cc09d739e69bd6fffd3c5cc117861579b07be9a996eb2a38a0",
+      "bytes": 2124,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "57490ef25e9505497f85998951b856c8ad22fee99917866e30d43cf1ccbcb4c5",
+      "run_copy": "<impl>/out/fetch.out",
+      "publication_edit": "One line reworded because its 'api = <hex>' form trips gitleaks' generic-api-key rule; the digest and the equality it states are unchanged: sha256(checksums.txt)      = 4c7116898ae812960dfa0de3b3acc5406a0da49209f0ad7bed4d4ed8c4785048 (the GitHub releases API reports the same digest for checksums.txt; so does the research record)"
+    },
+    {
+      "path": "out/install.out",
+      "sha256": "99e97a66f8af15153f147ec8e7798c28878f5ea7e0dc0924333084936199a393",
+      "bytes": 793,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "d7a3538e769de48a786226e58c3816c81ad2057d9620d88e06096d8649ed0ece",
+      "run_copy": "<impl>/out/install.out"
+    },
+    {
+      "path": "out/run-acceptance.summary",
+      "sha256": "ad4283b3c9bcbb143f286b082a01ab34f8e1e96c56d5fbbe5a90f5555566225e",
+      "bytes": 908,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "ad4283b3c9bcbb143f286b082a01ab34f8e1e96c56d5fbbe5a90f5555566225e",
+      "run_copy": "<impl>/out/run-acceptance.summary"
+    },
+    {
+      "path": "out/run-v31.summary",
+      "sha256": "c651e72aa07a5cf5db98e4baf01a8ea34796e3c29bc6bc2f57c9aa19e8f164fe",
+      "bytes": 518,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "c651e72aa07a5cf5db98e4baf01a8ea34796e3c29bc6bc2f57c9aa19e8f164fe",
+      "run_copy": "<impl>/out/run-v31.summary"
+    },
+    {
+      "path": "out/v2-050.out",
+      "sha256": "33b6f39989cd2b5bcf66d6765d3339dc4907fece5aba7b9e75ff309e11d53df4",
+      "bytes": 1374,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "3b6258eb1846b92044204d97ac4b9eeb23c882fd069b3ca8eeccba473afd0eb8",
+      "run_copy": "<impl>/out/v2-050.out"
+    },
+    {
+      "path": "out/v2-049.out",
+      "sha256": "cb2f7a468e9764c76b2a93732765f6c6be1c9db08256e5dcd79f4a31ac5b7a0e",
+      "bytes": 1542,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "7e9b6839b3237d728a98fd8a88589cf0d3d384fd8b3407efcba1a42c2e7a937e",
+      "run_copy": "<impl>/out/v2-049.out"
+    },
+    {
+      "path": "out/v31-050.out",
+      "sha256": "748e5e4219747d41d5c6341201a4f7b08e2f608b4b2806c2e13674500769bb8e",
+      "bytes": 3478,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "b6ef9e218f8dada2b0c395b0d9d03aa1039f0a4e7d0b831319420ad23debcf84",
+      "run_copy": "<impl>/out/v31-050.out"
+    },
+    {
+      "path": "out/v31-049.out",
+      "sha256": "19458daeaa7de3df2089360cf6612658e24487de4f99ea1d96c39c8ca1cee914",
+      "bytes": 3683,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "42fb6910d60df1fa97661cc4af9ab2b139b7eb03811d821f3171528f6b63a29d",
+      "run_copy": "<impl>/out/v31-049.out"
+    },
+    {
+      "path": "out/v31-fake-block.out",
+      "sha256": "1c794c5f615fbfd484277b90d658c4513819ead2f59f5ceaf24b9aadb20f5a4a",
+      "bytes": 6925,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "90dc051ca8f37875e7d49b43766b4a1b80c4483fa8ade0ae2b06c3cfd32866f4",
+      "run_copy": "<impl>/out/v31-fake-block.out"
+    },
+    {
+      "path": "out/v31-fake-allow.out",
+      "sha256": "c37c9cd43550822a733a34286c03676e6a412413f8078c97102b5b0da5c5071e",
+      "bytes": 7838,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "a416a7eff5eda39e208c0819e2fb2844414504433d0a3771cd18f45980ada0ad",
+      "run_copy": "<impl>/out/v31-fake-allow.out"
+    },
+    {
+      "path": "out/verify-0.50.0.out",
+      "sha256": "66e5c69675089b206da056ae57e29ea99588a22642e611255c66c4071658aa9f",
+      "bytes": 163,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "66e5c69675089b206da056ae57e29ea99588a22642e611255c66c4071658aa9f",
+      "run_copy": "<impl>/out/verify-0.50.0.out"
+    },
+    {
+      "path": "out/verify-0.49.0.out",
+      "sha256": "66e5c69675089b206da056ae57e29ea99588a22642e611255c66c4071658aa9f",
+      "bytes": 163,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "66e5c69675089b206da056ae57e29ea99588a22642e611255c66c4071658aa9f",
+      "run_copy": "<impl>/out/verify-0.49.0.out"
+    },
+    {
+      "path": "out/a2.summary",
+      "sha256": "c878ee65bb4c2b1a58ede13407d0f764c5876fe33d7945cb3fd77bced31af335",
+      "bytes": 369,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "c878ee65bb4c2b1a58ede13407d0f764c5876fe33d7945cb3fd77bced31af335",
+      "run_copy": "<impl>/out/a2.summary"
+    },
+    {
+      "path": "out/mitigation.out",
+      "sha256": "8abab9a22d59ff3d775bb7e91e73d1862545f3e53b91031c4ba13b98c2ce6967",
+      "bytes": 2412,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "8abab9a22d59ff3d775bb7e91e73d1862545f3e53b91031c4ba13b98c2ce6967",
+      "run_copy": "<impl>/out/mitigation.out"
+    },
+    {
+      "path": "out/negrow.out",
+      "sha256": "73b98af0ea745689b9845388c3640489419308f1ab0a224a05c216789b55a4e1",
+      "bytes": 1214,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "73b98af0ea745689b9845388c3640489419308f1ab0a224a05c216789b55a4e1",
+      "run_copy": "<impl>/out/negrow.out"
+    },
+    {
+      "path": "out/pytest-resolve.out",
+      "sha256": "296cebfb64062a7566f82a98a9273a6711d36a45b7eec162895bfc5ff00b17a9",
+      "bytes": 531,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "296cebfb64062a7566f82a98a9273a6711d36a45b7eec162895bfc5ff00b17a9",
+      "run_copy": "<impl>/out/pytest-resolve.out"
+    },
+    {
+      "path": "out/post-switch-v31.txt",
+      "sha256": "5c213154377d977c618bff56251f6424fc09fa1010ac1efb5d09d945128f1e5f",
+      "bytes": 3330,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "5c213154377d977c618bff56251f6424fc09fa1010ac1efb5d09d945128f1e5f",
+      "run_copy": "<impl>/out/post-switch-v31.txt"
+    },
+    {
+      "path": "out/post-switch-v31-noconfig.txt",
+      "sha256": "5da7c4a21a6cd27ec1416aea3d623ae861608814ed56a60f47ab17493819e3de",
+      "bytes": 3466,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "5da7c4a21a6cd27ec1416aea3d623ae861608814ed56a60f47ab17493819e3de",
+      "run_copy": "<impl>/out/post-switch-v31-noconfig.txt"
+    },
+    {
+      "path": "out/gain-0.49.0-gain---format-json.txt",
+      "sha256": "24db57f82e572fbc27360015bd175f3df962b87cd699e7b585deef6ff93ea817",
+      "bytes": 217,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "24db57f82e572fbc27360015bd175f3df962b87cd699e7b585deef6ff93ea817",
+      "run_copy": "<impl>/out/gain-0.49.0-gain---format-json.txt"
+    },
+    {
+      "path": "out/gain-0.50.0-gain---format-json.txt",
+      "sha256": "24db57f82e572fbc27360015bd175f3df962b87cd699e7b585deef6ff93ea817",
+      "bytes": 217,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "24db57f82e572fbc27360015bd175f3df962b87cd699e7b585deef6ff93ea817",
+      "run_copy": "<impl>/out/gain-0.50.0-gain---format-json.txt"
+    },
+    {
+      "path": "out/negrow-0.49.0-gain---all---format-json.txt",
+      "sha256": "d435ed226a9b0fd19f914fa8b5e96741945345896494afe8828a9e7c873f258d",
+      "bytes": 1577,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "d435ed226a9b0fd19f914fa8b5e96741945345896494afe8828a9e7c873f258d",
+      "run_copy": "<impl>/out/negrow-0.49.0-gain---all---format-json.txt"
+    },
+    {
+      "path": "out/negrow-0.50.0-gain---all---format-json.txt",
+      "sha256": "ebcc1edf7508503240be1abf68d5def9d70f51c7b408488f99957052015a14ba",
+      "bytes": 1504,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "ebcc1edf7508503240be1abf68d5def9d70f51c7b408488f99957052015a14ba",
+      "run_copy": "<impl>/out/negrow-0.50.0-gain---all---format-json.txt"
+    },
+    {
+      "path": "out/a2/a2-report.json",
+      "sha256": "211f7e2e44df47e8543b9597d6239ce908f17fad3fb1fa5ea9ee01459c4150db",
+      "bytes": 28772,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "211f7e2e44df47e8543b9597d6239ce908f17fad3fb1fa5ea9ee01459c4150db",
+      "run_copy": "<impl>/out/a2/a2-report.json"
+    },
+    {
+      "path": "out/a2/a2-table.txt",
+      "sha256": "719600a4f2867af1f53c09d3b904c606917f2700054ad72e3cae1b1eadaa3766",
+      "bytes": 7619,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "719600a4f2867af1f53c09d3b904c606917f2700054ad72e3cae1b1eadaa3766",
+      "run_copy": "<impl>/out/a2/a2-table.txt"
+    },
+    {
+      "path": "out/a2/raw/git-show-blob-tail.native.out",
+      "sha256": "bb93ea3b86e6c08404d176f63449f982dfe130b492463716098fea3d49c7da3d",
+      "bytes": 45,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "bb93ea3b86e6c08404d176f63449f982dfe130b492463716098fea3d49c7da3d",
+      "run_copy": "<impl>/out/a2/raw/git-show-blob-tail.native.out"
+    },
+    {
+      "path": "out/a2/raw/git-show-blob-tail.native.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/git-show-blob-tail.native.err"
+    },
+    {
+      "path": "out/a2/raw/git-show-blob-tail.049.out",
+      "sha256": "bb93ea3b86e6c08404d176f63449f982dfe130b492463716098fea3d49c7da3d",
+      "bytes": 45,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "bb93ea3b86e6c08404d176f63449f982dfe130b492463716098fea3d49c7da3d",
+      "run_copy": "<impl>/out/a2/raw/git-show-blob-tail.049.out"
+    },
+    {
+      "path": "out/a2/raw/git-show-blob-tail.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/git-show-blob-tail.049.err"
+    },
+    {
+      "path": "out/a2/raw/git-show-blob-tail.050.out",
+      "sha256": "8da640e83e2f8c41dddc5e2d99ca684aac17752ef146e45aea21b7d4f0ff8c59",
+      "bytes": 121,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "8da640e83e2f8c41dddc5e2d99ca684aac17752ef146e45aea21b7d4f0ff8c59",
+      "run_copy": "<impl>/out/a2/raw/git-show-blob-tail.050.out"
+    },
+    {
+      "path": "out/a2/raw/git-show-blob-tail.050.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/git-show-blob-tail.050.err"
+    },
+    {
+      "path": "out/a2/raw/find-missing.native.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/find-missing.native.out"
+    },
+    {
+      "path": "out/a2/raw/find-missing.native.err",
+      "sha256": "3401a947eb452bee599065ff1d1d4c9ec0a8ef82199386acab0848f204c13fa4",
+      "bytes": 47,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "3401a947eb452bee599065ff1d1d4c9ec0a8ef82199386acab0848f204c13fa4",
+      "run_copy": "<impl>/out/a2/raw/find-missing.native.err"
+    },
+    {
+      "path": "out/a2/raw/find-missing.049.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/find-missing.049.out"
+    },
+    {
+      "path": "out/a2/raw/find-missing.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/find-missing.049.err"
+    },
+    {
+      "path": "out/a2/raw/find-missing.050.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/find-missing.050.out"
+    },
+    {
+      "path": "out/a2/raw/find-missing.050.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/find-missing.050.err"
+    },
+    {
+      "path": "out/a2/raw/diff-missing.native.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/diff-missing.native.out"
+    },
+    {
+      "path": "out/a2/raw/diff-missing.native.err",
+      "sha256": "e9a0041b1c4fe568cedb5c83d3a62f5adcd005fb96fc43d9606354ef913a7d41",
+      "bytes": 45,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e9a0041b1c4fe568cedb5c83d3a62f5adcd005fb96fc43d9606354ef913a7d41",
+      "run_copy": "<impl>/out/a2/raw/diff-missing.native.err"
+    },
+    {
+      "path": "out/a2/raw/diff-missing.049.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/diff-missing.049.out"
+    },
+    {
+      "path": "out/a2/raw/diff-missing.049.err",
+      "sha256": "3578cecb5e93285bf68cb2e5922621e608003676239689207814d24d7851d53a",
+      "bytes": 44,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "3578cecb5e93285bf68cb2e5922621e608003676239689207814d24d7851d53a",
+      "run_copy": "<impl>/out/a2/raw/diff-missing.049.err"
+    },
+    {
+      "path": "out/a2/raw/diff-missing.050.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/diff-missing.050.out"
+    },
+    {
+      "path": "out/a2/raw/diff-missing.050.err",
+      "sha256": "3578cecb5e93285bf68cb2e5922621e608003676239689207814d24d7851d53a",
+      "bytes": 44,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "3578cecb5e93285bf68cb2e5922621e608003676239689207814d24d7851d53a",
+      "run_copy": "<impl>/out/a2/raw/diff-missing.050.err"
+    },
+    {
+      "path": "out/a2/raw/git-log-plain.native.out",
+      "sha256": "005ac39188cc33754f1fb1e609c7e2233b68662ef774cf80e7769cac0265d212",
+      "bytes": 1863,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "005ac39188cc33754f1fb1e609c7e2233b68662ef774cf80e7769cac0265d212",
+      "run_copy": "<impl>/out/a2/raw/git-log-plain.native.out"
+    },
+    {
+      "path": "out/a2/raw/git-log-plain.native.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/git-log-plain.native.err"
+    },
+    {
+      "path": "out/a2/raw/git-log-plain.049.out",
+      "sha256": "fff1722ca268fd770bf2b95e0f32dbc74eb9e9deb6f9c1a5465c9afc7b214152",
+      "bytes": 324,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "fff1722ca268fd770bf2b95e0f32dbc74eb9e9deb6f9c1a5465c9afc7b214152",
+      "run_copy": "<impl>/out/a2/raw/git-log-plain.049.out"
+    },
+    {
+      "path": "out/a2/raw/git-log-plain.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/git-log-plain.049.err"
+    },
+    {
+      "path": "out/a2/raw/git-log-plain.050.out",
+      "sha256": "fff1722ca268fd770bf2b95e0f32dbc74eb9e9deb6f9c1a5465c9afc7b214152",
+      "bytes": 324,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "fff1722ca268fd770bf2b95e0f32dbc74eb9e9deb6f9c1a5465c9afc7b214152",
+      "run_copy": "<impl>/out/a2/raw/git-log-plain.050.out"
+    },
+    {
+      "path": "out/a2/raw/git-log-plain.050.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/git-log-plain.050.err"
+    },
+    {
+      "path": "out/a2/raw/git-log-oneline.native.out",
+      "sha256": "414dc8921e19e40a4c1b02c023d4e48c40bb827fedbbea50c545349f921dbebb",
+      "bytes": 186,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "414dc8921e19e40a4c1b02c023d4e48c40bb827fedbbea50c545349f921dbebb",
+      "run_copy": "<impl>/out/a2/raw/git-log-oneline.native.out"
+    },
+    {
+      "path": "out/a2/raw/git-log-oneline.native.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/git-log-oneline.native.err"
+    },
+    {
+      "path": "out/a2/raw/git-log-oneline.049.out",
+      "sha256": "fd7bdef04127a1da266a4f2958c9a6887f15417111c3ed44078d9c374878b57a",
+      "bytes": 158,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "fd7bdef04127a1da266a4f2958c9a6887f15417111c3ed44078d9c374878b57a",
+      "run_copy": "<impl>/out/a2/raw/git-log-oneline.049.out"
+    },
+    {
+      "path": "out/a2/raw/git-log-oneline.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/git-log-oneline.049.err"
+    },
+    {
+      "path": "out/a2/raw/git-log-oneline.050.out",
+      "sha256": "fd7bdef04127a1da266a4f2958c9a6887f15417111c3ed44078d9c374878b57a",
+      "bytes": 158,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "fd7bdef04127a1da266a4f2958c9a6887f15417111c3ed44078d9c374878b57a",
+      "run_copy": "<impl>/out/a2/raw/git-log-oneline.050.out"
+    },
+    {
+      "path": "out/a2/raw/git-log-oneline.050.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/git-log-oneline.050.err"
+    },
+    {
+      "path": "out/a2/raw/python-m-pytest.native.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/python-m-pytest.native.out"
+    },
+    {
+      "path": "out/a2/raw/python-m-pytest.native.err",
+      "sha256": "388552e41b2d166e6c7226b80052afa6c69a6b71ed8c63a6e8002dc3c4817e78",
+      "bytes": 67,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "a08e91849bc894008c400698042cff341fb0a49d17d0d77c4e0f997a12eb0d65",
+      "run_copy": "<impl>/out/a2/raw/python-m-pytest.native.err"
+    },
+    {
+      "path": "out/a2/raw/python-m-pytest.049.out",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "run_copy": "<impl>/out/a2/raw/python-m-pytest.049.out"
+    },
+    {
+      "path": "out/a2/raw/python-m-pytest.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_copy": "<impl>/out/a2/raw/python-m-pytest.049.err"
+    },
+    {
+      "path": "out/a2/raw/python-m-pytest.050.out",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "run_copy": "<impl>/out/a2/raw/python-m-pytest.050.out"
+    },
+    {
+      "path": "out/a2/raw/python-m-pytest.050.err",
+      "sha256": "d79af70eaa4401456e680940c237b174a45e4043b2d302123609067731e1f917",
+      "bytes": 51,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "d79af70eaa4401456e680940c237b174a45e4043b2d302123609067731e1f917",
+      "run_copy": "<impl>/out/a2/raw/python-m-pytest.050.err"
+    },
+    {
+      "path": "out/readback.out",
+      "sha256": "3755880cd097828bdb3025f0e517843ac49f78561a9e05fd4a8b0611ccfcaa21",
+      "bytes": 973,
+      "byte_identical_to_run_copy": false,
+      "run_copy": "writing worker read-back (read-only), rtk section"
+    }
+  ],
+  "integrity": {
+    "artifact": "rtk-x86_64-unknown-linux-musl.tar.gz from GitHub release rtk-ai/rtk v0.50.0 (4857739 bytes; single tar member `rtk`, 11040640 bytes, mode 0755, member sha256 23433a2a50bdeb12199cadd4b94b639238d6c38529fcba1c30c9295db5fa9517 = installed binary)",
+    "expected": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
+    "actual": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
+    "source": "Checked before install (2026-09-25T18:44:35Z). The digest matches (1) the publisher checksums.txt from the same v0.50.0 release (`sha256sum --check --strict`: OK); the checksums.txt sha256 is 4c7116898ae812960dfa0de3b3acc5406a0da49209f0ad7bed4d4ed8c4785048, which equals the GitHub API digest for that asset. It also matches (2) the GitHub releases API asset digest for the tarball, (3) the research-recorded value and (4) the refuter's earlier independent download. The tag v0.50.0 resolves to 1d87b8e719ce0a50c223cd93ca64dd16921f9aec, and the release is latest=true and not a prerelease. No signature is published and the attestations API returned HTTP 404. All sources come from the same release workflow; the binary was not rebuilt from source.",
+    "verified": true
+  },
+  "steps": [
+    {
+      "name": "pre-state fingerprint (read-only)",
+      "arm": "production",
+      "command": "bash <impl>/prestate.sh before   (<impl> = <scratchpad>/sota-refresh/impl/rtk)",
+      "exit": 0,
+      "output_excerpt": "18:44:03Z. bin/rtk -> ~/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk. There is no rtk-0.50.0 prefix. tools/rtk-0.49.0/rtk sha256 a051b223.... ~/.claude/settings.json sha256 ddfcbf6d... registers PreToolUse 'rtk hook claude' once (matcher Bash); defaultMode bypassPermissions. Bash allow rules: user 0, project 0. There is no ~/.config/rtk/config.toml, and filters.toml has sha256 dbe3740d.... The legacy ~/.claude/hooks/rtk-rewrite.sh is absent. 12 user services are running.",
+      "pass": true,
+      "observed_by": "implementer"
+    },
+    {
+      "name": "download + integrity verification",
+      "arm": "candidate",
+      "command": "bash <impl>/fetch.sh   (gh release download v0.50.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt)",
+      "exit": 0,
+      "output_excerpt": "Release list: v0.50.0 latest=true. Newer releases are prereleases only: dev-0.50.1-rc.456/457 and dev-0.51.0-rc.459. sha256(tarball)=bc2b8902..., identical to the checksums.txt line, the API digest, the research value and the refuter's download. checksums.txt 4c711689... equals the API digest. The tar listing is exactly `rtk` (-rwxr-xr-x, 11040640 bytes). Attestation lookup: 'gh: Not Found (HTTP 404)'. Output ends 'INTEGRITY verified'.",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "out/fetch.out"
+    },
+    {
+      "name": "install into new prefix only",
+      "arm": "candidate",
+      "command": "bash <impl>/install.sh   (test ! -e prefix; mkdir ~/.local/share/codex-ecosystem/tools/rtk-0.50.0; tar -xzf <verified tarball> -C prefix)",
+      "exit": 0,
+      "output_excerpt": "Installed sha256 23433a2a50bdeb12199cadd4b94b639238d6c38529fcba1c30c9295db5fa9517, an ELF 64-bit static-pie. 'version: rtk 0.50.0' and 'baseline version: rtk 0.49.0'. bin/rtk is unchanged (before = after = tools/rtk-0.49.0/rtk), and PATH rtk still resolves to 0.49.0.",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "out/install.out"
+    },
+    {
+      "name": "refuter's corrected acceptance v2 (unchanged, sha256 186dd891...)",
+      "arm": "candidate",
+      "command": "TMPDIR=<impl>/tmp bash rtk-hook-acceptance-v2.sh ~/.local/share/codex-ecosystem/tools/rtk-0.50.0 0.50.0",
+      "exit": 0,
+      "output_excerpt": "42 PASS, 0 FAIL, 1 NOTE ('diff unreadable-file rc=1 (native diff: 2 ...) stderr=[rtk: No such file or directory (os error 2)]'), RESULT pass. This matches the refuter's predicted 42/0/1.",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "out/v2-050.out"
+    },
+    {
+      "name": "refuter's corrected acceptance v2 (unchanged)",
+      "arm": "baseline",
+      "command": "TMPDIR=<impl>/tmp bash rtk-hook-acceptance-v2.sh ~/.local/share/codex-ecosystem/tools/rtk-0.49.0 0.49.0",
+      "exit": 1,
+      "output_excerpt": "34 PASS, 8 FAIL, 1 NOTE, RESULT fail. The FAILs: head-1 and head-5 rewrite to '--max-lines N' and their bytes differ from native head; 'wc stderr lost: []'; 'pytest stderr lost: []'; 'blob not windowed/announced: [row 4000]'; 'log cap silent: []'. This reproduces the refuter's baseline.",
+      "pass": false,
+      "observed_by": "implementer",
+      "output_file": "out/v2-049.out"
+    },
+    {
+      "name": "extended acceptance v3, first run (sha256 df7a7fb3...)",
+      "arm": "candidate",
+      "command": "TMPDIR=<impl>/tmp bash rtk-hook-acceptance-v3.sh ~/.local/share/codex-ecosystem/tools/rtk-0.50.0 0.50.0",
+      "exit": 1,
+      "output_excerpt": "87 PASS, 1 FAIL, 4 NOTE. The only FAIL: 'git status outside repo error text lost [not a git repository] :: stderr=[Not a git repository]'; the exit code matched native (128). The baseline has the same FAIL. The cause is the check's case-sensitive key: rtk condenses git's fatal line to 'Not a git repository' in both versions (git_cmd.rs).",
+      "pass": false,
+      "observed_by": "implementer",
+      "output_file": "out/run-acceptance.summary"
+    },
+    {
+      "name": "extended acceptance v3, first run",
+      "arm": "baseline",
+      "command": "TMPDIR=<impl>/tmp bash rtk-hook-acceptance-v3.sh ~/.local/share/codex-ecosystem/tools/rtk-0.49.0 0.49.0",
+      "exit": 1,
+      "output_excerpt": "78 PASS, 10 FAIL, 4 NOTE. It differs from the candidate on exactly 9 lines: head-1 and head-5 (x4), wc stderr, pytest stderr, ruff stderr-only error text, blob window and log cap.",
+      "pass": false,
+      "observed_by": "implementer",
+      "output_file": "out/run-acceptance.summary"
+    },
+    {
+      "name": "extended acceptance v3.1 (sha256 3644a0dc...; one change: chk_fail2 phrase match is case-insensitive, as in upstream's own test)",
+      "arm": "candidate",
+      "command": "TMPDIR=<impl>/tmp bash rtk-hook-acceptance-v3.1.sh ~/.local/share/codex-ecosystem/tools/rtk-0.50.0 0.50.0",
+      "exit": 0,
+      "output_excerpt": "COUNTS pass=88 fail=0 note=4, RESULT pass. The checks:\n- Every hook call exits 0.\n- Empty, malformed and no-command payloads get exit 0 and silence.\n- 0 live Bash allow rules, so no permissionDecision on any live rewrite.\n- Synthetic config: allow and legacy ':*' allow give 'allow'; ask and compound forms give no decision; deny and leading-wildcard deny are silent.\n- Failure signals keep native rc and error text: wc, grep, pytest(fake), ruff(fake), ls, cat, find(abs), grep -r, rg, git status, git log/diff bad ref.\n- Content is kept for git status, diff, diff --cached, log -3, log --oneline -5 and show HEAD~1, and for grep -rn, rg -n, find, ls and wc.\n- The blob window recovers exactly and the log cap is announced.\nNOTEs: diff rc=1; plain git log shows 10 distinct subjects with no cap notice; Bash(git status) gives 'allow' for 'git status --short'; hook stderr in 1 of 45 calls ('No hook installed', synthetic config only).",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "out/v31-050.out"
+    },
+    {
+      "name": "extended acceptance v3.1",
+      "arm": "baseline",
+      "command": "TMPDIR=<impl>/tmp bash rtk-hook-acceptance-v3.1.sh ~/.local/share/codex-ecosystem/tools/rtk-0.49.0 0.49.0",
+      "exit": 1,
+      "output_excerpt": "COUNTS pass=79 fail=9 note=4, RESULT fail. The 9 FAILs: head-1 rewrite and bytes, head-5 rewrite and bytes, 'wc stderr lost: []', 'pytest stderr lost: []', 'ruff check (stderr-only) error text lost [Failed to parse] :: stderr=[]', 'blob not windowed/announced: [row 4000]', 'log cap silent: []'.",
+      "pass": false,
+      "observed_by": "implementer",
+      "output_file": "out/v31-049.out"
+    },
+    {
+      "name": "v3.1 discriminates broken candidates (refuter's fakes)",
+      "arm": "control",
+      "command": "bash rtk-hook-acceptance-v3.1.sh <sota-refresh>/rtk/refuter/fake-block 0.50.0 ; ... fake-allow 0.49.0",
+      "exit": 1,
+      "output_excerpt": "fake-block (deny JSON, exit 2): pass=4 fail=100 note=11, RESULT fail. fake-allow (injects 'allow' into 0.49.0 rewrites): pass=17 fail=85 note=11, RESULT fail. Both broken candidates are rejected.",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "out/v31-fake-block.out, out/v31-fake-allow.out"
+    },
+    {
+      "name": "rtk verify (scratch XDG_DATA_HOME)",
+      "arm": "candidate",
+      "command": "XDG_DATA_HOME=<scratch> RTK_DB_PATH=<scratch>/history.db ~/.local/share/codex-ecosystem/tools/rtk-0.50.0/rtk verify",
+      "exit": 0,
+      "output_excerpt": "'PASS  native binary hook registered in settings.json / command: rtk hook claude'; '154/154 tests passed'",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "out/verify-0.50.0.out"
+    },
+    {
+      "name": "rtk verify (scratch XDG_DATA_HOME)",
+      "arm": "baseline",
+      "command": "XDG_DATA_HOME=<scratch> RTK_DB_PATH=<scratch>/history.db ~/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk verify",
+      "exit": 0,
+      "output_excerpt": "'PASS  native binary hook registered in settings.json'; '154/154 tests passed'",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "out/verify-0.49.0.out"
+    },
+    {
+      "name": "A2 differential: 76-command corpus through both hooks, run in one deterministic fixture",
+      "arm": "both",
+      "command": "python3 <impl>/a2.py   (gh with an empty scratch GH_CONFIG_DIR and token variables removed; uv run, htop and the redirect form are compared as rewrites only)",
+      "exit": 0,
+      "output_excerpt": "corpus=76, executed=73. Hook rc is 0 for all commands on both versions, and permissionDecision is set on none.\n\n11 commands differ:\n- git-log-p: cap notice, stderr 53 bytes.\n- git-show-blob: 34893 -> 8275 bytes.\n- git-show-blob-tail: native and 0.49.0 print rows 3996-4000; 0.50.0 prints 'row 1030..row 1033' plus '... (+2967 lines) [see remaining: rtk proxy git show 'HEAD:big.txt' | tail -n +1034]'.\n- git-diff-stat: 0.50.0 is byte-identical to native; 0.49.0 dropped the leading space.\n- head-3, head-bare (0.49.0 311 bytes vs native 71) and head-n-3.\n- wc-missing, pytest-fake, python-m-pytest and ruff-fake: stderr now forwarded.\n\nrc differs from native on both versions: find-missing (native 1, rtk 0), diff-missing (native 2, rtk 1) and python-m-pytest.\n\ngit-diff-stat was reviewed as a benign fix. git-show-blob-tail needs review under the A2 rule.",
+      "pass": false,
+      "observed_by": "implementer",
+      "output_file": "out/a2.summary, out/a2/a2-table.txt, out/a2/a2-report.json, out/a2/raw/"
+    },
+    {
+      "name": "exclude_commands mitigation (scratch XDG_CONFIG_HOME, never ~/.config/rtk)",
+      "arm": "both",
+      "command": "bash <impl>/mitigation.sh   ([hooks] exclude_commands = [\"^git show [^ ]*:\", \"diff\"])",
+      "exit": 0,
+      "output_excerpt": "On both versions:\n- 'git show HEAD:big.txt | tail -n 5', 'git show HEAD:big.txt' and 'diff a.txt missing.txt' become SILENT (native).\n- 'git show HEAD~2', 'git show --stat HEAD', 'git diff' and 'git status' are still rewritten.\n\nUnder the mitigation on 0.50.0:\n- The tail output equals native (sha256 bb93ea3b86e6c08404d176f63449f982dfe130b492463716098fea3d49c7da3d).\n- diff gives rc=2 'diff: missing.txt: No such file or directory'.\n- rtk hook check returns rc=1 'No rewrite for: ...' for excluded commands and rc=0 for the others.\n\nControl without the config: both commands are rewritten.",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "out/mitigation.out"
+    },
+    {
+      "name": "rollback hazard: negative saved_tokens rows (SYNTHETIC rows in a scratch DB copy)",
+      "arm": "baseline",
+      "command": "python3 <impl>/negrow.py   (A2's 0.50.0 scratch DB plus 2 synthetic rows with saved_tokens=-500; rtk gain, --history, --all, --format json|csv)",
+      "exit": 0,
+      "output_excerpt": "The A2 DB written by 0.50.0 has 66 rows, 0 of them negative. With the synthetic rows, 0.49.0 shows:\n- rtk gain --history: '--5000% (18446744073709.6M)'.\n- --all --format json: '\"saved_tokens\": 18446744073709551116', '\"savings_pct\": 1.844674407370955e+20'.\n- --all text: '18446744073709.6M 184467440737095516160.0%'.\nThe default rtk gain view shows no wrapped values.",
+      "pass": false,
+      "observed_by": "implementer",
+      "output_file": "out/negrow.out"
+    },
+    {
+      "name": "rollback hazard: same synthetic scratch data read by the candidate",
+      "arm": "candidate",
+      "command": "python3 <impl>/negrow.py",
+      "exit": 0,
+      "output_excerpt": "0.50.0 rtk gain --history shows '--5000% (0)' (clamped). --all and csv show no wrapped values. The only long digit run is avg_savings_pct 31.784704915978672.",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "out/negrow.out"
+    },
+    {
+      "name": "hook latency A/B (40 invocations per case, alternating, scratch data, live settings read-only)",
+      "arm": "both",
+      "command": "python3 <impl>/extras.py",
+      "exit": 0,
+      "output_excerpt": "Medians: [git status] 0.49.0 58.5 ms vs 0.50.0 59.3 ms; [htop] 0.49.0 38.6 ms vs 0.50.0 38.1 ms. p90 is within about 1.5 ms. No hook-latency regression; the numbers vary from run to run.",
+      "pass": true,
+      "observed_by": "implementer"
+    },
+    {
+      "name": "python3 -m pytest rewrite resolution (no pytest binary on PATH)",
+      "arm": "both",
+      "command": "bash <impl>/pytest-resolve.sh",
+      "exit": 0,
+      "output_excerpt": "PATH has no python and no pytest binary. Native python3 -m pytest: rc=1 '~/.local/share/codex-ecosystem/bin/python3: No module named pytest'. Both 0.49.0 and 0.50.0 rewrite it to 'rtk pytest -q nosuch_test.py', giving rc=1 'rtk: Failed to run pytest: Failed to spawn process: No such file or directory (os error 2)'. This is pre-existing and identical in both versions.",
+      "pass": false,
+      "observed_by": "implementer",
+      "output_file": "out/pytest-resolve.out"
+    },
+    {
+      "name": "post-state fingerprint + diff",
+      "arm": "production",
+      "command": "bash <impl>/prestate.sh after && diff state/before.txt state/after.txt",
+      "exit": 1,
+      "output_excerpt": "18:59:36Z. The diff shows only tools/ entries, 35 -> 38: +rtk-0.50.0 (this unit, created 18:45:05Z), +mcporter-0.14.1 (18:44:32Z) and +ai-memory-2.4.0 (ctime 18:57:15Z), the last two from other units, plus the tools/ mtime. Unchanged:\n- bin/rtk target and the bin listing digest\n- the rtk-0.49.0 binary sha256\n- ~/.claude/settings.json sha256\n- ~/.config/rtk\n- ~/.codex/hooks.json\n- the systemd user unit-file digest\n- the running-services Id/MainPID/ActiveEnterTimestampMonotonic file ('units identical')",
+      "pass": true,
+      "observed_by": "implementer"
+    },
+    {
+      "name": "production tracking-DB leakage check (read-only snapshot in 0700 private dir, deleted after)",
+      "arm": "production",
+      "command": "bash <impl>/leakcheck.sh",
+      "exit": 0,
+      "output_excerpt": "- hook_decisions rows with this unit's session markers (sota-refresh-rtk%): 0.\n- v2 marker session_id='acc' since 18:44Z: 0.\n- commands rows referencing the test dirs since 18:44Z: 0.\n- The 4 rows containing fixture strings are rtk_version=0.49.0 live-hook logs of this session's own Bash calls (test_marker=0, test_cwd=0, session_cwd=1).\n- Production rows with saved_tokens<0: 0.\n- The snapshot and the private rtk dir were removed.",
+      "pass": true,
+      "observed_by": "implementer"
+    },
+    {
+      "name": "rtk gain --format json on the same A2 scratch database",
+      "arm": "both",
+      "command": "rtk gain --format json (0.49.0 and 0.50.0, same scratch RTK_DB_PATH)",
+      "exit": 0,
+      "output_excerpt": "Both versions returned the same summary object (total_commands 66, total_saved 22830); the --all --format json key sets (summary, daily, weekly, monthly) are identical across versions.",
+      "pass": true,
+      "observed_by": "implementer (key sets compared by the writing worker)",
+      "output_file": "out/gain-0.49.0-gain---format-json.txt, out/gain-0.50.0-gain---format-json.txt, out/negrow-0.49.0-gain---all---format-json.txt, out/negrow-0.50.0-gain---all---format-json.txt"
+    },
+    {
+      "name": "production switch",
+      "arm": "production",
+      "command": "ln -sfn \"$S/tools/rtk-0.50.0/rtk\" \"$S/bin/rtk\"; rtk --version   (S=~/.local/share/codex-ecosystem)",
+      "exit": 0,
+      "output_excerpt": "bin/rtk -> tools/rtk-0.50.0/rtk; 'rtk 0.50.0'. tools/rtk-0.49.0 is kept for rollback.",
+      "pass": true,
+      "observed_by": "coordinator"
+    },
+    {
+      "name": "retained verified archive",
+      "arm": "production",
+      "command": "copy the verified tarball and checksums.txt into ~/.local/share/codex-ecosystem/downloads/rtk-0.50.0; sha256sum --check --strict",
+      "exit": 0,
+      "output_excerpt": "rtk-x86_64-unknown-linux-musl.tar.gz: OK; tarball sha256 bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
+      "pass": true,
+      "observed_by": "coordinator"
+    },
+    {
+      "name": "host mitigation config",
+      "arm": "production",
+      "command": "write ~/.config/rtk/config.toml: [hooks] exclude_commands = [\"^git show [^ ]*:\", \"diff\"]; rtk hook check <command>",
+      "exit": 0,
+      "output_excerpt": "rtk hook check reports 'No rewrite for' (the command runs natively) for `git show <rev>:<path> | tail` and `diff`; other git show forms and git diff are still rewritten.",
+      "pass": true,
+      "observed_by": "coordinator"
+    },
+    {
+      "name": "v3.1 acceptance on the production binary, production config",
+      "arm": "production",
+      "command": "bash rtk-hook-acceptance-v3.1.sh <production rtk prefix> 0.50.0",
+      "exit": 1,
+      "output_excerpt": "COUNTS pass=87 fail=1 note=3; RESULT fail. The only FAIL is 'blob not windowed/announced: []': under the exclusion `git show HEAD:big.txt` runs natively, so the check's windowing expectation no longer applies. The 'diff unreadable-file' NOTE is absent because diff is no longer rewritten.",
+      "pass": false,
+      "observed_by": "coordinator",
+      "output_file": "out/post-switch-v31.txt",
+      "assessment": "Expected: the one FAIL is the host exclusion taking effect, not a defect. The exit code follows RESULT (the script ends `exit $fail`)."
+    },
+    {
+      "name": "v3.1 acceptance on the production binary, empty XDG_CONFIG_HOME",
+      "arm": "production",
+      "command": "XDG_CONFIG_HOME=<empty dir> bash rtk-hook-acceptance-v3.1.sh <production rtk prefix> 0.50.0",
+      "exit": 0,
+      "output_excerpt": "COUNTS pass=88 fail=0 note=4; RESULT pass. Identical to the qualification run apart from temporary paths.",
+      "pass": true,
+      "observed_by": "coordinator",
+      "output_file": "out/post-switch-v31-noconfig.txt"
+    },
+    {
+      "name": "read-back of the switched state",
+      "arm": "production",
+      "command": "bash readback.sh (read-only)",
+      "exit": 0,
+      "output_excerpt": "bin/rtk -> ~/.local/share/codex-ecosystem/tools/rtk-0.50.0/rtk; 'rtk 0.50.0'; installed sha256 23433a2a...; archive check OK; config.toml holds the two exclude_commands; rtk hook check rc 1 for `git show HEAD:x | tail -n 5` and `diff a.txt missing.txt`, rc 0 (rewritten) for `git show HEAD~1` and `git diff`; `rtk init --help` describes --codex as 'Target Codex CLI (uses PreToolUse hook + AGENTS.md + RTK.md)'.",
+      "pass": true,
+      "observed_by": "writing_worker",
+      "output_file": "out/readback.out"
+    }
+  ],
+  "differences": [
+    "[0.50.0 NEW – blocks the switch until reviewed (A2 rule and the review's overturn condition)] `git show <rev>:<path> | tail -n K` returns the tail of the ~8 KiB blob window plus a '[see remaining: rtk proxy git show '<rev>:<path>' | tail -n +M]' hint instead of the end of the file. On the fixture, 0.50.0 printed rows 1030-1033 plus the hint where native git and 0.49.0 printed rows 3996-4000. Verified mitigation in a scratch config, on both versions: `[hooks] exclude_commands = [\"^git show [^ ]*:\"]` restores native bytes and still rewrites other git show forms.",
+    "[0.50.0 new, allowed class] `git show <rev>:<path>` over 8 KiB is windowed (fixture 34893 -> 8275 bytes), and the shown head plus the hinted tail recovers the blob byte-exactly (v2/v3.1 'blob window recovers exactly'). `git show ... | head -n 5` is unchanged.",
+    "[0.50.0 new, allowed class] `git log -p` without -n is capped at 10 commits, with '[rtk] capped at 10 commits; pass -n <count> for more' on stderr (fixture stdout 42217 -> 41097 bytes, stderr 53 bytes).",
+    "[0.49.0 defect, fixed in 0.50.0] head -N, head -n N and bare head now rewrite to `rtk read f --head-lines N`, byte-identical to native. 0.49.0 rewrote them to `--max-lines N` (smart truncation, wrong lines), bare `head f` read the whole file (311 bytes vs native 71), and `head -n N` was not rewritten.",
+    "[0.49.0 defect, fixed in 0.50.0] Stderr-only failures lost their error text on 0.49.0 while keeping the exit code: wc -l missing (rc 1), fake pytest (rc 4), fake ruff 'ruff failed / Failed to parse' (rc 2), and python3 -m pytest via rtk pytest. 0.50.0 forwards stderr. It names the program by absolute path, e.g. '/usr/bin/wc: missing.txt: No such file or directory'.",
+    "[0.50.0 change, benign] `git diff --stat` is now byte-identical to native; 0.49.0 dropped the leading space of the stat line.",
+    "[pre-existing in both, persists] `diff a missing` exits 1 (native 2) and prints 'rtk: No such file or directory (os error 2)' without naming the file. The upstream fix bdee7f2 is develop-only. Verified mitigation: exclude_commands \"diff\" gives rc 2 with the native message.",
+    "[pre-existing in both, NEW finding] `find <nonexistent-relative-dir> -name x` exits 0 with no output and no error (native: rc 1, \"No such file or directory\"). rtk's find dispatch treats a first token that has no '/' and is not an existing directory as its legacy `find <pattern> [path]` syntax, so it searches '.' instead. An absolute nonexistent path keeps rc 1 and the message.",
+    "[pre-existing in both] Plain `git log` is silently capped at 10 commits (13-commit fixture: 10 subjects, no notice). `--no-merges` is injected, so `git log --oneline` silently drops merge commits (fixture: 14 of 15 lines).",
+    "[pre-existing in both] `python3 -m pytest` is rewritten to `rtk pytest`, which runs `pytest` from PATH, else `python -m pytest`, not the named python3. On this host (no `python`, no pytest binary) it fails with 'Failed to spawn process: No such file or directory' (rc 1) where native reports 'No module named pytest' (rc 1).",
+    "[pre-existing in both] `git status` outside a repository: rtk replaces 'fatal: not a git repository (or any of the parent directories): .git' with 'Not a git repository' (rc 128 kept). v3's case-sensitive key failed this on both versions; v3.1 matches case-insensitively, like upstream's own test.",
+    "[pre-existing in both] `find g -type d` omits the starting directory and prints names relative to it ('sub' vs native 'g', 'g/sub').",
+    "[pre-existing in both, no live effect] rtk treats a wildcard-free allow rule as a word-boundary prefix: Bash(git status) also gives permissionDecision 'allow' for 'git status --short'. Live settings have 0 Bash allow rules, so live rewrites carry no decision on either version.",
+    "[rollback hazard, 0.49.0 read path] 0.50.0 stores signed negative saved_tokens, and 0.49.0 casts them unchecked. With synthetic -500 rows, 0.49.0 rtk gain --history/--all/--format json|csv shows 18446744073709551116 or '18446744073709.6M', while 0.50.0 clamps to 0. The A2 corpus produced 0 negative rows of 66, and production has 0 negative rows today.",
+    "[cosmetic, both] Failing rtk-wrapped commands print an extra blank line on stdout (make, systemctl status, wc, pytest, ruff). curl file:// output gains a trailing newline.",
+    "[no difference] Hook exit status and response shape are the same, with no permissionDecision on any of 76 live-settings rewrites on either version. Deferrals ($(...), file redirect, heredoc, htop, uname, non-display pipe) are silent on both. rtk proxy is byte-identical to raw. Median hook latency is within about 1 ms."
+  ],
+  "production_untouched_during_qualification": "I fingerprinted production read-only before (2026-09-25T18:44:03Z) and after (18:59:36Z), using state/before.txt and state/after.txt.\n\nIdentical before and after:\n- bin/rtk still points to ~/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk, and the full bin/ listing digest (3237208c...) is unchanged.\n- tools/rtk-0.49.0/rtk sha256 a051b22361c7cfa36022bc3f06bb41cdc88e58a07263dc340d8bd3468c41befe.\n- The retained 0.49.0 archive sha256 7278231d....\n- ~/.claude/settings.json sha256 ddfcbf6dabc375b8e926800a94573c225c7262e1e1a0416a0416fcce79e45ddf, with one 'rtk hook claude' PreToolUse Bash hook.\n- ~/.config/rtk: only filters.toml, sha256 dbe3740d...; there is no config.toml.\n- ~/.codex/hooks.json sha256 e705a4b1....\n- The systemd user unit-file digest d7365111....\n- The Id/MainPID/ActiveEnterTimestampMonotonic records of all 12 running user services, so no service was restarted or stopped.\n\nThe only change I made is the new tools/rtk-0.50.0 (created 18:45:05Z). The other two new tools/ entries, mcporter-0.14.1 (18:44:32Z) and ai-memory-2.4.0 (ctime 18:57:15Z), came from other units.\n\nTest isolation:\n- Every test invocation exported a scratch XDG_DATA_HOME and RTK_DB_PATH, with TMPDIR under the impl dir.\n- Hook payloads carried distinctive session_ids.\n- Mitigation tests used a scratch XDG_CONFIG_HOME.\n- gh ran with an empty scratch GH_CONFIG_DIR, and token variables were removed from the child environment without being read.\n- The scratch DBs did receive rows. For example, A2's 0.50.0 DB got 66 command rows and 76 hook_decisions rows, which shows the redirection worked.\n\nLeakage check on a read-only sqlite snapshot of ~/.local/share/rtk/history.db, taken in the 0700 private dir and deleted afterwards:\n- 0 hook_decisions rows with this unit's markers.\n- 0 rows with the v2 marker 'acc' since 18:44Z.\n- 0 commands rows referencing the test dirs since 18:44Z.\n- The 4 rows containing fixture strings are live 0.49.0 hook logs of this session's own Bash calls (test_marker=0, session cwd).\n- ~/.cache/rtk, ~/.local/state/rtk and ~/.local/share/rtk/tee are absent. ~/.local/share/rtk/.hook_warn_last keeps its 2026-09-23 mtime.\n\nNot accessed at all: the ai-memory store, Qdrant, the dagu data dir, git checkouts, and the embedding and generation servers. No scratch server was started, and no process referencing the candidate or scratch dir remains.\n\nKnown unavoidable side effect: this session's own Bash calls go through the live 0.49.0 hook, which logs to the production history.db and recall.db, the same as any session on this host.",
+  "switch": {
+    "method": "Prefix flip: bin/rtk repointed to the qualified tools/rtk-0.50.0/rtk; `rtk init` was not re-run (the Claude hook command `rtk hook claude` is unchanged).",
+    "host_config": {
+      "path": "~/.config/rtk/config.toml",
+      "content": "[hooks]\nexclude_commands = [\"^git show [^ ]*:\", \"diff\"]\n",
+      "reason": "Excludes the 0.50.0 `git show <rev>:<path> | tail` blob-window defect and the pre-existing `diff` exit-code defect from hook rewriting."
+    },
+    "rollback": "(1) `ln -sfn \"$HOME/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk\" \"$HOME/.local/share/codex-ecosystem/bin/rtk\"`, then confirm that `rtk --version` prints rtk 0.49.0.\n\n(2) Before or right after rolling back, run the read-only query `SELECT COUNT(*) FROM commands WHERE saved_tokens<0` on a snapshot of ~/.local/share/rtk/history.db (0 today). If it is above 0, 0.49.0's rtk gain --history, --all and --format json|csv will show wrapped values of about 1.8e19; I verified this on synthetic scratch data. The effect is cosmetic, but tools/token-report ingests gain JSON, so clamp or exclude those rows in the report. Any change to the production rows needs its own approval.\n\n(3) Re-run `bash rtk-hook-acceptance-v3.1.sh $S/tools/rtk-0.49.0 0.49.0`. Expect 79 PASS / 9 FAIL / 4 NOTE, the known 0.49.0 defect set.\n\n(4) Keep any exclude_commands entries only if they are still wanted; they behave the same on 0.49.0.\n\n(5) No schema or config conversion is needed: SCHEMA_VERSION 1 in both, config changes are additive, and the hook command is unchanged. Delete tools/rtk-0.50.0 only after the rollback is confirmed, and keep tools/rtk-0.49.0 and the retained 0.49.0 archive (sha256 7278231d...)."
+  },
+  "verifier": {
+    "verdict": "agree",
+    "production_touched": false,
+    "defects": [
+      {
+        "claim": "The production_untouched_proof stops before the implementer's last steps, and ~/.claude/settings.json changed inside that uncovered window. As a result, the result's 'settings.json sha256 ddfcbf6d... unchanged' no longer matches the live file, and a later reader could blame the rtk unit. The evidence does not implicate rtk.",
+        "evidence": "Timing:\n- The implementer's post-state fingerprint was taken at 18:59:36Z.\n- Its leakcheck ran at 19:01:15Z and 19:01:35Z, and its notes move at 19:02:23Z.\n- settings.json mtime is 19:01:59.96Z: sha256 ddfcbf6dabc375b8... (8059 bytes) became cc635f9f163fb08c... (8097 bytes).\n\nWhy it is not rtk:\n- No rtk script writes the file. Every reference is a read or a synthetic CLAUDE_CONFIG_DIR under $T.\n- leakcheck.sh only opens history.db with mode=ro.\n- The rtk-relevant fields are unchanged: one 'rtk hook claude' PreToolUse hook with matcher Bash, 0 Bash allow rules, deny 11/26, defaultMode bypassPermissions.\n- My re-runs of every 0.50.0 step between 19:11:57Z and 19:28:50Z left the hash at cc635f9f....\n- The ai-memory unit's own snapshots bracket the change: <scratchpad>/sota-refresh/impl/ai-memory/results/prod-snapshot-before.json (mtime 18:57:02Z) holds the old hash, and prod-snapshot-after.json (mtime 19:03:42Z) holds the new one.\n- The context-mode heal log at 19:03:07Z says 'skipped: not-claude-code'.\n\nThe coordinator should attribute this change and re-fingerprint settings.json before any switch.",
+        "severity": "minor"
+      },
+      {
+        "claim": "The gating acceptance scripts (v2 and v3.1) would pass the one switch-blocking 0.50.0 hazard. `git show <rev>:<path> | tail -n K` returns lines from the ~8 KiB window plus a hint, not the end of the file, yet v3.1 still passes on 0.50.0. Only the non-gating A2 differential catches it. The implementer disclosed this (the A2 step is pass=false and the item is marked 'blocks the switch until reviewed'), so candidate_pass=true must not be read as ready to switch.",
+        "evidence": "v3.1 has no `| tail` blob case, and v31-050 gives 88/0/4.\n\nIn my own A2 re-run, raw/git-show-blob-tail.050.out is 'row 1030'..'row 1033' plus \"... (+2967 lines) [see remaining: rtk proxy git show 'HEAD:big.txt' | tail -n +1034]\". Native and 0.49.0 print rows 3996-4000 (sha256 bb93ea3b...).\n\nFix: add a gated v3.1 assertion that this command either equals native or is silent under the chosen exclude_commands config.",
+        "severity": "minor"
+      },
+      {
+        "claim": "The implementer broke the write-location rule and reported it itself. It first wrote 16 extract and dump files directly under <scratchpad>/sota-refresh/ instead of impl/rtk/.",
+        "evidence": "The implementer's scratch_cleanup says the files were moved to impl/rtk/notes/. The notes/ listing shows 16 rtk_* files. The sota-refresh root now holds only other units' dump files and no rtk files. This affected scratch only.",
+        "severity": "minor"
+      }
+    ],
+    "reproduced": [
+      "Installed prefix integrity, checked independently at 19:15:31Z:\n- I downloaded v0.50.0 fresh over curl without gh credentials: rtk-x86_64-unknown-linux-musl.tar.gz, 4857739 bytes, sha256 bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89.\n- That equals the checksums.txt line and the GitHub API asset digest.\n- checksums.txt sha256 4c7116898ae812960dfa0de3b3acc5406a0da49209f0ad7bed4d4ed8c4785048 equals the API digest.\n- `sha256sum --check --strict` gave OK.\n- The tarball holds a single member `rtk` (11040640 bytes, mode 0755) with sha256 23433a2a50bdeb12199cadd4b94b639238d6c38529fcba1c30c9295db5fa9517.\n- `cmp` shows it byte-identical to ~/.local/share/codex-ecosystem/tools/rtk-0.50.0/rtk, and the prefix has exactly 1 entry.\n- Tag ref v0.50.0 resolves to commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec.\n- /releases/latest returns v0.50.0 (prerelease false, published 2026-09-24T10:02:31Z).",
+      "Refuter v2 script, sha256 186dd8914a6c18850261d3bf34a3fd2f2c8767d6696931a99c90f1eeb79c9376 (identical to the refuter's copy):\n- Candidate 0.50.0: 42 PASS / 0 FAIL / 1 NOTE, rc 0.\n- Baseline 0.49.0: 34 PASS / 8 FAIL / 1 NOTE, rc 1.\n- Both outputs are line-identical to the implementer's recorded v2-050.out and v2-049.out after temp-path normalisation.",
+      "v3.1 script, sha256 3644a0dc50e9bcb1f785e5cc5fe36fda233ca915dd731ab1aa4709932f5f7755:\n- Candidate: 88/0/4, rc 0, RESULT pass.\n- Baseline: 79/9/4, rc 1, with the same 9 FAILs: head-1 and head-5 (rewrite and bytes), wc, pytest and ruff stderr loss, 'blob not windowed/announced' and 'log cap silent'.\n- Both outputs are line-identical to the recorded ones.",
+      "`rtk verify` with a scratch XDG_DATA_HOME: 0.50.0 and 0.49.0 both gave rc 0, 'PASS native binary hook registered in settings.json' and '154/154 tests passed'.",
+      "The refuter's fakes through v3.1 reproduce line-identically:\n- fake-block (sha256 c8d72dd6...): 4/100/11, rc 1.\n- fake-allow (sha256 1bcdbc52...): 17/85/11, rc 1.",
+      "The acceptance discriminates against broken candidates I built around the real binaries. v3.1 gave RESULT fail for every one:\n- A wrapper that injects 'allow' into every 0.50.0 rewrite: 17/85. Every live rewrite fails the permissionDecision=none assertion.\n- The 0.49.0 binary reporting 'rtk 0.50.0': 79/9, the same 9 FAILs as the baseline.\n- A wrapper where git status drops untracked entries and grep drops a match: 82/6.\n- A wc wrapper that loses stderr: 87/1 ('wc stderr lost').\n- A wrapper that removes the blob-window hint: 87/1 ('blob not windowed/announced: [row 1033]').\n- A binary truncated to 2,000,000 bytes (segfaults with rc 139): 2/102.",
+      "A2 differential, re-run from a byte-identical copy of a2.py into my verify dir:\n- corpus=76, executed=73, differing=11, with the same ids. No non-zero hook rc and no permissionDecision set.\n- rc differs from native on both versions: find-missing [1,0,0], diff-missing [2,1,1], python-m-pytest [1,4,4].\n- The report is field-identical to the implementer's, except curl-missing err_len is +7 bytes on all 3 arms. That is a path-length artifact of 'verify/' in the fixture path.\n- `git show HEAD:big.txt | tail -n 5`: native and 0.49.0 print rows 3996-4000; 0.50.0 prints rows 1030-1033 plus the hint.\n- git-show-blob shrinks from 34893 to 8275 bytes.\n- git log -p on 0.50.0 prints '[rtk] capped at 10 commits; pass -n <count> for more' on stderr.\n- git diff --stat on 0.50.0 is byte-identical to native.\n- Bare head gives 311 bytes on 0.49.0 vs 71 native.\n- git log --oneline gives 15 lines natively and 14 on rtk, dropping the merge commit.\n- find g -type d prints 'g g/sub' natively and 'sub' on rtk.\n- find with a missing relative dir: rtk rc 0 with no output.",
+      "Mitigation, re-run from a byte-identical copy of mitigation.sh. The output is byte-identical to the implementer's mitigation.out:\n- With exclude_commands [\"^git show [^ ]*:\", \"diff\"], the excluded git show blob and diff commands are SILENT on both versions.\n- git show HEAD~2, git show --stat HEAD, git diff and git status are still rewritten.\n- The tail output equals native (sha256 bb93ea3b...).\n- diff gives rc 2 with the native message.\n- `rtk hook check` returns rc 1 'No rewrite for' on excluded commands.\n- The source anchors a plain-word pattern as ^diff($|\\s), so git diff is not excluded.",
+      "Extra check beyond the implementer's run: forward and backward DB compatibility on a private mode=ro snapshot of the production history.db (19742 commands, 26448 hook_decisions), in the 0700 dir, deleted afterwards:\n- 0.50.0 rtk gain, --history and --all --format json all gave rc 0 with valid JSON.\n- A 0.50.0 hook call plus its rewritten command appended exactly +1 commands and +1 hook_decisions rows.\n- 0.49.0 then read the same copy with rc 0 and no wrapped values.\n- The schema (8 objects, user_version 1, hash 859b4f42...) was unchanged throughout.\nThis supports 'no schema or config conversion is needed' on real data.",
+      "Production was untouched by rtk:\n- 12 running user services. Their Id, MainPID and ActiveEnterTimestampMonotonic records match the implementer's 18:44:03Z record at 19:11:57Z, 19:23:10Z, 19:26:18Z and 19:28:50Z.\n- bin/rtk still points to tools/rtk-0.49.0/rtk. The bin listing digest (3237208c...), the rtk-0.49.0 sha256 (a051b223...) and the retained 0.49.0 archive (7278231d...) are unchanged.\n- ~/.config/rtk holds only filters.toml (dbe3740d...), with no config.toml.\n- ~/.codex/hooks.json (e705a4b1...) and the systemd user unit digest (d7365111...) are unchanged; every unit-file mtime is at or before 18:33:13Z.\n- The tools/ delta is only rtk-0.50.0 (18:45:05Z) plus other units' mcporter-0.14.1 and ai-memory-2.4.0 (ctime 18:57:15Z).\n- The production history.db has 0 rows with any 'sota-refresh-rtk%' marker (all time), 0 rows with session_id 'acc' since 18:44Z, 0 hook_decisions or commands rows with a test-temp-dir project_path, and 0 negative saved_tokens rows.\n- .hook_warn_last keeps its 2026-09-23 mtime. ~/.cache/rtk, ~/.local/state/rtk and the tee dir are absent.\n- No process references the candidate or the impl dir. impl/rtk/tmp is empty, and the private rtk dir is absent.",
+      "receipt_draft.claim cross-check: every number and statement appears in the recorded outputs:\n- fetch.out and install.out\n- run-acceptance.summary and run-v31.summary\n- v2-*.out, v31-*.out and verify-*.out\n- a2.summary, a2-report.json and raw/\n- mitigation.out\nThe host label and date are receipt metadata, not measured values."
+    ],
+    "notes": "**Verdict: agree.**\n- Every material claim reproduced. I re-ran the implementer's hash-pinned v2 and v3.1 scripts, `rtk verify`, the A2 differential and the mitigation on the candidate, and ran the same checks on the baseline so the A/B could be attributed. Each re-run matched the recorded outputs line for line, apart from temporary-path normalisation; A2 also has one explained path-length artifact.\n- I confirmed integrity independently with a fresh, unauthenticated download; the installed binary is byte-identical to the release member.\n- The acceptance discriminates against a fake that blocks everything, fakes that inject allow (built around both 0.49.0 and 0.50.0), a wrong binary spoofing its version, content loss, stderr loss, silent blob truncation and a truncated binary.\n- Its one blind spot, the `git show ... | tail` window, is caught only by A2, which the implementer marked blocking. See defect 2.\n\n**Not re-executed; checked only against recorded outputs:** negrow (rollback hazard on synthetic rows), extras (the latency medians 58.5 vs 59.3 ms and 38.6 vs 38.1 ms vary from run to run) and pytest-resolve. The recorded values match the implementer's narrative.\n\n**Other observations:**\n- Live check B was not performed, which is correct under the no-switch rule.\n- The v3 to v3.1 change (a case-insensitive error-phrase match) came after a FAIL that hit both versions equally. It follows upstream's own test and is disclosed with both results kept, so it is not an unchanged retry.\n- The refuter's fake-allow wraps 0.49.0, so on its own it cannot separate the allow injection from 0.49.0's defects. My allow wrapper around 0.50.0 closes that gap and gives the same 17/85.\n- Transient history.db-shm and history.db-wal sidecars appeared in ~/.local/share/rtk right after read-only snapshots and live hook writes, and were gone 20 s later. The listing returned to the implementer's recorded set.\n- The `settings.json` change at 19:01:59Z is out of scope for rtk (defect 1). The ai-memory unit's own snapshots bracket it.\n\n**Side effects:** my own Bash calls went through the live 0.49.0 hook and were logged to the production history.db, like any session on this host.\n\n**Working files:** <scratchpad>/sota-refresh/impl/rtk/verify/, about 8.5 MB, where <scratchpad> is this session's scratchpad directory. It holds:\n- scripts: integrity.sh, run-verifier.sh, leakcheck-verifier.sh, fwdcompat.sh, latest.sh, and copies of a2.py, mitigation.sh and prestate.sh\n- out/: all run outputs\n- state/: fingerprints\n- dl/: the freshly verified tarball and checksums.txt\n- fakes/: the broken candidates, including a deliberately truncated 2 MB rtk that segfaults\n\nNothing was written to production, and the private snapshot dir was created and removed again (twice). Scratch is not evidence until it is copied into a sanitized receipt."
+  },
+  "unverified": [
+    "Live Claude Code behaviour after the symlink switch (check B: head -3, wc -l on a nonexistent file, uname -s, echo $(date +%Y) in a fresh session) was not performed.",
+    "Upstream `cargo test --all` was not run locally; cargo is not installed. Only the upstream CI evidence recorded by the research exists.",
+    "Claude Code's own matching semantics for wildcard-free Bash allow rules were not checked against rtk's word-boundary prefix semantics.",
+    "The live deny rule `* --show-token*` was not probed, because this session's own deny rule applies and I did not work around it. A structurally equivalent synthetic `Bash(* --porcelain*)` deny was verified to make the hook silent.",
+    "It was not audited whether any workflow on this host depends on full-blob `git show <rev>:<path>` through `| tail`/`| cat`, or on unbounded `git log -p` output.",
+    "How often 0.50.0 writes negative saved_tokens rows in real use is unknown beyond 0 of 66 in the corpus.",
+    "rtk init, including the Codex hook installation added in 0.50.0, was neither run nor evaluated.",
+    "The prereleases dev-0.50.1-rc.456, dev-0.50.1-rc.457 and dev-0.51.0-rc.459 were not tested.",
+    "Hook behaviour under SQLite lock contention on the shared history.db was not measured. Both versions log hook decisions the same way, with a 5 s busy_timeout, after writing the reply."
+  ]
+}

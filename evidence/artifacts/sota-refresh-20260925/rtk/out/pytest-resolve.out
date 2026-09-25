@@ -1,0 +1,4 @@
+python on PATH: no; python3: ~/.local/share/codex-ecosystem/bin/python3; pytest binary on PATH: no
+native python3 -m pytest: rc=1 stderr=[~/.local/share/codex-ecosystem/bin/python3: No module named pytest ]
+0.49.0 rewrite=[rtk pytest -q nosuch_test.py] rc=1 stdout=[] stderr=[rtk: Failed to run pytest: Failed to spawn process: No such file or directory (os error 2) ]
+0.50.0 rewrite=[rtk pytest -q nosuch_test.py] rc=1 stdout=[] stderr=[rtk: Failed to run pytest: Failed to spawn process: No such file or directory (os error 2) ]

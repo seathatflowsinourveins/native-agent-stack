@@ -1,0 +1,44 @@
+PASS version
+PASS precondition: live settings have 0 Bash allow rules
+FAIL head-1 rewrite: [rtk read <impl>/tmp/tmp.8nP5A6fYyu/f.txt --max-lines 1]
+FAIL head-1 bytes differ from native head
+FAIL head-5 rewrite: [rtk read <impl>/tmp/tmp.8nP5A6fYyu/f.txt --max-lines 5]
+FAIL head-5 bytes differ from native head
+PASS cat bytes==native [rtk read <impl>/tmp/tmp.8nP5A6fYyu/f.txt]
+PASS tail-3 bytes==native [rtk read <impl>/tmp/tmp.8nP5A6fYyu/f.txt --tail-lines 3]
+PASS wc rc=1
+FAIL wc stderr lost: []
+PASS grep rc=2
+PASS grep stderr kept
+PASS pytest rc=4
+FAIL pytest stderr lost: []
+NOTE diff unreadable-file rc=1 (native diff: 2; upstream fix bdee7f2 is develop-only) stderr=[rtk: No such file or directory (os error 2)]
+PASS gitlog rc=128
+PASS gitlog stderr kept
+PASS silent: command substitution
+PASS silent: file redirect
+PASS silent: heredoc
+PASS silent: no rtk equivalent
+PASS silent: non-display pipe consumer
+PASS proxy==raw
+FAIL blob not windowed/announced: [row 4000]
+FAIL log cap silent: []
+PASS git status shows n.txt
+PASS git status shows untracked-file.txt
+PASS git status shows staged-file.txt
+PASS git diff names n.txt
+PASS git diff keeps added line
+PASS grep -rn keeps needle one
+PASS grep -rn keeps needle two
+PASS grep -rn keeps y needle three
+PASS grep -rn keeps a.txt
+PASS grep -rn keeps b.txt
+PASS grep -rn keeps c.md
+PASS ls keeps one.txt
+PASS ls keeps two.log
+PASS ls keeps three
+PASS explicit allow rule -> allow
+PASS partly allowed compound -> no decision
+PASS ask rule -> no decision
+PASS silent: deny rule
+RESULT fail
