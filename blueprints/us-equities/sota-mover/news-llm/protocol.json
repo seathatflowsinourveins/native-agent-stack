@@ -1,8 +1,8 @@
 {
  "schema": "sota-mover-news-llm-protocol/1",
  "id": "sota-mover-news-llm-20260925",
- "status": "draft_pending_independent_pre_outcome_review",
- "frozen_before_outcomes": false,
+ "status": "frozen_pre_outcome",
+ "frozen_before_outcomes": true,
  "created_at": "2026-09-25",
  "base_commit": "636751ae",
  "evidence_labels": {
@@ -680,7 +680,7 @@
   "C9 D5 audit: 200 dropped headlines labelled from text",
   "C10 strict versus operative (D22) label counts of the stored outputs by checkpoint and lane (output text only)"
  ],
- "frozen_at": null,
+ "frozen_at": "2026-09-25T09:41:12Z",
  "frozen_status_value": "frozen_pre_outcome",
  "scope": "All verdicts apply to firms present in the 2026-09-21 asset master (Alpaca; current names, exchanges and tickers). Firms delisted or renamed before that date are under-represented (limitation L11), so results do not generalize to the full historical cross-section.",
  "expectation_before_freeze": "NEWS-1 is expected to fail. The model authors report about 3 bps/day gross for this prompt (next-day close-to-close, 2007-2023), while modelled costs are about 9 bps/day for the long-short. The confirmatory value of NEWS-1 is its one-sided 95% upper bound on the mean net and gross return and the break-even round-trip cost, read against 3 bps/day and 34 bps/day.",
