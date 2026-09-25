@@ -1,0 +1,10 @@
+{
+ "schema_version": 1,
+ "kind": "orb_freeze_record",
+ "protocol_sha256": "0a943b48a27d455b98cc5864b80e15a0e3594d3a69d8b6866348f0ee7e0161c1",
+ "protocol_commit": "201dbbe219054a7faba85fdf9ec88694791f3afb",
+ "frozen_at": "2026-09-25T03:52:40Z",
+ "reviewer": "evidence-reviewer subagent (opus), independent of the builder; coordinator Claude session agent-lab-ea",
+ "review_verdict": "freeze_ready_after_fixes (4 major, 4 minor) at b3dd67fe; freeze_ready on re-check of f0af29f5; coordinator-requested guard binding and quote-coverage gate in b3fff9ec",
+ "outcomes_computed_before_freeze": false
+}
