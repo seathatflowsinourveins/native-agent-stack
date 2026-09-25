@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "kind": "skills_trial_manifest",
+  "checked_at": "2026-09-25",
+  "decision_record": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
+  "trial": {
+    "started": "2026-09-25",
+    "window_days": 30,
+    "review_after": "2026-10-25",
+    "prune_rule": "A skill installed for at least window_days with zero invocations in the last window_days is demoted one step (on -> name-only -> off) or removed; kept verdict winners change only through a verdict re-record.",
+    "measurement": {
+      "claude": "native /skill-doctor (claude -p \"/skill-doctor\"), run by hand per host",
+      "codex": "tools/skill-usage/skill_usage.py over explicitly passed rollout roots"
+    }
+  },
+  "skills": [
+    {
+      "name": "gh-fix-ci",
+      "source": "openai/skills",
+      "status": "kept",
+      "gap": "Verdict winner: triage failing GitHub Actions checks.",
+      "claude_listing": "on",
+      "codex_enabled": true
+    },
+    {
+      "name": "typesafe-ai",
+      "source": "typesafe-ai/skills",
+      "status": "kept",
+      "gap": "Verdict winner: typed semantic judgments for evidence review.",
+      "claude_listing": "name-only",
+      "codex_enabled": true
+    },
+    {
+      "name": "tdd",
+      "source": "mattpocock/skills",
+      "status": "trial",
+      "gap": "New scripts land with unittest suites but no test-first procedure is loaded.",
+      "claude_listing": "on",
+      "codex_enabled": true
+    },
+    {
+      "name": "diagnosing-bugs",
+      "source": "mattpocock/skills",
+      "status": "trial",
+      "gap": "No debugging procedure is installed.",
+      "claude_listing": "on",
+      "codex_enabled": true
+    },
+    {
+      "name": "grill-me",
+      "source": "mattpocock/skills",
+      "status": "trial",
+      "gap": "User-invoked stress test of a plan before approval.",
+      "claude_listing": "user-invocable-only",
+      "codex_enabled": false
+    },
+    {
+      "name": "semgrep",
+      "source": "trailofbits/skills",
+      "status": "trial",
+      "gap": "No custom static rules exist beyond CodeQL default setup.",
+      "claude_listing": "off",
+      "codex_enabled": false
+    },
+    {
+      "name": "codeql",
+      "source": "trailofbits/skills",
+      "status": "trial",
+      "gap": "CodeQL default setup gates main via the code_scanning rule, but alert triage has no procedure.",
+      "claude_listing": "on",
+      "codex_enabled": true
+    }
+  ]
+}

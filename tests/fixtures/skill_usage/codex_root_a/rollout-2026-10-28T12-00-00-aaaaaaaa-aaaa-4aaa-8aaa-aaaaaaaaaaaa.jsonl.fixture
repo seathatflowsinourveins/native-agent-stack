@@ -1,0 +1,6 @@
+{"timestamp": "2026-10-28T11:59:00Z", "type": "session_meta", "payload": {"id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", "timestamp": "2026-10-28T11:59:00Z", "cwd": "REDACTED", "originator": "codex_cli_rs", "cli_version": "0.155.1"}}
+{"timestamp": "2026-10-28T12:00:00Z", "type": "response_item", "payload": {"type": "message", "id": null, "role": "user", "content": [{"type": "input_text", "text": "Please use $gh-fix-ci to look at the failing workflow run"}]}, "ordinal": 1}
+{"timestamp": "2026-10-28T12:05:00Z", "type": "response_item", "payload": {"type": "function_call", "id": null, "name": "Read", "arguments": "{\"file_path\": \"/home/tester/.agents/skills/gh-fix-ci/SKILL.md\"}", "call_id": "call_1"}, "ordinal": 2}
+{"timestamp": "2026-10-28T12:06:00Z", "type": "response_item", "payload": {"type": "function_call", "id": null, "name": "Read", "arguments": "{\"file_path\": \"/home/tester/.agents/skills/not-a-real-skill/SKILL.md\"}", "call_id": "call_2"}, "ordinal": 3}
+{not valid json,,,
+{"timestamp": "2026-09-01T00:00:00Z", "type": "response_item", "payload": {"type": "message", "id": null, "role": "user", "content": [{"type": "input_text", "text": "an old message mentioning $tdd outside every window"}]}, "ordinal": 4}

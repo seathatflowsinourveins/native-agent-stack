@@ -1,0 +1,15 @@
+Skills loaded this session
+
+  skill                           source          context  7d tokens   uses  last used
+  gh-fix-ci                       userSettings       ~110         340    6×  2 days ago
+  typesafe-ai                     userSettings       ~230           -    0×  never
+  tdd                             userSettings        ~40           -    0×  never
+  diagnosing-bugs                 userSettings        ~60           -    0×  never
+  grill-me                        userSettings          -           -    0×  never
+  codeql                          userSettings        ~80           -    0×  never
+
+  context = this skill's one-line listing in the system prompt, included every turn
+  (dash = not in the current listing, costs nothing; full SKILL.md loads only when it runs)
+  7d tokens = tokens attributed to the skill over the last 7 days of sessions on this machine
+
+5 skills loaded but never invoked. Each one adds to the system prompt every turn. Disable in /skills, or remove from .claude/skills.
