@@ -98,9 +98,10 @@ For an explicitly captured direct `ctx_stats` response, supply
 There is no implicit search of Codex or Claude transcripts.
 
 Historical event imports require explicit `rtk_database` or `headroom_events`
-paths. `inspect_project_history` additionally queries retained RTK working
-directories; `inspect_hook_history` additionally inspects the configured Context
-Mode roots' hook metadata. Both default to false and are unnecessary for counters.
+paths. An `rtk_database` path also enables RTK's client-visible view (see below).
+`inspect_project_history` additionally queries retained RTK working directories;
+`inspect_hook_history` additionally inspects the configured Context Mode roots'
+hook metadata. Both default to false and are unnecessary for counters.
 
 ## Exact artifact comparisons
 
@@ -131,18 +132,32 @@ comparison against compact JSON, with that result stored separately.
 ## Read the numbers correctly
 
 - RTK global and project snapshots overlap. The report never sums them.
-- RTK's total is uncapped: each row is `ceil(bytes/4)` of the raw output minus
-  that of the filtered output, so a few very large outputs can dominate it.
-  - When `rtk_database` is configured, the global snapshot adds `client_visible`.
-    It re-counts every row as a client first shows it: whole up to
-    `client_inline_chars` (default 30000), otherwise a preview of
-    `client_preview_chars` (default 2000). Those are Claude Code 2.1.282's
-    `bashOutputMaxChars` default and its saved-output preview.
-  - The resulting net is a model, not an upstream number. It excludes later reads
-    of saved output files, and Codex has its own output limits.
-- Headroom 0.37.0 calls a 30-day estimate `lifetime`. `headroom savings --json`
-  also prints zero when its ledger file does not exist. The snapshot records
-  `ledger_present`, so an absent ledger is not read as a measured zero.
+- RTK's total is uncapped. Each row saves `max(0, raw - filtered)`, with both
+  sides in `ceil(bytes/4)`, so a few very large outputs can dominate the total.
+  Rows where filtering made the output longer count as 0.
+- When `rtk_database` is configured, the global snapshot adds `client_visible`,
+  which re-counts every row as a client first shows the output:
+  - whole up to `client_inline_chars` (default 30000, allowed 4000–128000);
+  - otherwise a preview of at most `client_preview_chars` (default 2000).
+
+  Those defaults are Claude Code 2.1.282's `bashOutputMaxChars` and its
+  saved-output preview.
+  - **Sign:** the view keeps the sign, so an expansion, or a filtered output
+    longer than the raw output's preview, counts as `added`. Its net therefore
+    differs from the floored upstream total.
+  - **It is a model, not a bound:**
+    - bytes stand in for characters, which is exact only for ASCII;
+    - the preview's wrapper text and later reads of saved output files are not
+      counted;
+    - rows from scripts that no client displayed are included;
+    - Codex has its own output limits.
+  - **Mismatch check:** if the configured database holds fewer rows than
+    `rtk gain` reported, the view is omitted and an issue names the mismatch.
+- Headroom 0.37.0 calls a 30-day estimate `lifetime`, and
+  `headroom savings --json` also prints zero when its ledger file does not
+  exist. When the report names its ledger path, the snapshot records
+  `ledger_present`. It resolves a relative path from the configured project, the
+  directory Headroom runs in, so an absent ledger is not read as a measured zero.
 - Context Mode 1.0.169 uses retained-event and byte estimates with finite
   retention. Its `tokens_saved_lifetime` is retained events × 256.
 - jcodemunch's persistent total estimates bytes avoided divided by four and can
