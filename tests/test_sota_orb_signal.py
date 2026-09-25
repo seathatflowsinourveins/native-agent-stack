@@ -207,10 +207,22 @@ class EntryStopExit(unittest.TestCase):
         only = S.simulate_trade([b(958, 11.9, 12.1, 11.95, 12.05)], 1, 12.0, self.ATR, CLOSE, "F0", no_spread)
         self.assertEqual((only["exit_reason"], only["exit_base"]), ("eod", 12.05))
 
-    def test_f2_adds_one_tick(self):
-        self.assertAlmostEqual(S.adverse("F2", 1, 10.0, 0.001), 10.01 + 0.01)
-        self.assertAlmostEqual(S.adverse("F2", -1, 10.0, 0.001), 9.99 - 0.01)
+    def test_f2_adds_two_bps(self):
+        self.assertEqual(S.F2_EXTRA, 0.0002)
+        self.assertAlmostEqual(S.adverse("F2", 1, 100.0, 0.001), 100.0 * 1.0012)
+        self.assertAlmostEqual(S.adverse("F2", -1, 100.0, 0.001), 100.0 * 0.9988)
+        self.assertAlmostEqual(S.adverse("F1", 1, 100.0, 0.001), 100.1)
         self.assertEqual(S.adverse("F0", 1, 10.0, 0.5), 10.0)
+
+    def test_same_bar_favour_variant(self):
+        bars = [b(575, 11.9, 12.1, 11.7, 12.05), b(576, 12.05, 12.3, 12.0, 12.2), flat(959, 15.0)]
+        against = S.simulate_trade(bars, 1, 12.0, self.ATR, CLOSE, "F0", no_spread)
+        favour = S.simulate_trade(bars, 1, 12.0, self.ATR, CLOSE, "F0", no_spread, same_bar="favour")
+        self.assertTrue(against["same_bar"] and favour["same_bar"])
+        self.assertEqual(against["exit_reason"], "stop_same_bar")
+        self.assertEqual((favour["exit_reason"], favour["exit_base"]), ("eod", 15.0))
+        clean = S.simulate_trade([b(575, 12.0, 12.1, 11.95, 12.05)], 1, 12.0, self.ATR, CLOSE, "F0", no_spread)
+        self.assertFalse(clean["same_bar"])
 
 
 class FeesRAndSizing(unittest.TestCase):

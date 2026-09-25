@@ -28,10 +28,10 @@ import orb_common as C  # noqa: E402
 import collect_quotes as Q  # noqa: E402
 import orb_signal as S  # noqa: E402
 
-MODELS = ("F0", "F1", "F2")
+MODELS = ("F0", "F1", "F2", "F0fav")  # F0fav: descriptive F0 resolving same-bar entry+stop in favour (D6)
 TRADE_COLS = ["d", "segment", "symbol", "dirn", "rank", "relvol", "atr14", "slots", "model", "entry_minute",
               "entry_base", "entry_fill", "stop", "gap_entry", "exit_minute", "exit_base", "exit_fill",
-              "exit_reason", "gross_R", "net_R", "ssr_flag"]
+              "exit_reason", "gross_R", "net_R", "ssr_flag", "same_bar"]
 
 
 def cost_function(table: dict, segment: str, liq_tier: int, close_minute: int):
@@ -49,12 +49,13 @@ def cost_function(table: dict, segment: str, liq_tier: int, close_minute: int):
 
 def trade_record(model, fees, d, dirn, level, atr, bars, close_minute, hs):
     """One simulated trade as a flat dict, or None when the order never triggers."""
-    t = S.simulate_trade(bars, dirn, level, atr, close_minute, model, hs)
+    base_model, same_bar = ("F0", "favour") if model == "F0fav" else (model, "against")
+    t = S.simulate_trade(bars, dirn, level, atr, close_minute, base_model, hs, same_bar=same_bar)
     if t is None:
         return None
     r_ps = S.r_per_share(atr)
     gross = dirn * (t["exit_base"] - t["entry_base"]) / r_ps
-    net = S.net_r(model, fees, d, dirn, t["entry_fill"], t["exit_fill"], atr, shares=1.0)
+    net = S.net_r(base_model, fees, d, dirn, t["entry_fill"], t["exit_fill"], atr, shares=1.0)
     return dict(t, gross_R=gross, net_R=net)
 
 
@@ -106,7 +107,9 @@ def load_orders(population: str):
 
 
 def cmd_run(a) -> int:
-    C.verify_pins(C.require_frozen(C.PROTOCOL_PATH, a.protocol_sha256))
+    proto = C.require_frozen(C.PROTOCOL_PATH, a.protocol_sha256)
+    head = C.require_clean_tree()
+    C.verify_pins(proto)
     import orb_prepare as P
     fees = C.load_json(C.FEES_PATH)
     table = C.load_json(C.PRIVATE / "cost-table.json")
@@ -160,10 +163,10 @@ def cmd_run(a) -> int:
                     n[f"trades:{model}"] += 1
                     w.writerow([d, seg, sym, dirn, rank, rv, atr, slots, model, t["entry_minute"], t["entry_base"],
                                 t["entry_fill"], t["stop"], int(t["gap_entry"]), t["exit_minute"], t["exit_base"],
-                                t["exit_fill"], t["exit_reason"], t["gross_R"], t["net_R"], ssr])
+                                t["exit_fill"], t["exit_reason"], t["gross_R"], t["net_R"], ssr, int(t["same_bar"])])
         txt.flush()
         txt.detach()
-    res = dict(n, sha256=C.sha256_file(out))
+    res = dict(n, sha256=C.sha256_file(out), protocol_sha256=a.protocol_sha256.strip().lower(), git_head=head)
     print(json.dumps(res, sort_keys=True))
     C.write_private_json(C.PRIVATE / f"trades-{a.population}.counts.json", res)
     return 0

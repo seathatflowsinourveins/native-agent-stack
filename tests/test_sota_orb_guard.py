@@ -1,14 +1,16 @@
 """SYN: freeze guard, cost-table helpers and statistics of the ORB replication (sota-mover/orb).
 
 Synthetic inputs only; no private data is read (every refusal happens before any file other than the
-protocol is opened). Stdlib only (system python3).
+protocol and the freeze record is opened; path attributes are patched to temporary files). Stdlib only (system python3).
 """
 import hashlib
 import importlib.util
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -29,12 +31,25 @@ sys.modules["orb_common"] = C
 E = load("orb_evaluate_under_test", "evaluate.py")
 Q = load("orb_collect_quotes_under_test", "collect_quotes.py")
 SIM = load("orb_simulate_under_test", "simulate.py")
+QC = load("orb_quote_check_under_test", "quote_check.py")
 
 
-def write_protocol(tmp, status, frozen):
+def write_protocol(tmp, status, frozen, extra=None):
     p = Path(tmp) / "protocol.json"
-    p.write_text(json.dumps({"id": "x", "status": status, "frozen_before_outcomes": frozen}))
+    p.write_text(json.dumps(dict({"id": "x", "status": status, "frozen_before_outcomes": frozen}, **(extra or {}))))
     return p, hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def write_record(tmp, sha):
+    r = Path(tmp) / "freeze-record.json"
+    r.write_text(json.dumps({"protocol_sha256": sha}))
+    return r
+
+
+def git(*args, cwd):
+    subprocess.run(["git", *args], cwd=cwd, check=True, capture_output=True,
+                   env={"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
+                        "GIT_COMMITTER_EMAIL": "t@t", "PATH": "/usr/bin:/bin", "HOME": cwd})
 
 
 class RefusalGuard(unittest.TestCase):
@@ -42,32 +57,131 @@ class RefusalGuard(unittest.TestCase):
         proto = json.loads((ORB / "protocol.json").read_text())
         self.assertEqual(proto["status"], "draft_pending_independent_pre_outcome_review")
         self.assertIs(proto["frozen_before_outcomes"], False)
+        self.assertFalse((ORB / "evidence/freeze-record.json").exists())
 
-    def test_require_frozen(self):
+    def test_require_frozen_uses_the_freeze_record(self):
         with tempfile.TemporaryDirectory() as tmp:
-            p, sha = write_protocol(tmp, "draft_pending_independent_pre_outcome_review", False)
-            with self.assertRaises(SystemExit) as cm:
-                C.require_frozen(p, None)
-            self.assertIn("required", str(cm.exception.code))
-            with self.assertRaises(SystemExit) as cm:
-                C.require_frozen(p, sha)
-            self.assertIn("status", str(cm.exception.code))
-            p, sha = write_protocol(tmp, "frozen_before_outcomes", False)
-            with self.assertRaises(SystemExit):
-                C.require_frozen(p, sha)
             p, sha = write_protocol(tmp, "frozen_before_outcomes", True)
-            with self.assertRaises(SystemExit) as cm:
-                C.require_frozen(p, "0" * 64)
-            self.assertIn("does not match", str(cm.exception.code))
-            self.assertEqual(C.require_frozen(p, sha.upper())["id"], "x")
+            with mock.patch.object(C, "FREEZE_RECORD", Path(tmp) / "freeze-record.json"):
+                with self.assertRaises(SystemExit) as cm:
+                    C.require_frozen(p, None)
+                self.assertIn("required", str(cm.exception.code))
+                with self.assertRaises(SystemExit) as cm:          # no record yet
+                    C.require_frozen(p, sha)
+                self.assertIn("freeze record", str(cm.exception.code))
+                write_record(tmp, sha)
+                with self.assertRaises(SystemExit) as cm:          # argument differs from the record
+                    C.require_frozen(p, "0" * 64)
+                self.assertIn("freeze record", str(cm.exception.code))
+                self.assertEqual(C.require_frozen(p, sha.upper())["id"], "x")
+                p.write_text(p.read_text() + " ")                  # the working file changed after the freeze
+                with self.assertRaises(SystemExit) as cm:
+                    C.require_frozen(p, sha)
+                self.assertIn("does not match the freeze record", str(cm.exception.code))
+                for status, frozen in (("draft_pending_independent_pre_outcome_review", False),
+                                       ("frozen_before_outcomes", False)):
+                    p2, sha2 = write_protocol(tmp, status, frozen)
+                    write_record(tmp, sha2)
+                    with self.assertRaises(SystemExit) as cm:
+                        C.require_frozen(p2, sha2)
+                    self.assertIn("status", str(cm.exception.code))
 
     def test_entry_points_refuse_on_the_draft(self):
         sha = hashlib.sha256((ORB / "protocol.json").read_bytes()).hexdigest()
         for main, args in ((E.main, ["run"]), (E.main, ["run", "--protocol-sha256", sha]),
-                           (SIM.main, ["run", "--protocol-sha256", sha]), (SIM.main, ["run", "--population", "base"])):
+                           (SIM.main, ["run", "--protocol-sha256", sha]), (SIM.main, ["run", "--population", "base"]),
+                           (QC.main, ["sample", "--protocol-sha256", sha]), (QC.main, ["apply"])):
             with self.assertRaises(SystemExit) as cm:
                 main(args)
             self.assertTrue(str(cm.exception.code).startswith("refused"), args)
+
+
+class PinsCountsAndGit(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        root = Path(self.tmp.name)
+        self.priv = root / "private"
+        self.priv.mkdir()
+        (self.priv / "a.csv").write_text("x\n")
+        self.inputs = {}
+        for name in ("daily_parquet", "minute_plan", "fees", "calendar"):
+            f = root / f"{name}.bin"
+            f.write_text(name)
+            self.inputs[name] = f
+        self.patches = [mock.patch.object(C, "PRIVATE", self.priv),
+                        mock.patch.object(C, "DAILY_PARQUET", self.inputs["daily_parquet"]),
+                        mock.patch.object(C, "MINUTE_PLAN", self.inputs["minute_plan"]),
+                        mock.patch.object(C, "FEES_PATH", self.inputs["fees"]),
+                        mock.patch.object(C, "CALENDAR_PATH", self.inputs["calendar"])]
+        for pt in self.patches:
+            pt.start()
+
+    def tearDown(self):
+        for pt in self.patches:
+            pt.stop()
+        self.tmp.cleanup()
+
+    def pins(self):
+        return {"pinned_artifacts": {"private": {"a.csv": C.sha256_file(self.priv / "a.csv")},
+                                     "inputs": {k: C.sha256_file(v) for k, v in self.inputs.items()}}}
+
+    def test_verify_pins(self):
+        C.verify_pins(self.pins())
+        with self.assertRaises(SystemExit):
+            C.verify_pins({"pinned_artifacts": {"private": {"a.csv": "0" * 64}}})       # inputs not pinned
+        proto = self.pins()
+        (self.priv / "a.csv").write_text("y\n")
+        with self.assertRaises(SystemExit) as cm:
+            C.verify_pins(proto)
+        self.assertIn("a.csv", str(cm.exception.code))
+        proto = self.pins()
+        self.inputs["fees"].write_text("changed")
+        with self.assertRaises(SystemExit) as cm:
+            C.verify_pins(proto)
+        self.assertIn("fees", str(cm.exception.code))
+        proto = self.pins()
+        self.inputs["daily_parquet"].unlink()
+        with self.assertRaises(SystemExit):
+            C.verify_pins(proto)
+
+    def test_check_trades(self):
+        sha = "ab" * 32
+        with self.assertRaises(SystemExit):
+            C.check_trades("selected", sha)                                      # missing
+        t = self.priv / "trades-selected.csv.gz"
+        t.write_bytes(b"trades")
+        counts = self.priv / "trades-selected.counts.json"
+        counts.write_text(json.dumps({"sha256": C.sha256_file(t), "protocol_sha256": sha}))
+        self.assertEqual(C.check_trades("selected", sha.upper())["protocol_sha256"], sha)
+        with self.assertRaises(SystemExit) as cm:
+            C.check_trades("selected", "cd" * 32)
+        self.assertIn("another protocol", str(cm.exception.code))
+        t.write_bytes(b"tampered")
+        with self.assertRaises(SystemExit) as cm:
+            C.check_trades("selected", sha)
+        self.assertIn("does not match its counts", str(cm.exception.code))
+
+    def test_require_clean_tree(self):
+        repo = Path(self.tmp.name) / "repo"
+        study = repo / "study"
+        study.mkdir(parents=True)
+        with self.assertRaises(SystemExit):
+            C.require_clean_tree(study)                                          # not a git tree
+        git("init", "-q", cwd=repo)
+        (study / "f.py").write_text("x = 1\n")
+        (repo / "other.txt").write_text("outside the study directory\n")
+        git("add", "study/f.py", cwd=repo)
+        git("commit", "-q", "-m", "c", cwd=repo)
+        head = C.require_clean_tree(study)                                       # other.txt is outside
+        self.assertEqual(len(head), 40)
+        (study / "f.py").write_text("x = 2\n")
+        with self.assertRaises(SystemExit) as cm:
+            C.require_clean_tree(study)
+        self.assertIn("uncommitted", str(cm.exception.code))
+        (study / "f.py").write_text("x = 1\n")
+        (study / "new.json").write_text("{}")
+        with self.assertRaises(SystemExit):
+            C.require_clean_tree(study)                                          # untracked counts as dirty
 
 
 class QuoteHelpers(unittest.TestCase):
@@ -136,29 +250,78 @@ class SimulateHelpers(unittest.TestCase):
         self.assertEqual(SIM.ssr_flag(-1, 9.5, 10.0, 20.0, 2.0, bars, 576), 1)       # prior close in post-split units
 
 
+class QuoteCheck(unittest.TestCase):
+    def test_executions_and_delta(self):
+        t = {"gap_entry": 1, "entry_minute": 576, "entry_base": 12.5, "dirn": 1, "exit_reason": "stop",
+             "exit_minute": 600, "exit_base": 11.0, "stop": 12.3}
+        ex = QC.executions(t)
+        self.assertEqual(ex, [("entry_gap", 576, 12.5, 1, True), ("stop_exit", 600, 11.0, -1, True)])
+        eod = dict(t, gap_entry=0, exit_reason="eod")
+        self.assertEqual(QC.executions(eod), [])
+        inside = dict(t, gap_entry=0, exit_base=12.3)
+        self.assertEqual(QC.executions(inside), [("stop_exit", 600, 12.3, -1, False)])
+        # measured spreads wider than the bucket lower R: -(0.002-0.001)*12.5/0.2 - (0.001-0.001)*11/0.2
+        self.assertAlmostEqual(QC.trade_delta_r(ex, [0.002, 0.001], [0.001, 0.001], 0.2), -0.0625)
+        self.assertAlmostEqual(QC.segment_shift([-0.1, -0.3], 50, 100), -0.1)
+        self.assertEqual(QC.segment_shift([], 0, 100), 0.0)
+
+    def test_sample_key_depends_on_protocol(self):
+        a = [QC.in_check("2024-01-02", f"S{i}", 1, "aa" * 32) for i in range(1000)]
+        b = [QC.in_check("2024-01-02", f"S{i}", 1, "bb" * 32) for i in range(1000)]
+        self.assertTrue(60 < sum(a) < 140)
+        self.assertNotEqual(a, b)
+
+
 class Statistics(unittest.TestCase):
-    def test_holm(self):
-        h = E.holm({"a": 0.01, "b": 0.04, "c": 0.03}, 0.05)
-        self.assertTrue(h["a"][1])
-        self.assertFalse(h["c"][1])   # 0.03 > 0.05/2
-        self.assertFalse(h["b"][1])
-        self.assertAlmostEqual(h["a"][0], 0.03)
-        self.assertAlmostEqual(h["c"][0], 0.06)
-        self.assertAlmostEqual(h["b"][0], 0.06)
+    def test_fixed_sequence(self):
+        seq = ("ORB-1", "ORB-2", "ORB-3")
+        self.assertEqual(E.fixed_sequence({"ORB-1": 0.01, "ORB-2": 0.049, "ORB-3": 0.04}, seq, 0.05),
+                         {"ORB-1": "rejected", "ORB-2": "rejected", "ORB-3": "rejected"})
+        self.assertEqual(E.fixed_sequence({"ORB-1": 0.01, "ORB-2": 0.2, "ORB-3": 0.001}, seq, 0.05),
+                         {"ORB-1": "rejected", "ORB-2": "not_rejected", "ORB-3": "not_tested"})
+        self.assertEqual(E.fixed_sequence({"ORB-1": 0.06, "ORB-2": 0.001, "ORB-3": None}, seq, 0.05),
+                         {"ORB-1": "not_rejected", "ORB-2": "not_tested", "ORB-3": "not_tested"})
+
+    def test_verdict_wording(self):
+        v = E.item_verdict
+        self.assertEqual(v("rejected", True, True, 0.2, True, True), "supported on the 500 most liquid names")
+        self.assertTrue(v("rejected", True, None, 0.2, True, True).startswith("pending"))
+        self.assertTrue(v("rejected", True, False, 0.2, True, True).startswith("not supported, inconclusive"))
+        self.assertTrue(v("rejected", False, True, 0.2, True, True).startswith("not supported"))
+        self.assertEqual(v("not_rejected", True, True, 0.05, True, True),
+                         "not supported; an effect >= 0.08R is excluded on the 500 most liquid names")
+        self.assertEqual(v("not_rejected", True, True, 0.08, True, True),
+                         "not supported, inconclusive at 0.08R on the 500 most liquid names")
+        self.assertEqual(v("not_tested", True, True, 0.1, True, False), "not supported on the 500 most liquid names")
+        self.assertTrue(v("rejected", True, True, 0.2, False, True).startswith("inconclusive"))
 
     def test_bootstrap_mean(self):
-        mean, p, lo, hi = E.bootstrap_mean([10.0] * 50, [10] * 50, 200, 1)
-        self.assertEqual((mean, lo, hi), (1.0, 1.0, 1.0))
+        mean, p, lo, hi, up = E.bootstrap_mean([10.0] * 50, [10] * 50, 200, 1)
+        self.assertEqual((mean, lo, hi, up), (1.0, 1.0, 1.0, 1.0))
         self.assertLess(p, 0.01)
-        mean, p, lo, hi = E.bootstrap_mean([1.0, -1.0] * 50, [1] * 100, 500, 1)
+        mean, p, lo, hi, up = E.bootstrap_mean([1.0, -1.0] * 50, [1] * 100, 500, 1)
         self.assertEqual(mean, 0.0)
         self.assertGreater(p, 0.3)
         self.assertLess(lo, 0.0)
-        self.assertGreater(hi, 0.0)
+        self.assertGreater(hi, up)
+        self.assertGreater(up, 0.0)
+
+    def test_week_clusters(self):
+        self.assertEqual(E.iso_week("2024-01-01"), E.iso_week("2024-01-05"))
+        self.assertNotEqual(E.iso_week("2024-01-05"), E.iso_week("2024-01-08"))
+        sums, counts = E.cluster_sums([{"d": "2024-01-02", "x": 1.0}, {"d": "2024-01-03", "x": 2.0},
+                                       {"d": "2024-01-08", "x": 4.0}], lambda t: E.iso_week(t["d"]), lambda t: t["x"])
+        self.assertEqual((sums, counts), ([3.0, 4.0], [2, 1]))
 
     def test_power(self):
-        self.assertGreater(E.n_required(0.08, 3.0, 1.0, 0.05 / 3), E.n_required(0.08, 2.0, 1.0, 0.05 / 3))
-        self.assertAlmostEqual(E.mde(E.n_required(0.08, 2.0, 1.3, 0.05 / 3), 2.0, 1.3, 0.05 / 3), 0.08, places=3)
+        self.assertGreater(E.n_required(0.08, 3.0, 1.0, 0.05), E.n_required(0.08, 2.0, 1.0, 0.05))
+        self.assertAlmostEqual(E.mde(E.n_required(0.08, 2.0, 1.3, 0.05), 2.0, 1.3, 0.05), 0.08, places=3)
+        # the protocol's recorded minimum sample matches the formula at its stated basis
+        proto = json.loads((ORB / "protocol.json").read_text())
+        t = proto["sample_size"]["table"]
+        deff = 1 + (t["m_bar_combined"] - 1) * 0.02
+        self.assertEqual(proto["sample_size"]["n_min_trades"], E.n_required(0.08, 2.0, deff, 0.05))
+        self.assertEqual(proto["multiplicity"]["alpha_per_step"], 0.05)
 
     def test_portfolio_paper_sizing(self):
         fees = json.loads((ORB.parents[1] / "mover-v3/data/fees-v3.json").read_text())

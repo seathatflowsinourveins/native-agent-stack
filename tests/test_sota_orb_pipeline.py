@@ -9,6 +9,7 @@ import hashlib
 import importlib.util
 import json
 import random
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -48,14 +49,20 @@ class SyntheticPipeline(unittest.TestCase):
         C.DAILY_PARQUET = root / "daily.parquet"
         C.MINUTE_PLAN = root / "plan.json"
         cls.P.BARS_GLOB = str(C.MINUTE_ROOT / "bars/symbol=*/year=*/full.parquet")
-        sessions = [s for s, _ in C.calendar() if "2023-11-15" <= s <= "2024-02-09"]
+        daily_sessions = [s for s, _ in C.calendar() if "2023-06-01" <= s <= "2024-02-09"]
+        sessions = [s for s in daily_sessions if s >= "2023-11-15"]  # minute bars only here
         syms = [f"S{i:02d}" for i in range(24)]
         rng = random.Random(7)
         con = duckdb.connect()
         drows, mrows = [], []
+        for s in daily_sessions:  # the membership calendar symbol; not in the corpus (a counted 'missing' member)
+            drows.append(("SPY", s, 400, 401, 399, 400, 5e7, 400, 401, 399, 400, 5e7))
         for sym in syms:
             px = rng.uniform(20, 150)
-            for s in sessions:
+            for s in daily_sessions:
+                if s < sessions[0]:
+                    drows.append((sym, s, px, px * 1.02, px * 0.98, px, 3e6, px, px * 1.02, px * 0.98, px, 3e6))
+                    continue
                 o = px * (1 + rng.gauss(0, 0.01))
                 path, hi, lo = [o], o, o
                 for m in range(570, 960):
@@ -92,6 +99,14 @@ class SyntheticPipeline(unittest.TestCase):
         C.PROTOCOL_PATH = root / "protocol.json"
         C.PROTOCOL_PATH.write_text(json.dumps(proto, indent=1))
         cls.sha = hashlib.sha256(C.PROTOCOL_PATH.read_bytes()).hexdigest()
+        C.FREEZE_RECORD = root / "freeze-record.json"
+        C.STUDY_DIR = root / "study"  # a clean git tree standing in for the study directory
+        C.STUDY_DIR.mkdir()
+        (C.STUDY_DIR / "protocol.json").write_text("{}")
+        env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
+               "GIT_COMMITTER_EMAIL": "t@t", "PATH": "/usr/bin:/bin", "HOME": str(root)}
+        for args in (["init", "-q"], ["add", "."], ["commit", "-q", "-m", "freeze"]):
+            subprocess.run(["git", *args], cwd=C.STUDY_DIR, check=True, capture_output=True, env=env)
 
     @classmethod
     def tearDownClass(cls):
@@ -105,7 +120,7 @@ class SyntheticPipeline(unittest.TestCase):
 
     def test_pipeline(self):
         C, P, Q, SIM, E = self.C, self.P, self.Q, self.SIM, self.E
-        for cmd in ("or-table", "candidates", "select", "triggers"):
+        for cmd in ("or-table", "membership", "candidates", "select", "triggers"):
             self.assertEqual(self.run_quiet(P.main, [cmd])[0], 0, cmd)
         self.assertEqual(self.run_quiet(P.main, ["verify-or", "--n", "5"])[0], 0)
         sel = C.load_json(C.PRIVATE / "selected.counts.json")
@@ -120,11 +135,17 @@ class SyntheticPipeline(unittest.TestCase):
                                                                            ("reproduction", "post_publication")}}))
         # pin the private inputs in the frozen copy, as the real freeze does
         proto = json.loads(C.PROTOCOL_PATH.read_text())
-        proto["pinned_artifacts"] = {n: C.sha256_file(C.PRIVATE / n) for n in
-                                     ("candidates.csv.gz", "selected.csv", "triggers.csv", "cost-table.json")}
+        proto["pinned_artifacts"] = {
+            "private": {n: C.sha256_file(C.PRIVATE / n) for n in
+                        ("membership.parquet", "candidates.csv.gz", "selected.csv", "triggers.csv", "cost-table.json")},
+            "inputs": {k: C.sha256_file(v) for k, v in C.input_paths().items()}}
         C.PROTOCOL_PATH.write_text(json.dumps(proto, indent=1))
         self.sha = hashlib.sha256(C.PROTOCOL_PATH.read_bytes()).hexdigest()
-        # the draft (repository) protocol and a wrong hash are refused before anything is read
+        # no freeze record yet, then a wrong hash: refused before anything is read
+        with self.assertRaises(SystemExit) as cm:
+            SIM.main(["run", "--protocol-sha256", self.sha])
+        self.assertIn("freeze record", str(cm.exception.code))
+        C.FREEZE_RECORD.write_text(json.dumps({"protocol_sha256": self.sha}))
         with self.assertRaises(SystemExit):
             SIM.main(["run", "--protocol-sha256", "0" * 64])
         with self.assertRaises(SystemExit):
@@ -136,10 +157,27 @@ class SyntheticPipeline(unittest.TestCase):
         self.assertEqual(json.loads(out)["sha256"], first["sha256"])        # byte-reproducible
         self.assertEqual(first["trades:F0"], first["trades:F1"])
         self.assertEqual(first["trades:F1"], first["trades:F2"])
+        self.assertEqual(first["trades:F0"], first["trades:F0fav"])
+        self.assertEqual(first["protocol_sha256"], self.sha)
+        self.assertEqual(len(first["git_head"]), 40)
         self.assertEqual(first["trades:F1"], trig["post_publication"]["fired"] + trig.get("reproduction", {}).get("fired", 0))
         self.assertEqual(self.run_quiet(SIM.main, ["run", "--protocol-sha256", self.sha, "--population", "base"])[0], 0)
         rc, out = self.run_quiet(E.main, ["run", "--protocol-sha256", self.sha])
         self.assertEqual(rc, 0)
+        # a tampered trades file is refused by evaluate
+        tr = C.PRIVATE / "trades-selected.csv.gz"
+        saved_tr = tr.read_bytes()
+        tr.write_bytes(saved_tr + b"x")
+        with self.assertRaises(SystemExit) as cm:
+            E.main(["run", "--protocol-sha256", self.sha])
+        self.assertIn("counts file", str(cm.exception.code))
+        tr.write_bytes(saved_tr)
+        # a dirty study directory is refused
+        (C.STUDY_DIR / "stray.txt").write_text("x")
+        with self.assertRaises(SystemExit) as cm:
+            E.main(["run", "--protocol-sha256", self.sha])
+        self.assertIn("uncommitted", str(cm.exception.code))
+        (C.STUDY_DIR / "stray.txt").unlink()
         # a changed pinned input is refused
         saved = (C.PRIVATE / "cost-table.json").read_bytes()
         (C.PRIVATE / "cost-table.json").write_bytes(saved + b" ")
@@ -149,11 +187,14 @@ class SyntheticPipeline(unittest.TestCase):
         (C.PRIVATE / "cost-table.json").write_bytes(saved)
         res = C.load_json(C.PRIVATE / "results.json")
         self.assertEqual(set(res["items"]), {"ORB-1", "ORB-2", "ORB-3"})
-        for item in res["items"].values():
-            self.assertIn("holm_adjusted_p", item)
-        self.assertIn(res["verdicts"]["combined"], ("supported", "not_supported", "inconclusive"))
+        for k, item in res["items"].items():
+            self.assertIn(item["sequence_status"], ("rejected", "not_rejected", "not_tested"))
+            self.assertTrue(res["verdicts"][k].startswith(("supported", "not supported", "pending", "inconclusive")))
+        self.assertIsNone(res["verdicts"]["quote_adjusted_mean_R"])   # quote check not run in this dry run
+        self.assertIn("week_block_bootstrap_ORB-1", res["descriptive"])
+        self.assertIn("same_bar_count", res["per_trade"]["post_publication|F1|combined"])
         self.assertIn("fig4|post_publication|F0", res["descriptive"])
-        # the F2 mean is below the F1 mean on every leg (one extra tick per side)
+        # the F2 mean is below the F1 mean (2 bps extra per side)
         pt = res["per_trade"]
         self.assertLess(pt["post_publication|F2|combined"]["mean_net_R"], pt["post_publication|F1|combined"]["mean_net_R"])
 

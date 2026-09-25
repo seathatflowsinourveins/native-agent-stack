@@ -27,7 +27,7 @@ MIN_RELVOL = 1.0           # paper filter 4: relative volume >= 100%
 TOP_N = 20                 # paper filter 5: top 20 by relative volume
 STOP_ATR_FRACTION = 0.10   # stop 10% of ATR from the executed entry price
 SPLIT_TOLERANCE = 1e-2     # a day-over-day adjustment-factor change above 1% is treated as a split
-TICK = 0.01                # Reg NMS sub-penny rule: $0.01 increment for quotes >= $1 (F2 slippage)
+F2_EXTRA = 0.0002          # F2 stress: +2 bps of price per side on top of the F1 half-spread
 
 
 # ---------------------------------------------------------------- opening range and direction
@@ -211,13 +211,12 @@ def entry_base(model: str, dirn: int, level: float, bar_open: float) -> float:
 def adverse(model: str, side: int, base: float, half_spread: float) -> float:
     """Fill after costs for one execution. side +1 buys (pays up), -1 sells (receives less).
 
-    F0: no spread. F1: the measured half-spread (fraction of price). F2: F1 plus one tick."""
+    F0: no spread. F1: the measured half-spread (fraction of price). F2: F1 plus F2_EXTRA (2 bps) of
+    price-proportional slippage per side."""
     if model == "F0":
         return base
-    px = base * (1.0 + side * half_spread)
-    if model == "F2":
-        px += side * TICK
-    return px
+    extra = F2_EXTRA if model == "F2" else 0.0
+    return base * (1.0 + side * (half_spread + extra))
 
 
 def stop_price(dirn: int, fill: float, atr: float) -> float:
@@ -225,12 +224,15 @@ def stop_price(dirn: int, fill: float, atr: float) -> float:
     return fill - dirn * STOP_ATR_FRACTION * atr
 
 
-def simulate_trade(bars, dirn: int, level: float, atr: float, close_minute: int, model: str, half_spread):
+def simulate_trade(bars, dirn: int, level: float, atr: float, close_minute: int, model: str, half_spread,
+                   same_bar: str = "against"):
     """One symbol-day under fill model F0/F1/F2. Returns None when the order never triggers, else a dict.
 
     half_spread(minute, price) -> fraction for an execution in that bar at that base price (ignored by F0).
-    Same-bar ambiguity: if the entry bar also reaches the stop, the trade is stopped in that bar (against
-    the trade), at the stop without gap (the bar traded through the trigger before the stop).
+    Same-bar ambiguity (same_bar="against", the preregistered rule D6): if the entry bar also reaches the
+    stop, the trade is stopped in that bar at the stop without gap (the bar traded through the trigger
+    before the stop). same_bar="favour" (descriptive F0 variant only) ignores the stop inside the entry
+    bar and starts the stop test at the next bar.
     Later bars: long stops when low <= stop, at min(stop, open) (gap-through fills at the open); short
     symmetrically. Otherwise exit at the close of the last bar before the session close (16:00, or 13:00
     on early closes)."""
@@ -243,7 +245,8 @@ def simulate_trade(bars, dirn: int, level: float, atr: float, close_minute: int,
     stop = stop_price(dirn, fill_in, atr)
     out = {"entry_minute": eb[0], "entry_base": base_in, "entry_fill": fill_in, "stop": stop,
            "gap_entry": base_in != level}
-    if (dirn > 0 and eb[3] <= stop) or (dirn < 0 and eb[2] >= stop):
+    out["same_bar"] = (dirn > 0 and eb[3] <= stop) or (dirn < 0 and eb[2] >= stop)
+    if out["same_bar"] and same_bar == "against":
         base_out, m_out, reason = stop, eb[0], "stop_same_bar"
     else:
         base_out = m_out = reason = None

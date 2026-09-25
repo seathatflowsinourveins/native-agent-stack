@@ -22,10 +22,34 @@
    "r_unit": "p.7: R = the potential maximum loss per share (the stop distance, 10% of ATR)."
   },
   "reported": {
-   "table2_orb_relvol": {"total_return": "1,637%", "irr": "41.6%", "volatility": "14.8%", "sharpe": 2.81, "hit_ratio": "48.4%", "mdd": "12%", "worst_day": "-1.61%", "alpha": "35.8%", "beta": 0.0},
-   "table1_orb_base": {"total_return": "29%", "irr": "3.2%", "volatility": "6.6%", "sharpe": 0.48, "hit_ratio": "41.4%", "mdd": "13%"},
-   "fig4_mean_R_net_of_commission": {"relvol_lt_1": -0.02, "relvol_gt_1": 0.08, "relvol_gt_30": 0.38},
-   "table3_5m_vs_15m_sharpe": {"5m": 2.81, "15m": 1.43}
+   "table2_orb_relvol": {
+    "total_return": "1,637%",
+    "irr": "41.6%",
+    "volatility": "14.8%",
+    "sharpe": 2.81,
+    "hit_ratio": "48.4%",
+    "mdd": "12%",
+    "worst_day": "-1.61%",
+    "alpha": "35.8%",
+    "beta": 0.0
+   },
+   "table1_orb_base": {
+    "total_return": "29%",
+    "irr": "3.2%",
+    "volatility": "6.6%",
+    "sharpe": 0.48,
+    "hit_ratio": "41.4%",
+    "mdd": "13%"
+   },
+   "fig4_mean_R_net_of_commission": {
+    "relvol_lt_1": -0.02,
+    "relvol_gt_1": 0.08,
+    "relvol_gt_30": 0.38
+   },
+   "table3_5m_vs_15m_sharpe": {
+    "5m": 2.81,
+    "15m": 1.43
+   }
   }
  },
  "data": {
@@ -40,16 +64,46 @@
   "daily_bars": {
    "path": "~/codex-ecosystem/state/broad-market-20260921/dataset/daily.parquet",
    "sha256": "f7584f24519367e03e0a4ac0fc57f9b410c047991b001bb0259ebdfc09b31105",
-   "use": "ATR14 and 14-day average volume from sessions strictly before t; from session t only the share-adjustment ratio all_v/raw_v (a corporate-action schedule, public before the open) to detect a split between t-1 and t (D8)"
+   "use": "ATR14 and 14-day average volume from sessions strictly before t; from session t only the share-adjustment ratio all_v/raw_v (a corporate-action schedule, public before the open) to detect a split between t-1 and t (D8); point-in-time liquidity membership (med20 from sessions before t)"
   },
-  "session_calendar": {"path": "blueprints/us-equities/mover-v3/data/session-calendar.json", "sha256": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c", "use": "session order for the 14-session windows; 13:00 close on scheduled early closes"},
-  "fees": {"path": "blueprints/us-equities/mover-v3/data/fees-v3.json", "sha256": "f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a"},
+  "session_calendar": {
+   "path": "blueprints/us-equities/mover-v3/data/session-calendar.json",
+   "sha256": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c",
+   "use": "session order for the 14-session windows; 13:00 close on scheduled early closes"
+  },
+  "fees": {
+   "path": "blueprints/us-equities/mover-v3/data/fees-v3.json",
+   "sha256": "f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a"
+  },
   "quotes": "Alpaca /v2/stocks/quotes, feed=sip, asof=2026-09-22, GET only, for the preregistered cost sample (cost_table)",
-  "private_root": "~/.local/state/native-agent-stack/research/sota-mover/orb/ (mode 0700; never committed)"
+  "private_root": "~/.local/state/native-agent-stack/research/sota-mover/orb/ (mode 0700; never committed)",
+  "corporate_actions": "Alpaca GET /v1/corporate-actions (types forward_split, reverse_split, 2016-12-01..2026-08-14) for the 926 corpus symbols, used only to cross-check D8 (split_check.py)"
  },
  "universe": {
-  "pool": "D1: universe A per-year membership (the 500 most liquid symbols of each calendar year by the median of prior-20-session median dollar volume over that year's eligible sessions; minute-plan-stage1.json universe_a.per_year). A symbol-day is a candidate only when the symbol is a member for that year.",
-  "filters_1_3": "open > $5 (the first 09:30-09:34 minute bar's open), 14-day average share volume >= 1,000,000, 14-day ATR > $0.50; all from sessions strictly before t"
+  "pool": "D1 (review fix 1): point-in-time top-500 liquidity membership. On each session t every daily.parquet symbol is ranked by med20 = median raw dollar volume over the 20 sessions t-20..t-1 (strictly before t), among symbols with 20 and 60 calendar-contiguous prior sessions with bars, raw close of t-1 >= $5, med20 >= $20M and no warrant/unit/right suffix (the stage-1 construction, applied per session instead of per year). The 500 highest med20 (ties by symbol; the same N as universe A) are members on t; members outside the 926-symbol minute corpus are dropped (coverage limitation, counted in membership.counts.json). orb_prepare.py membership.",
+  "filters_1_3": "open > $5 (the first 09:30-09:34 minute bar's open), 14-day average share volume >= 1,000,000, 14-day ATR > $0.50; all from sessions strictly before t",
+  "superseded_pool": "universe A per-year membership (each calendar year ranked by the median of med20 over the whole year: same-year future data). Replaced before any outcome; its selection is kept privately under v1-membership/ for the change count only.",
+  "membership_counts": {
+   "post_publication": {
+    "member_days": 328500,
+    "in_corpus_days": 317866,
+    "missing_days": 10634,
+    "missing_symbols": 265,
+    "sessions": 657
+   },
+   "reproduction": {
+    "member_days": 873000,
+    "in_corpus_days": 846004,
+    "missing_days": 26996,
+    "missing_symbols": 467,
+    "sessions": 1746
+   },
+   "missing_share": "3.2% of member symbol-days in both segments; per year 2.1%-4.7% (membership.counts.json)",
+   "change_vs_superseded_pool": {
+    "post_publication_orders": "13,079 now vs 13,077 before; 1,596 orders only under the new pool, 1,594 only under the old (625 of 657 sessions changed)",
+    "reproduction_orders": "34,633 now vs 34,639 before; 3,907 only new, 3,913 only old"
+   }
+  }
  },
  "features": {
   "opening_range": "bars 09:30..09:34 (et_minute 570-574): open = first bar's open, high = max high, low = min low, close = last bar's close, volume = sum; a symbol-day with no bar in that window is not a candidate",
@@ -62,15 +116,34 @@
  "selection": "per session: filters 1-3, RelVol >= 1, then the 20 highest RelVol (ties by symbol ascending). Dojis keep their slot and place no order (C1). Sessions with fewer than 20 selectable names trade what they have; their count is reported.",
  "orders": {
   "live": "from the 09:35 bar through the last bar before the close (16:00, 13:00 on early closes)",
-  "trigger": "long: first bar with high >= OR high; short: first bar with low <= OR low; a touch triggers",
+  "trigger": "long: first bar with high >= OR high; short: first bar with low <= OR low; a touch triggers; a trigger counts from the start of its bar (D13)",
   "stop": "10% of ATR14 from the executed entry price (after spread/slippage under F1/F2)",
   "exit": "stop, else the close of the last regular-session minute bar before the close (D10)",
-  "same_bar": "if the entry bar also reaches the stop, the trade is stopped in that bar at the stop (against the trade; all fill models)"
+  "same_bar": "if the entry bar also reaches the stop, the trade is stopped in that bar at the stop (against the trade; F0, F1 and F2); the same-bar count is reported and F0fav resolves those bars in the trade's favour (descriptive, D6)"
  },
  "fill_models": {
-  "F0": {"role": "paper-exact, descriptive reproduction", "entry": "the trigger", "stop_exit": "the stop", "eod": "last bar close", "costs": "$0.0035/share each side, no minimum, no spread, no regulatory fees"},
-  "F1": {"role": "primary", "entry": "the trigger, or the bar open when the bar opens beyond the trigger (gap-through), moved adversely by the measured half-spread of its cost cell", "stop_exit": "the stop, or the bar open on a gap-through, minus (long) / plus (short) the half-spread", "eod": "last bar close adjusted by the half-spread", "costs": "zero commission; SEC Section 31 and FINRA TAF on every sale (a long's exit, a short's entry), fees-v3.json on the trade date"},
-  "F2": {"role": "stress", "definition": "F1 plus one tick ($0.01) adverse on every execution"}
+  "F0": {
+   "role": "paper-exact, descriptive reproduction",
+   "entry": "the trigger",
+   "stop_exit": "the stop",
+   "eod": "last bar close",
+   "costs": "$0.0035/share each side, no minimum, no spread, no regulatory fees"
+  },
+  "F1": {
+   "role": "primary. F1 is not claimed to be conservative: its half-spreads are cell means measured at fixed stamps, not at the fills. The post-freeze quote check (quote_check) measures them at a sample of actual stop exits and gap-through fills.",
+   "entry": "the trigger, or the bar open when the bar opens beyond the trigger (gap-through), moved adversely by the measured half-spread of its cost cell",
+   "stop_exit": "the stop, or the bar open on a gap-through, minus (long) / plus (short) the half-spread",
+   "eod": "last bar close adjusted by the half-spread",
+   "costs": "zero commission; SEC Section 31 and FINRA TAF on every sale (a long's exit, a short's entry), fees-v3.json on the trade date"
+  },
+  "F2": {
+   "role": "stress",
+   "definition": "F1 plus 2 bps of the execution price adverse on every execution (orb_signal.F2_EXTRA = 0.0002), price-proportional instead of one tick"
+  },
+  "F0fav": {
+   "role": "descriptive only (D6)",
+   "definition": "F0 with same-bar entry+stop bars resolved in the trade's favour (the stop test starts at the next bar)"
+  }
  },
  "cost_table": {
   "population": "selected, non-doji orders that trigger (signal-firing timestamps), all sessions 2017-01-24..2026-08-14",
@@ -81,7 +154,11 @@
   "estimator": "5%-trimmed mean per cell with >= 30 observations; else the time x price fallback with >= 30; else the table's 90th percentile of its own measured/fallback values (the mover v1 method)",
   "groups": "two tables: reproduction sessions (2017-2023) and post-publication sessions (2024-2026-08-14); each trade uses its own group's table",
   "lookup": "an execution at minute m and price p of a symbol-day with liquidity tier k uses cell (bucket(m), tier(p), k); F0 uses none",
-  "sample_rate": {"reproduction": 10, "post_publication": 5, "fixed_at": "2026-09-25 after the fired counts (28,911 and 10,755) and before any quote request; collect_quotes.py SAMPLE_RATE"}
+  "sample_rate": {
+   "reproduction": 10,
+   "post_publication": 5,
+   "fixed_at": "2026-09-25 after the first fired counts and before any quote request (collect_quotes.py SAMPLE_RATE); redrawn with the same key and rates after the D1 membership fix (28,920 and 10,771 fired; 2,926 and 2,136 sampled)"
+  }
  },
  "sizing": {
   "paper": "D4: allocation per slot = start-of-day equity / 20; shares = min(0.01 x allocation / (0.1 x ATR14), 4 x allocation / entry fill); fractional shares; allocations of empty, doji and unfired slots stay in cash",
@@ -91,8 +168,30 @@
   "per_trade_R_fees": "per-trade net R charges fees per share without the TAF per-trade cap (conservative; the cap only lowers fees); the portfolio charges them on its actual share counts, cap included"
  },
  "segments": {
-  "reproduction": {"dates": ["2017-01-24", "2023-12-29"], "role": "descriptive reproduction of the paper's sample years we hold; reported for 2017-01-24..2021-12-31 and 2022-01-03..2023-12-29 separately and pooled. 2017-01-24 is the first session with 14 prior sessions of opening-range volume (the brief's 2017-01-03 start leaves 14 sessions with no selectable name, which would only add zero-return days to the portfolio)", "report_subperiods": {"2017-2021": ["2017-01-24", "2021-12-31"], "2022-2023": ["2022-01-03", "2023-12-29"]}},
-  "post_publication": {"dates": ["2024-01-02", "2026-08-14"], "role": "confirmatory; the items are tested here once, after the freeze"}
+  "reproduction": {
+   "dates": [
+    "2017-01-24",
+    "2023-12-29"
+   ],
+   "role": "descriptive reproduction of the paper's sample years we hold; reported for 2017-01-24..2021-12-31 and 2022-01-03..2023-12-29 separately and pooled. 2017-01-24 is the first session with 14 prior sessions of opening-range volume (the brief's 2017-01-03 start leaves 14 sessions with no selectable name, which would only add zero-return days to the portfolio)",
+   "report_subperiods": {
+    "2017-2021": [
+     "2017-01-24",
+     "2021-12-31"
+    ],
+    "2022-2023": [
+     "2022-01-03",
+     "2023-12-29"
+    ]
+   }
+  },
+  "post_publication": {
+   "dates": [
+    "2024-01-02",
+    "2026-08-14"
+   ],
+   "role": "confirmatory; the items are tested here once, after the freeze"
+  }
  },
  "outcomes": {
   "per_trade": "net R = (dirn x (exit fill - entry fill) x shares - explicit costs) / shares / (0.1 x ATR14), per fill model",
@@ -102,90 +201,282 @@
   "legs": "every statistic for combined, long-only and short-only trades"
  },
  "items": [
-  {"id": "ORB-1", "segment": "post_publication", "fill_model": "F1", "trades": "combined", "statistic": "mean net R per fired trade", "null": "mean <= 0", "alternative": "mean > 0 (one-sided)", "test": "session-clustered bootstrap, centred", "why": "the direct post-publication test of the paper's per-trade edge after measured costs; primary"},
-  {"id": "ORB-2", "segment": "post_publication", "fill_model": "F1", "trades": "long only", "statistic": "mean net R per fired long trade", "null": "mean <= 0", "alternative": "mean > 0 (one-sided)", "test": "session-clustered bootstrap, centred", "why": "historical borrow is unknown, so the short leg's feasibility is unmeasured; the long leg is computable without borrow and is what a cash account could trade"},
-  {"id": "ORB-3", "segment": "post_publication", "fill_model": "F1", "trades": "portfolio at the paper sizing (D4)", "statistic": "mean daily return over all post-publication sessions", "null": "mean <= 0", "alternative": "mean > 0 (one-sided)", "test": "bootstrap over sessions, centred", "why": "the paper's claim is a portfolio claim; sizing weights trades by 1/ATR up to the 4x cap, so the portfolio can differ in sign from the equal-weight per-trade mean"}
+  {
+   "id": "ORB-1",
+   "segment": "post_publication",
+   "fill_model": "F1",
+   "trades": "combined",
+   "statistic": "mean net R per fired trade",
+   "null": "mean <= 0",
+   "alternative": "mean > 0 (one-sided)",
+   "test": "session-clustered bootstrap, centred; fixed sequence step at alpha 0.05",
+   "why": "the direct post-publication test of the paper's per-trade edge after measured costs; primary"
+  },
+  {
+   "id": "ORB-2",
+   "segment": "post_publication",
+   "fill_model": "F1",
+   "trades": "long only",
+   "statistic": "mean net R per fired long trade",
+   "null": "mean <= 0",
+   "alternative": "mean > 0 (one-sided)",
+   "test": "session-clustered bootstrap, centred; fixed sequence step at alpha 0.05",
+   "why": "historical borrow is unknown, so the short leg's feasibility is unmeasured; the long leg is computable without borrow and is what a cash account could trade"
+  },
+  {
+   "id": "ORB-3",
+   "segment": "post_publication",
+   "fill_model": "F1",
+   "trades": "portfolio at the paper sizing (D4)",
+   "statistic": "mean daily return over all post-publication sessions",
+   "null": "mean <= 0",
+   "alternative": "mean > 0 (one-sided)",
+   "test": "bootstrap over sessions, centred; fixed sequence step at alpha 0.05",
+   "why": "the paper's claim is a portfolio claim; sizing weights trades by 1/ATR up to the 4x cap, so the portfolio can differ in sign from the equal-weight per-trade mean"
+  }
  ],
  "not_items": {
   "break_even_vs_measured_cost": "reported with its CI but not tested: 'break-even cost >= measured cost' is the same event as 'mean net R at measured cost >= 0', i.e. ORB-1's point estimate, so a separate test would duplicate ORB-1 inside the family",
   "reproduction": "descriptive only (F0/F1/F2 on 2017-2021 and 2022-2023): Table 2 analogues, the Fig. 4 analogue (mean F0 net R by RelVol < 1, >= 1, >= 30 over all filter-1-3 names, base strategy) and the Table 1 analogue (all eligible names, allocation equity / eligible count); no gate"
  },
- "multiplicity": {"method": "Holm", "family": ["ORB-1", "ORB-2", "ORB-3"], "m": 3, "family_alpha": 0.05},
+ "multiplicity": {
+  "method": "fixed sequence (review fix 9)",
+  "order": [
+   "ORB-1",
+   "ORB-2",
+   "ORB-3"
+  ],
+  "alpha_per_step": 0.05,
+  "rule": "test ORB-1 at 0.05; only if rejected test ORB-2 at 0.05; only if rejected test ORB-3 at 0.05; stop at the first non-rejection (later items are 'not tested'); controls the familywise error at 0.05"
+ },
  "statistics": {
-  "bootstrap": {"B": 10000, "seed": 20260925, "unit": "session (all of a session's trades move together)", "p_value": "(1 + #{b : mean*_b - mean_hat >= mean_hat}) / (B + 1)", "ci": "2.5% and 97.5% percentiles of mean*_b"},
+  "bootstrap": {
+   "B": 10000,
+   "seed": 20260925,
+   "unit": "session (all of a session's trades move together)",
+   "p_value": "(1 + #{b : mean*_b - mean_hat >= mean_hat}) / (B + 1)",
+   "ci": "2.5% and 97.5% percentiles of mean*_b",
+   "upper95": "95th percentile of mean*_b (one-sided 95% upper bound)"
+  },
   "sharpe": "mean / sd (ddof 1) x sqrt(252)",
-  "max_drawdown": "max over t of 1 - equity_t / max_{s<=t} equity_s on the compounded daily equity"
+  "max_drawdown": "max over t of 1 - equity_t / max_{s<=t} equity_s on the compounded daily equity",
+  "week_block_bootstrap": "descriptive sensitivity: the ORB-1 statistic re-bootstrapped with ISO weeks as clusters (B and seed as above)"
  },
  "gates": {
-  "pre_outcome": ["verify-or: 0 mismatches between the SQL opening-range table and orb_signal.opening_range on the sha-keyed sample", "every stamp of the cost sample complete (HTTP 200) or reported as incomplete; the table records its observation count", "post-publication fired trades >= sample_size.n_min_trades, otherwise every item is reported as inconclusive (not as a fail)"],
+  "pre_outcome": [
+   "verify-or: 0 mismatches between the SQL opening-range table and orb_signal.opening_range on the sha-keyed sample",
+   "every stamp of the cost sample complete (HTTP 200) or reported as incomplete; the table records its observation count",
+   "post-publication fired trades >= sample_size.n_min_trades, otherwise every item is reported as inconclusive (not as a fail)",
+   "split_check: every flagged D8 window compared with provider split records; disagreements disclosed in D8"
+  ],
   "verdict": {
-   "combined": "supported only if ORB-1 is rejected under Holm AND the F2 combined mean net R point estimate is > 0",
-   "long_only": "supported only if ORB-2 is rejected under Holm AND the F2 long mean net R point estimate is > 0",
-   "portfolio": "supported only if ORB-3 is rejected under Holm AND the F2 portfolio Sharpe point estimate is > 0",
-   "otherwise": "not supported; no parameter search, no re-run with other windows, no new segment"
+   "supported": "an item is 'supported on the 500 most liquid names' only if the fixed sequence rejects it, its F2 point estimate is > 0 (mean net R for ORB-1/ORB-2, Sharpe for ORB-3) and the quote-check-adjusted F1 mean net R is > 0",
+   "excluded": "otherwise, for ORB-1/ORB-2: 'not supported; an effect >= 0.08R is excluded on the 500 most liquid names' only when the one-sided 95% upper bound of the F1 mean net R is < 0.08R",
+   "inconclusive": "otherwise 'not supported, inconclusive at 0.08R on the 500 most liquid names' (ORB-3: 'not supported on the 500 most liquid names')",
+   "sample": "if post-publication fired trades < n_min_trades every item reads 'inconclusive: post-publication trades below n_min'",
+   "otherwise": "no parameter search, no re-run with other windows, no new segment"
   }
  },
  "sample_size": {
-  "method": "normal approximation for a one-sided test at the worst Holm level alpha = 0.05/3 with power 0.8; per-trade sd of net R assumed (no outcome is read) at 1.5, 2.0 and 3.0 R; a session design effect 1 + (m_bar - 1) x rho with rho in {0, 0.02, 0.05} and m_bar = fired trades per session with a fired trade",
+  "method": "normal approximation for a one-sided test at alpha 0.05 (each fixed-sequence step) with power 0.8; per-trade sd of net R assumed (no outcome is read) at 1.5, 2.0 and 3.0 R; a session design effect 1 + (m_bar - 1) x rho with rho in {0, 0.02, 0.05}. sd 2R with rho 0.02 is optimistic; sd 3R with rho 0.05 is reported beside it, and the verdict wording (gates.verdict) never reads a non-rejection as evidence of no effect unless the upper bound excludes 0.08R",
   "target_effect": "+0.08 R (Fig. 4's RelVol > 1 average, net of commission)",
-  "n_min_trades": 7207,
+  "n_min_trades": 5054,
   "computed_from": "evaluate.py power (reads triggers.counts.json only)",
-  "table": {"post_publication_fired_trades": 10755, "post_publication_fired_longs": 5421, "sessions": 657, "m_bar_combined": 16.37, "m_bar_long": 8.251, "mde_R_combined_sd2_rho0.02": 0.0655, "mde_R_combined_sd2_rho0.05": 0.0762, "mde_R_combined_sd3_rho0.05": 0.1142, "mde_R_long_sd2_rho0.02": 0.0863, "mde_R_long_sd3_rho0.05": 0.1412, "n_required_long_sd2_rho0.02": 6312, "mde_annualised_sharpe_portfolio": 1.8392, "reading": "the combined item meets n_min (10,755 >= 7,207); the long-only item is under-powered for +0.08 R at the central assumptions (MDE about 0.086 R); ORB-3 can detect a Sharpe near the reported 2.81 but not one below about 1.8", "source": "evaluate.py power -> private power.json"}
+  "table": {
+   "post_publication_fired_trades": 10771,
+   "post_publication_fired_longs": 5421,
+   "sessions": 657,
+   "m_bar_combined": 16.394,
+   "m_bar_long": 8.251,
+   "mde_R_combined_sd2_rho0.02": 0.0548,
+   "mde_R_combined_sd3_rho0.05": 0.0956,
+   "mde_R_long_sd2_rho0.02": 0.0723,
+   "mde_R_long_sd3_rho0.05": 0.1183,
+   "n_min_combined_sd3_rho0.05": 15387,
+   "n_min_long_sd3_rho0.05": 11847,
+   "mde_annualised_sharpe_portfolio": 1.5399,
+   "reading": "at the optimistic sd 2R / rho 0.02 both per-trade items can detect +0.08R (combined MDE 0.055R, long 0.072R); at sd 3R / rho 0.05 neither can (MDE 0.096R and 0.118R; n_min 15,387 and 11,847 against 10,771 and 5,421 trades). A non-rejection is therefore read as 'inconclusive at 0.08R' unless the upper bound excludes it (gates.verdict).",
+   "source": "evaluate.py power -> private power.json"
+  },
+  "n_min_basis": "sd 2.0 R, rho 0.02, effect +0.08 R, one-sided alpha 0.05, power 0.8 (the sample gate)"
  },
  "deviations": [
-  {"id": "D1", "what": "Universe: the top 20 by RelVol are ranked within universe A (500 most liquid per year, per-year membership) instead of all ~7,000 NYSE/Nasdaq stocks.", "why": "our minute corpus holds regular-hours bars for universe A only; membership uses that year's median liquidity, a within-year look-ahead in the pool (not in the rules), and current-ticker identities. Sessions with fewer than 20 selectable names are counted."},
-  {"id": "D2", "what": "Sample: 2017-01-24..2023-12-29 for reproduction (the paper covers 2016-2023) plus 2024-01-02..2026-08-14 post-publication.", "why": "the minute corpus starts 2017-01-03 and RelVol needs 14 prior sessions of opening-range volume; 2016 is not held."},
-  {"id": "D3", "what": "Data: Alpaca SIP 1-minute bars aggregated to the 5-minute range; the open filter and the candle open use the first 09:30 minute bar's open rather than the official opening print; daily ATR and volume from Alpaca daily bars.", "why": "the paper used IQFeed intraday and CRSP data we do not hold."},
-  {"id": "D4", "what": "Sizing: conservative reading. Each of 20 slots gets equity/20; a stop-out loses 1% of that allocation; notional is capped at 4x the allocation; fractional shares; unused slots stay in cash.", "why": "'capital deployed for that position' is ambiguous. Reading it as 1% of total equity per position would risk ~20% of equity per day before the leverage cap binds; the per-slot reading keeps the book within 4x and the per-trade risk at 0.05% of equity, and is the magnitude consistent with the reported 41.6%/yr at a mean near +0.1-0.2 R. It cannot inflate returns relative to the other reading."},
-  {"id": "D5", "what": "Costs: F1/F2 replace the paper's commission-only model with measured half-spreads, gap-through fills, zero commission and SEC/TAF on sells (F0 keeps the paper's). The SEC Section 31 rate is taken on the trade date although the rule keys it to settlement.", "why": "the claim under test is net profitability; the settlement-date offset only matters within two sessions of a rate change."},
-  {"id": "D6", "what": "Same-bar ambiguity (entry and stop inside one minute bar) is resolved against the trade under every fill model, including F0.", "why": "minute bars do not order the high and low; the paper does not state its intrabar rule."},
-  {"id": "D7", "what": "ATR14 = simple mean of 14 true ranges from split/dividend-adjusted daily bars, rescaled to the decision session's raw basis.", "why": "the paper does not state Wilder smoothing or the price basis; an unadjusted range across a split would be spurious."},
-  {"id": "D8", "what": "The 14-day ATR, volume and RelVol windows are split-consistent (converted to the decision session's share and price units). A split effective on t is detected from the share-adjustment ratio all_v/raw_v of t versus t-1; that ratio is the only field of session t's daily row that is used.", "why": "an unadjusted window across a split would move RelVol and ATR by the split ratio. The price-adjustment factor was rejected as a detector after it flagged ex-dividend and spin-off sessions (a pre-outcome feature check); the share factor changes only at splits and encodes a schedule announced before the open, not day-t trading."},
-  {"id": "D9", "what": "Short leg: borrow is assumed available at zero fee; locates, hard-to-borrow fees and the Rule 201 short-sale restriction are not modelled.", "why": "historical borrow data are not held; ORB-2 (long only) does not depend on it. A descriptive short-leg sensitivity drops shorts on sessions where Rule 201 was plausibly active (prior session low <= 90% of its previous close)."},
-  {"id": "D10", "what": "The 16:00 exit uses the close of the last regular-session minute bar (15:59, or 12:59 on early closes) instead of the official closing auction.", "why": "the minute corpus has no separate auction price; F1 charges a half-spread on it."},
-  {"id": "D11", "what": "Triggers and stops are evaluated on minute-bar highs and lows (a touch fills); no ticks, queue position, halts or LULD pauses.", "why": "no tick data are held; halted minutes have no bar and a gap-through fills at the next bar's open under F1/F2."},
-  {"id": "D12", "what": "ETFs in universe A stay eligible.", "why": "the paper's Table 4 lists QQQ among 15-minute ORB names, so its universe appears to have included ETFs."}
+  {
+   "id": "D1",
+   "what": "Universe: the top 20 by RelVol are ranked within a point-in-time top-500 liquidity membership (ranked each session from sessions before t) intersected with the 926-symbol minute corpus, instead of all ~7,000 NYSE/Nasdaq stocks.",
+   "why": "our minute corpus holds regular-hours bars for universe A only; the pool uses no same-year future data (review fix 1). Members outside the corpus (3.2% of member symbol-days) are dropped and counted; identities are current tickers. Verdicts are worded 'on the 500 most liquid names'."
+  },
+  {
+   "id": "D2",
+   "what": "Sample: 2017-01-24..2023-12-29 for reproduction (the paper covers 2016-2023) plus 2024-01-02..2026-08-14 post-publication.",
+   "why": "the minute corpus starts 2017-01-03 and RelVol needs 14 prior sessions of opening-range volume; 2016 is not held."
+  },
+  {
+   "id": "D3",
+   "what": "Data: Alpaca SIP 1-minute bars aggregated to the 5-minute range; the open filter and the candle open use the first 09:30 minute bar's open rather than the official opening print; daily ATR and volume from Alpaca daily bars.",
+   "why": "the paper used IQFeed intraday and CRSP data we do not hold."
+  },
+  {
+   "id": "D4",
+   "what": "Sizing: conservative reading. Each of 20 slots gets equity/20; a stop-out loses 1% of that allocation; notional is capped at 4x the allocation; fractional shares; unused slots stay in cash.",
+   "why": "'capital deployed for that position' is ambiguous. Reading it as 1% of total equity per position would risk ~20% of equity per day before the leverage cap binds; the per-slot reading keeps the book within 4x and the per-trade risk at 0.05% of equity. It cannot inflate returns relative to the other reading."
+  },
+  {
+   "id": "D5",
+   "what": "Costs: F1/F2 replace the paper's commission-only model with measured half-spreads, gap-through fills, zero commission and SEC/TAF on sells (F0 keeps the paper's). The SEC Section 31 rate is taken on the trade date although the rule keys it to settlement.",
+   "why": "the claim under test is net profitability; the settlement-date offset only matters within two sessions of a rate change."
+  },
+  {
+   "id": "D6",
+   "what": "Same-bar ambiguity (entry and stop inside one minute bar) is resolved against the trade under every fill model, including F0. The count of same-bar trades is reported per segment and leg, with a descriptive F0 variant (F0fav) that resolves those bars in the trade's favour.",
+   "why": "minute bars do not order the high and low; the paper does not state its intrabar rule."
+  },
+  {
+   "id": "D7",
+   "what": "ATR14 = simple mean of 14 true ranges from split/dividend-adjusted daily bars, rescaled to the decision session's raw basis.",
+   "why": "the paper does not state Wilder smoothing or the price basis; an unadjusted range across a split would be spurious."
+  },
+  {
+   "id": "D8",
+   "what": "The 14-day ATR, volume and RelVol windows are split-consistent (converted to the decision session's share and price units). A split effective on t is detected from the share-adjustment ratio all_v/raw_v of t versus t-1; that ratio is the only field of session t's daily row that is used.",
+   "why": "an unadjusted window across a split would move RelVol and ATR by the split ratio. The price-adjustment factor was rejected as a detector after it flagged ex-dividend and spin-off sessions (a pre-outcome feature check); the share factor changes only at splits and encodes a schedule announced before the open, not day-t trading.",
+   "cross_check": {
+    "source": "Alpaca /v1/corporate-actions forward and reverse splits, 19 GET requests, all HTTP 200, 278 split records for the 926 symbols (split_check.py; private split-check.json)",
+    "flagged_windows": 151,
+    "confirmed_by_record_and_ratio": 145,
+    "ratio_mismatch": [
+     "TT 2020-03-02: detector 1.137, record 1.289 (Carrier/Otis spin-off with a share consolidation)"
+    ],
+    "flagged_without_record": [
+     "BALL 2017-05-17 (2.0; a real 2-for-1 split absent from the provider records)",
+     "DD 2019-04-02 (1.487; DowDuPont reverse split with the Dow spin-off)",
+     "RTX 2020-04-03 (0.500; UTC-Raytheon merger share conversion)",
+     "SQQQ 2018-05-02 (1.019) and 2018-05-03 (0.988): an adjustment-factor artifact that nets out over two sessions"
+    ],
+    "records_on_member_days_not_flagged": 0,
+    "disposition": "kept as computed; the six disagreements are 6 of 1,163,382 member symbol-days and are disclosed here, not patched"
+   }
+  },
+  {
+   "id": "D9",
+   "what": "Short leg: borrow is assumed available at zero fee; locates, hard-to-borrow fees and the Rule 201 short-sale restriction are not modelled.",
+   "why": "historical borrow data are not held; ORB-2 (long only) does not depend on it. A descriptive short-leg sensitivity drops shorts on sessions where Rule 201 was plausibly active (prior session low <= 90% of its previous close)."
+  },
+  {
+   "id": "D10",
+   "what": "The 16:00 exit uses the close of the last regular-session minute bar (15:59, or 12:59 on early closes) instead of the official closing auction.",
+   "why": "the minute corpus has no separate auction price; F1 charges a half-spread on it."
+  },
+  {
+   "id": "D11",
+   "what": "Triggers and stops are evaluated on minute-bar highs and lows (a touch fills); no ticks, queue position, halts or LULD pauses.",
+   "why": "no tick data are held; halted minutes have no bar and a gap-through fills at the next bar's open under F1/F2."
+  },
+  {
+   "id": "D12",
+   "what": "ETFs in universe A stay eligible.",
+   "why": "the paper's Table 4 lists QQQ among 15-minute ORB names, so its universe appears to have included ETFs."
+  },
+  {
+   "id": "D13",
+   "what": "A trigger counts from the start of its minute bar (from the 09:35 bar's first second), so the first eligible moment is optimistic by up to a few seconds against an order placed after the 09:35 bar is known.",
+   "why": "minute bars carry no sub-minute times; the 09:35 bar starts at 09:35:00, when the 5-minute candle has just closed."
+  }
  ],
  "clarifications": [
-  {"id": "C1", "text": "A doji ranked in the top 20 keeps its slot; the 21st name is not promoted."},
-  {"id": "C2", "text": "RelVol ties break by symbol ascending."},
-  {"id": "C3", "text": "An order that never triggers before the close is no trade and has no R; its slot's allocation stays in cash."},
-  {"id": "C4", "text": "The stop is 10% of ATR from the F1/F2 executed fill (after the half-spread and tick), per the paper's 'executed entry price'; R per share stays 0.1 x ATR14 for every fill model."},
-  {"id": "C5", "text": "Average volume must be >= 1,000,000 ('at least'); open and ATR thresholds are strict ('above', 'more than')."},
-  {"id": "C6", "text": "Positions are flat at the close; nothing carries overnight; each session's P&L is realised that session."}
+  {
+   "id": "C1",
+   "text": "A doji ranked in the top 20 keeps its slot; the 21st name is not promoted."
+  },
+  {
+   "id": "C2",
+   "text": "RelVol ties break by symbol ascending."
+  },
+  {
+   "id": "C3",
+   "text": "An order that never triggers before the close is no trade and has no R; its slot's allocation stays in cash."
+  },
+  {
+   "id": "C4",
+   "text": "The stop is 10% of ATR from the F1/F2 executed fill (after the half-spread and, under F2, the 2 bps), per the paper's 'executed entry price'; R per share stays 0.1 x ATR14 for every fill model."
+  },
+  {
+   "id": "C5",
+   "text": "Average volume must be >= 1,000,000 ('at least'); open and ATR thresholds are strict ('above', 'more than')."
+  },
+  {
+   "id": "C6",
+   "text": "Positions are flat at the close; nothing carries overnight; each session's P&L is realised that session."
+  }
  ],
  "limitations": [
   "Historical borrow, locates and hard-to-borrow fees are unknown (D9).",
-  "Universe A is a liquidity-ranked subset with within-year selection look-ahead and current-ticker identities (D1); names that were liquid only briefly or were delisted may be missing.",
+  "The pool is a point-in-time top-500 liquidity ranking intersected with the minute corpus: 3.2% of member symbol-days (265 symbols post-publication, 467 in reproduction) are outside the corpus and dropped; identities are current tickers (D1).",
   "Minute bars cannot order events inside a minute (D6, D11); the quote-measured half-spread is sampled at fixed stamps, not at each fill.",
   "The post-publication segment overlaps the stage-1 'interim' segment that other hypotheses on the same corpus may have read; this ORB rule set has not been evaluated on it.",
-  "Spreads were measured by sampling and apply by cell; queue position, partial fills, market impact beyond one tick (F2) and data-vendor differences are not modelled."
+  "Spreads were measured by sampling and apply by cell; queue position, partial fills, market impact beyond the F2 2 bps and data-vendor differences are not modelled."
  ],
  "freeze_discipline": {
-  "allowed_before_freeze_on_real_data": ["coverage and membership counts", "opening-range features up to 09:35 and 14-day windows before t", "selection, direction and doji counts", "the first trigger minute of each selected order (signal-firing timestamps, from bar highs/lows only)", "SIP quote spreads at the trigger minute and the fixed exit-agnostic stamps", "sample-size and MDE arithmetic from counts"],
+  "allowed_before_freeze_on_real_data": [
+   "coverage and membership counts",
+   "opening-range features up to 09:35 and 14-day windows before t",
+   "selection, direction and doji counts",
+   "the first trigger minute of each selected order (signal-firing timestamps, from bar highs/lows only)",
+   "SIP quote spreads at the trigger minute and the fixed exit-agnostic stamps",
+   "sample-size and MDE arithmetic from counts",
+   "provider split records for the D8 cross-check"
+  ],
   "forbidden_before_freeze": "any fill price, stop, exit, return, P&L, R, hit rate or price change after a decision time, or anything derived from them, including sanity checks",
-  "guard": "simulate.py run and evaluate.py run refuse unless status == frozen_before_outcomes, frozen_before_outcomes == true and the protocol file's sha256 equals --protocol-sha256"
+  "guard": "simulate.py run, quote_check.py and evaluate.py run refuse unless: evidence/freeze-record.json exists and records --protocol-sha256; protocol.json hashes to it and has status frozen_before_outcomes with frozen_before_outcomes true; the study directory's git tree is clean (HEAD is recorded); every pinned private artifact and external input matches (orb_common.verify_pins). evaluate.py and quote_check.py also require trades-selected.csv.gz to match its counts file, which must record the same protocol sha256 (orb_common.check_trades).",
+  "quote_page_disclosure": "The raw cost-sample quote pages (quotes/pages, pinned through quotes/ledger.jsonl) hold bid and ask at trigger+15m, trigger+60m and close-5m, i.e. prices after the decision time. Only half-spreads were computed from them; no mid was compared with any trigger, stop or level, and no price change was derived."
  },
  "live_shadow_hook": "If any verdict is supported, a separate prospective protocol (new id, new freeze) runs the same orb_prepare/orb_signal code at 09:35 ET each session on live SIP data, records the would-be orders, trigger times and quotes without placing orders, and compares realised fills against F1 for a preregistered number of sessions before any paper order. Nothing in this study authorises paper or live orders.",
- "runtime": {"python": "3.12.3", "duckdb": "1.5.5", "numpy": "not required", "tests": "system python3 3.12 (stdlib only)"},
- "pinned_artifacts": {
-   "or5.parquet": "e7e33f5f07415b0dfdf2991c115c6f1aebcabf432887633c48ab15e516465790",
-   "candidates.csv.gz": "ab26f20ea96883cac9431a85f4581fa160453b10d2df5c56a8a669007ae16eee",
-   "selected.csv": "2fdbeb90aa5383303a12160ad35618ab173b09118f079d8a47b28087602bb0c9",
-   "triggers.csv": "90599376fe12a438f882b06666883cb9fe6844278634f8c300942c8e9dbd5c89",
-   "quotes/sample.json": "ff2cb8a93140cdb971cfefbc4da8d14c219769b6448b3e823cf6d7528b2cdb74",
-   "cost-table.json": "44fffd2e1f3aa5e13c73fc84b4c8a21f78ef2b4ce053339620c0ff32ce4bc6b6"
+ "runtime": {
+  "python": "3.12.3",
+  "duckdb": "1.5.5",
+  "numpy": "not required",
+  "tests": "system python3 3.12 (stdlib only)"
  },
- "pinned_artifacts_rule": "simulate.py run refuses when a private file differs from its pin (orb_common.verify_pins)",
+ "pinned_artifacts": {
+  "private": {
+   "or5.parquet": "e7e33f5f07415b0dfdf2991c115c6f1aebcabf432887633c48ab15e516465790",
+   "membership.parquet": "1564ddbbbc7b8dc782ad08c9185164f5eb1f5813e93c0775e1c8ceb150cb456d",
+   "candidates.csv.gz": "6e703c60b10e291e4f009afd3f4877bf145e91ab0c7b145cd4b2200b152bdf59",
+   "selected.csv": "9d30c8e795ff888af206e78ea49d94bcfccc2263212f99c7a0f3cd9587b907ad",
+   "triggers.csv": "0ca41e14c81cf52b2929723e019ebc27c2a8da3e5e6dec285a5bc5881205a4b6",
+   "quotes/sample.json": "80f209814e3c90702927e16a2c91c176ada7b771ad56ba77d3b2825b4c6e7533",
+   "quotes/ledger.jsonl": "04f71641308e8ece8bd3a8f5f13f09959eb8685ba0166c97ac1728dd64701d6f",
+   "cost-table.json": "96c9876a06e06a17079a24d18fe32303b92710b4869100a26aad9277364b2ff6",
+   "splits/ledger.jsonl": "da05df8d7e51fb3db774efff522eebf57f1c176cec5d1b0d581a9d8aa24de8eb"
+  },
+  "inputs": {
+   "daily_parquet": "f7584f24519367e03e0a4ac0fc57f9b410c047991b001bb0259ebdfc09b31105",
+   "minute_plan": "4384402ea54b4546dc1ea91d830d77d99615557f2bc0f020cd5daafc0a1fad1b",
+   "fees": "f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a",
+   "calendar": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c"
+  }
+ },
+ "pinned_artifacts_rule": "simulate.py, quote_check.py and evaluate.py refuse when a private artifact or an external input differs from its pin (orb_common.verify_pins)",
  "pre_freeze_computations": [
-   "1. orb_prepare.py or-table: 09:30-09:34 open/high/low/close/volume and regular-hours bar count per symbol-day for the 926 universe-A symbols (1,957,885 rows).",
-   "2. orb_prepare.py candidates: ATR14, 14-day average volume, RelVol, split ratio and filters 1-3 per member symbol-day (1,192,531 member symbol-days; 992,134 pass filters 1-3). Run five times: the first run used the price-adjustment factor as a split detector and flagged 1,977 windows (ex-dividend and spin-off sessions); D8 moved detection to the share factor (176 windows). Runs 2-5 give the same counts; runs 2-3 differed in their gzip header timestamp, which is now fixed at 0, and runs 4-5 are byte-identical. After the reproduction start moved to 2017-01-24 it was run twice more (byte-identical): 1,185,667 member symbol-days, the same 992,134 eligible, 170 split-adjusted windows.",
-   "3. A distribution check of that split factor (pre-decision daily fields only), which prompted the D8 change.",
-   "4. orb_prepare.py select: top 20 per session with direction and doji counts, and sessions with fewer than 20 selectable names (from 2017-01-03: reproduction 16 of 1,760, 14 of them the first 14 sessions of 2017 without RelVol history; from 2017-01-24: 2 of 1,746; post-publication 4 of 657). Rerun after step 2 and after the start moved to 2017-01-24; selected.csv stayed byte-identical.",
-   "5. orb_prepare.py triggers: the first trigger minute of each non-doji order from bar highs and lows at or after 09:35 (reproduction 28,911 of 34,639 orders fired; post-publication 10,755 of 13,077). No price other than the level test was kept.",
-   "6. orb_prepare.py verify-or: 242 sha-keyed symbol-days re-derived from raw bars with orb_signal.opening_range, 0 mismatches.",
-   "7. collect_quotes.py sample/fetch/table: 5,041 sampled fired orders, 20,091 stamps, 20,091 GET requests, all HTTP 200, 9 stamps without a valid quote; half-spread cells per group.",
-   "8. evaluate.py power: MDE and minimum sample from the trigger counts only.",
-   "No fill price, stop, exit, return, P&L, R, hit rate or post-decision price change was computed on real data. The only post-09:35 price data read were bar highs and lows for the trigger test (step 5) and SIP quotes at the signal stamps (step 7)."
- ]
+  "1. orb_prepare.py or-table: 09:30-09:34 open/high/low/close/volume and regular-hours bar count per symbol-day for the 926 corpus symbols (1,957,885 rows).",
+  "2. orb_prepare.py candidates, first under the superseded per-year membership: split detection moved from the price factor (1,977 flagged windows, ex-dividend and spin-off sessions) to the share factor (D8); reruns byte-identical once the gzip timestamp was fixed. A distribution check of the split factor (pre-decision daily fields only) prompted D8.",
+  "3. orb_prepare.py select / triggers / verify-or / collect_quotes.py sample, fetch, table / evaluate.py power under the superseded membership (13,077 post-publication orders, 20,091 quote requests, all HTTP 200). Kept privately under v1-membership/ for the change count only.",
+  "4. orb_prepare.py membership (review fix 1): point-in-time top-500 membership, 2,403 sessions x 500; 3.2% of member symbol-days outside the corpus (membership.counts.json); byte-identical rerun.",
+  "5. orb_prepare.py candidates under it: 1,163,382 member symbol-days, 989,983 pass filters 1-3, 151 split-adjusted windows.",
+  "6. orb_prepare.py select: reproduction 34,913 selected (280 dojis), 4 of 1,746 sessions with fewer than 20 selectable names; post-publication 13,134 selected (55 dojis), 3 of 657.",
+  "7. orb_prepare.py triggers: first trigger minute from bar highs/lows at or after 09:35; reproduction 28,920 of 34,633 orders fired, post-publication 10,771 of 13,079. orb_prepare.py compare-membership: 1,596 post-publication orders only under the new pool, 1,594 only under the old.",
+  "8. orb_prepare.py verify-or: 233 sha-keyed symbol-days re-derived from raw bars with orb_signal.opening_range, 0 mismatches.",
+  "9. collect_quotes.py sample/fetch/table: 5,062 sampled fired orders, 20,175 stamps; 2,396 new GET requests (22,487 in the ledger), all HTTP 200; 7 stamps without a valid quote.",
+  "10. split_check.py fetch/compare: 19 GET requests to /v1/corporate-actions, all HTTP 200; 145 of 151 flagged windows confirmed (D8.cross_check).",
+  "11. evaluate.py power: MDE and minimum sample from trigger counts only.",
+  "No fill price, stop, exit, return, P&L, R, hit rate or post-decision price change was computed on real data, and no quote mid was compared with any trigger, stop or level. The only post-09:35 price data read were bar highs and lows for the trigger test and SIP quotes at the signal stamps (freeze_discipline.quote_page_disclosure)."
+ ],
+ "quote_check": {
+  "when": "after the freeze and simulate.py run, before evaluate.py run (quote_check.py sample/fetch/apply, each behind the full guard)",
+  "population": "post-publication F1 trades with a stop exit (including same-bar stops) or a gap-through entry",
+  "sample": "sha256('d|symbol|dirn|protocol_sha256') first 8 bytes big-endian mod 10 == 0",
+  "quote_time": "newest valid SIP quote in the 60 s before the bar start for a gap-through fill (the fill is the bar open), before the bar end otherwise",
+  "shift": "per sampled trade dR = -sum over its checked executions of (measured - bucket half-spread) x base price / R per share; segment shift = (population / all trades of the leg) x mean dR; an execution without a valid quote contributes 0 and is counted",
+  "use": "a verdict additionally requires F1 mean net R + shift > 0 (combined for ORB-1 and ORB-3, long for ORB-2); until it has run, a would-be supported verdict reads 'pending'"
+ }
 }

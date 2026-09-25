@@ -1,11 +1,12 @@
-"""Statistics, items, Holm and verdicts for the ORB replication (protocol.json). Stdlib only.
+"""Statistics, items, fixed-sequence testing and verdicts for the ORB replication (protocol.json). Stdlib only.
 
   python evaluate.py power                              # pre-freeze: MDE and minimum sample from counts only
   python evaluate.py run --protocol-sha256 SHA          # post-freeze: items, portfolio, descriptives
 
-``run`` refuses (exit != 0, nothing read) unless protocol.json has status frozen_before_outcomes,
-frozen_before_outcomes true, and a sha256 equal to --protocol-sha256. ``power`` reads only signal-firing
-counts (triggers.csv), never a price after a decision time.
+``run`` refuses (exit != 0, before any trade file is read) unless: the freeze record exists and records
+--protocol-sha256; protocol.json hashes to it and is frozen; the study directory's git tree is clean;
+every pinned private artifact and external input matches; and trades-selected.csv.gz matches its
+counts file, which must record the same protocol sha256. ``power`` reads only signal-firing counts.
 """
 from __future__ import annotations
 
@@ -15,21 +16,23 @@ _HERE = _os.path.dirname(_os.path.abspath(__file__))
 if _HERE not in _sys.path:
     _sys.path.insert(0, _HERE)
 
-import argparse
-import csv
-import gzip
-import json
-import math
-import random
-import sys
-from collections import defaultdict
-from pathlib import Path
-from statistics import NormalDist
+import argparse  # noqa: E402
+import csv  # noqa: E402
+import gzip  # noqa: E402
+import json  # noqa: E402
+import math  # noqa: E402
+import random  # noqa: E402
+from collections import defaultdict  # noqa: E402
+from datetime import date  # noqa: E402
+from statistics import NormalDist  # noqa: E402
 
 import orb_common as C  # noqa: E402
 import orb_signal as S  # noqa: E402
 
 LEGS = ("combined", "long", "short")
+SEQUENCE = ("ORB-1", "ORB-2", "ORB-3")
+TARGET_EFFECT_R = 0.08
+LIQUID_SCOPE = "on the 500 most liquid names"
 
 
 # ------------------------------------------------------------------ power (pre-freeze)
@@ -65,7 +68,7 @@ def power_table(per_session_fired: dict, per_session_long: dict, sessions: int, 
 
 def cmd_power(a) -> int:
     proto = C.load_json(C.PROTOCOL_PATH)
-    alpha = proto["multiplicity"]["family_alpha"] / proto["multiplicity"]["m"]
+    alpha = proto["multiplicity"]["alpha_per_step"]
     lo, hi = proto["segments"]["post_publication"]["dates"]
     sessions = sum(1 for s, _ in C.calendar() if lo <= s <= hi)
     fired, longs = defaultdict(int), defaultdict(int)
@@ -76,11 +79,15 @@ def cmd_power(a) -> int:
             fired[r["d"]] += 1
             longs[r["d"]] += int(r["dirn"] == "1")
     res = power_table(fired, longs, sessions, alpha, a.effect)
-    res["alpha_one_sided_worst_holm"] = alpha
+    res["alpha_one_sided_per_step"] = alpha
     res["target_effect_R"] = a.effect
-    central = [row for row in res["combined"]["table"] if row["sd_R"] == 2.0 and row["rho"] == 0.02][0]
-    res["n_min_trades"] = central["n_required_for_effect"]
-    res["n_min_basis"] = "sd 2.0 R, rho 0.02, effect +0.08 R, one-sided alpha 0.05/3, power 0.8"
+
+    def row(leg, sd, rho):
+        return [r for r in res[leg]["table"] if r["sd_R"] == sd and r["rho"] == rho][0]
+    res["n_min_trades"] = row("combined", 2.0, 0.02)["n_required_for_effect"]
+    res["n_min_basis"] = "sd 2.0 R, rho 0.02, effect +0.08 R, one-sided alpha 0.05 (fixed sequence), power 0.8"
+    res["n_min_trades_sd3_rho005"] = row("combined", 3.0, 0.05)["n_required_for_effect"]
+    res["n_min_long_sd3_rho005"] = row("long", 3.0, 0.05)["n_required_for_effect"]
     res["inputs"] = {"triggers_sha256": C.sha256_file(C.PRIVATE / "triggers.csv"), "label": "HIST counts only"}
     print(json.dumps(res, indent=1, sort_keys=True))
     C.write_private_json(C.PRIVATE / "power.json", res)
@@ -89,10 +96,10 @@ def cmd_power(a) -> int:
 
 # ------------------------------------------------------------------ statistics
 
-def cluster_sums(rows, key_session, value):
+def cluster_sums(rows, key, value):
     sums, counts = defaultdict(float), defaultdict(int)
     for r in rows:
-        s = key_session(r)
+        s = key(r)
         sums[s] += value(r)
         counts[s] += 1
     keys = sorted(sums)
@@ -100,9 +107,11 @@ def cluster_sums(rows, key_session, value):
 
 
 def bootstrap_mean(sums, counts, B: int, seed: int):
-    """Session-clustered bootstrap of a ratio mean sum(x)/n. Returns (mean, p_one_sided_gt0, lo, hi)."""
+    """Clustered bootstrap of a ratio mean sum(x)/n.
+
+    Returns (mean, p_one_sided_gt0, ci95_lo, ci95_hi, upper95_one_sided)."""
     if not counts or sum(counts) == 0:
-        return None, None, None, None
+        return None, None, None, None, None
     mean = math.fsum(sums) / sum(counts)
     rng = random.Random(seed)
     k = len(sums)
@@ -114,11 +123,12 @@ def bootstrap_mean(sums, counts, B: int, seed: int):
         reps.append(math.fsum(sums[i] for i in pick) / n if n else 0.0)
     exceed = sum(1 for m in reps if m - mean >= mean)
     reps.sort()
-    return mean, (1 + exceed) / (B + 1), reps[int(0.025 * (B - 1))], reps[int(math.ceil(0.975 * (B - 1)))]
+    return (mean, (1 + exceed) / (B + 1), reps[int(0.025 * (B - 1))], reps[int(math.ceil(0.975 * (B - 1)))],
+            reps[int(math.ceil(0.95 * (B - 1)))])
 
 
 def bootstrap_ratio(num, den, B: int, seed: int):
-    """Clustered bootstrap of sum(num)/sum(den) (per-session sums). Returns (ratio, lo, hi)."""
+    """Clustered bootstrap of sum(num)/sum(den) (per-cluster sums). Returns (ratio, lo, hi)."""
     if not den or math.fsum(den) == 0:
         return None, None, None
     ratio = math.fsum(num) / math.fsum(den)
@@ -133,19 +143,42 @@ def bootstrap_ratio(num, den, B: int, seed: int):
     return ratio, reps[int(0.025 * (B - 1))], reps[int(math.ceil(0.975 * (B - 1)))]
 
 
-def holm(pvals: dict, alpha: float) -> dict:
-    """Holm step-down: {id: (adjusted_p, rejected)}."""
-    order = sorted(pvals, key=lambda k: pvals[k])
-    m = len(order)
-    out, running, stop = {}, 0.0, False
-    for j, k in enumerate(order):
-        adj = min(1.0, (m - j) * pvals[k])
-        running = max(running, adj)
-        rejected = (not stop) and pvals[k] <= alpha / (m - j)
-        if not rejected:
-            stop = True
-        out[k] = (running, rejected)
+def fixed_sequence(pvals: dict, order, alpha: float) -> dict:
+    """Fixed-sequence test: each hypothesis at alpha in `order`, stopping at the first non-rejection.
+
+    Returns {id: "rejected" | "not_rejected" | "not_tested"}."""
+    out, open_ = {}, True
+    for k in order:
+        if not open_:
+            out[k] = "not_tested"
+            continue
+        p = pvals.get(k)
+        if p is not None and p <= alpha:
+            out[k] = "rejected"
+        else:
+            out[k] = "not_rejected"
+            open_ = False
     return out
+
+
+def iso_week(d: str) -> str:
+    y, w, _ = date.fromisoformat(d).isocalendar()
+    return f"{y}-W{w:02d}"
+
+
+def item_verdict(status: str, f2_ok: bool, quote_ok, upper95, sample_ok: bool, r_scale: bool) -> str:
+    """Preregistered verdict wording (protocol gates.verdict)."""
+    if not sample_ok:
+        return "inconclusive: post-publication trades below n_min"
+    if status == "rejected" and f2_ok and quote_ok is True:
+        return f"supported {LIQUID_SCOPE}"
+    if status == "rejected" and f2_ok and quote_ok is None:
+        return "pending: the post-freeze quote check has not run"
+    if r_scale and upper95 is not None and upper95 < TARGET_EFFECT_R:
+        return f"not supported; an effect >= {TARGET_EFFECT_R}R is excluded {LIQUID_SCOPE}"
+    if r_scale:
+        return f"not supported, inconclusive at {TARGET_EFFECT_R}R {LIQUID_SCOPE}"
+    return f"not supported {LIQUID_SCOPE}"
 
 
 def portfolio(trades, sessions, fees, model, sizing, start=25000.0):
@@ -154,12 +187,13 @@ def portfolio(trades, sessions, fees, model, sizing, start=25000.0):
     for t in trades:
         by_day[t["d"]].append(t)
     eq, peak, mdd, rets, wins, n = start, start, 0.0, [], 0, 0
+    base_model = "F0" if model == "F0fav" else model
     for d in sessions:
         pnl = 0.0
         for t in by_day.get(d, []):
             ef, xf, atr, dirn, slots = t["entry_fill"], t["exit_fill"], t["atr14"], t["dirn"], t["slots"]
             sh = S.paper_shares(eq, ef, atr, slots) if sizing == "paper" else S.unlevered_shares(eq, ef, slots)
-            p = S.net_pnl(dirn, sh, ef, xf, S.trade_costs(model, fees, d, dirn, sh, ef, xf))
+            p = S.net_pnl(dirn, sh, ef, xf, S.trade_costs(base_model, fees, d, dirn, sh, ef, xf))
             pnl += p
             wins += p > 0
             n += 1
@@ -180,7 +214,7 @@ def portfolio(trades, sessions, fees, model, sizing, start=25000.0):
 
 def read_trades(population):
     path = C.PRIVATE / f"trades-{population}.csv.gz"
-    ints = {"dirn", "rank", "slots", "entry_minute", "exit_minute", "gap_entry"}
+    ints = {"dirn", "rank", "slots", "entry_minute", "exit_minute", "gap_entry", "same_bar"}
     strs = {"d", "segment", "symbol", "model", "exit_reason", "ssr_flag"}
     with gzip.open(path, "rt", newline="") as f:
         for r in csv.DictReader(f):
@@ -191,37 +225,57 @@ def leg_filter(leg):
     return {"combined": lambda t: True, "long": lambda t: t["dirn"] > 0, "short": lambda t: t["dirn"] < 0}[leg]
 
 
+def quote_shift(protocol_sha256: str):
+    """{leg: shift in mean net R} from quote_check.py apply, or None when it has not run."""
+    path = C.PRIVATE / "quote-check.json"
+    if not path.exists():
+        return None
+    q = C.load_json(path)
+    if q.get("protocol_sha256") != protocol_sha256.strip().lower():
+        raise C.FreezeError("refused: quote-check.json was produced under another protocol")
+    return {leg: q["legs"][leg]["segment_shift_R"] for leg in ("combined", "long")}
+
+
 def cmd_run(a) -> int:
     proto = C.require_frozen(C.PROTOCOL_PATH, a.protocol_sha256)
+    head = C.require_clean_tree()
+    C.verify_pins(proto)
+    C.check_trades("selected", a.protocol_sha256)
+    has_base = (C.PRIVATE / "trades-base.csv.gz").exists()
+    if has_base:
+        C.check_trades("base", a.protocol_sha256)
     B, seed = proto["statistics"]["bootstrap"]["B"], proto["statistics"]["bootstrap"]["seed"]
+    alpha = proto["multiplicity"]["alpha_per_step"]
     fees = C.load_json(C.FEES_PATH)
     cal = [s for s, _ in C.calendar()]
     periods = {"post_publication": tuple(proto["segments"]["post_publication"]["dates"]),
                "reproduction": tuple(proto["segments"]["reproduction"]["dates"])}
     periods.update({f"reproduction_{k}": tuple(v) for k, v in proto["segments"]["reproduction"]["report_subperiods"].items()})
     trades = list(read_trades("selected"))
-    res = {"protocol_id": proto["id"], "protocol_sha256": a.protocol_sha256, "label": "HIST", "per_trade": {},
-           "portfolio": {}, "break_even": {}, "items": {}, "descriptive": {}}
+    res = {"protocol_id": proto["id"], "protocol_sha256": a.protocol_sha256.strip().lower(), "git_head": head,
+           "label": "HIST", "per_trade": {}, "portfolio": {}, "break_even": {}, "items": {}, "descriptive": {}}
     for pname, (lo, hi) in periods.items():
         sess = [s for s in cal if lo <= s <= hi]
-        for model in ("F0", "F1", "F2"):
+        for model in ("F0", "F1", "F2", "F0fav"):
             tm = [t for t in trades if t["model"] == model and lo <= t["d"] <= hi]
             for leg in LEGS:
                 tl = [t for t in tm if leg_filter(leg)(t)]
                 sums, counts = cluster_sums(tl, lambda t: t["d"], lambda t: t["net_R"])
                 b = B if pname == "post_publication" else max(1000, B // 10)
-                mean, p, ci_lo, ci_hi = bootstrap_mean(sums, counts, b, seed)
+                mean, p, ci_lo, ci_hi, up = bootstrap_mean(sums, counts, b, seed)
                 res["per_trade"][f"{pname}|{model}|{leg}"] = {
                     "n": len(tl), "sessions": len(sums), "mean_net_R": mean, "p_one_sided": p, "ci95": [ci_lo, ci_hi],
-                    "bootstrap_B": b, "win_rate": sum(1 for t in tl if t["net_R"] > 0) / len(tl) if tl else None,
-                    "stop_share": sum(1 for t in tl if t["exit_reason"] != "eod") / len(tl) if tl else None}
+                    "upper95_one_sided": up, "bootstrap_B": b,
+                    "win_rate": sum(1 for t in tl if t["net_R"] > 0) / len(tl) if tl else None,
+                    "stop_share": sum(1 for t in tl if t["exit_reason"] != "eod") / len(tl) if tl else None,
+                    "same_bar_count": sum(t["same_bar"] for t in tl)}
             for sizing in ("paper", "1x"):
                 stats, rets = portfolio(tm, sess, fees, model, sizing)
                 res["portfolio"][f"{pname}|{model}|{sizing}"] = stats
                 if pname == "post_publication" and model == "F1" and sizing == "paper":
-                    mean, p, ci_lo, ci_hi = bootstrap_mean(rets, [1] * len(rets), B, seed)
-                    res["items"]["ORB-3"] = {"mean_daily": mean, "p_one_sided": p, "ci95": [ci_lo, ci_hi]}
-        # break-even per-side cost vs measured, F1 bases
+                    mean, p, ci_lo, ci_hi, up = bootstrap_mean(rets, [1] * len(rets), B, seed)
+                    res["items"]["ORB-3"] = {"mean_daily": mean, "p_one_sided": p, "ci95": [ci_lo, ci_hi],
+                                             "upper95_one_sided": up}
         tf = [t for t in trades if t["model"] == "F1" and lo <= t["d"] <= hi]
         if tf:
             num, _ = cluster_sums(tf, lambda t: t["d"], lambda t: t["gross_R"])
@@ -234,30 +288,38 @@ def cmd_run(a) -> int:
                                         "round_trip_bps_ci95": [2e4 * c_lo, 2e4 * c_hi] if c_lo is not None else None,
                                         "measured_round_trip_bps_mean": 1e4 * math.fsum(meas) / len(meas)}
     post = res["per_trade"]
-    res["items"]["ORB-1"] = {k: post["post_publication|F1|combined"][k] for k in ("n", "mean_net_R", "p_one_sided", "ci95")}
-    res["items"]["ORB-2"] = {k: post["post_publication|F1|long"][k] for k in ("n", "mean_net_R", "p_one_sided", "ci95")}
-    alpha = proto["multiplicity"]["family_alpha"]
-    h = holm({k: v["p_one_sided"] if v["p_one_sided"] is not None else 1.0 for k, v in res["items"].items()}, alpha)
-    for k, (adj, rej) in h.items():
-        res["items"][k].update({"holm_adjusted_p": adj, "rejected": rej})
+    for k, leg in (("ORB-1", "combined"), ("ORB-2", "long")):
+        res["items"][k] = {x: post[f"post_publication|F1|{leg}"][x]
+                           for x in ("n", "mean_net_R", "p_one_sided", "ci95", "upper95_one_sided")}
+    status = fixed_sequence({k: v["p_one_sided"] for k, v in res["items"].items()}, SEQUENCE, alpha)
+    shift = quote_shift(a.protocol_sha256)
     n_min = proto["sample_size"]["n_min_trades"]
     n_post = post["post_publication|F1|combined"]["n"]
-    enough = n_min is not None and n_post >= n_min
-    f2 = post["post_publication|F2|combined"]["mean_net_R"]
-    f2l = post["post_publication|F2|long"]["mean_net_R"]
-    f2s = res["portfolio"]["post_publication|F2|paper"]["sharpe"]
-    res["verdicts"] = {
-        "sample_gate": {"n_post_F1": n_post, "n_min": n_min, "met": enough},
-        "combined": "inconclusive" if not enough else ("supported" if res["items"]["ORB-1"]["rejected"] and f2 is not None and f2 > 0 else "not_supported"),
-        "long_only": "inconclusive" if not enough else ("supported" if res["items"]["ORB-2"]["rejected"] and f2l is not None and f2l > 0 else "not_supported"),
-        "portfolio": "inconclusive" if not enough else ("supported" if res["items"]["ORB-3"]["rejected"] and f2s is not None and f2s > 0 else "not_supported")}
-    # descriptive: Rule 201 sensitivity for the short leg (post-publication, F1)
+    sample_ok = n_min is not None and n_post >= n_min
+    f2 = {"ORB-1": post["post_publication|F2|combined"]["mean_net_R"], "ORB-2": post["post_publication|F2|long"]["mean_net_R"],
+          "ORB-3": res["portfolio"]["post_publication|F2|paper"]["sharpe"]}
+    adj = None if shift is None else {
+        "ORB-1": post["post_publication|F1|combined"]["mean_net_R"] + shift["combined"],
+        "ORB-2": post["post_publication|F1|long"]["mean_net_R"] + shift["long"]}
+    if adj is not None:
+        adj["ORB-3"] = adj["ORB-1"]  # the portfolio verdict also needs the combined quote-adjusted mean > 0
+    res["verdicts"] = {"sample_gate": {"n_post_F1": n_post, "n_min": n_min, "met": sample_ok},
+                       "sequence": list(SEQUENCE), "alpha_per_step": alpha, "quote_adjusted_mean_R": adj}
+    for k in SEQUENCE:
+        res["items"][k]["sequence_status"] = status[k]
+        res["verdicts"][k] = item_verdict(status[k], f2[k] is not None and f2[k] > 0,
+                                          None if adj is None else adj[k] > 0,
+                                          res["items"][k]["upper95_one_sided"], sample_ok, k != "ORB-3")
+    # descriptive: week-block bootstrap of the ORB-1 statistic
     tf = [t for t in trades if t["model"] == "F1" and t["segment"] == "post_publication"]
+    ws, wc = cluster_sums(tf, lambda t: iso_week(t["d"]), lambda t: t["net_R"])
+    wm, wp, wlo, whi, wup = bootstrap_mean(ws, wc, B, seed)
+    res["descriptive"]["week_block_bootstrap_ORB-1"] = {"weeks": len(ws), "p_one_sided": wp, "ci95": [wlo, whi],
+                                                        "upper95_one_sided": wup}
     ex = [t for t in tf if not (t["dirn"] < 0 and t["ssr_flag"] == "1")]
     res["descriptive"]["ssr_excluded_post_F1_combined_mean_R"] = math.fsum(t["net_R"] for t in ex) / len(ex) if ex else None
     res["descriptive"]["ssr_flagged_shorts_post"] = sum(1 for t in tf if t["dirn"] < 0 and t["ssr_flag"] == "1")
-    base_path = C.PRIVATE / "trades-base.csv.gz"
-    if base_path.exists():
+    if has_base:
         base = list(read_trades("base"))
         for pname, (lo, hi) in periods.items():
             tb = [t for t in base if lo <= t["d"] <= hi]
@@ -278,7 +340,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("power")
-    p.add_argument("--effect", type=float, default=0.08)
+    p.add_argument("--effect", type=float, default=TARGET_EFFECT_R)
     r = sub.add_parser("run")
     r.add_argument("--protocol-sha256", default=None)
     a = ap.parse_args(argv)

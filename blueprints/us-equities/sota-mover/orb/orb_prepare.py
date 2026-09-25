@@ -6,6 +6,7 @@ reads or writes a fill price, stop, exit, return or any price after the trigger 
 freeze_discipline). Needs duckdb (the adaptive-paper tools Python).
 
   python orb_prepare.py or-table            # opening-range table from the minute corpus (bounded run)
+  python orb_prepare.py membership        # point-in-time top-500 liquidity membership per session (D1)
   python orb_prepare.py candidates          # 14-day ATR / volume / RelVol per member symbol-day (pure Python)
   python orb_prepare.py select              # top-20 per session, directions, dojis, thin-session counts
   python orb_prepare.py triggers            # first trigger minute of each selected order (no prices kept)
@@ -49,10 +50,81 @@ def protocol():
     return C.load_json(C.PROTOCOL_PATH)
 
 
+TOP_LIQUID = 500  # the same N as universe A's construction
+EXCLUDED_SUFFIX = r"\.(WS|W|U|R|RT)$"  # the stage-1 plan's warrant/unit/right exclusion
+
+
 def membership():
-    """{year: set(symbols)} universe A per-year membership (deviation D1)."""
+    """({session: set(in-corpus members)}, union) from the point-in-time membership (D1, fix 1)."""
     plan = C.load_json(C.MINUTE_PLAN)
-    return {int(y): set(v) for y, v in plan["universe_a"]["per_year"].items()}, plan["universe_a"]["union"]
+    con = connect()
+    by_day = defaultdict(set)
+    for d, sym in con.execute(f"SELECT d, symbol FROM '{C.PRIVATE / 'membership.parquet'}' WHERE in_corpus").fetchall():
+        by_day[d].add(sym)
+    return by_day, plan["universe_a"]["union"]
+
+
+def cmd_membership(a) -> int:
+    """Point-in-time top-500 liquidity membership for each session t, from sessions strictly before t.
+
+    Mirrors the stage-1 universe-A construction (minute-plan selection_sql) but ranks each session on its
+    own: med20 = median raw dollar volume over the 20 sessions t-20..t-1 (the window excludes t),
+    20 and 60 calendar-contiguous prior sessions with bars, raw close of t-1 >= $5, med20 >= $20M, no
+    warrant/unit/right suffix; the 500 highest med20 (ties by symbol). From session t it reads only the
+    existence of its daily bar (the symbol trades that day), never a price or volume of t."""
+    proto = protocol()
+    start, end = proto["segments"]["reproduction"]["dates"][0], proto["segments"]["post_publication"]["dates"][1]
+    union = C.load_json(C.MINUTE_PLAN)["universe_a"]["union"]
+    con = connect()
+    con.execute("CREATE TEMP TABLE u(symbol VARCHAR)")
+    con.executemany("INSERT INTO u VALUES (?)", [(s,) for s in union])
+    out = C.private_dir() / "membership.parquet"
+    con.execute(f"""
+    COPY (
+      WITH cal AS (
+        SELECT session_date, row_number() OVER (ORDER BY session_date) AS si
+        FROM (SELECT DISTINCT session_date FROM read_parquet('{C.DAILY_PARQUET}') WHERE symbol = 'SPY' AND in_raw)
+      ),
+      d AS (
+        SELECT b.symbol, b.session_date, c.si, b.raw_c, b.raw_c * b.raw_v AS dv
+        FROM read_parquet('{C.DAILY_PARQUET}') b JOIN cal c USING (session_date)
+        WHERE b.in_raw AND b.raw_c IS NOT NULL AND b.raw_v IS NOT NULL AND b.session_date <= DATE '{end}'
+          AND NOT regexp_matches(b.symbol, '{EXCLUDED_SUFFIX}')
+      ),
+      w AS (
+        SELECT symbol, session_date, si,
+               median(dv) OVER (PARTITION BY symbol ORDER BY si ROWS BETWEEN 20 PRECEDING AND 1 PRECEDING) AS med20,
+               lag(raw_c) OVER (PARTITION BY symbol ORDER BY si) AS prev_c,
+               si - lag(si, 20) OVER (PARTITION BY symbol ORDER BY si) AS d_lookback,
+               si - lag(si, 60) OVER (PARTITION BY symbol ORDER BY si) AS d_history
+        FROM d
+      ),
+      e AS (
+        SELECT symbol, CAST(session_date AS VARCHAR) AS d, med20,
+               row_number() OVER (PARTITION BY session_date ORDER BY med20 DESC, symbol) AS rank
+        FROM w
+        WHERE d_lookback = 20 AND d_history = 60 AND prev_c >= 5.0 AND med20 >= 20000000.0
+          AND session_date BETWEEN DATE '{start}' AND DATE '{end}'
+      )
+      SELECT e.d, e.symbol, e.rank, e.med20, e.symbol IN (SELECT symbol FROM u) AS in_corpus
+      FROM e WHERE rank <= {TOP_LIQUID} ORDER BY d, rank
+    ) TO '{out}' (FORMAT parquet, COMPRESSION zstd)""")
+    res = {"top_n": TOP_LIQUID, "segments": {}, "years": {}}
+    for name, (lo, hi) in ((k, v["dates"]) for k, v in proto["segments"].items()):
+        r = con.execute(f"""SELECT count(DISTINCT d), count(*), count(*) FILTER (WHERE in_corpus),
+            count(*) FILTER (WHERE NOT in_corpus), count(DISTINCT symbol) FILTER (WHERE NOT in_corpus),
+            min(n), max(n) FROM (SELECT *, count(*) OVER (PARTITION BY d) AS n FROM '{out}')
+            WHERE d BETWEEN '{lo}' AND '{hi}'""").fetchone()
+        res["segments"][name] = dict(zip(("sessions", "member_days", "in_corpus_days", "missing_days",
+                                          "missing_symbols", "min_members_per_session", "max_members_per_session"), r))
+    for y, n, inc, miss, msym in con.execute(f"""SELECT substr(d, 1, 4), count(*), count(*) FILTER (WHERE in_corpus),
+            count(*) FILTER (WHERE NOT in_corpus), count(DISTINCT symbol) FILTER (WHERE NOT in_corpus)
+            FROM '{out}' GROUP BY 1 ORDER BY 1""").fetchall():
+        res["years"][y] = {"member_days": n, "in_corpus_days": inc, "missing_days": miss, "missing_symbols": msym}
+    res["sha256"] = C.sha256_file(out)
+    print(json.dumps(res, sort_keys=True))
+    C.write_private_json(C.PRIVATE / "membership.counts.json", res)
+    return 0
 
 
 # ------------------------------------------------------------------ or-table
@@ -82,7 +154,7 @@ def cmd_or_table(a) -> int:
 
 # ------------------------------------------------------------------ candidates
 
-CAND_COLS = ["symbol", "d", "year_member", "or_open", "or_high", "or_low", "or_close", "or_vol", "or_n",
+CAND_COLS = ["symbol", "d", "pit_member", "or_open", "or_high", "or_low", "or_close", "or_vol", "or_n",
              "atr14", "avgvol14", "relvol", "split", "eligible", "reason"]
 
 
@@ -123,10 +195,10 @@ def cmd_candidates(a) -> int:
                 or_open, or_high, or_low, or_close, or_vol, or_n, _ = o
                 if or_n == 0:
                     continue  # no opening-range bar: not a candidate that day
-                member = sym in members.get(int(d[:4]), ())
+                member = sym in members.get(d, ())
                 counts["or_symbol_days"] += 1
                 if not member:
-                    counts["not_member_year"] += 1
+                    counts["not_member_pit"] += 1
                     continue
                 i = idx[d]
                 row = [sym, d, 1, or_open, or_high, or_low, or_close, or_vol, or_n]
@@ -296,12 +368,34 @@ def cmd_verify_or(a) -> int:
     return 0 if bad == 0 else 1
 
 
+# ------------------------------------------------------------------ compare-membership
+
+def cmd_compare_membership(a) -> int:
+    """Selected orders under the point-in-time membership versus the superseded per-year membership."""
+    def orders(path):
+        with open(path, newline="") as f:
+            return {(r["segment"], r["d"], r["symbol"], r["dirn"]) for r in csv.DictReader(f)}
+    new, old = orders(C.PRIVATE / "selected.csv"), orders(C.PRIVATE / "v1-membership/selected.csv")
+    res = {}
+    for seg in ("reproduction", "post_publication"):
+        n = {o for o in new if o[0] == seg}
+        o = {x for x in old if x[0] == seg}
+        nd, od = {x for x in n if x[3] != "0"}, {x for x in o if x[3] != "0"}
+        res[seg] = {"selected_new": len(n), "selected_old": len(o), "only_new": len(n - o), "only_old": len(o - n),
+                    "orders_new": len(nd), "orders_old": len(od), "orders_only_new": len(nd - od),
+                    "orders_only_old": len(od - nd), "sessions_changed": len({x[1] for x in (n ^ o)})}
+    print(json.dumps(res, sort_keys=True))
+    C.write_private_json(C.PRIVATE / "membership-change.json", res)
+    return 0
+
+
 # ------------------------------------------------------------------ receipt
 
 def cmd_receipt(a) -> int:
     files = ["or5.parquet", "candidates.csv.gz", "selected.csv", "triggers.csv", "candidates.counts.json",
              "selected.counts.json", "triggers.counts.json", "verify-or.json", "power.json", "cost-table.json",
-             "quotes/sample.json", "quotes/ledger.jsonl"]
+             "quotes/sample.json", "quotes/ledger.jsonl", "membership.parquet", "membership.counts.json",
+             "membership-change.json", "split-check.json", "splits/ledger.jsonl"]
     out = {"kind": "orb_pre_outcome_receipt", "label": "HIST", "outcomes_computed": False,
            "protocol_id": protocol()["id"],
            "inputs": {"minute_plan_file_sha256": C.sha256_file(C.MINUTE_PLAN),
@@ -322,9 +416,12 @@ def cmd_receipt(a) -> int:
                 for g, x in t["groups"].items()}}
         elif name == "power.json":
             t = C.load_json(p)
-            out["counts"][name] = {k: t[k] for k in ("n_min_trades", "n_min_basis", "alpha_one_sided_worst_holm",
+            out["counts"][name] = {k: t[k] for k in ("n_min_trades", "n_min_basis", "n_min_trades_sd3_rho005", "n_min_long_sd3_rho005", "alpha_one_sided_per_step",
                                                      "target_effect_R", "portfolio")} | {
                 leg: {k: v for k, v in t[leg].items() if k != "table"} for leg in ("combined", "long")}
+        elif name == "split-check.json":
+            t = C.load_json(p)
+            out["counts"][name] = {k: (len(v) if isinstance(v, list) else v) for k, v in t.items()}
         elif name == "quotes/sample.json":
             t = C.load_json(p)
             out["counts"][name] = {k: v for k, v in t.items() if k != "sample"}
@@ -337,13 +434,13 @@ def cmd_receipt(a) -> int:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
-    for name in ("or-table", "candidates", "select", "triggers", "receipt"):
+    for name in ("or-table", "membership", "candidates", "select", "triggers", "receipt", "compare-membership"):
         sub.add_parser(name)
     v = sub.add_parser("verify-or")
     v.add_argument("--n", type=int, default=300)
     a = ap.parse_args(argv)
-    return {"or-table": cmd_or_table, "candidates": cmd_candidates, "select": cmd_select,
-            "triggers": cmd_triggers, "verify-or": cmd_verify_or, "receipt": cmd_receipt}[a.cmd](a)
+    return {"or-table": cmd_or_table, "membership": cmd_membership, "candidates": cmd_candidates, "select": cmd_select,
+            "triggers": cmd_triggers, "verify-or": cmd_verify_or, "receipt": cmd_receipt, "compare-membership": cmd_compare_membership}[a.cmd](a)
 
 
 if __name__ == "__main__":
