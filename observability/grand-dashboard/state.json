@@ -1,20 +1,20 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-24T15:52:10Z",
+  "recorded_at_utc": "2026-09-25T01:38:18Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
       "kind": "lane",
       "id": "simulation",
       "title": "Historical simulation / backtest",
-      "state": "AAPL diagnostic retained / adaptive native capacity179submits per minute synthetic / merit unqualified",
-      "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
+      "state": "AAPL diagnostic retained / sim-to-paper fills agree 3 of 5 below 50 ms and 5 of 5 from 70 ms (one trial) / DSR and PBO show no skill / merit unqualified",
+      "evidence_ref": "blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json"
     },
     {
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "adaptive 1x broker trial passed 2026-09-23 (main 843dc8f) / regular session only / leverage rungs pending / account flat",
+      "state": "1x broker trial passed 2026-09-23 / 1x ladder attempt 2026-09-24 needs attention (fill precision) peak 0.15x / order contract and credential guard merged / flat",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
     },
     {
@@ -30,7 +30,7 @@
       "kind": "gate",
       "id": "alpaca-paper-operational",
       "title": "Alpaca bounded paper lifecycle",
-      "state": "smoke passed / adaptive 1x broker trial passed 2026-09-23 / native fault gate established 2026-09-24 (definitive rejection and repeat cancel only)",
+      "state": "smoke passed / 1x broker trial passed 2026-09-23 / native faults re-verified on order-contract engine 2026-09-24 / corporate-action guard merged 2026-09-25",
       "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
     },
     {
@@ -135,7 +135,7 @@
       "kind": "gate",
       "id": "corporate-action-data",
       "title": "Split and dividend data semantics",
-      "state": "25 AAPL sessions / probe accepted / upstream suite unresolved",
+      "state": "25 AAPL sessions / probe accepted / overnight-hold guard merged 2026-09-25 (process-date window) / upstream suite unresolved",
       "evidence_ref": "blueprints/us-equities/corporate-action-readiness/receipt.json"
     },
     {
