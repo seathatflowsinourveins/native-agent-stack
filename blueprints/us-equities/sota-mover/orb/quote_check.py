@@ -34,11 +34,13 @@ import orb_common as C  # noqa: E402
 import orb_signal as S  # noqa: E402
 
 RATE = 10
+MAX_MISSING_SHARE = 0.05  # above this share of executions without a valid quote the check is inconclusive
 
 
 def guard(sha):
     proto = C.require_frozen(C.PROTOCOL_PATH, sha)
     C.require_clean_tree()
+    C.require_freeze_commit()
     C.verify_pins(proto)
     C.check_trades("selected", sha)
     return proto
@@ -63,6 +65,11 @@ def executions(t):
 def trade_delta_r(execs, measured, bucket, r_ps) -> float:
     """dR for one trade: minus the extra half-spread cost (measured - bucket) of each execution, in R."""
     return -math.fsum((measured[i] - bucket[i]) * px / r_ps for i, (_, _, px, _, _) in enumerate(execs))
+
+
+def coverage_ok(missing: int, total: int) -> bool:
+    """False when more than MAX_MISSING_SHARE of the sampled executions have no valid quote."""
+    return total == 0 or missing / total <= MAX_MISSING_SHARE
 
 
 def segment_shift(delta_rs, population: int, total: int):
@@ -154,10 +161,11 @@ def cmd_apply(a) -> int:
         elif r["event"].startswith("stamp_"):
             status[r["key"]] = r["event"]
     deltas = {"combined": [], "long": []}
-    missing = 0
+    missing = executions_total = 0
     for s in sample["sample"]:
         measured, bucket = [], []
         for e in s["execs"]:
+            executions_total += 1
             k = f"{s['symbol']}|{s['d']}|{s['dirn']}|{e['kind']}"
             quotes = [q for raw in pages.get(k, []) for q in (json.loads(raw).get("quotes") or {}).get(s["symbol"]) or []]
             q = Q.valid_quote(quotes) if status.get(k) == "stamp_complete" else None
@@ -177,7 +185,8 @@ def cmd_apply(a) -> int:
                   "segment_shift_R": segment_shift(v, sample["population"][leg], sample["total"][leg])}
             for leg, v in deltas.items()}
     out = {"protocol_sha256": a.protocol_sha256.strip().lower(), "label": "HIST", "legs": legs,
-           "executions_without_valid_quote": missing}
+           "executions_total": executions_total, "executions_without_valid_quote": missing,
+           "coverage_ok": coverage_ok(missing, executions_total), "max_missing_share": MAX_MISSING_SHARE}
     sha = C.write_private_json(C.PRIVATE / "quote-check.json", out)
     print(json.dumps(out | {"sha256": sha}, indent=1))
     return 0

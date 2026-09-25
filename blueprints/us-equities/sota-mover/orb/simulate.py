@@ -109,6 +109,7 @@ def load_orders(population: str):
 def cmd_run(a) -> int:
     proto = C.require_frozen(C.PROTOCOL_PATH, a.protocol_sha256)
     head = C.require_clean_tree()
+    freeze_commit = C.require_freeze_commit()
     C.verify_pins(proto)
     import orb_prepare as P
     fees = C.load_json(C.FEES_PATH)
@@ -166,7 +167,8 @@ def cmd_run(a) -> int:
                                 t["exit_fill"], t["exit_reason"], t["gross_R"], t["net_R"], ssr, int(t["same_bar"])])
         txt.flush()
         txt.detach()
-    res = dict(n, sha256=C.sha256_file(out), protocol_sha256=a.protocol_sha256.strip().lower(), git_head=head)
+    res = dict(n, sha256=C.sha256_file(out), protocol_sha256=a.protocol_sha256.strip().lower(), git_head=head,
+               freeze_commit=freeze_commit)
     print(json.dumps(res, sort_keys=True))
     C.write_private_json(C.PRIVATE / f"trades-{a.population}.counts.json", res)
     return 0

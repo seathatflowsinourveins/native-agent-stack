@@ -172,6 +172,8 @@ def item_verdict(status: str, f2_ok: bool, quote_ok, upper95, sample_ok: bool, r
         return "inconclusive: post-publication trades below n_min"
     if status == "rejected" and f2_ok and quote_ok is True:
         return f"supported {LIQUID_SCOPE}"
+    if status == "rejected" and f2_ok and quote_ok == "coverage":
+        return "inconclusive (quote coverage)"
     if status == "rejected" and f2_ok and quote_ok is None:
         return "pending: the post-freeze quote check has not run"
     if r_scale and upper95 is not None and upper95 < TARGET_EFFECT_R:
@@ -226,19 +228,20 @@ def leg_filter(leg):
 
 
 def quote_shift(protocol_sha256: str):
-    """{leg: shift in mean net R} from quote_check.py apply, or None when it has not run."""
+    """({leg: shift in mean net R}, coverage_ok) from quote_check.py apply, or (None, None) when it has not run."""
     path = C.PRIVATE / "quote-check.json"
     if not path.exists():
-        return None
+        return None, None
     q = C.load_json(path)
     if q.get("protocol_sha256") != protocol_sha256.strip().lower():
         raise C.FreezeError("refused: quote-check.json was produced under another protocol")
-    return {leg: q["legs"][leg]["segment_shift_R"] for leg in ("combined", "long")}
+    return {leg: q["legs"][leg]["segment_shift_R"] for leg in ("combined", "long")}, bool(q["coverage_ok"])
 
 
 def cmd_run(a) -> int:
     proto = C.require_frozen(C.PROTOCOL_PATH, a.protocol_sha256)
     head = C.require_clean_tree()
+    freeze_commit = C.require_freeze_commit()
     C.verify_pins(proto)
     C.check_trades("selected", a.protocol_sha256)
     has_base = (C.PRIVATE / "trades-base.csv.gz").exists()
@@ -253,7 +256,7 @@ def cmd_run(a) -> int:
     periods.update({f"reproduction_{k}": tuple(v) for k, v in proto["segments"]["reproduction"]["report_subperiods"].items()})
     trades = list(read_trades("selected"))
     res = {"protocol_id": proto["id"], "protocol_sha256": a.protocol_sha256.strip().lower(), "git_head": head,
-           "label": "HIST", "per_trade": {}, "portfolio": {}, "break_even": {}, "items": {}, "descriptive": {}}
+           "freeze_commit": freeze_commit, "label": "HIST", "per_trade": {}, "portfolio": {}, "break_even": {}, "items": {}, "descriptive": {}}
     for pname, (lo, hi) in periods.items():
         sess = [s for s in cal if lo <= s <= hi]
         for model in ("F0", "F1", "F2", "F0fav"):
@@ -292,7 +295,7 @@ def cmd_run(a) -> int:
         res["items"][k] = {x: post[f"post_publication|F1|{leg}"][x]
                            for x in ("n", "mean_net_R", "p_one_sided", "ci95", "upper95_one_sided")}
     status = fixed_sequence({k: v["p_one_sided"] for k, v in res["items"].items()}, SEQUENCE, alpha)
-    shift = quote_shift(a.protocol_sha256)
+    shift, coverage = quote_shift(a.protocol_sha256)
     n_min = proto["sample_size"]["n_min_trades"]
     n_post = post["post_publication|F1|combined"]["n"]
     sample_ok = n_min is not None and n_post >= n_min
@@ -304,11 +307,12 @@ def cmd_run(a) -> int:
     if adj is not None:
         adj["ORB-3"] = adj["ORB-1"]  # the portfolio verdict also needs the combined quote-adjusted mean > 0
     res["verdicts"] = {"sample_gate": {"n_post_F1": n_post, "n_min": n_min, "met": sample_ok},
-                       "sequence": list(SEQUENCE), "alpha_per_step": alpha, "quote_adjusted_mean_R": adj}
+                       "sequence": list(SEQUENCE), "alpha_per_step": alpha, "quote_adjusted_mean_R": adj,
+                       "quote_coverage_ok": coverage}
     for k in SEQUENCE:
         res["items"][k]["sequence_status"] = status[k]
         res["verdicts"][k] = item_verdict(status[k], f2[k] is not None and f2[k] > 0,
-                                          None if adj is None else adj[k] > 0,
+                                          None if adj is None else ("coverage" if not coverage else adj[k] > 0),
                                           res["items"][k]["upper95_one_sided"], sample_ok, k != "ORB-3")
     # descriptive: week-block bootstrap of the ORB-1 statistic
     tf = [t for t in trades if t["model"] == "F1" and t["segment"] == "post_publication"]

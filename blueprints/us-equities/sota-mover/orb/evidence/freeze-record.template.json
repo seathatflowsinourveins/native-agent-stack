@@ -1,0 +1,8 @@
+{
+ "_instructions": "Template only. At freeze time the coordinator commits protocol.json with status frozen_before_outcomes and frozen_before_outcomes true, then writes evidence/freeze-record.json with these fields filled (drop this key) and commits it. After that commit only files under evidence/ may change in the study directory (orb_common.require_freeze_commit).",
+ "protocol_sha256": "<sha256 of protocol.json as committed at protocol_commit>",
+ "protocol_commit": "<40-hex commit that contains the frozen protocol.json; must be an ancestor of HEAD>",
+ "frozen_at": "<ISO 8601 UTC timestamp>",
+ "reviewer": "<independent pre-outcome reviewer>",
+ "review_verdict": "<e.g. freeze_ready>"
+}

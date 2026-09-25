@@ -99,14 +99,17 @@ class SyntheticPipeline(unittest.TestCase):
         C.PROTOCOL_PATH = root / "protocol.json"
         C.PROTOCOL_PATH.write_text(json.dumps(proto, indent=1))
         cls.sha = hashlib.sha256(C.PROTOCOL_PATH.read_bytes()).hexdigest()
-        C.FREEZE_RECORD = root / "freeze-record.json"
-        C.STUDY_DIR = root / "study"  # a clean git tree standing in for the study directory
-        C.STUDY_DIR.mkdir()
-        (C.STUDY_DIR / "protocol.json").write_text("{}")
-        env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
-               "GIT_COMMITTER_EMAIL": "t@t", "PATH": "/usr/bin:/bin", "HOME": str(root)}
-        for args in (["init", "-q"], ["add", "."], ["commit", "-q", "-m", "freeze"]):
-            subprocess.run(["git", *args], cwd=C.STUDY_DIR, check=True, capture_output=True, env=env)
+        C.STUDY_DIR = root / "study"  # a git repository standing in for the study directory
+        (C.STUDY_DIR / "evidence").mkdir(parents=True)
+        C.FREEZE_RECORD = C.STUDY_DIR / "evidence/freeze-record.json"
+        cls.git_env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
+                       "GIT_COMMITTER_EMAIL": "t@t", "PATH": "/usr/bin:/bin", "HOME": str(root)}
+        cls.git("init", "-q")
+
+    @classmethod
+    def git(cls, *args):
+        return subprocess.run(["git", *args], cwd=cls.C.STUDY_DIR, check=True, capture_output=True, text=True,
+                              env=cls.git_env).stdout.strip()
 
     @classmethod
     def tearDownClass(cls):
@@ -139,13 +142,21 @@ class SyntheticPipeline(unittest.TestCase):
             "private": {n: C.sha256_file(C.PRIVATE / n) for n in
                         ("membership.parquet", "candidates.csv.gz", "selected.csv", "triggers.csv", "cost-table.json")},
             "inputs": {k: C.sha256_file(v) for k, v in C.input_paths().items()}}
+        C.PROTOCOL_PATH = C.STUDY_DIR / "protocol.json"   # freeze it inside the study repository
         C.PROTOCOL_PATH.write_text(json.dumps(proto, indent=1))
         self.sha = hashlib.sha256(C.PROTOCOL_PATH.read_bytes()).hexdigest()
+        self.git("add", ".")
+        self.git("commit", "-q", "-m", "freeze")
+        commit = self.git("rev-parse", "HEAD")
         # no freeze record yet, then a wrong hash: refused before anything is read
         with self.assertRaises(SystemExit) as cm:
             SIM.main(["run", "--protocol-sha256", self.sha])
         self.assertIn("freeze record", str(cm.exception.code))
-        C.FREEZE_RECORD.write_text(json.dumps({"protocol_sha256": self.sha}))
+        C.FREEZE_RECORD.write_text(json.dumps({"protocol_sha256": self.sha, "protocol_commit": commit,
+                                               "frozen_at": "2026-09-25T00:00:00Z", "reviewer": "t",
+                                               "review_verdict": "freeze_ready"}))
+        self.git("add", ".")
+        self.git("commit", "-q", "-m", "freeze record")
         with self.assertRaises(SystemExit):
             SIM.main(["run", "--protocol-sha256", "0" * 64])
         with self.assertRaises(SystemExit):
@@ -160,6 +171,7 @@ class SyntheticPipeline(unittest.TestCase):
         self.assertEqual(first["trades:F0"], first["trades:F0fav"])
         self.assertEqual(first["protocol_sha256"], self.sha)
         self.assertEqual(len(first["git_head"]), 40)
+        self.assertEqual(first["freeze_commit"], commit)
         self.assertEqual(first["trades:F1"], trig["post_publication"]["fired"] + trig.get("reproduction", {}).get("fired", 0))
         self.assertEqual(self.run_quiet(SIM.main, ["run", "--protocol-sha256", self.sha, "--population", "base"])[0], 0)
         rc, out = self.run_quiet(E.main, ["run", "--protocol-sha256", self.sha])
@@ -178,6 +190,14 @@ class SyntheticPipeline(unittest.TestCase):
             E.main(["run", "--protocol-sha256", self.sha])
         self.assertIn("uncommitted", str(cm.exception.code))
         (C.STUDY_DIR / "stray.txt").unlink()
+        # a committed code change after the freeze is refused although the tree is clean
+        (C.STUDY_DIR / "simulate.py").write_text("# changed after the freeze\n")
+        self.git("add", ".")
+        self.git("commit", "-q", "-m", "post-freeze change")
+        with self.assertRaises(SystemExit) as cm:
+            E.main(["run", "--protocol-sha256", self.sha])
+        self.assertIn("changed after the freeze commit", str(cm.exception.code))
+        self.git("reset", "-q", "--hard", "HEAD~1")   # drop the change in this scratch repository only
         # a changed pinned input is refused
         saved = (C.PRIVATE / "cost-table.json").read_bytes()
         (C.PRIVATE / "cost-table.json").write_bytes(saved + b" ")

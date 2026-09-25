@@ -81,6 +81,37 @@ def require_clean_tree(study_dir: Path | None = None) -> str:
     return head
 
 
+def _git(study_dir: Path, *args, binary: bool = False):
+    return subprocess.run(["git", "-C", str(study_dir), *args], capture_output=True, text=not binary)
+
+
+def require_freeze_commit(study_dir: Path | None = None) -> str:
+    """Bind the code to the freeze: refuse unless the freeze record's `protocol_commit` (40 hex) is an
+    ancestor of HEAD, protocol.json at that commit hashes to the recorded `protocol_sha256`, and nothing in
+    the study directory other than evidence/ changed between that commit and HEAD. Returns the commit."""
+    study = Path(study_dir or STUDY_DIR)
+    rec_path = Path(FREEZE_RECORD)
+    if not rec_path.exists():
+        raise FreezeError("refused: no freeze record (evidence/freeze-record.json)")
+    rec = json.loads(rec_path.read_text())
+    commit = str(rec.get("protocol_commit", "")).strip().lower()
+    recorded = str(rec.get("protocol_sha256", "")).strip().lower()
+    if len(commit) != 40 or any(ch not in "0123456789abcdef" for ch in commit):
+        raise FreezeError("refused: the freeze record has no 40-hex protocol_commit")
+    if _git(study, "merge-base", "--is-ancestor", commit, "HEAD").returncode != 0:
+        raise FreezeError("refused: protocol_commit is not an ancestor of HEAD")
+    shown = _git(study, "show", f"{commit}:./protocol.json", binary=True)
+    if shown.returncode != 0 or hashlib.sha256(shown.stdout).hexdigest() != recorded:
+        raise FreezeError("refused: protocol.json at protocol_commit does not hash to the recorded protocol_sha256")
+    diff = _git(study, "diff", "--name-only", "--relative", commit, "HEAD", "--", ".")
+    if diff.returncode != 0:
+        raise FreezeError("refused: cannot diff protocol_commit against HEAD")
+    changed = [p for p in diff.stdout.splitlines() if p and not p.startswith("evidence/")]
+    if changed:
+        raise FreezeError(f"refused: {len(changed)} study file(s) changed after the freeze commit, e.g. {changed[0]}")
+    return commit
+
+
 def input_paths() -> dict:
     """Pinned external inputs by name (resolved at call time)."""
     return {"daily_parquet": DAILY_PARQUET, "minute_plan": MINUTE_PLAN, "fees": FEES_PATH, "calendar": CALENDAR_PATH}

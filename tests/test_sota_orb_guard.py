@@ -184,6 +184,87 @@ class PinsCountsAndGit(unittest.TestCase):
             C.require_clean_tree(study)                                          # untracked counts as dirty
 
 
+class FreezeCommit(unittest.TestCase):
+    """require_freeze_commit in a scratch git repository."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.repo = Path(self.tmp.name) / "repo"
+        self.study = self.repo / "study"
+        (self.study / "evidence").mkdir(parents=True)
+        git("init", "-q", cwd=self.repo)
+        (self.study / "orb_signal.py").write_text("X = 1\n")
+        (self.study / "protocol.json").write_text('{"status": "frozen_before_outcomes"}')
+        git("add", ".", cwd=self.repo)
+        git("commit", "-q", "-m", "freeze", cwd=self.repo)
+        self.commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.repo, capture_output=True, text=True,
+                                     check=True).stdout.strip()
+        self.sha = hashlib.sha256((self.study / "protocol.json").read_bytes()).hexdigest()
+        self.record = self.study / "evidence/freeze-record.json"
+        self.patch = mock.patch.object(C, "FREEZE_RECORD", self.record)
+        self.patch.start()
+
+    def tearDown(self):
+        self.patch.stop()
+        self.tmp.cleanup()
+
+    def write_record(self, **kw):
+        rec = {"protocol_sha256": self.sha, "protocol_commit": self.commit, "frozen_at": "2026-09-25T00:00:00Z",
+               "reviewer": "r", "review_verdict": "freeze_ready"}
+        rec.update(kw)
+        self.record.write_text(json.dumps(rec))
+        git("add", ".", cwd=self.repo)
+        git("commit", "-q", "-m", "record", cwd=self.repo)
+
+    def test_accept_path(self):
+        self.write_record()
+        (self.study / "evidence/receipt.json").write_text("{}")  # later evidence commits are allowed
+        git("add", ".", cwd=self.repo)
+        git("commit", "-q", "-m", "evidence", cwd=self.repo)
+        self.assertEqual(C.require_freeze_commit(self.study), self.commit)
+        self.assertEqual(len(C.require_clean_tree(self.study)), 40)
+
+    def test_code_change_after_freeze_refused(self):
+        self.write_record()
+        (self.study / "orb_signal.py").write_text("X = 2\n")
+        git("add", ".", cwd=self.repo)
+        git("commit", "-q", "-m", "change rules", cwd=self.repo)
+        C.require_clean_tree(self.study)  # the tree is clean, yet the code moved
+        with self.assertRaises(SystemExit) as cm:
+            C.require_freeze_commit(self.study)
+        self.assertIn("orb_signal.py", str(cm.exception.code))
+
+    def test_missing_or_malformed_commit_refused(self):
+        with self.assertRaises(SystemExit):
+            C.require_freeze_commit(self.study)                 # no record at all
+        self.write_record(protocol_commit=None)
+        with self.assertRaises(SystemExit) as cm:
+            C.require_freeze_commit(self.study)
+        self.assertIn("40-hex", str(cm.exception.code))
+        self.write_record(protocol_commit="1" * 40)             # well-formed but not in the history
+        with self.assertRaises(SystemExit) as cm:
+            C.require_freeze_commit(self.study)
+        self.assertIn("ancestor", str(cm.exception.code))
+
+    def test_wrong_commit_protocol_refused(self):
+        (self.study / "protocol.json").write_text('{"status": "frozen_before_outcomes", "edited": true}')
+        git("add", ".", cwd=self.repo)
+        git("commit", "-q", "-m", "protocol edit", cwd=self.repo)
+        self.write_record()   # records the sha of the edited file but points at the earlier commit
+        rec = json.loads(self.record.read_text())
+        rec["protocol_sha256"] = hashlib.sha256((self.study / "protocol.json").read_bytes()).hexdigest()
+        self.record.write_text(json.dumps(rec))
+        git("add", ".", cwd=self.repo)
+        git("commit", "-q", "-m", "record", cwd=self.repo)
+        with self.assertRaises(SystemExit) as cm:
+            C.require_freeze_commit(self.study)
+        self.assertIn("does not hash", str(cm.exception.code))
+
+    def test_template_has_the_fields(self):
+        t = json.loads((ORB / "evidence/freeze-record.template.json").read_text())
+        self.assertTrue({"protocol_sha256", "protocol_commit", "frozen_at", "reviewer", "review_verdict"} <= set(t))
+
+
 class QuoteHelpers(unittest.TestCase):
     def test_stamps(self):
         day = "2024-03-05"
@@ -264,6 +345,12 @@ class QuoteCheck(unittest.TestCase):
         self.assertAlmostEqual(QC.trade_delta_r(ex, [0.002, 0.001], [0.001, 0.001], 0.2), -0.0625)
         self.assertAlmostEqual(QC.segment_shift([-0.1, -0.3], 50, 100), -0.1)
         self.assertEqual(QC.segment_shift([], 0, 100), 0.0)
+
+    def test_quote_coverage(self):
+        self.assertTrue(QC.coverage_ok(5, 100))
+        self.assertFalse(QC.coverage_ok(6, 100))
+        self.assertTrue(QC.coverage_ok(0, 0))
+        self.assertEqual(E.item_verdict("rejected", True, "coverage", 0.2, True, True), "inconclusive (quote coverage)")
 
     def test_sample_key_depends_on_protocol(self):
         a = [QC.in_check("2024-01-02", f"S{i}", 1, "aa" * 32) for i in range(1000)]
