@@ -13,21 +13,19 @@ RTK_TELEMETRY_DISABLED = "1"
 enabled = true
 max_concurrent_threads_per_session = 3
 
-# Keep the trusted plugin hooks; start its MCP server in this project's scope.
-[plugins."context-mode@context-mode".mcp_servers.context-mode]
-enabled = false
+# serena, ai-memory and socraticode moved to user scope (codex.config.template.toml), so every Codex
+# worktree worker has them without this project-local file (docs/decisions/2026-09-25-codex-mcp-scope.md).
+# context-mode also moved: its own plugin manifest (~/.codex/plugins/cache/context-mode/*/.codex-plugin/
+# plugin.json) already declares its mcp_servers.context-mode with no "cwd", so the "enabled = false"
+# override this project template used to carry, and its own cwd-pinned mcp_servers.context-mode block,
+# are both removed -- the plugin's own user-scope registration (already enabled in
+# codex.config.template.toml's [plugins."context-mode@context-mode"]) is used unchanged.
 
-[mcp_servers.context-mode]
-command = "${ECO_ROOT}/bin/context-mode"
-cwd = "${PROJECT_ROOT}"
-startup_timeout_sec = 60
-
-[mcp_servers.context-mode.env]
-RTK_TELEMETRY_DISABLED = "1"
-PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
-CONTEXT_MODE_PLATFORM = "codex"
-CONTEXT_MODE_PROJECT_DIR = "${PROJECT_ROOT}"
-
+# jcodemunch stays project-scoped: its own MCP instructions ("Prefer it over Read/Grep/Glob/Bash for code
+# navigation") would load into every session at user scope, contradicting this catalog's own retrieval
+# routing, the same reasoning docs/decisions/2026-09-23-claude-user-profile.md's 2026-09-25 addendum
+# gives for Claude. A worktree that wants jcodemunch registers it per worktree, exactly as a project that
+# wants it opts in today (adoption/bootstrap.md "jCodeMunch, per project").
 [mcp_servers.jcodemunch]
 command = "${ECO_ROOT}/bin/jcodemunch-mcp"
 startup_timeout_sec = 60
@@ -37,38 +35,3 @@ RTK_TELEMETRY_DISABLED = "1"
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 CODE_INDEX_PATH = "${CODE_INDEX_PATH}"
 JCODEMUNCH_SHARE_SAVINGS = "0"
-
-[mcp_servers.serena]
-command = "${ECO_ROOT}/bin/serena"
-args = ["start-mcp-server", "--transport", "stdio", "--project-from-cwd", "--context", "codex", "--enable-web-dashboard", "true", "--open-web-dashboard", "false", "--enable-gui-log-window", "false"]
-startup_timeout_sec = 60
-
-[mcp_servers.serena.env]
-RTK_TELEMETRY_DISABLED = "1"
-PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
-
-[mcp_servers.ai-memory]
-url = "http://${AI_MEMORY_URL}/mcp"
-
-[mcp_servers.socraticode]
-command = "${ECO_ROOT}/bin/node"
-args = ["${ECO_ROOT}/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"]
-startup_timeout_sec = 120
-
-[mcp_servers.socraticode.env]
-RTK_TELEMETRY_DISABLED = "1"
-PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
-QDRANT_MODE = "external"
-QDRANT_URL = "http://${QDRANT_URL}"
-EMBEDDING_PROVIDER = "lmstudio"
-LMSTUDIO_URL = "http://${EMBED_URL}/v1"
-EMBEDDING_MODEL = "nvidia/Nemotron-3-Embed-1B-BF16"
-EMBEDDING_DIMENSIONS = "2048"
-EMBEDDING_CONTEXT_LENGTH = "4096"
-EMBEDDING_QUERY_PREFIX = "query: "
-EMBEDDING_DOCUMENT_PREFIX = "passage: "
-EMBEDDING_DOCUMENT_INCLUDE_PATH = "true"
-RESPECT_GITIGNORE = "true"
-INCLUDE_DOT_FILES = "false"
-SOCRATICODE_WATCHER = "auto"
-SEARCH_DEFAULT_LIMIT = "3"

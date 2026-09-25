@@ -8,6 +8,60 @@ mcp_oauth_credentials_store = "file"
 enabled = true
 max_concurrent_threads_per_session = 3
 
+# User scope, so every worktree Codex is launched from inherits these servers without a project-local
+# .codex/config.toml (docs/decisions/2026-09-25-codex-mcp-scope.md). serena and socraticode take no
+# "cwd" and resolve their project from Codex's own launch directory (serena's own --project-from-cwd).
+# ai-memory's registration carries no project: its workspace/project scoping is a per-call argument.
+# headroom, codebase-memory and qmd mirror the Claude user-scope set: headroom's dead proxy URL means
+# it reroutes no model traffic, codebase-memory indexes only on an explicit index_repository call,
+# and qmd serves the named catalog index. jcodemunch stays project-scoped (#240) and context-mode comes
+# from its plugin; see project.codex.config.template.toml.
+[mcp_servers.serena]
+command = "${ECO_ROOT}/bin/serena"
+args = ["start-mcp-server", "--transport", "stdio", "--project-from-cwd", "--context", "codex", "--enable-web-dashboard", "true", "--open-web-dashboard", "false", "--enable-gui-log-window", "false"]
+startup_timeout_sec = 60
+
+[mcp_servers.serena.env]
+RTK_TELEMETRY_DISABLED = "1"
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+
+[mcp_servers.ai-memory]
+url = "http://${AI_MEMORY_URL}/mcp"
+
+[mcp_servers.socraticode]
+command = "${ECO_ROOT}/bin/node"
+args = ["${ECO_ROOT}/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"]
+startup_timeout_sec = 120
+
+[mcp_servers.socraticode.env]
+RTK_TELEMETRY_DISABLED = "1"
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+QDRANT_MODE = "external"
+QDRANT_URL = "http://${QDRANT_URL}"
+EMBEDDING_PROVIDER = "lmstudio"
+LMSTUDIO_URL = "http://${EMBED_URL}/v1"
+EMBEDDING_MODEL = "nvidia/Nemotron-3-Embed-1B-BF16"
+EMBEDDING_DIMENSIONS = "2048"
+EMBEDDING_CONTEXT_LENGTH = "4096"
+EMBEDDING_QUERY_PREFIX = "query: "
+EMBEDDING_DOCUMENT_PREFIX = "passage: "
+EMBEDDING_DOCUMENT_INCLUDE_PATH = "true"
+RESPECT_GITIGNORE = "true"
+INCLUDE_DOT_FILES = "false"
+SOCRATICODE_WATCHER = "auto"
+SEARCH_DEFAULT_LIMIT = "3"
+
+[mcp_servers.headroom]
+command = "${ECO_ROOT}/bin/headroom"
+args = ["mcp", "serve", "--proxy-url", "http://127.0.0.1:1"]
+
+[mcp_servers.codebase-memory]
+command = "${ECO_ROOT}/bin/codebase-memory-mcp"
+
+[mcp_servers.qmd]
+command = "${ECO_ROOT}/bin/qmd"
+args = ["--index", "native-agent-stack-catalog", "mcp"]
+
 [projects."${HOME}/codex-ecosystem/validation/native-codex"]
 trust_level = "trusted"
 
