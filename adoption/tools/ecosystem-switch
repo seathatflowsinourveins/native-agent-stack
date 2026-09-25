@@ -421,8 +421,21 @@ def recompute_state(root: Path) -> dict:
         # without needing the component spec here. A rollback re-emits the original op name as
         # "rollback:<op>" (e.g. "rollback:link"), which must count the same as "link" here, or a
         # rolled-back link never updates "current" and a later apply sees false drift.
+        #
+        # Major finding (round 8; invariant (d) in tests/test_adoption_switch_model.py): this used
+        # to also require entry.get("to") is not None, skipping the update whenever a current/<id>
+        # link's OWN reversal unlinks it entirely (a relink's first-ever forward entry always has
+        # from=None, since current/<id> did not exist before it -- so rolling it back removes the
+        # link rather than repointing it, recorded here as to=None; see rollback_txn's link
+        # branch). "current" then stayed at whatever STALE value it held before that reversal
+        # (the just-reversed relink's own forward value, or an even older one) instead of
+        # reflecting that current/<id> no longer exists at all -- a live/ledger mismatch `recover`
+        # itself can silently leave behind (it never touches a live value it did not just derive a
+        # refusal from), caught only by this model test since no CLI-facing test happened to assert
+        # the DERIVED "current" specifically after fully rolling back a component's only-ever
+        # relink. A "to" of None is exactly as meaningful here as any real value: record it.
         base_op = op[len("rollback:"):] if isinstance(op, str) and op.startswith("rollback:") else op
-        if (component and base_op in ("link", "resync", "baseline") and entry.get("to") is not None
+        if (component and base_op in ("link", "resync", "baseline")
                 and (entry.get("surface") or "").startswith("current/")):
             components.setdefault(component, {})["current"] = entry.get("to")
             components[component]["updated_at_utc"] = entry.get("at_utc")
@@ -486,11 +499,35 @@ def open_txn_for_component(root: Path, component_id: str) -> tuple[str, str] | N
     crash -- `recover`, which can now close it (see close_superseded_txn) whether or not a later
     txn has since superseded it, so no component is ever left permanently unable to relink/apply
     (the round-5 regression this function's round-4 version introduced: recover could refuse a
-    superseded in_progress txn forever, and that refusal itself then blocked relink permanently)."""
+    superseded in_progress txn forever, and that refusal itself then blocked relink permanently).
+
+    Round 8 (major finding; invariant (a) in tests/test_adoption_switch_model.py): also open when a
+    txn's OWN rollback started (a ``rollback:intent`` with no matching ``rollback:done``) but never
+    finished, even though its status is applied/pending_confirmation/verify_failed rather than
+    in_progress (recompute_state leaves it exactly where it was until ``rollback:done`` is actually
+    reached). Before this, a fresh `apply` could proceed on the SAME component while an earlier
+    txn's own interrupted rollback sat unresolved -- the new apply's own drift check saw no
+    disagreement (nothing had reversed the earlier txn's link yet, or its own reversal already
+    matched what was live) and let it through, becoming the component's new standing baseline ON
+    TOP of the half-reversed earlier txn. Resuming (or `recover` finishing) that earlier txn's
+    rollback is then correctly refused as superseded -- it would now clobber the new baseline (see
+    ``_superseding_txn``) -- but it can never be closed the other way either: `close_superseded_txn`
+    deliberately refuses once a txn's own rollback has already started (its own docstring: a
+    partial reversal makes "closing without touching anything" a lie). Left with neither path, the
+    txn -- and every later apply/relink attempt on the same component, refused by THIS SAME guard
+    -- was stuck forever: a permanent wedge, closed here by refusing the fresh apply that would
+    have created the unresolvable state in the first place. An operator resumes/finishes
+    (`rollback --txn`) or otherwise reconciles (`recover`) the interrupted rollback before a new
+    apply/relink is allowed to build on top of it."""
     state = load_state(root)
     for txn, record in state["txns"].items():
-        if record.get("component") == component_id and record.get("status") in OPEN_TXN_STATUSES:
+        if record.get("component") != component_id:
+            continue
+        if record.get("status") in OPEN_TXN_STATUSES:
             return txn, record["status"]
+        if record.get("status") != "rolled_back" and any(
+                entry.get("op") == "rollback:intent" for entry in record.get("ops") or []):
+            return txn, f"{record.get('status')} (rollback interrupted)"
     return None
 
 
@@ -907,7 +944,15 @@ def op_data_restore(root: Path, surface: str, backup_path: str) -> tuple[dict, d
     return fields, {}
 
 
-def _write_reversal_issue(target: Path, entry: dict) -> str | None:
+# Sentinel default for the ``live_target``/``current`` override parameters below: ``None`` is
+# itself a legitimate observed value (a missing symlink or file), so it cannot double as "not
+# supplied". Used by _rollback_precheck_issues (round 8) to feed a SIMULATED value -- what an
+# entry's surface would read as once every entry ordered after it in the reversal walk has
+# already been simulated-reversed -- instead of these functions' own default, a fresh disk read.
+_UNSET = object()
+
+
+def _write_reversal_issue(target: Path, entry: dict, *, current=_UNSET) -> str | None:
     """None when reversing a text-replace/file-write ``entry`` against ``target`` right now would
     succeed (or is already a verified no-op); otherwise the refusal message. The surface's current
     bytes must match either ``entry``'s own recorded ``post_sha256`` (what THIS operation itself
@@ -920,11 +965,14 @@ def _write_reversal_issue(target: Path, entry: dict) -> str | None:
     takes when a backup exists, simply rewrites the identical bytes again). Only a third,
     unexplained value is refused. Split from a raising ``_refuse_if_drifted_since_write`` (round 7)
     so ``rollback_txn``'s own all-entries pre-check can ask the same question for every entry
-    before mutating any of them, not just the one about to be reversed."""
+    before mutating any of them, not just the one about to be reversed. ``current`` (round 8) lets
+    that pre-check pass a simulated value instead of a fresh disk read -- see ``_UNSET`` above and
+    ``_rollback_precheck_issues``; every other caller leaves it unset and gets today's real bytes."""
     expected_post = entry.get("post_sha256")
     if expected_post is None:
         return None
-    current = sha256_file(target)
+    if current is _UNSET:
+        current = sha256_file(target)
     if current is None or current == expected_post or current == entry.get("pre_sha256"):
         return None
     return (f"refusing to roll back {target}: its current contents (sha256 {current}) no longer "
@@ -1275,18 +1323,6 @@ def cmd_confirm(args) -> int:
         return 0
 
 
-def _txn_sets_current_link(entries: list[dict]) -> bool:
-    """Whether any of ``entries`` (a txn's own OPERATION_KINDS-filtered ledger entries) is a
-    ``link`` whose surface names a component's ``current/<id>`` switch point -- the same
-    predicate ``recompute_state`` uses to decide whether an entry updates a component's
-    ``updated_txn``. The single source of truth both ``rollback_txn`` and ``cmd_rollback``'s own
-    pre-check gate their "superseded" refusal on: a txn that never became its component's own
-    current-link setter cannot have been superseded by one, whatever ``updated_txn`` currently
-    names (minor finding; see rollback_txn's comment)."""
-    return any(entry.get("op") == "link" and (entry.get("surface") or "").startswith("current/")
-              for entry in entries)
-
-
 # A txn in one of these statuses is still "standing" for its component: its own forward effect
 # has not been reversed (rolled_back) or accepted-and-closed by recover's roll-forward
 # (superseded), and it is not a non-transactional record (baseline/resync/prune all close
@@ -1310,17 +1346,19 @@ def _txn_first_seq(ledger_entries: list[dict], txn: str, ops: tuple[str, ...]) -
 
 def _superseding_txn(root: Path, component_id: str, txn: str, own_entries: list[dict]) -> str | None:
     """Name of a later txn for ``component_id`` that ``rollback_txn``/``cmd_rollback`` must refuse
-    to roll ``txn`` back underneath, or None when none exists.
+    to roll ``txn`` back underneath, or None when none exists. The single decision every caller
+    (``rollback_txn``'s own pre-check, ``cmd_rollback``'s pre-check, and -- round 8 -- ``recover``'s
+    ``close_superseded_txn``) shares, literally, not merely "agrees with" (round 7's own residual
+    note: these used to be separate reads of the same idea).
 
     Coordinator decision (round 7, simple and safe): a later txn blocks ``txn``'s rollback
     whenever it is still STANDING (``STANDING_TXN_STATUSES``) -- full stop, regardless of what the
-    live current/<id> link (or anything else on disk) happens to read right now, and regardless of
-    whether that later txn itself ever touched current/<id>. "Later" is ``txn``'s own earliest
-    forward (``OPERATION_KINDS``) ledger entry versus the candidate's: ledger order and recorded
-    status, never a value read off the filesystem. The operator must roll back every later
-    standing txn first, newest first, before an earlier one is reachable again (see
-    test_rollback_by_txn_succeeds_after_the_apply_that_superseded_it_was_itself_rolled_back and the
-    A-B-A tests next to it).
+    live current/<id> link (or anything else on disk) happens to read right now. "Later" is
+    ``txn``'s own earliest forward (``OPERATION_KINDS``) ledger entry versus the candidate's:
+    ledger order and recorded status, never a value read off the filesystem. The operator must
+    roll back every later standing txn first, newest first, before an earlier one is reachable
+    again (see test_rollback_by_txn_succeeds_after_the_apply_that_superseded_it_was_itself_rolled_
+    back and the A-B-A tests next to it).
 
     Round 6 read the live current/<id> link directly and accepted it as proof ``txn`` was not
     superseded whenever it merely matched ``txn``'s OWN recorded ``to``/``from`` -- fine for two
@@ -1330,12 +1368,30 @@ def _superseding_txn(root: Path, component_id: str, txn: str, own_entries: list[
     OLDEST of the three exited 0 and clobbered the still-applied newest one (round 7 major finding).
     Ledger identity, order and recorded status can't be fooled by a value coincidence like that.
 
-    A ``resync`` is a separate case: not reversible, and recompute_state always closes it
-    "recorded" immediately (never one of ``STANDING_TXN_STATUSES``), but it is a deliberate,
-    permanent, out-of-band acceptance the operator named explicitly (see cmd_adopt's ``--resync``
-    branch) -- round 4 intended it to go on superseding an older txn's rollback forever, which a
-    bare status-set membership test would otherwise silently drop. Checked the same way (ledger
-    order only, never a live value) so it cannot reopen the same coincidence bug for resync."""
+    Round 8 (major finding): every caller used to gate this whole check on the txn BEING ROLLED
+    BACK itself being a current/<id> setter (the now-removed ``_txn_sets_current_link``) --
+    correct for the round-6 implementation this replaced, which read ``updated_txn`` (a value only
+    a current-link setter's own txn can ever become) directly, but wrong here: a later ``adopt
+    --relink`` performed while current/<id> already existed links only entrypoints/surfaces, never
+    current/<id> itself (relink links it only when absent), so it could still stand as this
+    component's own latest change while being invisible to a check gated that way -- an OLDER
+    txn's rollback (including an earlier relink) then exited 0 underneath it, restoring
+    pre-migration entrypoint targets/text while the later relink's own effect on the SAME entrypoints
+    was silently clobbered. This function never needed that gate: it never reads ``updated_txn`` or
+    any live value at all, only ledger order and status, so it already produces the right answer
+    for a txn that never touched current/<id> itself -- callers simply stopped skipping it.
+
+    Round 8 (minor finding, dropped): a ``resync`` used to count as a standing, forever-superseding
+    event on its own (round 4), even one that merely RE-OBSERVED the exact value a still-pending
+    txn itself set (e.g. a resync run, out of habit, during an `apply --confirm-within` window that
+    changed nothing on disk) -- blocking that txn's own confirm-or-revert timer from ever reverting
+    it, well past what the coordinator's literal rule ("applied/unconfirmed/in_progress") asks for.
+    Removed: resync never itself changes the live value (it only ever re-records whatever is
+    already there), so the entry-level compare-and-swap checks below (``_link_reversal_issue``/
+    ``_write_reversal_issue``, via ``_rollback_precheck_issues`` and again at each entry's own
+    reversal) remain the real, independent defense against clobbering a genuinely DIFFERENT
+    out-of-band value a resync accepted -- they already refuse on a live value that matches
+    neither what the entry being reversed set nor what reversing it would restore, resync or not."""
     ledger_entries = Ledger(root).all()
     own_seq = _txn_first_seq(ledger_entries, txn, OPERATION_KINDS)
     if own_seq is None:
@@ -1344,12 +1400,9 @@ def _superseding_txn(root: Path, component_id: str, txn: str, own_entries: list[
     for other_txn, record in load_state(root)["txns"].items():
         if other_txn == txn or record.get("component") != component_id:
             continue
-        if record.get("status") in STANDING_TXN_STATUSES:
-            other_seq = _txn_first_seq(ledger_entries, other_txn, OPERATION_KINDS)
-        elif any(e.get("op") == "resync" for e in record.get("ops") or []):
-            other_seq = _txn_first_seq(ledger_entries, other_txn, ("resync",))
-        else:
+        if record.get("status") not in STANDING_TXN_STATUSES:
             continue
+        other_seq = _txn_first_seq(ledger_entries, other_txn, OPERATION_KINDS)
         if other_seq is not None and other_seq > own_seq:
             later.append((other_seq, other_txn))
     if not later:
@@ -1358,14 +1411,18 @@ def _superseding_txn(root: Path, component_id: str, txn: str, own_entries: list[
     return later[-1][1]
 
 
-def _link_reversal_issue(root: Path, entry: dict) -> str | None:
+def _link_reversal_issue(root: Path, entry: dict, *, live_target=_UNSET) -> str | None:
     """None when reversing this ``link`` entry right now is safe; otherwise the refusal message.
     A relaxed compare-and-swap (round 5, relaxed round 6): the live target must equal either what
     this operation last set it to (``to``, not yet reversed) or what reversing it would restore
     (``from``, already reversed -- an earlier interrupted attempt, or a second redundant call).
     Split out (round 7) so ``rollback_txn``'s all-entries pre-check can ask the same question for
-    every link entry before mutating any of them, not just the one about to be reversed."""
-    live_target = read_link_target(root / entry["surface"])
+    every link entry before mutating any of them, not just the one about to be reversed.
+    ``live_target`` (round 8) lets that pre-check pass a simulated value instead of a fresh disk
+    read -- see ``_UNSET`` and ``_rollback_precheck_issues``; every other caller leaves it unset
+    and gets today's real target."""
+    if live_target is _UNSET:
+        live_target = read_link_target(root / entry["surface"])
     if live_target != entry.get("to") and live_target != entry.get("from"):
         return (f"refusing to roll back {entry['surface']}: its current target ({live_target!r}) "
                 f"no longer matches what this operation last set it to ({entry.get('to')!r}) or "
@@ -1373,6 +1430,67 @@ def _link_reversal_issue(root: Path, entry: dict) -> str | None:
                 "changed it since (e.g. an out-of-band relink/bootstrap) -- investigate and "
                 "resync/fix it by hand before rolling back")
     return None
+
+
+def _rollback_precheck_issues(root: Path, non_restart_entries: list[dict]) -> list[str]:
+    """The all-entries pre-check ``rollback_txn`` runs before mutating anything (round 7),
+    corrected (round 8 major-finding fix; see that function's own comment and invariant (c) in
+    tests/test_adoption_switch_model.py) to walk ``non_restart_entries`` in the SAME
+    reverse-chronological order the real reversal loop uses, carrying each entry's own
+    post-reversal value forward to the next, OLDER entry that shares its surface -- rather than
+    comparing every entry independently against today's untouched, pre-reversal live state the way
+    round 7's version did.
+
+    Round 7 read the live filesystem/symlink fresh for every entry, which is correct when at most
+    one entry in a txn ever touches a given surface, but produces a false refusal when two entries
+    of the SAME txn chain on the SAME surface (e.g. a text-replace applied twice, S0->S1 then
+    S1->S2): read fresh, the OLDER (S0->S1) entry's own check compares against S2 (today's live
+    bytes, since neither entry has been reversed yet) -- neither its own ``post_sha256`` (S1) nor
+    ``pre_sha256`` (S0) -- and refuses a rollback the real reversal loop below would in fact
+    complete correctly (it reverses S1->S2 first, leaving S1 live, which the older entry's own turn
+    then matches). Simulating the same reverse walk here, one entry at a time, checks the older
+    entry against what reversing every entry AHEAD of it would actually leave behind, not a raw
+    disk snapshot taken before any of them ran (minor finding: latent, since no shipped
+    ``surfaces[]`` entry yet gives a single txn two entries on one path).
+
+    Also closes a related latent gap: a text-replace and a file-write entry on the same resolved
+    path now chain through the same ``simulated_content`` map, keyed by the RESOLVED target (via
+    ``resolve_surface_path``, so a ``~``-rooted and an equivalent absolute spelling of one path
+    also chain correctly), since both op kinds share the same ``pre_sha256``/``post_sha256`` fields
+    and meaning.
+
+    An entry an earlier, interrupted rollback attempt already reversed for real needs no special
+    case here: seeding a surface's simulated value from the live filesystem/symlink on first touch
+    already reads back exactly what that real reversal left behind, which then matches this same
+    entry's own ``from``/``pre_sha256`` (the "already reverted" branch both underlying checks
+    already accept) -- so it flows through this same walk correctly with no separate
+    ``already_reversed`` lookup needed here, unlike the real reversal loop below, which still needs
+    that set to avoid re-mutating (and re-ledgering) work already done."""
+    simulated_links: dict[str, str | None] = {}
+    simulated_content: dict[str, str | None] = {}
+    issues: list[str] = []
+    for entry in reversed(non_restart_entries):
+        op = entry.get("op")
+        if op == "link":
+            key = str(root / entry["surface"])
+            if key not in simulated_links:
+                simulated_links[key] = read_link_target(Path(key))
+            issue = _link_reversal_issue(root, entry, live_target=simulated_links[key])
+            if issue:
+                issues.append(issue)
+            else:
+                simulated_links[key] = entry.get("from")
+        elif op in ("text-replace", "file-write"):
+            target = resolve_surface_path(root, entry["surface"])
+            key = str(target)
+            if key not in simulated_content:
+                simulated_content[key] = sha256_file(target)
+            issue = _write_reversal_issue(target, entry, current=simulated_content[key])
+            if issue:
+                issues.append(issue)
+            elif entry.get("post_sha256") is not None:
+                simulated_content[key] = entry.get("pre_sha256")
+    return issues
 
 
 def rollback_txn(root: Path, txn: str) -> list[str]:
@@ -1388,21 +1506,28 @@ def rollback_txn(root: Path, txn: str) -> list[str]:
     Coordinator decision (round 6): rollback is idempotent and resumable, so this same function is
     also how `recover` resumes an interrupted rollback (see cmd_recover), and how a second,
     redundant `rollback` call on an already-rolled-back txn becomes a clean no-op instead of an
-    error. Writes a ``rollback:intent`` marker first, then -- for each forward entry, in reverse
-    order -- skips one a matching ``rollback:<op>`` ledger entry already reverses (an earlier
-    attempt got that far before being interrupted, or already finished), and treats a live target
-    that already matches what reversing this entry would restore as "already reverted", not drift
-    (a relaxed compare-and-swap: see ``_refuse_if_drifted_since_write`` above and the ``link``
-    branch below). Only a live value matching NEITHER this entry's own forward nor reverted state
-    is still refused as unexplained drift.
+    error. For each forward entry, in reverse order, skips one a matching ``rollback:<op>`` ledger
+    entry already reverses (an earlier attempt got that far before being interrupted, or already
+    finished), and treats a live target that already matches what reversing this entry would
+    restore as "already reverted", not drift (a relaxed compare-and-swap: see
+    ``_refuse_if_drifted_since_write`` above and the ``link`` branch below). Only a live value
+    matching NEITHER this entry's own forward nor reverted state is still refused as unexplained
+    drift.
 
-    Residual of round 6's major, closed round 7: current/<id> is always a relink's FIRST forward
-    entry (build_apply_plan/cmd_adopt), so it was always reversed LAST here -- an all-entries
-    pre-check now asks every not-yet-reversed link/text-replace/file-write entry's own drift
-    question (``_link_reversal_issue``/``_write_reversal_issue``) up front, before touching
-    anything, so a doomed rollback (its current/<id> link's own CAS would refuse) is refused
-    whole, never leaving entrypoints or surfaces already reversed while current/<id> alone was
-    left drifted and unreachable except by hand."""
+    Residual of round 6's major, closed round 7, reordered round 8 (major finding; invariant (c)
+    in tests/test_adoption_switch_model.py): current/<id> is always a relink's FIRST forward entry
+    (build_apply_plan/cmd_adopt), so it was always reversed LAST here -- an all-entries pre-check
+    (``_rollback_precheck_issues``) asks every not-yet-reversed link/text-replace/file-write
+    entry's own drift question up front, before touching anything, so a doomed rollback (its
+    current/<id> link's own CAS would refuse) is refused whole, never leaving entrypoints or
+    surfaces already reversed while current/<id> alone was left drifted and unreachable except by
+    hand. The ``rollback:intent`` marker (see below) is written only once that pre-check, and the
+    superseded-txn check ahead of it, have BOTH already passed -- round 7 wrote it first, before
+    either check ran, which left it behind even on a rollback either check went on to refuse: a
+    real, permanent wedge, since the marker itself makes ``confirm`` refuse the txn (see
+    cmd_confirm) and makes `recover` stop treating an in_progress txn as a plain crashed apply
+    (see cmd_recover's ``has_incomplete_rollback``), and neither drift nor a standing superseding
+    txn resolves itself on a later retry."""
     ledger = Ledger(root)
     entries = [entry for entry in ledger.for_txn(txn) if entry.get("op") in OPERATION_KINDS]
     # Previously-unresolved finding: cmd_rollback's own "superseded" pre-check (below, for a
@@ -1416,32 +1541,25 @@ def rollback_txn(root: Path, txn: str) -> list[str]:
     # time a post-apply verify can fail, this txn is necessarily still its component's own
     # updated_txn.
     component_ids = {entry.get("component") for entry in entries if entry.get("component")}
-    # Minor finding: this used to run whenever exactly one component was touched, even when this
-    # txn itself never became that component's own "current" setter (recompute_state only updates
-    # updated_txn from a link/resync/baseline entry whose surface starts with "current/"). Two
-    # concrete cases: a relink that fails partway *after* current/<id> already existed (so this
-    # txn only links entrypoints/surfaces, never current/<id> itself -- relink links it only when
-    # absent), and an apply that fails at a data-backup step before its own link step ever runs.
-    # In both, updated_txn still names whatever EARLIER txn last set current/<id>, and the old
-    # unconditional check misread that as "a later txn already moved it on", permanently refusing
-    # recover/rollback and leaving the txn in_progress forever. Gated on whether this txn's own
-    # entries actually include a current/<id>-setting "link" (the only OPERATION_KINDS member that
-    # can be one; resync/baseline are not reversible and never reach `entries`): only then can a
-    # different current updated_txn mean a genuinely later change this rollback would clobber.
-    if len(component_ids) == 1 and _txn_sets_current_link(entries):
+    # Coordinator decision (round 8): no longer additionally gated on whether this txn's own
+    # entries include a current/<id>-setting "link" (the now-removed ``_txn_sets_current_link``;
+    # see _superseding_txn's own docstring for the full reasoning). Major finding this closes: a
+    # relink performed while current/<id> already existed only links entrypoints/surfaces, never
+    # current/<id> itself (relink links it only when absent), so the old gate made such a relink's
+    # own rollback invisible to this refusal even while a later, still-standing apply/relink on the
+    # same component stood -- contradicting the coordinator's own rule ("refused while ANY later
+    # txn for the component is applied/unconfirmed/in_progress, for every txn kind including
+    # relink") and this tool's own README/lifecycle.md wording. ``_superseding_txn`` never reads
+    # updated_txn or any other live value (only ledger order and each candidate's own recorded
+    # status), so it already answers correctly for a txn that never touched current/<id> itself --
+    # only the gate in front of it needed removing.
+    if len(component_ids) == 1:
         (component_id,) = component_ids
         superseding_txn = _superseding_txn(root, component_id, txn, entries)
         if superseding_txn is not None:
             raise SwitchError(f"txn {txn!r} is no longer the latest change to component {component_id!r} "
                                f"(a later txn {superseding_txn!r} already moved it on); refusing to roll "
                                "back a superseded txn and clobber that later apply")
-    # Coordinator decision (round 6): write the rollback-intent marker before touching anything, so
-    # the ledger itself records that a reversal of this txn began (an audit trail across a possible
-    # interruption below) -- inert for recompute_state's own "current"/status derivation: surface
-    # "_txn_start" never starts with "current/", and this op is explicitly excluded from the
-    # "already reversed" scan a few lines down and from the terminal-status check in
-    # recompute_state, both of which look only for "_txn_end".
-    ledger.append(txn=txn, op="rollback:intent", component=next(iter(component_ids), None), surface="_txn_start")
     problems: list[str] = []
     component = None
     backup_dir = root / "switch" / "backups" / txn
@@ -1484,28 +1602,34 @@ def rollback_txn(root: Path, txn: str) -> list[str]:
     # before it already reversed -- a permanently half-migrated component the "resync/fix it by
     # hand" advice could never actually finish reversing (a resync makes it superseded; a
     # superseded txn is never physically touched again). Asks every not-yet-reversed link/
-    # text-replace/file-write entry's own drift question up front, before mutating any of them, so
-    # a doomed rollback refuses whole instead of partway. data-backup/data-restore and unit-restart
+    # text-replace/file-write entry's own drift question up front, before mutating any of them
+    # (round 8: simulating the same reverse-order walk the reversal loop below uses, via
+    # ``_rollback_precheck_issues``, rather than comparing every entry independently against
+    # today's untouched live state -- see that function's own docstring for why), so a doomed
+    # rollback refuses whole instead of partway. data-backup/data-restore and unit-restart
     # (deliberately reversed last, and not a value-drift question in the same sense -- see below)
     # are unaffected.
-    precheck_issues: list[str] = []
-    for entry in non_restart_entries:
-        if (entry.get("op"), entry.get("surface")) in already_reversed:
-            continue
-        if entry.get("op") == "link":
-            issue = _link_reversal_issue(root, entry)
-        elif entry.get("op") in ("text-replace", "file-write"):
-            issue = _write_reversal_issue(resolve_surface_path(root, entry["surface"]), entry)
-        else:
-            issue = None
-        if issue:
-            precheck_issues.append(issue)
+    precheck_issues = _rollback_precheck_issues(root, non_restart_entries)
     if precheck_issues:
         if len(precheck_issues) == 1:
             raise SwitchError(precheck_issues[0])
         raise SwitchError(
             f"refusing to roll back txn {txn!r}: {len(precheck_issues)} of its own operations can "
             "no longer be safely reversed without leaving it half-reversed -- " + " | ".join(precheck_issues))
+    # Coordinator decision (round 6, reordered round 8 -- major finding, invariant (c)): write the
+    # rollback-intent marker only now that every refusal check above (superseded-txn, then the
+    # all-entries drift pre-check) has already passed, never before them, so a rollback either one
+    # refuses never leaves this marker behind at all -- round 7 wrote it first, which left it
+    # behind even on a refused rollback, and the marker is load-bearing (confirm refuses any txn
+    # that carries one; recover's ``has_incomplete_rollback`` stops treating an in_progress txn as
+    # a plain crashed apply once it exists), so a refused-but-marked txn could never be closed by
+    # confirm, by a retry of rollback/recover (refused the same way every time, nothing about the
+    # drift or the superseding txn having changed), or by anything else at all: a permanent wedge.
+    # Inert for recompute_state's own "current"/status derivation either way: surface "_txn_start"
+    # never starts with "current/", and this op is excluded from the "already reversed" scan above
+    # and from the terminal-status check in recompute_state, both of which look only for
+    # "_txn_end".
+    ledger.append(txn=txn, op="rollback:intent", component=next(iter(component_ids), None), surface="_txn_start")
     for entry in reversed(non_restart_entries):
         component = entry.get("component")
         if (entry.get("op"), entry.get("surface")) in already_reversed:
@@ -1589,18 +1713,18 @@ def rollback_txn(root: Path, txn: str) -> list[str]:
 
 def close_superseded_txn(root: Path, txn: str) -> bool:
     """True (and closes ``txn`` with a terminal "superseded" ledger entry, touching nothing else)
-    when ``txn`` is provably superseded by a later txn that already became its component's own
-    updated_txn -- the same underlying signal ``_superseding_txn`` (used by ``rollback_txn``/
-    ``cmd_rollback`` to REFUSE a manual rollback of a superseded txn) derives from the live link
-    directly, reused here by ``cmd_recover`` to instead CLOSE one automatically. Reads
-    ``updated_txn`` itself rather than calling ``_superseding_txn``: this only ever runs against a
-    txn that crashed before its own post-apply verify, so it was never itself authoritative and has
-    no confirmed live state of its own to compare a live link against the way a txn being manually
-    rolled back always does (each op is ledgered only after it runs, never write-ahead, so
-    ``updated_txn`` here can only ever name a later change that already finished being ledgered
-    itself). False (the caller should fall back to a normal ``rollback_txn`` reversal) when ``txn``
-    never set a current/<id> link at all, or nothing later has superseded it -- the ordinary
-    crash-recovery case, unaffected by this function.
+    when ``txn`` is provably superseded by a later, still-standing txn for the same component.
+    Round 8: calls ``_superseding_txn`` directly -- the SAME decision ``rollback_txn``/
+    ``cmd_rollback`` use to REFUSE a manual rollback of a superseded txn, not a separate read of
+    "the same underlying signal" that merely agreed with it in practice (round 7's own residual
+    note this closes: recover's docs used to have to say the two checks "agree... though not the
+    identical code"). False (the caller should fall back to a normal ``rollback_txn`` reversal)
+    when ``txn`` touched more than one component (or none), or nothing later has superseded it --
+    the ordinary crash-recovery case, unaffected by this function. Safe even though this only ever
+    runs against a txn that crashed before its own post-apply verify (so it was never itself
+    authoritative, and has no confirmed live state of its own the way a txn being manually rolled
+    back always does): ``_superseding_txn`` reasons purely from ledger order and each candidate's
+    own recorded status, never a live value, so it needs no such state from ``txn`` either.
 
     Coordinator decision on the txn state machine (round 5): recover must be able to close every
     in_progress txn it can prove superseded (roll FORWARD: accept the later, already-verified
@@ -1616,11 +1740,11 @@ def close_superseded_txn(root: Path, txn: str) -> bool:
     denial-of-service against the very component it was protecting)."""
     entries = [entry for entry in Ledger(root).for_txn(txn) if entry.get("op") in OPERATION_KINDS]
     component_ids = {entry.get("component") for entry in entries if entry.get("component")}
-    if len(component_ids) != 1 or not _txn_sets_current_link(entries):
+    if len(component_ids) != 1:
         return False
     (component_id,) = component_ids
-    superseding_txn = (load_state(root)["components"].get(component_id) or {}).get("updated_txn")
-    if superseding_txn in (None, txn):
+    superseding_txn = _superseding_txn(root, component_id, txn, entries)
+    if superseding_txn is None:
         return False
     superseded_fields = {"from": superseding_txn, "to": "superseded"}
     Ledger(root).append(txn=txn, op="recover:superseded", component=component_id, surface="_txn_end",
@@ -1646,14 +1770,46 @@ def cmd_rollback(args) -> int:
             # "candidate"). Restricted to STANDING txns (the same set _superseding_txn treats as a
             # real, not-yet-reversed change) and ordered by each candidate's own earliest forward
             # entry (_txn_first_seq), which a later attempt on that SAME txn can never move forward.
+            #
+            # Minor finding (round 8): this set still included the one-time `adopt --relink`
+            # migration itself (also "applied", also with reversible link entries) -- so once every
+            # real version-change apply on a component was rolled back, a REPEATED bare `rollback
+            # ID` no longer no-opped the way lifecycle.md documents ("a second, redundant rollback
+            # ... is a clean no-op"): it kept cascading into the relink migration next, tearing down
+            # current/<id> and every entrypoint's indirection through it, after which apply/relink
+            # refuse until someone relinks again by hand. `adopt --relink` txn ids are always
+            # `relink-<component>-...` by construction (see cmd_adopt). Excluding every relink
+            # unconditionally would itself regress a DIFFERENT, already-tested case though
+            # (TildeSurfaceRollbackTests): a component that has NEVER been applied has no version
+            # change to mean at all -- its one relink IS the only txn there has ever been, and the
+            # bare form has always been allowed to reach it. So the boundary this draws is: once
+            # this component has EVER had a real `apply` txn (whatever its current status -- an
+            # already-rolled-back one still counts, so a further bare call past it stays a no-op
+            # rather than falling through to the relink underneath), the bare form is restricted to
+            # apply txns only and never automatically reaches the relink; a component that has only
+            # ever been relinked keeps targeting its relink the same as before. An operator who
+            # genuinely wants to undo a relink migration once an apply exists too still can,
+            # explicitly, with `rollback --txn <that-id>` (the pre-check above, unaffected by this
+            # filter, still protects it the same as any other txn).
+            relink_prefix = f"relink-{args.component}-"
             ledger_entries = ledger.all()
-            candidates = [(_txn_first_seq(ledger_entries, t, OPERATION_KINDS), t)
-                          for t, record in state["txns"].items()
-                          if record.get("component") == args.component
-                          and record.get("status") in STANDING_TXN_STATUSES
-                          and any(e.get("op") in OPERATION_KINDS for e in record.get("ops") or [])]
+            component_txns = [t for t, record in state["txns"].items()
+                              if record.get("component") == args.component
+                              and any(e.get("op") in OPERATION_KINDS for e in record.get("ops") or [])]
+            apply_txns = [t for t in component_txns if not t.startswith(relink_prefix)]
+            eligible_txns = apply_txns if apply_txns else component_txns
+            standing = [t for t in eligible_txns if state["txns"][t].get("status") in STANDING_TXN_STATUSES]
+            candidates = [(_txn_first_seq(ledger_entries, t, OPERATION_KINDS), t) for t in standing]
             candidates = [(seq, t) for seq, t in candidates if seq is not None]
             if not candidates:
+                if eligible_txns:
+                    # Every eligible txn for this component (every apply, once one has ever
+                    # existed; otherwise its relink) has already been rolled back or superseded --
+                    # the same clean, non-error no-op a repeated rollback of an already-reversed
+                    # single txn gets below, rather than the "no reversible txn" refusal (reserved
+                    # for a component nothing has ever touched at all).
+                    print(json.dumps({"status": "already_rolled_back", "txn": None}))
+                    return 0
                 raise SwitchError(f"no reversible txn recorded for component {args.component!r}")
             txn = max(candidates)[1]  # highest opening seq, i.e. most recently applied
         record = state["txns"].get(txn, {})
@@ -1676,13 +1832,17 @@ def cmd_rollback(args) -> int:
             raise SwitchError(f"txn {txn!r} has no reversible operations (e.g. a baseline/resync/prune "
                                "record); nothing to roll back")
         component_id = record.get("component")
-        # Minor finding: this used to fire whenever *any* other txn had since become the
-        # component's updated_txn, even one this txn never was itself (e.g. a relink that fails
-        # partway after current/<id> already existed, or an apply that fails before its own link
-        # step) -- see rollback_txn's matching gate and _txn_sets_current_link for the full
-        # reasoning; both pre-checks must agree, since cmd_recover calls rollback_txn directly and
-        # never goes through this one.
-        if component_id and _txn_sets_current_link(txn_entries):
+        # Coordinator decision (round 8): no longer additionally gated on whether THIS txn's own
+        # entries include a current/<id>-setting "link" (the now-removed
+        # ``_txn_sets_current_link``) -- see rollback_txn's matching check for the full reasoning
+        # (major finding: a relink performed while current/<id> already existed only links
+        # entrypoints/surfaces, never current/<id> itself, so the old gate made such a relink's own
+        # rollback invisible to this refusal even while a later, still-standing txn stood). This
+        # check and rollback_txn's own now call the exact same ``_superseding_txn``, not merely
+        # "agree" with it (round 7's own residual note) -- cmd_recover still calls ``rollback_txn``
+        # directly and never goes through this one, so both entry points must reach the identical
+        # decision either way.
+        if component_id:
             superseding_txn = _superseding_txn(root, component_id, txn, txn_entries)
             if superseding_txn is not None:
                 raise SwitchError(f"txn {txn!r} is no longer the latest change to component {component_id!r} "
