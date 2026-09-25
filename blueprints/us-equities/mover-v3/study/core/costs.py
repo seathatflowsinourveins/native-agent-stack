@@ -279,22 +279,45 @@ def cash_term(cal, raw: dict, split: dict, allc: dict, e: str, x: str):
     across a missing bar leaves the cash undefined (populations.corporate_actions: the trade or H3-c event is
     excluded and counted like an undefined F); a step inside the band there books nothing, as between any two
     sessions."""
-    r_e = raw.get(e)
-    sessions = cal.range(e, x)
-    days = [d for d in sessions if (split.get(d) or {}).get("c") and (allc.get(d) or {}).get("c")]
-    if not r_e or not r_e.get("c") or not days or days[0] != e or days[-1] != x:
+    if not cash_defined(cal, raw, split, allc, e, x):
         return None
-    pos = {d: i for i, d in enumerate(sessions)}
+    r_e = raw[e]
+    days = _cash_days(cal, split, allc, e, x)
     a_e = float(r_e["c"]) / float(split[e]["c"])
     total = 0.0
     for p_, k in zip(days, days[1:]):
-        step = 1.0 - (allc[p_]["c"] / split[p_]["c"]) / (allc[k]["c"] / split[k]["c"])
+        step = _dividend_step(split, allc, p_, k)
         if abs(step) > C["cash_band"]:
-            if pos[k] - pos[p_] != 1:
-                return None
             total += float(split[p_]["c"]) * step
     cash = a_e * total
     return cash if abs(cash) > C["cash_band"] * float(r_e["c"]) else 0.0
+
+
+def _cash_days(cal, split, allc, e, x) -> list:
+    return [d for d in cal.range(e, x) if (split.get(d) or {}).get("c") and (allc.get(d) or {}).get("c")]
+
+
+def _dividend_step(split, allc, p_, k) -> float:
+    """s_k = 1 - D(p) / D(k), D(d) = all_c(d) / split_c(d): a ratio of two adjustment factors, each a ratio of two
+    closes of one session (never a price level or a return)."""
+    return 1.0 - (allc[p_]["c"] / split[p_]["c"]) / (allc[k]["c"] / split[k]["c"])
+
+
+def cash_defined(cal, raw: dict, split: dict, allc: dict, e: str, x: str) -> bool:
+    """Whether cash_term is defined, from bar presence and the adjustment factors D(d) alone (review round 15, F05):
+    the raw bar of e and the split and all bars of e and x exist, and no step outside the 2e-3 band spans a session
+    without its split or all bar. It computes no amount, so the holdout count path (count_unit) applies the same
+    eligibility as the read without a price; cash_term is None exactly when this is False."""
+    r_e = raw.get(e)
+    sessions = cal.range(e, x)
+    days = _cash_days(cal, split, allc, e, x)
+    if not r_e or not r_e.get("c") or not days or days[0] != e or days[-1] != x:
+        return False
+    pos = {d: i for i, d in enumerate(sessions)}
+    for p_, k in zip(days, days[1:]):
+        if abs(_dividend_step(split, allc, p_, k)) > C["cash_band"] and pos[k] - pos[p_] != 1:
+            return False
+    return True
 
 
 def trade_net_return(notional, entry_mid, exit_price, F, cash, c_in, c_out, fees: Fees, exit_day: str) -> float:

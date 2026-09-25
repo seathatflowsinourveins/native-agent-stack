@@ -14,7 +14,7 @@ from core import costs, fills, plan
 from core import formulas as FM
 from core.chronology import embargoed, segment_of
 from core.params import C, T
-from core.records import MERGER_TYPES, SPLIT_TYPES, et_date
+from core.records import MERGER_TYPES, SPIN_OFF_TYPES, SPLIT_TYPES, et_date
 
 MULTI_SESSION_ARMS = ("b_lane", "b_overnight")
 
@@ -111,6 +111,32 @@ def _cash(cal, ev, e, x, F):
     return costs.cash_term(cal, ev["raw"], ev["split"], ev["all"], e, x)
 
 
+def record_exclusion(ctx: Ctx, ev: dict, sym: str, e: str, x: str):
+    """The price-independent record exclusions of a hold from session e through session x (review round 15, F01 and
+    N06), shared by the count and the read: a retained forward_split or reverse_split record effective on a session
+    of (e, x] while F(e, x) = 1 ('split_record_excluded', populations.suspected_unadjusted_split), and a retained
+    spin_off record of the held symbol (source_symbol) effective (ex_date) on a session of (e, x]
+    ('spin_off_record_excluded', populations.corporate_actions: a spin-off's entitlement is shares of another issuer,
+    which the cash term does not book). None when neither applies."""
+    if any(r.get("date") and e < r["date"] <= x for r in ctx.records(SPLIT_TYPES, symbol=sym)) and \
+            _factor(ev, e, x) == 1.0:
+        return "split_record_excluded"
+    if any(r.get("date") and e < r["date"] <= x for r in ctx.records(SPIN_OFF_TYPES, source_symbol=sym)):
+        return "spin_off_record_excluded"
+    return None
+
+
+def accounting_defined(ctx: Ctx, ev: dict, e: str, x: str) -> bool:
+    """Whether a booking from e to x has a defined share factor and cash term (review round 15, F05), from the
+    cumulative adjustment factors a(s) and D(s) and bar presence alone (core.costs.cash_defined): the condition under
+    which the read books an exit or excludes the trade as 'undefined_factor'."""
+    if e == x:
+        return _factor(ev, e, x) is not None
+    if not (ev["raw"].get(x) or {}).get("c"):
+        return False
+    return _factor(ev, e, x) is not None and costs.cash_defined(ctx.cal, ev["raw"], ev["split"], ev["all"], e, x)
+
+
 def trade(ev: dict, arm: str, ctx: Ctx, store) -> dict:
     cal, sym, t = ctx.cal, ev["symbol"], ev["t"]
     d1 = cal.offset(t, 1)
@@ -139,10 +165,16 @@ def trade(ev: dict, arm: str, ctx: Ctx, store) -> dict:
     if store.empty(req_in["key"], sym):
         out["entry_window_empty"] = True
     e_session, x_stamp, censored = plan.planned_exit(cal, t, arm, seg_last)
-    split_hit = [r for r in ctx.records(SPLIT_TYPES, symbol=sym) if r.get("date") and d1 < r["date"] <= e_session]
-    if split_hit and _factor(ev, d1, e_session) == 1.0:
-        return {**out, "status": "split_record_excluded"}
+    excluded = record_exclusion(ctx, ev, sym, d1, e_session)
+    if excluded:
+        return {**out, "status": excluded}
     if ctx.mode == "count":
+        # review round 15, F05: the count applies the read's accounting exclusion wherever it can know it without an
+        # exit price: a planned exit session that traded (its raw daily bar exists) books F and the cash term at it,
+        # so an undefined one there excludes the trade in both paths. With no bar on E the exit may be delayed or
+        # terminal (a terminal trade needs neither and stays in the statistic), so the read alone decides it.
+        if (ev["raw"].get(e_session) or {}).get("c") and not accounting_defined(ctx, ev, d1, e_session):
+            return {**out, "status": "undefined_factor"}
         return {**out, "status": "counted" if _has_entry(cal, q_in, x_in) else "no_entry", "notional_ok": True}
     fill_in = fills.fill_at(cal, q_in, x_in, plan.entry_deadline(x_in))
     if fill_in is None:
@@ -210,6 +242,12 @@ def trade(ev: dict, arm: str, ctx: Ctx, store) -> dict:
     if kind == "fill":
         ts_out, quote_out, _ = hit
         x_session = et_date(ts_out)
+        # review round 15, N06: a delayed exit holds the position past E, so the record exclusions run through the
+        # actual exit session, not only through E (a split record in (E, x] with F = 1 would book the wrong shares)
+        if x_session > e_session:
+            excluded = record_exclusion(ctx, ev, sym, d1, x_session)
+            if excluded:
+                return {**out, "status": excluded, "exit_session": x_session}
         exit_mid, h_out = fills.mid(quote_out), fills.half_spread(quote_out)
         hs_out = ctx.cells[costs.cell_key(x_session, ts_out, exit_mid, FM.cum_dv_at(cal, ev["minute"], x_session, ts_out))]
         booked = book(exit_mid, x_session, lambda mode, im: costs.per_side(hs_out, h_out, im, mode))
@@ -297,15 +335,19 @@ def h3c_event(ev: dict, ctx: Ctx) -> dict:
     if missing:
         later = [k for k in range(min(missing) + 1, 6) if opens.get(k) is not None or closes.get(k) is not None]
         return {**out, "status": "terminal" if not later else "missing_leg"}
+    # review round 15, F01 and F05: the count and the read share the event's accounting eligibility: no spin-off
+    # record of the symbol in (t+1, t+5], and every overnight leg's share factor and cash term defined
+    if any(r.get("date") and d[1] < r["date"] <= d[5] for r in ctx.records(SPIN_OFF_TYPES, source_symbol=ev["symbol"])):
+        return {**out, "status": "spin_off_record_excluded"}
+    if not all(accounting_defined(ctx, ev, d[k], d[k + 1]) for k in range(1, 5)):
+        return {**out, "status": "undefined_factor"}
     if ctx.mode == "count":
         return {**out, "status": "counted"}
     overnight, intraday = [], []
     for k in range(1, 5):
         e, x = d[k], d[k + 1]
         F = FM.share_factor(ev["raw"], ev["split"], e, x)
-        cash = _cash(ctx.cal, ev, e, x, F) if F is not None else None
-        if F is None or cash is None:
-            return {**out, "status": "undefined_factor"}
+        cash = _cash(ctx.cal, ev, e, x, F)
         num = opens[k + 1] * F + cash
         if num <= 0:
             return {**out, "status": "undefined_factor"}

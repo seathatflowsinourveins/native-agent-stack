@@ -8,8 +8,9 @@ Empty responses (universe_and_identity.empty_responses): a 200 page set with no 
 'empty', never fetch-incomplete.
 
 Corporate-action dates (review round 8, E7): a record is effective on the session named by one field per type:
-name_change process_date; forward_split, reverse_split, unit_split, stock_dividend and cash_dividend ex_date;
-cash_merger, stock_merger and stock_and_cash_merger effective_date; any other type process_date.
+name_change process_date; forward_split, reverse_split, unit_split, stock_dividend, cash_dividend and (review round
+15, F01) spin_off ex_date; cash_merger, stock_merger and stock_and_cash_merger effective_date; any other type
+process_date.
 """
 from __future__ import annotations
 
@@ -26,12 +27,16 @@ EFFECTIVE_DATE_FIELD = {
     "unit_split": "ex_date",
     "stock_dividend": "ex_date",
     "cash_dividend": "ex_date",
+    "spin_off": "ex_date",
     "cash_merger": "effective_date",
     "stock_merger": "effective_date",
     "stock_and_cash_merger": "effective_date",
 }
 MERGER_TYPES = ("cash_merger", "stock_merger", "stock_and_cash_merger")
 SPLIT_TYPES = ("forward_split", "reverse_split")
+# review round 15, F01: a spin-off's entitlement is shares of another issuer, not cash; its record (source_symbol = the
+# held symbol) excludes the trade or H3-c event (core.trades.record_exclusion)
+SPIN_OFF_TYPES = ("spin_off",)
 SYMBOL_FIELDS = ("symbol", "old_symbol", "new_symbol", "acquirer_symbol", "acquiree_symbol", "target_symbol",
                  "source_symbol", "new_symbol_2")
 

@@ -332,6 +332,107 @@ class Splits(unittest.TestCase):
         self.assertEqual(tr["status"], "undefined_factor")
 
 
+class Round15Accounting(unittest.TestCase):
+    """Review round 15: F01 (spin-off accounting), F05 (the count applies the read's accounting eligibility) and N06
+    (a delayed exit is checked for split records through its actual exit session)."""
+
+    def setUp(self):
+        self.cal = synth.calendar()
+        self.t = "2020-06-01"
+        self.d = [self.cal.offset(self.t, k) for k in range(0, 12)]
+
+    def _both(self, ev, arm, actions=(), qs=None):
+        """(read status, count status) of one trade, the read served from qs."""
+        cal, d = self.cal, self.d
+        qs = qs or [book(cal, d[1], "09:35"), book(cal, d[1], "15:55"), book(cal, d[2], "09:30", dt=1),
+                    book(cal, d[5], "15:55")]
+        read = resolve(ev, arm, ctx_for(cal, actions=actions), Store(), {"MOVR": qs})
+        count = resolve(ev, arm, ctx_for(cal, actions=actions, mode="count"), Store(), {"MOVR": qs})
+        return read["status"], count["status"]
+
+    def test_a_split_record_during_a_delayed_exit_excludes_the_trade(self):
+        """N06: E = d[5]; no quote on E or E+1, a fill on E+2 = d[7], and a forward split record effective on d[7]
+        that the adjusted bars do not carry (F = 1). At e7529b47 only (d1, E] was checked, so the trade was booked
+        with F = 1 at a post-split price (a 50% loss that is an artifact)."""
+        cal, d = self.cal, self.d
+        ev = make_event(cal, self.t)
+        rec = {"type": "forward_split", "symbol": "MOVR", "date": d[7], "new_rate": 2, "old_rate": 1}
+        qs = [book(cal, d[1], "09:35"), book(cal, d[7], "10:00", 5.0, 5.01)]
+        tr = resolve(ev, "b_lane", ctx_for(cal, actions=[rec]), Store(), {"MOVR": qs})
+        self.assertEqual((tr["status"], tr["exit_session"]), ("split_record_excluded", d[7]))
+        # the same fill with no record books a delayed exit
+        tr = resolve(ev, "b_lane", ctx_for(cal), Store(), {"MOVR": qs})
+        self.assertEqual((tr["status"], tr["exit"]), ("filled", "delayed"))
+
+    def test_a_spin_off_record_excludes_the_trade_and_the_h3c_event_in_both_paths(self):
+        """F01: a spin-off's entitlement is shares of another issuer. With a spin_off record of the held symbol
+        effective inside the hold, the trade (read and count) and the H3-c event are excluded and counted; at
+        e7529b47 the all/split step was booked as a dividend and the trade stayed in the statistic."""
+        cal, d = self.cal, self.d
+        ev = make_event(cal, self.t)
+        spin = {"type": "spin_off", "source_symbol": "MOVR", "new_symbol": "SPUN", "date": d[3], "source_rate": 1,
+                "new_rate": 0.5}
+        self.assertEqual(self._both(ev, "b_lane", [spin]), ("spin_off_record_excluded", "spin_off_record_excluded"))
+        self.assertEqual(self._both(ev, "a_intraday", [spin])[0], "filled")      # same-session hold: none spans it
+        for mode in ("read", "count"):
+            self.assertEqual(h3c_event(ev, ctx_for(cal, actions=[spin], mode=mode))["status"],
+                             "spin_off_record_excluded")
+        other = dict(spin, source_symbol="ELSE")
+        self.assertEqual(self._both(ev, "b_lane", [other])[0], "filled")
+
+    def test_a_spin_off_record_is_parsed_with_its_ex_date(self):
+        from core import records
+        body = {"corporate_actions": {"spin_offs": [{"source_symbol": "MOVR", "new_symbol": "SPUN",
+                                                     "ex_date": "2020-06-04", "process_date": "2020-06-05",
+                                                     "source_rate": 1, "new_rate": 0.5}]}}
+        self.assertEqual(records.corporate_actions(body), [{"type": "spin_off", "date": "2020-06-04",
+                                                            "source_symbol": "MOVR", "new_symbol": "SPUN",
+                                                            "new_rate": 0.5}])
+
+    def test_a_distribution_without_a_record_is_booked_as_cash(self):
+        """F01's limitation, pinned: a distribution that the provider's all adjustment carries but no retained record
+        names (a spin-off whose record is missing looks the same) is booked as cash at its adjustment value, the
+        close before its ex-date times the step, never as a share change."""
+        cal, d = self.cal, self.d
+        ev = make_event(cal, self.t)
+        raw, split, allc = synth.series(cal, cal.offset(self.t, -60), cal.offset(self.t, 12),
+                                        lambda x: 10.0 if x < d[3] else 9.0, cash_at={d[3]: 1.0})
+        ev.update({"raw": raw, "split": split, "all": allc})
+        qs = [book(cal, d[1], "09:35"), book(cal, d[5], "15:55", 9.0, 9.02)]
+        tr = resolve(ev, "b_lane", ctx_for(cal), Store(), {"MOVR": qs})
+        self.assertEqual((tr["status"], tr["F"]), ("filled", 1.0))
+        self.assertAlmostEqual(tr["cash"], 1.0, places=9)
+
+    def test_the_count_excludes_what_the_read_excludes_for_an_undefined_factor(self):
+        """F05: E = d[5] traded (its raw bar exists) but its split bar is missing, so F(d1, E) is undefined: the read
+        books nothing ('undefined_factor') and the count now agrees; at e7529b47 the count returned 'counted' before
+        the accounting checks. With no raw bar on E at all (a halt or a delisting), the count keeps the trade and the
+        read decides it (a terminal trade stays in the statistic)."""
+        cal, d = self.cal, self.d
+        ev = make_event(cal, self.t)
+        del ev["split"][d[5]]
+        self.assertEqual(self._both(ev, "b_lane"), ("undefined_factor", "undefined_factor"))
+        halted = make_event(cal, self.t, missing=(d[5],))
+        qs = [book(cal, d[1], "09:35"), book(cal, d[3], "11:00", 4.0, 4.05)]
+        read, count = self._both(halted, "b_lane", qs=qs)
+        self.assertEqual(count, "counted")
+        tr = resolve(halted, "b_lane", ctx_for(cal), Store(), {"MOVR": qs})
+        self.assertEqual((read, tr["exit"]), ("filled", "terminal_zero"))
+
+    def test_the_h3c_count_applies_the_reads_leg_accounting(self):
+        """F05: H3-c overnight legs whose all bars are missing have an undefined cash term: the read excludes the event
+        and the count now does too (at e7529b47 the count returned 'counted' once the 8 prints existed)."""
+        cal, d = self.cal, self.d
+        ev = make_event(cal, self.t)
+        raw, split, allc = synth.series(cal, cal.offset(self.t, -60), cal.offset(self.t, 12),
+                                        lambda x: 10.0 if x < d[3] else 9.0, cash_at={d[3]: 1.0})
+        del allc[d[3]]
+        ev.update({"raw": raw, "split": split, "all": allc})
+        del ev["all"][d[2]]
+        for mode in ("read", "count"):
+            self.assertEqual(h3c_event(ev, ctx_for(cal, mode=mode))["status"], "undefined_factor", mode)
+
+
 def _entry_store(cal, ev, d):
     store = Store()
     req = plan.entry_window(cal, "MOVR", ev["t"], "b_lane")
