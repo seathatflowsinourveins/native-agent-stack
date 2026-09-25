@@ -224,8 +224,8 @@
       "purpose": "Compact supported command outputs, retain failure/raw recovery",
       "upstream_commands": {
         "install": [
-          "gh release download v0.49.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir \"$STACK_HOME/downloads/rtk-0.49.0\"",
-          "(cd \"$STACK_HOME/downloads/rtk-0.49.0\" && sha256sum --check --ignore-missing checksums.txt && tar -xf rtk-x86_64-unknown-linux-musl.tar.gz -C \"$PREFIX\")"
+          "gh release download v0.50.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir \"$STACK_HOME/downloads/rtk-0.50.0\"",
+          "(cd \"$STACK_HOME/downloads/rtk-0.50.0\" && sha256sum --check --ignore-missing checksums.txt && tar -xf rtk-x86_64-unknown-linux-musl.tar.gz -C \"$PREFIX\")"
         ],
         "use": [
           "rtk git log -3",
@@ -236,7 +236,7 @@
           "rtk gain --project --format json"
         ],
         "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
-        "install_note": "Official [rtk-ai/rtk v0.49.0](https://github.com/rtk-ai/rtk/releases/tag/v0.49.0), asset `rtk-x86_64-unknown-linux-musl.tar.gz`, `checksums.txt`; exact archive procedure above The guarded subshell checks and extracts inside the owned download directory; PREFIX must be the absolute owned installation prefix.",
+        "install_note": "Official [rtk-ai/rtk v0.50.0](https://github.com/rtk-ai/rtk/releases/tag/v0.50.0), asset `rtk-x86_64-unknown-linux-musl.tar.gz`, `checksums.txt`; exact archive procedure above; for the Claude hook, also the `exclude_commands` config in recipes/README.md. The guarded subshell checks and extracts inside the owned download directory; PREFIX must be the absolute owned installation prefix.",
         "statistics_note": "Upstream savings estimate; keep its own scope."
       },
       "returned_result_summary": "2026-09-20 14:55:57 UTC upstream refresh returned 1,722 estimated saved tokens across 55 retained commands; the selected project's 234 across 18 commands are included. Earlier same-day Desktop acceptance: native rtk git log -3 returned successfully; meter moved from 54 commands / 1,708 saved to 55 commands / 1,722 saved. An independent SQLite row matched 118 input, 104 output, 14 saved and 9 ms. These are estimates over retained history, not measured provider savings.",
@@ -1425,14 +1425,14 @@
       "purpose": "Convert supported source documents to readable Markdown",
       "upstream_commands": {
         "install": [
-          "uv tool install markitdown==0.1.7"
+          "uv tool install markitdown==0.1.8"
         ],
         "use": [
           "markitdown fixtures/greeting.html -o \"$STACK_HOME/output/greeting.md\""
         ],
         "statistics": [],
         "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
-        "install_note": "`uv tool install markitdown==0.1.7`",
+        "install_note": "`uv tool install markitdown==0.1.8`",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
       "returned_result_summary": "Retained upstream CLI exited 0 and output contained the expected greeting heading. Stored HTML conversion 10322\u21921360 o 200 k tokens; base HTML converter only, PDF/Office extras absent from this installation.",

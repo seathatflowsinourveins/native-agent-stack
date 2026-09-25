@@ -151,7 +151,7 @@ Desktop WSL, native Claude and native Codex Context Mode runtime scopes.
 
 | Upstream command/tool | Native scope | Interpretation |
 | --- | --- | --- |
-| rtk gain --format json | Retained command-history estimates | Installed 0.49.0 defaults history_days to 90; this is not a forever ledger or provider accounting. |
+| rtk gain --format json | Retained command-history estimates | Installed 0.50.0, like 0.49.0, defaults history_days to 90; this is not a forever ledger or provider accounting. 0.50.0 clamps negative per-command savings to 0 when reading; 0.49.0 shows them as values near 1.8e19. |
 | rtk gain --project --format json | Same history, selected project | A subset of the all-history view, not another total to add. |
 | toon input.json --stats -o output.toon | One conversion | TOON 4.1.1 uses tokenx 1.3.0 estimates here; no native cross-run savings ledger. Exact o200k_base recount is separate. |
 | Context Mode ctx_stats | Connection/session and reported lifetime estimates | Session estimates differ from lifetime event-count × 256-token heuristics; neither is exact provider usage. A new Inspector connection has its own session. |

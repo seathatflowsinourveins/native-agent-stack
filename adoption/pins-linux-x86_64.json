@@ -99,11 +99,11 @@
     },
     {
       "id": "rtk",
-      "version": "0.49.0",
+      "version": "0.50.0",
       "kind": "tarball",
-      "url": "https://github.com/rtk-ai/rtk/releases/download/v0.49.0/rtk-x86_64-unknown-linux-musl.tar.gz",
-      "sha256": "7278231dfd7e6a730a4ab7f847b195bcf02289c2d57622b0dab75a6411100c8f",
-      "install_note": "Verified against the release's checksums.txt fetched 2026-09-22, matching blueprints/convergence-practice/wsl-native-tools style pins and recipes/README.md's rtk 0.49.0 row.",
+      "url": "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz",
+      "sha256": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
+      "install_note": "Verified against the v0.50.0 release's checksums.txt fetched 2026-09-25 (`sha256sum --check --strict`: OK; the checksums.txt sha256 4c7116898ae812960dfa0de3b3acc5406a0da49209f0ad7bed4d4ed8c4785048 equals the GitHub API asset digest), matching recipes/README.md's rtk 0.50.0 row; qualified against 0.49.0 and switched on nativestack-5975wx-20260925 (evidence/receipts/rtk-050-qualification-20260925.json). The bootstrap installs the binary only: a host that runs the Claude hook also needs the ~/.config/rtk/config.toml exclude_commands in recipes/README.md, or 0.50.0's `git show <rev>:<path> | tail` blob window is live.",
       "version_probe": {
         "method": "exec",
         "command": "rtk",
@@ -156,11 +156,11 @@
     },
     {
       "id": "markitdown",
-      "version": "0.1.7",
+      "version": "0.1.8",
       "kind": "uv-tool",
-      "url": "https://files.pythonhosted.org/packages/59/93/e8a4af0c47551beb6383e226e840cbc811a577b8096eb385251b3fcc8f62/markitdown-0.1.7.tar.gz",
-      "sha256": "4d1f3c69cd43b82288fdc3653686d759dcf355ee7c681aa6a855aed98a1e4f44",
-      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: the host that recorded PR #139 (docs/decisions/2026-09-23-claude-user-profile.md) had markitdown 0.1.7 (Microsoft's Office/PDF/HTML-to-Markdown converter) installed as a uv tool on 2026-09-23: its uv-receipt.toml required markitdown==0.1.7 with no-build, and its console script's shebang pointed into the tool's own virtualenv. That is one host's state, not evidence about any other Linux host. The artifact at the URL above was re-downloaded and sha256-hashed independently; it matches PyPI's published digest (https://pypi.org/pypi/markitdown/0.1.7/json urls[].digests.sha256, read 2026-09-23). install_pin's *-uv-tool case runs `uv tool install --python 3.13 markitdown==0.1.7` into UV_TOOL_DIR, so the entry point runs in its own environment. uv resolves the pinned version from PyPI and does not check this sha256; it is recorded as an independent artifact cross-check and satisfies this catalog's fail-closed null-sha256 refusal.",
+      "url": "https://files.pythonhosted.org/packages/11/60/2431842a40975524da12edd4d64dd7dc31ef56e209b4848ebf0b14ad1431/markitdown-0.1.8.tar.gz",
+      "sha256": "17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed",
+      "install_note": "2026-09-25: 0.1.8 was qualified against 0.1.7 and switched on nativestack-5975wx-20260925 (evidence/receipts/markitdown-018-qualification-20260925.json); that is one host's state, not evidence about any other Linux host. The sdist at the URL above (69,112 bytes) and the wheel uv installs, markitdown-0.1.8-py3-none-any.whl (89,737 bytes, sha256 de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab), were downloaded and sha256-hashed; both match PyPI's published digests (https://pypi.org/pypi/markitdown/0.1.8/json urls[].digests.sha256 and the PEP 691 Simple API, read 2026-09-25). install_pin's *-uv-tool case runs `uv tool install --python 3.13 markitdown==0.1.8` into UV_TOOL_DIR, so the entry point runs in its own environment. uv resolves the pinned version from PyPI and does not check this sha256; it is recorded as an independent artifact cross-check and satisfies this catalog's fail-closed null-sha256 refusal.",
       "version_probe": {
         "method": "exec",
         "command": "markitdown",

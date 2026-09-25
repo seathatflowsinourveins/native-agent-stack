@@ -12,19 +12,19 @@ counter capture uses the Python standard library and installed upstream tools.
 ## Install the selected upstream tools once
 
 The [native recipes](../../recipes/README.md) contain the pinned release and
-checksum procedure for RTK 0.49.0, plus the official upstream source links.
+checksum procedure for RTK 0.50.0, plus the official upstream source links.
 Keep a working existing installation; installation is not a step in each refresh.
 For a new Linux x86_64 installation, the upstream commands are:
 
 ```sh
 REPORT_TOOLS="${XDG_DATA_HOME:-$HOME/.local/share}/native-token-report"
-mkdir -p "$REPORT_TOOLS/rtk-0.49.0"
-gh release download v0.49.0 --repo rtk-ai/rtk \
+mkdir -p "$REPORT_TOOLS/rtk-0.50.0"
+gh release download v0.50.0 --repo rtk-ai/rtk \
   --pattern rtk-x86_64-unknown-linux-musl.tar.gz \
-  --pattern checksums.txt --dir "$REPORT_TOOLS/rtk-0.49.0"
+  --pattern checksums.txt --dir "$REPORT_TOOLS/rtk-0.50.0"
 (
   set -eu
-  cd "$REPORT_TOOLS/rtk-0.49.0"
+  cd "$REPORT_TOOLS/rtk-0.50.0"
   sha256sum --check --ignore-missing checksums.txt
   tar -xf rtk-x86_64-unknown-linux-musl.tar.gz
 )
@@ -32,7 +32,7 @@ uv venv "$REPORT_TOOLS/headroom-0.37.0"
 uv pip install --python "$REPORT_TOOLS/headroom-0.37.0/bin/python" headroom-ai==0.37.0
 uv tool install jcodemunch-mcp==1.108.319
 npm install --prefix "$REPORT_TOOLS/mcporter-0.13.13" mcporter@0.13.13
-export PATH="$REPORT_TOOLS/rtk-0.49.0:$REPORT_TOOLS/headroom-0.37.0/bin:$REPORT_TOOLS/mcporter-0.13.13/node_modules/.bin:$HOME/.local/bin:$PATH"
+export PATH="$REPORT_TOOLS/rtk-0.50.0:$REPORT_TOOLS/headroom-0.37.0/bin:$REPORT_TOOLS/mcporter-0.13.13/node_modules/.bin:$HOME/.local/bin:$PATH"
 ```
 
 The checksum command must report the selected archive as `OK`. Other operating

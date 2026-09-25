@@ -1201,31 +1201,31 @@
     {
       "component_id": "markitdown",
       "repository": "https://github.com/microsoft/markitdown",
-      "selected_repository_url": "https://github.com/microsoft/markitdown/releases/tag/v0.1.7",
-      "selected_version": "0.1.7",
+      "selected_repository_url": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
+      "selected_version": "0.1.8",
       "selected_source_pin": null,
       "checks": [
         {
           "endpoint": "repos/microsoft/markitdown",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:41.467781+00:00",
-          "ended_at": "2026-09-21T22:31:41.941218+00:00",
-          "stdout_sha256": "bf642bffc687f72f07b24d32c63af73ef145184728528db7012f35a2edb42236",
+          "started_at": "2026-09-25T20:09:07.664195+00:00",
+          "ended_at": "2026-09-25T20:09:08.111664+00:00",
+          "stdout_sha256": "24b85e1f3b5b2acea1291d33ab7da6649fa9d9a0917ac01ca8939ba68eaeed33",
           "status": "ok"
         },
         {
           "endpoint": "repos/microsoft/markitdown/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:41.941316+00:00",
-          "ended_at": "2026-09-21T22:31:42.262479+00:00",
-          "stdout_sha256": "08016b30179f7cacdc5791e8852abdd4a5a02f08ca33a6ebdeb6c138c05e1656",
+          "started_at": "2026-09-25T20:09:08.111772+00:00",
+          "ended_at": "2026-09-25T20:09:08.395510+00:00",
+          "stdout_sha256": "3aa3cf5ae4dc923c6eaabe024e4584447f74dc40a3c8b0f7a4f9fcf03e5e510b",
           "status": "ok"
         },
         {
           "endpoint": "repos/microsoft/markitdown/commits/v0.1.8",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:42.262659+00:00",
-          "ended_at": "2026-09-21T22:31:42.692444+00:00",
+          "started_at": "2026-09-25T20:09:08.395640+00:00",
+          "ended_at": "2026-09-25T20:09:08.760923+00:00",
           "stdout_sha256": "82210f399d03b385c46ba111f8c775adcbdd9e7c9aebd6dcd4d28be5f6b9d5d9",
           "status": "ok"
         }
@@ -1254,7 +1254,7 @@
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "version_only",
       "primary_repository": "https://github.com/microsoft/markitdown",
-      "release_relationship": "newer_stable_release_review_pending"
+      "release_relationship": "selected_version_matches_latest_stable"
     },
     {
       "component_id": "mcp-inspector",
@@ -1768,32 +1768,32 @@
     {
       "component_id": "rtk",
       "repository": "https://github.com/rtk-ai/rtk",
-      "selected_repository_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
-      "selected_version": "0.49.0",
+      "selected_repository_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+      "selected_version": "0.50.0",
       "selected_source_pin": null,
       "checks": [
         {
           "endpoint": "repos/rtk-ai/rtk",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:05.566557+00:00",
-          "ended_at": "2026-09-21T22:32:06.411882+00:00",
-          "stdout_sha256": "81d2ce0e8b76d2294b953413f269623984109e01cc2c27701da651cefeb6a93e",
+          "started_at": "2026-09-25T20:09:06.688018+00:00",
+          "ended_at": "2026-09-25T20:09:07.077689+00:00",
+          "stdout_sha256": "1743ded3363d2bdcf86ff118d0575a487b8bed71941dcf8fded67b043fa739bf",
           "status": "ok"
         },
         {
           "endpoint": "repos/rtk-ai/rtk/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:06.412123+00:00",
-          "ended_at": "2026-09-21T22:32:07.171116+00:00",
-          "stdout_sha256": "b5ab7424cf4eaa3861dd258ccc65ddebdd8bfcb24aa64f32cae58338ff959f17",
+          "started_at": "2026-09-25T20:09:07.077794+00:00",
+          "ended_at": "2026-09-25T20:09:07.344426+00:00",
+          "stdout_sha256": "247043896c94397b0ad595b176f21b70b80967c84bcb85ee2bdcb97cf9f104a4",
           "status": "ok"
         },
         {
-          "endpoint": "repos/rtk-ai/rtk/commits/v0.49.0",
+          "endpoint": "repos/rtk-ai/rtk/commits/v0.50.0",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:07.172024+00:00",
-          "ended_at": "2026-09-21T22:32:07.798001+00:00",
-          "stdout_sha256": "3b0484210c3f6f65ef7cb3f48dcd05f8f98cc724b75b2775ccac8bccc96adba7",
+          "started_at": "2026-09-25T20:09:07.344600+00:00",
+          "ended_at": "2026-09-25T20:09:07.664062+00:00",
+          "stdout_sha256": "3ed900f60361792b8c8fa84b1be35988bed740390f9b352ac99f31d26c24d1b9",
           "status": "ok"
         }
       ],
@@ -1801,21 +1801,21 @@
       "archived": false,
       "disabled": false,
       "default_branch": "develop",
-      "pushed_at": "2026-09-21T15:06:25Z",
+      "pushed_at": "2026-09-25T10:14:06Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v0.49.0",
-        "published_at": "2026-09-11T08:52:38Z",
-        "html_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
-        "target_commitish": "b1c0dc00649c50fbe8930f849c800d4d6ca12091",
+        "tag_name": "v0.50.0",
+        "published_at": "2026-09-24T10:02:31Z",
+        "html_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+        "target_commitish": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.49.0",
-        "sha": "b1c0dc00649c50fbe8930f849c800d4d6ca12091",
-        "html_url": "https://github.com/rtk-ai/rtk/commit/b1c0dc00649c50fbe8930f849c800d4d6ca12091",
-        "committed_at": "2026-09-11T08:52:10Z"
+        "ref": "v0.50.0",
+        "sha": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+        "html_url": "https://github.com/rtk-ai/rtk/commit/1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+        "committed_at": "2026-09-24T10:01:59Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",

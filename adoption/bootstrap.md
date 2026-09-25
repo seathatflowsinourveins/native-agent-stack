@@ -144,7 +144,12 @@ GitHub-hosted macOS runner; see
    text only: the markitdown, tavily-cli, orx and agent-browser notes
    attribute their installed-state observations to the 2026-09-23 recording
    host. Versions, URLs and hashes are unchanged, so a host at that tag
-   installs the same artifacts.
+   installs the same artifacts. It changed after `v2026.09.25.1` again: rtk
+   moves from 0.49.0 to 0.50.0 and markitdown from 0.1.7 to 0.1.8 (URLs,
+   hashes and notes), so a host at that tag installs the earlier two. A host
+   that runs the Claude RTK hook at 0.50.0 also needs the `exclude_commands`
+   config in [the RTK hook recipe](../recipes/README.md#native-context-mode-and-hooks),
+   which the script does not write.
 
    Both scripts and both claude-code pins changed after `v2026.09.24.1`: at
    that tag the pins are 2.1.280 and `adoption/bootstrap-linux.sh` and

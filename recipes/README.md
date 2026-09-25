@@ -44,16 +44,16 @@ For an archive entry in the catalog, use its linked release and the following na
 
 ```sh
 REPOSITORY=rtk-ai/rtk
-RELEASE=v0.49.0
+RELEASE=v0.50.0
 ASSET=rtk-x86_64-unknown-linux-musl.tar.gz
-PREFIX="$STACK_HOME/tools/rtk-0.49.0"
+PREFIX="$STACK_HOME/tools/rtk-0.50.0"
 gh release view "$RELEASE" --repo "$REPOSITORY" --json tagName,assets
-mkdir -p "$PREFIX" "$STACK_HOME/downloads/rtk-0.49.0"
-gh release download "$RELEASE" --repo "$REPOSITORY" --pattern "$ASSET" --dir "$STACK_HOME/downloads/rtk-0.49.0"
-gh release download "$RELEASE" --repo "$REPOSITORY" --pattern checksums.txt --dir "$STACK_HOME/downloads/rtk-0.49.0"
+mkdir -p "$PREFIX" "$STACK_HOME/downloads/rtk-0.50.0"
+gh release download "$RELEASE" --repo "$REPOSITORY" --pattern "$ASSET" --dir "$STACK_HOME/downloads/rtk-0.50.0"
+gh release download "$RELEASE" --repo "$REPOSITORY" --pattern checksums.txt --dir "$STACK_HOME/downloads/rtk-0.50.0"
 # In the download directory, check the exact asset against the publisher's checksum.
 # Inspect archive members before extracting into the empty versioned prefix.
-cd "$STACK_HOME/downloads/rtk-0.49.0"
+cd "$STACK_HOME/downloads/rtk-0.50.0"
 sha256sum --check --ignore-missing checksums.txt
 tar -tf "$ASSET"
 tar -xf "$ASSET" -C "$PREFIX"
@@ -95,7 +95,7 @@ Commands assume the selected upstream executable is on the current shell's PATH.
 | `gitleaks` · `8.30.1` | Official [gitleaks/gitleaks v8.30.1](https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1), archive/hash above | `gitleaks git --redact=100 --no-banner --no-color --report-format json --report-path "$STACK_HOME/output/gitleaks.json" "$PROJECT_ROOT"`. Exit 0 means no matches in the scanned scope; distinguish detection from operational errors. On macOS, run it through [`adoption/tools/gitleaks-guarded-macos`](../adoption/tools/README.md#macos-gitleaks-guarded-macos-2026-09-24). In this repository's all-refs history the redacted findings exceed its 6 GiB cap (exit 137), so scan a narrower range there. |
 | `headroom` · `0.37.0` | `uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'` | [Upstream MCP compression and retrieval](#headroom-native-compression-and-recovery). The earlier local exact-recovery guard remains separate; no automatic agent-traffic interception. |
 | `huggingface-hub-native` · `1.32.0` | `uv tool install huggingface-hub==1.32.0` | `hf --version`; [revision-pinned model download](#local-semantic-code-search). Authentication, if needed, uses native `hf auth login`; never publish credentials. |
-| `markitdown` · `0.1.7` | `uv tool install markitdown==0.1.7` | `markitdown fixtures/greeting.html -o "$STACK_HOME/output/greeting.md"`; inspect the greeting in the result. This uses the base HTML converter; PDF/Office extras are separate decisions. |
+| `markitdown` · `0.1.8` | `uv tool install markitdown==0.1.8` | `markitdown fixtures/greeting.html -o "$STACK_HOME/output/greeting.md"`; inspect the greeting in the result. This uses the base HTML converter; PDF/Office extras are separate decisions. 0.1.8 replaced 0.1.7 on the NativeStack WSL2 host on 2026-09-25 after a discriminating comparison (`evidence/receipts/markitdown-018-qualification-20260925.json`): fixture, 8-K and committed-HTML outputs are byte-identical, while `<u>` now stays inline HTML and `<strike>`, `%2F` paths and `data-src` images convert differently. |
 | `mcp-inspector` · `2.7.0` | `npm install --global --prefix "$STACK_HOME/tools/mcp-inspector-2.7.0" @modelcontextprotocol/inspector@2.7.0` | `mcp-inspector --cli --config "$PROJECT_ROOT/.mcp.json" --server socraticode --method tools/list --format json --stored-auth-only --cwd "$PROJECT_ROOT"`. Handshake/schema discovery only; follow with a selected tool call for functionality. Read the installed version with `npm ls --global --prefix "$STACK_HOME/tools/mcp-inspector-2.7.0" --depth=0`: the launcher has no version flag and forwards unknown arguments to the default web mode, so `mcp-inspector --version` starts the web UI with `--version` as a stdio server command (observed 2026-09-25 on 2.7.0; 2.8.0's launcher is identical). Unless `MCP_AUTO_OPEN_ENABLED=false`, that web mode also opens a browser tab (on WSL, the Windows browser), which then shows `spawn --version ENOENT`; both client templates set it to `false` for agent commands (`resolveAutoOpen` in the 2.7.0 web build). |
 | `mcporter` · `0.13.13` | `npm install --global --prefix "$STACK_HOME/tools/mcporter-0.13.13" mcporter@0.13.13` | `mcporter --config "$MCPORTER_CONFIG" list socraticode --brief --no-oauth`, then [local semantic search](#local-semantic-code-search) or [Context Mode](#retained-context-mode). Node >=24 is required. |
 | `openresearch` · `0.2.7` | Official [alphaXiv/OpenResearch v0.2.7](https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7), asset `openresearch-cli-x86_64-unknown-linux-musl.tar.xz`; [qualified archive and rollback](native-upgrades-20260921.md) | `orx --no-telemetry discover keyword 'agent memory' --published-after 2026-06-21 --published-before 2026-09-19 --limit 3`; retrieve only a selected result with `orx --no-telemetry paper "$PAPER_ID" --full`. Public literature access, not a model-quality ranking. |
@@ -104,7 +104,7 @@ Commands assume the selected upstream executable is on the current shell's PATH.
 | `qdrant` · `1.19.1` | Official [qdrant/qdrant v1.19.1](https://github.com/qdrant/qdrant/releases/tag/v1.19.1), archive/hash above; retain Apache-2.0 license | `qdrant --config-path "$QDRANT_CONFIG" --disable-telemetry`; [loopback service and RAG](#local-semantic-code-search). Persistent data paths are separate from the versioned binary. |
 | `qmd` · `2.8.3` | `npm install --global --prefix "$STACK_HOME/tools/qmd-2.8.3" @tobilu/qmd@2.8.3` | [Document workflow](#documents-and-selected-artifacts). BM25 `search` uses no model weights; native dependencies can still occupy substantial disk. `query`/`embed` are separate model-enabled choices. |
 | `repomix` · `1.18.1` | [Qualified isolated-prefix installation](native-upgrades-20260921.md#installation) with explicit candidate executable | `repomix "$PROJECT_ROOT" --include 'fixtures/before.py,fixtures/after.py' --style xml --parsable-style --compress --token-count-encoding o200k_base --output "$STACK_HOME/output/selected-code.xml"`. Explicit two-file artifact; compression omits details, so read originals before editing. |
-| `rtk` · `0.49.0` | Official [rtk-ai/rtk v0.49.0](https://github.com/rtk-ai/rtk/releases/tag/v0.49.0), asset `rtk-x86_64-unknown-linux-musl.tar.gz`, `checksums.txt`; exact archive procedure above | In this clone, `rtk git log -6`; use `rtk proxy git log -6` for raw recovery. [Native hooks](#native-context-mode-and-hooks) keep Codex explicit at this stable pin. Counters estimate savings. |
+| `rtk` · `0.50.0` | Official [rtk-ai/rtk v0.50.0](https://github.com/rtk-ai/rtk/releases/tag/v0.50.0), asset `rtk-x86_64-unknown-linux-musl.tar.gz`, `checksums.txt`; exact archive procedure above; for the Claude hook, also the [`exclude_commands` config](#native-context-mode-and-hooks) | In this clone, `rtk git log -6`; use `rtk proxy git log -6` for raw recovery. [Native hooks](#native-context-mode-and-hooks) keep Codex explicit at this stable pin. Counters estimate savings. 0.50.0 replaced 0.49.0 on the NativeStack WSL2 host on 2026-09-25 (`evidence/receipts/rtk-050-qualification-20260925.json`); 0.49.0's hook returned wrong `head` windows and dropped stderr-only failures. |
 | `sandbox-runtime` · `0.0.77` | `npm install --global --prefix "$STACK_HOME/tools/sandbox-runtime-0.0.77" --ignore-scripts @anthropic-ai/sandbox-runtime@0.0.77` | [Isolation workflow](#on-demand-isolation). Linux requires bubblewrap, socat and ripgrep. Package metadata establishes the pin; the CLI can report a fallback version. |
 | `serena` · `c6fbd1c5932df2494ffa0020af5a9fbe80b82143` | Installed command, which the adoption MCP templates name as `${ECO_ROOT}/bin/serena`: `uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143` with `UV_TOOL_DIR` and `UV_TOOL_BIN_DIR` in the ecosystem prefix, as in [bootstrap step 4a](../adoption/bootstrap.md). One-off pinned execution without an install: `uvx --from git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143 serena start-mcp-server --context codex --project-from-cwd` | [Client MCP setup](#native-project-mcp). Upstream declares `2.0.0.dev0`; the commit is the identity. Language-server support varies by project; a handshake alone does not prove every language. |
 | `shanraisshan/claude-code-best-practice` · `15969ed2471a177d938c889255d2f23f07e4742a` | `git clone https://github.com/shanraisshan/claude-code-best-practice.git "$STACK_HOME/tools/claude-code-best-practice"`, then `git -C "$STACK_HOME/tools/claude-code-best-practice" checkout --detach 15969ed2471a177d938c889255d2f23f07e4742a` | Optional reference: read selected README guidance; verify advice against current native docs. No runtime or bulk plugin installation. |
@@ -131,18 +131,25 @@ Back up the affected settings privately first; preserve unrelated hooks and plug
 
 Context Mode's upstream `start.mjs` can maintain its own dependencies/cache-heal hooks and check the npm registry. Native installation is not a promise of offline-only startup. Keep native plugin version/provenance receipts and review changes before upgrading.
 
-RTK 0.49.0 supplies a supported Claude hook and explicit Codex instructions. Install global awareness once in each intended client profile, preserving its existing native home:
+RTK 0.50.0 supplies a supported Claude hook; Codex uses explicit `rtk` commands. Install Claude's global awareness once in each intended client profile, preserving its existing native home:
 
 ```sh
 rtk init --global --auto-patch --no-trust-filters
-rtk init --global --codex
 rtk init --global --show
-rtk init --global --codex --show
 ```
 
-Run the Codex form separately under each intended `CODEX_HOME`; an inherited Desktop home must not be mistaken for the native CLI home. The installer writes `RTK.md` and its global instruction reference. Claude's command installs awareness and preserves an existing matching hook; `--no-trust-filters` avoids expanding trusted project filters during this setup. Fresh sessions consume these instructions. Setup is not a prerequisite to repeat at every startup.
+The installer writes `RTK.md` and its global instruction reference. Claude's command installs awareness and preserves an existing matching hook; `--no-trust-filters` avoids expanding trusted project filters during this setup. Fresh sessions consume these instructions. Setup is not a prerequisite to repeat at every startup. The 2026-09-25 switch to 0.50.0 did not re-run `rtk init`: the hook command it registers, `rtk hook claude`, is unchanged, and the adoption Claude settings template already names it.
 
-The Codex form at this pin writes instructions, not an automatic command-rewriting hook; do not combine `--codex` with `--auto-patch`. The prior automatic candidate did not establish reliable runtime rewriting and is not an active recipe. For raw-sensitive Git/history operations, use explicit commands or RTK's supported exclusions rather than treating compressed output as a complete record. Inspect generated hook changes alongside existing Context Mode hooks. Verify the result with one useful native task and its actual tool output.
+Do not run the Codex form (`rtk init --global --codex`) at this pin. At 0.49.0 it wrote instructions only; at 0.50.0, `rtk init --help` describes `--codex` as "Target Codex CLI (uses PreToolUse hook + AGENTS.md + RTK.md)", and the 2026-09-25 source review found that hook answering `permissionDecision: allow` on every rewrite. That Codex hook is not qualified here. A Codex home that ran the Codex form at 0.49.0 keeps its instructions; otherwise an explicit-command profile carries the RTK instruction in its task envelope ([token practice](../docs/token-practice.md)). The prior automatic candidate did not establish reliable runtime rewriting and is not an active recipe. For raw-sensitive Git/history operations, use explicit commands or RTK's supported exclusions rather than treating compressed output as a complete record. Inspect generated hook changes alongside existing Context Mode hooks. Verify the result with one useful native task and its actual tool output.
+
+**Claude hook exclusions at 0.50.0.** Through the hook, 0.50.0 windows a large `git show <rev>:<path>` blob to about 8 KiB and appends a recovery hint, so `git show <rev>:<path> | tail -n 5` returns lines from that window instead of the end of the file. `diff` on a missing file exits 1 instead of 2 (0.49.0 too). A host that runs the Claude hook therefore needs `~/.config/rtk/config.toml` (`$XDG_CONFIG_HOME/rtk/config.toml` when that is set), keeping any other keys it already has:
+
+```toml
+[hooks]
+exclude_commands = ["^git show [^ ]*:", "diff"]
+```
+
+Then `rtk hook check "git show HEAD:x | tail -n 5"` and `rtk hook check "diff a.txt missing.txt"` print `No rewrite for: ...` and exit 1, while `rtk hook check "git show HEAD~1"` still prints `rtk git show HEAD~1`. [`adoption/bootstrap-linux.sh`](../adoption/bootstrap-linux.sh) installs only the binary, and no adoption template renders this file, so create it by hand. Rewrites that stay imperfect in both versions: `find` on a missing relative directory exits 0 without output, plain `git log` stops at 10 commits without a notice and drops merge commits, and `python3 -m pytest` becomes `rtk pytest`, which does not use the named interpreter; use `rtk proxy <command>` or the native command where that matters. Before rolling back to 0.49.0, count `saved_tokens<0` rows read-only in a snapshot of `history.db`: 0.49.0 shows such rows as values near 1.8e19 in `rtk gain --history`, `--all` and `--format json|csv` ([receipt](../evidence/receipts/rtk-050-qualification-20260925.json)).
 
 ## Native project MCP
 
