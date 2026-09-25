@@ -1,0 +1,105 @@
+{
+ "schema": "news-reversal-s-measurement/1",
+ "run": {
+  "command": "python measure_s.py --out <scratch>/s-measurement.json (from blueprints/us-equities/sota-mover/news-reversal)",
+  "rule_commit": "e8a3ca6a39c0560a375b428561de83be2a58f3fc",
+  "rule_committed_at": "2026-09-25T14:30:23Z",
+  "started_at": "2026-09-25T14:30:29Z",
+  "finished_at": "2026-09-25T14:30:38Z",
+  "exit_code": 0,
+  "runs": 1,
+  "note": "the only run on the private inputs, after the rule, script and tests were committed; the output below is copied unchanged"
+ },
+ "script_sha256": "368411425d890b623e41803ddf31ed6bce758fc8ccffa15c0ac216e59ef804c4",
+ "return_free": "entry quotes, labels, lanes, sessions, Rule 201 inputs and close existence only; no exit price, return or P&L",
+ "inputs": {
+  "pins_equal_frozen_study": true,
+  "root": "~/.local/state/native-agent-stack/research/sota-mover/news-llm",
+  "sha256": {
+   "auctions/auctions.jsonl.gz": "0b545e43358bb1508f35b0a1292d485f250af4382bca80e7ce31ebc3b7d6b3ce",
+   "events.jsonl.gz": "c9f4e9a279409cdac045224b209543c9b68e4d8c127ae30122e7375248937781",
+   "scores/scores-20151231.jsonl": "0f1a3e5d0e437ae4117b94234612c5992bb3f596ab2e0082c22df5209e5e54cd",
+   "scores/scores-20161231.jsonl": "4dba4ccb46ef918f8e81ed41f545cd87a2de344d34c4891ed64c8dd05901f526",
+   "scores/scores-20171231.jsonl": "483525cf3e33d9bcbfe92154aba62e9d781706e97bedb1b1ad23e24ca0329ea7",
+   "scores/scores-20181231.jsonl": "f338c869e41e679afe076487bbb1527bab93f3e47743c70c1f1aab72d32f5e63",
+   "scores/scores-20191231.jsonl": "3ae78a71eab448f3b8eb018a9ec6d65afdfff40a86799d09236aa6c722641f25",
+   "scores/scores-20201231.jsonl": "d082475f262df50bfb50c6271368372405b635761434c67d8af30e28edb835c3",
+   "scores/scores-20211231.jsonl": "37e37eaaa7deeca1b2835a24c0831cfbe43514a89ad5ceb541d27216fe98d9f4",
+   "scores/scores-20221231.jsonl": "0d2cc33203489862c5745396217c01111aec02eba9b0db0eed6783bf8cbc9445",
+   "scores/scores-20231231.jsonl": "a3e8cbb934a3b149f0b1cf4afb03d9ad36c646768e5c0144f996db58bffae49f",
+   "scores/scores-20241231.jsonl": "04dad12f60a7fe7dd1bae82bb1d10bbc0566f811c8e3685bf7a3a17b12b50801",
+   "spreads/quotes.jsonl": "d527b168d1306d10d1857eacf58bf77584802076adbd6c891a29097940a1fbd3"
+  }
+ },
+ "news3": {
+  "S_bps": 21.680849104133692,
+  "S_bps_2025_2026": 36.404759865158375,
+  "inverse_size_mean": 0.16034110264493423,
+  "long_short_days": 2618,
+  "long_short_days_2025_2026": 428,
+  "matches_frozen_news3_days": true,
+  "mean_position_full_spread_bps": 12.027823914401802
+ },
+ "planning": {
+  "S_bps": 21.680849104133692,
+  "confirmatory_min_effect_bps": 5.0,
+  "in_sample_gross_bps": 11.0083,
+  "label": "exploratory",
+  "mid_based_effect_bps": 0.16787544793315412,
+  "planning_effect_bps": -10.672549104133692
+ },
+ "sd_scaling": {
+  "forward_sd_bps_nw_effective": 85.08852457727419,
+  "forward_sd_bps_sample": 75.6138140739448,
+  "ratio": 1.1698325087297485,
+  "rule": "var_forward = var_news3 x E_fwd[1/n_long + 1/n_short] / E_news3[...] (idiosyncratic variance only; the common part of daily variance is not modelled)",
+  "sd_factor": 1.08158795700107
+ },
+ "2025_2026": {
+  "forward_like": {
+   "S_bps_reversal_legs": 31.321050297435146,
+   "both_legs_ge_2_rate": 0.9976689976689976,
+   "both_legs_ge_2_sessions": 428,
+   "inverse_size_mean": 0.18757223435961753,
+   "names_long": {"mean": 12.0, "median": 12, "p10": 12, "p90": 12, "share_at_12": 1.0, "share_ge_2": 1.0},
+   "names_short": {"mean": 10.680652680652681, "median": 12, "p10": 7, "p90": 12, "share_at_12": 0.655011655011655,
+                   "share_ge_2": 0.9976689976689976},
+   "sessions": 429
+  },
+  "study_consistent": {
+   "S_bps_reversal_legs": 35.334580849672435,
+   "both_legs_ge_2_rate": 0.9976689976689976,
+   "both_legs_ge_2_sessions": 428,
+   "inverse_size_mean": 0.08879858478434523,
+   "names_long": {"mean": 92.17249417249417, "median": 89, "p10": 58, "p90": 130, "share_at_12": 1.0, "share_ge_2": 1.0},
+   "names_short": {"mean": 18.12121212121212, "median": 16, "p10": 8, "p90": 31, "share_at_12": 0.7202797202797203,
+                   "share_ge_2": 0.9976689976689976},
+   "sessions": 429
+  }
+ },
+ "news3_segment": {
+  "forward_like": {
+   "S_bps_reversal_legs": 21.196447225919698,
+   "both_legs_ge_2_rate": 0.9779274223718668,
+   "both_legs_ge_2_sessions": 2614,
+   "inverse_size_mean": 0.2224812200041733,
+   "names_long": {"mean": 10.8791619902731, "median": 12, "p10": 7, "p90": 12, "share_at_12": 0.7478488589599701,
+                  "share_ge_2": 0.9958847736625515},
+   "names_short": {"mean": 9.732510288065845, "median": 12, "p10": 4, "p90": 12, "share_at_12": 0.5544332210998878,
+                   "share_ge_2": 0.9816685372240928},
+   "sessions": 2673
+  },
+  "study_consistent": {
+   "S_bps_reversal_legs": 21.554275872258017,
+   "both_legs_ge_2_rate": 0.978675645342312,
+   "both_legs_ge_2_sessions": 2616,
+   "inverse_size_mean": 0.16188056011707289,
+   "names_long": {"mean": 45.19416386083053, "median": 31, "p10": 7, "p90": 104, "share_at_12": 0.7497194163860831,
+                  "share_ge_2": 0.9958847736625515},
+   "names_short": {"mean": 15.762439206883652, "median": 13, "p10": 5, "p90": 30, "share_at_12": 0.5682753460531238,
+                   "share_ge_2": 0.9824167601945379},
+   "sessions": 2673
+  }
+ },
+ "reading": "S = 21.68 bps, so the in-sample reversal gross is about 11.01 - 21.68 = -10.67 bps/day and the mid-based reversal about +0.17 bps/day: NEWS-3's -11.0 bps/day is almost entirely the entry half-spread (about 10.84 bps/day over two legs), not a post-news price reversal. By the rule committed in e8a3ca6a (confirmatory only if 11.0083 - S >= 5.0) the test is EXPLORATORY."
+}
