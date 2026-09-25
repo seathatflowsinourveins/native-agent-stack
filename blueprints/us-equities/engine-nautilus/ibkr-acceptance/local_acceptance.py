@@ -6,18 +6,26 @@ kill switch. Three fresh-process TradingNode phases run against a signed-in PAPE
 or TWS, bracketed by an independent official-ibapi observer.
 
 Subcommands:
-  preflight    Read-only: plan, runtime pins, port, prerequisites, kill-switch latch, session
-               window, paper account (every managed account starts with DU), zero positions and
-               open orders, and the node's client id free. Places and cancels nothing.
-  run          The acceptance run. Refused unless --enable-paper-orders is given.
-  kill-switch  'status', or 'clear --confirm --reason TEXT' (the only way to remove the latch).
-  phase        Internal: one TradingNode phase (A, B or C) in a fresh process, started by 'run'.
+  preflight     Read-only: plan, runtime pins, port, prerequisites, kill-switch latch, session
+                window, paper account (every managed account starts with DU), zero positions and
+                open orders, and the node's client id free. Places and cancels nothing.
+  run           The acceptance run. Refused unless --enable-paper-orders is given. It writes the
+                steps receipt only, never the gate receipt.
+  gate-receipt  The receipt builder, the only writer of the gate receipt. It reads files only: a
+                passed steps receipt and at least one independent corroboration record for the
+                same run (the Gateway API message log or the next-day IBKR activity statement,
+                read in a separate session). It connects to nothing.
+  kill-switch   'status', or 'clear --confirm --reason TEXT' (the only way to remove the latch).
+  phase         Internal: one TradingNode phase (A, B or C) in a fresh process, started by 'run'.
 
 Every order is a non-marketable resting LIMIT BUY of 1 SPY; the runner has no marketable or
 flattening order. The gate receipt (receipt.json next to this file, kind
-native_ibkr_local_acceptance) is written only when every case and checkpoint passed and the
-prerequisite receipts named in the plan exist with status passed. Heavy modules
-(nautilus_trader, ibapi) are imported lazily; nothing connects at import time.
+native_ibkr_local_acceptance) is written only by 'gate-receipt', and only when every case and
+checkpoint of the run passed, the prerequisite receipts named in the plan exist with status
+passed, and a corroboration record from IB's own records passes every check of its source. The
+kill-switch latch, its audit log and the single-writer run lock live at one frozen per-account
+path (CONTROL_DIR), whatever --state-dir says. Heavy modules (nautilus_trader, ibapi) are
+imported lazily; nothing connects at import time.
 """
 from __future__ import annotations
 
@@ -27,6 +35,8 @@ import hashlib
 import importlib.util
 import json
 import os
+import pwd
+import re
 import secrets
 import signal
 import socket
@@ -68,6 +78,46 @@ CANCELLED_STATUSES = {"Cancelled", "ApiCancelled"}
 SESSIONS = {("09:30", "16:00"): "regular", ("16:00", "20:00"): "after_hours"}
 DEFAULT_STATE_DIR = (Path(os.environ.get("XDG_STATE_HOME") or Path.home() / ".local" / "state")
                      / "native-agent-stack" / "ibkr-local-acceptance")
+
+
+def _frozen_control_dir() -> Path:
+    """The account's home directory from the password database (not $HOME, XDG_STATE_HOME or
+    any option) plus a fixed suffix. Path.home() is used only for an account without a
+    password entry."""
+    try:
+        home = Path(pwd.getpwuid(os.getuid()).pw_dir)
+    except KeyError:
+        home = Path.home()
+    return home / ".local" / "state" / "native-agent-stack" / "ibkr-local-acceptance"
+
+
+# The kill-switch latch, its audit log and the single-writer run lock live at this one frozen
+# per-account path, whatever --state-dir says, so a run with any state directory sees an
+# engaged latch and a concurrent run. --state-dir holds the run's phase files only.
+CONTROL_DIR = _frozen_control_dir()
+LATCH_NAME = "kill-switch.json"
+CORROBORATION_KIND = "ibkr_local_acceptance_corroboration"
+# What a steps receipt claims about IB and what the in-process observer (client 98, the same
+# official ibapi library as the adapter) reported. Nothing the runner itself wrote is
+# independent confirmation of these (docs/acceptance-evidence-policy.md).
+RUN_CLAIMS = ("no_duplicate_submission", "r1_r2_cancelled_at_ib", "p1_p2_never_reached_ib", "no_fill",
+              "flat_at_end")
+# Independent sources, read after the run by a separate session: the checks a corroboration
+# record must report true for the run prefix, and the run claims they corroborate. The plan's
+# receipt.gate_receipt.corroboration must list exactly these (validate_plan).
+CORROBORATION_SOURCES = {
+    "gateway_api_message_log": {
+        "checks": ("r1_r2_each_sent_once", "r1_r2_cancelled_by_ib", "p1_p2_never_sent", "no_execution_of_the_run",
+                   "flat_at_end"),
+        "corroborates": RUN_CLAIMS,
+    },
+    "ibkr_activity_statement": {
+        "checks": ("paper_account_statement", "no_trade_in_symbol_on_run_date",
+                   "no_position_in_symbol_at_end_of_run_date"),
+        "corroborates": ("no_fill", "flat_at_end"),
+    },
+}
+SHA256_HEX = re.compile(r"[0-9a-f]{64}")
 PHASE_GRACE_SECONDS = 30
 TERMINATE_GRACE_SECONDS = 20
 # Node build, the first-tick start of a phase's first case and the 1 s watchdog granularity of
@@ -212,9 +262,15 @@ def validate_plan(plan: dict) -> list[str]:
         need(g["schema"] == {"schema_version": 1, "kind": GATE_KIND, "broker": "ibkr"}, "gate receipt schema mismatch")
         need(bool(g["prerequisites"]) and all(p.get("status") == "passed" for p in g["prerequisites"]),
              "gate prerequisites must each require status passed")
+        c = g["corroboration"]
+        need(c["required"] is True and c["record_kind"] == CORROBORATION_KIND,
+             f"gate receipt corroboration must be required, with record kind {CORROBORATION_KIND}")
+        need({k: (list(v["checks"]), list(v["corroborates"])) for k, v in c["sources"].items()}
+             == {k: (list(v["checks"]), list(v["corroborates"])) for k, v in CORROBORATION_SOURCES.items()},
+             "corroboration sources, checks and claims must match the gate-receipt builder's")
         need(bool(plan.get("version_selection_record")), "version_selection_record is required")
         need(plan.get("evidence_class") == "native_paper", "evidence_class must be native_paper")
-    except (KeyError, TypeError, ValueError) as exc:
+    except (AttributeError, KeyError, TypeError, ValueError) as exc:
         errors.append(f"plan field missing or malformed: {exc!r}")
     return errors
 
@@ -313,23 +369,43 @@ def private_dir(path) -> Path:
 class KillSwitch:
     """A file latch independent of any strategy logic. Its existence is the engaged state, so
     an unreadable or corrupt latch still reads as engaged. Only clear() removes it, after an
-    audit line is on disk; no restart path clears it."""
+    audit line is on disk; no restart path clears it.
 
-    def __init__(self, state_dir):
-        self.dir = Path(state_dir)
-        self.path = self.dir / "kill-switch.json"
+    The latch and its audit log live at the frozen per-account CONTROL_DIR, whatever
+    --state-dir says, so a run with any state directory sees an engaged latch. A latch file
+    that an earlier revision of this runner wrote under a state directory (legacy_dirs) also
+    reads as engaged, and clear() removes it too."""
+
+    def __init__(self, legacy_dirs=(), control=None):
+        self.dir = Path(CONTROL_DIR if control is None else control)
+        self.path = self.dir / LATCH_NAME
         self.audit_path = self.dir / "kill-switch-audit.jsonl"
+        seen = {self.path.resolve()}
+        self.legacy_paths = []
+        for directory in legacy_dirs:
+            path = Path(directory) / LATCH_NAME
+            if path.resolve() not in seen:
+                seen.add(path.resolve())
+                self.legacy_paths.append(path)
+
+    def _engaged_paths(self) -> list:
+        return [p for p in (self.path, *self.legacy_paths) if p.exists() or p.is_symlink()]
 
     def engaged(self) -> bool:
-        return self.path.exists() or self.path.is_symlink()
+        return bool(self._engaged_paths())
 
     def status(self) -> dict:
-        if not self.engaged():
+        paths = self._engaged_paths()
+        if not paths:
             return {"engaged": False}
+        out = {"engaged": True, "location": "frozen" if paths[0] == self.path else "legacy_state_dir"}
+        if len(paths) > 1:
+            out["latches"] = len(paths)
         try:
-            return {"engaged": True, "readable": True, "record": json.loads(self.path.read_text())}
+            out.update(readable=True, record=json.loads(paths[0].read_text()))
         except (OSError, ValueError):
-            return {"engaged": True, "readable": False}
+            out.update(readable=False)
+        return out
 
     def _audit(self, entry: dict) -> None:
         fd = os.open(str(self.audit_path), os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
@@ -353,20 +429,28 @@ class KillSwitch:
             return {"status": "refused_not_confirmed"}
         if not reason or not reason.strip():
             return {"status": "refused_reason_required"}
-        if not self.engaged():
+        paths = self._engaged_paths()
+        if not paths:
             return {"status": "not_engaged"}
         entry = {"event": "cleared", "cleared_at": now or utc_now_iso(), "reason": redact(reason)[:200],
-                 "prior": self.status().get("record")}
-        self._audit(entry)  # the audit line is durable before the latch goes
-        self.path.unlink()
-        _fsync_dir(self.dir)
+                 "prior": self.status().get("record"), "latches_cleared": len(paths),
+                 "legacy_latches_cleared": sum(p != self.path for p in paths)}
+        private_dir(self.dir)
+        self._audit(entry)  # the audit line is durable before any latch goes
+        for path in paths:
+            path.unlink()
+            _fsync_dir(path.parent)
         return {"status": "cleared", **entry}
 
 
-def acquire_lock(state_dir):
-    """Single writer per state directory: a held lock refuses a second run. Returns the open
-    file (keep it referenced) or None when another process holds it."""
-    fh = open(Path(state_dir) / "run.lock", "a+")  # noqa: SIM115 - held for the run's lifetime
+def acquire_lock(control=None):
+    """Single writer per account: one 0600 lock file at the frozen CONTROL_DIR, whatever
+    --state-dir says, so a held lock refuses a second run with any state directory. Returns the
+    open file (keep it referenced) or None when another process holds it."""
+    directory = private_dir(CONTROL_DIR if control is None else control)
+    fd = os.open(str(directory / "run.lock"), os.O_RDWR | os.O_CREAT, 0o600)
+    os.fchmod(fd, 0o600)
+    fh = os.fdopen(fd, "r+")  # held for the run's lifetime
     try:
         fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
     except OSError:
@@ -1760,8 +1844,12 @@ def write_json(path, receipt: dict, secret_values=(), quiet=False) -> int:
     return code
 
 
-def gate_receipt(plan: dict, receipt: dict, receipt_path: Path, prerequisites: list[dict], repo=None) -> dict:
-    """The preregistered flip receipt; built only for a passed run."""
+def gate_receipt(plan: dict, receipt: dict, receipt_path: Path, prerequisites: list[dict], corroborations: list[dict],
+                 repo=None) -> dict:
+    """The preregistered flip receipt; built only by the gate-receipt builder, for a passed run
+    with at least one checked corroboration record (cmd_gate_receipt)."""
+    if not corroborations:
+        raise ValueError("a gate receipt needs at least one checked corroboration record")
     phases = {p["phase"]: p for p in receipt.get("phases", [])}
 
     def case(phase, cid):
@@ -1770,8 +1858,14 @@ def gate_receipt(plan: dict, receipt: dict, receipt_path: Path, prerequisites: l
                 return c
         return None
 
+    covered = {claim for record in corroborations for claim in record["corroborates"]}
     return {"schema_version": 1, "kind": GATE_KIND, "status": "passed", "broker": "ibkr",
             "generated_at": utc_now_iso(), "evidence_class": "native_paper",
+            "run_finished_at": receipt.get("finished_at"),
+            "corroboration": {"records": corroborations,
+                              "claims_corroborated": [c for c in RUN_CLAIMS if c in covered],
+                              "claims_on_the_in_process_observer_only": [c for c in RUN_CLAIMS if c not in covered]},
+            "builder_sha256": PO.sha256_file(RUNNER_PATH),
             "engine": {"nautilus_trader": receipt.get("nautilus_trader_version"), "ibapi": receipt.get("ibapi_version"),
                        "adapter": plan["engine"]["adapter"], "selected_by": plan["version_selection_record"]},
             "gateway": {"port": receipt.get("port"), "paper_account_prefix": plan["account_prefix"], "managed_accounts": 1},
@@ -1800,6 +1894,107 @@ def run_status(phases: list[dict], checkpoints: dict, final: dict | None) -> str
     if "failed" in statuses or any(c.get("passed") is False for c in checkpoints.values()) or final.get("passed") is False:
         return "failed"
     return "incomplete"
+
+
+def steps_receipt_errors(steps) -> list[str]:
+    """Why a steps receipt cannot back the gate receipt; empty means it can. Re-derives the run
+    status from the phases, checkpoints and final observer instead of trusting its status field."""
+    if not isinstance(steps, dict):
+        return ["not_a_json_object"]
+    reasons = []
+    if steps.get("schema_version") != SCHEMA_VERSION or steps.get("kind") != RECEIPT_KIND:
+        reasons.append("not_a_steps_receipt")
+    if steps.get("status") != "passed" or steps.get("provisional"):
+        reasons.append(f"status_{steps.get('status')}")
+    if steps.get("evidence_class") != "native_paper":
+        reasons.append("evidence_class")
+    if steps.get("plan") not in PLAN_NAMES or not SHA256_HEX.fullmatch(str(steps.get("plan_sha256") or "")):
+        reasons.append("plan")
+    if not str(steps.get("run_prefix") or "").startswith("NTA-"):
+        reasons.append("run_prefix")
+    phases, checkpoints = steps.get("phases") or [], steps.get("checkpoints") or {}
+    try:
+        passed = ([p["phase"] for p in phases] == list(PHASES)
+                  and run_status(phases, checkpoints, steps.get("final")) == "passed")
+    except (AttributeError, KeyError, TypeError):
+        passed = False
+    if not passed:
+        reasons.append("run_not_passed")
+    if (steps.get("gate_receipt") or {}).get("eligible") is not True:
+        reasons.append("gate_receipt_not_eligible")
+    if _aware(steps.get("finished_at")) is None:
+        reasons.append("finished_at_missing")
+    return reasons
+
+
+def _aware(value) -> datetime | None:
+    """An ISO 8601 time with a UTC offset, else None."""
+    try:
+        parsed = datetime.fromisoformat(str(value))
+    except (TypeError, ValueError):
+        return None
+    return parsed if parsed.tzinfo is not None else None
+
+
+def run_trade_date(plan: dict, steps: dict) -> str | None:
+    started = _aware(steps.get("generated_at"))
+    return started.astimezone(ZoneInfo(plan["session"]["timezone"])).date().isoformat() if started else None
+
+
+def corroboration_errors(record, steps: dict, steps_rel: str, steps_sha256: str, plan: dict) -> list[str]:
+    """Why a corroboration record does not corroborate this run; empty means it does. The record
+    comes from IB's own records (README 'Independent corroboration'), read after the run by a
+    separate session; it names the private raw files by sha256 only."""
+    if not isinstance(record, dict):
+        return ["record must be a JSON object"]
+    errors = []
+
+    def need(cond, msg):
+        if not cond:
+            errors.append(msg)
+
+    def section(key) -> dict:
+        value = record.get(key)
+        return value if isinstance(value, dict) else {}
+
+    need(record.get("schema_version") == 1, "schema_version must be 1")
+    need(record.get("kind") == CORROBORATION_KIND, f"kind must be {CORROBORATION_KIND}")
+    need(record.get("run_prefix") == steps.get("run_prefix"), "run_prefix must be the steps receipt's")
+    bound = section("steps_receipt")
+    need(bound.get("path") == steps_rel and bound.get("sha256") == steps_sha256,
+         "steps_receipt must name this steps receipt's path and sha256")
+    source, observer = section("source"), section("observer")
+    kind = source.get("kind")
+    spec = CORROBORATION_SOURCES.get(kind)
+    need(spec is not None, f"source.kind must be one of {sorted(CORROBORATION_SOURCES)}")
+    raw = source.get("raw_sha256")
+    need(isinstance(raw, list) and bool(raw) and all(isinstance(h, str) and SHA256_HEX.fullmatch(h) for h in raw),
+         "source.raw_sha256 must list the sha256 of each private raw file")
+    finished, retrieved, observed = (_aware(steps.get("finished_at")), _aware(source.get("retrieved_at")),
+                                     _aware(observer.get("observed_at")))
+    need(retrieved is not None and finished is not None and retrieved >= finished,
+         "source.retrieved_at must be an ISO time with a UTC offset, after the run finished")
+    need(observed is not None and retrieved is not None and observed >= retrieved,
+         "observer.observed_at must be an ISO time with a UTC offset, after source.retrieved_at")
+    need(observer.get("separate_session") is True, "observer.separate_session must be true")
+    need(observer.get("started_the_run") is False, "observer.started_the_run must be false")
+    need(isinstance(observer.get("method"), str) and bool(observer["method"].strip()),
+         "observer.method must describe the read-only method")
+    if kind == "gateway_api_message_log":
+        ids = source.get("client_ids")
+        wanted = {plan["client_ids"]["node"], plan["client_ids"]["check"]}
+        need(isinstance(ids, list) and all(isinstance(i, int) for i in ids) and wanted <= set(ids),
+             f"source.client_ids must include the node's and the observer's ids {sorted(wanted)}")
+    elif kind == "ibkr_activity_statement":
+        tz, trade_date = ZoneInfo(plan["session"]["timezone"]), run_trade_date(plan, steps)
+        need(trade_date is not None and source.get("statement_date") == trade_date,
+             "source.statement_date must be the run's New York trade date")
+        need(retrieved is not None and trade_date is not None and retrieved.astimezone(tz).date().isoformat() > trade_date,
+             "an activity statement must be retrieved on a later New York date than the run")
+    checks = section("checks")
+    for name in (spec or {}).get("checks", ()):
+        need(checks.get(name) is True, f"checks.{name} must be true")
+    return errors
 
 
 # --------------------------------------------------------------------------- parent: phases
@@ -1972,8 +2167,7 @@ def cmd_preflight(a, *, check_fn=None, contender_fn=None, now_fn=None, versions_
     out.update(fields)
     account = None
     if status is None:
-        state = Path(a.state_dir)
-        if KillSwitch(state).engaged():
+        if KillSwitch(legacy_dirs=(a.state_dir, DEFAULT_STATE_DIR)).engaged():
             status = "refused_kill_switch_engaged"
         else:
             status, account, _ = _checks_before_orders(
@@ -2011,15 +2205,18 @@ def cmd_run(a, *, check_fn=None, contender_fn=None, observe_fn=None, cancel_fn=N
     if status:
         return _refuse(receipt, receipt_path, status)
     state = private_dir(a.state_dir)
-    kill = KillSwitch(state)
+    # The latch and the lock sit at the frozen CONTROL_DIR, so another --state-dir changes neither.
+    kill = KillSwitch(legacy_dirs=(state, DEFAULT_STATE_DIR))
     if kill.engaged():
         return _refuse(receipt, receipt_path, "refused_kill_switch_engaged", kill_switch=kill.status())
-    lock = acquire_lock(state)
+    lock = acquire_lock()
     if lock is None:
         return _refuse(receipt, receipt_path, "refused_concurrent_run")
     signals = signals or ParentSignals()
     account = None
     try:
+        if kill.engaged():  # read again under the lock: a run that just ended may have engaged it
+            return _refuse(receipt, receipt_path, "refused_kill_switch_engaged", kill_switch=kill.status())
         signals.install()
         status, account, window_end = _checks_before_orders(
             a, plan, receipt, check_fn=check_fn or PO.run_check, contender_fn=contender_fn or contender_probe,
@@ -2130,12 +2327,13 @@ def _run_phases(a, plan, receipt, receipt_path, account, prefix, ids, run_dir, t
         status = "incomplete"
     receipt["status"] = status
     receipt["elapsed_seconds"] = round(time.monotonic() - t0, 3)
+    receipt["finished_at"] = utc_now_iso()
     receipt.pop("provisional", None)
-    entries = None
     if status == "passed":
         ok, entries = gate_prerequisites(plan, repo)
-        # The steps receipt is final before the gate receipt binds its sha256, so it names the
-        # gate receipt path only; the gate receipt carries the hash. A steps receipt outside the
+        # The run never writes the gate receipt. The gate-receipt builder does, later, and only
+        # once an independent corroboration record for this run passes (README "Independent
+        # corroboration"); it binds this steps receipt's sha256. A steps receipt outside the
         # repository could not be checked by anyone qualifying the flip, so it makes none.
         if rel(receipt_path, repo) == "<private>":
             receipt["gate_receipt"] = {"eligible": False, "reason": "steps_receipt_outside_repository"}
@@ -2143,28 +2341,15 @@ def _run_phases(a, plan, receipt, receipt_path, account, prefix, ids, run_dir, t
             receipt["gate_receipt"] = {"eligible": False, "reason": "prerequisites_changed_during_run",
                                        "prerequisites": entries}
         else:
-            receipt["gate_receipt"] = {"eligible": True, "path": rel(gate_path, repo)}
+            receipt["gate_receipt"] = {"eligible": True, "written": False, "awaiting": "independent_corroboration",
+                                       "path": rel(gate_path, repo), "builder": "local_acceptance.py gate-receipt"}
     try:
         code = write_json(receipt_path, receipt, [account], quiet=True)
     except OSError as exc:
         print(json.dumps({"status": status, "final_receipt_written": False, "exit_code": 3,
                           "error": redact(f"{type(exc).__name__}: {exc}")[:200]}))
         return 3
-    written = False
-    if receipt["gate_receipt"].get("eligible"):
-        try:
-            write_json(gate_path, gate_receipt(plan, receipt, receipt_path, entries, repo), [account], quiet=True)
-            written = True
-        except OSError as exc:
-            # Nothing binds the steps receipt yet, so it can record that there is no gate receipt.
-            receipt["gate_receipt"] = {"eligible": False, "reason": "gate_receipt_write_failed",
-                                       "error": redact(f"{type(exc).__name__}: {exc}")[:200]}
-            try:
-                write_json(receipt_path, receipt, [account], quiet=True)
-            except OSError:
-                pass
-    print(json.dumps({"status": status, "exit_code": code, "run_prefix": prefix, "gate_receipt_written": written,
-                      "gate_receipt": receipt["gate_receipt"],
+    print(json.dumps({"status": status, "exit_code": code, "run_prefix": prefix, "gate_receipt": receipt["gate_receipt"],
                       "kill_switch_engaged": receipt["kill_switch"].get("engaged")}))
     return code
 
@@ -2199,7 +2384,7 @@ def cmd_phase(a, *, node_fn=None, versions_fn=None) -> int:
     account = os.environ.get(ACCOUNT_ENV, "")
     if not account.startswith(plan["account_prefix"]):
         return refuse("refused_not_paper_account")
-    kill = KillSwitch(manifest["state_dir"])
+    kill = KillSwitch(legacy_dirs=(manifest["state_dir"], DEFAULT_STATE_DIR))
     if (a.phase_name == "C") is not kill.engaged():
         return refuse("refused_kill_switch_state", expected_engaged=a.phase_name == "C")
     PO.install_signal_handlers()
@@ -2239,13 +2424,88 @@ def cmd_phase(a, *, node_fn=None, versions_fn=None) -> int:
 
 
 def cmd_kill_switch(a) -> int:
-    ks = KillSwitch(a.state_dir)
+    ks = KillSwitch(legacy_dirs=(a.state_dir, DEFAULT_STATE_DIR))
     if a.action == "status":
         print(json.dumps(ks.status(), default=str))
         return 0
     res = ks.clear(a.confirm, a.reason)
     print(json.dumps(res, default=str))
     return 0 if res["status"] in ("cleared", "not_engaged") else 3
+
+
+# --------------------------------------------------------------------------- CLI: gate-receipt (the builder)
+
+
+def cmd_gate_receipt(a, *, gate_path=None, repo_root=None) -> int:
+    """The receipt builder and the only writer of the gate receipt. It reads files only (no
+    connection, no order): a passed steps receipt and one corroboration record per independent
+    source (README 'Independent corroboration'). Any refusal writes nothing."""
+    repo = REPO if repo_root is None else Path(repo_root)
+    gate = Path(gate_path) if gate_path else GATE_RECEIPT
+    out = {"kind": "ibkr_local_acceptance_gate_receipt_build"}
+
+    def done(status, **fields):
+        out.update(status=status, exit_code=0 if status == "passed" else 3, **fields)
+        print(json.dumps(out, default=str))
+        return out["exit_code"]
+
+    steps_path, corr_paths = Path(a.steps_receipt), [Path(p) for p in a.corroboration]
+    named = [steps_path, *corr_paths]
+    if any(is_gate_receipt(p) or p.resolve() == gate.resolve() for p in named):
+        return done("refused_gate_receipt_path")
+    if any(rel(p, repo) == "<private>" for p in named):
+        # Anyone qualifying the flip must be able to check every bound file.
+        return done("refused_outside_repository")
+    if len({p.resolve() for p in named}) != len(named):
+        return done("refused_same_file_twice")
+    if gate.exists() or gate.is_symlink():
+        return done("refused_gate_receipt_exists",
+                    note="a gate receipt already stands; remove it in a reviewed commit before binding another run")
+    try:
+        steps, steps_sha = json.loads(steps_path.read_text()), PO.sha256_file(steps_path)
+    except (OSError, ValueError) as exc:
+        return done("refused_steps_receipt_unreadable", error=type(exc).__name__)
+    reasons = steps_receipt_errors(steps)
+    if reasons:
+        return done("refused_steps_receipt_not_passed", reasons=reasons)
+    plan_path = HERE / steps["plan"]
+    plan = _load_plan_or_none(plan_path)
+    if plan is None or validate_plan(plan):
+        return done("refused_plan_invalid")
+    if PO.sha256_file(plan_path) != steps["plan_sha256"]:
+        return done("refused_plan_changed_since_run")
+    ok, prerequisites = gate_prerequisites(plan, repo)
+    if not ok:
+        return done("refused_gate_prerequisites_missing", prerequisites=prerequisites)
+    records, sources = [], set()
+    for path in corr_paths:
+        where = rel(path, repo)
+        try:
+            text = path.read_text()
+            record = json.loads(text)
+        except (OSError, ValueError) as exc:
+            return done("refused_corroboration_unreadable", path=where, error=type(exc).__name__)
+        if PO.ACCOUNT_ID.search(text) or PO.HOME_PATH.search(text):
+            return done("refused_corroboration_private_content", path=where)
+        errors = corroboration_errors(record, steps, rel(steps_path, repo), steps_sha, plan)
+        if errors:
+            return done("refused_corroboration_invalid", path=where, reasons=errors)
+        kind = record["source"]["kind"]
+        if kind in sources:
+            return done("refused_one_record_per_source", source=kind)
+        sources.add(kind)
+        records.append({"path": where, "sha256": PO.sha256_file(path), "source_kind": kind,
+                        "retrieved_at": record["source"]["retrieved_at"], "observed_at": record["observer"]["observed_at"],
+                        "checks": list(CORROBORATION_SOURCES[kind]["checks"]),
+                        "corroborates": list(CORROBORATION_SOURCES[kind]["corroborates"])})
+    receipt = gate_receipt(plan, steps, steps_path, prerequisites, records, repo)
+    try:
+        write_json(gate, receipt, quiet=True)
+    except OSError as exc:
+        return done("gate_receipt_write_failed", error=redact(f"{type(exc).__name__}: {exc}")[:200])
+    return done("passed", gate_receipt=rel(gate, repo), run_prefix=steps["run_prefix"],
+                claims_corroborated=receipt["corroboration"]["claims_corroborated"],
+                claims_on_the_in_process_observer_only=receipt["corroboration"]["claims_on_the_in_process_observer_only"])
 
 
 def main(argv=None, **hooks) -> int:
@@ -2257,15 +2517,21 @@ def main(argv=None, **hooks) -> int:
         p.add_argument("--plan", choices=PLAN_NAMES, default=PLAN_NAMES[0],
                        help="predeclared plan next to this file: regular session (default) or 16:00-20:00 with outsideRth")
         p.add_argument("--state-dir", default=str(DEFAULT_STATE_DIR),
-                       help="private directory for the lock, the kill-switch latch and phase files (created 0700)")
+                       help="private directory for the phase files (created 0700); the kill-switch latch and the run "
+                            "lock are at the frozen per-account path, whatever this says")
         if name == "run":
             p.add_argument("--receipt", required=True)
             p.add_argument("--enable-paper-orders", action="store_true",
                            help="required: without it 'run' refuses before connecting")
             p.add_argument("--log-level", default="WARNING", help="Nautilus console log level (console output is not redacted)")
+    g = sub.add_parser("gate-receipt", help="build the gate receipt from a passed steps receipt and its corroboration")
+    g.add_argument("--steps-receipt", required=True, help="the run's steps receipt, inside the repository")
+    g.add_argument("--corroboration", action="append", required=True,
+                   help="a corroboration record inside the repository (repeat for a second source)")
     k = sub.add_parser("kill-switch")
     k.add_argument("action", choices=("status", "clear"))
-    k.add_argument("--state-dir", default=str(DEFAULT_STATE_DIR))
+    k.add_argument("--state-dir", default=str(DEFAULT_STATE_DIR),
+                   help="also covers a latch that an earlier revision of this runner wrote under this state directory")
     k.add_argument("--confirm", action="store_true")
     k.add_argument("--reason")
     ph = sub.add_parser("phase", help="internal: started by 'run'")
@@ -2278,6 +2544,8 @@ def main(argv=None, **hooks) -> int:
         return cmd_kill_switch(a)
     if a.cmd == "phase":
         return cmd_phase(a, **{k: v for k, v in hooks.items() if k in ("node_fn", "versions_fn")})
+    if a.cmd == "gate-receipt":
+        return cmd_gate_receipt(a, **{k: v for k, v in hooks.items() if k in ("gate_path", "repo_root")})
     return cmd_run(a, **hooks)
 
 

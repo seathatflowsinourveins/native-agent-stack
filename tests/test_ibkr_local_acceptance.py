@@ -12,12 +12,13 @@ import hashlib
 import importlib.util
 import json
 import os
+import pwd
 import re
 import signal
 import stat
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
@@ -42,6 +43,36 @@ def _load(name, path):
 LA = _load("ibkr_local_acceptance", SOURCE / "local_acceptance.py")
 PLAN = LA.load_plan(SOURCE / "local-acceptance-plan.json")
 POST = LA.load_plan(SOURCE / "local-acceptance-plan-post.json")
+# The frozen per-account latch, audit and lock directory as imported, before any test redirects it.
+IMPORTED_CONTROL_DIR = LA.CONTROL_DIR
+_MODULE_PATCHES = []
+
+
+def setUpModule():
+    # No test may read or write the real per-account latch, lock or default state directory:
+    # every test class below redirects them again to its own temporary directory.
+    tmp = tempfile.TemporaryDirectory()
+    _MODULE_PATCHES.append(tmp)
+    for name in ("CONTROL_DIR", "DEFAULT_STATE_DIR"):
+        patch = mock.patch.object(LA, name, Path(tmp.name) / name.lower())
+        patch.start()
+        _MODULE_PATCHES.append(patch)
+
+
+def tearDownModule():
+    while _MODULE_PATCHES:
+        item = _MODULE_PATCHES.pop()
+        (item.stop if hasattr(item, "stop") else item.cleanup)()
+
+
+def isolate_control(case, root: Path) -> Path:
+    """Give one test its own frozen control directory and default state directory."""
+    control = Path(root) / "control"
+    for name, value in (("CONTROL_DIR", control), ("DEFAULT_STATE_DIR", Path(root) / "default-state")):
+        patch = mock.patch.object(LA, name, value)
+        patch.start()
+        case.addCleanup(patch.stop)
+    return control
 
 
 def ny(y, mo, d, h, mi, s=0):
@@ -160,6 +191,26 @@ class PlanValidation(unittest.TestCase):
             self.assertFalse(ok)
             self.assertEqual([e["ok"] for e in entries], [False, False, True])
 
+    def test_the_plan_preregisters_the_builders_corroboration_rule(self):
+        c = PLAN["receipt"]["gate_receipt"]["corroboration"]
+        self.assertIs(c["required"], True)
+        self.assertEqual(set(c["sources"]), {"gateway_api_message_log", "ibkr_activity_statement"})
+        self.assertEqual(c["sources"]["gateway_api_message_log"]["corroborates"], list(LA.RUN_CLAIMS))
+        weakened = [
+            ("required", lambda g: g.update(required=False)),
+            ("kind", lambda g: g.update(record_kind="other")),
+            ("check dropped", lambda g: g["sources"]["gateway_api_message_log"]["checks"].remove("p1_p2_never_sent")),
+            ("claim added", lambda g: g["sources"]["ibkr_activity_statement"]["corroborates"].append("r1_r2_cancelled_at_ib")),
+            ("source added", lambda g: g["sources"].update(runner_log={"checks": [], "corroborates": ["no_fill"]})),
+            ("sources not an object", lambda g: g.update(sources=[])),
+            ("block removed", lambda g: g.clear()),
+        ]
+        for label, change in weakened:
+            with self.subTest(label=label):
+                plan = copy.deepcopy(PLAN)
+                change(plan["receipt"]["gate_receipt"]["corroboration"])
+                self.assertNotEqual(LA.validate_plan(plan), [])
+
 
 # --------------------------------------------------------------------------- kill switch and lock
 
@@ -167,27 +218,56 @@ class PlanValidation(unittest.TestCase):
 class KillSwitchLatch(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.dir = Path(self.tmp.name) / "state"
-        self.ks = LA.KillSwitch(self.dir)
-
-    def tearDown(self):
-        self.tmp.cleanup()
+        self.addCleanup(self.tmp.cleanup)
+        self.dir = isolate_control(self, Path(self.tmp.name))
+        self.ks = LA.KillSwitch()
 
     def test_engage_is_private_durable_and_audited(self):
         self.assertFalse(self.ks.engaged())
         rec = self.ks.engage("NTA-X", "case B2")
         self.assertTrue(self.ks.engaged())
+        self.assertEqual(self.ks.path, self.dir / "kill-switch.json")
         self.assertEqual(stat.S_IMODE(self.ks.path.stat().st_mode), 0o600)
         self.assertEqual(stat.S_IMODE(self.dir.stat().st_mode), 0o700)
         self.assertEqual(json.loads(self.ks.path.read_text())["run_prefix"], "NTA-X")
         self.assertEqual(self.ks.status()["record"]["reason"], rec["reason"])
         self.assertEqual([json.loads(line)["event"] for line in self.ks.audit_path.read_text().splitlines()], ["engaged"])
+        self.assertEqual(stat.S_IMODE(self.ks.audit_path.stat().st_mode), 0o600)
+
+    def test_the_latch_path_is_frozen_per_account(self):
+        # Regression (review of PR #280): the latch and the lock lived under --state-dir, so a
+        # run with another state directory did not see an engaged latch. The directory now
+        # comes from the password database, not from $HOME, XDG_STATE_HOME or any option.
+        expected = (Path(pwd.getpwuid(os.getuid()).pw_dir) / ".local" / "state" / "native-agent-stack"
+                    / "ibkr-local-acceptance")
+        with mock.patch.dict(os.environ, {"HOME": str(self.dir / "fake-home"), "XDG_STATE_HOME": str(self.dir / "xdg")}):
+            self.assertEqual(LA._frozen_control_dir(), expected)
+        self.assertEqual(IMPORTED_CONTROL_DIR, expected)
+        self.assertTrue(expected.is_absolute())
+        # Every state directory resolves to the same latch.
+        for other in (self.dir / "a", self.dir / "b", LA.DEFAULT_STATE_DIR):
+            self.assertEqual(LA.KillSwitch(legacy_dirs=(other,)).path, self.ks.path)
+
+    def test_a_latch_an_earlier_revision_wrote_under_a_state_dir_still_counts(self):
+        legacy = Path(self.tmp.name) / "old-state"
+        legacy.mkdir()
+        (legacy / "kill-switch.json").write_text(json.dumps({"engaged": True, "run_prefix": "NTA-OLD"}))
+        ks = LA.KillSwitch(legacy_dirs=(legacy,))
+        self.assertFalse(self.ks.engaged())  # the frozen latch itself is not engaged
+        self.assertEqual((ks.engaged(), ks.status()["location"], ks.status()["record"]["run_prefix"]),
+                         (True, "legacy_state_dir", "NTA-OLD"))
+        res = ks.clear(True, "reviewed run NTA-OLD")
+        self.assertEqual((res["status"], res["legacy_latches_cleared"]), ("cleared", 1))
+        self.assertFalse((legacy / "kill-switch.json").exists())
+        self.assertFalse(ks.engaged())
+        # The audit line sits at the frozen path even though only a legacy latch was engaged.
+        self.assertEqual(json.loads(self.ks.audit_path.read_text().splitlines()[-1])["prior"]["run_prefix"], "NTA-OLD")
 
     def test_a_corrupt_latch_still_reads_as_engaged(self):
         self.dir.mkdir(parents=True)
         self.ks.path.write_text("{not json")
         self.assertTrue(self.ks.engaged())
-        self.assertEqual(self.ks.status(), {"engaged": True, "readable": False})
+        self.assertEqual(self.ks.status(), {"engaged": True, "location": "frozen", "readable": False})
 
     def test_clear_needs_confirm_and_reason_and_audits_first(self):
         self.ks.engage("NTA-X", "case B2")
@@ -204,21 +284,26 @@ class KillSwitchLatch(unittest.TestCase):
 
     def test_cli_status_and_clear(self):
         self.ks.engage("NTA-X", "case B2")
-        with mock.patch("builtins.print"):
-            self.assertEqual(LA.main(["kill-switch", "status", "--state-dir", str(self.dir)]), 0)
-            self.assertEqual(LA.main(["kill-switch", "clear", "--state-dir", str(self.dir)]), 3)
+        other = str(Path(self.tmp.name) / "another-state-dir")
+        with mock.patch("builtins.print") as out:
+            self.assertEqual(LA.main(["kill-switch", "status"]), 0)
+            self.assertIs(json.loads(out.call_args[0][0])["engaged"], True)
+            # Another state directory sees the same latch.
+            self.assertEqual(LA.main(["kill-switch", "status", "--state-dir", other]), 0)
+            self.assertIs(json.loads(out.call_args[0][0])["engaged"], True)
+            self.assertEqual(LA.main(["kill-switch", "clear", "--state-dir", other]), 3)
             self.assertTrue(self.ks.engaged())
-            self.assertEqual(LA.main(["kill-switch", "clear", "--state-dir", str(self.dir), "--confirm",
-                                      "--reason", "reviewed"]), 0)
+            self.assertEqual(LA.main(["kill-switch", "clear", "--state-dir", other, "--confirm", "--reason", "reviewed"]), 0)
         self.assertFalse(self.ks.engaged())
 
-    def test_lock_is_single_writer(self):
-        self.dir.mkdir(parents=True)
-        first = LA.acquire_lock(self.dir)
+    def test_lock_is_single_writer_and_private(self):
+        first = LA.acquire_lock()
         self.assertIsNotNone(first)
-        self.assertIsNone(LA.acquire_lock(self.dir))
+        lock = self.dir / "run.lock"
+        self.assertEqual((stat.S_IMODE(lock.stat().st_mode), stat.S_IMODE(self.dir.stat().st_mode)), (0o600, 0o700))
+        self.assertIsNone(LA.acquire_lock())
         first.close()
-        again = LA.acquire_lock(self.dir)
+        again = LA.acquire_lock()
         self.assertIsNotNone(again)
         again.close()
 
@@ -707,13 +792,18 @@ class QuietSignals(LA.ParentSignals):
         pass
 
 
-class RunCommand(unittest.TestCase):
+class _RunHarness(unittest.TestCase):
+    """A temporary repository root, the frozen control directory redirected into it, and 'run'
+    driven through the Scenario fakes. No test methods of its own."""
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
         self.d = Path(self.tmp.name)
         self.receipt = self.d / "steps.json"
         self.gate = self.d / "gate.json"
         self.state = self.d / "state"
+        self.control = isolate_control(self, self.d)
         # The temporary directory stands in for the repository root: the prerequisites are read
         # from it, and a steps receipt inside it counts as in the repository.
         for rel in [p["path"] for p in PLAN["receipt"]["gate_receipt"]["prerequisites"]] + [PLAN["version_selection_record"]]:
@@ -721,14 +811,11 @@ class RunCommand(unittest.TestCase):
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes((ROOT / rel).read_bytes())
 
-    def tearDown(self):
-        self.tmp.cleanup()
-
     def run_cli(self, sc=None, extra=(), enable=True, port=4002, now=WEDNESDAY_10AM, versions=PINNED, plan=None,
-                signals=None, repo_root="tmp"):
+                signals=None, repo_root="tmp", state=None):
         sc = sc or Scenario(self.d)
         sc.receipt_path = self.receipt
-        argv = ["run", "--port", str(port), "--receipt", str(self.receipt), "--state-dir", str(self.state)]
+        argv = ["run", "--port", str(port), "--receipt", str(self.receipt), "--state-dir", str(state or self.state)]
         argv += ["--enable-paper-orders"] if enable else []
         argv += ["--plan", plan] if plan else []
         argv += list(extra)
@@ -741,6 +828,8 @@ class RunCommand(unittest.TestCase):
         receipt = json.loads(self.receipt.read_text()) if self.receipt.exists() else None
         return code, receipt, sc
 
+
+class RunCommand(_RunHarness):
     def test_refuses_without_enable_flag_and_connects_nothing(self):
         code, r, sc = self.run_cli(enable=False)
         self.assertEqual((code, r["status"]), (3, "refused_orders_not_enabled"))
@@ -761,11 +850,11 @@ class RunCommand(unittest.TestCase):
     def test_static_and_state_refusals(self):
         code, r, _ = self.run_cli(versions={"nautilus_trader": "2.0.0rc5", "ibapi": None})
         self.assertEqual(r["status"], "refused_unpinned_runtime")
-        LA.KillSwitch(self.state).engage("NTA-OLD", "left engaged")
+        LA.KillSwitch().engage("NTA-OLD", "left engaged")
         code, r, sc = self.run_cli()
         self.assertEqual((r["status"], sc.calls), ("refused_kill_switch_engaged", []))
-        LA.KillSwitch(self.state).clear(True, "test")
-        lock = LA.acquire_lock(LA.private_dir(self.state))
+        LA.KillSwitch().clear(True, "test")
+        lock = LA.acquire_lock()
         try:
             code, r, sc = self.run_cli()
             self.assertEqual((r["status"], sc.calls), ("refused_concurrent_run", []))
@@ -793,23 +882,70 @@ class RunCommand(unittest.TestCase):
                 self.assertFalse(any(c.startswith("phase-") for c in sc.calls))
                 self.assertNotIn(FAKE_ACCOUNT, self.receipt.read_text())
 
-    def test_passed_run_writes_the_gate_receipt_bound_to_the_steps_receipt(self):
+    def test_an_engaged_latch_refuses_a_run_with_any_state_dir(self):
+        # Regression (review of PR #280): B2 of a run with one state directory engages the latch;
+        # a later run or preflight with another state directory must still refuse.
+        LA.KillSwitch(legacy_dirs=(self.state,)).engage("NTA-EARLIER", "acceptance case B2")
+        for other in (self.state, self.d / "another-state", self.d / "third-state"):
+            with self.subTest(state=other.name):
+                code, r, sc = self.run_cli(state=other)
+                self.assertEqual((code, r["status"], sc.calls), (3, "refused_kill_switch_engaged", []))
+                self.assertEqual(r["kill_switch"]["record"]["run_prefix"], "NTA-EARLIER")
+        def no_connection(*args, **kwargs):
+            raise AssertionError("preflight connected despite an engaged latch")
+
+        with mock.patch("builtins.print") as out:
+            code = LA.main(["preflight", "--state-dir", str(self.d / "fourth-state")], versions_fn=lambda: dict(PINNED),
+                           check_fn=no_connection, contender_fn=no_connection)
+        self.assertEqual((code, json.loads(out.call_args[0][0])["status"]), (3, "refused_kill_switch_engaged"))
+        self.assertFalse(self.gate.exists())
+
+    def test_a_held_lock_refuses_a_run_with_another_state_dir(self):
+        lock = LA.acquire_lock()
+        try:
+            code, r, sc = self.run_cli(state=self.d / "another-state")
+            self.assertEqual((code, r["status"], sc.calls), (3, "refused_concurrent_run", []))
+        finally:
+            lock.close()
+
+    def test_a_latch_engaged_while_the_lock_was_taken_is_seen(self):
+        real = LA.acquire_lock
+
+        def lock_after_a_run_ended():
+            # A run that ends in this instant leaves its latch engaged and releases the lock.
+            LA.KillSwitch().engage("NTA-JUST-ENDED", "acceptance case B2")
+            return real()
+
+        with mock.patch.object(LA, "acquire_lock", lock_after_a_run_ended):
+            code, r, sc = self.run_cli()
+        self.assertEqual((code, r["status"], sc.calls), (3, "refused_kill_switch_engaged", []))
+        again = LA.acquire_lock()  # the refusal released the lock
+        self.assertIsNotNone(again)
+        again.close()
+
+    def test_a_legacy_latch_under_the_state_dir_refuses(self):
+        self.state.mkdir(parents=True)
+        (self.state / "kill-switch.json").write_text("{}")  # where an earlier revision kept it
+        code, r, sc = self.run_cli()
+        self.assertEqual((r["status"], r["kill_switch"]["location"], sc.calls),
+                         ("refused_kill_switch_engaged", "legacy_state_dir", []))
+
+    def test_a_passed_run_writes_no_gate_receipt_and_awaits_corroboration(self):
+        # Regression (review of PR #280): the run's own result and its in-process observer are
+        # not independent confirmation, so the run never writes the gate receipt.
         code, r, sc = self.run_cli()
         self.assertEqual((code, r["status"]), (0, "passed"), r)
         self.assertEqual([c for c in sc.calls if c.startswith("phase-")], ["phase-A", "phase-B", "phase-C"])
         self.assertEqual(sc.cancels, [])  # nothing of the run was left working
         self.assertTrue(r["checkpoints"]["after_A"]["passed"] and r["checkpoints"]["after_B"]["passed"])
         self.assertTrue(r["final"]["passed"])
-        self.assertEqual(r["gate_receipt"]["eligible"], True)
-        gate = json.loads(self.gate.read_text())
-        for key, value in {"schema_version": 1, "kind": "native_ibkr_local_acceptance", "status": "passed",
-                           "broker": "ibkr"}.items():
-            self.assertEqual(gate[key], value)
-        self.assertEqual(gate["steps_receipt"]["sha256"], hashlib.sha256(self.receipt.read_bytes()).hexdigest())
-        self.assertEqual(len(gate["prerequisites"]), 3)
-        for text in (self.receipt.read_text(), self.gate.read_text()):
-            self.assertIsNone(RAW_ACCOUNT.search(text))
-            self.assertNotIn(str(Path.home()), text)
+        self.assertEqual(r["gate_receipt"], {"eligible": True, "written": False, "awaiting": "independent_corroboration",
+                                             "path": "gate.json", "builder": "local_acceptance.py gate-receipt"})
+        self.assertFalse(self.gate.exists())
+        self.assertLessEqual(datetime.fromisoformat(r["generated_at"]), datetime.fromisoformat(r["finished_at"]))
+        text = self.receipt.read_text()
+        self.assertIsNone(RAW_ACCOUNT.search(text))
+        self.assertNotIn(str(Path.home()), text)
 
     def test_phase_manifests_carry_the_handshake_and_state(self):
         _, r, sc = self.run_cli()
@@ -887,14 +1023,6 @@ class RunCommand(unittest.TestCase):
         self.assertEqual(r["final"]["probes_checked"], [])
         self.assertTrue(r["final"]["passed"])
 
-    def test_a_failed_gate_write_is_recorded_in_the_steps_receipt(self):
-        self.gate.mkdir()  # writing the gate receipt there fails
-        code, r, _ = self.run_cli()
-        self.assertEqual(r["status"], "passed")
-        self.assertEqual((r["gate_receipt"]["eligible"], r["gate_receipt"]["reason"]), (False, "gate_receipt_write_failed"))
-        self.assertIn("error", r["gate_receipt"])
-        self.assertNotIn("gate_receipt_error", r)
-
     def test_a_plan_edited_during_the_run_stops_before_the_next_phase(self):
         real = LA.PO.sha256_file
         changed = {"now": False}
@@ -962,19 +1090,224 @@ class RunCommand(unittest.TestCase):
         self.assertEqual((code, json.loads(out.call_args[0][0])["status"]), (3, "refused_live_port"))
 
 
+# --------------------------------------------------------------------------- gate-receipt (the builder)
+
+
+class GateReceiptBuilder(_RunHarness):
+    """The builder writes the gate receipt only from a passed steps receipt plus a checked
+    corroboration record from IB's own records (review of PR #280). Synthetic records only."""
+
+    def setUp(self):
+        super().setUp()
+        code, self.steps, _ = self.run_cli()
+        self.assertEqual((code, self.steps["status"]), (0, "passed"))
+        self.steps_sha = hashlib.sha256(self.receipt.read_bytes()).hexdigest()
+
+    def record(self, kind="gateway_api_message_log", **over) -> dict:
+        finished = datetime.fromisoformat(self.steps["finished_at"])
+        retrieved = finished + (timedelta(minutes=5) if kind == "gateway_api_message_log" else timedelta(days=1))
+        rec = {"schema_version": 1, "kind": LA.CORROBORATION_KIND, "run_prefix": self.steps["run_prefix"],
+               "steps_receipt": {"path": "steps.json", "sha256": self.steps_sha},
+               "source": {"kind": kind, "raw_sha256": ["ab" * 32], "retrieved_at": retrieved.isoformat()},
+               "observer": {"separate_session": True, "started_the_run": False,
+                            "method": "read the private raw file for the run prefix; no ibapi, no local_acceptance.py",
+                            "observed_at": (retrieved + timedelta(minutes=5)).isoformat()},
+               "checks": dict.fromkeys(LA.CORROBORATION_SOURCES.get(kind, {}).get("checks", ()), True)}
+        if kind == "gateway_api_message_log":
+            rec["source"]["client_ids"] = [93, 98]
+        else:
+            rec["source"]["statement_date"] = LA.run_trade_date(PLAN, self.steps)
+        for dotted, value in over.items():
+            *parents, leaf = dotted.split("__")
+            node = rec
+            for key in parents:
+                node = node[key]
+            if value is DELETE:
+                node.pop(leaf, None)
+            else:
+                node[leaf] = value
+        return rec
+
+    def write(self, rec, name="corroboration.json") -> Path:
+        path = self.d / name
+        path.write_text(json.dumps(rec, indent=2) + "\n")
+        return path
+
+    def build(self, *corroborations, steps=None, repo_root="tmp"):
+        argv = ["gate-receipt", "--steps-receipt", str(steps or self.receipt)]
+        for path in corroborations:
+            argv += ["--corroboration", str(path)]
+        with mock.patch("builtins.print") as out:
+            code = LA.main(argv, gate_path=str(self.gate), repo_root=self.d if repo_root == "tmp" else repo_root)
+        return code, json.loads(out.call_args[0][0])
+
+    def test_only_a_passing_corroboration_record_writes_the_gate_receipt(self):
+        # Discriminating control first: the same record with one check false writes nothing.
+        failing = self.write(self.record(checks__p1_p2_never_sent=False))
+        code, out = self.build(failing)
+        self.assertEqual((code, out["status"]), (3, "refused_corroboration_invalid"))
+        self.assertIn("checks.p1_p2_never_sent must be true", out["reasons"])
+        self.assertFalse(self.gate.exists())
+        path = self.write(self.record())
+        code, out = self.build(path)
+        self.assertEqual((code, out["status"]), (0, "passed"), out)
+        gate = json.loads(self.gate.read_text())
+        for key, value in {"schema_version": 1, "kind": "native_ibkr_local_acceptance", "status": "passed",
+                           "broker": "ibkr"}.items():
+            self.assertEqual(gate[key], value)
+        self.assertEqual(gate["steps_receipt"], {"path": "steps.json", "sha256": self.steps_sha})
+        record = gate["corroboration"]["records"][0]
+        self.assertEqual((record["path"], record["sha256"], record["source_kind"]),
+                         ("corroboration.json", hashlib.sha256(path.read_bytes()).hexdigest(), "gateway_api_message_log"))
+        self.assertEqual(gate["corroboration"]["claims_corroborated"], list(LA.RUN_CLAIMS))
+        self.assertEqual(gate["corroboration"]["claims_on_the_in_process_observer_only"], [])
+        self.assertEqual(len(gate["prerequisites"]), 3)
+        self.assertEqual((gate["run_prefix"], gate["run_finished_at"]), (self.steps["run_prefix"], self.steps["finished_at"]))
+        text = self.gate.read_text()
+        self.assertIsNone(RAW_ACCOUNT.search(text))
+        self.assertNotIn(str(Path.home()), text)
+        # A standing gate receipt is never replaced by the builder.
+        code, out = self.build(path)
+        self.assertEqual((code, out["status"]), (3, "refused_gate_receipt_exists"))
+
+    def test_an_activity_statement_alone_leaves_the_cancel_and_probe_claims_on_the_observer(self):
+        code, out = self.build(self.write(self.record("ibkr_activity_statement")))
+        self.assertEqual((code, out["status"]), (0, "passed"), out)
+        gate = json.loads(self.gate.read_text())
+        self.assertEqual(gate["corroboration"]["claims_corroborated"], ["no_fill", "flat_at_end"])
+        self.assertEqual(gate["corroboration"]["claims_on_the_in_process_observer_only"],
+                         ["no_duplicate_submission", "r1_r2_cancelled_at_ib", "p1_p2_never_reached_ib"])
+
+    def test_both_sources_together_and_one_record_per_source(self):
+        api = self.write(self.record(), "api.json")
+        statement = self.write(self.record("ibkr_activity_statement"), "statement.json")
+        code, out = self.build(api, self.write(self.record(), "api-again.json"))
+        self.assertEqual((code, out["status"]), (3, "refused_one_record_per_source"))
+        self.assertFalse(self.gate.exists())
+        code, out = self.build(api, statement)
+        self.assertEqual((code, out["status"]), (0, "passed"), out)
+        gate = json.loads(self.gate.read_text())
+        self.assertEqual([r["source_kind"] for r in gate["corroboration"]["records"]],
+                         ["gateway_api_message_log", "ibkr_activity_statement"])
+
+    def test_invalid_records_are_refused(self):
+        finished = datetime.fromisoformat(self.steps["finished_at"])
+        cases = [
+            ({"run_prefix": "NTA-0101-000000-abcdef"}, "run_prefix"),
+            ({"kind": "other"}, "kind must be"),
+            ({"steps_receipt__sha256": "0" * 64}, "steps_receipt must name"),
+            ({"steps_receipt__path": "other.json"}, "steps_receipt must name"),
+            ({"source__kind": "runner_log"}, "source.kind must be one of"),
+            ({"source__raw_sha256": []}, "source.raw_sha256"),
+            ({"source__raw_sha256": ["not-a-hash"]}, "source.raw_sha256"),
+            ({"source__retrieved_at": (finished - timedelta(seconds=1)).isoformat()}, "after the run finished"),
+            ({"source__retrieved_at": finished.replace(tzinfo=None).isoformat()}, "UTC offset"),
+            ({"observer__observed_at": finished.isoformat()}, "after source.retrieved_at"),
+            ({"observer__separate_session": False}, "separate_session"),
+            ({"observer__started_the_run": True}, "started_the_run"),
+            ({"observer__started_the_run": DELETE}, "started_the_run"),
+            ({"observer__method": " "}, "observer.method"),
+            ({"source__client_ids": [93]}, "client_ids"),
+            ({"source__client_ids": [93, 98, {"id": 1}]}, "client_ids"),
+            ({"source": "not an object"}, "source.kind must be one of"),
+            ({"checks__flat_at_end": "true"}, "checks.flat_at_end must be true"),
+            ({"checks__r1_r2_each_sent_once": DELETE}, "checks.r1_r2_each_sent_once must be true"),
+        ]
+        for over, needle in cases:
+            with self.subTest(over=over):
+                code, out = self.build(self.write(self.record(**over)))
+                self.assertEqual((code, out["status"]), (3, "refused_corroboration_invalid"))
+                self.assertTrue(any(needle in reason for reason in out["reasons"]), out["reasons"])
+                self.assertFalse(self.gate.exists())
+
+    def test_an_activity_statement_must_be_the_next_day_statement_of_the_run_date(self):
+        finished = datetime.fromisoformat(self.steps["finished_at"])
+        same_day = self.record("ibkr_activity_statement", source__retrieved_at=(finished + timedelta(seconds=1)).isoformat(),
+                               observer__observed_at=(finished + timedelta(seconds=2)).isoformat())
+        trade_date = LA.run_trade_date(PLAN, self.steps)
+        ny_same_day = datetime.fromisoformat(same_day["source"]["retrieved_at"]).astimezone(NY).date().isoformat()
+        if ny_same_day == trade_date:  # a run finishing just before New York midnight has no same-day case
+            code, out = self.build(self.write(same_day))
+            self.assertEqual(out["status"], "refused_corroboration_invalid")
+            self.assertTrue(any("later New York date" in r for r in out["reasons"]), out["reasons"])
+        wrong_date = self.record("ibkr_activity_statement", source__statement_date="2026-01-02")
+        code, out = self.build(self.write(wrong_date))
+        self.assertTrue(any("statement_date" in r for r in out["reasons"]), out)
+        self.assertFalse(self.gate.exists())
+
+    def test_private_content_in_a_record_is_refused(self):
+        for text in (FAKE_ACCOUNT, "/home/example/private/api.93.Fri.log"):
+            with self.subTest(text=text):
+                code, out = self.build(self.write(self.record(notes=f"read {text}")))
+                self.assertEqual((code, out["status"]), (3, "refused_corroboration_private_content"))
+                self.assertNotIn(text, json.dumps(out))
+        self.assertFalse(self.gate.exists())
+
+    def test_steps_receipts_that_cannot_back_the_gate_are_refused(self):
+        path = self.write(self.record())
+        tampered = dict(self.steps, final={**self.steps["final"], "flat": False})  # status still says passed
+        self.receipt.write_text(json.dumps(tampered))
+        code, out = self.build(path)
+        self.assertEqual((code, out["status"]), (3, "refused_steps_receipt_not_passed"))
+        self.assertIn("run_not_passed", out["reasons"])
+        for change, reason in (({"status": "failed"}, "status_failed"), ({"provisional": True}, "status_passed"),
+                               ({"gate_receipt": {"eligible": False}}, "gate_receipt_not_eligible"),
+                               ({"finished_at": None}, "finished_at_missing"), ({"plan": "plan.json"}, "plan"),
+                               ({"kind": "other"}, "not_a_steps_receipt")):
+            with self.subTest(change=change):
+                self.receipt.write_text(json.dumps({**self.steps, **change}))
+                code, out = self.build(path)
+                self.assertEqual(out["status"], "refused_steps_receipt_not_passed")
+                self.assertIn(reason, out["reasons"])
+        self.assertFalse(self.gate.exists())
+
+    def test_path_plan_and_prerequisite_refusals(self):
+        path = self.write(self.record())
+        self.assertEqual(self.build(path, steps=path)[1]["status"], "refused_same_file_twice")
+        self.assertEqual(self.build(self.gate)[1]["status"], "refused_gate_receipt_path")
+        self.assertEqual(self.build(LA.GATE_RECEIPT)[1]["status"], "refused_gate_receipt_path")
+        self.assertEqual(self.build(self.d / "missing.json")[1]["status"], "refused_corroboration_unreadable")
+        # Outside the repository: the temporary files are outside the real repository root.
+        self.assertEqual(self.build(path, repo_root=None)[1]["status"], "refused_outside_repository")
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"), self.assertRaises(SystemExit):
+            LA.main(["gate-receipt", "--steps-receipt", str(self.receipt)])  # no corroboration named
+        real = LA.PO.sha256_file
+
+        def sha(p):
+            return "0" * 64 if Path(p).name == "local-acceptance-plan.json" else real(p)
+
+        with mock.patch.object(LA.PO, "sha256_file", sha):
+            self.assertEqual(self.build(path)[1]["status"], "refused_plan_changed_since_run")
+        (self.d / PLAN["receipt"]["gate_receipt"]["prerequisites"][0]["path"]).unlink()
+        self.assertEqual(self.build(path)[1]["status"], "refused_gate_prerequisites_missing")
+        self.assertFalse(self.gate.exists())
+
+    def test_a_failed_write_is_reported_and_leaves_no_receipt(self):
+        with mock.patch.object(LA, "write_json", side_effect=OSError("disk full")):
+            code, out = self.build(self.write(self.record()))
+        self.assertEqual((code, out["status"]), (3, "gate_receipt_write_failed"))
+        self.assertFalse(self.gate.exists())
+
+    def test_the_receipt_function_itself_needs_a_corroboration(self):
+        with self.assertRaises(ValueError):
+            LA.gate_receipt(PLAN, self.steps, self.receipt, [], [], self.d)
+
+
+DELETE = object()
+
+
 # --------------------------------------------------------------------------- phase command (child)
 
 
 class PhaseCommand(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
         self.d = Path(self.tmp.name)
         self.token = "t" * 32
         self.state = self.d / "state"
         self.state.mkdir()
-
-    def tearDown(self):
-        self.tmp.cleanup()
+        isolate_control(self, self.d)
 
     def manifest(self, phase="A", **over):
         m = {"schema_version": 1, "run_prefix": "NTA-X", "phase": phase, "token_sha256": LA.sha256_text(self.token),
@@ -1018,10 +1351,12 @@ class PhaseCommand(unittest.TestCase):
 
     def test_kill_switch_state_must_match_the_phase(self):
         self.assertEqual(self.run_phase("C")[0], 3)  # C needs the latch engaged
-        LA.KillSwitch(self.state).engage("NTA-X", "B2")
+        LA.KillSwitch().engage("NTA-X", "B2")  # the frozen latch, whatever the manifest's state_dir
         self.assertEqual(self.run_phase("A")[0], 3)  # A and B refuse an engaged latch
         self.assertEqual(self.run_phase("B")[0], 3)
         code, result = self.run_phase("C")
+        self.assertEqual((code, result["status"]), (0, "passed"))
+        code, result = self.run_phase("C", state_dir=str(self.d / "another-state"))
         self.assertEqual((code, result["status"]), (0, "passed"))
 
     def test_passed_phase_writes_a_private_result_after_a_provisional_one(self):
@@ -1107,11 +1442,37 @@ class SourceSafety(unittest.TestCase):
         self.assertNotIn("OrderSide.SELL", self.source)
         self.assertNotIn("TradingState.ACTIVE", self.source)
 
-    def test_gate_receipt_written_only_on_the_passed_path(self):
-        writes = [c for c in ast.walk(self.tree) if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)
-                  and c.func.id == "write_json" and c.args and ast.unparse(c.args[0]) == "gate_path"]
-        self.assertEqual(len(writes), 1)
-        self.assertEqual(self._enclosing(writes[0]), "_run_phases")
+    def _named_calls(self, name):
+        return [c for c in ast.walk(self.tree) if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)
+                and c.func.id == name]
+
+    def test_only_the_builder_writes_the_gate_receipt(self):
+        # Regression (review of PR #280): the run wrote the gate receipt from its own result.
+        # Now one write site builds it, in the builder, after the corroboration checks.
+        builds = self._named_calls("gate_receipt")
+        self.assertEqual([self._enclosing(c) for c in builds], ["cmd_gate_receipt"])
+        writes = [c for c in self._named_calls("write_json") if c.args and ast.unparse(c.args[0]) in ("gate", "gate_path")]
+        self.assertEqual([(self._enclosing(c), ast.unparse(c.args[0])) for c in writes], [("cmd_gate_receipt", "gate")])
+        body = ast.unparse(next(n for n in ast.walk(self.tree) if isinstance(n, ast.FunctionDef)
+                                and n.name == "cmd_gate_receipt"))
+        self.assertLess(body.index("corroboration_errors"), body.index("gate_receipt(plan"))
+        self.assertLess(body.index("steps_receipt_errors"), body.index("gate_receipt(plan"))
+
+    def test_the_builder_connects_to_nothing(self):
+        node = next(n for n in ast.walk(self.tree) if isinstance(n, ast.FunctionDef) and n.name == "cmd_gate_receipt")
+        called = {c.func.id if isinstance(c.func, ast.Name) else c.func.attr
+                  for c in ast.walk(node) if isinstance(c, ast.Call) and isinstance(c.func, (ast.Name, ast.Attribute))}
+        for name in ("observe", "observe_with_retry", "contender_probe", "_connect", "ibapi_cancel_run_orders",
+                     "spawn_phase", "run_phase_node", "run_check", "cmd_run", "_run_phases", "engage"):
+            self.assertNotIn(name, called)
+
+    def test_the_latch_and_lock_ignore_the_state_dir(self):
+        # Every KillSwitch the CLI builds takes its latch from CONTROL_DIR; state directories
+        # enter only as legacy_dirs, and the lock takes no state directory at all.
+        for call in self._named_calls("KillSwitch"):
+            self.assertEqual([k.arg for k in call.keywords], ["legacy_dirs"], ast.unparse(call))
+            self.assertEqual(call.args, [])
+        self.assertEqual([ast.unparse(c) for c in self._named_calls("acquire_lock")], ["acquire_lock()"])
 
     def test_no_heavy_imports_at_module_level(self):
         for node in self.tree.body:
@@ -1148,7 +1509,7 @@ class FakeHooks:
     uses the real latch and the backtest engine's real RiskEngine."""
 
     def __init__(self, engine, state_dir, down_polls=1, halt=True, records_disconnection=True):
-        self.engine, self.kill = engine, LA.KillSwitch(state_dir)
+        self.engine, self.kill = engine, LA.KillSwitch(control=state_dir)
         self.down_polls, self.halt, self.records = down_polls, halt, records_disconnection
         self.stops, self.injected, self.probes = [], 0, []
 

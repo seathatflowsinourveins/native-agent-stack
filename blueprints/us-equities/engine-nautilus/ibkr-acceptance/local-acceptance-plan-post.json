@@ -3,8 +3,8 @@
   "kind": "ibkr_local_acceptance_plan",
   "frozen_at": "2026-09-25",
   "frozen_before_first_run": true,
-  "revision": 1,
-  "revision_note": "After-hours variant of local-acceptance-plan.json, written on 2026-09-25 before any run: identical bounds, cases, phases, checkpoints, timeouts and kill-switch policy; only the session changes to 16:00-20:00 America/New_York with outsideRth on every order (IBOrderTags), today's window read from the contract's tradingHours, and use_regular_trading_hours off for the data client.",
+  "revision": 2,
+  "revision_note": "After-hours variant of local-acceptance-plan.json, written on 2026-09-25 before any run: identical bounds, cases, phases, checkpoints, timeouts and kill-switch policy; only the session changes to 16:00-20:00 America/New_York with outsideRth on every order (IBOrderTags), today's window read from the contract's tradingHours, and use_regular_trading_hours off for the data client. Revision 2 (2026-09-25, still before any run): the same change as local-acceptance-plan.json revision 2, the frozen per-account kill-switch latch and run lock and the corroboration-gated gate receipt.",
   "gate_id": "ibkr-local-acceptance",
   "procedure": "blueprints/us-equities/engine-nautilus/acceptance-plan.md section 5 steps 2-4 (the cases the 2026-09-23 paper-order receipt did not run)",
   "version_selection_record": "docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md",
@@ -207,7 +207,8 @@
     "final": "Observer: zero open orders, zero positions, zero executions carrying this run's prefix; once a probe order was attempted, R1 and R2 appear among completed orders as cancelled and no attempted probe (P1, P2) appears among open or completed orders."
   },
   "kill_switch": {
-    "latch": "<state-dir>/kill-switch.json, written with fsync and mode 0600",
+    "latch": "kill-switch.json in the frozen per-account directory ~/.local/state/native-agent-stack/ibkr-local-acceptance, where ~ is the account's home directory from the password database (local_acceptance.py CONTROL_DIR), not $HOME, XDG_STATE_HOME or --state-dir; written with fsync and mode 0600, directory 0700. A latch file that an earlier revision wrote under a state directory also counts as engaged, and 'kill-switch clear' removes it too.",
+    "lock": "run.lock in the same frozen directory, mode 0600, held with flock for the whole run: one run per account, whatever --state-dir says.",
     "on_engage": [
       "write the latch",
       "RiskEngine.set_trading_state(TradingState.HALTED)",
@@ -235,7 +236,44 @@
         "kind": "native_ibkr_local_acceptance",
         "broker": "ibkr"
       },
-      "written_only_when": "every case passed, every checkpoint passed, the run status is passed, and each prerequisite below exists with status passed",
+      "written_only_when": "Only the gate-receipt builder writes it, never the run: the steps receipt shows every phase, case and checkpoint passed, a flat final observer and gate_receipt.eligible; the plan is unchanged since the run; each prerequisite below exists with status passed; and at least one corroboration record for the same run passes every check of its source (corroboration below).",
+      "corroboration": {
+        "required": true,
+        "record_kind": "ibkr_local_acceptance_corroboration",
+        "why": "The run's status is the runner's own result, and its observer (client 98) uses the same official ibapi 10.45.1 library as the 1.231.0 adapter, so neither is independent confirmation (docs/acceptance-evidence-policy.md). IB's own records, read after the run by a session that did not start it, are.",
+        "sources": {
+          "gateway_api_message_log": {
+            "checks": [
+              "r1_r2_each_sent_once",
+              "r1_r2_cancelled_by_ib",
+              "p1_p2_never_sent",
+              "no_execution_of_the_run",
+              "flat_at_end"
+            ],
+            "corroborates": [
+              "no_duplicate_submission",
+              "r1_r2_cancelled_at_ib",
+              "p1_p2_never_reached_ib",
+              "no_fill",
+              "flat_at_end"
+            ],
+            "how": "The Gateway writes api.<clientId>.<weekday>.log while 'Create API message log file' is on (Configure > Settings > API > Settings), so it is switched on before the run. After the run, the logs of client ids 93 and 98 are decrypted from the same Gateway session and kept private, outside the repository."
+          },
+          "ibkr_activity_statement": {
+            "checks": [
+              "paper_account_statement",
+              "no_trade_in_symbol_on_run_date",
+              "no_position_in_symbol_at_end_of_run_date"
+            ],
+            "corroborates": [
+              "no_fill",
+              "flat_at_end"
+            ],
+            "how": "The Daily Activity statement for the run's New York trade date from IBKR's statements (Client Portal), retrieved on a later date and kept private. It lists trades and positions, not unfilled orders, so the cancel and probe claims stay on the in-process observer when it is the only source."
+          }
+        },
+        "record_rules": "One record per source, inside the repository: run_prefix and the steps receipt's path and sha256 as bound by the run; source.raw_sha256 lists the sha256 of each private raw file; source.retrieved_at follows the run's finished_at and observer.observed_at follows it; observer.separate_session true and observer.started_the_run false; an API log record lists client ids 93 and 98; an activity statement record names the run's trade date and is retrieved on a later New York date; no account id or home path in the record."
+      },
       "prerequisites": [
         {
           "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20260923.json",
@@ -248,7 +286,7 @@
           "covers": "step 3 submit/acknowledge, cancel, fill and flatten on NautilusTrader 1.231.0"
         }
       ],
-      "qualification": "The checker only reads /status. That a signed-in paper Gateway accepted the adapter locally is qualified manually before the dated commit that flips the gate."
+      "qualification": "The checker only reads /status. The builder writes status passed only with a checked corroboration record and lists the claims that rest on the in-process observer alone. That a signed-in paper Gateway accepted the adapter locally is still qualified manually before the dated commit that flips the gate."
     }
   },
   "evidence_class": "native_paper",
