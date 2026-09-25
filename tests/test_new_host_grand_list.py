@@ -8,6 +8,7 @@ import argparse
 import contextlib
 import io
 import json
+import re
 import os
 import tempfile
 import unittest
@@ -109,6 +110,26 @@ class BuildTests(unittest.TestCase):
         s = self.data["summary"]
         self.assertEqual(s["winners"], sum(len(l["winners"]) for l in self.data["layers"]))
         self.assertEqual(s["layers"]["foundation"] + s["layers"]["us-equities"], len(self.data["layers"]))
+
+    def test_every_winner_carries_its_ledger_basis(self):
+        ledgers = {c: {l["layer_id"]: l for l in json.loads((REPO_ROOT / rel).read_text(encoding="utf-8"))["layers"]}
+                   for c, rel in g.LEDGERS.items()}
+        for layer in self.data["layers"]:
+            recorded = {w["component_id"]: w for w in ledgers[layer["catalog"]][layer["layer_id"]].get("winners") or []}
+            for w in layer["winners"]:
+                self.assertIn(w["component_id"], recorded, (layer["layer_id"], w["component_id"]))
+                src = recorded[w["component_id"]]
+                self.assertEqual(w["why_selected"], src.get("why_selected"), (layer["layer_id"], w["component_id"]))
+                self.assertEqual(w["evidence_refs"], list(src.get("evidence_refs") or []), (layer["layer_id"], w["component_id"]))
+
+    def test_rendered_markdown_explains_what_a_winner_means_without_new_paths(self):
+        md = g.render_md(self.data)
+        section = md.split("## What a winner means", 1)[1].split("\n## ", 1)[0]
+        self.assertIn("not a claim that the component is the best in its field", section)
+        counts = [int(n) for n in re.findall(r"`[a-z_]+` (\d+)", section)]
+        self.assertEqual(sum(counts), len(self.data["layers"]))
+        # The Markdown is a new-host document (scripts/release_due.py), so the section names no repository paths.
+        self.assertIsNone(re.search(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+", section))
 
     def test_headline_pairs_add_up_to_the_winners(self):
         # needs_host excludes both accepted and host_verified, so the three counts partition the pairs.
