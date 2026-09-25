@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "kind": "blind_ab_adjudication",
+  "question_id": "tabular-question",
+  "question": "for predicting which US equities become +200% movers within 20 trading sessions, from\npoint-in-time tabular features over 2015-2025 with temporal splits, delistings and an embargo (a\ntemporal, non-IID, large dataset), should a local tabular foundation model be trialled against\ngradient-boosted trees, or skipped?",
+  "items": [
+    {
+      "name": "TabICLv2",
+      "url": "https://github.com/soda-inria/tabicl"
+    },
+    {
+      "name": "TabPFN-3.5",
+      "url": "https://github.com/PriorLabs/TabPFN"
+    }
+  ],
+  "method": "Blind A/B adjudication by one judge model (gpt-6-sol, high reasoning effort, codex exec with a read-only sandbox and live web search) in three presentation orders: original (trial listed first as Return A), label-swapped (trial still listed first, as Return B) and reversed listing (skip listed first as Return A). Lane identities were scrubbed. The judge was told to check the cited papers itself and not to favor a return for its position; the run logs show searches naming TabICLv2 and TabPFN-3.5 in the first two runs and BeyondArena and TabPFN-3.5 in the reversed run (the logs truncate multi-query searches). No refuter was run, so refuting_votes 0 is not a survived refutation.",
+  "judgments": [
+    {
+      "packet_order": "original",
+      "run_label": "adjudicator-original",
+      "input": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/a.json",
+      "original_input_sha256": "e48d77db14a6e8062498fa252d0a74c9e4a891c32e0e2a07bf1b611a592ead0b",
+      "claude_position": "B",
+      "preferred_position": "B",
+      "preferred_lane": "claude",
+      "preferred_return": "skip",
+      "preferred_listing_position": "second",
+      "judge": {
+        "model": "gpt-6-sol",
+        "family": "openai",
+        "effort": "high"
+      },
+      "why": "[BeyondArena](https://arxiv.org/html/2606.30410) finds that trees and deep nets outperform tabular foundation models on temporal, non-IID and large datasets—the closest match to this equity task. The newer [TabPFN-3.5 report](https://arxiv.org/html/2609.17895) leads overall, but says tuned MLPs still lead on its temporal and large subsets. TabICLv2’s TabArena/TALENT gains are less directly relevant to embargoed equity predictions. B’s license point is overstated: TabPFN-3.5 permits local evaluation, though its weights restrict commercial use.",
+      "why_words": 67,
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/a.json",
+        "https://arxiv.org/html/2606.30410",
+        "https://arxiv.org/html/2609.17895"
+      ],
+      "votes": 1,
+      "refuting_votes": 0,
+      "refuters_run": 0,
+      "returned_text": "B\n\n[BeyondArena](https://arxiv.org/html/2606.30410) finds that trees and deep nets outperform tabular foundation models on temporal, non-IID and large datasets—the closest match to this equity task. The newer [TabPFN-3.5 report](https://arxiv.org/html/2609.17895) leads overall, but says tuned MLPs still lead on its temporal and large subsets. TabICLv2’s TabArena/TALENT gains are less directly relevant to embargoed equity predictions. B’s license point is overstated: TabPFN-3.5 permits local evaluation, though its weights restrict commercial use.",
+      "returned_sha256": "bc9d19d8b268915b7e298890f4e472376a3b1c95adfa386919378e13b42c0a15"
+    },
+    {
+      "packet_order": "swapped",
+      "run_label": "adjudicator-swapped",
+      "input": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/b.json",
+      "original_input_sha256": "ac382709be36a34225e5dee1fa7e9a60d35b6ecb002f927faff622557df7b23f",
+      "claude_position": "A",
+      "preferred_position": "A",
+      "preferred_lane": "claude",
+      "preferred_return": "skip",
+      "preferred_listing_position": "second",
+      "judge": {
+        "model": "gpt-6-sol",
+        "family": "openai",
+        "effort": "high"
+      },
+      "why": "[BeyondArena](https://arxiv.org/html/2606.30410) directly tests non-IID temporal and large tabular data and finds conventional models generally stronger there. The newer [TabPFN-3.5 report](https://arxiv.org/html/2609.17895) claims an overall lead, but says tuned, ensembled MLPs still lead its temporal and large subsets. [TabICLv2’s](https://arxiv.org/html/2602.11139) cited TabArena and TALENT wins do not establish an advantage for this equity task. That evidence better supports skipping the local foundation-model trial for now. A’s license point is weaker: TabPFN-3.5 weights permit internal evaluation, though commercial use is restricted.",
+      "why_words": 77,
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/b.json",
+        "https://arxiv.org/html/2606.30410",
+        "https://arxiv.org/html/2609.17895",
+        "https://arxiv.org/html/2602.11139"
+      ],
+      "votes": 1,
+      "refuting_votes": 0,
+      "refuters_run": 0,
+      "returned_text": "A\n\n[BeyondArena](https://arxiv.org/html/2606.30410) directly tests non-IID temporal and large tabular data and finds conventional models generally stronger there. The newer [TabPFN-3.5 report](https://arxiv.org/html/2609.17895) claims an overall lead, but says tuned, ensembled MLPs still lead its temporal and large subsets. [TabICLv2’s](https://arxiv.org/html/2602.11139) cited TabArena and TALENT wins do not establish an advantage for this equity task. That evidence better supports skipping the local foundation-model trial for now. A’s license point is weaker: TabPFN-3.5 weights permit internal evaluation, though commercial use is restricted.",
+      "returned_sha256": "d9ad27c203b999f44796da38ce3947ea47efdff501cc73a0b58f51c6cc3f5dd9"
+    },
+    {
+      "packet_order": "reversed",
+      "run_label": "adjudicator-reversed",
+      "input": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/c.json",
+      "original_input_sha256": "4b21cc4f0c2a808c165b0e6ada943fb0a44e0da8a1b6c7747a41d05aa5bc74a5",
+      "claude_position": "A",
+      "preferred_position": "A",
+      "preferred_lane": "claude",
+      "preferred_return": "skip",
+      "preferred_listing_position": "first",
+      "judge": {
+        "model": "gpt-6-sol",
+        "family": "openai",
+        "effort": "high"
+      },
+      "why": "[BeyondArena’s regime analysis](https://arxiv.org/html/2606.30410) ranks tuned and ensembled RealMLP first on both temporal and large datasets, the closest tested settings to this equity task. [TabICLv2’s reported wins](https://arxiv.org/html/2602.11139) come from benchmarks that do not establish an edge under embargoed temporal splits. Even the newer [TabPFN-3.5 report](https://arxiv.org/html/2609.17895) says tuned MLPs retain the lead on temporal and large subsets. None of these papers tests rare +200% equity events with PR-AUC and Brier score, so skipping is a judgment from the closest evidence, not a demonstrated result for this exact label.",
+      "why_words": 86,
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/c.json",
+        "https://arxiv.org/html/2606.30410",
+        "https://arxiv.org/html/2602.11139",
+        "https://arxiv.org/html/2609.17895"
+      ],
+      "votes": 1,
+      "refuting_votes": 0,
+      "refuters_run": 0,
+      "returned_text": "A\n\n[BeyondArena’s regime analysis](https://arxiv.org/html/2606.30410) ranks tuned and ensembled RealMLP first on both temporal and large datasets, the closest tested settings to this equity task. [TabICLv2’s reported wins](https://arxiv.org/html/2602.11139) come from benchmarks that do not establish an edge under embargoed temporal splits. Even the newer [TabPFN-3.5 report](https://arxiv.org/html/2609.17895) says tuned MLPs retain the lead on temporal and large subsets. None of these papers tests rare +200% equity events with PR-AUC and Brier score, so skipping is a judgment from the closest evidence, not a demonstrated result for this exact label.",
+      "returned_sha256": "7c8d443a13adc191258e1fc6aa7929f532bc27b70836bc3b508e541756432865",
+      "account_note": "Ran on a different ChatGPT account from the first two judgments because the first account's weekly limit was exhausted (reported by the coordinator); model, effort and settings were unchanged. No account identifier is recorded."
+    }
+  ],
+  "preferred_lane": "claude",
+  "adjudicated_disposition": "skip",
+  "why": "All three judgments preferred the skip return. Decisive evidence: BeyondArena (arXiv 2606.30410, academic) tests temporal, non-IID and large tabular data and finds conventional models stronger there (the reversed-listing judgment cites its regime analysis ranking tuned, ensembled RealMLP first on temporal and large datasets), the closest match to embargoed equity prediction; the newer TabPFN-3.5 report (arXiv 2609.17895) claims an overall lead but says tuned MLPs still lead its temporal and large subsets; TabICLv2's TabArena and TALENT wins do not establish an advantage for this task.",
+  "caveats": [
+    "The first two judgments call the skip return's license point overstated or weaker: TabPFN-3.5 weights permit local or internal evaluation, while commercial use is restricted. The reversed-listing judgment does not address licensing.",
+    "The reversed-listing judgment notes that none of the cited papers tests rare +200% equity events with PR-AUC and Brier score, so the skip is a judgment from the closest evidence, not a demonstrated result for this label."
+  ],
+  "evidence_refs": [
+    "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/a.json",
+    "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/b.json",
+    "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/c.json",
+    "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/adjudication-key.json",
+    "https://arxiv.org/html/2606.30410",
+    "https://arxiv.org/html/2609.17895",
+    "https://arxiv.org/html/2602.11139"
+  ],
+  "votes": 3,
+  "refuting_votes": 0,
+  "limitations": [
+    "One judge model (gpt-6-sol), from the same model family as the Codex lane: three runs of one model are not independent judges, and varying the presentation does not remove family bias.",
+    "Listing position is counterbalanced for this one question: across three judgments, skip was chosen when listed second (twice: the original and the label-swapped runs) and when listed first (the reversed run), and under both letters (B in the original run, A in the other two).",
+    "The reversed-listing run used a different ChatGPT account from the first two because the first account's weekly limit was exhausted; model, effort and settings were unchanged.",
+    "The judge saw condensed returns, not the full lane rows; the condensation is the coordinator's.",
+    "Discovery-level evidence: the judge read the cited papers on the web; no model was trained or evaluated."
+  ]
+}
