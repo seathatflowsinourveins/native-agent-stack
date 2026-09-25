@@ -7862,8 +7862,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/README.md",
-      "sha256": "d1301e472b0775e896cc1c1bd23b64635fd8f7861f64a8ab8294e45d45e88df2",
-      "bytes": 24050
+      "sha256": "8ff7c47ec109e902781eea859bee7c40cae4e8545e4c24364b855517ac0de9b8",
+      "bytes": 24294
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131151Z-handrolled-protocol-probe.json",

@@ -379,7 +379,10 @@ example `evidence/corroboration-<run_prefix>-api-log.json`:
 An activity-statement record has `"kind": "ibkr_activity_statement"`, a
 `"statement_date"` (the run's New York trade date) instead of `client_ids`, and
 its three checks. A record carries no account id, raw log line or home path; the
-builder refuses one that does.
+builder refuses one that does. The builder checks a record's structure, bindings
+and times, but it cannot read the private raw files. Its checks therefore remain
+the corroborating session's statement, which anyone holding the private files can
+re-check against their sha256.
 
 Then build the gate receipt. The builder reads files only and connects to
 nothing:
