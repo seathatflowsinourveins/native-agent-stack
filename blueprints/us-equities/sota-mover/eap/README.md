@@ -42,7 +42,7 @@ $BR $PY collect_edgar.py fetch --rate 7.0
 $PY collect_edgar.py extract && $PY collect_edgar.py tzcheck --sample 24
 $BR $PY expected_dates.py accuracy --root "$ROOT" --daily "$DAILY"
 $PY spreads.py sample --daily "$DAILY" && $BR $PY spreads.py fetch && $PY spreads.py table
-for c in survivorship weights events; do $BR $PY prefreeze.py $c --daily "$DAILY" --out receipts/$c.json; done
+for c in survivorship weights events; do $BR $PY prefreeze.py $c --daily "$DAILY" --out receipts/$c.json; done   # then: mv receipts/events.json receipts/event-counts.json
 $PY evaluate.py --print-pins --root "$ROOT" --daily "$DAILY"   # values for protocol.json#/pins
 ```
 
