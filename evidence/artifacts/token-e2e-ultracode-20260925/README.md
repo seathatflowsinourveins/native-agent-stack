@@ -91,6 +91,7 @@ A fresh `claude -p` session on Sonnet 5 listed these MCP servers as `connected` 
 - **Secret guard false positive:** it blocked a heredoc Python checker containing `set(...)` as `environment_dump`. Workers wrote their checkers to files instead.
 - **MarkItDown** needs an `.html` extension. On a `.txt` file it exits 0 and passes the HTML through unchanged.
 - **Versions differ from the pins** because another session upgraded these tools today: rtk 0.50.0 (pin 0.49.0), markitdown 0.1.8 (0.1.7), ai-memory 2.4.0 (2.3.2), mcporter 0.14.1 (0.13.13).
+- **Headroom's beacon was on during the run.** Headroom 0.37.0 uploads an anonymous usage summary by default (`BEACON_DEFAULT_ON = True`), and nothing opted out at the time. So the two `headroom_compress` calls through MCPorter may have sent summaries. Since then, both the Claude user-scope registration and the token-report service set `HEADROOM_OFFLINE=1` and `DO_NOT_TRACK=1` (see `recipes/README.md`).
 - **OmniRoute** was not exercised. It reroutes model traffic and needs a provider credential, which is the user's decision.
 - **claude-hud and otel-tui** are interactive. otel-tui was exercised headless only.
 - **The Macs:** the same coverage check was requested in issue #276, with no result yet.
