@@ -220,9 +220,12 @@ def load_auction_prices(frozen, path, events):
     """(symbol, session) -> official open / close by news_signal.select_auction_price."""
     require(frozen)
     listing = {(ev["symbol"], ev["session"]): ev.get("exchange") for ev in events}
-    opens, closes = {}, {}
+    opens, closes, seen = {}, {}, set()
     for row in read_jsonl(path):
         key = (row["symbol"], row["session"])
+        if key in seen:
+            raise Refusal(f"duplicate auction row for {key}")
+        seen.add(key)
         venue = listing.get(key)
         o = sig.select_auction_price(row["o"], "open", venue)
         c = sig.select_auction_price(row["c"], "close", venue)

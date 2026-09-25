@@ -176,7 +176,14 @@
   "timestamp_measurements_pre_freeze": {
    "updated_minus_created_single_symbol": "n 1,761,588; zero 898,769; <=60 s 835,434; <=15 min 13,326; <=1 h 4,644; <=1 d 7,398; >1 d 2,014; negative 3; p50 0 s, p95 1 s, p99 337 s, p99.9 118,612 s",
    "guard_A_drops": 5060,
-   "guard_B_history": "v1 (median of 101 centred ids, created > 1 h earlier) and v2 (median of the 5 lower ids) were replaced before any outcome, on review: guard B now compares an estimated ingestion time with the window's own decision cutoff. New counts are in receipts/prepare-summary.json."
+   "guard_B_history": "v1 (median of 101 centred ids, created > 1 h earlier) and v2 (median of the 5 lower ids) were replaced before any outcome, on review: guard B now compares an estimated ingestion time with the window's own decision cutoff. New counts are in receipts/prepare-summary.json.",
+   "guard_B_drops": 55884,
+   "estimated_ingestion_minus_created": {
+    "1h_1d": 94778,
+    "1min_1h": 273704,
+    "gt_1d": 1870,
+    "le_1min": 11846
+   }
   },
   "d5_audit": {
    "method": "200 headlines drawn with random.Random(20260925).sample from the 131,566 single-symbol archive headlines that the narrowed filter drops (sorted by news id); labelled from text only by the builder",
@@ -192,6 +199,20 @@
    "narrowing": "before the audit, 'sell' (163 single-symbol hits alone in Mar/Jun 2021-2024, mostly 'Offering ... By Selling Stockholders') was removed and 'up'/'down' followed by 'to' ('Up To $8.4M') no longer matches",
    "reading": "B headlines carry firm news but state the market's reaction; they are dropped, as the paper drops RavenPack stock-gain/stock-loss items; this removes some news events (limitation L12)",
    "private_file": "<private root>/d5-audit-sample.json (sha256 151de9055907592763d678923e5ede4ef621c2b0831eccda88ba70db1fcac03e)"
+  },
+  "survivorship_share_by_ny_year": {
+   "2015": 0.3416,
+   "2016": 0.3033,
+   "2017": 0.2734,
+   "2018": 0.2284,
+   "2019": 0.2124,
+   "2020": 0.2056,
+   "2021": 0.2279,
+   "2022": 0.231,
+   "2023": 0.188,
+   "2024": 0.1395,
+   "2025": 0.0829,
+   "2026": 0.0418
   }
  },
  "timing": {
@@ -481,17 +502,23 @@
  "pre_freeze_data": {
   "prepare_receipt": "receipts/prepare-summary.json (counts and sha256 only)",
   "events": {
-   "rows": 449718,
-   "sha256": "103187845992933dc1716e6bb26aea3332db8caa3939aefef4c77c1dc74bb0cb",
-   "overnight_liquid": 230896,
-   "overnight_small": 96951,
-   "rth_liquid": 121871,
+   "rows": 499608,
+   "sha256": "c9f4e9a279409cdac045224b209543c9b68e4d8c127ae30122e7375248937781",
+   "built_from_commit": "2b73c70ceef3df17fc0eaaf74a05ca74798c2728",
+   "study_dir_clean": true,
+   "news_signal_py_sha256": "d8453de13031e58af9fbc07e3e9f4e8d7f469ca30c2ccac622c06b515c19965f",
+   "overnight_liquid": 228550,
+   "overnight_small": 96328,
+   "rth_liquid": 174730,
    "sessions": {
-    "overnight_liquid": 2673,
-    "overnight_small": 2673,
-    "rth_liquid": 2417
+    "overnight:liquid": 2672,
+    "overnight:small": 2672,
+    "rth:liquid": 2673
    },
-   "by_checkpoint": "see receipts/prepare-summary.json"
+   "guard_A_drops": 5060,
+   "guard_B_drops": 55884,
+   "movement_drops": 72552,
+   "previous_build": "events sha 103187845992933dc1716e6bb26aea3332db8caa3939aefef4c77c1dc74bb0cb (449,718 rows) was built from uncommitted code (review finding 9) and is superseded"
   },
   "scoring_status": {
    "unit": "sota-news-score-20260925T0419Z (systemd --user transient, MemoryHigh=3G, MemoryMax=4G, RuntimeMaxSec=28800)",
@@ -545,14 +572,15 @@
  ],
  "no_outcome_statement": "Up to this draft no return, P&L, hit rate or post-decision price change has been computed on real data, and no open was paired with a close; only the computations in pre_freeze_computations were run.",
  "pre_freeze_computations": [
-  "C1 prepare.py over the news archive: parsing, symbol counts, asset-master membership, timing-window assignment, timestamp-guard checks (updated_at vs cutoff; created_at vs id predecessors), movement-headline and duplicate flags, first-per-window selection; funnel counts and the updated_at - created_at distribution",
-  "C2 liquidity lanes from daily bars of sessions strictly before each trade session (prior raw close, 20-session median raw dollar volume, bar completeness); lane counts",
-  "C3 minute-bar file existence per symbol-year (no bar was read)",
+  "C1 prepare.py over the news archive: parsing, symbol counts, asset-master membership (and its share by year), timing-window assignment, timestamp guards (updated_at vs cutoff; estimated ingestion from id predecessors vs cutoff), movement-headline and duplicate flags, first-per-window selection; funnel counts and the updated_at - created_at distribution",
+  "C2 liquidity lanes and the Rule 201 carry-over flag from daily bars of sessions strictly before each trade session",
+  "C3 (retired 2026-09-25) minute-bar file existence; minute bars are no longer used",
   "C4 auction collection and materialization: request/response tallies and counts of symbol-sessions with an official open, close or both, and which selection step supplied them (no open and close were combined)",
-  "C5 SIP quote collection at RTH entry times: first valid half-spread per event and its distribution (quotes at the entry instant only)",
+  "C5 SIP quote collection at RTH entry times: whether a valid entry quote exists and its half-spread distribution (the entry quote only; no exit price was read with it)",
   "C6 model downloads with sha256 verification; tokenizer file verification",
   "C7 model scores on events (all prompt variants in probes, the operative variant in the full run): raw outputs, labels, label distributions, parse failures, batch-1 agreement, throughput and GPU memory",
-  "C8 numerics diagnostics: logit differences between batch shapes, dtypes, TF32 and the cached decoder on real prompts"
+  "C8 numerics diagnostics: logit differences between batch shapes, dtypes, TF32 and the cached decoder on real prompts",
+  "C9 D5 audit: 200 dropped headlines labelled from text"
  ],
  "frozen_at": null,
  "frozen_status_value": "frozen_pre_outcome",

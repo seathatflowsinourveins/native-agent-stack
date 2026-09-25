@@ -2,25 +2,34 @@
 
 **Status: draft preregistration. Nothing is frozen and no outcome has been computed.**
 [`protocol.json`](protocol.json) has status `draft_pending_independent_pre_outcome_review` and
-`frozen_before_outcomes: false`. `evaluate.py` refuses to run until the protocol is frozen and its sha256 is given.
+`frozen_before_outcomes: false`. `evaluate.py` refuses to read any event, score or price until
+`receipts/freeze-record.json` names a frozen protocol (status `frozen_pre_outcome`) committed in an ancestor of HEAD,
+every code, reference and private-input pin matches, and the study directory is clean (template:
+`receipts/freeze-record.template.json`).
 
 ## Question
 
 Lopez-Lira & Tang (arXiv 2304.07619v6) show that GPT-4's reading of a firm's headline predicts that firm's
 next-session return (gross long-short 0.34%/day, Sharpe 2.97, Oct 2021-May 2024). The effect decays (Sharpe 6.54 to
 1.22) and breaks even near 20 bps per round trip. Critics show that prompting cannot remove a model's knowledge of
-later prices. This study asks whether the effect holds after realistic costs from 2016 to 2026, when every headline is
-scored by a **chronologically consistent** model whose training data end before the headline: ChronoGPT-Instruct
-(`manelalab/chrono-gpt-instruct-v1-<Y-1>1231` for a headline in year Y).
+later prices. This study tests the paper's trading design with the **chronologically consistent** ChronoGPT-Instruct
+1.55B classifier (`manelalab/chrono-gpt-instruct-v1-<Y-1>1231` for a headline in year Y) and the model authors'
+prompt. Their own estimate for that prompt is about 3 bps/day gross, below the ~9 bps/day of modelled long-short
+costs, so **NEWS-1 is expected to fail**; its value is the upper bound and the break-even cost. Every verdict applies
+to firms present in the 2026-09-21 asset master (survivorship, limitation L11).
 
-Four confirmatory items share a Holm family (details in the protocol):
+| Item | Window | Lane | Series | Segment | Family |
+|---|---|---|---|---|---|
+| NEWS-1 | overnight (open to close) | liquid | long-short, both legs | 2016-02-02..2026-09-18 | fixed sequence 1st; Holm |
+| NEWS-4 | overnight | liquid | long-short, both legs | last 24 months | fixed sequence 2nd |
+| NEWS-2B | overnight | liquid | long leg minus all scored liquid events | 2016-02-02..2026-09-18 | Holm (m=3) |
+| NEWS-2 | overnight | liquid | long leg (absolute) | same | at 0.05/3 after NEWS-2B |
+| NEWS-3 | intraday, release + 15 min (quote) to close | liquid | long-short, both legs | 2016-02-02..2026-09-18 | Holm (m=3) |
 
-| Item | Window | Lane | Leg | Segment |
-|---|---|---|---|---|
-| NEWS-1 | overnight (open to close) | liquid | long-short | 2016-02-02..2026-09-18 |
-| NEWS-2 | overnight | liquid | long (long-only tradable) | same |
-| NEWS-3 | intraday, release + 15 min to close | liquid | long-short | 2017-01-03..2026-08-14 |
-| NEWS-4 | overnight | liquid | long-short | last 24 months |
+Gates, all computed in `evaluate.evaluate_items`: long-only paper candidate = NEWS-2B, NEWS-2 and a positive recent
+long leg; long-short candidate = NEWS-1 and NEWS-4; intraday candidate = NEWS-3. Non-rejected items report the
+one-sided 95% upper bound of the mean net and gross return against 3 and 34 bps/day. Shorts under the SEC Rule 201
+restriction (from pre-decision data) are excluded from confirmatory items.
 
 ## Files
 
@@ -28,11 +37,11 @@ Four confirmatory items share a Holm family (details in the protocol):
 |---|---|
 | `protocol.json` | The preregistration: paper facts, model pins, prompt, filters, windows, prices, costs, portfolios, items, gates, MDE, deviations, limitations, freeze procedure. |
 | `checkpoints.json` | Hugging Face revision and sha256 of every checkpoint file, the reviewed `ChronoGPT_instruct.py` sha256, tokenizer file hashes, and the load policy. |
-| `news_signal.py` | Every preregistered rule as a pure function (standard library only): timing windows, guards, novelty, instrument filter, prompt variants, label parsing, lanes, auction price selection, fees, net returns, portfolios, Newey-West, Holm. Named to avoid shadowing the standard-library `signal`. |
+| `news_signal.py` | Every preregistered rule as a pure function (standard library only): timing windows, timestamp and ingestion guards, novelty, instrument filter, prompt variants, label parsing, lanes, auction and entry-quote prices, Rule 201 flags, fees, net returns, portfolios, Newey-West, fixed sequence, Holm. Named to avoid shadowing the standard-library `signal`. |
 | `prepare.py` | Builds the event list from the news archive, calendar, asset master and prior-session daily bars; writes counts only. |
 | `score.py` | `fetch` downloads the pinned checkpoints with sha256 checks; `run` scores events resumably and stores provenance for every label. |
 | `collect_auctions.py` | Official auction prints and entry-time SIP quotes from the Alpaca data API (read-only, rate-limited, guarded credentials). |
-| `evaluate.py` | Post-freeze evaluation; refuses unless the protocol is frozen and its sha256 matches `--protocol-sha256`. |
+| `evaluate.py` | Post-freeze evaluation behind the EAP-standard guard (freeze record, ancestor freeze commit, clean tree, sha pins, a guard token checked inside every loader); score-row checks, Rule 201 flags, families, upper bounds and gates. |
 | `receipts.py` | Regenerates `receipts/` from the private root (counts and sha256 only; refuses to write the home path). |
 | `receipts/` | Small committed receipts: prepare funnel, model downloads, collection coverage and HTTP tallies, scoring probes, scoring status. |
 
@@ -64,7 +73,8 @@ python3 collect_auctions.py auctions
 python3 collect_auctions.py spreads
 
 # after the freeze only
-python3 evaluate.py --protocol-sha256 <sha256 of the frozen protocol.json>
+python3 evaluate.py --print-pins          # hashes to copy into protocol.json#/pins at the freeze
+python3 evaluate.py                       # reads the sha only from receipts/freeze-record.json
 ```
 
 ## Scoring decisions made before the freeze (label counts only)

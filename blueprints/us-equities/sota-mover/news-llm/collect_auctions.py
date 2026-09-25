@@ -296,39 +296,43 @@ def cmd_auctions(args, client):
 
 
 def materialize_auctions(out_dir, events):
-    """One row per (session, symbol) with the raw o/c entries; coverage counts only.
+    """Exactly one row per wanted (session, symbol) with the raw o/c entries; coverage counts only.
 
-    Streams the retained pages in (session, symbol) order so memory stays bounded.
+    A request for day D+1 can return an entry dated D (a late close print stamped after
+    midnight UTC), and overlapping requests return the same entry twice, so the o and c
+    entries of every (symbol, trading date) are merged across all retained pages and
+    de-duplicated. Rows are written in (session, symbol) order.
     """
     primary = {(ev["symbol"], ev["session"]): ev.get("exchange") for ev in events}
     pages_dir = os.path.join(out_dir, "pages")
-    by_day = defaultdict(list)
-    for name in os.listdir(pages_dir):
-        if name.endswith(".json.gz"):
-            by_day[name[:10]].append(name)
+    merged = {}
+    for name in sorted(os.listdir(pages_dir)):
+        if not name.endswith(".json.gz"):
+            continue
+        with gzip.open(os.path.join(pages_dir, name), "rt", encoding="utf-8") as handle:
+            page = json.load(handle)
+        for symbol, days in page["auctions"].items():
+            for d in days:
+                key = (symbol, d.get("d"))
+                if key not in primary:
+                    continue
+                slot = merged.setdefault(key, {"o": {}, "c": {}})
+                for kind in ("o", "c"):
+                    for e in d.get(kind) or []:
+                        slot[kind][json.dumps(e, sort_keys=True)] = e
     path = os.path.join(out_dir, "auctions.jsonl.gz")
     coverage = Counter()
-    found = set()
     written = 0
     with DeterministicGzipText(path) as out:
-        for day in sorted(by_day):
-            rows = {}
-            for name in by_day[day]:
-                with gzip.open(os.path.join(pages_dir, name), "rt", encoding="utf-8") as handle:
-                    page = json.load(handle)
-                for symbol, days in page["auctions"].items():
-                    for d in days:
-                        key = (symbol, d.get("d"))
-                        if key in primary:
-                            rows[symbol] = {"symbol": symbol, "session": d.get("d"), "o": d.get("o") or [], "c": d.get("c") or []}
-            for symbol in sorted(rows):
-                row = rows[symbol]
-                out.write(json.dumps(row, sort_keys=True) + "\n")
-                written += 1
-                found.add((symbol, row["session"]))
-                count_coverage(coverage, row, primary[(symbol, row["session"])])
+        for symbol, session in sorted(merged, key=lambda k: (k[1], k[0])):
+            slot = merged[(symbol, session)]
+            row = {"symbol": symbol, "session": session,
+                   "o": [slot["o"][k] for k in sorted(slot["o"])], "c": [slot["c"][k] for k in sorted(slot["c"])]}
+            out.write(json.dumps(row, sort_keys=True) + "\n")
+            written += 1
+            count_coverage(coverage, row, primary[(symbol, session)])
     coverage["symbol_sessions_wanted"] = len(primary)
-    coverage["no_auction_record"] = len(primary) - len(found)
+    coverage["no_auction_record"] = len(primary) - written
 
     with open(path, "rb") as handle:
         digest = hashlib.sha256(handle.read()).hexdigest()

@@ -190,6 +190,20 @@ class GuardRefusals(unittest.TestCase):
         with self.assertRaises(ev_mod.Refusal):
             ev_mod.load_rth_quotes(frozen, self.dir / "q.jsonl", [])
 
+    def test_duplicate_auction_rows_are_refused(self):
+        path, digest = write_protocol(self.dir, frozen_protocol())
+        frozen = ev_mod.guard(path, digest)
+        auctions = self.dir / "a.jsonl.gz"
+        row = {"symbol": "A", "session": "2023-03-01", "o": [{"c": "O", "p": 10.0, "x": "N"}], "c": [{"c": "6", "p": 10.1, "x": "N"}]}
+        with gzip.open(auctions, "wt") as fh:
+            fh.write(json.dumps(row) + "\n")
+        events = [make_event(1, "A", "2023-03-01")]
+        self.assertEqual(ev_mod.load_auction_prices(frozen, auctions, events), ({("A", "2023-03-01"): 10.0}, {("A", "2023-03-01"): 10.1}))
+        with gzip.open(auctions, "wt") as fh:
+            fh.write(json.dumps(row) + "\n" + json.dumps(row) + "\n")
+        with self.assertRaises(ev_mod.Refusal):
+            ev_mod.load_auction_prices(frozen, auctions, events)
+
     def test_pins_missing_absent_or_changed_are_refused(self):
         data = self.dir / "data"
         (data / "scores").mkdir(parents=True)
