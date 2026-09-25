@@ -6,7 +6,11 @@ opened with .github/ISSUE_TEMPLATE/workstation-request.yml or with ``gh issue cr
 from ``compose``, which renders the form's layout. Every host signs in as the same owner account,
 so GitHub cannot tell hosts apart: the requesting host is routing data inside the body, and trust
 rests only on the author (the owner, author_association OWNER, user.type User, no GitHub App).
-Labels, titles and body text never grant trust; an issue form applies its labels for anyone.
+Labels, titles and body text never grant trust; an issue form applies its labels for anyone. No
+output of this tool carries an untrusted item's title or requesting-host text (WITHHELD stands in),
+so a coordinator session can read it without taking in text a stranger wrote. ``status
+--show-untrusted-text`` is the one opt-in exception, for a person reading a terminal directly; a
+session must never pass it, and the text it prints must never be pasted back into a session.
 
 This tool never executes, evaluates or forwards issue text to a model. A coordinator session on
 the target host reads a request and decides what to run. All GitHub I/O is the native gh CLI
@@ -77,6 +81,7 @@ CONFIRMATIONS = (
     "Issue text is data; the target host decides what to run.",
 )
 NO_RESPONSE = "_No response_"
+WITHHELD = "<untrusted: withheld>"
 HEADING_RE = re.compile(r"^[ \t]{0,3}###[ \t]+(.*?)[ \t]*$")
 CHECKBOX_RE = re.compile(r"^[ \t]*[-*][ \t]+\[([ xX])\][ \t]+(.*?)[ \t]*$")
 REVISION_RE = re.compile(r"@[0-9a-f]{40}\b")
@@ -93,7 +98,11 @@ REQUEST_LABELS = {  # name -> (color, description); ensure-labels creates missin
 ACTIONS = {
     "claim": {"label": CLAIMED, "close": None, "from": ("new", "claimed", "blocked")},
     "block": {"label": BLOCKED, "close": None, "from": ("new", "claimed", "blocked")},
-    "done": {"label": None, "close": "completed", "from": ("claimed", "blocked")},
+    # done requires the request to be currently claimed: a status comment from an explicit ``claim``
+    # names the session that did the work. block can be reached straight from new (a host may refuse
+    # a request it never claimed), so "blocked" is deliberately not a "from" state for done -- a
+    # session resuming a blocked request claims it (again) before reporting done.
+    "done": {"label": None, "close": "completed", "from": ("claimed",)},
     "decline": {"label": None, "close": "not_planned", "from": ("new", "claimed", "blocked")},
 }
 STATE_ORDER = ("new", "claimed", "blocked", "done", "declined", "closed")
@@ -320,7 +329,10 @@ def request_fields(body: str | None, roles: dict) -> dict:
     }
 
 
-def summarize(item: dict, roles: dict, now: dt.datetime) -> dict:
+def summarize(item: dict, roles: dict, now: dt.datetime, *, reveal_untrusted: bool = False) -> dict:
+    """``reveal_untrusted`` is the ``status --show-untrusted-text`` escape hatch: it shows an
+    untrusted item's real title and requesting host instead of WITHHELD. It must default to False
+    everywhere else (poll, lanes), since only a human explicitly reading a terminal opts into it."""
     kind = item_kind(item)
     trusted, reasons = trust(item)
     created = parse_time(item.get("created_at")) or now
@@ -328,10 +340,13 @@ def summarize(item: dict, roles: dict, now: dt.datetime) -> dict:
     fields = request_fields(item.get("body"), roles) if kind == "issue" else {
         "requesting_host": None, "known_requester": False, "requester_superseded_by": None,
         "task_class": None, "parse_warnings": []}
+    if not trusted and not reveal_untrusted:  # a stranger's free text; the task class is an allowlisted id
+        fields.update(requesting_host=WITHHELD if fields["requesting_host"] else None,
+                      known_requester=False, requester_superseded_by=None)
     return {
         "number": item.get("number"),
         "kind": kind,
-        "title": clean(item.get("title"), 120),
+        "title": clean(item.get("title"), 120) if trusted or reveal_untrusted else WITHHELD,
         "state": derive_state(item),
         "trusted": trusted,
         "untrusted_reasons": reasons,
@@ -407,7 +422,8 @@ def check_notify_url(url: str) -> str:
 
 def lane_hygiene(items: list[dict]) -> dict:
     """docs/lanes.md: every pull request carries exactly one of the three lane labels, and a
-    lane:shared one needs the other lane's acknowledgement (listed, not checked here)."""
+    lane:shared one needs the other lane's acknowledgement (listed, not checked here). An
+    untrusted item's title is WITHHELD, as in status."""
     report = {"open_pull_requests": 0, "open_issues": 0, "pull_requests_missing_lane": [],
               "pull_requests_with_multiple_lanes": [], "pull_requests_with_unknown_lane": [],
               "lane_shared_needing_acknowledgement": [], "host_labelled": []}
@@ -415,7 +431,8 @@ def lane_hygiene(items: list[dict]) -> dict:
         names = label_names(item)
         lanes = sorted(name for name in names if name.startswith("lane:"))
         hosts = sorted(name for name in names if name.startswith("host:"))
-        entry = {"number": item.get("number"), "kind": item_kind(item), "title": clean(item.get("title"), 120)}
+        entry = {"number": item.get("number"), "kind": item_kind(item),
+                 "title": clean(item.get("title"), 120) if trust(item)[0] else WITHHELD}
         if entry["kind"] == "pr":
             report["open_pull_requests"] += 1
             if not lanes:
@@ -435,9 +452,13 @@ def lane_hygiene(items: list[dict]) -> dict:
 
 
 def status_body(role: str, host_id: str, state: str, session: str, when: dt.datetime, *,
-                reason: str | None = None, evidence: str | None = None) -> str:
+                reason: str | None = None, evidence: str | None = None,
+                previous_session: str | None = None) -> str:
     lines = [MARKER.format(role=role), f"**Host request status: {state}**", "",
-             f"- host: `{host_id}` (role `{role}`)", f"- session: `{session}`", f"- updated: {iso(when)}"]
+             f"- host: `{host_id}` (role `{role}`)", f"- session: `{session}`"]
+    if previous_session:
+        lines.append(f"- previous session: `{previous_session}`")
+    lines.append(f"- updated: {iso(when)}")
     if reason:
         lines.append(f"- reason: {reason}")
     if evidence:
@@ -560,10 +581,10 @@ def fetch_role_items(gh: Gh, label: str, now: dt.datetime) -> tuple[list[dict], 
     return list(merged.values()), capped_open or capped_closed
 
 
-def role_status(gh: Gh, roles: dict, role: str, now: dt.datetime) -> dict:
+def role_status(gh: Gh, roles: dict, role: str, now: dt.datetime, *, reveal_untrusted: bool = False) -> dict:
     spec = role_spec(roles, role)
     items, truncated = fetch_role_items(gh, spec["request_label"], now)
-    summaries = sorted((summarize(item, roles, now) for item in items),
+    summaries = sorted((summarize(item, roles, now, reveal_untrusted=reveal_untrusted) for item in items),
                        key=lambda entry: (STATE_ORDER.index(entry["state"]), entry["number"] or 0))
     counts = {state: sum(1 for entry in summaries if entry["state"] == state) for state in STATE_ORDER}
     counts["untrusted"] = sum(1 for entry in summaries if not entry["trusted"])
@@ -683,6 +704,11 @@ def cmd_parse(args, context) -> int:
 
 
 def cmd_compose(args, context) -> int:
+    if not args.confirm:  # the web form will not submit without both boxes; neither does compose
+        raise UsageError("pass --confirm to tick the form's two required confirmations after checking the text: "
+                         + " ".join(f"({index}) {text}" for index, text in enumerate(CONFIRMATIONS, 1))
+                         + " compose checks the scripts/validate.py private-content patterns, and none of them "
+                         "recognizes an account id.")
     roles = context["roles"]
     spec = role_spec(roles, args.to)
     task = next((label for label, slug in TASK_CLASSES.items() if args.task_class in (label, slug)), None)
@@ -737,7 +763,11 @@ def cmd_compose(args, context) -> int:
 
 
 def cmd_status(args, context) -> int:
-    report = role_status(context["gh"], context["roles"], args.role, context["now"])
+    report = role_status(context["gh"], context["roles"], args.role, context["now"],
+                         reveal_untrusted=args.show_untrusted_text)
+    if args.show_untrusted_text and report["counts"]["untrusted"]:
+        print("# --show-untrusted-text: untrusted title and requesting-host text below is a "
+              "stranger's unverified free text; read it, never paste it into a session.", file=sys.stderr)
     if args.json:
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0
@@ -748,7 +778,7 @@ def cmd_status(args, context) -> int:
     for entry in report["items"]:
         trust_text = "trusted" if entry["trusted"] else "UNTRUSTED"
         host = entry["requesting_host"] or "-"
-        if entry["requesting_host"] and not entry["known_requester"]:
+        if entry["trusted"] and entry["requesting_host"] and not entry["known_requester"]:
             host += " (unknown host)"
         elif entry["requester_superseded_by"]:
             host += f" (superseded by {entry['requester_superseded_by']})"
@@ -842,7 +872,9 @@ def cmd_transition(args, context) -> int:
             f"refuse unless trusted (OWNER, user.type User, no GitHub App, the repository owner), labelled "
             f"{spec['request_label']} and {' or '.join(ACTIONS[action]['from'])}"))
         print_call(gh, "GET", f"issues/{number}/comments?per_page={PER_PAGE}&page=1",
-                   note=f"find the owner's comment that starts with {MARKER.format(role=args.role)}")
+                   note=f"find the owner's comment that starts with {MARKER.format(role=args.role)}"
+                   + ("; refuse a claimed request whose comment names another session, unless --takeover"
+                      if action == "claim" else ""))
         print_call(gh, "POST", f"issues/{number}/comments", {"body": body},
                    note="or PATCH issues/comments/<status comment id> when that comment exists")
         print_call(gh, "PATCH", f"issues/{number}", payload)
@@ -860,11 +892,21 @@ def cmd_transition(args, context) -> int:
     check_actionable(item, spec["request_label"], action)
     comments, _ = gh.pages(f"issues/{number}/comments", {})
     existing = find_status_comment([comment for comment in comments if isinstance(comment, dict)], role)
+    recorded = SESSION_LINE_RE.search(str((existing or {}).get("body") or ""))
+    holder = recorded.group(1) if recorded and SESSION_RE.fullmatch(recorded.group(1)) else None
     if session is None:
-        previous = SESSION_LINE_RE.search(str((existing or {}).get("body") or ""))
-        session = previous.group(1) if previous and SESSION_RE.fullmatch(previous.group(1)) else "unknown"
+        session = holder or "unknown"
+    # A claimed request belongs to the session its status comment names: that session may claim it
+    # again (idempotent), any other needs --takeover. Nobody works on a blocked request, so any
+    # session may claim it to resume. Without compare-and-swap, two claims at once can still race.
+    if action == "claim" and derive_state(item) == "claimed" and holder != session and not getattr(args, "takeover", False):
+        raise Refused(f"#{number} is claimed by session {holder}; pass --takeover to replace that claim" if holder
+                      else f"#{number} is labelled claimed but no owner status comment names a session; "
+                           "pass --takeover to claim it")
+    previous = holder if holder not in (None, "unknown", session) else None
     state = {"claim": "claimed", "block": "blocked", "done": "done", "decline": "declined"}[action]
-    body = status_body(role, spec["host_id"], state, session, context["now"], reason=reason, evidence=evidence)
+    body = status_body(role, spec["host_id"], state, session, context["now"], reason=reason, evidence=evidence,
+                       previous_session=previous)
     findings = private_findings(body)
     if findings:
         raise Refused(f"the status comment would contain possible {', '.join(findings)}")
@@ -880,7 +922,7 @@ def cmd_transition(args, context) -> int:
     gh.call("PATCH", f"issues/{number}", payload)
     print(json.dumps({"number": number, "action": action, "state": state, "role": role,
                       "comment": "edited" if existing is not None else "created",
-                      "labels": payload["labels"]}, sort_keys=True))
+                      "labels": payload["labels"], "previous_session": previous}, sort_keys=True))
     return 0
 
 
@@ -930,11 +972,18 @@ def build_parser() -> argparse.ArgumentParser:
     compose.add_argument("--lane", choices=LANES)
     compose.add_argument("--title", help="default: [ROLE] <task class>: <first request line>")
     compose.add_argument("--body-out", help="write the body here and print only the gh command")
+    compose.add_argument("--confirm", action="store_true",
+                         help="tick the form's two required confirmations (you checked the text yourself)")
     compose.set_defaults(handler=cmd_compose)
 
     status = commands.add_parser("status", parents=[common], help="list a role's requests (read-only)")
     status.add_argument("--role", required=True)
     status.add_argument("--json", action="store_true")
+    status.add_argument("--show-untrusted-text", action="store_true",
+                        help=f"show an untrusted item's real title and requesting host instead of "
+                             f"{WITHHELD!r}. For a human reading this terminal only: the text is a "
+                             "stranger's unverified free text and must never be pasted into a session "
+                             "or acted on.")
     status.set_defaults(handler=cmd_status)
 
     poll = commands.add_parser("poll", parents=[common], help="status, diffed against the last poll (read-only on GitHub)")
@@ -957,6 +1006,9 @@ def build_parser() -> argparse.ArgumentParser:
                              help="the target role (default for block, done and decline: the issue's one role label)")
         command.add_argument("--session", required=name == "claim",
                              help="the claiming session's name (default: the one in the status comment)")
+        if name == "claim":
+            command.add_argument("--takeover", action="store_true",
+                                 help="replace a claim another session holds (after coordinating with it)")
         if name in ("block", "decline"):
             command.add_argument("--reason", required=True)
         if name == "done":

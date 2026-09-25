@@ -2,6 +2,7 @@
 # syntax pages). Field ids, labels and dropdown options must stay equal to FIELDS, TASK_CLASSES,
 # LANES and CONFIRMATIONS in scripts/host_requests.py: tests/test_host_requests.py checks both, and
 # `host_requests.py compose` renders the same body for requesters who use `gh issue create`.
+# Double-quote any value containing " #" or ": " (unquoted, YAML reads " #" as a comment start).
 name: Workstation request
 description: Ask the GPU workstation (nativestack-5975wx-20260925) for memory, RAG, model hosting, qualification or review work.
 title: "[workstation] "
@@ -70,7 +71,7 @@ body:
     id: related
     attributes:
       label: Related
-      description: Related pull requests or issues, for example #253.
+      description: "Related pull requests or issues, for example #253."
     validations:
       required: false
   - type: checkboxes

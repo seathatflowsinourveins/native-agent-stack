@@ -214,3 +214,54 @@ This is a drafted lane. Its evidence is `local_integration`, `synthetic` and `so
 Not done yet: creating the labels, filing an issue through the form, any claim, block, done or
 decline on GitHub, installing the timer, sending an ntfy notice, and executing a request end to
 end. The lane becomes `native_proven` only after those have run and been recorded.
+
+### Fix round 2: independent-review findings (2026-09-25)
+
+A second independent review of the round-1 fix (claim ownership, WITHHELD titles/hosts, YAML
+quoting, the `credentials` note, `compose --confirm`, the `send_notice` transport tests) found
+seven residual findings, all resolved here:
+
+1. `claim` on a `claimed` request now refuses (exit 3) a session that differs from the one the
+   status comment names, unless `--takeover` is given; the same session re-claims idempotently.
+2. `status` already replaced an untrusted item's title and requesting host with
+   `<untrusted: withheld>`; this round adds the missing `--show-untrusted-text` flag (documented
+   for a human reader only) as the one way to see the raw text, in text and JSON output alike.
+3. The issue form's `Related` description is quoted (round 1); the YAML cross-check test now
+   compares `description` and `placeholder` text too, not only ids and options.
+4. The recipe says the `huggingface-native` credential-status row lands with a separate change,
+   matching `host-roles.json`'s own note (round 1).
+5. `compose` refuses to render a body (exit 2) unless `--confirm` is passed, and documents that
+   its private-content patterns do not recognize an account id (round 1).
+6. `done` now requires the request to be currently `claimed`: `ACTIONS["done"]["from"]` dropped
+   `"blocked"`, because `block` is reachable straight from `new` and was not, by itself, evidence
+   that any session had claimed and done the work.
+7. `NoticeTransportTests` posts to a loopback `http.server` with `http_proxy`/`HTTP_PROXY` set and
+   a 302 responder, asserting the notice reaches only the topic and the redirect is not followed.
+
+**Acceptance (counts only, sanitized):**
+
+- `local_integration`: `/usr/bin/python3 -m unittest tests.test_host_requests` -- 49 tests, 0
+  failed. The same suite plus `tests.test_adoption_docs_consistency` under
+  `uv run --no-project --python 3.13 --with-requirements .github/requirements-ci.txt python` --
+  82 tests, 0 failed, 2 skipped (the PyYAML cross-check, because PyYAML is not in the CI
+  requirements; one unrelated profile-table check with nothing to compare at HEAD).
+  `python scripts/validate.py` under the same interpreter: `"status": "passed"`.
+- `local_integration`: read-only `status --role workstation --json` and `lanes --json` against
+  the real repository returned well-formed JSON (0 open requests in every state, 14 open pull
+  requests, 8 open issues, not truncated); `claim 1 --role workstation --session x --dry-run`
+  printed the planned `gh api` calls and made none.
+- `synthetic`: a mutation check (one exact source replacement per guard, run against scratch
+  copies with `tests.test_host_requests` as the oracle) covered 26 mutants across both fix
+  rounds' guards (trust, state, claim ownership, done-requires-claimed, WITHHELD /
+  `--show-untrusted-text`, notice transport, `compose --confirm`, YAML quoting, the credential id
+  check) -- 26 killed, 0 survivors.
+- `synthetic`: `systemd-analyze --user verify` on scratch copies of both drafted units -- exit 0,
+  no diagnostics (the unit files are unchanged this round).
+- `synthetic`: the issue form re-validated against SchemaStore's `github-issue-forms.json` (same
+  sha256 `c2722dbf00334ce4fdeffa960b8c9047caf4f1cbb8f3809663f4d604b1d3ae76` as the original check)
+  -- 0 errors; a negative-control mutant (an invalid element id, a duplicate dropdown option)
+  gave 2 errors.
+
+Still not done: creating the labels, filing a real issue, any claim, block, done or decline on
+GitHub, installing the timer, sending a live ntfy notice. The lane stays evidence class
+`local_integration`, `synthetic` and `source_review` until those run.
