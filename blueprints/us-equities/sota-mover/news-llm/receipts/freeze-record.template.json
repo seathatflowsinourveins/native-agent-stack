@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "kind": "news_llm_freeze_record",
+  "protocol_id": "sota-mover-news-llm-20260925",
+  "protocol_sha256": null,
+  "protocol_commit": null,
+  "frozen_at": null,
+  "reviewer": null,
+  "review_verdict": null,
+  "outcomes_computed_before_freeze": false,
+  "instructions": "Copy to receipts/freeze-record.json after the frozen protocol.json (status frozen_pre_outcome, frozen_before_outcomes true, frozen_at set, all pins filled) is committed; set protocol_sha256 to the sha256 of the committed protocol.json bytes and protocol_commit to that full commit; commit the record. evaluate.py reads the expected sha256 only from receipts/freeze-record.json."
+}

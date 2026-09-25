@@ -159,6 +159,8 @@ class Workflows(unittest.TestCase):
                 if sym == "C":
                     continue  # no auction record for C
                 out[sym] = [auction_day(day, code="Q" if sym != "A" else "N")]
+                if sym == "A" and day == "2023-03-02":  # late close print of the previous trading date
+                    out[sym].append({"d": "2023-03-01", "o": None, "c": [{"c": "M", "p": 10.2, "t": "2023-03-02T00:05:00Z", "x": "N"}]})
             return 200, json.dumps({"auctions": out, "next_page_token": None}).encode(), {}
         if path == ca.QUOTES_PATH:
             sym = q["symbols"]
@@ -182,6 +184,8 @@ class Workflows(unittest.TestCase):
         self.assertEqual(summary["rows"], 3)
         rows = [json.loads(l) for l in gzip.open(self.dir / "auctions/auctions.jsonl.gz", "rt")]
         self.assertEqual([(r["session"], r["symbol"]) for r in rows], [("2023-03-01", "A"), ("2023-03-01", "B"), ("2023-03-02", "A")])
+        self.assertEqual(len(rows[0]["c"]), 2)  # the late print merged into the one (A, 2023-03-01) row
+        self.assertEqual(len(rows[0]["o"]), 1)
         first = (self.dir / "auctions/auctions.jsonl.gz").read_bytes()
         self.run_cmd("auctions", transport)
         self.assertEqual(len(transport.calls), 2)  # ledger: nothing re-requested
@@ -201,7 +205,7 @@ class Workflows(unittest.TestCase):
         self.assertEqual(q["B"]["end"], "2023-03-01T15:01:05Z")
         self.assertEqual((q["B"]["feed"], q["B"]["limit"]), ("sip", "10"))
         summary = json.loads((self.dir / "spreads/spreads-summary.json").read_text())
-        self.assertEqual(summary["counts"], {"events": 2, "no_valid_quote": 1})
+        self.assertEqual(summary["counts"], {"events": 2, "no_valid_entry_quote": 1})
         self.assertAlmostEqual(summary["half_spread_bps"]["median"], 10.0, places=2)
 
 

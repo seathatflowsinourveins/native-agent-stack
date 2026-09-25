@@ -1,13 +1,35 @@
 #!/usr/bin/env python3
 """Confirmatory evaluation of the news-LLM direction study (runs only after the freeze).
 
-Refuses to read any data unless protocol.json has status "frozen", frozen_before_outcomes
-true, and its sha256 equals --protocol-sha256. Inputs whose sha256 the frozen protocol
-lists under frozen_inputs must match too. Everything the protocol preregisters (windows,
-prices, costs, portfolios, items, multiplicity, gates) is applied exactly once, here.
+  python evaluate.py [--data-root ROOT] [--freeze-record PATH] [--protocol-sha256 SHA] [--out RESULT.json]
+  python evaluate.py --print-pins [--data-root ROOT]     # hashes only, no data read
 
-Core computations are pure functions (build_positions, series_stats, evaluate_items) so
-the synthetic tests exercise every path without data; the loaders are thin.
+run() refuses (exit 2) before it opens any event, score or price unless all of these hold
+(the standard of blueprints/us-equities/sota-mover/eap/evaluate.py):
+* receipts/freeze-record.json names the sha256 of protocol.json and the full commit that
+  froze it (--protocol-sha256, when given, must equal the record);
+* protocol.json hashes to that sha256, has status 'frozen_pre_outcome',
+  frozen_before_outcomes true and frozen_at set;
+* the freeze commit is an ancestor of HEAD and protocol.json at that commit hashes to the
+  recorded sha256;
+* every pin in protocol.json#/pins matches: code (news_signal.py, evaluate.py, prepare.py,
+  score.py, collect_auctions.py, receipts.py), reference data (fees, session calendar,
+  checkpoints.json) and private inputs (events, every scores file, auctions, entry quotes);
+* ``git status --porcelain`` is empty for the study directory; HEAD is recorded.
+Only authorize() runs that whole chain, and only it issues the Authorization token that
+data_pass() and every loader require; each loader also re-runs guard() on the protocol and
+reads only the pinned files under the authorized data root. guard() alone (protocol checks
+only) cannot open the data.
+
+Positions use the operative score (news_signal.operative_score, D22); the model authors'
+strict label rule is evaluated alongside as a descriptive sensitivity for every item.
+
+Families: primary fixed sequence at alpha 0.05, NEWS-1 then NEWS-4 (long-short gate);
+secondary Holm at alpha 0.05 over three members: NEWS-1, the long-only pair (NEWS-2B and
+NEWS-2 as one intersection-union member, p = max of the two) and NEWS-3. Each family
+bounds its false rejections at 0.05, so the chance of any false gate is at most 0.10.
+Non-rejection is read through the one-sided 95% upper bound of the mean against 3 bps/day
+(the model authors' estimate) and 34 bps/day (the paper).
 """
 import argparse
 import gzip
@@ -16,16 +38,17 @@ import importlib.util
 import json
 import math
 import os
+import subprocess
 import sys
 from collections import Counter, defaultdict
 from datetime import date, datetime, timezone
+from pathlib import Path
 
-
-_HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = Path(__file__).resolve().parent
 
 
 def load_news_signal():
-    spec = importlib.util.spec_from_file_location("news_signal", os.path.join(_HERE, "news_signal.py"))
+    spec = importlib.util.spec_from_file_location("news_signal", HERE / "news_signal.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules["news_signal"] = module
     spec.loader.exec_module(module)
@@ -34,268 +57,198 @@ def load_news_signal():
 
 sig = load_news_signal()
 
-REPO = os.path.abspath(os.path.join(_HERE, "..", "..", "..", ".."))
-FROZEN_STATUS = "frozen"
-PRIVATE_ROOT = os.path.expanduser("~/.local/state/native-agent-stack/research/sota-mover/news-llm")
-MINUTE_ROOT = os.path.expanduser("~/.local/share/native-agent-stack/minute-bars/stage1/bars")
+REPO = HERE.parents[3]
+PROTOCOL_PATH = HERE / "protocol.json"
+FREEZE_RECORD_PATH = HERE / "receipts" / "freeze-record.json"
+FROZEN_STATUS = "frozen_pre_outcome"
+PRIVATE_ROOT = Path(os.path.expanduser("~/.local/state/native-agent-stack/research/sota-mover/news-llm"))
+CODE_PINS = ("news_signal.py", "evaluate.py", "prepare.py", "score.py", "collect_auctions.py", "receipts.py")
+REFERENCE_PINS = {
+    "fees-v3.json": "blueprints/us-equities/mover-v3/data/fees-v3.json",
+    "session-calendar.json": "blueprints/us-equities/mover-v3/data/session-calendar.json",
+    "checkpoints.json": "blueprints/us-equities/sota-mover/news-llm/checkpoints.json",
+}
+PRIVATE_INPUTS = ("events.jsonl.gz", "auctions/auctions.jsonl.gz", "spreads/quotes.jsonl") + tuple(
+    f"scores/scores-{y}1231.jsonl" for y in range(sig.FIRST_CHECKPOINT_YEAR, sig.LAST_CHECKPOINT_YEAR + 1))
+PRIOR_BPS = {"model_authors_3bps": 0.0003, "paper_34bps": 0.0034}
+Z95 = 1.6448536269514722
+_TOKEN = object()
+_RUN_TOKEN = object()
 
 
 class Refusal(SystemExit):
-    """Raised before any data is read when the protocol is not frozen and pinned."""
+    def __init__(self, reason):
+        super().__init__(2)
+        self.reason = reason
+
+    def __str__(self):
+        return f"refusing: {self.reason}"
 
 
-def sha256_bytes(raw):
-    return hashlib.sha256(raw).hexdigest()
+class FrozenProtocol:
+    """Proof that guard() accepted the protocol; cannot be built without the module token."""
+
+    def __init__(self, protocol, sha256, path, token):
+        if token is not _TOKEN:
+            raise Refusal("FrozenProtocol can only be created by guard()")
+        self.protocol, self.sha256, self.path, self._token = protocol, sha256, Path(path), token
 
 
 def sha256_file(path):
-    digest = hashlib.sha256()
-    with open(path, "rb") as handle:
-        for block in iter(lambda: handle.read(1 << 22), b""):
-            digest.update(block)
-    return digest.hexdigest()
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 22), b""):
+            h.update(chunk)
+    return h.hexdigest()
 
 
-def check_protocol(path, expected_sha256):
-    """Return the parsed protocol only if it is frozen and byte-identical to the pin."""
-    if not expected_sha256 or len(expected_sha256) != 64:
-        raise Refusal("refusing: --protocol-sha256 must be the 64-hex sha256 of the frozen protocol")
-    with open(path, "rb") as handle:
-        raw = handle.read()
-    actual = sha256_bytes(raw)
-    if actual != expected_sha256.lower():
-        raise Refusal(f"refusing: protocol sha256 {actual} does not match --protocol-sha256")
-    protocol = json.loads(raw)
-    if protocol.get("status") != FROZEN_STATUS or protocol.get("frozen_before_outcomes") is not True:
-        raise Refusal(
-            f"refusing: protocol status is {protocol.get('status')!r} and frozen_before_outcomes is "
-            f"{protocol.get('frozen_before_outcomes')!r}; evaluation needs status 'frozen' and true"
-        )
-    return protocol
+def _hex(value, length):
+    v = str(value or "").strip().lower()
+    return v if len(v) == length and all(c in "0123456789abcdef" for c in v) else None
 
 
-def check_inputs(protocol, root):
-    """Every frozen input the protocol pins must exist with the pinned sha256."""
-    pinned = protocol.get("frozen_inputs") or {}
-    missing = [k for k, v in pinned.items() if not v]
-    if missing:
-        raise Refusal(f"refusing: frozen_inputs without a sha256: {sorted(missing)}")
-    for rel, digest in pinned.items():
-        path = os.path.join(root, rel)
-        if not os.path.exists(path):
-            raise Refusal(f"refusing: frozen input missing: {rel}")
-        if sha256_file(path) != digest:
-            raise Refusal(f"refusing: frozen input changed: {rel}")
+def read_freeze_record(path):
+    try:
+        rec = json.loads(Path(path).read_text())
+    except FileNotFoundError:
+        raise Refusal(f"freeze record missing: {path}") from None
+    except ValueError:
+        raise Refusal("freeze record is not valid JSON") from None
+    sha = _hex(rec.get("protocol_sha256"), 64)
+    if sha is None:
+        raise Refusal("freeze record has no protocol_sha256")
+    commit = _hex(rec.get("protocol_commit"), 40)
+    if commit is None:
+        raise Refusal("freeze record has no full protocol_commit")
+    return sha, commit
 
 
-# --------------------------------------------------------------------------------------
-# Pure evaluation
-# --------------------------------------------------------------------------------------
+def guard(protocol_path, expected_sha256):
+    """The parsed protocol, only when frozen and its bytes hash to ``expected_sha256``."""
+    raw = Path(protocol_path).read_bytes()
+    actual = hashlib.sha256(raw).hexdigest()
+    if _hex(expected_sha256, 64) != actual:
+        raise Refusal(f"protocol sha256 mismatch: expected {expected_sha256!r}, file has {actual}")
+    p = json.loads(raw)
+    if p.get("status") != FROZEN_STATUS or p.get("frozen_before_outcomes") is not True or not p.get("frozen_at"):
+        raise Refusal(f"protocol is not frozen (status={p.get('status')!r}, "
+                      f"frozen_before_outcomes={p.get('frozen_before_outcomes')!r}, frozen_at={p.get('frozen_at')!r})")
+    return FrozenProtocol(p, actual, protocol_path, _TOKEN)
 
 
-def entry_cost_fraction(ev, costs, spread_lookup):
-    """Per-side adverse cost at entry (fraction of price) for an event."""
-    if ev["window"] == sig.RTH:
-        hs = spread_lookup(ev)
-        return hs + costs["rth_entry_allowance_bps"] / 1e4
-    return costs["auction_slippage_bps_per_side"][ev["lane"]] / 1e4
+class Authorization:
+    """Issued only by authorize() after the freeze record, frozen protocol, pins, clean tree
+    and freeze-commit checks; the only key to data_pass() and the loaders."""
+
+    def __init__(self, frozen, head, study_dir, data_root, repo_root, token):
+        if token is not _RUN_TOKEN:
+            raise Refusal("an Authorization can only be issued by authorize()")
+        if not isinstance(frozen, FrozenProtocol) or frozen._token is not _TOKEN:
+            raise Refusal("an Authorization needs the FrozenProtocol returned by guard()")
+        self.frozen, self.head, self._token = frozen, head, token
+        self.study_dir, self.data_root, self.repo_root = Path(study_dir), Path(data_root), Path(repo_root)
 
 
-def exit_cost_fraction(ev, costs):
-    return costs["auction_slippage_bps_per_side"][ev["lane"]] / 1e4
+def require(auth):
+    """Every loader and data_pass() call this first: an authorize()-issued token, and a
+    protocol file still byte-identical to the one authorized."""
+    if not isinstance(auth, Authorization) or auth._token is not _RUN_TOKEN:
+        raise Refusal("data access requires the Authorization issued by authorize() "
+                      "(freeze record, pins, clean tree and freeze commit checked)")
+    guard(auth.frozen.path, auth.frozen.sha256)
+    return auth
 
 
-def build_positions(events, scores, open_prices, close_prices, rth_entries, spread_lookup, fees, costs,
-                    expected_template=None):
-    """Positions with gross and net returns, plus exclusion counts.
-
-    events: prepared events; scores: event_id -> score row; open_prices / close_prices:
-    (symbol, session) -> price (official auction, already selected); rth_entries:
-    event_id -> entry price from the first minute bar at/after release + 15 min.
-    """
-    positions = []
-    excluded = Counter()
-    for ev in events:
-        row = scores.get(ev["event_id"])
-        if row is None:
-            excluded["no_score"] += 1
-            continue
-        if expected_template and row.get("template_sha256") != expected_template:
-            excluded["template_mismatch"] += 1
-            continue
-        side = int(row["score"])
-        if side == 0:
-            excluded[f"no_position_{row['label']}"] += 1
-            continue
-        key = (ev["symbol"], ev["session"])
-        exit_price = close_prices.get(key)
-        if ev["window"] == sig.OVERNIGHT:
-            entry_price = open_prices.get(key)
-        else:
-            entry_price = rth_entries.get(ev["event_id"])
-        if entry_price is None:
-            excluded[f"missing_entry_{ev['window']}"] += 1
-            continue
-        if exit_price is None:
-            excluded[f"missing_exit_{ev['window']}"] += 1
-            continue
-        day = date.fromisoformat(ev["session"])
-        entry_cost = entry_cost_fraction(ev, costs, spread_lookup)
-        exit_cost = exit_cost_fraction(ev, costs)
-        net = sig.position_net_return(side, entry_price, exit_price, day, fees, costs["notional_usd"], entry_cost, exit_cost)
-        gross = sig.gross_return(side, entry_price, exit_price)
-        positions.append({
-            "event_id": ev["event_id"],
-            "symbol": ev["symbol"],
-            "session": ev["session"],
-            "window": ev["window"],
-            "lane": ev["lane"],
-            "side": side,
-            "gross": gross,
-            "net": net,
-            "cost": gross - net,
-        })
-    return positions, excluded
+def git(directory, *args):
+    return subprocess.run(["git", *args], cwd=directory, capture_output=True, text=True)
 
 
-def daily_series(positions, window, lane, field):
-    """Daily long, short and long-short series for one window x lane on `field` returns."""
-    chosen = [{"session": p["session"], "side": p["side"], "ret": p[field]}
-              for p in positions if p["window"] == window and p["lane"] == lane]
-    return sig.daily_portfolios(chosen)
+def git_clean_head(directory):
+    st = git(directory, "status", "--porcelain", "--", ".")
+    if st.returncode != 0:
+        raise Refusal("not a git checkout: " + st.stderr.strip())
+    if st.stdout.strip():
+        raise Refusal("study directory has uncommitted changes")
+    head = git(directory, "rev-parse", "HEAD")
+    if head.returncode != 0:
+        raise Refusal("git rev-parse HEAD failed")
+    return head.stdout.strip()
 
 
-def series_stats(values, lags):
-    values = [v for v in values if v is not None]
-    n = len(values)
-    if n < 2:
-        return {"n_days": n, "mean": values[0] if values else None, "t_nw": None, "p_one_sided": None}
-    t, se = sig.newey_west_t(values, lags)
-    mu = sum(values) / n
-    sd = math.sqrt(sum((v - mu) ** 2 for v in values) / (n - 1))
+def verify_freeze_commit(directory, commit, expected_sha256):
+    """The freeze commit is an ancestor of HEAD and its protocol.json hashes to the record."""
+    anc = subprocess.run(["git", "merge-base", "--is-ancestor", commit, "HEAD"], cwd=directory, capture_output=True)
+    if anc.returncode != 0:
+        raise Refusal(f"freeze commit {commit} is not an ancestor of HEAD")
+    shown = subprocess.run(["git", "show", f"{commit}:./protocol.json"], cwd=directory, capture_output=True)
+    if shown.returncode != 0 or hashlib.sha256(shown.stdout).hexdigest() != expected_sha256:
+        raise Refusal("protocol.json at the freeze commit does not match the freeze record")
+
+
+def pin_paths(study_dir, data_root, repo_root):
     return {
-        "n_days": n,
-        "mean": mu,
-        "sd": sd,
-        "se_nw": se,
-        "t_nw": t,
-        "p_one_sided": sig.normal_sf(t) if not math.isnan(t) else None,
-        "sharpe_annualized": (mu / sd * math.sqrt(252)) if sd > 0 else None,
-        "hit_rate": sum(1 for v in values if v > 0) / n,
+        "code": {n: Path(study_dir) / n for n in CODE_PINS},
+        "reference": {n: Path(repo_root) / rel for n, rel in REFERENCE_PINS.items()},
+        "private_inputs": {n: Path(data_root) / n for n in PRIVATE_INPUTS},
     }
 
 
-def in_segment(session_iso, segment):
-    return segment["first_session"] <= session_iso <= segment["last_session"]
+def compute_pins(study_dir, data_root, repo_root):
+    return {g: {n: (sha256_file(p) if p.exists() else None) for n, p in d.items()}
+            for g, d in pin_paths(study_dir, data_root, repo_root).items()}
 
 
-def leg_values(daily, leg, segment):
-    return [v[leg] for d, v in sorted(daily.items()) if in_segment(d, segment) and v[leg] is not None]
-
-
-def break_even_round_trip(gross_daily, segment):
-    """Per-position round-trip cost that sets the mean long-short return to zero."""
-    num, legs = 0.0, 0
-    days = 0
-    for d, v in gross_daily.items():
-        if not in_segment(d, segment) or v["long_short"] is None:
-            continue
-        days += 1
-        num += v["long_short"]
-        legs += (v["long"] is not None) + (v["short"] is not None)
-    if days == 0 or legs == 0:
-        return None
-    return (num / days) / (legs / days)
-
-
-def evaluate_items(protocol, positions):
-    """Preregistered confirmatory items with Holm adjustment and gates."""
-    lags = protocol["inference"]["newey_west_lags"]
-    alpha = protocol["inference"]["family_alpha"]
-    segments = protocol["segments"]
-    results = {}
-    raw_p = {}
-    for item in protocol["items"]:
-        daily = daily_series(positions, item["window"], item["lane"], "net")
-        seg = segments[item["segment"]]
-        values = leg_values(daily, item["leg"], seg)
-        stats = series_stats(values, lags)
-        stats["min_days"] = item["min_days"]
-        stats["sample_ok"] = stats["n_days"] >= item["min_days"]
-        results[item["id"]] = stats
-        raw_p[item["id"]] = stats["p_one_sided"] if stats["sample_ok"] else None
-    adjusted = sig.holm(raw_p)
-    for item in protocol["items"]:
-        r = results[item["id"]]
-        r["p_holm"] = adjusted[item["id"]]
-        if not r["sample_ok"]:
-            r["verdict"] = "insufficient_sample"
-        elif r["p_holm"] <= alpha and r["mean"] is not None and r["mean"] > 0:
-            r["verdict"] = "pass"
-        else:
-            r["verdict"] = "fail"
-    return results
-
-
-def descriptive(protocol, positions):
-    """Legs, gross versions, per-year and small-cap lane tables (never confirmatory)."""
-    lags = protocol["inference"]["newey_west_lags"]
-    out = {}
-    for window in (sig.OVERNIGHT, sig.RTH):
-        for lane in (sig.LIQUID, sig.SMALL):
-            net_daily = daily_series(positions, window, lane, "net")
-            gross_daily = daily_series(positions, window, lane, "gross")
-            if not net_daily:
-                continue
-            block = {}
-            for seg_name, seg in protocol["segments"].items():
-                if not isinstance(seg, dict):
-                    continue  # e.g. the "justification" text
-                block[seg_name] = {
-                    f"{field}_{leg}": series_stats(leg_values(daily, leg, seg), lags)
-                    for field, daily in (("net", net_daily), ("gross", gross_daily))
-                    for leg in ("long", "short", "long_short")
-                }
-                block[seg_name]["break_even_round_trip"] = break_even_round_trip(gross_daily, seg)
-            years = sorted({d[:4] for d in net_daily})
-            block["by_year_net_long_short"] = {
-                y: series_stats([v["long_short"] for d, v in net_daily.items() if d[:4] == y and v["long_short"] is not None], lags)
-                for y in years
-            }
-            chosen = [p for p in positions if p["window"] == window and p["lane"] == lane]
-            block["positions"] = len(chosen)
-            block["mean_cost_per_position"] = (sum(p["cost"] for p in chosen) / len(chosen)) if chosen else None
-            out[f"{window}:{lane}"] = block
-    return out
+def verify_pins(protocol, study_dir, data_root, repo_root):
+    pins = protocol.get("pins") or {}
+    for group, files in pin_paths(study_dir, data_root, repo_root).items():
+        want = pins.get(group) or {}
+        for name, path in files.items():
+            if not _hex(want.get(name), 64):
+                raise Refusal(f"pin missing: {group}/{name}")
+            if not path.exists():
+                raise Refusal(f"pinned file missing: {group}/{name}")
+            if sha256_file(path) != want[name]:
+                raise Refusal(f"pin mismatch: {group}/{name}")
 
 
 # --------------------------------------------------------------------------------------
-# Loaders (thin I/O)
+# Loaders: authorize()-issued token only; they read the pinned files under its data root
 # --------------------------------------------------------------------------------------
 
 
 def read_jsonl(path):
-    opener = gzip.open if path.endswith(".gz") else open
+    opener = gzip.open if str(path).endswith(".gz") else open
     with opener(path, "rt", encoding="utf-8") as handle:
         for line in handle:
             if line.strip():
                 yield json.loads(line)
 
 
-def load_scores(score_dir):
-    scores = {}
-    for name in sorted(os.listdir(score_dir)):
-        if name.startswith("scores-") and name.endswith(".jsonl"):
-            for row in read_jsonl(os.path.join(score_dir, name)):
-                scores.setdefault(row["event_id"], row)
-    return scores
+def load_events(auth):
+    require(auth)
+    return list(read_jsonl(auth.data_root / "events.jsonl.gz"))
 
 
-def load_auction_prices(path, events):
+def load_score_rows(auth):
+    require(auth)
+    rows = defaultdict(list)
+    for rel in PRIVATE_INPUTS:
+        if rel.startswith("scores/"):
+            for row in read_jsonl(auth.data_root / rel):
+                rows[row["event_id"]].append(row)
+    return rows
+
+
+def load_auction_prices(auth, events):
+    """(symbol, session) -> official open / close by news_signal.select_auction_price."""
+    require(auth)
     listing = {(ev["symbol"], ev["session"]): ev.get("exchange") for ev in events}
-    opens, closes = {}, {}
-    for row in read_jsonl(path):
+    opens, closes, seen = {}, {}, set()
+    for row in read_jsonl(auth.data_root / "auctions" / "auctions.jsonl.gz"):
         key = (row["symbol"], row["session"])
+        if key in seen:
+            raise Refusal(f"duplicate auction row for {key}")
+        seen.add(key)
         venue = listing.get(key)
         o = sig.select_auction_price(row["o"], "open", venue)
         c = sig.select_auction_price(row["c"], "close", venue)
@@ -306,116 +259,375 @@ def load_auction_prices(path, events):
     return opens, closes
 
 
-def load_rth_entries(events, minute_root, memory_limit="2.5GB", threads=4):
-    wanted = defaultdict(list)
+def load_rth_quotes(auth, events):
+    """event_id -> entry quote {bid, ask, t} (news_signal.rth_entry_quote), RTH events only."""
+    require(auth)
+    entries = {ev["event_id"]: ev["entry_utc"] for ev in events if ev["window"] == sig.RTH}
+    out = {}
+    for row in read_jsonl(auth.data_root / "spreads" / "quotes.jsonl"):
+        eid = row["event_id"]
+        if eid in entries and eid not in out:
+            q = sig.rth_entry_quote(row.get("quotes"), entries[eid])
+            if q is not None:
+                out[eid] = q
+    return out
+
+
+# --------------------------------------------------------------------------------------
+# Pure evaluation
+# --------------------------------------------------------------------------------------
+
+
+def check_scores(events, score_rows, protocol, pins):
+    """Exactly one valid score row per confirmatory-lane event; returns event_id -> row.
+
+    Refuses when a confirmatory (liquid) event has no row, when any event has more than
+    one row, or when a used row disagrees with the event or the pinned scoring settings.
+    Small-lane events without a row are left out (descriptive lane).
+    """
+    settings = protocol["scoring"]["pinned_settings"]
+    confirmatory = set(protocol["confirmatory_lanes"])
+    chosen, missing_small = {}, 0
     for ev in events:
-        if ev["window"] == sig.RTH:
-            d, m = sig.rth_entry_minute(ev["entry_utc"])
-            wanted[(ev["symbol"], d.year)].append((ev["event_id"], d, m))
-    entries = {}
-    if not wanted:
-        return entries
-    import duckdb  # noqa: PLC0415 - only the data runtime has it
-
-    con = duckdb.connect()
-    con.execute(f"SET memory_limit='{memory_limit}'")
-    con.execute(f"SET threads={threads}")
-    for (symbol, year), items in sorted(wanted.items()):
-        path = os.path.join(minute_root, f"symbol={symbol}", f"year={year}", "full.parquet")
-        if not os.path.exists(path):
+        rows = score_rows.get(ev["event_id"], [])
+        if len(rows) > 1:
+            raise Refusal(f"{len(rows)} score rows for event {ev['event_id']}")
+        if not rows:
+            if ev["lane"] in confirmatory:
+                raise Refusal(f"confirmatory event {ev['event_id']} is unscored")
+            missing_small += 1
             continue
-        days = sorted({d for _, d, _ in items})
-        rows = con.execute(
-            "SELECT et_date, et_minute, o FROM read_parquet(?) WHERE et_date IN (SELECT unnest(?::DATE[]))",
-            [path, days],
-        ).fetchall()
-        bars = defaultdict(dict)
-        for d, m, o in rows:
-            bars[d][int(m)] = {"o": o}
-        for event_id, d, m in items:
-            hit = sig.pick_entry_bar(bars.get(d, {}), m)
-            if hit:
-                entries[event_id] = hit[1]
-    con.close()
-    return entries
+        row = rows[0]
+        year = sig.checkpoint_year(ev["created_at"])
+        entry = pins["checkpoints"].get(str(year), {})
+        expected = {
+            "checkpoint_year": year,
+            "revision": entry.get("revision"),
+            "weights_sha256": entry.get("files", {}).get("pytorch_model.bin", {}).get("sha256"),
+            "code_sha256": pins["reviewed_code"]["sha256"],
+            "variant": settings["variant"],
+            "template_sha256": settings["template_sha256"],
+            "dtype": settings["dtype"],
+            "matmul": settings["matmul"],
+            "decoder": settings["decoder"],
+            "prompt_sha256": sig.sha256_text(sig.model_input(ev["company"], ev["headline"], settings["variant"])),
+        }
+        for key, value in expected.items():
+            if row.get(key) != value:
+                raise Refusal(f"score row {ev['event_id']} has {key}={row.get(key)!r}, expected {value!r}")
+        label, score, _ = sig.parse_label(row["raw_output"], settings["variant"]) if row.get("stop") != "context_overflow" \
+            else ("PARSE_FAIL", 0, False)
+        if (row.get("label"), row.get("score")) != (label, score):
+            raise Refusal(f"score row {ev['event_id']} label does not match its raw output")
+        chosen[ev["event_id"]] = row
+    return chosen, {"small_lane_unscored": missing_small}
 
 
-def spread_lookup_factory(quotes_path, events, fallback_bps):
-    """Event half-spread, else the symbol-year median, else the lane median, else fallback."""
-    by_event = {}
-    if os.path.exists(quotes_path):
-        for row in read_jsonl(quotes_path):
-            for q in row["quotes"]:
-                hs = sig.half_spread_fraction(q)
-                if hs is not None:
-                    by_event.setdefault(row["event_id"], hs)
-                    break
-    lane_of = {ev["event_id"]: ev for ev in events}
-    by_symbol_year = defaultdict(list)
-    all_values = []
-    for event_id, hs in by_event.items():
-        ev = lane_of.get(event_id)
-        if ev is None:
+def cost_fractions(ev, costs):
+    exit_cost = costs["auction_slippage_bps_per_side"][ev["lane"]] / 1e4
+    if ev["window"] == sig.RTH:
+        return costs["rth_entry_allowance_bps"] / 1e4, exit_cost
+    return costs["auction_slippage_bps_per_side"][ev["lane"]] / 1e4, exit_cost
+
+
+SCORE_RULES = ("operative", "strict")
+
+
+def position_side(row, rule):
+    """(label, side) of a validated score row: the operative prefix rule (D22) or the
+    model authors' strict rule (the stored label, kept as a descriptive sensitivity)."""
+    if rule == "operative":
+        label, side, _ = sig.operative_score(row.get("raw_output"), row.get("stop"))
+        return label, side
+    if rule == "strict":
+        return row["label"], int(row["score"])
+    raise ValueError(f"unknown score rule {rule!r}")
+
+
+def build_positions(events, scores, opens, closes, rth_quotes, fees, costs, rule="operative"):
+    """Positions (with gross/net returns and Rule 201 flags), benchmark rows, exclusions.
+
+    Overnight: official open to official close. RTH: long at the entry quote's ask, short at
+    its bid (news_signal.rth_entry_price), exit at the official close. Benchmark rows: every
+    scored liquid overnight event held long open to close (NEWS-2B), whatever its label.
+    rule selects how a row's raw output becomes a side (position_side).
+    """
+    positions, bench = [], []
+    excluded = Counter()
+    for ev in events:
+        row = scores.get(ev["event_id"])
+        if row is None:
+            excluded["no_score"] += 1
             continue
-        by_symbol_year[(ev["symbol"], ev["session"][:4])].append(hs)
-        all_values.append(hs)
+        label, side = position_side(row, rule)
+        key = (ev["symbol"], ev["session"])
+        exit_price = closes.get(key)
+        day = date.fromisoformat(ev["session"])
+        entry_cost, exit_cost = cost_fractions(ev, costs)
+        if ev["window"] == sig.OVERNIGHT and ev["lane"] == sig.LIQUID:
+            o = opens.get(key)
+            if o is not None and exit_price is not None:
+                bench.append({"session": ev["session"],
+                              "net": sig.position_net_return(1, o, exit_price, day, fees, costs["notional_usd"], entry_cost, exit_cost),
+                              "gross": sig.gross_return(1, o, exit_price)})
+        if side == 0:
+            excluded[f"no_position_{label}"] += 1
+            continue
+        quote = rth_quotes.get(ev["event_id"]) if ev["window"] == sig.RTH else None
+        if ev["window"] == sig.OVERNIGHT:
+            entry_price = opens.get(key)
+        else:
+            entry_price = sig.rth_entry_price(quote, side)
+        if entry_price is None:
+            excluded[f"missing_entry_{ev['window']}"] += 1
+            continue
+        if exit_price is None:
+            excluded[f"missing_exit_{ev['window']}"] += 1
+            continue
+        net = sig.position_net_return(side, entry_price, exit_price, day, fees, costs["notional_usd"], entry_cost, exit_cost)
+        gross = sig.gross_return(side, entry_price, exit_price)
+        ssr = side == -1 and sig.ssr_flag(ev, quote)
+        positions.append({"event_id": ev["event_id"], "symbol": ev["symbol"], "session": ev["session"],
+                          "window": ev["window"], "lane": ev["lane"], "side": side, "gross": gross, "net": net,
+                          "cost": gross - net, "ssr": ssr})
+        if ssr:
+            excluded[f"ssr_short_{ev['window']}"] += 1
+    return positions, bench, excluded
 
-    def median(xs):
-        xs = sorted(xs)
-        n = len(xs)
-        return None if n == 0 else (xs[n // 2] if n % 2 else (xs[n // 2 - 1] + xs[n // 2]) / 2)
 
-    lane_median = median(all_values)
-    sy_median = {k: median(v) for k, v in by_symbol_year.items()}
+def daily_series(positions, window, lane, field, include_ssr=False):
+    chosen = [{"session": p["session"], "side": p["side"], "ret": p[field]}
+              for p in positions if p["window"] == window and p["lane"] == lane and (include_ssr or not p["ssr"])]
+    return sig.daily_portfolios(chosen)
 
-    def lookup(ev):
-        if ev["event_id"] in by_event:
-            return by_event[ev["event_id"]]
-        m = sy_median.get((ev["symbol"], ev["session"][:4]))
-        if m is not None:
-            return m
-        if lane_median is not None:
-            return lane_median
-        return fallback_bps / 1e4
 
-    return lookup
+def bench_daily(bench, field):
+    days = defaultdict(list)
+    for b in bench:
+        days[b["session"]].append(b[field])
+    return {d: sum(v) / len(v) for d, v in days.items()}
+
+
+def in_segment(session_iso, segment):
+    return segment["first_session"] <= session_iso <= segment["last_session"]
+
+
+def item_values(item, positions, bench, field, segment):
+    """The daily series an item tests: long_short (both legs), long, or long_bench."""
+    daily = daily_series(positions, item["window"], item["lane"], field)
+    if item["series"] == "long_bench":
+        b = bench_daily(bench, field)
+        return [v["long"] - b[d] for d, v in sorted(daily.items())
+                if in_segment(d, segment) and v["long"] is not None and d in b]
+    return [v[item["series"]] for d, v in sorted(daily.items()) if in_segment(d, segment) and v[item["series"]] is not None]
+
+
+def series_stats(values, lags):
+    values = [v for v in values if v is not None]
+    n = len(values)
+    if n < 2:
+        return {"n_days": n, "mean": values[0] if values else None, "t_nw": None, "p_one_sided": None,
+                "upper_bound_95_one_sided": None}
+    t, se = sig.newey_west_t(values, lags)
+    mu = sum(values) / n
+    sd = math.sqrt(sum((v - mu) ** 2 for v in values) / (n - 1))
+    ok = not math.isnan(t)
+    return {
+        "n_days": n, "mean": mu, "sd": sd, "se_nw": se if ok else None, "t_nw": t if ok else None,
+        "p_one_sided": sig.normal_sf(t) if ok else None,
+        "upper_bound_95_one_sided": mu + Z95 * se if ok else None,
+        "sharpe_annualized": (mu / sd * math.sqrt(252)) if sd > 0 else None,
+        "hit_rate": sum(1 for v in values if v > 0) / n,
+    }
+
+
+def prior_reading(upper_bound):
+    """Which prior effect sizes the one-sided 95% upper bound excludes."""
+    if upper_bound is None:
+        return None
+    return {name: {"prior_per_day": x, "excluded_by_upper_bound": upper_bound < x} for name, x in PRIOR_BPS.items()}
+
+
+def evaluate_items(protocol, positions, bench):
+    """Items, multiplicity families, gates. Pure (tested on synthetic positions)."""
+    lags = protocol["inference"]["newey_west_lags"]
+    segments = protocol["segments"]
+    mult = protocol["multiplicity"]
+    results = {}
+    for item in protocol["items"]:
+        seg = segments[item["segment"]]
+        net = series_stats(item_values(item, positions, bench, "net", seg), lags)
+        gross = series_stats(item_values(item, positions, bench, "gross", seg), lags)
+        net["sample_ok"] = net["n_days"] >= item["min_days"]
+        results[item["id"]] = {
+            "net": net, "gross": gross, "min_days": item["min_days"],
+            "p": net["p_one_sided"] if net["sample_ok"] else None,
+            "reading": {"net": prior_reading(net["upper_bound_95_one_sided"]),
+                        "gross": prior_reading(gross["upper_bound_95_one_sided"])},
+        }
+    prim = mult["primary"]
+    seq = sig.fixed_sequence([(k, results[k]["p"]) for k in prim["items"]], prim["alpha"])
+    sec = mult["secondary"]
+    member_p = {}
+    for member, ids in sec["members"].items():
+        ps = [results[i]["p"] for i in ids]
+        # intersection-union member: rejected only if every item in it is (p = max)
+        member_p[member] = None if any(p is None for p in ps) else max(ps)
+    holm = sig.holm_reject(member_p, sec["alpha"])
+    for member, ids in sec["members"].items():
+        for i in ids:
+            results[i]["secondary_member"] = member
+            results[i]["secondary_member_p"] = member_p[member]
+            results[i]["rejected_secondary_holm"] = holm[member]
+    for k, r in results.items():
+        r["rejected_primary_sequence"] = seq.get(k)
+        rejected = bool(seq.get(k) or r.get("rejected_secondary_holm"))
+        r["verdict"] = "insufficient_sample" if not r["net"]["sample_ok"] else ("rejected" if rejected else "not_rejected")
+    recent = segments[protocol["gates"]["recent_segment"]]
+    recent_long = item_values({"window": sig.OVERNIGHT, "lane": sig.LIQUID, "series": "long"}, positions, bench, "net", recent)
+    recent_mean = sum(recent_long) / len(recent_long) if recent_long else None
+    g = protocol["gates"]
+    gates = {
+        "long_only_paper_candidate": bool(holm[g["long_only_member"]] and recent_mean is not None and recent_mean > 0),
+        "long_short_candidate": all(seq.get(k) for k in prim["items"]),
+        "rth_candidate": bool(holm[g["rth_member"]]),
+        "recent_long_leg_mean_net": recent_mean,
+        "recent_long_leg_days": len(recent_long),
+    }
+    return results, gates
+
+
+def attach_strict_sensitivity(items, items_strict, gates_strict):
+    """Report the strict-rule (authors') version beside every operative item; never a gate."""
+    for k, r in items.items():
+        s = items_strict[k]
+        r["strict_rule_sensitivity"] = {"net": s["net"], "gross": s["gross"], "p": s["p"], "verdict": s["verdict"]}
+    return {"gates_if_strict_rule_descriptive_only": gates_strict}
+
+
+def break_even(daily_gross, leg, segment):
+    """Per-position round-trip cost that sets the mean of a gross leg series to zero."""
+    num, legs, days = 0.0, 0, 0
+    for d, v in daily_gross.items():
+        if not in_segment(d, segment) or v[leg] is None:
+            continue
+        days += 1
+        num += v[leg]
+        legs += 2 if leg == "long_short" else 1
+    return (num / days) / (legs / days) if days else None
+
+
+def descriptive(protocol, positions, bench):
+    """Legs, the paper's single-leg long-short, Rule 201 counts, break-evens, years, lanes."""
+    lags = protocol["inference"]["newey_west_lags"]
+    out = {}
+    for window in (sig.OVERNIGHT, sig.RTH):
+        for lane in (sig.LIQUID, sig.SMALL):
+            chosen = [p for p in positions if p["window"] == window and p["lane"] == lane]
+            if not chosen:
+                continue
+            net = daily_series(positions, window, lane, "net")
+            gross = daily_series(positions, window, lane, "gross")
+            with_ssr = daily_series(positions, window, lane, "net", include_ssr=True)
+            block = {"positions": len(chosen), "ssr_shorts_excluded": sum(p["ssr"] for p in chosen),
+                     "mean_cost_per_position": sum(p["cost"] for p in chosen) / len(chosen)}
+            for seg_name, seg in protocol["segments"].items():
+                if not isinstance(seg, dict):
+                    continue
+                days = [d for d in net if in_segment(d, seg)]
+                block[seg_name] = {
+                    **{f"{f}_{leg}": series_stats([s[d][leg] for d in days if d in s and s[d][leg] is not None], lags)
+                       for f, s in (("net", net), ("gross", gross)) for leg in ("long", "short", "long_short", "long_short_paper")},
+                    "net_long_short_including_ssr_shorts": series_stats(
+                        [with_ssr[d]["long_short"] for d in with_ssr if in_segment(d, seg) and with_ssr[d]["long_short"] is not None], lags),
+                    "single_leg_days": sum(1 for d in days if net[d]["single_leg"]),
+                    "break_even_round_trip_long_short": break_even(gross, "long_short", seg),
+                    "break_even_round_trip_long": break_even(gross, "long", seg),
+                }
+            block["by_year_net_long_short"] = {
+                y: series_stats([v["long_short"] for d, v in net.items() if d[:4] == y and v["long_short"] is not None], lags)
+                for y in sorted({d[:4] for d in net})}
+            out[f"{window}:{lane}"] = block
+    out["benchmark_days"] = len(bench_daily(bench, "net"))
+    return out
+
+
+# --------------------------------------------------------------------------------------
+# Guarded run
+# --------------------------------------------------------------------------------------
+
+
+def authorize(a, study_dir=HERE, repo_root=REPO):
+    """The full check chain; the only issuer of the Authorization the data pass needs."""
+    record = Path(getattr(a, "freeze_record", None) or Path(study_dir) / "receipts" / "freeze-record.json")
+    expected, commit = read_freeze_record(record)
+    given = getattr(a, "protocol_sha256", None)
+    if given and given.strip().lower() != expected:
+        raise Refusal("--protocol-sha256 differs from the freeze record")
+    frozen = guard(Path(study_dir) / "protocol.json", expected)
+    verify_pins(frozen.protocol, study_dir, a.data_root, repo_root)
+    head = git_clean_head(study_dir)
+    verify_freeze_commit(study_dir, commit, expected)
+    return Authorization(frozen, head, study_dir, a.data_root, repo_root, _RUN_TOKEN)
+
+
+def run(a, study_dir=HERE, repo_root=REPO):
+    auth = authorize(a, study_dir, repo_root)
+    result = data_pass(auth)
+    protocol = auth.frozen.protocol
+    result.update(git_head=auth.head, protocol_sha256=auth.frozen.sha256, protocol_id=protocol["id"],
+                  evidence_label="HIST", scope=protocol["scope"])
+    return result
+
+
+def data_pass(auth):
+    protocol = require(auth).frozen.protocol
+    pins = json.loads((auth.repo_root / REFERENCE_PINS["checkpoints.json"]).read_text())
+    fees = json.loads((auth.repo_root / REFERENCE_PINS["fees-v3.json"]).read_text())
+    events = load_events(auth)
+    scores, score_notes = check_scores(events, load_score_rows(auth), protocol, pins)
+    opens, closes = load_auction_prices(auth, events)
+    quotes = load_rth_quotes(auth, events)
+    positions, bench, excluded = build_positions(events, scores, opens, closes, quotes, fees, protocol["costs"], "operative")
+    strict_positions, _, strict_excluded = build_positions(events, scores, opens, closes, quotes, fees, protocol["costs"], "strict")
+    items, gates = evaluate_items(protocol, positions, bench)
+    sensitivity = attach_strict_sensitivity(items, *evaluate_items(protocol, strict_positions, bench))
+    return {
+        "schema": "sota-news-llm-results/3",
+        "score_rule": "operative (news_signal.operative_score, D22); strict_rule_sensitivity beside every item",
+        "evaluated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "positions": len(positions),
+        "strict_rule": {"positions": len(strict_positions), "excluded": dict(strict_excluded), **sensitivity},
+        "excluded": dict(excluded),
+        "score_checks": score_notes,
+        "items": items,
+        "gates": gates,
+        "descriptive": descriptive(protocol, positions, bench),
+    }
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--protocol", default=os.path.join(_HERE, "protocol.json"))
-    parser.add_argument("--protocol-sha256", required=True)
-    parser.add_argument("--data-root", default=PRIVATE_ROOT)
-    parser.add_argument("--minute-root", default=MINUTE_ROOT)
-    parser.add_argument("--out", default=None)
-    args = parser.parse_args(argv)
-    protocol = check_protocol(args.protocol, args.protocol_sha256)
-    check_inputs(protocol, args.data_root)
-    with open(os.path.join(REPO, protocol["costs"]["fees"]["file"]), encoding="utf-8") as handle:
-        fees = json.load(handle)
-    events = list(read_jsonl(os.path.join(args.data_root, "events.jsonl.gz")))
-    scores = load_scores(os.path.join(args.data_root, "scores"))
-    opens, closes = load_auction_prices(os.path.join(args.data_root, "auctions", "auctions.jsonl.gz"), events)
-    rth_entries = load_rth_entries(events, args.minute_root)
-    lookup = spread_lookup_factory(os.path.join(args.data_root, "spreads", "quotes.jsonl"), events,
-                                   protocol["costs"]["rth_half_spread_fallback_bps"])
-    positions, excluded = build_positions(events, scores, opens, closes, rth_entries, lookup, fees, protocol["costs"],
-                                          expected_template=protocol["scoring"]["template_sha256"])
-    results = {
-        "schema": "sota-news-llm-results/1",
-        "evidence_label": "HIST",
-        "protocol_sha256": args.protocol_sha256,
-        "evaluated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "positions": len(positions),
-        "excluded": dict(excluded),
-        "items": evaluate_items(protocol, positions),
-        "descriptive": descriptive(protocol, positions),
-    }
-    out = args.out or os.path.join(args.data_root, "results.json")
-    with open(out, "w", encoding="utf-8") as handle:
-        json.dump(results, handle, indent=1, sort_keys=True)
-    print(json.dumps({k: results[k] for k in ("positions", "excluded", "items")}, indent=1, sort_keys=True, default=str))
+    parser.add_argument("--data-root", type=Path, default=PRIVATE_ROOT)
+    parser.add_argument("--freeze-record", type=Path, default=FREEZE_RECORD_PATH)
+    parser.add_argument("--protocol-sha256")
+    parser.add_argument("--out", type=Path)
+    parser.add_argument("--print-pins", action="store_true")
+    a = parser.parse_args(argv)
+    if a.print_pins:
+        print(json.dumps(compute_pins(HERE, a.data_root, REPO), indent=1, sort_keys=True))
+        return 0
+    try:
+        result = run(a)
+    except Refusal as r:
+        print(f"REFUSED: {r.reason}", file=sys.stderr)
+        return 2
+    out = a.out or (Path(a.data_root) / "results.json")
+    out.write_text(json.dumps(result, indent=1, sort_keys=True, default=str))
+    print(json.dumps({"items": {k: v["verdict"] for k, v in result["items"].items()}, "gates": result["gates"],
+                      "git_head": result["git_head"]}, sort_keys=True, default=str))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

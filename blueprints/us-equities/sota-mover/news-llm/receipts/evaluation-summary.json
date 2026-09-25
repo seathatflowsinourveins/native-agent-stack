@@ -1,0 +1,422 @@
+{
+ "evidence_label": "HIST",
+ "gates": {
+  "long_only_paper_candidate": false,
+  "long_short_candidate": false,
+  "recent_long_leg_days": 495,
+  "recent_long_leg_mean_net": -0.0004207155870806485,
+  "rth_candidate": false
+ },
+ "git_head": "9504cd73054264dcfdbaa7dc19dc609d185e086e",
+ "items": {
+  "NEWS-1": {
+   "gross": {
+    "hit_rate": 0.5,
+    "mean": -2.833007126305945e-06,
+    "n_days": 2658,
+    "p_one_sided": 0.5067477160332274,
+    "sd": 0.008668639232451356,
+    "se_nw": 0.00016748666155960078,
+    "sharpe_annualized": -0.005187964651212984,
+    "t_nw": -0.01691482235018344,
+    "upper_bound_95_one_sided": 0.0002726580356059971
+   },
+   "net": {
+    "hit_rate": 0.44996237772761477,
+    "mean": -0.0008419582365414231,
+    "n_days": 2658,
+    "p_one_sided": 0.9999997512323938,
+    "sample_ok": true,
+    "sd": 0.008667399568603382,
+    "se_nw": 0.00016747852386784555,
+    "sharpe_annualized": -1.542062592517617,
+    "t_nw": -5.027260911409741,
+    "upper_bound_95_one_sided": -0.0005664805791209186
+   },
+   "p": 0.9999997512323938,
+   "reading": {
+    "gross": {
+     "model_authors_3bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0003
+     },
+     "paper_34bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0034
+     }
+    },
+    "net": {
+     "model_authors_3bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0003
+     },
+     "paper_34bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0034
+     }
+    }
+   },
+   "rejected_primary_sequence": false,
+   "rejected_secondary_holm": false,
+   "secondary_member": "NEWS-1",
+   "secondary_member_p": 0.9999997512323938,
+   "strict_rule_sensitivity": {
+    "gross": {
+     "hit_rate": 0.5033860045146726,
+     "mean": -3.4512801873672054e-05,
+     "n_days": 2658,
+     "p_one_sided": 0.5799898718090458,
+     "sd": 0.00883467272431025,
+     "se_nw": 0.00017096754107292077,
+     "sharpe_annualized": -0.06201403967428301,
+     "t_nw": -0.20186756887935656,
+     "upper_bound_95_one_sided": 0.00024670377815109643
+    },
+    "net": {
+     "hit_rate": 0.45598194130925507,
+     "mean": -0.0008736583690645735,
+     "n_days": 2658,
+     "p_one_sided": 0.9999998390680127,
+     "sample_ok": true,
+     "sd": 0.00883365095493966,
+     "se_nw": 0.000170964539135164,
+     "sharpe_annualized": -1.5700073189438826,
+     "t_nw": -5.110172983731218,
+     "upper_bound_95_one_sided": -0.0005924467267880121
+    },
+    "p": 0.9999998390680127,
+    "verdict": "not_rejected"
+   },
+   "verdict": "not_rejected"
+  },
+  "NEWS-2": {
+   "gross": {
+    "hit_rate": 0.5099511828764551,
+    "mean": 0.000241426203412643,
+    "n_days": 2663,
+    "p_one_sided": 0.14413729371205403,
+    "sd": 0.012578298314037523,
+    "se_nw": 0.00022734998560048174,
+    "sharpe_annualized": 0.3046932160091117,
+    "t_nw": 1.0619143114303828,
+    "upper_bound_95_one_sided": 0.0006153836518149604
+   },
+   "net": {
+    "hit_rate": 0.49042433345850545,
+    "mean": -0.0001779176365280069,
+    "n_days": 2663,
+    "p_one_sided": 0.7831615769737852,
+    "sample_ok": true,
+    "sd": 0.012573015381273362,
+    "se_nw": 0.00022725016887693806,
+    "sharpe_annualized": -0.22463624158446566,
+    "t_nw": -0.7829153105023828,
+    "upper_bound_95_one_sided": 0.00019587562797455924
+   },
+   "p": 0.7831615769737852,
+   "reading": {
+    "gross": {
+     "model_authors_3bps": {
+      "excluded_by_upper_bound": false,
+      "prior_per_day": 0.0003
+     },
+     "paper_34bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0034
+     }
+    },
+    "net": {
+     "model_authors_3bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0003
+     },
+     "paper_34bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0034
+     }
+    }
+   },
+   "rejected_primary_sequence": null,
+   "rejected_secondary_holm": false,
+   "secondary_member": "LONG-ONLY",
+   "secondary_member_p": 0.7831615769737852,
+   "strict_rule_sensitivity": {
+    "gross": {
+     "hit_rate": 0.5099511828764551,
+     "mean": 0.00024139446418021765,
+     "n_days": 2663,
+     "p_one_sided": 0.14424423260047559,
+     "sd": 0.012579835095221778,
+     "se_nw": 0.00022742095870649067,
+     "sharpe_annualized": 0.30461594222223104,
+     "t_nw": 1.0614433496068458,
+     "upper_bound_95_one_sided": 0.0006154686529533698
+    },
+    "net": {
+     "hit_rate": 0.49042433345850545,
+     "mean": -0.00017794935088297144,
+     "n_days": 2663,
+     "p_one_sided": 0.7831310077830581,
+     "sample_ok": true,
+     "sd": 0.012574549668122314,
+     "se_nw": 0.00022732090303493227,
+     "sharpe_annualized": -0.22464886973818027,
+     "t_nw": -0.7828112087678363,
+     "upper_bound_95_one_sided": 0.00019596026095592084
+    },
+    "p": 0.7831310077830581,
+    "verdict": "not_rejected"
+   },
+   "verdict": "not_rejected"
+  },
+  "NEWS-2B": {
+   "gross": {
+    "hit_rate": 0.49680811115283513,
+    "mean": 6.110120438191136e-06,
+    "n_days": 2663,
+    "p_one_sided": 0.4791589190708322,
+    "sd": 0.006144903880254053,
+    "se_nw": 0.00011690737616526887,
+    "sharpe_annualized": 0.01578464966267794,
+    "t_nw": 0.05226462725117892,
+    "upper_bound_95_one_sided": 0.00019840564214101372
+   },
+   "net": {
+    "hit_rate": 0.49680811115283513,
+    "mean": 6.319310042376905e-06,
+    "n_days": 2663,
+    "p_one_sided": 0.4784368653031726,
+    "sample_ok": true,
+    "sd": 0.006142283624391653,
+    "se_nw": 0.00011685739601889177,
+    "sharpe_annualized": 0.01633202618314284,
+    "t_nw": 0.054077108147740104,
+    "upper_bound_95_one_sided": 0.00019853262172015557
+   },
+   "p": 0.4784368653031726,
+   "reading": {
+    "gross": {
+     "model_authors_3bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0003
+     },
+     "paper_34bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0034
+     }
+    },
+    "net": {
+     "model_authors_3bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0003
+     },
+     "paper_34bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0034
+     }
+    }
+   },
+   "rejected_primary_sequence": null,
+   "rejected_secondary_holm": false,
+   "secondary_member": "LONG-ONLY",
+   "secondary_member_p": 0.7831615769737852,
+   "strict_rule_sensitivity": {
+    "gross": {
+     "hit_rate": 0.49680811115283513,
+     "mean": 6.078381205765791e-06,
+     "n_days": 2663,
+     "p_one_sided": 0.4792769785787644,
+     "sd": 0.006146594558764983,
+     "se_nw": 0.0001169632628527521,
+     "sharpe_annualized": 0.015698336590012366,
+     "t_nw": 0.051968293783134396,
+     "upper_bound_95_one_sided": 0.00019846582832919348
+    },
+    "net": {
+     "hit_rate": 0.49680811115283513,
+     "mean": 6.287595687412366e-06,
+     "n_days": 2663,
+     "p_one_sided": 0.47855521838191506,
+     "sample_ok": true,
+     "sd": 0.006143973330680911,
+     "se_nw": 0.00011691325036314812,
+     "sharpe_annualized": 0.016245592522686,
+     "t_nw": 0.05378000926227144,
+     "upper_bound_95_one_sided": 0.0001985927795859221
+    },
+    "p": 0.47855521838191506,
+    "verdict": "not_rejected"
+   },
+   "verdict": "not_rejected"
+  },
+  "NEWS-3": {
+   "gross": {
+    "hit_rate": 0.4079449961802903,
+    "mean": -0.0011008276722868492,
+    "n_days": 2618,
+    "p_one_sided": 0.9999999999995963,
+    "sd": 0.0069906908602503206,
+    "se_nw": 0.00015374865536731092,
+    "sharpe_annualized": -2.4997668889379177,
+    "t_nw": -7.159917396720858,
+    "upper_bound_95_one_sided": -0.0008479336388670159
+   },
+   "net": {
+    "hit_rate": 0.33346065699006877,
+    "mean": -0.0019392488537215732,
+    "n_days": 2618,
+    "p_one_sided": 1.0,
+    "sample_ok": true,
+    "sd": 0.006988245268023957,
+    "se_nw": 0.00015366431228089344,
+    "sharpe_annualized": -4.4052004476927875,
+    "t_nw": -12.620034053038212,
+    "upper_bound_95_one_sided": -0.001686493552333342
+   },
+   "p": 1.0,
+   "reading": {
+    "gross": {
+     "model_authors_3bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0003
+     },
+     "paper_34bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0034
+     }
+    },
+    "net": {
+     "model_authors_3bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0003
+     },
+     "paper_34bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0034
+     }
+    }
+   },
+   "rejected_primary_sequence": null,
+   "rejected_secondary_holm": false,
+   "secondary_member": "NEWS-3",
+   "secondary_member_p": 1.0,
+   "strict_rule_sensitivity": {
+    "gross": {
+     "hit_rate": 0.4090909090909091,
+     "mean": -0.0010718865618810495,
+     "n_days": 2618,
+     "p_one_sided": 0.9999999999978949,
+     "sd": 0.007046266900675097,
+     "se_nw": 0.00015467479378568355,
+     "sharpe_annualized": -2.4148491532197798,
+     "t_nw": -6.929936905985141,
+     "upper_bound_95_one_sided": -0.0008174691663246969
+    },
+    "net": {
+     "hit_rate": 0.3357524828113063,
+     "mean": -0.0019103068452428072,
+     "n_days": 2618,
+     "p_one_sided": 1.0,
+     "sample_ok": true,
+     "sd": 0.007043996779324112,
+     "se_nw": 0.00015459863103783197,
+     "sharpe_annualized": -4.305110009566286,
+     "t_nw": -12.356557315021336,
+     "upper_bound_95_one_sided": -0.0016560147262584968
+    },
+    "p": 1.0,
+    "verdict": "not_rejected"
+   },
+   "verdict": "not_rejected"
+  },
+  "NEWS-4": {
+   "gross": {
+    "hit_rate": 0.47474747474747475,
+    "mean": -7.65843332996468e-06,
+    "n_days": 495,
+    "p_one_sided": 0.506337937966359,
+    "sd": 0.010830923102232002,
+    "se_nw": 0.0004820407435480997,
+    "sharpe_annualized": -0.01122469977796032,
+    "t_nw": -0.015887522854591427,
+    "upper_bound_95_one_sided": 0.0007852280320335116
+   },
+   "net": {
+    "hit_rate": 0.4262626262626263,
+    "mean": -0.0008433714453353358,
+    "n_days": 495,
+    "p_one_sided": 0.9599471160534305,
+    "sample_ok": true,
+    "sd": 0.010828559319683578,
+    "se_nw": 0.00048190651736900456,
+    "sharpe_annualized": -1.2363700699248361,
+    "t_nw": -1.7500727110721994,
+    "upper_bound_95_one_sided": -5.070576238937598e-05
+   },
+   "p": 0.9599471160534305,
+   "reading": {
+    "gross": {
+     "model_authors_3bps": {
+      "excluded_by_upper_bound": false,
+      "prior_per_day": 0.0003
+     },
+     "paper_34bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0034
+     }
+    },
+    "net": {
+     "model_authors_3bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0003
+     },
+     "paper_34bps": {
+      "excluded_by_upper_bound": true,
+      "prior_per_day": 0.0034
+     }
+    }
+   },
+   "rejected_primary_sequence": false,
+   "rejected_secondary_holm": null,
+   "secondary_member": null,
+   "secondary_member_p": null,
+   "strict_rule_sensitivity": {
+    "gross": {
+     "hit_rate": 0.49292929292929294,
+     "mean": -4.861113989850651e-05,
+     "n_days": 495,
+     "p_one_sided": 0.5380353355224068,
+     "sd": 0.011262558718887416,
+     "se_nw": 0.0005090952877170945,
+     "sharpe_annualized": -0.0685171053908732,
+     "t_nw": -0.09548534640045586,
+     "upper_bound_95_one_sided": 0.0007887760905668597
+    },
+    "net": {
+     "hit_rate": 0.45252525252525255,
+     "mean": -0.000884378066007711,
+     "n_days": 495,
+     "p_one_sided": 0.9588441205790867,
+     "sample_ok": true,
+     "sd": 0.011260790438570053,
+     "se_nw": 0.0005090158399840541,
+     "sharpe_annualized": -1.2467212352708303,
+     "t_nw": -1.7374273972209113,
+     "upper_bound_95_one_sided": -4.7121515434189374e-05
+    },
+    "p": 0.9588441205790867,
+    "verdict": "not_rejected"
+   },
+   "verdict": "not_rejected"
+  }
+ },
+ "protocol_id": "sota-mover-news-llm-20260925",
+ "protocol_sha256": "bba1b157e607f3a29f88bb82af44b4b7f2a754f1dc8266c883989c9fc2fddb37",
+ "results_file": {
+  "bytes": 67693,
+  "private_path": "~/.local/state/native-agent-stack/research/sota-mover/news-llm/results-frozen-bba1b157.json",
+  "sha256": "10bb47001bddf68c275f9413fb1e9781cc704cc019e63a8cab350dff69a071da"
+ },
+ "scope": "All verdicts apply to firms present in the 2026-09-21 asset master (Alpaca; current names, exchanges and tickers). Firms delisted or renamed before that date are under-represented (limitation L11), so results do not generalize to the full historical cross-section.",
+ "score_rule": "operative (news_signal.operative_score, D22); strict_rule_sensitivity beside every item"
+}

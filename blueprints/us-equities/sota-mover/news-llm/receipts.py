@@ -5,7 +5,8 @@
   receipts/models-fetch.json        checkpoint download jobs (bytes, status)
   receipts/collection-summary.json  auction and spread coverage, HTTP tallies
   receipts/scoring-probes.json      prompt-variant and numerics probes
-  receipts/scoring-status.json      the full scoring run (labels per checkpoint)
+  receipts/scoring-status.json      every scoring run, batch-1 agreement, strict vs operative labels
+  receipts/d5-audit.json            the movement-filter audit: rule, seed, counts, ids and labels (no text)
 
 No price, return or other outcome is read or written. Refuses to write a receipt that
 would contain the home directory path.
@@ -13,13 +14,28 @@ would contain the home directory path.
 import argparse
 import collections
 import glob
+import gzip
+import hashlib
+import importlib.util
 import json
 import os
+import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 PRIVATE_ROOT = os.path.expanduser("~/.local/state/native-agent-stack/research/sota-mover/news-llm")
 MODELS_ROOT = os.path.expanduser("~/.local/share/native-agent-stack/models/chronogpt-instruct")
 SCHEMA = "sota-news-llm-receipt/1"
+
+
+def _load_news_signal():
+    spec = importlib.util.spec_from_file_location("news_signal", os.path.join(_HERE, "news_signal.py"))
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["news_signal"] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+sig = _load_news_signal()
 
 
 def dump(out_dir, name, obj):
@@ -39,10 +55,10 @@ def load(path):
 
 def prepare_summary(priv):
     r = load(os.path.join(priv, "prepare-receipt.json"))
-    keys = ("started_at", "finished_at", "inputs", "asset_master", "funnel", "eligible_by_window_lane",
+    keys = ("started_at", "finished_at", "git", "inputs", "asset_master", "funnel", "eligible_by_window_lane",
             "selected_by_window_lane", "selected_sessions_by_window_lane", "selected_by_session_year",
             "selected_by_checkpoint", "diagnostics", "events_file")
-    return {"schema": SCHEMA, "evidence_label": "HIST", "kind": "prepare", **{k: r[k] for k in keys}}
+    return {"schema": SCHEMA, "evidence_label": "HIST", "kind": "prepare", **{k: r.get(k) for k in keys}}
 
 
 def models_fetch(models):
@@ -88,11 +104,12 @@ def collection_summary(priv):
 def summarize_progress(p):
     labels, stops, agree = collections.Counter(), collections.Counter(), [0, 0]
     for s in p["by_checkpoint"].values():
-        labels.update(s["labels"])
-        stops.update(s["stops"])
-        if "batch1_agreement" in s:
-            agree[0] += s["batch1_agreement"]["agree"]
-            agree[1] += s["batch1_agreement"]["checked"]
+        labels.update(s.get("labels") or {})
+        stops.update(s.get("stops") or {})
+        check = s.get("batch1_agreement")  # absent or null for a checkpoint that did not finish
+        if check:
+            agree[0] += check["agree"]
+            agree[1] += check["checked"]
     return labels, stops, {"agree": agree[0], "checked": agree[1]}
 
 
@@ -121,15 +138,47 @@ def scoring_probes(priv):
     return out
 
 
+def d5_audit(priv):
+    """Counts and ids of the D5 movement-filter audit (no headline text is committed)."""
+    path = os.path.join(priv, "d5-audit-sample.json")
+    if not os.path.exists(path):
+        return None
+    d = load(path)
+    with open(path, "rb") as handle:
+        digest = hashlib.sha256(handle.read()).hexdigest()
+    labels = d.get("labels") or []
+    return {
+        "schema": SCHEMA, "evidence_label": "HIST", "kind": "d5-movement-filter-audit",
+        "sampling_rule": "random.Random(seed).sample(dropped, 200), where dropped = every single-symbol archive "
+                         "headline (news_signal.parse_symbols) that news_signal.is_movement_headline flags, as "
+                         "(news id, cleaned headline) pairs sorted by news id",
+        "seed": d["seed"], "population_single_symbol": d["population_single_symbol"], "dropped_by_filter": d["dropped"],
+        "sample_size": len(d["sample"]), "counts": dict(collections.Counter(labels)), "label_key": d.get("label_key"),
+        "labelled_by": d.get("labelled_by"),
+        "sample_ids_and_labels": [{"news_id": nid, "label": lab} for (nid, _), lab in zip(d["sample"], labels)],
+        "private_file_sha256": digest,
+    }
+
+
+RUN_FILES = (
+    ("progress-first-unit.json", "first unit sota-news-score-20260925T0419Z (superseded event build; stopped by a CUDA fault)"),
+    ("progress-liquid.json", "liquid lane"),
+    ("progress-small.json", "small lane"),
+    ("progress-delta-liquid.json", "incremental unit sota-news-score-20260925T0603Z, liquid lane"),
+    ("progress-delta-small.json", "incremental unit sota-news-score-20260925T0603Z, small lane"),
+)
+
+
 def scoring_status(priv):
     runs = {}
-    for name in ("progress-liquid.json", "progress-small.json", "progress.json"):
+    for name, role in RUN_FILES:
         path = os.path.join(priv, "scores", name)
         if not os.path.exists(path):
             continue
         p = load(path)
         labels, stops, agree = summarize_progress(p)
         runs[name] = {
+            "role": role,
             "progress": {k: p.get(k) for k in ("started_at", "updated_at", "finished_at", "events_in_file", "already_scored",
                                                "to_score", "scored_this_run", "events_per_second", "elapsed_seconds",
                                                "eta_seconds", "variant", "template_sha256", "dtype", "matmul", "decoder",
@@ -152,7 +201,46 @@ def scoring_status(priv):
                     continue
         files[os.path.basename(path)] = {"rows": rows}
     return {"schema": SCHEMA, "evidence_label": "HIST", "kind": "scoring-status", "runs": runs,
-            "score_files": files, "labels_in_files": dict(totals), "rows_in_files": sum(totals.values())}
+            "score_files": files, "labels_in_files": dict(totals), "rows_in_files": sum(totals.values()),
+            "label_rules_on_current_events": label_rules(priv)}
+
+
+def label_rules(priv):
+    """Strict (stored) versus operative (news_signal.operative_score, D22) labels of the
+    current events' score rows, by checkpoint and by window x lane (output text only)."""
+    events_path = os.path.join(priv, "events.jsonl.gz")
+    if not os.path.exists(events_path):
+        return None
+    lanes = {}
+    with gzip.open(events_path, "rt", encoding="utf-8") as handle:
+        for line in handle:
+            ev = json.loads(line)
+            lanes[ev["event_id"]] = f"{ev['window']}:{ev['lane']}"
+    by_ck = collections.defaultdict(collections.Counter)
+    by_lane = collections.defaultdict(collections.Counter)
+    for path in sorted(glob.glob(os.path.join(priv, "scores", "scores-*.jsonl"))):
+        with open(path, encoding="utf-8") as handle:
+            for line in handle:
+                row = json.loads(line)
+                lane = lanes.get(row["event_id"])
+                if lane is None:
+                    continue
+                label, _, how = sig.operative_score(row.get("raw_output"), row.get("stop"))
+                for c in (by_ck[str(row["checkpoint_year"])], by_lane[lane]):
+                    c["rows"] += 1
+                    c[f"strict:{row['label']}"] += 1
+                    c[f"operative:{label}"] += 1
+                    if row["label"] == "PARSE_FAIL" and how == "prefix":
+                        c[f"strict_parse_fail_recovered_as:{label}"] += 1
+
+    def finish(c):
+        out = dict(sorted(c.items()))
+        out["strict_parse_fail_share"] = round(c["strict:PARSE_FAIL"] / c["rows"], 4) if c["rows"] else None
+        out["operative_parse_fail_share"] = round(c["operative:PARSE_FAIL"] / c["rows"], 4) if c["rows"] else None
+        return out
+
+    return {"by_checkpoint": {k: finish(v) for k, v in sorted(by_ck.items())},
+            "by_window_lane": {k: finish(v) for k, v in sorted(by_lane.items())}}
 
 
 def main(argv=None):
@@ -167,6 +255,9 @@ def main(argv=None):
     dump(args.out, "collection-summary.json", collection_summary(args.private_root))
     dump(args.out, "scoring-probes.json", scoring_probes(args.private_root))
     dump(args.out, "scoring-status.json", scoring_status(args.private_root))
+    audit = d5_audit(args.private_root)
+    if audit is not None:
+        dump(args.out, "d5-audit.json", audit)
 
 
 if __name__ == "__main__":

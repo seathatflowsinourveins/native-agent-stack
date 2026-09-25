@@ -96,19 +96,55 @@ class TimingWindows(unittest.TestCase):
         w = CALENDAR.classify(ny(2020, 12, 24, 14, 0))  # early close, then Christmas, then weekend
         self.assertEqual((w.kind, w.session), (sig.OVERNIGHT, date(2020, 12, 28)))
 
-    def test_id_order_lag(self):
-        self.assertIsNone(sig.id_order_lag([], 100))
-        self.assertEqual(sig.id_order_lag([10_000, 10_100, 9_000], 5_000), 5_000)  # median 10,000
-        # sparse periods: predecessors are all earlier, so the lag is negative (never flagged)
-        self.assertLess(sig.id_order_lag([1_000, 2_000, 3_000, 4_000, 5_000], 20_000), 0)
-        self.assertGreater(sig.id_order_lag([90_000] * 5, 90_000 - 3_601), sig.ID_ORDER_GUARD_SECONDS)
+    def test_estimated_ingestion_uses_p90_of_predecessors(self):
+        self.assertEqual(sig.estimated_ingestion([], 500), 500)
+        preds = sorted(range(1_000, 1_100))  # 100 predecessors, p90 = element 89 -> 1,089
+        self.assertEqual(sig.quantile_sorted(preds, 0.9), 1_089)
+        self.assertEqual(sig.estimated_ingestion(preds, 500), 1_089)  # stamped earlier than neighbours
+        self.assertEqual(sig.estimated_ingestion(preds, 2_000), 2_000)  # quiet period: own stamp
+        # a handful of late-stamped predecessors cannot move the p90
+        noisy = sorted([1_000] * 95 + [10**9] * 5)
+        self.assertEqual(sig.estimated_ingestion(noisy, 900), 1_000)
 
-    def test_rth_entry_minute_rounds_up_to_a_full_bar(self):
-        self.assertEqual(sig.rth_entry_minute(utc("2021-03-15T14:15:00Z")), (date(2021, 3, 15), 615))
-        self.assertEqual(sig.rth_entry_minute(utc("2021-03-15T14:15:20Z")), (date(2021, 3, 15), 616))
-        bars = {616: {"o": 0}, 617: None, 618: {"o": 10.5}}
-        self.assertEqual(sig.pick_entry_bar(bars, 616), (618, 10.5))
-        self.assertIsNone(sig.pick_entry_bar({700: {"o": 1.0}}, 616))
+    def test_ingestion_guard_against_the_window_cutoff(self):
+        w = CALENDAR.classify(ny(2021, 3, 15, 7, 0))  # overnight, cutoff 09:00 EDT = 13:00Z
+        cutoff = utc("2021-03-15T13:00:00Z").timestamp()
+        self.assertEqual(sig.ingestion_guard(w, cutoff - 1), (True, "ok"))
+        self.assertEqual(sig.ingestion_guard(w, cutoff), (False, "ingested_after_cutoff"))
+        r = CALENDAR.classify(ny(2021, 3, 15, 10, 0))  # RTH, cutoff = entry 10:15
+        entry = utc("2021-03-15T14:15:00Z").timestamp()
+        self.assertEqual(sig.ingestion_guard(r, entry), (True, "ok"))
+        self.assertEqual(sig.ingestion_guard(r, entry + 1), (False, "ingested_after_cutoff"))
+        # an old stamp ingested after the cutoff is dropped although created_at is early
+        self.assertFalse(sig.ingestion_guard(w, utc("2021-03-15T15:00:00Z").timestamp())[0])
+
+    def test_rth_entry_quote_and_price(self):
+        entry = "2021-03-15T14:15:00Z"
+        quotes = [
+            {"bp": 10.0, "ap": 10.02, "t": "2021-03-15T14:14:59Z"},   # before entry
+            {"bp": 0, "ap": 10.02, "t": "2021-03-15T14:15:01Z"},      # one-sided
+            {"bp": 10.05, "ap": 10.0, "t": "2021-03-15T14:15:02Z"},   # crossed
+            {"bp": 10.01, "ap": 10.03, "t": "2021-03-15T14:15:03Z"},
+        ]
+        q = sig.rth_entry_quote(quotes, entry)
+        self.assertEqual((q["bid"], q["ask"]), (10.01, 10.03))
+        self.assertEqual(sig.rth_entry_price(q, 1), 10.03)
+        self.assertEqual(sig.rth_entry_price(q, -1), 10.01)
+        self.assertIsNone(sig.rth_entry_quote([{"bp": 1, "ap": 1.1, "t": "2021-03-15T14:16:01Z"}], entry))
+        self.assertIsNone(sig.rth_entry_price(None, 1))
+
+    def test_rule_201_flags_use_pre_decision_information(self):
+        self.assertTrue(sig.ssr_carryover(89.9, 100.0))
+        self.assertTrue(sig.ssr_carryover(90.0, 100.0))
+        self.assertFalse(sig.ssr_carryover(90.1, 100.0))
+        self.assertFalse(sig.ssr_carryover(None, 100.0))
+        over = {"window": "overnight", "ssr_carryover": False, "prior_close": 100.0}
+        self.assertFalse(sig.ssr_flag(over))
+        self.assertTrue(sig.ssr_flag(dict(over, ssr_carryover=True)))
+        rth = {"window": "rth", "ssr_carryover": False, "prior_close": 100.0}
+        self.assertTrue(sig.ssr_flag(rth, {"bid": 89.99, "ask": 90.1}))
+        self.assertFalse(sig.ssr_flag(rth, {"bid": 90.01, "ask": 90.1}))
+        self.assertFalse(sig.ssr_flag(rth, None))
 
     def test_timestamp_guard(self):
         w = CALENDAR.classify(ny(2021, 3, 15, 7, 0))
@@ -198,6 +234,36 @@ class Scoring(unittest.TestCase):
         self.assertEqual(sig.parse_label("YES", "hlmw_alpaca"), ("PARSE_FAIL", 0, False))
         self.assertEqual(sig.parse_label("FAVORABLE", "llt_alpaca"), ("PARSE_FAIL", 0, False))
 
+    def test_operative_score_unique_prefix_rule(self):
+        cases = {
+            "UNFAVORABLE": ("UNFAVORABLE", -1, "exact"),
+            "UNFLEXIBLE": ("UNFAVORABLE", -1, "prefix"),
+            "UNFRIENDLY,": ("UNFAVORABLE", -1, "prefix"),
+            "UNF FA": ("UNFAVORABLE", -1, "prefix"),
+            "Unfavorable news": ("UNFAVORABLE", -1, "exact"),
+            "FAVORABLE.": ("FAVORABLE", 1, "exact"),
+            "FAVOR": ("FAVORABLE", 1, "prefix"),
+            "**Favorable**": ("FAVORABLE", 1, "exact"),
+            "UNCLEAR": ("UNCLEAR", 0, "exact"),
+            "UNCERTAINTY": ("UNCLEAR", 0, "prefix"),
+            "Answer: UNFLEASIBLE": ("UNFAVORABLE", -1, "prefix"),
+            "UN": ("PARSE_FAIL", 0, "none"),
+            "FA": ("PARSE_FAIL", 0, "none"),
+            "THE": ("PARSE_FAIL", 0, "none"),
+            "": ("PARSE_FAIL", 0, "none"),
+            None: ("PARSE_FAIL", 0, "none"),
+        }
+        for raw, expected in cases.items():
+            with self.subTest(raw=raw):
+                self.assertEqual(sig.operative_score(raw), expected)
+        self.assertEqual(sig.operative_score("UNFAVORABLE", stop="context_overflow"), ("PARSE_FAIL", 0, "none"))
+        # the strict rule (stored labels) is unchanged: UNFLEXIBLE stays a parse failure there
+        self.assertEqual(sig.parse_label("UNFLEXIBLE", "hlmw_alpaca"), ("PARSE_FAIL", 0, False))
+        # every exact label maps to the same score under both rules
+        for word, score in sig.FAVORABLE_LABELS.items():
+            self.assertEqual(sig.operative_score(word)[1], score)
+            self.assertEqual(sig.parse_label(word, "hlmw_alpaca")[1], score)
+
     def test_label_decided_stop_rule(self):
         self.assertFalse(sig.label_decided(""))
         self.assertFalse(sig.label_decided("YES"))
@@ -273,6 +339,9 @@ class TextAndRelevance(unittest.TestCase):
             "Gogoro Reiterate 2023 Outlook; Revenue Of $400M-$450M, Up 4.5%-17.6% Y/Y",
             "Advanced Drainage Systems Board Approves A 17% Increase In Annual Dividend",
             "FDA Approves Merck's Keytruda For New Indication",
+            # D5 audit narrowing: offerings by selling holders and "up to" sizes are news
+            "Paycor HCM Reports Commencement Of Public Offering Of 8M Shares Of Common Stock By Selling Stockholders",
+            "Nauticus Robotics May Now Offer & Sell Shares Of Common Stock Offering Price Of Up To $8.4M",
         ]
         for h in moving:
             with self.subTest(h=h):
@@ -419,9 +488,23 @@ class PortfoliosAndStats(unittest.TestCase):
         self.assertAlmostEqual(out["d1"]["long"], 0.02)
         self.assertAlmostEqual(out["d1"]["short"], 0.01)
         self.assertAlmostEqual(out["d1"]["long_short"], 0.03)
+        self.assertAlmostEqual(out["d1"]["long_short_paper"], 0.03)
+        self.assertFalse(out["d1"]["single_leg"])
+        # confirmatory long-short needs both legs; the paper's single-leg version is kept
         self.assertIsNone(out["d2"]["long"])
-        self.assertAlmostEqual(out["d2"]["long_short"], 0.02)
+        self.assertIsNone(out["d2"]["long_short"])
+        self.assertAlmostEqual(out["d2"]["long_short_paper"], 0.02)
+        self.assertTrue(out["d2"]["single_leg"])
         self.assertIsNone(out["d3"]["long_short"])
+        self.assertIsNone(out["d3"]["long_short_paper"])
+        self.assertFalse(out["d3"]["single_leg"])
+
+    def test_fixed_sequence_and_holm_reject(self):
+        self.assertEqual(sig.fixed_sequence([("A", 0.01), ("B", 0.04)], 0.05), {"A": True, "B": True})
+        self.assertEqual(sig.fixed_sequence([("A", 0.06), ("B", 0.001)], 0.05), {"A": False, "B": False})
+        self.assertEqual(sig.fixed_sequence([("A", None), ("B", 0.001)], 0.05), {"A": False, "B": False})
+        self.assertEqual(sig.holm_reject({"a": 0.01, "b": 0.02, "c": 0.04}, 0.05), {"a": True, "b": True, "c": True})
+        self.assertEqual(sig.holm_reject({"a": 0.01, "b": 0.03, "c": 0.04}, 0.05), {"a": True, "b": False, "c": False})
 
     def test_newey_west_zero_lag_equals_plain_t(self):
         x = [0.01, -0.02, 0.03, 0.0, 0.02, -0.01]

@@ -38,7 +38,9 @@ PAPER_PROMPT_VERBATIM = (
     "Headline: headline"
 )
 
-# Operative template: identical words, ASCII double quotes (deviation D3 in protocol.json).
+# The paper's prompt with ASCII double quotes and {company}/{headline} placeholders. Used
+# only by the tested (non-operative) variants llt_alpaca and llt_upstream_wrapper; the
+# operative variant is hlmw_alpaca (OPERATIVE_VARIANT, protocol D3).
 PROMPT_TEMPLATE = (
     "Forget all your previous instructions. Pretend you are a financial expert. You are "
     "a financial expert with stock recommendation experience. Answer \"YES\" if good "
@@ -108,9 +110,11 @@ VARIANTS = {
     },
 }
 VARIANT_PREFERENCE = ("llt_alpaca", "hlmw_alpaca", "llt_upstream_wrapper")
-# Chosen by select_variant on the 2026-09-25 probe (500 events, 50 per checkpoint by
-# smallest sha256(event_id)): llt_alpaca 48/500 valid labels, hlmw_alpaca 483/500
-# (FAVORABLE 188, UNFAVORABLE 285, UNCLEAR 10), llt_upstream_wrapper 21/500.
+# Selected by outcome-blind label compliance (select_variant, rule v2) on the float32
+# probe of 2026-09-25 (500 events, 50 per checkpoint by smallest sha256(event_id)):
+# directional labels llt_alpaca 56/500, hlmw_alpaca 474/500, llt_upstream_wrapper
+# 29/500. The rule was amended after the first (bfloat16) probe; v1 picked the same
+# variant, so the amendment had no effect on the choice (protocol D17).
 OPERATIVE_VARIANT = "hlmw_alpaca"
 
 
@@ -128,7 +132,7 @@ def model_input(company, headline, variant=None):
 
 TEMPLATE_SHA256 = template_sha256(OPERATIVE_VARIANT)
 
-LABEL_SCORES = YES_NO_LABELS
+LABEL_SCORES = YES_NO_LABELS  # compatibility name only; the operative labels are VARIANTS[OPERATIVE_VARIANT]["labels"]
 _LEADING_JUNK = re.compile(r"^[\s\"'`*_#>\-“”‘’(\[]+")
 _ANSWER_PREFIX = re.compile(r"^(?:answer|response)\s*[:\-]\s*", re.I)
 _FIRST_WORD = re.compile(r"^([A-Za-z]+)")
@@ -168,6 +172,36 @@ def parse_label(raw_output, variant=None):
     if word in labels:
         return word, labels[word], True
     return "PARSE_FAIL", 0, False
+
+
+# Operative score (deviation D22). The stored label of every score row stays the strict
+# parse_label result (validated unchanged by evaluate.check_scores); the position a row
+# takes comes from operative_score. The rule was chosen on 2026-09-25 from the output
+# text alone (99.8% of strict PARSE_FAIL outputs begin with "UNF", e.g. "UNFLEXIBLE",
+# "UNFRIENDLY", "UNF"); no price or return was read. The three label words have unique
+# three-letter prefixes, so the prefix identifies the label the model started to write.
+OPERATIVE_PREFIXES = {"UNF": ("UNFAVORABLE", -1), "FAV": ("FAVORABLE", 1), "UNC": ("UNCLEAR", 0)}
+
+
+def operative_score(raw_output, stop=None):
+    """(label, score, rule) from the first word's unique prefix: UNF -> -1, FAV -> +1,
+    UNC -> 0, anything else PARSE_FAIL (0). rule is "exact" when the word is the full
+    label, "prefix" when only the prefix matched, "none" otherwise. Context overflows
+    are PARSE_FAIL."""
+    if stop == "context_overflow" or raw_output is None:
+        return "PARSE_FAIL", 0, "none"
+    text = _normalized_first_line(raw_output)
+    if text is None:
+        return "PARSE_FAIL", 0, "none"
+    match = _FIRST_WORD.match(text)
+    if match is None:
+        return "PARSE_FAIL", 0, "none"
+    word = match.group(1).upper()
+    hit = OPERATIVE_PREFIXES.get(word[:3])
+    if hit is None:
+        return "PARSE_FAIL", 0, "none"
+    label, score = hit
+    return label, score, "exact" if word == label else "prefix"
 
 
 def label_decided(generated_text):
@@ -301,9 +335,12 @@ def normalize_headline(text):
 # Headlines that only report the stock's own price move (the paper drops RavenPack's
 # 'stock-gain'/'stock-loss' categories). Deterministic approximation, deviation D5.
 MOVEMENT_PATTERNS = (
+    # D5 audit (2026-09-25): "sell" was removed (it matched "... Shares By Selling
+    # Stockholders" offering news) and "up"/"down" may not be followed by "to" ("Offering
+    # Of Up To $8.4M").
     r"\b(?:shares|stock|stocks)\b[^.]{0,40}\b(?:(?:trad|mov|ris|fall|soar|sink|surg|plung|jump|tumbl|climb|"
-    r"slid|slip|spik|drop|slump|rall|skyrocket|rocket|crash|tank|sell|spik|gain)\w*|rose|fell|sank|"
-    r"down|up|higher|lower)\b",
+    r"slid|slip|spik|drop|slump|rall|skyrocket|rocket|crash|tank|gain)\w*|rose|fell|sank|"
+    r"(?:down|up)(?!\s+to\b)|higher|lower)\b",
     r"\bwhat(?:'s|\s+is)\s+going\s+on\s+with\b",
     r"\binvested\s+(?:\$\s?\d[\d,]*\s+)?in\b[^.]{0,80}\b(?:years?|months?)\s+ago\b",
     r"\$\s?\d[\d,]*\s+invested\b",
@@ -513,15 +550,45 @@ def timestamp_guard(window, updated_at_utc):
     return (True, "ok") if ok else (False, "updated_after_cutoff")
 
 
-# Second timestamp guard (prepare.py): drop an article whose created_at is more than one
-# hour before the median created_at of the articles with the 5 next-lower news ids, i.e.
-# a story that entered the feed (ids follow ingestion order) later than its stamp claims.
+# Second timestamp guard (prepare.py). News ids follow ingestion order, so an article
+# cannot have entered the feed much before the articles with the next-lower ids. Its
+# estimated ingestion time is the later of its own created_at and the 90th percentile of
+# the created_at of the 100 articles with the next-lower ids; the article is dropped when
+# that estimate is later than its window's decision cutoff (ingestion_guard).
+INGESTION_PREDECESSORS = 100
+INGESTION_QUANTILE = 0.90
+
+
+def quantile_sorted(ordered, q):
+    """Lower empirical quantile of an ascending list (element at floor(q * (n - 1)))."""
+    return ordered[int(q * (len(ordered) - 1))]
+
+
+def estimated_ingestion(predecessor_times_sorted, created_ts):
+    """max(created_at, 90th percentile of the predecessors' created_at); epoch seconds."""
+    if not predecessor_times_sorted:
+        return created_ts
+    return max(created_ts, quantile_sorted(predecessor_times_sorted, INGESTION_QUANTILE))
+
+
+def ingestion_guard(window, ingestion_ts):
+    """Same comparison as timestamp_guard, applied to the estimated ingestion time."""
+    if window.kind not in (OVERNIGHT, RTH):
+        return False, "not_tradable_window"
+    cutoff = window.decision_cutoff_utc.timestamp()
+    ok = ingestion_ts < cutoff if window.kind == OVERNIGHT else ingestion_ts <= cutoff
+    return (True, "ok") if ok else (False, "ingested_after_cutoff")
+
+
+# ---- Compatibility names (not used by this study since the 2026-09-25 review fixes).
+# Kept because another builder imports this module by path; do not rely on them here.
 ID_ORDER_GUARD_SECONDS = 3600
 ID_ORDER_PREDECESSORS = 5
+RTH_ENTRY_SEARCH_MINUTES = 5
 
 
 def id_order_lag(predecessor_times, t):
-    """Seconds by which t precedes the median of its id predecessors' times (None if none)."""
+    """Superseded guard-B statistic: t's lag behind the median of its predecessors (or None)."""
     if not predecessor_times:
         return None
     ordered = sorted(predecessor_times)
@@ -529,11 +596,7 @@ def id_order_lag(predecessor_times, t):
 
 
 def rth_entry_minute(entry_utc):
-    """(session-local date, ET minute of day) of the first full minute bar at or after entry.
-
-    Minute bars are stamped at their start; a bar starting at m covers [m, m+1min).
-    Entry at 10:15:00 uses the 10:15 bar; entry at 10:15:20 uses the 10:16 bar.
-    """
+    """Superseded minute-bar entry: (NY date, ET minute) of the first full bar at/after entry."""
     t = as_utc(entry_utc)
     if t.second or t.microsecond:
         t = t.replace(second=0, microsecond=0) + timedelta(minutes=1)
@@ -541,16 +604,74 @@ def rth_entry_minute(entry_utc):
     return local.date(), local.hour * 60 + local.minute
 
 
-RTH_ENTRY_SEARCH_MINUTES = 5
-
-
 def pick_entry_bar(bars_by_minute, entry_minute):
-    """First bar in [entry_minute, entry_minute + 5) with a positive open, else None."""
+    """Superseded: first bar in [entry_minute, entry_minute + 5) with a positive open."""
     for m in range(entry_minute, entry_minute + RTH_ENTRY_SEARCH_MINUTES):
         bar = bars_by_minute.get(m)
         if bar is not None and bar.get("o") and bar["o"] > 0:
             return m, float(bar["o"])
     return None
+# ---- end of compatibility names
+
+
+RTH_QUOTE_WINDOW = timedelta(seconds=60)
+
+
+def rth_entry_quote(quotes, entry_utc):
+    """First two-sided, uncrossed SIP quote stamped in [entry, entry + 60 s], else None.
+
+    Returns {"bid", "ask", "t"}. The order is assumed to reach the market at the entry
+    time and to fill against the first quote it meets: longs pay the ask, shorts receive
+    the bid (rth_entry_price).
+    """
+    start = as_utc(entry_utc)
+    end = start + RTH_QUOTE_WINDOW
+    for q in quotes or []:
+        if half_spread_fraction(q) is None or not q.get("t"):
+            continue
+        t = as_utc(q["t"])
+        if start <= t <= end:
+            return {"bid": float(q["bp"]), "ask": float(q["ap"]), "t": q["t"]}
+    return None
+
+
+def rth_entry_price(quote, side):
+    """Ask for a long (+1), bid for a short (-1)."""
+    if quote is None:
+        return None
+    return quote["ask"] if side == 1 else quote["bid"]
+
+
+# --------------------------------------------------------------------------------------
+# Short-sale restriction (SEC Rule 201), from information available before the decision
+# --------------------------------------------------------------------------------------
+
+SSR_DECLINE = 0.10
+
+
+def ssr_carryover(prior_low_adj, prior2_close_adj):
+    """Rule 201 in force on the trade session because it triggered on the prior session:
+    the prior session's low was at least 10% below the close of the session before it
+    (split-adjusted daily bars, both strictly before the trade session)."""
+    if prior_low_adj is None or prior2_close_adj is None or prior2_close_adj <= 0:
+        return False
+    return prior_low_adj <= (1 - SSR_DECLINE) * prior2_close_adj
+
+
+def ssr_flag(event, entry_quote=None):
+    """True when a short on this event may be restricted under Rule 201.
+
+    Overnight (entry at the open): only the carry-over from the prior session is knowable.
+    RTH: the carry-over, or the entry quote's bid already 10% or more below the prior
+    session's raw close (then the restriction has triggered for the day).
+    """
+    if event.get("ssr_carryover"):
+        return True
+    if event.get("window") == RTH and entry_quote is not None:
+        prior = event.get("prior_close")
+        if prior and entry_quote["bid"] <= (1 - SSR_DECLINE) * prior:
+            return True
+    return False
 
 
 # --------------------------------------------------------------------------------------
@@ -763,8 +884,9 @@ def daily_portfolios(positions):
 
     positions: iterable of dicts with keys session, side (+1/-1) and ret (the position's
     return per dollar, already signed for its side). A leg exists on a day only with at
-    least two names (paper footnote 20); the long-short return is long leg + short leg
-    when both exist, otherwise the single existing leg; days with no leg are absent.
+    least two names. Confirmatory long_short = long leg + short leg and exists only when
+    both legs exist. long_short_paper follows the paper's footnote 20 (the single existing
+    leg when only one exists; descriptive), and single_leg marks those days.
     """
     by_day = {}
     for p in positions:
@@ -775,18 +897,37 @@ def daily_portfolios(positions):
         longs, shorts = legs[1], legs[-1]
         long_ret = sum(longs) / len(longs) if len(longs) >= MIN_NAMES_PER_LEG else None
         short_ret = sum(shorts) / len(shorts) if len(shorts) >= MIN_NAMES_PER_LEG else None
+        both = long_ret is not None and short_ret is not None
         if long_ret is None and short_ret is None:
-            ls = None
+            paper = None
         else:
-            ls = (long_ret or 0.0) + (short_ret or 0.0)
+            paper = (long_ret or 0.0) + (short_ret or 0.0)
         out[day] = {
             "n_long": len(longs),
             "n_short": len(shorts),
             "long": long_ret,
             "short": short_ret,
-            "long_short": ls,
+            "long_short": long_ret + short_ret if both else None,
+            "long_short_paper": paper,
+            "single_leg": paper is not None and not both,
         }
     return out
+
+
+def fixed_sequence(pvalues_in_order, alpha):
+    """Test in order at alpha; stop at the first non-rejection. {name: rejected}."""
+    out, open_ = {}, True
+    for name, p in pvalues_in_order:
+        rej = open_ and p is not None and not math.isnan(p) and p <= alpha
+        out[name] = bool(rej)
+        open_ = open_ and rej
+    return out
+
+
+def holm_reject(pvalues, alpha):
+    """Holm step-down rejections at family level alpha. {name: rejected}."""
+    adjusted = holm(pvalues)
+    return {k: adjusted[k] <= alpha for k in pvalues}
 
 
 def mean(xs):
