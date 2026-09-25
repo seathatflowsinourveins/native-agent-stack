@@ -3209,8 +3209,8 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "9d54a891de68794ecb5ae992cd366762df5ede0546d0655056bdf277d568d9c1",
-      "bytes": 26352
+      "sha256": "a88b51be651156e073bf91f8a34ac9d31664962079df43d44b813f44ca74fed5",
+      "bytes": 27187
     },
     {
       "path": "adoption/bootstrap-macos.sh",
@@ -3269,8 +3269,8 @@
     },
     {
       "path": "adoption/lifecycle.md",
-      "sha256": "4b158bd1a468b26a710c0c8ba44458ea824e42d03897809dc0afae1e208a5daf",
-      "bytes": 28662
+      "sha256": "b3f40007a6da662898894ba9d16e715a5b5eb7b4351ddc8e365d0bf4f489fa8a",
+      "bytes": 29780
     },
     {
       "path": "adoption/manifest.json",
@@ -29150,8 +29150,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "4932c872c3992a177d13b5807e3b07b60c39c4e2ef15cbea7495a1b0f1ff1126",
-      "bytes": 40385
+      "sha256": "39fcad274f154721af3785447b74a8d5b8ba19a26b149666e421ea197f4be673",
+      "bytes": 44085
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
