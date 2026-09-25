@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "kind": "blind_adjudication_input",
+  "question_id": "tabular-question",
+  "packet_order": "swapped",
+  "source_file": "adjudication/tabular-question-swapped.md",
+  "original_sha256": "ac382709be36a34225e5dee1fa7e9a60d35b6ecb002f927faff622557df7b23f",
+  "original_bytes": 856,
+  "transformation": "The input Markdown is embedded unchanged in input_text; question and returns are parsed from it without edits.",
+  "scrubbing": "The coordinator condensed each lane's position on tabular foundation models into one quoted return and removed lane, model and file identities before the judge saw it: the trial return condenses the Codex lane's TabICLv2 row, the skip return is the Claude lane's not-local bullet with its link reduced to the arXiv number.",
+  "listing_order": [
+    "B",
+    "A"
+  ],
+  "listed_first": "trial",
+  "question": "for predicting which US equities become +200% movers within 20 trading sessions, from\npoint-in-time tabular features over 2015-2025 with temporal splits, delistings and an embargo (a\ntemporal, non-IID, large dataset), should a local tabular foundation model be trialled against\ngradient-boosted trees, or skipped?",
+  "returns": {
+    "B": "Trial: TabICLv2 (arXiv 2602.11139, 2026-02; TabArena/TALENT results, permissive license), runner-up\nTabPFN-3.5 (arXiv 2609.17895, 2026-09; TabArena/BeyondArena leadership claim, restricted weights).\nEquities edge unknown. Acceptance: beat logistic regression and CatBoost on PR-AUC and Brier score\nwith temporal splits and a 20-session embargo.",
+    "A": "Skip: trees and deep nets still win on temporal, non-IID, large data (BeyondArena, arXiv\n2606.30410, 2026-06-29, academic); TabPFN-3 weights are non-commercial."
+  },
+  "adjudicator_prompt": "Read tabular-question-swapped.md. You are an evidence adjudicator. Check the cited sources yourself (search the papers). Decide which return the evidence better supports for this specific use: answer exactly 'A' or 'B' on the first line, then at most 120 words naming the decisive evidence and its relevance to temporal, non-IID equity data. Do not favor a return for its position.",
+  "adjudicator_prompt_source": "transcribed from the run log header section (log not committed)",
+  "input_text": "Question: for predicting which US equities become +200% movers within 20 trading sessions, from\npoint-in-time tabular features over 2015-2025 with temporal splits, delistings and an embargo (a\ntemporal, non-IID, large dataset), should a local tabular foundation model be trialled against\ngradient-boosted trees, or skipped?\n\nReturn B:\n\"Trial: TabICLv2 (arXiv 2602.11139, 2026-02; TabArena/TALENT results, permissive license), runner-up\nTabPFN-3.5 (arXiv 2609.17895, 2026-09; TabArena/BeyondArena leadership claim, restricted weights).\nEquities edge unknown. Acceptance: beat logistic regression and CatBoost on PR-AUC and Brier score\nwith temporal splits and a 20-session embargo.\"\n\nReturn A:\n\"Skip: trees and deep nets still win on temporal, non-IID, large data (BeyondArena, arXiv\n2606.30410, 2026-06-29, academic); TabPFN-3 weights are non-commercial.\"\n"
+}

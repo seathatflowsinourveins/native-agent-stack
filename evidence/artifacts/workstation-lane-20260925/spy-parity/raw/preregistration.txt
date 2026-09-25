@@ -1,0 +1,21 @@
+written_utc: 2026-09-25T14:27:07Z
+host: nativestack-5975wx-20260925 (CPU only; no GPU use)
+harness: worktree at origin/main 720e294b (harness files hash as bwrap-cc4503f-qualifying)
+interpreter: ~/.local/share/codex-ecosystem/nautilus-py312 (README names tools/nautilus-2.0.0rc5; deviation)
+data root: ~/.local/share/codex-ecosystem/lean/Lean/Data (README names tools/lean-985ef30/Data; deviation)
+command A: README lines 86-103 bwrap run.py (no --review-record, no --harness-commit), output <scratch>/spy-parity-run/native
+  expect: exit 0; five frozen input hashes accepted by run.py; fills 2; dividend 428.64; native end cash 90734.08; two_run_records_equal true
+command B: compare.py --receipt <fresh receipt> --bars <fresh rows> --verdict <scratch>/spy-parity-run/cmp/fresh.verdict.json
+  expect: exit 1, verdict FAIL, preregistration_qualifying false, execution_checks 106/0/0; failures confined to precondition_review
+  (no review record passed; no_prior_replay_ran_the_reviewed_harness names bwrap-cc4503f-qualifying) -- by the harness design, no retry from cc4503f can qualify
+command C: compare.py --receipt receipt-v2.json --bars <fresh rows> --verdict <scratch>/spy-parity-run/cmp/committed.verdict.json
+  expect: exit 0, PASS, complete true, failed 0, case one_zero; verdict bytes sha256 = verdict-v2.json 1816835f...
+check D: fresh receipt economic ledger equals committed receipt-v2 (intents, fills, cash_ledger, distribution_ledger, dividend, fees, final qty, native/reconciled end cash, per-run normalized_economic_sha256, converted_rows_sha256 6c6fcf4a...)
+negative control E: compare.py --receipt receipt-v2.json --bars <fresh rows with one close altered by 0.0001> must refuse (converted_rows_sha256_mismatch)
+amendment_utc: 2026-09-25T14:28:01Z (after B and C ran)
+  observed: C (--bars, committed receipt-v2) exit 1, FAIL, complete false, failed 0, 1 SKIPPED (precondition_hashes.inputs_at_comparison: only --lean-data re-hashes the inputs); under v2 a skipped check is FAIL. My C prediction was wrong; retained as run.
+  observed: B (--bars, fresh receipt) exit 1, FAIL, execution 106/0/0, failed 2 (retained_record_before_run, no_prior_replay_ran_the_reviewed_harness = bwrap-cc4503f-qualifying) + the same SKIPPED.
+command C2: compare.py --receipt receipt-v2.json --lean-data <data root> --verdict <scratch>/spy-parity-run/cmp/committed-leandata.verdict.json (README's documented alternative mode)
+  expect: exit 0, PASS, complete true, failed 0, bytes equal verdict-v2.json (1816835f...)
+command B2: compare.py --receipt <fresh receipt> --lean-data <data root> --verdict <scratch>/spy-parity-run/cmp/fresh-leandata.verdict.json
+  expect: exit 1, FAIL, complete true, failed 2 (the two precondition_review checks), 0 skipped, execution 106/0/0

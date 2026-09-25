@@ -1,0 +1,239 @@
+#!/usr/bin/env python3
+"""Preserve upstream Gitleaks scanning semantics, with host-local containment on macOS.
+
+macOS has no per-job memory cgroup, so this front end enforces the same caps as
+the Linux scope (MemoryMax 6G, RuntimeMaxSec 600) with a watchdog: it samples
+the physical footprint, the figure Jetsam acts on, of the whole scan process
+tree and kills the tree when the sum crosses the cap. One scan runs per user,
+across worktrees and clients. A busy, killed, timed-out or unobservable scan is
+a failure, never a successful empty result.
+"""
+
+import ctypes
+import errno
+import fcntl
+import os
+import platform
+import signal
+import stat
+import subprocess
+import sys
+import time
+
+PROG = "gitleaks-guarded-macos"
+MEMORY_MAX = 6 << 30  # same ceiling as the Linux scope's MemoryMax=6G
+RUNTIME_MAX = 600  # same bound as RuntimeMaxSec=600
+LOCK_WAIT_DEFAULT = 60
+POLL_SECONDS = 0.05
+STOP_GRACE_SECONDS = 5
+EXIT_BUSY, EXIT_REFUSED, EXIT_TIMEOUT, EXIT_MEMORY = 75, 78, 124, 137
+FAST_PATH = ("version", "--version", "--help", "-h")
+UNITS = {"": 0, "K": 10, "M": 20, "G": 30, "T": 40}
+
+
+def refuse(reason):
+    print(f"{PROG}: {reason}; scan was not started", file=sys.stderr)
+    sys.exit(EXIT_REFUSED)
+
+
+def parse_size(text):
+    text = text.strip()
+    unit = text[-1:] if text[-1:] in "KMGT" else ""
+    digits = text[:-1] if unit else text
+    if not digits.isdigit() or digits.startswith("0") or len(digits) > 18:
+        raise ValueError(text)
+    return int(digits) << UNITS[unit]
+
+
+def limits(environ):
+    """Caps may be lowered through the Linux runner's variables, never raised."""
+    memory, seconds = MEMORY_MAX, RUNTIME_MAX
+    try:
+        if environ.get("ECOSYSTEM_JOB_MEMORY_MAX"):
+            memory = min(memory, parse_size(environ["ECOSYSTEM_JOB_MEMORY_MAX"]))
+        if environ.get("ECOSYSTEM_JOB_SECONDS"):
+            value = environ["ECOSYSTEM_JOB_SECONDS"].strip()
+            if not value.isdigit() or value.startswith("0"):
+                raise ValueError(value)
+            seconds = min(seconds, int(value))
+        value = environ.get("ECOSYSTEM_GITLEAKS_LOCK_WAIT", str(LOCK_WAIT_DEFAULT)).strip()
+        if not value.isdigit() or len(value) > 6:
+            raise ValueError(value)
+        wait = int(value)
+    except ValueError:
+        refuse("limits must be positive finite sizes or whole seconds")
+    return memory, seconds, wait
+
+
+class RUsageInfoV0(ctypes.Structure):
+    _fields_ = [("ri_uuid", ctypes.c_uint8 * 16)] + [
+        (name, ctypes.c_uint64) for name in (
+            "ri_user_time", "ri_system_time", "ri_pkg_idle_wkups", "ri_interrupt_wkups",
+            "ri_pageins", "ri_wired_size", "ri_resident_size", "ri_phys_footprint",
+            "ri_proc_start_abstime", "ri_proc_exit_abstime")]
+
+
+class Tree:
+    """The scan's process tree through libproc: parent links and footprints."""
+
+    def __init__(self):
+        self.libproc = ctypes.CDLL("/usr/lib/libproc.dylib", use_errno=True)
+
+    def footprint(self, pid):
+        usage = RUsageInfoV0()
+        if self.libproc.proc_pid_rusage(pid, 0, ctypes.byref(usage)) != 0:  # RUSAGE_INFO_V0
+            return None
+        return usage.ri_phys_footprint
+
+    def members(self, root):
+        found, pending = [], [root]
+        buffer = (ctypes.c_int * 4096)()
+        while pending:
+            pid = pending.pop()
+            found.append(pid)
+            count = self.libproc.proc_listchildpids(pid, buffer, ctypes.sizeof(buffer))
+            pending.extend(buffer[i] for i in range(max(0, min(count, 4096)))
+                           if buffer[i] > 0 and buffer[i] not in found)
+        return found
+
+
+def acquire_lock(path, wait):
+    """Hold the per-user scan lock; a read-only descriptor is enough for flock."""
+    flags = os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC
+    try:
+        os.makedirs(os.path.dirname(path), mode=0o700, exist_ok=True)
+        try:
+            descriptor = os.open(path, flags)
+        except FileNotFoundError:
+            try:
+                descriptor = os.open(path, flags | os.O_CREAT | os.O_EXCL, 0o600)
+            except FileExistsError:
+                descriptor = os.open(path, flags)
+    except OSError as error:
+        if error.errno == errno.ELOOP:
+            refuse(f"per-user lock {path} is a symbolic link")
+        refuse(f"per-user lock {path} is unavailable (create it once outside any sandbox)")
+    info = os.fstat(descriptor)
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid():
+        refuse(f"per-user lock {path} is not a regular file owned by this user")
+    deadline = time.monotonic() + wait
+    announced = False
+    while True:
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            return descriptor
+        except BlockingIOError:
+            if time.monotonic() >= deadline:
+                held = f" for {wait} s" if wait else ""
+                print(f"{PROG}: another scan holds the per-user lock{held}; retry after it "
+                      "finishes; scan was not started", file=sys.stderr)
+                sys.exit(EXIT_BUSY)
+            if not announced:
+                print(f"{PROG}: waiting up to {wait} s for another scan to finish", file=sys.stderr)
+                announced = True
+            time.sleep(0.2)
+        except OSError:
+            refuse("could not acquire the per-user lock")
+
+
+def stop(child, pids, number):
+    """Signal the scan's descendants, then the scan itself while it is unreaped."""
+    for pid in pids:
+        if pid != child.pid:
+            try:
+                os.kill(pid, number)
+            except (ProcessLookupError, PermissionError):
+                pass
+    if child.poll() is None:
+        child.send_signal(number)
+
+
+def run(native, arguments, memory, seconds, lock):
+    tree = Tree()
+    if tree.footprint(os.getpid()) is None:
+        refuse("process footprints are not observable here")
+    received = []
+    for number in (signal.SIGHUP, signal.SIGINT, signal.SIGTERM):
+        signal.signal(number, lambda number, _frame: received.append(number))
+    # The scan stays in the caller's process group, so a group signal from the
+    # caller reaches it too. It inherits the lock: an orphaned scan keeps it.
+    try:
+        child = subprocess.Popen([native, *arguments], pass_fds=(lock,))
+    except OSError:
+        refuse("the native binary could not be executed")
+    started = time.monotonic()
+    peak, outcome, pids = 0, None, [child.pid]
+    while child.poll() is None:
+        pids = tree.members(child.pid)
+        sizes = {pid: tree.footprint(pid) for pid in pids}
+        total = sum(size for size in sizes.values() if size)
+        peak = max(peak, total)
+        if received:
+            outcome = "signal"
+        elif sizes[child.pid] is None and child.poll() is None:
+            outcome = "unobservable"
+        elif total > memory:
+            outcome = "memory"
+        elif time.monotonic() - started > seconds:
+            outcome = "runtime"
+        if outcome:
+            break
+        time.sleep(POLL_SECONDS)
+    if received and not outcome:
+        outcome = "signal"
+    if outcome in ("signal", "runtime"):
+        stop(child, pids, signal.SIGTERM)
+        deadline = time.monotonic() + STOP_GRACE_SECONDS
+        while child.poll() is None and time.monotonic() < deadline:
+            time.sleep(POLL_SECONDS)
+    if outcome:
+        if child.poll() is None:
+            pids = tree.members(child.pid)
+        stop(child, pids, signal.SIGKILL)
+    status = child.wait()
+    if outcome == "memory":
+        print(f"{PROG}: memory cap exceeded (scan footprint {peak / 2**30:.2f} GiB > "
+              f"{memory / 2**30:.2f} GiB); the scan was killed and produced no result",
+              file=sys.stderr)
+        return EXIT_MEMORY
+    if outcome == "runtime":
+        print(f"{PROG}: runtime cap of {seconds} s exceeded; the scan was stopped and produced "
+              "no result", file=sys.stderr)
+        return EXIT_TIMEOUT
+    if outcome == "unobservable":
+        print(f"{PROG}: the scan's footprint became unobservable; the scan was killed and "
+              "produced no result", file=sys.stderr)
+        return EXIT_REFUSED
+    if outcome == "signal":
+        return 128 + received[0]
+    return status if status >= 0 else 128 - status
+
+
+def main(arguments):
+    home = os.environ.get("HOME", "")
+    native = os.environ.get("GITLEAKS_NATIVE") or os.path.join(
+        os.environ.get("MISE_DATA_DIR") or os.path.join(home, ".local", "share", "mise"),
+        "installs", "gitleaks", "8.30.1", "gitleaks")
+    if not (os.path.isfile(native) and os.access(native, os.X_OK)):
+        refuse("native binary is missing")
+    if os.path.realpath(native) == os.path.realpath(__file__):
+        refuse("GITLEAKS_NATIVE points at this front end")
+    # These exact invocations cannot start a scan and need no lock or watchdog.
+    if len(arguments) == 1 and arguments[0] in FAST_PATH:
+        os.execv(native, [native, *arguments])
+    if platform.system() != "Darwin":
+        refuse("macOS only; use gitleaks-guarded (systemd scope) on Linux")
+    memory, seconds, wait = limits(os.environ)
+    lock_path = os.environ.get("ECOSYSTEM_GITLEAKS_LOCK") or os.path.join(
+        home, ".local", "state", "ecosystem-gitleaks.lock")
+    if not os.path.isabs(lock_path):
+        refuse("the per-user lock path must be absolute")
+    lock = acquire_lock(lock_path, wait)
+    return run(native, arguments, memory, seconds, lock)
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except KeyboardInterrupt:  # interrupted before the scan started
+        sys.exit(128 + signal.SIGINT)

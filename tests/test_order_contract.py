@@ -111,6 +111,37 @@ class OrderContractTests(unittest.TestCase):
         text = json.dumps(self.intent()).replace('"100.10"', '100.10')
         self.assertEqual(contract.loads(text)["intent"]["limit_price"], "100.1")
 
+    def test_build_envelope_defaults_equal_canonicalize(self):
+        for changes in ({}, {"side": "sell"}, {"limit_price": "0.1234"}, {"symbol": "BRK.B"}):
+            intent = dict(self.intent(), **changes)
+            with self.subTest(changes=changes):
+                self.assertEqual(contract.build_envelope(intent), contract.canonicalize(intent))
+        for field, value in (("qty", "0.5"), ("extended_hours", True), ("limit_price", "1.001")):
+            with self.subTest(field=field), self.assertRaises(contract.ContractError):
+                contract.build_envelope(dict(self.intent(), **{field: value}))
+
+    def test_build_envelope_adapter_policies_are_explicit_and_narrow(self):
+        sell = dict(self.intent(), side="sell", qty="0.123456789")
+        result = contract.build_envelope(sell, fractional_sell_qty=True)
+        self.assertEqual((result["mode"], result["submission_enabled"]), ("offline", False))
+        self.assertEqual(result["intent"]["qty"], "0.123456789")
+        self.assertEqual(contract.build_envelope(dict(sell, qty=Decimal("0.500000000")),
+                                                 fractional_sell_qty=True)["intent"]["qty"], "0.5")
+        for changes in ({"side": "buy"}, {"qty": "0.1234567891"}, {"qty": "1e-9"}, {"qty": 0.5},
+                        {"qty": Decimal("1E-10")}):
+            with self.subTest(changes=repr(changes)), self.assertRaises(contract.ContractError):
+                contract.build_envelope(dict(sell, **changes), fractional_sell_qty=True)
+        with self.assertRaises(contract.ContractError):
+            contract.build_envelope(sell)  # whole shares unless the adapter opts in
+        extended = dict(self.intent(), extended_hours=True)
+        self.assertIs(contract.build_envelope(extended, extended_hours_allowed=True)["intent"]["extended_hours"], True)
+        for value in (1, "true", None):
+            with self.subTest(extended_hours=value), self.assertRaises(contract.ContractError):
+                contract.build_envelope(dict(extended, extended_hours=value), extended_hours_allowed=True)
+        with self.assertRaises(contract.ContractError):  # policies never relax the price increment
+            contract.build_envelope(dict(sell, limit_price="100.001"), fractional_sell_qty=True,
+                                    extended_hours_allowed=True)
+
     def test_cli_rejects_submission_and_reports_no_values(self):
         result = subprocess.run([sys.executable, str(PATH), "--submit"],
                                 input=json.dumps(self.intent()), text=True, capture_output=True)

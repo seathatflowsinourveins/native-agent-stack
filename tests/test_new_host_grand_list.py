@@ -8,6 +8,8 @@ import argparse
 import contextlib
 import io
 import json
+import re
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -108,6 +110,32 @@ class BuildTests(unittest.TestCase):
         s = self.data["summary"]
         self.assertEqual(s["winners"], sum(len(l["winners"]) for l in self.data["layers"]))
         self.assertEqual(s["layers"]["foundation"] + s["layers"]["us-equities"], len(self.data["layers"]))
+
+    def test_every_winner_carries_its_ledger_basis(self):
+        ledgers = {c: {l["layer_id"]: l for l in json.loads((REPO_ROOT / rel).read_text(encoding="utf-8"))["layers"]}
+                   for c, rel in g.LEDGERS.items()}
+        for layer in self.data["layers"]:
+            recorded = {w["component_id"]: w for w in ledgers[layer["catalog"]][layer["layer_id"]].get("winners") or []}
+            for w in layer["winners"]:
+                self.assertIn(w["component_id"], recorded, (layer["layer_id"], w["component_id"]))
+                src = recorded[w["component_id"]]
+                self.assertEqual(w["why_selected"], src.get("why_selected"), (layer["layer_id"], w["component_id"]))
+                self.assertEqual(w["evidence_refs"], list(src.get("evidence_refs") or []), (layer["layer_id"], w["component_id"]))
+
+    def test_rendered_markdown_explains_what_a_winner_means_without_new_paths(self):
+        md = g.render_md(self.data)
+        section = md.split("## What a winner means", 1)[1].split("\n## ", 1)[0]
+        self.assertIn("not a claim that the component is the best in its field", section)
+        counts = [int(n) for n in re.findall(r"`[a-z_]+` (\d+)", section)]
+        self.assertEqual(sum(counts), len(self.data["layers"]))
+        # The Markdown is a new-host document (scripts/release_due.py), so the section names no repository paths.
+        self.assertIsNone(re.search(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+", section))
+
+    def test_headline_pairs_add_up_to_the_winners(self):
+        # needs_host excludes both accepted and host_verified, so the three counts partition the pairs.
+        s = self.data["summary"]
+        for p in g.PLATFORMS:
+            self.assertEqual(s["e2e_accepted"][p] + s["e2e_host_verified"][p] + s["needs_host"][p], s["winners"], p)
 
     def test_rendered_markdown_has_every_layer(self):
         md = g.render_md(self.data)
@@ -221,6 +249,13 @@ class RecordHostToGrandListTests(unittest.TestCase):
             self.assertEqual(entry["measured"]["cores"], 12)
             self.assertEqual(entry["measured"]["effective_ram_gb"], 64.0)
 
+    def test_recorded_host_under_a_two_letter_user_name(self):
+        # The same round trip under a two-letter account name inside the id ("ed" in
+        # "recorded"): matched as a substring, the id was refused, which CI (user "runner")
+        # never saw.
+        with mock.patch.dict(os.environ, {"USER": "ed", "LOGNAME": "ed"}):
+            self.test_recorded_host_gets_non_null_measured_in_the_grand_list()
+
 
 class MeasuredCellTests(unittest.TestCase):
     def test_none_measured_returns_none(self):
@@ -252,10 +287,19 @@ class QualifiedModelsRenderTests(unittest.TestCase):
             "summary": {
                 "layers": {"foundation": 0, "us-equities": 0}, "winners": 0, "distinct_components": 0,
                 "pins_behind_upstream": [], "e2e_accepted": {p: 0 for p in g.PLATFORMS},
+                "e2e_host_verified": {p: 0 for p in g.PLATFORMS},
                 "needs_host": {p: 0 for p in g.PLATFORMS}, "not_joined_to_manifest": [],
             },
             "setup_order": [], "hosts": [], "layers": [], "qualified_models": qualified_models,
         }
+
+    def test_headline_counts_host_verified_pairs_as_accepted(self):
+        data = self._minimal_data([])
+        data["summary"]["e2e_accepted"] = {"linux-wsl2-x86_64": 28, "macos-arm64": 0}
+        data["summary"]["e2e_host_verified"] = {"linux-wsl2-x86_64": 18, "macos-arm64": 6}
+        md = g.render_md(data)
+        self.assertIn("Pairs accepted end to end: 46 (18 of them `host_verified` on a host receipt) on WSL2, "
+                      "6 (6 of them `host_verified` on a host receipt) on macOS.", md)
 
     def test_empty_section_renders_a_placeholder_row(self):
         md = g.render_md(self._minimal_data([]))

@@ -103,3 +103,4 @@ enabled = true
 [shell_environment_policy.set]
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 RTK_TELEMETRY_DISABLED = "1"
+MCP_AUTO_OPEN_ENABLED = "false"

@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--vllm--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "6752ede5be451f35d36ca410233467b2f5ea4234",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "vllm",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "\"$HOME/.local/share/codex-ecosystem/tools/vllm-0.30.0/bin/python\" -I -c \"import vllm, torch; print('vllm', vllm.__version__, '| torch', torch.__version__, '| cuda', torch.version.cuda, '| gpu', torch.cuda.is_available(), torch.cuda.get_device_name(0))\"",
+      "exit": 0,
+      "duration_s": 3.706,
+      "output_sha256": "2dd64fa88f44e59d10b24d5779cf69768709030451ff7a76bb3fbf6e6671f5b2",
+      "output_excerpt": "vllm 0.30.0 | torch 2.13.0+cu130 | cuda 13.0 | gpu True NVIDIA GeForce RTX 4090\n"
+    },
+    {
+      "cmd": "\"$HOME/.local/share/codex-ecosystem/tools/vllm-0.30.0/bin/python\" -I -c \"\nimport importlib.metadata as m, hashlib, base64\nd = m.distribution('vllm'); n = bad = 0\nfor f in d.files or []:\n    if f.hash is None: continue\n    n += 1\n    h = base64.urlsafe_b64encode(hashlib.new(f.hash.mode, f.locate().read_bytes()).digest()).rstrip(b'=').decode()\n    bad += h != f.hash.value\nwheel = (d.locate_file(d._path.name) / 'WHEEL').read_text() if hasattr(d, '_path') else ''\nprint('vllm', d.version, 'RECORD files hashed', n, 'mismatched', bad, '| installer', (d.read_text('INSTALLER') or '').strip(), '|', [l for l in (d.read_text('WHEEL') or '').splitlines() if l.startswith('Tag:')])\nraise SystemExit(1 if bad or not n else 0)\"",
+      "exit": 0,
+      "duration_s": 1.012,
+      "output_sha256": "0d5d6418f33dd32d987b8ed1b66f9bba9326d9dada8d9abf39d50ee8ef222c95",
+      "output_excerpt": "vllm 0.30.0 RECORD files hashed 5100 mismatched 0 | installer uv | ['Tag: cp38-abi3-linux_x86_64']\n"
+    },
+    {
+      "cmd": "uv pip check --python \"$HOME/.local/share/codex-ecosystem/tools/vllm-0.30.0/bin/python\" 2>&1 | tail -3; uv --version",
+      "exit": 0,
+      "duration_s": 0.028,
+      "output_sha256": "a23199cb3402819aa254cfa0b4f45813f245d473681c7b80d6b35bc3cb491c4a",
+      "output_excerpt": "Using Python 3.13.15 environment at: ~/.local/share/codex-ecosystem/tools/vllm-0.30.0\nChecked 198 packages in 2ms\nAll installed packages are compatible\nuv 0.12.17 (x86_64-unknown-linux-gnu)\n"
+    },
+    {
+      "cmd": "python3 -c \"\nimport json, urllib.request\nd = json.load(urllib.request.urlopen('https://pypi.org/pypi/vllm/0.30.0/json', timeout=30))\nw = [u for u in d['urls'] if u['filename'] == 'vllm-0.30.0-cp38-abi3-manylinux_2_28_x86_64.whl']\nprint(w[0]['filename'], w[0]['digests']['sha256'], w[0]['upload_time_iso_8601'], 'yanked', w[0]['yanked'])\"",
+      "exit": 0,
+      "duration_s": 0.084,
+      "output_sha256": "78a85f4a8f27dc4b287f07ea4ece28e1d202eab7586008a8eb2284b69a6003bd",
+      "output_excerpt": "vllm-0.30.0-cp38-abi3-manylinux_2_28_x86_64.whl ef52ee58c410ead0b8afb190838fa4cbcb52075596f67862a03859d984966ac4 2026-09-22T05:22:50.169318Z yanked False\n"
+    },
+    {
+      "cmd": "\"$HOME/.local/share/codex-ecosystem/tools/vllm-0.30.0/bin/vllm\" --version 2>/dev/null | tail -1; \"$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/bin/vllm\" --version 2>/dev/null | tail -1; systemctl --user cat native-stack-embeddings.service | grep -c '^ExecStart=.*tools/vllm-0.30.0/bin/vllm serve'",
+      "exit": 0,
+      "duration_s": 14.737,
+      "output_sha256": "afa4a5fdf13d491164105005a98374204603860db2c8dc2c4199038ff5bfe11c",
+      "output_excerpt": "0.30.0\n0.25.0\n1\n"
+    }
+  ],
+  "tool_versions": {
+    "vllm": "0.30.0"
+  },
+  "observed_at_utc": "2026-09-25T17:18:13Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64, NVIDIA RTX 4090 24 GB), the vLLM 0.30.0 prefix tools/vllm-0.30.0 (a uv 0.12.17 virtual environment on Python 3.13.15) imports vllm 0.30.0 with torch 2.13.0+cu130 and sees the RTX 4090; all 5,100 hashed files listed in the vllm dist-info RECORD match their recorded hashes (0 mismatched); `uv pip check` reports all 198 installed packages compatible; PyPI serves vllm-0.30.0-cp38-abi3-manylinux_2_28_x86_64.whl with sha256 ef52ee58c410ead0b8afb190838fa4cbcb52075596f67862a03859d984966ac4, not yanked; and the production unit native-stack-embeddings runs this prefix's `vllm serve`, while the 0.25.0 prefix stays installed for rollback.",
+  "limitations": [
+    "The install itself ran earlier on 2026-09-25 in another Claude session (uv pip install vllm==0.30.0 --exclude-newer 2026-09-25T23:59:59Z into a new prefix, per evidence/receipts/vllm-030-switch-20260925.json). This receipt verifies the installed result read-only; it did not reinstall, restart or reconfigure anything.",
+    "The link between the installed files and the PyPI artifact rests on the version, the uv INSTALLER record, the private install log (a wheel install with no source build; its sha256 89d2293bd7d03e0f... equals the switch receipt's provenance entry) and the RECORD self-check. The downloaded wheel was not re-hashed. The dist-info WHEEL file records the build tag cp38-abi3-linux_x86_64, while PyPI serves only the manylinux_2_28 file for x86_64 (plus an aarch64 wheel and an sdist).",
+    "The foundation semantic-rag winner pin in catalogs/landscape/foundation.json is still 0.25.0, while manifests/stack.json pins 0.30.0 (#260). A receipt counts toward a winner only while its tool_versions entry equals the winner's pin, so this receipt does not count toward the semantic-rag winner until that pin moves through the lane process.",
+    "Recorded from a Claude Code session in a detached git worktree of this repository at origin/main (the catalog_revision). It took over this recording from the session that switched production (evidence/receipts/vllm-030-switch-20260925.json), whose round-2 receipts were deferred by a model-usage limit.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T17:18:13Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked as an install-stage receipt and re-ran commands 1, 2, 3 and 5 (1-based) read-only on this host with byte-identical output (vllm 0.30.0 with torch 2.13.0+cu130 on the RTX 4090; RECORD 5100 hashed, 0 mismatched; uv pip check 198 compatible; 0.30.0 and 0.25.0 prefixes present with one 0.30.0 ExecStart), did not re-run the PyPI query (network out of review scope), confirmed catalog_revision 6752ede5 via the GitHub API with its pins (stack 0.30.0, semantic-rag winner 0.25.0), and found the not-re-hashed PyPI link stated honestly and more conservatively than local evidence allows (no direct_url.json, so an index install; the 0.25.0 prefix installed from the same PyPI manylinux_2_28 file also carries WHEEL Tag cp38-abi3-linux_x86_64; the private install log matches sha256 89d2293b and shows a 300.3 MiB download with no build step; the install session's isolated uv cache names the files.pythonhosted.org manylinux_2_28 wheel and holds sha256 ef52ee58), with non-blocking notes that the WHEEL line is a compatibility tag rather than a build tag, the PyPI file-list sentence has no retained command, 'runs' rests on the unit file here while the running state is retained in use -3, and tool_versions 0.30.0 is unbound to the semantic-rag pin 0.25.0 as disclosed, so this receipt counts toward nothing until that pin moves.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T17:27:37Z",
+      "reviewer": {
+        "identity_sha256": "bde627edff79bdc3c9221b8142257ad48338015833b8f346d9704c39149737dc",
+        "model": "claude headless reviewer"
+      }
+    }
+  ]
+}

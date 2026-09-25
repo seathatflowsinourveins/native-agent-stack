@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "kind": "star_identity_refresh",
+  "claim": "The authenticated starred listing held 357 repositories: the 342 identities of the 2026-09-20 public snapshot plus 15 additions, with no removals, duplicates or private repositories.",
+  "checked_at_utc": "2026-09-24T17:33:14Z",
+  "endpoint": "GET /user/starred, authenticated, Accept: application/vnd.github.star+json, all pages",
+  "current_count": 357,
+  "prior_count": 342,
+  "prior_receipt": "blueprints/us-equities/data-readiness/public-stars-refresh.json",
+  "added_count": 15,
+  "removed_count": 0,
+  "duplicate_identities": 0,
+  "private_repositories": 0,
+  "identity_sha256": "5bfcd767523dc3fe17ffb6daf29ae2f92b206b0f005bd033082381f6ca4680be",
+  "identity_encoding": "SHA256 of UTF-8 json.dumps(sorted(full_name.lower() for row in rows), separators=(',', ':')); the same 357 strings are the owner/name paths of catalogs/us-equities/coverage.json stars[], lowercased.",
+  "added": [
+    {
+      "id": 1167284837,
+      "full_name": "6551Team/opennews-mcp"
+    },
+    {
+      "id": 282652875,
+      "full_name": "AI4Finance-Foundation/FinRL-Trading"
+    },
+    {
+      "id": 461335313,
+      "full_name": "alpacahq/alpaca-py"
+    },
+    {
+      "id": 1179164349,
+      "full_name": "chrisworsey55/atlas-gic"
+    },
+    {
+      "id": 228824550,
+      "full_name": "coding-kitties/investing-algorithm-framework"
+    },
+    {
+      "id": 5103141,
+      "full_name": "fasiondog/hikyuu"
+    },
+    {
+      "id": 1373659194,
+      "full_name": "jarrodwatts/jev-trader"
+    },
+    {
+      "id": 1303829880,
+      "full_name": "MIgHTy-alIeN/ai-trader-bot"
+    },
+    {
+      "id": 110684325,
+      "full_name": "polakowo/vectorbt"
+    },
+    {
+      "id": 27251463,
+      "full_name": "QuantConnect/Lean"
+    },
+    {
+      "id": 63773246,
+      "full_name": "ricequant/rqalpha"
+    },
+    {
+      "id": 132754148,
+      "full_name": "stefan-jansen/machine-learning-for-trading"
+    },
+    {
+      "id": 214587193,
+      "full_name": "supabase/supabase"
+    },
+    {
+      "id": 1161025758,
+      "full_name": "TraderAlice/OpenAlice"
+    },
+    {
+      "id": 925270205,
+      "full_name": "trycua/cua"
+    }
+  ],
+  "removed": [],
+  "visibility_check": {
+    "checked_on": "2026-09-24",
+    "method": "One GitHub GraphQL query of repository(owner, name) { isPrivate isArchived viewerHasStarred databaseId } for the 15 additions.",
+    "result": {
+      "repositories": 15,
+      "private": 0,
+      "archived": 0,
+      "not_starred_by_viewer": 0
+    }
+  },
+  "limitations": [
+    "Identity refresh only. Repository content, licenses and maintenance are covered by the per-entry reviews in star-audit.json, not by this listing.",
+    "The listing was captured by the coordinating session; its retained projection has no numeric ids, so duplicates were checked by lowercase full_name, and the ids above come from the separate GraphQL check.",
+    "The exact invocation and raw responses are not retained. checked_at_utc is the write time of the snapshot file; the fetch completed shortly before it.",
+    "Per-repository starred_at values from the star+json response are not published (star-audit.json method.private_handling)."
+  ]
+}

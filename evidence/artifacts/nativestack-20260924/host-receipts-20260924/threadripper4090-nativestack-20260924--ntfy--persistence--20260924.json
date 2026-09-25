@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--ntfy--persistence--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "ntfy",
+  "stage": "persistence",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/retained-checks.py ntfy",
+      "exit": 0,
+      "duration_s": 0.027,
+      "output_sha256": "428d6bc9c2cfb87973ecce9ce727a5e2a08be3e43cb2fdf127f55650e605e227",
+      "output_excerpt": "{\"component\": \"ntfy\", \"metadata_checked\": 1, \"scope\": \"Restart preserved local test notification; no external notification sent.\", \"native_execution_repeated\": false}\n"
+    }
+  ],
+  "tool_versions": {
+    "ntfy": "2.28.0"
+  },
+  "observed_at_utc": "2026-09-24T04:21:58Z",
+  "result": "pass",
+  "claim": "Validated the retained native command metadata for: Restart preserved local test notification; no external notification sent.",
+  "limitations": [
+    "Retained metadata validation is not a fresh execution of the underlying component. Original commands, times, exits and stream digests are in execution-ledger.json; raw streams remain private. Prior failures and scope limitations remain."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:21:58Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "kind": "frozen_research_packet",
+  "packet_id": "local-model-workloads-20260924",
+  "date": "2026-09-24",
+  "source_file": "local-uses-packet.md",
+  "original_sha256": "38586709f488bcbe0d2488f4d8c0fdbb8c41a99e1a0286c67ba6d6103ace5eb7",
+  "original_bytes": 2867,
+  "transformation": "The packet Markdown is embedded unchanged in text; no redaction was needed.",
+  "output_contract": "A table with one row per workload, then short notes; at most 900 words; 'unknown' where evidence is missing (the packet's Output section).",
+  "excluded_from_lanes": [
+    "seathatflowsinourveins/native-agent-stack",
+    "seathatflowsinourveins/agent-ecosystem",
+    "their catalogs",
+    "any other lane's output"
+  ],
+  "text": "# Research packet: local-model workloads beyond memory and RAG (blind lane)\n\nDate: 2026-09-24. Answer from primary sources you find yourself. Do not read or search the\nrepositories `seathatflowsinourveins/native-agent-stack` or `seathatflowsinourveins/agent-ecosystem`,\ntheir catalogs, or any other lane's output.\n\n## Setup\n\n- Primary agents run in the cloud: Claude Code with Claude Opus 5.5 and Codex CLI with GPT-6 Astra\n  (Artificial Analysis Intelligence Index 56–58 and 52–53). Local models do not replace them.\n- Local hardware: MacBook Pro 16-inch, Apple M5 Pro, 64 GB unified memory, 307 GB/s, 20-core GPU\n  with neural accelerators, macOS 26.5. Served today through Ollama 0.34.4 (OpenAI-compatible API).\n  Measured here: Qwen3.8-27B 4-bit decodes about 26 tok/s at 8K context with multi-token\n  prediction; prompt processing runs about 250–320 tok/s. Qwen3-Embedding-4B embeds about\n  8,700 tok/s. qwen3.5-9b is also installed.\n- Already covered, out of scope: agent memory, conversational recall, document and code RAG,\n  embeddings and rerankers for that retrieval.\n\n## North star\n\nUS-equities research and historical simulation: NautilusTrader 2.0 with IBKR, a separate Alpaca\nadapter path, then paper trading. It uses EdgarTools for SEC filings, skfolio, DuckDB, and daily and\nintraday catalyst research, including historical discovery of +200% movers. Rule: models belong in\nresearch; numeric, risk and order state stay deterministic code. The second pillar is native agent\nengineering (Claude Code and Codex with MCP, skills, hooks and worktrees).\n\n## Question\n\nWhich local-model workloads, other than memory and RAG, deliver measurable value on this Mac for\nthis north star and for agent engineering? For each workload give:\n\n1. What the workload is, and why run it locally rather than on the cloud models (volume or cost,\n   privacy, latency, offline use, or determinism).\n2. The best current open repository and model as of September 2026, with version or date and\n   URL, and the runner-up.\n3. Evidence, graded I (independent benchmark), A (peer-reviewed or academic), S (self-reported by\n   the maker), C (a competitor's claim) or P (popularity only). Give a URL and date for each item.\n   Name the benchmark or leaderboard, for example GIFT-Eval or fev-bench for time series, or\n   olmOCR-bench for parsing.\n4. The expected throughput or latency on this hardware, marked as measured elsewhere or estimated.\n5. A concrete acceptance test we could run locally, with a frozen dataset, a baseline and a\n   metric.\n6. A verdict: adopt, trial (measure first), or skip, with the reason.\n\nAlso list the workloads that are not worth running locally given cloud frontier models, and why.\n\n## Output\n\nA table with one row per workload, then short notes. At most 900 words. No speculation without a\nsource; write \"unknown\" where evidence is missing.\n"
+}

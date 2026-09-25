@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "wsl-authoring-20260923--jcodemunch-mcp--use--20260925-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "wsl-authoring-20260923",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "dcd6f0cf01ee67417946f70c02c068f1c2f1b654",
+  "recorded_by": {
+    "identity_sha256": "a62650d0061c27ffda78d57ce0387b635234cde41a78ff2b34f0f36a7b2f77c2",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "jcodemunch-mcp",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v jcodemunch-mcp) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && jcodemunch-mcp --version",
+      "exit": 0,
+      "duration_s": 0.411,
+      "output_sha256": "a21a80a35c46fa48ad1815e8a889af6afd3ff27d5a36a0aed3b44144744061cc",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp -> ~/.local/share/codex-ecosystem/tools/jcodemunch-mcp-1.108.319/jcodemunch-mcp/bin/jcodemunch-mcp\njcodemunch-mcp 1.108.319\n"
+    },
+    {
+      "cmd": "python3 -c 'import json,os,tomllib;h=os.environ[\"HOME\"];cj=json.load(open(h+\"/.claude.json\"))[\"projects\"][h+\"/code/agent-lab\"][\"mcpServers\"][\"jcodemunch\"];cx=tomllib.load(open(h+\"/code/agent-lab/.codex/config.toml\",\"rb\"))[\"mcp_servers\"][\"jcodemunch\"];ok=all(x[\"env\"].get(\"CODE_INDEX_PATH\")==h+\"/.code-index\" and str(x[\"env\"].get(\"JCODEMUNCH_SHARE_SAVINGS\"))==\"0\" and x[\"command\"]==h+\"/.local/share/codex-ecosystem/bin/jcodemunch-mcp\" for x in (cj,cx));print(\"agent-lab Claude and Codex registrations: command\",cj[\"command\"],\"| CODE_INDEX_PATH\",cj[\"env\"][\"CODE_INDEX_PATH\"],\"| JCODEMUNCH_SHARE_SAVINGS\",cj[\"env\"][\"JCODEMUNCH_SHARE_SAVINGS\"],\"| same in both:\",ok);raise SystemExit(0 if ok else 1)' && echo \"asserted: both agent-lab registrations launch this binary with CODE_INDEX_PATH=~/.code-index and savings sharing off\"",
+      "exit": 0,
+      "duration_s": 0.021,
+      "output_sha256": "c389253b35550172abc5d4c18bc693cda22bad33d71491fef8f030caab187cf0",
+      "output_excerpt": "agent-lab Claude and Codex registrations: command ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp | CODE_INDEX_PATH ~/.code-index | JCODEMUNCH_SHARE_SAVINGS 0 | same in both: True\nasserted: both agent-lab registrations launch this binary with CODE_INDEX_PATH=~/.code-index and savings sharing off\n"
+    },
+    {
+      "cmd": "mcporter call --stdio \"$(command -v jcodemunch-mcp)\" --env \"CODE_INDEX_PATH=$HOME/.code-index\" --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth | python3 -c 'import json,sys;d=json.load(sys.stdin);t=d[\"total_tokens_saved\"];b=d[\"lifetime_by_tool\"];bs=d[\"total_tokens_saved_basis\"];u=d[\"lifetime_unattributed\"];print(\"total_tokens_saved\",t,\"| basis\",bs,\"| lifetime_by_tool\",b,\"since\",d[\"lifetime_by_tool_since\"],\"| unattributed\",u);assert t>0 and u==0 and bs[\"mixed_basis\"] is False and sum(b.values())==t;print(\"asserted: positive lifetime total on one unmixed basis, fully attributed by tool with 0 unattributed\")'",
+      "exit": 0,
+      "duration_s": 0.903,
+      "output_sha256": "14b71a480f2982538bd33ae133126a1806c79a3bd173266881160bd660f2ce77",
+      "output_excerpt": "total_tokens_saved 59640 | basis {'generation': 2, 'first_generation': 2, 'mixed_basis': False} | lifetime_by_tool {'get_symbol_source': 59640, 'search_symbols': 0} since 2026-09-20 | unattributed 0\nasserted: positive lifetime total on one unmixed basis, fully attributed by tool with 0 unattributed\n"
+    }
+  ],
+  "tool_versions": {
+    "jcodemunch-mcp": "1.108.319"
+  },
+  "observed_at_utc": "2026-09-25T18:58:50Z",
+  "result": "pass",
+  "claim": "On host wsl-authoring-20260923 (WSL2 x86_64: Intel Core Ultra 9 275HX, NVIDIA RTX 5090 Laptop GPU; the catalog's WSL authoring laptop), jcodemunch-mcp 1.108.319 (the catalog pin) resolves from the ecosystem PATH to its versioned install (shown). Both agent-lab registrations, Claude's project entry in ~/.claude.json and Codex's .codex/config.toml, launch that binary with CODE_INDEX_PATH=~/.code-index and JCODEMUNCH_SHARE_SAVINGS=0 (asserted). Launched the same way over MCPorter's stdio bridge, the server answered get_session_stats through its order front door with a positive lifetime total_tokens_saved on one unmixed basis, fully attributed by tool with 0 unattributed (asserted); the excerpt shows the whole total attributed to get_symbol_source since 2026-09-20 and none to search_symbols. All commands exit 0.",
+  "limitations": [
+    "No model session ran. The stats call started a fresh server process, so its session counters are zero and only the persisted lifetime counters carry information. The lifetime figure is the upstream whole-file bytes/4 counterfactual, not a provider token measurement, and it includes acceptance and verification reads; this receipt does not separate them from ordinary use.",
+    "The server was not called through Claude Code or Codex; MCPorter launched the same installed binary with the same index path and savings-sharing setting as both registrations. The ~/.claude.json read printed only the jcodemunch entry's command and two env values.",
+    "Supersedes wsl-authoring-20260923--jcodemunch-mcp--use--20260925, which carries an independent needs_changes review: its assertion checked neither the unattributed count nor the basis, and it showed no binary path. That file stays byte-identical.",
+    "Recorded from a Claude Code session in a detached git worktree of this repository at catalog_revision (origin/main at recording time), with this branch's first-generation receipts copied into the working tree so --supersedes could resolve them; not a pinned install checkout. The tools resolve as the commands show."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T18:58:50Z",
+      "reviewer": {
+        "identity_sha256": "a62650d0061c27ffda78d57ce0387b635234cde41a78ff2b34f0f36a7b2f77c2",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #270 independent session review (generation 2)",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:07:29Z",
+      "reviewer": {
+        "identity_sha256": "770fed978e9b0044b40247f768fdbb8b35da160b45d4175260e0ecac31999f16",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ],
+  "supersedes": "wsl-authoring-20260923--jcodemunch-mcp--use--20260925"
+}

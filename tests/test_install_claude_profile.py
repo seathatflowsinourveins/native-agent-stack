@@ -9,6 +9,8 @@ placeholder rendering and `claude mcp add` argument order are tested as data.
 
 import io
 import json
+import string
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -19,6 +21,20 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 
 import install_claude_profile as icp  # noqa: E402
+
+# The jcodemunch entry adoption/mcp/claude-user.json carried until 2026-09-25, when jCodeMunch moved
+# to a per-project opt-in (adoption/bootstrap.md step 4a). It stays here, inline, as the fixture for
+# a stdio server with ${HOME} in an env value and env names to match: no template entry has either now.
+JCODEMUNCH_SPEC = {
+    "type": "stdio",
+    "command": "${ECO_ROOT}/bin/jcodemunch-mcp",
+    "args": [],
+    "env": {"CODE_INDEX_PATH": "${HOME}/.code-index", "JCODEMUNCH_SHARE_SAVINGS": "0"},
+}
+
+
+def template_server_names() -> list[str]:
+    return list(json.loads(icp.MCP_TEMPLATE.read_text())["mcpServers"])
 
 
 class GuardInstallTests(unittest.TestCase):
@@ -46,12 +62,93 @@ class GuardInstallTests(unittest.TestCase):
             self.assertFalse((home / ".claude" / "hooks" / "effort-default-guard.py").exists())
 
 
+class SecretGuardProfileTests(unittest.TestCase):
+    """The secret-path guard and its deny rules ship in the user profile for every new host."""
+
+    TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+
+    def test_install_guards_installs_both_hooks_pinned_by_sha256sums(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            results = icp.install_guards(home, dry_run=False)
+            self.assertEqual(results, {"effort-default-guard.py": "installed", "secret_path_guard.py": "installed"})
+            dest = home / ".claude" / "hooks" / "secret_path_guard.py"
+            self.assertEqual(dest.read_bytes(), icp.SECRET_GUARD_SRC.read_bytes())
+            self.assertEqual(icp.install_guards(home, dry_run=False),
+                             {"effort-default-guard.py": "skipped", "secret_path_guard.py": "skipped"})
+
+    def test_sha256sums_verifies_like_sha256sum_c(self):
+        entries = icp.sha256sums_entries()
+        self.assertEqual(set(entries), {src.resolve() for src in icp.HOOKS.values()})
+        for source, digest in entries.items():
+            with self.subTest(source=source.name):
+                self.assertEqual(icp.sha256_of(source), digest)
+
+    def test_modified_hook_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.object(icp, "expected_sha256", return_value="0" * 64):
+                with self.assertRaises(icp.InstallError):
+                    icp.install_guards(Path(tmp), dry_run=False)
+            self.assertFalse((Path(tmp) / ".claude").exists())
+
+    def test_template_carries_project_deny_rules_and_the_guard_hook(self):
+        template = json.loads(self.TEMPLATE.read_text())
+        project = json.loads((ROOT / ".claude" / "settings.json").read_text())
+        deny = template["permissions"]["deny"]
+        for rule in project["permissions"]["deny"]:
+            self.assertIn(rule, deny)
+        self.assertIn("Agent(codex:codex-rescue)", deny)
+        bash_groups = [g for g in template["hooks"]["PreToolUse"] if g.get("matcher") == "Bash"]
+        commands = [h["command"] for g in bash_groups for h in g["hooks"]]
+        self.assertTrue(any("secret_path_guard.py" in c for c in commands))
+
+    def rendered_hook(self, home: Path) -> str:
+        text = string.Template(self.TEMPLATE.read_text()).safe_substitute(HOME=str(home))
+        for group in json.loads(text)["hooks"]["PreToolUse"]:
+            for hook in group["hooks"]:
+                if "secret_path_guard.py" in hook["command"]:
+                    return hook["command"]
+        self.fail("no secret guard hook in the template")
+
+    def run_rendered(self, command: str, bash_command: str) -> subprocess.CompletedProcess:
+        payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": bash_command}})
+        return subprocess.run(["sh", "-c", command], input=payload, capture_output=True, text=True, timeout=30)
+
+    def test_rendered_hook_blocks_after_install_and_is_inert_before(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            command = self.rendered_hook(home)
+            missing = self.run_rendered(command, "cat \"$PAPER_ENV_FILE\"")
+            self.assertEqual(missing.returncode, 0, "no installed guard must not block every Bash call")
+            icp.install_guards(home, dry_run=False)
+            blocked = self.run_rendered(command, "cat \"$PAPER_ENV_FILE\"")
+            self.assertEqual(blocked.returncode, 2)
+            self.assertIn("credential_file_read", blocked.stderr)
+            allowed = self.run_rendered(command, "git status")
+            self.assertEqual((allowed.returncode, allowed.stderr), (0, ""))
+
+    def test_apply_merge_keeps_host_rules_and_adds_the_guard(self):
+        import apply_claude_settings as acs
+        with tempfile.TemporaryDirectory() as tmp:
+            template = json.loads(string.Template(self.TEMPLATE.read_text()).safe_substitute(HOME=tmp))
+        base = {"permissions": {"deny": ["Bash(rm -rf /)"]},
+                "hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "rtk hook claude"}]}]}}
+        merged = acs.merge_settings(base, template)
+        self.assertEqual(merged["permissions"]["deny"][0], "Bash(rm -rf /)")
+        self.assertIn("Read(~/.config/native-agent-stack/**)", merged["permissions"]["deny"])
+        commands = [h["command"] for h in merged["hooks"]["PreToolUse"][0]["hooks"]]
+        self.assertEqual(commands.count("rtk hook claude"), 1)
+        self.assertTrue(any("secret_path_guard.py" in c for c in commands))
+
+
 class AgentsInstallTests(unittest.TestCase):
-    def test_installs_all_five_agents(self):
+    def test_installs_every_adoption_agent(self):
+        # Seven since 2026-09-23: the blind layer-verdict roles (blind-lane-reviewer, blind-adjudicator) joined.
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             results = icp.install_agents(home, dry_run=False)
-            self.assertEqual(len(results), 5)
+            self.assertEqual(len(results), len(list(icp.AGENTS_SRC_DIR.glob("*.md"))))
+            self.assertEqual(len(results), 7)
             dest_dir = home / ".claude" / "agents"
             installed = sorted(p.name for p in dest_dir.glob("*.md"))
             expected = sorted(p.name for p in icp.AGENTS_SRC_DIR.glob("*.md"))
@@ -67,6 +164,39 @@ class AgentsInstallTests(unittest.TestCase):
             self.assertTrue(all(r == "skipped" for r in results))
 
 
+class ShippedAgentEffortTests(unittest.TestCase):
+    """Every shipped agent runs at effort max beside its task-matched model
+    (docs/decisions/2026-09-23-max-effort-default.md): an agent's frontmatter effort
+    is what a stage without its own effort runs at, and a second, lower effort line
+    must not hide behind the first."""
+
+    @staticmethod
+    def frontmatter(path: Path) -> list[str]:
+        lines = path.read_text(encoding="utf-8").splitlines()
+        if not lines or lines[0] != "---" or "---" not in lines[1:]:
+            return []
+        return lines[1:lines.index("---", 1)]
+
+    def test_each_shipped_agent_has_exactly_one_effort_max_line(self):
+        agents = sorted(icp.AGENTS_SRC_DIR.glob("*.md"))
+        self.assertTrue(agents)
+        for path in agents:
+            with self.subTest(agent=path.name):
+                effort_lines = [line for line in self.frontmatter(path) if line.startswith("effort:")]
+                self.assertEqual(effort_lines, ["effort: max"])
+
+    def test_the_check_rejects_a_lower_or_repeated_effort(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for body in ("---\nname: a\nmodel: opus\neffort: high\n---\nx\n",
+                         "---\nname: a\nmodel: opus\neffort: max\neffort: high\n---\nx\n",
+                         "---\nname: a\nmodel: opus\n---\neffort: max\n"):
+                path = Path(tmp) / "a.md"
+                path.write_text(body, encoding="utf-8")
+                with self.subTest(body=body):
+                    effort_lines = [line for line in self.frontmatter(path) if line.startswith("effort:")]
+                    self.assertNotEqual(effort_lines, ["effort: max"])
+
+
 class McpMatchTests(unittest.TestCase):
     def test_http_server_matches_on_url_and_type(self):
         existing = "ai-memory:\n  Type: http\n  URL: http://127.0.0.1:49374/mcp\n"
@@ -79,11 +209,11 @@ class McpMatchTests(unittest.TestCase):
     def test_stdio_server_matches_command_args_and_env_names(self):
         existing = (
             "serena:\n  Type: stdio\n"
-            "  Command: /home/example/.local/share/codex-ecosystem/bin/serena-context\n"
+            "  Command: /home/example/.local/share/codex-ecosystem/bin/serena\n"
             "  Args: start-mcp-server --transport stdio --project-from-cwd\n"
         )
         self.assertTrue(icp.existing_config_matches(
-            existing, "stdio", "/home/example/.local/share/codex-ecosystem/bin/serena-context",
+            existing, "stdio", "/home/example/.local/share/codex-ecosystem/bin/serena",
             ["start-mcp-server", "--transport", "stdio", "--project-from-cwd"], {}))
 
     def test_stdio_server_checks_env_var_names_present(self):
@@ -112,22 +242,39 @@ class McpMatchTests(unittest.TestCase):
 
 
 class McpTemplateShapeTests(unittest.TestCase):
-    def test_template_names_the_three_expected_servers(self):
-        import json
+    def test_template_names_the_two_expected_servers(self):
+        # jcodemunch left the user-scope template on 2026-09-25 for a per-project opt-in.
         data = json.loads(icp.MCP_TEMPLATE.read_text())
-        self.assertEqual(set(data["mcpServers"].keys()), {"ai-memory", "jcodemunch", "serena"})
+        self.assertEqual(set(data["mcpServers"].keys()), {"ai-memory", "serena"})
         self.assertEqual(data["mcpServers"]["ai-memory"]["type"], "http")
-        self.assertEqual(data["mcpServers"]["jcodemunch"]["env"]["JCODEMUNCH_SHARE_SAVINGS"], "0")
+        self.assertEqual(data["mcpServers"]["serena"]["type"], "stdio")
         self.assertIn("--project-from-cwd", data["mcpServers"]["serena"]["args"])
+
+    def test_the_jcodemunch_opt_in_snippets_keep_savings_sharing_off(self):
+        # The template no longer carries JCODEMUNCH_SHARE_SAVINGS=0, so the two documented opt-in
+        # forms in adoption/bootstrap.md step 4a are where it ships: the local command and the
+        # checked-in .mcp.json entry must both keep it.
+        text = (ROOT / "adoption" / "bootstrap.md").read_text()
+        start = text.index("**jCodeMunch, per project.**")
+        paragraph = text[start:text.index("Then apply the settings template itself", start)]
+        self.assertIn("-e JCODEMUNCH_SHARE_SAVINGS=0", paragraph)
+        self.assertIn('"JCODEMUNCH_SHARE_SAVINGS": "0"', paragraph)
+        self.assertEqual(paragraph.count("JCODEMUNCH_SHARE_SAVINGS"), 2)
 
 
 class McpRenderAndCommandTests(unittest.TestCase):
     def test_placeholders_are_rendered_for_the_target_host(self):
         servers = icp.render_servers(json.loads(icp.MCP_TEMPLATE.read_text()),
                                      Path("/home/example"), Path("/opt/eco"))
+        self.assertEqual(servers["serena"]["command"], "/opt/eco/bin/serena")
+        self.assertNotIn("${", json.dumps(servers))
+
+    def test_home_and_eco_root_are_rendered_in_command_and_env_values(self):
+        servers = icp.render_servers({"mcpServers": {"jcodemunch": JCODEMUNCH_SPEC}},
+                                     Path("/home/example"), Path("/opt/eco"))
         self.assertEqual(servers["jcodemunch"]["command"], "/opt/eco/bin/jcodemunch-mcp")
-        self.assertEqual(servers["jcodemunch"]["env"]["CODE_INDEX_PATH"], "/home/example/.code-index")
-        self.assertEqual(servers["serena"]["command"], "/opt/eco/bin/serena-context")
+        self.assertEqual(servers["jcodemunch"]["env"],
+                         {"CODE_INDEX_PATH": "/home/example/.code-index", "JCODEMUNCH_SHARE_SAVINGS": "0"})
         self.assertNotIn("${", json.dumps(servers))
 
     def test_unknown_placeholder_fails(self):
@@ -151,15 +298,50 @@ class McpRenderAndCommandTests(unittest.TestCase):
         with mock.patch.object(icp, "claude_mcp_get", return_value="x:\n  Scope: User config\n  Type: stdio\n  Command: /other\n"), \
              mock.patch.object(icp.subprocess, "run", side_effect=lambda *a, **k: calls.append(a[0])):
             results = icp.install_mcp_servers("claude", False, Path("/h"), Path("/e"))
-        self.assertEqual(results, ["differs", "differs", "differs"])
+        self.assertEqual(results, ["differs"] * len(template_server_names()))
         self.assertEqual(calls, [])
+
+    def test_registers_only_the_servers_the_template_names(self):
+        # A jcodemunch registration left by an earlier template is neither re-added nor removed.
+        asked, ran = [], []
+
+        def fake_get(claude_bin, name):
+            asked.append(name)
+            return None
+
+        def fake_run(cmd, **kwargs):
+            ran.append(cmd)
+            return mock.Mock(returncode=0, stdout="", stderr="")
+        with mock.patch.object(icp, "claude_mcp_get", side_effect=fake_get), \
+             mock.patch.object(icp.subprocess, "run", side_effect=fake_run):
+            results = icp.install_mcp_servers("claude", False, Path("/home/example"), Path("/e"))
+        names = template_server_names()
+        rendered = icp.render_servers(json.loads(icp.MCP_TEMPLATE.read_text()), Path("/home/example"), Path("/e"))
+        self.assertEqual(asked, names)
+        self.assertEqual(results, ["installed"] * len(names))
+        self.assertEqual(ran, [icp.mcp_add_command("claude", name, rendered[name]) for name in names])
+        self.assertNotIn("jcodemunch", json.dumps(ran))
 
 
 class McpGetOutputTests(unittest.TestCase):
-    # Recorded from `claude mcp get` (claude 2.1.280, 2026-09-23) with the home path replaced.
-    SERENA = (
+    # SERENA_CONTEXT_20260923, JCODEMUNCH and AI_MEMORY were recorded from `claude mcp get` (claude
+    # 2.1.280, 2026-09-23) with the home path replaced. That day's serena entry ran the recording
+    # host's own `serena-context` wrapper, which nothing in this repository installs. JCODEMUNCH is
+    # the user-scope entry the template carried until 2026-09-25; it stays the recorded fixture for
+    # a stdio server with empty args and env names, matched against JCODEMUNCH_SPEC.
+    SERENA_CONTEXT_20260923 = (
         "serena:\n  Scope: User config (available in all your projects)\n  Status: \u2714 Connected\n"
         "  Type: stdio\n  Command: /home/example/.local/share/codex-ecosystem/bin/serena-context\n"
+        "  Args: start-mcp-server --transport stdio --project-from-cwd --context claude-code "
+        "--enable-web-dashboard true --open-web-dashboard false --enable-gui-log-window false\n"
+        "  Environment:\n\nTo remove this server, run: claude mcp remove serena -s user\n"
+    )
+    # Recorded 2026-09-25 (claude 2.1.282) after install_claude_profile.py --only mcp registered the
+    # current template under a temporary CLAUDE_CONFIG_DIR, with Serena installed as a uv tool at the
+    # stack pin; the scratch ecosystem prefix is replaced by the default one.
+    SERENA = (
+        "serena:\n  Scope: User config (available in all your projects)\n  Status: \u2714 Connected\n"
+        "  Type: stdio\n  Command: /home/example/.local/share/codex-ecosystem/bin/serena\n"
         "  Args: start-mcp-server --transport stdio --project-from-cwd --context claude-code "
         "--enable-web-dashboard true --open-web-dashboard false --enable-gui-log-window false\n"
         "  Environment:\n\nTo remove this server, run: claude mcp remove serena -s user\n"
@@ -179,6 +361,10 @@ class McpGetOutputTests(unittest.TestCase):
         return icp.render_servers(json.loads(icp.MCP_TEMPLATE.read_text()),
                                   Path("/home/example"), Path("/home/example/.local/share/codex-ecosystem"))
 
+    def rendered_jcodemunch(self):
+        return icp.render_servers({"mcpServers": {"jcodemunch": JCODEMUNCH_SPEC}}, Path("/home/example"),
+                                  Path("/home/example/.local/share/codex-ecosystem"))["jcodemunch"]
+
     def matches(self, text, spec):
         kind = spec.get("type", "stdio")
         return icp.existing_config_matches(text, kind, spec["url"] if kind == "http" else spec["command"],
@@ -187,8 +373,23 @@ class McpGetOutputTests(unittest.TestCase):
     def test_recorded_outputs_match_the_rendered_template(self):
         servers = self.rendered()
         self.assertTrue(self.matches(self.SERENA, servers["serena"]))
-        self.assertTrue(self.matches(self.JCODEMUNCH, servers["jcodemunch"]))
         self.assertTrue(self.matches(self.AI_MEMORY, servers["ai-memory"]))
+
+    def test_recorded_env_output_matches_on_env_names(self):
+        spec = self.rendered_jcodemunch()
+        self.assertTrue(self.matches(self.JCODEMUNCH, spec))
+        # The running host owns env values: another value still matches, a missing name does not.
+        other_value = self.JCODEMUNCH.replace("=/home/example/.code-index", "=/srv/code-index")
+        missing_name = self.JCODEMUNCH.replace("    JCODEMUNCH_SHARE_SAVINGS=0\n", "")
+        self.assertNotEqual(other_value, self.JCODEMUNCH)
+        self.assertNotEqual(missing_name, self.JCODEMUNCH)
+        self.assertTrue(self.matches(other_value, spec))
+        self.assertFalse(self.matches(missing_name, spec))
+
+    def test_the_earlier_wrapper_registration_differs(self):
+        # A host registered from the 2026-09-23 template is reported as differing and left
+        # unchanged until --replace-mcp re-registers it with the upstream script.
+        self.assertFalse(self.matches(self.SERENA_CONTEXT_20260923, self.rendered()["serena"]))
 
     def test_reordered_or_extra_args_do_not_match(self):
         spec = dict(self.rendered()["serena"])
@@ -207,7 +408,7 @@ class McpGetOutputTests(unittest.TestCase):
         with mock.patch.object(icp, "claude_mcp_get", return_value=managed), \
              mock.patch.object(icp.subprocess, "run") as run:
             results = icp.install_mcp_servers("claude", False, Path("/home/example"), Path("/e"), replace=True)
-        self.assertEqual(results, ["other-scope"] * 3)
+        self.assertEqual(results, ["other-scope"] * len(template_server_names()))
         run.assert_not_called()
 
     def test_missing_claude_binary_is_a_clean_failure(self):

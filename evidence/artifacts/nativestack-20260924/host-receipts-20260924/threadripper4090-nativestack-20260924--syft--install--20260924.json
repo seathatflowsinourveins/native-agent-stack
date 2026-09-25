@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--syft--install--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "syft",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/checks.py syft --version-only",
+      "exit": 0,
+      "duration_s": 0.092,
+      "output_sha256": "c569cb912bd6a8de1c2f9b58f8b907dd4b01673e8291205e3ccf4e9ad7ed1842",
+      "output_excerpt": "Application:   syft\nVersion:       1.52.0\nBuildDate:     2026-09-17T14:32:25Z\nGitCommit:     02ba369d13b4248395b20a504eca94b0cab564d8\nGitDescription: v1.52.0\nPlatform:      linux/amd64\nGoVersion:     go1.26.3\nCompiler:      gc\nSchemaVersion: 16.1.10\n\n"
+    }
+  ],
+  "tool_versions": {
+    "syft": "1.52.0"
+  },
+  "observed_at_utc": "2026-09-24T04:18:33Z",
+  "result": "pass",
+  "claim": "Installed native command executed and reported its version. Functional acceptance is a separate observation.",
+  "limitations": [
+    "This receipt does not imply whole-platform acceptance, comparative quality, provider billing, untested repository coverage, or an off-host recovery guarantee. Historical failures remain in execution-ledger.json."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:18:33Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}

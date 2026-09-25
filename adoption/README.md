@@ -2,7 +2,7 @@
 
 Start from a reviewed checkout, select capabilities, and record new local evidence. Historical receipts describe the authoring host; a clone does not inherit its logins, service state, tool discovery or acceptance.
 
-For a single ordered new-machine walkthrough, use [the bootstrap page](bootstrap.md). It links each step to this reference's profiles below and to the per-platform page: [Linux/WSL2 x86_64](platforms/linux-wsl2.md) (accepted) and [macOS arm64](platforms/macos-arm64.md) (drafted, not accepted). Render native client configs for a selected host with [`tools/adoption/render_config.py`](../tools/adoption/render_config.py) and its [templates](templates/).
+For a single ordered new-machine walkthrough, use [the bootstrap page](bootstrap.md). It links each step to this reference's profiles below and to the per-platform page: [Linux/WSL2 x86_64](platforms/linux-wsl2.md) (accepted) and [macOS arm64](platforms/macos-arm64.md) (drafted, not accepted). Render native client configs for a selected host with [`tools/adoption/render_config.py`](../tools/adoption/render_config.py) and its [templates](templates/). The rendered Claude settings keep ai-memory's automatic assistant capture off; a host opts in explicitly with `AI_MEMORY_CAPTURE_ASSISTANT=true` in its host value file or `--set`, which adds `--capture-assistant` to the Stop hook only (the ai-memory server's own `capture_assistant` setting must also be enabled).
 
 Use the [grand catalog handbook](../docs/grand-catalog-handbook.md) to connect
 repository quality, native runtime review, profile selection and the current
@@ -28,20 +28,21 @@ The pin columns count how many of a profile's components have a SHA-256 pin in
 [`pins-macos-arm64.json`](pins-macos-arm64.json), which is all the bootstrap
 scripts install; the repository test `test_adoption_docs_consistency.py` recomputes them.
 A count is main's; "(X at `vT`)" after it is the coverage release `vT`'s own
-pin files give, shown while the pinned release differs (and kept as history
-after a re-pin). The script refuses (exit 3) a profile with an unpinned
-component until those ids are named in `--allow-unpinned`; it then installs
-the pinned ones and skips the named ones, which you install through their
-recipes ([bootstrap step 2](bootstrap.md)).
+pin files give, shown while the pinned release differs (a re-pin may leave it
+as history until a later change drops it). The script refuses (exit 3) a
+profile with an unpinned component until those ids are named in
+`--allow-unpinned`; it then installs the pinned ones and skips the named ones,
+which you install through their recipes ([bootstrap step 2](bootstrap.md)).
 
 | Adoption profile | Selects | Linux pins | macOS pins | Next native acceptance |
 | --- | --- | --- | --- | --- |
 | `foundation-cpu` | Codex, Claude Code, Context Mode, RTK, QMD BM25, explicitly scoped ai-memory, MCPorter | all 7 | 5 of 7 | Native client setup; one useful context/document call and scoped memory retrieval. On macOS use `macos-arm64-foundation` |
-| `macos-arm64-foundation` | macOS only, drafted: Codex, Claude Code, Context Mode, ai-memory, MCPorter, llama.cpp Metal embedding, Qdrant, SocratiCode | 5 of 8 | all 8 (7 of 8 at `v2026.09.23`) | The macOS acceptance lane on [the macOS page](platforms/macos-arm64.md); not accepted |
+| `macos-arm64-foundation` | macOS only, drafted: Codex, Claude Code, Context Mode, ai-memory, MCPorter, llama.cpp Metal embedding, Qdrant, SocratiCode | 5 of 8 | all 8 | The macOS acceptance lane on [the macOS page](platforms/macos-arm64.md); not accepted |
+| `token-efficiency` | Drafted, not accepted, and changed after `v2026.09.25.1`, whose manifest lacks it: the selected token practice (RTK, Context Mode, explicit-file Repomix, guarded Headroom and TOON, ccusage, QMD, MarkItDown, Serena, SocratiCode, ai-memory, MCPorter) wired into both native clients | 8 of 14 | 6 of 14 | The [coverage check](../docs/token-efficiency-stack.md#coverage-check) for command presence and client wiring, then pinned-version evidence and one useful native call per tool in each client, recorded through a PR. The bootstraps pin only part of it; install the rest through their recipes |
 | `research-runtime` | Historical hash-locked SDK/DuckDB, Dagu and LEAN comparison lane | 2 of 11 | 2 of 11 | Reproduce the retained comparison; this profile does not override the Nautilus destination |
 | `trading-nautilus` | Selected pinned Nautilus engine and separate Alpaca boundary | none of 2 | none of 2 | Reproduce the bounded engine check; qualify each broker independently |
 | `observability` | Collector, Prometheus, Loki, Grafana, Alertmanager, ntfy | none of 6 | none of 6 | Native config validation, actual task/event delivery, matching usage categories |
-| `semantic-rag` | HF, vLLM, Qdrant, SocratiCode | none of 4 | 2 of 4 (1 of 4 at `v2026.09.23`) | Hardware-compatible model serving, explicit project index and real retrieval/watcher behavior |
+| `semantic-rag` | HF, vLLM, Qdrant, SocratiCode | none of 4 | 2 of 4 | Hardware-compatible model serving, explicit project index and real retrieval/watcher behavior |
 | `recovery` | Restic plus selected ai-memory/Qdrant application state | 1 of 3 | 2 of 3 | Isolated restore, logical comparison, independent key/destination, then explicit consumer cutover |
 
 The [reference manifest](manifest.json) maps **every selected component ID** to its native guide, including optional components outside these starting profiles. The offline HTML setup guide (`docs/ecosystem/index.html`) generates current counts and embeds these recipes alongside layer/profile selection, scoped acceptance and measured baseline choices; it is generated, not committed -- build it with `python3 scripts/build_ecosystem.py --write`, or download it from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only). The [lifecycle guide](lifecycle.md) covers ownership, restart, recovery and rollback. The [portability comparison](research.md) explains why native uv is the required dependency tool and other environment managers remain optional.
@@ -55,7 +56,7 @@ acceptance on a destination host and do not enable broker access.
 
 1. Clone this repository and check out the pinned release ([bootstrap step 0](bootstrap.md)); when a newer release is pinned later, follow [moving a host to a new release](update.md#moving-a-host-to-a-new-release). Read `AGENTS.md`; Claude's `CLAUDE.md` imports the same instructions. Record `git rev-parse HEAD` privately. Inspect upstream installers, version pins and checksums in the selected recipes.
 2. Run the two portable integrity validators below. Choose explicit installation/project paths. Install only the selected native tools through their recipe links, preserving existing client settings.
-3. Run the nonmutating prerequisite report. It reports executable presence, platform compatibility and recipe references. It never logs in, edits client configuration, starts services, executes catalog commands or certifies functional acceptance.
+3. Run the nonmutating prerequisite report. It reports executable presence, platform compatibility and recipe references. It never logs in, edits client configuration, starts services, executes catalog commands or certifies functional acceptance. Its opt-in `--client-wiring` also parses fixed Claude Code and Codex configuration files and reports, as booleans, counts and a computed `complete` only, whether the selected token practice is wired into both clients; the exit code stays the prerequisite result (changed after `v2026.09.25.1`: that release's `adoption_status.py` has no `--client-wiring` and its manifest has no `token-efficiency` profile, so run that check from a default-branch clone).
 4. Recreate the SDK only for the research profile using the [transitive lock](sdk/README.md). Run useful local fixtures before any model request. Base tests can skip DuckDB-dependent checks; the locked SDK acceptance must retain test and skip counts.
 5. Register selected plugins/MCP tools through each client's native commands. Resolve template placeholders deliberately. JSON/TOML strings do not generally expand shell variables. Select the memory workspace/project pair and explicit QMD/code-RAG project scope.
 6. Use native sign-in on the target host. Then verify the actual client's tool discovery and one bounded useful call. Treat Linux Codex, Linux Claude and Desktop as separate client scopes. No authentication store is copied.
@@ -69,6 +70,9 @@ python3 scripts/validate_catalogs.py
 "$PYTHON_BIN" scripts/adoption_status.py --profile foundation-cpu --json
 # Or select the supported interpreter through native uv:
 uv run --no-project --python 3.13 python scripts/adoption_status.py --profile foundation-cpu --json
+# The selected token practice: command presence plus native client wiring (booleans and counts only;
+# changed after v2026.09.25.1, so run it from a default-branch clone until the next release):
+"$PYTHON_BIN" scripts/adoption_status.py --profile token-efficiency --client-wiring --json
 # After the SDK recipe, use that environment to check research prerequisites:
 "$SDK_ENV/bin/python" scripts/adoption_status.py --profile research-runtime --json
 ```

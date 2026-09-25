@@ -31,8 +31,8 @@
     "class": "measured from committed files (headers recorded by adaptive-paper's GuardedSession observer)",
     "command": "python3 blueprints/us-equities/order-throughput/rate_limit_evidence.py --check",
     "totals_by_origin_and_limit": {
-      "data:10000": 9,
-      "trading:200": 419
+      "data:10000": 14,
+      "trading:200": 705
     },
     "files": [
       {
@@ -146,6 +146,71 @@
           "read:200": 52
         },
         "min_trading_remaining": 174
+      },
+      {
+        "path": "blueprints/us-equities/adaptive-paper/trials/ladder-1x-20260924a-needs-attention/paper-output.json",
+        "counts_by_origin_and_limit": {
+          "data:10000": 1,
+          "trading:200": 64
+        },
+        "counts_by_request_kind_and_limit": {
+          "data_read:10000": 1,
+          "read:200": 60,
+          "submit:200": 4
+        },
+        "min_trading_remaining": 173
+      },
+      {
+        "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/paper-output.json",
+        "counts_by_origin_and_limit": {
+          "data:10000": 1,
+          "trading:200": 114
+        },
+        "counts_by_request_kind_and_limit": {
+          "cancel:200": 3,
+          "data_read:10000": 1,
+          "read:200": 78,
+          "submit:200": 33
+        },
+        "min_trading_remaining": 173
+      },
+      {
+        "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/preflight.json",
+        "counts_by_origin_and_limit": {
+          "data:10000": 1,
+          "trading:200": 28
+        },
+        "counts_by_request_kind_and_limit": {
+          "data_read:10000": 1,
+          "read:200": 28
+        },
+        "min_trading_remaining": 174
+      },
+      {
+        "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/paper-output.json",
+        "counts_by_origin_and_limit": {
+          "data:10000": 1,
+          "trading:200": 44
+        },
+        "counts_by_request_kind_and_limit": {
+          "cancel:200": 1,
+          "data_read:10000": 1,
+          "read:200": 42,
+          "submit:200": 1
+        },
+        "min_trading_remaining": 172
+      },
+      {
+        "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/recover-output.json",
+        "counts_by_origin_and_limit": {
+          "data:10000": 1,
+          "trading:200": 36
+        },
+        "counts_by_request_kind_and_limit": {
+          "data_read:10000": 1,
+          "read:200": 36
+        },
+        "min_trading_remaining": 167
       }
     ],
     "unattributed": [

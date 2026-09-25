@@ -13,12 +13,44 @@ node_modules/
 *.sqlite*
 *.db
 *.jsonl
+# The mover v3 run log, holdout access log and amendment files are append-only records that every run requires to be
+# committed and pushed (blueprints/us-equities/mover-v3/protocol-core-draft.json, run_discipline).
+!blueprints/us-equities/mover-v3/*.jsonl
+!blueprints/us-equities/mover-v3/data/*.jsonl
 adoption/hosts/*.json
 !adoption/hosts/example.json
 !adoption/hosts/macos-example.json
+
+# scripts/host_receipts.py review: a stable per-receipt flock anchor (never deleted, to
+# avoid the classic lockfile-deletion race) and the temp file its atomic os.replace() write
+# uses; process coordination artifacts, never evidence.
+evidence/hosts/**/*.json.lock
+evidence/hosts/**/*.json.tmp-*
 
 # Generated public explorer (scripts/build_ecosystem.py --write); rebuilt
 # locally or downloaded from the publish-catalog.yml release artifact/
 # attestation, never committed. See docs/decisions/2026-09-23-generated-
 # explorer-sorted-manifest.md.
 /docs/ecosystem/index.html
+
+# Claude Code: personal project-local settings, and the worktrees
+# `claude --worktree` creates inside the repository.
+.claude/settings.local.json
+.claude/worktrees/
+
+# Credential-shaped files never belong in a checkout; secrets live under
+# ${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack (docs/secret-storage.md).
+*.env
+*.key
+*.pem
+.credentials.json
+auth.json
+hosts.yml
+.netrc
+stored_tokens
+
+# Hugging Face's other file, the active token, has the bare basename `token`.
+# That name is deliberately not listed here: it is too generic to ignore
+# repository-wide (it would silently hide an unrelated tracked file with that
+# exact name). scripts/credential_status.py's SENSITIVE_BASENAME makes the
+# same choice (docs/secret-storage.md "Threat model").
