@@ -486,7 +486,23 @@ open one first: `confirm --txn ID` (`pending_confirmation` only), `rollback
 one left by a crash, `recover` -- which can now close it whether or not a
 later change has since superseded it (see `recover` below), and which (round
 6) also resumes an interrupted rollback of one rather than getting stuck on
-it, so this refusal is never permanent. `adopt --baseline [--spec PATH]`
+it, so this refusal is never permanent.
+
+Round 8 (major finding): "open" also covers a transaction whose OWN rollback
+started (a `rollback:intent` with no matching `rollback:done`) but never
+finished, even though its status is `applied`/`pending_confirmation`/
+`verify_failed` rather than `in_progress`. Without this, a fresh `apply`
+could proceed on the same component while an earlier transaction's own
+interrupted rollback sat unresolved, becoming the component's new standing
+baseline on top of the half-reversed earlier one -- after which finishing
+that earlier transaction's rollback is correctly refused as superseded (see
+`rollback`/`recover` below), but it can never be closed the other way either,
+leaving it -- and every later `apply`/`adopt --relink` on the component,
+refused by this same guard -- stuck forever. Closed by refusing the fresh
+`apply` in the first place: resume or otherwise reconcile the interrupted
+rollback first.
+
+`adopt --baseline [--spec PATH]`
 is the read-only counterpart: it snapshots the current, already-relinked
 state (or records that a component is not relinked yet) without changing
 anything, for `status`/`verify` to compare against later. `adopt --resync ID
@@ -583,20 +599,43 @@ would still need to reverse is checked this same way BEFORE any of them are
 touched, so a doomed rollback (one whose current/<id> link -- always reversed
 LAST, since it is always a relink's first forward entry -- would fail this
 check) refuses whole rather than leaving the entries reversed before it
-already mutated and ledgered -- (`--if-unconfirmed` is a no-op once the
+already mutated and ledgered -- round 8: this all-entries check now simulates
+the reverse walk the actual reversal loop uses, carrying each entry's own
+post-reversal value forward to the next, older entry sharing its surface,
+rather than comparing every entry independently against today's untouched
+live bytes (which falsely refused two entries of one transaction that chain
+on the same surface, even though the real reversal loop would complete them
+correctly) -- (`--if-unconfirmed` is a no-op once the
 transaction was already confirmed or already rolled back -- exactly what the
 scheduled timer above calls; every rollback also refuses a txn ANY later,
 still-standing transaction on the same component has since moved past --
 round 7: by ledger order and recorded status alone, never a live value, which
 used to let two DIFFERENT later transactions that coincidentally shared a
-value fool this check (an A-B-A history) -- the operator rolls back every
+value fool this check (an A-B-A history) -- round 8: this now applies to a
+transaction of ANY kind, including `adopt --relink`, not only one that
+itself became the component's own current/<id> setter (a relink performed
+while current/<id> already exists only re-links entrypoints/surfaces, so it
+used to be exempt from this refusal even while a later, still-standing
+change stood; round 8 also drops a resync's own power to supersede a
+rollback on its own -- resync never itself changes the live value, so the
+compare-and-swap check above already protects against clobbering a
+genuinely different out-of-band value without it, resync or not) -- the
+operator rolls back every
 later transaction first, newest first; reports `already_superseded` if
 `recover` already closed it that way itself, and one with no reversible
 operation at all, e.g. a bare baseline/resync/prune record); the bare
 `rollback ID` form (no `--txn`) is restricted to that set of still-standing
 transactions too (round 7: a stale, already-rolled-back transaction's OWN
 later rollback entries used to be able to out-rank a genuinely standing one by
-raw ledger sequence); `verify [--component ID] --json`
+raw ledger sequence; round 8: once a component has EVER had a real `apply`
+transaction, this form is further restricted to `apply` transactions only,
+never automatically reaching the one-time relink migration underneath even
+once every apply is itself rolled back -- a repeated bare call used to keep
+cascading into that migration, tearing down current/<id> and every
+entrypoint's indirection through it; a component only ever relinked, never
+applied, keeps targeting its relink the same as always, and a relink
+migration is always still reachable explicitly via `rollback --txn`);
+`verify [--component ID] --json`
 re-checks live state against the ledger and the ledger's own hash chain,
 independent of any apply; `recover` reconciles every transaction a crash left
 unfinished -- two different shapes (round 7): one still `in_progress` (a crash
@@ -647,9 +686,30 @@ receipt, window, rollback_class, actor, at_utc, prev_hash, hash`) is hash-
 chained (`hash = sha256(prev_hash + canonical_json(entry))`); `verify` and
 `recover` both re-derive that chain and report a break rather than trust a
 cached summary. `switch/state.json` is always recomputed from the ledger,
-never hand-edited.
+never hand-edited. Round 8 (major finding): a component's derived "current"
+root used to stay stuck at whatever value it held before a `link` entry's
+own reversal *removed* current/<id> entirely (rolling back a relink's
+first-ever forward entry, which always has no prior value, unlinks it rather
+than repointing it) -- the derivation skipped updating "current" whenever the
+touching entry's own recorded value was empty, instead of recording that
+emptiness itself, so `status`/`verify` could report a stale root for a
+component whose live current/<id> no longer existed at all. Fixed by
+recording that value -- including "not linked" -- exactly like any other.
 
-**What the tests establish (`tests/test_adoption_switch.py`).** A synthetic
+**What the tests establish (`tests/test_adoption_switch.py`,
+`tests/test_adoption_switch_model.py`).** A synthetic model-based test
+(`test_adoption_switch_model.py`; stdlib `random` with a fixed, per-sequence
+seed) runs many random sequences of `apply`/`confirm`/`rollback`/`relink`/
+`recover`/`resync`/the confirm-or-revert timer -- plus two synthetic
+out-of-band drift actions -- against a temp `ECO_INSTALL_ROOT`, injecting a
+simulated crash between the tool's own write-ahead checkpoints (a mutation
+returning, or a ledger append completing), and asserts after every step that
+no transaction is ever permanently wedged, that rollback of a transaction is
+refused while any later one for the component is standing (for every
+transaction kind, including `adopt --relink`), that the `rollback:intent`
+marker is written only after every refusal pre-check has passed, that live
+state matches the ledger's derived state after `recover`, and that the
+confirm-or-revert timer only ever acts on its own transaction. A synthetic
 temporary `ECO_INSTALL_ROOT` throughout, with `ECOSYSTEM_SWITCH_SYSTEMCTL` /
 `ECOSYSTEM_SWITCH_SYSTEMD_RUN` stubs for the unit-restart and confirm-or-
 revert tests (one stub health-probes a real, separately copied Python
