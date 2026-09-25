@@ -262,18 +262,41 @@ def scan_news(calendar, assets, ambiguous, args):
         },
     }
     kept = []
+    guard_b = defaultdict(Counter)
     for c in candidates:
         window = c.pop("_window")
         created_ts = c.pop("_created_ts")
         nid = int(c["news_id"]) if c["news_id"].isdigit() else None
         est = ingestion.get(nid, created_ts)
         ok, reason = sig.ingestion_guard(window, est)
+        cell = guard_b[f"{c['window']}:{c['session'][:4]}"]
+        cell["evaluated"] += 1
         if not ok:
+            cell["dropped"] += 1
             funnel[f"drop_guard_{reason}"] += 1
             funnel["pre_eligibility_candidates"] -= 1
             continue
         kept.append(c)
+    diagnostics["guard_B_drops_by_window_and_session_year"] = guard_b_table(guard_b)
     return kept, funnel, diagnostics
+
+
+def guard_b_table(cells):
+    """{window: {year: {evaluated, dropped, share}}, window + ':all': {...}} from "window:year" counters.
+    Denominator: candidates that reached guard B (after the instrument, window, guard A,
+    movement, duplicate and checkpoint filters)."""
+    table = defaultdict(dict)
+    totals = defaultdict(Counter)
+    for key in sorted(cells):
+        window, year = key.split(":")
+        c = cells[key]
+        table[window][year] = {"evaluated": c["evaluated"], "dropped": c["dropped"],
+                               "share": round(c["dropped"] / c["evaluated"], 4) if c["evaluated"] else None}
+        totals[window].update(c)
+    for window, c in totals.items():
+        table[window]["all"] = {"evaluated": c["evaluated"], "dropped": c["dropped"],
+                                "share": round(c["dropped"] / c["evaluated"], 4) if c["evaluated"] else None}
+    return dict(table)
 
 
 def estimate_ingestion(ids, id_times):

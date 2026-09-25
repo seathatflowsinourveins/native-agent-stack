@@ -62,7 +62,7 @@
   "company": "news_signal.clean_company_name(asset-master name): security-type tails such as 'Common Stock', 'Class A Common Stock', '(The)' removed",
   "headline": "news_signal.clean_headline: HTML entities decoded, whitespace collapsed",
   "decoding": "greedy (argmax); at most 16 new tokens; stop at EOS (50256) or once news_signal.label_decided (the first word of the first non-empty line is followed by a non-letter, or that line has ended)",
-  "parse": "news_signal.parse_label: first non-empty line; leading quotes/markdown and an optional 'Answer:'/'Response:' prefix removed; first alphabetic word compared case-insensitively with the operative label set; anything else PARSE_FAIL scored 0",
+  "parse": "Stored label (unchanged): news_signal.parse_label, the model authors' strict rule - the first word of the first non-empty line (quotes, markdown and an 'Answer:'/'Response:' prefix removed) must equal FAVORABLE, UNFAVORABLE or UNCLEAR; anything else is stored as PARSE_FAIL (0). evaluate.check_scores validates every stored label against its raw output. Position (operative, D22): news_signal.operative_score on the same first word - prefix UNF -> -1, FAV -> +1, UNC -> 0, anything else PARSE_FAIL (0); context overflows are PARSE_FAIL.",
   "context_overflow": "prompt tokens + 16 > 1,792: not generated, stored as PARSE_FAIL with stop 'context_overflow'",
   "stored_per_event": [
    "event_id",
@@ -152,7 +152,25 @@
    "matmul": "highest",
    "decoder": "cached"
   },
-  "score_row_checks": "evaluate.check_scores: exactly one score row per liquid-lane event (refuse if any is unscored or duplicated); for every used row: checkpoint_year = news_signal.checkpoint_year(created_at), revision, weights and code sha256 = checkpoints.json, variant/template/dtype/matmul/decoder = pinned_settings, prompt_sha256 = the event's own prompt, and label/score reproduce from raw_output. Small-lane events without a row are left out and counted."
+  "score_row_checks": "evaluate.check_scores: exactly one score row per liquid-lane event (refuse if any is unscored or duplicated); for every used row: checkpoint_year = news_signal.checkpoint_year(created_at), revision, weights and code sha256 = checkpoints.json, variant/template/dtype/matmul/decoder = pinned_settings, prompt_sha256 = the event's own prompt, and label/score reproduce from raw_output. Small-lane events without a row are left out and counted.",
+  "operative_rule": {
+   "function": "news_signal.operative_score (evaluate.position_side, rule 'operative')",
+   "sensitivity": "the strict rule (stored labels, evaluate.position_side rule 'strict') is evaluated on the same data and reported beside every item as strict_rule_sensitivity; it never opens a gate",
+   "chosen_from": "output text only, 2026-09-25, before the freeze; no price or return was read",
+   "evidence": {
+    "strict_parse_fail_current_events": 59803,
+    "beginning_with_UNF": 59673,
+    "share_UNF": 0.9978,
+    "top_first_words": {
+     "UNFLEXIBLE": 26071,
+     "UNFRIENDLY": 25493,
+     "UNF": 7240,
+     "UNFLEARED": 363,
+     "UNFLEARABLE": 347
+    },
+    "operative_parse_fail_share_max_per_checkpoint": 0.0012
+   }
+  }
  },
  "news": {
   "archive": "~/.local/state/native-agent-stack/research/data-lake/news/<YYYY>/<MM>/<DD>.jsonl.gz (Alpaca news API, Benzinga), 2015-01-01..2026-09-23; run-header records 2,213,433 records; 2,217,343 lines read on 2026-09-25 (2 repeated ids dropped)",
@@ -335,39 +353,66 @@
   "statistic": "one-sided t of the mean daily net return with a Newey-West (Bartlett) variance",
   "newey_west_lags": 5,
   "p_value": "upper-tail standard normal",
-  "item_rejected": "days >= min_days and rejected by its family rule (evaluate.evaluate_items); days < min_days -> insufficient_sample",
+  "item_rejected": "days >= min_days and rejected in its family (primary fixed sequence, or its secondary Holm member); days < min_days -> insufficient_sample",
   "non_rejection_reading": "report the one-sided 95% upper bound (mean + 1.645 x NW se) of the mean net and mean gross daily return, and whether it lies below 3 bps/day (model authors' estimate) and 34 bps/day (the paper)"
  },
  "gates": {
-  "long_only_paper_candidate": "NEWS-2B rejected (secondary Holm) AND NEWS-2 rejected (gatekeeping at 0.05/3) AND the overnight liquid long-leg mean net return in recent_24m > 0 (point estimate)",
+  "long_only_paper_candidate": "the secondary LONG-ONLY member (NEWS-2B and NEWS-2 jointly) rejected AND the overnight liquid long-leg mean net return in recent_24m > 0 (point estimate)",
   "long_short_candidate": "NEWS-1 and NEWS-4 both rejected in the primary fixed sequence",
-  "rth_candidate": "NEWS-3 rejected (secondary Holm)",
+  "rth_candidate": "the secondary NEWS-3 member rejected",
   "recent_segment": "recent_24m",
   "computed_by": "evaluate.evaluate_items",
-  "failure_rule": "If no gate is met the result is recorded as a failure of this preregistered specification; no post-hoc prompt, model, threshold, lane or window variant is promoted from this dataset."
+  "failure_rule": "If no gate is met the result is recorded as a failure of this preregistered specification; no post-hoc prompt, model, threshold, lane or window variant is promoted from this dataset.",
+  "long_only_member": "LONG-ONLY",
+  "rth_member": "NEWS-3"
  },
  "minimum_detectable_effect": {
-  "formula": "MDE = (z_{1-0.05/4} + z_{0.80}) x sigma / sqrt(N) = 3.083 x sigma / sqrt(N) (Holm worst case, one-sided, 80% power; Newey-West inflation ignored)",
-  "sigma_assumptions": "daily sd of the long-short series 1.0% (liquid-only guess) and 1.82% (the paper's Table 1: 0.34% mean at Sharpe 2.97); long leg 1.63% (paper: 0.08% mean at Sharpe 0.78)",
-  "expected_days": "overnight_full about 2,600 (2,673 sessions carry liquid overnight events); rth_full about 2,400 (2,417 sessions); recent_24m about 500",
+  "formula": "MDE = (z_{1-alpha_item} + z_{0.80}) x sigma / sqrt(N), one-sided, 80% power, Newey-West inflation ignored",
+  "levels": {
+   "NEWS-1 and NEWS-4 (primary fixed sequence, each at 0.05)": 2.4865,
+   "secondary Holm members at the worst-case level 0.05/3 (NEWS-1, LONG-ONLY items, NEWS-3)": 2.9697
+  },
+  "sigma_assumptions_percent_per_day": {
+   "long_short": [
+    1.0,
+    1.82
+   ],
+   "long_leg": [
+    1.63
+   ],
+   "benchmarked_long_leg": [
+    0.5,
+    1.0
+   ]
+  },
+  "expected_days": {
+   "overnight_full": "about 2,600 (2,672 sessions carry liquid overnight events; days with both legs are fewer)",
+   "rth_full": "at most 2,673 sessions carry liquid intraday events",
+   "recent_24m": "about 500"
+  },
   "mde_percent_per_day": {
-   "NEWS-1": {
-    "sigma_1.0": 0.06,
-    "sigma_1.82": 0.11
+   "NEWS-1 (primary, 0.05)": {
+    "sigma_1.0": 0.049,
+    "sigma_1.82": 0.089
    },
-   "NEWS-2": {
-    "sigma_1.63": 0.099
+   "NEWS-4 (primary, 0.05, after NEWS-1)": {
+    "sigma_1.0": 0.111,
+    "sigma_1.82": 0.202
    },
-   "NEWS-3": {
-    "sigma_1.0": 0.063,
-    "sigma_1.82": 0.115
+   "NEWS-2B (LONG-ONLY, worst 0.05/3)": {
+    "sigma_0.5": 0.029,
+    "sigma_1.0": 0.058
    },
-   "NEWS-4": {
-    "sigma_1.0": 0.138,
-    "sigma_1.82": 0.251
+   "NEWS-2 (LONG-ONLY, worst 0.05/3)": {
+    "sigma_1.63": 0.095
+   },
+   "NEWS-3 (Holm, worst 0.05/3)": {
+    "sigma_1.0": 0.057,
+    "sigma_1.82": 0.105
    }
   },
-  "reading": "The prior for this classifier is about 3 bps/day gross (model authors), far below the full-segment MDE (6-11 bps/day) and below modelled long-short costs (about 9 bps/day): NEWS-1 is expected to fail. Its value is the upper bound and the break-even estimate. An effect of the paper's size (34 bps/day gross) would be detected."
+  "error_bound": "the two families at 0.05 each bound the chance of any false gate at 0.10",
+  "reading": "The prior for this classifier is about 3 bps/day gross (model authors), far below the full-segment MDE (5-11 bps/day) and below modelled long-short costs (about 9 bps/day): NEWS-1 is expected to fail. Its value is the upper bound and the break-even estimate. An effect of the paper's size (34 bps/day gross) would be detected."
  },
  "descriptive_only": [
   "gross and net long, short and long-short for every window x lane x segment, with Sharpe and daily hit rate",
@@ -483,6 +528,11 @@
    "id": "D21",
    "what": "Benchmarked long leg (NEWS-2B) and a fixed-sequence plus Holm multiplicity design",
    "why": "Review fix: a long leg can be positive because news days rise; the benchmark isolates selection."
+  },
+  {
+   "id": "D22",
+   "what": "Operative score by the unique three-letter prefix of the first answer word (UNF -> -1, FAV -> +1, UNC -> 0, anything else PARSE_FAIL 0) instead of the authors' exact-word rule; the exact-word rule is reported beside every item",
+   "why": "In float32 greedy decoding the model often starts 'UNF' and continues with another token ('UNFLEXIBLE', 'UNFRIENDLY', 'UNF'): 59,673 of the 59,803 strict parse failures of the current events (99.8%) begin with 'UNF', and they are 31.2% of the 2023 checkpoint's outputs and 26.0% of 2024's, so the exact-word rule would silently drop a quarter to a third of the negative calls in NEWS-4's segment. The three label words have unique three-letter prefixes. Decided before the freeze from output text only; no price or return was read."
   }
  ],
  "limitations": [
@@ -495,7 +545,7 @@
   "L7 News coverage grows over time (18,585 selected events scored by the 2015 checkpoint vs 104,614 by the 2024 checkpoint), so early years carry fewer names per leg.",
   "L8 Timestamp guards reduce but cannot remove the risk that created_at precedes public availability.",
   "L9 Label mix varies by checkpoint vintage (float32 probe, 50 events each: e.g. the 2022 checkpoint labels most headlines UNFAVORABLE), so leg sizes shift across years; portfolios are formed within a day, where one checkpoint scores all headlines of that calendar year.",
-  "L10 A few percent of outputs are malformed words (e.g. 'UNFLEXIBLE') and score 0 under the authors' rule; they are counted as PARSE_FAIL and reported per checkpoint.",
+  "L10 Output malformation varies with the checkpoint vintage. Share of current-event outputs that fail the authors' exact-word rule: 2015 0.09%, 2016 1.56%, 2017 0.05%, 2018 0%, 2019 0.19%, 2020 0.01%, 2021 7.42%, 2022 0.03%, 2023 31.17%, 2024 26.04% (the re-check's 31.2/26.0/7.8% counted superseded rows too); 99.8% of them begin with 'UNF'. Under the operative prefix rule (D22) at most 0.12% of any checkpoint's outputs remain PARSE_FAIL. The strict-rule sensitivity shows how much the confirmatory results depend on D22.",
   "L11 Survivorship: single-symbol headlines whose ticker is absent from the 2026-09-21 asset master are dropped (prepare.py F3). The missing share falls from 30.3% of single-symbol headlines in 2016 to 4.2% in 2026 (reviewer's per-year count; the rerun's counts are in receipts/prepare-summary.json diagnostics.survivorship_*). Delisted and renamed firms are therefore under-represented in early years; every verdict is scoped to firms present in the 2026-09-21 asset master (protocol scope).",
   "L12 The movement filter drops headlines that carry firm news together with the stock's reaction (22% of the D5 audit sample)."
  ],
@@ -619,7 +669,8 @@
   "C6 model downloads with sha256 verification; tokenizer file verification",
   "C7 model scores on events (all prompt variants in probes, the operative variant in the full run): raw outputs, labels, label distributions, parse failures, batch-1 agreement, throughput and GPU memory",
   "C8 numerics diagnostics: logit differences between batch shapes, dtypes, TF32 and the cached decoder on real prompts",
-  "C9 D5 audit: 200 dropped headlines labelled from text"
+  "C9 D5 audit: 200 dropped headlines labelled from text",
+  "C10 strict versus operative (D22) label counts of the stored outputs by checkpoint and lane (output text only)"
  ],
  "frozen_at": null,
  "frozen_status_value": "frozen_pre_outcome",
@@ -649,19 +700,23 @@
   },
   "secondary": {
    "type": "holm",
-   "items": [
-    "NEWS-1",
-    "NEWS-2B",
-    "NEWS-3"
-   ],
-   "alpha": 0.05
+   "alpha": 0.05,
+   "members": {
+    "NEWS-1": [
+     "NEWS-1"
+    ],
+    "LONG-ONLY": [
+     "NEWS-2B",
+     "NEWS-2"
+    ],
+    "NEWS-3": [
+     "NEWS-3"
+    ]
+   },
+   "member_p": "the largest p among the member's items (intersection-union test, Berger 1982): the LONG-ONLY member is rejected only if both the benchmarked and the absolute long-leg tests are",
+   "reason": "Holm (m=3) over NEWS-1, the benchmarked long leg (jointly with the absolute long leg) and NEWS-3; replaces the earlier gatekeeping step (NEWS-2 at 0.05/3 after NEWS-2B), which could add up to 0.05/3 of false rejections outside the Holm family"
   },
-  "gatekeeping": {
-   "item": "NEWS-2",
-   "after": "NEWS-2B",
-   "alpha": 0.016666666666666666,
-   "reason": "the absolute long leg is tested only after NEWS-2B is rejected, at the smallest Holm level (0.05/3)"
-  }
+  "error_bound": "Each family bounds the probability of any false rejection at 0.05 (fixed sequence and Holm control the familywise error strongly; the intersection-union member is a level-0.05 test of the union null). Every gate opens only on rejections in one family, so the probability that any gate opens falsely is at most 0.05 + 0.05 = 0.10."
  },
  "pins": {
   "code": {
@@ -693,5 +748,6 @@
    "scores/scores-20241231.jsonl": null
   },
   "how": "python3 evaluate.py --print-pins prints every pin (paths relative to the private data root); fill code and private_inputs at the freeze commit"
- }
+ },
+ "evaluation_access": "evaluate.authorize() alone runs the freeze-record, frozen-protocol, pin, clean-tree and freeze-commit checks and issues the Authorization token; data_pass() and every loader refuse anything else, including the FrozenProtocol returned by the public guard()."
 }

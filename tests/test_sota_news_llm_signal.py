@@ -234,6 +234,36 @@ class Scoring(unittest.TestCase):
         self.assertEqual(sig.parse_label("YES", "hlmw_alpaca"), ("PARSE_FAIL", 0, False))
         self.assertEqual(sig.parse_label("FAVORABLE", "llt_alpaca"), ("PARSE_FAIL", 0, False))
 
+    def test_operative_score_unique_prefix_rule(self):
+        cases = {
+            "UNFAVORABLE": ("UNFAVORABLE", -1, "exact"),
+            "UNFLEXIBLE": ("UNFAVORABLE", -1, "prefix"),
+            "UNFRIENDLY,": ("UNFAVORABLE", -1, "prefix"),
+            "UNF FA": ("UNFAVORABLE", -1, "prefix"),
+            "Unfavorable news": ("UNFAVORABLE", -1, "exact"),
+            "FAVORABLE.": ("FAVORABLE", 1, "exact"),
+            "FAVOR": ("FAVORABLE", 1, "prefix"),
+            "**Favorable**": ("FAVORABLE", 1, "exact"),
+            "UNCLEAR": ("UNCLEAR", 0, "exact"),
+            "UNCERTAINTY": ("UNCLEAR", 0, "prefix"),
+            "Answer: UNFLEASIBLE": ("UNFAVORABLE", -1, "prefix"),
+            "UN": ("PARSE_FAIL", 0, "none"),
+            "FA": ("PARSE_FAIL", 0, "none"),
+            "THE": ("PARSE_FAIL", 0, "none"),
+            "": ("PARSE_FAIL", 0, "none"),
+            None: ("PARSE_FAIL", 0, "none"),
+        }
+        for raw, expected in cases.items():
+            with self.subTest(raw=raw):
+                self.assertEqual(sig.operative_score(raw), expected)
+        self.assertEqual(sig.operative_score("UNFAVORABLE", stop="context_overflow"), ("PARSE_FAIL", 0, "none"))
+        # the strict rule (stored labels) is unchanged: UNFLEXIBLE stays a parse failure there
+        self.assertEqual(sig.parse_label("UNFLEXIBLE", "hlmw_alpaca"), ("PARSE_FAIL", 0, False))
+        # every exact label maps to the same score under both rules
+        for word, score in sig.FAVORABLE_LABELS.items():
+            self.assertEqual(sig.operative_score(word)[1], score)
+            self.assertEqual(sig.parse_label(word, "hlmw_alpaca")[1], score)
+
     def test_label_decided_stop_rule(self):
         self.assertFalse(sig.label_decided(""))
         self.assertFalse(sig.label_decided("YES"))

@@ -22,14 +22,20 @@ to firms present in the 2026-09-21 asset master (survivorship, limitation L11).
 |---|---|---|---|---|---|
 | NEWS-1 | overnight (open to close) | liquid | long-short, both legs | 2016-02-02..2026-09-18 | fixed sequence 1st; Holm |
 | NEWS-4 | overnight | liquid | long-short, both legs | last 24 months | fixed sequence 2nd |
-| NEWS-2B | overnight | liquid | long leg minus all scored liquid events | 2016-02-02..2026-09-18 | Holm (m=3) |
-| NEWS-2 | overnight | liquid | long leg (absolute) | same | at 0.05/3 after NEWS-2B |
+| NEWS-2B | overnight | liquid | long leg minus all scored liquid events | 2016-02-02..2026-09-18 | Holm (m=3), LONG-ONLY member |
+| NEWS-2 | overnight | liquid | long leg (absolute) | same | Holm (m=3), LONG-ONLY member |
 | NEWS-3 | intraday, release + 15 min (quote) to close | liquid | long-short, both legs | 2016-02-02..2026-09-18 | Holm (m=3) |
 
-Gates, all computed in `evaluate.evaluate_items`: long-only paper candidate = NEWS-2B, NEWS-2 and a positive recent
-long leg; long-short candidate = NEWS-1 and NEWS-4; intraday candidate = NEWS-3. Non-rejected items report the
+The secondary Holm family has three members: NEWS-1, LONG-ONLY (NEWS-2B and NEWS-2 as one intersection-union test,
+p = the larger of the two) and NEWS-3. Each family bounds its false rejections at 0.05, so the chance of any false gate
+is at most 0.10. Gates, all computed in `evaluate.evaluate_items`: long-only paper candidate = LONG-ONLY and a positive
+recent long leg; long-short candidate = NEWS-1 and NEWS-4; intraday candidate = NEWS-3. Non-rejected items report the
 one-sided 95% upper bound of the mean net and gross return against 3 and 34 bps/day. Shorts under the SEC Rule 201
 restriction (from pre-decision data) are excluded from confirmatory items.
+
+Positions use the operative prefix rule (D22): an answer starting "UNF" is UNFAVORABLE (-1), "FAV" FAVORABLE (+1),
+"UNC" UNCLEAR (0). The model often writes "UNFLEXIBLE"/"UNFRIENDLY" for UNFAVORABLE (26-31% of 2023-2024 outputs).
+The rule was chosen from output text only; the authors' exact-word rule is reported beside every item.
 
 ## Files
 

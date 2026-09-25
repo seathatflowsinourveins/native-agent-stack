@@ -174,6 +174,36 @@ def parse_label(raw_output, variant=None):
     return "PARSE_FAIL", 0, False
 
 
+# Operative score (deviation D22). The stored label of every score row stays the strict
+# parse_label result (validated unchanged by evaluate.check_scores); the position a row
+# takes comes from operative_score. The rule was chosen on 2026-09-25 from the output
+# text alone (99.8% of strict PARSE_FAIL outputs begin with "UNF", e.g. "UNFLEXIBLE",
+# "UNFRIENDLY", "UNF"); no price or return was read. The three label words have unique
+# three-letter prefixes, so the prefix identifies the label the model started to write.
+OPERATIVE_PREFIXES = {"UNF": ("UNFAVORABLE", -1), "FAV": ("FAVORABLE", 1), "UNC": ("UNCLEAR", 0)}
+
+
+def operative_score(raw_output, stop=None):
+    """(label, score, rule) from the first word's unique prefix: UNF -> -1, FAV -> +1,
+    UNC -> 0, anything else PARSE_FAIL (0). rule is "exact" when the word is the full
+    label, "prefix" when only the prefix matched, "none" otherwise. Context overflows
+    are PARSE_FAIL."""
+    if stop == "context_overflow" or raw_output is None:
+        return "PARSE_FAIL", 0, "none"
+    text = _normalized_first_line(raw_output)
+    if text is None:
+        return "PARSE_FAIL", 0, "none"
+    match = _FIRST_WORD.match(text)
+    if match is None:
+        return "PARSE_FAIL", 0, "none"
+    word = match.group(1).upper()
+    hit = OPERATIVE_PREFIXES.get(word[:3])
+    if hit is None:
+        return "PARSE_FAIL", 0, "none"
+    label, score = hit
+    return label, score, "exact" if word == label else "prefix"
+
+
 def label_decided(generated_text):
     """True once more tokens cannot change the parsed label.
 

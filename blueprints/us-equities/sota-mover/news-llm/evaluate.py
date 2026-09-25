@@ -16,14 +16,20 @@ run() refuses (exit 2) before it opens any event, score or price unless all of t
   score.py, collect_auctions.py, receipts.py), reference data (fees, session calendar,
   checkpoints.json) and private inputs (events, every scores file, auctions, entry quotes);
 * ``git status --porcelain`` is empty for the study directory; HEAD is recorded.
-guard() returns a FrozenProtocol token, and every loader re-runs guard() on that token
-before it reads a byte.
+Only authorize() runs that whole chain, and only it issues the Authorization token that
+data_pass() and every loader require; each loader also re-runs guard() on the protocol and
+reads only the pinned files under the authorized data root. guard() alone (protocol checks
+only) cannot open the data.
+
+Positions use the operative score (news_signal.operative_score, D22); the model authors'
+strict label rule is evaluated alongside as a descriptive sensitivity for every item.
 
 Families: primary fixed sequence at alpha 0.05, NEWS-1 then NEWS-4 (long-short gate);
-secondary Holm at alpha 0.05 over NEWS-1, NEWS-2B and NEWS-3; NEWS-2 (absolute long leg)
-is tested at alpha 0.05/3 only after NEWS-2B is rejected. Non-rejection is read through the
-one-sided 95% upper bound of the mean against 3 bps/day (the model authors' estimate) and
-34 bps/day (the paper).
+secondary Holm at alpha 0.05 over three members: NEWS-1, the long-only pair (NEWS-2B and
+NEWS-2 as one intersection-union member, p = max of the two) and NEWS-3. Each family
+bounds its false rejections at 0.05, so the chance of any false gate is at most 0.10.
+Non-rejection is read through the one-sided 95% upper bound of the mean against 3 bps/day
+(the model authors' estimate) and 34 bps/day (the paper).
 """
 import argparse
 import gzip
@@ -67,6 +73,7 @@ PRIVATE_INPUTS = ("events.jsonl.gz", "auctions/auctions.jsonl.gz", "spreads/quot
 PRIOR_BPS = {"model_authors_3bps": 0.0003, "paper_34bps": 0.0034}
 Z95 = 1.6448536269514722
 _TOKEN = object()
+_RUN_TOKEN = object()
 
 
 class Refusal(SystemExit):
@@ -129,11 +136,27 @@ def guard(protocol_path, expected_sha256):
     return FrozenProtocol(p, actual, protocol_path, _TOKEN)
 
 
-def require(frozen):
-    """Every loader calls this first: a guard() token for the unchanged frozen protocol."""
-    if not isinstance(frozen, FrozenProtocol) or frozen._token is not _TOKEN:
-        raise Refusal("data access requires the FrozenProtocol returned by guard()")
-    return guard(frozen.path, frozen.sha256)
+class Authorization:
+    """Issued only by authorize() after the freeze record, frozen protocol, pins, clean tree
+    and freeze-commit checks; the only key to data_pass() and the loaders."""
+
+    def __init__(self, frozen, head, study_dir, data_root, repo_root, token):
+        if token is not _RUN_TOKEN:
+            raise Refusal("an Authorization can only be issued by authorize()")
+        if not isinstance(frozen, FrozenProtocol) or frozen._token is not _TOKEN:
+            raise Refusal("an Authorization needs the FrozenProtocol returned by guard()")
+        self.frozen, self.head, self._token = frozen, head, token
+        self.study_dir, self.data_root, self.repo_root = Path(study_dir), Path(data_root), Path(repo_root)
+
+
+def require(auth):
+    """Every loader and data_pass() call this first: an authorize()-issued token, and a
+    protocol file still byte-identical to the one authorized."""
+    if not isinstance(auth, Authorization) or auth._token is not _RUN_TOKEN:
+        raise Refusal("data access requires the Authorization issued by authorize() "
+                      "(freeze record, pins, clean tree and freeze commit checked)")
+    guard(auth.frozen.path, auth.frozen.sha256)
+    return auth
 
 
 def git(directory, *args):
@@ -189,7 +212,7 @@ def verify_pins(protocol, study_dir, data_root, repo_root):
 
 
 # --------------------------------------------------------------------------------------
-# Loaders (each re-runs the guard)
+# Loaders: authorize()-issued token only; they read the pinned files under its data root
 # --------------------------------------------------------------------------------------
 
 
@@ -201,27 +224,27 @@ def read_jsonl(path):
                 yield json.loads(line)
 
 
-def load_events(frozen, data_root):
-    require(frozen)
-    return list(read_jsonl(Path(data_root) / "events.jsonl.gz"))
+def load_events(auth):
+    require(auth)
+    return list(read_jsonl(auth.data_root / "events.jsonl.gz"))
 
 
-def load_score_rows(frozen, data_root):
-    require(frozen)
+def load_score_rows(auth):
+    require(auth)
     rows = defaultdict(list)
     for rel in PRIVATE_INPUTS:
         if rel.startswith("scores/"):
-            for row in read_jsonl(Path(data_root) / rel):
+            for row in read_jsonl(auth.data_root / rel):
                 rows[row["event_id"]].append(row)
     return rows
 
 
-def load_auction_prices(frozen, path, events):
+def load_auction_prices(auth, events):
     """(symbol, session) -> official open / close by news_signal.select_auction_price."""
-    require(frozen)
+    require(auth)
     listing = {(ev["symbol"], ev["session"]): ev.get("exchange") for ev in events}
     opens, closes, seen = {}, {}, set()
-    for row in read_jsonl(path):
+    for row in read_jsonl(auth.data_root / "auctions" / "auctions.jsonl.gz"):
         key = (row["symbol"], row["session"])
         if key in seen:
             raise Refusal(f"duplicate auction row for {key}")
@@ -236,14 +259,12 @@ def load_auction_prices(frozen, path, events):
     return opens, closes
 
 
-def load_rth_quotes(frozen, path, events):
+def load_rth_quotes(auth, events):
     """event_id -> entry quote {bid, ask, t} (news_signal.rth_entry_quote), RTH events only."""
-    require(frozen)
+    require(auth)
     entries = {ev["event_id"]: ev["entry_utc"] for ev in events if ev["window"] == sig.RTH}
     out = {}
-    if not Path(path).exists():
-        return out
-    for row in read_jsonl(path):
+    for row in read_jsonl(auth.data_root / "spreads" / "quotes.jsonl"):
         eid = row["event_id"]
         if eid in entries and eid not in out:
             q = sig.rth_entry_quote(row.get("quotes"), entries[eid])
@@ -309,12 +330,27 @@ def cost_fractions(ev, costs):
     return costs["auction_slippage_bps_per_side"][ev["lane"]] / 1e4, exit_cost
 
 
-def build_positions(events, scores, opens, closes, rth_quotes, fees, costs):
+SCORE_RULES = ("operative", "strict")
+
+
+def position_side(row, rule):
+    """(label, side) of a validated score row: the operative prefix rule (D22) or the
+    model authors' strict rule (the stored label, kept as a descriptive sensitivity)."""
+    if rule == "operative":
+        label, side, _ = sig.operative_score(row.get("raw_output"), row.get("stop"))
+        return label, side
+    if rule == "strict":
+        return row["label"], int(row["score"])
+    raise ValueError(f"unknown score rule {rule!r}")
+
+
+def build_positions(events, scores, opens, closes, rth_quotes, fees, costs, rule="operative"):
     """Positions (with gross/net returns and Rule 201 flags), benchmark rows, exclusions.
 
     Overnight: official open to official close. RTH: long at the entry quote's ask, short at
     its bid (news_signal.rth_entry_price), exit at the official close. Benchmark rows: every
-    scored liquid overnight event held long open to close (NEWS-2B).
+    scored liquid overnight event held long open to close (NEWS-2B), whatever its label.
+    rule selects how a row's raw output becomes a side (position_side).
     """
     positions, bench = [], []
     excluded = Counter()
@@ -323,7 +359,7 @@ def build_positions(events, scores, opens, closes, rth_quotes, fees, costs):
         if row is None:
             excluded["no_score"] += 1
             continue
-        side = int(row["score"])
+        label, side = position_side(row, rule)
         key = (ev["symbol"], ev["session"])
         exit_price = closes.get(key)
         day = date.fromisoformat(ev["session"])
@@ -335,7 +371,7 @@ def build_positions(events, scores, opens, closes, rth_quotes, fees, costs):
                               "net": sig.position_net_return(1, o, exit_price, day, fees, costs["notional_usd"], entry_cost, exit_cost),
                               "gross": sig.gross_return(1, o, exit_price)})
         if side == 0:
-            excluded[f"no_position_{row['label']}"] += 1
+            excluded[f"no_position_{label}"] += 1
             continue
         quote = rth_quotes.get(ev["event_id"]) if ev["window"] == sig.RTH else None
         if ev["window"] == sig.OVERNIGHT:
@@ -432,28 +468,41 @@ def evaluate_items(protocol, positions, bench):
     prim = mult["primary"]
     seq = sig.fixed_sequence([(k, results[k]["p"]) for k in prim["items"]], prim["alpha"])
     sec = mult["secondary"]
-    holm = sig.holm_reject({k: results[k]["p"] for k in sec["items"]}, sec["alpha"])
-    gk = mult["gatekeeping"]
-    gk_p = results[gk["item"]]["p"]
-    gk_rej = bool(holm.get(gk["after"]) and gk_p is not None and gk_p <= gk["alpha"])
+    member_p = {}
+    for member, ids in sec["members"].items():
+        ps = [results[i]["p"] for i in ids]
+        # intersection-union member: rejected only if every item in it is (p = max)
+        member_p[member] = None if any(p is None for p in ps) else max(ps)
+    holm = sig.holm_reject(member_p, sec["alpha"])
+    for member, ids in sec["members"].items():
+        for i in ids:
+            results[i]["secondary_member"] = member
+            results[i]["secondary_member_p"] = member_p[member]
+            results[i]["rejected_secondary_holm"] = holm[member]
     for k, r in results.items():
         r["rejected_primary_sequence"] = seq.get(k)
-        r["rejected_secondary_holm"] = holm.get(k)
-        if k == gk["item"]:
-            r["rejected_gatekeeping"] = gk_rej
-        rejected = bool(seq.get(k) or holm.get(k) or (k == gk["item"] and gk_rej))
+        rejected = bool(seq.get(k) or r.get("rejected_secondary_holm"))
         r["verdict"] = "insufficient_sample" if not r["net"]["sample_ok"] else ("rejected" if rejected else "not_rejected")
     recent = segments[protocol["gates"]["recent_segment"]]
     recent_long = item_values({"window": sig.OVERNIGHT, "lane": sig.LIQUID, "series": "long"}, positions, bench, "net", recent)
     recent_mean = sum(recent_long) / len(recent_long) if recent_long else None
+    g = protocol["gates"]
     gates = {
-        "long_only_paper_candidate": bool(holm.get("NEWS-2B") and gk_rej and recent_mean is not None and recent_mean > 0),
-        "long_short_candidate": bool(seq.get("NEWS-1") and seq.get("NEWS-4")),
-        "rth_candidate": bool(holm.get("NEWS-3")),
+        "long_only_paper_candidate": bool(holm[g["long_only_member"]] and recent_mean is not None and recent_mean > 0),
+        "long_short_candidate": all(seq.get(k) for k in prim["items"]),
+        "rth_candidate": bool(holm[g["rth_member"]]),
         "recent_long_leg_mean_net": recent_mean,
         "recent_long_leg_days": len(recent_long),
     }
     return results, gates
+
+
+def attach_strict_sensitivity(items, items_strict, gates_strict):
+    """Report the strict-rule (authors') version beside every operative item; never a gate."""
+    for k, r in items.items():
+        s = items_strict[k]
+        r["strict_rule_sensitivity"] = {"net": s["net"], "gross": s["gross"], "p": s["p"], "verdict": s["verdict"]}
+    return {"gates_if_strict_rule_descriptive_only": gates_strict}
 
 
 def break_even(daily_gross, leg, segment):
@@ -508,7 +557,8 @@ def descriptive(protocol, positions, bench):
 # --------------------------------------------------------------------------------------
 
 
-def run(a, study_dir=HERE, repo_root=REPO):
+def authorize(a, study_dir=HERE, repo_root=REPO):
+    """The full check chain; the only issuer of the Authorization the data pass needs."""
     record = Path(getattr(a, "freeze_record", None) or Path(study_dir) / "receipts" / "freeze-record.json")
     expected, commit = read_freeze_record(record)
     given = getattr(a, "protocol_sha256", None)
@@ -518,27 +568,36 @@ def run(a, study_dir=HERE, repo_root=REPO):
     verify_pins(frozen.protocol, study_dir, a.data_root, repo_root)
     head = git_clean_head(study_dir)
     verify_freeze_commit(study_dir, commit, expected)
-    result = data_pass(a, frozen, repo_root)
-    result.update(git_head=head, protocol_sha256=frozen.sha256, protocol_id=frozen.protocol["id"], evidence_label="HIST",
-                  scope=frozen.protocol["scope"])
+    return Authorization(frozen, head, study_dir, a.data_root, repo_root, _RUN_TOKEN)
+
+
+def run(a, study_dir=HERE, repo_root=REPO):
+    auth = authorize(a, study_dir, repo_root)
+    result = data_pass(auth)
+    protocol = auth.frozen.protocol
+    result.update(git_head=auth.head, protocol_sha256=auth.frozen.sha256, protocol_id=protocol["id"],
+                  evidence_label="HIST", scope=protocol["scope"])
     return result
 
 
-def data_pass(a, frozen, repo_root=REPO):
-    protocol = require(frozen).protocol
-    data_root = Path(a.data_root)
-    pins = json.loads((Path(repo_root) / REFERENCE_PINS["checkpoints.json"]).read_text())
-    fees = json.loads((Path(repo_root) / REFERENCE_PINS["fees-v3.json"]).read_text())
-    events = load_events(frozen, data_root)
-    scores, score_notes = check_scores(events, load_score_rows(frozen, data_root), protocol, pins)
-    opens, closes = load_auction_prices(frozen, data_root / "auctions" / "auctions.jsonl.gz", events)
-    quotes = load_rth_quotes(frozen, data_root / "spreads" / "quotes.jsonl", events)
-    positions, bench, excluded = build_positions(events, scores, opens, closes, quotes, fees, protocol["costs"])
+def data_pass(auth):
+    protocol = require(auth).frozen.protocol
+    pins = json.loads((auth.repo_root / REFERENCE_PINS["checkpoints.json"]).read_text())
+    fees = json.loads((auth.repo_root / REFERENCE_PINS["fees-v3.json"]).read_text())
+    events = load_events(auth)
+    scores, score_notes = check_scores(events, load_score_rows(auth), protocol, pins)
+    opens, closes = load_auction_prices(auth, events)
+    quotes = load_rth_quotes(auth, events)
+    positions, bench, excluded = build_positions(events, scores, opens, closes, quotes, fees, protocol["costs"], "operative")
+    strict_positions, _, strict_excluded = build_positions(events, scores, opens, closes, quotes, fees, protocol["costs"], "strict")
     items, gates = evaluate_items(protocol, positions, bench)
+    sensitivity = attach_strict_sensitivity(items, *evaluate_items(protocol, strict_positions, bench))
     return {
-        "schema": "sota-news-llm-results/2",
+        "schema": "sota-news-llm-results/3",
+        "score_rule": "operative (news_signal.operative_score, D22); strict_rule_sensitivity beside every item",
         "evaluated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "positions": len(positions),
+        "strict_rule": {"positions": len(strict_positions), "excluded": dict(strict_excluded), **sensitivity},
         "excluded": dict(excluded),
         "score_checks": score_notes,
         "items": items,

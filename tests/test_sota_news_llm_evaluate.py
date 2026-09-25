@@ -74,16 +74,24 @@ def make_event(eid, sym, session, window="overnight", lane="liquid", created=Non
     return ev
 
 
-def make_row(ev, label):
+def make_row(ev, raw_output):
+    """A valid score row; the stored label is the strict parse of raw_output (as score.py writes it)."""
     year = sig.checkpoint_year(ev["created_at"])
     entry = PINS["checkpoints"][str(year)]
-    labels = sig.VARIANTS[SETTINGS["variant"]]["labels"]
+    label, score, _ = sig.parse_label(raw_output, SETTINGS["variant"])
     return {"event_id": ev["event_id"], "checkpoint_year": year, "revision": entry["revision"],
             "weights_sha256": entry["files"]["pytorch_model.bin"]["sha256"], "code_sha256": PINS["reviewed_code"]["sha256"],
             "variant": SETTINGS["variant"], "template_sha256": SETTINGS["template_sha256"], "dtype": SETTINGS["dtype"],
             "matmul": SETTINGS["matmul"], "decoder": SETTINGS["decoder"],
             "prompt_sha256": sig.sha256_text(sig.model_input(ev["company"], ev["headline"], SETTINGS["variant"])),
-            "raw_output": label, "stop": "eos", "label": label, "score": labels.get(label, 0)}
+            "raw_output": raw_output, "stop": "eos", "label": label, "score": score}
+
+
+def authorization(protocol_path, digest, data_root):
+    """Test-only: an Authorization for a synthetic data root, issued with the module's private
+    token (the production path is authorize(), exercised in GuardedRunInGit)."""
+    frozen = ev_mod.guard(protocol_path, digest)
+    return ev_mod.Authorization(frozen, "0" * 40, BLUEPRINT, data_root, ROOT, ev_mod._RUN_TOKEN)
 
 
 class ProtocolConsistency(unittest.TestCase):
@@ -110,9 +118,14 @@ class ProtocolConsistency(unittest.TestCase):
             self.assertIn(item["series"], ("long", "long_short", "long_bench"))
         m = p["multiplicity"]
         self.assertEqual(m["primary"]["items"], ["NEWS-1", "NEWS-4"])
-        self.assertEqual(m["secondary"]["items"], ["NEWS-1", "NEWS-2B", "NEWS-3"])
-        self.assertAlmostEqual(m["gatekeeping"]["alpha"], 0.05 / 3)
+        self.assertEqual(m["secondary"]["members"], {"NEWS-1": ["NEWS-1"], "LONG-ONLY": ["NEWS-2B", "NEWS-2"], "NEWS-3": ["NEWS-3"]})
+        self.assertEqual((m["primary"]["alpha"], m["secondary"]["alpha"]), (0.05, 0.05))
+        self.assertNotIn("gatekeeping", m)
+        self.assertEqual(p["gates"]["long_only_member"], "LONG-ONLY")
+        self.assertEqual(p["gates"]["rth_member"], "NEWS-3")
+        self.assertIn("0.10", p["minimum_detectable_effect"]["error_bound"])
         self.assertIn("2026-09-21 asset master", p["scope"])
+        self.assertTrue(any(d["id"] == "D22" for d in p["deviations"]))
 
 
 class GuardRefusals(unittest.TestCase):
@@ -165,44 +178,52 @@ class GuardRefusals(unittest.TestCase):
             with self.assertRaises(ev_mod.Refusal, msg=field):
                 ev_mod.guard(path, digest)
 
-    def test_token_cannot_be_forged_and_every_loader_checks_it(self):
+    def test_tokens_cannot_be_forged_and_guard_alone_cannot_open_the_data(self):
         with self.assertRaises(ev_mod.Refusal):
             ev_mod.FrozenProtocol({}, "a" * 64, "p", object())
-        fake = SimpleNamespace(protocol={}, sha256="a" * 64, path=self.dir / "protocol.json", _token=object())
+        path, digest = write_protocol(self.dir, frozen_protocol())
+        frozen = ev_mod.guard(path, digest)  # protocol checks only: no pins, record or git
+        with self.assertRaises(ev_mod.Refusal):
+            ev_mod.Authorization(frozen, "0" * 40, BLUEPRINT, self.dir, ROOT, object())
+        with self.assertRaises(ev_mod.Refusal):
+            ev_mod.Authorization(SimpleNamespace(_token=object()), "0" * 40, BLUEPRINT, self.dir, ROOT, ev_mod._RUN_TOKEN)
+        fake = SimpleNamespace(frozen=frozen, data_root=self.dir, repo_root=ROOT, _token=object())
         loaders = [
-            lambda f: ev_mod.load_events(f, self.dir),
-            lambda f: ev_mod.load_score_rows(f, self.dir),
-            lambda f: ev_mod.load_auction_prices(f, self.dir / "a.jsonl.gz", []),
-            lambda f: ev_mod.load_rth_quotes(f, self.dir / "q.jsonl", []),
-            lambda f: ev_mod.data_pass(SimpleNamespace(data_root=self.dir), f),
+            lambda t: ev_mod.load_events(t),
+            lambda t: ev_mod.load_score_rows(t),
+            lambda t: ev_mod.load_auction_prices(t, []),
+            lambda t: ev_mod.load_rth_quotes(t, []),
+            lambda t: ev_mod.data_pass(t),
         ]
         for loader in loaders:
-            for bad in (None, fake):
+            for bad in (None, fake, frozen):  # the public guard()'s token is not enough
                 with self.assertRaises(ev_mod.Refusal):
                     loader(bad)
 
     def test_loaders_refuse_after_the_protocol_changes(self):
         path, digest = write_protocol(self.dir, frozen_protocol())
-        frozen = ev_mod.guard(path, digest)
-        (self.dir / "q.jsonl").write_text("")
-        self.assertEqual(ev_mod.load_rth_quotes(frozen, self.dir / "q.jsonl", []), {})
+        (self.dir / "spreads").mkdir()
+        (self.dir / "spreads" / "quotes.jsonl").write_text("")
+        auth = authorization(path, digest, self.dir)
+        self.assertEqual(ev_mod.load_rth_quotes(auth, []), {})
         path.write_bytes(path.read_bytes() + b" ")
         with self.assertRaises(ev_mod.Refusal):
-            ev_mod.load_rth_quotes(frozen, self.dir / "q.jsonl", [])
+            ev_mod.load_rth_quotes(auth, [])
 
     def test_duplicate_auction_rows_are_refused(self):
         path, digest = write_protocol(self.dir, frozen_protocol())
-        frozen = ev_mod.guard(path, digest)
-        auctions = self.dir / "a.jsonl.gz"
+        auth = authorization(path, digest, self.dir)
+        (self.dir / "auctions").mkdir()
+        auctions = self.dir / "auctions" / "auctions.jsonl.gz"
         row = {"symbol": "A", "session": "2023-03-01", "o": [{"c": "O", "p": 10.0, "x": "N"}], "c": [{"c": "6", "p": 10.1, "x": "N"}]}
         with gzip.open(auctions, "wt") as fh:
             fh.write(json.dumps(row) + "\n")
         events = [make_event(1, "A", "2023-03-01")]
-        self.assertEqual(ev_mod.load_auction_prices(frozen, auctions, events), ({("A", "2023-03-01"): 10.0}, {("A", "2023-03-01"): 10.1}))
+        self.assertEqual(ev_mod.load_auction_prices(auth, events), ({("A", "2023-03-01"): 10.0}, {("A", "2023-03-01"): 10.1}))
         with gzip.open(auctions, "wt") as fh:
             fh.write(json.dumps(row) + "\n" + json.dumps(row) + "\n")
         with self.assertRaises(ev_mod.Refusal):
-            ev_mod.load_auction_prices(frozen, auctions, events)
+            ev_mod.load_auction_prices(auth, events)
 
     def test_pins_missing_absent_or_changed_are_refused(self):
         data = self.dir / "data"
@@ -243,6 +264,17 @@ class ScoreChecks(unittest.TestCase):
         chosen, notes = self.check(rows)
         self.assertEqual(notes, {"small_lane_unscored": 1})
 
+    def test_stored_strict_labels_are_validated_unchanged(self):
+        # a truncated UNFAVORABLE is stored as the strict PARSE_FAIL and passes; the
+        # operative rule is applied later, from raw_output, in build_positions
+        rows = {**self.rows, self.events[0]["event_id"]: [make_row(self.events[0], "UNFLEXIBLE")]}
+        self.assertEqual(rows[self.events[0]["event_id"]][0]["label"], "PARSE_FAIL")
+        chosen, _ = self.check(rows)
+        self.assertEqual(chosen[self.events[0]["event_id"]]["score"], 0)
+        relabelled = {**rows, self.events[0]["event_id"]: [dict(rows[self.events[0]["event_id"]][0], label="UNFAVORABLE", score=-1)]}
+        with self.assertRaises(ev_mod.Refusal):
+            self.check(relabelled)
+
     def test_refusals(self):
         e0 = self.events[0]["event_id"]
         cases = {
@@ -257,15 +289,16 @@ class ScoreChecks(unittest.TestCase):
                 self.check(rows)
 
 
-def overnight_world(n_days, start=date(2023, 3, 1), long_move=0.01, short_move=-0.01, other_move=0.0, noise=0.0):
-    """3 FAVORABLE, 2 UNFAVORABLE and 1 UNCLEAR liquid overnight events per weekday."""
+def overnight_world(n_days, start=date(2023, 3, 1), long_move=0.01, short_move=-0.01, other_move=0.0, noise=0.0,
+                    short_word="UNFAVORABLE"):
+    """3 FAVORABLE, 2 negative (raw output short_word) and 1 UNCLEAR liquid overnight events per weekday."""
     events, scores, opens, closes = [], {}, {}, {}
     d, days = start, 0
     while days < n_days:
         if d.weekday() < 5:
             wiggle = noise * math.sin(days * 1.7)
             for k, (label, move) in enumerate((("FAVORABLE", long_move), ("FAVORABLE", long_move), ("FAVORABLE", long_move),
-                                               ("UNFAVORABLE", short_move), ("UNFAVORABLE", short_move), ("UNCLEAR", other_move))):
+                                               (short_word, short_move), (short_word, short_move), ("UNCLEAR", other_move))):
                 ev = make_event(f"{days}{k}", f"S{k}", d.isoformat())
                 events.append(ev)
                 scores[ev["event_id"]] = make_row(ev, label)
@@ -304,6 +337,18 @@ class Pricing(unittest.TestCase):
         daily = ev_mod.daily_series(positions, "rth", "liquid", "net")
         self.assertEqual((daily["2023-03-01"]["n_long"], daily["2023-03-01"]["n_short"]), (1, 1))  # C excluded
 
+    def test_operative_rule_turns_unf_outputs_into_shorts_and_strict_does_not(self):
+        events, scores, opens, closes = overnight_world(1, short_word="UNFLEXIBLE")
+        op, bench_op, ex_op = ev_mod.build_positions(events, scores, opens, closes, {}, FEES, COSTS)
+        st, bench_st, ex_st = ev_mod.build_positions(events, scores, opens, closes, {}, FEES, COSTS, rule="strict")
+        self.assertEqual(sorted(p["side"] for p in op), [-1, -1, 1, 1, 1])
+        self.assertEqual(sorted(p["side"] for p in st), [1, 1, 1])
+        self.assertEqual(ex_st["no_position_PARSE_FAIL"], 2)
+        self.assertEqual(ex_op["no_position_UNCLEAR"], 1)
+        self.assertEqual(len(bench_op), len(bench_st))  # the benchmark ignores labels
+        with self.assertRaises(ValueError):
+            ev_mod.position_side(scores[events[0]["event_id"]], "loose")
+
     def test_missing_prices_and_neutral_labels_are_counted(self):
         events, scores, opens, closes = overnight_world(1)
         del closes[(events[0]["symbol"], events[0]["session"])]
@@ -324,9 +369,9 @@ def test_protocol(min_days=10):
 
 
 class FamiliesAndGates(unittest.TestCase):
-    def run_world(self, protocol=None, **kw):
+    def run_world(self, protocol=None, rule="operative", **kw):
         events, scores, opens, closes = overnight_world(60, noise=0.003, **kw)
-        positions, bench, _ = ev_mod.build_positions(events, scores, opens, closes, {}, FEES, COSTS)
+        positions, bench, _ = ev_mod.build_positions(events, scores, opens, closes, {}, FEES, COSTS, rule=rule)
         return ev_mod.evaluate_items(protocol or test_protocol(), positions, bench)
 
     def test_strong_selection_passes_long_only_and_long_short(self):
@@ -334,7 +379,9 @@ class FamiliesAndGates(unittest.TestCase):
         self.assertEqual(items["NEWS-1"]["verdict"], "rejected")
         self.assertTrue(items["NEWS-4"]["rejected_primary_sequence"])
         self.assertTrue(items["NEWS-2B"]["rejected_secondary_holm"])
-        self.assertTrue(items["NEWS-2"]["rejected_gatekeeping"])
+        self.assertTrue(items["NEWS-2"]["rejected_secondary_holm"])
+        self.assertEqual(items["NEWS-2"]["secondary_member"], "LONG-ONLY")
+        self.assertEqual(items["NEWS-2B"]["secondary_member_p"], max(items["NEWS-2"]["p"], items["NEWS-2B"]["p"]))
         self.assertTrue(gates["long_short_candidate"])
         self.assertTrue(gates["long_only_paper_candidate"])
         self.assertFalse(gates["rth_candidate"])
@@ -345,10 +392,23 @@ class FamiliesAndGates(unittest.TestCase):
         # every event rises 1%: the long leg is positive but no better than holding all events
         items, gates = self.run_world(long_move=0.01, short_move=0.01, other_move=0.01)
         self.assertTrue(items["NEWS-2"]["net"]["mean"] > 0)
+        self.assertLess(items["NEWS-2"]["p"], 0.001)  # the absolute leg alone would pass ...
         self.assertFalse(items["NEWS-2B"]["rejected_secondary_holm"])
-        self.assertFalse(items["NEWS-2"]["rejected_gatekeeping"])
+        self.assertFalse(items["NEWS-2"]["rejected_secondary_holm"])  # ... but the member needs both
+        self.assertEqual(items["NEWS-2"]["verdict"], "not_rejected")
         self.assertFalse(gates["long_only_paper_candidate"])
         self.assertFalse(gates["long_short_candidate"])
+
+    def test_strict_rule_is_reported_beside_every_item_and_never_gates(self):
+        items, gates = self.run_world(short_word="UNFLEXIBLE")
+        strict_items, strict_gates = self.run_world(short_word="UNFLEXIBLE", rule="strict")
+        extra = ev_mod.attach_strict_sensitivity(items, strict_items, strict_gates)
+        self.assertEqual(items["NEWS-1"]["verdict"], "rejected")  # operative: UNF -> short leg exists
+        self.assertEqual(items["NEWS-1"]["strict_rule_sensitivity"]["verdict"], "insufficient_sample")  # no short leg
+        self.assertTrue(gates["long_short_candidate"])
+        self.assertFalse(extra["gates_if_strict_rule_descriptive_only"]["long_short_candidate"])
+        for k in items:
+            self.assertEqual(set(items[k]["strict_rule_sensitivity"]), {"net", "gross", "p", "verdict"})
 
     def test_fixed_sequence_stops_after_news1(self):
         p = test_protocol()
@@ -459,6 +519,9 @@ class GuardedRunInGit(unittest.TestCase):
                                                 "recent_long_leg_mean_net", "recent_long_leg_days"})
         block = result["descriptive"]["overnight:liquid"]["overnight_full"]
         self.assertEqual(block["single_leg_days"], 0)
+        self.assertIn("operative", result["score_rule"])
+        self.assertEqual(result["strict_rule"]["positions"], 12 * 5 + 1)  # synthetic outputs are exact labels
+        self.assertTrue(all("strict_rule_sensitivity" in v for v in result["items"].values()))
 
     def test_wrong_cli_sha_is_refused(self):
         with self.assertRaises(ev_mod.Refusal):
