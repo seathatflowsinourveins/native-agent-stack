@@ -1,17 +1,22 @@
-# Portable guarded runners
+# Portable guarded runners and the switch tool
 
 Two host-local launchers that keep a heavy maintenance job, and every process it
 spawns, inside its own native systemd scope with hard memory, task and runtime
 limits, plus a CPU quota where the user manager delegates the cpu controller. They exist because an unbounded scan or build on a WSL2 host can exhaust
 the VM and take the whole session down; the scope kills the job instead.
 A third script, `gitleaks-guarded-macos`, applies the same Gitleaks caps on
-macOS, which has no per-job cgroup (see "macOS" below).
+macOS, which has no per-job cgroup (see "macOS" below). A fourth tool,
+`ecosystem-switch`, is unrelated to job containment: it is the one atomic
+switch point a host uses to move an already-adopted component from one
+installed version to another (see "ecosystem-switch" near the end of this
+page).
 
 | Script | Role |
 | --- | --- |
 | `ecosystem-bounded-run` | Generic launcher: runs `COMMAND [ARG ...]` in a transient `--user --scope` unit with `MemoryHigh`/`MemoryMax`/`MemorySwapMax`/`TasksMax`/`RuntimeMaxSec` applied, and `CPUQuota` where cpu is delegated (see "CPU quota" below). Refuses to run at all when it cannot contain the job. |
 | `gitleaks-guarded` | Gitleaks front end: preserves upstream Gitleaks argument and exit-code semantics, adds a per-user non-blocking lock so two scans cannot run at once, and delegates the actual scan to `ecosystem-bounded-run`. |
 | `gitleaks-guarded-macos` | macOS Gitleaks front end: the same argument and exit-code semantics, a per-user lock that waits up to 60 s, and a footprint watchdog that kills the scan's whole process tree above 6 GiB or after 600 s. Python 3 standard library only. |
+| `ecosystem-switch` | Python-stdlib CLI: one `current/<id>` indirection per adopted component, flipped atomically by `apply`, gated by a receipt/window/memory/drift check, with a hash-chained ledger and an automatic rollback on a failed post-apply verify. |
 
 ## Provenance
 
@@ -406,3 +411,165 @@ opened at line 22 (line 21 before the 2026-09-24 re-sync) survives the final `ex
 observation, not a suite assertion.
 
 The shellcheck structural test excludes `SC2317` (info: "command appears to be unreachable"): the bounded runner's cleanup function is only reached through `trap`, which the shellcheck release on the current GitHub-hosted image (its version is not captured in the run log) reports as unreachable while 0.11.0 is clean; the scripts are kept faithful to their recorded provenance (only the divergences listed above) rather than annotated for that finding.
+
+## `ecosystem-switch`
+
+**Why.** Before this tool, every consumer of an adopted component -- `bin/*`
+symlinks, a systemd unit's `Environment=PATH=...`, a wrapper script, an MCP
+server config -- pointed straight at that component's versioned install
+(`tools/<name>-<version>`), and "rolling forward" meant hand-editing each of
+those consumers, with `ln -sfn` (a remove-then-create window, never atomic)
+for the symlink ones. `ecosystem-switch` introduces one indirection,
+`current/<id>`, so every consumer is edited exactly once (by `adopt --relink`,
+described below) and every later version change is one atomic flip of that
+one link, with a receipt/window/memory/drift gate in front of it, a
+hash-chained record behind it, and an automatic reverse-order rollback if the
+post-apply verify fails.
+
+**Install.** Same pattern as the guarded runners above: copy the file to
+`$ECO_INSTALL_ROOT/bin/ecosystem-switch` and make sure that directory is on
+`PATH`. It is Python 3 standard library only (no pip install, no virtualenv).
+
+```bash
+install -m 0755 adoption/tools/ecosystem-switch "$ECO_INSTALL_ROOT/bin/ecosystem-switch"
+```
+
+**Component spec.** `ecosystem-switch` manages exactly the components named in
+`$ECO_INSTALL_ROOT/switch/components.json` (or an explicit `--spec PATH`,
+including a full `adoption/pins-linux-x86_64.json`-shaped `{"tools": [...]}`
+file, from which it reads each tool's `id`, `version`, `root_name`,
+`current_link`, `entrypoints[]`, `surfaces[]`, `state_dirs[]`, `window` and
+`rollback_class` -- see `adoption/pins-schema-v2.json` for the exact shape of
+each field). A component with `root_name`/`current_link` both `null` (a
+self-updating `native`-kind pin such as `claude-code`, or a `uv-tool`-kind
+pin whose environment `uv` itself owns) has no switch-managed root at all;
+`adopt --relink` skips it and `adoption/pins-linux-x86_64.json`'s
+`divergence[]` array is where that is declared, not this tool.
+
+**One-time migration: `adopt --relink [--component ID ...] [--spec PATH]`.**
+For each managed component, creates `current/<id>` pointing at whatever real
+root is already active (a no-op in terms of real, resolved paths: `readlink
+-f` on every entrypoint before and after this command must be identical --
+enforced, not just documented, by an in-process check that aborts the whole
+relink if it is not), then repoints every `entrypoints[]` symlink and every
+`surfaces[]` `text-replace`/`file-write` surface (a systemd unit, wrapper
+script or MCP config text) from the real root to `current/<id>/...`. A
+`text-replace` surface under a path containing `/frozen/` is refused outright
+before anything is written; every other one backs up the original bytes
+under `switch/backups/<txn>/` first and refuses unless its declared `old`
+substring occurs exactly `expected_count` times. Idempotent: re-running it
+once relinked leaves everything unchanged. `adopt --baseline [--spec PATH]`
+is the read-only counterpart: it snapshots the current, already-relinked
+state (or records that a component is not relinked yet) without changing
+anything, for `status`/`verify` to compare against later. `adopt --resync ID
+--reason TEXT` accepts a live value some out-of-band change (an operator's
+manual `ln -sfn`, the pre-switch workflow) produced, recording the reason in
+the ledger, so `apply`'s drift check does not keep refusing it.
+
+**Everyday version change: `plan` then `apply`.** `plan ID --to-root PATH
+--receipt RID` prints the exact ordered operations `apply` would run and
+their `plan_sha256`; `apply ID --to-root PATH --receipt RID --window NAME
+--plan-sha256 SHA [--confirm-within SEC]` re-computes that same plan and
+refuses if its hash no longer matches (something changed between review and
+execution), then, only once every gate below passes, executes it and appends
+one hash-chained ledger entry per operation:
+
+- **Receipt gate.** `--receipt RID` names a
+  `switch/receipts/<RID>.json` document shaped like
+  `tools/sota-convergence/native-rollout-receipt.schema.json`. `apply` refuses
+  unless that receipt's overall `status` is `"passed"`, its `identity`
+  matches the component and target version, tiers `T0`, `T2` and `T4` are all
+  `"passed"`, and tier `T1` is either `"passed"` or explicitly `"unavailable"`
+  with a stated reason.
+- **Window gate.** `--window NAME` names `switch/windows/<name>.json`
+  (`{name, start_utc, end_utc, allowed_components}`); `apply` refuses outside
+  that time range or when the component is not in `allowed_components`.
+- **Memory gate.** A plan step that restarts a unit (a `surfaces[]` entry of
+  kind `unit-restart`) refuses when `/proc/meminfo`'s `MemAvailable` is below
+  a floor (default 6 GiB, `ECOSYSTEM_SWITCH_MIN_MEMORY_KIB` only ever lowers
+  it, for tests) -- the same rule this rollout's own workers apply to
+  themselves before a heavy job (`docs/linux-efficiency.md`), applied here to
+  a restart that may load a model.
+- **Drift gate.** If `current/<id>`'s live target no longer matches what the
+  ledger last recorded, `apply` refuses and names `adopt --resync` as the
+  fix, rather than silently overwriting an out-of-band change.
+- **Denylist.** A `unit-restart` step never restarts
+  `adaptive-paper-rung1x-20260923-ladder2`, `ibkr-paper-post-20260923`,
+  `incentive-forward@1330`, `mover-daily-scan-0925` or
+  `mover-rth-trial-20260924`, whether or not a receipt or window would
+  otherwise allow it.
+
+After the operations run, `apply` runs the same check `verify` below runs for
+that one component; a failure there triggers an immediate, in-process,
+reverse-order rollback of everything the transaction just did, and the
+command exits non-zero. On success, with no `--confirm-within`, the
+transaction is immediately `applied`. With `--confirm-within SEC`, it asks
+`systemd-run --user --on-active=<SEC>s -- ecosystem-switch rollback --txn T
+--if-unconfirmed` to call back later (real usage: this always fires well
+after `apply` itself has returned and released its lock) and the
+transaction's own status is `pending_confirmation` until `confirm --txn T` is
+run or that timer fires. `ECOSYSTEM_SWITCH_SYSTEMD_RUN` /
+`ECOSYSTEM_SWITCH_SYSTEMCTL` point tests at stub executables instead of the
+real commands.
+
+**Everything else.** `status [--json] [--component ID]` prints each managed
+component's current root and every recorded transaction; `confirm --txn TXN`
+marks a pending transaction confirmed and best-effort stops its revert timer;
+`rollback ID | --txn TXN [--if-unconfirmed]` undoes a transaction's
+operations in reverse order (`--if-unconfirmed` is a no-op once the
+transaction was already confirmed or already rolled back -- exactly what the
+scheduled timer above calls); `verify [--component ID] --json` re-checks live
+state against the ledger and the ledger's own hash chain, independent of any
+apply; `recover` rolls back any transaction still `in_progress` (a crash
+mid-`apply` or mid-`relink`) rather than ever completing one after the fact;
+`prune --list` reports `tools/<name>-<version>` roots no `current/<id>` link
+points at and that this tool's own (reduced-scope: `PATH` entries and `bin/`
+symlink targets only, no process/mount/unit/citation scan --
+`bin/ecosystem-wave-retention` on the host has the fuller technique this
+should grow into) in-use check does not find referenced; `prune --apply ROOT
+--reason TEXT` removes one such eligible root and records the reason;
+`write-installed-versions` regenerates an `installed-versions.txt`-style
+report from the switch state, independent of running a fresh bootstrap.
+
+**Safety.** A global `flock` on `switch/switch.lock` (busy -> exit 75, the
+same convention as `gitleaks-guarded` above) and, in the same call, the
+bootstrap lock `bootstrap-linux.sh` itself takes, so a switch operation and a
+bootstrap run can never interleave. The ledger
+(`switch/ledger.jsonl`, 0600, append-only, one JSON object per line: `seq,
+txn, op, component, surface, from, to, pre_sha256, post_sha256, backup,
+receipt, window, rollback_class, actor, at_utc, prev_hash, hash`) is hash-
+chained (`hash = sha256(prev_hash + canonical_json(entry))`); `verify` and
+`recover` both re-derive that chain and report a break rather than trust a
+cached summary. `switch/state.json` is always recomputed from the ledger,
+never hand-edited.
+
+**What the tests establish (`tests/test_adoption_switch.py`).** A synthetic
+temporary `ECO_INSTALL_ROOT` throughout, with `ECOSYSTEM_SWITCH_SYSTEMCTL` /
+`ECOSYSTEM_SWITCH_SYSTEMD_RUN` stubs for the unit-restart and confirm-or-
+revert tests (one stub health-probes a real, separately copied Python
+interpreter running under the new root, because `/proc/<pid>/exe` reports the
+exec'd file's own real path, not a symlink's target). Covered: relink
+preserves every real, resolved path and is idempotent; a `text-replace`
+surface is rewritten and backed up, a frozen one is refused untouched, and a
+partial relink failure is left `in_progress` for `recover` to roll back;
+apply's receipt/window/memory/drift/denylist gates each refuse under a
+`.stderr` naming the reason and leave the live entrypoint unchanged; a failed
+verify triggers the automatic rollback; `rollback` (no `--txn`) selects the
+most recently touched transaction by ledger sequence, not by sorting
+transaction-id text (an earlier draft of this tool picked the wrong one this
+way, confirmed by a failing test before the fix); a tampered ledger line is
+detected by `verify`; a held `switch/switch.lock` makes a second operation
+exit exactly 75; and `prune --list`/`--apply` distinguish a referenced root
+from an eligible one. The lower-level `text-replace`/`file-write`/
+`native-cli`/`data-backup`/`data-restore` operation functions are additionally
+exercised directly (`OperationUnitTests`), because none of this track's
+shipped `adoption/pins-linux-x86_64.json` entries has a populated
+`surfaces[]` of those kinds to drive them through the CLI end to end yet --
+every one of the 14 migrated pins is a bare CLI tool with no known external
+hard-coded-root consumer today. `switch.md`'s Facts section names the actual
+hard-coded roots a later qualify wave should give real `surfaces[]` entries
+(`vllm`, `gitleaks`, `mcp-inspector`, `serena-context`, `dagu`,
+`adaptive-paper-runtime`; see `adoption/pins-linux-x86_64.json`'s
+`candidates[]`), which is also why the denylisted-unit names above are
+enforced unconditionally rather than only for a component that happens to
+declare them.

@@ -159,6 +159,93 @@ unavailable UVA support. Preserve the accepted environment and model/vector
 data; repeating installation until the version number is newer would not
 resolve that compatibility failure.
 
+### Switching an adopted component's active version
+
+Everything above keeps the old versioned prefix around "for rollback" as a
+manual convention: today, moving a component from one already-installed
+version to another means finding and re-running every `ln -sfn` that pointed
+at the old prefix by hand, non-atomically, with no record of what changed and
+no automatic way back. `adoption/tools/ecosystem-switch`
+(`adoption/tools/README.md` has its full command reference) replaces that
+manual step for an adopted component, once `adopt --relink` has run for it
+once: every consumer -- `bin/*`, a systemd unit, a wrapper script, an MCP
+config -- is repointed at `current/<id>` instead of the real
+`tools/<name>-<version>` prefix, with no real, resolved path changing (that
+one-time migration verifies this itself, `readlink -f` before and after,
+before it touches anything). From then on, moving that component to a
+different already-installed prefix (the vLLM 0.25.0/0.29.0 case above, for
+example, once vLLM is switch-adopted) is one `apply`, which flips only
+`current/<id>` and restarts only the units the component's own `surfaces[]`
+name -- never `adaptive-paper-rung1x-20260923-ladder2`,
+`ibkr-paper-post-20260923`, `incentive-forward@1330`,
+`mover-daily-scan-0925` or `mover-rth-trial-20260924`, which `apply` refuses
+to restart under any circumstance.
+
+**Ledger.** Every operation `apply`, `adopt --relink` or `rollback` performs
+appends one entry to `$ECO_INSTALL_ROOT/switch/ledger.jsonl`: a 0600,
+append-only, newline-delimited JSON file, each line hash-chained to the one
+before it (`hash = sha256(prev_hash + canonical_json({seq, txn, op,
+component, surface, from, to, pre_sha256, post_sha256, backup, receipt,
+window, rollback_class, actor, at_utc, prev_hash}))`, genesis `prev_hash` 64
+zero characters). `$ECO_INSTALL_ROOT/switch/state.json` (each component's
+current root, each transaction's status) is always recomputed from this
+ledger, on every command that needs it -- it is derived cache, never the
+source of truth, and is never hand-edited. `ecosystem-switch verify --json`
+independently re-derives the whole chain and reports a broken link, a
+mismatched entry hash, or a live root that no longer matches what the ledger
+last recorded, rather than trusting a cached summary.
+
+**Windows.** `apply --window NAME` requires
+`$ECO_INSTALL_ROOT/switch/windows/<name>.json` (`{name, start_utc, end_utc,
+allowed_components}`) to name the switching component and to be open right
+now; a maintenance window for a component that also has a live service (an
+`unit-restart` surface) additionally gates that restart on
+`/proc/meminfo`'s `MemAvailable` staying above a floor (default 6 GiB), so a
+version switch never restarts a model-loading service while the host is
+already under memory pressure.
+
+**Rollback.** `apply` itself runs a post-switch verify and, on failure, rolls
+back every operation of that one transaction in reverse order automatically,
+in-process, before it ever returns to the caller. `apply --confirm-within
+SEC` additionally schedules `systemd-run --user --on-active=<SEC>s --
+ecosystem-switch rollback --txn T --if-unconfirmed`, so an operator who never
+runs `confirm --txn T` gets an automatic revert once that window elapses,
+without needing to stay attached to watch it. `rollback ID` (no `--txn`)
+targets that component's most recently touched transaction (by ledger
+sequence -- never by sorting transaction-id text, which sorts a plain `apply`
+transaction's id after a `relink-`-prefixed one regardless of which actually
+happened more recently). A crashed or interrupted `apply`/`adopt --relink`
+never completes after the fact: `ecosystem-switch recover` finds any
+transaction still `in_progress` and rolls it back, the same as an explicit
+`rollback` would.
+
+**Prune.** `prune --list` reports which `tools/<name>-<version>` prefixes no
+`current/<id>` link points at and this tool's own reduced-scope in-use check
+(PATH entries and `bin/` symlink targets only) does not find referenced
+elsewhere; `prune --apply ROOT --reason TEXT` removes one such prefix and
+records the reason on the ledger. This in-use check is deliberately narrower
+than `bin/ecosystem-wave-retention` on the host (which additionally inspects
+every process, systemd unit and a citation search across evidence
+repositories for its own, differently-scoped notion of a prunable wave
+cache): treat an "eligible" prefix here as a lead worth checking by hand
+before deleting it, not a proof that nothing on the host still needs it, and
+extend this check with that script's fuller technique before relying on it
+unattended.
+
+Component coverage today is intentionally partial: `adoption/pins-linux-x86_64.json`'s
+schema_version 2 migration gave every one of its 14 existing pins the fields
+`ecosystem-switch` needs (`root_name`, `current_link`, `entrypoints[]`,
+`surfaces[]`, `state_dirs[]`, `window`, `rollback_class`), but none of those
+14 is a live service with an external hard-coded root today, so none of their
+`surfaces[]` is populated yet. The actual hard-coded-root consumers this
+page's own Facts (see `docs/tasks/sota-rollout-20260925/briefs/switch.md`)
+named -- vLLM, the Gitleaks/mcp-inspector/serena-context guarded wrappers,
+Dagu, and the adaptive-paper `*/frozen/*` launchers -- are recorded as
+`pending` `candidates[]` in that same pins file rather than given fabricated
+`surfaces[]` entries; a later qualify wave should give each one a real pin
+and real `surfaces[]`, informed by that host script's fuller in-use
+technique for `prune`, before `ecosystem-switch` manages them.
+
 ## Native client integration and process lifecycle
 
 Register only the selected tool in the intended native client/project. Inspect
