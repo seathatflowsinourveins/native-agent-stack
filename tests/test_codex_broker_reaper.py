@@ -5,13 +5,23 @@ openai-codex plugin's `app-server-broker.mjs` (a real unix-socket server that
 answers `broker/shutdown`, spawned with a script file literally named
 `app-server-broker.mjs` so its real `/proc/<pid>/cmdline` matches guard (a)
 exactly) and, separately, a live "claude" look-alike (comm forced to "claude"
-via `prctl(PR_SET_NAME)`, since a Python-shebang script's own comm is the
-interpreter's, not the script's -- checked by hand against the real
-~/.local/bin/claude binary before writing this suite). No real broker, no
-real Claude Code or Codex session, and no plugin state directory on this
-host is read or touched: every state/workspace directory is a fresh
-tempfile.mkdtemp(), and `--state-root`/direct function calls always point at
-that synthetic tree.
+via `prctl(PR_SET_NAME)`, since a Python process run as `python3 script.py`
+reports comm == "python3", the interpreter's own name, not the script's --
+checked by hand against the real ~/.local/bin/claude binary before writing
+this suite; corrected in the 2026-09-25 fix round, see the tool's own
+`is_claude_or_codex_process` docstring for why -- it is not shebang
+rewriting). No real broker, no real Claude Code or Codex session, and no
+plugin state directory on this host is read or touched: every
+state/workspace directory is a fresh tempfile.mkdtemp(), and
+`--state-root`/direct function calls always point at that synthetic tree.
+
+This suite spawns real processes and reads their live /proc/<pid> state
+(cmdline, comm, cwd, stat, uptime) plus sets a process's name with
+prctl(PR_SET_NAME) via ctypes -- all Linux-only, like the tool itself; see
+LINUX_ONLY below (precedent: tests/test_adoption_bootstrap.py's
+LINUX_X86_64_ONLY, applied there per-method since only some of that file's
+tests are platform-specific -- applied here per-class since this whole
+suite is).
 """
 from __future__ import annotations
 
@@ -231,6 +241,7 @@ class ReaperTestCase(unittest.TestCase):
         return proc
 
 
+@LINUX_ONLY
 class PidReuseGuardTests(ReaperTestCase):
     """Guard (a): cmdline must still name app-server-broker.mjs serve --endpoint <same>."""
 
@@ -271,6 +282,7 @@ class PidReuseGuardTests(ReaperTestCase):
         self.assertIn("pid reuse", record["reasons"][0])
 
 
+@LINUX_ONLY
 class RunningJobGuardTests(ReaperTestCase):
     """Guard (b): no job in state.json may have a non-terminal status."""
 
@@ -305,6 +317,7 @@ class RunningJobGuardTests(ReaperTestCase):
         self.assertFalse(record["eligible"])
 
 
+@LINUX_ONLY
 class LiveCwdGuardTests(ReaperTestCase):
     """Guard (c): workspace gone, or no live claude/codex process is under it."""
 
@@ -473,7 +486,37 @@ class MinAgeGuardTests(ReaperTestCase):
         self.assertGreaterEqual(started, before - 2.0)
         self.assertLessEqual(started, time.time() + 2.0)
 
+    def test_age_is_correct_even_with_an_artificially_stale_reference_time(self):
+        # A fix-round review finding alleged age is "overstated by the
+        # elapsed evaluation time" because run() passes one `now`, captured
+        # once, as both process_start_epoch's `reference` and the external
+        # age subtrahend. Checked against the source (not just re-argued):
+        # algebraically that cancels exactly --
+        #   age = now - started = now - ((now - uptime) + ticks/clk)
+        #       = uptime - ticks/clk
+        # -- which does not depend on `now`/`reference` at all; it is always
+        # the broker's true instantaneous age as of the live /proc/uptime
+        # read, not a value skewed by how stale the caller's `now` is.
+        # Proven here with a reference an hour stale, far beyond any real
+        # scan lag, so a real dependence on `reference` would be unmissable.
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        state_dir = self.root / "workspace-slug-stale-reference"
+        state_dir.mkdir()
+        proc, endpoint = self.spawn_fake_broker(cwd=workspace)
+        write_broker_json(state_dir, endpoint=endpoint, pid=proc.pid)
+        write_state_json(state_dir, jobs=[])
 
+        stale_reference = time.time() - 3600.0  # 1 hour stale
+        record = module.evaluate_broker(state_dir, min_age=0.0, now=stale_reference)
+        self.assertIsNotNone(record["age_seconds"])
+        # True age is close to 0 (the broker was just spawned); a real
+        # staleness bug of the kind alleged would shift this by ~3600s.
+        self.assertGreaterEqual(record["age_seconds"], 0.0)
+        self.assertLess(record["age_seconds"], 5.0)
+
+
+@LINUX_ONLY
 class ReceiptShapeTests(ReaperTestCase):
     def test_list_mode_receipt_shape_and_file_written(self):
         state_root = self.root / "state"
@@ -561,6 +604,7 @@ class ReceiptShapeTests(ReaperTestCase):
         self.assertTrue(module.process_exists(proc.pid))
 
 
+@LINUX_ONLY
 class ApplyAndEscalationTests(ReaperTestCase):
     def test_apply_stops_an_eligible_broker_via_rpc_alone(self):
         state_root = self.root / "state"
@@ -673,7 +717,85 @@ class ApplyAndEscalationTests(ReaperTestCase):
         # The real process must be untouched: no signal was actually sent to it.
         self.assertTrue(module.process_exists(proc.pid))
 
+    def test_escalation_is_skipped_when_broker_is_not_its_own_process_group_leader(self):
+        # Fix-round finding: --escalate sent SIGTERM to os.getpgid(pid)
+        # without checking pgid == pid; the docstring asserted the broker is
+        # always its own group leader (Node's detached:true) but the code
+        # never checked it. Deterministic simulation via monkeypatching
+        # os.getpgid, since a real pgid mismatch is racy/platform-dependent
+        # to set up portably.
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        proc, endpoint = self.spawn_fake_broker(cwd=workspace, extra_args=["--ignore-shutdown"])
+        record = {"pid": proc.pid, "endpoint": endpoint, "reasons": [], "rpc_result": None,
+                  "action": "none", "exit_observed": None}
 
+        original_wait = module.EXIT_WAIT_SECONDS
+        original_getpgid = os.getpgid
+        module.EXIT_WAIT_SECONDS = 0.3
+        os.getpgid = lambda target: target + 1 if target == proc.pid else original_getpgid(target)
+        self.addCleanup(setattr, module, "EXIT_WAIT_SECONDS", original_wait)
+        self.addCleanup(setattr, os, "getpgid", original_getpgid)
+
+        module.stop_broker(record, escalate=True)
+
+        self.assertEqual(record["action"], "escalation_skipped_not_group_leader")
+        self.assertIn("not its own process-group leader", " ".join(record["reasons"]))
+        self.assertFalse(record["exit_observed"])
+        # No signal was actually sent: the real process is untouched.
+        self.assertTrue(module.process_exists(proc.pid))
+
+    def test_apply_rechecks_each_broker_immediately_before_stopping_it(self):
+        # Fix-round finding: all brokers were evaluated up front and stopped
+        # one after another later, with no re-check of guards before each
+        # RPC; an earlier broker's own stop can take long enough for a
+        # session to attach to a later one in the same run. Deterministic
+        # simulation: make the *second* evaluate_broker() call (the pre-stop
+        # re-check inside run()) report a live session, rather than racing a
+        # real session attaching against real stop timing.
+        state_root = self.root / "state"
+        state_dir = state_root / "workspace-slug-recheck"
+        state_dir.mkdir(parents=True)
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        proc, endpoint = self.spawn_fake_broker(cwd=workspace)
+        write_broker_json(state_dir, endpoint=endpoint, pid=proc.pid)
+        write_state_json(state_dir, jobs=[])
+        shutil.rmtree(workspace)  # guard c satisfied for the initial scan
+
+        call_count = {"n": 0}
+        original_evaluate = module.evaluate_broker
+
+        def fake_evaluate(broker_dir, *, min_age, now):
+            call_count["n"] += 1
+            record = original_evaluate(broker_dir, min_age=min_age, now=now)
+            if call_count["n"] > 1:
+                # Simulate a session that attached between the initial scan
+                # and this broker's turn to be stopped.
+                record["eligible"] = False
+                record["guards"]["c_workspace_unused"] = False
+                record["reasons"].append("fixture: simulated live session attached before stop")
+            return record
+
+        module.evaluate_broker = fake_evaluate
+        self.addCleanup(setattr, module, "evaluate_broker", original_evaluate)
+
+        buffer = StringIO()
+        with redirect_stdout(buffer):
+            exit_code = module.main(["--apply", "--min-age", "0", "--state-root", str(state_root)])
+        self.assertEqual(exit_code, 0)
+        report = json.loads(buffer.getvalue())
+        record = report["brokers"][0]
+        self.assertEqual(record["action"], "skipped_recheck_failed")
+        self.assertFalse(record["eligible"])
+        self.assertEqual(report["summary"]["eligible"], 0)
+        self.assertEqual(report["summary"]["stopped"], 0)
+        self.assertEqual(report["summary"]["failed_to_stop"], 0)
+        # The broker (never signaled) must still be alive.
+        self.assertTrue(module.process_exists(proc.pid))
+
+
+@LINUX_ONLY
 class RpcTransportTests(ReaperTestCase):
     def test_send_shutdown_rpc_reports_socket_missing_for_a_stale_endpoint(self):
         result = module.send_shutdown_rpc(f"unix:{self.root}/nonexistent.sock")
@@ -681,6 +803,26 @@ class RpcTransportTests(ReaperTestCase):
 
     def test_send_shutdown_rpc_reports_unsupported_endpoint_for_non_unix_schemes(self):
         self.assertEqual(module.send_shutdown_rpc("pipe:\\\\.\\pipe\\example"), "unsupported_endpoint")
+
+
+@LINUX_ONLY
+class PlatformGuardTests(ReaperTestCase):
+    def test_main_refuses_to_run_without_proc(self):
+        # Fix-round finding: on a host with no /proc at all, every broker's
+        # own evaluation silently fails the same way a dead pid would ("pid
+        # N is not running"), reporting 0 eligible instead of an honest
+        # unsupported-platform error. proc_is_available() lets main() fail
+        # closed instead of misleading an operator; simulated here since
+        # this test host does have /proc.
+        original = module.proc_is_available
+        module.proc_is_available = lambda: False
+        self.addCleanup(setattr, module, "proc_is_available", original)
+
+        stderr_buffer = StringIO()
+        with redirect_stderr(stderr_buffer), self.assertRaises(SystemExit) as raised:
+            module.main(["--list"])
+        self.assertEqual(raised.exception.code, 2)
+        self.assertIn("/proc", stderr_buffer.getvalue())
 
 
 if __name__ == "__main__":

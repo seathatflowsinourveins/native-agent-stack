@@ -117,6 +117,22 @@ def process_exists(pid: int) -> bool:
     return Path(f"/proc/{pid}").is_dir()
 
 
+def proc_is_available() -> bool:
+    """False on a host with no /proc at all (this tool is Linux-only).
+
+    Every guard here reads /proc/<pid>/{cmdline,comm,cwd,stat}, /proc/uptime
+    and /proc/meminfo directly; without /proc every one of those reads
+    fails the same way a dead pid would (see read_proc_cmdline and
+    process_start_epoch, which both return None on OSError), so a live
+    broker on an unsupported host would be silently misreported as "pid N
+    is not running" -- 0 eligible, nothing wrong -- instead of failing
+    closed with an explicit, honest error. main() checks this once, up
+    front, rather than letting every broker's own evaluation fail the same
+    ambiguous way.
+    """
+    return Path("/proc").is_dir()
+
+
 def read_proc_cmdline(pid: int) -> list[str] | None:
     try:
         raw = Path(f"/proc/{pid}/cmdline").read_bytes()
@@ -582,9 +598,26 @@ def stop_broker(record: dict, *, escalate: bool) -> None:
         )
         return
 
+    try:
+        pgid = os.getpgid(pid)
+    except (ProcessLookupError, OSError) as error:
+        record["reasons"].append(f"escalation SIGTERM failed: {error}")
+        return
+    if pgid != pid:
+        # The docstring's premise (Node's detached:true spawn makes the
+        # broker its own process-group leader) does not hold here -- signal
+        # only a group the broker is confirmed to lead, since SIGTERM to
+        # someone else's group could reach unrelated live processes.
+        record["action"] = "escalation_skipped_not_group_leader"
+        record["reasons"].append(
+            f"escalation skipped: pid {pid} is not its own process-group leader (pgid {pgid}); "
+            "SIGTERM to that group could reach unrelated processes"
+        )
+        return
+
     record["action"] = "escalated_sigterm"
     try:
-        os.killpg(os.getpgid(pid), signal.SIGTERM)
+        os.killpg(pgid, signal.SIGTERM)
     except (ProcessLookupError, PermissionError, OSError) as error:
         record["reasons"].append(f"escalation SIGTERM failed: {error}")
         return
@@ -638,12 +671,32 @@ def run(args: argparse.Namespace) -> tuple[dict, int]:
     records = [evaluate_broker(broker_dir, min_age=args.min_age, now=now) for broker_dir in broker_dirs]
 
     if args.apply:
-        for record in records:
-            if record["eligible"]:
-                stop_broker(record, escalate=args.escalate)
+        for broker_dir, record in zip(broker_dirs, records):
+            if not record["eligible"]:
+                continue
+            # Re-check every guard immediately before acting, not once for
+            # the whole batch: `records` above came from a single evaluation
+            # pass, and an earlier broker's own stop (RPC + up to 15s wait,
+            # 35s with --escalate) can take long enough for a new session to
+            # attach to a *later* broker in this same list before its turn
+            # (ensureBrokerSession reuses any broker whose endpoint already
+            # answers, broker-lifecycle.mjs). Never act on a stale verdict.
+            recheck = evaluate_broker(broker_dir, min_age=args.min_age, now=time.time())
+            if not recheck["eligible"]:
+                record["eligible"] = False
+                record["action"] = "skipped_recheck_failed"
+                record["reasons"].append(
+                    "re-checked immediately before stopping and was no longer eligible ("
+                    + "; ".join(recheck["reasons"]) + "); left untouched"
+                )
+                continue
+            stop_broker(record, escalate=args.escalate)
         # Only meaningful once an action was actually attempted: --list
         # leaves exit_observed None (not-attempted) on every record, even an
-        # eligible one, and that must never read as a stop failure.
+        # eligible one, and that must never read as a stop failure. A
+        # failed re-check above already flips eligible to False, so it
+        # falls out of both sums too, exactly like any other ineligible
+        # broker (never touched, never a "failed to stop").
         failed = sum(1 for record in records if record["eligible"] and record["exit_observed"] is not True)
         stopped = sum(1 for record in records if record["eligible"] and record["exit_observed"] is True)
     else:
@@ -677,6 +730,12 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.min_age < 0:
         parser.error("--min-age must be >= 0")
+    if not proc_is_available():
+        parser.error(
+            "this host has no /proc: codex-broker-reaper reads /proc/<pid>/{cmdline,comm,cwd,stat}, "
+            "/proc/uptime and /proc/meminfo directly and only supports Linux (see adoption/tools/README.md); "
+            "refusing to run rather than silently report every broker as 'not running'"
+        )
 
     receipt, failed = run(args)
     text = json.dumps(receipt, indent=2, sort_keys=True)
