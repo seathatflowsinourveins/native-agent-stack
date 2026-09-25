@@ -240,6 +240,25 @@ class RelinkTests(SwitchFixture):
         self.assertFalse((self.root / "current" / "foo").exists(),
                          "current/foo must not be created either when an entrypoint would mismatch")
 
+    def test_relink_refuses_when_current_link_already_points_at_a_different_root(self):
+        # Minor finding: relink used to keep any existing current/<id> untouched and
+        # unconditionally repoint every entrypoint through it. Each entrypoint's own pre-check
+        # (above) only compares bin/foo's *current direct* target against real_root -- it says
+        # nothing about what current/foo itself already names. If current/foo already existed
+        # (e.g. apply ran once before relink ever did) and pointed at a *different* root, relink
+        # would still pass that pre-check (bin/foo is still a direct, unredirected symlink into
+        # real_root) and then silently move bin/foo to the *other* root by repointing it through
+        # current/foo -- the exact real-path change this tool promises never to make.
+        other_root = self.make_tool_root("foo-9.9.9", "v9")
+        (self.root / "current").mkdir()
+        (self.root / "current" / "foo").symlink_to(other_root.resolve())
+        before_target = os.readlink(self.root / "bin" / "foo")
+        result = run(self.env, "adopt", "--relink")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("already resolves to", result.stderr)
+        self.assertEqual(os.readlink(self.root / "bin" / "foo"), before_target, "bin/foo must be untouched")
+        self.assertEqual(switch.Ledger(self.root).all(), [], "a refused relink must leave no ledger entry")
+
     def test_relink_refuses_a_regular_file_entrypoint_instead_of_silently_symlinking_over_it(self):
         # A regular file at a bin/* entrypoint (not a symlink) must never be silently replaced by
         # a symlink: that conversion has no recorded inverse.
@@ -622,6 +641,26 @@ class ApplyGateTests(SwitchFixture):
                      "--window", "default", "--plan-sha256", "0" * 64)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("absolute", result.stderr)
+
+    def test_plan_and_apply_refuse_a_component_relink_never_pointed_bin_through(self):
+        # Minor finding: build_apply_plan used to check only that the spec *named* a
+        # current_link string, not that adopt --relink had actually created it yet. Applying
+        # before that would leave current/<id> created fresh at --to-root while bin/* still
+        # resolved directly into the old real root, unredirected -- apply reporting "applied"
+        # with no real change to what bin/* runs.
+        self.write_components({"never-relinked": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-1.0.0",
+            "current_link": "current/never-relinked", "entrypoints": [], "surfaces": [],
+            "state_dirs": [], "window": "default", "rollback_class": "safe",
+        }})
+        plan_result = run(self.env, "plan", "never-relinked", "--to-root", str(self.root_v2), "--receipt", "R9")
+        self.assertNotEqual(plan_result.returncode, 0)
+        self.assertIn("does not exist yet", plan_result.stderr)
+        apply_result = run(self.env, "apply", "never-relinked", "--to-root", str(self.root_v2), "--receipt", "R9",
+                           "--window", "default", "--plan-sha256", "0" * 64)
+        self.assertNotEqual(apply_result.returncode, 0)
+        self.assertIn("does not exist yet", apply_result.stderr)
+        self.assertFalse((self.root / "current" / "never-relinked").exists())
 
     def test_stale_plan_sha256_refuses(self):
         self.write_receipt("R1", "foo", "2.0.0")
@@ -1315,6 +1354,19 @@ class OperationUnitTests(unittest.TestCase):
         self.assertEqual((source / "a.txt").read_text(), "A")
         self.assertFalse((source / "c.txt").exists())
 
+    def test_op_data_backup_expands_a_tilde_state_dir_path(self):
+        # Minor finding: a state_dirs[] path like adoption/pins-linux-x86_64.json's own pending
+        # "~/.cache/qmd" or "~/.local/state/ai-memory" entries used to be treated as a literal
+        # relative path under ECO_INSTALL_ROOT (root/"~/.cache/qmd", which never exists) instead
+        # of this user's real home directory.
+        fake_home = self.root / "fake-home"
+        (fake_home / ".cache" / "qmd").mkdir(parents=True)
+        (fake_home / ".cache" / "qmd" / "index.db").write_text("data")
+        with unittest.mock.patch.dict(os.environ, {"HOME": str(fake_home)}, clear=False):
+            fields, inverse = switch.op_data_backup(self.root, "~/.cache/qmd", backup_dir=self.root / "backups")
+        self.assertTrue((Path(fields["backup"]) / "index.db").is_file())
+        self.assertEqual((Path(fields["backup"]) / "index.db").read_text(), "data")
+
     def test_op_data_backup_refuses_a_non_directory_source_instead_of_recording_an_empty_backup(self):
         with self.assertRaises(switch.SwitchError):
             switch.op_data_backup(self.root, "does-not-exist", backup_dir=self.root / "backups")
@@ -1360,6 +1412,22 @@ class OperationUnitTests(unittest.TestCase):
         # A receipt recorded for a *different* real root (e.g. a stale -r20260101 root, or a
         # different component entirely) must not authorize switching to this one.
         issue = switch.receipt_gate_issue(base, "foo", "2.0.0", root=self.root, to_root=str(self.root / "tools" / "foo-2.0.0-r20260101"))
+        self.assertIsNotNone(issue)
+        self.assertIn("install.root", issue)
+
+    def test_receipt_gate_fails_closed_when_install_root_is_missing(self):
+        # Minor finding: a receipt with no (or a non-string) install.root used to skip the root
+        # binding check entirely once root/to_root were given, silently authorizing any --to-root
+        # whose basename suffix matched the version.
+        no_install_root = {
+            "status": "passed", "identity": {"component_id": "foo", "version": "2.0.0"}, "install": {},
+            "tiers": [{"tier": "T0", "result": "passed"}, {"tier": "T1", "result": "unavailable", "unavailable_reason": "n/a"},
+                      {"tier": "T2", "result": "passed"}, {"tier": "T4", "result": "passed"}],
+        }
+        # Without root/to_root, still unaffected (the tier-rule-in-isolation contract).
+        self.assertIsNone(switch.receipt_gate_issue(no_install_root, "foo", "2.0.0"))
+        issue = switch.receipt_gate_issue(no_install_root, "foo", "2.0.0", root=self.root,
+                                          to_root=str(self.root / "tools" / "foo-2.0.0"))
         self.assertIsNotNone(issue)
         self.assertIn("install.root", issue)
 

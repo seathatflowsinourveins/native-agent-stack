@@ -217,6 +217,21 @@ def atomic_symlink(link_path: Path, target: str) -> None:
         raise
 
 
+def resolve_surface_path(root: Path, surface: str) -> Path:
+    """A surface's path (pins-v2 ``surfaces[]``/``state_dirs[]``'s own ``path``): ``~`` (or
+    ``~user``) expands to that user's real home directory -- a state_dirs[] path can live outside
+    ``$ECO_INSTALL_ROOT`` entirely (e.g. adoption/pins-linux-x86_64.json's own pending qmd
+    ``~/.cache/qmd`` and ai-memory ``~/.local/state/ai-memory`` entries; minor finding: this used
+    to be treated as a literal relative path under ``root``, e.g. ``$ECO_INSTALL_ROOT/~/...``,
+    which never exists). An absolute path (already covering the ``${STACK_HOME}``-resolved form
+    used elsewhere) is used as-is; anything else resolves under ``root``."""
+    if surface.startswith("~"):
+        return Path(surface).expanduser()
+    if surface.startswith("/"):
+        return Path(surface)
+    return root / surface
+
+
 def read_link_target(link_path: Path) -> str | None:
     try:
         return os.readlink(link_path)
@@ -498,9 +513,12 @@ def receipt_gate_issue(receipt: dict | None, component_id: str, version: str, *,
     documented tier rule in isolation pass neither), also requires the receipt's own
     ``install.root`` (after resolving its ``${STACK_HOME}`` placeholder against ``root``) to name
     that same ``to_root``, so a receipt authorizes only the specific root it was recorded for --
-    not merely a same-named version anywhere else on disk. ``install.marker_sha256`` is not
-    cross-checked here: no generic, per-component marker-file location is defined yet for
-    ecosystem-switch to locate on its own; a future qualify wave may add one."""
+    not merely a same-named version anywhere else on disk. A receipt with no (or a non-string)
+    ``install.root`` fails this check rather than skipping it (minor finding: it used to fail
+    open, silently authorizing any ``--to-root`` whose basename suffix happened to match
+    ``version``). ``install.marker_sha256`` is not cross-checked here: no generic, per-component
+    marker-file location is defined yet for ecosystem-switch to locate on its own; a future
+    qualify wave may add one."""
     if receipt is None:
         return "receipt not found"
     if receipt.get("status") != "passed":
@@ -512,11 +530,12 @@ def receipt_gate_issue(receipt: dict | None, component_id: str, version: str, *,
     if root is not None and to_root is not None:
         install = receipt.get("install") if isinstance(receipt.get("install"), dict) else {}
         declared_root = install.get("root")
-        if isinstance(declared_root, str):
-            resolved_root = declared_root.replace("${STACK_HOME}", str(root))
-            if os.path.normpath(resolved_root) != os.path.normpath(to_root):
-                return (f"receipt install.root {declared_root!r} (resolved {resolved_root!r}) does not match "
-                        f"--to-root {to_root!r}")
+        if not isinstance(declared_root, str) or not declared_root:
+            return "receipt has no install.root to bind it to a specific root"
+        resolved_root = declared_root.replace("${STACK_HOME}", str(root))
+        if os.path.normpath(resolved_root) != os.path.normpath(to_root):
+            return (f"receipt install.root {declared_root!r} (resolved {resolved_root!r}) does not match "
+                    f"--to-root {to_root!r}")
     tiers = {tier.get("tier"): tier for tier in receipt.get("tiers") or [] if isinstance(tier, dict)}
     for required in REQUIRED_PASSED_TIERS:
         tier = tiers.get(required)
@@ -598,7 +617,7 @@ def op_link(root: Path, surface: str, to: str) -> tuple[dict, dict]:
 
 def op_text_replace(root: Path, surface: str, old: str, new: str, *, backup_dir: Path,
                      expected_count: int = 1, expected_pre_sha256: str | None = None) -> tuple[dict, dict]:
-    target = root / surface if not surface.startswith("/") else Path(surface)
+    target = resolve_surface_path(root, surface)
     frozen_issue = frozen_surface_issue(surface, target)
     if frozen_issue:
         raise SwitchError(frozen_issue)
@@ -657,7 +676,7 @@ def _parse_toml_or_raise(data: bytes) -> None:
 
 
 def op_file_write(root: Path, surface: str, content: bytes, *, backup_dir: Path) -> tuple[dict, dict]:
-    target = root / surface if not surface.startswith("/") else Path(surface)
+    target = resolve_surface_path(root, surface)
     frozen_issue = frozen_surface_issue(surface, target)
     if frozen_issue:
         raise SwitchError(frozen_issue)
@@ -735,7 +754,7 @@ def op_unit_restart(unit: str, *, window_component_ok: bool, expected_root: str)
 
 
 def op_data_backup(root: Path, surface: str, *, backup_dir: Path) -> tuple[dict, dict]:
-    source = root / surface if not surface.startswith("/") else Path(surface)
+    source = resolve_surface_path(root, surface)
     if not source.is_dir():
         raise SwitchError(f"data-backup source is not a directory, refusing to record an empty backup: {source}")
     manifest = sorted(str(p.relative_to(source)) for p in source.rglob("*"))
@@ -750,7 +769,7 @@ def op_data_backup(root: Path, surface: str, *, backup_dir: Path) -> tuple[dict,
 
 
 def op_data_restore(root: Path, surface: str, backup_path: str) -> tuple[dict, dict]:
-    destination = root / surface if not surface.startswith("/") else Path(surface)
+    destination = resolve_surface_path(root, surface)
     source = Path(backup_path)
     if not source.is_dir():
         raise SwitchError(f"data-restore backup missing: {source}")
@@ -806,10 +825,19 @@ def apply_inverse(root: Path, entry: dict, spec_inverse: dict, *, backup_dir: Pa
 # plan / apply / confirm / rollback / verify / recover
 # --------------------------------------------------------------------------------------
 
-def build_apply_plan(spec: dict, component_id: str, to_root: str) -> list[dict]:
+def build_apply_plan(spec: dict, component_id: str, to_root: str, *, root: Path) -> list[dict]:
     entry = component_entry(spec, component_id)
     if not entry.get("current_link"):
         raise SwitchError(f"component {component_id!r} has no current_link; run adopt --relink first")
+    if not (root / entry["current_link"]).exists():
+        # Minor finding: build_apply_plan used to check only that the *spec* named a
+        # current_link string, not that adopt --relink had actually pointed bin/* through it
+        # yet. Applying before that left current/<id> created fresh at --to-root while every
+        # entrypoint still resolved directly into the *old* real root (never redirected through
+        # current/<id> in the first place) -- apply would report "applied" with the new root in
+        # `status`, but bin/* stayed on the old one.
+        raise SwitchError(f"component {component_id!r}'s {entry['current_link']} does not exist yet; "
+                           "run 'adopt --relink' first so bin/* already resolves through it")
     if not to_root.startswith("/"):
         raise SwitchError(f"--to-root must be an absolute path (got {to_root!r}): a symlink written at "
                            "current/<id> resolves a relative target against current/'s own directory, "
@@ -836,7 +864,7 @@ def plan_sha256(steps: list[dict]) -> str:
 def cmd_plan(args) -> int:
     root = eco_root()
     spec = load_spec(root, args.spec)
-    steps = build_apply_plan(spec, args.component, args.to_root)
+    steps = build_apply_plan(spec, args.component, args.to_root, root=root)
     digest = plan_sha256(steps)
     print(json.dumps({"component": args.component, "to_root": args.to_root, "receipt": args.receipt,
                       "plan_sha256": digest, "steps": steps}, sort_keys=True, indent=2))
@@ -848,7 +876,7 @@ def cmd_apply(args) -> int:
     with switch_locks(root):
         spec = load_spec(root, args.spec)
         entry = component_entry(spec, args.component)
-        steps = build_apply_plan(spec, args.component, args.to_root)
+        steps = build_apply_plan(spec, args.component, args.to_root, root=root)
         digest = plan_sha256(steps)
         if digest != args.plan_sha256:
             raise SwitchError(f"--plan-sha256 {args.plan_sha256} does not match the live plan ({digest}); "
@@ -1451,6 +1479,12 @@ def cmd_adopt(args) -> int:
                 # since converting it has no recorded inverse. The prospective target is computed
                 # straight from the real root, not through current/<id> (which may not exist
                 # yet, on a component's very first relink, so realpath could not see through it).
+                # Captured here (bin -> its pre-relink realpath) and checked again after the
+                # repoint loop below actually runs: README/lifecycle.md promise "readlink -f on
+                # every entrypoint before and after this command must be identical -- enforced,
+                # not just documented" (minor finding: previously enforced only before, never
+                # verified again after the write).
+                before_resolved_by_bin: dict[str, str] = {}
                 for entrypoint in entry.get("entrypoints") or []:
                     if not (isinstance(entrypoint, dict) and entrypoint.get("bin") and entrypoint.get("in_root")):
                         continue
@@ -1464,13 +1498,38 @@ def cmd_adopt(args) -> int:
                                 f"{entrypoint['bin']} currently resolves to {before_resolved}, but relinking it "
                                 f"through {entry['current_link']!r} would resolve to {prospective_resolved} -- "
                                 "the component spec's root_name/entrypoints do not match this live root")
+                        before_resolved_by_bin[entrypoint["bin"]] = before_resolved
                     elif link_path.exists():
                         raise SwitchError(
                             f"relink for {component_id!r} refused before changing anything: {entrypoint['bin']} "
                             f"({link_path}) is a regular file, not a symlink; replacing it with a symlink has no "
                             "recorded inverse -- back it up and remove it manually first")
-                ledger.append(txn=txn, op="txn_begin", component=component_id, surface="_txn")
+                # Minor finding ("no after-check"): the entrypoint loop above only validates each
+                # bin/* entrypoint's *own* resolved target, never current/<id> itself. If
+                # current/<id> already exists (e.g. apply already ran once before relink ever
+                # did, or a stale prior link from a different root_name), the entrypoint loop can
+                # still pass -- every bin/* still resolves directly into real_root, unredirected
+                # -- while current/<id> secretly names a *different* root. The repoint loop below
+                # would then blindly move every entrypoint through current/<id>, silently
+                # changing what they resolve to instead of preserving it (this tool's core
+                # promise). Refused here, before anything is touched, the same as every other
+                # pre-check above.
                 current_link_path = root / entry["current_link"]
+                if current_link_path.exists():
+                    if not current_link_path.is_symlink():
+                        raise SwitchError(
+                            f"relink for {component_id!r} refused before changing anything: "
+                            f"{entry['current_link']} ({current_link_path}) exists but is not a symlink; "
+                            "replacing it has no recorded inverse")
+                    current_link_resolved = os.path.realpath(current_link_path)
+                    if current_link_resolved != real_root:
+                        raise SwitchError(
+                            f"relink for {component_id!r} refused before changing anything: "
+                            f"{entry['current_link']} already resolves to {current_link_resolved}, not this "
+                            f"pin's real root {real_root} -- repointing every entrypoint through it would "
+                            "silently move them to a different root than the one just validated above "
+                            "(e.g. apply ran before relink); fix the component spec/pins or resync first")
+                ledger.append(txn=txn, op="txn_begin", component=component_id, surface="_txn")
                 if not current_link_path.exists():
                     fields, _inverse = op_link(root, entry["current_link"], real_root)
                     ledger.append(txn=txn, op="link", component=component_id, surface=entry["current_link"],
@@ -1482,6 +1541,15 @@ def cmd_adopt(args) -> int:
                     fields, _inverse = op_link(root, entrypoint["bin"], new_target)
                     ledger.append(txn=txn, op="link", component=component_id, surface=entrypoint["bin"],
                                   rollback_class=entry.get("rollback_class"), **fields)
+                    expected_before = before_resolved_by_bin.get(entrypoint["bin"])
+                    if expected_before is not None:
+                        after_resolved = os.path.realpath(root / entrypoint["bin"])
+                        if after_resolved != expected_before:
+                            raise SwitchError(
+                                f"relink for {component_id!r}: after relinking, {entrypoint['bin']} now resolves "
+                                f"to {after_resolved}, not {expected_before} as it did before -- aborting (the "
+                                "readlink -f before-and-after guarantee); run 'recover' to roll back this "
+                                "partial relink")
                 current_link_absolute = str(root / entry["current_link"])
                 backup_dir = root / "switch" / "backups" / txn
                 for surface in entry.get("surfaces") or []:
