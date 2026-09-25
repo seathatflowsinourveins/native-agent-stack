@@ -218,11 +218,11 @@ class NativeClaudeCodePinTests(unittest.TestCase):
     def test_claude_code_is_a_native_pin(self):
         tool = self.by_id["claude-code"]
         self.assertEqual(tool["kind"], "native")
-        self.assertEqual(tool["version"], "2.1.280")
+        self.assertEqual(tool["version"], "2.1.281")
         self.assertEqual(tool["version"], self.linux_by_id["claude-code"]["version"])
         self.assertRegex(tool["sha256"], SHA256_HEX)
         self.assertIn("darwin-arm64", tool["url"])
-        self.assertIn("2.1.280", tool["url"])
+        self.assertIn("2.1.281", tool["url"])
         self.assertNotIn("platform_dependency", tool)
 
     def test_claude_code_sha256_differs_from_linux_binary(self):
@@ -457,11 +457,16 @@ class ScriptStructureTests(unittest.TestCase):
         self.assertIn(r'exec "\$llama_prefix/llama-server" "\$@"', self.text)
         self.assertNotIn('ln -sfn "$prefix/llama-server"', self.text)
 
-    def test_version_report_covers_every_placed_executable_and_brew(self):
-        self.assertIn('for installed_executable in "$bin_dir"/*', self.text)
-        self.assertIn('"$installed_executable" --version', self.text)
-        self.assertIn("brew list --versions", self.text)
-        self.assertIn('tee "$ecosystem_root/installed-versions.txt"', self.text)
+    def test_version_report_checks_installed_pins_lists_bin_dir_and_brew(self):
+        # Declared, bounded probes replaced `--version` on every placed
+        # executable, which blocked on socraticode and context-mode (both
+        # start an MCP stdio server); tests/test_adoption_version_probes.py
+        # runs this report step under bash 3.2 when one is available.
+        self.assertIn('for id in ${installed_pin_ids[@]+"${installed_pin_ids[@]}"}; do', self.text)
+        self.assertIn('for executable in "$bin_dir"/*; do', self.text)
+        self.assertNotIn('"$installed_executable" --version', self.text)
+        self.assertIn("brew list --versions </dev/null", self.text)
+        self.assertIn('version_report="$ecosystem_root/installed-versions.txt"', self.text)
 
     @unittest.skipUnless(SHELLCHECK, "native shellcheck unavailable; CI installs the pinned analyzer")
     def test_shellcheck_style_is_clean(self):
@@ -774,6 +779,14 @@ class LlamaWrapperQuotingTests(unittest.TestCase):
     install_llama_cpp and find_one are extracted verbatim from the script and
     run with fetch stubbed out and a pre-built archive, so no network is used.
     The install root deliberately contains shell syntax.
+
+    The stand-in llama-server runs under this test's own Python, not /bin/sh.
+    With System Integrity Protection enabled (the macOS default), macOS purges
+    every DYLD_* variable when it launches a SIP-protected binary such as
+    /bin/sh. The wrapper exports DYLD_LIBRARY_PATH after its own /bin/sh has
+    started, so the value reaches the real llama-server, an unprotected
+    Mach-O, but a #!/bin/sh stand-in is a second /bin/sh launch and never
+    sees it on such a Mac.
     """
 
     def test_install_path_with_shell_syntax_is_data_in_the_wrapper(self):
@@ -786,9 +799,20 @@ class LlamaWrapperQuotingTests(unittest.TestCase):
             stage.mkdir()
             source = tmp_path / "src" / "llama"
             source.mkdir(parents=True)
+            # A space-free path for the shebang line, whatever sys.executable is.
+            interpreter = tmp_path / "python"
+            interpreter.symlink_to(sys.executable)
             server = source / "llama-server"
-            server.write_text('#!/bin/sh\nprintf "%s\\n%s\\n" "$0" "$DYLD_LIBRARY_PATH"\n')
+            server.write_text(f"#!{interpreter}\nimport os, sys\nprint(sys.argv[0])\n"
+                              "print(os.environ.get('DYLD_LIBRARY_PATH', ''))\n")
             server.chmod(0o755)
+            # Control: an interpreter that drops even a DYLD_* value handed to it
+            # directly (SIP-protected or hardened runtime) cannot observe the
+            # wrapper's export, so an empty value from it would prove nothing.
+            control = subprocess.run([str(server)], capture_output=True, text=True, timeout=60,
+                                     env={**os.environ, "DYLD_LIBRARY_PATH": "control"})
+            self.assertEqual(control.returncode, 0, control.stdout + control.stderr)
+            observes_dyld = control.stdout.splitlines()[1:] == ["control"]
             archive = root / "downloads" / "llama.tar.gz"
             subprocess.run(["tar", "-czf", str(archive), "-C", str(source.parent), "llama"],
                            check=True)
@@ -802,17 +826,144 @@ class LlamaWrapperQuotingTests(unittest.TestCase):
             built = subprocess.run(["bash", str(harness), str(root), str(stage)],
                                    capture_output=True, text=True, timeout=60)
             self.assertEqual(built.returncode, 0, built.stdout + built.stderr)
+            # Unset, not empty: SIP's /bin/sh drops an inherited DYLD_* value,
+            # while elsewhere an inherited one stays exported and would hide a
+            # missing export line. Unset gives every host the same input.
+            env = {key: value for key, value in os.environ.items() if key != "DYLD_LIBRARY_PATH"}
             run = subprocess.run(["sh", str(root / "bin" / "llama-server")],
                                  capture_output=True, text=True, timeout=60, cwd=tmp_path,
-                                 env={**os.environ, "DYLD_LIBRARY_PATH": ""})
+                                 env=env)
             self.assertFalse((tmp_path / "PWNED").exists(), "$(...) in the path was executed")
             self.assertFalse((tmp_path / "PWNED2").exists(), "`...` in the path was executed")
             self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
             prefix = f"{root}/tools/llama-cpp-b1"
-            self.assertEqual(run.stdout.splitlines(), [f"{prefix}/llama-server", prefix])
+            observed = run.stdout.splitlines()
+            self.assertEqual(observed[:1], [f"{prefix}/llama-server"])
+            if not observes_dyld:
+                self.skipTest(f"{sys.executable} drops DYLD_* values handed to it directly, "
+                              "so it cannot observe the wrapper's DYLD_LIBRARY_PATH")
+            self.assertEqual(observed, [f"{prefix}/llama-server", prefix])
 
 
 NPM = shutil.which("npm")
+
+
+class NativeInstallFloorTests(unittest.TestCase):
+    """2026-09-24: a native pin is a floor, not a ceiling. install_pin,
+    install_native and fetch are extracted verbatim and run against a one-pin
+    fixture: only `curl` is shimmed (it logs the URL and copies a stub native
+    installer whose real sha256 the fixture pin records), and HOME is a
+    temporary directory whose ~/.local/bin/claude, when present, answers
+    --version with a chosen line. A launcher at or above the pin is kept with
+    no download and no install; anything else takes the unchanged
+    checksum-verified install."""
+
+    PIN = "2.1.281"
+    URL = f"https://downloads.claude.ai/claude-code-releases/{PIN}/darwin-arm64/claude"
+    KEPT = ("2.1.281 (Claude Code)", "2.1.290 (Claude Code)", "2.2.0 (Claude Code)",
+            "10.0.0 (Claude Code)", "2.1.281")
+    # 2.1.99 sorts after 2.1.281 as text but is older; a pre-release suffix,
+    # a non-version first word and empty output are not trusted as a version.
+    INSTALLED = ("2.1.280 (Claude Code)", "2.1.99 (Claude Code)", "1.99.999 (Claude Code)",
+                 "2.1.290-dev (Claude Code)", "Claude Code", "")
+
+    def _run(self, tmp_path: Path, version_line=None, launcher_exit=0, sha256=None, bash="bash"):
+        home = tmp_path / "home"
+        (home / ".local" / "bin").mkdir(parents=True)
+        launcher = home / ".local" / "bin" / "claude"
+        if version_line is not None:
+            launcher.write_text(f"#!/bin/sh\nprintf '%s\\n' {json.dumps(version_line)}\nexit {launcher_exit}\n")
+            launcher.chmod(0o755)
+        installs, downloads = tmp_path / "installs.log", tmp_path / "downloads.log"
+        installer = tmp_path / "native-installer"
+        installer.write_text(f'#!/bin/sh\nprintf "%s\\n" "$*" >> {json.dumps(str(installs))}\n')
+        shim = tmp_path / "curl-shim"
+        shim.mkdir()
+        (shim / "curl").write_text(
+            "#!/bin/sh\n"
+            'out=""; prev=""; url=""\n'
+            'for arg in "$@"; do\n'
+            '  if [ "$prev" = "--output" ]; then out="$arg"; fi\n'
+            '  case "$arg" in https://*) url="$arg" ;; esac\n'
+            '  prev="$arg"\n'
+            "done\n"
+            f'printf "%s\\n" "$url" >> {json.dumps(str(downloads))}\n'
+            f'cp {json.dumps(str(installer))} "$out"\n'
+        )
+        (shim / "curl").chmod(0o755)
+        eco = tmp_path / "eco"
+        for child in ("bin", "downloads"):
+            (eco / child).mkdir(parents=True)
+        pins_path = tmp_path / "pins.json"
+        pins_path.write_text(json.dumps({"tools": [{
+            "id": "claude-code", "version": self.PIN, "kind": "native", "url": self.URL,
+            "sha256": sha256 or hashlib.sha256(installer.read_bytes()).hexdigest(),
+            "install_note": "fixture", "bin": "claude",
+        }]}))
+        harness = tmp_path / "install-native-floor-harness.sh"
+        harness.write_text(
+            "set -Eeuo pipefail\n"
+            + _shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_native", "install_pin")
+            + f"pins_path={json.dumps(str(pins_path))}\n"
+            + f"bin_dir={json.dumps(str(eco / 'bin'))}\n"
+            + f"cache_dir={json.dumps(str(eco / 'downloads'))}\n"
+            + "plan_mode=0\n"
+            + "install_pin claude-code\n"
+        )
+        result = subprocess.run(
+            [bash, str(harness)], capture_output=True, text=True, timeout=60,
+            env={**os.environ, "HOME": str(home), "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}"},
+        )
+        logs = [path.read_text() if path.exists() else "" for path in (installs, downloads)]
+        return result, *logs, eco, launcher
+
+    def assert_kept(self, version_line, **kwargs):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, installs, downloads, eco, launcher = self._run(Path(tmp), version_line, **kwargs)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(f"Kept installed claude-code {version_line.split()[0]}: at or above the "
+                          f"pinned floor {self.PIN}", result.stdout)
+            self.assertNotIn("Installed claude-code", result.stdout)
+            self.assertEqual((downloads, installs), ("", ""), "a kept launcher must not be fetched or installed")
+            self.assertEqual(list((eco / "downloads").iterdir()), [])
+            self.assertIn(json.dumps(version_line), launcher.read_text(), "the kept launcher was modified")
+            # The ecosystem's own launcher still execs the kept native install.
+            self.assertIn('exec "$HOME/.local/bin/claude"', (eco / "bin" / "claude").read_text())
+
+    def assert_installed(self, version_line, **kwargs):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, installs, downloads, _, _ = self._run(Path(tmp), version_line, **kwargs)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(f"Installed claude-code {self.PIN} (native)", result.stdout)
+            self.assertNotIn("Kept installed", result.stdout)
+            self.assertEqual(downloads.splitlines(), [self.URL])
+            self.assertEqual(installs.splitlines(), [f"install {self.PIN}"])
+
+    def test_a_launcher_at_or_above_the_pin_is_kept_without_download_or_install(self):
+        for version_line in self.KEPT:
+            with self.subTest(version_line=version_line):
+                self.assert_kept(version_line)
+
+    def test_a_missing_older_or_unreadable_launcher_takes_the_verified_install(self):
+        for version_line in (None, *self.INSTALLED):
+            with self.subTest(version_line=version_line):
+                self.assert_installed(version_line)
+
+    def test_a_failing_version_probe_takes_the_verified_install(self):
+        self.assert_installed("2.1.290 (Claude Code)", launcher_exit=1)
+
+    def test_the_install_path_still_fails_closed_on_a_checksum_mismatch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, installs, downloads, _, _ = self._run(Path(tmp), "2.1.280 (Claude Code)", sha256="0" * 64)
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Checksum mismatch", result.stderr)
+            self.assertEqual(downloads.splitlines(), [self.URL])
+            self.assertEqual(installs, "", "an unverified download must never run")
+
+    @unittest.skipUnless(BASH32, "no real bash 3.2 binary reachable (set BASH32_BINARY, or run on a real Mac)")
+    def test_the_floor_check_runs_under_real_bash_32(self):
+        self.assert_kept("2.1.290 (Claude Code)", bash=BASH32)
+        self.assert_installed("2.1.99 (Claude Code)", bash=BASH32)
 
 
 class EmbeddingModelInstallTests(unittest.TestCase):
@@ -1397,6 +1548,7 @@ class PlatformDependencyInstallTests(unittest.TestCase):
         symlinked_var.symlink_to(real_var, target_is_directory=True)
         return symlinked_var
 
+    @unittest.skipUnless(NPM, "native npm unavailable")
     def test_places_the_verified_tarball_correctly_when_the_prefix_is_reached_through_a_symlink(self):
         # Round 3b, Opus Medium M1 / hosted macos-15 run 35820422561: seven
         # PlatformDependencyInstallTests failed on a real Mac with "does not

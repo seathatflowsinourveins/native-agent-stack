@@ -145,7 +145,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event stop --agent claude-code --server-url http://${AI_MEMORY_URL} --capture-assistant"
+            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event stop --agent claude-code --server-url http://${AI_MEMORY_URL}${AI_MEMORY_CAPTURE_ASSISTANT}"
           }
         ]
       }

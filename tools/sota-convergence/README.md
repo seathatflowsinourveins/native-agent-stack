@@ -16,7 +16,14 @@ default reconciliation file. No step here calls a model.
    `trading-catalog.json`, `trading-by-layer.json` (consolidated onto the
    12-layer taxonomy copied live from
    `catalogs/sota-convergence/manifest-20260922.json#/taxonomy`),
-   `star-candidates.json` and `models.json` into `--out`.
+   `trading-pins.json`, `star-candidates.json` and `models.json` into `--out`.
+   `trading-pins.json` holds the trading upstreams that a blueprint or runtime
+   record pins but that no selected (`default`/`conditional`) us-equities card
+   carries: hftbacktest, nautilus-ibapi and rust-ibapi. Each is declared in
+   `TRADING_PIN_SOURCES` as a JSON pointer into its source record, so the pin
+   is read from that record, not copied. A pointer that no longer resolves, a
+   non-taxonomy layer or an id that collides with a card id raises instead of
+   dropping the component.
 
    ```sh
    python3 tools/sota-convergence/extract_layers.py --repo-root . --out /path/to/work-dir
@@ -24,7 +31,8 @@ default reconciliation file. No step here calls a model.
 
 2. **`github_freshness.py`** -- a real network step (authenticated `gh api`
    calls; `gh auth status` must already pass). Reads the repository URLs out
-   of the three working files above and writes `github-freshness.json` with
+   of the working files above (`foundation-layers.json`, `trading-catalog.json`,
+   `trading-pins.json` when present, and `star-candidates.json`) and writes `github-freshness.json` with
    stars, `pushed_at`, latest release/tag, head commit, license, archived and
    rename status per repository, plus every alias URL seen for that
    repository's normalized GitHub slug (`"aliases"` -- a `/releases/tag/vX`
@@ -87,6 +95,17 @@ default reconciliation file. No step here calls a model.
    `{"general": []}` when the flag is not given. Refuses to write if a host
    path, a bare session UUID, or a known secret-prefix marker survives
    sanitization.
+   `--trading-freshness-out PATH` also writes a report-only
+   `trading-freshness.json` (schema `trading-freshness/1`), separate from the
+   manifest. It has one row per pinned trading component: each selected card
+   (with every taxonomy layer it sits in) plus each `trading-pins.json` entry
+   (`--trading-pins`, default `<work-dir>/trading-pins.json`). Rows use the
+   manifest's own `compute_upstream`/`classify_pin` fields and add a
+   `dormancy` block from `compute_dormancy`. An upstream is dormant when its
+   newest GitHub release and default-branch head commit are both at least 180
+   days before `--checked-at`. `pushed_at` stands in only when the commit date
+   is unknown. `dormant` is `null`, never `false`, when the run has no data
+   for the repository. The manifest's key layout and rows are unchanged.
 
    ```sh
    python3 tools/sota-convergence/build_manifest.py \

@@ -154,10 +154,12 @@ first establish that it contains only that task's immutable tool files, not a
 database, model cache, project checkout or account store. Package deletion was
 not required to establish the retained native execution results.
 
-The working WSL vLLM pin remains 0.25.0. Version 0.29.0 failed real startup with
-unavailable UVA support. Preserve the accepted environment and model/vector
-data; repeating installation until the version number is newer would not
-resolve that compatibility failure.
+The working WSL vLLM pin is 0.30.0 since 2026-09-25, qualified against 0.25.0
+on the same host before the switch; 0.25.0 stays installed for rollback.
+Version 0.29.0 failed real startup with unavailable UVA support. Preserve the
+accepted environment and model/vector data; repeating installation until the
+version number is newer would not resolve such a compatibility failure, so a
+new version is qualified on an owned instance first.
 
 ## Native client integration and process lifecycle
 

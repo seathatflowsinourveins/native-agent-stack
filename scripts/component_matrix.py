@@ -128,15 +128,32 @@ def open_gap_counts_by_layer(gap_crosswalk_doc: dict | None) -> dict[tuple[str, 
 
 
 def repository_to_component_id(stack_doc: dict | None) -> dict[str, str]:
+    """Normalized repository (``host_receipts.normalize_repository``) -> the first
+    ``manifests/stack.json`` id with that repository."""
     mapping: dict[str, str] = {}
     for component in (stack_doc or {}).get("components", []) or []:
         if not isinstance(component, dict):
             continue
-        repository = component.get("repository")
+        repository = host_receipts.normalize_repository(component.get("repository"))
         component_id = component.get("id")
-        if isinstance(repository, str) and isinstance(component_id, str):
+        if repository is not None and isinstance(component_id, str):
             mapping.setdefault(repository, component_id)
     return mapping
+
+
+def alias_ids_by_winner(stack_doc: dict | None, landscape_docs) -> dict[str, tuple[str, ...]]:
+    """Winner component_id -> the ``manifests/stack.json`` ids that are aliases of it
+    (``host_receipts.stack_aliases_of_winners``: same normalized repository, not itself a winner
+    id), from the landscape documents this matrix joins."""
+    winners = [winner for document in landscape_docs for layer in (document or {}).get("layers", []) or []
+               if isinstance(layer, dict) for winner in layer.get("winners", []) or [] if isinstance(winner, dict)]
+    components = [component for component in (stack_doc or {}).get("components", []) or []
+                  if isinstance(component, dict)]
+    by_winner: dict[str, set[str]] = {}
+    for stack_id, winner_ids in host_receipts.stack_aliases_of_winners(components, winners).items():
+        for winner_id in winner_ids:
+            by_winner.setdefault(winner_id, set()).add(stack_id)
+    return {winner_id: tuple(sorted(ids)) for winner_id, ids in sorted(by_winner.items())}
 
 
 # ---------------------------------------------------------------------- classification
@@ -206,11 +223,46 @@ def platform_qualified_models(receipts_summary: dict, component_id: str, platfor
     return out
 
 
+def platform_alias_receipts(receipts_summary: dict, winner: dict, alias_ids, platform_key: str) -> list[dict]:
+    """Receipts on ``platform_key`` recorded under a ``manifests/stack.json`` alias of ``winner``
+    (``alias_ids``). Informational only: ``scripts/platform_status.py`` joins receipts by the
+    winner's own component_id, so these never reach the counts, the derived status, the flip
+    rule or e2e_state; they are listed so evidence recorded under the wrong id stays visible."""
+    component_id, pin = winner.get("component_id"), winner.get("pin")
+    out = []
+    for alias_id in alias_ids:
+        component_bucket = receipts_summary.get("components", {}).get(alias_id, {})
+        platform_bucket = component_bucket.get("platforms", {}).get(platform_key) or {}
+        for entry in platform_bucket.get("receipts", []) or []:
+            if not isinstance(entry, dict):
+                continue
+            version = entry.get("component_version")
+            version_matches = host_receipts.pin_matches(version, pin)
+            out.append({
+                "path": entry.get("path"),
+                "host_id": entry.get("host_id"),
+                "observed_at_utc": entry.get("observed_at_utc"),
+                "recorded_component_id": alias_id,
+                "recorded_version": version,
+                "evidence_class": entry.get("evidence_class"),
+                "stage": entry.get("stage"),
+                "result": entry.get("result"),
+                "binds": False,
+                "version_matches_pin": version_matches,
+                "reason": (f"recorded under manifests/stack.json id {alias_id!r}, an alias of winner "
+                           f"{component_id!r}; receipts bind by the winner's own component_id"
+                           + ("" if version_matches else f", and version {version!r} is not the winner pin in full")),
+            })
+    out.sort(key=lambda item: (item.get("path") or "", item.get("recorded_component_id") or ""))
+    return out
+
+
 def build_winner(winner: dict, decisions: dict[str, list[dict]], receipts_summary: dict,
-                 status_context: platform_evidence.StatusContext):
+                 status_context: platform_evidence.StatusContext, alias_ids: tuple[str, ...] = ()):
     """Per-platform catalog status, the status the evidence derives (scripts/platform_status.py),
     receipt counts and e2e_state. ``host_verified`` means the derived status is ``accepted``
-    on the strength of a host receipt; otherwise e2e_state is the declared catalog status."""
+    on the strength of a host receipt; otherwise e2e_state is the declared catalog status.
+    ``alias_receipts`` lists receipts recorded under a stack alias of the winner; never counted."""
     component_id = winner.get("component_id")
     platforms: dict[str, dict] = {}
     violations: list[str] = []
@@ -226,6 +278,7 @@ def build_winner(winner: dict, decisions: dict[str, list[dict]], receipts_summar
             "host_receipts": platform_receipt_info(receipts_summary, component_id, platform_key),
             "e2e_state": "host_verified" if host_verified else catalog_status,
             "qualified_models": platform_qualified_models(receipts_summary, component_id, platform_key),
+            "alias_receipts": platform_alias_receipts(receipts_summary, winner, alias_ids, platform_key),
         }
         if platform_key in ENFORCED_PLATFORMS:
             error = platform_evidence.declared_status_error(platform_key, catalog_status, winner, status_context)
@@ -244,7 +297,8 @@ def build_winner(winner: dict, decisions: dict[str, list[dict]], receipts_summar
 
 def build_alternative(alternative: dict, repo_to_component: dict[str, str], receipts_summary: dict) -> dict:
     repository = alternative.get("repository")
-    component_id = repo_to_component.get(repository) if isinstance(repository, str) else None
+    normalized = host_receipts.normalize_repository(repository)
+    component_id = repo_to_component.get(normalized) if normalized is not None else None
     e2e_state = "not_run"
     if isinstance(component_id, str):
         component_bucket = receipts_summary.get("components", {}).get(component_id)
@@ -269,7 +323,8 @@ def build_alternative(alternative: dict, repo_to_component: dict[str, str], rece
 def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[dict]],
               gap_counts: dict[tuple[str, str], int], receipts_summary: dict,
               repo_to_component: dict[str, str], open_gap_counts: dict[tuple[str, str], int] | None = None,
-              status_context: platform_evidence.StatusContext | None = None):
+              status_context: platform_evidence.StatusContext | None = None,
+              winner_aliases: dict[str, tuple[str, ...]] | None = None):
     if status_context is None:
         status_context = platform_evidence.load_context(root)
     layer_id = layer.get("layer_id")
@@ -279,7 +334,8 @@ def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[d
     winners = []
     flip_violations: list[str] = []
     for winner in layer.get("winners", []) or []:
-        built, violations = build_winner(winner, decisions, receipts_summary, status_context)
+        built, violations = build_winner(winner, decisions, receipts_summary, status_context,
+                                         (winner_aliases or {}).get(winner.get("component_id"), ()))
         winners.append(built)
         flip_violations.extend(f"{catalog}/{layer_id} winner {built['component_id']!r}: {violation}"
                                for violation in violations)
@@ -318,10 +374,12 @@ def build_document(root: Path):
     status_context = platform_evidence.load_context(root)
     receipts_summary = status_context.summary
 
+    landscape_docs = {catalog: load_optional(root, relative) for catalog, relative in LANDSCAPE_FILES.items()}
+    winner_aliases = alias_ids_by_winner(stack_doc, landscape_docs.values())
+
     rows: list[dict] = []
     flip_violations: list[str] = []
-    for catalog, relative in LANDSCAPE_FILES.items():
-        landscape_doc = load_optional(root, relative)
+    for catalog, landscape_doc in landscape_docs.items():
         if landscape_doc is None:
             continue
         for layer in landscape_doc.get("layers", []) or []:
@@ -329,12 +387,21 @@ def build_document(root: Path):
                 continue
             row, row_flip_violations = build_row(
                 root, catalog, layer, decisions, gap_counts, receipts_summary, repo_to_component, open_gap_counts,
-                status_context,
+                status_context, winner_aliases,
             )
             rows.append(row)
             flip_violations.extend(row_flip_violations)
 
     rows.sort(key=lambda row: (row["catalog"], row["layer_id"]))
+
+    # Whether each alias receipt is exempt from validate's alias rejection (GRANDFATHERED_ALIAS_RECEIPTS,
+    # path and recorded-claim digest); informational like the rest of the alias listing.
+    grandfathered_paths = host_receipts.grandfathered_alias_paths(root)
+    for row in rows:
+        for winner in row["winners"]:
+            for entry in winner["platforms"].values():
+                for alias in entry.get("alias_receipts") or []:
+                    alias["grandfathered"] = alias.get("path") in grandfathered_paths
 
     needs_host: dict[str, list[dict]] = {platform_key: [] for platform_key in sorted(PLATFORM_KEYS)}
     for row in rows:
@@ -392,6 +459,24 @@ def assert_no_private_content(text: str) -> None:
             raise SystemExit(f"component_matrix: generated output contains possible {description}; aborting")
 
 
+def alias_summary_sentence(aliases: list[dict]) -> str:
+    """One sentence derived from the listed alias receipts (count, hosts, observation dates and how
+    many are grandfathered), or ``""`` when there are none. ``aliases`` holds one entry per
+    (row, winner, platform), so a winner selected in several layers repeats the same receipt;
+    receipts are counted once each by ``path`` (an entry without a path counts on its own)."""
+    unique: dict = {}
+    for alias in aliases:
+        unique.setdefault(alias.get("path") or id(alias), alias)
+    aliases = list(unique.values())
+    if not aliases:
+        return ""
+    hosts = sorted({alias.get("host_id") or "unknown host" for alias in aliases})
+    dates = sorted({(alias.get("observed_at_utc") or "")[:10] or "unknown date" for alias in aliases})
+    grandfathered = sum(1 for alias in aliases if alias.get("grandfathered"))
+    return (f" Listed: {len(aliases)} alias receipt(s) from host(s) {', '.join(f'`{host}`' for host in hosts)}, "
+            f"observed {', '.join(dates)}; {grandfathered} of {len(aliases)} grandfathered.")
+
+
 def render_markdown(document: dict) -> str:
     lines = [
         "# Component evidence matrix",
@@ -429,6 +514,8 @@ def render_markdown(document: dict) -> str:
                 f"{counts.get('independently_reviewed_pass', 0)}/{counts.get('independently_reviewed_fail', 0)}]")
         if counts.get("dissented"):
             cell += f" dissented {counts['dissented']}"
+        if entry.get("alias_receipts"):
+            cell += f" +{len(entry['alias_receipts'])} alias receipt(s), not counted"
         return cell
 
     for row in document["rows"]:
@@ -442,6 +529,28 @@ def render_markdown(document: dict) -> str:
             f"| `{row['catalog']}/{row['layer_id']}` | {row['independent_review']}{adjudication} "
             f"| {'; '.join(winner_cells) if winner_cells else '-'} |"
         )
+    alias_entries = [(row, winner, platform_key, alias) for row in document["rows"] for winner in row["winners"]
+                     for platform_key, entry in sorted(winner["platforms"].items())
+                     for alias in entry.get("alias_receipts") or []]
+    lines += ["", "## Alias receipts (listed, never counted)", "", (
+        "Receipts recorded under a `manifests/stack.json` id whose repository is a winner's repository "
+        "(`scripts/host_receipts.py` `winner_stack_aliases`). Receipts bind to a winner only by its own "
+        "`component_id` and full pin, so these never enter the counts, the derived status, the flip rule or "
+        "`e2e_state`. `scripts/host_receipts.py record` refuses such ids, and `validate` rejects such receipts "
+        "except those grandfathered unchanged, by path and recorded-claim digest, in `GRANDFATHERED_ALIAS_RECEIPTS`; "
+        "re-recording on the same host under the winner's `component_id` with its full pin is the path to "
+        "binding." + alias_summary_sentence([alias for _row, _winner, _platform, alias in alias_entries])
+    ), ""]
+    alias_lines = []
+    for row, winner, platform_key, alias in alias_entries:
+        match = "matches" if alias.get("version_matches_pin") else "does not match"
+        grandfathered = "; grandfathered" if alias.get("grandfathered") else ""
+        alias_lines.append(
+            f"- `{row['catalog']}/{row['layer_id']}` `{winner['component_id']}` {platform_key}: "
+            f"`{alias['path']}` recorded as `{alias['recorded_component_id']}` "
+            f"{alias.get('recorded_version')!r} ({alias.get('evidence_class')}, {alias.get('stage')}, "
+            f"{alias.get('result')}); binds: no (id alias; version {match} the pin in full{grandfathered})")
+    lines += alias_lines or ["None."]
     lines += ["", "## Needs host evidence", "", (
         "Winners whose per-platform `e2e_state` is neither `accepted` nor `host_verified`, grouped by "
         "platform. This is the list other WSL/macOS machines should work through with "

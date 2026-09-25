@@ -116,7 +116,8 @@ match the Linux profile instead of floating with the tap.
 
 Homebrew formulae that remain float to whatever is current at install time. The
 bootstrap records `brew list --versions` into
-`$ECO_INSTALL_ROOT/installed-versions.txt`; copy it into the host receipt
+`$ECO_INSTALL_ROOT/installed-versions.txt`, above the checked version of each
+installed pin; copy it into the host receipt
 (`evidence/receipts/adoption-<host>-<date>.json`, schema in
 [`adoption/receipt.json`](../receipt.json)) so the exact installed versions are
 retained, not just the formula names above.
@@ -159,6 +160,18 @@ acceptance — remains unrun.
 | 2 | Usage error: missing `--profile`, an unknown argument, or a flag given without its value. |
 | 3 | A selected component has no pin at all in [`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json) and was not named in `--allow-unpinned`. Checked before anything is installed, and in `--plan` too; `--allow-unpinned <id,id,...>` skips the named ids instead and echoes them to the run log. |
 | 4 | A prerequisite (`curl`, `git`, `tar`, `shasum`, `unzip`, `jq`, `mktemp`) is still missing after the Homebrew step. With `--skip-system-packages` no `brew install` is attempted and the check lists what is missing. |
+| 5 | An installed pin's `version_probe` failed, timed out (30 s, or the longer `timeout_seconds` a pin declares: `llama-cpp` allows 180 s because its first launch on a fresh Mac takes over 30 s) or reported another version. `installed-versions.txt` is still written and nothing is removed; the run stops before its closing message and `--configure-claude-user-profile`. |
+
+The version report and exit 5 changed after `v2026.09.24.1`, in both
+[`adoption/bootstrap-macos.sh`](../bootstrap-macos.sh) and
+[`adoption/bootstrap-linux.sh`](../bootstrap-linux.sh), with a `version_probe`
+added to every entry of [`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json)
+and `adoption/pins-linux-x86_64.json`: at that release, and at every earlier
+one, both scripts run `--version` on every file in
+`$ECO_INSTALL_ROOT/bin` with the terminal's stdin, which blocks on
+`context-mode` and `socraticode` (both serve MCP on stdin), so run such a
+release's script with `</dev/null`.
+[`adoption/bootstrap.md`](../bootstrap.md) step 2 describes the report.
 
 Every selected `macos-arm64-foundation` component, including
 `socraticode` (below), has a pin, so the shipped profile needs no
@@ -189,7 +202,7 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `uv` | 0.12.17 | `uv-aarch64-apple-darwin.tar.gz` | `85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b` | `publisher_checksum_sidecar` |
 | `gh` | 2.101.0 | `gh_2.101.0_macOS_arm64.zip` | `e4303e39d8f07141c4bad4b99b01079f05029c59b27076e8fbc825c985ecdd8b` | `publisher_checksum_file` |
 | `codex` | 0.155.1 | `codex-0.155.1.tgz` | `fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66` | `npm_registry_integrity_crosscheck` |
-| `claude-code` | 2.1.280 | `darwin-arm64/claude` (native, not npm) | `387a5c5dcdbb815085edf0baf79591f9d8894efe922bceaf3d75b1b08055229d` | `manifest_crosscheck` |
+| `claude-code` | 2.1.281 | `darwin-arm64/claude` (native, not npm) | `a922981f6f3b55a251ef9f9dbaa0621a5f99cbcb5ca67f8a797476ccfc83f626` | `manifest_crosscheck` |
 | `mcporter` | 0.13.13 | `mcporter-0.13.13.tgz` | `ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d` | `npm_registry_integrity_crosscheck` |
 | `context-mode` | 1.0.169 | `context-mode-1.0.169.tgz` | `09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c` | `npm_registry_integrity_crosscheck` |
 | `ai-memory` | 2.3.2 | `ai-memory-macos-aarch64.tar.gz` | `e0f07ad28938f3ed98a5feb21d11917245d77501764e0005049e7d9c1c16f28a` | `publisher_checksum_sidecar` |
@@ -242,7 +255,7 @@ postinstall-copy design entirely.** It is now a `kind: native` pin (see the
 table above): `adoption/bootstrap-macos.sh`'s `install_native` downloads the
 per-version `darwin-arm64/claude` binary directly from
 `downloads.claude.ai`, verifies its sha256 against the pin, and runs `"$bin"
-install 2.1.280`, exactly mirroring `adoption/pins-linux-x86_64.json`'s own
+install 2.1.281`, exactly mirroring `adoption/pins-linux-x86_64.json`'s own
 `claude-code` pin and `~/codex-ecosystem/bin/bootstrap-linux.sh`'s
 existing claude-code step. There is no more nested platform package, no
 `install.cjs` postinstall to defer, and no `postinstall_binary_check`; the
@@ -250,6 +263,17 @@ native binary manages its own version directory and launcher and keeps
 auto-updating on the latest channel afterward. (`adoption/pins-linux-x86_64.json`
 changed after `v2026.09.24.1` in `install_note` text only; its `claude-code`
 pin is unchanged.)
+
+The pin is a floor: when `~/.local/bin/claude --version` already reports the
+pinned version or newer, `install_native` keeps that launcher, downloads and
+installs nothing, and logs `Kept installed claude-code <version>`; only a
+missing, older or unreadable launcher gets the verified install, so re-running
+the bootstrap never moves a native auto-updated Claude Code back to the pin
+(`adoption/bootstrap-linux.sh` runs the same `install_native`).
+The script and both claude-code pins (2.1.281, which fixes a recursive `rm` of
+command-substitution output running unprompted in auto and bypass mode)
+changed after `v2026.09.24.1`: at that tag the pins are 2.1.280 and the script
+runs the pinned install unconditionally, downgrading a newer Claude Code.
 
 `llama-server` is a profile `required_command`, so llama.cpp is pinned rather
 than left to `brew install llama.cpp`. The macOS asset holds every executable

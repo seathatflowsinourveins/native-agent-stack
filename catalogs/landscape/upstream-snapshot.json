@@ -2228,39 +2228,39 @@
       "component_id": "vllm",
       "repository": "https://github.com/vllm-project/vllm",
       "selected_repository_url": "https://github.com/vllm-project/vllm",
-      "selected_version": "0.25.0",
-      "selected_source_pin": "702f4814fe54fabff350d43cb753ae3e47c0c276",
+      "selected_version": "0.30.0",
+      "selected_source_pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
       "checks": [
         {
           "endpoint": "repos/vllm-project/vllm",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:45.730258+00:00",
-          "ended_at": "2026-09-21T22:32:46.175248+00:00",
-          "stdout_sha256": "a814ec20c2c7b9571835abc416e580171feb7a121a5ba6923621b214a948e64f",
+          "started_at": "2026-09-25T16:12:44.330894+00:00",
+          "ended_at": "2026-09-25T16:12:44.711487+00:00",
+          "stdout_sha256": "e56bc5a32692b13e8044063bcee56cd5ac75bc43853e5858ef8efb9eb32d5d5b",
           "status": "ok"
         },
         {
           "endpoint": "repos/vllm-project/vllm/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:46.175381+00:00",
-          "ended_at": "2026-09-21T22:32:46.596954+00:00",
-          "stdout_sha256": "bcf961adc0a8df6703b4a2a5cbfebd1067bc3ea61fd11883eb5c74cb51f0eac8",
+          "started_at": "2026-09-25T16:12:44.711618+00:00",
+          "ended_at": "2026-09-25T16:12:45.016575+00:00",
+          "stdout_sha256": "367f651bccc6b1c1da875f3728804965561e7bffbfbcd2942cfce9d35357d793",
           "status": "ok"
         },
         {
-          "endpoint": "repos/vllm-project/vllm/commits/702f4814fe54fabff350d43cb753ae3e47c0c276",
+          "endpoint": "repos/vllm-project/vllm/commits/ced6857afa0ea7b2e3f0846a62e1394e90f15607",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:46.597123+00:00",
-          "ended_at": "2026-09-21T22:32:47.023082+00:00",
-          "stdout_sha256": "7b3ccd8f93e7c376d45b4d90ff2fff2155c02aebc46fcfeff5044afaf24a872f",
+          "started_at": "2026-09-25T16:12:45.016818+00:00",
+          "ended_at": "2026-09-25T16:12:45.318262+00:00",
+          "stdout_sha256": "2d3c5a3b9d60b7dd995316fe0cf543c9a27201c4aea94119b4e0a49b6051a4b9",
           "status": "ok"
         },
         {
-          "endpoint": "repos/vllm-project/vllm/commits/v0.29.0",
+          "endpoint": "repos/vllm-project/vllm/commits/v0.30.0",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:47.023192+00:00",
-          "ended_at": "2026-09-21T22:32:47.462890+00:00",
-          "stdout_sha256": "b477c7002b8010d6aa1f456442540cfa55ac90221b653a282fbff3a772565ecb",
+          "started_at": "2026-09-25T16:12:45.318345+00:00",
+          "ended_at": "2026-09-25T16:12:45.633026+00:00",
+          "stdout_sha256": "2d3c5a3b9d60b7dd995316fe0cf543c9a27201c4aea94119b4e0a49b6051a4b9",
           "status": "ok"
         }
       ],
@@ -2268,33 +2268,33 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-21T22:30:14Z",
+      "pushed_at": "2026-09-25T16:12:29Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v0.29.0",
-        "published_at": "2026-09-09T08:54:49Z",
-        "html_url": "https://github.com/vllm-project/vllm/releases/tag/v0.29.0",
+        "tag_name": "v0.30.0",
+        "published_at": "2026-09-22T05:20:54Z",
+        "html_url": "https://github.com/vllm-project/vllm/releases/tag/v0.30.0",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "702f4814fe54fabff350d43cb753ae3e47c0c276",
-        "sha": "702f4814fe54fabff350d43cb753ae3e47c0c276",
-        "html_url": "https://github.com/vllm-project/vllm/commit/702f4814fe54fabff350d43cb753ae3e47c0c276",
-        "committed_at": "2026-07-11T10:25:04Z"
+        "ref": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+        "sha": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+        "html_url": "https://github.com/vllm-project/vllm/commit/ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+        "committed_at": "2026-09-21T22:32:49Z"
       },
       "latest_release_source": {
-        "ref": "v0.29.0",
-        "sha": "98dff2a81d747d1dba01a47f939f48c3526d4206",
-        "html_url": "https://github.com/vllm-project/vllm/commit/98dff2a81d747d1dba01a47f939f48c3526d4206",
-        "committed_at": "2026-09-08T08:50:34Z"
+        "ref": "v0.30.0",
+        "sha": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+        "html_url": "https://github.com/vllm-project/vllm/commit/ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+        "committed_at": "2026-09-21T22:32:49Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/vllm-project/vllm",
-      "release_relationship": "newer_stable_release_review_pending"
+      "release_relationship": "selected_version_matches_latest_stable"
     },
     {
       "component_id": "worktrunk",
@@ -3973,39 +3973,39 @@
       "component_id": "nextjs",
       "repository": "https://github.com/vercel/next.js",
       "selected_repository_url": "https://github.com/vercel/next.js",
-      "selected_version": "16.3.5",
-      "selected_source_pin": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
+      "selected_version": "16.3.6",
+      "selected_source_pin": "a758ffcf501f6f1ddb03175bd1033508424c261e",
       "checks": [
         {
           "endpoint": "repos/vercel/next.js",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:34:03.815933+00:00",
-          "ended_at": "2026-09-21T22:34:04.267016+00:00",
-          "stdout_sha256": "9361488900d1870d22b2d8345ea22b65f6631d6908eca1f72def2839db750458",
+          "started_at": "2026-09-25T13:54:09.500324+00:00",
+          "ended_at": "2026-09-25T13:54:09.892223+00:00",
+          "stdout_sha256": "f42503630379a1bcd34701ead37d4fd33ae390a3a775a10ff6027308d4deb068",
           "status": "ok"
         },
         {
           "endpoint": "repos/vercel/next.js/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:34:04.267174+00:00",
-          "ended_at": "2026-09-21T22:34:04.635959+00:00",
-          "stdout_sha256": "f99f5c1e705cd1a9f1c8513306356eaac2111dd074f0f8f53b180ab355e531bf",
+          "started_at": "2026-09-25T13:54:09.892693+00:00",
+          "ended_at": "2026-09-25T13:54:10.167807+00:00",
+          "stdout_sha256": "6b8cb55525442a8a0d8e011bb77ee28b953645f86e713dce4d0f38afaff01c16",
           "status": "ok"
         },
         {
-          "endpoint": "repos/vercel/next.js/commits/ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
+          "endpoint": "repos/vercel/next.js/commits/a758ffcf501f6f1ddb03175bd1033508424c261e",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:34:04.636043+00:00",
-          "ended_at": "2026-09-21T22:34:05.104534+00:00",
-          "stdout_sha256": "bd036fa99ad7db0e368805d9ff214d76751c869664d8b86d231aa17d9e80449b",
+          "started_at": "2026-09-25T13:54:10.168077+00:00",
+          "ended_at": "2026-09-25T13:54:10.521879+00:00",
+          "stdout_sha256": "fb94afe98d35bb366eaf6ff72a0f15422fd9e14eb456f8dced29df26fa7540a1",
           "status": "ok"
         },
         {
-          "endpoint": "repos/vercel/next.js/commits/v16.3.5",
+          "endpoint": "repos/vercel/next.js/commits/v16.3.6",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:34:05.104694+00:00",
-          "ended_at": "2026-09-21T22:34:05.555622+00:00",
-          "stdout_sha256": "bd036fa99ad7db0e368805d9ff214d76751c869664d8b86d231aa17d9e80449b",
+          "started_at": "2026-09-25T13:54:10.522060+00:00",
+          "ended_at": "2026-09-25T13:54:10.849822+00:00",
+          "stdout_sha256": "fb94afe98d35bb366eaf6ff72a0f15422fd9e14eb456f8dced29df26fa7540a1",
           "status": "ok"
         }
       ],
@@ -4013,27 +4013,27 @@
       "archived": false,
       "disabled": false,
       "default_branch": "canary",
-      "pushed_at": "2026-09-21T22:27:24Z",
+      "pushed_at": "2026-09-25T13:45:22Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v16.3.5",
-        "published_at": "2026-09-11T19:15:50Z",
-        "html_url": "https://github.com/vercel/next.js/releases/tag/v16.3.5",
+        "tag_name": "v16.3.6",
+        "published_at": "2026-09-22T17:15:10Z",
+        "html_url": "https://github.com/vercel/next.js/releases/tag/v16.3.6",
         "target_commitish": "canary",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
-        "sha": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
-        "html_url": "https://github.com/vercel/next.js/commit/ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
-        "committed_at": "2026-09-11T16:33:05Z"
+        "ref": "a758ffcf501f6f1ddb03175bd1033508424c261e",
+        "sha": "a758ffcf501f6f1ddb03175bd1033508424c261e",
+        "html_url": "https://github.com/vercel/next.js/commit/a758ffcf501f6f1ddb03175bd1033508424c261e",
+        "committed_at": "2026-09-22T15:41:35Z"
       },
       "latest_release_source": {
-        "ref": "v16.3.5",
-        "sha": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
-        "html_url": "https://github.com/vercel/next.js/commit/ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
-        "committed_at": "2026-09-11T16:33:05Z"
+        "ref": "v16.3.6",
+        "sha": "a758ffcf501f6f1ddb03175bd1033508424c261e",
+        "html_url": "https://github.com/vercel/next.js/commit/a758ffcf501f6f1ddb03175bd1033508424c261e",
+        "committed_at": "2026-09-22T15:41:35Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",

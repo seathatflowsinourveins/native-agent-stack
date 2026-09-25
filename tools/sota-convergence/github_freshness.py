@@ -11,6 +11,7 @@ pushed_at, latest release/tag, head commit, license, archived, rename).
 Reads (repository-relative to --work-dir):
   foundation-layers.json  (#/layers[]/components[]/repository)
   trading-catalog.json    (#/entries[]/repository)
+  trading-pins.json       (#/entries[]/repository; optional)
   star-candidates.json    (#/star_candidates[]/repository, #/beyond_stars[]/repository)
 
 Writes --out (default <work-dir>/github-freshness.json):
@@ -45,6 +46,11 @@ WORKING_FILE_REPO_PATHS = (
         for component in layer.get("components", [])
     )),
     ("trading-catalog.json", lambda doc: (
+        entry.get("repository") for entry in doc.get("entries", [])
+    )),
+    # Trading pins outside the selected catalog cards (extract_layers.py's
+    # TRADING_PIN_SOURCES); absent from working directories written before it existed.
+    ("trading-pins.json", lambda doc: (
         entry.get("repository") for entry in doc.get("entries", [])
     )),
     ("star-candidates.json", lambda doc: (

@@ -196,6 +196,13 @@
       "evidence_class": "native_proven",
       "evidence": "evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json",
       "note": "Actual scripts/hardware_profile.py output for this host, written by scripts/hardware_profile.py --record-host."
+    },
+    {
+      "id": "mac-coordinator-64gb-20260925",
+      "label": "macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory (measured)",
+      "evidence_class": "native_proven",
+      "evidence": "evidence/artifacts/hw-profiles/mac-coordinator-64gb-20260925/profile.json",
+      "note": "Actual scripts/hardware_profile.py output for this host, written by scripts/hardware_profile.py --record-host."
     }
   ]
 }

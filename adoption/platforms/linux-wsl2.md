@@ -58,11 +58,18 @@ rollback checks passing in scope. That page's own boundary applies here too:
 fresh Linux userspace on the existing WSL kernel is not a booted new PC, an
 independent kernel, or a full-foundation deployment.
 
-## vLLM pin: 0.25.0, not 0.29.0
+## vLLM pin: 0.30.0 (0.29.0 fails on WSL)
 
-The working WSL vLLM pin is **0.25.0**. Version **0.29.0 failed real startup
-with "UVA is not available"** on this WSL GPU path (unified virtual
-addressing unsupported by the WSL GPU driver surface at that release).
+The working WSL vLLM pin is **0.30.0** since 2026-09-25
+([`evidence/receipts/vllm-030-switch-20260925.json`](../../evidence/receipts/vllm-030-switch-20260925.json)).
+0.30.0 carries the pinned-memory fallback for WSL (vllm-project/vllm PR
+#56908) and closes GHSA-25q3-v2hm-8vpf and GHSA-5fj9-pfhr-6j48. On the
+NativeStack RTX 4090 host it served the same Nemotron-3-Embed-1B-BF16 files
+with embeddings and code-index results identical to 0.25.0, first on an
+owned instance and then in production; 0.25.0 stays installed for rollback.
+Version **0.29.0 failed real startup with "UVA is not available"** on this
+WSL GPU path (unified virtual addressing unsupported by the WSL GPU driver
+surface at that release).
 [`adoption/lifecycle.md`](../lifecycle.md) records this exactly: "The working
 WSL vLLM pin remains 0.25.0. Version 0.29.0 failed real startup with
 unavailable UVA support. Preserve the accepted environment and model/vector
@@ -76,6 +83,20 @@ itself evidence the WSL UVA gap closed.
 
 1. Follow [`adoption/bootstrap.md`](../bootstrap.md) steps 1–3 (prerequisites,
    `bootstrap-linux.sh --profile <id>`, native sign-in).
+   `adoption/bootstrap-linux.sh` and its `claude-code` pin
+   changed after `v2026.09.24.1`: at that tag the pin is 2.1.280 and the
+   script reinstalls it even over a newer Claude Code, so a re-run
+   downgrades a native auto-updated install. On main the pin is 2.1.281 and a floor: the script
+   keeps a `~/.local/bin/claude` whose `--version` reports 2.1.281 or newer
+   (logging `Kept installed claude-code <version>`, with nothing downloaded
+   or installed) and runs the checksum-verified install only when that
+   launcher is missing, older or unreadable.
+   Its version report changed after `v2026.09.24.1`: that release, and
+   every earlier one, runs `--version` on every file in
+   `$ECO_INSTALL_ROOT/bin` and blocks on `context-mode`, which serves MCP on
+   stdin instead, so run such a release's script with `</dev/null` (step 2 of
+   [`adoption/bootstrap.md`](../bootstrap.md) has the details and the
+   `mcp-inspector` case).
 2. Recreate the SDK only for the `research-runtime` profile using
    [`adoption/sdk/README.md`](../sdk/README.md)'s transitive lock; retain the
    same exact-match and uncached-reinstall checks as

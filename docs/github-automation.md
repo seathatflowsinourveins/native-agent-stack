@@ -327,6 +327,16 @@ a fixed-tool pin table (actionlint, gitleaks, syft, zizmor, grype,
 `$GITHUB_STEP_SUMMARY`, and uploads both as a 30-day artifact. It opens no
 issue and writes nothing back to the repository; a maintainer reads the
 summary/artifact and decides whether a real lane review is warranted.
+`drift.md` then adds a report-only trading table, built from
+`build_manifest.py --trading-freshness-out` (also retained in the artifact).
+The drift diff lists only rows that changed and only ids the published
+manifest already has. The trading table lists every pinned trading component:
+each selected us-equities card, plus the pins in `extract_layers.py`'s
+`TRADING_PIN_SOURCES` that no card carries (hftbacktest, nautilus-ibapi,
+rust-ibapi). Each row shows pin vs upstream latest, the last release and
+default-branch commit dates, a dormancy flag (no release or commit in 180+
+days) and the archived flag. Dormant or archived rows never set
+`drift-status.txt` and are never read into the `propose` job's component ids.
 
 `catalog-freshness.yml`'s `python3 -m unittest` step runs on this job's
 `setup-python 3.13` interpreter, which has no `requests` package installed
