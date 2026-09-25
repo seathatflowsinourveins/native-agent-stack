@@ -398,6 +398,16 @@ def recompute_state(root: Path) -> dict:
                 record["status"] = "verify_failed"
             elif op and op.startswith("rollback:") and entry.get("surface") == "_txn_end":
                 record["status"] = "rolled_back"
+            elif op == "recover:superseded" and entry.get("surface") == "_txn_end":
+                # Coordinator decision on the txn state machine (round 5): recover must be able to
+                # close an in_progress txn it can prove superseded by a later, already-committed
+                # txn for the same component -- accepting that later state as authoritative ("roll
+                # forward") rather than physically reversing this one's own partial operations,
+                # which would clobber it (see close_superseded_txn). A terminal status distinct
+                # from "rolled_back" (nothing here was actually reversed) and "applied" (this txn's
+                # own post-apply verify never ran) -- but never "in_progress" either, so recover
+                # never revisits it and open_txn_for_component's guard never blocks on it again.
+                record["status"] = "superseded"
             elif op in ("baseline", "resync", "prune"):
                 # Single-shot, non-transactional records, not a multi-step apply: they carry no
                 # reversible operation (rollback_txn's OPERATION_KINDS filter empties them out),
@@ -445,25 +455,42 @@ def save_state(root: Path) -> dict:
     return state
 
 
-def in_progress_txn_for_component(root: Path, component_id: str) -> str | None:
-    """The txn id of a transaction already recorded for ``component_id`` whose status is still
-    ``in_progress``, or None. Major finding: neither `adopt --relink` nor `apply` refused to start
-    while an earlier txn for the same component was still in_progress (a relink that failed
-    partway through its surfaces after current/<id> and every entrypoint were already migrated, or
-    a crashed/interrupted apply). A second attempt could reach its own terminal state without ever
-    re-touching current/<id> itself: relink links it only when absent, and a retried apply with the
-    same --to-root would collide the same way if the first attempt already flipped the link before
-    crashing. Since recompute_state's own updated_txn tracking only follows a link entry whose
-    surface starts with "current/", the second attempt then leaves updated_txn still naming the
-    stale first txn -- and a later `recover` reversing that stale in_progress txn (the only thing
-    that still names it) could unlink current/<id> or revert entrypoints/surfaces out from under
-    the second attempt's own, already-terminal work, while both commands themselves kept exiting 0.
-    Refusing outright here forces an operator to run `recover` (which fully, safely reverts the
-    stale txn) before any retry, so there is never more than one live transaction per component."""
+OPEN_TXN_STATUSES = ("in_progress", "pending_confirmation")
+
+
+def open_txn_for_component(root: Path, component_id: str) -> tuple[str, str] | None:
+    """The (txn id, status) of a transaction already recorded for ``component_id`` whose status is
+    still OPEN -- ``in_progress`` (a relink that failed partway, or a crashed/interrupted apply) or
+    ``pending_confirmation`` (an apply that passed its own post-apply verify but has not yet been
+    confirmed or rolled back) -- or None.
+
+    Coordinator decision on the txn state machine (round 5, replacing the round-4
+    in_progress-only, relink-only guard this function used to be): at most one open txn per
+    component. Both `apply` and `adopt --relink` refuse (a busy-style EXIT_BUSY refusal, not a
+    silent proceed) to start a second one while either state holds. Two concrete failures this
+    closes:
+
+    - Major finding (round 4): relink only (re-)links current/<id> when it is absent, so a second,
+      "fixed" relink attempt never re-ledgers its own current/<id> link -- recompute_state's
+      updated_txn still names the FIRST (stale) txn -- and a later `recover` reversing that stale
+      in_progress txn could unlink current/<id> or revert entrypoints/surfaces out from under the
+      second attempt's own, already-terminal work, while every command involved kept exiting 0.
+    - Major finding (round 5): nothing refused a second `apply` while an earlier one on the same
+      component was still `pending_confirmation`, defeating confirm-or-revert outright (apply A1
+      v1->v2 --confirm-within, then A2 v2->v3 with nothing refusing it; once A2 itself reverts,
+      A1's old root is unrecoverable through either `rollback --txn A1` -- refused as superseded --
+      or `rollback foo`, which keeps re-selecting A2).
+
+    The operator closes the existing open txn with `confirm --txn` (pending_confirmation only),
+    `rollback --txn`/`rollback <component>` (either state), or -- for an in_progress txn left by a
+    crash -- `recover`, which can now close it (see close_superseded_txn) whether or not a later
+    txn has since superseded it, so no component is ever left permanently unable to relink/apply
+    (the round-5 regression this function's round-4 version introduced: recover could refuse a
+    superseded in_progress txn forever, and that refusal itself then blocked relink permanently)."""
     state = load_state(root)
     for txn, record in state["txns"].items():
-        if record.get("component") == component_id and record.get("status") == "in_progress":
-            return txn
+        if record.get("component") == component_id and record.get("status") in OPEN_TXN_STATUSES:
+            return txn, record["status"]
     return None
 
 
@@ -962,16 +989,28 @@ def cmd_apply(args) -> int:
     with switch_locks(root):
         spec = load_spec(root, args.spec)
         entry = component_entry(spec, args.component)
-        # Deliberately NOT the same in_progress-txn guard `adopt --relink` gets below (deviation
-        # from switch.md round-4 review's literal "refuse relink/apply" phrasing, evidence in the
-        # round-4 fix task record): build_apply_plan (below) always includes exactly one
-        # unconditional `link` step, unlike relink's "link current/<id> only when absent" -- so an
-        # apply that reaches its own link step and completes always re-claims updated_txn for
-        # itself, regardless of any earlier, still in_progress (crashed) txn for the same
-        # component. That already-existing, already-tested design is exactly what lets `recover`
-        # correctly refuse to reverse a superseded crashed txn once a later, real apply has moved
-        # the component on again (test_recover_refuses_to_clobber_a_txn_a_later_apply_already_superseded);
-        # a blanket refusal here would instead block that legitimate recovery path outright.
+        # Coordinator decision on the txn state machine (round 5), superseding round 4's
+        # deliberate omission of this guard here (evidence: the round-4 fix task record's own
+        # reasoning, now stale -- see open_txn_for_component and close_superseded_txn for why it no
+        # longer applies): at most one open txn per component. apply refuses (busy, EXIT_BUSY, not
+        # a silent proceed) while an earlier txn on the same component is still in_progress
+        # (crashed) or pending_confirmation (awaiting its own confirm-or-revert timer). The
+        # pending_confirmation case is the major finding this closes: nothing used to stop a second
+        # apply on top of an unconfirmed one (apply A1 v1->v2 --confirm-within, then A2 v2->v3),
+        # which defeated confirm-or-revert outright -- once A2 itself reverted, A1's old root was
+        # unrecoverable through either `rollback --txn A1` (refused as superseded by A2) or
+        # `rollback foo` (which kept re-selecting A2). The in_progress case no longer needs
+        # round 4's carve-out either: `recover` can now close a superseded in_progress txn instead
+        # of only ever refusing to reverse it (close_superseded_txn), so refusing a stacked apply
+        # here never creates the permanent-block round 4 was avoiding.
+        open_txn = open_txn_for_component(root, args.component)
+        if open_txn is not None:
+            open_id, open_status = open_txn
+            raise Busy(
+                f"apply refused: component {args.component!r} already has an open transaction "
+                f"{open_id!r} (status {open_status!r}) -- run 'confirm --txn {open_id}' (if "
+                f"pending_confirmation) or 'rollback --txn {open_id}' to close it, or 'recover' if "
+                "it is in_progress after a crash, before retrying")
         steps = build_apply_plan(spec, args.component, args.to_root, root=root)
         digest = plan_sha256(steps)
         if digest != args.plan_sha256:
@@ -1121,6 +1160,16 @@ def schedule_confirm_or_revert(root: Path, txn: str, seconds: int) -> None:
         raise SwitchError(f"could not confirm the confirm-or-revert timer was scheduled (systemd-run "
                            f"timed out after {error.timeout}s); rolled back immediately instead of "
                            "leaving an unrevertable pending apply") from error
+    except OSError as error:
+        # Minor finding (round 5): a missing/misconfigured systemd-run (FileNotFoundError via
+        # ECOSYSTEM_SWITCH_SYSTEMD_RUN or PATH; PermissionError) used to escape this function
+        # uncaught the same way the timeout case above did before its own round-4 fix -- same
+        # remedy: the timer was definitely never scheduled (the spawn itself failed), so roll back
+        # immediately rather than leave an apply nothing will ever revert.
+        rollback_txn(root, txn)
+        raise SwitchError(f"could not schedule the confirm-or-revert timer (systemd-run could not "
+                           f"run: {error}); rolled back immediately instead of leaving an "
+                           "unrevertable pending apply") from error
     if result.returncode != 0:
         rollback_txn(root, txn)
         raise SwitchError(f"could not schedule the confirm-or-revert timer ({result.stderr.strip()[:200]}); "
@@ -1138,6 +1187,12 @@ def cmd_confirm(args) -> int:
             raise SwitchError(f"txn {args.txn!r} was already rolled back; cannot confirm it")
         if record.get("status") == "verify_failed":
             raise SwitchError(f"txn {args.txn!r} failed its post-apply verify; cannot confirm it")
+        if record.get("status") == "superseded":
+            # A txn `recover` closed as superseded (round 5) never itself reached verify_pass with
+            # confirm_target "confirm_pending" -- there is nothing pending_confirmation about it to
+            # confirm, and it is not this component's current state either.
+            raise SwitchError(f"txn {args.txn!r} was closed as superseded by a later change on its "
+                               "component (see 'recover'); cannot confirm it")
         if record.get("status") == "in_progress":
             # Previously-unresolved finding: a crashed/interrupted apply never reached
             # verify_pass, so confirming it would mark a half-applied component "applied"
@@ -1149,7 +1204,14 @@ def cmd_confirm(args) -> int:
                                "verify); run 'recover' or 'rollback --txn' to reconcile it, not confirm")
         ledger = Ledger(root)
         ledger.append(txn=args.txn, op="txn_confirm", component=record.get("component"), surface="_txn", to="confirmed")
-        with contextlib.suppress(SwitchError):
+        # Minor finding (round 5): a best-effort stop of the now-irrelevant revert timer must
+        # never fail a confirm that has already been recorded in the ledger -- suppress()
+        # previously caught only SwitchError, so a subprocess.TimeoutExpired or an OSError (a
+        # missing/misconfigured systemctl) still escaped uncaught here and made an already-
+        # confirmed txn's own `confirm` command exit 1. If the timer does fire later regardless,
+        # `rollback --txn ... --if-unconfirmed` is already a documented no-op against a confirmed
+        # txn.
+        with contextlib.suppress(SwitchError, subprocess.TimeoutExpired, OSError):
             run_captured([*systemctl_argv(), "--user", "stop", f"ecosystem-switch-revert-{args.txn}.timer"])
         save_state(root)
         print(json.dumps({"status": "confirmed", "txn": args.txn}))
@@ -1263,6 +1325,42 @@ def rollback_txn(root: Path, txn: str) -> list[str]:
     return problems
 
 
+def close_superseded_txn(root: Path, txn: str) -> bool:
+    """True (and closes ``txn`` with a terminal "superseded" ledger entry, touching nothing else)
+    when ``txn`` is provably superseded by a later txn that already became its component's own
+    updated_txn -- the exact same write-ahead check ``rollback_txn`` and ``cmd_rollback`` already
+    use to REFUSE a manual rollback of a superseded txn, reused here by ``cmd_recover`` to instead
+    CLOSE one automatically. False (the caller should fall back to a normal ``rollback_txn``
+    reversal) when ``txn`` never set a current/<id> link at all, or nothing later has superseded
+    it -- the ordinary crash-recovery case, unaffected by this function.
+
+    Coordinator decision on the txn state machine (round 5): recover must be able to close every
+    in_progress txn it can prove superseded (roll FORWARD: accept the later, already-verified
+    state as authoritative, matching what a fresh ``adopt --relink``/``apply`` would already
+    observe as "current" -- never physically reverse a superseded txn's own operations, which would
+    silently clobber the later one) or abandoned (roll BACK: the ordinary case, handled by the
+    caller's own ``rollback_txn`` fallback). Before this existed, ``recover`` could only refuse a
+    superseded in_progress txn (reporting it as a problem, never closing it) -- and since nothing
+    else ever transitions a txn out of "in_progress" except a rollback, that refusal left the txn
+    permanently stuck, which in turn left ``open_txn_for_component``'s guard permanently refusing
+    every later `apply`/`adopt --relink` on that component (the exact major-finding regression this
+    function exists to close: a safety fix, at-most-one-open-txn, that had turned into a permanent
+    denial-of-service against the very component it was protecting)."""
+    entries = [entry for entry in Ledger(root).for_txn(txn) if entry.get("op") in OPERATION_KINDS]
+    component_ids = {entry.get("component") for entry in entries if entry.get("component")}
+    if len(component_ids) != 1 or not _txn_sets_current_link(entries):
+        return False
+    (component_id,) = component_ids
+    superseding_txn = (load_state(root)["components"].get(component_id) or {}).get("updated_txn")
+    if superseding_txn in (None, txn):
+        return False
+    superseded_fields = {"from": superseding_txn, "to": "superseded"}
+    Ledger(root).append(txn=txn, op="recover:superseded", component=component_id, surface="_txn_end",
+                        **superseded_fields)
+    save_state(root)
+    return True
+
+
 def cmd_rollback(args) -> int:
     root = eco_root()
     with switch_locks(root):
@@ -1283,6 +1381,14 @@ def cmd_rollback(args) -> int:
             return 0
         if record.get("status") == "rolled_back":
             print(json.dumps({"status": "already_rolled_back", "txn": txn}))
+            return 0
+        if record.get("status") == "superseded":
+            # Same terminal outcome the generic superseded-refusal check below would reach anyway
+            # (a superseded txn's own updated_txn never names it) -- reported directly here for a
+            # clean, non-error result, the same courtesy already_rolled_back/already_confirmed get,
+            # since `recover` closing a txn this way (round 5) is itself a normal outcome, not a
+            # user mistake to refuse with an error exit.
+            print(json.dumps({"status": "already_superseded", "txn": txn}))
             return 0
         txn_entries = [entry for entry in ledger.for_txn(txn) if entry.get("op") in OPERATION_KINDS]
         if not txn_entries:
@@ -1395,26 +1501,42 @@ def cmd_status(args) -> int:
 
 
 def cmd_recover(args) -> int:
-    """Reconcile any txn left in_progress (a crash mid-apply): roll it back rather than
-    leaving a half-applied component. Never 'completes' an interrupted apply."""
+    """Reconcile every txn left in_progress (a crash mid-apply/mid-relink): each one must reach a
+    terminal status, never stay stuck. Coordinator decision on the txn state machine (round 5):
+    close each one either by rolling it BACK (the ordinary case -- nothing later touched its
+    component, so reverse it exactly as a manual `rollback` would) or, when a later txn already
+    became the component's own updated_txn (provable from the ledger's own write-ahead entries,
+    the same check rollback_txn/cmd_rollback already use to refuse a manual rollback of one), by
+    rolling FORWARD -- closing it as `superseded` without touching anything, since a physical
+    reversal at that point would clobber the later, already-verified apply/relink. Before this
+    split existed, the superseded case was only ever refused (never closed), which left the txn
+    in_progress forever and, with it, `open_txn_for_component`'s guard permanently refusing every
+    later `apply`/`adopt --relink` on that component -- the major-finding regression this closes.
+    Never 'completes' an interrupted apply/relink as if it had itself succeeded, either way."""
     root = eco_root()
     with switch_locks(root):
         state = load_state(root)
         recovered = []
+        superseded = []
         rollback_problems: list[str] = []
         for txn, record in state["txns"].items():
             if record.get("status") == "in_progress":
                 try:
-                    rollback_problems.extend(rollback_txn(root, txn))
-                    recovered.append(txn)
+                    if close_superseded_txn(root, txn):
+                        superseded.append(txn)
+                    else:
+                        rollback_problems.extend(rollback_txn(root, txn))
+                        recovered.append(txn)
                 except SwitchError as error:
-                    # rollback_txn's own superseded-txn refusal (a later, already-applied txn on
-                    # the same component moved it on since this one crashed): report it and keep
-                    # reconciling every other in_progress txn in this run instead of aborting the
-                    # whole recover on the first one that is unsafe to blindly reverse.
+                    # Neither branch above is expected to raise in practice (close_superseded_txn
+                    # never touches a live surface, and a txn that is not superseded has already
+                    # been proven safe to reverse) -- kept as a last-resort safety net, the same as
+                    # before this split: report it and keep reconciling every other in_progress txn
+                    # in this run instead of aborting the whole recover on the first problem.
                     rollback_problems.append(f"{txn}: {error}")
         problems = Ledger(root).verify_chain()
-        print(json.dumps({"recovered_txns": recovered, "ledger_chain_ok": not problems, "ledger_problems": problems,
+        print(json.dumps({"recovered_txns": recovered, "superseded_txns": superseded,
+                          "ledger_chain_ok": not problems, "ledger_problems": problems,
                           "rollback_problems": rollback_problems}))
         return 0 if not problems and not rollback_problems else 1
 
@@ -1529,7 +1651,12 @@ def prune_candidates(root: Path) -> list[dict]:
     referenced_roots = {info["current"] for info in state["components"].values() if info.get("current")}
     ledger = Ledger(root)
     for txn, record in state["txns"].items():
-        if record.get("status") == "rolled_back":
+        if record.get("status") in ("rolled_back", "superseded"):
+            # A superseded txn (round 5: `recover` closes one this way rather than reversing it,
+            # see close_superseded_txn) is never a live rollback target either -- both
+            # rollback_txn's own guard and cmd_rollback's pre-check permanently refuse rolling one
+            # back once a later txn has become its component's updated_txn, so its own "previous"
+            # root can be pruned the same as an already-rolled-back txn's.
             continue
         for entry in ledger.for_txn(txn):
             # An unconfirmed or already-applied txn's *previous* root is a live rollback target
@@ -1635,15 +1762,27 @@ def cmd_adopt(args) -> int:
                 if not entry.get("root_name") or not entry.get("current_link"):
                     results[component_id] = "skipped (no switch-managed root; see divergence)"
                     continue
-                stale_txn = in_progress_txn_for_component(root, component_id)
-                if stale_txn:
-                    raise SwitchError(
-                        f"component {component_id!r} has an in_progress transaction {stale_txn!r} left "
-                        "over from an earlier relink/apply (it failed partway, or the process crashed); "
-                        "run 'recover' to reconcile it before retrying, rather than layering a second "
-                        "relink on top -- a retry that never re-touches current/<id> (relink links it "
-                        "only when absent) could leave 'recover' able to unwind the stale txn's own "
-                        "current/<id> link or entrypoints out from under this retry's later work")
+                # Coordinator decision on the txn state machine (round 5): at most one open txn
+                # per component; relink refuses (busy, EXIT_BUSY) the same as apply now does (see
+                # cmd_apply) while an earlier txn for this component is still in_progress (it
+                # failed partway, or the process crashed -- a retry that never re-touches
+                # current/<id>, since relink links it only when absent, could leave 'recover' able
+                # to unwind the stale txn's own current/<id> link or entrypoints out from under
+                # this retry's later work) or pending_confirmation (an `apply` awaiting its own
+                # confirm-or-revert timer -- relinking on top of an unconfirmed version change is
+                # exactly as unsafe as a second apply would be). 'recover' can now close an
+                # in_progress txn even when a later change has since superseded it
+                # (close_superseded_txn), so this refusal is never permanent the way round 4's own
+                # version of it could become (major finding, round 5).
+                open_txn = open_txn_for_component(root, component_id)
+                if open_txn is not None:
+                    open_id, open_status = open_txn
+                    raise Busy(
+                        f"relink refused: component {component_id!r} has an open transaction "
+                        f"{open_id!r} (status {open_status!r}) left over from an earlier relink/apply; "
+                        f"run 'recover' if it is in_progress after a crash, or 'confirm --txn {open_id}'/"
+                        f"'rollback --txn {open_id}' to close a pending_confirmation one, before "
+                        "retrying -- rather than layering a second relink on top")
                 # os.getpid(), the same as apply's own txn id (cmd_apply above): two separate
                 # `adopt --relink` invocations for the same component within the same wall-clock
                 # second (int(time.time())'s own resolution) would otherwise collide onto one

@@ -740,12 +740,58 @@ class ApplyGateTests(SwitchFixture):
         self.assertIn("supersed", result.stderr.lower())
         self.assertEqual(self.run_entrypoint(), "v3", "the superseded rollback must never have touched current/foo")
 
-    def test_recover_refuses_to_clobber_a_txn_a_later_apply_already_superseded(self):
-        # Previously-unresolved finding: the superseded-txn refusal above only ever protected a
-        # manual `rollback --txn` (cmd_rollback's own pre-check). `recover` -- reconciling any
-        # txn still in_progress after a crash -- calls rollback_txn directly, with no equivalent
-        # check, so a crashed txn whose component a *later*, successful apply has since moved on
-        # would be blindly reversed, silently clobbering that later apply.
+    def test_recover_rolls_back_a_crashed_apply_when_nothing_later_superseded_it(self):
+        # Crash-then-recover, the ordinary case (coordinator decision, round 5): an apply crashes
+        # right after its own link step, before the post-apply verify -- the txn is left
+        # in_progress, open_txn_for_component's guard now refuses a retry outright, and 'recover'
+        # is the only way forward. Nothing else has touched "foo" since, so this is the plain
+        # "abandoned" case: recover physically rolls the crashed txn back (not the "superseded"
+        # roll-forward case the next test covers).
+        self.write_receipt("R1", "foo", "2.0.0")
+        crashed_txn = "crashed-1"
+        ledger = switch.Ledger(self.root)
+        ledger.append(txn=crashed_txn, op="txn_begin", component="foo", surface="_txn")
+        fields, _inverse = switch.op_link(self.root, "current/foo", str(self.root_v2.resolve()))
+        ledger.append(txn=crashed_txn, op="link", component="foo", surface="current/foo", **fields)
+        self.assertEqual(self.run_entrypoint(), "v2")
+
+        # A retry is refused outright while the crash left "foo" with an open txn -- apply must
+        # not silently proceed on top of unreconciled, half-applied state.
+        blocked = self.apply("foo", self.root_v2, "R1")
+        self.assertEqual(blocked.returncode, 75, blocked.stderr)
+        self.assertIn(crashed_txn, blocked.stderr)
+        self.assertIn("in_progress", blocked.stderr)
+
+        recover_result = run(self.env, "recover")
+        self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
+        payload = json.loads(recover_result.stdout)
+        self.assertEqual(payload["recovered_txns"], [crashed_txn])
+        self.assertEqual(payload["superseded_txns"], [])
+        self.assertEqual(payload["rollback_problems"], [])
+        self.assertEqual(self.run_entrypoint(), "v1", "recover must roll the crashed apply back")
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["components"]["foo"]["current"], str(self.root_v1.resolve()))
+        self.assertEqual(state["txns"][crashed_txn]["status"], "rolled_back")
+
+        # The open-txn guard is now clear: a fresh apply succeeds.
+        retry = self.apply("foo", self.root_v2, "R1")
+        self.assertEqual(retry.returncode, 0, retry.stderr)
+        self.assertEqual(self.run_entrypoint(), "v2")
+
+    def test_recover_closes_a_superseded_crashed_txn_instead_of_leaving_it_stuck(self):
+        # Major finding (round 5): recover used to only ever REFUSE to reverse a superseded
+        # in_progress txn (round 4's own fix, evidenced below), which left it in_progress forever
+        # -- and since open_txn_for_component's guard (round 5, see cmd_apply/adopt --relink) now
+        # refuses apply/relink outright while ANY in_progress txn is open, that permanent refusal
+        # became a permanent denial-of-service on the whole component: relink could never run
+        # again either. Coordinator decision: recover must instead CLOSE a superseded txn (roll it
+        # FORWARD -- accept the later state as authoritative, touch nothing) so nothing is ever
+        # stuck. The scenario below can now only arise from a ledger a pre-fix version of this
+        # tool already left in exactly this state: a real `apply` call for the "later" txn would
+        # itself now be correctly refused (busy) while crashed_txn is still open, so both the
+        # crashed txn and the txn that superseded it are synthesized directly on the ledger here
+        # (the same technique the crashed txn itself already used) to reproduce that pre-existing,
+        # already-broken state.
         crashed_txn = "crashed-1"
         ledger = switch.Ledger(self.root)
         ledger.append(txn=crashed_txn, op="txn_begin", component="foo", surface="_txn")
@@ -755,23 +801,55 @@ class ApplyGateTests(SwitchFixture):
         ledger.append(txn=crashed_txn, op="link", component="foo", surface="current/foo", **fields)
         self.assertEqual(self.run_entrypoint(), "v2")
 
-        # A later, real apply succeeds and moves "foo" on again -- superseding the crashed txn.
+        # A later, real apply -- synthesized the same way -- succeeds and moves "foo" on again,
+        # superseding the crashed txn.
         root_v3 = self.make_tool_root("foo-3.0.0", "v3")
-        self.write_receipt("R3", "foo", "3.0.0")
-        later = self.apply("foo", root_v3, "R3")
-        self.assertEqual(later.returncode, 0, later.stderr)
+        later_txn = "later-1"
+        ledger.append(txn=later_txn, op="txn_begin", component="foo", surface="_txn")
+        later_fields, _inverse = switch.op_link(self.root, "current/foo", str(root_v3.resolve()))
+        ledger.append(txn=later_txn, op="link", component="foo", surface="current/foo", **later_fields)
+        ledger.append(txn=later_txn, op="verify_pass", component="foo", surface="_txn", to="applied")
         self.assertEqual(self.run_entrypoint(), "v3")
 
         recover_result = run(self.env, "recover")
+        self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
         payload = json.loads(recover_result.stdout)
         self.assertNotIn(crashed_txn, payload["recovered_txns"],
-                         "a superseded in_progress txn must not be silently reversed")
-        self.assertTrue(any(crashed_txn in problem and "supersed" in problem.lower()
-                            for problem in payload["rollback_problems"]), payload["rollback_problems"])
+                         "a superseded in_progress txn must not be physically reversed")
+        self.assertEqual(payload["superseded_txns"], [crashed_txn])
+        self.assertEqual(payload["rollback_problems"], [],
+                         "closing a superseded txn is success, not a reported problem")
         # current/foo must still point at the later, real apply's root -- never clobbered.
         self.assertEqual(self.run_entrypoint(), "v3")
         state = json.loads(run(self.env, "status", "--json").stdout)
         self.assertEqual(state["components"]["foo"]["current"], str(root_v3.resolve()))
+        self.assertEqual(state["txns"][crashed_txn]["status"], "superseded")
+
+        # Manually rolling the superseded txn back is still refused -- it is closed, not
+        # reversible -- but as a clean, non-error "already_superseded" result, the same courtesy
+        # "already_rolled_back" already gets, not a raw refusal.
+        manual_rollback = run(self.env, "rollback", "--txn", crashed_txn)
+        self.assertEqual(manual_rollback.returncode, 0, manual_rollback.stderr)
+        self.assertEqual(json.loads(manual_rollback.stdout)["status"], "already_superseded")
+        confirm_attempt = run(self.env, "confirm", "--txn", crashed_txn)
+        self.assertNotEqual(confirm_attempt.returncode, 0)
+        self.assertIn("superseded", confirm_attempt.stderr.lower())
+
+        # "Relink after recover" (coordinator decision, round 5): before this fix, recover could
+        # only ever refuse a superseded in_progress txn, leaving it in_progress forever -- and
+        # since open_txn_for_component's guard blocks 'adopt --relink' while ANY in_progress txn
+        # is open, that refusal permanently blocked every future relink on "foo" too (the major
+        # finding this test guards). Now that recover has closed crashed_txn, "foo" has no open
+        # txn left, and relink succeeds again -- reflecting the pin catching up to the now-current
+        # real root (root_v3) the way a qualify wave would after this kind of recovery.
+        self.write_components({"foo": {
+            "version": "3.0.0", "kind": "tarball", "root_name": "foo-3.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}], "surfaces": [], "state_dirs": [],
+            "window": "default", "rollback_class": "safe",
+        }})
+        relink_after = run(self.env, "adopt", "--relink", "--component", "foo")
+        self.assertEqual(relink_after.returncode, 0, relink_after.stderr)
+        self.assertEqual(self.run_entrypoint(), "v3")
 
     def test_confirm_refuses_a_rolled_back_txn(self):
         self.write_receipt("R1", "foo", "2.0.0")
@@ -1050,6 +1128,146 @@ class ConfirmAndRevertTests(SwitchFixture):
         self.assertIn("timed out", str(ctx.exception))
         state = switch.load_state(self.root)
         self.assertEqual(state["txns"][txn]["status"], "rolled_back")
+
+    def test_a_missing_systemd_run_rolls_back_immediately_like_a_clean_scheduling_failure(self):
+        # Minor finding (round 5): the same gap as the timeout case above, but for OSError (a
+        # missing/misconfigured systemd-run: FileNotFoundError via ECOSYSTEM_SWITCH_SYSTEMD_RUN
+        # or PATH, or PermissionError) -- also used to escape this function uncaught, since the
+        # only handler was `except subprocess.TimeoutExpired`.
+        real_current = os.readlink(self.root / "current" / "foo")
+        ledger = switch.Ledger(self.root)
+        txn = "foo-9998-1"
+        ledger.append(txn=txn, op="txn_begin", component="foo", surface="_txn")
+        ledger.append(txn=txn, op="link", component="foo", surface="current/foo",
+                      **{"from": real_current, "to": real_current})
+        ledger.append(txn=txn, op="verify_pass", component="foo", surface="_txn", to="confirm_pending")
+        switch.save_state(self.root)
+
+        def fake_run_captured(argv, **_kwargs):
+            raise FileNotFoundError(2, "No such file or directory", argv[0])
+        with unittest.mock.patch.object(switch, "run_captured", side_effect=fake_run_captured):
+            with self.assertRaises(switch.SwitchError) as ctx:
+                switch.schedule_confirm_or_revert(self.root, txn, 300)
+        self.assertIn("could not run", str(ctx.exception))
+        state = switch.load_state(self.root)
+        self.assertEqual(state["txns"][txn]["status"], "rolled_back")
+
+    def test_confirm_succeeds_even_when_stopping_the_revert_timer_fails(self):
+        # Minor finding (round 5): a best-effort stop of the now-irrelevant revert timer must
+        # never fail a confirm that has already been recorded in the ledger --
+        # contextlib.suppress used to catch only SwitchError, so a subprocess.TimeoutExpired or
+        # an OSError (a missing/misconfigured systemctl) still made an already-confirmed txn's
+        # own `confirm` command exit 1, even though the confirmation itself had already landed.
+        first = self.apply("foo", self.root_v2, "R1", extra=("--confirm-within", "300"))
+        self.assertEqual(first.returncode, 0, first.stderr)
+        first_txn = json.loads(first.stdout)["txn"]
+        env = {**self.env, "ECOSYSTEM_SWITCH_SYSTEMCTL": "/nonexistent/systemctl-does-not-exist"}
+        confirm = run(env, "confirm", "--txn", first_txn)
+        self.assertEqual(confirm.returncode, 0, confirm.stderr)
+        self.assertEqual(json.loads(confirm.stdout)["status"], "confirmed")
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["txns"][first_txn]["status"], "applied")
+
+    def test_apply_refuses_while_an_earlier_txns_confirmation_is_still_pending(self):
+        # Major finding (round 5): nothing used to stop a second apply while an earlier one on
+        # the same component was still pending_confirmation, defeating confirm-or-revert outright
+        # (apply A1 v1->v2 --confirm-within, then A2 v2->v3, nothing refusing it -- once A2
+        # itself reverted, A1's old root was unrecoverable through either `rollback --txn A1`,
+        # refused as superseded by A2, or `rollback foo`, which kept re-selecting A2).
+        # open_txn_for_component's guard (round 5) now refuses the second apply outright instead.
+        first = self.apply("foo", self.root_v2, "R1", extra=("--confirm-within", "300"))
+        self.assertEqual(first.returncode, 0, first.stderr)
+        first_txn = json.loads(first.stdout)["txn"]
+
+        root_v3 = self.make_tool_root("foo-3.0.0", "v3")
+        self.write_receipt("R3", "foo", "3.0.0")
+        blocked = self.apply("foo", root_v3, "R3")
+        self.assertEqual(blocked.returncode, 75, blocked.stderr)
+        self.assertIn(first_txn, blocked.stderr)
+        self.assertIn("pending_confirmation", blocked.stderr)
+        self.assertEqual(self.run_entrypoint(), "v2", "the blocked apply must not have touched anything")
+
+        # Closed via `confirm`: the guard clears and the second apply now succeeds.
+        confirm = run(self.env, "confirm", "--txn", first_txn)
+        self.assertEqual(confirm.returncode, 0, confirm.stderr)
+        second = self.apply("foo", root_v3, "R3")
+        self.assertEqual(second.returncode, 0, second.stderr)
+        self.assertEqual(self.run_entrypoint(), "v3")
+
+    def test_apply_refuses_while_pending_confirmation_until_rolled_back(self):
+        # Same guard as above, closed via `rollback` instead of `confirm`.
+        first = self.apply("foo", self.root_v2, "R1", extra=("--confirm-within", "300"))
+        self.assertEqual(first.returncode, 0, first.stderr)
+        first_txn = json.loads(first.stdout)["txn"]
+
+        root_v3 = self.make_tool_root("foo-3.0.0", "v3")
+        self.write_receipt("R3", "foo", "3.0.0")
+        blocked = self.apply("foo", root_v3, "R3")
+        self.assertEqual(blocked.returncode, 75, blocked.stderr)
+
+        rollback = run(self.env, "rollback", "--txn", first_txn)
+        self.assertEqual(rollback.returncode, 0, rollback.stderr)
+        self.assertEqual(self.run_entrypoint(), "v1")
+        second = self.apply("foo", root_v3, "R3")
+        self.assertEqual(second.returncode, 0, second.stderr)
+        self.assertEqual(self.run_entrypoint(), "v3")
+
+    def test_relink_refuses_while_an_earlier_applys_confirmation_is_still_pending(self):
+        # The open-txn guard (round 5) covers `adopt --relink` too, not just a second apply:
+        # relinking on top of an unconfirmed version change is exactly as unsafe, and this is the
+        # same guard `apply` gets above, reused.
+        first = self.apply("foo", self.root_v2, "R1", extra=("--confirm-within", "300"))
+        self.assertEqual(first.returncode, 0, first.stderr)
+        first_txn = json.loads(first.stdout)["txn"]
+
+        blocked = run(self.env, "adopt", "--relink", "--component", "foo")
+        self.assertEqual(blocked.returncode, 75, blocked.stderr)
+        self.assertIn(first_txn, blocked.stderr)
+        self.assertIn("pending_confirmation", blocked.stderr)
+
+        confirm = run(self.env, "confirm", "--txn", first_txn)
+        self.assertEqual(confirm.returncode, 0, confirm.stderr)
+        # The pin/spec must catch up to the now-current real root (root_v2) for relink's own
+        # pre-check to agree with it -- unrelated to the open-txn guard this test exercises,
+        # exactly like a qualify wave updating the pin after a version change in real use.
+        self.write_components({"foo": {
+            "version": "2.0.0", "kind": "tarball", "root_name": "foo-2.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}], "surfaces": [], "state_dirs": [],
+            "window": "default", "rollback_class": "safe",
+        }})
+        relink_after = run(self.env, "adopt", "--relink", "--component", "foo")
+        self.assertEqual(relink_after.returncode, 0, relink_after.stderr)
+
+    def test_confirm_or_revert_timer_only_acts_on_its_own_txn(self):
+        # Coordinator decision on the txn state machine (round 5): "the confirm-or-revert timer
+        # of a txn only acts on its own txn." A stray/late `--if-unconfirmed` callback for an
+        # OLD, already-closed txn (a duplicate systemd-run firing, or an operator re-running a
+        # stale command by hand) must be a harmless no-op against that old txn, never touching a
+        # newer, unrelated open txn on the same component -- schedule_confirm_or_revert always
+        # names its own `--txn` explicitly (never "whichever txn is open now"), which is what
+        # this guarantees in practice; the open-txn guard above additionally ensures there is at
+        # most one genuinely open txn per component for a stray callback to ever collide with.
+        first = self.apply("foo", self.root_v2, "R1", extra=("--confirm-within", "300"))
+        self.assertEqual(first.returncode, 0, first.stderr)
+        first_txn = json.loads(first.stdout)["txn"]
+        confirm = run(self.env, "confirm", "--txn", first_txn)
+        self.assertEqual(confirm.returncode, 0, confirm.stderr)
+
+        root_v3 = self.make_tool_root("foo-3.0.0", "v3")
+        self.write_receipt("R3", "foo", "3.0.0")
+        second = self.apply("foo", root_v3, "R3", extra=("--confirm-within", "300"))
+        self.assertEqual(second.returncode, 0, second.stderr)
+        second_txn = json.loads(second.stdout)["txn"]
+        self.assertNotEqual(first_txn, second_txn)
+
+        # A stray revert callback for the OLD (already-confirmed) txn must be a no-op and must
+        # never touch the second, still-open txn.
+        stray = run(self.env, "rollback", "--txn", first_txn, "--if-unconfirmed")
+        self.assertEqual(stray.returncode, 0, stray.stderr)
+        self.assertEqual(json.loads(stray.stdout)["status"], "already_confirmed")
+        self.assertEqual(self.run_entrypoint(), "v3", "the stray callback must not have reverted the second txn")
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["txns"][second_txn]["status"], "pending_confirmation")
 
 
 @REQUIRES_PROCFS
