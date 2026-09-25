@@ -9576,8 +9576,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "9ed65813828bf171912a0ba6c034e4096c9d5e97f5f2e78a0063ad5eadb6fefc",
-      "bytes": 179052
+      "sha256": "ecd1d773a4abbd25e55bbf1d5bf00039d364f08c91cee5d340df4c653e38c085",
+      "bytes": 186410
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -10076,13 +10076,13 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "eacab116e7e38e1d29b3c6cfd4d8f28c54bc0f5363e9c3bc33433d6ef78390aa",
-      "bytes": 17289
+      "sha256": "07b63bb67ccd5e59715a36d42347552f16f9e6f8c4e637c2afe74cbd34b5a581",
+      "bytes": 19028
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "f20bda7c773cbb47036e5017a74cdf32e4e1e0e638804348f6c82133e61790d5",
-      "bytes": 28201
+      "sha256": "eab29e3eb9f89780aa2cbb2163ba2053239edb4840bf4f963ee2e9af96ef2f5a",
+      "bytes": 29824
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -29401,8 +29401,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "b1fa0f762d2bc39a062b23eb93c88ff1a650f0d2bbc9f85cfa2feaa718c66c4b",
-      "bytes": 26462
+      "sha256": "a204dfb17bc1ed438b3b145718082d86573a24de1530953c5b524f6c83d0e6ee",
+      "bytes": 33866
     },
     {
       "path": "scripts/credential_status.py",
@@ -29431,8 +29431,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "f236b6885dc0f6d4f2c09734e8eadf08125c22d73a96f205e47aa36b515d242b",
-      "bytes": 75640
+      "sha256": "90cfe1316bcb2ead4c9bad46b2636341b88cb3b6d38cb1bd8b6364bae22fd20a",
+      "bytes": 95432
     },
     {
       "path": "scripts/landscape.py",
@@ -29453,6 +29453,11 @@
       "path": "scripts/platform_status.py",
       "sha256": "b45a62e4babb37d0ef8e1ab9b8e5759e08d38ba6e7bc491bb70939fe00fe6d04",
       "bytes": 11399
+    },
+    {
+      "path": "scripts/receipt_staleness.py",
+      "sha256": "2360fcd200cf9a98914367408aca1ec7df44fdadf32c97c2f13df27a2b18a997",
+      "bytes": 13408
     },
     {
       "path": "scripts/recount-tokens.cjs",
@@ -29741,8 +29746,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "c2bdbacd7e48f268adbf9b6df3fe24811ca6a085dd7f01d846ffc0cb994bb12e",
-      "bytes": 25175
+      "sha256": "4ce9b8c16944c966af2d2ccca6e891ddefac58ed740558aba8f8e5f501783bc5",
+      "bytes": 34296
     },
     {
       "path": "tests/test_convergence_contract.py",
@@ -29861,8 +29866,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "8a0cc4d8450600986606ae9ad0af83a6b611f7755a38dfc8de63260bf7be748d",
-      "bytes": 101033
+      "sha256": "4a2a0fa0d8b97439e96c5fd99338a5005407fdac8b82bdf91444fe28fc5f0387",
+      "bytes": 130320
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
@@ -30053,6 +30058,11 @@
       "path": "tests/test_promotion_gate_codex_review.py",
       "sha256": "ac1a31d28a737ca208d58595173e2f57ef43828088dc0c4e286de3c95f76d4ab",
       "bytes": 20781
+    },
+    {
+      "path": "tests/test_receipt_staleness.py",
+      "sha256": "3bf62e631f72fc93740f4ebf361fd76d0da5c9b1743e7ba65542bea640e37fae",
+      "bytes": 24084
     },
     {
       "path": "tests/test_release_pin_contents.py",
