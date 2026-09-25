@@ -1,5 +1,5 @@
 {
- "mode": "dry-run",
+ "mode": "paper",
  "first_order_not_before": "2026-09-25T09:15:00-04:00",
  "dry_run_equity": "900988.95",
  "dry_run_multiplier": "4",
