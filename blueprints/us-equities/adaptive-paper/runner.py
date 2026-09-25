@@ -1906,14 +1906,17 @@ def main():
         print(json.dumps(result))
         return 2
     key, secret = credentials(args.env_file)
-    # Trading-lane audit gap #8: constructed unconditionally (object
-    # construction only, no network call -- see AlpacaCorporateActionsSource's
-    # docstring) so it is available to run_native's AdaptiveStrategy below
-    # for both `paper` and a future recovery-time consultation; inert until
-    # its first evaluate()/refresh() call. Never logs or stores key/secret
-    # beyond the client object; the same env-file credential path every
-    # other broker call in this file already uses.
-    config["_corporate_action_guard"] = CorporateActionMonitor(AlpacaCorporateActionsSource(key, secret))
+    # Trading-lane audit gap #8: the guard only ever acts when
+    # session_policy["overnight_holds"] is enabled (see
+    # _corporate_action_guard_for_strategy), so it is constructed only then.
+    # Construction makes no network call, but AlpacaCorporateActionsSource
+    # imports alpaca-py's data client; a regular-session run (every shipped
+    # config) therefore never needs that import or the object. Never logs or
+    # stores key/secret beyond the client object; the same env-file
+    # credential path every other broker call in this file already uses.
+    config["_corporate_action_guard"] = (
+        CorporateActionMonitor(AlpacaCorporateActionsSource(key, secret))
+        if session_policy["overnight_holds"] else None)
     attempts, responses = [], []
     def observe_request(kind, **kwargs):
         attempts.append({"timestamp": time.time(), "kind": kind})

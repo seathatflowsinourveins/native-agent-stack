@@ -585,6 +585,19 @@ class AlpacaCorporateActionsSource:
     _MAX_PAGES = 5
 
     def __init__(self, api_key, secret_key):
+        # alpaca-py's data client is imported and built on first use (the
+        # `_client` property below), not here: runner.main constructs this
+        # source for every overnight-holds run before its gate checks, and a
+        # process that never fetches (a refused run, or a test environment
+        # without alpaca-py) must not need alpaca-py installed.
+        self._api_key = api_key
+        self._secret_key = secret_key
+        self._client_instance = None
+
+    @property
+    def _client(self):
+        if self._client_instance is not None:
+            return self._client_instance
         from alpaca.data.historical.corporate_actions import CorporateActionsClient
         # raw_data=True: this wrapper's own inherited `RESTClient.get()`
         # (which fetch() below calls directly) already returns the plain
@@ -603,7 +616,7 @@ class AlpacaCorporateActionsSource:
         # `partial_calls`, `capital_gains_distributions` -- is now moot for
         # fetch() specifically, since it never goes through
         # CorporateActionsSet at all.
-        self._client = CorporateActionsClient(api_key, secret_key, raw_data=True)
+        client = CorporateActionsClient(self._api_key, self._secret_key, raw_data=True)
         # HIGH finding 2: alpaca-py's RESTClient (verified against the
         # installed alpaca-py==0.44.0 RESTClient.__init__/_request) sets no
         # per-request HTTP timeout at all, and sleeps `_retry_wait` (default
@@ -623,7 +636,7 @@ class AlpacaCorporateActionsSource:
         # past that point (see that function's own docstring and
         # CorporateActionMonitor's generation check, which is what makes a
         # late write from such a call harmless rather than "bounded").
-        session = self._client._session
+        session = client._session
         original_request = session.request
 
         def _bounded_request(method, url, **kwargs):
@@ -631,8 +644,10 @@ class AlpacaCorporateActionsSource:
             return original_request(method, url, **kwargs)
 
         session.request = _bounded_request
-        self._client._retry = 1
-        self._client._retry_wait = 1
+        client._retry = 1
+        client._retry_wait = 1
+        self._client_instance = client
+        return client
 
     @staticmethod
     def _parse_date(value):
