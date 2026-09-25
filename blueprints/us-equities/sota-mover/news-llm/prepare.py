@@ -14,15 +14,17 @@ Runs in a Python with duckdb (the adaptive-paper runtime); the rules themselves 
 in news_signal.py and are shared with every other script.
 """
 import argparse
+import bisect
 import gzip
 import hashlib
 import importlib.util
 import io
 import json
 import os
+import subprocess
 import sys
 from array import array
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 from datetime import date, datetime, timezone
 
 
@@ -47,13 +49,10 @@ ASSET_FILES = [
     os.path.expanduser("~/codex-ecosystem/state/broad-market-20260921/entitlement-probe-assets-inactive.json"),
 ]
 DAILY = os.path.expanduser("~/codex-ecosystem/state/broad-market-20260921/dataset/daily.parquet")
-MINUTE_ROOT = os.path.expanduser("~/.local/share/native-agent-stack/minute-bars/stage1/bars")
 PRIVATE_ROOT = os.path.expanduser("~/.local/state/native-agent-stack/research/sota-mover/news-llm")
 
 STUDY_FIRST_SESSION = date(2016, 1, 4)
 STUDY_LAST_SESSION = date(2026, 9, 18)
-MINUTE_LAST_SESSION = date(2026, 8, 14)
-MINUTE_FIRST_SESSION = date(2017, 1, 3)
 
 
 class DeterministicGzipText:
@@ -128,6 +127,8 @@ def scan_news(calendar, assets, ambiguous, args):
     seen_ids = set()
     tracker = sig.DuplicateTracker()
     candidates = []
+    by_year_single = Counter()
+    by_year_missing = Counter()
     last_prune_day = None
     for path, file_day in iter_news_files(args.news_root):
         with gzip.open(path, "rt", encoding="utf-8") as handle:
@@ -171,6 +172,8 @@ def scan_news(calendar, assets, ambiguous, args):
                 continue
             funnel["single_symbol"] += 1
             symbol = symbols[0]
+            ny_year = created.astimezone(sig.NY).year
+            by_year_single[ny_year] += 1
             updated = None
             try:
                 updated = sig.as_utc(row["updated_at"]) if row.get("updated_at") else None
@@ -187,6 +190,7 @@ def scan_news(calendar, assets, ambiguous, args):
             asset = assets.get(symbol)
             if asset is None:
                 funnel["drop_symbol_not_in_asset_master"] += 1
+                by_year_missing[ny_year] += 1
                 continue
             if not sig.is_primary_operating_company(symbol, asset.get("name"), asset.get("exchange")):
                 funnel["drop_not_primary_operating_company"] += 1
@@ -234,50 +238,71 @@ def scan_news(calendar, assets, ambiguous, args):
                 "session": window.session.isoformat(),
                 "entry_utc": window.entry_utc.isoformat().replace("+00:00", "Z"),
                 "exit_utc": window.exit_utc.isoformat().replace("+00:00", "Z"),
+                "decision_cutoff_utc": window.decision_cutoff_utc.isoformat().replace("+00:00", "Z"),
                 "checkpoint_year": ckpt,
+                "_window": window,
+                "_created_ts": int(created.timestamp()),
             })
-    # id/time consistency (guard B): an article stamped more than an hour before the
-    # median created_at of the articles with the 5 next-lower ids entered the feed later
-    # than its stamp claims (ids are assigned in ingestion order).
-    order = sorted(range(len(ids)), key=lambda i: ids[i])
-    times = [id_times[i] for i in order]
-    backdated = Counter()
-    suspect_ids = set()
-    for pos, t in enumerate(times):
-        lag = sig.id_order_lag(times[max(0, pos - sig.ID_ORDER_PREDECESSORS):pos], t)
-        if lag is None:
-            continue
-        if lag > sig.ID_ORDER_GUARD_SECONDS:
-            suspect_ids.add(str(ids[order[pos]]))
-        if lag > 86400:
-            backdated["created_gt_1d_before_predecessors"] += 1
-        elif lag > 3600:
-            backdated["created_1h_1d_before_predecessors"] += 1
+    ingestion, lag_counts = estimate_ingestion(ids, id_times)
     diagnostics = {
         "updated_minus_created_seconds": {
             "n": len(gaps),
             "buckets": dict(gap_counts),
             "quantiles": quantiles(list(gaps)),
         },
-        "id_order_consistency": {"n_with_numeric_id": len(ids), "vs_median_of_5_lower_ids": dict(backdated)},
+        "estimated_ingestion_minus_created": {"n_with_numeric_id": len(ids), "rule": "max(created, p90 of 100 lower ids)",
+                                              "buckets": dict(lag_counts)},
         "file_day_differs_from_created_at_utc_date": file_date_mismatch,
         "windows_after_instrument_filter": dict(by_window),
         "guard": dict(guard),
+        "survivorship_single_symbol_not_in_asset_master_by_ny_year": {
+            str(y): {"single_symbol": by_year_single[y], "not_in_asset_master": by_year_missing[y],
+                     "share": round(by_year_missing[y] / by_year_single[y], 4) if by_year_single[y] else None}
+            for y in sorted(by_year_single)
+        },
     }
     kept = []
     for c in candidates:
-        if c["news_id"] in suspect_ids:
-            funnel["drop_guard_id_order"] += 1
+        window = c.pop("_window")
+        created_ts = c.pop("_created_ts")
+        nid = int(c["news_id"]) if c["news_id"].isdigit() else None
+        est = ingestion.get(nid, created_ts)
+        ok, reason = sig.ingestion_guard(window, est)
+        if not ok:
+            funnel[f"drop_guard_{reason}"] += 1
             funnel["pre_eligibility_candidates"] -= 1
             continue
         kept.append(c)
     return kept, funnel, diagnostics
 
 
+def estimate_ingestion(ids, id_times):
+    """Guard B input: news id -> estimated ingestion time (epoch s), only where it exceeds
+    created_at (news_signal.estimated_ingestion over the 100 next-lower ids)."""
+    order = sorted(range(len(ids)), key=lambda i: ids[i])
+    window_sorted, recent = [], deque()
+    out = {}
+    lags = Counter()
+    for i in order:
+        t = id_times[i]
+        if window_sorted:
+            est = sig.estimated_ingestion(window_sorted, t)
+            if est > t:
+                out[ids[i]] = est
+                lag = est - t
+                lags["gt_1d" if lag > 86400 else "1h_1d" if lag > 3600 else "1min_1h" if lag > 60 else "le_1min"] += 1
+        bisect.insort(window_sorted, t)
+        recent.append(t)
+        if len(recent) > sig.INGESTION_PREDECESSORS:
+            old = recent.popleft()
+            del window_sorted[bisect.bisect_left(window_sorted, old)]
+    return out, lags
+
+
 # Bars of the pair symbols on XNYS sessions (daily rows on non-calendar dates are ignored).
 DAILY_SQL = """
 CREATE TABLE d AS
-SELECT b.symbol, c.si, b.raw_c, b.raw_c * b.raw_v AS dv
+SELECT b.symbol, c.si, b.raw_c, b.raw_c * b.raw_v AS dv, b.all_l, b.all_c
 FROM read_parquet(?) b JOIN cal c ON c.session = b.session_date
 WHERE b.in_raw AND b.raw_c IS NOT NULL AND b.raw_v IS NOT NULL
   AND b.symbol IN (SELECT DISTINCT symbol FROM pairs)
@@ -287,12 +312,15 @@ WHERE b.in_raw AND b.raw_c IS NOT NULL AND b.raw_v IS NOT NULL
 # predecessors; `span = 19` proves those 20 bars sit on 20 consecutive XNYS sessions.
 ELIGIBILITY_SQL = """
 WITH w AS (
-  SELECT symbol, si, raw_c,
+  SELECT symbol, si, raw_c, all_l,
          median(dv) OVER (PARTITION BY symbol ORDER BY si ROWS BETWEEN 19 PRECEDING AND CURRENT ROW) AS med20,
-         si - lag(si, 19) OVER (PARTITION BY symbol ORDER BY si) AS span
+         si - lag(si, 19) OVER (PARTITION BY symbol ORDER BY si) AS span,
+         lag(all_c) OVER (PARTITION BY symbol ORDER BY si) AS prev_all_c,
+         si - lag(si) OVER (PARTITION BY symbol ORDER BY si) AS gap1
   FROM d
 )
-SELECT p.symbol, p.session, w.raw_c AS prior_close, w.med20, coalesce(w.span = 19, false) AS complete
+SELECT p.symbol, p.session, w.raw_c AS prior_close, w.med20, coalesce(w.span = 19, false) AS complete,
+       w.all_l AS prior_low_adj, CASE WHEN w.gap1 = 1 THEN w.prev_all_c END AS prior2_close_adj
 FROM pairs p LEFT JOIN w ON w.symbol = p.symbol AND w.si = p.si - 1
 """
 
@@ -318,17 +346,20 @@ def eligibility(candidates, calendar, args):
     in_daily = {r[0] for r in con.execute("SELECT DISTINCT symbol FROM d").fetchall()}
     rows = con.execute(ELIGIBILITY_SQL).fetchall()
     stats = {}
-    for symbol, session, prior_close, med20, complete in rows:
-        stats[(symbol, session.isoformat())] = (prior_close, med20, bool(complete), symbol in in_daily)
+    for symbol, session, prior_close, med20, complete, low_adj, prior2_adj in rows:
+        stats[(symbol, session.isoformat())] = (prior_close, med20, bool(complete), symbol in in_daily, low_adj, prior2_adj)
     con.close()
     return stats
 
 
-def minute_available(symbol, session_iso):
-    d = date.fromisoformat(session_iso)
-    if not (MINUTE_FIRST_SESSION <= d <= MINUTE_LAST_SESSION):
-        return False
-    return os.path.exists(os.path.join(MINUTE_ROOT, f"symbol={symbol}", f"year={d.year}", "full.parquet"))
+def git_provenance():
+    """HEAD and whether the study directory is clean; events must come from committed code."""
+    def git(*args):
+        return subprocess.run(["git", *args], cwd=_HERE, capture_output=True, text=True)
+    head = git("rev-parse", "HEAD")
+    status = git("status", "--porcelain", "--", ".")
+    return {"head": head.stdout.strip() if head.returncode == 0 else None,
+            "study_dir_clean": status.returncode == 0 and not status.stdout.strip()}
 
 
 def main(argv=None):
@@ -338,7 +369,11 @@ def main(argv=None):
     parser.add_argument("--out", default=PRIVATE_ROOT)
     parser.add_argument("--memory-limit", default="2.5GB")
     parser.add_argument("--threads", type=int, default=4)
+    parser.add_argument("--allow-dirty", action="store_true", help="tests only: build from uncommitted code")
     args = parser.parse_args(argv)
+    provenance = git_provenance()
+    if not provenance["study_dir_clean"] and not args.allow_dirty:
+        raise SystemExit("refusing: the study directory has uncommitted changes; events must be built from committed code")
     os.makedirs(args.out, exist_ok=True)
     started = datetime.now(timezone.utc)
     with open(CALENDAR, encoding="utf-8") as handle:
@@ -349,7 +384,8 @@ def main(argv=None):
     eligible = []
     lane_counts = Counter()
     for c in candidates:
-        prior_close, med20, complete, in_daily = stats.get((c["symbol"], c["session"]), (None, None, False, False))
+        prior_close, med20, complete, in_daily, low_adj, prior2_adj = stats.get(
+            (c["symbol"], c["session"]), (None, None, False, False, None, None))
         if not in_daily:
             funnel["drop_symbol_not_in_daily_dataset"] += 1
             continue
@@ -357,16 +393,13 @@ def main(argv=None):
         if lane is None:
             funnel["drop_not_eligible_lane"] += 1
             continue
-        if c["window"] == sig.RTH:
-            if lane != sig.LIQUID:
-                funnel["drop_rth_not_liquid"] += 1
-                continue
-            if not minute_available(c["symbol"], c["session"]):
-                funnel["drop_rth_no_minute_bars"] += 1
-                continue
+        if c["window"] == sig.RTH and lane != sig.LIQUID:
+            funnel["drop_rth_not_liquid"] += 1
+            continue
         c["lane"] = lane
         c["prior_close"] = prior_close
         c["prior_median_dollar_volume_20"] = med20
+        c["ssr_carryover"] = sig.ssr_carryover(low_adj, prior2_adj)
         eligible.append(c)
         lane_counts[f"{c['window']}:{lane}"] += 1
     funnel["eligible_before_first_per_window"] = len(eligible)
@@ -378,7 +411,7 @@ def main(argv=None):
     selected_lanes = Counter()
     sessions = defaultdict(set)
     events_path = os.path.join(args.out, "events.jsonl.gz")
-    with DeterministicGzipText(events_path) as out:
+    with DeterministicGzipText(events_path + ".tmp") as out:
         for ev in selected:
             ev["event_id"] = f"{ev['news_id']}:{ev['symbol']}"
             out.write(json.dumps(ev, sort_keys=True) + "\n")
@@ -387,11 +420,13 @@ def main(argv=None):
             per_ckpt[ev["checkpoint_year"]] += 1
             selected_lanes[key] += 1
             sessions[key].add(ev["session"])
+    os.replace(events_path + ".tmp", events_path)  # readers never see a partial file
     receipt = {
         "schema": "sota-news-llm-prepare/1",
         "evidence_label": "HIST",
         "started_at": started.isoformat(timespec="seconds"),
         "finished_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "git": provenance,
         "inputs": {
             "news_manifest_sha256": sha256_file(os.path.join(args.news_root, "manifest.jsonl")),
             "news_run_header_sha256": sha256_file(os.path.join(args.news_root, "run-header.json")),
@@ -410,7 +445,7 @@ def main(argv=None):
         "selected_by_checkpoint": {str(k): v for k, v in sorted(per_ckpt.items())},
         "diagnostics": diagnostics,
         "events_file": {"path": "events.jsonl.gz", "sha256": sha256_file(events_path), "rows": len(selected)},
-        "no_outcome_statement": "No price after any decision time was read; only prior-session daily bars (liquidity filter) and file existence of minute bars were used.",
+        "no_outcome_statement": "No price after any decision time was read; only daily bars of sessions before each trade session (liquidity lanes, Rule 201 carry-over) were used.",
     }
     with open(os.path.join(args.out, "prepare-receipt.json"), "w", encoding="utf-8") as handle:
         json.dump(receipt, handle, indent=1, sort_keys=True)

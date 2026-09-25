@@ -49,13 +49,13 @@ ARTICLES = [
     article(103, "2023-03-01T14:10:00Z", ["ACME"], "Acme Names New CFO"),                 # 09:10 EST, excluded window
     article(104, "2023-03-01T15:00:00Z", ["BETA"], "Beta Signs Supplier", "2023-03-01T15:20:00Z"),  # guard A
     article(105, "2023-03-01T15:01:00Z", ["BETA"], "Beta Shares Are Trading Higher"),     # movement headline
-    article(106, "2023-03-02T01:00:00Z", ["ACME"], "Acme wins big contract!"),            # 24 h duplicate of 100
+    article(121, "2023-03-02T01:00:00Z", ["ACME"], "Acme wins big contract!"),            # 24 h duplicate of 100
     article(107, "2023-03-01T15:02:00Z", ["ZZZZ"], "Unknown Co Reports"),                 # not in asset master
     article(108, "2023-03-01T15:05:00Z", ["BETA"], "Beta Launches Product"),              # kept: RTH
-    article(109, "2023-02-25T15:00:00Z", ["GAMMA"], "Gamma Raises Guidance"),            # guard B (id order)
+    article(109, "2023-02-25T15:00:00Z", ["GAMMA"], "Gamma Raises Guidance"),            # guard B: ingested after its cutoff
     article(110, "2023-03-01T15:06:00Z", [], "Economic Calendar"),                        # no symbols
     article(111, "2023-03-01T15:07:00Z", ["AMB"], "Ambiguous Co Update"),                 # ambiguous symbol
-    article(112, "2023-03-01T20:45:00Z", ["BETA"], "Beta Late Update"),                   # 15:45 EST, last 30 min
+    article(120, "2023-03-01T20:45:00Z", ["BETA"], "Beta Late Update"),                   # 15:45 EST, last 30 min
     article(113, "2023-03-01T15:08:00Z", ["ACME"], "Acme Opens Plant"),                   # kept: RTH (ACME)
     article(114, "2023-03-01T15:09:00Z", ["ACME"], "Acme Opens Second Plant"),            # later RTH, same window
 ]
@@ -92,7 +92,10 @@ class ScanNews(unittest.TestCase):
         self.assertEqual(funnel["drop_guard_updated_after_cutoff"], 1)
         self.assertEqual(funnel["drop_movement_headline"], 1)
         self.assertEqual(funnel["drop_duplicate_24h"], 1)
-        self.assertEqual(funnel["drop_guard_id_order"], 1)
+        self.assertEqual(funnel["drop_guard_ingested_after_cutoff"], 1)
+        surv = diagnostics["survivorship_single_symbol_not_in_asset_master_by_ny_year"]["2023"]
+        self.assertEqual(surv["not_in_asset_master"], 1)
+        self.assertEqual(surv["share"], round(1 / surv["single_symbol"], 4))
         kept = {c["news_id"]: c for c in candidates}
         self.assertEqual(sorted(kept), ["100", "108", "113", "114"])  # first-per-window runs after eligibility
         acme = kept["100"]

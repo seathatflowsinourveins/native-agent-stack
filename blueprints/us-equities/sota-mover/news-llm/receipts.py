@@ -39,10 +39,10 @@ def load(path):
 
 def prepare_summary(priv):
     r = load(os.path.join(priv, "prepare-receipt.json"))
-    keys = ("started_at", "finished_at", "inputs", "asset_master", "funnel", "eligible_by_window_lane",
+    keys = ("started_at", "finished_at", "git", "inputs", "asset_master", "funnel", "eligible_by_window_lane",
             "selected_by_window_lane", "selected_sessions_by_window_lane", "selected_by_session_year",
             "selected_by_checkpoint", "diagnostics", "events_file")
-    return {"schema": SCHEMA, "evidence_label": "HIST", "kind": "prepare", **{k: r[k] for k in keys}}
+    return {"schema": SCHEMA, "evidence_label": "HIST", "kind": "prepare", **{k: r.get(k) for k in keys}}
 
 
 def models_fetch(models):

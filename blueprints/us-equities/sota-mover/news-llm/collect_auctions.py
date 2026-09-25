@@ -400,7 +400,8 @@ def first_valid_half_spread(quotes):
 
 
 def summarize_spreads(out_dir, event_ids=None):
-    """Half-spread distribution over the current RTH events (rows of dropped events are ignored)."""
+    """Entry-quote coverage and half-spread distribution over the current RTH events
+    (news_signal.rth_entry_quote, the rule that prices RTH entries; rows of dropped events are ignored)."""
     rows_path = os.path.join(out_dir, "quotes.jsonl")
     values = []
     counts = Counter()
@@ -413,9 +414,10 @@ def summarize_spreads(out_dir, event_ids=None):
                     continue
                 seen.add(row["event_id"])
                 counts["events"] += 1
-                hs, _ = first_valid_half_spread(row["quotes"])
+                q = sig.rth_entry_quote(row["quotes"], row["entry_utc"])
+                hs = None if q is None else (q["ask"] - q["bid"]) / (q["ask"] + q["bid"])
                 if hs is None:
-                    counts["no_valid_quote"] += 1
+                    counts["no_valid_entry_quote"] += 1
                 else:
                     values.append(hs * 1e4)
     values.sort()

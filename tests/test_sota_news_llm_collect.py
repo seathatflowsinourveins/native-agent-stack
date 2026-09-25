@@ -201,7 +201,7 @@ class Workflows(unittest.TestCase):
         self.assertEqual(q["B"]["end"], "2023-03-01T15:01:05Z")
         self.assertEqual((q["B"]["feed"], q["B"]["limit"]), ("sip", "10"))
         summary = json.loads((self.dir / "spreads/spreads-summary.json").read_text())
-        self.assertEqual(summary["counts"], {"events": 2, "no_valid_quote": 1})
+        self.assertEqual(summary["counts"], {"events": 2, "no_valid_entry_quote": 1})
         self.assertAlmostEqual(summary["half_spread_bps"]["median"], 10.0, places=2)
 
 
