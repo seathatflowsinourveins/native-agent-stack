@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--markitdown--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "markitdown",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v markitdown) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && markitdown --version && python3 -c \"import json,sys;print('bootstrap pin (adoption/pins-linux-x86_64.json)',[t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']==sys.argv[1]])\" markitdown && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" markitdown",
+      "exit": 0,
+      "duration_s": 0.321,
+      "output_sha256": "c7336eaa9b9a253b8bc4e7e2dfc4b4c9e8dbfe675dddf61071b7692e22ef49cb",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/markitdown -> ~/.local/share/codex-ecosystem/python-tools/markitdown/bin/markitdown\nmarkitdown 0.1.7\nbootstrap pin (adoption/pins-linux-x86_64.json) ['0.1.7']\nstack ['0.1.7'] winner pins ['0.1.7']\n"
+    },
+    {
+      "cmd": "sha256sum blueprints/us-equities/catalyst-provenance/upstream-8k.html && markitdown blueprints/us-equities/catalyst-provenance/upstream-8k.html > /tmp/nsr-markitdown.md && python3 -c \"import re;t=open('/tmp/nsr-markitdown.md').read();need=['FORM 8-K','PREMIER FINANCIAL BANCORP'];rows=[l for l in t.splitlines() if l.startswith('|')];print('markdown bytes',len(t),'lines',len(t.splitlines()),'table rows',len(rows),'| required phrases',{k:(k in t) for k in need},'| raw tags left',len(re.findall(r'<[a-zA-Z][^>]*>',t)));raise SystemExit(0 if all(k in t for k in need) and rows else 1)\" ",
+      "exit": 0,
+      "duration_s": 0.367,
+      "output_sha256": "7c186b7ebc3fe7a4420f8f83213e376ef95005361d4c010742a5965400fbe20e",
+      "output_excerpt": "a1e7ca4772bca52911631c6ba2626878cb8c5ebdf17c662033e89d04ef4a0b17  blueprints/us-equities/catalyst-provenance/upstream-8k.html\nmarkdown bytes 5536 lines 120 table rows 29 | required phrases {'FORM 8-K': True, 'PREMIER FINANCIAL BANCORP': True} | raw tags left 0\n"
+    },
+    {
+      "cmd": "rm -f /tmp/nsr-markitdown.md && echo \"scratch output removed\"",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "ecb7a16ef4c4bedb9bc3933b8851412f1331b20ba7c1d422a764f686c9dce5f5",
+      "output_excerpt": "scratch output removed\n"
+    }
+  ],
+  "tool_versions": {
+    "markitdown": "0.1.7"
+  },
+  "observed_at_utc": "2026-09-25T05:38:09Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), markitdown 0.1.7 (the catalog and bootstrap pin) converted a real historical SEC filing to Markdown: blueprints/us-equities/catalyst-provenance/upstream-8k.html (sha256 a1e7ca47..., the vendored copy recorded in upstream-8k-source.json of a pinned edgartools test fixture holding Premier Financial Bancorp's 2021-03-29 Form 8-K HTML) became 5,536 bytes of Markdown with 29 table rows, no remaining HTML tags, and the phrases 'FORM 8-K' and 'PREMIER FINANCIAL BANCORP'. That command exits 0 only when both phrases and at least one table row are present. All commands exit 0.",
+  "limitations": [
+    "One HTML document: PDF, Office, image, OCR and audio converters and plugins were not exercised, and table fidelity was checked by row count, not cell by cell.",
+    "The input is a real filing's HTML as vendored in this repository from a pinned upstream edgartools test fixture, not a document fetched from SEC by this receipt.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:38:09Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (a real 8-K HTML filing converted to Markdown with required phrases, table rows and no raw tags asserted; markitdown 0.1.7 and the input sha256 are backed, the latter equal to vendored_file.sha256 in upstream-8k-source.json; bound to the document-retrieval winner) and re-ran the conversion into a mktemp file on this host with identical results (5536 bytes, 29 table rows, both phrases, 0 tags).",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
+    }
+  ]
+}

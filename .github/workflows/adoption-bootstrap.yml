@@ -32,28 +32,13 @@ on:
       - 'manifests/evidence.json'
       - 'blueprints/convergence-practice/wsl-native-tools/pins.json'
       - '.github/workflows/adoption-bootstrap.yml'
+  # No `paths:` filter here (2026-09-25, validate-macos required-check readiness): a
+  # required check must report a status on every pull_request or GitHub leaves the PR
+  # "Expected -- Waiting for status" forever (docs/decisions/2026-09-22-github-automation-closure.md,
+  # "validate-macos required (2026-09-25)"). validate-macos below always runs; the
+  # `changes` job below still path-gates the three bootstrap-* jobs, which stay
+  # unrequired and exercise real installs, not this repository's own read-only checks.
   pull_request:
-    paths:
-      - 'adoption/**'
-      - 'tools/adoption/**'
-      - 'tests/test_adoption_*.py'
-      - 'scripts/validate.py'
-      - 'scripts/validate_catalogs.py'
-      - 'scripts/validate_foundation.py'
-      - 'scripts/landscape.py'
-      - 'scripts/build_ecosystem.py'
-      - 'scripts/adoption_status.py'
-      - 'evidence/artifacts/macos-embed-reference-20260923/**'
-      - 'scripts/host_receipts.py'
-      - 'scripts/component_matrix.py'
-      - 'scripts/new_host_grand_list.py'
-      - 'tools/sota-convergence/build_verdicts.py'
-      - 'scripts/platform_status.py'
-      - 'scripts/validate_convergence.py'
-      - 'scripts/release_due.py'
-      - 'manifests/evidence.json'
-      - 'blueprints/convergence-practice/wsl-native-tools/pins.json'
-      - '.github/workflows/adoption-bootstrap.yml'
   schedule:
     - cron: '47 6 * * 1' # Weekly Monday 06:47 UTC re-check of live pinned downloads.
   workflow_dispatch:
@@ -61,8 +46,131 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  # Lightweight path-change detector for a pull_request event only (bootstrap-linux,
+  # bootstrap-macos and bootstrap-macos-brew below stay path-gated on push by the `push:`
+  # trigger's own `paths:` filter above, which GitHub reads before the job graph starts;
+  # schedule and workflow_dispatch are not path-filtered and run them unconditionally; a pull_request has no filter to read now, so this job computes the same
+  # membership by diffing the PR's base and head with plain git -- no new third-party
+  # action). The PATTERNS list below must be kept identical (up to the `**`-vs-`*` glob
+  # spelling) to the `push:` trigger's `paths:` list above it; tests/test_workflow_hardening.py
+  # asserts that. This job fails safe: any internal error below (a missing payload SHA, a
+  # failed `git diff`) still writes `bootstrap=true`, never a skip, so the three bootstrap-*
+  # jobs run rather than silently stop when this job itself is broken.
+  changes:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      bootstrap: ${{ steps.filter.outputs.bootstrap }}
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository with enough history to diff the PR
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Detect whether any bootstrap-relevant path changed in this pull request
+        id: filter
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # GitHub runs `shell: bash` as `bash --noprofile --norc -eo pipefail`,
+          # so errexit is on unless disabled here. `set +e` turns it off: every
+          # failure path below must still reach its own
+          # `echo "bootstrap=true" >> "$GITHUB_OUTPUT"` (fail safe) instead of
+          # exiting before writing an output, which is what left the three
+          # bootstrap-* jobs silently skipped (dispatch run 36085789483,
+          # "validate-macos required (2026-09-25)" below).
+          set +e
+          set -uo pipefail
+          # Keep in sync with the push trigger's `paths:` list above (also this
+          # job's own file, so an edit to this job re-runs bootstrap-linux/macos).
+          PATTERNS=(
+            'adoption/*'
+            'tools/adoption/*'
+            'tests/test_adoption_*.py'
+            'scripts/validate.py'
+            'scripts/validate_catalogs.py'
+            'scripts/validate_foundation.py'
+            'scripts/landscape.py'
+            'scripts/build_ecosystem.py'
+            'scripts/adoption_status.py'
+            'evidence/artifacts/macos-embed-reference-20260923/*'
+            'scripts/host_receipts.py'
+            'scripts/component_matrix.py'
+            'scripts/new_host_grand_list.py'
+            'tools/sota-convergence/build_verdicts.py'
+            'scripts/platform_status.py'
+            'scripts/validate_convergence.py'
+            'scripts/release_due.py'
+            'manifests/evidence.json'
+            'blueprints/convergence-practice/wsl-native-tools/pins.json'
+            '.github/workflows/adoption-bootstrap.yml'
+          )
+          if [ -z "${BASE_SHA:-}" ] || [ -z "${HEAD_SHA:-}" ]; then
+            echo "::warning::changes: missing base or head sha in the pull_request payload; failing safe (bootstrap=true)" >&2
+            echo "bootstrap=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          diff_file="$(mktemp)" || { echo "bootstrap=true" >> "$GITHUB_OUTPUT"; exit 0; }
+          # -z / NUL-delimited: a plain `--name-only` diff quotes non-ASCII names
+          # (for example "adoption/na\303\256ve.md"), which would never match a
+          # PATTERNS glob; -z with a NUL-delimited read below avoids both that and
+          # the shell word-splitting a newline-delimited list would need.
+          if ! git diff -z --no-renames --name-only "$BASE_SHA...$HEAD_SHA" > "$diff_file"; then
+            echo "::warning::changes: git diff failed; failing safe (bootstrap=true)" >&2
+            echo "bootstrap=true" >> "$GITHUB_OUTPUT"
+            rm -f "$diff_file"
+            exit 0
+          fi
+          match=false
+          while IFS= read -r -d '' file; do
+            [ -z "$file" ] && continue
+            for pattern in "${PATTERNS[@]}"; do
+              # Glob matching is intended: each pattern is a path glob, and in a
+              # case pattern `*` also matches `/`, which reproduces the push
+              # `paths:` list's `**` membership test. This only ever over-matches
+              # (for example `tests/test_adoption_*.py` also matches a nested path
+              # under a directory literally named `tests/test_adoption_*`, such as
+              # `tests/test_adoption_dir/x.py`) -- safe, because it means more
+              # re-runs of bootstrap-linux/macos, never fewer.
+              # shellcheck disable=SC2254
+              case "$file" in
+                $pattern) match=true ;;
+              esac
+            done
+          done < "$diff_file"
+          rm -f "$diff_file"
+          echo "bootstrap=$match" >> "$GITHUB_OUTPUT"
+          echo "bootstrap-relevant path changed: $match"
+
   bootstrap-linux:
+    needs: changes
+    # On push, GitHub itself already applied the `push:` trigger's own `paths:` filter
+    # before the job graph started (this job never even starts if it did not match); on
+    # schedule/workflow_dispatch there is no filter and the job always runs. On
+    # pull_request the `changes` job above supplies the same path-change test via
+    # `needs.changes.outputs.bootstrap`.
+    # !cancelled(): `needs: changes` on its own applies an implicit `success()`, so a
+    # skipped `changes` job (its own `if: github.event_name == 'pull_request'` is false
+    # off pull_request) would skip this job too, on every push/schedule/dispatch run --
+    # exactly the "bootstrap jobs are skipped on push, schedule and dispatch" bug this
+    # comment and condition fix (dispatch run 36085789483 first showed it: `changes`
+    # skipped and all three bootstrap-* jobs completed as skipped, while `validate-macos`
+    # ran normally). `!= 'false'` (not `== 'true'`) also means a `changes` job that itself
+    # errored or was cancelled -- its output is then empty, not `'false'` -- still runs
+    # this job, matching `changes`' own fail-safe `bootstrap=true` default.
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.bootstrap != 'false') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -132,6 +240,11 @@ jobs:
   # backend a real Mac would use; see "Record which backend llama-server's
   # own log reports" below and adoption/platforms/macos-arm64.md.
   bootstrap-macos:
+    needs: changes
+    # See bootstrap-linux's own comment above for why `!cancelled()` and `!= 'false'`
+    # (not a bare `if:` and `== 'true'`) are both required for this job to still run on
+    # push, schedule and workflow_dispatch.
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.bootstrap != 'false') }}
     runs-on: macos-15
     timeout-minutes: 30
     steps:
@@ -421,6 +534,11 @@ jobs:
   # macos-arm64 platform profile out of drafted_not_accepted and signs into
   # no native client.
   bootstrap-macos-brew:
+    needs: changes
+    # See bootstrap-linux's own comment above for why `!cancelled()` and `!= 'false'`
+    # (not a bare `if:` and `== 'true'`) are both required for this job to still run on
+    # push, schedule and workflow_dispatch.
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.bootstrap != 'false') }}
     runs-on: macos-15
     timeout-minutes: 30
     steps:
@@ -479,6 +597,12 @@ jobs:
   # modules on Darwin/arm64, since every other job here exercises the
   # bootstrap script but never the repository's own Python tooling on macOS.
   # No account sign-in, no live provider call.
+  #
+  # Required check (docs/decisions/2026-09-22-github-automation-closure.md,
+  # "validate-macos required (2026-09-25)"): named in .github/main-ruleset.json's
+  # required_status_checks. It has no `needs:` and no `if:` of its own, and the
+  # workflow's pull_request trigger above carries no `paths:` filter, so this job
+  # reports a status on every pull request and can safely be required.
   validate-macos:
     runs-on: macos-15
     timeout-minutes: 30

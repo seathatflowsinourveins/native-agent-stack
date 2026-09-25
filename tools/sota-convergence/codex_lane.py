@@ -295,10 +295,27 @@ ISOLATION_ARGS = ("--ignore-user-config", "-c", "features.hooks=false", "-c", "f
                   "-c", 'web_search="disabled"', "-c", 'cli_auth_credentials_store="file"')
 
 AUDIT_NAME = "blind-audit.json"
-# CLIs that reach memory stores, code indexes, session history, git history or the network.
-AUDIT_TOOLS = ("git", "ai-memory", "agentsview", "mcporter", "qmd", "socraticode", "jcodemunch", "serena",
-               "sqlite3", "curl", "wget")
-ABSOLUTE_PATH = re.compile(r"(?<![\w.~}-])(/[^\s'\"|;&<>()`]+)")
+# CLIs that reach memory stores, code indexes or session history, and the agent CLIs (a nested ``codex exec`` would
+# find the linked credential and run without the isolation flags). A blind child's PATH resolves none of them
+# (BLIND_CHILD_PATH; blind_path_issue refuses a host where one would), so its audit no longer looks for their names:
+# they are also candidates a lane must search for, and on the 2026-09-24 re-record `rg -i 'qmd|...'` and Python lists
+# of candidate ids voided 11 of 32 layers with no read outside the export. A non-blind run keeps looking for them.
+BLIND_UNRESOLVABLE = ("ai-memory", "agentsview", "mcporter", "qmd", "socraticode", "jcodemunch", "serena", "codex",
+                      "claude")
+# System tools a blind child's PATH keeps (git history, a database, the network): a command naming one is flagged.
+AUDIT_TOOLS = ("git", "sqlite3", "curl", "wget")
+# A blind child's PATH: the system executable directories only. The caller's PATH carried the retrieval CLIs
+# (~/.local/share/codex-ecosystem/bin on this WSL host); codex itself is launched by the absolute path the caller's
+# PATH resolves (run_attempt).
+BLIND_CHILD_PATH = os.pathsep.join(("/usr/bin", "/bin", "/usr/sbin", "/sbin"))
+# A URL scheme right before ``//``: its authority is no filesystem path unless the scheme is ``file`` (``jar:file://``
+# too). Any other scheme needs the network, which the read-only sandbox refuses a blind child (measured 2026-09-24), or
+# a CLI a blind child cannot resolve, so ``qmd://``, ``s3://`` and ``https://`` search terms stay clean (independent
+# review of #206, R2-1).
+URL_SCHEME_BEFORE = re.compile(r"(?i)(?<![A-Za-z0-9+.-])([A-Za-z][A-Za-z0-9+.-]*):\Z")
+# Not after ``)`` or ``]``: Python's path join (``Path.cwd()/ref``, ``parts[0]/name``) names no absolute path
+# (2026-09-24 re-record).
+ABSOLUTE_PATH = re.compile(r"(?<![\w.~})\]-])(/[^\s'\"|;&<>()`]+)")
 HOME_PATH = re.compile(r"(?:~|\$HOME|\$\{HOME\})(?:/[^\s'\"|;&<>()`]*)?")
 # Any other environment variable used as a path (``$CODEX_HOME/AGENTS.md``, ``${XDG_DATA_HOME}/x``) can point
 # outside the repository; only its value, which the event does not show, says where (round-2 review).
@@ -345,6 +362,15 @@ def executable_token_starts(command: str) -> set:
     return {match.end() for match in EXECUTABLE_TOKEN.finditer(command)}
 
 
+def network_authority(command: str, match) -> bool:
+    """Whether an ABSOLUTE_PATH match is a URL's authority (``https://host/x``, a bare ``'https://'``, ``qmd://x``),
+    which is no filesystem path (2026-09-24 re-record); ``file://`` and ``https:///`` are not one (Codex review of
+    #206, P2; independent review of #206, C1)."""
+    path = match.group(1)
+    scheme = URL_SCHEME_BEFORE.search(command[max(0, match.start(1) - 32):match.start(1)])
+    return path.startswith("//") and not path.startswith("///") and bool(scheme) and scheme.group(1).lower() != "file"
+
+
 def outside_paths(command: str, allowed_roots) -> list:
     """Absolute paths in ``command`` outside ``allowed_roots``, except /dev/null and a segment's system
     executable token."""
@@ -354,12 +380,32 @@ def outside_paths(command: str, allowed_roots) -> list:
         path = match.group(1)
         if path in EXEMPT_PATHS:
             continue
+        if network_authority(command, match):
+            continue
         if match.start(1) in executables and path.startswith(SYSTEM_EXECUTABLE_PREFIXES):
             continue
         if any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots):
             continue
         found.append(path)
     return found
+
+
+def names_root(command: str) -> bool:
+    """Whether ``command`` names the filesystem root ``/``: ROOT_PATH, except a quoted ``'/'`` joined with ``+`` between
+    two non-literal operands (``p+'/'+k``, ``path + '/' + str(i)`` walking a JSON document), which names no directory;
+    ``os.walk('/')``, ``'/'+'etc/passwd'``, ``''+'/'+'etc'`` and ``ls /`` still do (2026-09-24 re-record: 8 voided
+    layers)."""
+    for match in ROOT_PATH.finditer(command):
+        slash = match.end() - 1
+        quote = command[slash - 1:slash]
+        # Joined between two non-literal operands only: '/'+'etc/passwd' and ''+'/'+'etc/passwd' build /etc/passwd
+        # (independent review of #206, C2 and round 1 (a)).
+        if quote in ("'", '"') and command[slash + 1:slash + 2] == quote and (
+                re.search(r"[\w)\]]\s*\+\s*\Z", command[:slash - 1])
+                and re.match(r"\s*\+\s*[A-Za-z_(]", command[slash + 2:])):
+            continue
+        return True
+    return False
 
 
 def unnamed_cd_targets(command: str) -> list:
@@ -372,9 +418,10 @@ def unnamed_cd_targets(command: str) -> list:
     return found
 
 
-def blind_audit(events_path: Path, allowed_roots) -> dict:
+def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS) -> dict:
     """Reading of one child's event stream: web searches, MCP tool calls, and commands that name an absolute path
-    outside ``allowed_roots`` (the repository and the packets directory) or run a CLI in AUDIT_TOOLS. In a blind run
+    outside ``allowed_roots`` (the repository and the packets directory) or name a CLI in ``tools`` (AUDIT_TOOLS; a
+    non-blind run adds BLIND_UNRESOLVABLE, which its PATH may resolve). In a blind run
     a flagged layer is void: its return is set aside before it is written, and a resume re-audits a kept return
     (round 7, REG7-1); in a non-blind run the report is for review and disclosure.
 
@@ -402,7 +449,7 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
             command = item.get("command") if isinstance(item.get("command"), str) else ""
             reasons = [f"path outside the repository and packets: {path}"
                        for path in outside_paths(command, allowed_roots)]
-            reasons += ["names the filesystem root /"] if ROOT_PATH.search(command) else []
+            reasons += ["names the filesystem root /"] if names_root(command) else []
             reasons += [f"home-relative path: {path}" for path in HOME_PATH.findall(command)]
             reasons += [f"variable path: {path}" for path in VARIABLE_PATH.findall(command)]
             # Parameter expansion (${CODEX_HOME%/*}, ${X:-/path}) builds a path the event does not show
@@ -417,7 +464,17 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
             reasons += [f"cd leaves for an unnamed directory: cd {target}" for target in unnamed_cd_targets(command)]
             reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
             words = set(re.findall(r"[A-Za-z][\w.-]*", command))
-            reasons += [f"runs {tool}" for tool in AUDIT_TOOLS if tool in words]
+            reasons += [f"runs {tool}" for tool in tools if tool in words]
+            # A CLI named by an absolute path runs whatever PATH says (``/usr/local/bin/qmd``, an exempt system
+            # executable token otherwise), so its basename is checked against every audited CLI (Codex review of
+            # #206, P2); a bare search word is not a path.
+            # A network URL ending in a CLI's name (``https://github.com/tobi/qmd``) is a search term (Codex review of
+            # #206 at 882ba4b9).
+            reasons += [f"runs {name} by path: {path}" for match in ABSOLUTE_PATH.finditer(command)
+                        if not network_authority(command, match)
+                        for path in [match.group(1)] for name in [os.path.basename(path.rstrip("/"))]
+                        if name in AUDIT_TOOLS + BLIND_UNRESOLVABLE and name not in tools
+                        and not any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots)]
             if reasons:
                 report["flagged_commands"].append({"command": command, "reasons": reasons})
     return report
@@ -692,13 +749,133 @@ def terminate_on_signal():
 
 
 def child_env(codex_home: Path) -> dict:
-    """The whole environment of a blind child: the allowlisted variables, CODEX_HOME, the empty HOME and TMPDIR.
-    No API key variable: the child authenticates through the linked native auth.json (round 6, ISO-R6-4)."""
+    """The whole environment of a blind child: the allowlisted variables, CODEX_HOME, the empty HOME and TMPDIR, and
+    BLIND_CHILD_PATH instead of the caller's PATH. No API key variable: the child authenticates through the linked
+    native auth.json (round 6, ISO-R6-4)."""
     env = {key: value for key, value in os.environ.items()
            if key in CHILD_ENV_ALLOWLIST or (CHILD_ENV_EXTRA_PREFIXES and key.startswith(CHILD_ENV_EXTRA_PREFIXES))}
     env.update({"CODEX_HOME": str(codex_home), "HOME": str(child_home(codex_home)),
-                "TMPDIR": str(Path(codex_home) / "tmp")})
+                "TMPDIR": str(Path(codex_home) / "tmp"), "PATH": BLIND_CHILD_PATH})
     return env
+
+
+PATH_SENTINEL = "__NAS_BLIND_PATH__="
+
+
+class PathUnmeasured(Exception):
+    """A PATH a blind child's commands can end up with could not be measured (the probe and why)."""
+
+
+def login_shell_path() -> str:
+    """Every PATH a blind child's commands can end up with on this host, joined; PathUnmeasured names the probe that
+    could not be measured and why (independent review of #206, R2-4).
+    Codex runs each command through the user's shell with ``-lc`` (``/bin/bash -lc`` here), whose profile can add
+    directories: on this WSL host /etc/profile.d/apps-bin-path.sh adds /snap/bin, and macOS path_helper adds /etc/paths
+    and /etc/paths.d (2026-09-24 probe: codex also prepends its own codex-path directory, which holds only rg). A command
+    can also drop PATH (``subprocess.run(..., shell=True, env={})``), and a shell started without one sets its compiled
+    default, /usr/local/bin included, while Python's exec uses os.defpath (independent review of #206, C3). Each is
+    measured after a sentinel, so profile output is not read as a directory (C5)."""
+    import pwd
+    import tempfile
+    try:
+        shell = pwd.getpwuid(os.getuid()).pw_shell or "/bin/sh"
+    except KeyError as error:
+        raise PathUnmeasured(f"no login shell for this user: {error}") from error
+    probe = f'printf "\\n{PATH_SENTINEL}%s" "$PATH"'
+    paths = [os.defpath]
+    with tempfile.TemporaryDirectory() as home:
+        for argv, env in (([shell, "-lc", probe], {"PATH": BLIND_CHILD_PATH, "HOME": home}),
+                          (["/bin/sh", "-c", probe], {}), ([shell, "-c", probe], {})):
+            where = f"`{argv[0]} {argv[1]}`" + (" with an empty environment" if not env else "")
+            try:
+                # Profile output need not be UTF-8 (R2-4): it is decoded leniently and only the sentinel's tail is read.
+                result = subprocess.run(argv, env=env, stdin=subprocess.DEVNULL, capture_output=True,
+                                        encoding="utf-8", errors="replace", timeout=30)
+            except (OSError, subprocess.SubprocessError) as error:
+                raise PathUnmeasured(f"{where}: {error}") from error
+            if result.returncode != 0 or PATH_SENTINEL not in result.stdout:
+                raise PathUnmeasured(f"{where} exited {result.returncode} without printing its PATH: "
+                                     f"{result.stderr.strip()[-200:] or 'no output'}")
+            paths.append(result.stdout.rsplit(PATH_SENTINEL, 1)[1])
+    return os.pathsep.join(path for path in paths if path)
+
+
+def blind_path_issue(path: str = None):
+    """None when no BLIND_UNRESOLVABLE CLI resolves on a blind child's PATH, else the refusal naming each one that does:
+    the audit relies on their not running by name. ``path`` defaults to BLIND_CHILD_PATH and what the login shell adds
+    (login_shell_path); a login shell that cannot be measured is a refusal too."""
+    if path is None:
+        try:
+            measured = login_shell_path()
+        except PathUnmeasured as error:
+            return (f"the PATH a blind child's commands can end up with could not be measured ({error}), so a blind "
+                    "run is refused")
+        path = os.pathsep.join((BLIND_CHILD_PATH, measured))
+    directories = [d for d in path.split(os.pathsep) if d]
+    found = [f"{name} ({where})" for name in BLIND_UNRESOLVABLE
+             for where in [next((os.path.join(d, name) for d in directories if os.path.isfile(os.path.join(d, name))
+                                 and os.access(os.path.join(d, name), os.X_OK)), None)] if where]
+    return (f"a blind child's PATH ({path}) resolves {', '.join(found)}; the blind audit relies on those CLIs not "
+            "running by name, so a blind run is refused on this host") if found else None
+
+
+def child_executable(name: str):
+    """The absolute path the caller's PATH resolves ``name`` to, for a blind child whose own PATH cannot."""
+    return name if os.path.isabs(name) else shutil.which(name)
+
+
+SHELL_INTERPRETERS = frozenset({"sh", "bash", "dash", "zsh", "ksh", "mksh", "ash", "fish"})
+
+
+def codex_launch_issue(name: str = "codex"):
+    """None unless the codex the caller's PATH resolves is a shell-script launcher (pnpm's cmd-shim runs
+    ``exec node ...`` by name), which a blind child's PATH cannot run: it would exit 127 on every layer, so a blind run
+    is refused up front with the launcher named (independent review of #206, R2-2)."""
+    program = child_executable(name)
+    if program is None:
+        return None
+    try:
+        with open(program, "rb") as handle:
+            first = handle.readline(256)
+    except OSError:
+        return None
+    words = first[2:].decode("utf-8", errors="replace").split() if first.startswith(b"#!") else []
+    if words and os.path.basename(words[0]) in SHELL_INTERPRETERS:
+        return (f"{program} is a shell-script launcher ({' '.join(words)}); it runs its tools by name, which a blind "
+                f"child's PATH ({BLIND_CHILD_PATH}) does not resolve, so a blind run is refused. Put a native codex "
+                "binary or an env-style launcher (#!/usr/bin/env node) first on PATH")
+    return None
+
+
+def child_failure_detail(result: dict) -> str:
+    """The last lines of a failed child's stderr, for the operator's console only: recorded reasons stay fixed text,
+    since stderr can carry host paths (independent review of #206, R2-2)."""
+    lines = [line for line in (result.get("stderr") or "").splitlines()
+             if line.strip() and not line.startswith("Reading additional input from stdin")]
+    return " | ".join(lines[-3:])[-400:]
+
+
+def blind_child_argv(cmd: list) -> list:
+    """``cmd`` as a blind child runs it: its program by the absolute path the caller's PATH resolves, and, when that
+    program is a ``#!/usr/bin/env <interpreter>`` script (npm's codex launcher: ``#!/usr/bin/env node``, installed by
+    adoption/bootstrap-macos.sh), preceded by the interpreter the caller's PATH resolves, since the child's own PATH
+    (BLIND_CHILD_PATH) has no node (Codex review of #206, P1). An unresolved program is left for Popen to report."""
+    program = child_executable(cmd[0])
+    if program is None:
+        return list(cmd)
+    try:
+        with open(program, "rb") as handle:
+            first = handle.readline(256)
+    except OSError:
+        return [program, *cmd[1:]]
+    words = first[2:].decode("utf-8", errors="replace").split() if first.startswith(b"#!") else []
+    if len(words) >= 2 and os.path.basename(words[0]) == "env":
+        # Only env's own -S; an interpreter's -S (python -S) stays (R2-6).
+        rest = words[2:] if words[1] == "-S" else words[1:]
+        interpreter = shutil.which(rest[0]) if rest and not rest[0].startswith("-") else None
+        if interpreter:
+            return [interpreter, *rest[1:], program, *cmd[1:]]
+    return [program, *cmd[1:]]
 
 
 def child_home(codex_home: Path) -> Path:
@@ -712,6 +889,8 @@ def run_attempt(cmd: list, timeout: float) -> dict:
     if STOP.is_set():
         return {"exit_code": None, "stdout": "", "stderr": "", "elapsed": 0.0, "timed_out": False, "stopped": True}
     env = child_env(CHILD_CODEX_HOME) if CHILD_CODEX_HOME is not None else None
+    # A blind child's PATH has no codex (BLIND_CHILD_PATH), so it runs the one the caller's PATH resolves.
+    cmd = blind_child_argv(cmd) if env is not None else cmd
     # The in-use lock rides along (round 7, ISO-R7-2); no stdin (round 5, ISO-R5-3): codex exec appends a
     # non-terminal stdin to the prompt and waits for its end.
     pass_fds = (IN_USE_HANDLE.fileno(),) if IN_USE_HANDLE is not None else ()
@@ -1003,7 +1182,7 @@ def main(argv=None) -> int:
 
     if blind:
         # The home refusals create nothing, so they run before the dry run and the lock (round 6, ISO-R6-5).
-        issue = codex_home_issue(work_dir, repo)
+        issue = codex_home_issue(work_dir, repo) or blind_path_issue() or codex_launch_issue()
         if issue:
             print(f"codex_lane: {issue}", file=sys.stderr)
             return 2
@@ -1022,7 +1201,8 @@ def main(argv=None) -> int:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
             cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model, ISOLATION_ARGS)
-            print(shlex.join(env_prefix + cmd))
+            # The child's PATH has no codex, so the printed command names the one this PATH resolves.
+            print(shlex.join(env_prefix + (blind_child_argv(cmd) if blind else cmd)))
         return 0
 
     if pending and shutil.which("codex") is None:
@@ -1067,6 +1247,8 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
     failures: list = []
     blind = not args.allow_git_history
     roots = [str(repo), str((work_dir / "packets").resolve())]
+    # A non-blind child inherits the caller's PATH, where the retrieval CLIs may resolve (BLIND_UNRESOLVABLE).
+    tools = AUDIT_TOOLS if blind else AUDIT_TOOLS + BLIND_UNRESOLVABLE
     audit_path = codex_dir / AUDIT_NAME
     try:
         audit = json.loads(audit_path.read_text(encoding="utf-8")) if audit_path.is_file() else {}
@@ -1133,6 +1315,9 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
 
             if result["timed_out"] or result["exit_code"] != 0:
                 last_failure = "timed out" if result["timed_out"] else f"codex exec exited {result['exit_code']}"
+                detail = child_failure_detail(result)
+                if detail:
+                    print(f"codex_lane: {name} attempt {attempt}: {last_failure}: {detail}", file=sys.stderr)
                 tmp_out.unlink(missing_ok=True)
                 continue
             if not tmp_out.exists():
@@ -1156,7 +1341,7 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
             # flagged layer (a read outside the export and packets, web search or an MCP tool) is void, as an
             # adjudication judgment is, since it may have read the packet keys or another lane's return (Codex review
             # of #145). Its return is kept only as <name>.json.audit-flagged, and the layer is recorded as failed.
-            report = blind_audit(events_path, roots)
+            report = blind_audit(events_path, roots, tools)
             record_audit(name, report)
             if blind and audit_is_flagged(report):
                 out_path.unlink(missing_ok=True)
@@ -1175,7 +1360,7 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
         if not succeeded:
             # A stale return (e.g. one rejected for an older packet hash) must
             # not survive, so record_verdicts.py records this `failed` reason.
-            record_audit(name, blind_audit(events_path, roots))
+            record_audit(name, blind_audit(events_path, roots, tools))
             out_path.unlink(missing_ok=True)
             failures.append((catalog, layer_id, f"failed after retry: {last_failure}"))
 

@@ -1,20 +1,20 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-24T15:52:10Z",
+  "recorded_at_utc": "2026-09-25T13:38:02Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
       "kind": "lane",
       "id": "simulation",
       "title": "Historical simulation / backtest",
-      "state": "AAPL diagnostic retained / adaptive native capacity179submits per minute synthetic / merit unqualified",
-      "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
+      "state": "sim capacity 859 to 882 fills per min (30 of 30 min) / hftbacktest cross-check agrees within 0.36 pct after driver fix / infrastructure evidence only",
+      "evidence_ref": "blueprints/us-equities/sim-engine-crosscheck/receipts/20260925-crosscheck.json"
     },
     {
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "adaptive 1x broker trial passed 2026-09-23 (main 843dc8f) / regular session only / leverage rungs pending / account flat",
+      "state": "engine P0 and exact cancel identity merged 2026-09-25 / fault rerun and 1x ladder blocked (stored paper keys rejected HTTP 401 - rotation needed) / flat",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
     },
     {
@@ -30,7 +30,7 @@
       "kind": "gate",
       "id": "alpaca-paper-operational",
       "title": "Alpaca bounded paper lifecycle",
-      "state": "smoke passed / adaptive 1x broker trial passed 2026-09-23 / native fault gate established 2026-09-24 (definitive rejection and repeat cancel only)",
+      "state": "smoke passed / 1x broker trial passed 2026-09-23 / native faults re-verified on order-contract engine 2026-09-24 / corporate-action guard merged 2026-09-25",
       "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
     },
     {
@@ -105,6 +105,13 @@
     },
     {
       "kind": "gate",
+      "id": "wsl-workstation-host",
+      "title": "WSL2 workstation host record (nativestack-5975wx-20260925)",
+      "state": "recorded 2026-09-25 / 21 receipts / 20 independent-session agree / systemd install withheld (needs_changes)",
+      "evidence_ref": "evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json"
+    },
+    {
+      "kind": "gate",
       "id": "macos",
       "title": "macOS native acceptance",
       "state": "target host pending",
@@ -135,7 +142,7 @@
       "kind": "gate",
       "id": "corporate-action-data",
       "title": "Split and dividend data semantics",
-      "state": "25 AAPL sessions / probe accepted / upstream suite unresolved",
+      "state": "25 AAPL sessions / probe accepted / overnight-hold guard merged 2026-09-25 (process-date window) / upstream suite unresolved",
       "evidence_ref": "blueprints/us-equities/corporate-action-readiness/receipt.json"
     },
     {

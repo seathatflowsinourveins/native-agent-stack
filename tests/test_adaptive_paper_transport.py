@@ -77,12 +77,21 @@ class FakeStream:
         self._loop = None
         self._should_run = True
         self.channel = "orders" if "paper" in kwargs else "quotes"
+        self._handlers = {"quotes": {}, "statuses": {}, "lulds": {}}
 
     def subscribe_trade_updates(self, handler):
         self.handler = handler
 
     def subscribe_quotes(self, handler, *symbols):
         self.handler = handler
+        self._subscribe(handler, symbols, self._handlers["quotes"])
+
+    def subscribe_trading_statuses(self, handler, *symbols):
+        self._subscribe(handler, symbols, self._handlers["statuses"])
+
+    def _subscribe(self, handler, symbols, handlers):
+        for symbol in symbols:
+            handlers[symbol] = handler
 
     def run(self):
         async def main():
@@ -273,6 +282,50 @@ class HTTPBoundary(unittest.TestCase):
             self.assertEqual(call.kwargs["timeout"], (5, 5))
             self.assertFalse(call.kwargs["allow_redirects"])
         self.assertEqual(self.observer.call_args.args[0]["headers"], {"x-ratelimit-limit": "200"})
+
+    def test_cancel_budget_names_only_the_announced_order(self):
+        # Built at runtime like ID (no literal UUID in published files); hex letters exercise case folding.
+        lettered = str(__import__("uuid").UUID(int=0xABCDEF01_2345_6789_ABCD_EF0123456789))
+        other = str(__import__("uuid").UUID(int=2))
+        with patch.object(self.session._session, "request", return_value=response(None, 204)) as sent:
+            self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + lettered)
+            self.session.announce_cancel(lettered.upper(), "trial-1")
+            self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + other)
+            self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + lettered.upper())
+            self.session.request("GET", t.PAPER_URL + "/v2/orders/" + lettered)
+            # A malformed expectation only drops the name: the DELETE still goes out.
+            self.session._cancel_expectation = 5
+            self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + lettered)
+            self.session.withdraw_cancel()
+            self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + lettered)
+        self.assertEqual([(c.args, c.kwargs) for c in self.budget.call_args_list],
+                         [(("cancel",), {}), (("cancel",), {}), (("cancel",), {"client_id": "trial-1"}),
+                          (("read",), {}), (("cancel",), {}), (("cancel",), {})])
+        self.assertEqual([c.args[0] for c in sent.call_args_list], ["DELETE"] * 3 + ["GET"] + ["DELETE"] * 2)
+
+    def test_fill_activities_read_is_allowed_only_filtered_by_one_order(self):
+        url = t.PAPER_URL + t.ACTIVITY_FILL_PATH
+        token = "20260924150021320::" + str(__import__("uuid").uuid4())
+        allowed = [{"order_id": ID}, {"order_id": ID, "direction": "asc", "page_size": 100},
+                   {"order_id": ID, "direction": "asc", "page_size": 100, "page_token": token}]
+        with patch.object(self.session._session, "request", return_value=response([])) as request:
+            for params in allowed:
+                self.session.request("GET", url, params=params)
+        self.assertEqual(request.call_count, 3)
+        self.assertEqual([c.args[0] for c in self.budget.call_args_list], ["read"] * 3)
+        refused = [("GET", url, None), ("GET", url, {}), ("GET", url, {"order_id": "not-a-uuid"}),
+                   ("GET", url, {"order_id": ID, "direction": "desc"}),
+                   ("GET", url, {"order_id": ID, "page_size": 101}), ("GET", url, {"order_id": ID, "page_size": "100"}),
+                   ("GET", url, {"order_id": ID, "page_token": "not::a-token"}),
+                   ("GET", url, {"order_id": ID, "date": "2026-09-24"}),
+                   ("GET", t.PAPER_URL + "/v2/account/activities", {"order_id": ID}),
+                   ("GET", t.PAPER_URL + "/v2/account/activities/FEE", {"order_id": ID}),
+                   ("POST", url, {"order_id": ID}), ("DELETE", url, {"order_id": ID})]
+        self.budget.reset_mock()
+        for method, target, params in refused:
+            with self.subTest(method=method, url=target, params=params), self.assertRaises(t.TransportError):
+                self.session.request(method, target, params=params)
+        self.budget.assert_not_called()
 
     def test_sdk_zero_retry_applied_after_constructor(self):
         client = t._sdk_client("fixture-key", "fixture-secret", self.budget)
@@ -512,6 +565,34 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(calls, ["read", "cancel", "read"])
         self.assertEqual([c.args[0] for c in request.call_args_list], ["GET", "DELETE", "GET"])
 
+    async def test_a_named_cancel_keeps_the_waiting_budget_path(self):
+        # Naming the order must not move a cancel onto the submission path's 0.25 s,
+        # never-wait deadline: a cancel whose budget waits still goes out.
+        async def budget(kind, client_id=None):
+            if kind == "cancel":
+                await asyncio.sleep(0.4)
+        self.port.before_request = budget
+        self.port.adopt_intents([intent()])
+        await self.port._observe(t.normalize_order(order()))
+        with patch.object(self.port._client._session._session, "request",
+                          side_effect=[response(None, 204), response(order(status="canceled"))]) as request:
+            result = await self.port.cancel("trial-1")
+        self.assertEqual(result["status"], "canceled")
+        self.assertEqual([c.args[0] for c in request.call_args_list], ["DELETE", "GET"])
+        self.assertEqual(self.port.health["reasons"], [])
+
+    async def test_a_named_cancel_uses_the_default_owner_deadline_and_freeze(self):
+        # No _owner_timeout/_freeze_timeout override: the 65 s default and the freeze on timeout.
+        self.port.adopt_intents([intent()])
+        await self.port._observe(t.normalize_order(order()))
+        with patch.object(self.port, "_on_owner", side_effect=self.port._on_owner) as owner, \
+                patch.object(self.port._client._session._session, "request",
+                             side_effect=[response(None, 204), response(order(status="canceled"))]):
+            await self.port.cancel("trial-1")
+        cancels = [c for c in owner.call_args_list if c.args[1:2] == ("cancel",)]
+        self.assertEqual([(c.args, c.kwargs) for c in cancels],
+                         [((self.port.before_request, "cancel"), {"client_id": "trial-1"})])
+
     async def test_replayed_id_cannot_change_intent(self):
         self.port.adopt_intents([intent()])
         with patch.object(self.port._client._session._session, "request") as request:
@@ -528,7 +609,9 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
             result = await self.port.cancel("trial-1")
         self.assertEqual(result["status"], "filled")
         self.assertEqual([c.args[0] for c in request.call_args_list], ["GET", "DELETE", "GET"])
-        self.assertEqual([c[0] for c in self.budgets], ["read", "cancel", "read"])
+        # Only the DELETE's budget call names the owned order; the expectation does not outlive it.
+        self.assertEqual([c[:2] for c in self.budgets], [("read", None), ("cancel", "trial-1"), ("read", None)])
+        self.assertIsNone(self.port._client._session._cancel_expectation)
 
     async def test_known_partial_then_invisible_order_still_cancels_known_id(self):
         self.port.adopt_intents([intent()])
@@ -590,6 +673,7 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
                 response(order(status="canceled", updated_at="2026-09-21T15:00:01Z"))]):
             await self.port.cancel("trial-1")
         self.assertIn("cancellation_unresolved", self.port.health["reasons"])
+        self.assertIsNone(self.port._client._session._cancel_expectation)
 
     async def test_documented_sub_penny_422_is_definitive_once_absent(self):
         # C04: Alpaca documents this body for a price beyond the minimum price variance.
@@ -703,6 +787,172 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         observed = await self.port._observe(t.normalize_order(order(filled_qty="0.25", status="partially_filled")))
         self.assertEqual(observed["filled_qty"], "1")
         self.assertEqual(len(self.observations), 1)
+
+    async def test_stream_execution_is_forwarded_after_a_rest_read_advanced_past_it(self):
+        # REST cancel read first (2 of 3 filled, canceled); the stream's older partial_fill for those 2
+        # shares must still reach the sink and the adapter with its own qty, price and execution id.
+        self.port.adopt_intents([intent(qty="3")])
+        seen = []
+        self.port._on_order = seen.append
+        rest = order(qty="3", filled_qty="2", filled_avg_price="100.01", status="canceled",
+                     updated_at="2026-09-21T15:00:02Z")
+        await self.port._observe(t.normalize_order(rest))
+        execution_id = str(__import__("uuid").uuid4())
+        stream = {"event": "partial_fill", "execution_id": execution_id, "qty": "2", "price": "100.01",
+                  "order": order(qty="3", filled_qty="2", filled_avg_price="100.01", status="partially_filled",
+                                 updated_at="2026-09-21T15:00:01Z")}
+        self.port._enqueue("order", stream)
+        self.port._enqueue("order", dict(stream))   # delivered twice
+        await self._drain()
+        forwarded = [o for o in self.observations if o.get("execution_id")]
+        self.assertEqual(len(forwarded), 1)
+        self.assertEqual((forwarded[0]["event_qty"], forwarded[0]["event_price"], forwarded[0]["filled_qty"],
+                          forwarded[0]["event"]), ("2", "100.01", "2", "partial_fill"))
+        self.assertEqual([o.get("execution_id") for o in seen], [execution_id, None])
+        self.assertEqual(self.port._observed["trial-1"]["status"], "canceled")   # stored state never moves back
+        self.assertNotIn("execution_id", self.port._observed["trial-1"])
+        self.assertEqual(self.port.health["reasons"], [])
+
+    def fill_activity(self, cum, qty, price="5.61", *, index=0, order_id=ID, **changes):
+        row = {"activity_type": "FILL", "id": "20260924150021%03d::%s" % (index, __import__("uuid").uuid4()),
+               "cum_qty": str(cum), "leaves_qty": "0", "order_id": order_id, "order_status": "partially_filled",
+               "price": price, "qty": str(qty), "side": "sell", "symbol": "SPY",
+               "transaction_time": "2026-09-24T15:00:21.320056Z", "type": "partial_fill"}
+        row.update(changes)
+        return row
+
+    async def test_fill_activities_page_through_the_guarded_session_and_tile_one_order(self):
+        first = [self.fill_activity(i + 1, 1, index=i) for i in range(100)]
+        second = [self.fill_activity(101, 1, index=100, type="fill", order_status="filled")]
+        with patch.object(self.port._client._session._session, "request",
+                          side_effect=[response(first), response(second)]) as request:
+            executions = await self.port.fill_activities(ID)
+        self.assertEqual(len(executions), 101)
+        self.assertEqual([c.args[0] for c in request.call_args_list], ["GET", "GET"])
+        self.assertTrue(all(c.args[1] == t.PAPER_URL + t.ACTIVITY_FILL_PATH for c in request.call_args_list))
+        self.assertEqual(request.call_args_list[0].kwargs["params"], {"order_id": ID, "direction": "asc", "page_size": 100})
+        self.assertEqual(request.call_args_list[1].kwargs["params"]["page_token"], first[-1]["id"])
+        self.assertEqual([b[0] for b in self.budgets], ["read", "read"])
+        e = executions[0]
+        self.assertEqual((e["qty"], e["price"], e["cum_qty"], e["side"], e["symbol"], e["type"]),
+                         ("1", "5.61", "1", "sell", "SPY", "partial_fill"))
+        self.assertEqual(e["trade_id"], first[0]["id"].split("::")[1])
+        self.assertEqual(len(e["trade_id"]), 36)
+        self.assertEqual(e["transaction_time_ns"], t.timestamp_ns("2026-09-24T15:00:21.320056Z"))
+
+    async def test_fill_activities_that_do_not_describe_one_complete_order_are_refused(self):
+        other = str(__import__("uuid").UUID(int=2))
+        cases = {"gap": [self.fill_activity(1, 1), self.fill_activity(3, 1, index=1)],
+                 "other_order": [self.fill_activity(1, 1, order_id=other)],
+                 "not_fill": [self.fill_activity(1, 1, activity_type="FEE")],
+                 "zero_qty": [self.fill_activity(1, 0)],
+                 "qty_above_cum": [self.fill_activity(1, 2)],
+                 "bad_id": [self.fill_activity(1, 1, id="20260924::not-a-uuid")],
+                 "mixed_side": [self.fill_activity(1, 1), self.fill_activity(2, 1, index=1, side="buy")],
+                 "not_a_list": {"activities": []}}
+        for label, payload in cases.items():
+            with self.subTest(label=label):
+                with patch.object(self.port._client._session._session, "request", return_value=response(payload)):
+                    with self.assertRaises(t.TransportError):
+                        await self.port.fill_activities(ID)
+        with patch.object(self.port._client._session._session, "request") as request:
+            with self.assertRaises(t.TransportError):
+                await self.port.fill_activities("not-an-order-id")
+        request.assert_not_called()
+
+    async def test_trading_status_messages_reach_the_status_sink_and_are_counted(self):
+        statuses = []
+        self.port.sink_status = statuses.append
+        # The 2026-09-24 SIP capture's ATGL pause and resumption, in the documented schema, for SPY.
+        self.port._enqueue("status", {"T": "s", "S": "SPY", "sc": "P", "sm": "Volatility Trading Pause",
+                                      "rc": "LUDP", "rm": "Volatility Trading Pause",
+                                      "t": "2026-09-24T15:40:40.219046565Z", "z": "C"})
+        self.port._enqueue("status", {"T": "s", "S": "SPY", "sc": "T", "sm": "Trading Resumption", "rc": "C11",
+                                      "rm": "Trade Halt Concluded By Other Regulatory Auth,; Quotes/Trades Resume",
+                                      "t": "2026-09-24T15:45:40.219163054Z", "z": "C"})
+        await self._drain()
+        self.assertEqual([(s["symbol"], s["state"], s["halted"], s["reason_code"]) for s in statuses],
+                         [("SPY", "volatility_pause", True, "LUDP"), ("SPY", "trading", False, "C11")])
+        self.assertEqual(statuses[0]["ts_ns"], t.timestamp_ns("2026-09-24T15:40:40.219046565Z"))
+        self.assertEqual(self.port.health["trading_status_messages"], {"volatility_pause": 1, "trading": 1})
+        self.assertEqual(self.port.health["reasons"], [])
+        self.port._enqueue("status", {"T": "s", "S": "TSLA", "sc": "H", "t": "2026-09-24T15:40:40Z", "z": "C"})
+        await self._drain()
+        self.assertIn("callback_failure", self.port.health["reasons"])   # a symbol this transport never subscribed
+
+    async def test_luld_bands_are_kept_for_receipts_and_never_freeze(self):
+        self.port._enqueue("luld", {"T": "l", "S": "SPY", "u": 3.24, "d": 2.65, "i": "B",
+                                    "t": "2026-09-24T15:40:40Z", "z": "C"})
+        self.port._enqueue("luld", {"T": "l", "S": "SPY", "u": 3.30, "d": 2.70, "i": "A",
+                                    "t": "2026-09-24T15:40:39Z", "z": "C"})   # older: ignored
+        self.port._enqueue("luld", {"T": "l", "S": "SPY", "u": "bad", "d": 1, "t": "2026-09-24T15:40:41Z"})
+        self.port._enqueue("luld", {"T": "l", "S": "TSLA", "u": 1, "d": 1, "t": "2026-09-24T15:40:41Z"})
+        await self._drain()
+        band = self.port.health["luld_bands"]["SPY"]
+        self.assertEqual((band["limit_up"], band["limit_down"], band["indicator"], band["tape"]),
+                         ("3.24", "2.65", "B", "C"))
+        self.assertEqual(self.port.health["luld_invalid"], 2)
+        self.assertEqual(self.port.health["reasons"], [])
+
+    def sip_port(self, symbols=("SPY",), **changes):
+        port = t.AlpacaPaperTransport("fixture-key", "fixture-secret", list(symbols),
+                                      before_request=lambda *a, **k: None, before_submit=lambda x: None,
+                                      sink_observation=lambda x: None, feed="sip", **changes)
+        port._loop = asyncio.get_running_loop()
+        port._authorized("quotes")
+        return port
+
+    async def test_quote_subscription_ack_requires_statuses_and_lulds_for_every_symbol_on_sip(self):
+        port = self.sip_port()
+        self.addAsyncCleanup(port.stop)
+        self.assertTrue(port.halt_statuses)
+        await port._quotes_stream._dispatch({"T": "subscription", "quotes": ["SPY"], "statuses": ["SPY"],
+                                             "lulds": ["SPY"]})
+        self.assertTrue(port._acks["quotes"])
+        await port._quotes_stream._dispatch({"T": "subscription", "quotes": ["SPY"], "statuses": [],
+                                             "lulds": ["SPY"]})
+        self.assertFalse(port._acks["quotes"])
+        self.assertIn("halt_status_subscription_rejected", port.health["reasons"])
+
+    async def test_an_iex_quote_ack_needs_no_halt_channels(self):
+        # E4 scopes statuses and LULD bands to the SIP connection; on iex neither is
+        # subscribed, so a quote-only acknowledgement is complete.
+        self.assertFalse(self.port.halt_statuses)
+        self.assertEqual(self.port.health["halt_status_channels"], [])
+        self.port._acks["quotes"] = False
+        await self.port._quotes_stream._dispatch({"T": "subscription", "quotes": ["SPY"]})
+        self.assertTrue(self.port._acks["quotes"])
+        self.assertEqual(self.port.health["reasons"], [])
+
+    async def test_start_subscribes_statuses_and_lulds_on_the_sip_quote_connection(self):
+        await self.port.stop()
+        with patch.object(t, "_stream_classes", return_value=(FakeStream, FakeStream)):
+            self.port = t.AlpacaPaperTransport("fixture-key", "fixture-secret", ["SPY", "QQQ"],
+                    before_request=lambda *a, **k: None, before_submit=lambda x: None,
+                    sink_observation=lambda x: None, start_timeout=1, required_quote_symbols=["SPY"], feed="sip")
+        await self.port.start(lambda quote: None, lambda order: None)
+        handlers = self.port._quotes_stream._handlers
+        self.assertEqual({channel: set(handlers[channel]) for channel in ("quotes", "statuses", "lulds")},
+                         {channel: {"QQQ", "SPY"} for channel in ("quotes", "statuses", "lulds")})
+        self.assertEqual(handlers["statuses"]["SPY"], self.port._status_callback)
+        self.assertEqual(handlers["lulds"]["SPY"], self.port._luld_callback)
+        self.assertEqual(self.port.health["halt_status_channels"], ["statuses", "lulds"])
+
+    async def test_start_on_iex_subscribes_quotes_only(self):
+        await self.port.stop()
+        with patch.object(t, "_stream_classes", return_value=(FakeStream, FakeStream)):
+            self.port = t.AlpacaPaperTransport("fixture-key", "fixture-secret", ["SPY", "QQQ"],
+                    before_request=lambda *a, **k: None, before_submit=lambda x: None,
+                    sink_observation=lambda x: None, start_timeout=1, required_quote_symbols=["SPY"])
+        await self.port.start(lambda quote: None, lambda order: None)
+        handlers = self.port._quotes_stream._handlers
+        self.assertEqual(set(handlers["quotes"]), {"QQQ", "SPY"})
+        self.assertEqual((handlers["statuses"], handlers["lulds"]), ({}, {}))
+
+    async def test_queued_statuses_and_lulds_do_not_block_reconciliation(self):
+        self.port._enqueue("status", {"T": "s", "S": "SPY", "sc": "T", "t": "2026-09-24T15:40:40Z"})
+        self.port._enqueue("luld", {"T": "l", "S": "SPY", "u": 1, "d": 1, "t": "2026-09-24T15:40:40Z"})
+        self.port.mark_reconciled()
 
     async def test_disconnect_requires_explicit_reconciliation(self):
         self.assertTrue(self.port.ready)
@@ -1001,6 +1251,275 @@ class ConfiguredQuoteFeed(unittest.TestCase):
                 t.preflight("fixture-key", "fixture-secret", ["SPY"], feed=DataFeed.SIP,
                             before_request=lambda *a, **k: None)
         client.assert_not_called()
+
+
+class TradingStatusParsing(unittest.TestCase):
+    """E4: every trading status code Alpaca documents per tape
+    (https://docs.alpaca.markets/us/docs/real-time-stock-pricing-data.md, "Trading Status"),
+    in the documented message schema. Synthetic fixtures; no stream connection."""
+
+    def status(self, sc, rc="", z="C", ts="2026-09-24T15:40:40.219046565Z", symbol="SPY"):
+        return {"T": "s", "S": symbol, "sc": sc, "sm": "", "rc": rc, "rm": "", "t": ts, "z": z}
+
+    def test_every_documented_status_code_maps_to_one_effect(self):
+        cta = {"2": True, "3": False, "5": True, "6": None, "7": None, "8": None, "9": None, "A": None,
+               "C": None, "D": None, "E": None, "F": None}
+        utp = {"H": True, "Q": True, "P": True, "T": False}
+        for tape, table in (("A", cta), ("B", cta), ("C", utp), ("O", utp)):
+            for code, halted in table.items():
+                with self.subTest(tape=tape, code=code):
+                    self.assertIs(t.normalize_trading_status(self.status(code, z=tape))["halted"], halted)
+        self.assertEqual(set(t.CTA_STATUS_CODES), set(cta))
+        self.assertEqual(set(t.UTP_STATUS_CODES), set(utp))
+
+    def test_cta_halt_with_reason_m_is_a_luld_pause_and_e_or_f_never_changes_the_state(self):
+        status = t.normalize_trading_status(self.status("2", "M", z="A"))
+        self.assertEqual((status["state"], status["halted"], status["reason_code"]), ("luld_pause", True, "M"))
+        for code, state in (("E", "short_sale_restriction"), ("F", "luld_limit_state")):
+            status = t.normalize_trading_status(self.status(code, z="B"))
+            self.assertEqual((status["state"], status["halted"]), (state, None))
+
+    def test_cta_price_indication_halts_and_trading_range_indication_does_not(self):
+        # CTS Pillar output specification v2.11b: a Price Indication is the reopening range
+        # "when trading resumes after a Trading Halt"; a Trading Range Indication describes
+        # "a security that is not Trading Halted", before or after the opening.
+        price = t.normalize_trading_status(self.status("5", z="A"))
+        self.assertEqual((price["state"], price["halted"]), ("price_indication", True))
+        trading_range = t.normalize_trading_status(self.status("6", z="B"))
+        self.assertEqual((trading_range["state"], trading_range["halted"]), ("trading_range_indication", None))
+
+    def test_halt_statuses_ride_only_the_sip_feed(self):
+        self.assertTrue(t.halt_statuses_supported("sip"))
+        for feed in ("iex", "delayed_sip", "boats", "otc", "SIP", None):
+            with self.subTest(feed=feed):
+                self.assertFalse(t.halt_statuses_supported(feed))
+
+    def test_market_wide_circuit_breakers_halt_and_mwcq_resumes(self):
+        for code, reason, tape in (("2", "1", "A"), ("2", "3", "B"), ("H", "MWC1", "C"), ("H", "MWC0", "O")):
+            with self.subTest(code=code, reason=reason):
+                status = t.normalize_trading_status(self.status(code, reason, z=tape))
+                self.assertEqual((status["state"], status["halted"]), ("market_wide_circuit_breaker", True))
+        resume = t.normalize_trading_status(self.status("T", "MWCQ"))
+        self.assertEqual((resume["state"], resume["halted"]), ("trading", False))
+
+    def test_unknown_or_cross_tape_codes_fail_closed_and_malformed_messages_raise(self):
+        for code, tape in (("X", "C"), ("H", "A"), ("2", "C"), ("Z", None), ("Z", "Q"), ("T", "A"), ("3", "C")):
+            with self.subTest(code=code, tape=tape):
+                status = t.normalize_trading_status(self.status(code, z=tape))
+                self.assertEqual((status["state"], status["halted"]), ("unknown_status", True))
+        # Without a tape the code alone decides (the two tables share no code).
+        self.assertIs(t.normalize_trading_status(self.status("H", z=None))["halted"], True)
+        for changes in ({"S": None}, {"S": "spy"}, {"sc": None}, {"sc": ""}, {"t": None},
+                        {"t": "2026-09-24T15:40:40"}):
+            with self.subTest(changes=changes), self.assertRaises(t.TransportError):
+                t.normalize_trading_status({**self.status("H"), **changes})
+
+    def test_an_unrecognized_tape_reads_both_tables_so_a_documented_resume_still_resumes(self):
+        # B7: a tape outside A, B, C and O (for example an empty string) used to turn every code
+        # into unknown_status, so the symbol could never resume in-session.
+        for tape in ("", "Q", "X", 7, None):
+            for code, state, halted in (("H", "halted", True), ("T", "trading", False), ("2", "halted", True),
+                                        ("3", "trading", False), ("6", "trading_range_indication", None),
+                                        ("P", "volatility_pause", True), ("X", "unknown_status", True)):
+                with self.subTest(tape=tape, code=code):
+                    status = t.normalize_trading_status(self.status(code, z=tape))
+                    self.assertEqual((status["state"], status["halted"]), (state, halted))
+        self.assertIsNone(t.normalize_trading_status(self.status("T", z=7))["tape"])
+
+    def test_documented_luld_band_parses_and_malformed_bands_raise(self):
+        band = t.normalize_luld({"T": "l", "S": "IONM", "u": 3.24, "d": 2.65, "i": "B",
+                                 "t": "2023-04-06T13:34:45.565004401Z", "z": "C"})
+        self.assertEqual((band["symbol"], band["limit_up"], band["limit_down"], band["indicator"], band["tape"]),
+                         ("IONM", "3.24", "2.65", "B", "C"))
+        for changes in ({"S": None}, {"u": -1}, {"d": "x"}, {"t": None}):
+            with self.subTest(changes=changes), self.assertRaises(t.TransportError):
+                t.normalize_luld({"T": "l", "S": "IONM", "u": 3.24, "d": 2.65, "t": "2023-04-06T13:34:45Z",
+                                  **changes})
+
+
+def halt_item(symbol, date, time_, reason="LUDP", market="NASDAQ", resume_date="", resume_trade=""):
+    """One trade halts RSS item in the schema Nasdaq Trader publishes (ndaq: fields)."""
+    return ("<item><title>%s</title><ndaq:HaltDate>%s</ndaq:HaltDate><ndaq:HaltTime>%s</ndaq:HaltTime>"
+            "<ndaq:IssueSymbol>%s</ndaq:IssueSymbol><ndaq:IssueName>Fixture</ndaq:IssueName>"
+            "<ndaq:Market>%s</ndaq:Market><ndaq:ReasonCode>%s</ndaq:ReasonCode><ndaq:PauseThresholdPrice />"
+            "<ndaq:ResumptionDate>%s</ndaq:ResumptionDate><ndaq:ResumptionQuoteTime />"
+            "<ndaq:ResumptionTradeTime>%s</ndaq:ResumptionTradeTime><description>table</description></item>"
+            % (symbol, date, time_, symbol, market, reason, resume_date, resume_trade))
+
+
+def halt_feed(*items):
+    return ("﻿<?xml version=\"1.0\" encoding=\"utf-8\"?><rss version=\"2.0\" "
+            "xmlns:ndaq=\"http://www.nasdaqtrader.com/\"><channel><title>NASDAQTrader.com</title><ttl>1</ttl>"
+            + "".join(items) + "</channel></rss>").encode("utf-8")
+
+
+class FakeFeedResponse:
+    """A streamed requests.Response of the halts feed. Each socket read returns at most
+    ``chunk`` bytes and advances the fake ``clock`` by ``per_read`` seconds. ``raw.read1``
+    is one socket read (urllib3 HTTPResponse.read1); ``iter_content(size)`` keeps reading
+    until it has ``size`` bytes, as urllib3's read(amt) does."""
+
+    def __init__(self, status=200, body=b"", chunk=65536, headers=None, clock=None, per_read=0.0):
+        self.status_code, self.body, self.chunk, self.closed = status, body, chunk, False
+        self.headers = dict(headers or {})
+        self.clock, self.per_read, self.offset, self.socket_reads = clock, per_read, 0, 0
+        self.raw = self
+
+    def _socket_read(self, size):
+        self.socket_reads += 1
+        if self.clock is not None:
+            self.clock[0] += self.per_read
+        data = self.body[self.offset:self.offset + min(size, self.chunk)]
+        self.offset += len(data)
+        return data
+
+    def read1(self, amt, decode_content=None):
+        return self._socket_read(amt)
+
+    def iter_content(self, size):
+        while self.offset < len(self.body):
+            data = b""
+            while len(data) < size and self.offset < len(self.body):
+                data += self._socket_read(size - len(data))
+            yield data
+
+    def close(self):
+        self.closed = True
+
+
+class HaltFeedSeed(unittest.TestCase):
+    """E4 startup state: halts already in force when the engine subscribes, from one trade
+    halts RSS read (synthetic documents in the published item schema; no network)."""
+
+    NOW = t.eastern_ns("09/24/2026", "11:42:00")
+    FEED = halt_feed(
+        halt_item("AAA", "09/24/2026", "11:40:40.220", resume_date="09/24/2026", resume_trade="11:45:40"),
+        halt_item("BBB", "09/24/2026", "11:22:36.116", resume_date="09/24/2026", resume_trade="11:27:36"),
+        halt_item("CCC", "09/23/2026", "15:10:02.004", reason="T12", market="NYSE"),
+        halt_item("DDD", "09/24/2026", "10:01:00.000", resume_date="09/24/2026", resume_trade="10:06:00"),
+        halt_item("DDD", "09/24/2026", "11:41:30.500", reason="M", market="NYSE"),
+        halt_item("ZZZ", "not a date", "11:00:00"))
+
+    def test_the_feed_parses_to_rows_of_the_documented_fields(self):
+        rows = t.parse_nasdaq_halts(self.FEED)
+        self.assertEqual(len(rows), 6)
+        self.assertEqual(rows[0], {"HaltDate": "09/24/2026", "HaltTime": "11:40:40.220", "IssueSymbol": "AAA",
+                                   "Market": "NASDAQ", "ReasonCode": "LUDP", "ResumptionDate": "09/24/2026",
+                                   "ResumptionQuoteTime": None, "ResumptionTradeTime": "11:45:40"})
+        for payload in (b"not xml", b"<html><body/></html>", b"<rss version=\"2.0\"/>", None):
+            with self.subTest(payload=payload), self.assertRaises(t.TransportError):
+                t.parse_nasdaq_halts(payload)
+
+    def test_active_halts_are_the_latest_unresumed_halt_of_each_wanted_symbol(self):
+        rows = t.parse_nasdaq_halts(self.FEED)
+        halts = t.active_halts(rows, ["AAA", "BBB", "CCC", "DDD", "SPY"], self.NOW)
+        # AAA resumes at 11:45:40 (still ahead); BBB resumed at 11:27:36; CCC (T12, yesterday)
+        # has no resumption; DDD's newer halt has none. ZZZ is not wanted, so its bad row is ignored.
+        self.assertEqual(sorted(halts), ["AAA", "CCC", "DDD"])
+        self.assertEqual(halts["AAA"], {"halted_at_ns": t.timestamp_ns("2026-09-24T15:40:40.220Z"),
+                                        "resumption_trade_ns": t.timestamp_ns("2026-09-24T15:45:40Z"),
+                                        "reason_code": "LUDP", "market": "NASDAQ"})
+        self.assertEqual((halts["DDD"]["reason_code"], halts["DDD"]["resumption_trade_ns"]), ("M", None))
+        self.assertEqual(t.active_halts(rows, ["AAA"], t.eastern_ns("09/24/2026", "11:45:41")), {})
+        with self.assertRaises(t.TransportError):   # a malformed row of a wanted symbol is never guessed
+            t.active_halts(rows, ["ZZZ"], self.NOW)
+
+    def test_eastern_times_convert_across_daylight_saving(self):
+        self.assertEqual(t.eastern_ns("09/24/2026", "11:40:40.220"), t.timestamp_ns("2026-09-24T15:40:40.220Z"))
+        self.assertEqual(t.eastern_ns("01/05/2026", "09:30:00"), t.timestamp_ns("2026-01-05T14:30:00Z"))
+        for date, time_ in (("2026-09-24", "11:40:40"), ("09/24/2026", "11:40"), ("13/01/2026", "10:00:00"), (None, None)):
+            with self.subTest(date=date, time_=time_), self.assertRaises(t.TransportError):
+                t.eastern_ns(date, time_)
+
+    def test_one_bounded_get_of_the_one_url_without_redirects(self):
+        calls, response = [], FakeFeedResponse(body=self.FEED, chunk=100)
+        def get(url, **kwargs):
+            calls.append((url, kwargs))
+            return response
+        self.assertEqual(t.fetch_nasdaq_halts(get=get), self.FEED)
+        self.assertEqual(len(calls), 1)
+        url, kwargs = calls[0]
+        self.assertEqual(url, "https://www.nasdaqtrader.com/rss.aspx?feed=tradehalts")
+        self.assertEqual((kwargs["allow_redirects"], kwargs["stream"]), (False, True))
+        self.assertTrue(response.closed)
+        refused = {"redirect": lambda url, **kw: FakeFeedResponse(status=302),
+                   "server_error": lambda url, **kw: FakeFeedResponse(status=503),
+                   "too_large": lambda url, **kw: FakeFeedResponse(body=b"x" * 2048, chunk=512),
+                   "network": Mock(side_effect=OSError("connection reset"))}
+        for label, fake in refused.items():
+            with self.subTest(label=label), self.assertRaises(t.TransportError):
+                t.fetch_nasdaq_halts(get=fake, max_bytes=1024)
+
+    def test_a_dripping_server_cannot_hold_the_read_past_its_deadline(self):
+        # A6: requests' timeout bounds each socket read, not the body. A server sending one
+        # byte every 4 s (inside the 5 s read timeout) kept one 64 KB iter_content chunk open
+        # for len(body) x 4 s before any deadline check; each read1 is one socket read and the
+        # deadline is checked before every read.
+        clock = [1000.0]
+        response = FakeFeedResponse(body=self.FEED, chunk=1, clock=clock, per_read=4.0)
+        with patch.object(t.time, "monotonic", lambda: clock[0]), self.assertRaises(t.TransportError):
+            t.fetch_nasdaq_halts(get=lambda url, **kwargs: response, seconds=5.0)
+        self.assertLessEqual(clock[0] - 1000.0, 5.0 + 4.0)          # at most one read past the deadline
+        self.assertLessEqual(response.socket_reads, 3)
+        self.assertTrue(response.closed)
+
+    @unittest.skipUnless(importlib.util.find_spec("requests"), "requests is not installed")
+    def test_a_dripping_loopback_server_is_cut_off_at_the_deadline_by_the_real_http_stack(self):
+        # A6, local integration with the installed requests/urllib3 (loopback only): a server
+        # that sends its 40-byte body one byte every 0.3 s stays inside the 1 s per-read
+        # timeout, so reading the whole body takes 12 s; the fetch must end near its 1 s
+        # deadline (one read past it at most) and never return a partial body.
+        import http.server
+        import requests
+
+        class Drip(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                self.send_response(200)
+                self.send_header("Content-Type", "application/rss+xml")
+                self.send_header("Content-Length", "40")
+                self.end_headers()
+                try:
+                    for _ in range(40):
+                        self.wfile.write(b"x")
+                        self.wfile.flush()
+                        time.sleep(0.3)
+                except (BrokenPipeError, ConnectionResetError):
+                    pass
+
+            def log_message(self, *args):
+                pass
+
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Drip)
+        server.daemon_threads = True
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        url = "http://127.0.0.1:%d/" % server.server_address[1]
+        try:
+            started = time.monotonic()
+            with self.assertRaises(t.TransportError):
+                t.fetch_nasdaq_halts(get=lambda _, **kwargs: requests.get(url, **kwargs), seconds=1.0)
+            self.assertLess(time.monotonic() - started, 3.0)
+        finally:
+            server.shutdown()
+            server.server_close()
+
+    def test_the_feed_is_requested_uncompressed_and_an_encoded_body_is_refused(self):
+        calls = []
+        def get(url, **kwargs):
+            calls.append(kwargs)
+            return FakeFeedResponse(body=self.FEED, headers={"Content-Encoding": "gzip"})
+        with self.assertRaises(t.TransportError):
+            t.fetch_nasdaq_halts(get=get)
+        self.assertEqual(calls[0]["headers"]["Accept-Encoding"], "identity")
+        plain = FakeFeedResponse(body=self.FEED, headers={"Content-Encoding": "identity"})
+        self.assertEqual(t.fetch_nasdaq_halts(get=lambda url, **kwargs: plain), self.FEED)
+
+    def test_the_seed_records_its_source_digest_and_active_halts(self):
+        seed = t.nasdaq_halt_seed(["AAA", "BBB", "SPY"], now_ns=self.NOW, fetch=lambda: self.FEED)
+        self.assertEqual((seed["source"], seed["items"], seed["bytes"], seed["fetched_at_ns"]),
+                         ("nasdaq_trade_halts_rss", 6, len(self.FEED), self.NOW))
+        self.assertRegex(seed["sha256"], r"\A[0-9a-f]{64}\Z")
+        self.assertEqual(sorted(seed["halts"]), ["AAA"])
 
 
 class LeverageNormalizeAccountTests(unittest.TestCase):

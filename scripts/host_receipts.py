@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import bisect
+import fcntl
 import getpass
 import hashlib
 import json
@@ -81,9 +82,14 @@ HOST_ID_PATTERN = re.compile(r"^[a-z0-9-]+-[0-9]{8}$")
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 ISO_UTC_PATTERN = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
+# A generation suffix ('-2', '-3', ...) distinguishes a superseding receipt's id from the
+# id it supersedes without changing host/component/stage/date; see cmd_record's --supersedes
+# handling and next_free_superseding_id(). No leading zero and never '-0'/'-1': the bare id
+# with no suffix is generation 1.
 ID_PATTERN = re.compile(
     r"^(?P<host_id>[a-z0-9-]+-[0-9]{8})--(?P<component_id>[A-Za-z0-9][A-Za-z0-9._/:-]*)--"
-    r"(?P<stage>install|use|restart|recovery|persistence|cleanup)--(?P<date>[0-9]{8})$"
+    r"(?P<stage>install|use|restart|recovery|persistence|cleanup)--(?P<date>[0-9]{8})"
+    r"(?:-(?P<generation>[2-9]|[1-9][0-9]+))?$"
 )
 
 TOP_LEVEL_REQUIRED = [
@@ -250,8 +256,22 @@ def git_head(root: Path) -> str:
     return revision
 
 
+# sanitize() redacts the user name only as a whole token, so a short name is not cut out of a longer word (user "ed"
+# in "recorded", "used" or "cached"): no letter, digit or underscore may touch it on either side. An escape just before
+# it (JSON "\n", "\r", "\t" or "\u002f", a "\x2f", a URL's "%2F") encodes a separator although it ends in a letter or
+# digit, so an encoded home path such as "%2FUsers%2F<name>" is still redacted.
+USER_NAME_START = "|".join((
+    r"(?<!\w)", r"(?<=\\[nrt])", r"(?<=\\u[0-9A-Fa-f]{4})", r"(?<=\\x[0-9A-Fa-f]{2})", r"(?<=%[0-9A-Fa-f]{2})",
+))
+
+
+def user_name_pattern(user: str) -> re.Pattern:
+    """``user`` as a whole token (USER_NAME_START), never as part of a longer word."""
+    return re.compile(f"(?:{USER_NAME_START}){re.escape(user)}" + r"(?!\w)")
+
+
 def sanitize(text: str) -> str:
-    """Replace $HOME with ~ and the current username with <user>; never raises."""
+    """Replace $HOME with ~ and the current username, as a whole token, with <user>; never raises."""
     home = str(Path.home())
     if home and home != "/":
         text = text.replace(home, "~")
@@ -260,7 +280,7 @@ def sanitize(text: str) -> str:
     except Exception:
         user = None
     if user:
-        text = re.sub(re.escape(user), "<user>", text)
+        text = user_name_pattern(user).sub("<user>", text)
     for _description, pattern in PRIVATE_CONTENT:
         text = pattern.sub("[redacted]", text)
     return text
@@ -684,6 +704,54 @@ def stack_commands_for_record(root: Path, component_id: str,
     return [], f"no plain-string commands found for component {searched} in manifests/stack.json; pass --cmd"
 
 
+def existing_review_summary(path: Path) -> str:
+    """``kind:verdict`` for each review already in the receipt at ``path``, joined by ', ',
+    so a refused overwrite names exactly what it would have erased (2026-09-25: a same-day
+    rerecord silently erased an independent_session ``needs_changes`` review). Never raises:
+    a receipt too damaged to parse still refuses the overwrite, it just cannot describe it."""
+    try:
+        existing = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, ValueError):
+        return "existing receipt is unreadable"
+    reviews = existing.get("reviews") if isinstance(existing, dict) and isinstance(existing.get("reviews"), list) else []
+    entries = [f"{review.get('kind')}:{review.get('verdict')}" for review in reviews if isinstance(review, dict)]
+    return ", ".join(entries) if entries else "no reviews"
+
+
+def refuse_overwrite_message(relative_path: str, target: Path, latest_id: str) -> str:
+    return (f"error: refusing to overwrite existing receipt {relative_path!r} (existing reviews: "
+            f"{existing_review_summary(target)}); receipts are never overwritten once written "
+            f"(docs/contributing-evidence.md) -- pass --supersedes {latest_id!r} to record a new receipt "
+            "that supersedes it without touching the original")
+
+
+def latest_generation_id(root: Path, host_id: str, base_id: str) -> str | None:
+    """The id of the highest-generation existing receipt in ``base_id``'s family: ``base_id``
+    itself (generation 1), or ``base_id-N`` for the largest existing N, or ``None`` if no
+    receipt in this family has been recorded yet. Generations are contiguous by construction
+    (``next_free_superseding_id`` always fills the lowest free slot), so a sequential scan
+    from N=2 stops at the first gap. ``record --supersedes`` requires naming exactly this id,
+    so an older generation can never be superseded while a newer one exists (which would hide
+    the newer one's own reviews)."""
+    host_dir = root / "evidence" / "hosts" / host_id
+    latest = base_id if (host_dir / f"{receipt_filename_stem(base_id)}.json").is_file() else None
+    generation = 2
+    while (host_dir / f"{receipt_filename_stem(f'{base_id}-{generation}')}.json").is_file():
+        latest = f"{base_id}-{generation}"
+        generation += 1
+    return latest
+
+
+def next_free_superseding_id(root: Path, host_id: str, base_id: str) -> str:
+    """Smallest ``<base_id>-N`` (N >= 2) with no existing receipt file under
+    ``evidence/hosts/<host_id>/``, for ``record --supersedes``."""
+    host_dir = root / "evidence" / "hosts" / host_id
+    generation = 2
+    while (host_dir / f"{receipt_filename_stem(f'{base_id}-{generation}')}.json").exists():
+        generation += 1
+    return f"{base_id}-{generation}"
+
+
 def cmd_record(args: argparse.Namespace) -> int:
     root = repo_root(args.root)
     host_id = args.host_id
@@ -794,6 +862,54 @@ def cmd_record(args: argparse.Namespace) -> int:
     observed_at = utc_now()
     date_stamp = observed_at[:10].replace("-", "")
 
+    # Compute the receipt id/path and refuse a collision *before* any command below runs, so a
+    # same-day rerun can never erase an existing file's appended independent reviews (the
+    # 2026-09-25 incident) -- receipts are never overwritten once written. --supersedes is the
+    # reviewable way to record a new receipt for the same host/component/stage/date instead.
+    base_id = f"{host_id}--{args.component_id}--{args.stage}--{date_stamp}"
+    if args.supersedes is None:
+        receipt_id = base_id
+    else:
+        supersedes_match = ID_PATTERN.fullmatch(args.supersedes)
+        if (supersedes_match is None or supersedes_match.group("host_id") != host_id
+                or supersedes_match.group("component_id") != args.component_id
+                or supersedes_match.group("stage") != args.stage
+                or supersedes_match.group("date") != date_stamp):
+            print(f"error: --supersedes {args.supersedes!r} must be an existing receipt id for this same "
+                  f"recording's host/component/stage/date ({base_id!r}, optionally with a '-N' generation "
+                  "suffix from an earlier supersede)")
+            return 2
+        superseded_relative = f"evidence/hosts/{host_id}/{receipt_filename_stem(args.supersedes)}.json"
+        try:
+            superseded_target = safe_file(root, superseded_relative)
+        except InvalidDecisionIndex as error:
+            print(f"error: --supersedes {args.supersedes!r} is not a valid receipt path: {error}")
+            return 2
+        if not superseded_target.is_file():
+            print(f"error: --supersedes names {superseded_relative!r}, which does not exist; --supersedes must "
+                  "name an already-recorded receipt")
+            return 2
+        # --supersedes must name the *latest* existing generation: superseding an older one
+        # while a newer generation already exists would silently drop the newer one's own
+        # reviews from the chain (nobody would ever be told to supersede it in turn).
+        latest = latest_generation_id(root, host_id, base_id)
+        if args.supersedes != latest:
+            print(f"error: --supersedes {args.supersedes!r} is not the latest receipt for this host/component/"
+                  f"stage/date; the latest is {latest!r} -- pass --supersedes {latest!r} instead (superseding an "
+                  "older generation while a newer one exists would hide the newer one's own reviews)")
+            return 2
+        receipt_id = next_free_superseding_id(root, host_id, base_id)
+
+    relative_path = f"evidence/hosts/{host_id}/{receipt_filename_stem(receipt_id)}.json"
+    try:
+        target = safe_file(root, relative_path)
+    except InvalidDecisionIndex as error:
+        print(f"error: cannot record a receipt at {relative_path!r}: {error}")
+        return 2
+    if target.exists():
+        print(refuse_overwrite_message(relative_path, target, latest_generation_id(root, host_id, base_id)))
+        return 2
+
     command_records = []
     for cmd in commands_to_run:
         exit_code, output, duration = run_command(cmd, cwd=root, timeout=args.timeout)
@@ -808,7 +924,6 @@ def cmd_record(args: argparse.Namespace) -> int:
 
     result = "pass" if all(record["exit"] == 0 for record in command_records) else "fail"
 
-    receipt_id = f"{host_id}--{args.component_id}--{args.stage}--{date_stamp}"
     limitations = args.limitation or [
         "Recorded receipt covers only the listed commands; it does not establish full "
         "component functional acceptance beyond what these commands exercise.",
@@ -851,13 +966,8 @@ def cmd_record(args: argparse.Namespace) -> int:
         receipt["qualified_models"] = qualified_models
     if args.hardware_profile_ref:
         receipt["host"]["hardware_profile_ref"] = args.hardware_profile_ref
-
-    relative_path = f"evidence/hosts/{host_id}/{receipt_filename_stem(receipt_id)}.json"
-    try:
-        target = safe_file(root, relative_path)
-    except InvalidDecisionIndex as error:
-        print(f"error: cannot record a receipt at {relative_path!r}: {error}")
-        return 2
+    if args.supersedes:
+        receipt["supersedes"] = args.supersedes
 
     # Check the receipt against the schema before writing anything (for example an overlong
     # --model), so a failed check never leaves a receipt that validate would reject.
@@ -867,11 +977,27 @@ def cmd_record(args: argparse.Namespace) -> int:
         print("error: the receipt would not validate: " + "; ".join(shape_errors))
         return 2
 
-    # Validate (and register) before/around the final write, rolling back the file on any
-    # registration failure, so a crash here can never leave a written-but-unregistered
+    # The write below is an exclusive create (FileExistsError is defense in depth alongside
+    # the target.exists() check earlier -- both mean this call never overwrites). Any other
+    # failure while writing, or a failure to register afterward, deletes the file this run
+    # created, so a crash here can never leave a written-but-unregistered (or truncated)
     # receipt behind (the receipt file and manifests/evidence.json stay coherent together).
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+    try:
+        with target.open("x", encoding="utf-8") as handle:
+            handle.write(json.dumps(receipt, indent=2) + "\n")
+    except FileExistsError:
+        # Defense in depth: the target.exists() check above already refused this exact path
+        # once; this only catches a receipt another process created in the window since then.
+        print(refuse_overwrite_message(relative_path, target, latest_generation_id(root, host_id, base_id)))
+        return 2
+    except Exception:
+        # The exclusive create above means this run, and only this run, could have created
+        # target; a failure partway through writing it (for example ENOSPC) is safe to delete
+        # rather than leaving a truncated or empty receipt behind. Re-raise so the underlying
+        # error is not hidden.
+        target.unlink(missing_ok=True)
+        raise
     try:
         register_file(root, relative_path)
     except Exception as error:
@@ -914,7 +1040,6 @@ def cmd_review(args: argparse.Namespace) -> int:
         print("error: --receipt must be inside the repository root")
         return 2
     path = safe_file(root, relative_path)
-    receipt = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
     if args.kind not in REVIEW_KINDS:
         print(f"error: --kind must be one of {sorted(REVIEW_KINDS)}")
         return 2
@@ -929,35 +1054,58 @@ def cmd_review(args: argparse.Namespace) -> int:
     if reviewer is None:
         print(f"error: no reviewer identity: pass --identity NAME (only a Claude Code session exports {IDENTITY_ENV})")
         return 2
-    recorder = (receipt.get("recorded_by") or {}).get("identity_sha256") if isinstance(receipt.get("recorded_by"), dict) else None
-    if args.kind != "self":
-        if recorder is None:
-            print("error: this receipt has no recorded_by identity, so an independent review cannot be checked "
-                  "against its recorder; re-record it with the current scripts/host_receipts.py record")
+
+    # An exclusive lock on a stable file beside the receipt -- never the receipt path itself,
+    # which os.replace() swaps to a new inode below and so would stop protecting a second
+    # waiter still holding the old one -- serializes concurrent reviewers of the same receipt.
+    # Each re-reads the receipt only after acquiring the lock, so two reviews racing to append
+    # cannot silently lose one, and the write goes to a temp file that is os.replace()d into
+    # place, so a crash mid-write can never truncate the receipt that was there before.
+    lock_path = path.with_name(path.name + ".lock")
+    lock_handle = open(lock_path, "a+")
+    try:
+        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+        receipt = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
+        recorder = (receipt.get("recorded_by") or {}).get("identity_sha256") \
+            if isinstance(receipt.get("recorded_by"), dict) else None
+        if args.kind != "self":
+            if recorder is None:
+                print("error: this receipt has no recorded_by identity, so an independent review cannot be "
+                      "checked against its recorder; re-record it with the current scripts/host_receipts.py record")
+                return 2
+            if reviewer == recorder:
+                print(f"error: --kind {args.kind} review from the recorder's own identity; an independent review "
+                      "must come from a different session, lane or person")
+                return 2
+        now = utc_now()
+        observed_at = receipt.get("observed_at_utc")
+        if isinstance(observed_at, str) and now < observed_at:
+            print(f"error: this host's clock ({now}) is behind the receipt's observed_at_utc ({observed_at}); a "
+                  "review dated before the observation is refused by validate, so fix the clock and rerun")
             return 2
-        if reviewer == recorder:
-            print(f"error: --kind {args.kind} review from the recorder's own identity; an independent review must "
-                  "come from a different session, lane or person")
+        receipt.setdefault("reviews", []).append({
+            "kind": args.kind, "ref": args.ref, "verdict": args.verdict, "at_utc": now,
+            "reviewer": identity_record(reviewer, args.model),
+        })
+        shape_errors: list[str] = []
+        validate_receipt_shape(root, receipt, relative_path, shape_errors)
+        if shape_errors:
+            print("error: the reviewed receipt would not validate: " + "; ".join(shape_errors))
             return 2
-    now = utc_now()
-    observed_at = receipt.get("observed_at_utc")
-    if isinstance(observed_at, str) and now < observed_at:
-        print(f"error: this host's clock ({now}) is behind the receipt's observed_at_utc ({observed_at}); a review "
-              "dated before the observation is refused by validate, so fix the clock and rerun")
-        return 2
-    receipt.setdefault("reviews", []).append({
-        "kind": args.kind, "ref": args.ref, "verdict": args.verdict, "at_utc": now,
-        "reviewer": identity_record(reviewer, args.model),
-    })
-    shape_errors: list[str] = []
-    validate_receipt_shape(root, receipt, relative_path, shape_errors)
-    if shape_errors:
-        print("error: the reviewed receipt would not validate: " + "; ".join(shape_errors))
-        return 2
-    path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
-    register_file(root, relative_path)
-    print(relative_path)
-    return 0
+        temp_path = path.with_name(f"{path.name}.tmp-{os.getpid()}")
+        try:
+            temp_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+            os.replace(temp_path, path)
+        except Exception:
+            # temp_path was created exclusively by this run, under the lock; safe to delete.
+            temp_path.unlink(missing_ok=True)
+            raise
+        register_file(root, relative_path)
+        print(relative_path)
+        return 0
+    finally:
+        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
+        lock_handle.close()
 
 
 # ----------------------------------------------------------------------- validate
@@ -1040,6 +1188,54 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
             expected_date = observed_at[:10].replace("-", "")
             _require(id_date == expected_date, errors,
                       f"{label}: id date segment {id_date!r} does not match observed_at_utc date {expected_date!r}")
+
+    # The id pattern and supersedes' own pattern (adoption/host-receipt.schema.json) cannot
+    # express this cross-field rule, so it is enforced here: a '-N' generation suffix on this
+    # receipt's own id requires a supersedes field, and a bare id (generation 1) must not
+    # carry one -- a receipt's generation and its supersedes link cannot drift apart.
+    supersedes = receipt.get("supersedes")
+    supersedes_present = "supersedes" in receipt
+    id_generation = id_match.group("generation") if id_match is not None else None
+    if id_match is not None:
+        if id_generation is not None:
+            _require(supersedes_present, errors,
+                      f"{label}: id {receipt_id!r} has a '-{id_generation}' generation suffix, so it must carry "
+                      "a supersedes field naming the earlier receipt it supersedes")
+        else:
+            _require(not supersedes_present, errors,
+                      f"{label}: id {receipt_id!r} has no generation suffix (generation 1), so it must not carry "
+                      "a supersedes field")
+
+    if isinstance(supersedes, str) and supersedes:
+        supersedes_match = ID_PATTERN.fullmatch(supersedes)
+        if supersedes_match is None:
+            errors.append(f"{label}: supersedes {supersedes!r} is not a well-formed receipt id")
+        else:
+            _require(supersedes_match.group("host_id") == host_id, errors,
+                      f"{label}: supersedes host segment {supersedes_match.group('host_id')!r} does not match "
+                      f"host.host_id {host_id!r}")
+            _require(supersedes_match.group("component_id") == component_id, errors,
+                      f"{label}: supersedes component segment {supersedes_match.group('component_id')!r} does "
+                      f"not match component_id {component_id!r}")
+            _require(supersedes_match.group("stage") == receipt.get("stage"), errors,
+                      f"{label}: supersedes stage segment {supersedes_match.group('stage')!r} does not match "
+                      f"stage {receipt.get('stage')!r}")
+            _require(supersedes != receipt_id, errors, f"{label}: supersedes must not equal this receipt's own id")
+            if id_match is not None:
+                # 'same day' is the UTC date segment carried in the id, not any other clock.
+                _require(supersedes_match.group("date") == id_match.group("date"), errors,
+                          f"{label}: supersedes date segment {supersedes_match.group('date')!r} does not match "
+                          f"this receipt's own id date segment {id_match.group('date')!r} ('same day' is the UTC "
+                          "date in the id)")
+                own_generation = int(id_generation or "1")
+                superseded_generation = int(supersedes_match.group("generation") or "1")
+                _require(superseded_generation < own_generation, errors,
+                          f"{label}: supersedes {supersedes!r} (generation {superseded_generation}) must be a "
+                          f"lower generation than this receipt's own id {receipt_id!r} (generation {own_generation})")
+            superseded_relative = f"evidence/hosts/{host_id}/{receipt_filename_stem(supersedes)}.json"
+            _require(superseded_relative in known_files, errors,
+                      f"{label}: supersedes {supersedes!r} ({superseded_relative}) is not registered in "
+                      "manifests/evidence.json files[]")
 
     commands = receipt.get("commands") if isinstance(receipt.get("commands"), list) else []
     result = receipt.get("result")
@@ -1521,6 +1717,13 @@ def build_parser() -> argparse.ArgumentParser:
     record_parser.add_argument("--platform-id", required=True)
     record_parser.add_argument("--component-id", required=True)
     record_parser.add_argument("--stage", required=True, choices=sorted(STAGES))
+    record_parser.add_argument("--supersedes", default=None,
+                               help="The LATEST existing receipt id for this same host/component/stage/date to "
+                                    "supersede (an older generation is refused, naming the actual latest): writes "
+                                    "a new receipt at the next free '-N' generation, records this in its "
+                                    "'supersedes' field, and leaves the original file untouched. Without this, "
+                                    "record refuses (exit 2) when today's receipt for this host/component/stage "
+                                    "already exists, instead of overwriting it.")
     record_parser.add_argument("--hardware-profile-ref", default=None)
     record_parser.add_argument("--second-physical-machine", action="store_true")
     record_parser.add_argument("--cmd", action="append", default=[])

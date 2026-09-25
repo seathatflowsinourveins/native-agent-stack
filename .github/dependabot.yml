@@ -3,9 +3,23 @@ version: 2
 # every manifest in the dependency graph are a repository setting (on since
 # 2026-09-22); pip version updates for the hash-locked, cutoff-reproducible locks stay
 # off (docs/decisions/2026-09-22-github-automation-closure.md, section 8).
-# The pip entry below exists only to keep security-update PRs off the deliberately
-# vulnerable grype positive-control fixture: `ignore` also applies to security
-# updates, and open-pull-requests-limit: 0 disables its version updates.
+# The CI analyzer lock is .github/requirements-ci.txt (renamed from requirements-ci.lock
+# on 2026-09-25) so the dependency graph can list zizmor and security updates can cover it
+# (post-merge SBOM check in section 8). No pip version-update entry is added: a zizmor
+# security-update PR fails the pin test and the evidence hash check by design, and the
+# maintainer does the reviewed relock and closes it, as with #97/#98 -> #99.
+# npm/pnpm and uv: the only manifests (blueprints/convergence-practice/application-delivery,
+# blueprints/convergence-practice/wsl-retrieval, evidence/artifacts/macos-application-20260924/variant)
+# are frozen experiment or evidence artifacts whose lock hashes are registered in
+# manifests/evidence.json and cited by receipts, so a version bump would break validate;
+# application-delivery also pins pnpm 12, outside the pnpm versions Dependabot lists.
+# NuGet: the 23 packages.lock.json files are overlays for an upstream LEAN checkout with
+# no project file; neither Dependabot nor the dependency graph discovers them, and
+# security-scan.yml's osv-scanner job is their only vulnerability-alert path.
+# Overturn for both: section 8, "Ecosystems without a version-update entry (2026-09-25)".
+# The grype positive-control fixture at blueprints/gap-wave2-20260923/grype-known-cve-fixture
+# is named requirements.txt.fixture (not requirements.txt), so Dependabot's pip manifest
+# discovery never finds it there and needs no dedicated pip entry or ignore rule.
 updates:
   - package-ecosystem: github-actions
     directory: /
@@ -25,14 +39,3 @@ updates:
     # option; security updates are exempt). Matches agent-lab's setting.
     cooldown:
       default-days: 7
-  # Deliberately vulnerable positive-control fixture (urllib3 1.26.4, gap
-  # ci-supply-chain[13], tests/test_grype_known_cve_fixture.py). `ignore` also
-  # applies to security updates (exclude-paths and the PR limit do not), so no
-  # PR bumps the pin; alerts still appear and are dismissed as not_used.
-  - package-ecosystem: pip
-    directory: /blueprints/gap-wave2-20260923/grype-known-cve-fixture
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 0
-    ignore:
-      - dependency-name: urllib3
