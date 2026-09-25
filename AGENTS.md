@@ -74,6 +74,11 @@ its own `effort` inherits the coordinator's `xhigh` unless its agent's
 frontmatter sets one. Probes and overturn conditions:
 `docs/decisions/2026-09-23-max-effort-default.md`.
 
+Until the trading lane moves to its own repository, `docs/lanes.md` assigns
+foundation, trading and shared paths, gives the protocol for shared hot files
+such as `manifests/evidence.json`, and requires one `lane:*` label per PR.
+Hand off to a live session that owns an area instead of editing it.
+
 For general engineering and ecosystem changes, start with
 `docs/convergence-architecture.md`. New convergence claims use
 `scripts/validate_convergence.py` with a scoped experiment record. Preserve failed
