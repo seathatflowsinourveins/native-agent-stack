@@ -198,8 +198,10 @@ def rtk_client_visible(db,inline_chars=CLIENT_INLINE_CHARS,preview_chars=CLIENT_
 
 def rtk_visible_boundary(view):
     share=lambda value:"n/a" if value is None else "{:.2%}".format(value)
+    shown=("as Claude Code 2.1.282 first shows it by default" if (view["inline_chars"],view["preview_chars"])==
+           (CLIENT_INLINE_CHARS,CLIENT_PREVIEW_CHARS) else "with the configured client limits")
     return (" Each row saves max(0, raw - filtered) in ceil(bytes/4), with no cap; the ten largest commands hold {} of"
-            " the retained total. Counting each output as Claude Code 2.1.282 first shows it by default ({:,} characters"
+            " the retained total. Counting each output "+shown+" ({:,} characters"
             " inline, otherwise a preview of at most {:,}), the net is {:,} estimated tokens ({} of the total). This is"
             " a model, not a bound: later reads of saved output files are not counted, and Codex has its own output limits."
             ).format(share(view["top10_share"]),view["inline_chars"],view["preview_chars"],view["net"],share(view["net_share"]))
@@ -514,7 +516,7 @@ def coverage_matrix(stack,audit,gaps,fresh,comparisons):
     gap={c["id"]:c for c in (gaps or {}).get("components",[])}
     recent={c["id"]:c for c in (fresh or {}).get("components",[])}
     ops=audit.get("operations",[])+(gaps or {}).get("operations",[])+(fresh or {}).get("operations",[])
-    native={"rtk":("retained estimate","rtk gain --format json; rtk gain --project --format json","90-day configured retention; global includes project views; uncapped bytes/4 of raw minus filtered output, so a few very large outputs can dominate"),
+    native={"rtk":("retained estimate","rtk gain --format json; rtk gain --project --format json","90-day configured retention; global includes project views; each row saves max(0, raw - filtered) in bytes/4 with no cap, so a few very large outputs can dominate"),
             "context-mode":("retained estimate","ctx_stats({})","Runtime-specific byte/event estimates; lifetime = retained events x 256; 7-day startup cleanup and 1000 events/session cap"),
             "headroom":("retained estimate","headroom savings --json","Native lifetime field covers at most 30 days; a missing ledger file also reads as zero; offline artifact guards do not add events"),
             "jcodemunch":("cumulative estimate","order(action=\"get_session_stats\", args={})","Persistent bytes/4 whole-file retrieval estimate; repeated calls count again; default index root keeps retrieval accounting and stats aligned"),
@@ -695,11 +697,13 @@ def refresh(config,context_file=None):
                 if label=="rtk-global" and config.get("rtk_database") and Path(config["rtk_database"]).exists():
                     # A failure here is the view's own issue; the rtk gain counter read above stays successful.
                     try:
-                        view=rtk_client_visible(config["rtk_database"],
-                                                client_limit(config,"client_inline_chars",CLIENT_INLINE_CHARS,4000,128000),
-                                                client_limit(config,"client_preview_chars",CLIENT_PREVIEW_CHARS,1,128000))
+                        inline_chars=client_limit(config,"client_inline_chars",CLIENT_INLINE_CHARS,4000,128000)
+                        preview_chars=client_limit(config,"client_preview_chars",CLIENT_PREVIEW_CHARS,1,inline_chars-1)
+                        view=rtk_client_visible(config["rtk_database"],inline_chars,preview_chars)
                         gain_rows=parsed["summary"].get("total_commands")
-                        if view and type(gain_rows) is int and view["rows"]<gain_rows:
+                        # Allow 1% fewer rows than rtk gain counted, for retention pruning between the two reads;
+                        # a different database is flagged.
+                        if view and type(gain_rows) is int and view["rows"]*100<gain_rows*99:
                             issues.append("RTK client-visible view: the configured rtk_database holds "+str(view["rows"])+
                                           " rows but rtk gain reported "+str(gain_rows)+" commands, so the view was omitted")
                         elif view:

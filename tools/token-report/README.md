@@ -138,10 +138,12 @@ comparison against compact JSON, with that result stored separately.
 - When `rtk_database` is configured, the global snapshot adds `client_visible`,
   which re-counts every row as a client first shows the output:
   - whole up to `client_inline_chars` (default 30000, allowed 4000–128000);
-  - otherwise a preview of at most `client_preview_chars` (default 2000).
+  - otherwise a preview of at most `client_preview_chars` (default 2000, which
+    must stay below the inline limit).
 
   Those defaults are Claude Code 2.1.282's `bashOutputMaxChars` and its
-  saved-output preview.
+  saved-output preview. The boundary text says "by default" only when both
+  limits are the defaults.
   - **Sign:** the view keeps the sign, so an expansion, or a filtered output
     longer than the raw output's preview, counts as `added`. Its net therefore
     differs from the floored upstream total.
@@ -151,8 +153,9 @@ comparison against compact JSON, with that result stored separately.
       counted;
     - rows from scripts that no client displayed are included;
     - Codex has its own output limits.
-  - **Mismatch check:** if the configured database holds fewer rows than
-    `rtk gain` reported, the view is omitted and an issue names the mismatch.
+  - **Mismatch check:** if the configured database holds more than 1% fewer rows
+    than `rtk gain` reported, the view is omitted and an issue names the
+    mismatch. The 1% allows for retention pruning between the two reads.
 - Headroom 0.37.0 calls a 30-day estimate `lifetime`, and
   `headroom savings --json` also prints zero when its ledger file does not
   exist. When the report names its ledger path, the snapshot records
