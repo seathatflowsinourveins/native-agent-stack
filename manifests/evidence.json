@@ -9139,6 +9139,51 @@
       "bytes": 377
     },
     {
+      "path": "blueprints/us-equities/sim-capacity/README.md",
+      "sha256": "3edcce2f8e1950119e68f2b7f1f9088e5e1630fa3bfc93285d62fe432cbe7e65",
+      "bytes": 11413
+    },
+    {
+      "path": "blueprints/us-equities/sim-capacity/exerciser.py",
+      "sha256": "88950a01d64dd40d43fcc4211e0240a062592fbf7c03a0e28cfb11c17e8675ca",
+      "bytes": 10524
+    },
+    {
+      "path": "blueprints/us-equities/sim-capacity/experiment.json",
+      "sha256": "c4854c4e2841d039cc1b3cdcecadeeb201983d0c1cd88efeec0d752f5564a205",
+      "bytes": 12166
+    },
+    {
+      "path": "blueprints/us-equities/sim-capacity/fee_model.py",
+      "sha256": "ad118a529b4429be909c477892178519eca1081aa81ca9667e364ae114118f21",
+      "bytes": 4114
+    },
+    {
+      "path": "blueprints/us-equities/sim-capacity/fetcher.py",
+      "sha256": "fe2b97913f252a852bdf386587ccc6811eddeb182fe62a6dea2915cd801b18c0",
+      "bytes": 9814
+    },
+    {
+      "path": "blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json",
+      "sha256": "e0156a4589ac17eb2f2850b0a0ce18b59c38d93b3993ff39271930b6076f69e6",
+      "bytes": 40076
+    },
+    {
+      "path": "blueprints/us-equities/sim-capacity/receipts/20260924-paper-parity.json",
+      "sha256": "55b67b10c57b4aea174f282804ffffa10ed6eaff8f95c951aa4eb3d45726155b",
+      "bytes": 36961
+    },
+    {
+      "path": "blueprints/us-equities/sim-capacity/runner.py",
+      "sha256": "8b5b9053c649429993fd0332a58656633a052ce740725ffec9771b4ef55ae4f6",
+      "bytes": 26463
+    },
+    {
+      "path": "blueprints/us-equities/sim-capacity/schedule.py",
+      "sha256": "942db6ee2ccaf7604a55fe703250ec732173713a58432f2a0957a1af77ddb074",
+      "bytes": 2744
+    },
+    {
       "path": "blueprints/us-equities/sim-paper-compare/README.md",
       "sha256": "5b6065ba0fe6b143a34221e2678a4cd18abca4d855224be1059cd05571e67570",
       "bytes": 35911
@@ -29589,6 +29634,11 @@
       "bytes": 14063
     },
     {
+      "path": "tests/test_sim_capacity.py",
+      "sha256": "730525a0149c36b3aa24b8ab3be9905ac1fa92e1504786fb57a46139fb4f01d9",
+      "bytes": 15686
+    },
+    {
       "path": "tests/test_sim_paper_compare.py",
       "sha256": "8202b8f9524b26d1d6ced7bd6cae36477cc4801c8cc0ca14d403242e52ef9247",
       "bytes": 97855
@@ -29784,6 +29834,7 @@
     "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
     "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
     "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
-    "evidence/artifacts/local-model-workloads-20260924/experiment.json"
+    "evidence/artifacts/local-model-workloads-20260924/experiment.json",
+    "blueprints/us-equities/sim-capacity/experiment.json"
   ]
 }

@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "research-application",
+  "discovery_provenance": [
+    "The us-equities north star already selects NautilusTrader 2.0.0rc5 as the destination backtest/paper engine (catalogs/us-equities/runtime-target.json); this experiment builds the simulation-lane capacity infrastructure test on that pinned selection rather than re-opening engine choice from scratch.",
+    "hftbacktest (nkaz001/hftbacktest) is the repository's own retained cross-check candidate for latency/queue calibration (catalogs/us-equities/architecture/trading.json source_commit 5f3ec40b2afb764e0fea112f941ed85523ef4e88, refuted_keep_but_compare disposition; mover-v3/README.md's simulation-fidelity section names it as 'a comparison harness on a tick subset only').",
+    "Lean, vectorbt/vectorbt.pro, ABIDES, mbt_gym, backtrader, zipline-reloaded, hummingbot and freqtrade were screened by the coordinator against this task's requirements (native per-order latency model, L1 queue/liquidity realism, a native per-account rate limiter, Python strategy API) and found unsuitable for the reasons in decision_and_scope.scope and this record's limitations."
+  ],
+  "license_and_compatibility": "NautilusTrader is LGPL-3.0 (already the accepted north-star engine license posture); hftbacktest is MIT. No new native authentication, credential export or model default follows from this record.",
+  "predeclared_metrics": {
+    "quality_rule": "The elite-tier profile must sustain >=180 fills/simulated-minute in every full minute of the 30-minute analysis window, independently recounted from NautilusTrader's own generate_fills_report() and matching the strategy's own counters exactly; the paper-parity profile must never exceed 180 fills/min (by construction of its RiskEngineConfig budget). Both must flatten to zero net position at end.",
+    "usage_rule": "No token/model usage is claimed by this record (usage_assessment.claim is 'none'); this is an infrastructure capacity measurement, not a model-task comparison."
+  },
+  "commands": [
+    "python3 blueprints/us-equities/sim-capacity/runner.py fetch --pages ~/.local/state/native-agent-stack/sim-capacity/pages --catalog ~/.local/state/native-agent-stack/sim-capacity/catalog",
+    "python3 blueprints/us-equities/sim-capacity/runner.py run --catalog ~/.local/state/native-agent-stack/sim-capacity/catalog --receipt blueprints/us-equities/sim-capacity/receipts/20260924-paper-parity.json --profile paper-parity",
+    "python3 blueprints/us-equities/sim-capacity/runner.py run --catalog ~/.local/state/native-agent-stack/sim-capacity/catalog --receipt blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json --profile elite-tier",
+    "python3 -m unittest -v tests.test_sim_capacity"
+  ],
+  "observations": [
+    {
+      "id": "elite-tier-capacity-run",
+      "task": "sim-capacity-throughput",
+      "role": "capacity-exerciser",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "native_cli_execution",
+      "scope": "Elite-tier venue/risk profile (900/min submit budget), 8 symbols, real Alpaca SIP quotes/trades, 2026-09-24T14:00-14:30Z, NautilusTrader 2.0.0rc5 BacktestEngine, 70ms primary latency plus 0/250/1000ms sensitivity",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": true, "contract": true},
+      "artifacts": [
+        {"path": "blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json",
+         "sha256": "e0156a4589ac17eb2f2850b0a0ce18b59c38d93b3993ff39271930b6076f69e6"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
+                "reasoning_in_output": null, "total": null, "native_retries": 0}
+    },
+    {
+      "id": "paper-parity-capacity-run",
+      "task": "sim-capacity-throughput",
+      "role": "capacity-exerciser",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Paper-parity venue/risk profile (180/min submit budget), 8 symbols, real Alpaca SIP quotes/trades, 2026-09-24T14:00-14:30Z, NautilusTrader 2.0.0rc5 BacktestEngine, 70ms latency",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": true, "contract": true},
+      "artifacts": [
+        {"path": "blueprints/us-equities/sim-capacity/receipts/20260924-paper-parity.json",
+         "sha256": "55b67b10c57b4aea174f282804ffffa10ed6eaff8f95c951aa4eb3d45726155b"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
+                "reasoning_in_output": null, "total": null, "native_retries": 0}
+    },
+    {
+      "id": "hermetic-unit-tests",
+      "task": "sim-capacity-throughput",
+      "role": "test-verifier",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Fee model, schedule/budget math, recount logic, crossed-quote dropping, argv redaction and the pinned-runtime engine smoke tests (native limiter denial, IOC collar fill), on both system Python and the pinned adaptive-paper-20260921 runtime",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": true, "contract": true},
+      "artifacts": [
+        {"path": "tests/test_sim_capacity.py",
+         "sha256": "730525a0149c36b3aa24b8ab3be9905ac1fa92e1504786fb57a46139fb4f01d9"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
+                "reasoning_in_output": null, "total": null, "native_retries": 0}
+    }
+  ],
+  "failures_and_skips": [],
+  "usage_assessment": {"claim": "none", "coverage": "partial", "expected_run_ids": [], "coverage_artifact": null},
+  "task_and_failure": "The simulation lane needed evidence that the pinned NautilusTrader 2.0.0rc5 BacktestEngine, under a native per-account rate limiter, a calibrated latency model and realistic L1 execution (trade_execution, liquidity_consumption, queue_position all on), can sustain the fill rate an elite-tier Alpaca account's request budget implies (>=180 fills/simulated-minute), without any strategy manufacturing a trade to hit that number -- infrastructure capacity evidence, never strategy performance.",
+  "primary_sources_and_pins": [
+    {"url": "https://github.com/nautechsystems/nautilus_trader", "revision": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"},
+    {"url": "https://github.com/nkaz001/hftbacktest", "revision": "5f3ec40b2afb764e0fea112f941ed85523ef4e88"}
+  ],
+  "baseline_and_candidate": {
+    "baseline": "paper-parity venue/risk profile: RiskEngineConfig(max_order_submit_rate=\"180/00:01:00\"), mirroring Alpaca's standard 200 req/min x 0.9 -- fills are expected to be capped near/under 180/min by construction",
+    "candidate": "elite-tier venue/risk profile: RiskEngineConfig(max_order_submit_rate=\"900/00:01:00\"), the Alpaca Elite/non-retail 1000 req/min x 0.9 rate -- must sustain >=180 fills/min in every full simulated minute"
+  },
+  "frozen_inputs": {
+    "base_revision": "57fb6d891d991c513a4818cbe264371f37485c6b",
+    "tasks": ["sim-capacity-throughput"],
+    "roles": ["capacity-exerciser", "test-verifier"],
+    "sources": [
+      {"path": "blueprints/us-equities/sim-paper-compare/replay_compare.py",
+       "sha256": "fab6a7c490828527f9dc67f0fcb7543ae34e73f2be844f92624576cbfe376037"},
+      {"path": "blueprints/us-equities/mover-v3/data/fees-v3.json",
+       "sha256": "f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a"}
+    ],
+    "inputs": [
+      {"path": "blueprints/us-equities/sim-capacity/fetcher.py",
+       "sha256": "fe2b97913f252a852bdf386587ccc6811eddeb182fe62a6dea2915cd801b18c0"},
+      {"path": "blueprints/us-equities/sim-capacity/exerciser.py",
+       "sha256": "88950a01d64dd40d43fcc4211e0240a062592fbf7c03a0e28cfb11c17e8675ca"},
+      {"path": "blueprints/us-equities/sim-capacity/fee_model.py",
+       "sha256": "ad118a529b4429be909c477892178519eca1081aa81ca9667e364ae114118f21"},
+      {"path": "blueprints/us-equities/sim-capacity/schedule.py",
+       "sha256": "942db6ee2ccaf7604a55fe703250ec732173713a58432f2a0957a1af77ddb074"}
+    ],
+    "evaluation": [
+      {"path": "blueprints/us-equities/sim-capacity/runner.py",
+       "sha256": "8b5b9053c649429993fd0332a58656633a052ce740725ffec9771b4ef55ae4f6"},
+      {"path": "tests/test_sim_capacity.py",
+       "sha256": "730525a0149c36b3aa24b8ab3be9905ac1fa92e1504786fb57a46139fb4f01d9"}
+    ]
+  },
+  "runtime_and_platform": {
+    "platform": "Linux (WSL2) x86_64",
+    "tools": [
+      {"name": "nautilus_trader", "version": "2.0.0rc5"},
+      {"name": "alpaca-py", "version": "0.44.0"},
+      {"name": "python", "version": "3.12.3"}
+    ],
+    "isolation": "Pinned venv at ~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921; read-only Alpaca SIP data GETs only, no order placement, credentials resolved in-process and never printed/logged."
+  },
+  "limitations": [
+    "Lean has no per-order latency model and fills whole orders against a bar, not a native queue/liquidity model, so it cannot exercise a submit-rate limiter's interaction with fine-grained fill timing the way this test needs.",
+    "vectorbt and vectorbt.pro are bar-level (no tick-level order lifecycle, no native rate limiter), unsuitable for a per-order-submission capacity test.",
+    "ABIDES is archived with old, hard-to-reproduce dependencies and synthetic-only agents; not selected for a real-data capacity replay.",
+    "mbt_gym targets RL environment design, not a broker-realistic order/fill/fee pipeline.",
+    "backtrader and zipline-reloaded lack a native per-order latency model and a per-account rate limiter comparable to a real broker's.",
+    "hummingbot and freqtrade are crypto-market execution frameworks; their fee/queue/latency assumptions do not match US equities or Alpaca's REST rate-limit semantics.",
+    "MarS is GPU-hosted and trained on Chinese-market data; out of scope for a US-equities Alpaca capacity test with no GPU dependency in this lane.",
+    "hftbacktest was not run as a cross-check in this record (next-phase item; see next_decision_changing_test) -- it remains a comparison harness on a tick subset only per mover-v3/README.md.",
+    "This is infrastructure capacity evidence only: no order reacts to a signal, and no strategy manufactures a trade to hit a throughput target (docs/harness-rules-convergence-20260922.md NS-06; blueprints/us-equities/adaptive-paper/README.md L40).",
+    "Alpaca's historical trade data carries no aggressor-side field; every TradeTick is tagged NO_AGGRESSOR, which makes any queue-depletion-based fill estimate derived from these trade ticks optimistic (documented in fetcher.py).",
+    "The FINRA TAF cap's per-order-vs-per-execution scope is UNVERIFIED; this fee model applies it per fill (documented in fee_model.py)."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "Elite-tier venue/risk profile (900/min submit budget), 8 symbols, real Alpaca SIP quotes/trades, 2026-09-24T14:00-14:30Z, NautilusTrader 2.0.0rc5 BacktestEngine, 70ms primary latency plus 0/250/1000ms sensitivity",
+    "qualification_run_ids": ["elite-tier-capacity-run"]
+  },
+  "rollback": "Remove blueprints/us-equities/sim-capacity/ and its manifests/evidence.json entries; no other blueprint imports this one, and it makes no live/paper trading claim to unwind.",
+  "next_decision_changing_test": "Cross-check the same fetched data through hftbacktest 2.4.4/rust 0.9.4 (MIT, catalogued at 5f3ec40b2afb764e0fea112f941ed85523ef4e88) and compare fill rate / median time-to-fill; overturn if it diverges from this record's NautilusTrader results by more than 20% or 2x with no attributable Nautilus matching bug. Also overturn if: replaying one 6.5h session at 1000 fills/min takes more than 1h on this host; cost per fill at 50k fills in one position is more than 2x that at 1k (the upstream v2 position-copy regression); or NautilusTrader 2.0 final changes queue or latency semantics (upstream issue #4942)."
+}
