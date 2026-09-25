@@ -212,7 +212,14 @@ step is always reversed only *after* its own `link` (never restarted while
 running the new build with the link pointing at the old one); its health
 probe on rollback compares against that `link`'s own recorded old root, not
 the pre-restart MainPID string the ledger's `unit-restart` entry itself
-carries (which is never a root path and could never have matched). `apply
+carries (which is never a root path and could never have matched). A
+`unit-restart` step that reaches `systemctl ... restart` before failing --
+either the command itself exits non-zero, or it exits 0 but the post-restart
+health probe rejects the result -- is still ledgered before `apply`
+re-raises (major finding), because the restart is a real side effect even
+though it failed: without that entry, an automatic rollback would revert the
+`link` but never try restarting the unit again, leaving it running the new
+(or a crashed) build while the ledger says `rolled_back`. `apply
 --confirm-within SEC` additionally schedules `systemd-run --user
 --on-active=<SEC>s --setenv=ECO_INSTALL_ROOT=... -- ecosystem-switch rollback
 --txn T --if-unconfirmed` (every test-stub variable in play is forwarded the
@@ -236,7 +243,12 @@ reconciles a transaction still `in_progress`, it would then never see that
 transaction again either. A crashed or interrupted `apply`/`adopt --relink`
 never completes after the fact: `ecosystem-switch recover` finds any
 transaction still `in_progress` and rolls it back, the same as an explicit
-`rollback` would.
+`rollback` would -- and (previously-unresolved finding) the same superseded-
+txn refusal `rollback --txn` applies is enforced inside the shared reversal
+itself, not only in the `rollback` command's own pre-check, so `recover`
+cannot silently clobber a later, already-applied txn either when reconciling
+an old crashed one; it reports that refusal as a problem for the operator
+and keeps reconciling every other `in_progress` transaction in the same run.
 
 **Prune.** `prune --list` reports which `tools/<name>-<version>` prefixes no
 `current/<id>` link points at, that are not the previous root of any
@@ -244,18 +256,24 @@ not-yet-rolled-back transaction (a pending or already-applied transaction's
 own rollback target stays live until that transaction is actually rolled
 back, not merely superseded by a later one), and this tool's own
 reduced-scope in-use check (PATH entries, `bin/` symlink targets, this
-user's own running processes' exe/cwd/cmdline, and this user's `systemd
---user` unit file text) does not find referenced elsewhere; `prune --apply
-ROOT --reason TEXT` removes one such prefix and records the reason on the
-ledger. This in-use check is deliberately narrower than
-`bin/ecosystem-wave-retention` on the host (which additionally inspects
-mounts, symlink hops and a citation search across evidence repositories, and
-this tool's own check cannot see a hard-coded root inside a wrapper script
-under `adoption/tools/` in the catalog checkout, since it only ever reads
-`$ECO_INSTALL_ROOT`): treat an "eligible" prefix here as a lead worth
-checking by hand before deleting it, not a proof that nothing on the host
-still needs it, and extend this check with that script's fuller technique
-before relying on it unattended.
+user's own running processes' exe/cwd/cmdline, this user's `systemd --user`
+unit file text, and -- previously-unresolved finding -- the wrapper-script
+text under `wrapper_scan_dirs()`, default `~/codex-ecosystem/bin`, override
+`ECOSYSTEM_SWITCH_WRAPPER_DIRS`) does not find referenced elsewhere;
+`prune --apply ROOT --reason TEXT` removes one such prefix and records the
+reason on the ledger. The wrapper scan is what now catches `gitleaks-guarded`
+and `mcp-inspector-2.7.0-guarded` hard-coding a `tools/<root_name>` path with
+no `bin/` symlink, unit file or PATH entry naming it at all (verified
+read-only against this host's real `~/codex-ecosystem/bin`). This in-use
+check is still deliberately narrower than `bin/ecosystem-wave-retention` on
+the host (which additionally inspects mounts, symlink hops and a citation
+search across evidence repositories, and this tool's own check cannot see a
+hard-coded root inside a wrapper script *under `adoption/tools/` in the
+catalog checkout*, since it only ever reads `$ECO_INSTALL_ROOT` and
+`wrapper_scan_dirs()`, never the catalog checkout itself): treat an
+"eligible" prefix here as a lead worth checking by hand before deleting it,
+not a proof that nothing on the host still needs it, and extend this check
+with that script's fuller technique before relying on it unattended.
 
 Component coverage today is intentionally partial: `adoption/pins-linux-x86_64.json`'s
 schema_version 2 migration gave every one of its 14 existing pins the fields

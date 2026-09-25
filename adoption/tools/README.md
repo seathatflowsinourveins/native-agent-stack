@@ -451,14 +451,28 @@ For each managed component, creates `current/<id>` pointing at whatever real
 root is already active (a no-op in terms of real, resolved paths: `readlink
 -f` on every entrypoint before and after this command must be identical --
 enforced, not just documented, by an in-process check that aborts the whole
-relink if it is not), then repoints every `entrypoints[]` symlink and every
-`surfaces[]` `text-replace`/`file-write` surface (a systemd unit, wrapper
-script or MCP config text) from the real root to `current/<id>/...`. A
-`text-replace` surface under a path containing `/frozen/` is refused outright
-before anything is written; every other one backs up the original bytes
-under `switch/backups/<txn>/` first and refuses unless its declared `old`
-substring occurs exactly `expected_count` times. Idempotent: re-running it
-once relinked leaves everything unchanged. `adopt --baseline [--spec PATH]`
+relink if it is not; if `current/<id>` already exists, it must itself
+already resolve to that same real root -- minor finding: previously
+unchecked, which could silently move every entrypoint to whatever root
+`current/<id>` secretly named, e.g. because `apply` had already run once
+before `adopt --relink` ever did), then repoints every `entrypoints[]`
+symlink and every `surfaces[]` `text-replace`/`file-write` surface (a
+systemd unit, wrapper script or MCP config text) from the real root to
+`current/<id>/...`. A `text-replace` surface under a path containing
+`/frozen/` is refused outright before anything is written; every other one
+backs up the original bytes under `switch/backups/<txn>/` first, optionally
+refuses unless its current bytes match a declared `expected_pre_sha256`
+(previously-unresolved finding: this precondition existed in
+`op_text_replace` but no production caller ever passed it), and refuses
+unless its declared `old` substring occurs exactly `expected_count` times.
+Idempotent: re-running it once relinked leaves everything unchanged,
+including a component with a `text-replace` surface (minor finding: a
+second run recognizes the surface is already migrated -- `old` text gone,
+`current/<id>`'s own text already present -- instead of re-searching for
+text that is no longer there and aborting partway through). `apply` itself
+now also refuses when `current/<id>` does not exist yet (minor finding:
+applying before `adopt --relink` had ever run used to create it fresh while
+every entrypoint stayed on the old real root, unredirected). `adopt --baseline [--spec PATH]`
 is the read-only counterpart: it snapshots the current, already-relinked
 state (or records that a component is not relinked yet) without changing
 anything, for `status`/`verify` to compare against later. `adopt --resync ID
