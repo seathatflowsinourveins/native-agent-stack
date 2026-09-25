@@ -131,8 +131,20 @@ comparison against compact JSON, with that result stored separately.
 ## Read the numbers correctly
 
 - RTK global and project snapshots overlap. The report never sums them.
-- Headroom 0.37.0 calls a 30-day estimate `lifetime`.
-- Context Mode 1.0.169 uses retained-event and byte estimates with finite retention.
+- RTK's total is uncapped: each row is `ceil(bytes/4)` of the raw output minus
+  that of the filtered output, so a few very large outputs can dominate it.
+  - When `rtk_database` is configured, the global snapshot adds `client_visible`.
+    It re-counts every row as a client first shows it: whole up to
+    `client_inline_chars` (default 30000), otherwise a preview of
+    `client_preview_chars` (default 2000). Those are Claude Code 2.1.282's
+    `bashOutputMaxChars` default and its saved-output preview.
+  - The resulting net is a model, not an upstream number. It excludes later reads
+    of saved output files, and Codex has its own output limits.
+- Headroom 0.37.0 calls a 30-day estimate `lifetime`. `headroom savings --json`
+  also prints zero when its ledger file does not exist. The snapshot records
+  `ledger_present`, so an absent ledger is not read as a measured zero.
+- Context Mode 1.0.169 uses retained-event and byte estimates with finite
+  retention. Its `tokens_saved_lifetime` is retained events × 256.
 - jcodemunch's persistent total estimates bytes avoided divided by four and can
   include repeated verification reads. Its schema-size estimate is a separate field.
 - Exact artifact counts use `o200k_base`; they are not provider billing or measured

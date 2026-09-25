@@ -655,5 +655,53 @@ class LedgerContract(unittest.TestCase):
                     else:
                         m.refresh(config)
 
+    def rtk_history(self,rows,name="history.db"):
+        db=self.root/name
+        with closing(sqlite3.connect(db)) as c:
+            c.execute("CREATE TABLE commands (id INTEGER PRIMARY KEY, timestamp TEXT NOT NULL, original_cmd TEXT NOT NULL,"
+                      " rtk_cmd TEXT NOT NULL, input_tokens INTEGER NOT NULL, output_tokens INTEGER NOT NULL,"
+                      " saved_tokens INTEGER NOT NULL, project_path TEXT DEFAULT '')")
+            c.executemany("INSERT INTO commands (timestamp,original_cmd,rtk_cmd,input_tokens,output_tokens,saved_tokens)"
+                          " VALUES (?,?,?,?,?,?)",[("2026-09-25T00:00:00Z","cmd","rtk cmd",i,o,max(0,i-o)) for i,o in rows])
+            c.commit()
+        return db
+
+    def test_rtk_client_visible_counts_what_the_client_shows_first(self):
+        # Small output inline both ways; huge raw output shows a 500-token preview, so a filtered output larger
+        # than the preview counts as added context rather than saved.
+        view=m.rtk_client_visible(self.rtk_history([(100,20),(200000,300),(50000,9000),(40000,1000)]))
+        self.assertEqual((view["inline_tokens"],view["preview_tokens"]),(7500,500))
+        self.assertEqual(view["saved"],80+199700+41000+39000)
+        self.assertEqual((view["avoided"],view["added"],view["net"]),(80+200,500,-220))
+        self.assertEqual(view["top10_share"],1.0)
+        self.assertIsNone(m.rtk_client_visible(self.rtk_history([],"empty.db")))
+
+    def test_refresh_states_rtk_client_view_and_headroom_ledger_presence(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config.update(rtk="selected-rtk",headroom="selected-headroom",rtk_database=str(self.rtk_history([(100,20),(200000,300)])))
+        ledger=self.root/"workspace"/"savings_events.jsonl"
+        def returned(argv,cwd,root,label):
+            body={"summary":{"total_saved":199780}} if label.startswith("rtk") else {"path":str(ledger),"lifetime":{"tokens_saved":0,"calls":0}}
+            return {"argv":argv,"exit_code":0,"stdout_text":json.dumps(body),"stderr_text":"","completed_at":m.now()}
+        def latest():
+            return {r["tool"]+"|"+r["scope"]:r["latest"]["metrics"] for r in json.loads(Path(config["output_json"]).read_text())["native"]}
+        with patch.object(m,"capture",side_effect=returned):
+            self.assertEqual(m.refresh(config)["issues"],[])
+        rows=latest()
+        rtk_global=rows["rtk|Native / all retained projects"]
+        self.assertEqual(rtk_global["saved"],199780)
+        self.assertEqual(rtk_global["client_visible"]["net"],80+200)
+        self.assertIn("as a client first shows it",rtk_global["boundary"])
+        self.assertNotIn("client_visible",rows["rtk|Native / project "+str(self.root)])
+        self.assertFalse(rows["headroom|Native / last 30 days"]["ledger_present"])
+        self.assertIn("ledger file is absent",rows["headroom|Native / last 30 days"]["boundary"])
+        ledger.parent.mkdir();ledger.write_text("")
+        with patch.object(m,"capture",side_effect=returned):
+            self.assertEqual(m.refresh(config)["issues"],[])
+        headroom=latest()["headroom|Native / last 30 days"]
+        self.assertTrue(headroom["ledger_present"])
+        self.assertNotIn("absent",headroom["boundary"])
+
 if __name__=="__main__":
     unittest.main()
