@@ -9627,8 +9627,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "e480d7cdd5d54a7b40646a6ccfc2955defc743d7c069ab232dc9370d26f5c87b",
-      "bytes": 470568
+      "sha256": "6ab0bc9a52ed96196e1c9f10937fb5c0e67cd1b20a502c22425cdd59a93df346",
+      "bytes": 472512
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -9677,8 +9677,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "b1be43a4e9b41eca294dd22064cd1b3635f9665ec8258115be25e6c919045091",
-      "bytes": 80172
+      "sha256": "1ce9e548066342e7995e41219f20c24d761f8f9160d5626b0260e7173e30cc23",
+      "bytes": 282813
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -10432,8 +10432,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "39499f52c88d37c305716455142f8e3691f5a80d768c5eacd3f0196adc946ef3",
-      "bytes": 16028
+      "sha256": "8655a74a175edb43e495a90f7c22fe8f5be3a84793a088d28675b1e0918e7f1b",
+      "bytes": 16622
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -30812,8 +30812,8 @@
     },
     {
       "path": "tests/test_new_host_grand_list.py",
-      "sha256": "18be7cd7c9d5223018015e241efa14901d541a305b016664233e7aafd45560e5",
-      "bytes": 16903
+      "sha256": "8e24fa3326e9a4f3c5df3269eb81f8472a46963aa357609e2c8e9bff98057e0b",
+      "bytes": 18369
     },
     {
       "path": "tests/test_observability.py",

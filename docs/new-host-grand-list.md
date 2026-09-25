@@ -126,6 +126,10 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 
 "bootstrap X" means the platform's bootstrap installs version X from a pinned, checksummed artifact; it can differ from the ledger pin in the Pin column (the ledger records what a verdict was measured on, the bootstrap what a new host installs). An E2E state of `accepted` is scoped to the recorded host; a new host proves its own.
 
+## What a winner means
+
+A winner is the layer's recorded choice from its lane verdict, shown with its evidence class. It is not a claim that the component is the best in its field. The Decision column is the layer ledger's decision (`keep_but_compare` 17, `retain` 14, `adjust` 1 across 32 layers); a `keep_but_compare` row keeps its incumbent while the comparison the row names is still owed. Each winner's recorded basis, its `why_selected` text and its `evidence_refs`, is carried in the JSON form of this list and in the layer ledgers, together with the layer's limitations and open gaps.
+
 ## How to update this page
 
 Generated, not hand-edited. After any change to the component evidence matrix (host receipts, decisions, verdict re-records), the layer ledgers, `catalogs/sota-convergence/manifest-20260923.json`, `adoption/manifest.json`, the bootstrap pin files or `adoption/hardware-profiles.json`, run `python3 scripts/component_matrix.py --write` and then `python3 scripts/new_host_grand_list.py --write`, and commit the outputs. `--check` runs in CI.
