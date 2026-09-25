@@ -1253,7 +1253,7 @@ version_output_matches() {
 # Prints the report for every pin this run installed, then every executable
 # in bin_dir; counts failed pins in version_probe_failed(_ids).
 write_version_report() {
-  local id entry version method expected match package status observed result executable target argument
+  local id entry version method expected match package status observed result executable target argument seconds
   local probe_stdout="$stage_dir/version-probe.stdout" probe_stderr="$stage_dir/version-probe.stderr"
   local verified=0
   local probe_argv
@@ -1267,6 +1267,9 @@ write_version_report() {
     method="$(jq -r '.version_probe.method // "undeclared"' <<<"$entry")"
     expected="$(jq -r '.version_probe.expect // .version' <<<"$entry")"
     match="$(jq -r '.version_probe.match // "exact"' <<<"$entry")"
+    # A pin may declare a longer bound, e.g. a first launch that the OS
+    # assesses before running it.
+    seconds="$(jq -r --argjson default "$version_probe_seconds" '.version_probe.timeout_seconds // $default' <<<"$entry")"
     status=0
     : >"$probe_stdout"
     : >"$probe_stderr"
@@ -1277,10 +1280,10 @@ write_version_report() {
           probe_argv+=("$argument")
         done < <(jq -r '.version_probe.args[]?' <<<"$entry")
         printf -- '-- %s %s: %s --\n' "$id" "$version" "${probe_argv[*]#"$bin_dir"/}"
-        run_version_probe "$version_probe_seconds" "$probe_stdout" "$probe_stderr" ${probe_argv[@]+"${probe_argv[@]}"} || status=$?
+        run_version_probe "$seconds" "$probe_stdout" "$probe_stderr" ${probe_argv[@]+"${probe_argv[@]}"} || status=$?
         sed -n '1,20p' "$probe_stdout" "$probe_stderr"
         if [[ "$status" == 124 ]]; then
-          result="FAILED (no exit within ${version_probe_seconds}s; its process group was killed)"
+          result="FAILED (no exit within ${seconds}s; its process group was killed)"
         elif [[ "$status" != 0 ]]; then
           result="FAILED (exit $status)"
         elif version_output_matches "$expected" "$match" "$probe_stdout" "$probe_stderr"; then
@@ -1294,12 +1297,12 @@ write_version_report() {
         printf -- '-- %s %s: npm ls %s (package metadata; the package is not run) --\n' "$id" "$version" "$package"
         # npm ls exits nonzero for unrelated tree problems while still
         # printing the installed version, so the version decides the result.
-        run_version_probe "$version_probe_seconds" "$probe_stdout" "$probe_stderr" \
+        run_version_probe "$seconds" "$probe_stdout" "$probe_stderr" \
           "$bin_dir/npm" ls --global --prefix "$ecosystem_root/tools/$id-$version" --depth=0 --json "$package" || status=$?
         observed="$(jq -r --arg package "$package" '.dependencies[$package].version // empty' "$probe_stdout" 2>/dev/null || true)"
         printf '%s@%s\n' "$package" "${observed:-(not installed)}"
         if [[ "$status" == 124 ]]; then
-          result="FAILED (npm ls did not exit within ${version_probe_seconds}s)"
+          result="FAILED (npm ls did not exit within ${seconds}s)"
         elif [[ "$observed" == "$expected" ]]; then
           result="verified (exact $expected)"
         else
@@ -1339,7 +1342,7 @@ write_version_report() {
 }
 
 version_report="$ecosystem_root/installed-versions.txt"
-printf 'Checking installed versions (at most %ss per probe)...\n' "$version_probe_seconds"
+printf 'Checking installed versions (at most %ss per probe unless its pin declares more)...\n' "$version_probe_seconds"
 write_version_report >"$version_report"
 cat -- "$version_report"
 if [[ "$version_probe_failed" -gt 0 ]]; then

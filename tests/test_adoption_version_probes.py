@@ -41,7 +41,7 @@ PINS = {
     "linux": ROOT / "adoption/pins-linux-x86_64.json",
     "macos": ROOT / "adoption/pins-macos-arm64.json",
 }
-PROBE_KEYS = {"method", "command", "args", "expect", "match", "note"}
+PROBE_KEYS = {"method", "command", "args", "expect", "match", "timeout_seconds", "note"}
 # No version flag: any other argument starts an MCP stdio server (and, for
 # MCP Inspector, which no pin installs, the web UI).
 SERVER_WITHOUT_VERSION_FLAG = {"context-mode", "socraticode", "mcp-inspector"}
@@ -91,6 +91,9 @@ class DeclaredProbeTests(unittest.TestCase):
                 self.assertIn(probe.get("match", "exact"), {"exact", "minimum"}, label)
                 if "expect" in probe:
                     self.assertTrue(isinstance(probe["expect"], str) and probe["expect"].strip(), label)
+                if "timeout_seconds" in probe:
+                    self.assertIsInstance(probe["timeout_seconds"], int, label)
+                    self.assertTrue(30 < probe["timeout_seconds"] <= 600, f"{label}: timeout_seconds outside (30, 600]")
                 if probe["method"] == "exec":
                     self.assertRegex(probe.get("command", ""), r"^[A-Za-z0-9._-]+$", label)
                     self.assertIsInstance(probe.get("args"), list, label)
@@ -99,7 +102,7 @@ class DeclaredProbeTests(unittest.TestCase):
                     self.assertEqual(tool["kind"], "npm", f"{label}: npm-metadata needs an npm pin")
                     self.assertNotIn("command", probe, label)
                     self.assertNotIn("args", probe, label)
-                if probe.get("match") == "minimum" or "expect" in probe or probe["method"] != "exec":
+                if probe.get("match") == "minimum" or "expect" in probe or "timeout_seconds" in probe or probe["method"] != "exec":
                     self.assertTrue(probe.get("note", "").strip(), f"{label}: a non-default probe says why")
 
     def test_servers_without_a_version_flag_are_never_executed(self):
@@ -280,6 +283,9 @@ def cases(markers: Path):
         (exec_pin("stderr-build", "b11057", expect="build 11057"),
          'echo "version: 0.4.1-dev (build 11057, commit abc)" >&2\n', "verified (exact build 11057)"),
         (exec_pin("absent", "1.0.0", command="not-installed"), None, "FAILED (exit "),
+        # Answers after the 2 s default bound, within its own declared bound.
+        (exec_pin("slow-first-launch", "3.1.0", timeout_seconds=8), 'sleep 3\necho "slow 3.1.0"\n',
+         "verified (exact 3.1.0)"),
         (npm_pin("npm-good", "1.0.0"), None, "verified (exact 1.0.0)"),
         (npm_pin("npm-stale", "1.0.0"), None, "FAILED (npm reports 0.9.0, pinned 1.0.0)"),
         (npm_pin("npm-missing", "1.0.0"), None, "FAILED (npm reports no installed package, pinned 1.0.0)"),

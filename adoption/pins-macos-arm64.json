@@ -165,7 +165,8 @@
           "--version"
         ],
         "expect": "build 11057",
-        "note": "llama-server prints its build number, not the b-prefixed release tag (evidence/receipts/adoption-macos-hosted-smoke-20260922.json)."
+        "timeout_seconds": 180,
+        "note": "llama-server prints its build number, not the b-prefixed release tag (evidence/receipts/adoption-macos-hosted-smoke-20260922.json). Its first launch on a hosted macOS runner took 31-39 s before printing (adoption-bootstrap run 36143844969, 2026-09-25; the next launch takes about 1 s), so its bound is 180 s instead of the default 30 s."
       }
     },
     {

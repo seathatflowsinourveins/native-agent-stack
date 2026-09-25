@@ -779,6 +779,14 @@ class LlamaWrapperQuotingTests(unittest.TestCase):
     install_llama_cpp and find_one are extracted verbatim from the script and
     run with fetch stubbed out and a pre-built archive, so no network is used.
     The install root deliberately contains shell syntax.
+
+    The stand-in llama-server runs under this test's own Python, not /bin/sh.
+    With System Integrity Protection enabled (the macOS default), macOS purges
+    every DYLD_* variable when it launches a SIP-protected binary such as
+    /bin/sh. The wrapper exports DYLD_LIBRARY_PATH after its own /bin/sh has
+    started, so the value reaches the real llama-server, an unprotected
+    Mach-O, but a #!/bin/sh stand-in is a second /bin/sh launch and never
+    sees it on such a Mac.
     """
 
     def test_install_path_with_shell_syntax_is_data_in_the_wrapper(self):
@@ -791,9 +799,20 @@ class LlamaWrapperQuotingTests(unittest.TestCase):
             stage.mkdir()
             source = tmp_path / "src" / "llama"
             source.mkdir(parents=True)
+            # A space-free path for the shebang line, whatever sys.executable is.
+            interpreter = tmp_path / "python"
+            interpreter.symlink_to(sys.executable)
             server = source / "llama-server"
-            server.write_text('#!/bin/sh\nprintf "%s\\n%s\\n" "$0" "$DYLD_LIBRARY_PATH"\n')
+            server.write_text(f"#!{interpreter}\nimport os, sys\nprint(sys.argv[0])\n"
+                              "print(os.environ.get('DYLD_LIBRARY_PATH', ''))\n")
             server.chmod(0o755)
+            # Control: an interpreter that drops even a DYLD_* value handed to it
+            # directly (SIP-protected or hardened runtime) cannot observe the
+            # wrapper's export, so an empty value from it would prove nothing.
+            control = subprocess.run([str(server)], capture_output=True, text=True, timeout=60,
+                                     env={**os.environ, "DYLD_LIBRARY_PATH": "control"})
+            self.assertEqual(control.returncode, 0, control.stdout + control.stderr)
+            observes_dyld = control.stdout.splitlines()[1:] == ["control"]
             archive = root / "downloads" / "llama.tar.gz"
             subprocess.run(["tar", "-czf", str(archive), "-C", str(source.parent), "llama"],
                            check=True)
@@ -807,14 +826,23 @@ class LlamaWrapperQuotingTests(unittest.TestCase):
             built = subprocess.run(["bash", str(harness), str(root), str(stage)],
                                    capture_output=True, text=True, timeout=60)
             self.assertEqual(built.returncode, 0, built.stdout + built.stderr)
+            # Unset, not empty: SIP's /bin/sh drops an inherited DYLD_* value,
+            # while elsewhere an inherited one stays exported and would hide a
+            # missing export line. Unset gives every host the same input.
+            env = {key: value for key, value in os.environ.items() if key != "DYLD_LIBRARY_PATH"}
             run = subprocess.run(["sh", str(root / "bin" / "llama-server")],
                                  capture_output=True, text=True, timeout=60, cwd=tmp_path,
-                                 env={**os.environ, "DYLD_LIBRARY_PATH": ""})
+                                 env=env)
             self.assertFalse((tmp_path / "PWNED").exists(), "$(...) in the path was executed")
             self.assertFalse((tmp_path / "PWNED2").exists(), "`...` in the path was executed")
             self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
             prefix = f"{root}/tools/llama-cpp-b1"
-            self.assertEqual(run.stdout.splitlines(), [f"{prefix}/llama-server", prefix])
+            observed = run.stdout.splitlines()
+            self.assertEqual(observed[:1], [f"{prefix}/llama-server"])
+            if not observes_dyld:
+                self.skipTest(f"{sys.executable} drops DYLD_* values handed to it directly, "
+                              "so it cannot observe the wrapper's DYLD_LIBRARY_PATH")
+            self.assertEqual(observed, [f"{prefix}/llama-server", prefix])
 
 
 NPM = shutil.which("npm")
@@ -1402,6 +1430,7 @@ class PlatformDependencyInstallTests(unittest.TestCase):
         symlinked_var.symlink_to(real_var, target_is_directory=True)
         return symlinked_var
 
+    @unittest.skipUnless(NPM, "native npm unavailable")
     def test_places_the_verified_tarball_correctly_when_the_prefix_is_reached_through_a_symlink(self):
         # Round 3b, Opus Medium M1 / hosted macos-15 run 35820422561: seven
         # PlatformDependencyInstallTests failed on a real Mac with "does not

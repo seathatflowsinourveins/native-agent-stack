@@ -160,7 +160,7 @@ acceptance — remains unrun.
 | 2 | Usage error: missing `--profile`, an unknown argument, or a flag given without its value. |
 | 3 | A selected component has no pin at all in [`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json) and was not named in `--allow-unpinned`. Checked before anything is installed, and in `--plan` too; `--allow-unpinned <id,id,...>` skips the named ids instead and echoes them to the run log. |
 | 4 | A prerequisite (`curl`, `git`, `tar`, `shasum`, `unzip`, `jq`, `mktemp`) is still missing after the Homebrew step. With `--skip-system-packages` no `brew install` is attempted and the check lists what is missing. |
-| 5 | An installed pin's `version_probe` failed, timed out after 30 s or reported another version. `installed-versions.txt` is still written and nothing is removed; the run stops before its closing message and `--configure-claude-user-profile`. |
+| 5 | An installed pin's `version_probe` failed, timed out (30 s, or the longer `timeout_seconds` a pin declares: `llama-cpp` allows 180 s because its first launch on a fresh Mac takes over 30 s) or reported another version. `installed-versions.txt` is still written and nothing is removed; the run stops before its closing message and `--configure-claude-user-profile`. |
 
 The version report and exit 5 changed after `v2026.09.24.1`, in both
 [`adoption/bootstrap-macos.sh`](../bootstrap-macos.sh) and

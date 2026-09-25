@@ -107,7 +107,8 @@ GitHub-hosted macOS runner; see
 
    `installed-versions.txt` checks each pin the run installed with the
    `version_probe` its pin entry declares: the declared command, run with
-   stdin from `/dev/null` in its own process group and killed after 30 s, must
+   stdin from `/dev/null` in its own process group and killed after 30 s (or the
+   longer `timeout_seconds` its pin declares), must
    report the pinned version (Claude Code's pin is a floor, so any later
    version passes); `context-mode` and `socraticode` have no version flag and
    start their MCP stdio server on any other argument, so npm reads their
