@@ -1,0 +1,161 @@
+{
+  "schema": "engine-h2h-protocol/v1",
+  "id": "alpaca-engine-h2h-protocol-v1-20260925",
+  "status": "draft-preregistered",
+  "created": "2026-09-25",
+  "scope": "Alpaca paper trading only. Never live. No paid hosting. The paper-2, paper-3 and paper-4 accounts, the adaptive lane's account and the live incentive engine are out of bounds.",
+  "question": "Which engine path should carry the Alpaca paper lane: the incumbent NautilusTrader 2.0.0rc5 with our adapter, LEAN with the official Alpaca brokerage, or Lumibot 4.6.0?",
+  "preregistration": {
+    "rule": "The order script, the runners, the metric definitions and the decision rule are fixed before the first paper order. frozen_files holds their SHA-256 at registration; a paper session run with any differing file is invalid, and any change needs a new protocol id.",
+    "frozen_at": "draft 2026-09-25; re-freeze once the observer and orchestrator are reviewed, before the first paper order",
+    "frozen_files": {
+      "order_script.json": "1aa41e19ea4f39d4ac7903abd03bbe5e0b24367435072534047256a756a5c1a8",
+      "h2h_common.py": "e3317539c3776d0aec37e97ae1e95276b7d63431c57fba488daa3533941620d7",
+      "run_nautilus.py": "223a25d46aa95b311c41a63b71418bd4992d77d6eb0fc32dde56144db30feff4",
+      "run_lumibot.py": "0aeaa0cf6dc62bcad054c321eb38091ecbafdcdfcdb2f60c9bc8a56c5f389b34",
+      "run_lean/run.py": "3ca1b4b5f9183e1003140f56bb06748ed84abde0586d3ba35ca0237e2ad8ba45",
+      "run_lean/H2HOrderScriptAlgorithm.cs": "5a777478273c266712ddc1dbce5f24ba38e9f388480e228c0f033498505d5433"
+    }
+  },
+  "engines": {
+    "nautilus": {
+      "role": "incumbent",
+      "engine": "NautilusTrader 2.0.0rc5 (LGPL-3.0)",
+      "path": "Our adapter: blueprints/us-equities/adaptive-paper native_adapter.build_node, runner.Controller, safety.Ledger, transport.AlpacaPaperTransport. Nautilus has no upstream Alpaca adapter (nautechsystems/nautilus_trader#3374 open; #3375 closed unmerged).",
+      "runtime_root": "tools/adaptive-paper-r20260925 (hash-locked; peer rollout)",
+      "runner": "run_nautilus.py",
+      "configuration": "Session policy extended_hours=true, overnight_holds=false (the adapter default). Risk limits run_nautilus.H2H_LIMITS admit every scripted order except R12's deliberate 100000 shares. Everything else is the adapter's own behaviour."
+    },
+    "lean": {
+      "role": "challenger",
+      "engine": "LEAN 985ef30 plus the recorded three-line dependency remediation (Apache-2.0)",
+      "brokerage": "QuantConnect/Lean.Brokerages.Alpaca 1973f61, source-integrated build (Apache-2.0)",
+      "runtime_root": "tools/lean-985ef30-r20260925 (engine, read-only) and tools/lean-alpaca-1973f61-remediated (plugin, read-only, loaded through plugin-directory)",
+      "runner": "run_lean/run.py and run_lean/H2HOrderScriptAlgorithm.cs",
+      "prerequisite": "The plugin's ValidateSubscription() (AlpacaBrokerage.cs:167, 994-1119) needs a QuantConnect user id, API token and organization holding product 347's license; it sends machine name, user name, OS and every up interface's IP and MAC address to QuantConnect and exits the process on failure. A paid QuantConnect subscription and that disclosure are a user decision; without them LEAN cannot run on paper and the comparison is two-way."
+    },
+    "lumibot": {
+      "role": "challenger",
+      "engine": "Lumibot 4.6.0 (GPL-3.0), its own Alpaca broker over alpaca-py 0.44.0",
+      "runtime_root": "tools/lumibot-4.6.0-r20260925 (hash-locked lock of 264 packages)",
+      "runner": "run_lumibot.py",
+      "configuration": "LUMIWEALTH_API_KEY unset (Lumibot's only cloud and error-report switch). Documented API only; extended hours through its documented custom_params passthrough."
+    }
+  },
+  "accounts": {
+    "rule": "One dedicated Alpaca paper account per engine, never shared between engines or with any other lane.",
+    "required": 3,
+    "required_if_lean_license_declined": 2,
+    "env_files": {
+      "nautilus": "alpaca-paper-h2h-nautilus.env",
+      "lean": "alpaca-paper-h2h-lean.env",
+      "lumibot": "alpaca-paper-h2h-lumibot.env"
+    },
+    "lean_extra_file": "A separate 0600 QuantConnect file with QC_JOB_USER_ID, QC_API_ACCESS_TOKEN and QC_JOB_ORGANIZATION_ID, only if the license decision is yes.",
+    "storage": "The private credential store of docs/secret-storage.md: 0600 files in a 0700 directory outside every worktree, written with tools/credentials/set_credential.py. Variables APCA_API_KEY_ID and APCA_API_SECRET_KEY; optional APCA_API_BASE_URL must be https://paper-api.alpaca.markets.",
+    "runner_refusals": "Each runner refuses unless given exactly its own file name, refuses paper-1/2/3/4 names and the other engines' names, refuses any non-paper base URL in the file or the environment, and reads the file only through credential_guard.open_verified with no symlink component (h2h_common.load_paper_env).",
+    "distinctness": "Before session 1 a read-only GET /v2/account per file yields each account id; the run refuses unless the three fingerprints are pairwise distinct and differ from the other lanes' (h2h_common.assert_distinct_accounts).",
+    "starting_state": "Each account flat, no open orders, paper equity reset to the same value before session 1."
+  },
+  "order_script": {
+    "path": "order_script.json",
+    "cases_counted": 21,
+    "reconciliation_case": "E01 closes every regular session and every extended window; it is a correctness check, not coverage.",
+    "matrix": {
+      "resting_limit": ["R01", "X01"],
+      "marketable_limit": ["R02", "X02", "X03"],
+      "market": ["R03"],
+      "stop": ["R04"],
+      "stop_limit": ["R05"],
+      "trailing_stop": ["R06"],
+      "bracket": ["R07"],
+      "oto": ["R08"],
+      "oco": ["R09"],
+      "moo": ["M01"],
+      "moc": ["M02"],
+      "extended_hours_limit": ["X01", "X02", "X03"],
+      "extended_hours_market_refusal": ["X04"],
+      "cancel": ["R01", "R04", "R05", "R06", "X01"],
+      "replace": ["R01"],
+      "partial_fill": ["R10"],
+      "subpenny_rejection": ["R11"],
+      "broker_side_rejection": ["R12"],
+      "kill_mid_order": ["F01"],
+      "stream_drop": ["F02"],
+      "restart_with_open_orders": ["F03"]
+    }
+  },
+  "sessions": {
+    "regular": {"count": 5, "phases": ["pre_open", "regular", "faults", "close", "reconcile"]},
+    "extended": {"count": 2, "windows": [{"phase": "extended_pre", "on_regular_session": 2}, {"phase": "extended_post", "on_regular_session": 4}]},
+    "concurrency": "All engines run the same phases on the same trading day, each on its own account, started within 60 s of each other.",
+    "invalid_session": "A market holiday or early close, an Alpaca incident on status.alpaca.markets during the session, a host clock offset above 50 ms (chrony) at start or end, or an observer outage longer than 5 minutes. An invalid session is replaced by the next trading day, at most 3 times; after that the run is inconclusive.",
+    "offline_plan": "LEAN's bundled SPY minute trade and quote bars cover 2013-10-07 to 2013-10-11: five sessions with extended_pre on the first and extended_post on the second (h2h_common.BACKTEST_PLAN). Offline runs do not replace paper sessions."
+  },
+  "harness": {
+    "observer": "One read-only alpaca-py poller per account (orders status=all, positions, account, FILL activities) at no more than 12 requests per minute: the broker truth for reconciliation and broker timestamps. Specified; not built yet.",
+    "orchestrator": "Starts the three runners per phase, enforces the frozen-file hashes, and performs the fault steps. Specified; not built yet.",
+    "faults": {
+      "kill": "SIGKILL within 50 ms after the engine journals the F01 submit.",
+      "stop": "SIGTERM after F03's two orders are open.",
+      "restart": "Same state directory. LEAN restarts with parameter resume=<case>; the Nautilus adapter starts only flat, so it must recover through recovery.recover (its design); Lumibot restarts with the same strategy.",
+      "stream_drop": "Each engine runs in its own network namespace behind an SNI-preserving TCP pass-through relay (no TLS termination). F02 resets every relayed connection and refuses new ones for 20 s; REST and the trade stream both drop."
+    }
+  },
+  "metrics": {
+    "correctness_failures": {
+      "must_equal": 0,
+      "reconciliation_mismatch": "At every E01 and after each restart: the engine's open orders, per-order status and filled quantity, position and cash differ from the observer's broker snapshot.",
+      "duplicate_order": "More than one broker order for one script step.",
+      "orphan_order": "A broker order the engine does not track after its step's timeout or after a restart's reconcile step.",
+      "unintended_execution": "A fill for a step expected open, canceled or refused; a MOO/MOC fill outside its auction; any fill with a side or quantity the script did not order.",
+      "fill_booking_mismatch": "Per order, the engine's booked executions differ from the broker's FILL activities (lost or double-booked partial fills included)."
+    },
+    "coverage": {
+      "covered": "Counted cases whose worst status across all valid sessions is passed or passed_with_deviation (h2h_common.summarize).",
+      "covered_without_glue": "Covered cases whose order path contains no project-maintained broker adapter code. Zero for the incumbent by construction.",
+      "deviations": "Recorded, not penalized: e.g. rounding a sub-penny price in engine state, or MOO/MOC fill times a backtest does not model."
+    },
+    "latency": {
+      "submit_to_ack_ms": "Engine wall clock at its first broker acknowledgement event for the order minus the engine wall clock just before the submit call.",
+      "fill_to_engine_ms": "Engine wall clock when the engine surfaces the fill minus the broker's execution transaction_time (observer).",
+      "percentiles": ["p50", "p95"],
+      "method": "Nearest rank over all orders of all valid regular sessions (h2h_common.percentile)."
+    },
+    "stream": {
+      "fills_seen_share": "Engine-surfaced fills within 120 s divided by the observer's broker fills, in normal operation and during F02 separately.",
+      "on_stream_share": "Where the engine labels a fill's source (the incumbent's adapter does), the share first seen on the trade stream; unlabeled otherwise.",
+      "recovery_time_s": "F02: stream restore to the engine booking the fill. F01/F03: restart to the engine's reconciled state."
+    },
+    "rate_limit": {"budget_per_minute": 180, "observer_reserved_per_minute": 12, "metric": "HTTP 429 responses in engine and observer logs."},
+    "backtest_vs_paper_fill_delta_bps": "Per filled marketable, market, MOO and MOC step: |paper fill - the same engine's backtest fill of that session's script on that day's Alpaca minute bars and quotes| / paper fill x 10000; p50 and p95. The replay tooling is not built yet.",
+    "glue_lines": {
+      "definition": "Non-blank, non-comment lines (h2h_common.glue_lines) in files we maintain on an engine's order path. The shared harness is counted separately.",
+      "nautilus": ["../adaptive-paper/native_adapter.py", "../adaptive-paper/transport.py", "../adaptive-paper/safety.py", "../adaptive-paper/recovery.py", "../adaptive-paper/sessions.py", "../adaptive-paper/credential_guard.py", "../adaptive-paper/credential_source.py", "../order-contract/order_contract.py", "run_nautilus.py"],
+      "nautilus_note": "A lower bound: runner.Controller also sits on the order path but runner.py is not counted.",
+      "lean": ["run_lean/run.py", "run_lean/H2HOrderScriptAlgorithm.cs", "../engine/patches/lean-dependencies.patch", "../engine/patches/alpaca-source-references.patch"],
+      "lumibot": ["run_lumibot.py"],
+      "shared": ["h2h_common.py"]
+    }
+  },
+  "decision_rule": {
+    "incumbent": "nautilus",
+    "p95_metrics": ["submit_to_ack_ms_p95", "fill_to_engine_ms_p95"],
+    "max_p95_ratio": "1.25",
+    "rule": "A challenger wins only with zero correctness failures, coverage at least the incumbent's, and each p95 latency at most 1.25 times the incumbent's. If several win, higher coverage, then lower p95 submit-to-ack, decides; an exact tie needs a dated decision record. Missing data is inconclusive, never a win.",
+    "implementation": "h2h_common.decide",
+    "after_the_run": "Any change of the Alpaca lane is a dated decision record naming the evidence, the alternatives and the comparison that would overturn it."
+  },
+  "known_before_the_run": [
+    "LEAN at 985ef30 has no contingent orders and the Alpaca plugin at 1973f61 none either: QuantConnect/Lean#9828 (merged 2026-09-25) and Lean.Brokerages.Alpaca#83 (open) add them. R07-R09 are unsupported for LEAN at these pins.",
+    "Lumibot 4.6.0 documents trail_percent as a fraction (strategy.py:671-675) and backtests it that way (order.py:788-791), but its Alpaca broker forwards the number unchanged (alpaca.py:1156, 1171, 1192) to Alpaca's percent field (orders-at-alpaca.md:304): a documented 10 percent trail becomes 0.1 percent. R06 on paper tests this.",
+    "Lumibot 4.6.0's Alpaca broker sends bracket and OTO parents as type=market (alpaca.py:1141-1146) while its docs give limit_price as the entry (strategy.py:749-781).",
+    "The incumbent adapter accepts limit/DAY only (native_adapter.py:721-723), rejects every modify (768-774), and has no _submit_order_list, so a bracket reaches rc5's NotImplementedError (nautilus_trader/live/clients.py:655-656) and stops the node (shutdown_on_error=True, native_adapter.py:913)."
+  ],
+  "offline_verification": "receipts/offline-20260925.json",
+  "limitations": [
+    "Draft. Paper runner modes, the observer, the orchestrator and the backtest-replay tooling are untested or unbuilt; offline results are local integration and synthetic evidence, not paper evidence.",
+    "Alpaca paper fills are simulated by Alpaca; they do not establish live queue position, slippage or partial-fill behaviour. Partial fills occur at random (paper-trading.md: 10 percent of the time), so R10 is observational.",
+    "One symbol (SPY) and one account size. Results do not transfer to other symbols, sizes or live trading."
+  ]
+}

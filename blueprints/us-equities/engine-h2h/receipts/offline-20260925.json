@@ -1,0 +1,789 @@
+{
+  "schema": "engine-h2h-offline-receipt/v1",
+  "id": "alpaca-engine-h2h-offline-20260925",
+  "date": "2026-09-25",
+  "evidence_class": "Local integration (LEAN and Lumibot backtests over LEAN's bundled SPY data) and a synthetic fixture (the incumbent adapter against its synthetic port). No broker, no credentials, no network, no paper orders.",
+  "script_sha256": "1aa41e19ea4f39d4ac7903abd03bbe5e0b24367435072534047256a756a5c1a8",
+  "runner_sha256": {
+    "h2h_common.py": "e3317539c3776d0aec37e97ae1e95276b7d63431c57fba488daa3533941620d7",
+    "run_nautilus.py": "223a25d46aa95b311c41a63b71418bd4992d77d6eb0fc32dde56144db30feff4",
+    "run_lumibot.py": "0aeaa0cf6dc62bcad054c321eb38091ecbafdcdfcdb2f60c9bc8a56c5f389b34",
+    "run_lean/run.py": "3ca1b4b5f9183e1003140f56bb06748ed84abde0586d3ba35ca0237e2ad8ba45",
+    "run_lean/H2HOrderScriptAlgorithm.cs": "5a777478273c266712ddc1dbce5f24ba38e9f388480e228c0f033498505d5433"
+  },
+  "isolation": "LEAN runs inside execution-realism's accepted bubblewrap sandbox (--unshare-all, engine/SDK/data read-only; all 1467 mounted inputs re-hashed unchanged). Lumibot and Nautilus run in bubblewrap --unshare-all with a read-only root and only the run directory writable, under codex-ecosystem's bounded cgroup runner. Peer roots were used read-only with bytecode writing disabled.",
+  "roots_read_only": {
+    "lean_engine": "${STACK_HOME}/lean-985ef30-r20260925 (Launcher.dll per rollout receipt lean.json attempt 7)",
+    "lean_alpaca_plugin": "${STACK_HOME}/lean-alpaca-1973f61-remediated/source/QuantConnect.AlpacaBrokerage/bin/Debug",
+    "dotnet_sdk": "${STACK_HOME}/dotnet-equity10 (SDK 10.0.401)",
+    "nautilus_adapter_runtime": "${STACK_HOME}/adaptive-paper-r20260925 (nautilus-trader 2.0.0rc5, alpaca-py 0.44.0; hash-locked)",
+    "lumibot_runtime": "${STACK_HOME}/lumibot-4.6.0-r20260925 (installed by this work; see install)"
+  },
+  "install": {
+    "lumibot": {
+      "component": "lumibot",
+      "version": "4.6.0",
+      "class": "python-venv",
+      "asset": "lumibot-4.6.0-py3-none-any.whl",
+      "sha256": "872e91cbd27cd5cfcfaeacaa5a2b8b28887537001b8af75d7a489a1aafb7b0e7",
+      "digest_source": "PyPI JSON API digest (upload 2026-09-24T19:43:29Z) matched by uv --require-hashes lock",
+      "license": "GPL-3.0",
+      "upstream": "https://github.com/Lumiwealth/lumibot/tree/v4.6.0",
+      "upstream_tag_commit": "231fd9e78c96",
+      "python": "/usr/bin/python3.12 (CPython 3.12.3)",
+      "installer": "uv 0.12.17",
+      "install_command": [
+        "uv --no-config venv --python /usr/bin/python3.12 ${STACK_HOME}/lumibot-4.6.0-r20260925",
+        "uv --no-config pip compile --generate-hashes --python ${STACK_HOME}/lumibot-4.6.0-r20260925/bin/python --index-url https://pypi.org/simple --exclude-newer 2026-09-25T00:00:00Z -o ${STACK_HOME}/lumibot-4.6.0-r20260925/requirements.lock ${STACK_HOME}/lumibot-4.6.0-r20260925/requirements.in",
+        "uv --no-config pip sync --require-hashes --link-mode copy --python ${STACK_HOME}/lumibot-4.6.0-r20260925/bin/python --index-url https://pypi.org/simple ${STACK_HOME}/lumibot-4.6.0-r20260925/requirements.lock",
+        "uv --no-config pip check --python ${STACK_HOME}/lumibot-4.6.0-r20260925/bin/python"
+      ],
+      "isolation": {
+        "uv_cache_dir": "dedicated per-install scratch cache, not ~/.cache/uv",
+        "link_mode": "copy",
+        "files_with_nlink_gt_1": 0,
+        "regular_files": 40419,
+        "bounded_run": "codex-ecosystem/bin/ecosystem-bounded-run (compile and sync)"
+      },
+      "artifacts": {
+        "requirements.in.sha256": "8a6e75350cbae1fd07e0d76722117276620245866802f2bd338c37c538fbee62",
+        "requirements.lock.sha256": "5c32bbc0203afaf1a23c0b7b1b8c94bb8d4c7e21af9bd54adb8fbdbc56c1e3fe",
+        "installed-freeze.txt.sha256": "f158bd859d365124f36ad9fb4e7c1f0a36cabbee32125021be4a09de1a2311c0",
+        "installed_packages": 264,
+        "pip_check": "All installed packages are compatible"
+      },
+      "purpose": "Alpaca engine head-to-head (paper only); offline backtest verification, no credentials read",
+      "installed_utc": "2026-09-25T14:46:42Z",
+      "installed_by": "engine-h2h worker, branch claude/alpaca-engine-h2h-20260925"
+    }
+  },
+  "engines": {
+    "lean": {
+      "command": [
+        "${ECOSYSTEM}/bin/ecosystem-bounded-run",
+        "/usr/bin/python3",
+        "-B",
+        "${H2H}/run_lean/run.py",
+        "backtest",
+        "--lean-source",
+        "${STACK_HOME}/lean-985ef30-r20260925/Lean",
+        "--dotnet",
+        "${STACK_HOME}/dotnet-equity10/dotnet",
+        "--out",
+        "${RUN_DIR}/final/lean-backtest"
+      ],
+      "exit_code": 0,
+      "evidence_class": "HIST-backtest (local integration; bundled LEAN data)",
+      "script_sha256": "1aa41e19ea4f39d4ac7903abd03bbe5e0b24367435072534047256a756a5c1a8",
+      "algorithm_sha256": "5a777478273c266712ddc1dbce5f24ba38e9f388480e228c0f033498505d5433",
+      "compiled_dll_sha256": "5ff5eef1a3bc4371e2523261021ad243f067bb5cbbaf3f374e4691c3d2c5b1ac",
+      "journal_sha256": "7fda0cd5d11d9a1bf1d786bc9436dd3802e28a87acdae2933768dd2dfcb429f2",
+      "mounted_input_files": 1467,
+      "mounted_inputs_unchanged": true,
+      "repeat": {
+        "journal_sha256": "7fda0cd5d11d9a1bf1d786bc9436dd3802e28a87acdae2933768dd2dfcb429f2",
+        "journal_identical": true,
+        "results_identical": true
+      },
+      "final_quantity": "0",
+      "open_orders": 0,
+      "partially_filled_orders": 0,
+      "results": {
+        "X01": {
+          "status": "passed",
+          "detail": null
+        },
+        "X02": {
+          "status": "passed",
+          "detail": null
+        },
+        "X03": {
+          "status": "passed",
+          "detail": null
+        },
+        "X04": {
+          "status": "passed",
+          "detail": "refused_by_engine_or_broker"
+        },
+        "E01": {
+          "status": "passed",
+          "detail": null
+        },
+        "M01": {
+          "status": "passed",
+          "detail": null
+        },
+        "R01": {
+          "status": "passed",
+          "detail": null
+        },
+        "R02": {
+          "status": "passed",
+          "detail": null
+        },
+        "R03": {
+          "status": "passed",
+          "detail": null
+        },
+        "R04": {
+          "status": "passed",
+          "detail": null
+        },
+        "R05": {
+          "status": "passed",
+          "detail": null
+        },
+        "R06": {
+          "status": "passed",
+          "detail": null
+        },
+        "R07": {
+          "status": "unsupported",
+          "detail": "contingent_orders_absent_at_pin:bracket"
+        },
+        "R08": {
+          "status": "unsupported",
+          "detail": "contingent_orders_absent_at_pin:oto"
+        },
+        "R09": {
+          "status": "unsupported",
+          "detail": "contingent_orders_absent_at_pin:oco"
+        },
+        "R10": {
+          "status": "not_observable",
+          "detail": "no partial fill occurred in this run"
+        },
+        "R11": {
+          "status": "passed_with_deviation",
+          "detail": "rounded_in_engine_state:159.655->159.66"
+        },
+        "R12": {
+          "status": "passed",
+          "detail": "refused_by_engine_or_broker"
+        },
+        "M02": {
+          "status": "passed",
+          "detail": null
+        },
+        "F01": {
+          "status": "not_run_offline",
+          "detail": "fault case needs a live process and a broker"
+        },
+        "F02": {
+          "status": "not_run_offline",
+          "detail": "fault case needs a live process and a broker"
+        },
+        "F03": {
+          "status": "not_run_offline",
+          "detail": "fault case needs a live process and a broker"
+        }
+      },
+      "summary": {
+        "cases": 21,
+        "covered": 14,
+        "covered_without_glue": 14,
+        "by_status": {
+          "passed": [
+            "M01",
+            "M02",
+            "R01",
+            "R02",
+            "R03",
+            "R04",
+            "R05",
+            "R06",
+            "R12",
+            "X01",
+            "X02",
+            "X03",
+            "X04"
+          ],
+          "passed_with_deviation": [
+            "R11"
+          ],
+          "refused_explicit": [],
+          "unsupported": [
+            "R07",
+            "R08",
+            "R09"
+          ],
+          "failed": [],
+          "not_run_offline": [
+            "F01",
+            "F02",
+            "F03"
+          ],
+          "not_observable": [
+            "R10"
+          ]
+        }
+      },
+      "notes": [
+        "R11: LEAN rounded the sub-penny limit in its own order state (BrokerageTransactionHandler.RoundOrderPrices); its one rounding warning per process went to R06's trailing stop price, so this rounding was silent.",
+        "R07-R09: no contingent-order API at LEAN 985ef30 (QuantConnect/Lean#9828 merged after the pin).",
+        "Runs under SetBrokerageModel(BrokerageName.Alpaca): the Alpaca model refused X04 and R12 before any fill."
+      ]
+    },
+    "lumibot": {
+      "command": [
+        "${ECOSYSTEM}/bin/ecosystem-bounded-run",
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--new-session",
+        "--ro-bind",
+        "/",
+        "/",
+        "--dev",
+        "/dev",
+        "--proc",
+        "/proc",
+        "--tmpfs",
+        "/tmp",
+        "--bind",
+        "${RUN_DIR}/final",
+        "${RUN_DIR}/final",
+        "--clearenv",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "HOME",
+        "${RUN_DIR}/final",
+        "--setenv",
+        "LANG",
+        "C.UTF-8",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "MPLBACKEND",
+        "Agg",
+        "${STACK_HOME}/lumibot-4.6.0-r20260925/bin/python",
+        "-B",
+        "${H2H}/run_lumibot.py",
+        "backtest",
+        "--lean-data",
+        "${STACK_HOME}/lean-985ef30-r20260925/Lean/Data/equity/usa/minute/spy",
+        "--out",
+        "${RUN_DIR}/final/lumibot-backtest-2"
+      ],
+      "exit_code": 0,
+      "evidence_class": "HIST-backtest (local integration; LEAN's bundled SPY bars through Lumibot's PandasData)",
+      "script_sha256": "1aa41e19ea4f39d4ac7903abd03bbe5e0b24367435072534047256a756a5c1a8",
+      "runner_sha256": "0aeaa0cf6dc62bcad054c321eb38091ecbafdcdfcdb2f60c9bc8a56c5f389b34",
+      "journal_sha256": "3644edd1b8ebb29149519b8c2e41cce220720d72110ada627e54c367b525b0c7",
+      "repeat": {
+        "runs": [
+          {
+            "runner_sha256": "d5496db3ebaa545a006ffdc7429157cede854417c01e0e0022c341221781e28e",
+            "journal_sha256": "9944005705180f97597b728fd1e1d2a6addfc993218992e9e0f85cbc76249fa0",
+            "results_identical": true
+          },
+          {
+            "runner_sha256": "d5496db3ebaa545a006ffdc7429157cede854417c01e0e0022c341221781e28e",
+            "journal_sha256": "347824fb1c9f67fb94c3677d282ce7a0e8c7492facabf00c783fc10113070cfe",
+            "results_identical": true
+          }
+        ],
+        "results_identical": true,
+        "note": "Two earlier runs on the previous runner revision (paper-only fault_point and paper step interval changed since); journals differ by wall-clock stamps only."
+      },
+      "final_quantity": "0",
+      "open_orders": 0,
+      "results": {
+        "E01": {
+          "detail": null,
+          "status": "passed"
+        },
+        "M01": {
+          "detail": "auction_time_not_modelled",
+          "status": "passed_with_deviation"
+        },
+        "M02": {
+          "detail": "auction_time_not_modelled",
+          "status": "passed_with_deviation"
+        },
+        "R01": {
+          "detail": null,
+          "status": "passed"
+        },
+        "R02": {
+          "detail": null,
+          "status": "passed"
+        },
+        "R03": {
+          "detail": null,
+          "status": "passed"
+        },
+        "R04": {
+          "detail": null,
+          "status": "passed"
+        },
+        "R05": {
+          "detail": null,
+          "status": "passed"
+        },
+        "R06": {
+          "detail": null,
+          "status": "passed"
+        },
+        "R07": {
+          "detail": null,
+          "status": "passed"
+        },
+        "R08": {
+          "detail": null,
+          "status": "passed"
+        },
+        "R09": {
+          "detail": null,
+          "status": "passed"
+        },
+        "R10": {
+          "status": "not_observable",
+          "detail": "no partial fill occurred in this run"
+        },
+        "R11": {
+          "detail": "timeout:open",
+          "status": "failed"
+        },
+        "R12": {
+          "detail": "unintended_execution",
+          "status": "failed"
+        },
+        "X01": {
+          "detail": null,
+          "status": "passed"
+        },
+        "X02": {
+          "detail": null,
+          "status": "passed"
+        },
+        "X03": {
+          "detail": null,
+          "status": "passed"
+        },
+        "X04": {
+          "detail": "unintended_execution",
+          "status": "failed"
+        },
+        "F01": {
+          "status": "not_run_offline",
+          "detail": "fault case needs a live process and a broker"
+        },
+        "F02": {
+          "status": "not_run_offline",
+          "detail": "fault case needs a live process and a broker"
+        },
+        "F03": {
+          "status": "not_run_offline",
+          "detail": "fault case needs a live process and a broker"
+        }
+      },
+      "summary": {
+        "cases": 21,
+        "covered": 14,
+        "covered_without_glue": 14,
+        "by_status": {
+          "passed": [
+            "R01",
+            "R02",
+            "R03",
+            "R04",
+            "R05",
+            "R06",
+            "R07",
+            "R08",
+            "R09",
+            "X01",
+            "X02",
+            "X03"
+          ],
+          "passed_with_deviation": [
+            "M01",
+            "M02"
+          ],
+          "refused_explicit": [],
+          "unsupported": [],
+          "failed": [
+            "R11",
+            "R12",
+            "X04"
+          ],
+          "not_run_offline": [
+            "F01",
+            "F02",
+            "F03"
+          ],
+          "not_observable": [
+            "R10"
+          ]
+        }
+      },
+      "notes": [
+        "R11: the backtest accepted a sub-penny limit at 3 decimals; Lumibot's Alpaca broker would round it before sending (alpaca.py:1159-1168).",
+        "R12: the backtest filled 100000 shares on a 100000 USD budget (no buying-power check): an unintended execution in the backtest model.",
+        "X04: the backtest filled a market order carrying extended_hours; Alpaca rejects that shape.",
+        "M01/M02: opg/cls are passed through to Alpaca but not modelled by the backtest, which filled before the auction.",
+        "No .env file was loaded (LUMIBOT_DISABLE_DOTENV set before import)."
+      ]
+    },
+    "nautilus": {
+      "command": [
+        "${ECOSYSTEM}/bin/ecosystem-bounded-run",
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--new-session",
+        "--ro-bind",
+        "/",
+        "/",
+        "--dev",
+        "/dev",
+        "--proc",
+        "/proc",
+        "--tmpfs",
+        "/tmp",
+        "--bind",
+        "${RUN_DIR}/final",
+        "${RUN_DIR}/final",
+        "--clearenv",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "HOME",
+        "${RUN_DIR}/final",
+        "--setenv",
+        "LANG",
+        "C.UTF-8",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "${STACK_HOME}/adaptive-paper-r20260925/bin/python",
+        "-B",
+        "${H2H}/run_nautilus.py",
+        "synthetic",
+        "--out",
+        "${RUN_DIR}/final/nautilus-synthetic-2"
+      ],
+      "exit_code": 0,
+      "evidence_class": "SYN (real 2.0.0rc5 LiveNode, our adapter, synthetic port; no broker)",
+      "script_sha256": "1aa41e19ea4f39d4ac7903abd03bbe5e0b24367435072534047256a756a5c1a8",
+      "runner_sha256": "223a25d46aa95b311c41a63b71418bd4992d77d6eb0fc32dde56144db30feff4",
+      "adapter_sha256": {
+        "native_adapter.py": "33311b032fd156f406e85118805c0c09b8bc0a831487e37d6e2e69f8b4a5fcb1",
+        "runner.py": "f157be180d0cf19393137e41871318476db24aea775d05a5b3b95ea8bd5dc1a6",
+        "safety.py": "7e00d5bb60db2f214ffab5966d086e1d2c705ef40489fa147ec24884b802d3ed",
+        "transport.py": "2653682b325f3349465abe1f7d324c49e89e8ae48697c1f4d8802a6cc55d86dc",
+        "mover_simulation.py": "8ac5955de1e814bb26fbfbca068a5719b9033b2bae0d8e50e78d7a78a546761e"
+      },
+      "journal_sha256": "c28672a5d64888c6259a07a56e1e955e8ec1c3ba9557fa7aa8a3a809667da948",
+      "repeat": {
+        "runs": [
+          {
+            "runner_sha256": "b725af7a22d73af70655956f20baf029eae3f8e32f558a12935ceda2c3453ada",
+            "journal_sha256": "df9224ebbc82e8c5b5bb0ff69307513682e502babeb2c2c5d8238bd3e77d32e2",
+            "results_identical": true
+          },
+          {
+            "runner_sha256": "b725af7a22d73af70655956f20baf029eae3f8e32f558a12935ceda2c3453ada",
+            "journal_sha256": "4d555081f7e2b352457bb4d5c1891994e3ef36ee27b60f73e753c877a93f5e23",
+            "results_identical": true
+          }
+        ],
+        "results_identical": true,
+        "note": "Two earlier runs on the previous runner revision (paper-only fault_point changed since); journals differ by wall-clock stamps only."
+      },
+      "final_quantity": "0",
+      "open_orders": 0,
+      "node_stops": [
+        "R07",
+        "R07",
+        "R07",
+        "R07",
+        "R07"
+      ],
+      "adapter_errors": [],
+      "native_assertions": {
+        "fill_events_carry_execution_fields": true,
+        "no_fill_gap_open_at_stop": true,
+        "overturn_signals": []
+      },
+      "results": {
+        "X01": {
+          "status": "passed",
+          "detail": "extended_hours_flag_set_by_session_policy",
+          "glue_required": true
+        },
+        "X02": {
+          "status": "passed",
+          "detail": "extended_hours_flag_set_by_session_policy",
+          "glue_required": true
+        },
+        "X03": {
+          "status": "passed",
+          "detail": "extended_hours_flag_set_by_session_policy",
+          "glue_required": true
+        },
+        "X04": {
+          "status": "passed",
+          "detail": "only_USD_equity_limit_DAY_supported",
+          "glue_required": true
+        },
+        "E01": {
+          "status": "passed",
+          "detail": null,
+          "glue_required": true
+        },
+        "M01": {
+          "status": "refused_explicit",
+          "detail": "only_USD_equity_limit_DAY_supported",
+          "glue_required": true
+        },
+        "R01": {
+          "status": "refused_explicit",
+          "detail": "replace_not_qualified_use_cancel_then_new_intent",
+          "glue_required": true
+        },
+        "R02": {
+          "status": "passed",
+          "detail": null,
+          "glue_required": true
+        },
+        "R03": {
+          "status": "refused_explicit",
+          "detail": "only_USD_equity_limit_DAY_supported",
+          "glue_required": true
+        },
+        "R04": {
+          "status": "refused_explicit",
+          "detail": "only_USD_equity_limit_DAY_supported",
+          "glue_required": true
+        },
+        "R05": {
+          "status": "refused_explicit",
+          "detail": "only_USD_equity_limit_DAY_supported",
+          "glue_required": true
+        },
+        "R06": {
+          "status": "refused_explicit",
+          "detail": "only_USD_equity_limit_DAY_supported",
+          "glue_required": true
+        },
+        "R07": {
+          "status": "failed",
+          "detail": "node_stopped:",
+          "glue_required": true
+        },
+        "R08": {
+          "status": "unsupported",
+          "detail": "standalone_oto:rc5_python_order_factory_has_bracket_only",
+          "glue_required": true
+        },
+        "R09": {
+          "status": "unsupported",
+          "detail": "standalone_oco:rc5_python_order_factory_has_bracket_only",
+          "glue_required": true
+        },
+        "R10": {
+          "status": "not_observable",
+          "detail": "no partial fill occurred in this run",
+          "glue_required": true
+        },
+        "R11": {
+          "status": "passed",
+          "detail": "PRICE_PRECISION_EXCEEDS_MAXIMUM: field=PRICE, price=474.995, precision=3, max_precision=2",
+          "glue_required": true
+        },
+        "R12": {
+          "status": "passed",
+          "detail": "NOTIONAL_EXCEEDS_FREE_BALANCE: free=100000.00 USD, notional=50252000.00 USD",
+          "glue_required": true
+        },
+        "M02": {
+          "status": "refused_explicit",
+          "detail": "only_USD_equity_limit_DAY_supported",
+          "glue_required": true
+        },
+        "F01": {
+          "status": "not_run_offline",
+          "detail": "fault case needs a live process and a broker",
+          "glue_required": true
+        },
+        "F02": {
+          "status": "not_run_offline",
+          "detail": "fault case needs a live process and a broker",
+          "glue_required": true
+        },
+        "F03": {
+          "status": "not_run_offline",
+          "detail": "fault case needs a live process and a broker",
+          "glue_required": true
+        }
+      },
+      "summary": {
+        "cases": 21,
+        "covered": 7,
+        "covered_without_glue": 0,
+        "by_status": {
+          "passed": [
+            "R02",
+            "R11",
+            "R12",
+            "X01",
+            "X02",
+            "X03",
+            "X04"
+          ],
+          "passed_with_deviation": [],
+          "refused_explicit": [
+            "M01",
+            "M02",
+            "R01",
+            "R03",
+            "R04",
+            "R05",
+            "R06"
+          ],
+          "unsupported": [
+            "R08",
+            "R09"
+          ],
+          "failed": [
+            "R07"
+          ],
+          "not_run_offline": [
+            "F01",
+            "F02",
+            "F03"
+          ],
+          "not_observable": [
+            "R10"
+          ]
+        }
+      },
+      "notes": [
+        "Every case runs through our adapter, so covered_without_glue is 0 by construction.",
+        "R07: the bracket reached the adapter's inherited _submit_order_list, rc5's NotImplementedError (nautilus_trader/live/clients.py:655-656), and shutdown_on_error stopped the node, once per regular phase; the runner then continued on a fresh flat synthetic account.",
+        "R01/R03-R06, M01/M02: explicit adapter refusals (only_USD_equity_limit_DAY_supported; replace_not_qualified_use_cancel_then_new_intent).",
+        "R11 and R12 were refused before sending by the ledger (price increment; order size cap).",
+        "X01-X03 passed, but the extended_hours flag is set by the session policy and the wall clock, not per order; this run was in regular hours."
+      ]
+    }
+  },
+  "lean_alpaca_plugin_probe": {
+    "question": "Is lean-alpaca-1973f61-remediated compatible with lean-985ef30-r20260925?",
+    "command": [
+      "${ECOSYSTEM}/bin/ecosystem-bounded-run",
+      "/usr/bin/python3",
+      "-B",
+      "${H2H}/run_lean/run.py",
+      "probe-alpaca",
+      "--lean-source",
+      "${STACK_HOME}/lean-985ef30-r20260925/Lean",
+      "--dotnet",
+      "${STACK_HOME}/dotnet-equity10/dotnet",
+      "--plugin",
+      "${STACK_HOME}/lean-alpaca-1973f61-remediated/source/QuantConnect.AlpacaBrokerage/bin/Debug",
+      "--out",
+      "${RUN_DIR}/final/lean-probe"
+    ],
+    "exit_code": 0,
+    "result": {
+      "probe": {
+        "factories": 3,
+        "found": true,
+        "detail": {
+          "assembly": "QuantConnect.Brokerages.Alpaca, Version=2.5.0.0, Culture=neutral, PublicKeyToken=null",
+          "brokerage_type": "QuantConnect.Brokerages.Alpaca.AlpacaBrokerage",
+          "data_keys": [
+            "alpaca-access-token",
+            "alpaca-api-key",
+            "alpaca-api-secret",
+            "alpaca-paper-trading"
+          ],
+          "model": "QuantConnect.Brokerages.AlpacaBrokerageModel",
+          "references": [
+            {
+              "name": "QuantConnect.Common",
+              "referenced": "2.5.0.0",
+              "loaded": "2.5.0.0"
+            },
+            {
+              "name": "QuantConnect.Brokerages",
+              "referenced": "2.5.0.0",
+              "loaded": "2.5.0.0"
+            },
+            {
+              "name": "QuantConnect.Api",
+              "referenced": "2.5.0.0",
+              "loaded": "2.5.0.0"
+            },
+            {
+              "name": "QuantConnect.Configuration",
+              "referenced": "2.5.0.0",
+              "loaded": "2.5.0.0"
+            },
+            {
+              "name": "QuantConnect.Logging",
+              "referenced": "2.5.0.0",
+              "loaded": "2.5.0.0"
+            },
+            {
+              "name": "QuantConnect.Lean.Engine",
+              "referenced": "2.5.0.0",
+              "loaded": "2.5.0.0"
+            }
+          ],
+          "all_references_match": true
+        }
+      },
+      "plugin_dll_sha256": "c990eb666904d54de1bb062bee15e78dc99e35723410e0493998cd5459dd599e",
+      "alpaca_markets_dll_sha256": "d256854258a8ae0c24bc88fb4f819c90b40f93573a39feba1bfe31d0aa5189e9",
+      "mounted_inputs_unchanged": true,
+      "compatible": true
+    },
+    "answer": "Yes at the binary level: the r20260925 engine's own composer loaded the plugin through plugin-directory, the factory, brokerage type and AlpacaBrokerageModel resolved, and all six QuantConnect references (2.5.0.0) match the loaded engine. No new lean-alpaca root was built. Not established: the brokerage object itself (network, QuantConnect license check) or any order."
+  },
+  "attempts_preserved": [
+    {
+      "run": "lean-bt-1",
+      "journal_sha256": "ff97b85cfe2d2a4d1335543e0bd6519ddbe29a763cd403210a8431d4c0971cbd",
+      "outcome": "Runner bugs: a Day TIF on MarketOnClose expired before LEAN's close fill, and failed-case keys lacked a per-phase run id so M02 was skipped on later days. Fixed."
+    },
+    {
+      "run": "lean-bt-2",
+      "journal_sha256": "a51ad810dfefde14bcac3c93fdb5114807297da577aad8ee4a8fd4a03aedb473",
+      "outcome": "Script flaw found by E01: M01's share was liquidated by a failed case's cleanup and M02 then sold short (final -1). M01/M02 made flat-to-flat and requires_position enforced."
+    },
+    {
+      "run": "lean-bt-3",
+      "journal_sha256": "45ba02a8b73caac268692f049898f916c2f8e2b41fca24706d8a597dbbc00d83",
+      "outcome": "Clean run on the previous algorithm; superseded after replace verification was added."
+    },
+    {
+      "run": "lumibot-bt-1",
+      "outcome": "Runner bug: Data(timezone=...) on an already tz-aware index raised TypeError. Fixed."
+    },
+    {
+      "run": "nautilus-syn-1",
+      "outcome": "Runner bug: rc5's bracket factory returns a list, not an OrderList. Fixed."
+    },
+    {
+      "run": "nautilus-syn-2",
+      "outcome": "R07 stopped the node and the runner ended the script there. Node-stop handling added."
+    },
+    {
+      "run": "lean-probe-1",
+      "outcome": "Compatible (same result as the final probe)."
+    }
+  ],
+  "limitations": [
+    "Offline runs do not establish paper behaviour: no broker acknowledgement, streaming, latency, partial fills, rate limits or fault recovery were exercised.",
+    "The three offline modes are different evidence classes (two backtests with different fill models, one synthetic port); their coverage counts are not a head-to-head result.",
+    "Paper modes of all three runners are untested boundaries; the orchestrator and observer are specified in protocol.json but not built.",
+    "LEAN's backtest used the Alpaca brokerage model, not the Alpaca brokerage; the plugin probe constructed no brokerage object."
+  ]
+}

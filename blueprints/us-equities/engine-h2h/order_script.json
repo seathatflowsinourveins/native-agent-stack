@@ -1,0 +1,140 @@
+{
+  "schema": "engine-h2h-order-script/v1",
+  "id": "alpaca-engine-h2h-order-script-v1-20260925",
+  "status": "draft-preregistered",
+  "symbol": "SPY",
+  "determinism": "Every order is fixed by its case, its price rule and the engine's own reference quote at decision time. Nothing depends on fills, P&L or strategy returns. Quantities, sides, types, time in force and step order are constants.",
+  "flat_invariant": "Every case starts and ends flat in the symbol, except the two linked pairs R02->R03 and X02->X03, where the second case consumes the first's share. A case with requires_position is not submitted, and fails as precondition_position, when the engine's position differs; a failed case is cleaned up (open orders canceled, position closed) before the next case.",
+  "reference_quote": {
+    "paper": "The engine's own latest bid/ask for the symbol at decision time. A quote older than 5 s, a non-positive bid or an ask below the bid defers the step for up to 60 s; after that the case fails as no_quote.",
+    "backtest": "The latest bar the engine has: quote-bar bid/ask closes when available, else the trade-bar close as both bid and ask.",
+    "synthetic": "The synthetic port's scripted bid/ask."
+  },
+  "rounding": "Decimal arithmetic. floor_cent and ceil_cent round to 0.01 toward negative and positive infinity; add is applied after rounding.",
+  "price_rules": {
+    "resting_buy": {"side_of_book": "bid", "multiplier": "0.95", "rounding": "floor_cent"},
+    "resting_buy_replace": {"side_of_book": "bid", "multiplier": "0.94", "rounding": "floor_cent"},
+    "ext_resting_buy": {"side_of_book": "bid", "multiplier": "0.97", "rounding": "floor_cent"},
+    "marketable_buy": {"side_of_book": "ask", "multiplier": "1.005", "rounding": "ceil_cent"},
+    "marketable_sell": {"side_of_book": "bid", "multiplier": "0.995", "rounding": "floor_cent"},
+    "far_buy_stop": {"side_of_book": "ask", "multiplier": "1.10", "rounding": "ceil_cent"},
+    "far_buy_stop_limit": {"side_of_book": "ask", "multiplier": "1.11", "rounding": "ceil_cent"},
+    "take_profit": {"side_of_book": "ask", "multiplier": "1.10", "rounding": "ceil_cent"},
+    "stop_loss": {"side_of_book": "bid", "multiplier": "0.90", "rounding": "floor_cent"},
+    "subpenny_buy": {"side_of_book": "bid", "multiplier": "0.95", "rounding": "floor_cent", "add": "0.005"}
+  },
+  "constants": {
+    "trail_percent": "10",
+    "buying_power_reject_qty": 100000,
+    "partial_probe_qty": 10,
+    "partial_probe_repeats": 5
+  },
+  "phases": {
+    "extended_pre": {"at_et": "08:00", "session": "extended", "cases": ["X01", "X02", "X03", "X04", "E01"]},
+    "pre_open": {"at_et": "09:20", "session": "regular", "cases": ["M01"]},
+    "regular": {"at_et": "10:00", "session": "regular", "cases": ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10", "R11", "R12"]},
+    "faults": {"at_et": "11:30", "session": "regular", "cases": ["F01", "F02", "F03"]},
+    "close": {"at_et": "15:35", "session": "regular", "cases": ["M02"]},
+    "reconcile": {"at_et": "16:05", "session": "regular", "cases": ["E01"]},
+    "extended_post": {"at_et": "17:00", "session": "extended", "cases": ["X01", "X02", "X03", "X04", "E01"]}
+  },
+  "cases": {
+    "R01": {"title": "Resting limit buy, replace, cancel", "covers": ["resting_limit", "replace", "cancel"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "buy", "qty": 1, "tif": "day", "limit": "resting_buy"}, "expect": "open", "timeout_s": 30},
+        {"do": "replace", "ref": "a", "limit": "resting_buy_replace", "expect": "open", "timeout_s": 30},
+        {"do": "cancel", "ref": "a", "expect": "canceled", "timeout_s": 30}]},
+    "R02": {"title": "Marketable limit buy", "covers": ["marketable_limit"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "buy", "qty": 1, "tif": "day", "limit": "marketable_buy"}, "expect": "filled", "timeout_s": 60}]},
+    "R03": {"title": "Market sell closing R02", "covers": ["market"], "requires_position": 1,
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "market", "side": "sell", "qty": 1, "tif": "day"}, "expect": "filled", "timeout_s": 60}]},
+    "R04": {"title": "Stop buy resting far above, then cancel", "covers": ["stop", "cancel"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "stop", "side": "buy", "qty": 1, "tif": "day", "stop": "far_buy_stop"}, "expect": "open", "timeout_s": 30},
+        {"do": "cancel", "ref": "a", "expect": "canceled", "timeout_s": 30}]},
+    "R05": {"title": "Stop-limit buy resting far above, then cancel", "covers": ["stop_limit", "cancel"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "stop_limit", "side": "buy", "qty": 1, "tif": "day", "stop": "far_buy_stop", "limit": "far_buy_stop_limit"}, "expect": "open", "timeout_s": 30},
+        {"do": "cancel", "ref": "a", "expect": "canceled", "timeout_s": 30}]},
+    "R06": {"title": "Trailing-stop buy (10 percent), then cancel", "covers": ["trailing_stop", "cancel"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "trailing_stop", "side": "buy", "qty": 1, "tif": "day", "trail_percent": "trail_percent"}, "expect": "open", "timeout_s": 30},
+        {"do": "cancel", "ref": "a", "expect": "canceled", "timeout_s": 30}]},
+    "R07": {"title": "Bracket: marketable limit entry, take-profit limit, stop-loss stop", "covers": ["bracket"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"class": "bracket", "type": "limit", "side": "buy", "qty": 1, "tif": "day", "limit": "marketable_buy", "take_profit": "take_profit", "stop_loss": "stop_loss"}, "expect": "entry_filled_legs_open", "timeout_s": 60},
+        {"do": "flatten", "expect": "flat", "timeout_s": 60}]},
+    "R08": {"title": "OTO: marketable limit entry, stop-loss leg", "covers": ["oto"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"class": "oto", "type": "limit", "side": "buy", "qty": 1, "tif": "day", "limit": "marketable_buy", "stop_loss": "stop_loss"}, "expect": "entry_filled_legs_open", "timeout_s": 60},
+        {"do": "flatten", "expect": "flat", "timeout_s": 60}]},
+    "R09": {"title": "OCO exit on a held share", "covers": ["oco"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "buy", "qty": 1, "tif": "day", "limit": "marketable_buy"}, "expect": "filled", "timeout_s": 60},
+        {"do": "submit", "ref": "b", "order": {"class": "oco", "type": "limit", "side": "sell", "qty": 1, "tif": "day", "take_profit": "take_profit", "stop_loss": "stop_loss"}, "expect": "legs_open", "timeout_s": 30},
+        {"do": "flatten", "expect": "flat", "timeout_s": 60}]},
+    "R10": {"title": "Partial-fill probe: five 10-share marketable buys, each flattened", "covers": ["partial_fill"], "observational": true,
+      "repeat": "partial_probe_repeats",
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "buy", "qty": "partial_probe_qty", "tif": "day", "limit": "marketable_buy"}, "expect": "filled", "timeout_s": 60},
+        {"do": "flatten", "expect": "flat", "timeout_s": 60}]},
+    "R11": {"title": "Sub-penny limit price", "covers": ["subpenny_rejection"],
+      "outcome_classes": ["refused_by_engine", "rejected_by_broker", "rounded_in_engine_state"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "buy", "qty": 1, "tif": "day", "limit": "subpenny_buy"}, "expect": "refused_or_rounded", "timeout_s": 30},
+        {"do": "cancel_if_open", "ref": "a", "expect": "canceled_or_refused", "timeout_s": 30}]},
+    "R12": {"title": "Buying-power rejection: 100000-share marketable buy", "covers": ["rejection"],
+      "outcome_classes": ["refused_by_engine", "rejected_by_broker"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "buy", "qty": "buying_power_reject_qty", "tif": "day", "limit": "marketable_buy"}, "expect": "refused", "timeout_s": 30}]},
+    "M01": {"title": "Market-on-open buy before 09:28 ET, then a marketable limit sell after the open", "covers": ["moo"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "market", "side": "buy", "qty": 1, "tif": "opg"}, "expect": "filled", "timeout_s": 900},
+        {"do": "submit", "ref": "b", "order": {"type": "limit", "side": "sell", "qty": 1, "tif": "day", "limit": "marketable_sell"}, "expect": "filled", "timeout_s": 60}]},
+    "M02": {"title": "Marketable limit buy, then a market-on-close sell before 15:44 ET", "covers": ["moc"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "buy", "qty": 1, "tif": "day", "limit": "marketable_buy"}, "expect": "filled", "timeout_s": 60},
+        {"do": "submit", "ref": "b", "order": {"type": "market", "side": "sell", "qty": 1, "tif": "cls"}, "expect": "filled", "timeout_s": 1800}]},
+    "F01": {"title": "Kill the engine mid-order, restart, reconcile", "covers": ["kill_mid_order"], "paper_only": true,
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "buy", "qty": 1, "tif": "day", "limit": "resting_buy"}, "expect": "submitted", "timeout_s": 5},
+        {"do": "kill", "signal": "SIGKILL", "within_ms_after_submit": 50},
+        {"do": "restart"},
+        {"do": "reconcile", "expect": "adopted_once", "timeout_s": 120},
+        {"do": "cancel", "ref": "a", "expect": "canceled", "timeout_s": 30}]},
+    "F02": {"title": "Drop the trade-update stream while a marketable order fills", "covers": ["stream_drop"], "paper_only": true,
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "buy", "qty": 1, "tif": "day", "limit": "marketable_buy"}, "expect": "submitted", "timeout_s": 5},
+        {"do": "drop_stream", "seconds": 20},
+        {"do": "await", "ref": "a", "expect": "filled_once", "timeout_s": 120},
+        {"do": "flatten", "expect": "flat", "timeout_s": 60}]},
+    "F03": {"title": "Restart with two open orders", "covers": ["restart_with_open_orders"], "paper_only": true,
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "buy", "qty": 1, "tif": "day", "limit": "resting_buy"}, "expect": "open", "timeout_s": 30},
+        {"do": "submit", "ref": "b", "order": {"type": "stop", "side": "buy", "qty": 1, "tif": "day", "stop": "far_buy_stop"}, "expect": "open", "timeout_s": 30},
+        {"do": "stop", "signal": "SIGTERM"},
+        {"do": "restart"},
+        {"do": "reconcile", "expect": "adopted_once", "timeout_s": 120},
+        {"do": "cancel", "ref": "a", "expect": "canceled", "timeout_s": 30},
+        {"do": "cancel", "ref": "b", "expect": "canceled", "timeout_s": 30}]},
+    "X01": {"title": "Extended-hours resting limit buy, then cancel", "covers": ["extended_hours_limit", "cancel"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "buy", "qty": 1, "tif": "day", "extended_hours": true, "limit": "ext_resting_buy"}, "expect": "open", "timeout_s": 30},
+        {"do": "cancel", "ref": "a", "expect": "canceled", "timeout_s": 30}]},
+    "X02": {"title": "Extended-hours marketable limit buy", "covers": ["extended_hours_limit"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "buy", "qty": 1, "tif": "day", "extended_hours": true, "limit": "marketable_buy"}, "expect": "filled", "timeout_s": 120}]},
+    "X03": {"title": "Extended-hours marketable limit sell closing X02", "covers": ["extended_hours_limit"], "requires_position": 1,
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "limit", "side": "sell", "qty": 1, "tif": "day", "extended_hours": true, "limit": "marketable_sell"}, "expect": "filled", "timeout_s": 120}]},
+    "X04": {"title": "Extended-hours market order must be refused, never queued", "covers": ["extended_hours_refusal"],
+      "outcome_classes": ["refused_by_engine", "rejected_by_broker"],
+      "steps": [
+        {"do": "submit", "ref": "a", "order": {"type": "market", "side": "buy", "qty": 1, "tif": "day", "extended_hours": true}, "expect": "refused", "timeout_s": 30}]},
+    "E01": {"title": "End-of-phase reconciliation: flat, no open orders, engine state equals broker state", "covers": ["reconciliation"],
+      "steps": [
+        {"do": "reconcile", "expect": "flat", "timeout_s": 120}]}
+  }
+}
