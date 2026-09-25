@@ -1010,6 +1010,161 @@ class ApplyGateTests(SwitchFixture):
         self.assertEqual(os.readlink(current), str(other_root.resolve()),
                          "the out-of-band repoint must be left untouched, never silently overwritten")
 
+    def test_rollback_resumes_after_being_killed_partway_through_a_multi_surface_txn(self):
+        # Major finding (round 6): rollback is idempotent and resumable (coordinator decision).
+        # Simulates a `rollback` process killed after reversing the FIRST surface rollback_txn
+        # processes (non-restart entries are reversed in reverse-chronological order, so a
+        # synthetic text-replace surface ledgered after the link is reversed first) and ledgering
+        # that reversal, but before it ever reaches the link -- then calls rollback_txn again (the
+        # "resumed" run) and checks it finishes cleanly, reversing only what is still outstanding.
+        self.write_receipt("R1", "foo", "2.0.0")
+        config = self.root / "config.txt"
+        config.write_text("old-value")
+        txn = "multi-1"
+        ledger = switch.Ledger(self.root)
+        ledger.append(txn=txn, op="txn_begin", component="foo", surface="_txn")
+        link_fields, _inverse = switch.op_link(self.root, "current/foo", str(self.root_v2.resolve()))
+        ledger.append(txn=txn, op="link", component="foo", surface="current/foo", **link_fields)
+        backup_dir = self.root / "switch" / "backups" / txn
+        text_fields, _inverse = switch.op_text_replace(self.root, "config.txt", "old-value", "new-value",
+                                                        backup_dir=backup_dir)
+        ledger.append(txn=txn, op="text-replace", component="foo", surface="config.txt", **text_fields)
+        self.assertEqual(self.run_entrypoint(), "v2")
+        self.assertEqual(config.read_text(), "new-value")
+
+        # The interrupted rollback attempt got as far as reversing and ledgering config.txt, then
+        # died -- current/foo is untouched at this point, exactly like a process killed mid-loop.
+        reverse_text_fields, _inverse = switch.op_text_replace(self.root, "config.txt", "new-value", "old-value",
+                                                                backup_dir=backup_dir)
+        ledger.append(txn=txn, op="rollback:text-replace", component="foo", surface="config.txt",
+                      **reverse_text_fields)
+        self.assertEqual(config.read_text(), "old-value")
+        self.assertEqual(self.run_entrypoint(), "v2", "the interrupted attempt must not have reached the link yet")
+
+        problems = switch.rollback_txn(self.root, txn)
+        self.assertEqual(problems, [])
+        self.assertEqual(self.run_entrypoint(), "v1", "the resumed rollback must still reverse the link")
+        self.assertEqual(config.read_text(), "old-value", "an already-reverted surface must not change again")
+
+        entries = switch.Ledger(self.root).for_txn(txn)
+        text_reversals = [e for e in entries if e["op"] == "rollback:text-replace"]
+        self.assertEqual(len(text_reversals), 1,
+                         "the already-reverted surface must not be reversed (and re-ledgered) a second time")
+        self.assertEqual(len([e for e in entries if e["op"] == "rollback:link"]), 1)
+        self.assertEqual(len([e for e in entries if e["op"] == "rollback:done"]), 1)
+        self.assertEqual(len([e for e in entries if e["op"] == "rollback:intent"]), 1,
+                         "the resumed call also writes its own rollback-intent marker")
+
+    def test_rollback_txn_called_twice_is_idempotent(self):
+        # Coordinator decision (round 6): a second `rollback_txn` call for an already fully
+        # rolled-back txn (e.g. a stray retry) must be a clean no-op, never re-reverse anything.
+        self.write_receipt("R1", "foo", "2.0.0")
+        result = self.apply("foo", self.root_v2, "R1")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        txn = json.loads(result.stdout)["txn"]
+
+        first = switch.rollback_txn(self.root, txn)
+        self.assertEqual(first, [])
+        self.assertEqual(self.run_entrypoint(), "v1")
+
+        second = switch.rollback_txn(self.root, txn)
+        self.assertEqual(second, [], "a second rollback of an already-rolled-back txn must report no problems")
+        self.assertEqual(self.run_entrypoint(), "v1", "must not touch current/foo again")
+
+        entries = switch.Ledger(self.root).for_txn(txn)
+        self.assertEqual(len([e for e in entries if e["op"] == "rollback:link"]), 1,
+                         "the link must not be reversed a second time")
+        self.assertEqual(len([e for e in entries if e["op"] == "rollback:done"]), 2,
+                         "each call still writes its own terminal marker, harmless once already rolled_back")
+
+        # The CLI's own pre-existing early exit for an already-rolled-back txn stays intact too.
+        cli_second = run(self.env, "rollback", "--txn", txn)
+        self.assertEqual(cli_second.returncode, 0, cli_second.stderr)
+        self.assertEqual(json.loads(cli_second.stdout)["status"], "already_rolled_back")
+
+    def test_recover_resumes_an_interrupted_rollback_instead_of_leaving_it_stuck(self):
+        # Major finding (round 6): the round-5 link compare-and-swap made a resumed rollback
+        # impossible. Review's own repro: a crashed txn (current/foo->v2, never reaching its own
+        # verify_pass) whose own recover-initiated rollback was itself interrupted after really
+        # reversing the link (current/foo really is back at v1) and ledgering that reversal, but
+        # before appending "rollback:done", left the txn stuck in_progress ('recover => exit 1,
+        # apply => 75') because the live target (v1) no longer matched this txn's own forward "to"
+        # (v2), the CAS precondition's only accepted value before this fix. Coordinator decision:
+        # recover must resume (not refuse) an interrupted rollback the same way rollback_txn itself
+        # is now idempotent and resumable.
+        self.write_receipt("R1", "foo", "2.0.0")
+        crashed_txn = "crashed-1"
+        ledger = switch.Ledger(self.root)
+        ledger.append(txn=crashed_txn, op="txn_begin", component="foo", surface="_txn")
+        fields, _inverse = switch.op_link(self.root, "current/foo", str(self.root_v2.resolve()))
+        ledger.append(txn=crashed_txn, op="link", component="foo", surface="current/foo", **fields)
+        self.assertEqual(self.run_entrypoint(), "v2")
+
+        # An earlier `recover` (or manual `rollback --txn crashed-1`) already reversed the link for
+        # real and ledgered it, then was itself killed before appending "rollback:done" -- the
+        # exact repro the review recorded.
+        reverse_fields, _inverse = switch.op_link(self.root, "current/foo", str(self.root_v1.resolve()))
+        ledger.append(txn=crashed_txn, op="rollback:link", component="foo", surface="current/foo",
+                      **reverse_fields)
+        self.assertEqual(self.run_entrypoint(), "v1")
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["txns"][crashed_txn]["status"], "in_progress",
+                         "never reaching rollback:done leaves it in_progress, not rolled_back")
+
+        blocked = self.apply("foo", self.root_v2, "R1")
+        self.assertEqual(blocked.returncode, 75, blocked.stderr)
+        self.assertIn(crashed_txn, blocked.stderr)
+
+        recover_result = run(self.env, "recover")
+        self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
+        payload = json.loads(recover_result.stdout)
+        self.assertEqual(payload["recovered_txns"], [crashed_txn])
+        self.assertEqual(payload["rollback_problems"], [])
+        self.assertEqual(self.run_entrypoint(), "v1", "recover must not clobber the already-reverted link")
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["txns"][crashed_txn]["status"], "rolled_back")
+
+        retry = self.apply("foo", self.root_v2, "R1")
+        self.assertEqual(retry.returncode, 0,
+                         f"the open-txn guard must clear once recover resumes it: {retry.stderr}")
+        self.assertEqual(self.run_entrypoint(), "v2")
+
+        entries = switch.Ledger(self.root).for_txn(crashed_txn)
+        self.assertEqual(len([e for e in entries if e["op"] == "rollback:link"]), 1,
+                         "the already-reverted link must not be reversed (and re-ledgered) a second time")
+
+    def test_rollback_by_txn_succeeds_after_the_apply_that_superseded_it_was_itself_rolled_back(self):
+        # Minor finding (round 6, residual of round 4's second major): the superseded-refusal
+        # check used to compare only state.json's derived updated_txn, which recompute_state sets
+        # from the LAST ledger entry to touch current/<id> -- including a txn's own rollback of
+        # ITSELF (a rollback:link entry is still tagged with that same txn's id). So once A2
+        # (v2->v3) was itself rolled back, updated_txn named "A2" again (its own rollback record,
+        # not a still-standing forward apply), and `rollback --txn A1` was refused as superseded by
+        # A2 forever, even though current/foo had already gone back to exactly what A1 itself set
+        # it to.
+        self.write_receipt("R1", "foo", "2.0.0")
+        first = self.apply("foo", self.root_v2, "R1")
+        self.assertEqual(first.returncode, 0, first.stderr)
+        first_txn = json.loads(first.stdout)["txn"]
+        root_v3 = self.make_tool_root("foo-3.0.0", "v3")
+        self.write_receipt("R3", "foo", "3.0.0")
+        second = self.apply("foo", root_v3, "R3")
+        self.assertEqual(second.returncode, 0, second.stderr)
+        second_txn = json.loads(second.stdout)["txn"]
+
+        # Roll A2 back first: current/foo goes back to exactly what A1 itself set it to (v2).
+        revert_second = run(self.env, "rollback", "--txn", second_txn)
+        self.assertEqual(revert_second.returncode, 0, revert_second.stderr)
+        self.assertEqual(self.run_entrypoint(), "v2")
+
+        # A1 is no longer superseded by anything still standing -- rolling it back must now succeed.
+        revert_first = run(self.env, "rollback", "--txn", first_txn)
+        self.assertEqual(revert_first.returncode, 0, revert_first.stderr)
+        self.assertEqual(self.run_entrypoint(), "v1")
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["txns"][first_txn]["status"], "rolled_back")
+        self.assertEqual(state["txns"][second_txn]["status"], "rolled_back")
+
 
 class ConfirmAndRevertTests(SwitchFixture):
     STUB_SYSTEMD_RUN = textwrap.dedent("""\
@@ -1031,6 +1186,24 @@ class ConfirmAndRevertTests(SwitchFixture):
         sys.exit(0)
         """)
 
+    # Minor finding (round 6): every test in this class but the two that locally override
+    # ECOSYSTEM_SWITCH_SYSTEMCTL for their own purpose (test_confirm_succeeds_even_when_stopping_
+    # the_revert_timer_fails, and any that also gets UnitRestartTests' own stub) used to run
+    # `confirm`'s best-effort `systemctl --user stop ecosystem-switch-revert-<txn>.timer` against
+    # the real host systemctl instead -- harmless (each unit name is unique and the call's result
+    # is discarded either way -- see cmd_confirm), but this module's own docstring promises "No
+    # real host tool root, systemd unit, or receipt is read or changed", which this class alone
+    # broke. A minimal stub that only needs to accept "stop" and exit 0 closes the gap.
+    STUB_SYSTEMCTL = textwrap.dedent("""\
+        #!/usr/bin/env python3
+        import os, sys
+        args = sys.argv[1:]
+        if args[:2] == ["--user", "stop"]:
+            with open(os.environ["STUB_SYSTEMCTL_LOG"], "a") as log:
+                log.write(" ".join(args[2:]) + "\\n")
+        sys.exit(0)
+        """)
+
     def setUp(self):
         super().setUp()
         self.root_v1 = self.make_tool_root("foo-1.0.0", "v1")
@@ -1048,8 +1221,14 @@ class ConfirmAndRevertTests(SwitchFixture):
         stub_path.write_text(self.STUB_SYSTEMD_RUN)
         stub_path.chmod(0o755)
         self.stub_log = self.root / "stub.log"
+        systemctl_stub_path = self.root / "stub-systemctl.py"
+        systemctl_stub_path.write_text(self.STUB_SYSTEMCTL)
+        systemctl_stub_path.chmod(0o755)
+        self.systemctl_stub_log = self.root / "systemctl-stub.log"
         self.env = {**self.env, "ECOSYSTEM_SWITCH_SYSTEMD_RUN": f"{sys.executable} {stub_path}",
-                   "STUB_LOG": str(self.stub_log)}
+                   "STUB_LOG": str(self.stub_log),
+                   "ECOSYSTEM_SWITCH_SYSTEMCTL": f"{sys.executable} {systemctl_stub_path}",
+                   "STUB_SYSTEMCTL_LOG": str(self.systemctl_stub_log)}
 
     def run_entrypoint(self):
         return subprocess.run([str(self.root / "bin" / "foo")], capture_output=True, text=True).stdout.strip()
@@ -1065,6 +1244,10 @@ class ConfirmAndRevertTests(SwitchFixture):
 
         confirm = run(self.env, "confirm", "--txn", payload["txn"])
         self.assertEqual(confirm.returncode, 0, confirm.stderr)
+        self.assertTrue(self.systemctl_stub_log.is_file(),
+                        "confirm's best-effort timer stop must go through the test's own systemctl "
+                        "stub, not the real host systemctl (module docstring: no real host tool touched)")
+        self.assertIn(f"ecosystem-switch-revert-{payload['txn']}.timer", self.systemctl_stub_log.read_text())
 
         # The timer firing after confirmation must be a no-op (--if-unconfirmed).
         late_fire = run(self.env, "rollback", "--txn", payload["txn"], "--if-unconfirmed")
