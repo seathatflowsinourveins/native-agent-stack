@@ -2,17 +2,17 @@
  "evidence_label": "HIST",
  "kind": "scoring-status",
  "labels_in_files": {
-  "FAVORABLE": 82863,
-  "PARSE_FAIL": 3800,
-  "UNCLEAR": 24,
-  "UNFAVORABLE": 97883
+  "FAVORABLE": 168849,
+  "PARSE_FAIL": 60505,
+  "UNCLEAR": 14333,
+  "UNFAVORABLE": 273934
  },
- "rows_in_files": 184570,
+ "rows_in_files": 517621,
  "runs": {
   "progress.json": {
    "batch1_agreement": {
-    "agree": 112,
-    "checked": 112
+    "agree": 160,
+    "checked": 160
    },
    "by_checkpoint": {
     "2015": {
@@ -21,19 +21,18 @@
       "checked": 16
      },
      "labels": {
-      "FAVORABLE": 6502,
-      "PARSE_FAIL": 13,
-      "UNFAVORABLE": 5883
+      "FAVORABLE": 2770,
+      "UNFAVORABLE": 3289
      },
-     "load_seconds": 12.7,
+     "load_seconds": 15.0,
      "overflow": 0,
      "revision": "5a7f3439fd5d782b3780c366160c43177e6f5eba",
-     "scored": 12398,
+     "scored": 6059,
      "stops": {
-      "eos": 12385,
-      "label_decided": 13
+      "eos": 6058,
+      "label_decided": 1
      },
-     "to_score": 12398
+     "to_score": 6059
     },
     "2016": {
      "batch1_agreement": {
@@ -41,20 +40,19 @@
       "checked": 16
      },
      "labels": {
-      "FAVORABLE": 8340,
-      "PARSE_FAIL": 294,
-      "UNCLEAR": 1,
-      "UNFAVORABLE": 7704
+      "FAVORABLE": 3901,
+      "PARSE_FAIL": 68,
+      "UNFAVORABLE": 2654
      },
-     "load_seconds": 14.1,
+     "load_seconds": 12.5,
      "overflow": 0,
      "revision": "5aec0aacc696f9526e12abe22a3fc96348dfca1d",
-     "scored": 16339,
+     "scored": 6623,
      "stops": {
-      "eos": 16047,
-      "label_decided": 292
+      "eos": 6555,
+      "label_decided": 68
      },
-     "to_score": 16339
+     "to_score": 6623
     },
     "2017": {
      "batch1_agreement": {
@@ -62,19 +60,19 @@
       "checked": 16
      },
      "labels": {
-      "FAVORABLE": 10310,
-      "PARSE_FAIL": 6,
-      "UNFAVORABLE": 9729
+      "FAVORABLE": 3615,
+      "PARSE_FAIL": 5,
+      "UNFAVORABLE": 3007
      },
-     "load_seconds": 12.7,
+     "load_seconds": 10.9,
      "overflow": 0,
      "revision": "5f6b4ab1664bd5e658af44ad6b02183178b81b55",
-     "scored": 20045,
+     "scored": 6627,
      "stops": {
-      "eos": 20030,
-      "label_decided": 15
+      "eos": 6622,
+      "label_decided": 5
      },
-     "to_score": 20045
+     "to_score": 6627
     },
     "2018": {
      "batch1_agreement": {
@@ -82,17 +80,17 @@
       "checked": 16
      },
      "labels": {
-      "FAVORABLE": 16075,
-      "UNFAVORABLE": 5764
+      "FAVORABLE": 5082,
+      "UNFAVORABLE": 1679
      },
-     "load_seconds": 13.2,
+     "load_seconds": 8.5,
      "overflow": 0,
      "revision": "331c03be137a1a80f1a371232d3d6a9636f6ad9a",
-     "scored": 21839,
+     "scored": 6761,
      "stops": {
-      "eos": 21839
+      "eos": 6761
      },
-     "to_score": 21839
+     "to_score": 6761
     },
     "2019": {
      "batch1_agreement": {
@@ -100,20 +98,19 @@
       "checked": 16
      },
      "labels": {
-      "FAVORABLE": 15400,
-      "PARSE_FAIL": 59,
-      "UNCLEAR": 1,
-      "UNFAVORABLE": 14859
+      "FAVORABLE": 4203,
+      "PARSE_FAIL": 13,
+      "UNFAVORABLE": 4617
      },
-     "load_seconds": 13.3,
+     "load_seconds": 9.6,
      "overflow": 0,
      "revision": "4dfb7817915d07d0ed99815877186f827ec3b88e",
-     "scored": 30319,
+     "scored": 8833,
      "stops": {
-      "eos": 30262,
-      "label_decided": 57
+      "eos": 8820,
+      "label_decided": 13
      },
-     "to_score": 30319
+     "to_score": 8833
     },
     "2020": {
      "batch1_agreement": {
@@ -121,19 +118,17 @@
       "checked": 16
      },
      "labels": {
-      "FAVORABLE": 18138,
-      "PARSE_FAIL": 5,
-      "UNFAVORABLE": 16931
+      "FAVORABLE": 6289,
+      "UNFAVORABLE": 3594
      },
-     "load_seconds": 12.6,
+     "load_seconds": 9.6,
      "overflow": 0,
      "revision": "f8020c2c939645abbec9caf8a0cdd1d7806cb42a",
-     "scored": 35074,
+     "scored": 9883,
      "stops": {
-      "eos": 35070,
-      "label_decided": 4
+      "eos": 9883
      },
-     "to_score": 35074
+     "to_score": 9883
     },
     "2021": {
      "batch1_agreement": {
@@ -141,96 +136,146 @@
       "checked": 16
      },
      "labels": {
-      "FAVORABLE": 7871,
-      "PARSE_FAIL": 3415,
-      "UNCLEAR": 2,
-      "UNFAVORABLE": 30612
+      "FAVORABLE": 1846,
+      "PARSE_FAIL": 272,
+      "UNFAVORABLE": 7651
      },
-     "load_seconds": 12.0,
+     "load_seconds": 8.8,
      "overflow": 0,
      "revision": "7f3c7d0dccea060d96dfb89391ef830655b8dbaf",
-     "scored": 41900,
+     "scored": 9769,
      "stops": {
-      "eos": 38485,
-      "label_decided": 3415
+      "eos": 9497,
+      "label_decided": 272
      },
-     "to_score": 41900
+     "to_score": 9769
     },
     "2022": {
-     "batch1_agreement": null,
-     "labels": {
-      "FAVORABLE": 227,
-      "PARSE_FAIL": 8,
-      "UNCLEAR": 20,
-      "UNFAVORABLE": 6401
+     "batch1_agreement": {
+      "agree": 16,
+      "checked": 16
      },
-     "load_seconds": 18.3,
+     "labels": {
+      "FAVORABLE": 1388,
+      "PARSE_FAIL": 1,
+      "UNCLEAR": 4,
+      "UNFAVORABLE": 9556
+     },
+     "load_seconds": 8.7,
      "overflow": 0,
      "revision": "f1b8c4eb806a9fe7c26b7e5d30cf003304ed9281",
-     "scored": 6656,
+     "scored": 10949,
      "stops": {
-      "eos": 6645,
-      "label_decided": 11
+      "eos": 10948,
+      "label_decided": 1
      },
-     "to_score": 43045
+     "to_score": 10949
+    },
+    "2023": {
+     "batch1_agreement": {
+      "agree": 16,
+      "checked": 16
+     },
+     "labels": {
+      "FAVORABLE": 1938,
+      "PARSE_FAIL": 3546,
+      "UNCLEAR": 7,
+      "UNFAVORABLE": 5888
+     },
+     "load_seconds": 9.4,
+     "overflow": 0,
+     "revision": "2156f3ac9a36916773664266397682b951d43411",
+     "scored": 11379,
+     "stops": {
+      "eos": 10144,
+      "label_decided": 1235
+     },
+     "to_score": 11379
+    },
+    "2024": {
+     "batch1_agreement": {
+      "agree": 16,
+      "checked": 16
+     },
+     "labels": {
+      "FAVORABLE": 5126,
+      "PARSE_FAIL": 4404,
+      "UNCLEAR": 1147,
+      "UNFAVORABLE": 8768
+     },
+     "load_seconds": 12.6,
+     "overflow": 0,
+     "revision": "c162df20666475d125737e030943e18e10b3d91f",
+     "scored": 19445,
+     "stops": {
+      "eos": 19252,
+      "label_decided": 193
+     },
+     "to_score": 19445
     }
    },
    "labels": {
-    "FAVORABLE": 82863,
-    "PARSE_FAIL": 3800,
-    "UNCLEAR": 24,
-    "UNFAVORABLE": 97883
+    "FAVORABLE": 36158,
+    "PARSE_FAIL": 8309,
+    "UNCLEAR": 1158,
+    "UNFAVORABLE": 50703
    },
    "progress": {
-    "already_scored": 0,
+    "already_scored": 421293,
     "batch_size": 32,
     "decoder": "cached",
     "dtype": "float32",
-    "elapsed_seconds": 5845.9,
-    "eta_seconds": 5328.0,
-    "events_in_file": 449718,
-    "events_per_second": 31.57,
-    "finished_at": null,
+    "elapsed_seconds": 3514.4,
+    "eta_seconds": 0.0,
+    "events_in_file": 499608,
+    "events_per_second": 27.41,
+    "finished_at": "2026-09-25T09:11:45+00:00",
     "matmul": "highest",
     "max_gpu_memory_allocated_gib": 10.17,
-    "scored_this_run": 184570,
-    "started_at": "2026-09-25T04:19:43+00:00",
+    "scored_this_run": 96328,
+    "started_at": "2026-09-25T08:13:10+00:00",
     "template_sha256": "9ee4590bbe7d71190864d1b0331ce95848bcfb7977f48b3a50a0b24478401c8a",
-    "to_score": 352767,
-    "updated_at": "2026-09-25T05:57:09+00:00",
+    "to_score": 96328,
+    "updated_at": "2026-09-25T09:11:45+00:00",
     "variant": "hlmw_alpaca"
    },
    "stops": {
-    "eos": 180763,
-    "label_decided": 3807
+    "eos": 94540,
+    "label_decided": 1788
    }
   }
  },
  "schema": "sota-news-llm-receipt/1",
  "score_files": {
   "scores-20151231.jsonl": {
-   "rows": 12398
+   "rows": 24631
   },
   "scores-20161231.jsonl": {
-   "rows": 16339
+   "rows": 24458
   },
   "scores-20171231.jsonl": {
-   "rows": 20045
+   "rows": 28647
   },
   "scores-20181231.jsonl": {
-   "rows": 21839
+   "rows": 30721
   },
   "scores-20191231.jsonl": {
-   "rows": 30319
+   "rows": 43232
   },
   "scores-20201231.jsonl": {
-   "rows": 35074
+   "rows": 50240
   },
   "scores-20211231.jsonl": {
-   "rows": 41900
+   "rows": 58356
   },
   "scores-20221231.jsonl": {
-   "rows": 6656
+   "rows": 58095
+  },
+  "scores-20231231.jsonl": {
+   "rows": 69004
+  },
+  "scores-20241231.jsonl": {
+   "rows": 130237
   }
  }
 }

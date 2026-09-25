@@ -526,8 +526,54 @@
    "order": "liquid lane (352,767 events) then small lane (96,951)",
    "settings": "variant hlmw_alpaca, float32, TF32 off, cached decoder, batch 32, 3,072 batch tokens, --check-batch1 16",
    "throughput": "about 32-34 events/s, peak GPU 10.17 GiB",
-   "final": "fill from receipts/scoring-status.json (python3 receipts.py) when the unit finishes",
-   "delta": "after the unit, one incremental pass for new or changed events (same settings), then --check-batch1 16"
+   "final": {
+    "coverage": {
+     "overnight:liquid:rows=1": 228550,
+     "overnight:small:rows=1": 96328,
+     "rth:liquid:rows=1": 174730
+    },
+    "labels_by_window_lane": {
+     "overnight:liquid": {
+      "UNFAVORABLE": 118145,
+      "FAVORABLE": 81780,
+      "PARSE_FAIL": 24291,
+      "UNCLEAR": 4334
+     },
+     "overnight:small": {
+      "UNFAVORABLE": 50703,
+      "FAVORABLE": 36158,
+      "PARSE_FAIL": 8309,
+      "UNCLEAR": 1158
+     },
+     "rth:liquid": {
+      "FAVORABLE": 44242,
+      "UNFAVORABLE": 94447,
+      "PARSE_FAIL": 27203,
+      "UNCLEAR": 8838
+     }
+    },
+    "stale_rows_for_events_no_longer_selected": 18013,
+    "settings_on_event_rows": {
+     "hlmw_alpaca|float32|highest|cached": 499608
+    },
+    "batch1_agreement": {
+     "incremental_liquid_pass": "160/160 (16 per checkpoint)",
+     "incremental_small_pass": "160/160",
+     "first_unit": "16/16 on each finished checkpoint 2015-2021 before the CUDA fault"
+    },
+    "parse_fail_share": {
+     "overnight:liquid": 0.1063,
+     "overnight:small": 0.0863,
+     "rth:liquid": 0.1557
+    },
+    "check_scores": "evaluate.check_scores on the real events and rows (no prices): passed, 499,608 rows used, 0 unscored",
+    "finished_at": "2026-09-25T09:11Z (05:11 ET)"
+   },
+   "delta": "after the unit, one incremental pass for new or changed events (same settings), then --check-batch1 16",
+   "units": {
+    "sota-news-score-20260925T0419Z": "liquid lane of the superseded event build; stopped by a transient CUDA 'unknown error' at 02:01 ET after 184,570 events (batches are appended and fsynced, so nothing partial was kept)",
+    "sota-news-score-20260925T0603Z": "incremental pass on the rebuilt events (liquid, then small), same settings, --check-batch1 16"
+   }
   },
   "auctions_status": {
    "rows": 447671,
