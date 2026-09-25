@@ -1,0 +1,622 @@
+{
+  "schema_version": 1,
+  "id": "sota-refresh-20260925-markitdown",
+  "unit": "markitdown",
+  "host": "nativestack-5975wx-20260925",
+  "date_utc": "2026-09-25",
+  "baseline_version": "0.1.7",
+  "candidate_version": "0.1.8",
+  "upstream": {
+    "repository": "https://github.com/microsoft/markitdown",
+    "release": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
+    "tag_commit": "b8f79c57ebc0044be41323d89b2a45d3fda8460e",
+    "published_at": "2026-09-21T21:22:51Z",
+    "sdist": "https://files.pythonhosted.org/packages/11/60/2431842a40975524da12edd4d64dd7dc31ef56e209b4848ebf0b14ad1431/markitdown-0.1.8.tar.gz",
+    "wheel": "https://files.pythonhosted.org/packages/33/de/0b23cd8d8955221a39438ba8e4cf583e4f510fc79c6891fff88fb3e61198/markitdown-0.1.8-py3-none-any.whl"
+  },
+  "roles": {
+    "implementer": "Qualification unit of the 2026-09-25 SOTA-refresh workflow: installed the candidate into a new prefix and ran every step below for both arms without touching production.",
+    "verifier": "A separate agent that re-ran the implementer's steps from byte-identical copies of the scripts, checked integrity independently and returned the verdict and defects below.",
+    "coordinator": "The coordinating session that performed the production switch and the post-switch runs (coordinator observations).",
+    "writing_worker": "The session that assembled this directory; it performed only the read-only production read-back in out/readback.out."
+  },
+  "sanitization": "Session scratch paths are replaced by <impl>/$IMPL (the unit's scratch directory), <scratchpad> and <session-tmp>; the home directory by ~ and the account name by <user>. Session identifiers and tokens are not present. Files marked byte_identical_to_run_copy are the exact bytes that ran; for the others run_copy_sha256 is the digest of the unsanitized run copy, which stays in session scratch.",
+  "files": [
+    {
+      "path": "run_arm.py",
+      "sha256": "2fd719b4072648f24d902afdddfcbb247bc3e295e0699f4d0ea3c2c2547d36f6",
+      "bytes": 8277,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run_arm.py"
+    },
+    {
+      "path": "check_outputs.py",
+      "sha256": "fd24e9d1b774e7af5251970c5facd8c48e41a047f3df9a6d576dbb81a8b3620b",
+      "bytes": 1833,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/check_outputs.py"
+    },
+    {
+      "path": "ab-compare.json",
+      "sha256": "2e1c587cdba41bcf55acdcfcfa255b0d8d580f6b1d7edd9580f5f9d18121d59d",
+      "bytes": 11224,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/ab-compare.json"
+    },
+    {
+      "path": "steps-baseline.json",
+      "sha256": "4811aa664f44d5fb74cf374b690ce98ca0ddff131642b994b1c1143d698b44f1",
+      "bytes": 4585,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/steps-baseline.json"
+    },
+    {
+      "path": "steps-candidate.json",
+      "sha256": "c6f510ae62b6fecd900e8338c599243cc8c1f6985f92337a3275fefae26ab1b2",
+      "bytes": 4699,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/steps-candidate.json"
+    },
+    {
+      "path": "postswitch-out.json",
+      "sha256": "5d1de1a0c39eb90f4d70afef0995bbf09dceafeba499034c42058ee1c3a69bda",
+      "bytes": 4561,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/postswitch-out.json"
+    },
+    {
+      "path": "out/install.log",
+      "sha256": "98299a10cee552c8c60ac6b3bf387269e9c462f48ef4c8750070765b6266a488",
+      "bytes": 919,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "c18a803d4330bc300ba6961b6e5c873c2697bf645b8bf3cf0d7ea34baa948ba6",
+      "run_copy": "$IMPL/install.log"
+    },
+    {
+      "path": "out/postswitch.log",
+      "sha256": "8abcb49bd24fcde5504694e765035c16982640bffd2aebf9ee45cc7880bc85ec",
+      "bytes": 1868,
+      "byte_identical_to_run_copy": true,
+      "run_copy_sha256": "8abcb49bd24fcde5504694e765035c16982640bffd2aebf9ee45cc7880bc85ec",
+      "run_copy": "$IMPL/postswitch.log"
+    },
+    {
+      "path": "out/postswitch-attempt1.log",
+      "sha256": "2a7b7e9c8caeb1f13c46f8e749d389de1113c9a00dc87bb786fcdcefcbdee58d",
+      "bytes": 220,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "97039932f38b3436ab030a37013d360b8ff2f9b4db6623de0954ee7043af1aed",
+      "run_copy": "$IMPL/run-postswitch/run.log"
+    },
+    {
+      "path": "out/readback.out",
+      "sha256": "4f8297abbe4b468b1c53d79ed70274e9e40ff0e7510507764687db26ca6d7fd1",
+      "bytes": 463,
+      "byte_identical_to_run_copy": false,
+      "run_copy": "writing worker read-back (read-only), markitdown section"
+    }
+  ],
+  "not_published": [
+    {
+      "run_copy": "$IMPL/ab_compare.py",
+      "sha256": "1063aa9b9fdf2ede5cbe3c7f712db898033aa9e1dd3624df7be8e60c67cd24da",
+      "bytes": 6527,
+      "reason": "It embeds a host path; its output ab-compare.json is published byte-identical."
+    }
+  ],
+  "integrity": {
+    "artifact": "markitdown-0.1.8-py3-none-any.whl (89,737 bytes; the file uv installs) and markitdown-0.1.8.tar.gz (69,112 bytes; the artifact the pins file references)",
+    "expected": "wheel sha256 de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab; sdist sha256 17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed",
+    "actual": "wheel sha256 de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab; sdist sha256 17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed (sha256sum -c: both OK). Downloaded from files.pythonhosted.org at 2026-09-25T18:38:40Z, before the install started at 18:39:30Z. After install, the installed files were compared with the verified wheel: 45 of 45 non-RECORD members byte-identical, 0 missing; the wheel's RECORD is self-consistent (45 entries, 0 mismatches); uv added only INSTALLER and REQUESTED.",
+    "source": "PyPI JSON https://pypi.org/pypi/markitdown/0.1.8/json urls[].digests.sha256 and the PEP 691 Simple API https://pypi.org/simple/markitdown/ files[].hashes.sha256, both fetched 2026-09-25T18:38:31Z. They agree with each other and with the values the review and refuter recorded. Both files yanked=false; the release's PyPI vulnerabilities list is []. No PEP 740 attestation was checked (the research reports none exists).",
+    "verified": true
+  },
+  "steps": [
+    {
+      "name": "Pre-install integrity: PyPI JSON and Simple API digests, download, sha256sum -c",
+      "arm": "candidate",
+      "command": "curl -fsSL https://pypi.org/pypi/markitdown/0.1.8/json; curl -fsSL -H 'Accept: application/vnd.pypi.simple.v1+json' https://pypi.org/simple/markitdown/; curl -fsSL -o markitdown-0.1.8-py3-none-any.whl https://files.pythonhosted.org/packages/33/de/0b23cd8d8955221a39438ba8e4cf583e4f510fc79c6891fff88fb3e61198/markitdown-0.1.8-py3-none-any.whl; curl -fsSL -o markitdown-0.1.8.tar.gz https://files.pythonhosted.org/packages/11/60/2431842a40975524da12edd4d64dd7dc31ef56e209b4848ebf0b14ad1431/markitdown-0.1.8.tar.gz; sha256sum -c sha256-expected-pypi.txt",
+      "exit": 0,
+      "output_excerpt": "JSON and SIMPLE both list: wheel 89737 bytes de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab, sdist 69112 bytes 17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed, yanked=False; info.version 0.1.8; requires_python <3.15,>=3.10; vulnerabilities []. markitdown-0.1.8-py3-none-any.whl: OK; markitdown-0.1.8.tar.gz: OK",
+      "pass": true,
+      "observed_by": "implementer"
+    },
+    {
+      "name": "Install 0.1.8 as a uv tool into a new prefix (base package, no extras, --python 3.13, frozen with --exclude-newer)",
+      "arm": "candidate",
+      "command": "test ! -e ~/.local/share/codex-ecosystem/tools/markitdown-0.1.8 && mkdir ~/.local/share/codex-ecosystem/tools/markitdown-0.1.8 && UV_CACHE_DIR=$IMPL/uv-cache UV_PYTHON_DOWNLOADS=never UV_LINK_MODE=copy UV_TOOL_DIR=~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools UV_TOOL_BIN_DIR=~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin uv tool install --python 3.13 --exclude-newer 2026-09-25T17:00:00Z 'markitdown==0.1.8'   # uv 0.12.17; $IMPL=<scratchpad>/sota-refresh/impl/markitdown",
+      "exit": 0,
+      "output_excerpt": "Resolved 20 packages in 329ms; Prepared 20 packages; Installed 20 packages: beautifulsoup4==4.15.0 certifi==2026.7.22 charset-normalizer==3.5.1 click==8.5.0 defusedxml==0.7.1 flatbuffers==25.12.19 idna==3.20 magika==0.6.3 markdownify==1.2.3 markitdown==0.1.8 numpy==2.5.3 onnxruntime==1.30.0 packaging==26.3 protobuf==7.36.2 python-dotenv==1.2.3 requests==2.34.2 six==1.17.0 soupsieve==2.10 typing-extensions==4.16.0 urllib3==2.8.0; Installed 1 executable: markitdown (warning: prefix bin not on PATH)",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "out/install.log"
+    },
+    {
+      "name": "Post-install: installed files vs the hash-verified wheel",
+      "arm": "candidate",
+      "command": "python3 -B $IMPL/verify_installed.py $IMPL/artifacts/markitdown-0.1.8-py3-none-any.whl ~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools/markitdown/lib/python3.13/site-packages",
+      "exit": 0,
+      "output_excerpt": "wheel_members=46 record_entries_checked=45 record_mismatches=0; installed_identical=45 installed_differs=0 installed_missing=0 (RECORD excluded); installer_added_distinfo_files=INSTALLER,REQUESTED",
+      "pass": true,
+      "observed_by": "implementer"
+    },
+    {
+      "name": "Native read-back of the prefix install and receipt",
+      "arm": "candidate",
+      "command": "UV_NO_CACHE=1 UV_PYTHON_DOWNLOADS=never UV_TOOL_DIR=<prefix>/uv-tools UV_TOOL_BIN_DIR=<prefix>/bin uv tool list --show-version-specifiers --show-python --show-paths; grep -c exclude-newer <prefix>/uv-tools/markitdown/uv-receipt.toml",
+      "exit": 0,
+      "output_excerpt": "markitdown v0.1.8 [required: ==0.1.8] [CPython 3.13.15]; receipt: requirements markitdown ==0.1.8, python = \"3.13\", [tool.options] exclude-newer = \"2026-09-25T17:00:00Z\", link-mode = \"copy\"; exclude-newer count 1 (production receipt: 0)",
+      "pass": true,
+      "observed_by": "implementer"
+    },
+    {
+      "name": "L1 version == 'markitdown 0.1.8'",
+      "arm": "candidate",
+      "command": "~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin/markitdown --version",
+      "exit": 0,
+      "output_excerpt": "stdout='markitdown 0.1.8'",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-candidate.json"
+    },
+    {
+      "name": "L2 greeting.html -o greeting.md",
+      "arm": "candidate",
+      "command": "<prefix>/bin/markitdown ~/code/native-agent-stack-live/fixtures/greeting.html -o $IMPL/run-candidate/greeting.md",
+      "exit": 0,
+      "output_excerpt": "sha256=6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2 bytes=76 stderr=''",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-candidate.json"
+    },
+    {
+      "name": "L3 upstream-8k.html -o 8k.md",
+      "arm": "candidate",
+      "command": "<prefix>/bin/markitdown ~/code/native-agent-stack-live/blueprints/us-equities/catalyst-provenance/upstream-8k.html -o $IMPL/run-candidate/8k.md",
+      "exit": 0,
+      "output_excerpt": "sha256=b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977 bytes=5610 stderr=''",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-candidate.json"
+    },
+    {
+      "name": "L4 8-K stdout sha256 == a27f0f27 (retained at evidence/receipts/token-practice-artifacts-20260920.json:217)",
+      "arm": "candidate",
+      "command": "<prefix>/bin/markitdown ~/code/native-agent-stack-live/blueprints/us-equities/catalyst-provenance/upstream-8k.html | sha256sum",
+      "exit": 0,
+      "output_excerpt": "sha256=a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b bytes=5611 (the retained line 217 is candidate_artifact 5611 bytes for baseline input sha256 a1e7ca47..., the same fixture)",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-candidate.json"
+    },
+    {
+      "name": "L5 disc.html (exact printf from the corrected check) sha256 == 932d7f62",
+      "arm": "candidate",
+      "command": "printf '%s\\n' '<!doctype html><html><body>' '<p>First<u>word</u>Last</p>' '<p><a href=\"https://example.com/items/a%2Fb\">example</a></p>' '<p><strike>gone</strike></p>' '<p><img src=\"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7\" data-src=\"https://example.com/photo.jpg\" alt=\"A photo\"></p>' '</body></html>' > $IMPL/run-candidate/disc.html",
+      "exit": 0,
+      "output_excerpt": "sha256=932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e bytes=314",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-candidate.json"
+    },
+    {
+      "name": "L6 disc.html -o disc.md",
+      "arm": "candidate",
+      "command": "<prefix>/bin/markitdown $IMPL/run-candidate/disc.html -o $IMPL/run-candidate/disc.md",
+      "exit": 0,
+      "output_excerpt": "sha256=66a75a8cfa9cf61e0224f43680c915f40805b8a761ce809dc28ec5bc0ef76629 content='First<u>word</u>Last\\n\\n[example](https://example.com/items/a%2Fb)\\n\\n~~gone~~\\n\\n![A photo](https://example.com/photo.jpg)'",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-candidate.json"
+    },
+    {
+      "name": "L7 PDF refused on the base prefix (exit != 0, stderr names markitdown[pdf])",
+      "arm": "candidate",
+      "command": "<prefix>/bin/markitdown ~/code/native-agent-stack-live/blueprints/convergence-practice/document-ingestion/corpus/lumen-qualification.pdf -o $IMPL/run-candidate/pdf.md 2>$IMPL/run-candidate/pdf.err; grep -q 'markitdown\\[pdf\\]' pdf.err",
+      "exit": 1,
+      "output_excerpt": "exit 1; FileConversionException: PdfConverter threw MissingDependencyException ... * pip install 'markitdown[pdf]'; pdf.md not created; literal grep exit 0",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-candidate.json"
+    },
+    {
+      "name": "L8 reviewer checker check_outputs.py (sha256 fd24e9d1...): 12 PASS, exit 0",
+      "arm": "candidate",
+      "command": "python3 $IMPL/check_outputs.py $IMPL/run-candidate",
+      "exit": 0,
+      "output_excerpt": "PASS=12 FAIL=0",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-candidate.json"
+    },
+    {
+      "name": "L9 uv pip list == recorded 20-package set, no extras",
+      "arm": "candidate",
+      "command": "uv pip list --python <prefix>/uv-tools/markitdown/bin/python > $IMPL/run-candidate/pip-list.txt; grep -qiE '^(pdfminer-six|pdfplumber|mammoth|lxml|openpyxl|python-pptx|pandas|olefile|xlrd) '",
+      "exit": 0,
+      "output_excerpt": "packages=20 extras_found=[] diff_vs_recorded={}",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-candidate.json"
+    },
+    {
+      "name": "L10 optional consumer leg: document.html gives '# NativeStack evidence' and 'Scoped memory' (output not saved)",
+      "arm": "candidate",
+      "command": "<prefix>/bin/markitdown ~/.local/state/nativestack/final-acceptance/document.html",
+      "exit": 0,
+      "output_excerpt": "has_heading=True has_scoped_memory=True stdout_sha256=7bdfac14ff7a01f70a790edbcb5d522475b22aaa4f46ff95c10aa7da28f299fb bytes=70 input_sha256=f6f51dbb81d3a4c68334cb5ef2e4dfe2bfac3807e5508b0ad620c8a5c5967c2e",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-candidate.json"
+    },
+    {
+      "name": "L1 version == 'markitdown 0.1.8'",
+      "arm": "baseline",
+      "command": "~/.local/share/codex-ecosystem/bin/markitdown --version",
+      "exit": 0,
+      "output_excerpt": "stdout='markitdown 0.1.7' (expected discriminator failure for 0.1.7)",
+      "pass": false,
+      "observed_by": "implementer",
+      "output_file": "steps-baseline.json"
+    },
+    {
+      "name": "L2 greeting.html -o greeting.md",
+      "arm": "baseline",
+      "command": "~/.local/share/codex-ecosystem/bin/markitdown ~/code/native-agent-stack-live/fixtures/greeting.html -o $IMPL/run-baseline/greeting.md",
+      "exit": 0,
+      "output_excerpt": "sha256=6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2 bytes=76",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-baseline.json"
+    },
+    {
+      "name": "L3 upstream-8k.html -o 8k.md",
+      "arm": "baseline",
+      "command": "~/.local/share/codex-ecosystem/bin/markitdown ~/code/native-agent-stack-live/blueprints/us-equities/catalyst-provenance/upstream-8k.html -o $IMPL/run-baseline/8k.md",
+      "exit": 0,
+      "output_excerpt": "sha256=b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977 bytes=5610",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-baseline.json"
+    },
+    {
+      "name": "L4 8-K stdout sha256 == a27f0f27",
+      "arm": "baseline",
+      "command": "~/.local/share/codex-ecosystem/bin/markitdown ~/code/native-agent-stack-live/blueprints/us-equities/catalyst-provenance/upstream-8k.html | sha256sum",
+      "exit": 0,
+      "output_excerpt": "sha256=a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b bytes=5611",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-baseline.json"
+    },
+    {
+      "name": "L5 disc.html sha256 == 932d7f62",
+      "arm": "baseline",
+      "command": "(same printf) > $IMPL/run-baseline/disc.html",
+      "exit": 0,
+      "output_excerpt": "sha256=932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e bytes=314",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-baseline.json"
+    },
+    {
+      "name": "L6 disc.html -o disc.md",
+      "arm": "baseline",
+      "command": "~/.local/share/codex-ecosystem/bin/markitdown $IMPL/run-baseline/disc.html -o $IMPL/run-baseline/disc.md",
+      "exit": 0,
+      "output_excerpt": "sha256=177abc325d9996496390b3df367eec90f1a5ef2b8bb0d5d59b407a0ab09cec1d content='FirstwordLast\\n\\n[example](https://example.com/items/a/b)\\n\\ngone\\n\\n![A photo](data:image/gif;base64...)'",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-baseline.json"
+    },
+    {
+      "name": "L7 PDF refused (exit != 0, stderr names markitdown[pdf])",
+      "arm": "baseline",
+      "command": "~/.local/share/codex-ecosystem/bin/markitdown .../lumen-qualification.pdf -o $IMPL/run-baseline/pdf.md 2>$IMPL/run-baseline/pdf.err; grep -q 'markitdown\\[pdf\\]' pdf.err",
+      "exit": 1,
+      "output_excerpt": "exit 1; same MissingDependencyException message; pdf.md not created; literal grep exit 0",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-baseline.json"
+    },
+    {
+      "name": "L8 checker: 12 PASS, exit 0",
+      "arm": "baseline",
+      "command": "python3 $IMPL/check_outputs.py $IMPL/run-baseline",
+      "exit": 1,
+      "output_excerpt": "PASS=8 FAIL=4 failed=['v018_underline', 'v018_encoded_slash', 'v018_strike', 'v018_data_src'] (exactly the predicted 0.1.8 discriminators)",
+      "pass": false,
+      "observed_by": "implementer",
+      "output_file": "steps-baseline.json"
+    },
+    {
+      "name": "L9 uv pip list == recorded 20-package set, no extras",
+      "arm": "baseline",
+      "command": "uv pip list --python ~/.local/share/codex-ecosystem/python-tools/markitdown/bin/python > $IMPL/run-baseline/pip-list.txt",
+      "exit": 0,
+      "output_excerpt": "packages=20 extras_found=[] diff_vs_recorded={'markitdown': ('0.1.8', '0.1.7')} (only markitdown's own version differs)",
+      "pass": false,
+      "observed_by": "implementer",
+      "output_file": "steps-baseline.json"
+    },
+    {
+      "name": "L10 optional consumer leg",
+      "arm": "baseline",
+      "command": "~/.local/share/codex-ecosystem/bin/markitdown ~/.local/state/nativestack/final-acceptance/document.html",
+      "exit": 0,
+      "output_excerpt": "has_heading=True has_scoped_memory=True stdout_sha256=7bdfac14ff7a01f70a790edbcb5d522475b22aaa4f46ff95c10aa7da28f299fb bytes=70",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "steps-baseline.json"
+    },
+    {
+      "name": "A/B shared-output byte identity",
+      "arm": "both",
+      "command": "python3 -B $IMPL/ab_compare.py $IMPL/ab-compare.json (A1, A2)",
+      "exit": 0,
+      "output_excerpt": "greeting.md, 8k.md, 8-K stdout, consumer stdout: identical across arms; pip list minus markitdown: identical (21 lines); pdf.err differs only in traceback frame paths and source line numbers (e.g. __main__.py 254->259, _markitdown.py 306->349); literal grep 'markitdown\\[pdf\\]' exit 0 on both",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "ab-compare.json"
+    },
+    {
+      "name": "A/B transitive set byte identity (candidate env vs production 0.1.7 env, read-only)",
+      "arm": "both",
+      "command": "python3 -B $IMPL/ab_compare.py (A3: RECORD equality + per-file sha256 in both envs)",
+      "exit": 0,
+      "output_excerpt": "dists=19 record_equal=19 files_checked_each_env=1624 candidate_hash_mismatch=0 baseline_hash_mismatch=0",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "ab-compare.json"
+    },
+    {
+      "name": "Supplementary: every committed *.html in the live clone converted by both arms",
+      "arm": "both",
+      "command": "python3 -B $IMPL/ab_compare.py (A4: git ls-files '*.html' '*.htm' with GIT_OPTIONAL_LOCKS=0; stdout sha256 per arm)",
+      "exit": 0,
+      "output_excerpt": "live_head=ae30f94b796591760fc92b4a6d252f8e19e88caa files=19 identical=19 both_exit0=19 worktree_eq_head=19 non_ascii_after_4KiB=10; construct counts: <u> 0, <strike>/<s> 0, data-src 0, %HH hrefs 3 (the single %2F is in a query string), data: img 1",
+      "pass": true,
+      "observed_by": "implementer",
+      "output_file": "ab-compare.json"
+    },
+    {
+      "name": "Fixture provenance in the live clone (read-only)",
+      "arm": "both",
+      "command": "GIT_OPTIONAL_LOCKS=0 git -C ~/code/native-agent-stack-live diff --quiet {6752ede5,ae3d3d37} HEAD -- <3 fixtures>; git rev-parse HEAD:<f>; git hash-object <f>",
+      "exit": 0,
+      "output_excerpt": "fixtures unchanged 6752ede5..HEAD and ae3d3d37..HEAD (exit 0); worktree blob == HEAD blob for greeting.html 55a5f181, upstream-8k.html c6c2095d (sha256 a1e7ca47..., 32435 bytes), lumen-qualification.pdf 0c153df6",
+      "pass": true,
+      "observed_by": "implementer"
+    },
+    {
+      "name": "Production untouched: fingerprint before (18:38:02Z) vs after (18:42:42Z and after the timing probe)",
+      "arm": "production",
+      "command": "python3 -B $IMPL/fingerprint.py prod-fingerprint-{before,after,after2}.json",
+      "exit": 0,
+      "output_excerpt": "fields identical 16 of 16: env entries 2214, files 1956, pyc 243, env digest with mtimes b9f39e9616d8..., content digest e1835557f2c3..., receipt 4a26d4de7af7..., bin/markitdown -> python-tools/markitdown/bin/markitdown, bin listing 84a198c73939... (57 entries), managed python and uv default tool dirs unchanged",
+      "pass": true,
+      "observed_by": "implementer"
+    },
+    {
+      "name": "Timing probe with bytecode equalized (warmed PYTHONPYCACHEPREFIX in scratch, 3 runs each, 8-K)",
+      "arm": "both",
+      "command": "PYTHONPYCACHEPREFIX=$IMPL/pycache-<arm> <M> upstream-8k.html | sha256sum (x3 after warm-up)",
+      "exit": 0,
+      "output_excerpt": "candidate 412/395/406 ms, baseline 482/461/527 ms, hash a27f0f27487e on every run; candidate prefix .pyc count 0 (uv default no bytecode compile)",
+      "pass": true,
+      "observed_by": "implementer"
+    },
+    {
+      "name": "production switch (prefix flip)",
+      "arm": "production",
+      "command": "repoint ~/.local/share/codex-ecosystem/bin/markitdown to tools/markitdown-0.1.8/bin/markitdown; markitdown --version",
+      "exit": 0,
+      "output_excerpt": "'markitdown 0.1.8'. The 0.1.7 uv tool env python-tools/markitdown is untouched for rollback.",
+      "pass": true,
+      "observed_by": "coordinator"
+    },
+    {
+      "name": "post-switch legs, first attempt",
+      "arm": "production",
+      "command": "python3 -B run_arm.py postswitch-0.1.8 ~/.local/share/codex-ecosystem/bin/markitdown ... $IMPL/run-postswitch ...",
+      "exit": 1,
+      "output_excerpt": "AssertionError: RUN_DIR must be new (the run directory already existed); no leg ran.",
+      "pass": false,
+      "observed_by": "coordinator",
+      "output_file": "out/postswitch-attempt1.log"
+    },
+    {
+      "name": "L1 version == 'markitdown 0.1.8'",
+      "arm": "production (post-switch)",
+      "command": "\"~/.local/share/codex-ecosystem/bin/markitdown\" --version",
+      "exit": 0,
+      "output_excerpt": "stdout='markitdown 0.1.8'",
+      "pass": true,
+      "observed_by": "coordinator",
+      "output_file": "postswitch-out.json"
+    },
+    {
+      "name": "L2 greeting.html -o greeting.md",
+      "arm": "production (post-switch)",
+      "command": "\"~/.local/share/codex-ecosystem/bin/markitdown\" \"~/code/native-agent-stack-live/fixtures/greeting.html\" -o \"$IMPL/run-postswitch2/greeting.md\"",
+      "exit": 0,
+      "output_excerpt": "sha256=6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2 bytes=76 stderr=''",
+      "pass": true,
+      "observed_by": "coordinator",
+      "output_file": "postswitch-out.json"
+    },
+    {
+      "name": "L3 upstream-8k.html -o 8k.md",
+      "arm": "production (post-switch)",
+      "command": "\"~/.local/share/codex-ecosystem/bin/markitdown\" \"~/code/native-agent-stack-live/blueprints/us-equities/catalyst-provenance/upstream-8k.html\" -o \"$IMPL/run-postswitch2/8k.md\"",
+      "exit": 0,
+      "output_excerpt": "sha256=b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977 bytes=5610 stderr=''",
+      "pass": true,
+      "observed_by": "coordinator",
+      "output_file": "postswitch-out.json"
+    },
+    {
+      "name": "L4 8-K stdout sha256 == a27f0f27 (retained at evidence/receipts/token-practice-artifacts-20260920.json:217)",
+      "arm": "production (post-switch)",
+      "command": "\"~/.local/share/codex-ecosystem/bin/markitdown\" \"~/code/native-agent-stack-live/blueprints/us-equities/catalyst-provenance/upstream-8k.html\" | sha256sum",
+      "exit": 0,
+      "output_excerpt": "sha256=a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b bytes=5611",
+      "pass": true,
+      "observed_by": "coordinator",
+      "output_file": "postswitch-out.json"
+    },
+    {
+      "name": "L5 disc.html sha256 == 932d7f62",
+      "arm": "production (post-switch)",
+      "command": "printf '%s\\n' '<!doctype html><html><body>' '<p>First<u>word</u>Last</p>' '<p><a href=\"https://example.com/items/a%2Fb\">example</a></p>' '<p><strike>gone</strike></p>' '<p><img src=\"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7\" data-src=\"https://example.com/photo.jpg\" alt=\"A photo\"></p>' '</body></html>' > \"$IMPL/run-postswitch2/disc.html\"",
+      "exit": 0,
+      "output_excerpt": "sha256=932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e bytes=314",
+      "pass": true,
+      "observed_by": "coordinator",
+      "output_file": "postswitch-out.json"
+    },
+    {
+      "name": "L6 disc.html -o disc.md",
+      "arm": "production (post-switch)",
+      "command": "\"~/.local/share/codex-ecosystem/bin/markitdown\" \"$IMPL/run-postswitch2/disc.html\" -o \"$IMPL/run-postswitch2/disc.md\"",
+      "exit": 0,
+      "output_excerpt": "sha256=66a75a8cfa9cf61e0224f43680c915f40805b8a761ce809dc28ec5bc0ef76629 content='First<u>word</u>Last\\n\\n[example](https://example.com/items/a%2Fb)\\n\\n~~gone~~\\n\\n![A photo](https://example.com/photo.jpg)'",
+      "pass": true,
+      "observed_by": "coordinator",
+      "output_file": "postswitch-out.json"
+    },
+    {
+      "name": "L7 PDF refused (exit!=0, stderr names markitdown[pdf])",
+      "arm": "production (post-switch)",
+      "command": "\"~/.local/share/codex-ecosystem/bin/markitdown\" \"~/code/native-agent-stack-live/blueprints/convergence-practice/document-ingestion/corpus/lumen-qualification.pdf\" -o \"$IMPL/run-postswitch2/pdf.md\" 2>\"$IMPL/run-postswitch2/pdf.err\"",
+      "exit": 1,
+      "output_excerpt": "stderr_tail=[\"* pip install 'markitdown[all]'\", \"* pip install 'markitdown[pdf, ...]'\", '* etc.'] pdf.md_exists=False",
+      "pass": true,
+      "observed_by": "coordinator",
+      "output_file": "postswitch-out.json"
+    },
+    {
+      "name": "L8 check_outputs.py: 12 PASS, exit 0",
+      "arm": "production (post-switch)",
+      "command": "python3 \"check_outputs.py\" \"$IMPL/run-postswitch2\"",
+      "exit": 0,
+      "output_excerpt": "PASS=12 FAIL=0 failed=[]",
+      "pass": true,
+      "observed_by": "coordinator",
+      "output_file": "postswitch-out.json"
+    },
+    {
+      "name": "L9 uv pip list == recorded 20-package set, no extras",
+      "arm": "production (post-switch)",
+      "command": "uv pip list --python \"~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools/markitdown/bin/python\" > \"$IMPL/run-postswitch2/pip-list.txt\"",
+      "exit": 0,
+      "output_excerpt": "packages=20 extras_found=[] diff_vs_recorded={}",
+      "pass": true,
+      "observed_by": "coordinator",
+      "output_file": "postswitch-out.json"
+    },
+    {
+      "name": "L10 optional consumer leg: document.html has '# NativeStack evidence' and 'Scoped memory'",
+      "arm": "production (post-switch)",
+      "command": "\"~/.local/share/codex-ecosystem/bin/markitdown\" \"~/.local/state/nativestack/final-acceptance/document.html\"",
+      "exit": 0,
+      "output_excerpt": "has_heading=True has_scoped_memory=True stdout_sha256=7bdfac14ff7a01f70a790edbcb5d522475b22aaa4f46ff95c10aa7da28f299fb bytes=70 input_sha256=f6f51dbb81d3a4c68334cb5ef2e4dfe2bfac3807e5508b0ad620c8a5c5967c2e",
+      "pass": true,
+      "observed_by": "coordinator",
+      "output_file": "postswitch-out.json"
+    },
+    {
+      "name": "post-switch arm result",
+      "arm": "production (post-switch)",
+      "command": "run_arm.py summary",
+      "exit": 0,
+      "output_excerpt": "ARM postswitch-0.1.8 overall_pass=True legs=10 passed=10",
+      "pass": true,
+      "observed_by": "coordinator",
+      "output_file": "out/postswitch.log"
+    },
+    {
+      "name": "read-back of the switched state",
+      "arm": "production",
+      "command": "bash readback.sh (read-only; TMPDIR in scratch)",
+      "exit": 0,
+      "output_excerpt": "bin/markitdown -> ~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin/markitdown; 'markitdown 0.1.8'; prefix uv-receipt requires ==0.1.8 and has 1 exclude-newer line; the rollback env python-tools/markitdown requires ==0.1.7 and prints 'markitdown 0.1.7'. The two markitdown calls left .ses and mat-debug-<pid>.log files in the scratch TMPDIR (verifier defect 1 reproduced).",
+      "pass": true,
+      "observed_by": "writing_worker",
+      "output_file": "out/readback.out"
+    }
+  ],
+  "differences": [
+    "No regression found on the stack's HTML path. greeting.md (6196d91e...), 8k.md (b434cd31...), the 8-K stdout (a27f0f27..., which equals the retained repository hash) and the consumer document output (7bdfac14...) are byte-identical across both arms. All 19 committed HTML files at live HEAD ae30f94b converted identically, including 10 with non-ASCII bytes after 4 KiB.",
+    "The baseline failing is the designed discrimination, not a fault. 0.1.7 fails exactly the version leg ('markitdown 0.1.7'), the 4 v018 checker lines (8 PASS / 4 FAIL, exit 1) and the markitdown version in the pip set. It passes all 7 version-independent legs.",
+    "Intended 0.1.8 output changes, seen only on the synthetic discriminator: <u> is kept as inline HTML ('First<u>word</u>Last' vs 0.1.7 'FirstwordLast'); a %2F path escape is preserved ('items/a%2Fb' vs 0.1.7 'items/a/b'); <strike> becomes '~~gone~~' (vs 'gone'); data-src is preferred over a data: placeholder (vs '![A photo](data:image/gif;base64...)'). A consumer that asserts no raw HTML tags would now see <u> on underlined input.",
+    "The PDF refusal message is unchanged: the same MissingDependencyException naming markitdown[pdf]. Only the traceback frame paths and source line numbers differ.",
+    "The transitive set is byte-identical, not just version-equal: 19 distributions, 1,624 recorded files verified in each env, 0 mismatches.",
+    "Prefix bookkeeping differs from production. The candidate uv-receipt.toml has python = \"3.13\" and a [tool.options] table (exclude-newer = \"2026-09-25T17:00:00Z\", link-mode = \"copy\"), and its venv home is the managed minor-version link cpython-3.13-linux-x86_64-gnu. Production's receipt has python = \"3.13.15\", no options table, and home cpython-3.13.15-linux-x86_64-gnu. Both run CPython 3.13.15. The exclude-newer option would freeze `uv tool upgrade` inside this prefix, as the refuter's defect predicted.",
+    "First-run wall time was higher for the candidate (0.55-0.69 s vs 0.29-0.43 s per call) because the fresh prefix has 0 .pyc files and the runs disabled bytecode writes, while production already has 243. With bytecode equalized in scratch, the candidate took 395-412 ms against 461-527 ms for the baseline, so this is not a 0.1.8 regression.",
+    "The corpus is larger than the refuter measured: 19 committed HTML files at ae30f94b, against 16 at ae3d3d37."
+  ],
+  "production_untouched_during_qualification": "A read-only fingerprint of production state was taken before any change (18:38:02Z) and after the runs (18:42:42Z, and again after the timing probe). All 16 fields are identical:\n- The python-tools/markitdown env: 2,214 entries, 1,956 files, 243 .pyc; a digest including mtimes b9f39e9616d8ea710ba773327ceec79ec7e540a7f98743264df4103e39c4dba6 and a content digest e1835557f2c3cc2326d8c9571c00d63390a48d919fc938eda339b6245ae660fc.\n- uv-receipt.toml sha256 4a26d4de7af7980d494834ab3e94c363c074642bfa2a39be0499fa7947d57167 (exclude-newer count 0) and pyvenv.cfg sha256 8bd6313d...\n- ~/.local/share/codex-ecosystem/bin/markitdown still points to python-tools/markitdown/bin/markitdown, and the bin listing (57 entries, with link targets and mtimes) hashes to 84a198c739396a0a2ea3c12bb96e9e20a45cc585bdb03b05ca08cf145052aec9.\n- The python-tools top level, the ~/.local/share/uv top level, the managed-Python entries (the cpython-3.13 link predates the run) and the default uv tools dir are unchanged.\n\nHow the runs stayed off production:\n- Baseline runs used PYTHONDONTWRITEBYTECODE=1, and the .pyc count is unchanged.\n- uv ran with UV_PYTHON_DOWNLOADS=never and a private scratch cache. No user or system uv config exists and no UV_/PIP_/PYTHON variables are exported (a names-only check), so the index was PyPI's default.\n- The live clone was accessed only with read-only git plumbing under GIT_OPTIONAL_LOCKS=0 (rev-parse, cat-file, tree-to-tree diff, hash-object without -w, ls-files, log). HEAD was ae30f94b before and after.\n\nNot touched:\n- systemd units, drop-ins and services; ~/.claude, ~/.codex, MCP configs and hooks.\n- the ai-memory store, Qdrant and dagu.\n- the GPU, embedding and generation servers.\n- No server was started.",
+  "switch": {
+    "method": "Prefix flip (the switch procedure's alternative route): bin/markitdown repointed to the qualification prefix tools/markitdown-0.1.8, a uv tool layout (UV_TOOL_DIR=<prefix>/uv-tools, UV_TOOL_BIN_DIR=<prefix>/bin). The refuter's primary route (install_pin's form into python-tools without --exclude-newer) was not used.",
+    "prefix_receipt": "requirements markitdown ==0.1.8, python \"3.13\", [tool.options] exclude-newer = \"2026-09-25T17:00:00Z\", link-mode = \"copy\"",
+    "rollback": {
+      "current": "Since the coordinator's prefix flip, roll back by atomically re-pointing ~/.local/share/codex-ecosystem/bin/markitdown to python-tools/markitdown/bin/markitdown (the 0.1.7 env, untouched; `ln -sn` to a temporary name, then `mv -T`), then repeat the checks of step 2 under 'After a primary-route promotion' in the historical text below: 'markitdown 0.1.7', disc.md 'FirstwordLast' (checker 8 PASS / 4 FAIL), 8-K stdout sha256 a27f0f27..., pip list equal to run-baseline/pip-list.txt.",
+      "historical_qualification_text": {
+        "written": "at qualification time (2026-09-25 18:38-18:42Z), before the coordinator's production switch; its opening 'nothing to roll back in production, because it was never switched' was true only then",
+        "text": "Now: nothing to roll back in production, because it was never switched.\n\nAfter a primary-route promotion:\n1. Run `UV_TOOL_DIR=~/.local/share/codex-ecosystem/python-tools UV_TOOL_BIN_DIR=~/.local/share/codex-ecosystem/bin uv tool install --python 3.13 'markitdown==0.1.7'` (no --exclude-newer).\n2. Expect `markitdown --version` to print 'markitdown 0.1.7' and disc.md to read 'FirstwordLast' (checker 8 PASS / 4 FAIL, exit 1). Expect the 8-K stdout sha256 to be a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b and pip-list to equal run-baseline/pip-list.txt.\n3. Revert the pins, stack, recipe and landscape entries to 0.1.7 (sdist sha256 4d1f3c69cd43b82288fdc3653686d759dcf355ee7c681aa6a855aed98a1e4f44).\n\nAfter a prefix flip:\n1. Atomically re-point ~/.local/share/codex-ecosystem/bin/markitdown to ~/.local/share/codex-ecosystem/python-tools/markitdown/bin/markitdown (ln -sn to a temporary name, then mv -T). That env was fingerprinted unchanged: content digest e1835557...\n2. Repeat the same checks.\n\nTo discard the qualification prefix (an orchestrator decision, not done here):\n1. Run `UV_TOOL_DIR=~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools UV_TOOL_BIN_DIR=~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin uv tool uninstall markitdown`.\n2. Check `test ! -e ~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin/markitdown`.\n3. Remove only that literal prefix directory."
+      }
+    }
+  },
+  "verifier": {
+    "verdict": "agree",
+    "production_touched": false,
+    "defects": [
+      {
+        "claim": "Running markitdown in either arm writes files outside the scratch area, and the implementer did not disclose this. Its production_untouched_proof and scratch_cleanup describe the runs as staying in scratch.",
+        "evidence": "Importing onnxruntime 1.30.0's native module (onnxruntime_pybind11_state*.so; `strings` shows '.ses' and 'mat-debug-') creates $TMPDIR/.ses (51 bytes: a timestamp and a UUID) and an empty $TMPDIR/mat-debug-<pid>.log. Measured with TMPDIR set to scratch: `python -c pass` and `import numpy` created 0 new files, `import onnxruntime.capi._pybind_state` created 2, and `markitdown --version` also creates them. TMPDIR is unset on this host, so the implementer's runs wrote to /tmp: 62 empty mat-debug-*.log files there have mtimes 18:38-18:45Z, consistent with its roughly 60 invocations. This is not production state and is harmless, and 0.1.7 does the same because onnxruntime is byte-identical in both environments. The next run should set TMPDIR to scratch, or the receipt should disclose the effect.",
+        "severity": "minor"
+      },
+      {
+        "claim": "The corrected check's no-extras grep does not catch every markitdown extra. Only the implementer's added L9 check, which requires exact equality with the 20-package set, closes that gap, and the receipt should name that check as the gate.",
+        "evidence": "In mutation tests on scratch copies of pip-list.txt, adding 'mammoth 1.11.0' and 'lxml 6.1.3' was caught by the grep (rc 0). Adding 'azure-identity' (from the [az-doc-intel] extra) was missed by the grep (rc 1) but caught by the equality comparison (cmp rc 1). The grep list also omits pydub, SpeechRecognition and youtube-transcript-api.",
+        "severity": "minor"
+      },
+      {
+        "claim": "The claim's wording 'passed all 10 legs of the refuter's corrected acceptance check' is loose.",
+        "evidence": "L1-L10 is the implementer's own numbering. L10 is the refuter's optional consumer leg. The corrected check's install line ran separately and with deviations the rules required: <prefix>/uv-tools plus <prefix>/bin instead of $RUN_DIR/uv-tools plus uv-bin, UV_LINK_MODE=copy added (it appears in the receipt as link-mode = \"copy\"), and UV_CACHE_DIR in the impl dir. These are disclosed elsewhere in the result. A more precise wording is 'passed the corrected check's post-install legs and its optional consumer leg'. The substance is reproduced: my verbatim run of those post-install lines exits 0.",
+        "severity": "minor"
+      },
+      {
+        "claim": "Some numbers in the result's steps and regressions sections exist only in the returned JSON, with no retained output file. None of them is in receipt_draft.claim.",
+        "evidence": "The impl dir holds no retained output for the timing probe (candidate 412/395/406 ms, baseline 482/461/527 ms), the uv cache clean (1,764 files, 161.6 MiB) or the corpus construct counts. I reproduced the construct counts from git cat-file copies of the 19 files at ae30f94b: <u> 0, <strike>/<s> 0, data-src 0, %HH hrefs 3 with the one %2f in a query string, data: img 1. The timing and cleanup figures cannot be reproduced after the fact.",
+        "severity": "minor"
+      }
+    ],
+    "reproduced": [
+      "Artifact integrity, checked independently at 18:51:26Z: PyPI JSON and the PEP 691 Simple API both list the wheel at 89,737 bytes with sha256 de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab and the sdist at 69,112 bytes with sha256 17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed, both yanked=false, vulnerabilities []. A fresh wheel download from files.pythonhosted.org passes `sha256sum -c` and is byte-identical to the implementer's copy. The wheel's RECORD is self-consistent (45 of 45). There is no PEP 740 attestation: the Simple API provenance field is null, and the integrity/provenance endpoint returns HTTP 404 for both files (19:00:25Z).",
+      "The integrity check came before the install: the implementer's PyPI JSON was fetched at 18:38:31Z and the wheel and sdist downloaded at 18:38:40-41Z. install-started.txt reads 18:39:30Z, and the prefix directory's birth time is 18:39:30.98Z, so the prefix was new.",
+      "Prefix integrity: 45 of 45 wheel members (RECORD excluded) are byte-identical to the installed files, and uv added only INSTALLER and REQUESTED. The installed RECORD entries of all 20 distributions verify: 1,680 OK, 0 bad. The only site-packages files outside any RECORD are _virtualenv.pth and _virtualenv.py. The prefix has 0 .pyc files and 0 hardlinks (copy mode), and no entry is newer than the install time 18:39:32Z, checked again after all my runs. The receipt says ==0.1.8, python \"3.13\", exclude-newer \"2026-09-25T17:00:00Z\", link-mode \"copy\". pyvenv.cfg says uv = 0.12.17 and version_info = 3.13.15. `uv tool list` prints 'markitdown v0.1.8 [required: ==0.1.8] [CPython 3.13.15]'. The prefix is 160M, and uv on PATH is 0.12.17.",
+      "Re-ran the refuter's corrected_acceptance_check verbatim from --version through the no-extras grep against <prefix>/bin/markitdown. It used a new scratch RUN_DIR, fixture copies whose git blob hashes match HEAD (55a5f181, c6c2095d, 0c153df6), and the reviewer checker (sha256 fd24e9d1...). Exit 0.",
+      "Candidate legs, reproduced exactly:\n- L1 printed 'markitdown 0.1.8'.\n- greeting.md 6196d91e... (76 bytes); 8k.md b434cd31... (5,610 bytes); 8-K stdout a27f0f27... (5,611 bytes).\n- disc.html 932d7f62... (314 bytes); disc.md 66a75a8c... with 'First<u>word</u>Last', '[example](https://example.com/items/a%2Fb)', '~~gone~~' and '![A photo](https://example.com/photo.jpg)'.\n- The PDF exits 1, grep 'markitdown\\[pdf\\]' returns rc 0, and no pdf.md is written.\n- The checker prints PASS=12 and exits 0.\n- uv pip list shows 20 packages, no extras, and equals the refuter's recorded set.\n- The consumer document.html (input sha256 f6f51dbb...) gives stdout 7bdfac14... (70 bytes) with both markers.",
+      "Baseline 0.1.7 legs (production executable, run read-only with PYTHONDONTWRITEBYTECODE=1), reproduced exactly:\n- --version prints 'markitdown 0.1.7'.\n- The same greeting, 8k.md, 8-K stdout and consumer hashes.\n- disc.md 177abc32... ('FirstwordLast', 'items/a/b', 'gone', data: img).\n- The checker gives PASS=8 FAIL=4 (v018_underline, v018_encoded_slash, v018_strike, v018_data_src) and exits 1.\n- The PDF refusal is the same, with no extras.\n- The pip list differs from the candidate's only on the markitdown line.",
+      "All 14 of my run outputs (7 files per arm: greeting.md, 8k.md, 8k.stdout.md, disc.html, disc.md, pip-list.txt and pdf.err) are byte-identical to the implementer's recorded run-candidate and run-baseline files. The two arms' pdf.err files differ only in traceback paths and line numbers (__main__.py 259 vs 254, _markitdown.py 349 vs 306, 403 vs 360, 694 vs 649).",
+      "Transitive set byte identity: the 19 non-markitdown distributions have the same names and equal RECORDs, covering 1,624 site-packages files. The production env's RECORD hashes verify with 0 mismatches, and the candidate and production files show 0 byte differences.",
+      "Corpus: extracted all 19 committed *.html/*.htm files at ae30f94b with git cat-file into scratch and converted each with both arms. 19 of 19 match the recorded A4 exit code, sha256 and byte count for each arm, and the two arms are identical on 19 of 19. The committed HTML set is unchanged from ae30f94b to the current live HEAD 7783682f.",
+      "Line 217 of evidence/receipts/token-practice-artifacts-20260920.json holds candidate_artifact sha256 a27f0f27... (5,611 bytes) for input a1e7ca47..., in both the live clone and the working checkout. The fixtures and that receipt are unchanged from ae30f94b to HEAD.",
+      "The acceptance discriminates (mutation tests on scratch copies):\n- An onnxruntime shadowed by a failing stub: the corrected check exits 1.\n- Production 0.1.7 passed off as the candidate: exit 1.\n- [docx] extras in pip-list: detected.\n- A one-byte drift in 8k.md: the checker exits 1 (8k_chars_5535, 8k_sha256).\n- An [az-doc-intel] extra: detected only by the 20-package equality check.",
+      "Production untouched:\n- Production fingerprint (the implementer's read-only fingerprint.py) is 16 of 16 fields identical to the implementer's 18:38:02Z 'before' at 18:53:35Z, 18:57:21Z and 19:00:33Z, the last two taken after my own baseline and corpus runs.\n- bin/markitdown still points to python-tools/markitdown/bin/markitdown, and no bin entry has been modified since 18:30Z.\n- Production uv-receipt.toml: ==0.1.7, python \"3.13.15\", exclude-newer count 0.\n- Services: 12 running user services are all active. Each ActiveEnterTimestamp predates the run (the latest is native-stack-embeddings at 15:52:14Z), and start times and MainPIDs were identical across three checks. There are no failed units.\n- Configs: the newest systemd unit-file mtime is 18:33:13Z (another session's host-requests-workstation units from ae30f94b). Hook and client configs (~/.claude/settings.json 18:33:47Z; ~/.codex/config.toml and hooks.json from Sep 23-24) predate the run and contain 0 markitdown references (count-only grep).\n- Live clone: the reflog shows HEAD at ae30f94b from 18:33:08Z to 18:43:54Z, which covers the implementer's runs; the host's periodic 'checkout to origin/main' then moved it.\n- Leftovers: no markitdown process is running. The implementer's uv-cache and pycache dirs, and the private store dir, are absent. The research files are unchanged (acceptance.sh 63bb7c14..., check_outputs.py fd24e9d1...)."
+    ],
+    "notes": "I agree with the implementer's result. Every number and statement in receipt_draft.claim traces to a recorded output, and I reproduced every material value myself:\n- the digests and sizes;\n- the 45/45 wheel equality;\n- uv 0.12.17 and CPython 3.13.15 (from pyvenv.cfg and uv tool list);\n- 20 packages resolved (install.log);\n- all fixture, stdout, discriminator and consumer hashes;\n- checker 12/0 on the candidate and 8/4 on the baseline;\n- the 19 distributions and 1,624 files;\n- the 19-file corpus at ae30f94b;\n- the production fingerprint;\n- the 18:38-18:42Z window, from the timestamps of the recorded files.\n\nThe host id and the phrase \"qualifies ... does not promote\" come from the task context and the research. Nothing in the claim is unsupported, so all defects are minor.\n\n**How I verified:**\n- Everything ran read-only against the installed prefix and the production 0.1.7 environment, with PYTHONDONTWRITEBYTECODE=1 and TMPDIR plus UV_CACHE_DIR pointed at my scratch dir.\n- Downloads came only from pypi.org and files.pythonhosted.org.\n- I installed and switched nothing, started no server, and made no GPU or embedding requests.\n- I removed my scratch temp and cache dirs by literal path.\n- My evidence is kept under <scratchpad>/sota-refresh/impl/markitdown/verify/: independent-integrity.json, verbatim-candidate.log, legs-candidate.log, legs-baseline.log, corpus-rerun.json, the mut/ logs, prod-fingerprint-verifier-{pre,post,final}.json, units-{pre,post,final}.tsv, the fresh wheel and PyPI JSON under dl/, and the scripts.\n\n**Research items I closed** that the implementer had left unverified: PyPI publishes no PEP 740 attestation for either file (Simple API provenance is null; the integrity endpoint returns 404 at 19:00:25Z).\n\n**Discrimination:** the 0.1.7 baseline fails exactly the 0.1.8-specific legs, and all version-independent legs match. Mutations for a broken dependency, a stale environment, extras present and a one-byte output drift all fail.\n\n**Residual caveats:**\n- The ai-memory, Qdrant and dagu stores have no before/after fingerprint, and concurrent sessions write to them. \"Untouched\" rests on command scope: none of the implementer's scripts or commands reference them, and markitdown is a stateless CLI.\n- ~/.claude/settings.json changed at 18:33:47Z, about 8 seconds before the implementer's first recorded file (18:33:55Z) and during another session's host-request lane deployment. It contains no markitdown reference, and I did not attribute the change further.\n- The implementer's disclosed stray review dump in the research folder was moved; the research files' hashes are unchanged.\n- Still unverified: the upstream `hatch test` run on this host, and tag-tree blob equality (research-reported).\n- The promotion gate was correctly left for the orchestrator. The switch procedure matches install_uv_tool's form in adoption/bootstrap-linux.sh:338-342 and the pin entries it names: tools[10], components[18], recipes/README.md:97."
+  },
+  "unverified": [
+    "The upstream test suite (`hatch test --python 3.13` at v0.1.8 with the [all] dependencies) was not run on this host.",
+    "I did not re-verify that the artifacts match the v0.1.8 tag tree (git blob equality with commit b8f79c57) or the upstream CI pass on PR #2545; both come from the review and refuter.",
+    "I did not recheck that PyPI has no PEP 740 attestation for 0.1.8; that is research-reported.",
+    "Whether uv validates index-provided hashes during `uv tool install` is unknown. It is not needed here, because the installed bytes were compared with the verified wheel directly.",
+    "The install_pin-form promotion (without --exclude-newer) was not run. Its transitive set equals the qualified one only while no newer compatible dependency release appears after 2026-09-25T17:00:00Z.",
+    "How a later install_pin run interacts with a prefix-flipped bin/markitdown symlink was not tested.",
+    "The output effect on real filings containing <u>, <strike>, path %2F escapes or data-src images was not measured; the committed corpus has none in affected positions.",
+    "The timing comparison is 3 runs per arm on a shared host; treat those numbers as run-to-run observations only."
+  ]
+}

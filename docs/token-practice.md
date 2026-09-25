@@ -151,7 +151,7 @@ Desktop WSL, native Claude and native Codex Context Mode runtime scopes.
 
 | Upstream command/tool | Native scope | Interpretation |
 | --- | --- | --- |
-| rtk gain --format json | Retained command-history estimates | Installed 0.49.0 defaults history_days to 90; this is not a forever ledger or provider accounting. |
+| rtk gain --format json | Retained command-history estimates | Installed 0.50.0, like 0.49.0, defaults history_days to 90; this is not a forever ledger or provider accounting. |
 | rtk gain --project --format json | Same history, selected project | A subset of the all-history view, not another total to add. |
 | toon input.json --stats -o output.toon | One conversion | TOON 4.1.1 uses tokenx 1.3.0 estimates here; no native cross-run savings ledger. Exact o200k_base recount is separate. |
 | Context Mode ctx_stats | Connection/session and reported lifetime estimates | Session estimates differ from lifetime event-count × 256-token heuristics; neither is exact provider usage. A new Inspector connection has its own session. |
@@ -161,6 +161,13 @@ The reviewed RTK retained-history snapshot reported 46 commands, 11,509 input,
 9,852 output and 1,657 estimated saved tokens (14.3974%). Its project view
 reported 11 commands, 3,949 input, 3,749 output and 200 estimated saved.
 These are dated upstream estimates, not maintained live counters.
+
+RTK 0.50.0 can store negative per-command savings and clamps them to 0 when
+reading. If a host rolls back to 0.49.0 while such rows exist, 0.49.0 shows
+them as values near 1.8e19 in `rtk gain --history` and `--all` (including
+`--all --format json|csv`); in the qualification test, plain
+`rtk gain --format json` showed none
+([receipt](../evidence/receipts/rtk-050-qualification-20260925.json)).
 
 The reviewed Headroom ledger returned zero calls and zero tokens in its capped
 reporting window. Its separate local guard passed seven fixtures. A zero ledger

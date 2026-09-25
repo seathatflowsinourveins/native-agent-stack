@@ -4702,8 +4702,8 @@
     },
     {
       "component_id": "markitdown",
-      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.7",
-      "version": "0.1.7",
+      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
+      "version": "0.1.8",
       "profile": "supporting",
       "role": "Convert supported source documents to readable Markdown",
       "installation_assessment": "runtime present at retained native operation date",
@@ -4747,6 +4747,11 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "markitdown-018-qualification-20260925",
+            "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -7308,8 +7313,8 @@
     },
     {
       "component_id": "rtk",
-      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
-      "version": "0.49.0",
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+      "version": "0.50.0",
       "profile": "core",
       "role": "Compact supported command outputs, retain failure/raw recovery",
       "installation_assessment": "runtime present at retained native operation date",
@@ -7403,6 +7408,11 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "rtk-050-qualification-20260925",
+            "path": "evidence/receipts/rtk-050-qualification-20260925.json",
             "kind": "native_cli_e2e"
           }
         ],

@@ -1,0 +1,4 @@
+PASS  native binary hook registered in settings.json
+      command: rtk hook claude
+      (no script file — integrity check not applicable)
+154/154 tests passed

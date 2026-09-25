@@ -24,7 +24,7 @@ import xml.etree.ElementTree as ET
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PINS = {"rtk": "0.49.0", "qmd": "2.8.3", "repomix": "1.18.1", "toon": "4.1.1"}
+PINS = {"rtk": "0.50.0", "qmd": "2.8.3", "repomix": "1.18.1", "toon": "4.1.1"}
 PACKAGES = {"qmd": "@tobilu/qmd", "repomix": "repomix", "toon": "@toon-format/cli"}
 
 

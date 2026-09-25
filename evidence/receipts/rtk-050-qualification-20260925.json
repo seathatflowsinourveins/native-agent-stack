@@ -1,0 +1,453 @@
+{
+  "schema_version": 1,
+  "id": "rtk-050-qualification-20260925",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-25T20:30:00Z",
+  "component_ids": [
+    "rtk"
+  ],
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-25, rtk 0.50.0 was qualified against the installed 0.49.0 on the Claude Code hook path and then switched into production. The rtk-ai/rtk v0.50.0 asset rtk-x86_64-unknown-linux-musl.tar.gz hashed to sha256 bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89, equal to its checksums.txt line (sha256sum --check --strict: OK) and to the GitHub API asset digest, and was installed into a new tools/rtk-0.50.0 prefix (binary sha256 23433a2a50bdeb12199cadd4b94b639238d6c38529fcba1c30c9295db5fa9517). Driving `rtk hook claude` with Claude PreToolUse JSON and scratch data directories, the hash-pinned acceptance scripts gave 42 PASS / 0 FAIL / 1 NOTE (v2, sha256 186dd891...) and 88 PASS / 0 FAIL / 4 NOTE (v3.1, sha256 3644a0dc...) for 0.50.0, against 34/8/1 and 79/9/4 for 0.49.0; v3.1 rejected two broken fake candidates (4/100/11 and 17/85/11), and `rtk verify` passed 154/154 on both versions. An independent verifier re-ran these, reproduced the outputs line for line and agreed. The coordinator then repointed bin/rtk to the new prefix (`rtk --version`: rtk 0.50.0) and created ~/.config/rtk/config.toml with `exclude_commands = [\"^git show [^ ]*:\", \"diff\"]`. v3.1 on the production binary gave 87 PASS / 1 FAIL / 3 NOTE with that config, the one FAIL ('blob not windowed/announced') being the exclusion taking effect, and 88 PASS / 0 FAIL / 4 NOTE with an empty XDG_CONFIG_HOME.",
+  "limitations": [
+    "0.50.0 blob-window defect: through the hook, `git show <rev>:<path> | tail -n K` returns lines from the ~8 KiB blob window plus a '[see remaining: rtk proxy git show ...]' hint instead of the end of the file (fixture: rows 1030-1033 plus the hint, where native git and 0.49.0 print rows 3996-4000). Neither acceptance script gates it; only the non-gating A2 differential caught it. This host mitigates it with ~/.config/rtk/config.toml `[hooks] exclude_commands = [\"^git show [^ ]*:\", \"diff\"]`, which also sends every `git show <rev>:<path>` and plain `diff` to the native command. adoption/bootstrap-linux.sh installs only the binary and does not render this file: a new host must create it (recipes/README.md), or the defect is live there.",
+    "Pre-existing defects persist in 0.50.0 exactly as in 0.49.0: `find <nonexistent-relative-dir> -name x` exits 0 with no output (native: exit 1, 'No such file or directory'); plain `git log` is silently capped at 10 commits and `--no-merges` is injected, so `git log --oneline` drops merge commits; `python3 -m pytest` is rewritten to `rtk pytest`, which runs `pytest` from PATH or `python -m pytest`, not the named interpreter. `diff` on a missing file still exits 1 instead of 2 in the binary; only the host exclusion avoids it.",
+    "Rollback hazard: 0.50.0 stores signed negative saved_tokens, and 0.49.0 reads them with an unchecked cast. With synthetic -500 rows, 0.49.0's `rtk gain --history` and `--all` (including `--all --format json|csv`) showed wrapped values such as 18446744073709551116, while plain `rtk gain` and `rtk gain --format json` showed none (out/negrow.out) and 0.50.0 clamps them to 0. The qualification corpus wrote 0 negative rows of 66 and production had 0 at qualification; the natural frequency is unmeasured. Before rolling back to 0.49.0, count `saved_tokens<0` rows read-only on a snapshot of history.db. tools/token-report's `rtk gain --format json` read showed no wrapped value, but the report also reads saved_tokens directly from history.db (tools/token-report/token_manifest.py).",
+    "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the token-efficiency winner pin rtk 0.49.0 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 0.50.0 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
+    "Linux x86_64 only: adoption/pins-macos-arm64.json has no rtk pin and is unchanged; nothing here is macOS evidence.",
+    "Local integration evidence with synthetic fixtures (fake pytest and ruff, generated git repositories, synthetic negative rows); the hook was driven directly with PreToolUse JSON. Upstream `cargo test` was not run on this host, and no fresh-session live Claude Code check after the switch is recorded.",
+    "Provenance rests on checksums.txt and the GitHub API digest, both from the same release workflow; no signature is published, the attestation lookup returned HTTP 404, and the binary was not rebuilt from source.",
+    "`rtk init` was not re-run. At 0.50.0, `rtk init --help` describes `--codex` as 'Target Codex CLI (uses PreToolUse hook + AGENTS.md + RTK.md)', so re-running the recipe's `rtk init --global --codex` would install a Codex hook that is not qualified; recipes/README.md now says so.",
+    "One host (NativeStack, WSL2) and a prefix-flip switch; tools/rtk-0.49.0 and its archive are kept for rollback. The verifier's three minor defects (an unrelated ~/.claude/settings.json change outside the fingerprint window, the ungated `| tail` case, scratch written outside the unit dir) are retained in the artifact."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; production paths under ~/.local/share/codex-ecosystem"
+  },
+  "data": {
+    "observed_at_utc": "2026-09-25",
+    "previous_version": "0.49.0",
+    "version": "0.50.0",
+    "release": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+    "tag_commit": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+    "asset": "rtk-x86_64-unknown-linux-musl.tar.gz",
+    "asset_sha256": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
+    "checksums_txt_sha256": "4c7116898ae812960dfa0de3b3acc5406a0da49209f0ad7bed4d4ed8c4785048",
+    "binary_sha256": "23433a2a50bdeb12199cadd4b94b639238d6c38529fcba1c30c9295db5fa9517",
+    "acceptance_scripts": {
+      "rtk-hook-acceptance-v2.sh": "186dd8914a6c18850261d3bf34a3fd2f2c8767d6696931a99c90f1eeb79c9376",
+      "rtk-hook-acceptance-v3.1.sh": "3644a0dc50e9bcb1f785e5cc5fe36fda233ca915dd731ab1aa4709932f5f7755"
+    },
+    "qualification_counts_pass_fail_note": {
+      "v2": {
+        "0.50.0": [
+          42,
+          0,
+          1
+        ],
+        "0.49.0": [
+          34,
+          8,
+          1
+        ]
+      },
+      "v3.1": {
+        "0.50.0": [
+          88,
+          0,
+          4
+        ],
+        "0.49.0": [
+          79,
+          9,
+          4
+        ],
+        "fake-block": [
+          4,
+          100,
+          11
+        ],
+        "fake-allow": [
+          17,
+          85,
+          11
+        ]
+      },
+      "v3_first_run_superseded_by_v3.1": {
+        "0.50.0": [
+          87,
+          1,
+          4
+        ],
+        "0.49.0": [
+          78,
+          10,
+          4
+        ]
+      }
+    },
+    "a2_differential": "76 commands, 73 executed, 11 differ; hook exit 0 and no permissionDecision on either version",
+    "host_config": {
+      "path": "~/.config/rtk/config.toml",
+      "content": "[hooks]\nexclude_commands = [\"^git show [^ ]*:\", \"diff\"]\n"
+    },
+    "post_switch_counts_pass_fail_note": {
+      "production config": [
+        87,
+        1,
+        3
+      ],
+      "empty XDG_CONFIG_HOME": [
+        88,
+        0,
+        4
+      ]
+    },
+    "rollback": "ln -sfn ~/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk ~/.local/share/codex-ecosystem/bin/rtk after the read-only negative-row count; config.toml entries behave the same on 0.49.0",
+    "independent_review": "verdict agree, production_touched false, 3 minor defects (artifact results.json verifier section)",
+    "native_token_ci_rtk_fixture": "scripts/native_token_ci.py's rtk install path and rtk_fixture at PINS rtk 0.50.0, run locally by the writing worker: fresh release download, checksum verification and all 6 fixture checks passed (out/native-token-ci-rtk-only.json); the hosted native-token-e2e workflow has not run at 0.50.0",
+    "artifacts": "evidence/artifacts/sota-refresh-20260925/rtk/"
+  },
+  "provenance": [
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/rtk-hook-acceptance-v2.sh",
+      "sha256": "186dd8914a6c18850261d3bf34a3fd2f2c8767d6696931a99c90f1eeb79c9376",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/rtk-hook-acceptance-v3.1.sh",
+      "sha256": "3644a0dc50e9bcb1f785e5cc5fe36fda233ca915dd731ab1aa4709932f5f7755",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/a2.py",
+      "sha256": "e7bb3550fa4db0a7cf90b6b17f0ad66708bbf63b655f51ab91bfc999eb390be1",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/mitigation.sh",
+      "sha256": "b4f68b559bfd9bb9d6ed3c6f2aa69cf8d7112a607e1c623638e651f319257d4f",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/fetch.out",
+      "sha256": "8942f58ac4fd35cc09d739e69bd6fffd3c5cc117861579b07be9a996eb2a38a0",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/install.out",
+      "sha256": "99e97a66f8af15153f147ec8e7798c28878f5ea7e0dc0924333084936199a393",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/run-acceptance.summary",
+      "sha256": "ad4283b3c9bcbb143f286b082a01ab34f8e1e96c56d5fbbe5a90f5555566225e",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/run-v31.summary",
+      "sha256": "c651e72aa07a5cf5db98e4baf01a8ea34796e3c29bc6bc2f57c9aa19e8f164fe",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/v2-050.out",
+      "sha256": "33b6f39989cd2b5bcf66d6765d3339dc4907fece5aba7b9e75ff309e11d53df4",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/v2-049.out",
+      "sha256": "cb2f7a468e9764c76b2a93732765f6c6be1c9db08256e5dcd79f4a31ac5b7a0e",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/v31-050.out",
+      "sha256": "748e5e4219747d41d5c6341201a4f7b08e2f608b4b2806c2e13674500769bb8e",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/v31-049.out",
+      "sha256": "19458daeaa7de3df2089360cf6612658e24487de4f99ea1d96c39c8ca1cee914",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/v31-fake-block.out",
+      "sha256": "1c794c5f615fbfd484277b90d658c4513819ead2f59f5ceaf24b9aadb20f5a4a",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/v31-fake-allow.out",
+      "sha256": "c37c9cd43550822a733a34286c03676e6a412413f8078c97102b5b0da5c5071e",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/verify-0.50.0.out",
+      "sha256": "66e5c69675089b206da056ae57e29ea99588a22642e611255c66c4071658aa9f",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/verify-0.49.0.out",
+      "sha256": "66e5c69675089b206da056ae57e29ea99588a22642e611255c66c4071658aa9f",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2.summary",
+      "sha256": "c878ee65bb4c2b1a58ede13407d0f764c5876fe33d7945cb3fd77bced31af335",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/mitigation.out",
+      "sha256": "8abab9a22d59ff3d775bb7e91e73d1862545f3e53b91031c4ba13b98c2ce6967",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/negrow.out",
+      "sha256": "73b98af0ea745689b9845388c3640489419308f1ab0a224a05c216789b55a4e1",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/pytest-resolve.out",
+      "sha256": "296cebfb64062a7566f82a98a9273a6711d36a45b7eec162895bfc5ff00b17a9",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/post-switch-v31.txt",
+      "sha256": "5c213154377d977c618bff56251f6424fc09fa1010ac1efb5d09d945128f1e5f",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/post-switch-v31-noconfig.txt",
+      "sha256": "5da7c4a21a6cd27ec1416aea3d623ae861608814ed56a60f47ab17493819e3de",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/gain-0.49.0-gain---format-json.txt",
+      "sha256": "24db57f82e572fbc27360015bd175f3df962b87cd699e7b585deef6ff93ea817",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/gain-0.50.0-gain---format-json.txt",
+      "sha256": "24db57f82e572fbc27360015bd175f3df962b87cd699e7b585deef6ff93ea817",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/negrow-0.49.0-gain---all---format-json.txt",
+      "sha256": "d435ed226a9b0fd19f914fa8b5e96741945345896494afe8828a9e7c873f258d",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/negrow-0.50.0-gain---all---format-json.txt",
+      "sha256": "ebcc1edf7508503240be1abf68d5def9d70f51c7b408488f99957052015a14ba",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/a2-report.json",
+      "sha256": "211f7e2e44df47e8543b9597d6239ce908f17fad3fb1fa5ea9ee01459c4150db",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/a2-table.txt",
+      "sha256": "719600a4f2867af1f53c09d3b904c606917f2700054ad72e3cae1b1eadaa3766",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-show-blob-tail.native.out",
+      "sha256": "bb93ea3b86e6c08404d176f63449f982dfe130b492463716098fea3d49c7da3d",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-show-blob-tail.native.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-show-blob-tail.049.out",
+      "sha256": "bb93ea3b86e6c08404d176f63449f982dfe130b492463716098fea3d49c7da3d",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-show-blob-tail.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-show-blob-tail.050.out",
+      "sha256": "8da640e83e2f8c41dddc5e2d99ca684aac17752ef146e45aea21b7d4f0ff8c59",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-show-blob-tail.050.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/find-missing.native.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/find-missing.native.err",
+      "sha256": "3401a947eb452bee599065ff1d1d4c9ec0a8ef82199386acab0848f204c13fa4",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/find-missing.049.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/find-missing.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/find-missing.050.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/find-missing.050.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/diff-missing.native.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/diff-missing.native.err",
+      "sha256": "e9a0041b1c4fe568cedb5c83d3a62f5adcd005fb96fc43d9606354ef913a7d41",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/diff-missing.049.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/diff-missing.049.err",
+      "sha256": "3578cecb5e93285bf68cb2e5922621e608003676239689207814d24d7851d53a",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/diff-missing.050.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/diff-missing.050.err",
+      "sha256": "3578cecb5e93285bf68cb2e5922621e608003676239689207814d24d7851d53a",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-plain.native.out",
+      "sha256": "005ac39188cc33754f1fb1e609c7e2233b68662ef774cf80e7769cac0265d212",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-plain.native.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-plain.049.out",
+      "sha256": "fff1722ca268fd770bf2b95e0f32dbc74eb9e9deb6f9c1a5465c9afc7b214152",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-plain.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-plain.050.out",
+      "sha256": "fff1722ca268fd770bf2b95e0f32dbc74eb9e9deb6f9c1a5465c9afc7b214152",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-plain.050.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-oneline.native.out",
+      "sha256": "414dc8921e19e40a4c1b02c023d4e48c40bb827fedbbea50c545349f921dbebb",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-oneline.native.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-oneline.049.out",
+      "sha256": "fd7bdef04127a1da266a4f2958c9a6887f15417111c3ed44078d9c374878b57a",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-oneline.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-oneline.050.out",
+      "sha256": "fd7bdef04127a1da266a4f2958c9a6887f15417111c3ed44078d9c374878b57a",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/git-log-oneline.050.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/python-m-pytest.native.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/python-m-pytest.native.err",
+      "sha256": "388552e41b2d166e6c7226b80052afa6c69a6b71ed8c63a6e8002dc3c4817e78",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/python-m-pytest.049.out",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/python-m-pytest.049.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/python-m-pytest.050.out",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/a2/raw/python-m-pytest.050.err",
+      "sha256": "d79af70eaa4401456e680940c237b174a45e4043b2d302123609067731e1f917",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/native_token_ci_rtk_only.py",
+      "sha256": "4ade0a773af3bdac2da8ad67082adf187075b6169c7db9af1b831e0d4a4f7b5c",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/native-token-ci-rtk-only.json",
+      "sha256": "70753126a9e66dc489ead9ef478ffebdba7e26b5da7581bc7d0ff8b416cb0975",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/readback.out",
+      "sha256": "3755880cd097828bdb3025f0e517843ac49f78561a9e05fd4a8b0611ccfcaa21",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/results.json",
+      "sha256": "cbca93315306d5cf420182e94b30c9e87764e38f2526dad4e748828de80922a1",
+      "byte_identical_to_run_copy": false
+    }
+  ]
+}

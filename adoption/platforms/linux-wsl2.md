@@ -97,6 +97,7 @@ itself evidence the WSL UVA gap closed.
    stdin instead, so run such a release's script with `</dev/null` (step 2 of
    [`adoption/bootstrap.md`](../bootstrap.md) has the details and the
    `mcp-inspector` case).
+   The script and its rtk and markitdown pins changed after `v2026.09.25.2`: on main they are 0.50.0 and 0.1.8, and after installing rtk the script prints a reminder when `~/.config/rtk/config.toml` lacks the Claude-hook `exclude_commands` from [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks); it never writes that file.
 2. Recreate the SDK only for the `research-runtime` profile using
    [`adoption/sdk/README.md`](../sdk/README.md)'s transitive lock; retain the
    same exact-match and uncached-reinstall checks as

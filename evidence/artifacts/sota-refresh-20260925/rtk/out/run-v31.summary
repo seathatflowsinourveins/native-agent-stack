@@ -1,0 +1,6 @@
+3644a0dc50e9bcb1f785e5cc5fe36fda233ca915dd731ab1aa4709932f5f7755  rtk-hook-acceptance-v3.1.sh
+v31-050 rc=0 pass=88 fail=0 note=4 2026-09-25T18:49:34Z..2026-09-25T18:49:39Z :: RESULT pass
+v31-049 rc=1 pass=79 fail=9 note=4 2026-09-25T18:49:39Z..2026-09-25T18:49:44Z :: RESULT fail
+v31-fake-block rc=1 pass=4 fail=100 note=11 2026-09-25T18:49:44Z..2026-09-25T18:49:45Z :: RESULT fail
+v31-fake-allow rc=1 pass=17 fail=85 note=11 2026-09-25T18:49:45Z..2026-09-25T18:49:50Z :: RESULT fail
+leftover mktemp dirs under tmp: 0
