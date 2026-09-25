@@ -31,6 +31,8 @@ usage() {
     'in <dir> instead of ECO_INSTALL_ROOT/bin; --no-link installs the versioned' \
     'root only and never creates or updates a bin/ symlink for it (a uv-tool-kind' \
     'pin still lets uv manage its own shim directory; see adoption/lifecycle.md).' \
+    'A native-kind pin (claude-code) is refused under --no-link instead: its own' \
+    'installer writes to a fixed live location this script cannot isolate.' \
     'Every symlink this script creates or replaces -- with or without these three' \
     'flags -- is written atomically (a temporary symlink, then mv -T over the' \
     'destination), never a remove-then-create ln -sfn.'
@@ -356,17 +358,22 @@ install_native() {
   # $5 is the command the native installer creates (the pin's `bin`, e.g.
   # claude-code installs ~/.local/bin/claude); it defaults to the pin id.
   local id="$1" version="$2" url="$3" sha256="$4" bin_name="${5:-$1}"
+  # Minor finding: every other install_* function isolates its writes under
+  # tools/<id>-<version><suffix>, which --tools-suffix/--no-link/--link-dir all key off of. A
+  # native pin's own installer instead manages a fixed *live* location outside this script's
+  # control entirely (e.g. claude-code's $HOME/.local/share/claude/versions and
+  # $HOME/.local/bin/claude) -- running it under --no-link would silently mutate that live
+  # location despite --no-link's own promise never to touch anything live. ${no_link:-} (not a
+  # bare $no_link): tests/test_adoption_bootstrap.py's InstallNativeLauncherTests runs this
+  # function's body in isolation under `set -u`, with no_link never declared at all.
+  if [[ "${no_link:-}" == 1 ]]; then
+    printf 'Refusing to install native pin %s under --no-link: its own installer writes to a fixed live location (e.g. %s/.local/bin), which --no-link cannot isolate; install it in a plain (unstaged) run instead.\n' "$id" "$HOME" >&2
+    exit 1
+  fi
   local download="$cache_dir/${id}-${version}-native"
   fetch "$url" "$sha256" "$download"
   chmod 0755 "$download"
   "$download" install "$version"
-  # --no-link means never create or update a bin/ entrypoint for this pin, the same as every
-  # other install_* function's own no_link guard; a native pin has no tools/<id>-<version>
-  # prefix of its own to isolate under --tools-suffix (the installer manages its own versions
-  # directory), so only the redirecting bin_dir/$bin_name script is skipped here. ${no_link:-}
-  # (not a bare $no_link): tests/test_adoption_bootstrap.py's InstallNativeLauncherTests runs
-  # this function's body in isolation under `set -u`, with no_link never declared at all.
-  [[ "${no_link:-}" != 1 ]] || return 0
   # When bin_dir is the installer's own ~/.local/bin, its launcher (a symlink
   # into ~/.local/share/claude/versions) already provides the command; writing
   # ours there would replace it with a script that execs itself.
@@ -464,16 +471,36 @@ for id in "${component_ids[@]}"; do
   install_pin "$id"
 done
 
-versions_log="$ecosystem_root/installed-versions.txt"
-# A staged run (--tools-suffix, --no-link and/or --link-dir) must never clobber the canonical,
-# already-adopted installed-versions.txt with a report about the staging area instead; only a
-# plain, unflagged run (the one that actually updates the live bin/) writes the canonical file.
-if [[ -n "$tools_suffix" || "$no_link" == 1 || -n "$link_dir_override" ]]; then
-  versions_log="$ecosystem_root/installed-versions${tools_suffix}.txt"
-fi
-{
+versions_log_path() {
+  # A staged run (--tools-suffix, --no-link and/or --link-dir) must never clobber the canonical,
+  # already-adopted installed-versions.txt with a report about the staging area instead; only a
+  # plain, unflagged run (the one that actually updates the live bin/) writes the canonical file.
+  # Minor finding: an empty --tools-suffix alone used to still resolve to the exact same
+  # canonical filename here (installed-versions.txt) even under --no-link/--link-dir, because the
+  # name was installed-versions${tools_suffix}.txt with tools_suffix="" -- silently clobbering it
+  # anyway. A staged run with no --tools-suffix now falls back to a distinct ".staged" marker.
+  if [[ -n "$tools_suffix" || "$no_link" == 1 || -n "$link_dir_override" ]]; then
+    local suffix="$tools_suffix"
+    [[ -n "$suffix" ]] || suffix=".staged"
+    printf '%s\n' "$ecosystem_root/installed-versions${suffix}.txt"
+  else
+    printf '%s\n' "$ecosystem_root/installed-versions.txt"
+  fi
+}
+
+write_versions_report() {
   printf 'Verified executable versions at %s for profile %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$profile_id"
   git --version
+  # Minor finding: under --no-link, no install_* function ever wrote a bin/ entrypoint for
+  # anything this run installed (every one of their own no_link guards skips atomic_link
+  # entirely) -- bin_dir here is therefore whatever pre-existed the run (this host's own *live*
+  # bin/, whenever --link-dir was not also given), so iterating it would report live versions
+  # unrelated to this staged install, not the pins this run actually staged.
+  if [[ "$no_link" == 1 ]]; then
+    printf 'Note: --no-link was given; no bin/ entrypoint was created for any pin installed by this run, so no --version output is recorded here. See tools/<id>-<version>%s under %s for the staged installs themselves.\n' \
+      "$tools_suffix" "$ecosystem_root"
+    return 0
+  fi
   # Every symlink actually placed in bin_dir gets its own --version run, not a
   # fixed subset: this covers all installed pins (node/npm/npx/corepack, uv/uvx,
   # gh, and each npm- or tarball-kind CLI), so the retained log matches what
@@ -484,7 +511,10 @@ fi
     printf -- '-- %s --\n' "$installed_name"
     "$installed_executable" --version 2>&1 || printf '%s --version exited %s\n' "$installed_name" "$?"
   done
-} | tee "$versions_log"
+}
+
+versions_log="$(versions_log_path)"
+write_versions_report | tee "$versions_log"
 
 printf '\nInstallation finished. Add %q to PATH to use it in this shell.\n' "$bin_dir"
 printf '%s\n' 'Next: sign into Codex, Claude, and GitHub using their native browser login flows.' \

@@ -481,16 +481,18 @@ class InstallNativeLauncherTests(unittest.TestCase):
         "ln -sfn \"$HOME/.local/share/claude/versions/$2\" \"$HOME/.local/bin/claude\"\n"
     )
 
-    def run_install_native(self, script: Path, home: Path, bin_dir: Path):
+    def run_install_native(self, script: Path, home: Path, bin_dir: Path, *, no_link=None):
         text = script.read_text()
         match = re.search(r"(?ms)^install_native\(\) \{.*?^\}$", text)
         self.assertIsNotNone(match, f"install_native not found in {script}")
         stub = home / "stub-installer"
         stub.write_text(self.STUB_INSTALLER)
+        no_link_decl = f"no_link={shlex.quote(str(no_link))}\n" if no_link is not None else ""
         harness = (
             f"set -euo pipefail\ncache_dir={shlex.quote(str(home / 'cache'))}\n"
             f"bin_dir={shlex.quote(str(bin_dir))}\nmkdir -p \"$cache_dir\" \"$bin_dir\"\n"
-            f"fetch() {{ cp {shlex.quote(str(stub))} \"$3\"; }}\n"
+            + no_link_decl
+            + f"fetch() {{ cp {shlex.quote(str(stub))} \"$3\"; }}\n"
             + match.group(0)
             + "\ninstall_native claude-code 2.1.280 https://example.invalid/claude 0 claude\n"
         )
@@ -523,6 +525,111 @@ class InstallNativeLauncherTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertTrue((home / ".local/bin/claude").is_symlink())
                 self.assertEqual((home / ".local/bin/claude").read_text(), "REAL-BINARY\n")
+
+    @LINUX_X86_64_ONLY
+    def test_install_native_refuses_under_no_link_instead_of_mutating_the_live_installer_location(self):
+        # Minor finding: a native-kind pin's own installer manages a fixed live location this
+        # script does not control (e.g. claude-code's $HOME/.local/bin), unlike every other
+        # install_* function, which isolates its writes under tools/<id>-<version><suffix>.
+        # Running it anyway under --no-link used to silently mutate that live location despite
+        # --no-link's own promise never to touch anything live. bootstrap-macos.sh has no
+        # --no-link flag at all (out of this track's allowed paths), so this is Linux-only.
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            bin_dir = home / "eco" / "bin"
+            bin_dir.mkdir(parents=True)
+            result = self.run_install_native(SCRIPT_PATH, home, bin_dir, no_link=1)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("--no-link", result.stderr)
+            # Nothing was written to the live installer location the stub would otherwise use.
+            self.assertFalse((home / ".local" / "bin" / "claude").exists())
+            self.assertFalse((home / ".local" / "share" / "claude").exists())
+
+
+@LINUX_X86_64_ONLY
+class VersionsReportTests(unittest.TestCase):
+    """Runs versions_log_path/write_versions_report (bootstrap-linux.sh's staged-run isolation
+    fix) in an isolated harness, the same extraction technique InstallNativeLauncherTests uses
+    for install_native -- both functions read the script's own globals (tools_suffix, no_link,
+    link_dir_override, ecosystem_root, bin_dir, profile_id) rather than taking parameters, so
+    the harness declares those directly instead of passing arguments."""
+
+    def extract(self, name: str) -> str:
+        match = re.search(rf"(?ms)^{name}\(\) \{{.*?^\}}$", SCRIPT_PATH.read_text())
+        self.assertIsNotNone(match, f"{name} not found in {SCRIPT_PATH}")
+        return match.group(0)
+
+    def run_versions_log_path(self, *, tools_suffix="", no_link=0, link_dir_override=""):
+        harness = (
+            "set -euo pipefail\n"
+            f"tools_suffix={shlex.quote(tools_suffix)}\n"
+            f"no_link={shlex.quote(str(no_link))}\n"
+            f"link_dir_override={shlex.quote(link_dir_override)}\n"
+            "ecosystem_root=/eco\n"
+            + self.extract("versions_log_path")
+            + "\nversions_log_path\n"
+        )
+        result = subprocess.run(["bash", "-c", harness], capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return result.stdout.strip()
+
+    def test_a_plain_run_uses_the_canonical_filename(self):
+        self.assertEqual(self.run_versions_log_path(), "/eco/installed-versions.txt")
+
+    def test_tools_suffix_alone_uses_the_suffixed_filename(self):
+        self.assertEqual(self.run_versions_log_path(tools_suffix="-r20260925"),
+                         "/eco/installed-versions-r20260925.txt")
+
+    def test_no_link_alone_with_no_tools_suffix_does_not_clobber_the_canonical_filename(self):
+        # Minor finding: this used to resolve to the exact same "/eco/installed-versions.txt" as
+        # a plain run (installed-versions${tools_suffix}.txt with tools_suffix=""), silently
+        # clobbering the canonical, already-adopted report with one about the staging area.
+        self.assertEqual(self.run_versions_log_path(no_link=1), "/eco/installed-versions.staged.txt")
+
+    def test_link_dir_alone_with_no_tools_suffix_does_not_clobber_the_canonical_filename(self):
+        self.assertEqual(self.run_versions_log_path(link_dir_override="/somewhere/else"),
+                         "/eco/installed-versions.staged.txt")
+
+    def run_write_versions_report(self, home: Path, bin_dir: Path, *, no_link=0):
+        harness = (
+            "set -euo pipefail\n"
+            f"profile_id=test-profile\nno_link={shlex.quote(str(no_link))}\n"
+            f"tools_suffix=''\necosystem_root={shlex.quote(str(home / 'eco'))}\n"
+            f"bin_dir={shlex.quote(str(bin_dir))}\n"
+            + self.extract("write_versions_report")
+            + "\nwrite_versions_report\n"
+        )
+        return subprocess.run(["bash", "-c", harness], capture_output=True, text=True, timeout=30)
+
+    def test_no_link_report_never_runs_a_pre_existing_live_bin_dir_executable(self):
+        # Minor finding: under --no-link, no install_* function ever links anything into
+        # bin_dir, so bin_dir there is whatever pre-existed the run (potentially this host's own
+        # live bin/) -- the report used to still iterate and --version every executable it found,
+        # reporting live versions unrelated to what this run actually staged.
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            bin_dir = home / "live-bin"
+            bin_dir.mkdir(parents=True)
+            marker = bin_dir / "must-not-run"
+            marker.write_text('#!/bin/sh\necho "SENTINEL: I should never execute" >&2\nexit 0\n')
+            marker.chmod(0o755)
+            result = self.run_write_versions_report(home, bin_dir, no_link=1)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("--no-link", result.stdout)
+            self.assertNotIn("SENTINEL", result.stdout)
+            self.assertNotIn("SENTINEL", result.stderr)
+
+    def test_a_plain_report_still_runs_every_bin_dir_executable(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            bin_dir = home / "eco" / "bin"
+            bin_dir.mkdir(parents=True)
+            fake_tool = bin_dir / "fake-tool"
+            fake_tool.write_text('#!/bin/sh\necho "fake-tool v1.2.3"\n')
+            fake_tool.chmod(0o755)
+            result = self.run_write_versions_report(home, bin_dir, no_link=0)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("fake-tool v1.2.3", result.stdout)
 
 
 if __name__ == "__main__":
