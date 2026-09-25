@@ -23,6 +23,7 @@ import time
 
 from corporate_actions import AlpacaCorporateActionsSource, CorporateActionMonitor
 from credential_guard import CredentialGuardError, MAX_CREDENTIAL_BYTES, REASON_ENCODING, REASON_SIZE, open_verified
+from financing import MARGIN_RATES, overnight_financing_projection
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
 from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP,
                     execution_from_observation)
@@ -358,6 +359,16 @@ def load_config(path, *, registry_path=None):
         raise ValueError("unqualified_lane_configuration")
     exit_replace_enabled = exits_cfg.get("replace_enabled", False)
     if type(exit_replace_enabled) is not bool:
+        raise ValueError("unqualified_lane_configuration")
+    # Financing: an optional top-level "financing_plan" key selects the
+    # modeled margin-interest rate plan (financing.MARGIN_RATES) that
+    # run_native's _modeled_financing_block reads when a run ends
+    # "held_overnight" under session_policy["overnight_holds"]. Absent
+    # (every shipped config) defaults to "standard"; validated here,
+    # fail-fast, the same way gap_stop_cfg/exits_cfg above are -- any other
+    # value is refused rather than silently defaulting or failing later.
+    financing_plan = c.get("financing_plan", "standard")
+    if financing_plan not in MARGIN_RATES:
         raise ValueError("unqualified_lane_configuration")
     resolved_registry_path = registry_path if registry_path is not None else SOURCE / "registry.json"
     registry_entries = load_registry(resolved_registry_path)
@@ -1871,8 +1882,8 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
             "peak_achieved_leverage": str(achievement_state["peak_achieved_leverage"]),
             "ceiling_at_peak_achieved_leverage": str(achievement_state["ceiling_at_peak"]),
             "seconds_above_next_lower_rung_ceiling": achievement_state["seconds_above_next_lower_rung_ceiling"]}
-    outcome["status"] = _run_native_status(reconciliation, session.errors, strategy.native_fills,
-                                           outcome, session_policy, time.time())
+    _finalize_status_and_financing(reconciliation, session.errors, strategy.native_fills, outcome,
+                                   session_policy, config, controller.ledger, baseline_cash, time.time())
     return outcome
 
 
@@ -1966,6 +1977,53 @@ def _honest_overnight_hold(outcome, session_policy, now):
             and not outcome.get("adapter_errors")
             and not (outcome.get("accounting") or {}).get("halted_reason")
             and guard_clear)
+
+
+def _modeled_financing_block(config, ledger, baseline_cash, now):
+    """Financing: the "modeled_financing" outcome block, built only when
+    run_native's own status just decided "held_overnight" (see
+    ``_finalize_status_and_financing`` below, the only caller). Uses the
+    ledger's end-of-run open positions (their cost basis, summed) and the
+    trial's baseline cash to call financing.overnight_financing_projection
+    -- see that function's docstring for the exact debit formula and the
+    simplifying assumption (``settled_cash_usd`` is the trial's starting
+    capital, not a reconstructed post-buy running-cash figure) and
+    financing.py's module docstring for the underlying Alpaca sources.
+
+    Always labelled "evidence_class": "modeled" -- this is a projection,
+    never a broker read, and Alpaca's paper-trading docs do not confirm
+    whether paper even posts margin interest (see financing.py). The
+    "financing_plan" config key (validated in load_config; "standard" when
+    absent, every shipped config) selects the rate plan.
+    """
+    positions_cost_usd = sum((p.cost_basis_usd for p in ledger.positions().values() if p.qty), Decimal("0"))
+    trade_date = session_at(datetime.fromtimestamp(now, timezone.utc)).session_date
+    plan = config.get("financing_plan", "standard")
+    projection = overnight_financing_projection(positions_cost_usd, Decimal(str(baseline_cash)), trade_date, plan)
+    return {**projection, "evidence_class": "modeled",
+            "note": "Modeled projection only; not reconciled against the paper account -- "
+                    "Alpaca's paper-trading docs do not confirm whether paper posts margin interest."}
+
+
+def _finalize_status_and_financing(reconciliation, session_errors, native_fills, outcome,
+                                   session_policy, config, ledger, baseline_cash, now):
+    """run_native's last two outcome steps, factored out so both are
+    directly testable without driving a full native node/port (same
+    rationale as ``_run_native_status`` itself): decide ``outcome["status"]``
+    via ``_run_native_status``, then attach ``outcome["modeled_financing"]``
+    (``_modeled_financing_block``) if and only if that status is
+    "held_overnight". Mutates and returns ``outcome``.
+
+    With ``session_policy["overnight_holds"]`` False (every shipped config),
+    ``_honest_overnight_hold`` -> ``_run_native_status`` can never return
+    "held_overnight" (its first check is exactly that flag), so this never
+    adds "modeled_financing" for any shipped config -- the outcome stays
+    byte-identical to before this function existed.
+    """
+    outcome["status"] = _run_native_status(reconciliation, session_errors, native_fills, outcome, session_policy, now)
+    if outcome["status"] == "held_overnight":
+        outcome["modeled_financing"] = _modeled_financing_block(config, ledger, baseline_cash, now)
+    return outcome
 
 
 # D6 (round 8): the failed/sticky pre-recovery statuses -- see

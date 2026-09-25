@@ -1205,6 +1205,54 @@ class IntegratedRunner(unittest.TestCase):
         self.assertEqual(phase2, "held_overnight")
         self.assertEqual(exit_code2, 0)
 
+    def test_finalize_status_and_financing_adds_no_key_when_overnight_holds_false(self):
+        """Financing: outcome["modeled_financing"] is added only when the
+        run just ended "held_overnight" under
+        session_policy["overnight_holds"] -- every shipped config leaves
+        overnight_holds False, so _finalize_status_and_financing (the exact
+        function run_native calls, not a re-implementation) must never add
+        the key for any of them; the outcome stays byte-identical to
+        before this function existed. Confirmed from both sides: with
+        overnight_holds False the identical reconciled/boundary inputs
+        never reach "held_overnight" and never gain the key; with it True
+        they do reach "held_overnight" and DO gain a well-formed
+        "modeled_financing" block -- proving the key's absence above is
+        specifically the overnight_holds gate, not some other difference
+        between the two calls."""
+        from datetime import datetime, timezone as _tz
+        from decimal import Decimal
+        from zoneinfo import ZoneInfo
+        import runner as runner_module
+        from safety import Position
+
+        post_ts = datetime(2026, 3, 10, 18, 0, tzinfo=ZoneInfo("America/New_York")) \
+            .astimezone(_tz.utc).timestamp()  # a real POST-session boundary instant
+        reconciliation = {"positions_match": True, "cash_match": True, "cash_delta_usd": "0",
+                          "open_orders": 0, "positions": 1}  # non-flat: one reconciled position
+
+        class _FakeLedger:
+            def positions(self):
+                return {"AAPL": Position("AAPL", Decimal("10"), Decimal("1500"))}
+
+        outcome_off = {"reconciliation": reconciliation, "adapter_errors": [],
+                       "accounting": {"halted_reason": None}, "corporate_action_guard": {}}
+        session_policy_off = {"extended_hours": True, "overnight_holds": False}
+        result_off = runner_module._finalize_status_and_financing(
+            reconciliation, [], 0, outcome_off, session_policy_off, {}, _FakeLedger(), "1000", post_ts)
+        self.assertNotEqual(result_off["status"], "held_overnight")
+        self.assertNotIn("modeled_financing", result_off)
+
+        outcome_on = {"reconciliation": reconciliation, "adapter_errors": [],
+                     "accounting": {"halted_reason": None}, "corporate_action_guard": {}}
+        session_policy_on = {"extended_hours": True, "overnight_holds": True}
+        result_on = runner_module._finalize_status_and_financing(
+            reconciliation, [], 0, outcome_on, session_policy_on, {}, _FakeLedger(), "1000", post_ts)
+        self.assertEqual(result_on["status"], "held_overnight")
+        financing = result_on["modeled_financing"]
+        self.assertEqual(financing["evidence_class"], "modeled")
+        self.assertEqual(financing["plan"], "standard")
+        self.assertEqual(financing["debit_usd"], Decimal("500"))  # 1500 cost basis - 1000 baseline cash
+
     def test_forced_recovery_that_fails_to_flatten_cannot_report_held_overnight_or_exit_0(self):
         """D4 (round 6): main()'s forced-recovery branch used to set
         outcome["flat"] = recovery["flat"] but never touch
