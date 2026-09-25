@@ -21,7 +21,7 @@ def load_port_overrides(path, error):
         error(f'{path}: port overrides must be a JSON object of "template port": host port')
     overrides = {}
     for key, value in raw.items():
-        if not (isinstance(key, str) and key.isdigit() and type(value) is int
+        if not (isinstance(key, str) and key.isascii() and key.isdigit() and type(value) is int
                 and 0 < int(key) < 65536 and 0 < value < 65536 and int(key) != value):
             error(f'{path}: {key!r}: {value!r} is not a "template port": different host port pair (1-65535)')
         overrides[int(key)] = value
@@ -30,21 +30,26 @@ def load_port_overrides(path, error):
     return overrides
 
 
-def apply_port_overrides(outputs, overrides, error):
+def apply_port_overrides(outputs, overrides, error, roots=()):
     """Rewrite every 127.0.0.1:<template port> address in the rendered files in one pass (no chaining).
 
     Fails closed when an override matches no rendered address (a stale entry), when its port also appears outside
     a 127.0.0.1:<port> address (such as Grafana's http_port or Loki's listen ports, which this does not rewrite),
-    or when its host port is already a rendered port that is not itself overridden."""
-    texts = [text for _, text in outputs]
-    rendered = {int(port) for text in texts for port in LOOPBACK.findall(text)}
+    or when its host port is already a rendered port that is not itself overridden. The checks ignore the
+    caller's root paths (``roots``), so a directory name that contains the port's digits is not a collision."""
+    texts = []
+    for path, text in outputs:
+        for root in sorted(roots, key=len, reverse=True): text = text.replace(root, '')
+        texts.append((path, text))
+    rendered = {int(port) for _, text in texts for port in LOOPBACK.findall(text)}
     for port, new in sorted(overrides.items()):
-        addresses = sum(len(re.findall(rf'127\.0\.0\.1:{port}(?!\d)', text)) for text in texts)
-        anywhere = sum(len(re.findall(rf'(?<!\d){port}(?!\d)', text)) for text in texts)
-        if not addresses:
+        address = rf'127\.0\.0\.1:{port}(?!\d)'
+        if not any(re.search(address, text) for _, text in texts):
             error(f'port override {port}: no rendered file has a 127.0.0.1:{port} address')
-        if anywhere > addresses:
-            error(f'port override {port}: the port also appears outside a 127.0.0.1:{port} address, '
+        bare = [path.name for path, text in texts
+                if len(re.findall(rf'(?<!\d){port}(?!\d)', text)) > len(re.findall(address, text))]
+        if bare:
+            error(f'port override {port}: {bare[0]} also has the port outside a 127.0.0.1:{port} address, '
                   'which this override does not rewrite')
         if new in rendered and new not in overrides:
             error(f'port override {port} -> {new}: 127.0.0.1:{new} is already a rendered address')
@@ -101,7 +106,7 @@ def main():
         text+=f'WorkingDirectory={data}/ecosystem-{name}\nExecStart={command}\nRestart=on-failure\nRestartSec=5\nTimeoutStopSec=60\n\n[Install]\nWantedBy=default.target\n'
         outputs.append((a.unit_root/f'ecosystem-{name}.service',text))
     # Every override is checked against the whole render before anything is written.
-    if overrides: outputs=apply_port_overrides(outputs,overrides,p.error)
+    if overrides: outputs=apply_port_overrides(outputs,overrides,p.error,paths.values())
     for dest in [a.config_root,a.data_root,a.unit_root]:
         dest.mkdir(parents=True,exist_ok=True)
     for name in versions:

@@ -29972,8 +29972,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "c5e14d0a3c4f5061a4be3a5516d14f2d02a3d8af2e3f7f2c5e577f4d4672079c",
-      "bytes": 19239
+      "sha256": "d8aa6e0d547dd0bed7cd4888b435ba9e79fb12d0650054782dba9e704cc8f7ec",
+      "bytes": 19394
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -29987,8 +29987,8 @@
     },
     {
       "path": "observability/backends/configure.py",
-      "sha256": "784bca3a228b34d830377b207ed122071c0870122153c52e4a9eb26dad5155ad",
-      "bytes": 7877
+      "sha256": "4d8c94bc4812d4a2f976d6828715277b94464c90b4223e3c8ce7560fd4ff212e",
+      "bytes": 8225
     },
     {
       "path": "observability/backends/install.py",

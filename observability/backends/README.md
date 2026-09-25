@@ -61,7 +61,9 @@ The renderer rewrites every `127.0.0.1:<template port>` address in the configs
 and units in a single pass, so a swap such as `{"19090": 19093, "19093": 19090}`
 works. It keeps the map as `$STACK_CONFIG_ROOT/port-overrides.json`, which later
 renders reuse without the flag; delete that file to render the template ports
-again. It refuses the whole render (exit 2, nothing written) in three cases:
+again. It refuses the whole render (exit 2, nothing written) in four cases:
+- the file is not a JSON object of ASCII-digit template ports to different
+  integer host ports in 1-65535, or it maps two template ports to one host port;
 - an override matches no rendered address;
 - the port also appears outside a `127.0.0.1:<port>` address, as Grafana's
   `http_port` and Loki's listen ports do, which the override does not rewrite;
