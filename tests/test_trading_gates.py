@@ -5,8 +5,10 @@ throwaway keys made in temporary directories; they skip on a host without
 ssh-keygen, and no key or signature is committed."""
 from __future__ import annotations
 
+import contextlib
 import copy
 import hashlib
+import io
 import json
 import os
 import shutil
@@ -373,6 +375,18 @@ class TradingGatesTests(GateTreeCase):
                 holds, detail = trading_gates.condition_holds(self.root, gate(flip_condition=condition))
                 self.assertFalse(holds, detail)
                 self.assertIn("source_matches", detail)
+        # A symlink loop at the source path is refused, not raised: Path.resolve() raises
+        # RuntimeError on a loop in Python 3.12 and earlier (OSError from 3.13).
+        with self.subTest(case="path_symlink_loop"):
+            loop = self.root / "src" / "loop.json"
+            try:
+                loop.symlink_to(loop.name)
+            except (OSError, NotImplementedError):
+                self.skipTest("symbolic links are unavailable here")
+            self.write("r.json", {**good, "source": {**good["source"], "path": "src/loop.json"}})
+            holds, detail = trading_gates.condition_holds(self.root, gate(flip_condition=condition))
+            self.assertFalse(holds, detail)
+            self.assertIn("source_matches: src/loop.json cannot be resolved", detail)
         # A source that hashes correctly but is not JSON is refused, not crashed on.
         (self.root / "src" / "out.json").write_bytes(b"not json")
         self.write("r.json", {**good, "source": {**good["source"], "sha256": hashlib.sha256(b"not json").hexdigest()}})
@@ -924,17 +938,39 @@ class LiveGoAuthorshipTests(GateTreeCase):
     def test_paths_that_resolve_outside_the_tree_fail_closed(self):
         self.put(LIVE_GO_MD, b"# live go\n")
         self.put(LIVE_GO_SIG, b"signature")
+        link = self.root / LIVE_GO_SIGNERS
         with tempfile.TemporaryDirectory() as outside:
             target = Path(outside) / "allowed_signers"
             target.write_text("signer line\n", encoding="utf-8")
             try:
-                (self.root / LIVE_GO_SIGNERS).symlink_to(target)
+                link.symlink_to(target)
             except (OSError, NotImplementedError):
                 self.skipTest("symbolic links are unavailable here")
             with mock.patch.object(trading_gates.subprocess, "run",
                                    side_effect=AssertionError("ssh-keygen must not run")):
                 self.assert_fails_closed(self.run_check(self.ladder(self.established())),
                                          f"allowed_signers file {LIVE_GO_SIGNERS} resolves outside the tree")
+        # A symlink loop fails closed the same way. Path.resolve() raises RuntimeError on a
+        # loop in Python 3.12 and earlier (OSError from 3.13), which main() would not catch.
+        link.unlink()
+        link.symlink_to(link.name)
+        reason = f"allowed_signers file {LIVE_GO_SIGNERS} cannot be resolved"
+        with mock.patch.object(trading_gates.subprocess, "run",
+                               side_effect=AssertionError("ssh-keygen must not run")):
+            result = self.run_check(self.ladder(self.established()))
+            self.assert_fails_closed(result, reason)
+            printed = io.StringIO()
+            with contextlib.redirect_stdout(printed):
+                code = trading_gates.main(["--root", str(self.root), "--path", "gates.json"])
+        # main() reports the loop as JSON with exit 1, and no host path reaches its output.
+        self.assertEqual(code, 1)
+        output = json.loads(printed.getvalue())
+        self.assertEqual(output["status"], "failed")
+        self.assertEqual(output["blocking"]["live"], ["live-go"])
+        self.assertIn(reason, output["authorship"]["live-go"]["detail"])
+        for host_path in {str(self.root), str(self.root.resolve())}:
+            self.assertNotIn(host_path, printed.getvalue())
+            self.assertNotIn(host_path, json.dumps(result))
 
     def test_live_go_never_holds_on_presence_alone(self):
         self.put(LIVE_GO_MD, b"# live go\n")

@@ -203,9 +203,11 @@ Once, before the first go:
      "$(cut -d' ' -f1,2 ~/.ssh/live-go_ed25519_sk.pub)" > docs/decisions/live-go.allowed_signers
    ```
 
-   The `namespaces` option limits the key to live-go signatures. To give a go an expiry, append `,valid-before="YYYYMMDD"` to that option list. After that date the verification fails and live-go stops counting. If live-go is still recorded established, `--check` then fails on `main` until you extend the line or set live-go back to `user_decision`.
+   The `namespaces` option limits the key to live-go signatures. To give a go an expiry, append `,valid-before="YYYYMMDD"` to that option list. After that date the verification fails and live-go stops counting. If live-go is still recorded established, `--check` then fails on `main`, and so does the repository test that both required CI jobs run on every pull request. Two changes fix it, each merged through a pull request like a go (steps 6 and 7 below):
+   - extend the date in `live-go.allowed_signers`. That file is not registered in `manifests/evidence.json`, so this is a one-file change;
+   - or, in the gates file, set live-go's `status` back to `user_decision` and its `evidence_class` back to `none`. This edits a registered file, so re-register it (step 5) and commit `manifests/evidence.json` with it.
 
-For each go:
+For each go (run every command from the repository root):
 
 1. Write your decision in `docs/decisions/live-go.md`. The signature covers the exact committed bytes, and this repository stores text with LF line endings (`.gitattributes`), so save the file with LF endings before you sign.
 2. Sign it. `ssh-keygen -Y sign` stops to ask before it overwrites a signature, so remove an old one first:
@@ -217,7 +219,16 @@ For each go:
 
 3. Run the verify command above. It prints `Good "live-go@native-agent-stack" signature for live-go-signer with ...`. While live-go is still `user_decision`, `--check` already reports `authorship.live-go.verified: true`.
 4. In `gates-20260922.json`, set live-go's `status` to `established` and its `evidence_class` to `user_decision`. Run `python3 scripts/trading_gates.py --check`: it must exit 0 with `status: passed`, `errors: []` and `authorship.live-go.verified: true`. `rung_ready.live` becomes `true` only when every other required gate is established and holds as well.
-5. Commit `live-go.md`, `live-go.md.sig`, `live-go.allowed_signers` and the gates file yourself.
+5. Re-register the gates file. `manifests/evidence.json` records its sha256 and byte count, and `scripts/validate.py`, which both required CI jobs run, fails on an edit that is not re-registered. Then run both checks; each must pass:
+
+   ```sh
+   python3 -c 'import sys; from pathlib import Path; sys.path.insert(0, "scripts"); import host_receipts; host_receipts.register_file(Path("."), "catalogs/us-equities/gates-20260922.json")'
+   python3 scripts/validate.py
+   python3 scripts/evidence_manifest.py --check
+   ```
+
+6. Commit the changed files yourself, in one commit on a branch based on the current `main`: `live-go.md`, `live-go.md.sig`, `live-go.allowed_signers` (on the first go, or when you changed it), the gates file and `manifests/evidence.json`. If `main` moves before you merge, rebase onto it, take `main`'s copy of `manifests/evidence.json` (`git checkout origin/main -- manifests/evidence.json`), repeat step 5 and amend the commit. The [hot-file protocol](../../docs/lanes.md#hot-file-protocol) gives the exact commands, including for a rebase that stops on that file.
+7. Open a pull request with the label `lane:trading`. The required `sota-sources` check needs a non-empty `## SOTA sources` section in its description; naming OpenSSH's `ssh-keygen -Y sign` and `-Y verify`, which this control uses, and this README section satisfies it. Merge it yourself once every required check passes. Agents never write, flip or merge a live-go change.
 
 Any later edit to `live-go.md` needs a new signature, and until you re-sign the checker fails closed. You can sign on any machine, because only the committed bytes count. To rotate or revoke the key, edit `live-go.allowed_signers`.
 

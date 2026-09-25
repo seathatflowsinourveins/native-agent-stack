@@ -30,12 +30,12 @@ allowed_signers_path, principal, namespace, note}. Only a gate owned by
 only when its receipt is non-empty and ``ssh-keygen -Y verify -f
 <allowed_signers_path> -I <principal> -n <namespace> -s <signature_path>``
 accepts the receipt's exact bytes. It fails closed: an absent or empty receipt,
-signature or allowed_signers file, a path that resolves outside the tree, no
-ssh-keygen, a timeout or any non-zero exit means the gate does not hold, so it
-cannot count as established. The ``live-go`` gate must have a control, and once
-recorded ``established`` it must carry evidence class ``user_decision``. The
-checker only verifies; it never creates a key, a signature, an allowed_signers
-entry or a receipt.
+signature or allowed_signers file, a path that resolves outside the tree or not
+at all (a symlink loop), no ssh-keygen, a timeout or any non-zero exit means the
+gate does not hold, so it cannot count as established. The ``live-go`` gate must
+have a control, and once recorded ``established`` it must carry evidence class
+``user_decision``. The checker only verifies; it never creates a key, a
+signature, an allowed_signers entry or a receipt.
 
 Rung readiness is arithmetic: a rung is ready when every ``required`` gate of
 that rung and of every earlier rung is ``established`` and its condition holds
@@ -159,9 +159,15 @@ def source_matches_holds(root: Path, document, condition: dict) -> tuple[bool, s
     if not (isinstance(recorded_sha, str) and SHA256_HEX.fullmatch(recorded_sha)):
         return False, f"source_matches: {condition['sha256_pointer']} is not a lowercase sha256 hex digest"
     try:
-        resolved = (root / source_path).resolve()
+        resolved = (root / source_path).resolve(strict=True)
+    except FileNotFoundError:
+        return False, f"source_matches: source file missing: {source_path}"
+    except (OSError, RuntimeError):
+        # A symlink loop: Python 3.12 and earlier raise RuntimeError, 3.13+ OSError.
+        return False, f"source_matches: {source_path} cannot be resolved (a symlink loop or an unreadable path)"
+    try:
         resolved.relative_to(root.resolve())
-    except (OSError, ValueError):
+    except ValueError:
         return False, f"source_matches: {source_path} resolves outside the tree"
     if not resolved.is_file():
         return False, f"source_matches: source file missing: {source_path}"
@@ -218,17 +224,23 @@ def authorship_holds(root: Path, gate: dict, control: dict) -> tuple[bool, str]:
     """Fail closed: the gate's receipt counts only when ``ssh-keygen -Y verify``
     accepts a detached SSH signature over its exact bytes, made in the named
     namespace by a key that the in-tree allowed_signers file lists for the named
-    principal. An absent, empty or out-of-tree file, no ssh-keygen, a timeout or
-    a non-zero exit is a refusal."""
+    principal. An absent, empty, out-of-tree or unresolvable file (a symlink
+    loop), no ssh-keygen, a timeout or a non-zero exit is a refusal."""
     base = root.resolve()
     files: dict[str, Path] = {}
     for label, relative in (("receipt", gate["receipt_path"]),
                             ("allowed_signers file", control["allowed_signers_path"]),
                             ("signature", control["signature_path"])):
         try:
-            resolved = (root / relative).resolve()
+            resolved = (root / relative).resolve(strict=True)
+        except FileNotFoundError:
+            return False, f"authorship: {label} missing: {relative}"
+        except (OSError, RuntimeError):
+            # A symlink loop: Python 3.12 and earlier raise RuntimeError, 3.13+ OSError.
+            return False, f"authorship: {label} {relative} cannot be resolved (a symlink loop or an unreadable path)"
+        try:
             inside = resolved.relative_to(base)
-        except (OSError, ValueError):
+        except ValueError:
             return False, f"authorship: {label} {relative} resolves outside the tree"
         if not resolved.is_file():
             return False, f"authorship: {label} missing: {relative}"

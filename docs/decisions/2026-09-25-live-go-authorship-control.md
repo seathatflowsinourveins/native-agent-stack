@@ -6,10 +6,10 @@
 signature. This is a coordinator choice, subject to independent review. The user owns the signing key, the
 allowed_signers entry, `docs/decisions/live-go.md` and every go.
 
-**Scope:** `scripts/trading_gates.py`, `tests/test_trading_gates.py`, the `authorship` block and the
-`live-go` note in `catalogs/us-equities/gates-20260922.json`, and the setup section of
-`catalogs/us-equities/README.md`. No other gate's status, condition or evidence rule changes, and no gate is
-flipped.
+**Scope:** `scripts/trading_gates.py`, `tests/test_trading_gates.py`, the `authorship` block, the
+`live-go` note and the readiness and flip-rule sentences of the top-level `scope` in
+`catalogs/us-equities/gates-20260922.json`, and the setup section of `catalogs/us-equities/README.md`. No
+other gate's status, condition or evidence rule changes, and no gate is flipped.
 
 ## Evidence
 
@@ -59,7 +59,8 @@ flipped.
    live-go holds only when its receipt is non-empty and that verification accepts the receipt's exact bytes.
    Anything else fails closed:
    - an absent or empty document, signature or allowed_signers file;
-   - a path that resolves outside the tree;
+   - a path that resolves outside the tree, or that cannot be resolved at all (a symlink loop, on which
+     Python 3.12's `Path.resolve()` raises `RuntimeError`);
    - a host without `ssh-keygen`;
    - a timeout or a non-zero exit.
 
@@ -76,7 +77,7 @@ setup is in `catalogs/us-equities/README.md`.
 ## Sources
 
 - **OpenSSH `ssh-keygen`**, installed rather than reimplemented. Source: openssh/openssh-portable, tag
-  `V_9_6_P1` (commit b24f772e), `ssh-keygen.1`:
+  `V_9_6_P1` (tag object b24f772e, commit 8241b9c0), `ssh-keygen.1`:
   - `-Y verify` (lines 765-790) reads the message on standard input, with `-n` namespace, `-s` signature, `-I`
     signer identity and `-f` allowed signers. "Successful verification by an authorized signer is signalled
     by returning a zero exit status", so the checker counts only exit 0 as verified.
@@ -84,10 +85,11 @@ setup is in `catalogs/us-equities/README.md`.
     used in the setup.
   - Lines 758-764 advise custom namespaces of the form NAMESPACE@YOUR.DOMAIN, hence
     `live-go@native-agent-stack`.
-- **git's SSH signature verification**, the reference for the invocation. Source: git/git, tag `v2.43.0`,
-  `gpg-interface.c`, `verify_ssh_signed_buffer` (lines 447-580). It refuses when no allowed signers file is
-  configured (469-472), and runs `ssh-keygen -Y verify -n <namespace> -f <allowed signers> -I <principal>
-  -s <signature>` with the payload on standard input (557-575). This checker differs in two ways:
+- **git's SSH signature verification**, the reference for the invocation. Source: git/git, tag `v2.43.0`
+  (tag object c089584a, commit 564d0252), `gpg-interface.c`, `verify_ssh_signed_buffer` (lines 447-580).
+  It refuses when no allowed signers file is configured (469-472), and runs `ssh-keygen -Y verify -n
+  <namespace> -f <allowed signers> -I <principal> -s <signature>` with the payload on standard input
+  (557-575). This checker differs in two ways:
   - it pins the principal in the catalog instead of finding it with `-Y find-principals`;
   - it passes no `-Overify-time`, so an allowed_signers `valid-before` expiry applies at check time.
 - **The readiness predicate and the `user_decision` class** change this repository's own checker contract,
@@ -152,6 +154,14 @@ setup is in `catalogs/us-equities/README.md`.
 - The checker runs the first `ssh-keygen` on `PATH`, so a local run trusts that host's environment. The
   enforcing run is the required CI jobs' unit suite, whose repository test fails on any error from an
   established live-go that does not verify, on the runner image's own `ssh-keygen`.
+- The signature tests and the README dry run used plain ed25519 keys. That a hardware-backed `ed25519-sk`
+  signature also verifies on both required runners rests on a key-type listing and source review, not on a
+  run. `ssh -Q key` on the workstation's OpenSSH_9.6p1 (Ubuntu 24.04, the release of the ubuntu-24.04
+  runner) lists `sk-ssh-ed25519@openssh.com`. Apple's OpenSSH builds define `ENABLE_SK`
+  (apple-oss-distributions/OpenSSH `openssh/config.h` at OpenSSH-328.100.5, OpenSSH-342 and
+  OpenSSH-346.120.3, which ship OpenSSH 9.6p1 to 9.9p2); which of these the macos-15 image ships was not
+  identified. The same builds leave `ENABLE_SK_INTERNAL` undefined, so macOS's own `ssh-keygen` cannot
+  create such a key without a separate FIDO middleware.
 - The checker verifies who signed `live-go.md`, not what it says. This change adds no format lint for its
   content.
 - `docs/grand-catalog-handbook.md` still says no checker can evaluate live-go. It is a shared document and is
