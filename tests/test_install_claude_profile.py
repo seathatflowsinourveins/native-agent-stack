@@ -195,11 +195,11 @@ class McpMatchTests(unittest.TestCase):
     def test_stdio_server_matches_command_args_and_env_names(self):
         existing = (
             "serena:\n  Type: stdio\n"
-            "  Command: /home/example/.local/share/codex-ecosystem/bin/serena-context\n"
+            "  Command: /home/example/.local/share/codex-ecosystem/bin/serena\n"
             "  Args: start-mcp-server --transport stdio --project-from-cwd\n"
         )
         self.assertTrue(icp.existing_config_matches(
-            existing, "stdio", "/home/example/.local/share/codex-ecosystem/bin/serena-context",
+            existing, "stdio", "/home/example/.local/share/codex-ecosystem/bin/serena",
             ["start-mcp-server", "--transport", "stdio", "--project-from-cwd"], {}))
 
     def test_stdio_server_checks_env_var_names_present(self):
@@ -243,7 +243,7 @@ class McpRenderAndCommandTests(unittest.TestCase):
                                      Path("/home/example"), Path("/opt/eco"))
         self.assertEqual(servers["jcodemunch"]["command"], "/opt/eco/bin/jcodemunch-mcp")
         self.assertEqual(servers["jcodemunch"]["env"]["CODE_INDEX_PATH"], "/home/example/.code-index")
-        self.assertEqual(servers["serena"]["command"], "/opt/eco/bin/serena-context")
+        self.assertEqual(servers["serena"]["command"], "/opt/eco/bin/serena")
         self.assertNotIn("${", json.dumps(servers))
 
     def test_unknown_placeholder_fails(self):
@@ -272,10 +272,22 @@ class McpRenderAndCommandTests(unittest.TestCase):
 
 
 class McpGetOutputTests(unittest.TestCase):
-    # Recorded from `claude mcp get` (claude 2.1.280, 2026-09-23) with the home path replaced.
-    SERENA = (
+    # SERENA_CONTEXT_20260923, JCODEMUNCH and AI_MEMORY were recorded from `claude mcp get` (claude
+    # 2.1.280, 2026-09-23) with the home path replaced. That day's serena entry ran the recording
+    # host's own `serena-context` wrapper, which nothing in this repository installs.
+    SERENA_CONTEXT_20260923 = (
         "serena:\n  Scope: User config (available in all your projects)\n  Status: \u2714 Connected\n"
         "  Type: stdio\n  Command: /home/example/.local/share/codex-ecosystem/bin/serena-context\n"
+        "  Args: start-mcp-server --transport stdio --project-from-cwd --context claude-code "
+        "--enable-web-dashboard true --open-web-dashboard false --enable-gui-log-window false\n"
+        "  Environment:\n\nTo remove this server, run: claude mcp remove serena -s user\n"
+    )
+    # Recorded 2026-09-25 (claude 2.1.282) after install_claude_profile.py --only mcp registered the
+    # current template under a temporary CLAUDE_CONFIG_DIR, with Serena installed as a uv tool at the
+    # stack pin; the scratch ecosystem prefix is replaced by the default one.
+    SERENA = (
+        "serena:\n  Scope: User config (available in all your projects)\n  Status: \u2714 Connected\n"
+        "  Type: stdio\n  Command: /home/example/.local/share/codex-ecosystem/bin/serena\n"
         "  Args: start-mcp-server --transport stdio --project-from-cwd --context claude-code "
         "--enable-web-dashboard true --open-web-dashboard false --enable-gui-log-window false\n"
         "  Environment:\n\nTo remove this server, run: claude mcp remove serena -s user\n"
@@ -305,6 +317,11 @@ class McpGetOutputTests(unittest.TestCase):
         self.assertTrue(self.matches(self.SERENA, servers["serena"]))
         self.assertTrue(self.matches(self.JCODEMUNCH, servers["jcodemunch"]))
         self.assertTrue(self.matches(self.AI_MEMORY, servers["ai-memory"]))
+
+    def test_the_earlier_wrapper_registration_differs(self):
+        # A host registered from the 2026-09-23 template is reported as differing and left
+        # unchanged until --replace-mcp re-registers it with the upstream script.
+        self.assertFalse(self.matches(self.SERENA_CONTEXT_20260923, self.rendered()["serena"]))
 
     def test_reordered_or_extra_args_do_not_match(self):
         spec = dict(self.rendered()["serena"])

@@ -557,8 +557,11 @@ _DROP_LIMITS = (
 # does not enable the cpu controller) or differs from the requested one. The
 # dropped variant runs in a fresh slice that no CPUQuota unit has touched, so
 # cpu is never enabled there and cpu.max is absent whatever else is running.
+# systemd keeps a transient slice loaded after its last scope exits, so the name
+# is fixed here and the test that uses it stops the slice again.
+NOCPU_SLICE = f"ecosystem-check-nocpu-{os.getpid()}.slice"
 _DROP_CPU = (
-    "args=(--slice=ecosystem-check-nocpu-$$.slice)\n"
+    f"args=(--slice={NOCPU_SLICE})\n"
     "for arg in \"$@\"; do\n"
     "  case $arg in --property=CPUQuota=*) ;; *) args+=(\"$arg\") ;; esac\n"
     "done\n"
@@ -699,6 +702,7 @@ class BoundedRunCpuQuotaTests(unittest.TestCase):
 
     @unittest.skipUnless(CPU_DELEGATED, "needs a user manager that delegates cpu (systemd 252+)")
     def test_scope_with_a_dropped_or_altered_cpu_quota_is_refused_with_78(self):
+        self.addCleanup(_run, ["systemctl", "--user", "stop", NOCPU_SLICE])
         for name, launcher, reason in (("dropped", _DROP_CPU, "cpu.max is not enforced"),
                                        ("altered", _ALTER_CPU, "cpu.max is 37000 100000, not")):
             with self.subTest(launcher=name), tempfile.TemporaryDirectory() as tmp:
@@ -711,6 +715,10 @@ class BoundedRunCpuQuotaTests(unittest.TestCase):
                 self.assertIn(reason, result.stderr)
                 self.assertIn("was not started", result.stderr)
                 self.assertFalse(oracle.exists(), "the command ran although it was refused")
+        # Before this stop every run left one empty slice loaded on the host.
+        _run(["systemctl", "--user", "stop", NOCPU_SLICE])
+        state = _run(["systemctl", "--user", "show", "-p", "ActiveState", "--value", NOCPU_SLICE])
+        self.assertEqual(state.stdout.strip(), "inactive", f"{NOCPU_SLICE} outlived its test")
 
     @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
     def test_without_cpu_delegation_the_default_is_skipped_and_an_explicit_quota_refused(self):
