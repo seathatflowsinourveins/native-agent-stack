@@ -1138,20 +1138,21 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
 
 ## validate-macos required (2026-09-25)
 
-- **Evidence.** PR #219's shared fail-closed credential guard passed on `validate` (ubuntu-24.04)
-  but failed on macOS only when it was later run there: 5 failures and 13 errors, because `/var`
-  and `/tmp` are OS-level symlinks on macOS and the guard's no-follow check refused them. Nothing
-  in the required-check set would have caught that before merge: `adoption-bootstrap.yml`'s
-  `validate-macos` job already runs this repository's own read-only validators and its full
-  `python3 -m unittest` suite on `macos-15` (added by PR #126, gating since the run recorded in
-  that job's own comment), but the workflow's `pull_request` trigger carried a `paths:` filter
-  (`adoption/**`, `tools/adoption/**`, `manifests/evidence.json` and others), so a PR that changes
-  only `adaptive-paper` or similar non-adoption code never ran it at all.
+- **Evidence.** PR #219's shared fail-closed credential guard did run `validate-macos` (the PR
+  touched `manifests/evidence.json`, which was already in the `pull_request` `paths:` filter) and
+  failed there: 5 failures and 13 errors, because `/var` and `/tmp` are OS-level symlinks on macOS
+  and the guard's no-follow check refused them. But nothing required that job: it was not in
+  `main-ruleset.json`'s `required_status_checks`, so its failure would not have blocked the merge
+  on its own -- only the fact that `validate` (ubuntu-24.04) also passed let the PR merge with a
+  known-red macOS run sitting next to it. A PR that touches no path in the filter (`adoption/**`,
+  `tools/adoption/**`, `manifests/evidence.json` and the others) does not run `validate-macos` at
+  all, so a macOS-only regression in code outside those paths (`adaptive-paper`, for one) would
+  have gone completely unseen, required or not.
 - **Alternatives.**
   - *Keep it optional (status quo before this change).* Rejected: an optional check that already
     exists and already caught a real macOS-only failure (#219) is exactly the evidence for making
-    it required; keeping it optional leaves every future macOS-only regression unguarded on the
-    same class of PR.
+    it required; keeping it optional leaves every future macOS-only regression unguarded, whether
+    or not the PR happens to touch a filtered path.
   - *Require it but keep the `paths:` filter.* Rejected: a required status check that GitHub never
     receives a run for is not "passing", it is "Expected -- Waiting for status" forever on any PR
     outside the filtered paths, and such a PR can never merge (GitHub's own required-status-check
@@ -1165,43 +1166,77 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     with (`adoption/pins-macos-arm64.json`, the launchd agents, the embedding-model cache). Moving
     it would split that shared context across two workflow files for no gain: the job id and check
     name (`validate-macos`) are what the ruleset and the tests key on, not the file it lives in.
-  - **Decision.** `adoption-bootstrap.yml`'s `pull_request` trigger drops its `paths:` filter
-    entirely, so every job in the workflow is at least evaluated on every PR. A new `changes` job
-    (ubuntu-24.04, harden-runner first step, `contents: read`, no new third-party action) diffs the
-    PR's base and head with plain `git diff --name-only` against the same path list the `push:`
-    trigger still carries, and its `bootstrap` output keeps `bootstrap-linux`, `bootstrap-macos` and
-    `bootstrap-macos-brew` path-gated on `pull_request` via `needs: changes` plus
-    `if: github.event_name != 'pull_request' || needs.changes.outputs.bootstrap == 'true'` --
-    those three jobs' behaviour on `push`, `schedule` and `workflow_dispatch` is unchanged.
-    `validate-macos` itself gets no `needs:` and no `if:` of its own, so it is reachable on every
-    PR regardless of which paths it touches. `.github/main-ruleset.json` adds
-    `{"context": "validate-macos", "integration_id": 15368}` to `required_status_checks`, keeping
-    `strict_required_status_checks_policy: false` unchanged. The coordinator applies the ruleset
-    with the PUT above after this change merges, as with every other required check added to the
-    target file in this record.
-  - **Cost.** One additional macOS full-test-suite run per pull request, roughly 7-12 minutes
-    (measured range of prior `validate-macos` runs on `macos-15`), at no monetary cost: GitHub
-    Actions minutes for macOS runners on a public repository are free. This is on top of the
-    `bootstrap-macos`/`bootstrap-macos-brew` real-install jobs, which stay path-gated and do not
-    run on most PRs.
-  - **Strict up-to-date stays off.** This change does not revisit that standing choice. Its
-    recorded overturn condition ("Ruleset upgrade, 2026-09-22" / "Automation closure, 2026-09-22"
-    above: a `main` failure traced to two PRs merging close together, i.e. merge skew) has not
-    occurred as of 2026-09-25; `strict_required_status_checks_policy: false` remains asserted by
-    `tests/test_workflow_hardening.py`'s `TargetRulesetTests`.
-  - **Overturn (this decision).** Either a measured `validate-macos` flake rate above 10% of runs
-    over a rolling 20-run window (tracked the same way `catalog-freshness.yml`'s drift report is
-    read, by inspecting run history for the job), or a sustained macOS runner queue delay above 15
-    minutes median over a week, both of which would make the required check itself the bottleneck
-    rather than a signal. Either observed condition is grounds to move `validate-macos` back to a
-    `paths:`-filtered, non-required lane while keeping the `bootstrap-*` jobs' existing gating.
-  - **Measured.** `tests/test_workflow_hardening.py`'s new `AdoptionBootstrapMacosRequiredTests`
-    asserts the `pull_request` trigger carries no `paths:` key, that `validate-macos` has no
-    `needs:` and no job-level `if:`, that `bootstrap-linux`/`bootstrap-macos`/`bootstrap-macos-brew`
-    keep `needs: changes` and an `if:` referencing `needs.changes.outputs.bootstrap`, and that the
-    `changes` job's own path patterns match the `push:` trigger's `paths:` list one-for-one (so the
-    two cannot silently drift apart). `TargetRulesetTests` extends its existing loop to also assert
-    `validate-macos` at `integration_id: 15368` and that
-    `strict_required_status_checks_policy` stays `false`. The full pre-existing hardening,
-    security-coverage, adoption-bootstrap and adoption-docs-consistency suites still pass
-    unchanged.
+- **Decision.** `adoption-bootstrap.yml`'s `pull_request` trigger drops its `paths:` filter
+  entirely, so every job in the workflow is at least evaluated on every PR. A new `changes` job
+  (ubuntu-24.04, harden-runner first step, `contents: read`, no new third-party action) diffs the
+  PR's base and head with plain `git diff -z --name-only` against the same path list the `push:`
+  trigger still carries, and its `bootstrap` output keeps `bootstrap-linux`, `bootstrap-macos` and
+  `bootstrap-macos-brew` path-gated on `pull_request` via `needs: changes` plus
+  `if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.bootstrap != 'false') }}`.
+  `push`, `schedule` and `workflow_dispatch` keep exactly the `push:` trigger's own pre-existing
+  `paths:` filter (unedited) for the three bootstrap-* jobs; `!cancelled()` is required precisely
+  because a plain `if:` on a job with `needs: changes` applies an implicit `success()`, which would
+  skip these jobs on every event where `changes` itself does not run (see "Measured" below for the
+  dispatch run that demonstrated this before the fix). `validate-macos` itself gets no `needs:` and
+  no `if:` of its own, so it is reachable on every PR regardless of which paths it touches.
+  `.github/main-ruleset.json` adds `{"context": "validate-macos", "integration_id": 15368}` to
+  `required_status_checks`, keeping `strict_required_status_checks_policy: false` unchanged. The
+  coordinator applies the ruleset with the PUT above after this change merges, as with every other
+  required check added to the target file in this record. The `changes` job also fails safe: a
+  missing payload SHA or a failed `git diff` writes `bootstrap=true` and exits 0, rather than
+  failing the job and skipping the three bootstrap-* jobs through `needs:`.
+- **Cost.** One additional macOS full-test-suite run per pull request, measured at 8.2-13.4
+  minutes (median 10.9 minutes) over the last 36 `validate-macos` runs, at no monetary cost: GitHub
+  Actions minutes for macOS runners on a public repository are free. This is on top of the
+  `bootstrap-macos`/`bootstrap-macos-brew` real-install jobs, which stay path-gated and do not run
+  on most PRs.
+- **Strict up-to-date stays off.** This change does not revisit that standing choice. Its recorded
+  overturn condition ("Ruleset upgrade, 2026-09-22" / "Automation closure, 2026-09-22" above: a
+  `main` failure traced to two PRs merging close together, i.e. merge skew) has not occurred as of
+  2026-09-25; `strict_required_status_checks_policy: false` remains asserted by
+  `tests/test_workflow_hardening.py`'s `TargetRulesetTests`.
+- **Overturn (this decision).** Either a measured `validate-macos` flake rate above 10% of runs
+  over a rolling 20-run window (tracked the same way `catalog-freshness.yml`'s drift report is
+  read, by inspecting run history for the job), or a sustained macOS runner queue delay above 15
+  minutes median over a week, both of which would make the required check itself the bottleneck
+  rather than a signal. Either observed condition is grounds to move `validate-macos` back to a
+  `paths:`-filtered, non-required lane while keeping the `bootstrap-*` jobs' existing gating.
+- **Rollout.** Applying the ruleset makes `validate-macos` required from that moment on GitHub's
+  side, but it does not retroactively re-run anything: an already-open PR whose most recent run
+  predates the ruleset PUT, and whose last push happened while the old `paths:` filter was still in
+  place, has no `validate-macos` status recorded at all until it receives a new push (including a
+  rebase/merge commit) or is closed and reopened. Until then GitHub reports that PR as "Expected --
+  Waiting for status" on the newly-required check, the same symptom the "keep it path-gated"
+  alternative above was rejected for, but here it is transient and self-resolving on the PR's own
+  next push rather than a standing gap.
+- **Measured (before the fix).** Independent review found that `bootstrap-linux`/`bootstrap-macos`/
+  `bootstrap-macos-brew`'s original `if: github.event_name != 'pull_request' || ...` (no
+  `!cancelled()`) combined with `needs: changes` and `changes`' own
+  `if: github.event_name == 'pull_request'` meant `needs: changes` applied an implicit `success()`
+  on every non-`pull_request` event: with `changes` skipped, `success()` was false and all three
+  bootstrap-* jobs were skipped too. The coordinator's dispatch run
+  [36085789483](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36085789483)
+  (`gh workflow run adoption-bootstrap.yml --ref claude/require-validate-macos-20260925` at
+  `f0bea733`) confirmed this directly: `changes` reported skipped, `bootstrap-linux`,
+  `bootstrap-macos` and `bootstrap-macos-brew` all completed as skipped, and `validate-macos` ran
+  normally (it has no `needs:`). This would have silently stopped the weekly pinned-download
+  re-check and the post-merge/dispatch install smoke.
+- **Measured (after the fix).** *(coordinator to fill in after the fix is pushed: dispatch run id,
+  and confirmation that `changes` still runs only on `pull_request` while `bootstrap-linux`,
+  `bootstrap-macos` and `bootstrap-macos-brew` now complete rather than skip on
+  `workflow_dispatch`.)*
+- **Static checks.** `tests/test_workflow_hardening.py`'s new `AdoptionBootstrapMacosRequiredTests`
+  asserts the `pull_request` trigger carries no `paths:` key, that `validate-macos` has no
+  `needs:` and no job-level `if:`, that `bootstrap-linux`/`bootstrap-macos`/`bootstrap-macos-brew`
+  keep `needs: changes` with an `if:` that both uses `!cancelled()` (or `always()`) and compares
+  `needs.changes.outputs.bootstrap` with `!= 'false'` (not `== 'true'`, which is exactly what
+  reintroduces the skip-on-push/schedule/dispatch bug -- the test fails against the pre-fix text),
+  and that the `changes` job's own path patterns match the `push:` trigger's `paths:` list once
+  both are normalized to the same glob spelling (a case pattern's single `*` is a wider match than
+  `paths:`'s `**`, always in the safe, over-matching direction; the test compares the normalized
+  text, not GitHub's exact `paths:` matching semantics). `TargetRulesetTests` extends its existing
+  loop to also assert `validate-macos` at `integration_id: 15368` and that
+  `strict_required_status_checks_policy` stays `false`. actionlint 1.7.12 (with shellcheck on
+  `PATH`) and zizmor's offline strict pass report no findings on the changed workflow. The full
+  pre-existing hardening, security-coverage, adoption-bootstrap and adoption-docs-consistency
+  suites still pass unchanged.

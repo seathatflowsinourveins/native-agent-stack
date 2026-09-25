@@ -288,7 +288,7 @@ checks; a required check must run on every PR, and a scheduled or path-gated
 lane does not. Update 2026-09-22: `sbom-vuln` is no longer report-only; it
 fails its own job on a High or Critical grype match (see "Secret and
 supply-chain scanning"), but it is still not a required check.
-`adoption-bootstrap.yml`'s fourth job, `validate-macos`, is the exception
+`adoption-bootstrap.yml`'s fifth job, `validate-macos`, is the exception
 (2026-09-25): its workflow's `pull_request` trigger carries no `paths:` filter
 at all, so `validate-macos` itself reports a status on every pull request and
 is a required check (see "validate-macos required (2026-09-25)" in

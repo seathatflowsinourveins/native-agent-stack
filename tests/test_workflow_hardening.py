@@ -740,20 +740,58 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
         self.assertNotIn("needs:", header)
         self.assertNotRegex(header, r"(?m)^    if:", "a required check must not be skipped on any pull_request")
 
-    def test_bootstrap_jobs_stay_path_gated_on_pull_request(self):
+    def test_bootstrap_jobs_stay_path_gated_on_pull_request_and_still_run_off_it(self):
+        # Regression for "bootstrap jobs are skipped on push, schedule and dispatch"
+        # (independent review of this branch, 2026-09-25): `needs: changes` alone applies
+        # an implicit `success()`, and `changes` itself only runs `if:
+        # github.event_name == 'pull_request'`, so on push/schedule/workflow_dispatch
+        # `changes` is skipped and a bare `if: github.event_name != 'pull_request' ||
+        # needs.changes.outputs.bootstrap == 'true'` (no status function) is never even
+        # evaluated -- the implicit success() check fails first and the job is skipped
+        # too. Confirmed live: dispatch run 36085789483 showed `changes` skipped and all
+        # three bootstrap-* jobs completing as skipped (docs/decisions/
+        # 2026-09-22-github-automation-closure.md, "validate-macos required
+        # (2026-09-25)", "Measured (before the fix)"). The fix needs both a status
+        # function (`!cancelled()` or `always()`) so the `if:` is evaluated at all when
+        # `changes` was skipped, and `!= 'false'` rather than `== 'true'` so a `changes`
+        # job that itself failed or was cancelled (empty output, not the string
+        # `'false'`) still runs these jobs (`changes`' own fail-safe default is
+        # `bootstrap=true`, never a skip).
         for job_id in ("bootstrap-linux", "bootstrap-macos", "bootstrap-macos-brew"):
             job = self.job_map[job_id]
             self.assertIn("needs: changes", job, job_id)
             condition = block_if(job)
             self.assertIsNotNone(condition, job_id)
-            self.assertIn("needs.changes.outputs.bootstrap", condition, job_id)
+            self.assertRegex(condition, r"!cancelled\(\)|always\(\)",
+                              f"{job_id}: if: needs a status function (!cancelled() or always()) "
+                              f"or an implicit success() from `needs: changes` skips it whenever "
+                              f"changes itself is skipped (every push/schedule/dispatch run); got: {condition!r}")
+            self.assertIn("needs.changes.outputs.bootstrap != 'false'", condition, job_id)
+            self.assertNotIn("needs.changes.outputs.bootstrap == 'true'", condition,
+                              f"{job_id}: '== ' true would keep the fail-open behaviour a "
+                              f"missing/empty output (changes skipped, failed or cancelled) needs "
+                              f"'!= \\'false\\'' to avoid")
             self.assertIn("github.event_name != 'pull_request'", condition, job_id)
 
-    def test_changes_job_runs_only_on_pull_request_and_diffs_the_same_paths_as_push(self):
+    def test_the_pre_fix_condition_text_fails_this_tests_own_assertions(self):
+        # Proof the strengthened assertions above are not vacuous: the exact `if:` text
+        # this branch shipped before the fix round (a bare `if:`, no status function, and
+        # `== 'true'`) must fail them.
+        pre_fix_condition = "github.event_name != 'pull_request' || needs.changes.outputs.bootstrap == 'true'"
+        with self.assertRaises(AssertionError):
+            self.assertRegex(pre_fix_condition, r"!cancelled\(\)|always\(\)")
+        with self.assertRaises(AssertionError):
+            self.assertIn("needs.changes.outputs.bootstrap != 'false'", pre_fix_condition)
+
+    def test_changes_job_runs_only_on_pull_request_and_diffs_paths_matching_push(self):
         job = self.job_map["changes"]
         self.assertEqual(block_if(job), "github.event_name == 'pull_request'")
         # The push trigger's `paths:` list stays the source of truth this job's own
-        # PATTERNS array must match, so the two cannot silently drift apart.
+        # PATTERNS array must match once both are normalized to the same glob spelling;
+        # this is a textual comparison of the two lists, not a re-derivation of GitHub's
+        # own `paths:` matching semantics (a case pattern's single `*` matches `/`, so it
+        # is a strictly wider match than `paths:`'s `**` -- always in the safe,
+        # over-matching direction; see the job's own in-file comment).
         trigger = self.text.split("\non:\n", 1)[1].split("\n\njobs:", 1)[0]
         push = trigger.split("push:", 1)[1].split("pull_request:", 1)[0]
         push_paths = re.findall(r"(?m)^      - '([^']+)'$", push)
@@ -767,6 +805,34 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
         job_patterns = re.findall(r"(?m)^            '([^']+)'$", job)
         self.assertTrue(job_patterns)
         self.assertEqual(sorted(normalize(path) for path in push_paths), sorted(job_patterns))
+
+    def test_changes_job_fails_safe_on_missing_shas_and_git_diff_errors(self):
+        # Item 2/3 of the independent review: a missing payload SHA or a failed `git
+        # diff` must still write bootstrap=true (never leave the job to fail and skip
+        # the three bootstrap-* jobs through `needs:`), and the diff must be NUL-delimited
+        # so a non-ASCII quoted filename still matches a PATTERNS glob.
+        job = self.job_map["changes"]
+        script = step_block(job, "Detect whether any bootstrap-relevant path changed")
+        (set_flags,) = re.findall(r"(?m)^\s+set (-\S+)(?: |$)", script)
+        self.assertNotIn("e", set_flags, "set -e would abort before a failure path's own bootstrap=true write")
+        self.assertIn('echo "bootstrap=true" >> "$GITHUB_OUTPUT"', script)
+
+        def if_block(needle):
+            # A same-indentation-anchored match (not a naive string split on "fi", which
+            # false-positives inside "$diff_file"): captures from the matched "if" line
+            # through the "fi" at the same leading whitespace.
+            match = re.search(rf"(?ms)^([ \t]*)if\b[^\n]*{re.escape(needle)}.*?\n(.*?)\n\1fi\b", script)
+            self.assertIsNotNone(match, needle)
+            return match.group(0)
+
+        missing_sha_block = if_block('-z "${BASE_SHA:-}"')
+        self.assertIn('echo "bootstrap=true"', missing_sha_block)
+        self.assertIn("exit 0", missing_sha_block)
+        self.assertIn("git diff -z --no-renames --name-only", script)
+        diff_failure_block = if_block("git diff -z")
+        self.assertIn('echo "bootstrap=true"', diff_failure_block)
+        self.assertIn("exit 0", diff_failure_block)
+        self.assertIn("read -r -d ''", script)
 
 
 if __name__ == "__main__":
