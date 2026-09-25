@@ -235,7 +235,32 @@ hand over the `broker/shutdown` RPC, which worked cleanly.
   opened in the workspace after a crash can cancel a job an earlier,
   now-dead session left behind. Operators can read the blocking job's id
   straight out of `--list`'s per-broker `reasons` (a guard (b) failure names
-  it) to pass to `/codex:cancel`.
+  it) to pass to `/codex:cancel`. **Caveat, added here (minor finding,
+  sixth fix round, 2026-09-25): `/codex:cancel` itself carries the same
+  pid-reuse hazard guard (a) exists to prevent, and this tool has no control
+  over it.** Verified directly in the plugin source: `handleCancel`
+  (`codex-companion.mjs` L986) calls `terminateProcessTree(job.pid ??
+  NaN)` -- which sends `SIGTERM` to `-pid`, the process GROUP
+  (`lib/process.mjs`'s `killImpl(-pid, "SIGTERM")`) -- *before* the job
+  record is written with `status: "cancelled"` (L990-997), and swallows
+  only an `ESRCH` error; there is no cmdline check and no liveness check
+  beyond that. The recorded `pid` is either the crashed session's own
+  worker process (`process.pid`, `tracked-jobs.mjs` L148, for a task run)
+  or its detached child (`child.pid`, `codex-companion.mjs` L693, for a
+  queued job), and is set to `null` only on completion or cancellation --
+  so a crash-orphaned job's recorded `pid` can already be stale by the time
+  an operator runs `/codex:cancel` later. If the OS has since reused that
+  pid for an unrelated process-group leader (`pid_max` 4194304 on this
+  host, `/proc/sys/kernel/pid_max`), `/codex:cancel` sends `SIGTERM` to
+  that UNRELATED process group instead -- the same upstream #743 shape
+  guard (a) exists to prevent, just on the plugin's own remedy path rather
+  than this tool's. Operators should confirm the recorded pid (from the
+  job's own record, or the broker's `--list` `reasons`) is either already
+  gone (`/proc/<pid>` missing, or `kill -0 <pid>` fails) or still genuinely
+  that job's own worker (its `/proc/<pid>/cmdline` still names the expected
+  `codex`/task invocation) before running `/codex:cancel` -- the same
+  identity check this tool's own guard (a) performs before ever acting on a
+  recorded pid itself.
 - **Guard (c), a coordinator with no git relationship to the worktree at
   all:** found in review of this rollout's own "reaper" track (second fix
   round, 2026-09-25) — a coordinating session that dispatches into a
@@ -946,7 +971,11 @@ summarizes.
   `/codex:cancel` as the remedy; this tool still does not act on it itself
   (unchanged rationale: relaxing guard (b) based on the job's own recorded
   `pid` not being alive would trade a disclosed, conservative margin for a
-  different, unverified one).
+  different, unverified one). **Caveat added here (minor finding, sixth fix
+  round, 2026-09-25):** this remedy description did not itself warn that
+  `/codex:cancel` carries the same pid-reuse hazard guard (a) exists to
+  prevent -- see "Known limitations" above, "Guard (b), crash-orphaned
+  jobs", for the mechanism and the operator-facing warning now added there.
 - **Not actioned -- verification-scope note, not a code defect.** A finding
   that required-check results on the eventual PR merge commit (`validate`,
   `validate-macos`, `secret-scan`, `token-report`, `dependency-review`,
@@ -993,3 +1022,133 @@ summarizes.
   proportionate gap rather than triggering a re-pin for a wording-only
   change; a future pass touching the README for another reason should
   update both while it is there.
+
+## Fix round (2026-09-25, sixth pass)
+
+A review of `e4b58e95` (the fifth pass's own HEAD) found one major and two
+minor findings; all three are resolved here (code, this record, and the
+README). See the tool's own docstring and `tests/test_codex_broker_reaper.py`
+for the code-level detail this section summarizes.
+
+- **Major -- guard (c)'s keying root walked PAST a removed `git worktree`
+  checkout into an unrelated enclosing checkout.** The fifth pass's own
+  `keying_root = find_git_toplevel(workspace_root) or workspace_root` walks
+  upward for the nearest ancestor with a currently EXISTING `.git` entry.
+  For Claude Code's own `.claude/worktrees/<name>` layout (this project's
+  own workflow-child worktrees), once the worktree directory itself is
+  removed, `os.path.exists(worktree/".git")` is False, so the walk
+  continued straight into the ENCLOSING main checkout -- a directory the
+  plugin's own `state.mjs` `resolveStateDir` never hashed for this broker
+  at all -- and a live session anywhere under that unrelated enclosing
+  checkout then wrongly kept an already-removed, genuinely orphaned
+  worktree broker blocked. It was correctly eligible before the fifth
+  pass's own keying_root gating was introduced (the fourth pass's plain
+  `os.path.isdir(workspace_root)` check, applied to the broker's raw
+  `/proc/<pid>/cwd`, reached "workspace unused" directly). Reproduced
+  directly, not only reasoned about, against a scratch copy of the pre-fix
+  tool pointed at `git show e4b58e95:adoption/tools/codex-broker-reaper`
+  (see "Re-measured" below). Fixed: guard (c) now selects the keying root
+  by IDENTITY instead of existence (`find_keying_root`, `hash_workspace_root`,
+  `state_dir_hash_suffix`) -- `workspace_root` itself, then each successive
+  parent, is hashed with `sha256(realpath(...))[:16]` (mirroring
+  `resolveStateDir`'s own hash) and compared against the hash already
+  sitting in this broker's own state-dir name, returning the FIRST (nearest)
+  match. `workspace_root` is always checked before any parent, so a removed
+  worktree whose own path already matches the suffix is returned
+  immediately and is never superseded by an enclosing checkout that merely
+  happens to still exist on disk. Falls back to the previous
+  `find_git_toplevel(workspace_root) or workspace_root` heuristic whenever
+  the broker's own state-dir name does not end in the plugin's 16-hex-
+  character hash, or no ancestor's hash matches it -- every pre-sixth-pass
+  guard (c) test uses a synthetic state-dir name that does not itself end
+  in 16 hex characters, so this fallback path is exactly what all 50 of
+  them continue to exercise unchanged (confirmed: all 50 pass unmodified,
+  see "Re-measured" below). Regression tests: `KeyingRootTests` (six new
+  unit tests against `find_keying_root`/`hash_workspace_root`/
+  `state_dir_hash_suffix` directly, no spawned broker or session --
+  `test_matches_workspace_root_itself_before_walking_up` is the exact
+  removed-worktree-whose-own-path-matches shape); and, end to end, two new
+  `LiveCwdGuardTests` reproducing the reported `.claude/worktrees/<name>`
+  layout with a live session in the parent (main) checkout:
+  `test_removed_dot_claude_worktree_state_dir_keys_off_the_worktree_not_the_main_checkout`
+  (confirmed red against the pre-fix tool -- guard (c) wrongly failed,
+  `eligible: false`, "guard c failed: live pid ... has a cwd under
+  .../main-checkout" -- and green against the fixed one) and its companion
+  `test_worktree_still_exists_and_hash_matched_state_dir_still_detects_a_live_session_inside_it`
+  (proving the fix does not overcorrect: a live session genuinely inside a
+  still-existing, hash-matched worktree still blocks eligibility).
+- **Minor -- the decision record's `/codex:cancel` remedy did not warn
+  about the plugin's own pid-reuse hazard.** The fifth pass added
+  `/codex:cancel <job-id>` as the operator's remedy for a crash-orphaned
+  `queued`/`running` job (guard (b)) without disclosing that
+  `handleCancel` (`codex-companion.mjs` L986) calls
+  `terminateProcessTree(job.pid ?? NaN)` -- `SIGTERM` to the recorded pid's
+  process GROUP (`lib/process.mjs`'s `killImpl(-pid, "SIGTERM")`) -- with no
+  liveness or identity check beyond swallowing `ESRCH`, and *before* the
+  job record is written `cancelled`. Verified directly against the
+  installed plugin source (evidence above): the recorded pid can be stale
+  by the time an operator acts (it is set to `null` only on completion or
+  cancellation), and this host's own `pid_max` is 4194304, so a reused pid
+  is not implausible over time -- exactly the upstream #743 pid-reuse shape
+  this tool's own guard (a) exists to prevent, just on the plugin's remedy
+  path rather than this tool's. Not a defect in this tool (it never calls
+  `/codex:cancel` itself and has no control over the plugin's own
+  `handleCancel`), but an omission in advice this record itself gives
+  operators. Fixed: both "Known limitations" ("Guard (b), crash-orphaned
+  jobs") and the fifth-pass recap above now warn operators to confirm the
+  recorded pid is either already gone or still genuinely the job's own
+  worker before running `/codex:cancel`, mirroring the identity check
+  guard (a) itself performs before this tool ever acts on a recorded pid.
+  No test: this is advisory prose for a human operator acting outside this
+  tool's own process, not a code path this tool's test suite exercises.
+- **Minor -- the README fell one pass behind the tool and the suite
+  again, plus overstated the tests' own isolation.** Flagged by this
+  round's own review, disclosed as expected in the fifth pass's own
+  closing note above. Fixed: the guard (c) table row now describes the
+  keying root by identity (hash match, falling back to git-toplevel, falling
+  back to the raw cwd) rather than "read from the broker's own live
+  `/proc/<pid>/cwd`" alone; the test count/pass label is now "58 tests ...
+  (sixth pass)" (`grep -c '^    def test_' tests/test_codex_broker_reaper.py`
+  = 58, matching `python3 -m unittest tests.test_codex_broker_reaper -v`'s
+  own "Ran 58 tests"); and the claim that no real broker, session, or state
+  directory "is read or touched by the tests" is corrected -- guard (c)'s
+  live-session scan is host-wide and unrestricted, and the live-broker scan
+  reads every real broker's own `cmdline` before `LiveCwdGuardTests.setUp`
+  restricts its EXCLUSION result back down to this suite's own fixtures (the
+  test module's own docstring already discloses this; the README did not).
+  Mechanical re-pin, listed here per this track's own common rules: `manifests/evidence.json`'s
+  `adoption/tools/README.md` entry (`sha256` and `bytes` only,
+  `sha256=2982f8557c58a6d273ea18773559543352e0f3f267f30a2afba42be95d8ffa84`,
+  `bytes=35285`); `git diff manifests/evidence.json` confirms exactly those
+  two fields changed, matching every earlier pass's own re-pin shape and
+  `json.dumps(..., indent=2)`'s default `ensure_ascii=True` escaping
+  elsewhere in the file untouched.
+- **Re-measured (sixth pass):** `python3 -m unittest
+  tests.test_codex_broker_reaper -v` (58 tests, all passing -- 50 before
+  this round's 8 new regression tests: 6 `KeyingRootTests` unit tests plus 2
+  end-to-end `LiveCwdGuardTests`; all 50 pre-existing tests pass unmodified,
+  confirming the hash-matching fallback path preserves their exact prior
+  behavior); `python3 adoption/tools/codex-broker-reaper --list` against
+  this host's real plugin state (still 17 found, 0 eligible, exit 0 --
+  unchanged from every earlier round); `python3 scripts/validate.py`
+  (`{"components": 69, "hashed_files": 5402, "profiles": 4, "receipts":
+  145, "status": "passed"}`, exit 0 -- identical component/receipt figures
+  to the fifth pass's own, confirming this pass's only publication-hashed
+  change is the README re-pin above) and `python3
+  scripts/validate_foundation.py` (`FOUNDATION catalog valid: layers=20,
+  decisions=54, foundation_components=61, domain_components=7,
+  evidence_receipts=84, candidates=3`, exit 0), both re-run directly
+  against this round's own commits. The major finding's new tests were
+  additionally confirmed red against the pre-fix tool: a scratch copy of
+  `test_removed_dot_claude_worktree_state_dir_keys_off_the_worktree_not_the_main_checkout`'s
+  own scenario, run against `git show e4b58e95:adoption/tools/codex-broker-reaper`
+  loaded under a separate module name (not the fixed tool under test),
+  reproduces the exact guard (c) failure the finding describes (`eligible:
+  false`, `"guard c failed: live pid ... has a cwd under
+  .../main-checkout"`); the companion "does not overcorrect" test needs no
+  separate pre-fix run, since it asserts the *same* blocked outcome the
+  pre-fix tool already produced for a live session genuinely inside an
+  existing workspace. This round's diff touches the tool script, the test
+  module, this decision record, and (mechanically) `adoption/tools/README.md`
+  plus `manifests/evidence.json`'s matching re-pin -- every allowed path for
+  this track, nothing else.
