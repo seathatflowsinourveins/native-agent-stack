@@ -135,6 +135,19 @@ def _ohlcv(b):
 
 
 def part1_counts(store, cal, sessions: list, symbols: list, actions: list) -> dict:
+    """The part-1 counts per year (and per listing exchange). Review round 15, N03: a fetch-incomplete request no
+    longer drops its batch from every rate. Each rate keeps its own cohort, defined by the requests that decide
+    membership in it, and a pair whose membership or outcome is unknown counts against coverage (fail closed):
+      official close   cohort: asof = s raw close >= $1. An incomplete raw request puts every sampled pair of the
+                       batch in the denominator with no accepted close (raw_fetch_incomplete_pairs); a known member
+                       whose auctions request is incomplete stays in the denominator (official_close_fetch_incomplete).
+      identity         cohort: default-asof raw close >= $1. An incomplete default-asof request counts every pair of
+                       the batch as unreached (default_asof_pairs_unknown); a member whose asof = s raw request is
+                       incomplete is unreached (identity_unreached_pairs_fetch_incomplete).
+      stamps, minutes  phase2_counts: an incomplete raw request counts each coverage-selected pair's stamps and its
+                       minute pair as fetch-incomplete.
+    The candidate count for the fetch estimate adds every pair whose candidacy is unknown (sampled_candidates_unknown;
+    fetch_estimate counts them as candidates)."""
     new_symbols = {r["new_symbol"] for r in actions if r.get("type") == "name_change" and r.get("new_symbol")}
     c = defaultdict(Counter)
     for s in sessions:
@@ -144,31 +157,47 @@ def part1_counts(store, cal, sessions: list, symbols: list, actions: list) -> di
         for batch in plan.batches(picked):
             reqs = {r["kind"]: r for r in plan.screen_requests(cal, s, batch)}
             dflt = {r["kind"]: r for r in part1_requests(cal, s, batch) if r["kind"].startswith("count_default")}
-            if any(store.status(r["key"]) != "complete" for r in reqs.values()):
+            ok = {k: store.status(r["key"]) == "complete" for k, r in reqs.items()}
+            dflt_key = dflt["count_default_asof_daily_raw"]["key"]
+            dflt_ok = store.status(dflt_key) == "complete"
+            if not all(ok.values()):
                 c[y]["sampled_pairs_fetch_incomplete"] += len(batch)
-                continue
-            for r in reqs.values():
+            for k, r in reqs.items():
                 c[y]["screen_requests"] += 1
-                c[y]["screen_requests_empty"] += store.empty(r["key"])
-            raw = store.parsed(reqs["screen_daily_raw"]["key"])
-            split = store.parsed(reqs["screen_daily_split"]["key"])
-            prints = store.parsed(reqs["screen_auctions"]["key"])
-            draw = store.parsed(dflt["count_default_asof_daily_raw"]["key"]) \
-                if store.status(dflt["count_default_asof_daily_raw"]["key"]) == "complete" else {}
+                if ok[k]:
+                    c[y]["screen_requests_empty"] += store.empty(r["key"])
+                else:
+                    c[y][f"screen_requests_fetch_incomplete:{k}"] += 1
+            raw = store.parsed(reqs["screen_daily_raw"]["key"]) if ok["screen_daily_raw"] else None
+            split = store.parsed(reqs["screen_daily_split"]["key"]) if ok["screen_daily_split"] else None
+            prints = store.parsed(reqs["screen_auctions"]["key"]) if ok["screen_auctions"] else None
+            draw = store.parsed(dflt_key) if dflt_ok else None
             for x in batch:
                 c[y]["sampled_pairs"] += 1
-                b = raw.get(x, {}).get(s)
-                pr = prints.get(x, {})
-                ex = FM.listing_exchange(pr.get(s)) or "none"
+                b = raw.get(x, {}).get(s) if raw is not None else None
+                pr = prints.get(x, {}) if prints is not None else {}
+                ex = (FM.listing_exchange(pr.get(s)) or "none") if prints is not None else "unknown"
                 # identity diagnostic, per year and per listing exchange (review round 11, C5)
-                db = draw.get(x, {}).get(s)
-                if db and db["c"] >= 1.0:
-                    c[y]["default_asof_pairs_close_ge_1"] += 1
-                    c[y][f"default_asof_pairs_close_ge_1:{ex}"] += 1
-                    if (b is None or _ohlcv(db) != _ohlcv(b)) and x not in new_symbols:
-                        c[y]["identity_unreached_pairs"] += 1
-                        c[y][f"identity_unreached_pairs:{ex}"] += 1
-                        c[y]["_unreached:" + x] = 1
+                if draw is None:
+                    c[y]["default_asof_pairs_unknown"] += 1
+                    c[y][f"default_asof_pairs_unknown:{ex}"] += 1
+                else:
+                    db = draw.get(x, {}).get(s)
+                    if db and db["c"] >= 1.0:
+                        c[y]["default_asof_pairs_close_ge_1"] += 1
+                        c[y][f"default_asof_pairs_close_ge_1:{ex}"] += 1
+                        if raw is None:
+                            c[y]["identity_unreached_pairs_fetch_incomplete"] += 1
+                            c[y][f"identity_unreached_pairs_fetch_incomplete:{ex}"] += 1
+                        elif (b is None or _ohlcv(db) != _ohlcv(b)) and x not in new_symbols:
+                            c[y]["identity_unreached_pairs"] += 1
+                            c[y][f"identity_unreached_pairs:{ex}"] += 1
+                            c[y]["_unreached:" + x] = 1
+                if raw is None:
+                    # membership in the official-close cohort is unknown: counted against it (fail closed)
+                    c[y]["raw_fetch_incomplete_pairs"] += 1
+                    c[y]["sampled_candidates_unknown"] += 1
+                    continue
                 if not b:
                     continue
                 # every part-1 output is counted per year and, as '<name>:<listing exchange>', per exchange
@@ -178,16 +207,22 @@ def part1_counts(store, cal, sessions: list, symbols: list, actions: list) -> di
                     c[y][name] += 1
                     c[y][f"{name}:{ex}"] += 1
                 tally("with_daily_bar")
-                f_t = FM.share_factor(raw.get(x, {}), split.get(x, {}), prev, s)
+                f_t = FM.share_factor(raw.get(x, {}), split.get(x, {}), prev, s) if split is not None else None
                 prev_b = raw.get(x, {}).get(prev)
                 suspected = FM.suspected_unadjusted_split(b["c"], prev_b["c"] if prev_b else None, f_t)
                 # the candidate count applies D's floor to the accepted official close only, never to the raw daily
                 # close, so a pair with raw close < $1 and official close >= $1 still counts (review round 9, L-3)
-                if not suspected and _sampled_candidate(x, s, prev, pr, f_t):
+                if split is None or prints is None:
+                    tally("sampled_candidates_unknown")
+                elif not suspected and _sampled_candidate(x, s, prev, pr, f_t):
                     tally("sampled_candidates")
                 if b["c"] < 1.0:
                     continue
                 tally("with_bar_close_ge_1")
+                if prints is None:
+                    # a known member of the official-close cohort whose prints are unknown counts against it
+                    tally("official_close_fetch_incomplete")
+                    continue
                 label_c = FM.close_label(pr.get(s))
                 label_o = official_price(pr.get(s), "o")[1] or "no_print"
                 tally(f"close_label:{label_c}")
@@ -209,21 +244,32 @@ def _sampled_candidate(x: str, s: str, prev: str, pr: dict, f_t) -> bool:
 
 
 def phase2_counts(store, cal, sessions: list, symbols: list, c: dict) -> None:
+    """Coverage stamps and minute pairs. Review round 15, N03: a batch whose asof = s raw request is incomplete has
+    an unknown stamp and minute cohort, so each coverage-selected pair of it counts its stamps as fetch-incomplete and
+    its minute pair as fetch-incomplete (fail closed), instead of leaving both denominators."""
     for s in sessions:
         y = year_of(s)
         picked = [x for x in symbols if sampled(x, s)]
         for batch in plan.batches(picked):
             reqs = {r["kind"]: r for r in plan.screen_requests(cal, s, batch)}
             if store.status(reqs["screen_daily_raw"]["key"]) != "complete":
+                for x in batch:
+                    if coverage_selected(x, s):
+                        n = len(coverage_stamps(cal, s))
+                        c[y]["coverage_stamps_fetch_incomplete"] += n
+                        c[y]["coverage_stamps_fetch_incomplete:unknown"] += n
+                        c[y]["minute_pairs_fetch_incomplete"] += 1
+                        c[y]["minute_pairs_fetch_incomplete:unknown"] += 1
+                        c[y]["coverage_pairs_raw_unknown"] += 1
                 continue
             raw = store.parsed(reqs["screen_daily_raw"]["key"])
-            prints = store.parsed(reqs["screen_auctions"]["key"]) \
-                if store.status(reqs["screen_auctions"]["key"]) == "complete" else {}
+            auctions_ok = store.status(reqs["screen_auctions"]["key"]) == "complete"
+            prints = store.parsed(reqs["screen_auctions"]["key"]) if auctions_ok else {}
             with_bar = [x for x in batch if (raw.get(x, {}).get(s) or {}).get("c", 0) >= 1.0]
             for req in part1_phase2(cal, s, with_bar):
                 x = req["params"]["symbols"]
                 st = store.status(req["key"])
-                ex = FM.listing_exchange(prints.get(x, {}).get(s)) or "none"
+                ex = (FM.listing_exchange(prints.get(x, {}).get(s)) or "none") if auctions_ok else "unknown"
 
                 def tally(name, ex=ex, y=y):       # per year and per listing exchange (review round 11, C5)
                     c[y][name] += 1
@@ -253,14 +299,26 @@ def plan_stamp(req) -> float:
 
 
 def rates(cy: Counter) -> dict:
+    """coverage_rule.year_rule's four rates, each over its own cohort, with every fetch-incomplete member or unknown
+    candidate member counted against coverage (review round 15, N03; part1_counts, phase2_counts)."""
     def ratio(a, b):
         return (a / b) if b else None
     q_den = cy["coverage_stamps_with_eligible"] + cy["coverage_stamps_without_eligible"] + cy["coverage_stamps_fetch_incomplete"]
     m_den = cy["minute_pairs_with_regular_bar"] + cy["minute_pairs_without_regular_bar"] + cy["minute_pairs_fetch_incomplete"]
-    return {"official_close_rate": ratio(cy["accepted_official_close"], cy["with_bar_close_ge_1"]),
+    oc_den = cy["with_bar_close_ge_1"] + cy["raw_fetch_incomplete_pairs"]
+    id_num = cy["identity_unreached_pairs"] + cy["identity_unreached_pairs_fetch_incomplete"] + \
+        cy["default_asof_pairs_unknown"]
+    id_den = cy["default_asof_pairs_close_ge_1"] + cy["default_asof_pairs_unknown"]
+    return {"official_close_rate": ratio(cy["accepted_official_close"], oc_den),
             "eligible_quote_rate": ratio(cy["coverage_stamps_with_eligible"], q_den),
-            "identity_unreached_rate": ratio(cy["identity_unreached_pairs"], cy["default_asof_pairs_close_ge_1"]),
+            "identity_unreached_rate": ratio(id_num, id_den),
             "minute_bar_rate": ratio(cy["minute_pairs_with_regular_bar"], m_den)}
+
+
+def candidates_for_bound(cy: Counter) -> int:
+    """k of candidate_bound: the sampled candidates plus every sampled pair whose candidacy is unknown because a
+    screen request it needs is fetch-incomplete (review round 15, N03: an unknown counts against the margin)."""
+    return cy["sampled_candidates"] + cy["sampled_candidates_unknown"]
 
 
 def candidate_bound(k: int) -> int:
@@ -280,7 +338,7 @@ def outputs(protocol: dict, c: dict, probe: dict, part0: dict, fetch_estimate_se
         public = {k: v for k, v in sorted(cy.items()) if not k.startswith("_")}
         public["distinct_unreached_symbols"] = sum(1 for k in cy if k.startswith("_unreached:"))
         years[str(y)] = {"counts": public, "rates": r, "decision": decisions[y],
-                         "candidate_bound": candidate_bound(cy["sampled_candidates"])}
+                         "candidate_bound": candidate_bound(candidates_for_bound(cy))}
     return {"kind": "mover_v3_count_only_output", "coverage_rule_sha256": rule_sha256(protocol),
             "years": years, "item_rule": item_rule(decisions),
             "validation_identity_limited": identity_limited(years["2020"]["rates"]["identity_unreached_rate"], th),
@@ -516,7 +574,7 @@ def run(protocol: dict, cal, transports: dict, snapshot_root, fetch_date: str, r
     c = part1_counts(s1, cal, sessions, enum["symbols"], enum["actions"])
     phase2_counts(s1, cal, sessions, enum["symbols"], c)
     part0 = {**part0_counts(enum), "enumeration_sha256": sha256_bytes(enum_bytes)}
-    est = fetch_estimate(cal, len(enum["symbols"]), {y: c.get(y, Counter())["sampled_candidates"]
+    est = fetch_estimate(cal, len(enum["symbols"]), {y: candidates_for_bound(c.get(y, Counter()))
                                                      for y in range(2016, 2021)}, rate_per_minute)
     out = outputs(protocol, c, probe_counts(s3, cal, probes), part0, est["estimate_seconds"])
     out["fetch_estimate"] = est

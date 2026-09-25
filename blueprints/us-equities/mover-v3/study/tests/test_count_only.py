@@ -157,6 +157,63 @@ class Pipeline(unittest.TestCase):
         self.assertEqual(out["years"]["2020"]["counts"]["distinct_unreached_symbols"], 1 if unreached else 0)
 
 
+class SelectiveFailures(unittest.TestCase):
+    """Review round 15, N03: a failed endpoint no longer removes its batch from every rate. Four sessions, each with
+    its own sampled pairs, every pair with a raw close >= $1, an accepted official close, quotes at both stamps and
+    regular-session minute bars: s1 complete; s2 with its screen auctions failing; s3 with its asof = s raw daily
+    request failing (one of its pairs coverage-selected); s4 with its default-asof raw request failing. At e7529b47
+    s2 and s3 dropped out of every rate (official close 1.0, identity 0.0) and s4 out of the identity rate."""
+
+    def test_each_rate_keeps_its_cohort_and_counts_unknowns_against_coverage(self):
+        cal = synth.calendar()
+        s1, s2, s3, s4 = "2020-06-02", "2020-06-03", "2020-06-04", "2020-06-05"
+        sess = [s1, s2, s3, s4]
+        names = [f"N{i:04d}" for i in range(3000)]
+        chosen = {s: [x for x in names if CO.sampled(x, s)][:3] for s in sess}
+        chosen[s3].append(next(x for x in names if CO.sampled(x, s3) and CO.coverage_selected(x, s3)))
+        symbols = sorted({x for xs in chosen.values() for x in xs})
+        m = synth.FakeMarket(cal)
+        for sym in symbols:
+            daily, prints = issuer_data(cal, cal.offset(s1, -2), s4, lambda d: 5.0)
+            quotes = [synth.quote(st - 0.2, 4.99, 5.01) for d in sess for st in CO.coverage_stamps(cal, d)]
+            minute = [b for d in sess for b in synth.minute_rows(cal, d, 5.0, 10, n=3)]
+            m.add(sym, [("2015-01-01", sym)], daily=daily, auctions=prints, minute=minute, quotes=quotes)
+        m.fail = [(lambda path, p: path == "/v2/stocks/auctions" and p.get("asof") == s2, "urlerror", 10_000),
+                  (lambda path, p: path == "/v2/stocks/bars" and p.get("timeframe") == "1Day" and
+                   p.get("adjustment") == "raw" and p.get("asof") == s3, "urlerror", 10_000),
+                  (lambda path, p: path == "/v2/stocks/bars" and p.get("timeframe") == "1Day" and
+                   p.get("adjustment") == "raw" and "asof" not in p and p.get("end") == s4, "urlerror", 10_000)]
+        store = Store()
+        driver.stage_fetch(CO.part1_planner(cal, sess, symbols), transports(m), store, "2026-09-25",
+                           clock=fixed_clock)
+        c = CO.part1_counts(store, cal, sess, symbols, [])
+        CO.phase2_counts(store, cal, sess, symbols, c)
+        cy = c[2020]
+        n = {s: sum(CO.sampled(x, s) for x in symbols) for s in sess}
+        cov3 = sum(CO.sampled(x, s3) and CO.coverage_selected(x, s3) for x in symbols)
+        self.assertGreaterEqual(cov3, 1)
+        self.assertEqual(cy["with_bar_close_ge_1"], n[s1] + n[s2] + n[s4])
+        self.assertEqual(cy["official_close_fetch_incomplete"], n[s2])
+        self.assertEqual(cy["raw_fetch_incomplete_pairs"], n[s3])
+        self.assertEqual(cy["accepted_official_close"], n[s1] + n[s4])
+        self.assertEqual(cy["default_asof_pairs_unknown"], n[s4])
+        self.assertEqual(cy["identity_unreached_pairs_fetch_incomplete"], n[s3])
+        self.assertEqual(cy["identity_unreached_pairs"], 0)
+        r = CO.rates(cy)
+        total = sum(n.values())
+        self.assertAlmostEqual(r["official_close_rate"], (n[s1] + n[s4]) / total)
+        self.assertAlmostEqual(r["identity_unreached_rate"], (n[s3] + n[s4]) / total)
+        # the raw-incomplete batch's coverage-selected pairs count against the stamp and minute rates
+        self.assertEqual(cy["coverage_pairs_raw_unknown"], cov3)
+        self.assertGreaterEqual(cy["coverage_stamps_fetch_incomplete"], 2 * cov3)
+        self.assertGreaterEqual(cy["minute_pairs_fetch_incomplete"], cov3)
+        self.assertLess(r["eligible_quote_rate"], 1.0)
+        self.assertLess(r["minute_bar_rate"], 1.0)
+        # every pair whose candidacy is unknown (s2: prints; s3: raw) counts toward the fetch-estimate bound
+        self.assertEqual(cy["sampled_candidates_unknown"], n[s2] + n[s3])
+        self.assertEqual(CO.candidates_for_bound(cy), cy["sampled_candidates"] + n[s2] + n[s3])
+
+
 class Round9(unittest.TestCase):
     """Review round 9: the candidate count uses D's floor on the official close only (L-3), coverage_rule's hash is
     checked before any fetch (L-3), and the committed count-only command (M-2, F8)."""
