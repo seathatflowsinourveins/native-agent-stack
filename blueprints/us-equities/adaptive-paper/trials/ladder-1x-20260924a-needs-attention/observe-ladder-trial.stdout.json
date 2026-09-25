@@ -1,0 +1,114 @@
+{
+ "method": "alpaca-py TradingClient.get_orders(status=all, after) filtered by client-id prefix; GET /v2/account/activities/FILL (after) joined to those orders; get_all_positions; open orders",
+ "alpaca_py_version": "0.44.0",
+ "python": "3.12.3",
+ "observed_at": "2026-09-24T15:45:36.379888-04:00",
+ "prefix": "adp-ladder-1x-20260924a-",
+ "listing_after": "2026-09-24T19:27:00+00:00",
+ "orders_listed_since_after": 4,
+ "orders_with_prefix": 4,
+ "orders": [
+  {
+   "order": "0000001",
+   "symbol": "INTC",
+   "side": "buy",
+   "qty": "7",
+   "limit_price": "126.13",
+   "status": "filled",
+   "filled_qty": "7",
+   "filled_avg_price": "126.12"
+  },
+  {
+   "order": "0000002",
+   "symbol": "AMD",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "627.13",
+   "status": "filled",
+   "filled_qty": "1",
+   "filled_avg_price": "627.11"
+  },
+  {
+   "order": "0000003",
+   "symbol": "AMD",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "626.85",
+   "status": "filled",
+   "filled_qty": "1",
+   "filled_avg_price": "626.86"
+  },
+  {
+   "order": "0000004",
+   "symbol": "INTC",
+   "side": "sell",
+   "qty": "7",
+   "limit_price": "126.31",
+   "status": "filled",
+   "filled_qty": "7",
+   "filled_avg_price": "126.327143"
+  }
+ ],
+ "fill_activities": [
+  {
+   "order": "0000001",
+   "symbol": "INTC",
+   "side": "buy",
+   "qty": "7",
+   "price": "126.12",
+   "cum_qty": "7",
+   "leaves_qty": "0",
+   "type": "fill",
+   "transaction_time": "2026-09-24T19:30:07.520763Z"
+  },
+  {
+   "order": "0000002",
+   "symbol": "AMD",
+   "side": "buy",
+   "qty": "1",
+   "price": "627.11",
+   "cum_qty": "1",
+   "leaves_qty": "0",
+   "type": "fill",
+   "transaction_time": "2026-09-24T19:30:12.175087Z"
+  },
+  {
+   "order": "0000003",
+   "symbol": "AMD",
+   "side": "sell",
+   "qty": "1",
+   "price": "626.86",
+   "cum_qty": "1",
+   "leaves_qty": "0",
+   "type": "fill",
+   "transaction_time": "2026-09-24T19:30:18.617633Z"
+  },
+  {
+   "order": "0000004",
+   "symbol": "INTC",
+   "side": "sell",
+   "qty": "6",
+   "price": "126.33",
+   "cum_qty": "6",
+   "leaves_qty": "1",
+   "type": "partial_fill",
+   "transaction_time": "2026-09-24T19:30:43.792527Z"
+  },
+  {
+   "order": "0000004",
+   "symbol": "INTC",
+   "side": "sell",
+   "qty": "1",
+   "price": "126.31",
+   "cum_qty": "7",
+   "leaves_qty": "0",
+   "type": "fill",
+   "transaction_time": "2026-09-24T19:30:44.355408Z"
+  }
+ ],
+ "status_counts": {
+  "filled": 4
+ },
+ "positions_now": 0,
+ "open_orders_now": 0
+}

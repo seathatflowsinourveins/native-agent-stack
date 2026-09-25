@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--headroom--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "headroom",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v headroom) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" headroom",
+      "exit": 0,
+      "duration_s": 0.034,
+      "output_sha256": "961fd52182eeca7c78f14b36b24f2212ad98117689dd75843718084e41589300",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/headroom -> ~/.local/share/codex-ecosystem/python-tools/headroom-ai/bin/headroom\nstack ['0.37.0'] winner pins ['0.37.0']\n"
+    },
+    {
+      "cmd": "headroom --version",
+      "exit": 0,
+      "duration_s": 0.203,
+      "output_sha256": "c7de8da02118d954bbff5cd74e90f8488d0e945455384b057e495e13125330c2",
+      "output_excerpt": "headroom, version 0.37.0\n"
+    }
+  ],
+  "tool_versions": {
+    "headroom": "0.37.0"
+  },
+  "observed_at_utc": "2026-09-25T05:38:17Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), headroom is installed at the pinned version (the catalog pin): the command resolves to this host's install under ~/.local/share/codex-ecosystem, and its version call reports the pin. Readiness only; a version call is not functional acceptance. All commands exit 0.",
+  "limitations": [
+    "Install stage: a resolved path, a pin record and a version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "No proxy, MCP server, wrap or savings report was run.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:38:17Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked points 3 and 4 for this install receipt (the resolved path, stack and winner pins and version call each have retained output; component_id is the token-efficiency winner and 0.37.0 pin_matches its pin) and re-ran every command on this host with identical output (headroom, version 0.37.0).",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
+    }
+  ]
+}

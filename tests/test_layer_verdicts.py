@@ -424,6 +424,13 @@ class WaveFreezeTests(LayerVerdictFixture):
         self.assertIn("us-equities/market-data-reference", output)
         self.assertIn("20260922", output)
 
+    def test_frozen_row_comparison_is_type_strict(self):
+        # A type-only rewrite (1 -> 1.0 or True) must not compare equal to the frozen entry.
+        same_json = build_verdicts.__dict__["same_json"]
+        self.assertTrue(same_json({"a": 1, "b": [True]}, {"b": [True], "a": 1}))
+        for rewritten in ({"a": 1.0, "b": [True]}, {"a": True, "b": [True]}, {"a": 1, "b": [1]}):
+            self.assertFalse(same_json({"a": 1, "b": [True]}, rewritten))
+
     def test_the_newest_wave_is_regenerated_from_the_current_rows(self):
         self.two_waves()
         self.record_later_wave_on_the_foundation_row(gap="a second correction in the same wave")

@@ -11,6 +11,7 @@ from pathlib import Path
 import sys
 import time
 import unittest
+from unittest import mock
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -145,18 +146,49 @@ class SessionClockTests(unittest.TestCase):
             self.skipTest("exchange_calendars is not installed in this shared engine environment")
         self.assertTrue(result)
 
+    def test_exchange_calendars_agreement_2027_or_absent(self):
+        # The 2027 table (NYSE hours-calendars page, fetched 2026-09-24) must
+        # match XNYS session by session, including the 13:00 early close.
+        result = sess.exchange_calendars_agrees(2027)
+        if result is None:
+            self.skipTest("exchange_calendars is not installed in this shared engine environment")
+        self.assertTrue(result)
+
     def test_year_outside_calendar_refused(self):
-        # D7: dates outside the frozen table's year(s) must not be silently
-        # classified against the 2026 table. exchange_calendars is not
-        # installed in this environment, so both raise.
-        with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
-            sess.session_at(ny(2025, 12, 25, 12, 0))
-        with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
-            sess.session_at(ny(2027, 1, 1, 12, 0))
+        # D7/finding-6 (2026-09-24 fix round): dates outside the frozen
+        # table's year(s) must not be silently classified against another
+        # year's table. The exchange_calendars fallback is disabled here so
+        # the result does not depend on whether exchange_calendars is
+        # installed (fix round 3, item 10: CI only installs the lockfile
+        # into the separate promotion-gate venv, not this test interpreter,
+        # so that package is not reliably present here either way).
+        # 2027 is covered by HOLIDAYS_2027 (see test_2027_calendar_covered
+        # below); 2025 and 2028 are not.
+        with mock.patch.object(sess, "_exchange_calendars_day", return_value=None):
+            with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
+                sess.session_at(ny(2025, 12, 25, 12, 0))
+            with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
+                sess.session_at(ny(2028, 1, 1, 12, 0))
 
     def test_year_inside_calendar_still_works(self):
         info = sess.session_at(ny(2026, 12, 31, 12, 0))
         self.assertEqual(info.kind, sess.SessionKind.RTH)
+
+    def test_2027_calendar_covered(self):
+        # finding 6: next_trading_day(2026-12-31) used to raise because the
+        # calendar covered only 2026 -- a session-calendar failure at a
+        # year boundary must no longer happen for 2026 -> 2027. New Year's
+        # Day 2027 (a Friday) is a full-closure holiday; the next trading
+        # day after it is Monday 2027-01-04.
+        self.assertEqual(sess.next_trading_day(date(2026, 12, 31)), date(2027, 1, 4))
+        info = sess.session_at(ny(2027, 1, 4, 12, 0))
+        self.assertEqual(info.kind, sess.SessionKind.RTH)
+        self.assertFalse(sess.is_trading_session(ny(2027, 1, 1, 12, 0)))  # New Year's Day holiday
+        # Friday after Thanksgiving 2027 is a scheduled 13:00 ET early close.
+        early = sess.session_at(ny(2027, 11, 26, 12, 0))
+        self.assertTrue(early.is_early_close)
+        self.assertEqual(early.kind, sess.SessionKind.RTH)
+        self.assertEqual(sess.session_at(ny(2027, 11, 26, 13, 30)).kind, sess.SessionKind.POST)
 
     def test_extended_session_close_spans_pre_rth_post(self):
         # D4: PRE's own .close (09:30) is only the RTH-open boundary, not the
@@ -782,6 +814,333 @@ class TradingStatusTsNsGuardTests(unittest.TestCase):
         self.controller.trading_status({"symbol": "SPY", "halted": True})  # ignored
         self.controller.trading_status({"symbol": "SPY", "halted": True, "ts_ns": 100})
         self.assertIn("SPY", self.controller.halted_symbols)
+
+
+class HaltStateFromStatusMessages(unittest.TestCase):
+    """E4: per-symbol halt state from trading status messages in Alpaca's documented
+    schema (synthetic fixtures), through transport.normalize_trading_status into
+    runner.Controller.trading_status, the transport's sink_status."""
+
+    def setUp(self):
+        import tempfile
+        self.tmp = tempfile.TemporaryDirectory()
+        self.now = 1_800_000_000.0
+        self.ledger = Ledger(Path(self.tmp.name) / "account.sqlite3")
+        self.ledger.start_trial(self.now)
+        self.controller = Controller(self.ledger, self.now + 3600, market_open=True, clock=lambda: self.now)
+
+        class Port:
+            ready = True
+        self.controller.port = Port()
+
+    def tearDown(self):
+        self.ledger.close()
+        self.tmp.cleanup()
+
+    def send(self, symbol, sc, second, rc="", z="C"):
+        self.controller.trading_status(normalize_trading_status(
+            {"T": "s", "S": symbol, "sc": sc, "sm": "", "rc": rc, "rm": "",
+             "t": "2026-09-24T15:40:%02d.000000000Z" % second, "z": z}))
+
+    def halted(self, symbol="SPY"):
+        return self.controller.is_halted(symbol)
+
+    def quote(self, symbol="SPY"):
+        self.controller.quote({"symbol": symbol, "bid": "100", "ask": "100.01", "ts_ns": int(self.now * 1e9)})
+
+    def test_cta_halt_with_reason_m_halts_and_resume_clears(self):
+        self.send("SPY", "2", 10, rc="M", z="A")
+        self.assertTrue(self.halted())
+        self.assertEqual(self.controller.halt_states["SPY"]["state"], "luld_pause")
+        self.send("SPY", "3", 11, z="A")
+        self.assertFalse(self.halted())
+
+    def test_e_and_f_never_clear_a_halt_and_never_move_the_ordering_guard(self):
+        self.send("SPY", "2", 10, rc="M", z="A")
+        self.send("SPY", "F", 20, z="A")
+        self.send("SPY", "E", 30, z="B")
+        self.assertTrue(self.halted())
+        # A genuine resume stamped before those E/F messages still applies: they moved no guard.
+        self.send("SPY", "3", 15, z="A")
+        self.assertFalse(self.halted())
+        # And E or F alone never halts a trading symbol.
+        self.send("QQQ", "F", 20, z="B")
+        self.send("QQQ", "E", 21, z="B")
+        self.assertFalse(self.halted("QQQ"))
+        effects = [e["effect"] for e in self.controller.events if e["type"] == "trading_status"]
+        self.assertEqual(effects, ["halted", "unchanged", "unchanged", "resumed", "unchanged", "unchanged"])
+
+    def test_out_of_order_messages_keep_the_newest_state(self):
+        self.send("SPY", "T", 30)
+        self.send("SPY", "P", 20, rc="LUDP")     # older pause after a newer resume: stale
+        self.assertFalse(self.halted())
+        self.send("SPY", "H", 50, rc="T12")
+        self.send("SPY", "T", 40)                # older resume after a newer halt: stale
+        self.assertTrue(self.halted())
+        self.assertEqual(sum(1 for e in self.controller.events if e.get("effect") == "stale_ignored"), 2)
+
+    def test_a_halt_and_a_resume_with_one_timestamp_resolve_to_halted(self):
+        self.send("SPY", "T", 59)
+        self.send("SPY", "H", 59, rc="T12")
+        self.assertTrue(self.halted())
+        self.send("SPY", "T", 59)
+        self.assertTrue(self.halted())
+
+    def test_subscribing_mid_halt_takes_the_first_message_as_it_comes(self):
+        # The stream sends no snapshot: without a startup seed, a symbol already halted when
+        # the engine subscribed is known from its next message. A quotation-only period (UTP
+        # Q) or a CTA price indication (5) is only sent while halted, so it halts on arrival
+        # with no prior halt seen; a CTA trading range indication (6) describes a symbol that
+        # is not halted and changes nothing.
+        self.send("SPY", "Q", 5, rc="T3")
+        self.send("IWM", "5", 5, z="A")
+        self.send("DIA", "6", 5, z="B")
+        self.assertTrue(self.halted("SPY") and self.halted("IWM"))
+        self.assertFalse(self.halted("DIA"))
+        self.send("QQQ", "T", 5, rc="C11")      # a resume with no prior state leaves it trading
+        self.assertFalse(self.halted("QQQ"))
+        self.send("SPY", "T", 6)
+        self.send("IWM", "3", 6, z="A")
+        self.assertFalse(self.halted("SPY") or self.halted("IWM"))
+        self.send("DIA", "2", 7, rc="M", z="B")
+        self.send("DIA", "6", 8, z="B")          # a range indication never clears a halt either
+        self.assertTrue(self.halted("DIA"))
+
+    def seed(self, halts, **extra):
+        return {"source": "nasdaq_trade_halts_rss", "fetched_at_ns": int(self.now * 1e9), "sha256": "0" * 64,
+                "bytes": 1, "items": len(halts), "halts": halts, **extra}
+
+    def ts(self, second):
+        return normalize_trading_status({"T": "s", "S": "SPY", "sc": "T",
+                                         "t": "2026-09-24T15:40:%02d.000000000Z" % second})["ts_ns"]
+
+    def run_seed(self, fetch, symbols=("SPY", "QQQ")):
+        self.controller.halt_seed_fetch = fetch
+
+        async def go():
+            task = self.controller.start_halt_seed(list(symbols))
+            self.assertTrue(self.controller.halt_seed_pending())
+            await task
+        asyncio.run(go())
+
+    def clock_at(self, seconds):
+        """Put the controller's clock ``seconds`` after 2026-09-24 15:40:00Z (the status times)."""
+        self.now = self.ts(0) / 1e9 + seconds
+
+    def luld_seed(self, halted_at=None, resumes=None, reason="LUDP"):
+        return lambda symbols: self.seed({"SPY": {"halted_at_ns": self.ts(10) if halted_at is None else halted_at,
+                                                  "resumption_trade_ns": resumes, "reason_code": reason,
+                                                  "market": "NASDAQ"}})
+
+    def test_a_startup_seed_halts_a_symbol_until_a_later_streamed_resume(self):
+        self.clock_at(60)   # the engine starts a minute into the pause
+        seen = []
+        def fetch(symbols):
+            seen.append(symbols)
+            return self.seed({"SPY": {"halted_at_ns": self.ts(10), "resumption_trade_ns": None,
+                                      "reason_code": "LUDP", "market": "NASDAQ"}})
+        self.quote()
+        self.run_seed(fetch)
+        self.assertEqual(seen, [["QQQ", "SPY"]])
+        self.assertFalse(self.controller.halt_seed_pending())
+        self.assertTrue(self.halted())
+        self.assertTrue(self.controller.quotes["SPY"].halted)       # entries refused at once
+        self.assertFalse(self.halted("QQQ"))
+        self.assertEqual(self.controller.halt_states["SPY"]["state"], "seeded_halt")
+        summary = self.controller.halt_summary()["seed"]
+        self.assertEqual((summary["status"], summary["halted"], summary["applied"]), ("seeded", ["SPY"], ["SPY"]))
+        self.send("SPY", "T", 5)                  # a resume older than the seeded halt: stale
+        self.assertTrue(self.halted())
+        self.send("SPY", "T", 20, rc="C11")       # the pause's own resume clears the seeded halt
+        self.assertFalse(self.halted())
+
+    def test_a_resume_streamed_before_the_seed_returned_is_not_undone(self):
+        self.clock_at(60)
+        self.send("SPY", "T", 30, rc="C11")       # the pause ended while the feed was being read
+        self.run_seed(lambda symbols: self.seed({"SPY": {"halted_at_ns": self.ts(10), "resumption_trade_ns": None,
+                                                          "reason_code": "LUDP", "market": "NASDAQ"}}))
+        self.assertFalse(self.halted())
+        self.assertEqual(self.controller.halt_seed["applied"], [])
+        self.assertEqual(self.controller.events[-2]["effect"], "stale_ignored")
+
+    def test_a_failed_seed_read_is_recorded_and_halts_nothing(self):
+        from transport import TransportError
+        def fetch(symbols):
+            raise TransportError("halts feed unavailable")
+        self.run_seed(fetch)
+        self.assertEqual((self.controller.halt_seed["status"], self.controller.halt_seed["reason"]),
+                         ("unavailable", "halts feed unavailable"))
+        self.assertFalse(self.halted() or self.halted("QQQ") or self.controller.halt_seed_pending())
+        def odd(symbols):
+            raise RuntimeError("provider said something long and private")
+        self.run_seed(odd)
+        self.assertEqual(self.controller.halt_seed["reason"], "RuntimeError")   # never provider text
+
+    def test_entries_wait_for_the_seed_only_until_its_bound(self):
+        import threading
+        clock, release = [self.now], threading.Event()
+        self.controller.clock = lambda: clock[0]
+        self.controller.halt_seed_fetch = lambda symbols: (release.wait(5), self.seed({}))[1]
+
+        async def go():
+            task = self.controller.start_halt_seed(["SPY"], wait_seconds=3.0)
+            self.assertTrue(self.controller.halt_seed_pending())
+            clock[0] = self.now + 3.0             # the wait runs out while the read is still open
+            self.assertFalse(self.controller.halt_seed_pending())
+            release.set()
+            await task
+        asyncio.run(go())
+        self.assertEqual(self.controller.halt_seed["status"], "seeded")   # a late seed is still applied
+
+    def test_without_a_seed_source_nothing_waits(self):
+        async def go():
+            return self.controller.start_halt_seed(["SPY"])
+        self.assertIsNone(asyncio.run(go()))
+        self.assertEqual(self.controller.halt_summary()["seed"], {"status": "not_configured"})
+        self.assertFalse(self.controller.halt_seed_pending())
+
+    def test_a_seed_read_still_open_at_the_end_is_cancelled(self):
+        import threading
+        release = threading.Event()
+        self.controller.halt_seed_fetch = lambda symbols: (release.wait(5), self.seed({}))[1]
+
+        async def go():
+            self.controller.start_halt_seed(["SPY"])
+            await asyncio.sleep(0)
+            await self.controller.stop_halt_seed()
+            release.set()
+        asyncio.run(go())
+        self.assertEqual(self.controller.halt_seed["status"], "cancelled")
+
+    def test_market_wide_circuit_breaker_halts_each_symbol_until_it_resumes(self):
+        self.send("SPY", "2", 10, rc="1", z="B")
+        self.send("IBM", "2", 10, rc="1", z="A")
+        self.send("QQQ", "H", 10, rc="MWC1", z="C")
+        self.assertTrue(all(self.halted(s) for s in ("SPY", "IBM", "QQQ")))
+        self.assertEqual({self.controller.halt_states[s]["state"] for s in ("SPY", "IBM", "QQQ")},
+                         {"market_wide_circuit_breaker"})
+        self.send("QQQ", "T", 20, rc="MWCQ")
+        self.send("SPY", "3", 21, z="B")
+        self.assertEqual(self.controller.halt_summary()["halted_now"], ["IBM"])
+
+    @unittest.skipUnless(NATIVE, "Controller.before_submit imports native_adapter (pinned Nautilus 2.0.0rc5 runtime)")
+    def test_no_entry_while_halted_and_entries_resume_after(self):
+        self.quote()
+        order = {"client_order_id": "adp-t1-0000001", "symbol": "SPY", "side": "buy", "qty": "1",
+                 "limit_price": "100.02"}
+        self.send("SPY", "P", 10, rc="LUDP")
+        self.assertTrue(self.controller.quotes["SPY"].halted)   # the stored quote is marked at once
+        from native_adapter import NativeOrderRejected
+        with self.assertRaisesRegex(NativeOrderRejected, "quote_halted"):
+            self.controller.before_submit(order)
+        self.assertEqual(self.ledger.intents(), [])
+        self.send("SPY", "T", 11)
+        self.quote()
+        self.controller.before_submit(order)
+        self.assertEqual([i.client_id for i in self.ledger.intents()], ["adp-t1-0000001"])
+
+    def test_a_status_for_a_symbol_without_a_quote_marks_the_first_quote_halted(self):
+        self.send("SPY", "H", 10, rc="T1")
+        self.assertNotIn("SPY", self.controller.quotes)
+        self.quote()
+        self.assertTrue(self.controller.quotes["SPY"].halted)
+
+    def test_a_stale_luld_seed_expires_so_it_cannot_block_the_symbol_for_the_session(self):
+        # A3: the pause resumed before the engine subscribed, but the lagging feed still shows
+        # it and the stream sends changes only, so no status follows. The seed stops counting
+        # 12 minutes after the pause began; until then the symbol gets no order at all.
+        self.clock_at(70)
+        self.quote()
+        self.run_seed(self.luld_seed())
+        self.assertTrue(self.halted())
+        self.assertTrue(self.controller.quotes["SPY"].halted)
+        expires = self.ts(10) + 12 * 60 * 10 ** 9
+        summary = self.controller.halt_summary()
+        self.assertEqual(summary["seed"]["expiry"], {"SPY": {"expires_ns": expires, "basis": "luld_pause_bound"}})
+        self.assertEqual(summary["seeded_only"], {"SPY": {"expires_ns": expires, "basis": "luld_pause_bound"}})
+        self.assertEqual(self.controller.halt_states["SPY"]["expires_ns"], expires)
+        self.clock_at(10 + 12 * 60 - 1)
+        self.assertTrue(self.halted())
+        self.clock_at(10 + 12 * 60)
+        self.assertFalse(self.halted())
+        self.assertFalse(self.controller.quotes["SPY"].halted)      # entries resume as well
+        self.assertEqual(self.controller.halt_states["SPY"]["state"], "seed_expired")
+        expired = self.controller.events[-1]
+        self.assertEqual((expired["effect"], expired["basis"], expired["ts_ns"]),
+                         ("seed_expired", "luld_pause_bound", expires))
+        self.assertEqual(self.controller.halt_summary()["seeded_only"], {})
+        self.send("SPY", "H", 30, rc="T1")      # a streamed halt newer than the seed still applies
+        self.assertTrue(self.halted())
+
+    def test_a_seeded_halt_expires_at_its_resumption_trade_time(self):
+        self.clock_at(20)
+        resumes = self.ts(10) + 5 * 60 * 10 ** 9
+        self.run_seed(self.luld_seed(resumes=resumes, reason="T1"))
+        self.assertTrue(self.halted())
+        self.assertEqual(self.controller.halt_seed["expiry"]["SPY"],
+                         {"expires_ns": resumes, "basis": "resumption_trade_time"})
+        self.clock_at(10 + 5 * 60)
+        self.assertFalse(self.halted())
+
+    def test_a_seeded_halt_the_stream_confirms_never_expires(self):
+        self.clock_at(20)
+        self.run_seed(self.luld_seed())
+        self.send("SPY", "P", 15, rc="LUDP")    # a streamed pause after the seed's halt time
+        self.assertEqual(self.controller.halt_summary()["seeded_only"], {})
+        self.clock_at(10 + 30 * 60)
+        self.assertTrue(self.halted())
+        self.send("SPY", "T", 50)
+        self.assertFalse(self.halted())
+
+    def test_a_seed_row_already_past_its_expiry_is_not_applied(self):
+        # A prior day's pause whose row kept no resumption time.
+        self.clock_at(20)
+        self.run_seed(self.luld_seed(halted_at=self.ts(10) - 24 * 3600 * 10 ** 9))
+        self.assertFalse(self.halted())
+        self.assertEqual((self.controller.halt_seed["applied"], self.controller.halt_seed["expired_on_arrival"]),
+                         ([], ["SPY"]))
+        self.assertNotIn("SPY", self.controller.halt_states)
+
+    def test_a_non_luld_seed_without_a_resumption_time_lasts_until_a_status_arrives(self):
+        self.clock_at(20)
+        self.run_seed(self.luld_seed(reason="T12"))
+        self.assertEqual(self.controller.halt_seed["expiry"]["SPY"], {"expires_ns": None, "basis": None})
+        self.clock_at(10 + 6 * 3600)
+        self.assertTrue(self.halted())
+        self.send("SPY", "T", 40, rc="C11")
+        self.assertFalse(self.halted())
+
+    def test_the_quote_condition_flag_blocks_entries_but_never_exits(self):
+        # B6: the per-quote condition flag is a best-effort, unverified signal. It marks the
+        # stored quote halted (the ledger refuses an entry), but is_halted, which gates every
+        # order of a halted symbol including exits and exit re-pricing, reads only the status
+        # stream and the startup seed.
+        flagged = {"symbol": "SPY", "bid": "100", "ask": "100.01", "ts_ns": int(self.now * 1e9), "halted": True}
+        self.controller.quote(flagged)
+        self.assertTrue(self.controller.quotes["SPY"].halted)
+        self.assertFalse(self.halted())
+        with self.assertRaisesRegex(SafetyError, "quote_halted"):
+            self.ledger.reserve_intent("adp-t1-0000001", "SPY", "buy", "1", "100.02",
+                                       quote=self.controller.quotes["SPY"], now=self.now, market_open=True,
+                                       session_close=self.now + 3600)
+        self.send("SPY", "H", 10, rc="T1")
+        self.assertTrue(self.halted())
+        self.send("SPY", "T", 11)
+        self.assertFalse(self.halted())
+        self.assertTrue(self.controller.quotes["SPY"].halted)       # the quote's own flag still stands
+        self.controller.quote(dict(flagged, halted=False, ts_ns=flagged["ts_ns"] + 1_000_000))
+        self.assertFalse(self.controller.quotes["SPY"].halted)
+
+    def test_an_unrecognized_tape_still_resumes_on_a_documented_resume(self):
+        # B7: a message whose tape is missing or unrecognized reads its code from both tables.
+        self.send("SPY", "H", 10, rc="T1", z="")
+        self.assertTrue(self.halted())
+        self.send("SPY", "T", 11, z="")
+        self.assertFalse(self.halted())
+        self.send("QQQ", "2", 10, rc="M", z="X")
+        self.assertEqual(self.controller.halt_states["QQQ"]["state"], "luld_pause")
+        self.send("QQQ", "3", 11, z="X")
+        self.assertFalse(self.halted("QQQ"))
 
 
 class OvernightGrossCapLiveConsumerTests(unittest.TestCase):

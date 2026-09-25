@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "id": "macos-m5pro-20260924--alpaca-py--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "macos-m5pro-20260924",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true
+  },
+  "catalog_revision": "6f7a77c65c6d905244152be42b0ba5acccf25abe",
+  "recorded_by": {
+    "identity_sha256": "465f6e5b081bc30590a2e335daf6619193359c7c36b080838038d9a317f7d25c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "alpaca-py",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": ".runtime/mac-paper-e2e/venv/bin/python -c \"import importlib.metadata as m;print(*[k+'=='+m.version(k) for k in ('nautilus_trader','alpaca-py','numpy','pandas')])\" && .runtime/mac-paper-e2e/venv/bin/python -c \"import re,sys,platform,importlib.metadata as m;n=lambda s:re.sub(r'[-_.]+','-',s).lower();L={n(k):v for k,v in re.findall(r'^([a-z0-9][a-z0-9._-]*)==(\\S+)',open(sys.argv[1]).read(),re.M)};I={n(d.metadata['Name']):d.version for d in m.distributions()};bad=sorted(k for k in set(L)|set(I) if L.get(k)!=I.get(k));print(sys.version.split()[0],platform.machine(),'lock',len(L),'installed',len(I),'mismatch',bad);sys.exit(1 if bad else 0)\" evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock && .runtime/mac-paper-e2e/gate-venv/bin/python -c \"import re,sys,platform,importlib.metadata as m;n=lambda s:re.sub(r'[-_.]+','-',s).lower();L={n(k):v for k,v in re.findall(r'^([a-z0-9][a-z0-9._-]*)==(\\S+)',open(sys.argv[1]).read(),re.M)};I={n(d.metadata['Name']):d.version for d in m.distributions()};bad=sorted(k for k in set(L)|set(I) if L.get(k)!=I.get(k));print(sys.version.split()[0],platform.machine(),'lock',len(L),'installed',len(I),'mismatch',bad);sys.exit(1 if bad else 0)\" blueprints/us-equities/data/requirements.lock && UV_NO_CONFIG=1 uv pip check --python .runtime/mac-paper-e2e/venv/bin/python && UV_NO_CONFIG=1 uv pip check --python .runtime/mac-paper-e2e/gate-venv/bin/python",
+      "exit": 0,
+      "duration_s": 0.134,
+      "output_sha256": "244bb1acbf4f856f48762513160861bf1369c6669eacc1ff7ff0c45a3cf3a936",
+      "output_excerpt": "nautilus_trader==2.0.0rc5 alpaca-py==0.44.0 numpy==2.5.3 pandas==3.0.6\n3.12.14 arm64 lock 20 installed 20 mismatch []\n3.12.14 arm64 lock 21 installed 21 mismatch []\nUsing Python 3.12.14 environment at: .runtime/mac-paper-e2e/venv\nChecked 20 packages in 0.55ms\nAll installed packages are compatible\nUsing Python 3.12.14 environment at: .runtime/mac-paper-e2e/gate-venv\nChecked 21 packages in 0.73ms\nAl"
+    },
+    {
+      "cmd": ".runtime/mac-paper-e2e/venv/bin/python -m unittest discover -s tests -p 'test_adaptive_paper_*.py' > .runtime/mac-paper-e2e/logs/receipt-adaptive-paper.log 2>&1; a=$?; .runtime/mac-paper-e2e/venv/bin/python -m unittest discover -s tests -p 'test_native_faults_min.py' > .runtime/mac-paper-e2e/logs/receipt-native-faults.log 2>&1; b=$?; grep -hE '^(Ran |OK|FAILED)' .runtime/mac-paper-e2e/logs/receipt-adaptive-paper.log .runtime/mac-paper-e2e/logs/receipt-native-faults.log; grep -o \"skipped '[^']*'\" .runtime/mac-paper-e2e/logs/receipt-adaptive-paper.log; exit $((a|b))",
+      "exit": 0,
+      "duration_s": 111.824,
+      "output_sha256": "1a3c071fb75a7dd5257e5a3ca45f3043cf96a0a99efd745a6905653f7477610e",
+      "output_excerpt": "Ran 732 tests in 111.513s\nOK (skipped=1)\nRan 17 tests in 0.055s\nOK\n"
+    },
+    {
+      "cmd": ".runtime/mac-paper-e2e/venv/bin/python blueprints/us-equities/adaptive-paper/runner.py preflight --env-file \"$PAPER_ENV_FILE\" --config blueprints/us-equities/adaptive-paper/config-sip.json --output .runtime/mac-paper-e2e/out/preflight-receipt.json && python3 -c \"import json;d=json.load(open('.runtime/mac-paper-e2e/out/preflight-receipt.json'));print({k:d[k] for k in ('status','endpoint','feed','account_status','capital_available','open_order_count','position_count','asset_count','quote_count','orders_submitted')})\"",
+      "exit": 0,
+      "duration_s": 0.947,
+      "output_sha256": "1bbae74b5d370f2f54c2fa51ff8b1e3e7d8c41d3b0296d42b911b0caefdc0efb",
+      "output_excerpt": "{\"status\": \"ready\", \"orders_submitted\": 0}\n{'status': 'ready', 'endpoint': 'https://paper-api.alpaca.markets', 'feed': 'sip', 'account_status': 'ACTIVE', 'capital_available': True, 'open_order_count': 0, 'position_count': 0, 'asset_count': 24, 'quote_count': 24, 'orders_submitted': 0}\n"
+    },
+    {
+      "cmd": "python3 blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/verify_artifacts.py",
+      "exit": 0,
+      "duration_s": 0.063,
+      "output_sha256": "d5168246914dc9baca7b70e131d17474cf4febacc31328d7010b054f798e9b99",
+      "output_excerpt": "a: passed flat; 33 submits 3 cancels 30 fills 15 round trips 3 cancel-replace; peak/60s 10/24; realized -1.51\nb: STOP +12.6 ms after intent, cancel +115 ms; 0 intents/submits after; ended 51.6 s; recover passed flat\nfaults: C01 C02 native_paper; C05 short-circuit; C04 unobserved; flat\nfrozen: 526 files match git archive 6f7a77c\nall checks passed\n"
+    },
+    {
+      "cmd": "test ! -e \"$HOME/.local/state/native-agent-stack/alpaca-paper/STOP\" && echo 'engine STOP absent: the drill STOP was released after recover proved flat' && ! ls \"$HOME\"/.local/state/native-agent-stack/native-faults/*/IN_FLIGHT \"$HOME\"/.local/state/native-agent-stack/native-faults/*/CLEANUP_REQUIRED >/dev/null 2>&1 && echo 'no native-faults IN_FLIGHT or CLEANUP_REQUIRED marker'",
+      "exit": 0,
+      "duration_s": 0.005,
+      "output_sha256": "e2622acc43514a51b77b39c7d35ef2c14f59de8b304bf7fcc623e79dbca94f44",
+      "output_excerpt": "engine STOP absent: the drill STOP was released after recover proved flat\nno native-faults IN_FLIGHT or CLEANUP_REQUIRED marker\n"
+    }
+  ],
+  "tool_versions": {
+    "alpaca-py": "0.44.0"
+  },
+  "observed_at_utc": "2026-09-24T14:38:03Z",
+  "result": "pass",
+  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, Mac17,8, macOS 26.5.1 build 25F80, arm64), the second physical machine, the Alpaca paper lane ran end to end through the adaptive NautilusTrader 2.0.0rc5 engine with alpaca-py 0.44.0, in hash-locked CPython 3.12.14 runtimes (the #176 engine lock and the promotion-gate lock). The 732 adaptive-paper tests (one skip by design) and 17 native-faults offline tests passed. A live read-only runner preflight reported ready on the paper endpoint. The committed 2026-09-24 artifacts, re-checked offline by verify_artifacts.py, show: a 300 s 1x SIP one-share trial from a frozen 6f7a77c archive (33 submits, 3 cancel-replaces, 30 native fills in 15 round trips, reconciled flat, realized -1.51 USD); a STOP drill in which a working entry was canceled unfilled 115 ms after STOP, with no order after it and recover flat; and the native-faults harness (C01 and C02 native_paper; C05 engine short-circuit; C04 unobserved).",
+  "limitations": [
+    "The paper trial, STOP drill, recover and native-faults runs executed once on this host earlier in the same session (2026-09-24 14:23-14:32Z) from a read-only git archive of main 6f7a77c. The verify_artifacts.py command here re-checks their committed outputs offline; it is not a new broker run. Only the preflight command contacted the broker when this receipt was recorded (read-only, no orders).",
+    "Paper only: no live endpoint was used. Alpaca paper fills are simulated. One 5-minute window with 1-share orders at 1x is not evidence of strategy edge, broker throughput or live readiness.",
+    "Recorded outside Claude Code's Seatbelt sandbox, which denies the credential-store read, broker network access and the loopback bind that 3 metrics tests need. macOS has no GNU timeout, so scheduled_trial.sh ran unchanged with a stdlib stand-in (trials/mac-2026-09-24-a-passed/macos_timeout.py).",
+    "The paper account is shared with other hosts, and the engine's account lock is host-local. Native evidence for fault cases C04 and C05 is blocked on unmerged PR #169; plan.json defines no C03. The STOP drill did not exercise an exit under STOP (the entry never filled), a restart with STOP present, or a failed cancel.",
+    "The one test skip is by design (exchange_calendars is not in the engine runtime). The 42 unchanged upstream adapter tests, the full repository suite in this runtime and the bwrap network-namespaced engine replay were not run."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T14:38:03Z",
+      "reviewer": {
+        "identity_sha256": "465f6e5b081bc30590a2e335daf6619193359c7c36b080838038d9a317f7d25c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

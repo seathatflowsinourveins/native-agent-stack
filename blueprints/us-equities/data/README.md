@@ -179,8 +179,14 @@ named check reports `status: "fail"` despite a "pass" top-level status),
 `promotion_gate_mismatch` (hash does not match the current file). `mode=None`
 (the `preflight` and `recover` call sites) is unaffected. `--snapshot` must
 name an actual bars/universe input file that
-was run through `promotion_gate.py` -- this repository does not yet ship a
-production bars/universe ingest that produces one; until that ingest exists,
-an operator must supply the real file it will produce (or, for the bounded
-CSV fixtures used in tests here, `fixtures/good.csv` with
-`fixtures/good-gate-result.json`).
+was run through `promotion_gate.py`. [`ingest_snapshot.py`](ingest_snapshot.py)
+(added in #84) writes one: a bounded, read-only Alpaca daily-bar snapshot of
+the adaptive-paper universe plus a receipt of counts and hashes, which
+`../adaptive-paper/scheduled_trial.sh` gates before the `paper` command.
+Trial `adaptive-20260923g` retained both results in
+`../adaptive-paper/trials/20260923g-main-passed/` (`ingest-receipt.json` and
+`gate-result.json`: 480 rows, gate `pass`, `input_sha256` equal to the
+receipt's `snapshot_sha256`); the snapshot CSV itself was not retained. That
+is one real ingest gating one paper trial, not the full production ingest
+described earlier in this README. For the bounded CSV fixtures used in
+tests here, use `fixtures/good.csv` with `fixtures/good-gate-result.json`.

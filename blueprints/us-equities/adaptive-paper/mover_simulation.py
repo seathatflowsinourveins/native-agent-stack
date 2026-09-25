@@ -6,7 +6,9 @@ limit), otherwise it rests until a later quote makes it marketable or it is
 canceled. ``partial_fill`` leaves part of a symbol's buy resting forever, to
 exercise entry timeouts. This fixture does not model queue priority, market
 impact, fees, halts, auctions or broker latency, and it is not evidence of fills a
-real venue would give.
+real venue would give. Each fill is one execution: the streamed row carries its
+execution_id, qty and price as transport.py forwards a trade_updates fill, and
+fill_activities() returns an order's executions as the transport does.
 """
 from __future__ import annotations
 
@@ -16,6 +18,7 @@ import inspect
 import itertools
 import secrets
 import time
+import uuid
 
 _ORDER_IDS = itertools.count(1)
 
@@ -53,6 +56,7 @@ class MoverSimulatedPort:
         self.health = {"ready": False, "simulation": True, "reasons": [], "fresh_quotes": True,
                        "dropped_quotes": {}, "dropped_quotes_by_symbol": {}}
         self.orders, self.positions = {}, {}
+        self.executions = {}   # broker order id -> executions, oldest first
         self.cash = Decimal(cash)
         self.quotes = {}
         self.payloads = []
@@ -73,6 +77,7 @@ class MoverSimulatedPort:
                                   extended_hours_allowed=self.extended_hours_allowed)
         port.partial_fill = dict(self.partial_fill)
         port.orders, port.positions, port.t0 = self.orders, self.positions, self.t0
+        port.executions = self.executions
         port.fill_sells, port.snapshot_latency = fill_sells, self.snapshot_latency
         return port
 
@@ -132,10 +137,17 @@ class MoverSimulatedPort:
         self.health.setdefault("reasons", []).append(str(reason))
         self.ready = self.health["ready"] = False
 
-    async def _emit(self, order):
+    async def _emit(self, order, execution=None):
         order["updated_at_ns"] = time.time_ns()
-        self.controller.observe(dict(order))
-        await _invoke(self.on_order, dict(order))
+        row = self._public(order)
+        if execution is not None:
+            row.update(execution)
+        self.controller.observe(dict(row))
+        await _invoke(self.on_order, dict(row))
+
+    async def fill_activities(self, order_id):
+        await self.controller.before_request("read")
+        return [dict(row) for row in self.executions.get(order_id, [])]
 
     def _fill_quantity(self, order):
         remaining = Decimal(order["qty"]) - Decimal(order["filled_qty"])
@@ -175,7 +187,14 @@ class MoverSimulatedPort:
         order["status"] = "filled" if filled == Decimal(order["qty"]) else "partially_filled"
         self.positions[order["symbol"]] = held + (quantity if order["side"] == "buy" else -quantity)
         self.cash += (-quantity if order["side"] == "buy" else quantity) * price
-        await self._emit(order)
+        execution_id = str(uuid.uuid4())
+        self.executions.setdefault(order["id"], []).append(
+            {"trade_id": execution_id, "qty": format(quantity, "f"), "price": format(price, "f"),
+             "cum_qty": format(filled, "f"), "symbol": order["symbol"], "side": order["side"],
+             "transaction_time_ns": time.time_ns(), "source": "activity"})
+        await self._emit(order, {"event": "partial_fill" if order["status"] == "partially_filled" else "fill",
+                                 "execution_id": execution_id, "event_qty": format(quantity, "f"),
+                                 "event_price": format(price, "f")})
 
     async def _match(self, symbol):
         for order in list(self.orders.values()):
@@ -200,7 +219,7 @@ class MoverSimulatedPort:
         if client_id not in self._intents:
             from transport import TransportError
             raise TransportError("cancellation requires an owned durable intent")
-        await self.controller.before_request("cancel")
+        await self.controller.before_request("cancel", client_id=client_id)
         order = self.orders.get(client_id)
         if order is None:
             return None

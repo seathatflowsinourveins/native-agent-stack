@@ -18,6 +18,12 @@ const configured = (key) => resolve(HERE, typeof CONFIG[key] === 'string' ? CONF
 // afterwards, so the suite always reaches its SUMMARY line.
 const readOr = (path) => { try { return readFileSync(path, 'utf8') } catch { return '' } }
 const WF = { review: 'workflows/review-changes.js', readiness: 'workflows/readiness-audit.js' }
+// The one effort every saved workflow stage and project agent binds (since 2026-09-23; decision
+// docs/decisions/2026-09-23-max-effort-default.md in the catalog). The coordinator stays at xhigh under
+// ultracode: a stage with no effort of its own and no agent frontmatter effort inherits that xhigh, and
+// CLAUDE_CODE_EFFORT_LEVEL overrides every child's effort, so max is bound per stage and per agent and the
+// settings leave that variable unset.
+const STAGE_EFFORT = 'max'
 function load(file, stubs) {
   const body = readFileSync(join(ROOT, file), 'utf8').replace(/^export const meta/m, 'const meta')
   const fn = new Function('args', 'agent', 'parallel', 'pipeline', 'phase', 'log', 'budget', 'workflow', 'return (async () => {\n' + body + '\n})()')
@@ -358,11 +364,12 @@ function agentOptionLiterals(src) {
     const packetText = new Function(packets[files.indexOf(f)] + '; return PACKET')()
     expect('contract: ' + f + ' starts every worker prompt with the full shared packet', packetText.length > 200 && calls.every((c) => c.prompt.startsWith(packetText + '\n')))
     // Reviewed routing, by stage label prefix: [agentType, model, effort]. A new saved workflow
-    // or a rerouted stage fails here until the routing is reviewed and listed.
+    // or a rerouted stage fails here until the routing is reviewed and listed. Models stay task-matched
+    // (Sonnet scouts, Opus reviewers and judges); every stage runs at effort max since 2026-09-23.
     const ROUTING = {
-      [WF.review]: { inventory: ['source-scout', 'sonnet', 'medium'], review: ['evidence-reviewer', 'opus', 'high'], recheck: ['source-scout', 'sonnet', 'medium'] },
-      [WF.readiness]: { 'read:': ['source-scout', 'sonnet', 'medium'], verify: [undefined, 'opus', 'high'] },
-      'workflows/layer-verdict-lane.js': { 'propose:': ['semantic-evidence-reviewer', 'opus', 'high'], 'refute:': ['evidence-reviewer', 'opus', 'high'] },
+      [WF.review]: { inventory: ['source-scout', 'sonnet', 'max'], review: ['evidence-reviewer', 'opus', 'max'], recheck: ['source-scout', 'sonnet', 'max'] },
+      [WF.readiness]: { 'read:': ['source-scout', 'sonnet', 'max'], verify: [undefined, 'opus', 'max'] },
+      'workflows/layer-verdict-lane.js': { 'propose:': ['blind-lane-reviewer', 'opus', 'max'], 'refute:': ['blind-lane-reviewer', 'opus', 'max'] },
     }
     const routes = ROUTING[f] || {}
     const routeOf = (label) => Object.keys(routes).find((k) => String(label).startsWith(k))
@@ -380,6 +387,13 @@ function agentOptionLiterals(src) {
     expect('contract: ' + f + ' has no agent( inside a template literal', (structure(src, true).match(/\bagent\s*\(/g) || []).length === sites)
     expect('contract: ' + f + ' passes an inline options literal to every agent() call', literals.every((o) => o !== null))
     expect('contract: ' + f + ' binds model and effort inside every options literal', literals.every((o) => ['haiku', 'sonnet', 'opus'].includes(optionValue(o, 'model')) && ['low', 'medium', 'high', 'xhigh', 'max'].includes(optionValue(o, 'effort'))))
+    // Policy, separate from validity: every call site, reached by the stub or not, binds the one stage effort.
+    expect('contract: ' + f + ' binds effort ' + STAGE_EFFORT + ' in every options literal', sites > 0 && literals.every((o) => optionValue(o, 'effort') === STAGE_EFFORT))
+    // A workflow that records its model in a MODEL literal (the layer-verdict lane returns it) must record, in one
+    // strict single-line form, the same model and effort that every options literal binds.
+    const modelDecls = src.match(/^\s*(?:export\s+)?(?:const|let|var)\s+MODEL\s*=/mg) || []
+    const declared = src.match(/^\s*(?:export\s+)?const\s+MODEL\s*=\s*\{\s*name:\s*'([^']+)',\s*effort:\s*'([^']+)'\s*\}\s*;?\s*$/m)
+    expect('contract: ' + f + ' records in MODEL, when declared, the same model and effort it binds in every options literal', modelDecls.length === 0 || (modelDecls.length === 1 && declared !== null && literals.every((o) => optionValue(o, 'model') === declared[1] && optionValue(o, 'effort') === declared[2])))
     const times = (lit, key) => (lit ? lit.code.match(new RegExp('\\b' + key + ':', 'g')) || [] : []).length
     expect('contract: ' + f + ' declares model and effort exactly once per options literal and spreads nothing into it', literals.every((o) => o !== null && times(o, 'model') === 1 && times(o, 'effort') === 1 && times(o, 'agentType') <= 1 && !o.code.includes('...')))
     const namedAgents = literals.map((o) => optionValue(o, 'agentType')).filter(Boolean)
@@ -398,11 +412,40 @@ function agentOptionLiterals(src) {
     const tools = ((fm.match(/^tools: (.*)$/m) || [null, ''])[1]).split(',').map((t) => t.trim()).filter(Boolean)
     expect('agents: ' + n + ' name matches its file', nameOf(fm) === n.replace(/\.md$/, ''))
     expect('agents: ' + n + ' declares an explicit model and effort', /^model: (haiku|sonnet|opus)$/m.test(fm) && /^effort: (low|medium|high|xhigh|max)$/m.test(fm))
+    // One effort line, and it is the stage effort: a second, lower line cannot hide behind the first.
+    expect('agents: ' + n + ' runs at effort ' + STAGE_EFFORT + ' on a single effort line', (fm.match(/^effort:/mg) || []).length === 1 && new RegExp('^effort: ' + STAGE_EFFORT + '$', 'm').test(fm))
     expect('agents: ' + n + ' declares a tools allowlist', tools.length > 0)
     expect('agents: ' + n + ' runs in its own worktree when it can edit files', !tools.some((t) => ['Edit', 'Write', 'NotebookEdit'].includes(t)) || /^isolation: worktree$/m.test(fm))
     expect('agents: ' + n + ' grants MCP tools by full name, never a bare server prefix', tools.filter((t) => t.startsWith('mcp__')).every((t) => /^mcp__.+__[A-Za-z0-9_]+$/.test(t) && !t.endsWith('__*')))
     expect('agents: ' + n + ' keeps granted MCP tools deferred behind ToolSearch', !tools.some((t) => t.startsWith('mcp__')) || tools.includes('ToolSearch'))
   }
+  // The role routing table in the routing doc restates what the agent files and saved stages bind: one
+  // row per project agent carrying the model and effort its file declares, default-child rows at the stage
+  // effort, and the coordinator row at xhigh under ultracode. Drift on either side fails here.
+  const routingLines = readOr(configured('routing_doc')).split('\n')
+  const head = routingLines.findIndex((l) => l.startsWith('| Task class | Agent / stage | Model, effort |'))
+  const roleRows = []
+  for (let i = head + 2; head >= 0 && i < routingLines.length && routingLines[i].startsWith('|'); i++) roleRows.push(routingLines[i].split('|').slice(1, -1).map((c) => c.trim()))
+  const title = { haiku: 'Haiku', sonnet: 'Sonnet', opus: 'Opus' }
+  expect('routing doc: the role routing table lists every project agent once with the model and effort its file declares', roleRows.length > 0 && names.every((n) => {
+    const fm = (readFileSync(join(dir, n), 'utf8').match(/^---\n([\s\S]*?)\n---/) || [null, ''])[1]
+    const rows = roleRows.filter((r) => (r[1] || '').startsWith('`' + n.replace(/\.md$/, '') + '`'))
+    return rows.length === 1 && rows[0][2] === title[(fm.match(/^model: (\w+)$/m) || [])[1]] + ', ' + (fm.match(/^effort: (\w+)$/m) || [])[1]
+  }))
+  const defaultRows = roleRows.filter((r) => r[1] === 'default workflow subagent')
+  expect('routing doc: every default workflow subagent row binds a model at effort ' + STAGE_EFFORT, defaultRows.length > 0 && defaultRows.every((r) => new RegExp('^(Sonnet|Opus), ' + STAGE_EFFORT + '$').test(r[2])))
+  const coordinatorRows = roleRows.filter((r) => r[1] === 'coordinator')
+  expect('routing doc: the coordinator row stays at xhigh under ultracode', coordinatorRows.length === 1 && coordinatorRows[0][2].includes('xhigh under `ultracode`'))
+  // Effort profile: the coordinator keeps ultracode at xhigh, so the settings must not set
+  // CLAUDE_CODE_EFFORT_LEVEL (any value overrides every stage's and agent's own effort, and a value other than
+  // xhigh also leaves ultracode's orchestration inactive) and must not cap effort below the stage effort, either
+  // with a top-level maxEffortLevel or with one inside a modelSettings entry.
+  let settingsJson = {}
+  try { settingsJson = JSON.parse(readOr(configured('settings'))) || {} } catch { settingsJson = {} }
+  const settingsEnv = settingsJson.env && typeof settingsJson.env === 'object' ? settingsJson.env : {}
+  const effortCaps = [settingsJson.maxEffortLevel, ...Object.values(settingsJson.modelSettings && typeof settingsJson.modelSettings === 'object' ? settingsJson.modelSettings : {}).map((m) => (m && typeof m === 'object' ? m.maxEffortLevel : undefined))].filter((v) => v !== undefined)
+  expect('settings: CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort', !Object.prototype.hasOwnProperty.call(settingsEnv, 'CLAUDE_CODE_EFFORT_LEVEL') && effortCaps.every((v) => v === STAGE_EFFORT))
+  expect('instructions: the project instructions state the effort literal every stage binds', readOr(configured('instructions')).includes("`effort: '" + STAGE_EFFORT + "'`"))
   const reviewer = (readFileSync(join(dir, 'evidence-reviewer.md'), 'utf8').match(/^tools: (.*)$/m) || [null, ''])[1]
   // The reviewer's surface is pinned exactly, so any added tool (for example a Serena
   // create_/replace_ tool) fails here until it is reviewed and listed. Two grants stay

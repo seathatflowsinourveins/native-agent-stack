@@ -28,6 +28,9 @@ remain in `catalogs/foundation/manifest.json`, and trading limitations in
 `catalogs/us-equities/runtime-target.json` and its linked domain receipts. Historical receipts are reference
 evidence, never a new host's passed status. Keep host paths and native sign-ins
 private, and use the nonmutating `scripts/adoption_status.py` for prerequisites.
+Credentials follow `docs/secret-storage.md` (per-provider 0600 files outside every
+worktree, native sign-ins left native); check them with the value-free
+`scripts/credential_status.py`, and never read, print or copy a credential value.
 
 This is a portable reference stack with evidence, native recipes and examples. Preserve the distinction between historical host execution, reproducible artifact checks and live provider/GPU acceptance. Never describe a version check or recorded receipt replay as a new model run.
 
@@ -61,6 +64,15 @@ Read only the selected recipe during work; do not preload the HTML payload.
 Use upstream executables and supported integration formats. Keep client accounts, model routes, native caching and tool discovery intact. Load detailed guides only for the current task. Run the repository validation command before committing changed evidence or manifests. Do not fetch private state or authentication stores.
 
 One coordinator integrates. Writing workers need separate worktrees and bounded file ownership. Evidence belongs in compact sanitized receipts; no raw conversations, tokens, personal paths or machine-specific active client configuration.
+
+This repository commits `.claude/settings.json` with Ultracode on. The Claude
+coordinator stays at `xhigh` under Ultracode, because a `max` session turns its
+workflow orchestration off, and never sets `CLAUDE_CODE_EFFORT_LEVEL` (any value
+overrides every child's effort). Pass `effort: 'max'` with an explicit
+task-matched `model` on every ad-hoc workflow `agent()` call: a stage without
+its own `effort` inherits the coordinator's `xhigh` unless its agent's
+frontmatter sets one. Probes and overturn conditions:
+`docs/decisions/2026-09-23-max-effort-default.md`.
 
 For general engineering and ecosystem changes, start with
 `docs/convergence-architecture.md`. New convergence claims use

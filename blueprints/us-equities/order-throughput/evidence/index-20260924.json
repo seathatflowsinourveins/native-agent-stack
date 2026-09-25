@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "kind": "order_throughput_native_paper_evidence_index",
+  "date": "2026-09-24",
+  "evidence_class": "native_paper",
+  "counts_as_strategy_trades": false,
+  "policy": "Capacity measurements of the Alpaca paper transport and rate limit only. Harness orders are non-marketable probes cancelled individually; they are not strategy trades, fills, signals or performance.",
+  "host_class": "WSL2 workstation (Linux x86_64 under Windows)",
+  "account_tier": {
+    "trading_x_ratelimit_limit": 200,
+    "data_x_ratelimit_limit": 10000,
+    "note": "Header values observed on every run's preflight; the data limit never sizes the budget."
+  },
+  "harness_revision": {
+    "git_revision": "4911baf411370517b1c5e0e83ca4d49c14e36db3",
+    "alpaca_py_version": "0.44.0",
+    "python_version": "3.12.3",
+    "note": "All four runs used this revision (before --stream-timeout existed), default configuration, stream_timeout_seconds 10."
+  },
+  "runs": [
+    {
+      "receipt": "capacity-200-20260924.json",
+      "started_at": "2026-09-24T13:15:31Z",
+      "session_kind": "PRE",
+      "status": "refused",
+      "refusal_reason": "quote_stale",
+      "exit_code": 2,
+      "orders_submitted": 0,
+      "outcome": "retained non-pass: refused before any order"
+    },
+    {
+      "receipt": "capacity-200-20260924-rth.json",
+      "started_at": "2026-09-24T13:31:31Z",
+      "session_kind": "RTH",
+      "status": "needs_attention",
+      "stop_reason": "frozen:stream_terminal_missing",
+      "exit_code": 3,
+      "orders_submitted": 10,
+      "rest_accepted": 10,
+      "cancel_http": {
+        "204": 11,
+        "422": 4
+      },
+      "submit_to_stream_terminal_ms": {
+        "p50": 16142.431,
+        "max": 16776.857
+      },
+      "cleanup_verified_zero_open": false,
+      "reconciliation_clean": false,
+      "outcome": "retained non-pass: paper cancel confirmations took about 16 s at the open, beyond the 10 s stream timeout"
+    },
+    {
+      "receipt": "capacity-200-20260924-rth-recover.json",
+      "mode": "recover",
+      "ended_at": "2026-09-24T13:32:13Z",
+      "status": "completed",
+      "exit_code": 0,
+      "broker_orders_with_prefix_by_status": {
+        "canceled": 10
+      },
+      "individual_cancels": 0,
+      "verified_zero_open": true,
+      "outcome": "all 10 orders of the frozen run were already canceled at the broker when recover listed them; recover issued no cancels and verified zero open"
+    },
+    {
+      "receipt": "capacity-200-20260924-rth2.json",
+      "started_at": "2026-09-24T13:50:01Z",
+      "session_kind": "RTH",
+      "status": "completed",
+      "stop_reason": "duration_reached",
+      "exit_code": 0,
+      "full_windows": 5,
+      "order_actions_per_full_window": 180,
+      "target_per_window": 170,
+      "submits": 496,
+      "cancels": 496,
+      "http_429": 0,
+      "websocket_completeness": 1.0,
+      "reconciliation_clean": true,
+      "cleanup_verified_zero_open": true,
+      "unexpected_fill_qty": "0",
+      "self_reported_passed": true,
+      "outcome": "capacity criteria met at a 200/min limit (self-reported); see independent-observation-20260924.json (a retained alpaca-py listing script and stdout, with the hashes recorded there)"
+    }
+  ],
+  "not_measured": [
+    "1000 order actions/min (the account reported x-ratelimit-limit 200)",
+    "any run with --stream-timeout raised",
+    "any host other than this WSL2 workstation"
+  ],
+  "sanitization": {
+    "rule": "Absolute host paths would be replaced by <private>/...; the harness already writes <path> for argv path values and records no credentials, account identifiers or broker order IDs.",
+    "copied": [
+      {
+        "file": "capacity-200-20260924.json",
+        "original": "<private>/alpaca-paper/capacity-200-20260924.json",
+        "original_sha256": "1781bb6ef261b078d51f2dfbe0c531a6b9d73b8cefe7bcff3d045b43bca686fa",
+        "committed_sha256": "1781bb6ef261b078d51f2dfbe0c531a6b9d73b8cefe7bcff3d045b43bca686fa",
+        "host_path_redactions": 0,
+        "byte_identical": true
+      },
+      {
+        "file": "capacity-200-20260924-rth.json",
+        "original": "<private>/alpaca-paper/capacity-200-20260924-rth.json",
+        "original_sha256": "2da1e838eb231006da5781622b4ad594fbefbc0bfa30969cbafadba16c10fbf9",
+        "committed_sha256": "2da1e838eb231006da5781622b4ad594fbefbc0bfa30969cbafadba16c10fbf9",
+        "host_path_redactions": 0,
+        "byte_identical": true
+      },
+      {
+        "file": "capacity-200-20260924-rth-recover.json",
+        "original": "<private>/alpaca-paper/capacity-200-20260924-rth-recover.json",
+        "original_sha256": "83785408370d1f26d4497c33c17c856e97e1c20c1b64eda00eac42f45a414c83",
+        "committed_sha256": "83785408370d1f26d4497c33c17c856e97e1c20c1b64eda00eac42f45a414c83",
+        "host_path_redactions": 0,
+        "byte_identical": true
+      },
+      {
+        "file": "capacity-200-20260924-rth2.json",
+        "original": "<private>/alpaca-paper/capacity-200-20260924-rth2.json",
+        "original_sha256": "b78d1fff07669c5daac1f35d1de2da8ed30b4ff901869f79b80e499ecb04ed9a",
+        "committed_sha256": "b78d1fff07669c5daac1f35d1de2da8ed30b4ff901869f79b80e499ecb04ed9a",
+        "host_path_redactions": 0,
+        "byte_identical": true
+      }
+    ],
+    "private_only": [
+      {
+        "file": "capacity-200-20260924.stdout",
+        "original": "<private>/alpaca-paper/capacity-200-20260924.stdout",
+        "original_sha256": "a3d0b1c025f932624647b2dba71a95a1d756fe2e2ebdb24a0257858ab12b308c",
+        "committed": false
+      },
+      {
+        "file": "capacity-200-20260924-rth.journal.jsonl",
+        "original": "<private>/alpaca-paper/capacity-200-20260924-rth.journal.jsonl",
+        "original_sha256": "2fb8605b5e9f4b5a96d4909c968a817f22cd41483e7fcc4999774b5de2cc9be3",
+        "committed": false
+      },
+      {
+        "file": "capacity-200-20260924-rth.stdout",
+        "original": "<private>/alpaca-paper/capacity-200-20260924-rth.stdout",
+        "original_sha256": "2c356f0eda8fc8043c991e32743c26ac2b963d5db38e7d8ad7717fc9c4f2808c",
+        "committed": false
+      },
+      {
+        "file": "capacity-200-20260924-rth2.journal.jsonl",
+        "original": "<private>/alpaca-paper/capacity-200-20260924-rth2.journal.jsonl",
+        "original_sha256": "3ef170fb326d4fe1938b6699d049b3ff1a22b97ca63d4234018020998a51f4af",
+        "committed": false
+      },
+      {
+        "file": "capacity-200-20260924-rth2.stdout",
+        "original": "<private>/alpaca-paper/capacity-200-20260924-rth2.stdout",
+        "original_sha256": "de3932f98b736a6ba149b0f8b66a6be349efa3c2c0c55bae389f5294f818109b",
+        "committed": false
+      }
+    ]
+  }
+}

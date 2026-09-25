@@ -25,7 +25,28 @@
   },
   "permissions": {
     "deny": [
-      "Agent(codex:codex-rescue)"
+      "Agent(codex:codex-rescue)",
+      "Read(~/.config/native-agent-stack/**)",
+      "Edit(~/.config/native-agent-stack/**)",
+      "Read(~/.config/ecosystem-observability/*.env)",
+      "Read(~/.config/nativestack/*.key)",
+      "Read(~/.claude/.credentials.json)",
+      "Read(~/.codex/auth.json)",
+      "Read(~/.config/gh/hosts.yml)",
+      "Read(//proc/*/environ)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(!.env.example)",
+      "Read(!.env.*.example)",
+      "Bash(printenv)",
+      "Bash(printenv *)",
+      "Bash(env)",
+      "Bash(gh auth token)",
+      "Bash(gh auth token *)",
+      "Bash(* --show-token*)",
+      "Bash(git credential fill*)",
+      "Bash(gh auth git-credential *)",
+      "Bash(security find-generic-password *)"
     ],
     "defaultMode": "bypassPermissions"
   },
@@ -38,6 +59,11 @@
           {
             "type": "command",
             "command": "rtk hook claude"
+          },
+          {
+            "type": "command",
+            "command": "f=\"${HOME}/.claude/hooks/secret_path_guard.py\"; [ ! -f \"$$f\" ] || exec python3 \"$$f\"",
+            "timeout": 10
           }
         ]
       },

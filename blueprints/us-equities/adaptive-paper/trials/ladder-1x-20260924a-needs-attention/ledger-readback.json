@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "kind": "ledger_readback",
+  "trial": "ladder-1x-20260924a",
+  "method": "read-only sqlite3 (mode=ro) query of the run's engine ledger (tables intents and events) after the run; broker order ids removed; no broker request made",
+  "intents": [
+    {
+      "client_id": "adp-ladder-1x-20260924a-0000001",
+      "symbol": "INTC",
+      "side": "buy",
+      "qty": "7",
+      "limit_price": "126.13",
+      "status": "filled",
+      "filled_qty": "7",
+      "average_price": "126.12"
+    },
+    {
+      "client_id": "adp-ladder-1x-20260924a-0000002",
+      "symbol": "AMD",
+      "side": "buy",
+      "qty": "1",
+      "limit_price": "627.13",
+      "status": "filled",
+      "filled_qty": "1",
+      "average_price": "627.11"
+    },
+    {
+      "client_id": "adp-ladder-1x-20260924a-0000003",
+      "symbol": "AMD",
+      "side": "sell",
+      "qty": "1",
+      "limit_price": "626.85",
+      "status": "filled",
+      "filled_qty": "1",
+      "average_price": "626.86"
+    },
+    {
+      "client_id": "adp-ladder-1x-20260924a-0000004",
+      "symbol": "INTC",
+      "side": "sell",
+      "qty": "7",
+      "limit_price": "126.31",
+      "status": "filled",
+      "filled_qty": "7",
+      "average_price": "126.327143"
+    }
+  ],
+  "events": [
+    {
+      "id": 1,
+      "kind": "next_trial_started",
+      "client_id": null,
+      "at": 1790278054.4727447,
+      "required_external_proof": "fresh_broker_flat_idle_and_cash_reconciled",
+      "trial_id": "ladder-1x-20260924a"
+    },
+    {
+      "id": 2,
+      "kind": "intent_reserved",
+      "client_id": "adp-ladder-1x-20260924a-0000001",
+      "at": 1790278207.2599595,
+      "limit_price": "126.13",
+      "qty": "7",
+      "side": "buy",
+      "symbol": "INTC"
+    },
+    {
+      "id": 3,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000001",
+      "at": 1790278207.300599,
+      "average_price": null,
+      "delta_notional": "0",
+      "delta_qty": "0",
+      "filled_qty": "0",
+      "status": "pending_new"
+    },
+    {
+      "id": 4,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000001",
+      "at": 1790278207.3742146,
+      "average_price": null,
+      "delta_notional": "0",
+      "delta_qty": "0",
+      "filled_qty": "0",
+      "status": "new"
+    },
+    {
+      "id": 5,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000001",
+      "at": 1790278207.522308,
+      "average_price": "126.12",
+      "delta_notional": "882.84",
+      "delta_qty": "7",
+      "filled_qty": "7",
+      "status": "filled"
+    },
+    {
+      "id": 6,
+      "kind": "intent_reserved",
+      "client_id": "adp-ladder-1x-20260924a-0000002",
+      "at": 1790278211.459994,
+      "limit_price": "627.13",
+      "qty": "1",
+      "side": "buy",
+      "symbol": "AMD"
+    },
+    {
+      "id": 7,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000002",
+      "at": 1790278211.4820304,
+      "average_price": null,
+      "delta_notional": "0",
+      "delta_qty": "0",
+      "filled_qty": "0",
+      "status": "pending_new"
+    },
+    {
+      "id": 8,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000002",
+      "at": 1790278211.488151,
+      "average_price": null,
+      "delta_notional": "0",
+      "delta_qty": "0",
+      "filled_qty": "0",
+      "status": "new"
+    },
+    {
+      "id": 9,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000002",
+      "at": 1790278212.1768548,
+      "average_price": "627.11",
+      "delta_notional": "627.11",
+      "delta_qty": "1",
+      "filled_qty": "1",
+      "status": "filled"
+    },
+    {
+      "id": 10,
+      "kind": "intent_reserved",
+      "client_id": "adp-ladder-1x-20260924a-0000003",
+      "at": 1790278217.7265222,
+      "limit_price": "626.85",
+      "qty": "1",
+      "side": "sell",
+      "symbol": "AMD"
+    },
+    {
+      "id": 11,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000003",
+      "at": 1790278217.7508948,
+      "average_price": null,
+      "delta_notional": "0",
+      "delta_qty": "0",
+      "filled_qty": "0",
+      "status": "pending_new"
+    },
+    {
+      "id": 12,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000003",
+      "at": 1790278217.763815,
+      "average_price": null,
+      "delta_notional": "0",
+      "delta_qty": "0",
+      "filled_qty": "0",
+      "status": "new"
+    },
+    {
+      "id": 13,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000003",
+      "at": 1790278218.6192367,
+      "average_price": "626.86",
+      "delta_notional": "626.86",
+      "delta_qty": "1",
+      "filled_qty": "1",
+      "status": "filled"
+    },
+    {
+      "id": 14,
+      "kind": "intent_reserved",
+      "client_id": "adp-ladder-1x-20260924a-0000004",
+      "at": 1790278242.55207,
+      "limit_price": "126.31",
+      "qty": "7",
+      "side": "sell",
+      "symbol": "INTC"
+    },
+    {
+      "id": 15,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000004",
+      "at": 1790278242.568804,
+      "average_price": null,
+      "delta_notional": "0",
+      "delta_qty": "0",
+      "filled_qty": "0",
+      "status": "pending_new"
+    },
+    {
+      "id": 16,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000004",
+      "at": 1790278242.5779874,
+      "average_price": null,
+      "delta_notional": "0",
+      "delta_qty": "0",
+      "filled_qty": "0",
+      "status": "new"
+    },
+    {
+      "id": 17,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000004",
+      "at": 1790278243.7946858,
+      "average_price": "126.33",
+      "delta_notional": "757.98",
+      "delta_qty": "6",
+      "filled_qty": "6",
+      "status": "partially_filled"
+    },
+    {
+      "id": 18,
+      "kind": "order_observed",
+      "client_id": "adp-ladder-1x-20260924a-0000004",
+      "at": 1790278244.3572142,
+      "average_price": "126.327143",
+      "delta_notional": "126.310001",
+      "delta_qty": "1",
+      "filled_qty": "7",
+      "status": "filled"
+    }
+  ]
+}

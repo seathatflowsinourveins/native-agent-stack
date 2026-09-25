@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--qdrant--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "qdrant",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "curl -fsS http://127.0.0.1:26333/ && echo && systemctl --user show -p ActiveState -p SubState -p NRestarts -p ExecStart native-stack-qdrant.service | grep -o 'ActiveState=[a-z]*\\|SubState=[a-z]*\\|NRestarts=[0-9]*\\|tools/qdrant-[0-9.]*/qdrant' | awk '!seen[$0]++' | tr '\\n' ' ' && echo && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" qdrant",
+      "exit": 0,
+      "duration_s": 0.048,
+      "output_sha256": "3b6837bbdebdd118431763cec1ec789eefd2cb4a4299cd303535a46bdeec872b",
+      "output_excerpt": "{\"title\":\"qdrant - vector search engine\",\"version\":\"1.19.1\",\"commit\":\"6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de\"}\nNRestarts=0 tools/qdrant-1.19.1/qdrant ActiveState=active SubState=running \nstack ['1.19.1'] winner pins ['1.19.1']\n"
+    },
+    {
+      "cmd": "python3 -c \"import json,time,urllib.request as u\ndef call(m,url,body=None):\n    r=u.Request(url,method=m,data=None if body is None else json.dumps(body).encode(),headers={'Content-Type':'application/json'})\n    try: return json.load(u.urlopen(r,timeout=60))\n    except u.HTTPError as e: return {'http_error':e.code}\nQ='http://127.0.0.1:26333'\ndocs=['passage: restic restore latest --target DIR restores the newest backup snapshot into DIR','passage: Prometheus scrapes metrics from HTTP targets at a fixed interval','passage: Loki indexes log streams by label and stores chunks on the filesystem']\nq='query: how do I recover files from my latest backup?'\nv=[x['embedding'] for x in sorted(call('POST','http://127.0.0.1:18231/v1/embeddings',{'model':'nvidia/Nemotron-3-Embed-1B-BF16','input':[q]+docs})['data'],key=lambda x:x['index'])]\nn0=len(call('GET',Q+'/collections')['result']['collections'])\nname='nsr_receipt_probe_%d'%int(time.time())\nc=call('PUT',Q+'/collections/'+name,{'vectors':{'size':len(v[0]),'distance':'Cosine'}})\np=call('PUT',Q+'/collections/'+name+'/points?wait=true',{'points':[{'id':i+1,'vector':v[i+1],'payload':{'doc':i}} for i in range(len(docs))]})\ns=call('POST',Q+'/collections/'+name+'/points/search',{'vector':v[0],'limit':3,'with_payload':True})\nhits=[(h['payload']['doc'],round(h['score'],4)) for h in s.get('result',[])]\nd=call('DELETE',Q+'/collections/'+name);g=call('GET',Q+'/collections/'+name);n1=len(call('GET',Q+'/collections')['result']['collections'])\nprint('dims',len(v[0]),'| create',c.get('result'),'| upsert',p.get('result',{}).get('status'),'| hits (doc, score)',hits,'| delete',d.get('result'),'| get after delete http',g.get('http_error'),'| collections before/after',n0,n1)\nraise SystemExit(0 if c.get('result') is True and hits and hits[0][0]==0 and d.get('result') is True and g.get('http_error')==404 and n0==n1 else 1)\" ",
+      "exit": 0,
+      "duration_s": 0.408,
+      "output_sha256": "c52e8ad9aa690f6413af8e1acefdc631cc4586202c113b9fb81194ca5d82013c",
+      "output_excerpt": "dims 2048 | create True | upsert completed | hits (doc, score) [(0, 0.5844), (2, 0.2269), (1, 0.0588)] | delete True | get after delete http 404 | collections before/after 5 5\n"
+    }
+  ],
+  "tool_versions": {
+    "qdrant": "1.19.1"
+  },
+  "observed_at_utc": "2026-09-25T05:37:57Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), the running Qdrant server (GET / version 1.19.1, commit 6ab21ca, the catalog pin; unit native-stack-qdrant active and running from tools/qdrant-1.19.1) stored and searched real embeddings. One command embedded a query and three passages with this host's vLLM embedder (2048 dimensions), created a temporary cosine collection, upserted the three passages, searched with the query vector and got the backup passage first, then deleted the collection, confirmed that GET on it returns 404 and that the number of existing collections was unchanged. That command exits 0 only when all of these hold. All commands exit 0.",
+  "limitations": [
+    "A three-point temporary collection, removed in the same command; existing collections were counted but neither listed nor read. Payload indexes, filtering, snapshots, restart persistence, recovery and load were not exercised. The rehearsal created and deleted one more temporary collection of the same shape.",
+    "The service was already running under its systemd user unit on this host (ActiveState, SubState and NRestarts are in the first command's output); this receipt did not start, stop or reconfigure it.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:37:57Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (server stored and searched real 2048-dimensional embeddings with the backup passage asserted first, then deleted the collection and confirmed 404; a store and query server, so no planted-fault control is needed; GET / 1.19.1 and unit state are backed; bound to the semantic-rag winner) and re-ran GET /, the collection count and unit state on this host plus the same four embeddings from vLLM, whose cosines reproduce the recorded ranking; no collection was created.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:51Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
+    }
+  ]
+}

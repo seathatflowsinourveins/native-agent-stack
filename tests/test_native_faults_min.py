@@ -5,7 +5,6 @@ engine seams (before_submit -> before_request -> sink_observation) around the
 real runner.Controller and safety.Ledger; it establishes no broker behaviour.
 """
 import asyncio
-from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 import importlib.util
 import json
@@ -34,7 +33,14 @@ SPEC = importlib.util.spec_from_file_location("native_faults_min_harness", HARNE
 h = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(h)
 import safety  # noqa: E402  (same module object the harness imported)
-from transport import TERMINAL, TransportError  # noqa: E402
+from transport import (TERMINAL, AmbiguousSubmission, OrderContractRefused, RejectedSubmission,  # noqa: E402
+                       SUB_PENNY_REFUSAL, TransportError, check_wire_submission, documented_refusal,
+                       violates_minimum_price_variance)
+try:
+    import alpaca  # noqa: F401
+    HAS_SDK = True
+except ImportError:
+    HAS_SDK = False
 
 try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
     from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
@@ -61,6 +67,18 @@ class NotSent(TransportError):
     not_sent = True
 
 
+class FakeAPIError(Exception):
+    """Shape of alpaca-py's APIError: code and message parsed from the response body."""
+
+    def __init__(self, body):
+        super().__init__("provider text that must not be recorded")
+        self.code, self.message = body.get("code"), body.get("message")
+
+
+DOCUMENTED_SUB_PENNY = {"code": 42210000, "message": "invalid limit_price 240.0001. sub-penny increment "
+                                                     "does not fulfill minimum pricing criteria"}
+
+
 class FakeClient:
     def get_clock(self):
         close = datetime.now(timezone.utc) + timedelta(hours=2)
@@ -71,7 +89,13 @@ class FakeClient:
 
 
 class FakePort:
-    """Engine-seam fake: every broker call reports a response to the observer."""
+    """Engine-seam fake: every broker call reports a response to the observer.
+
+    Mirrors AlpacaPaperTransport's current semantics: a sub-penny POST is answered
+    with a 422 (by default Alpaca's documented minimum-price-variance body), then a
+    client-id lookup 404, and classified by the real transport.documented_refusal;
+    a cancel sends the DELETE to a known order whatever its cached status and
+    treats 404/422 as data once the follow-up read shows it terminal."""
     scenario = {}
     instances = []
 
@@ -115,9 +139,16 @@ class FakePort:
             self.in_flight_at_first_post = [json.loads(m.read_text())
                                             for m in self.scenario["run_root"].glob("*/IN_FLIGHT")]
         self.posts += 1
-        if Decimal(order["limit_price"]) != Decimal(order["limit_price"]).quantize(Decimal("0.01")):
-            self.observer({"kind": "submit", "status": 422})
-            raise TransportError("submission unresolved; no automatic retry")
+        if violates_minimum_price_variance(order["limit_price"]):
+            status = self.scenario.get("c04_status", 422)
+            self.observer({"kind": "submit", "status": status})
+            await self._http("read", 404)  # client-id absence lookup
+            refusal = documented_refusal(FakeAPIError(self.scenario.get("c04_body", DOCUMENTED_SUB_PENNY)),
+                                         status, order)
+            if status in (401, 403, 404) or refusal is not None:
+                raise RejectedSubmission(status, refusal)
+            self.reasons.add("submission_ambiguous")
+            raise AmbiguousSubmission("submission unresolved; no automatic retry")
         self.observer({"kind": "submit", "status": 200})
         record = {"client_order_id": order["client_order_id"], "id": "b-%d" % self.posts, "symbol": "SPY",
                   "side": "buy", "qty": "1", "filled_qty": "0", "filled_avg_price": None,
@@ -134,18 +165,20 @@ class FakePort:
             raise TransportError("cancellation requires an owned durable intent")
         if self.scenario.get("cancel_raises_first") and self.cancel_calls == 1:
             raise RuntimeError("provider text that must not be recorded")
-        await self._http("read", 200)
         order = self.orders[cid]
-        if order["status"] in TERMINAL:
-            if self.scenario.get("delete_when_terminal"):
-                await self._http("cancel", 422)
-                self.deletes.append(cid)
+        if self.scenario.get("legacy_short_circuit") and order["status"] in TERMINAL:
+            await self._http("read", 200)  # the pre-2026-09-24 engine: lookup, then no DELETE
             return dict(order)
-        await self._http("cancel", 204)
+        answer = self.scenario.get("terminal_delete_answer", 422) if order["status"] in TERMINAL else 204
+        await self._http("cancel", answer)
         self.deletes.append(cid)
-        order.update(status="canceled", updated_at_ns=time.time_ns())
-        if self.scenario.get("leak_position_on_cancel"):
-            self.positions = [{"symbol": "SPY", "qty": "1", "avg_entry_price": "300"}]
+        if answer == 204:
+            order.update(status="canceled", updated_at_ns=time.time_ns())
+            if self.scenario.get("leak_position_on_cancel"):
+                self.positions = [{"symbol": "SPY", "qty": "1", "avg_entry_price": "300"}]
+        elif answer not in (404, 422):
+            self.reasons.add("cancellation_unresolved")
+        await self._http("read", 200)
         self.sink(dict(order))
         return dict(order)
 
@@ -212,13 +245,14 @@ class HarnessRuns(unittest.TestCase):
     def markers(self, name="CLEANUP_REQUIRED"):
         return list(self.root.glob("*/" + name))
 
-    def test_full_sequence_records_engine_state_and_honest_c04(self):
+    def test_full_sequence_reaches_native_faults_passed_offline(self):
         code, receipt, port = self.run_harness(run_root=self.root)
         cases = {c["id"]: c for c in receipt["cases"]}
+        prefix = receipt["client_id_prefix"]
         self.assertEqual([c["id"] for c in receipt["cases"]], ["C01", "C02", "C05", "C04"])
         # Write-ahead marker existed before the first POST and was removed after flat proof.
         self.assertEqual(port.in_flight_at_first_post, [
-            {"run_id": receipt["client_id_prefix"].rstrip("-"), "client_id_prefix": receipt["client_id_prefix"],
+            {"run_id": prefix.rstrip("-"), "client_id_prefix": prefix,
              "at": port.in_flight_at_first_post[0]["at"]}])
         self.assertEqual(self.markers("IN_FLIGHT"), [])
         self.assertFalse(receipt["in_flight_marker_present"])
@@ -227,37 +261,99 @@ class HarnessRuns(unittest.TestCase):
         self.assertEqual(cases["C01"]["detail"]["limit_price"], "300.00")
         self.assertEqual(cases["C02"]["outcome"], "passed")
         self.assertEqual(cases["C02"]["detail"]["ledger"]["status"], "canceled")
-        self.assertEqual(cases["C05"]["outcome"], "passed")
-        self.assertFalse(cases["C05"]["detail"]["delete_sent"])
-        self.assertFalse(cases["C05"]["detail"]["broker_refusal_observed"])
-        # The engine Ledger refuses a sub-penny >= $1 price before any POST.
-        self.assertEqual(cases["C04"]["outcome"], "unobserved")
-        self.assertEqual(cases["C04"]["evidence_class"], "none")
-        self.assertEqual(cases["C04"]["requests"], [])
-        self.assertEqual(cases["C04"]["detail"]["unobserved_reason"],
-                         "engine_refused_before_send: invalid_price_increment")
-        self.assertEqual(port.posts, 1)
-        self.assertEqual(port.deletes, [receipt["client_id_prefix"] + "c01"])
-        self.assertEqual(receipt["status"], "native_faults_incomplete")
+        # C05: the second cancel sends the DELETE; the broker's 422 is data.
+        c05 = cases["C05"]
+        self.assertEqual((c05["outcome"], c05["evidence_class"]), ("passed", "native_paper"))
+        self.assertEqual([r["kind"] for r in c05["requests"]], ["cancel", "read"])
+        self.assertTrue(c05["detail"]["delete_sent"])
+        self.assertEqual(c05["detail"]["cancel_http_statuses"], [422])
+        self.assertTrue(c05["detail"]["broker_refusal_observed"])
+        self.assertEqual(c05["detail"]["ledger_before"], c05["detail"]["ledger_after"])
+        self.assertEqual(c05["detail"]["new_transport_freeze_reasons"], [])
+        # C04: the sub-penny order reaches the broker and its documented 422 is definitive.
+        c04 = cases["C04"]
+        self.assertEqual((c04["outcome"], c04["evidence_class"]), ("passed", "native_paper"))
+        self.assertEqual(c04["detail"]["limit_price"], "240.0001")
+        self.assertEqual([(r["kind"], r["status"]) for r in c04["requests"]], [("submit", 422), ("read", 404)])
+        self.assertEqual(c04["detail"]["ledger"]["status"], "broker_refused")
+        self.assertEqual(c04["detail"]["ledger_refusal"], {"http_status": 422, "refusal": SUB_PENNY_REFUSAL})
+        self.assertEqual(c04["detail"]["effect_before"], c04["detail"]["effect_after"])
+        self.assertEqual(receipt["c04_pre_send_exemption"],
+                         "FaultLedger exempts only client id %sc04 from invalid_price_increment; FaultTransport "
+                         "exempts only its limit price increment from the order-contract boundary" % prefix)
+        self.assertEqual(set(receipt["engine_sources_sha256"]),
+                         {"transport.py", "safety.py", "runner.py", "../order-contract/order_contract.py"})
+        self.assertEqual(port.posts, 2)
+        self.assertEqual(port.deletes, [prefix + "c01", prefix + "c01"])
+        self.assertEqual(receipt["cleanup"]["cancels"], [])
         self.assertTrue(receipt["cleanup"]["flat"])
-        self.assertEqual(code, 1)
+        self.assertEqual((receipt["status"], code), ("native_faults_passed", 0))
         self.assertEqual(self.markers(), [])
         for case in ("C01", "C02"):
             self.assertEqual(cases[case]["evidence_class"], "native_paper")
-        # C05's GET-by-client-id reached the broker but no DELETE was sent.
-        self.assertEqual(cases["C05"]["evidence_class"], "engine_short_circuit")
-        self.assertEqual([r["kind"] for r in cases["C05"]["requests"]], ["read"])
         plan_sha = __import__("hashlib").sha256((HARNESS.parent / "plan.json").read_bytes()).hexdigest()
         self.assertEqual(receipt["plan_sha256"], plan_sha)
 
-    def test_c05_delete_sent_is_native_paper(self):
-        code, receipt, port = self.run_harness(delete_when_terminal=True)
+    def test_default_factory_is_the_fault_transport_for_the_c04_id(self):
+        requested = []
+
+        def fault_transport(client_id):
+            requested.append(client_id)
+            return FakePort
+        FakePort.scenario = {}
+        with patch.object(h, "fault_transport", side_effect=fault_transport):
+            h.run(self.env, self.root, self.out)
+        receipt = json.loads(self.out.read_text())
+        self.assertEqual(requested, [receipt["client_id_prefix"] + "c04"])
+
+    def test_legacy_short_circuit_is_never_native_evidence(self):
+        # The engine as run on 2026-09-23: a client-id GET found the order terminal, no DELETE.
+        code, receipt, port = self.run_harness(legacy_short_circuit=True)
+        c05 = {c["id"]: c for c in receipt["cases"]}["C05"]
+        self.assertEqual((c05["outcome"], c05["evidence_class"]), ("passed", "engine_short_circuit"))
+        self.assertFalse(c05["detail"]["delete_sent"])
+        self.assertFalse(c05["detail"]["broker_refusal_observed"])
+        self.assertEqual((receipt["status"], code), ("native_faults_incomplete", 1))
+
+    def test_c05_unresolved_delete_answer_fails(self):
+        code, receipt, port = self.run_harness(terminal_delete_answer=500)
+        cases = {c["id"]: c for c in receipt["cases"]}
+        self.assertEqual(cases["C05"]["outcome"], "failed")
+        self.assertEqual(cases["C05"]["detail"]["new_transport_freeze_reasons"], ["cancellation_unresolved"])
+        self.assertEqual(cases["C04"]["outcome"], "not_run")
+        self.assertEqual(port.posts, 1)
+        self.assertEqual((receipt["status"], code), ("native_faults_failed", 1))
+
+    def test_c05_404_answer_is_data(self):
+        code, receipt, port = self.run_harness(terminal_delete_answer=404)
         c05 = {c["id"]: c for c in receipt["cases"]}["C05"]
         self.assertEqual((c05["outcome"], c05["evidence_class"]), ("passed", "native_paper"))
-        self.assertTrue(c05["detail"]["delete_sent"])
-        self.assertTrue(c05["detail"]["broker_refusal_observed"])
-        # C04 is still refused before send, so the run cannot pass.
-        self.assertEqual((receipt["status"], code), ("native_faults_incomplete", 1))
+        self.assertEqual(c05["detail"]["cancel_http_statuses"], [404])
+        self.assertEqual((receipt["status"], code), ("native_faults_passed", 0))
+
+    def test_c04_definitive_403_passes(self):
+        code, receipt, port = self.run_harness(c04_status=403)
+        c04 = {c["id"]: c for c in receipt["cases"]}["C04"]
+        self.assertEqual(c04["outcome"], "passed")
+        self.assertEqual(c04["detail"]["ledger_refusal"], {"http_status": 403, "refusal": None})
+        self.assertEqual((receipt["status"], code), ("native_faults_passed", 0))
+
+    def test_c04_undocumented_422_stays_ambiguous_and_fails(self):
+        # "client_order_id must be unique" proves an order exists: never a definitive refusal.
+        for label, body in (("duplicate", {"code": 40010001, "message": "client_order_id must be unique"}),
+                            ("other_code", dict(DOCUMENTED_SUB_PENNY, code=40010001))):
+            with self.subTest(label=label):
+                FakePort.instances = []
+                self.root = self.state_base / ("native-faults-" + label)
+                code, receipt, port = self.run_harness(c04_body=body)
+                c04 = {c["id"]: c for c in receipt["cases"]}["C04"]
+                self.assertEqual(c04["outcome"], "failed")
+                self.assertEqual(c04["detail"]["ledger"]["status"], "reserved")
+                self.assertIsNone(c04["detail"]["ledger_refusal"])
+                self.assertEqual(c04["detail"]["error"]["type"], "AmbiguousSubmission")
+                # An ambiguous submission is never proven flat: the run is marked for manual recovery.
+                self.assertFalse(receipt["cleanup"]["flat"])
+                self.assertEqual((receipt["status"], code), ("cleanup_required", 3))
 
     def test_flat_start_refusal_makes_no_write(self):
         code, receipt, port = self.run_harness(positions=[{"symbol": "AAPL", "qty": "3", "avg_entry_price": "1"}])
@@ -390,6 +486,15 @@ class Units(unittest.TestCase):
         for status in (400, 422, 429, 500):  # Ambiguous to the engine; never a definitive refusal.
             self.assertEqual(h.judge_c04([{"kind": "submit", "status": status}], refused, None, effect, effect)[0],
                              "failed")
+        documented = {"http_status": 422, "refusal": SUB_PENNY_REFUSAL}
+        sub422 = [{"kind": "submit", "status": 422}, {"kind": "read", "status": 404}]
+        self.assertEqual(h.judge_c04(sub422, refused, None, effect, effect, documented)[0], "passed")
+        # The ledger's own refusal record decides; a 422 without it, or on a live intent, fails.
+        self.assertEqual(h.judge_c04(sub422, refused, None, effect, effect,
+                                     {"http_status": 422, "refusal": None})[0], "failed")
+        self.assertEqual(h.judge_c04(sub422, ambiguous, None, effect, effect, documented)[0], "failed")
+        self.assertEqual(h.judge_c04([{"kind": "submit", "status": 500}], refused, None, effect, effect,
+                                     documented)[0], "failed")
         self.assertEqual(h.judge_c04(sub, ambiguous, {"type": "AmbiguousSubmission"}, effect, effect)[0], "failed")
         moved = {"positions": {"SPY": "1"}, "cash_delta_usd": "-1"}
         self.assertEqual(h.judge_c04(sub, refused, None, effect, moved)[0], "failed")
@@ -408,6 +513,47 @@ class Units(unittest.TestCase):
         outcome, detail = h.judge_c05(state, state, None, {"cancellation_unresolved"}, effect, effect, refusal)
         self.assertEqual(outcome, "failed")
         self.assertEqual(h.judge_c05(state, state, {"type": "TransportError"}, set(), effect, effect, [])[0], "failed")
+        unresolved = [{"kind": "cancel", "status": 503}, {"kind": "read", "status": 200}]
+        self.assertEqual(h.judge_c05(state, state, None, set(), effect, effect, unresolved)[0], "failed")
+        outcome, detail = h.judge_c05(state, state, None, set(), effect, effect, [{"kind": "read", "status": 200}])
+        self.assertEqual((outcome, detail["delete_sent"]), ("passed", False))  # run_cases then marks it engine_short_circuit
+
+    def test_fault_ledger_exempts_only_the_c04_client_id(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger = h.FaultLedger(Path(tmp) / "ledger.sqlite3", sub_penny_client_id="nf-x-c04")
+            now = time.time()
+            ledger.start_trial(now)
+            quote = safety.Quote("SPY", "600", "600.02", now)
+            args = {"quote": quote, "now": now, "market_open": True, "session_close": now + 7200,
+                    "stop_file": Path(tmp) / "STOP"}
+            for cid in ("nf-x-c01", "nf-x-c040", "other"):
+                with self.assertRaisesRegex(safety.SafetyError, "invalid_price_increment"):
+                    ledger.reserve_intent(cid, "SPY", "buy", "1", "240.0001", **args)
+            self.assertTrue(ledger.reserve_intent("nf-x-c04", "SPY", "buy", "1", "240.0001", **args).newly_reserved)
+            self.assertTrue(ledger.reserve_intent("nf-x-c01", "SPY", "buy", "1", "240.00", **args).newly_reserved)
+            ledger.close()
+
+    @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
+    def test_fault_transport_exempts_only_the_c04_price_increment(self):
+        port = h.fault_transport("nf-x-c04")(KEY, SECRET, ["SPY"], before_request=lambda *a, **k: None,
+                                             before_submit=lambda order: None,
+                                             sink_observation=lambda order: None)
+        self.addCleanup(port._client._session.close)
+        self.assertIsInstance(port, h.FaultTransport)
+        order = {"client_order_id": "nf-x-c04", "symbol": "SPY", "side": "buy", "qty": "1",
+                 "limit_price": "240.0001", "extended_hours": False}
+        envelope, request = port._validated_request(order)
+        self.assertEqual(envelope["intent"]["limit_price"], "240.0001")
+        # The C04 POST body must still equal its envelope at the wire gate.
+        self.assertIs(check_wire_submission({"nf-x-c04": envelope}, request.to_request_fields()), envelope)
+        for cid in ("nf-x-c01", "nf-x-c040", "other"):
+            with self.subTest(client_order_id=cid), self.assertRaises(OrderContractRefused):
+                port._validated_request(dict(order, client_order_id=cid))
+        for change in ({"symbol": "BRK-B"}, {"qty": "0.5"}, {"extended_hours": True}):
+            with self.subTest(change=change), self.assertRaises(OrderContractRefused):
+                port._validated_request(dict(order, **change))  # every other rule still applies to C04
+        self.assertEqual(port._validated_request(dict(order, limit_price="240.01"))[0]["intent"]["limit_price"],
+                         "240.01")
 
     def test_c01_c02_judges_use_ledger_state(self):
         state = {"status": "new", "filled_qty": "0", "submit_attempted": True, "broker_id_recorded": True}

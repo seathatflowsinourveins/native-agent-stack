@@ -4,13 +4,20 @@ Two host-local launchers that keep a heavy maintenance job, and every process it
 spawns, inside its own native systemd scope with hard memory, task and runtime
 limits, plus a CPU quota where the user manager delegates the cpu controller. They exist because an unbounded scan or build on a WSL2 host can exhaust
 the VM and take the whole session down; the scope kills the job instead.
+A third script, `gitleaks-guarded-macos`, applies the same Gitleaks caps on
+macOS, which has no per-job cgroup (see "macOS" below).
 
 | Script | Role |
 | --- | --- |
 | `ecosystem-bounded-run` | Generic launcher: runs `COMMAND [ARG ...]` in a transient `--user --scope` unit with `MemoryHigh`/`MemoryMax`/`MemorySwapMax`/`TasksMax`/`RuntimeMaxSec` applied, and `CPUQuota` where cpu is delegated (see "CPU quota" below). Refuses to run at all when it cannot contain the job. |
 | `gitleaks-guarded` | Gitleaks front end: preserves upstream Gitleaks argument and exit-code semantics, adds a per-user non-blocking lock so two scans cannot run at once, and delegates the actual scan to `ecosystem-bounded-run`. |
+| `gitleaks-guarded-macos` | macOS Gitleaks front end: the same argument and exit-code semantics, a per-user lock that waits up to 60 s, and a footprint watchdog that kills the scan's whole process tree above 6 GiB or after 600 s. Python 3 standard library only. |
 
 ## Provenance
+
+`gitleaks-guarded-macos` has no external source: it was written in this
+repository on 2026-09-24, after the macOS memory incident described below. The
+rest of this section covers the two Linux scripts.
 
 - Source: the `bin` directory of the private `codex-ecosystem` checkout on the
   WSL2 host that developed them (not published here; the two files below are the
@@ -163,7 +170,7 @@ incomplete coverage.
 
 ## Runtime boundary
 
-These scripts are **Linux-only**, and only on a host that provides all of:
+`ecosystem-bounded-run` and `gitleaks-guarded` are **Linux-only**, and run only on a host that provides all of:
 
 - **cgroup v2** — `ecosystem-bounded-run` requires
   `/sys/fs/cgroup/cgroup.controllers` to exist. Without it the memory and task
@@ -184,15 +191,117 @@ being prevented. `gitleaks-guarded` refuses the same way (78) when the native
 binary, the runner or the private runtime directory is unavailable — before any
 scan begins.
 
-**macOS has no equivalent.** launchd provides no per-job memory cgroup, so there
-is no way to reproduce `MemoryMax`/`MemorySwapMax` containment for a transient
-scope. The "always run Gitleaks through the guarded launcher" rule is therefore
-scoped to Linux/WSL2 hosts; a macOS bootstrap must not pretend to satisfy it by
-installing an unbounded shim. The same holds for the CPU quota: a macOS host
-installs neither script, so it has no per-job CPU cap. This is a recorded
-limitation, not a gap this repository closes.
+**macOS has no cgroup equivalent.** launchd provides no per-job memory cgroup,
+so `MemoryMax`/`MemorySwapMax` containment for a transient scope cannot be
+reproduced there, and neither script above runs on macOS. For Gitleaks, a macOS
+host uses `gitleaks-guarded-macos` instead (next section): a user-space
+watchdog with the same caps, which is weaker than a kernel limit. Other heavy
+jobs still have no macOS containment, and no macOS job has a CPU cap.
+
+## macOS: `gitleaks-guarded-macos` (2026-09-24)
+
+**Why.** At 09:45 and 09:46 EDT on 2026-09-24, Jetsam on a 24 GB MacBook Pro
+recorded three concurrent Gitleaks 8.30.1 processes at a combined 52.8 GiB,
+then 58.2 GiB, and killed 405, then 4,255 other processes. The two largest came
+from the global pre-commit hook (`gitleaks git --pre-commit --staged --redact`)
+on scratch commits made by `tests/test_catalog_freshness_propose.py`, before
+#181 made the tests' Git configuration hermetic. `TrackedExplorerSubprocessTests`
+force-adds the generated explorer. The mechanism is upstream redaction:
+`filter()` calls `report.Finding.Redact` for every finding, and `Redact` copies
+the finding's whole line. In Git mode a hunk holds whole lines, so the
+explorer's 2,335 findings on one 12,889,851-byte line retain about 28 GiB. The
+same happens to `gitleaks git --redact=100` over this repository's all-refs
+history, where 240 commits touch that file. `dir` mode reads files in bounded
+chunks and stayed at about 0.13 GiB, even for 714 MB with nested worktrees. The
+measurements are in
+[the receipt](../../evidence/receipts/gitleaks-macos-memory-bound-20260924.json).
+
+**What it does.**
+
+- It keeps Gitleaks' arguments, output and exit status. `version`, `--version`,
+  `--help` and `-h` on their own exec the native binary with no lock or
+  watchdog.
+- One scan runs per user, across worktrees and clients. The front end holds an
+  exclusive `flock` on `~/.local/state/ecosystem-gitleaks.lock`, and the scan
+  inherits it. A second scan waits up to `ECOSYSTEM_GITLEAKS_LOCK_WAIT` seconds
+  (default 60; `0` gives the Linux launcher's fail-fast behaviour) and then exits
+  **75**. A read-only descriptor is enough to take the lock, so sandboxed
+  clients can use it, but only an unsandboxed run can create the file.
+- Every 50 ms it sums the physical footprint (the figure Jetsam acts on) of the
+  scan's whole process tree, including its `git` child. Above **6 GiB** it
+  SIGKILLs the tree and exits **137**. After **600 s** it sends SIGTERM, then
+  SIGKILL 5 s later, and exits **124**. `ECOSYSTEM_JOB_MEMORY_MAX` and
+  `ECOSYSTEM_JOB_SECONDS` can lower either cap, never raise it.
+- It refuses with **78** before any scan in these cases: off macOS; the native
+  binary is missing (default
+  `${MISE_DATA_DIR:-~/.local/share/mise}/installs/gitleaks/8.30.1/gitleaks`, or
+  `GITLEAKS_NATIVE`); that path is the front end itself; the lock is unusable or
+  a symbolic link; a limit is malformed; or process footprints cannot be read.
+  A scan whose footprint becomes unreadable while it runs is killed and exits
+  with the same 78.
+  A signal to the front end stops the tree and exits 128 plus the signal
+  number.
+- The scan stays in the caller's process group, so a group signal from the
+  caller, such as Ctrl-C or a tool timeout, reaches it too.
+
+**What it is not.** It is a user-space watchdog, not a kernel limit. The
+measured overshoot was 0.04-0.20 GiB above the cap at the observed allocation
+rates. If the front end itself is SIGKILLed, the scan continues unwatched but
+keeps the lock, so no second scan can start. There is no CPU or task cap. A scan
+stopped at the cap produced no result: that is fail-closed, not coverage.
+
+**Rejected alternatives**, measured on the same host:
+
+- `--max-target-megabytes` fails open. Gitleaks skips an oversized fragment at
+  debug log level, so the staged explorer's 2,335 findings became `no leaks
+  found` with exit 0.
+- Path exclusions in `.gitleaks.toml`: a top-level path allowlist skips whole
+  files in both modes (see that file's header), and `dir` memory was already
+  bounded.
+- `GOMEMLIMIT`: at 4 GiB the history scan still crossed the cap, because the
+  growth is live findings, not garbage.
+- A kernel memory limit: `memorystatus_control` refuses unprivileged callers
+  with EPERM.
+
+**Install (the host's owner).**
+
+```bash
+mkdir -p "$HOME/.local/bin" "$HOME/.local/state"
+install -m 0755 adoption/tools/gitleaks-guarded-macos "$HOME/.local/bin/gitleaks-guarded-macos"
+ln -sfn gitleaks-guarded-macos "$HOME/.local/bin/gitleaks"   # the name the tracked pre-commit hook calls
+gitleaks-guarded-macos version                     # execs the native binary directly
+: > "$HOME/.local/state/ecosystem-gitleaks.lock"  # once, outside any sandbox
+```
+
+`$HOME/.local/bin` must come before every directory that holds the native
+binary on `PATH` (a Homebrew or mise directory, for example). The front end
+finds the native binary through `GITLEAKS_NATIVE` or the mise install path,
+never through `PATH`, and refuses with 78 when that path is missing or
+resolves to the front end itself, so the link cannot loop. The install passes
+when `command -v gitleaks` prints `$HOME/.local/bin/gitleaks`,
+`readlink "$(command -v gitleaks)"` prints `gitleaks-guarded-macos` and
+`gitleaks version` prints `8.30.1`. On 2026-09-25 this was checked only off
+macOS, with a stand-in `HOME`: the link resolved, `gitleaks version` printed
+`8.30.1`, and `GITLEAKS_NATIVE` set to the link was refused with 78. Only the
+`version` path and the refusals run off macOS; the install has not yet been
+run on a Mac.
+
+Every caller must invoke the front end, not the native binary. That includes
+the global pre-commit hook, which the agent-ecosystem repository installs; the
+hook change is handed off to that repository's owner. Do not raise the caps to
+retry a scan the front end killed. Narrow the scope instead, for example to the
+CI history scope (`--log-opts=HEAD --max-target-megabytes 2`, measured at
+2.9 GiB), and record any size-based skip as incomplete coverage.
 
 ## What the tests establish
+
+`tests/test_gitleaks_guarded_macos.py` covers the macOS front end. Structural
+checks run on every host, plus a refusal check off macOS. On macOS, integration
+checks against stub binaries cover exit-status propagation, the memory cap on an
+allocating grandchild, the runtime cap, the lock (busy, waiting, serialised,
+held during the scan) and every refusal. The stubs are synthetic fixtures; the
+Gitleaks measurements are in the receipt above. The rest of this section covers
+the Linux scripts.
 
 `tests/test_adoption_guarded_runners.py` covers two different evidence classes,
 and prints which containment branch it took.
@@ -312,3 +421,96 @@ opened at line 22 (line 21 before the 2026-09-24 re-sync) survives the final `ex
 observation, not a suite assertion.
 
 The shellcheck structural test excludes `SC2317` (info: "command appears to be unreachable"): the bounded runner's cleanup function is only reached through `trap`, which the shellcheck release on the current GitHub-hosted image (its version is not captured in the run log) reports as unreachable while 0.11.0 is clean; the scripts are kept faithful to their recorded provenance (only the divergences listed above) rather than annotated for that finding.
+
+## `codex-broker-reaper` (2026-09-25)
+
+Python 3 stdlib, no third-party dependencies, **Linux-only**: every guard
+reads `/proc/<pid>/{cmdline,comm,cwd,stat}`, `/proc/uptime` and
+`/proc/meminfo` directly (`main()` fails closed with an explicit error on a
+host with no `/proc`, rather than silently reporting every broker as "not
+running"). Stops the openai-codex Claude Code plugin's leaked
+`app-server-broker.mjs` processes: a crashed session or an abandoned
+workflow-child worktree leaves its broker (and the `codex app-server` child
+it owns) running indefinitely, because only the main session's own
+`SessionEnd` hook ever shuts one down. See
+[`../../docs/decisions/2026-09-25-codex-broker-reaper.md`](../../docs/decisions/2026-09-25-codex-broker-reaper.md)
+for the upstream issue/PR evidence and the alternatives this rejected.
+
+```
+adoption/tools/codex-broker-reaper --list                       # dry run (default); changes nothing
+adoption/tools/codex-broker-reaper --apply --receipt out.json   # stop every eligible broker
+adoption/tools/codex-broker-reaper --apply --escalate           # + SIGTERM the process group if the RPC alone doesn't work
+```
+
+A broker is only ever eligible when **all** of these hold, each checked live
+rather than assumed:
+
+| Guard | Check |
+| --- | --- |
+| (a) pid/cmdline | `/proc/<pid>/cmdline` still names `app-server-broker.mjs serve` with the exact recorded `--endpoint` (guards pid reuse, upstream #743) |
+| (b) no active jobs | no job in the workspace's `state.json` has a status outside `{completed, failed, cancelled}`; an unrecognized status blocks reaping rather than being treated as safe |
+| (c) workspace unused | the workspace's KEYING root — the ancestor whose own `sha256(realpath(...))[:16]` matches the plugin's own state-dir hash (falling back to the nearest git checkout root, then the broker's own raw live `/proc/<pid>/cwd`, when nothing matches) — no longer exists, or no live `claude`/`codex` process — excluding every live broker's own process subtree (e.g. each one's `codex app-server` child), not only the broker being evaluated, host-wide — has a cwd equal to or under the workspace root, under that keying root, or under the *other* checkout a `git worktree` workspace belongs to (see the decision doc's "Known limitations" for what these checks do and do not cover) |
+| (d) old enough | the broker process (from `/proc/<pid>/stat`'s `starttime`, not a file mtime) is older than `--min-age` (default 1800s) |
+| (e) job-idle | the workspace's most recent recorded job activity (`state.json` jobs[]' `updatedAt`/`completedAt`/`createdAt`/`startedAt`) is at least `--min-age` in the past too — not just the broker process's own age; a workspace that has never run a job has no signal here and this guard passes trivially |
+
+Action on an eligible broker is the `broker/shutdown` JSON-RPC over its unix
+socket (5s), then up to 15s waiting for the broker and the OS children it had
+at that moment to exit. **No SIGKILL, ever.** `--escalate` only adds a
+process-group `SIGTERM` after that wait fails, and only after re-checking
+guard (a) again first (the pid could have been reused in those 15s). Once an
+exit is confirmed, `broker.json` is removed if it still names the exact
+pid/endpoint just stopped (re-read just before deleting, so a new broker
+started for the same workspace during the wait is never touched). `--list`
+is the default and changes nothing; `--receipt PATH` writes the same JSON
+report `--list`/`--apply` print to a file. One broker's own unreadable or
+malformed state is reported as that broker's own ineligibility reason and
+never aborts evaluation of the rest. Exit 0 normally; 2 if an eligible
+broker was not confirmed stopped, or for invalid command-line usage; 3 if
+this host has no `/proc` at all (unsupported platform).
+
+Plugin data directories are discovered at
+`~/.claude/plugins/data/*codex*/state`; `--state-root PATH` (repeatable)
+replaces that discovery with an explicit `state` directory, which is how the
+tests point it at a synthetic tree instead of a real host's plugin data.
+
+**Evidence class: local integration, synthetic fixtures.**
+`tests/test_codex_broker_reaper.py` runs every guard against a real spawned
+process: a small Python stand-in plays the broker (a real unix-socket server,
+started from a script file literally named `app-server-broker.mjs` so its
+real `/proc/<pid>/cmdline` matches guard (a), answering `broker/shutdown`
+exactly like the plugin's own broker) and, separately, a live `claude`/`codex`
+look-alike (`comm` forced with `prctl(PR_SET_NAME)`, since a Python process
+run as `python3 script.py` reports `comm` == `python3`, the interpreter's own
+name, not the script's, simply because `python3` is the binary actually
+running — checked by hand against the real `claude` binary before writing
+the suite). No real broker, no real Claude Code or Codex session, and no
+plugin state directory on any host is ever stopped or otherwise acted on by
+the tests — every state/workspace directory a test evaluates is a fresh
+synthetic tempdir — but guard (c)'s live-session and live-broker scans do
+*read* every host process's `/proc/<pid>/comm`/`cwd` and every real
+broker's own `cmdline` while checking for a live session or another live
+broker (`LiveCwdGuardTests.setUp` restricts the live-broker exclusion
+result back down to the test's own spawned fixtures; the live-session scan
+itself is host-wide and unrestricted; see the test module's own docstring).
+58 tests as of the 2026-09-25 fix round (sixth pass): guard (e) job-idle
+timing, the worktree-to-parent check (a hand-written `.git` `gitdir:`
+pointer file, no real `git worktree` needed), `path_is_under`'s
+filesystem-root case, malformed broker.json/state.json (non-object JSON,
+non-UTF-8 bytes) evaluating to an ineligible record rather than crashing
+the run, `broker.json` cleanup after a confirmed stop, and the sixth
+pass's own hash-matched keying-root selection for a removed
+`.claude/worktrees/<name>` checkout, in addition to the coverage described
+in the decision doc.
+`--list` was run against this host's real
+`~/.claude/plugins/data/codex-openai-codex/state` on 2026-09-25 (read-only):
+every broker present had already exited (dead pid; guard (a) alone already
+refuses it), so 0 were eligible — consistent with the facts recorded in the
+decision doc.
+
+The systemd user templates
+([`../templates/systemd/codex-broker-reaper.service`](../templates/systemd/codex-broker-reaper.service),
+[`.timer`](../templates/systemd/codex-broker-reaper.timer)) are drafted, not
+installed: no host has loaded, started or enabled them. `@REPOSITORY@` is a
+placeholder for this repository's checkout path and must be substituted
+before installing either unit; `%h` is systemd's own home-directory specifier
+and needs no substitution.

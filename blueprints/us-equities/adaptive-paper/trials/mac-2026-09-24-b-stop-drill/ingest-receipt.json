@@ -1,0 +1,21 @@
+{
+  "kind": "promotion_gate_snapshot_ingest",
+  "evidence_class": "native_market_data_readonly",
+  "fetched_at_utc": "2026-09-24T14:30:08Z",
+  "feed": "sip",
+  "adjustment": "raw",
+  "timeframe": "1Day",
+  "sessions_requested": 20,
+  "symbols": 24,
+  "expected_latest_session": "2026-09-23",
+  "coverage_problems": {},
+  "row_count": 480,
+  "sessions_range": [
+    "2026-08-26",
+    "2026-09-23"
+  ],
+  "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+  "snapshot_sha256": "89233358f95271d618b92c461a9f7b82c09f1c31eba11a7fdd73c6bb14902e86",
+  "snapshot_bytes": 35134,
+  "alpaca_py": "0.44.0"
+}

@@ -216,6 +216,24 @@ class Validator:
             self.error(f"{relative_path}: unsupported schema_version")
         return result
 
+    def check_credential_inventory(self) -> None:
+        """Names-only credential inventory (docs/secret-storage.md), when present."""
+        path = self.root / "adoption/credential-inventory.json"
+        if not path.is_file():
+            return
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "_credential_status", Path(__file__).resolve().with_name("credential_status.py"))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        try:
+            inventory = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            self.error("adoption/credential-inventory.json: invalid JSON")
+            return
+        for message in module.inventory_errors(inventory, self.root):
+            self.error(f"adoption/credential-inventory.json: {message}")
+
     def publication_paths(self, hashed_paths) -> list[str]:
         """Use only this root's Git boundary; archives retain filesystem scanning."""
         paths = {"manifests/stack.json", "manifests/evidence.json", *hashed_paths}
@@ -437,6 +455,7 @@ class Validator:
             for receipt_id in self.identifiers(model.get("evidence_ids", []), "model.evidence_ids"):
                 if receipt_id not in receipts:
                     self.error(f"model: unknown evidence {receipt_id}")
+        self.check_credential_inventory()
         self.scan_publication(files)
         if self.errors:
             raise InvalidPublication("\n".join(self.errors))
