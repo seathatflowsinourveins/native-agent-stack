@@ -298,7 +298,20 @@ though it failed: without that entry, an automatic rollback would revert the
 same way, so the timer acts on the same root and stubs the run that
 scheduled it actually used), so an operator who never runs `confirm --txn T`
 gets an automatic revert once that window elapses, without needing to stay
-attached to watch it. `rollback ID` (no `--txn`) targets that component's
+attached to watch it. Round 9 (major finding): that callback used to take
+`switch.lock`/`bootstrap.lock` the same non-blocking way every interactive
+command does, so a lock merely busy for a moment at the exact instant the
+timer fired (another `ecosystem-switch` command, or a `bootstrap-linux.sh`
+run, which holds `bootstrap.lock` for its whole duration) lost the revert
+for good -- nothing else in the tool ever re-fires it. `--if-unconfirmed`
+now waits out a busy lock for up to
+`ECOSYSTEM_SWITCH_IF_UNCONFIRMED_LOCK_WAIT_SECONDS` (default 300s) before
+giving up with the same exit 75, and the transient unit itself carries
+`Restart=on-failure`, `RestartSec=30` and a `StartLimitIntervalSec=`/
+`StartLimitBurst=` pair sized to keep retrying for at least the operator's
+own `--confirm-within` window, so systemd itself retries a 75 exit rather
+than the callback being a genuine one-shot. `rollback ID` (no `--txn`)
+targets that component's
 most recently applied, still-standing transaction with at least one
 reversible operation (by each transaction's own earliest ledger entry --
 never by sorting transaction-id text, which sorts a plain `apply`

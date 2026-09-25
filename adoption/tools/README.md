@@ -572,7 +572,15 @@ transaction is immediately `applied`. With `--confirm-within SEC`, it asks
 --if-unconfirmed` to call back later (real usage: this always fires well
 after `apply` itself has returned and released its lock) and the
 transaction's own status is `pending_confirmation` until `confirm --txn T` is
-run or that timer fires. `ECOSYSTEM_SWITCH_SYSTEMD_RUN` /
+run or that timer fires. Round 9: the transient unit also carries
+`Restart=on-failure`, `RestartSec=30` and a `StartLimitIntervalSec=`/
+`StartLimitBurst=` pair sized to keep retrying for at least the
+`--confirm-within` window, and the callback itself
+(`rollback --txn T --if-unconfirmed`, never an interactive command) waits
+out a busy `switch.lock`/`bootstrap.lock` for up to
+`ECOSYSTEM_SWITCH_IF_UNCONFIRMED_LOCK_WAIT_SECONDS` (default 300s) before
+exiting 75 -- so a lock merely busy at the exact instant the timer fires no
+longer loses the revert for good. `ECOSYSTEM_SWITCH_SYSTEMD_RUN` /
 `ECOSYSTEM_SWITCH_SYSTEMCTL` point tests at stub executables instead of the
 real commands.
 

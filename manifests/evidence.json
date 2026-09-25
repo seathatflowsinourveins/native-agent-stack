@@ -3269,8 +3269,8 @@
     },
     {
       "path": "adoption/lifecycle.md",
-      "sha256": "605cedc7a5908a24e51d468bd6c93ba36126d07a9e1ad976f09dd587cb8498f3",
-      "bytes": 41837
+      "sha256": "26b8b86cfa602c9acc746557b4fbd5fb04b8858c608f4dcf1f102700cbaf3c87",
+      "bytes": 42705
     },
     {
       "path": "adoption/manifest.json",
@@ -3379,8 +3379,8 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "ac14502a1d305128756a8d6674f100f0bf0b3e2158f49756c143021920cf57e6",
-      "bytes": 50693
+      "sha256": "ff9df65fa7839913e5e21d60a3b5260cea351851aae49b93db5e57faddab1084",
+      "bytes": 51229
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
