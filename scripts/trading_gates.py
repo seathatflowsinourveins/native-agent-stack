@@ -244,8 +244,13 @@ def bound_path(base: str, key) -> str | None:
 
 def source_binding(root: Path, gate: dict, spec: dict) -> tuple[dict, list[dict]]:
     """Compare the sha256 values a gate's receipt binds with the tree and the
-    release manifest. Returns (counts, warnings); never raises, and nothing it
-    finds changes the gate's status, rung readiness, errors or the exit code."""
+    release manifest. Returns (counts, warnings), and nothing it finds changes
+    the gate's status, rung readiness, errors or the exit code. A missing,
+    unreadable, malformed, too deeply nested or symlink-looping file becomes a
+    warning, not an exception: the reads below catch OSError, ValueError and
+    RuntimeError (Python 3.12 and earlier raise RuntimeError from
+    Path.resolve() on a symlink loop; RecursionError, raised by json on deep
+    nesting, is a RuntimeError)."""
     warnings: list[dict] = []
 
     def warn(path, detail, recorded=None, tree=None, listed=None):
@@ -254,7 +259,7 @@ def source_binding(root: Path, gate: dict, spec: dict) -> tuple[dict, list[dict]
 
     try:
         receipt = load_json(root / gate["receipt_path"])
-    except (OSError, ValueError) as error:
+    except (OSError, RuntimeError, ValueError) as error:
         warn(gate["receipt_path"], f"receipt unreadable ({error.__class__.__name__}); source binding not checked")
         return {"bound": 0, "stale": 0, "checked": False}, warnings
     manifest: dict = {}
@@ -264,7 +269,7 @@ def source_binding(root: Path, gate: dict, spec: dict) -> tuple[dict, list[dict]
             manifest = loaded
         else:
             warn(spec["manifest"], "release manifest is not an object; bindings compared with the tree only")
-    except (OSError, ValueError) as error:
+    except (OSError, RuntimeError, ValueError) as error:
         warn(spec["manifest"], f"release manifest unreadable ({error.__class__.__name__}); "
                                "bindings compared with the tree only")
     bound: list[tuple[str, str | None, object]] = []
@@ -296,6 +301,12 @@ def source_binding(root: Path, gate: dict, spec: dict) -> tuple[dict, list[dict]
         try:
             resolved = (root / path).resolve()
             resolved.relative_to(root.resolve())
+        except RuntimeError:
+            # Python 3.12 and earlier: a symlink loop. Python 3.13 resolves it without
+            # raising, and is_file() below is then False, so it is reported as missing.
+            stale += 1
+            warn(path, "bound path is a symlink loop; nothing was read", recorded)
+            continue
         except (OSError, ValueError):
             stale += 1
             warn(path, "bound path resolves outside the tree; nothing was read", recorded)

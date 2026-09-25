@@ -184,6 +184,39 @@ class SyntheticBindingTests(unittest.TestCase):
         self.assertIn("resolves outside the tree", details[f"{ENGINE}/linked.py"])
         self.assertEqual(sum("not a relative in-tree path" in detail for detail in details.values()), 3)
 
+    def test_symlink_loop_is_one_warning_not_an_exception(self):
+        # Python 3.12 raises RuntimeError from Path.resolve() on a symlink loop; 3.13 does not.
+        # Either way the loop is one warning, the check passes and the exit code stays 0.
+        target = self.root / ENGINE / "runner.py"
+        target.unlink()
+        try:
+            target.symlink_to("runner.py")
+        except OSError:
+            self.skipTest("symlinks unavailable")
+        result = self.check()
+        self.assert_report_only(result)
+        self.assertEqual(result["source_bindings"][GATE_ID], {"bound": 6, "stale": 1, "checked": True})
+        (warning,) = result["warnings"]
+        self.assertEqual((warning["path"], warning["tree_sha256"]), (f"{ENGINE}/runner.py", None))
+        self.assertTrue("symlink loop" in warning["detail"] or "the file is missing" in warning["detail"],
+                        warning["detail"])
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout):
+            code = trading_gates.main(["--root", str(self.root), "--path", "gates.json"])
+        printed = json.loads(stdout.getvalue())
+        self.assertEqual((code, printed["status"], printed["errors"]), (0, "passed", []))
+        self.assertEqual([item["path"] for item in printed["warnings"]], [f"{ENGINE}/runner.py"])
+
+    def test_deeply_nested_manifest_is_one_warning_not_an_exception(self):
+        # json raises RecursionError (a RuntimeError) on nesting deeper than the interpreter's limit.
+        self.put(MANIFEST, b"[" * 200000 + b"]" * 200000)
+        result = self.check()
+        self.assert_report_only(result)
+        (warning,) = result["warnings"]
+        self.assertEqual(warning["path"], MANIFEST)
+        self.assertIn("release manifest unreadable (RecursionError)", warning["detail"])
+        self.assertEqual(result["source_bindings"][GATE_ID], {"bound": 6, "stale": 0, "checked": True})
+
     def test_unreadable_receipt_or_manifest_never_raises(self):
         self.put(MANIFEST, b"not json")
         result = self.check()

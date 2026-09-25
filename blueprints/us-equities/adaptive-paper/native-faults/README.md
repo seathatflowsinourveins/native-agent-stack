@@ -11,7 +11,8 @@ earlier incomplete run, `receipt-20260923.json`, and under `evidence/` the
 independent observations of the three passing runs' broker orders, a second,
 standard-library observation of the 2026-09-25 run by a separate session, the
 sanitized run record of the 2026-09-25 run, and that run's host-clock evidence
-(five `chrony-20260925t*.txt` snapshots and `host-clock-diagnosis-20260925.txt`). The offline
+(five `chrony-20260925t*.txt` snapshots, `host-clock-diagnosis-20260925.txt` and
+`host-clock-process-view-20260925t224915z.txt`). The offline
 suite `tests/test_native_faults_min.py` is a local synthetic fixture with a fake
 transport; it drives the real `runner.Controller` and `safety.Ledger`.
 
@@ -148,16 +149,19 @@ and 27 s after the run, cap the offset at 0.35 s at those times.
 The pre-run reading of 0.0009 s does not contradict this. Two chronyd daemons
 were steering the one kernel clock:
 - One follows PHC0, the Hyper-V PTP clock that carries the Windows host's time.
-  That clock was about 0.27 to 0.29 s fast. The 0.0009 s snapshot
-  (`evidence/chrony-20260925t182439z-before-run.txt`, all 13 lines) was this
-  daemon's answer. The same snapshot also shows RMS offset 0.083 s, Frequency
-  12.063 ppm slow and Residual freq -3087.581 ppm.
+  That clock was about 0.27 to 0.29 s fast. Between the other daemon's steps the
+  clock was pulled forward again, toward PHC0 time: before each of its steps
+  sampled from 18:54Z to 18:57Z, the other daemon measured it about 0.28 s ahead
+  again. How this daemon moves the clock (slewing or stepping) was not captured.
+  The 0.0009 s snapshot (`evidence/chrony-20260925t182439z-before-run.txt`, all
+  13 lines) was this daemon's answer. The same snapshot also shows RMS offset
+  0.083 s, Frequency 12.063 ppm slow and Residual freq -3087.581 ppm.
 - The other is this distribution's own chronyd, which follows internet NTP
   servers. It was restarted at 18:09:44Z with clock control on and
   `makestep 0.1 -1`. From then to 19:00Z it stepped the clock back 45 times by
-  0.10 to 0.50 s, about once a minute. The lane's unsaved 18:22:44Z reading
-  (38.28.93.135, last offset +0.375 s, 4012 ppm fast) was this daemon's answer,
-  at its -0.375 s step.
+  0.10 to 0.50 s, about once a minute, and forward once (+0.124 s at 18:46:23Z).
+  The lane's unsaved 18:22:44Z reading (38.28.93.135, last offset +0.375 s,
+  4012 ppm fast) was this daemon's answer, at its -0.375 s step.
 
 No step reached the run. The last step before it was at 18:24:55Z and the next at
 18:25:56Z, and the ledger's 21 request times increase monotonically. The engine's
@@ -165,7 +169,10 @@ No step reached the run. The last step before it was at 18:24:55Z and the next a
 harness (`harness.py:42`, `harness.py:296-314`), so the run neither passed nor
 failed it. No case outcome depends on the offset. A clock that runs ahead makes
 quotes look older, not future-dated. Both observations compared broker timestamps
-with the receipt window, with at least 0.6 s to spare at either end.
+with the receipt window, and both fall inside it. On host time, `submitted_at` is
+1.146 s after the window opens and `canceled_at` 0.599 s before it closes.
+Corrected for the host's 0.22 to 0.35 s lead, those margins are 1.37 to 1.50 s
+and 0.25 to 0.38 s.
 
 The evidence is in these files:
 - The other four `evidence/chrony-20260925t*.txt` snapshots. Like the pre-run
@@ -175,6 +182,12 @@ The evidence is in these files:
 - `evidence/host-clock-diagnosis-20260925.txt`, captured at 21:37Z. It holds the
   Hyper-V clock name, the configuration change, two command sockets per loopback
   address, ten queries alternating between the two daemons, and the journal.
+- `evidence/host-clock-process-view-20260925t224915z.txt`, captured at 22:49Z
+  after the second review, because the 21:37Z capture holds no `ps` output. Only
+  this distribution's chronyd (systemd MainPID 2546733, started 18:09:44Z, the PID
+  in the journal) and one child process of it are visible here, while both
+  sockets and the alternating answers remain. That the PHC0 daemon runs outside
+  this distribution's process view is an inference from these observations.
 - The `host` section of the run record.
 
 Time sync was not changed. Before the next timed paper run on this host, it must
@@ -425,16 +438,51 @@ lists the difference under `warnings`.
 
 ## Run
 
-```
-~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python \
-  blueprints/us-equities/adaptive-paper/native-faults/harness.py run \
-  --env-file ~/.config/<private>/alpaca-paper.env \
-  --state-root ~/.local/state/native-agent-stack/native-faults \
-  --out blueprints/us-equities/adaptive-paper/native-faults/receipt.json
-```
+The harness has no expected-account input. It takes the engine's account-writer
+lock for whichever account the env file names (`harness.py:296-301`) and refuses
+only a non-flat account (`harness.py:308-310`), so a flat env file of another
+lane would send the C01 and C04 POSTs to that lane's account. Follow these
+steps (added 2026-09-25 after the second review of PR #278). The 2026-09-25 run
+followed steps 1, 3, 4 and 5 (run record `get_checks`, `harness.argv_redacted`,
+`harness.exit_code`, `harness.receipt_copy`). Step 2 was not recorded
+separately: that run used a fresh state root, and its accepted C01 buy shows that
+no `STOP` file was present. Keep every account value private; none is committed.
 
-Run it during regular hours, at least five minutes before the close. The
-harness uses these interfaces:
+1. Confirm the account with GET requests only. Load the env file of the paper
+   account assigned to this gate lane through `runner.credentials()` and read
+   the account, clock, positions and open orders. Compare the first 12 hex digits
+   of sha256(account id) with the value the lane keeps privately for its
+   assigned account, and stop before any further request on a mismatch.
+   Continue only if the account is `ACTIVE` and not trading- or account-blocked,
+   holds zero positions and zero open orders, and the clock says the market is
+   open.
+2. Check that no marker exists: no engine `STOP` file
+   (`~/.local/state/native-agent-stack/alpaca-paper/STOP`, `safety.py:39`; while
+   it exists the ledger refuses the C01 buy with `stop_blocks_entry`), and no
+   `IN_FLIGHT` or `CLEANUP_REQUIRED` in any earlier harness state root used for
+   this account. The harness checks only the state root it is given, and refuses
+   with exit 2 when a marker is there.
+3. Run inside the regular session, at least five minutes before the close, and
+   never while a ladder session runs on this host: both use the engine's `STOP`
+   file and account-writer lock namespace (`safety.py:39`, `safety.py:366`).
+   Write the receipt to a private path, not to the tracked `receipt.json`, and
+   keep the exit code:
+
+   ```
+   ~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python \
+     blueprints/us-equities/adaptive-paper/native-faults/harness.py run \
+     --env-file ~/.config/<private>/alpaca-paper.env \
+     --state-root ~/.local/state/native-agent-stack/native-faults \
+     --out ~/.local/state/native-agent-stack/<private-lane-dir>/receipt.json
+   echo $? > ~/.local/state/native-agent-stack/<private-lane-dir>/harness.exit
+   ```
+4. Repeat the GET probe of step 1 after the run: same account, zero positions,
+   zero open orders.
+5. Retain the current `receipt.json` under a dated name, copy the private receipt
+   to `receipt.json` byte for byte, and check that both copies have the same
+   sha256.
+
+The harness uses these interfaces:
 
 - Credentials come from `runner.credentials()`. The file must be mode 0600,
   owned by you and outside any Git worktree, and is read only in-process.

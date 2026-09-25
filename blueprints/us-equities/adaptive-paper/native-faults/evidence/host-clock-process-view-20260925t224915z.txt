@@ -1,0 +1,64 @@
+# Host clock process view for the 2026-09-25 18:25:13Z native-faults run (README 'Host clock'; run record host.diagnosis).
+# Captured 2026-09-25T22:49:15Z on the same WSL2 host, after the second review of PR #278, with read-only commands only.
+# host-clock-diagnosis-20260925.txt (captured 21:37:01Z) holds no ps output; this later capture adds the process view.
+# ps start times are left out: this clock has been stepped many times since boot, so ps would misstate them.
+# Nothing is redacted: no command below prints the host name. Time sync was not changed.
+
+## 1. chronyd processes visible in this distribution
+$ ps -C chronyd -o pid,ppid,user,args
+    PID    PPID USER     COMMAND
+2546733       1 _chrony  /usr/sbin/chronyd -F 1
+2546736 2546733 _chrony  /usr/sbin/chronyd -F 1
+$ systemctl show chrony -p MainPID -p ExecMainStartTimestamp
+MainPID=2546733
+ExecMainStartTimestamp=Fri 2026-09-25 14:09:44 EDT
+
+## 2. chronyd command sockets (an unprivileged chronyc queries these over UDP)
+$ ss -uln | grep ":323 "
+UNCONN 0      0           127.0.0.1:323       0.0.0.0:*          
+UNCONN 0      0           127.0.0.1:323       0.0.0.0:*          
+UNCONN 0      0               [::1]:323          [::]:*          
+UNCONN 0      0               [::1]:323          [::]:*          
+
+## 3. Ten consecutive unprivileged queries
+$ for i in $(seq 10); do date -u +%H:%M:%S.%3NZ; chronyc -n tracking | grep -E "^(Reference ID|Stratum|Frequency)"; done
+22:49:15.252Z
+Reference ID    : 50484330 (PHC0)
+Stratum         : 1
+Frequency       : 2.400 ppm slow
+22:49:15.260Z
+Reference ID    : 00000000 ()
+Stratum         : 0
+Frequency       : 43015.957 ppm fast
+22:49:15.271Z
+Reference ID    : 50484330 (PHC0)
+Stratum         : 1
+Frequency       : 2.400 ppm slow
+22:49:15.281Z
+Reference ID    : 50484330 (PHC0)
+Stratum         : 1
+Frequency       : 2.400 ppm slow
+22:49:15.290Z
+Reference ID    : 00000000 ()
+Stratum         : 0
+Frequency       : 43015.957 ppm fast
+22:49:15.301Z
+Reference ID    : 00000000 ()
+Stratum         : 0
+Frequency       : 43015.957 ppm fast
+22:49:15.313Z
+Reference ID    : 00000000 ()
+Stratum         : 0
+Frequency       : 43015.957 ppm fast
+22:49:15.321Z
+Reference ID    : 50484330 (PHC0)
+Stratum         : 1
+Frequency       : 2.400 ppm slow
+22:49:15.330Z
+Reference ID    : 00000000 ()
+Stratum         : 0
+Frequency       : 43015.957 ppm fast
+22:49:15.340Z
+Reference ID    : 00000000 ()
+Stratum         : 0
+Frequency       : 43015.957 ppm fast

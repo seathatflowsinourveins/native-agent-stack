@@ -6577,13 +6577,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-safety.md",
-      "sha256": "06276fc7d12dea851e7b0bf502f6820e91e0a3041044d646b4d0fcb84fa18ddb",
-      "bytes": 25647
+      "sha256": "cea19e941f514591c410b28d71909b8f240678074f7c5627b1609ccc74d03e38",
+      "bytes": 25821
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-transport.md",
-      "sha256": "54d85e84e5a613392f5d4b34e09144019c1e3938929270e4d65af83dc7e7ca0a",
-      "bytes": 17470
+      "sha256": "7b7837cd6866ef36271887edf261c0ab1862e04b49ff2dcbb2e3e74262fa6e23",
+      "bytes": 17640
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
@@ -6717,8 +6717,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/README.md",
-      "sha256": "a7ad33fd573f46da43848bae5bce518ae0832b82b21f9445188f8001bc533673",
-      "bytes": 39720
+      "sha256": "727189cd2d13df2470b4cb0ce4e3a798b801dc35217313cd63f080ea5a9003bf",
+      "bytes": 43060
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/chrony-20260925t182439z-before-run.txt",
@@ -6749,6 +6749,11 @@
       "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/host-clock-diagnosis-20260925.txt",
       "sha256": "25c2c6c9a797d6c4e43bb02c0f4b5e024d24e704ea2f0b0abb0b6afc8b61f619",
       "bytes": 23359
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/host-clock-process-view-20260925t224915z.txt",
+      "sha256": "22e7d6682be7666d9a6abbbd6a98b2299d17085b719ebd03a4d1242f791fedf5",
+      "bytes": 2454
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/independent-observation-20260924.json",
@@ -6797,8 +6802,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/run-20260925t182513.json",
-      "sha256": "3fe2e954ff3ea1ad63e9286eb55b018d8532b4bfd688c3dd8d584e0cafe28038",
-      "bytes": 15697
+      "sha256": "a096a306db8c31007309574aa339186365996597b11047cc8a98c53ae0a6b2d6",
+      "bytes": 17773
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/harness.py",
@@ -9867,8 +9872,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "07bf68f79ea9940fc8f47cdf5c102608d6b3df5317ea87e339ca962c2ff87108",
-      "bytes": 16742
+      "sha256": "6c94bd6d4eaefeab854b76f715dba5b7efdb13678a950ebf740a4e66a1e13312",
+      "bytes": 16994
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -10042,8 +10047,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "6a1033ca46675c5271d58a8e4712cfb090d4e8d2d01d4c71c62194e2d22bc25d",
-      "bytes": 67077
+      "sha256": "1534ffde0c013ee2761f381ce3130d5aefb02709c3ce1696041d1621f9bb5010",
+      "bytes": 67221
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -10122,8 +10127,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "31bb934437125d2582af7bb824b29ea0c9bf61e8cf0a8beaa39f705f7c101b54",
-      "bytes": 15137
+      "sha256": "a1c69546d898dfcd8790efa573f13d7b5cc797e3ef6b3ee5a1e0c0a4856064af",
+      "bytes": 16411
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -30602,8 +30607,8 @@
     },
     {
       "path": "scripts/trading_gates.py",
-      "sha256": "726e50d8de67a1b28cb57eed859b3d73988ebd1e1cd5bd78f9c802fa84cb38b3",
-      "bytes": 24260
+      "sha256": "06aadfbca9ee50371aac6e620fcda087f5843508afb3b81124b053673875a152",
+      "bytes": 24948
     },
     {
       "path": "scripts/validate.py",
@@ -31287,8 +31292,8 @@
     },
     {
       "path": "tests/test_trading_gates_bindings.py",
-      "sha256": "8c0a84621ca157e2c52361ee710badeece9b983414352d290b7cc4526a8e7e00",
-      "bytes": 12877
+      "sha256": "645bae30192a44f38495bceb1bd9ea659a4122f198fb4de0366f320f9f8eb272",
+      "bytes": 14793
     },
     {
       "path": "tests/test_validate.py",
