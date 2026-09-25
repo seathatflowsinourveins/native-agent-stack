@@ -170,6 +170,22 @@ class MinuteQuantities(unittest.TestCase):
         late = [b for b in rows if b["t"] > x - 60]
         self.assertIsNone(FM.entry_bar_dv(self.cal, late, self.d, x))  # no completed bar: cap 0, a no-fill
 
+    def test_the_cost_cells_dollar_volume_counts_only_bars_complete_at_the_fill(self):
+        """Review round 15, F02: a fill at 09:35:30 counts the bars of 04:00 .. 09:34 (complete by 09:35:00), never
+        the 09:35 bar that is still trading. Here that bar alone lifts the cumulative dollar volume across the $1M dv
+        tier boundary, so at e7529b47 (bars that start before the fill) the fill was priced in the cheaper $1-5M
+        cell."""
+        from core import costs
+        d = self.d
+        rows = synth.minute_rows(self.cal, d, 10.0, 1_000, start="09:30", n=5)          # 09:30 .. 09:34: $50,000
+        rows.append({"t": self.cal.at(d, "09:35"), "o": 10.0, "h": 10.0, "l": 10.0, "c": 10.0, "v": 200_000,
+                     "vw": 10.0})                                                     # the 09:35 bar: $2,000,000
+        fill = self.cal.at(d, "09:35") + 30
+        self.assertEqual(FM.cum_dv_at(self.cal, rows, d, fill), 50_000.0)
+        self.assertEqual(FM.cum_dv_at(self.cal, rows, d, self.cal.at(d, "09:36")), 2_050_000.0)   # complete at 09:36
+        self.assertEqual(FM.cum_dv_at(self.cal, rows, d, self.cal.at(d, "09:35")), 50_000.0)      # exactly at 09:35
+        self.assertEqual(costs.cell_key(d, fill, 10.0, FM.cum_dv_at(self.cal, rows, d, fill)), "2|2|0")
+
     def test_med20_and_sigma(self):
         cal = self.cal
         t = "2020-03-10"

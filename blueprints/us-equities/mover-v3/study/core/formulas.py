@@ -153,8 +153,13 @@ def minute_rows_of(cal, minute_rows: list, s: str) -> list:
 
 
 def cum_dv_at(cal, minute_rows: list, s: str, ts: float) -> float:
-    """rules.Bars.cum_dv: summed vwap x volume of the session's bars from 04:00 ET that start before ts."""
-    return Bars.from_rows(minute_rows_of(cal, minute_rows, s), day_start=cal.at(s, T["premarket_start_hhmm"])).cum_dv(ts)
+    """The cost cell's dollar volume at a fill at ts (cost_model.lookup.cell_key): the summed vwap x volume of the
+    session's 1-minute bars from 04:00 ET that are complete by ts, i.e. that start at or before ts - 60 s. Review
+    round 15, F02: rules.Bars.cum_dv(ts) counts every bar that starts before ts, so a fill at 09:35:30 counted the
+    whole 09:35 bar, volume traded after the fill, which could move the fill into a more liquid, cheaper dv tier.
+    The pinned Bars arithmetic is kept; only completed bars are passed to it."""
+    done = [b for b in minute_rows_of(cal, minute_rows, s) if b["t"] + T["entry_bar_complete_s"] <= ts]
+    return Bars.from_rows(done, day_start=cal.at(s, T["premarket_start_hhmm"])).cum_dv(float("inf"))
 
 
 def entry_bar_dv(cal, minute_rows: list, s: str, x: float):
