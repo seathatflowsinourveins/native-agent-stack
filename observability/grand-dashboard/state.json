@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-25T07:26:19Z",
+  "recorded_at_utc": "2026-09-25T07:42:53Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -102,6 +102,13 @@
       "title": "Alpaca data and margin entitlements",
       "state": "historical SIP sample accepted / other entitlements unproved",
       "evidence_ref": "blueprints/us-equities/authenticated-data/native-receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "wsl-workstation-host",
+      "title": "WSL2 workstation host record (nativestack-5975wx-20260925)",
+      "state": "recorded 2026-09-25 / 21 receipts / 20 independent-session agree / systemd install withheld (needs_changes)",
+      "evidence_ref": "evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json"
     },
     {
       "kind": "gate",
