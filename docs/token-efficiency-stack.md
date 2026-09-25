@@ -210,6 +210,32 @@ tool remain each client's own checks. A host records its JSON as its own evidenc
 through a PR ([contributing host evidence](contributing-evidence.md)); another
 host's result, the reference host's included, is not its acceptance.
 
+## Inside Ultracode subagents (2026-09-25)
+
+On the workstation, 16 Sonnet 5 workflow subagents each used one tool on real work in this repository and checked the answer against the plain baseline. The record is in [the E2E receipt](../evidence/artifacts/token-e2e-ultracode-20260925/README.md).
+
+**Coverage.** All 16 tools worked:
+- the RTK hook;
+- Context Mode, jCodeMunch, Serena, SocratiCode and ai-memory as native MCP;
+- Headroom as MCP through MCPorter;
+- QMD, Repomix, TOON, ast-grep, codebase-memory-mcp, Context Hub, MarkItDown, agentsview and otel-tui as CLIs.
+
+Three passed only on a second attempt, each after a real binding constraint:
+- Context Mode reads only under the session project root;
+- Serena is bound to the session project;
+- Context Hub's registry lacks some documents.
+
+**Counters over the 28-minute window:**
+- RTK counted +56,527 tokens saved for this run's worktree alone, over 89 commands.
+- Headroom's lifetime counter moved +183,904. An exact `o200k_base` comparison of the same compression measured 180,752 removed.
+- Exact per-task reductions ranged from 12.5% (codebase-memory caller search) to 99.8% (a Context Mode summary of a 416 KB file).
+
+**Cost.** The subagents spent 649,193 output tokens, provider-returned per child.
+
+**Fresh sessions.** A fresh `claude -p` session loaded the Headroom, codebase-memory and QMD MCP servers registered at user scope, and called each of them.
+
+**Not run.** Codex workers could not run: the account is at its usage limit until 2026-09-30. OmniRoute stays excluded, because it reroutes model traffic.
+
 ## Reproduce on another PC
 
 1. Clone the canonical repository and open the offline HTML. Choose the relevant

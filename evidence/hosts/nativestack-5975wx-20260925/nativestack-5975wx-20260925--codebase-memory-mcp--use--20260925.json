@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--codebase-memory-mcp--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "0074a0c3276952bb1ab23a4a9fa455334ca1b78b",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+  },
+  "component_id": "codebase-memory-mcp",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "d=$(mktemp -d) && cp -r tools/mlx-smoke \"$d/mlx-smoke\" && codebase-memory-mcp cli --json index_repository --repo-path \"$d/mlx-smoke\" --name receipt-check-mlx-smoke && p=$(codebase-memory-mcp cli --json search_code --project receipt-check-mlx-smoke --pattern main --format json) && echo \"$p\" | grep -q \"run_smoke.main\" && echo \"POSITIVE ASSERTION PASS: found known symbol run_smoke.main\" && n=$(codebase-memory-mcp cli --json search_code --project receipt-check-mlx-smoke --pattern zzznonexistentsymbolzzz --format json) && echo \"$n\" | grep -q \"\\\"total_results\\\":0\" && echo \"NEGATIVE CONTROL PASS: 0 results for a symbol that does not exist\"; ec=$?; codebase-memory-mcp cli --json delete_project --project receipt-check-mlx-smoke; codebase-memory-mcp cli --json list_projects; rm -rf \"$d\"; exit $ec",
+      "exit": 0,
+      "duration_s": 9.303,
+      "output_sha256": "cba68fef5a920d9ab273729f1409c162d3c2380b34b73448574f681882ff258f",
+      "output_excerpt": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"project\\\":\\\"receipt-check-mlx-smoke\\\",\\\"not_indexed_files_count\\\":0,\\\"skipped_count\\\":0,\\\"parse_partial_count\\\":0,\\\"parse_unusable_count\\\":0,\\\"nodes\\\":17,\\\"edges\\\":18,\\\"expected_nodes\\\":17,\\\"expected_edges\\\":18,\\\"adr_present\\\":false,\\\"adr_hint\\\":\\\"Project indexed. Consider creating an Architecture Decision Record: explore the codebase with get_architecture(asp"
+    }
+  ],
+  "tool_versions": {
+    "codebase-memory-mcp": "0.11.0"
+  },
+  "observed_at_utc": "2026-09-25T21:40:45Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), 1 command(s) were run for component 'codebase-memory-mcp' at stage 'use'; overall result pass.",
+  "limitations": [
+    "Recorded receipt covers only the listed commands; it does not establish full component functional acceptance beyond what these commands exercise."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T21:40:45Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #296 independent session review",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T22:00:31Z",
+      "reviewer": {
+        "identity_sha256": "9c5823e90820f7b48da70f2f984fbeceed028a61e961da16716145d1915abfc7",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

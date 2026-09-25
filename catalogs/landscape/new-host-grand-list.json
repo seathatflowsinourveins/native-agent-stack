@@ -612,7 +612,7 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
               "bootstrap_pinned": true,
-              "bootstrap_version": "0.1.7"
+              "bootstrap_version": "0.1.8"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -1827,7 +1827,7 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
               "bootstrap_pinned": true,
-              "bootstrap_version": "0.49.0"
+              "bootstrap_version": "0.50.0"
             },
             "macos-arm64": {
               "e2e_state": "host_verified",

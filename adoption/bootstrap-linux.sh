@@ -385,6 +385,19 @@ install_uv_tool() {
     uv tool install --python 3.13 "${id}==${version}"
 }
 
+# rtk 0.50.0's Claude hook windows `git show <rev>:<path>` blobs (a piped
+# `| tail` then reads the window, not the file's end), and a rewritten `diff`
+# exits 1 instead of 2 on a missing file. recipes/README.md#native-context-mode-and-hooks
+# excludes both through rtk's own config. Print-only: never writes that file.
+rtk_config_reminder() {
+  local config="${XDG_CONFIG_HOME:-$HOME/.config}/rtk/config.toml"
+  if [[ -f "$config" ]] && grep -Eq '^[[:space:]]*exclude_commands[[:space:]]*=' "$config" \
+    && grep -Fq '"^git show [^ ]*:"' "$config" && grep -Fq '"diff"' "$config"; then
+    return 0
+  fi
+  printf 'Reminder: for the Claude hook, %s needs [hooks] exclude_commands = ["^git show [^ ]*:", "diff"] (recipes/README.md#native-context-mode-and-hooks); this script does not write it.\n' "$config"
+}
+
 install_pin() {
   local id="$1"
   local entry
@@ -421,6 +434,7 @@ install_pin() {
   installed_pin_ids+=("$id")
   [[ -z "$native_floor_kept" ]] || return 0
   printf 'Installed %s %s (%s)\n' "$id" "$version" "$kind"
+  [[ "$id" != rtk ]] || rtk_config_reminder
 }
 
 # The pins this run installed, in install order; the version report below

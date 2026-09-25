@@ -565,8 +565,8 @@
     },
     {
       "id": "markitdown",
-      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.7",
-      "version": "0.1.7",
+      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
+      "version": "0.1.8",
       "license": "MIT",
       "profile": "supporting",
       "role": "Convert supported source documents to readable Markdown",
@@ -579,13 +579,14 @@
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "markitdown-018-qualification-20260925"
       ],
       "upstream_sources": [
-        "https://github.com/microsoft/markitdown/releases/tag/v0.1.7"
+        "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "freshness": "0.1.8 serves bin/markitdown on the NativeStack WSL2 host since 2026-09-25 after a discriminating comparison against 0.1.7 (byte-identical fixture, 8-K and committed-HTML outputs; intended <u>/<strike>/%2F/data-src changes; independent review). 0.1.7 is kept for rollback. The landscape winner pin stays 0.1.7 until a new verdict wave."
     },
     {
       "id": "mcp-inspector",
@@ -808,8 +809,8 @@
     },
     {
       "id": "rtk",
-      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
-      "version": "0.49.0",
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+      "version": "0.50.0",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Compact supported command outputs, retain failure/raw recovery",
@@ -832,13 +833,14 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "rtk-050-qualification-20260925"
       ],
       "upstream_sources": [
-        "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
+        "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "freshness": "0.50.0 runs the Claude Code hook on the NativeStack WSL2 host since 2026-09-25 after qualification against 0.49.0 (hash-pinned hook acceptance, independent review); that host excludes `git show <rev>:<path>` and `diff` from rewriting through ~/.config/rtk/config.toml, which the bootstrap does not render. 0.49.0 is kept for rollback. The landscape winner pin stays 0.49.0 until a new verdict wave."
     },
     {
       "id": "sandbox-runtime",

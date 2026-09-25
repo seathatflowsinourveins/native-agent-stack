@@ -59,7 +59,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `candidate:actions-attest` | unpinned | native_proven | accepted | untested | — |  |
 | Code navigation | retain | `serena` | 2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | native_proven | host_verified | untested | token-efficiency | 2 / 5 |
 | Documents and ingestion | keep_but_compare | `qmd` | 2.8.3 | local_integration | host_verified, bootstrap 2.8.3 | untested | foundation-cpu, token-efficiency | 5 / 7 |
-|  |  | `markitdown` | 0.1.7 (behind v0.1.8) | local_integration | host_verified, bootstrap 0.1.7 | untested | token-efficiency |  |
+|  |  | `markitdown` | 0.1.7 (behind v0.1.8) | local_integration | host_verified, bootstrap 0.1.8 | untested | token-efficiency |  |
 |  |  | `poppler` | 26.09.0 | local_integration | host_verified | untested | — |  |
 | Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.4.0) | native_proven | host_verified, bootstrap 2.3.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency | 9 / 13 |
 | Git practice and GitHub automation | retain | `worktrunk` | 0.79.0 | source_review | host_verified | host_verified | — | 11 / 12 |
@@ -90,7 +90,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Semantic code retrieval | keep_but_compare | `socraticode` | 1.14.0 | native_proven | host_verified | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation, token-efficiency | 10 / 12 |
 |  |  | `qdrant` | 1.19.1 | native_proven | host_verified | untested, bootstrap 1.19.1 | semantic-rag, recovery, macos-arm64-foundation |  |
 |  |  | `vllm` | 0.25.0 (behind v0.30.0) | native_proven | host_verified | untested | semantic-rag |  |
-| Context and usage efficiency | keep_but_compare | `rtk` | 0.49.0 | synthetic | host_verified, bootstrap 0.49.0 | host_verified | foundation-cpu, token-efficiency | 4 / 6 |
+| Context and usage efficiency | keep_but_compare | `rtk` | 0.49.0 | synthetic | host_verified, bootstrap 0.50.0 | host_verified | foundation-cpu, token-efficiency | 4 / 6 |
 |  |  | `headroom` | 0.37.0 (behind v0.38.0) | synthetic | host_verified | untested | token-efficiency |  |
 |  |  | `ccusage` | 20.0.24 | synthetic | host_verified | untested | token-efficiency |  |
 | Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional, bootstrap 0.1.8 | untested | — | 7 / 9 |

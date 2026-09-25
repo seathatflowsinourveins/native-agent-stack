@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--ast-grep--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "0074a0c3276952bb1ab23a4a9fa455334ca1b78b",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+  },
+  "component_id": "ast-grep",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "a=$(ast-grep run --lang python --pattern \"subprocess.run(\\$\\$\\$ARGS)\" scripts/ --json=compact | python3 -c \"import json,sys;print(len(json.load(sys.stdin)))\") && g=$(grep -rho \"subprocess\\.run(\" scripts/ --include=*.py | wc -l) && echo \"ast_grep_count=$a grep_count=$g\" && test \"$a\" = \"$g\" && echo \"POSITIVE ASSERTION PASS: structural match count equals grep count ($a matches in scripts/)\" && n=$(ast-grep run --lang python --pattern \"zzz_this_call_does_not_exist_xyz(\\$\\$\\$ARGS)\" scripts/ --json=compact | python3 -c \"import json,sys;print(len(json.load(sys.stdin)))\") && test \"$n\" = \"0\" && echo \"NEGATIVE CONTROL PASS: 0 matches for a nonexistent call pattern\"",
+      "exit": 0,
+      "duration_s": 0.065,
+      "output_sha256": "a90c4e1b170bf2dca03c90445e316b225753b4be20b42bfaafe41946e916d279",
+      "output_excerpt": "ast_grep_count=18 grep_count=18\nPOSITIVE ASSERTION PASS: structural match count equals grep count (18 matches in scripts/)\nNEGATIVE CONTROL PASS: 0 matches for a nonexistent call pattern\n"
+    }
+  ],
+  "tool_versions": {
+    "ast-grep": "0.45.3"
+  },
+  "observed_at_utc": "2026-09-25T21:40:41Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), 1 command(s) were run for component 'ast-grep' at stage 'use'; overall result pass.",
+  "limitations": [
+    "Recorded receipt covers only the listed commands; it does not establish full component functional acceptance beyond what these commands exercise."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T21:40:41Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #296 independent session review",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T22:00:23Z",
+      "reviewer": {
+        "identity_sha256": "9c5823e90820f7b48da70f2f984fbeceed028a61e961da16716145d1915abfc7",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

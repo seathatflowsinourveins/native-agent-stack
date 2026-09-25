@@ -4,7 +4,7 @@ The [Linux workflow](../.github/workflows/native-token-e2e.yml) installs and inv
 
 | Pin | Upstream installation | Actual acceptance |
 | --- | --- | --- |
-| RTK 0.49.0 | Official `rtk-x86_64-unknown-linux-musl.tar.gz` and `checksums.txt`; check the exact asset hash, inspect members, then native `tar -xf` | Two fixture commit subjects survive filtered output; `rtk proxy git log -2` equals original stdout; missing Git reference remains a failure; fixture-local `gain --format json` retained |
+| RTK 0.50.0 | Official `rtk-x86_64-unknown-linux-musl.tar.gz` and `checksums.txt`; check the exact asset hash, inspect members, then native `tar -xf` | Two fixture commit subjects survive filtered output; `rtk proxy git log -2` equals original stdout; missing Git reference remains a failure; fixture-local `gain --format json` retained |
 | QMD 2.8.3 | `npm install --global --prefix "$PREFIX" @tobilu/qmd@2.8.3` | Named BM25 collection, search/get with exact source body inside the pinned output framing, update and retrieval from fresh CLI processes, then owned collection removal |
 | Repomix 1.18.0 | `npm install --global --prefix "$PREFIX" repomix@1.18.0` | Explicit two-file XML contains the complete original source and no extra file; separate compressed pack retains structure, without claiming complete implementation fidelity |
 | TOON 4.1.1 | `npm install --global --prefix "$PREFIX" @toon-format/cli@4.1.1` | Encode/statistics, strict decode with equal JSON values/types, and a rejected truncated array |
@@ -32,4 +32,4 @@ GitHub uploads only the sanitized result directory for 14 days, including a fail
 
 RTK's returned counters are local estimates. QMD has no savings counter; Repomix/TOON token reports describe representations. Neither this job nor a smaller fixture output proves reduced provider billing. Follow [the session handbook](token-session-handbook.md) for native adoption and [the lifecycle guide](../adoption/lifecycle.md) for stateful service/new-PC acceptance.
 
-Primary sources: [RTK v0.49.0](https://github.com/rtk-ai/rtk/tree/v0.49.0), [QMD v2.8.3](https://github.com/tobi/qmd/tree/v2.8.3), [node-llama-cpp install controls](https://node-llama-cpp.withcat.ai/guide/building-from-source), [Repomix v1.18.0](https://github.com/yamadashy/repomix/tree/v1.18.0), [TOON v4.1.1](https://github.com/toon-format/toon/tree/v4.1.1).
+Primary sources: [RTK v0.50.0](https://github.com/rtk-ai/rtk/tree/v0.50.0), [QMD v2.8.3](https://github.com/tobi/qmd/tree/v2.8.3), [node-llama-cpp install controls](https://node-llama-cpp.withcat.ai/guide/building-from-source), [Repomix v1.18.0](https://github.com/yamadashy/repomix/tree/v1.18.0), [TOON v4.1.1](https://github.com/toon-format/toon/tree/v4.1.1).

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--otel-tui--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "0074a0c3276952bb1ab23a4a9fa455334ca1b78b",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+  },
+  "component_id": "otel-tui",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "set -u\nPORT_HTTP=28317\nPORT_GRPC=28318\nD=$(mktemp -d)\ncat > \"$D/span.json\" <<EOF\n{\"resourceSpans\":[{\"resource\":{\"attributes\":[{\"key\":\"service.name\",\"value\":{\"stringValue\":\"nativestack-receipt-otel-tui\"}}]},\"scopeSpans\":[{\"scope\":{\"name\":\"nativestack-receipt-scope\"},\"spans\":[{\"traceId\":\"4bf92f3577b34da6a3ce929d0e0e4736\",\"spanId\":\"00f067aa0ba902b7\",\"name\":\"nativestack-receipt-span-otel-tui-20260925\",\"kind\":1,\"startTimeUnixNano\":\"1700000000000000000\",\"endTimeUnixNano\":\"1700000000100000000\"}]}]}]}\nEOF\ncat > \"$D/run.sh\" <<EOF\n#!/bin/sh\nstty cols 250 rows 50 2>/dev/null\nexec otel-tui --http $PORT_HTTP --grpc $PORT_GRPC\nEOF\nchmod +x \"$D/run.sh\"\ntimeout 15 script -qfec \"$D/run.sh\" \"$D/capture.tty\" </dev/null >/dev/null 2>&1 &\nSPID=$!\nsleep 3\nHTTP_STATUS=$(curl -sS -o \"$D/curl.out\" -w \"%{http_code}\" -X POST \"http://127.0.0.1:$PORT_HTTP/v1/traces\" -H \"Content-Type: application/json\" --data-binary \"@$D/span.json\")\necho \"curl_http_status=$HTTP_STATUS\"\nwait \"$SPID\"\ntr -d \"\\r\" < \"$D/capture.tty\" | sed -E \"s/\\x1b\\[[0-9;?]*[a-zA-Z]//g; s/\\x1b\\([AB]//g\" > \"$D/clean.txt\"\nRESULT=0\nif grep -q \"nativestack-receipt-span-otel-tui-20260925\" \"$D/clean.txt\"; then\n  echo \"POSITIVE ASSERTION PASS: span name visible in captured TUI output\"\nelse\n  echo \"POSITIVE ASSERTION FAIL: span name NOT found in captured TUI output\"\n  RESULT=1\nfi\nif grep -q \"definitely-not-a-real-span-xyz\" \"$D/clean.txt\"; then\n  echo \"NEGATIVE CONTROL FAIL: an unsent span name was found (unexpected)\"\n  RESULT=1\nelse\n  echo \"NEGATIVE CONTROL PASS: an unsent span name is correctly absent\"\nfi\nrm -rf \"$D\"\necho \"CLEANUP_DONE http_status=$HTTP_STATUS\"\nexit $RESULT",
+      "exit": 0,
+      "duration_s": 17.012,
+      "output_sha256": "437e9237b73d7e35a1818129dd1813d1dc563d4508016a159a4b3d27b134c5d0",
+      "output_excerpt": "curl_http_status=200\nPOSITIVE ASSERTION PASS: span name visible in captured TUI output\nNEGATIVE CONTROL PASS: an unsent span name is correctly absent\nCLEANUP_DONE http_status=200\n"
+    }
+  ],
+  "tool_versions": {
+    "otel-tui": "0.7.5"
+  },
+  "observed_at_utc": "2026-09-25T21:41:08Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), 1 command(s) were run for component 'otel-tui' at stage 'use'; overall result pass.",
+  "limitations": [
+    "Recorded receipt covers only the listed commands; it does not establish full component functional acceptance beyond what these commands exercise."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T21:41:08Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #296 independent session review",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T22:00:31Z",
+      "reviewer": {
+        "identity_sha256": "9c5823e90820f7b48da70f2f984fbeceed028a61e961da16716145d1915abfc7",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--agentsview--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "0074a0c3276952bb1ab23a4a9fa455334ca1b78b",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+  },
+  "component_id": "agentsview",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v agentsview) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && agentsview --version",
+      "exit": 0,
+      "duration_s": 0.029,
+      "output_sha256": "f1eaa3848506484e3e1c71ae8d23e451e028252c1c791e7f8c2e83a9ab58abc9",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/agentsview -> ~/.local/share/codex-ecosystem/tools/agentsview-0.43.0/bin/agentsview\nagentsview v0.43.0 (commit 9be7745ad1906ee24e04eb05bb86c872ef0939a1, built 2026-09-14T02:30:01Z)\n"
+    },
+    {
+      "cmd": "cd ~/.local/share/codex-ecosystem/tools/agentsview-0.43.0/downloads && sha256sum --ignore-missing --check SHA256SUMS",
+      "exit": 0,
+      "duration_s": 0.032,
+      "output_sha256": "8c1e60b22f53737983d44bb215082956cf89605eda2c8c946846d222a47b73dd",
+      "output_excerpt": "agentsview_0.43.0_linux_amd64.tar.gz: OK\n"
+    }
+  ],
+  "tool_versions": {
+    "agentsview": "0.43.0"
+  },
+  "observed_at_utc": "2026-09-25T21:27:14Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), 2 command(s) were run for component 'agentsview' at stage 'install'; overall result pass.",
+  "limitations": [
+    "Recorded receipt covers only the listed commands; it does not establish full component functional acceptance beyond what these commands exercise."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T21:27:14Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #296 independent session review",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T22:00:23Z",
+      "reviewer": {
+        "identity_sha256": "9c5823e90820f7b48da70f2f984fbeceed028a61e961da16716145d1915abfc7",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

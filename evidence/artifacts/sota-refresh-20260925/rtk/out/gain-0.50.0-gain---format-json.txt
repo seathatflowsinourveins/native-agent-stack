@@ -1,0 +1,11 @@
+{
+  "summary": {
+    "total_commands": 66,
+    "total_input": 71807,
+    "total_output": 48977,
+    "total_saved": 22830,
+    "avg_savings_pct": 31.79355773114042,
+    "total_time_ms": 619,
+    "avg_time_ms": 9
+  }
+}

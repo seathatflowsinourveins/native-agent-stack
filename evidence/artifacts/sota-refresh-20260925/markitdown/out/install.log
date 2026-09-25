@@ -1,0 +1,31 @@
+Resolved 20 packages in 329ms
+Downloading magika (14.7MiB)
+Downloading numpy (15.9MiB)
+Downloading onnxruntime (22.5MiB)
+ Downloaded magika
+ Downloaded numpy
+ Downloaded onnxruntime
+Prepared 20 packages in 424ms
+Installed 20 packages in 220ms
+ + beautifulsoup4==4.15.0
+ + certifi==2026.7.22
+ + charset-normalizer==3.5.1
+ + click==8.5.0
+ + defusedxml==0.7.1
+ + flatbuffers==25.12.19
+ + idna==3.20
+ + magika==0.6.3
+ + markdownify==1.2.3
+ + markitdown==0.1.8
+ + numpy==2.5.3
+ + onnxruntime==1.30.0
+ + packaging==26.3
+ + protobuf==7.36.2
+ + python-dotenv==1.2.3
+ + requests==2.34.2
+ + six==1.17.0
+ + soupsieve==2.10
+ + typing-extensions==4.16.0
+ + urllib3==2.8.0
+Installed 1 executable: markitdown
+warning: `~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin` is not on your PATH. To use installed tools, run `export PATH="~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin:$PATH"` or `uv tool update-shell`.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-25T21:04:50Z",
+  "recorded_at_utc": "2026-09-25T22:46:00Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -74,6 +74,34 @@
       "title": "Isolated memory lifecycle",
       "state": "native acceptance / reviewed",
       "evidence_ref": "blueprints/us-equities/memory-lifecycle/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "memory-lifecycle-v2",
+      "title": "Memory lifecycle v2 (ai-memory 2.3.2 and 2.4.0)",
+      "state": "89 of 89 checks pass on each build / real-time TTL / 4-project scope / restart durability / store migration not exercised",
+      "evidence_ref": "blueprints/memory-lifecycle-v2/results-20260925.json"
+    },
+    {
+      "kind": "gate",
+      "id": "retrieval-quality-v2",
+      "title": "Held-out document retrieval quality",
+      "state": "QMD hybrid selected over QMD lexical search / nDCG10 0.714 vs 0.223 / 95 pct CI 0.367 to 0.618 / 30 sealed queries / BM25 baseline pending",
+      "evidence_ref": "blueprints/retrieval-quality-v2/results-20260925.json"
+    },
+    {
+      "kind": "gate",
+      "id": "token-efficiency-wiring",
+      "title": "Token-efficiency wiring for every session",
+      "state": "fresh-worktree coverage complete / Codex MCP at user scope / 4 host tools ahead of pins / 7 without Linux pins / bootstrap pending",
+      "evidence_ref": "docs/decisions/2026-09-25-codex-mcp-scope.md"
+    },
+    {
+      "kind": "gate",
+      "id": "local-model-eval-e2e",
+      "title": "Local-model evaluation end to end",
+      "state": "promptfoo 4 of 4 plus failing control / Inspect accuracy 0.75 plus failing control / both accepted on WSL2",
+      "evidence_ref": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--inspect-ai--use--20260925-2.json"
     },
     {
       "kind": "gate",
@@ -249,6 +277,20 @@
       "title": "Governed Alpaca historical data lake",
       "state": "source layer merged 2026-09-25 / news 2015-2026 retained privately (46568 requests 0 HTTP 429) / minute-bar pilot not run",
       "evidence_ref": "blueprints/us-equities/data-lake/README.md"
+    },
+    {
+      "kind": "gate",
+      "id": "token-stack-subagent-e2e",
+      "title": "Token stack inside Ultracode subagents",
+      "state": "16 of 16 tools used in Sonnet workflow subagents with passing checks / RTK +56527 run-only / Headroom +183904 lifetime / Codex workers blocked until 2026-09-30",
+      "evidence_ref": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "host-request-lane",
+      "title": "GitHub host request lane (other PCs to the workstation)",
+      "state": "live / workstation poll timer every 10 min / 0 workstation requests / 2 mac-coordinator requests open (274 and 276)",
+      "evidence_ref": "recipes/host-request-lane.md"
     }
   ],
   "workers": [

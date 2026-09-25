@@ -1,0 +1,375 @@
+{
+ "A1_shared_output_identity": {
+  "greeting.md": {
+   "identical": true,
+   "candidate_sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+   "baseline_sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2"
+  },
+  "8k.md": {
+   "identical": true,
+   "candidate_sha256": "b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977",
+   "baseline_sha256": "b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977"
+  },
+  "8k.stdout.md": {
+   "identical": true,
+   "candidate_sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+   "baseline_sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b"
+  },
+  "pdf.err": {
+   "identical": false,
+   "candidate_sha256": "ec536842e55cdf4aaac5c1e6d0647b3f693fbe9f8ba3c5c82b38caebda0b9fbb",
+   "baseline_sha256": "9269d92a07ac3d9ba97eb05d67d7bda2963605bfdf184645d2bce37ccda9d465"
+  },
+  "pip-list minus markitdown": {
+   "identical": true,
+   "lines": 21
+  }
+ },
+ "A2_grep_markitdown_pdf_exit": {
+  "candidate": 0,
+  "baseline": 0
+ },
+ "A3_transitive_byte_identity": {
+  "dists": 19,
+  "record_equal": 19,
+  "files_checked_each_env": 1624,
+  "candidate_hash_mismatch": 0,
+  "baseline_hash_mismatch": 0,
+  "mismatched_dists": []
+ },
+ "A4_corpus": {
+  "live_head": "ae30f94b796591760fc92b4a6d252f8e19e88caa",
+  "files": 19,
+  "identical": 19,
+  "both_exit0": 19,
+  "worktree_eq_head": 19,
+  "non_ascii_after_4KiB": 10,
+  "differences": [],
+  "seconds": 21.3,
+  "rows": [
+   {
+    "file": "blueprints/us-equities/catalyst-provenance/upstream-8k.html",
+    "bytes": 32435,
+    "first_non_ascii_byte": null,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+     "bytes": 5611
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+     "bytes": 5611
+    },
+    "identical": true
+   },
+   {
+    "file": "docs/ecosystem/claude-repository-evidence.html",
+    "bytes": 507201,
+    "first_non_ascii_byte": 10975,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "16b3237567873b6adb826b324cf266566f2f0f3c4836e881173006279b80ebe4",
+     "bytes": 271
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "16b3237567873b6adb826b324cf266566f2f0f3c4836e881173006279b80ebe4",
+     "bytes": 271
+    },
+    "identical": true
+   },
+   {
+    "file": "docs/ecosystem/claude-upstream-checks.html",
+    "bytes": 60970,
+    "first_non_ascii_byte": 1916,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "042dca04704c65c83dbacb1ea05b69a03cd7927953d968bbc4ce61dddf3c8886",
+     "bytes": 42891
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "042dca04704c65c83dbacb1ea05b69a03cd7927953d968bbc4ce61dddf3c8886",
+     "bytes": 42891
+    },
+    "identical": true
+   },
+   {
+    "file": "docs/ecosystem/template.html",
+    "bytes": 103223,
+    "first_non_ascii_byte": 403,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "6ad573567b71912042b8943ea4205095c38dd9a2f90410bfe27ef99f0ebb872e",
+     "bytes": 8344
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "6ad573567b71912042b8943ea4205095c38dd9a2f90410bfe27ef99f0ebb872e",
+     "bytes": 8344
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20160108005018.html",
+    "bytes": 77008,
+    "first_non_ascii_byte": null,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "f99ba822594ab2771e8f82ddb33fdd4e2bb336cf24540a8766297d4331e77de0",
+     "bytes": 15254
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "f99ba822594ab2771e8f82ddb33fdd4e2bb336cf24540a8766297d4331e77de0",
+     "bytes": 15254
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20170301172132.html",
+    "bytes": 231972,
+    "first_non_ascii_byte": null,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "b689e3318be9009555a19a5c148490689d1d9a03755669dd2b6ad8824362c884",
+     "bytes": 18246
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "b689e3318be9009555a19a5c148490689d1d9a03755669dd2b6ad8824362c884",
+     "bytes": 18246
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20181215174802.html",
+    "bytes": 90958,
+    "first_non_ascii_byte": 17776,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "68d4140a6aafd9e463cb50925830807476e5a9252c18a3280197c34c213ee775",
+     "bytes": 16850
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "68d4140a6aafd9e463cb50925830807476e5a9252c18a3280197c34c213ee775",
+     "bytes": 16850
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20210111130129.html",
+    "bytes": 198775,
+    "first_non_ascii_byte": 17947,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "fc76026cb1147edbc986aca4d0c758a87c37182c8d53c21c7f77bb68e6374ce6",
+     "bytes": 18502
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "fc76026cb1147edbc986aca4d0c758a87c37182c8d53c21c7f77bb68e6374ce6",
+     "bytes": 18502
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20220706011712.html",
+    "bytes": 92700,
+    "first_non_ascii_byte": 14684,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "678ebf02f98e24c4a7292ff895456bd1e2d6e7693a92a3cb07a66c296c3351d9",
+     "bytes": 9081
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "678ebf02f98e24c4a7292ff895456bd1e2d6e7693a92a3cb07a66c296c3351d9",
+     "bytes": 9081
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20240111002222.html",
+    "bytes": 119564,
+    "first_non_ascii_byte": 23069,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "ac52394d134f149e509d7bdad9b9aa74c6acdc4eb6d5ac771ccf4333bfb2e914",
+     "bytes": 8989
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "ac52394d134f149e509d7bdad9b9aa74c6acdc4eb6d5ac771ccf4333bfb2e914",
+     "bytes": 8989
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-cboe-hours-holidays.html",
+    "bytes": 382837,
+    "first_non_ascii_byte": 129067,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "1c11728a28233a108c9f344d9941e0bae6034d03ee0fa570d33d3a119a2f70a7",
+     "bytes": 10319
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "1c11728a28233a108c9f344d9941e0bae6034d03ee0fa570d33d3a119a2f70a7",
+     "bytes": 10319
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nasdaqtrader-holiday-calendar.html",
+    "bytes": 53768,
+    "first_non_ascii_byte": null,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "d6bac5f495771f8fc91da25186fc5b8af796189008cb666ac0940dd3b79b7b48",
+     "bytes": 18677
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "d6bac5f495771f8fc91da25186fc5b8af796189008cb666ac0940dd3b79b7b48",
+     "bytes": 18677
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nyse-hours-calendars.html",
+    "bytes": 101300,
+    "first_non_ascii_byte": 19220,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "d830e76f0d10b3f80ecd3122a738a0dba41755ba337587c97abc2b18a96cf177",
+     "bytes": 8367
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "d830e76f0d10b3f80ecd3122a738a0dba41755ba337587c97abc2b18a96cf177",
+     "bytes": 8367
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-quantconnect-terms.html",
+    "bytes": 79077,
+    "first_non_ascii_byte": 14730,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "48222633fa8871c16400a884a78b50fa1f4e291c4c9ef896b017dc8c2df13ac2",
+     "bytes": 48817
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "48222633fa8871c16400a884a78b50fa1f4e291c4c9ef896b017dc8c2df13ac2",
+     "bytes": 48817
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-accessing-edgar-data-wb20260821.html",
+    "bytes": 79723,
+    "first_non_ascii_byte": 7450,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "1db2a9a53eaf9219a603ec1cbcd1e261c0bf1181591d8c6afef8a7d7aabdaca1",
+     "bytes": 23481
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "1db2a9a53eaf9219a603ec1cbcd1e261c0bf1181591d8c6afef8a7d7aabdaca1",
+     "bytes": 23481
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-live-403-response.html",
+    "bytes": 1925,
+    "first_non_ascii_byte": null,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "0df232ec49c00a0cdae7d0079d577079111b721e6b23e3bdd12e55be29cd5ce2",
+     "bytes": 406
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "0df232ec49c00a0cdae7d0079d577079111b721e6b23e3bdd12e55be29cd5ce2",
+     "bytes": 406
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-privacy-information-wb20260919.html",
+    "bytes": 90240,
+    "first_non_ascii_byte": 7094,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "ae4689f277bab1a77f86a9c182eef7bef4e199c044d667214903832c0de19e47",
+     "bytes": 35125
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "ae4689f277bab1a77f86a9c182eef7bef4e199c044d667214903832c0de19e47",
+     "bytes": 35125
+    },
+    "identical": true
+   },
+   {
+    "file": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/report.html",
+    "bytes": 41418,
+    "first_non_ascii_byte": 173,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "79cc3390d39d2874f7d4742538b72cbf12644e7f948766c2a38937fe22fed91d",
+     "bytes": 1570
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "79cc3390d39d2874f7d4742538b72cbf12644e7f948766c2a38937fe22fed91d",
+     "bytes": 1570
+    },
+    "identical": true
+   },
+   {
+    "file": "fixtures/greeting.html",
+    "bytes": 474,
+    "first_non_ascii_byte": null,
+    "worktree_eq_head": true,
+    "candidate": {
+     "exit": 0,
+     "sha256": "cabe3237a51bb1c465b17eb7d8bca03f0018259ce62c664491a9e44f4f60f2f1",
+     "bytes": 77
+    },
+    "baseline": {
+     "exit": 0,
+     "sha256": "cabe3237a51bb1c465b17eb7d8bca03f0018259ce62c664491a9e44f4f60f2f1",
+     "bytes": 77
+    },
+    "identical": true
+   }
+  ]
+ }
+}
