@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--data-edgartools--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "data-edgartools",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 -c \"import json,glob,sys;s,c=sys.argv[1],sys.argv[2];print('stack',s,[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==s],'| winner',c,'pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" edgartools data-edgartools && \"$HOME/.local/share/codex-ecosystem/catalyst-provenance/sdk/bin/python\" -s -c \"import importlib.metadata as m;print('edgartools',m.version('edgartools'))\" && c=$(python3 -c \"import json,glob,re,sys;c=sys.argv[1];p={w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c};m={x for q in p for x in re.findall(r'[0-9a-f]{40}',q)};assert len(m)==1,p;print(m.pop())\" data-edgartools) && t=$(git ls-remote https://github.com/dgunning/edgartools 'refs/tags/v5.58.0' 'refs/tags/v5.58.0^{}' | tail -1 | cut -f1) && echo \"upstream dgunning/edgartools tag v5.58.0 -> $t | winner pin commit $c\" && test \"$t\" = \"$c\"",
+      "exit": 0,
+      "duration_s": 0.369,
+      "output_sha256": "67db37ce65a25c37bc6bf6ca5f08d5727a51cf6ed56c07ebc668e12bf7bc9f71",
+      "output_excerpt": "stack edgartools ['5.58.0'] | winner data-edgartools pins ['v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a']\nedgartools 5.58.0\nupstream dgunning/edgartools tag v5.58.0 -> abe44344c56cf4bfb5443e0debca7e39342f6e7a | winner pin commit abe44344c56cf4bfb5443e0debca7e39342f6e7a\n"
+    },
+    {
+      "cmd": "out=$(uv pip sync --dry-run --offline --python \"$HOME/.local/share/codex-ecosystem/catalyst-provenance/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/requirements.lock 2>&1) && printf '%s\\n' \"$out\" | tail -2 && printf '%s' \"$out\" | grep -q 'Would make no changes' && grep -A1 \"^edgartools==\" blueprints/us-equities/catalyst-provenance/requirements.lock | head -2 && echo \"the environment matches blueprints/us-equities/catalyst-provenance/requirements.lock exactly (uv pip sync --dry-run --offline would make no changes)\"",
+      "exit": 0,
+      "duration_s": 0.025,
+      "output_sha256": "ff6995610d723081b4123766d9e91fcfa60f019e704452b0d48c5c28e31d522a",
+      "output_excerpt": "Checked 42 packages in 0.46ms\nWould make no changes\nedgartools==5.58.0\nfilelock==4.0.1\nthe environment matches blueprints/us-equities/catalyst-provenance/requirements.lock exactly (uv pip sync --dry-run --offline would make no changes)\n"
+    },
+    {
+      "cmd": "O=\"${RR:?}/edgartools-use\"; mkdir \"$O\" && PYTHONDONTWRITEBYTECODE=1 /usr/bin/timeout 180 bwrap --unshare-net --die-with-parent --ro-bind / / --bind \"$O\" \"$O\" --dev /dev --proc /proc \"$HOME/.local/share/codex-ecosystem/catalyst-provenance/sdk/bin/python\" -s blueprints/us-equities/catalyst-provenance/native_document.py --out \"$O/native-document.json\"",
+      "exit": 0,
+      "duration_s": 1.015,
+      "output_sha256": "ed6f2d144ac40c0b8a6a9d55a536be963cb9e804cb18bdaa78b16180746f3d41",
+      "output_excerpt": "{\"status\": \"complete\", \"mode\": \"real_upstream_fixture_offline\", \"edgartools\": \"5.58.0\", \"native_markdown_bytes\": 5325, \"eligible_before_first_observation\": false, \"eligible_after_first_observation\": false, \"sec_network_requests\": 0}\n"
+    },
+    {
+      "cmd": "O=\"${RR:?}/edgartools-use\"; python3 -c \"\nimport json,sys\nr=json.load(open(sys.argv[1]));md=open(sys.argv[2]).read()\nneed=['# Item 8.01. Other Events','# Item 9.01. Financial Statements and Exhibits','Peoples Bancorp','Agreement and Plan','PREMIER FINANCIAL BANCORP']\nok=r['status']=='complete' and r['edgartools']=='5.58.0' and r['sec_network_requests']==0 and all(k in md for k in need)\nprint('status',r['status'],'| edgartools',r['edgartools'],'| upstream fixture',r['source']['path'].split('/')[-1],'sha256',r['source']['sha256'][:12],'| markdown bytes',len(md.encode()),'| Item 8.01 and 9.01 headings, both merger parties and the agreement present:',all(k in md for k in need),'| SEC requests',r['sec_network_requests'])\nraise SystemExit(0 if ok else 1)\n\" \"$O/native-document.json\" \"$O/native-document.md\"",
+      "exit": 0,
+      "duration_s": 0.019,
+      "output_sha256": "ff78875cffa3a308fcb4799a58ace0f4fa1bde7a883063d65d1f8a4f6b339bd3",
+      "output_excerpt": "status complete | edgartools 5.58.0 | upstream fixture 0000887919-21-000012.html sha256 6f40108c938a | markdown bytes 5325 | Item 8.01 and 9.01 headings, both merger parties and the agreement present: True | SEC requests 0\n"
+    },
+    {
+      "cmd": "rm -rf \"${RR:?}/edgartools-use\" && test ! -e \"${RR:?}/edgartools-use\" && echo \"parse outputs removed\"",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "e406e6f8d2a1b48e4d5178d5fb56bb8993a96749ecd15e1b553c4a815987c1cc",
+      "output_excerpt": "parse outputs removed\n"
+    }
+  ],
+  "tool_versions": {
+    "data-edgartools": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a"
+  },
+  "observed_at_utc": "2026-09-25T15:36:36Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), EdgarTools 5.58.0 (the data-edgartools winner pin 'v5.58.0; source abe44344...'; upstream tag v5.58.0 resolves to that commit and the catalyst-provenance environment matches its requirements.lock exactly) parsed a real historical SEC filing offline. blueprints/us-equities/catalyst-provenance/native_document.py, run in a bubblewrap namespace with no network, verified the vendored upstream fixture's recorded hashes (Premier Financial Bancorp's 2021 Form 8-K HTML from edgartools' own tests at abe44344), parsed it with the native edgar.documents.HTMLParser and wrote Markdown containing the Item 8.01 (Other Events) and Item 9.01 (Financial Statements and Exhibits) headings, both merger parties and the merger agreement, with zero SEC requests. The checking command exits 0 only when all of these hold; all commands exit 0.",
+  "limitations": [
+    "One pinned historical 8-K from the upstream test fixtures, parsed offline: no live SEC access, no filing index, XBRL, financial statements or other forms, and no historical point-in-time availability claim (the fixture lacks acceptance metadata and stays quarantined).",
+    "Recorded under the landscape winner id data-edgartools; manifests/stack.json names it edgartools.",
+    "Scratch state lived in an owned directory under this session's scratchpad, referenced as $RR in the commands (the worker exported RR before recording); the last command removes it.",
+    "The same commands were rehearsed while planning. This receipt changes no platform_status.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; edgartools is this host's existing ~/.local/share/codex-ecosystem/catalyst-provenance/sdk environment.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:36:36Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

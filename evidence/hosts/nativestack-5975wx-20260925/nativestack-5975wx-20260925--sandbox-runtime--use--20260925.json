@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--sandbox-runtime--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "sandbox-runtime",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v srt) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,sys;d=json.load(open(sys.argv[1]));print('installed package',d['name'],d['version'])\" \"$HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/lib/node_modules/@anthropic-ai/sandbox-runtime/package.json\" && echo \"srt --version prints $(srt --version) (the upstream CLI's fallback string; package metadata establishes the pin)\" && command -v bwrap socat rg > /dev/null && echo \"bwrap, socat and ripgrep present\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" sandbox-runtime",
+      "exit": 0,
+      "duration_s": 0.183,
+      "output_sha256": "6c42c8dfb91bce66508d0b889e91535bd059d9111eed479b3b9d4bb1b3efc369",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/srt -> ~/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/lib/node_modules/@anthropic-ai/sandbox-runtime/dist/cli.js\ninstalled package @anthropic-ai/sandbox-runtime 0.0.77\nsrt --version prints 1.0.0 (the upstream CLI's fallback string; package metadata establishes the pin)\nbwrap, socat and ripgrep present\nstack ['0.0.77'] winner pins ['0.0.77']"
+    },
+    {
+      "cmd": "S=\"${RR:?}/sandbox-runtime-use\"; mkdir \"$S\" && mkdir \"$S/allowed\" \"$S/blocked\" \"$S/write-protected\" && printf 'blocked fixture nsr-blocked-5d1\\n' > \"$S/blocked/marker.txt\" && printf 'original fixture\\n' > \"$S/write-protected/marker.txt\" && python3 -c \"import json,sys;r=sys.argv[1];json.dump({'network':{'allowedDomains':[],'deniedDomains':['*']},'filesystem':{'denyRead':[r+'/blocked'],'allowWrite':[r+'/allowed'],'denyWrite':[r+'/write-protected']}},open(r+'/policy.json','w'))\" \"$S\" || exit 2; h0=$(sha256sum < \"$S/write-protected/marker.txt\"); X=$(dirname \"$(command -v srt)\"); /usr/bin/env -i HOME=\"$HOME\" PATH=\"$X:/usr/bin:/bin\" srt --settings \"$S/policy.json\" -- sh -c 'printf allowed > \"$1\"' sh \"$S/allowed/result.txt\"; a=$?; /usr/bin/env -i HOME=\"$HOME\" PATH=\"$X:/usr/bin:/bin\" srt --settings \"$S/policy.json\" -- cat \"$S/blocked/marker.txt\" > \"$S/read.out\" 2>&1; b=$?; /usr/bin/env -i HOME=\"$HOME\" PATH=\"$X:/usr/bin:/bin\" srt --settings \"$S/policy.json\" -- sh -c 'printf changed > \"$1\"' sh \"$S/write-protected/marker.txt\" > \"$S/write.out\" 2>&1; c=$?; /usr/bin/env -i HOME=\"$HOME\" PATH=\"$X:/usr/bin:/bin\" srt --settings \"$S/policy.json\" -- sh -c 'printf outside > \"$1\"' sh \"$S/unlisted.txt\" > \"$S/unlisted.out\" 2>&1; d=$?; h1=$(sha256sum < \"$S/write-protected/marker.txt\"); echo \"allowed write exit=$a content=$(cat \"$S/allowed/result.txt\" 2>/dev/null) | denied read exit=$b marker leaked=$(grep -c nsr-blocked-5d1 \"$S/read.out\") | denied write exit=$c host bytes unchanged=$(test \"$h0\" = \"$h1\" && echo yes || echo no) | unlisted-path write exit=$d file created=$(test -e \"$S/unlisted.txt\" && echo yes || echo no)\"; test $a -eq 0 && test \"$(cat \"$S/allowed/result.txt\")\" = allowed && test $b -ne 0 && ! grep -q nsr-blocked-5d1 \"$S/read.out\" && test $c -ne 0 && test \"$h0\" = \"$h1\" && test $d -ne 0 && test ! -e \"$S/unlisted.txt\"",
+      "exit": 0,
+      "duration_s": 1.254,
+      "output_sha256": "45698a5896cb8ed2b9ecfe1b5d8e22629426019e737c07d877e7b15361b55102",
+      "output_excerpt": "allowed write exit=0 content=allowed | denied read exit=1 marker leaked=0 | denied write exit=2 host bytes unchanged=yes | unlisted-path write exit=2 file created=no\n"
+    },
+    {
+      "cmd": "S=\"${RR:?}/sandbox-runtime-use\"; mkdir \"$S/www\" && printf 'nsr-sandbox-payload-8e2\\n' > \"$S/www/payload.txt\" || exit 2\npython3 -u -m http.server 0 --bind 127.0.0.1 --directory \"$S/www\" > \"$S/server.log\" 2>&1 &\nV=$!\ni=0; while [ $i -lt 40 ] && ! grep -q 'port [0-9]' \"$S/server.log\"; do sleep 0.25; i=$((i+1)); done\nP=$(grep -o 'port [0-9]*' \"$S/server.log\" | head -1 | cut -d' ' -f2)\nX=$(dirname \"$(command -v srt)\")\nfor m in allow deny empty; do\n  python3 -c \"import json,sys;r,m=sys.argv[1],sys.argv[2];n={'allow':{'allowedDomains':['127.0.0.1'],'deniedDomains':[]},'deny':{'allowedDomains':['127.0.0.1'],'deniedDomains':['127.0.0.1']},'empty':{'allowedDomains':[],'deniedDomains':[]}}[m];json.dump({'network':n,'filesystem':{'denyRead':[],'allowWrite':[],'denyWrite':[]}},open(r+'/net-'+m+'.json','w'))\" \"$S\" $m\n  /usr/bin/env -i HOME=\"$HOME\" PATH=\"$X:/usr/bin:/bin\" srt --settings \"$S/net-$m.json\" curl --silent --show-error --fail --max-time 10 --retry 2 --retry-connrefused --retry-delay 1 --noproxy \"\" \"http://127.0.0.1:$P/payload.txt\" > \"$S/net-$m.out\" 2>&1\n  echo \"$m=$?\" >> \"$S/net.rc\"\ndone\nkill $V; wait $V 2>/dev/null\nn=$(grep -c 'GET /payload.txt' \"$S/server.log\")\necho \"owned loopback HTTP server on an OS-assigned port | curl exits: $(tr '\\n' ' ' < \"$S/net.rc\")| allow returned payload: $(grep -c nsr-sandbox-payload-8e2 \"$S/net-allow.out\") | proxy 403 for deny/empty: $(grep -c 'error: 403' \"$S/net-deny.out\")/$(grep -c 'error: 403' \"$S/net-empty.out\") | requests that reached the server: $n\"\ngrep -qx 'allow=0' \"$S/net.rc\" && grep -qx 'deny=22' \"$S/net.rc\" && grep -qx 'empty=22' \"$S/net.rc\" && grep -q nsr-sandbox-payload-8e2 \"$S/net-allow.out\" && grep -q 'error: 403' \"$S/net-deny.out\" && grep -q 'error: 403' \"$S/net-empty.out\" && test \"$n\" -eq 1",
+      "exit": 0,
+      "duration_s": 4.275,
+      "output_sha256": "85886a42e6adca5c500727af2d5e661cf0cdb5835dc34e516aa02d7e43c6cc6d",
+      "output_excerpt": "owned loopback HTTP server on an OS-assigned port | curl exits: allow=0 deny=22 empty=22 | allow returned payload: 1 | proxy 403 for deny/empty: 1/1 | requests that reached the server: 1\n"
+    },
+    {
+      "cmd": "rm -rf \"${RR:?}/sandbox-runtime-use\" && test ! -e \"${RR:?}/sandbox-runtime-use\" && echo \"owned fixture, policies and server files removed\"",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "51f8943529f9e8d0b1bab9d47d35f8fb646a2692c4af1da67bb7d8a2352799c1",
+      "output_excerpt": "owned fixture, policies and server files removed\n"
+    }
+  ],
+  "tool_versions": {
+    "sandbox-runtime": "0.0.77"
+  },
+  "observed_at_utc": "2026-09-25T15:37:27Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), sandbox-runtime 0.0.77 (the catalog pin; installed package.json reads @anthropic-ai/sandbox-runtime 0.0.77, while srt --version prints the CLI's fallback 1.0.0) enforced file and network policy on real commands with a cleared environment. With an owned policy: a write under allowWrite succeeded with the expected content; a read of the denyRead directory's marker failed and did not leak its text; a write into denyWrite failed and left the host file's sha256 unchanged; a write to an unlisted path failed and created nothing. Against an owned loopback HTTP server: an allowlisted request returned the payload (exit 0), while explicit deny and an empty allowlist each returned proxy HTTP 403 (curl exit 22), and exactly one request reached the server. Each command exits 0 only when every outcome holds; all commands exit 0.",
+  "limitations": [
+    "Linux bubblewrap backend on WSL2 with owned fixtures only: no TLS, SOCKS, IPv6, DNS-rebinding, remote-host or escape testing, and no claim that every client command on this host is sandboxed.",
+    "Upstream starts its in-sandbox proxy listener without a readiness wait; the allow request uses curl --retry-connrefused, so a first refused connection before the payload is expected.",
+    "Scratch state lived in an owned directory under this session's scratchpad, referenced as $RR in the commands (the worker exported RR before recording); the last command removes it.",
+    "The same commands were rehearsed while planning. This receipt changes no platform_status.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:37:27Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points; re-ran all four commands with RR under /tmp (all exit 0, excerpts identical). (1) Layer role: srt enforced the owned filesystem policy (the allowWrite write succeeded; the denyRead read exited 1 without leaking; denyWrite and unlisted writes were refused with bytes unchanged) and the network policy (the allowlisted loopback fetch succeeded; deny and empty allowlists got proxy 403, curl exit 22; one request reached the server). (2) Controls: allowed operations succeed beside the denied ones. In my own control, the same srt read with denyRead empty printed the marker (exit 0), so the denial comes from the policy. (3) Backed: the installed package.json 0.0.77 and install path are retained, and dist/cli.js confirms the srt --version fallback (npm_package_version || '1.0.0'); catalog_revision 74886724 is on origin/main. Host facts independently observed here: Ubuntu 24.04.5, WSL 2.7.13.0, 48 CPUs, RTX 4090 24 GB, 102.2 GiB RAM. (4) sandbox-runtime is the isolation winner and 0.0.77 pin_matches.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:26:52Z",
+      "reviewer": {
+        "identity_sha256": "559738f43703ab61d558cbe1eddb4e67c1639c5c85e72a1f9ddd56bf2519e78c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

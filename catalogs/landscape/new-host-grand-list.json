@@ -382,7 +382,7 @@
           "recipe": "blueprints/convergence-practice/ci-security/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -405,7 +405,7 @@
           "recipe": "blueprints/us-equities/supply-chain/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -886,7 +886,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1465,7 +1465,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1488,7 +1488,7 @@
           "recipe": "recipes/native-upgrades-20260921.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -2224,7 +2224,7 @@
           "recipe": "blueprints/us-equities/supply-chain/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -2372,11 +2372,11 @@
       "candidate:typesafe-ai-skills"
     ],
     "e2e_accepted": {
-      "linux-wsl2-x86_64": 26,
+      "linux-wsl2-x86_64": 22,
       "macos-arm64": 0
     },
     "e2e_host_verified": {
-      "linux-wsl2-x86_64": 20,
+      "linux-wsl2-x86_64": 26,
       "macos-arm64": 6
     },
     "bootstrap_pinned": {
@@ -2409,7 +2409,7 @@
       ]
     },
     "needs_host": {
-      "linux-wsl2-x86_64": 20,
+      "linux-wsl2-x86_64": 18,
       "macos-arm64": 60
     }
   }

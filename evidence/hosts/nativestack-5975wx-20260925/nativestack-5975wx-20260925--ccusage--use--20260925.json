@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--ccusage--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "ccusage",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v ccusage) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && ccusage --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" ccusage",
+      "exit": 0,
+      "duration_s": 0.072,
+      "output_sha256": "d37962cdebd66461312e5847d1a7b53b5cea2e31c546e01ee8d09ca694f17652",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/ccusage -> ~/.local/share/codex-ecosystem/tools/ccusage-20.0.24/lib/node_modules/ccusage/src/cli.js\nccusage 20.0.24\nstack ['20.0.24'] winner pins ['20.0.24']\n"
+    },
+    {
+      "cmd": "F=\"${RR:?}/ccusage-use\"; mkdir \"$F\" && mkdir -p \"$F/cfg/projects/-tmp-ccusage-fixture\" && python3 -c \"\nimport json,sys\ndef row(i,ts,inp,out,cw,cr):\n    return {'parentUuid':None,'isSidechain':False,'userType':'external','cwd':'/tmp/ccusage-fixture','sessionId':'nsr-ccusage-fixture-session','version':'2.1.278','type':'assistant','uuid':'u'+str(i),'timestamp':ts,'requestId':'req_nsr_'+str(i),'message':{'id':'msg_nsr_'+str(i),'type':'message','role':'assistant','model':'claude-sonnet-4-5-20250929','content':[{'type':'text','text':'fixture'}],'usage':{'input_tokens':inp,'output_tokens':out,'cache_creation_input_tokens':cw,'cache_read_input_tokens':cr}}}\nrows=[row(1,'2026-01-15T10:00:00.000Z',100,20,300,4000),row(2,'2026-01-15T11:00:00.000Z',50,10,0,6000),row(2,'2026-01-15T11:00:00.000Z',50,10,0,6000),row(3,'2026-01-16T09:00:00.000Z',7,3,0,0)]\nopen(sys.argv[1],'w').write(''.join(json.dumps(r,separators=(',',':'))+'\\n' for r in rows))\n\" \"$F/cfg/projects/-tmp-ccusage-fixture/nsr-ccusage-fixture-session.jsonl\" && CLAUDE_CONFIG_DIR=\"$F/cfg\" ccusage claude daily --json --offline --timezone UTC --since 20260101 --until 20260131 > \"$F/daily.json\" && python3 -c \"\nimport json,sys\nd=json.load(open(sys.argv[1]));k=('inputTokens','outputTokens','cacheCreationTokens','cacheReadTokens','totalTokens')\ngot={r['date']:tuple(r[x] for x in k) for r in d['daily']};tot=tuple(d['totals'][x] for x in k)\nwant={'2026-01-15':(150,30,300,10000,10480),'2026-01-16':(7,3,0,0,10)};wt=(157,33,300,10000,10490)\nprint('fixture per-day (input, output, cache create, cache read, total):',got,'| totals',tot,'| equal to the hand-computed values with the repeated message counted once:',got==want and tot==wt)\nraise SystemExit(0 if got==want and tot==wt else 1)\n\" \"$F/daily.json\"",
+      "exit": 0,
+      "duration_s": 0.095,
+      "output_sha256": "d73dce237939e2c324700a727a4e175e9599bbc87f1ecefc430e9ea15ea877f1",
+      "output_excerpt": "fixture per-day (input, output, cache create, cache read, total): {'2026-01-15': (150, 30, 300, 10000, 10480), '2026-01-16': (7, 3, 0, 0, 10)} | totals (157, 33, 300, 10000, 10490) | equal to the hand-computed values with the repeated message counted once: True\n"
+    },
+    {
+      "cmd": "F=\"${RR:?}/ccusage-use\"; CLAUDE_CONFIG_DIR=\"$F/cfg\" ccusage claude daily --json --offline --timezone UTC --since 20260116 --until 20260131 | python3 -c \"import json,sys;d=json.load(sys.stdin);r=[(x['date'],x['totalTokens']) for x in d['daily']];print('fixture with --since 20260116:',r);raise SystemExit(0 if r==[('2026-01-16',10)] else 1)\" && mkdir -p \"$F/empty/projects\" && CLAUDE_CONFIG_DIR=\"$F/empty\" ccusage claude daily --json --offline --timezone UTC | python3 -c \"import json,sys;d=json.load(sys.stdin);print('empty projects directory: days',len(d['daily']),'total tokens',d['totals']['totalTokens']);raise SystemExit(0 if not d['daily'] and d['totals']['totalTokens']==0 else 1)\"",
+      "exit": 0,
+      "duration_s": 0.098,
+      "output_sha256": "a31558ec5a4a9d459360964ed71ba00ae5ecb5b09dacdedb34e60c0e16a7b6cc",
+      "output_excerpt": "fixture with --since 20260116: [('2026-01-16', 10)]\nempty projects directory: days 0 total tokens 0\n"
+    },
+    {
+      "cmd": "t=$(date -u +%Y%m%d); y=$(date -u -d yesterday +%Y%m%d); ccusage claude daily --json --offline --timezone UTC --since \"$y\" --until \"$t\" | python3 -c \"\nimport datetime,json,sys\nd=json.load(sys.stdin);k=('inputTokens','outputTokens','cacheCreationTokens','cacheReadTokens');rows=d['daily']\ntoday=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d');models=sorted({m for r in rows for m in r.get('modelsUsed',[])})\ncons=all(r['totalTokens']==sum(r[x] for x in k) for r in rows) and d['totals']['totalTokens']==sum(r['totalTokens'] for r in rows)\nprint('this host Claude Code logs, UTC days',[r['date'] for r in rows],'| models',models,'| row and grand totals internally consistent:',cons,'| today present:',today in [r['date'] for r in rows],'| token counts withheld')\nraise SystemExit(0 if rows and cons and today in [r['date'] for r in rows] and any(m.startswith('claude-') for m in models) else 1)\"",
+      "exit": 0,
+      "duration_s": 0.352,
+      "output_sha256": "5077af7d49653df2c9ac72bd96e24e87f4b5c5be104626ef7eae29013fbc4b17",
+      "output_excerpt": "this host Claude Code logs, UTC days ['2026-09-24', '2026-09-25'] | models ['claude-haiku-4-5-20251001', 'claude-opus-4-8', 'claude-opus-5-5', 'claude-sonnet-5'] | row and grand totals internally consistent: True | today present: True | token counts withheld\n"
+    },
+    {
+      "cmd": "rm -rf \"${RR:?}/ccusage-use\" && test ! -e \"${RR:?}/ccusage-use\" && echo \"fixture directory removed\"",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "1896a0364eab403d4fe825d6f27247585119293f6594372514b693823e6dc5e0",
+      "output_excerpt": "fixture directory removed\n"
+    }
+  ],
+  "tool_versions": {
+    "ccusage": "20.0.24"
+  },
+  "observed_at_utc": "2026-09-25T15:35:37Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), ccusage 20.0.24 (the catalog pin) aggregated Claude Code usage logs. On a four-line fixture in Claude Code's compact JSONL format (two days, one message repeated with the same message and request ids) it reported per-day input, output, cache-creation, cache-read and total tokens equal to the hand-computed values with the repeated message counted once; --since 20260116 kept only the second day, and an empty projects directory produced no rows and zero tokens. Against this host's own Claude Code logs for yesterday and today (UTC) it returned rows including today with claude-* models, and each row's total equals the sum of its four token fields and the grand total equals the sum of the rows; token counts are withheld. Each command exits 0 only when its assertion holds; all commands exit 0.",
+  "limitations": [
+    "Token accounting only, with --offline pricing: costs were neither asserted nor used; not provider billing or subscription usage. Codex and other agents' logs were not read.",
+    "The exact-value check uses an owned synthetic fixture (compact JSON, as Claude Code writes; ccusage 20.0.24 skipped the same rows when they were written with spaces after separators). The real-log run asserts presence and internal consistency, not independently known totals.",
+    "Scratch state lived in an owned directory under this session's scratchpad, referenced as $RR in the commands (the worker exported RR before recording); the last command removes it.",
+    "The same commands were rehearsed while planning. This receipt changes no platform_status.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:35:37Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points; re-ran all five commands with RR under /tmp (all exit 0, excerpts identical). (1) Layer role: ccusage aggregated a known-answer Claude Code JSONL fixture to the hand-computed per-day and total tokens with the repeated message deduplicated, honoured --since, and read this host's real logs with internally consistent rows. (2) Control: the exact-value assertion discriminates, since my variant giving the duplicate a distinct message id totalled 16550 instead of 10490; the empty projects dir gave 0 rows; the limitation that spaced JSON rows are skipped also reproduced (0 rows). (3) Backed: cmd 0 retains ccusage --version 20.0.24, the resolved install path and stack/winner pins 20.0.24; catalog_revision 74886724 is on origin/main. Host facts independently observed here: Ubuntu 24.04.5, WSL 2.7.13.0, 48 CPUs, RTX 4090 24 GB, 102.2 GiB RAM. (4) ccusage is the foundation token-efficiency winner and 20.0.24 pin_matches its pin.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:26:51Z",
+      "reviewer": {
+        "identity_sha256": "559738f43703ab61d558cbe1eddb4e67c1639c5c85e72a1f9ddd56bf2519e78c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}
