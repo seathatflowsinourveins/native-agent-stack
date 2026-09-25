@@ -449,17 +449,24 @@ rather than assumed:
 | --- | --- |
 | (a) pid/cmdline | `/proc/<pid>/cmdline` still names `app-server-broker.mjs serve` with the exact recorded `--endpoint` (guards pid reuse, upstream #743) |
 | (b) no active jobs | no job in the workspace's `state.json` has a status outside `{completed, failed, cancelled}`; an unrecognized status blocks reaping rather than being treated as safe |
-| (c) workspace unused | the workspace directory (read from the broker's own live `/proc/<pid>/cwd`) no longer exists, or no live `claude`/`codex` process — other than the broker's own descendants, e.g. its `codex app-server` child — has a cwd equal to or under it or under its nearest git checkout root (see the decision doc's "Known limitations" for what that second check does and does not cover) |
+| (c) workspace unused | the workspace directory (read from the broker's own live `/proc/<pid>/cwd`) no longer exists, or no live `claude`/`codex` process — other than the broker's own descendants, e.g. its `codex app-server` child — has a cwd equal to or under it, under its nearest git checkout root, or under the *other* checkout a `git worktree` workspace belongs to (see the decision doc's "Known limitations" for what these checks do and do not cover) |
 | (d) old enough | the broker process (from `/proc/<pid>/stat`'s `starttime`, not a file mtime) is older than `--min-age` (default 1800s) |
+| (e) job-idle | the workspace's most recent recorded job activity (`state.json` jobs[]' `updatedAt`/`completedAt`/`createdAt`/`startedAt`) is at least `--min-age` in the past too — not just the broker process's own age; a workspace that has never run a job has no signal here and this guard passes trivially |
 
 Action on an eligible broker is the `broker/shutdown` JSON-RPC over its unix
 socket (5s), then up to 15s waiting for the broker and the OS children it had
 at that moment to exit. **No SIGKILL, ever.** `--escalate` only adds a
 process-group `SIGTERM` after that wait fails, and only after re-checking
-guard (a) again first (the pid could have been reused in those 15s). `--list`
+guard (a) again first (the pid could have been reused in those 15s). Once an
+exit is confirmed, `broker.json` is removed if it still names the exact
+pid/endpoint just stopped (re-read just before deleting, so a new broker
+started for the same workspace during the wait is never touched). `--list`
 is the default and changes nothing; `--receipt PATH` writes the same JSON
-report `--list`/`--apply` print to a file. Exit 0 normally, 2 if an eligible
-broker was not confirmed stopped.
+report `--list`/`--apply` print to a file. One broker's own unreadable or
+malformed state is reported as that broker's own ineligibility reason and
+never aborts evaluation of the rest. Exit 0 normally; 2 if an eligible
+broker was not confirmed stopped, or for invalid command-line usage; 3 if
+this host has no `/proc` at all (unsupported platform).
 
 Plugin data directories are discovered at
 `~/.claude/plugins/data/*codex*/state`; `--state-root PATH` (repeatable)
@@ -478,7 +485,14 @@ name, not the script's, simply because `python3` is the binary actually
 running — checked by hand against the real `claude` binary before writing
 the suite). No real broker, no
 real Claude Code or Codex session, and no plugin state directory on any host
-is read or touched by the tests. `--list` was run against this host's real
+is read or touched by the tests. 40 tests as of the 2026-09-25 fix round
+(second pass): guard (e) job-idle timing, the worktree-to-parent check
+(a hand-written `.git` `gitdir:` pointer file, no real `git worktree`
+needed), `path_is_under`'s filesystem-root case, malformed broker.json/
+state.json (non-object JSON, non-UTF-8 bytes) evaluating to an ineligible
+record rather than crashing the run, and `broker.json` cleanup after a
+confirmed stop, in addition to the coverage described in the decision doc.
+`--list` was run against this host's real
 `~/.claude/plugins/data/codex-openai-codex/state` on 2026-09-25 (read-only):
 every broker present had already exited (dead pid; guard (a) alone already
 refuses it), so 0 were eligible — consistent with the facts recorded in the

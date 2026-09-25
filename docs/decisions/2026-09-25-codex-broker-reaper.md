@@ -166,6 +166,33 @@ hand over the `broker/shutdown` RPC, which worked cleanly.
   different, unverified one — exactly the kind of guess this tool's own
   docstring says it never makes. Operators can see this in `--list`'s
   per-broker `reasons` (a guard (b) failure names the blocking job ids).
+- **Guard (c), a coordinator with no git relationship to the worktree at
+  all:** found in review of this rollout's own "reaper" track (second fix
+  round, 2026-09-25) — a coordinating session that dispatches into a
+  worktree by prefixing every Bash command with `cd <worktree> &&`, rather
+  than changing its own OS process cwd, is findable by guard (c)'s
+  worktree-to-parent check (`read_worktree_parent_root`) only when it was
+  itself launched from that worktree's own main checkout. Verified directly
+  against this tool's own live process during this fix round: a coordinator
+  launched from a *separate* driver repository (this rollout's own
+  `agent-lab`, unrelated by git ancestry to the `codex-broker-reaper`
+  worktree it was dispatching this very fix into) has no cwd-based signal
+  under any of guard (c)'s checks at all. Mitigated, not fully closed, by
+  guard (e) (below): a session that periodically runs *codex jobs* in that
+  workspace keeps resetting the job-activity clock even though no live
+  process's cwd is ever under the workspace itself. A worktree broker that
+  has never yet run a single job (empty `jobs[]`, so guard (e) has no
+  timestamp signal either) and whose only live coordinator is entirely
+  git-unrelated to it is not reliably protected by any guard here beyond
+  guard (d)'s plain process age — this is the same shape of gap as the
+  subdirectory case above, disclosed rather than guessed at a further fix.
+- **Guard (e), idle-since-last-job rather than idle-since-ever:** guard (e)
+  only requires `--min-age` since the most *recent* job, not since the
+  workspace was first used — a session that runs a codex job every 20
+  minutes (below the 1800s default `--min-age`) keeps its broker ineligible
+  indefinitely, which is the intended effect, not a bug, but is worth
+  stating plainly: guard (e) is not a cap on how long a broker may live
+  while genuinely in periodic use.
 
 ## Evidence that would overturn this decision
 
@@ -190,9 +217,15 @@ hand over the `broker/shutdown` RPC, which worked cleanly.
 - `python3 -m unittest tests.test_codex_broker_reaper -v`: 20 tests, all
   passing, at the initial build — the "19" recorded here at the time of
   review was inaccurate (`grep -cE '^\s+def test_' tests/test_codex_broker_reaper.py`
-  gives 20 at both HEAD and 8a86ba52, the commit that last changed the test
-  file before this figure was written); 26 after the 2026-09-25 fix round
-  added six regression tests (see "Fix round" below), all still passing.
+  gives 20 at bd03b2a7, the commit this sentence was written at, and
+  likewise at 8a86ba52, the commit that last changed the test file before
+  then — corrected in the second fix round below; this sentence previously
+  said "HEAD" in place of "bd03b2a7", which is only accurate at the commit
+  it was written at, not as a standing reference — at 7167a244 and after it
+  no longer named that commit at all); 26 after the 2026-09-25 fix round
+  added six regression tests (see "Fix round" below), all still passing; 40
+  after the second fix round (see "Fix round (2026-09-25, second pass)"
+  below), all still passing.
   Every guard is exercised against a real spawned process, not a
   mock: a small Python stand-in plays the broker (a genuine unix-socket
   server started from a script file literally named `app-server-broker.mjs`
@@ -335,3 +368,159 @@ this section summarizes.
   (c) is reached, so this fix round's guard (c) change does not move this
   host's own number); `python3 scripts/validate.py` and `python3
   scripts/validate_foundation.py` (both still pass).
+
+## Fix round (2026-09-25, second pass)
+
+A review of 7167a244 (the first fix round's own HEAD) found one new major
+finding and four new minor findings, resolved here, plus a scope-disclosure
+gap in this same record; see the tool's own docstring and
+`tests/test_codex_broker_reaper.py` for the code-level detail this section
+summarizes.
+
+- **Major — guard (c) cannot see a live in-process workflow child, the leak
+  source the brief itself names.** Verified directly against this session's
+  own live processes while investigating: a coordinator that dispatches
+  into a worktree by prefixing every Bash command with `cd <worktree> &&`
+  (this rollout's own pattern) never changes its own OS process cwd, so
+  neither the workspace-root scan nor the git-toplevel scan could ever see
+  it, and its transient per-command Bash shells (`comm` `bash`, not
+  `claude`/`codex`) are gone again before the next scan. Once a broker
+  passed `--min-age` this way it was reaped even while its owning session
+  was still actively, if intermittently, using it — the exact case the
+  brief's "Never touch brokers of live sessions" and this record's own
+  Context section (guard (c) bullet) claimed was handled, without
+  disclosing this gap. Two fixes, both applied (the finding offered either
+  as sufficient; both were cheap and independently useful):
+  - Guard (c) now also checks the *other* checkout a `git worktree`
+    workspace belongs to (`read_worktree_parent_root`, parses the
+    worktree's own `.git` `gitdir: .../.git/worktrees/<name>` pointer file,
+    pure stdlib), for a live session there. This closes the gap exactly
+    when the coordinator was launched from the worktree's own main
+    checkout — verified against a hand-written `.git` pointer file in
+    `LiveCwdGuardTests.test_a_live_session_at_the_worktrees_main_checkout_blocks_eligibility`
+    (no real `git worktree` needed, same style as the existing
+    subdirectory-broker test) — but not when the coordinator is a separate
+    driver repository with no git relationship to the worktree at all
+    (this rollout's own `agent-lab`, checked directly: still true after
+    this fix).
+  - New guard (e): the workspace's most recent recorded job activity
+    (`state.json` jobs[]' `updatedAt`, set on every job write by the
+    plugin's own `upsertJob` — verified directly in `scripts/lib/
+    state.mjs`) must also be at least `--min-age` in the past, not just the
+    broker *process's* own age (guard (d)). This does not depend on seeing
+    any live process at all, so it also covers the `agent-lab`-style
+    cross-repo coordinator case above — as long as that session's work in
+    the workspace involves running codex jobs periodically, which resets
+    the guard (e) clock each time. Regression tests: `JobIdleGuardTests`
+    (three tests: recent activity blocks despite an old-looking broker
+    process, old-enough activity allows, no activity timestamp at all falls
+    back to guard (d) alone).
+  - Residual, disclosed rather than further guessed at: a worktree broker
+    that has never yet run a single job has no guard (e) signal either, so
+    a cross-repo coordinator that has not yet run its first codex job in a
+    given workspace is still only protected by guard (d)'s plain process
+    age (see "Known limitations").
+- **Minor — stopping a broker left `broker.json` pointing at the dead
+  endpoint/pid.** `stop_broker()` confirmed the broker *process* exited but
+  never touched its `broker.json`; a plugin code path that trusts
+  `broker.json` without itself reconnecting first (traced to `codex.mjs`'s
+  `getSessionRuntimeStatus` and `getCodexAuthStatus`'s
+  `reuseExistingBroker` path) would misreport for that workspace until its
+  own next `SessionEnd`. Fixed: `clear_broker_json_if_stopped()` removes
+  `broker.json` once an exit is confirmed, but only after re-reading it and
+  confirming it still names the exact pid/endpoint just stopped — guarding
+  against a *new* broker having started (and written its own new
+  `broker.json`) for the same workspace during the stop's own wait.
+  Regression tests: `ApplyAndEscalationTests.
+  test_apply_removes_broker_json_after_a_confirmed_stop` and `.
+  test_apply_leaves_broker_json_when_it_now_names_a_different_broker` (the
+  race case, via a direct `stop_broker()` call followed by a simulated
+  concurrent broker.json rewrite).
+- **Minor — exit code 2 was overloaded.** The README and rollout brief both
+  document exit 2 as "an eligible broker was not confirmed stopped", but
+  `main()` also used `parser.error()` (always exit 2) for a host with no
+  `/proc` at all, and for ordinary argparse usage errors (bad flags,
+  `--min-age` below 0). A monitor or systemd consumer following the
+  documented contract could not tell a platform refusal from a real stop
+  failure. Fixed: the `/proc`-missing refusal now prints directly to
+  stderr and returns 3, rather than going through `parser.error()` — which
+  also makes that path consistent with every other exit from `main()` (a
+  plain `return`, wrapped in `SystemExit` only by the `if __name__ ==
+  "__main__":` guard, not raised from inside `main()` itself). Ordinary
+  argparse usage errors (bad `--min-age`, mutually exclusive flags, unknown
+  options) keep exit code 2, matching the near-universal argparse
+  convention — the finding's own ask was to give the `/proc` refusal a
+  distinct code, not to also carve out usage errors. Regression tests:
+  `PlatformGuardTests.test_main_refuses_to_run_without_proc` (updated for
+  the new code and calling convention) and the new `.
+  test_bad_usage_still_exits_2_via_argparse`.
+- **Minor — `path_is_under()` was wrong for a filesystem-root workspace.**
+  With root `"/"`, the old `root + os.sep` was `"//"`, which only the
+  literal string `"/"` itself ever starts with, so `path_is_under(anything,
+  "/")` returned False for every real absolute path — wrong in the unsafe
+  direction for a live-session safety check (improbable in practice: a
+  broker's workspace root or nearest `.git` ancestor resolving to `"/"`).
+  Fixed: append the separator only when `root` does not already end with
+  one. Regression tests: `PathIsUnderTests` (new class; also covers the
+  ordinary case and a same-string-prefix sibling that must not match).
+- **Minor — one broker's malformed state could abort the whole run.**
+  `evaluate_broker()`'s `except (OSError, json.JSONDecodeError)` around
+  `broker.json`/`state.json` reads did not catch `UnicodeDecodeError` (a
+  `UnicodeError` -> `ValueError` subclass, not an `OSError` or
+  `JSONDecodeError`) from a non-UTF-8 file, and a `broker.json` that parsed
+  as valid JSON but was not an object (e.g. a bare list) crashed at the
+  `broker.get(...)` call just below with an uncaught `AttributeError` —
+  either crashed `run()`'s list comprehension over every broker, losing the
+  whole hour's receipt and reaping, contrary to `evaluate_broker()`'s own
+  "always returns a fully-shaped record" contract. Fixed two ways: (1) the
+  two specific reads now catch `(OSError, ValueError)` (`ValueError` is the
+  shared superclass of `json.JSONDecodeError` and `UnicodeDecodeError`) and
+  a non-dict `broker.json` returns an ineligible record explicitly; (2) a
+  new `safe_evaluate_broker()` wraps `evaluate_broker()` in a bare
+  `except Exception` (not `BaseException`, so `KeyboardInterrupt`/
+  `SystemExit` still propagate) as an outer safety net for anything neither
+  fix (1) nor guard (a)/(b)'s own existing reads anticipate; `run()` now
+  calls it instead of `evaluate_broker()` directly, for both the initial
+  scan and the pre-stop re-check. Regression tests: `MalformedStateTests`
+  (new class; non-object `broker.json`, non-UTF-8 `broker.json`, non-UTF-8
+  `state.json`, and a monkeypatched-raise proving `run()`/`main()` still
+  evaluates every other broker and exits 0).
+- **Also fixed — this record's own inaccurate "HEAD" reference.** See
+  "Measured" above: "gives 20 at both HEAD and 8a86ba52" was written once,
+  at bd03b2a7, where it was correct — but was never revisited when the
+  first fix round (5da77e6b) added six more tests, so "HEAD" silently kept
+  meaning whatever commit a reader checked it against. By 7167a244 (this
+  pass's own review base) `grep -cE '^\s+def test_' tests/test_codex_broker_reaper.py`
+  gave 26 there (now 40), contradicting the sentence's own "20" figure.
+  Corrected to name the specific commit (bd03b2a7) instead of "HEAD".
+- **Scope disclosure — `manifests/evidence.json`.** Outside this track's
+  allowed paths (`adoption/tools/codex-broker-reaper`,
+  `adoption/tools/README.md`, the systemd templates,
+  `tests/test_codex_broker_reaper.py`, this decision record), but touched
+  in both this fix round and the first one (commits 7167a244 and, before
+  it, the first round's own README update): `scripts/validate.py`'s
+  `scan_publication` hash-pins `adoption/tools/README.md`'s exact
+  `sha256`/`bytes` in `manifests/evidence.json`'s `files[]`, so every edit
+  to that README requires a matching two-field re-pin there or
+  `scripts/validate.py` (this track's own acceptance command) fails
+  integrity. Mechanical, sha256/bytes-only, single-file diff each time,
+  computed directly from the edited README's own bytes — never hand-picked
+  or used to touch any other field. The first round's own commit message
+  said as much but this record did not; disclosed here for both rounds,
+  closing that gap.
+- **Re-measured (second pass):** `python3 -m unittest
+  tests.test_codex_broker_reaper -v` (40 tests, all passing); `python3
+  adoption/tools/codex-broker-reaper --list` against this host's real
+  plugin state (still 17 found, 0 eligible, all refused at guard (a) before
+  guards (c)/(e) are reached — this pass's changes do not move this host's
+  own number, same as the first pass); `python3 scripts/validate.py` and
+  `python3 scripts/validate_foundation.py` (both still pass, after the
+  `manifests/evidence.json` re-pin above); `python3 -m unittest discover -s
+  tests` under `ecosystem-bounded-run` (this repository's full suite,
+  4746 tests): 9 pre-existing failures, all `INT`-signal cases in
+  `tests/test_adoption_bootstrap_macos.py` and
+  `tests/test_adoption_launchd.py`, untouched by this track's diff (which
+  only touches `adoption/tools/`, `docs/decisions/`,
+  `tests/test_codex_broker_reaper.py`, `manifests/evidence.json`) and
+  reproduced on an unrelated worker's checkout of the same base commit —
+  not this track's regression.
