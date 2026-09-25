@@ -28,6 +28,13 @@
   "gates": [
     {
       "kind": "gate",
+      "id": "memory-scheduled-learning",
+      "title": "Native scheduled memory lifecycle",
+      "state": "two learned pages applied / later decode failure retained / quality unqualified",
+      "evidence_ref": "observability/memory-scheduled-20260923.json"
+    },
+    {
+      "kind": "gate",
       "id": "alpaca-paper-operational",
       "title": "Alpaca bounded paper lifecycle",
       "state": "smoke passed / 1x broker trial passed 2026-09-23 / native faults re-verified on order-contract engine 2026-09-24 / corporate-action guard merged 2026-09-25",
