@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "wsl-authoring-20260923--headroom--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "wsl-authoring-20260923",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "ae3d3d37377022fe63112dcb10c93c765d6d2601",
+  "recorded_by": {
+    "identity_sha256": "a62650d0061c27ffda78d57ce0387b635234cde41a78ff2b34f0f36a7b2f77c2",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "headroom",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "headroom --version",
+      "exit": 0,
+      "duration_s": 0.144,
+      "output_sha256": "c7de8da02118d954bbff5cd74e90f8488d0e945455384b057e495e13125330c2",
+      "output_excerpt": "headroom, version 0.37.0\n"
+    },
+    {
+      "cmd": "hp=$(ps -eo pid=,args= | awk '$2 ~ /(^|\\/)headroom$/ || $3 ~ /(^|\\/)headroom$/'); if [ -n \"$hp\" ]; then echo \"headroom process running: $hp\"; exit 1; fi; echo \"no process whose executable or script is headroom; ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-unset}\"",
+      "exit": 0,
+      "duration_s": 0.012,
+      "output_sha256": "2ffeda4aa8c1aef451fabdef6aa1eeb3814efb6071db7982e0805105bd772c3b",
+      "output_excerpt": "no process whose executable or script is headroom; ANTHROPIC_BASE_URL=unset\n"
+    },
+    {
+      "cmd": "h=$(readlink -f \"$(command -v headroom)\") && f=$(\"$(dirname \"$h\")/python\" -c 'import headroom.savings_ledger as m;print(m.__file__)') && grep -n -E 'Hard-cap the lookback at 30 days|now 30-day-bounded\\) lifetime view' \"$f\" && test \"$(grep -c -E 'Hard-cap the lookback at 30 days|now 30-day-bounded\\) lifetime view' \"$f\")\" -eq 2 && echo \"asserted: installed headroom caps its ledger read at 30 days and reports that bucket as lifetime\"",
+      "exit": 0,
+      "duration_s": 0.06,
+      "output_sha256": "98c27ce7d1b1c54674731f74ef47781444285daa4d75357def66032e55baee02",
+      "output_excerpt": "297:    # Hard-cap the lookback at 30 days regardless of caller input (0/None means\n309:    # both the \"Last 30 days\" window and the (now 30-day-bounded) lifetime view.\nasserted: installed headroom caps its ledger read at 30 days and reports that bucket as lifetime\n"
+    },
+    {
+      "cmd": "headroom savings --json | python3 -c 'import json,sys;d=json.load(sys.stdin);l=d[\"lifetime\"];w=d[\"windows\"];print(\"lifetime\",l);print(\"windows\",{k:(v[\"tokens_saved\"],v[\"calls\"]) for k,v in w.items()});assert l[\"tokens_saved\"]==0 and l[\"calls\"]==0;print(\"asserted: the ledger holds 0 calls and 0 tokens saved\")'",
+      "exit": 0,
+      "duration_s": 0.168,
+      "output_sha256": "d6ae0766d8174da989d7028b14e31bb3063c5ae847950a95a636c084b87e9705",
+      "output_excerpt": "lifetime {'tokens_saved': 0, 'tokens_before': 0, 'cost_usd': 0.0, 'calls': 0, 'savings_percent': 0.0}\nwindows {'today': (0, 0), 'last_7_days': (0, 0), 'last_30_days': (0, 0)}\nasserted: the ledger holds 0 calls and 0 tokens saved\n"
+    }
+  ],
+  "tool_versions": {
+    "headroom": "0.37.0"
+  },
+  "observed_at_utc": "2026-09-25T18:32:38Z",
+  "result": "pass",
+  "claim": "On host wsl-authoring-20260923 (WSL2 x86_64: Intel Core Ultra 9 275HX, NVIDIA RTX 5090 Laptop GPU; the catalog's WSL authoring laptop), headroom 0.37.0 (the catalog pin) returned its savings ledger through headroom savings --json: lifetime holds 0 calls and 0 tokens saved (asserted), and the today, 7-day and 30-day windows print the same zeros. No process whose executable or script is headroom was running, and ANTHROPIC_BASE_URL was unset in the recording shell (asserted for the process). The installed savings_ledger.py hard-caps the ledger read at 30 days and reports that bucket as lifetime (asserted by grep), so at this pin the field named lifetime covers at most 30 days. All commands exit 0.",
+  "limitations": [
+    "No model session ran and no call went through a Headroom proxy, so the zero ledger shows that the counter is readable and empty, not that Headroom saves nothing. The guarded offline compression lane does not append to this ledger.",
+    "A first recording attempt in this session was discarded before commit: its process check used pgrep -f, which matched the recorder's own command line. The check now matches only a process whose executable or script path ends in headroom; a negative control with such a process running made it exit 1.",
+    "Recorded from a Claude Code session in a git worktree of this repository at catalog_revision (origin/main when this branch started), not a pinned install checkout. The tools are this host's existing installs under ~/.local/share/codex-ecosystem (and, for the client check, the native Claude Code install under ~/.local/share/claude/versions), resolved as the commands show."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T18:32:38Z",
+      "reviewer": {
+        "identity_sha256": "a62650d0061c27ffda78d57ce0387b635234cde41a78ff2b34f0f36a7b2f77c2",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}
