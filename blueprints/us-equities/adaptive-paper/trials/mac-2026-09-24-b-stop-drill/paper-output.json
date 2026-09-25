@@ -1,0 +1,852 @@
+{
+  "accounting": {
+    "cash_delta_usd": "-1.51",
+    "cumulative_realized_loss_usd": "1.79",
+    "drawdown_usd": "1.62",
+    "gross_exposure_usd": "0",
+    "gross_loss_usd": "1.79",
+    "halted_reason": null,
+    "held_symbols": 0,
+    "outstanding_orders": 0,
+    "peak_pnl_usd": "0.11",
+    "pending_buy_notional_usd": "0",
+    "realized_pnl_usd": "-1.51",
+    "unrealized_pnl_usd": "0"
+  },
+  "adapter_errors": [],
+  "boundary_receipts": [],
+  "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+  "dropped_quotes": {
+    "by_reason": {
+      "crossed": 10
+    },
+    "by_symbol": {
+      "GOOGL": 1,
+      "INTC": 3,
+      "META": 3,
+      "QQQ": 3
+    }
+  },
+  "elapsed_seconds": 51.64351620798698,
+  "engine": "NautilusTrader LiveNode 2.0.0rc5",
+  "events": [
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260211.9168131,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260213.9437351,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260215.96849,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260218.002044,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260220.047006,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260222.0908449,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260224.1286058,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260226.1635041,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260228.1896489,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260230.20942,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260232.232086,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260234.252064,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260236.283339,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260238.304747,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260240.323309,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260242.339833,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260244.360399,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260246.380199,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260248.403292,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260250.422095,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260252.439919,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260254.471671,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260256.506749,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260258.5329971,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260260.557642,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.00878,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 8.09488700784483,
+          "family": "relative_strength",
+          "score": 3.0559099909941008,
+          "symbol": "CRWV"
+        }
+      ],
+      "targets": {
+        "CRWV": 1
+      },
+      "timestamp": 1790260262.58658,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924b-stop-0000001",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "CRWV",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260262.691574,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260262.795635,
+      "type": "decision"
+    }
+  ],
+  "feed": "sip",
+  "flat": true,
+  "live_event_write_errors": 0,
+  "mode": "adaptive_paper",
+  "native_fill_events": 0,
+  "native_quotes": 58867,
+  "native_rejections": 0,
+  "policy_selections": {
+    "defensive_cash": 0,
+    "mean_reversion": 0,
+    "range_breakout": 0,
+    "relative_strength": 1,
+    "trend_momentum": 0
+  },
+  "preflight": {
+    "account_status": "ACTIVE",
+    "asset_count": 24,
+    "capital_available": true,
+    "clock": {
+      "is_open": true,
+      "next_close_ns": 1790280000000000000,
+      "next_open_ns": 1790343000000000000,
+      "received_at_ns": 1790260210874010000,
+      "timestamp_ns": 1790260210873328308
+    },
+    "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+    "endpoint": "https://paper-api.alpaca.markets",
+    "feed": "sip",
+    "http": [
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260211"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260211"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790260211"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790260211"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790260212"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790260212"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790260212"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790260213"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "192",
+          "x-ratelimit-reset": "1790260213"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "191",
+          "x-ratelimit-reset": "1790260213"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "190",
+          "x-ratelimit-reset": "1790260214"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "189",
+          "x-ratelimit-reset": "1790260214"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "188",
+          "x-ratelimit-reset": "1790260214"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "187",
+          "x-ratelimit-reset": "1790260215"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "187",
+          "x-ratelimit-reset": "1790260215"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "186",
+          "x-ratelimit-reset": "1790260215"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "185",
+          "x-ratelimit-reset": "1790260215"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "184",
+          "x-ratelimit-reset": "1790260216"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "183",
+          "x-ratelimit-reset": "1790260216"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "182",
+          "x-ratelimit-reset": "1790260216"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "181",
+          "x-ratelimit-reset": "1790260216"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "180",
+          "x-ratelimit-reset": "1790260217"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "179",
+          "x-ratelimit-reset": "1790260217"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "178",
+          "x-ratelimit-reset": "1790260217"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "177",
+          "x-ratelimit-reset": "1790260218"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "176",
+          "x-ratelimit-reset": "1790260218"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "175",
+          "x-ratelimit-reset": "1790260218"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "174",
+          "x-ratelimit-reset": "1790260219"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "10000",
+          "x-ratelimit-remaining": "9999",
+          "x-ratelimit-reset": "1790260211"
+        },
+        "kind": "data_read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "175",
+          "x-ratelimit-reset": "1790260219"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "174",
+          "x-ratelimit-reset": "1790260219"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "173",
+          "x-ratelimit-reset": "1790260219"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "172",
+          "x-ratelimit-reset": "1790260220"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260241"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790260242"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790260242"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790260242"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260262"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790260263"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790260263"
+        },
+        "kind": "cancel",
+        "status": 204
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790260263"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790260264"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790260264"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790260264"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "192",
+          "x-ratelimit-reset": "1790260265"
+        },
+        "kind": "read",
+        "status": 200
+      }
+    ],
+    "observed_at": "2026-09-24T14:30:11.473337+00:00",
+    "open_order_count": 0,
+    "orders_submitted": 0,
+    "position_count": 0,
+    "quote_count": 24,
+    "quote_errors": {}
+  },
+  "reconciliation": {
+    "cash_delta_usd": "-1.51",
+    "cash_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "positions_match": true
+  },
+  "requests": [
+    {
+      "kind": "read",
+      "timestamp": 1790260211.763853
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260211.8376079
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260211.856351
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260211.8797529
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260241.536008
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260241.558059
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260241.580929
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260241.6084852
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260262.593979
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260262.6961548
+    },
+    {
+      "kind": "cancel",
+      "timestamp": 1790260262.72058
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260262.745329
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260262.800239
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260262.8204858
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260262.842342
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260262.8670552
+    }
+  ],
+  "session_policy": {
+    "extended_hours": false,
+    "overnight_holds": false
+  },
+  "startup_reconciliation": null,
+  "status": "completed_no_signals"
+}

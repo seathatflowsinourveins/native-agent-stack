@@ -97,6 +97,23 @@ does not, by itself, move a platform from `drafted_not_accepted` to
 `accepted` — that requires a receipt recorded on a real second physical
 machine (`host.second_physical_machine: true`), independently reviewed.
 
+Every receipt also names one `stage`. Two decide a platform status:
+
+- **`install`** shows the component is present and starts: a `--help` or
+  `--version` call, a package query or a first launch. On its own, a
+  reviewed install pass supports `conditional` at most.
+- **`use`** shows the component doing its job on this host: it reads or
+  writes real input, answers a query, runs a workload or serves a request.
+  A help or version call is never `use`, however it is wrapped. The
+  independent review (step 8) enforces this: a reviewer records
+  `needs_changes` on such a receipt, which withholds `accepted`. As a
+  convenience, `host_receipts.py record` also refuses `--stage use` when
+  every command is exactly a program and one of `--help`, `--version`,
+  `-V`, `help` or `version`. That check is knowingly incomplete (it passes
+  `sh -c 'x --version'` or `x help sub`) and nothing derives a status from
+  command text. Among receipts, only a reviewed `use` pass supports
+  `accepted` (Section 5).
+
 ## 3. The flow
 
 1. **Bootstrap, then work on current `main`.** Follow
@@ -129,7 +146,7 @@ machine (`host.second_physical_machine: true`), independently reviewed.
      --component-id <a manifests/stack.json component id> \
      --stage use \
      --evidence-class native_proven \
-     --from-stack-commands
+     --cmd "<a command that makes the component do its job>"
    ```
 
    From a Codex session, a human shell or CI (generate the token once per
@@ -144,7 +161,7 @@ machine (`host.second_physical_machine: true`), independently reviewed.
      --stage use \
      --evidence-class native_proven \
      --identity "$identity" \
-     --from-stack-commands
+     --cmd "<a command that makes the component do its job>"
    ```
 
    `--host-id` must match `^[a-z0-9-]+-[0-9]{8}$` (lowercase, digits,
@@ -160,7 +177,10 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    filesystem path segment cannot contain. `--from-stack-commands` reuses the
    component's own documented command(s) from `manifests/stack.json`; add
    explicit `--cmd "<shell command>"` flags (repeatable) instead or in
-   addition when you need a different check. Pass `--second-physical-machine`
+   addition when you need a different check. Those documented commands are
+   often only `--help` or `--version` checks (for example `ccusage --help`):
+   record them as `--stage install`, and pass a functional `--cmd` for
+   `--stage use` (Section 2). Pass `--second-physical-machine`
    only when this really is a second physical machine, not a fresh prefix or
    container on the catalog's existing authoring host — a receipt recorded
    without this flag can never satisfy the `component_matrix.py` macOS flip
@@ -193,7 +213,20 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    sanitizes `$HOME` to `~` and your username to `<user>` in the captured
    excerpt, writes the receipt under `evidence/hosts/<host_id>/`, and
    registers it in `manifests/evidence.json`. It never uploads anything over
-   the network. `--os`/`--architecture` default to the actual host's values
+   the network. A receipt is never overwritten: recording the same
+   host/component/stage again on the same day -- "same day" means the same
+   `yyyymmdd` carried in the receipt's own `id`, not any other clock --
+   refuses (exit 2, naming the existing file and its review kinds/verdicts,
+   and the latest existing generation to supersede) instead of silently
+   erasing it and any appended independent review. Pass `--supersedes
+   <existing-receipt-id>` to record a new receipt for that same
+   host/component/stage/date instead: `--supersedes` must name the *latest*
+   existing generation (superseding an older one while a newer one already
+   exists is refused, naming the actual latest), writes the next free `-N`
+   generation of the base id (for example, once `X-2` exists, superseding it
+   writes `X-3`, not another `X-2`), records `supersedes` in the new
+   receipt, and leaves the original file byte-identical.
+   `--os`/`--architecture` default to the actual host's values
    but can be overridden; nothing in this repository can verify from the
    receipt's JSON alone that a claimed `platform_id`,
    `second_physical_machine` or `os`/`architecture` combination is honest —
@@ -251,7 +284,39 @@ machine (`host.second_physical_machine: true`), independently reviewed.
 8. **Independent review.** Someone other than the recorder — another agent
    session, the Codex review lane, or a human — reviews the receipt (reads
    the commands and output excerpt, and if practical reproduces at least one
-   command) and appends a review:
+   command) and appends a review. For a `use` receipt, an `agree` needs all
+   four of these points. #185's receipts met them:
+
+   1. **Layer role.** The commands make the component do the job its layer
+      names, not just run. A server is observed serving, through a query or
+      a request. A build's output is served or used. A verifier's verdict is
+      read.
+   2. **Positive control.** Where a clean result proves nothing (a scanner,
+      a test runner, a linter, a gate), the receipt also shows the component
+      failing on a deliberate fault, as #185's gitleaks fixture does.
+   3. **Backed claims.** Every install, version and pin claim in the receipt
+      has a retained command and its output. A claim with no retained
+      command is unbacked.
+   4. **Bound to the winner.** The receipt's `component_id` is the layer
+      winner's id, and its `tool_versions` match the winner's pin as
+      `scripts/host_receipts.py` `pin_matches` compares them. That comparison
+      normalises first (`v1.5.5` matches `1.5.5`), and it accepts an
+      abbreviation of a full commit id that is 7 or more hex characters
+      long. A receipt recorded under another id binds to nothing.
+
+   A help or version call, including one wrapped in a shell, `&&` or a
+   subcommand (`sh -c 'x --version'`, `true && x -V`, `x help sub`), is not
+   use. Re-running the commands shows that they reproduce, not that they meet
+   the four points, so a reproduce-only check is not an `agree`. When any
+   point fails, record `--verdict needs_changes`, which withholds `accepted`
+   (Section 5), and name the missing point. State in `--ref` what the review
+   itself did:
+   - which commands you re-ran (reproduce-only);
+   - which of the four points you checked (adequacy-checked).
+
+   A later reader can then tell the two apart. #201's seven receipts were
+   agreed after reproduction alone, and were then held at `needs_changes`
+   against these four points (#209).
 
    ```sh
    python3 scripts/host_receipts.py review \
@@ -354,11 +419,14 @@ for running them.
   not-yet-re-recorded status is allowed.
 
   A *qualifying* receipt, on either platform, is one for that `component_id`
-  that is `result: pass`, `evidence_class: native_proven`, stage `use` or
-  `install`, bound to the winner's current pin, independently reviewed (step
-  8) with no standing dissent, declares `host.second_physical_machine: true`,
-  and has `host.os`/`host.architecture` consistent with
-  `adoption/manifest.json`'s `platform_profiles[]` entry for that platform id.
+  that is `result: pass`, `evidence_class: native_proven`, stage `use`, bound
+  to the winner's current pin, independently reviewed (step 8) with no
+  standing dissent, declares `host.second_physical_machine: true`, and has
+  `host.os`/`host.architecture` consistent with `adoption/manifest.json`'s
+  `platform_profiles[]` entry for that platform id. The same receipt at stage
+  `install` (for example a version call) supports `conditional` at most: it
+  shows the binary resolves, not that the component does its layer's job
+  ([decision 2026-09-24](decisions/2026-09-24-accepted-needs-use-stage.md)).
   A `native_proven` fail at `use` or `install` that is the latest receipt for
   its host and stage is *blocking*, whatever its review, until that host
   records a later pass. The two platforms then differ:

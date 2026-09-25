@@ -1,0 +1,2731 @@
+{
+ "schema_version": 1,
+ "policy": {
+  "K": 3,
+  "min_gap_days": 7
+ },
+ "sweeps": [
+  {
+   "sweep_id": "landscape-sweep-20260923-attempt-1",
+   "date": "2026-09-23",
+   "workflow_run": "wf_28d47bbc-1b5",
+   "status": "stopped",
+   "manifest_ref": "catalogs/sota-convergence/manifest-20260923.json",
+   "manifest_sha256": "304d75dd0dabb02ba46191161732c17d234c3608a194f538c6bee6b64b8069c8",
+   "lane": "landscape-sweep-20260923",
+   "prompts_sha256": null,
+   "usage_ref": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
+   "usage_sha256": "801d59237231fddcae82ab5a19d3b25b09388e9b6f6f61e974073cf1251e63be",
+   "lower_bound_usage": true,
+   "record_ref": "evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json",
+   "lost_workers": [
+    "discover:token-efficiency",
+    "discover:quality-evaluation",
+    "discover:ci-supply-chain",
+    "discover:scheduling-supervision",
+    "discover:hosting-services",
+    "discover:recovery-portability",
+    "discover:observation-inference",
+    "discover:agent-sdks"
+   ],
+   "not_retained": [
+    "prompts_sha256",
+    "lane_returns"
+   ],
+   "notes": [
+    "Stopped by the coordinator when the user's effort policy changed to effort max for every worker; relaunched with identical prompts at effort max as wf_38aa6d5d-d6c.",
+    "Retained for audit only; nothing here was merged into manifest-20260923. No refuter evaluated these returns.",
+    "Repositories not proposed again by the completed run are not candidates of this wave; they are dated inputs for a later sweep.",
+    "The attempt record has no date of its own; date is catalogs/sota-convergence/manifest-20260923.json#/checked_at, the date of the superseding run wf_38aa6d5d-d6c.",
+    "This run produced no manifest; manifest_ref is the known/new baseline only, and the 8 children stopped in flight are lost_workers, with no layer entry."
+   ],
+   "prev_sha256": "6f7d7f8287906f08303525fe308d21a199c23fc9a5992da4690bdb52ba7cff8b",
+   "layers": [
+    {
+     "catalog": "foundation",
+     "layer_id": "code-navigation",
+     "requirement_sha256": "1ef34f38eebd4497e961ecb5b4447d098d4ba7d136f56dc60e51c39606c99ad8",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_returned",
+     "votes_note": "stopped after 9 discovery returns and 0 refuter returns (evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json)",
+     "calls": {
+      "web_search": 6,
+      "web_fetch": 0,
+      "gh_api": 30
+     },
+     "proposed": [
+      "https://github.com/scip-code/scip",
+      "https://github.com/facebookincubator/Glean",
+      "https://github.com/universal-ctags/ctags"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/scip-code/scip",
+      "https://github.com/facebookincubator/Glean",
+      "https://github.com/universal-ctags/ctags"
+     ],
+     "survived": [],
+     "refuted": [],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "document-retrieval",
+     "requirement_sha256": "9c18aa39fc1403f5dcff25d059ec77637d2a95df4c45faa6fc253cdacbf53a76",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_returned",
+     "votes_note": "stopped after 9 discovery returns and 0 refuter returns (evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json)",
+     "calls": {
+      "web_search": 3,
+      "web_fetch": 0,
+      "gh_api": 19
+     },
+     "proposed": [
+      "https://github.com/opendatalab/MinerU",
+      "https://github.com/datalab-to/marker",
+      "https://github.com/allenai/olmocr",
+      "https://github.com/Unstructured-IO/unstructured"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/opendatalab/MinerU",
+      "https://github.com/datalab-to/marker",
+      "https://github.com/allenai/olmocr",
+      "https://github.com/Unstructured-IO/unstructured"
+     ],
+     "survived": [],
+     "refuted": [],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "durable-memory",
+     "requirement_sha256": "7e41c5c3a4b3de9cf7b3c58dc65a2b92b70245a1de65ad3c2f0ecd71572819c1",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_returned",
+     "votes_note": "stopped after 9 discovery returns and 0 refuter returns (evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json)",
+     "calls": {
+      "web_search": 8,
+      "web_fetch": 0,
+      "gh_api": 21
+     },
+     "proposed": [
+      "https://github.com/doobidoo/mcp-memory-service",
+      "https://github.com/MemTensor/MemOS",
+      "https://github.com/NevaMind-AI/memU",
+      "https://github.com/modelcontextprotocol/servers"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/doobidoo/mcp-memory-service",
+      "https://github.com/MemTensor/MemOS",
+      "https://github.com/NevaMind-AI/memU",
+      "https://github.com/modelcontextprotocol/servers"
+     ],
+     "survived": [],
+     "refuted": [],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "instructions-skills",
+     "requirement_sha256": "1a095568d89a07d2d08bacd559f0cd5e5e2a13f39247e09977d5a30b0b294137",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_returned",
+     "votes_note": "stopped after 9 discovery returns and 0 refuter returns (evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json)",
+     "calls": {
+      "web_search": 8,
+      "web_fetch": 0,
+      "gh_api": 18
+     },
+     "proposed": [
+      "https://github.com/agentsmd/agents.md",
+      "https://github.com/agent-ecosystem/skill-validator"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/agentsmd/agents.md",
+      "https://github.com/agent-ecosystem/skill-validator"
+     ],
+     "survived": [],
+     "refuted": [],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "isolation",
+     "requirement_sha256": "0bf4bf6c3c95d0db4a706e900c65c4d8bb7c745c26f6fdd6ae8c866945c4df49",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_returned",
+     "votes_note": "stopped after 9 discovery returns and 0 refuter returns (evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json)",
+     "calls": {
+      "web_search": 2,
+      "web_fetch": 0,
+      "gh_api": 9
+     },
+     "proposed": [
+      "https://github.com/firecracker-microvm/firecracker",
+      "https://github.com/kata-containers/kata-containers",
+      "https://github.com/containers/bubblewrap",
+      "https://github.com/google/nsjail"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/firecracker-microvm/firecracker",
+      "https://github.com/kata-containers/kata-containers",
+      "https://github.com/containers/bubblewrap",
+      "https://github.com/google/nsjail"
+     ],
+     "survived": [],
+     "refuted": [],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "native-clients",
+     "requirement_sha256": "05399edb0f84f790f19a312272324d5ee9682d751e92721e929ec7a706928e87",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_returned",
+     "votes_note": "stopped after 9 discovery returns and 0 refuter returns (evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json)",
+     "calls": {
+      "web_search": 5,
+      "web_fetch": 0,
+      "gh_api": 26
+     },
+     "proposed": [
+      "https://github.com/google-gemini/gemini-cli",
+      "https://github.com/anomalyco/opencode",
+      "https://github.com/aaif-goose/goose"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/google-gemini/gemini-cli",
+      "https://github.com/anomalyco/opencode",
+      "https://github.com/aaif-goose/goose"
+     ],
+     "survived": [],
+     "refuted": [],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "semantic-rag",
+     "requirement_sha256": "3f19f7ecc004bfd0a4a22e68146ddf26ce85e0eca4290a76f9124d4711cd80f9",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_returned",
+     "votes_note": "stopped after 9 discovery returns and 0 refuter returns (evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json)",
+     "calls": {
+      "web_search": 4,
+      "web_fetch": 0,
+      "gh_api": 19
+     },
+     "proposed": [
+      "https://github.com/huggingface/text-embeddings-inference"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/huggingface/text-embeddings-inference"
+     ],
+     "survived": [],
+     "refuted": [],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "web-research",
+     "requirement_sha256": "c90c7296603e2905021600b07d55018b752fa8a02b017d57e946a1bc77fc75e6",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_returned",
+     "votes_note": "stopped after 9 discovery returns and 0 refuter returns (evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json)",
+     "calls": {
+      "web_search": 3,
+      "web_fetch": 0,
+      "gh_api": 18
+     },
+     "proposed": [
+      "https://github.com/microsoft/playwright-mcp",
+      "https://github.com/browserbase/stagehand",
+      "https://github.com/exa-labs/exa-mcp-server",
+      "https://github.com/jina-ai/reader"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/microsoft/playwright-mcp",
+      "https://github.com/browserbase/stagehand",
+      "https://github.com/exa-labs/exa-mcp-server",
+      "https://github.com/jina-ai/reader"
+     ],
+     "survived": [],
+     "refuted": [],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "workers",
+     "requirement_sha256": "84c867267a451e87491d14819310ec956908c15dedc94809e631611a467c6bd0",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_returned",
+     "votes_note": "stopped after 9 discovery returns and 0 refuter returns (evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json)",
+     "calls": {
+      "web_search": 4,
+      "web_fetch": 0,
+      "gh_api": 20
+     },
+     "proposed": [
+      "https://github.com/BloopAI/vibe-kanban",
+      "https://github.com/smtg-ai/claude-squad"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/BloopAI/vibe-kanban",
+      "https://github.com/smtg-ai/claude-squad"
+     ],
+     "survived": [],
+     "refuted": [],
+     "reopen": []
+    }
+   ]
+  },
+  {
+   "sweep_id": "landscape-sweep-20260923",
+   "date": "2026-09-23",
+   "workflow_run": "wf_38aa6d5d-d6c",
+   "status": "completed",
+   "manifest_ref": "catalogs/sota-convergence/manifest-20260923.json",
+   "manifest_sha256": "304d75dd0dabb02ba46191161732c17d234c3608a194f538c6bee6b64b8069c8",
+   "lane": "landscape-sweep-20260923",
+   "prompts_sha256": null,
+   "usage_ref": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_38aa6d5d-d6c.json",
+   "usage_sha256": "865fe3ad94f8cc0e8690e6f6b78b1b74dde5b9883fe2df12b52226a4c029bddc",
+   "lower_bound_usage": false,
+   "lane_calls": {
+    "web_search": 182,
+    "web_fetch": 74,
+    "gh_api": 1107
+   },
+   "not_retained": [
+    "prompts_sha256",
+    "lane_returns",
+    "per_layer_calls"
+   ],
+   "notes": [
+    "Lane limits: catalogs/sota-convergence/manifest-20260923.json#/lane_limits/landscape-sweep-20260923.",
+    "Per-vote returns were not retained; the manifest keeps each vote's refuted flag and a 400-character reasoning excerpt by lens index, without naming which lens was the facts or fit refuter, so no layer of this sweep counts as clean."
+   ],
+   "prev_sha256": "5d20ef4b9b416f09f69879f108a3d91720af66af5e1bb815878011fb00c5c588",
+   "layers": [
+    {
+     "catalog": "foundation",
+     "layer_id": "native-clients",
+     "requirement_sha256": "05399edb0f84f790f19a312272324d5ee9682d751e92721e929ec7a706928e87",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/anomalyco/opencode",
+      "https://github.com/google-gemini/gemini-cli"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/anomalyco/opencode",
+      "https://github.com/google-gemini/gemini-cli"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/anomalyco/opencode",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/0/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/0/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/google-gemini/gemini-cli",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/0/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/0/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "instructions-skills",
+     "requirement_sha256": "1a095568d89a07d2d08bacd559f0cd5e5e2a13f39247e09977d5a30b0b294137",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/agentplugins/agent-plugins-spec",
+      "https://github.com/agentsmd/agents.md",
+      "https://github.com/obra/superpowers",
+      "https://github.com/vercel-labs/skills",
+      "https://github.com/intellectronica/ruler"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/agentplugins/agent-plugins-spec",
+      "https://github.com/agentsmd/agents.md",
+      "https://github.com/obra/superpowers",
+      "https://github.com/vercel-labs/skills",
+      "https://github.com/intellectronica/ruler"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/agentplugins/agent-plugins-spec",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/1/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/1/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/agentsmd/agents.md",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/1/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/1/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/obra/superpowers",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/1/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/1/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/vercel-labs/skills",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/1/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/1/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/intellectronica/ruler",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/1/candidates/6/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/1/candidates/6/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "workers",
+     "requirement_sha256": "84c867267a451e87491d14819310ec956908c15dedc94809e631611a467c6bd0",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/HKUDS/DeepCode",
+      "https://github.com/gastownhall/gastown",
+      "https://github.com/nimbalyst/nimbalyst"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/HKUDS/DeepCode",
+      "https://github.com/gastownhall/gastown",
+      "https://github.com/nimbalyst/nimbalyst"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/HKUDS/DeepCode",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/2/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/2/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/gastownhall/gastown",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/2/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/2/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/nimbalyst/nimbalyst",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/2/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/2/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "isolation",
+     "requirement_sha256": "0bf4bf6c3c95d0db4a706e900c65c4d8bb7c745c26f6fdd6ae8c866945c4df49",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/TencentCloud/CubeSandbox",
+      "https://github.com/firecracker-microvm/firecracker",
+      "https://github.com/BloopAI/vibe-kanban",
+      "https://github.com/kata-containers/kata-containers"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/TencentCloud/CubeSandbox",
+      "https://github.com/firecracker-microvm/firecracker",
+      "https://github.com/BloopAI/vibe-kanban",
+      "https://github.com/kata-containers/kata-containers"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/TencentCloud/CubeSandbox",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/3/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/3/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/firecracker-microvm/firecracker",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/3/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/3/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/BloopAI/vibe-kanban",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/3/candidates/5/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/3/candidates/5/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/kata-containers/kata-containers",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/3/candidates/6/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/3/candidates/6/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "code-navigation",
+     "requirement_sha256": "1ef34f38eebd4497e961ecb5b4447d098d4ba7d136f56dc60e51c39606c99ad8",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/scip-code/scip",
+      "https://github.com/sourcegraph/zoekt",
+      "https://github.com/universal-ctags/ctags"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/scip-code/scip",
+      "https://github.com/sourcegraph/zoekt",
+      "https://github.com/universal-ctags/ctags"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/scip-code/scip",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/4/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/4/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/sourcegraph/zoekt",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/4/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/4/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/universal-ctags/ctags",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/4/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/4/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "document-retrieval",
+     "requirement_sha256": "9c18aa39fc1403f5dcff25d059ec77637d2a95df4c45faa6fc253cdacbf53a76",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/datalab-to/marker",
+      "https://github.com/opendatalab/MinerU",
+      "https://github.com/PaddlePaddle/PaddleOCR",
+      "https://github.com/Unstructured-IO/unstructured",
+      "https://github.com/allenai/olmocr",
+      "https://github.com/datalab-to/chandra"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/datalab-to/marker",
+      "https://github.com/opendatalab/MinerU",
+      "https://github.com/PaddlePaddle/PaddleOCR",
+      "https://github.com/Unstructured-IO/unstructured",
+      "https://github.com/allenai/olmocr",
+      "https://github.com/datalab-to/chandra"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/datalab-to/marker",
+       "source_review": "evidence/artifacts/landscape-sweep-20260923/datalab-to-marker.json",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/opendatalab/MinerU",
+       "source_review": "evidence/artifacts/landscape-sweep-20260923/opendatalab-mineru.json",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/PaddlePaddle/PaddleOCR",
+       "source_review": "evidence/artifacts/landscape-sweep-20260923/paddlepaddle-paddleocr.json",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/Unstructured-IO/unstructured",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/allenai/olmocr",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/5/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/5/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/datalab-to/chandra",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/6/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/6/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "semantic-rag",
+     "requirement_sha256": "3f19f7ecc004bfd0a4a22e68146ddf26ce85e0eca4290a76f9124d4711cd80f9",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/ollama/ollama",
+      "https://github.com/cocoindex-io/cocoindex",
+      "https://github.com/huggingface/text-embeddings-inference",
+      "https://github.com/continuedev/continue"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/ollama/ollama",
+      "https://github.com/cocoindex-io/cocoindex",
+      "https://github.com/huggingface/text-embeddings-inference",
+      "https://github.com/continuedev/continue"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/ollama/ollama",
+       "source_review": "evidence/artifacts/landscape-sweep-20260923/ollama-ollama.json",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/6/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/6/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/cocoindex-io/cocoindex",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/6/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/6/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/huggingface/text-embeddings-inference",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/6/candidates/5/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/6/candidates/5/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/continuedev/continue",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/6/candidates/6/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/6/candidates/6/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "durable-memory",
+     "requirement_sha256": "7e41c5c3a4b3de9cf7b3c58dc65a2b92b70245a1de65ad3c2f0ecd71572819c1",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/AVIDS2/memorix",
+      "https://github.com/MemTensor/MemOS",
+      "https://github.com/doobidoo/mcp-memory-service"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/AVIDS2/memorix",
+      "https://github.com/MemTensor/MemOS",
+      "https://github.com/doobidoo/mcp-memory-service"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/AVIDS2/memorix",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/7/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/7/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/MemTensor/MemOS",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/7/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/7/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/doobidoo/mcp-memory-service",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/7/candidates/5/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/7/candidates/5/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "web-research",
+     "requirement_sha256": "c90c7296603e2905021600b07d55018b752fa8a02b017d57e946a1bc77fc75e6",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/exa-labs/exa-mcp-server",
+      "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+      "https://github.com/jina-ai/reader",
+      "https://github.com/steel-dev/steel-browser",
+      "https://github.com/browserbase/stagehand"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/exa-labs/exa-mcp-server",
+      "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+      "https://github.com/jina-ai/reader",
+      "https://github.com/steel-dev/steel-browser",
+      "https://github.com/browserbase/stagehand"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/exa-labs/exa-mcp-server",
+       "source_review": "evidence/artifacts/landscape-sweep-20260923/exa-labs-exa-mcp-server.json",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/8/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/8/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/8/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/8/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/jina-ai/reader",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/8/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/8/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/steel-dev/steel-browser",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/8/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/8/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/browserbase/stagehand",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/8/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/8/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "token-efficiency",
+     "requirement_sha256": "550781682cd15dad5061ce74f8335fb3ecaf8234b25772a88a11c104e8099a6e",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/BerriAI/litellm",
+      "https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor",
+      "https://github.com/microsoft/LLMLingua",
+      "https://github.com/coderamp-labs/gitingest"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/BerriAI/litellm",
+      "https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor",
+      "https://github.com/microsoft/LLMLingua",
+      "https://github.com/coderamp-labs/gitingest"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/BerriAI/litellm",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/9/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/9/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/9/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/9/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/microsoft/LLMLingua",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/9/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/9/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/coderamp-labs/gitingest",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/9/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/9/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "quality-evaluation",
+     "requirement_sha256": "6b73a569e50fd0c2e3dcf534674115943253b4d66663e50a92d552708d138a97",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/HypothesisWorks/hypothesis",
+      "https://github.com/semgrep/semgrep",
+      "https://github.com/stryker-mutator/stryker-js",
+      "https://github.com/confident-ai/deepeval"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/HypothesisWorks/hypothesis",
+      "https://github.com/semgrep/semgrep",
+      "https://github.com/stryker-mutator/stryker-js",
+      "https://github.com/confident-ai/deepeval"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/HypothesisWorks/hypothesis",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/10/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/10/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/semgrep/semgrep",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/10/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/10/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/stryker-mutator/stryker-js",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/10/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/10/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/confident-ai/deepeval",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/10/candidates/8/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/10/candidates/8/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "ci-supply-chain",
+     "requirement_sha256": "7541357e60b31124c35f70256419b2c5f3868940ecc53412239d96d3603c7e34",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/ossf/allstar"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/ossf/allstar"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/ossf/allstar",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/11/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/11/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "scheduling-supervision",
+     "requirement_sha256": "0500b3a76f92e3729e633ed4b18dd687983369dce5bf162e612fffa0b3be513d",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/Nukesor/pueue",
+      "https://github.com/dbos-inc/dbos-transact-py",
+      "https://github.com/skarnet/s6",
+      "https://github.com/windmill-labs/windmill"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/Nukesor/pueue",
+      "https://github.com/dbos-inc/dbos-transact-py",
+      "https://github.com/skarnet/s6",
+      "https://github.com/windmill-labs/windmill"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/Nukesor/pueue",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/12/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/12/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/dbos-inc/dbos-transact-py",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/12/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/12/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/skarnet/s6",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/12/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/12/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/windmill-labs/windmill",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/12/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/12/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "hosting-services",
+     "requirement_sha256": "48c6a135983cda6c8eefb9848955270b55aed9ef5d6073ff9edeb90c2ba2b624",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/basecamp/kamal",
+      "https://github.com/grafana/k6",
+      "https://github.com/oauth2-proxy/oauth2-proxy",
+      "https://github.com/pgbackrest/pgbackrest"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/basecamp/kamal",
+      "https://github.com/grafana/k6",
+      "https://github.com/oauth2-proxy/oauth2-proxy",
+      "https://github.com/pgbackrest/pgbackrest"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/basecamp/kamal",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/13/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/13/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/grafana/k6",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/13/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/13/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/oauth2-proxy/oauth2-proxy",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/13/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/13/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/pgbackrest/pgbackrest",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/13/candidates/5/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/13/candidates/5/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "recovery-portability",
+     "requirement_sha256": "a8f3f5c054ca28031260c8188b78970dc87250f0b4a94ac36658e286c4be333c",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/borgbackup/borg",
+      "https://github.com/checkpoint-restore/criu",
+      "https://github.com/getsops/sops"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/borgbackup/borg",
+      "https://github.com/checkpoint-restore/criu",
+      "https://github.com/getsops/sops"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/borgbackup/borg",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/14/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/14/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/checkpoint-restore/criu",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/14/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/14/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/getsops/sops",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/14/candidates/5/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/14/candidates/5/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "observation-inference",
+     "requirement_sha256": "3a68575079a1c43b718c4eb417317c5cb336dab6848e12b4f36df30fe10a154c",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/grafana/tempo",
+      "https://github.com/data-privacy-stack/presidio",
+      "https://github.com/vectordotdev/vector"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/grafana/tempo",
+      "https://github.com/data-privacy-stack/presidio",
+      "https://github.com/vectordotdev/vector"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/grafana/tempo",
+       "source_review": "evidence/artifacts/landscape-sweep-20260923/grafana-tempo.json",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/15/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/15/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/data-privacy-stack/presidio",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/15/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/15/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/vectordotdev/vector",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/15/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/15/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "agent-sdks",
+     "requirement_sha256": "e2a4bef5dcc9f4e1c0e06df41f5bf6ba27d9a18fb81ded371ac77bed163f36c4",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/google/adk-python",
+      "https://github.com/pydantic/pydantic-ai",
+      "https://github.com/strands-agents/harness-sdk"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/google/adk-python",
+      "https://github.com/pydantic/pydantic-ai",
+      "https://github.com/strands-agents/harness-sdk"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/google/adk-python",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/16/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/16/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/pydantic/pydantic-ai",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/16/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/16/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/strands-agents/harness-sdk",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/16/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/16/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "mcp-surfaces",
+     "requirement_sha256": "772dbba88018c58887ad2e7b5335a4658cb4b3237653ea19cfaff774738c754f",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/MCPJam/inspector",
+      "https://github.com/microsoft/mcp-gateway",
+      "https://github.com/docker/mcp-registry",
+      "https://github.com/modelcontextprotocol/registry"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/MCPJam/inspector",
+      "https://github.com/microsoft/mcp-gateway",
+      "https://github.com/docker/mcp-registry",
+      "https://github.com/modelcontextprotocol/registry"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/MCPJam/inspector",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/17/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/17/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/microsoft/mcp-gateway",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/17/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/17/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/docker/mcp-registry",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/17/candidates/5/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/17/candidates/5/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/modelcontextprotocol/registry",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/17/candidates/6/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/17/candidates/6/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "secrets-credentials",
+     "requirement_sha256": "90fc33447f621715fdc6efcb806daa2a0e9ba88283d5370183925ec52525d57e",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/trufflesecurity/trufflehog",
+      "https://github.com/betterleaks/betterleaks",
+      "https://github.com/Yelp/detect-secrets",
+      "https://github.com/getsops/sops",
+      "https://github.com/GitGuardian/ggshield",
+      "https://github.com/Infisical/infisical"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/trufflesecurity/trufflehog",
+      "https://github.com/betterleaks/betterleaks",
+      "https://github.com/Yelp/detect-secrets",
+      "https://github.com/getsops/sops",
+      "https://github.com/GitGuardian/ggshield",
+      "https://github.com/Infisical/infisical"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/trufflesecurity/trufflehog",
+       "source_review": "evidence/artifacts/landscape-sweep-20260923/trufflesecurity-trufflehog.json",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/18/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/18/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/betterleaks/betterleaks",
+       "source_review": "evidence/artifacts/landscape-sweep-20260923/betterleaks-betterleaks.json",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/18/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/18/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/Yelp/detect-secrets",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/18/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/18/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/getsops/sops",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/18/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/18/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/GitGuardian/ggshield",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/18/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/18/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/Infisical/infisical",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/18/candidates/5/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/18/candidates/5/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "git-github-automation",
+     "requirement_sha256": "430b1de3110ad4f3f7dcc4b20426393d6c67c57427dcbc56472b8081e8f9cab1",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/anthropics/claude-code-action",
+      "https://github.com/The-PR-Agent/pr-agent",
+      "https://github.com/jj-vcs/jj",
+      "https://github.com/openai/codex-action",
+      "https://github.com/reviewdog/reviewdog"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/anthropics/claude-code-action",
+      "https://github.com/The-PR-Agent/pr-agent",
+      "https://github.com/jj-vcs/jj",
+      "https://github.com/openai/codex-action",
+      "https://github.com/reviewdog/reviewdog"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/anthropics/claude-code-action",
+       "source_review": "evidence/artifacts/landscape-sweep-20260923/anthropics-claude-code-action.json",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/The-PR-Agent/pr-agent",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/jj-vcs/jj",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/openai/codex-action",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/reviewdog/reviewdog",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "us-equities",
+     "layer_id": "market-data-reference",
+     "requirement_sha256": "470a282980e83bf48422965f735db212330fe93bc511cd48149830d494029184",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/Nasdaq/data-link-python",
+      "https://github.com/wharton/wrds"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/Nasdaq/data-link-python",
+      "https://github.com/wharton/wrds"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/Nasdaq/data-link-python",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/0/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/0/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/wharton/wrds",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/0/candidates/5/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/0/candidates/5/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "us-equities",
+     "layer_id": "identity-provenance",
+     "requirement_sha256": "470a282980e83bf48422965f735db212330fe93bc511cd48149830d494029184",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/MarquezProject/marquez",
+      "https://github.com/fivetran/great_expectations",
+      "https://github.com/delta-io/delta",
+      "https://github.com/projectnessie/nessie"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/MarquezProject/marquez",
+      "https://github.com/fivetran/great_expectations",
+      "https://github.com/delta-io/delta",
+      "https://github.com/projectnessie/nessie"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/MarquezProject/marquez",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/1/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/1/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/fivetran/great_expectations",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/1/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/1/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/delta-io/delta",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/1/candidates/5/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/1/candidates/5/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/projectnessie/nessie",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/1/candidates/6/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/1/candidates/6/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "us-equities",
+     "layer_id": "storage-compute",
+     "requirement_sha256": "470a282980e83bf48422965f735db212330fe93bc511cd48149830d494029184",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/duckdb/ducklake",
+      "https://github.com/fivetran/great_expectations",
+      "https://github.com/xtdb/xtdb"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/duckdb/ducklake",
+      "https://github.com/fivetran/great_expectations",
+      "https://github.com/xtdb/xtdb"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/duckdb/ducklake",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/2/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/2/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/fivetran/great_expectations",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/2/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/2/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/xtdb/xtdb",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/2/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/2/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "us-equities",
+     "layer_id": "data-quality-orchestration",
+     "requirement_sha256": "bd85b01972ad3ff392207528f43ed236828a6fec151396d786b3849936e801e8",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/dbos-inc/dbos-transact-py",
+      "https://github.com/fivetran/great_expectations",
+      "https://github.com/hatchet-dev/hatchet"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/dbos-inc/dbos-transact-py",
+      "https://github.com/fivetran/great_expectations",
+      "https://github.com/hatchet-dev/hatchet"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/dbos-inc/dbos-transact-py",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/3/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/3/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/fivetran/great_expectations",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/3/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/3/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/hatchet-dev/hatchet",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/3/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/3/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "us-equities",
+     "layer_id": "research-factors-ml",
+     "requirement_sha256": "05654fcd99ad74800f9912a667b3e6ec90af3014531c71fea9511dbba1bd72fd",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/lightgbm-org/LightGBM",
+      "https://github.com/microsoft/RD-Agent",
+      "https://github.com/ICT-FinD-Lab/alphagen"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/lightgbm-org/LightGBM",
+      "https://github.com/microsoft/RD-Agent",
+      "https://github.com/ICT-FinD-Lab/alphagen"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/lightgbm-org/LightGBM",
+       "source_review": "evidence/artifacts/landscape-sweep-20260923/lightgbm-org-lightgbm.json",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/4/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/4/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/microsoft/RD-Agent",
+       "source_review": "evidence/artifacts/landscape-sweep-20260923/microsoft-rd-agent.json",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/4/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/4/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/ICT-FinD-Lab/alphagen",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/4/candidates/5/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/4/candidates/5/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "us-equities",
+     "layer_id": "backtesting-engine",
+     "requirement_sha256": "05654fcd99ad74800f9912a667b3e6ec90af3014531c71fea9511dbba1bd72fd",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "discovery return not retained; the manifest has no lane rows for this layer, so an empty proposal set cannot be verified",
+     "calls": null,
+     "proposed": [],
+     "known": [],
+     "new": [],
+     "survived": [],
+     "refuted": [],
+     "reopen": []
+    },
+    {
+     "catalog": "us-equities",
+     "layer_id": "execution-broker",
+     "requirement_sha256": "05654fcd99ad74800f9912a667b3e6ec90af3014531c71fea9511dbba1bd72fd",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/QuantConnect/Lean.Brokerages.InteractiveBrokers",
+      "https://github.com/Voyz/ibeam",
+      "https://github.com/Voyz/ibind"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/QuantConnect/Lean.Brokerages.InteractiveBrokers",
+      "https://github.com/Voyz/ibeam",
+      "https://github.com/Voyz/ibind"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/QuantConnect/Lean.Brokerages.InteractiveBrokers",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/6/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/6/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/Voyz/ibeam",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/6/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/6/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/Voyz/ibind",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/6/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/6/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "us-equities",
+     "layer_id": "portfolio-risk",
+     "requirement_sha256": "05654fcd99ad74800f9912a667b3e6ec90af3014531c71fea9511dbba1bd72fd",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/dcajasn/Riskfolio-Lib"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/dcajasn/Riskfolio-Lib"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/dcajasn/Riskfolio-Lib",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/7/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/7/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "us-equities",
+     "layer_id": "evaluation-experiments",
+     "requirement_sha256": "bd85b01972ad3ff392207528f43ed236828a6fec151396d786b3849936e801e8",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/comet-ml/opik",
+      "https://github.com/confident-ai/deepeval",
+      "https://github.com/langfuse/langfuse"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/comet-ml/opik",
+      "https://github.com/confident-ai/deepeval",
+      "https://github.com/langfuse/langfuse"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/comet-ml/opik",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/8/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/8/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/confident-ai/deepeval",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/8/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/8/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/langfuse/langfuse",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/8/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/8/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "us-equities",
+     "layer_id": "agents-models-workers",
+     "requirement_sha256": "c2358d8f11c2f15c2f4494c8de4cbe8ffb4dcac77f0af2a098163b354e5e7b01",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/confident-ai/deepeval",
+      "https://github.com/infiniflow/ragflow",
+      "https://github.com/google-gemini/gemini-cli",
+      "https://github.com/modelcontextprotocol/servers"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/confident-ai/deepeval",
+      "https://github.com/infiniflow/ragflow",
+      "https://github.com/google-gemini/gemini-cli",
+      "https://github.com/modelcontextprotocol/servers"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/confident-ai/deepeval",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/9/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/9/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/infiniflow/ragflow",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/9/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/9/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/google-gemini/gemini-cli",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/9/candidates/4/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/9/candidates/4/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/modelcontextprotocol/servers",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/9/candidates/5/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/9/candidates/5/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "us-equities",
+     "layer_id": "observability-hosting",
+     "requirement_sha256": "bd85b01972ad3ff392207528f43ed236828a6fec151396d786b3849936e801e8",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/SigNoz/signoz",
+      "https://github.com/langfuse/langfuse",
+      "https://github.com/vectordotdev/vector"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/SigNoz/signoz",
+      "https://github.com/langfuse/langfuse",
+      "https://github.com/vectordotdev/vector"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/SigNoz/signoz",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/10/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/10/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/langfuse/langfuse",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/10/candidates/2/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/10/candidates/2/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/vectordotdev/vector",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/10/candidates/3/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/10/candidates/3/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "us-equities",
+     "layer_id": "security-supply-chain",
+     "requirement_sha256": "bd85b01972ad3ff392207528f43ed236828a6fec151396d786b3849936e801e8",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "not_retained",
+     "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+     "calls": null,
+     "proposed": [
+      "https://github.com/semgrep/semgrep",
+      "https://github.com/trufflesecurity/trufflehog"
+     ],
+     "known": [],
+     "new": [
+      "https://github.com/semgrep/semgrep",
+      "https://github.com/trufflesecurity/trufflehog"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/semgrep/semgrep",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/11/candidates/0/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/11/candidates/0/adversarial_verification/votes/1"
+        }
+       ]
+      },
+      {
+       "repo": "https://github.com/trufflesecurity/trufflehog",
+       "lens_votes": [
+        {
+         "lens": 0,
+         "vote": "not_refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/11/candidates/1/adversarial_verification/votes/0"
+        },
+        {
+         "lens": 1,
+         "vote": "refuted",
+         "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/11/candidates/1/adversarial_verification/votes/1"
+        }
+       ]
+      }
+     ],
+     "reopen": []
+    }
+   ]
+  }
+ ],
+ "head_sha256": "7f9f4619e052f685303ccd021c01067a90062141d5eaf7afc712d8213e468cd6"
+}

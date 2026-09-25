@@ -1,0 +1,3970 @@
+{
+  "accounting": {
+    "cash_delta_usd": "-1.51",
+    "cumulative_realized_loss_usd": "1.79",
+    "drawdown_usd": "1.62",
+    "gross_exposure_usd": "0",
+    "gross_loss_usd": "1.79",
+    "halted_reason": null,
+    "held_symbols": 0,
+    "outstanding_orders": 0,
+    "peak_pnl_usd": "0.11",
+    "pending_buy_notional_usd": "0",
+    "realized_pnl_usd": "-1.51",
+    "unrealized_pnl_usd": "0"
+  },
+  "adapter_errors": [],
+  "boundary_receipts": [],
+  "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+  "dropped_quotes": {
+    "by_reason": {
+      "crossed": 16
+    },
+    "by_symbol": {
+      "CRWV": 3,
+      "INTC": 4,
+      "META": 1,
+      "MSFT": 1,
+      "QQQ": 1,
+      "TSLA": 6
+    }
+  },
+  "elapsed_seconds": 300.39838579201023,
+  "engine": "NautilusTrader LiveNode 2.0.0rc5",
+  "events": [
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259825.545454,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259827.561043,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259829.57521,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259831.5904698,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259833.6073658,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259835.6230688,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259837.640106,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259839.657413,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259841.673242,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259843.687583,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259845.699418,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259847.715206,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259849.72995,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259851.750081,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259853.776614,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259855.8010461,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.028057,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 4.2648447825074935,
+          "family": "relative_strength",
+          "score": 4.2648447825074935,
+          "symbol": "IWM"
+        }
+      ],
+      "targets": {
+        "IWM": 1
+      },
+      "timestamp": 1790259857.821156,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000001",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "IWM",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.028057,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {
+        "IWM": "1"
+      },
+      "timestamp": 1790259859.852205,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.028055,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {
+        "IWM": "1"
+      },
+      "timestamp": 1790259861.877862,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "IWM": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259863.9072058,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000002",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "IWM",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259865.931349,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259867.9727008,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259870.0403771,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259872.0875819,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259874.121461,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259876.1522539,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259878.201142,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.03782,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 13.737683399575594,
+          "family": "relative_strength",
+          "score": 7.843420371489016,
+          "symbol": "TSLA"
+        }
+      ],
+      "targets": {
+        "TSLA": 1
+      },
+      "timestamp": 1790259880.2366679,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000003",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "TSLA",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.037824,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 14.511605686275963,
+          "family": "relative_strength",
+          "score": 8.378679306639741,
+          "symbol": "TSLA"
+        }
+      ],
+      "targets": {
+        "TSLA": 1
+      },
+      "timestamp": 1790259882.275091,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.037832,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 16.599221652705275,
+          "family": "relative_strength",
+          "score": 9.614355194261247,
+          "symbol": "TSLA"
+        }
+      ],
+      "targets": {
+        "TSLA": 1
+      },
+      "timestamp": 1790259884.2909582,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.03783,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 15.921390726240936,
+          "family": "relative_strength",
+          "score": 9.169356290473939,
+          "symbol": "TSLA"
+        }
+      ],
+      "targets": {
+        "TSLA": 1
+      },
+      "timestamp": 1790259886.31037,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.037818,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 13.25288844370942,
+          "family": "relative_strength",
+          "score": 7.36195511971181,
+          "symbol": "TSLA"
+        }
+      ],
+      "targets": {
+        "TSLA": 1
+      },
+      "timestamp": 1790259888.3281112,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.03782,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 11.528553233018934,
+          "family": "relative_strength",
+          "score": 6.49636726546618,
+          "symbol": "TSLA"
+        }
+      ],
+      "targets": {
+        "TSLA": "1"
+      },
+      "timestamp": 1790259890.334207,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.037823,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 8.362767803685722,
+          "family": "relative_strength",
+          "score": 5.1805432478158355,
+          "symbol": "TSLA"
+        }
+      ],
+      "targets": {
+        "TSLA": "1"
+      },
+      "timestamp": 1790259892.352673,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.037829,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 6.2787175555267805,
+          "family": "relative_strength",
+          "score": 4.201257988445478,
+          "symbol": "TSLA"
+        }
+      ],
+      "targets": {
+        "TSLA": 1
+      },
+      "timestamp": 1790259894.372652,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.037838,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 11.537677639852085,
+          "family": "relative_strength",
+          "score": 8.018533417498551,
+          "symbol": "TSLA"
+        }
+      ],
+      "targets": {
+        "TSLA": 1
+      },
+      "timestamp": 1790259896.389872,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.037838,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 13.200241472329788,
+          "family": "relative_strength",
+          "score": 9.55482926913918,
+          "symbol": "TSLA"
+        }
+      ],
+      "targets": {
+        "TSLA": 1
+      },
+      "timestamp": 1790259898.4094641,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.037814,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 7.144038742182557,
+          "family": "relative_strength",
+          "score": 4.036999369960538,
+          "symbol": "TSLA"
+        }
+      ],
+      "targets": {
+        "TSLA": 1
+      },
+      "timestamp": 1790259900.429495,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "TSLA": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259902.44754,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000004",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "TSLA",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259904.465083,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259906.483354,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259908.513957,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259910.5360792,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259912.555613,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.095978,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 5.324036542392885,
+          "family": "relative_strength",
+          "score": 5.324036542392885,
+          "symbol": "NVDA"
+        },
+        {
+          "edge_bps": 4.352395026862577,
+          "family": "relative_strength",
+          "score": 4.352395026862577,
+          "symbol": "QQQ"
+        }
+      ],
+      "targets": {
+        "NVDA": 1,
+        "QQQ": 1
+      },
+      "timestamp": 1790259914.584853,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000005",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "NVDA",
+      "type": "intent"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000006",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "QQQ",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.172639,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 35.84016097478382,
+          "family": "relative_strength",
+          "score": 16.435414906173268,
+          "symbol": "META"
+        },
+        {
+          "edge_bps": 6.659276073980314,
+          "family": "relative_strength",
+          "score": 6.659276073980314,
+          "symbol": "NVDA"
+        }
+      ],
+      "targets": {
+        "META": 1,
+        "NVDA": "1",
+        "QQQ": "1"
+      },
+      "timestamp": 1790259916.6150231,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000007",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "META",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.172605,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 32.865956559801624,
+          "family": "relative_strength",
+          "score": 15.14837170938617,
+          "symbol": "META"
+        },
+        {
+          "edge_bps": 5.5837066157765625,
+          "family": "relative_strength",
+          "score": 5.5837066157765625,
+          "symbol": "NVDA"
+        }
+      ],
+      "targets": {
+        "META": "1",
+        "NVDA": "1",
+        "QQQ": "1"
+      },
+      "timestamp": 1790259918.737973,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.172591,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 25.141742591109907,
+          "family": "relative_strength",
+          "score": 11.926103777147222,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "META": "1",
+        "NVDA": "1",
+        "QQQ": "1"
+      },
+      "timestamp": 1790259920.760096,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.07658999999999999,
+      "exits": {
+        "NVDA": "portfolio_rotation",
+        "QQQ": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 14.70965613927705,
+          "family": "relative_strength",
+          "score": 6.042112291258387,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "META": 1
+      },
+      "timestamp": 1790259922.785429,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000008",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "QQQ",
+      "type": "intent"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000009",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "NVDA",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "META": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259924.808181,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000010",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "META",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259926.830312,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259928.859849,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259930.878964,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259932.9016519,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259934.924781,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259936.94625,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259938.965803,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259940.98621,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259943.006507,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259945.026159,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259947.0473468,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259949.0699708,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259951.089837,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259953.1097028,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259955.129961,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259957.1510131,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259959.171902,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259961.1911628,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259963.2114692,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259965.2330072,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.01241,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 4.843451692667089,
+          "family": "relative_strength",
+          "score": 3.0215321657869665,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790259967.258067,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000011",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "INTC",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.021179000000000003,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 13.870515297255693,
+          "family": "relative_strength",
+          "score": 5.845585306087587,
+          "symbol": "CRWV"
+        },
+        {
+          "edge_bps": 7.142132206689467,
+          "family": "relative_strength",
+          "score": 4.145311508086407,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "CRWV": 1,
+        "INTC": "1"
+      },
+      "timestamp": 1790259969.2777421,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000012",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "CRWV",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.021186,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 22.911114343752704,
+          "family": "relative_strength",
+          "score": 9.077804594934198,
+          "symbol": "CRWV"
+        },
+        {
+          "edge_bps": 10.42619780052323,
+          "family": "relative_strength",
+          "score": 6.004086607492155,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "CRWV": 1,
+        "INTC": "1"
+      },
+      "timestamp": 1790259971.298263,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.021184,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 25.316732797506237,
+          "family": "relative_strength",
+          "score": 10.087295545833593,
+          "symbol": "CRWV"
+        },
+        {
+          "edge_bps": 7.155637956900995,
+          "family": "relative_strength",
+          "score": 3.883364147214656,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "CRWV": 1,
+        "INTC": 1
+      },
+      "timestamp": 1790259973.3199842,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.021183999999999998,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 24.59142005721948,
+          "family": "relative_strength",
+          "score": 9.644101241945362,
+          "symbol": "CRWV"
+        },
+        {
+          "edge_bps": 6.835161309955984,
+          "family": "relative_strength",
+          "score": 3.779404909535947,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "CRWV": 1,
+        "INTC": 1
+      },
+      "timestamp": 1790259975.34147,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.021182,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 29.65874820268055,
+          "family": "relative_strength",
+          "score": 11.966296284435034,
+          "symbol": "CRWV"
+        },
+        {
+          "edge_bps": 6.177149547703098,
+          "family": "relative_strength",
+          "score": 3.384305330034511,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "CRWV": 1,
+        "INTC": 1
+      },
+      "timestamp": 1790259977.363229,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.021183999999999998,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 33.14685769889247,
+          "family": "relative_strength",
+          "score": 13.744091343823737,
+          "symbol": "CRWV"
+        },
+        {
+          "edge_bps": 8.417706323028407,
+          "family": "relative_strength",
+          "score": 4.693158627114327,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "CRWV": 1,
+        "INTC": 1
+      },
+      "timestamp": 1790259979.3849,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.008773999999999999,
+      "exits": {
+        "INTC": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 26.96376505857162,
+          "family": "relative_strength",
+          "score": 10.833495833460928,
+          "symbol": "CRWV"
+        }
+      ],
+      "targets": {
+        "CRWV": 1
+      },
+      "timestamp": 1790259981.4152021,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000013",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "INTC",
+      "type": "intent"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000014",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "CRWV",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.008777,
+      "exits": {
+        "INTC": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 28.8223669889176,
+          "family": "relative_strength",
+          "score": 11.950257997184815,
+          "symbol": "CRWV"
+        }
+      ],
+      "targets": {
+        "CRWV": "1"
+      },
+      "timestamp": 1790259983.437421,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.008777,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 28.184084444894953,
+          "family": "relative_strength",
+          "score": 11.639816996636622,
+          "symbol": "CRWV"
+        }
+      ],
+      "targets": {
+        "CRWV": "1"
+      },
+      "timestamp": 1790259985.460268,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.008777,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 27.622224332450873,
+          "family": "relative_strength",
+          "score": 11.868830924625135,
+          "symbol": "CRWV"
+        }
+      ],
+      "targets": {
+        "CRWV": 1
+      },
+      "timestamp": 1790259987.4818401,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "CRWV": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259989.501206,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000015",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "CRWV",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "CRWV": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259991.523843,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "CRWV": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259993.5465531,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "CRWV": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790259995.567379,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.076757,
+      "exits": {
+        "CRWV": "trailing_stop"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 11.26503536050122,
+          "family": "relative_strength",
+          "score": 5.379925643756104,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "META": 1
+      },
+      "timestamp": 1790259997.5875158,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000016",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "META",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.076736,
+      "exits": {
+        "CRWV": "trailing_stop"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 6.589328419614182,
+          "family": "relative_strength",
+          "score": 4.460523819094643,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "META": "1"
+      },
+      "timestamp": 1790259999.608991,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000017",
+      "reason": "trailing_stop",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "CRWV",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.07672999999999999,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 9.875767450739925,
+          "family": "relative_strength",
+          "score": 7.2886721803456185,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "META": "1"
+      },
+      "timestamp": 1790260001.632409,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.076723,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 6.02353920227311,
+          "family": "relative_strength",
+          "score": 4.516546958303364,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "META": 1
+      },
+      "timestamp": 1790260003.6557262,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "META": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260005.67777,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000018",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "META",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "META": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260007.696139,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260009.7985,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260011.819871,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260013.840408,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.01241,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 4.771505735211012,
+          "family": "relative_strength",
+          "score": 3.3668431177450406,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790260015.8623161,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000019",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "INTC",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.012415,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 5.660120497060217,
+          "family": "relative_strength",
+          "score": 3.8228447140004915,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": "1"
+      },
+      "timestamp": 1790260017.883307,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012412000000000001,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {
+        "INTC": "1"
+      },
+      "timestamp": 1790260019.903798,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "INTC": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260021.92524,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000020",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "INTC",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260023.945207,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260025.964541,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260027.986016,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260030.003958,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260032.029875,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260034.051937,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012417000000000001,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 8.329439284155416,
+          "family": "relative_strength",
+          "score": 5.369191708130128,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790260036.081391,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000021",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "INTC",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.089191,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 8.969723463103652,
+          "family": "relative_strength",
+          "score": 5.531689415199489,
+          "symbol": "INTC"
+        },
+        {
+          "edge_bps": 7.225728555044775,
+          "family": "relative_strength",
+          "score": 5.328590808700291,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "INTC": "1",
+        "META": 1
+      },
+      "timestamp": 1790260038.115573,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000022",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "META",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.012425,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 8.561898712968198,
+          "family": "relative_strength",
+          "score": 5.054159891206172,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": "1"
+      },
+      "timestamp": 1790260040.1506188,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012428,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 10.876343442474957,
+          "family": "relative_strength",
+          "score": 6.207038663136002,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790260042.181847,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012426999999999999,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 10.87608684465502,
+          "family": "relative_strength",
+          "score": 6.205769537295017,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790260044.212597,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012431000000000001,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 14.189056106010955,
+          "family": "relative_strength",
+          "score": 7.865990991099158,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790260046.246644,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012431000000000001,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 11.47528407873466,
+          "family": "relative_strength",
+          "score": 9.77881669073536,
+          "symbol": "META"
+        },
+        {
+          "edge_bps": 9.866582384969735,
+          "family": "relative_strength",
+          "score": 5.735877559078885,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": "1"
+      },
+      "timestamp": 1790260048.2842538,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.08928699999999999,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 13.474323079102902,
+          "family": "relative_strength",
+          "score": 10.27828954174825,
+          "symbol": "META"
+        },
+        {
+          "edge_bps": 11.511710978797108,
+          "family": "relative_strength",
+          "score": 6.97970464541109,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1,
+        "META": 1
+      },
+      "timestamp": 1790260050.323678,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000023",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "META",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.08927099999999999,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 11.799333245430809,
+          "family": "relative_strength",
+          "score": 8.49878103036875,
+          "symbol": "META"
+        },
+        {
+          "edge_bps": 8.694200688599828,
+          "family": "relative_strength",
+          "score": 5.171608545382105,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1,
+        "META": "1"
+      },
+      "timestamp": 1790260052.359306,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.089287,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 13.796624123869062,
+          "family": "relative_strength",
+          "score": 8.801096931402778,
+          "symbol": "INTC"
+        },
+        {
+          "edge_bps": 12.17547449540779,
+          "family": "relative_strength",
+          "score": 7.6660538051290725,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "INTC": 1,
+        "META": "1"
+      },
+      "timestamp": 1790260054.391205,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.08928900000000001,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 14.669891715141103,
+          "family": "relative_strength",
+          "score": 9.65396618361804,
+          "symbol": "INTC"
+        },
+        {
+          "edge_bps": 10.053129575743336,
+          "family": "relative_strength",
+          "score": 6.342909266049075,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "INTC": 1,
+        "META": 1
+      },
+      "timestamp": 1790260056.426903,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.089284,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 15.298436081256916,
+          "family": "relative_strength",
+          "score": 10.090510005948225,
+          "symbol": "INTC"
+        },
+        {
+          "edge_bps": 12.174262722779439,
+          "family": "relative_strength",
+          "score": 7.646881342114725,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "INTC": 1,
+        "META": 1
+      },
+      "timestamp": 1790260058.456398,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.089296,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 17.54166236586141,
+          "family": "relative_strength",
+          "score": 11.082923038392021,
+          "symbol": "INTC"
+        },
+        {
+          "edge_bps": 13.185333811814303,
+          "family": "relative_strength",
+          "score": 8.413326767323365,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "INTC": 1,
+        "META": 1
+      },
+      "timestamp": 1790260060.485196,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.08929699999999999,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 20.069437026029036,
+          "family": "relative_strength",
+          "score": 12.563562992450793,
+          "symbol": "INTC"
+        },
+        {
+          "edge_bps": 11.874494002441782,
+          "family": "relative_strength",
+          "score": 7.646605054480591,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "INTC": 1,
+        "META": 1
+      },
+      "timestamp": 1790260062.509664,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012440000000000001,
+      "exits": {
+        "META": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 16.723507635498237,
+          "family": "relative_strength",
+          "score": 9.900982191019464,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790260064.5354471,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000024",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "META",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.012443000000000001,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 16.772984930674696,
+          "family": "relative_strength",
+          "score": 10.149144346946422,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790260066.5682182,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.089281,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 19.54934642585171,
+          "family": "relative_strength",
+          "score": 11.545635630646203,
+          "symbol": "INTC"
+        },
+        {
+          "edge_bps": 8.70158382963837,
+          "family": "relative_strength",
+          "score": 5.38333547189023,
+          "symbol": "META"
+        }
+      ],
+      "targets": {
+        "INTC": 1,
+        "META": 1
+      },
+      "timestamp": 1790260068.5930529,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000025",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "META",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.089273,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 13.497676900813826,
+          "family": "relative_strength",
+          "score": 9.142295962415036,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1,
+        "META": "1"
+      },
+      "timestamp": 1790260070.629441,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.089275,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 14.373601046004381,
+          "family": "relative_strength",
+          "score": 9.752664680056515,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1,
+        "META": "1"
+      },
+      "timestamp": 1790260072.668747,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.089285,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 12.990641372154222,
+          "family": "relative_strength",
+          "score": 9.188935779448174,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1,
+        "META": "1"
+      },
+      "timestamp": 1790260074.6998851,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012449,
+      "exits": {
+        "META": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 14.079125206425957,
+          "family": "relative_strength",
+          "score": 10.16309982902638,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790260076.735428,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000026",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "META",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.01245,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 11.133850716908423,
+          "family": "relative_strength",
+          "score": 8.708807544616912,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790260078.774095,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012447,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 8.607334420852597,
+          "family": "relative_strength",
+          "score": 6.5115701591005894,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790260080.837433,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012445999999999999,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 12.713304128888769,
+          "family": "relative_strength",
+          "score": 10.268438292774574,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790260082.877565,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "INTC": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260084.907594,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000027",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "INTC",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260086.945655,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260088.9841611,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260091.01391,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.033974000000000004,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 4.341618497997746,
+          "family": "relative_strength",
+          "score": 4.341618497997746,
+          "symbol": "GOOGL"
+        }
+      ],
+      "targets": {
+        "GOOGL": 1
+      },
+      "timestamp": 1790260093.0572748,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000028",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "GOOGL",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.033974000000000004,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {
+        "GOOGL": "1"
+      },
+      "timestamp": 1790260095.097219,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.033974000000000004,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {
+        "GOOGL": "1"
+      },
+      "timestamp": 1790260097.136863,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "GOOGL": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260099.1758778,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000029",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "GOOGL",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260101.2049541,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260103.234623,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260105.259001,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.008786,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 20.325755246612676,
+          "family": "relative_strength",
+          "score": 4.520602727383701,
+          "symbol": "CRWV"
+        }
+      ],
+      "targets": {
+        "CRWV": 1
+      },
+      "timestamp": 1790260107.279135,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000030",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "CRWV",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.008786,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {
+        "CRWV": "1"
+      },
+      "timestamp": 1790260109.287806,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.008786,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {
+        "CRWV": "1"
+      },
+      "timestamp": 1790260111.310092,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "CRWV": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260113.333368,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000031",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "CRWV",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260115.356253,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012443000000000001,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 5.901547191131118,
+          "family": "relative_strength",
+          "score": 3.8910855861164806,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790260117.378593,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000032",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "INTC",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.012445,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {
+        "INTC": "1"
+      },
+      "timestamp": 1790260119.397633,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012445,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {
+        "INTC": "1"
+      },
+      "timestamp": 1790260121.420253,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "INTC": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260123.4418051,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-mac-20260924a-0000033",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "INTC",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790260125.0602088,
+      "type": "decision"
+    }
+  ],
+  "feed": "sip",
+  "flat": true,
+  "live_event_write_errors": 0,
+  "mode": "adaptive_paper",
+  "native_fill_events": 30,
+  "native_quotes": 273586,
+  "native_rejections": 0,
+  "policy_selections": {
+    "defensive_cash": 0,
+    "mean_reversion": 0,
+    "range_breakout": 0,
+    "relative_strength": 61,
+    "trend_momentum": 0
+  },
+  "preflight": {
+    "account_status": "ACTIVE",
+    "asset_count": 24,
+    "capital_available": true,
+    "clock": {
+      "is_open": true,
+      "next_close_ns": 1790280000000000000,
+      "next_open_ns": 1790343000000000000,
+      "received_at_ns": 1790259824220754000,
+      "timestamp_ns": 1790259824218275972
+    },
+    "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+    "endpoint": "https://paper-api.alpaca.markets",
+    "feed": "sip",
+    "http": [
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259824"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259824"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790259824"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790259825"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790259825"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790259825"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790259826"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790259826"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "192",
+          "x-ratelimit-reset": "1790259826"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "191",
+          "x-ratelimit-reset": "1790259827"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "190",
+          "x-ratelimit-reset": "1790259827"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "189",
+          "x-ratelimit-reset": "1790259827"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "189",
+          "x-ratelimit-reset": "1790259827"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "188",
+          "x-ratelimit-reset": "1790259828"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "187",
+          "x-ratelimit-reset": "1790259828"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "186",
+          "x-ratelimit-reset": "1790259828"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "185",
+          "x-ratelimit-reset": "1790259829"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "184",
+          "x-ratelimit-reset": "1790259829"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "183",
+          "x-ratelimit-reset": "1790259829"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "182",
+          "x-ratelimit-reset": "1790259830"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "181",
+          "x-ratelimit-reset": "1790259830"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "180",
+          "x-ratelimit-reset": "1790259830"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "179",
+          "x-ratelimit-reset": "1790259831"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "178",
+          "x-ratelimit-reset": "1790259831"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "177",
+          "x-ratelimit-reset": "1790259831"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "176",
+          "x-ratelimit-reset": "1790259831"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "175",
+          "x-ratelimit-reset": "1790259832"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "174",
+          "x-ratelimit-reset": "1790259832"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "10000",
+          "x-ratelimit-remaining": "9999",
+          "x-ratelimit-reset": "1790259824"
+        },
+        "kind": "data_read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "176",
+          "x-ratelimit-reset": "1790259832"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "175",
+          "x-ratelimit-reset": "1790259832"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "174",
+          "x-ratelimit-reset": "1790259833"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "173",
+          "x-ratelimit-reset": "1790259833"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259855"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790259855"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790259856"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790259856"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259858"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259864"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259880"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259888"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790259889"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790259889"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790259889"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259902"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259914"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790259915"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259916"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259918"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790259919"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790259919"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790259919"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259923"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790259923"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259925"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259948"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790259949"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790259949"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790259949"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259967"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259969"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259979"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790259979"
+        },
+        "kind": "cancel",
+        "status": 204
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790259980"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790259980"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790259981"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790259981"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790259981"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259981"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790259982"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259989"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259997"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790259999"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790260000"
+        },
+        "kind": "cancel",
+        "status": 204
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790260000"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790260000"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260005"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260009"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790260010"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790260010"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790260010"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260016"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260022"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260036"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260038"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260048"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790260048"
+        },
+        "kind": "cancel",
+        "status": 204
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790260049"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790260049"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790260049"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790260050"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790260050"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260050"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260064"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260068"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260077"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260078"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790260079"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790260079"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790260079"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260085"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260093"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260099"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260107"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260108"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790260109"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790260109"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790260109"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260113"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260117"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260123"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790260125"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790260125"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790260126"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790260126"
+        },
+        "kind": "read",
+        "status": 200
+      }
+    ],
+    "observed_at": "2026-09-24T14:23:44.852234+00:00",
+    "open_order_count": 0,
+    "orders_submitted": 0,
+    "position_count": 0,
+    "quote_count": 24,
+    "quote_errors": {}
+  },
+  "reconciliation": {
+    "cash_delta_usd": "-1.51",
+    "cash_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "positions_match": true
+  },
+  "requests": [
+    {
+      "kind": "read",
+      "timestamp": 1790259825.3557508
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259825.422178
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259825.440994
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259825.462616
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259855.0880792
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259855.123473
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259855.1453881
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259855.1668339
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259857.830802
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259863.910924
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259880.239079
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259888.429837
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259888.4515798
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259888.4742668
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259888.496713
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259902.4497721
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259914.588894
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259914.62594
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259916.6190069
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259918.5484722
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259918.567609
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259918.586561
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259918.6095512
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259922.788565
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259922.817931
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259924.811114
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259948.664456
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259948.6928372
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259948.712257
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259948.743629
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259967.2605639
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259969.280396
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259979.285207
+    },
+    {
+      "kind": "cancel",
+      "timestamp": 1790259979.305894
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259979.3270772
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259979.488102
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259979.513728
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259979.537162
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259979.563891
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259981.4174562
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259981.43985
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259989.5034492
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259997.590951
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259999.508662
+    },
+    {
+      "kind": "cancel",
+      "timestamp": 1790259999.530261
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790259999.5528388
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790259999.6113868
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260005.680002
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260009.612409
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260009.632849
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260009.6536179
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260009.674596
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260015.864855
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260021.927568
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260036.086111
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260038.118454
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260048.184279
+    },
+    {
+      "kind": "cancel",
+      "timestamp": 1790260048.217566
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260048.243516
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260048.2888691
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260048.312021
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260048.339642
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260048.36369
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260050.32698
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260064.542322
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260068.598489
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260076.742037
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260078.467791
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260078.4886951
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260078.520378
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260078.543475
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260084.912917
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260093.059924
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260099.182297
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260107.281539
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260108.593046
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260108.615125
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260108.633846
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260108.657656
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260113.3360572
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260117.3809412
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790260123.444242
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260125.062152
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260125.0872772
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260125.108447
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790260125.129466
+    }
+  ],
+  "session_policy": {
+    "extended_hours": false,
+    "overnight_holds": false
+  },
+  "startup_reconciliation": null,
+  "status": "passed"
+}

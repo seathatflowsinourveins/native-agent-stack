@@ -25,7 +25,12 @@ differences stop recovery. It never uses account-wide cancellation or liquidatio
 All owned open orders are canceled first. Actual terminal confirmation and a
 fresh snapshot must precede a residual exit. Exits use sequential SELL-only
 LIMIT/DAY orders with fresh quotes and the original per-order quantity/notional
-caps. Quantities retain up to nine decimal places. Cleanup client IDs advance
+caps. Each exit is sized within the share cap the ledger applies to that sell at
+that bid (`RiskLimits.effective_max_order_qty`): `max_order_qty` in "fixed" mode,
+as before, and `min(max_order_qty, floor(max_order_notional_usd / bid), 100)` whole
+shares in "notional" mode, so an appreciated position exits in chunks the ledger
+admits instead of being refused (`order_size_cap_exceeded`). Quantities retain up
+to nine decimal places. Cleanup client IDs advance
 past prior journal IDs, including previous failed cleanup attempts. Fully unfilled
 exit cancellation stops with `needs_attention`; there is no blind repricing loop.
 

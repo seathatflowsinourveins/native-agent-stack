@@ -103,8 +103,8 @@ for _path in (ROOT, TOOL_DIR):
 # family and adjudication rules; the verdict tools own the ledger/registry paths and packet format.
 from scripts.landscape import (  # noqa: E402
     DEFAULT_SEALED_BASE, GRANDFATHERED_RUN_IDS, LANE_FAMILIES, LANES, MANIFEST, RUN_MANIFEST_NAME,
-    SEALED_BASE_PREFIX, judge_adjudication, lane_model_issue, run_id_of, run_manifest_row_issue,
-    withheld_packet_keys,
+    PACKET_KEYS_NAME, SEALED_BASE_PREFIX, judge_adjudication, lane_model_issue, packet_keys_issue,
+    packet_seals_candidates, run_id_of, run_manifest_row_issue, unseal_packet, withheld_packet_keys,
 )
 from scripts import platform_status as platform_evidence  # noqa: E402
 from scripts.catalog_decisions import identity, safe_file, unique_json  # noqa: E402
@@ -162,6 +162,11 @@ TRUST_PATHS = (
     "scripts/catalog_decisions.py", "scripts/host_receipts.py", "scripts/validate.py",
     "tools/sota-convergence/build_verdicts.py", "tools/sota-convergence/record_verdicts.py",
     "tools/sota-convergence/build_manifest.py", "tools/sota-convergence/lane_packets.py",
+    "tools/sota-convergence/codex_lane.py",
+    # record_verdicts.py measures a new wave's prose exposure with these (round 7, BL7-2).
+    "tools/sota-convergence/export_isolation_check.py", "tools/sota-convergence/blind_checkout.py",
+    # The Claude family's read-boundary audit (round 9, BR9-1).
+    "tools/sota-convergence/transcript_audit.py",
     "tools/sota-convergence/lane-return.schema.json", "tools/sota-convergence/lane-provenance.json",
     "adoption/host-receipt.schema.json", ".github/workflows/validate.yml",
 )
@@ -460,6 +465,23 @@ def sealed_packet(head, sealed_base, catalog, layer_id, manifest=None, manifest_
     if withheld:
         return (f"{path} carries withheld keys {withheld}; a new wave's lanes judge --withhold-labels packets"), \
             None, None
+    if packet_seals_candidates(packet):
+        # The candidates' manifest fields are sealed in the wave's packet-keys document (review of #145).
+        keys_path = f"{sealed_base}/{PACKET_KEYS_NAME}"
+        keys_bytes = head.read(keys_path)
+        if keys_bytes is None:
+            return (f"{keys_path} is absent, so the sealed candidates' component ids cannot be resolved; "
+                    "failing closed"), None, None
+        if sha256(keys_bytes) != manifest.get("packet_keys_sha256"):
+            return f"{keys_path} is not the run manifest's packet_keys_sha256", None, None
+        try:
+            keys_doc = strict_json(keys_bytes)
+        except ValueError:
+            return f"{keys_path} is not JSON", None, None
+        issue = packet_keys_issue(keys_doc, name, actual, packet)
+        if issue:
+            return f"{keys_path}: {issue}", None, None
+        packet = unseal_packet(packet, keys_doc, name)
     candidates = {candidate.get("key"): candidate for candidate in (packet.get("candidates") or [])
                   if isinstance(candidate, dict)}
     return None, candidates, actual
@@ -851,8 +873,15 @@ class RowCheck:
             sealed = field.get("sealed_sha256")
             if not sealed:
                 outcome = ((manifest_entry or {}).get("lanes") or {}).get(lane) or {}
-                if manifest_entry is not None and outcome.get("outcome") not in ("rejected", "missing"):
-                    self.fail(f"the unsealed {lane} lane is not recorded as rejected or missing in the run manifest")
+                # "failed" (a Claude layer refuted twice, a Codex layer failed after retry) is a documented outcome
+                # with its reasons, as scripts/landscape.run_manifest_row_issue accepts (round 5, ops N2).
+                failed_with_reasons = (outcome.get("outcome") == "failed" and isinstance(outcome.get("reasons"), list)
+                                       and any(isinstance(reason, str) and reason.strip()
+                                               for reason in outcome["reasons"]))
+                if manifest_entry is not None and outcome.get("outcome") not in ("rejected", "missing") \
+                        and not failed_with_reasons:
+                    self.fail(f"the unsealed {lane} lane is not recorded as rejected, missing or failed with its "
+                              "reasons in the run manifest")
                 continue
             expected_run = f"{catalog}-{layer_id}-{run_id}"
             if field.get("run_id") != expected_run:

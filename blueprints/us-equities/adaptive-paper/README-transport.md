@@ -40,13 +40,83 @@ the caller's recovered durable intents. A repeated ID is looked up, never posted
 again. Broker 401/403/404 refusals with a confirming absent-ID lookup, and a
 locally prevented request, expose `definitive_rejection=True`. A 400 or 422 may
 mean a duplicate ID whose earlier order is not visible yet; it remains ambiguous
-unless lookup resolves the frozen intent. Ambiguous errors retain unresolved
-state, freeze admission, and perform at most one lookup without resubmission.
-Cancellation acknowledgements are followed by a lookup, not treated as fills or
-terminal cancellations. All observations contain cumulative quantities; stream
+unless lookup resolves the frozen intent. The one exception is Alpaca's documented
+minimum-price-variance refusal: a 422 whose body code is 42210000 and whose message
+contains "sub-penny increment does not fulfill minimum pricing criteria", for a
+first POST whose limit price really has more than two decimals at or above $1.00
+(four below), followed by an absent-ID lookup. Alpaca states such orders "will be
+rejected" (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md). That page
+documents the body but not the HTTP status. 422 was inferred from the code prefix and
+the POST /v2/orders 422 entry. It was observed once on the paper endpoint in the
+2026-09-24 native-fault run (`native-faults/receipt.json`, C04). The message, not the
+code, is the discriminator. The transport
+raises `RejectedSubmission(422, "sub_penny_minimum_price_variance")` and compares
+the body with those constants only, never retaining or raising it. The engine's
+own Ledger and the order-contract boundary below both refuse such prices before
+send, so only the native-fault harness, whose `FaultLedger` and `FaultTransport`
+each exempt only its single C04 client ID, can reach this path. Ambiguous errors
+retain unresolved state, freeze admission, and perform at most one lookup without
+resubmission. `cancel()` sends the DELETE for every owned order: to the broker ID
+it already observed, or, with no observation, to the ID a client-ID lookup
+returns. It does not skip the DELETE because a cached or freshly read status is
+terminal; the caller asked because it believes the order open or ambiguous. The
+answer is data: 204 is only an acknowledgement; 404 or 422 ("The order status is
+not cancelable",
+https://docs.alpaca.markets/us/reference/deleteorderbyorderid-1.md) is accepted
+without a freeze when the follow-up lookup shows the order terminal, and freezes
+`cancellation_unresolved` otherwise; a timeout, 429 or 5xx freezes as before. Every
+DELETE is followed by a lookup, never treated as a fill or terminal cancellation,
+and repeating a known terminal observation changes no ledger state. All observations contain cumulative quantities; stream
 observations additionally retain available execution IDs and individual event
 quantity/price. Consumers must deduplicate executions and never manufacture
-individual fills from a cumulative REST snapshot.
+individual fills from a cumulative REST snapshot. A stream fill whose `execution_id`
+has not been forwarded yet is forwarded even when a REST read (for example the lookup
+after a cancel) already advanced the cumulative quantity past it; the stored
+cumulative state never moves back. `fill_activities(order_id)` returns one order's
+executions from `GET /v2/account/activities/FILL` filtered by the documented
+`order_id` parameter (ascending, 100 per page, the last activity id as `page_token`),
+each with its own `qty` and `price` and the order's `cum_qty` after it, and requires
+them to tile the filled quantity from zero. It is the only activities read the
+guarded session allows: another activity type, filter, page size or method is refused
+before any request. An activity id is `<timestamp>::<uuid>`; its 36-character UUID is
+the native trade id.
+
+## Pre-submission order-contract boundary
+
+Every alpaca-py order submit first passes the offline
+[order contract](../order-contract/order_contract.py)'s `build_envelope()`. After
+the `before_submit` risk callback and before any HTTP request, `submit()` validates
+the exact SDK-bound projection of the normalized intent (symbol, qty, side, limit
+type, DAY, client ID, limit price, `extended_hours`; attribution metadata never
+reaches the wire) and builds the `LimitOrderRequest` only from the envelope. The
+engine's own semantics are passed explicitly: fractional sell quantities up to nine
+decimals (exact residual exits) and `extended_hours: true` only when the transport
+was constructed with extended hours allowed. Everything else is the contract's own
+narrower policy: symbol syntax `[A-Z]{1,5}(\.[A-Z])?` (so `BRK-B` is refused while
+`BRK.B` is admitted), a client ID beginning with a letter or digit, and the
+minimum price increment.
+
+A refusal raises `OrderContractRefused`, a `SubmissionNotSent` subclass with
+`local_refusal="order_contract"` and `not_sent_reason="order_contract_refused"`.
+No request budget is reserved and no HTTP request is sent; a replay of that client
+ID stays a local refusal without a lookup. It is never a `RejectedSubmission`,
+which remains reserved for a broker's definitive HTTP answer. `Controller.bind`
+records the reserved intent as ledger status `not_sent` with event reason
+`order_contract_refused`, distinct from `broker_refused`.
+
+`GuardedSession` also gates the wire: an order POST is admitted only while
+`submit_enveloped()` holds that client ID's envelope, and only when the serialized
+body carries exactly its fields and values. alpaca-py serializes qty and price as
+floats; a float whose text no longer equals the exact envelope decimal, or a
+dropped or added field, is refused locally before the budget hook. The order-
+throughput `AlpacaCapacityPort` uses the same helpers, so no alpaca-py submit
+through `_sdk_client` bypasses the boundary. `order_contract_status(symbols)` is the
+network-free self-test behind `runner.check_order_contract_boundary`. `runner.main`
+runs it before credentials are read (an inactive boundary or an inadmissible
+configured symbol writes `not_started` at stage `order_contract`) and records the
+status as `order_contract` in the preflight summary; `validate_preflight`, which the
+mover runner shares, repeats it and raises `order_contract_boundary_inactive:<check>`. Evidence class for all of this is local synthetic tests; no
+broker run has exercised the wired boundary yet.
 
 `ready` requires successful native authentication, an observed subscription ACK
 from each socket, fresh quotes for the required benchmark basket, and no frozen
@@ -61,6 +131,37 @@ connect guard pins; any other value is refused before a client, socket or
 endpoint is built. Feed selection is a configuration choice, not evidence of
 market-data entitlement. Native callbacks only enqueue into a bounded queue; the
 owning loop runs consumer callbacks.
+
+Halt state (E4). On the `sip` feed the quote connection also subscribes trading
+statuses and LULD bands for every symbol (alpaca-py 0.44.0's
+`subscribe_trading_statuses` and its `lulds` handler slot; the SDK sends every channel
+in its one subscribe message per connect), and the subscription ACK must list all
+three channels for every symbol (`halt_status_subscription_rejected` otherwise).
+`normalize_trading_status` maps Alpaca's documented CTA and UTP status codes: CTA `2`
+halts (with reason `M` a LULD pause) and `3` resumes; `5` (price indication) halts,
+since the CTA's output specification (CTS Pillar v2.11b) sends it only before a
+reopening after a halt; `6` (trading range indication, "a security that is not Trading
+Halted"), `E` (short-sale restriction), `F` (LULD limit state) and the imbalance codes
+change nothing; UTP `H`, `Q` (quotation only) and `P` (volatility pause) halt and `T`
+resumes. Market-wide circuit-breaker reasons (`1`-`3`, `MWC0`-`MWC3`) are labelled; an
+unknown or cross-tape code halts until a documented resume. A message whose tape is
+missing or not one of `A`, `B`, `C`, `O` reads its code from both tables (they share
+no code), so a documented resume still resumes it. Statuses go to
+`sink_status` on the owner loop; LULD bands are kept only for receipts
+(`health.luld_bands`), and a malformed band is counted, never a freeze. On `iex`
+neither channel is subscribed (their availability there is unverified and a refused
+channel would block readiness), so halt state then comes only from the quote-condition
+fallback, which blocks entries only: on `iex` no exit waits on a halt. The stream
+sends no snapshot at subscribe time: `nasdaq_halt_seed(symbols)` reads Nasdaq Trader's
+trade halts RSS once (one https URL, no redirects, an uncompressed body of at most
+4 MB; the feed's own TTL is one minute) and returns the symbols whose latest halt has
+no resumption trade time or one still ahead. requests' 5 s timeout bounds each socket
+read, not the body, so the body is read one socket read at a time (urllib3 `read1`)
+with the 5 s total deadline checked before each: the read ends at most one 5 s read
+timeout after the deadline. The runner expires a halt only the seed asserts (at its
+resumption trade time, or 12 minutes after a LULD pause began) and skips a seed row
+already past that on arrival. A reconnect loses the status messages sent during the
+gap; the next message restores the state.
 Reconnect, stale quotes, missing initial order updates, malformed callbacks and
 overflow stop new exposure. After inspecting and reconciling a fresh complete
 snapshot, the caller may explicitly call `mark_reconciled()`. Queue loss or

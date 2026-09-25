@@ -198,6 +198,12 @@ class Recorder:
                         os.killpg(process.pid, signal.SIGKILL)
                     except ProcessLookupError:
                         pass
+                    except PermissionError:
+                        # macOS answers EPERM when no member can be signalled. Once the leader has
+                        # exited, the rest are unreaped zombies (XNU killpg1 skips them), so nothing is
+                        # left to kill; while the leader still runs, the refusal is real.
+                        if process.poll() is None:
+                            raise
                 process.wait()
                 record["exit_code"] = process.returncode
                 process.stdout.close()

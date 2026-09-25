@@ -14,7 +14,7 @@ it (a commit cannot contain its own hash), and the pinned tag may predate
 ```sh
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack
-python3 scripts/release_due.py   # on the default branch (added after v2026.09.23): steps main documents that the pinned release lacks
+python3 scripts/release_due.py   # on the default branch: steps main documents that the pinned release lacks
 tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
 git checkout "$tag"
@@ -25,13 +25,14 @@ and confirms it resolves to `source.release_commit` (read from the manifest you 
 cloned, never from a commit pasted into prose, which a later re-pin would leave
 stale), published with SLSA build
 provenance by `.github/workflows/publish-catalog.yml`. `scripts/release_due.py`
-was added after `v2026.09.23`, so it runs here, on the default branch, before
-the checkout. After checkout, follow the documents in your checkout.
+runs here, on the default branch, before the checkout. After checkout, follow
+the documents in your checkout.
 
 The pages here name the release a step was written against. "Added after
 `vT`" means release `vT` lacks the file that step uses (a path in
 `release_due.py`'s `due` list); "changed after `vT`" means the file exists at
-`vT` but behaves as the note says there, not as main documents it. If your
+`vT` but behaves as the note says there, not as main documents it (its
+`changed` list names every new-machine file whose content differs from `vT`). If your
 checkout is `vT`, follow the note: run that step from a separate clone of the
 default branch (never the pinned one you install from; a result from it is
 main-only evidence) or wait for the next re-pin. If your checkout is a later
@@ -48,12 +49,26 @@ remains meaningful only as the comparison point `scripts/adoption_status.py`
 uses for its `baseline_matches`/`baseline_differs` `git` result, not as a
 checkout target.
 
-If downloading the release archive from an Actions run instead of
-`git clone` (e.g. no local git), verify its attested provenance before use:
+If installing from the release archive instead of `git clone` (e.g. no local
+git), download it from the GitHub Release and verify it before use. Both checks
+bind the file to this release: `verify-asset` to the immutable release's asset
+digest, and `--source-ref`/`--source-digest` to the tagged commit. Without them
+the attestation check also passes for an attested archive of any other commit
+(a `workflow_dispatch` run of `publish-catalog.yml`) saved under this name.
+`verify-asset` and `attestation verify` need a signed-in `gh` (`gh auth login`;
+without it both exit 4). Without a clone, read the pin from the default branch:
 ```sh
+gh api -H 'Accept: application/vnd.github.raw+json' \
+  repos/seathatflowsinourveins/native-agent-stack/contents/adoption/manifest.json \
+  | python3 -c "import json,sys; s=json.load(sys.stdin)['source']; print(s['release_tag'], s['release_commit'])"
+gh release download <release_tag> --repo seathatflowsinourveins/native-agent-stack \
+  --pattern 'native-agent-stack-<release_commit>.tar.gz'
+gh release verify-asset <release_tag> native-agent-stack-<release_commit>.tar.gz \
+  --repo seathatflowsinourveins/native-agent-stack
 gh attestation verify native-agent-stack-<release_commit>.tar.gz \
   --repo seathatflowsinourveins/native-agent-stack \
-  --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml
+  --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml \
+  --source-ref refs/tags/<release_tag> --source-digest <release_commit>
 ```
 
 Read the platform page for the chosen
@@ -104,16 +119,11 @@ GitHub-hosted macOS runner; see
    its `recipe_map` page (the SDK lock for `research-runtime`). A profile with
    "none of N" pinned installs none of its own components through the script
    (only the `node`, `uv` and `gh` every run installs); use the recipes.
-
-   The macOS script and pins changed after `v2026.09.23`. At `v2026.09.23`,
-   `adoption/bootstrap-macos.sh` installs only a missing `jq` through Homebrew
-   (install the other formulae on
-   [the macOS page](platforms/macos-arm64.md#prerequisites) yourself first),
-   `adoption/pins-macos-arm64.json` has no `socraticode` pin (the script skips
-   it by default, so `macos-arm64-foundation` installs 7 of 8), no pinned
-   darwin binary for Codex or Claude Code (npm resolves those unverified) and
-   no embedding-model pin. Linux/WSL2's script and pins are the same at
-   `v2026.09.23` as on main.
+   `pins-linux-x86_64.json` changed after `v2026.09.24.1` in `install_note`
+   text only: the markitdown, tavily-cli, orx and agent-browser notes
+   attribute their installed-state observations to the 2026-09-23 recording
+   host. Versions, URLs and hashes are unchanged, so a host at that tag
+   installs the same artifacts.
 
    The macOS script and both claude-code pins changed after `v2026.09.23.1`:
    at that tag the pins are 2.1.280 and `adoption/bootstrap-macos.sh` reinstalls
@@ -130,6 +140,10 @@ GitHub-hosted macOS runner; see
    Then confirm discovery with `codex mcp list` and `claude mcp list` before any
    scoped task (native verification tier "Client activation" in
    [`adoption/README.md`](README.md#native-verification-tiers)).
+   Provider keys (Alpaca paper, SEC contact, optional paid keys) go in
+   per-provider `0600` files outside the checkout; follow
+   [`docs/secret-storage.md`](../docs/secret-storage.md) and check with
+   `python3 scripts/credential_status.py` (both added after `v2026.09.24.1`).
 
 4. **Render configs.** Use [`tools/adoption/render_config.py`](../tools/adoption/render_config.py)
    with the selected host's `adoption/hosts/<host>.json` (gitignored; copy
@@ -151,7 +165,10 @@ GitHub-hosted macOS runner; see
    explicitly, or export `ADOPTION_PROJECT_ROOT` before running (see
    `tools/adoption/render_config.py --help`). `--check` prints a unified diff
    and exits 1 on any byte difference; a pure JSON-formatting difference is
-   called out explicitly in its output.
+   called out explicitly in its output. `project.codex.config.template.toml`
+   changed after `v2026.09.24.1`: its `serena` server runs
+   `${ECO_ROOT}/bin/serena` (installed in step 4a), where the tag's copy names
+   `${ECO_ROOT}/bin/serena-context`, a wrapper nothing in this catalog installs.
 
    **Trust-state warning.** The rendered `codex.config.toml` (user-level)
    carries this source host's accumulated Codex `[projects."..."]
@@ -173,7 +190,26 @@ GitHub-hosted macOS runner; see
    (this step is a no-op, not a failure, without it -- the MCP registration
    sub-step below needs a working `claude` binary), install this catalog's
    Claude Code user-scope assets with
-   [`tools/adoption/install_claude_profile.py`](../tools/adoption/install_claude_profile.py):
+   [`tools/adoption/install_claude_profile.py`](../tools/adoption/install_claude_profile.py).
+   Its MCP sub-step registers the template's commands but installs none of
+   them, so first install Serena, the template's one stdio server, and
+   jCodeMunch, which the per-project opt-in below uses, at their pins, with the
+   uv-tool layout `bootstrap-linux.sh` uses for its uv-tool pins
+   (`python-tools/` and `bin/` under the ecosystem prefix, on either
+   platform). That puts `serena` and `jcodemunch-mcp` in `${ECO_ROOT}/bin`,
+   where the template and the opt-in point (changed after `v2026.09.24.1`,
+   whose template names a `serena-context` wrapper instead of `serena` and
+   also registers `jcodemunch` at user scope):
+   ```sh
+   eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
+   UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
+     uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143
+   UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
+     uv tool install --python 3.13 jcodemunch-mcp==1.108.319
+   "$eco/bin/serena" --version           # Serena 2.0.0.dev0
+   "$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.319
+   ```
+   Then run the installer:
    ```sh
    python3 tools/adoption/install_claude_profile.py            # guard + agents + MCP servers
    python3 tools/adoption/install_claude_profile.py --dry-run   # report only, write/register nothing
@@ -184,25 +220,70 @@ GitHub-hosted macOS runner; see
    last step (still only meaningful after sign-in; run it manually
    afterward otherwise, exactly as the script's own closing message says).
    Three idempotent sub-steps, each safe to re-run:
-   - **guard hook**: copies [`adoption/hooks/claude/effort-default-guard.py`](hooks/claude/effort-default-guard.py)
-     to `~/.claude/hooks/effort-default-guard.py`, refusing to install unless
-     its sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS);
-     skipped if the installed copy already matches.
-   - **agents**: copies the five [`adoption/agents/claude/*.md`](agents/claude/)
+   - **guard hooks**: copies [`adoption/hooks/claude/effort-default-guard.py`](hooks/claude/effort-default-guard.py)
+     to `~/.claude/hooks/effort-default-guard.py` and the secret guard
+     [`scripts/hooks/secret_path_guard.py`](../scripts/hooks/secret_path_guard.py)
+     to `~/.claude/hooks/secret_path_guard.py` (the secret guard and its
+     settings entries were added after `v2026.09.24.1`), refusing to install either unless
+     every sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS)
+     (paths relative to that file); skipped per file if the installed copy
+     already matches.
+   - **agents**: copies the seven [`adoption/agents/claude/*.md`](agents/claude/)
      files verbatim to `~/.claude/agents/`; skipped per-file when already
      byte-identical.
    - **MCP servers**: for each entry in
      [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
-     http, `jcodemunch` and `serena` stdio), renders its `${HOME}` and
+     http and `serena` stdio), renders its `${HOME}` and
      `${ECO_ROOT}` placeholders (`--eco-root`, default `$ECO_INSTALL_ROOT` or
      `~/.local/share/codex-ecosystem`), then runs `claude mcp add --scope user
      <name> [-e KEY=VALUE ...] -- <command> [args...]`; skipped when `claude
      mcp get <name>` already reports a matching transport, command/URL, args
      and env variable names (values are not compared -- the running host owns
      them). A same-named server with a different config is reported and left
-     unchanged unless `--replace-mcp` is given.
+     unchanged unless `--replace-mcp` is given. That flag re-registers every
+     differing server, including an `ai-memory` entry that names this host's
+     own port. To change one server, remove it and rerun without the flag:
+     `claude mcp remove <name> -s user`, then
+     `python3 tools/adoption/install_claude_profile.py --only mcp`. The
+     template's `ai-memory` URL is this catalog's default, `127.0.0.1:49374`;
+     the registration must name the port this host's ai-memory unit binds
+     (`AI_MEMORY_URL` in step 4). `claude mcp add` refuses a name that already
+     exists, so for another port run `claude mcp remove ai-memory -s user`,
+     then
+     `claude mcp add --scope user --transport http ai-memory http://127.0.0.1:<port>/mcp`.
+
+   **jCodeMunch, per project.** The template leaves `jcodemunch` out (changed
+   after `v2026.09.24.1`). At user scope its server instruction ("Prefer it
+   over Read/Grep/Glob/Bash for code navigation") loaded into every session
+   and contradicted agent-lab's routing (`rg` for discovery, Serena for
+   symbols). On 2026-09-25 the recording host's 5,076 retained Claude Code
+   transcripts, the oldest from 2026-09-18, held 15 jCodeMunch tool calls
+   (Serena 33, SocratiCode 7), and in a retrieval comparison it scored hit@5
+   0.25 against SocratiCode's 0.85
+   ([addendum](../docs/decisions/2026-09-23-claude-user-profile.md#addendum-2026-09-25-jcodemunch-registers-per-project-not-at-user-scope)).
+   A project that wants it registers it from the project root, privately:
+   ```sh
+   claude mcp add --scope local jcodemunch \
+     -e "CODE_INDEX_PATH=$HOME/.code-index" -e JCODEMUNCH_SHARE_SAVINGS=0 \
+     -- "${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"
+   ```
+   or for everyone who opens it, with this entry in the project's checked-in
+   `.mcp.json`. Claude Code expands `${HOME}` in it, and starts the server
+   only after the workspace is trusted and the server approved:
+   ```json
+   {"mcpServers": {"jcodemunch": {"type": "stdio",
+     "command": "${HOME}/.local/share/codex-ecosystem/bin/jcodemunch-mcp", "args": [],
+     "env": {"CODE_INDEX_PATH": "${HOME}/.code-index", "JCODEMUNCH_SHARE_SAVINGS": "0"}}}}
+   ```
+   A nested default such as `${ECO_INSTALL_ROOT:-${HOME}/...}` does not
+   expand there, so a host with another ecosystem prefix uses the local form,
+   which takes precedence over the project entry. The
+   [jCodeMunch recipe](../recipes/README.md#focused-jcodemunch-retrieval)
+   covers indexing and the native statistics.
+
    Then apply the settings template itself (model, effort, ultracode,
-   workflow env, hooks) into the live `~/.claude/settings.json` with
+   workflow env, hooks, and the credential deny rules plus the `PreToolUse`
+   secret-guard hook from [`docs/secret-storage.md`](../docs/secret-storage.md#user-level-guards-deployed-by-the-claude-profile)) into the live `~/.claude/settings.json` with
    [`tools/adoption/apply_claude_settings.py`](../tools/adoption/apply_claude_settings.py),
    after rendering it for this host with step 4's `render_config.py --out`:
    ```sh
@@ -219,10 +300,28 @@ GitHub-hosted macOS runner; see
    template does not mention is kept), writes atomically and
    preserves the original file's mode bits. Never touches `~/.claude.json`
    or any credential store.
-   The profile installer, the apply tool and their assets
-   (`adoption/hooks/claude/`, `adoption/agents/claude/`,
-   `adoption/mcp/claude-user.json`) were added after `v2026.09.23`; at that
-   tag, merge the rendered settings by hand.
+   The agent definitions in `adoption/agents/claude/` changed after `v2026.09.24.1`:
+   at that tag `source-scout` and `isolated-builder` declare `effort: medium`
+   (`source-scout` also `maxTurns: 40`), `evidence-reviewer`,
+   `semantic-evidence-reviewer` and `blind-judge` declare `effort: high`, and the
+   two blind lane roles are absent; here all seven declare `effort: max`
+   ([decision](../docs/decisions/2026-09-23-max-effort-default.md)). The guard
+   hooks' `adoption/hooks/claude/` also changed after `v2026.09.24.1` (its
+   `SHA256SUMS` gained the secret-path guard entry). The installer replaces a
+   differing agent file, so rerunning its agents step from a checkout that has
+   the change installs the `max` definitions. The MCP template
+   `adoption/mcp/claude-user.json` also changed after `v2026.09.24.1`: at that
+   tag its `serena` entry runs `${ECO_ROOT}/bin/serena-context`, a wrapper
+   nothing in this catalog installs, so a host at the tag registers a `serena`
+   server that cannot start. Here it runs `${ECO_ROOT}/bin/serena`, installed
+   above. On a host already registered from the tag the installer reports
+   `serena` as differing; run `claude mcp remove serena -s user`, then
+   `python3 tools/adoption/install_claude_profile.py --only mcp`. The tag's
+   template also registers `jcodemunch` at user scope. This one has no
+   `jcodemunch` entry, and the installer only visits the servers the template
+   names, so it neither adds nor removes one: a host registered from the tag
+   runs `claude mcp remove jcodemunch -s user` and opts in per project as
+   above.
 
    **Plugin revision check** (added after `v2026.09.23.1`; it reads only this
    host's plugin registry, so it runs the same from any checkout). A Claude
@@ -270,12 +369,14 @@ GitHub-hosted macOS runner; see
    `systemctl --user` on Linux/WSL2 (owned units only; never stop the shared
    MCPorter daemon to "clean up" another component), `launchctl` on macOS
    (table in [the macOS page](platforms/macos-arm64.md#launchd-services); run
-   only on a hosted runner, not yet on a Mac workstation; its launchd
-   templates were added after `v2026.09.23`). For the portable guarded runner wrappers used by
+   only on a hosted runner, not yet on a Mac workstation). For the portable guarded runner wrappers used by
    these services, see `adoption/tools/README.md`.
 
-6. **Prerequisite report.** `python3 scripts/adoption_status.py --profile <id> --json`
-   reports command presence and recipe-path presence only; it never logs in,
+6. **Prerequisite report.** `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --json`
+   (changed after `v2026.09.23.1`, whose step 6 runs plain `python3`: the manifest
+   supports Python 3.13 only, so a `python3` that is 3.12, as on Ubuntu 24.04,
+   reports `prerequisites_missing` and exits 2; on a checkout of that release, run
+   this form instead) reports command presence and recipe-path presence only; it never logs in,
    edits configuration, starts services, or certifies functional acceptance
    (see its own docstring and `adoption/README.md`'s "Native verification
    tiers" table).
@@ -288,8 +389,7 @@ GitHub-hosted macOS runner; see
    has neither. `scripts/host_receipts.py` (this same step's own recording
    tool, plus `scripts/component_matrix.py`, `scripts/new_host_grand_list.py`,
    `tools/sota-convergence/build_verdicts.py`,
-   `scripts/validate_convergence.py` and `scripts/release_due.py`, which was
-   added after `v2026.09.23`) needs
+   `scripts/validate_convergence.py` and `scripts/release_due.py`) needs
    **Python 3.9 or newer**: every one of those scripts parses under the
    Python 3.9 grammar and uses `from __future__ import annotations`, and this
    is exercised directly, not merely declared -- a macOS CI job runs the

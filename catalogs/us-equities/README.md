@@ -28,6 +28,22 @@ the reasons for retaining or comparing the CLI, MCP and simulation alternatives.
 Its bounded operational paper lane uses 120 requests/minute against the observed
 200/minute account limit; Elite's advertised 1,000 is API calls, not fills.
 
+The [September 24 mover v3 sweep](mover-v3-sweep-20260924.json) records the
+catalog actions behind the [mover v3 research plan](../../blueprints/us-equities/mover-v3/README.md):
+literature and metadata evidence only, with each record's sweep status. Its
+repository records are registered in the decision index.
+
+The [September 24 local-model workload discovery](local-model-workloads-20260924.json)
+records which local-model workloads beyond memory and RAG are worth measuring on
+the 64 GB M5 Pro, from two blind cross-family lanes and one blind adjudication
+([sealed evidence](../../evidence/artifacts/local-model-workloads-20260924/README.md)).
+Four workloads converged as trials: catalyst extraction, earnings-call
+transcription, image-only exhibit OCR and volatility/volume time-series features.
+Tabular foundation models for mover prediction were adjudicated a skip. The
+record also keeps single-lane leads and the workloads that stay on the cloud
+agents. Discovery evidence only: nothing was installed or executed, and inclusion
+selects nothing. Its repository records are registered in the decision index.
+
 The [current token-practice audit](../../docs/token-practice.md) maps the
 then-selected 52 components to their evidence levels and records ten exact artifact comparisons
 plus four accepted native coding trials. Catalog inclusion does not supply a
@@ -121,12 +137,14 @@ The later [native observability receipt](../../observability/receipt.json) estab
 The September 20 native public-endpoint refresh contained **342 public stars**, with
 zero added, removed or renamed identity pairs since the previous refresh. The
 [refresh receipt](../../blueprints/us-equities/authenticated-data/public-stars-refresh.json)
-preserves the identity hash and scope. The card-membership ledger and 105
-beyond-star baseline card identities remain in [coverage.json](coverage.json);
+preserves the identity hash and scope. The September 24 authenticated refresh
+contained **357 stars**: 15 additions, no removals and no private repositories
+([receipt](star-refresh-20260924.json)). The card-membership ledger and 102
+beyond-star card identities remain in [coverage.json](coverage.json);
 the [complete star audit](star-audit.md) and typed union include subsequent
 additions. A recorded disposition is distinct from code review or native execution.
 
-Source review covered official metadata, README/license text and relevant API/source documentation at the date and depth stated per record. It did not deeply benchmark all 342 stars or every project beyond them. Repository freshness, stars, model launch dates and author benchmarks do not establish superiority. The catalog exposes missing acceptance work rather than turning a list into a deployment claim.
+Source review covered official metadata, README/license text and relevant API/source documentation at the date and depth stated per record. It did not deeply benchmark all 357 stars or every project beyond them. Repository freshness, stars, model launch dates and author benchmarks do not establish superiority. The catalog exposes missing acceptance work rather than turning a list into a deployment claim.
 
 ## Decision and evidence vocabulary
 

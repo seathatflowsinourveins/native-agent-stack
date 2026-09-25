@@ -39,7 +39,7 @@ CODE_INDEX_PATH = "${CODE_INDEX_PATH}"
 JCODEMUNCH_SHARE_SAVINGS = "0"
 
 [mcp_servers.serena]
-command = "${ECO_ROOT}/bin/serena-context"
+command = "${ECO_ROOT}/bin/serena"
 args = ["start-mcp-server", "--transport", "stdio", "--project-from-cwd", "--context", "codex", "--enable-web-dashboard", "true", "--open-web-dashboard", "false", "--enable-gui-log-window", "false"]
 startup_timeout_sec = 60
 

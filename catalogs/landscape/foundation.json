@@ -1908,12 +1908,18 @@
         "docs/native-memory-rag-lifecycle.md",
         "evidence/artifacts/memory-landscape-20260921/sources.json",
         "catalogs/landscape/candidate-quality-review.json",
-        "docs/candidate-quality-review-20260921.md"
+        "docs/candidate-quality-review-20260921.md",
+        "evidence/artifacts/memory-stack-20260925/README.md",
+        "evidence/artifacts/memory-stack-20260925/convergence.json",
+        "catalogs/foundation/memory-stack-20260925.json"
       ],
       "limitations": [
         "Scheduler admission does not establish learned-write quality; the retained model review rejected insufficient evidence.",
         "Bounded sanitized assistant excerpts are not complete transcripts, and exact lifetime memory token savings are unknown.",
-        "Current primary-source review corrects manual-only, Claude-only and cloud-only exclusions. No matched memory benchmark or new installation was run; automatic capture, local providers and published scores remain source claims until exercised on the selected profile."
+        "Current primary-source review (2026-09-21) corrects manual-only, Claude-only and cloud-only exclusions. No matched memory benchmark or new installation was run in that review; automatic capture, local providers and published scores remain source claims until exercised on the selected profile.",
+        "The 2026-09-25 memory-stack convergence (catalogs/foundation/memory-stack-20260925.json) keeps ai-memory as the production control and adopts no challenger. Its only measurements are Mac runs in the LongMemEval-S harness, descriptive under amendment A15.2 (full track, n = 470, recall_all@5): C3, ai-memory with its production embedder and the reranker off, scores 0.570, and am-minilm (+0.251, 95% CI [+0.203, +0.299]), dense Qwen3-Embedding-4B (+0.183), BM25 (+0.177) and the official BM25 (+0.170) exceed it with Holm p 0.0001, while ai-memory with MiniLM (0.496) and with FTS only (0.400) trail it. The layer decision still needs C4, production with the LLM reranker (A14), which did not run on the Mac, and confirmatory decisions come only from the VelaNext rerun under A15, A15.2 and A16.",
+        "Its trial rows (three memory systems, plus the named embedders, rerankers and memory LLMs) rest on discovery and vendor evidence and blind cross-family judgments by one judge model; a trial changes production only through the preregistered comparison against both C3 and C4 and the memory-lane acceptance.",
+        "Production now runs ai-memory 19b6429, a local cargo build of release/2.5 that reports 2.4.0 and is ahead of official v2.4.0; the retained native evidence covers the 2.3.2 pin only and does not transfer to that build."
       ],
       "overturn_when": "An isolated representative corpus and question set shows better source-grounded recall/usefulness and acceptable complete provider use, latency, capture/deletion and restore behavior without ambiguous memory ownership.",
       "candidates": [

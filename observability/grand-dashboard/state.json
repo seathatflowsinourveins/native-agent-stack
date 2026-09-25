@@ -1,20 +1,20 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-23T23:45:00Z",
+  "recorded_at_utc": "2026-09-25T07:42:53Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
       "kind": "lane",
       "id": "simulation",
       "title": "Historical simulation / backtest",
-      "state": "AAPL diagnostic retained / adaptive native capacity179submits per minute synthetic / merit unqualified",
-      "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
+      "state": "sim capacity 859 to 882 fills per min elite budget (30 of 30 min) and 171 to 180 paper parity / quotes-only rc5 / infrastructure evidence only",
+      "evidence_ref": "blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json"
     },
     {
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "adaptive 1x broker trial passed 2026-09-23 (main 843dc8f) / regular session only / leverage rungs pending / account flat",
+      "state": "1x broker trial passed 2026-09-23 / 1x ladder attempt 2026-09-24 needs attention (fill precision) peak 0.15x / order contract and credential guard merged / flat",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
     },
     {
@@ -30,15 +30,15 @@
       "kind": "gate",
       "id": "alpaca-paper-operational",
       "title": "Alpaca bounded paper lifecycle",
-      "state": "smoke passed / adaptive 1x broker trial passed 2026-09-23 / native fault behaviour partial (C01 C02 native)",
+      "state": "smoke passed / 1x broker trial passed 2026-09-23 / native faults re-verified on order-contract engine 2026-09-24 / corporate-action guard merged 2026-09-25",
       "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
     },
     {
       "kind": "gate",
       "id": "alpaca-paper-rate",
       "title": "Alpaca observed Trading API rate",
-      "state": "observed200REST/min / adaptive submits180 plus management reserve / actual throughput pending",
-      "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
+      "state": "observed200REST/min / native paper capacity 180 actions/min passed 2026-09-24 (self-reported / counts independently listed) / 1000/min not measured",
+      "evidence_ref": "blueprints/us-equities/order-throughput/evidence/index-20260924.json"
     },
     {
       "kind": "gate",
@@ -105,6 +105,13 @@
     },
     {
       "kind": "gate",
+      "id": "wsl-workstation-host",
+      "title": "WSL2 workstation host record (nativestack-5975wx-20260925)",
+      "state": "recorded 2026-09-25 / 21 receipts / 20 independent-session agree / systemd install withheld (needs_changes)",
+      "evidence_ref": "evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json"
+    },
+    {
+      "kind": "gate",
       "id": "macos",
       "title": "macOS native acceptance",
       "state": "target host pending",
@@ -135,7 +142,7 @@
       "kind": "gate",
       "id": "corporate-action-data",
       "title": "Split and dividend data semantics",
-      "state": "25 AAPL sessions / probe accepted / upstream suite unresolved",
+      "state": "25 AAPL sessions / probe accepted / overnight-hold guard merged 2026-09-25 (process-date window) / upstream suite unresolved",
       "evidence_ref": "blueprints/us-equities/corporate-action-readiness/receipt.json"
     },
     {
@@ -212,8 +219,15 @@
       "kind": "gate",
       "id": "sota-convergence-20260922",
       "title": "SOTA repository convergence and practice",
-      "state": "28 layers vs 396 upstream repositories / 33 newcomers and 1 targeted candidate / practice tooling and workflow recorded / Codex review established (7 passes)",
-      "evidence_ref": "catalogs/sota-convergence/README.md"
+      "state": "32-layer landscape sweep 2026-09-23 / 11 sweep candidates survived both refuters (9 new + 2 previously recorded) / source review only",
+      "evidence_ref": "catalogs/sota-convergence/manifest-20260923.json"
+    },
+    {
+      "kind": "gate",
+      "id": "mover-early-entry-studies",
+      "title": "Mover early-entry studies v1 and v2",
+      "state": "v1 768 and v2 244 preregistered rule-exits / no development pass in any family / holdout unread / research result not strategy acceptance",
+      "evidence_ref": "blueprints/us-equities/mover-early-entry/README.md"
     }
   ],
   "workers": [

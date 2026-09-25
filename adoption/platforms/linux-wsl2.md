@@ -10,7 +10,7 @@ archive):
 ```sh
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack
-python3 scripts/release_due.py   # on the default branch (added after v2026.09.23): steps main documents that the pinned release lacks
+python3 scripts/release_due.py   # on the default branch: steps main documents that the pinned release lacks
 tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
 git checkout "$tag"
@@ -21,9 +21,7 @@ That checkout target is `adoption/manifest.json` `source.release_tag` (or a
 later tag), confirmed at `source.release_commit` and published with SLSA
 build provenance by `.github/workflows/publish-catalog.yml`. Read both values
 before the checkout, as above: the release's own manifest names the release
-before it. `scripts/release_due.py` itself was added after `v2026.09.23`, so
-it runs on the default branch; nothing else on this page needs a newer
-release. Do
+before it, so `scripts/release_due.py` runs on the default branch. Do
 **not** check out `source.baseline_commit`: that field predates `adoption/`
 and `tools/adoption/` entirely and is never a checkout target (Codex
 cross-family review finding, `codex-review-72`; `codex-review-64` is the
@@ -78,10 +76,6 @@ itself evidence the WSL UVA gap closed.
 
 1. Follow [`adoption/bootstrap.md`](../bootstrap.md) steps 1–3 (prerequisites,
    `bootstrap-linux.sh --profile <id>`, native sign-in).
-   `adoption/bootstrap-linux.sh` and its pins changed after `v2026.09.23`
-   (native `claude-code` pin, uv-tool `markitdown`/`tavily-cli`,
-   `--configure-claude-user-profile`); at `v2026.09.23` the script installs
-   the npm `claude-code` 2.1.278 pin and has no profile step.
 2. Recreate the SDK only for the `research-runtime` profile using
    [`adoption/sdk/README.md`](../sdk/README.md)'s transitive lock; retain the
    same exact-match and uncached-reinstall checks as
@@ -92,7 +86,9 @@ itself evidence the WSL UVA gap closed.
 4. Start selected `systemd --user` units per
    [`adoption/lifecycle.md`](../lifecycle.md#native-client-integration-and-process-lifecycle);
    never stop the shared MCPorter daemon to clean up another component.
-5. Run `python3 scripts/adoption_status.py --profile <id> --json` and record
+5. Run `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --json` (changed after
+   `v2026.09.23.1`, which runs plain `python3`: Ubuntu 24.04's `python3` is 3.12,
+   which the manifest does not support; run this form there too) and record
    the per-host receipt (`adoption/bootstrap.md` steps 6–7).
 6. Contribute what ran: record host receipts with `scripts/host_receipts.py`
    from a branch of current `main`, refresh the generated matrix and grand
@@ -100,6 +96,78 @@ itself evidence the WSL UVA gap closed.
    [`docs/contributing-evidence.md`](../../docs/contributing-evidence.md).
 7. When a newer release is pinned, follow
    [moving a host to a new release](../update.md#moving-a-host-to-a-new-release).
+
+## Windows-side commands from WSL
+
+Lessons from work on the WSL workstation in September 2026; the links give the
+upstream behavior behind each.
+
+- Do not pipe a script to `powershell.exe -Command -`. PowerShell reads
+  standard input one statement at a time, as if typed at the prompt, and does
+  not run a statement that fails to parse
+  ([about_PowerShell_exe](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_powershell_exe?view=powershell-5.1)),
+  so a multi-line block can be dropped without an error. Write a `.ps1` file
+  and run it with
+  `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w file.ps1)"`.
+- Strip `\r` and `\0` from Windows-side output before comparing or parsing it,
+  for example with `tr -d '\r\0'`. Windows programs end lines with CRLF, and
+  `wsl.exe` writes UTF-16 unless `WSL_UTF8=1` is set
+  ([`WslClient.cpp` at 2.7.14](https://github.com/microsoft/WSL/blob/2.7.14/src/windows/common/WslClient.cpp#L1843-L1852)).
+- `Get-ChildItem -Filter 'name.*'` also matches an extensionless `name`: the
+  filter follows Win32 wildcard rules, in which `.*` also matches no extension
+  ([.NET `FileSystemName`](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/IO/Enumeration/FileSystemName.cs#L139)).
+  Before any `Remove-Item`, select with `-LiteralPath` or an exact list of
+  names and print that list. `Remove-Item` deletes permanently; it does not use
+  the Recycle Bin
+  ([PowerShell#6801](https://github.com/PowerShell/PowerShell/issues/6801)).
+- A long script passed inline, as in `wsl.exe -d <distro> -- bash -lc '...'`,
+  can fail with `Argument list too long`: Linux refuses a single argument of
+  128 KiB or more (measured on the workstation's WSL kernel: 131,071 bytes
+  ran, 131,072 did not), and a Windows command line is limited to 32,767
+  characters
+  ([CreateProcessW](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw)).
+  `/dev/stdin` could not be reopened by path across the interop boundary
+  either. Pipe the script to `bash -s` instead:
+  `wsl.exe -d <distro> -- bash -s < script.sh`.
+
+## Listeners and ports
+
+- All WSL 2 distributions share one network namespace
+  ([About WSL](https://learn.microsoft.com/en-us/windows/wsl/about)), so
+  `ss -ltnp` in one distribution lists the other distributions' listeners too,
+  without a process. Attribute a listener to its distribution, unit and
+  upstream documentation before labelling it. On the WSL workstation on
+  2026-09-25, `127.0.0.1:49374`, this repository's default ai-memory port, was
+  held by another distribution, and that host's scoped `nativestack-memory`
+  unit binds `127.0.0.1:49474`. The ai-memory MCP registration and the
+  rendered hook commands (`AI_MEMORY_URL` in the host's
+  `adoption/hosts/<host>.json`) must name the port the host's own ai-memory
+  unit binds. The user-scope template `adoption/mcp/claude-user.json` keeps
+  the default 49374, and its comment gives the remove-then-add sequence for
+  another port. That template changed after `v2026.09.24.1`: serena runs
+  `${ECO_ROOT}/bin/serena` instead of a `serena-context` wrapper, and
+  jcodemunch is no longer registered at user scope (a per-project opt-in in
+  `adoption/bootstrap.md` step 4a).
+- With `networkingMode=mirrored`, a wildcard (`*` or `0.0.0.0`) listener can be
+  reached from the local network
+  ([mirrored mode](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking))
+  unless the Hyper-V firewall blocks it. WSL 2.0.9 and later turn that
+  firewall on by default on Windows 11 22H2 and later
+  ([WSL and firewall](https://learn.microsoft.com/en-us/windows/wsl/networking#wsl-and-firewall)),
+  and the mirrored-mode page opens inbound connections only by changing the
+  firewall's settings or adding a firewall rule. Bind services to `127.0.0.1`
+  and check `ss -ltnp` after each start.
+- vLLM listens on a wildcard port even with `--host 127.0.0.1`. vLLM 0.25.0
+  initializes `torch.distributed` over TCP on a single GPU too (its
+  `UniProcExecutor` passes a `tcp://` init method), and PyTorch's `TCPStore`
+  listens on all interfaces by default. vLLM documents this as known,
+  intended PyTorch behavior and says to firewall the internal ports
+  ([security guidance at v0.25.0](https://github.com/vllm-project/vllm/blob/v0.25.0/docs/usage/security.md#security-and-firewalls-protecting-exposed-vllm-systems)).
+  On the WSL workstation on 2026-09-25 (vLLM 0.25.0, torch 2.11.0, API server
+  on `127.0.0.1:18231`), `ss -ltnp` showed the engine-core process
+  (`VLLM::EngineCor`) listening on `*:24706`. Treat this as a known upstream
+  limitation that the Hyper-V firewall mitigates only while it blocks inbound
+  connections: keep that firewall on and its inbound default at block.
 
 ## Boundaries
 

@@ -1,0 +1,43 @@
+{
+  "accounting": {
+    "cash_delta_usd": "-5.40",
+    "cumulative_realized_loss_usd": "5.40",
+    "drawdown_usd": "5.40",
+    "gross_exposure_usd": "0",
+    "gross_loss_usd": "5.40",
+    "halted_reason": null,
+    "held_symbols": 0,
+    "outstanding_orders": 0,
+    "peak_pnl_usd": "0",
+    "pending_buy_notional_usd": "0",
+    "realized_pnl_usd": "-5.40",
+    "unrealized_pnl_usd": "0"
+  },
+  "adapter_errors": [],
+  "average_submissions_per_minute": 178.775977124595,
+  "broker_connections": 0,
+  "completed_synthetic_roundtrips": 90,
+  "elapsed_seconds": 60.41080112499185,
+  "engine": "NautilusTrader LiveNode 2.0.0rc5",
+  "kind": "local_native_synthetic_capacity",
+  "limitations": [
+    "Immediate synthetic fills; zero fees; no broker/network latency or liquidity effects.",
+    "Forced alternating intents; not adaptive strategy performance or paper acceptance."
+  ],
+  "native_fill_events": 180,
+  "native_portfolio_flat": true,
+  "paper_orders": 0,
+  "peak_submissions_in_60_seconds": 179,
+  "reconciliation": {
+    "cash_delta_usd": "-5.40",
+    "cash_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "positions_match": true
+  },
+  "requests_reserved": 182,
+  "status": "passed",
+  "strategy_errors": [],
+  "synthetic_submissions": 180,
+  "target_submit_ceiling_per_minute": 180
+}

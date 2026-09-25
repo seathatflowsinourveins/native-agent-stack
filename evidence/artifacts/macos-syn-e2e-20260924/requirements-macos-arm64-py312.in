@@ -1,0 +1,6 @@
+# Direct pins of blueprints/us-equities/adaptive-paper/requirements.txt
+nautilus-trader==2.0.0rc5
+alpaca-py==0.44.0
+# Nautilus 2.0.0rc5 companion pins from blueprints/us-equities/engine-nautilus/README.md
+numpy==2.5.3
+pandas==3.0.6

@@ -1,0 +1,328 @@
+{
+  "acceptance": {
+    "best_consecutive_full_windows_at_target": 5,
+    "capacity_criteria_met": true,
+    "cleanup_verified_zero_open": true,
+    "evidence_class_qualifies": true,
+    "frozen_criteria": {
+      "configured_at_or_above": true,
+      "required_windows_min": 5,
+      "target_actions_ratio_min": 0.85
+    },
+    "independent_observation_required": "Native acceptance also needs an observation by a separate method, e.g. the Alpaca dashboard or account-activity export for this prefix, checked against the receipt counts.",
+    "no_health_freezes": true,
+    "no_unexpected_fills": true,
+    "passed": true,
+    "passed_blockers": [],
+    "passed_is_self_reported": true,
+    "reconciliation_clean": true,
+    "required_consecutive_full_windows": 5,
+    "sustained": true,
+    "target_order_actions_per_window": 170,
+    "target_rule": "ceil(target_actions_ratio * effective_limit); each broker-accepted submit and each acknowledged (2xx) cancel is one completed order action",
+    "unhandled_http_429": 0,
+    "websocket_completeness_is_1": true
+  },
+  "cleanup": {
+    "cancel_all_decision": "not_enabled",
+    "cancel_all_used": false,
+    "ceiling_seconds": 240.0,
+    "individual_cancels": 1,
+    "open_harness_orders_after": 0,
+    "open_listing_complete": true,
+    "rest_sweep_cancels": 0,
+    "seconds": 0.89,
+    "step_errors": [],
+    "verification_rounds": 1,
+    "verified_zero_open": true
+  },
+  "config": {
+    "acknowledged_open_orders": 0,
+    "acknowledged_positions": 0,
+    "allow_cancel_all": false,
+    "allow_extended_hours": true,
+    "band_bps": 500,
+    "base_url": "https://paper-api.alpaca.markets",
+    "burst": null,
+    "cleanup_timeout_seconds": 60.0,
+    "configured_cap_per_minute": 200,
+    "headroom": 0.9,
+    "inflight": 4,
+    "max_consecutive_rejections": 10,
+    "max_duration_seconds": 330.0,
+    "max_http_429": 5,
+    "max_open_notional_usd": "10000",
+    "max_open_orders": 10,
+    "max_order_notional_usd": "1000",
+    "max_orders": 600,
+    "max_quote_age_seconds": 60.0,
+    "qty": 1,
+    "required_windows": 5,
+    "requote_seconds": 60.0,
+    "stream_start_timeout_seconds": 15.0,
+    "stream_timeout_seconds": 10.0,
+    "symbol": "SPY",
+    "target_actions_ratio": 0.85
+  },
+  "counts_as_strategy_trades": false,
+  "error_type": null,
+  "evidence_class": "native_paper",
+  "extended_hours_orders": false,
+  "harness": "order-throughput/1",
+  "health_freezes": [],
+  "http_429": {
+    "handled": 0,
+    "total": 0,
+    "unhandled": 0
+  },
+  "http_status_counts": {
+    "data:data_read:200": 1,
+    "trading:cancel:204": 496,
+    "trading:read:200": 9,
+    "trading:submit:200": 496
+  },
+  "latency": {
+    "submit_rest_ack": {
+      "count": 496,
+      "max_ms": 234.292,
+      "p50_ms": 19.724,
+      "p95_ms": 37.788,
+      "p99_ms": 153.646
+    },
+    "submit_to_stream_ack": {
+      "count": 496,
+      "max_ms": 177.649,
+      "p50_ms": 31.405,
+      "p95_ms": 57.349,
+      "p99_ms": 148.158
+    },
+    "submit_to_stream_terminal": {
+      "count": 496,
+      "max_ms": 2179.327,
+      "p50_ms": 371.834,
+      "p95_ms": 1109.625,
+      "p99_ms": 2064.907
+    }
+  },
+  "observed_rate_limit_headers": {
+    "counts_by_origin_and_limit": {
+      "data:10000": 1,
+      "trading:200": 1001
+    },
+    "min_remaining_by_origin": {
+      "data": 9999,
+      "trading": 193
+    }
+  },
+  "orders": {
+    "cancel_requests": 496,
+    "rest_accepted": 496,
+    "rest_rejections": {},
+    "submit_attempts": 496,
+    "unexpected_fill_qty": "0"
+  },
+  "policy": "Execution-capacity qualification only. Harness orders are non-marketable probes that are cancelled individually; they are not strategy trades and must never be counted as strategy trades, fills, signals or performance.",
+  "port_errors": 0,
+  "preflight": {
+    "acknowledged_open_orders": 0,
+    "acknowledged_positions": 0,
+    "asset_tradable": true,
+    "data_limit_headers_seen": [
+      "10000"
+    ],
+    "open_orders": 0,
+    "open_orders_complete": true,
+    "positions": 0,
+    "trading_limit_header": 200,
+    "trading_limit_headers_seen": [
+      200
+    ]
+  },
+  "probe_plan": {
+    "band_bps_below_bid": 500,
+    "cancel": "individual DELETE /v2/orders/{order_id}",
+    "client_order_id_prefix": "cap-20260924t135000-acc709-",
+    "limit_price": "726.61",
+    "marketable": false,
+    "side": "buy",
+    "time_in_force": "day",
+    "type": "limit"
+  },
+  "provenance": {
+    "alpaca_py_version": "0.44.0",
+    "argv": [
+      "paper",
+      "--env-file",
+      "<path>",
+      "--output",
+      "<path>"
+    ],
+    "ended_at": "2026-09-24T13:55:32.875140+00:00",
+    "exit_code": 0,
+    "git_revision": "4911baf411370517b1c5e0e83ca4d49c14e36db3",
+    "journal_used": true,
+    "python_version": "3.12.3",
+    "source_sha256": {
+      "adaptive-paper/runner.py": "03427aa9bf65c2d0863ae147fd1daa135dc1f7379bafcd82aa2ba3b1c19de73a",
+      "adaptive-paper/safety.py": "8cc67464ab55794b232cedb9988c264b86c8ec11ebe1734a94fb71480a269fa0",
+      "adaptive-paper/sessions.py": "1920952ac8219caf09e622fe517179e2766652fc7f987f7a11258481aa881998",
+      "adaptive-paper/transport.py": "59ffbb35726b0909c9b9db9043f993242e9beb29329c0d851359617244b06934",
+      "order-throughput/alpaca_capacity_port.py": "e4c7bd0b834b4e851b6b2fede43bbc7aff3cf62e106ab59f1dee63ac1c61f02e",
+      "order-throughput/capacity.py": "70947e8e43a0c98eb84fb48f9fce336d39cb7e5ba5615b2fadfcb237f5feeb41",
+      "order-throughput/capacity_fixture.py": "553d3ec76cfb48c3e51fb6dbf5589375743226b0018b454779e043a369a849fa",
+      "order-throughput/rate_governor.py": "f6ce579a20072d640bebbbd396ac9fff562f60b8453c55343ef513aee8489ed5"
+    }
+  },
+  "rate": {
+    "admitted": {
+      "cancel": 496,
+      "read": 4,
+      "submit": 496
+    },
+    "backoff_seconds": 0.0,
+    "backoffs": [],
+    "backoffs_over_max": 0,
+    "bucket_capacity": 9.0,
+    "budget_per_minute": 180,
+    "configured_cap_per_minute": 200,
+    "denied": {
+      "frozen": 0,
+      "server_remaining": 0,
+      "tokens": 4680,
+      "window": 20783
+    },
+    "effective_limit": 200,
+    "external_calls_noted": 5,
+    "headroom": 0.9,
+    "http_429": 0,
+    "observed_limit": 200,
+    "reserve_per_minute": 20
+  },
+  "rate_limit_changes": [
+    {
+      "budget": 180,
+      "effective_limit": 200,
+      "limit": 200,
+      "seconds_from_start": -0.131
+    }
+  ],
+  "reconciliation": {
+    "all_positions_unchanged": true,
+    "ambiguous_submits": {
+      "existed": 0,
+      "not_created": 0,
+      "unresolved": 0
+    },
+    "broker_orders_with_prefix": 496,
+    "changed_position_symbols": 0,
+    "clean": true,
+    "filled_probes": [],
+    "listing_complete": true,
+    "local_probes": 496,
+    "missing_from_broker": [],
+    "non_terminal_at_end": [],
+    "performed": true,
+    "position_unchanged": true,
+    "status_mismatches": [],
+    "unknown_prefix_orders": 0
+  },
+  "refusal_reason": null,
+  "schema_version": 1,
+  "session_kind": "RTH",
+  "stage": "reconciliation",
+  "started_at": "2026-09-24T13:50:01.273707+00:00",
+  "status": "completed",
+  "stop_reason": "duration_reached",
+  "strategy_trades": 0,
+  "throughput": {
+    "full_windows": 5,
+    "max_order_actions_full_window": 180,
+    "min_order_actions_full_window": 180,
+    "min_submits_full_window": 90,
+    "order_actions_attempted_in_phase": 991,
+    "order_actions_in_phase": 991,
+    "order_actions_not_completed_in_phase": 0,
+    "order_actions_per_minute_mean": 180.16,
+    "submission_phase_seconds": 330.04,
+    "windows": [
+      {
+        "cancels": 88,
+        "cancels_attempted": 88,
+        "full": true,
+        "index": 0,
+        "order_actions": 180,
+        "order_actions_attempted": 180,
+        "reads": 0,
+        "submits": 92,
+        "submits_attempted": 92
+      },
+      {
+        "cancels": 90,
+        "cancels_attempted": 90,
+        "full": true,
+        "index": 1,
+        "order_actions": 180,
+        "order_actions_attempted": 180,
+        "reads": 0,
+        "submits": 90,
+        "submits_attempted": 90
+      },
+      {
+        "cancels": 90,
+        "cancels_attempted": 90,
+        "full": true,
+        "index": 2,
+        "order_actions": 180,
+        "order_actions_attempted": 180,
+        "reads": 0,
+        "submits": 90,
+        "submits_attempted": 90
+      },
+      {
+        "cancels": 90,
+        "cancels_attempted": 90,
+        "full": true,
+        "index": 3,
+        "order_actions": 180,
+        "order_actions_attempted": 180,
+        "reads": 0,
+        "submits": 90,
+        "submits_attempted": 90
+      },
+      {
+        "cancels": 90,
+        "cancels_attempted": 90,
+        "full": true,
+        "index": 4,
+        "order_actions": 180,
+        "order_actions_attempted": 180,
+        "reads": 0,
+        "submits": 90,
+        "submits_attempted": 90
+      },
+      {
+        "cancels": 48,
+        "cancels_attempted": 48,
+        "full": false,
+        "index": 5,
+        "order_actions": 92,
+        "order_actions_attempted": 92,
+        "reads": 4,
+        "submits": 44,
+        "submits_attempted": 44
+      }
+    ]
+  },
+  "websocket": {
+    "ack_observed": 496,
+    "complete": 496,
+    "completeness": 1.0,
+    "events_this_run": 1488,
+    "events_total": 1488,
+    "foreign_events_ignored": 0,
+    "malformed_events": 0,
+    "orders_expected": 496,
+    "terminal_observed": 496,
+    "unknown_harness_events": 0
+  }
+}

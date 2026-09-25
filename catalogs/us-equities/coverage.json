@@ -2,7 +2,7 @@
   "schema_version": 1,
   "checked_at": "2026-09-19",
   "scope": "Public-star catalog membership ledger. no_catalog_card means no current full catalog or adopted baseline card; every public star also has a separate source disposition and review depth in star-audit.json. Membership does not imply native execution.",
-  "source_command": "gh api --paginate --slurp users/seathatflowsinourveins/starred?per_page=100",
+  "source_command": "2026-09-24 refresh: authenticated GET /user/starred with Accept: application/vnd.github.star+json, all pages (see latest_public_refresh). Earlier 342-star public snapshot: gh api --paginate --slurp users/seathatflowsinourveins/starred?per_page=100",
   "baseline_source_command": "Earlier 337-star snapshot: gh api --paginate user/starred --jq '.[] | {full_name,private,html_url}'",
   "stars": [
     {
@@ -19,6 +19,12 @@
     },
     {
       "repository": "https://github.com/1jehuang/jcode",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/6551Team/opennews-mcp",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
       "prior_candidate_decision": false
@@ -84,6 +90,14 @@
       "prior_candidate_decision": false
     },
     {
+      "repository": "https://github.com/AI4Finance-Foundation/FinRL-Trading",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "finrl-x"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
       "repository": "https://github.com/akfamily/akshare",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
@@ -119,6 +133,15 @@
       "repository": "https://github.com/alirezarezvani/claude-skills",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "alpaca-py",
+        "data-alpaca-py"
+      ],
       "prior_candidate_decision": false
     },
     {
@@ -356,6 +379,12 @@
       "prior_candidate_decision": false
     },
     {
+      "repository": "https://github.com/chrisworsey55/atlas-gic",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
       "repository": "https://github.com/citrolabs/ego-lite",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
@@ -407,6 +436,12 @@
     },
     {
       "repository": "https://github.com/codejunkie99/agentic-stack",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/coding-kitties/investing-algorithm-framework",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
       "prior_candidate_decision": false
@@ -636,6 +671,12 @@
       "prior_candidate_decision": false
     },
     {
+      "repository": "https://github.com/fasiondog/hikyuu",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
       "repository": "https://github.com/fffaraz/awesome-cpp",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
@@ -860,6 +901,12 @@
     {
       "repository": "https://github.com/jarrodwatts/claude-hud",
       "disposition": "baseline_record",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/jarrodwatts/jev-trader",
+      "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
       "prior_candidate_decision": false
     },
@@ -1121,6 +1168,12 @@
     },
     {
       "repository": "https://github.com/microsoft/SkillOpt",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/MIgHTy-alIeN/ai-trader-bot",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
       "prior_candidate_decision": false
@@ -1470,6 +1523,14 @@
       "prior_candidate_decision": false
     },
     {
+      "repository": "https://github.com/polakowo/vectorbt",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "vectorbt"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
       "repository": "https://github.com/PostHog/posthog",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
@@ -1522,6 +1583,14 @@
       "prior_candidate_decision": false
     },
     {
+      "repository": "https://github.com/QuantConnect/Lean",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "lean"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
       "repository": "https://github.com/quemsah/awesome-claude-plugins",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
@@ -1543,6 +1612,12 @@
     },
     {
       "repository": "https://github.com/revfactory/harness",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ricequant/rqalpha",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
       "prior_candidate_decision": false
@@ -1688,7 +1763,19 @@
       "prior_candidate_decision": false
     },
     {
+      "repository": "https://github.com/stefan-jansen/machine-learning-for-trading",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
       "repository": "https://github.com/storybloq/storybloq",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/supabase/supabase",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
       "prior_candidate_decision": false
@@ -1802,6 +1889,12 @@
       "prior_candidate_decision": false
     },
     {
+      "repository": "https://github.com/TraderAlice/OpenAlice",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
       "repository": "https://github.com/tradermonty/claude-trading-skills",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
@@ -1815,6 +1908,12 @@
     },
     {
       "repository": "https://github.com/trailofbits/skills",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/trycua/cua",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
       "prior_candidate_decision": false
@@ -2164,12 +2263,6 @@
       ]
     },
     {
-      "repository": "https://github.com/ai4finance-foundation/finrl-trading",
-      "catalog_entry_ids": [
-        "finrl-x"
-      ]
-    },
-    {
       "repository": "https://github.com/alex9smith/gdelt-doc-api",
       "catalog_entry_ids": [
         "data-gdeltdoc"
@@ -2179,13 +2272,6 @@
       "repository": "https://github.com/alpacahq/alpaca-backtrader-api",
       "catalog_entry_ids": [
         "alpaca-backtrader-legacy"
-      ]
-    },
-    {
-      "repository": "https://github.com/alpacahq/alpaca-py",
-      "catalog_entry_ids": [
-        "alpaca-py",
-        "data-alpaca-py"
       ]
     },
     {
@@ -2569,12 +2655,6 @@
       ]
     },
     {
-      "repository": "https://github.com/polakowo/vectorbt",
-      "catalog_entry_ids": [
-        "vectorbt"
-      ]
-    },
-    {
       "repository": "https://github.com/prometheus/alertmanager",
       "catalog_entry_ids": [
         "alertmanager"
@@ -2602,12 +2682,6 @@
       "repository": "https://github.com/qdrant/qdrant",
       "catalog_entry_ids": [
         "foundation-qdrant"
-      ]
-    },
-    {
-      "repository": "https://github.com/quantconnect/lean",
-      "catalog_entry_ids": [
-        "lean"
       ]
     },
     {
@@ -2800,13 +2874,13 @@
     "linkedin/datahub": "datahub-project/datahub"
   },
   "latest_public_refresh": {
-    "checked_at_utc": "2026-09-20T00:03:16.689897+00:00",
-    "endpoint": "GET /users/seathatflowsinourveins/starred?per_page=100 (all pages)",
-    "public_repositories": 342,
-    "added_since_recorded_snapshot": 0,
+    "checked_at_utc": "2026-09-24T17:33:14Z",
+    "endpoint": "GET /user/starred (authenticated; Accept: application/vnd.github.star+json; all pages)",
+    "public_repositories": 357,
+    "added_since_recorded_snapshot": 15,
     "removed_since_recorded_snapshot": 0,
     "duplicate_ids": 0,
-    "evidence_ref": "blueprints/us-equities/data-readiness/public-stars-refresh.json",
-    "scope": "Public endpoint identity refresh; no private-star inventory or source-execution claim."
+    "evidence_ref": "catalogs/us-equities/star-refresh-20260924.json",
+    "scope": "Authenticated star identity refresh. All 357 repositories are public (15 additions confirmed by GraphQL isPrivate), so no private star is excluded; no source-execution claim."
   }
 }

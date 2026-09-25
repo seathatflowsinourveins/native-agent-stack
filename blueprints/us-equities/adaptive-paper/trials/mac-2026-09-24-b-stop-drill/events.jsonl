@@ -1,0 +1,29 @@
+{"at": 1790260211.9173481, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260211.9168131, "type": "decision"}
+{"at": 1790260213.9443789, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260213.9437351, "type": "decision"}
+{"at": 1790260215.968993, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260215.96849, "type": "decision"}
+{"at": 1790260218.004182, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260218.002044, "type": "decision"}
+{"at": 1790260220.048439, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260220.047006, "type": "decision"}
+{"at": 1790260222.0936599, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260222.0908449, "type": "decision"}
+{"at": 1790260224.130154, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260224.1286058, "type": "decision"}
+{"at": 1790260226.164059, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260226.1635041, "type": "decision"}
+{"at": 1790260228.190502, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260228.1896489, "type": "decision"}
+{"at": 1790260230.2107131, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260230.20942, "type": "decision"}
+{"at": 1790260232.232624, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260232.232086, "type": "decision"}
+{"at": 1790260234.252558, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260234.252064, "type": "decision"}
+{"at": 1790260236.28459, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260236.283339, "type": "decision"}
+{"at": 1790260238.305278, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260238.304747, "type": "decision"}
+{"at": 1790260240.324008, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "unavailable", "signals": [], "targets": {}, "timestamp": 1790260240.323309, "type": "decision"}
+{"at": 1790260242.3413088, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [], "targets": {}, "timestamp": 1790260242.339833, "type": "decision"}
+{"at": 1790260244.361813, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [], "targets": {}, "timestamp": 1790260244.360399, "type": "decision"}
+{"at": 1790260246.3813498, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [], "targets": {}, "timestamp": 1790260246.380199, "type": "decision"}
+{"at": 1790260248.404763, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [], "targets": {}, "timestamp": 1790260248.403292, "type": "decision"}
+{"at": 1790260250.423372, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [], "targets": {}, "timestamp": 1790260250.422095, "type": "decision"}
+{"at": 1790260252.4421718, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [], "targets": {}, "timestamp": 1790260252.439919, "type": "decision"}
+{"at": 1790260254.473943, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [], "targets": {}, "timestamp": 1790260254.471671, "type": "decision"}
+{"at": 1790260256.5096378, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [], "targets": {}, "timestamp": 1790260256.506749, "type": "decision"}
+{"at": 1790260258.534376, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [], "targets": {}, "timestamp": 1790260258.5329971, "type": "decision"}
+{"at": 1790260260.56044, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [], "targets": {}, "timestamp": 1790260260.557642, "type": "decision"}
+{"at": 1790260262.5902798, "effective_leverage": 0.00878, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [{"edge_bps": 8.09488700784483, "family": "relative_strength", "score": 3.0559099909941008, "symbol": "CRWV"}], "targets": {"CRWV": 1}, "timestamp": 1790260262.58658, "type": "decision"}
+{"at": 1790260262.592483, "client_id": "adp-mac-20260924b-stop-0000001", "reason": "relative_strength", "side": "buy", "strategy": "ADAPTIVE-001-A", "symbol": "CRWV", "type": "intent"}
+{"at": 1790260262.694887, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [], "targets": {}, "timestamp": 1790260262.691574, "type": "decision"}
+{"at": 1790260262.79921, "effective_leverage": 0.0, "exits": {}, "gap_bps": {}, "regime": "range", "signals": [], "targets": {}, "timestamp": 1790260262.795635, "type": "decision"}

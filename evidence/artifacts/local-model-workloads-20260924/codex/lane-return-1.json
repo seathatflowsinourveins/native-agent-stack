@@ -1,0 +1,407 @@
+{
+  "schema_version": 1,
+  "kind": "blind_lane_return",
+  "lane": "codex",
+  "run_label": "codex-lane",
+  "attempt": 1,
+  "packet_sha256": "38586709f488bcbe0d2488f4d8c0fdbb8c41a99e1a0286c67ba6d6103ace5eb7",
+  "model": {
+    "name": "gpt-6-astra",
+    "effort": "high",
+    "family": "openai"
+  },
+  "model_note": "Requested gpt-6-astra at high reasoning effort; the retained JSON event stream does not repeat the resolved model or effort.",
+  "client": "codex exec, read-only sandbox, --ignore-user-config, hooks disabled, live web search",
+  "source_file": "local-uses-codex.md",
+  "original_sha256": "7b91aec490960d3734c34b8eed5f2c72a348b3701c2126d4bd68862915fd32e0",
+  "original_bytes": 7513,
+  "return_text": "**Prioritize catalyst extraction, transcription, and parsing difficult exhibits.** Their value can be measured directly; forecasting and agent assistance need stronger local validation.\n\nSelections below are best-fit candidates as of **2026-09-24**, not established universal winners. **A** = academic; **S** = maker-reported. Undated sources were checked on that date. Proposed acceptance thresholds are engineering gates, not published results.\n\n| Workload; reason to run locally | Repository/model; runner-up | Evidence and date | Mac throughput/latency | Frozen acceptance test | Verdict |\n|---|---|---|---|---|---|\n| **Catalyst classification and event extraction:** offerings, acquisitions, trial results, guidance changes; batch volume and private annotations. | [GLiNER2](https://github.com/fastino-ai/GLiNER2), **gliner2.5-base-v1**, 2026-08-24. Runner-up: installed [Qwen3.8-27B](https://huggingface.co/Qwen/Qwen3.8-27B) for harder relationships. | **S**, [GLiNER2.5 evaluation](https://fastino.ai/blog/gliner2-5-span-free-information-extraction), 2026-08-24: Few-NERD F1 55.14; 16-task average 54.87. Financial catalyst accuracy **unknown**. | M5 Pro **unknown**; CPU inference is supported. Do not transfer older GLiNER speed claims. | Freeze 1,000 manually adjudicated 2024–2025 SEC/news passages, including negatives. Compare keyword rules and frontier extraction. Require ≥95% catalyst recall, ≥90% precision, source-span accuracy, and lower cost/document. | **Trial first:** directly useful research annotations; modest general benchmark scores require abstention. |\n| **OCR/layout/table extraction from scanned exhibits:** batch processing and offline access. Use existing HTML/XBRL parsing first. | [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR), [VL-1.6, 0.9B](https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6), 2026-05-28. Runner-up: [olmOCR-2-7B-1025](https://github.com/allenai/olmocr). | **A/S**, [PaddleOCR report](https://arxiv.org/abs/2606.03264), 2026-06: OmniDocBench v1.6 **96.33**. Different benchmark versions are not interchangeable. | M5 Pro pages/minute **unknown**; complete pipeline compatibility also needs verification. | Freeze 200 exhibit pages with transcribed tables. Compare deterministic PDF extraction and cloud vision. Require table TEDS ≥0.95, numeric-cell exact match ≥99.5%, and lower corrected-page cost. | **Trial:** valuable exception path; never treat OCR numbers as verified financial facts. |\n| **Earnings-call transcription and agent dictation:** recurring audio volume, privacy, offline operation. | [FluidAudio](https://github.com/FluidInference/FluidAudio) + **Parakeet-TDT-0.6B-v3 CoreML**. Runner-up: [mlx-whisper](https://github.com/ml-explore/mlx-examples/tree/main/whisper) + Whisper large-v3-turbo. | **S**, [NVIDIA card](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3), checked 2026-09-24: Open ASR benchmark Earnings-22 WER **11.42%**. | **Measured elsewhere:** [FluidAudio FLEURS](https://github.com/FluidInference/FluidAudio/blob/main/Documentation/Benchmarks.md), checked 2026-09-24: **207× realtime**, English, M4 Pro. M5 and long-call performance **unknown**. | Freeze Earnings-22 test files plus 100 finance dictations. Compare Whisper; require no worse WER, ≥98% ticker/number accuracy on dictations, ≥20× realtime. | **Trial first:** strong throughput evidence; finance entities need separate scoring. |\n| **Tabular catalyst/outcome experiments:** repeatable private research without sending feature tables to cloud LLMs. | [TabICLv2](https://github.com/soda-inria/tabicl), checkpoint **20260212**. Runner-up: [TabPFN-3.5](https://github.com/PriorLabs/TabPFN), checkpoint **20260909**, restricted weights. | **A**, [TabICLv2](https://arxiv.org/abs/2602.11139), 2026-02; TabArena/TALENT. **A/S**, [TabPFN-3.5](https://arxiv.org/abs/2609.17895), 2026-09: TabArena/BeyondArena leadership claim. Equities edge **unknown**. | M5 Pro **unknown**. TabICL reports <10 seconds for 50K×100 on **H100**, not this Mac. | Freeze point-in-time 2015–2025 equities features; predict +200% within 20 sessions. Include delistings, temporal splits and 20-session embargo. Beat logistic regression/CatBoost on PR-AUC and Brier score. | **Trial:** research challenger; TabICL’s permissive license favors it for this use. |\n| **Volume/volatility forecasting experiments:** local batch research, no cloud-token serialization of numeric arrays. | [Chronos-2](https://github.com/amazon-science/chronos-forecasting), **120M**, 2025-10-20. Runner-up: [TimesFM-3](https://github.com/google-research/timesfm), 2026-08-31, stronger reported results but restricted weights. | **A/S**, [Chronos-2](https://arxiv.org/abs/2510.15821), 2025-10: fev-bench/GIFT-Eval. **S**, [Google](https://www.research.google/blog/timesfm-3-a-zero-shot-foundation-model-for-multivariate-forecasting/), 2026-08-31: newer benchmark leadership. | M5 latency **unknown**; benchmark leadership supplies no hardware estimate. | Freeze the same market archive; rolling forecasts using only then-known covariates. Compare seasonal-naive volume and EWMA volatility. Require ≥5% lower pinball loss with calibrated intervals. | **Trial, lower priority:** forecasting scores do not establish tradable returns. |\n| **Asynchronous failure-log triage:** private logs and fewer cloud input tokens. | [Qwen3.8](https://github.com/QwenLM/Qwen3.8) **27B**, 2026-08-14, existing Ollama. Runner-up: installed Qwen3.5-9B. | **S**, [model card](https://huggingface.co/Qwen/Qwen3.8-27B): Terminal Bench 2.1 **73.0**; triage-specific evidence **unknown**. | **Packet measurement:** 26 output tok/s; 250–320 input tok/s. Long-log prefill can dominate. | Freeze 500 labeled build/test failures. Compare regex extraction and frontier processing of raw logs. Require ≥99% failure recall, ≥30% fewer cloud tokens, no reduction in repair success. | **Trial:** advisory summaries with raw evidence retained; avoid synchronous hooks initially. |\n| **Editor next-edit suggestions:** offline coding and private source. | [Sweep v2-7B model/inference repository](https://huggingface.co/sweepai/sweep-next-edit-v2-7B). Runner-up: [Sweep 1.5B](https://huggingface.co/sweepai/sweep-next-edit-1.5B). | Quality superiority **unknown**. [oMLX community benchmark](https://omlx.ai/benchmarks/performance/bs4hq2u5), 2026-08-19, reports hardware throughput, not edit usefulness. | **Measured elsewhere:** M5 Pro 20-GPU-core, 48GB, 8-bit: **32.2 tok/s at 8K**. Ollama latency **unknown**. | Freeze 300 chronological edit traces. Compare language-server completion; require ≥20% accepted suggestions and p95 ≤500ms, including prefill. | **Trial only if editing frequently:** little benefit to unattended CLI agents. |\n\nFreeze dataset hashes, labels, model revisions, quantization and runner settings before tuning. Measure cold/warm latency, peak memory, correction time and cloud costs avoided. No tests were run.\n\n[TabPFN-3.5](https://huggingface.co/Prior-Labs/tabpfn_3_5) and [TimesFM-3](https://huggingface.co/google/timesfm-3.0-pytorch) have noncommercial weight licenses; open code does not remove those restrictions.\n\n**Skip locally:** frontier replacement, autonomous strategy selection, authoritative model judging, and speculative synthetic-market simulation—task-specific benefit is unproven. Keep arithmetic, corporate-action adjustments, portfolio risk, broker reconciliation and order state deterministic. Local execution does not itself make model outputs deterministic.",
+  "output_contract_check": {
+    "table_rows": 7,
+    "not_local_items": 4,
+    "words_whitespace_split": 770,
+    "word_limit": 900,
+    "within_limit": true
+  },
+  "items": [
+    {
+      "row": 1,
+      "workload": "Catalyst classification and event extraction: offerings, acquisitions, trial results, guidance changes",
+      "why_local": "batch volume and private annotations.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "GLiNER2",
+          "urls": [
+            "https://github.com/fastino-ai/GLiNER2"
+          ],
+          "details": "gliner2.5-base-v1, 2026-08-24"
+        },
+        {
+          "role": "runner_up",
+          "name": "Qwen3.8-27B",
+          "urls": [
+            "https://huggingface.co/Qwen/Qwen3.8-27B"
+          ],
+          "details": "for harder relationships"
+        }
+      ],
+      "evidence": [
+        {
+          "grade": "S",
+          "source": "GLiNER2.5 evaluation",
+          "url": "https://fastino.ai/blog/gliner2-5-span-free-information-extraction",
+          "date": "2026-08-24",
+          "claim": "Few-NERD F1 55.14; 16-task average 54.87. Financial catalyst accuracy unknown."
+        }
+      ],
+      "unknowns": [],
+      "throughput": "S, GLiNER2.5 evaluation, 2026-08-24: Few-NERD F1 55.14; 16-task average 54.87. Financial catalyst accuracy unknown.",
+      "throughput_urls": [
+        "https://fastino.ai/blog/gliner2-5-span-free-information-extraction"
+      ],
+      "acceptance_test": "M5 Pro unknown; CPU inference is supported. Do not transfer older GLiNER speed claims.",
+      "verdict": "Trial first",
+      "verdict_class": "trial",
+      "verdict_reason": "directly useful research annotations; modest general benchmark scores require abstention."
+    },
+    {
+      "row": 2,
+      "workload": "OCR/layout/table extraction from scanned exhibits",
+      "why_local": "batch processing and offline access. Use existing HTML/XBRL parsing first.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "PaddleOCR",
+          "urls": [
+            "https://github.com/PaddlePaddle/PaddleOCR",
+            "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6"
+          ],
+          "details": "VL-1.6, 0.9B, 2026-05-28"
+        },
+        {
+          "role": "runner_up",
+          "name": "olmOCR-2-7B-1025",
+          "urls": [
+            "https://github.com/allenai/olmocr"
+          ],
+          "details": null
+        }
+      ],
+      "evidence": [
+        {
+          "grade": "A/S",
+          "source": "PaddleOCR report",
+          "url": "https://arxiv.org/abs/2606.03264",
+          "date": "2026-06",
+          "claim": "OmniDocBench v1.6 96.33. Different benchmark versions are not interchangeable."
+        }
+      ],
+      "unknowns": [],
+      "throughput": "A/S, PaddleOCR report, 2026-06: OmniDocBench v1.6 96.33. Different benchmark versions are not interchangeable.",
+      "throughput_urls": [
+        "https://arxiv.org/abs/2606.03264"
+      ],
+      "acceptance_test": "M5 Pro pages/minute unknown; complete pipeline compatibility also needs verification.",
+      "verdict": "Trial",
+      "verdict_class": "trial",
+      "verdict_reason": "valuable exception path; never treat OCR numbers as verified financial facts."
+    },
+    {
+      "row": 3,
+      "workload": "Earnings-call transcription and agent dictation",
+      "why_local": "recurring audio volume, privacy, offline operation.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "FluidAudio + Parakeet-TDT-0.6B-v3 CoreML",
+          "urls": [
+            "https://github.com/FluidInference/FluidAudio"
+          ],
+          "details": null
+        },
+        {
+          "role": "runner_up",
+          "name": "mlx-whisper + Whisper large-v3-turbo",
+          "urls": [
+            "https://github.com/ml-explore/mlx-examples/tree/main/whisper"
+          ],
+          "details": null
+        }
+      ],
+      "evidence": [
+        {
+          "grade": "S",
+          "source": "NVIDIA card",
+          "url": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3",
+          "date": "checked 2026-09-24",
+          "claim": "Open ASR benchmark Earnings-22 WER 11.42%."
+        }
+      ],
+      "unknowns": [],
+      "throughput": "S, NVIDIA card, checked 2026-09-24: Open ASR benchmark Earnings-22 WER 11.42%.",
+      "throughput_urls": [
+        "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3"
+      ],
+      "acceptance_test": "Measured elsewhere: FluidAudio FLEURS, checked 2026-09-24: 207× realtime, English, M4 Pro. M5 and long-call performance unknown.",
+      "verdict": "Trial first",
+      "verdict_class": "trial",
+      "verdict_reason": "strong throughput evidence; finance entities need separate scoring."
+    },
+    {
+      "row": 4,
+      "workload": "Tabular catalyst/outcome experiments",
+      "why_local": "repeatable private research without sending feature tables to cloud LLMs.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "TabICLv2",
+          "urls": [
+            "https://github.com/soda-inria/tabicl"
+          ],
+          "details": "checkpoint 20260212"
+        },
+        {
+          "role": "runner_up",
+          "name": "TabPFN-3.5",
+          "urls": [
+            "https://github.com/PriorLabs/TabPFN"
+          ],
+          "details": "checkpoint 20260909, restricted weights"
+        }
+      ],
+      "evidence": [
+        {
+          "grade": "A",
+          "source": "TabICLv2",
+          "url": "https://arxiv.org/abs/2602.11139",
+          "date": "2026-02",
+          "claim": "TabArena/TALENT."
+        },
+        {
+          "grade": "A/S",
+          "source": "TabPFN-3.5",
+          "url": "https://arxiv.org/abs/2609.17895",
+          "date": "2026-09",
+          "claim": "TabArena/BeyondArena leadership claim. Equities edge unknown."
+        }
+      ],
+      "unknowns": [],
+      "throughput": "A, TabICLv2, 2026-02; TabArena/TALENT. A/S, TabPFN-3.5, 2026-09: TabArena/BeyondArena leadership claim. Equities edge unknown.",
+      "throughput_urls": [
+        "https://arxiv.org/abs/2602.11139",
+        "https://arxiv.org/abs/2609.17895"
+      ],
+      "acceptance_test": "M5 Pro unknown. TabICL reports <10 seconds for 50K×100 on H100, not this Mac.",
+      "verdict": "Trial",
+      "verdict_class": "trial",
+      "verdict_reason": "research challenger; TabICL’s permissive license favors it for this use."
+    },
+    {
+      "row": 5,
+      "workload": "Volume/volatility forecasting experiments",
+      "why_local": "local batch research, no cloud-token serialization of numeric arrays.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "Chronos-2",
+          "urls": [
+            "https://github.com/amazon-science/chronos-forecasting"
+          ],
+          "details": "120M, 2025-10-20"
+        },
+        {
+          "role": "runner_up",
+          "name": "TimesFM-3",
+          "urls": [
+            "https://github.com/google-research/timesfm"
+          ],
+          "details": "2026-08-31, stronger reported results but restricted weights"
+        }
+      ],
+      "evidence": [
+        {
+          "grade": "A/S",
+          "source": "Chronos-2",
+          "url": "https://arxiv.org/abs/2510.15821",
+          "date": "2025-10",
+          "claim": "fev-bench/GIFT-Eval."
+        },
+        {
+          "grade": "S",
+          "source": "Google",
+          "url": "https://www.research.google/blog/timesfm-3-a-zero-shot-foundation-model-for-multivariate-forecasting/",
+          "date": "2026-08-31",
+          "claim": "newer benchmark leadership."
+        }
+      ],
+      "unknowns": [],
+      "throughput": "A/S, Chronos-2, 2025-10: fev-bench/GIFT-Eval. S, Google, 2026-08-31: newer benchmark leadership.",
+      "throughput_urls": [
+        "https://arxiv.org/abs/2510.15821",
+        "https://www.research.google/blog/timesfm-3-a-zero-shot-foundation-model-for-multivariate-forecasting/"
+      ],
+      "acceptance_test": "M5 latency unknown; benchmark leadership supplies no hardware estimate.",
+      "verdict": "Trial, lower priority",
+      "verdict_class": "trial",
+      "verdict_reason": "forecasting scores do not establish tradable returns."
+    },
+    {
+      "row": 6,
+      "workload": "Asynchronous failure-log triage",
+      "why_local": "private logs and fewer cloud input tokens.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "Qwen3.8 27B",
+          "urls": [
+            "https://github.com/QwenLM/Qwen3.8"
+          ],
+          "details": "2026-08-14, existing Ollama"
+        },
+        {
+          "role": "runner_up",
+          "name": "Qwen3.5-9B",
+          "urls": [],
+          "details": "installed"
+        }
+      ],
+      "evidence": [
+        {
+          "grade": "S",
+          "source": "model card",
+          "url": "https://huggingface.co/Qwen/Qwen3.8-27B",
+          "date": null,
+          "claim": "Terminal Bench 2.1 73.0; triage-specific evidence unknown."
+        }
+      ],
+      "unknowns": [],
+      "throughput": "S, model card: Terminal Bench 2.1 73.0; triage-specific evidence unknown.",
+      "throughput_urls": [
+        "https://huggingface.co/Qwen/Qwen3.8-27B"
+      ],
+      "acceptance_test": "Packet measurement: 26 output tok/s; 250–320 input tok/s. Long-log prefill can dominate.",
+      "verdict": "Trial",
+      "verdict_class": "trial",
+      "verdict_reason": "advisory summaries with raw evidence retained; avoid synchronous hooks initially."
+    },
+    {
+      "row": 7,
+      "workload": "Editor next-edit suggestions",
+      "why_local": "offline coding and private source.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "Sweep v2-7B model/inference repository",
+          "urls": [
+            "https://huggingface.co/sweepai/sweep-next-edit-v2-7B"
+          ],
+          "details": null
+        },
+        {
+          "role": "runner_up",
+          "name": "Sweep 1.5B",
+          "urls": [
+            "https://huggingface.co/sweepai/sweep-next-edit-1.5B"
+          ],
+          "details": null
+        }
+      ],
+      "evidence": [
+        {
+          "grade": null,
+          "source": "oMLX community benchmark",
+          "url": "https://omlx.ai/benchmarks/performance/bs4hq2u5",
+          "date": "2026-08-19",
+          "claim": "reports hardware throughput, not edit usefulness."
+        }
+      ],
+      "unknowns": [
+        "Quality superiority unknown."
+      ],
+      "throughput": "Quality superiority unknown. oMLX community benchmark, 2026-08-19, reports hardware throughput, not edit usefulness.",
+      "throughput_urls": [
+        "https://omlx.ai/benchmarks/performance/bs4hq2u5"
+      ],
+      "acceptance_test": "Measured elsewhere: M5 Pro 20-GPU-core, 48GB, 8-bit: 32.2 tok/s at 8K. Ollama latency unknown.",
+      "verdict": "Trial only if editing frequently",
+      "verdict_class": "trial",
+      "verdict_reason": "little benefit to unattended CLI agents."
+    }
+  ],
+  "not_local": [
+    {
+      "workload": "frontier replacement",
+      "reason": "task-specific benefit is unproven.",
+      "evidence": [],
+      "verdict": "skip"
+    },
+    {
+      "workload": "autonomous strategy selection",
+      "reason": "task-specific benefit is unproven.",
+      "evidence": [],
+      "verdict": "skip"
+    },
+    {
+      "workload": "authoritative model judging",
+      "reason": "task-specific benefit is unproven.",
+      "evidence": [],
+      "verdict": "skip"
+    },
+    {
+      "workload": "speculative synthetic-market simulation",
+      "reason": "task-specific benefit is unproven.",
+      "evidence": [],
+      "verdict": "skip"
+    }
+  ],
+  "deterministic_boundary": "Keep arithmetic, corporate-action adjustments, portfolio risk, broker reconciliation and order state deterministic. Local execution does not itself make model outputs deterministic.",
+  "notes": [
+    "Prioritize catalyst extraction, transcription, and parsing difficult exhibits. Their value can be measured directly; forecasting and agent assistance need stronger local validation.",
+    "Selections below are best-fit candidates as of 2026-09-24, not established universal winners. A = academic; S = maker-reported. Undated sources were checked on that date. Proposed acceptance thresholds are engineering gates, not published results.",
+    "Freeze dataset hashes, labels, model revisions, quantization and runner settings before tuning. Measure cold/warm latency, peak memory, correction time and cloud costs avoided. No tests were run.",
+    "TabPFN-3.5 and TimesFM-3 have noncommercial weight licenses; open code does not remove those restrictions."
+  ],
+  "sources_read": [
+    "https://github.com/fastino-ai/GLiNER2",
+    "https://huggingface.co/Qwen/Qwen3.8-27B",
+    "https://fastino.ai/blog/gliner2-5-span-free-information-extraction",
+    "https://github.com/PaddlePaddle/PaddleOCR",
+    "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6",
+    "https://github.com/allenai/olmocr",
+    "https://arxiv.org/abs/2606.03264",
+    "https://github.com/FluidInference/FluidAudio",
+    "https://github.com/ml-explore/mlx-examples/tree/main/whisper",
+    "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3",
+    "https://github.com/FluidInference/FluidAudio/blob/main/Documentation/Benchmarks.md",
+    "https://github.com/soda-inria/tabicl",
+    "https://github.com/PriorLabs/TabPFN",
+    "https://arxiv.org/abs/2602.11139",
+    "https://arxiv.org/abs/2609.17895",
+    "https://github.com/amazon-science/chronos-forecasting",
+    "https://github.com/google-research/timesfm",
+    "https://arxiv.org/abs/2510.15821",
+    "https://www.research.google/blog/timesfm-3-a-zero-shot-foundation-model-for-multivariate-forecasting/",
+    "https://github.com/QwenLM/Qwen3.8",
+    "https://huggingface.co/sweepai/sweep-next-edit-v2-7B",
+    "https://huggingface.co/sweepai/sweep-next-edit-1.5B",
+    "https://omlx.ai/benchmarks/performance/bs4hq2u5",
+    "https://huggingface.co/Prior-Labs/tabpfn_3_5",
+    "https://huggingface.co/google/timesfm-3.0-pytorch"
+  ],
+  "event_stream_page_opens": [
+    "https://github.com/fastino-ai/GLiNER2",
+    "https://huggingface.co/sweepai/sweep-next-edit-1.5B",
+    "https://huggingface.co/sweepai/sweep-next-edit-1.5B/raw/main/README.md",
+    "https://github.com/soda-inria/tabicl/blob/main/CHANGES.md",
+    "https://omlx.ai/benchmarks/performance/bs4hq2u5"
+  ],
+  "limits": [
+    "Discovery only; the return itself states 'No tests were run.'",
+    "The JSON event stream (not committed) shows one local read of the packet (exit 0), 14 completed web_search items (8 searches carrying 29 queries, 5 page opens, 1 empty) and 4 agent messages. No query names the excluded repositories; their only occurrence is the packet text the read echoed.",
+    "sources_read lists the cited URLs; event_stream_page_opens lists the pages the stream shows being opened. Search result pages read inside a search are not itemized.",
+    "M5 Pro throughput is unknown for most rows per the return; the Sweep figure is a community benchmark on a 48 GB M5 Pro.",
+    "The Qwen3.8 link points to the GitHub repository QwenLM/Qwen3.8 (verified to exist on 2026-09-24); the weights are Qwen/Qwen3.8-27B on Hugging Face.",
+    "items, not_local and notes are the recorder's transcription (every string is a substring of the return with link targets and bold markers removed); return_text is authoritative."
+  ]
+}
