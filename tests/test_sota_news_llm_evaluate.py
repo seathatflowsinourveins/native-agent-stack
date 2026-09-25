@@ -95,10 +95,12 @@ def authorization(protocol_path, digest, data_root):
 
 
 class ProtocolConsistency(unittest.TestCase):
-    def test_draft_matches_code_and_pins(self):
+    def test_committed_protocol_is_frozen_and_matches_code(self):
+        # The protocol was frozen at 70bd2b84 (receipts/freeze-record.json); it must stay frozen.
         p = DRAFT
-        self.assertEqual(p["status"], "draft_pending_independent_pre_outcome_review")
-        self.assertIs(p["frozen_before_outcomes"], False)
+        self.assertEqual(p["status"], ev_mod.FROZEN_STATUS)
+        self.assertIs(p["frozen_before_outcomes"], True)
+        self.assertTrue(p["frozen_at"])
         self.assertEqual(p["frozen_status_value"], ev_mod.FROZEN_STATUS)
         self.assertEqual(p["scoring"]["operative_variant"], sig.OPERATIVE_VARIANT)
         self.assertEqual(SETTINGS["variant"], sig.OPERATIVE_VARIANT)
@@ -159,10 +161,15 @@ class GuardRefusals(unittest.TestCase):
         with self.assertRaises(ev_mod.Refusal):
             ev_mod.read_freeze_record(BLUEPRINT / "receipts" / "freeze-record.template.json")
 
-    def test_committed_draft_is_refused_even_with_its_own_sha(self):
-        raw = (BLUEPRINT / "protocol.json").read_bytes()
-        with self.assertRaises(ev_mod.Refusal) as ctx:
-            ev_mod.guard(BLUEPRINT / "protocol.json", sha(raw))
+    def test_draft_copy_is_refused_even_with_its_own_sha(self):
+        p = json.loads((BLUEPRINT / "protocol.json").read_text())
+        p.update(status="draft_pending_independent_pre_outcome_review", frozen_before_outcomes=False, frozen_at=None)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "protocol.json"
+            raw = json.dumps(p).encode()
+            path.write_bytes(raw)
+            with self.assertRaises(ev_mod.Refusal) as ctx:
+                ev_mod.guard(path, sha(raw))
         self.assertIn("not frozen", ctx.exception.reason)
 
     def test_guard_needs_matching_sha_and_every_freeze_field(self):
