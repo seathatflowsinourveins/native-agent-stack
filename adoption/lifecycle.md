@@ -287,28 +287,51 @@ same way, so the timer acts on the same root and stubs the run that
 scheduled it actually used), so an operator who never runs `confirm --txn T`
 gets an automatic revert once that window elapses, without needing to stay
 attached to watch it. `rollback ID` (no `--txn`) targets that component's
-most recently touched transaction with at least one reversible operation (by
-ledger sequence -- never by sorting transaction-id text, which sorts a plain
-`apply` transaction's id after a `relink-`-prefixed one regardless of which
-actually happened more recently, and never a bare `adopt --baseline`/
-`--resync`/`prune` record, which carries nothing to reverse). `rollback
---txn T` also refuses a txn a *later* apply on the same component has since
-superseded (re-pointing `current/<id>` to T's old root would silently
-clobber that later apply -- reports `already_superseded` rather than an
-error if `recover`, below, already closed T that way itself) or whose live
-target no longer matches what this same rollback's own `link` operation last
-set it to (a compare-and-swap precondition, round 5: something else changed
-it since, e.g. an out-of-band relink or bootstrap re-run, and overwriting
-that unnoticed change is worse than refusing -- round 6: relaxed to also
-accept the live target already matching what THIS reversal would itself
-restore, so a rollback interrupted partway through, or run a second time
-after it already finished, is idempotent and resumable rather than refused
-as if something else had drifted it), and `confirm --txn T` refuses
+most recently applied, still-standing transaction with at least one
+reversible operation (by each transaction's own earliest ledger entry --
+never by sorting transaction-id text, which sorts a plain `apply`
+transaction's id after a `relink-`-prefixed one regardless of which actually
+happened more recently, and round 7: never by raw last-touched ledger
+sequence either, which lets an already-rolled-back transaction's own later
+rollback entries out-rank a still-standing one, nor without restricting the
+candidates to transactions still standing at all -- a rolled-back/superseded/
+non-transactional `baseline`/`resync`/`prune` record carries nothing left to
+reverse). `rollback --txn T` also refuses a txn ANY later, still-standing
+transaction on the same component has since moved past -- round 7: purely by
+ledger order and each candidate's own recorded status, never by reading the
+live `current/<id>` link, which used to let two DIFFERENT later transactions
+that coincidentally shared a value fool this check into reporting "not
+superseded" (an A-B-A history: v1->v2, v2->v3, v3->v2 again) and clobber the
+still-standing newer one; the operator rolls back every later standing
+transaction first, newest first, before an earlier one becomes reachable
+again (reports `already_superseded` rather than an error if `recover`,
+below, already closed T that way itself) -- or whose live target no longer
+matches what this same rollback's own `link` operation last set it to (a
+compare-and-swap precondition, round 5: something else changed it since,
+e.g. an out-of-band relink or bootstrap re-run, and overwriting that
+unnoticed change is worse than refusing -- round 6: relaxed to also accept
+the live target already matching what THIS reversal would itself restore, so
+a rollback interrupted partway through, or run a second time after it
+already finished, is idempotent and resumable rather than refused as if
+something else had drifted it -- round 7: every one of a transaction's own
+link/text-replace/file-write entries still needing reversal is checked this
+way BEFORE any of them are touched, not just the one about to be reversed,
+so a doomed rollback (its current/<id> link -- always reversed LAST, since
+it is always a relink's first forward entry -- would fail this check)
+refuses whole instead of leaving every earlier entry already reversed and
+ledgered first), and `confirm --txn T` refuses
 a txn that was already rolled back, whose post-apply verify already failed,
 that is still `in_progress` (a crashed or interrupted `apply` that never
-reached its own post-apply verify), or that `recover` has already closed as
-`superseded` -- confirming any of those would mark a half-applied or
-already-superseded component "applied" through the ledger alone.
+reached its own post-apply verify), that has a `rollback:intent` recorded
+against it with no matching `rollback:done` (round 7: an interrupted or
+in-flight rollback of an otherwise `applied`/`pending_confirmation`/
+`verify_failed` transaction -- recompute_state leaves that status exactly
+where it was until `rollback:done` is actually reached, so nothing else
+catches this, and the Busy message a stacked `apply` gets names this same
+`confirm --txn` as one way to close an open transaction), or that `recover`
+has already closed as `superseded` -- confirming any of those would mark a
+half-applied, half-reverted or already-superseded component "applied"
+through the ledger alone.
 
 **At most one open transaction per component.** Coordinator decision on the
 txn state machine (round 5): `apply` and `adopt --relink` both refuse (a
@@ -324,35 +347,65 @@ open transaction first: `confirm --txn ID` (`pending_confirmation` only),
 `rollback --txn ID`/`rollback <component>` (either state), or, for an
 `in_progress` one left by a crash, `recover`.
 
-A crashed or interrupted `apply`/`adopt --relink` never completes after the
-fact: `ecosystem-switch recover` finds every transaction still `in_progress`
-and closes each one, either by rolling it back (the ordinary case -- nothing
-later touched its component) or, when a *later* transaction on the same
-component has since become that component's own current-setting change
-(provable from the ledger's own recorded entries -- each operation is
-ledgered only after it runs, never write-ahead, so this can only see a later
-change that already finished being ledgered itself; the identical check
-`rollback --txn` itself uses to refuse), by closing it as `superseded`
-without touching anything -- accepting that later, already-verified state as
-authoritative rather than clobbering it. Before this split existed
-(round-5 finding), the superseded case was only ever *refused*, never
-closed: since nothing else ever moves a transaction out of `in_progress`,
-that refusal left it stuck forever, and with it, the open-transaction guard
-above permanently refused every later `apply`/`adopt --relink` on that
-component -- a safety fix that had turned into a permanent denial-of-service
-against the very component it was protecting. `recover` reports each
-transaction it reconciled under `recovered_txns` (rolled back) or
-`superseded_txns` (closed without touching anything), and any genuine
-problem (e.g. a rollback's own compare-and-swap refusal above) under
-`rollback_problems` for the operator, while it keeps reconciling every other
-`in_progress` transaction in the same run. Round 6: `rollback`'s own reversal
-(the "rolling it back" branch above, also used directly by a manual
-`rollback`) is now idempotent and resumable -- an interrupted rollback (the
-process was killed partway through, not the apply/relink it is reversing)
-is resumed from whichever of its operations the ledger already shows
-reversed, rather than refusing on what used to look like drift; a second,
-redundant `rollback` of an already-finished one is a clean no-op the same
-way.
+A crashed or interrupted `apply`/`adopt --relink`/`rollback` never completes
+after the fact. Round 7: `recover` reconciles two DIFFERENT crash shapes, not
+one -- a previously-unresolved finding this separates rather than
+conflating. The ordinary one is a transaction still `in_progress` (a crash
+mid-`apply`/mid-`relink`, or an in-flight rollback of one that never itself
+reached its own post-apply verify): `ecosystem-switch recover` finds every
+one of those and closes each, either by rolling it back (nothing later
+touched its component) or, when a *later* transaction on the same component
+has since become that component's own current-setting change (provable from
+the ledger's own recorded entries -- each operation is ledgered only after
+it runs, never write-ahead, so this can only see a later change that already
+finished being ledgered itself; a check that agrees with the one `rollback
+--txn` itself uses to refuse for every transaction `recover` ever evaluates,
+though it is not the identical code -- `recover` reads the component's own
+last-recorded current-setting transaction directly, since it only ever
+evaluates a transaction that was never itself authoritative; `rollback`
+reasons purely from ledger order and status, since it must also handle a
+transaction that already WAS authoritative once), by closing it as
+`superseded` without touching anything -- accepting that later,
+already-verified state as authoritative rather than clobbering it. Before
+this split existed (round-5 finding), the superseded case was only ever
+*refused*, never closed: since nothing else ever moves a transaction out of
+`in_progress`, that refusal left it stuck forever, and with it, the
+open-transaction guard above permanently refused every later `apply`/`adopt
+--relink` on that component -- a safety fix that had turned into a permanent
+denial-of-service against the very component it was protecting.
+
+The second shape (round 7, previously-unresolved finding) is a transaction
+that already reached `applied`/`pending_confirmation`/`verify_failed` -- not
+`in_progress` -- but has a `rollback:intent` of its own recorded with no
+matching `rollback:done`: a crash mid-`rollback` of an otherwise-normal
+transaction (a manual `rollback`, or the confirm-or-revert timer's own
+`--if-unconfirmed` call, not a crashed `apply`/`relink`). recompute_state
+leaves that transaction's status exactly where it was until `rollback:done`
+is actually reached, so the ordinary `in_progress` scan above never revisits
+it at all -- this is the crash shape recover's own docs used to claim it
+reconciled unconditionally ("mid-`rollback`") without actually doing so.
+`recover` now always finishes this second shape's rollback the same
+idempotent, resumable way (never `superseded`: that outcome's whole premise
+is a transaction that crashed before its own post-apply verify ever ran, no
+longer true once its own rollback may already have partially reversed it).
+
+`recover` reports each transaction it reconciled under `recovered_txns`
+(rolled back, either shape) or `superseded_txns` (the first shape only,
+closed without touching anything), and any genuine problem (e.g. a
+rollback's own compare-and-swap refusal above) under `rollback_problems` for
+the operator, while it keeps reconciling every other unfinished transaction
+in the same run. Round 6: `rollback`'s own reversal (the "rolling it back"
+branch above, also used directly by a manual `rollback`) is idempotent and
+resumable -- an interrupted rollback (the process was killed partway
+through, not the apply/relink it is reversing) is resumed from whichever of
+its operations the ledger already shows reversed, rather than refusing on
+what used to look like drift; a second, redundant `rollback` of an
+already-finished one is a clean no-op the same way. Round 7: a unit-restart
+reversal that already soft-failed once is still never retried by a resumed
+call (retrying a restart that already failed once is not this resumability
+feature's job), but that outstanding failure is now re-reported in
+`rollback_problems` on every later call instead of being silently treated as
+resolved.
 
 **Prune.** `prune --list` reports which `tools/<name>-<version>` prefixes no
 `current/<id>` link points at, that are not the previous root of any
