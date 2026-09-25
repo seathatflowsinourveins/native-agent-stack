@@ -3075,6 +3075,22 @@
         "Reports status only; upgrades and adoption stay with the SOTA-convergence lane review."
       ],
       "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json"
+    },
+    {
+      "id": "vllm-030-switch-20260925",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "vllm",
+        "socraticode"
+      ],
+      "claim": "vLLM 0.30.0 now serves the production Nemotron-3-Embed-1B-BF16 embeddings on the NativeStack WSL2 RTX 4090 host. Qualified first on an owned instance against production 0.25.0 (identical model files, flags and route), then switched by a systemd drop-in that changes only the binary path; the live service returned identical embeddings and identical top-10 code-index results after the switch.",
+      "limitations": [
+        "One host (NativeStack, RTX 4090, WSL2 Windows driver 616.64) and one model/route (/v1/embeddings with Nemotron-3-Embed-1B-BF16); not a claim about other GPUs, models or the /v2/embed route. NVIDIA's model card still names vllm==0.25.0 for BF16 /v2/embed serving.",
+        "Retrieval equality covers 8 gate texts and 5 live code-index queries (top-10), not an aggregate retrieval-quality benchmark.",
+        "0.30.0 relies on its pinned-memory fallback for WSL (PR #56908); the 0.29.0 UVA failure recorded in vllm-compatibility remains true for 0.29.0.",
+        "The 0.25.0 prefix is kept for rollback; the base unit still names it and only the drop-in points at 0.30.0."
+      ],
+      "path": "evidence/receipts/vllm-030-switch-20260925.json"
     }
   ],
   "files": [
@@ -3295,8 +3311,8 @@
     },
     {
       "path": "adoption/lifecycle.md",
-      "sha256": "e3a7d9091e134d11b2e1871492319dc03fe05c11ae84fe9dca0f15bedc084d4f",
-      "bytes": 16875
+      "sha256": "26d31caff5267fa5b09adad132a0e38f9171ec1e814d3f65f9ff3be9af0317fc",
+      "bytes": 17045
     },
     {
       "path": "adoption/manifest.json",
@@ -3345,8 +3361,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "f095985ff0936621d5cec17d7764f086ecc7f0301ae92e5f8b0e643cc14a038a",
-      "bytes": 11809
+      "sha256": "d05d07701afd8deedbd58576468ba0f5341279d6a5c23f6efe075ce772a7484e",
+      "bytes": 12312
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -6456,8 +6472,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "11a5f52761f0c52caae81d69acb281f5d06ce7fc23be5d4de776abf438af4b99",
-      "bytes": 479903
+      "sha256": "bbe79ef2b3bdf86429af257bed5cba62c8ee43a0bd3ff2564b7d25e91ddeea52",
+      "bytes": 480084
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -9606,8 +9622,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "cacb0ee2adf06fa6c0f29ebe6d4843c52f15d06a6a4ed0fb10acd7bd9a32fd71",
-      "bytes": 187529
+      "sha256": "0b3441b11b4df8ae360ed8c8cee42ef7ecb82209d23788dbbc401535f949c029",
+      "bytes": 187579
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -9661,8 +9677,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "9441ae3b003edf66493cc667256b23beaf39d8c4dd8aba9a0b331d26714e52fb",
-      "bytes": 80069
+      "sha256": "3b8b8a3d2d3f2255dca9175a7e226c6013931c285acc0044510fcb45dc4bfb2f",
+      "bytes": 80079
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9671,8 +9687,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "307308e80469399bcce7070cd003bc1c9d102d625584bb5d6c4be10ec31f12bc",
-      "bytes": 248568
+      "sha256": "2232fa88eee4f9f0c66459b534d91440a87f0d3b7e08d9f6b724505df3022a77",
+      "bytes": 248571
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -10106,8 +10122,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "1138739b5a5d10d75e6f96f8289de0ea5ba9eab73948b2908e9bf0916d33ae53",
-      "bytes": 18899
+      "sha256": "7601511241c08133177bb2ab5f66a1e1b152c5be78e646520a822375a7e296fe",
+      "bytes": 18921
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -10416,8 +10432,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "7ee758efee60bfa111ef7774b0618c8c2f6614b38cca033e499e7b457062501c",
-      "bytes": 15920
+      "sha256": "21cb9c35367e061b3114fadfc7c5a1e5479cee62831485bf52dc4e1a6dfda8c8",
+      "bytes": 15930
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -10526,8 +10542,8 @@
     },
     {
       "path": "docs/token-native-saturation.md",
-      "sha256": "7e3bc6b340440ac7d293a33c374167c80f935c95a58bd6b594900b828bafdf19",
-      "bytes": 11158
+      "sha256": "3aebda839dcce15004f41c1744c3c7dd1b6e57373169447a09ab7e3d607280f7",
+      "bytes": 11221
     },
     {
       "path": "docs/token-practice.md",
@@ -28365,6 +28381,11 @@
       "bytes": 4890
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--ai-memory--use--20260925.json",
+      "sha256": "3c48947337df78d66c671b8bc1d055ac883a57d78849314309e1438b43ba2c9c",
+      "bytes": 12391
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--ccusage--install--20260925.json",
       "sha256": "15739642653640620a17adafa62ade5f7847c7c1431e035135b603f106737807",
       "bytes": 4281
@@ -28553,6 +28574,16 @@
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--skfolio--use--20260925.json",
       "sha256": "3377c4d19b8e366505362c33ccf7de7900ef1f3d640fb27d9662d34eaa6f8457",
       "bytes": 10214
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--socraticode--use--20260925-2.json",
+      "sha256": "50d84abf1fdc30a3427ad8065f07296566b96dffc2050a6832fd59466f252fdd",
+      "bytes": 11862
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--socraticode--use--20260925.json",
+      "sha256": "6a288edcd417e0b28c0b0dc32cded0f4e0e44ac438780726bedc18187932c447",
+      "bytes": 11113
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--syft--install--20260925.json",
@@ -29140,6 +29171,11 @@
       "bytes": 6948
     },
     {
+      "path": "evidence/receipts/vllm-030-switch-20260925.json",
+      "sha256": "dba0b77c509986c6c89128da954b653478ce33a08790fe105e5bf282c18297e7",
+      "bytes": 5190
+    },
+    {
       "path": "evidence/receipts/vllm-compatibility.json",
       "sha256": "33adf727233d608e0d76bf8da12e30909b279582e2f73bc74ceccde520fb8a99",
       "bytes": 1939
@@ -29421,8 +29457,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "d3a3ac4e66dd82efccfecd86545d1e3137afa6003eb0475bcda48db2bd664d1a",
-      "bytes": 88150
+      "sha256": "b3f3a28bd51fe699d4d6b42fdd45d51154e5e51d099146962c8483e1c1b0b665",
+      "bytes": 88395
     },
     {
       "path": "observability/README.md",
@@ -29666,8 +29702,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "31bd234efd2a7d937024007a36e3a1d0577ea050f765009cc27dec76b9958451",
-      "bytes": 60722
+      "sha256": "374f53721bbbd8654a9c69b1b122675994c64670c241c649c572dfd7c8b57110",
+      "bytes": 60920
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",

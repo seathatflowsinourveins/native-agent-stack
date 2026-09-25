@@ -645,16 +645,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T05:38:17Z",
-                "pass": 1
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T14:37:15Z",
+                "pass": 2
               },
               "qualified_models": []
             },
@@ -2514,16 +2514,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T14:40:04Z",
+                "pass": 2
               },
               "qualified_models": []
             },
@@ -3986,7 +3986,7 @@
         },
         {
           "disposition": "out_of_scope",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "foundation-socraticode",
           "repository": "https://github.com/giancarloerra/SocratiCode"

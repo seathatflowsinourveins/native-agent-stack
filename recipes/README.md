@@ -110,7 +110,7 @@ Commands assume the selected upstream executable is on the current shell's PATH.
 | `shellcheck` · `0.11.0` | Official [koalaman/shellcheck v0.11.0](https://github.com/koalaman/shellcheck/releases/tag/v0.11.0), asset `shellcheck-v0.11.0.linux.x86_64.tar.xz`; archive procedure | `shellcheck --norc --format=json1 fixtures/example.sh`; inspect all diagnostics. Static shell analysis is not a product test suite. |
 | `socraticode` · `1.14.0` | `npm install --global --prefix "$STACK_HOME/tools/socraticode-1.14.0" --ignore-scripts socraticode@1.14.0` | [Local semantic code search](#local-semantic-code-search). Source `2218f25153d0f3f4a76ee240a5643dbc873e80be`; AGPL-3.0-only with upstream commercial alternative. This profile uses external local services, not Docker or a cloud key. |
 | `toon` · `4.1.1` | `npm install --global --prefix "$STACK_HOME/tools/toon-4.1.1" @toon-format/cli@4.1.1` | `toon fixtures/records.json --stats -o "$STACK_HOME/output/records.toon"`; `toon "$STACK_HOME/output/records.toon" --decode --strict -o "$STACK_HOME/output/records.recovered.json"`. Compare decoded JSON values to the original, including numeric precision. Token estimates are not provider billing. |
-| `vllm` · `0.25.0` | `uv venv --python 3.13 "$STACK_HOME/tools/vllm-0.25.0"`; `uv pip install --python "$STACK_HOME/tools/vllm-0.25.0/bin/python" vllm==0.25.0` | [Pinned local GPU embedding service](#local-semantic-code-search). Latest observed 0.29.0 resolved and installed but failed GPU startup under WSL with unavailable UVA; 0.25.0 was restored and real search passed. Do not label 0.25.0 latest or 0.29.0 ready. |
+| `vllm` · `0.30.0` | `uv venv --python 3.13 "$STACK_HOME/tools/vllm-0.30.0"`; `uv pip install --python "$STACK_HOME/tools/vllm-0.30.0/bin/python" vllm==0.30.0` | [Pinned local GPU embedding service](#local-semantic-code-search). 0.30.0 carries the WSL pinned-memory fallback and serves the production embeddings on the NativeStack WSL2 host since 2026-09-25, qualified against 0.25.0 first (identical embeddings and code-index results; `evidence/receipts/vllm-030-switch-20260925.json`). 0.29.0 failed GPU startup under WSL with unavailable UVA; keep 0.25.0 installed for rollback until the new pin has run a while. |
 | `worktrunk` · `0.79.0` | Official [max-sixty/worktrunk v0.79.0](https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0); [qualified archive and rollback](native-upgrades-20260921.md) | `wt list --format json`; for an actual owned writing task, `wt switch --create "$BRANCH" --base "$BASE_REF" --no-cd --no-hooks --format json`. The retained disposable lifecycle verified selection and `wt remove "$BRANCH" --foreground --no-hooks --format json`, leaving only the original worktree. |
 
 ## Native context mode and hooks
@@ -190,7 +190,7 @@ hf download nvidia/Nemotron-3-Embed-1B-BF16 \
 
 qdrant --config-path "$QDRANT_CONFIG" --disable-telemetry
 # In a second terminal, or via the reviewed user unit:
-"$STACK_HOME/tools/vllm-0.25.0/bin/vllm" serve "$MODEL_DIRECTORY" \
+"$STACK_HOME/tools/vllm-0.30.0/bin/vllm" serve "$MODEL_DIRECTORY" \
   --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 \
   --host 127.0.0.1 --port 8231 --max-model-len 4096 --max-num-seqs 4 \
   --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests
