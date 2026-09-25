@@ -3,7 +3,7 @@
 **Decided by:** the agent-lab token-efficiency session, from agent-lab's record
 `docs/tasks/2026-09-25-quality-optimization.md`, sections G3, G4, H1 and H2. That record is on agent-lab's default
 branch `codex/native-expansion`, through agent-lab PRs #66 and #67. This change is on branch
-`claude/model-fallback-guard-20260925`, rebased onto `origin/main@dcd6f0cf`.
+`claude/model-fallback-guard-20260925`, rebased onto `origin/main@5abd17e4`.
 
 **Scope:**
 - `adoption/templates/claude.settings.template.json`. `tools/adoption/apply_claude_settings.py` merges it into a
@@ -21,9 +21,12 @@ list stay open: `CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS`, `--safe-mode` and fal
   and the workflow contract configuration, so it is left to that recipe's owner.
 - **Agents that skip the user file.** The user-level file does not reach agents that set `omitClaudeMd: true`:
   `adoption/agents/claude/source-scout.md`, `blind-judge.md`, `blind-lane-reviewer.md` and `blind-adjudicator.md`.
-  Several of Claude Code's built-in agents also omit it, among them Explore and Plan. For those agents, the StructuredOutput sentence has to be in the
-  agent body. That change is on the rollout's contract track for `adoption/agents/claude/`, and until it lands a new
-  host's `source-scout` children do not get the rule.
+  For those four agents, the StructuredOutput sentence has to be in the agent body. That change is on the rollout's
+  contract track for `adoption/agents/claude/`, and until it lands a new host's `source-scout` children do not get the
+  rule.
+- **Built-in agents.** Several of Claude Code's built-in agents also omit the user file, among them Explore and Plan.
+  Their bodies cannot be edited. The rule reaches them only through a custom agent of the same name, as agent-lab does
+  for Explore at project level, and the contract-track change does not cover them.
 
 ## Decision
 
@@ -43,9 +46,8 @@ list stay open: `CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS`, `--safe-mode` and fal
 3. **Template precedence.**
    - Applying the template sets both keys whatever the host had, as it already does for `model` and `effortLevel`. A
      re-apply resets a host that set `switchModelsOnFlag: true` or the variable to `"0"`.
-   - The client passes `MQt()`, which returns `WM()`, as `refusalFallbackSettingToggleVisible`. agent-lab's reading is
-     that `/config` then hides the "Switch models when a message is flagged" toggle while the variable is set. That
-     path was not traced to the UI here.
+   - While the variable is set, `/config` omits the "Switch models when a message is flagged" row. The client adds that
+     row only when `MQt()`, which returns `WM()`, is true (`...MQt()?[{id:"switchModelsOnFlag",…}]:[]`).
    - A host that wants the automatic switch sets `switchModelsOnFlag` to `true` and the variable to `"0"` in its
      rendered template before applying it. The client parses the variable as a boolean (`M.bool`). Removing the two
      keys is not enough on a host that already applied them, because the merge keeps keys that the template no longer
@@ -67,10 +69,12 @@ list stay open: `CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS`, `--safe-mode` and fal
 - **Client code (2.1.282).**
   - `UQt(e)` returns `"subagent"` for any thread other than the main one before it reads `switchModelsOnFlag`, so a
     subagent's fallback runs without asking.
-  - The setting is also read in three other places, and none of them stops a subagent's fallback:
+  - None of the setting's other reads stops a subagent's fallback either:
     - `wpo()` suppresses the fallback, but only on the main thread when no dialog can be shown;
     - the server lane, `apo()`;
-    - `Spo()`.
+    - `Spo()`;
+    - a telemetry reason in `zDn()`;
+    - the main thread's one-time preference question.
   - The setting alone therefore would have stopped none of the six incidents.
   - `WM()` is `!CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK && …`. Fallback target selection, `aHn()`, picks a target only
     when `WM()` is true.
@@ -138,8 +142,8 @@ probe, `tools/compare/effort/max-ultracode-probe.sh --check-fallback-guard`, exi
 reads the variable. That probe checks only the `WM()` read; it does not detect a widened silent-retry lane.
 
 This catalog has no automated counterpart yet, so a host that follows only the catalog is not watched until one exists.
-Open PR #264 proposes a `--client-wiring` report for `scripts/adoption_status.py`. If it merges, that report is the
-natural home; otherwise this needs a new check. Until then, a host can check its installed client by hand:
+The natural home is `scripts/adoption_status.py --client-wiring`, merged in #264, but it does not check the variable
+yet. Until it does, a host can check its installed client by hand:
 
 ```sh
 grep -a -c '!.\{1,4\}\.CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK&&' "$(readlink -f ~/.local/bin/claude)"
