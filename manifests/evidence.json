@@ -6421,6 +6421,36 @@
       "bytes": 4172
     },
     {
+      "path": "blueprints/memory-lifecycle-v2/PREREGISTRATION.md",
+      "sha256": "fb82e0aa48df80bb97349a957dac195ca268bee9f1ff7673303e057abdfb1d7c",
+      "bytes": 23733
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/README.md",
+      "sha256": "70dcb968207dc416eebd61f49bba7117bcdb8a576ee352db404f3b4619295bee",
+      "bytes": 9708
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/analyze.py",
+      "sha256": "aade41ff4efd347c3269c7e88283fe0133a594346bdfeaea251ddac6458ac832",
+      "bytes": 12358
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/exercise.py",
+      "sha256": "bcca4997c8ea0b5812c402f7af78ee90518a1c761344ca94e97c55b5f8aae62d",
+      "bytes": 18370
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/results-20260925.json",
+      "sha256": "f87410a11b1894460bbe504ca8417e15e6711b79203251a940d2dbbeb51ef3b3",
+      "bytes": 20380
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/run.py",
+      "sha256": "b0b82e4b634d1b0e1140065ef1d9425846415d8240ecbd7d0638d420a8bea911",
+      "bytes": 6315
+    },
+    {
       "path": "blueprints/native-skill-practice/README.md",
       "sha256": "f171739544379d3e69bdc0001911776584e1b0b0775f4f37e6b7737c106c4996",
       "bytes": 5271
