@@ -955,6 +955,52 @@ class ValidationBinding(unittest.TestCase):
                 holdout.require_validated_carried(other, auth)
 
 
+class ValidationTimeliness(unittest.TestCase):
+    """Review round 15, N04: the validation results are timely only if the exact governing bytes and their governing
+    'evaluate' line both reached origin/main before 09:30 ET on N0. At e7529b47 first_reach dated the pathname, so
+    a placeholder committed before N0 made a result and line merged after N0 look timely."""
+
+    def test_a_placeholder_before_n0_does_not_date_a_later_result(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo = fx["repo"]
+            ctx = runner_ctx(repo)
+            cal, n0 = ctx["cal"], ctx["n0_pinned"]
+            FR.write(repo / RESULTS_DIR / "validation.json", '{"placeholder": true}')
+            FR.commit_push(repo, FR.git_date(cal.at(cal.offset(n0, -5), "12:00")))    # before N0
+            write_validation(repo, fx)                                                # the real bytes and line
+            FR.commit_push(repo, FR.git_date(cal.at(n0, "12:00")))                    # after 09:30 ET on N0
+            state = holdout.validation_state(runner_ctx(repo))
+            self.assertTrue(state["present"])
+            self.assertFalse(state["reachable_before_n0"])
+            self.assertEqual(state["reach"], int(cal.at(n0, "12:00")))
+
+    def test_the_line_must_be_timely_too(self):
+        """The governing bytes on origin/main before N0 but their 'evaluate' line merged after it: not timely."""
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo = fx["repo"]
+            ctx = runner_ctx(repo)
+            cal, n0 = ctx["cal"], ctx["n0_pinned"]
+            FR.write(repo / RESULTS_DIR / "validation.json", validation_body().decode("utf-8"))
+            FR.commit_push(repo, FR.git_date(cal.at(cal.offset(n0, -5), "12:00")))
+            logs.append_line(repo / RUN_LOG, {"stage": "validation", "purpose": "evaluate", "status": "complete",
+                                              "results_sha256": validation_sha(), "study_tree": fx["tree"],
+                                              "protocol_sha256": fx["protocol_sha256"]})
+            FR.commit_push(repo, FR.git_date(cal.at(n0, "12:00")))
+            self.assertFalse(holdout.validation_state(runner_ctx(repo))["reachable_before_n0"])
+
+    def test_bytes_and_line_before_n0_are_timely(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo = fx["repo"]
+            ctx = runner_ctx(repo)
+            cal, n0 = ctx["cal"], ctx["n0_pinned"]
+            write_validation(repo, fx)
+            FR.commit_push(repo, FR.git_date(cal.at(cal.offset(n0, -1), "20:00")))
+            self.assertTrue(holdout.validation_state(runner_ctx(repo))["reachable_before_n0"])
+
+
 class Collection(unittest.TestCase):
     def test_late_batches_and_plan(self):
         cal = synth.calendar("2026-06-01", "2027-06-30")

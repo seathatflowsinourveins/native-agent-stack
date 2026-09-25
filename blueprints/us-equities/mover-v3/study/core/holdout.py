@@ -86,15 +86,31 @@ def read_due(ctx: dict, now: float) -> bool:
 
 # ---------------------------------------------------------------- committed state
 
-def first_reach(repo, path: str, ref: str = guards.MAIN):
-    """Committer epoch of the first first-parent commit of origin/main that holds path, or None."""
+def first_reach_of_bytes(repo, path: str, sha256: str, ref: str = guards.MAIN):
+    """Committer epoch of the first first-parent commit of origin/main whose version of path has this sha256 (a
+    signed merge), or None."""
     rows = guards.git(repo, "log", "--first-parent", "--reverse", "--format=%H %ct", ref, "--", path).splitlines()
     for row in rows:
         commit, ct = row.split()
-        if guards.committed_bytes(repo, commit, path) is not None:
-            guards.require_verified(repo, commit, f"the first commit holding {path}")    # review round 10, M3
+        data = guards.committed_bytes(repo, commit, path)
+        if data is not None and sha256_bytes(data) == sha256:
+            guards.require_verified(repo, commit, f"the first commit holding these bytes of {path}")
             return int(ct)
     return None
+
+
+def governing_validation_reach(ctx: dict, gov):
+    """Review round 15, N04: the signed time the governing validation result became reachable from origin/main: the
+    later of the first commit holding the exact governing bytes (the governing line's results_sha256) and the first
+    commit holding that governing 'evaluate' run-log line. At e7529b47 first_reach dated the pathname, so a
+    placeholder results/validation.json committed before N0 made a result and evaluation line merged after N0 look
+    timely. None when either has not reached origin/main."""
+    if gov is None or not gov.get("results_sha256"):
+        return None
+    t_bytes = first_reach_of_bytes(ctx["repo"], f"{RESULTS_DIR}/validation.json", gov["results_sha256"])
+    idx = next((i for i, x in enumerate(ctx["run_log"]) if x is gov), None)
+    t_line = logs.line_reach_of(ctx["repo"], RUN_LOG, idx) if idx is not None else None
+    return None if t_bytes is None or t_line is None else max(t_bytes, t_line)
 
 
 def validation_state(ctx: dict) -> dict:
@@ -107,8 +123,8 @@ def validation_state(ctx: dict) -> dict:
         gov = None
     present = path.exists() and gov is not None
     n0, _ = window(ctx, 0)
-    reach = first_reach(ctx["repo"], rel)
-    return {"present": present, "sha256": sha256_file(path) if path.exists() else None,
+    reach = governing_validation_reach(ctx, gov)                   # review round 15, N04
+    return {"present": present, "sha256": sha256_file(path) if path.exists() else None, "reach": reach,
             "committed_sha256": (gov or {}).get("results_sha256"),
             "reachable_before_n0": reach is not None and reach < ctx["cal"].at(n0, "09:30"),
             "run_tree": (gov or {}).get("study_tree"), "run_protocol_sha256": (gov or {}).get("protocol_sha256"),
@@ -628,7 +644,8 @@ def _terminal_date(fl, now) -> str:
 
 
 def _validation_reach_utc(ctx):
-    t = first_reach(ctx["repo"], f"{RESULTS_DIR}/validation.json")
+    """The governing validation result's signed reach time (governing_validation_reach; review round 15, N04)."""
+    t = validation_state(ctx)["reach"]
     return iso_utc(t) if t is not None else None
 
 
