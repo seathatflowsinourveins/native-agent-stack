@@ -478,6 +478,23 @@ class CorporateActionMonitor:
                     # action.
                     self._mark_degraded((symbol,))
                     continue
+                if symbol in ambiguous and not new_value:
+                    # LOW finding (fix round 6): an ambiguous symbol with NO
+                    # valid records of its OWN in this response must not
+                    # overwrite a previously confirmed (non-empty) result
+                    # with an empty list -- exactly like the sentinel branch
+                    # above, this degrades instead, preserving the last
+                    # known good records. Reproduced by an independent
+                    # review's own probe: an in-range NVDA split confirmed
+                    # on one fetch, then a LATER fetch reporting the SAME
+                    # split again but now missing its ex_date (so it
+                    # resolves to zero valid records for NVDA, plus
+                    # ambiguity) used to silently write `_results["NVDA"]
+                    # = []`, turning an already-confirmed must_flatten back
+                    # into block-and-flag -- losing a still-live intraday
+                    # exit signal the guard had already raised.
+                    self._mark_degraded((symbol,))
+                    continue
                 self._results[symbol] = new_value
                 if symbol in ambiguous:
                     # HIGH finding (fix round 5): keep the (possibly

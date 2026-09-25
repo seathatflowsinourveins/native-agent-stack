@@ -426,6 +426,30 @@ class CorporateActionMonitorTests(unittest.TestCase):
                                                "leaving the symbol degraded from the timeout")
         self.assertFalse(after.must_flatten)
 
+    def test_refresh_timed_out_for_an_already_superseded_generation_is_a_no_op(self):
+        """LOW finding (fix round 6): a timeout for a SPECIFIC, now-
+        superseded generation (a NEWER attempt has already started -- not
+        yet committed -- since that timeout was captured) must be ignored,
+        exactly like an ordinary superseded write. Distinguishes the
+        generation-specific check from a coarser (round-4-era) heuristic
+        that only compared `_generation` against `_committed_generation`
+        without checking the SPECIFIC generation passed in -- that coarser
+        rule would wrongly treat this case as "nothing committed yet, so
+        the timeout is real" and degrade a symbol whose newer attempt is
+        still perfectly in flight."""
+        monitor = CA.CorporateActionMonitor(self.FakeSource(), clock=lambda: 1000.0)
+        old_generation = monitor.begin_attempt({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        new_generation = monitor.begin_attempt({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1000.5)
+        self.assertNotEqual(old_generation, new_generation)
+        # A timeout fires for the OLD, now-superseded attempt -- the NEWER
+        # attempt is still genuinely in flight (never committed either
+        # way) -- must be a complete no-op.
+        monitor.refresh_timed_out(old_generation, {"AAPL"})
+        self.assertFalse(monitor._last_attempt_failed,
+                         "a stale timeout for an already-superseded generation must not affect "
+                         "the still-in-flight newer attempt's own state")
+        self.assertNotIn("AAPL", monitor._degraded)
+
     def test_per_symbol_ambiguous_result_never_erases_a_confirmed_action(self):
         """HIGH finding 1 (fix round 4): reproduces the review's own Q2a
         probe -- a confirmed split, then a LATER fetch that reports the
@@ -469,6 +493,36 @@ class CorporateActionMonitorTests(unittest.TestCase):
                                     candidate_symbols=set(), now=1000.0)["NVDA"]
         self.assertTrue(decision.must_flatten, "the confirmed record must still flatten the position")
         self.assertTrue(decision.needs_attention, "the independent ambiguity flag must still raise attention")
+
+    def test_ambiguous_only_response_preserves_a_previously_confirmed_record(self):
+        """LOW finding (fix round 6): reproduces an independent review's own
+        probe -- an in-range NVDA split is confirmed on one fetch, then a
+        LATER fetch reports the SAME split again but now missing its own
+        governing date (so it resolves to zero valid records for NVDA, plus
+        ambiguity via the tuple contract's second element) -- must not
+        silently overwrite `_results["NVDA"]` with an empty list, turning
+        an already-confirmed must_flatten back into mere block-and-flag and
+        losing an already-live intraday exit signal. The symbol must stay
+        degraded (needs_attention) while the confirmed record is
+        preserved."""
+        seq = [({"NVDA": [action("NVDA", "forward_split", NEXT_SESSION)]}, set()),
+               ({"NVDA": []}, {"NVDA"})]
+
+        class Src:
+            def fetch(self, symbols, start, end):
+                return seq.pop(0)
+
+        monitor = CA.CorporateActionMonitor(Src(), refresh_seconds=0, clock=lambda: 1000.0)
+        monitor.refresh({"NVDA"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        before = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"NVDA"},
+                                  candidate_symbols=set(), now=1000.0)["NVDA"]
+        self.assertTrue(before.must_flatten)
+        monitor.refresh({"NVDA"}, start=TODAY, end=NEXT_SESSION, now=1100.0)
+        after = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"NVDA"},
+                                 candidate_symbols=set(), now=1100.0)["NVDA"]
+        self.assertTrue(after.must_flatten, "an ambiguous-only later response must not erase the earlier "
+                                            "confirmed record -- the intraday exit signal must survive")
+        self.assertTrue(after.needs_attention)
 
     def test_timeout_processed_just_after_a_committed_success_is_ignored(self):
         """NIT finding 9 (fix round 4): reproduces the review's own Q5

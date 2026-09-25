@@ -1102,7 +1102,20 @@ async def _schedule_corporate_action_refresh(guard, watch, start, end, now, stat
                 else:
                     guard.refresh(watch, start=start, end=end, now=now)
             except Exception:
-                pass  # never raises in the well-behaved case; defensive only
+                # LOW finding (fix round 6): run_attempt/refresh are not
+                # expected to raise (they catch their own source errors
+                # internally) -- but if one somehow does, the pre-allocated
+                # generation must not be left dangling: with no fail_attempt
+                # call, `_last_attempt_failed` would stay whatever it was
+                # before this attempt, so a genuinely failed refresh could
+                # be silently retried on the ordinary long `refresh_seconds`
+                # interval instead of the short `retry_seconds` one, AND no
+                # symbol would ever be marked degraded for this failure.
+                if two_phase:
+                    try:
+                        guard.fail_attempt(watch, generation)
+                    except Exception:
+                        pass  # never let a defensive cleanup call itself raise
             finally:
                 def _resolve():
                     if not fut.done():
@@ -1118,7 +1131,20 @@ async def _schedule_corporate_action_refresh(guard, watch, start, end, now, stat
         # reset so the NEXT tick is not permanently locked out believing a
         # refresh that never actually started is still running.
         try:
-            threading.Thread(target=worker, daemon=True, name="ca-refresh").start()
+            try:
+                threading.Thread(target=worker, daemon=True, name="ca-refresh").start()
+            except Exception:
+                # LOW finding (fix round 6): if starting the worker thread
+                # itself fails (e.g. a resource-exhaustion OSError), the
+                # worker's own body -- including its fail_attempt call
+                # above -- never runs at all, so the pre-allocated
+                # generation would otherwise be left permanently unresolved
+                # (never committed, never failed, never invalidated) --
+                # refreshes would then be throttled by the ordinary long
+                # `refresh_seconds` interval with nothing ever flagged.
+                if two_phase:
+                    guard.fail_attempt(watch, generation)
+                raise
             try:
                 await asyncio.wait_for(fut, timeout=CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS)
             except asyncio.TimeoutError:
@@ -1196,12 +1222,20 @@ async def _preflight_corporate_action_refresh(config, session_policy, ledger, ca
     preflight_watch = set(config["symbols"]) | {p.symbol for p in ledger.positions().values() if p.qty}
     preflight_task = await _schedule_corporate_action_refresh(
         guard, preflight_watch, preflight_start, preflight_end, preflight_now, ca_refresh_state)
+    # NIT (fix round 6): `_schedule_corporate_action_refresh` returns None,
+    # not a task, when the two-phase `begin_attempt` itself reports a
+    # throttled no-op (an equivalent fresh result is already cached for
+    # this exact symbol set/window) -- e.g. a SECOND preflight call on an
+    # already-warmed monitor. `await None` raises TypeError; there is
+    # simply nothing to await in that case (a no-op is already complete).
+    #
     # _run() inside _schedule_corporate_action_refresh never raises (its
     # own wait_for already swallows the timeout) -- awaiting the task it
-    # returned is itself already bounded, so the preflight still blocks (as
-    # intended -- "do the first fetch in preflight") until the fetch
-    # resolves or times out, never longer.
-    await preflight_task
+    # returned (when one was actually created) is itself already bounded,
+    # so the preflight still blocks (as intended -- "do the first fetch in
+    # preflight") until the fetch resolves or times out, never longer.
+    if preflight_task is not None:
+        await preflight_task
 
 
 def _final_corporate_action_guard_summary(strategy, held_symbols, now):

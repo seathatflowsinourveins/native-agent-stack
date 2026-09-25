@@ -3237,6 +3237,73 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
 
         asyncio.run(scenario())
 
+    def test_scheduled_refresh_timeout_flags_the_symbol_and_retries_after_60s_not_900s(self):
+        """LOW finding (fix round 6, test gap): mutation G4 (drop the
+        scheduler's call to `guard.refresh_timed_out(generation, watch)`
+        for a two-phase guard) survived every existing short-timeout test,
+        because they all drive a LEGACY guard exposing only the single-arg
+        `refresh_timed_out(symbols)` convention -- never the REAL
+        `CorporateActionMonitor`'s own generation-aware two-phase timeout
+        path. Drives the real monitor through `_schedule_corporate_action_
+        refresh` with an artificially short timeout, and asserts (a) the
+        symbol is actually flagged needs_attention right after the
+        timeout, and (b) the next attempt is retried on the SHORT
+        `retry_seconds` (60s) interval, not the ordinary long
+        `refresh_seconds` (900s) one -- proving `refresh_timed_out` (not
+        merely `invalidate_attempt`, which does not set `_last_attempt_
+        failed`) is what actually ran."""
+        import asyncio
+        import threading
+        import time as time_module
+        from datetime import date
+        import corporate_actions as CA
+        import runner as runner_module
+
+        release = threading.Event()
+
+        class HangingSrc:
+            def fetch(self, symbols, start, end):
+                release.wait(5)
+                return ({s: [] for s in symbols}, set())
+
+        monitor = CA.CorporateActionMonitor(HangingSrc(), refresh_seconds=900, retry_seconds=60,
+                                            clock=lambda: time_module.time())
+
+        async def scenario():
+            state = {"in_flight": False}
+            original_timeout = runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS
+            runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = 0.05
+            now0 = time_module.time()
+            try:
+                await runner_module._schedule_corporate_action_refresh(
+                    monitor, {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), now0, state)
+                for _ in range(50):
+                    if not state["in_flight"]:
+                        break
+                    await asyncio.sleep(0.02)
+                self.assertFalse(state["in_flight"])
+            finally:
+                runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = original_timeout
+            decision = monitor.evaluate(today=date(2026, 9, 24), next_session_date=date(2026, 9, 25),
+                                        held_symbols={"AAPL"}, candidate_symbols=set(), now=now0 + 1)["AAPL"]
+            self.assertTrue(decision.needs_attention, "the real monitor's generation-aware refresh_timed_out "
+                                                      "must actually run and flag the symbol")
+            # Still inside the SHORT retry_seconds=60 window -- a second
+            # attempt must still be throttled.
+            gen_throttled = monitor.begin_attempt({"AAPL"}, start=date(2026, 9, 17), end=date(2026, 12, 24),
+                                                  now=now0 + 30)
+            self.assertIsNone(gen_throttled, "must not yet retry within the short retry_seconds window")
+            # Past retry_seconds=60 -- a fresh attempt must now be allowed,
+            # proving the SHORT interval applied (not the ordinary long
+            # refresh_seconds=900).
+            gen_ready = monitor.begin_attempt({"AAPL"}, start=date(2026, 9, 17), end=date(2026, 12, 24),
+                                              now=now0 + 61)
+            self.assertIsNotNone(gen_ready, "must retry on the short retry_seconds=60 interval after a "
+                                            "timeout, not the ordinary long refresh_seconds=900 one")
+            release.set()
+
+        asyncio.run(scenario())
+
     def test_hung_refresh_does_not_delay_process_exit(self):
         """LOW finding 6 (fix round 4): `asyncio.run()`'s own cleanup joins
         every outstanding `asyncio.to_thread`/default-executor thread
@@ -3473,7 +3540,21 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
             await runner_module._schedule_corporate_action_refresh(
                 monitor, {"SPY"}, date(2026, 9, 17), date(2026, 12, 24), 1900.0, state)
             await asyncio.sleep(0.1)  # let the worker actually enter fetch() and block on `release`
+            with monitor._lock:
+                generation_before_cancel = monitor._generation
             await runner_module._shutdown_corporate_action_tasks(state)
+            # LOW finding (fix round 6, G5 mutation gap): checking only the
+            # END STATE (needs_attention stays False) cannot distinguish a
+            # real invalidate_attempt call from a no-op cancellation that
+            # happens to leave the same clean state anyway, because the
+            # delayed fetch itself also returns a clean result -- assert
+            # the generation counter was ACTUALLY bumped past the
+            # cancelled attempt, proving invalidate_attempt really ran.
+            with monitor._lock:
+                generation_after_cancel = monitor._generation
+            self.assertGreater(generation_after_cancel, generation_before_cancel,
+                               "cancellation must actually invalidate (bump past) the in-flight attempt's "
+                               "own generation, not silently do nothing")
             decisions = monitor.evaluate(today=date(2026, 9, 24), next_session_date=date(2026, 9, 25),
                                          held_symbols={"SPY"}, candidate_symbols=set(), now=1900.0)
             self.assertFalse(decisions["SPY"].needs_attention,
@@ -3517,6 +3598,119 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 await task
             self.assertFalse(state["in_flight"], "in_flight must be reset even when Thread.start() itself raises")
+
+        asyncio.run(scenario())
+
+    def test_thread_start_failure_still_resolves_the_real_monitors_attempt(self):
+        """LOW finding (fix round 6): reproduces an independent review's
+        own probe (S3) against the REAL `CorporateActionMonitor` -- when
+        `Thread.start()` itself raises, the pre-allocated generation must
+        not be left permanently unresolved (never committed, never failed,
+        never invalidated). Without `fail_attempt` being called on this
+        path, `_last_attempt_failed` stays False and the symbol is never
+        marked degraded, so a genuinely failed launch would be silently
+        retried on the ordinary long `refresh_seconds` (900s) interval
+        with nothing ever flagged, instead of the short `retry_seconds`
+        (60s) one."""
+        import asyncio
+        import threading
+        import time as time_module
+        from datetime import date
+        import corporate_actions as CA
+        import runner as runner_module
+
+        class Src:
+            calls = 0
+
+            def fetch(self, symbols, start, end):
+                Src.calls += 1
+                return ({s: [] for s in symbols}, set())
+
+        monitor = CA.CorporateActionMonitor(Src(), refresh_seconds=900, retry_seconds=60,
+                                            clock=lambda: time_module.time())
+        t0 = time_module.time()
+        monitor.refresh({"SPY"}, start=date(2026, 9, 17), end=date(2026, 12, 24), now=t0 - 1000)  # earlier clean success
+
+        real_start = threading.Thread.start
+
+        def boom(self):
+            if self.name == "ca-refresh":
+                raise RuntimeError("can't start new thread")
+            return real_start(self)
+
+        async def scenario():
+            state = {"in_flight": False}
+            threading.Thread.start = boom
+            try:
+                task = await runner_module._schedule_corporate_action_refresh(
+                    monitor, {"SPY"}, date(2026, 9, 17), date(2026, 12, 24), t0, state)
+                await asyncio.gather(task, return_exceptions=True)
+            finally:
+                threading.Thread.start = real_start
+            self.assertFalse(state["in_flight"], "in_flight must still be reset")
+            with monitor._lock:
+                generation, committed, failed = (monitor._generation, monitor._committed_generation,
+                                                 monitor._last_attempt_failed)
+            self.assertEqual(generation, committed,
+                             "the failed launch's generation must be resolved (committed as a failure), "
+                             "not left dangling ahead of _committed_generation forever")
+            self.assertTrue(failed, "a failed launch must be recorded as a failure, enabling the short "
+                                    "retry_seconds interval")
+            decision = monitor.evaluate(today=date(2026, 9, 24), next_session_date=date(2026, 9, 25),
+                                        held_symbols={"SPY"}, candidate_symbols=set(), now=t0)["SPY"]
+            self.assertTrue(decision.needs_attention,
+                            "the failed launch must have flagged SPY degraded right away")
+            # 30s later: still inside the SHORT retry_seconds=60 window --
+            # a fresh attempt must still be throttled.
+            still_throttled = monitor.begin_attempt({"SPY"}, start=date(2026, 9, 17), end=date(2026, 12, 24),
+                                                     now=t0 + 30)
+            self.assertIsNone(still_throttled, "must not yet retry within the short retry_seconds window")
+            # 60s later: past retry_seconds=60 -- a fresh attempt must now
+            # be allowed, proving the SHORT interval applied (the failure
+            # was actually recorded), not the ordinary long
+            # refresh_seconds=900 one.
+            next_task = await runner_module._schedule_corporate_action_refresh(
+                monitor, {"SPY"}, date(2026, 9, 17), date(2026, 12, 24), t0 + 61, state)
+            self.assertIsNotNone(next_task, "must retry on the short retry_seconds interval, not be "
+                                            "throttled for the ordinary long refresh_seconds=900")
+            if next_task is not None:
+                await next_task
+
+        asyncio.run(scenario())
+
+    def test_second_preflight_on_an_already_warmed_monitor_does_not_raise(self):
+        """NIT (fix round 6): reproduces an independent review's own probe
+        (S4) -- `_schedule_corporate_action_refresh` returns `None`, not a
+        task, when the two-phase `begin_attempt` itself reports a
+        throttled no-op (an equivalent fresh result already cached for
+        this exact symbol set/window). `_preflight_corporate_action_
+        refresh` used to unconditionally `await` that return value --
+        `await None` raises TypeError -- so a SECOND preflight call while
+        the monitor is already warm (e.g. a resumed/retried startup path)
+        would crash instead of being the harmless no-op it should be."""
+        import asyncio
+        import corporate_actions as CA
+        import runner as runner_module
+
+        class Src:
+            def fetch(self, symbols, start, end):
+                return ({x: [] for x in symbols}, set())
+
+        class FakeLedger:
+            def positions(self):
+                return {}
+
+        monitor = CA.CorporateActionMonitor(Src())
+        config = {"_corporate_action_guard": monitor, "symbols": ["SPY"]}
+        state = {"in_flight": False}
+
+        async def scenario():
+            await runner_module._preflight_corporate_action_refresh(
+                config, {"overnight_holds": True}, FakeLedger(), state)
+            # The second call, within the same throttle interval, must be a
+            # harmless no-op -- not raise TypeError from `await None`.
+            await runner_module._preflight_corporate_action_refresh(
+                config, {"overnight_holds": True}, FakeLedger(), state)
 
         asyncio.run(scenario())
 
