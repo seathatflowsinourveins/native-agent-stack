@@ -680,11 +680,16 @@ def cmd_run(args) -> int:
             "source_cat_and_elite": ("https://files.alpaca.markets/disclosures/library/BrokFeeSched.pdf "
                                      "(Revised on September 17, 2026; retrieved 2026-09-25; sha256 "
                                      "7bc75e3cd86f5c1950f8ce1292049965280340a3cebe727ca7aee4a7d2d71b12)"),
-            "taf_cap_scope": ("Per execution, not per order (settled): FINRA TAF FAQ A200.17 -- "
+            "taf_cap_scope": ("Per execution for this exerciser (settled): FINRA TAF FAQ A200.17 -- "
                              "https://www.finra.org/rules-guidance/guidance/faqs/trading-activity-fee -- "
-                             "each street-side execution is a separate sale (its own example: ten "
-                             "100,000-share executions of one order are ten separately capped sales); "
-                             "Alpaca's schedule's 'per trade' wording is consistent with this reading."),
+                             "verbatim, a member 'may choose to calculate the Trading Activity Fee on "
+                             "either the individual street side executions or on the account level "
+                             "average price confirmation' (its own example: ten 100,000-share executions "
+                             "of a 1,000,000-share order bill as 'ten sales at $5' under the "
+                             "street-side-execution method, vs 'one sale at $5' under the account-level "
+                             "method; this choice is specifically for average-price-allocated orders). "
+                             "This exerciser does no average-price allocation, so the "
+                             "street-side-execution (per-fill) method applies."),
             "partial": ["The cost_plus commission plan's exchange-fee/rebate pass-through component "
                         "is not modeled."],
             "rounding_method_note": ("Alpaca aggregates each fee type per day, per account, and rounds "

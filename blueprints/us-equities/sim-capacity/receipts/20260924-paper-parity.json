@@ -319,9 +319,9 @@
     "sec_section31_usd_per_dollar": "20.60/1000000 (effective 2026-04-04, open-ended at retrieval)",
     "source_cat_and_elite": "https://files.alpaca.markets/disclosures/library/BrokFeeSched.pdf (Revised on September 17, 2026; retrieved 2026-09-25; sha256 7bc75e3cd86f5c1950f8ce1292049965280340a3cebe727ca7aee4a7d2d71b12)",
     "source_sec_taf": "blueprints/us-equities/mover-v3/data/fees-v3.json (retrieved_at 2026-09-24)",
-    "taf_cap_scope": "Per execution, not per order (settled): FINRA TAF FAQ A200.17 -- https://www.finra.org/rules-guidance/guidance/faqs/trading-activity-fee -- each street-side execution is a separate sale (its own example: ten 100,000-share executions of one order are ten separately capped sales); Alpaca's schedule's 'per trade' wording is consistent with this reading."
+    "taf_cap_scope": "Per execution for this exerciser (settled): FINRA TAF FAQ A200.17 -- https://www.finra.org/rules-guidance/guidance/faqs/trading-activity-fee -- verbatim, a member 'may choose to calculate the Trading Activity Fee on either the individual street side executions or on the account level average price confirmation' (its own example: ten 100,000-share executions of a 1,000,000-share order bill as 'ten sales at $5' under the street-side-execution method, vs 'one sale at $5' under the account-level method; this choice is specifically for average-price-allocated orders). This exerciser does no average-price allocation, so the street-side-execution (per-fill) method applies."
   },
-  "generated_at_utc": "2026-09-25T06:21:37.477065+00:00",
+  "generated_at_utc": "2026-09-25T06:58:09.196969+00:00",
   "latency_note": "PRIMARY_LATENCY_MS=70 is a primary-reference point, chosen near the retained sim-to-paper receipt's own sensitivity-check flip point (~69.2ms) -- it is far BELOW that receipt's observed paper submit-to-fill range (0.65-1.09s), not inside it; of this lane's own 0/70/250/1000ms sweep points, 1000ms is the closest to that observed range. It is explicitly NOT a calibration (that receipt itself says 'Sensitivity check, not a calibration'). On rc5 a deferred order is released at the first of its own next quote or ANY due clock timer, so the exerciser's own tick cadence mixes into the measured submit-to-fill distribution alongside the configured latency; the sweep below therefore varies configured latency together with that timer-cadence effect, not latency alone. See each run's submit_to_fill_latency_ms for the measured distribution.",
   "latency_sensitivity_elite_tier": [],
   "profiles": {
@@ -332,7 +332,7 @@
       "submits_per_sec": 5.0
     }
   },
-  "runner_sha256": "29c1de966c8b4bcb4507a477df0792739b50a025de79d2f0288d9c19a3f3c728",
+  "runner_sha256": "a9a32e690397e6e3ab872e1f0f16311b0c3adf0448ae6480cb4bbaa6b54401e8",
   "runs": [
     {
       "counters": {
@@ -347,7 +347,7 @@
       "denied_reasons": {
         "RATE_LIMIT_EXCEEDED": 3598
       },
-      "events_per_second": 476470.4022205898,
+      "events_per_second": 435071.9729406989,
       "execution_cost_vs_mid_usd": "1229.200",
       "fee_rounding": {
         "alpaca_method_by_type_usd": {
@@ -653,7 +653,7 @@
         "p50_ms": 138.603998,
         "p90_ms": 200.0
       },
-      "wall_seconds": 2.8562613620015327
+      "wall_seconds": 3.1280433690117206
     }
   ],
   "symbols": [

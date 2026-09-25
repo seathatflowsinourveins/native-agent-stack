@@ -402,6 +402,41 @@ class RunnerPureLogicTests(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# README latency-sweep table vs the committed receipt (no engine needed --
+# pure file parsing, so this runs on system Python too)
+# ---------------------------------------------------------------------------
+
+class ReadmeReceiptDriftTests(unittest.TestCase):
+    def test_readme_latency_sweep_table_matches_receipt(self):
+        # A stale copy of this exact table (README.md's elite-tier latency
+        # sweep) was caught by review once already (a hand-retyped 1000ms row
+        # no longer matched the committed receipt). This test reads both and
+        # asserts every row still agrees, so a future edit to one without the
+        # other fails the suite instead of silently drifting.
+        import re
+
+        readme = (SIM_CAPACITY / "README.md").read_text()
+        receipt = json.loads((SIM_CAPACITY / "receipts/20260924-elite-tier.json").read_text())
+        by_latency = {row["latency_ms"]: row["fills_per_minute_stats"]
+                      for row in receipt["latency_sensitivity_elite_tier"]}
+        self.assertTrue(by_latency, "receipt has no latency_sensitivity_elite_tier rows")
+
+        row_re = re.compile(r"^\|\s*(\d+)(?:\s*\(primary\))?\s*\|\s*(\d+)\s*\|\s*([\d.]+)\s*\|\s*(\d+)\s*\|\s*(\d+)/30\s*\|\s*$",
+                            re.M)
+        found = {}
+        for m in row_re.finditer(readme):
+            latency_ms, min_v, median_v, max_v, full_v = m.groups()
+            found[int(latency_ms)] = {"min": int(min_v), "median": float(median_v), "max": int(max_v),
+                                      "full_minutes_at_or_above_180": int(full_v)}
+        self.assertEqual(set(found), set(by_latency), "README table latencies must match the receipt's")
+        for latency_ms, readme_stats in found.items():
+            receipt_stats = by_latency[latency_ms]
+            for key in ("min", "median", "max", "full_minutes_at_or_above_180"):
+                self.assertEqual(readme_stats[key], receipt_stats[key],
+                                 f"README latency-sweep row for {latency_ms}ms.{key} does not match the receipt")
+
+
+# ---------------------------------------------------------------------------
 # --replay never opens credentials
 # ---------------------------------------------------------------------------
 
@@ -496,7 +531,8 @@ class RealVenueRunOneTests(unittest.TestCase):
     paper-parity (commission_plan="none") profile; an independent recount;
     TIF is IOC; and the configured budget values."""
 
-    DISPLAYED_SIZE = 3  # tight enough that "fill qty <= displayed size" is a real check
+    DISPLAYED_SIZE = 7  # max of the cycled sizes below; still tight enough that
+    # "fill qty <= displayed size" is a real check
 
     @classmethod
     def setUpClass(cls):
@@ -507,8 +543,21 @@ class RealVenueRunOneTests(unittest.TestCase):
             rows = []
             for i in range(3000):  # 3000 * 20ms = 60s of quotes
                 ts = i * 20_000_000
+                # Cycle displayed size 3,4,5,6,7,3,4,... (never a constant
+                # repeated (price, size) pair) -- see README.md's Limitations
+                # section: on the pinned rc5 engine, a book level's consumed
+                # tally under liquidity_consumption=True resets only when its
+                # displayed size actually changes; an unmodified, constant
+                # quote every tick was measured to lock up after literally 4
+                # fills (95-99% of every subsequent order then expiring for
+                # the rest of the run), which would have made every
+                # behavioral assertion in this class rest on those same 4
+                # fills. A plain two-value alternation (3,4,3,4,...) was
+                # tried and measured to still lock up; a wider 5-value cycle
+                # was measured to sustain fills throughout the run instead.
+                size = 3 + (i % 5)
                 rows.append({"symbol": s, "ts_ns": ts, "bid": "100.00", "ask": "100.02",
-                             "bid_size": cls.DISPLAYED_SIZE, "ask_size": cls.DISPLAYED_SIZE})
+                             "bid_size": size, "ask_size": size})
             quotes[s] = rows
         cls.quotes = quotes
         cls.result = cls.runner.run_one(quotes, {}, profile_name="paper-parity",
@@ -532,16 +581,22 @@ class RealVenueRunOneTests(unittest.TestCase):
         self.assertEqual(check["violation_count"], 0, check["violations"])
 
     def test_fees_charged_on_sells_only_at_commission_plan_none(self):
-        # paper-parity uses commission_plan="none": CAT alone rounds to 0.00 at
-        # this run's tiny (<=3 share) fills, so BUY fees must be exactly 0.00
-        # while SELL fees (SEC+TAF) must be nonzero.
+        # paper-parity uses commission_plan="none": every fill's engine-charged
+        # fee must exactly match an independent recomputation via
+        # fee_model.commission_usd (CAT on both sides, SEC+TAF sells only).
+        # Some individual sells round to "0.00" at a small enough partial-fill
+        # quantity, so the meaningful assertion is exact-match-per-fill, not a
+        # blanket "sells are always nonzero" -- SELL fees must still be
+        # strictly higher on average than BUY fees at comparable quantities.
         fills = [e for e in self.result["events"] if e["kind"] == "fill"]
         buys = [f for f in fills if f["side"] == "BUY"]
         sells = [f for f in fills if f["side"] == "SELL"]
         self.assertGreater(len(buys), 0)
         self.assertGreater(len(sells), 0)
-        self.assertTrue(all(f["fee_usd"] == "0.00" for f in buys))
-        self.assertTrue(all(f["fee_usd"] != "0.00" for f in sells))
+        for f in fills:
+            expected = FM.commission_usd(side=f["side"], quantity=f["qty"], price=f["price"], commission_plan="none")
+            self.assertEqual(Decimal(f["fee_usd"]), expected, f)
+        self.assertGreater(sum(Decimal(f["fee_usd"]) for f in sells), sum(Decimal(f["fee_usd"]) for f in buys))
 
     def test_independent_recount_agrees(self):
         summary = self.runner.summarize_run(self.result, self.quotes)
@@ -673,18 +728,66 @@ class RealVenueRunOneTests(unittest.TestCase):
         self.assertTrue(25 <= denied <= 65, f"submits={submits} denied={denied}")
 
     def test_no_short_sale_rejects_with_concurrent_sells_in_flight(self):
-        # M3 regression: at a higher cadence (elite-tier), several sells for
-        # the same symbol can be in flight at once; the reservation-based
-        # clamp (not just the plain position clamp) must still prevent every
+        # M3 regression: at a higher cadence (elite-tier) and a long enough
+        # latency (1000ms) that several sells for the same symbol can be
+        # submitted before any of them resolve, the reservation-based clamp
+        # (not just the plain position clamp) must still prevent every
         # short-sale reject.
-        result = self.runner.run_one(self.quotes, {}, profile_name="elite-tier",
+        #
+        # Deliberately uses its own small, constant (unvarying) quote --
+        # *not* the class-shared `self.quotes` fixture -- because a thin,
+        # slowly-replenishing position is exactly what exposes this race:
+        # the shared fixture's now-abundant, always-replenishing liquidity
+        # (see the class docstring and README.md's Limitations section) lets
+        # inventory grow large enough, fast enough, that even a *reverted*
+        # reservation mechanism never actually oversells in that fixture
+        # (measured directly: this exact mutation went uncaught once the
+        # shared fixture was fixed to vary size). This fixture's own
+        # liquidity-lock quirk is what keeps positions thin here, which is
+        # the genuinely discriminating condition for this specific race.
+        quotes = {}
+        for s in ("AAPL", "MSFT"):
+            quotes[s] = [{"symbol": s, "ts_ns": i * 20_000_000, "bid": "100.00", "ask": "100.02",
+                         "bid_size": 3, "ask_size": 3} for i in range(3000)]
+        result = self.runner.run_one(quotes, {}, profile_name="elite-tier",
                                       latency_ms=1000, run_seconds=20.0)
         reject_reasons = {}
         for ev in result["events"]:
             if ev["kind"] == "reject":
                 reject_reasons[ev["reason"]] = reject_reasons.get(ev["reason"], 0) + 1
         self.assertEqual(result["counters"].get("rejects", 0), 0, reject_reasons)
-        self.assertNotIn("Short selling not permitted on a CASH account", reject_reasons)
+        self.assertFalse(any("Short selling not permitted on a CASH account" in r for r in reject_reasons),
+                         reject_reasons)
+
+    def test_clamp_binds_with_asymmetric_buy_sell_sizes(self):
+        # LOW#3: the two tests above exercise the in-flight *reservation*, not
+        # the qty *clamp* itself -- disabling the clamp alone (mutate.py's
+        # X6a/b/c) was measured to still pass the whole suite, since neither
+        # existing fixture ever proposes a SELL for more than is genuinely
+        # held. This fixture forces it directly: ask size (buys) cycles
+        # 2..6, bid size (sells) cycles 5..9 -- always bigger -- so a SELL
+        # decision's displayed-size-derived desired quantity habitually
+        # exceeds a thin position built from smaller buys. Disabling the
+        # clamp on this exact fixture was measured to produce 44 short-sale
+        # rejects (out of 332 submits, latency 70ms); the real, unmutated
+        # clamp must produce zero.
+        quotes = {"AAPL": []}
+        for i in range(3000):
+            ts = i * 20_000_000
+            ask_size = 2 + (i % 5)
+            bid_size = 5 + (i % 5)
+            quotes["AAPL"].append({"symbol": "AAPL", "ts_ns": ts, "bid": "100.00", "ask": "100.02",
+                                   "bid_size": bid_size, "ask_size": ask_size})
+        result = self.runner.run_one(quotes, {}, profile_name="elite-tier",
+                                      latency_ms=self.runner.PRIMARY_LATENCY_MS, run_seconds=20.0)
+        reject_reasons = {}
+        for ev in result["events"]:
+            if ev["kind"] == "reject":
+                reject_reasons[ev["reason"]] = reject_reasons.get(ev["reason"], 0) + 1
+        self.assertGreater(result["counters"].get("submits", 0), 100)
+        self.assertEqual(result["counters"].get("rejects", 0), 0, reject_reasons)
+        self.assertFalse(any("Short selling not permitted on a CASH account" in r for r in reject_reasons),
+                         reject_reasons)
 
 
 @unittest.skipUnless(_pinned_runtime_active(), "requires the pinned nautilus_trader==2.0.0rc5 runtime")
@@ -710,7 +813,9 @@ class CmdRunIntegrationTests(unittest.TestCase):
                              "bid_size": 500, "ask_size": 500})
             quotes[s] = rows
         trades = {s: [] for s in symbols}
-        cls.tmp = Path(tempfile.mkdtemp())
+        cls._tmpdir = tempfile.TemporaryDirectory()
+        cls.addClassCleanup(cls._tmpdir.cleanup)  # always removed, even on failure/error
+        cls.tmp = Path(cls._tmpdir.name)
         (cls.tmp / "quotes.private.json").write_text(json.dumps(quotes))
         (cls.tmp / "trades.private.json").write_text(json.dumps(trades))
         manifest = {

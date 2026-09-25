@@ -201,13 +201,18 @@ Sources:
   (`https://files.alpaca.markets/disclosures/library/BrokFeeSched.pdf`),
   "Revised on September 17, 2026", retrieved 2026-09-25, sha256
   `7bc75e3cd86f5c1950f8ce1292049965280340a3cebe727ca7aee4a7d2d71b12`.
-- **TAF cap scope is settled**: per **execution**, not per order (FINRA TAF
-  FAQ [A200.17](https://www.finra.org/rules-guidance/guidance/faqs/trading-activity-fee):
-  "each street-side execution represents a separate sale" -- its own example
-  bills ten 100,000-share executions of one order as ten separately capped
-  sales; Alpaca's schedule's "per trade" wording is consistent with this
-  reading). This model already applies the cap per fill, which is the
-  settled, sourced behavior.
+- **TAF cap scope is settled for this exerciser**: per **execution**, not per
+  order (FINRA TAF FAQ [A200.17](https://www.finra.org/rules-guidance/guidance/faqs/trading-activity-fee),
+  verbatim: a member "may choose to calculate the Trading Activity Fee on
+  either the individual street side executions or on the account level
+  average price confirmation" -- its own example bills a 1,000,000-share
+  order filled as ten 100,000-share executions as "ten sales at $5" under the
+  street-side-execution method (vs. "one sale at $5" under the account-level
+  method; A200.17 is specifically about average-price-allocated orders and
+  requires the chosen method be applied consistently). This exerciser does
+  no average-price allocation, so the street-side-execution method applies,
+  and per-fill -- what this model already does -- is the settled, sourced
+  behavior for this case, not a conservative guess.
 
 **Partial**: the `cost_plus` commission plan excludes its exchange-fee/rebate
 pass-through component (not modeled).
@@ -281,14 +286,20 @@ guard: 0 violations in both profiles after the fix (see above).
 | paper-parity (70ms) | 171 | 175.0 | 180 | 1/30 (by design: capped by the 180/min limiter) | ~45.33 | ~3.1s | agrees |
 | elite-tier (70ms, primary) | 859 | 873.0 | 882 | **30/30** | ~243.45 | ~5.2s | agrees |
 
-Latency sensitivity (elite-tier, full 30-min run at each latency):
+Latency sensitivity (elite-tier, full 30-min run at each latency). **This
+table is sourced from `receipts/20260924-elite-tier.json`'s
+`latency_sensitivity_elite_tier`** -- read the numbers from that file when
+regenerating this table, rather than retyping them, so it cannot silently
+drift from the committed receipt (a stale copy of this exact table was
+caught by review once already); `tests.test_sim_capacity`'s
+`test_readme_latency_sweep_table_matches_receipt` asserts the two agree:
 
 | latency (ms) | min/min | median/min | max/min | full minutes >=180 |
 |---|---|---|---|---|
 | 0 | 889 | 898.5 | 900 | 30/30 |
 | 70 (primary) | 859 | 873.0 | 882 | 30/30 |
 | 250 | 801 | 829.0 | 852 | 30/30 |
-| 1000 | 655 | 724.5 | 758 | 30/30 |
+| 1000 | 670 | 728.0 | 757 | 30/30 |
 
 ### Quotes-only vs with-trades (H1 evidence)
 
@@ -313,6 +324,44 @@ every round trip plus fees with no offsetting signal. See
 `receipts/20260924-paper-parity.json` and `receipts/20260924-elite-tier.json`
 for full per-minute breakdowns, page hashes, engine/runtime versions and the
 redacted argv.
+
+## Limitations
+
+**Undocumented rc5 liquidity-consumption behavior: a price level's consumed
+tally is not reset by an identical repeated quote.** On the pinned engine, a
+book level's consumed-quantity tally under `liquidity_consumption=True` is
+reset only when that price's *displayed size actually changes*
+(`matching_engine/mod.rs:371-375`); it is otherwise cleared only on an
+explicit book reset or an instrument precision change
+(`matching_engine/mod.rs:297-298,1338-1339`). Two SIP quotes for the same
+symbol that happen to repeat the exact same (price, size) pair -- not
+uncommon in real market data during a quiet moment -- therefore do **not**
+replenish liquidity at that price between them, even though each is a fresh,
+independent quote. A taker order that would otherwise be marketable can
+expire unfilled purely because an earlier order already consumed that
+price's displayed size at an earlier, identically-priced-and-sized quote.
+
+Measured directly on the committed elite-tier@70ms receipt
+(`runner.stale_tally`-style attribution, cross-checked with the independent
+reviewer's `final_check.py`): of 855 IOC expiries, 66 (7.7% of expiries,
+**~0.25% of the 26,155 total fills**) are marketable-at-cancel, have nonzero
+displayed size at the quote in force, and were already consumed by an
+earlier fill at that same (symbol, side, price) since that quote instance
+first appeared -- i.e. exactly this stale-tally artifact. This makes the
+lane's throughput and cost figures **pessimistic** (fewer fills, not more)
+relative to a hypothetical engine that replenishes every fresh quote
+regardless of whether its price/size repeats a prior one, so it does not
+inflate the >=180 fills/min claim.
+
+This also affects the test suite's own synthetic fixtures: an early,
+naive fixture using an *identical*, unchanging (price, size) quote every
+tick fell into this depletion lock almost immediately (4 fills, then 95-99%
+of subsequent orders expired for the rest of the run) -- every
+`RealVenueRunOneTests` behavioral assertion would otherwise have rested on
+just those first 4 fills. The shared fixture now varies size tick-to-tick
+(so no two consecutive quotes at a given price ever share the same
+displayed size), which lets liquidity keep replenishing and gives each test
+a meaningful, healthy fill count instead.
 
 ## Convergence record
 

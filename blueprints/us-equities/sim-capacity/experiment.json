@@ -28,13 +28,13 @@
       "attempt": 1,
       "command_index": 2,
       "evidence_class": "native_cli_execution",
-      "scope": "Elite-tier venue/risk profile (900/min submit budget), 8 symbols, real Alpaca SIP quotes/trades, 2026-09-24T14:00-14:30Z, NautilusTrader 2.0.0rc5 BacktestEngine, 70ms primary latency plus 0/250/1000ms sensitivity",
+      "scope": "Elite-tier venue/risk profile (900/min submit budget), 8 symbols, real Alpaca SIP quotes only (trades fetched and cataloged but not fed into the engine; see H1), 2026-09-24T14:00-14:30Z, NautilusTrader 2.0.0rc5 BacktestEngine, 70ms primary latency plus 0/250/1000ms sensitivity",
       "status": "passed",
       "exit_code": 0,
       "quality": {"semantic": true, "contract": true},
       "artifacts": [
         {"path": "blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json",
-         "sha256": "e805d93329ab5611e39258456c2cd7372e0df7bb234d14859186afd9f71ae9c7"}
+         "sha256": "a465e38dadc9f6444cbd529ff5ef45923b9c04dc3b4c055acdfdefca17ea777c"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
                 "reasoning_in_output": null, "total": null, "native_retries": 0}
@@ -47,13 +47,13 @@
       "attempt": 1,
       "command_index": 1,
       "evidence_class": "native_cli_execution",
-      "scope": "Paper-parity venue/risk profile (180/min submit budget), 8 symbols, real Alpaca SIP quotes/trades, 2026-09-24T14:00-14:30Z, NautilusTrader 2.0.0rc5 BacktestEngine, 70ms latency",
+      "scope": "Paper-parity venue/risk profile (180/min submit budget), 8 symbols, real Alpaca SIP quotes only (trades fetched and cataloged but not fed into the engine; see H1), 2026-09-24T14:00-14:30Z, NautilusTrader 2.0.0rc5 BacktestEngine, 70ms latency",
       "status": "passed",
       "exit_code": 0,
       "quality": {"semantic": true, "contract": true},
       "artifacts": [
         {"path": "blueprints/us-equities/sim-capacity/receipts/20260924-paper-parity.json",
-         "sha256": "be68aae38bc014f4713ced49286d4a76e5d2d1e39ed111d4386c7cd10c4069fd"}
+         "sha256": "62c2da144a534eb4c992baf2438cdf3f3df8f1eb9eba22aa22e67450a7372be7"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
                 "reasoning_in_output": null, "total": null, "native_retries": 0}
@@ -72,7 +72,7 @@
       "quality": {"semantic": true, "contract": true},
       "artifacts": [
         {"path": "tests/test_sim_capacity.py",
-         "sha256": "ff8570b546f7a3f42d678593feebf7c62b900670f2364583f3bcd050d25e9728"}
+         "sha256": "a8c2778e500d5b9a501fece644033aba5448eef73bfe284944fe9f0be783e1b5"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
                 "reasoning_in_output": null, "total": null, "native_retries": 0}
@@ -105,15 +105,15 @@
       {"path": "blueprints/us-equities/sim-capacity/exerciser.py",
        "sha256": "81835d6e21ff1cace1d15b7c71bfb34722015d2fa2afb16402c1ad61cbee468a"},
       {"path": "blueprints/us-equities/sim-capacity/fee_model.py",
-       "sha256": "c5e9751d872a4966028d7efee7216295c40a378e26fb79b329fe63e601a612b3"},
+       "sha256": "164ce06f67ce71eeec91848f0551f61a7f121eb2a9764500f499c96a4dc636aa"},
       {"path": "blueprints/us-equities/sim-capacity/schedule.py",
        "sha256": "c214a3b2a7105b95937d0b449f5bc76bf41d6ac6cf314fa477b80656f544bb48"}
     ],
     "evaluation": [
       {"path": "blueprints/us-equities/sim-capacity/runner.py",
-       "sha256": "29c1de966c8b4bcb4507a477df0792739b50a025de79d2f0288d9c19a3f3c728"},
+       "sha256": "a9a32e690397e6e3ab872e1f0f16311b0c3adf0448ae6480cb4bbaa6b54401e8"},
       {"path": "tests/test_sim_capacity.py",
-       "sha256": "ff8570b546f7a3f42d678593feebf7c62b900670f2364583f3bcd050d25e9728"}
+       "sha256": "a8c2778e500d5b9a501fece644033aba5448eef73bfe284944fe9f0be783e1b5"}
     ]
   },
   "runtime_and_platform": {
@@ -138,11 +138,12 @@
     "An independent review found 41.2% of elite-tier fills beat the NBBO touch when trade ticks were fed into the engine alongside quotes (an rc5 L1-book artifact: a trade print overwrites both sides of the book and nothing restores the prior quote for a NO_AGGRESSOR trade). Fixed by feeding quotes only into the engine (trade ticks are still fetched and cataloged for future passive-order work, just not replayed here); measured 0 touch violations after the fix, asserted by cmd_run in every run including the latency sweep, and cross-checked by the builder with the reviewer's own harness before commit (the reviewer separately verifies independently).",
     "An independent review found 162/163 elite and 112/113 paper order rejects were 'Short selling not permitted on a CASH account', consuming rate-limit budget and driving position-cap skips. Fixed with inventory-aware side selection (never sell from a flat or short position; a sell's quantity is clamped to the current long); measured 0 short-sale rejects after the fix.",
     "Alpaca's historical trade data carries no aggressor-side field; every TradeTick is tagged NO_AGGRESSOR, which makes any queue-depletion-based fill estimate derived from these trade ticks optimistic (documented in fetcher.py).",
-    "The FINRA TAF cap's per-order-vs-per-execution scope is now settled (FINRA TAF FAQ A200.17: the cap applies per execution); this fee model applies it per fill, which is the settled, sourced behavior (documented in fee_model.py)."
+    "The FINRA TAF cap's per-order-vs-per-execution scope is now settled for this exerciser (FINRA TAF FAQ A200.17, verbatim: a member may calculate the fee on 'either the individual street side executions or ... the account level average price confirmation', an average-price-allocation choice this exerciser's plain per-fill IOC activity does not involve, so the street-side-execution/per-fill method applies); this fee model already applies it per fill, which is the settled, sourced behavior for this case (documented in fee_model.py).",
+    "Undocumented rc5 behavior: a book level's consumed-quantity tally under liquidity_consumption=True resets only when that price's displayed size actually changes (matching_engine/mod.rs:371-375), clearing otherwise only on a book reset or instrument precision change (:297-298,:1338-1339) -- an identical repeated (price, size) quote never replenishes liquidity between them. Measured on the committed elite-tier@70ms receipt: 66 of 855 IOC expiries (~0.25% of the 26,155 total fills) are marketable-at-cancel with nonzero displayed size, already consumed by an earlier fill at that same (symbol, side, price) since the quote instance in force first appeared. This makes the lane's throughput/cost figures pessimistic (fewer fills), not inflated. It also broke an early, unmodified-quote test fixture (4 fills, then 95-99% expiry for the rest of the run); the shared fixture now varies displayed size tick-to-tick so liquidity keeps replenishing."
   ],
   "decision_and_scope": {
     "decision": "adopt_within_scope",
-    "scope": "Elite-tier venue/risk profile (900/min submit budget), 8 symbols, real Alpaca SIP quotes/trades, 2026-09-24T14:00-14:30Z, NautilusTrader 2.0.0rc5 BacktestEngine, 70ms primary latency plus 0/250/1000ms sensitivity",
+    "scope": "Elite-tier venue/risk profile (900/min submit budget), 8 symbols, real Alpaca SIP quotes only (trades fetched and cataloged but not fed into the engine; see H1), 2026-09-24T14:00-14:30Z, NautilusTrader 2.0.0rc5 BacktestEngine, 70ms primary latency plus 0/250/1000ms sensitivity",
     "qualification_run_ids": ["elite-tier-capacity-run"]
   },
   "rollback": "Remove blueprints/us-equities/sim-capacity/ and its manifests/evidence.json entries; no other blueprint imports this one, and it makes no live/paper trading claim to unwind.",

@@ -47,14 +47,19 @@ Smart Router commission applies only when trading through the Elite offering
 apply to ... use of the Elite Smart Router under the Alpaca Elite offering."
 
 **TAF cap is per execution, not per order** (FINRA TAF FAQ A200.17,
-https://www.finra.org/rules-guidance/guidance/faqs/trading-activity-fee:
-"each street-side execution represents a separate sale" -- its own example
-is ten 100,000-share executions of one order billed as "ten sales" each
-separately capped, not one order-level cap; Alpaca's schedule's own "per
-trade" wording is consistent with this reading, where "trade" means
-execution/fill, not the parent order). This model already applies the cap
-per fill, which is therefore the settled, sourced behavior, not a
-conservative guess.
+https://www.finra.org/rules-guidance/guidance/faqs/trading-activity-fee,
+verbatim: a member "may choose to calculate the Trading Activity Fee on
+either the individual street side executions or on the account level
+average price confirmation" -- its own example bills a 1,000,000-share order
+filled as ten 100,000-share executions as "ten sales at $5" under the
+street-side-execution method (the alternative, account-level method bills
+the same order as "one sale at $5"; A200.17 describes this choice for average-
+price-allocated orders specifically, and requires the chosen method be
+applied consistently). This exerciser has no average-price allocation at
+all, so the street-side-execution method is the applicable one, and per-
+execution -- what this model already does -- is not a conservative guess but
+the settled, sourced behavior for this case: each IOC fill is its own sale,
+separately capped.
 
 **Partial**: the `cost_plus` commission plan's per-share rate is exact at
 this lane's (lowest) volume tier, but its additional "Exchange Fees or
