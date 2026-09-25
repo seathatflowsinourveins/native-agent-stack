@@ -73,6 +73,25 @@ class Parameters(unittest.TestCase):
         self.assertIn("run_discipline.amendment_format", pins["amendment_rule"])
         self.assertNotIn("left to the freeze pull request", pins["amendment_rule"])
 
+    def test_freeze_acceptance_lists_every_precondition_without_claiming_completion(self):
+        """Review round 15, F15: one status per freeze precondition, only 'open' or 'done in draft' in the draft, each
+        'done' naming its evidence; the protocol stays a draft that is not frozen before outcomes."""
+        fa = PROTOCOL["study_code_status"]["freeze_acceptance"]
+        self.assertEqual([e["index"] for e in fa["entries"]], list(range(len(PROTOCOL["freeze_preconditions"]))))
+        self.assertTrue(all(e["status"] in ("open", "done in draft") for e in fa["entries"]))
+        self.assertTrue(all(e["evidence"] for e in fa["entries"] if e["status"] != "open"))
+        self.assertIn("never by the presence of code", fa["rule"])
+        self.assertIs(PROTOCOL["frozen_before_outcomes"], False)
+        self.assertNotEqual(PROTOCOL["status"], "frozen")
+
+    def test_the_readme_states_the_governing_coverage_and_deviation_rules(self):
+        """Review round 15, N08: the overview names the minute-bar threshold and does not describe results from a
+        deviated tree, which the guards refuse."""
+        text = " ".join((Path(__file__).resolve().parents[2] / "README.md").read_text().split())
+        self.assertIn("90% minute-bar coverage", text)
+        self.assertNotIn("reported beside the governing ones", text)
+        self.assertIn("A code change after the freeze cannot run", text)
+
     def test_amendment_lines_follow_the_format(self):
         from core import amendments
         from tests import synth

@@ -1058,6 +1058,18 @@
       "round": 15,
       "input": "Review round 15, F12 (conservative fetch budget; unresolved, major): $.freeze_preconditions[5] and core/count_only.py fetch_estimate divided the request count by the rate ceiling; pagination, achieved serial throughput, retries, storage, evaluation and merge time were not budgeted, and acknowledging that the estimate was not an upper bound did not make the margin conservative. The operational facts (a 200/min trading limit, 10,000/min market data) did not show conservative end-to-end throughput; separate budgets and a measured pipeline allowance were to be pinned before the margin gate applies.",
       "resolution": "Resolved as a mechanism with pinned inputs; the input values stay open decisions. (1) Separate budgets: $.exposure_registry.pre_freeze_access_path.rate_limit now pins the market-data and the trading limits with their sources (per_minute, trading_per_minute), core.count_only.pinned_rate_limit refuses while either is null, and core/transport_proc.py paces each host at its own rate (worker_apis, a --trading-per-minute argument). (2) Pages and measured throughput: the new $.exposure_registry.pre_freeze_access_path.pipeline_allowance pins seconds_per_page, pages_per_request for every priced request kind (core.count_only.PAGE_KINDS), retry_seconds and evaluation_and_merge_seconds, and the count-only run refuses while any is null (pinned_pipeline_allowance). (3) core.count_only.fetch_estimate prices pages per kind at the slower of 60 / per_minute and the pinned seconds per page, the trading pages at their own limit, and adds the retry and evaluation-and-merge allowances; the hashed $.coverage_rule.thresholds.fetch_estimate.rule says so (COVERAGE_RULE_SHA256 now 22077d62b9f40272999c404e3069d79916b9a89960eb793722427f0187c301dc). (4) Measurement and binding: the native dry run's output records its measurement from its seal (core.count_only.dry_run_measured: the largest pages per request per kind and the seconds per page over its page vintages); every frozen run refuses unless the output's allowance equals the frozen one and the committed dry run, with its complete line from the frozen tree, is within it (core.runner.check_dry_run_bound); the allowance joins the count-only dependency manifest. $.freeze_preconditions[5] now puts the native dry run before the count-only run. Tests: tests/test_count_only.py FetchBudget (a case e7529b47's request estimate passes and the page-based estimate at a measured 1.5 s per page fails; unpinned budgets refused; the dry-run measurement from a seal) and tests/test_fetch.py (separate pacers and the child's arguments), tests/test_cli.py test_the_frozen_allowance_is_bounded_by_the_committed_dry_run. On the code before this change they fail (no page kinds, allowance or dry-run binding). Open decision (not guessed): the pinned values, set by a reviewed pull request after the native dry run and before the count-only run. Recommendation: seconds_per_page and pages_per_request at twice the dry run's measurement, the backward and rename windows at the largest quote-kind value; retry_seconds as the worst case under the void threshold (1% of requests x (21 s of waits + 4 x 60 s timeouts) x 2 for the re-fetch) if the margin still holds, else the dry run's observed retry time x 10; evaluation_and_merge_seconds as 24 h per committed step (fetch start and end and evaluation start and end for both stages, 8 steps) plus the measured evaluation time."
+    },
+    {
+      "date": "2026-09-25",
+      "round": 15,
+      "input": "Review round 15, N08 (minor): the README overview drifted from governing behaviour: its coverage summary omitted the minute-bar threshold, it described non-transport deviations as producing side-by-side results although the guards refuse them, and its crash and retry claim needed qualifying.",
+      "resolution": "Resolved. README.md now names all four coverage thresholds (the 90% minute-bar rate included) with the fail-closed cohorts, the identity probe and the page-based margin; says that a code change outside study/fetch/ cannot run after the freeze (every command refuses such a tree, so no deviated result exists); qualifies the crash and retry claim (a run that ends before the write writes nothing; an uncited file is recomputed and replaced, a pre-freeze one adopted only if it reproduces, a lost completion recovered by run.py complete; synthetic-tested only); and reflects the round-15 rules (settlement-date fees, primary-contrast verdicts, completed-bar cost tiers, retrospective scope, content-dated validation timeliness). study/README.md lists the complete command and a round-15 summary. Test: tests/test_params.py test_the_readme_states_the_governing_coverage_and_deviation_rules; the README at e7529b47 fails it (no minute-bar threshold; 'reported beside the governing ones')."
+    },
+    {
+      "date": "2026-09-25",
+      "round": 15,
+      "input": "Review round 15, F15 (preconditions versus evidence; partially resolved): code, lock, synthetic tests and separately pinned specifications existed, but native coverage, identity, dry-run, collector and other freeze acceptance were unestablished, rate and freeze pins were null, and artifact presence is not completion evidence.",
+      "resolution": "Resolved as a record, not as acceptance: $.study_code_status.freeze_acceptance lists every freeze precondition by index with its status ('open' or 'done in draft') and the evidence it rests on, under a rule that only a named receipt, run-log line, review record or pull request meets one, never artifact presence. Two are done in draft (the pinned data files, now loadable; the synthetic suite at the recorded tree); the rest, the rate limits and pipeline allowance among them, remain open. frozen_before_outcomes stays false and status stays draft; no freeze is claimed. Test: tests/test_params.py test_freeze_acceptance_lists_every_precondition_without_claiming_completion; at e7529b47 the record does not exist."
     }
   ],
   "overturn": "Any headline result is overturned if a rerun on the same frozen inputs, study tree and runtime.lock does not reproduce it byte for byte, if an independent quote sample puts the cost table off by more than 2x, or if the access log shows a holdout read that no committed granted entry preceded.",
@@ -1070,6 +1082,76 @@
       "the other freeze_preconditions (literature reads, data files, the count-only runs and their outputs, the identity probe, the rate-limit estimate, the native dry run, the collector schedule and the exposure-registry update)",
       "then the freeze: status frozen, frozen_before_outcomes true, study_code tree and fetch_tree, data_file_sha256s and coverage_decision recorded in a commit that becomes reachable from origin/main"
     ],
+    "freeze_acceptance": {
+      "rule": "Review round 15, F15: one entry per freeze_preconditions item, by index. A precondition is met only by the committed receipt, run-log line, review record or pull request its evidence names, never by the presence of code, a lock, a test or a file: 'done in draft' names evidence that must be redone on the tree the freeze pins, and 'open' has none yet. The freeze pull request turns every entry into 'done' with its evidence.",
+      "entries": [
+        {
+          "index": 0,
+          "status": "open",
+          "evidence": "Round 15 (2026-09-25) resolves the 2026-09-24 cross-family review in dated review_record entries; a new cross-family pre-outcome review of the round-15 tree is still required (Codex unavailable until 2026-09-30)."
+        },
+        {
+          "index": 1,
+          "status": "open",
+          "evidence": null
+        },
+        {
+          "index": 2,
+          "status": "done in draft",
+          "evidence": "data/session-calendar.json and data/fees-v3.json committed and pinned in data-pins.json (#186, #194), both amendment files committed empty; the study reads both in their committed schemas (review round 15, N01). The pins are copied into run_discipline.data_files at the freeze."
+        },
+        {
+          "index": 3,
+          "status": "open",
+          "evidence": null
+        },
+        {
+          "index": 4,
+          "status": "open",
+          "evidence": null
+        },
+        {
+          "index": 5,
+          "status": "open",
+          "evidence": "exposure_registry.pre_freeze_access_path.rate_limit and pipeline_allowance are null (open decisions, review round 15, F12)."
+        },
+        {
+          "index": 6,
+          "status": "open",
+          "evidence": null
+        },
+        {
+          "index": 7,
+          "status": "done in draft",
+          "evidence": "run_discipline.study_code.test_record at draft_tree_at_this_revision; it must be rerun on the tree the freeze pins."
+        },
+        {
+          "index": 8,
+          "status": "open",
+          "evidence": null
+        },
+        {
+          "index": 9,
+          "status": "open",
+          "evidence": null
+        },
+        {
+          "index": 10,
+          "status": "open",
+          "evidence": null
+        },
+        {
+          "index": 11,
+          "status": "open",
+          "evidence": null
+        },
+        {
+          "index": 12,
+          "status": "open",
+          "evidence": "re-checked in the freeze pull request"
+        }
+      ]
+    },
     "status_note": "status stays draft_pending_independent_pre_outcome_review and frozen_before_outcomes stays false."
   },
   "open_before_first_holdout_count": []

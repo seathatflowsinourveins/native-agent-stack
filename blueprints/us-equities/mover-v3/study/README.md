@@ -34,7 +34,7 @@ results files (`../results/`) sit outside this tree, so appending to them never 
 `run.py` is the only entry point (`study/runtime.lock` `run_command`, run as `python -I -B`). Before the freeze only
 `build-calendar`, `count-only` and `dry-run` run; after it, `fetch` and `evaluate` (development and validation, each
 once), `transport-check` (from a tree that changes only `fetch/`) and the holdout commands `authorize`, `amend`,
-`collect`, `count` and `read`. `count` and `read` run twice under one authorization: the first run fetches and seals,
+`collect`, `count`, `read` and `complete` (review round 15). `count` and `read` run twice under one authorization: the first run fetches and seals,
 the second, after that line is pushed, evaluates over the sealed snapshot. Every command refuses unless its run-log,
 access-log and amendment lines are committed and pushed to origin/main (checked against the remote with
 `git ls-remote`, and append-only across origin/main's history), and a holdout action runs only under its own committed
@@ -79,6 +79,25 @@ and the trade is excluded like an undefined share factor, never priced at an old
 its line by a hard kill is recomputed and replaced on the retry, and a fetch step refuses a sealed ledger that no
 committed line names. `authorize --purpose count` refuses while the protocol's `open_before_first_holdout_count` list
 has an entry.
+
+Review round 15 (the 2026-09-24 cross-family review of #190): the calendar and fee files are read in their committed
+schemas and the calendar must reach the t-60 lookback of 2016-01-04; amendment lines follow the versioned
+`run_discipline.amendment_format` (`core/amendments.py`). A sale's SEC fee row is chosen by its settlement date (T+3,
+T+2, T+1 by trade date) and its TAF row by its trade date. Each coverage rate keeps its cohort and counts unknowns
+against coverage; rename probes need the same sessions across the rename and identical quotes, and an observed
+ticker-reuse failure fails the gate. The count-only output records its dependency manifest and is bound at the freeze
+to its complete line, the frozen tree, data files, parameters and budgets; count-only, dry-run and transport-check
+adopt an output a hard kill left without its line only if it reproduces from its seals (the transport check seals its
+live samples). A count and a read fetch their own terminal records (`terminal_actions`), so
+`open_before_first_holdout_count` is empty. Cost tiers use minute bars complete at the fill; the count and the read
+share record (split, spin-off) and accounting exclusions, and a delayed exit is checked through its exit session.
+Undefined or degenerate bootstrap draws gate both a pass and an MDE exclusion; item results report occupied sessions
+and units. Verdicts come from H1-D and H3-c alone, with the tradable cells under `profitability`. H3-a is embargoed with
+a 10-session block. Validation timeliness is dated by the governing bytes and line. `run.py complete --authorization
+ID` rebuilds a completion lost between an action's two log writes. Results carry `claims_scope` (retrospective
+reconstruction) and `input_vintage_range`. The fetch-time margin is priced in pages at the measured throughput with
+separate market-data and trading limits and pinned retry and evaluation-and-merge allowances, bound to the native dry
+run's measurement.
 
 ## Tests
 
