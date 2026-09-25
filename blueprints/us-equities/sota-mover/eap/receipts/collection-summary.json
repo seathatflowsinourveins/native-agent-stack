@@ -1,0 +1,70 @@
+{
+ "extract": {
+  "at": "2026-09-25T03:23:35Z",
+  "by_form": {
+   "10-K": 38791,
+   "10-K/A": 4208,
+   "10-KT": 86,
+   "10-KT/A": 11,
+   "10-Q": 115359,
+   "10-Q/A": 2053,
+   "8-K": 470536,
+   "8-K/A": 10984,
+   "8-K_item_2.02": 142944,
+   "duplicate_accession_rows": 935
+  },
+  "ciks_complete": 6127,
+  "ciks_with_item_2_02": 3973,
+  "filings_jsonl_sha256": "64539d877aefaa58e2aed44ae9dbfd29ddc4fcc203d7437475dfe79556ee1b0c",
+  "item_2_02_filing_date_range": [
+   "2015-01-05",
+   "2026-09-24"
+  ],
+  "manifest_lines": 13496,
+  "manifest_sha256": "bb4688f52584559abb90ffea082e72f638f1ca9cb563faa82a79239e0c56edfb",
+  "not_found_ciks": 0,
+  "rows": 642028,
+  "stored_files": 7369
+ },
+ "fetch_http_status_totals": {
+  "200": 7369
+ },
+ "fetch_runs": [
+  {
+   "at": "2026-09-25T03:05:26Z",
+   "ciks_attempted": 5,
+   "elapsed_s": 0.8,
+   "http": {
+    "200": 6
+   },
+   "mean_rate_per_s": 7.927,
+   "outcomes": {
+    "ok": 5
+   },
+   "rate_cap": 7.5,
+   "requests": 6
+  },
+  {
+   "at": "2026-09-25T03:23:10Z",
+   "ciks_attempted": 6122,
+   "elapsed_s": 1057.9,
+   "http": {
+    "200": 7363
+   },
+   "mean_rate_per_s": 6.96,
+   "outcomes": {
+    "ok": 6122
+   },
+   "rate_cap": 7.0,
+   "requests": 7363
+  }
+ ],
+ "kind": "eap_sec_collection",
+ "label": "HIST",
+ "outcomes_computed": false,
+ "private_root": "~/.local/state/native-agent-stack/research/sota-mover/eap/",
+ "source": "data.sec.gov/submissions (+ filings.files continuations with filingTo >= 2015-01-01)",
+ "universe_http": {
+  "200": 1
+ }
+}

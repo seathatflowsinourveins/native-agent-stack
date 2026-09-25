@@ -1,0 +1,213 @@
+{
+ "at": "2026-09-25T03:24:24Z",
+ "conclusion": "acceptanceDateTime is UTC; converted to America/New_York it equals the SGML header",
+ "first_attempt_preserved": {
+  "hypothesis": "digits are Eastern wall clock (Z ignored)",
+  "json_equals_header_wallclock": 0,
+  "result": "rejected; code changed to convert UTC to America/New_York before any accuracy computation",
+  "sample": 24
+ },
+ "header_found": 24,
+ "http": {
+  "200": 24
+ },
+ "json_equals_header_wallclock": 0,
+ "json_utc_converted_equals_header": 24,
+ "kind": "eap_acceptance_clock_check",
+ "label": "HIST",
+ "rows": [
+  {
+   "filing_date": "2017-11-17",
+   "header_eastern": "20171117110324",
+   "json_converted_to_eastern": "20171117110324",
+   "json_utc": "20171117160324",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2019-11-05",
+   "header_eastern": "20191105164545",
+   "json_converted_to_eastern": "20191105164545",
+   "json_utc": "20191105214545",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2016-11-01",
+   "header_eastern": "20161101085634",
+   "json_converted_to_eastern": "20161101085634",
+   "json_utc": "20161101125634",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2015-12-15",
+   "header_eastern": "20151215164903",
+   "json_converted_to_eastern": "20151215164903",
+   "json_utc": "20151215214903",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2022-02-01",
+   "header_eastern": "20220201161618",
+   "json_converted_to_eastern": "20220201161618",
+   "json_utc": "20220201211618",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2019-05-08",
+   "header_eastern": "20190508074526",
+   "json_converted_to_eastern": "20190508074526",
+   "json_utc": "20190508114526",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2024-10-10",
+   "header_eastern": "20241010060859",
+   "json_converted_to_eastern": "20241010060859",
+   "json_utc": "20241010100859",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2022-09-30",
+   "header_eastern": "20220930160257",
+   "json_converted_to_eastern": "20220930160257",
+   "json_utc": "20220930200257",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2023-09-11",
+   "header_eastern": "20230908213631",
+   "json_converted_to_eastern": "20230908213631",
+   "json_utc": "20230909013631",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2019-07-26",
+   "header_eastern": "20190726120402",
+   "json_converted_to_eastern": "20190726120402",
+   "json_utc": "20190726160402",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2024-02-28",
+   "header_eastern": "20240228170032",
+   "json_converted_to_eastern": "20240228170032",
+   "json_utc": "20240228220032",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2016-06-21",
+   "header_eastern": "20160621085505",
+   "json_converted_to_eastern": "20160621085505",
+   "json_utc": "20160621125505",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2016-11-02",
+   "header_eastern": "20161101211643",
+   "json_converted_to_eastern": "20161101211643",
+   "json_utc": "20161102011643",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2018-03-08",
+   "header_eastern": "20180308070910",
+   "json_converted_to_eastern": "20180308070910",
+   "json_utc": "20180308120910",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2025-07-23",
+   "header_eastern": "20250723075815",
+   "json_converted_to_eastern": "20250723075815",
+   "json_utc": "20250723115815",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2017-10-19",
+   "header_eastern": "20171019095418",
+   "json_converted_to_eastern": "20171019095418",
+   "json_utc": "20171019135418",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2018-06-19",
+   "header_eastern": "20180619091136",
+   "json_converted_to_eastern": "20180619091136",
+   "json_utc": "20180619131136",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2026-04-07",
+   "header_eastern": "20260407163848",
+   "json_converted_to_eastern": "20260407163848",
+   "json_utc": "20260407203848",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2021-01-21",
+   "header_eastern": "20210121163304",
+   "json_converted_to_eastern": "20210121163304",
+   "json_utc": "20210121213304",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2015-10-26",
+   "header_eastern": "20151026063709",
+   "json_converted_to_eastern": "20151026063709",
+   "json_utc": "20151026103709",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2024-07-22",
+   "header_eastern": "20240722162437",
+   "json_converted_to_eastern": "20240722162437",
+   "json_utc": "20240722202437",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2021-03-18",
+   "header_eastern": "20210318161632",
+   "json_converted_to_eastern": "20210318161632",
+   "json_utc": "20210318201632",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2015-11-16",
+   "header_eastern": "20151116160149",
+   "json_converted_to_eastern": "20151116160149",
+   "json_utc": "20151116210149",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  },
+  {
+   "filing_date": "2020-04-20",
+   "header_eastern": "20200420061525",
+   "json_converted_to_eastern": "20200420061525",
+   "json_utc": "20200420101525",
+   "same_wallclock": false,
+   "utc_to_eastern_matches": true
+  }
+ ],
+ "sample": 24
+}

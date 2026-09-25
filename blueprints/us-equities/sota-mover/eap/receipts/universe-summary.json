@@ -1,0 +1,18 @@
+{
+ "company_tickers_sha256": "3749c0b4a6197feb35e91a6704b3836e45f245dbc2dec1ffa559d1c028852d23",
+ "daily_symbols": 17997,
+ "daily_symbols_without_current_cik": 10721,
+ "http": {
+  "200": 1
+ },
+ "kind": "eap_identity_coverage",
+ "label": "HIST",
+ "matched_ciks": 6127,
+ "matched_symbols": 7276,
+ "outcomes_computed": false,
+ "private_root": "~/.local/state/native-agent-stack/research/sota-mover/eap/",
+ "sec_ciks_without_daily_symbol": 1877,
+ "sec_ticker_rows": 10413,
+ "sec_unique_ciks": 8004,
+ "universe_json_sha256": "4eadb1bb12cddf7c113c23c524046ed861931b0dbe2331d6dd5b3f07f58287e5"
+}
