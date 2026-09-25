@@ -3,7 +3,7 @@
 **Decided by:** the agent-lab token-efficiency session, from agent-lab's record
 `docs/tasks/2026-09-25-quality-optimization.md`, sections G3, G4, H1 and H2. That record is on agent-lab's default
 branch `codex/native-expansion`, through agent-lab PRs #66 and #67. This change is on branch
-`claude/model-fallback-guard-20260925`, rebased onto `origin/main@5abd17e4`.
+`claude/model-fallback-guard-20260925`, rebased onto `origin/main@3e4054d0`.
 
 **Scope:**
 - `adoption/templates/claude.settings.template.json`. `tools/adoption/apply_claude_settings.py` merges it into a
