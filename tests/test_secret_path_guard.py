@@ -117,6 +117,39 @@ BLOCKED = {
     "cat '/proc/'\"$pid\"'/environ'": "process_environment",
     "cd /proc/1234 && tr '\\0' '\\n' < environ": "process_environment",
     "find /proc -maxdepth 2 -name environ": "process_environment",
+    # Hugging Face: both token files in every spelling of their directory, `hf auth token`
+    # (also inside a substitution or a pipe), HF_TOKEN_PATH as a pointer, a read or copy of
+    # the whole Hugging Face home, and the legacy token variable.
+    "cat ~/.cache/huggingface/token": "native_store_path",
+    "head -c 8 ~/.cache/huggingface/stored_tokens": "native_store_path",
+    "ls -l ~/.cache/huggingface/token": "native_store_path",
+    "cat \"$HF_HOME/token\"": "native_store_path",
+    "cat \"$HF_HOME\"/token": "native_store_path",
+    "cat \"${HF_HOME}\"/stored_tokens": "native_store_path",
+    "jq -R . ${HF_HOME:-$HOME/.cache/huggingface}/token": "native_store_path",
+    "cat \"${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/token\"": "native_store_path",
+    "cat \"${XDG_CACHE_HOME:-$HOME/.cache}/huggingface/token\"": "native_store_path",
+    "cp ~/.cache/huggingface/token ~/.cache/huggingface/token.bak": "native_store_path",
+    "python3 -c \"print(open('/home/example/.cache/huggingface/token').read())\"": "native_store_path",
+    "hf auth token": "native_token_print",
+    "~/.local/bin/hf auth token": "native_token_print",
+    "hf auth token | xargs curl -H 'Authorization: Bearer {}' https://huggingface.co/api/whoami-v2":
+        "native_token_print",
+    "curl -H \"Authorization: Bearer $(hf auth token)\" https://huggingface.co/api/whoami-v2": "native_token_print",
+    "uvx hf auth token": "native_token_print",
+    "huggingface-cli auth token": "native_token_print",
+    "huggingface-cli token": "native_token_print",
+    "cat \"$HF_TOKEN_PATH\"": "credential_file_read",
+    "base64 < \"${HF_TOKEN_PATH}\"": "credential_file_read",
+    "grep -r hf_ ~/.cache/huggingface": "native_store_path",
+    "rg -uu . \"$HF_HOME\"": "native_store_path",
+    "grep -r x \"$XDG_CACHE_HOME/huggingface/\"": "native_store_path",
+    "cp -r ~/.cache/huggingface /tmp/backup": "native_store_path",
+    "rsync -a ~/.cache/huggingface/ /mnt/backup/hf/": "native_store_path",
+    "cat ~/.cache/huggingface/*": "native_store_path",
+    "find ~/.cache/huggingface -type f -exec cat {} +": "native_store_path",
+    "echo \"$HUGGING_FACE_HUB_TOKEN\"": "secret_variable_reference",
+    "hf auth login --token $HF_TOKEN": "secret_variable_reference",
 }
 
 ALLOWED = [
@@ -136,6 +169,19 @@ ALLOWED = [
     "wc -c \"$PAPER_ENV_FILE\"",
     "stat -c '%a %U' \"$PAPER_ENV_FILE\"",
     "( set -a; . \"$PAPER_ENV_FILE\"; set +a; exec python3 blueprints/us-equities/alpaca-paper/paper_runner.py --once )",
+    # Hugging Face: hf reads its own store, so checking the sign-in, the operator's interactive
+    # login, revision-pinned downloads and checksum verification never expose the token.
+    "hf auth whoami",
+    "hf auth login",
+    "hf auth login --force",
+    "hf download nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 "
+    "--local-dir /srv/models/nemotron",
+    "hf cache verify nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 "
+    "--local-dir /srv/models/nemotron",
+    "hf cache ls",
+    "hf cache ls --revisions",
+    "stat -c '%a %U' \"$HF_TOKEN_PATH\"",
+    "env -u HF_TOKEN -u HUGGING_FACE_HUB_TOKEN python3 run.py",
 ]
 
 # Negative corpus: ordinary repository and shell work that must never be blocked.
@@ -210,12 +256,27 @@ SAFE_CORPUS = [
     "echo 'PORT=3000' | tee -a .env",
     "set -a; source .env; set +a; npm run dev",
     "ls -la .env",
+    # The Hugging Face cache beside the token files stays usable.
+    "ls -la ~/.cache/huggingface",
+    "du -sh ~/.cache/huggingface/hub",
+    "rg -n tokenizer ~/.cache/huggingface/hub/models--x/snapshots",
+    "cat ~/.cache/huggingface/hub/models--x/refs/main",
+    "find ~/.cache/huggingface -name '*.incomplete' -delete",
+    "rsync -a /mnt/backup/hf/hub ~/.cache/huggingface/",
+    "HF_HUB_OFFLINE=1 python3 serve.py",
+    "HF_HUB_DISABLE_IMPLICIT_TOKEN=1 python3 worker.py",
+    "git clone https://github.com/huggingface/tokenizers",
+    "hf download huggingface/token-classification-demo --local-dir demo",
+    "pip download huggingface_hub",
 ]
 
 # Known heuristic gaps, asserted so a change that closes one is noticed.
 EXPECTED_PASS_THROUGH = [
     "python3 -c \"import runner; print(runner.credentials(__import__('os').path.expandvars('$PAPER_ENV_FILE')))\"",
     "python3 -c 'import os;print(dict(os.environ))'",
+    # huggingface_hub's own loader, and an archiver on the whole Hugging Face home.
+    "python3 -c 'from huggingface_hub import get_token; print(get_token())'",
+    "tar czf /tmp/hf.tgz -C ~/.cache huggingface",
 ]
 
 
@@ -259,6 +320,17 @@ class SecretPathGuardTests(unittest.TestCase):
         self.assertEqual(sorted(names - set(guard.SECRET_NAMES)), [])
         self.assertEqual(len(guard.SECRET_NAMES), len(set(guard.SECRET_NAMES)))
 
+    def test_inventory_pointer_variables_are_guarded(self):
+        # A pointer variable (PAPER_ENV_FILE, or huggingface_hub's own HF_TOKEN_PATH) names a
+        # credential file, so a reader on it is blocked for every inventory entry.
+        inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text())
+        pointers = {name for entry in inventory["entries"] for name in entry["pointer_variables"]}
+        self.assertIn("HF_TOKEN_PATH", pointers)
+        for name in sorted(pointers):
+            with self.subTest(name=name):
+                self.assertEqual(guard.check(f"cat \"${name}\""), "credential_file_read")
+                self.assertEqual(guard.check(f"cat \"${{{name}}}\""), "credential_file_read")
+
     def test_known_bypasses_are_recorded_not_claimed(self):
         for command in EXPECTED_PASS_THROUGH:
             with self.subTest(command=command):
@@ -286,7 +358,9 @@ class SecretPathGuardTests(unittest.TestCase):
         for rule in ("Read(~/.config/native-agent-stack/**)", "Edit(~/.config/native-agent-stack/**)",
                      "Read(~/.claude/.credentials.json)", "Read(~/.codex/auth.json)",
                      "Read(~/.config/gh/hosts.yml)", "Read(//proc/*/environ)",
+                     "Read(~/.cache/huggingface/token)", "Read(~/.cache/huggingface/stored_tokens)",
                      "Bash(printenv *)", "Bash(env)", "Bash(gh auth token *)",
+                     "Bash(hf auth token)", "Bash(hf auth token *)",
                      "Bash(git credential fill*)", "Bash(gh auth git-credential *)"):
             self.assertIn(rule, deny)
         self.assertLess(deny.index("Read(.env.*)"), deny.index("Read(!.env.example)"))

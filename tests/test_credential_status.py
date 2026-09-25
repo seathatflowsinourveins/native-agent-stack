@@ -71,7 +71,10 @@ class CredentialStatusTests(unittest.TestCase):
     def test_real_inventory_is_valid(self):
         self.assertEqual(cs.inventory_errors(self.inventory, ROOT), [])
         ids = {e["id"] for e in self.inventory["entries"]}
-        self.assertTrue({"alpaca-paper", "sec-contact", "claude-native", "codex-native", "gh-native"} <= ids)
+        self.assertTrue({"alpaca-paper", "sec-contact", "claude-native", "codex-native", "gh-native",
+                         "huggingface-native", "huggingface-native-stored"} <= ids)
+        self.assertIn("HUGGING_FACE_HUB_TOKEN", self.inventory["must_not_be_set"])
+        self.assertIn("HF_TOKEN", self.inventory["must_not_be_set"])
 
     def test_inventory_rejects_non_home_template_and_bad_names(self):
         broken = copy.deepcopy(self.inventory)
@@ -323,6 +326,156 @@ class CredentialStatusTests(unittest.TestCase):
 
     def test_repository_has_no_tracked_sensitive_names(self):
         self.assertEqual(cs.tracked_sensitive_names(ROOT), [])
+
+
+class HuggingFaceNativeStoreTests(unittest.TestCase):
+    """The two Hugging Face rows: lstat-only checks of hf's own token files in a fake home."""
+
+    IDS = ("huggingface-native", "huggingface-native-stored")
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.home = Path(temporary.name) / "home"
+        self.home.mkdir()
+        self.hf_home = self.home / ".cache" / "huggingface"
+        self.inventory = json.loads((ROOT / cs.INVENTORY).read_text())
+        self.fake = "SENTINELHF" + os.urandom(12).hex()  # never shaped like a real token
+        self.env = {"HOME": str(self.home)}
+
+    def sign_in(self, directory=None, mode=0o600, directory_mode=0o700):
+        """What `hf auth login` leaves behind: both files 0600, their directory 0700."""
+        directory = directory or self.hf_home
+        directory.mkdir(parents=True, exist_ok=True)
+        for name, text in (("token", self.fake), ("stored_tokens", f"[host]\nhf_token = {self.fake}\n")):
+            (directory / name).write_text(text)
+            (directory / name).chmod(mode)
+        directory.chmod(directory_mode)
+        return directory
+
+    def report(self, env=None):
+        return cs.inspect(ROOT, self.inventory, self.env if env is None else env)
+
+    def entry(self, report, identifier="huggingface-native"):
+        return next(e for e in report["entries"] if e["id"] == identifier)
+
+    def run_cli(self, env=None, *args):
+        cli_env = {"PATH": os.environ.get("PATH", ""), **(self.env if env is None else env)}
+        result = subprocess.run([sys.executable, str(SCRIPT), "--root", str(ROOT), *args],
+                                env=cli_env, capture_output=True, text=True, timeout=60)
+        for text in (result.stdout, result.stderr):
+            self.assertNotIn(self.fake, text)
+            self.assertNotIn(str(self.home), text)
+        return result
+
+    def test_rows_are_native_stores_that_render_as_missing_before_sign_in(self):
+        rows = {e["id"]: e for e in self.inventory["entries"] if e["id"] in self.IDS}
+        self.assertEqual(set(rows), set(self.IDS))
+        for row in rows.values():
+            self.assertEqual((row["class"], row["status"], row["store"]["kind"]),
+                             ("native_signin", "native", "native_store"))
+            self.assertEqual(row["pointer_variables"], ["HF_TOKEN_PATH"])
+            self.assertEqual(row["variables"], [])
+        report = self.report()
+        for identifier in self.IDS:
+            self.assertEqual(self.entry(report, identifier)["state"], "missing")
+        self.assertEqual(report["result"], "ok")
+        result = self.run_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("missing   huggingface-native          native", result.stdout)
+        self.assertIn("missing   huggingface-native-stored   native", result.stdout)
+        self.assertIn("${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/token", result.stdout)
+
+    def test_signed_in_store_is_ok_and_read_by_lstat_only(self):
+        self.sign_in()
+        opened = []
+        real_open, real_os_open = builtins.open, os.open
+
+        def watch_open(file, *args, **kwargs):
+            opened.append(str(file))
+            return real_open(file, *args, **kwargs)
+
+        def watch_os_open(file, *args, **kwargs):
+            opened.append(str(file))
+            return real_os_open(file, *args, **kwargs)
+
+        with patch("builtins.open", watch_open), patch("os.open", watch_os_open), \
+                patch.object(Path, "read_text", side_effect=AssertionError("read_text called")), \
+                patch.object(Path, "read_bytes", side_effect=AssertionError("read_bytes called")):
+            report = self.report()
+        self.assertFalse([p for p in opened if str(self.hf_home) in p])
+        for identifier in self.IDS:
+            entry = self.entry(report, identifier)
+            self.assertEqual((entry["state"], entry["mode"], entry["directory_mode"]), ("ok", "0600", "0700"))
+            self.assertEqual(entry["findings"], [])
+        self.assertNotIn(self.fake, json.dumps(report) + cs.render_text(report))
+        self.assertEqual(self.run_cli().returncode, 0)
+
+    def test_group_or_world_readable_token_is_a_finding_and_fails(self):
+        self.sign_in()
+        (self.hf_home / "token").chmod(0o644)
+        report = self.report()
+        entry = self.entry(report)
+        self.assertEqual(entry["state"], "unsafe")
+        self.assertIn("group_or_other_access", entry["findings"])
+        self.assertEqual(self.entry(report, "huggingface-native-stored")["state"], "ok")
+        self.assertEqual(report["unsafe_stored"], ["huggingface-native"])
+        self.assertEqual(report["unsafe_required"], [])
+        result = self.run_cli()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("group_or_other_access", result.stdout)
+
+    def test_template_follows_hf_home_then_xdg_cache_home_like_huggingface_hub(self):
+        template = next(e for e in self.inventory["entries"]
+                        if e["id"] == "huggingface-native")["store"]["path_template"]
+        cache = self.home / "xdg-cache"
+        custom = self.home / "hf-home"
+        cases = (({}, self.hf_home), ({"XDG_CACHE_HOME": str(cache)}, cache / "huggingface"),
+                 ({"XDG_CACHE_HOME": str(cache), "HF_HOME": str(custom)}, custom))
+        for extra, directory in cases:
+            with self.subTest(extra=extra):
+                env = {**self.env, **extra}
+                self.assertEqual(cs.expand_template(template, env), directory / "token")
+        # Single-level templates expand exactly as before.
+        self.assertEqual(cs.expand_template("${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/x.env", self.env),
+                         self.home / ".config" / "native-agent-stack" / "x.env")
+        self.sign_in(cache / "huggingface")
+        report = self.report({**self.env, "XDG_CACHE_HOME": str(cache)})
+        self.assertEqual(self.entry(report)["state"], "ok")
+        self.assertEqual(self.entry(self.report())["state"], "missing")
+
+    def test_token_path_override_is_reported_by_name_only(self):
+        elsewhere = self.home / "elsewhere"
+        self.sign_in(elsewhere)
+        env = {**self.env, "HF_TOKEN_PATH": str(elsewhere / "token"),
+               # Our own stores are found through pointer variables on purpose; not an override.
+               "PAPER_ENV_FILE": str(self.home / "paper.env")}
+        report = self.report(env)
+        self.assertEqual(report["environment"]["native_store_path_overrides_present"], ["HF_TOKEN_PATH"])
+        for identifier in self.IDS:
+            entry = self.entry(report, identifier)
+            self.assertEqual(entry["state"], "missing")
+            self.assertIn("store_path_overridden", entry["warnings"])
+        self.assertNotIn("store_path_overridden", self.entry(report, "alpaca-paper")["warnings"])
+        text = cs.render_text(report)
+        self.assertIn("environment native store path overrides present: HF_TOKEN_PATH", text)
+        self.assertNotIn(str(elsewhere), json.dumps(report) + text)
+        self.assertEqual(self.report()["environment"]["native_store_path_overrides_present"], [])
+        result = self.run_cli(env, "--json")
+        self.assertEqual(json.loads(result.stdout)["environment"]["native_store_path_overrides_present"],
+                         ["HF_TOKEN_PATH"])
+
+    def test_token_variables_are_flagged_by_name_only(self):
+        other = "SENTINELHF" + os.urandom(12).hex()
+        env = {**self.env, "HUGGING_FACE_HUB_TOKEN": self.fake, "HF_TOKEN": other}
+        report = self.report(env)
+        self.assertEqual(report["environment"]["must_not_be_set_present"],
+                         ["HF_TOKEN", "HUGGING_FACE_HUB_TOKEN"])
+        self.assertNotIn(self.fake, json.dumps(report) + cs.render_text(report))
+        self.assertNotIn(other, json.dumps(report) + cs.render_text(report))
+        result = self.run_cli({**self.env, "HUGGING_FACE_HUB_TOKEN": self.fake})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("environment must_not_be_set present: HUGGING_FACE_HUB_TOKEN", result.stdout)
 
 
 if __name__ == "__main__":

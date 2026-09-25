@@ -187,3 +187,49 @@ user-level hook, macOS, and any real credential.
 
 `local_integration`, plus a docs and source review. No provider was called
 and no credential value was read.
+
+## Addendum 2026-09-25: Hugging Face native sign-in
+
+**Decision.** The Hugging Face token stays in `hf`'s own store, like the other
+native sign-ins. The operator runs `hf auth login` in their own terminal on
+each host and pastes a fine-grained token made for that host, with read
+access to public gated repositories only. The inventory lists both files `hf`
+writes: `huggingface-native` for `$HF_HOME/token` and
+`huggingface-native-stored` for `$HF_HOME/stored_tokens`. Their template uses
+huggingface_hub's own default,
+`${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}`, which the checker
+now expands. `HUGGING_FACE_HUB_TOKEN` joins `HF_TOKEN` in `must_not_be_set`.
+`HF_TOKEN_PATH` stays unset, and the checker reports it by name. The guard and
+the deny rules cover `hf auth token`, both files, and reads through `$HF_HOME`
+or `$HF_TOKEN_PATH`. Agents use the sign-in only through `hf`, for
+revision-pinned downloads and checksum verification. The runbook section is
+[Hugging Face sign-in](../secret-storage.md#hugging-face-sign-in).
+
+**Verified** from the installed huggingface_hub 1.32.0 source and the same
+files at the upstream `v2.0.0` tag. Token precedence is OIDC, then `HF_TOKEN`,
+then `HUGGING_FACE_HUB_TOKEN`, then the file. Both files are written `0600`
+and their directory is set to `0700`. `hf auth token` prints the token. The
+paste login reads the token with `getpass` and never writes a git credential;
+only an explicit `--add-to-git-credential` (with `--token`, or on
+`hf auth switch`) does. The browser login
+requests a device code with only the client id and saves the refresh token it
+gets back.
+
+**Alternatives rejected.**
+
+- A file in the private store (`<store>/huggingface.env`) loaded as
+  `HF_TOKEN`: every consumer would hold the value in its process environment,
+  and huggingface_hub consumers already read the native file.
+- The default browser login: its OAuth token's permissions are not the
+  operator's choice, and a refresh token is stored beside it.
+- One token shared by all hosts: one revocation would stop every host.
+- Denying `hf` as a whole: agents need `hf download` and `hf cache verify`
+  for revision-pinned acquisition.
+
+**Would overturn it.** huggingface_hub moves tokens into an OS keyring or
+changes their paths or modes; an agent obtains the value despite the guard,
+in which case gated downloads move to operator-only runs; or Hugging Face
+offers a narrower token than fine-grained read access to gated repositories.
+
+**Evidence class.** Docs and source review plus `local_integration` unit tests
+with synthetic sentinel files. No token was created, read or used.
