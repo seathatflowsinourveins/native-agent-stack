@@ -4,12 +4,21 @@
 Description=Hourly trigger for the guarded openai-codex broker reaper
 
 [Timer]
+# OnCalendar=hourly is what makes Persistent= below actually do anything:
+# systemd applies Persistent= only to OnCalendar= timers, never to the
+# monotonic OnBootSec=/OnUnitActiveSec= ones (fix round, 2026-09-25; `man
+# systemd.timer` on this host, systemd 255.4-1ubuntu8.17: "Note that this
+# setting only has an effect on timers configured with OnCalendar=. Defaults
+# to false."). The previous OnBootSec=+OnUnitActiveSec=-only draft never
+# caught up on a missed run despite setting Persistent=true. OnBootSec is
+# kept alongside OnCalendar only for an early run shortly after boot, before
+# the first hourly tick; it contributes no catch-up behavior of its own.
+OnCalendar=hourly
 OnBootSec=10min
-OnUnitActiveSec=1h
 AccuracySec=1min
-# A missed run (host was off/suspended at the scheduled time) still runs
-# once shortly after the next start, instead of silently waiting a full
-# extra hour before the next on-time trigger.
+# A missed OnCalendar= run (host was off/suspended at the scheduled time)
+# still runs once shortly after the next start (Persistent=true, see
+# above), instead of silently waiting for the next on-time trigger.
 Persistent=true
 Unit=codex-broker-reaper.service
 
