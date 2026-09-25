@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "kind": "blind_ab_adjudication",
+  "question_id": "q1-memory-system",
+  "question": "Which memory system or systems should the ecosystem trial, in priority order, as the replacement for ai-memory for shared Claude Code and Codex memory? Should ai-memory be retained, trialled or rejected? Weigh measured versus vendor evidence, local operation, Claude and Codex integration, licence, operational weight, and the user's constraints.\n\nJudge only from this brief. Do not browse or search. Answer in under 500 words, ending with one line: PREFERRED: A | B | SPLIT | NEITHER, and one line: RANKING: <comma-separated candidate names>.",
+  "shared_context": "Ecosystem: Claude Code (Opus 5.5) and Codex CLI (GPT-6 Astra) need ONE shared, local-first long-term memory: automatic capture of sessions, query over MCP or hooks, project scoping, recovery. North star: US-equities research and native agent engineering. User constraints: upstream official artifacts rather than self-builds, passwordless and low-friction operation, evidence plus convergence as the source of truth. Hosts: a 64 GB M5 Pro Mac as the control machine, plus an RTX 4090 WSL2 workstation for evaluations.\n\nNeutral measurements (our harness, the official LongMemEval-S cleaned retrieval protocol, recall_all@5 over sessions, 470 questions, full track, each system as shipped):\n- agentmemory 0.9.29 with MiniLM: 0.821\n- dense retrieval with Qwen3-Embedding-4B: 0.753\n- BM25: 0.747\n- ai-memory 2.5-pre (the current production system) with MiniLM: 0.496\n- ai-memory with FTS only: 0.400\n\nai-memory with its production Qwen3-4B embedder is still finishing. A preregistered rule requires +5 pp and significance to replace production. Caveat: agentmemory was fed through its REST remember API, not its shipped hook path.",
+  "items": [
+    {
+      "name": "agentmemory",
+      "url": "https://github.com/rohitg00/agentmemory"
+    },
+    {
+      "name": "MemPalace",
+      "url": "https://github.com/MemPalace/mempalace"
+    },
+    {
+      "name": "Hindsight",
+      "url": "https://github.com/vectorize-io/hindsight"
+    },
+    {
+      "name": "Attemory",
+      "url": "https://github.com/AttemorySystem/attemory"
+    },
+    {
+      "name": "GBrain",
+      "url": "https://github.com/garrytan/gbrain"
+    }
+  ],
+  "method": "Blind A/B adjudication by one judge model (gpt-6-sol through codex exec with a read-only sandbox; the effort was not recorded) in three presentation orders defined by the key: a (Codex return as A, listed first), b (Claude return as A, listed first) and c (Codex return as A, Claude return as B listed first). The brief told the judge to judge only from the brief, not to browse or search, to answer in under 500 words, and to end with a PREFERRED line (A, B, SPLIT or NEITHER) and a RANKING line. Each run's event stream shows one command, a read of its own brief (exit 0), and no web search. The runs were launched from agents of the coordinator's convergence workflow, outside the Claude sandbox so that codex could reach its provider; no refuter was run, so refuting_votes 0 is not a survived refutation.",
+  "judgments": [
+    {
+      "packet_order": "a",
+      "order_definition": "original: Return A = first lane listed in the brief spec (codex); Return A listed first",
+      "run_label": "adjudicator-q1-memory-system-a",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-a.json",
+      "original_input_sha256": "1c40278e0feaf89a6e449fb8dc5b41c28984f1fbb91f52cad4401cc7f29c29ad",
+      "claude_position": "B",
+      "claude_listed": "second",
+      "preferred_position": "SPLIT",
+      "preferred_lane": null,
+      "ranking": [
+        "agentmemory",
+        "MemPalace",
+        "Hindsight",
+        "Attemory"
+      ],
+      "judge": {
+        "model": "gpt-6-sol",
+        "family": "openai",
+        "effort": null
+      },
+      "why": "Trial candidates in this order:\n\n1. **agentmemory** — Its 0.821 recall_all@5 is the strongest result from the neutral harness. First verify the shipped capture path and shared Claude Code/Codex operation; the measured run used its REST API.\n2. **MemPalace** — MIT licensed, local, light to operate, and offers hooks for both clients plus MCP. The 0.857 and 0.887 figures come from re-scoring its committed logs, with different turn and question sets. Re-run the full protocol and the actual hook path before treating either as a win.\n3. **Hindsight** — The clearest documented shared-client integration. MIT and local-model support fit the constraints, but its published figures are QA scores, while extraction cost and accuracy with local models remain unmeasured. Its worker and database add operational weight.\n4. **Attemory** — Its reported 0.9638 uses the closest published retrieval metric. Trial it as a retrieval challenger only after checking the prebuilt SDK’s source and licence coverage; automatic dual-client capture is unverified.\n\n**Retain ai-memory as the production control** while its Qwen3-4B run finishes. Replace it only if an end-to-end candidate clears the preregistered five-point, significant improvement and works reliably across both clients. Neither return alone gives sufficient grounds to reject it. Return B contributes the MemPalace re-scoring; Return A contributes the directly comparable Attemory claim and stronger deployment caveats. Both underweight the neutral agentmemory result.",
+      "why_words": 221,
+      "returned_words": 228,
+      "within_word_limit": true,
+      "ends_with_required_lines": true,
+      "votes": 1,
+      "refuting_votes": 0,
+      "refuters_run": 0,
+      "exit_code_reported": 0,
+      "returned_text": "Trial candidates in this order:\n\n1. **agentmemory** — Its 0.821 recall_all@5 is the strongest result from the neutral harness. First verify the shipped capture path and shared Claude Code/Codex operation; the measured run used its REST API.\n2. **MemPalace** — MIT licensed, local, light to operate, and offers hooks for both clients plus MCP. The 0.857 and 0.887 figures come from re-scoring its committed logs, with different turn and question sets. Re-run the full protocol and the actual hook path before treating either as a win.\n3. **Hindsight** — The clearest documented shared-client integration. MIT and local-model support fit the constraints, but its published figures are QA scores, while extraction cost and accuracy with local models remain unmeasured. Its worker and database add operational weight.\n4. **Attemory** — Its reported 0.9638 uses the closest published retrieval metric. Trial it as a retrieval challenger only after checking the prebuilt SDK’s source and licence coverage; automatic dual-client capture is unverified.\n\n**Retain ai-memory as the production control** while its Qwen3-4B run finishes. Replace it only if an end-to-end candidate clears the preregistered five-point, significant improvement and works reliably across both clients. Neither return alone gives sufficient grounds to reject it. Return B contributes the MemPalace re-scoring; Return A contributes the directly comparable Attemory claim and stronger deployment caveats. Both underweight the neutral agentmemory result.\n\nPREFERRED: SPLIT  \nRANKING: agentmemory, MemPalace, Hindsight, Attemory",
+      "returned_sha256": "4a8418f9ed808a14355b93da86268cd0f4b52b1860b4638e4812cb4029f6012d",
+      "native_usage": {
+        "input_tokens": 39567,
+        "cached_input_tokens": 17152,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2273,
+        "reasoning_output_tokens": 1840
+      }
+    },
+    {
+      "packet_order": "b",
+      "order_definition": "label-swapped: the other lane (claude) is labelled Return A; Return A listed first",
+      "run_label": "adjudicator-q1-memory-system-b",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-b.json",
+      "original_input_sha256": "06069691dafa39565e75e9a1ced103c7efc4c0c359a6e2670d4afd2326bb05fb",
+      "claude_position": "A",
+      "claude_listed": "first",
+      "preferred_position": "A",
+      "preferred_lane": "claude",
+      "ranking": [
+        "MemPalace",
+        "Hindsight"
+      ],
+      "judge": {
+        "model": "gpt-6-sol",
+        "family": "openai",
+        "effort": null
+      },
+      "why": "**Trial MemPalace first, then Hindsight.** MemPalace best fits the local, low-friction requirement: MIT, no model service, and Claude Code and Codex hooks. Its re-scored logs are promising, but the 0.857 raw result indexes user turns only, and the 0.887 hybrid result covers 424 held-out questions. Neither is a directly comparable, end-to-end win over agentmemory’s neutral-harness 0.821. Test transcript capture, MCP retrieval, identical role inclusion, and a pooled store before treating it as a replacement.\n\nHindsight is the strongest documented shared-memory integration, with hooks for both clients and local model support. Trial it on the proposed 100-question subset first: its published figures measure answer quality rather than your recall_all@5 metric, and local extraction adds substantial time and operational weight.\n\nKeep agentmemory as the measured retrieval control and check its shipped hook path; its 0.821 came through the REST API. Attemory and GBrain have striking reported results, but their integration or local-model evidence is too incomplete to put ahead of these trials.\n\n**Retain ai-memory in production for now.** Its Qwen3-4B run is unfinished, and the preregistered replacement rule requires a significant gain of at least five percentage points. Return A provides the better trial starting point, provided its MemPalace scores are treated as leads to verify, not proof of superiority.",
+      "why_words": 208,
+      "returned_words": 213,
+      "within_word_limit": true,
+      "ends_with_required_lines": true,
+      "votes": 1,
+      "refuting_votes": 0,
+      "refuters_run": 0,
+      "exit_code_reported": 0,
+      "returned_text": "**Trial MemPalace first, then Hindsight.** MemPalace best fits the local, low-friction requirement: MIT, no model service, and Claude Code and Codex hooks. Its re-scored logs are promising, but the 0.857 raw result indexes user turns only, and the 0.887 hybrid result covers 424 held-out questions. Neither is a directly comparable, end-to-end win over agentmemory’s neutral-harness 0.821. Test transcript capture, MCP retrieval, identical role inclusion, and a pooled store before treating it as a replacement.\n\nHindsight is the strongest documented shared-memory integration, with hooks for both clients and local model support. Trial it on the proposed 100-question subset first: its published figures measure answer quality rather than your recall_all@5 metric, and local extraction adds substantial time and operational weight.\n\nKeep agentmemory as the measured retrieval control and check its shipped hook path; its 0.821 came through the REST API. Attemory and GBrain have striking reported results, but their integration or local-model evidence is too incomplete to put ahead of these trials.\n\n**Retain ai-memory in production for now.** Its Qwen3-4B run is unfinished, and the preregistered replacement rule requires a significant gain of at least five percentage points. Return A provides the better trial starting point, provided its MemPalace scores are treated as leads to verify, not proof of superiority.\n\nPREFERRED: A  \nRANKING: MemPalace, Hindsight",
+      "returned_sha256": "f4645e81cc6305edd437f9ccaca9103ec27dd2642ed4d0afbdb08a11e5cdb8b7",
+      "native_usage": {
+        "input_tokens": 39557,
+        "cached_input_tokens": 34304,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2498,
+        "reasoning_output_tokens": 2094
+      }
+    },
+    {
+      "packet_order": "c",
+      "order_definition": "reversed listing: labels as in order a (A = codex); Return B listed first",
+      "run_label": "adjudicator-q1-memory-system-c",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-c.json",
+      "original_input_sha256": "efb4ac7e4c63f6eadfa334f1180b1d3aaec45a2b3bed75f2e2ef866f8ef38672",
+      "claude_position": "B",
+      "claude_listed": "first",
+      "preferred_position": "SPLIT",
+      "preferred_lane": null,
+      "ranking": [
+        "MemPalace",
+        "agentmemory",
+        "Hindsight",
+        "Attemory",
+        "GBrain"
+      ],
+      "judge": {
+        "model": "gpt-6-sol",
+        "family": "openai",
+        "effort": null
+      },
+      "why": "**Trial MemPalace first**, then **agentmemory**, then **Hindsight**.\n\n1. **MemPalace** best matches the deployment constraints: local storage, no services, MIT licence, and Claude Code and Codex hooks plus MCP. Its rescored logs reach 0.857 recall_all@5 in raw mode, but those are vendor-produced retrieval logs, use user turns only, and raw mode bypasses the palace code. Test identical session text and the actual capture-to-search path before trusting the lead.\n2. **agentmemory** has the strongest neutral evidence: 0.821 in the shared harness versus ai-memory’s 0.496 with MiniLM. Its ingestion used the REST API, so its shipped capture path and suitability as one shared memory for both clients still need testing.\n3. **Hindsight** has the clearest documented shared capture integration and can run with local models. Its QA claims do not establish recall_all@5, while extraction on every retain and its Postgres/worker stack add cost and operational weight.\n\n**Keep ai-memory in production during these trials.** Its production Qwen3 result is unfinished, and the preregistered replacement rule requires a significant gain of at least five percentage points. Do not reject it from the incomplete comparison. Attemory’s reported exact-metric score warrants a later trial only if its prebuilt core and missing dual-client capture can be verified; GBrain’s reported result uses hosted models and five chunks rather than five sessions.",
+      "why_words": 212,
+      "returned_words": 220,
+      "within_word_limit": true,
+      "ends_with_required_lines": true,
+      "votes": 1,
+      "refuting_votes": 0,
+      "refuters_run": 0,
+      "exit_code_reported": 0,
+      "returned_text": "**Trial MemPalace first**, then **agentmemory**, then **Hindsight**.\n\n1. **MemPalace** best matches the deployment constraints: local storage, no services, MIT licence, and Claude Code and Codex hooks plus MCP. Its rescored logs reach 0.857 recall_all@5 in raw mode, but those are vendor-produced retrieval logs, use user turns only, and raw mode bypasses the palace code. Test identical session text and the actual capture-to-search path before trusting the lead.\n2. **agentmemory** has the strongest neutral evidence: 0.821 in the shared harness versus ai-memory’s 0.496 with MiniLM. Its ingestion used the REST API, so its shipped capture path and suitability as one shared memory for both clients still need testing.\n3. **Hindsight** has the clearest documented shared capture integration and can run with local models. Its QA claims do not establish recall_all@5, while extraction on every retain and its Postgres/worker stack add cost and operational weight.\n\n**Keep ai-memory in production during these trials.** Its production Qwen3 result is unfinished, and the preregistered replacement rule requires a significant gain of at least five percentage points. Do not reject it from the incomplete comparison. Attemory’s reported exact-metric score warrants a later trial only if its prebuilt core and missing dual-client capture can be verified; GBrain’s reported result uses hosted models and five chunks rather than five sessions.\n\nPREFERRED: SPLIT  \nRANKING: MemPalace, agentmemory, Hindsight, Attemory, GBrain",
+      "returned_sha256": "a80b541211e096797794b0a25109af353847644a2cc45850be72f46c42e9f1fb",
+      "native_usage": {
+        "input_tokens": 39542,
+        "cached_input_tokens": 17152,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2011,
+        "reasoning_output_tokens": 1589
+      }
+    }
+  ],
+  "lane_preference_counts": {
+    "SPLIT": 2,
+    "claude": 1
+  },
+  "convergence_table_row": {
+    "question": "q1 memory system",
+    "order_a": "SPLIT. agentmemory > MemPalace > Hindsight > Attemory",
+    "order_b": "A = **Claude**. MemPalace > Hindsight; agentmemory kept as the measured control",
+    "order_c": "SPLIT. MemPalace > agentmemory > Hindsight > Attemory > GBrain",
+    "lane_preference_across_orders": "**Not stable.** SPLIT 2/3, Claude 1/3, Codex 0/3",
+    "holds_in_all_orders": "Retain ai-memory. Trial MemPalace, Hindsight and agentmemory. Attemory only after a gate. MemPalace ranks #1 only in b and c, the two orders where the Claude return was listed first."
+  },
+  "adjudicated_outcome": "Retain ai-memory as the production control; trial MemPalace, Hindsight and agentmemory; Attemory only after a source and licence gate. The order among MemPalace and agentmemory moves with the listing order and is left to measurement.",
+  "evidence_refs": [
+    "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-a.json",
+    "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-b.json",
+    "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-c.json",
+    "evidence/artifacts/memory-stack-20260925/adjudication-inputs/adjudication-key.json",
+    "evidence/artifacts/memory-stack-20260925/convergence.json"
+  ],
+  "votes": 3,
+  "refuting_votes": 0,
+  "limitations": [
+    "One judge model (gpt-6-sol), from the same model family as the Codex lanes: three runs of one model are not independent judges, and varying the presentation does not remove family bias.",
+    "The judge never preferred the Codex return. Its only non-SPLIT answers came in order b, where the Claude return held letter A and was listed first; in order a the Codex return held that position and got SPLIT, so the order-b preference cannot be separated from a position or label effect.",
+    "The judge worked from the brief alone: it did not check the lanes' cited sources, so its reading of the evidence is only as good as the returns.",
+    "The judge effort, the Codex CLI version and the exact prompt were not retained; the exit status 0 is as the workflow's runner agents reported it.",
+    "Discovery-level evidence: no model was installed, downloaded or executed for any candidate named here."
+  ]
+}

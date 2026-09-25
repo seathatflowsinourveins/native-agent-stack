@@ -1,0 +1,266 @@
+{
+  "schema_version": 1,
+  "kind": "blind_lane_return",
+  "lane": "claude",
+  "packet": "sota-models",
+  "run_label": "claude-sota-models-lane",
+  "attempt": 1,
+  "packet_sha256": "1847b3a1a0508078076f8d114e9ea1a021a92f8322f8e13e4f2482ca18f5a51a",
+  "model": {
+    "name": "claude-opus-5-5",
+    "effort": null,
+    "family": "anthropic"
+  },
+  "model_note": "Opus 5.5 research subagent as the coordinator's header line names it; the effort and a resolved model were not recorded.",
+  "client": "Claude Code research subagent with web tools",
+  "source_file": "sota-models-claude.md",
+  "original_sha256": "bd99a4468233d8456899474be6457ac80e2dea3a509fedfc8915e4814b870cd7",
+  "original_bytes": 7487,
+  "recorder_header": "<!-- Claude lane (Opus 5.5 subagent), 2026-09-24/25; 130 tool uses, 414,369 subagent tokens; answer verbatim below. -->",
+  "recorder_header_note": "Line 1 of the original is the coordinator's HTML comment (lane, model, tool uses and tokens), not part of the lane's answer; the judges saw the answer without it (blinded_sha256).",
+  "blinded_sha256": "69d4d7273fd46035dd3cd6abcaf510ff82df963a60586cbc52b109cd7d5fdee4",
+  "return_text": "<!-- Claude lane (Opus 5.5 subagent), 2026-09-24/25; 130 tool uses, 414,369 subagent tokens; answer verbatim below. -->\n\n**Evidence snapshot, fetched 2026-09-24.** Sources: the [MTEB leaderboard API](https://mteb-leaderboard-backend.hf.space/v1/benchmarks/LMEB/scores) and [Artificial Analysis](https://artificialanalysis.ai) model pages. **LMEB** (Long-horizon Memory Embedding Benchmark) averages nDCG@10 over 22 tasks. **LME** is its LongMemEval task. The LMEB authors, who are also the KaLM team, ran the LMEB scores below in results PRs #600 and #617. That makes them independent of NVIDIA and Microsoft.\n\n### 1. Embedding\n\n| # | Model (dev) | Released | Params · license · max input | Retrieval evidence | Local IDs (published) |\n|---|---|---|---|---|---|\n| 1 | Nemotron-3-Embed-8B-BF16 (NVIDIA) | 2026-07-16 [card](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16) | 7.95B · OpenMDW-1.1 · 32,768 | LMEB 64.36 (#1), LME 85.70 (indep.). [RTEB(beta)](https://mteb-leaderboard.hf.space/benchmark/RTEB%28beta%29): rank 2, the top open model. Public tasks were vendor-submitted; MTEB maintainers ran the private ones. Vendor: RTEB-16 78.46 | No Ollama tag. Community: `Abiray/Nemotron-3-Embed-8B-GGUF` (07-21), `shadowrock-io/Nemotron-3-Embed-8B-Community-MLX-4bit` (08-04) |\n| 2 | Nemotron-3-Embed-1B-BF16 (NVIDIA) | 2026-07-16 [card](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16) | 1.14B · OpenMDW-1.1 · 32,768 | LMEB 61.50, LME 81.58 (indep.). RTEB rank 14. Vendor: RTEB-16 72.38 | `mlx-community/Nemotron-3-Embed-1B-BF16` (07-21, needs a custom script), `zenmagnets/Nemotron-3-Embed-1B-Q4_K_M-GGUF` (07-17) |\n| 3 | harrier-oss-v1-0.6b (Microsoft) | Weights 2026-03-30 ([HF](https://huggingface.co/microsoft/harrier-oss-v1-0.6b)), announced 04-07 ([Bing](https://blogs.bing.com/search/April-2026/Microsoft-Open-Sources-Industry-Leading-Embedding-Model)) | 0.6B (Qwen3 architecture) · MIT · 32,768 | LMEB 58.43, LME 72.46 (indep.). MMTEB v2 69.01, retrieval 70.75 (vendor) | `onnx-community/harrier-oss-v1-0.6b-ONNX` (transformers.js, 03-30), `mradermacher/harrier-oss-v1-0.6b-GGUF` (03-31) |\n\nCurrent models on LMEB/LME, same snapshot: Qwen3-Embedding-8B 55.94/77.66, 4B 53.30/50.21, 0.6B 54.56/73.08. all-MiniLM-L6-v2 scores 43.77/67.94 and has a 256-token window.\n\n### 2. Reranking\n\n| # | Model (dev) | Released | Params · license · max | Evidence | Local IDs |\n|---|---|---|---|---|---|\n| 1 | ettin-reranker-400m-v1 (Sentence Transformers) | Repo 2026-05-15, [blog](https://huggingface.co/blog/ettin-reranker) 05-19 | 0.40B · Apache-2.0 · 7,999 | Vendor: MTEB(eng,v2) Retrieval, top-100 reranked, averaged over 6 retrievers: 0.6091 vs 0.5082 for ms-marco-MiniLM-L6-v2. NanoBEIR 0.7193 vs 0.6312. Independent: not found | ONNX in the official [repo](https://huggingface.co/cross-encoder/ettin-reranker-400m-v1), including qint8_arm64. `cstr/ettin-reranker-400m-v1-GGUF` (08-22) |\n| 2 | Qwen3-Reranker-4B (Alibaba Qwen) | 2025-06-05 [arXiv](https://arxiv.org/abs/2506.05176) | 4.0B · Apache-2.0 · 32K | Vendor MTEB-R 69.76. Third-party: 0.6367 in the ettin table, the best there. On LMEB dialogue the KaLM paper reports LME 53.72, against 84.91 for its 0.6B sibling | llama.cpp `--reranking --pooling rank`. `Voodisss/Qwen3-Reranker-4B-GGUF-llama_cpp` (2026-03-09) |\n| 3 | KaLM-Reranker-V1-Small (KaLM team) | 2026-06 [arXiv 2606.22807](https://arxiv.org/abs/2606.22807). R2 checkpoint 08-14 | 1B active (T5Gemma-2 encoder-decoder) · Apache-2.0 · 128K | Vendor, LMEB dialogue: LME 87.58 (first stage 75.18), 6-task average 63.15. BEIR 60.01, against 63.50 for Qwen3-Reranker-4B in the same table. R2 LMEB: not found | PyTorch with `trust_remote_code`. `KaLM-Embedding/KaLM-Reranker-V1-Small-Q4_K_M-GGUF` (07-06) has no documented llama.cpp rerank path |\n\n### 3. Memory LLM (AA-LCR = Artificial Analysis Long Context Reasoning, independent)\n\n| # | Model (dev) | Released | Params · license · context | Evidence | Local IDs |\n|---|---|---|---|---|---|\n| 1 | Qwen3.6-35B-A3B (Alibaba Qwen) | 2026-04-16 [QwenLM news](https://github.com/QwenLM/Qwen3.8) | 35B total, 3B active · Apache-2.0 · 262,144 | [AA-LCR](https://artificialanalysis.ai/models/qwen3-6-35b-a3b-non-reasoning) 64.3 without reasoning, 71.7 with it. Retrieval/LongMemEval scores: not found | Ollama `qwen3.6:35b-a3b` (23 GB), `qwen3.6:35b-mlx` (library updated 2026-09-01). `lmstudio-community/Qwen3.6-35B-A3B-MLX-4bit` (04-16) |\n| 2 | Nemotron 3.5 Lightning 30B-A3B (NVIDIA) | 2026-08-11 [card](https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16) | 30B total, 3B active, Mamba-2/MoE hybrid · OpenMDW-1.1 · 1M | [AA-LCR](https://artificialanalysis.ai/models/nemotron-3-5-lightning) 60.3 with reasoning; the non-reasoning score was not found. Vendor AA-LCR 52.00 | Ollama `nemotron-3.5-lightning:30b-a3b` (25 GB), `:30b-a3b-mlx` (256K; library updated 08-31). `ggml-org/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-GGUF` (08-11) |\n\nThe current Qwen3.5-9B scores [AA-LCR](https://artificialanalysis.ai/models/qwen3-5-9b-non-reasoning) 46.0 without reasoning and 70.0 with it. Apple measured time to first token under 3 s for a 4-bit 30B-A3B MoE with a 4,096-token prompt on the base M5 ([2025-11-19](https://machinelearning.apple.com/research/exploring-llms-mlx-m5)). Speed on the M5 Pro is unmeasured.\n\n### Benchmark in the LongMemEval-S harness\n\n- **Nemotron-3-Embed-8B** replaces Qwen3-Embedding-8B.\n- **Nemotron-3-Embed-1B** replaces Qwen3-Embedding-4B.\n- **harrier-oss-v1-0.6b** replaces all-MiniLM-L6-v2 (agentmemory, ONNX) and Qwen3-Embedding-0.6B (ai-memory, GGUF).\n- **ettin-reranker-400m-v1** replaces ms-marco-MiniLM-L-6-v2.\n- **Qwen3-Reranker-4B** and **KaLM-Reranker-V1-Small** go in as an added cross-encoder stage, measured against listwise reranking by the LLM.\n- **Qwen3.6-35B-A3B** with thinking off, then **Nemotron 3.5 Lightning**, each replace Qwen3.5-9B. Keep Qwen3.5-9B as the control.\n\n### Risks\n\n- **Licensing:** OpenMDW-1.1 is permissive. It requires you to keep its notices, and your rights end if you bring a patent suit. The others are Apache-2.0 or MIT. I excluded CC-BY-NC rerankers.\n- **Runtime:**\n  - Nemotron-3-Embed uses a bidirectional `Ministral3Model` (`is_causal: false`). The llama.cpp master converter does not register that class, so the community GGUFs are unofficial and have not been checked against the reference model.\n  - The MLX version needs a custom script, and no Ollama tag exists.\n  - No native Ollama rerank endpoint was found.\n  - Qwen3-Reranker GGUFs need the classifier head, or they return near-zero scores (llama.cpp #16407).\n  - ettin's ONNX export keeps Sentence Transformers' separate scoring head (pooling and dense layers). Whether it drops into transformers.js is unverified.\n  - KaLM needs PyTorch on MPS.\n- **Context:** MiniLM (256 tokens) and ms-marco (512 tokens) truncate 4–8k-token pages. The replacements take 7,999 tokens or more. NVIDIA's own scores used a 4,096-token sequence length.\n- **Speed:**\n  - The 8B embedder has 7× the parameters of the 1B, and each haystack is about 115k tokens, so deduplicate sessions before embedding.\n  - Qwen3-Reranker-4B has 10× the parameters of ettin-400m.\n  - Listwise reranking must run with thinking off and short prompts to fit the 20 s timeout.\n- **Evidence gaps:**\n  - No independent reranker results on memory data were found.\n  - The KaLM team runs LMEB and competes on it.\n  - No LLM LongMemEval scores were found. AA-LCR stands in as a proxy.\n",
+  "output_contract_check": {
+    "shortlist_counts": {
+      "1. Embedding": 3,
+      "2. Reranking": 3,
+      "3. Memory LLM (AA-LCR = Artificial Analysis Long Context Reasoning, independent)": 2
+    },
+    "shortlist_limit_per_role": 3,
+    "within_shortlist_limit": true,
+    "words_whitespace_split": 886,
+    "word_scope": "the answer without the coordinator's header line",
+    "word_limit": 900,
+    "within_limit": true
+  },
+  "sections": [
+    {
+      "heading": null,
+      "text": "**Evidence snapshot, fetched 2026-09-24.** Sources: the [MTEB leaderboard API](https://mteb-leaderboard-backend.hf.space/v1/benchmarks/LMEB/scores) and [Artificial Analysis](https://artificialanalysis.ai) model pages. **LMEB** (Long-horizon Memory Embedding Benchmark) averages nDCG@10 over 22 tasks. **LME** is its LongMemEval task. The LMEB authors, who are also the KaLM team, ran the LMEB scores below in results PRs #600 and #617. That makes them independent of NVIDIA and Microsoft."
+    },
+    {
+      "heading": "1. Embedding",
+      "text": "| # | Model (dev) | Released | Params · license · max input | Retrieval evidence | Local IDs (published) |\n|---|---|---|---|---|---|\n| 1 | Nemotron-3-Embed-8B-BF16 (NVIDIA) | 2026-07-16 [card](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16) | 7.95B · OpenMDW-1.1 · 32,768 | LMEB 64.36 (#1), LME 85.70 (indep.). [RTEB(beta)](https://mteb-leaderboard.hf.space/benchmark/RTEB%28beta%29): rank 2, the top open model. Public tasks were vendor-submitted; MTEB maintainers ran the private ones. Vendor: RTEB-16 78.46 | No Ollama tag. Community: `Abiray/Nemotron-3-Embed-8B-GGUF` (07-21), `shadowrock-io/Nemotron-3-Embed-8B-Community-MLX-4bit` (08-04) |\n| 2 | Nemotron-3-Embed-1B-BF16 (NVIDIA) | 2026-07-16 [card](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16) | 1.14B · OpenMDW-1.1 · 32,768 | LMEB 61.50, LME 81.58 (indep.). RTEB rank 14. Vendor: RTEB-16 72.38 | `mlx-community/Nemotron-3-Embed-1B-BF16` (07-21, needs a custom script), `zenmagnets/Nemotron-3-Embed-1B-Q4_K_M-GGUF` (07-17) |\n| 3 | harrier-oss-v1-0.6b (Microsoft) | Weights 2026-03-30 ([HF](https://huggingface.co/microsoft/harrier-oss-v1-0.6b)), announced 04-07 ([Bing](https://blogs.bing.com/search/April-2026/Microsoft-Open-Sources-Industry-Leading-Embedding-Model)) | 0.6B (Qwen3 architecture) · MIT · 32,768 | LMEB 58.43, LME 72.46 (indep.). MMTEB v2 69.01, retrieval 70.75 (vendor) | `onnx-community/harrier-oss-v1-0.6b-ONNX` (transformers.js, 03-30), `mradermacher/harrier-oss-v1-0.6b-GGUF` (03-31) |\n\nCurrent models on LMEB/LME, same snapshot: Qwen3-Embedding-8B 55.94/77.66, 4B 53.30/50.21, 0.6B 54.56/73.08. all-MiniLM-L6-v2 scores 43.77/67.94 and has a 256-token window."
+    },
+    {
+      "heading": "2. Reranking",
+      "text": "| # | Model (dev) | Released | Params · license · max | Evidence | Local IDs |\n|---|---|---|---|---|---|\n| 1 | ettin-reranker-400m-v1 (Sentence Transformers) | Repo 2026-05-15, [blog](https://huggingface.co/blog/ettin-reranker) 05-19 | 0.40B · Apache-2.0 · 7,999 | Vendor: MTEB(eng,v2) Retrieval, top-100 reranked, averaged over 6 retrievers: 0.6091 vs 0.5082 for ms-marco-MiniLM-L6-v2. NanoBEIR 0.7193 vs 0.6312. Independent: not found | ONNX in the official [repo](https://huggingface.co/cross-encoder/ettin-reranker-400m-v1), including qint8_arm64. `cstr/ettin-reranker-400m-v1-GGUF` (08-22) |\n| 2 | Qwen3-Reranker-4B (Alibaba Qwen) | 2025-06-05 [arXiv](https://arxiv.org/abs/2506.05176) | 4.0B · Apache-2.0 · 32K | Vendor MTEB-R 69.76. Third-party: 0.6367 in the ettin table, the best there. On LMEB dialogue the KaLM paper reports LME 53.72, against 84.91 for its 0.6B sibling | llama.cpp `--reranking --pooling rank`. `Voodisss/Qwen3-Reranker-4B-GGUF-llama_cpp` (2026-03-09) |\n| 3 | KaLM-Reranker-V1-Small (KaLM team) | 2026-06 [arXiv 2606.22807](https://arxiv.org/abs/2606.22807). R2 checkpoint 08-14 | 1B active (T5Gemma-2 encoder-decoder) · Apache-2.0 · 128K | Vendor, LMEB dialogue: LME 87.58 (first stage 75.18), 6-task average 63.15. BEIR 60.01, against 63.50 for Qwen3-Reranker-4B in the same table. R2 LMEB: not found | PyTorch with `trust_remote_code`. `KaLM-Embedding/KaLM-Reranker-V1-Small-Q4_K_M-GGUF` (07-06) has no documented llama.cpp rerank path |"
+    },
+    {
+      "heading": "3. Memory LLM (AA-LCR = Artificial Analysis Long Context Reasoning, independent)",
+      "text": "| # | Model (dev) | Released | Params · license · context | Evidence | Local IDs |\n|---|---|---|---|---|---|\n| 1 | Qwen3.6-35B-A3B (Alibaba Qwen) | 2026-04-16 [QwenLM news](https://github.com/QwenLM/Qwen3.8) | 35B total, 3B active · Apache-2.0 · 262,144 | [AA-LCR](https://artificialanalysis.ai/models/qwen3-6-35b-a3b-non-reasoning) 64.3 without reasoning, 71.7 with it. Retrieval/LongMemEval scores: not found | Ollama `qwen3.6:35b-a3b` (23 GB), `qwen3.6:35b-mlx` (library updated 2026-09-01). `lmstudio-community/Qwen3.6-35B-A3B-MLX-4bit` (04-16) |\n| 2 | Nemotron 3.5 Lightning 30B-A3B (NVIDIA) | 2026-08-11 [card](https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16) | 30B total, 3B active, Mamba-2/MoE hybrid · OpenMDW-1.1 · 1M | [AA-LCR](https://artificialanalysis.ai/models/nemotron-3-5-lightning) 60.3 with reasoning; the non-reasoning score was not found. Vendor AA-LCR 52.00 | Ollama `nemotron-3.5-lightning:30b-a3b` (25 GB), `:30b-a3b-mlx` (256K; library updated 08-31). `ggml-org/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-GGUF` (08-11) |\n\nThe current Qwen3.5-9B scores [AA-LCR](https://artificialanalysis.ai/models/qwen3-5-9b-non-reasoning) 46.0 without reasoning and 70.0 with it. Apple measured time to first token under 3 s for a 4-bit 30B-A3B MoE with a 4,096-token prompt on the base M5 ([2025-11-19](https://machinelearning.apple.com/research/exploring-llms-mlx-m5)). Speed on the M5 Pro is unmeasured."
+    },
+    {
+      "heading": "Benchmark in the LongMemEval-S harness",
+      "text": "- **Nemotron-3-Embed-8B** replaces Qwen3-Embedding-8B.\n- **Nemotron-3-Embed-1B** replaces Qwen3-Embedding-4B.\n- **harrier-oss-v1-0.6b** replaces all-MiniLM-L6-v2 (agentmemory, ONNX) and Qwen3-Embedding-0.6B (ai-memory, GGUF).\n- **ettin-reranker-400m-v1** replaces ms-marco-MiniLM-L-6-v2.\n- **Qwen3-Reranker-4B** and **KaLM-Reranker-V1-Small** go in as an added cross-encoder stage, measured against listwise reranking by the LLM.\n- **Qwen3.6-35B-A3B** with thinking off, then **Nemotron 3.5 Lightning**, each replace Qwen3.5-9B. Keep Qwen3.5-9B as the control."
+    },
+    {
+      "heading": "Risks",
+      "text": "- **Licensing:** OpenMDW-1.1 is permissive. It requires you to keep its notices, and your rights end if you bring a patent suit. The others are Apache-2.0 or MIT. I excluded CC-BY-NC rerankers.\n- **Runtime:**\n  - Nemotron-3-Embed uses a bidirectional `Ministral3Model` (`is_causal: false`). The llama.cpp master converter does not register that class, so the community GGUFs are unofficial and have not been checked against the reference model.\n  - The MLX version needs a custom script, and no Ollama tag exists.\n  - No native Ollama rerank endpoint was found.\n  - Qwen3-Reranker GGUFs need the classifier head, or they return near-zero scores (llama.cpp #16407).\n  - ettin's ONNX export keeps Sentence Transformers' separate scoring head (pooling and dense layers). Whether it drops into transformers.js is unverified.\n  - KaLM needs PyTorch on MPS.\n- **Context:** MiniLM (256 tokens) and ms-marco (512 tokens) truncate 4–8k-token pages. The replacements take 7,999 tokens or more. NVIDIA's own scores used a 4,096-token sequence length.\n- **Speed:**\n  - The 8B embedder has 7× the parameters of the 1B, and each haystack is about 115k tokens, so deduplicate sessions before embedding.\n  - Qwen3-Reranker-4B has 10× the parameters of ettin-400m.\n  - Listwise reranking must run with thinking off and short prompts to fit the 20 s timeout.\n- **Evidence gaps:**\n  - No independent reranker results on memory data were found.\n  - The KaLM team runs LMEB and competes on it.\n  - No LLM LongMemEval scores were found. AA-LCR stands in as a proxy."
+    }
+  ],
+  "items": [
+    {
+      "section": "Benchmark in the LongMemEval-S harness",
+      "marker": "-",
+      "name": "Nemotron-3-Embed-8B",
+      "text": "- **Nemotron-3-Embed-8B** replaces Qwen3-Embedding-8B."
+    },
+    {
+      "section": "Benchmark in the LongMemEval-S harness",
+      "marker": "-",
+      "name": "Nemotron-3-Embed-1B",
+      "text": "- **Nemotron-3-Embed-1B** replaces Qwen3-Embedding-4B."
+    },
+    {
+      "section": "Benchmark in the LongMemEval-S harness",
+      "marker": "-",
+      "name": "harrier-oss-v1-0.6b",
+      "text": "- **harrier-oss-v1-0.6b** replaces all-MiniLM-L6-v2 (agentmemory, ONNX) and Qwen3-Embedding-0.6B (ai-memory, GGUF)."
+    },
+    {
+      "section": "Benchmark in the LongMemEval-S harness",
+      "marker": "-",
+      "name": "ettin-reranker-400m-v1",
+      "text": "- **ettin-reranker-400m-v1** replaces ms-marco-MiniLM-L-6-v2."
+    },
+    {
+      "section": "Benchmark in the LongMemEval-S harness",
+      "marker": "-",
+      "name": "Qwen3-Reranker-4B",
+      "text": "- **Qwen3-Reranker-4B** and **KaLM-Reranker-V1-Small** go in as an added cross-encoder stage, measured against listwise reranking by the LLM."
+    },
+    {
+      "section": "Benchmark in the LongMemEval-S harness",
+      "marker": "-",
+      "name": "Qwen3.6-35B-A3B",
+      "text": "- **Qwen3.6-35B-A3B** with thinking off, then **Nemotron 3.5 Lightning**, each replace Qwen3.5-9B. Keep Qwen3.5-9B as the control."
+    },
+    {
+      "section": "Risks",
+      "marker": "-",
+      "name": "Licensing:",
+      "text": "- **Licensing:** OpenMDW-1.1 is permissive. It requires you to keep its notices, and your rights end if you bring a patent suit. The others are Apache-2.0 or MIT. I excluded CC-BY-NC rerankers."
+    },
+    {
+      "section": "Risks",
+      "marker": "-",
+      "name": "Runtime:",
+      "text": "- **Runtime:**\n  - Nemotron-3-Embed uses a bidirectional `Ministral3Model` (`is_causal: false`). The llama.cpp master converter does not register that class, so the community GGUFs are unofficial and have not been checked against the reference model.\n  - The MLX version needs a custom script, and no Ollama tag exists.\n  - No native Ollama rerank endpoint was found.\n  - Qwen3-Reranker GGUFs need the classifier head, or they return near-zero scores (llama.cpp #16407).\n  - ettin's ONNX export keeps Sentence Transformers' separate scoring head (pooling and dense layers). Whether it drops into transformers.js is unverified.\n  - KaLM needs PyTorch on MPS."
+    },
+    {
+      "section": "Risks",
+      "marker": "-",
+      "name": "Context:",
+      "text": "- **Context:** MiniLM (256 tokens) and ms-marco (512 tokens) truncate 4–8k-token pages. The replacements take 7,999 tokens or more. NVIDIA's own scores used a 4,096-token sequence length."
+    },
+    {
+      "section": "Risks",
+      "marker": "-",
+      "name": "Speed:",
+      "text": "- **Speed:**\n  - The 8B embedder has 7× the parameters of the 1B, and each haystack is about 115k tokens, so deduplicate sessions before embedding.\n  - Qwen3-Reranker-4B has 10× the parameters of ettin-400m.\n  - Listwise reranking must run with thinking off and short prompts to fit the 20 s timeout."
+    },
+    {
+      "section": "Risks",
+      "marker": "-",
+      "name": "Evidence gaps:",
+      "text": "- **Evidence gaps:**\n  - No independent reranker results on memory data were found.\n  - The KaLM team runs LMEB and competes on it.\n  - No LLM LongMemEval scores were found. AA-LCR stands in as a proxy."
+    }
+  ],
+  "tables": [
+    {
+      "section": "1. Embedding",
+      "header": [
+        "#",
+        "Model (dev)",
+        "Released",
+        "Params · license · max input",
+        "Retrieval evidence",
+        "Local IDs (published)"
+      ],
+      "rows": [
+        [
+          "1",
+          "Nemotron-3-Embed-8B-BF16 (NVIDIA)",
+          "2026-07-16 [card](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16)",
+          "7.95B · OpenMDW-1.1 · 32,768",
+          "LMEB 64.36 (#1), LME 85.70 (indep.). [RTEB(beta)](https://mteb-leaderboard.hf.space/benchmark/RTEB%28beta%29): rank 2, the top open model. Public tasks were vendor-submitted; MTEB maintainers ran the private ones. Vendor: RTEB-16 78.46",
+          "No Ollama tag. Community: `Abiray/Nemotron-3-Embed-8B-GGUF` (07-21), `shadowrock-io/Nemotron-3-Embed-8B-Community-MLX-4bit` (08-04)"
+        ],
+        [
+          "2",
+          "Nemotron-3-Embed-1B-BF16 (NVIDIA)",
+          "2026-07-16 [card](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16)",
+          "1.14B · OpenMDW-1.1 · 32,768",
+          "LMEB 61.50, LME 81.58 (indep.). RTEB rank 14. Vendor: RTEB-16 72.38",
+          "`mlx-community/Nemotron-3-Embed-1B-BF16` (07-21, needs a custom script), `zenmagnets/Nemotron-3-Embed-1B-Q4_K_M-GGUF` (07-17)"
+        ],
+        [
+          "3",
+          "harrier-oss-v1-0.6b (Microsoft)",
+          "Weights 2026-03-30 ([HF](https://huggingface.co/microsoft/harrier-oss-v1-0.6b)), announced 04-07 ([Bing](https://blogs.bing.com/search/April-2026/Microsoft-Open-Sources-Industry-Leading-Embedding-Model))",
+          "0.6B (Qwen3 architecture) · MIT · 32,768",
+          "LMEB 58.43, LME 72.46 (indep.). MMTEB v2 69.01, retrieval 70.75 (vendor)",
+          "`onnx-community/harrier-oss-v1-0.6b-ONNX` (transformers.js, 03-30), `mradermacher/harrier-oss-v1-0.6b-GGUF` (03-31)"
+        ]
+      ]
+    },
+    {
+      "section": "2. Reranking",
+      "header": [
+        "#",
+        "Model (dev)",
+        "Released",
+        "Params · license · max",
+        "Evidence",
+        "Local IDs"
+      ],
+      "rows": [
+        [
+          "1",
+          "ettin-reranker-400m-v1 (Sentence Transformers)",
+          "Repo 2026-05-15, [blog](https://huggingface.co/blog/ettin-reranker) 05-19",
+          "0.40B · Apache-2.0 · 7,999",
+          "Vendor: MTEB(eng,v2) Retrieval, top-100 reranked, averaged over 6 retrievers: 0.6091 vs 0.5082 for ms-marco-MiniLM-L6-v2. NanoBEIR 0.7193 vs 0.6312. Independent: not found",
+          "ONNX in the official [repo](https://huggingface.co/cross-encoder/ettin-reranker-400m-v1), including qint8_arm64. `cstr/ettin-reranker-400m-v1-GGUF` (08-22)"
+        ],
+        [
+          "2",
+          "Qwen3-Reranker-4B (Alibaba Qwen)",
+          "2025-06-05 [arXiv](https://arxiv.org/abs/2506.05176)",
+          "4.0B · Apache-2.0 · 32K",
+          "Vendor MTEB-R 69.76. Third-party: 0.6367 in the ettin table, the best there. On LMEB dialogue the KaLM paper reports LME 53.72, against 84.91 for its 0.6B sibling",
+          "llama.cpp `--reranking --pooling rank`. `Voodisss/Qwen3-Reranker-4B-GGUF-llama_cpp` (2026-03-09)"
+        ],
+        [
+          "3",
+          "KaLM-Reranker-V1-Small (KaLM team)",
+          "2026-06 [arXiv 2606.22807](https://arxiv.org/abs/2606.22807). R2 checkpoint 08-14",
+          "1B active (T5Gemma-2 encoder-decoder) · Apache-2.0 · 128K",
+          "Vendor, LMEB dialogue: LME 87.58 (first stage 75.18), 6-task average 63.15. BEIR 60.01, against 63.50 for Qwen3-Reranker-4B in the same table. R2 LMEB: not found",
+          "PyTorch with `trust_remote_code`. `KaLM-Embedding/KaLM-Reranker-V1-Small-Q4_K_M-GGUF` (07-06) has no documented llama.cpp rerank path"
+        ]
+      ]
+    },
+    {
+      "section": "3. Memory LLM (AA-LCR = Artificial Analysis Long Context Reasoning, independent)",
+      "header": [
+        "#",
+        "Model (dev)",
+        "Released",
+        "Params · license · context",
+        "Evidence",
+        "Local IDs"
+      ],
+      "rows": [
+        [
+          "1",
+          "Qwen3.6-35B-A3B (Alibaba Qwen)",
+          "2026-04-16 [QwenLM news](https://github.com/QwenLM/Qwen3.8)",
+          "35B total, 3B active · Apache-2.0 · 262,144",
+          "[AA-LCR](https://artificialanalysis.ai/models/qwen3-6-35b-a3b-non-reasoning) 64.3 without reasoning, 71.7 with it. Retrieval/LongMemEval scores: not found",
+          "Ollama `qwen3.6:35b-a3b` (23 GB), `qwen3.6:35b-mlx` (library updated 2026-09-01). `lmstudio-community/Qwen3.6-35B-A3B-MLX-4bit` (04-16)"
+        ],
+        [
+          "2",
+          "Nemotron 3.5 Lightning 30B-A3B (NVIDIA)",
+          "2026-08-11 [card](https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16)",
+          "30B total, 3B active, Mamba-2/MoE hybrid · OpenMDW-1.1 · 1M",
+          "[AA-LCR](https://artificialanalysis.ai/models/nemotron-3-5-lightning) 60.3 with reasoning; the non-reasoning score was not found. Vendor AA-LCR 52.00",
+          "Ollama `nemotron-3.5-lightning:30b-a3b` (25 GB), `:30b-a3b-mlx` (256K; library updated 08-31). `ggml-org/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-GGUF` (08-11)"
+        ]
+      ]
+    }
+  ],
+  "sources_read": [
+    "https://mteb-leaderboard-backend.hf.space/v1/benchmarks/LMEB/scores",
+    "https://artificialanalysis.ai",
+    "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16",
+    "https://mteb-leaderboard.hf.space/benchmark/RTEB%28beta%29",
+    "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+    "https://huggingface.co/microsoft/harrier-oss-v1-0.6b",
+    "https://blogs.bing.com/search/April-2026/Microsoft-Open-Sources-Industry-Leading-Embedding-Model",
+    "https://huggingface.co/blog/ettin-reranker",
+    "https://huggingface.co/cross-encoder/ettin-reranker-400m-v1",
+    "https://arxiv.org/abs/2506.05176",
+    "https://arxiv.org/abs/2606.22807",
+    "https://github.com/QwenLM/Qwen3.8",
+    "https://artificialanalysis.ai/models/qwen3-6-35b-a3b-non-reasoning",
+    "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+    "https://artificialanalysis.ai/models/nemotron-3-5-lightning",
+    "https://artificialanalysis.ai/models/qwen3-5-9b-non-reasoning",
+    "https://machinelearning.apple.com/research/exploring-llms-mlx-m5"
+  ],
+  "native_report": {
+    "tool_uses": 130,
+    "subagent_tokens": 414369,
+    "source": "the coordinator's header line (recorder_header)"
+  },
+  "limits": [
+    "Discovery only: the lane did web research; nothing was installed, downloaded or executed on the Mac or VelaNext.",
+    "sections, items and tables are the recorder's transcription; every string in them is an exact substring of return_text (the answer part), and return_text is authoritative.",
+    "sources_read lists the URLs the answer cites, in order of first appearance; it is not a record of pages opened.",
+    "The subagent's tool log was not retained, so which pages it opened is not recorded, and its blindness rests on the packet instruction.",
+    "The Codex return for the same packet existed in the lanes directory from 23:53 EDT while this lane ran (it returned at 00:12 EDT)."
+  ]
+}

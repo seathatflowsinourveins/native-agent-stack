@@ -69,7 +69,17 @@ DELETE is followed by a lookup, never treated as a fill or terminal cancellation
 and repeating a known terminal observation changes no ledger state. All observations contain cumulative quantities; stream
 observations additionally retain available execution IDs and individual event
 quantity/price. Consumers must deduplicate executions and never manufacture
-individual fills from a cumulative REST snapshot.
+individual fills from a cumulative REST snapshot. A stream fill whose `execution_id`
+has not been forwarded yet is forwarded even when a REST read (for example the lookup
+after a cancel) already advanced the cumulative quantity past it; the stored
+cumulative state never moves back. `fill_activities(order_id)` returns one order's
+executions from `GET /v2/account/activities/FILL` filtered by the documented
+`order_id` parameter (ascending, 100 per page, the last activity id as `page_token`),
+each with its own `qty` and `price` and the order's `cum_qty` after it, and requires
+them to tile the filled quantity from zero. It is the only activities read the
+guarded session allows: another activity type, filter, page size or method is refused
+before any request. An activity id is `<timestamp>::<uuid>`; its 36-character UUID is
+the native trade id.
 
 ## Pre-submission order-contract boundary
 
@@ -121,6 +131,37 @@ connect guard pins; any other value is refused before a client, socket or
 endpoint is built. Feed selection is a configuration choice, not evidence of
 market-data entitlement. Native callbacks only enqueue into a bounded queue; the
 owning loop runs consumer callbacks.
+
+Halt state (E4). On the `sip` feed the quote connection also subscribes trading
+statuses and LULD bands for every symbol (alpaca-py 0.44.0's
+`subscribe_trading_statuses` and its `lulds` handler slot; the SDK sends every channel
+in its one subscribe message per connect), and the subscription ACK must list all
+three channels for every symbol (`halt_status_subscription_rejected` otherwise).
+`normalize_trading_status` maps Alpaca's documented CTA and UTP status codes: CTA `2`
+halts (with reason `M` a LULD pause) and `3` resumes; `5` (price indication) halts,
+since the CTA's output specification (CTS Pillar v2.11b) sends it only before a
+reopening after a halt; `6` (trading range indication, "a security that is not Trading
+Halted"), `E` (short-sale restriction), `F` (LULD limit state) and the imbalance codes
+change nothing; UTP `H`, `Q` (quotation only) and `P` (volatility pause) halt and `T`
+resumes. Market-wide circuit-breaker reasons (`1`-`3`, `MWC0`-`MWC3`) are labelled; an
+unknown or cross-tape code halts until a documented resume. A message whose tape is
+missing or not one of `A`, `B`, `C`, `O` reads its code from both tables (they share
+no code), so a documented resume still resumes it. Statuses go to
+`sink_status` on the owner loop; LULD bands are kept only for receipts
+(`health.luld_bands`), and a malformed band is counted, never a freeze. On `iex`
+neither channel is subscribed (their availability there is unverified and a refused
+channel would block readiness), so halt state then comes only from the quote-condition
+fallback, which blocks entries only: on `iex` no exit waits on a halt. The stream
+sends no snapshot at subscribe time: `nasdaq_halt_seed(symbols)` reads Nasdaq Trader's
+trade halts RSS once (one https URL, no redirects, an uncompressed body of at most
+4 MB; the feed's own TTL is one minute) and returns the symbols whose latest halt has
+no resumption trade time or one still ahead. requests' 5 s timeout bounds each socket
+read, not the body, so the body is read one socket read at a time (urllib3 `read1`)
+with the 5 s total deadline checked before each: the read ends at most one 5 s read
+timeout after the deadline. The runner expires a halt only the seed asserts (at its
+resumption trade time, or 12 minutes after a LULD pause began) and skips a seed row
+already past that on arrival. A reconnect loses the status messages sent during the
+gap; the next message restores the state.
 Reconnect, stale quotes, missing initial order updates, malformed callbacks and
 overflow stop new exposure. After inspecting and reconciling a fresh complete
 snapshot, the caller may explicitly call `mark_reconciled()`. Queue loss or

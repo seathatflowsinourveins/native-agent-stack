@@ -134,9 +134,13 @@ install -D -m 0644 adoption/agents/claude/blind-adjudicator.md ~/.claude/agents/
 #    Args carry the launch identity {repo, repo_tree_sha256, agent_sha256} and lane-prompt.md,
 #    which the workflow echoes; run it headless from the export root with hooks disabled (every stage runs as
 #    blind-lane-reviewer), then collect. claude_lane.py refuses a result whose launch or prompt does not match.
+#    The workflow runs in the background, and `claude -p` ends background tasks 600 s after its turn ends unless
+#    CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 ("Background tasks still running after 600s; terminating": the
+#    2026-09-24 lane was killed 20 minutes in). Set it for this call and the adjudication's.
 python3 tools/sota-convergence/claude_lane_args.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
   --agent-file ~/.claude/agents/blind-lane-reviewer.md --agentlab-root "$AL" > "$WORK_DIR/claude-args.json"
-(cd "$BLIND_DIR/export" && claude -p --settings '{"disableAllHooks": true}' --output-format json "Use a workflow. \
+(cd "$BLIND_DIR/export" && CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 claude -p --settings '{"disableAllHooks": true}' \
+  --output-format json "Use a workflow. \
 Run the saved workflow at scriptPath $AL/.claude/workflows/layer-verdict-lane.js with the Workflow tool, passing the \
 JSON object in $WORK_DIR/claude-args.json exactly as args, then copy its task output file byte for byte to \
 $WORK_DIR/claude-workflow-output.json." > "$WORK_DIR/claude-session.json")
@@ -167,7 +171,7 @@ python3 tools/sota-convergence/adjudicate.py codex --work-dir "$WORK_DIR" --repo
 python3 tools/sota-convergence/adjudicate.py claude-args --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
   --run-dir "$BLIND_DIR/export" > "$WORK_DIR/adjudication-claude-args.json"
 #    Run $CATALOG/tools/sota-convergence/adjudication-lane.js (the export has no tools/) headless from the
-#    export root as in step 3 (its --output-format json to adjudication-session.json), with
+#    export root as in step 3, with CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 (its --output-format json to adjudication-session.json), with
 #    adjudication-claude-args.json as args, and write the workflow's result to adjudication-claude-result.json.
 #    claude-collect audits each judgment on what its agents opened, from that run's transcripts.
 python3 tools/sota-convergence/adjudicate.py claude-collect --work-dir "$WORK_DIR" \

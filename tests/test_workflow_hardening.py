@@ -12,11 +12,12 @@ a full commit SHA.
 from datetime import date
 from pathlib import Path
 import hashlib
-import os
 import re
 import subprocess
 import tempfile
 import unittest
+
+import tests
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github/workflows"
@@ -257,7 +258,7 @@ class SecurityScanTests(unittest.TestCase):
     def test_zizmor_online_skips_pull_requests_and_reports_without_failing(self):
         job = jobs(self.text)["zizmor-online"]
         self.assertIn("if: github.event_name != 'pull_request'", job)
-        self.assertIn("-r .github/requirements-ci.lock", job)
+        self.assertIn("-r .github/requirements-ci.txt", job)
         self.assertIn("--require-hashes", job)
         self.assertIn("GH_TOKEN: ${{ github.token }}", job)
         self.assertIn("--no-exit-codes", job)
@@ -315,6 +316,66 @@ class SecurityScanTests(unittest.TestCase):
                              "should only run after zizmor-online actually produced an artifact")
 
 
+def zizmor_step(job_text):
+    """The one step of a job whose ``run:`` invokes zizmor."""
+    lines = job_text.splitlines()
+    hits = [i for i, line in enumerate(lines) if re.search(r"(^|\s)zizmor\s+--", line) and not line.lstrip().startswith("#")]
+    if len(hits) != 1:
+        raise AssertionError(f"expected one zizmor invocation, found {len(hits)}")
+    start = next(i for i in range(hits[0], -1, -1) if re.match(r"^      - ", lines[i]))
+    end = next((i for i in range(hits[0] + 1, len(lines)) if re.match(r"^      - ", lines[i])), len(lines))
+    return "\n".join(lines[start:end])
+
+
+def uncommented(text):
+    return "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
+
+
+def zizmor_inputs(step):
+    """The positional inputs of a step's zizmor invocation (backslash continuations joined,
+    option values and any shell redirection dropped)."""
+    command = re.sub(r"\\\n\s*", " ", uncommented(step))
+    invocation = re.search(r"(?:^|\s)zizmor\s+([^\n>|;&]*)", command).group(1).split()
+    inputs, skip = [], False
+    for token in invocation:
+        if skip:
+            skip = False
+        elif token in {"--persona", "--format", "--cache-dir", "--min-severity", "--min-confidence", "--config"}:
+            skip = True
+        elif not token.startswith("-"):
+            inputs.append(token)
+    return inputs
+
+
+class ValidateZizmorGateTests(unittest.TestCase):
+    """The required validate check runs zizmor's online audits and fails on findings
+    (docs/decisions/2026-09-22-github-automation-closure.md, "GitHub hardening follow-up
+    (2026-09-25)"). zizmor 1.30.1 with no token silently falls back to offline mode and
+    exits 0, so the token line is what keeps the online audits in the gate."""
+
+    step = zizmor_step(jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))["validate"])
+
+    def test_online_audits_get_the_read_only_job_token(self):
+        self.assertIn("GH_TOKEN: ${{ github.token }}", self.step)
+        self.assertEqual(scopes((WORKFLOWS / "validate.yml").read_text(encoding="utf-8").split("\njobs:\n", 1)[0]),
+                         [{"contents": "read"}])
+        self.assertIsNone(re.search(r"(?m)^    permissions:", jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))["validate"]),
+                          "the validate job adds no job-level scope")
+
+    def test_findings_fail_the_required_check(self):
+        command = uncommented(self.step)
+        for forbidden in ("--offline", "--no-exit-codes", "--format sarif", "--format=sarif", "continue-on-error"):
+            self.assertNotIn(forbidden, command)
+        self.assertIn("--persona regular", command)
+        self.assertIn("--no-config --no-ignores", command)
+        self.assertIn("--strict-collection", command)
+
+    def test_both_ci_runs_audit_the_repository_root_so_dependabot_yml_is_collected(self):
+        online = zizmor_step(jobs((WORKFLOWS / "security-scan.yml").read_text(encoding="utf-8"))["zizmor-online"])
+        for label, step in (("validate", self.step), ("zizmor-online", online)):
+            self.assertEqual(zizmor_inputs(step), ["."], label)
+
+
 class PublishReleaseTests(unittest.TestCase):
     text = (WORKFLOWS / "publish-catalog.yml").read_text(encoding="utf-8")
 
@@ -369,7 +430,7 @@ class TargetRulesetTests(unittest.TestCase):
         (checks,) = self.rule("required_status_checks")
         contexts = {check["context"]: check.get("integration_id") for check in checks["parameters"]["required_status_checks"]}
         for context in ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner",
-                        "verdict-review-gate"):
+                        "verdict-review-gate", "validate-macos"):
             self.assertEqual(contexts.get(context), 15368, context)
         self.assertEqual(len(self.rule("code_scanning")), 1)
 
@@ -451,7 +512,8 @@ class VerdictReviewGateTests(unittest.TestCase):
         stub = scratch / "bin" / "python3"
         stub.write_text('#!/bin/sh\necho "gate-invoked $*"\n')
         stub.chmod(0o755)
-        environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+        # Drops inherited GIT_* but keeps the package's hermetic config (no global hooks or auto maintenance).
+        environment = tests.hermetic_git_environment()
         environment.update(PATH=f"{scratch / 'bin'}:{environment['PATH']}", EVENT_NAME=event,
                            PR_BASE_SHA=self.commits["base"], PR_HEAD_SHA=pr_head, PUSH_BEFORE_SHA="",
                            PR_BASE_REF=base_ref,
@@ -715,6 +777,172 @@ class GitleaksConfigTestsRunInCI(unittest.TestCase):
         install = job.index("Install checksum-verified pinned gitleaks")
         self.assertLess(install, job.index("gitleaks allowlist regression tests"),
                         "the tests must run after the pinned binary is installed")
+
+class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
+    """validate-macos required-check readiness (docs/decisions/2026-09-22-github-automation-closure.md,
+    "validate-macos required (2026-09-25)"): validate-macos must report a status on every
+    pull_request (a required check that never reports blocks the PR forever), while the
+    three real-install bootstrap-* jobs stay path-gated exactly as before."""
+
+    text = (WORKFLOWS / "adoption-bootstrap.yml").read_text(encoding="utf-8")
+    job_map = jobs(text)
+
+    def test_pull_request_trigger_has_no_path_filter(self):
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\njobs:", 1)[0]
+        pull_request = trigger.split("\n  pull_request:", 1)[1].split("\n  schedule:", 1)[0]
+        self.assertNotIn("paths", pull_request)
+
+    def test_validate_macos_is_reachable_on_every_pull_request(self):
+        # No `needs:` (so it is never withheld pending another job) and no job-level `if:`
+        # (so no expression can skip the job itself for a pull_request): a required check
+        # must be reachable on every PR. Step-level `if: always()` (log upload) is fine and
+        # deliberately not what this checks.
+        job = self.job_map["validate-macos"]
+        header = job.split("\n    steps:\n", 1)[0]
+        self.assertNotIn("needs:", header)
+        self.assertNotRegex(header, r"(?m)^    if:", "a required check must not be skipped on any pull_request")
+
+    def test_bootstrap_jobs_stay_path_gated_on_pull_request_and_still_run_off_it(self):
+        # Regression for "bootstrap jobs are skipped on push, schedule and dispatch"
+        # (independent review of this branch, 2026-09-25): `needs: changes` alone applies
+        # an implicit `success()`, and `changes` itself only runs `if:
+        # github.event_name == 'pull_request'`, so on push/schedule/workflow_dispatch
+        # `changes` is skipped and a bare `if: github.event_name != 'pull_request' ||
+        # needs.changes.outputs.bootstrap == 'true'` (no status function) is never even
+        # evaluated -- the implicit success() check fails first and the job is skipped
+        # too. Confirmed live: dispatch run 36085789483 showed `changes` skipped and all
+        # three bootstrap-* jobs completing as skipped (docs/decisions/
+        # 2026-09-22-github-automation-closure.md, "validate-macos required
+        # (2026-09-25)", "Measured (before the fix)"). The fix needs both a status
+        # function (`!cancelled()` or `always()`) so the `if:` is evaluated at all when
+        # `changes` was skipped, and `!= 'false'` rather than `== 'true'` so a `changes`
+        # job that itself failed or was cancelled (empty output, not the string
+        # `'false'`) still runs these jobs (`changes`' own fail-safe default is
+        # `bootstrap=true`, never a skip).
+        for job_id in ("bootstrap-linux", "bootstrap-macos", "bootstrap-macos-brew"):
+            job = self.job_map[job_id]
+            self.assertIn("needs: changes", job, job_id)
+            condition = block_if(job)
+            self.assertIsNotNone(condition, job_id)
+            self.assertRegex(condition, r"!cancelled\(\)|always\(\)",
+                              f"{job_id}: if: needs a status function (!cancelled() or always()) "
+                              f"or an implicit success() from `needs: changes` skips it whenever "
+                              f"changes itself is skipped (every push/schedule/dispatch run); got: {condition!r}")
+            self.assertIn("needs.changes.outputs.bootstrap != 'false'", condition, job_id)
+            self.assertNotIn("needs.changes.outputs.bootstrap == 'true'", condition,
+                              f"{job_id}: '== ' true would keep the fail-open behaviour a "
+                              f"missing/empty output (changes skipped, failed or cancelled) needs "
+                              f"'!= \\'false\\'' to avoid")
+            self.assertIn("github.event_name != 'pull_request'", condition, job_id)
+
+    def test_the_pre_fix_condition_text_fails_this_tests_own_assertions(self):
+        # Proof the strengthened assertions above are not vacuous: the exact `if:` text
+        # this branch shipped before the fix round (a bare `if:`, no status function, and
+        # `== 'true'`) must fail them.
+        pre_fix_condition = "github.event_name != 'pull_request' || needs.changes.outputs.bootstrap == 'true'"
+        with self.assertRaises(AssertionError):
+            self.assertRegex(pre_fix_condition, r"!cancelled\(\)|always\(\)")
+        with self.assertRaises(AssertionError):
+            self.assertIn("needs.changes.outputs.bootstrap != 'false'", pre_fix_condition)
+
+    def test_changes_job_runs_only_on_pull_request_and_diffs_paths_matching_push(self):
+        job = self.job_map["changes"]
+        self.assertEqual(block_if(job), "github.event_name == 'pull_request'")
+        # The push trigger's `paths:` list stays the source of truth this job's own
+        # PATTERNS array must match once both are normalized to the same glob spelling;
+        # this is a textual comparison of the two lists, not a re-derivation of GitHub's
+        # own `paths:` matching semantics (a case pattern's single `*` matches `/`, so it
+        # is a strictly wider match than `paths:`'s `**` -- always in the safe,
+        # over-matching direction; see the job's own in-file comment).
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\njobs:", 1)[0]
+        push = trigger.split("push:", 1)[1].split("pull_request:", 1)[0]
+        push_paths = re.findall(r"(?m)^      - '([^']+)'$", push)
+        self.assertTrue(push_paths)
+
+        def normalize(path):
+            # PATTERNS uses bash case-glob syntax ('adoption/*'); push uses
+            # gitignore-style globs ('adoption/**'). Both mean "everything under".
+            return path.replace("/**", "/*")
+
+        job_patterns = re.findall(r"(?m)^            '([^']+)'$", job)
+        self.assertTrue(job_patterns)
+        self.assertEqual(sorted(normalize(path) for path in push_paths), sorted(job_patterns))
+
+    def test_changes_job_fails_safe_on_missing_shas_and_git_diff_errors(self):
+        # Item 2/3 of the independent review: a missing payload SHA or a failed `git
+        # diff` must still write bootstrap=true (never leave the job to fail and skip
+        # the three bootstrap-* jobs through `needs:`), and the diff must be NUL-delimited
+        # so a non-ASCII quoted filename still matches a PATTERNS glob.
+        job = self.job_map["changes"]
+        script = step_block(job, "Detect whether any bootstrap-relevant path changed")
+        (set_flags,) = re.findall(r"(?m)^\s+set (-\S+)(?: |$)", script)
+        self.assertNotIn("e", set_flags, "set -e would abort before a failure path's own bootstrap=true write")
+        # `shell: bash` runs as `bash -eo pipefail`, so errexit must be turned off explicitly.
+        self.assertRegex(script, r"(?m)^\s+set \+e\s*$", "errexit is on under shell: bash unless the script runs set +e")
+        self.assertIn('diff_file="$(mktemp)" || { echo "bootstrap=true" >> "$GITHUB_OUTPUT"; exit 0; }', script)
+        self.assertIn('echo "bootstrap=true" >> "$GITHUB_OUTPUT"', script)
+
+        def if_block(needle):
+            # A same-indentation-anchored match (not a naive string split on "fi", which
+            # false-positives inside "$diff_file"): captures from the matched "if" line
+            # through the "fi" at the same leading whitespace.
+            match = re.search(rf"(?ms)^([ \t]*)if\b[^\n]*{re.escape(needle)}.*?\n(.*?)\n\1fi\b", script)
+            self.assertIsNotNone(match, needle)
+            return match.group(0)
+
+        missing_sha_block = if_block('-z "${BASE_SHA:-}"')
+        self.assertIn('echo "bootstrap=true"', missing_sha_block)
+        self.assertIn("exit 0", missing_sha_block)
+        self.assertIn("git diff -z --no-renames --name-only", script)
+        diff_failure_block = if_block("git diff -z")
+        self.assertIn('echo "bootstrap=true"', diff_failure_block)
+        self.assertIn("exit 0", diff_failure_block)
+        self.assertIn("read -r -d ''", script)
+
+
+class NoWorkflowApprovesPullRequestsTests(unittest.TestCase):
+    """`can_approve_pull_request_reviews` stays on because one toggle also lets GITHUB_TOKEN
+    create the catalog-freshness `propose` PR (docs/decisions/2026-09-23-bot-pr-dispatch.md,
+    "Approval guard (2026-09-25)"). Since the setting also lets any workflow approve a PR, these
+    cross-workflow checks keep the approve capability unused: `pull-requests: write` only on
+    `catalog-freshness.yml:propose` (whose exact scopes tests/test_catalog_freshness_propose.py
+    pins), no `actions: write` (the scope `POST /actions/runs/{run_id}/approve` needs), and no
+    review/approve call anywhere."""
+
+    texts = {path.name: path.read_text(encoding="utf-8") for path in sorted(WORKFLOWS.glob("*.y*ml"))}
+
+    def test_every_permissions_key_is_a_parsed_block(self):
+        # permission_blocks() only parses block-form mappings; any other form would slip past the
+        # scope checks below, so every non-comment `permissions:` key must be one it parsed.
+        for name, text in self.texts.items():
+            body = uncommented(text)
+            self.assertNotIn("write-all", body, name)
+            self.assertNotRegex(body, r"(?m)^\s*permissions:[ \t]*[^\s#]", f"{name}: inline permissions form")
+            keys = len(re.findall(r"(?m)^\s*permissions:", body))
+            self.assertEqual(keys, len(permission_blocks(body)), f"{name}: unparsed permissions key")
+
+    def test_pull_requests_write_is_granted_only_to_the_propose_job(self):
+        grants = set()
+        for name, text in self.texts.items():
+            sections = {"<top-level>": text.split("\njobs:\n", 1)[0], **jobs(text)}
+            for section, section_text in sections.items():
+                if any(block.get("pull-requests") == "write" for block in scopes(section_text)):
+                    grants.add(f"{name}:{section}")
+        self.assertEqual(grants, {"catalog-freshness.yml:propose"})
+
+    def test_no_workflow_holds_actions_write(self):
+        for name, text in self.texts.items():
+            for block in scopes(text):
+                self.assertNotEqual(block.get("actions"), "write", name)
+
+    def test_no_workflow_reviews_or_approves_a_pull_request(self):
+        patterns = (r"gh\s+pr\s+review", r"--approve\b", r"pulls/[^/\s]+/reviews", r"\bAPPROVE\b",
+                    r"(?mi)^\s*(?:- )?uses:\s*\S*approve")
+        for name, text in self.texts.items():
+            body = uncommented(text)
+            for pattern in patterns:
+                self.assertNotRegex(body, pattern, name)
+
 
 if __name__ == "__main__":
     unittest.main()

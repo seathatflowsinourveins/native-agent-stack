@@ -9,7 +9,7 @@ import argparse
 import ast
 import asyncio
 from dataclasses import asdict, replace
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import hashlib
 import json
@@ -18,18 +18,46 @@ from pathlib import Path
 import re
 import shlex
 import signal
+import threading
 import time
 
+from corporate_actions import AlpacaCorporateActionsSource, CorporateActionMonitor
+from credential_guard import CredentialGuardError, MAX_CREDENTIAL_BYTES, REASON_ENCODING, REASON_SIZE, open_verified
+from financing import MARGIN_RATES, overnight_financing_projection
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
-from safety import Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP
+from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP,
+                    execution_from_observation)
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
-                     must_end_flat, session_at, validate_session_policy)
+                     must_end_flat, next_trading_day, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
 from transport import (AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, order_contract_status,
-                       preflight)
+                       preflight, halt_statuses_supported, nasdaq_halt_seed)
 
 SOURCE = Path(__file__).resolve().parent
 LAST_OUTPUT = None
+# E4: how long entries wait at startup for the halt seed read (one halts feed request run
+# while the node connects) before the stream alone decides.
+HALT_SEED_WAIT_SECONDS = 3.0
+# A halt only the startup seed asserts (no status message has confirmed or cleared it)
+# expires, because the stream sends changes only and the feed lags (about 65 s p50), so a
+# pause that ended just before the read would otherwise hold its symbol all session: at
+# its resumption trade time when the feed gives one, or, for a LULD trading pause, 12
+# minutes after it began. LULD Plan Amendment 12 (Cboe fact sheet): a pause's first 5-
+# minute halt segment, and a second one when it is extended, run in full, so a pause still
+# closed after 10 minutes is exceptional; 2 minutes are a margin. A longer pause then counts
+# as trading until the stream reports it. Other seeded halts without a resumption time stay
+# until a status message arrives.
+SEEDED_LULD_PAUSE_SECONDS = 12 * 60
+LULD_PAUSE_REASON_CODES = frozenset({"LUDP", "LUDS", "M"})
+
+
+def _seed_failure(exc):
+    """A bounded reason for a failed halt seed read: the transport's own sanitized message
+    (it never carries provider text) or the exception type."""
+    text = str(exc)
+    if isinstance(exc, TransportError) and re.fullmatch(r"[a-z ]{1,60}", text):
+        return text
+    return type(exc).__name__
 
 
 def save(path, data):
@@ -50,40 +78,48 @@ def save(path, data):
         os.close(fd)
 
 
-def _inside_git_worktree(path):
-    """Walk parents for a `.git` entry (directory in a normal clone, file in
-    a linked worktree). Resolved so a symlink cannot hide the real location."""
-    current = path.parent
-    while True:
-        if (current / ".git").exists() or (current / ".git").is_symlink():
-            return True
-        parent = current.parent
-        if parent == current:
-            return False
-        current = parent
-
-
 def credentials(path):
     """Fail closed on a paper-credential env file with unsafe permissions,
     ownership, or location before any content is read. File contents are
-    never included in a raised error or log."""
-    resolved = Path(path).resolve()
+    never included in a raised error or log.
+
+    The ownership/mode/worktree-location rules and their fd-traversal-bound
+    open live in `credential_guard.open_verified()`, shared with
+    `market_research.credentials()` so the two loaders cannot drift; this
+    keeps `follow_symlinks=True`, i.e. a symlinked env file is resolved and
+    the rules applied to its target, matching this loader's prior behavior.
+
+    The file's `KEY=value` lines are required to be plain ASCII: an Alpaca
+    key id/secret is itself an ASCII token, and every writer of this file
+    (`tools/credentials/set_credential.py`, a human `chmod 600`'d text file)
+    only ever emits ASCII. A byte outside that range is refused before any
+    line is parsed, deliberately, rather than accepted as UTF-8 and only
+    failing later (or not at all) inside the per-variable value parser.
+
+    The read is bounded the same way `market_research.credentials()`'s is:
+    at most `MAX_CREDENTIAL_BYTES + 1` bytes are read from the already-open
+    descriptor, and a longer result is refused, rather than trusting an
+    earlier `fstat`-reported size a concurrent writer could grow past.
+    """
     try:
-        info = resolved.stat()
-    except OSError:
-        raise SafetyError("credential_file_permissions: cannot stat the env file; "
-                           "create it at a private path outside this repository with `chmod 600`")
-    if info.st_uid != os.getuid():
-        raise SafetyError("credential_file_permissions: env file is not owned by the current user; "
-                           "chown it to your own account (never share a paper credential file)")
-    if info.st_mode & 0o777 != 0o600:
-        raise SafetyError("credential_file_permissions: env file mode must be exactly 0600; "
-                           f"run `chmod 600 {resolved.name}`")
-    if _inside_git_worktree(resolved):
-        raise SafetyError("credential_file_permissions: env file must live outside any Git worktree; "
-                           "move it to a private, non-repository path (e.g. under your home config directory)")
+        with open_verified(path, follow_symlinks=True) as handle:
+            raw = handle.read(MAX_CREDENTIAL_BYTES + 1)
+    except CredentialGuardError as error:
+        raise SafetyError(str(error)) from None
+    if len(raw) > MAX_CREDENTIAL_BYTES:
+        raise SafetyError(REASON_SIZE)
+    # Checked before decoding, never inside a `except UnicodeDecodeError`
+    # handler: that handler's exception carries `.object` (the *entire*
+    # input bytes, secret included) as an attribute, and raising from
+    # inside it -- even with `from None` -- still leaves that exception
+    # reachable via `__context__`, which `from None` does not clear (see
+    # credential_guard's module docstring for the same reasoning applied
+    # to its own exceptions).
+    if not raw.isascii():
+        raise SafetyError(REASON_ENCODING)
+    text = raw.decode("ascii")
     result = {}
-    for line in resolved.read_text().splitlines():
+    for line in text.splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
@@ -323,6 +359,16 @@ def load_config(path, *, registry_path=None):
         raise ValueError("unqualified_lane_configuration")
     exit_replace_enabled = exits_cfg.get("replace_enabled", False)
     if type(exit_replace_enabled) is not bool:
+        raise ValueError("unqualified_lane_configuration")
+    # Financing: an optional top-level "financing_plan" key selects the
+    # modeled margin-interest rate plan (financing.MARGIN_RATES) that
+    # run_native's _modeled_financing_block reads when a run ends
+    # "held_overnight" under session_policy["overnight_holds"]. Absent
+    # (every shipped config) defaults to "standard"; validated here,
+    # fail-fast, the same way gap_stop_cfg/exits_cfg above are -- any other
+    # value is refused rather than silently defaulting or failing later.
+    financing_plan = c.get("financing_plan", "standard")
+    if financing_plan not in MARGIN_RATES:
         raise ValueError("unqualified_lane_configuration")
     resolved_registry_path = registry_path if registry_path is not None else SOURCE / "registry.json"
     registry_entries = load_registry(resolved_registry_path)
@@ -736,6 +782,21 @@ class Controller:
         self.defer_until = 0
         self.halted_symbols = set()
         self.last_status_ts = {}
+        self.halt_states = {}      # symbol -> last applied trading status (receipts)
+        self.status_messages = 0
+        # E4: halts only the startup seed asserts, with their expiry ({"expires_ns",
+        # "basis"}); a streamed status for the symbol replaces the seed's say.
+        self.seeded_halts = {}
+        # The quote's own best-effort condition flag (transport.normalize_quote), per
+        # symbol: it blocks entries through the stored quote, never exits.
+        self.quote_condition_halted = {}
+        # E4 startup state: a blocking callable (symbols) -> transport.nasdaq_halt_seed
+        # result, set by the paper entry points on a feed that streams statuses; None
+        # (simulations, tests, other feeds) seeds nothing.
+        self.halt_seed_fetch = None
+        self.halt_seed = {"status": "not_configured"}
+        self._halt_seed_task = None
+        self._halt_seed_deadline = 0.0
 
     async def before_request(self, kind, client_id=None):
         if kind == "data_read":
@@ -750,9 +811,17 @@ class Controller:
                                              market_open=self.market_open, session_close=self.close)
                 if intent.side == "buy" and (self.stop or not self.port.ready):
                     raise SafetyError("admissions_not_ready")
-            wait = self.ledger.request_budget(self.clock(), kind, client_id=client_id)
+            # The durable row binds only a submit to its intent (requests.client_id is a
+            # foreign key), so naming a cancel can never make its budget reservation fail.
+            wait = self.ledger.request_budget(self.clock(), kind,
+                                              client_id=client_id if kind == "submit" else None)
             if not wait:
-                self.requests.append({"timestamp": self.clock(), "kind": kind})
+                entry = {"timestamp": self.clock(), "kind": kind}
+                if client_id is not None:
+                    # Submits and cancels name their order, so a sim-to-paper comparison
+                    # pairs each cancel exactly instead of inferring it from timing.
+                    entry["client_id"] = client_id
+                self.requests.append(entry)
                 return
             if kind == "submit":
                 self.defer_until = max(self.defer_until, self.clock() + wait)
@@ -786,24 +855,52 @@ class Controller:
             self.ledger.freeze("external_order_detected")
             raise SafetyError("external_order_detected")
         self.ledger.record_order(order["client_order_id"], order["id"], order["status"], order["filled_qty"],
-                                 order.get("filled_avg_price"), timestamp=order["updated_at_ns"] / 1e9)
+                                 order.get("filled_avg_price"), timestamp=order["updated_at_ns"] / 1e9,
+                                 execution=execution_from_observation(order))
 
     def quote(self, quote):
-        # halted merges the per-quote signal (transport.normalize_quote's
-        # best-effort condition-code mapping) with any standing halt recorded
-        # from a trading_status message (see trading_status() below); either
-        # source marks the symbol halted until trading_status clears it.
-        halted = bool(quote.get("halted", False)) or quote["symbol"] in self.halted_symbols
+        # The stored quote's halted flag merges the per-quote signal
+        # (transport.normalize_quote's best-effort condition-code mapping) with any
+        # standing halt from a trading_status message or the startup seed; it gates
+        # entries (reserve_intent, the mover's entry). Exits and exit re-pricing read
+        # is_halted(), the status and seed state alone.
+        self._expire_seeded_halts()
+        flagged = bool(quote.get("halted", False))
+        halted = flagged or quote["symbol"] in self.halted_symbols
         q = Quote(quote["symbol"], quote["bid"], quote["ask"], quote["ts_ns"] / 1e9, halted=halted)
         old = self.quotes.get(q.symbol)
         if old is None or q.timestamp > old.timestamp:
             self.quotes[q.symbol] = q
+            self.quote_condition_halted[q.symbol] = flagged
+
+    def current_quote(self, symbol):
+        """The stored quote of ``symbol`` after any expired seeded halt is cleared (the
+        mover book's quote source)."""
+        self._expire_seeded_halts()
+        return self.quotes.get(symbol)
+
+    def _restamp(self, symbol):
+        """Re-stamp the stored quote's halted flag in place (D6: a halt or resume takes
+        effect at once, not at the next newer quote)."""
+        stored = self.quotes.get(symbol)
+        halted = self.quote_condition_halted.get(symbol, False) or symbol in self.halted_symbols
+        if stored is not None and stored.halted != halted:
+            self.quotes[symbol] = replace(stored, halted=halted)
 
     def trading_status(self, status):
-        """Consume a normalize_trading_status(...) result (deliverable D3).
-        Not yet driven by a live websocket subscription in this change; see
-        the task handoff. Kept separate from quote() so a future subscription
-        only needs to call this, not touch the quote path.
+        """Consume a transport.normalize_trading_status(...) result: the transport's
+        ``sink_status`` delivers every trading status message of a subscribed symbol
+        (statuses ride the quote connection). ``halted`` True halts the symbol (no
+        entries: its stored quote is marked halted, which reserve_intent refuses; no new
+        exit and no exit re-pricing: the strategies read is_halted), False resumes it (an
+        applied halt or resume replaces the startup seed's say for the symbol), None (CTA 6
+        trading range indication, E short-sale restriction, F LULD limit state, imbalance
+        indicators) never changes it and does not move the per-symbol ordering guard, so
+        a late genuine halt is still applied. A halt and a resume with the same timestamp resolve to halted.
+        The stream sends no snapshot at subscribe time: a symbol already halted when the
+        engine subscribed is known from the startup seed (start_halt_seed) or from its
+        next status message (a quotation-only period or a CTA price indication halts on
+        arrival; a resume with no halt seen leaves it trading).
 
         D6: a halt must take effect immediately, not only once a strictly
         newer quote update arrives (quote() only ever replaces the stored
@@ -836,18 +933,150 @@ class Controller:
             self.events.append({"type": "trading_status_ignored", "symbol": symbol,
                                "reason": "missing_or_invalid_ts_ns"})
             return
-        last_ts = self.last_status_ts.get(symbol)
-        if last_ts is not None and ts_ns <= last_ts:
+        self._expire_seeded_halts()
+        self.status_messages += 1
+        detail = {key: status.get(key) for key in ("state", "status_code", "reason_code", "tape")}
+        halted = status.get("halted")
+        if halted is None:
+            self.events.append({"type": "trading_status", "symbol": symbol, "effect": "unchanged",
+                                "ts_ns": ts_ns, **detail})
             return
+        self._apply_halt(symbol, ts_ns, bool(halted), detail, source="stream")
+
+    def _apply_halt(self, symbol, ts_ns, halted, detail, *, source):
+        """Apply one halt or resume at ``ts_ns`` unless a newer one is already applied (a
+        halt wins a tie). Returns whether it was applied."""
+        last_ts = self.last_status_ts.get(symbol)
+        if last_ts is not None and (ts_ns < last_ts or (ts_ns == last_ts and not halted)):
+            self.events.append({"type": "trading_status", "symbol": symbol, "effect": "stale_ignored",
+                                "ts_ns": ts_ns, "source": source, **detail})
+            return False
         self.last_status_ts[symbol] = ts_ns
-        halted = bool(status.get("halted"))
         if halted:
             self.halted_symbols.add(symbol)
         else:
             self.halted_symbols.discard(symbol)
-        stored = self.quotes.get(symbol)
-        if stored is not None and stored.halted != halted:
-            self.quotes[symbol] = replace(stored, halted=halted)
+        if source == "stream":
+            self.seeded_halts.pop(symbol, None)   # a streamed status confirms or clears the seed
+        self.halt_states[symbol] = {"halted": halted, "ts_ns": ts_ns, "source": source, **detail}
+        self.events.append({"type": "trading_status", "symbol": symbol,
+                            "effect": "halted" if halted else "resumed", "ts_ns": ts_ns, "source": source,
+                            **detail})
+        self._restamp(symbol)
+        return True
+
+    @staticmethod
+    def _seed_expiry(halt):
+        """When a halt only the startup seed asserts stops counting (epoch ns), and why:
+        its resumption trade time when the feed gives one; else, for a LULD trading pause,
+        SEEDED_LULD_PAUSE_SECONDS after its halt time; else never (None)."""
+        if halt.get("resumption_trade_ns") is not None:
+            return int(halt["resumption_trade_ns"]), "resumption_trade_time"
+        if halt.get("reason_code") in LULD_PAUSE_REASON_CODES:
+            return int(halt["halted_at_ns"]) + SEEDED_LULD_PAUSE_SECONDS * 1_000_000_000, "luld_pause_bound"
+        return None, None
+
+    def _expire_seeded_halts(self):
+        """Clear each seeded halt whose expiry has passed and that no streamed status has
+        replaced (a stale seed cannot block a symbol for the rest of the session)."""
+        if not self.seeded_halts:
+            return
+        now_ns = int(self.clock() * 1_000_000_000)
+        for symbol, seed in list(self.seeded_halts.items()):
+            if seed["expires_ns"] is None or now_ns < seed["expires_ns"]:
+                continue
+            del self.seeded_halts[symbol]
+            self.halted_symbols.discard(symbol)
+            self.halt_states[symbol] = {**self.halt_states.get(symbol, {}), "halted": False,
+                                        "state": "seed_expired", "expired_at_ns": now_ns}
+            self.events.append({"type": "trading_status", "symbol": symbol, "effect": "seed_expired",
+                                "ts_ns": seed["expires_ns"], "basis": seed["basis"], "source": "seed_expiry"})
+            self._restamp(symbol)
+
+    def start_halt_seed(self, symbols, *, wait_seconds=HALT_SEED_WAIT_SECONDS):
+        """E4 startup state, called on the owner loop as the node starts: run
+        ``halt_seed_fetch(symbols)`` (one halts feed read) in a worker thread and apply
+        its halts when it returns. Entries wait for it (halt_seed_pending) for at most
+        ``wait_seconds``; a failed or late read leaves the symbols to the stream alone and
+        is recorded, never retried."""
+        if self.halt_seed_fetch is None:
+            self.halt_seed = {"status": "not_configured"}
+            return None
+        self.halt_seed = {"status": "pending", "symbols": sorted(symbols)}
+        self._halt_seed_deadline = self.clock() + wait_seconds
+        fetch = self.halt_seed_fetch
+
+        async def resolve():
+            try:
+                seed = await asyncio.to_thread(fetch, sorted(symbols))
+            except asyncio.CancelledError:
+                self.halt_seed = {**self.halt_seed, "status": "cancelled"}
+                raise
+            except Exception as exc:
+                self.halt_seed = {**self.halt_seed, "status": "unavailable", "reason": _seed_failure(exc)}
+                self.events.append({"type": "halt_seed", "status": "unavailable",
+                                    "reason": self.halt_seed["reason"]})
+                return
+            self.apply_halt_seed(seed)
+
+        self._halt_seed_task = asyncio.get_running_loop().create_task(resolve())
+        return self._halt_seed_task
+
+    def halt_seed_pending(self):
+        """True while the startup halt seed is in flight and its wait has not run out."""
+        return self.halt_seed.get("status") == "pending" and self.clock() < self._halt_seed_deadline
+
+    def apply_halt_seed(self, seed):
+        """Mark each seeded symbol halted from its halt time (state ``seeded_halt``). A
+        stream status newer than that time wins, so a resume streamed before the seed
+        returned is not undone, and a later streamed resume clears the seeded halt. A
+        seeded halt no status has replaced expires (_seed_expiry); a seed already past its
+        expiry (for example a prior day's pause whose row kept no resumption time) is not
+        applied. Each applied symbol's expiry is recorded in the seed summary."""
+        halts = seed.get("halts") or {}
+        now_ns = int(self.clock() * 1_000_000_000)
+        applied, expiry, expired = [], {}, []
+        for symbol, halt in sorted(halts.items()):
+            expires_ns, basis = self._seed_expiry(halt)
+            if expires_ns is not None and expires_ns <= now_ns:
+                expired.append(symbol)
+                continue
+            detail = {"state": "seeded_halt", "status_code": None, "reason_code": halt.get("reason_code"),
+                      "tape": None, "expires_ns": expires_ns}
+            if self._apply_halt(symbol, int(halt["halted_at_ns"]), True, detail, source=str(seed.get("source"))):
+                applied.append(symbol)
+                self.seeded_halts[symbol] = {"expires_ns": expires_ns, "basis": basis}
+                expiry[symbol] = {"expires_ns": expires_ns, "basis": basis}
+        self.halt_seed = {**self.halt_seed, "status": "seeded",
+                          **{key: seed.get(key) for key in ("source", "url", "fetched_at_ns", "sha256", "bytes",
+                                                            "items")},
+                          "halted": sorted(halts), "applied": applied, "expired_on_arrival": expired,
+                          "expiry": expiry}
+        self.events.append({"type": "halt_seed", "status": "seeded", "halted": sorted(halts), "applied": applied,
+                            "expired_on_arrival": expired, "sha256": seed.get("sha256")})
+
+    async def stop_halt_seed(self):
+        """Cancel a seed read still in flight (the run is over)."""
+        task, self._halt_seed_task = self._halt_seed_task, None
+        if task is not None and not task.done():
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
+
+    def is_halted(self, symbol):
+        """True while a trading status, or a startup seed that has not expired, marks
+        ``symbol`` halted, paused or quotation-only: the strategies then send it no order
+        (no entry, no new exit) and do not re-price its resting exit. The quote's own
+        best-effort condition flag is not read here: it blocks entries only, through the
+        stored quote, and never an exit."""
+        self._expire_seeded_halts()
+        return symbol in self.halted_symbols
+
+    def halt_summary(self):
+        self._expire_seeded_halts()
+        return {"status_messages": self.status_messages, "halted_now": sorted(self.halted_symbols),
+                "last_status": {symbol: dict(state) for symbol, state in sorted(self.halt_states.items())},
+                "seeded_only": {symbol: dict(seed) for symbol, seed in sorted(self.seeded_halts.items())},
+                "seed": dict(self.halt_seed)}
 
     def bind(self, port):
         """Retain proven negative outcomes before native/recovery callbacks."""
@@ -921,9 +1150,378 @@ PROJECT_EQUITY_FLOOR_USD = 25000
 
 RECONCILE_EVERY_SECONDS = 30  # periodic broker snapshot and reconciliation during a run
 
+# CRITICAL finding 1 (2026-09-24 fix round): Alpaca's `/v1/corporate-actions`
+# endpoint filters by PROCESS date, which for a cash dividend is the payable
+# date -- AFTER the ex_date this guard actually reasons about
+# (blueprints/us-equities/alpaca-historical/README.md's own documented
+# behaviour; independently confirmed by a native read-only check recorded in
+# corporate-actions-native-check-20260924.json: fetch(['AAPL'],
+# 2024-08-09, 2024-08-12) -- the guard's actual pre-fix production window
+# around the real 2024-08-12 ex-date -- returned []). A narrow today..
+# next_session request window therefore systematically misses real
+# dividends. Request a WIDE window from the source and let evaluate_guard's
+# own narrow date check (today..next_session_date, inclusive -- finding 4)
+# do the actual filtering locally, exactly as corporate_actions.py's module
+# docstring already describes this split of responsibilities.
+#
+# MEDIUM finding 6 (fix round 3): the forward pad below is sized from three
+# observed governing-to-process lags, each recorded with its source in
+# corporate-actions-native-check-20260924.json's lag_observations -- a
+# native AAPL dividend (3 days), and two Alpaca-documented examples (6 and
+# 15 days). This is NOT a proven maximum: no exceeding case has been found
+# or exhaustively searched for, and Alpaca does not guarantee upcoming-
+# action announcement availability at all. Treat 90 days as an evidence-
+# backed assumption, not an established bound.
+CORPORATE_ACTION_FETCH_WINDOW_PAST_DAYS = 7
+CORPORATE_ACTION_FETCH_WINDOW_FUTURE_DAYS = 90
+# HIGH finding 2/finding 1 (fix round 3): the hard ceiling on how long this
+# coroutine waits for the corporate-action guard's background refresh
+# thread (see _schedule_corporate_action_refresh below) before giving up.
+# The thread itself is NOT stopped by this timeout -- Python cannot
+# forcibly kill a running thread -- it may still be blocked in alpaca-py
+# past this point and could finish much later. `_schedule_corporate_
+# action_refresh` accounts for that: on timeout it calls the guard's own
+# `refresh_timed_out()` (generation-bumping the monitor so the eventual
+# late write is dropped as superseded, and treating the timeout as a
+# failure right now), clears `state["in_flight"]` so the NEXT tick's
+# refresh is not permanently locked out, and retains the task in
+# `state["tasks"]` so run_native's own shutdown path can still cancel/join
+# it rather than leaving it fully untracked.
+CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = 20.0
+
+
+def _corporate_action_guard_for_strategy(config, session_policy):
+    """MEDIUM finding 8 (2026-09-24 fix round): pure decision, independently
+    unit-testable without driving run_native's full native tick loop -- the
+    corporate-action guard is wired into the strategy ONLY when
+    `session_policy["overnight_holds"]` is True. No shipped config
+    currently enables overnight_holds; a regular-session-only run never
+    holds a position across a corporate-action date at all (this guard
+    exists specifically for that overnight-hold gap -- audit gap #8), so
+    wiring it in unconditionally used to mean a single failed first fetch
+    could block every entry for a whole regular-session run that could
+    never have benefited from the guard in the first place."""
+    return config.get("_corporate_action_guard") if session_policy["overnight_holds"] else None
+
+
+def _corporate_action_fetch_window(session_date):
+    """The wide fetch window (finding 1) for a corporate-action refresh
+    anchored at `session_date`: `session_date`'s own trading-day horizon
+    (today's session extended through the next trading session -- the
+    guard's actual hold horizon) padded well past Alpaca's process-date
+    filtering lag in both directions. Raises ValueError (uncaught here) if
+    `session_date` cannot be resolved against the session calendar -- every
+    caller already handles that the same way session_at/next_trading_day's
+    other callers do."""
+    next_session_date = next_trading_day(session_date)
+    start = session_date - timedelta(days=CORPORATE_ACTION_FETCH_WINDOW_PAST_DAYS)
+    end = next_session_date + timedelta(days=CORPORATE_ACTION_FETCH_WINDOW_FUTURE_DAYS)
+    return next_session_date, start, end
+
+
+async def _schedule_corporate_action_refresh(guard, watch, start, end, now, state):
+    """HIGH finding 1/2 (fix round 3): run `guard.refresh()` (a blocking
+    network call) off the asyncio event loop in a worker thread, bounded by
+    a hard `asyncio.wait_for` timeout, and guarded by `state["in_flight"]`
+    -- as an ordinary (not a guaranteed) scheduling check -- so a
+    still-running previous refresh thread is not ORDINARILY overlapped by
+    a second concurrent one from this scheduler's own perspective (LOW
+    finding 1 wording, fix round 4: this check alone does not GUARANTEE no
+    overlap at the OS-thread level -- see this function's own docstring
+    below for what actually makes an overlap harmless). `state` is a plain
+    dict callers own and can share across call sites (the tick loop AND
+    the preflight fetch both pass the SAME dict, fix round 3, so an
+    in-flight preflight thread is
+    visible to the tick loop's first check too).
+
+    `wait_for`'s timeout only stops THIS coroutine from waiting; it cannot
+    stop the worker thread itself (Python cannot forcibly kill a thread) --
+    reproduced by an independent review: the thread kept running past the
+    timeout and later wrote a stale result over a newer one. LOW finding 1
+    (fix round 4, wording): refreshes are never overlapped only because
+    `CorporateActionMonitor`'s own generation check (under its lock) rejects
+    any write from a superseded (stale) attempt -- this scheduling layer's
+    `state["in_flight"]` check is a best-effort scheduling optimization
+    (avoid spinning up a redundant thread most of the time), not itself a
+    correctness guarantee; a timed-out worker can still overlap a later one
+    at the OS-thread level, and the generation check is what makes that
+    harmless. Defenses in place:
+      1. HIGH finding (fix round 5): for a guard exposing the two-phase
+         `begin_attempt`/`run_attempt`/`invalidate_attempt` API (the real
+         CorporateActionMonitor does), the generation is allocated by
+         `guard.begin_attempt(...)` HERE, synchronously, on the calling
+         coroutine, BEFORE the worker thread is even created -- not lazily,
+         inside the worker, once it happens to start running. Reproduced by
+         an independent review's own probe: allocating the generation
+         lazily left a window where a worker thread had been *launched*
+         (`Thread.start()` already called) but was still merely queued by
+         the OS, not yet actually running -- `_generation` hadn't moved yet
+         -- so a shutdown-time cancellation landing in that window saw
+         "nothing in flight" and did nothing, and the delayed worker later
+         committed a stale result AFTER shutdown had already decided the
+         run was done. Allocating up front closes that window: cancellation
+         always has a concrete generation to invalidate, however early it
+         happens.
+           - On CANCELLATION specifically (shutdown cancelling an otherwise
+             routine in-flight refresh), `guard.invalidate_attempt(
+             generation)` is called -- NOT `refresh_timed_out` -- so a
+             perfectly clean, still-fresh cached result is never forced
+             into `needs_attention` just because the routine periodic
+             refresh checking it happened to still be in flight at
+             shutdown (LOW finding, Claude's review: the old code routed
+             cancellation through the SAME degrading path as a genuine
+             timeout).
+           - On a genuine TIMEOUT (`wait_for` itself gives up, not a
+             cancellation), `guard.refresh_timed_out(generation, watch)` is
+             still called, which DOES degrade -- a timeout is itself
+             evidence something may be wrong (unlike an ordinary shutdown).
+         For a simpler guard (most existing test fakes) that does not
+         expose `begin_attempt`, this falls back to the OLD single-call
+         convention (`guard.refresh(...)` inside the worker,
+         `guard.refresh_timed_out(watch)` on timeout OR cancellation) to
+         avoid breaking any test built against that simpler contract.
+      2. The created task is retained in `state["tasks"]` (pruned of
+         already-done entries on every call) so a caller (run_native's own
+         `finally` block) can cancel and join every still-pending
+         corporate-action refresh task at shutdown, instead of leaving
+         them as untracked, unaccounted-for background work.
+      3. LOW finding 6 (fix round 4): the worker itself runs on a DAEMON
+         thread bridged back to this event loop via `loop.call_soon_
+         threadsafe` (not `asyncio.to_thread`, which uses the loop's
+         default `ThreadPoolExecutor` -- `asyncio.run()`'s own cleanup
+         joins every outstanding default-executor thread before returning,
+         so a single still-hanging refresh used to delay the WHOLE
+         process's result-save and account-lock release by the hang's full
+         duration, measured: a 4s hang delayed both by ~4s with
+         `asyncio.to_thread`, vs ~0.1s with this daemon-thread bridge,
+         which never blocks `asyncio.run()`'s shutdown). A daemon thread is
+         not joined at interpreter exit either.
+
+    A no-op if a refresh is already in flight; callers check
+    `state["in_flight"]` before calling this so a throttled (no-op)
+    `refresh()` call never even spins up a thread. Returns the created
+    task (or None if the two-phase `begin_attempt` itself reports a
+    throttled no-op, in which case no worker is launched at all) so a
+    caller that needs the result now (the preflight fetch) can `await` it
+    directly -- `_run()` below never raises (its own `asyncio.wait_for`
+    swallows the timeout), so awaiting the returned task is itself already
+    bounded by `CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS`."""
+    two_phase = hasattr(guard, "begin_attempt")
+    generation = None
+    if two_phase:
+        generation = guard.begin_attempt(watch, start=start, end=end, now=now)
+        if generation is None:
+            # Throttled: an equivalent fresh result is already cached for
+            # this exact symbol set/window -- no attempt to invalidate, no
+            # worker to launch.
+            return None
+
+    state["in_flight"] = True
+
+    async def _run():
+        loop = asyncio.get_running_loop()
+        fut = loop.create_future()
+
+        def worker():
+            try:
+                if two_phase:
+                    guard.run_attempt(watch, generation, start=start, end=end, now=now)
+                else:
+                    guard.refresh(watch, start=start, end=end, now=now)
+            except Exception:
+                # LOW finding (fix round 6): run_attempt/refresh are not
+                # expected to raise (they catch their own source errors
+                # internally) -- but if one somehow does, the pre-allocated
+                # generation must not be left dangling: with no fail_attempt
+                # call, `_last_attempt_failed` would stay whatever it was
+                # before this attempt, so a genuinely failed refresh could
+                # be silently retried on the ordinary long `refresh_seconds`
+                # interval instead of the short `retry_seconds` one, AND no
+                # symbol would ever be marked degraded for this failure.
+                if two_phase:
+                    try:
+                        guard.fail_attempt(watch, generation)
+                    except Exception:
+                        pass  # never let a defensive cleanup call itself raise
+            finally:
+                def _resolve():
+                    if not fut.done():
+                        fut.set_result(None)
+                try:
+                    loop.call_soon_threadsafe(_resolve)
+                except RuntimeError:
+                    pass  # the loop is already closed -- the late result is simply dropped
+
+        # LOW finding (fix round 5): `Thread.start()` moved INSIDE this
+        # try/finally -- if starting the thread itself ever raised (e.g. a
+        # resource-exhaustion OSError), `state["in_flight"]` must still be
+        # reset so the NEXT tick is not permanently locked out believing a
+        # refresh that never actually started is still running.
+        try:
+            try:
+                threading.Thread(target=worker, daemon=True, name="ca-refresh").start()
+            except Exception:
+                # LOW finding (fix round 6): if starting the worker thread
+                # itself fails (e.g. a resource-exhaustion OSError), the
+                # worker's own body -- including its fail_attempt call
+                # above -- never runs at all, so the pre-allocated
+                # generation would otherwise be left permanently unresolved
+                # (never committed, never failed, never invalidated) --
+                # refreshes would then be throttled by the ordinary long
+                # `refresh_seconds` interval with nothing ever flagged.
+                if two_phase:
+                    guard.fail_attempt(watch, generation)
+                raise
+            try:
+                await asyncio.wait_for(fut, timeout=CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS)
+            except asyncio.TimeoutError:
+                if two_phase:
+                    guard.refresh_timed_out(generation, watch)
+                elif hasattr(guard, "refresh_timed_out"):
+                    guard.refresh_timed_out(watch)
+            except asyncio.CancelledError:
+                if two_phase:
+                    guard.invalidate_attempt(generation)
+                elif hasattr(guard, "refresh_timed_out"):
+                    guard.refresh_timed_out(watch)
+                raise
+        finally:
+            state["in_flight"] = False
+
+    task = asyncio.create_task(_run())
+    tasks = state.setdefault("tasks", [])
+    tasks[:] = [t for t in tasks if not t.done()]
+    tasks.append(task)
+    return task
+
+
+async def _shutdown_corporate_action_tasks(ca_refresh_state):
+    """HIGH finding 1 (fix round 3, 'keep the task and join or cancel it at
+    shutdown'): cancel and join every still-pending corporate-action
+    refresh task tracked in `ca_refresh_state["tasks"]` -- a background
+    task run_native itself spawned (via _schedule_corporate_action_refresh)
+    must never be left running, unaccounted for, past run_native's own
+    return. An ordinary function, not inlined into run_native's `finally`
+    block, specifically so it is independently unit-testable (a fully
+    hanging worker thread cannot itself be joined quickly in a test --
+    `asyncio.run()`'s own cleanup joins the default thread-pool executor
+    regardless of any Task cancellation, since Python cannot forcibly kill
+    a thread -- but a plain asyncio.sleep()-based fake task CAN be, and
+    exercises the same cancel/gather logic).
+
+    Cancelling the task only stops THIS process from waiting on the worker
+    thread further; the thread's own eventual completion (whenever it
+    happens) is still safely a no-op via the monitor's generation check
+    (see refresh_timed_out/CancelledError handling in
+    _schedule_corporate_action_refresh)."""
+    pending_ca_tasks = [t for t in ca_refresh_state.get("tasks", []) if not t.done()]
+    for t in pending_ca_tasks:
+        t.cancel()
+    if pending_ca_tasks:
+        await asyncio.gather(*pending_ca_tasks, return_exceptions=True)
+
+
+async def _preflight_corporate_action_refresh(config, session_policy, ledger, ca_refresh_state):
+    """HIGH finding 2 ("do the first fetch in preflight")/finding 1 (fix
+    round 3, "share that state with the preflight"): only meaningful (and
+    only ever attempted) when overnight_holds is enabled -- see
+    run_native's own gating of the guard (finding 8) -- so the guard's
+    cache is already warm before run_native's tick loop starts its first
+    refresh, instead of every trial's very first tick paying for a cold
+    background fetch. Uses the SAME `_schedule_corporate_action_refresh`
+    helper (and the SAME `ca_refresh_state` dict the caller also passes
+    into run_native) the tick loop uses -- an ordinary function, not an
+    inline closure inside main()'s execute(), specifically so it is
+    independently unit-testable without driving all of main() (fix round
+    3, mutation F1b: "preflight call site fetches a one-day window" --
+    only directly testable once this was its own seam). Uses the SAME wide
+    `_corporate_action_fetch_window` the tick loop uses, never a narrower
+    one-day window."""
+    guard = _corporate_action_guard_for_strategy(config, session_policy)
+    if guard is None:
+        return
+    try:
+        preflight_now = time.time()
+        preflight_session = session_at(datetime.fromtimestamp(preflight_now, timezone.utc))
+        _, preflight_start, preflight_end = _corporate_action_fetch_window(preflight_session.session_date)
+    except ValueError:
+        return
+    preflight_watch = set(config["symbols"]) | {p.symbol for p in ledger.positions().values() if p.qty}
+    preflight_task = await _schedule_corporate_action_refresh(
+        guard, preflight_watch, preflight_start, preflight_end, preflight_now, ca_refresh_state)
+    # NIT (fix round 6): `_schedule_corporate_action_refresh` returns None,
+    # not a task, when the two-phase `begin_attempt` itself reports a
+    # throttled no-op (an equivalent fresh result is already cached for
+    # this exact symbol set/window) -- e.g. a SECOND preflight call on an
+    # already-warmed monitor. `await None` raises TypeError; there is
+    # simply nothing to await in that case (a no-op is already complete).
+    #
+    # _run() inside _schedule_corporate_action_refresh never raises (its
+    # own wait_for already swallows the timeout) -- awaiting the task it
+    # returned (when one was actually created) is itself already bounded,
+    # so the preflight still blocks (as intended -- "do the first fetch in
+    # preflight") until the fetch resolves or times out, never longer.
+    if preflight_task is not None:
+        await preflight_task
+
+
+def _final_corporate_action_guard_summary(strategy, held_symbols, now):
+    """MEDIUM finding 3 (fix round 4): the run-outcome guard summary,
+    recomputed FRESH against `held_symbols` (the CURRENT holdings, read
+    right before this call) and the guard's CURRENT monitor state --
+    deliberately NOT `strategy._ca_last_must_flatten`/`_ca_last_needs_
+    attention_held`, which are only as fresh as the last rebalance() tick
+    that actually ran. A refresh that fails, times out, or is cancelled
+    AFTER that last tick (e.g. during run_native's own shutdown, just
+    before this function is called) changes the monitor's state without
+    any further rebalance() tick ever re-reading it -- reproduced by an
+    independent review's own probe: `monitor.evaluate(...)` already
+    reported `needs_attention=True` for a held symbol, while the stale
+    tick snapshot still reported `pending_needs_attention_held=[]`,
+    letting `_honest_overnight_hold` wrongly approve a `held_overnight`
+    outcome. This function calls `strategy.corporate_action_guard.
+    evaluate()` directly (the same call `_corporate_action_guard_symbols`
+    makes every tick) one more time, right here, so the outcome always
+    reflects the guard's truly final state -- never emits an event or
+    mutates the strategy (a pure read), unlike the per-tick method."""
+    guard = strategy.corporate_action_guard
+    ever_flagged = set(strategy._ca_ever_flagged)
+    if guard is None:
+        return {"enabled": False, "ever_flagged_symbols": sorted(ever_flagged),
+                "pending_must_flatten": [], "pending_needs_attention_held": []}
+    if not held_symbols:
+        return {"enabled": True, "ever_flagged_symbols": sorted(ever_flagged),
+                "pending_must_flatten": [], "pending_needs_attention_held": []}
+    try:
+        info = session_at(datetime.fromtimestamp(now, timezone.utc))
+        next_session_date = next_trading_day(info.session_date)
+    except ValueError:
+        # Fail-closed exactly like _corporate_action_guard_symbols's own
+        # ValueError branch (finding 6, round 3): every held symbol is not
+        # positively verified clear, but none is force-flattened purely
+        # because the calendar itself failed to classify this instant.
+        return {"enabled": True, "ever_flagged_symbols": sorted(ever_flagged | set(held_symbols)),
+                "pending_must_flatten": [], "pending_needs_attention_held": sorted(held_symbols)}
+    decisions = guard.evaluate(today=info.session_date, next_session_date=next_session_date,
+                               held_symbols=set(held_symbols), candidate_symbols=set(), now=now)
+    pending_must_flatten = {symbol for symbol, decision in decisions.items() if decision.must_flatten}
+    pending_needs_attention_held = {symbol for symbol, decision in decisions.items()
+                                    if decision.needs_attention and symbol in held_symbols}
+    # G9 (fix round 4): a held symbol absent from `decisions` entirely
+    # (should not happen -- evaluate() decides every held|candidate symbol
+    # -- but this function does not trust that blindly, matching
+    # _corporate_action_guard_symbols's own equivalent defensive union)
+    # counts as NOT verified, never silently "clear".
+    pending_needs_attention_held |= set(held_symbols) - set(decisions)
+    ever_flagged |= {symbol for symbol, decision in decisions.items()
+                    if decision.block_entry or decision.must_flatten or decision.needs_attention}
+    return {"enabled": True, "ever_flagged_symbols": sorted(ever_flagged),
+            "pending_must_flatten": sorted(pending_must_flatten),
+            "pending_needs_attention_held": sorted(pending_needs_attention_held)}
+
 
 async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation",
-                     log_directory=None):
+                     log_directory=None, ca_refresh_state=None):
     from native_adapter import build_node
     from native_strategy import AdaptiveStrategy
     # R5: use the same registry entries load_config already validated (and
@@ -938,9 +1536,35 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     pool, selector = strategy_pool_and_selector(config, registry_entries)
     leverage_policy = config.get("_leverage_policy")
     policy = AdaptivePolicy(policy_config, strategy_pool=pool, selector=selector, leverage_policy=leverage_policy)
+    # MEDIUM finding 8 (2026-09-24 fix round): moved up from further below
+    # so it is available here -- the corporate-action guard is now wired
+    # into the strategy ONLY when overnight_holds is actually enabled. No
+    # shipped config currently enables overnight_holds (see
+    # config*.json); wiring the guard unconditionally used to mean a
+    # regular-session-only run -- which never holds a position across a
+    # corporate-action date at all, and for which this guard's own module
+    # docstring exists specifically because of an overnight-hold gap --
+    # could still have its very first entry blocked for a whole run by a
+    # single failed first fetch it has no way to benefit from.
+    session_policy = validate_session_policy(config)
     strategy = AdaptiveStrategy(policy, controller.ledger, trial_id,
                                 event_sink=controller.events.append, transport=controller.port,
-                                account_multiplier=config.get("_account_multiplier"))
+                                account_multiplier=config.get("_account_multiplier"),
+                                halted=controller.is_halted,
+                                corporate_action_guard=_corporate_action_guard_for_strategy(
+                                    config, session_policy))
+    # HIGH finding 2/finding 1 (fix round 3): a per-run state dict (not a
+    # strategy/monitor attribute) tracking whether a background refresh
+    # thread is currently in flight, and the still-pending refresh tasks
+    # themselves -- see _schedule_corporate_action_refresh. A caller
+    # (main()'s execute(), for its own preflight fetch) can pass in an
+    # already-existing dict here so the SAME in-flight/task state is shared
+    # across the preflight fetch and this tick loop -- a preflight fetch
+    # thread still running when the tick loop starts must be visible to the
+    # tick loop's own in_flight check, not invisible because each used its
+    # own separate dict.
+    if ca_refresh_state is None:
+        ca_refresh_state = {"in_flight": False}
     # Capture actual streaming quotes before native conversion. Every native
     # strategy event still arrives through the data engine's ordinary path.
     port = controller.port
@@ -955,10 +1579,16 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     port.start = start_with_quotes
     metadata = [{"symbol": a["symbol"], "price_precision": 2, "price_increment": "0.01", "lot_size": "1"}
                 for a in assets]
-    session_policy = validate_session_policy(config)
     session = build_node(port, metadata, [strategy], account_id="ALPACA-PAPER-" + account_fingerprint[:16],
                          max_order_submit_rate="180/00:01:00", session_policy=session_policy,
                          log_directory=log_directory)
+    # A guarded order/position callback that raises stops the session here: the
+    # adapter then denies submits, the node stops, and main() recovers any residual.
+    strategy.fault_sink = session.fail
+    # E4: the startup halt seed (when main() configured one) is read while the node
+    # connects, for the symbols whose statuses the port streams; entries wait for it
+    # (halt_seed_pending, bounded).
+    controller.start_halt_seed(list(getattr(port, "symbols", None) or [m["symbol"] for m in metadata]))
     task = asyncio.create_task(session.run_async())
     started = time.monotonic()
     last_reconciliation = started
@@ -1037,7 +1667,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                 controller.stop = True
                 force_exit = True
             strategy.enabled = (strategy.started and port.ready and not force_exit
-                                and now >= controller.defer_until)
+                                and now >= controller.defer_until and not controller.halt_seed_pending())
             fresh_quotes = [q for q in controller.quotes.values()
                             if -.25 <= now - q.timestamp <= config["quote_max_age_seconds"]]
             try:
@@ -1075,6 +1705,31 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                         open_orders=len(controller.ledger.unresolved()), reconciled_at_boundary=True))
                 last_session_kind = now_kind
             if strategy.started:
+                # Trading-lane audit gap #8: refresh the corporate-action
+                # cache before this tick's rebalance() consults it.
+                # CorporateActionMonitor.refresh is internally rate-limited
+                # (refresh_seconds/retry_seconds), so calling it every tick
+                # is safe -- most calls are a no-op cache-hit check, not a
+                # request. A session this tick's clock cannot classify
+                # skips the refresh entirely; rebalance()'s own guard call
+                # still fails closed independently on the same ValueError
+                # (see native_strategy._corporate_action_guard_symbols).
+                # HIGH finding 2: the actual fetch is dispatched to a worker
+                # thread, bounded by a wait_for timeout, and never launched
+                # while a previous refresh thread is still in flight -- see
+                # _schedule_corporate_action_refresh -- so a slow/stuck
+                # alpaca-py call can never block this async trading loop.
+                if strategy.corporate_action_guard is not None and not ca_refresh_state["in_flight"]:
+                    try:
+                        ca_session = session_at(datetime.fromtimestamp(now, timezone.utc))
+                        ca_next_session, ca_start, ca_end = _corporate_action_fetch_window(ca_session.session_date)
+                    except ValueError:
+                        pass
+                    else:
+                        ca_watch = set(config["symbols"]) | {
+                            p.symbol for p in controller.ledger.positions().values() if p.qty}
+                        await _schedule_corporate_action_refresh(
+                            strategy.corporate_action_guard, ca_watch, ca_start, ca_end, now, ca_refresh_state)
                 strategy.cancel_expired(now, config["order_timeout_seconds"], all_entries=force_exit)
                 strategy.rebalance(now, force_exit=force_exit)
                 if leverage_policy is not None:
@@ -1135,16 +1790,36 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     finally:
         strategy.enabled = False
         controller.stop = True
-        session.stop()
+        # LOW finding 7 (fix round 4): _shutdown_corporate_action_tasks
+        # must run even if the halt-seed stop, session.stop(), the task
+        # wait/cancel, or port.stop() itself raises -- an ordinary exception
+        # in any of those used to skip refresh-task cleanup entirely, leaving
+        # a still-pending task retained but never cancelled/joined. Its own
+        # nested `finally` guarantees this regardless of what happens
+        # above it.
         try:
-            await asyncio.wait_for(task, 20)
-        except (asyncio.TimeoutError, asyncio.CancelledError):
-            task.cancel()
-            await asyncio.gather(task, return_exceptions=True)
-        await port.stop()
+            await controller.stop_halt_seed()
+            session.stop()
+            try:
+                await asyncio.wait_for(task, 20)
+            except (asyncio.TimeoutError, asyncio.CancelledError):
+                task.cancel()
+                await asyncio.gather(task, return_exceptions=True)
+            await port.stop()
+        finally:
+            await _shutdown_corporate_action_tasks(ca_refresh_state)
     state = asdict(controller.ledger.accounting())
     is_flat = not controller.ledger.positions() and not controller.ledger.unresolved()
     port_health = getattr(port, "health", {})
+    # MEDIUM finding 3 (fix round 4): recomputed fresh against the CURRENT
+    # held positions and the CURRENT monitor state, not the strategy's
+    # last-tick snapshot (_ca_last_must_flatten/_ca_last_needs_attention_
+    # held) -- a refresh that fails, times out, or is cancelled AFTER the
+    # last rebalance() tick (e.g. during the shutdown just above) would
+    # otherwise leave the outcome reporting a stale, already-superseded
+    # guard state. See _final_corporate_action_guard_summary's own
+    # docstring.
+    held_symbols_now = {p.symbol for p in controller.ledger.positions().values() if p.qty}
     outcome = {"engine": "NautilusTrader LiveNode 2.0.0rc5", "native_quotes": strategy.received_quotes,
               "dropped_quotes": {"by_reason": {str(k): int(v) for k, v in port_health.get("dropped_quotes", {}).items()},
                                  "by_symbol": {str(k): int(v) for k, v in port_health.get("dropped_quotes_by_symbol", {}).items()}},
@@ -1152,11 +1827,24 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
               "policy_selections": strategy.policy.counts, "accounting": state,
               "reconciliation": reconciliation, "startup_reconciliation": session.reconciliation,
               "adapter_errors": list(session.errors), "flat": is_flat,
+              "execution_stats": dict(session.execution_stats),
+              # E2's overturn condition as named receipt assertions (overturn_signals).
+              "native_assertions": session.native_assertions(),
+              "average_invariant_mismatches": list(session.average_invariant_mismatches),
+              "callback_faults": list(strategy.callback_faults), "halts": controller.halt_summary(),
               "requests": controller.requests, "events": controller.events,
               "session_policy": {"extended_hours": session_policy["extended_hours"],
                                  "overnight_holds": session_policy["overnight_holds"]},
               "boundary_receipts": boundary_receipts,
-              "elapsed_seconds": time.monotonic() - started}
+              "elapsed_seconds": time.monotonic() - started,
+              # MEDIUM finding 8 (round 3)/finding 3 (round 4): a guard
+              # summary on every run outcome, regardless of whether the
+              # guard was actually wired in this run. "pending_must_flatten"
+              # and "pending_needs_attention_held" are read by
+              # _honest_overnight_hold below -- a run cannot end
+              # "held_overnight" while either is non-empty.
+              "corporate_action_guard": _final_corporate_action_guard_summary(
+                  strategy, held_symbols_now, time.time())}
     if leverage_policy is not None:
         capital = Decimal(config["capital_usd"])
         peak_effective_leverage = (peak_gross_exposure_usd / capital) if capital else Decimal("0")
@@ -1194,8 +1882,8 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
             "peak_achieved_leverage": str(achievement_state["peak_achieved_leverage"]),
             "ceiling_at_peak_achieved_leverage": str(achievement_state["ceiling_at_peak"]),
             "seconds_above_next_lower_rung_ceiling": achievement_state["seconds_above_next_lower_rung_ceiling"]}
-    outcome["status"] = _run_native_status(reconciliation, session.errors, strategy.native_fills,
-                                           outcome, session_policy, time.time())
+    _finalize_status_and_financing(reconciliation, session.errors, strategy.native_fills, outcome,
+                                   session_policy, config, controller.ledger, baseline_cash, time.time())
     return outcome
 
 
@@ -1249,7 +1937,27 @@ def _honest_overnight_hold(outcome, session_policy, now):
         with positions still open";
       - run_native's own reconciliation succeeded (its outcome carries a
         non-None ``reconciliation``);
-      - there were no adapter errors and no risk halt.
+      - there were no adapter errors and no risk halt;
+      - MEDIUM finding 5 (2026-09-24 fix round): the corporate-action
+        guard summary (``outcome["corporate_action_guard"]``) carries no
+        ``pending_must_flatten`` symbol -- a held symbol still flagged
+        must_flatten at the run's own boundary means a confirmed
+        in-range corporate action was never actually flattened (an order
+        never filled, was rejected, or the run simply ended before the
+        engine-layer forced-sell path caught up); that is a genuine
+        failure, not an intentional overnight hold, and must instead take
+        the recovery path below.
+      - MEDIUM finding 4 (fix round 3): the same guard summary carries no
+        ``pending_needs_attention_held`` symbol -- a held symbol whose
+        corporate-action lookup failed, was ambiguous, went stale, or fell
+        outside a classifiable session for the ENTIRE run was never
+        positively verified clear for the next session. This guard's own
+        documented contract is block-and-flag, not "assume clear on
+        silence" -- not force-flattening an unverified holding is correct
+        (this module never guesses at a corporate action from partial
+        data), but reporting the run a clean "held_overnight" success
+        (exit 0) is not: it silently drops the exact needs_attention state
+        that same tick's own corporate_action_guard event already raised.
 
     Any other non-flat end must stay "needs_attention" (routed through the
     force-flat/recover path below) so a genuine failure is never silently
@@ -1262,9 +1970,60 @@ def _honest_overnight_hold(outcome, session_policy, now):
     except ValueError:
         return False
     boundary_reached = kind in (SessionKind.POST, SessionKind.CLOSED)
+    guard_summary = outcome.get("corporate_action_guard") or {}
+    guard_clear = (not guard_summary.get("pending_must_flatten")
+                  and not guard_summary.get("pending_needs_attention_held"))
     return (boundary_reached and outcome.get("reconciliation") is not None
             and not outcome.get("adapter_errors")
-            and not (outcome.get("accounting") or {}).get("halted_reason"))
+            and not (outcome.get("accounting") or {}).get("halted_reason")
+            and guard_clear)
+
+
+def _modeled_financing_block(config, ledger, baseline_cash, now):
+    """Financing: the "modeled_financing" outcome block, built only when
+    run_native's own status just decided "held_overnight" (see
+    ``_finalize_status_and_financing`` below, the only caller). Uses the
+    ledger's end-of-run open positions (their cost basis, summed) and the
+    trial's baseline cash to call financing.overnight_financing_projection
+    -- see that function's docstring for the exact debit formula and the
+    simplifying assumption (``settled_cash_usd`` is the trial's starting
+    capital, not a reconstructed post-buy running-cash figure) and
+    financing.py's module docstring for the underlying Alpaca sources.
+
+    Always labelled "evidence_class": "modeled" -- this is a projection,
+    never a broker read, and Alpaca's paper-trading docs do not confirm
+    whether paper even posts margin interest (see financing.py). The
+    "financing_plan" config key (validated in load_config; "standard" when
+    absent, every shipped config) selects the rate plan.
+    """
+    positions_cost_usd = sum((p.cost_basis_usd for p in ledger.positions().values() if p.qty), Decimal("0"))
+    trade_date = session_at(datetime.fromtimestamp(now, timezone.utc)).session_date
+    plan = config.get("financing_plan", "standard")
+    projection = overnight_financing_projection(positions_cost_usd, Decimal(str(baseline_cash)), trade_date, plan)
+    return {**projection, "evidence_class": "modeled",
+            "note": "Modeled projection only; not reconciled against the paper account -- "
+                    "Alpaca's paper-trading docs do not confirm whether paper posts margin interest."}
+
+
+def _finalize_status_and_financing(reconciliation, session_errors, native_fills, outcome,
+                                   session_policy, config, ledger, baseline_cash, now):
+    """run_native's last two outcome steps, factored out so both are
+    directly testable without driving a full native node/port (same
+    rationale as ``_run_native_status`` itself): decide ``outcome["status"]``
+    via ``_run_native_status``, then attach ``outcome["modeled_financing"]``
+    (``_modeled_financing_block``) if and only if that status is
+    "held_overnight". Mutates and returns ``outcome``.
+
+    With ``session_policy["overnight_holds"]`` False (every shipped config),
+    ``_honest_overnight_hold`` -> ``_run_native_status`` can never return
+    "held_overnight" (its first check is exactly that flag), so this never
+    adds "modeled_financing" for any shipped config -- the outcome stays
+    byte-identical to before this function existed.
+    """
+    outcome["status"] = _run_native_status(reconciliation, session_errors, native_fills, outcome, session_policy, now)
+    if outcome["status"] == "held_overnight":
+        outcome["modeled_financing"] = _modeled_financing_block(config, ledger, baseline_cash, now)
+    return outcome
 
 
 # D6 (round 8): the failed/sticky pre-recovery statuses -- see
@@ -1426,6 +2185,17 @@ def main():
         print(json.dumps(result))
         return 2
     key, secret = credentials(args.env_file)
+    # Trading-lane audit gap #8: the guard only ever acts when
+    # session_policy["overnight_holds"] is enabled (see
+    # _corporate_action_guard_for_strategy), so it is constructed only then.
+    # Construction makes no network call, but AlpacaCorporateActionsSource
+    # imports alpaca-py's data client; a regular-session run (every shipped
+    # config) therefore never needs that import or the object. Never logs or
+    # stores key/secret beyond the client object; the same env-file
+    # credential path every other broker call in this file already uses.
+    config["_corporate_action_guard"] = (
+        CorporateActionMonitor(AlpacaCorporateActionsSource(key, secret))
+        if session_policy["overnight_holds"] else None)
     attempts, responses = [], []
     def observe_request(kind, **kwargs):
         attempts.append({"timestamp": time.time(), "kind": kind})
@@ -1554,6 +2324,9 @@ def main():
                 if controller_market_open:
                     controller_close = extended_session_close(now_dt).astimezone(timezone.utc).timestamp()
             controller = Controller(ledger, controller_close, market_open=controller_market_open)
+            # E4: seed halts already in force at startup only where the stream carries
+            # statuses (SIP), since only a streamed resume can clear a seeded halt.
+            controller.halt_seed_fetch = nasdaq_halt_seed if halt_statuses_supported(config["feed"]) else None
             if args.live_dir is not None:
                 controller.events = LiveEventLog(args.live_dir / "events.jsonl")
                 # Binds this run's live record to its own ledger and kill switch for
@@ -1598,7 +2371,8 @@ def main():
                 needed = sorted(set(ledger.positions()) | {i.symbol for i in ledger.unresolved()})
                 return controller.bind(AlpacaPaperTransport(key, secret, config["symbols"],
                     before_request=controller.before_request, before_submit=controller.before_submit,
-                    sink_observation=controller.observe, request_observer=responses.append,
+                    sink_observation=controller.observe, sink_status=controller.trading_status,
+                    request_observer=responses.append,
                     quote_timeout=config["quote_max_age_seconds"], feed=config["feed"],
                     required_quote_symbols=needed if recovering and needed else config["benchmarks"],
                     history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
@@ -1612,10 +2386,13 @@ def main():
                     controller.port = fresh_port(True)
                     return await recover(controller, metadata, config)
                 controller.port = fresh_port()
+                ca_refresh_state = {"in_flight": False}
+                await _preflight_corporate_action_refresh(config, session_policy, ledger, ca_refresh_state)
                 try:
                     outcome = await run_native(controller, policy_config, observation["assets"], args.trial,
                                                config, metadata["baseline_cash"], account_fingerprint=fingerprint,
-                                               log_directory=None if args.live_dir is None else args.live_dir / "nautilus")
+                                               log_directory=None if args.live_dir is None else args.live_dir / "nautilus",
+                                               ca_refresh_state=ca_refresh_state)
                 except Exception as exc:
                     outcome = {"status": "needs_attention", "flat": False, "native_fill_events": 0,
                                "error_type": type(exc).__name__}

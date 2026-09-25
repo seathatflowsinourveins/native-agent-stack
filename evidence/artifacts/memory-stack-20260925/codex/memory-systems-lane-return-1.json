@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "kind": "blind_lane_return",
+  "lane": "codex",
+  "packet": "memory-systems",
+  "run_label": "codex-memory-systems-lane",
+  "attempt": 1,
+  "packet_sha256": "31318b2121b387e4a478456a5b794e6bf1119d100f9cb3aeeb96c17f19e6e807",
+  "model": {
+    "name": "gpt-6-astra",
+    "effort": null,
+    "family": "openai"
+  },
+  "model_note": "GPT-6 Astra as the coordinator's stage-one note names it; the retained JSON event stream does not repeat the session header, so the resolved model, the effort and the Codex CLI version are not recorded.",
+  "client": "codex exec with live web search, working directory the coordinator's lanes directory; sandbox and config flags were not retained",
+  "source_file": "memory-systems-codex.md",
+  "original_sha256": "2eb2fa3b78e8aad04ff1cc7db9175dc213df8e1eafa726ddbd12a85820d948cf",
+  "original_bytes": 6862,
+  "recorder_header": null,
+  "recorder_header_note": null,
+  "blinded_sha256": "2eb2fa3b78e8aad04ff1cc7db9175dc213df8e1eafa726ddbd12a85820d948cf",
+  "return_text": "**As of 25 September 2026, I would benchmark these five in order.** This ranks suitability for your harness and deployment. All scores below are vendor/maintainer reports; I found no independent reproduction matching your exact local configuration. Adapter descriptions are engineering proposals, not tested integrations.\n\n1. **Hindsight — strongest complete shared-memory candidate.** [MIT repository](https://github.com/vectorize-io/hindsight); latest [v0.10.1, September 21](https://github.com/vectorize-io/hindsight/releases/tag/v0.10.1), including Codex transcript/timestamp fixes. Documented [Claude Code/Codex hooks and MCP](https://hindsight.vectorize.io/sdks/integrations/coding-agents) provide automatic capture. Supports [Ollama/OpenAI-compatible inference](https://hindsight.vectorize.io/developer/configuration); operational weight is API/worker plus [PostgreSQL and vector extension](https://hindsight.vectorize.io/developer/installation).\n\n   **Evidence:** [December 14, 2025 paper](https://arxiv.org/html/2512.12818v1): LongMemEval-S **91.4% QA**, LoCoMo **89.61%**, Gemini-3 Pro answers, GPT-OSS-120B memory/judge. Current [manifest](https://raw.githubusercontent.com/vectorize-io/agent-memory-benchmark/main/results-manifest.json) reports **94.6%/92.01%** respectively and BEAM-10M single-query **64.08%**; exact run date/model are missing.\n\n   **Adapter/risk:** [Retain](https://hindsight.vectorize.io/developer/api/retain) timestamped sessions as separate documents; aggregate [ranked facts’ document IDs](https://hindsight.vectorize.io/developer/api/recall) into sessions. Extraction cost and accuracy with your smaller local models remain unmeasured.\n\n2. **Attemory — strongest directly relevant reported retrieval result; conditional on dependency verification.** [MIT repository](https://github.com/AttemorySystem/attemory); latest [v0.1.3, August 13](https://github.com/AttemorySystem/attemory/releases), evidencing continuing releases.\n\n   **Evidence:** Undated [benchmark files](https://github.com/AttemorySystem/attemory/blob/main/benchmarks/LongMemEval.md), checked today: **96.38% session recall_all@5**, cleaned LongMemEval-S/470, local Qwen3.5-9B; **83.62%** on M. These are retrieval scores, without an answer model. [LoCoMo QA](https://github.com/AttemorySystem/attemory): **94.52%**, GPT-4.1-mini answers/GPT-4o-mini judge; run date missing.\n\n   **Adapter/risk:** Reuse dated-turn ingestion and session deduplication; match assistant-turn inclusion across controls. [Runtime](https://github.com/AttemorySystem/attemory/blob/main/doc/usage.md) requires its own local Qwen/GGUF service and KV storage, outside your Ollama/OpenAI endpoint convention. Claude integration covers code search; MCP remains planned and automatic dual-client capture is unverified. The required [prebuilt core SDK](https://github.com/AttemorySystem/attemory/blob/main/CMakeLists.txt) leaves full source/licence coverage unverified.\n\n3. **GBrain — auditable retrieval challenger with native client support.** [MIT repository](https://github.com/garrytan/gbrain); latest [v0.56.2.0, September 24](https://github.com/garrytan/gbrain/releases/tag/v0.56.2.0), with active indexing/sync fixes.\n\n   **Evidence:** [September 6 evaluation](https://github.com/garrytan/gbrain-evals/blob/main/docs/benchmarks/2026-09-06-longmemeval-ranker-wave.md), v0.48.4.0: cleaned S, **449/470 = 95.53% all-session coverage within five chunks**. Uses OpenAI text-embedding-3-large and Voyage rerank-2.5; five chunks differ from five distinct sessions. Separate **86.6% QA** uses Sonnet 4.6/GPT-4o judging. Equivalent local scores are missing.\n\n   **Adapter/risk:** [Ollama providers](https://github.com/garrytan/gbrain/blob/master/docs/integrations/embedding-providers.md), Bun and embedded PGLite support local deployment. [Claude/Codex MCP and capture](https://github.com/garrytan/gbrain/blob/master/docs/guides/bootstrap.md) require bootstrap; Codex capture is SessionEnd-only. Preserve timestamps/session IDs, over-fetch chunks and deduplicate in returned order. Use one shared server owner. Published results depend on hosted models; the latest release also acknowledges an unresolved macOS reindex hang.\n\n4. **Mem0 OSS — useful extraction-plus-hybrid baseline.** [Apache-2.0 repository](https://github.com/mem0ai/mem0); latest Python [v2.2.0, September 23](https://github.com/mem0ai/mem0/releases), following September 18 updates.\n\n   **Evidence:** Undated [OSS results](https://github.com/mem0ai/memory-benchmarks): LongMemEval-S **91.0% QA**, GPT-5 extraction/answer/judge, Qwen-600M embeddings. Published **94.4% LongMemEval, 92.5% LoCoMo**, and BEAM-1M/10M average scores **0.641/0.486** belong to the managed platform.\n\n   **Adapter/risk:** [Ollama](https://docs.mem0.ai/components/llms/models/ollama) is supported; benchmark infrastructure uses API plus Qdrant. Native capture plugins target the cloud ([Claude](https://github.com/mem0ai/mem0/issues/7105), [Codex](https://github.com/mem0ai/mem0/blob/main/docs/integrations/codex.mdx)); local capture needs glue. Use fresh collections, source-session metadata and session aggregation. Encode dates in text/metadata because [OSS rejects native timestamp parameters](https://github.com/mem0ai/mem0/blob/main/mem0/memory/main.py). Cloud/OSS feature and score differences are material.\n\n5. **OpenViking — integration-focused comparison.** [AGPL-3.0 repository](https://github.com/volcengine/OpenViking); latest [v0.4.21, September 20](https://github.com/volcengine/OpenViking/releases), following September 14. Offers native [Claude](https://docs.openviking.ai/en/agent-integrations/02-claude-code)/[Codex](https://docs.openviking.ai/en/agent-integrations/04-codex) hooks+MCP, [Ollama/OpenAI-compatible providers](https://docs.openviking.ai/en/guides/01-configuration), and a server with embedded storage.\n\n   **Evidence:** [May 29 report](https://blog.openviking.ai/post/openviking-benchmark-results/), v0.3.22: LoCoMo **80.32% QA with Claude Code**, Doubao 2.0 Pro VLM; separately identified answer model missing. A [LongMemEval harness](https://github.com/volcengine/OpenViking/tree/main/benchmark/longmemeval/openviking) exists, but no verified published score was located.\n\n   **Adapter/risk:** Ingest timestamped sessions; maintain URI→session provenance and aggregate [ranked URI hits](https://docs.openviking.ai/en/concepts/07-retrieval). Risks are AGPL requirements, provenance through extraction, and Codex hook/version restrictions.\n\nFor all five, use the [official evaluator](https://github.com/xiaowu0162/LongMemEval/blob/main/src/retrieval/run_retrieval.py): fresh stores, gold labels excluded from ingestion, identical role inclusion, and five distinct returned sessions. Measure ingestion cost and latency alongside recall. No verified MemoryAgentBench results were located for these five.",
+  "output_contract_check": {
+    "shortlist_counts": {
+      "shortlist": 5
+    },
+    "shortlist_limit_per_role": 5,
+    "within_shortlist_limit": true,
+    "words_whitespace_split": 562,
+    "word_scope": "the whole return",
+    "word_limit": 900,
+    "within_limit": true
+  },
+  "sections": [
+    {
+      "heading": null,
+      "text": "**As of 25 September 2026, I would benchmark these five in order.** This ranks suitability for your harness and deployment. All scores below are vendor/maintainer reports; I found no independent reproduction matching your exact local configuration. Adapter descriptions are engineering proposals, not tested integrations.\n\n1. **Hindsight — strongest complete shared-memory candidate.** [MIT repository](https://github.com/vectorize-io/hindsight); latest [v0.10.1, September 21](https://github.com/vectorize-io/hindsight/releases/tag/v0.10.1), including Codex transcript/timestamp fixes. Documented [Claude Code/Codex hooks and MCP](https://hindsight.vectorize.io/sdks/integrations/coding-agents) provide automatic capture. Supports [Ollama/OpenAI-compatible inference](https://hindsight.vectorize.io/developer/configuration); operational weight is API/worker plus [PostgreSQL and vector extension](https://hindsight.vectorize.io/developer/installation).\n\n   **Evidence:** [December 14, 2025 paper](https://arxiv.org/html/2512.12818v1): LongMemEval-S **91.4% QA**, LoCoMo **89.61%**, Gemini-3 Pro answers, GPT-OSS-120B memory/judge. Current [manifest](https://raw.githubusercontent.com/vectorize-io/agent-memory-benchmark/main/results-manifest.json) reports **94.6%/92.01%** respectively and BEAM-10M single-query **64.08%**; exact run date/model are missing.\n\n   **Adapter/risk:** [Retain](https://hindsight.vectorize.io/developer/api/retain) timestamped sessions as separate documents; aggregate [ranked facts’ document IDs](https://hindsight.vectorize.io/developer/api/recall) into sessions. Extraction cost and accuracy with your smaller local models remain unmeasured.\n\n2. **Attemory — strongest directly relevant reported retrieval result; conditional on dependency verification.** [MIT repository](https://github.com/AttemorySystem/attemory); latest [v0.1.3, August 13](https://github.com/AttemorySystem/attemory/releases), evidencing continuing releases.\n\n   **Evidence:** Undated [benchmark files](https://github.com/AttemorySystem/attemory/blob/main/benchmarks/LongMemEval.md), checked today: **96.38% session recall_all@5**, cleaned LongMemEval-S/470, local Qwen3.5-9B; **83.62%** on M. These are retrieval scores, without an answer model. [LoCoMo QA](https://github.com/AttemorySystem/attemory): **94.52%**, GPT-4.1-mini answers/GPT-4o-mini judge; run date missing.\n\n   **Adapter/risk:** Reuse dated-turn ingestion and session deduplication; match assistant-turn inclusion across controls. [Runtime](https://github.com/AttemorySystem/attemory/blob/main/doc/usage.md) requires its own local Qwen/GGUF service and KV storage, outside your Ollama/OpenAI endpoint convention. Claude integration covers code search; MCP remains planned and automatic dual-client capture is unverified. The required [prebuilt core SDK](https://github.com/AttemorySystem/attemory/blob/main/CMakeLists.txt) leaves full source/licence coverage unverified.\n\n3. **GBrain — auditable retrieval challenger with native client support.** [MIT repository](https://github.com/garrytan/gbrain); latest [v0.56.2.0, September 24](https://github.com/garrytan/gbrain/releases/tag/v0.56.2.0), with active indexing/sync fixes.\n\n   **Evidence:** [September 6 evaluation](https://github.com/garrytan/gbrain-evals/blob/main/docs/benchmarks/2026-09-06-longmemeval-ranker-wave.md), v0.48.4.0: cleaned S, **449/470 = 95.53% all-session coverage within five chunks**. Uses OpenAI text-embedding-3-large and Voyage rerank-2.5; five chunks differ from five distinct sessions. Separate **86.6% QA** uses Sonnet 4.6/GPT-4o judging. Equivalent local scores are missing.\n\n   **Adapter/risk:** [Ollama providers](https://github.com/garrytan/gbrain/blob/master/docs/integrations/embedding-providers.md), Bun and embedded PGLite support local deployment. [Claude/Codex MCP and capture](https://github.com/garrytan/gbrain/blob/master/docs/guides/bootstrap.md) require bootstrap; Codex capture is SessionEnd-only. Preserve timestamps/session IDs, over-fetch chunks and deduplicate in returned order. Use one shared server owner. Published results depend on hosted models; the latest release also acknowledges an unresolved macOS reindex hang.\n\n4. **Mem0 OSS — useful extraction-plus-hybrid baseline.** [Apache-2.0 repository](https://github.com/mem0ai/mem0); latest Python [v2.2.0, September 23](https://github.com/mem0ai/mem0/releases), following September 18 updates.\n\n   **Evidence:** Undated [OSS results](https://github.com/mem0ai/memory-benchmarks): LongMemEval-S **91.0% QA**, GPT-5 extraction/answer/judge, Qwen-600M embeddings. Published **94.4% LongMemEval, 92.5% LoCoMo**, and BEAM-1M/10M average scores **0.641/0.486** belong to the managed platform.\n\n   **Adapter/risk:** [Ollama](https://docs.mem0.ai/components/llms/models/ollama) is supported; benchmark infrastructure uses API plus Qdrant. Native capture plugins target the cloud ([Claude](https://github.com/mem0ai/mem0/issues/7105), [Codex](https://github.com/mem0ai/mem0/blob/main/docs/integrations/codex.mdx)); local capture needs glue. Use fresh collections, source-session metadata and session aggregation. Encode dates in text/metadata because [OSS rejects native timestamp parameters](https://github.com/mem0ai/mem0/blob/main/mem0/memory/main.py). Cloud/OSS feature and score differences are material.\n\n5. **OpenViking — integration-focused comparison.** [AGPL-3.0 repository](https://github.com/volcengine/OpenViking); latest [v0.4.21, September 20](https://github.com/volcengine/OpenViking/releases), following September 14. Offers native [Claude](https://docs.openviking.ai/en/agent-integrations/02-claude-code)/[Codex](https://docs.openviking.ai/en/agent-integrations/04-codex) hooks+MCP, [Ollama/OpenAI-compatible providers](https://docs.openviking.ai/en/guides/01-configuration), and a server with embedded storage.\n\n   **Evidence:** [May 29 report](https://blog.openviking.ai/post/openviking-benchmark-results/), v0.3.22: LoCoMo **80.32% QA with Claude Code**, Doubao 2.0 Pro VLM; separately identified answer model missing. A [LongMemEval harness](https://github.com/volcengine/OpenViking/tree/main/benchmark/longmemeval/openviking) exists, but no verified published score was located.\n\n   **Adapter/risk:** Ingest timestamped sessions; maintain URI→session provenance and aggregate [ranked URI hits](https://docs.openviking.ai/en/concepts/07-retrieval). Risks are AGPL requirements, provenance through extraction, and Codex hook/version restrictions.\n\nFor all five, use the [official evaluator](https://github.com/xiaowu0162/LongMemEval/blob/main/src/retrieval/run_retrieval.py): fresh stores, gold labels excluded from ingestion, identical role inclusion, and five distinct returned sessions. Measure ingestion cost and latency alongside recall. No verified MemoryAgentBench results were located for these five."
+    }
+  ],
+  "items": [
+    {
+      "section": null,
+      "marker": "1.",
+      "name": "Hindsight — strongest complete shared-memory candidate.",
+      "text": "1. **Hindsight — strongest complete shared-memory candidate.** [MIT repository](https://github.com/vectorize-io/hindsight); latest [v0.10.1, September 21](https://github.com/vectorize-io/hindsight/releases/tag/v0.10.1), including Codex transcript/timestamp fixes. Documented [Claude Code/Codex hooks and MCP](https://hindsight.vectorize.io/sdks/integrations/coding-agents) provide automatic capture. Supports [Ollama/OpenAI-compatible inference](https://hindsight.vectorize.io/developer/configuration); operational weight is API/worker plus [PostgreSQL and vector extension](https://hindsight.vectorize.io/developer/installation).\n\n   **Evidence:** [December 14, 2025 paper](https://arxiv.org/html/2512.12818v1): LongMemEval-S **91.4% QA**, LoCoMo **89.61%**, Gemini-3 Pro answers, GPT-OSS-120B memory/judge. Current [manifest](https://raw.githubusercontent.com/vectorize-io/agent-memory-benchmark/main/results-manifest.json) reports **94.6%/92.01%** respectively and BEAM-10M single-query **64.08%**; exact run date/model are missing.\n\n   **Adapter/risk:** [Retain](https://hindsight.vectorize.io/developer/api/retain) timestamped sessions as separate documents; aggregate [ranked facts’ document IDs](https://hindsight.vectorize.io/developer/api/recall) into sessions. Extraction cost and accuracy with your smaller local models remain unmeasured."
+    },
+    {
+      "section": null,
+      "marker": "2.",
+      "name": "Attemory — strongest directly relevant reported retrieval result; conditional on dependency verification.",
+      "text": "2. **Attemory — strongest directly relevant reported retrieval result; conditional on dependency verification.** [MIT repository](https://github.com/AttemorySystem/attemory); latest [v0.1.3, August 13](https://github.com/AttemorySystem/attemory/releases), evidencing continuing releases.\n\n   **Evidence:** Undated [benchmark files](https://github.com/AttemorySystem/attemory/blob/main/benchmarks/LongMemEval.md), checked today: **96.38% session recall_all@5**, cleaned LongMemEval-S/470, local Qwen3.5-9B; **83.62%** on M. These are retrieval scores, without an answer model. [LoCoMo QA](https://github.com/AttemorySystem/attemory): **94.52%**, GPT-4.1-mini answers/GPT-4o-mini judge; run date missing.\n\n   **Adapter/risk:** Reuse dated-turn ingestion and session deduplication; match assistant-turn inclusion across controls. [Runtime](https://github.com/AttemorySystem/attemory/blob/main/doc/usage.md) requires its own local Qwen/GGUF service and KV storage, outside your Ollama/OpenAI endpoint convention. Claude integration covers code search; MCP remains planned and automatic dual-client capture is unverified. The required [prebuilt core SDK](https://github.com/AttemorySystem/attemory/blob/main/CMakeLists.txt) leaves full source/licence coverage unverified."
+    },
+    {
+      "section": null,
+      "marker": "3.",
+      "name": "GBrain — auditable retrieval challenger with native client support.",
+      "text": "3. **GBrain — auditable retrieval challenger with native client support.** [MIT repository](https://github.com/garrytan/gbrain); latest [v0.56.2.0, September 24](https://github.com/garrytan/gbrain/releases/tag/v0.56.2.0), with active indexing/sync fixes.\n\n   **Evidence:** [September 6 evaluation](https://github.com/garrytan/gbrain-evals/blob/main/docs/benchmarks/2026-09-06-longmemeval-ranker-wave.md), v0.48.4.0: cleaned S, **449/470 = 95.53% all-session coverage within five chunks**. Uses OpenAI text-embedding-3-large and Voyage rerank-2.5; five chunks differ from five distinct sessions. Separate **86.6% QA** uses Sonnet 4.6/GPT-4o judging. Equivalent local scores are missing.\n\n   **Adapter/risk:** [Ollama providers](https://github.com/garrytan/gbrain/blob/master/docs/integrations/embedding-providers.md), Bun and embedded PGLite support local deployment. [Claude/Codex MCP and capture](https://github.com/garrytan/gbrain/blob/master/docs/guides/bootstrap.md) require bootstrap; Codex capture is SessionEnd-only. Preserve timestamps/session IDs, over-fetch chunks and deduplicate in returned order. Use one shared server owner. Published results depend on hosted models; the latest release also acknowledges an unresolved macOS reindex hang."
+    },
+    {
+      "section": null,
+      "marker": "4.",
+      "name": "Mem0 OSS — useful extraction-plus-hybrid baseline.",
+      "text": "4. **Mem0 OSS — useful extraction-plus-hybrid baseline.** [Apache-2.0 repository](https://github.com/mem0ai/mem0); latest Python [v2.2.0, September 23](https://github.com/mem0ai/mem0/releases), following September 18 updates.\n\n   **Evidence:** Undated [OSS results](https://github.com/mem0ai/memory-benchmarks): LongMemEval-S **91.0% QA**, GPT-5 extraction/answer/judge, Qwen-600M embeddings. Published **94.4% LongMemEval, 92.5% LoCoMo**, and BEAM-1M/10M average scores **0.641/0.486** belong to the managed platform.\n\n   **Adapter/risk:** [Ollama](https://docs.mem0.ai/components/llms/models/ollama) is supported; benchmark infrastructure uses API plus Qdrant. Native capture plugins target the cloud ([Claude](https://github.com/mem0ai/mem0/issues/7105), [Codex](https://github.com/mem0ai/mem0/blob/main/docs/integrations/codex.mdx)); local capture needs glue. Use fresh collections, source-session metadata and session aggregation. Encode dates in text/metadata because [OSS rejects native timestamp parameters](https://github.com/mem0ai/mem0/blob/main/mem0/memory/main.py). Cloud/OSS feature and score differences are material."
+    },
+    {
+      "section": null,
+      "marker": "5.",
+      "name": "OpenViking — integration-focused comparison.",
+      "text": "5. **OpenViking — integration-focused comparison.** [AGPL-3.0 repository](https://github.com/volcengine/OpenViking); latest [v0.4.21, September 20](https://github.com/volcengine/OpenViking/releases), following September 14. Offers native [Claude](https://docs.openviking.ai/en/agent-integrations/02-claude-code)/[Codex](https://docs.openviking.ai/en/agent-integrations/04-codex) hooks+MCP, [Ollama/OpenAI-compatible providers](https://docs.openviking.ai/en/guides/01-configuration), and a server with embedded storage.\n\n   **Evidence:** [May 29 report](https://blog.openviking.ai/post/openviking-benchmark-results/), v0.3.22: LoCoMo **80.32% QA with Claude Code**, Doubao 2.0 Pro VLM; separately identified answer model missing. A [LongMemEval harness](https://github.com/volcengine/OpenViking/tree/main/benchmark/longmemeval/openviking) exists, but no verified published score was located.\n\n   **Adapter/risk:** Ingest timestamped sessions; maintain URI→session provenance and aggregate [ranked URI hits](https://docs.openviking.ai/en/concepts/07-retrieval). Risks are AGPL requirements, provenance through extraction, and Codex hook/version restrictions."
+    }
+  ],
+  "tables": [],
+  "sources_read": [
+    "https://github.com/vectorize-io/hindsight",
+    "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.1",
+    "https://hindsight.vectorize.io/sdks/integrations/coding-agents",
+    "https://hindsight.vectorize.io/developer/configuration",
+    "https://hindsight.vectorize.io/developer/installation",
+    "https://arxiv.org/html/2512.12818v1",
+    "https://raw.githubusercontent.com/vectorize-io/agent-memory-benchmark/main/results-manifest.json",
+    "https://hindsight.vectorize.io/developer/api/retain",
+    "https://hindsight.vectorize.io/developer/api/recall",
+    "https://github.com/AttemorySystem/attemory",
+    "https://github.com/AttemorySystem/attemory/releases",
+    "https://github.com/AttemorySystem/attemory/blob/main/benchmarks/LongMemEval.md",
+    "https://github.com/AttemorySystem/attemory/blob/main/doc/usage.md",
+    "https://github.com/AttemorySystem/attemory/blob/main/CMakeLists.txt",
+    "https://github.com/garrytan/gbrain",
+    "https://github.com/garrytan/gbrain/releases/tag/v0.56.2.0",
+    "https://github.com/garrytan/gbrain-evals/blob/main/docs/benchmarks/2026-09-06-longmemeval-ranker-wave.md",
+    "https://github.com/garrytan/gbrain/blob/master/docs/integrations/embedding-providers.md",
+    "https://github.com/garrytan/gbrain/blob/master/docs/guides/bootstrap.md",
+    "https://github.com/mem0ai/mem0",
+    "https://github.com/mem0ai/mem0/releases",
+    "https://github.com/mem0ai/memory-benchmarks",
+    "https://docs.mem0.ai/components/llms/models/ollama",
+    "https://github.com/mem0ai/mem0/issues/7105",
+    "https://github.com/mem0ai/mem0/blob/main/docs/integrations/codex.mdx",
+    "https://github.com/mem0ai/mem0/blob/main/mem0/memory/main.py",
+    "https://github.com/volcengine/OpenViking",
+    "https://github.com/volcengine/OpenViking/releases",
+    "https://docs.openviking.ai/en/agent-integrations/02-claude-code",
+    "https://docs.openviking.ai/en/agent-integrations/04-codex",
+    "https://docs.openviking.ai/en/guides/01-configuration",
+    "https://blog.openviking.ai/post/openviking-benchmark-results/",
+    "https://github.com/volcengine/OpenViking/tree/main/benchmark/longmemeval/openviking",
+    "https://docs.openviking.ai/en/concepts/07-retrieval",
+    "https://github.com/xiaowu0162/LongMemEval/blob/main/src/retrieval/run_retrieval.py"
+  ],
+  "event_stream": {
+    "items_completed": {
+      "agent_message": 6,
+      "command_execution": 3,
+      "web_search": 16
+    },
+    "web_search_items": 16,
+    "search_actions": 6,
+    "search_queries": 19,
+    "other_web_actions": 10,
+    "commands": [
+      {
+        "command": "/bin/zsh -lc \"pwd && rg --files -g 'memory-systems-packet.md' -g 'AGENTS.md' -g '*memory*' .\"",
+        "exit_code": 0
+      },
+      {
+        "command": "/bin/zsh -lc 'cat memory-systems-packet.md'",
+        "exit_code": 0
+      },
+      {
+        "command": "/bin/zsh -lc 'cat <agent-skills directory>/ecosystem-catalog/SKILL.md'",
+        "exit_code": 0
+      }
+    ],
+    "commands_note": "Commands as the stream records them, except that a local skills directory path is generalized to <agent-skills directory>."
+  },
+  "event_stream_page_opens": [
+    "https://github.com/AttemorySystem/attemory",
+    "https://github.com/AttemorySystem/attemory/blob/main/LICENSE",
+    "https://raw.githubusercontent.com/AttemorySystem/attemory/main/benchmarks/LongMemEval.md",
+    "https://github.com/mem0ai/mem0/releases",
+    "https://github.com/xiaowu0162/LongMemEval/blob/main/src/retrieval/run_retrieval.py",
+    "https://github.com/mem0ai/mem0",
+    "https://raw.githubusercontent.com/mem0ai/memory-benchmarks/main/README.md",
+    "https://raw.githubusercontent.com/AttemorySystem/attemory/v0.1.3/benchmarks/LongMemEval.md",
+    "https://raw.githubusercontent.com/mem0ai/memory-benchmarks/main/benchmarks/longmemeval/run.py"
+  ],
+  "event_stream_other_actions": [
+    "'longmemeval_s'"
+  ],
+  "limits": [
+    "Discovery only: the lane did web research; nothing was installed, downloaded or executed on the Mac or VelaNext.",
+    "sections, items and tables are the recorder's transcription; every string in them is an exact substring of return_text (the answer part), and return_text is authoritative.",
+    "sources_read lists the URLs the answer cites, in order of first appearance; it is not a record of pages opened.",
+    "The JSON event stream (not committed) shows 16 completed web_search items (6 searches carrying 19 queries and 10 other actions: 9 page opens and 1 find-in-page pattern) and three local commands, all exit 0: a file listing of its working directory filtered to the packet, AGENTS.md and '*memory*' names (it listed only its own packet, stderr and event files), a read of the packet, and a read of the ecosystem-catalog skill's SKILL.md from the user's agent-skills directory.",
+    "Blindness caveat: that SKILL.md belongs to the catalog tooling of the excluded agent-ecosystem repository. The stream shows no catalog query or catalog data read after it, and the lane's next message says it will use primary web sources and avoid local catalogs and prior lane outputs. No web query or open names the excluded repositories.",
+    "The coordinator's stage-one note says 16 web_search calls; the bench ledger said 32 searches. The stream shows 16 web_search items carrying 19 search queries."
+  ]
+}
