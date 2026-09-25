@@ -3,7 +3,7 @@
 **Decided by:** the agent-lab token-efficiency session, from agent-lab's record
 `docs/tasks/2026-09-25-quality-optimization.md`, sections G3, G4, H1 and H2. That record is on agent-lab's default
 branch `codex/native-expansion`, through agent-lab PRs #66 and #67. This change is on branch
-`claude/model-fallback-guard-20260925`, based on `origin/main@ae3d3d37`.
+`claude/model-fallback-guard-20260925`, rebased onto `origin/main@dcd6f0cf`.
 
 **Scope:**
 - `adoption/templates/claude.settings.template.json`. `tools/adoption/apply_claude_settings.py` merges it into a
@@ -20,8 +20,8 @@ list stay open: `CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS`, `--safe-mode` and fal
   although all six incidents below were workflow children. Changing that file also changes the recipe's embedded copy
   and the workflow contract configuration, so it is left to that recipe's owner.
 - **Agents that skip the user file.** The user-level file does not reach agents that set `omitClaudeMd: true`:
-  `adoption/agents/claude/source-scout.md`, `blind-judge.md`, `blind-lane-reviewer.md` and `blind-adjudicator.md`. It
-  does not reach Claude Code's built-in Explore either. For those agents, the StructuredOutput sentence has to be in the
+  `adoption/agents/claude/source-scout.md`, `blind-judge.md`, `blind-lane-reviewer.md` and `blind-adjudicator.md`.
+  Several of Claude Code's built-in agents also omit it, among them Explore and Plan. For those agents, the StructuredOutput sentence has to be in the
   agent body. That change is on the rollout's contract track for `adoption/agents/claude/`, and until it lands a new
   host's `source-scout` children do not get the rule.
 
@@ -31,20 +31,25 @@ list stay open: `CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS`, `--safe-mode` and fal
    - When Opus 5.5's or a Fable model's safeguards flag a request, the request is not re-run on an older model.
      Without the guard, a cybersecurity flag re-runs it on Opus 4.8 and a biology flag re-runs it on Opus 5. This holds
      in the main thread and in every subagent, per the Claude Code 2.1.282 client code; it was not probed.
-   - The request ends in a refusal. The exception is a client experiment arm that silently retries on the refusing
+   - The request ends in a refusal. The exception is a server-armed silent-retry lane, which retries on the refusing
      model itself (see Evidence).
 2. The example user-level `CLAUDE.md` gets two sentences.
    - Workers return StructuredOutput with the schema fields at the top level of the call arguments, never wrapped in an
      `input`, `output` or `result` key.
-   - A worker that returns null or incomplete output may have been stopped by a safety flag. The coordinator edits the
+   - When a worker returns null or incomplete output, the coordinator first checks the worker's transcript for a
+     safety refusal, because session limits and other errors also produce null results. After a refusal it edits the
      brief and retries on the current model, the documented pause option, and never accepts an older model's answer
      in its place.
 3. **Template precedence.**
    - Applying the template sets both keys whatever the host had, as it already does for `model` and `effortLevel`. A
      re-apply resets a host that set `switchModelsOnFlag: true` or the variable to `"0"`.
-   - While the variable is set, `/config` hides the "Switch models when a message is flagged" toggle, because the
-     client's `MQt()` returns `WM()`.
-   - A host that wants the automatic switch removes both keys from its rendered template before applying it.
+   - The client passes `MQt()`, which returns `WM()`, as `refusalFallbackSettingToggleVisible`. agent-lab's reading is
+     that `/config` then hides the "Switch models when a message is flagged" toggle while the variable is set. That
+     path was not traced to the UI here.
+   - A host that wants the automatic switch sets `switchModelsOnFlag` to `true` and the variable to `"0"` in its
+     rendered template before applying it. The client parses the variable as a boolean (`M.bool`). Removing the two
+     keys is not enough on a host that already applied them, because the merge keeps keys that the template no longer
+     mentions.
 
 ## Evidence
 
@@ -60,14 +65,19 @@ list stay open: `CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS`, `--safe-mode` and fal
   - With `switchModelsOnFlag` set to `false`, "a flagged request then pauses the session with two options: switch to
     the fallback model, or edit the prompt and retry on the current model."
 - **Client code (2.1.282).**
-  - `UQt(e)` returns `"subagent"` for any thread other than the main one before it reads `switchModelsOnFlag`. The
-    ask-first path, `wpo()`, requires `e.isMainThread`. The setting therefore governs only the main thread, and it
-    alone would have stopped none of the six incidents.
+  - `UQt(e)` returns `"subagent"` for any thread other than the main one before it reads `switchModelsOnFlag`, so a
+    subagent's fallback runs without asking.
+  - The setting is also read in three other places, and none of them stops a subagent's fallback:
+    - `wpo()` suppresses the fallback, but only on the main thread when no dialog can be shown;
+    - the server lane, `apo()`;
+    - `Spo()`.
+  - The setting alone therefore would have stopped none of the six incidents.
   - `WM()` is `!CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK && …`. Fallback target selection, `aHn()`, picks a target only
     when `WM()` is true.
-  - The request handler runs on `(WM()||me)`, where `me` is a silent-retry attempt. That lane is armed by `Pbr()`,
-    which checks an experiment flag (`fRt()`) and returns the refusing model itself. With the variable set, the only
-    remaining retry is therefore on the same model, never on an older one.
+  - The request handler runs on `(WM()||me)`, where `me` is a silent-retry attempt. That lane is armed by the server:
+    `Vpe()` checks the model configuration (`convolute_arcades`) or a response header (`x-cc-tender-quilt`), and
+    `Pbr()` then returns the refusing model itself. With the variable set, the only remaining retry is therefore on
+    the same model, never on an older one.
   - The setting's own description in the client: "When safeguards flag a message, automatically switch to a different
     model to keep chatting. When off, your session will pause instead."
 - **Undocumented variable.** `CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK` is in the client's env-var registry but not on
@@ -76,8 +86,10 @@ list stay open: `CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS`, `--safe-mode` and fal
 
 ### StructuredOutput (`native_proven` on the WSL authoring laptop)
 
-- **Baseline (G3).** Of agent-lab's first 3,275 workflow children, 251 had at least one StructuredOutput schema error.
-  `source-scout` had 54 of 266 (20.3%).
+- **Baseline (G3).**
+  - Of agent-lab's first 3,275 workflow children (cut at 2026-09-24T03:24:08Z), 251 had at least one StructuredOutput
+    schema error.
+  - Among Sonnet children started before 2026-09-25T14:44:03Z, 54 of 266 `source-scout` children had one (20.3%).
 - **Interleaved A/B (G4, run `wf_134a2bb7-819`).**
   - Setup: 60 Sonnet 5 children at effort max, a six-field builder-shaped schema and the same read-and-report task.
     The sentence was appended in the treatment arm only.
@@ -94,18 +106,18 @@ list stay open: `CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS`, `--safe-mode` and fal
 
 1. **Keep the automatic switch.** Rejected. The workflow requires the latest models, and on 2026-09-24 a silent
    downgrade led a review to be recorded as "verified on 5.5" when one verifier had run on Opus 4.8.
-2. **`switchModelsOnFlag: false` alone.** Insufficient, because it never reaches subagents. It is kept as the documented
+2. **`switchModelsOnFlag: false` alone.** Insufficient, because it cannot stop a subagent's fallback. It is kept as the documented
    backstop: inert while the variable is set, and it governs the main thread again if a future client stops reading
    the variable.
 3. **An `availableModels` allowlist that excludes Opus 4.8 and Opus 5.** The docs say an excluded fallback target does
-   not run, so the flagged request ends with a refusal ("Restrict model selection"), and this would be documented and
-   subagent-wide. It is rejected for this profile for two reasons:
+   not run, so the flagged request ends with a refusal ("Restrict model selection"). This is documented, and the docs
+   do not limit it to the main session. It is rejected for this profile for two reasons:
    - The family alias `opus` is a wildcard over Opus versions. Excluding older ones takes version prefixes or full IDs
      such as `claude-opus-5-5`, which disable that family's wildcard. The next Opus release would then stay excluded
      until someone edits the list, which works against always running the latest model.
    - It also restricts the `/model` picker.
 4. **The StructuredOutput rule in agent bodies only.** This is required for the `omitClaudeMd` agents listed under
-   Scope and stays on the rollout's track. The user-level file covers every other session and workflow child.
+   Scope and stays on the rollout's track. The user-level file covers the other agents and workflow children.
 
 ## Comparison that would overturn it
 
@@ -126,8 +138,8 @@ probe, `tools/compare/effort/max-ultracode-probe.sh --check-fallback-guard`, exi
 reads the variable. That probe checks only the `WM()` read; it does not detect a widened silent-retry lane.
 
 This catalog has no automated counterpart yet, so a host that follows only the catalog is not watched until one exists.
-The natural home is the adoption status check's client-wiring report. Until then, a host can check its installed
-client by hand:
+Open PR #264 proposes a `--client-wiring` report for `scripts/adoption_status.py`. If it merges, that report is the
+natural home; otherwise this needs a new check. Until then, a host can check its installed client by hand:
 
 ```sh
 grep -a -c '!.\{1,4\}\.CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK&&' "$(readlink -f ~/.local/bin/claude)"
