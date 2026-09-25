@@ -516,11 +516,13 @@ summarizes.
   own number, same as the first pass); `python3 scripts/validate.py` and
   `python3 scripts/validate_foundation.py` (both still pass, after the
   `manifests/evidence.json` re-pin above); `python3 -m unittest discover -s
-  tests` under `ecosystem-bounded-run` (this repository's full suite,
-  4746 tests): 9 pre-existing failures, all `INT`-signal cases in
-  `tests/test_adoption_bootstrap_macos.py` and
+  tests` under `ecosystem-bounded-run` (this repository's full suite, run
+  directly against this round's own commits, not just cited from an earlier
+  check): 4760 tests (4746 before this round's 14 new tests in
+  `tests/test_codex_broker_reaper.py`), 9 pre-existing failures, all
+  `INT`-signal cases in `tests/test_adoption_bootstrap_macos.py` and
   `tests/test_adoption_launchd.py`, untouched by this track's diff (which
   only touches `adoption/tools/`, `docs/decisions/`,
-  `tests/test_codex_broker_reaper.py`, `manifests/evidence.json`) and
-  reproduced on an unrelated worker's checkout of the same base commit —
-  not this track's regression.
+  `tests/test_codex_broker_reaper.py`, `manifests/evidence.json`) — the same
+  9, by name, as an unrelated worker's checkout of the same base commit
+  reported before this round began; not this track's regression.
