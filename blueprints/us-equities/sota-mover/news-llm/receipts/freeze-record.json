@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "kind": "news_llm_freeze_record",
+  "protocol_id": "sota-mover-news-llm-20260925",
+  "protocol_sha256": "bba1b157e607f3a29f88bb82af44b4b7f2a754f1dc8266c883989c9fc2fddb37",
+  "protocol_commit": "70bd2b849fb989b764b68bb4bf778e38837d55c4",
+  "frozen_at": "2026-09-25T09:41:12Z",
+  "reviewer": "evidence-reviewer subagent (opus), independent of the builder; coordinator Claude session agent-lab-ea",
+  "review_verdict": "freeze_ready_after_fixes at fa2b06b7; not_freeze_ready (parse failures) at 6c558902; freeze_ready on re-check of feb649dc",
+  "outcomes_computed_before_freeze": false
+}
