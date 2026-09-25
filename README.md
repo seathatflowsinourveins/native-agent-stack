@@ -63,8 +63,8 @@ analysis. [Ten-source review and current star delta](catalogs/convergence-practi
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and its retained **357-star coverage ledger**. Its current combined index includes
-**857 repository identities**, including the 357 public stars and
-500 identities beyond them (`python3 scripts/catalog_decisions.py --check` prints the current counts),
+**861 repository identities**, including the 357 public stars and
+504 identities beyond them (`python3 scripts/catalog_decisions.py --check` prints the current counts),
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.

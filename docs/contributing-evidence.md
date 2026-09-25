@@ -214,7 +214,20 @@ Every receipt also names one `stage`. Two decide a platform status:
    excerpt (the name only as a whole token, so a short one such as `ed` is
    not cut out of `used`), writes the receipt under `evidence/hosts/<host_id>/`, and
    registers it in `manifests/evidence.json`. It never uploads anything over
-   the network. `--os`/`--architecture` default to the actual host's values
+   the network. A receipt is never overwritten: recording the same
+   host/component/stage again on the same day -- "same day" means the same
+   `yyyymmdd` carried in the receipt's own `id`, not any other clock --
+   refuses (exit 2, naming the existing file and its review kinds/verdicts,
+   and the latest existing generation to supersede) instead of silently
+   erasing it and any appended independent review. Pass `--supersedes
+   <existing-receipt-id>` to record a new receipt for that same
+   host/component/stage/date instead: `--supersedes` must name the *latest*
+   existing generation (superseding an older one while a newer one already
+   exists is refused, naming the actual latest), writes the next free `-N`
+   generation of the base id (for example, once `X-2` exists, superseding it
+   writes `X-3`, not another `X-2`), records `supersedes` in the new
+   receipt, and leaves the original file byte-identical.
+   `--os`/`--architecture` default to the actual host's values
    but can be overridden; nothing in this repository can verify from the
    receipt's JSON alone that a claimed `platform_id`,
    `second_physical_machine` or `os`/`architecture` combination is honest —

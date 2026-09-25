@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CATALOG_FRESHNESS = ROOT / ".github/workflows/catalog-freshness.yml"
 VALIDATE = ROOT / ".github/workflows/validate.yml"
 SUPPLY_CHAIN = ROOT / ".github/workflows/supply-chain.yml"
-REQUIREMENTS_LOCK = ROOT / ".github/requirements-ci.lock"
+REQUIREMENTS_LOCK = ROOT / ".github/requirements-ci.txt"
 
 
 def _freshness_spec_table() -> dict[str, tuple[str, str]]:
@@ -85,7 +85,7 @@ class CatalogFreshnessPinTableTests(unittest.TestCase):
         _, table_pin = self.table["zizmor"]
         lock_text = REQUIREMENTS_LOCK.read_text()
         match = re.search(r"zizmor==([\w.]+)", lock_text)
-        self.assertIsNotNone(match, "requirements-ci.lock no longer pins zizmor")
+        self.assertIsNotNone(match, "requirements-ci.txt no longer pins zizmor")
         self.assertEqual(table_pin, match.group(1))
 
 

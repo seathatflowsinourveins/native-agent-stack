@@ -57,7 +57,14 @@ release, the note is history and the step is in your checkout (`test -e
    exits 3 here.
 3. Native sign-in and config rendering: [`adoption/bootstrap.md`](../bootstrap.md)
    steps 3–4 (Codex, Claude and GitHub device flows; `tools/adoption/render_config.py`
-   with this host's own `adoption/hosts/<host>.json`).
+   with this host's own `adoption/hosts/<host>.json`). Its step 4a installs
+   Serena and jcodemunch-mcp into the ecosystem prefix, registers the
+   user-scope MCP servers (`ai-memory` and `serena`) and gives jCodeMunch's
+   per-project opt-in. The MCP template `adoption/mcp/claude-user.json`
+   changed after `v2026.09.24.1`: the tag's `serena` entry names a
+   `serena-context` wrapper that nothing installs, and main's runs
+   `${ECO_ROOT}/bin/serena`; the tag also registers `jcodemunch` at user
+   scope, which main leaves to each project.
 4. launchd services and the embedding acceptance ("launchd services" and
    "Embedding backend decision" below).
 5. `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile macos-arm64-foundation --json`
@@ -240,7 +247,9 @@ install 2.1.280`, exactly mirroring `adoption/pins-linux-x86_64.json`'s own
 existing claude-code step. There is no more nested platform package, no
 `install.cjs` postinstall to defer, and no `postinstall_binary_check`; the
 native binary manages its own version directory and launcher and keeps
-auto-updating on the latest channel afterward.
+auto-updating on the latest channel afterward. (`adoption/pins-linux-x86_64.json`
+changed after `v2026.09.24.1` in `install_note` text only; its `claude-code`
+pin is unchanged.)
 
 `llama-server` is a profile `required_command`, so llama.cpp is pinned rather
 than left to `brew install llama.cpp`. The macOS asset holds every executable
