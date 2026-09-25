@@ -3,38 +3,60 @@
   "id": "native-rollout-20260925-sim-historical-simulation",
   "kind": "native_cli_e2e",
   "component_ids": ["lean"],
-  "status": "not_run_blocked_on_lean_build",
-  "claim": "The six-scenario LEAN historical-simulation replay could not be run on lean-985ef30-r20260925: the solution build blocked (see evidence/artifacts/native-rollout-20260925/sim/lean.json). This receipt records the frozen oracle verified directly from the source files, so the comparison this track was asked to make is on record even though it could not be executed.",
+  "status": "ran_twice_matched_oracle",
+  "claim": "The six-scenario LEAN historical-simulation replay ran twice (independent fresh processes) on lean-985ef30-r20260925 after this fix round resolved the dotnet build blocker (see lean.json). Both runs exited 0. Every economic/behavioral field this track was asked to compare -- native_end_equity_usd, fees, dividends, fill/margin-call counts, and max_observed_drawdown to full decimal precision, plus the full order/intent/margin-call/audit ledgers -- matched the frozen 2026-09-19 oracle exactly, for both runs. Of the 24 recorded artifact hashes, 12 (events_sha256, audit_sha256 for all 6 cases) matched the oracle and each other exactly; the other 12 (summary_sha256, native_result_sha256) did not, because those two files embed a wall-clock StartTime/EndTime, a 'Used RAM (MB)' measurement, and one generated GUID -- confirmed by diffing the two fresh runs' underlying JSON, which differ in nothing else at all.",
   "track": "sota-rollout-20260925/w1/sim",
   "base_commit": "57fb6d89",
-  "frozen_oracle_source": "blueprints/us-equities/historical-simulation/{README.md,plan.json,receipt.json} (2026-09-19)",
+  "frozen_oracle_source": "blueprints/us-equities/historical-simulation/receipt.json (2026-09-19), exact field values transcribed directly from the file, not the README's rounded display table",
   "frozen_oracle_correction": {
     "brief_claim": "six SPY scenarios vs nine oracle hashes",
     "verified_from_file": "Six scenarios confirmed. Each scenario's receipt.json entry carries exactly four artifact hashes (summary_sha256, events_sha256, audit_sha256, native_result_sha256): 6 x 4 = 24 recorded hashes, not nine. Reported as a correction, not assumed from the brief's paraphrase."
   },
-  "frozen_oracle_verified_fields": {
-    "one_zero": {"native_end_equity_usd": "90734.08", "fees_usd": "0", "dividends_usd": "428.64", "drawdown_pct": "33.98", "fills": 2, "margin_liquidations": 0},
-    "one_stress": {"native_end_equity_usd": "90358.00", "fees_usd": "2", "dividends_usd": "428.64", "drawdown_pct": "34.04", "fills": 2, "margin_liquidations": 0},
-    "two_zero": {"native_end_equity_usd": "76310.34", "fees_usd": "0", "dividends_usd": "613.35", "drawdown_pct": "58.52", "fills": 5, "margin_liquidations": 3},
-    "two_stress": {"native_end_equity_usd": "75607.75", "fees_usd": "5", "dividends_usd": "610.53", "drawdown_pct": "58.65", "fills": 5, "margin_liquidations": 3},
-    "adaptive_stress": {"native_end_equity_usd": "95324.10", "fees_usd": "3", "dividends_usd": "211.50", "drawdown_pct": "19.40", "fills": 3, "margin_liquidations": 0},
-    "over_limit": {"native_end_equity_usd": "100000.00", "fees_usd": "0", "dividends_usd": "0", "drawdown_pct": "0", "fills": 0, "margin_liquidations": 0}
+  "frozen_oracle_exact_fields": {
+    "one_zero": {"end_cash_usd": "90734.080", "native_end_equity_usd": "90734.08", "fees_usd": "0.0", "dividends_usd": "428.64", "fill_count": 2, "margin_call_count": 0, "max_observed_drawdown": "0.3398044743988061746214252514"},
+    "one_stress": {"end_cash_usd": "90357.995840", "native_end_equity_usd": "90358.00", "fees_usd": "2.0", "dividends_usd": "428.64", "fill_count": 2, "margin_call_count": 0, "max_observed_drawdown": "0.3404477819941050938741295816"},
+    "two_zero": {"end_cash_usd": "76310.340", "native_end_equity_usd": "76310.34", "fees_usd": "0.0", "dividends_usd": "613.35", "fill_count": 5, "margin_call_count": 3, "max_observed_drawdown": "0.585196354221566353958047855"},
+    "two_stress": {"end_cash_usd": "75607.752140", "native_end_equity_usd": "75607.75", "fees_usd": "5.0", "dividends_usd": "610.53", "fill_count": 5, "margin_call_count": 3, "max_observed_drawdown": "0.5865089430356140845215034269"},
+    "adaptive_stress": {"end_cash_usd": "95324.104760", "native_end_equity_usd": "95324.10", "fees_usd": "3.0", "dividends_usd": "211.50", "fill_count": 3, "margin_call_count": 0, "max_observed_drawdown": "0.1940055040180580456724561525"},
+    "over_limit": {"end_cash_usd": "100000.00", "native_end_equity_usd": "100000", "fees_usd": "0", "dividends_usd": "0.00", "fill_count": 0, "margin_call_count": 0, "max_observed_drawdown": "0.0", "note": "expected_buying_power_rejection: one Invalid order intent, zero fills, by design"}
   },
-  "planned_method": {
-    "commands": [
-      {"argv": ["python3", "blueprints/us-equities/historical-simulation/run.py", "--lean-source", "${LEAN_SOURCE}", "--dotnet", "${DOTNET_ROOT}/dotnet", "--out", "${PRIVATE_RUN_DIR}/sim/historical-simulation-run-1"], "status": "not_executed"},
-      {"argv": ["python3", "blueprints/us-equities/historical-simulation/run.py", "--lean-source", "${LEAN_SOURCE}", "--dotnet", "${DOTNET_ROOT}/dotnet", "--out", "${PRIVATE_RUN_DIR}/sim/historical-simulation-run-2"], "status": "not_executed", "note": "Independent fresh-process re-run per brief step 3, to be compared with a local comparator that excludes wall-clock-only fields, the same approach validated on the equity-replay track's economic-only hash."}
-    ],
-    "comparator_prepared": "identity-preserving hash + economic-field comparison script prepared (not yet run): checks native_end_equity_usd, fees_usd, dividends_usd, fill_count, margin_calls length against both the oracle table above and between the two runs, plus the four per-case artifact hashes for run-to-run equality."
+  "frozen_oracle_hashes": {
+    "one_zero": {"summary_sha256": "d1b136f013c20578d8c191b0319e1d950b74088df032d3f30fd04fcb0b973bee", "events_sha256": "e5c8a1f18a3591e0fd334669a3ed2d82f3377b48687d2564e21affe0eb8f0133", "audit_sha256": "92e0a9354ae413a23e39c0b2658a20854e2b2c3fa69f94073cc1706e43627dcb", "native_result_sha256": "17f01267d2f88eb53b0abe5e4f0b49532adebd7478fa2097b74fefd0fb08bfd6"},
+    "one_stress": {"summary_sha256": "a89830fedf930e4a1a92249a1161c23926be0c3d2f72301dd51a5da7e8a1440b", "events_sha256": "c489d559d66f386381cc68d209c9087b50b6039460f98a30a90c3d345e5ab606", "audit_sha256": "a3bf226d9244c77e5683b0464f7512e59cf1df51357b37c4c5fffffe738d9bd5", "native_result_sha256": "c889380fbff1d95b292978da46492affaa212ae0a2c6aaf8507f27c693380c6b"},
+    "two_zero": {"summary_sha256": "57face1bdaa2c2e242e4f08df7c9cfca8a11d213ca9a229faff87d15587e8ca9", "events_sha256": "042b637e4e5a778fda70a9b229d7813028e90c3e42804a3e5b79d8f17341c290", "audit_sha256": "f1c56d7f711a1d3216969d34f004039a7eed1b5f8080ecc830ae6aefa1161692", "native_result_sha256": "9efce2870f577f8dbbe31de978a7916af5cb205c6c05b74b8128a239b89d17a6"},
+    "two_stress": {"summary_sha256": "5efe53d4d469bda49395fb6e440a0d535dcb4e06cfd4eec42e05babe41917174", "events_sha256": "b9ee692244bf855b7010771cc7064b77a0f80f634918730fae6d17787ccdde88", "audit_sha256": "fa7aebd8fc3bcf7d92bfe34c04633d74dc278c52d86f07e2b1785e566b27d30b", "native_result_sha256": "d7c22d913f28518fcf53cbb32fae5a5838dfdec476974a6c849de75b8b73f721"},
+    "adaptive_stress": {"summary_sha256": "87c91f746da52f5c7cb8551793164563044c732174fa8aa62c1613510564b3f5", "events_sha256": "c0ec9f05b8c66ef5334acb84dc1e577ddff48cf5ddbe6e82964c9ba8f485fc1d", "audit_sha256": "82935c33a035276ed35caf03476cf11120214426d4e76546e4130f7e30025c11", "native_result_sha256": "5f77dc22d2fa5d638bf9a53bd0577bf67e00cc1e3fd9485bc92cfa76813983f5"},
+    "over_limit": {"summary_sha256": "2196ed0220dc801f0b46ff97281262c39578c163e60c1e06d46f4eab10644a9e", "events_sha256": "139313001294917bae7a03ee9ad6d5c0f3f428f988b259f1261206910e3794aa", "audit_sha256": "b26b715d71cc3ac599a9243725aa0dccca77736690ff08a370fba724c431d819", "native_result_sha256": "1ab75f400d8ae330b544d32c01bba898e9e620811ee7dc0f77418d9be3b4c794"}
   },
-  "blocker": {
-    "cause": "lean-985ef30-r20260925's dotnet build did not complete (see lean.json in this directory for the full attempt log and diagnostic evidence)",
-    "market_data_or_orders_involved": false,
-    "note": "Bundled upstream LEAN sample data only; no new data acquisition was attempted or needed for this step."
+  "commands": [
+    {"label": "run-1", "argv": ["python3", "blueprints/us-equities/historical-simulation/run.py", "--lean-source", "${LEAN_SOURCE}", "--dotnet", "${DOTNET_ROOT}/dotnet", "--out", "${PRIVATE_RUN_DIR}/sim/historical-simulation-run-1"], "exit_code": 0, "mounted_input_files": 1467, "mounted_inputs_unchanged": true, "frozen_plan_sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"},
+    {"label": "run-2", "argv": ["python3", "blueprints/us-equities/historical-simulation/run.py", "--lean-source", "${LEAN_SOURCE}", "--dotnet", "${DOTNET_ROOT}/dotnet", "--out", "${PRIVATE_RUN_DIR}/sim/historical-simulation-run-2"], "exit_code": 0, "mounted_input_files": 1467, "mounted_inputs_unchanged": true, "frozen_plan_sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632", "note": "Independent fresh-process re-run per brief step 3; a fresh compile of HistoricalSimulation.dll and a fresh Launcher invocation per case, not a cached replay of run-1."}
+  ],
+  "results_per_case": {
+    "one_zero": {"native_end_equity_usd": "90734.08", "fill_count": 2, "invalid_count": 0, "max_observed_drawdown": "0.3398044743988061746214252514", "matches_oracle_exact_fields": true, "matches_between_runs_exact_fields": true, "events_sha256_matches_oracle": true, "audit_sha256_matches_oracle": true, "summary_sha256_matches_oracle": false, "native_result_sha256_matches_oracle": false},
+    "one_stress": {"native_end_equity_usd": "90358.00", "fill_count": 2, "invalid_count": 0, "max_observed_drawdown": "0.3404477819941050938741295816", "matches_oracle_exact_fields": true, "matches_between_runs_exact_fields": true, "events_sha256_matches_oracle": true, "audit_sha256_matches_oracle": true, "summary_sha256_matches_oracle": false, "native_result_sha256_matches_oracle": false},
+    "two_zero": {"native_end_equity_usd": "76310.34", "fill_count": 5, "invalid_count": 0, "max_observed_drawdown": "0.585196354221566353958047855", "matches_oracle_exact_fields": true, "matches_between_runs_exact_fields": true, "events_sha256_matches_oracle": true, "audit_sha256_matches_oracle": true, "summary_sha256_matches_oracle": false, "native_result_sha256_matches_oracle": false},
+    "two_stress": {"native_end_equity_usd": "75607.75", "fill_count": 5, "invalid_count": 0, "max_observed_drawdown": "0.5865089430356140845215034269", "matches_oracle_exact_fields": true, "matches_between_runs_exact_fields": true, "events_sha256_matches_oracle": true, "audit_sha256_matches_oracle": true, "summary_sha256_matches_oracle": false, "native_result_sha256_matches_oracle": false},
+    "adaptive_stress": {"native_end_equity_usd": "95324.10", "fill_count": 3, "invalid_count": 0, "max_observed_drawdown": "0.1940055040180580456724561525", "matches_oracle_exact_fields": true, "matches_between_runs_exact_fields": true, "events_sha256_matches_oracle": true, "audit_sha256_matches_oracle": true, "summary_sha256_matches_oracle": false, "native_result_sha256_matches_oracle": false},
+    "over_limit": {"native_end_equity_usd": "100000", "fill_count": 0, "invalid_count": 1, "max_observed_drawdown": "0.0", "matches_oracle_exact_fields": true, "matches_between_runs_exact_fields": true, "events_sha256_matches_oracle": true, "audit_sha256_matches_oracle": true, "summary_sha256_matches_oracle": false, "native_result_sha256_matches_oracle": false}
   },
+  "oracle_comparison": {
+    "method": "Deep structural diff of each run's full results.json (every intent, fill, margin call, reduction, and the max_observed_drawdown/max_observed_gross Decimal strings to full precision) against the frozen receipt.json table above, plus a byte-for-byte comparison of all 24 recorded hashes.",
+    "exact_field_result": "0 mismatches across all 6 cases, both runs, against the frozen oracle: every field in frozen_oracle_exact_fields reproduced exactly.",
+    "hash_result": "12 of 24 hashes matched exactly (events_sha256, audit_sha256 for all 6 cases, both runs, and the 2026-09-19 oracle). The other 12 (summary_sha256, native_result_sha256) did not match the oracle and also differed between run-1 and run-2 on this same root.",
+    "hash_mismatch_root_cause": "A full structural diff of run-1 vs run-2's results.json found exactly 12 differing leaves -- precisely those 12 hash fields and nothing else (every economic/behavioral field, to full Decimal-string precision, was byte-identical between the two independent runs). Directly diffing the underlying files showed the only differences are HistoricalSimulationAlgorithm-summary.json's/HistoricalSimulationAlgorithm.json's own 'StartTime', 'EndTime', 'Used RAM (MB)' fields (wall-clock/runtime measurements LEAN writes into its own result files) plus one generated GUID in the full result JSON. This is the same category of field the equity-replay track's frozen oracle explicitly excludes from reoccurrence claims ('Generated identities are not claimed to repeat'); LEAN's summary/result files were not previously known to embed wall-clock fields, so this receipt records the finding rather than assuming a byte-for-byte match.",
+    "result": "The six-scenario replay is accepted as matching its oracle on every economic/behavioral field with 0 mismatches; the 12/24 hash mismatches are attributed to specific, identified, non-economic fields (not a silent partial match)."
+  },
+  "reoccurrence_verification": {
+    "twice_identical_economic_fields": true,
+    "twice_identical_ledger_hashes": "events_sha256 and audit_sha256 identical across both runs for all 6 cases",
+    "twice_differing_hashes_explained": "summary_sha256 and native_result_sha256 differ across runs solely due to StartTime/EndTime/Used RAM (MB)/one generated GUID, verified by a full diff of the underlying JSON files (no other differences found)."
+  },
+  "blocker_history": "Prior to this fix round, lean-985ef30-r20260925's dotnet build did not complete (0 of 2 required runs); see lean.json for the build blocker's diagnosis and this round's fix.",
   "limitations": [
-    "No E2E execution occurred on the new root for this component; every field in this receipt outside frozen_oracle_verified_fields describes what was planned, not what was measured.",
-    "This receipt exists so the required oracle verification and planned method are on record, per brief step 4, rather than omitting the file for the blocked component."
+    "Retrospective frozen-data stress scenarios on bundled upstream LEAN sample data, not a live/paper broker execution or a claim of forward profitability (same scope as the original blueprint).",
+    "summary_sha256/native_result_sha256 cannot be claimed to reproduce byte-for-byte in future runs on this root either, since they embed a wall-clock timestamp and RAM measurement by construction; future comparisons on this track should use events_sha256/audit_sha256 plus the exact economic fields, not all 24 hashes.",
+    "Run-to-run determinism was exercised twice on one root in one session; longer-horizon determinism (different day, different host load, a dotnet/OS update) was not exercised."
   ],
   "sanitization": "Host paths use ${LEAN_SOURCE}, ${DOTNET_ROOT}, ${PRIVATE_RUN_DIR} placeholders. No credential values or session identifiers appear in this receipt."
 }

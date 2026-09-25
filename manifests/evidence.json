@@ -26720,23 +26720,23 @@
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/adaptive-paper.json",
-      "sha256": "469edb81b8e76820026ee69cbe864dcbb4768cbaea07663028a8e24ea4cfb17d",
-      "bytes": 4180
+      "sha256": "1589c0b6fd2dd093fcfeabe94989436c05d768f5d43f0c65c67eb0ce20f6f984",
+      "bytes": 4772
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/equity-replay.json",
-      "sha256": "2af45a22d77ba306c18a401529505b8dfe57d44308c15cc979285597969c8f89",
-      "bytes": 7301
+      "sha256": "4493edb858b458d3466ba6b7fbefce1ced6f9d2553c667a54138b0c811abfb5a",
+      "bytes": 8726
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/historical-simulation.json",
-      "sha256": "e3b3ada44bf77e9cf4b8449a931784e3025acd8b5129595da60fd8fdf99e8d7b",
-      "bytes": 4146
+      "sha256": "b15eb8b6927c2a74e2773e0a800d08da81c6b5b198c0026f4083367046555ef9",
+      "bytes": 12391
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/lean.json",
-      "sha256": "275038d434defee1dd4c9e5abdc62b78f5ced715fd3f0dc70bd7b663c42071ac",
-      "bytes": 6463
+      "sha256": "64c5f684069caa1b71d544ebc10c1e959f0846b8eec49dbdf8429766ee263ea1",
+      "bytes": 12481
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/nautilus.json",
