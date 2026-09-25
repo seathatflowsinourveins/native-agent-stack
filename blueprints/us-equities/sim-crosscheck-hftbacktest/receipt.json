@@ -1,0 +1,130 @@
+{
+  "task": "Phase-B prep: hftbacktest as the independent cross-check engine for the simulation lane",
+  "date_utc": "2026-09-25",
+  "upstream": {
+    "project": "hftbacktest (nkaz001/hftbacktest)",
+    "license": "MIT",
+    "python_release_tag": "py-v2.4.4",
+    "rust_release_tag": "rust-v0.9.4",
+    "pinned_version": "2.4.4",
+    "source_url": "https://github.com/nkaz001/hftbacktest",
+    "pypi_url": "https://pypi.org/pypi/hftbacktest/json"
+  },
+  "versions": {
+    "python_interpreter": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "venv_path": "~/.local/share/native-agent-stack/hftbacktest-2.4.4",
+    "hftbacktest": "2.4.4",
+    "numpy": "2.2.6",
+    "numba": "0.67.0",
+    "polars": "1.44.2",
+    "uv": "0.12.17"
+  },
+  "wheel": {
+    "filename": "hftbacktest-2.4.4-cp312-cp312-manylinux_2_28_x86_64.whl",
+    "sha256": "7df29f3f600e74cde4b7223dbc65d64caed7ae16c67dd4a85d33a5bf4e2e36b5",
+    "source": "pypi.org/pypi/hftbacktest/json (urls[] digests.sha256), cross-checked against the installed wheel's recorded RECORD/dist-info via uv"
+  },
+  "evidence": [
+    {
+      "item": "isolated venv + pinned install",
+      "evidence_class": "structural_validation",
+      "commands": [
+        {"cmd": "uv venv --python 3.12 ~/.local/share/native-agent-stack/hftbacktest-2.4.4", "exit_code": 0},
+        {"cmd": "uv pip compile --python <venv>/bin/python3 --generate-hashes requirements.in -o requirements.lock", "exit_code": 0},
+        {"cmd": "uv pip sync --python <venv>/bin/python3 --require-hashes requirements.lock", "exit_code": 0}
+      ],
+      "requirements_lock_sha256": "c6a3e11fef05209374aae054b303513246771663f8c69349fb0d93e4d8c4ff35",
+      "note": "requirements.lock pins hftbacktest==2.4.4 plus its full dependency closure (numpy, numba, polars, matplotlib, holoviews/panel/bokeh transitive stack) with --hash for every wheel uv resolved."
+    },
+    {
+      "item": "supply-chain scan of the pinned lock",
+      "evidence_class": "independent_observation",
+      "tool": "pip-audit 2.10.1 (installed via `uv tool run pip-audit`; osv-scanner CLI binary was not found on this host -- only its GitHub Action config exists in this repo, no local binary -- so pip-audit is the supply-chain scan actually run here)",
+      "commands": [
+        {"cmd": "uv tool run pip-audit -r requirements.lock --format json", "exit_code": 0}
+      ],
+      "result": "0 known vulnerabilities across 42 scanned dependencies",
+      "stdout_sha256": "655e1b47b1065384b71fc54d0c82929c9b2b43332cf5856241bf2746b3df13cc",
+      "not_scanned": "osv-scanner CLI was not run locally (binary absent on this host); only pip-audit's OSV/PyPI-advisory-backed database was consulted for the Python dependency closure. No scan was run for transitive native/Rust extension code inside the wheel itself."
+    },
+    {
+      "item": "upstream Python test suite at the pinned tag",
+      "evidence_class": "upstream_test",
+      "source": "git clone --depth 1 --branch py-v2.4.4 https://github.com/nkaz001/hftbacktest.git (commit a244a14250b42d97fc305569c93c4117cd5e1dff)",
+      "commands": [
+        {"cmd": "python3 -m unittest test_hftbacktest.py (in py-hftbacktest/tests, run with the pinned venv interpreter)", "exit_code": 1}
+      ],
+      "stdout_stderr_sha256": "b655df5181026937ee96e9b34fc7e1355ebaf8cf650dbe665c18b80e72977dac",
+      "result": "1 test, 1 error: FileNotFoundError: 'tmp_20240501.npz' -- the sole upstream unittest (py-hftbacktest/tests/test_hftbacktest.py) requires a private/undistributed binary market-data fixture (tmp_20240501.npz) that is not present in the tagged source tree and is not fetched by any script or CI workflow in the repository.",
+      "additional_finding": "The repository's own CI (.github/workflows/release-python.yml, codeql.yml, stale.yml at this tag) contains no workflow that runs this test file; maturin build/wheel jobs run, but no `pytest`/`unittest` step exists. This is recorded, not inferred: upstream currently has no CI-executed Python test suite for this release.",
+      "claim_boundary": "This exercises the actual upstream test file at the actual pinned tag with the actual upstream command; the result (a fixture-availability failure, not a code defect) is the accurate, unmodified outcome. It does not establish upstream's Rust core correctness, which is covered separately (or not) below."
+    },
+    {
+      "item": "upstream Rust test suite (hftbacktest crate) at the pinned tag",
+      "evidence_class": "unresolved",
+      "result": "NOT RUN: no Rust/cargo toolchain is installed on this host (`cargo --version` -> command not found). The pinned source tree has 8 files containing #[test] functions (connector/src/utils.rs, hftbacktest/src/types.rs, hftbacktest/src/backtest/mod.rs, hftbacktest/src/backtest/models/queue.rs, hftbacktest/src/depth/{roivectormarketdepth,fuse,hashmapmarketdepth,btreemarketdepth}.rs), including unit tests directly on the queue/depth models this cross-check relies on. This remains an unverified gap for this host; running `cargo test` (with a Rust toolchain installed) at commit a244a14250b42d97fc305569c93c4117cd5e1dff is the concrete follow-up.",
+      "claim_boundary": "Unresolved, explicitly recorded per docs/acceptance-evidence-policy.md -- not silently skipped or reported as passing."
+    },
+    {
+      "item": "L1 top-of-book feasibility fixture",
+      "evidence_class": "synthetic_fixture",
+      "constructed_by": "this task, blueprints/us-equities/sim-crosscheck-hftbacktest/l1_feasibility.py",
+      "commands": [
+        {"cmd": "python3 l1_feasibility.py --out <path>", "exit_code": 0}
+      ],
+      "stdout_sha256": "7c4230e9ed430226cc7c914e570df5099e055c02ce60b75e76a9481c12421fd7",
+      "script_sha256": "f197f1cc906daecf85c9c985f9d66f32ebb8ba83c6c02063de6815ddbbba4da5",
+      "scenarios": {
+        "A_marketable_ioc_fill": {
+          "setup": "Static book (bid 10.00/100, ask 10.02/100); constant_order_latency(70ms,70ms); power_prob_queue_model(2.0); no_partial_fill_exchange. IOC buy limit submitted at ask+$0.01 collar.",
+          "hand_expectation": "FILLED at 10.02 (ack_new's price_tick>=best_ask_tick branch fires purely from L1 best-ask depth)",
+          "actual_result": "FILLED at 10.02, exec_qty=10.0, leaves_qty=0.0 -- matches"
+        },
+        "B_ioc_expiry": {
+          "setup": "Same book; order priced off ask=10.02 (limit 10.03) submitted at 50ms; ask re-quotes to 10.06 at 100ms, before the order's 70ms entry latency lands it at the exchange at 120ms.",
+          "hand_expectation": "EXPIRED (10.03 < prevailing ask 10.06 at arrival; IOC/FOK do not rest, per nopartialfillexchange.rs ack_new else-branch)",
+          "actual_result": "EXPIRED, exec_qty=0.0, leaves_qty=10.0 -- matches"
+        },
+        "C_queue_trade_depletion_needs_side": {
+          "setup": "Resting GTC buy at bid=10.00 (qty 20 ahead); five TRADE_EVENT prints of qty 10 at 10.00, once with SELL_EVENT (aggressor hits the bid) and once with no side bit at all (our L1/SIP reality).",
+          "hand_expectation": "with_side: FILLED (queue_model.trade() consumes queue ahead via EXCH_SELL_TRADE_EVENT, matching the resting Side::Buy order). without_side: stays NEW (a bare TRADE_EVENT matches neither EXCH_BUY_TRADE_EVENT nor EXCH_SELL_TRADE_EVENT in nopartialfillexchange.rs, so it is silently dropped and queue_model.trade() is never called).",
+          "actual_result": "with_side: FILLED, exec_qty=5.0. without_side: NEW, exec_qty=0.0 -- matches"
+        }
+      },
+      "source_citations": [
+        "hftbacktest/src/backtest/proc/nopartialfillexchange.rs (ack_new IOC/FOK branches; EXCH_BUY_TRADE_EVENT/EXCH_SELL_TRADE_EVENT branches)",
+        "docs/data.rst (qty==0 at a DEPTH_EVENT price removes that level)"
+      ]
+    }
+  ],
+  "l1_feasibility_verdict": {
+    "verdict": "feasible-with-limits",
+    "feasible_for": [
+      "Order acceptance/rejection logic driven by top-of-book crossing (marketable IOC/limit fills, GTX/limit rejection at the touch)",
+      "IOC/FOK immediate-fill-or-expire semantics, decided purely from best-bid/best-ask depth",
+      "Constant and per-symbol latency modelling (entry + response), independent of depth granularity",
+      "FlatPerTradeFeeModel / TradingValueFeeModel cost accounting on realized fills"
+    ],
+    "not_feasible_or_meaningless_for": [
+      "Probabilistic queue-position models (RiskAdverse/Power/Log) that key off trade-print volume at the touch: hftbacktest's exchange models only apply a trade to queue depletion when the event carries a BUY_EVENT/SELL_EVENT aggressor bit (EXCH_BUY_TRADE_EVENT/EXCH_SELL_TRADE_EVENT). Alpaca's consolidated SIP tape has no aggressor side, so these models silently receive zero trade-driven queue depletion under L1 data -- demonstrated empirically in Scenario C, not just asserted.",
+      "The L3 FIFO queue model, which needs individual order add/cancel/execute events (order_id-level), categorically unavailable from L1 or even standard L2 SIP quotes.",
+      "Any depth-percentile / multi-level queue heuristic that reads levels beyond the touch (our L1 feed only ever has one level per side)."
+    ],
+    "reasoning": "Confirmed by reading hftbacktest/src/backtest/proc/nopartialfillexchange.rs (the exchange model used) and reproducing both code paths (depth-crossing fill/expiry vs trade-driven queue depletion) with a hand-verified synthetic fixture; the L1-driven paths matched hand computation exactly, and the side-dependent path was empirically shown to be a no-op without an aggressor bit."
+  },
+  "cross_check_plan": {
+    "goal": "Cross-check the NautilusTrader sim-capacity run (blueprints/us-equities/sim-capacity/, built by a parallel worker, not touched by this task) against hftbacktest on the same bounded private SIP sample.",
+    "sample": "A bounded 5-minute window of 2 symbols' Alpaca SIP quotes+trades, reused from whatever anchored sample sim-capacity/sim-paper-compare already retained (no new market-data acquisition here).",
+    "conversion": "Alpaca SIP best-bid/best-ask -> paired DEPTH_EVENT (qty=0 at old price, qty>0 at new price) per side, per this fixture's documented representation; trades -> bare TRADE_EVENT (no side).",
+    "exchange_model": "no_partial_fill_exchange with constant_order_latency (start at 69.2ms per blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json's measured flip; keep the queue model fixed to whichever one is 'feasible' above).",
+    "comparison_metrics": ["fill_rate", "median_time_to_fill", "fill_share_at_touch", "cost (fees + realized slippage vs decision price)"],
+    "status": "not yet run -- this task delivers the engine, its pinned install, its upstream-test status and its L1 feasibility boundary; the actual side-by-side run against sim-capacity's output is the next bounded step once sim-capacity lands on main.",
+    "does_not_touch": "blueprints/us-equities/sim-capacity/ (owned by a parallel builder; not read or modified by this task)"
+  },
+  "unverified": [
+    "cargo test for the Rust crate at py-v2.4.4/rust-v0.9.4 (no Rust toolchain on this host)",
+    "osv-scanner CLI scan (binary not found on this host; pip-audit was run instead and is recorded as the substitute, not a silent replacement)",
+    "Actual side-by-side numeric comparison against the NautilusTrader sim-capacity run (that run did not exist in this worktree at the time of this task; blueprints/us-equities/sim-capacity/ was explicitly out of scope)",
+    "Whether hftbacktest's optional partial-fill exchange model (PartialFillExchange) changes the L1 feasibility verdict; only NoPartialFillExchange was exercised here"
+  ]
+}

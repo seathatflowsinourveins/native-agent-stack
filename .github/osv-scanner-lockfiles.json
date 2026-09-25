@@ -6,6 +6,10 @@
       "parser": "requirements.txt"
     },
     {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
       "path": "adoption/sdk/accepted-constraints.txt",
       "parser": "requirements.txt"
     },

@@ -3084,8 +3084,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "894966b5a5f6f775a5e9764725b3644d9598cae0637ff8b6190be015a510e416",
-      "bytes": 8728
+      "sha256": "eb4d2d3347b90dd1f584e40896d7e957410d7eb406217be8ff18732260637e23",
+      "bytes": 8861
     },
     {
       "path": ".github/pull_request_template.md",
@@ -9137,6 +9137,36 @@
       "path": "blueprints/us-equities/security-identity/select.sql",
       "sha256": "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477",
       "bytes": 377
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/README.md",
+      "sha256": "36a5ee4c8132c98bea3f0ec411a427109a791e4ff9316873b5faa68b4de1c4d5",
+      "bytes": 8769
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/l1_feasibility.py",
+      "sha256": "f197f1cc906daecf85c9c985f9d66f32ebb8ba83c6c02063de6815ddbbba4da5",
+      "bytes": 12497
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/receipt.json",
+      "sha256": "51999b4de226a724666ad58a014c716659bea6b9c89f3a1f4be68b569e4be610",
+      "bytes": 11642
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.in",
+      "sha256": "d77598fdec53a553756633094d85efabe3901294bd73ebd91f20d4631e840cf2",
+      "bytes": 25
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
+      "sha256": "c6a3e11fef05209374aae054b303513246771663f8c69349fb0d93e4d8c4ff35",
+      "bytes": 92438
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/tests/test_sim_crosscheck_hftbacktest.py",
+      "sha256": "f20effdde3a915601aa03aeb4313c07db2eca80bc116965ca42860696b5e1cb1",
+      "bytes": 4718
     },
     {
       "path": "blueprints/us-equities/sim-paper-compare/README.md",
