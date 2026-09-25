@@ -1697,10 +1697,10 @@
     {
       "id": "nextjs",
       "repository": "https://github.com/vercel/next.js",
-      "version": "16.3.5",
+      "version": "16.3.6",
       "license": "MIT",
       "role": "Typed production application UI with native build and browser acceptance",
-      "source_pin": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
+      "source_pin": "a758ffcf501f6f1ddb03175bd1033508424c261e",
       "commands": [
         "pnpm typecheck",
         "pnpm build",
@@ -1712,9 +1712,11 @@
       ],
       "profile": "supporting",
       "upstream_sources": [
-        "https://registry.npmjs.org/next/16.3.5"
+        "https://registry.npmjs.org/next/16.3.6",
+        "https://github.com/vercel/next.js/releases/tag/v16.3.6",
+        "https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j"
       ],
-      "freshness": "Primary-source checked September20,2026; acceptance is scoped to the dated host/task receipt. Compatibility can justify a supported older dependency."
+      "freshness": "Primary-source checked September 25, 2026: 16.3.6 (tag commit a758ffc, not a prerelease) fixes the critical GHSA-vcvr-r3jv-pc5j next/og ImageResponse RCE, an urgent fix outside the 7-day cooldown. The application-delivery lock moved from 16.3.5 (history/recipe-revisions.json); its locked install, typecheck and production build pass at 16.3.6. The listed receipts ran 16.3.5 and do not qualify 16.3.6."
     },
     {
       "id": "react",

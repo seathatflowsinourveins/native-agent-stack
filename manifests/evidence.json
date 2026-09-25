@@ -3469,8 +3469,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/README.md",
-      "sha256": "4d6c01c4fbd881b1a55f0cb6472ca778d50b4def31c08bb839c9cd558b504422",
-      "bytes": 9437
+      "sha256": "da5a9228eea023b01388752e034cc6251e5e30b77d6755d64de84de725394bb0",
+      "bytes": 10005
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/acceptance-plan.json",
@@ -3553,9 +3553,19 @@
       "bytes": 2609
     },
     {
+      "path": "blueprints/convergence-practice/application-delivery/history/package.0472177.json",
+      "sha256": "dfcda7940e4723c79e5675f55bf713fa1d8c49c2ab0d2b828f061010536238c9",
+      "bytes": 792
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.0472177.yaml",
+      "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b",
+      "bytes": 32972
+    },
+    {
       "path": "blueprints/convergence-practice/application-delivery/history/recipe-revisions.json",
-      "sha256": "d7eb27d31cfdeac5a1664306d1ff94d5df1095f43f0d1041796dc6ef384132b1",
-      "bytes": 3077
+      "sha256": "8070b79c9771d3f46b2705b47b265313ada7f5ec2932f96d0f4bc233080a7b42",
+      "bytes": 6569
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/history/serve.cabbe2c.py",
@@ -3594,7 +3604,7 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/package.json",
-      "sha256": "dfcda7940e4723c79e5675f55bf713fa1d8c49c2ab0d2b828f061010536238c9",
+      "sha256": "adc11906a06213750da8eb351ee5a6289720b2cdb2ffc6723025e1624270c31d",
       "bytes": 792
     },
     {
@@ -3604,7 +3614,7 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
-      "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b",
+      "sha256": "03aebeb4339167d6b22e5b34e53049569c4dd77fc6285470b23f7ddd6d596084",
       "bytes": 32972
     },
     {
@@ -6415,7 +6425,7 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "90796fee6aeba3372936251bb58c622c1233c78d93e8f2f7ee1299bd4422b95d",
+      "sha256": "11a5f52761f0c52caae81d69acb281f5d06ce7fc23be5d4de776abf438af4b99",
       "bytes": 479903
     },
     {
@@ -9600,7 +9610,7 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "09bbf962f6bc5faafad27b4aea570b883950c2e300d2d6e16265d216f77fb539",
+      "sha256": "307308e80469399bcce7070cd003bc1c9d102d625584bb5d6c4be10ec31f12bc",
       "bytes": 248568
     },
     {
@@ -29045,8 +29055,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "6c089730f992ebafe3fe9b9bbdf3544d8b488e51001d568c81160777a7ada17c",
-      "bytes": 87746
+      "sha256": "d3a3ac4e66dd82efccfecd86545d1e3137afa6003eb0475bcda48db2bd664d1a",
+      "bytes": 88150
     },
     {
       "path": "observability/README.md",
