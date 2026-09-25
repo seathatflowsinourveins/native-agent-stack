@@ -187,10 +187,11 @@ closure, 2026-09-22"). A separate [tag ruleset](https://github.com/seathatflowsi
 (id 23829417, created 2026-09-22T11:08:53-04:00) is also active.
 
 The committed [main-ruleset.json](../.github/main-ruleset.json) is the reviewed
-*target*, not this applied state: it adds `dependency-review` and `osv-scanner`
-to the required checks, keeps the strict up-to-date policy off, and adds a
-CodeQL `code_scanning` rule and squash-only merges (see "Automation closure,
-2026-09-22" below). It does not add `required_signatures`: a measured run
+*target*, not this applied state: it adds `dependency-review`, `osv-scanner`
+and (2026-09-25) `validate-macos` to the required checks, keeps the strict
+up-to-date policy off, and adds a CodeQL `code_scanning` rule and squash-only
+merges (see "Automation closure, 2026-09-22" below, and "validate-macos
+required (2026-09-25)" in that same decision record). It does not add `required_signatures`: a measured run
 blocked PRs whose branch commits are unsigned, even with signed squash merges. The coordinator applies it after
 the change that adds `security-scan.yml` merges; until then the GET above is
 the ground truth. [tag-ruleset.json](../.github/tag-ruleset.json) (ruleset
@@ -280,13 +281,24 @@ remain the execution evidence.
 Three lanes run on a schedule and are not required checks: `catalog-freshness.yml`
 (Mondays 06:17 UTC, plus manual dispatch with a `max_repos` bound), the
 `sbom-vuln` job in `supply-chain.yml` (weekly, plus push/PR when its own paths
-change) and `adoption-bootstrap.yml` (weekly Monday 06:47 UTC, plus push/PR
-when `adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`
-change; described in full further below). None of these three appear in
-`main-ruleset.json`'s required status checks; a required check must run on
-every PR, and a scheduled lane does not. Update 2026-09-22: `sbom-vuln` is no
-longer report-only; it fails its own job on a High or Critical grype match
-(see "Secret and supply-chain scanning"), but it is still not a required check.
+change) and `adoption-bootstrap.yml`'s `bootstrap-linux`, `bootstrap-macos` and
+`bootstrap-macos-brew` jobs (weekly Monday 06:47 UTC, plus push when
+`adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`
+change, or on a pull request that touches the same paths -- described in full
+further below). None of these appear in `main-ruleset.json`'s required status
+checks; a required check must run on every PR, and a scheduled or path-gated
+lane does not. Update 2026-09-22: `sbom-vuln` is no longer report-only; it
+fails its own job on a High or Critical grype match (see "Secret and
+supply-chain scanning"), but it is still not a required check.
+`adoption-bootstrap.yml`'s fourth job, `validate-macos`, is the exception
+(2026-09-25): its workflow's `pull_request` trigger carries no `paths:` filter
+at all, so `validate-macos` itself reports a status on every pull request and
+is a required check (see "validate-macos required (2026-09-25)" in
+[docs/decisions/2026-09-22-github-automation-closure.md](decisions/2026-09-22-github-automation-closure.md)).
+A `changes` job, added in the same workflow, diffs the pull request's base and
+head with plain `git` (no new third-party action) to keep the other three jobs
+path-gated on `pull_request` the same way GitHub's own `paths:` filter already
+path-gates them on `push`.
 
 `catalog-freshness.yml` reuses `tools/sota-convergence/extract_layers.py` and
 `github_freshness.py` unchanged, then rebuilds a manifest with

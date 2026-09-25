@@ -369,7 +369,7 @@ class TargetRulesetTests(unittest.TestCase):
         (checks,) = self.rule("required_status_checks")
         contexts = {check["context"]: check.get("integration_id") for check in checks["parameters"]["required_status_checks"]}
         for context in ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner",
-                        "verdict-review-gate"):
+                        "verdict-review-gate", "validate-macos"):
             self.assertEqual(contexts.get(context), 15368, context)
         self.assertEqual(len(self.rule("code_scanning")), 1)
 
@@ -715,6 +715,59 @@ class GitleaksConfigTestsRunInCI(unittest.TestCase):
         install = job.index("Install checksum-verified pinned gitleaks")
         self.assertLess(install, job.index("gitleaks allowlist regression tests"),
                         "the tests must run after the pinned binary is installed")
+
+class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
+    """validate-macos required-check readiness (docs/decisions/2026-09-22-github-automation-closure.md,
+    "validate-macos required (2026-09-25)"): validate-macos must report a status on every
+    pull_request (a required check that never reports blocks the PR forever), while the
+    three real-install bootstrap-* jobs stay path-gated exactly as before."""
+
+    text = (WORKFLOWS / "adoption-bootstrap.yml").read_text(encoding="utf-8")
+    job_map = jobs(text)
+
+    def test_pull_request_trigger_has_no_path_filter(self):
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\njobs:", 1)[0]
+        pull_request = trigger.split("\n  pull_request:", 1)[1].split("\n  schedule:", 1)[0]
+        self.assertNotIn("paths", pull_request)
+
+    def test_validate_macos_is_reachable_on_every_pull_request(self):
+        # No `needs:` (so it is never withheld pending another job) and no job-level `if:`
+        # (so no expression can skip the job itself for a pull_request): a required check
+        # must be reachable on every PR. Step-level `if: always()` (log upload) is fine and
+        # deliberately not what this checks.
+        job = self.job_map["validate-macos"]
+        header = job.split("\n    steps:\n", 1)[0]
+        self.assertNotIn("needs:", header)
+        self.assertNotRegex(header, r"(?m)^    if:", "a required check must not be skipped on any pull_request")
+
+    def test_bootstrap_jobs_stay_path_gated_on_pull_request(self):
+        for job_id in ("bootstrap-linux", "bootstrap-macos", "bootstrap-macos-brew"):
+            job = self.job_map[job_id]
+            self.assertIn("needs: changes", job, job_id)
+            condition = block_if(job)
+            self.assertIsNotNone(condition, job_id)
+            self.assertIn("needs.changes.outputs.bootstrap", condition, job_id)
+            self.assertIn("github.event_name != 'pull_request'", condition, job_id)
+
+    def test_changes_job_runs_only_on_pull_request_and_diffs_the_same_paths_as_push(self):
+        job = self.job_map["changes"]
+        self.assertEqual(block_if(job), "github.event_name == 'pull_request'")
+        # The push trigger's `paths:` list stays the source of truth this job's own
+        # PATTERNS array must match, so the two cannot silently drift apart.
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\njobs:", 1)[0]
+        push = trigger.split("push:", 1)[1].split("pull_request:", 1)[0]
+        push_paths = re.findall(r"(?m)^      - '([^']+)'$", push)
+        self.assertTrue(push_paths)
+
+        def normalize(path):
+            # PATTERNS uses bash case-glob syntax ('adoption/*'); push uses
+            # gitignore-style globs ('adoption/**'). Both mean "everything under".
+            return path.replace("/**", "/*")
+
+        job_patterns = re.findall(r"(?m)^            '([^']+)'$", job)
+        self.assertTrue(job_patterns)
+        self.assertEqual(sorted(normalize(path) for path in push_paths), sorted(job_patterns))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -32,28 +32,13 @@ on:
       - 'manifests/evidence.json'
       - 'blueprints/convergence-practice/wsl-native-tools/pins.json'
       - '.github/workflows/adoption-bootstrap.yml'
+  # No `paths:` filter here (2026-09-25, validate-macos required-check readiness): a
+  # required check must report a status on every pull_request or GitHub leaves the PR
+  # "Expected -- Waiting for status" forever (docs/decisions/2026-09-22-github-automation-closure.md,
+  # "validate-macos required (2026-09-25)"). validate-macos below always runs; the
+  # `changes` job below still path-gates the three bootstrap-* jobs, which stay
+  # unrequired and exercise real installs, not this repository's own read-only checks.
   pull_request:
-    paths:
-      - 'adoption/**'
-      - 'tools/adoption/**'
-      - 'tests/test_adoption_*.py'
-      - 'scripts/validate.py'
-      - 'scripts/validate_catalogs.py'
-      - 'scripts/validate_foundation.py'
-      - 'scripts/landscape.py'
-      - 'scripts/build_ecosystem.py'
-      - 'scripts/adoption_status.py'
-      - 'evidence/artifacts/macos-embed-reference-20260923/**'
-      - 'scripts/host_receipts.py'
-      - 'scripts/component_matrix.py'
-      - 'scripts/new_host_grand_list.py'
-      - 'tools/sota-convergence/build_verdicts.py'
-      - 'scripts/platform_status.py'
-      - 'scripts/validate_convergence.py'
-      - 'scripts/release_due.py'
-      - 'manifests/evidence.json'
-      - 'blueprints/convergence-practice/wsl-native-tools/pins.json'
-      - '.github/workflows/adoption-bootstrap.yml'
   schedule:
     - cron: '47 6 * * 1' # Weekly Monday 06:47 UTC re-check of live pinned downloads.
   workflow_dispatch:
@@ -61,8 +46,89 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  # Lightweight path-change detector for a pull_request event only (bootstrap-linux,
+  # bootstrap-macos and bootstrap-macos-brew below stay path-gated on push/schedule/dispatch
+  # via their own `paths:` filters already read by GitHub before the job graph starts; a
+  # pull_request has no filter to read now, so this job computes the same membership by
+  # diffing the PR's base and head with plain git -- no new third-party action). The
+  # PATTERNS list below must be kept identical to the `push:`/`pull_request:` (historical)
+  # paths list above it; tests/test_workflow_hardening.py asserts that.
+  changes:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      bootstrap: ${{ steps.filter.outputs.bootstrap }}
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository with enough history to diff the PR
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Detect whether any bootstrap-relevant path changed in this pull request
+        id: filter
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          # Keep in sync with the push trigger's `paths:` list above (also this
+          # job's own file, so an edit to this job re-runs bootstrap-linux/macos).
+          PATTERNS=(
+            'adoption/*'
+            'tools/adoption/*'
+            'tests/test_adoption_*.py'
+            'scripts/validate.py'
+            'scripts/validate_catalogs.py'
+            'scripts/validate_foundation.py'
+            'scripts/landscape.py'
+            'scripts/build_ecosystem.py'
+            'scripts/adoption_status.py'
+            'evidence/artifacts/macos-embed-reference-20260923/*'
+            'scripts/host_receipts.py'
+            'scripts/component_matrix.py'
+            'scripts/new_host_grand_list.py'
+            'tools/sota-convergence/build_verdicts.py'
+            'scripts/platform_status.py'
+            'scripts/validate_convergence.py'
+            'scripts/release_due.py'
+            'manifests/evidence.json'
+            'blueprints/convergence-practice/wsl-native-tools/pins.json'
+            '.github/workflows/adoption-bootstrap.yml'
+          )
+          if [ -z "$BASE_SHA" ] || [ -z "$HEAD_SHA" ]; then
+            echo "::error::changes: missing base or head sha in the pull_request payload" >&2
+            exit 1
+          fi
+          changed="$(git diff --no-renames --name-only "$BASE_SHA...$HEAD_SHA")"
+          match=false
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            for pattern in "${PATTERNS[@]}"; do
+              case "$file" in
+                $pattern) match=true ;;
+              esac
+            done
+          done <<< "$changed"
+          echo "bootstrap=$match" >> "$GITHUB_OUTPUT"
+          echo "bootstrap-relevant path changed: $match"
+
   bootstrap-linux:
+    needs: changes
+    # Push/schedule/dispatch keep the historical path-filtered behaviour (GitHub itself skips
+    # the run before the job graph starts on push/pull_request; schedule/dispatch always run).
+    # On pull_request the `changes` job above supplies the same membership test.
+    if: github.event_name != 'pull_request' || needs.changes.outputs.bootstrap == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -132,6 +198,8 @@ jobs:
   # backend a real Mac would use; see "Record which backend llama-server's
   # own log reports" below and adoption/platforms/macos-arm64.md.
   bootstrap-macos:
+    needs: changes
+    if: github.event_name != 'pull_request' || needs.changes.outputs.bootstrap == 'true'
     runs-on: macos-15
     timeout-minutes: 30
     steps:
@@ -421,6 +489,8 @@ jobs:
   # macos-arm64 platform profile out of drafted_not_accepted and signs into
   # no native client.
   bootstrap-macos-brew:
+    needs: changes
+    if: github.event_name != 'pull_request' || needs.changes.outputs.bootstrap == 'true'
     runs-on: macos-15
     timeout-minutes: 30
     steps:
@@ -479,6 +549,12 @@ jobs:
   # modules on Darwin/arm64, since every other job here exercises the
   # bootstrap script but never the repository's own Python tooling on macOS.
   # No account sign-in, no live provider call.
+  #
+  # Required check (docs/decisions/2026-09-22-github-automation-closure.md,
+  # "validate-macos required (2026-09-25)"): named in .github/main-ruleset.json's
+  # required_status_checks. It has no `needs:` and no `if:` of its own, and the
+  # workflow's pull_request trigger above carries no `paths:` filter, so this job
+  # reports a status on every pull request and can safely be required.
   validate-macos:
     runs-on: macos-15
     timeout-minutes: 30
