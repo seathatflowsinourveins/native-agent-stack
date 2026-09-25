@@ -1,0 +1,746 @@
+{
+  "schema_version": 1,
+  "kind": "discovery_provenance",
+  "run_date": "2026-09-24/25",
+  "timezone_note": "Times are the input files' modification times on the coordinator host, US Eastern (EDT, UTC-4).",
+  "base_revision": "6568f47252bc394641a32664c00eb1a700f135ed",
+  "practice_revision_cited": "aa0812b (blueprints/convergence-practice/protocol.json is unchanged between aa0812b and the base revision)",
+  "inputs_location": "the coordinator host's bench lanes and longmemeval directories (not committed)",
+  "timeline": [
+    {
+      "file": "longmemeval/report-interim.md (interim harness report)",
+      "modified": "2026-09-24 23:35:06"
+    },
+    {
+      "file": "sota-models-packet.md",
+      "modified": "2026-09-24 23:44:56"
+    },
+    {
+      "file": "sota-models-codex.stderr (codex lane start)",
+      "modified": "2026-09-24 23:45:14"
+    },
+    {
+      "file": "sota-models-codex.md and its event stream",
+      "modified": "2026-09-24 23:53:14"
+    },
+    {
+      "file": "sota-models-claude.md",
+      "modified": "2026-09-25 00:12:47"
+    },
+    {
+      "file": "sota-models-convergence.md",
+      "modified": "2026-09-25 00:13:07"
+    },
+    {
+      "file": "memory-systems-packet.md",
+      "modified": "2026-09-25 00:20:58"
+    },
+    {
+      "file": "memory-systems-codex.stderr (codex lane start)",
+      "modified": "2026-09-25 00:20:59"
+    },
+    {
+      "file": "memory-systems-codex.md and its event stream",
+      "modified": "2026-09-25 00:28:44"
+    },
+    {
+      "file": "memory-systems-claude.md",
+      "modified": "2026-09-25 00:47:57"
+    },
+    {
+      "file": "memory-systems-convergence.md",
+      "modified": "2026-09-25 00:48:11"
+    },
+    {
+      "file": "adjudication-20260925: the nine briefs, the key and SHA256SUMS (frozen read-only)",
+      "modified": "2026-09-25 01:41:21"
+    },
+    {
+      "file": "adjudication-20260925: first judge stderr (runs start)",
+      "modified": "2026-09-25 01:41:53"
+    },
+    {
+      "file": "adjudication-20260925: last verdict (q3-reranker-c.verdict.md)",
+      "modified": "2026-09-25 01:43:28"
+    },
+    {
+      "file": "adjudication-20260925/convergence-table.md",
+      "modified": "2026-09-25 02:06:35"
+    },
+    {
+      "file": "adjudication-20260925/claude-md-manifest.md",
+      "modified": "2026-09-25 02:06:45"
+    },
+    {
+      "file": "longmemeval/PREREGISTRATION.md (A16 added)",
+      "modified": "2026-09-25 02:15:44"
+    },
+    {
+      "file": "longmemeval/results/aimem-qwen3.jsonl (C3 complete, 470/470)",
+      "modified": "2026-09-25 02:32:49"
+    },
+    {
+      "file": "longmemeval/results-drift-macos27/aimem-qwen3.jsonl (20-question drift check)",
+      "modified": "2026-09-25 02:41:17"
+    },
+    {
+      "file": "longmemeval/report-mac-descriptive.md (supersedes report-interim.md)",
+      "modified": "2026-09-25 02:41:42"
+    }
+  ],
+  "files": [
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/packets/sota-models.json",
+      "sources": [
+        {
+          "file": "sota-models-packet.md",
+          "original_sha256": "1847b3a1a0508078076f8d114e9ea1a021a92f8322f8e13e4f2482ca18f5a51a"
+        }
+      ],
+      "public_sha256": "8d6f1fe60f4cd2052bf647ac53571839008dbe1c2eeb0fe0966dc8c397ec28f5",
+      "transformation": "verbatim text embedded as a JSON string"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/packets/memory-systems.json",
+      "sources": [
+        {
+          "file": "memory-systems-packet.md",
+          "original_sha256": "31318b2121b387e4a478456a5b794e6bf1119d100f9cb3aeeb96c17f19e6e807"
+        }
+      ],
+      "public_sha256": "63f5361e20fa4ef52a7110b71c36ed748f7fe168c177590c807bc61f709ffdba",
+      "transformation": "verbatim text embedded as a JSON string"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+      "sources": [
+        {
+          "file": "sota-models-claude.md",
+          "original_sha256": "bd99a4468233d8456899474be6457ac80e2dea3a509fedfc8915e4814b870cd7"
+        }
+      ],
+      "public_sha256": "b0bc3c145c4ac2bf20e95d1fe79e20afd5661b6c7afc25cd7eb24b9911bdc7cf",
+      "transformation": "verbatim return_text plus a substring-checked transcription"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json",
+      "sources": [
+        {
+          "file": "memory-systems-claude.md",
+          "original_sha256": "fe609037bee332a597c554c09f03f15b3c3637108ab033e130fe35adbdf43d9d"
+        }
+      ],
+      "public_sha256": "6d1c522475b5bce6350d19a7a89b178d3dfe8dd09d4144eb9335595faa7b53b6",
+      "transformation": "verbatim return_text plus a substring-checked transcription"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+      "sources": [
+        {
+          "file": "sota-models-codex.md",
+          "original_sha256": "a3fa6b77be06cb7456c6c41f95a315a8d506d62e3b277aa7d1704544aeb737f0"
+        },
+        {
+          "file": "sota-models-codex.events.jsonl",
+          "original_sha256": null
+        }
+      ],
+      "public_sha256": "6b6579d91f1a0d3b11fbd28a9cbeb1e31f92961eea9ba56a7957e136b51ce3c9",
+      "transformation": "verbatim return_text plus a substring-checked transcription; event-stream counts, commands and page opens from the not-committed JSONL"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+      "sources": [
+        {
+          "file": "memory-systems-codex.md",
+          "original_sha256": "2eb2fa3b78e8aad04ff1cc7db9175dc213df8e1eafa726ddbd12a85820d948cf"
+        },
+        {
+          "file": "memory-systems-codex.events.jsonl",
+          "original_sha256": null
+        }
+      ],
+      "public_sha256": "5166806f08076904f3990d17d739217eec2d05776452c6f57e9450e6b0015823",
+      "transformation": "verbatim return_text plus a substring-checked transcription; event-stream counts, commands and page opens from the not-committed JSONL"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-a.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/q1-memory-system-a.md",
+          "original_sha256": "1c40278e0feaf89a6e449fb8dc5b41c28984f1fbb91f52cad4401cc7f29c29ad"
+        }
+      ],
+      "public_sha256": "dcfe6a1db362c4555de62683db601602668e3e22b9d63aa94ec608d9da1e6db7",
+      "transformation": "verbatim input_text plus substring-checked context and question and character offsets of each return"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-b.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/q1-memory-system-b.md",
+          "original_sha256": "06069691dafa39565e75e9a1ced103c7efc4c0c359a6e2670d4afd2326bb05fb"
+        }
+      ],
+      "public_sha256": "8aaa24e7418cd4da2d26d47dc7a27827a539ada0fd9133c9c6994bd29ec2a3b6",
+      "transformation": "verbatim input_text plus substring-checked context and question and character offsets of each return"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-c.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/q1-memory-system-c.md",
+          "original_sha256": "efb4ac7e4c63f6eadfa334f1180b1d3aaec45a2b3bed75f2e2ef866f8ef38672"
+        }
+      ],
+      "public_sha256": "25101afbbd159b0485ec0f3df2665ab3e77cb5a2ccb2a39883de63f06c5fc328",
+      "transformation": "verbatim input_text plus substring-checked context and question and character offsets of each return"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-a.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/q2-memory-llm-a.md",
+          "original_sha256": "4209e482980f68a062ed570b02a235d538266cbd976d0e3c91cee4efb0b378ce"
+        }
+      ],
+      "public_sha256": "113ddece701e6f647151cdb7b2ad505ebcfe8e6f8d6b7c4676644f876859f8ab",
+      "transformation": "verbatim input_text plus substring-checked context and question and character offsets of each return"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-b.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/q2-memory-llm-b.md",
+          "original_sha256": "159751e31bfcc9d750b1697158c855101c17fddcb2c777b38482ac8a57acdf63"
+        }
+      ],
+      "public_sha256": "b4ea294ef737848d396d5b016f11cbb36f506e31f1787c813b6573c10c16c0a4",
+      "transformation": "verbatim input_text plus substring-checked context and question and character offsets of each return"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-c.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/q2-memory-llm-c.md",
+          "original_sha256": "316938aea9967e5d750834e98fe8f375a4f6d38166a30207774bd1413aeb8546"
+        }
+      ],
+      "public_sha256": "ade78033b5932c1aeb7ba6bd33f62eef92d3ffe33ed4e0a80bca561ec1155a1f",
+      "transformation": "verbatim input_text plus substring-checked context and question and character offsets of each return"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-a.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/q3-reranker-a.md",
+          "original_sha256": "daa4178b5a7bd45885ddc0eac970f9055bde60241d8d6e05d0085858a045b3f6"
+        }
+      ],
+      "public_sha256": "11a3d119ff06592d33d1475d35d02df90ec4f129aac67c2b176fe4802012b6c6",
+      "transformation": "verbatim input_text plus substring-checked context and question and character offsets of each return"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-b.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/q3-reranker-b.md",
+          "original_sha256": "d6d32c9d80e282a880661553ecab56a9c190ca48fe82313863d766e6c0903422"
+        }
+      ],
+      "public_sha256": "f83257ee3d725d531b251324a091286e720336097938fc86701a5d18322dd2b0",
+      "transformation": "verbatim input_text plus substring-checked context and question and character offsets of each return"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-c.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/q3-reranker-c.md",
+          "original_sha256": "d7dbf218d428e7105e53646e6ea27dc0ce9e16f57539a80f12350fb40b81eeaa"
+        }
+      ],
+      "public_sha256": "d26a14c6f2aac0bce5d5a262a5e98f02d50655225c3f97ee0cf4edeeba8d41e3",
+      "transformation": "verbatim input_text plus substring-checked context and question and character offsets of each return"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/adjudication-key.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/adjudication-key.json",
+          "original_sha256": "1eed64c0c60abbcd01239b9c793070d7aef8ef958bb89ee86ba1ff185d696040"
+        },
+        {
+          "file": "adjudication-20260925/SHA256SUMS",
+          "original_sha256": "095ec6a82f1db70f42478acde58ff9e07fc1bb2efe8c340ff9a6f6d9edaf3037"
+        }
+      ],
+      "public_sha256": "2882221c9e895964190830c28449107a8a6fd151cf2eae7f9c1558e7d538ad51",
+      "transformation": "recorder transcription of the key with absolute local paths reduced to file names; SHA256SUMS embedded verbatim"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/q1-memory-system-a.verdict.md",
+          "original_sha256": "4a8418f9ed808a14355b93da86268cd0f4b52b1860b4638e4812cb4029f6012d"
+        },
+        {
+          "file": "adjudication-20260925/q1-memory-system-b.verdict.md",
+          "original_sha256": "f4645e81cc6305edd437f9ccaca9103ec27dd2642ed4d0afbdb08a11e5cdb8b7"
+        },
+        {
+          "file": "adjudication-20260925/q1-memory-system-c.verdict.md",
+          "original_sha256": "a80b541211e096797794b0a25109af353847644a2cc45850be72f46c42e9f1fb"
+        },
+        {
+          "file": "adjudication-20260925/q1-memory-system-a.events.jsonl",
+          "original_sha256": null
+        },
+        {
+          "file": "adjudication-20260925/q1-memory-system-b.events.jsonl",
+          "original_sha256": null
+        },
+        {
+          "file": "adjudication-20260925/q1-memory-system-c.events.jsonl",
+          "original_sha256": null
+        }
+      ],
+      "public_sha256": "c72f204af6acd931987b2a20ec0fc899757cb2cc102111602c9ed0ae755c2039",
+      "transformation": "each verdict embedded verbatim as returned_text (equal to the final agent message in its event stream); why is the text before the PREFERRED line; native usage from each stream's turn.completed"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/q2-memory-llm-a.verdict.md",
+          "original_sha256": "21d2e60533c30400252055f8d0268794a234c96ffa94f425e30c890eb6d0a7ba"
+        },
+        {
+          "file": "adjudication-20260925/q2-memory-llm-b.verdict.md",
+          "original_sha256": "53a0e12eea3f9c907e4681afb274ff43f50f3a76e57a667a2544c9474637798a"
+        },
+        {
+          "file": "adjudication-20260925/q2-memory-llm-c.verdict.md",
+          "original_sha256": "793b0469c8f519f7e316cf6b7698d3fa1444c780a91c789f7c6ff87827421a3e"
+        },
+        {
+          "file": "adjudication-20260925/q2-memory-llm-a.events.jsonl",
+          "original_sha256": null
+        },
+        {
+          "file": "adjudication-20260925/q2-memory-llm-b.events.jsonl",
+          "original_sha256": null
+        },
+        {
+          "file": "adjudication-20260925/q2-memory-llm-c.events.jsonl",
+          "original_sha256": null
+        }
+      ],
+      "public_sha256": "e16804649d0061eabda060e5164abbffd72753c11c9014033cd17a7272bff780",
+      "transformation": "each verdict embedded verbatim as returned_text (equal to the final agent message in its event stream); why is the text before the PREFERRED line; native usage from each stream's turn.completed"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/q3-reranker-a.verdict.md",
+          "original_sha256": "56d1527ae8d9bc7a170a1fd7ff19a6c0e135095ca7bcfdaaf144fc4984d03efa"
+        },
+        {
+          "file": "adjudication-20260925/q3-reranker-b.verdict.md",
+          "original_sha256": "a128fa1824b69dd51cd2586df974f2f4b662f0fb8a4a51a4b661bd9228533270"
+        },
+        {
+          "file": "adjudication-20260925/q3-reranker-c.verdict.md",
+          "original_sha256": "26bf571202c665f1bbd052252800d15944bfb9116eeec22b8c8bbaea318af873"
+        },
+        {
+          "file": "adjudication-20260925/q3-reranker-a.events.jsonl",
+          "original_sha256": null
+        },
+        {
+          "file": "adjudication-20260925/q3-reranker-b.events.jsonl",
+          "original_sha256": null
+        },
+        {
+          "file": "adjudication-20260925/q3-reranker-c.events.jsonl",
+          "original_sha256": null
+        }
+      ],
+      "public_sha256": "c75539956c17030a7d8abcf72e1e87129e9ed81cb873e5f6d5755bc550f514e8",
+      "transformation": "each verdict embedded verbatim as returned_text (equal to the final agent message in its event stream); why is the text before the PREFERRED line; native usage from each stream's turn.completed"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+      "sources": [
+        {
+          "file": "adjudication-20260925/convergence-table.md",
+          "original_sha256": "6d00a850f0fd63ea7c85010f701aa47a190ffb7e2ede56a6d16395bebb6c9070"
+        },
+        {
+          "file": "sota-models-convergence.md",
+          "original_sha256": "31723c68e154b9c28c7bdfcfeaa2be6f1a1749415707476ce047805c4c129831"
+        },
+        {
+          "file": "memory-systems-convergence.md",
+          "original_sha256": "2790d873498fda163be5f2015dcfab868b97e873169721b8dd1b3937d31ae511"
+        },
+        {
+          "file": "longmemeval/report-mac-descriptive.md",
+          "original_sha256": "62c0079136d575f21f5c96c5606bb2d84407ec94b13b7c525c3ebcb5cac3f120"
+        },
+        {
+          "file": "longmemeval/report-interim.md",
+          "original_sha256": "911f6f1df0a65dc35bd421dec77685a211b0d9fa646ce367ecb316e4de001038"
+        },
+        {
+          "file": "longmemeval/PREREGISTRATION.md",
+          "original_sha256": "1f3ca9d554cff24dc785c35f275335027a831dd386f460890f8a3082a07c11c2"
+        },
+        {
+          "file": "longmemeval/results/aimem-qwen3.jsonl and results-drift-macos27/aimem-qwen3.jsonl (drift check)",
+          "original_sha256": null
+        },
+        {
+          "file": "the convergence workflow's structured result (skeptic checks)",
+          "original_sha256": "b668e0673eca586956473f303bf622f7281db1288abb1c2f21c02da2bdc601a9"
+        }
+      ],
+      "public_sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed",
+      "transformation": "convergence table with two checkout paths replaced by placeholders, tables parsed cell by cell; stage-one notes verbatim; complete-arm measurements transcribed from the descriptive report; amendments cited; skeptic corrections and measurement updates listed"
+    },
+    {
+      "public_path": "evidence/artifacts/memory-stack-20260925/usage.json",
+      "sources": [
+        {
+          "file": "sota-models-codex.events.jsonl",
+          "original_sha256": null
+        },
+        {
+          "file": "memory-systems-codex.events.jsonl",
+          "original_sha256": null
+        },
+        {
+          "file": "adjudication-20260925/q*-*.events.jsonl (nine files)",
+          "original_sha256": null
+        }
+      ],
+      "public_sha256": "0a7be62925865c5d0db37ac1506b69c559b621db4c8c1fe7db6ebfd32084c31e",
+      "transformation": "native counters extracted; the streams are not committed and their hashes are not recorded because they are not published"
+    }
+  ],
+  "not_embedded_inputs": [
+    {
+      "file": "adjudication-20260925/claude-md-manifest.md",
+      "original_sha256": "f6cbdd6af575bf3961c75f28b99e0ca935b905f4669713088380ee3eeb5086b7",
+      "reason": "A proposed replacement for the coordinator's global CLAUDE.md (machine-specific client configuration, with local paths); it points at this record's convergence.json as the source of truth. Not published here."
+    },
+    {
+      "file": "longmemeval/report-mac-descriptive.md",
+      "original_sha256": "62c0079136d575f21f5c96c5606bb2d84407ec94b13b7c525c3ebcb5cac3f120",
+      "reason": "Complete-arm values and the paired comparisons against C3 are transcribed into convergence.json#/neutral_measurements; the report is not committed."
+    },
+    {
+      "file": "longmemeval/report-interim.md",
+      "original_sha256": "911f6f1df0a65dc35bd421dec77685a211b0d9fa646ce367ecb316e4de001038",
+      "reason": "The interim report the convergence table cites (C3 at 139/470); superseded by report-mac-descriptive.md."
+    },
+    {
+      "file": "longmemeval/PREREGISTRATION.md",
+      "original_sha256": "1f3ca9d554cff24dc785c35f275335027a831dd386f460890f8a3082a07c11c2",
+      "reason": "Cited by amendment (A13–A16) in convergence.json#/preregistration; not committed."
+    },
+    {
+      "file": "the convergence workflow's structured result",
+      "original_sha256": "b668e0673eca586956473f303bf622f7281db1288abb1c2f21c02da2bdc601a9",
+      "reason": "Holds the per-row skeptic checks; its corrections are applied and listed in convergence.json#/skeptic_review, but the file holds local paths and is not committed."
+    }
+  ],
+  "runs": [
+    {
+      "run_label": "claude-sota-models-lane",
+      "lane": "claude",
+      "role": "blind discovery lane",
+      "client": "Claude Code research subagent with web tools",
+      "requested": {
+        "model": "claude-opus-5-5",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The coordinator's header line gives tool uses and tokens, not a resolved model or effort.",
+      "input": "evidence/artifacts/memory-stack-20260925/packets/sota-models.json",
+      "output": "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+    },
+    {
+      "run_label": "codex-sota-models-lane",
+      "lane": "codex",
+      "role": "blind discovery lane",
+      "client": "codex exec --json with live web search; the working directory was the coordinator's lanes directory",
+      "requested": {
+        "model": "gpt-6-astra",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The retained event stream does not repeat the session header, and the invocation was not retained, so the effort, sandbox and config flags and the CLI version are not recorded.",
+      "input": "evidence/artifacts/memory-stack-20260925/packets/sota-models.json",
+      "output": "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json"
+    },
+    {
+      "run_label": "claude-memory-systems-lane",
+      "lane": "claude",
+      "role": "blind discovery lane",
+      "client": "Claude Code research subagent with web tools",
+      "requested": {
+        "model": "claude-opus-5-5",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The coordinator's header line gives tool uses and tokens, not a resolved model or effort.",
+      "input": "evidence/artifacts/memory-stack-20260925/packets/memory-systems.json",
+      "output": "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+    },
+    {
+      "run_label": "codex-memory-systems-lane",
+      "lane": "codex",
+      "role": "blind discovery lane",
+      "client": "codex exec --json with live web search; the working directory was the coordinator's lanes directory",
+      "requested": {
+        "model": "gpt-6-astra",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The retained event stream does not repeat the session header, and the invocation was not retained, so the effort, sandbox and config flags and the CLI version are not recorded.",
+      "input": "evidence/artifacts/memory-stack-20260925/packets/memory-systems.json",
+      "output": "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json"
+    },
+    {
+      "run_label": "adjudicator-q1-memory-system-a",
+      "lane": null,
+      "role": "blind adjudicator, order a",
+      "client": "codex exec -m gpt-6-sol -s read-only --json, launched by a runner agent of the convergence workflow (outside the Claude sandbox so codex could reach its provider)",
+      "requested": {
+        "model": "gpt-6-sol",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The event stream does not repeat the session header; the model is as the runner agents report it, and the effort and CLI version were not recorded.",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-a.json",
+      "output": "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json"
+    },
+    {
+      "run_label": "adjudicator-q1-memory-system-b",
+      "lane": null,
+      "role": "blind adjudicator, order b",
+      "client": "codex exec -m gpt-6-sol -s read-only --json, launched by a runner agent of the convergence workflow (outside the Claude sandbox so codex could reach its provider)",
+      "requested": {
+        "model": "gpt-6-sol",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The event stream does not repeat the session header; the model is as the runner agents report it, and the effort and CLI version were not recorded.",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-b.json",
+      "output": "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json"
+    },
+    {
+      "run_label": "adjudicator-q1-memory-system-c",
+      "lane": null,
+      "role": "blind adjudicator, order c",
+      "client": "codex exec -m gpt-6-sol -s read-only --json, launched by a runner agent of the convergence workflow (outside the Claude sandbox so codex could reach its provider)",
+      "requested": {
+        "model": "gpt-6-sol",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The event stream does not repeat the session header; the model is as the runner agents report it, and the effort and CLI version were not recorded.",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-c.json",
+      "output": "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json"
+    },
+    {
+      "run_label": "adjudicator-q2-memory-llm-a",
+      "lane": null,
+      "role": "blind adjudicator, order a",
+      "client": "codex exec -m gpt-6-sol -s read-only --json, launched by a runner agent of the convergence workflow (outside the Claude sandbox so codex could reach its provider)",
+      "requested": {
+        "model": "gpt-6-sol",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The event stream does not repeat the session header; the model is as the runner agents report it, and the effort and CLI version were not recorded.",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-a.json",
+      "output": "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json"
+    },
+    {
+      "run_label": "adjudicator-q2-memory-llm-b",
+      "lane": null,
+      "role": "blind adjudicator, order b",
+      "client": "codex exec -m gpt-6-sol -s read-only --json, launched by a runner agent of the convergence workflow (outside the Claude sandbox so codex could reach its provider)",
+      "requested": {
+        "model": "gpt-6-sol",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The event stream does not repeat the session header; the model is as the runner agents report it, and the effort and CLI version were not recorded.",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-b.json",
+      "output": "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json"
+    },
+    {
+      "run_label": "adjudicator-q2-memory-llm-c",
+      "lane": null,
+      "role": "blind adjudicator, order c",
+      "client": "codex exec -m gpt-6-sol -s read-only --json, launched by a runner agent of the convergence workflow (outside the Claude sandbox so codex could reach its provider)",
+      "requested": {
+        "model": "gpt-6-sol",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The event stream does not repeat the session header; the model is as the runner agents report it, and the effort and CLI version were not recorded.",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-c.json",
+      "output": "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json"
+    },
+    {
+      "run_label": "adjudicator-q3-reranker-a",
+      "lane": null,
+      "role": "blind adjudicator, order a",
+      "client": "codex exec -m gpt-6-sol -s read-only --json, launched by a runner agent of the convergence workflow (outside the Claude sandbox so codex could reach its provider)",
+      "requested": {
+        "model": "gpt-6-sol",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The event stream does not repeat the session header; the model is as the runner agents report it, and the effort and CLI version were not recorded.",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-a.json",
+      "output": "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json"
+    },
+    {
+      "run_label": "adjudicator-q3-reranker-b",
+      "lane": null,
+      "role": "blind adjudicator, order b",
+      "client": "codex exec -m gpt-6-sol -s read-only --json, launched by a runner agent of the convergence workflow (outside the Claude sandbox so codex could reach its provider)",
+      "requested": {
+        "model": "gpt-6-sol",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The event stream does not repeat the session header; the model is as the runner agents report it, and the effort and CLI version were not recorded.",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-b.json",
+      "output": "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json"
+    },
+    {
+      "run_label": "adjudicator-q3-reranker-c",
+      "lane": null,
+      "role": "blind adjudicator, order c",
+      "client": "codex exec -m gpt-6-sol -s read-only --json, launched by a runner agent of the convergence workflow (outside the Claude sandbox so codex could reach its provider)",
+      "requested": {
+        "model": "gpt-6-sol",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The event stream does not repeat the session header; the model is as the runner agents report it, and the effort and CLI version were not recorded.",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-c.json",
+      "output": "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json"
+    },
+    {
+      "run_label": "coordinator-stage-one",
+      "lane": null,
+      "role": "coordinator: packets and one convergence note per packet",
+      "client": "coordinator session",
+      "requested": {
+        "model": null,
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "Not recorded.",
+      "input": "both lane returns of each packet",
+      "output": "evidence/artifacts/memory-stack-20260925/convergence.json#/stage_one_notes"
+    },
+    {
+      "run_label": "convergence-workflow",
+      "lane": null,
+      "role": "coordinator's workflow: blinded briefs and key, the nine judge runs, the convergence table, the CLAUDE.md manifest and two skeptic checks per row",
+      "client": "Claude Code workflow agents",
+      "requested": {
+        "model": null,
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "Not recorded per agent.",
+      "input": "the lane returns, the stage-one notes, report-interim.md and PREREGISTRATION.md (A13–A15.2)",
+      "output": "evidence/artifacts/memory-stack-20260925/convergence.json"
+    },
+    {
+      "run_label": "recorder-artifact-check",
+      "lane": null,
+      "role": "recorder: sealing, catalog decisions, registration and offline checks",
+      "client": "coordinator-owned Claude Code worker",
+      "requested": {
+        "model": "claude-opus-5-5",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "Not recorded.",
+      "input": "the originals listed in files[]",
+      "output": "catalogs/foundation/memory-stack-20260925.json"
+    }
+  ],
+  "blindness": [
+    "Neither lane of a packet was given the other lane's output or the repository catalogs; each packet excluded seathatflowsinourveins/native-agent-stack, seathatflowsinourveins/agent-ecosystem, their catalogs and any other lane's output.",
+    "Codex model-screen lane: its stream shows one read of the packet, no query or page open naming the excluded repositories, and three computer-use browser calls that loaded no page. It finished (23:53) before the Claude return existed (00:12).",
+    "Codex memory-system lane: its stream shows a filtered listing of its working directory, a read of the packet, and a read of the ecosystem-catalog skill's SKILL.md, which belongs to the excluded agent-ecosystem repository's tooling; no catalog query or catalog data read follows, and no web query or open names the excluded repositories. It finished (00:28) before the Claude return existed (00:47).",
+    "Claude lanes: their tool logs were not retained, so their blindness rests on the packet instruction. Each ran while the same packet's Codex return existed in the lanes directory.",
+    "Judges: the Claude return's header comment was removed and lane identities appear only in the key. The q1 shared context names Opus 5.5 and GPT-6 Astra as the client models the memory must serve; that is subject matter, not authorship. Each judge stream shows a single command, a read of its own brief, and no web search."
+  ],
+  "not_copied": [
+    "The Codex lanes' JSONL event streams and stderr, and the nine judge event streams and stderr files: raw streams hold thread identifiers and local paths. Counts, commands (with the local skills path generalized), page opens and usage are extracted into the lane returns, the adjudication records and usage.json.",
+    "The convergence workflow's structured result and the CLAUDE.md manifest (see not_embedded_inputs)."
+  ],
+  "pin_resolution": "The recorder resolved the convergence table's short revisions and release tags to full commits on 2026-09-25 through the GitHub GraphQL API (tags and commits) and the Hugging Face model API (main revisions, licence tags, gating). Every Hugging Face short revision in the table is its repository's current main revision. Nothing was downloaded or installed.",
+  "run_labels_note": "Runs are named by label only; no session, thread or task identifiers are published."
+}

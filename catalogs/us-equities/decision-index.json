@@ -27,6 +27,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/foundation/memory-stack-20260925.json",
+      "collection": "/repository_decisions",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/landscape/candidate-quality-review.json",
       "collection": "/candidates",
       "repository_field": "repository",
@@ -389,16 +395,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 857,
+    "repositories": 861,
     "public_star_repositories": 357,
-    "beyond_public_stars": 500,
-    "references": 2008,
+    "beyond_public_stars": 504,
+    "references": 2031,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 69,
       "legacy_candidate": 20,
       "public_star": 357,
-      "research_supplement": 575,
+      "research_supplement": 581,
       "star_review": 357
     }
   },
@@ -1092,6 +1098,14 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/0",
+          "id": "memory-stack-ai-memory",
+          "decision": "retain",
+          "evidence_level": "mac_nce_descriptive"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/candidate-quality-review.json",
@@ -3345,6 +3359,24 @@
       ]
     },
     {
+      "repository": "https://github.com/attemorysystem/attemory",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/4",
+          "id": "memory-stack-attemory",
+          "decision": "defer",
+          "evidence_level": "discovery_vendor"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/avelino/awesome-go",
       "aliases": [],
       "public_star": true,
@@ -3538,6 +3570,14 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/10",
+          "id": "memory-stack-basic-memory",
+          "decision": "reject",
+          "evidence_level": "discovery_vendor"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/candidate-quality-review.json",
@@ -7799,9 +7839,18 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/5",
+          "id": "memory-stack-gbrain",
+          "decision": "defer",
+          "evidence_level": "discovery_vendor"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -8070,6 +8119,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/11",
+          "id": "memory-stack-graphiti",
+          "decision": "defer",
+          "evidence_level": "discovery_vendor"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/candidate-quality-review.json",
           "pointer": "/candidates/9",
           "disposition": "conditional"
@@ -8142,6 +8199,14 @@
           "decision": "investigate",
           "review_level": "source_review",
           "evidence_level": "pinned_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/18",
+          "id": "memory-stack-llama-cpp",
+          "decision": "trial",
+          "evidence_level": "model_task_execution_other_workload"
         },
         {
           "kind": "research_supplement",
@@ -9488,6 +9553,24 @@
           "pointer": "/candidates/183",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/huggingface/transformers.js",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/22",
+          "id": "memory-stack-transformers-js",
+          "decision": "retain",
+          "evidence_level": "mac_nce_descriptive"
         }
       ]
     },
@@ -11285,6 +11368,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/16",
+          "id": "memory-stack-letta",
+          "decision": "reject",
+          "evidence_level": "discovery_vendor"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/candidate-quality-review.json",
           "pointer": "/candidates/12",
           "disposition": "out_of_scope"
@@ -12165,6 +12256,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/6",
+          "id": "memory-stack-mem0-oss",
+          "decision": "defer",
+          "evidence_level": "discovery_vendor"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/candidate-quality-review.json",
           "pointer": "/candidates/8",
           "disposition": "conditional"
@@ -12298,9 +12397,18 @@
         "catalog_card",
         "legacy_candidate",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/2",
+          "id": "memory-stack-mempalace",
+          "decision": "trial",
+          "evidence_level": "discovery_independent"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -12328,6 +12436,24 @@
           "path": "manifests/candidates.json",
           "pointer": "/candidates/1",
           "decision": "Conditional alternative for exact historical conversation retrieval; choose only if a real archive corpus needs semantic recall beyond AgentsView/QMD. Do not co-install as a second default memory layer."
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/memtensor/memos",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/15",
+          "id": "memory-stack-memos",
+          "decision": "defer",
+          "evidence_level": "discovery_vendor"
         }
       ]
     },
@@ -12924,6 +13050,24 @@
       ]
     },
     {
+      "repository": "https://github.com/ml-explore/mlx",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/20",
+          "id": "memory-stack-mlx",
+          "decision": "trial",
+          "evidence_level": "operational_record"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/ml-explore/mlx-lm",
       "aliases": [],
       "public_star": false,
@@ -12938,6 +13082,14 @@
           "decision": "investigate",
           "review_level": "source_review",
           "evidence_level": "pinned_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/21",
+          "id": "memory-stack-mlx-lm",
+          "decision": "trial",
+          "evidence_level": "operational_record"
         },
         {
           "kind": "research_supplement",
@@ -14102,6 +14254,14 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/17",
+          "id": "memory-stack-ollama",
+          "decision": "retain",
+          "evidence_level": "mac_nce_descriptive"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/claude-independent-discovery.json",
@@ -15765,6 +15925,14 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/8",
+          "id": "memory-stack-honcho",
+          "decision": "reject",
+          "evidence_level": "discovery_vendor"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/claude-independent-discovery.json",
@@ -17777,6 +17945,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/1",
+          "id": "memory-stack-agentmemory",
+          "decision": "trial",
+          "evidence_level": "mac_nce_descriptive"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/claude-independent-discovery.json",
           "pointer": "/candidates/336",
           "decision": "discovery_only",
@@ -19560,6 +19736,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/12",
+          "id": "memory-stack-supermemory",
+          "decision": "defer",
+          "evidence_level": "discovery_vendor"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/candidate-quality-review.json",
           "pointer": "/candidates/15",
           "disposition": "conditional"
@@ -20266,6 +20450,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/14",
+          "id": "memory-stack-claude-mem",
+          "decision": "defer",
+          "evidence_level": "discovery_vendor"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/candidate-quality-review.json",
           "pointer": "/candidates/10",
           "disposition": "overlap"
@@ -20497,6 +20689,14 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/7",
+          "id": "memory-stack-qmd",
+          "decision": "retain",
+          "evidence_level": "operational_record"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/5/candidates/0",
           "disposition": "selected"
@@ -20610,6 +20810,14 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/13",
+          "id": "memory-stack-cognee",
+          "decision": "defer",
+          "evidence_level": "discovery_vendor"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/candidate-quality-review.json",
@@ -21697,6 +21905,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/3",
+          "id": "memory-stack-hindsight",
+          "decision": "trial",
+          "evidence_level": "discovery_vendor"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/candidate-quality-review.json",
           "pointer": "/candidates/7",
           "disposition": "unqualified"
@@ -22121,6 +22337,14 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/19",
+          "id": "memory-stack-vllm-openai",
+          "decision": "defer",
+          "evidence_level": "discovery_vendor"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/claude-independent-discovery.json",
           "pointer": "/candidates/423",
           "decision": "discovery_only",
@@ -22215,6 +22439,14 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "pointer": "/repository_decisions/9",
+          "id": "memory-stack-openviking",
+          "decision": "reject",
+          "evidence_level": "discovery_vendor"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/candidate-quality-review.json",
