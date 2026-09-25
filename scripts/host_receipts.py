@@ -204,8 +204,22 @@ def git_head(root: Path) -> str:
     return revision
 
 
+# sanitize() redacts the user name only as a whole token, so a short name is not cut out of a longer word (user "ed"
+# in "recorded", "used" or "cached"): no letter, digit or underscore may touch it on either side. An escape just before
+# it (JSON "\n", "\r", "\t" or "\u002f", a "\x2f", a URL's "%2F") encodes a separator although it ends in a letter or
+# digit, so an encoded home path such as "%2FUsers%2F<name>" is still redacted.
+USER_NAME_START = "|".join((
+    r"(?<!\w)", r"(?<=\\[nrt])", r"(?<=\\u[0-9A-Fa-f]{4})", r"(?<=\\x[0-9A-Fa-f]{2})", r"(?<=%[0-9A-Fa-f]{2})",
+))
+
+
+def user_name_pattern(user: str) -> re.Pattern:
+    """``user`` as a whole token (USER_NAME_START), never as part of a longer word."""
+    return re.compile(f"(?:{USER_NAME_START}){re.escape(user)}" + r"(?!\w)")
+
+
 def sanitize(text: str) -> str:
-    """Replace $HOME with ~ and the current username with <user>; never raises."""
+    """Replace $HOME with ~ and the current username, as a whole token, with <user>; never raises."""
     home = str(Path.home())
     if home and home != "/":
         text = text.replace(home, "~")
@@ -214,7 +228,7 @@ def sanitize(text: str) -> str:
     except Exception:
         user = None
     if user:
-        text = re.sub(re.escape(user), "<user>", text)
+        text = user_name_pattern(user).sub("<user>", text)
     for _description, pattern in PRIVATE_CONTENT:
         text = pattern.sub("[redacted]", text)
     return text

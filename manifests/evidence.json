@@ -9905,8 +9905,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "8b60352383cc809aa7615277980ad351be124a0b007cf72a79f8e3bebb2d74d0",
-      "bytes": 27199
+      "sha256": "31d99664841519594ec9dfbf34778f1f90222bc0cd94c84c796162052a36c83f",
+      "bytes": 27289
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -28955,8 +28955,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "30da2f203f9f3d03c60eec6dc8ce416e84665013523e9001681429fbaf6d7598",
-      "bytes": 62536
+      "sha256": "6cdca28aca94ebd1ad01121297b8f205bf8876f5878983ec14fb982b307dd227",
+      "bytes": 63354
     },
     {
       "path": "scripts/landscape.py",
@@ -29360,8 +29360,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "8494c3483a225d97ba9fb33cb12eb5e4728e14ae8313f3bdad03f424b135df81",
-      "bytes": 73068
+      "sha256": "49f0b3ab16b3cf196ad3b449ac74dc0ad415fe1210a9969373460b76007c5a48",
+      "bytes": 76923
     },
     {
       "path": "tests/test_ibkr_acceptance.py",

@@ -1145,6 +1145,69 @@ class JsonEqualityTests(unittest.TestCase):
         self.assertTrue(errors)
 
 
+class SanitizeUserNameTests(unittest.TestCase):
+    """sanitize() redacts the user name only as a whole token. A substring match cut a
+    two-letter account name such as "ed" out of "recorded", "used" or "cached": under it,
+    hardware_profile.py --record-host refused "recorded-host-20260101" and a recorded excerpt
+    read "cach<user>". Every case runs as that account, whatever the test host's own user is,
+    and home paths must stay redacted in every form. Home paths are spelled through variables
+    so that this file passes the repository's own home-path scan (scripts/validate.py)."""
+
+    USERS, HOME_DIR = "Users", "home"
+    HOME = f"/{USERS}/ed"
+
+    def _sanitize(self, text: str) -> str:
+        with mock.patch.dict(os.environ, {"USER": "ed", "LOGNAME": "ed", "HOME": self.HOME}):
+            return hr.sanitize(text)
+
+    def test_words_that_contain_a_two_letter_name_are_kept(self):
+        for text in ("recorded-host-20260101", "used embedded cached shared edge",
+                     "ed2 edx ed_old ED", '{"hosts": ["cached-a"]}'):
+            with self.subTest(text=text):
+                self.assertEqual(self._sanitize(text), text)
+
+    def test_the_name_as_a_whole_token_is_redacted(self):
+        for text, expected in (("ed", "<user>"), ("ed@mbp:~", "<user>@mbp:~"), ('"ed"', '"<user>"'),
+                               ("owner ed staff", "owner <user> staff"), ("~ed/", "~<user>/")):
+            with self.subTest(text=text):
+                self.assertEqual(self._sanitize(text), expected)
+
+    def test_home_paths_stay_redacted_in_every_form(self):
+        # $HOME itself becomes ~. The name in any other home-path form (another OS's layout, a
+        # Windows path, a Claude project slug, URL-encoded, JSON-escaped) is still a token: an
+        # escape ending in a letter or digit ("%2F", "\u002f", "\n") is not part of its word.
+        # Another account whose name merely starts with it falls to the private-content pattern.
+        users, home = self.USERS, self.HOME_DIR
+        for text, expected in (
+                (f"/{users}/ed/code/x.py", "~/code/x.py"),
+                (f"/{home}/ed/x", f"/{home}/<user>/x"),
+                (f"C:\\{users}\\ed\\x", f"C:\\{users}\\<user>\\x"),
+                (f"-{users}-ed-src-app", f"-{users}-<user>-src-app"),
+                (f"file%3A%2F%2F%2F{users}%2Fed%2Fx", f"file%3A%2F%2F%2F{users}%2F<user>%2Fx"),
+                (f"\\u002f{users}\\u002fed\\u002fx", f"\\u002f{users}\\u002f<user>\\u002fx"),
+                (f"\\x2f{home}\\x2fed", f"\\x2f{home}\\x2f<user>"),
+                ('"line\\ned@mbp"', '"line\\n<user>@mbp"'),
+                (f"/{home}/ed_old/x", "[redacted]x")):
+            with self.subTest(text=text):
+                self.assertEqual(self._sanitize(text), expected)
+
+    def test_record_keeps_words_in_the_excerpt_and_redacts_the_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _init_support_tree(root)
+            buffer = io.StringIO()
+            with mock.patch.dict(os.environ, {"USER": "ed", "LOGNAME": "ed"}), contextlib.redirect_stdout(buffer):
+                exit_code = _run_cli([
+                    "record", "--root", str(root), "--host-id", "test-host-20260101",
+                    "--platform-id", "linux-wsl2-x86_64", "--os", "linux", "--architecture", "x86_64",
+                    "--component-id", "widget", "--stage", "install", "--evidence-class", "synthetic",
+                    "--cmd", "printf '%s\\n' 'embedded model cached (used 2 GB)' 'owner: ed'"])
+            self.assertEqual(exit_code, 0, buffer.getvalue())
+            receipt = json.loads((root / buffer.getvalue().strip()).read_text(encoding="utf-8"))
+        self.assertEqual(receipt["commands"][0]["output_excerpt"],
+                         "embedded model cached (used 2 GB)\nowner: <user>\n")
+
+
 class RegisterFileSortTests(unittest.TestCase):
     """register_file() keeps manifests/evidence.json files[] sorted by path
     (bisect insert) instead of always appending, so record/review stay
