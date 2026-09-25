@@ -472,7 +472,20 @@ second run recognizes the surface is already migrated -- `old` text gone,
 text that is no longer there and aborting partway through). `apply` itself
 now also refuses when `current/<id>` does not exist yet (minor finding:
 applying before `adopt --relink` had ever run used to create it fresh while
-every entrypoint stayed on the old real root, unredirected). `adopt --baseline [--spec PATH]`
+every entrypoint stayed on the old real root, unredirected).
+
+**At most one open transaction per component.** Coordinator decision on the
+txn state machine (round 5): `adopt --relink` and `apply` both refuse
+(a busy-style `EXIT_BUSY`, exit 75, naming the open txn id -- the same
+convention the `switch.lock` flock uses) to start a second transaction on a
+component that already has one open -- `in_progress` (a relink or apply that
+failed partway, or whose process crashed) or `pending_confirmation` (an
+`apply --confirm-within` awaiting its own confirm-or-revert timer). Close the
+open one first: `confirm --txn ID` (`pending_confirmation` only), `rollback
+--txn ID` or `rollback <component>` (either state), or, for an `in_progress`
+one left by a crash, `recover` -- which can now close it whether or not a
+later change has since superseded it (see `recover` below), so this refusal
+is never permanent. `adopt --baseline [--spec PATH]`
 is the read-only counterpart: it snapshots the current, already-relinked
 state (or records that a component is not relinked yet) without changing
 anything, for `status`/`verify` to compare against later. `adopt --resync ID
@@ -549,22 +562,32 @@ real commands.
 **Everything else.** `status [--json] [--component ID]` prints each managed
 component's current root and every recorded transaction; `confirm --txn TXN`
 marks a pending transaction confirmed and best-effort stops its revert timer
-(refuses a txn that was already rolled back, or whose post-apply verify
-already failed); `rollback ID | --txn TXN [--if-unconfirmed]` undoes a
+(refuses a txn that was already rolled back, whose post-apply verify already
+failed, that is still `in_progress`, or that `recover` has already closed as
+`superseded`); `rollback ID | --txn TXN [--if-unconfirmed]` undoes a
 transaction's operations in reverse order -- a service's `unit-restart` is
 always reversed only after its own `link` (never restarted while
 `current/<id>` still points at the new root), and its health probe compares
 against that `link`'s own recorded old root, not the pre-restart MainPID
-string the ledger's `unit-restart` entry itself carries -- (`--if-unconfirmed`
-is a no-op once the transaction was already confirmed or already rolled back
--- exactly what the scheduled timer above calls; every rollback also refuses
-a txn a later apply on the same component has since superseded, and one with
-no reversible operation at all, e.g. a bare baseline/resync/prune record);
-`verify [--component ID] --json` re-checks live state against the ledger and
-the ledger's own hash chain, independent of any apply; `recover` rolls back
-any transaction still `in_progress` (a crash
-mid-`apply` or mid-`relink`) rather than ever completing one after the fact;
-`prune --list` reports `tools/<name>-<version>` roots no `current/<id>` link
+string the ledger's `unit-restart` entry itself carries; a `link` reversal
+itself now refuses (compare-and-swap) rather than overwrites when the live
+target no longer matches what this same operation last set it to -- (
+`--if-unconfirmed` is a no-op once the transaction was already confirmed or
+already rolled back -- exactly what the scheduled timer above calls; every
+rollback also refuses a txn a later apply on the same component has since
+superseded (reports `already_superseded` if `recover` already closed it that
+way itself), and one with no reversible operation at all, e.g. a bare
+baseline/resync/prune record); `verify [--component ID] --json` re-checks
+live state against the ledger and the ledger's own hash chain, independent of
+any apply; `recover` reconciles every transaction still `in_progress` (a
+crash mid-`apply` or mid-`relink`), never completing one after the fact --
+each one is either rolled back (the ordinary case) or, when a *later*
+transaction on the same component has since superseded it, closed as
+`superseded` without touching anything (accepting that later, already-
+verified state rather than clobbering it -- see **At most one open
+transaction per component** above: this is what keeps that refusal from
+becoming permanent); `prune --list` reports `tools/<name>-<version>` roots no
+`current/<id>` link
 points at, that are not the previous root of any not-yet-rolled-back txn (a
 pending or already-applied txn's own rollback target stays live until that
 txn is actually rolled back), and that this tool's own reduced-scope in-use

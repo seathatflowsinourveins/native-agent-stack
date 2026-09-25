@@ -294,21 +294,52 @@ actually happened more recently, and never a bare `adopt --baseline`/
 `--resync`/`prune` record, which carries nothing to reverse). `rollback
 --txn T` also refuses a txn a *later* apply on the same component has since
 superseded (re-pointing `current/<id>` to T's old root would silently
-clobber that later apply), and `confirm --txn T` refuses a txn that was
-already rolled back, whose post-apply verify already failed, or that is
-still `in_progress` (a crashed or interrupted `apply` that never reached its
-own post-apply verify) -- confirming one of those would mark a half-applied
-component "applied" through the ledger alone, and since `recover` only
-reconciles a transaction still `in_progress`, it would then never see that
-transaction again either. A crashed or interrupted `apply`/`adopt --relink`
-never completes after the fact: `ecosystem-switch recover` finds any
-transaction still `in_progress` and rolls it back, the same as an explicit
-`rollback` would -- and (previously-unresolved finding) the same superseded-
-txn refusal `rollback --txn` applies is enforced inside the shared reversal
-itself, not only in the `rollback` command's own pre-check, so `recover`
-cannot silently clobber a later, already-applied txn either when reconciling
-an old crashed one; it reports that refusal as a problem for the operator
-and keeps reconciling every other `in_progress` transaction in the same run.
+clobber that later apply -- reports `already_superseded` rather than an
+error if `recover`, below, already closed T that way itself) or whose live
+target no longer matches what this same rollback's own `link` operation last
+set it to (a compare-and-swap precondition, round 5: something else changed
+it since, e.g. an out-of-band relink or bootstrap re-run, and overwriting
+that unnoticed change is worse than refusing), and `confirm --txn T` refuses
+a txn that was already rolled back, whose post-apply verify already failed,
+that is still `in_progress` (a crashed or interrupted `apply` that never
+reached its own post-apply verify), or that `recover` has already closed as
+`superseded` -- confirming any of those would mark a half-applied or
+already-superseded component "applied" through the ledger alone.
+
+**At most one open transaction per component.** Coordinator decision on the
+txn state machine (round 5): `apply` and `adopt --relink` both refuse (a
+busy-style `EXIT_BUSY`, the same 75 the `switch.lock` flock uses, naming the
+open txn id) to start a second transaction on a component that already has
+one `in_progress` or `pending_confirmation`. This is what closes the major
+finding that a second `apply` on top of an unconfirmed one (A1 v1->v2
+`--confirm-within`, then A2 v2->v3, nothing refusing it) used to defeat
+confirm-or-revert outright -- once A2 itself reverted, A1's old root was
+unrecoverable through either `rollback --txn A1` (refused as superseded by
+A2) or `rollback foo` (which kept re-selecting A2). The operator closes the
+open transaction first: `confirm --txn ID` (`pending_confirmation` only),
+`rollback --txn ID`/`rollback <component>` (either state), or, for an
+`in_progress` one left by a crash, `recover`.
+
+A crashed or interrupted `apply`/`adopt --relink` never completes after the
+fact: `ecosystem-switch recover` finds every transaction still `in_progress`
+and closes each one, either by rolling it back (the ordinary case -- nothing
+later touched its component) or, when a *later* transaction on the same
+component has since become that component's own current-setting change
+(provable from the ledger's own write-ahead entries, the identical check
+`rollback --txn` itself uses to refuse), by closing it as `superseded`
+without touching anything -- accepting that later, already-verified state as
+authoritative rather than clobbering it. Before this split existed
+(round-5 finding), the superseded case was only ever *refused*, never
+closed: since nothing else ever moves a transaction out of `in_progress`,
+that refusal left it stuck forever, and with it, the open-transaction guard
+above permanently refused every later `apply`/`adopt --relink` on that
+component -- a safety fix that had turned into a permanent denial-of-service
+against the very component it was protecting. `recover` reports each
+transaction it reconciled under `recovered_txns` (rolled back) or
+`superseded_txns` (closed without touching anything), and any genuine
+problem (e.g. a rollback's own compare-and-swap refusal above) under
+`rollback_problems` for the operator, while it keeps reconciling every other
+`in_progress` transaction in the same run.
 
 **Prune.** `prune --list` reports which `tools/<name>-<version>` prefixes no
 `current/<id>` link points at, that are not the previous root of any
