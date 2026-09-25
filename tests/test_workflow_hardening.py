@@ -369,7 +369,7 @@ class TargetRulesetTests(unittest.TestCase):
         (checks,) = self.rule("required_status_checks")
         contexts = {check["context"]: check.get("integration_id") for check in checks["parameters"]["required_status_checks"]}
         for context in ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner",
-                        "verdict-review-gate"):
+                        "verdict-review-gate", "validate-macos"):
             self.assertEqual(contexts.get(context), 15368, context)
         self.assertEqual(len(self.rule("code_scanning")), 1)
 
@@ -715,6 +715,128 @@ class GitleaksConfigTestsRunInCI(unittest.TestCase):
         install = job.index("Install checksum-verified pinned gitleaks")
         self.assertLess(install, job.index("gitleaks allowlist regression tests"),
                         "the tests must run after the pinned binary is installed")
+
+class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
+    """validate-macos required-check readiness (docs/decisions/2026-09-22-github-automation-closure.md,
+    "validate-macos required (2026-09-25)"): validate-macos must report a status on every
+    pull_request (a required check that never reports blocks the PR forever), while the
+    three real-install bootstrap-* jobs stay path-gated exactly as before."""
+
+    text = (WORKFLOWS / "adoption-bootstrap.yml").read_text(encoding="utf-8")
+    job_map = jobs(text)
+
+    def test_pull_request_trigger_has_no_path_filter(self):
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\njobs:", 1)[0]
+        pull_request = trigger.split("\n  pull_request:", 1)[1].split("\n  schedule:", 1)[0]
+        self.assertNotIn("paths", pull_request)
+
+    def test_validate_macos_is_reachable_on_every_pull_request(self):
+        # No `needs:` (so it is never withheld pending another job) and no job-level `if:`
+        # (so no expression can skip the job itself for a pull_request): a required check
+        # must be reachable on every PR. Step-level `if: always()` (log upload) is fine and
+        # deliberately not what this checks.
+        job = self.job_map["validate-macos"]
+        header = job.split("\n    steps:\n", 1)[0]
+        self.assertNotIn("needs:", header)
+        self.assertNotRegex(header, r"(?m)^    if:", "a required check must not be skipped on any pull_request")
+
+    def test_bootstrap_jobs_stay_path_gated_on_pull_request_and_still_run_off_it(self):
+        # Regression for "bootstrap jobs are skipped on push, schedule and dispatch"
+        # (independent review of this branch, 2026-09-25): `needs: changes` alone applies
+        # an implicit `success()`, and `changes` itself only runs `if:
+        # github.event_name == 'pull_request'`, so on push/schedule/workflow_dispatch
+        # `changes` is skipped and a bare `if: github.event_name != 'pull_request' ||
+        # needs.changes.outputs.bootstrap == 'true'` (no status function) is never even
+        # evaluated -- the implicit success() check fails first and the job is skipped
+        # too. Confirmed live: dispatch run 36085789483 showed `changes` skipped and all
+        # three bootstrap-* jobs completing as skipped (docs/decisions/
+        # 2026-09-22-github-automation-closure.md, "validate-macos required
+        # (2026-09-25)", "Measured (before the fix)"). The fix needs both a status
+        # function (`!cancelled()` or `always()`) so the `if:` is evaluated at all when
+        # `changes` was skipped, and `!= 'false'` rather than `== 'true'` so a `changes`
+        # job that itself failed or was cancelled (empty output, not the string
+        # `'false'`) still runs these jobs (`changes`' own fail-safe default is
+        # `bootstrap=true`, never a skip).
+        for job_id in ("bootstrap-linux", "bootstrap-macos", "bootstrap-macos-brew"):
+            job = self.job_map[job_id]
+            self.assertIn("needs: changes", job, job_id)
+            condition = block_if(job)
+            self.assertIsNotNone(condition, job_id)
+            self.assertRegex(condition, r"!cancelled\(\)|always\(\)",
+                              f"{job_id}: if: needs a status function (!cancelled() or always()) "
+                              f"or an implicit success() from `needs: changes` skips it whenever "
+                              f"changes itself is skipped (every push/schedule/dispatch run); got: {condition!r}")
+            self.assertIn("needs.changes.outputs.bootstrap != 'false'", condition, job_id)
+            self.assertNotIn("needs.changes.outputs.bootstrap == 'true'", condition,
+                              f"{job_id}: '== ' true would keep the fail-open behaviour a "
+                              f"missing/empty output (changes skipped, failed or cancelled) needs "
+                              f"'!= \\'false\\'' to avoid")
+            self.assertIn("github.event_name != 'pull_request'", condition, job_id)
+
+    def test_the_pre_fix_condition_text_fails_this_tests_own_assertions(self):
+        # Proof the strengthened assertions above are not vacuous: the exact `if:` text
+        # this branch shipped before the fix round (a bare `if:`, no status function, and
+        # `== 'true'`) must fail them.
+        pre_fix_condition = "github.event_name != 'pull_request' || needs.changes.outputs.bootstrap == 'true'"
+        with self.assertRaises(AssertionError):
+            self.assertRegex(pre_fix_condition, r"!cancelled\(\)|always\(\)")
+        with self.assertRaises(AssertionError):
+            self.assertIn("needs.changes.outputs.bootstrap != 'false'", pre_fix_condition)
+
+    def test_changes_job_runs_only_on_pull_request_and_diffs_paths_matching_push(self):
+        job = self.job_map["changes"]
+        self.assertEqual(block_if(job), "github.event_name == 'pull_request'")
+        # The push trigger's `paths:` list stays the source of truth this job's own
+        # PATTERNS array must match once both are normalized to the same glob spelling;
+        # this is a textual comparison of the two lists, not a re-derivation of GitHub's
+        # own `paths:` matching semantics (a case pattern's single `*` matches `/`, so it
+        # is a strictly wider match than `paths:`'s `**` -- always in the safe,
+        # over-matching direction; see the job's own in-file comment).
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\njobs:", 1)[0]
+        push = trigger.split("push:", 1)[1].split("pull_request:", 1)[0]
+        push_paths = re.findall(r"(?m)^      - '([^']+)'$", push)
+        self.assertTrue(push_paths)
+
+        def normalize(path):
+            # PATTERNS uses bash case-glob syntax ('adoption/*'); push uses
+            # gitignore-style globs ('adoption/**'). Both mean "everything under".
+            return path.replace("/**", "/*")
+
+        job_patterns = re.findall(r"(?m)^            '([^']+)'$", job)
+        self.assertTrue(job_patterns)
+        self.assertEqual(sorted(normalize(path) for path in push_paths), sorted(job_patterns))
+
+    def test_changes_job_fails_safe_on_missing_shas_and_git_diff_errors(self):
+        # Item 2/3 of the independent review: a missing payload SHA or a failed `git
+        # diff` must still write bootstrap=true (never leave the job to fail and skip
+        # the three bootstrap-* jobs through `needs:`), and the diff must be NUL-delimited
+        # so a non-ASCII quoted filename still matches a PATTERNS glob.
+        job = self.job_map["changes"]
+        script = step_block(job, "Detect whether any bootstrap-relevant path changed")
+        (set_flags,) = re.findall(r"(?m)^\s+set (-\S+)(?: |$)", script)
+        self.assertNotIn("e", set_flags, "set -e would abort before a failure path's own bootstrap=true write")
+        # `shell: bash` runs as `bash -eo pipefail`, so errexit must be turned off explicitly.
+        self.assertRegex(script, r"(?m)^\s+set \+e\s*$", "errexit is on under shell: bash unless the script runs set +e")
+        self.assertIn('diff_file="$(mktemp)" || { echo "bootstrap=true" >> "$GITHUB_OUTPUT"; exit 0; }', script)
+        self.assertIn('echo "bootstrap=true" >> "$GITHUB_OUTPUT"', script)
+
+        def if_block(needle):
+            # A same-indentation-anchored match (not a naive string split on "fi", which
+            # false-positives inside "$diff_file"): captures from the matched "if" line
+            # through the "fi" at the same leading whitespace.
+            match = re.search(rf"(?ms)^([ \t]*)if\b[^\n]*{re.escape(needle)}.*?\n(.*?)\n\1fi\b", script)
+            self.assertIsNotNone(match, needle)
+            return match.group(0)
+
+        missing_sha_block = if_block('-z "${BASE_SHA:-}"')
+        self.assertIn('echo "bootstrap=true"', missing_sha_block)
+        self.assertIn("exit 0", missing_sha_block)
+        self.assertIn("git diff -z --no-renames --name-only", script)
+        diff_failure_block = if_block("git diff -z")
+        self.assertIn('echo "bootstrap=true"', diff_failure_block)
+        self.assertIn("exit 0", diff_failure_block)
+        self.assertIn("read -r -d ''", script)
+
 
 if __name__ == "__main__":
     unittest.main()

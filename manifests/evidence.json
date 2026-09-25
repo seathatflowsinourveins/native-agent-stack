@@ -3079,8 +3079,8 @@
     },
     {
       "path": ".github/main-ruleset.json",
-      "sha256": "fedbe641236d9089c6d5e5f417efc8f63af7409a579458d41c98f87e00776b8f",
-      "bytes": 1633
+      "sha256": "7760b633919767f6e0851e7af284471f81fb820a6b736323142f543adb5b0d8a",
+      "bytes": 1699
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
@@ -3109,8 +3109,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "9c55d841ef987adb9891464966c090d43f315296ee58e8e49e7f2c28ec0dca34",
-      "bytes": 31496
+      "sha256": "0c9cae84deded9dda6822c9092315fd5efb087ad4c5b989f21215897bbcb4252",
+      "bytes": 39257
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -9950,8 +9950,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "82f20005cb56e97cab4ef36e7c521e7892642e4f9c1bb603e0f5df8d8c5e948d",
-      "bytes": 84235
+      "sha256": "9dafb830932b4dea8af51d367952cd3211e4eeaa1417b4ed63633eff22545429",
+      "bytes": 93884
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -10080,8 +10080,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "29c4bb47a021a313a85c0efdef9335f877c7a1c465ce8c3a11da4570c01a8d2a",
-      "bytes": 78773
+      "sha256": "fa108ea72ff72c26b5a183404b67270dfecb5a603c4f17cbf7f45c106f9dfd22",
+      "bytes": 79676
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -29155,8 +29155,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "adb957701308abd587555a3161791e4c53ab56747aa768b594f03d5d15949e36",
-      "bytes": 165300
+      "sha256": "4efffa5c652fcdcff26939c0e0a559b40a74933effe466678dc0bbe8a9623e38",
+      "bytes": 165726
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -29630,8 +29630,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "7ecbde4156ce4484091e33cd934636755ed6a14b764aa6a3100dc5164d2d408b",
-      "bytes": 42344
+      "sha256": "51a699673378a9da4924b9bac612f8669da43f85d994d4960545ffa2bfb1e4d8",
+      "bytes": 50481
     },
     {
       "path": "tests/test_workflow_security.py",
