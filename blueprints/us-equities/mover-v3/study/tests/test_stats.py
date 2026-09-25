@@ -172,6 +172,68 @@ class MDE(unittest.TestCase):
         self.assertTrue(ST.mde_excluded("H1-D", stats, mde))
 
 
+class ConcentratedSessions(unittest.TestCase):
+    """Review round 15, F06: undefined and degenerate bootstrap draws control both support and exclusion."""
+
+    def _h1d(self, n_sessions, per_group=100, spread=0.0):
+        """H1-D rows at validation: each group has per_group trades spread over n_sessions sessions (L = 10 apart),
+        every value 0 (+/- spread), so the group means coincide."""
+        from core import evaluate as EV
+        sessions = [f"s{i:03d}" for i in range(252)]
+        occupied = [sessions[(i * 20) % 252] for i in range(n_sessions)]
+        rows = []
+        for k, g in enumerate(("high", "low")):
+            for j in range(per_group):
+                v = spread * ((j * (k + 2)) % 5 - 2)                  # values in {-2, .., 2} x spread, mean 0
+                nets = {m: v for m in ("primary", "c0.5", "c2.0", "table_only", "stress")}
+                rows.append({"session": occupied[(j + k) % n_sessions], "value": v, "group": g,
+                             "rec": {"symbol": f"S{j}", "exit": "normal", "nets": nets}})
+        return EV.item_result("H1-D", "validation", rows, sessions, "mover-v3-test", B=4000)
+
+    def test_one_occupied_session_supports_no_exclusion(self):
+        """The review's case: both H1-D groups meet the 100-trade minimum inside one entry session and their means
+        coincide. Draws holding that session have difference 0, the others none. At e7529b47 bound() dropped the
+        undefined draws, the interval was [0, 0] and the item was labelled 'not_supported_mde_excluded'."""
+        res = self._h1d(1)
+        self.assertTrue(res["n_ok"])
+        self.assertEqual(res["occupied_sessions"], {"high": 1, "low": 1})
+        self.assertGreater(res["inference"]["undefined_fraction"], 0.2)
+        self.assertFalse(res["inference"]["valid"])
+        self.assertFalse(res["mde_excluded"])
+        label = ST.item_label("validation", "H1-D", p_stage=1.0, n_ok=True, robust_ok=True, mde_ok=res["mde_excluded"],
+                              inference_ok=res["inference"]["valid"])
+        self.assertEqual(label, "underpowered")
+
+    def test_spread_sessions_restore_valid_inference(self):
+        res = self._h1d(12, spread=0.001)
+        self.assertLessEqual(res["inference"]["undefined_fraction"], ST.tail_level("H1-D"))
+        self.assertTrue(res["inference"]["valid"])
+        self.assertTrue(res["mde_excluded"])
+
+    def test_degenerate_draws_support_neither_a_pass_nor_an_exclusion(self):
+        stats = np.full(1000, 0.02)                               # every draw the same positive mean
+        chk = ST.inference_check("H3-a", stats)
+        self.assertTrue(chk["degenerate"])
+        self.assertFalse(chk["valid"])
+        self.assertFalse(ST.mde_excluded("H3-a", np.zeros(1000), 0.05))
+        self.assertEqual(ST.item_label("validation", "H3-a", p_stage=0.001, n_ok=True, robust_ok=True, mde_ok=False,
+                                       inference_ok=False), "underpowered")
+
+    def test_conservative_bounds(self):
+        rng = np.random.default_rng(3)
+        x = rng.normal(size=5001)
+        for q in (0.005, 0.01, 0.5, 0.99, 0.995):              # equal to numpy's linear quantile with no undefined draw
+            self.assertAlmostEqual(ST.conservative_bound(x, q, upper=q > 0.5), float(np.quantile(x, q)), places=12)
+        y = x.copy()
+        y[:60] = np.nan                                          # 1.2% undefined
+        self.assertEqual(ST.conservative_bound(y, 0.99, upper=True), float("inf"))
+        self.assertEqual(ST.conservative_bound(y, 0.01, upper=False), float("-inf"))
+        self.assertTrue(np.isfinite(ST.conservative_bound(y, 0.95, upper=True)))
+        self.assertFalse(ST.inference_check("H3-a", y)["valid"])
+        self.assertTrue(ST.inference_check("H3-a", x)["valid"])
+        self.assertEqual(ST.tail_level("H3-c"), 0.005)
+
+
 class Labels(unittest.TestCase):
     def test_stage_pass_names_and_rules(self):
         kw = dict(n_ok=True, robust_ok=True, mde_ok=False)

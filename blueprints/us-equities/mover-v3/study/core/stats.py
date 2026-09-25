@@ -6,7 +6,9 @@ start i contributes sessions i, i+1, ..., i+L-1 (mod n), and the concatenation i
 statistic is the trade-level mean over the drawn sessions' trades (H1-D: high mean minus low mean, sessions drawn
 jointly). Review round 8, R8-11: the null side is closed (stat_b <= 0 for 'greater', >= 0 for 'less'), and a draw
 with an empty group or cell has no statistic and counts as a null-side draw (for both sides of H3-c). Percentile
-bounds and the normal-tail sd use the draws that have a statistic.
+bounds and the normal-tail sd use the draws that have a statistic. Review round 15, F06: the MDE-exclusion bounds
+place an undefined draw on the side that cannot support an exclusion (conservative_bound), and inference_check decides
+whether the bootstrap supports any label (occupied-cluster eligibility and degenerate draws).
 """
 from __future__ import annotations
 
@@ -112,8 +114,50 @@ def normal_tail_p(estimate: float, stats, alternative: str) -> float:
 
 
 def bound(stats, q: float):
+    """The q-quantile of the draws that have a statistic (numpy 'linear'): the descriptive interval_95 only."""
     defined = stats[~np.isnan(stats)]
     return float(np.quantile(defined, q, method="linear")) if len(defined) else None
+
+
+def conservative_bound(stats, q: float, upper: bool) -> float:
+    """Review round 15, F06: the q-quantile over all B draws (numpy 'linear' interpolation), a draw with no statistic
+    placed beyond every defined one on the side that cannot support an exclusion (+inf for an upper bound, -inf for a
+    lower one), as the p-value counts it on the null side (statistics.p_value). With no undefined draw it equals
+    bound(). At e7529b47 the MDE bounds dropped undefined draws, so a group occupying one session gave a zero-width
+    interval and an unjustified 'not_supported_mde_excluded'."""
+    stats = np.asarray(stats, dtype=float)
+    nan = np.isnan(stats)
+    k, defined = int(nan.sum()), np.sort(stats[~nan])
+    x = np.concatenate([defined, np.full(k, np.inf)]) if upper else np.concatenate([np.full(k, -np.inf), defined])
+    h = (len(x) - 1) * q
+    lo, hi = int(math.floor(h)), int(math.ceil(h))
+    if np.isinf(x[lo]) or np.isinf(x[hi]):
+        return float(x[hi] if upper else x[lo])
+    return float(x[lo] + (h - lo) * (x[hi] - x[lo]))
+
+
+def tail_level(item: str) -> float:
+    """The Bonferroni tail level of the MDE bounds (outcome_reporting.labels): 0.05 / 5 one-sided, 0.05 / 10 per tail
+    for the two-sided H3-c."""
+    return TEST["alpha"] / (2 * TEST["m"]) if ALTERNATIVE[item] == "two-sided" else TEST["alpha"] / TEST["m"]
+
+
+def inference_check(item: str, stats) -> dict:
+    """Review round 15, F06: whether the bootstrap supports a label at all, deciding both a pass and an MDE exclusion
+    (item_label's inference_ok). Occupied-cluster eligibility: the draws in which the item (each H1-D group) has no
+    trade have no statistic, and their share may not exceed the item's tail level, so that the tail bounds and the
+    null side are decided by draws that hold data (with blocks of L sessions it needs the trades to span several
+    blocks: G occupied sessions more than L apart leave about exp(-1)^G of the draws empty, about 5 sessions at the
+    one-sided 0.01 and 6 at the two-sided 0.005). Degenerate inference: fewer than two defined draws, or defined draws
+    with no spread, support neither a pass nor an exclusion."""
+    stats = np.asarray(stats, dtype=float)
+    B = len(stats)
+    undefined = int(np.isnan(stats).sum())
+    defined = stats[~np.isnan(stats)]
+    degenerate = len(defined) < 2 or float(np.max(defined) - np.min(defined)) == 0.0
+    share = undefined / B if B else 1.0
+    return {"draws": B, "undefined_draws": undefined, "undefined_fraction": share, "tail_level": tail_level(item),
+            "degenerate": bool(degenerate), "valid": bool(B and share <= tail_level(item) and not degenerate)}
 
 
 # ---------------------------------------------------------------- Holm
@@ -200,19 +244,17 @@ def mde(item: str, n: int | None = None, n1: int | None = None, n2: int | None =
 
 
 def mde_excluded(item: str, stats, mde_value) -> bool:
-    if mde_value is None:
+    """outcome_reporting.labels.not_supported_mde_excluded, with the conservative bounds (review round 15, F06) and
+    only when inference_check holds."""
+    if mde_value is None or not inference_check(item, stats)["valid"]:
         return False
-    alt = ALTERNATIVE[item]
+    alt, a = ALTERNATIVE[item], tail_level(item)
     if alt == "two-sided":
-        a = TEST["alpha"] / (2 * TEST["m"])
-        lo, hi = bound(stats, a), bound(stats, 1.0 - a)
-        return lo is not None and hi is not None and lo > -mde_value and hi < mde_value
-    a = TEST["alpha"] / TEST["m"]
+        return conservative_bound(stats, a, upper=False) > -mde_value and \
+            conservative_bound(stats, 1.0 - a, upper=True) < mde_value
     if alt == "less":
-        lo = bound(stats, a)
-        return lo is not None and lo > -mde_value
-    hi = bound(stats, 1.0 - a)
-    return hi is not None and hi < mde_value
+        return conservative_bound(stats, a, upper=False) > -mde_value
+    return conservative_bound(stats, 1.0 - a, upper=True) < mde_value
 
 
 LINEAGE_LEVEL = TEST["alpha"] / TEST["lineage_trials"]
@@ -229,7 +271,7 @@ PASS_NAME = {"development": "development pass", "validation": "screened", "holdo
 
 def item_label(stage: str, item: str, *, p_stage: float, n_ok: bool, robust_ok: bool, mde_ok: bool,
                void: bool = False, sign_ok: bool = True, contaminated: bool = False, carried: bool = True,
-               opposite: bool = False) -> str:
+               opposite: bool = False, inference_ok: bool = True) -> str:
     """outcome_reporting.labels: the stage pass name, 'not_supported_mde_excluded' or 'underpowered'.
     p_stage is the unadjusted p at development and the Holm-adjusted p at validation and the holdout. At the holdout
     an item that was not carried is 'not carried' whatever its sample (review round 9, M-1). An estimate opposite a
@@ -237,7 +279,9 @@ def item_label(stage: str, item: str, *, p_stage: float, n_ok: bool, robust_ok: 
     its bootstrap p is large (outcome_reporting.rule; review round 12, F9)."""
     if stage == "holdout" and not carried:
         return "not carried"
-    if void or not n_ok:
+    # review round 15, F06: an invalid or degenerate bootstrap (inference_check) supports neither a pass nor an
+    # exclusion
+    if void or not n_ok or not inference_ok:
         return "underpowered"
     # the robustness means are required for a tradable cell's validation and holdout pass, not at development
     passes = p_stage <= TEST["alpha"] and (robust_ok or item not in TRADABLE or stage == "development")

@@ -17,6 +17,10 @@ from core.trades import h3c_event, trade
 ARM_OF = {"H1-D": "b_lane", "H1-D-b_lane-low": "b_lane", "H3-a": "a_intraday", "H3-b": "b_overnight"}
 ARMS = ("b_lane", "a_intraday", "b_overnight")
 SENSITIVITY_MODES = ("c0.5", "c2.0", "table_only", "stress")
+# review round 15, F14: the units of an item's estimate, interval and MDE
+MDE_UNITS = {"H1-D": "difference of mean net returns (fraction)", "H1-D-b_lane-low": "mean net return (fraction)",
+             "H3-a": "mean net return (fraction)", "H3-b": "mean net return (fraction)",
+             "H3-c": "difference of mean log returns (log units; x 100 = log points, not a percent return)"}
 TERMINAL_KINDS = ("terminal_zero", "terminal_merger", "censored_terminal")
 
 
@@ -182,13 +186,21 @@ def item_result(item: str, stage: str, rows: list, sessions: list, protocol_id: 
         boot = ST.bootstrap(sessions, groups, rng, L, B=B)
     p = ST.p_value(boot, alt)
     p_n = ST.normal_tail_p(est, boot, alt) if est is not None else 1.0
+    # review round 15, F06 and F14: occupied entry sessions (per group for H1-D) and the bootstrap's validity, which
+    # decides both a pass and an MDE exclusion (core.stats.inference_check)
+    if item == "H1-D":
+        occupied = {g: len({r["session"] for r in rows if r["group"] == g}) for g in ("high", "low")}
+    else:
+        occupied = len({r["session"] for r in rows})
     res = {"item": item, "alternative": alt, "estimate": est, "n": n, "n_high": n_hi, "n_low": n_lo,
+           "occupied_sessions": occupied, "units": MDE_UNITS[item],
            "median": float(np.median([r["value"] for r in rows])) if rows else None,
            "p": p, "p_normal_tail": p_n, "mde": mde_v, "mde_excluded": ST.mde_excluded(item, boot, mde_v),
+           "inference": ST.inference_check(item, boot),
            "n_ok": ST.minimum_met(item, stage, n, n_hi, n_lo),
            "lineage_confirmed": ST.lineage_confirmed(p, p_n),
            # outcome_reporting.rule (review round 11, C12): the 95% percentile interval of the estimate, reported
-           # with the opposite_direction flag set by evaluate()
+           # with the opposite_direction flag set by evaluate(); over the draws that have a statistic
            "interval_95": [ST.bound(boot, 0.025), ST.bound(boot, 0.975)]}
     res["sensitivities"] = sensitivities(item, rows)
     if item == "H1-D":
@@ -355,7 +367,8 @@ def evaluate(stage: str, events: list, ctx, store, *, protocol_id: str, stage_se
                                   robust_ok=bool(r.get("robustness", {}).get("all_positive", True)),
                                   mde_ok=r["mde_excluded"], void=is_void, sign_ok=sign_ok,
                                   contaminated=contaminated, carried=i in carried,
-                                  opposite=r["opposite_direction"] and ALTERNATIVE[i] != "two-sided")
+                                  opposite=r["opposite_direction"] and ALTERNATIVE[i] != "two-sided",
+                                  inference_ok=r["inference"]["valid"])
         r["p_stage"] = p_stage[i]
         r["label"] = labels[i]
         r["qualifiers"] = ST.qualifiers(stage, labels[i], r["lineage_confirmed"], qualifiers)
