@@ -101,6 +101,22 @@ class Busy(SwitchError):
         super().__init__(message, EXIT_BUSY)
 
 
+class UnitRestartAttempted(SwitchError):
+    """A unit-restart that reached ``systemctl ... restart`` (a real side effect on the host)
+    before failing -- either the restart command itself exited non-zero, or it exited 0 but the
+    post-restart health probe rejected the result. Unlike a pre-flight refusal (denylisted unit,
+    outside its window, or the memory gate: none of which ever call ``restart``), the unit is no
+    longer guaranteed to be running the old build here, so the caller must still ledger this step
+    (``fields``, gathered as far as the failure allowed) before re-raising: otherwise
+    ``rollback_txn``'s reverse-order pass never finds it and never restarts the unit again against
+    the reverted root, leaving it running the new (or a crashed) build while the ledger says
+    ``rolled_back`` (major finding)."""
+
+    def __init__(self, message: str, fields: dict):
+        super().__init__(message)
+        self.fields = fields
+
+
 # --------------------------------------------------------------------------------------
 # Small utilities
 # --------------------------------------------------------------------------------------
@@ -690,19 +706,29 @@ def op_unit_restart(unit: str, *, window_component_ok: bool, expected_root: str)
     if memory_issue:
         raise SwitchError(f"unit-restart of {unit} refused: {memory_issue}")
     before = run_captured([*systemctl_argv(), "--user", "show", "--property=MainPID", "--value", unit])
+    before_fields = {"from": (before.stdout or "").strip(), "pre_sha256": sha256_text(before.stdout or "")}
     run_captured([*systemctl_argv(), "--user", "daemon-reload"])
     restart = run_captured([*systemctl_argv(), "--user", "restart", unit])
     if restart.returncode != 0:
-        raise SwitchError(f"systemctl --user restart {unit} exited {restart.returncode}: {restart.stderr.strip()[:400]}")
+        # A real side effect (systemctl restart was actually invoked) even though it failed: the
+        # unit may no longer be running the old build. UnitRestartAttempted carries what little
+        # this call knows (the pre-restart MainPID; no post-restart exe to report) so the caller
+        # can still ledger the attempt before re-raising (major finding).
+        raise UnitRestartAttempted(
+            f"systemctl --user restart {unit} exited {restart.returncode}: {restart.stderr.strip()[:400]}",
+            {**before_fields, "to": None, "post_sha256": sha256_text("")})
     after_pid = run_captured([*systemctl_argv(), "--user", "show", "--property=MainPID", "--value", unit])
     pid = (after_pid.stdout or "").strip()
     exe = None
     if pid.isdigit() and pid != "0":
         exe = read_link_target(Path(f"/proc/{pid}/exe"))
     if exe is None or not path_is_under(exe, expected_root):
-        raise SwitchError(f"health probe failed for {unit}: /proc/{pid}/exe is {exe!r}, expected it under {expected_root!r}")
-    fields = {"from": (before.stdout or "").strip(), "to": exe, "pre_sha256": sha256_text(before.stdout or ""),
-              "post_sha256": sha256_text(exe)}
+        # The restart command itself succeeded (returncode 0): the unit was actually restarted,
+        # just not health-probed as landing under expected_root. Same reasoning as above.
+        raise UnitRestartAttempted(
+            f"health probe failed for {unit}: /proc/{pid}/exe is {exe!r}, expected it under {expected_root!r}",
+            {**before_fields, "to": exe, "post_sha256": sha256_text(exe or "")})
+    fields = {**before_fields, "to": exe, "post_sha256": sha256_text(exe)}
     inverse = None  # a unit-restart's inverse is another unit-restart after the link is rolled back; the
     # caller (apply's reverse-order rollback) re-issues op_unit_restart against the reverted root, not this dict.
     return fields, inverse
@@ -832,11 +858,33 @@ def cmd_apply(args) -> int:
         if not to_root_name.startswith(prefix):
             raise SwitchError(f"--to-root basename {to_root_name!r} does not start with the expected "
                                f"{prefix!r} prefix for component {args.component!r}; refusing to guess a version")
-        version = to_root_name[len(prefix):]
+        full_suffix = to_root_name[len(prefix):]
 
         # Every gate below must pass BEFORE current/<id> (or any unit) is touched: a receipt,
         # window, memory or denylist refusal must never leave a half-applied component.
         receipt = load_receipt(root, args.receipt)
+        # identity.version must stay the clean upstream version throughout its life: it is what
+        # record_native_rollout.py copies verbatim into a landscape winner's pin (read downstream
+        # by validate_pins_v2 parity and platform_status.py's host-receipt binding against a live
+        # host's plain `--version` output), never a --to-root basename. Deriving an "expected
+        # version" from --to-root and forcing identity.version to equal it byte-for-byte (the old
+        # design) broke exactly that for a staged bootstrap --tools-suffix root (e.g.
+        # tools/rtk-0.50.0-r20260925): a receipt for the real "0.50.0" was refused, and a receipt
+        # written to satisfy apply instead polluted the pin with "0.50.0-r20260925" (major
+        # finding). So this reads the receipt's own claimed identity.version first and only checks
+        # it is *consistent* with the root name (exactly "<component>-<version>", or that plus a
+        # "-<suffix>" staging marker) -- the receipt's install.root (checked below, exact match
+        # required) is what binds it to this *specific* staged root, not the version string.
+        identity = receipt.get("identity") if isinstance(receipt, dict) and isinstance(receipt.get("identity"), dict) else {}
+        claimed_version = identity.get("version")
+        if isinstance(claimed_version, str) and claimed_version:
+            if not (full_suffix == claimed_version or full_suffix.startswith(f"{claimed_version}-")):
+                raise SwitchError(f"receipt gate: receipt identity.version {claimed_version!r} is not consistent "
+                                   f"with --to-root basename {to_root_name!r} (expected {prefix!r} + "
+                                   f"{claimed_version!r}, optionally followed by '-<staging suffix>')")
+            version = claimed_version
+        else:
+            version = full_suffix
         receipt_issue = receipt_gate_issue(receipt, args.component, version, root=root, to_root=args.to_root)
         if receipt_issue:
             raise SwitchError(f"receipt gate: {receipt_issue}")
@@ -866,9 +914,21 @@ def cmd_apply(args) -> int:
                     fields, _inverse = op_link(root, step["surface"], step["to"])
                     surface = step["surface"]
                 elif step["kind"] == "unit-restart":
-                    fields, _inverse = op_unit_restart(step["unit"], window_component_ok=True,
-                                                       expected_root=step["expected_root"])
                     surface = step["unit"]
+                    try:
+                        fields, _inverse = op_unit_restart(step["unit"], window_component_ok=True,
+                                                           expected_root=step["expected_root"])
+                    except UnitRestartAttempted as error:
+                        # Major finding: a restart that reached systemctl before failing (a
+                        # non-zero exit, or a health probe that rejected the result) is a real
+                        # side effect rollback_txn must still be able to find. Ledger it here,
+                        # before re-raising, so the reverse-order rollback below restarts the
+                        # unit again against the reverted root instead of leaving it running the
+                        # new (or a crashed) build while the ledger says "rolled_back".
+                        ledger.append(txn=txn, op="unit-restart", component=args.component, surface=surface,
+                                      receipt=args.receipt, window=args.window,
+                                      rollback_class=entry.get("rollback_class"), **error.fields)
+                        raise SwitchError(str(error)) from error
                 elif step["kind"] == "data-backup":
                     fields, _inverse = op_data_backup(root, step["surface"], backup_dir=backup_dir)
                     surface = step["surface"]

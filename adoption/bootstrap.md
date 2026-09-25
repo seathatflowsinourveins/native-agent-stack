@@ -103,6 +103,9 @@ GitHub-hosted macOS runner; see
    null `sha256`) — installs the selected profile's components
    using each entry's `recipe_map` path. Inspect the script before running it
    on a new host; it installs only what the chosen `--profile` selects.
+   `bootstrap-linux.sh` and `pins-linux-x86_64.json` both changed after `v2026.09.24.1`
+   (staging flags `--tools-suffix`/`--link-dir`/`--no-link` plus atomic `mv -T`
+   link replacement, and the pins schema_version 2 migration, respectively).
 
    The scripts install only components that have a pin in
    [`pins-linux-x86_64.json`](pins-linux-x86_64.json) or

@@ -46,7 +46,11 @@ class PinsSchemaTests(unittest.TestCase):
         self.pins = load_pins()
 
     def test_schema_version_and_platform(self):
-        self.assertEqual(self.pins["schema_version"], 1)
+        # adoption/pins-linux-x86_64.json migrated to schema_version 2 (switch.md); the legacy
+        # v1 fields this class checks (id/version/kind/url/sha256/install_note) are a strict
+        # subset of v2's shape (tests/test_pins_v2.py checks the v2-only fields), so accepting 2
+        # here keeps this file's own static checks meaningful without duplicating them.
+        self.assertIn(self.pins["schema_version"], (1, 2))
         self.assertEqual(self.pins["platform"], "linux-x86_64")
 
     def test_tools_is_nonempty_list(self):

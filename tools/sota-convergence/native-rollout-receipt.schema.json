@@ -31,7 +31,11 @@
           "minLength": 1,
           "description": "A manifests/stack.json components[].id or a catalogs/landscape/*.json layers[].winners[].component_id, as adoption/host-receipt.schema.json's own component_id field documents."
         },
-        "version": {"type": "string", "minLength": 1},
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The clean upstream version (e.g. \"0.50.0\"), never a bootstrap-linux.sh --tools-suffix staging marker (e.g. \"-r20260925\") appended to it: record_native_rollout.py copies this value verbatim into a landscape winner's pin, which validate_pins_v2 parity and platform_status.py's host-receipt binding then read as the plain upstream version a live host's own --version reports. adoption/tools/ecosystem-switch's apply accepts this value for a staged root (tools/<id>-<version>-<suffix>) as long as it is a prefix of that root's own version segment; install.root (below), not this field, is what binds the receipt to that specific staged root."
+        },
         "host_id": {"type": "string", "pattern": "^[a-z0-9-]+-[0-9]{8}$"}
       }
     },

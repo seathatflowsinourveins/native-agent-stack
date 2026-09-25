@@ -34,6 +34,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SWITCH_BIN = ROOT / "adoption" / "tools" / "ecosystem-switch"
 
+# ecosystem-switch's unit-restart operation and its memory gate are procfs-based
+# (/proc/<MainPID>/exe, /proc/meminfo: adoption/tools/ecosystem-switch's available_memory_kib/
+# op_unit_restart), and UnitRestartTests additionally spawns real per-root daemon processes and
+# probes their own /proc/<pid>/exe -- there is no macOS equivalent to fake. validate-macos (the
+# required check that runs this full suite on macos-15) has no /proc at all, so
+# memory_gate_issue() would refuse every restart unconditionally regardless of any override
+# (blocking finding). Same idiom as tests/test_adoption_bootstrap.py's LINUX_X86_64_ONLY: skip
+# the whole platform-specific class rather than special-casing each assertion.
+REQUIRES_PROCFS = unittest.skipUnless(sys.platform.startswith("linux"), "requires real /proc (Linux only)")
+
 _loader = importlib.machinery.SourceFileLoader("ecosystem_switch", str(SWITCH_BIN))
 _spec = importlib.util.spec_from_loader(_loader.name, _loader)
 switch = importlib.util.module_from_spec(_spec)
@@ -53,7 +63,13 @@ class SwitchFixture(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.root = Path(self.tmp.name) / "eco"
+        # .resolve() here, once, so every path derived from self.root below (root_v1/root_v2,
+        # current/<id> targets, etc.) is already canonical: on macOS tempfile's /var/folders is
+        # itself a symlink to /private/var/folders, so an unresolved self.root and a later
+        # os.path.realpath()/.resolve() of a path built from it would otherwise disagree (macOS
+        # validate-macos blocking finding; same pattern as tests/test_record_verdicts.py's
+        # "macOS: /var/folders resolves to /private/var/folders" fixtures).
+        self.root = Path(self.tmp.name).resolve() / "eco"
         self.root.mkdir()
         (self.root / "bin").mkdir()
         (self.root / "tools").mkdir()
@@ -85,6 +101,7 @@ class SwitchFixture(unittest.TestCase):
         (self.root / "switch" / "windows" / f"{name}.json").write_text(json.dumps(window))
 
     def write_receipt(self, rid: str, component_id: str, version: str, *, status="passed",
+                      install_root: str | None = None,
                       tiers=(("T0", "passed", None), ("T1", "unavailable", "no GPU"),
                              ("T2", "passed", None), ("T4", "passed", None))):
         (self.root / "switch" / "receipts").mkdir(parents=True, exist_ok=True)
@@ -100,7 +117,10 @@ class SwitchFixture(unittest.TestCase):
             "identity": {"component_id": component_id, "version": version, "host_id": "test-host-20260925"},
             "upstream": {"repo": "https://example.invalid/x", "tag": f"v{version}",
                         "artifact_url": "https://example.invalid/x.tar.gz", "sha256": "0" * 64},
-            "install": {"class": "tarball", "root": f"${{STACK_HOME}}/tools/{component_id}-{version}",
+            # install_root overrides the default "clean" derivation below: identity.version stays
+            # the plain upstream version, but a receipt for a staged (-rDATE) root must bind
+            # install.root to that exact staged path (major finding: see cmd_apply).
+            "install": {"class": "tarball", "root": install_root or f"${{STACK_HOME}}/tools/{component_id}-{version}",
                        "marker_sha256": "0" * 64, "argv": ["true"], "private_env_names": []},
             "tiers": tier_docs,
             "independent": {"rerun_label": "test", "agreement": "same_result", "loki": []},
@@ -387,15 +407,42 @@ class ApplyGateTests(SwitchFixture):
         result = self.apply("foo", self.root_v2, "R1")
         self.assertEqual(result.returncode, 0, f"a pending state_dirs[] entry must never be guessed at: {result.stderr}")
 
-    def test_apply_accepts_a_dated_suffixed_to_root_and_matches_its_full_version(self):
+    def test_apply_accepts_a_dated_suffixed_to_root_when_the_receipt_uses_the_full_suffix_as_version(self):
         # tools/<id>-<version>-rDATE (this rollout's own bootstrap --tools-suffix convention):
-        # the version derived from --to-root must be the full "2.0.0-r20260925" suffix, not just
-        # "r20260925" (the old rsplit("-", 1) bug), and the receipt must be for that exact string.
+        # the version derived from --to-root is the full "2.0.0-r20260925" suffix, not just
+        # "r20260925" (the old rsplit("-", 1) bug). A receipt whose identity.version happens to
+        # equal that whole string still authorizes the root (the root name equals
+        # "<component>-<identity.version>" exactly).
         dated_root = self.make_tool_root("foo-2.0.0-r20260925", "v2-dated")
         self.write_receipt("R2", "foo", "2.0.0-r20260925")
         result = self.apply("foo", dated_root, "R2")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.run_entrypoint(), "v2-dated")
+
+    def test_apply_accepts_a_dated_suffixed_to_root_when_the_receipt_uses_the_clean_upstream_version(self):
+        # Major finding: identity.version must stay the clean upstream version
+        # (record_native_rollout.py copies it verbatim into a landscape winner's pin, read
+        # downstream by validate_pins_v2 parity and platform_status.py's host-receipt binding
+        # against a live host's plain `--version` output) -- it must never be forced to also
+        # carry a bootstrap staging suffix just to satisfy this apply. A receipt for the real
+        # "2.0.0" now authorizes a staged "2.0.0-r20260925" root as long as its own install.root
+        # names that exact staged path (the actual, stronger binding).
+        dated_root = self.make_tool_root("foo-2.0.0-r20260925", "v2-dated")
+        self.write_receipt("R2", "foo", "2.0.0", install_root="${STACK_HOME}/tools/foo-2.0.0-r20260925")
+        result = self.apply("foo", dated_root, "R2")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.run_entrypoint(), "v2-dated")
+
+    def test_apply_refuses_a_receipt_whose_clean_version_is_inconsistent_with_a_dated_root(self):
+        # Defense in depth: a receipt for a *different* base version must not authorize a staged
+        # root merely because both end in the same date suffix (e.g. a same-day rebuild off a
+        # different base) -- even before install.root is ever consulted.
+        dated_root = self.make_tool_root("foo-2.0.0-r20260925", "v2-dated")
+        self.write_receipt("R2", "foo", "1.9.0", install_root="${STACK_HOME}/tools/foo-2.0.0-r20260925")
+        result = self.apply("foo", dated_root, "R2")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("not consistent", result.stderr)
+        self.assertEqual(self.run_entrypoint(), "v1")
 
     def test_rollback_refuses_a_txn_a_later_apply_already_superseded(self):
         # Major finding: rollback --txn (including the timer's --if-unconfirmed call) must not
@@ -609,6 +656,7 @@ class ConfirmAndRevertTests(SwitchFixture):
         self.assertEqual(state["components"]["foo"]["current"], str(self.root_v1.resolve()))
 
 
+@REQUIRES_PROCFS
 class UnitRestartTests(SwitchFixture):
     STUB_SYSTEMCTL = textwrap.dedent("""\
         #!/usr/bin/env python3
@@ -776,6 +824,51 @@ class UnitRestartTests(SwitchFixture):
         # against the forward entry's own MainPID string.
         restarts = [line for line in self.stub_log.read_text().splitlines() if line.strip()]
         self.assertEqual(len(restarts), 2, restarts)
+
+    def test_a_restart_command_that_itself_fails_is_still_ledgered_and_reflected_in_rollback(self):
+        # Major finding: op_unit_restart used to raise a plain SwitchError as soon as the
+        # `systemctl ... restart` command itself failed (or its health probe rejected the
+        # result) -- before cmd_apply's loop ever reached the ledger.append() for that step. A
+        # real side effect (the restart command actually ran) therefore went completely
+        # unrecorded: rollback_txn's reverse-order pass found no unit-restart entry for this txn
+        # and never tried to restart the unit again after reverting the link, leaving it running
+        # whatever the failed restart left behind while the ledger said "rolled_back". The stub
+        # systemctl has always supported STUB_DENY_RESTART (it denies exactly the named unit);
+        # this is the first test that actually sets it.
+        self.write_svc_spec()
+        self.relink("svc")
+        digest = self.plan_sha("svc", self.root_v2, "R1")
+        env = {**self.env, "STUB_DENY_RESTART": "svc.service"}
+        result = run(env, "apply", "svc", "--to-root", str(self.root_v2), "--receipt", "R1",
+                     "--window", "default", "--plan-sha256", digest)
+        self.assertNotEqual(result.returncode, 0)
+        combined = (result.stderr + result.stdout).lower()
+        self.assertIn("rolled back", combined)
+
+        # The link step (ledgered before the unit-restart step ran) must still have been
+        # reverted: this is the primary safety property even when the unit itself cannot be
+        # restarted again (systemctl denying it outright).
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["components"]["svc"]["current"], str(self.root_v1.resolve()))
+        self.assertEqual(os.path.realpath(self.root / "bin" / "svc"), os.path.realpath(self.root_v1 / "bin" / "svc"))
+
+        # The failed restart attempt is exactly what rollback_txn needs to find in order to even
+        # try restarting the unit again; before the fix it was never ledgered at all.
+        ledger_entries = switch.Ledger(self.root).all()
+        self.assertTrue(any(e["op"] == "unit-restart" and e["surface"] == "svc.service" for e in ledger_entries),
+                        "the failed restart attempt must still be ledgered so rollback can find it")
+        # STUB_DENY_RESTART still applies during the rollback's own re-restart attempt, so that
+        # second attempt fails too -- and must be surfaced as a reported problem, never silently
+        # dropped.
+        self.assertTrue(any(e["op"] == "rollback:unit-restart-failed" for e in ledger_entries),
+                        "the rollback's own re-restart attempt (also denied) must be recorded, not skipped")
+        self.assertIn("svc.service", combined)
+
+        # The txn must not be left in_progress: apply's own automatic rollback already closed it
+        # out (as "rolled_back"), even though the unit itself could not be brought back up.
+        recover_result = run(self.env, "recover")
+        self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
+        self.assertEqual(json.loads(recover_result.stdout)["recovered_txns"], [])
 
 
 class LockTests(SwitchFixture):

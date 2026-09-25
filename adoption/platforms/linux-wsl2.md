@@ -75,7 +75,10 @@ itself evidence the WSL UVA gap closed.
 ## Ordered steps for a new Linux/WSL2 host
 
 1. Follow [`adoption/bootstrap.md`](../bootstrap.md) steps 1–3 (prerequisites,
-   `bootstrap-linux.sh --profile <id>`, native sign-in).
+   `bootstrap-linux.sh --profile <id>`, native sign-in; `bootstrap-linux.sh`
+   changed after `v2026.09.24.1`: it gained `--tools-suffix`, `--link-dir`
+   and `--no-link` staging flags plus atomic `mv -T` link replacement, so a
+   staged run never touches the canonical `bin/` links).
 2. Recreate the SDK only for the `research-runtime` profile using
    [`adoption/sdk/README.md`](../sdk/README.md)'s transitive lock; retain the
    same exact-match and uncached-reinstall checks as

@@ -157,8 +157,10 @@ Every selected `macos-arm64-foundation` component, including
 `socraticode` (below), has a pin, so the shipped profile needs no
 `--allow-unpinned`.
 Exit codes 3 and 4 and the `--allow-unpinned` flag mirror
-[`adoption/bootstrap-linux.sh`](../bootstrap-linux.sh). One difference is
-disclosed rather than hidden: the script keeps a `documented_unpinned_ids=()`
+[`adoption/bootstrap-linux.sh`](../bootstrap-linux.sh), which changed after `v2026.09.24.1`
+(staging flags `--tools-suffix`/`--link-dir`/`--no-link` and atomic link
+replacement; this macOS script has no equivalent yet). One
+difference is disclosed rather than hidden: the script keeps a `documented_unpinned_ids=()`
 mechanism the Linux script does not have — a built-in skip list, currently
 empty, so a future undocumented gap still trips the exit-3 refusal instead of
 silently reusing a stale skip; `--plan` is also macOS-only.
@@ -197,6 +199,11 @@ documents for the Linux recipe; it has no `adoption/pins-linux-x86_64.json`
 entry of its own there, only that documented manual recipe. Not in this table:
 `gitleaks`, `syft` and `dagu`, which are not in the `macos-arm64-foundation`
 component list.
+
+`adoption/pins-linux-x86_64.json` changed after `v2026.09.24.1` (schema_version
+2 migration: root_name/current_link/entrypoints/surfaces/state_dirs/window/
+rollback_class for `adoption/tools/ecosystem-switch`); this macOS pins file
+has not migrated yet.
 
 One pin, `codex`, still carries an additional `platform_dependency`, not
 covered by the hash above. The `@openai/codex` npm tarball is byte-identical
