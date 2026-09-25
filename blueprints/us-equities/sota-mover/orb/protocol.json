@@ -1,8 +1,9 @@
 {
  "schema_version": 1,
  "id": "sota-orb-stocks-in-play-v1-20260925",
- "status": "draft_pending_independent_pre_outcome_review",
- "frozen_before_outcomes": false,
+ "status": "frozen_before_outcomes",
+ "frozen_before_outcomes": true,
+ "frozen_at": "2026-09-25T03:52:40Z",
  "created": "2026-09-25",
  "evidence_label": "HIST (historical simulation on Alpaca SIP minute bars); SYN for the unit tests. Nothing here is paper or live behaviour.",
  "question": "Does the Zarattini-Barbon-Aziz Stocks-in-Play 5-minute opening-range breakout (top 20 by opening relative volume) earn a positive mean net R after measured spreads and regulatory fees on sessions after its publication (2024-01-02..2026-08-14), and does it reproduce on the paper's sample years that we hold?",
