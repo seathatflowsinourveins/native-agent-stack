@@ -367,6 +367,13 @@ def claude_rtk_hook_enabled(settings):
                 continue
     return False
 
+def codex_hooks_enabled(config):
+    # codex-cli 0.155.1 `codex features list`: hooks is stable and on by default; codex_hooks is its
+    # legacy alias; plugin_hooks is removed (always false), so it no longer gates plugin hooks.
+    features=config.get("features",{})
+    value=features.get("hooks",features.get("codex_hooks")) if isinstance(features,dict) else None
+    return True if value is None else value is True
+
 def native_hook_inventory(config,run,issues,ledger=None):
     rows=[]
     query="SELECT source_hook,COUNT(*),MIN(created_at),MAX(created_at) FROM session_events GROUP BY source_hook"
@@ -382,7 +389,7 @@ def native_hook_inventory(config,run,issues,ledger=None):
             d=json.loads(raw) if claude else tomllib.loads(raw.decode())
             row["configuration_source"]=dict(path=str(cfg),sha256=digest(raw),disclosure="Only allowlisted enable flags; private configuration is not copied")
             row["context_mode_enabled"]=d.get("enabledPlugins",{}).get("context-mode@context-mode",False) if claude else d.get("plugins",{}).get("context-mode@context-mode",{}).get("enabled",False)
-            row["hook_engine_enabled"]=not d.get("disableAllHooks",False) if claude else bool(d.get("features",{}).get("hooks") and d.get("features",{}).get("plugin_hooks"))
+            row["hook_engine_enabled"]=not d.get("disableAllHooks",False) if claude else codex_hooks_enabled(d)
             row["rtk_automatic_configured"]=claude_rtk_hook_enabled(d) if claude else False
             row["rtk_lane"]="Native Claude Bash hook configured; historical decisions in RTK database" if row["rtk_automatic_configured"] else "Explicit RTK commands; automatic Codex RTK rewrite not configured"
             relative="hooks/hooks.json" if claude else ".codex-plugin/hooks.json"
