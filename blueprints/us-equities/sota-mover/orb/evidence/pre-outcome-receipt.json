@@ -1,0 +1,230 @@
+{
+ "artifacts_sha256": {
+  "candidates.counts.json": "0e70f55c9ac65f6ad96d1e1e0f739fa922d96058be3611ad2d23f2a585bd2cb6",
+  "candidates.csv.gz": "a013ce9eed5c6f271260d15627114fb9947ce30fd07c5ff80133cd8edeb1f651",
+  "cost-table.json": "44fffd2e1f3aa5e13c73fc84b4c8a21f78ef2b4ce053339620c0ff32ce4bc6b6",
+  "or5.parquet": "e7e33f5f07415b0dfdf2991c115c6f1aebcabf432887633c48ab15e516465790",
+  "power.json": "bbf9b3f0bcaa9dc7daff231dbda19f04c811a89c16dd051fb50ff89b843fd71e",
+  "quotes/ledger.jsonl": "a6cbfdfc1465b3e724f06048205865f63206c930e8d589b0d84da5845a202fe4",
+  "quotes/sample.json": "ff2cb8a93140cdb971cfefbc4da8d14c219769b6448b3e823cf6d7528b2cdb74",
+  "selected.counts.json": "4a306b30ce6d0d9f68f497be8cab485eea2f0bce53209030f6fb6a3f48392c32",
+  "selected.csv": "2fdbeb90aa5383303a12160ad35618ab173b09118f079d8a47b28087602bb0c9",
+  "triggers.counts.json": "3be94d2a9fcb26bb7113ff7b6fdf773e407aafc18ccfd6e98a4b268d79be80cd",
+  "triggers.csv": "90599376fe12a438f882b06666883cb9fe6844278634f8c300942c8e9dbd5c89",
+  "verify-or.json": "b6ec3d8df716e00b16dae2469a0ae93d2cfeb5da2115324f84c07170947c93a1"
+ },
+ "counts": {
+  "candidates.counts.json": {
+   "eligible_1_3": 992134,
+   "member_symbol_days": 1192531,
+   "not_member_year": 758583,
+   "or_symbol_days": 1951114,
+   "reason:daily_gap": 1189,
+   "reason:daily_today_missing": 6,
+   "reason:eligible": 992134,
+   "reason:filters_1_3": 191563,
+   "reason:relvol_window_invalid": 7639,
+   "sha256": "a013ce9eed5c6f271260d15627114fb9947ce30fd07c5ff80133cd8edeb1f651",
+   "split_adjusted_windows": 176
+  },
+  "cost-table.json": {
+   "cell_key": "time_bucket|price_tier|liq_tier",
+   "fired": {
+    "post_publication": 10755,
+    "reproduction": 28911
+   },
+   "groups": {
+    "post_publication": {
+     "cell_sources": {
+      "cell": 30,
+      "table_p90": 3,
+      "time_x_price": 15
+     },
+     "median_half_spread": 0.0003271193718584294,
+     "median_half_spread_at_trigger": 0.0005355828599857337,
+     "observations": 8408,
+     "table_p90_half_spread": 0.0007156661165591278
+    },
+    "reproduction": {
+     "cell_sources": {
+      "cell": 30,
+      "table_p90": 0,
+      "time_x_price": 18
+     },
+     "median_half_spread": 0.00020990213327492436,
+     "median_half_spread_at_trigger": 0.00036427660871328206,
+     "observations": 11674,
+     "table_p90_half_spread": 0.0005513935127538392
+    }
+   },
+   "http_status": {
+    "200": 20091
+   },
+   "kind": "orb_quote_cost_table",
+   "label": "HIST",
+   "liq_tier_bounds_usd": [
+    100000000.0,
+    500000000.0
+   ],
+   "min_cell": 30,
+   "price_tier_bounds": [
+    20.0,
+    50.0,
+    200.0
+   ],
+   "protocol": "sota-orb-stocks-in-play-v1-20260925",
+   "requests": 20091,
+   "sample_rate": {
+    "post_publication": 5,
+    "reproduction": 10
+   },
+   "sample_sha256": "ff2cb8a93140cdb971cfefbc4da8d14c219769b6448b3e823cf6d7528b2cdb74",
+   "sampled": {
+    "post_publication": 2112,
+    "reproduction": 2929
+   },
+   "schema_version": 1,
+   "stamps": 20091,
+   "tally": {
+    "obs:post_publication:close-5m": 2112,
+    "obs:post_publication:trigger": 2112,
+    "obs:post_publication:trigger+15m": 2098,
+    "obs:post_publication:trigger+60m": 2086,
+    "obs:reproduction:close-5m": 2926,
+    "obs:reproduction:trigger": 2928,
+    "obs:reproduction:trigger+15m": 2917,
+    "obs:reproduction:trigger+60m": 2903,
+    "stamps_without_valid_quote": 9
+   },
+   "time_buckets_et_minutes": [
+    [
+     575,
+     600
+    ],
+    [
+     600,
+     660
+    ],
+    [
+     660,
+     930
+    ],
+    [
+     930,
+     961
+    ]
+   ]
+  },
+  "power.json": {
+   "alpha_one_sided_worst_holm": 0.016666666666666666,
+   "combined": {
+    "m_bar": 16.37,
+    "sessions_with_trades": 657,
+    "trades": 10755
+   },
+   "long": {
+    "m_bar": 8.251,
+    "sessions_with_trades": 657,
+    "trades": 5421
+   },
+   "n_min_basis": "sd 2.0 R, rho 0.02, effect +0.08 R, one-sided alpha 0.05/3, power 0.8",
+   "n_min_trades": 7207,
+   "portfolio": {
+    "mde_annualised_sharpe": 1.8392,
+    "sessions": 657
+   },
+   "target_effect_R": 0.08
+  },
+  "quotes/sample.json": {
+   "asof": "2026-09-22",
+   "fired": {
+    "post_publication": 10755,
+    "reproduction": 28911
+   },
+   "kind": "orb_cost_sample",
+   "sample_rate": {
+    "post_publication": 5,
+    "reproduction": 10
+   },
+   "sampled": {
+    "post_publication": 2112,
+    "reproduction": 2929
+   },
+   "selected_sha256": "2fdbeb90aa5383303a12160ad35618ab173b09118f079d8a47b28087602bb0c9",
+   "stamps": 20091,
+   "triggers_sha256": "90599376fe12a438f882b06666883cb9fe6844278634f8c300942c8e9dbd5c89"
+  },
+  "selected.counts.json": {
+   "post_publication": {
+    "doji": 49,
+    "eligible_1_3": 273055,
+    "eligible_relvol_ge_1": 91055,
+    "long": 6624,
+    "relvol_ge_30": 26,
+    "selectable_on_thin_sessions_median": 18,
+    "selected": 13126,
+    "sessions": 657,
+    "sessions_lt20_selectable": 4,
+    "short": 6453
+   },
+   "reproduction": {
+    "doji": 273,
+    "eligible_1_3": 719079,
+    "eligible_relvol_ge_1": 236085,
+    "long": 17673,
+    "relvol_ge_30": 124,
+    "selectable_on_thin_sessions_median": 17,
+    "selected": 34912,
+    "sessions": 1746,
+    "sessions_lt20_selectable": 2,
+    "short": 16966
+   },
+   "sha256": "2fdbeb90aa5383303a12160ad35618ab173b09118f079d8a47b28087602bb0c9"
+  },
+  "triggers.counts.json": {
+   "post_publication": {
+    "fired": 10755,
+    "fired_by_1000": 8997,
+    "fired_by_1030": 9732,
+    "fired_long": 5421,
+    "fired_short": 5334,
+    "not_fired": 2322,
+    "orders": 13077,
+    "trigger_minute_p10_p50_p90": [
+     575,
+     576,
+     625
+    ]
+   },
+   "reproduction": {
+    "fired": 28911,
+    "fired_by_1000": 24794,
+    "fired_by_1030": 26447,
+    "fired_long": 14825,
+    "fired_short": 14086,
+    "not_fired": 5728,
+    "orders": 34639,
+    "trigger_minute_p10_p50_p90": [
+     575,
+     576,
+     618
+    ]
+   },
+   "sha256": "90599376fe12a438f882b06666883cb9fe6844278634f8c300942c8e9dbd5c89"
+  },
+  "verify-or.json": {
+   "checked": 242,
+   "mismatched": 0
+  }
+ },
+ "inputs": {
+  "calendar_sha256": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c",
+  "daily_parquet_sha256": "f7584f24519367e03e0a4ac0fc57f9b410c047991b001bb0259ebdfc09b31105",
+  "fees_sha256": "f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a",
+  "minute_plan_file_sha256": "4384402ea54b4546dc1ea91d830d77d99615557f2bc0f020cd5daafc0a1fad1b"
+ },
+ "kind": "orb_pre_outcome_receipt",
+ "label": "HIST",
+ "outcomes_computed": false,
+ "protocol_id": "sota-orb-stocks-in-play-v1-20260925"
+}
