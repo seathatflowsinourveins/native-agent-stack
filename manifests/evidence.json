@@ -3054,6 +3054,27 @@
         "Raw stderr, reports and the Jetsam files stay on the host; published values are sanitized (paths replaced by placeholders, no process or session identifiers)."
       ],
       "path": "evidence/receipts/gitleaks-macos-memory-bound-20260924.json"
+    },
+    {
+      "id": "env-freshness-wsl-ubuntu-main-20260924",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "nautilus-trader",
+        "alpaca-py",
+        "duckdb",
+        "pandas",
+        "edgartools",
+        "exchange-calendars",
+        "vllm"
+      ],
+      "claim": "On one WSL Ubuntu host, 13 isolated tool environments were inventoried with their own interpreters and the watched trading/foundation packages compared with PyPI on 2026-09-24: 34 current, 2 on the newest pre-release (nautilus-trader 2.0.0rc5), 11 behind the latest stable (deltalake 1.6.4 vs 1.6.6, openai-codex 0.154.0 vs 0.156.1, and the numpy/torch/vllm pins inside the vllm 0.25/0.29/0.30 environments).",
+      "limitations": [
+        "PyPI index only: git-pinned or other-index installs read as ahead_of_index or unknown.",
+        "CLIs and non-Python tools are covered by the catalog GitHub freshness snapshot, not by this report.",
+        "One host; each PC publishes its own report under the same schema.",
+        "Reports status only; upgrades and adoption stay with the SOTA-convergence lane review."
+      ],
+      "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json"
     }
   ],
   "files": [
@@ -3224,8 +3245,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "a164c072941274ed5f158d32437bb630550a7d582188971658780669ec244639",
-      "bytes": 11605
+      "sha256": "a5d2bed86c974f1f1b61248e2dbb9b89585b5da074468db8e72845d381206af8",
+      "bytes": 11673
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -6475,8 +6496,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "07c9fbc3cff4c7b4c5ed598d519105c4c48bd173bc96f534373e48e00a4e7e3c",
-      "bytes": 18529
+      "sha256": "664a7a3b0371d7d47c3ebe575c8340be1556eb47e976e92553ae208d71c4aa7e",
+      "bytes": 19255
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -6534,6 +6555,11 @@
       "bytes": 22201
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/credential_source.py",
+      "sha256": "0bbe30aab4e665226e230e9927ef51e7f8875c53dda6527d19e6efe76bbaeacc",
+      "bytes": 9305
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/evidence-hashes.json",
       "sha256": "a38097f52aa89d7509e848bc244bc796bd6d96ad3314635e4b6f8b7cca6df5bf",
       "bytes": 869
@@ -6570,8 +6596,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/market_research.py",
-      "sha256": "1de0e88b9bdc3304e0e247bf4de2a0462e25717695016ad2dd7a4b114f64449f",
-      "bytes": 24083
+      "sha256": "bba9cf77c3c3c6dff32dec1cb01fa8c1957c6b012b7d5bd9693fcc268d557158",
+      "bytes": 26553
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/metrics.py",
@@ -6665,8 +6691,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "49f0433c066e6178c461818735f181e0bf2e27f3e81e5de0cb3199b8acb282b0",
-      "bytes": 148739
+      "sha256": "f157be180d0cf19393137e41871318476db24aea775d05a5b3b95ea8bd5dc1a6",
+      "bytes": 151392
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -6690,8 +6716,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "3ee9b19a236cf4921fbe3fbd24baef6be1fb8751271141118951e8e1f4ac5953",
-      "bytes": 6717
+      "sha256": "d14c8d7262357e39a562fe519b41ecc64ec555845f1107c28f1614908d3537b6",
+      "bytes": 6969
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -7217,6 +7243,21 @@
       "path": "blueprints/us-equities/alpaca-historical/plan.json",
       "sha256": "258a3f935ba385105f831f9270db4a14cfccfdfec2feb1046af2f4184a4fa66b",
       "bytes": 1761
+    },
+    {
+      "path": "blueprints/us-equities/alpaca-history-fixture/README.md",
+      "sha256": "f4abb17a17adfa2146937317be11beef8e3f2e87d6f4f9b4725996f806785c54",
+      "bytes": 10667
+    },
+    {
+      "path": "blueprints/us-equities/alpaca-history-fixture/fixture.py",
+      "sha256": "2a7d77bbad8de02e8e36e0cfb59b352e42b97c342648dae19ce8f111c0389101",
+      "bytes": 52182
+    },
+    {
+      "path": "blueprints/us-equities/alpaca-history-fixture/protocol.json",
+      "sha256": "cb5e321de20b784857af31e265959676b046c066a7ad8932045b760e96888876",
+      "bytes": 24538
     },
     {
       "path": "blueprints/us-equities/alpaca-paper/README.md",
@@ -10040,8 +10081,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "0a62cc90b087baf1dfac27dfad70220d56caa7cc35a8cb6ec2409ed8d5a0e52b",
-      "bytes": 28111
+      "sha256": "f20bda7c773cbb47036e5017a74cdf32e4e1e0e638804348f6c82133e61790d5",
+      "bytes": 28201
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -10075,8 +10116,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-broker-credential-handling.md",
-      "sha256": "2b16c53efcdc0dd1c06d82226e4f595d37133855217d718cfa021d16e7e02530",
-      "bytes": 23985
+      "sha256": "f3bfafc99ca8bbe7ef567fb2fbc59997112c8f07cdd9001739b4b911133351e7",
+      "bytes": 29940
     },
     {
       "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
@@ -10912,6 +10953,11 @@
       "path": "evidence/artifacts/direct-desktop-search.txt",
       "sha256": "228c4bc674c606fc6cfbbb57fba4164fe30066de34bba396fe68a335799f035f",
       "bytes": 2166
+    },
+    {
+      "path": "evidence/artifacts/env-freshness-20260924/wsl-ubuntu-main.json",
+      "sha256": "45104744c02f09434292e5562689426c76543c8a782cf9e3e491947022094025",
+      "bytes": 13084
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
@@ -28384,6 +28430,11 @@
       "bytes": 1298
     },
     {
+      "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json",
+      "sha256": "a860492d5ffb82b9d73cc031e34e03ccc8c8c898b68f29c20a2354bef092359b",
+      "bytes": 2807
+    },
+    {
       "path": "evidence/receipts/exchange-calendars-native-check-20260922.json",
       "sha256": "ee5ec2a85edf415b1c440c2704b3252c348fe3da9ff01d83a9266b711c2b9efe",
       "bytes": 3320
@@ -29230,8 +29281,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "a3144ff30608b65236d98bf2c83a02e8fa6d62e3300f0e85b8b3675f08ade49e",
-      "bytes": 12259
+      "sha256": "4da11aae199af99a66bd731baadac6055aa9199ae00cda7749f18faea82b9463",
+      "bytes": 12267
     },
     {
       "path": "observability/native-data/README.md",
@@ -29354,9 +29405,19 @@
       "bytes": 19904
     },
     {
+      "path": "scripts/env_freshness.py",
+      "sha256": "93646b8896d9efa89536b0c1be350de1cb2ce63ce73a463d30d13c79f0e548db",
+      "bytes": 7138
+    },
+    {
       "path": "scripts/git-hooks/pre-commit",
       "sha256": "58fd9d28e55ac2396c487d1cd7f1ac1743737abcf16de5787ab75cb33cc4fb9a",
       "bytes": 608
+    },
+    {
+      "path": "scripts/hardware_profile.py",
+      "sha256": "4b1201497c2afc17cb9932902cebf33cdc18b19d02c49ee10d66c99f36589973",
+      "bytes": 25054
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
@@ -29365,8 +29426,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "ad9e23a23e46300ddd9eae720266be6f1e4349c1657aa2c731d1c46b7e8c4a92",
-      "bytes": 74822
+      "sha256": "f236b6885dc0f6d4f2c09734e8eadf08125c22d73a96f205e47aa36b515d242b",
+      "bytes": 75640
     },
     {
       "path": "scripts/landscape.py",
@@ -29499,6 +29560,11 @@
       "bytes": 66824
     },
     {
+      "path": "tests/test_adaptive_paper_credential_source.py",
+      "sha256": "32c3aa93e40392a2af60078dd4ba6c222e195a9a47b22a0bfc0f52a92814382a",
+      "bytes": 25425
+    },
+    {
       "path": "tests/test_adaptive_paper_financing.py",
       "sha256": "8d9f1f21f9d53c9ed120281409bdcb97b8c9ddacc615d0cdfa392cfcf111fa90",
       "bytes": 8708
@@ -29570,8 +29636,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "530389b11897666ffd9c2bea5d99bf1133a5e872e541d219bfbe52ed57d3b877",
-      "bytes": 172432
+      "sha256": "b2457cef7cd17296846e9f48d2bf53041285a92dc2e9692465f978e95af0be8f",
+      "bytes": 174421
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -29602,6 +29668,11 @@
       "path": "tests/test_alpaca_historical.py",
       "sha256": "4ec30086b77d6a75081be8ffdae1a7aa5fe516229573aa71eec818c2f5f58ac0",
       "bytes": 18678
+    },
+    {
+      "path": "tests/test_alpaca_history_fixture.py",
+      "sha256": "bd164d7eb3ca7559eaec1b9ecaaad6d576ae677f7d938148ac20fb0bfa76a584",
+      "bytes": 33202
     },
     {
       "path": "tests/test_alpaca_paper.py",
@@ -29704,6 +29775,11 @@
       "bytes": 27591
     },
     {
+      "path": "tests/test_env_freshness.py",
+      "sha256": "0eb7bb209a38fd5b680776b67b99e448f50b1f1c29b2c550b33483b2404919f3",
+      "bytes": 3446
+    },
+    {
       "path": "tests/test_execution_realism.py",
       "sha256": "556bcaecd191d5ec52674b882905f3d7d1a147e3614b6a0a65c1dd9d7327129f",
       "bytes": 3691
@@ -29764,6 +29840,11 @@
       "bytes": 6657
     },
     {
+      "path": "tests/test_hardware_profile.py",
+      "sha256": "1c6d4b28c0f61c825e9cf761b2e486b7dff9cb37190830fb93b0d77204811d5d",
+      "bytes": 32779
+    },
+    {
       "path": "tests/test_historical_comparison.py",
       "sha256": "ea6d395520931585a58928f083b4276919ff9d162a59867292b532f5316c426e",
       "bytes": 3985
@@ -29775,8 +29856,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "d3898e35ca32895b11a60aa6a7506a60c54dfe5d7a6f81537e141bd95489a772",
-      "bytes": 97178
+      "sha256": "8a0cc4d8450600986606ae9ad0af83a6b611f7755a38dfc8de63260bf7be748d",
+      "bytes": 101033
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
@@ -29897,6 +29978,11 @@
       "path": "tests/test_nautilus_equity_replay.py",
       "sha256": "5e254b3f118ac09434dee27133c0665788e0b18190889334c39e4470a22fb056",
       "bytes": 5412
+    },
+    {
+      "path": "tests/test_new_host_grand_list.py",
+      "sha256": "161eb27cf4a9ffc065e670e4589a2f3d0c23fcc2e2bebcfe07b958f40d882b8a",
+      "bytes": 15982
     },
     {
       "path": "tests/test_observability.py",
