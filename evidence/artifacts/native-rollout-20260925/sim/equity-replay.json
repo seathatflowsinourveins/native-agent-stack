@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "id": "native-rollout-20260925-sim-equity-replay",
+  "kind": "native_cli_e2e",
+  "component_ids": ["nautilus-trader"],
+  "claim": "Ran blueprints/us-equities/engine-nautilus/equity-replay on the new nautilus-2.0.0rc5-r20260925 root against the same retained authenticated AAPL Alpaca acquisition (receipt a59c6ed7...). Two independent fresh-process runs exited 0 and matched the frozen oracle exactly: baseline 10 filled orders / 5 closed positions / $0 fees / -$133.40 realized PnL / $99,866.60 ending cash; fee_slippage_stress 10 filled orders / 5 closed positions / $10 fees / -$144.40 realized PnL / $99,855.60 ending cash. account.csv and the identity-excluded economic hash were byte-identical between the two runs.",
+  "track": "sota-rollout-20260925/w1/sim",
+  "base_commit": "57fb6d89",
+  "new_root": "${STACK_HOME}/nautilus-2.0.0rc5-r20260925",
+  "frozen_oracle_source": "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json (2026-09-21, base_commit 86952998)",
+  "frozen_oracle_verified_fields": {
+    "baseline": {"filled_orders": 10, "closed_positions": 5, "fees_usd": "0.00", "realized_pnl_usd": "-133.40", "ending_cash_usd": "99866.60"},
+    "fee_slippage_stress": {"filled_orders": 10, "closed_positions": 5, "fees_usd": "10.00", "realized_pnl_usd": "-144.40", "ending_cash_usd": "99855.60"},
+    "note": "Verified by reading the file directly, not assumed from the task brief's paraphrase."
+  },
+  "input": {
+    "retained_run": "${PRIVATE_STATE}/authenticated-data-20260920/alpaca-run-1",
+    "receipt_sha256": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
+    "new_acquisition_requests": 0,
+    "note": "Frozen/cached data already on disk; no Alpaca or other market-data API call was made."
+  },
+  "commands": [
+    {
+      "label": "run-1",
+      "argv": ["python3", "blueprints/us-equities/engine-nautilus/equity-replay/launch.py",
+        "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
+        "--run", "${PRIVATE_STATE}/authenticated-data-20260920/alpaca-run-1",
+        "--out", "${PRIVATE_RUN_DIR}/sim/equity-replay-run-1"],
+      "exit_code": 0,
+      "stderr_sha256": "f969600f63a65edbabef417efbffc781fa4806c11e2f2491fa407ff3564af5bc",
+      "note": "stderr sha256 matches the original 2026-09-21 receipt's returned_runs[0].stderr sha256 exactly (four pandas deprecation warnings, deterministic)."
+    },
+    {
+      "label": "run-2",
+      "argv": ["python3", "blueprints/us-equities/engine-nautilus/equity-replay/launch.py",
+        "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
+        "--run", "${PRIVATE_STATE}/authenticated-data-20260920/alpaca-run-1",
+        "--out", "${PRIVATE_RUN_DIR}/sim/equity-replay-run-2"],
+      "exit_code": 0,
+      "stderr_sha256": "f969600f63a65edbabef417efbffc781fa4806c11e2f2491fa407ff3564af5bc",
+      "note": "Independent fresh-process re-run per brief step 3."
+    }
+  ],
+  "results_per_run": [
+    {"id": "baseline", "processed_bars": 15, "filled_orders": 10, "closed_positions": 5, "fees_usd": "0.00",
+     "realized_pnl_usd": "-133.40", "ending_cash_usd": "99866.60", "open_orders": 0, "open_positions": 0,
+     "cash_ledger_reconciled": true, "realized_pnl_reconciled": true,
+     "account_csv_sha256_run1": "90e64a86776bafeb85d6ee860a00380ed87439b2a2cb86add3a2e3afbd0e4d26",
+     "account_csv_sha256_run2": "90e64a86776bafeb85d6ee860a00380ed87439b2a2cb86add3a2e3afbd0e4d26",
+     "account_csv_matches_original_2026-09-21_receipt": true,
+     "economic_repeat_sha256_run1": "338d9548cdf7138e25f0092a474d6cc2a60a9253c92e997361fef73696211838",
+     "economic_repeat_sha256_run2": "338d9548cdf7138e25f0092a474d6cc2a60a9253c92e997361fef73696211838"},
+    {"id": "fee_slippage_stress", "processed_bars": 15, "filled_orders": 10, "closed_positions": 5, "fees_usd": "10.00",
+     "realized_pnl_usd": "-144.40", "ending_cash_usd": "99855.60", "open_orders": 0, "open_positions": 0,
+     "cash_ledger_reconciled": true, "realized_pnl_reconciled": true,
+     "account_csv_sha256_run1": "a59552b97963404701614346136f1e3d676d376154d8ea1dfc580bc89e404e4d",
+     "account_csv_sha256_run2": "a59552b97963404701614346136f1e3d676d376154d8ea1dfc580bc89e404e4d",
+     "account_csv_matches_original_2026-09-21_receipt": true,
+     "economic_repeat_sha256_run1": "fe8baf7424fb9c92444a2e9b6059c1b42df4554339da869d7ca0978fbc28fe83",
+     "economic_repeat_sha256_run2": "fe8baf7424fb9c92444a2e9b6059c1b42df4554339da869d7ca0978fbc28fe83"}
+  ],
+  "reoccurrence_verification": {
+    "twice_identical": true,
+    "account_csv_byte_identical_across_runs": true,
+    "economic_repeat_hash_identical_across_runs": true,
+    "economic_hash_encoding": "SHA256 of json.dumps({fills: selected non-identity fields, cash: account total strings, position_pnl: realized_pnl strings}, sort_keys=True, separators=(',', ':')); generated identities (order/position/fill UUIDs) excluded, matching the original receipt's own documented method",
+    "fills_csv_and_positions_csv_hash_differ_across_runs": true,
+    "fills_positions_hash_difference_explained": "Expected and documented by the source blueprint (README.md: 'Generated identities are not claimed to repeat'); only generated identity fields differ, verified by the economic-only hash matching exactly."
+  },
+  "oracle_comparison": {"result": "exact match on every oracle field for both cases, both runs, and against the original 2026-09-21 receipt", "mismatches": 0},
+  "isolation": {
+    "mechanism": "existing launch.py Bubblewrap sandbox: --unshare-all --clearenv, mandatory new network namespace, read-only runtime/repository/data, only the run's own output directory writable",
+    "network_interfaces_observed": ["lo"],
+    "credential_variables": 0,
+    "market_data_api_calls": 0,
+    "orders_placed": 0
+  },
+  "repository_checks": [
+    {"argv": ["python3", "-c", "compute economic-only hash from reports.json per case"], "exit_code": 0, "scope": "local verification script, not a repository test suite"}
+  ],
+  "limitations": [
+    "Retrospective scheduled diagnostic on completed daily bars, not a realizable closing-auction strategy or profitability claim (same scope as the original blueprint).",
+    "OneTickSlippageFillModel supplies unlimited synthetic depth; liquidity_consumption=true does not qualify finite liquidity, queue position, or broker restrictions.",
+    "No SPY/LEAN parity, IBKR/Alpaca broker execution, or paper/live order was exercised by this environment-build track.",
+    "Wall-clock/generated-identity fields (stdout completed_utc, fill/position/order UUIDs) are not claimed to repeat and are excluded from the reoccurrence check by design."
+  ],
+  "sanitization": "Host paths use ${STACK_HOME} (codex-ecosystem tools root), ${PRIVATE_STATE} (codex-ecosystem/state) and ${PRIVATE_RUN_DIR} (this track's private run directory) placeholders. No raw provider prices, credentials, or session identifiers appear in this receipt."
+}

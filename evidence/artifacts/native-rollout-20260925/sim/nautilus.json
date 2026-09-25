@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "native-rollout-20260925-sim-nautilus",
+  "kind": "native_cli_e2e",
+  "component_ids": ["nautilus-trader"],
+  "claim": "Built nautilus-2.0.0rc5-r20260925 the same way as the existing tools/nautilus-2.0.0rc5 recipe recorded in evidence/receipts/native-nautilus-v2-20260920.json: uv venv + uv pip install --pre nautilus_trader==2.0.0rc5 numpy pandas. The resulting freeze is byte-identical to that record's own freeze output.",
+  "track": "sota-rollout-20260925/w1/sim",
+  "base_commit": "57fb6d89",
+  "new_root": "${STACK_HOME}/nautilus-2.0.0rc5-r20260925",
+  "existing_root_untouched": "${STACK_HOME}/nautilus-2.0.0rc5",
+  "source_recipe": "evidence/receipts/native-nautilus-v2-20260920.json#commands.install",
+  "commands": [
+    {
+      "label": "venv",
+      "argv": ["uv", "--no-config", "venv", "--python", "/usr/bin/python3.12", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925"],
+      "exit_code": 0
+    },
+    {
+      "label": "install",
+      "argv": ["uv", "--no-config", "pip", "install", "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
+        "--pre", "--index-url", "https://pypi.org/simple", "nautilus_trader==2.0.0rc5", "numpy", "pandas"],
+      "exit_code": 0,
+      "installed_packages": 5
+    },
+    {
+      "label": "pip-check",
+      "argv": ["uv", "--no-config", "pip", "check", "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python"],
+      "exit_code": 0,
+      "stdout": "All installed packages are compatible"
+    }
+  ],
+  "installed_distributions": [
+    "nautilus-trader==2.0.0rc5", "numpy==2.5.3", "pandas==3.0.6",
+    "python-dateutil==2.9.0.post0", "six==1.17.0"
+  ],
+  "artifacts": {
+    "installed-freeze.txt": {"bytes": 94, "sha256": "9a2c65a6102be63a64f65f2c489ddcdd144bacadeee63a05b119e8e038a67f75"}
+  },
+  "comparison_to_recorded_recipe": {
+    "method": "diff of sorted freeze output against native-nautilus-v2-20260920.json's recorded installed_distributions and freeze.stdout sha256",
+    "result": "IDENTICAL package set/versions; installed-freeze.txt sha256 exactly matches the recorded freeze.stdout sha256 (9a2c65a6102be63a64f65f2c489ddcdd144bacadeee63a05b119e8e038a67f75)"
+  },
+  "isolation": {
+    "network_used": "PyPI package resolution/download only (https://pypi.org/simple); no Alpaca or other market-data endpoint contacted",
+    "credentials_read": 0,
+    "orders_placed": 0,
+    "existing_root_modified": false
+  },
+  "limitations": [
+    "Release candidate build (2.0.0rc5), not a production/live-capital acceptance.",
+    "This receipt covers environment construction only; the equity-replay backtest receipt in this same directory covers the runtime E2E acceptance on this root.",
+    "PyPI wheel hashes are trusted from the index at install time; no separate re-hash/signature verification of the downloaded wheel was performed for this build (matching the source recipe's own documented scope)."
+  ],
+  "sanitization": "Host paths use the ${STACK_HOME} placeholder for ~/.local/share/codex-ecosystem/tools. No credential values or session identifiers appear in this receipt."
+}

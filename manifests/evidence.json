@@ -26719,6 +26719,21 @@
       "bytes": 11000
     },
     {
+      "path": "evidence/artifacts/native-rollout-20260925/sim/adaptive-paper.json",
+      "sha256": "469edb81b8e76820026ee69cbe864dcbb4768cbaea07663028a8e24ea4cfb17d",
+      "bytes": 4180
+    },
+    {
+      "path": "evidence/artifacts/native-rollout-20260925/sim/equity-replay.json",
+      "sha256": "91aaf113ccfacbbb20653547ac410b80defa44618d8b649372e3090d2711273b",
+      "bytes": 6958
+    },
+    {
+      "path": "evidence/artifacts/native-rollout-20260925/sim/nautilus.json",
+      "sha256": "ba7d74de51afddc88fb33b81ac22028b4b932ca77d3bd7a10a0803c8fc8b7788",
+      "bytes": 3097
+    },
+    {
       "path": "evidence/artifacts/native-service-reboot-20260920/cleanup.json",
       "sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
       "bytes": 111

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "native-rollout-20260925-sim-adaptive-paper",
+  "kind": "native_cli_e2e",
+  "component_ids": ["adaptive-paper"],
+  "claim": "Built a fresh adaptive-paper-r20260925 venv from a hash lock derived from the live adaptive-paper-20260921 venv's read-only pip freeze; uv pip sync --require-hashes installed the identical 21-package set and versions with no dependency drift.",
+  "track": "sota-rollout-20260925/w1/sim",
+  "base_commit": "57fb6d89",
+  "new_root": "${STACK_HOME}/adaptive-paper-r20260925",
+  "existing_root_untouched": "${STACK_HOME}/adaptive-paper-20260921",
+  "method": "Read the live venv's exact versions read-only (uv pip freeze), wrote them as a pinned requirements.in, generated a hash-locked requirements.lock with uv pip compile --generate-hashes against the same interpreter, then created the new venv and installed strictly from that lock with uv pip sync --require-hashes.",
+  "commands": [
+    {
+      "label": "freeze-live-readonly",
+      "argv": ["uv", "--no-config", "pip", "freeze", "--python", "${STACK_HOME}/adaptive-paper-20260921/bin/python"],
+      "exit_code": 0,
+      "note": "Read-only; no write to the live venv."
+    },
+    {
+      "label": "venv",
+      "argv": ["uv", "--no-config", "venv", "--python", "/usr/bin/python3.12", "${STACK_HOME}/adaptive-paper-r20260925"],
+      "exit_code": 0
+    },
+    {
+      "label": "compile-hashes",
+      "argv": ["uv", "--no-config", "pip", "compile", "--generate-hashes", "--python", "${STACK_HOME}/adaptive-paper-r20260925/bin/python",
+        "--index-url", "https://pypi.org/simple", "-o", "${STACK_HOME}/adaptive-paper-r20260925/requirements.lock",
+        "${STACK_HOME}/adaptive-paper-r20260925/requirements.in"],
+      "exit_code": 0,
+      "resolved_packages": 21
+    },
+    {
+      "label": "sync-require-hashes",
+      "argv": ["uv", "--no-config", "pip", "sync", "--require-hashes", "--python", "${STACK_HOME}/adaptive-paper-r20260925/bin/python",
+        "--index-url", "https://pypi.org/simple", "${STACK_HOME}/adaptive-paper-r20260925/requirements.lock"],
+      "exit_code": 0,
+      "installed_packages": 21
+    }
+  ],
+  "artifacts": {
+    "requirements.in": {"bytes": 398, "sha256": "b1ef40c58746e818993054408375643c7e041fe59f2074aefef9e4cd3573f83d"},
+    "requirements.lock": {"bytes": 65038, "sha256": "bfc47abf3406fdf8d1aec1dcffadf386251adb7e7ba67d9fb54ca611376e3c66"},
+    "installed-freeze.txt": {"bytes": 398, "sha256": "5233376f1e6264f3617ed20159521261f4d74753f562355cc6db1b5ecdd1f013"}
+  },
+  "package_set": [
+    "alpaca-py==0.44.0", "annotated-types==0.8.0", "certifi==2026.7.22", "charset-normalizer==3.5.1",
+    "duckdb==1.5.5", "idna==3.20", "msgpack==1.2.2", "nautilus-trader==2.0.0rc5", "numpy==2.5.3",
+    "pandas==3.0.6", "pydantic==2.13.5", "pydantic-core==2.46.5", "python-dateutil==2.9.0.post0",
+    "pytz==2026.3.post1", "requests==2.34.2", "six==1.17.0", "sseclient-py==1.9.0",
+    "typing-extensions==4.16.0", "typing-inspection==0.4.4", "urllib3==2.8.0", "websockets==17.1"
+  ],
+  "comparison_to_live_venv": {
+    "method": "diff of sorted `uv pip freeze` output between the live venv (read-only) and the new venv",
+    "result": "IDENTICAL package set and versions; zero drift"
+  },
+  "isolation": {
+    "network_used": "PyPI package resolution/download only (https://pypi.org/simple); no Alpaca or other market-data endpoint contacted",
+    "credentials_read": 0,
+    "orders_placed": 0,
+    "live_venv_modified": false
+  },
+  "limitations": [
+    "Version/hash equivalence to the live venv, not a runtime behavioral acceptance of adaptive-paper itself; no strategy, paper order, or broker call was exercised in this track.",
+    "PyPI wheel hashes are trusted from the index at build time; no independent third-party wheel-signature verification beyond uv's --require-hashes content check.",
+    "The live venv's actual running process/state was not inspected; only its installed-package versions were read via pip freeze."
+  ],
+  "sanitization": "Host paths use the ${STACK_HOME} placeholder for ~/.local/share/codex-ecosystem/tools. No credential values, session identifiers, or raw provider data appear in this receipt."
+}
