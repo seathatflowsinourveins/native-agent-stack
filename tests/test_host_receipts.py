@@ -159,6 +159,38 @@ class SchemaSyncTests(unittest.TestCase):
         self.assertIsNone(schema_pattern.fullmatch(candidate))
         self.assertIsNone(hr.ID_PATTERN.fullmatch(candidate))
 
+    def test_id_pattern_accepts_a_supersede_generation_suffix(self):
+        # A receipt recorded with 'record --supersedes' gets a '-N' (N >= 2) generation
+        # suffix on the same host/component/stage/date id; both the schema and the code
+        # must accept it.
+        schema_pattern = re.compile(self.schema["properties"]["id"]["pattern"])
+        for candidate in (
+            "host-20260101--widget--use--20260101-2",
+            "host-20260101--widget--use--20260101-10",
+            "host-20260101--widget--use--20260101-999",
+        ):
+            self.assertTrue(schema_pattern.fullmatch(candidate), candidate)
+            match = hr.ID_PATTERN.fullmatch(candidate)
+            self.assertIsNotNone(match, candidate)
+            self.assertEqual(match.group("date"), "20260101")
+
+    def test_id_pattern_rejects_a_malformed_generation_suffix(self):
+        # Generation 1 is the bare id with no suffix: '-0' and '-1' are never valid, and
+        # neither is a leading zero ('-02') or a dangling hyphen.
+        schema_pattern = re.compile(self.schema["properties"]["id"]["pattern"])
+        for candidate in (
+            "host-20260101--widget--use--20260101-0",
+            "host-20260101--widget--use--20260101-1",
+            "host-20260101--widget--use--20260101-02",
+            "host-20260101--widget--use--20260101-",
+        ):
+            self.assertIsNone(schema_pattern.fullmatch(candidate), candidate)
+            self.assertIsNone(hr.ID_PATTERN.fullmatch(candidate), candidate)
+
+    def test_supersedes_property_shares_the_id_pattern_and_is_optional(self):
+        self.assertEqual(self.schema["properties"]["supersedes"]["pattern"], self.schema["properties"]["id"]["pattern"])
+        self.assertNotIn("supersedes", self.schema["required"])
+
 
 class _ReceiptFixtureCase(unittest.TestCase):
     """Shared tmp-tree/fixture/validate helpers, not itself collected as a test case
@@ -313,6 +345,45 @@ class ValidateFixtureTests(_ReceiptFixtureCase):
         exit_code, output = self._validate()
         self.assertEqual(exit_code, 1)
         self.assertIn("inconsistent with adoption/manifest.json platform_profiles", output)
+
+    def test_supersedes_component_mismatch_is_rejected(self):
+        # 'widget' appears exactly once in valid.json's id (the component segment); a
+        # supersedes pointing at a different component id is a nonsensical cross-link.
+        def substitute(data):
+            data["supersedes"] = data["id"].replace("widget", "not-widget", 1)
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("supersedes component segment", output)
+        self.assertIn("does not match component_id", output)
+
+    def test_supersedes_referencing_an_unregistered_receipt_is_rejected(self):
+        # supersedes must resolve to a receipt manifests/evidence.json actually knows about;
+        # a dangling reference (the named original was never placed/registered) is rejected.
+        def substitute(data):
+            original_id = data["id"]
+            data["supersedes"] = original_id
+            data["id"] = f"{original_id}-2"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("is not registered in manifests/evidence.json", output)
+
+    def test_supersedes_well_formed_and_registered_is_accepted(self):
+        # The happy path at the validate_receipt_cross_references level: supersedes names a
+        # real, registered receipt for the same host/component/stage/date.
+        original_path = self._place("valid.json")
+        original_id = json.loads(original_path.read_text(encoding="utf-8"))["id"]
+
+        def substitute(data):
+            data["supersedes"] = original_id
+            data["id"] = f"{original_id}-2"
+
+        self._place("valid.json", filename=f"{original_id}-2.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 0, output)
 
     def test_json_escaped_personal_home_path_in_value_is_rejected(self):
         # A JSON / escape decodes to '/', hiding a personal home path from a scan of
@@ -875,11 +946,16 @@ class RecorderRoundTripTests(unittest.TestCase):
         with contextlib.redirect_stdout(buffer):
             self.assertEqual(self._run(argv), 2, buffer.getvalue())
         self.assertIn("--allow-unbound-version", buffer.getvalue())
-        with contextlib.redirect_stdout(io.StringIO()):
-            self.assertEqual(self._run([*argv, "--allow-unbound-version"]), 0)
+        allow_buffer = io.StringIO()
+        with contextlib.redirect_stdout(allow_buffer):
+            self.assertEqual(self._run([*argv, "--allow-unbound-version"]), 0, allow_buffer.getvalue())
+        # Re-recording the same host/component/stage/date with the version written correctly
+        # (no --allow-unbound-version needed) must not silently overwrite the receipt just
+        # written above; --supersedes records it as the newer, corrected receipt instead.
+        superseded_id = json.loads((self.root / allow_buffer.getvalue().strip()).read_text(encoding="utf-8"))["id"]
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
-            exit_code = self._run([*argv[:-1], "2.0.0rc5 (tag v2.0.0rc5)"])
+            exit_code = self._run([*argv[:-1], "2.0.0rc5 (tag v2.0.0rc5)", "--supersedes", superseded_id])
         self.assertEqual(exit_code, 0, buffer.getvalue())
 
     def test_overlong_model_is_refused_before_anything_is_written(self):
@@ -955,6 +1031,151 @@ class RecorderRoundTripTests(unittest.TestCase):
             ])
         self.assertEqual(exit_code, 2, buffer.getvalue())
         self.assertIn("git is not on PATH", buffer.getvalue())
+
+
+class SupersedeRecordTests(unittest.TestCase):
+    """2026-09-25 incident: re-recording the same host/component/stage on the same day
+    silently overwrote the existing receipt file, erasing an appended independent_session
+    'needs_changes' review. record must now refuse (before running any command) instead of
+    overwriting, and --supersedes is the reviewable way to record a new receipt for that same
+    host/component/stage/date, leaving the original file byte-identical."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_support_tree(self.root)
+
+    def _run(self, argv: list[str]) -> int:
+        return _run_cli(argv)
+
+    def _record_argv(self, extra: list[str] | None = None) -> list[str]:
+        return [
+            "record", "--root", str(self.root),
+            "--host-id", "test-host-20260101",
+            "--platform-id", "linux-wsl2-x86_64",
+            "--os", "linux", "--architecture", "x86_64",
+            "--component-id", "widget",
+            "--stage", "use",
+            "--evidence-class", "synthetic",
+            "--from-stack-commands",
+            *(extra or []),
+        ]
+
+    def test_record_refuses_to_overwrite_an_existing_receipt(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run(self._record_argv())
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        relative_path = buffer.getvalue().strip()
+        path = self.root / relative_path
+
+        # An independent review with a needs_changes verdict: exactly the kind of review the
+        # 2026-09-25 incident's silent overwrite erased.
+        review_buffer = io.StringIO()
+        with contextlib.redirect_stdout(review_buffer):
+            review_exit = self._run([
+                "review", "--root", str(self.root), "--receipt", relative_path,
+                "--kind", "independent_session", "--ref", "t", "--verdict", "needs_changes",
+                "--identity", "reviewer",
+            ])
+        self.assertEqual(review_exit, 0, review_buffer.getvalue())
+        before = path.read_bytes()
+
+        # A marker file a second record run must never touch if it refuses before running commands.
+        marker = self.root / "executed.marker"
+        second_buffer = io.StringIO()
+        with contextlib.redirect_stdout(second_buffer):
+            second_exit = self._run(self._record_argv(["--cmd", f"touch {marker}"]))
+        second_output = second_buffer.getvalue()
+
+        self.assertEqual(second_exit, 2, second_output)
+        self.assertIn(relative_path, second_output)
+        self.assertIn("independent_session:needs_changes", second_output)
+        self.assertFalse(marker.exists(), "record ran a command before refusing to overwrite")
+        self.assertEqual(path.read_bytes(), before,
+                         "the existing receipt was not byte-identical after a refused overwrite")
+
+        validate_buffer = io.StringIO()
+        with contextlib.redirect_stdout(validate_buffer):
+            validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
+        self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
+    def test_supersedes_writes_a_distinct_receipt_and_leaves_the_original_untouched(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run(self._record_argv())
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        original_relative = buffer.getvalue().strip()
+        original_path = self.root / original_relative
+        original_id = json.loads(original_path.read_text(encoding="utf-8"))["id"]
+        before = original_path.read_bytes()
+
+        second_buffer = io.StringIO()
+        with contextlib.redirect_stdout(second_buffer):
+            second_exit = self._run(self._record_argv(["--supersedes", original_id]))
+        self.assertEqual(second_exit, 0, second_buffer.getvalue())
+        superseding_relative = second_buffer.getvalue().strip()
+        self.assertNotEqual(superseding_relative, original_relative)
+        self.assertTrue(superseding_relative.endswith(f"{original_id}-2.json"), superseding_relative)
+
+        self.assertEqual(original_path.read_bytes(), before, "supersedes touched the original receipt file")
+
+        superseding_receipt = json.loads((self.root / superseding_relative).read_text(encoding="utf-8"))
+        self.assertEqual(superseding_receipt["supersedes"], original_id)
+        self.assertEqual(superseding_receipt["id"], f"{original_id}-2")
+        # No reviews are inherited: the new receipt starts with only its own fresh 'self' entry.
+        self.assertEqual([review["kind"] for review in superseding_receipt["reviews"]], ["self"])
+
+        # A third recording finds the next free generation rather than colliding with the second.
+        third_buffer = io.StringIO()
+        with contextlib.redirect_stdout(third_buffer):
+            third_exit = self._run(self._record_argv(["--supersedes", original_id]))
+        self.assertEqual(third_exit, 0, third_buffer.getvalue())
+        self.assertTrue(third_buffer.getvalue().strip().endswith(f"{original_id}-3.json"))
+
+        validate_buffer = io.StringIO()
+        with contextlib.redirect_stdout(validate_buffer):
+            validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
+        self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
+    def test_supersedes_rejects_an_id_for_a_different_host_component_stage_or_date(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run(self._record_argv())
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        relative_path = buffer.getvalue().strip()
+        real_id = json.loads((self.root / relative_path).read_text(encoding="utf-8"))["id"]
+        host_id, component_id, stage, date_stamp = real_id.split("--")
+
+        for bad_id in (
+            f"other-host-20260101--{component_id}--{stage}--{date_stamp}",
+            f"{host_id}--not-{component_id}--{stage}--{date_stamp}",
+            f"{host_id}--{component_id}--install--{date_stamp}",
+            f"{host_id}--{component_id}--{stage}--20200101",
+            "not-a-well-formed-id",
+        ):
+            bad_buffer = io.StringIO()
+            with contextlib.redirect_stdout(bad_buffer):
+                bad_exit = self._run(self._record_argv(["--supersedes", bad_id]))
+            self.assertEqual(bad_exit, 2, f"{bad_id}: {bad_buffer.getvalue()}")
+
+        # None of the rejected attempts touched the original receipt.
+        self.assertEqual(json.loads((self.root / relative_path).read_text(encoding="utf-8"))["id"], real_id)
+
+    def test_supersedes_rejects_a_nonexistent_receipt_id(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run(self._record_argv())
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        real_id = json.loads((self.root / buffer.getvalue().strip()).read_text(encoding="utf-8"))["id"]
+
+        # Well-formed and same-family, but generation 2 was never actually recorded.
+        missing_buffer = io.StringIO()
+        with contextlib.redirect_stdout(missing_buffer):
+            exit_code = self._run(self._record_argv(["--supersedes", f"{real_id}-2"]))
+        self.assertEqual(exit_code, 2, missing_buffer.getvalue())
+        self.assertIn("does not exist", missing_buffer.getvalue())
 
 
 class ReviewIndependenceTests(unittest.TestCase):
@@ -1218,14 +1439,15 @@ class UseStageLintTests(unittest.TestCase):
         self.root = Path(self.tmp.name)
         _init_support_tree(self.root)
 
-    def _record(self, stage: str, commands: list[str]) -> tuple[int, str]:
+    def _record(self, stage: str, commands: list[str], extra: list[str] | None = None) -> tuple[int, str]:
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
             exit_code = _run_cli([
                 "record", "--root", str(self.root), "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64", "--os", "linux", "--architecture", "x86_64",
                 "--component-id", "widget", "--stage", stage, "--evidence-class", "synthetic",
-                *[argument for command in commands for argument in ("--cmd", command)]])
+                *[argument for command in commands for argument in ("--cmd", command)],
+                *(extra or [])])
         return exit_code, buffer.getvalue()
 
     def test_only_an_exact_help_or_version_argv_matches(self):
@@ -1245,8 +1467,13 @@ class UseStageLintTests(unittest.TestCase):
 
     def test_help_calls_record_as_install_and_a_functional_command_as_use(self):
         self.assertEqual(self._record("install", ["true --help"])[0], 0)
-        self.assertEqual(self._record("use", ["true --version", "echo hi"])[0], 0)
-        self.assertEqual(self._record("use", ["du -h /dev/null"])[0], 0)
+        use_exit, use_output = self._record("use", ["true --version", "echo hi"])
+        self.assertEqual(use_exit, 0, use_output)
+        # A second 'use' receipt for the same host/component/date must not silently overwrite
+        # the one just written; supersede it explicitly instead.
+        use_id = json.loads((self.root / use_output.strip()).read_text(encoding="utf-8"))["id"]
+        exit_code, output = self._record("use", ["du -h /dev/null"], extra=["--supersedes", use_id])
+        self.assertEqual(exit_code, 0, output)
 
     def test_validate_derives_nothing_from_command_text(self):
         self.assertEqual(self._record("use", ["echo hi"])[0], 0)

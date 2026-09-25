@@ -213,7 +213,14 @@ Every receipt also names one `stage`. Two decide a platform status:
    sanitizes `$HOME` to `~` and your username to `<user>` in the captured
    excerpt, writes the receipt under `evidence/hosts/<host_id>/`, and
    registers it in `manifests/evidence.json`. It never uploads anything over
-   the network. `--os`/`--architecture` default to the actual host's values
+   the network. A receipt is never overwritten: recording the same
+   host/component/stage on the same day again refuses (exit 2, naming the
+   existing file and its review kinds/verdicts) instead of silently erasing
+   it and any appended independent review. Pass `--supersedes
+   <existing-receipt-id>` to record a new receipt for that same
+   host/component/stage/date instead: it writes `<id>-2` (or the next free
+   `-N`), records `supersedes` in the new receipt, and leaves the original
+   file byte-identical. `--os`/`--architecture` default to the actual host's values
    but can be overridden; nothing in this repository can verify from the
    receipt's JSON alone that a claimed `platform_id`,
    `second_physical_machine` or `os`/`architecture` combination is honest —

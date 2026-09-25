@@ -3229,8 +3229,8 @@
     },
     {
       "path": "adoption/host-receipt.schema.json",
-      "sha256": "6a6db61f6e3fe78fbfd955802b8bed2bba385b8be161f0ddff895acdee2d9972",
-      "bytes": 8536
+      "sha256": "8fc831c5ca5586d74ce4e8180f78d41a2db90dea2df8ebfaf55f629d430f1271",
+      "bytes": 9155
     },
     {
       "path": "adoption/host-state.example.json",
@@ -9935,8 +9935,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "8b60352383cc809aa7615277980ad351be124a0b007cf72a79f8e3bebb2d74d0",
-      "bytes": 27199
+      "sha256": "e476513db4b7e6b10906a97fe62863e69cc834bec2408b2e17e5ba7c656a6740",
+      "bytes": 27700
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -29220,8 +29220,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "30da2f203f9f3d03c60eec6dc8ce416e84665013523e9001681429fbaf6d7598",
-      "bytes": 62536
+      "sha256": "a1633209e182e034d62af380b115cb07d991af7b3955b2b81bac4d47c56873ea",
+      "bytes": 69098
     },
     {
       "path": "scripts/landscape.py",
@@ -29625,8 +29625,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "8494c3483a225d97ba9fb33cb12eb5e4728e14ae8313f3bdad03f424b135df81",
-      "bytes": 73068
+      "sha256": "d4563ddda6b7c53c81eab5e3b35752a12d691e7a06194a14ad4693d24508677b",
+      "bytes": 85236
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
