@@ -40,6 +40,26 @@
       "exit_code": 0,
       "stderr_sha256": "f969600f63a65edbabef417efbffc781fa4806c11e2f2491fa407ff3564af5bc",
       "note": "Independent fresh-process re-run per brief step 3."
+    },
+    {
+      "label": "run-3",
+      "argv": ["python3", "blueprints/us-equities/engine-nautilus/equity-replay/launch.py",
+        "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
+        "--run", "${PRIVATE_STATE}/authenticated-data-20260920/alpaca-run-1",
+        "--out", "${PRIVATE_RUN_DIR}/sim/equity-replay-run-3"],
+      "exit_code": 0,
+      "stderr_sha256": "f969600f63a65edbabef417efbffc781fa4806c11e2f2491fa407ff3564af5bc",
+      "note": "This fix round's post-remediation reconfirmation, run against nautilus-2.0.0rc5-r20260925 AFTER it was rebuilt with --link-mode copy (see nautilus.json hardlink_entanglement_incident). Re-run because the root's site-packages files changed storage (hardlink -> independent copy) after run-1/run-2 completed; this confirms the relink did not change runtime behavior."
+    },
+    {
+      "label": "run-4",
+      "argv": ["python3", "blueprints/us-equities/engine-nautilus/equity-replay/launch.py",
+        "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
+        "--run", "${PRIVATE_STATE}/authenticated-data-20260920/alpaca-run-1",
+        "--out", "${PRIVATE_RUN_DIR}/sim/equity-replay-run-4"],
+      "exit_code": 0,
+      "stderr_sha256": "f969600f63a65edbabef417efbffc781fa4806c11e2f2491fa407ff3564af5bc",
+      "note": "Second post-remediation reconfirmation run (independent fresh process), same purpose as run-3."
     }
   ],
   "results_per_run": [
@@ -49,6 +69,8 @@
      "realized_pnl_reconciled": true,
      "account_csv_sha256_run1": "90e64a86776bafeb85d6ee860a00380ed87439b2a2cb86add3a2e3afbd0e4d26",
      "account_csv_sha256_run2": "90e64a86776bafeb85d6ee860a00380ed87439b2a2cb86add3a2e3afbd0e4d26",
+     "account_csv_sha256_run3_post_relink_fix": "90e64a86776bafeb85d6ee860a00380ed87439b2a2cb86add3a2e3afbd0e4d26",
+     "account_csv_sha256_run4_post_relink_fix": "90e64a86776bafeb85d6ee860a00380ed87439b2a2cb86add3a2e3afbd0e4d26",
      "account_csv_matches_original_2026-09-21_receipt": true,
      "economic_repeat_sha256_run1": "8f81042abf13c444d7148c723bd6c82d323bd2e30297d4eba358d20988505e57",
      "economic_repeat_sha256_run2": "8f81042abf13c444d7148c723bd6c82d323bd2e30297d4eba358d20988505e57",
@@ -59,11 +81,17 @@
      "realized_pnl_reconciled": true,
      "account_csv_sha256_run1": "a59552b97963404701614346136f1e3d676d376154d8ea1dfc580bc89e404e4d",
      "account_csv_sha256_run2": "a59552b97963404701614346136f1e3d676d376154d8ea1dfc580bc89e404e4d",
+     "account_csv_sha256_run3_post_relink_fix": "a59552b97963404701614346136f1e3d676d376154d8ea1dfc580bc89e404e4d",
+     "account_csv_sha256_run4_post_relink_fix": "a59552b97963404701614346136f1e3d676d376154d8ea1dfc580bc89e404e4d",
      "account_csv_matches_original_2026-09-21_receipt": true,
      "economic_repeat_sha256_run1": "2b97563442ef6d12235a85f09e78db960f8a10afb739777e7ab219ebc03e0a04",
      "economic_repeat_sha256_run2": "2b97563442ef6d12235a85f09e78db960f8a10afb739777e7ab219ebc03e0a04",
      "economic_repeat_sha256_matches_original_2026-09-21_receipt": true}
   ],
+  "post_remediation_reconfirmation": {
+    "reason": "nautilus-2.0.0rc5-r20260925 (the root run-1/run-2 executed against) was rebuilt in place by this fix round to resolve hardlink_entanglement_incident in nautilus.json (uv --link-mode copy instead of the default hardlink). The rebuild does not change installed package content (freeze hash reverified identical), but it does replace every site-packages file's underlying storage, so run-1/run-2's result is technically about a filesystem state that no longer exists.",
+    "action": "Ran two more independent fresh-process runs (run-3, run-4) against the rebuilt root; both exited 0 and reproduced the same oracle-matching account.csv hashes shown above (account_csv_sha256_run3_post_relink_fix / _run4_post_relink_fix), and the same deterministic stderr_sha256 as run-1/run-2. This satisfies the brief's 'twice' requirement on the root as it actually exists after this fix round, not only on its pre-fix state."
+  },
   "reoccurrence_verification": {
     "twice_identical": true,
     "account_csv_byte_identical_across_runs": true,
@@ -83,7 +111,16 @@
     "orders_placed": 0
   },
   "repository_checks": [
-    {"argv": ["python3", "-c", "compute economic-only hash from reports.json per case"], "exit_code": 0, "scope": "local verification script, not a repository test suite"}
+    {"argv": ["python3", "-c", "compute economic-only hash from reports.json per case"], "exit_code": 0, "scope": "local verification script, not a repository test suite",
+     "status": "SUPERSEDED / INCORRECT DESCRIPTION -- kept only as the record of the prior round's mistake, not as a description of how the recorded hashes were produced. This command describes the reports.json-based method that reoccurrence_verification.correction says gave the wrong hashes (338d9548.../fe8baf74...); see the corrected entry below."},
+    {"argv": ["python3", "-c", "csv.DictReader over each case's fills.csv/account.csv/positions.csv; hash {fills: <non-identity fields>, cash: account totals, position_pnl: realized_pnl} via json.dumps(sort_keys=True, separators=(',',':')) + sha256 -- see economic_hash_encoding for the documented method"],
+     "exit_code": null,
+     "scope": "local verification script, not a repository test suite",
+     "note": "This fix round corrects the stale entry above, which described the wrong (reports.json-based) method. This entry restates economic_hash_encoding's documented method, which the prior round asserted reproduces the recorded economic_repeat_sha256 exactly.",
+     "independently_reverified_this_round": {
+       "account_csv_sha256": "Fully reproduced from scratch: sha256 of fills-run's account.csv for both cases, both new post-fix runs (run-3, run-4), exactly matches the recorded account_csv_sha256_run1/run2 values and the oracle's final_2_reports_sha256.account.csv (90e64a86.../a59552b9...). This does not depend on guessing the fill-dict field selection.",
+       "economic_repeat_sha256": "NOT independently re-derived byte-for-byte this round. Several plausible reconstructions of the 'non-identity fields' fill-dict subset (9-field combinations drawn from fills.csv's 32 columns, e.g. side/type/quantity/status/filled_qty/commissions/avg_px/ts_init/ts_last and other variants) were tried against fills.csv/account.csv/positions.csv from run-3 and did not reproduce 8f81042abf13c444d7148c723bd6c82d323bd2e30297d4eba358d20988505e57. The exact serialization (field set, key naming, value normalization) is under-specified by economic_hash_encoding's prose alone and the originating script is not checked into the repository. What IS independently confirmed: the recorded economic_repeat_sha256_run1/run2 value is unchanged from, and internally consistent with, this same receipt's own oracle-comparison claim (it equals blueprints/us-equities/engine-nautilus/equity-replay/receipt.json's recorded economic_repeat_sha256 for both cases, read directly from that file), and the simpler, fully-reproducible account.csv hash corroborates the same underlying CSVs are economically identical to the oracle run. Treat the specific economic_repeat_sha256 reproduction claim as evidenced by internal/oracle-file consistency, not by an independently re-executed script, until the original computation is checked in or reconstructed exactly."
+     }}
   ],
   "limitations": [
     "Retrospective scheduled diagnostic on completed daily bars, not a realizable closing-auction strategy or profitability claim (same scope as the original blueprint).",

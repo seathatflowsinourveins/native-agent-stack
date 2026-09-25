@@ -20,15 +20,41 @@
       "argv": ["uv", "--no-config", "pip", "install", "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
         "--pre", "--index-url", "https://pypi.org/simple", "nautilus_trader==2.0.0rc5", "numpy", "pandas"],
       "exit_code": 0,
-      "installed_packages": 5
+      "installed_packages": 5,
+      "superseded_by": "install-link-mode-copy (see hardlink_entanglement_incident); this original invocation used uv's Linux default --link-mode hardlink and is the root cause of the incident below. Kept here unmodified as the accurate historical record of what actually ran."
+    },
+    {
+      "label": "install-link-mode-copy",
+      "argv": ["uv", "--no-config", "pip", "install", "--link-mode", "copy", "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
+        "--pre", "--index-url", "https://pypi.org/simple", "nautilus_trader==2.0.0rc5", "numpy", "pandas"],
+      "exit_code": 0,
+      "installed_packages": 5,
+      "note": "This fix round's remediation for hardlink_entanglement_incident. ${STACK_HOME}/nautilus-2.0.0rc5-r20260925 was removed and recreated (uv venv) before this install so no pre-existing hardlinked file could remain. No new PyPI network access was needed (already-warm local cache: \"Resolved 5 packages in 4ms\"). Raw log: ${PRIVATE_RUN_DIR}/sim/venv-relink-fix/nautilus.log."
     },
     {
       "label": "pip-check",
       "argv": ["uv", "--no-config", "pip", "check", "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python"],
       "exit_code": 0,
-      "stdout": "All installed packages are compatible"
+      "stdout": "All installed packages are compatible",
+      "note": "Re-run after install-link-mode-copy; identical result."
     }
   ],
+  "hardlink_entanglement_incident": {
+    "discovered_by": "This fix round, in response to review finding 'adaptive.json:11,22,35,61 ... made adaptive-paper-r20260925 and nautilus-2.0.0rc5-r20260925 share inodes with tools/adaptive-paper-20260921'.",
+    "note_on_which_root": "This root's entanglement was with the FORBIDDEN live paper venv tools/adaptive-paper-20260921 (via the numpy/pandas/six/python-dateutil versions this install shares with that venv's package set), not with the existing_root_untouched named above (tools/nautilus-2.0.0rc5); a direct inode comparison against tools/nautilus-2.0.0rc5 found 0 shared inodes, so that root's own 'existing_root_modified: false' claim (below) was never at risk. The at-risk claim was isolation.existing_root_modified for the live venv, which this receipt did not previously mention at all.",
+    "root_cause": "The original install command above did not pass --link-mode, so uv 0.12.17's Linux default (hardlink from the shared ~/.cache/uv content-addressed cache) made this root's numpy/pandas/six/python-dateutil files hardlinks to the same cache-backed inodes already used by tools/adaptive-paper-20260921 (which installs the identical pinned versions of those four packages).",
+    "measured_before_fix": {
+      "method": "os.lstat st_ino comparison, nautilus-2.0.0rc5-r20260925 vs adaptive-paper-20260921 (the live venv), both lib/python3.12/site-packages trees",
+      "result": "2575 of 2593 new-root files shared an inode with the live venv."
+    },
+    "fix": "Rebuilt nautilus-2.0.0rc5-r20260925 from scratch (uv venv, fresh directory) and reinstalled the identical package set with `uv pip install --link-mode copy`.",
+    "measured_after_fix": {
+      "method": "same os.lstat st_ino comparison, re-run after the copy-mode rebuild",
+      "result": "0 of 2592 new-root files share an inode with the live venv or anything outside the new root.",
+      "freeze_unchanged": "Regenerated installed-freeze.txt after the rebuild: 94 bytes, sha256 9a2c65a6102be63a64f65f2c489ddcdd144bacadeee63a05b119e8e038a67f75 -- byte-identical to this receipt's originally recorded value, confirming the package set/versions are unaffected by link mode.",
+      "backtest_reconfirmed": "Two fresh equity-replay confirmation runs (run-3, run-4, see evidence/artifacts/native-rollout-20260925/sim/equity-replay.json) were executed against this corrected root after the fix and both still reproduced the oracle's account.csv hashes exactly, so the relink did not change runtime behavior."
+    }
+  },
   "installed_distributions": [
     "nautilus-trader==2.0.0rc5", "numpy==2.5.3", "pandas==3.0.6",
     "python-dateutil==2.9.0.post0", "six==1.17.0"
@@ -41,15 +67,17 @@
     "result": "IDENTICAL package set/versions; installed-freeze.txt sha256 exactly matches the recorded freeze.stdout sha256 (9a2c65a6102be63a64f65f2c489ddcdd144bacadeee63a05b119e8e038a67f75)"
   },
   "isolation": {
-    "network_used": "PyPI package resolution/download only (https://pypi.org/simple); no Alpaca or other market-data endpoint contacted",
+    "network_used": "PyPI package resolution/download only (https://pypi.org/simple); no Alpaca or other market-data endpoint contacted. The copy-mode rebuild needed no additional network access (already-warm local uv cache).",
     "credentials_read": 0,
     "orders_placed": 0,
-    "existing_root_modified": false
+    "existing_root_modified": false,
+    "existing_root_modified_note": "True and unaffected by the incident below: tools/nautilus-2.0.0rc5 shares 0 inodes with this new root, confirmed by direct comparison. See hardlink_entanglement_incident for a *different* root (the forbidden live paper venv tools/adaptive-paper-20260921) that this receipt did not previously disclose being entangled with at all."
   },
   "limitations": [
     "Release candidate build (2.0.0rc5), not a production/live-capital acceptance.",
     "This receipt covers environment construction only; the equity-replay backtest receipt in this same directory covers the runtime E2E acceptance on this root.",
-    "PyPI wheel hashes are trusted from the index at install time; no separate re-hash/signature verification of the downloaded wheel was performed for this build (matching the source recipe's own documented scope)."
+    "PyPI wheel hashes are trusted from the index at install time; no separate re-hash/signature verification of the downloaded wheel was performed for this build (matching the source recipe's own documented scope).",
+    "See hardlink_entanglement_incident: the original build hardlinked this root's numpy/pandas/six/python-dateutil files to the FORBIDDEN live paper venv tools/adaptive-paper-20260921 via uv's Linux default link mode -- an undisclosed scope/isolation issue in the prior round's receipt, distinct from and in addition to the adaptive-paper.json incident. Fixed this round by rebuilding with --link-mode copy (0 shared inodes verified after)."
   ],
   "sanitization": "Host paths use the ${STACK_HOME} placeholder for ~/.local/share/codex-ecosystem/tools. No credential values or session identifiers appear in this receipt."
 }
