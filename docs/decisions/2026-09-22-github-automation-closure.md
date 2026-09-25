@@ -1513,7 +1513,9 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
     -f 'patterns_allowed[]=ossf/scorecard-action@*'
   gh api repos/seathatflowsinourveins/native-agent-stack/actions/permissions
   ```
-  `After-GET: pending coordinator`
+  `After-GET: pending coordinator`. **Rollback:** the same first PUT with
+  `allowed_actions=all`:
+  `gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/actions/permissions -f allowed_actions=all -F enabled=true`.
 - **Fork-approval after-GET (closes the pending step above).** "GitHub
   hardening follow-up (2026-09-25)" decided `all_external_contributors` and
   left "record the dated after-GET here" open. A live, read-only GET of
