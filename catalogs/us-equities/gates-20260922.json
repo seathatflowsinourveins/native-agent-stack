@@ -13,6 +13,16 @@
     "paper": "paper operation qualified: broker path exercised, alerts wired, credentials handled, snapshots gated",
     "live": "live entry prerequisites: paper leverage ladder, native fault behaviour, IBKR acceptance, explicit go"
   },
+  "authorship": {
+    "live-go": {
+      "method": "ssh-keygen -Y verify",
+      "signature_path": "docs/decisions/live-go.md.sig",
+      "allowed_signers_path": "docs/decisions/live-go.allowed_signers",
+      "principal": "live-go-signer",
+      "namespace": "live-go@native-agent-stack",
+      "note": "Authorship control for the explicit live go, 2026-09-25. scripts/trading_gates.py counts live-go as holding only when docs/decisions/live-go.md is non-empty and `ssh-keygen -Y verify -f docs/decisions/live-go.allowed_signers -I live-go-signer -n live-go@native-agent-stack -s docs/decisions/live-go.md.sig` accepts its exact committed bytes. It fails closed: an absent or empty document, signature or allowed_signers file, a path that resolves outside the tree, no ssh-keygen, a timeout or a failed verification leaves live-go not holding, so it cannot count as established and stays in blocking.live (an established live-go that does not verify is also an error). Recorded established, live-go must carry evidence_class user_decision. Only the user creates the signing key, the allowed_signers entry, live-go.md and its signature; the one-time setup is in catalogs/us-equities/README.md, and automation never does any of it. None of the three files existed when this control was added. Limits: the allowed_signers file lives in the tree, so anyone with write access can replace it; a replacement shows in that file's diff and history but the checker does not prevent it, and a hardware-backed key that needs a physical touch keeps agent sessions from signing with the registered key. Design record: docs/decisions/2026-09-25-live-go-authorship-control.md."
+    }
+  },
   "gates": [
     {
       "id": "equity-replay",
@@ -526,7 +536,7 @@
       "required": true,
       "receipt_path": "docs/decisions/live-go.md",
       "flip_condition": null,
-      "note": "Never flipped by automation; catalog inclusion does not authorize live configuration, paid hosting or orders."
+      "note": "Never flipped by automation; catalog inclusion does not authorize live configuration, paid hosting or orders. Authorship control, 2026-09-25 (status unchanged): this gate counts as holding only when the detached SSH signature named in this document's authorship block verifies over docs/decisions/live-go.md with ssh-keygen -Y verify against docs/decisions/live-go.allowed_signers; otherwise it fails closed and stays in blocking.live. Recorded established, it must carry evidence_class user_decision, which the checker accepts only for a gate owned by user-decision with a null flip_condition."
     }
   ]
 }

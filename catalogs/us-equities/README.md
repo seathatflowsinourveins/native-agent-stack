@@ -98,7 +98,7 @@ The latest [architecture wave](architecture/README.md) reviews 40 finalist recor
 
 ## Read the layer you need
 
-Gate ladder: [`gates-20260922.json`](gates-20260922.json) records the sim → paper → live gates with owner, evidence class, receipt path and flip condition; `python3 scripts/trading_gates.py --check` verifies them arithmetically (nothing is flipped by the checker). For each gate listed in `SOURCE_BINDINGS` in that script (currently `native-fault-behaviour`), it also lists under `warnings` every source file whose sha256 recorded in the receipt differs from the tree (or is missing there) or from the release manifest (`source-hashes.json`) where that manifest lists the file, and any binding it cannot check; this is report-only and never fails the check.
+Gate ladder: [`gates-20260922.json`](gates-20260922.json) records the sim → paper → live gates with owner, evidence class, receipt path and flip condition; `python3 scripts/trading_gates.py --check` verifies them arithmetically (nothing is flipped by the checker). A rung is ready only while every required gate up to it is established and its condition holds now. The last gate, `live-go`, counts only with your detached SSH signature; see [Live-go authorship control](#live-go-authorship-control-your-one-time-setup). For each gate listed in `SOURCE_BINDINGS` in that script (currently `native-fault-behaviour`), it also lists under `warnings` every source file whose sha256 recorded in the receipt differs from the tree (or is missing there) or from the release manifest (`source-hashes.json`) where that manifest lists the file, and any binding it cannot check; this is report-only and never fails the check.
 
 | Layer | Cards | Guide / structured manifest |
 | --- | ---: | --- |
@@ -177,3 +177,48 @@ See the [resolution ledger](../../blueprints/us-equities/gap-resolution.md) for 
 The [bounded source follow-up](source-followup.md) refreshed the unchanged public-star identities and four adopted release pins. Two additional observability alternatives expand the index to 453; neither was installed. The follow-up also distinguishes abtop modes that can invoke a model from its private model-free JSON snapshot.
 
 The later [research-runtime evidence](../../blueprints/us-equities/research-runtime/receipt.json) adds real Dagu packet/Parquet preparation and a standalone Claude report. The new paired Astra run is allowance-blocked and the SEC acquisition returned HTTP 403. [Restic acceptance](../../blueprints/us-equities/hosting/backup/receipt.json) establishes only a same-host backup and verified restore of selected static public files; it does not establish off-host or live-database recovery.
+
+## Live-go authorship control (your one-time setup)
+
+`live-go` is the last gate of the [gate ladder](gates-20260922.json), and only you establish it. Since 2026-09-25, `python3 scripts/trading_gates.py --check` counts it only when a detached SSH signature over `docs/decisions/live-go.md` verifies:
+
+```sh
+ssh-keygen -Y verify -f docs/decisions/live-go.allowed_signers -I live-go-signer \
+  -n live-go@native-agent-stack -s docs/decisions/live-go.md.sig < docs/decisions/live-go.md
+```
+
+The gates document's `authorship` block names these paths, the principal and the namespace. The check fails closed: if the document, the signature or the allowed_signers file is absent or empty, if `ssh-keygen` is missing, or if the verification fails, live-go does not count as established. It then stays in `blocking.live`, and a live-go recorded as established is reported as an error. Recorded established, live-go must carry the evidence class `user_decision`, which the checker accepts only for a gate owned by `user-decision` with a null flip condition. Automation never creates the key, the allowed_signers entry, `live-go.md` or its signature; none of them existed when this control was added.
+
+Once, before the first go:
+
+1. Make a signing key that agent sessions on your machines cannot use. A hardware-backed key is best, because each signature then needs your touch. For example, on a FIDO2 security key where your platform supports one:
+   `ssh-keygen -t ed25519-sk -C live-go-signer -f ~/.ssh/live-go_ed25519_sk`.
+   Otherwise, make an ed25519 key with a passphrase and keep it out of any ssh-agent that agent sessions can reach:
+   `ssh-keygen -t ed25519 -C live-go-signer -f ~/.ssh/live-go_ed25519`.
+   The commands below use the first name; substitute your key's path.
+2. Register its public key as the only line of the allowed_signers file:
+
+   ```sh
+   printf 'live-go-signer namespaces="live-go@native-agent-stack" %s\n' \
+     "$(cut -d' ' -f1,2 ~/.ssh/live-go_ed25519_sk.pub)" > docs/decisions/live-go.allowed_signers
+   ```
+
+   The `namespaces` option limits the key to live-go signatures. To give a go an expiry, append `,valid-before="YYYYMMDD"` to that option list. After that date the verification fails and live-go stops counting. If live-go is still recorded established, `--check` then fails on `main` until you extend the line or set live-go back to `user_decision`.
+
+For each go:
+
+1. Write your decision in `docs/decisions/live-go.md`. The signature covers the exact committed bytes, and this repository stores text with LF line endings (`.gitattributes`), so save the file with LF endings before you sign.
+2. Sign it. `ssh-keygen -Y sign` stops to ask before it overwrites a signature, so remove an old one first:
+
+   ```sh
+   rm -f docs/decisions/live-go.md.sig
+   ssh-keygen -Y sign -f ~/.ssh/live-go_ed25519_sk -n live-go@native-agent-stack docs/decisions/live-go.md
+   ```
+
+3. Run the verify command above. It prints `Good "live-go@native-agent-stack" signature for live-go-signer with ...`. While live-go is still `user_decision`, `--check` already reports `authorship.live-go.verified: true`.
+4. In `gates-20260922.json`, set live-go's `status` to `established` and its `evidence_class` to `user_decision`. Run `python3 scripts/trading_gates.py --check`: it must exit 0 with `status: passed`, `errors: []` and `authorship.live-go.verified: true`. `rung_ready.live` becomes `true` only when every other required gate is established and holds as well.
+5. Commit `live-go.md`, `live-go.md.sig`, `live-go.allowed_signers` and the gates file yourself.
+
+Any later edit to `live-go.md` needs a new signature, and until you re-sign the checker fails closed. You can sign on any machine, because only the committed bytes count. To rotate or revoke the key, edit `live-go.allowed_signers`.
+
+Limits: the allowed_signers file lives in the tree, so anyone with write access can replace it. A replacement shows in that file's diff and history, but the checker does not prevent it. An optional complement, and your change to make, is a ruleset or code-owner review requirement on `docs/decisions/live-go*` and the gates file. The design record is [2026-09-25-live-go-authorship-control](../../docs/decisions/2026-09-25-live-go-authorship-control.md).
