@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--serena--use--20260925-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "3f267b5c155e9dc7848e9b75fc9202bd810a9ad3",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "serena",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v serena) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && serena --version && python3 -c \"import glob,json,os,sys;b=os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[1])));f=glob.glob(os.path.join(b,'lib','python3*','site-packages','serena_agent-*.dist-info','direct_url.json'))[0];d=json.load(open(f));print('direct_url.json:',d['url'],'commit',d['vcs_info']['commit_id'])\" \"$p\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" serena",
+      "exit": 0,
+      "duration_s": 0.829,
+      "output_sha256": "e4fc3645c6635d2377443dac01a700f05d531d916e5259b861c38a7510e94834",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/serena -> ~/.local/share/codex-ecosystem/python-tools/serena-agent/bin/serena\nSerena 2.0.0.dev0\ndirect_url.json: https://github.com/oraios/serena commit c6fbd1c5932df2494ffa0020af5a9fbe80b82143\nstack ['2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143'] winner pins ['2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143']\n"
+    },
+    {
+      "cmd": "w=$(pwd); d=$(mktemp -d) || exit 1; mkdir \"$d/serena-state\" || exit 1; py=\"$(dirname \"$(readlink -f \"$(command -v serena)\")\")/python\"; tpl=$(\"$py\" -c \"from serena.constants import SERENA_CONFIG_TEMPLATE_FILE as t;print(t)\") || exit 1; sed 's|^project_serena_folder_location: .*$|project_serena_folder_location: \"'\"$d\"'/projects/$projectFolderName/.serena\"|' \"$tpl\" > \"$d/serena-state/serena_config.yml\" || exit 1; cfg=$(grep -c '^project_serena_folder_location: \".*/projects/\\$projectFolderName/\\.serena\"$' \"$d/serena-state/serena_config.yml\"); s0=$(git --no-optional-locks status --porcelain --ignored --untracked-files=all | sha256sum); m0=$(stat -c %Y \"$HOME/.serena/serena_config.yml\" 2>/dev/null || echo none); SERENA_HOME=\"$d/serena-state\" serena project create \"$w\" --language python > \"$d/create.log\" 2>&1; c=$?; mcporter call --stdio serena --stdio-arg start-mcp-server --stdio-arg --context --stdio-arg codex --stdio-arg --project --stdio-arg \"$w\" --stdio-arg --enable-web-dashboard --stdio-arg false --stdio-arg --open-web-dashboard --stdio-arg false --stdio-arg --enable-gui-log-window --stdio-arg false --cwd \"$w\" --env \"SERENA_HOME=$d/serena-state\" --name serena --tool find_symbol --args '{\"name_path_pattern\":\"review_state\",\"relative_path\":\"scripts/host_receipts.py\",\"include_body\":true}' --output json --no-oauth --timeout 180000 > \"$d/out\" 2> \"$d/err\"; rc=$?; echo \"relocation lines $cfg | project create exit $c | mcporter exit $rc\"; [ \"$c\" -eq 0 ] || tail -3 \"$d/create.log\" | sed \"s#$d#<tmp>#g\"; [ \"$rc\" -eq 0 ] || tail -3 \"$d/err\" | sed \"s#$d#<tmp>#g\"; python3 -c \"import ast,hashlib,json,sys;r=json.loads(json.load(open(sys.argv[1]))['result']);p='scripts/host_receipts.py';src=open(p).read();lines=src.splitlines();f=[n for n in ast.parse(src).body if isinstance(n,ast.FunctionDef) and n.name=='review_state'][0];s=r[0];b=s['body_location'];got=(b['start_line']+1,b['end_line']+1);want=(f.lineno,f.end_lineno);ok=s['body']=='\\n'.join(lines[f.lineno-1:f.end_lineno]);print('find_symbol review_state:',len(r),'match,',s['kind'],s['relative_path'],'%d-%d (ast %d-%d),'%(got+want),'body sha256',hashlib.sha256(s['body'].encode()).hexdigest()[:12],'= checkout:',ok);raise SystemExit(0 if len(r)==1 and s['name_path']=='review_state' and s['relative_path']==p and s['kind']=='Function' and got==want and ok else 1)\" \"$d/out\"; pc=$?; s1=$(git --no-optional-locks status --porcelain --ignored --untracked-files=all | sha256sum); m1=$(stat -c %Y \"$HOME/.serena/serena_config.yml\" 2>/dev/null || echo none); n=$(find \"$d/projects\" -path '*/.serena/project.yml' 2>/dev/null | wc -l); lsv=$(cat \"$d\"/projects/*/.serena/project.yml 2>/dev/null | awk '/^language_servers:/{f=1;next} f&&/^- /{printf \"%s \",$2;next} f{exit}'); echo \"project.yml outside checkout: $n, language_servers: $lsv| checkout status incl. ignored unchanged: $([ \"$s0\" = \"$s1\" ] && echo yes || echo no) | .serena in checkout: $([ -e .serena ] && echo present || echo absent) | ~/.serena config mtime unchanged: $([ \"$m0\" = \"$m1\" ] && echo yes || echo no)\"; rm -rf \"$d\"; test \"$cfg\" -eq 1 && test \"$c\" -eq 0 && test \"$rc\" -eq 0 && test \"$pc\" -eq 0 && test \"$n\" -eq 1 && test \"$lsv\" = \"python \" && test \"$s0\" = \"$s1\" && test ! -e .serena && test \"$m0\" = \"$m1\"",
+      "exit": 0,
+      "duration_s": 3.479,
+      "output_sha256": "ae6123cd26dc3611759092adb2a906684ea5a543a1a3c67a5d6a22cd427af64e",
+      "output_excerpt": "relocation lines 1 | project create exit 0 | mcporter exit 0\nfind_symbol review_state: 1 match, Function scripts/host_receipts.py 1512-1553 (ast 1512-1553), body sha256 d6f7c8dd1438 = checkout: True\nproject.yml outside checkout: 1, language_servers: python | checkout status incl. ignored unchanged: yes | .serena in checkout: absent | ~/.serena config mtime unchanged: yes\n"
+    }
+  ],
+  "tool_versions": {
+    "serena": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+  },
+  "observed_at_utc": "2026-09-25T16:35:14Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), Serena 2.0.0.dev0 at commit c6fbd1c5932df2494ffa0020af5a9fbe80b82143 (the catalog pin; the installed package's direct_url.json records that commit) answered find_symbol on this repository's own source, the checkout the recorder ran in, through MCPorter's ad-hoc stdio bridge. A temporary SERENA_HOME held a serena_config.yml copied from the installed package's template with one change: Serena's upstream project_serena_folder_location setting pointed the per-project .serena folder at a temporary directory (asserted). serena project create --language python wrote the project's project.yml there, and serena start-mcp-server --context codex, with the web dashboard, browser and GUI log window disabled, activated the checkout as the project. find_symbol for review_state in scripts/host_receipts.py returned one match: a Function at lines 1512-1553, the lines Python's ast reports for that function in this checkout, whose body equals those lines (asserted). Exactly one project.yml existed outside the checkout, with language_servers python; the checkout's git status, ignored files included, was unchanged; the checkout has no .serena directory; and ~/.serena/serena_config.yml kept its modification time (asserted). All commands exit 0.",
+  "limitations": [
+    "One Python symbol lookup on this repository, restricted to one file, was exercised: references, edits, other languages, a project index and Serena's memories were not. The temporary SERENA_HOME ran without the host's global Serena configuration or registered projects, and it and the relocated project folder were removed after the call.",
+    "MCPorter's ad-hoc stdio bridge was used, not the documented mcp-inspector call or a native Claude or Codex registration, and no model session ran. Serena launches its pyright language server through uvx, which can read or refresh the uv cache.",
+    "Supersedes nativestack-5975wx-20260925--serena--use--20260925, whose only workload was a temporary project copied from this repository's fixtures: docs/contributing-evidence.md Section 2 classes that as local_integration, not the native_proven it was recorded as. This generation runs on this repository's own source instead. That file stays byte-identical. scripts/platform_status.py does not read supersedes, so an independent agree on it would still count its fixture run as a qualifying native_proven use pass. It needs needs_changes, not agree.",
+    "Recorded from a Claude Code session in a git worktree of this repository whose HEAD was detached at 3f267b5c (the catalog_revision; origin/main when this branch started), with this branch's earlier 2026-09-25 receipts present in the working tree, not in a pinned install checkout. Those receipts are the only difference from 3f267b5c. The tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:35:14Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #263 independent session review",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T17:10:09Z",
+      "reviewer": {
+        "identity_sha256": "53c730e05aac86347b0a1b363719c287b73652f720163a3a3266ce75f317f9fa",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--serena--use--20260925"
+}
