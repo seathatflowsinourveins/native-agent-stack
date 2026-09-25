@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-25T22:22:04Z",
+  "recorded_at_utc": "2026-09-25T22:46:00Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -277,6 +277,20 @@
       "title": "Governed Alpaca historical data lake",
       "state": "source layer merged 2026-09-25 / news 2015-2026 retained privately (46568 requests 0 HTTP 429) / minute-bar pilot not run",
       "evidence_ref": "blueprints/us-equities/data-lake/README.md"
+    },
+    {
+      "kind": "gate",
+      "id": "token-stack-subagent-e2e",
+      "title": "Token stack inside Ultracode subagents",
+      "state": "16 of 16 tools used in Sonnet workflow subagents with passing checks / RTK +56527 run-only / Headroom +183904 lifetime / Codex workers blocked until 2026-09-30",
+      "evidence_ref": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "host-request-lane",
+      "title": "GitHub host request lane (other PCs to the workstation)",
+      "state": "live / workstation poll timer every 10 min / 0 workstation requests / 2 mac-coordinator requests open (274 and 276)",
+      "evidence_ref": "recipes/host-request-lane.md"
     }
   ],
   "workers": [
