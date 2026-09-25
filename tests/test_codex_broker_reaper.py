@@ -204,6 +204,24 @@ def wait_until(predicate, timeout=5.0, interval=0.02):
     return predicate()
 
 
+def process_group_members(pgid: int) -> list[tuple[int, bytes]]:
+    """(pid, raw cmdline) of every live, non-zombie process in process group ``pgid``, from /proc."""
+    members = []
+    for entry in Path("/proc").iterdir():
+        if not entry.name.isdigit():
+            continue
+        try:
+            stat = (entry / "stat").read_text()
+            # Fields after the parenthesised comm: state, ppid, pgrp, ...
+            state, _ppid, pgrp = stat[stat.rindex(")") + 2:].split()[:3]
+            if int(pgrp) != pgid or state == "Z":
+                continue
+            members.append((int(entry.name), (entry / "cmdline").read_bytes()))
+        except (OSError, ValueError):
+            continue
+    return members
+
+
 def write_broker_json(state_dir: Path, *, endpoint: str, pid: int) -> None:
     (state_dir / "broker.json").write_text(json.dumps(
         {"endpoint": endpoint, "pidFile": None, "logFile": None, "sessionDir": None, "pid": pid}
@@ -250,6 +268,18 @@ class ReaperTestCase(unittest.TestCase):
                     proc.wait(timeout=5)
                 except subprocess.TimeoutExpired:
                     pass
+            else:
+                # The leader already exited (killed by the guard under test,
+                # or crashed before binding its socket), so os.getpgid() on it
+                # fails, yet its own child can still be in its group,
+                # reparented to init. Kill exactly the group members that run
+                # a script from this test's root.
+                for pid, cmdline in process_group_members(proc.pid):
+                    if os.fsencode(str(self.root)) in cmdline:
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except (ProcessLookupError, PermissionError):
+                            pass
 
     def spawn(self, source: str, script_name: str, args: list[str], *, cwd: Path) -> subprocess.Popen:
         script_path = self.root / script_name
@@ -313,6 +343,33 @@ class ReaperTestCase(unittest.TestCase):
             "fixture process never reported the forced non-UTF-8 comm",
         )
         return proc
+
+
+@LINUX_ONLY
+class FixtureCleanupTests(ReaperTestCase):
+    """_reap_all() must not leak a fixture's own child once the fixture itself has exited."""
+
+    def test_child_of_an_exited_broker_is_killed(self):
+        # A fake broker that dies first (killed by the guard under test, or
+        # crashing before it binds its socket, as it did under a long TMPDIR
+        # before #250) leaves its --spawn-child process in its process group,
+        # reparented to init. Cleanup used to skip a group whose leader had
+        # exited, so those children outlived the test run.
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+        broker_proc, _ = self.spawn_fake_broker(cwd=workspace, spawn_child_named="codex")
+        self.assertTrue(wait_until(lambda: [pid for pid, _ in process_group_members(broker_proc.pid)
+                                            if pid != broker_proc.pid]),
+                        "fake broker never spawned its own fake codex child")
+        os.kill(broker_proc.pid, signal.SIGKILL)
+        broker_proc.wait(timeout=5)
+        orphans = [pid for pid, _ in process_group_members(broker_proc.pid)]
+        self.assertEqual(len(orphans), 1, "the broker's child should survive the broker, as in the leak")
+
+        self._reap_all()
+
+        self.assertTrue(wait_until(lambda: not process_group_members(broker_proc.pid)),
+                        f"cleanup left the exited broker's child alive: {orphans}")
 
 
 @LINUX_ONLY
