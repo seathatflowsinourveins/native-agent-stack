@@ -255,10 +255,11 @@ The pin is a floor: when `~/.local/bin/claude --version` already reports the
 pinned version or newer, `install_native` keeps that launcher, downloads and
 installs nothing, and logs `Kept installed claude-code <version>`; only a
 missing, older or unreadable launcher gets the verified install, so re-running
-the bootstrap never moves a native auto-updated Claude Code back to the pin.
+the bootstrap never moves a native auto-updated Claude Code back to the pin
+(`adoption/bootstrap-linux.sh` runs the same `install_native`).
 The script and both claude-code pins (2.1.281, which fixes a recursive `rm` of
 command-substitution output running unprompted in auto and bypass mode)
-changed after `v2026.09.23.1`: at that tag the pins are 2.1.280 and the script
+changed after `v2026.09.24.1`: at that tag the pins are 2.1.280 and the script
 runs the pinned install unconditionally, downgrading a newer Claude Code.
 
 `llama-server` is a profile `required_command`, so llama.cpp is pinned rather
