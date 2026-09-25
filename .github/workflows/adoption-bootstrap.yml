@@ -115,6 +115,10 @@ jobs:
           while IFS= read -r file; do
             [ -z "$file" ] && continue
             for pattern in "${PATTERNS[@]}"; do
+              # Glob matching is intended: each pattern is a path glob, and in a
+              # case pattern `*` also matches `/`, which gives the push `paths:`
+              # list's `**` semantics.
+              # shellcheck disable=SC2254
               case "$file" in
                 $pattern) match=true ;;
               esac
