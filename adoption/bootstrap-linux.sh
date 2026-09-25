@@ -9,6 +9,7 @@ usage() {
     'Usage: bash bootstrap-linux.sh --profile <id> [--skip-system-packages]' \
     '                                [--allow-unpinned <id,id,...>]' \
     '                                [--configure-claude-user-profile]' \
+    '                                [--tools-suffix <suffix>] [--link-dir <dir>] [--no-link]' \
     '' \
     'Installs the tools pinned in adoption/pins-linux-x86_64.json for the' \
     "given profile's component_ids (from adoption/manifest.json) under" \
@@ -21,7 +22,18 @@ usage() {
     'Uses sudo only for missing Ubuntu/Debian apt prerequisites, installed' \
     'before the curl/git/tar/jq presence check unless --skip-system-packages' \
     'is given, in which case that check lists what is missing and exits 4.' \
-    'Never edits a shell profile.'
+    'Never edits a shell profile.' \
+    '' \
+    '--tools-suffix <suffix> installs each pin into tools/<id>-<version><suffix>' \
+    '(e.g. -r20260925) instead of tools/<id>-<version>, so a new root can be' \
+    'staged beside an already-installed one for adoption/tools/ecosystem-switch' \
+    'to adopt later; --link-dir <dir> places bin/ symlinks (and the PATH export)' \
+    'in <dir> instead of ECO_INSTALL_ROOT/bin; --no-link installs the versioned' \
+    'root only and never creates or updates a bin/ symlink for it (a uv-tool-kind' \
+    'pin still lets uv manage its own shim directory; see adoption/lifecycle.md).' \
+    'Every symlink this script creates or replaces -- with or without these three' \
+    'flags -- is written atomically (a temporary symlink, then mv -T over the' \
+    'destination), never a remove-then-create ln -sfn.'
 }
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
@@ -31,8 +43,33 @@ profile_id=""
 skip_system=0
 allow_unpinned_ids=()
 configure_claude_user_profile=0
+tools_suffix=""
+link_dir_override=""
+no_link=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --tools-suffix)
+      [[ $# -ge 2 ]] || { printf -- '--tools-suffix requires a value.\n' >&2; exit 2; }
+      tools_suffix="$2"
+      shift 2
+      ;;
+    --tools-suffix=*)
+      tools_suffix="${1#--tools-suffix=}"
+      shift
+      ;;
+    --link-dir)
+      [[ $# -ge 2 ]] || { printf -- '--link-dir requires a value.\n' >&2; exit 2; }
+      link_dir_override="$2"
+      shift 2
+      ;;
+    --link-dir=*)
+      link_dir_override="${1#--link-dir=}"
+      shift
+      ;;
+    --no-link)
+      no_link=1
+      shift
+      ;;
     --profile)
       [[ $# -ge 2 ]] || { printf -- '--profile requires a value.\n' >&2; exit 2; }
       profile_id="$2"
@@ -79,6 +116,12 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 [[ -n "$profile_id" ]] || { printf -- 'Missing required --profile <id>.\n' >&2; exit 2; }
+[[ -z "$tools_suffix" || "$tools_suffix" =~ ^-[A-Za-z0-9._-]+$ ]] || {
+  printf -- '--tools-suffix must look like -rDATE: a dash followed by [A-Za-z0-9._-].\n' >&2; exit 2
+}
+[[ -z "$link_dir_override" || "$link_dir_override" == /* ]] || {
+  printf -- '--link-dir must be an absolute path.\n' >&2; exit 2
+}
 
 [[ "$(uname -s)" == Linux && "$(uname -m)" == x86_64 ]] || {
   printf 'This verified asset set targets x86_64 Linux, not Windows/Git Bash or ARM.\n' >&2
@@ -181,7 +224,7 @@ ecosystem_root="$(realpath "$ecosystem_root")"
 if [[ "$ecosystem_root" == / || "$ecosystem_root" -ef "$HOME" || "$ecosystem_root" -ef / ]]; then
   printf 'ECO_INSTALL_ROOT must name a dedicated absolute directory (it resolves to %s).\n' "$ecosystem_root" >&2; exit 1
 fi
-bin_dir="$ecosystem_root/bin"
+bin_dir="${link_dir_override:-$ecosystem_root/bin}"
 cache_dir="$ecosystem_root/downloads"
 mkdir -p "$bin_dir" "$cache_dir" "$ecosystem_root/tools"
 # Exported before any install so npm-kind and uv-tool-kind pins resolve the
@@ -210,18 +253,30 @@ fetch() {
   mv -- "$destination.partial" "$destination"
 }
 
+# Atomically point $2 (a bin_dir entrypoint) at $1 (the real, versioned target): a
+# temporary symlink in $2's own directory, then `mv -T` over the destination. Never
+# `ln -sfn`, which briefly removes the old link before creating the new one, so a
+# concurrent reader can see bin_dir/<name> missing entirely mid-install.
+atomic_link() {
+  local target="$1" link_path="$2" tmp_dir
+  tmp_dir="$(mktemp -d "$(dirname -- "$link_path")/.atomic-link.XXXXXXXX")"
+  ln -s "$target" "$tmp_dir/link"
+  mv -T -- "$tmp_dir/link" "$link_path"
+  rmdir -- "$tmp_dir"
+}
+
 # Node needs multiple executables symlinked from one --strip-components=1 tree.
 install_node() {
   local version="$1" url="$2" sha256="$3"
   local archive="$cache_dir/node-v${version}-linux-x64.tar.xz"
   fetch "$url" "$sha256" "$archive"
-  local prefix="$ecosystem_root/tools/node-$version"
+  local prefix="$ecosystem_root/tools/node-$version$tools_suffix"
   mkdir -p "$prefix"
   tar -xf "$archive" --strip-components=1 -C "$prefix"
   local executable
   for executable in node npm npx corepack; do
-    if [[ -e "$prefix/bin/$executable" ]]; then
-      ln -sfn "$prefix/bin/$executable" "$bin_dir/$executable"
+    if [[ -e "$prefix/bin/$executable" && "$no_link" != 1 ]]; then
+      atomic_link "$prefix/bin/$executable" "$bin_dir/$executable"
     fi
   done
 }
@@ -230,15 +285,16 @@ install_node() {
 install_uv() {
   local version="$1" url="$2" sha256="$3"
   local archive="$cache_dir/${url##*/}" extract_dir="$stage_dir/uv-$version"
+  local prefix="$ecosystem_root/tools/uv-$version$tools_suffix"
   fetch "$url" "$sha256" "$archive"
-  mkdir -p "$extract_dir" "$ecosystem_root/tools/uv-$version"
+  mkdir -p "$extract_dir" "$prefix"
   tar -xf "$archive" -C "$extract_dir"
   local executable found
   for executable in uv uvx; do
     found="$(find "$extract_dir" -type f -name "$executable" | head -n1)"
     [[ -n "$found" ]] || { printf '%s missing from uv archive.\n' "$executable" >&2; exit 1; }
-    install -m 0755 "$found" "$ecosystem_root/tools/uv-$version/$executable"
-    ln -sfn "$ecosystem_root/tools/uv-$version/$executable" "$bin_dir/$executable"
+    install -m 0755 "$found" "$prefix/$executable"
+    [[ "$no_link" == 1 ]] || atomic_link "$prefix/$executable" "$bin_dir/$executable"
   done
 }
 
@@ -246,8 +302,9 @@ install_uv() {
 install_single_binary_tarball() {
   local id="$1" version="$2" url="$3" sha256="$4"
   local archive="$cache_dir/${url##*/}" extract_dir="$stage_dir/$id-$version"
+  local prefix="$ecosystem_root/tools/$id-$version$tools_suffix"
   fetch "$url" "$sha256" "$archive"
-  mkdir -p "$extract_dir" "$ecosystem_root/tools/$id-$version"
+  mkdir -p "$extract_dir" "$prefix"
   tar -xf "$archive" -C "$extract_dir"
   local matches=()
   mapfile -t matches < <(find "$extract_dir" -type f -name "$id")
@@ -255,8 +312,8 @@ install_single_binary_tarball() {
     printf 'Expected exactly one %s executable in its archive, found %s.\n' "$id" "${#matches[@]}" >&2
     exit 1
   }
-  install -m 0755 "${matches[0]}" "$ecosystem_root/tools/$id-$version/$id"
-  ln -sfn "$ecosystem_root/tools/$id-$version/$id" "$bin_dir/$id"
+  install -m 0755 "${matches[0]}" "$prefix/$id"
+  [[ "$no_link" == 1 ]] || atomic_link "$prefix/$id" "$bin_dir/$id"
 }
 
 npm_package_name() {
@@ -272,7 +329,7 @@ install_npm() {
   command -v npm >/dev/null || { printf 'npm is required to install %s; install node first.\n' "$id" >&2; exit 1; }
   local archive="$cache_dir/${id}-${version}.tgz"
   fetch "$url" "$sha256" "$archive"
-  local prefix="$ecosystem_root/tools/$id-$version"
+  local prefix="$ecosystem_root/tools/$id-$version$tools_suffix"
   mkdir -p "$prefix"
   local package
   package="$(npm_package_name "$url")"
@@ -281,8 +338,8 @@ install_npm() {
   if [[ -d "$prefix/bin" ]]; then
     for executable in "$prefix/bin"/*; do
       [[ -e "$executable" ]] || continue
-      ln -sfn "$executable" "$bin_dir/$(basename "$executable")"
       linked=1
+      [[ "$no_link" == 1 ]] || atomic_link "$executable" "$bin_dir/$(basename "$executable")"
     done
   fi
   [[ "$linked" == 1 ]] || printf 'Note: %s (%s) published no bin/ executable; installed for its library only.\n' "$id" "$package" >&2
@@ -326,12 +383,14 @@ install_pip() {
     printf 'pip is required to install %s.\n' "$id" >&2; exit 1
   }
   local pip_cmd; pip_cmd="$(command -v pip3 || command -v pip)"
-  local prefix="$ecosystem_root/tools/$id-$version"
+  local prefix="$ecosystem_root/tools/$id-$version$tools_suffix"
   mkdir -p "$prefix"
   "$pip_cmd" install --no-input --target "$prefix" "${id}==${version}"
-  [[ -d "$prefix/bin" ]] && for executable in "$prefix/bin"/*; do
-    [[ -e "$executable" ]] && ln -sfn "$executable" "$bin_dir/$(basename "$executable")"
-  done
+  if [[ -d "$prefix/bin" ]]; then
+    for executable in "$prefix/bin"/*; do
+      [[ -e "$executable" && "$no_link" != 1 ]] && atomic_link "$executable" "$bin_dir/$(basename "$executable")"
+    done
+  fi
   true
 }
 
