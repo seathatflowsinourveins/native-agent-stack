@@ -49,7 +49,7 @@
       "selected_path": "Nautilus native IBKR socket adapter with signed-in TWS or IB Gateway",
       "upstream_supported": true,
       "local_broker_acceptance": "not_established",
-      "local_broker_acceptance_scope": "For the selected 2.0.0rc5 destination. The 1.231.0 Python-adapter paper receipt below does not establish it: reconnect with an open order, restart reconciliation and the kill switch are not run, and no dated version-selection record accepts 1.231.0 for this gate.",
+      "local_broker_acceptance_scope": "The 1.231.0 Python-adapter paper receipt below does not establish it: reconnect with an open order, restart reconciliation and the kill switch are not run. Since 2026-09-25 the keep-but-compare record docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md selects NautilusTrader 1.231.0's Python adapter on ibapi 10.45.1 to carry this gate's local acceptance, as the user decided on 2026-09-25 (runner blueprints/us-equities/engine-nautilus/ibkr-acceptance/local_acceptance.py, not yet run; its gate receipt needs a Gateway API message log corroboration record covering every run claim). The comparator is the first 2.0.x release (not a dev wheel) containing nautilus_trader#5041, which no release contains yet; the pinned 2.0.0rc5 Rust adapter is not an overturn arm. The engine destination above is unchanged.",
       "python_adapter_paper_evidence": {
         "status": "passed",
         "receipt": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json",
@@ -59,19 +59,64 @@
         "not_established": "The pinned 2.0.0rc5 Rust adapter path, reconnect/restart reconciliation, the kill switch, and the after-hours run (receipt-20260923-post-incomplete.json, incomplete on the C4 step timeout).",
         "source": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md"
       },
+      "rc5_blockers_note": "2026-09-25 (gh api and source reading at tag v2.0.0rc5, commit 1b0a49d2; not observed on this host): #4983 moved to rc5_reclassified_reports as a stale v1.227.0 report, and the rc5 obstacles on the recovery and risk paths that acceptance steps 3-4 exercise are listed here instead. See docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md.",
       "rc5_blockers": [
+        {
+          "ref": "https://github.com/nautechsystems/nautilus_trader/issues/5007",
+          "state": "open",
+          "state_checked_at": "2026-09-25",
+          "path": "restart recovery: startup fill reconciliation",
+          "reported_against": "2.0.0rc5 (crates/adapters/interactive_brokers/src/execution/core.rs at 1b0a49d)",
+          "effect": "generate_fill_reports sends the prefixed AccountId as the execution filter's account code, so TWS rejects the fill query with error 321 and startup reconciliation gets no historical fills.",
+          "upstream_fix": "Listed as covered by open PR #5041; in no release."
+        },
+        {
+          "ref": "https://github.com/nautechsystems/nautilus_trader/issues/5057",
+          "state": "open",
+          "state_checked_at": "2026-09-25",
+          "path": "restart recovery: working orders from a previous session",
+          "reported_against": "2.0.0rc6.dev20260921; traced on 2.0.0rc5 in the issue thread",
+          "effect": "An IB PreSubmitted order reconciles as an unhandled SUBMITTED external order, and every later update for it fails with 'Trader ID not found', so the node cannot manage or cancel working orders it finds after a restart.",
+          "upstream_fix": "Listed as covered by open PR #5041; in no release."
+        },
+        {
+          "ref": "https://github.com/nautechsystems/nautilus_trader/issues/5060",
+          "state": "open",
+          "state_checked_at": "2026-09-25",
+          "path": "reconciliation: execution queries and external fills",
+          "reported_against": "2.0.0rc5 and develop",
+          "effect": "reqExecutions replies are replayed as live fills, fills for orders the node did not place become refused reduce-only orders, and the position check waits on them.",
+          "upstream_fix": "Listed as covered by open PR #5041; in no release."
+        },
+        {
+          "ref": "https://github.com/nautechsystems/nautilus_trader/issues/4946",
+          "state": "closed",
+          "state_checked_at": "2026-09-25",
+          "path": "pre-trade risk: account-scoped checks",
+          "reported_against": "2.0.0rc4; the fail-open branch is at crates/risk/src/engine/mod.rs:1218-1234 at tag v2.0.0rc5",
+          "effect": "For a broker-routed SMART instrument the account registered under venue IB is not found, so every account-scoped pre-trade check (max_notional_per_order, free balance, cumulative notional) is skipped with only a debug log.",
+          "upstream_fix": "Closed 2026-09-25T11:03:11Z by develop commit ed6fc8bf47fd37dda97d63b9b2df160719ee2bac ('Apply pre-trade risk to the destination execution account'), which is in no release; PR #5041 also lists it as covered."
+        }
+      ],
+      "rc5_reclassified_reports": [
         {
           "ref": "https://github.com/nautechsystems/nautilus_trader/issues/4983",
           "state": "open",
-          "state_checked_at": "2026-09-24",
-          "effect": "The rc5 Rust adapter's execution client venue IB never matches the SMART instrument venue, so every stock order is denied locally."
+          "state_checked_at": "2026-09-25",
+          "reported_against": "v1.227.0 (Rust adapter), filed 2026-09-12",
+          "reported_effect": "The execution client venue IB never matches the SMART instrument venue, so every stock order is denied locally.",
+          "classification": "stale for rc5",
+          "reclassified_at": "2026-09-25",
+          "basis": "Source reading, not an rc5 order observation: at tag v2.0.0rc5 (1b0a49d2) crates/execution/src/engine/mod.rs:2222 denies an order only when client.handles_order_venue(order_venue) is false, and the IB execution client overrides it to return true (crates/adapters/interactive_brokers/src/execution/core.rs:491-496; #4129, merged 2026-05-25, after v1.227.0 of 2026-05-18). An rc5 stock-order probe is optional evidence that would confirm or refute this reading; it is not an overturn path for the local-acceptance version selection.",
+          "decision_record": "docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md"
         }
       ],
       "upstream_ibapi_pin": {
-        "state_checked_at": "2026-09-24",
+        "state_checked_at": "2026-09-25",
         "rc5_pin": "Rust ibapi =3.3.0 (Cargo.toml at tag v2.0.0rc5)",
         "notice_2188_issue": "wboayue/rust-ibapi#764 closed 2026-08-27 by merged PR #765 (in v4.0.0); not listed as a blocker",
-        "pin_update": "nautechsystems/nautilus_trader PR #5041 (open) changes the pin to =4.1.0"
+        "pin_update": "nautechsystems/nautilus_trader PR #5041 (open, not merged, head 4b17ac3c) changes the root Cargo.toml pin from =3.3.0 to =4.2.0; no release contains it",
+        "pin_update_note": "2026-09-25: records before this date said =4.1.0; the PR head's Cargo.toml diff (gh api pulls/5041/files) and its body both name ibapi 4.2.0."
       },
       "paper_socket_defaults": {
         "tws": 7497,
@@ -91,7 +136,15 @@
       "sources": [
         "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/",
         "https://github.com/nautechsystems/nautilus_trader/issues/4983",
-        "https://github.com/nautechsystems/nautilus_trader/pull/5041"
+        "https://github.com/nautechsystems/nautilus_trader/pull/5041",
+        "https://github.com/nautechsystems/nautilus_trader/issues/5007",
+        "https://github.com/nautechsystems/nautilus_trader/issues/5057",
+        "https://github.com/nautechsystems/nautilus_trader/issues/5060",
+        "https://github.com/nautechsystems/nautilus_trader/issues/4946",
+        "https://github.com/nautechsystems/nautilus_trader/commit/ed6fc8bf47fd37dda97d63b9b2df160719ee2bac",
+        "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/execution/src/engine/mod.rs#L2222",
+        "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/adapters/interactive_brokers/src/execution/core.rs#L491-L496",
+        "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/risk/src/engine/mod.rs#L1218-L1234"
       ]
     },
     {
