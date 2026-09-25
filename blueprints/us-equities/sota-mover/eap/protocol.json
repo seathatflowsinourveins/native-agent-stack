@@ -348,6 +348,11 @@
       "id": "D13",
       "what": "EAP-2..4 are measured against SPY, not Frazzini-Lamont's sample value-weighted market",
       "why": "the sample market contains the long leg (L - M = (1 - w_L)(L - S)), so it duplicates EAP-1 and is not a tradable hedge"
+    },
+    {
+      "id": "D14",
+      "what": "the measured cost table pools 2016-2026 closing quotes and applies one time-invariant half-spread per tier cell to every month",
+      "why": "per-year cells would be too thin; the by-year tier medians stay recorded with the table, and EAP-4 with year-specific costs is not a preregistered item"
     }
   ],
   "resources": {
@@ -361,8 +366,9 @@
     "code": {
       "collect_edgar.py": "4a0b11f2287e6b7b5f45ae9534b7a68a7a9d12292fc1ce7842e350a7db6a0001",
       "eap_signal.py": "65857fb5fe7da23279fa3ad89f71a76ee2e40d5eda83a2e9b55ef5f48a0cb91a",
-      "evaluate.py": "6891ef9f6e4cfb5cfc4ce853a749caf9a8981102dd9c5cf4e164b08a3fbb025c",
+      "evaluate.py": "8fc251074f6d2477c3d88fd1f9d7ce8411012ea19d920b103b3aa091d6784881",
       "expected_dates.py": "9982b8ce647591c41303847aaf2e6e33a54d1301b0747244d2de07d7450ed923",
+      "prefreeze.py": "2173e5515254f1e6de47b4cf866fcddf1f4e5eb53cd05de29f90e6be1a3edc92",
       "spreads.py": "4bd22316d5f48d17d475d9a6cdf2c0b23dc50708f30a37f4271b1c2550f1b42e"
     },
     "private_inputs": {

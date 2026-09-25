@@ -285,7 +285,7 @@ class FrozenEndToEnd(unittest.TestCase):
         cls.study = cls.repo / "blueprints/us-equities/sota-mover/eap"
         (cls.study / "data").mkdir(parents=True)
         (cls.study / "receipts").mkdir()
-        for f in ("eap_signal.py", "expected_dates.py", "evaluate.py", "collect_edgar.py", "spreads.py"):
+        for f in ("eap_signal.py", "expected_dates.py", "evaluate.py", "collect_edgar.py", "spreads.py", "prefreeze.py"):
             shutil.copy2(BASE / f, cls.study / f)
         shutil.copy2(BASE / "data" / "cost-table-eap-v1.json", cls.study / "data")
         fees = cls.repo / "blueprints/us-equities/mover-v3/data"
@@ -304,7 +304,9 @@ class FrozenEndToEnd(unittest.TestCase):
         cls.git("init", "-q")
         cls.git("add", "-A")
         cls.git("commit", "-qm", "frozen synthetic study")
-        (cls.study / "receipts" / "freeze-record.json").write_text(json.dumps({"protocol_sha256": sha(cls.study / "protocol.json")}))
+        cls.freeze_commit = cls.git("rev-parse", "HEAD").stdout.strip()
+        (cls.study / "receipts" / "freeze-record.json").write_text(json.dumps({"protocol_sha256": sha(cls.study / "protocol.json"),
+                                                                                "protocol_commit": cls.freeze_commit}))
         cls.git("add", "-A")
         cls.git("commit", "-qm", "freeze record")
 
@@ -335,6 +337,17 @@ class FrozenEndToEnd(unittest.TestCase):
         self.assertGreater(res["descriptive"]["event_time"]["with_prices"], 0)
         self.assertIn(res["decision"], {"adopt_for_pre_positioning_research", "premium_exists_not_tradable",
                                         "long_short_premium_only", "no_evidence_underpowered"})
+
+    def test_1b_freeze_commit_must_match(self):
+        rec = Path(self.tmp.name) / "wrong-commit.json"
+        rec.write_text(json.dumps({"protocol_sha256": sha(self.study / "protocol.json"), "protocol_commit": "0" * 40}))
+        r = self.cli("--freeze-record", str(rec))
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("not an ancestor", r.stderr)
+        rec.write_text(json.dumps({"protocol_sha256": sha(self.study / "protocol.json")}))
+        r = self.cli("--freeze-record", str(rec))
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("protocol_commit", r.stderr)
 
     def test_2_dirty_tree_refused(self):
         extra = self.study / "scratch.txt"

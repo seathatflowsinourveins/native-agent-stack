@@ -42,7 +42,7 @@ LAGS = ST["nw_lags"]
 LAGS_SENS = ST["nw_lags_sensitivity"]
 PRIMARY = ST["multiplicity"]["primary"]
 SECONDARY = ST["multiplicity"]["secondary"]
-CODE_PINS = ("eap_signal.py", "expected_dates.py", "evaluate.py", "collect_edgar.py", "spreads.py")
+CODE_PINS = ("eap_signal.py", "expected_dates.py", "evaluate.py", "collect_edgar.py", "spreads.py", "prefreeze.py")
 _TOKEN = object()
 
 
@@ -78,6 +78,24 @@ def freeze_record_sha(path: Path) -> str:
     if len(sha) != 64 or any(c not in "0123456789abcdef" for c in sha):
         raise Refusal("freeze record has no protocol_sha256")
     return sha
+
+
+def freeze_record_commit(path: Path) -> str:
+    rec = json.loads(Path(path).read_text())
+    commit = str(rec.get("protocol_commit") or "").strip().lower()
+    if len(commit) != 40 or any(c not in "0123456789abcdef" for c in commit):
+        raise Refusal("freeze record has no full protocol_commit")
+    return commit
+
+
+def verify_freeze_commit(directory: Path, commit: str, expected_sha256: str) -> None:
+    """The freeze commit is an ancestor of HEAD and its protocol.json bytes hash to the recorded sha256."""
+    anc = subprocess.run(["git", "merge-base", "--is-ancestor", commit, "HEAD"], cwd=directory, capture_output=True)
+    if anc.returncode != 0:
+        raise Refusal(f"freeze commit {commit} is not an ancestor of HEAD")
+    shown = subprocess.run(["git", "show", f"{commit}:./protocol.json"], cwd=directory, capture_output=True)
+    if shown.returncode != 0 or hashlib.sha256(shown.stdout).hexdigest() != expected_sha256:
+        raise Refusal("protocol.json at the freeze commit does not match the freeze record")
 
 
 def guard(protocol_path: Path, expected_sha256: str | None) -> FrozenProtocol:
@@ -309,6 +327,7 @@ def run(a) -> dict:
     frozen = guard(PROTOCOL_PATH, expected)
     verify_pins(frozen.protocol, a.root, a.daily)
     head = git_clean_head(HERE)
+    verify_freeze_commit(HERE, freeze_record_commit(getattr(a, "freeze_record", None) or FREEZE_RECORD_PATH), expected)
     result = _data_pass(a, frozen)
     result.update(git_head=head, protocol_sha256=frozen.sha256, protocol_id=frozen.protocol["id"], label="HIST")
     return result
