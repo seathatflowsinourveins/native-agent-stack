@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-25T01:38:18Z",
+  "recorded_at_utc": "2026-09-25T07:26:19Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
       "kind": "lane",
       "id": "simulation",
       "title": "Historical simulation / backtest",
-      "state": "AAPL diagnostic retained / sim-to-paper fills agree 3 of 5 below 50 ms and 5 of 5 from 70 ms (one trial) / DSR and PBO show no skill / merit unqualified",
-      "evidence_ref": "blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json"
+      "state": "sim capacity 859 to 882 fills per min elite budget (30 of 30 min) and 171 to 180 paper parity / quotes-only rc5 / infrastructure evidence only",
+      "evidence_ref": "blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json"
     },
     {
       "kind": "lane",
