@@ -1,0 +1,237 @@
+{
+ "schema": "sota-news-reversal-forward-protocol/1",
+ "id": "sota-news-reversal-forward-20260925",
+ "status": "draft_pending_independent_pre_outcome_review",
+ "frozen_before_outcomes": false,
+ "frozen_at": null,
+ "frozen_status_value": "frozen_pre_outcome",
+ "created_at": "2026-09-25",
+ "evidence_label": "FWD-PAPER (prospective Alpaca paper fills of the preregistered rule; not live, not historical)",
+ "scope": "Paper only; never live. This protocol grants no live, leverage or paid-hosting authority. Liquid-lane single-name Benzinga headlines released in regular hours, scored point in time by the ChronoGPT-Instruct 2024-12-31 checkpoint.",
+ "hypothesis": {
+  "statement": "Trading against the operative (D22) ChronoGPT-Instruct label, entered 15 minutes after a regular-hours single-name headline and held to the close, has a positive mean daily long-short gross return.",
+  "direction_fixed": "reversal > 0; one-sided; H0: mean daily gross long-short return <= 0; H1: > 0",
+  "not_tested_here": "the net effect (see power: it cannot be resolved in any realistic paper horizon) and every other window, lane, label rule or holding period"
+ },
+ "origin": {
+  "post_hoc": true,
+  "source": "Frozen NEWS-PIT-LLM study sota-mover-news-llm-20260925 (protocol sha256 bba1b157e607f3a29f88bb82af44b4b7f2a754f1dc8266c883989c9fc2fddb37, frozen at commit 70bd2b84, evaluated once from 9504cd73, result commit baf158eb; blueprints/us-equities/sota-mover/news-llm/receipts/RESULTS.md and evaluation-summary.json), item NEWS-3.",
+  "in_sample_estimate": {
+   "item": "NEWS-3: liquid lane, entry at release + 15 min in the direction of the operative label (long at the first valid SIP quote's ask, short at its bid), exit at the official close, equal-weight legs of >= 2 names, both legs required, Rule 201-flagged shorts excluded, 2016-02-02..2026-09-18",
+   "days": 2618,
+   "gross_mean_bps_per_day": -11.0083,
+   "gross_t_newey_west": -7.16,
+   "gross_sd_bps_sample": 69.91,
+   "gross_se_newey_west_bps": 1.5375,
+   "gross_sd_bps_nw_effective": 78.67,
+   "net_mean_bps_per_day": -19.3925,
+   "net_t_newey_west": -12.62,
+   "modelled_cost_bps_per_day": 8.3842,
+   "modelled_cost_rule": "2 bps entry allowance + 2 bps closing-auction allowance per position plus SEC/FINRA fees on the sale leg; about 4.2 bps per round trip, 8.4 bps per long-short day (two legs)"
+  },
+  "selection_among_frozen_items": "The reversal was not predicted. It was chosen after seeing all five frozen items (NEWS-1, NEWS-2, NEWS-2B, NEWS-3, NEWS-4; gross t -0.02, 1.06, 0.05, -7.16, -0.02) as the only item whose gross t lies far from zero. Its in-sample size is therefore subject to selection (winner's curse) and the in-sample t is not evidence for the reversal; the study's own RESULTS.md says it may only be tested as a new hypothesis on unused data, i.e. forward. No historical data is clean for this hypothesis; only prospective sessions count.",
+  "spread_caveat": "NEWS-3's gross already charges the entry half-spread (longs at the ask, shorts at the bid; exit at the official close, no spread). The mirrored trade pays the spread too: per position, reversal gross is approximately minus momentum gross minus the full quoted spread as a fraction of mid, so the in-sample reversal gross is approximately 11.0 bps/day minus S, where S is the mean full entry spread of the FAVORABLE names plus that of the UNFAVORABLE names (bps). Under zero drift from the entry mid to the close, both the momentum and the reversal long-short lose about half of S. The frozen summary does not report entry spreads, so S is unknown here; the in-sample reversal net is about 2.6 - S bps/day and is likely at or below zero for liquid names. Power below is stated as a function of S.",
+  "hypothesis_generation_date": "2026-09-25"
+ },
+ "rule": {
+  "arm": "rth_reversal (runner arm rev, client order id prefix nf1r-, label preregistered_forward), config.json rth_reversal.from; ../news-forward/planner.py plan_rth_reversal_entry and supervisor.py rth_reversal_step",
+  "events": "Every liquid-lane single-name Benzinga headline released in regular hours [09:30, 15:30) ET (news_signal.Calendar.classify window rth: [open, close - 30 min), early closes follow the calendar) that passes the frozen filters in the study's order (data.filters) and is the first such headline of its symbol in the session's RTH window (news_signal.first_per_window, F13).",
+  "label": "news_signal.operative_score on the scorer's raw output (D22 prefix rule: UNF -> UNFAVORABLE, FAV -> FAVORABLE, UNC -> UNCLEAR, else PARSE_FAIL; context overflow -> PARSE_FAIL). The stored strict label is journaled beside it, never used.",
+  "side": "Against the operative label: FAVORABLE -> short, UNFAVORABLE -> long; UNCLEAR and PARSE_FAIL -> no trade.",
+  "entry": "At release + 15 min, on the first valid (two-sided, uncrossed) SIP quote stamped in [release + 15 min, release + 16 min] (news_signal.rth_entry_quote's window): a marketable day limit at that quote's ask for a buy, its bid for a sell (no price buffer); skipped when the quote's spread exceeds 50 bps of mid. A quote stamped before the entry time is not used (the runner waits for a fresher one within the minute). An entry still working 60 s after submission is cancelled; a decision after release + 16 min is skipped (entry_late). A position exists only for filled quantity.",
+  "shorts": "Require Alpaca asset flags shortable and easy_to_borrow, and no Rule 201 flag: news_signal.ssr_flag (the carry-over news_signal.ssr_carryover on split-adjusted daily bars of the two prior sessions, or the decision quote's bid <= 90% of the prior session's raw close), or today's session low so far <= 90% of that close (live addition), or missing inputs (fail closed). Longs ignore Rule 201.",
+  "exit": "Closing auction: CLS market orders from 15:40, re-planned every 30 s until 15:49 until every holding is covered; from 15:55 a day market order for anything uncovered; after 16:02 extended-hours limits. Every existing kill, trim, carry-over and after-close exit path applies unchanged. Returns use whatever exit actually filled.",
+  "sizing_and_caps": "Unchanged from the runner: per name min(0.0015 E / sigma_20d, 0.5% MDV20, 5% E) in whole shares, skipped below 1 share or $1,000 (section A); per order <= 5% E; at most 12 names per leg; one symbol per arm per day; the arm's gross cap L x E with L the autolev floor 1.0 capped by leverage.py (autolev's Kelly step is not applied to this arm during the test, so sizing never responds to interim outcomes); the account's gross cap across arms; per window |long - short notional| <= 0.10 E, a later entry shrunk to the remaining headroom or skipped (net_exposure_cap). Legs of fewer than 2 names may trade inside the net cap, but such days carry no primary value (estimands).",
+  "entry_times": "Releases [09:30, 15:30) give entries until 15:45 (plus the 60 s entry minute); the runner's M2 15:40 entry stop applies to the momentum arm only, and CLS exits cover these late entries.",
+  "other_arms": {
+   "momentum_rth": "From rth_reversal.from the momentum RTH arm is off: its decision on the same event and quote (label's own direction, same touch price and window) is journaled as arm core_shadow, action shadow_enter, and never sent. Descriptive comparison only.",
+   "overnight_core": "The OPG/CLS core arm keeps running, labelled execution_test: its study (NEWS-1) failed, so its fills are not evidence and never enter this protocol.",
+   "exploratory": "The pm and ah arms keep their own configuration; never evidence here."
+  },
+  "halt_file": "<state>/HALT-rth_reversal (written by analyze.py monitor --apply on a harm stop) refuses new rth_reversal entries; exits continue."
+ },
+ "data": {
+  "news": "Alpaca news API (Benzinga) polled every 15 s from the previous close - 24 h; each article keeps the first time this runner received it (received_at), restored from the day's journal after a restart.",
+  "filters": [
+   "F1 parseable created_at",
+   "F2 symbols parse to a list with exactly one symbol",
+   "F3 the symbol is in the current Alpaca asset master",
+   "F4 primary operating company (news_signal.is_primary_operating_company)",
+   "F5 window rth or overnight (news_signal.Calendar.classify); this rule uses rth only",
+   "F6 guard A: updated_at at or before release + 15 min (news_signal.timestamp_guard)",
+   "F7 non-empty headline",
+   "F8 not a price-movement headline (news_signal.MOVEMENT_RE, the narrowed D5 regex)",
+   "F9 novelty: no same normalized headline for the symbol in the prior 24 h (news_signal.DuplicateTracker)",
+   "F10 checkpoint mapping (news_signal.checkpoint_year; 2026 headlines use the 2024-12-31 checkpoint)",
+   "F11 guard B: news_signal.ingestion_guard with our own received_at as the ingestion time (at or before release + 15 min); the study's estimate (max of created_at and the 90th percentile of the created_at of the 100 next-lower ids seen) is journaled beside it and does not decide",
+   "F12 liquid lane (news_signal.lane_for on the 20 prior sessions' raw SIP daily bars: prior close >= $5 and median dollar volume >= $20M, all 20 bars present)",
+   "F13 first headline per (symbol, session, window) by (created_at, id) (news_signal.first_per_window)"
+  ],
+  "scores": "ChronoGPT-Instruct checkpoint chrono-gpt-instruct-v1-20241231 at the revision and sha256 pinned in ../news-llm/checkpoints.json, loaded by ../news-llm/score.py (weights_only, float32, highest matmul precision, cached decoder), prompt variant hlmw_alpaca (template sha256 in the study protocol); GPU via score.Scorer or CPU via live_score.MmapCpuScorer (same weights and numerics).",
+  "quotes": "Decision quote: the SIP latestQuote of GET /v2/stocks/snapshots at the decision (bid, ask, timestamp journaled on the decision).",
+  "fills": "Alpaca paper order history of the dedicated paper-3 account, journaled as fill rows at each day's reconciliation (filled quantity and average price per order).",
+  "close_marks": "The official closing auction price by news_signal.select_auction_price on GET /v2/stocks/auctions (feed sip), journaled as close_mark after the close; used for the exit-cost measurement and the momentum shadow only.",
+  "daily_bars": "GET /v2/stocks/bars 1Day SIP: raw for lanes, sigma and MDV20; split-adjusted for the Rule 201 carry-over."
+ },
+ "estimands": {
+  "primary": "Mean daily long-short GROSS return from actual paper fills: per position side x (exit VWAP / entry VWAP - 1) over its filled quantity (side +1 long, -1 short); per session each leg is the equal-weight mean of its positions and exists only with >= 2 names, and the long-short value (long leg + short leg) exists only when both legs exist (news_signal.daily_portfolios, as in NEWS-3).",
+  "secondary_reported_never_decisive": [
+   "net long-short: each position by news_signal.position_net_return with the net_cost_model on the actual entry and exit prices and entry notional",
+   "long leg and short leg separately, gross and net",
+   "execution cost (execution_cost_measurement)",
+   "momentum shadow long-short (descriptive; hypothetical fills at the decision touch, exit at the official close mark)"
+  ],
+  "net_cost_model": {
+   "rth_entry_allowance_bps": 2.0,
+   "exit_allowance_bps": 2.0,
+   "fees": "SEC Section 31 and FINRA TAF on the sale leg (news_signal.sale_fees_usd with blueprints/us-equities/mover-v3/data/fees-v3.json), on the position's actual notional",
+   "source": "the frozen study's costs (rth_entry_allowance_bps and the liquid lane's auction_slippage_bps_per_side)"
+  },
+  "statistic": "Newey-West (Bartlett) t of the mean of the primary series",
+  "newey_west_lags": 5,
+  "resolution": "A position is resolved when its exit quantity equals its entry quantity (carry-over exits in later journals count). A look uses only the first n counted long-short sessions in session order and waits until every counted session up to them is reconciled and resolved."
+ },
+ "execution_cost_measurement": {
+  "per_round_trip_bps_of_entry_notional": {
+   "half_spread": "(ask - bid) / 2 / mid of the decision quote",
+   "entry_vs_mid": "side x (entry VWAP - decision mid) / mid",
+   "entry_vs_touch": "side x (entry VWAP - ask for a long or bid for a short) / mid",
+   "exit_vs_close": "side x (official close mark - exit VWAP) / official close",
+   "fees": "modelled SEC and FINRA fees on the sale leg / entry notional"
+  },
+  "measured_vs_mid": "entry_vs_mid + exit_vs_close + fees (all-in against the decision mid)",
+  "measured_beyond_touch": "entry_vs_touch + exit_vs_close + fees (the part the frozen study's 4.2 bps per round trip was meant to cover)",
+  "assumed_vs_mid": "the frozen model's cost for the same position: half_spread (its gross pays the touch) + 2 + 2 bps + fees",
+  "comparison_to_history": "the mean over long-short sessions of (long leg's mean measured_beyond_touch + short leg's) against the historical 8.4 bps/day",
+  "expectation_stated_before_data": "Paper fills at the touch make entry_vs_touch about 0 and the CLS paper fill makes exit_vs_close about 0, so measured_beyond_touch is expected near the fees alone; that is a property of paper execution (limitation L-PAPER), not evidence that live costs are below 8.4 bps/day."
+ },
+ "counted_sessions": {
+  "start": "The first XNYS session whose official open is after both frozen_at (freeze record) and deployed_at (receipts/deployment-record.json). Deployment happens only after the 2026-09-25 16:00 ET reconciliation, so the start is 2026-09-28 or later.",
+  "excluded_always": "Pilot days (every session before rth_reversal.from, journal label pilot), pre-freeze shakedown sessions and every session before the start; analyze.py never opens their journals.",
+  "qualification": "A session on or after the start counts when its first start record shows mode paper, rth_reversal_active true, the run label reversal_forward, reversal_protocol_sha256 equal to the frozen protocol's sha256 and code sha256 values equal to #/pins runner_code and study_code. Otherwise it is excluded with its reason. The conditions are known at the session's start, before any outcome; a kill switch or exit-only restart later in a counted session does not remove it.",
+  "information_unit": "A counted long-short session: a counted session whose two legs each have >= 2 filled positions (decided from fill counts, before any return is computed). Looks are indexed by these sessions."
+ },
+ "power": {
+  "in_sample_gross_bps": 11.0083,
+  "daily_sd_bps_sample": 69.91,
+  "daily_sd_bps_nw_effective": 78.67,
+  "daily_sd_bps_rounded": 79.0,
+  "sd_basis": "NEWS-3's Newey-West standard error times sqrt(2,618 days); the plain sample sd is 69.9 bps. The forward sd may be larger (at most 12 names per leg, first come by entry time).",
+  "effect_scenarios_bps": {
+   "in_sample_11bps_spread_ignored": 11.0,
+   "spread_S_4bps": 7.0,
+   "spread_S_8bps": 3.0,
+   "net_equivalent_2p6bps": 2.6
+  },
+  "statement": "Stated before the freeze. With sd about 79 bps/day a +11 bps/day gross effect needs about 320 counted long-short sessions for 80% power at one-sided 0.05 in a fixed-sample test (316 with sd 78.67, 319 with sd 79; 250 with the plain sample sd 69.9). This plan's 375-session maximum gives 85% power at +11 bps (82% if the futility rule is followed). That +11 is the in-sample momentum loss with its sign flipped; the reversal also pays the entry spread (origin.spread_caveat), so its true effect is 11 - S. At S = 4 bps (7 bps/day) the plan has 52% power and a fixed test would need 781 sessions; at S = 8 bps (3 bps/day) 18% power and 4,252 sessions. The net effect (about +2.6 bps/day even before subtracting S) needs about 5,700 sessions, about 22 years of trading days: it cannot be resolved in any realistic paper horizon, and this protocol does not test it. The near-term informative output is the measured execution cost against the 8.4 bps/day assumption.",
+  "fixed_sample_formula": "((z_0.95 + z_0.80) x sd / effect)^2 with z_0.95 = 1.6449, z_0.80 = 0.8416"
+ },
+ "sequential_plan": {
+  "design": "Group-sequential one-sided test on the primary series: O'Brien-Fleming efficacy boundaries c_k = C / sqrt(t_k) at information fractions t_k = n_k / 375, C chosen so that the probability of any upper crossing under H0 is exactly alpha (recursive numerical integration, Jennison & Turnbull 2000 ch. 19; analyze.obf_boundaries); the efficacy boundaries ignore the futility rule (non-binding), so following or overriding it never raises the type I error above alpha.",
+  "looks_sessions": [60, 125, 250, 375],
+  "expected_calendar_time": "If about 98% of sessions have both legs (NEWS-3: 2,618 long-short days in 2,673 sessions), the looks fall roughly 3, 6, 12 and 18 months after the start; fewer qualifying days stretch them, and the forward label skew (limitation L-SKEW) makes that likely.",
+  "alpha_one_sided": 0.05,
+  "grid_points_m": 32,
+  "futility": {
+   "looks": [2, 3],
+   "z_at_or_below": 0.0,
+   "rule": "At look 2 (125 sessions) or look 3 (250), stop for futility when the Newey-West t of the primary series is <= 0 (the estimated gross reversal is not positive). No futility stop at look 1 (too little information: it would cost about 14% power at +11 bps)."
+  },
+  "decisions": {
+   "efficacy": "t >= c_k at any look: reject H0; the promotion gate may then be evaluated; the arm stays paper until it passes.",
+   "futility": "the futility rule at look 2 or 3: stop; the arm is switched off; not rejected.",
+   "final_not_rejected": "t < c_4 at look 4 (375): stop; not rejected; the arm is switched off.",
+   "continue": "otherwise, until the next look"
+  },
+  "no_other_peeking": "No decision is taken on the primary series except at these four looks. Each look is run once with analyze.py look, which refuses before its planned session count, after a stopping decision, or out of order, and writes receipts/look-<k>.json with a .sha256 sidecar (committed before the next look can run). Harm monitoring (harm_stops) reports only drawdown and cost metrics, never the primary statistic."
+ },
+ "design_numbers": {
+  "computed_by": "python analyze.py design (pure: sequential_plan and power only; no data)",
+  "obf_constant": 1.70963,
+  "information_fractions": [0.16, 0.33333, 0.66667, 1.0],
+  "efficacy_z": [4.27407, 2.96116, 2.09386, 1.70963],
+  "futility_z": [null, 0.0, 0.0, null],
+  "type_i_error": {"without_futility": 0.05, "if_futility_followed": 0.0467, "futility_stop_probability_h0": 0.625},
+  "power_at_375_max": {
+   "in_sample_11bps_spread_ignored": {"power_without_futility": 0.848, "power_if_futility_followed": 0.822, "futility_stop_probability": 0.064, "expected_sessions_if_futility_followed": 281},
+   "spread_S_4bps": {"power_without_futility": 0.521, "power_if_futility_followed": 0.495, "futility_stop_probability": 0.187, "expected_sessions_if_futility_followed": 298},
+   "spread_S_8bps": {"power_without_futility": 0.179, "power_if_futility_followed": 0.168, "futility_stop_probability": 0.415, "expected_sessions_if_futility_followed": 272},
+   "net_equivalent_2p6bps": {"power_without_futility": 0.154, "power_if_futility_followed": 0.145, "futility_stop_probability": 0.443, "expected_sessions_if_futility_followed": 267}
+  },
+  "fixed_sample_80pct_sessions": {"sd_69.91_effect_11.0083": 250, "sd_78.67_effect_11.0083": 316, "sd_79.0_effect_11.0083": 319, "sd_78.67_effect_7": 781, "sd_78.67_effect_3": 4252, "sd_78.67_effect_2.6": 5661},
+  "reference_check": "the same code reproduces Jennison & Turnbull (2000) Table 2.3 O'Brien-Fleming constants (K = 2..5; two-sided 0.05 and 0.10, i.e. one-sided 0.025 and 0.05) to 3 decimals, and K = 4 boundaries 4.049, 2.863, 2.337, 2.024 (tests/test_sota_news_reversal_analyze.py)"
+ },
+ "promotion_gate": {
+  "rule": "Promotion out of paper is possible only when BOTH hold: (a) an efficacy boundary crossing at a look of this plan, and (b) the existing live-rung paper-performance gate on this arm's counted sessions: >= 20 sessions, >= 100 round trips, a bootstrap one-sided 95% lower bound > 0 on the mean daily NET long-short return with the pinned net_cost_model, and maximum drawdown <= 20%. Otherwise the arm stays paper. Passing grants no live authority by itself: any live step is a separate, explicitly authorized decision outside this protocol.",
+  "gate_source_note": "The components are stated as given in the brief; this branch has no single code artifact for that gate (autolev.py's evidence gate uses n >= 20, round trips >= 100 and a normal, not bootstrap, lower bound). The reviewer should name the canonical definition before the freeze."
+ },
+ "harm_stops": {
+  "kill_switch": "The runner's daily kill (equity <= 98% of start-of-day equity): cancels and re-flattens every arm, persisted for the date.",
+  "drawdown_fraction_of_average_gross": 0.10,
+  "drawdown_rule": "Halt new rth_reversal entries and review when the arm's cumulative modelled net P&L over counted sessions (sum of position net return x entry notional) has a peak-to-trough drawdown >= 10% of its average daily gross entry notional.",
+  "cost_check_after_sessions": 60,
+  "cost_multiple": 2.0,
+  "cost_rule": "From the 60th counted session, halt and review when the mean measured_vs_mid cost per round trip exceeds 2 x the mean assumed_vs_mid cost of the same positions.",
+  "procedure": "analyze.py monitor runs after each day's reconciliation; with --apply a stop writes <state>/HALT-rth_reversal, which the runner reads before every rth_reversal entry. Only a documented review may remove it."
+ },
+ "limitations": [
+  "L-PAPER Paper fills are optimistic: Alpaca paper fills marketable orders against the quote with no queue position, market impact, short-locate or auction-imbalance risk. The primary estimand is paper gross; it bounds live gross from above for the same rule.",
+  "L11 Survivorship scope of the origin: the in-sample estimate covers firms in the 2026-09-21 asset master only (the study's L11). The forward universe is the live asset master, so the origin and the forward population differ.",
+  "L-CKPT Label skew by checkpoint: forward headlines are all scored by the 2024-12-31 checkpoint, while NEWS-3 pooled the 2015-2024 checkpoints, whose label mixes differ (strict parse failures, which D22 maps mostly to UNFAVORABLE, were 26% of the 2024 checkpoint's outputs and 31% of 2023's). The forward FAVORABLE/UNFAVORABLE balance and signal may differ from the pooled in-sample estimate.",
+  "L-SKEW Label skew and the net cap: under D22 the 2024-12-31 checkpoint's directional liquid labels were about 80% UNFAVORABLE in the study (FAVORABLE 20,070 against UNFAVORABLE 48,132 plus 29,511 prefix-mapped strict parse failures; news-llm/receipts/scoring-status.json), and the running service's 2026-09-25 scores (labels only) were 12 FAVORABLE against 100 UNFAVORABLE overnight and 1 against 16 in the first RTH half hour. The reversal therefore trades mostly longs: the 0.10 E net cap binds the long leg (the 2026-09-25 dry run skipped 2 of 5 eligible longs for it, receipts/dryrun-20260925.json), the dollar book runs near +0.10 E net long (market beta enters the dollar P&L and the drawdown harm stop, not the equal-weight estimand), and sessions with >= 2 filled short (FAVORABLE) names may be far rarer than NEWS-3's 98%, stretching the looks well beyond expected_calendar_time.",
+  "L13 Feed-timestamp regime: the study's guard B dropped 13.3% of intraday events overall, 0.3% in 2024 and 0% in 2025-2026 (an id-assignment regime change), so NEWS-3's sample leans to recent, promptly ingested articles. Live, guard B uses our own receipt time, a different measurement of the same cutoff.",
+  "L-SPREAD The in-sample reversal effect is 11 bps minus the unknown two-leg entry spread S (origin.spread_caveat); the forward rule also skips spreads above 50 bps, which the study did not.",
+  "L-RULE Execution differs from the study's arithmetic: caps (12 names per leg, per-order 5% E, gross L x E, net cap 0.10 E per window, first come by entry time), section-A risk sizing, the 60 s cancel of unfilled entries, the kill switch and market flatten, and a stricter live Rule 201 check (session low). The primary estimand keeps the study's equal-weight legs.",
+  "L-SELECT The hypothesis was selected post hoc as the one extreme item of five; expect the forward effect to be smaller than in sample.",
+  "L-SD The sd behind the power statement is historical; fewer names per leg forward would raise it and lower power."
+ ],
+ "deviations_from_frozen_study_rules": [
+  "Side reversed (the hypothesis itself).",
+  "Guard B uses our own received_at as the ingestion time instead of the id-based estimate (the estimate is journaled).",
+  "Entry is a real paper marketable limit at the decision quote's touch with a 60 s cancel, not a hypothetical fill at the first quote of the window.",
+  "Spread cap 50 bps; runner caps and section-A sizing; exits are actual paper fills (CLS and fallbacks), not the official close.",
+  "Rule 201: the study's flag plus today's session low so far, fail-closed on missing data.",
+  "Only the 2024-12-31 checkpoint scores forward headlines (2026 headlines map to it in the study's own rule)."
+ ],
+ "pins": {
+  "analysis_code": {
+   "analyze.py": "3300997f0b82028c4c9263973753e9ccb70cf302a1b1aa182ad5ca61eda54b45"
+  },
+  "reference": {
+   "checkpoints.json": "13423a94490d610f9a7dc4b16503613e38d3896df1db36e6d1bce9f63e4fa1f9",
+   "fees-v3.json": "f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a",
+   "session-calendar.json": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c"
+  },
+  "runner_code": {
+   "autolev.py": "74a31b316fdd60bee886511d6117fd6c74ab5265c3eca117f20728727d87556e",
+   "common.py": "c58f538fa332bd97337c80fa754dc785365d722861143cffe4c806e54057a9d8",
+   "executor.py": "074c81a49ee315be1a7ef44d826037d24018cf62f6078fe876c33750db9f5d12",
+   "live_news.py": "ff375427278c318db58f46e2ce159720f49101729a285771ff89fc9db486b118",
+   "live_score.py": "bb8d8a75997cc78b28d1240df39221250cb803e6f5ed738349ac6c2f2a25563a",
+   "planner.py": "d405fae3286051aa1b9bac5e7ee69e9cf25d826aef1f026b0c0890fde9f28944",
+   "shadow.py": "9d82437a86fe7dd56b8a3d69a42620a8f21c8506e6a9c5981aaebb86c1a992ea",
+   "supervisor.py": "8a4c308c03bf7786667a7683245468d7f3de982ca66a07f6bf2b487b2895a205"
+  },
+  "study_code": {
+   "news_signal.py": "c12c1caedea5499e3224dc3bb979bf93209a44118c135226209020b85a776254",
+   "score.py": "d53d85f44d111a329cf016514e09fd707c352d2352b13e6998c3efba50dae941"
+  },
+  "note": "Draft pins (python analyze.py pins); recompute at the freeze. study_code and reference equal the frozen NEWS-PIT-LLM protocol's own pins (news-llm/protocol.json#/pins), so the runner executes the frozen study code."
+ },
+ "freeze_procedure": [
+  "1. Independent pre-outcome review of this draft (not the builder); resolve every supported finding.",
+  "2. Recompute #/pins with `python analyze.py pins` and #/design_numbers with `python analyze.py design`; set status frozen_pre_outcome, frozen_before_outcomes true, frozen_at (UTC); commit and push.",
+  "3. Write receipts/freeze-record.json (protocol_sha256 of the frozen file, full protocol_commit, frozen_at, reviewer, verdict, outcomes_computed_before_freeze false); commit.",
+  "4. Deploy (README.md, deployment plan) from a commit that descends from the freeze commit; write receipts/deployment-record.json (deployed_at UTC, full deployed_commit, unit working directory, check-account verdict); commit.",
+  "5. The first counted session is the first XNYS session whose open is after both frozen_at and deployed_at; analyze.py computes nothing before it."
+ ],
+ "no_outcome_statement": "When this draft was written no rth_reversal paper order had been sent and no forward outcome of the reversal rule had been computed. The only reversal-direction outcome seen is the frozen study's NEWS-3 (the origin). The pilot's own sessions (momentum RTH entries, OPG basket) and the 2026-09-25 dry-run verification (intended decisions only, separate state) are excluded from every estimand.",
+ "review_questions": [
+  "Should S (the two-leg mean entry spread of NEWS-3's events) be computed from the study's private entry-quote file before the freeze? It is return-free; if S is about 4 bps or more the plan has at most about 50% power and the in-sample net is negative, which may argue against running the arm at all.",
+  "Label skew (L-SKEW): with about 80-90% UNFAVORABLE labels the book is mostly long and pinned at the net cap. Keep the runner's caps as briefed, or preregister a leg-balanced variant? Is 'counted long-short sessions' (both legs >= 2 filled names) still the right information unit if short-leg days are rare?",
+  "Which artifact defines the live-rung paper-performance gate (bootstrap lower bound, 20% drawdown, pinned costs)?",
+  "Are the extended entry minute to 15:46 (beyond the runner's M2 15:40 stop, covered by CLS re-planning to 15:49) and the 60 s cancel acceptable for the close-out path?",
+  "Is futility at t <= 0 at looks 2 and 3 (non-binding; about 6% power cost at +11 bps) acceptable, given the in-sample effect is likely inflated?",
+  "Accept the live deviations: guard B on our own received_at (the id-based estimate journaled only) and the Rule 201 session-low check (stricter than the study)?"
+ ]
+}

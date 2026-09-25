@@ -16,6 +16,8 @@ from zoneinfo import ZoneInfo
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 NEWS_LLM = os.path.abspath(os.path.join(HERE, "..", "news-llm"))
+NEWS_REVERSAL = os.path.abspath(os.path.join(HERE, "..", "news-reversal"))
+REVERSAL_PROTOCOL = os.path.join(NEWS_REVERSAL, "forward-protocol.json")
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", "..", ".."))
 CALENDAR_FILE = os.path.join(REPO, "blueprints/us-equities/mover-v3/data/session-calendar.json")
 CREDENTIAL_GUARD = os.path.join(REPO, "blueprints/us-equities/adaptive-paper/credential_guard.py")
@@ -34,6 +36,11 @@ NY = ZoneInfo("America/New_York")
 UTC = timezone.utc
 EVIDENCE_LABEL = "pilot"  # execution shakedown; not counted as forward-study evidence
 STRATEGY_ID = "news-llm-forward-v0-pilot"
+# Days on which the RTH window runs the preregistered rth_reversal arm (config rth_reversal.from).
+# Whether such a day is a counted session is decided only by news-reversal/analyze.py (freeze and
+# deployment records, code pins), never by this label.
+REVERSAL_RUN_LABEL = "reversal_forward"
+REVERSAL_STRATEGY_ID = "news-reversal-forward-v1"
 
 
 def load_by_path(name, path):
@@ -86,20 +93,22 @@ class Journal:
 
     Records never carry credentials. ``kind`` names the record type (news, eligibility,
     score, decision, order_intent, order_submitted, order_refused, fill, shadow_quote,
-    reconciliation, risk, lifecycle).
+    close_mark, reconciliation, risk, lifecycle). ``evidence_label`` is the run's label:
+    "pilot" before the reversal switch date, REVERSAL_RUN_LABEL from it.
     """
 
-    def __init__(self, root, trade_date, clock=utc_now):
+    def __init__(self, root, trade_date, clock=utc_now, evidence_label=EVIDENCE_LABEL):
         self.root = root
         self.dir = os.path.join(root, "journal")
         os.makedirs(self.dir, exist_ok=True)
         self.path = os.path.join(self.dir, f"{trade_date.isoformat()}.jsonl")
         self.clock = clock
+        self.evidence_label = evidence_label
         self.lock = threading.Lock()
         self.counts = {}
 
     def write(self, kind, **fields):
-        row = {"kind": kind, "at": iso(self.clock()), "evidence_label": EVIDENCE_LABEL, **fields}
+        row = {"kind": kind, "at": iso(self.clock()), "evidence_label": self.evidence_label, **fields}
         line = json.dumps(row, sort_keys=True, default=str)
         with self.lock:
             with open(self.path, "a", encoding="utf-8") as handle:

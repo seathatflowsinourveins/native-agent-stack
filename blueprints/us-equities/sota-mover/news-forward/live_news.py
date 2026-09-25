@@ -1,8 +1,8 @@
 """Read-only Alpaca market-data client and the 15-second news poller.
 
 Only GET requests to an explicit allow-list are possible: market data on
-https://data.alpaca.markets (news, daily bars, latest quotes, snapshots) and the asset
-master (GET /v2/assets) on https://paper-api.alpaca.markets. No order, position or
+https://data.alpaca.markets (news, daily bars, latest quotes, snapshots, auctions) and the
+asset master (GET /v2/assets) on https://paper-api.alpaca.markets. No order, position or
 account path is reachable through this client. Requests are spaced to at most
 300 per minute in total (one shared limiter).
 """
@@ -25,12 +25,14 @@ NEWS_PATH = "/v1beta1/news"
 BARS_PATH = "/v2/stocks/bars"
 LATEST_QUOTES_PATH = "/v2/stocks/quotes/latest"
 SNAPSHOTS_PATH = "/v2/stocks/snapshots"
+AUCTIONS_PATH = "/v2/stocks/auctions"  # official opening/closing auction prints (the study's exit price source)
 ASSETS_PATH = "/v2/assets"
 ALLOWED = {
     (DATA_HOST, NEWS_PATH),
     (DATA_HOST, BARS_PATH),
     (DATA_HOST, LATEST_QUOTES_PATH),
     (DATA_HOST, SNAPSHOTS_PATH),
+    (DATA_HOST, AUCTIONS_PATH),
     (PAPER_HOST, ASSETS_PATH),
 }
 ASSET_ONE = re.compile(r"^/v2/assets/[A-Z]{1,5}(?:\.[A-Z])?$")
@@ -148,15 +150,18 @@ class DataClient:
                 break
         return out
 
-    def daily_bars(self, symbols, start_day, end_day):
-        """Raw SIP daily bars per symbol for [start_day, end_day] (dates, New York)."""
+    def daily_bars(self, symbols, start_day, end_day, adjustment="raw"):
+        """SIP daily bars per symbol for [start_day, end_day] (dates, New York); raw by default,
+        "split" for the split-adjusted bars the study's Rule 201 carry-over uses."""
+        if adjustment not in ("raw", "split"):
+            raise ValueError("adjustment must be raw or split")
         out = {s: [] for s in symbols}
         for i in range(0, len(symbols), 100):
             chunk = symbols[i:i + 100]
             token = None
             while True:
                 params = {"symbols": ",".join(chunk), "timeframe": "1Day", "start": start_day.isoformat(),
-                          "end": end_day.isoformat(), "adjustment": "raw", "feed": "sip", "limit": 10000}
+                          "end": end_day.isoformat(), "adjustment": adjustment, "feed": "sip", "limit": 10000}
                 if token:
                     params["page_token"] = token
                 payload = self.get(DATA_HOST, BARS_PATH, params)
@@ -181,6 +186,30 @@ class DataClient:
             out.update(payload if isinstance(payload, dict) else {})
         return out
 
+    def auctions(self, symbols, day):
+        """{symbol: {"o": [...], "c": [...]}} of one session's SIP auction entries (as the study's
+        collect_auctions.fetch_auctions requests them), merged across pages; only entries dated `day`."""
+        out = {}
+        for i in range(0, len(symbols), 100):
+            token = None
+            while True:
+                params = {"symbols": ",".join(symbols[i:i + 100]), "start": f"{day.isoformat()}T00:00:00Z",
+                          "end": f"{day.isoformat()}T23:59:59Z", "limit": 10000, "feed": "sip", "sort": "asc"}
+                if token:
+                    params["page_token"] = token
+                payload = self.get(DATA_HOST, AUCTIONS_PATH, params)
+                for sym, days in (payload.get("auctions") or {}).items():
+                    for d in days or []:
+                        if d.get("d") != day.isoformat():
+                            continue
+                        slot = out.setdefault(sym, {"o": [], "c": []})
+                        slot["o"].extend(d.get("o") or [])
+                        slot["c"].extend(d.get("c") or [])
+                token = payload.get("next_page_token")
+                if not token:
+                    break
+        return out
+
     def assets(self):
         payload = self.get(PAPER_HOST, ASSETS_PATH, {"status": "active", "asset_class": "us_equity"})
         return {a["symbol"].upper(): a for a in payload}
@@ -194,15 +223,19 @@ class NewsPoller:
 
     The watermark is the newest created_at seen; each poll re-reads from watermark - 10
     minutes (late-indexed stories) and keeps only unseen ids, in (created_at, id) order.
+    received_at is the first time this runner received the id: `first_received` (news id ->
+    ISO time, e.g. rebuilt from today's journal after a restart) keeps the original receipt
+    time, so a restart does not make an article look late to guard B.
     """
 
     OVERLAP = timedelta(minutes=10)
 
-    def __init__(self, client, start_utc, clock=common.utc_now):
+    def __init__(self, client, start_utc, clock=common.utc_now, first_received=None):
         self.client = client
         self.watermark = start_utc
         self.clock = clock
         self.seen = set()
+        self.first_received = dict(first_received or {})
 
     def poll(self):
         received = self.clock()
@@ -214,7 +247,7 @@ class NewsPoller:
                 continue
             self.seen.add(aid)
             a = dict(a)
-            a["received_at"] = common.iso(received)
+            a["received_at"] = self.first_received.setdefault(aid, common.iso(received))
             fresh.append(a)
             try:
                 created = common.news_signal().as_utc(a["created_at"])

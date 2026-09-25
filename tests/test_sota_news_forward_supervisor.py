@@ -8,6 +8,7 @@ restart, exits while killed, cancel before re-flatten), the OPG basket (pre-mark
 a cancel race, carry-over exits, exit-only mode and the arm entries. No GPU, no network.
 """
 
+import json
 import os
 import shutil
 import sys
@@ -596,6 +597,203 @@ class ArmFlows(Scenario):
         self.tick(sup, clock, ny(9, 31))
         self.assertEqual([(o["client_order_id"], o["side"], o["limit_price"]) for o in b.all[n:]
                           if "-cof" in o["client_order_id"]], [("nf1-20260923-cof1-STALE-short", "buy", "50.31")])
+
+
+class ReversalFlow(Scenario):
+    """The preregistered rth_reversal arm inside the supervisor (paper broker double)."""
+
+    def reversal_sup(self, mode="paper"):
+        sup, clock = make_sup(self.dir, self.b, mode=mode)
+        sup.reversal = True
+        sup.cfg["rth_reversal"] = {"from": "2026-09-25"}
+        return sup, clock
+
+    def rth(self, sup, sym, label, created, nid, entry_quote_delay=1):
+        c = {"event_id": f"{nid}:{sym}", "news_id": str(nid), "symbol": sym, "label": label, "lane": "liquid",
+             "created_at": common.iso(created), "session": "2026-09-25", "window": "rth", "session_label": planner.RTH,
+             "entry_utc": common.iso(created + timedelta(minutes=15)), "sigma": 0.02, "exchange": "NYSE",
+             "prior_median_dollar_volume_20": 50_000_000.0, "prior_close": 50.0, "label_rule": "exact",
+             "strict_label": label, "received_at": common.iso(created + timedelta(seconds=5))}
+        sup.bars[(sym, "2026-09-25")] = bars_for(common.load_calendar().prior_sessions(FRIDAY, 2))
+        sup.candidates[c["event_id"]] = sup.rth_pending[c["event_id"]] = c
+        sup.quotes[sym] = {"bp": 49.95, "ap": 50.05,
+                           "t": common.iso(created + timedelta(minutes=15, seconds=entry_quote_delay))}
+        return c
+
+    def at_entry(self, sup, clock, created, seconds=2):
+        now = created + timedelta(minutes=15, seconds=seconds)
+        clock["now"] = self.b.now = now
+        return now
+
+    def test_entry_against_the_label_with_the_momentum_shadow(self):
+        sup, clock = self.reversal_sup()
+        t0 = ny(10, 0)
+        for i, (sym, label) in enumerate((("FAV", "FAVORABLE"), ("UNF", "UNFAVORABLE"), ("UNC", "UNCLEAR"))):
+            self.rth(sup, sym, label, t0, 11 + i)
+        sup.run_rth_entries(self.at_entry(sup, clock, t0))
+        # section A: min(0.0015 x 900k / 0.02, 0.5% x 50M, 5% x 900k) = 45,000 at the touch: 900 at 49.95, 899 at 50.05
+        self.assertEqual({o["client_order_id"]: (o["side"], o["limit_price"], o["qty"]) for o in self.b.all},
+                         {"nf1r-20260925-rth-FAV-short": ("sell", "49.95", "900"),
+                          "nf1r-20260925-rth-UNF-long": ("buy", "50.05", "899")})
+        decisions = self.rows(sup, "decision")
+        rev = {d["symbol"]: d for d in decisions if d["arm"] == "rev"}
+        shadow = {d["symbol"]: d for d in decisions if d["arm"] == supervisor.SHADOW_ARM}
+        self.assertEqual({s: (d["action"], d.get("reason")) for s, d in rev.items()},
+                         {"FAV": ("enter", "ok"), "UNF": ("enter", "ok"), "UNC": ("skip", "label_unclear")})
+        self.assertEqual({s: (d["action"], d.get("leg")) for s, d in shadow.items()},
+                         {"FAV": ("shadow_enter", "long"), "UNF": ("shadow_enter", "short"), "UNC": ("skip", None)})
+        self.assertFalse(any("client_order_id" in d for d in shadow.values()))  # a shadow is never an order
+        self.assertEqual((rev["FAV"]["quote_bid"], rev["FAV"]["quote_ask"], rev["FAV"]["ssr"]["restricted"]), ("49.95", "50.05", False))
+        submitted = {r["order"]["client_order_id"]: r for r in self.rows(sup, "order_submitted")}
+        self.assertEqual(submitted["nf1r-20260925-rth-FAV-short"]["arm_label"], "preregistered_forward")
+        self.assertEqual(sup.rth_pending, {})
+
+    def test_an_older_quote_waits_inside_the_entry_minute(self):
+        sup, clock = self.reversal_sup()
+        t0 = ny(10, 0)
+        c = self.rth(sup, "OLD", "FAVORABLE", t0, 21, entry_quote_delay=-3)  # stamped 3 s before the entry time
+        sup.run_rth_entries(self.at_entry(sup, clock, t0))
+        self.assertEqual((self.b.all, list(sup.rth_pending)), ([], [c["event_id"]]))
+        self.assertEqual([r["reason"] for r in self.rows(sup, "decision_wait")], ["quote_before_entry_time"] * 2)
+        sup.quotes["OLD"]["t"] = common.iso(t0 + timedelta(minutes=15, seconds=20))
+        sup.run_rth_entries(self.at_entry(sup, clock, t0, seconds=21))
+        self.assertEqual([o["client_order_id"] for o in self.b.all], ["nf1r-20260925-rth-OLD-short"])
+        self.assertEqual(sup.rth_pending, {})
+
+    def test_unfilled_entry_is_cancelled_after_its_minute(self):
+        sup, clock = self.reversal_sup()
+        t0 = ny(10, 0)
+        self.rth(sup, "UNF", "UNFAVORABLE", t0, 31)
+        sup.run_rth_entries(self.at_entry(sup, clock, t0))
+        entry = self.b.find("nf1r-20260925-rth-UNF-long")
+        self.tick(sup, clock, t0 + timedelta(minutes=15, seconds=40))
+        self.assertEqual(entry["status"], "accepted")  # 38 s old
+        self.tick(sup, clock, t0 + timedelta(minutes=16, seconds=3))
+        self.assertEqual(entry["status"], "canceled")  # 61 s after submission
+
+    def test_the_last_entry_minute_is_covered_by_the_close(self):
+        sup, clock = self.reversal_sup()
+        t0 = ny(15, 29)  # released a minute before the RTH window ends: entry 15:44, after the M2 15:40 stop
+        self.rth(sup, "LAT", "UNFAVORABLE", t0, 41)
+        self.b.fill_on_submit = lambda intent: "50.05" if intent["client_order_id"].startswith("nf1r-") else None
+        now = self.at_entry(sup, clock, t0)
+        sup.run_entries(now)
+        self.assertEqual([o["client_order_id"] for o in self.b.all], ["nf1r-20260925-rth-LAT-long"])
+        self.tick(sup, clock, ny(15, 44) + timedelta(seconds=30))
+        cls = [o for o in self.b.all if "-cls" in o["client_order_id"]]
+        self.assertEqual([(o["client_order_id"], o["time_in_force"], o["qty"]) for o in cls],
+                         [("nf1r-20260925-cls1-LAT-long", "cls", "899")])
+
+    def test_harm_halt_first_in_window_and_the_sweep(self):
+        sup, clock = self.reversal_sup()
+        Path(self.dir, supervisor.HALT_REVERSAL).write_text("{}")
+        t0 = ny(11, 0)
+        self.rth(sup, "HLT", "FAVORABLE", t0, 51)
+        second = self.rth(sup, "HLT", "UNFAVORABLE", t0 + timedelta(minutes=1), 52)
+        sup.quotes["HLT"]["t"] = common.iso(t0 + timedelta(minutes=15, seconds=1))  # one quote stream per symbol
+        sup.run_rth_entries(self.at_entry(sup, clock, t0))
+        self.assertEqual(self.b.all, [])
+        rows = {(d["arm"], d["event_id"]): d["reason"] for d in self.rows(sup, "decision")}
+        self.assertEqual(rows[("rev", "51:HLT")], "harm_halt")
+        self.assertEqual(rows[(supervisor.SHADOW_ARM, "51:HLT")], "ok")  # the shadow is descriptive and keeps running
+        sup.run_rth_entries(self.at_entry(sup, clock, t0 + timedelta(minutes=1)))
+        self.assertEqual({a: rows_ for a, rows_ in ((d["arm"], d["reason"]) for d in self.rows(sup, "decision")
+                                                    if d["event_id"] == second["event_id"])},
+                         {"rev": "not_first_in_window", supervisor.SHADOW_ARM: "not_first_in_window"})
+        late = self.rth(sup, "SWP", "FAVORABLE", ny(15, 20), 53, entry_quote_delay=-5)
+        sup.rth_pending = {late["event_id"]: late}
+        sup.sweep_after_cls_start(ny(15, 46) + timedelta(seconds=1))
+        self.assertEqual({d["arm"]: d["reason"] for d in self.rows(sup, "decision") if d["event_id"] == late["event_id"]},
+                         {"rev": "entry_after_last_entry_minute", supervisor.SHADOW_ARM: "entry_after_last_entry_minute"})
+
+    def test_dry_run_journals_intents_and_sends_nothing(self):
+        sup, clock = self.reversal_sup(mode="dry-run")
+        t0 = ny(10, 30)
+        self.rth(sup, "DRY", "FAVORABLE", t0, 61)
+        sup.run_rth_entries(self.at_entry(sup, clock, t0))
+        intents = self.rows(sup, "order_intent")
+        self.assertEqual([(r["mode"], r["arm"], r["envelope"]["intent"]["client_order_id"]) for r in intents],
+                         [("dry-run", "rev", "nf1r-20260925-rth-DRY-short")])
+        self.assertEqual((self.b.all, self.rows(sup, "order_submitted")), ([], []))
+
+    def test_operative_label_and_read_only_external_scores(self):
+        sup, clock = self.reversal_sup(mode="dry-run")
+        own = os.path.join(self.dir, "scores.jsonl")
+        other_dir = tempfile.mkdtemp(prefix="nf-other-")
+        self.addCleanup(shutil.rmtree, other_dir, True)
+        external = os.path.join(other_dir, "scores.jsonl")
+        with open(own, "w", encoding="utf-8") as handle:
+            handle.write(json.dumps({"event_id": "71:AAA", "raw_output": "UNFLEXIBLE", "stop": "eos",
+                                     "label": "PARSE_FAIL", "score": 0}) + "\n")
+        with open(external, "w", encoding="utf-8") as handle:
+            for eid, raw in (("71:AAA", "FAVORABLE"), ("72:BBB", "FAVORABLE is the answer")):
+                handle.write(json.dumps({"event_id": eid, "raw_output": raw, "stop": "eos", "label": "FAVORABLE", "score": 1}) + "\n")
+        before = os.stat(external)
+        sup.scores_path, sup.extra_scores_path = own, external
+        for nid, sym in ((71, "AAA"), (72, "BBB")):
+            c = self.rth(sup, sym, None, ny(10, 0), nid)
+            c.update(ext_segment="closed", arm_release=None)
+            del sup.rth_pending[c["event_id"]]
+        sup.read_scores(ny(10, 1))
+        scores = {r["event_id"]: r for r in self.rows(sup, "score")}
+        self.assertEqual((scores["71:AAA"]["label"], scores["71:AAA"]["strict_label"], scores["71:AAA"]["label_rule"],
+                          scores["71:AAA"]["score_source"]), ("UNFAVORABLE", "PARSE_FAIL", "prefix", "own"))
+        self.assertEqual((scores["72:BBB"]["label"], scores["72:BBB"]["score_source"]), ("FAVORABLE", "external"))
+        self.assertEqual(sup.candidates["71:AAA"]["label"], "UNFAVORABLE")
+        after = os.stat(external)
+        self.assertEqual((before.st_size, before.st_mtime_ns), (after.st_size, after.st_mtime_ns))  # never written
+
+    def test_close_marks_rev_daily_and_the_core_execution_test_label(self):
+        sup, clock = self.reversal_sup()
+        t0 = ny(10, 0)
+        self.rth(sup, "FAV", "FAVORABLE", t0, 81)
+        self.rth(sup, "UNF", "UNFAVORABLE", t0, 82)
+        self.b.fill_on_submit = lambda intent: "50" if intent["client_order_id"].startswith("nf1r-") else None
+        sup.run_rth_entries(self.at_entry(sup, clock, t0))
+        self.tick(sup, clock, ny(15, 40))
+        for o in self.b.all:
+            if "-cls1-" in o["client_order_id"]:
+                self.b.now = ny(16, 0)
+                self.b.fill(o["client_order_id"], price="50")
+        sup.data.auctions.return_value = {"FAV": {"c": [{"c": "6", "p": 49.5, "x": "N"}]}, "UNF": {"c": []}}
+        sup.record_close_marks(ny(16, 5))
+        sup.record_close_marks(ny(16, 45))  # the last attempt records a missing print as such
+        marks = {r["symbol"]: r for r in self.rows(sup, "close_mark")}
+        self.assertEqual((marks["FAV"]["official_close"], marks["FAV"]["condition"]), (49.5, "6"))
+        self.assertEqual((marks["UNF"]["official_close"], marks["UNF"]["note"]), (None, "no_close_auction_print"))
+        self.b.cash = "900000"
+        sup.reconcile()
+        daily = self.rows(sup, "rev_daily")[0]
+        self.assertEqual((daily["entry_fills"], daily["names_long"], daily["names_short"], daily["flat"]), (2, 1, 1, True))
+        self.assertFalse(daily["long_short_defined"])  # one name per leg: no long-short value under the study's rule
+        core = common.read_jsonl(os.path.join(self.dir, "autolev-daily-paper.jsonl"))[-1]
+        self.assertEqual(core["evidence_label"], "execution_test")
+        self.assertEqual(supervisor.autolev.counted([{**core, "core_flat": True}]), [])
+
+    def test_restart_keeps_the_first_receipt_time(self):
+        sup, clock = self.reversal_sup()
+        sup.journal.write("news", id=91, received_at="2026-09-25T14:00:05Z")
+        sup.journal.write("news", id=91, received_at="2026-09-25T15:30:00Z")  # a re-read after a restart
+        self.assertEqual(sup.first_received_today(), {"91": "2026-09-25T14:00:05Z"})
+        client = mock.Mock()
+        client.news_since.return_value = [{"id": 91, "created_at": "2026-09-25T14:00:00Z"}]
+        poller = supervisor.live_news.NewsPoller(client, ny(9), clock=lambda: ny(11, 30), first_received=sup.first_received_today())
+        self.assertEqual(poller.poll()[0]["received_at"], "2026-09-25T14:00:05Z")
+
+    def test_config_switch_and_cli_guards(self):
+        cfg = {"rth_reversal": {"from": "2026-09-28"}}
+        self.assertFalse(supervisor.reversal_active(cfg, FRIDAY))
+        self.assertTrue(supervisor.reversal_active(cfg, date(2026, 9, 28)))
+        self.assertFalse(supervisor.reversal_active({"rth_reversal": {"from": "2026-09-28", "enabled": False}}, date(2026, 9, 28)))
+        self.assertFalse(supervisor.reversal_active({}, date(2026, 9, 28)))
+        self.assertFalse(supervisor.arm_orders_enabled(cfg, "rev", FRIDAY))
+        self.assertTrue(supervisor.arm_orders_enabled(cfg, "rev", date(2026, 9, 28)))
+        with self.assertRaises(SystemExit):
+            supervisor.main(["--scores-from", "/nonexistent/scores.jsonl"])  # only with --dry-run
+        with self.assertRaises(SystemExit):
+            supervisor.main(["--dry-run", "--state", self.dir, "--scores-from", os.path.join(self.dir, "scores.jsonl")])
+        shipped = json.loads((ROOT / "blueprints/us-equities/sota-mover/news-forward/config.json").read_text())
+        self.assertEqual(shipped["rth_reversal"]["from"], "2026-09-28")  # never a pilot day
 
 
 if __name__ == "__main__":

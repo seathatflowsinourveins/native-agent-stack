@@ -1,0 +1,82 @@
+{
+ "schema": "news-reversal-dryrun-receipt/1",
+ "evidence_class": "local integration check against the live data feed (dry-run; nothing sent); pre-freeze, never evidence",
+ "trade_date": "2026-09-25",
+ "started_at": "2026-09-25T13:43:31.453921Z",
+ "stopped_at": "2026-09-25T13:55:00.792100Z",
+ "mode": "dry-run",
+ "requested_mode": "dry-run",
+ "account_verdict": "not_checked",
+ "rth_reversal_active": true,
+ "evidence_label": "reversal_forward",
+ "strategy": "news-reversal-forward-v1",
+ "setup": "one-off process from the news-reversal worktree: --dry-run (no trading client), --no-scorer (no systemd unit touched), a separate state root, --rate 60, a scratch config with rth_reversal.from 2026-09-25, score rows read-only from the running service's scores.jsonl (--scores-from) for the events this run screened itself; the running service, its worktree and its state were not modified",
+ "code": {
+  "git_head": "014a67b012f45c6dda7ab04d5e61eaa5db0008a0",
+  "git_dirty": true,
+  "code_sha256": {
+   "autolev.py": "74a31b316fdd60bee886511d6117fd6c74ab5265c3eca117f20728727d87556e",
+   "common.py": "c58f538fa332bd97337c80fa754dc785365d722861143cffe4c806e54057a9d8",
+   "executor.py": "074c81a49ee315be1a7ef44d826037d24018cf62f6078fe876c33750db9f5d12",
+   "live_news.py": "ff375427278c318db58f46e2ce159720f49101729a285771ff89fc9db486b118",
+   "live_score.py": "bb8d8a75997cc78b28d1240df39221250cb803e6f5ed738349ac6c2f2a25563a",
+   "planner.py": "d405fae3286051aa1b9bac5e7ee69e9cf25d826aef1f026b0c0890fde9f28944",
+   "shadow.py": "9d82437a86fe7dd56b8a3d69a42620a8f21c8506e6a9c5981aaebb86c1a992ea",
+   "supervisor.py": "8a4c308c03bf7786667a7683245468d7f3de982ca66a07f6bf2b487b2895a205"
+  },
+  "news_signal_sha256": "c12c1caedea5499e3224dc3bb979bf93209a44118c135226209020b85a776254",
+  "score_py_sha256": "d53d85f44d111a329cf016514e09fd707c352d2352b13e6998c3efba50dae941",
+  "reversal_protocol_sha256": "31c0e45b44f3d1961fbdbe1339d6238f7365b55f43bbe5144829f3cd50575bbb",
+  "note": "runner and study code equal forward-protocol.json#/pins as drafted; the protocol text was edited after the run (wording, key names, analyze.py pin), so its sha256 here is an earlier draft's"
+ },
+ "journal_sha256": "5ef2068a4df078bca547eb75e9683c64c0cc1e74f406ca09078aea48ac268cc6",
+ "counts": {
+  "journal_kinds": {"candidate": 21, "decision": 16, "decision_wait": 12, "eligibility": 1184, "leverage_decision": 1, "lifecycle": 3,
+                    "net_actual": 2, "news": 1183, "order_intent": 3, "reconciliation": 1, "score": 21, "shadow_quote": 2},
+  "eligibility_reasons": {"drop_guard_ingested_after_cutoff": 566, "drop_symbol_count_not_1": 275, "drop_not_primary_operating_company": 140,
+                          "drop_movement_headline": 66, "drop_window_excluded_0900_0930": 62, "drop_no_symbols": 38, "ok": 22,
+                          "drop_symbol_not_in_asset_master": 10, "drop_window_excluded_last_30min": 4, "drop_not_eligible_lane": 1},
+  "eligibility_note": "guard B uses this process's own receipt time; it started at 09:43 ET, after every overnight event's 09:00 cutoff, so all overnight events were dropped (the service, running from 03:55, receives them in time)",
+  "scores_by_source": {"external": 21},
+  "scores_operative_vs_strict": {"FAVORABLE->FAVORABLE (exact)": 2, "PARSE_FAIL->UNFAVORABLE (prefix)": 9, "UNCLEAR->UNCLEAR (exact)": 2,
+                                 "UNFAVORABLE->UNFAVORABLE (exact)": 8},
+  "decisions": {"rev|enter|ok": 3, "rev|skip|label_unclear": 2, "rev|skip|net_exposure_cap": 2, "rev|skip|spread_above_50bps": 1,
+                "core_shadow|shadow_enter|ok": 3, "core_shadow|skip|label_unclear": 2, "core_shadow|skip|net_exposure_cap": 2,
+                "core_shadow|skip|spread_above_50bps": 1},
+  "decision_waits": {"rev|quote_before_entry_time": 6, "core_shadow|quote_before_entry_time": 6},
+  "order_intents": {"dry-run|rev|entry": 3},
+  "orders_submitted": 0,
+  "orders_refused": {},
+  "step_errors": 0
+ },
+ "intended_rth_reversal_entries": [
+  {"symbol": "JCI", "label": "UNFAVORABLE", "label_rule": "prefix", "leg": "long", "entry_utc": "2026-09-25T13:45:16Z",
+   "quote_t": "2026-09-25T13:45:16.732909319Z", "quote_bid": "148.52", "quote_ask": "148.73", "spread_bps": "14.1",
+   "limit_price": "148.73", "qty": 302, "est_notional": "44916.46", "net_after": "44916.46"},
+  {"symbol": "FRVO", "label": "UNFAVORABLE", "label_rule": "prefix", "leg": "long", "entry_utc": "2026-09-25T13:45:16Z",
+   "quote_t": "2026-09-25T13:45:19.844841966Z", "quote_bid": "16.65", "quote_ask": "16.72", "spread_bps": "42.0",
+   "limit_price": "16.72", "qty": 981, "est_notional": "16402.32", "net_after": "61318.78"},
+  {"symbol": "OTIS", "label": "UNFAVORABLE", "label_rule": "prefix", "leg": "long", "entry_utc": "2026-09-25T13:50:32Z",
+   "quote_t": "2026-09-25T13:50:55.674533011Z", "quote_bid": "66.7", "quote_ask": "66.78", "spread_bps": "12.0",
+   "limit_price": "66.78", "qty": 430, "est_notional": "28715.40", "net_after": "90034.18",
+   "note": "shrunk to the net cap's headroom (0.10 E = 90,098.90 with the dry-run E of 900,988.95)"}
+ ],
+ "rth_reversal_non_entries": [
+  {"symbol": "VCTR", "label": "UNCLEAR", "action": "skip", "reason": "label_unclear", "entry_utc": "2026-09-25T13:46:50Z"},
+  {"symbol": "UBS", "label": "UNCLEAR", "action": "skip", "reason": "label_unclear", "entry_utc": "2026-09-25T13:47:56Z"},
+  {"symbol": "LII", "label": "UNFAVORABLE", "leg": "long", "action": "skip", "reason": "spread_above_50bps", "spread_bps": "96.3",
+   "entry_utc": "2026-09-25T13:47:57Z"},
+  {"symbol": "PH", "label": "UNFAVORABLE", "leg": "long", "action": "skip", "reason": "net_exposure_cap", "entry_utc": "2026-09-25T13:51:57Z"},
+  {"symbol": "ROK", "label": "UNFAVORABLE", "leg": "long", "action": "skip", "reason": "net_exposure_cap", "entry_utc": "2026-09-25T13:53:44Z"}
+ ],
+ "observation": "Every directional liquid label in the run was UNFAVORABLE except one FAVORABLE (CRL, released 09:46 ET, entry 10:01, after the run ended), so every intended reversal entry was a long and the 0.10 E net cap stopped the long book after three names. Of the 21 candidates, 8 were decided, 1 (TT, entry 2 s before the stop) was still waiting for a quote stamped in its entry minute, and 12 had entries after the stop. The running service's own scores for 2026-09-25 (labels only, read-only) show the same skew: overnight liquid 12 FAVORABLE, 11 UNCLEAR, 100 UNFAVORABLE; RTH liquid to 09:55 1, 2, 16.",
+ "paper3_check_account": {
+  "run_at": "2026-09-25T13:56:18Z",
+  "command": "news-forward/executor.py check-account (read-only: account, open orders and positions are read; nothing is submitted or cancelled)",
+  "verdict": "ready_for_paper",
+  "account_status": "ACTIVE",
+  "open_orders": 0,
+  "positions": 3,
+  "reading": "every position traces to the running service's runner-prefixed fills (no foreign holdings); no nf1r- order exists, since this dry run built no trading client"
+ }
+}

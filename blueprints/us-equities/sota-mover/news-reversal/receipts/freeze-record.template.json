@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "kind": "news_reversal_freeze_record",
+  "protocol_id": "sota-news-reversal-forward-20260925",
+  "protocol_sha256": null,
+  "protocol_commit": null,
+  "frozen_at": null,
+  "reviewer": null,
+  "review_verdict": null,
+  "outcomes_computed_before_freeze": false,
+  "note": "Template only: analyze.py refuses it (no sha256, no commit). Copy to freeze-record.json at the freeze (forward-protocol.json#/freeze_procedure step 3)."
+}

@@ -113,9 +113,11 @@ ASSETS = {
 }
 
 
-def article(aid, created, symbols=("ACME",), headline="Acme wins large contract", source="benzinga", updated=None):
+def article(aid, created, symbols=("ACME",), headline="Acme wins large contract", source="benzinga", updated=None,
+            received=None):
+    """A feed article as the poller hands it over: with our own received_at (default 5 s after release)."""
     return {"id": aid, "created_at": z(created), "updated_at": z(updated or created), "symbols": list(symbols),
-            "headline": headline, "source": source}
+            "headline": headline, "source": source, "received_at": z(received or created + timedelta(seconds=5))}
 
 
 class Screening(unittest.TestCase):
@@ -130,6 +132,8 @@ class Screening(unittest.TestCase):
         self.assertEqual(cand["company"], "Acme Corp.")
         self.assertEqual(cand["checkpoint_year"], 2024)
         self.assertEqual(cand["event_id"], "100:ACME")
+        self.assertEqual((cand["ingestion_basis"], cand["received_at"]), ("received_at", z(ny(2026, 9, 24, 18, 0, 5))))
+        self.assertEqual(cand["decision_cutoff_utc"], z(ny(2026, 9, 25, 9)))
 
     def test_guards(self):
         t = ny(2026, 9, 24, 18)
@@ -146,11 +150,41 @@ class Screening(unittest.TestCase):
         self.assertEqual(self.s.screen(article(10, ny(2026, 9, 24, 18), headline="Acme signs deal"))[1], "ok")
         self.assertEqual(self.s.screen(article(11, ny(2026, 9, 24, 19), headline="ACME signs deal!"))[1], "drop_duplicate_24h")
 
-    def test_id_order_guard(self):
+    def test_guard_b_compares_our_receipt_with_the_decision_cutoff(self):
+        rth = ny(2026, 9, 25, 10, 0)  # RTH cutoff: release + 15 min, inclusive
+        self.assertEqual(self.s.screen(article(300, rth, received=rth + timedelta(minutes=15)))[1], "ok")
+        late = article(301, rth, headline="Acme names new CFO", received=rth + timedelta(minutes=15, seconds=1))
+        self.assertEqual(self.s.screen(late)[1], "drop_guard_ingested_after_cutoff")
+        night = ny(2026, 9, 24, 18)  # overnight cutoff: strictly before 09:00 on the session
+        self.assertEqual(self.s.screen(article(302, night, headline="Acme opens a plant", received=ny(2026, 9, 25, 9)))[1],
+                         "drop_guard_ingested_after_cutoff")
+        self.assertEqual(self.s.screen(article(303, night, headline="Acme hires", received=ny(2026, 9, 25, 8, 59, 59)))[1], "ok")
+        unstamped = {k: v for k, v in article(304, night, headline="Acme sells a unit").items() if k != "received_at"}
+        self.assertEqual(self.s.screen(unstamped)[1], "drop_guard_missing_received_at")
+
+    def test_backdated_article_is_judged_by_its_receipt_and_the_study_estimate_is_recorded(self):
         for i in range(5):
             self.s.screen(article(200 + i, ny(2026, 9, 25, 6, i), symbols=("BETA", "ACME")))
-        backdated = article(206, ny(2026, 9, 25, 4, 30), headline="Acme names new CFO")
-        self.assertEqual(self.s.screen(backdated)[1], "drop_guard_id_order")
+        backdated = article(206, ny(2026, 9, 25, 4, 30), headline="Acme names new CFO", received=ny(2026, 9, 25, 6, 5))
+        cand, reason = self.s.screen(backdated)
+        self.assertEqual(reason, "ok")  # received before 09:00: the superseded id-order guard no longer applies
+        # the study's estimate: max(created, lower p90 of the 5 lower ids' created_at = element int(0.9 x 4) = 06:03)
+        self.assertEqual((cand["estimated_ingestion_at"], cand["estimated_ingestion_guard_ok"]), (z(ny(2026, 9, 25, 6, 3)), True))
+
+    def test_study_estimate_is_journaled_but_does_not_decide(self):
+        for i in range(5):  # lower ids stamped after the release: the id-based estimate lands after the cutoff
+            self.s.screen(article(390 + i, ny(2026, 9, 25, 10, 30 + i), symbols=("BETA", "ACME")))
+        cand, reason = self.s.screen(article(400, ny(2026, 9, 25, 10), headline="Acme raises its dividend",
+                                             received=ny(2026, 9, 25, 10, 5)))
+        self.assertEqual(reason, "ok")
+        self.assertFalse(cand["estimated_ingestion_guard_ok"])
+
+    def test_the_narrowed_d5_regex_is_the_studys(self):
+        t = ny(2026, 9, 24, 18)
+        self.assertIs(planner.sig.MOVEMENT_RE, sig.MOVEMENT_RE)
+        self.assertEqual(self.s.screen(article(40, t, headline="Acme Announces Offering Of Up To $8.4M Of Shares"))[1], "ok")
+        self.assertEqual(self.s.screen(article(41, t, headline="Acme Prices Offering Of 2M Shares By Selling Stockholders"))[1], "ok")
+        self.assertEqual(self.s.screen(article(42, t, headline="Acme Stock Is Trading Lower"))[1], "drop_movement_headline")
 
 
 def bars(days, close=100.0, volume=1_000_000, low=None):
@@ -178,6 +212,23 @@ class LanesAndShortFilters(unittest.TestCase):
         self.assertTrue(planner.ssr_active(CAL, d, bars([d1], 95.0)))  # missing data: restricted
         self.assertTrue(planner.ssr_active(CAL, d, normal, today_low=85.5))
         self.assertFalse(planner.ssr_active(CAL, d, normal, today_low=85.6))
+
+    def test_ssr_uses_split_adjusted_carryover_and_the_study_flag(self):
+        d = date(2026, 9, 25)
+        d2, d1 = CAL.prior_sessions(d, 2)
+        raw = bars([d2], 100.0) + bars([d1], 50.0, low=49.0)  # a 2:1 split between d2 and d1 looks like a 51% drop
+        adj = bars([d2], 50.0) + bars([d1], 50.0, low=49.0)
+        self.assertTrue(planner.ssr_active(CAL, d, raw))  # raw bars alone: carry-over (fail-safe direction)
+        self.assertFalse(planner.ssr_active(CAL, d, raw, adj_bars=adj))
+        st = planner.ssr_state(CAL, d, raw, adj_bars=adj, entry_quote={"bp": 45.01, "ap": 45.05})
+        self.assertEqual((st["restricted"], st["study_flag"], st["carryover"], st["data_missing"]), (False, False, False, False))
+        st = planner.ssr_state(CAL, d, raw, adj_bars=adj, entry_quote={"bp": 45.0, "ap": 45.05})  # bid <= 90% of 50
+        self.assertEqual((st["restricted"], st["study_flag"]), (True, True))
+        st = planner.ssr_state(CAL, d, raw, adj_bars=adj, entry_quote={"bp": 49.0, "ap": 49.05}, today_low=44.9)
+        self.assertEqual((st["restricted"], st["study_flag"], st["session_low_flag"]), (True, False, True))
+        st = planner.ssr_state(CAL, d, bars([d1], 50.0))  # d2 missing: fail closed
+        self.assertEqual((st["restricted"], st["data_missing"]), (True, True))
+        self.assertEqual(planner.ssr_carryover_from_bars(CAL, d, raw), sig.ssr_carryover(49.0, 100.0))
 
     def test_short_allowed(self):
         ok = {"shortable": True, "easy_to_borrow": True}
@@ -423,6 +474,111 @@ class NetExposureCap(unittest.TestCase):
         # pm headroom 5,000 at limit 50.21 -> 99 shares = 4,970.79 (pre-cap 224 shares)
         self.assertEqual((d["action"], d["pre_cap_qty"], i["qty"], d["net_after"]), ("enter", 224, "99", "89970.79"))
         self.assertEqual(i["client_order_id"], "nf1x-pm-20260925-ent-PMX-long")
+
+
+REV_LIMITS = planner.Limits.for_arm(planner.REV, E, 1)
+
+
+class ReversalRule(unittest.TestCase):
+    """The preregistered rth_reversal rule (news-reversal/forward-protocol.json#/rule)."""
+
+    ENTRY = ny(2026, 9, 25, 10, 15)
+
+    def ev(self, label="FAVORABLE", symbol="ACME", lane=sig.LIQUID, ssr=False, asset=None, target="45000"):
+        return {"event_id": f"9:{symbol}", "symbol": symbol, "label": label, "lane": lane, "entry_utc": z(self.ENTRY),
+                "asset": ASSET_OK if asset is None else asset, "ssr": ssr, "target_notional": Decimal(target)}
+
+    def q(self, bp=99.95, ap=100.05, t=None):
+        return {"bp": bp, "ap": ap, "t": z(t or self.ENTRY + timedelta(seconds=2))}
+
+    def plan(self, event, quote, now=None, exposure=None):
+        return planner.plan_rth_reversal_entry(event, quote, now or self.ENTRY + timedelta(seconds=3), date(2026, 9, 25),
+                                               exposure if exposure is not None else planner.Exposure(), REV_LIMITS)
+
+    def test_arm_ids_labels_and_limits(self):
+        self.assertEqual(planner.ARM_LABEL[planner.CORE], "execution_test")
+        self.assertEqual(planner.ARM_LABEL[planner.REV], "preregistered_forward")
+        self.assertEqual(planner.parse_cid("nf1r-20260928-rth-ACME-short"),
+                         {"arm": "rev", "date": date(2026, 9, 28), "stage": "rth", "symbol": "ACME", "leg": "short"})
+        self.assertTrue(planner.is_nf1("nf1r-20260928-cls1-ACME-short"))
+        self.assertEqual(planner.parse_cid("nf1-20260928-rth-ACME-long")["arm"], "core")  # prefixes stay distinct
+        self.assertEqual(planner.window_of(planner.REV, "rth"), planner.RTH)
+        self.assertEqual((REV_LIMITS.gross_cap, REV_LIMITS.per_order_cap, REV_LIMITS.net_cap),
+                         (E, Decimal("45000.00"), Decimal("90000.00")))
+
+    def test_operative_label_is_the_d22_prefix_rule(self):
+        self.assertEqual(planner.operative_label({"raw_output": "UNFLEXIBLE", "stop": "eos", "label": "PARSE_FAIL"}),
+                         ("UNFAVORABLE", -1, "prefix"))
+        self.assertEqual(planner.operative_label({"raw_output": "FAVORABLE\nGood news.", "stop": "eos"}), ("FAVORABLE", 1, "exact"))
+        self.assertEqual(planner.operative_label({"raw_output": "UNFAVORABLE", "stop": "context_overflow"})[0], "PARSE_FAIL")
+        self.assertEqual(planner.operative_label({"raw_output": "Maybe"})[0], "PARSE_FAIL")
+        self.assertEqual([planner.reversal_leg(x) for x in ("FAVORABLE", "UNFAVORABLE", "UNCLEAR", "PARSE_FAIL")],
+                         ["short", "long", None, None])
+
+    def test_against_the_label_at_the_touch(self):
+        d, i = self.plan(self.ev("FAVORABLE"), self.q())
+        # 45,000 / 99.95 -> 450 shares = 44,977.50; no price buffer: the limit is the bid itself
+        self.assertEqual((d["action"], d["leg"], i["side"], i["limit_price"], i["qty"], i["type"], i["time_in_force"]),
+                         ("enter", "short", "sell", "99.95", "450", "limit", "day"))
+        self.assertEqual((i["client_order_id"], d["est_notional"], d["arm"]), ("nf1r-20260925-rth-ACME-short", "44977.50", "rev"))
+        self.assertNotIn("extended_hours", i)
+        d, i = self.plan(self.ev("UNFAVORABLE"), self.q())
+        self.assertEqual((d["leg"], i["side"], i["limit_price"], i["qty"]), ("long", "buy", "100.05", "449"))
+        self.assertEqual((d["quote_bid"], d["quote_ask"], d["quote_mid"]), ("99.95", "100.05", "100.00"))
+        for label in ("UNCLEAR", "PARSE_FAIL"):
+            d, i = self.plan(self.ev(label), self.q())
+            self.assertEqual((d["action"], d["reason"], i), ("skip", f"label_{label.lower()}", None))
+
+    def test_the_entry_minute_and_the_quote_stamp(self):
+        ev = self.ev()
+        d, _ = self.plan(ev, self.q(), now=self.ENTRY - timedelta(seconds=1))
+        self.assertEqual((d["action"], d["reason"]), ("wait", "before_entry_time"))
+        d, _ = self.plan(ev, self.q(t=self.ENTRY - timedelta(seconds=1)))  # stamped before the entry: wait for a fresher one
+        self.assertEqual((d["action"], d["reason"]), ("wait", "quote_before_entry_time"))
+        d, _ = self.plan(ev, self.q(t=self.ENTRY), now=self.ENTRY + timedelta(seconds=60))  # both ends inclusive
+        self.assertEqual(d["action"], "enter")
+        d, _ = self.plan(ev, self.q(), now=self.ENTRY + timedelta(seconds=60, microseconds=1))
+        self.assertEqual((d["action"], d["reason"]), ("skip", "entry_late"))
+        d, _ = self.plan(ev, {"bp": 99.95, "ap": 100.05})
+        self.assertEqual(d["reason"], "quote_without_timestamp")
+
+    def test_spread_shorts_and_lanes(self):
+        d, i = self.plan(self.ev(), self.q(bp=99.7, ap=100.3))  # 60 bps
+        self.assertEqual((d["reason"], i, d["spread_bps"]), ("spread_above_50bps", None, "60.0"))
+        self.assertEqual(self.plan(self.ev(), self.q(bp=99.75, ap=100.25))[0]["action"], "enter")  # exactly 50 bps
+        self.assertEqual(self.plan(self.ev(ssr=True), self.q())[0]["reason"], "ssr_rule_201")  # a reversal short
+        self.assertEqual(self.plan(self.ev(asset={**ASSET_OK, "easy_to_borrow": False}), self.q())[0]["reason"], "not_easy_to_borrow")
+        self.assertEqual(self.plan(self.ev(asset={**ASSET_OK, "shortable": False}), self.q())[0]["reason"], "not_shortable")
+        self.assertEqual(self.plan(self.ev("UNFAVORABLE", ssr=True), self.q())[0]["action"], "enter")  # longs ignore Rule 201
+        self.assertEqual(self.plan(self.ev(lane=sig.SMALL), self.q())[0]["action"], "shadow")
+
+    def test_caps_and_net_headroom_as_the_runner_has_them(self):
+        x = planner.Exposure()
+        self.assertEqual(self.plan(self.ev(symbol="AAA"), self.q(), exposure=x)[0]["action"], "enter")
+        d2, _ = self.plan(self.ev(symbol="BBB"), self.q(), exposure=x)
+        self.assertEqual((d2["action"], d2["net_after"]), ("enter", "-89955.00"))
+        d3, i3 = self.plan(self.ev(symbol="CCC"), self.q(), exposure=x)  # 45 of headroom left: below one share
+        self.assertEqual((d3["reason"], i3), ("net_exposure_cap", None))
+        d4, i4 = self.plan(self.ev("UNFAVORABLE", symbol="DDD"), self.q(), exposure=x)  # a long reduces the net
+        self.assertEqual((d4["action"], i4["qty"]), ("enter", "449"))
+        self.assertEqual(self.plan(self.ev(symbol="AAA"), self.q(), exposure=x)[0]["reason"], "symbol_already_traded_today")
+        self.assertEqual(self.plan(self.ev(target="60000"), self.q())[0]["reason"], "per_order_notional_cap")
+
+    def test_momentum_shadow_mirrors_the_same_event_and_quote(self):
+        now = self.ENTRY + timedelta(seconds=3)
+        d, _ = planner.plan_rth_momentum_shadow(self.ev("FAVORABLE"), self.q(), now, date(2026, 9, 25), planner.Exposure(), BIG)
+        self.assertEqual((d["action"], d["leg"], d["limit_price"], d["arm"]), ("enter", "long", "100.05", "core"))
+        d, _ = planner.plan_rth_momentum_shadow(self.ev("UNFAVORABLE"), self.q(), now, date(2026, 9, 25), planner.Exposure(), BIG)
+        self.assertEqual((d["leg"], d["limit_price"]), ("short", "99.95"))
+
+    def test_first_headline_per_symbol_and_window(self):
+        base = {"symbol": "ACME", "session": "2026-09-25", "window": sig.RTH}
+        a = {**base, "event_id": "5:ACME", "news_id": "5", "created_at": z(ny(2026, 9, 25, 10))}
+        b = {**base, "event_id": "4:ACME", "news_id": "4", "created_at": z(ny(2026, 9, 25, 10, 1))}
+        c = {**base, "event_id": "3:ACME", "news_id": "3", "created_at": z(ny(2026, 9, 25, 10))}  # same second, lower id
+        other = {**base, "window": sig.OVERNIGHT, "event_id": "1:ACME", "news_id": "1", "created_at": z(ny(2026, 9, 24, 18))}
+        cands = [a, b, c, other]
+        self.assertEqual([planner.first_in_window(cands, e) for e in (a, b, c, other)], [False, False, True, True])
 
 
 class OvernightHold(unittest.TestCase):

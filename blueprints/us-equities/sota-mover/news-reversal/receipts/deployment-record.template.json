@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "kind": "news_reversal_deployment_record",
+  "protocol_id": "sota-news-reversal-forward-20260925",
+  "deployed_at": null,
+  "deployed_commit": null,
+  "service": "news-forward.service",
+  "service_working_directory": null,
+  "check_account_verdict": null,
+  "dry_run_check": null,
+  "note": "Template only: analyze.py refuses it (no deployed_at, no commit). Copy to deployment-record.json after the deployment steps in README.md; deployed_commit must descend from the freeze commit and deployed_at must be the UTC time the unit first started from it."
+}

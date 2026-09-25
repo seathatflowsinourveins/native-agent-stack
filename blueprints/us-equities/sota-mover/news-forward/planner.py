@@ -7,11 +7,21 @@ hard risk caps, per-arm client order ids and ledgers, order intents and
 reconciliation arithmetic.
 
 Arms (each with its own client-id prefix and gross cap):
-  core  nf1-       confirmatory path: open auction / RTH entry, CLS exit, flat by the close
+  core  nf1-       execution_test: open auction entry, CLS exit, flat by the close (its study,
+                   NEWS-1, failed, so it is not evidence); before the reversal switch date also
+                   the momentum RTH entry, afterwards shadow-only (no orders)
+  rev   nf1r-      preregistered rth_reversal (../news-reversal/forward-protocol.json): liquid
+                   RTH headlines, against the operative label at release + 15 min, marketable
+                   limit at the first valid quote's ask/bid within 60 s, CLS exit
   pm    nf1x-pm-   exploratory: 04:00-09:00 liquid headlines, extended-hours entry at
                    release + 15 min, CLS exit
   ah    nf1x-ah-   exploratory: 16:00-19:30 headlines, extended-hours entry at release
                    + 15 min, held overnight, exit at the next session's OPG
+
+Frozen study rules used here by path (``news_signal.py``): windows and guard A, guard B
+(``ingestion_guard`` on our own received_at, the study's id-based estimate recorded beside it),
+the narrowed D5 movement regex, novelty, lanes, Rule 201 (``ssr_carryover``/``ssr_flag``), the
+quote window of ``rth_entry_quote`` and, via the supervisor, the operative D22 label.
 """
 
 import bisect
@@ -30,9 +40,10 @@ NY = common.NY
 # Hard limits (the brief's numbers; the executor re-checks every order against them)
 # ---------------------------------------------------------------------------------------
 
-CORE, PM, AH = "core", "pm", "ah"
-ARM_PREFIX = {CORE: "nf1-", PM: "nf1x-pm-", AH: "nf1x-ah-"}
-ARM_LABEL = {CORE: "confirmatory_pilot", PM: "exploratory", AH: "exploratory"}
+CORE, PM, AH, REV = "core", "pm", "ah", "rev"
+ARM_PREFIX = {CORE: "nf1-", PM: "nf1x-pm-", AH: "nf1x-ah-", REV: "nf1r-"}
+# core: the overnight OPG/CLS arm's study (NEWS-1) failed, so its fills are an execution test only.
+ARM_LABEL = {CORE: "execution_test", PM: "exploratory", AH: "exploratory", REV: "preregistered_forward"}
 ORDER_PREFIX = ARM_PREFIX[CORE]
 MAX_NAMES_PER_LEG = 12
 # Section A sizing: notional_i = min(0.0015 E / sigma_i, 0.5% MDV20_i, 5% E)
@@ -58,7 +69,13 @@ EXT_FLATTEN_OFFSET = Decimal("0.005")
 AH_LAST_RELEASE = (19, 30)  # D2 takes headlines released 16:00-19:30 ET
 PM_LAST_RELEASE = (9, 0)    # D1 takes headlines released 04:00-09:00 ET
 RTH_ENTRY_GRACE = timedelta(minutes=sig.RTH_ENTRY_SEARCH_MINUTES)
-SSR_TRIGGER = Decimal("0.90")
+SSR_TRIGGER = Decimal("1") - Decimal(str(sig.SSR_DECLINE))  # 0.90, the study's Rule 201 decline
+# rth_reversal: the first valid SIP quote stamped in [release + 15 min, + 60 s] (news_signal.rth_entry_quote's
+# window) prices a marketable limit at its ask (buy) or bid (sell); a working entry is cancelled 60 s after
+# submission, so a position exists only if it filled inside the entry minute.
+REV_QUOTE_WINDOW = sig.RTH_QUOTE_WINDOW
+REV_ENTRY_TTL = sig.RTH_QUOTE_WINDOW
+REVERSAL_LEG = {"FAVORABLE": "short", "UNFAVORABLE": "long"}  # against the operative (D22) label
 
 # Session labels (what the user sees per stock group and timespan)
 OPEN_AUCTION = "open_auction"  # after-hours/overnight headline -> 09:30 OPG entry, CLS exit
@@ -183,12 +200,18 @@ def cls_submission_allowed(schedule, now):
 
 
 class Screener:
-    """Stateful but I/O-free: the 24-hour novelty tracker and the id-order index.
+    """Stateful but I/O-free: the 24-hour novelty tracker and the news-id index.
 
     Feed every received article (any symbol count) in (created_at, id) order. Returns a
-    candidate dict for a single-symbol Benzinga article that passes the relevance
-    (primary operating company), timestamp, D5 movement, novelty and id-order guards,
-    else a drop reason.
+    candidate dict for a single-symbol Benzinga article that passes the study's filters in
+    the study's order (prepare.scan_news: relevance and primary operating company, window,
+    guard A, D5 movement, novelty, headline year, then guard B), else a drop reason.
+
+    Guard B (the study's F11) compares an ingestion time with the window's decision cutoff
+    (news_signal.ingestion_guard). Live, the ingestion time is our own ``received_at`` (the
+    article must carry it; the poller stamps it); the study's estimate, max(created_at, p90
+    of the created_at of the 100 next-lower news ids seen), is recorded beside it and its
+    verdict journaled, but does not decide. The superseded id-order guard is not used.
     """
 
     def __init__(self, calendar, assets):
@@ -199,13 +222,14 @@ class Screener:
         self._times = {}  # id -> created_at epoch seconds
         self._last_prune_day = None
 
-    def _id_order_suspect(self, nid, created):
+    def estimated_ingestion(self, nid, created):
+        """The study's guard-B estimate (epoch s) over the next-lower ids seen so far (news_signal.estimated_ingestion)."""
+        created_ts = int(created.timestamp())
         if nid is None:
-            return False
+            return created_ts
         pos = bisect.bisect_left(self._ids, nid)
-        preds = [self._times[i] for i in self._ids[max(0, pos - sig.ID_ORDER_PREDECESSORS):pos]]
-        lag = sig.id_order_lag(preds, int(created.timestamp()))
-        return lag is not None and lag > sig.ID_ORDER_GUARD_SECONDS
+        preds = sorted(self._times[i] for i in self._ids[max(0, pos - sig.INGESTION_PREDECESSORS):pos])
+        return sig.estimated_ingestion(preds, created_ts)
 
     def screen(self, article):
         try:
@@ -260,8 +284,17 @@ class Screener:
             ckpt = sig.checkpoint_year(created)
         except ValueError:
             return None, "drop_headline_year_before_2016"
-        if self._id_order_suspect(nid, created):
-            return None, "drop_guard_id_order"
+        try:
+            received = sig.as_utc(article["received_at"]) if article.get("received_at") else None
+        except (ValueError, TypeError):
+            received = None
+        if received is None:
+            return None, "drop_guard_missing_received_at"  # guard B cannot be evaluated: fail closed
+        estimated = self.estimated_ingestion(nid, created)
+        est_ok, _ = sig.ingestion_guard(window, estimated)
+        ok, reason = sig.ingestion_guard(window, received.timestamp())
+        if not ok:
+            return None, f"drop_guard_{reason}"
         return {
             "news_id": raw_id,
             "event_id": f"{raw_id}:{symbol}",
@@ -277,6 +310,11 @@ class Screener:
             "session_label": session_label(window),
             "entry_utc": common.iso(window.entry_utc),
             "exit_utc": common.iso(window.exit_utc),
+            "decision_cutoff_utc": common.iso(window.decision_cutoff_utc),
+            "received_at": common.iso(received),
+            "ingestion_basis": "received_at",
+            "estimated_ingestion_at": common.iso(datetime.fromtimestamp(estimated, common.UTC)),
+            "estimated_ingestion_guard_ok": est_ok,
             "checkpoint_year": ckpt,
             "variant": sig.OPERATIVE_VARIANT,
         }, "ok"
@@ -332,26 +370,63 @@ def risk_notional(equity, sigma, mdv20, fraction=Decimal("1")):
     return (size * dec(fraction)).quantize(Decimal("0.01"), rounding=ROUND_DOWN)
 
 
-def ssr_active(calendar, trade_session, bars, today_low=None):
-    """Rule 201 short-sale restriction in force on trade_session, from pre-decision data.
+def ssr_carryover_from_bars(calendar, trade_session, bars):
+    """The study's Rule 201 carry-over (news_signal.ssr_carryover) from daily bars, or None when
+    the prior session's low or the close before it is missing (callers fail closed).
 
-    True when the previous session's low was at least 10% below the close before it
-    (carry-over to the next day), or when today's low so far is at least 10% below the
-    previous close. Missing data is treated as restricted (fail-closed: no short).
-    """
+    The study uses split-adjusted bars (the prior session's low <= 90% of the close of the
+    session before it); pass the split-adjusted bars when available."""
     by_day = bars_by_session(bars)
     prev = calendar.prior_sessions(trade_session, 2)
     if not prev:
-        return True
+        return None
     d2, d1 = prev
     if d1 not in by_day or d2 not in by_day:
+        return None
+    return sig.ssr_carryover(float(by_day[d1]["l"]), float(by_day[d2]["c"]))
+
+
+def ssr_active(calendar, trade_session, bars, today_low=None, adj_bars=None):
+    """Rule 201 short-sale restriction in force on trade_session, from pre-decision data.
+
+    True when the study's carry-over holds (news_signal.ssr_carryover on the split-adjusted
+    bars when given, else on `bars`), or when today's low so far is at least 10% below the
+    previous session's raw close (the live check of the day's own trigger). Missing data is
+    treated as restricted (fail-closed: no short).
+    """
+    carry = ssr_carryover_from_bars(calendar, trade_session, adj_bars if adj_bars else bars)
+    if carry is None or carry:
         return True
-    prev_close = dec(by_day[d1]["c"])
-    if dec(by_day[d1]["l"]) <= SSR_TRIGGER * dec(by_day[d2]["c"]):
+    prev = calendar.prior_sessions(trade_session, 1)
+    last = bars_by_session(bars).get(prev[-1]) if prev else None
+    if last is None:
         return True
-    if today_low is not None and dec(today_low) <= SSR_TRIGGER * prev_close:
+    if today_low is not None and dec(today_low) <= SSR_TRIGGER * dec(last["c"]):
         return True
     return False
+
+
+def ssr_state(calendar, trade_session, bars, adj_bars=None, entry_quote=None, today_low=None):
+    """Rule 201 components for an RTH short decision, fail-closed.
+
+    study_flag: news_signal.ssr_flag for an RTH event (the carry-over, or the entry quote's bid
+    <= 90% of the prior session's raw close); session_low_flag: today's low so far <= 90% of
+    that close (the live check of the day's own trigger, stricter than the study); data_missing:
+    the carry-over inputs or the prior close are unavailable. restricted = any of them.
+    """
+    carry = ssr_carryover_from_bars(calendar, trade_session, adj_bars if adj_bars else bars)
+    prev = calendar.prior_sessions(trade_session, 1)
+    last = bars_by_session(bars).get(prev[-1]) if prev else None
+    prior_close = float(last["c"]) if last else None
+    quote = None
+    if entry_quote and entry_quote.get("bp") and entry_quote.get("ap"):
+        quote = {"bid": float(entry_quote["bp"]), "ask": float(entry_quote["ap"]), "t": entry_quote.get("t")}
+    study = sig.ssr_flag({"ssr_carryover": bool(carry), "window": sig.RTH, "prior_close": prior_close}, quote)
+    low_flag = bool(today_low is not None and prior_close and dec(today_low) <= SSR_TRIGGER * dec(prior_close))
+    missing = carry is None or prior_close is None
+    return {"restricted": bool(missing or study or low_flag), "carryover": carry, "study_flag": bool(study),
+            "session_low_flag": low_flag, "data_missing": missing, "prior_close": prior_close,
+            "adjusted_bars": bool(adj_bars)}
 
 
 def short_allowed(asset, ssr):
@@ -366,6 +441,17 @@ def short_allowed(asset, ssr):
 
 def side_for_label(label):
     return {"FAVORABLE": LEG_LONG, "UNFAVORABLE": LEG_SHORT}.get(label)
+
+
+def reversal_leg(label):
+    """rth_reversal: FAVORABLE -> short, UNFAVORABLE -> long; UNCLEAR and PARSE_FAIL -> None (no trade)."""
+    return REVERSAL_LEG.get(label)
+
+
+def operative_label(score_row):
+    """(label, score, rule) of a scorer row by the study's operative D22 prefix rule
+    (news_signal.operative_score on raw_output and stop); the row's stored strict label is not used."""
+    return sig.operative_score((score_row or {}).get("raw_output"), (score_row or {}).get("stop"))
 
 
 # ---------------------------------------------------------------------------------------
@@ -431,6 +517,8 @@ def is_entry(info, side):
 def window_of(arm, stage):
     if arm == CORE:
         return {"opg": OPEN_AUCTION, "rth": RTH}.get(stage)
+    if arm == REV:
+        return RTH if stage == "rth" else None
     return EXT_PRE if arm == PM else EXT_POST
 
 
@@ -578,8 +666,8 @@ def contract_envelope(intent):
 
 @dataclass(frozen=True)
 class Limits:
-    """Per-arm caps: gross = L x E (core) or 0.25 E (each arm); per order = 5% E;
-    net = |long - short| notional per window <= 0.10 E."""
+    """Per-arm caps: gross = L x E (core and rev) or 0.25 E (each exploratory arm); per order
+    = 5% E; net = |long - short| notional per window <= 0.10 E."""
     equity: Decimal
     gross_cap: Decimal
     per_order_cap: Decimal
@@ -588,7 +676,7 @@ class Limits:
     @classmethod
     def for_arm(cls, arm, equity, leverage, extra_cap=None):
         e = dec(equity)
-        gross = dec(leverage) * e if arm == CORE else ARM_GROSS_FRACTION * e
+        gross = dec(leverage) * e if arm in (CORE, REV) else ARM_GROSS_FRACTION * e
         if extra_cap is not None:
             gross = min(gross, dec(extra_cap))
         return cls(e, gross, MAX_NAME_FRACTION * e, NET_CAP_FRACTION * e)
@@ -891,20 +979,36 @@ def spread_bps(bid, ask):
     return (ask - bid) / ((ask + bid) / 2) * Decimal("10000")
 
 
+def quote_fields(quote):
+    """The decision quote as journaled (bid, ask, stamp, mid); empty without a two-sided quote."""
+    q = quote or {}
+    if not q.get("bp") or not q.get("ap"):
+        return {}
+    return {"quote_bid": str(dec(q["bp"])), "quote_ask": str(dec(q["ap"])), "quote_t": q.get("t"),
+            "quote_mid": str((dec(q["bp"]) + dec(q["ap"])) / 2)}
+
+
 def _marketable_entry(ev, quote, now, session_date, exposure, limits, *, arm, window_label, stage, max_bps,
-                      long_mult, short_mult, extended, account=None):
+                      long_mult, short_mult, extended, account=None, leg_for=side_for_label, grace=RTH_ENTRY_GRACE,
+                      quote_window=None):
+    """(decision, intent|None) for one scored event at its entry time.
+
+    leg_for maps the label to a leg; the entry may happen until entry + grace. With
+    quote_window, the quote must be stamped in [entry, entry + quote_window] (the study's
+    rth_entry_quote window): an older quote means "wait" for a fresher one.
+    """
     base = {"event_id": ev.get("event_id"), "symbol": ev["symbol"], "session_label": window_label,
             "lane": ev.get("lane"), "label": ev.get("label"), "arm": arm}
     if ev.get("lane") != sig.LIQUID:
         return {**base, "action": "shadow", "reason": f"lane_{ev.get('lane')}_shadow_only"}, None
-    leg = side_for_label(ev.get("label"))
+    leg = leg_for(ev.get("label"))
     if leg is None:
         return {**base, "action": "skip", "reason": f"label_{str(ev.get('label')).lower()}"}, None
     base["leg"] = leg
     entry = sig.as_utc(ev["entry_utc"])
     if now < entry:
         return {**base, "action": "wait", "reason": "before_entry_time"}, None
-    if now - entry > RTH_ENTRY_GRACE:
+    if now - entry > grace:
         return {**base, "action": "skip", "reason": "entry_late"}, None
     if leg == LEG_SHORT:
         ok, why = short_allowed(ev.get("asset"), ev.get("ssr", True))
@@ -914,6 +1018,18 @@ def _marketable_entry(ev, quote, now, session_date, exposure, limits, *, arm, wi
         return {**base, "action": "skip", "reason": "not_tradable"}, None
     if not quote or not quote.get("bp") or not quote.get("ap"):
         return {**base, "action": "skip", "reason": "no_two_sided_quote"}, None
+    base.update(quote_fields(quote))
+    if quote_window is not None:
+        try:
+            stamped = sig.as_utc(quote["t"]) if quote.get("t") else None
+        except (ValueError, TypeError):
+            stamped = None
+        if stamped is None:
+            return {**base, "action": "skip", "reason": "quote_without_timestamp"}, None
+        if stamped < entry:
+            return {**base, "action": "wait", "reason": "quote_before_entry_time"}, None
+        if stamped > entry + quote_window:
+            return {**base, "action": "skip", "reason": "quote_after_entry_window"}, None
     bps = spread_bps(quote["bp"], quote["ap"])
     if bps is None:
         return {**base, "action": "skip", "reason": "crossed_or_invalid_quote"}, None
@@ -946,10 +1062,38 @@ def _marketable_entry(ev, quote, now, session_date, exposure, limits, *, arm, wi
 
 
 def plan_rth_entry(ev, quote, now, session_date, exposure, limits, account=None):
-    """(decision, intent|None) for one scored core RTH event at release + 15 min."""
+    """(decision, intent|None) for one scored core (momentum) RTH event at release + 15 min (pilot days)."""
     return _marketable_entry(ev, quote, now, session_date, exposure, limits, arm=CORE, window_label=RTH,
                              stage=SESSION_CODE[RTH], max_bps=MAX_SPREAD_BPS, long_mult=LONG_LIMIT_MULT,
                              short_mult=SHORT_LIMIT_MULT, extended=False, account=account)
+
+
+def plan_rth_reversal_entry(ev, quote, now, session_date, exposure, limits, account=None):
+    """(decision, intent|None) for the preregistered rth_reversal arm (forward-protocol.json rule).
+
+    Liquid lane only; against the operative label (FAVORABLE -> short, UNFAVORABLE -> long;
+    UNCLEAR and PARSE_FAIL -> no trade); at release + 15 min, on the first quote stamped in
+    [entry, entry + 60 s]: a marketable day limit at its ask (buy) or bid (sell), skipped
+    above a 50 bps spread; shorts need shortable, easy-to-borrow and no Rule 201 flag
+    (ev["ssr"]); section-A size, the rev arm's caps and its RTH window's net cap.
+    """
+    return _marketable_entry(ev, quote, now, session_date, exposure, limits, arm=REV, window_label=RTH,
+                             stage=SESSION_CODE[RTH], max_bps=MAX_SPREAD_BPS, long_mult=Decimal("1"),
+                             short_mult=Decimal("1"), extended=False, account=account, leg_for=reversal_leg,
+                             grace=REV_QUOTE_WINDOW, quote_window=REV_QUOTE_WINDOW)
+
+
+def plan_rth_momentum_shadow(ev, quote, now, session_date, exposure, limits):
+    """The momentum decision on the same event and quote, for comparison only (never an order).
+
+    Mirror of plan_rth_reversal_entry with the label's own direction (FAVORABLE -> long,
+    UNFAVORABLE -> short) at the same touch; the caller passes a shadow exposure so the
+    shadow never consumes the real arms' caps.
+    """
+    return _marketable_entry(ev, quote, now, session_date, exposure, limits, arm=CORE, window_label=RTH,
+                             stage=SESSION_CODE[RTH], max_bps=MAX_SPREAD_BPS, long_mult=Decimal("1"),
+                             short_mult=Decimal("1"), extended=False, leg_for=side_for_label,
+                             grace=REV_QUOTE_WINDOW, quote_window=REV_QUOTE_WINDOW)
 
 
 def plan_ext_entry(ev, quote, now, session_date, exposure, limits, arm, account=None):
@@ -962,6 +1106,17 @@ def plan_ext_entry(ev, quote, now, session_date, exposure, limits, arm, account=
     return _marketable_entry(ev, quote, now, session_date, exposure, limits, arm=arm, window_label=label,
                              stage="ent", max_bps=EXT_MAX_SPREAD_BPS, long_mult=EXT_LONG_LIMIT_MULT,
                              short_mult=EXT_SHORT_LIMIT_MULT, extended=True, account=account)
+
+
+def first_in_window(candidates, cand):
+    """True when `cand` is the earliest (created_at, news_id) candidate of its (symbol, session,
+    window) among `candidates` (the study's F13, news_signal.first_per_window). Guard B makes
+    this decidable at the entry time: an earlier-created candidate that passes guard B was
+    received by its own cutoff, which precedes this candidate's entry time."""
+    same = [c for c in candidates if c["symbol"] == cand["symbol"] and c["session"] == cand["session"]
+            and c.get("window") == cand.get("window")]
+    firsts = sig.first_per_window(same)
+    return bool(firsts) and firsts[0]["event_id"] == cand["event_id"]
 
 
 def overnight_hold_allowed(calendar, day):

@@ -7,5 +7,10 @@
   "pm": {"orders_from": "2026-09-28", "note": "pm entries fall before 09:15, and no order may precede 09:15 on 2026-09-25: intents are journaled only today"},
   "ah": {"orders_from": "2026-09-25", "note": "enabled 2026-09-25 after the ah flow and corporate-action guard tests passed; entries from 16:15 ET only when the next session is the next calendar day (never Fridays or pre-holiday days), exits at the next session's OPG"}
  },
+ "rth_reversal": {
+  "enabled": true,
+  "from": "2026-09-28",
+  "note": "From this session the RTH window runs the preregistered rth_reversal arm (nf1r-, ../news-reversal/forward-protocol.json) and the momentum RTH entries are journaled as shadow decisions only. Paper orders need mode paper. Which sessions count is decided only by news-reversal/analyze.py (the first regular session after both the protocol freeze and the deployment record); sessions before that are pre-freeze shakedown, never evidence."
+ },
  "note": "Set mode to paper only after `executor.py check-account` prints ready_for_paper for alpaca-paper-3.env; a paper start that fails any account check runs as dry-run and journals the refusal."
 }

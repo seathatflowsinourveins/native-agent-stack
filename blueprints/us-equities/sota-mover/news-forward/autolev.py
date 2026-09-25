@@ -3,7 +3,8 @@
 Daily decision, logged with every input:
 
   1. Input: the strategy's daily net returns on gross notional, from counted sessions
-     only (rows whose evidence label is not ``pilot``).
+     only (rows whose evidence label is neither ``pilot`` nor ``execution_test``). The
+     rth_reversal arm is sized at the floor (no rows) during its sequential test.
   2. Shrunk mean  mu = n * xbar / (n + 60)   (a 60-session prior centred on 0);
      sigma: EWMA standard deviation with a 20-session half-life (deviations from xbar,
      weights 0.5 ** (age / 20), age 0 = the latest session).
@@ -42,17 +43,21 @@ MIN_ROUND_TRIPS = 100
 Z_95_ONE_SIDED = 1.645
 
 
+NOT_EVIDENCE_LABELS = ("pilot", "execution_test")  # execution_test: the core arm once its study (NEWS-1) failed
+
+
 def counted(rows):
     """Daily rows that count as evidence, one per session in session order (M8).
 
     The last row written for a session wins (a restart can reconcile twice); rows labelled
-    pilot and days whose core arm was not flat at the reconciliation are excluded.
+    pilot or execution_test and days whose core arm was not flat at the reconciliation are
+    excluded.
     """
     by_session = {}
     for r in rows:
         by_session[r["session"]] = r
     return [r for _, r in sorted(by_session.items())
-            if r.get("evidence_label") != "pilot" and r.get("core_flat", False) is True]
+            if r.get("evidence_label") not in NOT_EVIDENCE_LABELS and r.get("core_flat", False) is True]
 
 
 def shrunk_mean(xs):

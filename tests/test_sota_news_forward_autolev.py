@@ -69,6 +69,11 @@ class Gate(unittest.TestCase):
         level, inputs = autolev.kelly_leverage(rows(self.GOOD, trips=10, label="pilot"))
         self.assertEqual((level, inputs["n_sessions"], inputs["gate_passed"]), (Decimal("1.0"), 0, False))
 
+    def test_execution_test_rows_are_excluded(self):
+        # the overnight core arm is an execution test once its study (NEWS-1) failed: never evidence for leverage
+        level, inputs = autolev.kelly_leverage(rows(self.GOOD, trips=10, label="execution_test"))
+        self.assertEqual((level, inputs["n_sessions"], inputs["gate_passed"]), (Decimal("1.0"), 0, False))
+
     def test_needs_20_sessions(self):
         level, inputs = autolev.kelly_leverage(rows(self.GOOD[:19], trips=10))
         self.assertFalse(inputs["gate"]["n_ge_20"])
