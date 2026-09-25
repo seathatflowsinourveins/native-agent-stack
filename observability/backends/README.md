@@ -308,3 +308,9 @@ registration are checked by `tests/test_observability_backends_alerts.py`,
 which runs `promtool test rules` over the rendered rule, and by
 `tests/test_adaptive_paper_metrics.py`, whose `FileSdRegistrationTests` run
 real exporter processes.
+
+The WSL workstation's post-merge rollout is recorded in
+[`paper-alert-file-sd-host-20260925.json`](paper-alert-file-sd-host-20260925.json).
+It was applied surgically, keeping the host's shifted loopback ports, and the
+rule read back empty with nothing registered. Silence 87eabf8a was then
+expired early.

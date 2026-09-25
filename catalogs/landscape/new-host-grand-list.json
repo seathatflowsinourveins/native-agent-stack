@@ -1136,7 +1136,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": true,
               "bootstrap_version": "0.13.13"
             },
@@ -3062,11 +3062,11 @@
       "candidate:typesafe-ai-skills"
     ],
     "e2e_accepted": {
-      "linux-wsl2-x86_64": 16,
+      "linux-wsl2-x86_64": 15,
       "macos-arm64": 0
     },
     "e2e_host_verified": {
-      "linux-wsl2-x86_64": 32,
+      "linux-wsl2-x86_64": 33,
       "macos-arm64": 6
     },
     "bootstrap_pinned": {
