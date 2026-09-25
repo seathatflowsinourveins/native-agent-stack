@@ -285,11 +285,14 @@ class TextReplaceAndFrozenTests(SwitchFixture):
         self.unit_path.write_text(f"[Service]\nEnvironment=PATH={real_root}/bin\nExecStart={real_root}/bin/bar\n")
         self.original_unit_text = self.unit_path.read_text()
 
-    def write_bar_spec(self, surface_path, expected_count=2):
+    def write_bar_spec(self, surface_path, expected_count=2, expected_pre_sha256=None):
+        surface = {"kind": "text-replace", "path": str(surface_path), "expected_count": expected_count}
+        if expected_pre_sha256 is not None:
+            surface["expected_pre_sha256"] = expected_pre_sha256
         self.write_components({"bar": {
             "version": "1.0.0", "kind": "tarball", "root_name": "bar-1.0.0", "current_link": "current/bar",
             "entrypoints": [{"bin": "bin/bar", "in_root": "bin/bar"}],
-            "surfaces": [{"kind": "text-replace", "path": str(surface_path), "expected_count": expected_count}],
+            "surfaces": [surface],
             "state_dirs": [], "window": "default", "rollback_class": "safe",
         }})
 
@@ -302,6 +305,56 @@ class TextReplaceAndFrozenTests(SwitchFixture):
         backups = list((self.root / "switch" / "backups").rglob("*.orig"))
         self.assertEqual(len(backups), 1)
         self.assertEqual(backups[0].read_text(), self.original_unit_text)
+
+    def test_relink_is_idempotent_for_a_component_with_a_text_replace_surface(self):
+        # Minor finding: a plain second `adopt --relink` used to re-search the already-rewritten
+        # file for the original real-root text (0 occurrences), raising after the bin/* link ops
+        # were already ledgered and leaving an in_progress txn -- RelinkTests.test_relink_is_
+        # idempotent only ever covered a component with no surfaces[] at all.
+        self.write_bar_spec(self.unit_path)
+        self.relink("bar")
+        after_first = self.unit_path.read_text()
+        backups_after_first = len(list((self.root / "switch" / "backups").rglob("*.orig")))
+        text_replace_ops_after_first = sum(1 for e in switch.Ledger(self.root).all() if e["op"] == "text-replace")
+
+        self.relink("bar")
+        self.assertEqual(self.unit_path.read_text(), after_first, "a re-run must leave the surface unchanged")
+        self.assertEqual(len(list((self.root / "switch" / "backups").rglob("*.orig"))), backups_after_first,
+                         "an already-migrated surface must not be backed up again")
+        text_replace_ops_after_second = sum(1 for e in switch.Ledger(self.root).all() if e["op"] == "text-replace")
+        self.assertEqual(text_replace_ops_after_second, text_replace_ops_after_first,
+                         "an already-migrated surface must not add a new ledger entry")
+        # No leftover in_progress txn from the second (no-op) relink.
+        recover_result = run(self.env, "recover")
+        self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
+        self.assertEqual(json.loads(recover_result.stdout)["recovered_txns"], [])
+
+    def test_relink_checks_the_expected_pre_image_sha256_when_the_surface_declares_one(self):
+        # Previously-unresolved finding: expected_pre_sha256 existed only as an op_text_replace
+        # parameter no production caller ever passed. adopt --relink is that caller for a
+        # text-replace surface; a pins-v2 entry can now declare one to refuse a surface that
+        # drifted from what the pin was written against, rather than blindly rewriting it.
+        wrong_sha = "0" * 64
+        self.write_bar_spec(self.unit_path, expected_pre_sha256=wrong_sha)
+        before_real = os.path.realpath(self.root / "bin" / "bar")
+        result = run(self.env, "adopt", "--relink")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("pre-image", result.stderr)
+        self.assertEqual(self.unit_path.read_text(), self.original_unit_text)
+        # Same partial-relink-failure shape as test_recover_rolls_back_a_relink_that_failed_
+        # partway: the current/bar and bin/bar link ops already ledgered before this surface's
+        # own precondition check ran are left in_progress, not silently applied, and `recover`
+        # cleans them up rather than leaving bin/bar pointed at a relink that never finished.
+        recover_result = run(self.env, "recover")
+        self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
+        self.assertEqual(len(json.loads(recover_result.stdout)["recovered_txns"]), 1)
+        self.assertEqual(os.path.realpath(self.root / "bin" / "bar"), before_real)
+
+        right_sha = switch.sha256_bytes(self.unit_path.read_bytes())
+        self.write_bar_spec(self.unit_path, expected_pre_sha256=right_sha)
+        result = run(self.env, "adopt", "--relink")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(str(self.root / "current" / "bar"), self.unit_path.read_text())
 
     def test_relink_refuses_a_frozen_surface(self):
         frozen = self.root / "frozen" / "thing.txt"
@@ -462,6 +515,39 @@ class ApplyGateTests(SwitchFixture):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("supersed", result.stderr.lower())
         self.assertEqual(self.run_entrypoint(), "v3", "the superseded rollback must never have touched current/foo")
+
+    def test_recover_refuses_to_clobber_a_txn_a_later_apply_already_superseded(self):
+        # Previously-unresolved finding: the superseded-txn refusal above only ever protected a
+        # manual `rollback --txn` (cmd_rollback's own pre-check). `recover` -- reconciling any
+        # txn still in_progress after a crash -- calls rollback_txn directly, with no equivalent
+        # check, so a crashed txn whose component a *later*, successful apply has since moved on
+        # would be blindly reversed, silently clobbering that later apply.
+        crashed_txn = "crashed-1"
+        ledger = switch.Ledger(self.root)
+        ledger.append(txn=crashed_txn, op="txn_begin", component="foo", surface="_txn")
+        # Really move the link (as a real apply's own link step would), but never append
+        # verify_pass -- simulating a crash right after the link, before the post-apply verify.
+        fields, _inverse = switch.op_link(self.root, "current/foo", str(self.root_v2.resolve()))
+        ledger.append(txn=crashed_txn, op="link", component="foo", surface="current/foo", **fields)
+        self.assertEqual(self.run_entrypoint(), "v2")
+
+        # A later, real apply succeeds and moves "foo" on again -- superseding the crashed txn.
+        root_v3 = self.make_tool_root("foo-3.0.0", "v3")
+        self.write_receipt("R3", "foo", "3.0.0")
+        later = self.apply("foo", root_v3, "R3")
+        self.assertEqual(later.returncode, 0, later.stderr)
+        self.assertEqual(self.run_entrypoint(), "v3")
+
+        recover_result = run(self.env, "recover")
+        payload = json.loads(recover_result.stdout)
+        self.assertNotIn(crashed_txn, payload["recovered_txns"],
+                         "a superseded in_progress txn must not be silently reversed")
+        self.assertTrue(any(crashed_txn in problem and "supersed" in problem.lower()
+                            for problem in payload["rollback_problems"]), payload["rollback_problems"])
+        # current/foo must still point at the later, real apply's root -- never clobbered.
+        self.assertEqual(self.run_entrypoint(), "v3")
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["components"]["foo"]["current"], str(root_v3.resolve()))
 
     def test_confirm_refuses_a_rolled_back_txn(self):
         self.write_receipt("R1", "foo", "2.0.0")
@@ -654,6 +740,24 @@ class ConfirmAndRevertTests(SwitchFixture):
         self.assertEqual(self.run_entrypoint(), "v1")
         state = json.loads(run(self.env, "status", "--json").stdout)
         self.assertEqual(state["components"]["foo"]["current"], str(self.root_v1.resolve()))
+
+    def test_confirm_refuses_an_in_progress_txn(self):
+        # Previously-unresolved finding: confirming a crashed/interrupted apply (still
+        # in_progress: never reached a post-apply verify) used to mark it "applied" through the
+        # ledger alone, and recover only ever reconciles a txn still "in_progress" -- so it would
+        # then never see that transaction again either, contradicting lifecycle.md's "a crashed
+        # or interrupted apply never completes after the fact".
+        ledger = switch.Ledger(self.root)
+        ledger.append(txn="crashed-1", op="txn_begin", component="synthetic", surface="_txn")
+        ledger.append(**{"txn": "crashed-1", "op": "link", "component": "synthetic",
+                         "surface": "current/synthetic", "from": None, "to": "/does/not/matter"})
+        result = run(self.env, "confirm", "--txn", "crashed-1")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in_progress", result.stderr)
+        # recover must still see it and roll it back -- confirm must not have "completed" it.
+        recover_result = run(self.env, "recover")
+        self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
+        self.assertEqual(json.loads(recover_result.stdout)["recovered_txns"], ["crashed-1"])
 
 
 @REQUIRES_PROCFS
@@ -967,6 +1071,36 @@ class PruneTests(SwitchFixture):
         paths = {c["path"]: c["eligible"] for c in listing["candidates"]}
         self.assertEqual(paths.get(str(stale)), True)
         self.assertNotIn(str(active), paths)
+
+    def test_wrapper_script_text_reference_blocks_a_prune_candidate(self):
+        # Previously-unresolved finding: a wrapper script (e.g. ~/codex-ecosystem/bin/
+        # gitleaks-guarded) that hard-codes a tools/<root_name> path as plain text, with no bin/
+        # symlink, unit file or PATH entry naming it, used to be entirely invisible to prune --
+        # --apply would delete a root a live wrapper still depends on.
+        active = self.make_tool_root("foo-2.0.0", "v2")
+        stale = self.make_tool_root("foo-1.0.0", "v1")
+        self.link_entrypoint("foo", active / "bin" / "foo")
+        self.write_components({"foo": {
+            "version": "2.0.0", "kind": "tarball", "root_name": "foo-2.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}], "surfaces": [], "state_dirs": [],
+            "window": "default", "rollback_class": "safe",
+        }})
+        self.relink("foo")
+        wrapper_dir = Path(self.tmp.name) / "wrappers"
+        wrapper_dir.mkdir()
+        wrapper = wrapper_dir / "foo-guarded"
+        wrapper.write_text(f"#!/bin/sh\nexec {stale}/bin/foo \"$@\"\n")
+        wrapper.chmod(0o755)
+        env = {**self.env, "ECOSYSTEM_SWITCH_WRAPPER_DIRS": str(wrapper_dir)}
+        listing = json.loads(run(env, "prune", "--list").stdout)
+        match = next(c for c in listing["candidates"] if c["path"] == str(stale))
+        self.assertFalse(match["eligible"])
+        self.assertTrue(any("wrapper script" in reason and str(wrapper) in reason for reason in match["blocked_by"]),
+                        match["blocked_by"])
+        # --apply must also refuse it, not just --list report it.
+        result = run(env, "prune", "--apply", str(stale), "--reason", "test")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertTrue(stale.exists())
 
     def test_apply_removes_an_eligible_root_and_records_a_reason(self):
         active = self.make_tool_root("foo-2.0.0", "v2")

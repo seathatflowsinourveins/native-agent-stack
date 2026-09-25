@@ -997,6 +997,15 @@ def cmd_confirm(args) -> int:
             raise SwitchError(f"txn {args.txn!r} was already rolled back; cannot confirm it")
         if record.get("status") == "verify_failed":
             raise SwitchError(f"txn {args.txn!r} failed its post-apply verify; cannot confirm it")
+        if record.get("status") == "in_progress":
+            # Previously-unresolved finding: a crashed/interrupted apply never reached
+            # verify_pass, so confirming it would mark a half-applied component "applied"
+            # through the ledger without it ever having passed a post-apply verify -- and
+            # cmd_recover only reconciles a txn still "in_progress", so it would then never see
+            # this one again either. lifecycle.md: "A crashed or interrupted apply ... never
+            # completes after the fact"; run `recover` (or `rollback --txn`), not `confirm`.
+            raise SwitchError(f"txn {args.txn!r} is still in_progress (never reached a post-apply "
+                               "verify); run 'recover' or 'rollback --txn' to reconcile it, not confirm")
         ledger = Ledger(root)
         ledger.append(txn=args.txn, op="txn_confirm", component=record.get("component"), surface="_txn", to="confirmed")
         with contextlib.suppress(SwitchError):
@@ -1017,6 +1026,25 @@ def rollback_txn(root: Path, txn: str) -> list[str]:
     ``from`` (that field is the pre-restart MainPID, not a root path, and can never match)."""
     ledger = Ledger(root)
     entries = [entry for entry in ledger.for_txn(txn) if entry.get("op") in OPERATION_KINDS]
+    # Previously-unresolved finding: cmd_rollback's own "superseded" pre-check (below, for a
+    # manual `rollback --txn`) never protected cmd_recover, which -- reconciling any txn still
+    # in_progress after a crash -- calls this function directly, with no chance for that
+    # caller-side check to run first. Duplicating the same rule here is what actually protects
+    # every caller: re-pointing current/<id> back to this txn's old root after a *later*,
+    # already-applied txn on the same component has since moved it on would silently clobber
+    # that later apply. Safe for apply's own automatic rollback too: that call always targets the
+    # txn it just began, and build_apply_plan always includes exactly one "link" step, so by the
+    # time a post-apply verify can fail, this txn is necessarily still its component's own
+    # updated_txn.
+    component_ids = {entry.get("component") for entry in entries if entry.get("component")}
+    if len(component_ids) == 1:
+        (component_id,) = component_ids
+        current_component_state = load_state(root)["components"].get(component_id) or {}
+        superseding_txn = current_component_state.get("updated_txn")
+        if superseding_txn not in (None, txn):
+            raise SwitchError(f"txn {txn!r} is no longer the latest change to component {component_id!r} "
+                               f"(a later txn {superseding_txn!r} already moved it on); refusing to roll "
+                               "back a superseded txn and clobber that later apply")
     problems: list[str] = []
     component = None
     backup_dir = root / "switch" / "backups" / txn
@@ -1176,8 +1204,15 @@ def cmd_recover(args) -> int:
         rollback_problems: list[str] = []
         for txn, record in state["txns"].items():
             if record.get("status") == "in_progress":
-                rollback_problems.extend(rollback_txn(root, txn))
-                recovered.append(txn)
+                try:
+                    rollback_problems.extend(rollback_txn(root, txn))
+                    recovered.append(txn)
+                except SwitchError as error:
+                    # rollback_txn's own superseded-txn refusal (a later, already-applied txn on
+                    # the same component moved it on since this one crashed): report it and keep
+                    # reconciling every other in_progress txn in this run instead of aborting the
+                    # whole recover on the first one that is unsafe to blindly reverse.
+                    rollback_problems.append(f"{txn}: {error}")
         problems = Ledger(root).verify_chain()
         print(json.dumps({"recovered_txns": recovered, "ledger_chain_ok": not problems, "ledger_problems": problems,
                           "rollback_problems": rollback_problems}))
@@ -1255,6 +1290,40 @@ def _systemd_user_unit_files_referencing(needle: str) -> list[str]:
     return hits
 
 
+def wrapper_scan_dirs() -> list[Path]:
+    """Directories of host-local wrapper scripts outside ``$ECO_INSTALL_ROOT`` (so none of
+    prune_candidates's other scans -- PATH, bin/ symlinks, unit files, this user's own
+    processes -- ever see them) whose plain script *text* can hard-code a tools/<root_name> path
+    with no symlink, unit or PATH entry naming it at all: switch.md's Facts section names
+    ``gitleaks-guarded``, ``mcp-inspector-2.7.0-guarded`` and ``serena-context`` under
+    ``~/codex-ecosystem/bin`` as exactly this shape. ``ECOSYSTEM_SWITCH_WRAPPER_DIRS`` (a
+    PATH-style, ``os.pathsep``-separated list) overrides the default, so a test never depends on
+    this host's own ``~/codex-ecosystem`` and a different host's layout is not hard-coded here."""
+    override = os.environ.get("ECOSYSTEM_SWITCH_WRAPPER_DIRS")
+    if override is not None:
+        return [Path(entry) for entry in override.split(os.pathsep) if entry]
+    return [Path.home() / "codex-ecosystem" / "bin"]
+
+
+def _wrapper_scripts_referencing(needle: str) -> list[str]:
+    """Paths of regular (non-symlink) files under wrapper_scan_dirs() whose text names
+    ``needle`` -- catches a wrapper that hard-codes a tools/<root_name> path as plain script
+    text (see wrapper_scan_dirs), the one prune in-use signal switch.md's own prune scope note
+    used to say this tool never checked."""
+    hits = []
+    for directory in wrapper_scan_dirs():
+        if not directory.is_dir():
+            continue
+        with contextlib.suppress(OSError):
+            for candidate in sorted(directory.iterdir()):
+                if candidate.is_symlink() or not candidate.is_file():
+                    continue
+                with contextlib.suppress(OSError, UnicodeDecodeError):
+                    if needle in candidate.read_text(encoding="utf-8"):
+                        hits.append(str(candidate))
+    return hits
+
+
 def prune_candidates(root: Path) -> list[dict]:
     state = load_state(root)
     referenced_roots = {info["current"] for info in state["components"].values() if info.get("current")}
@@ -1292,6 +1361,8 @@ def prune_candidates(root: Path) -> list[dict]:
                 in_use_reasons.append(f"referenced by running process {pid}")
             for unit_name in _systemd_user_unit_files_referencing(str(child)):
                 in_use_reasons.append(f"referenced by systemd --user unit file {unit_name}")
+            for wrapper_path in _wrapper_scripts_referencing(str(child)):
+                in_use_reasons.append(f"referenced by wrapper script {wrapper_path}")
             candidates.append({"path": str(child), "eligible": not in_use_reasons, "blocked_by": in_use_reasons})
     return candidates
 
@@ -1305,12 +1376,15 @@ def cmd_prune(args) -> int:
                 "candidates": candidates,
                 "scope_note": ("Reduced-scope in-use check relative to bin/ecosystem-wave-retention on the "
                                "host: PATH entries, bin/ symlink targets, this user's own running processes "
-                               "(exe/cwd/cmdline) and this user's systemd --user unit file text, plus every "
-                               "unconfirmed or not-yet-rolled-back txn's previous root. No mount/symlink-hop/"
-                               "citation scan, and no check of hard-coded roots inside wrapper scripts under "
-                               "adoption/tools/ (this tool only ever reads $ECO_INSTALL_ROOT, not the catalog "
-                               "checkout). Treat 'eligible' as a lead, not a guarantee; a future qualify wave "
-                               "should reuse that script's fuller technique."),
+                               "(exe/cwd/cmdline), this user's systemd --user unit file text, and the "
+                               "wrapper-script text under wrapper_scan_dirs() (default ~/codex-ecosystem/bin, "
+                               "override ECOSYSTEM_SWITCH_WRAPPER_DIRS) -- e.g. gitleaks-guarded, "
+                               "mcp-inspector-2.7.0-guarded -- plus every unconfirmed or not-yet-rolled-back "
+                               "txn's previous root. No mount/symlink-hop scan, and no check of hard-coded "
+                               "roots inside adoption/tools/'s own tracked wrapper copies (this tool only ever "
+                               "reads $ECO_INSTALL_ROOT and wrapper_scan_dirs(), not the catalog checkout). "
+                               "Treat 'eligible' as a lead, not a guarantee; a future qualify wave should reuse "
+                               "bin/ecosystem-wave-retention's fuller technique."),
             }, sort_keys=True, indent=2))
             return 0
         if args.apply:
@@ -1415,9 +1489,26 @@ def cmd_adopt(args) -> int:
                         continue
                     if surface.get("kind") == "text-replace":
                         old_text = surface.get("old", real_root)
+                        expected_count = surface.get("expected_count", 1)
+                        target_path = root / surface["path"] if not surface["path"].startswith("/") else Path(surface["path"])
+                        already_migrated = False
+                        with contextlib.suppress(OSError):
+                            current_bytes = target_path.read_bytes()
+                            already_migrated = (current_bytes.count(old_text.encode("utf-8")) == 0
+                                                 and current_bytes.count(current_link_absolute.encode("utf-8")) >= expected_count)
+                        if already_migrated:
+                            # Idempotent re-run (minor finding): a prior relink already replaced
+                            # every occurrence of old_text here and current_link_absolute is
+                            # already present -- re-searching for text that is now gone would
+                            # otherwise raise, contradicting README/lifecycle.md's "re-running
+                            # leaves everything unchanged". A surface where old_text is genuinely
+                            # absent AND the new text never landed (misconfigured, not merely
+                            # already-done) still falls through to op_text_replace below, which
+                            # correctly refuses with "expected N, found 0".
+                            continue
                         fields, _inverse = op_text_replace(root, surface["path"], old_text, current_link_absolute,
-                                                            backup_dir=backup_dir,
-                                                            expected_count=surface.get("expected_count", 1))
+                                                            backup_dir=backup_dir, expected_count=expected_count,
+                                                            expected_pre_sha256=surface.get("expected_pre_sha256"))
                         ledger.append(txn=txn, op="text-replace", component=component_id, surface=surface["path"],
                                       rollback_class=entry.get("rollback_class"), **fields)
                     elif surface.get("kind") == "file-write" and surface.get("content_utf8") is not None:

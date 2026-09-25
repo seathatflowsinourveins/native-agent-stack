@@ -228,10 +228,15 @@ actually happened more recently, and never a bare `adopt --baseline`/
 --txn T` also refuses a txn a *later* apply on the same component has since
 superseded (re-pointing `current/<id>` to T's old root would silently
 clobber that later apply), and `confirm --txn T` refuses a txn that was
-already rolled back or whose post-apply verify already failed. A crashed or
-interrupted `apply`/`adopt --relink` never completes after the fact:
-`ecosystem-switch recover` finds any transaction still `in_progress` and
-rolls it back, the same as an explicit `rollback` would.
+already rolled back, whose post-apply verify already failed, or that is
+still `in_progress` (a crashed or interrupted `apply` that never reached its
+own post-apply verify) -- confirming one of those would mark a half-applied
+component "applied" through the ledger alone, and since `recover` only
+reconciles a transaction still `in_progress`, it would then never see that
+transaction again either. A crashed or interrupted `apply`/`adopt --relink`
+never completes after the fact: `ecosystem-switch recover` finds any
+transaction still `in_progress` and rolls it back, the same as an explicit
+`rollback` would.
 
 **Prune.** `prune --list` reports which `tools/<name>-<version>` prefixes no
 `current/<id>` link points at, that are not the previous root of any

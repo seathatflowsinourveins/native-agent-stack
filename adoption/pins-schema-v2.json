@@ -96,7 +96,15 @@
         "kind": {"enum": ["link", "text-replace", "file-write", "native-cli", "unit-restart", "data-backup", "data-restore"]},
         "path": {"type": "string"},
         "status": {"const": "pending"},
-        "note": {"type": "string"}
+        "note": {"type": "string"},
+        "old": {"type": "string", "description": "text-replace only: the literal old substring adopt --relink looks for (defaults to this tool's real, resolved root_name path). Refused unless it occurs exactly expected_count times; refused outright when path contains '/frozen/'. A second relink that finds old_text already fully replaced (and the new current/<id> text already present) treats the surface as already migrated and leaves it unchanged, rather than refusing (adopt --relink is idempotent)."},
+        "expected_count": {"type": "integer", "minimum": 1, "description": "text-replace only; default 1."},
+        "expected_pre_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "text-replace only, optional: sha256 of the target's exact current bytes, checked before any write (adoption/tools/ecosystem-switch's op_text_replace expected_pre_sha256 parameter) so a surface that drifted from what this pin was written against is refused rather than blindly rewritten. Omitted entries (the default so far) skip this precondition and rely on the old-substring-count check alone."
+        },
+        "content_utf8": {"type": "string", "description": "file-write only: the UTF-8 text adopt --relink writes at path, backing up any pre-existing file first."}
       }
     },
     "stateDir": {
@@ -105,10 +113,7 @@
       "properties": {
         "path": {"type": "string"},
         "status": {"const": "pending"},
-        "note": {"type": "string"},
-        "old": {"type": "string", "description": "text-replace only: the literal old substring adopt --relink looks for (defaults to this tool's real, resolved root_name path). Refused unless it occurs exactly expected_count times; refused outright when path contains '/frozen/'."},
-        "expected_count": {"type": "integer", "minimum": 1, "description": "text-replace only; default 1."},
-        "content_utf8": {"type": "string", "description": "file-write only: the UTF-8 text adopt --relink writes at path, backing up any pre-existing file first."}
+        "note": {"type": "string"}
       }
     },
     "toolPinV2": {
