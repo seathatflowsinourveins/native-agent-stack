@@ -260,6 +260,40 @@
         "unified_memory_gb": 24.0
       },
       "sizing_arithmetic": null
+    },
+    {
+      "id": "nativestack-5975wx-20260925",
+      "label": "WSL2 x86_64 workstation, AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, RTX 4090 24 GB (measured)",
+      "evidence_class": "native_proven",
+      "assumptions": null,
+      "measured_tiers": {
+        "concurrent_use_warning": null,
+        "ecosystem_job_memory_high_gb": 17.1,
+        "ecosystem_job_memory_max_gb": 25.6,
+        "embedding_semantic_rag_tier": "headroom",
+        "local_generation_model_tier": "large-32b-q4",
+        "workflow_concurrency_cap": 16
+      },
+      "measured": {
+        "cores": 48,
+        "cpu_brand": "AMD Ryzen Threadripper PRO 5975WX 32-Cores",
+        "effective_ram_gb": 102.2,
+        "effective_ram_gb_source": "proc_meminfo",
+        "evidence_class": "native_proven",
+        "gpu": {
+          "evidence_class": "native_proven",
+          "name": "NVIDIA GeForce RTX 4090",
+          "vram_gb": 24.0
+        },
+        "is_wsl": true,
+        "platform": "wsl",
+        "ram_gb_proc_meminfo": 102.2,
+        "wslconfig_memory_gb": 104.0,
+        "wslconfig_memory_gb_evidence_class": "source_review",
+        "wslconfig_other_candidates": [],
+        "wslconfig_source": "/mnt/c/Users/<user>/.wslconfig"
+      },
+      "sizing_arithmetic": null
     }
   ],
   "layers": [
@@ -442,7 +476,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": true,
               "bootstrap_version": "2.8.3"
             },
@@ -465,7 +499,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": true,
               "bootstrap_version": "0.1.7"
             },
@@ -562,7 +596,7 @@
           "recipe": "recipes/native-upgrades-20260921.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "not_established",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -608,7 +642,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "not_established",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -805,7 +839,7 @@
           "recipe": "recipes/native-upgrades-20260921.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -992,7 +1026,7 @@
           "recipe": "observability/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1017,7 +1051,7 @@
           "recipe": "observability/backends/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1042,7 +1076,7 @@
           "recipe": "observability/backends/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1137,7 +1171,7 @@
           "recipe": "blueprints/us-equities/hosting/backup/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1197,7 +1231,7 @@
           "recipe": "blueprints/us-equities/hosting/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1257,7 +1291,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1322,7 +1356,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1347,7 +1381,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1384,7 +1418,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": true,
               "bootstrap_version": "0.49.0"
             },
@@ -1573,7 +1607,7 @@
           "recipe": "recipes/native-upgrades-20260921.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1698,7 +1732,7 @@
           "recipe": "blueprints/us-equities/engine-nautilus/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1760,7 +1794,7 @@
           "recipe": "blueprints/us-equities/hosting/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -2189,7 +2223,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -2300,7 +2334,7 @@
       "candidate:typesafe-ai-skills"
     ],
     "e2e_accepted": {
-      "linux-wsl2-x86_64": 33,
+      "linux-wsl2-x86_64": 28,
       "macos-arm64": 0
     },
     "bootstrap_pinned": {
@@ -2333,7 +2367,7 @@
       ]
     },
     "needs_host": {
-      "linux-wsl2-x86_64": 33,
+      "linux-wsl2-x86_64": 20,
       "macos-arm64": 60
     }
   }
