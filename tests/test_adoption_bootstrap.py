@@ -40,7 +40,8 @@ LINUX_X86_64_ONLY = unittest.skipUnless(
 GITHUB_AUTOMATION_DOC_PATH = ROOT / "docs/github-automation.md"
 
 SHA256_HEX = re.compile(r"[0-9a-f]{64}\Z")
-VALID_KINDS = {"tarball", "npm", "pip", "uv-tool", "native"}
+COMMIT_HEX = re.compile(r"\A[0-9a-f]{40}\Z")
+VALID_KINDS = {"tarball", "npm", "pip", "uv-tool", "native", "uv-tool-from-git"}
 
 
 def load_pins() -> dict:
@@ -83,9 +84,25 @@ class PinsSchemaTests(unittest.TestCase):
                 self.assertIsInstance(sha256, str)
                 self.assertRegex(sha256, SHA256_HEX, f"{tool['id']} sha256 is not 64 lowercase hex chars")
 
-    def test_all_pins_in_this_pr_have_a_verified_hash(self):
-        # This PR fetched and hashed every pinned artifact; none are deferred.
+    def test_uv_tool_from_git_pins_a_verified_commit_instead_of_a_hash(self):
+        # serena: upstream ships no released version to hash, so its own
+        # fail-closed integrity anchor is a verified 40-hex commit, checked
+        # by install_pin before dispatch instead of the sha256 gate.
         for tool in self.pins["tools"]:
+            if tool["kind"] == "uv-tool-from-git":
+                self.assertIsNone(tool["sha256"], f"{tool['id']}: uv-tool-from-git pins a commit, not a sha256")
+                self.assertRegex(tool.get("commit") or "", COMMIT_HEX,
+                                 f"{tool['id']} missing a verified 40-hex commit")
+
+    def test_all_pins_in_this_pr_have_a_verified_hash(self):
+        # This PR fetched and hashed every pinned artifact from its official
+        # registry/release metadata; none are deferred. The one exception is
+        # a uv-tool-from-git pin (see test_uv_tool_from_git_pins_a_verified_commit_instead_of_a_hash):
+        # there is no released archive to hash, so its own commit-shape
+        # check stands in for this one.
+        for tool in self.pins["tools"]:
+            if tool["kind"] == "uv-tool-from-git":
+                continue
             self.assertIsNotNone(tool["sha256"], f"{tool['id']} unexpectedly has a null sha256")
 
 
@@ -179,6 +196,43 @@ class ScriptBehaviorTests(unittest.TestCase):
             self.assertEqual(result.returncode, 1)
             self.assertIn("Refusing to install", result.stderr)
             self.assertIn("no verified sha256", result.stderr)
+            self.assertFalse(eco_root.exists() and any(eco_root.glob("tools/*/*")),
+                              "no tool files should have been installed before the refusal")
+
+    @LINUX_X86_64_ONLY
+    def test_uv_tool_from_git_pin_with_a_bad_commit_is_refused_before_any_download(self):
+        # Mirrors test_null_hash_pin_is_refused_before_any_download, but for
+        # the uv-tool-from-git gate (serena): mutate the first-installed core
+        # id (node, always installed first regardless of profile) into a
+        # uv-tool-from-git pin with a malformed commit, so the refusal is
+        # guaranteed to happen before uv, gh or any profile component -- and
+        # so before any network access.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            adoption_dir = tmp_path / "adoption"
+            adoption_dir.mkdir()
+            (adoption_dir / "manifest.json").write_text(MANIFEST_PATH.read_text())
+            (adoption_dir / "bootstrap-linux.sh").write_text(SCRIPT_PATH.read_text())
+            (adoption_dir / "bootstrap-linux.sh").chmod(0o755)
+            pins = load_pins()
+            self.assertEqual(pins["tools"][0]["id"], "node")
+            pins["tools"][0]["kind"] = "uv-tool-from-git"
+            pins["tools"][0]["commit"] = "not-forty-hex-chars"
+            pins["tools"][0]["sha256"] = None
+            pins["tools"][0]["install_note"] = "test: malformed commit"
+            (adoption_dir / "pins-linux-x86_64.json").write_text(json.dumps(pins))
+            eco_root = tmp_path / "eco"
+            result = subprocess.run(
+                ["bash", str(adoption_dir / "bootstrap-linux.sh"),
+                 "--profile", "foundation-cpu", "--skip-system-packages"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                env={**os.environ, "ECO_INSTALL_ROOT": str(eco_root)},
+            )
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            self.assertIn("Refusing to install", result.stderr)
+            self.assertIn("no verified 40-hex commit", result.stderr)
             self.assertFalse(eco_root.exists() and any(eco_root.glob("tools/*/*")),
                               "no tool files should have been installed before the refusal")
 
@@ -554,6 +608,60 @@ def sha256sum_checks_like_gnu() -> bool:
         result = subprocess.run(["sha256sum", "--check", "--status"], capture_output=True, text=True,
                                 input=f"{hashlib.sha256(data).hexdigest()}  {probe}\n", timeout=10, check=False)
     return result.returncode == 0
+
+
+class InstallUvToolFromGitTests(unittest.TestCase):
+    """install_uv_tool_from_git, extracted verbatim from bootstrap-linux.sh, run against a `uv` shim that
+    records its arguments and writes a chosen uv-receipt.toml. The install is accepted only when the
+    receipt records the pinned commit; a missing receipt, a receipt naming another commit and a missing
+    `uv` each exit 1 with their own refusal."""
+
+    COMMIT = "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+    OTHER = "0" * 40
+
+    def _run(self, tmp_path: Path, receipt_rev, with_uv=True):
+        eco, bin_dir, shim = tmp_path / "eco", tmp_path / "bin", tmp_path / "shim"
+        for directory in (eco, bin_dir, shim):
+            directory.mkdir()
+        calls = tmp_path / "uv-calls.log"
+        if with_uv:
+            write = ("" if receipt_rev is None else
+                     'mkdir -p "$UV_TOOL_DIR/serena-agent"\n'
+                     f'printf \'[tool]\\nrequirements = [{{ name = "serena-agent", git = "https://github.com/oraios/serena?rev={receipt_rev}" }}]\\n\' '
+                     '> "$UV_TOOL_DIR/serena-agent/uv-receipt.toml"\n')
+            (shim / "uv").write_text(f'#!/bin/sh\nprintf "%s\\n" "$*" >> {shlex.quote(str(calls))}\n{write}')
+            (shim / "uv").chmod(0o755)
+        harness = (f"set -euo pipefail\necosystem_root={shlex.quote(str(eco))}\nbin_dir={shlex.quote(str(bin_dir))}\n"
+                   + shell_functions(SCRIPT_PATH.read_text(), "install_uv_tool_from_git")
+                   + f"install_uv_tool_from_git serena '2.0.0.dev0' https://github.com/oraios/serena {self.COMMIT} serena-agent\n")
+        env = {"PATH": f"{shim}:/usr/bin:/bin", "HOME": str(tmp_path)}
+        result = subprocess.run(["bash", "-c", harness], capture_output=True, text=True, env=env, timeout=30)
+        return result, (calls.read_text() if calls.exists() else "")
+
+    def test_accepts_only_a_receipt_that_records_the_pinned_commit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, calls = self._run(Path(tmp), self.COMMIT)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(f"tool install --python 3.13 git+https://github.com/oraios/serena@{self.COMMIT}", calls)
+
+    def test_refuses_when_uv_writes_no_receipt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, _ = self._run(Path(tmp), None)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("no uv-receipt.toml", result.stderr)
+
+    def test_refuses_a_receipt_that_names_another_commit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, _ = self._run(Path(tmp), self.OTHER)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(f"does not record the pinned commit {self.COMMIT}", result.stderr)
+
+    def test_refuses_without_uv(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, calls = self._run(Path(tmp), self.COMMIT, with_uv=False)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("uv is required", result.stderr)
+        self.assertEqual(calls, "")
 
 
 class NativeInstallFloorTests(unittest.TestCase):

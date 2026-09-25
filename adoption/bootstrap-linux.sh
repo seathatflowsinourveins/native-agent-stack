@@ -15,7 +15,9 @@ usage() {
     'ECO_INSTALL_ROOT (default ~/.local/share/codex-ecosystem), each in an' \
     'isolated tools/<name>-<version> prefix with bin/ symlinks. Every archive' \
     'is SHA-256 verified before extraction; a pin with a null sha256 refuses' \
-    'to install (fail closed). A selected component with no pin at all also' \
+    'to install (fail closed), except a uv-tool-from-git pin (serena), which' \
+    'has no archive to hash and instead pins and verifies an exact git commit.' \
+    'A selected component with no pin at all also' \
     'fails closed (exit 3) before installing anything, unless it is named in' \
     '--allow-unpinned, in which case it is skipped and echoed to the run log.' \
     'Uses sudo only for missing Ubuntu/Debian apt prerequisites, installed' \
@@ -379,10 +381,44 @@ install_pip() {
 }
 
 install_uv_tool() {
-  local id="$1" version="$2"
+  # $3 (always given: install_pin below passes the pin's "package" field,
+  # falling back to its own "id" in the jq expression itself) is the actual
+  # installable spec when it differs from the component id -- e.g.
+  # headroom's PyPI distribution is "headroom-ai[mcp]", not "headroom".
+  # Every existing uv-tool pin has no "package" field and keeps installing
+  # "$id==$version" exactly as before.
+  local id="$1" version="$2" package="$3"
   command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
   UV_TOOL_DIR="$ecosystem_root/python-tools" UV_TOOL_BIN_DIR="$bin_dir" \
-    uv tool install --python 3.13 "${id}==${version}"
+    uv tool install --python 3.13 "${package}==${version}"
+}
+
+# Installs a uv tool pinned to an exact upstream git commit instead of a
+# released version (serena: upstream ships no PyPI release of its current
+# 2.0.0.dev0). The 40-hex commit is itself the integrity anchor -- git
+# refuses to resolve a rev that is not that exact object -- so there is no
+# downloaded archive to sha256; install_pin's own fail-closed gate checks
+# the commit's shape for this kind instead of a sha256. After install this
+# also reads back UV_TOOL_DIR's own uv-receipt.toml and refuses (exit 1)
+# unless uv actually resolved that same commit, so a stale prior install of
+# a different revision under the same tool name can never pass silently.
+install_uv_tool_from_git() {
+  # $5 is always given: install_pin below passes the pin's "package" field,
+  # falling back to its own "id" in the jq expression itself.
+  local id="$1" version="$2" repo_url="$3" commit="$4" package="$5"
+  command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
+  UV_TOOL_DIR="$ecosystem_root/python-tools" UV_TOOL_BIN_DIR="$bin_dir" \
+    uv tool install --python 3.13 "git+${repo_url}@${commit}"
+  local receipt="$ecosystem_root/python-tools/$package/uv-receipt.toml"
+  [[ -f "$receipt" ]] || {
+    printf 'Refusing %s %s: no uv-receipt.toml at %s after install; cannot verify the resolved commit.\n' \
+      "$id" "$version" "$receipt" >&2
+    exit 1
+  }
+  grep -Fq "rev=${commit}" "$receipt" || {
+    printf 'Refusing %s %s: %s does not record the pinned commit %s.\n' "$id" "$version" "$receipt" "$commit" >&2
+    exit 1
+  }
 }
 
 # rtk 0.50.0's Claude hook windows `git show <rev>:<path>` blobs (a piped
@@ -406,13 +442,19 @@ install_pin() {
     printf 'No pin for component %s in %s; skipping.\n' "$id" "$pins_path" >&2
     return 0
   fi
-  local version kind url sha256 note
+  local version kind url sha256 note commit
   version="$(jq -r '.version' <<<"$entry")"
   kind="$(jq -r '.kind' <<<"$entry")"
   url="$(jq -r '.url' <<<"$entry")"
   sha256="$(jq -r '.sha256' <<<"$entry")"
   note="$(jq -r '.install_note' <<<"$entry")"
-  if [[ "$sha256" == "null" || -z "$sha256" ]]; then
+  if [[ "$kind" == "uv-tool-from-git" ]]; then
+    commit="$(jq -r '.commit' <<<"$entry")"
+    [[ "$commit" =~ ^[0-9a-f]{40}$ ]] || {
+      printf 'Refusing to install %s %s: pin has no verified 40-hex commit (%s)\n' "$id" "$version" "$note" >&2
+      exit 1
+    }
+  elif [[ "$sha256" == "null" || -z "$sha256" ]]; then
     printf 'Refusing to install %s %s: pin has no verified sha256 (%s)\n' "$id" "$version" "$note" >&2
     exit 1
   fi
@@ -426,7 +468,8 @@ install_pin() {
     *-npm) install_npm "$id" "$version" "$url" "$sha256" ;;
     *-native) install_native "$id" "$version" "$url" "$sha256" "$(jq -r '.bin // .id' <<<"$entry")" ;;
     *-pip) install_pip "$id" "$version" ;;
-    *-uv-tool) install_uv_tool "$id" "$version" ;;
+    *-uv-tool) install_uv_tool "$id" "$version" "$(jq -r '.package // .id' <<<"$entry")" ;;
+    *-uv-tool-from-git) install_uv_tool_from_git "$id" "$version" "$url" "$commit" "$(jq -r '.package // .id' <<<"$entry")" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
   esac
   # A kept native launcher (at or above its floor) is still an installed
