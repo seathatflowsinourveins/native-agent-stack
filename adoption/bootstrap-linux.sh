@@ -47,6 +47,14 @@ allow_unpinned_ids=()
 configure_claude_user_profile=0
 tools_suffix=""
 link_dir_override=""
+# Populated by install_node/install_uv (unconditionally, regardless of no_link) so a later
+# npm- or uv-tool-kind pin can resolve THIS run's own just-installed node/uv directly, instead of
+# `command -v`/a bare invocation falling through PATH -- under --no-link no install_* function
+# ever links anything into bin_dir, so PATH there resolves a pre-existing host copy, or none
+# (minor finding, still unresolved after the first isolation-fix round: install_npm/
+# install_uv_tool themselves, not just the versions-report/native-installer paths already fixed).
+staged_node_bin_dir=""
+staged_uv_bin_dir=""
 no_link=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -275,6 +283,7 @@ install_node() {
   local prefix="$ecosystem_root/tools/node-$version$tools_suffix"
   mkdir -p "$prefix"
   tar -xf "$archive" --strip-components=1 -C "$prefix"
+  staged_node_bin_dir="$prefix/bin"
   local executable
   for executable in node npm npx corepack; do
     if [[ -e "$prefix/bin/$executable" && "$no_link" != 1 ]]; then
@@ -298,6 +307,7 @@ install_uv() {
     install -m 0755 "$found" "$prefix/$executable"
     [[ "$no_link" == 1 ]] || atomic_link "$prefix/$executable" "$bin_dir/$executable"
   done
+  staged_uv_bin_dir="$prefix"
 }
 
 # Generic single-binary tarball: find a file literally named <id> and install it.
@@ -328,14 +338,26 @@ npm_package_name() {
 
 install_npm() {
   local id="$1" version="$2" url="$3" sha256="$4"
-  command -v npm >/dev/null || { printf 'npm is required to install %s; install node first.\n' "$id" >&2; exit 1; }
+  # Minor finding: under --no-link, install_node never links npm into bin_dir at all, so a bare
+  # `command -v npm`/`npm ...` here used to fall through PATH to a pre-existing host copy, or
+  # none, instead of THIS run's own just-installed (but unlinked) staged npm. Resolved directly
+  # from staged_node_bin_dir (set unconditionally by install_node) when it names a real npm;
+  # ${staged_node_bin_dir:-} (not a bare $staged_node_bin_dir) because
+  # InstallNativeLauncherTests-style isolated harnesses run this function's body under `set -u`
+  # with no other global declared.
+  local npm_cmd="npm"
+  if [[ -n "${staged_node_bin_dir:-}" && -x "$staged_node_bin_dir/npm" ]]; then
+    npm_cmd="$staged_node_bin_dir/npm"
+  else
+    command -v npm >/dev/null || { printf 'npm is required to install %s; install node first.\n' "$id" >&2; exit 1; }
+  fi
   local archive="$cache_dir/${id}-${version}.tgz"
   fetch "$url" "$sha256" "$archive"
   local prefix="$ecosystem_root/tools/$id-$version$tools_suffix"
   mkdir -p "$prefix"
   local package
   package="$(npm_package_name "$url")"
-  npm install --global --no-audit --no-fund --prefix "$prefix" "$archive" >/dev/null
+  "$npm_cmd" install --global --no-audit --no-fund --prefix "$prefix" "$archive" >/dev/null
   local linked=0 executable
   if [[ -d "$prefix/bin" ]]; then
     for executable in "$prefix/bin"/*; do
@@ -410,7 +432,17 @@ install_pip() {
 
 install_uv_tool() {
   local id="$1" version="$2"
-  command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
+  # Minor finding: the same --no-link isolation gap install_npm has -- under --no-link,
+  # install_uv never links uv/uvx into bin_dir, so a bare `command -v uv`/`uv ...` here used to
+  # fall through PATH to a pre-existing host uv, or none. Resolved directly from
+  # staged_uv_bin_dir (set unconditionally by install_uv) when it names a real uv; ${...:-} for
+  # the same isolated-harness reason as install_npm's npm_cmd above.
+  local uv_cmd="uv"
+  if [[ -n "${staged_uv_bin_dir:-}" && -x "$staged_uv_bin_dir/uv" ]]; then
+    uv_cmd="$staged_uv_bin_dir/uv"
+  else
+    command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
+  fi
   # --tools-suffix isolates this pin's own uv-managed prefix the same way every other install_*
   # function isolates tools/<id>-<version><suffix>, so a staged run never shares (and cannot
   # silently upgrade) an already-installed uv tool's environment. --no-link keeps uv's own shim
@@ -424,7 +456,7 @@ install_uv_tool() {
     mkdir -p "$uv_tool_bin_dir"
   fi
   UV_TOOL_DIR="$uv_tool_dir" UV_TOOL_BIN_DIR="$uv_tool_bin_dir" \
-    uv tool install --python 3.13 "${id}==${version}"
+    "$uv_cmd" tool install --python 3.13 "${id}==${version}"
 }
 
 install_pin() {

@@ -5,6 +5,7 @@ Only the script's argument parsing, root refusal, and null-hash fail-closed
 behavior are exercised via `bash -c`, using a stub HOME and no real download.
 """
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -544,6 +545,137 @@ class InstallNativeLauncherTests(unittest.TestCase):
             # Nothing was written to the live installer location the stub would otherwise use.
             self.assertFalse((home / ".local" / "bin" / "claude").exists())
             self.assertFalse((home / ".local" / "share" / "claude").exists())
+
+
+@LINUX_X86_64_ONLY
+class NoLinkNpmUvResolutionTests(unittest.TestCase):
+    """Regression tests for the still-unresolved half of the staged-run isolation finding
+    (round 3): under --no-link, install_node/install_uv never link node/npm/uv/uvx into bin_dir
+    at all (their own no_link guards skip atomic_link entirely), so install_npm/install_uv_tool's
+    own `command -v npm`/`command -v uv` (and the bare `npm`/`uv` invocations that followed) used
+    to fall through PATH to a pre-existing host copy, or fail outright on a fresh host with
+    neither. Each function's own staged_node_bin_dir/staged_uv_bin_dir global (set unconditionally
+    by install_node/install_uv, not only when linked) is asserted here by running the affected
+    function directly with a stub npm/uv standing in for a real network install, the same
+    function-extraction technique InstallNativeLauncherTests and VersionsReportTests below use."""
+
+    def extract(self, name: str) -> str:
+        match = re.search(rf"(?ms)^{name}\(\) \{{.*?^\}}$", SCRIPT_PATH.read_text())
+        self.assertIsNotNone(match, f"{name} not found in {SCRIPT_PATH}")
+        return match.group(0)
+
+    def write_stub(self, path: Path, log_path: Path, *, label: str) -> None:
+        path.write_text(f"#!/bin/sh\nprintf '{label} %s\\n' \"$0\" >> {shlex.quote(str(log_path))}\nexit 0\n")
+        path.chmod(0o755)
+
+    def test_install_npm_under_no_link_resolves_the_staged_node_not_a_host_or_missing_npm(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            ecosystem_root = home / "eco"
+            cache_dir = ecosystem_root / "downloads"
+            bin_dir = ecosystem_root / "bin"
+            cache_dir.mkdir(parents=True)
+            bin_dir.mkdir(parents=True)
+            staged_node_bin = ecosystem_root / "tools" / "node-24.21.0" / "bin"
+            staged_node_bin.mkdir(parents=True)
+            log_path = home / "calls.log"
+            self.write_stub(staged_node_bin / "npm", log_path, label="STAGED")
+            # A decoy earlier on PATH: if install_npm ever falls back to a bare `command -v npm`
+            # under --no-link, this is the host/PATH copy it would wrongly resolve and run
+            # instead of the staged one above.
+            decoy_bin = home / "decoy-path"
+            decoy_bin.mkdir()
+            self.write_stub(decoy_bin / "npm", log_path, label="DECOY")
+            archive = cache_dir / "example-pkg-1.0.0.tgz"
+            archive.write_bytes(b"fixture archive; the stub npm above never actually reads it")
+            sha256 = hashlib.sha256(archive.read_bytes()).hexdigest()
+            harness = (
+                "set -euo pipefail\n"
+                f"cache_dir={shlex.quote(str(cache_dir))}\n"
+                f"ecosystem_root={shlex.quote(str(ecosystem_root))}\n"
+                f"bin_dir={shlex.quote(str(bin_dir))}\n"
+                "tools_suffix=''\nno_link=1\n"
+                f"staged_node_bin_dir={shlex.quote(str(staged_node_bin))}\n"
+                + self.extract("npm_package_name") + "\n"
+                + self.extract("fetch") + "\n"
+                + self.extract("atomic_link") + "\n"
+                + self.extract("install_npm") + "\n"
+                + "install_npm example-pkg 1.0.0 "
+                + "https://registry.npmjs.org/example-pkg/-/example-pkg-1.0.0.tgz " + sha256 + "\n"
+            )
+            env = {**os.environ, "PATH": f"{decoy_bin}{os.pathsep}{os.environ.get('PATH', '')}"}
+            result = subprocess.run(["bash", "-c", harness], capture_output=True, text=True, env=env, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(log_path.is_file(), "npm was never invoked")
+            calls = log_path.read_text().splitlines()
+            self.assertEqual(calls, [f"STAGED {staged_node_bin / 'npm'}"],
+                             f"expected only the staged npm to run, got {calls}")
+
+    def test_install_uv_tool_under_no_link_resolves_the_staged_uv_not_a_host_or_missing_uv(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            ecosystem_root = home / "eco"
+            bin_dir = ecosystem_root / "bin"
+            bin_dir.mkdir(parents=True)
+            staged_uv_dir = ecosystem_root / "tools" / "uv-0.12.17"
+            staged_uv_dir.mkdir(parents=True)
+            log_path = home / "calls.log"
+            self.write_stub(staged_uv_dir / "uv", log_path, label="STAGED")
+            decoy_bin = home / "decoy-path"
+            decoy_bin.mkdir()
+            self.write_stub(decoy_bin / "uv", log_path, label="DECOY")
+            harness = (
+                "set -euo pipefail\n"
+                f"ecosystem_root={shlex.quote(str(ecosystem_root))}\n"
+                f"bin_dir={shlex.quote(str(bin_dir))}\n"
+                "tools_suffix=''\nno_link=1\n"
+                f"staged_uv_bin_dir={shlex.quote(str(staged_uv_dir))}\n"
+                + self.extract("install_uv_tool") + "\n"
+                + "install_uv_tool example-tool 1.0.0\n"
+            )
+            env = {**os.environ, "PATH": f"{decoy_bin}{os.pathsep}{os.environ.get('PATH', '')}"}
+            result = subprocess.run(["bash", "-c", harness], capture_output=True, text=True, env=env, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(log_path.is_file(), "uv was never invoked")
+            calls = log_path.read_text().splitlines()
+            self.assertEqual(calls, [f"STAGED {staged_uv_dir / 'uv'}"],
+                             f"expected only the staged uv to run, got {calls}")
+
+    def test_a_plain_run_still_resolves_npm_when_staged_node_bin_dir_is_unset(self):
+        # The isolated-harness fallback path (bare `command -v npm`) must still work when a
+        # caller never declares staged_node_bin_dir at all -- e.g. any existing test that
+        # extracts install_npm's body without install_node ever having run first.
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            ecosystem_root = home / "eco"
+            cache_dir = ecosystem_root / "downloads"
+            bin_dir = ecosystem_root / "bin"
+            cache_dir.mkdir(parents=True)
+            bin_dir.mkdir(parents=True)
+            path_npm_dir = home / "path-npm"
+            path_npm_dir.mkdir()
+            log_path = home / "calls.log"
+            self.write_stub(path_npm_dir / "npm", log_path, label="PATH")
+            archive = cache_dir / "example-pkg-1.0.0.tgz"
+            archive.write_bytes(b"fixture archive")
+            sha256 = hashlib.sha256(archive.read_bytes()).hexdigest()
+            harness = (
+                "set -euo pipefail\n"
+                f"cache_dir={shlex.quote(str(cache_dir))}\n"
+                f"ecosystem_root={shlex.quote(str(ecosystem_root))}\n"
+                f"bin_dir={shlex.quote(str(bin_dir))}\n"
+                "tools_suffix=''\nno_link=0\n"
+                + self.extract("npm_package_name") + "\n"
+                + self.extract("fetch") + "\n"
+                + self.extract("atomic_link") + "\n"
+                + self.extract("install_npm") + "\n"
+                + "install_npm example-pkg 1.0.0 "
+                + "https://registry.npmjs.org/example-pkg/-/example-pkg-1.0.0.tgz " + sha256 + "\n"
+            )
+            env = {**os.environ, "PATH": f"{path_npm_dir}{os.pathsep}{os.environ.get('PATH', '')}"}
+            result = subprocess.run(["bash", "-c", harness], capture_output=True, text=True, env=env, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(log_path.read_text().splitlines(), [f"PATH {path_npm_dir / 'npm'}"])
 
 
 @LINUX_X86_64_ONLY
