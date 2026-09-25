@@ -16,39 +16,53 @@ class Amendments(unittest.TestCase):
             p = Path(tmp) / "session-calendar-amendments.jsonl"
             p.write_text("")
             run_log = [{"utc_start": "t0", "amendment_files": {"cal": logs.file_state(p)}}]
-            logs.append_line(p, {"kind": "remove_session", "session": "2027-01-09", "source": "notice"})
+            logs.append_line(p, synth.calendar_line("2027-01-11"))
             run_log.append({"utc_start": "t1", "amendment_files": {"cal": logs.file_state(p)}})
-            logs.append_line(p, {"kind": "remove_session", "session": "2027-03-01", "source": "notice"})
+            logs.append_line(p, synth.calendar_line("2027-03-01"))
             self.assertEqual(logs.check_amendment_files({"cal": p}, run_log), [])
-            p.write_text(p.read_text().replace("2027-01-09", "2027-01-10"))
+            p.write_text(p.read_text().replace("2027-01-11", "2027-01-12"))
             self.assertTrue(logs.check_amendment_files({"cal": p}, run_log))
 
     def test_calendar_line_must_reach_main_before_0930_of_its_session(self):
         cal = synth.calendar("2026-06-01", "2027-06-30")
-        lines = [{"kind": "remove_session", "session": "2027-01-12", "source": "NYSE notice"}]
+        lines = [synth.calendar_line("2027-01-12")]
         ok = logs.check_calendar_amendments(lines, {0: cal.at("2027-01-11", "20:00")}, cal, "2026-10-01")
         self.assertEqual(ok, [])
         late = logs.check_calendar_amendments(lines, {0: cal.at("2027-01-12", "09:30")}, cal, "2026-10-01")
         self.assertTrue(late)
-        early = logs.check_calendar_amendments([{"kind": "remove_session", "session": "2026-09-01", "source": "x"}],
-                                               {0: 0.0}, cal, "2026-10-01")
+        early = logs.check_calendar_amendments([synth.calendar_line("2026-09-01")], {0: 0.0}, cal, "2026-10-01")
         self.assertTrue(early)
+        # review round 15, amendment format: a line without the format's fields, and a date that is no session
+        loose = logs.check_calendar_amendments([{"kind": "remove_session", "session": "2027-01-12", "source": "x"}],
+                                               {0: 0.0}, cal, "2026-10-01")
+        self.assertIn("schema_version", loose[0])
+        weekend = logs.check_calendar_amendments([synth.calendar_line("2027-01-16")], {0: 0.0}, cal, "2026-10-01")
+        self.assertIn("not a session", weekend[0])
 
     def test_fee_line_must_reach_main_before_the_first_use(self):
-        line = [{"kind": "finra_taf", "from": "2027-01-01", "to": "2027-12-31", "usd_per_share": 0.0002,
-                 "max_per_trade": 10.0}]
+        line = [synth.fee_line("finra_taf_covered_equity", "2027-01-01", "2027-12-31", usd_per_share=0.0002,
+                               max_usd_per_trade=10.0)]
         self.assertEqual(logs.check_fee_amendments(line, {0: 100.0}, {0: 200.0}, "2026-10-01"), [])
         self.assertTrue(logs.check_fee_amendments(line, {0: 300.0}, {0: 200.0}, "2026-10-01"))
-        nocap = [dict(line[0], max_per_trade=None)]
+        nocap = [dict(line[0], max_usd_per_trade=None)]
         self.assertTrue(logs.check_fee_amendments(nocap, {0: 100.0}, {}, "2026-10-01"))
+        # review round 15, amendment format: the former line shape ('rate', 'max_per_trade', no source) is refused
+        old = [{"kind": "finra_taf", "from": "2027-01-01", "to": "2027-12-31", "usd_per_share": 0.0002,
+                "max_per_trade": 10.0}]
+        self.assertTrue(logs.check_fee_amendments(old, {0: 100.0}, {}, "2026-10-01"))
+        # an open-ended line (to null) has a first use like any other
+        open_line = [synth.fee_line("sec_section31", "2027-06-01", None, usd_per_million=21.0)]
+        use = logs.fee_first_use(open_line, [{"purpose": "read", "utc_start": "2028-01-20T21:00:00Z",
+                                              "fee_span": ["2027-01-04", "2028-01-07"]}])
+        self.assertIn(0, use)
 
 
     def test_a_read_uses_the_fee_rows_of_its_terminal_search_windows(self):
         """Review round 13, Codex P2: a read's trades exit, and pay sale fees, through 5 sessions after the window's
         last session. Its line's fee_span covers them, so a fee line for those dates has a first-use deadline;
         before the fix only [N0, last] counted and a line appended after a failed read was accepted on its retry."""
-        fee = [{"kind": "finra_taf", "from": "2028-01-04", "to": "2028-01-06", "usd_per_share": 0.0002,
-                "max_per_trade": 10.0}]
+        fee = [synth.fee_line("finra_taf_covered_equity", "2028-01-04", "2028-01-06", usd_per_share=0.0002,
+                              max_usd_per_trade=10.0)]
         read = {"stage": "holdout", "purpose": "read", "utc_start": "2028-01-20T21:00:00Z",
                 "sessions": ["2027-01-04", "2027-12-31"], "fee_span": ["2027-01-04", "2028-01-07"]}
         use = logs.fee_first_use(fee, [read])

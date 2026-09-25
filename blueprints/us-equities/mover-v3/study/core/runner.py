@@ -23,7 +23,7 @@ from pathlib import Path
 
 from core import chronology as CH
 from core import guards, logs
-from core.calendar import Calendar, read_amendments
+from core.calendar import Calendar, check_study_reach, read_amendments
 from core.canon import atomic_write_results, sha256_bytes, sha256_file
 from core.costs import Fees, load_table, monotone
 from core.coverage_rule import rule_sha256
@@ -122,6 +122,7 @@ def context(repo, *, versions=None, amend_pending_ok: bool = False, transport_ch
     refusals = logs.check_amendment_files(amend, run_log)
     cal_path, fee_path = repo / DATA_DIR / DATA_FILES[0], repo / DATA_DIR / DATA_FILES[1]
     pinned = Calendar.from_files(cal_path)
+    check_study_reach(pinned)                          # review round 15, N01
     freeze_session = CH.freeze_session(pinned, freeze_ts)
     if freeze_session is None:
         raise guards.Refused("the pinned calendar has no session after the freeze commit")

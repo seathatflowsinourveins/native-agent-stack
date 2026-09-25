@@ -58,6 +58,35 @@ class Parameters(unittest.TestCase):
         with self.assertRaises(guards.Refused):
             guards.check_parameters(bad)
 
+    def test_amendment_format_is_the_protocols_and_versioned(self):
+        """Review round 15, amendment-format item: data-pins.json left the line format to the freeze PR and the
+        parsers implied one that did not match the base files. The protocol now holds the versioned schema
+        (run_discipline.amendment_format) and the code validates exactly that object."""
+        from core import amendments
+        self.assertEqual(PROTOCOL["run_discipline"]["amendment_format"], amendments.FORMAT)
+        self.assertEqual(amendments.FORMAT["schema_version"], 1)
+        bad = json.loads(json.dumps(PROTOCOL))
+        bad["run_discipline"]["amendment_format"]["schema_version"] = 2
+        with self.assertRaises(guards.Refused):
+            guards.check_parameters(bad)
+        pins = json.loads((Path(__file__).resolve().parents[2] / "data-pins.json").read_text())
+        self.assertIn("run_discipline.amendment_format", pins["amendment_rule"])
+        self.assertNotIn("left to the freeze pull request", pins["amendment_rule"])
+
+    def test_amendment_lines_follow_the_format(self):
+        from core import amendments
+        from tests import synth
+        self.assertEqual(amendments.fee_line_problems(synth.fee_line("sec_section31", "2027-01-04", None,
+                                                                     usd_per_million=21.0)), [])
+        self.assertEqual(amendments.calendar_line_problems(synth.calendar_line("2027-01-04")), [])
+        good = synth.fee_line("finra_taf_covered_equity", "2027-01-04", "2027-12-31", usd_per_share=0.0002,
+                              max_usd_per_trade=10.0)
+        for broken in ({**good, "rate": 1.0}, {k: v for k, v in good.items() if k != "reason"},
+                       {**good, "to": "2026-12-31"}, {**good, "usd_per_share": -1.0},
+                       {**good, "source": {**good["source"], "url": "https://example.com/x"}},
+                       {**good, "schema_version": 2}, {**good, "kind": "finra_taf"}):
+            self.assertTrue(amendments.fee_line_problems(broken), broken)
+
 
 if __name__ == "__main__":
     unittest.main()

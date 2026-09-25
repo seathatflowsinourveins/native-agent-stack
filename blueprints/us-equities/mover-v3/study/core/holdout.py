@@ -422,8 +422,11 @@ def amend(ctx: dict, authorization_id: str, file_key: str, line: int, now: float
     if not 0 <= line < len(raws):
         raise HoldoutRefused(f"{name} has no line {line}")
     rec = json.loads(raws[line])
-    if not rec.get("source"):
-        raise HoldoutRefused(f"{name} line {line} cites no primary source")
+    # review round 15, amendment format: the line conforms to run_discipline.amendment_format (its source included)
+    from core.amendments import calendar_line_problems, fee_line_problems
+    problems = (calendar_line_problems if file_key == "calendar" else fee_line_problems)(rec)
+    if problems:
+        raise HoldoutRefused(f"{name} line {line} breaks run_discipline.amendment_format: {'; '.join(problems)}")
     if (name, line) in logs.amend_records(ctx["access_log"]):
         raise HoldoutRefused(f"{name} line {line} is already logged")
     done = gate.completion(authorization_id, iso_utc(now), "complete", None, 0, None, [])

@@ -93,6 +93,7 @@ def cmd_count_only(a) -> int:
     if out_path.exists():
         raise runner.RunRefused(f"{COUNT_ONLY_OUTPUT} exists")
     cal = CAL.Calendar.from_files(REPO / DATA_DIR / "session-calendar.json")
+    CAL.check_study_reach(cal)                     # review round 15, N01
     # review round 12, F3: once a failed run has sealed part 1 (the rows its rates come from), a later run keeps its
     # coverage_rule, so a rule is never changed after the rates it would be judged on could have been read
     for x in ctx["run_log"]:
@@ -140,6 +141,7 @@ def cmd_dry_run(a) -> int:
     if out_path.exists() or any(x.get("purpose") == "dry_run" and x.get("status") == "complete" for x in ctx["run_log"]):
         raise runner.RunRefused("the native dry run has its output; it runs once")
     cal = CAL.Calendar.from_files(REPO / DATA_DIR / "session-calendar.json")
+    CAL.check_study_reach(cal)                     # review round 15, N01
     count_only.dry_run_requests(cal, sessions, symbols)   # every request's reach, before any fetch or log line (C1)
     tr = transports(ctx["protocol"])                     # the pinned rate limit, before any fetch (C2)
     from core.canon import sha256_obj

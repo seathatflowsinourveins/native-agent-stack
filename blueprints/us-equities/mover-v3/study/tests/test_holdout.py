@@ -724,9 +724,7 @@ class OpenList(unittest.TestCase):
 def _gap_fees(n0):
     """Fee rows with an SEC Section 31 gap from the session after N0 (cost_model.fees)."""
     from core import costs
-    return costs.Fees({"sec_section31_usd_per_million_of_sales": [{"from": "2016-01-01", "to": n0, "rate": 8.0}],
-                       "finra_taf_covered_equity_sales": [{"from": "2016-01-01", "to": "2030-12-31",
-                                                           "usd_per_share": 0.000166, "max_per_trade": 8.3}]})
+    return costs.Fees(synth.fee_document([("2016-01-01", n0, 8.0)], [("2016-01-01", "2030-12-31", 0.000166, 8.3)]))
 
 
 def _granted(tmp, purpose, aid, final_count=False):

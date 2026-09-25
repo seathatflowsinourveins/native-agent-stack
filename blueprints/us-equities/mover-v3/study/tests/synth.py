@@ -21,7 +21,36 @@ ET = ZoneInfo("America/New_York")
 
 @lru_cache(maxsize=None)
 def calendar(first="2015-09-01", last="2021-06-30") -> Calendar:
-    return Calendar(build_calendar(first, last)["sessions"])
+    return Calendar.from_document(build_calendar(first, last))
+
+
+# ---------------------------------------------------------------- data-file shapes (review round 15, N01)
+
+def fee_document(sec: list, taf: list) -> dict:
+    """A fee file in data/fees-v3.json's schema. sec: [(from, to, usd_per_million)]; taf: [(from, to, usd_per_share,
+    max_usd_per_trade)]; a 'to' of None is the open end."""
+    from core.costs import SEC_UNIT, TAF_UNIT
+    return {"schema_version": 1, "id": "synthetic-fees",
+            "sec_section31": {"unit": SEC_UNIT, "rows": [{"from": a, "to": b, "usd_per_million": r, "sources": []}
+                                                         for a, b, r in sec]},
+            "finra_taf_covered_equity": {"unit": TAF_UNIT, "rows": [
+                {"from": a, "to": b, "usd_per_share": p, "max_usd_per_trade": c, "sources": []} for a, b, p, c in taf]}}
+
+
+SOURCE = {"document": "synthetic notice", "url": "https://www.sec.gov/synthetic", "retrieved_at": "2026-09-25",
+          "quotes": ["synthetic quote"]}
+
+
+def fee_line(kind: str, first: str, last, **rates) -> dict:
+    """A fee amendment line in run_discipline.amendment_format (schema_version 1)."""
+    return {"schema_version": 1, "kind": kind, "from": first, "to": last, **rates, "source": dict(SOURCE),
+            "reason": "synthetic"}
+
+
+def calendar_line(session: str) -> dict:
+    """A calendar amendment line in run_discipline.amendment_format (schema_version 1)."""
+    return {"schema_version": 1, "kind": "remove_session", "session": session,
+            "source": dict(SOURCE, url="https://www.nyse.com/synthetic-notice"), "reason": "synthetic closure"}
 
 
 def iso_us(ts: float) -> str:

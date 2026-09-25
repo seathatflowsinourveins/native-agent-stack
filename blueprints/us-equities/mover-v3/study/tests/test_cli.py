@@ -29,8 +29,11 @@ class Calendar(unittest.TestCase):
             out = Path(tmp) / "session-calendar.json"
             self.assertEqual(run.main(["build-calendar", "--first", "2016-11-23", "--last", "2016-11-28", "--out", str(out)]), 0)
             body = json.loads(out.read_text())
-            self.assertEqual([s["d"] for s in body["sessions"]], ["2016-11-23", "2016-11-25", "2016-11-28"])
-            self.assertEqual(body["sessions"][1]["close"], "2016-11-25T18:00:00Z")
+            self.assertEqual([s[0] for s in body["sessions"]], ["2016-11-23", "2016-11-25", "2016-11-28"])
+            self.assertEqual(body["sessions"][1][4], "2016-11-25T18:00:00Z")
+            self.assertTrue(body["sessions"][1][5])                  # the early close is flagged
+            from core.calendar import Calendar
+            self.assertTrue(Calendar.from_files(out).is_early_close("2016-11-25"))   # the schema the loader reads
 
 
 class DraftProtocol(unittest.TestCase):
@@ -320,8 +323,7 @@ class ContextRefusals(unittest.TestCase):
             repo = FR.build(tmp)["repo"]
             ctx = self.ctx(repo)
             s = ctx["cal"].offset(ctx["n0_pinned"], 10)
-            logs.append_line(repo / DATA_DIR / "session-calendar-amendments.jsonl",
-                             {"kind": "remove_session", "session": s, "source": "notice"})
+            logs.append_line(repo / DATA_DIR / "session-calendar-amendments.jsonl", synth.calendar_line(s))
             FR.commit_push(repo, "2026-11-20T00:00:00+00:00", sign=False)
             with self.assertRaisesRegex(guards.Refused, "not a merge commit signed"):
                 self.ctx(repo)
@@ -351,7 +353,7 @@ class ContextRefusals(unittest.TestCase):
             n0 = ctx["n0_pinned"]
             cal_amend = repo / DATA_DIR / "session-calendar-amendments.jsonl"
             # a line for a validation session (before the freeze session) is refused, even pushed in time
-            logs.append_line(cal_amend, {"kind": "remove_session", "session": "2020-06-01", "source": "notice"})
+            logs.append_line(cal_amend, synth.calendar_line("2020-06-01"))
             FR.commit_push(repo, "2026-10-03T00:00:00+00:00")
             with self.assertRaises(guards.Refused):
                 self.ctx(repo)
@@ -359,8 +361,8 @@ class ContextRefusals(unittest.TestCase):
             repo = FR.build(tmp)["repo"]
             cal_amend = repo / DATA_DIR / "session-calendar-amendments.jsonl"
             removed = ctx["cal"].offset(n0, 10)
-            logs.append_line(cal_amend, {"kind": "remove_session", "session": n0, "source": "notice"})
-            logs.append_line(cal_amend, {"kind": "remove_session", "session": removed, "source": "notice"})
+            logs.append_line(cal_amend, synth.calendar_line(n0))
+            logs.append_line(cal_amend, synth.calendar_line(removed))
             FR.commit_push(repo, "2026-11-20T00:00:00+00:00")   # before 09:30 ET of both sessions
             # review round 10, F2: each line must also be logged in the access log under purpose 'amend'
             with self.assertRaisesRegex(guards.Refused, "not logged in the access log under purpose 'amend'"):
@@ -374,13 +376,13 @@ class ContextRefusals(unittest.TestCase):
             log_amendment(repo, "calendar", 1, t + 600)
             rec = logs.read_lines(repo / ACCESS_LOG)[-1]
             self.assertEqual((rec["amendment"]["file"], rec["amendment"]["line"], rec["amendment"]["source"]),
-                             ("session-calendar-amendments.jsonl", 1, "notice"))
+                             ("session-calendar-amendments.jsonl", 1, synth.calendar_line(removed)["source"]))
             c2 = self.ctx(repo)
             self.assertFalse(c2["cal"].is_session(removed))
             self.assertEqual(c2["n0_pinned"], n0)                    # M-5: N0 keeps its freeze-time date
             self.assertEqual(c2["cal"].next_on_or_after(n0), ctx["cal"].offset(n0, 1))
             late = ctx["cal"].offset(n0, 20)
-            logs.append_line(cal_amend, {"kind": "remove_session", "session": late, "source": "notice"})
+            logs.append_line(cal_amend, synth.calendar_line(late))
             FR.commit_push(repo, FR.git_date(ctx["cal"].at(late, "10:00")))   # after 09:30 ET of its session
             with self.assertRaises(guards.Refused):
                 self.ctx(repo)
@@ -388,8 +390,7 @@ class ContextRefusals(unittest.TestCase):
             # a line pushed in time whose 'amend' record reached origin/main after 09:30 ET of its session
             repo = FR.build(tmp)["repo"]
             s = ctx["cal"].offset(n0, 5)
-            logs.append_line(repo / DATA_DIR / "session-calendar-amendments.jsonl",
-                             {"kind": "remove_session", "session": s, "source": "notice"})
+            logs.append_line(repo / DATA_DIR / "session-calendar-amendments.jsonl", synth.calendar_line(s))
             FR.commit_push(repo, "2026-11-20T00:00:00+00:00")
             log_amendment(repo, "calendar", 0, ctx["cal"].at(s, "09:40"))
             with self.assertRaisesRegex(guards.Refused, "'amend' record reached origin/main at or after"):
@@ -397,8 +398,8 @@ class ContextRefusals(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             repo = FR.build(tmp)["repo"]
             logs.append_line(repo / DATA_DIR / "fees-v3-amendments.jsonl",
-                             {"kind": "finra_taf", "from": "2020-01-01", "to": "2020-12-31", "usd_per_share": 0.0002,
-                              "max_per_trade": 9.0})
+                             synth.fee_line("finra_taf_covered_equity", "2020-01-01", "2020-12-31",
+                                            usd_per_share=0.0002, max_usd_per_trade=9.0))
             FR.commit_push(repo, "2026-10-03T00:00:00+00:00")
             with self.assertRaises(guards.Refused):
                 self.ctx(repo)

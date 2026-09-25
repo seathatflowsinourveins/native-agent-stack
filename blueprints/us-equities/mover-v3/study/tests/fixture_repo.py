@@ -24,11 +24,14 @@ from core.params import (ACCESS_LOG, COST_TABLE, COUNT_ONLY_OUTPUT, DATA_DIR, PR
                          STUDY_PATH)
 
 REAL = Path(__file__).resolve().parents[5]
-FEES_FIXTURE = {"sec_section31_usd_per_million_of_sales": [
-    {"from": "2016-01-01", "to": "2017-10-19", "rate": 21.80, "source": "synthetic"},
-    {"from": "2017-10-20", "to": "2028-12-31", "rate": 13.00, "source": "synthetic"}],
-    "finra_taf_covered_equity_sales": [
-    {"from": "2016-01-01", "to": "2028-12-31", "usd_per_share": 0.000119, "max_per_trade": 5.95, "source": "synthetic"}]}
+# review round 15, N01: the fixture's fee file has data/fees-v3.json's schema (an open-ended last row included)
+FEES_FIXTURE = {"schema_version": 1, "id": "synthetic-fees",
+                "sec_section31": {"unit": "US dollars per million dollars of covered sales", "rows": [
+                    {"from": "2016-01-01", "to": "2017-10-19", "usd_per_million": 21.80, "sources": []},
+                    {"from": "2017-10-20", "to": None, "usd_per_million": 13.00, "sources": []}]},
+                "finra_taf_covered_equity": {"unit": "US dollars per share sold, capped per trade", "rows": [
+                    {"from": "2016-01-01", "to": None, "usd_per_share": 0.000119, "max_usd_per_trade": 5.95,
+                     "sources": []}]}}
 
 
 # Review round 10, M3: a synthetic merge key stands in for GitHub's web-flow key. It is generated once per test

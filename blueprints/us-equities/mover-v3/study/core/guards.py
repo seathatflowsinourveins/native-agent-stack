@@ -360,6 +360,10 @@ def check_parameters(protocol: dict) -> None:
     got = (protocol.get("run_discipline", {}).get("study_code") or {}).get("parameters")
     if got != PARAMETERS:
         raise Refused("run_discipline.study_code.parameters differs from the code's parameters")
+    # review round 15, amendment format: the line schema the code validates is the protocol's
+    from core.amendments import FORMAT
+    if protocol.get("run_discipline", {}).get("amendment_format") != FORMAT:
+        raise Refused("run_discipline.amendment_format differs from the code's amendment line schema")
 
 
 # ---------------------------------------------------------------- runtime and vintages

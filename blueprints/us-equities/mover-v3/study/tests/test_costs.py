@@ -12,12 +12,8 @@ from tests import synth
 REPO = Path(__file__).resolve().parents[5]
 PROTOCOL = json.loads((Path(__file__).resolve().parents[2] / "protocol-core-draft.json").read_text())
 
-FEES = {"sec_section31_usd_per_million_of_sales": [
-            {"from": "2016-10-01", "to": "2017-10-19", "rate": 21.80, "source": "synthetic"},
-            {"from": "2017-10-20", "to": "2021-06-30", "rate": 13.00, "source": "synthetic"}],
-        "finra_taf_covered_equity_sales": [
-            {"from": "2016-01-01", "to": "2021-06-30", "usd_per_share": 0.000119, "max_per_trade": 5.95,
-             "source": "synthetic"}]}
+FEES = synth.fee_document([("2016-10-01", "2017-10-19", 21.80), ("2017-10-20", "2021-06-30", 13.00)],
+                          [("2016-01-01", "2021-06-30", 0.000119, 5.95)])
 
 
 class Table(unittest.TestCase):
@@ -87,16 +83,18 @@ class Fees(unittest.TestCase):
 
     def test_post_freeze_amendment_and_missing_cap(self):
         base = json.loads(json.dumps(FEES))
-        base["sec_section31_usd_per_million_of_sales"][-1]["to"] = "2026-12-31"
-        base["finra_taf_covered_equity_sales"][-1]["to"] = "2026-12-31"
+        base["sec_section31"]["rows"][-1]["to"] = "2026-12-31"
+        base["finra_taf_covered_equity"]["rows"][-1]["to"] = "2026-12-31"
         amended = costs.Fees(base, [
-            {"kind": "finra_taf", "from": "2027-01-01", "to": "2027-12-31", "usd_per_share": 0.0002, "max_per_trade": 10.0},
-            {"kind": "sec_section31", "from": "2027-01-01", "to": "2027-12-31", "rate": 30.0}])
+            synth.fee_line("finra_taf_covered_equity", "2027-01-01", "2027-12-31", usd_per_share=0.0002,
+                           max_usd_per_trade=10.0),
+            synth.fee_line("sec_section31", "2027-01-01", "2027-12-31", usd_per_million=30.0)])
         self.assertAlmostEqual(amended.sale_fees("2027-02-01", 1000, 10_000), 0.30 + 0.2)
         with self.assertRaises(ValueError):
-            costs.Fees(base, [{"kind": "finra_taf", "from": "2027-01-01", "to": "2027-12-31", "usd_per_share": 0.0002}])
+            costs.Fees(base, [synth.fee_line("finra_taf_covered_equity", "2027-01-01", "2027-12-31",
+                                             usd_per_share=0.0002)])
         # review round 9, F5: a line that starts before the freeze session is refused
-        early = {"kind": "sec_section31", "from": "2020-01-01", "to": "2020-12-31", "rate": 99.0}
+        early = synth.fee_line("sec_section31", "2020-01-01", "2020-12-31", usd_per_million=99.0)
         with self.assertRaises(ValueError):
             costs.Fees(base, [early], freeze_session="2026-10-05")
         with tempfile.TemporaryDirectory() as tmp:
@@ -117,10 +115,10 @@ class FeeSupersession(unittest.TestCase):
 
     def test_an_amendment_supersedes_an_open_ended_base_row(self):
         base = json.loads(json.dumps(FEES))
-        base["sec_section31_usd_per_million_of_sales"][-1]["to"] = "2099-12-31"      # open-ended, as pinned
-        base["finra_taf_covered_equity_sales"][-1]["to"] = "2099-12-31"
-        f = costs.Fees(base, [{"kind": "sec_section31", "from": "2027-05-14", "to": "2099-12-31", "rate": 27.8},
-                              {"kind": "sec_section31", "from": "2027-10-01", "to": "2099-12-31", "rate": 20.6}],
+        base["sec_section31"]["rows"][-1]["to"] = None               # open-ended, as pinned
+        base["finra_taf_covered_equity"]["rows"][-1]["to"] = None
+        f = costs.Fees(base, [synth.fee_line("sec_section31", "2027-05-14", None, usd_per_million=27.8),
+                              synth.fee_line("sec_section31", "2027-10-01", None, usd_per_million=20.6)],
                        freeze_session="2026-10-05")
         self.assertEqual(f.rates("2027-05-13")[0], 13.00)
         self.assertEqual(f.rates("2027-05-14")[0], 27.8)
@@ -129,7 +127,7 @@ class FeeSupersession(unittest.TestCase):
 
     def test_overlapping_base_rows_are_refused_and_gaps_are_named(self):
         bad = json.loads(json.dumps(FEES))
-        bad["sec_section31_usd_per_million_of_sales"][0]["to"] = "2017-10-20"
+        bad["sec_section31"]["rows"][0]["to"] = "2017-10-20"
         with self.assertRaisesRegex(ValueError, "overlap"):
             costs.Fees(bad)
         f = costs.Fees(FEES)                                      # the base ends 2021-06-30
@@ -147,6 +145,39 @@ class FeeSupersession(unittest.TestCase):
                 "sessions": ["2021-06-01", "2021-06-30"], "fee_span": ["2021-06-01", "2021-07-08"]}
         use = logs.fee_first_use([{"kind": "sec_section31", "from": "2021-07-01", "to": "2021-12-31"}], [line])
         self.assertIn(0, use)
+
+
+class PinnedDataFiles(unittest.TestCase):
+    """Review round 15, N01: the loaders read the committed data files in their own schemas. The former loaders read
+    a {"d", "open", "close"} dictionary per session and fee rows keyed sec_section31_usd_per_million_of_sales / rate
+    and finra_taf_covered_equity_sales / max_per_trade, so neither committed file loaded (KeyError), and the synthetic
+    fixtures used the loaders' format instead of the committed one."""
+
+    DATA = Path(__file__).resolve().parents[2] / "data"
+
+    def test_the_committed_fee_file_loads_and_covers_every_development_and_validation_sale(self):
+        f = costs.Fees.from_files(self.DATA / "fees-v3.json", self.DATA / "fees-v3-amendments.jsonl")
+        cases = {"2017-01-03": (21.80, 0.000119, 5.95), "2017-07-05": (23.10, 0.000119, 5.95),
+                 "2019-06-03": (20.70, 0.000119, 5.95), "2020-12-31": (22.10, 0.000119, 5.95),
+                 "2022-05-16": (22.90, 0.000130, 6.49), "2026-10-01": (20.60, 0.0, 0.0),
+                 "2031-06-02": (20.60, 0.000249, 12.5)}                  # both open-ended last rows
+        for day, want in cases.items():
+            self.assertEqual(f.rates(day), want, day)
+        cal = synth.calendar("2015-09-01", "2021-06-30")
+        # a development sale is booked from the first development entry through E+5 of the last validation trade
+        days = cal.range("2017-01-03", cal.offset("2020-12-31", 12))
+        self.assertEqual(f.gaps(days), [])
+
+    def test_the_pre_round_15_fee_format_is_refused(self):
+        old = {"sec_section31_usd_per_million_of_sales": [{"from": "2016-01-01", "to": "2030-12-31", "rate": 8.0}],
+               "finra_taf_covered_equity_sales": [{"from": "2016-01-01", "to": "2030-12-31", "usd_per_share": 0.0001,
+                                                   "max_per_trade": 5.0}]}
+        with self.assertRaises(costs.FeeSchemaError):
+            costs.Fees(old)
+        doc = json.loads((self.DATA / "fees-v3.json").read_text())
+        doc["sec_section31"]["unit"] = "US dollars per thousand dollars"          # a unit change is refused
+        with self.assertRaises(costs.FeeSchemaError):
+            costs.Fees(doc)
 
 
 class NetReturn(unittest.TestCase):

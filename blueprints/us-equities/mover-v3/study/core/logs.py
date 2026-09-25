@@ -70,16 +70,23 @@ def check_run_log_line(line: dict) -> list:
 
 def check_calendar_amendments(lines: list, reach_times: dict, cal, freeze_session: str) -> list:
     """lines: calendar amendment records; reach_times: {line index: epoch seconds the line first became reachable
-    from origin/main, as GitHub records it}. A line must concern a session on or after the freeze session and
-    reach main before 09:30 ET of that session."""
+    from origin/main, as GitHub records it}. A line conforms to run_discipline.amendment_format (review round 15),
+    concerns a session of the pinned calendar on or after the freeze session and reaches main before 09:30 ET of that
+    session."""
+    from core.amendments import calendar_line_problems
     refusals = []
     for i, rec in enumerate(lines):
-        s = rec.get("session")
-        if not s or s < freeze_session:
+        problems = calendar_line_problems(rec)
+        if problems:
+            refusals.append(f"calendar amendment {i}: {'; '.join(problems)}")
+            continue
+        s = rec["session"]
+        if s < freeze_session:
             refusals.append(f"calendar amendment {i}: concerns {s}, before the freeze session")
             continue
-        if not rec.get("source"):
-            refusals.append(f"calendar amendment {i}: no primary source")
+        if not cal.is_session(s):
+            refusals.append(f"calendar amendment {i}: {s} is not a session of the pinned calendar")
+            continue
         t = reach_times.get(i)
         if t is None or t >= cal.at(s, "09:30"):
             refusals.append(f"calendar amendment {i}: not on origin/main before 09:30 ET of {s}")
@@ -88,13 +95,16 @@ def check_calendar_amendments(lines: list, reach_times: dict, cal, freeze_sessio
 
 def check_fee_amendments(lines: list, reach_times: dict, first_use: dict, freeze_session: str) -> list:
     """first_use: {line index: epoch seconds of the first holdout count or read that used a date the line
-    covers}. A fee line concerns dates on or after the freeze session and must reach main before that use."""
+    covers}. A fee line conforms to run_discipline.amendment_format (review round 15), concerns dates on or after
+    the freeze session and must reach main before that use."""
+    from core.amendments import fee_line_problems
     refusals = []
     for i, rec in enumerate(lines):
-        if rec.get("from", "") < freeze_session:
+        problems = fee_line_problems(rec)
+        if problems:
+            refusals.append(f"fee amendment {i}: {'; '.join(problems)}")
+        elif rec["from"] < freeze_session:
             refusals.append(f"fee amendment {i}: starts {rec.get('from')}, before the freeze session")
-        if rec.get("kind") == "finra_taf" and rec.get("max_per_trade") is None:
-            refusals.append(f"fee amendment {i}: a TAF line must carry max_per_trade")
         use, t = first_use.get(i), reach_times.get(i)
         if use is not None and (t is None or t >= use):
             refusals.append(f"fee amendment {i}: reached main after the first count or read that used its dates")
@@ -148,13 +158,15 @@ def fee_first_use(lines: list, run_log: list) -> dict:
     Codex P2), so a fee line for those dates has a first-use deadline too."""
     out = {}
     for i, rec in enumerate(lines):
+        # review round 15, amendment format: a null 'to' is an open-ended line
+        lo, hi = rec.get("from") or "", rec.get("to") or "9999-12-31"
         for x in run_log:
             span = x.get("fee_span") or x.get("sessions")
             # review round 14, F2: a count's or read's '_fetch' step is a use too, so no fee line for its dates
             # can be added between the sealed fetch and the evaluation
             if x.get("purpose") not in ("count", "read", "count_fetch", "read_fetch") or not span:
                 continue
-            if span[0] <= rec.get("to", "") and rec.get("from", "") <= span[1]:
+            if span[0] <= hi and lo <= span[1]:
                 t = parse_utc(x["utc_start"])
                 out[i] = min(out.get(i, t), t)
     return out

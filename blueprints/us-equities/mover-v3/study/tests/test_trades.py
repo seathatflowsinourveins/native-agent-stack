@@ -291,10 +291,7 @@ class Round9(unittest.TestCase):
         self.assertTrue(resolve(ev, "b_lane", ctx_for(cal), Store(), qs)["ratio_rule_in_hold"])
 
 
-FEES_2028 = {"sec_section31_usd_per_million_of_sales": [
-    {"from": "2016-01-01", "to": "2028-12-31", "rate": 13.00, "source": "synthetic"}],
-    "finra_taf_covered_equity_sales": [
-    {"from": "2016-01-01", "to": "2028-12-31", "usd_per_share": 0.000119, "max_per_trade": 5.95, "source": "synthetic"}]}
+FEES_2028 = synth.fee_document([("2016-01-01", "2028-12-31", 13.00)], [("2016-01-01", "2028-12-31", 0.000119, 5.95)])
 
 
 class Splits(unittest.TestCase):

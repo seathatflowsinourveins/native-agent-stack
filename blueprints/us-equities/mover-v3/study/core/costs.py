@@ -5,8 +5,8 @@ aa6fc79, so the intervals are half-open: time buckets [04:00, 08:00), [08:00, 09
 [10:00, 16:01) ET; price tiers [0, 2), [2, 5), [5, 20), [20, inf); dv tiers [0, 1M), [1M, 5M), [5M, inf).
 A boundary value goes to the upper tier ($5.00 is in $5-20).
 
-Fees: SEC Section 31 at rate x sell value / 1e6 plus FINRA TAF min(usd_per_share x shares, max_per_trade),
-unrounded, from data/fees-v3.json and its append-only amendments; commission 0.
+Fees: SEC Section 31 at usd_per_million x sell value / 1e6 plus FINRA TAF min(usd_per_share x shares,
+max_usd_per_trade), unrounded, from data/fees-v3.json and its append-only amendments; commission 0.
 """
 from __future__ import annotations
 
@@ -81,41 +81,76 @@ def per_side(hs_cell: float, h_fill: float, imp: float, mode: str = "primary") -
     raise ValueError(mode)
 
 
+SEC_UNIT = "US dollars per million dollars of covered sales"
+TAF_UNIT = "US dollars per share sold, capped per trade"
+OPEN_END = "9999-12-31"          # the internal end of a row whose 'to' is null (open-ended)
+FEE_TABLES = {"sec_section31": ("sec_section31", SEC_UNIT, ("usd_per_million",)),
+              "finra_taf_covered_equity": ("finra_taf_covered_equity", TAF_UNIT,
+                                           ("usd_per_share", "max_usd_per_trade"))}
+
+
+class FeeSchemaError(ValueError):
+    pass
+
+
+def _fee_rows(base: dict, kind: str) -> list:
+    """The rows of one table of data/fees-v3.json, normalized to {"from", "to", <rate fields>} with an open end as
+    OPEN_END (review round 15, N01: the file's sec_section31.rows[].usd_per_million and
+    finra_taf_covered_equity.rows[].usd_per_share / max_usd_per_trade, a null 'to' on the open-ended last row)."""
+    from core.amendments import _is_date, _is_rate
+    key, unit, fields = FEE_TABLES[kind]
+    table = base.get(key)
+    if not isinstance(table, dict) or table.get("unit") != unit or not isinstance(table.get("rows"), list) \
+            or not table["rows"]:
+        raise FeeSchemaError(f"fees: {key} must hold a non-empty rows list in '{unit}'")
+    out = []
+    for i, r in enumerate(table["rows"]):
+        if not isinstance(r, dict) or not _is_date(r.get("from")) or \
+                (r.get("to") is not None and not _is_date(r.get("to"))) or \
+                not all(_is_rate(r.get(f)) for f in fields):
+            raise FeeSchemaError(f"fees: {key} row {i} needs from, to (a date or null) and {', '.join(fields)} >= 0")
+        out.append({"from": r["from"], "to": r["to"] or OPEN_END, **{f: float(r[f]) for f in fields}})
+    return out
+
+
 class Fees:
     """Review round 14, F2: the base file's rows of one kind never overlap and each has from <= to (a base that
     breaks this is refused at load, never at a read). An amendment line supersedes, for the dates it covers, every
     earlier row of its kind (the base's open-ended last row included): the latest appended line that covers a date
     governs, and a base row governs a date no amendment line covers. No line is edited; supersession is by
     precedence. core.holdout.require_fee_coverage checks that every date a count or read can book has a row before
-    that action fetches anything."""
+    that action fetches anything.
+
+    Review round 15, N01 and the amendment-format item: the base is data/fees-v3.json in its committed schema
+    (schema_version 1; sec_section31 and finra_taf_covered_equity, each with its unit and rows; a null 'to' is the
+    open end), and every amendment line conforms to run_discipline.amendment_format (core.amendments)."""
 
     def __init__(self, base: dict, amendments: list[dict] = (), freeze_session: str | None = None):
         """freeze_session, when given, refuses an amendment line whose first date precedes it (review round 9, F5);
         from_files requires it whenever the amendment file has a line."""
-        self.sec = list(base["sec_section31_usd_per_million_of_sales"])
-        self.taf = list(base["finra_taf_covered_equity_sales"])
+        from core.amendments import fee_line_problems
+        if not isinstance(base, dict) or base.get("schema_version") != 1:
+            raise FeeSchemaError("fees: schema_version must be 1")
+        self.sec = _fee_rows(base, "sec_section31")
+        self.taf = _fee_rows(base, "finra_taf_covered_equity")
         for name, rows in (("SEC", self.sec), ("TAF", self.taf)):
             spans = sorted((r["from"], r["to"]) for r in rows)
             for lo, hi in spans:
                 if lo > hi:
-                    raise ValueError(f"a base {name} fee row runs from {lo} to {hi}")
+                    raise FeeSchemaError(f"a base {name} fee row runs from {lo} to {hi}")
             for (_, hi), (lo, _) in zip(spans, spans[1:]):
                 if lo <= hi:
-                    raise ValueError(f"base {name} fee rows overlap on {lo}")
+                    raise FeeSchemaError(f"base {name} fee rows overlap on {lo}")
         self.sec_amend, self.taf_amend = [], []
-        for a in amendments:
-            if freeze_session is not None and (a.get("from") or "") < freeze_session:
-                raise ValueError(f"fee amendment starts {a.get('from')}, before the freeze session")
-            if not a.get("from") or not a.get("to") or a["from"] > a["to"]:
-                raise ValueError(f"fee amendment runs from {a.get('from')} to {a.get('to')}")
-            if a.get("kind") == "sec_section31":
-                self.sec_amend.append(a)
-            elif a.get("kind") == "finra_taf":
-                self.taf_amend.append(a)
-            else:
-                raise ValueError(f"unknown fee amendment kind {a.get('kind')!r}")
-        if any(r.get("max_per_trade") is None for r in self.taf + self.taf_amend):
-            raise ValueError("a TAF row must carry its max_per_trade cap")
+        for i, a in enumerate(amendments):
+            problems = fee_line_problems(a)
+            if problems:
+                raise ValueError(f"fee amendment line {i}: {'; '.join(problems)}")
+            if freeze_session is not None and a["from"] < freeze_session:
+                raise ValueError(f"fee amendment starts {a['from']}, before the freeze session")
+            fields = FEE_TABLES[a["kind"]][2]
+            row = {"from": a["from"], "to": a["to"] or OPEN_END, **{f: float(a[f]) for f in fields}}
+            (self.sec_amend if a["kind"] == "sec_section31" else self.taf_amend).append(row)
 
     @classmethod
     def from_files(cls, base_path, amendments_path=None, *, freeze_session: str | None = None):
@@ -138,8 +173,10 @@ class Fees:
         return hit[0]
 
     def rates(self, day: str):
+        """(SEC usd_per_million, TAF usd_per_share, TAF max_usd_per_trade) governing a sale on `day`."""
         taf = self._row(self.taf, self.taf_amend, day)
-        return self._row(self.sec, self.sec_amend, day)["rate"], taf["usd_per_share"], taf["max_per_trade"]
+        return self._row(self.sec, self.sec_amend, day)["usd_per_million"], taf["usd_per_share"], \
+            taf["max_usd_per_trade"]
 
     def gaps(self, days) -> list:
         """The days of `days` that have no governing SEC or TAF row."""

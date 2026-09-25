@@ -14,6 +14,7 @@ input is synthetic.
 | `core/records.py`, `core/store.py` | response parsing, the sealed snapshot, the ledger records and the corporate-action date fields |
 | `core/identity.py`, `core/screen.py`, `core/events.py` | `universe_and_identity`, the screen, dedup (pinned `dedupe_identity` through DuckDB, E1) and D membership |
 | `core/formulas.py`, `core/fills.py`, `core/costs.py`, `core/trades.py` | `populations`, `arms`, `cost_model` and the net return |
+| `core/calendar.py`, `core/amendments.py` | the session calendar and fee files read in their committed schemas, and the versioned amendment line schema (`populations.session_calendar`, `cost_model.fees`, `run_discipline.amendment_format`; review round 15, N01) |
 | `core/terciles.py`, `core/chronology.py`, `core/stats.py`, `core/evaluate.py` | `tercile_rule`, `chronology`, `statistics`, `multiple_testing` and `outcome_reporting` |
 | `core/count_unit.py`, `core/gate.py`, `core/logs.py`, `core/guards.py`, `core/runner.py` | the holdout count, the gate, the access log, the evaluator refusals, the append-only files and the runtime lock |
 | `core/holdout.py`, `core/holdout_store.py` | the holdout path: authorization, collection batches merged per (symbol, session), counts with the extension decision, the read and the not-read label (review round 9) |
