@@ -51,20 +51,11 @@ Codex 0.155.1 disables a skill without touching the lock or the symlink, through
 `[[skills.config]]` tables in `~/.codex/config.toml`: `name = "<skill>"` and `enabled = false`,
 no path needed. Claude Code 2.1.282 does the equivalent with a settings key, `skillOverrides`,
 mapping a skill name to `"on" | "name-only" | "user-invocable-only" | "off"` — exactly the four
-values the manifest's `claude_listing` field uses. That is the verified upstream client feature
-only: this repository does not wire it up yet. `adoption/templates/claude.settings.template.json`
-(239 lines, read in full for this record) has no `skillOverrides` key, and
-`tools/adoption/apply_claude_settings.py` never references the name, so no host's live
-`~/.claude/settings.json` is actually set from a manifest `claude_listing` value today; the
-manifest's own `settings_propagation` field states the same intended path but is equally a
-specification, not a verified fact. Installing or removing a skill still goes through the
-`skills` CLI alone (the canonical copy and the `claude-code` symlink). Adding that template
-block, and confirming the round trip through `apply_claude_settings.py`'s merge, is an open gap
-for whoever builds it — not something this record can cite as already working. (Once it exists:
-that script's `deep_merge_dict` is already a generic recursive merge that keeps a base key the
-incoming template omits, so a demotion would still need to write an explicit state rather than
-rely on deleting a key.) Native `claude -p "/skill-doctor" --output-format json` costs 0 API
-tokens
+values the manifest's `claude_listing` field uses, propagated to a host by
+`adoption/templates/claude.settings.template.json`'s `skillOverrides` block through
+`tools/adoption/apply_claude_settings.py`'s deep merge (a key removed from the template is never
+removed from an already-applied host, so a demotion must write an explicit state rather than
+delete a key). Native `claude -p "/skill-doctor" --output-format json` costs 0 API tokens
 (`num_turns` 0, model `<synthetic>`) and prints a table headed `skill  source  context  7d
 tokens  uses  last used`, with `context` a listing-cost estimate in tokens (`-` when a skill does
 not appear in the listing at all, as `off` skills do not), `uses` a count like `3×`, and `last
