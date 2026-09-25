@@ -209,17 +209,37 @@ between them. `--tools-suffix` alone still repoints the *canonical* `bin/*`
 symlinks at the freshly staged prefix directly (every `install_*` function
 links into `bin_dir`, which defaults to `ECO_INSTALL_ROOT/bin`, unless told
 otherwise) -- it does **not** by itself keep a staged run from touching the
-canonical links; only `--no-link` (installs the versioned root only, creates
-no `bin/*` symlink for it at all -- a uv-tool-kind pin still lets uv manage
-its own isolated shim directory under that staged prefix) or `--link-dir DIR`
-(redirects the symlinks and the reported `installed-versions*.txt` to `DIR`
-instead) actually isolate a staged run from the live `bin/*`. Pair
-`--tools-suffix` with one of those two when the intent is exactly "stage a
-root beside the live one, for `ecosystem-switch` to adopt later" rather than
-"switch to the new version immediately by re-running bootstrap" -- the
-second is also a valid, simpler path for a component `ecosystem-switch` does
-not manage yet, but it is the old non-atomic, non-ledgered `ln -sfn`-by-hand
-replacement this tool exists to retire, not a mix of the two.
+canonical links; only `--no-link` or `--link-dir DIR` actually isolate a
+staged run's symlinks from the live `bin/*`.
+
+`--no-link` installs the versioned root only and creates no `bin/*` symlink
+for it at all -- but this is not full isolation for every pin kind (minor
+finding). A uv-tool-kind pin's own tool environment lives at
+`$ECO_INSTALL_ROOT/python-tools<suffix>` (`UV_TOOL_DIR` in
+`install_uv_tool`), and `<suffix>` is empty unless `--tools-suffix` is also
+given; `--no-link` alone keeps `uv`'s shim out of the shared `bin_dir` (uv
+still "manages its own shim directory" under the staged prefix), but without
+`--tools-suffix` too, `uv tool install` still runs against the *live*
+`python-tools/` environment the live `bin/*` shims already use, even though
+no new symlink is created there. Pair `--no-link` with `--tools-suffix` when
+a uv-tool-kind pin must be fully isolated, not `--no-link` alone.
+
+`--link-dir DIR` writes the symlinks themselves under `DIR` instead of the
+canonical `bin_dir`, and the generated report's own listing reflects that;
+the report *file* itself (`installed-versions<suffix|.staged>.txt`,
+`versions_log_path` in `bootstrap-linux.sh`) is always written under
+`$ECO_INSTALL_ROOT`, regardless of `--link-dir` -- `--link-dir` relocates
+what the report lists, never the report file's own location (minor finding:
+this page previously said `--link-dir` redirects "the reported
+`installed-versions*.txt`" itself to `DIR`, which it does not).
+
+Pair `--tools-suffix` with `--no-link` and/or `--link-dir` when the intent is
+exactly "stage a root beside the live one, for `ecosystem-switch` to adopt
+later" rather than "switch to the new version immediately by re-running
+bootstrap" -- the second is also a valid, simpler path for a component
+`ecosystem-switch` does not manage yet, but it is the old non-atomic,
+non-ledgered `ln -sfn`-by-hand replacement this tool exists to retire, not a
+mix of the two.
 
 **Ledger.** Every operation `apply`, `adopt --relink` or `rollback` performs
 appends one entry to `$ECO_INSTALL_ROOT/switch/ledger.jsonl`: a 0600,
