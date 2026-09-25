@@ -1595,6 +1595,58 @@ class UnitRestartTimeoutTests(unittest.TestCase):
         self.assertIn("daemon-reload", str(ctx.exception))
         self.assertIn("timed out", str(ctx.exception))
 
+    def test_a_pre_restart_status_check_os_error_is_a_plain_refusal_not_an_attempted_restart(self):
+        # Minor finding (round 5): same reasoning as the timeout case above, but for OSError (a
+        # missing/misconfigured systemctl: FileNotFoundError via ECOSYSTEM_SWITCH_SYSTEMCTL or
+        # PATH, or PermissionError) -- the spawn itself fails, so nothing about what is running
+        # has changed, and this must be a plain refusal, never UnitRestartAttempted (unlike a
+        # client-side timeout, a spawn failure means systemctl was never actually invoked).
+        def fake_run_captured(argv, **_kwargs):
+            if "show" in argv:
+                raise FileNotFoundError(2, "No such file or directory", argv[0])
+            return subprocess.CompletedProcess(argv, 0, stdout="", stderr="")
+        with unittest.mock.patch.object(switch, "run_captured", side_effect=fake_run_captured):
+            with self.assertRaises(switch.SwitchError) as ctx:
+                switch.op_unit_restart("svc.service", window_component_ok=True, expected_root="/nonexistent")
+        self.assertNotIsInstance(ctx.exception, switch.UnitRestartAttempted)
+        self.assertIn("pre-restart", str(ctx.exception))
+        self.assertIn("could not run", str(ctx.exception))
+
+    def test_a_restart_command_os_error_is_a_plain_refusal_not_an_attempted_restart(self):
+        # Unlike the client-side timeout case (where systemd may already have queued the job), a
+        # spawn failure here means systemctl never ran at all -- systemd was never asked to
+        # restart anything, so this is also a plain refusal, not UnitRestartAttempted.
+        def fake_run_captured(argv, **_kwargs):
+            if argv[-2:] == ["restart", "svc.service"]:
+                raise FileNotFoundError(2, "No such file or directory", argv[0])
+            return subprocess.CompletedProcess(argv, 0, stdout="1111\n", stderr="")
+        with unittest.mock.patch.object(switch, "run_captured", side_effect=fake_run_captured):
+            with self.assertRaises(switch.SwitchError) as ctx:
+                switch.op_unit_restart("svc.service", window_component_ok=True, expected_root="/nonexistent")
+        self.assertNotIsInstance(ctx.exception, switch.UnitRestartAttempted)
+        self.assertIn("could not run", str(ctx.exception))
+
+    def test_a_post_restart_status_check_os_error_is_reported_as_unit_restart_attempted(self):
+        # The restart itself already succeeded here, so this IS a real side effect -- unlike the
+        # two cases above, an OSError this late is UnitRestartAttempted, the same as its timeout
+        # sibling just above (test_a_post_restart_status_check_timeout_is_reported_as_...).
+        show_calls = []
+
+        def fake_run_captured(argv, **_kwargs):
+            if argv[-2:] == ["restart", "svc.service"]:
+                return subprocess.CompletedProcess(argv, 0, stdout="", stderr="")
+            if "show" in argv:
+                show_calls.append(argv)
+                if len(show_calls) == 1:  # the pre-restart MainPID probe succeeds normally
+                    return subprocess.CompletedProcess(argv, 0, stdout="1111\n", stderr="")
+                raise FileNotFoundError(2, "No such file or directory", argv[0])  # the post-restart one fails
+            return subprocess.CompletedProcess(argv, 0, stdout="", stderr="")
+        with unittest.mock.patch.object(switch, "run_captured", side_effect=fake_run_captured):
+            with self.assertRaises(switch.UnitRestartAttempted) as ctx:
+                switch.op_unit_restart("svc.service", window_component_ok=True, expected_root="/nonexistent")
+        self.assertIn("post-restart", str(ctx.exception))
+        self.assertIn("could not run", str(ctx.exception))
+
 
 class LockTests(SwitchFixture):
     def test_concurrent_apply_is_refused_with_75(self):

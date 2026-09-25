@@ -805,6 +805,13 @@ def op_unit_restart(unit: str, *, window_component_ok: bool, expected_root: str)
     except subprocess.TimeoutExpired as error:
         raise SwitchError(f"pre-restart status check for {unit} timed out after {error.timeout}s; "
                            "refusing rather than restarting without a known prior MainPID") from error
+    except OSError as error:
+        # Minor finding (round 5): a missing/misconfigured systemctl (FileNotFoundError via
+        # ECOSYSTEM_SWITCH_SYSTEMCTL or PATH; PermissionError if it exists but is not executable)
+        # never even spawns -- nothing about what is running has changed, so this is a plain
+        # refusal too, the same as the timeout case above (never UnitRestartAttempted: unlike a
+        # client-side timeout, a spawn failure means systemctl was never actually invoked at all).
+        raise SwitchError(f"pre-restart status check for {unit} could not run systemctl: {error}") from error
     before_fields = {"from": (before.stdout or "").strip(), "pre_sha256": sha256_text(before.stdout or "")}
     try:
         run_captured([*systemctl_argv(), "--user", "daemon-reload"])
@@ -812,6 +819,9 @@ def op_unit_restart(unit: str, *, window_component_ok: bool, expected_root: str)
         raise SwitchError(f"systemctl --user daemon-reload timed out after {error.timeout}s before "
                            f"restarting {unit}; refusing rather than restarting against possibly "
                            "stale unit definitions") from error
+    except OSError as error:
+        raise SwitchError(f"systemctl --user daemon-reload could not run before restarting "
+                           f"{unit}: {error}") from error
     try:
         restart = run_captured([*systemctl_argv(), "--user", "restart", unit])
     except subprocess.TimeoutExpired as error:
@@ -826,6 +836,11 @@ def op_unit_restart(unit: str, *, window_component_ok: bool, expected_root: str)
             f"systemctl --user restart {unit} timed out after {error.timeout}s; systemd may have "
             "completed the restart after the client that requested it was abandoned",
             {**before_fields, "to": None, "post_sha256": sha256_text("")}) from error
+    except OSError as error:
+        # Unlike the timeout above, a spawn failure here (round 5 minor finding) means systemctl
+        # never ran at all, so systemd was never asked to restart anything -- a plain refusal, not
+        # UnitRestartAttempted (nothing was attempted).
+        raise SwitchError(f"systemctl --user restart {unit} could not run: {error}") from error
     if restart.returncode != 0:
         # A real side effect (systemctl restart was actually invoked) even though it failed: the
         # unit may no longer be running the old build. UnitRestartAttempted carries what little
@@ -841,6 +856,13 @@ def op_unit_restart(unit: str, *, window_component_ok: bool, expected_root: str)
         # this is purely a health-probe failure, not an unattempted restart.
         raise UnitRestartAttempted(
             f"post-restart status check for {unit} timed out after {error.timeout}s",
+            {**before_fields, "to": None, "post_sha256": sha256_text("")}) from error
+    except OSError as error:
+        # The restart itself already succeeded (returncode 0, reached this line), so systemctl
+        # plainly runs -- a spawn failure only now is still a real side effect either way (round 5
+        # minor finding), the same as the timeout case just above.
+        raise UnitRestartAttempted(
+            f"post-restart status check for {unit} could not run: {error}",
             {**before_fields, "to": None, "post_sha256": sha256_text("")}) from error
     pid = (after_pid.stdout or "").strip()
     exe = None
