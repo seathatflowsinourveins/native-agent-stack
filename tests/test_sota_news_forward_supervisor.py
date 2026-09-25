@@ -187,5 +187,97 @@ class PaperCloseOut(unittest.TestCase):
         self.assertEqual((rows[0]["evidence_label"], rows[0]["arm"], rows[0]["core_flat"]), ("pilot", "core", True))
 
 
+def bars_for(days, close=50.0):
+    return [{"t": common.iso(datetime(d.year, d.month, d.day, tzinfo=NY)), "c": close, "v": 1_000_000, "l": close * 0.99}
+            for d in days]
+
+
+class ArmFlows(unittest.TestCase):
+    """Arm entries through the supervisor with a paper broker double (no network)."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp(prefix="nf-arms-")
+        self.broker = Broker()
+        cal = common.load_calendar()
+        journal = common.Journal(self.dir, date(2026, 9, 25))
+        sup = supervisor.Supervisor.__new__(supervisor.Supervisor)
+        sup.mode, sup.schedule, sup.trade_date, sup.journal, sup.state = "paper", SCHED, date(2026, 9, 25), journal, self.dir
+        sup.calendar, sup.prev_session = cal, cal.previous(date(2026, 9, 25))
+        sup.cfg = {"arms": {"pm": {"orders_from": "2026-09-28"}, "ah": {"orders_from": "2026-09-25"}}}
+        sup.executor = supervisor.ex.Executor("paper", journal, self.dir, broker=self.broker)
+        sup.counts, sup.equity = supervisor.Counter(), Decimal("900000")
+        sup.exposures = {a: planner.Exposure() for a in planner.ARM_PREFIX}
+        sup.limits = {a: planner.Limits.for_arm(a, sup.equity, 1, extra_cap=sup.equity) for a in planner.ARM_PREFIX}
+        sup.account_gross_cap = 4 * sup.equity
+        sup.candidates, sup.bars, sup.done_steps = {}, {}, set()
+        sup.arm_pending = {planner.PM: {}, planner.AH: {}}
+        sup.data = mock.Mock()
+        sup.data.snapshots.side_effect = lambda syms: {s: {"latestQuote": {"bp": 49.95, "ap": 50.05}} for s in syms}
+        sup.data.asset.return_value = {"tradable": True, "shortable": True, "easy_to_borrow": True}
+        self.sup = sup
+
+    def tearDown(self):
+        shutil.rmtree(self.dir, ignore_errors=True)
+
+    def event(self, sym, created, session, label="FAVORABLE", nid=1):
+        ev = {"event_id": f"{nid}:{sym}", "news_id": str(nid), "symbol": sym, "label": label, "lane": "liquid",
+              "created_at": common.iso(created), "session": session, "session_label": planner.OPEN_AUCTION,
+              "sigma": 0.02, "prior_median_dollar_volume_20": 50_000_000.0,
+              "entry_utc": common.iso(created + timedelta(minutes=15))}
+        self.sup.bars[(sym, session)] = bars_for(common.load_calendar().prior_sessions(date.fromisoformat(session), 2))
+        self.sup.candidates[ev["event_id"]] = ev
+        return ev
+
+    def decisions(self):
+        return [r for r in common.read_jsonl(self.sup.journal.path) if r["kind"] == "decision"]
+
+    def test_ah_entry_with_corporate_action_guard(self):
+        ca = common.load_by_path("adaptive_paper_corporate_actions",
+                                 os.path.join(common.REPO, "blueprints/us-equities/adaptive-paper/corporate_actions.py"))
+        for i, sym in enumerate(("AAA", "BBB", "CCC")):
+            ev = self.event(sym, ny(16, 5 + i), "2026-09-28", nid=10 + i)
+            self.sup.arm_pending[planner.AH][ev["event_id"]] = ev
+        guard = {"AAA": ca.GuardDecision("AAA", False, False, False, None),
+                 "BBB": ca.GuardDecision("BBB", True, False, False, "corporate_action_split")}
+        with mock.patch.object(self.sup, "corporate_action_block", return_value=guard):
+            self.sup.run_arm_entries(ny(16, 25), planner.AH)
+        reasons = {d["symbol"]: d["reason"] for d in self.decisions()}
+        self.assertEqual(reasons, {"AAA": "ok", "BBB": "corporate_action_split", "CCC": "corporate_action_lookup_failed"})
+        sent = self.broker.all
+        self.assertEqual(len(sent), 1)
+        # 25% of min(0.0015 * 900k / 0.02, 0.5% * 50M, 5% * 900k) = 25% of 45,000 = 11,250 -> 224 shares at 50.21
+        self.assertEqual((sent[0]["client_order_id"], sent[0]["extended_hours"], sent[0]["time_in_force"], sent[0]["limit_price"], sent[0]["qty"]),
+                         ("nf1x-ah-20260925-ent-AAA-long", True, "day", "50.21", "224"))
+
+    def test_pm_is_gated_and_follows_core_first_event(self):
+        first = self.event("AAA", ny(6, 0), "2026-09-25", nid=1)
+        self.event("BBB", ny(3, 0), "2026-09-25", nid=2)  # the core's first BBB event is overnight
+        second = self.event("BBB", ny(6, 0), "2026-09-25", nid=3)
+        for ev in (first, second):
+            self.sup.arm_pending[planner.PM][ev["event_id"]] = ev
+        self.sup.run_arm_entries(ny(6, 16), planner.PM)
+        reasons = {d["symbol"]: d["reason"] for d in self.decisions()}
+        self.assertEqual(reasons, {"AAA": "ok", "BBB": "pm_event_not_core_first_in_window"})
+        self.assertEqual(self.broker.all, [])  # pm orders start 2026-09-28: intent journaled, nothing sent
+        intents = [r for r in common.read_jsonl(self.sup.journal.path) if r["kind"] == "order_intent"]
+        self.assertEqual([(r["mode"], r["arm"], r["envelope"]["intent"]["extended_hours"]) for r in intents], [("dry-run", "pm", True)])
+
+    def test_ah_opg_exit_precedes_and_blocks_the_core_basket(self):
+        self.broker.add("nf1x-ah-20260924-ent-AAA-long", "buy", 8, 8)
+        blocked = self.sup.run_ah_opg_exits()
+        self.assertEqual(blocked, {"AAA"})
+        self.assertEqual([(o["client_order_id"], o["time_in_force"]) for o in self.broker.all[1:]],
+                         [("nf1x-ah-20260924-opg-AAA-long", "opg")])
+
+    def test_first_order_time_is_enforced(self):
+        self.sup.executor.not_before = ny(9, 15)
+        self.sup.executor.clock = lambda: ny(9, 14)
+        intent = planner.entry_intent(date(2026, 9, 25), "opg", "AAA", "long", 5, "opg")
+        self.assertIsNone(self.sup.send(intent, {"purpose": "entry", "session_label": planner.OPEN_AUCTION}))
+        self.sup.executor.clock = lambda: ny(9, 15)
+        self.assertIsNotNone(self.sup.send(intent, {"purpose": "entry", "session_label": planner.OPEN_AUCTION}))
+        self.assertEqual(len(self.broker.all), 1)
+
+
 if __name__ == "__main__":
     unittest.main()
