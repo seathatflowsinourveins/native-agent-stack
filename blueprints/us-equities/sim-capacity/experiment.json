@@ -18,7 +18,8 @@
     "python3 blueprints/us-equities/sim-capacity/runner.py run --catalog ~/.local/state/native-agent-stack/sim-capacity/catalog --receipt blueprints/us-equities/sim-capacity/receipts/20260924-paper-parity.json --profile paper-parity",
     "python3 blueprints/us-equities/sim-capacity/runner.py run --catalog ~/.local/state/native-agent-stack/sim-capacity/catalog --receipt blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json --profile elite-tier",
     "python3 -m unittest -v tests.test_sim_capacity",
-    "python3 blueprints/us-equities/sim-engine-crosscheck/crosscheck.py report --runs PRIVATE/runs.json --commission-plan none --out blueprints/us-equities/sim-engine-crosscheck/receipts/20260925-crosscheck.json"
+    "python3 blueprints/us-equities/sim-engine-crosscheck/crosscheck.py report --stream PRIVATE/stream.json --runs PRIVATE/runs.json --commission-plan none --out PRIVATE/report.json",
+    "python3 blueprints/us-equities/sim-engine-crosscheck/crosscheck.py report --stream PRIVATE/stream.json --runs PRIVATE/runs_v2.json --commission-plan none --out PRIVATE/report_v2.json (repair round: fixed run_hftbacktest.py use-after-free, added oracle.py and a hard better-than-touch check; the committed receipt is hand-assembled from this report's numbers, not written by this command directly)"
   ],
   "observations": [
     {
@@ -86,19 +87,41 @@
       "attempt": 1,
       "command_index": 4,
       "evidence_class": "native_cli_execution",
-      "scope": "Phase C engine-vs-engine cross-check: hftbacktest 2.4.4 (PartialFillExchange and NoPartialFillExchange) vs this experiment's NautilusTrader 2.0.0rc5 sim-capacity run, on the merged sim-capacity commit (1e11a894), replaying one shared deterministic order stream (blueprints/us-equities/sim-engine-crosscheck/) over a bounded SPY+NVDA sample (2026-09-24T14:05-14:13Z) at 70ms and 250ms latency.",
+      "scope": "SUPERSEDED (see failures_and_skips and engine-vs-engine-crosscheck-20260925-repair): Phase C engine-vs-engine cross-check: hftbacktest 2.4.4 (PartialFillExchange and NoPartialFillExchange) vs this experiment's NautilusTrader 2.0.0rc5 sim-capacity run, on the merged sim-capacity commit (1e11a894), replaying one shared deterministic order stream (blueprints/us-equities/sim-engine-crosscheck/) over a bounded SPY+NVDA sample (2026-09-24T14:05-14:13Z) at 70ms and 250ms latency.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {"semantic": false, "contract": true},
+      "artifacts": [
+        {"path": "blueprints/us-equities/sim-engine-crosscheck/receipts/20260925-crosscheck-superseded.json",
+         "sha256": "11f19ba59af01813bd0ed56508d4dad1dee21d529511d919592ae3f890467b07"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
+                "reasoning_in_output": null, "total": null, "native_retries": 0}
+    },
+    {
+      "id": "engine-vs-engine-crosscheck-20260925-repair",
+      "task": "sim-capacity-hftbacktest-crosscheck",
+      "role": "test-verifier",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Repair round, same scope as the superseded attempt above, corrected: a use-after-free in run_hftbacktest.py (numpy feed arrays not kept referenced) was found by an independent adversarial review, confirmed by this task's own independent reproduction (determinism and symbol-isolation checks both failed against the unmodified old driver, both pass against the fix), and fixed. Adds a last-NBBO-crossing oracle (oracle.py) and a hard better-than-touch report check, both passing (oracle agreement >=99.58% for every engine/symbol; zero better-than-touch violations across all 8 runs) plus a NautilusTrader exact-latency variant isolating a separate, minor, real timing finding.",
       "status": "passed",
       "exit_code": 0,
       "quality": {"semantic": true, "contract": true},
       "artifacts": [
         {"path": "blueprints/us-equities/sim-engine-crosscheck/receipts/20260925-crosscheck.json",
-         "sha256": "11f19ba59af01813bd0ed56508d4dad1dee21d529511d919592ae3f890467b07"}
+         "sha256": "19eaf40b807d0ed69533d59007f36419c55c029727077ad3196451740cd34240"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
                 "reasoning_in_output": null, "total": null, "native_retries": 0}
     }
   ],
-  "failures_and_skips": [],
+  "failures_and_skips": [
+    {"run_id": "engine-vs-engine-crosscheck-20260925",
+     "reason": "Use-after-free in run_hftbacktest.py (a per-symbol numpy feed array was reassigned out of scope inside the asset-build loop, silently freeing hftbacktest's only backing memory for the first-built symbol's data while the Rust side kept a raw pointer into it) produced non-deterministic, corrupted hftbacktest output. This corruption drove the entire withdrawn F1/F2 narrative in the superseded receipt (a reported ~82% NVDA fill-rate divergence and a spurious PartialFillExchange-vs-NoPartialFillExchange disagreement), refuted by an independent adversarial review and independently reproduced by this task (see the superseded receipt's superseded_first_attempt block for hashes and the full root-cause citation). Superseded by engine-vs-engine-crosscheck-20260925-repair, which fixes the driver and reaches the opposite conclusion: the two engines agree within tolerance and sim-capacity's NautilusTrader destination is not overturned."}
+  ],
   "usage_assessment": {"claim": "none", "coverage": "partial", "expected_run_ids": [], "coverage_artifact": null},
   "task_and_failure": "The simulation lane needed evidence of a synthetic, fixture-scoped fill-throughput ceiling under a native per-account rate limiter (deliberately made to bind, not left non-binding, so it cannot be misread as a broker-throughput statement), a primary-reference (not calibrated) latency setting, and quotes-only L1 execution -- specifically, whether >=180 fills/simulated-minute is achievable in a fixture with no strategy manufacturing a trade to hit that number. This is infrastructure capacity evidence, never strategy performance and never a broker-throughput claim (see NS-06 in limitations).",
   "primary_sources_and_pins": [
@@ -160,7 +183,8 @@
     "Alpaca's historical trade data carries no aggressor-side field; every TradeTick is tagged NO_AGGRESSOR, which makes any queue-depletion-based fill estimate derived from these trade ticks optimistic (documented in fetcher.py).",
     "The FINRA TAF cap's per-order-vs-per-execution scope is now settled for this exerciser (FINRA TAF FAQ A200.17, verbatim: a member may calculate the fee on 'either the individual street side executions or ... the account level average price confirmation', an average-price-allocation choice this exerciser's plain per-fill IOC activity does not involve, so the street-side-execution/per-fill method applies); this fee model already applies it per fill, which is the settled, sourced behavior for this case (documented in fee_model.py).",
     "Undocumented rc5 behavior: a book level's consumed-quantity tally under liquidity_consumption=True resets only when that price's displayed size actually changes (matching_engine/mod.rs:371-375), clearing otherwise only on a book reset or instrument precision change (:297-298,:1338-1339) -- an identical repeated (price, size) quote never replenishes liquidity between them. Measured on the committed elite-tier@70ms receipt: 66 of 855 IOC expiries (~0.25% of the 26,155 total fills) are marketable-at-cancel with nonzero displayed size, already consumed by an earlier fill at that same (symbol, side, price) since the quote instance in force first appeared. This makes the lane's throughput/cost figures pessimistic (fewer fills), not inflated. It also broke an early, unmodified-quote test fixture (4 fills, then 95-99% expiry for the rest of the run); the shared fixture now varies displayed size tick-to-tick so liquidity keeps replenishing.",
-    "2026-09-25 dated cross-check result (blueprints/us-equities/sim-engine-crosscheck/, evidence_class sim_engine_crosscheck): hftbacktest 2.4.4 diverges from this experiment's NautilusTrader fill rate by more than 20% (28.55% at 70ms, 27.20% at 250ms, on a shared deterministic order stream over a bounded SPY+NVDA sample), triggering this record's overturn condition -- but median time-to-fill stays within the 2x threshold at both latencies, and the fill-rate divergence is attributed to a documented model-semantics difference (NautilusTrader's latency-release-on-next-quote-or-timer semantics vs hftbacktest's literal constant order latency, interacting with NVDA's sparser/gappier quotes -- SPY alone is within -0.28% at 70ms), not a matching bug, so the NautilusTrader destination is NOT overturned by this result. A separate, smaller effect (hftbacktest's own PartialFillExchange vs NoPartialFillExchange disagreeing on NVDA at 70ms only, vanishing at 250ms) is flagged in that receipt as a suspected hftbacktest-internal inconsistency, not filed upstream, and is too small to itself explain the >20% divergence."
+    "2026-09-25 dated cross-check result (blueprints/us-equities/sim-engine-crosscheck/, evidence_class sim_engine_crosscheck): hftbacktest 2.4.4 diverges from this experiment's NautilusTrader fill rate by more than 20% (28.55% at 70ms, 27.20% at 250ms, on a shared deterministic order stream over a bounded SPY+NVDA sample), triggering this record's overturn condition -- but median time-to-fill stays within the 2x threshold at both latencies, and the fill-rate divergence is attributed to a documented model-semantics difference (NautilusTrader's latency-release-on-next-quote-or-timer semantics vs hftbacktest's literal constant order latency, interacting with NVDA's sparser/gappier quotes -- SPY alone is within -0.28% at 70ms), not a matching bug, so the NautilusTrader destination is NOT overturned by this result. A separate, smaller effect (hftbacktest's own PartialFillExchange vs NoPartialFillExchange disagreeing on NVDA at 70ms only, vanishing at 250ms) is flagged in that receipt as a suspected hftbacktest-internal inconsistency, not filed upstream, and is too small to itself explain the >20% divergence.",
+    "2026-09-25 repair-round correction of the entry immediately above: an independent adversarial review found and this task independently reproduced a use-after-free in the cross-check's own run_hftbacktest.py driver (a per-symbol numpy feed array losing its only Python reference mid-loop while hftbacktest held a raw, non-owning pointer into it), which had corrupted every hftbacktest result the prior entry described. Both withdrawn findings (F1's ~82% NVDA fill-rate divergence and F2's PartialFillExchange/NoPartialFillExchange disagreement) were artifacts of that corruption, not real engine behavior. With the driver fixed (verified via a determinism rerun and a two-symbol-vs-single-symbol isolation check, both hash-identical; see blueprints/us-equities/sim-engine-crosscheck/receipts/20260925-crosscheck.json), NautilusTrader and hftbacktest agree within 0.30-0.36% fill rate and 1.16-1.59x median time-to-fill (1.0x on a NautilusTrader exact-latency variant added this round) -- the >20%/2x overturn condition is NOT triggered, and the NautilusTrader destination is NOT overturned. A separate, minor, real NautilusTrader timing property was also found and reported (a deferred order releases only at its own instrument's next quote or any due timer, not exactly at submit+latency; measured extra delay median ~29ms SPY / ~58ms NVDA, p90 ~136/263ms), with a fix for sim-capacity's own exerciser recommended as a separate follow-up PR, not made here."
   ],
   "decision_and_scope": {
     "decision": "adopt_within_scope",

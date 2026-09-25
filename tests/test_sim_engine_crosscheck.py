@@ -29,6 +29,7 @@ if str(BLUEPRINT) not in sys.path:
     sys.path.insert(0, str(BLUEPRINT))
 
 import metrics  # noqa: E402
+import oracle  # noqa: E402
 import order_stream  # noqa: E402
 
 NAUTILUS_AVAILABLE = importlib.util.find_spec("nautilus_trader") is not None
@@ -239,19 +240,185 @@ class ReceiptStructureTests(unittest.TestCase):
         receipt_path = BLUEPRINT / "receipts" / "20260925-crosscheck.json"
         self.assertTrue(receipt_path.is_file(), receipt_path)
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
-        for key in ("evidence_class", "sample", "order_stream", "engines", "config_matrix",
-                    "metrics_table", "mechanistic_findings", "overturn_evaluation", "unverified"):
+        for key in ("evidence_class", "repair_round", "superseded_first_attempt", "fix", "sample",
+                    "order_stream", "engines", "config_matrix", "metrics_table", "oracle_agreement",
+                    "better_than_touch_violations", "determinism_check", "release_timing_finding",
+                    "overturn_evaluation", "unverified"):
             self.assertIn(key, receipt)
         self.assertEqual(receipt["evidence_class"], "sim_engine_crosscheck")
 
-    def test_receipt_metrics_table_has_all_six_configs(self):
+    def test_receipt_metrics_table_has_all_eight_configs(self):
         receipt = json.loads((BLUEPRINT / "receipts" / "20260925-crosscheck.json").read_text(encoding="utf-8"))
-        overall = receipt["metrics_table"]["overall"]
-        self.assertEqual(len(overall), 6)
-        for label, row in overall.items():
+        table = receipt["metrics_table"]
+        self.assertEqual(len(table), 8)
+        for label, row in table.items():
             self.assertIn("fill_rate_pct", row, label)
             self.assertGreaterEqual(row["fill_rate_pct"], 0.0)
             self.assertLessEqual(row["fill_rate_pct"], 100.0)
+
+    def test_superseded_receipt_is_preserved_and_matches_its_declared_hash(self):
+        # The first (wrong) attempt is kept on record, not deleted -- and its
+        # content must still match the hash the corrected receipt cites for
+        # it in superseded_first_attempt.receipt_sha256.
+        superseded_path = BLUEPRINT / "receipts" / "20260925-crosscheck-superseded.json"
+        self.assertTrue(superseded_path.is_file(), superseded_path)
+        receipt = json.loads((BLUEPRINT / "receipts" / "20260925-crosscheck.json").read_text(encoding="utf-8"))
+        import hashlib
+
+        actual = hashlib.sha256(superseded_path.read_bytes()).hexdigest()
+        self.assertEqual(actual, receipt["superseded_first_attempt"]["receipt_sha256"])
+
+    def test_overturn_condition_is_not_triggered_on_the_corrected_data(self):
+        receipt = json.loads((BLUEPRINT / "receipts" / "20260925-crosscheck.json").read_text(encoding="utf-8"))
+        ev = receipt["overturn_evaluation"]
+        self.assertFalse(ev["fill_rate_divergence_gt_20pct"])
+        self.assertFalse(ev["median_time_to_fill_divergence_gt_2x"])
+        for pct in ev["fill_rate_relative_divergence_hftbacktest_vs_nautilus_primary"].values():
+            self.assertLess(abs(pct), 20.0)
+        for ratio in ev["median_time_to_fill_ratio_nautilus_primary_over_hftbacktest"].values():
+            self.assertLess(ratio, 2.0)
+
+    def test_oracle_agreement_at_least_99pct_for_every_engine_and_symbol(self):
+        receipt = json.loads((BLUEPRINT / "receipts" / "20260925-crosscheck.json").read_text(encoding="utf-8"))
+        table = receipt["oracle_agreement"]
+        checked = 0
+        for label, entry in table.items():
+            if not isinstance(entry, dict) or "overall_pct" not in entry:
+                continue  # skip the "method"/"interpretation" narrative keys
+            self.assertGreaterEqual(entry["overall_pct"], 99.0, label)
+            for sym, pct in entry["by_symbol_pct"].items():
+                self.assertGreaterEqual(pct, 99.0, f"{label}/{sym}")
+                checked += 1
+        self.assertGreater(checked, 0)
+
+    def test_zero_better_than_touch_violations_for_every_run(self):
+        receipt = json.loads((BLUEPRINT / "receipts" / "20260925-crosscheck.json").read_text(encoding="utf-8"))
+        table = receipt["better_than_touch_violations"]
+        checked = 0
+        for label, count in table.items():
+            if not isinstance(count, int):
+                continue  # skip the "note" narrative key
+            self.assertEqual(count, 0, label)
+            checked += 1
+        self.assertGreater(checked, 0)
+
+    def test_determinism_check_recorded_as_matching(self):
+        receipt = json.loads((BLUEPRINT / "receipts" / "20260925-crosscheck.json").read_text(encoding="utf-8"))
+        self.assertTrue(receipt["determinism_check"]["match"])
+        self.assertEqual(receipt["determinism_check"]["hash_1"], receipt["determinism_check"]["hash_2"])
+
+
+class OracleTests(unittest.TestCase):
+    """Hermetic, synthetic: oracle.py has no engine or network dependency."""
+
+    def _intent(self, order_id=1, ts_ns=0, symbol="AAA", side="BUY", qty=5, limit_price="10.03"):
+        return order_stream.OrderIntent(order_id=order_id, ts_ns=ts_ns, symbol=symbol, side=side, qty=qty,
+                                         limit_price=limit_price, touch_price="10.02", mid_price="10.01")
+
+    def test_predicts_fillable_when_crossing_and_size_sufficient(self):
+        quotes = {"AAA": [_quote_row(0, "10.00", "10.02", bid_size=100, ask_size=100)]}
+        intent = self._intent(side="BUY", qty=5, limit_price="10.03")
+        result = oracle.predict(quotes, intent, latency_ms=10)
+        self.assertTrue(result["fillable"])
+        self.assertIsNone(result["reason"])
+
+    def test_predicts_not_fillable_when_not_crossing(self):
+        quotes = {"AAA": [_quote_row(0, "10.00", "10.02", bid_size=100, ask_size=100)]}
+        intent = self._intent(side="BUY", qty=5, limit_price="10.01")  # below the ask -> does not cross
+        result = oracle.predict(quotes, intent, latency_ms=10)
+        self.assertFalse(result["fillable"])
+        self.assertEqual(result["reason"], "not_crossing")
+
+    def test_predicts_not_fillable_when_top_size_insufficient(self):
+        quotes = {"AAA": [_quote_row(0, "10.00", "10.02", bid_size=100, ask_size=2)]}
+        intent = self._intent(side="BUY", qty=5, limit_price="10.03")  # crosses, but only 2 shares shown
+        result = oracle.predict(quotes, intent, latency_ms=10)
+        self.assertFalse(result["fillable"])
+        self.assertEqual(result["reason"], "insufficient_top_size")
+
+    def test_predicts_not_fillable_before_any_quote_exists(self):
+        quotes = {"AAA": [_quote_row(1_000_000_000, "10.00", "10.02")]}
+        intent = self._intent(ts_ns=0, limit_price="10.03")  # arrival at 10ms, first quote is at 1s
+        result = oracle.predict(quotes, intent, latency_ms=10)
+        self.assertFalse(result["fillable"])
+        self.assertEqual(result["reason"], "no_quote_at_or_before_arrival")
+
+    def test_uses_the_last_quote_at_or_before_arrival_not_submit_time(self):
+        # ask moves from 10.02 to 10.10 shortly after submit but before arrival (submit+latency).
+        quotes = {"AAA": [_quote_row(0, "10.00", "10.02", ask_size=100),
+                           _quote_row(5_000_000, "10.00", "10.10", ask_size=100)]}
+        intent = self._intent(limit_price="10.03")  # only crosses the FIRST quote's ask, not the second
+        result = oracle.predict(quotes, intent, latency_ms=10)  # arrival at 10ms, after the second quote
+        self.assertFalse(result["fillable"])
+        self.assertEqual(result["touch"], "10.10")
+
+    def test_sell_side_uses_the_bid(self):
+        quotes = {"AAA": [_quote_row(0, "10.00", "10.02", bid_size=100)]}
+        intent = self._intent(side="SELL", qty=5, limit_price="9.99")  # crosses the bid
+        result = oracle.predict(quotes, intent, latency_ms=10)
+        self.assertTrue(result["fillable"])
+        self.assertEqual(result["touch"], "10.00")
+
+    def test_confusion_counts_are_correct(self):
+        predictions = [{"fillable": True}, {"fillable": True}, {"fillable": False}, {"fillable": False}]
+        outcomes = [{"exec_qty": 5}, {"exec_qty": 0}, {"exec_qty": 5}, {"exec_qty": 0}]
+        result = oracle.confusion(predictions, outcomes)
+        self.assertEqual(result, {"n": 4, "true_positive": 1, "false_positive": 1, "false_negative": 1,
+                                   "true_negative": 1, "agreement": 0.5})
+
+    def test_confusion_rejects_mismatched_lengths(self):
+        with self.assertRaises(ValueError):
+            oracle.confusion([{"fillable": True}], [])
+
+    def test_confusion_by_symbol_splits_correctly(self):
+        predictions = [{"fillable": True}, {"fillable": True}]
+        outcomes = [{"symbol": "AAA", "exec_qty": 5}, {"symbol": "BBB", "exec_qty": 0}]
+        result = oracle.confusion_by_symbol(predictions, outcomes)
+        self.assertEqual(result["AAA"]["agreement"], 1.0)
+        self.assertEqual(result["BBB"]["agreement"], 0.0)
+
+    def test_predict_stream_preserves_order_and_length(self):
+        quotes = {"AAA": [_quote_row(t * 1_000_000, "10.00", "10.02", ask_size=100) for t in range(20)]}
+        stream = order_stream.generate_order_stream(quotes, submits_per_sec=5.0)
+        predictions = oracle.predict_stream(quotes, stream, latency_ms=5)
+        self.assertEqual(len(predictions), len(stream))
+        self.assertEqual([p["order_id"] for p in predictions], [intent.order_id for intent in stream])
+
+
+class BetterThanTouchViolationTests(unittest.TestCase):
+    """Hermetic, synthetic: metrics.better_than_touch_violations has no
+    engine or network dependency. Added in the 2026-09-25 repair round --
+    the first attempt never ran this check against hftbacktest's own
+    output at all; it would have caught the use-after-free directly."""
+
+    def test_flags_a_buy_fill_strictly_better_than_the_ask(self):
+        quotes = {"AAA": [_quote_row(0, "10.00", "10.02")]}
+        outcomes = [_outcome(side="BUY", exec_qty=5, avg_exec_price="10.01", resolved_ts_ns=0)]
+        violations = metrics.better_than_touch_violations(outcomes, quotes)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["avg_exec_price"], "10.01")
+
+    def test_flags_a_sell_fill_strictly_better_than_the_bid(self):
+        quotes = {"AAA": [_quote_row(0, "10.00", "10.02")]}
+        outcomes = [_outcome(side="SELL", exec_qty=5, avg_exec_price="10.01", resolved_ts_ns=0)]
+        violations = metrics.better_than_touch_violations(outcomes, quotes)
+        self.assertEqual(len(violations), 1)
+
+    def test_does_not_flag_a_fill_exactly_at_the_touch(self):
+        quotes = {"AAA": [_quote_row(0, "10.00", "10.02")]}
+        outcomes = [_outcome(side="BUY", exec_qty=5, avg_exec_price="10.02", resolved_ts_ns=0)]
+        self.assertEqual(metrics.better_than_touch_violations(outcomes, quotes), [])
+
+    def test_does_not_flag_a_fill_through_but_not_beating_the_touch(self):
+        # A marketable IOC crossing the collar (worse than touch) is expected and fine.
+        quotes = {"AAA": [_quote_row(0, "10.00", "10.02")]}
+        outcomes = [_outcome(side="BUY", exec_qty=5, avg_exec_price="10.03", resolved_ts_ns=0)]
+        self.assertEqual(metrics.better_than_touch_violations(outcomes, quotes), [])
+
+    def test_empty_when_nothing_filled(self):
+        quotes = {"AAA": [_quote_row(0, "10.00", "10.02")]}
+        outcomes = [_outcome(exec_qty=0, status="NO_FILL", avg_exec_price=None, resolved_ts_ns=None)]
+        self.assertEqual(metrics.better_than_touch_violations(outcomes, quotes), [])
 
 
 @unittest.skipUnless(NAUTILUS_AVAILABLE, "nautilus_trader is not installed on this interpreter")
@@ -265,6 +432,19 @@ class NautilusDriverSmokeTests(unittest.TestCase):
         self.assertEqual(len(outcomes), 3)
         for o in outcomes:
             self.assertIn(o["status"], ("FILLED", "PARTIAL", "NO_FILL", "REJECTED", "DENIED", "UNRESOLVED"))
+
+    def test_exact_latency_resolves_every_fill_at_exactly_submit_plus_latency(self):
+        import run_nautilus
+
+        quotes = {"AAA": [_quote_row(t * 100_000_000, "10.00", "10.02", 1000, 1000) for t in range(50)]}
+        stream = order_stream.generate_order_stream(quotes, submits_per_sec=2.0)
+        latency_ms = 10
+        outcomes = run_nautilus.run_stream(quotes, stream[:5], latency_ms=latency_ms, exact_latency=True)
+        filled = [o for o in outcomes if o["exec_qty"] > 0]
+        self.assertGreater(len(filled), 0)
+        for o in filled:
+            delta_ms = (o["resolved_ts_ns"] - o["submit_ts_ns"]) / 1e6 - latency_ms
+            self.assertAlmostEqual(delta_ms, 0.0, places=6)
 
 
 @unittest.skipUnless(HFTBACKTEST_AVAILABLE, "hftbacktest is not installed on this interpreter")
@@ -290,6 +470,79 @@ class HftbacktestDriverSmokeTests(unittest.TestCase):
         self.assertEqual(len(outcomes), 3)
         for o in outcomes:
             self.assertIn(o["status"], ("FILLED", "PARTIAL", "NO_FILL", "REJECTED", "UNRESOLVED", "OTHER"))
+
+    @staticmethod
+    def _outcomes_hash(outcomes):
+        import hashlib
+
+        return hashlib.sha256(json.dumps(outcomes, sort_keys=True, default=str).encode()).hexdigest()
+
+    @staticmethod
+    def _two_symbol_quotes():
+        # Both symbols use the SAME tick spacing/count, so they span the
+        # exact same time range -- an "AAA alone" run's feed (built only
+        # from AAA's own rows) then comfortably covers every AAA order's
+        # submit time, including ones generated near the tail of the full
+        # combined stream (round-robin ticks keep using a symbol's LAST
+        # known quote past its own data if the other symbol's range were
+        # longer, which would otherwise submit an "alone" run's order past
+        # its own feed's padded end).
+        return {"AAA": [_quote_row(t * 50_000_000, "10.00", "10.02", 1000, 1000) for t in range(200)],
+                "BBB": [_quote_row(t * 50_000_000, "20.00", "20.05", 1000, 1000) for t in range(200)]}
+
+    def test_two_symbol_run_matches_each_symbols_own_single_symbol_run(self):
+        """Regression test for the 2026-09-25 repair round's use-after-free
+        fix (see run_hftbacktest.py's module docstring): a per-symbol numpy
+        feed array must not lose its only Python reference while a LATER
+        symbol's array is built in the same call, or hftbacktest reads
+        freed memory for the earlier symbol for the rest of the run.
+
+        Verified failing against the pre-fix driver (commit d5cc0c58,
+        `git show d5cc0c58:.../run_hftbacktest.py`, run unmodified): the
+        first symbol's outcomes extracted from a two-symbol run did NOT
+        match its own standalone single-symbol run (differing outcome
+        hashes) -- see receipts/20260925-crosscheck.json's
+        superseded_first_attempt.independently_reproduced_this_round block
+        for the exact hashes. This test passes against the fixed driver."""
+        import run_hftbacktest
+
+        # AAA built first (asset 0, the one the old driver's loop-reassigned
+        # `data` variable would free); BBB built second (asset 1).
+        quotes = self._two_symbol_quotes()
+        stream = order_stream.generate_order_stream(quotes, submits_per_sec=5.0)
+        self.assertGreater(len([o for o in stream if o.symbol == "AAA"]), 5)
+
+        two_symbol = run_hftbacktest.run_stream(quotes, stream, latency_ms=10, exchange="partial_fill")
+        two_symbol_aaa = [o for o in two_symbol if o["symbol"] == "AAA"]
+
+        aaa_stream = [intent for intent in stream if intent.symbol == "AAA"]
+        aaa_quotes = {"AAA": quotes["AAA"]}
+        aaa_alone = run_hftbacktest.run_stream(aaa_quotes, aaa_stream, latency_ms=10, exchange="partial_fill")
+
+        self.assertEqual(self._outcomes_hash(aaa_alone), self._outcomes_hash(two_symbol_aaa))
+
+    def test_determinism_rerun_is_hash_identical(self):
+        """Same regression coverage as the isolation test above, from the
+        non-determinism angle: verified failing against the pre-fix driver
+        (two identical calls gave DIFFERENT outcome hashes and different
+        filled-order counts, commit d5cc0c58 -- see the same receipt block).
+        Passes against the fixed driver."""
+        import run_hftbacktest
+
+        quotes = self._two_symbol_quotes()
+        stream = order_stream.generate_order_stream(quotes, submits_per_sec=5.0)
+        first = run_hftbacktest.run_stream(quotes, stream, latency_ms=10, exchange="partial_fill")
+        second = run_hftbacktest.run_stream(quotes, stream, latency_ms=10, exchange="partial_fill")
+        self.assertEqual(self._outcomes_hash(first), self._outcomes_hash(second))
+
+    def test_exchange_models_agree_once_the_use_after_free_is_fixed(self):
+        import run_hftbacktest
+
+        quotes = self._two_symbol_quotes()
+        stream = order_stream.generate_order_stream(quotes, submits_per_sec=5.0)
+        partial = run_hftbacktest.run_stream(quotes, stream, latency_ms=10, exchange="partial_fill")
+        no_partial = run_hftbacktest.run_stream(quotes, stream, latency_ms=10, exchange="no_partial_fill")
+        self.assertEqual(self._outcomes_hash(partial), self._outcomes_hash(no_partial))
 
 
 if __name__ == "__main__":

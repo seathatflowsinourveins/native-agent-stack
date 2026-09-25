@@ -11,6 +11,26 @@ inventory-reactive decision loop -- see order_stream.py's module docstring
 for why. `fee_model=None`: cost is computed post-hoc, uniformly for both
 engines, by metrics.py using sim-capacity's own fee_model.commission_usd.
 
+**Repair round (2026-09-25) addition: `exact_latency`.** An independent
+adversarial review of the first attempt found a genuine, separate
+NautilusTrader timing property (unrelated to the hftbacktest use-after-free
+documented in run_hftbacktest.py): a deferred order is released only when
+some event -- its own instrument's next quote, or ANY due clock timer, from
+any source -- is next processed at or after submit + latency, not exactly
+AT submit + latency. With this cross-check's own single, shared 3/sec
+submit-schedule timer as the only per-order timer registered, an order can
+sit past its configured latency until the next actual trigger arrives,
+adding extra, instrument-dependent delay (worse for a sparser name). Passing
+`exact_latency=True` registers one additional, otherwise-inert
+`set_time_alert_ns` per order at exactly `submit_ts + latency_ns` (a no-op
+callback that touches no order state) -- reviewed and tested directly: this
+makes every order resolve at exactly submit + latency, isolating how much of
+any Nautilus-side timing slack is attributable to this release mechanism
+specifically. The **primary** comparison in this cross-check remains the
+default (`exact_latency=False`) configuration, which is what sim-capacity's
+own `runner.run_one` actually uses; the exact-latency variant is reported
+alongside it as a named, additional finding, not a replacement.
+
 Requires the pinned runtime
 (~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python);
 imports nautilus_trader lazily inside `run_stream` so this module stays
@@ -44,10 +64,17 @@ def _outcome_row(intent: OrderIntent, status: str, exec_qty: int, notional: Deci
     }
 
 
-def run_stream(quotes_by_symbol: dict, stream: list[OrderIntent], *, latency_ms: int) -> list[dict]:
+def run_stream(quotes_by_symbol: dict, stream: list[OrderIntent], *, latency_ms: int,
+                exact_latency: bool = False) -> list[dict]:
     """Run one (stream, latency) combination through a fresh BacktestEngine.
     Returns a list of outcome dicts (see metrics.py's module docstring for
-    the schema), one per intent in `stream`, in intent order."""
+    the schema), one per intent in `stream`, in intent order.
+
+    `exact_latency=True` adds the no-op per-order release alert described in
+    the module docstring, forcing every order to resolve at exactly
+    submit_ts + latency_ns instead of at the next quote-or-timer event at or
+    after that point. Default False matches sim-capacity's own runner.run_one
+    (the primary comparison); True isolates the release-timing finding."""
     from nautilus_trader.backtest import BacktestEngine
     from nautilus_trader.common import LogLevel
     from nautilus_trader.config import BacktestEngineConfig, LoggerConfig, StrategyConfig
@@ -64,6 +91,7 @@ def run_stream(quotes_by_symbol: dict, stream: list[OrderIntent], *, latency_ms:
         # why a StrategyConfig subclass silently drops constructor kwargs for
         # any field it did not already declare, on this pinned rc5 runtime.
         stream: tuple
+        exact_latency_ns: int  # 0 disables the extra per-order release alert
 
     class ReplayExerciser(Strategy):
         def __init__(self, params: ReplayParams):
@@ -83,6 +111,19 @@ def run_stream(quotes_by_symbol: dict, stream: list[OrderIntent], *, latency_ms:
             for intent in self.params.stream:
                 self.clock.set_time_alert_ns(name=f"submit-{intent.order_id}", alert_time_ns=intent.ts_ns,
                                               callback=functools.partial(self._on_submit, intent))
+                if self.params.exact_latency_ns > 0:
+                    # Otherwise-inert: touches no order state. Its only
+                    # effect is to force the engine's timer processing to
+                    # reach exactly submit_ts + latency_ns, which is what
+                    # actually releases a deferred order on this pinned
+                    # engine (see module docstring's exact_latency note).
+                    self.clock.set_time_alert_ns(
+                        name=f"latency-tick-{intent.order_id}",
+                        alert_time_ns=intent.ts_ns + self.params.exact_latency_ns,
+                        callback=self._noop)
+
+        def _noop(self, event):
+            pass
 
         def on_stop(self):
             for order in list(self.cache.orders_open()):
@@ -174,7 +215,8 @@ def run_stream(quotes_by_symbol: dict, stream: list[OrderIntent], *, latency_ms:
         for instrument in instruments.values():
             engine.add_instrument(instrument)
         engine.add_data(ticks)
-        strategy = ReplayExerciser(ReplayParams(stream=tuple(stream)))
+        exact_latency_ns = int(latency_ms * 1_000_000) if exact_latency and latency_ms else 0
+        strategy = ReplayExerciser(ReplayParams(stream=tuple(stream), exact_latency_ns=exact_latency_ns))
         engine.add_strategy(strategy)
         engine.run()
 

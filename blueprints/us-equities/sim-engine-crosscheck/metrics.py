@@ -110,6 +110,37 @@ def touch_share(outcomes: list[dict], quotes_by_symbol: dict) -> dict:
     return {"n": len(filled), "at_touch": at_touch, "share": at_touch / len(filled)}
 
 
+def better_than_touch_violations(outcomes: list[dict], quotes_by_symbol: dict) -> list[dict]:
+    """Hard integrity check, added in the 2026-09-25 repair round: fills
+    STRICTLY better than the NBBO touch in force at resolution time, for
+    EITHER engine -- the same guard as sim-capacity's own
+    `runner.check_no_fill_beats_nbbo_touch` (a BUY fill must never be
+    strictly better than the ask in force; a SELL fill must never be
+    strictly better than the bid in force), applied here identically to
+    both NautilusTrader's and hftbacktest's outcomes. The first cross-check
+    attempt never ran this check against hftbacktest's own output at all;
+    it would have caught the use-after-free directly (354 of 384 NVDA fills
+    in that broken run were better than any displayed quote, by up to 87
+    cents -- see receipts/20260925-crosscheck.json's
+    `superseded_first_attempt` block). Returns the list of violations
+    (empty means the check passes); callers should treat any non-empty
+    result as a hard failure, not a metric to merely report."""
+    violations = []
+    for o in outcomes:
+        if o["exec_qty"] <= 0 or o.get("avg_exec_price") is None:
+            continue
+        ts = o.get("resolved_ts_ns") if o.get("resolved_ts_ns") is not None else o["submit_ts_ns"]
+        touch = _touch_at(quotes_by_symbol, o["symbol"], ts, o["side"])
+        if touch is None:
+            continue
+        px, touch_d = Decimal(o["avg_exec_price"]), Decimal(touch)
+        beats = (px < touch_d) if o["side"] == "BUY" else (px > touch_d)
+        if beats:
+            violations.append({"order_id": o["order_id"], "symbol": o["symbol"], "side": o["side"],
+                                "avg_exec_price": o["avg_exec_price"], "touch": touch, "resolved_ts_ns": ts})
+    return violations
+
+
 def cost_vs_mid_bps(outcomes: list[dict]) -> dict:
     """Signed execution cost vs. the mid price at submit time (same sign
     convention as sim-capacity's runner.summarize_run:
