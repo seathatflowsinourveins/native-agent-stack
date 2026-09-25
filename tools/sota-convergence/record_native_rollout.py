@@ -138,6 +138,11 @@ def validate_receipt(document) -> list[str]:
                   errors, "upstream.sha256 must be 64 lowercase hex digits")
         has_tag, has_commit = "tag" in upstream, "commit" in upstream
         _require(has_tag or has_commit, errors, "upstream needs tag or commit (at least one)")
+        if has_tag:
+            # Minor finding: only presence was checked here; the schema also requires a string of
+            # at least one character (upstream.tag {type: string, minLength: 1}), so "tag": 5 or
+            # "tag": "" used to validate.
+            _require(_is_str(upstream.get("tag")), errors, "upstream.tag must be nonempty text")
         if has_commit:
             _require(isinstance(upstream.get("commit"), str) and bool(SHA1.fullmatch(upstream["commit"])),
                       errors, "upstream.commit must be a full 40-hex-digit SHA")
@@ -240,6 +245,12 @@ def validate_receipt(document) -> list[str]:
         _no_extra_keys(independent, frozenset({"rerun_label", "agreement", "loki"}), errors, "independent")
         _require(_is_str(independent.get("rerun_label")), errors, "independent.rerun_label must be nonempty text")
         _require(independent.get("agreement") in AGREEMENTS, errors, f"independent.agreement must be one of {sorted(AGREEMENTS)}")
+        if "loki" in independent:
+            # Minor finding: loki's own items were never type-checked (the schema declares
+            # independent.loki as {type: array, items: {type: string}}), so a non-string entry
+            # (or a non-list value entirely) used to validate.
+            _require(isinstance(independent.get("loki"), list) and all(isinstance(item, str) for item in independent["loki"]),
+                      errors, "independent.loki must be a list of strings")
 
     switch = document.get("switch")
     if switch is not None:
@@ -251,7 +262,10 @@ def validate_receipt(document) -> list[str]:
             _require(isinstance(switch.get("ledger_seq"), list)
                       and all(isinstance(item, int) and not isinstance(item, bool) and item >= 1 for item in switch.get("ledger_seq", [])),
                       errors, "switch.ledger_seq must be a list of positive integers")
-            _require(isinstance(switch.get("surfaces"), list), errors, "switch.surfaces must be a list")
+            # Minor finding: only "is a list" was checked; the schema also requires string items
+            # (switch.surfaces {items: {type: string}}), so [1, 2] or [null] used to validate.
+            _require(isinstance(switch.get("surfaces"), list) and all(isinstance(item, str) for item in switch.get("surfaces", [])),
+                      errors, "switch.surfaces must be a list of strings")
             _require(_is_str(switch.get("window")), errors, "switch.window must be nonempty text")
 
     _require(document.get("decision") in DECISIONS, errors, f"decision must be one of {sorted(DECISIONS)}")

@@ -194,6 +194,45 @@ class ValidateReceiptTests(unittest.TestCase):
         receipt["switch"]["ledger_seq"] = [1, -2]
         self.assertTrue(record_native_rollout.validate_receipt(receipt))
 
+    def test_switch_surfaces_items_must_be_strings(self):
+        # Minor finding: only "surfaces is a list" was checked; the schema also requires string
+        # items, so a non-string entry used to validate.
+        receipt = valid_receipt()
+        receipt["switch"] = {"txn": "t1", "ledger_seq": [1], "surfaces": ["current/qmd", 5], "window": "default"}
+        errors = record_native_rollout.validate_receipt(receipt)
+        self.assertTrue(any("switch.surfaces" in e for e in errors), errors)
+
+    def test_upstream_tag_must_be_nonempty_text_not_merely_present(self):
+        # Minor finding: has_tag only checked "tag" in upstream, never its type/length, so
+        # "tag": 5 or "tag": "" used to validate (the schema requires a string, minLength 1).
+        receipt = valid_receipt()
+        receipt["upstream"]["tag"] = ""
+        errors = record_native_rollout.validate_receipt(receipt)
+        self.assertTrue(any("upstream.tag" in e for e in errors), errors)
+
+        receipt2 = valid_receipt()
+        receipt2["upstream"]["tag"] = 5
+        errors2 = record_native_rollout.validate_receipt(receipt2)
+        self.assertTrue(any("upstream.tag" in e for e in errors2), errors2)
+
+    def test_independent_loki_items_must_be_strings(self):
+        # Minor finding: independent.loki's own items were never type-checked at all (the schema
+        # declares {type: array, items: {type: string}}), so a non-string entry, or a non-list
+        # value entirely, used to validate.
+        receipt = valid_receipt()
+        receipt["independent"]["loki"] = ["query-ref-1", 7]
+        errors = record_native_rollout.validate_receipt(receipt)
+        self.assertTrue(any("independent.loki" in e for e in errors), errors)
+
+        receipt2 = valid_receipt()
+        receipt2["independent"]["loki"] = "not-a-list"
+        errors2 = record_native_rollout.validate_receipt(receipt2)
+        self.assertTrue(any("independent.loki" in e for e in errors2), errors2)
+
+        receipt3 = valid_receipt()
+        receipt3["independent"]["loki"] = ["query-ref-1", "query-ref-2"]
+        self.assertEqual(record_native_rollout.validate_receipt(receipt3), [])
+
 
 class QualificationTests(unittest.TestCase):
     def test_qualifies_native_proven_when_t2_t4_t5_pass_and_not_a_service(self):
