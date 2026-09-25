@@ -363,8 +363,10 @@ install_native() {
   # --no-link means never create or update a bin/ entrypoint for this pin, the same as every
   # other install_* function's own no_link guard; a native pin has no tools/<id>-<version>
   # prefix of its own to isolate under --tools-suffix (the installer manages its own versions
-  # directory), so only the redirecting bin_dir/$bin_name script is skipped here.
-  [[ "$no_link" != 1 ]] || return 0
+  # directory), so only the redirecting bin_dir/$bin_name script is skipped here. ${no_link:-}
+  # (not a bare $no_link): tests/test_adoption_bootstrap.py's InstallNativeLauncherTests runs
+  # this function's body in isolation under `set -u`, with no_link never declared at all.
+  [[ "${no_link:-}" != 1 ]] || return 0
   # When bin_dir is the installer's own ~/.local/bin, its launcher (a symlink
   # into ~/.local/share/claude/versions) already provides the command; writing
   # ours there would replace it with a script that execs itself.
@@ -408,9 +410,9 @@ install_uv_tool() {
   # inside that isolated prefix instead of the shared bin_dir, so it never creates or updates a
   # bin/ entrypoint there either -- uv still "manages its own shim directory" (usage text above),
   # just not one on the shared PATH when --no-link asked for no bin/ entrypoint at all.
-  local uv_tool_dir="$ecosystem_root/python-tools$tools_suffix"
+  local uv_tool_dir="$ecosystem_root/python-tools${tools_suffix:-}"
   local uv_tool_bin_dir="$bin_dir"
-  if [[ "$no_link" == 1 ]]; then
+  if [[ "${no_link:-}" == 1 ]]; then
     uv_tool_bin_dir="$uv_tool_dir/bin"
     mkdir -p "$uv_tool_bin_dir"
   fi
