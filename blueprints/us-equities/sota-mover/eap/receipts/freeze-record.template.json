@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "kind": "eap_freeze_record",
+  "protocol_id": "sota-mover-eap-v1-20260925",
+  "protocol_sha256": null,
+  "protocol_commit": null,
+  "frozen_at": null,
+  "reviewer": null,
+  "review_verdict": null,
+  "instructions": "Copy to receipts/freeze-record.json after the frozen protocol.json is committed; set protocol_sha256 to the sha256 of the committed protocol.json bytes and protocol_commit to that commit; commit the record. evaluate.py reads the expected sha256 only from receipts/freeze-record.json."
+}

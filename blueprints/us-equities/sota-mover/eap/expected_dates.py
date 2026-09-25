@@ -3,7 +3,7 @@
 
 Pure functions (standard library only) plus one CLI that measures date-prediction accuracy
 on real filing metadata. No price, return or outcome is read here; the CLI reads filing
-metadata, the session calendar and (through signal.py) pre-decision lane membership only.
+metadata, the session calendar and (through eap_signal.py) pre-decision lane membership only.
 
   python expected_dates.py accuracy --root ROOT --daily DAILY.parquet [--out RECEIPT.json]
 
@@ -23,17 +23,9 @@ Definitions (protocol.json#/announcements and #/expectation):
 """
 from __future__ import annotations
 
-import os
-import sys
-
-# signal.py in this directory would shadow the standard-library module: never import from
-# the script directory; siblings are loaded under eap_* names by load_sibling().
-_HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path[:] = [p for p in sys.path if os.path.abspath(p or os.curdir) != _HERE]
-
 import argparse
 import bisect
-import importlib.util
+import sys
 import calendar
 import gzip
 import json
@@ -62,17 +54,6 @@ NYSE_HOLIDAYS_2015 = {date(2015, 1, 1), date(2015, 1, 19), date(2015, 2, 16), da
 
 Month = tuple  # (year, month)
 
-
-def load_sibling(name: str):
-    """Import a module of this directory as ``eap_<name>`` without touching sys.path."""
-    key = f"eap_{name}"
-    if key in sys.modules:
-        return sys.modules[key]
-    spec = importlib.util.spec_from_file_location(key, HERE / f"{name}.py")
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[key] = mod
-    spec.loader.exec_module(mod)
-    return mod
 
 
 @dataclass(frozen=True, order=True)
@@ -331,7 +312,8 @@ def study_months(first: Month = (2017, 1), last: Month = (2026, 8)) -> list[Mont
 # ---------------------------------------------------------------- accuracy CLI (no returns)
 
 def cmd_accuracy(a) -> None:
-    S = load_sibling("signal")
+    sys.path.insert(0, str(HERE))
+    import eap_signal as S
     con = S.duck(a.root)
     sessions = load_sessions(con, a.daily)
     universe = json.loads((a.root / "universe.json").read_text())["ciks"]

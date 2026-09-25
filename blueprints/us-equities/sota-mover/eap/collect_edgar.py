@@ -23,18 +23,13 @@ The SEC contact is loaded inside this process from ~/.config/codex-ecosystem/sec
 """
 from __future__ import annotations
 
-import os
-import sys
-
-# signal.py in this directory would shadow the standard-library module.
-_HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path[:] = [p for p in sys.path if os.path.abspath(p or os.curdir) != _HERE]
-
 import argparse
 import gzip
 import hashlib
 import json
+import os
 import re
+import sys
 import threading
 import time
 import urllib.error

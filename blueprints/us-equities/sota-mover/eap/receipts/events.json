@@ -1,0 +1,30 @@
+{
+ "all_mapped_firm_months_ge5": 57252,
+ "all_mapped_share_ge5": 0.0806,
+ "definition": "firm-months 2017-01..2026-08 by the number of known merged Item 2.02 events with effective months in t-12..t-1",
+ "distribution": {
+  "all_mapped": {
+   "0": 364769,
+   "1": 10217,
+   "2": 8818,
+   "3": 21447,
+   "4": 248229,
+   "5": 41625,
+   "6+": 15627
+  },
+  "main": {
+   "0": 71969,
+   "1": 3745,
+   "2": 3508,
+   "3": 12255,
+   "4": 182466,
+   "5": 29455,
+   "6+": 9994
+  }
+ },
+ "kind": "eap_item_202_event_counts",
+ "label": "HIST",
+ "main_firm_months_ge5": 39449,
+ "main_share_ge5": 0.1259,
+ "outcomes_computed": false
+}

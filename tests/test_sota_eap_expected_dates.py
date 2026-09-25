@@ -1,5 +1,4 @@
 """SYN: point-in-time expected announcement dates for the EAP study (synthetic fixtures only)."""
-import importlib.util
 import sys
 import unittest
 from datetime import date, datetime, timedelta, timezone
@@ -9,17 +8,9 @@ from zoneinfo import ZoneInfo
 BASE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/sota-mover/eap"
 
 
-def load(name):
-    key = f"eap_{name}"
-    if key not in sys.modules:
-        spec = importlib.util.spec_from_file_location(key, BASE / f"{name}.py")
-        mod = importlib.util.module_from_spec(spec)
-        sys.modules[key] = mod
-        spec.loader.exec_module(mod)
-    return sys.modules[key]
+sys.path.insert(0, str(BASE))
+import expected_dates as E  # noqa: E402
 
-
-E = load("expected_dates")
 
 
 def weekdays(start, end):

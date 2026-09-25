@@ -1,5 +1,5 @@
 """SYN: EAP universe, portfolio, delisting, cost and statistics functions (synthetic fixtures only)."""
-import importlib.util
+import json
 import math
 import sys
 import unittest
@@ -9,17 +9,9 @@ from pathlib import Path
 BASE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/sota-mover/eap"
 
 
-def load(name):
-    key = f"eap_{name}"
-    if key not in sys.modules:
-        spec = importlib.util.spec_from_file_location(key, BASE / f"{name}.py")
-        mod = importlib.util.module_from_spec(spec)
-        sys.modules[key] = mod
-        spec.loader.exec_module(mod)
-    return sys.modules[key]
+sys.path.insert(0, str(BASE))
+import eap_signal as S  # noqa: E402
 
-
-S = load("signal")
 
 
 class Universe(unittest.TestCase):
@@ -97,12 +89,25 @@ class Costs(unittest.TestCase):
     FEES = {"sec_section31": {"rows": [{"from": "2016-01-01", "to": None, "usd_per_million": 20.0}]},
             "finra_taf_covered_equity": {"rows": [{"from": "2016-01-01", "to": None, "usd_per_share": 0.0002}]}}
 
-    def test_half_spread_table(self):
-        self.assertEqual(S.half_spread(10.0, 2e6, "main"), 0.00745)
-        self.assertEqual(S.half_spread(50.0, 2e6, "main"), 0.00745)
-        self.assertEqual(S.half_spread(10.0, 6e6, "main"), 0.00227)
-        self.assertEqual(S.half_spread(50.0, 6e6, "main"), 0.00177)
+    def test_mover_v1_sensitivity_table(self):
+        v1 = S.load_cost_table("mover_v1_sensitivity")
+        self.assertEqual(S.half_spread(10.0, 2e6, "main", v1), 0.00745)
+        self.assertEqual(S.half_spread(50.0, 2e6, "main", v1), 0.00745)
+        self.assertEqual(S.half_spread(10.0, 6e6, "main", v1), 0.00227)
+        self.assertEqual(S.half_spread(50.0, 6e6, "main", v1), 0.00177)
+        self.assertEqual(S.half_spread(3.0, 2e5, "small", v1), 0.01)
+
+    def test_measured_table_is_default_and_covers_main_lane(self):
+        doc = json.loads(S.COST_TABLE_PATH.read_text())
+        rows = {(r["dv_tier"], r["price_tier"]): r["half_spread"] for r in doc["rows"]}
+        self.assertEqual(len(rows), 12)
+        self.assertEqual(S.half_spread(10.0, 2e6, "main"), rows[(0, 0)])
+        self.assertEqual(S.half_spread(150.0, 1e9, "main"), rows[(3, 2)])
+        self.assertEqual(S.half_spread(50.0, 6e7, "main"), rows[(2, 1)])
         self.assertEqual(S.half_spread(3.0, 2e5, "small"), 0.01)
+        for px in (5.0, 19.99, 20.0, 99.99, 100.0, 5000.0):
+            for dv in (1e6, 4.9e6, 5e6, 5e7, 5e8, 1e12):
+                self.assertGreater(S.half_spread(px, dv, "main"), 0)
 
     def test_fees_from_v3_file(self):
         fees = S.load_fees()
@@ -115,7 +120,7 @@ class Costs(unittest.TestCase):
         old = {"A": 0.5, "B": 0.5}
         new = {"B": 0.5, "C": 0.5}
         px, dv = {"A": 10.0, "B": 10.0, "C": 50.0}, {"A": 6e6, "B": 6e6, "C": 6e6}
-        cost, turn = S.rebalance_cost(old, new, px, dv, {}, date(2020, 1, 31), self.FEES)
+        cost, turn = S.rebalance_cost(old, new, px, dv, {}, date(2020, 1, 31), self.FEES, S.load_cost_table("mover_v1_sensitivity"))
         self.assertAlmostEqual(turn, 1.0)
         expected = 0.5 * 0.00227 + 0.5 * (20e-6 + 0.0002 / 10) + 0.5 * 0.00177
         self.assertAlmostEqual(cost, expected)
@@ -125,7 +130,45 @@ class Costs(unittest.TestCase):
         self.assertAlmostEqual(w["A"], 2 / 3)
 
 
+class Weights(unittest.TestCase):
+    def test_cap_and_redistribution(self):
+        raw = {f"S{i}": 1.0 for i in range(98)} | {"BIG": 500.0, "MID": 30.0}
+        w = S.capped_weights(raw, 0.02)
+        self.assertAlmostEqual(sum(w.values()), 1.0)
+        self.assertLessEqual(max(w.values()), 0.02 + 1e-12)
+        self.assertAlmostEqual(w["BIG"], 0.02)
+        self.assertAlmostEqual(w["MID"], 0.02)
+        self.assertAlmostEqual(w["S0"], 0.96 / 98)
+
+    def test_infeasible_cap_becomes_equal_weight(self):
+        w = S.capped_weights({"A": 10.0, "B": 1.0, "C": 1.0}, 0.02)
+        for v in w.values():
+            self.assertAlmostEqual(v, 1 / 3)
+
+    def test_uncapped_names_keep_proportions(self):
+        raw = {f"S{i}": float(i + 1) for i in range(60)}
+        w = S.capped_weights(raw, 0.02)
+        free = [k for k, v in w.items() if v < 0.02 - 1e-12]
+        self.assertAlmostEqual(w[free[0]] / raw[free[0]], w[free[-1]] / raw[free[-1]])
+
+    def test_effective_n_and_portfolio_return(self):
+        self.assertAlmostEqual(S.effective_n({"A": 0.5, "B": 0.5}), 2.0)
+        members = {f"S{i}": (1.0, 0.01) for i in range(60)} | {"BIG": (1000.0, 0.5)}
+        self.assertAlmostEqual(S.portfolio_return(members, 0.02), 0.02 * 0.5 + 0.98 * 0.01)
+        self.assertGreater(S.portfolio_return(members, None), 0.4)
+
+
 class Statistics(unittest.TestCase):
+    def test_t_quantile(self):
+        self.assertAlmostEqual(S.t_ppf(0.975, 10), 2.228, places=3)
+        self.assertAlmostEqual(S.t_ppf(0.95, 115), 1.658, places=3)
+        self.assertAlmostEqual(S.t_ppf(0.5, 30), 0.0, places=6)
+
+    def test_fixed_sequence(self):
+        self.assertEqual(S.fixed_sequence([("EAP-2", 0.04), ("EAP-4", 0.049)], 0.05), {"EAP-2": True, "EAP-4": True})
+        self.assertEqual(S.fixed_sequence([("EAP-2", 0.06), ("EAP-4", 0.001)], 0.05), {"EAP-2": False, "EAP-4": False})
+        self.assertEqual(S.fixed_sequence([("EAP-2", 0.01), ("EAP-4", 0.2)], 0.05), {"EAP-2": True, "EAP-4": False})
+
     def test_nw_zero_lags_is_iid_se(self):
         xs = [0.01, -0.02, 0.03, 0.00, 0.02, -0.01]
         m, se, t = S.nw_t(xs, 0)

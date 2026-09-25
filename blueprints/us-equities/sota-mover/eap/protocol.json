@@ -4,23 +4,34 @@
   "status": "draft_pending_independent_pre_outcome_review",
   "frozen_before_outcomes": false,
   "frozen_at": null,
-  "freeze_procedure": "An independent reviewer inspects this file, the code and the pre-freeze receipts before any outcome exists, then sets status to 'frozen_pre_outcome', frozen_before_outcomes to true and frozen_at to the UTC time, commits, and passes the sha256 of the committed protocol.json bytes to evaluate.py --protocol-sha256. evaluate.py refuses any other state before it reads a price.",
-  "question": "Does the Frazzini-Lamont earnings announcement premium, with announcement dates from SEC 8-K Item 2.02 acceptance times, exist in US common stocks from 2017-01 to 2026-08, and does its tradable long leg survive measured costs?",
+  "freeze_procedure": "An independent reviewer inspects this file, the code and the pre-freeze receipts before any outcome exists; the coordinator sets status to 'frozen_pre_outcome', frozen_before_outcomes to true and frozen_at, commits, and then writes receipts/freeze-record.json (template: receipts/freeze-record.template.json) with the sha256 of the committed protocol.json bytes and commits it. evaluate.py takes the expected sha256 only from that record, verifies every pin and a clean git tree for this directory, and refuses otherwise before it reads a price.",
+  "question": "Does the Frazzini-Lamont earnings announcement premium, with announcement dates from SEC 8-K Item 2.02 acceptance times, exist in US common stocks from 2017-01 to 2026-08, and does its tradable long leg beat SPY after measured costs?",
   "evidence_label": "HIST (real SEC metadata and daily bars); SYN for tests",
   "literature": {
-    "frazzini_lamont_2007": {"source": "NBER w13090", "pages": "8-10 (prediction accuracy, strategy, Table III), 22-23 (volume)",
+    "frazzini_lamont_2007": {
+      "source": "NBER w13090",
+      "pages": "8-10 (prediction accuracy, strategy, Table III), 22-23 (volume)",
       "facts_confirmed_in_extracted_text": [
         "p.8: using last year's announcement months, 80% of announcements fall in the expected month; restricting to firms with at least 4 announcements in the previous calendar year raises accuracy to 93%",
         "p.9: buy expected announcers and short non-announcers on the last trading day of month t-1, hold to the last day of month t, value weighted",
         "p.9: sample restricted to firms with exactly 4 earnings announcements in the previous 12 calendar months",
         "p.10: the long-short portfolio earns 61 basis points per month with a t-statistic over 5 (1973-2004)",
-        "stocks with predictably high announcement volume earn 1.5% per month; the premium is not concentrated in small stocks (NYSE-breakpoint size deciles)"]},
-    "barber_degeorge_lehavy_trueman_2013": {"source": "JFE 108:118, author copy https://webuser.bus.umich.edu/rlehavy/BDLT.pdf",
+        "stocks with predictably high announcement volume earn 1.5% per month; the premium is not concentrated in small stocks (NYSE-breakpoint size deciles)"
+      ]
+    },
+    "barber_degeorge_lehavy_trueman_2013": {
+      "source": "JFE 108:118, author copy https://webuser.bus.umich.edu/rlehavy/BDLT.pdf",
       "facts_confirmed_in_extracted_text": [
         "footnote 2: probability that the actual annual announcement month equals the expected (prior-year) month ranges from 61.28% (October) to 81.69% (December); February 76.94%",
         "US 1991-2010 long-short 75.9 basis points per month",
-        "Table 4 minimum: at least ten firms on each side of a monthly long-short portfolio"]},
-    "heitz_narayanamoorthy_zekhnini": {"source": "SSRN 3296537", "status": "abstract not retrieved in this worktree (fetch failed); the claim that the US premium disappeared after 2004 and moved to 8-K filing dates is carried from the task brief, unverified here"}
+        "Table 4 minimum: at least ten firms on each side of a monthly long-short portfolio"
+      ]
+    },
+    "heitz_narayanamoorthy_zekhnini": {
+      "source": "SSRN 3296537",
+      "status": "abstract not retrieved in this worktree (fetch failed); the claim that the US premium disappeared after 2004 and moved to 8-K filing dates is carried from the task brief, unverified here",
+      "use": "context only, unverified; it is not a prior of any item, test or threshold"
+    }
   },
   "announcements": {
     "source": "SEC data.sec.gov/submissions CIK##########.json plus filings.files continuations; fields form, items, acceptanceDateTime, filingDate, reportDate, accessionNumber",
@@ -46,7 +57,11 @@
       "expected_date": "reference effective session + 364 days",
       "trade": "for main-lane eligible firms at D(t), with the expectation formed at month t's cutoff: enter at the close K=5 sessions before the first session on or after the expected date when that entry session lies in month t after D(t); no trade when an announcement accepted after the cutoff has an effective session on or before entry; exit at the close of the session after the effective session of the first later announcement; if there is none by expected date + 30 days, exit at the close of the first session on or after that date; benchmark SPY over the same window when SPY is in the dataset",
       "accuracy_match": "for date-prediction accuracy only, the actual announcement is the first later announcement assigned to the target period within 10 days (uses later 10-Q/10-K filings)",
-      "max_period_lag_days": 100, "period_tolerance_days": 10, "shift_days": 364, "k_sessions": 5, "fallback_exit_days": 30
+      "max_period_lag_days": 100,
+      "period_tolerance_days": 10,
+      "shift_days": 364,
+      "k_sessions": 5,
+      "fallback_exit_days": 30
     }
   },
   "universe": {
@@ -59,87 +74,310 @@
       "exclude_symbol_regex": "(^[A-Z]{4}[WUR]$)|(\\.(WS|U|R|W|RT)$)|(\\.P[A-Z]?$)",
       "basis": "mover-early-entry candidates.py derivative exclusion plus preferred-share suffixes; combined with the CIK map and the exactly-4 Item 2.02 rule, which removes funds and trusts that do not report quarterly earnings on 8-K"
     },
-    "main_lane": {"min_prior_raw_close": 5.0, "min_prior20_median_dollar_volume": 1000000.0},
-    "small_cap_lane": {"status": "descriptive", "definition": "not main lane", "min_prior_raw_close": 1.0, "min_prior20_median_dollar_volume": 100000.0},
-    "weights": "prior-20 median dollar volume (market-capitalisation proxy), per symbol",
-    "sample_market": "weighted return of all main-lane eligible symbols (expected and non-expected) in month t, as Frazzini-Lamont's sample value-weighted market"
+    "main_lane": {
+      "min_prior_raw_close": 5.0,
+      "min_prior20_median_dollar_volume": 1000000.0
+    },
+    "small_cap_lane": {
+      "status": "descriptive",
+      "definition": "not main lane",
+      "min_prior_raw_close": 1.0,
+      "min_prior20_median_dollar_volume": 100000.0
+    },
+    "weights": "confirmatory: prior-20 median dollar volume (market-capitalisation proxy) capped at 2% per name and renormalised (effective cap max(2%, 1/n), excess redistributed pro rata, iterated); applied separately to each portfolio (long, short, top tercile); equal weight and uncapped dollar-volume weight are descriptive",
+    "weight_cap": 0.02,
+    "benchmark": "SPY: all_c close at D(t) to all_c close on the last session of month t, from the same daily dataset; a month without both SPY closes is invalid for EAP-2..4",
+    "descriptive_sample_market": "M_t = weighted return of all main-lane eligible symbols (Frazzini-Lamont's sample market); descriptive only, because M contains the long leg: L - M = (1 - w_L)(L - S) duplicates EAP-1 and is not a tradable hedge"
   },
   "items": {
-    "EAP-1": {"hypothesis": "mean monthly weighted long-short return (expected announcers minus non-announcers, main lane) > 0", "series": "L_t - S_t", "role": "the published premium, gross of costs"},
-    "EAP-2": {"hypothesis": "mean monthly long-only expected-announcer excess over the sample market > 0", "series": "L_t - M_t", "role": "the tradable leg, gross"},
-    "EAP-3": {"hypothesis": "mean monthly excess over the sample market of the top tercile of expected announcers by mean |announcement-session return| over their 4 known prior announcements > 0", "series": "Ltop_t - M_t", "proxy": "announcement-session return = all_c(effective session) / all_c(previous bar) - 1, from bars before D(t); at least 3 of the 4 prior announcements must have it; tercile = floor(n/3) highest proxies among the month's expected announcers", "role": "extreme-mover proxy subset (replaces Frazzini-Lamont's announcement-volume sort)"},
-    "EAP-4": {"hypothesis": "mean monthly net excess of the EAP-2 long leg after modelled costs > 0", "series": "L_t - M_t - cost_t", "equivalence": "net mean > 0 is break-even cost per unit turnover above the turnover-weighted measured cost; both are reported", "role": "tradability"}
+    "EAP-2": {
+      "family": "primary",
+      "order": 1,
+      "hypothesis": "mean monthly return of the expected-announcer long leg in excess of SPY > 0",
+      "series": "L_t - SPY_t",
+      "role": "the tradable leg, gross"
+    },
+    "EAP-4": {
+      "family": "primary",
+      "order": 2,
+      "hypothesis": "mean monthly net excess of the EAP-2 long leg over SPY after modelled costs > 0",
+      "series": "L_t - SPY_t - cost_t",
+      "equivalence": "net mean > 0 is break-even cost per unit turnover above the turnover-weighted measured cost; both are reported",
+      "role": "tradability"
+    },
+    "EAP-1": {
+      "family": "secondary",
+      "hypothesis": "mean monthly long-short return (expected announcers minus non-announcers, main lane) > 0",
+      "series": "L_t - S_t",
+      "role": "the published premium, gross of costs and borrow"
+    },
+    "EAP-3": {
+      "family": "secondary",
+      "hypothesis": "mean monthly excess over SPY of the top tercile of expected announcers by mean |announcement-session return| over their 4 known prior announcements > 0",
+      "series": "Ltop_t - SPY_t",
+      "proxy": "announcement-session return = all_c(effective session) / all_c(previous bar) - 1, from bars before D(t); at least 3 of the 4 prior announcements must have it; tercile = floor(n/3) highest proxies among the month's expected announcers",
+      "role": "extreme-mover proxy subset (replaces Frazzini-Lamont's announcement-volume sort)"
+    },
+    "invalid_months": "a month whose portfolio is below its minimum count, or lacks SPY closes for EAP-2..4, is invalid for that item: it is excluded from the series, never entered as 0"
   },
   "statistics": {
-    "test": "one-sided Student t on the monthly series with Newey-West (Bartlett) standard errors, 3 lags, df = n - 1",
-    "nw_lags": 3,
-    "multiplicity": {"method": "Holm step-down", "family": ["EAP-1", "EAP-2", "EAP-3", "EAP-4"], "m": 4, "family_alpha": 0.05},
+    "test": "one-sided Student t on the monthly series with Newey-West (Bartlett) standard errors, 4 lags, df = n - 1; 3 and 12 lags reported as sensitivity",
+    "nw_lags": 4,
+    "multiplicity": {
+      "primary": {
+        "items": [
+          "EAP-2",
+          "EAP-4"
+        ],
+        "method": "fixed sequence at alpha 0.05: EAP-2 first; EAP-4 is tested only if EAP-2 is rejected",
+        "alpha": 0.05,
+        "adoption": "intersection-union: adopt only if both EAP-2 and EAP-4 are rejected"
+      },
+      "secondary": {
+        "items": [
+          "EAP-1",
+          "EAP-3"
+        ],
+        "method": "Holm step-down",
+        "alpha": 0.05
+      },
+      "note": "the two families are separate; secondary results never change the adoption decision"
+    },
     "minimum_samples": {
-      "per_month": "a month counts for EAP-1 with at least 10 long and 10 short symbols; for EAP-2 and EAP-4 with at least 10 long symbols; for EAP-3 with at least 30 long symbols carrying the proxy (at least 10 in the tercile)",
-      "min_valid_months": {"EAP-1": 100, "EAP-2": 100, "EAP-3": 90, "EAP-4": 100},
-      "below_minimum": "the item is reported inconclusive and not rejected; its p-value still enters Holm as 1.0"
+      "per_month": "EAP-1 needs at least 10 long and 10 short symbols; EAP-2 and EAP-4 at least 10 long symbols and both SPY closes; EAP-3 at least 30 long symbols carrying the proxy (at least 10 in the tercile) and both SPY closes",
+      "min_valid_months": {
+        "EAP-1": 100,
+        "EAP-2": 100,
+        "EAP-3": 90,
+        "EAP-4": 100
+      },
+      "below_minimum": "the item is reported inconclusive and not rejected; in the primary sequence an inconclusive EAP-2 stops the sequence; in Holm its p-value enters as 1.0"
     },
     "mde": {
-      "assumption": "monthly long-short standard deviation 2.39% (upper bound implied by Frazzini-Lamont: 61 bp, t > 5, 384 months); no outcome of this study was used",
-      "n_months": 116,
-      "power": 0.8,
-      "mde_monthly_at_holm_first_alpha_0.0125": 0.0069,
-      "mde_monthly_at_alpha_0.05": 0.0056,
-      "consequence": "if the premium persisted at Frazzini-Lamont's 61 bp, EAP-1 would be detected with power below 80% at the Holm-first threshold; a non-rejection is weak evidence of absence, not proof"
+      "formula": "MDE = (t_{1-alpha,n-1} + t_{0.80,n-1}) * sigma / sqrt(n), n = 116, one-sided, NW inflation ignored",
+      "sigma_assumption": "2.39%/month, the upper bound of Frazzini-Lamont's own long-short SD (61 bp with t > 5 over 384 months); for our series (a long leg over SPY with capped dollar-volume weights, 2017-2026) it should be read as a lower bound of the relevant SD, so every MDE here is optimistic; no outcome of this study was used",
+      "primary_alpha_0.05": {
+        "sigma_2.39": 0.00555,
+        "sigma_3.0": 0.00697,
+        "sigma_4.0": 0.0093
+      },
+      "secondary_holm_first_alpha_0.025": {
+        "sigma_2.39": 0.00627
+      },
+      "expected_effect_adoption_items": 0.004,
+      "consequence": "the adoption items are underpowered for an effect of about 0.4%/month; a non-rejection is not evidence of absence",
+      "power_at_0.4pct_if_sigma_2.39": 0.56,
+      "computed_with": "eap_signal.t_ppf / t_sf, df = 115"
+    },
+    "nw_lags_sensitivity": [
+      3,
+      12
+    ],
+    "upper_bound_reporting": {
+      "bound": "one-sided 95% upper confidence bound = mean + t_{0.95,n-1} * NW(4) se, reported for every item",
+      "realized_mde": "X = (t_{0.95,n-1} + t_{0.80,n-1}) * NW(4) se of the item's realized series",
+      "wording_when_not_rejected": "not rejected at the preregistered level; the design had 80% power only above ≈X%/month, so an effect of the published size is not ruled out"
     }
   },
   "segments": {
     "design": "one confirmatory pass over 2017-01..2026-08 (116 months) with descriptive calendar-year reporting",
     "justification": "every parameter is fixed from the literature before outcomes (no tuning, so no development split is needed); a split would cut a 116-month sample whose MDE already exceeds the published effect; the question is the post-2004 existence of the premium over the full available period",
-    "first_month": "2017-01", "last_month": "2026-08",
+    "first_month": "2017-01",
+    "last_month": "2026-08",
     "why_2017": "the daily dataset starts 2016-01-04 and the monthly rule needs the 12 prior months"
   },
   "costs": {
     "rebalance": "monthly at D(t)'s close; turnover = sum |w_new - w_old_drifted| over the long leg; the first month buys from cash; the final holdings are not charged a closing sale",
+    "fees": "blueprints/us-equities/mover-v3/data/fees-v3.json: SEC Section 31 (usd_per_million of sale notional, by trade date) plus FINRA TAF (usd_per_share / price per dollar sold; per-trade cap ignored, conservative); commission 0",
+    "not_modelled": [
+      "short-leg borrow and short rebates (EAP-1 is a gross paper premium)",
+      "the SPY hedge's own trading cost",
+      "market impact beyond the half-spread",
+      "closing-auction pricing that is usually tighter than the quoted spread"
+    ],
     "half_spread_table": {
+      "confirmatory": "data/cost-table-eap-v1.json (pinned): measured closing half-spreads on D(t) sessions, main lane, 4 dollar-volume tiers [1,5)M [5,50)M [50,500)M >=500M x 3 price tiers [5,20) [20,100) >=100; 5%-trimmed mean per cell, cells with n < 30 use their dollar-volume tier pooled",
+      "measurement": "spreads.py: stratified deterministic sample of main-lane (symbol, D(t)) pairs by year x dollar-volume tier x price tier (25 per cell), Alpaca SIP quotes 15:55-16:00 ET (12:55-13:00 on early closes) newest valid quote"
+    },
+    "small_cap_lane_flat_half_spread": 0.01,
+    "sensitivity_half_spread_table_mover_v1": {
       "source": "blueprints/us-equities/mover-early-entry/evidence/cost-table-run-v1.json, time bucket 10:00-16:01 ET (index 3), price tier bounds [2,5,20], dollar-volume tier bounds [1e6,5e6]",
       "main_lane": [
-        {"price_min": 5.0, "price_max": 20.0, "dv_min": 1000000.0, "dv_max": 5000000.0, "half_spread": 0.00745, "from_cell": "3|2|1 n=35 measured"},
-        {"price_min": 20.0, "price_max": 1e18, "dv_min": 1000000.0, "dv_max": 5000000.0, "half_spread": 0.00745, "from_cell": "3|2|1 used instead of 3|3|1 (0.00202, a fallback cell with n=17): conservative"},
-        {"price_min": 5.0, "price_max": 20.0, "dv_min": 5000000.0, "dv_max": 1e30, "half_spread": 0.00227, "from_cell": "3|2|2 n=923 measured"},
-        {"price_min": 20.0, "price_max": 1e18, "dv_min": 5000000.0, "dv_max": 1e30, "half_spread": 0.00177, "from_cell": "3|3|2 n=412 measured"}
+        {
+          "price_min": 5.0,
+          "price_max": 20.0,
+          "dv_min": 1000000.0,
+          "dv_max": 5000000.0,
+          "half_spread": 0.00745,
+          "from_cell": "3|2|1 n=35 measured"
+        },
+        {
+          "price_min": 20.0,
+          "price_max": 1e+18,
+          "dv_min": 1000000.0,
+          "dv_max": 5000000.0,
+          "half_spread": 0.00745,
+          "from_cell": "3|2|1 used instead of 3|3|1 (0.00202, a fallback cell with n=17): conservative"
+        },
+        {
+          "price_min": 5.0,
+          "price_max": 20.0,
+          "dv_min": 5000000.0,
+          "dv_max": 1e+30,
+          "half_spread": 0.00227,
+          "from_cell": "3|2|2 n=923 measured"
+        },
+        {
+          "price_min": 20.0,
+          "price_max": 1e+18,
+          "dv_min": 5000000.0,
+          "dv_max": 1e+30,
+          "half_spread": 0.00177,
+          "from_cell": "3|3|2 n=412 measured"
+        }
       ],
       "small_cap_lane_flat": 0.01,
-      "conservatism": "the cells were measured on mover-candidate entries (volatile names and sessions), not on month-end closes of liquid expected announcers; the table is expected to overstate the costs of large names"
-    },
-    "fees": "blueprints/us-equities/mover-v3/data/fees-v3.json: SEC Section 31 (usd_per_million of sale notional, by trade date) plus FINRA TAF (usd_per_share / price per dollar sold; per-trade cap ignored, conservative); commission 0",
-    "not_modelled": ["short-leg borrow and short rebates (EAP-1 is a gross paper premium)", "the market hedge of EAP-2/4 (assumed an index ETF at negligible cost)", "market impact beyond the half-spread", "closing-auction pricing that is usually tighter than the quoted spread"]
+      "role": "sensitivity only: EAP-4 net series recomputed with it and reported descriptively"
+    }
   },
   "descriptive_only": [
-    "calendar-year means of all four series",
-    "equal-weighted versions of EAP-1 and EAP-2",
+    "calendar-year means of all series",
+    "L - M against the sample market (duplicates EAP-1 scaled by 1 - w_L)",
+    "uncapped dollar-volume and equal-weighted versions of EAP-1 and EAP-2",
     "small-cap lane versions of EAP-1 and EAP-2",
-    "event-time secondary trades (main lane): count, mean and median return and market-relative return",
+    "EAP-4 with the mover-v1 half-spread table",
+    "all items with NW 3 and 12 lags",
+    "event-time secondary trades (main lane): count, mean and median return and return minus SPY",
     "break-even cost per unit turnover versus the turnover-weighted measured cost",
     "delisting and data flags: no_decision_close, no_bar_in_month, bars_end_early"
   ],
   "decision_rule": {
-    "adopt_for_pre_positioning_research": "EAP-2 and EAP-4 both rejected under Holm",
-    "premium_exists_not_tradable": "EAP-1 or EAP-2 rejected, EAP-4 not rejected",
-    "no_premium": "neither EAP-1 nor EAP-2 rejected (subject to the MDE caveat)",
+    "adopt_for_pre_positioning_research": "EAP-2 and EAP-4 both rejected in the primary fixed sequence",
+    "premium_exists_not_tradable": "EAP-2 rejected, EAP-4 not rejected",
+    "long_short_premium_only": "EAP-2 not rejected, EAP-1 rejected under the secondary Holm",
+    "no_evidence_underpowered": "neither EAP-2 nor EAP-1 rejected; reported with the upper-bound wording in statistics.upper_bound_reporting",
     "extreme_mover_targeting": "EAP-3 rejected supports sizing toward past extreme announcement reactions; it is not a standalone adoption"
   },
-  "pre_freeze_allowed_on_real_data": ["SEC filing metadata collection and counts", "CIK/ticker coverage and membership counts", "acceptance-clock check against SGML headers", "date-prediction accuracy (no returns)", "lane membership counts from raw close and raw volume before each decision session"],
-  "pre_freeze_receipts": ["receipts/universe-summary.json", "receipts/collection-summary.json", "receipts/tzcheck-summary.json", "receipts/accuracy.json"],
-  "pre_freeze_forbidden": ["any return, P&L, hit rate or post-decision price change, or anything derived from them, including sanity checks", "announcement-session returns (EAP-3 proxy) on real data"],
-  "deviations": [
-    {"id": "D1", "what": "announcement dates are SEC 8-K Item 2.02 acceptance sessions, not Compustat/Bloomberg report dates", "why": "point-in-time, timestamped primary source; post-2004 Item 2.02 is mandatory for earnings releases, but it also covers preliminary results and other results-of-operations disclosures (the exactly-4 rule removes most such firms)"},
-    {"id": "D2", "what": "weights are prior-20 median dollar volume, not market capitalisation", "why": "shares outstanding are not in the daily dataset; dollar volume over-weights high-turnover names, which Frazzini-Lamont find carry a larger premium, so this can bias EAP-1/2 upward"},
-    {"id": "D3", "what": "identity from the current SEC ticker map and a current-ticker daily dataset", "why": "no point-in-time ticker history is available; issuers delisted or renamed before retrieval drop out (survivorship), counts in receipts/universe-summary.json"},
-    {"id": "D4", "what": "returns from Alpaca all-adjusted closes; no delisting returns", "why": "CRSP is unavailable; a symbol whose bars stop in the holding month keeps its return to its last bar and then holds cash"},
-    {"id": "D5", "what": "common-stock heuristic from symbol patterns, not CRSP share codes 10/11", "why": "share-class codes are unavailable"},
-    {"id": "D6", "what": "information cutoff at 16:00 ET the session before D(t)", "why": "a decision at D(t)'s close cannot use filings accepted during D(t) and remain implementable; the count window therefore loses at most the last session of t-1"},
-    {"id": "D7", "what": "Item 2.02 filings within 7 days merged; 8-K/A excluded", "why": "corrections and re-furnished releases would otherwise break the exactly-4 count"},
-    {"id": "D8", "what": "early-close days treated as 16:00 closes; 2015 sessions from a listed NYSE holiday set", "why": "the dataset has no close times and starts in 2016; affects filings accepted 13:00-16:00 on a few half-days"},
-    {"id": "D9", "what": "costs from a conservative mover-v1 half-spread table plus fees-v3; borrow, hedge and impact not modelled", "why": "no quote sample of the EAP universe exists before the freeze; the table overstates liquid-name costs"},
-    {"id": "D10", "what": "EAP-3 sorts on past |announcement-session return| instead of announcement volume", "why": "the study targets extreme movers; Frazzini-Lamont's 1.5%/month volume result is the analogous published subset"},
-    {"id": "D11", "what": "116 months, underpowered at the published effect size", "why": "the dataset starts in 2016; see statistics.mde"},
-    {"id": "D12", "what": "direct stdlib HTTP against data.sec.gov submissions instead of EdgarTools", "why": "EdgarTools is installed only in an isolated Python 3.13 environment; the submissions JSON is the primary source it wraps, and direct access keeps exact raw bytes for the sha256 manifest and exact rate control (<= 8 requests/s)"}
+  "pre_freeze_allowed_on_real_data": [
+    "SEC filing metadata collection and counts",
+    "CIK/ticker coverage and membership counts",
+    "acceptance-clock check against SGML headers",
+    "date-prediction accuracy (no returns)",
+    "lane membership counts from raw close and raw volume before each decision session",
+    "closing-quote half-spreads on D(t) sessions (15:55-16:00 ET quotes only)",
+    "survivorship counts of main-lane-qualifying daily symbols without a current CIK",
+    "per-month maximum weight and effective N from pre-D(t) inputs",
+    "counts of firm-months by number of known Item 2.02 events"
   ],
-  "resources": {"duckdb_memory_limit": "2.5GB", "duckdb_threads": 4, "bounded_runner": "ecosystem-bounded-run with ECOSYSTEM_JOB_MEMORY_HIGH=3G ECOSYSTEM_JOB_MEMORY_MAX=4G ECOSYSTEM_JOB_SECONDS<=7200", "private_root": "~/.local/state/native-agent-stack/research/sota-mover/eap/"}
+  "pre_freeze_receipts": [
+    "receipts/universe-summary.json",
+    "receipts/collection-summary.json",
+    "receipts/tzcheck-summary.json",
+    "receipts/accuracy.json",
+    "receipts/survivorship.json",
+    "receipts/weights.json",
+    "receipts/event-counts.json",
+    "data/cost-table-eap-v1.json"
+  ],
+  "pre_freeze_forbidden": [
+    "any return, P&L, hit rate or post-decision price change, or anything derived from them, including sanity checks",
+    "announcement-session returns (EAP-3 proxy) on real data"
+  ],
+  "deviations": [
+    {
+      "id": "D1",
+      "what": "announcement dates are SEC 8-K Item 2.02 acceptance sessions, not Compustat/Bloomberg report dates",
+      "why": "point-in-time, timestamped primary source; post-2004 Item 2.02 is mandatory for earnings releases, but it also covers preliminary results and other results-of-operations disclosures (the exactly-4 rule removes most such firms)"
+    },
+    {
+      "id": "D2",
+      "what": "weights are prior-20 median dollar volume capped at 2% per name, not market capitalisation",
+      "why": "shares outstanding are not in the daily dataset; dollar volume over-weights high-turnover names (Frazzini-Lamont find a larger premium there), so the cap limits concentration; receipts/weights.json gives the per-month maximum weight and effective N"
+    },
+    {
+      "id": "D3",
+      "what": "identity from the current SEC ticker map and a current-ticker daily dataset",
+      "why": "no point-in-time ticker history is available; issuers delisted or renamed before retrieval drop out. receipts/survivorship.json counts, per decision session, the common-like main-lane-qualifying daily symbols without a current CIK. The bias is unsigned: the missing names include failures and acquired firms (often positive returns) as well as funds and ADRs that would never qualify"
+    },
+    {
+      "id": "D4",
+      "what": "returns from Alpaca all-adjusted closes; no delisting returns",
+      "why": "CRSP is unavailable; a symbol whose bars stop in the holding month keeps its return to its last bar and then holds cash"
+    },
+    {
+      "id": "D5",
+      "what": "common-stock heuristic from symbol patterns, not CRSP share codes 10/11",
+      "why": "share-class codes are unavailable"
+    },
+    {
+      "id": "D6",
+      "what": "information cutoff at 16:00 ET the session before D(t)",
+      "why": "a decision at D(t)'s close cannot use filings accepted during D(t) and remain implementable; the count window therefore loses at most the last session of t-1"
+    },
+    {
+      "id": "D7",
+      "what": "Item 2.02 filings within 7 days merged; 8-K/A excluded",
+      "why": "corrections and re-furnished releases would otherwise break the exactly-4 count"
+    },
+    {
+      "id": "D8",
+      "what": "early-close days treated as 16:00 closes; 2015 sessions from a listed NYSE holiday set",
+      "why": "the dataset has no close times and starts in 2016; affects filings accepted 13:00-16:00 on a few half-days"
+    },
+    {
+      "id": "D9",
+      "what": "costs from a measured closing half-spread table (pinned) plus fees-v3; the mover-v1 table only as a sensitivity; borrow, the hedge's cost and impact not modelled",
+      "why": "the D(t) close is the rebalancing point; quoted spreads overstate closing-auction costs"
+    },
+    {
+      "id": "D10",
+      "what": "EAP-3 sorts on past |announcement-session return| instead of announcement volume",
+      "why": "the study targets extreme movers; Frazzini-Lamont's 1.5%/month volume result is the analogous published subset"
+    },
+    {
+      "id": "D11",
+      "what": "116 months, underpowered at the published effect size",
+      "why": "the dataset starts in 2016; see statistics.mde"
+    },
+    {
+      "id": "D12",
+      "what": "direct stdlib HTTP against data.sec.gov submissions instead of EdgarTools; the signal module is eap_signal.py",
+      "why": "EdgarTools is installed only in an isolated Python 3.13 environment; the submissions JSON is the primary source it wraps, and direct access keeps exact raw bytes for the sha256 manifest and exact rate control (<= 8 requests/s)"
+    },
+    {
+      "id": "D13",
+      "what": "EAP-2..4 are measured against SPY, not Frazzini-Lamont's sample value-weighted market",
+      "why": "the sample market contains the long leg (L - M = (1 - w_L)(L - S)), so it duplicates EAP-1 and is not a tradable hedge"
+    }
+  ],
+  "resources": {
+    "duckdb_memory_limit": "2.5GB",
+    "duckdb_threads": 4,
+    "bounded_runner": "ecosystem-bounded-run with ECOSYSTEM_JOB_MEMORY_HIGH=3G ECOSYSTEM_JOB_MEMORY_MAX=4G ECOSYSTEM_JOB_SECONDS<=7200",
+    "private_root": "~/.local/state/native-agent-stack/research/sota-mover/eap/"
+  },
+  "pins": {
+    "note": "sha256 of code, reference data and private inputs; evaluate.run() verifies every entry before any price is read (paths: code and data/ relative to this directory, fees-v3.json under blueprints/us-equities/mover-v3/data/, private inputs under the private root and the daily dataset path passed as --daily); regenerate with evaluate.py --print-pins after any code change before the freeze; filings.jsonl.gz is pinned as its compressed file bytes, while receipts/collection-summary.json records the sha256 of its decompressed content",
+    "code": {
+      "collect_edgar.py": "4a0b11f2287e6b7b5f45ae9534b7a68a7a9d12292fc1ce7842e350a7db6a0001",
+      "eap_signal.py": "65857fb5fe7da23279fa3ad89f71a76ee2e40d5eda83a2e9b55ef5f48a0cb91a",
+      "evaluate.py": "6891ef9f6e4cfb5cfc4ce853a749caf9a8981102dd9c5cf4e164b08a3fbb025c",
+      "expected_dates.py": "9982b8ce647591c41303847aaf2e6e33a54d1301b0747244d2de07d7450ed923",
+      "spreads.py": "4bd22316d5f48d17d475d9a6cdf2c0b23dc50708f30a37f4271b1c2550f1b42e"
+    },
+    "private_inputs": {
+      "daily.parquet": "f7584f24519367e03e0a4ac0fc57f9b410c047991b001bb0259ebdfc09b31105",
+      "filings.jsonl.gz": "e396d136bfd07d2e6681e22ce09c75b005e1fc20276b948ff2cf874892bd0d61",
+      "universe.json": "4eadb1bb12cddf7c113c23c524046ed861931b0dbe2331d6dd5b3f07f58287e5"
+    },
+    "reference": {
+      "cost-table-eap-v1.json": "6af53074f6d6fb1c63cdd5c19051bf0b39c2cb1b9c9541b035af0e9c1b9a4b5e",
+      "fees-v3.json": "f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a"
+    }
+  },
+  "pre_freeze_summary": {
+    "survivorship": "main-lane-qualifying common-like daily symbols without a current CIK: 1,406-2,112 per decision session, 33.8%-42.2% of qualifying symbols (mean 37.4%); receipts/survivorship.json",
+    "weights": "long leg n 61-1,241; capped max weight 1.88%-2.00%, effective N 54.1-199.1 (uncapped max weight up to 59.4%, effective N down to 2.7); short leg capped effective N 94.6-218.7; receipts/weights.json",
+    "event_counts": "firm-months with >= 5 known Item 2.02 events: 57,252 of all mapped (8.1%), 39,449 main lane (12.6%); receipts/event-counts.json"
+  }
 }

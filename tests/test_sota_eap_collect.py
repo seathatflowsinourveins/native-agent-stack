@@ -2,7 +2,6 @@
 import argparse
 import contextlib
 import gzip
-import importlib.util
 import io
 import json
 import sys
@@ -14,17 +13,9 @@ from pathlib import Path
 BASE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/sota-mover/eap"
 
 
-def load(name):
-    key = f"eap_{name}"
-    if key not in sys.modules:
-        spec = importlib.util.spec_from_file_location(key, BASE / f"{name}.py")
-        mod = importlib.util.module_from_spec(spec)
-        sys.modules[key] = mod
-        spec.loader.exec_module(mod)
-    return sys.modules[key]
+sys.path.insert(0, str(BASE))
+import collect_edgar as C  # noqa: E402
 
-
-C = load("collect_edgar")
 
 
 class FakeClock:

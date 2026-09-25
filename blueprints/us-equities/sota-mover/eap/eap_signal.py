@@ -4,9 +4,6 @@ Pure functions use the standard library only and are exercised by synthetic fixt
 DuckDB loaders at the bottom read the daily dataset; ``load_lane_inputs`` reads raw close and
 raw volume on sessions before the decision session only (membership, allowed before the
 freeze). Adjusted closes are read only by evaluate.py's loaders, after its freeze guard.
-
-This module's file name shadows the standard-library ``signal`` module; load it by path
-under another name (expected_dates.load_sibling) and never put this directory on sys.path.
 """
 from __future__ import annotations
 
@@ -19,6 +16,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 PROTOCOL = json.loads((HERE / "protocol.json").read_text())
 FEES_PATH = HERE.parents[1] / "mover-v3" / "data" / "fees-v3.json"
+COST_TABLE_PATH = HERE / "data" / "cost-table-eap-v1.json"
+WEIGHT_CAP = PROTOCOL["universe"]["weight_cap"]
 
 U = PROTOCOL["universe"]
 MAIN_MIN_PRICE = U["main_lane"]["min_prior_raw_close"]
@@ -88,6 +87,37 @@ def normalized(weights: dict[str, float]) -> dict[str, float]:
     return {k: v / tw for k, v in weights.items()} if tw > 0 else {}
 
 
+def capped_weights(raw: dict[str, float], cap: float = WEIGHT_CAP) -> dict[str, float]:
+    """Normalised weights with no name above max(cap, 1/n); excess redistributed pro rata."""
+    w = normalized({k: v for k, v in raw.items() if v > 0})
+    if not w:
+        return {}
+    cap = max(cap, 1.0 / len(w))
+    fixed: dict[str, float] = {}
+    while True:
+        free = {k: v for k, v in w.items() if k not in fixed}
+        room = 1.0 - cap * len(fixed)
+        scaled = {k: v * room / sum(free.values()) for k, v in free.items()}
+        over = {k for k, v in scaled.items() if v > cap + 1e-15}
+        if not over:
+            return {**{k: cap for k in fixed}, **scaled}
+        fixed.update({k: cap for k in over})
+
+
+def effective_n(weights: dict[str, float]) -> float:
+    return 1.0 / sum(v * v for v in weights.values()) if weights else 0.0
+
+
+def portfolio_return(members: dict[str, tuple[float, float]], cap: float | None = WEIGHT_CAP) -> float | None:
+    """Return of ``members`` (symbol -> (raw weight, return)) with capped weights (cap None: raw)."""
+    if not members:
+        return None
+    if cap is None:
+        return vw_return(members)
+    w = capped_weights({s: m[0] for s, m in members.items()}, cap)
+    return sum(w[s] * members[s][1] for s in w) if w else None
+
+
 def split_portfolios(rows: dict[str, dict], lane_name: str = "main", equal_weight: bool = False) -> tuple[dict, dict]:
     """rows: symbol -> {eligible, expected, lane, weight, ret}; eligible symbols of one lane."""
     long, short = {}, {}
@@ -111,8 +141,18 @@ def top_tercile(proxies: dict[str, float]) -> set[str]:
 
 # ---------------------------------------------------------------- costs
 
+def load_cost_table(which: str = "measured", path: Path = COST_TABLE_PATH) -> dict:
+    """{"main_lane": rows, "small_cap_lane_flat": x}: the pinned measured table or the mover-v1 sensitivity."""
+    c = PROTOCOL["costs"]
+    if which == "mover_v1_sensitivity":
+        return c["sensitivity_half_spread_table_mover_v1"]
+    doc = json.loads(path.read_text())
+    rows = [{k: r[k] for k in ("price_min", "price_max", "dv_min", "dv_max", "half_spread")} for r in doc["rows"]]
+    return {"main_lane": rows, "small_cap_lane_flat": c["small_cap_lane_flat_half_spread"]}
+
+
 def half_spread(price: float, dv: float, lane_name: str, table: dict | None = None) -> float:
-    table = table or PROTOCOL["costs"]["half_spread_table"]
+    table = table or load_cost_table()
     if lane_name != "main":
         return table["small_cap_lane_flat"]
     for row in table["main_lane"]:
@@ -146,7 +186,7 @@ def drift(weights: dict[str, float], returns: dict[str, float]) -> dict[str, flo
 
 
 def rebalance_cost(old: dict[str, float], new: dict[str, float], price: dict[str, float], dv: dict[str, float],
-                   lanes: dict[str, str], d: date, fees: dict) -> tuple[float, float]:
+                   lanes: dict[str, str], d: date, fees: dict, table: dict | None = None) -> tuple[float, float]:
     """(cost, turnover) as fractions of book for moving from drifted ``old`` to ``new`` weights."""
     cost = turnover = 0.0
     for s in set(old) | set(new):
@@ -154,7 +194,7 @@ def rebalance_cost(old: dict[str, float], new: dict[str, float], price: dict[str
         if dw == 0:
             continue
         turnover += abs(dw)
-        cost += abs(dw) * half_spread(price[s], dv[s], lanes.get(s, "main"))
+        cost += abs(dw) * half_spread(price[s], dv[s], lanes.get(s, "main"), table)
         if dw < 0:
             cost += abs(dw) * sell_fee_per_dollar(d, price[s], fees)
     return cost, turnover
@@ -222,6 +262,18 @@ def t_sf(t: float, df: float) -> float:
     return tail if t > 0 else 1 - tail
 
 
+def t_ppf(q: float, df: float) -> float:
+    """Quantile of Student's t: the t with P(T <= t) = q (bisection on t_sf)."""
+    lo, hi = -60.0, 60.0
+    for _ in range(200):
+        mid = (lo + hi) / 2
+        if 1 - t_sf(mid, df) < q:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2
+
+
 def holm(pvalues: dict[str, float], alpha: float) -> dict[str, bool]:
     """Holm step-down: reject while p_(k) <= alpha / (m - k)."""
     m = len(pvalues)
@@ -231,6 +283,15 @@ def holm(pvalues: dict[str, float], alpha: float) -> dict[str, bool]:
             out[name] = True
         else:
             break
+    return out
+
+
+def fixed_sequence(pvalues: list[tuple[str, float]], alpha: float) -> dict[str, bool]:
+    """Test in the given order at full alpha; stop at the first non-rejection."""
+    out, go = {}, True
+    for name, p in pvalues:
+        out[name] = go and p <= alpha
+        go = out[name]
     return out
 
 
