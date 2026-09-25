@@ -37,15 +37,19 @@ def require(condition: bool, message: str) -> None:
         raise AssertionError(message)
 
 
-def signal_group(pid: int, signum: int) -> None:
-    """Signal a timed-out command's process group, if any member is still alive to receive it.
+def signal_group(process: subprocess.Popen, signum: int) -> None:
+    """Signal a timed-out command's process group unless it has already finished.
 
     The group can finish between the timeout and the signal: Linux then reports ESRCH once it is
-    reaped, and macOS reports EPERM while its members are unreaped zombies (XNU killpg1 skips them)."""
+    reaped, and macOS reports EPERM while its members are unreaped zombies (XNU killpg1 skips
+    them). EPERM while the leader still runs is a real refusal and is raised."""
     try:
-        os.killpg(pid, signum)
-    except (ProcessLookupError, PermissionError):
+        os.killpg(process.pid, signum)
+    except ProcessLookupError:
         pass
+    except PermissionError:
+        if process.poll() is None:
+            raise
 
 
 def verify_archive(archive: Path, checksums: str) -> None:
@@ -161,11 +165,11 @@ class Run:
             stdout, stderr = process.communicate(timeout=timeout)
         except subprocess.TimeoutExpired:
             timed_out = True
-            signal_group(process.pid, signal.SIGTERM)
+            signal_group(process, signal.SIGTERM)
             try:
                 stdout, stderr = process.communicate(timeout=5)
             except subprocess.TimeoutExpired:
-                signal_group(process.pid, signal.SIGKILL)
+                signal_group(process, signal.SIGKILL)
                 stdout, stderr = process.communicate()
         entry = {"label": label, "argv": [self.clean(arg) for arg in argv],
                  "cwd": self.clean(str(cwd or self.work)), "exit_code": process.returncode,

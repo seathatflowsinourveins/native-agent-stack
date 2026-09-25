@@ -196,10 +196,14 @@ class Recorder:
                 if record["error"] or process.poll() is None:
                     try:
                         os.killpg(process.pid, signal.SIGKILL)
-                    except (ProcessLookupError, PermissionError):
-                        # macOS reports EPERM, not ESRCH, for a group whose members have all exited
-                        # but are not reaped yet (XNU killpg1 skips zombies); nothing is left to kill.
+                    except ProcessLookupError:
                         pass
+                    except PermissionError:
+                        # macOS answers EPERM when no member can be signalled. Once the leader has
+                        # exited, the rest are unreaped zombies (XNU killpg1 skips them), so nothing is
+                        # left to kill; while the leader still runs, the refusal is real.
+                        if process.poll() is None:
+                            raise
                 process.wait()
                 record["exit_code"] = process.returncode
                 process.stdout.close()
