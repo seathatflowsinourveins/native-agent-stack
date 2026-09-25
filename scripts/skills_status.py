@@ -26,10 +26,12 @@ budget compared against a fresh sum over the manifest.
 Nonmutating: it only ever reads (os.readlink/is_file/iterdir/read_bytes/read_text) and
 never writes, installs, removes or touches a lock, a symlink or a client setting. It
 opens no credential store. Output never includes a setting's value except the fixed
-``skillOverrides`` state strings (on/name-only/user-invocable-only/off), and never a
-file's raw content -- SKILL.md and the lock are read only to compute a digest or to
-look up one field, and settings.json/config.toml are read only to pull the two fields
-this checker needs; nothing else from those files is copied into the report.
+``skillOverrides`` state strings (on/name-only/user-invocable-only/off) -- a value that
+is not one of those four strings is reported as the fixed ``invalid_value`` placeholder
+instead of being echoed -- and never a file's raw content -- SKILL.md and the lock are
+read only to compute a digest or to look up one field, and settings.json/config.toml
+are read only to pull the two fields this checker needs; nothing else from those files
+is copied into the report.
 
 Exit status: 0 when every required check above passes for every manifest skill (and,
 if ``--skills-bin`` was given, its ``--version`` matches ``cli.version``); 1 when any
@@ -57,6 +59,10 @@ CLAUDE_LISTING_STATES = {"on", "name-only", "user-invocable-only", "off"}
 # A skillOverrides key absent from settings.json defaults to "on" (Claude Code docs);
 # only a manifest pin of "on" is satisfied by that default with no key present at all.
 DEFAULT_CLAUDE_LISTING = "on"
+# overrides.get(name) can be any JSON value (a secret-shaped string, a number, a list,
+# a dict...) since settings.json is foreign input; a value that is not one of the four
+# strings above is reported as this fixed placeholder, never echoed verbatim.
+INVALID_CLAUDE_LISTING = "invalid_value"
 
 NAME_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*\Z")
 SHA1_RE = re.compile(r"[0-9a-f]{40}\Z")
@@ -222,7 +228,11 @@ def check_claude_link(link: Path, canonical: Path) -> dict:
         kind = "absolute" if os.path.isabs(os.readlink(link)) else "relative"
         try:
             resolved, expected = link.resolve(), canonical.resolve()
-        except (OSError, RecursionError):
+        except (OSError, RecursionError, RuntimeError):
+            # A symlink cycle raises RuntimeError("Symlink loop from ...") from Path.resolve()
+            # on CPython 3.11/3.12 (verified empirically; 3.13+ tolerates it silently instead
+            # in non-strict mode), not OSError/RecursionError -- caught here so one looping
+            # skill is reported, not an uncaught crash of the whole status check.
             return {"state": "cannot_resolve", "kind": kind}
         return {"state": "ok" if resolved == expected else "wrong_target", "kind": kind}
     return {"state": "not_a_symlink", "kind": "copy"}
@@ -232,7 +242,12 @@ def check_claude_listing(overrides: dict, overrides_state: str, skill: dict) -> 
     if overrides_state != "ok":
         return {"state": "settings_unreadable", "actual": None}
     actual = overrides.get(skill["name"], DEFAULT_CLAUDE_LISTING)
-    return {"state": "ok" if actual == skill["claude_listing"] else "mismatch", "actual": actual}
+    state = "ok" if actual == skill["claude_listing"] else "mismatch"
+    # `actual` is foreign input and may be any JSON value, not necessarily one of the four
+    # documented strings (or even a hashable type) -- never return it verbatim; only one of
+    # the known states, or the fixed placeholder, ever reaches the report.
+    reported = actual if isinstance(actual, str) and actual in CLAUDE_LISTING_STATES else INVALID_CLAUDE_LISTING
+    return {"state": state, "actual": reported}
 
 
 def codex_disable_entries(config: dict | None) -> list[dict]:

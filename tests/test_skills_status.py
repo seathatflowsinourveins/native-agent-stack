@@ -17,6 +17,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 from scripts import skills_status as ss
 
@@ -268,6 +269,23 @@ class SkillsStatusTests(unittest.TestCase):
         report = self.report(manifest)
         self.assertEqual(self.skill_result(report, "alpha-skill")["claude_link"]["state"], "wrong_target")
         self.assertEqual(report["result"], "fail")
+
+    def test_symlink_loop_reports_cannot_resolve_without_crashing(self):
+        """A symlink cycle makes Path.resolve() raise RuntimeError("Symlink loop from ...")
+        on CPython 3.11/3.12 (verified empirically against this repo's own interpreters);
+        3.13+ instead tolerates the cycle silently in non-strict mode and raises nothing.
+        The real symlink below exercises the state/kind computation that runs before the
+        resolve() call; RuntimeError itself is forced via mock so the regression holds
+        under whichever interpreter actually runs this suite, not just the ones where a
+        real filesystem loop happens to reproduce it."""
+        claude_skills = self.home / ".claude" / "skills"
+        claude_skills.mkdir(parents=True)
+        link = claude_skills / "looped-skill"
+        link.symlink_to(link.name)  # a real, relative, self-referential symlink
+        canonical = self.home / ".agents" / "skills" / "looped-skill"
+        with mock.patch.object(ss.Path, "resolve", side_effect=RuntimeError("Symlink loop from 'x'")):
+            result = ss.check_claude_link(link, canonical)
+        self.assertEqual(result, {"state": "cannot_resolve", "kind": "relative"})
 
     # -- wrong override -------------------------------------------------------
 
@@ -522,6 +540,36 @@ class SkillsStatusTests(unittest.TestCase):
                 self.assertNotIn(sentinel, result.stdout)
                 self.assertNotIn(sentinel, result.stderr)
                 self.assertNotIn("drifted body", result.stdout)
+
+    def test_non_enum_claude_listing_value_is_never_echoed(self):
+        """skillOverrides[name] is foreign input and may hold any string, not just the four
+        documented states; a secret-shaped one must never reach either output mode."""
+        manifest, alpha, beta = self.setup_pair()
+        secret = "SENTINEL-NOT-AN-ENUM-VALUE-" + os.urandom(12).hex()
+        self.write_claude_settings({"beta-skill": secret})  # manifest pins beta at "name-only"
+        report = self.report(manifest)
+        self.assertEqual(self.skill_result(report, "beta-skill")["claude_listing"],
+                         {"state": "mismatch", "actual": "invalid_value"})
+        self.assertFalse(self.skill_result(report, "beta-skill")["pass"])
+        dumped = json.dumps(report) + ss.render_text(report)
+        self.assertNotIn(secret, dumped)
+        for args in ((), ("--json",)):
+            with self.subTest(args=args):
+                result = self.run_cli(manifest, *args)
+                self.assertNotIn(secret, result.stdout)
+                self.assertNotIn(secret, result.stderr)
+
+    def test_non_string_claude_listing_value_does_not_crash(self):
+        """overrides.get(name) can be an unhashable JSON value (a list/dict); the enum
+        membership check must not raise TypeError on it."""
+        manifest, alpha, beta = self.setup_pair()
+        self.write_claude_settings({"beta-skill": ["nested", "nonsense"]})
+        report = self.report(manifest)  # must not raise
+        self.assertEqual(self.skill_result(report, "beta-skill")["claude_listing"],
+                         {"state": "mismatch", "actual": "invalid_value"})
+        result = self.run_cli(manifest, "--json")
+        self.assertEqual(result.returncode, 1)
+        self.assertNotIn("nested", result.stdout)
 
     def test_home_path_not_echoed_in_output(self):
         manifest, alpha, beta = self.setup_pair()
