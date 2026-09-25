@@ -3406,13 +3406,13 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "9ff8310954bf6ad378404224dd781bbc64ed183ed4a40a2a40ff6bbf067bfc99",
-      "bytes": 7566
+      "sha256": "3909b624dd03741f888d5f5d4495aa4b130638caf8b62b441687bc18c9030dcd",
+      "bytes": 7604
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "f48f9cfb1f2d593a29bc56b738e7242115a6ed21497a5d80d8c268fa2f9b1daa",
-      "bytes": 3953
+      "sha256": "e8cf599985565695f10b76ffd4637609f2866eaaeaaa537b8f5a3aad27fa3a5e",
+      "bytes": 3985
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
@@ -30217,8 +30217,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "b0b1a701d0d2f097a3c681aee865f548efa4e996389586870bc32f2a5a630988",
-      "bytes": 61252
+      "sha256": "a131f5515f3d02aaf7e2660723bb92dd418dc85d77f9aa0daecdb9ed6f035096",
+      "bytes": 61506
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
