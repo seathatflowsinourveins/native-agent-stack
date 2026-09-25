@@ -1,0 +1,569 @@
+{
+ "schema_version": 1,
+ "kind": "native_fault_independent_observation",
+ "evidence_class": "independent_observation",
+ "method": "Python stdlib urllib, HTTP GET only against https://paper-api.alpaca.markets (no harness, engine, order-contract or alpaca-py import): account, clock, orders(status=all, after=receipt started_at minus margin) filtered by the receipt's client_id_prefix, orders:by_client_order_id for every receipt client id, FILL activities per prefix order and account-wide, open orders, positions",
+ "script": "observe-native-fault-20260925t184220z.py",
+ "script_sha256": "6b9cf04569c16452c4b419e75dc1fd3a15267fc932bb027a535ea7fa386ba518",
+ "python": "3.12.3",
+ "observed_started_at": "2026-09-25T18:46:44.263860Z",
+ "receipt": {
+  "path": "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
+  "sha256": "31c112e3f1ff4471543b5ca034ef879561467a85e6d456000971f075d605e90d",
+  "gate": "native-fault-behaviour",
+  "status": "native_faults_passed",
+  "endpoint": "paper",
+  "symbol": "SPY",
+  "client_id_prefix": "nf-20260925t182513-9a1b9a-",
+  "started_at": "2026-09-25T18:25:13.333821+00:00",
+  "finished_at": "2026-09-25T18:25:15.124128+00:00",
+  "posts_reserved": 2,
+  "submit_responses": 2,
+  "client_ids": {
+   "c01": {
+    "cases": [
+     "C01",
+     "C02",
+     "C05"
+    ],
+    "submit_statuses": [
+     200
+    ],
+    "read_statuses": [
+     200,
+     200,
+     200,
+     200,
+     200,
+     200
+    ],
+    "final_ledger_status": "canceled",
+    "final_ledger_filled_qty": "0",
+    "broker_id_recorded": true
+   },
+   "c04": {
+    "cases": [
+     "C04"
+    ],
+    "submit_statuses": [
+     422
+    ],
+    "read_statuses": [
+     404
+    ],
+    "final_ledger_status": "broker_refused",
+    "final_ledger_filled_qty": "0",
+    "broker_id_recorded": false
+   }
+  }
+ },
+ "plan": {
+  "path": "blueprints/us-equities/adaptive-paper/native-faults/plan.json",
+  "sha256": "f276b26c16256b91de3a4f6fdf566b28a14a255f1210baa478537990dada6818",
+  "equals_receipt_plan_sha256": true
+ },
+ "pre_run_probe": {
+  "sha256": "6318b75288b1ecaf640039c92d2238c26c020e317e54fc5091c990a3ed40ee99",
+  "label": "pre-run",
+  "started_at": "2026-09-25T18:24:40.287430+00:00",
+  "identity_matched": true
+ },
+ "account": {
+  "identity_matched": true,
+  "status": "ACTIVE",
+  "trading_blocked": false,
+  "account_blocked": false,
+  "multiplier": "4",
+  "long_market_value_zero": true,
+  "short_market_value_zero": true,
+  "cash_equals_equity": true,
+  "cash_equals_pre_run_probe": true,
+  "equity_equals_pre_run_probe": true
+ },
+ "clock": {
+  "timestamp": "2026-09-25T14:46:44.498066489-04:00",
+  "is_open": true
+ },
+ "orders_listing": {
+  "after": "2026-09-25T18:20:13Z",
+  "pages": 1,
+  "complete": true,
+  "orders_listed": 1,
+  "orders_since_receipt_started_at": 1,
+  "orders_in_run_window": 1,
+  "orders_with_prefix": 1,
+  "foreign_orders_in_run_window": 0,
+  "foreign_orders_listed": []
+ },
+ "prefix_orders": [
+  {
+   "client_order_id": "nf-20260925t182513-9a1b9a-c01",
+   "has_run_prefix": true,
+   "symbol": "SPY",
+   "side": "buy",
+   "type": "limit",
+   "time_in_force": "day",
+   "qty": "1",
+   "limit_price": "385.67",
+   "extended_hours": false,
+   "status": "canceled",
+   "filled_qty": "0",
+   "filled_avg_price": null,
+   "submitted_at": "2026-09-25T18:25:14.48029804Z",
+   "canceled_at": "2026-09-25T18:25:14.524984264Z",
+   "filled_at": null,
+   "broker_order_id_sha256_12": "6452751d5d69",
+   "suffix": "c01",
+   "fill_activities": 0,
+   "fill_activity_qty": "0",
+   "fill_activities_complete": true
+  }
+ ],
+ "prefix_status_counts": {
+  "canceled": 1
+ },
+ "client_id_lookups": {
+  "c01": {
+   "http_status": 200,
+   "found": true,
+   "status": "canceled",
+   "filled_qty": "0",
+   "broker_order_id_sha256_12": "6452751d5d69",
+   "same_order_as_listing": true
+  },
+  "c04": {
+   "http_status": 404,
+   "found": false
+  }
+ },
+ "account_fill_activities": {
+  "after": "2026-09-25T18:20:13Z",
+  "complete": true,
+  "count": 0,
+  "in_run_window": 0,
+  "fills": []
+ },
+ "open_orders_now": {
+  "count": 0,
+  "with_prefix": 0,
+  "orders": []
+ },
+ "positions_now": {
+  "count": 0,
+  "positions": []
+ },
+ "ledger_crosscheck": {
+  "sha256": "1930c84a11f5a35f7e8bf072e34ebedc69301bcd31c56ce1d40d09a70aa47e05",
+  "opened": "read-only, immutable",
+  "client_ids": {
+   "c01": {
+    "in_ledger": true,
+    "ledger_status": "canceled",
+    "ledger_filled_qty": "0",
+    "broker_id_recorded": true,
+    "ledger_broker_id_equals_broker_order": true
+   },
+   "c04": {
+    "in_ledger": true,
+    "ledger_status": "broker_refused",
+    "ledger_filled_qty": "0",
+    "broker_id_recorded": false,
+    "ledger_broker_id_equals_broker_order": null
+   }
+  },
+  "event_kind_counts": {
+   "broker_refused": 1,
+   "intent_reserved": 2,
+   "order_observed": 3,
+   "trial_start": 1
+  },
+  "foreign_intents": 0,
+  "executions_total": 0,
+  "positions_rows": 0
+ },
+ "compat_observe_native_faults_20260924": {
+  "orders_listed_since_start": 1,
+  "orders_with_prefix": 1,
+  "by_suffix": {
+   "c01": {
+    "status": "canceled",
+    "filled_qty": "0"
+   }
+  },
+  "lookup_c01": {
+   "found": true,
+   "status": "canceled",
+   "filled_qty": "0"
+  },
+  "lookup_c04": {
+   "found": false,
+   "http_status": 404
+  },
+  "status_counts": {
+   "canceled": 1
+  },
+  "positions_now": 0,
+  "open_orders_now": 0
+ },
+ "checks": [
+  {
+   "check": "receipt_submits_equal_posts_reserved_and_submit_responses",
+   "expected": [
+    2,
+    2
+   ],
+   "observed": [
+    2,
+    2
+   ],
+   "match": true,
+   "basis": "receipt-internal count of submit requests in cases"
+  },
+  {
+   "check": "order_listing_complete",
+   "expected": true,
+   "observed": true,
+   "match": true,
+   "basis": "listing paginated to the end"
+  },
+  {
+   "check": "broker_orders_with_prefix",
+   "expected": 1,
+   "observed": 1,
+   "match": true,
+   "basis": "receipt: client ids with a 2xx submit (c01)"
+  },
+  {
+   "check": "prefix_order_suffixes",
+   "expected": [
+    "c01"
+   ],
+   "observed": [
+    "c01"
+   ],
+   "match": true,
+   "basis": "receipt: accepted client ids"
+  },
+  {
+   "check": "lookup_c01_found",
+   "expected": true,
+   "observed": true,
+   "match": true,
+   "basis": "receipt: accepted submit [200]"
+  },
+  {
+   "check": "lookup_c01_status",
+   "expected": "canceled",
+   "observed": "canceled",
+   "match": true,
+   "basis": "receipt C01/C02/C05 final ledger state"
+  },
+  {
+   "check": "listing_c01_status",
+   "expected": "canceled",
+   "observed": "canceled",
+   "match": true,
+   "basis": "receipt C01/C02/C05 final ledger state"
+  },
+  {
+   "check": "lookup_c01_filled_qty",
+   "expected": "0",
+   "observed": "0",
+   "match": true,
+   "basis": "receipt C01/C02/C05 final ledger state"
+  },
+  {
+   "check": "lookup_c01_same_order_as_listing",
+   "expected": true,
+   "observed": true,
+   "match": true,
+   "basis": "client-id lookup and prefix listing return one broker order"
+  },
+  {
+   "check": "fill_activities_c01",
+   "expected": "0",
+   "observed": "0",
+   "match": true,
+   "basis": "receipt C01/C02/C05 final ledger state filled_qty"
+  },
+  {
+   "check": "order_c01_symbol_and_limit_price",
+   "expected": [
+    "SPY",
+    "385.67"
+   ],
+   "observed": [
+    "SPY",
+    "385.67"
+   ],
+   "match": true,
+   "basis": "receipt symbol and case detail limit_price"
+  },
+  {
+   "check": "order_c01_type",
+   "expected": "limit",
+   "observed": "limit",
+   "match": true,
+   "basis": "receipt case detail carries a limit_price"
+  },
+  {
+   "check": "order_c01_plan_shape",
+   "expected": [
+    "buy",
+    "1",
+    "day",
+    false
+   ],
+   "observed": [
+    "buy",
+    "1",
+    "day",
+    false
+   ],
+   "match": true,
+   "basis": "plan.json bound by receipt plan_sha256"
+  },
+  {
+   "check": "lookup_c04_http_status",
+   "expected": [
+    404
+   ],
+   "observed": [
+    404
+   ],
+   "match": true,
+   "basis": "receipt C04 client-id read after submit [422]"
+  },
+  {
+   "check": "no_listed_order_c04",
+   "expected": false,
+   "observed": false,
+   "match": true,
+   "basis": "receipt: submit refused"
+  },
+  {
+   "check": "foreign_orders_in_run_window",
+   "expected": 0,
+   "observed": 0,
+   "match": true,
+   "basis": "single writer during the run (receipt posts_reserved are the run's only submits)"
+  },
+  {
+   "check": "account_fill_activities_in_run_window",
+   "expected": 0,
+   "observed": 0,
+   "match": true,
+   "basis": "receipt cleanup cash_delta_usd 0.00"
+  },
+  {
+   "check": "open_orders_with_prefix_now",
+   "expected": 0,
+   "observed": 0,
+   "match": true,
+   "basis": "receipt cleanup broker_open_orders 0"
+  },
+  {
+   "check": "open_orders_now",
+   "expected": 0,
+   "observed": 0,
+   "match": true,
+   "basis": "receipt cleanup reconcile open_orders"
+  },
+  {
+   "check": "positions_now",
+   "expected": 0,
+   "observed": 0,
+   "match": true,
+   "basis": "receipt cleanup reconcile positions"
+  },
+  {
+   "check": "account_market_value_zero",
+   "expected": [
+    true,
+    true
+   ],
+   "observed": [
+    true,
+    true
+   ],
+   "match": true,
+   "basis": "receipt cleanup flat True"
+  },
+  {
+   "check": "cash_and_equity_equal_pre_run_probe",
+   "expected": [
+    true,
+    true
+   ],
+   "observed": [
+    true,
+    true
+   ],
+   "match": true,
+   "basis": "receipt cleanup cash_delta_usd 0.00; baseline is the run stage's pre-run GET probe"
+  },
+  {
+   "check": "ledger_c01_broker_id_recorded",
+   "expected": true,
+   "observed": true,
+   "match": true,
+   "basis": "receipt ledger broker_id_recorded"
+  },
+  {
+   "check": "ledger_c01_broker_id_equals_broker_order",
+   "expected": true,
+   "observed": true,
+   "match": true,
+   "basis": "private ledger intent broker_id vs client-id lookup"
+  },
+  {
+   "check": "ledger_c01_status_and_fill_equal_broker",
+   "expected": [
+    "canceled",
+    "0"
+   ],
+   "observed": [
+    "canceled",
+    "0"
+   ],
+   "match": true,
+   "basis": "private ledger intent vs broker"
+  },
+  {
+   "check": "ledger_c04_broker_id_recorded",
+   "expected": false,
+   "observed": false,
+   "match": true,
+   "basis": "receipt ledger broker_id_recorded"
+  },
+  {
+   "check": "ledger_c04_status",
+   "expected": "broker_refused",
+   "observed": "broker_refused",
+   "match": true,
+   "basis": "receipt ledger status"
+  },
+  {
+   "check": "ledger_intents_equal_receipt_client_ids",
+   "expected": [
+    "c01",
+    "c04"
+   ],
+   "observed": [
+    "c01",
+    "c04"
+   ],
+   "match": true,
+   "basis": "private ledger intents"
+  },
+  {
+   "check": "ledger_foreign_intents_executions_positions",
+   "expected": [
+    0,
+    0,
+    0
+   ],
+   "observed": [
+    0,
+    0,
+    0
+   ],
+   "match": true,
+   "basis": "receipt: zero fills and flat"
+  }
+ ],
+ "mismatches": [],
+ "all_match": true,
+ "requests": [
+  {
+   "method": "GET",
+   "path": "/v2/account",
+   "params": {},
+   "status": 200,
+   "ms": 68
+  },
+  {
+   "method": "GET",
+   "path": "/v2/clock",
+   "params": {},
+   "status": 200,
+   "ms": 66
+  },
+  {
+   "method": "GET",
+   "path": "/v2/orders",
+   "params": {
+    "status": "all",
+    "after": "2026-09-25T18:20:13Z",
+    "direction": "asc",
+    "limit": 500
+   },
+   "status": 200,
+   "ms": 65
+  },
+  {
+   "method": "GET",
+   "path": "/v2/account/activities/FILL",
+   "params": {
+    "order_id": "sha256:6452751d5d69",
+    "direction": "asc",
+    "page_size": 100
+   },
+   "status": 200,
+   "ms": 208
+  },
+  {
+   "method": "GET",
+   "path": "/v2/orders:by_client_order_id",
+   "params": {
+    "client_order_id": "nf-20260925t182513-9a1b9a-c01"
+   },
+   "status": 200,
+   "ms": 67
+  },
+  {
+   "method": "GET",
+   "path": "/v2/orders:by_client_order_id",
+   "params": {
+    "client_order_id": "nf-20260925t182513-9a1b9a-c04"
+   },
+   "status": 404,
+   "ms": 72
+  },
+  {
+   "method": "GET",
+   "path": "/v2/account/activities/FILL",
+   "params": {
+    "after": "2026-09-25T18:20:13Z",
+    "direction": "asc",
+    "page_size": 100
+   },
+   "status": 200,
+   "ms": 65
+  },
+  {
+   "method": "GET",
+   "path": "/v2/orders",
+   "params": {
+    "status": "open",
+    "direction": "asc",
+    "limit": 500
+   },
+   "status": 200,
+   "ms": 73
+  },
+  {
+   "method": "GET",
+   "path": "/v2/positions",
+   "params": {},
+   "status": 200,
+   "ms": 62
+  }
+ ],
+ "request_count": 9,
+ "methods_used": [
+  "GET"
+ ],
+ "observed_finished_at": "2026-09-25T18:46:45.024220Z",
+ "privacy": "No key value, account id, account fingerprint, balance, broker order id or host path is printed; broker order ids appear only as sha256[:12]."
+}

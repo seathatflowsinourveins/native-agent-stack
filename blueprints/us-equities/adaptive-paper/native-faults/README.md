@@ -8,7 +8,8 @@ the retained receipt of the 2026-09-24 18:58Z run on the order-contract engine,
 `receipt-20260924t185811.json`, the retained receipt of the first passing run,
 `receipt-20260924t143905.json` (2026-09-24 14:39Z), the retained receipt of the
 earlier incomplete run, `receipt-20260923.json`, and under `evidence/` the
-independent observations of the three passing runs' broker orders and the
+independent observations of the three passing runs' broker orders, a second,
+standard-library observation of the 2026-09-25 run by a separate session, and the
 sanitized run record of the 2026-09-25 run. The offline
 suite `tests/test_native_faults_min.py` is a local synthetic fixture with a fake
 transport; it drives the real `runner.Controller` and `safety.Ledger`.
@@ -79,6 +80,36 @@ that window; the `c04` client-id lookup returned 404; 0 open orders and 0
 positions. These match the receipt. The same claim boundary applies as for the
 earlier observations: independent of the harness and engine code, not of the
 broker, and made by the session that started the run.
+
+**Second independent observation, by a separate session.**
+`evidence/observe-native-fault-20260925t184220z.stdout.json` (sha256
+19ce56c3...) is the retained stdout of
+`evidence/observe-native-fault-20260925t184220z.py` (sha256 6b9cf045...), run
+at 18:46:44Z to 18:46:45Z by a subagent session that did not start the run,
+with an empty stderr and exit code 0. The script uses only the Python standard
+library (`urllib`, Python 3.12.3 run with `-I -B`) and imports no harness,
+engine, order-contract or alpaca-py code; it sends only GET requests, refuses
+redirects, and exits 3 after one request if the credentials belong to another
+account. It sent 9 GETs, all answered 200 except the expected 404 for `c04`,
+and matched the receipt on 29 of 29 checks (`all_match: true`, no mismatches):
+a complete order listing since the receipt's `started_at` minus 300 s held
+exactly one order, `c01` (SPY buy 1 limit 385.67 day, not extended hours),
+canceled at 18:25:14.525Z inside the receipt window with filled quantity 0 and
+no fill activity; the `c04` client-id lookup returned 404; there was no fill
+activity on the account since then, 0 open orders and 0 positions; cash and
+equity equal the pre-run GET probe (compared, not printed); and `plan.json`
+equals the receipt's `plan_sha256`. A read-only, immutable open of the run's
+private ledger (sha256 1930c84a...) found `c01`'s recorded broker id equal to
+the broker's order, `c04` `broker_refused` with no broker id, intents exactly
+`c01` and `c04`, and no foreign intent, execution or position row; that
+cross-check reads the engine's own record. The 8 fields the 18:25:42Z alpaca-py
+observer also reports have identical values. Limits: GET requests cannot show
+the run's own HTTP answers (the C01 200, the C02 and C05 DELETE 204s, the C04
+422 body) or their order; the observer uses the same broker API and account as
+the harness; and its synthetic self-test (24 of 24 passed: a matching world
+exits 0, 12 injected mismatches exit 1, a wrong account exits 3, an unsafe env
+file exits 2 without a request, a redirect is refused, only GET is sent) stays
+in the lane's private scratch and is not committed.
 
 ## Run of 2026-09-24 18:58Z on the order-contract engine, retained as `receipt-20260924t185811.json`
 
