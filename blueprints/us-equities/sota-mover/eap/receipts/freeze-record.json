@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "kind": "eap_freeze_record",
+  "protocol_id": "sota-mover-eap-v1-20260925",
+  "protocol_sha256": "c00ca2cdc1028bc7468c8690359411f4a640baec6045f12ad599dc3ef05c272a",
+  "protocol_commit": "0332a94ee54ee4b28ee3c638af9e0aea4b92b5b8",
+  "frozen_at": "2026-09-25T03:50:01Z",
+  "reviewer": "evidence-reviewer subagent (opus), independent of the builder; coordinator Claude session agent-lab-ea",
+  "review_verdict": "freeze_ready_after_fixes (8 findings) at ac9ebc29; freeze_ready on re-check of 6179e1ea/e1eeecf9; 4 re-check minors resolved in 8263768d",
+  "outcomes_computed_before_freeze": false
+}
