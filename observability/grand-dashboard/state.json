@@ -1,20 +1,20 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-25T16:27:19Z",
+  "recorded_at_utc": "2026-09-25T21:04:50Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
       "kind": "lane",
       "id": "simulation",
       "title": "Historical simulation / backtest",
-      "state": "sim capacity 859 to 882 fills per min (30 of 30 min) / hftbacktest cross-check agrees within 0.36 pct after driver fix / infrastructure evidence only",
-      "evidence_ref": "blueprints/us-equities/sim-engine-crosscheck/receipts/20260925-crosscheck.json"
+      "state": "sim capacity 866 to 884 fills per min at 70 ms exact release (30 of 30 min) / 672 min at 1 s / hftbacktest cross-check within 0.36 pct / infrastructure only",
+      "evidence_ref": "blueprints/us-equities/sim-capacity/receipts/20260925-elite-tier.json"
     },
     {
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "engine P0 and exact cancel identity merged 2026-09-25 / fault rerun and 1x ladder blocked (stored paper keys rejected HTTP 401 - rotation needed) / flat",
+      "state": "engine P0 + cancel identity + margin financing model merged 2026-09-25 / fault rerun and 1x ladder blocked (paper keys HTTP 401 - rotation needed) / flat",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
     },
     {
@@ -114,7 +114,7 @@
       "kind": "gate",
       "id": "wsl-workstation-host",
       "title": "WSL2 workstation host record (nativestack-5975wx-20260925)",
-      "state": "recorded 2026-09-25 / 23 current receipts all independent-session agree / 3 superseded kept / systemd install re-recorded / Nemotron qualified on vllm 0.25.0",
+      "state": "69 receipts / 56 current independent agree / 1 needs changes / 0 awaiting review / 12 superseded kept / embeddings serve vllm 0.30.0 (winner pin 0.25.0)",
       "evidence_ref": "evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json"
     },
     {
@@ -232,9 +232,23 @@
     {
       "kind": "gate",
       "id": "mover-early-entry-studies",
-      "title": "Mover early-entry studies v1 and v2",
-      "state": "v1 768 and v2 244 preregistered rule-exits / no development pass in any family / holdout unread / research result not strategy acceptance",
+      "title": "Mover early-entry studies v1 to v3",
+      "state": "v1 768 and v2 244 rule-exits no development pass / holdout unread / v3 core merged 2026-09-25 not frozen (cross-family review after 09-30)",
       "evidence_ref": "blueprints/us-equities/mover-early-entry/README.md"
+    },
+    {
+      "kind": "gate",
+      "id": "incentive-board-forward",
+      "title": "Incentive monitor and board forward study",
+      "state": "monitor v1 and v2 merged 2026-09-25 / forward protocol v1 frozen before first order / 0 orders (paper keys HTTP 401)",
+      "evidence_ref": "blueprints/us-equities/incentive-monitor/README.md"
+    },
+    {
+      "kind": "gate",
+      "id": "data-lake-source",
+      "title": "Governed Alpaca historical data lake",
+      "state": "source layer merged 2026-09-25 / news 2015-2026 retained privately (46568 requests 0 HTTP 429) / minute-bar pilot not run",
+      "evidence_ref": "blueprints/us-equities/data-lake/README.md"
     }
   ],
   "workers": [
