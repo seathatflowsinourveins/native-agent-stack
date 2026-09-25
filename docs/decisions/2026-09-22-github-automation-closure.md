@@ -1143,8 +1143,9 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   failed there: 5 failures and 13 errors, because `/var` and `/tmp` are OS-level symlinks on macOS
   and the guard's no-follow check refused them. But nothing required that job: it was not in
   `main-ruleset.json`'s `required_status_checks`, so its failure would not have blocked the merge
-  on its own -- only the fact that `validate` (ubuntu-24.04) also passed let the PR merge with a
-  known-red macOS run sitting next to it. A PR that touches no path in the filter (`adoption/**`,
+  on its own. It failed on #219's earlier heads (72a15b89: 5 failures and 13 errors; 1bd4e2f7)
+  and passed only at the merged head 04c867b2 after a follow-up fix; had that fix been skipped,
+  a red macOS run would not have blocked the merge. A PR that touches no path in the filter (`adoption/**`,
   `tools/adoption/**`, `manifests/evidence.json` and the others) does not run `validate-macos` at
   all, so a macOS-only regression in code outside those paths (`adaptive-paper`, for one) would
   have gone completely unseen, required or not.
@@ -1173,8 +1174,9 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   trigger still carries, and its `bootstrap` output keeps `bootstrap-linux`, `bootstrap-macos` and
   `bootstrap-macos-brew` path-gated on `pull_request` via `needs: changes` plus
   `if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.bootstrap != 'false') }}`.
-  `push`, `schedule` and `workflow_dispatch` keep exactly the `push:` trigger's own pre-existing
-  `paths:` filter (unedited) for the three bootstrap-* jobs; `!cancelled()` is required precisely
+  `push` keeps exactly the `push:` trigger's own pre-existing `paths:` filter (unedited) for the
+  three bootstrap-* jobs, and `schedule` and `workflow_dispatch` are not path-filtered and run
+  every job; `!cancelled()` is required precisely
   because a plain `if:` on a job with `needs: changes` applies an implicit `success()`, which would
   skip these jobs on every event where `changes` itself does not run (see "Measured" below for the
   dispatch run that demonstrated this before the fix). `validate-macos` itself gets no `needs:` and

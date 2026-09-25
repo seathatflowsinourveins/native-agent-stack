@@ -52,9 +52,9 @@ concurrency:
 
 jobs:
   # Lightweight path-change detector for a pull_request event only (bootstrap-linux,
-  # bootstrap-macos and bootstrap-macos-brew below stay path-gated on push/schedule/dispatch
-  # by the `push:` trigger's own `paths:` filter above, which GitHub reads before the job
-  # graph starts; a pull_request has no filter to read now, so this job computes the same
+  # bootstrap-macos and bootstrap-macos-brew below stay path-gated on push by the `push:`
+  # trigger's own `paths:` filter above, which GitHub reads before the job graph starts;
+  # schedule and workflow_dispatch are not path-filtered and run them unconditionally; a pull_request has no filter to read now, so this job computes the same
   # membership by diffing the PR's base and head with plain git -- no new third-party
   # action). The PATTERNS list below must be kept identical (up to the `**`-vs-`*` glob
   # spelling) to the `push:` trigger's `paths:` list above it; tests/test_workflow_hardening.py
@@ -84,11 +84,14 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          # No `set -e`: every failure path below must still reach its own
+          # GitHub runs `shell: bash` as `bash --noprofile --norc -eo pipefail`,
+          # so errexit is on unless disabled here. `set +e` turns it off: every
+          # failure path below must still reach its own
           # `echo "bootstrap=true" >> "$GITHUB_OUTPUT"` (fail safe) instead of
           # exiting before writing an output, which is what left the three
           # bootstrap-* jobs silently skipped (dispatch run 36085789483,
           # "validate-macos required (2026-09-25)" below).
+          set +e
           set -uo pipefail
           # Keep in sync with the push trigger's `paths:` list above (also this
           # job's own file, so an edit to this job re-runs bootstrap-linux/macos).
@@ -119,7 +122,7 @@ jobs:
             echo "bootstrap=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          diff_file="$(mktemp)"
+          diff_file="$(mktemp)" || { echo "bootstrap=true" >> "$GITHUB_OUTPUT"; exit 0; }
           # -z / NUL-delimited: a plain `--name-only` diff quotes non-ASCII names
           # (for example "adoption/na\303\256ve.md"), which would never match a
           # PATTERNS glob; -z with a NUL-delimited read below avoids both that and

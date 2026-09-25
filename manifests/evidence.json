@@ -3109,8 +3109,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "97044f7243dffa6d55e1ef0004ef76477d321d2bf1f8345155ec53dd6029d9f1",
-      "bytes": 38975
+      "sha256": "0c9cae84deded9dda6822c9092315fd5efb087ad4c5b989f21215897bbcb4252",
+      "bytes": 39257
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -9950,8 +9950,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "9bb50f0e2e3738885b18f42cf743b9bfc364d139297dce20c0c867c07f12b0dd",
-      "bytes": 93733
+      "sha256": "9dafb830932b4dea8af51d367952cd3211e4eeaa1417b4ed63633eff22545429",
+      "bytes": 93884
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -29630,8 +29630,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "63bf46d675a9be58e5f698aa03fbed2d0b9d721632fff7fce3aa465d7dffb20d",
-      "bytes": 50151
+      "sha256": "51a699673378a9da4924b9bac612f8669da43f85d994d4960545ffa2bfb1e4d8",
+      "bytes": 50481
     },
     {
       "path": "tests/test_workflow_security.py",

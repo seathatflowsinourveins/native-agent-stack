@@ -815,6 +815,9 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
         script = step_block(job, "Detect whether any bootstrap-relevant path changed")
         (set_flags,) = re.findall(r"(?m)^\s+set (-\S+)(?: |$)", script)
         self.assertNotIn("e", set_flags, "set -e would abort before a failure path's own bootstrap=true write")
+        # `shell: bash` runs as `bash -eo pipefail`, so errexit must be turned off explicitly.
+        self.assertRegex(script, r"(?m)^\s+set \+e\s*$", "errexit is on under shell: bash unless the script runs set +e")
+        self.assertIn('diff_file="$(mktemp)" || { echo "bootstrap=true" >> "$GITHUB_OUTPUT"; exit 0; }', script)
         self.assertIn('echo "bootstrap=true" >> "$GITHUB_OUTPUT"', script)
 
         def if_block(needle):
