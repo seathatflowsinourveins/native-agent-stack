@@ -6501,6 +6501,31 @@
       "bytes": 10732
     },
     {
+      "path": "blueprints/retrieval-quality-v2/PREREGISTRATION.md",
+      "sha256": "8ad75717860afaa735ed1e449c577ec2043299e7ccf041b902e97dbd55d1d652",
+      "bytes": 14601
+    },
+    {
+      "path": "blueprints/retrieval-quality-v2/README.md",
+      "sha256": "3f59164e3ef68e0d83115e4e94d47c470cdee9f63f9b01ec5e21af4e24c02c2b",
+      "bytes": 7097
+    },
+    {
+      "path": "blueprints/retrieval-quality-v2/queries.json",
+      "sha256": "4d0a0eaf0f6fc48b899f6139e7e98a6c1edf4798b1f17ddfbf5ec3e1cc6c5c7a",
+      "bytes": 25811
+    },
+    {
+      "path": "blueprints/retrieval-quality-v2/results-20260925.json",
+      "sha256": "4a45bcc24f2da8235ebfb934ff5ce6752363d38fa831f126598527b9a318ca05",
+      "bytes": 59218
+    },
+    {
+      "path": "blueprints/retrieval-quality-v2/run.py",
+      "sha256": "594e2d44e218a506f5b8a6f99de80a78c2db5b11648e9dc634c05f02e73fb1b6",
+      "bytes": 48248
+    },
+    {
       "path": "blueprints/token-native-focus/saturation-audit.json",
       "sha256": "bbe79ef2b3bdf86429af257bed5cba62c8ee43a0bd3ff2564b7d25e91ddeea52",
       "bytes": 480084

@@ -1,0 +1,671 @@
+{
+  "schema_version": 1,
+  "description": "30 held-out research questions and graded relevance judgments over the 33-file document-retrieval corpus, authored independently of any retrieval system (no qmd/socraticode/embedding calls were run while writing this file). Sealed before any retrieval arm was executed. Supersedes nothing in the v1 fixture; the 12 v1 questions are excluded and were not reused or paraphrased here.",
+  "corpus_manifest_reference": "blueprints/us-equities/retrieval-evaluation/full-corpus-manifest.json",
+  "corpus_pin_policy": "Every corpus file is pinned by its sha256 at this repository's current worktree HEAD commit, not at the historical bfd03bc snapshot the v1 fixture used. 19 of the 33 files have changed since bfd03bc; 14 are byte-identical (see per-file sha256 below against full-corpus-manifest.json for the unchanged set).",
+  "corpus_commit": "3e4054d02eac06ae8ac995c5e96fe8a75c0824c8",
+  "query_count": 30,
+  "style_mix": {
+    "natural_language": 10,
+    "keyword": 10,
+    "paraphrased_indirect": 10
+  },
+  "grade_scale": {
+    "2": "directly answers the underlying information need",
+    "1": "partially relevant: same topic/fact restated, adjacent detail, or necessary context, but does not by itself fully answer the need",
+    "0": "omitted (not listed in a query's relevance array)"
+  },
+  "queries": [
+    {
+      "id": "nl-01",
+      "style": "natural_language",
+      "query": "What happens to a float-based check when the raw volume value is -1e-400, and why does the promotion gate parse it differently now?",
+      "information_need": "Why the promotion gate's volume_integral_non_negative check parses the raw CSV cell's exact source text with decimal.Decimal instead of converting through float first, and what specific failure mode (float underflow/precision loss) that avoids.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/data/README.md",
+          "grade": 2
+        }
+      ]
+    },
+    {
+      "id": "nl-02",
+      "style": "natural_language",
+      "query": "Why did the SPY/LEAN parity comparison for Nautilus come back BLOCKED instead of passing, and what were the two unsupported mappings?",
+      "information_need": "The specific mappings (distributions_and_cash, market_on_open_proxy) that caused the v1 Nautilus/LEAN SPY parity replay to fail, and how that differs from the later accepted v2 one_zero-case result.",
+      "relevance": [
+        {
+          "path": "catalogs/us-equities/engines-strategies.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/north-star.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "nl-03",
+      "style": "natural_language",
+      "query": "How does the research runtime confirm that a Claude report only used the numbers actually given to it, rather than the model's own outside knowledge?",
+      "information_need": "The mechanism that checks an independent Claude research report's numeric claims, units, citation IDs, cutoff and scope against the source packet before the report is accepted.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/research-runtime/README.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/deerflow/research-task.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "nl-04",
+      "style": "natural_language",
+      "query": "What blocked the first live acquisition attempt against SEC's API, and how is that different from the offline tests passing?",
+      "information_need": "That the SEC financial-data recipe's live acquisition attempt returned HTTP 403 and produced no dataset, while its separate offline test suite uses artificial fixtures and is not evidence the live acquisition worked.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/financial-data/README.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/gap-resolution.md",
+          "grade": 1
+        },
+        {
+          "path": "catalogs/us-equities/data-research.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "nl-05",
+      "style": "natural_language",
+      "query": "What did the security review find wrong with the ai-trader-bot smart contract that got it rejected?",
+      "information_need": "The specific documented vulnerabilities (undefined functions named in the README, an unrestricted owner-only withdraw, a third-party no-code deployer, a wallet-funding ask) behind MIgHTy-alIeN/ai-trader-bot's reject_security_risk disposition.",
+      "relevance": [
+        {
+          "path": "catalogs/us-equities/star-audit.md",
+          "grade": 2
+        }
+      ]
+    },
+    {
+      "id": "nl-06",
+      "style": "natural_language",
+      "query": "Which specific alert fires when the paper-trading ledger can't be opened or read at all, independent of what's inside it?",
+      "information_need": "The Prometheus alert and exported metric that guard against a wrong --ledger path, a permissions problem, or a failed read-only sqlite open for the adaptive-paper lane, as distinct from alerts about the ledger's content.",
+      "relevance": [
+        {
+          "path": "observability/backends/README.md",
+          "grade": 2
+        }
+      ]
+    },
+    {
+      "id": "nl-07",
+      "style": "natural_language",
+      "query": "Why is a Desktop app's exact total token usage for a whole parent conversation still not verifiable from the metrics being collected?",
+      "information_need": "Why unscoped/parent-level telemetry (missing a unique process-instance or client-scope identity) cannot establish one definitive final token total for an entire Desktop parent conversation.",
+      "relevance": [
+        {
+          "path": "observability/desktop-restart.md",
+          "grade": 2
+        },
+        {
+          "path": "observability/session-e2e.md",
+          "grade": 1
+        },
+        {
+          "path": "observability/README.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "nl-08",
+      "style": "natural_language",
+      "query": "Before letting a research LLM use QMD search results as a fact, what two-step process is it supposed to follow, and what should it do if the search comes back empty?",
+      "information_need": "The worker policy's required lexical-search workflow (search with concrete domain terms in an explicit collection, then fetch the source with get before citing a fact) and its single-reformulation fallback on a miss.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/workers/policy.md",
+          "grade": 2
+        },
+        {
+          "path": "catalogs/us-equities/native-workflows.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "nl-09",
+      "style": "natural_language",
+      "query": "The SDK kept its OTLP metrics exporter configured, but no histogram data was showing up anywhere for it — what single setting was actually missing, and where does it belong?",
+      "information_need": "The exact configuration key/value (an [analytics] enabled = true TOML setting in the user-level Codex config) and why an OTLP exporter alone did not produce the missing SDK token-usage histogram.",
+      "relevance": [
+        {
+          "path": "observability/session-e2e.md",
+          "grade": 2
+        },
+        {
+          "path": "observability/README.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "nl-10",
+      "style": "natural_language",
+      "query": "What specific role does NautilusTrader's IBKR adapter have today, and has its broker connection actually been accepted yet?",
+      "information_need": "Whether the Nautilus native IBKR socket adapter's broker connection has moved past 'selected path' to an actual accepted local_broker_acceptance status.",
+      "relevance": [
+        {
+          "path": "catalogs/us-equities/engines-strategies.md",
+          "grade": 2
+        },
+        {
+          "path": "catalogs/us-equities/agents-operations.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/README.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "kw-01",
+      "style": "keyword",
+      "query": "restic keep-last dry-run retention",
+      "information_need": "The exact retention-policy preview command run against the restic backup and its result.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/hosting/backup/README.md",
+          "grade": 2
+        },
+        {
+          "path": "catalogs/us-equities/agents-operations.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "kw-02",
+      "style": "keyword",
+      "query": "DotNetZip ProDotNetZip CVE directory traversal",
+      "information_need": "Which CVE and which replacement package resolved the DotNetZip advisory in the local LEAN dependency patch.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/engine/resolution.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/engine/README.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "kw-03",
+      "style": "keyword",
+      "query": "tokenizer o200k_base 6398 490 catalog reduction",
+      "information_need": "The exact token counts and tokenizer used for the catalog model-guide selected-source reduction example.",
+      "relevance": [
+        {
+          "path": "catalogs/us-equities/native-workflows.md",
+          "grade": 2
+        },
+        {
+          "path": "catalogs/us-equities/README.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "kw-04",
+      "style": "keyword",
+      "query": "Dagu auth.mode none passwordless anonymous API DAG write disabled",
+      "information_need": "What the local Dagu dashboard's auth.mode: none setting actually permits (anonymous reads) versus still blocks (DAG run/write), and which specific administrative surfaces stay unauthenticated regardless.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/hosting/README.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/hosting.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "kw-05",
+      "style": "keyword",
+      "query": "abtop --json --once summary invoke Claude private",
+      "information_need": "Which abtop CLI mode can invoke a model and which stays model-free, and the privacy implication of the richer mode's output.",
+      "relevance": [
+        {
+          "path": "catalogs/us-equities/source-followup.md",
+          "grade": 2
+        },
+        {
+          "path": "catalogs/us-equities/README.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "kw-06",
+      "style": "keyword",
+      "query": "OmniRoute CODEX_CLIENT_VERSION 0.149.0 mismatch",
+      "information_need": "Why the first OmniRoute Astra request failed with HTTP 400 and which deployment variable/setting fixed it.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/routing/README.md",
+          "grade": 2
+        },
+        {
+          "path": "catalogs/us-equities/agents-operations.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "kw-07",
+      "style": "keyword",
+      "query": "ctx_execute_file rejected scoped project root MCP approval",
+      "information_need": "Why the Astra worker's file-scope extraction attempt was rejected and what would still be needed to complete that acceptance.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/workers/README.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/gap-resolution.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "kw-08",
+      "style": "keyword",
+      "query": "Massive Databento corporate action adjustment split dividend",
+      "information_need": "How Massive and Databento differ in corporate-action timestamp conventions, and whether Massive's stock aggregates are dividend-adjusted.",
+      "relevance": [
+        {
+          "path": "catalogs/us-equities/data-research.md",
+          "grade": 2
+        }
+      ]
+    },
+    {
+      "id": "kw-09",
+      "style": "keyword",
+      "query": "Loki receipt_id max_over_time double counting",
+      "information_need": "The mechanism that prevents a replayed SDK observation receipt from being counted twice on the token dashboard.",
+      "relevance": [
+        {
+          "path": "observability/collector/README.md",
+          "grade": 2
+        },
+        {
+          "path": "observability/README.md",
+          "grade": 1
+        },
+        {
+          "path": "observability/session-e2e.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "kw-10",
+      "style": "keyword",
+      "query": "SGLang CUDA 13 vLLM 0.29.0 UVA WSL failure",
+      "information_need": "Why vLLM 0.29.0 failed to start on this WSL host, which version is the working pin, and the related SGLang CUDA-version requirement.",
+      "relevance": [
+        {
+          "path": "catalogs/us-equities/agents-operations.md",
+          "grade": 2
+        },
+        {
+          "path": "catalogs/us-equities/models.md",
+          "grade": 1
+        },
+        {
+          "path": "catalogs/us-equities/README.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "pa-01",
+      "style": "paraphrased_indirect",
+      "query": "If we kill the process because it's taking too long, does that also stop the meter from running on the provider's side?",
+      "information_need": "Whether the research worker's local process timeout also cancels or caps provider-side inference billing.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/routing/README.md",
+          "grade": 2
+        }
+      ]
+    },
+    {
+      "id": "pa-02",
+      "style": "paraphrased_indirect",
+      "query": "Is there any proof yet that switching AI-search modes actually finds better answers than plain keyword lookup, for this project's own documents?",
+      "information_need": "Whether a semantic or hybrid retrieval mode has actually been compared against the current BM25-only QMD setup for this project's Markdown collections.",
+      "relevance": [
+        {
+          "path": "catalogs/us-equities/foundation-memory.md",
+          "grade": 2
+        },
+        {
+          "path": "catalogs/us-equities/models.md",
+          "grade": 1
+        },
+        {
+          "path": "catalogs/us-equities/native-workflows.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "pa-03",
+      "style": "paraphrased_indirect",
+      "query": "If a company refiles something with the SEC, does the system assume the new numbers automatically replace the old ones?",
+      "information_need": "Whether the financial-data recipe treats an amended (/A) filing as automatically superseding the original values, or keeps both without an explicit supersedes relationship.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/financial-data/README.md",
+          "grade": 2
+        },
+        {
+          "path": "catalogs/us-equities/data-research.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "pa-04",
+      "style": "paraphrased_indirect",
+      "query": "Does finishing the code build mean the software is safe to point at real, untrusted data yet?",
+      "information_need": "Whether a clean LEAN source build and passing backtest establish any security approval for unattended deployment or untrusted inputs.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/engine/README.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/engine/resolution.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "pa-05",
+      "style": "paraphrased_indirect",
+      "query": "Can the assistant just say it looked something up and expect that to be taken at its word?",
+      "information_need": "What additional evidence, beyond the model's own returned text, was required before the DeerFlow embedded research task was accepted as actually having run.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/deerflow/README.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/research-runtime/README.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "pa-06",
+      "style": "paraphrased_indirect",
+      "query": "Would leaving that research web-service running overnight actually give us a dependable, always-on research backend?",
+      "information_need": "Whether the DeerFlow Gateway, in its current discovery configuration (in-memory database, models/tools/memory/scheduling disabled), would function as a durable always-on research service if simply left running.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/hosting.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/deerflow/README.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "pa-07",
+      "style": "paraphrased_indirect",
+      "query": "If the repo's automatic checks all come back green, does that tell us the trading pieces were actually exercised against something live?",
+      "information_need": "What the repository's structural/reference/privacy validation scripts actually cover, versus what they explicitly do not exercise (provider inference, GPU services, market data or orders).",
+      "relevance": [
+        {
+          "path": "catalogs/us-equities/native-workflows.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/gap-resolution.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "pa-08",
+      "style": "paraphrased_indirect",
+      "query": "When new repos get folded into the big master list, does that change how many are counted as officially reviewed decisions versus just names mentioned somewhere?",
+      "information_need": "How the grand repository index distinguishes a formally registered, reviewed decision record from an incidental prose mention or a raw discovery/organization listing.",
+      "relevance": [
+        {
+          "path": "catalogs/us-equities/repository-index.md",
+          "grade": 2
+        },
+        {
+          "path": "catalogs/us-equities/README.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "pa-09",
+      "style": "paraphrased_indirect",
+      "query": "Is a fill-in-the-blanks assignment sheet for a researcher the same thing as actually telling the model to go do something right now?",
+      "information_need": "Whether the research-task template file itself constitutes a dispatched model instruction, or only becomes one once filled in and passed to the worker launcher.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/workers/research-task.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/north-star.md",
+          "grade": 1
+        }
+      ]
+    },
+    {
+      "id": "pa-10",
+      "style": "paraphrased_indirect",
+      "query": "Knowing how many tools and models a system reports having available — does that by itself tell us it successfully reasoned about anything yet?",
+      "information_need": "Whether DeerFlow's discovery counts (configured models, upstream skills, adapter model choices) establish that any actual model inference or reasoning occurred.",
+      "relevance": [
+        {
+          "path": "blueprints/us-equities/deerflow/research-result.md",
+          "grade": 2
+        },
+        {
+          "path": "blueprints/us-equities/deerflow/research-task.md",
+          "grade": 1
+        }
+      ]
+    }
+  ],
+  "corpus": [
+    {
+      "path": "blueprints/us-equities/README.md",
+      "sha256": "c96eac4c51466043a7091d464262afa96f6cda1dffda754b22d1545f13cb7314",
+      "utf8_bytes": 9946
+    },
+    {
+      "path": "blueprints/us-equities/data/README.md",
+      "sha256": "8810322b8daa2459970f15432bea4c8476a683742327a81320f514ac50f544de",
+      "utf8_bytes": 12108
+    },
+    {
+      "path": "blueprints/us-equities/deerflow/README.md",
+      "sha256": "e1bec08e3b2d0e9ed78223b65091a2fd98d8513d660f3e3bdbed87a3c9c1004a",
+      "utf8_bytes": 13076
+    },
+    {
+      "path": "blueprints/us-equities/deerflow/research-result.md",
+      "sha256": "4aa4f228b0a976353c61adeb2d9f51d030081f3b359b2bfc8c388fbdc0b9d613",
+      "utf8_bytes": 2614
+    },
+    {
+      "path": "blueprints/us-equities/deerflow/research-task.md",
+      "sha256": "ea9a6c975597ca3ae135c657d07262b7f106f1d70a6cda3f660f24ab22b1445c",
+      "utf8_bytes": 1052
+    },
+    {
+      "path": "blueprints/us-equities/engine/README.md",
+      "sha256": "88a864d60160423a99722b0e300c71f9d7585549513b09aabc020e9c8b0e54cb",
+      "utf8_bytes": 8070
+    },
+    {
+      "path": "blueprints/us-equities/engine/resolution.md",
+      "sha256": "aa46db23be0c20b279026e24f1727e0bd3120df3349bb244cfa30f66725bc4ad",
+      "utf8_bytes": 10783
+    },
+    {
+      "path": "blueprints/us-equities/financial-data/README.md",
+      "sha256": "4bc6c3bec788aad0f05e1eedc1887cf51e1856794c53c86a7b3b6e1510ef9aed",
+      "utf8_bytes": 8176
+    },
+    {
+      "path": "blueprints/us-equities/gap-resolution.md",
+      "sha256": "5859a13cd7250327161f334fc7d6f5eb8e5dda4764c54708643fbddc3f66f35a",
+      "utf8_bytes": 10614
+    },
+    {
+      "path": "blueprints/us-equities/hosting.md",
+      "sha256": "ceed30aa8f9b8db1da4fe0e3735ae7bf2b8ebd14d5c45e36d21c31a9d9b4e1cf",
+      "utf8_bytes": 3219
+    },
+    {
+      "path": "blueprints/us-equities/hosting/README.md",
+      "sha256": "2f54419877841b64ea72c8738447ff34d360bc3619f662f005d9b81ab6669e15",
+      "utf8_bytes": 5877
+    },
+    {
+      "path": "blueprints/us-equities/hosting/backup/README.md",
+      "sha256": "ad00db7f83ee024c78518f4932701ac8a17f277a4111766ceff777c90b527ca5",
+      "utf8_bytes": 7193
+    },
+    {
+      "path": "blueprints/us-equities/north-star.md",
+      "sha256": "0934019e9dcce0e792dbcdca1f6e1ce5e48f8848a6d92381d7046cf1d7c3a9b7",
+      "utf8_bytes": 14643
+    },
+    {
+      "path": "blueprints/us-equities/research-runtime/README.md",
+      "sha256": "26941ae2c64ec137c3a9dc97e8d766d93cf6bdcb103ee290f871fd0a181f2757",
+      "utf8_bytes": 9587
+    },
+    {
+      "path": "blueprints/us-equities/routing/README.md",
+      "sha256": "c5e0abfd9d914c46ef58810427c5bf71b2d3bf8476c8e1314b4d486a1589a2bd",
+      "utf8_bytes": 20346
+    },
+    {
+      "path": "blueprints/us-equities/workers/README.md",
+      "sha256": "79de0f2d9e399e2ce04ccfe1c011788ea1adcab7745bfbfa02cdf8846c6d7425",
+      "utf8_bytes": 12195
+    },
+    {
+      "path": "blueprints/us-equities/workers/policy.md",
+      "sha256": "c59ef6d88cf5c60bac7971364b75643fd05018e2414b7868f82d1a7bc11d1c31",
+      "utf8_bytes": 2353
+    },
+    {
+      "path": "blueprints/us-equities/workers/research-task.md",
+      "sha256": "743c1f63d87ea9c4186b1d569ff02fc3a9dd32b3a7283048201ffee32b481cf5",
+      "utf8_bytes": 1309
+    },
+    {
+      "path": "catalogs/us-equities/README.md",
+      "sha256": "4ab4b02c9b51746d5891b4aa322d1d2b6dec5fdd3e31512d504475d95c15988b",
+      "utf8_bytes": 16601
+    },
+    {
+      "path": "catalogs/us-equities/agents-operations.md",
+      "sha256": "a765c37d0d689de51920e742686f5ffa2adfecd606f99b2b963fd5450ad40363",
+      "utf8_bytes": 26992
+    },
+    {
+      "path": "catalogs/us-equities/data-research.md",
+      "sha256": "9948f2ad3d789ca2a3b19010077320f36c5f20fbbe4b020e2b79f5ccc1711876",
+      "utf8_bytes": 23226
+    },
+    {
+      "path": "catalogs/us-equities/engines-strategies.md",
+      "sha256": "74d4c7f385b6de7ff9f9011647b87eed6c7c3a2a24334732875dc0d4a227277b",
+      "utf8_bytes": 25459
+    },
+    {
+      "path": "catalogs/us-equities/foundation-memory.md",
+      "sha256": "effe53a745b895b1683634bf0e174a62012a0bb62d2f173d40582cea2476f7d9",
+      "utf8_bytes": 47825
+    },
+    {
+      "path": "catalogs/us-equities/models.md",
+      "sha256": "798b07a2703bb53cc253caa5b2a460fb75ed3b81ea9ebce7ecf24ef33671ad76",
+      "utf8_bytes": 21253
+    },
+    {
+      "path": "catalogs/us-equities/native-workflows.md",
+      "sha256": "aae8aa3cf0232052cb4573df9ba553ef05523c5c0ed0180d98cea0fccd89c583",
+      "utf8_bytes": 11678
+    },
+    {
+      "path": "catalogs/us-equities/repository-index.md",
+      "sha256": "6f9473762c1271cc66ad81858ffd23e9443dc111afced7823a54e1f8d0df8c91",
+      "utf8_bytes": 86033
+    },
+    {
+      "path": "catalogs/us-equities/source-followup.md",
+      "sha256": "c4e39f56b1ab9d633e1fee9c0a717a06fbbdc6811a8346db6dfc36cbd43e4845",
+      "utf8_bytes": 5752
+    },
+    {
+      "path": "catalogs/us-equities/star-audit.md",
+      "sha256": "6742e0b8a24d8615e8ec29110c785f493131a20df7bb57da6354fb99e98f70cc",
+      "utf8_bytes": 28080
+    },
+    {
+      "path": "observability/README.md",
+      "sha256": "29bb61f67614f52e9759b958bb35556f34fe4ef5ad49f0fd7e1d30a525e90646",
+      "utf8_bytes": 14744
+    },
+    {
+      "path": "observability/backends/README.md",
+      "sha256": "8f72fc88a1e80645a509f8671832cc748e6091000a22b8fca5b0fd5b9e2390f0",
+      "utf8_bytes": 15802
+    },
+    {
+      "path": "observability/collector/README.md",
+      "sha256": "4a63f6dadfaad5ac4609bbb4a48d7eba04e094e2031ce05a0eae09e4ac513702",
+      "utf8_bytes": 6391
+    },
+    {
+      "path": "observability/desktop-restart.md",
+      "sha256": "39e4ee70ea568d8f30182715566c287abc0b6b06c6176634c93fdae2e7dbc711",
+      "utf8_bytes": 6238
+    },
+    {
+      "path": "observability/session-e2e.md",
+      "sha256": "843e8f4dff03e7f81d260b060ed3f140c2f6574555680beb84f3f7c0b2888712",
+      "utf8_bytes": 7704
+    }
+  ]
+}
