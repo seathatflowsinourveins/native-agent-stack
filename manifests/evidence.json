@@ -9677,8 +9677,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "3b8b8a3d2d3f2255dca9175a7e226c6013931c285acc0044510fcb45dc4bfb2f",
-      "bytes": 80079
+      "sha256": "8de9d22ebe03a8fbdeac0c0adf292dc9e98c6071e37b6ba551f4aee818e7f5c9",
+      "bytes": 80167
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -10432,8 +10432,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "21cb9c35367e061b3114fadfc7c5a1e5479cee62831485bf52dc4e1a6dfda8c8",
-      "bytes": 15930
+      "sha256": "934ccce589bb6e937b5e32c77b418e533cdaf58d96049f0d4d426d013d9917a1",
+      "bytes": 16023
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -30352,8 +30352,8 @@
     },
     {
       "path": "tests/test_new_host_grand_list.py",
-      "sha256": "161eb27cf4a9ffc065e670e4589a2f3d0c23fcc2e2bebcfe07b958f40d882b8a",
-      "bytes": 15982
+      "sha256": "18be7cd7c9d5223018015e241efa14901d541a305b016664233e7aafd45560e5",
+      "bytes": 16903
     },
     {
       "path": "tests/test_observability.py",
