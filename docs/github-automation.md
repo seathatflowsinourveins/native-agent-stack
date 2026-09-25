@@ -435,6 +435,18 @@ untracked files.
 
 ## Ruleset upgrade, 2026-09-22
 
+**Superseded 2026-09-25.** The snapshot below (required checks `validate`,
+`token-report`, `secret-scan`; `allowed_merge_methods: ["squash", "rebase"]`)
+predates several fields the target file has gained since. The current
+committed target is [`.github/main-ruleset.json`](../.github/main-ruleset.json)
+(required checks also add `dependency-review`, `osv-scanner`,
+`verdict-review-gate` and `validate-macos`; `allowed_merge_methods:
+["squash"]` only), compared field by field against the live ruleset in
+[`docs/decisions/2026-09-22-github-automation-closure.md`](decisions/2026-09-22-github-automation-closure.md),
+section 10 ("Rulesets"). This section is kept as history and is not
+corrected in place; the `gh api` commands below still apply (a `PUT` is
+idempotent), just against the current target file.
+
 [`.github/main-ruleset.json`](../.github/main-ruleset.json) gained
 `deletion`, `non_fast_forward`, `required_linear_history`, a `pull_request`
 rule (`required_approving_review_count: 0` -- unchanged from today's
@@ -1206,12 +1218,14 @@ holds the evidence, alternatives and overturn comparison for each item.
   [`docs/decisions/2026-09-22-codeql-first-analysis.md`](decisions/2026-09-22-codeql-first-analysis.md)); Dependabot security
   updates on; Actions `sha_pinning_required: true`; squash-only merges with
   auto-merge allowed and branches deleted on merge; immutable releases on;
-  private vulnerability reporting on. Fork PR workflow approval: decided
-  2026-09-25 to move from `first_time_contributors` (GET at
-  2026-09-25T06:34:07Z) to all external contributors
-  (`all_external_contributors`); the owner applies it with the PUT in the
-  record's "GitHub hardening follow-up (2026-09-25)" section, and until then
-  the live value is unchanged.
+  private vulnerability reporting on. Fork PR workflow approval: moved
+  2026-09-25 from `first_time_contributors` (GET at 2026-09-25T06:34:07Z) to
+  all external contributors (`all_external_contributors`), applied by the
+  owner with the PUT in the record's "GitHub hardening follow-up
+  (2026-09-25)" section. A same-day after-GET confirms the live value is
+  `all_external_contributors`
+  ([record](decisions/2026-09-22-github-automation-closure.md#2026-09-25-re-check-against-current-practice),
+  "2026-09-25 re-check against current practice").
 - **`security-scan.yml`.** The `osv-scanner` job (OSV-Scanner 2.6.0,
   checksum-verified) scans every lockfile and manifest listed in
   `.github/osv-scanner-lockfiles.json` with `--no-resolve` and fails on any

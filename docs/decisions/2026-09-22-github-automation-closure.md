@@ -1433,3 +1433,173 @@ Read-only `gh api` GETs are dated below.
   `docs/grand-catalog-handbook.md` still says `requirements-ci.lock` is a name
   Dependabot does not discover; lane outputs are not edited by hand, so this bullet
   corrects it until the next recorded lane run for that layer.
+
+## 2026-09-25 re-check against current practice
+
+**Decided by:** branch `claude/github-practice-recheck-20260925`, cut from
+`origin/main` `0074a0c3`. This unit re-checks the live GitHub configuration and
+this record's open items against current upstream practice and this
+repository's actual `.github/workflows`. It changed files only:
+`.github/actions-permissions.json` (new committed target),
+`tests/test_workflow_hardening.py` (new `ActionsAllowListTests`), and
+`docs/github-automation.md` (a superseded note on "Ruleset upgrade,
+2026-09-22" and the fork-approval after-GET). It applied no live repository
+setting itself; `allowed_actions` is applied by the coordinator after merge,
+the same pattern every other repository-settings change in this record
+follows. The `gh api` GETs quoted below were taken by the coordinator on
+2026-09-25.
+
+- **Primary-source comparison.**
+  - SHA-pinning/allow-listing policy
+    ([changelog, 2025-08-15](https://github.blog/changelog/2025-08-15-github-actions-policy-now-supports-blocking-and-sha-pinning-actions/)):
+    the feature this section adopts further. `sha_pinning_required` is
+    already `true` (section 1; today's live GET confirms it is still `true`);
+    `allowed_actions` moves from `all` to `selected` below.
+  - CodeQL default setup keeps analyzing under a restrictive Actions policy
+    (GitHub changelog 2025-11-25): default setup is a repository setting with
+    no `uses:` of its own, so tightening `allowed_actions` cannot block it --
+    the fact that makes adopting the allow-list safe without reopening
+    section 2's CodeQL-vs-zizmor comparison.
+  - Dependabot's new default cooldown is 3 days (GitHub changelog
+    2026-07-14); this repository's `github-actions` cooldown is already 7
+    days (section 8), stricter than the new default. No change needed.
+  - GitHub Code Quality is GA
+    ([changelog, 2026-07-20](https://github.blog/changelog/2026-07-20-github-code-quality-is-now-generally-available/)):
+    a paid product; non-adopted below.
+  - Blocking pull requests with exposed secrets is GA
+    ([changelog, 2026-09-09](https://github.blog/changelog/2026-09-09-block-pull-requests-with-exposed-secrets-from-merging/)):
+    a ruleset-native alternative to this repository's own required
+    `secret-scan` (gitleaks) job; non-adopted below (GitHub Secret Protection
+    preview).
+  - The required-reviewer ruleset rule is GA
+    ([changelog, 2026-02-17](https://github.blog/changelog/2026-02-17-required-reviewer-rule-is-now-generally-available/)):
+    non-adopted below (the rule names a reviewer Team; `CODEOWNERS` names
+    only the one repository owner).
+  - Merge queues need an organization-owned repository or Enterprise Cloud
+    ([managing a merge queue](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue)),
+    unchanged from section 11; non-adopted below.
+  - OSSF Scorecard's own check definitions
+    ([checks.md](https://github.com/ossf/scorecard/blob/main/docs/checks.md))
+    frame the acceptance and overturn conditions for the 5 open alerts below.
+  - SLSA v1.2's Source track requirements
+    ([source-requirements](https://slsa.dev/spec/v1.2/source-requirements))
+    frame the target level below.
+  - zizmor's audits reference ([docs.zizmor.sh/audits](https://docs.zizmor.sh/audits/))
+    confirms 1.30.1 (this repository's pin, `.github/requirements-ci.txt`) is
+    still current as of 2026-09-09; the online/offline audit split this
+    record already adopted ("GitHub hardening follow-up (2026-09-25)")
+    needs no further change today.
+
+- **`allowed_actions: selected` adoption.** Today's live GET of
+  `actions/permissions` returned `{"enabled":true,"allowed_actions":"all",
+  "sha_pinning_required":true}`. Every third-party `uses:` in this repository
+  is already `step-security/harden-runner` or `ossf/scorecard-action`
+  (`tests/test_workflow_hardening.py`'s `PinningTests`, and the new
+  `ActionsAllowListTests` below), so tightening to `selected` with
+  `github_owned_allowed: true` and those two actions as `patterns_allowed`
+  narrows nothing this repository actually runs. The committed target is
+  [`.github/actions-permissions.json`](../../.github/actions-permissions.json)
+  (it mirrors three GET endpoints plus this record's own explanatory fields
+  for readability, so it is applied field-by-field below, not passed to
+  `gh api --input` against a single endpoint the way `.github/main-ruleset.json`
+  is). The coordinator applies it after merge, the same as the main ruleset
+  (section 10) and the fork-approval PUT below:
+  ```sh
+  gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/actions/permissions \
+    -f allowed_actions=selected -F enabled=true
+  gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/actions/permissions/selected-actions \
+    -F github_owned_allowed=true -F verified_allowed=false \
+    -f 'patterns_allowed[]=step-security/harden-runner@*' \
+    -f 'patterns_allowed[]=ossf/scorecard-action@*'
+  gh api repos/seathatflowsinourveins/native-agent-stack/actions/permissions
+  ```
+  `After-GET: pending coordinator`
+- **Fork-approval after-GET (closes the pending step above).** "GitHub
+  hardening follow-up (2026-09-25)" decided `all_external_contributors` and
+  left "record the dated after-GET here" open. A live, read-only GET of
+  `actions/permissions/fork-pr-contributor-approval` on 2026-09-25 returned
+  `all_external_contributors`: the PUT decided there was applied and is
+  confirmed live. `docs/github-automation.md`'s "Automation closure,
+  2026-09-22" section ("... and until then the live value is unchanged") is
+  updated in the same change as this record to say so.
+- **Settings read-back ownership.** Private agent-ecosystem's
+  `scripts/github_settings.py` now carries an `observe` entry for this
+  repository's Actions and workflow-permissions settings. This supersedes
+  the "not managed as code" line in "GitHub hardening follow-up
+  (2026-09-25)" above and in `docs/github-automation.md`'s "Automation
+  closure, 2026-09-22" section **for read-back only**: every change to a
+  live setting is still applied by hand, by the owner or the coordinator,
+  through the `gh api` PUT commands recorded in this file.
+- **Scorecard structural alerts, accepted with overturns.** 5 open alerts,
+  created 2026-09-23
+  ([checks.md](https://github.com/ossf/scorecard/blob/main/docs/checks.md)):
+  - `CodeReviewID` and `BranchProtectionID` (score 3): both score a
+    human-reviewed-PR rate. This repository's ruleset keeps
+    `required_approving_review_count: 0` (section 1, section 10) because
+    there is one human owner and no team, and Scorecard's Code-Review check
+    counts only a human `APPROVED` review -- this repository's own
+    `verdict-review-gate` and cross-family AI review do not count toward it.
+    **Overturn:** a second human maintainer joins and PR review becomes
+    something this repository can require.
+  - `MaintainedID`: partly scores repository age and recent-activity
+    thresholds Scorecard's own docs describe, which a young repository
+    cannot yet clear. **Overturn:** none needed; the score improves as the
+    repository ages under unchanged practice.
+  - `FuzzingID`: accepted; a property-based-testing trial is tracked in
+    `docs/decisions/2026-09-25-skills-trial-and-usage.md`.
+  - `CIIBestPracticesID`: accepted; the only lever is an optional owner
+    step, registering the project on
+    [bestpractices.dev](https://www.bestpractices.dev/) -- no code or
+    workflow change, and not done today.
+- **SLSA v1.2 Source track: target L3.** Per
+  [source-requirements](https://slsa.dev/spec/v1.2/source-requirements), L4
+  needs two trusted persons reviewing each change; this is a single-owner
+  personal repository, so L4 is out of reach without a second trusted
+  maintainer. L3 is the target, consistent with what is already committed:
+  branch deletion/force-push protection, required linear history and the
+  required status checks in `.github/main-ruleset.json` (section 10).
+- **Non-adoptions (date, source, reason).**
+  - Merge queue -- 2026-09-25,
+    [managing a merge queue](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue)
+    -- organization-owned repository or Enterprise Cloud only (unchanged
+    from section 11).
+  - `code_quality`/`code_coverage` ruleset rules -- 2026-09-25,
+    [changelog, 2026-07-20](https://github.blog/changelog/2026-07-20-github-code-quality-is-now-generally-available/)
+    -- paid GitHub Code Quality.
+  - `required_reviewers` ruleset rule -- 2026-09-25,
+    [changelog, 2026-02-17](https://github.blog/changelog/2026-02-17-required-reviewer-rule-is-now-generally-available/)
+    -- the rule names a reviewer Team; `.github/CODEOWNERS` names only the
+    one repository owner.
+  - Secret-alert-resolution ruleset rule -- 2026-09-25,
+    [changelog, 2026-09-09](https://github.blog/changelog/2026-09-09-block-pull-requests-with-exposed-secrets-from-merging/)
+    -- GitHub Secret Protection (GHSP) preview; this repository's required
+    `secret-scan` (gitleaks) job stays the enforced gate.
+  - Partner validity checks -- 2026-09-25, this record's section 11
+    (non-provider secret patterns and validity checks) -- need both an
+    organization-owned repository and the paid Secret Protection plan;
+    refines section 11's "not free" note with the organization-ownership
+    requirement.
+  - Copilot review/approval ruleset rules -- 2026-09-25, no policy document
+    in this re-check's source set (an operational observation, not a
+    citation) -- a Copilot-only reviewer identity and Copilot
+    premium-request quota, neither of which this repository's automation
+    holds.
+- **Section 8 pip graph-update status: still open.** `gh api
+  repos/seathatflowsinourveins/native-agent-stack/dependency-graph/sbom`
+  lists `zizmor 1.30.1` (matches `.github/requirements-ci.txt`), but no
+  `dynamic/dependabot/update-graph` run named `Graph Update: pip in
+  /.github` has been observed in the run history yet. Section 8's own
+  fallback (a `directory: /.github` pip version-update entry with
+  `open-pull-requests-limit: 0`) stays the recourse if one never appears.
+- **Already-current items.** Every `uses:` is pinned at a current release as
+  of 2026-09-25: `actions/checkout` v7.0.1, `github/codeql-action` v4.38.1,
+  `ossf/scorecard-action` v2.4.4, `step-security/harden-runner` v2.21.1,
+  `actions/attest` v4.2.2. GitHub's Node 20 runtime removal (2026-09-23) does
+  not affect any of them (coordinator-verified); this re-check needs no
+  re-pin for it. No workflow adds `pull_request_target` or `workflow_run`
+  (`tests/test_workflow_hardening.py`'s
+  `test_no_dangerous_trigger_is_added_for_the_residual`, unchanged).
+- **Overturn (this section's allow-list adoption).** A needed action outside
+  `github_owned_allowed`/`patterns_allowed` (add a `patterns_allowed` entry
+  here with a dated reason), or a currently-used GitHub-owned action becomes
+  blocked under `selected`.

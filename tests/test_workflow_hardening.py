@@ -11,6 +11,7 @@ a full commit SHA.
 
 from datetime import date
 from pathlib import Path
+import fnmatch
 import hashlib
 import re
 import subprocess
@@ -942,6 +943,43 @@ class NoWorkflowApprovesPullRequestsTests(unittest.TestCase):
             body = uncommented(text)
             for pattern in patterns:
                 self.assertNotRegex(body, pattern, name)
+
+
+class ActionsAllowListTests(unittest.TestCase):
+    """The Actions allow-list target (docs/decisions/2026-09-22-github-automation-closure.md,
+    "2026-09-25 re-check against current practice"): every `uses:` in every workflow is either
+    GitHub-owned or matches .github/actions-permissions.json's own patterns_allowed, so moving
+    the live allowed_actions setting from "all" to "selected" with that file's
+    github_owned_allowed/patterns_allowed would not block anything this repository already runs."""
+
+    permissions = __import__("json").loads((ROOT / ".github/actions-permissions.json").read_text(encoding="utf-8"))
+
+    def test_settings_target_selected_actions_with_sha_pinning_required(self):
+        self.assertEqual(self.permissions["allowed_actions"], "selected")
+        self.assertIs(self.permissions["sha_pinning_required"], True)
+
+    def test_every_uses_is_github_owned_or_in_the_pattern_allow_list(self):
+        # Reuses PinningTests' own `uses:` extraction (the same regex, the same
+        # per-line walk over every workflow file), skipping a local `./` action and
+        # a `docker://` one exactly as that scan does, then checks ownership instead
+        # of the pin format.
+        patterns = self.permissions["patterns_allowed"]
+        not_allowed = []
+        for path in sorted(WORKFLOWS.glob("*.yml")):
+            for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                match = re.search(r"uses:\s*([^\s#]+)", line)
+                if not match:
+                    continue
+                target = match.group(1)
+                if target.startswith("./") or target.startswith("docker://"):
+                    continue
+                owner = target.split("/", 1)[0]
+                if owner in {"actions", "github"}:
+                    continue
+                if any(fnmatch.fnmatch(target, pattern) for pattern in patterns):
+                    continue
+                not_allowed.append(f"{path.name}:{line_number}: {target}")
+        self.assertEqual(not_allowed, [])
 
 
 if __name__ == "__main__":
