@@ -912,8 +912,8 @@ class UnitRestartTests(SwitchFixture):
         self.write_svc_spec()
         self.relink("svc")
         digest = self.plan_sha("svc", self.root_v2, "R1")
-        # ECOSYSTEM_SWITCH_MIN_MEMORY_KIB may only ever lower DEFAULT_MIN_MEMORY_KIB (never raise
-        # a production floor via a casual env var), so a test that needs the gate to reliably
+        # ECOSYSTEM_SWITCH_MIN_MEMORY_KIB may only ever raise DEFAULT_MIN_MEMORY_KIB (never lower
+        # this safety floor via a casual env var), so a test that needs the gate to reliably
         # refuse regardless of this host's real MemAvailable uses the test-only, unbounded
         # override instead: ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB.
         env = {**self.env, "ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB": str(2**62)}
@@ -927,20 +927,28 @@ class UnitRestartTests(SwitchFixture):
         # leave the live entrypoint on the old root entirely, not just fail to finish.
         self.assertEqual(os.path.realpath(self.root / "bin" / "svc"), os.path.realpath(self.root_v1 / "bin" / "svc"))
 
-    def test_min_memory_kib_env_var_can_only_lower_the_floor_not_raise_it(self):
-        # A plain ECOSYSTEM_SWITCH_MIN_MEMORY_KIB above the real default must never make the gate
-        # *more* permissive than a directly-restarted default would be, and must never disable it
-        # by raising unboundedly -- only ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB can do that.
-        self.assertIsNone(switch.memory_gate_issue(min_kib=0))
-        with unittest.mock.patch.dict(os.environ, {"ECOSYSTEM_SWITCH_MIN_MEMORY_KIB": str(2**62)}, clear=False):
-            # Clamped to DEFAULT_MIN_MEMORY_KIB, not honoured outright: this host must have well
-            # under 2**62 KiB available, so an unclamped read would refuse; the clamp means this
-            # only refuses if the host truly has under 6 GiB free right now.
+    def test_min_memory_kib_env_var_can_only_raise_the_floor_not_lower_it(self):
+        # Minor finding: the clamp direction used to be inverted (min(requested, DEFAULT)),
+        # letting a plain ECOSYSTEM_SWITCH_MIN_MEMORY_KIB silently disable the gate down to 0
+        # (the dangerous direction for a floor meant to prevent an OOM during a model-loading
+        # restart) while a request to make it *stricter* was the one silently ignored. It must
+        # now never make the gate *more* permissive than DEFAULT_MIN_MEMORY_KIB, only ever as
+        # strict or stricter -- only ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB can loosen it, and
+        # only for a test.
+        self.assertIsNone(switch.memory_gate_issue(min_kib=0), "an explicit min_kib=0 bypasses "
+                          "env-based clamping entirely -- unaffected by this guarantee")
+        with unittest.mock.patch.dict(os.environ, {"ECOSYSTEM_SWITCH_MIN_MEMORY_KIB": "0"}, clear=False):
+            # Clamped back up to DEFAULT_MIN_MEMORY_KIB, not honoured outright: a request to
+            # lower the floor to 0 must never actually let a restart through with less than the
+            # real default's worth of memory free.
             available = switch.available_memory_kib()
             issue = switch.memory_gate_issue()
-            if available is not None and available >= switch.DEFAULT_MIN_MEMORY_KIB:
-                self.assertIsNone(issue)
-
+            if available is not None and available < switch.DEFAULT_MIN_MEMORY_KIB:
+                self.assertIsNotNone(issue)
+        with unittest.mock.patch.dict(os.environ, {"ECOSYSTEM_SWITCH_MIN_MEMORY_KIB": str(2**62)}, clear=False):
+            # Raising above the default IS honoured (the safe direction): this host cannot
+            # possibly have 2**62 KiB free, so the gate must refuse.
+            self.assertIsNotNone(switch.memory_gate_issue())
 
     def test_rollback_of_a_unit_restart_txn_restores_the_service_on_the_old_root(self):
         # Major finding: rollback used to reverse ops in plain ledger order, so a service

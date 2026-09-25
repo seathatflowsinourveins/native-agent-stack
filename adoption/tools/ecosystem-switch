@@ -71,8 +71,9 @@ DENYLISTED_UNITS = frozenset({
 
 # Refuse a unit-restart that loads a model below this much available memory (matches the
 # >=6 GiB rule docs/linux-efficiency.md and this rollout's own common brief apply to workers
-# launching heavy jobs on this host). Never raised to retry; only ECOSYSTEM_SWITCH_MIN_MEMORY_KIB
-# lowers it, and only a test may need to.
+# launching heavy jobs on this host). Never lowered via a casual override to force a restart
+# through; ECOSYSTEM_SWITCH_MIN_MEMORY_KIB may only raise it (a stricter floor is always safe),
+# and only the test-only, unbounded ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB can loosen it.
 DEFAULT_MIN_MEMORY_KIB = 6 * 1024 * 1024
 
 OPERATION_KINDS = ("link", "text-replace", "file-write", "native-cli", "unit-restart",
@@ -573,11 +574,17 @@ def drift_issue(root: Path, component_id: str, entry: dict) -> str | None:
 
 def memory_gate_issue(min_kib: int | None = None) -> str | None:
     """None when available memory clears the floor. ``ECOSYSTEM_SWITCH_MIN_MEMORY_KIB`` may only
-    lower ``DEFAULT_MIN_MEMORY_KIB`` -- never raise a production floor via a casual env var --
-    so it is clamped to the default rather than trusted outright.
-    ``ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB`` has no such ceiling; it exists only so a test
-    can deterministically force this gate to refuse regardless of the real host's MemAvailable,
-    without also weakening the production-facing variable's one-directional guarantee."""
+    RAISE ``DEFAULT_MIN_MEMORY_KIB`` -- never lower this safety floor (meant to prevent an OOM
+    during a model-loading restart) via a casual env var -- so a request below the default is
+    clamped back up to it rather than trusted outright. Minor finding: the clamp direction used
+    to be inverted (``min(requested, DEFAULT)``), letting this var silently disable the gate down
+    to 0 while a request to make it *stricter* was the one silently ignored -- backwards for a
+    floor whose purpose is preventing an OOM, where loosening is the dangerous direction (a
+    restart proceeds with too little memory) and tightening is always safe (at worst, an
+    unnecessarily refused restart). ``ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB`` has no such
+    floor; it exists only so a test can deterministically force this gate to refuse regardless of
+    the real host's MemAvailable, without also loosening the production-facing variable's own
+    one-directional guarantee."""
     if min_kib is not None:
         minimum = min_kib
     else:
@@ -586,7 +593,7 @@ def memory_gate_issue(min_kib: int | None = None) -> str | None:
             minimum = int(forced)
         else:
             requested = os.environ.get("ECOSYSTEM_SWITCH_MIN_MEMORY_KIB")
-            minimum = min(int(requested), DEFAULT_MIN_MEMORY_KIB) if requested is not None else DEFAULT_MIN_MEMORY_KIB
+            minimum = max(int(requested), DEFAULT_MIN_MEMORY_KIB) if requested is not None else DEFAULT_MIN_MEMORY_KIB
     available = available_memory_kib()
     if available is None:
         return "cannot read /proc/meminfo; refusing a restart that may load a model"

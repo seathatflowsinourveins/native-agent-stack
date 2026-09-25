@@ -494,15 +494,18 @@ one hash-chained ledger entry per operation:
   that time range or when the component is not in `allowed_components`.
 - **Memory gate.** A plan step that restarts a unit (a `surfaces[]` entry of
   kind `unit-restart`) refuses when `/proc/meminfo`'s `MemAvailable` is below
-  a floor (default 6 GiB, `ECOSYSTEM_SWITCH_MIN_MEMORY_KIB` only ever lowers
-  it -- any higher value is clamped back down to the default, never trusted
-  outright -- for tests) -- the same rule this rollout's own workers apply to
-  themselves before a heavy job (`docs/linux-efficiency.md`), applied here to
-  a restart that may load a model. A test that needs the gate to
-  deterministically refuse regardless of this host's real `MemAvailable` uses
-  the separate, unbounded `ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB`
-  instead, so the production-facing variable's one-directional guarantee is
-  never itself weakened for a test's convenience.
+  a floor (default 6 GiB, `ECOSYSTEM_SWITCH_MIN_MEMORY_KIB` only ever raises
+  it -- any lower value is clamped back up to the default, never trusted
+  outright) -- the same rule this rollout's own workers apply to themselves
+  before a heavy job (`docs/linux-efficiency.md`), applied here to a restart
+  that may load a model. Loosening this floor is the dangerous direction (a
+  restart could proceed with too little memory and OOM); tightening it is
+  always safe, so only tightening is honoured from a casual env var. A test
+  that needs the gate to deterministically refuse regardless of this host's
+  real `MemAvailable` uses the separate, unbounded
+  `ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB` instead, so the
+  production-facing variable's one-directional guarantee is never itself
+  loosened for a test's convenience.
 - **Drift gate.** If `current/<id>`'s live target no longer matches what the
   ledger last recorded, `apply` refuses and names `adopt --resync` as the
   fix, rather than silently overwriting an out-of-band change.
