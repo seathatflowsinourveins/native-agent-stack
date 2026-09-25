@@ -1,19 +1,18 @@
 # Decision: skills trial and usage monitoring (2026-09-25)
 
 **Decided by:** the user's 2026-09-25 request to install all SOTA skills and monitor their
-invoke rate, portable to all hosts. `adoption/skills/manifest.json` (committed at `0f508fe9`,
-this branch's base: "Skills trial manifest: 26 pinned skills (5 kept winners, 21 trial) with
-audits, gaps and listing states") pins the selected, trial and excluded skills and already
-names this file as its `decision_record`. This record adds the measured baseline, writes up the
+invoke rate, portable to all hosts. `adoption/skills/manifest.json` (the first commit of this change: "Skills trial manifest: 26
+pinned skills (5 kept winners, 21 trial) with audits, gaps and listing states") pins the
+selected, trial and excluded skills and names this file as its `decision_record`. This record adds the measured baseline, writes up the
 listing/measurement policy the manifest's `trial` and `budget` fields already declare, and
-records the trial-scope supersession of two 2026-09-24 dispositions below. Branch
-`claude/skills-trial-a4-20260925`.
+records the trial-scope supersession of two 2026-09-24 dispositions below.
 
 **Scope:** this record, `blueprints/native-skill-practice/README.md`'s install section,
 `recipes/claude-native-profile.md`'s ECC skills-install section, and one added step in
-`adoption/update.md`. The manifest itself, `catalogs/landscape/foundation.json`'s
-`instructions-skills` row and `manifests/evidence.json` hash registration are outside this
-branch's owned paths; the coordinator integrates them.
+`adoption/update.md`, alongside the manifest, installer, status check, usage report, tests and
+this host's evidence artifact in the same change; that change's last commit registers every
+added or changed file in `manifests/evidence.json` under the `docs/lanes.md` hot-file protocol.
+`catalogs/landscape/foundation.json`'s `instructions-skills` row is deliberately unchanged.
 
 **Not covered:** whether any trial skill is promoted to a verdict winner (see
 [Verdict boundary](#verdict-boundary)); the actual per-host pinned install run, which is a

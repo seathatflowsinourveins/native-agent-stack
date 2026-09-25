@@ -16,14 +16,19 @@ truth for which skills are installed, at which upstream revision, and at which l
 decision record. Two scripts read that manifest instead of a hand-run upstream installer:
 
 ```sh
-python3 tools/adoption/install_skills.py --check   # dry run: prints what would change, changes nothing
-python3 tools/adoption/install_skills.py --write   # installs/updates every manifest entry at its pinned ref
-python3 scripts/skills_status.py                   # per-skill installed ref, listing state and lock currency
-claude -p "/skill-doctor" --output-format json      # native per-skill use count and last-used time, 0 tokens
+SKILLS=<tools-root>/skills-1.7.0/bin/skills
+npm install --global --prefix <tools-root>/skills-1.7.0 skills@1.7.0    # the manifest's cli.install (pinned, isolated)
+python3 tools/adoption/install_skills.py --skills-bin "$SKILLS" --dry-run   # prints what would change, changes nothing
+python3 tools/adoption/install_skills.py --skills-bin "$SKILLS"             # installs every manifest entry at its pinned ref
+python3 tools/adoption/install_skills.py --print-codex-config              # [[skills.config]] lines for ~/.codex/config.toml
+python3 scripts/skills_status.py --skills-bin "$SKILLS"                    # per-skill ref, lock, links, listing state, Codex config
+claude -p "/skill-doctor" --output-format json                             # native per-skill use count, 0 API tokens
 ```
 
-`install_skills.py` installs the pinned `skills` CLI (the manifest's `cli.version`) into an
-isolated npm prefix (`cli.install`), never a global or bare `npx` install, and runs every
+`install_skills.py` does not install the CLI itself: it requires the pinned `skills` CLI (the
+manifest's `cli.version`, installed into an isolated npm prefix by `cli.install`, never a global
+or bare `npx` install), refuses with that install command when `--skills-bin` is missing or
+reports another version, and runs every
 invocation with `DISABLE_TELEMETRY=1` so neither the telemetry event nor the add-time audit call
 fires. It installs each skill at the manifest's exact 40-hex `ref`, for both Claude and Codex in
 one command (`skills add <tree URL> --skill <name> -g -y -a claude-code codex`), and checks the

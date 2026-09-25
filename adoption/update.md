@@ -217,10 +217,13 @@ On a host that has adopted [`adoption/skills/manifest.json`](skills/manifest.jso
 `v2026.09.25.2`; see [the trial record](../docs/decisions/2026-09-25-skills-trial-and-usage.md)):
 
 ```sh
-python3 tools/adoption/install_skills.py --check   # dry run: prints what would change, changes nothing
-python3 tools/adoption/install_skills.py --write   # installs/updates every manifest entry at its pinned ref
-python3 scripts/skills_status.py                   # per-skill installed ref, listing state and lock currency
-claude -p "/skill-doctor" --output-format json      # native per-skill use count and last-used time, 0 tokens
+SKILLS=<tools-root>/skills-1.7.0/bin/skills
+npm install --global --prefix <tools-root>/skills-1.7.0 skills@1.7.0    # the manifest's cli.install (pinned, isolated)
+python3 tools/adoption/install_skills.py --skills-bin "$SKILLS" --dry-run   # prints what would change, changes nothing
+python3 tools/adoption/install_skills.py --skills-bin "$SKILLS"             # installs every manifest entry at its pinned ref
+python3 tools/adoption/install_skills.py --print-codex-config              # [[skills.config]] lines for ~/.codex/config.toml
+python3 scripts/skills_status.py --skills-bin "$SKILLS"                    # per-skill ref, lock, links, listing state, Codex config
+claude -p "/skill-doctor" --output-format json                             # native per-skill use count, 0 API tokens
 ```
 
 Run the dry run first on a host that has never applied this manifest, and compare its printed

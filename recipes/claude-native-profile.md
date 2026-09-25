@@ -93,8 +93,8 @@ revision as before, `2b6e839771e53096d8451a213d40dc64ec8acac0`, but now through 
 not the superseded Codex-only installer route below:
 
 ```sh
-python3 tools/adoption/install_skills.py --write   # installs every manifest entry, including both ECC skills
-python3 scripts/skills_status.py                   # confirms both are installed at 2b6e839...
+python3 tools/adoption/install_skills.py --skills-bin <tools-root>/skills-1.7.0/bin/skills   # installs every manifest entry, including both ECC skills
+python3 scripts/skills_status.py --skills-bin <tools-root>/skills-1.7.0/bin/skills          # confirms both are installed at 2b6e839...
 ```
 
 This puts both skills in the global lock (`~/.agents/.skill-lock.json`, or
