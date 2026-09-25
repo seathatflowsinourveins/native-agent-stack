@@ -29625,8 +29625,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "70d3926e26c671f73b23676446a64695404c309c1ee653cd5a9698050098319f",
-      "bytes": 97117
+      "sha256": "d3898e35ca32895b11a60aa6a7506a60c54dfe5d7a6f81537e141bd95489a772",
+      "bytes": 97178
     },
     {
       "path": "tests/test_ibkr_acceptance.py",

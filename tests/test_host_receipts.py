@@ -1338,7 +1338,8 @@ class ReviewAppendSafetyTests(unittest.TestCase):
         with contextlib.redirect_stdout(buffer):
             exit_code = self._run([
                 "record", "--root", str(self.root), "--host-id", "test-host-20260101",
-                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--platform-id", "linux-wsl2-x86_64", "--os", "linux", "--architecture", "x86_64",
+                "--component-id", "widget", "--stage", "use",
                 "--evidence-class", "synthetic", "--from-stack-commands",
             ])
         self.assertEqual(exit_code, 0, buffer.getvalue())
