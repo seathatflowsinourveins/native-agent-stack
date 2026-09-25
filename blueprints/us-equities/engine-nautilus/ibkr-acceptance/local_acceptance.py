@@ -8,13 +8,14 @@ or TWS, bracketed by an independent official-ibapi observer.
 Subcommands:
   preflight     Read-only: plan, runtime pins, port, prerequisites, kill-switch latch, session
                 window, paper account (every managed account starts with DU), zero positions and
-                open orders, and the node's client id free. Places and cancels nothing.
+                open orders, and the node's client id free. Places and cancels nothing. It holds
+                the run lock while it connects, so a preflight and a run never overlap.
   run           The acceptance run. Refused unless --enable-paper-orders is given. It writes the
                 steps receipt only, never the gate receipt.
   gate-receipt  The receipt builder, the only writer of the gate receipt. It reads files only: a
-                passed steps receipt and at least one independent corroboration record for the
-                same run (the Gateway API message log or the next-day IBKR activity statement,
-                read in a separate session). It connects to nothing.
+                passed steps receipt and a corroboration record for the same run from the Gateway
+                API message log (required), optionally with a next-day IBKR activity statement
+                record, each read in a separate session. It connects to nothing.
   kill-switch   'status', or 'clear --confirm --reason TEXT' (the only way to remove the latch).
   phase         Internal: one TradingNode phase (A, B or C) in a fresh process, started by 'run'.
 
@@ -22,7 +23,8 @@ Every order is a non-marketable resting LIMIT BUY of 1 SPY; the runner has no ma
 flattening order. The gate receipt (receipt.json next to this file, kind
 native_ibkr_local_acceptance) is written only by 'gate-receipt', and only when every case and
 checkpoint of the run passed, the prerequisite receipts named in the plan exist with status
-passed, and a corroboration record from IB's own records passes every check of its source. The
+passed, and corroboration records from IB's own records pass every check of their sources and
+together corroborate every run claim (so the Gateway API message log record is required). The
 kill-switch latch, its audit log and the single-writer run lock live at one frozen per-account
 path (CONTROL_DIR), whatever --state-dir says. Heavy modules (nautilus_trader, ibapi) are
 imported lazily; nothing connects at import time.
@@ -102,21 +104,30 @@ CORROBORATION_KIND = "ibkr_local_acceptance_corroboration"
 # independent confirmation of these (docs/acceptance-evidence-policy.md).
 RUN_CLAIMS = ("no_duplicate_submission", "r1_r2_cancelled_at_ib", "p1_p2_never_reached_ib", "no_fill",
               "flat_at_end")
-# Independent sources, read after the run by a separate session: the checks a corroboration
-# record must report true for the run prefix, and the run claims they corroborate. The plan's
-# receipt.gate_receipt.corroboration must list exactly these (validate_plan).
+# Independent sources, read after the run by a separate session: whether the gate receipt
+# requires the source, the checks a corroboration record must report true for the run prefix,
+# and the run claims they corroborate. The gate receipt needs every run claim corroborated, and
+# only the Gateway API message log covers them all, so it is required; the activity statement
+# (no fill, flat) is an optional additional record and never enough alone (second review of PR
+# #280). The plan's receipt.gate_receipt.corroboration must list exactly these (validate_plan).
 CORROBORATION_SOURCES = {
     "gateway_api_message_log": {
+        "required": True,
         "checks": ("r1_r2_each_sent_once", "r1_r2_cancelled_by_ib", "p1_p2_never_sent", "no_execution_of_the_run",
                    "flat_at_end"),
         "corroborates": RUN_CLAIMS,
     },
     "ibkr_activity_statement": {
+        "required": False,
         "checks": ("paper_account_statement", "no_trade_in_symbol_on_run_date",
                    "no_position_in_symbol_at_end_of_run_date"),
         "corroborates": ("no_fill", "flat_at_end"),
     },
 }
+REQUIRED_CORROBORATION_SOURCES = tuple(k for k, v in CORROBORATION_SOURCES.items() if v["required"])
+# A record's retrieved_at and observed_at are self-reported, so one later than the builder's own
+# clock by more than this skew describes a retrieval that has not happened yet, and is refused.
+MAX_FUTURE_SKEW_SECONDS = 300
 SHA256_HEX = re.compile(r"[0-9a-f]{64}")
 PHASE_GRACE_SECONDS = 30
 TERMINATE_GRACE_SECONDS = 20
@@ -265,9 +276,15 @@ def validate_plan(plan: dict) -> list[str]:
         c = g["corroboration"]
         need(c["required"] is True and c["record_kind"] == CORROBORATION_KIND,
              f"gate receipt corroboration must be required, with record kind {CORROBORATION_KIND}")
-        need({k: (list(v["checks"]), list(v["corroborates"])) for k, v in c["sources"].items()}
-             == {k: (list(v["checks"]), list(v["corroborates"])) for k, v in CORROBORATION_SOURCES.items()},
-             "corroboration sources, checks and claims must match the gate-receipt builder's")
+        need({k: (v["required"], list(v["checks"]), list(v["corroborates"])) for k, v in c["sources"].items()}
+             == {k: (v["required"], list(v["checks"]), list(v["corroborates"])) for k, v in CORROBORATION_SOURCES.items()},
+             "corroboration sources, whether each is required, checks and claims must match the gate-receipt builder's")
+        need(c["required_sources"] == list(REQUIRED_CORROBORATION_SOURCES),
+             f"corroboration required_sources must be {list(REQUIRED_CORROBORATION_SOURCES)}")
+        need(c["run_claims"] == list(RUN_CLAIMS) and c["every_run_claim_corroborated"] is True,
+             "every run claim must be corroborated: none may rest on the in-process observer alone")
+        need(c["max_future_skew_seconds"] == MAX_FUTURE_SKEW_SECONDS,
+             f"corroboration max_future_skew_seconds must be {MAX_FUTURE_SKEW_SECONDS}")
         need(bool(plan.get("version_selection_record")), "version_selection_record is required")
         need(plan.get("evidence_class") == "native_paper", "evidence_class must be native_paper")
     except (AttributeError, KeyError, TypeError, ValueError) as exc:
@@ -1844,12 +1861,24 @@ def write_json(path, receipt: dict, secret_values=(), quiet=False) -> int:
     return code
 
 
+def uncorroborated(corroborations: list[dict]) -> tuple[list[str], list[str]]:
+    """(required sources without a checked record, run claims no checked record corroborates).
+    Both must be empty for a gate receipt."""
+    kinds = {record["source_kind"] for record in corroborations}
+    covered = {claim for record in corroborations for claim in record["corroborates"]}
+    return ([s for s in REQUIRED_CORROBORATION_SOURCES if s not in kinds],
+            [c for c in RUN_CLAIMS if c not in covered])
+
+
 def gate_receipt(plan: dict, receipt: dict, receipt_path: Path, prerequisites: list[dict], corroborations: list[dict],
                  repo=None) -> dict:
     """The preregistered flip receipt; built only by the gate-receipt builder, for a passed run
-    with at least one checked corroboration record (cmd_gate_receipt)."""
-    if not corroborations:
-        raise ValueError("a gate receipt needs at least one checked corroboration record")
+    whose checked corroboration records include every required source and corroborate every
+    run claim (cmd_gate_receipt)."""
+    missing, claims = uncorroborated(corroborations)
+    if not corroborations or missing or claims:
+        raise ValueError("a gate receipt needs checked corroboration records from every required source that "
+                         "corroborate every run claim")
     phases = {p["phase"]: p for p in receipt.get("phases", [])}
 
     def case(phase, cid):
@@ -1941,10 +1970,12 @@ def run_trade_date(plan: dict, steps: dict) -> str | None:
     return started.astimezone(ZoneInfo(plan["session"]["timezone"])).date().isoformat() if started else None
 
 
-def corroboration_errors(record, steps: dict, steps_rel: str, steps_sha256: str, plan: dict) -> list[str]:
+def corroboration_errors(record, steps: dict, steps_rel: str, steps_sha256: str, plan: dict,
+                         now: datetime) -> list[str]:
     """Why a corroboration record does not corroborate this run; empty means it does. The record
     comes from IB's own records (README 'Independent corroboration'), read after the run by a
-    separate session; it names the private raw files by sha256 only."""
+    separate session; it names the private raw files by sha256 only. now is the builder's own
+    clock: a record time later than now plus MAX_FUTURE_SKEW_SECONDS is refused."""
     if not isinstance(record, dict):
         return ["record must be a JSON object"]
     errors = []
@@ -1976,6 +2007,13 @@ def corroboration_errors(record, steps: dict, steps_rel: str, steps_sha256: str,
          "source.retrieved_at must be an ISO time with a UTC offset, after the run finished")
     need(observed is not None and retrieved is not None and observed >= retrieved,
          "observer.observed_at must be an ISO time with a UTC offset, after source.retrieved_at")
+    # The times are self-reported; the builder's clock bounds them from above (second review of
+    # PR #280), so a retrieval or reading dated in the future is refused.
+    latest = now + timedelta(seconds=MAX_FUTURE_SKEW_SECONDS)
+    need(retrieved is None or retrieved <= latest,
+         f"source.retrieved_at must not be later than the builder's clock plus {MAX_FUTURE_SKEW_SECONDS} s")
+    need(observed is None or observed <= latest,
+         f"observer.observed_at must not be later than the builder's clock plus {MAX_FUTURE_SKEW_SECONDS} s")
     need(observer.get("separate_session") is True, "observer.separate_session must be true")
     need(observer.get("started_the_run") is False, "observer.started_the_run must be false")
     need(isinstance(observer.get("method"), str) and bool(observer["method"].strip()),
@@ -2167,12 +2205,28 @@ def cmd_preflight(a, *, check_fn=None, contender_fn=None, now_fn=None, versions_
     out.update(fields)
     account = None
     if status is None:
-        if KillSwitch(legacy_dirs=(a.state_dir, DEFAULT_STATE_DIR)).engaged():
+        kill = KillSwitch(legacy_dirs=(a.state_dir, DEFAULT_STATE_DIR))
+        if kill.engaged():
             status = "refused_kill_switch_engaged"
         else:
-            status, account, _ = _checks_before_orders(
-                a, plan, out, check_fn=check_fn or PO.run_check, contender_fn=contender_fn or contender_probe,
-                now_fn=now_fn or (lambda: datetime.now(timezone.utc)), t0=t0)
+            # Preflight connects the check client (98) and a contender on the node's id (93), the
+            # ids a run uses, so it holds the same frozen run lock while it connects (second review
+            # of PR #280): a preflight during a run is refused, and so is a run started during a
+            # preflight.
+            lock = acquire_lock()
+            if lock is None:
+                status = "refused_concurrent_run"
+            else:
+                try:
+                    if kill.engaged():  # read again under the lock, as run does
+                        status = "refused_kill_switch_engaged"
+                    else:
+                        status, account, _ = _checks_before_orders(
+                            a, plan, out, check_fn=check_fn or PO.run_check,
+                            contender_fn=contender_fn or contender_probe,
+                            now_fn=now_fn or (lambda: datetime.now(timezone.utc)), t0=t0)
+                finally:
+                    lock.close()
     out["status"] = status
     out["exit_code"] = 0 if status == "ready" else PO.exit_code_for(status)
     print(PO.scrub_serialized(json.dumps(out, default=str), [account]))
@@ -2332,9 +2386,10 @@ def _run_phases(a, plan, receipt, receipt_path, account, prefix, ids, run_dir, t
     if status == "passed":
         ok, entries = gate_prerequisites(plan, repo)
         # The run never writes the gate receipt. The gate-receipt builder does, later, and only
-        # once an independent corroboration record for this run passes (README "Independent
-        # corroboration"); it binds this steps receipt's sha256. A steps receipt outside the
-        # repository could not be checked by anyone qualifying the flip, so it makes none.
+        # once independent corroboration records for this run (the Gateway API message log at
+        # least) pass and cover every run claim (README "Independent corroboration"); it binds
+        # this steps receipt's sha256. A steps receipt outside the repository could not be
+        # checked by anyone qualifying the flip, so it makes none.
         if rel(receipt_path, repo) == "<private>":
             receipt["gate_receipt"] = {"eligible": False, "reason": "steps_receipt_outside_repository"}
         elif not ok:
@@ -2436,12 +2491,14 @@ def cmd_kill_switch(a) -> int:
 # --------------------------------------------------------------------------- CLI: gate-receipt (the builder)
 
 
-def cmd_gate_receipt(a, *, gate_path=None, repo_root=None) -> int:
+def cmd_gate_receipt(a, *, gate_path=None, repo_root=None, now_fn=None) -> int:
     """The receipt builder and the only writer of the gate receipt. It reads files only (no
     connection, no order): a passed steps receipt and one corroboration record per independent
-    source (README 'Independent corroboration'). Any refusal writes nothing."""
+    source (README 'Independent corroboration'); the records must include every required source
+    (the Gateway API message log) and corroborate every run claim. Any refusal writes nothing."""
     repo = REPO if repo_root is None else Path(repo_root)
     gate = Path(gate_path) if gate_path else GATE_RECEIPT
+    now = (now_fn or (lambda: datetime.now(timezone.utc)))()
     out = {"kind": "ibkr_local_acceptance_gate_receipt_build"}
 
     def done(status, **fields):
@@ -2487,7 +2544,7 @@ def cmd_gate_receipt(a, *, gate_path=None, repo_root=None) -> int:
             return done("refused_corroboration_unreadable", path=where, error=type(exc).__name__)
         if PO.ACCOUNT_ID.search(text) or PO.HOME_PATH.search(text):
             return done("refused_corroboration_private_content", path=where)
-        errors = corroboration_errors(record, steps, rel(steps_path, repo), steps_sha, plan)
+        errors = corroboration_errors(record, steps, rel(steps_path, repo), steps_sha, plan, now)
         if errors:
             return done("refused_corroboration_invalid", path=where, reasons=errors)
         kind = record["source"]["kind"]
@@ -2498,6 +2555,13 @@ def cmd_gate_receipt(a, *, gate_path=None, repo_root=None) -> int:
                         "retrieved_at": record["source"]["retrieved_at"], "observed_at": record["observer"]["observed_at"],
                         "checks": list(CORROBORATION_SOURCES[kind]["checks"]),
                         "corroborates": list(CORROBORATION_SOURCES[kind]["corroborates"])})
+    missing, claims = uncorroborated(records)
+    if missing or claims:
+        # An activity statement alone shows no fill and a flat account, which resting orders at
+        # half the bid leave whether or not the kill switch worked; the cancel, probe and
+        # duplicate claims need the API message log (second review of PR #280).
+        return done("refused_claims_uncorroborated", missing_sources=missing,
+                    claims_on_the_in_process_observer_only=claims)
     receipt = gate_receipt(plan, steps, steps_path, prerequisites, records, repo)
     try:
         write_json(gate, receipt, quiet=True)
@@ -2527,7 +2591,8 @@ def main(argv=None, **hooks) -> int:
     g = sub.add_parser("gate-receipt", help="build the gate receipt from a passed steps receipt and its corroboration")
     g.add_argument("--steps-receipt", required=True, help="the run's steps receipt, inside the repository")
     g.add_argument("--corroboration", action="append", required=True,
-                   help="a corroboration record inside the repository (repeat for a second source)")
+                   help="a corroboration record inside the repository; the Gateway API message log record is "
+                        "required, and an activity statement record may be added by repeating the option")
     k = sub.add_parser("kill-switch")
     k.add_argument("action", choices=("status", "clear"))
     k.add_argument("--state-dir", default=str(DEFAULT_STATE_DIR),
@@ -2545,7 +2610,7 @@ def main(argv=None, **hooks) -> int:
     if a.cmd == "phase":
         return cmd_phase(a, **{k: v for k, v in hooks.items() if k in ("node_fn", "versions_fn")})
     if a.cmd == "gate-receipt":
-        return cmd_gate_receipt(a, **{k: v for k, v in hooks.items() if k in ("gate_path", "repo_root")})
+        return cmd_gate_receipt(a, **{k: v for k, v in hooks.items() if k in ("gate_path", "repo_root", "now_fn")})
     return cmd_run(a, **hooks)
 
 

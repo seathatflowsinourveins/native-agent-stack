@@ -192,18 +192,39 @@ class PlanValidation(unittest.TestCase):
             self.assertEqual([e["ok"] for e in entries], [False, False, True])
 
     def test_the_plan_preregisters_the_builders_corroboration_rule(self):
-        c = PLAN["receipt"]["gate_receipt"]["corroboration"]
-        self.assertIs(c["required"], True)
-        self.assertEqual(set(c["sources"]), {"gateway_api_message_log", "ibkr_activity_statement"})
-        self.assertEqual(c["sources"]["gateway_api_message_log"]["corroborates"], list(LA.RUN_CLAIMS))
+        for plan in (PLAN, POST):
+            c = plan["receipt"]["gate_receipt"]["corroboration"]
+            self.assertIs(c["required"], True)
+            self.assertEqual(set(c["sources"]), {"gateway_api_message_log", "ibkr_activity_statement"})
+            self.assertEqual(c["sources"]["gateway_api_message_log"]["corroborates"], list(LA.RUN_CLAIMS))
+            # Revision 3 (second review of PR #280): the API message log is required and every run
+            # claim must be corroborated; the activity statement is optional and additional.
+            self.assertEqual((c["sources"]["gateway_api_message_log"]["required"],
+                              c["sources"]["ibkr_activity_statement"]["required"]), (True, False))
+            self.assertEqual(c["required_sources"], ["gateway_api_message_log"])
+            self.assertEqual((c["run_claims"], c["every_run_claim_corroborated"]), (list(LA.RUN_CLAIMS), True))
+            self.assertEqual(c["max_future_skew_seconds"], 300)
+        # The required sources alone cover every run claim, so a gate receipt never leaves one
+        # on the in-process observer.
+        covered = {claim for s in LA.REQUIRED_CORROBORATION_SOURCES for claim in LA.CORROBORATION_SOURCES[s]["corroborates"]}
+        self.assertEqual(covered, set(LA.RUN_CLAIMS))
+        self.assertLess(set(LA.CORROBORATION_SOURCES["ibkr_activity_statement"]["corroborates"]), set(LA.RUN_CLAIMS))
         weakened = [
             ("required", lambda g: g.update(required=False)),
             ("kind", lambda g: g.update(record_kind="other")),
             ("check dropped", lambda g: g["sources"]["gateway_api_message_log"]["checks"].remove("p1_p2_never_sent")),
             ("claim added", lambda g: g["sources"]["ibkr_activity_statement"]["corroborates"].append("r1_r2_cancelled_at_ib")),
-            ("source added", lambda g: g["sources"].update(runner_log={"checks": [], "corroborates": ["no_fill"]})),
+            ("source added", lambda g: g["sources"].update(runner_log={"required": False, "checks": [],
+                                                                        "corroborates": ["no_fill"]})),
             ("sources not an object", lambda g: g.update(sources=[])),
             ("block removed", lambda g: g.clear()),
+            ("api log made optional", lambda g: g["sources"]["gateway_api_message_log"].update(required=False)),
+            ("statement made required", lambda g: g["sources"]["ibkr_activity_statement"].update(required=True)),
+            ("statement named as the required source", lambda g: g.update(required_sources=["ibkr_activity_statement"])),
+            ("required sources removed", lambda g: g.pop("required_sources")),
+            ("claims may rest on the observer", lambda g: g.update(every_run_claim_corroborated=False)),
+            ("claim dropped from run_claims", lambda g: g["run_claims"].remove("p1_p2_never_reached_ib")),
+            ("future skew widened", lambda g: g.update(max_future_skew_seconds=86400)),
         ]
         for label, change in weakened:
             with self.subTest(label=label):
@@ -1085,9 +1106,64 @@ class RunCommand(_RunHarness):
         self.assertEqual((code, printed["status"]), (0, "ready"))
         self.assertEqual(sc.calls, ["check", "contender"])
         self.assertNotIn(FAKE_ACCOUNT, out.call_args[0][0])
+        again = LA.acquire_lock()  # preflight released the run lock on its way out
+        self.assertIsNotNone(again)
+        again.close()
         with mock.patch("builtins.print") as out:
             code = LA.main(["preflight", "--port", "4001", "--state-dir", str(self.state)], versions_fn=lambda: dict(PINNED))
         self.assertEqual((code, json.loads(out.call_args[0][0])["status"]), (3, "refused_live_port"))
+
+    def _preflight(self, state, check_fn, contender_fn):
+        with mock.patch("builtins.print") as out:
+            code = LA.main(["preflight", "--state-dir", str(state)], check_fn=check_fn, contender_fn=contender_fn,
+                           now_fn=lambda: WEDNESDAY_10AM, versions_fn=lambda: dict(PINNED))
+        return code, json.loads(out.call_args[0][0])
+
+    def test_preflight_and_a_run_never_overlap(self):
+        # Regression (second review of PR #280): preflight did not look at the run lock, so a
+        # preflight during a run connected client 98 and a contender on 93, the run's own ids.
+        def no_connection(*args, **kwargs):
+            raise AssertionError("preflight connected while a run held the lock")
+
+        lock = LA.acquire_lock()  # a run in progress, with any state directory
+        try:
+            code, out = self._preflight(self.d / "another-state", no_connection, no_connection)
+            self.assertEqual((code, out["status"]), (3, "refused_concurrent_run"))
+        finally:
+            lock.close()
+        # Discriminating control: the same preflight with the lock free connects and is ready,
+        # and while it connects it holds the lock, so a run started then is refused.
+        sc = Scenario(self.d)
+        seen = []
+
+        def check_fn(plan, port, *, with_session, deadline_s=None):
+            probe = LA.acquire_lock()
+            seen.append(probe is None)
+            if probe is not None:
+                probe.close()
+            return sc.check_fn(plan, port, with_session=with_session, deadline_s=deadline_s)
+
+        code, out = self._preflight(self.d / "another-state", check_fn, sc.contender_fn)
+        self.assertEqual((code, out["status"], seen, sc.calls), (0, "ready", [True], ["check", "contender"]))
+        code, r, run_sc = self.run_cli()  # the lock is free again once preflight returned
+        self.assertEqual((code, r["status"]), (0, "passed"))
+
+    def test_preflight_rereads_the_latch_under_the_lock(self):
+        real = LA.acquire_lock
+
+        def lock_after_a_run_ended():
+            LA.KillSwitch().engage("NTA-JUST-ENDED", "acceptance case B2")
+            return real()
+
+        def no_connection(*args, **kwargs):
+            raise AssertionError("preflight connected despite an engaged latch")
+
+        with mock.patch.object(LA, "acquire_lock", lock_after_a_run_ended):
+            code, out = self._preflight(self.state, no_connection, no_connection)
+        self.assertEqual((code, out["status"]), (3, "refused_kill_switch_engaged"))
+        again = LA.acquire_lock()  # the refusal released the lock
+        self.assertIsNotNone(again)
+        again.close()
 
 
 # --------------------------------------------------------------------------- gate-receipt (the builder)
@@ -1133,12 +1209,16 @@ class GateReceiptBuilder(_RunHarness):
         path.write_text(json.dumps(rec, indent=2) + "\n")
         return path
 
-    def build(self, *corroborations, steps=None, repo_root="tmp"):
+    def build(self, *corroborations, steps=None, repo_root="tmp", now=None):
+        """now is the builder's clock; by default two days after the run finished, later than
+        every time a default record reports."""
+        now = now or datetime.fromisoformat(self.steps["finished_at"]) + timedelta(days=2)
         argv = ["gate-receipt", "--steps-receipt", str(steps or self.receipt)]
         for path in corroborations:
             argv += ["--corroboration", str(path)]
         with mock.patch("builtins.print") as out:
-            code = LA.main(argv, gate_path=str(self.gate), repo_root=self.d if repo_root == "tmp" else repo_root)
+            code = LA.main(argv, gate_path=str(self.gate), repo_root=self.d if repo_root == "tmp" else repo_root,
+                           now_fn=lambda: now)
         return code, json.loads(out.call_args[0][0])
 
     def test_only_a_passing_corroboration_record_writes_the_gate_receipt(self):
@@ -1170,13 +1250,20 @@ class GateReceiptBuilder(_RunHarness):
         code, out = self.build(path)
         self.assertEqual((code, out["status"]), (3, "refused_gate_receipt_exists"))
 
-    def test_an_activity_statement_alone_leaves_the_cancel_and_probe_claims_on_the_observer(self):
-        code, out = self.build(self.write(self.record("ibkr_activity_statement")))
-        self.assertEqual((code, out["status"]), (0, "passed"), out)
-        gate = json.loads(self.gate.read_text())
-        self.assertEqual(gate["corroboration"]["claims_corroborated"], ["no_fill", "flat_at_end"])
-        self.assertEqual(gate["corroboration"]["claims_on_the_in_process_observer_only"],
+    def test_an_activity_statement_alone_is_refused_as_uncorroborated(self):
+        # Regression (second review of PR #280): a statement-only record wrote status passed,
+        # although no fill and a flat account are expected from orders resting at half the bid
+        # whether or not the kill switch worked. It now writes nothing.
+        statement = self.write(self.record("ibkr_activity_statement"), "statement.json")
+        code, out = self.build(statement)
+        self.assertEqual((code, out["status"]), (3, "refused_claims_uncorroborated"), out)
+        self.assertEqual(out["missing_sources"], ["gateway_api_message_log"])
+        self.assertEqual(out["claims_on_the_in_process_observer_only"],
                          ["no_duplicate_submission", "r1_r2_cancelled_at_ib", "p1_p2_never_reached_ib"])
+        self.assertFalse(self.gate.exists())
+        # Discriminating control: the same statement with the API message log record passes.
+        code, out = self.build(self.write(self.record(), "api.json"), statement)
+        self.assertEqual((code, out["status"], out["claims_on_the_in_process_observer_only"]), (0, "passed", []), out)
 
     def test_both_sources_together_and_one_record_per_source(self):
         api = self.write(self.record(), "api.json")
@@ -1189,6 +1276,43 @@ class GateReceiptBuilder(_RunHarness):
         gate = json.loads(self.gate.read_text())
         self.assertEqual([r["source_kind"] for r in gate["corroboration"]["records"]],
                          ["gateway_api_message_log", "ibkr_activity_statement"])
+        self.assertEqual((gate["corroboration"]["claims_corroborated"],
+                          gate["corroboration"]["claims_on_the_in_process_observer_only"]), (list(LA.RUN_CLAIMS), []))
+
+    def test_record_times_later_than_the_builders_clock_are_refused(self):
+        # Regression (second review of PR #280): retrieved_at and observed_at had no upper bound,
+        # so a record dated 30 days after the run, or a statement "retrieved tomorrow" on the run's
+        # own date, built a gate receipt.
+        finished = datetime.fromisoformat(self.steps["finished_at"])
+        month = self.write(self.record(source__retrieved_at=(finished + timedelta(days=30)).isoformat(),
+                                       observer__observed_at=(finished + timedelta(days=30, minutes=5)).isoformat()),
+                           "api-month.json")
+        code, out = self.build(month, now=finished + timedelta(days=2))
+        self.assertEqual((code, out["status"]), (3, "refused_corroboration_invalid"))
+        self.assertTrue(any("source.retrieved_at must not be later than the builder's clock" in r for r in out["reasons"]))
+        self.assertTrue(any("observer.observed_at must not be later than the builder's clock" in r for r in out["reasons"]))
+        self.assertFalse(self.gate.exists())
+        observed_ahead = self.write(self.record(observer__observed_at=(finished + timedelta(hours=3)).isoformat()),
+                                    "api-observed-ahead.json")
+        code, out = self.build(observed_ahead, now=finished + timedelta(hours=1))
+        self.assertEqual(out["reasons"], ["observer.observed_at must not be later than the builder's clock plus 300 s"])
+        # A same-day statement dated tomorrow: the builder runs on the run's own date.
+        api = self.write(self.record(), "api.json")  # retrieved 5 min and observed 10 min after the run
+        tomorrow = self.write(self.record("ibkr_activity_statement"), "statement-tomorrow.json")
+        code, out = self.build(api, tomorrow, now=finished + timedelta(hours=1))
+        self.assertEqual((code, out["status"], out["path"]), (3, "refused_corroboration_invalid", "statement-tomorrow.json"))
+        self.assertTrue(any("source.retrieved_at must not be later than the builder's clock" in r for r in out["reasons"]))
+        self.assertFalse(self.gate.exists())
+        # Within the skew still counts: clocks of two sessions may differ a little.
+        code, out = self.build(api, now=finished + timedelta(minutes=10) - timedelta(seconds=LA.MAX_FUTURE_SKEW_SECONDS))
+        self.assertEqual((code, out["status"]), (0, "passed"), out)
+        self.gate.unlink()
+        # Discriminating control: the same records pass once the builder's clock is past them.
+        code, out = self.build(month, now=finished + timedelta(days=31))
+        self.assertEqual((code, out["status"]), (0, "passed"), out)
+        self.gate.unlink()
+        code, out = self.build(api, tomorrow, now=finished + timedelta(days=2))
+        self.assertEqual((code, out["status"]), (0, "passed"), out)
 
     def test_invalid_records_are_refused(self):
         finished = datetime.fromisoformat(self.steps["finished_at"])
@@ -1291,6 +1415,16 @@ class GateReceiptBuilder(_RunHarness):
     def test_the_receipt_function_itself_needs_a_corroboration(self):
         with self.assertRaises(ValueError):
             LA.gate_receipt(PLAN, self.steps, self.receipt, [], [], self.d)
+        statement_only = [{"source_kind": "ibkr_activity_statement", "corroborates": ["no_fill", "flat_at_end"]}]
+        with self.assertRaises(ValueError):
+            LA.gate_receipt(PLAN, self.steps, self.receipt, [], statement_only, self.d)
+        self.assertEqual(LA.uncorroborated(statement_only),
+                         (["gateway_api_message_log"], ["no_duplicate_submission", "r1_r2_cancelled_at_ib",
+                                                        "p1_p2_never_reached_ib"]))
+        api = [{"source_kind": "gateway_api_message_log", "corroborates": list(LA.RUN_CLAIMS)}]
+        self.assertEqual(LA.uncorroborated(api), ([], []))
+        self.assertEqual(LA.gate_receipt(PLAN, self.steps, self.receipt, [], api, self.d)["corroboration"]
+                         ["claims_on_the_in_process_observer_only"], [])
 
 
 DELETE = object()
@@ -1457,6 +1591,8 @@ class SourceSafety(unittest.TestCase):
                                 and n.name == "cmd_gate_receipt"))
         self.assertLess(body.index("corroboration_errors"), body.index("gate_receipt(plan"))
         self.assertLess(body.index("steps_receipt_errors"), body.index("gate_receipt(plan"))
+        # Second review of PR #280: the claim-coverage refusal precedes the build.
+        self.assertLess(body.index("refused_claims_uncorroborated"), body.index("gate_receipt(plan"))
 
     def test_the_builder_connects_to_nothing(self):
         node = next(n for n in ast.walk(self.tree) if isinstance(n, ast.FunctionDef) and n.name == "cmd_gate_receipt")
@@ -1472,7 +1608,12 @@ class SourceSafety(unittest.TestCase):
         for call in self._named_calls("KillSwitch"):
             self.assertEqual([k.arg for k in call.keywords], ["legacy_dirs"], ast.unparse(call))
             self.assertEqual(call.args, [])
-        self.assertEqual([ast.unparse(c) for c in self._named_calls("acquire_lock")], ["acquire_lock()"])
+        # run and (second review of PR #280) preflight take the same frozen lock.
+        self.assertEqual(sorted((self._enclosing(c), ast.unparse(c)) for c in self._named_calls("acquire_lock")),
+                         [("cmd_preflight", "acquire_lock()"), ("cmd_run", "acquire_lock()")])
+        preflight = ast.unparse(next(n for n in ast.walk(self.tree) if isinstance(n, ast.FunctionDef)
+                                     and n.name == "cmd_preflight"))
+        self.assertLess(preflight.index("acquire_lock()"), preflight.index("_checks_before_orders"))
 
     def test_no_heavy_imports_at_module_level(self):
         for node in self.tree.body:

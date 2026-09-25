@@ -9,8 +9,10 @@ but the gate stays `not_established` because steps 2-4 need NautilusTrader
 native paper stock orders, which were blocked on the pinned rc5 path (see "Blockers").
 Since 2026-09-25 a dated keep-but-compare record
 (`docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md`) selects
-NautilusTrader 1.231.0's Python adapter for local acceptance. The remaining
-steps run through `local_acceptance.py` (see "Steps 2-4: local acceptance runner").
+NautilusTrader 1.231.0's Python adapter (official `ibapi` 10.45.1) for local
+acceptance, as the user decided on 2026-09-25, keep-but-compare against the first
+2.0.x release that contains nautilus_trader#5041. The remaining steps run through
+`local_acceptance.py` (see "Steps 2-4: local acceptance runner").
 
 ## Probes
 
@@ -194,6 +196,9 @@ It refuses by default:
   prerequisite receipts, an unpinned runtime (anything but 1.231.0 on
   ibapi 10.45.1) and a start outside the session window are all refused. The
   latch and the run lock are per account, not per `--state-dir` (see below).
+- `preflight` holds the same run lock while it connects (client 98 and a
+  contender on 93, the ids a run uses). A preflight during a run is refused as
+  `refused_concurrent_run`, and so is a run started during a preflight.
 
 Every order is a non-marketable resting limit, with at most four orders per run
 and two of them reaching IB. The runner has no marketable or flattening order.
@@ -222,8 +227,9 @@ only when:
   `../ibkr-paper-orders/evidence/receipt-20260923-passed.json`) exist with status
   `passed`, and the version-selection record exists,
 - the steps receipt and every corroboration record lie inside the repository, and
-- at least one independent corroboration record for the same run passes every
-  check of its source (see "Independent corroboration" below).
+- independent corroboration records for the same run, one of them from the
+  Gateway API message log, pass every check of their sources and together
+  corroborate every run claim (see "Independent corroboration" below).
 
 That receipt makes the gate a flip candidate only. The flip itself stays a
 manual, dated commit after qualification.
@@ -248,9 +254,10 @@ manual, dated commit after qualification.
    - **Master API client ID: empty** (IBC `OverrideTwsMasterClientID=` empty), or
      any id outside 93-98. The node must see only its own orders.
    - **Create API message log file: on.** The Gateway then writes
-     `api.<clientId>.<weekday>.log`, the recommended source for the run's
+     `api.<clientId>.<weekday>.log`, the required source for the run's
      independent corroboration (see below). It logs only while this is on, so
-     switch it on before the run.
+     switch it on before the run: without the log no gate receipt can be built
+     for the run.
 4. Sign out of every other session of the same username (Client Portal, mobile
    trading, another TWS). A competing session gets IB 10197, which means no
    quotes, so A1 never submits and the run ends `incomplete`.
@@ -285,7 +292,8 @@ live in one frozen per-account directory,
 account's home directory from the password database, not `$HOME`,
 `XDG_STATE_HOME` or `--state-dir` (latch and lock 0600, directory 0700). So a
 run or preflight with any `--state-dir` sees an engaged latch and a concurrent
-run. A latch file that an earlier revision of this runner wrote under a state
+run: `run` holds the lock for the whole run, and `preflight` holds it while it
+connects. A latch file that an earlier revision of this runner wrote under a state
 directory also counts as engaged, and `kill-switch clear` removes it too (pass
 that `--state-dir` to `kill-switch`).
 
@@ -326,17 +334,26 @@ needs IB's own records, read after the run by a session that did not start it
 (another agent session or the user), with a read-only method outside
 `local_acceptance.py`.
 
-| Source | Run claims it corroborates | Checks the record must report `true` |
-|---|---|---|
-| Gateway API message log (recommended) | all: no duplicate submission, R1 and R2 cancelled at IB, P1 and P2 never reached IB, no fill, flat at the end | `r1_r2_each_sent_once`, `r1_r2_cancelled_by_ib`, `p1_p2_never_sent`, `no_execution_of_the_run`, `flat_at_end` |
-| Next-day IBKR activity statement | no fill, flat at the end (a statement lists trades and positions, not unfilled orders) | `paper_account_statement`, `no_trade_in_symbol_on_run_date`, `no_position_in_symbol_at_end_of_run_date` |
+| Source | Needed for the gate receipt | Run claims it corroborates | Checks the record must report `true` |
+|---|---|---|---|
+| Gateway API message log | **required** | all: no duplicate submission, R1 and R2 cancelled at IB, P1 and P2 never reached IB, no fill, flat at the end | `r1_r2_each_sent_once`, `r1_r2_cancelled_by_ib`, `p1_p2_never_sent`, `no_execution_of_the_run`, `flat_at_end` |
+| Next-day IBKR activity statement | optional, in addition to the API log only | no fill, flat at the end (a statement lists trades and positions, not unfilled orders) | `paper_account_statement`, `no_trade_in_symbol_on_run_date`, `no_position_in_symbol_at_end_of_run_date` |
+
+Every run claim must be corroborated; none may rest on the in-process observer
+alone (plan revision 3, `receipt.gate_receipt.corroboration`). Every order rests
+at half the bid, so no fill and a flat account are expected whether or not the
+kill switch worked: a statement showing them cannot tell a working kill switch
+from a failed one. Only the API message log shows the cancels, the probes that
+never left and the absence of a duplicate submission, so without its record the
+builder refuses (`refused_claims_uncorroborated`, nothing written).
 
 **Gateway API message log.** IB documents that the Gateway writes
 `api.[clientId].[day].log` in its settings folder while **Create API message log
 file** is on, that since TWS build 977 these logs are encrypted locally and can
-be decrypted for review from the associated Gateway session, and that Ctrl-Alt-U
-shows the log folder ([TWS API support: API logs](https://interactivebrokers.github.io/tws-api/support.html)).
-The export steps on Gateway 10.50 are not verified here.
+be decrypted for review from the associated Gateway session, that Ctrl-Alt-U
+shows the log folder, and that IB Gateway shows its logs under **File > Gateway
+Logs** ([TWS API support: API logs](https://interactivebrokers.github.io/tws-api/support.html),
+re-read 2026-09-25). The export steps on Gateway 10.50 are not verified here.
 
 1. Switch the log on before the run (see "What you do first").
 2. After the run, from the same Gateway session, decrypt the logs of client ids
@@ -354,8 +371,8 @@ trade date from IBKR's statements (Client Portal statements, Period Daily; see
 retrieved on a later date and kept private. Confirm that it is the paper
 account's statement and that it lists no SPY trade that day and no SPY position
 at its end. Whether IBKR issues it for this paper account is not verified here.
-With the statement as the only source, the cancel and probe claims stay on the
-in-process observer, and the gate receipt says so.
+It is an optional second record next to the API log record; on its own it
+cannot make a gate receipt.
 
 Commit one corroboration record per source next to the steps receipt, for
 example `evidence/corroboration-<run_prefix>-api-log.json`:
@@ -393,8 +410,8 @@ nothing:
   --corroboration blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/corroboration-<run_prefix>-api-log.json
 ```
 
-Give `--corroboration` twice to bind both sources. The builder refuses (exit 3,
-nothing written):
+Give `--corroboration` a second time to add the activity statement record. The
+builder refuses (exit 3, nothing written):
 
 - a steps receipt whose phases, checkpoints or final observer did not pass,
 - a plan changed since the run, or a missing prerequisite,
@@ -402,12 +419,17 @@ nothing written):
   sha256, retrieved and observed after the run finished, a separate session that
   did not start the run, and for a statement the run's trade date retrieved on a
   later New York date,
-- two records of one source, and
+- a record whose `retrieved_at` or `observed_at` is later than the builder's own
+  clock plus 300 s (a retrieval that has not happened yet),
+- two records of one source,
+- no API message log record, or any run claim left uncorroborated
+  (`refused_claims_uncorroborated`), and
 - an existing gate receipt.
 
 The gate receipt binds the steps receipt and each record by sha256 and lists the
-run claims that were corroborated and those that rest on the in-process observer
-alone. Commit it with the records for independent qualification.
+corroborated run claims, which are all of them, so its
+`claims_on_the_in_process_observer_only` is always empty. Commit it with the
+records for independent qualification.
 
 ### Tests
 
@@ -420,8 +442,10 @@ The tests are offline and synthetic.
 
 - With plain `python3` they cover plan validation, the refusals, the latch and
   lock (the frozen per-account path, a legacy latch, a run with another
-  `--state-dir`), the verdicts, the phase handshake, the steps receipt, the
-  gate-receipt builder with its corroboration checks, and source checks.
+  `--state-dir`, a preflight during a run and a run during a preflight), the
+  verdicts, the phase handshake, the steps receipt, the gate-receipt builder
+  with its corroboration checks (the required API log record, claim coverage,
+  record times against the builder's clock), and source checks.
 - Under the 1.231.0 environment, the strategy also runs in a `BacktestEngine`
   against a simulated ARCA venue. That covers the phase A order flow with R2
   left working, and the real 1.231.0 risk engine denying P1/P2 with
