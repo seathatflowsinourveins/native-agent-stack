@@ -3451,8 +3451,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "25573c73964d92088cb5e02aaab9ee97b5ff9ac4a415b555b2181be508db6e9c",
-      "bytes": 6229
+      "sha256": "9dab7b2029d6ac8cc1f452bf2970a7471e7ea62f22b77b0649d347a0eb51a293",
+      "bytes": 6604
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",

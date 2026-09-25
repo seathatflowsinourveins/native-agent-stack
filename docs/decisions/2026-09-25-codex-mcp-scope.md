@@ -192,6 +192,8 @@ These checks ran on `nativestack-5975wx-20260925` after the ai-memory 2.4.0 prod
    - mismatched: rtk, markitdown, ai-memory, mcporter. These are the host moves ahead of their pin-move PRs: rtk 0.50.0, markitdown 0.1.8, ai-memory 2.4.0 and mcporter 0.14.1, applied by the cleanup session. The check reports intended divergence until the pins move.
    - unchecked: context-mode, repomix, headroom, toon, ccusage, serena, socraticode. context-mode's probe is `npm-metadata`, and the others have no entry in `adoption/pins-linux-x86_64.json`, which is the bootstrap-completion follow-up.
 
+**Addendum, 2026-09-25, later.** headroom's user-scope registration, in this host's Codex and Claude configs and in the Codex template, now sets `HEADROOM_OFFLINE=1` and `DO_NOT_TRACK=1`. headroom-ai 0.37.0 enables its usage beacon by default, and `HEADROOM_OFFLINE` switches off all its egress (see `offline.py` and `telemetry/beacon.py` in the installed package). `codex mcp get headroom --json` lists both variable names, and the server still serves its three tools. headroom stays on 0.37.0: the 0.39.0 qualification found its log summaries lossy, with a misleading omission count.
+
 ## Evidence class
 
 **`native_proven` for the wiring change** (steps 1–3 above, on the real host). For `--pinned-versions`, the evidence is `synthetic` (54 unit tests in `tests/test_adoption_status.py`, run on this branch) plus the native run in step 4. The ai-memory workspace/project-name resolution for worktree agents (`.ai-memory.toml` is untracked) remains a named residual; it does not affect registration.

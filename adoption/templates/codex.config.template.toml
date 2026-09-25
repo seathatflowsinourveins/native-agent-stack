@@ -55,6 +55,13 @@ SEARCH_DEFAULT_LIMIT = "3"
 command = "${ECO_ROOT}/bin/headroom"
 args = ["mcp", "serve", "--proxy-url", "http://127.0.0.1:1"]
 
+# headroom-ai 0.37.0 turns its usage beacon on by default (telemetry/beacon.py BEACON_DEFAULT_ON).
+# HEADROOM_OFFLINE is its master no-egress switch (offline.py): beacon, update check, usage reporter and
+# model downloads off. DO_NOT_TRACK also disables the beacon if a later release renames that switch.
+[mcp_servers.headroom.env]
+HEADROOM_OFFLINE = "1"
+DO_NOT_TRACK = "1"
+
 [mcp_servers.codebase-memory]
 command = "${ECO_ROOT}/bin/codebase-memory-mcp"
 
