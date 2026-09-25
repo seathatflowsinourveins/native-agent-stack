@@ -1,0 +1,604 @@
+#!/usr/bin/env python3
+"""Guarded reaper for orphaned openai-codex Claude Code plugin brokers.
+
+The openai-codex plugin (`app-server-broker.mjs serve --endpoint unix:<sock>`)
+starts one detached broker per workspace and records it in that workspace's
+plugin-data state directory as `broker.json` (endpoint, pidFile, logFile,
+sessionDir, pid) beside `state.json` (jobs[] with status/workspaceRoot/
+sessionId). Only the main session's SessionEnd hook
+(`scripts/session-lifecycle-hook.mjs` -> `scripts/lib/broker-lifecycle.mjs`
+`sendBrokerShutdown`) ever shuts a broker down, so a crashed session or an
+abandoned workflow-child worktree leaves its broker (and the `codex
+app-server` child it owns) running indefinitely. Upstream
+(openai/codex-plugin-cc) tracks this: issues #543, #605, #380, #767, #743
+(pid reuse -> wrong process), open PRs #680 (idle timeout), #660 (reap
+leaked sessions), #490; nothing merged as of 2026-09-25.
+
+This tool never guesses: a broker is stopped only when every one of these
+holds, each checked directly against the live process and the plugin's own
+recorded state rather than assumed --
+  (a) `/proc/<pid>/cmdline` still names `app-server-broker.mjs` and `serve`
+      with the *same* recorded endpoint (guards pid reuse, upstream #743);
+  (b) no job in its `state.json` has a non-terminal status. The plugin's own
+      status vocabulary (`scripts/lib/tracked-jobs.mjs`,
+      `scripts/lib/job-control.mjs`, `scripts/session-lifecycle-hook.mjs` in
+      openai-codex 1.0.6) is exactly {queued, running} (non-terminal) and
+      {completed, failed, cancelled} (terminal); anything else -- missing,
+      null, or a status this tool has never seen -- is treated as
+      non-terminal so an unrecognized future status blocks reaping instead
+      of being reaped by default;
+  (c) the broker's workspace directory no longer exists, or no live
+      `claude`/`codex` process has a cwd equal to or under it. The
+      workspace root is read from the *broker's own* `/proc/<pid>/cwd`
+      (the OS's live ground truth for the directory `app-server-broker.mjs`
+      was spawned with -- see `spawnBrokerProcess` in `broker-lifecycle.mjs`,
+      which sets the child's OS cwd to the workspace), not reconstructed
+      from `state.json`, which can be empty for a broker that started but
+      never ran a job;
+  (d) the broker process is older than `--min-age` (default 1800s), computed
+      from `/proc/<pid>/stat` field 22 (starttime, in clock ticks since
+      boot) plus `/proc/uptime`, not a filesystem mtime.
+
+Action on an eligible broker: send the `broker/shutdown` JSON-RPC
+(`{"id":1,"method":"broker/shutdown","params":{}}\n`) over its unix socket
+(5s timeout), then wait up to 15s for the broker pid and the OS children it
+had at that moment (its `codex app-server`) to exit. This tool never sends
+SIGKILL. `--escalate` is opt-in: only after that wait fails, and only after
+re-checking guard (a) (the pid could have been reused in the interim), it
+sends SIGTERM to the broker's own process group (Node's `detached: true`
+spawn makes the broker its own process-group leader) and waits again.
+
+`--list` (the default) makes no changes: it reports the same per-broker
+guard evaluation `--apply` would use, so an operator can see what would
+happen. `--receipt PATH` writes the same JSON report to a file as well as
+stdout, in both modes.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import signal
+import socket
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+PROG = "codex-broker-reaper"
+DEFAULT_MIN_AGE_SECONDS = 1800.0
+RPC_TIMEOUT_SECONDS = 5.0
+EXIT_WAIT_SECONDS = 15.0
+POLL_INTERVAL_SECONDS = 0.25
+
+# openai-codex 1.0.6 job status vocabulary (scripts/lib/tracked-jobs.mjs,
+# scripts/lib/job-control.mjs, scripts/session-lifecycle-hook.mjs). Anything
+# not in TERMINAL_JOB_STATUSES -- including a status this list has never
+# seen -- is treated as active, never as terminal.
+NON_TERMINAL_JOB_STATUSES = {"queued", "running"}
+TERMINAL_JOB_STATUSES = {"completed", "failed", "cancelled"}
+
+CLAUDE_OR_CODEX_NAMES = {"claude", "codex"}
+
+
+# --------------------------------------------------------------------------
+# /proc helpers. Every one of these returns None (never raises) when the
+# process is gone or the field is unreadable, so callers treat "unknown" as
+# "guard not satisfied" rather than crashing the whole run over one broker.
+# --------------------------------------------------------------------------
+
+def iter_pids() -> list[int]:
+    try:
+        return [int(name) for name in os.listdir("/proc") if name.isdigit()]
+    except OSError:
+        return []
+
+
+def process_exists(pid: int) -> bool:
+    return Path(f"/proc/{pid}").is_dir()
+
+
+def read_proc_cmdline(pid: int) -> list[str] | None:
+    try:
+        raw = Path(f"/proc/{pid}/cmdline").read_bytes()
+    except OSError:
+        return None
+    if not raw:
+        return None
+    parts = raw.split(b"\0")
+    if parts and parts[-1] == b"":
+        parts.pop()
+    if not parts:
+        return None
+    return [part.decode("utf-8", "surrogateescape") for part in parts]
+
+
+def read_proc_comm(pid: int) -> str | None:
+    try:
+        return Path(f"/proc/{pid}/comm").read_text().strip()
+    except OSError:
+        return None
+
+
+def read_proc_cwd(pid: int) -> str | None:
+    """The process's live OS working directory, or None if it can't be read.
+
+    A directory removed while a process still holds it open reads back with
+    a trailing " (deleted)" marker; that marker is stripped, and the
+    (now-nonexistent) path is still returned so callers can observe "no
+    longer exists" through the normal `os.path.isdir` check.
+    """
+    try:
+        target = os.readlink(f"/proc/{pid}/cwd")
+    except OSError:
+        return None
+    suffix = " (deleted)"
+    if target.endswith(suffix):
+        target = target[: -len(suffix)]
+    return target or None
+
+
+def process_start_epoch(pid: int, *, reference: float | None = None) -> float | None:
+    """Wall-clock start time of `pid`, from /proc/<pid>/stat's starttime.
+
+    starttime (field 22, in clock ticks since boot) is parsed after the
+    comm field's closing paren, since comm can itself contain spaces or
+    parentheses. /proc/uptime anchors ticks-since-boot to wall clock.
+    """
+    try:
+        uptime_seconds = float(Path("/proc/uptime").read_text().split()[0])
+        stat_raw = Path(f"/proc/{pid}/stat").read_text()
+    except (OSError, ValueError, IndexError):
+        return None
+    close = stat_raw.rfind(")")
+    if close == -1:
+        return None
+    fields = stat_raw[close + 2:].split()
+    if len(fields) < 20:
+        return None
+    try:
+        starttime_ticks = float(fields[19])  # field 22 overall; see docstring
+    except ValueError:
+        return None
+    clk_tck = os.sysconf("SC_CLK_TCK") or 100
+    now = reference if reference is not None else time.time()
+    boot_epoch = now - uptime_seconds
+    return boot_epoch + starttime_ticks / clk_tck
+
+
+def process_parent_pid(pid: int) -> int | None:
+    try:
+        stat_raw = Path(f"/proc/{pid}/stat").read_text()
+    except OSError:
+        return None
+    close = stat_raw.rfind(")")
+    if close == -1:
+        return None
+    fields = stat_raw[close + 2:].split()
+    if len(fields) < 2:
+        return None
+    try:
+        return int(fields[1])  # field 4 (ppid) overall; see process_start_epoch
+    except ValueError:
+        return None
+
+
+def collect_child_pids(pid: int) -> list[int]:
+    return [candidate for candidate in iter_pids() if process_parent_pid(candidate) == pid]
+
+
+def is_claude_or_codex_process(pid: int) -> bool:
+    """True when `pid` looks like a live `claude` or `codex` process.
+
+    Checked on this host: the native Claude Code binary (~/.local/bin/claude,
+    an ELF executable, not a wrapper script) reports comm == "claude" and
+    argv[0]'s basename == "claude"; the packaged codex CLI binary is native
+    too. A Python-shebang script does NOT get its own name as comm (the
+    kernel rewrites comm to the interpreter's own basename for a script), so
+    tests simulating a live session set comm directly (see
+    tests/test_codex_broker_reaper.py) rather than relying on a script name.
+    """
+    comm = read_proc_comm(pid)
+    if comm in CLAUDE_OR_CODEX_NAMES:
+        return True
+    argv = read_proc_cmdline(pid)
+    if argv:
+        base = os.path.basename(argv[0])
+        if base in CLAUDE_OR_CODEX_NAMES:
+            return True
+    return False
+
+
+def path_is_under(candidate: str, root: str) -> bool:
+    candidate = os.path.normpath(candidate)
+    root = os.path.normpath(root)
+    return candidate == root or candidate.startswith(root + os.sep)
+
+
+def find_live_session_under(workspace_root: str, *, exclude_pids: frozenset[int] = frozenset()) -> int | None:
+    """pid of a live claude/codex process whose cwd is under `workspace_root`, or None."""
+    for pid in iter_pids():
+        if pid in exclude_pids:
+            continue
+        if not is_claude_or_codex_process(pid):
+            continue
+        cwd = read_proc_cwd(pid)
+        if cwd and path_is_under(cwd, workspace_root):
+            return pid
+    return None
+
+
+# --------------------------------------------------------------------------
+# Broker discovery and per-broker guard evaluation.
+# --------------------------------------------------------------------------
+
+def discover_state_roots(explicit_roots: list[str] | None) -> list[Path]:
+    """The plugin's per-workspace `state` directories.
+
+    `--state-root` (repeatable) takes each given path literally as a
+    `state` directory (a directory of `<workspace-slug>-<hash>` entries) and
+    replaces discovery entirely. Otherwise this globs
+    `~/.claude/plugins/data/*codex*/state`, matching every installed
+    openai-codex-family plugin data directory (observed on this host as
+    `codex-openai-codex`).
+    """
+    if explicit_roots:
+        return [Path(root) for root in explicit_roots]
+    home = Path(os.environ.get("HOME") or Path.home())
+    base = home / ".claude" / "plugins" / "data"
+    if not base.is_dir():
+        return []
+    roots = []
+    for entry in sorted(base.iterdir()):
+        if entry.is_dir() and "codex" in entry.name:
+            state_dir = entry / "state"
+            if state_dir.is_dir():
+                roots.append(state_dir)
+    return roots
+
+
+def discover_brokers(state_roots: list[Path]) -> list[Path]:
+    """Per-workspace state directories that hold a `broker.json`."""
+    brokers = []
+    for root in state_roots:
+        if not root.is_dir():
+            continue
+        for entry in sorted(root.iterdir()):
+            if entry.is_dir() and (entry / "broker.json").is_file():
+                brokers.append(entry)
+    return brokers
+
+
+def broker_cmdline_matches(argv: list[str] | None, endpoint: str) -> bool:
+    """Guard (a): still an app-server-broker.mjs serving this exact endpoint."""
+    if not argv:
+        return False
+    if not any("app-server-broker.mjs" in part for part in argv):
+        return False
+    if "serve" not in argv:
+        return False
+    for index, part in enumerate(argv):
+        if part == "--endpoint":
+            return index + 1 < len(argv) and argv[index + 1] == endpoint
+    return False
+
+
+def blocking_jobs(jobs: list) -> list[dict]:
+    """Guard (b): jobs whose status is missing, unrecognized, or non-terminal."""
+    blocking = []
+    for job in jobs:
+        if not isinstance(job, dict) or job.get("status") not in TERMINAL_JOB_STATUSES:
+            blocking.append(job if isinstance(job, dict) else {})
+    return blocking
+
+
+def evaluate_broker(broker_dir: Path, *, min_age: float, now: float) -> dict:
+    """Evaluate one broker directory against guards (a)-(d).
+
+    Always returns a fully-shaped record (same keys whether or not later
+    guards were reachable), so `--list` and `--apply` reports and the
+    receipt schema stay identical regardless of where evaluation stopped.
+    """
+    record: dict = {
+        "state_dir": str(broker_dir),
+        "broker_json": None,
+        "endpoint": None,
+        "pid": None,
+        "job_count": None,
+        "workspace_root": None,
+        "age_seconds": None,
+        "guards": {
+            "a_pid_cmdline_match": False,
+            "b_no_active_jobs": None,
+            "c_workspace_unused": None,
+            "d_min_age": None,
+        },
+        "reasons": [],
+        "eligible": False,
+        "action": "none",
+        "rpc_result": None,
+        "exit_observed": None,
+    }
+
+    broker_json_path = broker_dir / "broker.json"
+    try:
+        broker = json.loads(broker_json_path.read_text())
+    except (OSError, json.JSONDecodeError) as error:
+        record["reasons"].append(f"cannot read broker.json: {error}")
+        return record
+    record["broker_json"] = str(broker_json_path)
+
+    endpoint, pid = broker.get("endpoint"), broker.get("pid")
+    record["endpoint"], record["pid"] = endpoint, pid
+    if not isinstance(endpoint, str) or not endpoint or not isinstance(pid, int) or isinstance(pid, bool):
+        record["reasons"].append("broker.json is missing a string endpoint or an integer pid")
+        return record
+
+    argv = read_proc_cmdline(pid)
+    if argv is None:
+        record["reasons"].append(f"pid {pid} is not running")
+        return record
+    if not broker_cmdline_matches(argv, endpoint):
+        record["reasons"].append(
+            f"pid {pid} is alive but its cmdline no longer names app-server-broker.mjs serve "
+            f"--endpoint {endpoint} (guard against pid reuse, upstream #743)"
+        )
+        return record
+    record["guards"]["a_pid_cmdline_match"] = True
+    record["reasons"].append("guard a: pid is alive and its cmdline still matches this broker")
+
+    # Guard (b): every recorded job (if any) is in a terminal status.
+    state_path = broker_dir / "state.json"
+    jobs: list | None = []
+    if state_path.is_file():
+        try:
+            state = json.loads(state_path.read_text())
+            jobs = state.get("jobs") if isinstance(state, dict) else None
+            if not isinstance(jobs, list):
+                jobs = []
+        except (OSError, json.JSONDecodeError) as error:
+            record["reasons"].append(f"cannot read state.json ({error}); treating jobs as active")
+            jobs = None
+    record["job_count"] = len(jobs) if isinstance(jobs, list) else None
+    if jobs is None:
+        record["guards"]["b_no_active_jobs"] = False
+    else:
+        blocking = blocking_jobs(jobs)
+        record["guards"]["b_no_active_jobs"] = not blocking
+        if blocking:
+            ids = ", ".join(str(job.get("id", "?")) for job in blocking[:5])
+            record["reasons"].append(f"guard b failed: {len(blocking)} job(s) not in a terminal status ({ids})")
+        else:
+            record["reasons"].append("guard b: no job has a non-terminal status")
+
+    # Guard (c): workspace root, read from the broker's own live cwd.
+    workspace_root = read_proc_cwd(pid)
+    record["workspace_root"] = workspace_root
+    if workspace_root is None:
+        record["guards"]["c_workspace_unused"] = False
+        record["reasons"].append("guard c failed: could not read the broker's /proc/<pid>/cwd")
+    elif not os.path.isdir(workspace_root):
+        record["guards"]["c_workspace_unused"] = True
+        record["reasons"].append(f"guard c: workspace directory {workspace_root} no longer exists")
+    else:
+        blocker_pid = find_live_session_under(workspace_root, exclude_pids=frozenset({pid}))
+        if blocker_pid is None:
+            record["guards"]["c_workspace_unused"] = True
+            record["reasons"].append(f"guard c: no live claude/codex process has a cwd under {workspace_root}")
+        else:
+            record["guards"]["c_workspace_unused"] = False
+            record["reasons"].append(f"guard c failed: live pid {blocker_pid} has a cwd under {workspace_root}")
+
+    # Guard (d): process age.
+    started = process_start_epoch(pid, reference=now)
+    if started is None:
+        record["guards"]["d_min_age"] = False
+        record["reasons"].append("guard d failed: could not determine the broker's process start time")
+    else:
+        age = now - started
+        record["age_seconds"] = round(age, 3)
+        old_enough = age >= min_age
+        record["guards"]["d_min_age"] = old_enough
+        verdict = "guard d" if old_enough else "guard d failed"
+        record["reasons"].append(f"{verdict}: age {age:.0f}s, --min-age {min_age:.0f}s")
+
+    record["eligible"] = all(record["guards"].values())
+    return record
+
+
+# --------------------------------------------------------------------------
+# Action: broker/shutdown RPC, wait, optional SIGTERM escalation.
+# --------------------------------------------------------------------------
+
+def send_shutdown_rpc(endpoint: str, *, timeout: float | None = None) -> str:
+    # Resolved at call time (not as a default-argument value) so tests can
+    # shorten RPC_TIMEOUT_SECONDS/EXIT_WAIT_SECONDS by monkeypatching the
+    # module constant without needing every internal caller to thread a
+    # parameter through.
+    if timeout is None:
+        timeout = RPC_TIMEOUT_SECONDS
+    if not isinstance(endpoint, str) or not endpoint.startswith("unix:"):
+        return "unsupported_endpoint"
+    socket_path = endpoint[len("unix:"):]
+    if not socket_path:
+        return "unsupported_endpoint"
+    request = json.dumps({"id": 1, "method": "broker/shutdown", "params": {}}).encode("utf-8") + b"\n"
+    client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    client.settimeout(timeout)
+    try:
+        client.connect(socket_path)
+        client.sendall(request)
+        try:
+            data = client.recv(4096)
+            return "ok" if data else "closed"
+        except socket.timeout:
+            return "sent_no_reply"
+    except FileNotFoundError:
+        return "socket_missing"
+    except ConnectionRefusedError:
+        return "connection_refused"
+    except socket.timeout:
+        return "connect_timeout"
+    except OSError as error:
+        return f"error:{error}"
+    finally:
+        client.close()
+
+
+def wait_for_exit(pid: int, extra_pids: list[int], *, timeout: float | None = None) -> bool:
+    """Poll /proc for `pid` and `extra_pids` to disappear.
+
+    This only asks whether /proc/<pid> exists, not whether the process has
+    been reaped by a parent that called wait() on it: a zombie's /proc/<pid>
+    directory still exists until something reaps it. That distinction does
+    not matter for the orphaned brokers this tool targets -- by definition
+    their original parent (the session that spawned them) is already gone,
+    so the kernel already reparented them to init, which reaps its children
+    the instant they exit. A broker that is still a direct child of a live
+    parent would not be "orphaned" and would already fail guard (c).
+    """
+    if timeout is None:
+        timeout = EXIT_WAIT_SECONDS
+    watch = {pid, *extra_pids}
+    deadline = time.monotonic() + timeout
+    while True:
+        watch = {candidate for candidate in watch if process_exists(candidate)}
+        if not watch:
+            return True
+        if time.monotonic() >= deadline:
+            return False
+        time.sleep(POLL_INTERVAL_SECONDS)
+
+
+def stop_broker(record: dict, *, escalate: bool) -> None:
+    """Attempt to stop one eligible broker; mutates `record` in place."""
+    pid, endpoint = record["pid"], record["endpoint"]
+    children = collect_child_pids(pid)
+    record["rpc_result"] = send_shutdown_rpc(endpoint)
+    record["action"] = "rpc_shutdown"
+    exited = wait_for_exit(pid, children)
+    record["exit_observed"] = exited
+    if exited or not escalate:
+        if not exited:
+            record["reasons"].append(
+                "broker did not exit within the wait window after broker/shutdown; "
+                "--escalate was not given, so no signal was sent"
+            )
+        return
+
+    # Re-check guard (a): the pid must still be *this* broker before signaling it.
+    argv = read_proc_cmdline(pid)
+    if not broker_cmdline_matches(argv, endpoint):
+        record["reasons"].append(
+            "escalation skipped: pid no longer matches this broker on re-check (possible pid reuse)"
+        )
+        return
+
+    record["action"] = "escalated_sigterm"
+    try:
+        os.killpg(os.getpgid(pid), signal.SIGTERM)
+    except (ProcessLookupError, PermissionError, OSError) as error:
+        record["reasons"].append(f"escalation SIGTERM failed: {error}")
+        return
+    exited = wait_for_exit(pid, children)
+    record["exit_observed"] = exited
+    if not exited:
+        record["reasons"].append("broker's process group did not exit even after SIGTERM escalation")
+
+
+# --------------------------------------------------------------------------
+# Receipt, CLI.
+# --------------------------------------------------------------------------
+
+def mem_available_kib() -> int | None:
+    try:
+        for line in Path("/proc/meminfo").read_text().splitlines():
+            if line.startswith("MemAvailable:"):
+                return int(line.split()[1])
+    except (OSError, ValueError):
+        pass
+    return None
+
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog=PROG, description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--list", action="store_true", help="Dry run (default): evaluate and report, change nothing.")
+    mode.add_argument("--apply", action="store_true", help="Stop every eligible broker; still reports the rest.")
+    parser.add_argument("--min-age", type=float, default=DEFAULT_MIN_AGE_SECONDS, metavar="SECONDS",
+                         help=f"Minimum broker process age to be eligible (default {DEFAULT_MIN_AGE_SECONDS:g}).")
+    parser.add_argument("--receipt", type=Path, metavar="PATH",
+                         help="Also write the JSON report to PATH (parent directories are created).")
+    parser.add_argument("--state-root", action="append", dest="state_roots", metavar="PATH",
+                         help="Use this plugin 'state' directory literally instead of discovering "
+                              "~/.claude/plugins/data/*codex*/state (repeatable).")
+    parser.add_argument("--escalate", action="store_true",
+                         help="If broker/shutdown gets no exit within the wait window, re-check guard (a) "
+                              "and send SIGTERM to the broker's process group. Never sends SIGKILL.")
+    return parser
+
+
+def run(args: argparse.Namespace) -> tuple[dict, int]:
+    now = time.time()
+    mem_before = mem_available_kib()
+    state_roots = discover_state_roots(args.state_roots)
+    broker_dirs = discover_brokers(state_roots)
+    records = [evaluate_broker(broker_dir, min_age=args.min_age, now=now) for broker_dir in broker_dirs]
+
+    if args.apply:
+        for record in records:
+            if record["eligible"]:
+                stop_broker(record, escalate=args.escalate)
+        # Only meaningful once an action was actually attempted: --list
+        # leaves exit_observed None (not-attempted) on every record, even an
+        # eligible one, and that must never read as a stop failure.
+        failed = sum(1 for record in records if record["eligible"] and record["exit_observed"] is not True)
+        stopped = sum(1 for record in records if record["eligible"] and record["exit_observed"] is True)
+    else:
+        failed = 0
+        stopped = 0
+
+    mem_after = mem_available_kib()
+
+    receipt = {
+        "tool": PROG,
+        "generated_at": now_iso(),
+        "mode": "apply" if args.apply else "list",
+        "min_age_seconds": args.min_age,
+        "escalate": bool(args.escalate) and bool(args.apply),
+        "state_roots": [str(root) for root in state_roots],
+        "mem_available_kib_before": mem_before,
+        "mem_available_kib_after": mem_after,
+        "brokers": records,
+        "summary": {
+            "total": len(records),
+            "eligible": sum(1 for record in records if record["eligible"]),
+            "stopped": stopped,
+            "failed_to_stop": failed,
+        },
+    }
+    return receipt, failed
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_arg_parser()
+    args = parser.parse_args(argv)
+    if args.min_age < 0:
+        parser.error("--min-age must be >= 0")
+
+    receipt, failed = run(args)
+    text = json.dumps(receipt, indent=2, sort_keys=True)
+    print(text)
+    if args.receipt:
+        args.receipt.parent.mkdir(parents=True, exist_ok=True)
+        args.receipt.write_text(text + "\n", encoding="utf-8")
+    return 2 if failed else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
