@@ -316,6 +316,33 @@ two-symbol-vs-single-symbol isolation check and a determinism rerun --
 their docstrings record that both were verified failing against the
 original, unmodified (use-after-free) driver before the fix.
 
+## Independent re-check (2026-09-25)
+
+**Verdict: ready.** The reviewer ran its own oracle, from the first review, on the regenerated outcome files. All 8 configurations matched exactly: fill rate, agreement overall and per symbol, zero better-than-touch fills, and median time-to-fill. The fix was confirmed from the hftbacktest source:
+- the arrays stay alive until `close()`;
+- `elapse()` runs to exactly `cur_ts + duration`;
+- `qty − leaves_qty` is correct because an IOC expiry never zeroes `leaves_qty`.
+
+Its corrections are recorded here. The run's code and receipt bytes are left as produced, because the receipt pins their hashes.
+
+1. **Which tests really guard.** Only the two-symbol isolation test is a reliable regression guard: it failed 5 of 5 times with the use-after-free patched back in.
+   - The determinism test failed 5/5 when run alone but 0/5 after the isolation test in the same process, and 2/5 against the original driver.
+   - The exchange-model agreement test never failed with the bug present (0 of 10).
+   - All three are runtime-gated and skip in CI.
+2. **The residual Nautilus-to-oracle gap is short-sale rejects plus timing, not timing alone.** The receipt's `oracle_agreement.interpretation` says timing alone.
+   - Every exact_latency disagreement is a short-sale reject: orders 223, 295, 608 and 1400 at 70 ms, and 299 at 250 ms.
+   - In the primary runs, 3 of 5 (70 ms) and 2 of 4 (250 ms) are rejects; the others (641, 1368, 58 and 335) are timing.
+3. **Locked quotes changed no outcome.** `run_hftbacktest.py`'s comment says they changed "exactly one order's outcome" and points to a `locked_quote_note` that the receipt does not contain. One order, 574 (a SPY buy), arrived during a locked quote and still filled.
+4. **The CI-runnable tests pin the receipt, not the data.**
+   - This round pins hftbacktest's oracle agreement at its measured 100%, instead of the shared 99% floor.
+   - Two things remain open: the report attaches oracle agreement but does not enforce it when it is built, and `metrics.py` skips a fill that has no quote in force rather than counting it as a violation.
+5. **Nits.**
+   - The 99% threshold is this task's own, not the reviewer's.
+   - The difference between the two delay medians comes from counting all orders versus filled orders only.
+   - The release-timing citations are in `sim-paper-compare/replay_compare.py`'s module docstring (as `sim-capacity/README.md` says), not in `sim-crosscheck-hftbacktest/README.md`.
+
+The reviewer's scratch scripts are not retained. The items above are its measured findings, stated here.
+
 ## Limitations
 
 - Two latency points, two exchange models (plus one Nautilus timing

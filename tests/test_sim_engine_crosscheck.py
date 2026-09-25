@@ -285,9 +285,12 @@ class ReceiptStructureTests(unittest.TestCase):
         for label, entry in table.items():
             if not isinstance(entry, dict) or "overall_pct" not in entry:
                 continue  # skip the "method"/"interpretation" narrative keys
-            self.assertGreaterEqual(entry["overall_pct"], 99.0, label)
+            # hftbacktest's constant-latency, last-NBBO model is the oracle's own definition: its measured
+            # 100% is pinned so a regenerated receipt cannot drift below it unnoticed (independent re-check).
+            floor = 100.0 if label.startswith("hftbacktest") else 99.0
+            self.assertGreaterEqual(entry["overall_pct"], floor, label)
             for sym, pct in entry["by_symbol_pct"].items():
-                self.assertGreaterEqual(pct, 99.0, f"{label}/{sym}")
+                self.assertGreaterEqual(pct, floor, f"{label}/{sym}")
                 checked += 1
         self.assertGreater(checked, 0)
 

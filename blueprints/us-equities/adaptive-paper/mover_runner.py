@@ -211,10 +211,13 @@ async def recover_mover(controller, metadata, config):
 
 
 def make_book(plan, controller):
+    """The mover book on the controller's quotes. Its exits (and exit re-pricing) wait on
+    Controller.is_halted, the status stream and unexpired startup seed; its entries also
+    wait on the quote's own condition flag (the stored quote's halted)."""
     ledger = controller.ledger
-    return MoverBook(plan, positions=ledger.positions, quote=controller.quotes.get, limits=ledger.limits,
+    return MoverBook(plan, positions=ledger.positions, quote=controller.current_quote, limits=ledger.limits,
                      trial_id=plan.trial_id, existing_client_ids=[i.client_id for i in ledger.intents()],
-                     event_sink=controller.events.append)
+                     event_sink=controller.events.append, halted=controller.is_halted)
 
 
 async def run_mover(controller, plan, config, baseline_cash, *, account_fingerprint="simulation",
@@ -259,6 +262,12 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
                          account_id="ALPACA-PAPER-" + account_fingerprint[:16], trader_id="MOVER-001",
                          max_order_submit_rate="180/00:01:00", session_policy=session_policy,
                          log_directory=log_directory)
+    # A guarded order callback that raises stops the session (adapter_error): no
+    # further submit, the node stops and the caller recovers the residual.
+    strategy.fault_sink = session.fail
+    # E4: the startup halt seed (when command_paper configured one) is read while the
+    # node connects, for the symbols whose statuses the port streams; entries wait for it.
+    controller.start_halt_seed(list(getattr(port, "symbols", None) or plan.symbol_names()))
     task = asyncio.create_task(session.run_async())
     started = time.monotonic()
     last_reconciliation = started
@@ -294,7 +303,7 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
                 if reason is not None and force_reason is None:
                     force_reason = reason
                 strategy.enabled = (strategy.started and port.ready and force_reason is None
-                                    and now >= controller.defer_until)
+                                    and now >= controller.defer_until and not controller.halt_seed_pending())
                 fresh_quotes = [q for q in controller.quotes.values()
                                 if -.25 <= now - q.timestamp <= config["quote_max_age_seconds"]]
                 try:
@@ -341,6 +350,7 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
             strategy.enabled = False
             strategy.suspended = True
             controller.stop = True
+            await controller.stop_halt_seed()
             session.stop()
             try:
                 await asyncio.wait_for(task, 20)
@@ -357,6 +367,11 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
                "native_fill_events": strategy.native_fills, "native_rejections": strategy.native_rejections,
                "orders_submitted": strategy.submitted, "reconciliation": reconciliation,
                "startup_reconciliation": session.reconciliation, "adapter_errors": list(session.errors),
+               "execution_stats": dict(session.execution_stats),
+               "native_assertions": session.native_assertions(),
+               "average_invariant_mismatches": list(session.average_invariant_mismatches),
+               "callback_faults": list(strategy.callback_faults),
+               "halts": controller.halt_summary() if hasattr(controller, "halt_summary") else None,
                "flat": not ledger.positions() and not ledger.unresolved(),
                "force_reason": book.force_reason, "force_at": _iso(book.force_at),
                "handoff_to_recovery": handoff,
@@ -496,6 +511,12 @@ def build_receipt(*, plan, outcome, config_sha256, scan, ledger, ledger_before, 
         "unsellable_positions": list((outcome.get("recovery") or {}).get("unsellable_positions", [])),
         "adapter_errors": outcome.get("adapter_errors", []), "error_type": outcome.get("error_type"),
         "error_reason": outcome.get("error_reason"),
+        "callback_faults": outcome.get("callback_faults", []),
+        "execution_stats": outcome.get("execution_stats"),
+        # E2's native assertions; a false one is named in its overturn_signals.
+        "native_assertions": outcome.get("native_assertions"),
+        "average_invariant_mismatches": outcome.get("average_invariant_mismatches", []),
+        "halts": outcome.get("halts"),
         "foreign_terminal_orders_ignored": outcome.get("foreign_terminal_orders_ignored", 0),
         "native": {key: outcome.get(key) for key in ("engine", "native_quotes", "native_fill_events",
                                                    "native_rejections", "orders_submitted", "requests",
@@ -592,7 +613,7 @@ def command_paper(args):
     LAST_EVIDENCE_CLASS = "PAPER"
     if not TRIAL_ID.fullmatch(args.trial):
         raise ValueError("invalid_trial_id")
-    from transport import AlpacaPaperTransport, TransportError, preflight
+    from transport import AlpacaPaperTransport, TransportError, halt_statuses_supported, nasdaq_halt_seed, preflight
     config, limits, settings = load_mover_config(args.config)
     config_sha = _sha256(args.config.read_bytes())
     try:
@@ -708,6 +729,8 @@ def command_paper(args):
             controller_close, market_open = _controller_session(close, now, session_policy)
             controller = MoverController(ledger, controller_close, market_open=market_open,
                                          max_entry_notional_usd=settings.max_entry_notional_usd)
+            # E4 startup state, as runner.main: only where the stream carries statuses.
+            controller.halt_seed_fetch = nasdaq_halt_seed if halt_statuses_supported(config["feed"]) else None
             if args.live_dir is not None:
                 controller.events = LiveEventLog(args.live_dir / "events.jsonl")
                 (args.live_dir / "run.json").write_text(json.dumps(
@@ -720,6 +743,7 @@ def command_paper(args):
                 return controller.bind(AlpacaPaperTransport(
                     key, secret, trial_config["symbols"], before_request=controller.before_request,
                     before_submit=controller.before_submit, sink_observation=controller.observe,
+                    sink_status=controller.trading_status,
                     request_observer=responses.append, quote_timeout=settings.stream_quote_timeout_seconds,
                     feed=config["feed"],
                     required_quote_symbols=needed if recovering and needed else list(settings.benchmarks),
@@ -822,6 +846,7 @@ def command_recover(args):
             controller.port = controller.bind(AlpacaPaperTransport(
                 key, secret, trial_config["symbols"], before_request=controller.before_request,
                 before_submit=controller.before_submit, sink_observation=controller.observe,
+                sink_status=controller.trading_status,
                 request_observer=responses.append, quote_timeout=settings.stream_quote_timeout_seconds,
                 feed=config["feed"], required_quote_symbols=recovering,
                 history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),

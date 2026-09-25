@@ -27,11 +27,23 @@ The receipt binds main's tree. Its `harness_sha256` (19d0a9b9...), `plan_sha256`
 (f276b26c...) and `engine_sources_sha256` for runner.py (8bb8d577...), safety.py
 (ad520fc4...), transport.py (34e6c4e6...) and `../order-contract/order_contract.py`
 (57405f75...) equal the SHA-256 of those files on main after #198 merged (checked
-at 3b7ae710), and the runner, safety and transport values equal the engine
-entries in `../source-hashes.json`. `c04_pre_send_exemption` names both
+at 3b7ae710), and the runner, safety and transport values equalled the engine
+entries in `../source-hashes.json` until the engine-release merge (amendment
+below). `c04_pre_send_exemption` names both
 exemptions (the `FaultLedger` price-increment check and the `FaultTransport`
 order-contract price increment), each for the single `nf-20260924t185811-6ddd39-c04`
 client id.
+
+Amendment, 2026-09-24 (engine-release merge): the adaptive-paper engine release
+of that day (0b492619 and its review follow-up 1cf633e4), merged with main after
+this run, changed runner.py, safety.py and transport.py, including the REST
+observation path, `Ledger.record_order` and the `GuardedSession` read allowlist
+this receipt exercised; it did not change harness.py, plan.json or
+`../order-contract/order_contract.py`. Since that merge the receipt's runner,
+safety and transport values no longer equal `../source-hashes.json`, so the
+receipt qualifies the order-contract engine before that release. Before the
+`native-fault-behaviour` gate is cited for the released engine, this plan (C01,
+C02, C05, C04) must run again on it and bind its source hashes.
 
 | Case | Outcome | Evidence class | Broker requests |
 |---|---|---|---|
