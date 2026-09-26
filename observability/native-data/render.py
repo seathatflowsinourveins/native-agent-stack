@@ -25,11 +25,25 @@ def by_query_source(field):
             ' | unwrap ' + field + ' [$__interval]))')
 
 
+def savings_series():
+    """One series per savings scope, grouped by entity_id alone, so no estimate is added to another.
+    A step shows a scope's estimate only when that scope's newest row in the step is ok: the newest
+    ok row's observed_unix must equal the newest row's, so an earlier success in the same step never
+    replaces a failed or stale newest row. Such a step has no value, which Grafana draws as a gap."""
+    def newest(fields, value):
+        return ('last_over_time({service_name="agent-stack-native-data",record_kind="savings"}'
+                ' | json ' + fields + ' | unwrap ' + value + ' | __error__="" [$__interval]) by (entity_id)')
+    return (newest('entity_id, state, estimated_saved | state="ok"', 'estimated_saved')
+            + ' and on(entity_id) (' + newest('entity_id, state, observed_unix | state="ok"', 'observed_unix')
+            + ' == on(entity_id) ' + newest('entity_id, observed_unix', 'observed_unix') + ')')
+
+
 def dashboard():
     panels = []
+    shift = [0]  # height of rows inserted above the panels added after them
 
     def add(pid, title, typ, x, y, w, h, expr=None, source='ecosystem-loki', **extra):
-        item = dict(id=pid, title=title, type=typ, gridPos=dict(x=x, y=y, w=w, h=h))
+        item = dict(id=pid, title=title, type=typ, gridPos=dict(x=x, y=y + shift[0], w=w, h=h))
         if expr:
             item.update(datasource={'uid': source}, targets=[{
                 'refId': 'A', 'expr': expr,
@@ -116,6 +130,24 @@ def dashboard():
     table(5, 'savings', 'Token-saving estimates · separate native scopes', 11, 12,
           ['title', 'state', 'estimated_saved', 'session_estimated_saved', 'source_updated_at',
            'kind', 'boundary', 'source_command'])
+    add(20, 'Token-saving estimates over time · one series per native scope, never summed', 'timeseries',
+        0, 23, 24, 8, savings_series(), interval='3m',
+        description='Each savings row is its own series, grouped only by entity_id. A step shows a scope\'s native '
+                    'estimate only when that scope\'s newest row in the step is ok; a step whose newest row failed '
+                    'or is stale is a gap, and an earlier success never fills it. Steps are at least 3 minutes, so '
+                    'each holds a 2-minute snapshot. Series are never stacked or added, and the legend names them '
+                    'without values: the table above is the latest generation with each scope\'s current value, '
+                    'state and source time. Scopes overlap: global RTK includes its project subset, and each '
+                    'Context Mode row is one runtime snapshot. These are native estimates, not provider usage. '
+                    'The symlog axis keeps small counters visible.',
+        fieldConfig={'defaults': {'unit': 'short', 'decimals': 0, 'noValue': 'No recent successful observation',
+                                  'custom': {'stacking': {'mode': 'none', 'group': 'A'}, 'spanNulls': False,
+                                             'scaleDistribution': {'type': 'symlog', 'log': 10, 'linearThreshold': 10}}},
+                     'overrides': []},
+        options={'legend': {'displayMode': 'list', 'placement': 'right', 'calcs': []},
+                 'tooltip': {'mode': 'multi', 'sort': 'desc'}})
+    panels[-1]['targets'][0]['legendFormat'] = '{{entity_id}}'
+    shift[0] = 8  # the sections below move down by the inserted series panel's height
     table(6, 'memory', 'Memory and retrieval · actual scoped inventory', 23, 7,
           ['title', 'state', 'value', 'unit', 'source_updated_at'],
           widths={'title': 290, 'state': 125, 'value': 90, 'unit': 85, 'source_updated_at': 260})

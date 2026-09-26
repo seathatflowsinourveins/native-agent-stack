@@ -7,4 +7,9 @@ Type=oneshot
 UMask=0077
 NoNewPrivileges=true
 TimeoutStartSec=90
-ExecStart=/usr/bin/python3 @REPOSITORY@/observability/native-data/snapshot.py --config @PRIVATE_CONFIG@ --publish
+# QMD's launcher is `#!/usr/bin/env node` and QMD 2.8.3 requires Node >=22. A user
+# manager's default PATH can lack node, so a directory holding a qualifying node comes first.
+Environment=PATH=@NODE_DIRECTORY@:/usr/local/bin:/usr/bin:/bin
+# RTK telemetry is opt-in; its upstream override also blocks it for this observer.
+Environment=RTK_TELEMETRY_DISABLED=1
+ExecStart=/usr/bin/python3 -B @REPOSITORY@/observability/native-data/snapshot.py --config @PRIVATE_CONFIG@ --publish

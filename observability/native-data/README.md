@@ -6,9 +6,14 @@ UI or QMD index. It runs no model, embedding, provider usage parser, indexing or
 token-report refresh. A snapshot is a current observation of the selected native
 commands plus explicitly dated existing report data.
 
-Copy `config.example.json` to a private location, supply absolute installed
-binaries and owned paths, and create the state directory with mode `0700`.
-Run from the repository root:
+Copy `config.example.json` to a private file outside every checkout, supply
+absolute installed binaries and owned paths, and create the state directory
+with mode `0700`. A host that uses the [native backends](../backends/README.md)
+roots keeps the config at `$STACK_CONFIG_ROOT/native-data.json` (mode `0600`,
+normally `~/.config/ecosystem-observability/native-data.json`) and the state at
+`$STACK_DATA_ROOT/native-data` (normally
+`~/.local/share/codex-ecosystem/observability/native-data`), beside the grand
+dashboard's cache. Run from the repository root:
 
 ```sh
 python3 observability/native-data/snapshot.py --config /absolute/private/config.json
@@ -28,8 +33,28 @@ their existing account and configuration behavior.
 | ai-memory 2.4.1 | `ai-memory --data-dir <configured-db> status --json` | Entire configured database: current pages, all versions, sessions, observations; allowlisted embedding mode and native completeness counts; memory LLM status |
 | QMD 2.8.3 | `qmd --index <configured-index> status` | Selected collection file count; index file/vector totals kept separately |
 | Qdrant | `GET /collections/<allowlisted-collection>` | Native `points_count`, segments and collection status |
-| Other token tools | Existing report `native[].latest` | Three Context Mode runtime roots, Headroom and jCodeMunch |
+| Other token tools | Existing report `native[].latest`, selected by `report_scopes` | Up to three Context Mode runtime roots, Headroom and jCodeMunch |
 | Coverage | Existing report `coverage_matrix` | Up to 68 allowlisted public component identifiers, dated historical status |
+
+ai-memory 2.4 `status` is an HTTP client of the running server: it calls
+`GET /admin/status` at its configured `server_url`, whose upstream default is
+`http://127.0.0.1:49374` (v2.4.1 `commands/status.rs` and `config.rs`). A server
+on another loopback port needs `ai_memory.server_url`, an exact
+`http://127.0.0.1:<port>` origin that the collector passes to that one command
+as `AI_MEMORY_SERVER_URL`. Without it, a server elsewhere leaves the row unknown
+after the command deadline. A server that requires a bearer token is out of
+scope: the collector never reads credentials.
+
+`report_scopes` maps each report entity id to the exact `scope` of one
+`native[]` entry in the token report. A Context Mode scope is that report's
+`context_roots[].name`, Headroom's is its `counter_scopes.headroom` (reporter
+default `Native / last 30 days`) and jCodeMunch's is always
+`Linux / upstream default index`. Leave out an entity whose runtime root the
+report does not capture; it then emits no row. Without the key the collector
+keeps the authoring host's labels (`Native Codex`, `Native Claude`,
+`Desktop WSL`, `Linux / native last 30 days`), and a report with other labels
+leaves those rows unknown. The labels stay in the private config: rows carry
+only the fixed entity id and title.
 
 The ai-memory CLI status command has no workspace/project selector. Those two
 config fields document the intended workspace privately; they do **not** filter
@@ -62,12 +87,22 @@ fields such as `pages_latest`, `collection_files` or `points_count`.
 Stable measurement identifiers are `rtk-global`, `rtk-project`,
 `context-mode-native-codex`, `context-mode-native-claude`,
 `context-mode-desktop-wsl`, `headroom`, `jcodemunch`, `ai-memory`, `qmd` and optional
-`qdrant`. Coverage identifiers prepend `coverage-` and replace repository `/`
+`qdrant`; the five report identifiers appear as `report_scopes` selects them.
+Coverage identifiers prepend `coverage-` and replace repository `/`
 with `--`. A final `snapshot` row carries `row_count` (excluding itself),
 `unknown_count` and `stale_count`. Every row shares one `observed_unix` generation.
 Consumers must select that latest generation before displaying values; filtering
 only successful measurements would resurrect earlier values after a failure.
 Only `service_name=agent-stack-native-data` and `record_kind` are Loki labels.
+The dashboard's tables show that latest generation. Its savings trend panel
+draws each savings row as its own series, grouped only by `entity_id`, with a
+three-minute minimum step and no stacking. A step shows a scope's estimate only
+when that scope's newest row in the step is ok: the panel keeps
+`last_over_time(... | state="ok" | unwrap estimated_saved ... [$__interval]) by (entity_id)`
+only where the newest ok row's `observed_unix` equals the newest row's. A step
+whose newest row failed or is stale is therefore a gap, never an earlier
+success, and no scope is added to another. The legend names the series without
+values; the savings table above the panel holds each scope's current value and state.
 
 Fresh native inventory/RTK rows use command completion time. Context Mode uses
 its actual persisted `updated_at` milliseconds converted to seconds. Headroom and
@@ -112,6 +147,72 @@ using string nanosecond timestamps and JSON log lines. Source command references
 [Context Mode](https://github.com/mksglu/context-mode). The projection and guards
 are local integration code, not an official upstream dashboard or E2E suite.
 
+## Scheduled deployment
+
+This section, the `report_scopes` and `ai_memory.server_url` keys and the
+savings trend panel changed after `v2026.09.26.2`; at that tag the service example
+set no `PATH` and the collector read only the authoring host's report labels.
+
+[`native-data.service.example`](native-data.service.example) and
+[`native-data.timer.example`](native-data.timer.example) run one collection every
+two minutes as a `systemd --user` timer. Replace `@REPOSITORY@` with a checkout that
+stays in place at a revision containing this adapter, `@PRIVATE_CONFIG@` with the
+private config and `@NODE_DIRECTORY@` with a directory that holds Node 22 or later
+for QMD's `env node` launcher. Install the results as
+`~/.config/systemd/user/ecosystem-native-data.service` and `.timer`, then use the
+native lifecycle commands:
+
+```sh
+systemd-analyze --user verify ~/.config/systemd/user/ecosystem-native-data.service ~/.config/systemd/user/ecosystem-native-data.timer
+systemctl --user daemon-reload
+systemctl --user start ecosystem-native-data.service
+systemctl --user show ecosystem-native-data.service --property=Result,ExecMainStatus
+systemctl --user show ecosystem-native-data.timer --property=UnitFileState,ActiveState
+systemctl --user enable --now ecosystem-native-data.timer
+```
+
+Render the dashboard into the backends' dashboard folder. Their file provider
+rescans it every 30 seconds, so Grafana needs no restart and no API credential:
+
+```sh
+python3 observability/native-data/render.py \
+  --output "$STACK_CONFIG_ROOT/ecosystem-grafana-dashboards/native-foundation-data.json"
+```
+
+That provider sets `disableDeletion: true`. Deleting the file later only
+unprovisions the dashboard (Grafana 13.2.2 `handleMissingDashboardFiles` in
+`pkg/services/provisioning/dashboards/file_reader.go`); removing the remaining copy
+is an administrator action inside Grafana.
+
+To undo the deployment, disable the timer, remove the installed units and the
+dashboard file, then reload the user manager. Undo only what the deployment
+changed ([lifecycle](../../adoption/lifecycle.md)): `enable --now` can change
+the timer's enablement, its activation or both, so undo each against the state
+read before it. Disable the timer only if it was not enabled before, and stop it
+only if it was not active before. If it was already enabled, restore its earlier
+unit files instead of removing them; if it was enabled but inactive, also stop it
+with `systemctl --user stop ecosystem-native-data.timer`.
+
+```sh
+systemctl --user disable --now ecosystem-native-data.timer
+systemctl --user stop ecosystem-native-data.service
+rm ~/.config/systemd/user/ecosystem-native-data.service ~/.config/systemd/user/ecosystem-native-data.timer
+rm "$STACK_CONFIG_ROOT/ecosystem-grafana-dashboards/native-foundation-data.json"
+systemctl --user daemon-reload
+```
+
+The private config and state directory hold no credential and stay until you
+remove them. Rows already pushed expire with Loki's retention.
+
+Choose `stale_after_seconds` from the token report's refresh cadence, because
+report rows keep their own capture or source time. A daily report needs the
+`86400` maximum, which still marks rows stale when one run starts more than a day
+after the previous one. The four-times-daily
+[refresh template](../../tools/token-report/README.md#optional-scheduled-refresh)
+needs `28800`. A Context Mode row is also stale when its runtime wrote no newer
+stats file within that interval. Fresh RTK, ai-memory, QMD and Qdrant rows are
+unaffected.
+
 Focused offline verification:
 
 ```sh
@@ -120,8 +221,11 @@ python3 -m unittest discover -s tests -p test_native_dashboard_data.py -v
 
 Tests retain source-shaped RTK, ai-memory and QMD metadata examples and cover
 failed-latest handling, stale/future timestamps, duplicate sources, numeric
-validation, explicit collection selection, payload privacy, private files,
-command failures/deadlines/output bounds and loopback-only publication. They do
+validation, explicit collection selection, report scope selection, the
+ai-memory server origin, payload privacy, private files,
+command failures/deadlines/output bounds, loopback-only publication, the unit
+examples, the per-scope savings series query with its newest-row guard and the
+documented undo order. They do
 not establish service uptime or an actual Loki publication; deployment and
 browser checks belong to the integrating task.
 

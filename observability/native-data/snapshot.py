@@ -36,6 +36,10 @@ opentelemetry-collector-contrib prometheus loki grafana alertmanager ntfy duckdb
 restic dagu lean syft alpaca-py systemd pandas skfolio edgartools zizmor beads
 skills-ref otel-tui llama-cpp jcodemunch-mcp nextjs react fastapi postgresql poppler
 apple-container playwright-test omniroute tavily-cli nautilus-trader""".split()
+# Default report scope labels, used when the private config has no "report_scopes".
+# They are the authoring host's labels; a token report names Context Mode scopes after
+# its own context_roots and Headroom after counter_scopes, so another host maps its
+# actual labels explicitly. Only these entity ids and titles are ever published.
 REPORT_SCOPES = {
     ("context-mode", "Native Codex"): ("context-mode-native-codex", "Context Mode: native Codex"),
     ("context-mode", "Native Claude"): ("context-mode-native-claude", "Context Mode: native Claude"),
@@ -43,6 +47,7 @@ REPORT_SCOPES = {
     ("headroom", "Linux / native last 30 days"): ("headroom", "Headroom: retained 30 days"),
     ("jcodemunch", "Linux / upstream default index"): ("jcodemunch", "jCodeMunch: default index"),
 }
+REPORT_ENTITIES = {entity: (tool, title) for (tool, _), (entity, title) in REPORT_SCOPES.items()}
 
 
 def utc(value):
@@ -91,18 +96,24 @@ def strict_json(raw):
     return json.loads(raw, parse_constant=reject)
 
 
+def loopback_origin(value, name):
+    if not isinstance(value, str) or not re.fullmatch(r"http://127\.0\.0\.1:[0-9]{1,5}", value) or not 1 <= urllib.parse.urlsplit(value).port <= 65535:
+        raise ValueError(name + " must be an exact IPv4 loopback origin")
+
+
 def validate_config(config):
     required = {"token_report", "project", "rtk", "ai_memory", "qmd", "state_dir", "loki_url"}
-    if not isinstance(config, dict) or not required <= config.keys() or config.keys() - required - {"qdrant", "stale_after_seconds", "command_timeout_seconds", "coverage"}:
+    if not isinstance(config, dict) or not required <= config.keys() or config.keys() - required - {"qdrant", "stale_after_seconds", "command_timeout_seconds", "coverage", "report_scopes"}:
         raise ValueError("invalid config keys")
     def absolute(value):
         if not isinstance(value, str) or not Path(value).is_absolute() or "\x00" in value:
             raise ValueError("config requires absolute paths")
     for key in ("token_report", "project", "rtk", "state_dir"):
         absolute(config[key])
-    for name, keys in (("ai_memory", {"binary", "data_dir", "workspace", "project"}), ("qmd", {"binary", "index", "collection"})):
+    for name, keys, optional in (("ai_memory", {"binary", "data_dir", "workspace", "project"}, {"server_url"}),
+                                 ("qmd", {"binary", "index", "collection"}, set())):
         section = config[name]
-        if not isinstance(section, dict) or set(section) != keys:
+        if not isinstance(section, dict) or not keys <= set(section) <= keys | optional:
             raise ValueError("invalid native scope config")
         absolute(section["binary"])
         for key in keys - {"binary"}:
@@ -110,16 +121,30 @@ def validate_config(config):
                 absolute(section[key])
             elif not isinstance(section[key], str) or not SAFE_NAME.fullmatch(section[key]):
                 raise ValueError("invalid native scope name")
+    if "server_url" in config["ai_memory"]:
+        # ai-memory 2.4 `status` asks the running server's /admin/status at this URL.
+        loopback_origin(config["ai_memory"]["server_url"], "ai-memory server")
     if config["loki_url"] != LOKI:
         raise ValueError("Loki must use the fixed loopback push endpoint")
     q = config.get("qdrant")
     if q is not None:
         if not isinstance(q, dict) or set(q) != {"url", "collection"}:
             raise ValueError("invalid Qdrant config")
-        if not re.fullmatch(r"http://127\.0\.0\.1:[0-9]{1,5}", q["url"]) or not 1 <= urllib.parse.urlsplit(q["url"]).port <= 65535:
-            raise ValueError("Qdrant must be an exact IPv4 loopback origin")
-        if not SAFE_NAME.fullmatch(q["collection"]):
+        loopback_origin(q["url"], "Qdrant")
+        if not isinstance(q["collection"], str) or not SAFE_NAME.fullmatch(q["collection"]):
             raise ValueError("invalid allowlisted Qdrant collection")
+    scopes = config.get("report_scopes")
+    if scopes is not None:
+        # Private labels select report rows; they are never copied into published rows.
+        if not isinstance(scopes, dict) or not scopes or scopes.keys() - REPORT_ENTITIES.keys():
+            raise ValueError("report_scopes must map known entity ids to report scopes")
+        selected = set()
+        for entity, scope in scopes.items():
+            if not isinstance(scope, str) or not 0 < len(scope) <= 200 or any(ord(c) < 32 or ord(c) == 127 for c in scope):
+                raise ValueError("invalid report scope label")
+            if (REPORT_ENTITIES[entity][0], scope) in selected:
+                raise ValueError("two entities select one report scope")
+            selected.add((REPORT_ENTITIES[entity][0], scope))
     for key, default, low, high in (("stale_after_seconds", 1800, 1, 86400), ("command_timeout_seconds", 10, 1, 30)):
         config[key] = count(config.get(key, default))
         if not low <= config[key] <= high:
@@ -160,13 +185,15 @@ class Recorder:
         record["stderr"] = write_private(self.state / (name + ".stderr"), stderr)
         self.records.append(record)
 
-    def command(self, name, argv, cwd):
+    def command(self, name, argv, cwd, env=None):
         started = time.time()
         record = {"id": name, "argv": argv, "cwd": str(cwd), "started_at": utc(started), "exit_code": None, "error": None}
+        if env:
+            record["environment_overrides"] = sorted(env)  # names only
         output = {"stdout": bytearray(), "stderr": bytearray()}
         process = None
         try:
-            process = subprocess.Popen(argv, cwd=cwd, stdin=subprocess.DEVNULL,
+            process = subprocess.Popen(argv, cwd=cwd, stdin=subprocess.DEVNULL, env=dict(os.environ, **env) if env else None,
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
             with selectors.DefaultSelector() as selector:
                 for stream in output:
@@ -316,12 +343,15 @@ def qdrant_metrics(raw):
                 unit="points", collection_status=r["status"], segments_count=count(r["segments_count"]))
 
 
-def report_rows(report, observed, stale_after, report_mtime):
+def report_rows(report, observed, stale_after, report_mtime, scopes=None):
     rows = []
     native = report.get("native", [])
     if not isinstance(native, list):
         native = []
-    for (tool, scope), (entity, title) in REPORT_SCOPES.items():
+    # Configured labels keep the canonical entity order; unselected entities emit no row.
+    selected = REPORT_SCOPES if scopes is None else {
+        (tool, scopes[entity]): (entity, title) for entity, (tool, title) in REPORT_ENTITIES.items() if entity in scopes}
+    for (tool, scope), (entity, title) in selected.items():
         context = tool == "context-mode"
         boundary = ("One runtime snapshot: retained estimate = event count x 256; session estimate = kept-out bytes / 4. Different bases, not additive or provider savings. Retention can decrease counters." if context else
                     "Latest native report capture; retained tool estimate, overlapping with other counters, not avoided provider usage.")
@@ -393,9 +423,11 @@ def collect(config, recorder, observed):
         ("ai-memory", "ai-memory: entire configured database", "native inventory", [config["ai_memory"]["binary"], "--data-dir", config["ai_memory"]["data_dir"], "status", "--json"], "ai-memory --data-dir <configured-db> status --json", memory_metrics, "memory", "Database-wide counts, not the selected project's inventory. Embedding coverage and provider status do not establish retrieval quality or LLM consolidation. Missing or unreviewed mode fields are unavailable."),
         ("qmd", "QMD: configured collection", "native inventory", [config["qmd"]["binary"], "--index", config["qmd"]["index"], "status"], "qmd --index <configured-index> status", lambda raw: qmd_metrics(raw, config["qmd"]["collection"]), "memory", "Selected collection files; vector and total counts apply to its entire index. Zero vectors can be intentional BM25 operation."),
     ]
+    server = config["ai_memory"].get("server_url")
     for entity, title, kind, argv, command, parser, record_kind, boundary in specs:
         row = base_row(entity, title, kind, command, boundary, observed, record_kind)
-        raw = recorder.command(entity, argv, config["project"])
+        env = {"AI_MEMORY_SERVER_URL": server} if entity == "ai-memory" and server else None
+        raw = recorder.command(entity, argv, config["project"], env=env)
         try:
             if raw is None:
                 raise ValueError("command failed")
@@ -435,7 +467,7 @@ def collect(config, recorder, observed):
         report = {}
         source["error"] = "unavailable_or_invalid_report"
     recorder.records.append(source)
-    rows.extend(report_rows(report, observed, config["stale_after_seconds"], mtime))
+    rows.extend(report_rows(report, observed, config["stale_after_seconds"], mtime, config.get("report_scopes")))
     if config.get("coverage", True):
         rows.extend(coverage_rows(report, observed))
     marker = base_row("snapshot", "Native data snapshot", "collector generation", "snapshot.py --config <private-config>", "One generation; failure rows supersede earlier success. No sum across estimates or token scopes.", observed, "snapshot")
