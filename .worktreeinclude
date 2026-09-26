@@ -1,0 +1,10 @@
+# Gitignored files copied from the source checkout into a new worktree, in .gitignore syntax.
+# Read by Claude Code for every worktree it creates with git and by Worktrunk's
+# `wt step copy-ignored` (from the primary worktree). A listed file is copied only when it
+# exists there and is ignored; tracked files are never copied.
+#
+# .ai-memory.toml is a host's own ai-memory capture opt-in, never committed. An unenrolled
+# clone has none, so nothing is copied. A worktree that gets it is enrolled: its new sessions are
+# captured and, at SessionStart, consume the project's pending ai-memory handoff. Never give it to an
+# independent-review or blind lane. See recipes/README.md, "Worktrees and the capture marker".
+.ai-memory.toml

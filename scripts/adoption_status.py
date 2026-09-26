@@ -7,19 +7,21 @@ only subprocess is a bounded native Git revision query. It opens no credential s
 service/process state, network endpoint or model API. Client configuration is read
 only with the opt-in --client-wiring, which parses fixed native client files whole and
 in-process and emits no value from them: fixed booleans and hook-event counts only,
-never a value, command, path or environment value. The opt-in --pinned-versions execs
+never a value, command, path or environment value (Codex hook trust is compared as a
+SHA-256 inside this process, as Codex computes it). The opt-in --pinned-versions execs
 a profile's PATH-resolved commands with their platform pin's declared "exec"
 version_probe only (never one declared "npm-metadata" or another method, since that
 method exists exactly because running the tool starts a server or a UI), each in its
 own process group that is killed once the probe exits, times out or is interrupted,
-and emits booleans, counts and version strings from the checked-in pins file and the
-output of a probe that exited 0.
+and emits booleans, counts, component ids and version strings from the checked-in
+manifest and pins file and the output of a probe that exited 0.
 """
 
 from __future__ import annotations
 
 import argparse
 import contextlib
+import hashlib
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -33,6 +35,7 @@ import sys
 import tempfile
 import threading
 from urllib.parse import urlsplit
+import warnings
 
 
 SHA = re.compile(r"[0-9a-f]{40}\Z")
@@ -52,15 +55,21 @@ LIMITATIONS = [
 ]
 # --client-wiring replaces NO_CLIENT_STATE with these two statements.
 CLIENT_WIRING_LIMITATIONS = [
-    "--client-wiring parses the user Claude settings and plugin registry, the Codex config.toml, hooks.json and "
-    "AGENTS.md, and this checkout's .claude/settings.json and .codex/config.toml whole and in-process, and emits no "
-    "value from them: fixed booleans and hook-event counts only. It opens no credential store (~/.claude.json, "
-    "~/.claude/.credentials.json, ~/.codex/auth.json), network endpoint or running process; environment variables "
-    "only locate the client homes, and two opt-ins are checked by name.",
+    "--client-wiring parses the user Claude settings and plugin registry, the Codex config.toml, hooks.json, "
+    "AGENTS.override.md, AGENTS.md and RTK.md, and this checkout's .claude/settings.json and .codex/config.toml whole "
+    "and in-process, and emits no value from them: fixed booleans and hook-event counts only. It opens no credential "
+    "store (~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json), network endpoint or running process; "
+    "environment variables only locate the client homes, and two opt-ins are checked by name.",
     "Configured wiring is not activation: managed, project or local Claude settings, and Codex profiles, project "
-    "config.toml features and command-line overrides, can override the user scope read here; plugin revisions, hook "
-    "and project trust, Claude MCP registrations, MCP server startup and a useful native call remain the clients' "
-    "own checks (/mcp, /hooks, the plugin doctor).",
+    "config.toml features and command-line overrides, can override the user scope read here. Codex hook trust is "
+    "computed for the ai-memory hooks.json entries only, the way Codex rust-v0.155.1 to rust-v0.157.1 computes it "
+    "(a user config.toml [hooks.state] trusted_hash equal to the hook's current hash); a later Codex that hashes "
+    "differently reads as untrusted here until this check follows it. hooks.json is read as Codex's serde parse "
+    "reads it, and both Codex hook counts are null for a file that parse rejects, since Codex then loads none of "
+    "its hooks; the trusted count is also null when a matcher on an ai-memory hook uses regex syntax this check "
+    "cannot evaluate as Rust's regex crate does. Plugin revisions and bundled plugin hooks, project trust, Claude "
+    "MCP registrations, MCP server startup and a useful native call remain the clients' own checks (/mcp, /hooks, "
+    "the app-server hooks/list, the plugin doctor).",
 ]
 PINNED_VERSION_TIMEOUT_SECONDS = 30
 # adoption/bootstrap-linux.sh run_version_probe: TERM to the probe's process group when its bound expires, KILL
@@ -96,13 +105,58 @@ AGENT_TEAMS_VARIABLE = "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"  # the agent-teams
 # Codex 0.155.1's lifecycle-hook feature keys (codex-rs/features: the legacy alias, then the key), in the sorted
 # order Codex applies them, so "hooks" wins when both are set.
 CODEX_HOOK_FEATURES = ("codex_hooks", "hooks")
+# The global instruction files Codex reads from its home, first non-blank one wins, passed to the model verbatim:
+# no "@path" reference is expanded (codex-rs/codex-home/src/instructions/mod.rs at rust-v0.155.1 and rust-v0.157.1).
+CODEX_INSTRUCTION_FILES = ("AGENTS.override.md", "AGENTS.md")
+# rtk 0.50.0 (src/hooks/init.rs RTK_MD_OWNED_MARKER) heads the RTK.md it writes with this comment line; it is RTK's
+# ownership record, not an instruction, so an inline copy may leave it out.
+RTK_OWNED_MARKER = "<!-- rtk-owned:"
+# Codex hook trust, read from codex-rs/hooks/src/engine/discovery.rs, config_rules.rs, lib.rs, events/common.rs and
+# codex-rs/config/src/hook_config.rs and fingerprint.rs (byte-identical where used at rust-v0.155.1 and
+# rust-v0.157.1). A hooks.json handler runs only when it is enabled and trusted: the user config.toml's
+# [hooks.state."<hooks.json path>:<event key>:<group>:<handler>"] trusted_hash equals the SHA-256 of the handler's
+# normalized identity. Event name -> the key label Codex uses in both.
+CODEX_HOOK_EVENTS = {"PreToolUse": "pre_tool_use", "PermissionRequest": "permission_request",
+                     "PostToolUse": "post_tool_use", "PreCompact": "pre_compact", "PostCompact": "post_compact",
+                     "SessionStart": "session_start", "SessionEnd": "session_end",
+                     "UserPromptSubmit": "user_prompt_submit", "SubagentStart": "subagent_start",
+                     "SubagentStop": "subagent_stop", "Stop": "stop", "Interrupt": "interrupt"}
+CODEX_EVENTS_WITHOUT_MATCHER = frozenset({"UserPromptSubmit", "Stop", "Interrupt"})  # matcher_pattern_for_event
+CODEX_CONTEXT_LIMIT_EVENTS = frozenset({"PreToolUse", "PostToolUse", "SessionStart", "UserPromptSubmit",
+                                        "SubagentStart"})  # the events that may emit additionalContext
+CODEX_DEFAULT_CONTEXT_LIMIT = 2_500  # DEFAULT_HOOK_OUTPUT_TOKEN_LIMIT, dropped from the identity when configured
+# Codex reads hooks.json with serde_json::from_str::<HooksFile> (discovery.rs load_hooks_json) and loads no hook at
+# all from a file that fails it. The fields of each serde struct in hook_config.rs, in declaration order (a JSON
+# array fills them in that order); HookHandlerConfig is internally tagged by "type", with these variants.
+CODEX_HOOKS_FILE_FIELDS = ("description", "hooks")
+CODEX_GROUP_FIELDS = ("matcher", "hooks")
+CODEX_HANDLER_FIELDS = {"command": ("command", "commandWindows", "timeout", "async", "statusMessage",
+                                    "additionalContextLimit"),
+                        "mcp_tool": ("server", "tool", "input", "timeout", "statusMessage"),
+                        "prompt": (), "agent": ()}
+# serde_json 1.0.149 (Codex 0.157.1's Cargo.lock): the 128th array or object nested along a path it parses fails
+# ("recursion limit exceeded"); a skipped unknown field's value is scanned without that limit.
+SERDE_JSON_RECURSION_LIMIT = 128
+U64_MAX = 2 ** 64 - 1
+I64_MAX = 2 ** 63 - 1  # a TOML integer: the widest number Codex's hook hash can hold
+RUST_WHITESPACE = ("\t\n\x0b\x0c\r \x85\xa0           "
+                   "     　")  # char::is_whitespace, which Rust's str::trim strips
+# The regex constructs that Python's re and Rust's regex crate (regex-syntax 0.8.8 in Codex 0.157.1) parse alike;
+# see shared_regex_subset.
+REGEX_META = frozenset("\\.+*?()|[]{}^$#&-~")  # regex-syntax's escapable meta characters; Python escapes them too
+REGEX_CLASS_ESCAPES = frozenset("dDwWsS")
+REGEX_CONTROL_ESCAPES = frozenset("aftnrv")
+REGEX_ASSERTION_ESCAPES = frozenset("bBA")
+REGEX_SUBSET_MAX_LENGTH = 1_000
+REGEX_SUBSET_MAX_CLASSES = 20  # Unicode classes compile large in Rust; a few stay far below its 10 MiB size limit
+REGEX_SUBSET_MAX_DEPTH = 64
 CLIENT_FILE_LIMIT = 1_048_576
 CLIENT_WIRING_KEYS = {
     "claude": ("rtk_hook", "ai_memory_hook_events", "context_mode_plugin_enabled", "subagent_spawn_depth_1",
                "workflow_concurrency_set", "effort_level_env_unset", "agent_teams_off"),
     "project": ("settings_depth_and_concurrency", "codex_mcp_servers_present"),
     "codex": ("rtk_instructions", "context_mode_plugin_enabled", "mcp_servers_present", "hooks_feature_enabled",
-              "ai_memory_hook_events"),
+              "ai_memory_hook_events", "ai_memory_hook_events_trusted"),
 }
 
 
@@ -362,10 +416,395 @@ def codex_hooks_enabled(config) -> bool | None:
     return enabled
 
 
-def codex_wiring(codex_dir: Path) -> dict:
+def instruction_text(text: str) -> str:
+    """Instruction text compared by content: whitespace runs collapsed, RTK's ownership comment line dropped."""
+    lines = [line for line in text.splitlines() if not line.lstrip().startswith(RTK_OWNED_MARKER)]
+    return " ".join(" ".join(lines).split())
+
+
+def codex_instructions(codex_dir: Path) -> str | None:
+    """The global instructions Codex gives the model: AGENTS.override.md when it has non-blank text, else AGENTS.md
+    ("" when neither has any). None when either file is unreadable here, since Codex may still read it."""
+    for name in CODEX_INSTRUCTION_FILES:
+        text = read_client_file(codex_dir / name, "text")
+        if text is None or text.strip():
+            return text
+    return ""
+
+
+def rtk_instructions_inline(codex_dir: Path) -> bool | None:
+    """RTK.md's text appears inline in the instructions Codex loads. A bare "@RTK.md" reference, which is what
+    `rtk init -g --codex` writes, is not enough: Codex expands no reference, so the model sees only the path."""
+    instructions, rtk = codex_instructions(codex_dir), read_client_file(codex_dir / "RTK.md", "text")
+    if instructions is None or rtk is None:
+        return None
+    body = instruction_text(rtk)
+    return bool(body) and body in instruction_text(instructions)
+
+
+def shared_regex_subset(pattern: str) -> bool:
+    """Whether ``pattern`` uses only constructs that Python's re and Rust's regex crate (regex-syntax 0.8.8, which
+    Codex 0.157.1 locks) accept and reject alike, so that Python's re.compile decides it as Rust would: literals,
+    ".", "^", "$", "|", "(" and "(?:" groups, one "*", "+" or "?" after an atom (then an optional lazy "?"),
+    escaped meta characters, \\d \\D \\w \\W \\s \\S, \\a \\f \\t \\n \\r \\v, \\b \\B \\A outside classes, and
+    classes of literals, ASCII letter and digit ranges and those escapes. Counted repetition, inline flags, named
+    groups, lookaround, backreferences, \\z \\Z \\p \\x \\0, nested classes and a repetition of an assertion or of
+    a repetition are not in it: there the engines differ (evidence/artifacts/adoption-status-truth-20260926)."""
+    if len(pattern) > REGEX_SUBSET_MAX_LENGTH:
+        return False
+    index, depth, classes, previous = 0, 0, 0, "start"  # previous: start, atom, assertion, repeat or lazy
+    while index < len(pattern):
+        char = pattern[index]
+        if char == "\\":
+            if index + 1 == len(pattern):
+                return True  # a trailing backslash: both engines reject the pattern
+            escaped = pattern[index + 1]
+            if escaped in REGEX_ASSERTION_ESCAPES:
+                previous = "assertion"
+            elif escaped in REGEX_META or escaped in REGEX_CONTROL_ESCAPES or escaped in REGEX_CLASS_ESCAPES:
+                classes += escaped in REGEX_CLASS_ESCAPES
+                previous = "atom"
+            else:
+                return False
+            index += 2
+        elif char == "[":
+            index += 1 + pattern.startswith("^", index + 1)
+            start, letter = index, False  # letter: the previous member is an ASCII letter or digit
+            while True:
+                if index == len(pattern):
+                    return True  # an unclosed class: both engines reject the pattern
+                member = pattern[index]
+                if member == "]" and index > start:
+                    break
+                if member in "[]&~" or pattern.startswith("--", index):
+                    return False  # nested classes and Rust's set operators && -- ~~
+                if member == "\\":
+                    escaped = pattern[index + 1:index + 2]
+                    if not escaped:
+                        return True
+                    if not (escaped in REGEX_META or escaped in REGEX_CONTROL_ESCAPES
+                            or escaped in REGEX_CLASS_ESCAPES):
+                        return False
+                    classes += escaped in REGEX_CLASS_ESCAPES
+                    index, letter = index + 2, False
+                elif member == "-" and index > start and pattern[index + 1:index + 2] != "]":
+                    end = pattern[index + 1:index + 2]
+                    if not (letter and end.isascii() and end.isalnum()):
+                        return False
+                    index, letter = index + 2, False  # a range such as a-z
+                else:
+                    index, letter = index + 1, member.isascii() and member.isalnum()
+            index += 1
+            classes += 1
+            previous = "atom"
+        elif char == "(":
+            if pattern.startswith("(?", index) and not pattern.startswith("(?:", index):
+                return False
+            index += 3 if pattern.startswith("(?:", index) else 1
+            depth += 1
+            if depth > REGEX_SUBSET_MAX_DEPTH:
+                return False
+            previous = "start"
+        elif char in "*+?":
+            if char == "?" and previous == "repeat":
+                previous = "lazy"
+            elif previous in ("atom", "start"):
+                previous = "repeat"  # after nothing, both engines reject: "nothing to repeat"
+            else:
+                return False
+            index += 1
+        elif char in "{}]":
+            return False
+        else:
+            previous = ("start" if char == "|" else "assertion" if char in "^$" else "atom")
+            depth -= char == ")"
+            index += 1
+    return classes <= REGEX_SUBSET_MAX_CLASSES
+
+
+def codex_matcher_loads(matcher: str) -> bool | None:
+    """validate_matcher_pattern (codex-rs/hooks/src/events/common.rs): "" and "*" match all, a name or a | list of
+    ASCII letters, digits and "_" is exact, anything else must compile in Rust's regex crate. None when the matcher
+    is outside shared_regex_subset, where Python's re cannot stand in for Rust's."""
+    if matcher in ("", "*") or re.fullmatch(r"[A-Za-z0-9_|]*", matcher):
+        return True
+    if not shared_regex_subset(matcher):
+        return None
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")  # FutureWarning on a possible nested set
+            re.compile(matcher)
+    except (re.error, RecursionError, OverflowError, ValueError):
+        return False
+    return True
+
+
+class CodexRejects(ValueError):
+    """Codex's own parse of hooks.json fails (or cannot finish), so Codex loads no hook from that file."""
+
+
+class JsonObject(dict):
+    """A JSON object as Codex's serde_json reads it: the dict keeps each key's last value, as serde_json's own maps
+    do, and ``pairs`` keeps every pair in order, repeats included, for serde's field checks."""
+
+    def __init__(self, pairs):
+        super().__init__(pairs)
+        self.pairs = pairs
+
+
+def reject_constant(_name):
+    raise CodexRejects("NaN and Infinity are not JSON")
+
+
+def parsed_text(value) -> str:
+    """A string serde_json parses into Rust text (a field, a key, anything buffered): a lone surrogate fails."""
+    if not isinstance(value, str):
+        raise CodexRejects("expected text")
+    try:
+        value.encode("utf-8")
+    except UnicodeEncodeError:
+        raise CodexRejects("lone surrogate") from None
+    return value
+
+
+def optional_text(value) -> str | None:
+    return None if value is None else parsed_text(value)
+
+
+def unsigned(value) -> int | None:
+    """Option<u64> or Option<usize>: null or a plain JSON integer from 0 to 2^64-1. serde_json's arbitrary_precision
+    feature, enabled in Codex's build, keeps any other number as text, which the field refuses."""
+    if value is None:
+        return None
+    if not isinstance(value, int) or isinstance(value, bool) or not 0 <= value <= U64_MAX:
+        raise CodexRejects("expected u64")
+    return value
+
+
+def buffered(value, depth: int) -> None:
+    """One internally tagged handler, which serde buffers whole before reading its tag: every key and string in it
+    is parsed as text, and each array or object in it counts toward serde_json's recursion limit (numbers stay
+    arbitrary-precision text, so none is out of range)."""
+    if isinstance(value, (list, dict)):
+        if depth >= SERDE_JSON_RECURSION_LIMIT:
+            raise CodexRejects("recursion limit exceeded")
+        for key, item in value.pairs if isinstance(value, JsonObject) else ((None, item) for item in value):
+            if key is not None:
+                parsed_text(key)
+            buffered(item, depth + 1)
+    elif isinstance(value, str):
+        parsed_text(value)
+
+
+def serde_struct(value, fields: tuple, *, deny_unknown: bool = False, aliases: dict | None = None) -> dict:
+    """A serde-derived struct read from a JSON object, where each key is parsed as text, a repeated field fails and
+    an unknown key fails under deny_unknown_fields or is otherwise skipped with its value unparsed; or read from a
+    JSON array, which holds the fields in declaration order and may be shorter, but not longer."""
+    if isinstance(value, list):
+        if len(value) > len(fields):
+            raise CodexRejects("trailing characters")
+        return dict(zip(fields, value))
+    if not isinstance(value, JsonObject):
+        raise CodexRejects("expected a struct")
+    found = {}
+    for key, item in value.pairs:
+        name = (aliases or {}).get(parsed_text(key), key)
+        if name in fields:
+            if name in found:
+                raise CodexRejects(f"duplicate field {name}")
+            found[name] = item
+        elif deny_unknown:
+            raise CodexRejects("unknown field")
+    return found
+
+
+def toml_representable(value) -> bool:
+    """An MCP hook's input must convert to TOML (deserialize_mcp_tool_input): no null anywhere. Numbers always
+    convert, as arbitrary-precision text."""
+    if isinstance(value, dict):
+        return all(toml_representable(item) for item in value.values())
+    if isinstance(value, list):
+        return all(toml_representable(item) for item in value)
+    return value is not None
+
+
+def codex_handler(value) -> dict | None:
+    """One HookHandlerConfig, tagged by "type" (buffered, then read as its variant), as a dict with its "type" and
+    the fields append_matcher_groups uses; None for prompt and agent, which Codex skips."""
+    buffered(value, 6)  # file, "hooks", event array, group, its "hooks" array, then this handler
+    if isinstance(value, list):  # an array: the tag, then the variant's fields in order
+        if not value:
+            raise CodexRejects("missing field type")
+        tag, fields = value[0], value[1:]
+    elif isinstance(value, JsonObject):
+        tags = [item for key, item in value.pairs if key == "type"]
+        if len(tags) != 1:
+            raise CodexRejects("missing or duplicate field type")
+        tag, fields = tags[0], JsonObject([(key, item) for key, item in value.pairs if key != "type"])
+    else:
+        raise CodexRejects("expected a handler")
+    if not isinstance(tag, str) or tag not in CODEX_HANDLER_FIELDS:
+        raise CodexRejects("expected variant identifier")
+    fields = serde_struct(fields, CODEX_HANDLER_FIELDS[tag],
+                          aliases={"command_windows": "commandWindows"} if tag == "command" else None)
+    if tag == "command":
+        handler = {"type": tag, "command": parsed_text(fields.get("command")),
+                   "timeout": unsigned(fields.get("timeout")), "async": fields.get("async", False),
+                   "statusMessage": optional_text(fields.get("statusMessage")),
+                   "additionalContextLimit": unsigned(fields.get("additionalContextLimit"))}
+        optional_text(fields.get("commandWindows"))
+        if not isinstance(handler["async"], bool):
+            raise CodexRejects("expected a boolean")
+        return handler
+    if tag == "mcp_tool":
+        server, tool = parsed_text(fields.get("server")), parsed_text(fields.get("tool"))
+        mcp_input = fields.get("input", JsonObject([]))
+        if not isinstance(mcp_input, dict) or not toml_representable(mcp_input):
+            raise CodexRejects("MCP hook input must be representable as TOML")
+        return {"type": tag, "server": server, "tool": tool, "timeout": unsigned(fields.get("timeout")),
+                "statusMessage": optional_text(fields.get("statusMessage"))}
+    return None
+
+
+def codex_hook_events(data) -> dict:
+    """A hooks.json as Codex parses it (HooksFile, HookEventsToml, MatcherGroup and HookHandlerConfig in
+    codex-rs/config/src/hook_config.rs, read by serde_json::from_str), as {event: [(matcher, [handler])]} with
+    codex_handler's handlers. Raises CodexRejects where that parse fails, and Codex then loads no hook from it."""
+    top = serde_struct(data, CODEX_HOOKS_FILE_FIELDS, deny_unknown=True)
+    optional_text(top.get("description"))
+    events = {}
+    for event, groups in serde_struct(top.get("hooks", JsonObject([])), tuple(CODEX_HOOK_EVENTS)).items():
+        if not isinstance(groups, list):
+            raise CodexRejects("expected a sequence")
+        events[event] = []
+        for group in groups:
+            fields = serde_struct(group, CODEX_GROUP_FIELDS)
+            handlers = fields.get("hooks", [])
+            if not isinstance(handlers, list):
+                raise CodexRejects("expected a sequence")
+            events[event].append((optional_text(fields.get("matcher")), [codex_handler(item) for item in handlers]))
+    return events
+
+
+def codex_hooks_json(text: str) -> dict:
+    """Parse hooks.json text as Codex's serde_json does: codex_hook_events of it, or CodexRejects. JSON objects keep
+    repeated keys, NaN and Infinity fail, and a skipped value keeps any number."""
+    try:
+        return codex_hook_events(json.loads(text, object_pairs_hook=JsonObject, parse_constant=reject_constant))
+    except CodexRejects:
+        raise
+    except (ValueError, RecursionError) as error:  # not JSON, or nested deeper than Python parses
+        raise CodexRejects(str(error)) from None
+
+
+def normalized_timeout(event: str, timeout: int | None) -> int:
+    """normalize_command_hook: SessionEnd and Interrupt default to 1 s and are clamped to 1-3 s, others default to
+    600 s and are at least 1 s."""
+    if event in ("SessionEnd", "Interrupt"):
+        return min(max(1 if timeout is None else timeout, 1), 3)
+    return max(600 if timeout is None else timeout, 1)
+
+
+def runs_ai_memory_hook(command: str) -> bool:
+    try:
+        argv = shlex.split(command)
+    except ValueError:
+        return False
+    return runs(argv, "ai-memory") and "hook" in argv[1:]
+
+
+def codex_hook_hashes(source: str, events: dict) -> dict:
+    """{key: (event, loads, current hash, runs ai-memory's hook)} for each command handler of one hooks.json whose
+    path is ``source``, following discovery.rs append_matcher_groups: a group whose matcher does not compile is
+    skipped (loads False; None when codex_matcher_loads cannot tell), as is a blank command. The hash is hook_hash
+    through fingerprint.rs version_for_toml: SHA-256 of the normalized identity as compact JSON with sorted keys.
+    Raises CodexRejects for a hook Codex cannot hash (a number beyond a TOML integer), on which Codex's hook
+    discovery panics and its app-server stops answering."""
+    result = {}
+    for event, groups in events.items():
+        label = CODEX_HOOK_EVENTS[event]
+        for group_index, (matcher, handlers) in enumerate(groups):
+            matcher = None if event in CODEX_EVENTS_WITHOUT_MATCHER else matcher
+            loads = True if matcher is None else codex_matcher_loads(matcher)
+            if loads is False:
+                continue  # Codex skips the whole group with a warning
+            for handler_index, handler in enumerate(handlers):
+                if handler is None:
+                    continue  # prompt and agent hooks: skipped as unsupported
+                if handler["type"] == "mcp_tool":
+                    if not (event == "SessionEnd" or not handler["server"].strip(RUST_WHITESPACE)
+                            or not handler["tool"].strip(RUST_WHITESPACE)) \
+                            and normalized_timeout(event, handler["timeout"]) > I64_MAX:
+                        raise CodexRejects("hook identity is not TOML")
+                    continue  # an MCP hook runs no command
+                if not handler["command"].strip(RUST_WHITESPACE):
+                    continue  # skipped before it is normalized or hashed
+                timeout = normalized_timeout(event, handler["timeout"])
+                limit = handler["additionalContextLimit"] if event in CODEX_CONTEXT_LIMIT_EVENTS else None
+                if max(timeout, limit or 0) > I64_MAX:
+                    raise CodexRejects("hook identity is not TOML")
+                config = {"type": "command", "command": handler["command"], "timeout": timeout,
+                          "async": handler["async"]}
+                if handler["statusMessage"] is not None:
+                    config["statusMessage"] = handler["statusMessage"]
+                if limit is not None and limit != CODEX_DEFAULT_CONTEXT_LIMIT:
+                    config["additionalContextLimit"] = limit
+                identity = {"event_name": label, "hooks": [config]}
+                if matcher is not None:
+                    identity["matcher"] = matcher
+                canonical = json.dumps(identity, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+                result[f"{source}:{label}:{group_index}:{handler_index}"] = (
+                    event, loads, "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+                    runs_ai_memory_hook(handler["command"]))
+    return result
+
+
+def codex_hook_states(config) -> dict:
+    """The user config.toml's [hooks.state] as config_rules.rs hook_states_from_stack reads it: keys trimmed as
+    Rust's str::trim does, an entry with a wrongly typed field skipped, and "enabled" and "trusted_hash" merged
+    field by field."""
+    states = {}
+    for key, value in table(table(table(config).get("hooks")).get("state")).items():
+        key = key.strip(RUST_WHITESPACE)
+        if not isinstance(value, dict) or not key:
+            continue
+        fields = {"enabled": value.get("enabled"), "trusted_hash": value.get("trusted_hash")}
+        if not (isinstance(fields["enabled"], (bool, type(None)))
+                and isinstance(fields["trusted_hash"], (str, type(None)))):
+            continue
+        states.setdefault(key, {}).update({name: item for name, item in fields.items() if item is not None})
+    return states
+
+
+def codex_ai_memory_hook_counts(events: dict, config, key_root: str) -> tuple[int, int | None]:
+    """(events with an ai-memory hook in hooks.json, events with one Codex runs): enabled, and its [hooks.state]
+    trusted_hash equal to its current hash, exactly as discovery.rs hook_enabled and hook_trust_status decide for a
+    user (not managed) hook. The second is None when a matcher on an ai-memory hook leaves loading undecided.
+    Hashes are compared here and never returned."""
+    configured = sum(any(handler is not None and handler["type"] == "command"
+                         and runs_ai_memory_hook(handler["command"]) for _, handlers in groups for handler in handlers)
+                     for groups in events.values())
+    hooks = codex_hook_hashes(f"{key_root}/hooks.json", events)
+    if any(loads is None for _, loads, _, ai_memory in hooks.values() if ai_memory):
+        return configured, None
+    states = codex_hook_states(config)
+    return configured, len({event for key, (event, loads, digest, ai_memory) in hooks.items()
+                            if ai_memory and loads and states.get(key, {}).get("enabled") is not False
+                            and states.get(key, {}).get("trusted_hash") == digest})
+
+
+def codex_wiring(codex_dir: Path, key_root: str | None = None) -> dict:
+    """``key_root`` is the Codex home as Codex spells it in hook keys (client_wiring passes it)."""
     config = read_client_file(codex_dir / "config.toml", "toml")
-    agents = read_client_file(codex_dir / "AGENTS.md", "text")
-    hooks = read_client_file(codex_dir / "hooks.json", "json")
+    engine = codex_hooks_enabled(config)
+    hooks_path = codex_dir / "hooks.json"
+    text = read_client_file(hooks_path, "text")
+    try:  # hooks off: none runs; an absent hooks.json: no hooks; unreadable, or failing Codex's own parse: unknown
+        counts = ((None, None) if text is None or engine is None else (0, 0) if not engine else
+                  codex_ai_memory_hook_counts(codex_hooks_json(text) if os.path.lexists(hooks_path) else {},
+                                              config, key_root or str(codex_dir)))
+    except CodexRejects:
+        counts = (None, None)
     entry = {} if config is None else table(table(config.get("plugins")).get(CONTEXT_MODE_PLUGIN))
     plugin = None if config is None else entry.get("enabled") is True
     if plugin:  # enabled in config.toml and present in the native plugin cache
@@ -374,14 +813,14 @@ def codex_wiring(codex_dir: Path) -> dict:
                          codex_dir.glob("plugins/cache/context-mode/context-mode/*/.codex-plugin/plugin.json"))
         except OSError:
             plugin = None
-    engine = codex_hooks_enabled(config)
+    configured, trusted = counts
     return {
-        "rtk_instructions": None if agents is None else "RTK.md" in agents and (codex_dir / "RTK.md").is_file(),
+        "rtk_instructions": rtk_instructions_inline(codex_dir),
         "context_mode_plugin_enabled": plugin,
         "mcp_servers_present": mcp_servers_present(config),
         "hooks_feature_enabled": engine,
-        "ai_memory_hook_events": None if hooks is None or engine is None else
-                                 ai_memory_hook_events(hooks.get("hooks")) if engine else 0,
+        "ai_memory_hook_events": configured,
+        "ai_memory_hook_events_trusted": trusted,
     }
 
 
@@ -416,14 +855,16 @@ def leaves(value) -> list:
 
 def wiring_complete(groups: dict) -> bool:
     """The documented rule (docs/token-efficiency-stack.md, "Coverage check"): every file parsed, every boolean
-    true with each Codex server named in the user or the project config.toml, and both hook counts above zero."""
+    true with each Codex server named in the user or the project config.toml, both hook counts above zero, and
+    every Codex event that runs ai-memory trusted, so Codex actually runs its hook."""
     if None in leaves(groups):
         return False
     claude, project, codex = groups["claude"], groups["project"], groups["codex"]
     servers = all(codex["mcp_servers_present"][name] or project["codex_mcp_servers_present"][name]
                   for name in WIRED_MCP_SERVERS)
     flags = all(value for group in groups.values() for value in group.values() if isinstance(value, bool))
-    return servers and flags and claude["ai_memory_hook_events"] > 0 and codex["ai_memory_hook_events"] > 0
+    return (servers and flags and claude["ai_memory_hook_events"] > 0 and codex["ai_memory_hook_events"] > 0
+            and codex["ai_memory_hook_events_trusted"] == codex["ai_memory_hook_events"])
 
 
 def client_wiring(root: Path, env=None) -> dict:
@@ -434,9 +875,13 @@ def client_wiring(root: Path, env=None) -> dict:
     and "complete" applies the documented rule to the three groups."""
     env = os.environ if env is None else env
     home = env.get("HOME") or str(Path.home())
+    codex_home = env.get("CODEX_HOME")
+    # Codex's own spelling of its home in hook keys: a set CODEX_HOME canonicalized, else $HOME/.codex as is
+    # (codex-rs/utils/home-dir find_codex_home).
+    key_root = os.path.realpath(codex_home) if codex_home else os.path.normpath(f"{home}/.codex")
     groups = {"claude": claude_wiring(Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude"), env),
               "project": project_wiring(root),
-              "codex": codex_wiring(Path(env.get("CODEX_HOME") or f"{home}/.codex"))}
+              "codex": codex_wiring(Path(codex_home or f"{home}/.codex"), key_root)}
     if not fixed_wiring(groups):
         raise AssertionError("client wiring must be the fixed keys with boolean or count values")
     return {**groups, "complete": wiring_complete(groups)}
@@ -666,6 +1111,22 @@ def pinned_versions(component_ids: list[str], pins: dict) -> list[dict]:
             for identifier in component_ids]
 
 
+def pinned_versions_summary(results: list[dict]) -> dict:
+    """One profile's component ids by outcome: matched, mismatched (checked, not the pin) and unchecked."""
+    return {"matched": [item["id"] for item in results if item["checked"] and item["matches_pin"]],
+            "mismatched": [item["id"] for item in results if item["checked"] and not item["matches_pin"]],
+            "unchecked": [item["id"] for item in results if not item["checked"]]}
+
+
+def pinned_versions_match(profiles: list[dict]) -> bool | None:
+    """False when any selected profile has a checked component that differs from its pin, True when at least one
+    was checked and none differs, None when nothing could be checked. Unchecked components do not count."""
+    summaries = [profile["pinned_versions_summary"] for profile in profiles]
+    if any(summary["mismatched"] for summary in summaries):
+        return False
+    return True if any(summary["matched"] for summary in summaries) else None
+
+
 def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[str] | None = None,
                      *, with_client_wiring: bool = False, with_pinned_versions: bool = False, env=None) -> dict:
     manifest = manifest.absolute()
@@ -712,7 +1173,11 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
                  "status": "prerequisites_present" if ready else "prerequisites_missing"}
         if with_pinned_versions:
             entry["pinned_versions"] = pinned_versions(profile["component_ids"], pins)
+            entry["pinned_versions_summary"] = pinned_versions_summary(entry["pinned_versions"])
         result["profiles"].append(entry)
+    if with_pinned_versions:
+        # Surfaced at the top: a mismatch leaves the prerequisite status and the exit code unchanged.
+        result["pinned_versions_match"] = pinned_versions_match(result["profiles"])
     revision = git_revision(root)
     baseline = data["source"]["baseline_commit"]
     result["git"] = {"baseline_commit": baseline, "current_commit": revision,
@@ -735,8 +1200,10 @@ def main(argv: list[str] | None = None) -> int:
                              "the exit code is unchanged)")
     parser.add_argument("--pinned-versions", action="store_true",
                         help="Also report, per selected profile, whether each component_id's declared platform "
-                             "pin (adoption/pins-<os>-<arch>.json) version_probe observed the pinned version "
-                             "(booleans, counts and version strings only; never execs a probe whose declared "
+                             "pin (adoption/pins-<os>-<arch>.json) version_probe observed the pinned version, "
+                             "each profile's matched, mismatched and unchecked ids, and a top-level "
+                             "pinned_versions_match that is false when any checked component differs from its pin "
+                             "(booleans, ids and version strings only; never execs a probe whose declared "
                              "method is not \"exec\", and the exit code is unchanged)")
     args = parser.parse_args(argv)
     with signals_interrupt_probes() if args.pinned_versions else contextlib.nullcontext():
@@ -751,14 +1218,13 @@ def main(argv: list[str] | None = None) -> int:
             missing = [item["name"] for item in profile["commands"] if not item["present"]]
             missing += [item["path"] for item in profile["recipes"] if not item["present"]]
             print(f"{profile['id']}: {profile['status']}" + (f" (missing: {', '.join(missing)})" if missing else ""))
-            if "pinned_versions" in profile:
-                matched = sum(1 for item in profile["pinned_versions"] if item["matches_pin"])
-                mismatched = [item["id"] for item in profile["pinned_versions"]
-                             if item["checked"] and not item["matches_pin"]]
-                unchecked = [item["id"] for item in profile["pinned_versions"] if not item["checked"]]
-                print(f"  pinned versions: {matched} matched"
-                      + (f", mismatched: {', '.join(mismatched)}" if mismatched else "")
-                      + (f", unchecked: {', '.join(unchecked)}" if unchecked else ""))
+            if "pinned_versions_summary" in profile:
+                summary = profile["pinned_versions_summary"]
+                print(f"  pinned versions: {len(summary['matched'])} matched"
+                      + (f", mismatched: {', '.join(summary['mismatched'])}" if summary["mismatched"] else "")
+                      + (f", unchecked: {', '.join(summary['unchecked'])}" if summary["unchecked"] else ""))
+        if "pinned_versions_match" in report:
+            print(f"Pinned versions match: {json.dumps(report['pinned_versions_match'])}")
         if "client_wiring" in report:
             wiring = dict(report["client_wiring"])
             print(f"Client wiring complete: {json.dumps(wiring.pop('complete', None))}")

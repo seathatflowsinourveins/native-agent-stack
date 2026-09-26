@@ -1,0 +1,16 @@
+checkout under test: ~/code/native-agent-stack-live @ 5008c30c
+primary checkout:    ~/code/native-agent-stack @ 720e294b
+FAIL  G9 checker reports hook trust and a top-level pin verdict: this checkout's adoption_status.py predates the fix
+FAIL  G9 rtk_instructions equals what Codex's model sees: codex debug prompt-input carries RTK.md text: False; checker rtk_instructions: True
+FAIL  G9 hook counts equal Codex's own hooks/list: hooks/list: 7 ai-memory events, 7 enabled and trusted; checker: 7 and None
+FAIL  G9 complete is false while Codex misses the practice: native: RTK text not model-visible; checker complete: True
+FAIL  G9 a pin mismatch surfaces at the top: --version: codex 0.157.1 (pin 0.155.1), claude 2.1.283 (floor 2.1.281); checker mismatched [], pinned_versions_match None
+FAIL  G13 stack.json claude-code follows the pins floor: stack.json 2.1.278, pins floor 2.1.281, claude --version 2.1.283
+FAIL  G13 render.py cites the identified G1 cause: Prometheus now: 100 series with instance=unscoped, 6227 counter resets in 1 h
+FAIL  G13 the 14-id profile and the 16-tool run reconcile: OK
+FAIL  G13 primary checkout carries the worktree recipe: .worktreeinclude tracked with the marker: False; marker ignored: True; marker present: True
+      worktrees: 75 linked, 75 outside $HOME, 0 carry the marker, 0 of those admit capture
+FAIL  G13 Worktrunk would copy exactly the marker into an unenrolled worktree: wt step copy-ignored --require-include --dry-run plans []
+FAIL  G13 primary checkout carries the fix: HEAD has the fixed checker: False; 95 commits behind origin/main (local ref)
+
+0 of 11 checks passed; failed: 11

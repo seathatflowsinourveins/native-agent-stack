@@ -1,0 +1,15 @@
+{
+ "evaluated_at_utc": "2026-09-26T18:01:54Z",
+ "prometheus_series": 112.0,
+ "prometheus_series_instance_unscoped": 112.0,
+ "prometheus_series_by_type": {
+  "cacheCreation": 28,
+  "cacheRead": 28,
+  "input": 28,
+  "output": 28
+ },
+ "prometheus_counter_resets_last_1h": 4504.0,
+ "prometheus_increase_output_tokens_last_1h": 342381798.540646,
+ "loki_api_request_output_tokens_last_1h": 6201101.0,
+ "increase_over_loki": 55.2
+}

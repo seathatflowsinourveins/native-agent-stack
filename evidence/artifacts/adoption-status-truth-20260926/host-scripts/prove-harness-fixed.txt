@@ -1,0 +1,45 @@
+prove.py under test: u5-p2/prove.py
+--- P1 no native blocker, P3 Prometheus unreachable
+checkout under test: $SCRATCH/wt-u5 @ ca8e37f1
+primary checkout:    $SCRATCH/u5-p2/repair/ph-main @ f391e24
+PASS  G9 checker reports hook trust and a top-level pin verdict: fields present
+PASS  G9 rtk_instructions equals what Codex's model sees: codex debug prompt-input carries RTK.md text: True; checker rtk_instructions: True
+PASS  G9 hook counts equal Codex's own hooks/list: hooks/list: 7 ai-memory events, 7 enabled and trusted; checker: 7 and 7
+UNTESTED  G9 complete is false while Codex misses the practice: no native blocker observed; checker complete: False
+PASS  G9 a pin mismatch surfaces at the top: --version: codex None (pin 0.155.1), claude None (floor 2.1.281); checker mismatched [], pinned_versions_match True
+FAIL  G13 stack.json claude-code follows the pins floor: stack.json 2.1.281, pins floor 2.1.281, claude --version None
+PASS  G13 render.py's text cites the identified G1 cause (a text check): panels 10 and 19 name the unscoped series
+UNTESTED  G13 the G1 cause render.py cites holds in Prometheus now: Prometheus not queried (connection refused)
+PASS  G13 the 14-id profile and the 16-tool run reconcile: OK
+FAIL  G13 primary checkout carries the worktree recipe: .worktreeinclude tracked with the marker: False; marker ignored: False; marker present: False
+      worktrees: 0 linked, 0 outside $HOME, 0 carry the marker, 0 of those admitted through it under allowlist mode
+FAIL  G13 primary checkout carries the fix: HEAD has the fixed checker: False;  commits behind origin/main (local ref)
+
+6 of 11 checks passed; failed: 3; untested: 2
+
+EXPECT P1 the complete check is not a PASS without a blocker: ok
+EXPECT P3 the render.py text check passes: ok
+EXPECT P3 the native G1 check is UNTESTED: ok
+--- P2 denylist data dir, P3 Prometheus with no unscoped series
+checkout under test: $SCRATCH/wt-u5 @ ca8e37f1
+primary checkout:    $SCRATCH/u5-p2/repair/ph-main @ f391e24
+PASS  G9 checker reports hook trust and a top-level pin verdict: fields present
+PASS  G9 rtk_instructions equals what Codex's model sees: codex debug prompt-input carries RTK.md text: True; checker rtk_instructions: True
+PASS  G9 hook counts equal Codex's own hooks/list: hooks/list: 7 ai-memory events, 7 enabled and trusted; checker: 7 and 7
+UNTESTED  G9 complete is false while Codex misses the practice: no native blocker observed; checker complete: False
+PASS  G9 a pin mismatch surfaces at the top: --version: codex None (pin 0.155.1), claude None (floor 2.1.281); checker mismatched [], pinned_versions_match True
+FAIL  G13 stack.json claude-code follows the pins floor: stack.json 2.1.281, pins floor 2.1.281, claude --version None
+PASS  G13 render.py's text cites the identified G1 cause (a text check): panels 10 and 19 name the unscoped series
+FAIL  G13 the G1 cause render.py cites holds in Prometheus now: 0 series with instance=unscoped, 0 counter resets in 1 h
+PASS  G13 the 14-id profile and the 16-tool run reconcile: OK
+FAIL  G13 primary checkout carries the worktree recipe: .worktreeinclude tracked with the marker: False; marker ignored: False; marker present: False
+      worktrees: 0 linked, 0 outside $HOME, 0 carry the marker, 0 of those admitted through it under allowlist mode
+FAIL  G13 enrolled worktree admits capture through its marker (worker): capture_mode denylist, marker_present False, admits_capture True
+FAIL  G13 primary checkout carries the fix: HEAD has the fixed checker: False;  commits behind origin/main (local ref)
+
+6 of 12 checks passed; failed: 5; untested: 1
+
+EXPECT P2 the capture check passes the installed hook's --data-dir: ok
+EXPECT P2 a worktree admitted by denylist mode FAILs: ok
+EXPECT P3 no unscoped series FAILs the native G1 check: ok
+=== summary: 0 expectation(s) not met

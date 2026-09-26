@@ -3,6 +3,7 @@
 import contextlib
 import dis
 import errno
+import hashlib
 import io
 import json
 import os
@@ -59,14 +60,136 @@ WIRED = {
     "project": {"settings_depth_and_concurrency": True, "codex_mcp_servers_present": dict.fromkeys(SERVERS, True)},
     "codex": {"rtk_instructions": True, "context_mode_plugin_enabled": True,
               "mcp_servers_present": dict.fromkeys(SERVERS, True), "hooks_feature_enabled": True,
-              "ai_memory_hook_events": 7},
+              "ai_memory_hook_events": 7, "ai_memory_hook_events_trusted": 7},
     "complete": True,
 }
+# The RTK.md that `rtk init -g --codex` (rtk 0.50.0) writes: RTK's ownership line, then the instructions.
+RTK_MD = (f"<!-- rtk-owned: written by `rtk init --codex`, removed by `rtk init --codex --uninstall` -->\n\n"
+          f"# RTK {PRIVATE}\n\nPrefix every shell command with `rtk`: `rtk git status`.\n")
+# The same instructions pasted into AGENTS.md: rewrapped, without the ownership line.
+AGENTS_INLINE = f"# {PRIVATE}\n\n# RTK {PRIVATE}\nPrefix every shell command\nwith `rtk`: `rtk git status`.\n"
+# currentHash that Codex's own `codex app-server` hooks/list returned for these hooks.json handlers, each alone in
+# its event (codex-cli 0.157.1, 2026-09-26, a throwaway CODEX_HOME;
+# evidence/artifacts/adoption-status-truth-20260926/codex-known-answers.json): known answers for codex_hook_hashes,
+# whose source is byte-identical at rust-v0.155.1.
+EXAMPLE_HOOK = ("/opt/example/ai-memory --data-dir /opt/example hook --event {} --agent codex "
+                "--server-url http://127.0.0.1:1")
+CODEX_KNOWN_HASHES = (
+    ("SessionStart", "", {"type": "command", "command": EXAMPLE_HOOK.format("session-start")},
+     "sha256:4d9205412446343ca20dacc40b406615e933c2f04732fbde2cb6b51d442817df"),
+    ("UserPromptSubmit", "", {"type": "command", "command": EXAMPLE_HOOK.format("user-prompt-submit")},
+     "sha256:bafdaee0246ea58754e42a0dde6985508cefd06c7510da4cee65a0fd29ff6297"),
+    ("SessionEnd", "", {"type": "command", "command": EXAMPLE_HOOK.format("session-end"), "timeout": 10},
+     "sha256:15f2c9d33be78a0162254dd01e08e2e0c9d7d7d284fa18db9fc2203be0970642"),
+    ("PreToolUse", "Bash", {"type": "command", "command": "rtk hook codex", "timeout": 30,
+                            "statusMessage": "rewriting"},
+     "sha256:fd1656dbf26529a5398e69be444b6c6bf660a49f7a42ed33f5504b237ae5080a"),
+    ("PostToolUse", "mcp__.*", {"type": "command", "command": EXAMPLE_HOOK.format("post-tool-use"), "async": True,
+                                "additionalContextLimit": 4000},
+     "sha256:717174d53c367657dfdeeb4663aa1a5b2eca26383a58d2c3d17c3b261007af34"),
+    ("Stop", None, {"type": "command", "command": "echo 'quoted \"text\" \u00e9'", "commandWindows": "echo win"},
+     "sha256:7e3fccfd4440e1614122d1f033d78f688ce70f27cbb06f81d233ed9bb02b47e1"),
+)
 
 
 def ai_memory_group(event: str) -> dict:
     command = f"/opt/{PRIVATE}/ai-memory --data-dir /opt/{PRIVATE} hook --event {event} --server-url http://{PRIVATE}"
     return {"matcher": "", "hooks": [{"type": "command", "command": command}]}
+
+
+STOP_COMMAND = json.dumps(ai_memory_group("Stop")["hooks"][0]["command"])
+
+
+def stop_handler(extra: str = "", command: str = STOP_COMMAND) -> str:
+    return '{"type": "command", "command": ' + command + extra + '}'
+
+
+def stop_group(handler: str | None = None, extra: str = "") -> str:
+    return '{"matcher": "", "hooks": [' + (handler or stop_handler()) + ']' + extra + '}'
+
+
+def codex_hooks_text(stop: str | None = None, *, top: str = "", events: str = "") -> str:
+    """The wired Codex hooks.json as JSON text, for shapes json.dumps cannot write: its Stop groups replaced by
+    ``stop``, ``top`` put before the "hooks" member and ``events`` after the Stop member."""
+    other = json.dumps({event: [ai_memory_group(event)] for event in CODEX_EVENTS if event != "Stop"})[1:-1]
+    return '{%s"hooks": {%s, "Stop": [%s]%s}}' % (top, other, stop or stop_group(), events)
+
+
+def nested_arrays(depth: int) -> str:
+    return "[" * depth + "]" * depth
+
+
+# Codex 0.157.1's own verdicts on hooks.json shapes: `codex app-server` hooks/list in a throwaway CODEX_HOME, run
+# 2026-09-26 on one Stop hook each (evidence/artifacts/adoption-status-truth-20260926/codex-parse-oracle.jsonl, a
+# local integration check, not an upstream test). Here each shape changes only the Stop part of a wired file.
+# Codex's serde parse fails on these, so it loads no hook from the file (its warning quoted in brief).
+CODEX_REJECTED_HOOKS_FILES = (
+    ("repeated top-level hooks (duplicate field `hooks`)", codex_hooks_text(top='"hooks": {}, ')),
+    ("repeated event (duplicate field `Stop`)", codex_hooks_text(events=', "Stop": []')),
+    ("repeated group field (duplicate field `matcher`)",
+     codex_hooks_text('{"matcher": "", "matcher": "", "hooks": [' + stop_handler() + ']}')),
+    ("repeated handler field (duplicate field `command`)",
+     codex_hooks_text(stop_group('{"type": "command", "command": "echo", "command": ' + STOP_COMMAND + '}'))),
+    ("repeated type tag (duplicate field `type`)",
+     codex_hooks_text(stop_group('{"type": "command", "type": "command", "command": ' + STOP_COMMAND + '}'))),
+    ("both commandWindows spellings (duplicate field `commandWindows`)",
+     codex_hooks_text(stop_group(stop_handler(', "commandWindows": "a", "command_windows": "b"')))),
+    ("NaN in an unknown handler field (expected value)", codex_hooks_text(stop_group(stop_handler(', "x": NaN')))),
+    ("Infinity in an unknown group field (expected value)", codex_hooks_text(stop_group(extra=', "x": Infinity'))),
+    ("lone surrogate in the command (unexpected end of hex escape)",
+     codex_hooks_text(stop_group(stop_handler(command=STOP_COMMAND[:-1] + ' \\ud800"')))),
+    ("lone surrogate in an unknown handler field", codex_hooks_text(stop_group(stop_handler(', "x": "\\ud800"')))),
+    ("lone surrogate in an unknown group key", codex_hooks_text(stop_group(extra=', "\\ud800": 1'))),
+    ("lone surrogate in the matcher", codex_hooks_text('{"matcher": "\\ud800", "hooks": [' + stop_handler() + ']}')),
+    ("128 nested arrays inside a handler (recursion limit exceeded)",
+     codex_hooks_text(stop_group(stop_handler(', "x": ' + nested_arrays(122))))),
+    ("timeout 2^64 (invalid type: map, expected u64)",
+     codex_hooks_text(stop_group(stop_handler(', "timeout": 18446744073709551616')))),
+    ("timeout 5.0 (invalid type: map, expected u64)", codex_hooks_text(stop_group(stop_handler(', "timeout": 5.0')))),
+    ("type tag as a variant index (expected variant identifier)",
+     codex_hooks_text(stop_group('{"type": 0, "command": ' + STOP_COMMAND + '}'))),
+    ("MCP input whose last duplicate is null (not representable as TOML)", codex_hooks_text(
+        stop_group() + ', {"hooks": [{"type": "mcp_tool", "server": "s", "tool": "t", '
+                       '"input": {"k": 1, "k": null}}]}')),
+    ("group array with an element left over (trailing characters)",
+     codex_hooks_text('[null, [' + stop_handler() + '], 1]')),
+    # Codex cannot hash a timeout beyond a TOML integer: hook discovery panics and hooks/list never answers.
+    ("timeout 2^63 (no answer)", codex_hooks_text(stop_group(stop_handler(', "timeout": 9223372036854775808')))),
+)
+# ... and parses these, loading the Stop hook with the same key and hash as the wired file's.
+CODEX_ACCEPTED_HOOKS_FILES = (
+    ("repeated unknown event", codex_hooks_text(events=', "Future": 1, "Future": 2')),
+    ("repeated unknown group field", codex_hooks_text(stop_group(extra=', "x": 1, "x": 2'))),
+    ("repeated unknown handler field", codex_hooks_text(stop_group(stop_handler(', "x": 1, "x": 2')))),
+    ("lone surrogate in an unknown group field", codex_hooks_text(stop_group(extra=', "x": {"\\ud800": "\\udc00"}'))),
+    ("lone surrogate in an unknown event", codex_hooks_text(events=', "Future": "\\ud800"')),
+    ("1e400 in an unknown handler field", codex_hooks_text(stop_group(stop_handler(', "x": 1e400')))),
+    ("400-digit integer in an unknown handler field",
+     codex_hooks_text(stop_group(stop_handler(', "x": 1' + "0" * 400)))),
+    ("127 nested arrays inside a handler", codex_hooks_text(stop_group(stop_handler(', "x": ' + nested_arrays(121))))),
+    ("300 nested arrays in an unknown group field", codex_hooks_text(stop_group(extra=', "x": ' + nested_arrays(296)))),
+    ("group as an array", codex_hooks_text('[null, [' + stop_handler() + ']]')),
+    ("handler as an array", codex_hooks_text(stop_group('["command", ' + STOP_COMMAND + ']'))),
+    ("MCP input whose last duplicate is set, with integers beyond i64", codex_hooks_text(
+        stop_group() + ', {"hooks": [{"type": "mcp_tool", "server": "s", "tool": "t", '
+                       '"input": {"k": null, "k": 9223372036854775808, "n": -9223372036854775809}}]}')),
+    ("context limit 2^63 on Stop, which drops it",
+     codex_hooks_text(stop_group(stop_handler(', "additionalContextLimit": 9223372036854775808')))),
+    ("file and events as arrays", '[null, [' + ", ".join(
+        json.dumps([ai_memory_group(event)] if event in CODEX_EVENTS else [])
+        for event in adoption_status.CODEX_HOOK_EVENTS) + ']]'),
+)
+# Matchers whose loading Codex 0.157.1 decided in the same run (one PreToolUse group each). The check decides a
+# matcher built from constructs both regex engines parse alike ...
+CODEX_LOADS_MATCHERS = ("", "*", "Bash", "Bash|Edit", "mcp__.*", "^Bash$", "(Bash|Edit)", "(?:Bash)", "[A-Z]\\w+",
+                        "\\bBash\\b", "Bash.*?", "a|", "()", "\\.", "\\-", "\\~", "\\n", "[a-]", "[^a-z]", "[\\]]",
+                        "é+", "a b", "\\AB", "(^)*", "(a|)*", "[*+?]", "[-]", "a$b", "(|)", "[^\\W]")
+CODEX_SKIPS_MATCHERS = ("(", ")", "*a", "a|*", "(*)", "[a", "[z-a]", "a\\")
+# ... and answers null (undecided) for the rest, whichever way Codex went (Codex's verdict in the comment).
+UNDECIDED_MATCHERS = ("(?#note)Bash", "(?a)Bash", "\\0Bash", "(B)?(?(1)ash|x)",  # Codex skips; Python compiles
+                      "\\N{LATIN SMALL LETTER A}", "(?=a)", "a\\Z", "a{,2}", "a{", "[\\b]",  # the same
+                      "a**", "^*", "\\b*", "a\\z", "\\p{L}", "(?<n>a)", "[a--b]", "\\x{41}",  # Codex loads; not Python
+                      "(?i)bash", "a{2}", "}", "[[:alpha:]]", "\\x41", "\\/", "a*+", "[]a]")  # both load
 
 
 def leaves(value):
@@ -636,6 +759,7 @@ class PinnedVersionsCheckTests(unittest.TestCase):
             result = inspect_adoption(self.path, self.root)
         popen.assert_not_called()
         self.assertEqual(result["profiles"][0].keys(), {"id", "commands", "recipes", "status"})
+        self.assertNotIn("pinned_versions_match", result)
         self.assertIn(NO_PINNED_VERSION, result["limitations"])
 
     def test_pinned_versions_reports_matched_unchecked_and_absent(self):
@@ -645,8 +769,33 @@ class PinnedVersionsCheckTests(unittest.TestCase):
             {"id": "context-mode", "pinned_version": "1.0.169", "checked": False, "matches_pin": None},
             {"id": "unpinned-tool", "pinned_version": None, "checked": False, "matches_pin": None},
         ])
+        self.assertEqual(result["profiles"][0]["pinned_versions_summary"],
+                         {"matched": ["qmd"], "mismatched": [], "unchecked": ["context-mode", "unpinned-tool"]})
+        self.assertIs(result["pinned_versions_match"], True)  # unchecked components do not count either way
         self.assertNotIn(NO_PINNED_VERSION, result["limitations"])
         self.assertEqual(result["limitations"][-1:], PINNED_VERSION_LIMITATIONS)
+
+    def test_a_mismatch_surfaces_at_the_top_while_status_and_exit_stay_the_prerequisite_result(self):
+        (self.root / "bin/qmd").write_text("#!/bin/sh\nprintf 'qmd 2.9.0\\n'\n")
+        result = inspect_adoption(self.path, self.root, with_pinned_versions=True)
+        self.assertEqual(result["profiles"][0]["pinned_versions_summary"],
+                         {"matched": [], "mismatched": ["qmd"], "unchecked": ["context-mode", "unpinned-tool"]})
+        self.assertIs(result["pinned_versions_match"], False)
+        self.assertEqual((result["status"], result["errors"]), ("prerequisites_present", []))
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            code = main(["--manifest", str(self.path), "--repo-root", str(self.root), "--pinned-versions"])
+        self.assertEqual(code, 0)
+        self.assertIn("pinned versions: 0 matched, mismatched: qmd, unchecked: context-mode, unpinned-tool\n"
+                      "Pinned versions match: false\n", output.getvalue())
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            main(["--manifest", str(self.path), "--repo-root", str(self.root), "--pinned-versions", "--json"])
+        self.assertIs(json.loads(output.getvalue())["pinned_versions_match"], False)
+
+    def test_pinned_versions_match_is_absent_without_the_flag_and_null_when_nothing_was_checked(self):
+        self.assertNotIn("pinned_versions_match", inspect_adoption(self.path, self.root))
+        self.pins.unlink()
+        self.assertIsNone(inspect_adoption(self.path, self.root, with_pinned_versions=True)["pinned_versions_match"])
 
     def test_an_absent_pins_file_reports_every_component_unchecked_not_an_error(self):
         self.pins.unlink()
@@ -1060,15 +1209,24 @@ class ClientWiringTests(unittest.TestCase):
         self.write(".claude/settings.json", self.claude_settings())
         self.write(".claude/plugins/installed_plugins.json", {"version": 2, "plugins": {"context-mode@context-mode": [
             {"scope": "user", "installPath": f"/opt/{PRIVATE}", "gitCommitSha": "a" * 40}]}})
-        self.write(".codex/config.toml", CODEX_CONFIG)
-        self.write(".codex/AGENTS.md", f"# {PRIVATE}\n\n@RTK.md\n")
-        self.write(".codex/RTK.md", f"# RTK {PRIVATE}\n")
+        self.write(".codex/AGENTS.md", AGENTS_INLINE)
+        self.write(".codex/RTK.md", RTK_MD)
         self.write(".codex/hooks.json", {"hooks": {event: [ai_memory_group(event)] for event in CODEX_EVENTS}})
+        self.write(".codex/config.toml", CODEX_CONFIG + self.trust())
         self.write(".codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/plugin.json",
                    {"name": PRIVATE})
         self.write(".claude/settings.json", {"env": {"CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
                                                      "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}}, self.root)
         self.write(".codex/config.toml", CODEX_CONFIG, self.root)
+
+    def trust(self, codex_home: Path | None = None, key_root: str | None = None) -> str:
+        """The [hooks.state] tables Codex's /hooks writes when every command hook in the Codex home's hooks.json is
+        trusted: each hook's key (its hooks.json path as Codex spells it) and current hash."""
+        codex_home = codex_home or self.home / ".codex"
+        events = adoption_status.codex_hooks_json((codex_home / "hooks.json").read_text(encoding="utf-8"))
+        hashes = adoption_status.codex_hook_hashes(f"{key_root or codex_home}/hooks.json", events)
+        return "".join(f'\n[hooks.state."{key}"]\ntrusted_hash = "{digest}"\n'
+                       for key, (_, _, digest, _) in hashes.items())
 
     def wiring(self, env=None) -> dict:
         result = client_wiring(self.root, self.env if env is None else env)
@@ -1096,7 +1254,7 @@ class ClientWiringTests(unittest.TestCase):
             # Without a config.toml Codex keeps its default: hooks on.
             "codex": {"rtk_instructions": False, "context_mode_plugin_enabled": False,
                       "mcp_servers_present": dict.fromkeys(SERVERS, False), "hooks_feature_enabled": True,
-                      "ai_memory_hook_events": 0},
+                      "ai_memory_hook_events": 0, "ai_memory_hook_events_trusted": 0},
             "complete": False})
 
     def test_malformed_files_report_null_without_raising(self):
@@ -1112,7 +1270,7 @@ class ClientWiringTests(unittest.TestCase):
             "project": {"settings_depth_and_concurrency": None, "codex_mcp_servers_present": dict.fromkeys(SERVERS)},
             "codex": {"rtk_instructions": None, "context_mode_plugin_enabled": None,
                       "mcp_servers_present": dict.fromkeys(SERVERS), "hooks_feature_enabled": None,
-                      "ai_memory_hook_events": None},
+                      "ai_memory_hook_events": None, "ai_memory_hook_events_trusted": None},
             "complete": False})
 
     def test_directories_oversized_files_and_dangling_links_are_unreadable(self):
@@ -1129,6 +1287,7 @@ class ClientWiringTests(unittest.TestCase):
         self.assertEqual(result["codex"]["mcp_servers_present"], dict.fromkeys(SERVERS))
         self.assertIsNone(result["codex"]["hooks_feature_enabled"])
         self.assertIsNone(result["codex"]["ai_memory_hook_events"])
+        self.assertIsNone(result["codex"]["ai_memory_hook_events_trusted"])
         self.assertTrue(result["codex"]["rtk_instructions"])
         self.assertIs(result["complete"], False)
 
@@ -1151,7 +1310,8 @@ class ClientWiringTests(unittest.TestCase):
         self.assertFalse(result["project"]["settings_depth_and_concurrency"])
         self.assertEqual(result["codex"], {"rtk_instructions": False, "context_mode_plugin_enabled": False,
                                            "mcp_servers_present": dict.fromkeys(SERVERS, False),
-                                           "hooks_feature_enabled": False, "ai_memory_hook_events": 0})
+                                           "hooks_feature_enabled": False, "ai_memory_hook_events": 0,
+                                           "ai_memory_hook_events_trusted": 0})
         self.assertIs(result["complete"], False)
 
     def test_the_rtk_hook_needs_a_bash_matcher_and_the_claude_hook_subcommand(self):
@@ -1187,33 +1347,218 @@ class ClientWiringTests(unittest.TestCase):
                  ('[features]\nhooks = "true"\n', False), ("[features]\ncodex_hooks = 1\n", False))
         for features, expected in cases:
             with self.subTest(features=features):
-                self.write(".codex/config.toml", CODEX_BASE + "\n" + features)
+                self.write(".codex/config.toml", CODEX_BASE + "\n" + features + self.trust())
                 result = self.wiring()
                 self.assertIs(result["codex"]["hooks_feature_enabled"], expected)
                 self.assertEqual(result["codex"]["ai_memory_hook_events"], 7 if expected else 0)
+                self.assertEqual(result["codex"]["ai_memory_hook_events_trusted"], 7 if expected else 0)
                 self.assertIs(result["codex"]["context_mode_plugin_enabled"], True)
                 self.assertIs(result["complete"], expected)
         self.write(".codex/config.toml", 'features = "hooks"\n' + CODEX_BASE)
         self.assertIs(self.wiring()["codex"]["hooks_feature_enabled"], False)
         self.write(".codex/config.toml", "= broken")  # hooks.json is still valid: the count is unknown, not zero
         codex = self.wiring()["codex"]
-        self.assertEqual((codex["hooks_feature_enabled"], codex["ai_memory_hook_events"]), (None, None))
+        self.assertEqual((codex["hooks_feature_enabled"], codex["ai_memory_hook_events"],
+                          codex["ai_memory_hook_events_trusted"]), (None, None, None))
 
     def test_complete_is_the_documented_rule(self):
         self.wire()
         self.assertIs(self.wiring()["complete"], True)
         elsewhere = CODEX_CONFIG.replace("[mcp_servers.serena]\n", "[mcp_servers.other]\n")
-        self.write(".codex/config.toml", elsewhere)  # still named in the project config.toml
+        self.write(".codex/config.toml", elsewhere + self.trust())  # still named in the project config.toml
         self.assertIs(self.wiring()["complete"], True)
         self.write(".codex/config.toml", elsewhere, self.root)  # now in neither
         self.assertIs(self.wiring()["complete"], False)
         for relative, content, base in ((".codex/hooks.json", {"hooks": {}}, None),  # a zero hook count
                                         (".codex/AGENTS.md", "# no instructions\n", None),  # one false boolean
+                                        (".codex/config.toml", CODEX_CONFIG, None),  # hooks configured, not trusted
                                         (".codex/config.toml", "= broken", self.root)):  # one unreadable file
-            with self.subTest(relative=relative, project=base is not None):
+            with self.subTest(relative=relative, project=base is not None, content=str(content)[:20]):
                 self.wire()
                 self.write(relative, content, base)
                 self.assertIs(self.wiring()["complete"], False)
+
+    def test_rtk_instructions_must_be_inline_not_a_reference(self):
+        # Codex passes its AGENTS.md to the model verbatim and expands no "@" reference, so a pointer to RTK.md,
+        # which is what `rtk init -g --codex` writes, leaves the model without the instructions.
+        self.wire()
+        cases = ((f"# {PRIVATE}\n\n@RTK.md\n", RTK_MD, False),
+                 (f"@{self.home}/.codex/RTK.md\n", RTK_MD, False),
+                 (AGENTS_INLINE, RTK_MD, True),  # rewrapped, without RTK's ownership line
+                 (AGENTS_INLINE + "\n@RTK.md\n", RTK_MD, True),
+                 (AGENTS_INLINE, RTK_MD.replace("`rtk git status`", "`rtk ls`"), False),  # RTK.md moved on since
+                 (AGENTS_INLINE, "", False),  # no RTK.md
+                 (AGENTS_INLINE, "<!-- rtk-owned: written by rtk -->\n \n", False),  # nothing but the ownership line
+                 ("", RTK_MD, False),
+                 (AGENTS_INLINE, b"\xff\xfe# RTK\n", None))  # RTK.md unreadable here
+        for agents, rtk, expected in cases:
+            with self.subTest(agents=agents[:20], rtk=rtk[:30]):
+                self.write(".codex/AGENTS.md", agents)
+                if rtk == "":
+                    (self.home / ".codex/RTK.md").unlink(missing_ok=True)
+                else:
+                    self.write(".codex/RTK.md", rtk)
+                result = self.wiring()
+                self.assertIs(result["codex"]["rtk_instructions"], expected)
+                self.assertIs(result["complete"], expected is True)
+
+    def test_a_non_blank_agents_override_replaces_agents_md(self):
+        # codex-rs/codex-home/src/instructions/mod.rs: AGENTS.override.md first, AGENTS.md only when it is blank.
+        self.wire()
+        for override, expected in ((f"# {PRIVATE}: override without RTK\n", False), (" \n\t\n", True),
+                                   (AGENTS_INLINE, True), (b"\xff\xfe# override\n", None)):
+            with self.subTest(override=override[:20]):
+                self.write(".codex/AGENTS.override.md", override)
+                self.assertIs(self.wiring()["codex"]["rtk_instructions"], expected)
+        (self.home / ".codex/AGENTS.override.md").unlink()
+        self.write(".codex/AGENTS.md", f"# {PRIVATE}\n")
+        self.write(".codex/AGENTS.override.md", AGENTS_INLINE)
+        self.assertIs(self.wiring()["codex"]["rtk_instructions"], True)
+
+    def test_codex_runs_an_ai_memory_hook_only_when_enabled_and_trusted(self):
+        self.wire()
+        hooks = f"{self.home}/.codex/hooks.json"
+        trusted = self.trust()
+        stale = trusted.replace('trusted_hash = "sha256:', 'trusted_hash = "sha256:0', 1)  # one hook modified
+        disabled = trusted.replace(f'[hooks.state."{hooks}:stop:0:0"]\n',
+                                   f'[hooks.state."{hooks}:stop:0:0"]\nenabled = false\n')
+        mistyped = trusted.replace(f'[hooks.state."{hooks}:stop:0:0"]\n',
+                                   f'[hooks.state."{hooks}:stop:0:0"]\nenabled = "yes"\n')
+        spaced = trusted.replace(f'[hooks.state."{hooks}:stop:0:0"]', f'[hooks.state." {hooks}:stop:0:0 "]')
+        # Rust's str::trim strips Unicode White_Space only; U+001C, which Python's str.strip() also strips, stays.
+        separated = trusted.replace(f'[hooks.state."{hooks}:stop:0:0"]', f'[hooks.state."\\u001c{hooks}:stop:0:0"]')
+        for state, expected in (("", 0), (trusted, 7), (stale, 6), (disabled, 6), (mistyped, 6), (spaced, 7),
+                                (separated, 6)):
+            with self.subTest(state=state[:60]):
+                self.write(".codex/config.toml", CODEX_CONFIG + state)
+                result = self.wiring()
+                self.assertEqual((result["codex"]["ai_memory_hook_events"],
+                                  result["codex"]["ai_memory_hook_events_trusted"]), (7, expected))
+                self.assertIs(result["complete"], expected == 7)
+        # A hook edited after it was trusted is "modified" to Codex until it is trusted again.
+        self.write(".codex/config.toml", CODEX_CONFIG + trusted)
+        edited = {"hooks": {event: [ai_memory_group(event)] for event in CODEX_EVENTS}}
+        edited["hooks"]["Stop"][0]["hooks"][0]["timeout"] = 30
+        self.write(".codex/hooks.json", edited)
+        self.assertEqual(self.wiring()["codex"]["ai_memory_hook_events_trusted"], 6)
+        # Only ai-memory hooks count: a trusted hook that runs something else adds nothing.
+        rtk = {"type": "command", "command": "rtk hook codex"}
+        self.write(".codex/hooks.json", {"hooks": {"Stop": [{"hooks": [rtk]}]}})
+        self.write(".codex/config.toml", CODEX_CONFIG + self.trust())
+        self.assertEqual(self.wiring()["codex"]["ai_memory_hook_events_trusted"], 0)
+
+    def test_a_hooks_file_codex_rejects_runs_no_hook(self):
+        # Codex parses hooks.json whole (HooksFile, then each handler by "type"): one bad value and none load, so
+        # both counts read as a malformed file's, null.
+        self.wire()
+
+        def stop(data):
+            return data["hooks"]["Stop"][0]["hooks"]
+
+        for label, change in (("unknown top-level key", lambda data: data.update(extra=True)),
+                              ("timeout as text", lambda data: stop(data)[0].update(timeout="9")),
+                              ("negative timeout", lambda data: stop(data)[0].update(timeout=-1)),
+                              ("async null", lambda data: stop(data)[0].update({"async": None})),
+                              ("unknown handler type", lambda data: stop(data).append({"type": "script"})),
+                              ("event not a list", lambda data: data["hooks"].update(PreCompact={"hooks": []})),
+                              ("MCP input with null", lambda data: stop(data).append(
+                                  {"type": "mcp_tool", "server": "s", "tool": "t", "input": {"k": None}}))):
+            with self.subTest(label=label):
+                data = {"hooks": {event: [ai_memory_group(event)] for event in CODEX_EVENTS}}
+                self.write(".codex/hooks.json", data)
+                self.write(".codex/config.toml", CODEX_CONFIG + self.trust())  # trusted while valid
+                change(data)
+                self.write(".codex/hooks.json", data)
+                codex = self.wiring()["codex"]
+                self.assertEqual((codex["ai_memory_hook_events"], codex["ai_memory_hook_events_trusted"]), (None, None))
+                self.assertIs(self.wiring()["complete"], False)
+        # Unknown events and extra fields are ignored by Codex, and so here.
+        data = {"hooks": {event: [ai_memory_group(event)] for event in CODEX_EVENTS}}
+        data["hooks"]["Future"] = "anything"
+        data["hooks"]["Stop"][0]["note"] = PRIVATE
+        self.write(".codex/hooks.json", data)
+        self.write(".codex/config.toml", CODEX_CONFIG + self.trust())
+        self.assertEqual(self.wiring()["codex"]["ai_memory_hook_events_trusted"], 7)
+
+    def test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does(self):
+        # Codex reads hooks.json with serde_json::from_str: a repeated field, NaN, a lone surrogate where it parses
+        # text, a number its field cannot hold, too deep a nesting or a hook it cannot hash, and it loads no hook.
+        self.wire()
+        trusted = CODEX_CONFIG + self.trust()  # the wired file's hooks, trusted
+        for label, text in CODEX_REJECTED_HOOKS_FILES:
+            with self.subTest(label=label):
+                self.write(".codex/hooks.json", text)
+                self.write(".codex/config.toml", trusted)
+                result = self.wiring()
+                self.assertEqual((result["codex"]["ai_memory_hook_events"],
+                                  result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                self.assertIs(result["complete"], False)
+
+    def test_a_hooks_file_codex_parses_runs_its_trusted_hooks(self):
+        # What Codex's parse skips or keeps as text is not checked: a repeated unknown key, a lone surrogate in a
+        # skipped value, any number outside a typed field, deep nesting in a skipped value, and serde's array form
+        # of each struct.
+        self.wire()
+        trusted = CODEX_CONFIG + self.trust()
+        for label, text in CODEX_ACCEPTED_HOOKS_FILES:
+            with self.subTest(label=label):
+                self.write(".codex/hooks.json", text)
+                self.write(".codex/config.toml", trusted)
+                result = self.wiring()
+                self.assertEqual((result["codex"]["ai_memory_hook_events"],
+                                  result["codex"]["ai_memory_hook_events_trusted"]), (7, 7))
+                self.assertIs(result["complete"], True)
+        # Codex reads "-0" as the integer 0 (serde_json with arbitrary_precision), which a timeout can hold.
+        self.write(".codex/hooks.json", codex_hooks_text(stop_group(stop_handler(', "timeout": 0'))))
+        self.write(".codex/config.toml", CODEX_CONFIG + self.trust())
+        self.write(".codex/hooks.json", codex_hooks_text(stop_group(stop_handler(', "timeout": -0'))))
+        self.assertEqual(self.wiring()["codex"]["ai_memory_hook_events_trusted"], 7)
+
+    def test_a_group_whose_matcher_codex_cannot_load_is_skipped(self):
+        self.wire()
+        for matcher, loads in (("", True), ("*", True), ("Bash|Edit", True), ("mcp__.*", True), ("(", False),
+                               ("(?=x)", None), ("(a)\\1", None), ("(?>a)", None), ("a\\Z", None),
+                               ("(?#note)Bash", None), ("(?i)bash", None)):
+            with self.subTest(matcher=matcher):
+                data = {"hooks": {event: [ai_memory_group(event)] for event in CODEX_EVENTS}}
+                data["hooks"]["PreToolUse"][0]["matcher"] = matcher
+                self.write(".codex/hooks.json", data)
+                self.write(".codex/config.toml", CODEX_CONFIG + self.trust())
+                result = self.wiring()
+                # A matcher this check cannot evaluate as Rust's regex crate does leaves the count unknown.
+                self.assertEqual(result["codex"]["ai_memory_hook_events_trusted"],
+                                 None if loads is None else 7 if loads else 6)
+                self.assertEqual(result["codex"]["ai_memory_hook_events"], 7)
+                self.assertIs(result["complete"], loads is True)
+        # A matcher on an event without matchers (Stop) is never compiled, as in Codex.
+        data = {"hooks": {event: [ai_memory_group(event)] for event in CODEX_EVENTS}}
+        data["hooks"]["Stop"][0]["matcher"] = "("
+        self.write(".codex/hooks.json", data)
+        self.write(".codex/config.toml", CODEX_CONFIG + self.trust())
+        self.assertEqual(self.wiring()["codex"]["ai_memory_hook_events_trusted"], 7)
+
+    def test_matcher_verdicts_equal_codexs_or_are_left_undecided(self):
+        for matchers, expected in ((CODEX_LOADS_MATCHERS, True), (CODEX_SKIPS_MATCHERS, False),
+                                   (UNDECIDED_MATCHERS, None)):
+            for matcher in matchers:
+                with self.subTest(matcher=matcher):
+                    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+
+    def test_hook_hashes_equal_the_ones_codex_reports(self):
+        root = str(self.home / ".codex")
+        for event, matcher, handler, current_hash in CODEX_KNOWN_HASHES:
+            with self.subTest(event=event, matcher=matcher):
+                group = {"hooks": [handler]} if matcher is None else {"matcher": matcher, "hooks": [handler]}
+                events = adoption_status.codex_hooks_json(json.dumps({"hooks": {event: [group]}}))
+                label = adoption_status.CODEX_HOOK_EVENTS[event]
+                self.assertEqual(adoption_status.codex_hook_hashes(f"{root}/hooks.json", events),
+                                 {f"{root}/hooks.json:{label}:0:0": (event, True, current_hash,
+                                                                    "ai-memory" in handler["command"])})
+        # The identity is fingerprint.rs version_for_toml: SHA-256 of compact JSON with sorted keys, which a
+        # hand-written string reproduces for the first known answer.
+        canonical = ('{"event_name":"session_start","hooks":[{"async":false,"command":"'
+                     + EXAMPLE_HOOK.format("session-start") + '","timeout":600,"type":"command"}],"matcher":""}')
+        self.assertEqual("sha256:" + hashlib.sha256(canonical.encode()).hexdigest(), CODEX_KNOWN_HASHES[0][3])
 
     def test_the_concurrency_cap_must_be_an_integer_the_client_accepts(self):
         self.wire()
@@ -1276,7 +1621,14 @@ class ClientWiringTests(unittest.TestCase):
         (self.home / ".claude").rename(moved / "claude")
         (self.home / ".codex").rename(moved / "codex")
         env = {**self.env, "CLAUDE_CONFIG_DIR": str(moved / "claude"), "CODEX_HOME": str(moved / "codex")}
+        # Codex keys hook trust by its hooks.json path, a set CODEX_HOME canonicalized: moving the home, or reaching
+        # it through a symbolic link, leaves the old trust behind until /hooks records it again.
+        self.assertEqual(self.wiring(env)["codex"]["ai_memory_hook_events_trusted"], 0)
+        self.write("configured/codex/config.toml",
+                   CODEX_CONFIG + self.trust(moved / "codex", os.path.realpath(moved / "codex")))
         self.assertEqual(self.wiring(env), WIRED)
+        (self.home / "link").symlink_to(moved)
+        self.assertEqual(self.wiring({**env, "CODEX_HOME": str(self.home / "link/codex")}), WIRED)
         self.assertFalse(self.wiring()["claude"]["rtk_hook"])
 
     def test_a_text_value_can_never_leave_the_check(self):
@@ -1329,6 +1681,19 @@ class TokenEfficiencyProfileTests(unittest.TestCase):
                          "a token row these layers now select (or drop) must join (or leave) the profile")
         self.assertEqual(selected & self.OPTIONAL, set())
         self.assertLessEqual(self.OPTIONAL, self.rows)
+
+    def test_the_sixteen_subagent_tools_are_ten_profile_rows_and_six_optional_rows(self):
+        # docs/token-efficiency-stack.md, "Inside Ultracode subagents": the 16 tools that run used are not the
+        # profile's 14 component_ids. Ten are profile rows; six are optional rows; the profile's other four are the
+        # two clients, ccusage (not run) and MCPorter (there only as Headroom's bridge).
+        receipt = self.load("evidence/artifacts/token-e2e-ultracode-20260925/receipt.json")
+        tools = {tool["component_id"] for tool in receipt["tools"]}
+        selected = set(self.profile["component_ids"])
+        self.assertEqual((len(tools), len(selected), len(tools & selected)), (16, 14, 10))
+        self.assertEqual(tools - selected, {"jcodemunch-mcp", "ast-grep", "codebase-memory-mcp", "context-hub",
+                                            "agentsview", "otel-tui"})
+        self.assertLessEqual(tools - selected, self.OPTIONAL)
+        self.assertEqual(selected - tools, {"codex", "claude-code", "ccusage", "mcporter"})
 
 
 if __name__ == "__main__":

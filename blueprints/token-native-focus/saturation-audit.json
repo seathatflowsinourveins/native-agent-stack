@@ -1381,7 +1381,7 @@
     {
       "component_id": "claude-code",
       "repository": "https://github.com/anthropics/claude-code",
-      "version": "2.1.278",
+      "version": "2.1.281",
       "profile": "core",
       "role": "Native subscription coding client",
       "installation_assessment": "native installation/operation recorded in scoped public receipt",

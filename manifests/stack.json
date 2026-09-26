@@ -188,7 +188,7 @@
     {
       "id": "claude-code",
       "repository": "https://github.com/anthropics/claude-code",
-      "version": "2.1.278",
+      "version": "2.1.281",
       "license": "proprietary CLI; no OSS license inferred from issue repository",
       "profile": "core",
       "role": "Native subscription coding client",
@@ -237,7 +237,7 @@
         "https://github.com/anthropics/claude-code"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "freshness": "2.1.281 is the floor both platform pins set since 2026-09-25 (adoption/pins-linux-x86_64.json and adoption/pins-macos-arm64.json, version_probe match minimum): the native installer verifies that build, then the launcher auto-updates on the latest channel, so a host may run a newer one (the NativeStack WSL2 host reported 2.1.283 on 2026-09-26). 2.1.281 fixes a recursive rm of command-substitution output that ran unprompted in auto and --dangerously-skip-permissions mode. It replaced the 2.1.278 npm-wrapper pin, which set DISABLE_AUTOUPDATER=1; receipts keep the version they recorded. The landscape winner pin stays 2.1.278 until a new verdict wave; latest release identity is separately recorded in manifests/landscape.json."
     },
     {
       "id": "claude-hud",

@@ -45,6 +45,10 @@ evidence/hosts/**/*.json.tmp-*
 .claude/settings.local.json
 .claude/worktrees/
 
+# ai-memory's capture opt-in is each host's own decision, never committed; .worktreeinclude
+# copies it into new worktrees (recipes/README.md, "Worktrees and the capture marker").
+/.ai-memory.toml
+
 # Credential-shaped files never belong in a checkout; secrets live under
 # ${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack (docs/secret-storage.md).
 *.env
