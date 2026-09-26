@@ -286,6 +286,12 @@ installs nothing, and logs `Kept installed claude-code <version>`; only a
 missing, older or unreadable launcher gets the verified install, so re-running
 the bootstrap never moves a native auto-updated Claude Code back to the pin
 (`adoption/bootstrap-linux.sh` runs the same `install_native`).
+`adoption/bootstrap-linux.sh` changed after `v2026.09.26` too, in an
+rtk-only, Linux-only check with no macOS equivalent (rtk has no
+`adoption/pins-macos-arm64.json` entry): its post-install reminder now
+requires all four `[hooks] exclude_commands` entries from
+[the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks),
+exactly once, instead of the tag's original two.
 The script and both claude-code pins (2.1.281, which fixes a recursive `rm` of
 command-substitution output running unprompted in auto and bypass mode)
 changed after `v2026.09.24.1`: at that tag the pins are 2.1.280 and the script
