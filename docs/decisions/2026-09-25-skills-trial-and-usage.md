@@ -287,3 +287,52 @@ Per [the acceptance-evidence policy](../acceptance-evidence-policy.md#identify-w
 - Trial window end (2026-10-25) → apply the prune rule to every `trial` skill still at zero
   invocations in the preceding 30 days, and record the result as a manifest update plus a
   follow-up decision record.
+
+## Addendum 2026-09-26: three trial additions, corrected counts, on-disk tree check
+
+Evidence: [`evidence/artifacts/skills-agents-layer-20260926/`](../../evidence/artifacts/skills-agents-layer-20260926/README.md)
+(`delta.json` holds every source, commit, audit reading and count cited here).
+
+**Pins unchanged.** On 2026-09-26 every one of the 26 pinned skill folders has the same git tree
+SHA at its source repository's default-branch HEAD as at its pin (8 of 9 source repositories have
+not moved at all; `affaan-m/ECC` moved to `e482e57` without touching `iterative-retrieval` or
+`search-first`). No pin follows `adoption/update.md` today. The skills.sh page labels of all 26
+read the same as on 2026-09-25.
+
+**Added for trial**, each under the [selection rule](#selection-rule) (gap, license, no audit
+Fail, no duplicate, no conflict, one winner per capability):
+
+| Name | Source @ ref | Status | Listing | Codex | Gap |
+| --- | --- | --- | --- | --- | --- |
+| variant-analysis | trailofbits/skills@0cc1c73 | trial | on | no | Post-merge review keeps finding siblings of fixed defects (#314 widened #291's rtk blob exclusion and closed a blind-packet leak the #269 filter missed); `fp-check` verifies one finding and says it is not for hunting. |
+| writing-for-agents | mattpocock/skills@c55ee46 | trial | on | yes | `AGENTS.md` (160 lines, 11,708 bytes) loads into every session and each worker that keeps project instructions, and changed in 28 commits from 2026-09-12 to 2026-09-26; no procedure covers context load, a single source of truth or pruning. |
+| skill-security | superagent-ai/skills@0da315b | trial | name-only | no | Rule 3 reads only third-party audits, and the page label can understate the audit API (`agentic-actions-auditor`: Socket `critical`, 1 alert, shown as Warn); no local content scan precedes a pin. |
+
+`skill-security` won its capability over `getsentry/skills` `skill-scanner` on a measured,
+synthetic comparison: 5 of 5 malicious fixtures flagged at high or critical against 3 of 5, with
+the same count (4 of 26) of high flags on the installed pinned skills. The fixtures are authored
+for this check and are a small diagnostic, not a universal ranking. Each addition's prune window
+starts at its own install on each host (the lock's `installedAt`), so none is a prune candidate at
+the 2026-10-25 review.
+
+**Corrected counts.** `budget.description_chars_method` now states the one method (Unicode code
+points of the PyYAML-parsed description, whitespace stripped): 23 of the 26 recorded values already
+followed it, and `semgrep`, `codeql` and `sarif-parsing` move from 709, 753 and 375 to 707, 751 and
+373. With the additions, `on` listings sum to 7,409 of the 8,000-character cap (591 left) and
+Codex-enabled descriptions to 3,054.
+
+**Mechanics correction.** The lock's `skillFolderHash` is written at install time and never
+recomputed, so it does not catch a file changed after install, which the [Alternatives
+considered](#alternatives-considered) entry implied. On this host `supply-chain-risk-auditor`'s own
+`uv run {baseDir}/scripts/collect.py` created `scripts/.venv` and `__pycache__` inside the installed
+folder and rewrote the pinned `scripts/uv.lock` (dropping upstream's `exclude-newer-span = "P1W"`
+option; the project declares no dependencies), while `scripts/skills_status.py` still passed.
+The status script now recomputes each canonical folder's git tree from disk and reports `ok`,
+`runtime_artifacts` or `drift` per skill, informationally: normal use recreates the files and
+`tools/adoption/install_skills.py` does not reinstall a folder whose SKILL.md and lock entry match.
+
+**Left for the verdict wave** (proposals in `delta.json`, not adopted): pin
+`semgrep-rule-creator` or re-scope the `semgrep` gap (the pinned `semgrep` skill routes custom rules
+to it, and neither the `semgrep` nor the `codeql` CLI is installed on this host); record raw audit
+API risks beside page labels in rule 3; a version-matched EdgarTools skill pin; `backtest-expert`
+on a frozen research task.
