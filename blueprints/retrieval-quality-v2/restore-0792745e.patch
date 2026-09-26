@@ -1,0 +1,816 @@
+--- a/blueprints/retrieval-quality-v2/run.py
++++ b/blueprints/retrieval-quality-v2/run.py
+@@ -59,10 +59,8 @@
+    the same index, with a fixture derived mechanically from ``queries.json``
+    (each query's grade-2 files are its expected files). The returned native
+    summary is kept verbatim next to an exact-identity audit of the same
+-   returned rankings. Output that lacks a result for any fixture query on
+-   any of QMD's four backends, an empty output included, is recorded as
+-   ``incomplete``, never as completed. It is corroboration only and never
+-   enters the preregistered decision rule.
++   returned rankings. It is corroboration only and never enters the
++   preregistered decision rule.
+ 8. Computes nDCG@10, recall@5 (of grade-2 files) and MRR per query per arm,
+    the paired bootstrap 95% CI of the per-query nDCG@10 difference, and the
+    preregistered decision rule. A query whose output is not a JSON array of
+@@ -87,30 +85,22 @@
+ only when the caller left it at its default action, so ``nohup``'s ignored
+ SIGHUP stays ignored. The handler only records the signal (see
+ ``StopRequests``); the runner acts on it at safe points. qmd runs in its own
+-session and never receives these signals, so within ``STOP_POLL_SECONDS``
+-the runner kills the process group of a qmd call that is still running,
+-keeps that call's partial output as a native record (``interrupted_by``
+-names the signal) and starts no further qmd call. The arm in progress
+-becomes ``interrupted`` (queries it already scored stay in ``per_query``; no
+-arm mean or decision is computed from a partial arm), the status becomes
+-``aborted_interrupted``, and all three outputs are written. ``interruption`` names the signal, the phase,
+-the qmd call that was running when the signal arrived (a call can finish
+-before the runner acts on the stop) and the call the stop cut short, if any.
+-A decision reached before the stop keeps its limitations, and a failure that
+-follows the stop is recorded as part of it. ``signals_received`` lists every
+-handled signal that arrived before the receipt was written; later ones only
+-reach stderr. Run as a script, the runner then ends by the signal that
+-stopped it, so a shell or supervisor sees the stop; ``main()`` itself
+-returns 128 + the signal number.
++session and never receives these signals, so the runner kills the qmd
++process group in flight within ``STOP_POLL_SECONDS``, keeps that call's
++partial output as a native record (``interrupted_by`` names the signal) and
++starts no further qmd call. The arm in progress becomes ``interrupted``
++(queries it already scored stay in ``per_query``; no arm mean or decision is
++computed from a partial arm), the status becomes ``aborted_interrupted``
++with the signal, the phase and the call in flight in ``interruption``, and
++all three outputs are written. ``signals_received`` lists every handled
++signal that arrived before the receipt was written; later ones only reach
++stderr. Run as a script, the runner then ends by the signal that stopped it,
++so a shell or supervisor sees the stop; ``main()`` itself returns 128 + the
++signal number.
+ 
+ Every path written into these outputs is sanitized: the repository checkout
+ and scratch-home roots are replaced with symbolic placeholders, and any
+-remaining ``/home/<user>`` fragment is replaced with ``~``. That covers qmd's
+-stdout and stderr and every string the receipt takes from them: the reasons
+-recorded for rejected hits, which quote the hit, qmd's version banner,
+-``qmd pull``'s model URIs, sizes and notes, and ``qmd embed``'s duration.
+-``qmd bench``'s summary is kept verbatim; QMD fills it with backend names and
+-numbers.
++remaining ``/home/<user>`` fragment is replaced with ``~``.
+ 
+ Usage:
+     python3 run.py --repo /path/to/native-agent-stack --scratch-home /path/to/scratch
+@@ -302,12 +292,8 @@
+ 
+     def __init__(self):
+         self._original = {}
+-        # (signal number, UTC time, phase, qmd call) in arrival order
+-        self.received = []
++        self.received = []  # (signal number, UTC time, phase) in arrival order
+         self.phase = None  # the phase main() is in; its phase timer keeps this current
+-        # The native record id of the qmd call QmdRunner.run is running (or starting), else None.
+-        # A signal records it, because that call may still finish before the runner acts on the stop.
+-        self.current_call = None
+ 
+     @classmethod
+     def signals(cls) -> list:
+@@ -315,7 +301,7 @@
+         return [getattr(signal, name) for name in cls.HANDLED if hasattr(signal, name)]
+ 
+     def _handle(self, signum, frame) -> None:
+-        self.received.append((int(signum), utc_now_iso_ms(), self.phase, self.current_call))
++        self.received.append((int(signum), utc_now_iso_ms(), self.phase))
+ 
+     def arm(self) -> None:
+         for signum in self.signals():
+@@ -337,7 +323,7 @@
+         return bool(self.received)
+ 
+     def first(self):
+-        """``(signal number, UTC time, phase, qmd call)`` of the stop request, or None."""
++        """``(signal number, UTC time, phase)`` of the stop request, or None."""
+         return self.received[0] if self.received else None
+ 
+     def checkpoint(self) -> None:
+@@ -687,23 +673,18 @@
+         cut short is recorded (``interrupted_by``, with its partial output) and
+         RunInterrupted is then raised, so it is never scored; a call that
+         finished first is returned as usual. A call that an exception cut short
+-        is recorded the same way before the exception propagates. While the
+-        call runs, ``stops.current_call`` names it, so a signal records which
+-        call was running even when that call finishes before the next poll.
++        is recorded the same way before the exception propagates.
+         """
+         self.checkpoint()
+         argv = [self.qmd_bin, *(str(a) for a in args)]
+         started_at = utc_now_iso_ms()
+         start = time.monotonic()
+-        self.stops.current_call = record_id
+         try:
+             result = run_command(argv, self.env, self.cwd, timeout, stop=self.stops.requested)
+         except BaseException as exc:
+             partial = getattr(exc, "partial_result", None) or CommandResult(b"", b"", None, False, False, False)
+             self._append(record_id, phase, argv, started_at, start, timeout, partial, exc)
+             raise
+-        finally:
+-            self.stops.current_call = None
+         record, stdout, stderr = self._append(record_id, phase, argv, started_at, start, timeout, result, None)
+         if result.stopped:
+             self.checkpoint()
+@@ -1038,14 +1019,8 @@
+                 for rank, hit in enumerate(hits[:top_k], start=1):
+                     path, note = resolve_repository_path(hit["file"], hit["docid"], corpus_sha, index_name)
+                     if path is None:
+-                        # The reason quotes the hit's own fields, so it is sanitized like them.
+                         rejected_hits.append(
+-                            {
+-                                "rank": rank,
+-                                "file": runner.san(hit["file"]),
+-                                "docid": runner.san(hit["docid"]),
+-                                "reason": runner.san(note),
+-                            }
++                            {"rank": rank, "file": runner.san(hit["file"]), "docid": runner.san(hit["docid"]), "reason": note}
+                         )
+                     ranked_paths.append(path)
+                 if rejected_hits:
+@@ -1209,10 +1184,9 @@
+         models.append(
+             {
+                 "role": role,
+-                # The URI and its parts come from qmd's output: sanitized where kept, raw for the lookup.
+-                "hf_uri": san(uri),
+-                "hf_repo_id": san(hf_repo_id),
+-                "filename": san(filename),
++                "hf_uri": uri,
++                "hf_repo_id": hf_repo_id,
++                "filename": filename,
+                 "size_bytes": size_bytes,
+                 "sha256": file_sha256,
+                 "hf_repo_revision": pin["revision"],
+@@ -1234,9 +1208,8 @@
+                     "cache bookkeeping; the sha256 and LFS fields above are the pin. null when QMD "
+                     "cached no ETag."
+                 ),
+-                # Free text from qmd's own output, sanitized like the rest of it.
+-                "pull_note": san(entry["note"]),
+-                "pull_size_reported": san(entry["size"]),
++                "pull_note": entry["note"],
++                "pull_size_reported": entry["size"],
+             }
+         )
+     return {"models": models, "pull_native_record_id": call.record["id"]}
+@@ -1254,7 +1227,7 @@
+     return {
+         "chunks_embedded": int(m.group(1)),
+         "documents_embedded": int(m.group(2)),
+-        "upstream_reported_duration": san(m.group(3)),
++        "upstream_reported_duration": m.group(3),
+         "native_record_id": call.record["id"],
+     }
+ 
+@@ -1373,52 +1346,6 @@
+     return audit
+ 
+ 
+-def _some(ids: list) -> str:
+-    """At most five ids, then how many more."""
+-    shown = ", ".join(str(i) for i in ids[:5])
+-    return shown + (f" and {len(ids) - 5} more" if len(ids) > 5 else "")
+-
+-
+-def bench_output_problems(doc: dict, fixture: dict) -> list:
+-    """What keeps a parsed ``qmd bench --json`` output from covering the fixture.
+-
+-    ``runBenchmark`` (src/bench/bench.ts) runs every fixture query on each of
+-    its four backends, so a complete output holds exactly one result per
+-    fixture query id, each with a result holding a ``top_files`` list for
+-    every backend, and a summary entry for every backend. Anything less, an
+-    empty output included, is not a completed benchmark. Returns the
+-    problems found, or an empty list.
+-    """
+-    problems = []
+-    expected = [q["id"] for q in fixture["queries"]]
+-    results = [r for r in doc["results"] if isinstance(r, dict)]
+-    if len(results) != len(doc["results"]):
+-        problems.append(f"{len(doc['results']) - len(results)} results are not objects")
+-    returned = [r.get("id") for r in results]
+-    missing = [qid for qid in expected if qid not in returned]
+-    if missing:
+-        problems.append(f"no result for fixture queries {_some(missing)}")
+-    unexpected = [qid for qid in returned if qid not in expected]
+-    if unexpected:
+-        problems.append(f"results for queries not in the fixture: {_some([repr(q) for q in unexpected])}")
+-    repeated = [qid for qid in expected if returned.count(qid) > 1]
+-    if repeated:
+-        problems.append(f"more than one result for {_some(repeated)}")
+-    for backend in BENCH_BACKENDS:
+-        lacking = []
+-        for result in results:
+-            backends = result.get("backends")
+-            entry = backends.get(backend) if isinstance(backends, dict) else None
+-            if not isinstance(entry, dict) or not isinstance(entry.get("top_files"), list):
+-                lacking.append(result.get("id"))
+-        if lacking:
+-            problems.append(f"no {backend} result with a top_files list for {_some(lacking)}")
+-    no_summary = [b for b in BENCH_BACKENDS if not isinstance(doc["summary"].get(b), dict)]
+-    if no_summary:
+-        problems.append(f"no summary for backends {', '.join(no_summary)}")
+-    return problems
+-
+-
+ def run_native_bench(
+     runner: QmdRunner,
+     index_name: str,
+@@ -1488,12 +1415,6 @@
+         section["status"] = "unexpected_shape"
+         section["error"] = "bench --json output lacks a summary object or results array"
+         return section
+-    problems = bench_output_problems(doc, fixture)
+-    if problems:
+-        section["status"] = "incomplete"
+-        section["error"] = runner.san("bench --json output does not cover the fixture: " + "; ".join(problems))
+-        section["native_query_count"] = len(doc["results"])
+-        return section
+     section["native_summary"] = doc["summary"]
+     section["native_query_count"] = len(doc["results"])
+     section["exact_identity_audit"] = audit_native_bench(doc, fixture, arm_results)
+@@ -1965,15 +1886,11 @@
+     outputs_rel = {key: path.name for key, path in outputs.items()}
+ 
+     receipt = {
+-        # Schema 4 names the qmd call that was running when a signal arrived
+-        # (interruption.qmd_call_running_when_received, signals_received[].qmd_call)
+-        # apart from the call the stop cut short (cut_short_native_record_id,
+-        # schema 3's in_flight_native_record_id), and adds the benchmark status
+-        # incomplete. Schema 3 receipts come from run.py 0792745e. Schema 3 added
+-        # the arm and benchmark statuses pending, running, interrupted, aborted
+-        # and not_reached, plus query_count, interruption and signals_received.
+-        # Schema 2 receipts come from run.py efba31d5, which had no signal handling.
+-        "schema_version": 4,
++        # Schema 3 adds the arm and benchmark statuses pending, running,
++        # interrupted, aborted and not_reached, plus query_count, interruption
++        # and signals_received. Schema 2 receipts come from run.py efba31d5,
++        # which had no signal handling.
++        "schema_version": 3,
+         "run_id": run_id,
+         "run_date": run_id[:8],
+         "generated_at_utc": utc_now_iso(),
+@@ -2046,43 +1963,27 @@
+ 
+         return _Timer()
+ 
+-    def record_interruption(signum: int, received_at, phase, running, cause=None) -> int:
+-        """Sets status aborted_interrupted with its details; returns the exit code.
+-
+-        ``running`` is the qmd call that was running when the signal arrived, which may have
+-        finished before the runner acted on the stop; the call the stop cut short, if any, is
+-        the last native record, marked ``interrupted_by``.
+-        """
++    def record_interruption(signum: int, received_at, phase, cause=None) -> int:
++        """Sets status aborted_interrupted with its details; returns the exit code."""
+         last = runner.records[-1] if runner is not None and runner.records else None
+-        cut_short = last["id"] if last is not None and last.get("interrupted_by") else None
+-        if received_at is None and running is None:
+-            # A caller's own SIGINT handler raised KeyboardInterrupt where the runner was
+-            # waiting, so the call that exception cut short is the one that was running.
+-            running = cut_short
++        in_flight = last["id"] if last is not None and last.get("interrupted_by") else None
+         name = signal_name(signum)
+         receipt["status"] = "aborted_interrupted"
+         receipt["interruption"] = {
+             "signal": name,
+             "received_at_utc": received_at,
+             "phase_when_received": phase,
+-            "qmd_call_running_when_received": running,
+             "acted_on_at_utc": utc_now_iso_ms(),
+-            "cut_short_native_record_id": cut_short,
++            "in_flight_native_record_id": in_flight,
+         }
+         reason = f"stopped by {name} during {phase or 'the runner work between phases'}"
+-        if cut_short:
++        if in_flight:
+             reason += (
+-                f"; the qmd call it cut short ({cut_short}) was killed with its process group and is kept in "
++                f"; the qmd call in flight ({in_flight}) was killed with its process group and is kept in "
+                 f"{outputs_rel['native']} with its partial output"
+             )
+-        elif running:
+-            reason += (
+-                f"; the qmd call that was running when the signal arrived ({running}) finished before the "
+-                f"runner acted on the stop, so no qmd call was cut short; that call is kept in "
+-                f"{outputs_rel['native']}"
+-            )
+         else:
+-            reason += "; no qmd call was running"
++            reason += "; no qmd call was in flight"
+         if cause is not None:
+             reason += f"; the run was already stopping when this failure followed: {cause}"
+         receipt["abort_reason"] = san(reason)
+@@ -2120,7 +2021,7 @@
+             runner = QmdRunner(qmd_bin, env, scratch_home, san, stops)
+             receipt["qmd"] = describe_qmd_install(qmd_bin, san)
+             ver = runner.setup("qmd:version", "setup", ["--index", args.index_name, "--version"], 30, "qmd_version")
+-            receipt["qmd_version_raw"] = san(ver.stdout.strip() or ver.stderr.strip())
++            receipt["qmd_version_raw"] = ver.stdout.strip() or ver.stderr.strip()
+             # "qmd --version" prints "qmd 2.8.3 (facd35e)"; keep just the semver for
+             # qmd_version and the full banner in qmd_version_raw.
+             version_match = re.search(r"(\d+\.\d+\.\d+)", receipt["qmd_version_raw"] or "")
+@@ -2180,10 +2081,9 @@
+                     embed_summary = embed_index(runner, args.index_name, args.embed_timeout, len(corpus), san)
+                 arm_b["embed_summary"] = embed_summary
+             except RunFailure as exc:
+-                if stops.requested():
+-                    # A failure that follows a stop request is part of stopping, not a
+-                    # finding about Arm B: the handler below records it with the stop.
+-                    raise
++                # A failure that follows a stop request is part of stopping, not a
++                # finding about Arm B.
++                stops.checkpoint()
+                 # PREREGISTRATION.md: Arm B fails closed and is reported as not evaluated.
+                 arm_b["status"] = "not_run"
+                 arm_b["not_run_reason"] = san(f"[{exc.slug}] {exc}")
+@@ -2212,8 +2112,27 @@
+             else:
+                 receipt["decision"] = decide(arm_a["summary"], "not_run", None, None)
+ 
+-        # The decision's limitations are recorded before the benchmark starts, so a run
+-        # stopped during the benchmark still carries them with its decision.
++        if args.skip_native_bench:
++            receipt["native_bench"] = {"status": "not_run", "reason": "--skip-native-bench was passed"}
++        elif arm_b["status"] != "evaluated":
++            receipt["native_bench"] = {
++                "status": "not_run",
++                "reason": "qmd bench's vector/hybrid/full backends need Arm B's models and embeddings, which were not prepared",
++            }
++        else:
++            bench = receipt["native_bench"] = {}
++            with t("native_bench"):
++                run_native_bench(
++                    runner,
++                    args.index_name,
++                    queries,
++                    scratch_home,
++                    args.bench_timeout,
++                    index_db_path(env),
++                    {"arm_a": arm_a["per_query"], "arm_b": arm_b["per_query"]},
++                    section=bench,
++                )
++
+         a_summary = arm_a["summary"]
+         receipt["limitations"] = [
+             "Arm A is QMD's lexical `search` command as research workers call it, not BM25 in general: it "
+@@ -2238,36 +2157,14 @@
+             ]
+         else:
+             receipt["limitations"].append(f"Arm B was not evaluated: {arm_b['not_run_reason']}")
+-
+-        if args.skip_native_bench:
+-            receipt["native_bench"] = {"status": "not_run", "reason": "--skip-native-bench was passed"}
+-        elif arm_b["status"] != "evaluated":
+-            receipt["native_bench"] = {
+-                "status": "not_run",
+-                "reason": "qmd bench's vector/hybrid/full backends need Arm B's models and embeddings, which were not prepared",
+-            }
+-        else:
+-            bench = receipt["native_bench"] = {}
+-            with t("native_bench"):
+-                run_native_bench(
+-                    runner,
+-                    args.index_name,
+-                    queries,
+-                    scratch_home,
+-                    args.bench_timeout,
+-                    index_db_path(env),
+-                    {"arm_a": arm_a["per_query"], "arm_b": arm_b["per_query"]},
+-                    section=bench,
+-                )
+         if receipt["native_bench"].get("status") != "not_run":
+             receipt["limitations"].append(
+                 "`qmd bench` is QMD's own command and scorer, but its fixture is derived here from "
+                 "queries.json, its scorer lowercases paths and accepts suffix matches in either direction "
+                 "(the exact-identity audit re-scores the same returned rankings), and its precision@k divides "
+                 "by min(k, expected files). It ran after Arm B on the same index, so QMD's LLM cache may serve "
+-                "its expansion/rerank results: its latencies may be warm, and its `full` backend is not an "
+-                "independent replication of Arm B's model calls. The LLM cache's row counts before and after "
+-                "it do not show which results were served from the cache."
++                "its expansion/rerank results: its latencies are warm and its `full` backend is not an "
++                "independent replication of Arm B's model calls."
+             )
+ 
+         receipt["status"] = (
+@@ -2279,10 +2176,10 @@
+         if first is not None:
+             exit_code = record_interruption(*first)
+         else:  # raised without a recorded signal, so not by this runner's StopRequests
+-            exit_code = record_interruption(exc.signum, None, getattr(exc, "run_phase", None), None)
++            exit_code = record_interruption(exc.signum, None, getattr(exc, "run_phase", None))
+     except KeyboardInterrupt as exc:
+         # Raised by a SIGINT handler the caller installed; the runner leaves those in place.
+-        exit_code = record_interruption(int(signal.SIGINT), None, getattr(exc, "run_phase", None), None)
++        exit_code = record_interruption(int(signal.SIGINT), None, getattr(exc, "run_phase", None))
+     except RunFailure as exc:
+         first = stops.first()
+         if first is not None:
+@@ -2302,8 +2199,8 @@
+             settle_statuses(receipt)
+             receipt.pop("status_note", None)
+             receipt["signals_received"] = [
+-                {"signal": signal_name(signum), "received_at_utc": at, "phase": phase, "qmd_call": call}
+-                for signum, at, phase, call in stops.received
++                {"signal": signal_name(signum), "received_at_utc": at, "phase": phase}
++                for signum, at, phase in stops.received
+             ]
+             durations["total_wall_clock"] = time.monotonic() - started_monotonic
+             native_doc = {
+@@ -2347,7 +2244,7 @@
+ 
+     unrecorded = stops.received[len(receipt["signals_received"]):]
+     if unrecorded:
+-        names = ", ".join(signal_name(signum) for signum, _at, _phase, _call in unrecorded)
++        names = ", ".join(signal_name(signum) for signum, _at, _phase in unrecorded)
+         print(f"note: {names} arrived while the outputs were being written and is not in the receipt", file=sys.stderr)
+     if exit_code == 0 and stops.received:
+         # The run finished its work before it reached a point where it could stop;
+--- a/tests/test_retrieval_quality_v2.py
++++ b/tests/test_retrieval_quality_v2.py
+@@ -6,10 +6,9 @@
+ goes to a temporary directory, never next to run.py. These tests cover the
+ harness's own contracts (environment isolation, fail-closed model pinning,
+ response validation, timeouts, stopping on SIGINT, SIGTERM and SIGHUP,
+-unique outputs, native-output retention and sanitization, and the ``qmd
+-bench`` audit and its refusal of incomplete output); they are not evidence
+-about QMD's behaviour. The signal tests run the runner in a child process
+-and signal only that process, or let the stub or the child signal itself.
++unique outputs, native-output retention and the ``qmd bench`` audit); they
++are not evidence about QMD's behaviour. The signal tests run the runner in a
++child process and signal only that process.
+ """
+ import contextlib
+ import hashlib
+@@ -19,7 +18,6 @@
+ import math
+ import os
+ from pathlib import Path
+-import shutil
+ import signal
+ import subprocess
+ import sys
+@@ -61,7 +59,7 @@
+ # QMD's `documents`/`llm_cache` columns at $INDEX_PATH, and answers
+ # search/query/bench from the baked-in scenario.
+ STUB = r'''
+-import hashlib, json, os, pathlib, signal, sqlite3, subprocess, sys, time
++import hashlib, json, os, pathlib, sqlite3, subprocess, sys, time
+ SCENARIO = json.loads(pathlib.Path(__file__).with_name("scenario.json").read_text())
+ argv = sys.argv[1:]
+ with open(SCENARIO["log"], "a") as fh:
+@@ -72,23 +70,8 @@
+     index = argv[at + 1]
+     del argv[at:at + 2]
+ if argv == ["--version"]:
+-    print(SCENARIO.get("version", "qmd 2.8.3 (stub)"))
++    print("qmd 2.8.3 (stub)")
+     sys.exit(0)
+-def hang_here(hang):
+-    # Stand-in for a slow qmd call: optionally a grandchild in the same process group
+-    # and partial output, then a marker the test waits for before it signals the runner.
+-    pids = {"stub": os.getpid()}
+-    if hang.get("sleeper"):
+-        pids["sleeper"] = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(120)"]).pid
+-    if hang.get("partial"):
+-        sys.stdout.write("[partial stdout before the hang")
+-        sys.stderr.write("Expanding query before the hang\n")
+-        sys.stdout.flush()
+-        sys.stderr.flush()
+-    marker = pathlib.Path(hang["marker"])
+-    marker.with_suffix(".tmp").write_text(json.dumps(pids))
+-    marker.with_suffix(".tmp").replace(marker)
+-    time.sleep(hang.get("seconds", 120))
+ cmd = argv[0]
+ behaviour = SCENARIO.get(cmd, {})
+ if behaviour.get("spawn_sleeper"):
+@@ -136,7 +119,7 @@
+         target = models / f"hf_{org}_{filename}"
+         target.write_bytes(uri.encode())
+         (models / f"{filename}.etag").write_text('"' + hashlib.sha256(b"xet:" + uri.encode()).hexdigest() + '"\n')
+-        print(f"- {uri} -> {target} (1 KB, {SCENARIO.get('pull_note', 'refreshed')})")
++        print(f"- {uri} -> {target} (1 KB, refreshed)")
+     sys.exit(0)
+ if cmd == "embed":
+     conn = connect()
+@@ -146,19 +129,24 @@
+ if cmd in ("search", "query"):
+     hang = behaviour.get("hang", {}).get(argv[1])
+     if hang:
+-        hang_here(hang)
++        # Stand-in for a slow qmd call: optionally a grandchild in the same process group
++        # and partial output, then a marker the test waits for before it signals the runner.
++        pids = {"stub": os.getpid()}
++        if hang.get("sleeper"):
++            pids["sleeper"] = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(120)"]).pid
++        if hang.get("partial"):
++            sys.stdout.write("[partial stdout before the hang")
++            sys.stderr.write("Expanding query before the hang\n")
++            sys.stdout.flush()
++            sys.stderr.flush()
++        marker = pathlib.Path(hang["marker"])
++        marker.with_suffix(".tmp").write_text(json.dumps(pids))
++        marker.with_suffix(".tmp").replace(marker)
++        time.sleep(hang.get("seconds", 120))
+     sys.stderr.write(behaviour.get("stderr", {}).get(argv[1], ""))
+     sys.stdout.write(behaviour.get("responses", {}).get(argv[1], behaviour.get("default", "[]")))
+-    sys.stdout.flush()
+-    # A signal to the runner (this process's parent) while this call runs; the call then ends
+-    # at once, before the runner's next poll for a stop.
+-    parent_signal = behaviour.get("signal_parent", {}).get(argv[1])
+-    if parent_signal:
+-        os.kill(os.getppid(), getattr(signal, parent_signal))
+     sys.exit(0)
+ if cmd == "bench":
+-    if behaviour.get("hang"):
+-        hang_here(behaviour["hang"])
+     sys.stdout.write(behaviour.get("stdout", "{}"))
+     sys.exit(behaviour.get("exit", 0))
+ sys.exit(3)
+@@ -203,23 +191,15 @@
+ # Child-process entry points, so a real signal can stop a run without touching the test
+ # process. Both give the signals an interactive shell's defaults first. DRIVER calls run.main()
+ # with only the Hugging Face lookup patched; it can ignore signals, as nohup does for SIGHUP, or
+-# install a SIGINT handler of its own. Its Hugging Face lookup can also send SIGTERM to its own
+-# process and then fail, and it can lengthen the runner's stop poll so that a qmd call that ends
+-# right after a signal finishes before the runner polls. SCRIPT runs run.py as __main__, exactly
+-# as a shell would.
++# install a SIGINT handler of its own. SCRIPT runs run.py as __main__, exactly as a shell would.
+ DRIVER = r'''
+-import importlib.util, json, os, signal, sys
++import importlib.util, json, signal, sys
+ from unittest import mock
+ settings = json.loads(sys.argv[1])
+ spec = importlib.util.spec_from_file_location("rqv2_run", settings["run_py"])
+ run = importlib.util.module_from_spec(spec)
+ spec.loader.exec_module(run)
+-if "stop_poll_seconds" in settings:
+-    run.STOP_POLL_SECONDS = settings["stop_poll_seconds"]
+ def hf_api_get(path, timeout=15.0, attempts=3):
+-    if settings.get("stop_during_hf_lookup"):
+-        os.kill(os.getpid(), signal.SIGTERM)
+-        return None, "URLError: <urlopen error offline>"
+     return (settings["tree"] if "/tree/" in path else {"sha": "a" * 40}), None
+ def own_sigint_handler(signum, frame):
+     raise KeyboardInterrupt
+@@ -252,7 +232,6 @@
+ stops = run.StopRequests()
+ stops.arm()
+ stops.phase = "arm_b"
+-stops.current_call = "arm_b:nl-01"
+ before = stops.requested()
+ for signum in (signal.SIGTERM, signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+     os.kill(os.getpid(), signum)
+@@ -264,7 +243,7 @@
+ stops.restore()
+ print(json.dumps({
+     "before": before,
+-    "received": [[signal.Signals(s).name, phase, call] for s, _at, phase, call in stops.received],
++    "received": [[signal.Signals(s).name, phase] for s, _at, phase in stops.received],
+     "raised": raised,
+     "restored": [signal.getsignal(signal.SIGINT) is signal.default_int_handler,
+                  signal.getsignal(signal.SIGTERM) is signal.SIG_DFL,
+@@ -556,10 +535,8 @@
+ @unittest.skipUnless(hasattr(signal, "SIGHUP") and hasattr(os, "killpg"), "POSIX signals and process groups")
+ class InterruptTests(RunnerHarness):
+     """A real signal stops a child process running run.main() (DRIVER) or run.py itself (SCRIPT)
+-    while the stub qmd hangs on one call, after writing partial output and starting a
+-    grandchild in its process group; or the stub signals the runner just before a call ends, or
+-    the child's patched Hugging Face lookup signals the child. The test process itself is never
+-    signalled."""
++    while the stub qmd hangs on one query, after writing partial output and starting a
++    grandchild in its process group. The test process itself is never signalled."""
+ 
+     RUN_PY = ROOT / "blueprints/retrieval-quality-v2/run.py"
+ 
+@@ -611,9 +588,9 @@
+         receipt = self.output("results")
+         self.assertEqual(receipt["status"], "aborted_interrupted")
+         stop = receipt["interruption"]
+-        self.assertEqual((stop["signal"], stop["phase_when_received"], stop["qmd_call_running_when_received"],
+-                          stop["cut_short_native_record_id"]), ("SIGINT", "arm_b", "arm_b:pa-01", "arm_b:pa-01"))
+-        self.assertEqual([(s["signal"], s["qmd_call"]) for s in receipt["signals_received"]], [("SIGINT", "arm_b:pa-01")])
++        self.assertEqual((stop["signal"], stop["phase_when_received"], stop["in_flight_native_record_id"]),
++                         ("SIGINT", "arm_b", "arm_b:pa-01"))
++        self.assertEqual([s["signal"] for s in receipt["signals_received"]], ["SIGINT"])
+         self.assertIn("arm_b:pa-01", receipt["abort_reason"])
+         self.assertEqual(receipt["arm_a"]["status"], "evaluated")
+         arm_b = receipt["arm_b"]
+@@ -650,7 +627,7 @@
+         self.assert_qmd_stopped(pids)
+         receipt = self.output("results")
+         self.assertEqual(receipt["status"], "aborted_interrupted")
+-        self.assertEqual((receipt["interruption"]["signal"], receipt["interruption"]["cut_short_native_record_id"]),
++        self.assertEqual((receipt["interruption"]["signal"], receipt["interruption"]["in_flight_native_record_id"]),
+                          ("SIGTERM", "arm_a:kw-02"))
+         # The kernel may merge the second SIGTERM into the first while it is pending.
+         self.assertIn([s["signal"] for s in receipt["signals_received"]], (["SIGTERM"], ["SIGTERM", "SIGTERM"]))
+@@ -685,86 +662,13 @@
+         self.assertEqual(receipt["status"], "aborted_interrupted")
+         stop = receipt["interruption"]
+         self.assertEqual((stop["signal"], stop["received_at_utc"], stop["phase_when_received"],
+-                          stop["qmd_call_running_when_received"], stop["cut_short_native_record_id"]),
+-                         ("SIGINT", None, "arm_a", "arm_a:kw-02", "arm_a:kw-02"))
++                          stop["in_flight_native_record_id"]), ("SIGINT", None, "arm_a", "arm_a:kw-02"))
+         self.assertEqual(receipt["signals_received"], [])
+         cut = self.output("native")["records"][-1]
+         self.assertEqual((cut["id"], cut["interrupted_by"], cut["exit_code"], cut["process_group_killed"]),
+                          ("arm_a:kw-02", "SIGINT", None, True))
+         self.assertEqual(receipt["arm_a"]["status"], "interrupted")
+ 
+-    def run_to_end(self, scenario, extra=(), **settings):
+-        """Runs DRIVER in a child process until it ends; the test sends it no signal."""
+-        payload = {"run_py": str(self.RUN_PY), "argv": self.argv(self.write_stub(scenario), extra),
+-                   "tree": fake_tree(), **settings}
+-        proc = subprocess.run([sys.executable, "-c", DRIVER, json.dumps(payload)], capture_output=True, text=True,
+-                              timeout=120, start_new_session=True)
+-        return proc.returncode, proc.stdout, proc.stderr
+-
+-    def test_a_call_that_ends_after_the_signal_is_named_but_not_cut_short(self):
+-        """SIGTERM reached the runner while `qmd search` ran nl-01, and that call ended before the runner
+-        acted on the stop, as in the real-qmd check 20260926T050511Z. run.py 0792745e then wrote "no qmd
+-        call was in flight"; the receipt must name the call that was running and say nothing was cut short."""
+-        nl01 = next(q[2] for q in QUERIES if q[0] == "nl-01")
+-        code, _out, err = self.run_to_end({"search": {"signal_parent": {nl01: "SIGTERM"}}}, extra=["--skip-arm-b"],
+-                                          stop_poll_seconds=30)
+-        self.assertEqual(code, 128 + signal.SIGTERM, err)
+-        receipt = self.output("results")
+-        reason = receipt["abort_reason"]
+-        self.assertIn("the qmd call that was running when the signal arrived (arm_a:nl-01) finished before the "
+-                      "runner acted on the stop, so no qmd call was cut short", reason)
+-        self.assertNotIn("in flight", reason)
+-        stop = receipt["interruption"]
+-        self.assertEqual((stop["signal"], stop["phase_when_received"], stop["qmd_call_running_when_received"],
+-                          stop["cut_short_native_record_id"]), ("SIGTERM", "arm_a", "arm_a:nl-01", None))
+-        self.assertEqual([(s["signal"], s["qmd_call"]) for s in receipt["signals_received"]], [("SIGTERM", "arm_a:nl-01")])
+-        last = self.output("native")["records"][-1]
+-        self.assertEqual((last["id"], last["exit_code"], last["interrupted_by"], last["process_group_killed"]),
+-                         ("arm_a:nl-01", 0, None, False))
+-        self.assertEqual([r["id"] for r in receipt["arm_a"]["per_query"]], ["kw-01", "nl-01"])
+-        self.assertEqual(receipt["arm_a"]["status"], "interrupted")
+-
+-    def test_a_stop_during_the_benchmark_keeps_the_decisions_limitations(self):
+-        """A run stopped while `qmd bench` ran keeps its decision, and the decision keeps its limitations.
+-        run.py 0792745e assigned every limitation after the benchmark, so this receipt had none."""
+-        self.marker = self.tmp / "hang.json"
+-        pids = self.start({"bench": {"hang": {"marker": str(self.marker), "sleeper": True, "partial": True}}})
+-        os.kill(self.child.pid, signal.SIGTERM)
+-        code, _out, err = self.finish()
+-        self.assertEqual(code, 128 + signal.SIGTERM, err)
+-        self.assert_qmd_stopped(pids)
+-        receipt = self.output("results")
+-        limitations = receipt["limitations"]
+-        self.assertTrue([item for item in limitations if item.startswith("Arm A is QMD's lexical `search` command")],
+-                        limitations)
+-        self.assertTrue([item for item in limitations if item.startswith("Arm B's models ran forced onto CPU")], limitations)
+-        self.assertFalse([item for item in limitations if "`qmd bench`" in item],
+-                         "a benchmark that returned nothing gets no limitation about its scorer")
+-        self.assertEqual(receipt["decision"]["decision"], "Hybrid (Arm B) selected over BM25")
+-        self.assertEqual((receipt["status"], receipt["native_bench"]["status"]), ("aborted_interrupted", "interrupted"))
+-        self.assertEqual(receipt["interruption"]["cut_short_native_record_id"], "native_bench")
+-        report = self.output("report")
+-        self.assertIn("**Stopped after the decision:** stopped by SIGTERM during native_bench", report)
+-        known = report.split("## Known limitations", 1)[1].split("## Durations", 1)[0]
+-        self.assertIn("- Arm A is QMD's lexical `search` command", known)
+-
+-    def test_a_setup_failure_after_a_stop_is_recorded_with_the_stop(self):
+-        """SIGTERM arrived during Arm B's Hugging Face lookup, which then failed. The failure is part of
+-        stopping: Arm B is interrupted rather than failed closed, and the stop's reason keeps the failure,
+-        which run.py 0792745e dropped."""
+-        code, _out, err = self.run_to_end({}, stop_during_hf_lookup=True)
+-        self.assertEqual(code, 128 + signal.SIGTERM, err)
+-        receipt = self.output("results")
+-        self.assertIn("the run was already stopping when this failure followed: [arm_b_model_revision_unresolved]",
+-                      receipt["abort_reason"])
+-        self.assertEqual((receipt["status"], receipt["arm_b"]["status"], receipt["arm_b"]["not_run_reason"]),
+-                         ("aborted_interrupted", "interrupted", None))
+-        stop = receipt["interruption"]
+-        self.assertEqual((stop["signal"], stop["phase_when_received"], stop["qmd_call_running_when_received"],
+-                          stop["cut_short_native_record_id"]), ("SIGTERM", "arm_b_pull", None, None))
+-        self.assertIsNone(receipt["decision"])
+-        self.assertEqual(self.output("native")["records"][-1]["id"], "arm_b:pull", "a qmd call started after the stop")
+-
+     def test_stop_requests_record_every_signal_and_raise_only_at_a_checkpoint(self):
+         proc = subprocess.run([sys.executable, "-c", STOP_REQUESTS, str(self.RUN_PY)], capture_output=True,
+                               text=True, timeout=60)
+@@ -772,8 +676,7 @@
+         result = json.loads(proc.stdout)
+         self.assertFalse(result["before"])
+         # SIGHUP was ignored before arm(), so it stays ignored and is never recorded.
+-        self.assertEqual(result["received"], [["SIGTERM", "arm_b", "arm_b:nl-01"], ["SIGTERM", "arm_b", "arm_b:nl-01"],
+-                                              ["SIGINT", "arm_b", "arm_b:nl-01"]])
++        self.assertEqual(result["received"], [["SIGTERM", "arm_b"], ["SIGTERM", "arm_b"], ["SIGINT", "arm_b"]])
+         self.assertEqual(result["raised"], int(signal.SIGTERM))
+         self.assertEqual(result["restored"], [True, True, True])
+ 
+@@ -822,20 +725,8 @@
+ 
+ class NativeRetentionTests(RunnerHarness):
+     def test_every_scored_query_links_to_its_retained_native_output(self):
+-        """Every scored query links to its native record, and no host path reaches any output. qmd's
+-        text here carries host paths in a rejected hit (nl-01: another user's home; kw-02: the scratch
+-        HOME), in its version banner and in a `qmd pull` note; run.py 0792745e kept the rejected hits'
+-        reasons, the banner and the note unsanitized."""
+-        text = {q[0]: q[2] for q in QUERIES}
+-        outside = {"docid": "#000000", "score": 0.9, "file": "/home/example-user/private/report.md", "title": "t"}
+-        in_scratch = {"docid": "#000000", "score": 0.9, "file": f"qmd://rqv2-foundation/{self.home}/private.md",
+-                      "title": "t"}
+-        self.run_main(scenario={
+-            "version": "qmd 2.8.3 (/home/example-user/qmd-build)",
+-            "pull_note": "cached in /home/example-user/models",
+-            "query": {"stderr": {text["pa-01"]: "Strong BM25 signal (0.93) - skipping expansion\n"},
+-                      "responses": {text["nl-01"]: json.dumps([outside]), text["kw-02"]: json.dumps([in_scratch])}},
+-        })
++        pa01 = next(q[2] for q in QUERIES if q[0] == "pa-01")
++        self.run_main(scenario={"query": {"stderr": {pa01: "Strong BM25 signal (0.93) - skipping expansion\n"}}})
+         receipt = self.output("results")
+         records = {r["id"]: r for r in self.output("native")["records"]}
+         corpus_sha = {p: s for p, s in SHA.items()}
+@@ -845,33 +736,21 @@
+                 self.assertEqual(record["exit_code"], 0)
+                 self.assertEqual(row["stdout_sha256"], record["stdout_sha256"])
+                 self.assertEqual(hashlib.sha256(record["stdout"].encode()).hexdigest(), record["stdout_sha256"])
+-                if row["error"] is not None:  # a rejected response keeps no ranked paths
+-                    self.assertEqual((row["ranked_paths"], row["ndcg_at_10"]), ([], 0.0))
+-                    continue
+                 self.assertTrue(record["stdout_identical_to_raw"])
+                 hits = json.loads(record["stdout"])
+                 rederived = [M.resolve_repository_path(h["file"], h["docid"], corpus_sha, "retrieval-quality-v2")[0]
+                              for h in hits]
+                 self.assertEqual(rederived, row["ranked_paths"])
+-        rejected = {r["id"]: r["rejected_hits"] for r in receipt["arm_b"]["per_query"] if r["rejected_hits"]}
+-        self.assertEqual(sorted(rejected), ["kw-02", "nl-01"])
+-        self.assertEqual(rejected["nl-01"][0]["reason"], "unexpected file field (no qmd:// prefix): '~/private/report.md'")
+-        self.assertIn("<SCRATCH_HOME>/private.md", rejected["kw-02"][0]["reason"])
+-        self.assertEqual(receipt["qmd_version_raw"], "qmd 2.8.3 (~/qmd-build)")
+-        self.assertEqual({m["pull_note"] for m in receipt["arm_b"]["model_provenance"]["models"]}, {"cached in ~/models"})
+         self.assertEqual(receipt["arm_b"]["expansion_skipped_queries"], ["pa-01"])
+         add = records["index:collection-add:rqv2-foundation"]
+         self.assertIn("<SCRATCH_HOME>/corpus-stage/blueprints/us-equities", add["argv"])
+         dumped = json.dumps(self.output("native")) + json.dumps(receipt) + self.output("report")
+         self.assertNotIn(str(self.home), dumped)
+         self.assertNotIn(str(self.repo), dumped)
+-        self.assertNotIn("/home/example-user", dumped)
+ 
+ 
+ class NativeBenchTests(RunnerHarness):
+     def bench_output(self):
+-        """`qmd bench --json` output for every fixture query on each of QMD's four backends
+-        (src/bench/bench.ts runs all four for every query)."""
+         results = []
+         for qid, _style, text, relevance in QUERIES:
+             full_top = [virtual(p) for p, _grade in sorted(relevance, key=lambda r: -r[1])]
+@@ -879,49 +758,15 @@
+             # QMD's scorer; the exact audit must not credit it.
+             root_readme = [virtual("blueprints/us-equities/README.md")]
+             bm25_top = root_readme if qid in ("kw-01", "kw-02") else []
+-            full = {"top_files": full_top, "recall_at_5": 1.0, "mrr": 1.0}
+             results.append({"id": qid, "query": text, "type": "exact", "backends": {
+                 "bm25": {"top_files": bm25_top, "recall_at_5": 1.0 if bm25_top else 0.0,
+                          "mrr": 1.0 if bm25_top else 0.0},
+-                "vector": dict(full), "hybrid": dict(full), "full": full,
++                "full": {"top_files": full_top, "recall_at_5": 1.0, "mrr": 1.0},
+             }})
+         summary = {name: {"avg_precision": 0.5, "avg_recall_at_5": 0.5, "avg_mrr": 0.5, "avg_latency_ms": 1.0}
+-                   for name in M.BENCH_BACKENDS}
++                   for name in ("bm25", "full")}
+         return json.dumps({"timestamp": "x", "fixture": "f", "results": results, "summary": summary})
+ 
+-    def test_empty_or_incomplete_bench_output_is_not_completed(self):
+-        """run.py 0792745e accepted `{"summary": {}, "results": []}` as a completed benchmark of all four
+-        backends with zero queries. Output must hold every fixture query, once, on every backend."""
+-        complete = json.loads(self.bench_output())
+-        missing_query = dict(complete, results=complete["results"][:-1])
+-        duplicated_query = dict(complete, results=complete["results"] + complete["results"][:1])
+-        missing_backend = json.loads(self.bench_output())
+-        del missing_backend["results"][1]["backends"]["vector"]
+-        summary_short = json.loads(self.bench_output())
+-        del summary_short["summary"]["hybrid"]
+-        cases = {
+-            "empty": ({"summary": {}, "results": []}, "no result for fixture queries kw-01, nl-01, pa-01, kw-02"),
+-            "missing query": (missing_query, "no result for fixture queries kw-02"),
+-            "duplicated query": (duplicated_query, "more than one result for kw-01"),
+-            "missing backend": (missing_backend, "no vector result with a top_files list for nl-01"),
+-            "summary lacks a backend": (summary_short, "no summary for backends hybrid"),
+-        }
+-        for name, (document, expected) in cases.items():
+-            with self.subTest(name):
+-                shutil.rmtree(self.out, ignore_errors=True)
+-                self.assertEqual(self.run_main(scenario={"bench": {"stdout": json.dumps(document)}}), 0)
+-                receipt = self.output("results")
+-                bench = receipt["native_bench"]
+-                self.assertEqual(bench["status"], "incomplete")
+-                self.assertIn(expected, bench["error"])
+-                self.assertNotIn("exact_identity_audit", bench)
+-                self.assertNotIn("native_summary", bench)
+-                self.assertEqual(receipt["status"], "completed_both_arms_evaluated")
+-                self.assertEqual(receipt["decision"]["decision"], "Hybrid (Arm B) selected over BM25")
+-                report = self.output("report")
+-                self.assertIn("Status `incomplete`", report)
+-                self.assertNotIn("ran all four upstream backends", report)
+-
+     def test_bench_runs_on_the_same_index_with_a_derived_fixture_and_an_exact_audit(self):
+         self.run_main(scenario={"bench": {"stdout": self.bench_output()}})
+         receipt = self.output("results")

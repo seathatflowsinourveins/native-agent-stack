@@ -241,6 +241,7 @@ LABEL_TEXT_SHA256 = frozenset({
     "6b8d0f36c12c9163c12a5b05fe32d5175e12e656e7a526063ed32c701d6f49d6",
     "6bef11d967221994271c977a708462542dd9ad5ff330f913c28ac6dde824b7e9",
     "c0a00234303c3efdd7148d7728960af4ad23acf20e29b02f94d382432c735ec7",
+    "f51f57469603d6adced2f73751b15dc14ce48abac71723fc121cc1b64baacb58",
 })
 DATA_VALUES = frozenset({"all_events", "top_20"})
 DATA_VALUE_SHA256 = frozenset({

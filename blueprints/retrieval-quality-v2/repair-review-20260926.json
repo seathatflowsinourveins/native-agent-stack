@@ -1,0 +1,1212 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-26T05:24:58Z",
+  "evidence_class": "local_integration",
+  "evidence_class_note": "The discriminating controls run stub-qmd contract tests against mutated copies of run.py; they are synthetic under docs/acceptance-evidence-policy.md and produce no native results. The real-qmd runs exercise this repository's harness (local integration). The attempt-1 timing, the ETag comparison with Hugging Face's API and the package comparison with the registry tarball are independent observations of the named properties only; the response counts and the patch check are structural validation.",
+  "subject": {
+    "run_py": {
+      "path": "blueprints/retrieval-quality-v2/run.py",
+      "sha256": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7"
+    },
+    "tests": {
+      "path": "tests/test_retrieval_quality_v2.py",
+      "sha256": "75cde97957787ef99b80d2d453f0e452885739b09ec58b78bdbbcdee688c4a83"
+    },
+    "reviewed_run_py_sha256": "efba31d53c4a36ac482e71d796146d600c76299952055c72005b5b27196f6004"
+  },
+  "review": {
+    "scope": "An independent, read-only review of the repaired run.py (efba31d5), both 2026-09-26 attempts and this directory's documents. It found the eight findings of the #293 review fixed at the root and reported five further defects, listed here with how each was verified and resolved.",
+    "defects": [
+      {
+        "id": "D1",
+        "severity": "medium",
+        "defect": "A stopped run was recorded misleadingly and could leave qmd running: no status on KeyboardInterrupt, the call in flight had no native record, and SIGTERM or SIGHUP ended the runner without writing outputs while qmd, in its own session, kept running.",
+        "verified": "attempt_1_timing: status 'started', Arm B 'not_run' with no reason although pull, embed and nl-01 to nl-06 ran; about 101.8 s of Arm B (nl-07) has no native record. efba31d5 installs no signal handler.",
+        "resolution": "StopRequests records SIGINT, SIGTERM and SIGHUP (only where the caller left the default disposition); run_command polls it every 0.2 s and kills the qmd process group; QmdRunner records the stopped call and raises RunInterrupted; main() sets aborted_interrupted, the interruption and signals_received, settles arm statuses and writes all three outputs; run as a script it ends by the signal. PREREGISTRATION.md's appended correction fixes Amendment 2's account; the README describes attempt 1 as under-reported.",
+        "checks": [
+          "tests InterruptTests (6 tests)",
+          "real_qmd_checks",
+          "discriminating_controls I1 to I9"
+        ]
+      },
+      {
+        "id": "D2",
+        "severity": "low",
+        "defect": "hf_content_store_etag was always null: run.py looked for <downloaded file name>.etag.",
+        "verified": "etag_observation: QMD writes <model cache>/<URI file name>.etag; no file exists at the old path.",
+        "resolution": "run.py reads <XDG_CACHE_HOME>/qmd/models/<URI file name>.etag and records its path; the note now says the value is Hugging Face's Xet hash for the file, not its sha256. The three committed receipts keep null.",
+        "checks": [
+          "test_qmd_cached_etag_is_read_from_its_uri_file_name",
+          "discriminating_controls E1",
+          "etag_observation"
+        ]
+      },
+      {
+        "id": "D3",
+        "severity": "low",
+        "defect": "Amendment 1 did not state that one unverifiable hit zeroes the whole query.",
+        "verified": "run_arm clears ranked_paths and scores 0 when any of the top -n hits is rejected.",
+        "resolution": "PREREGISTRATION.md's appended correction states the rule and how the 2026-09-25 runner differed; response_rule_check shows no reported response had a rejected hit.",
+        "checks": [
+          "test_one_unverifiable_hit_rejects_the_whole_query",
+          "discriminating_controls F3c",
+          "response_rule_check"
+        ]
+      },
+      {
+        "id": "D4",
+        "severity": "low",
+        "defect": "The grand-dashboard gate still cited results-20260925.json and its numbers.",
+        "verified": "observability/grand-dashboard/state.json gate retrieval-quality-v2.",
+        "resolution": "The gate cites results-20260926T024558Z.json: nDCG10 0.728 vs 0.223, 95 pct CI 0.381 to 0.633.",
+        "checks": []
+      },
+      {
+        "id": "D5",
+        "severity": "low",
+        "defect": "The repair's handoff misquoted four facts that the PR text could copy.",
+        "verified": "review-293-repro-20260926.json: F1 decoy db_bytes 122880 -> 1552384 (not 1,560,576); F6 results_20260925_sha256_after bd6ca838a190fd92e59e6bc577cfd8cad1d01d6cdee42068869dcae3d27455cb (not 4450ec97); run.py accepts a hit without an ?index= parameter; hf_api_get makes 3 attempts (2 retries, after 2 s and 4 s).",
+        "resolution": "The committed documents quote the receipts; resolve_repository_path's docstring states the index rule.",
+        "checks": []
+      }
+    ]
+  },
+  "attempt_1_timing": {
+    "evidence_class": "independent_observation",
+    "method": "Read from the committed results- and native-20260926T022931Z.json: the Arm B phase starts with its first call; its end is that start plus durations_seconds.arm_b; the gap after the last native record is the call that was running when SIGINT arrived.",
+    "receipt_status": "started",
+    "receipt_arm_b": {
+      "status": "not_run",
+      "not_run_reason": null,
+      "per_query": 0,
+      "model_provenance_recorded": true
+    },
+    "native_records": 44,
+    "arm_b_native_records": [
+      {
+        "id": "arm_b:nl-01",
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 104595.8
+      },
+      {
+        "id": "arm_b:nl-02",
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 103815.1
+      },
+      {
+        "id": "arm_b:nl-03",
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 90428.5
+      },
+      {
+        "id": "arm_b:nl-04",
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 82555.9
+      },
+      {
+        "id": "arm_b:nl-05",
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 69765.1
+      },
+      {
+        "id": "arm_b:nl-06",
+        "exit_code": null,
+        "timed_out": true,
+        "elapsed_ms": 240610.7
+      }
+    ],
+    "arm_b_phase_started_utc": "2026-09-26T02:31:47.220Z",
+    "durations_seconds_arm_b": 793.5558484750218,
+    "arm_b_phase_ended_utc_derived": "2026-09-26T02:45:00.775Z",
+    "last_native_record_ended_utc": "2026-09-26T02:43:18.992Z",
+    "unrecorded_call_seconds": 101.8,
+    "unrecorded_call": "arm_b:nl-07 (queries.json order; the next query after nl-06)"
+  },
+  "response_rule_check": {
+    "evidence_class": "structural_validation",
+    "method": "Counts over the committed receipts and their native stdout.",
+    "20260926T022931Z": {
+      "scored_responses": 30,
+      "responses_with_rejected_hits": 0,
+      "responses_with_errors": 0,
+      "hits_in_scored_responses": 8,
+      "hits_returned_by_completed_calls": 58,
+      "hits_naming_index_retrieval_quality_v2": 58
+    },
+    "20260926T024558Z": {
+      "scored_responses": 60,
+      "responses_with_rejected_hits": 0,
+      "responses_with_errors": 0,
+      "hits_in_scored_responses": 308,
+      "hits_returned_by_completed_calls": 308,
+      "hits_naming_index_retrieval_quality_v2": 308
+    }
+  },
+  "etag_observation": {
+    "evidence_class": "independent_observation",
+    "observed_at_utc": "2026-09-26T05:24:56Z",
+    "qmd_source": {
+      "file": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/src/llm.ts",
+      "pullModels_line": 495,
+      "filename_line": 508,
+      "etag_path_lines": [
+        517,
+        546
+      ],
+      "rule": "filename = model.split('/').pop(); etagPath = join(cacheDir, `${filename}.etag`); the ETag is the one Hugging Face serves for https://huggingface.co/<repo>/resolve/main/<file> (getRemoteEtag)",
+      "installed_dist_llm_js_lines": [
+        289,
+        297,
+        327
+      ]
+    },
+    "method": "Listed the model cache of both 2026-09-26 scratch HOMEs and read the .etag files QMD wrote there, then fetched https://huggingface.co/api/models/<repo>/tree/<revision>?expand=true for each pinned revision.",
+    "run_homes": {
+      "attempt_1_20260926T022931Z": {
+        "model_cache": "<SCRATCH_HOME>/.cache/qmd/models",
+        "files": [
+          "embeddinggemma-300M-Q8_0.gguf.etag",
+          "hf_ggml-org_embeddinggemma-300M-Q8_0.gguf",
+          "hf_ggml-org_qwen3-reranker-0.6b-q8_0.gguf",
+          "hf_tobil_qmd-query-expansion-1.7B-q4_k_m.gguf",
+          "qmd-query-expansion-1.7B-q4_k_m.gguf.etag",
+          "qwen3-reranker-0.6b-q8_0.gguf.etag"
+        ],
+        "etags": [
+          {
+            "role": "embed",
+            "qmd_writes": "<model cache>/embeddinggemma-300M-Q8_0.gguf.etag",
+            "exists": true,
+            "value": "\"9d3a58b91b634fdcebab88da61e696ba4a5512eee4182581a60f8c59234dc1f4\"",
+            "efba31d5_looked_for": "<model cache>/hf_ggml-org_embeddinggemma-300M-Q8_0.gguf.etag",
+            "exists_at_efba31d5_path": false
+          },
+          {
+            "role": "generate",
+            "qmd_writes": "<model cache>/qmd-query-expansion-1.7B-q4_k_m.gguf.etag",
+            "exists": true,
+            "value": "\"c3815846a946bfc89f95aeed122539a3286c91800084dd71398bcbf19a73f872\"",
+            "efba31d5_looked_for": "<model cache>/hf_tobil_qmd-query-expansion-1.7B-q4_k_m.gguf.etag",
+            "exists_at_efba31d5_path": false
+          },
+          {
+            "role": "rerank",
+            "qmd_writes": "<model cache>/qwen3-reranker-0.6b-q8_0.gguf.etag",
+            "exists": true,
+            "value": "\"19585ec8f4865d3bcb33b4e26b1cde1e6eb62b69ed02f53f718be293b7379ed7\"",
+            "efba31d5_looked_for": "<model cache>/hf_ggml-org_qwen3-reranker-0.6b-q8_0.gguf.etag",
+            "exists_at_efba31d5_path": false
+          }
+        ]
+      },
+      "restart_20260926T024558Z": {
+        "model_cache": "<SCRATCH_HOME>/.cache/qmd/models",
+        "files": [
+          "embeddinggemma-300M-Q8_0.gguf.etag",
+          "hf_ggml-org_embeddinggemma-300M-Q8_0.gguf",
+          "hf_ggml-org_qwen3-reranker-0.6b-q8_0.gguf",
+          "hf_tobil_qmd-query-expansion-1.7B-q4_k_m.gguf",
+          "qmd-query-expansion-1.7B-q4_k_m.gguf.etag",
+          "qwen3-reranker-0.6b-q8_0.gguf.etag"
+        ],
+        "etags": [
+          {
+            "role": "embed",
+            "qmd_writes": "<model cache>/embeddinggemma-300M-Q8_0.gguf.etag",
+            "exists": true,
+            "value": "\"9d3a58b91b634fdcebab88da61e696ba4a5512eee4182581a60f8c59234dc1f4\"",
+            "efba31d5_looked_for": "<model cache>/hf_ggml-org_embeddinggemma-300M-Q8_0.gguf.etag",
+            "exists_at_efba31d5_path": false
+          },
+          {
+            "role": "generate",
+            "qmd_writes": "<model cache>/qmd-query-expansion-1.7B-q4_k_m.gguf.etag",
+            "exists": true,
+            "value": "\"c3815846a946bfc89f95aeed122539a3286c91800084dd71398bcbf19a73f872\"",
+            "efba31d5_looked_for": "<model cache>/hf_tobil_qmd-query-expansion-1.7B-q4_k_m.gguf.etag",
+            "exists_at_efba31d5_path": false
+          },
+          {
+            "role": "rerank",
+            "qmd_writes": "<model cache>/qwen3-reranker-0.6b-q8_0.gguf.etag",
+            "exists": true,
+            "value": "\"19585ec8f4865d3bcb33b4e26b1cde1e6eb62b69ed02f53f718be293b7379ed7\"",
+            "efba31d5_looked_for": "<model cache>/hf_ggml-org_qwen3-reranker-0.6b-q8_0.gguf.etag",
+            "exists_at_efba31d5_path": false
+          }
+        ]
+      }
+    },
+    "huggingface": [
+      {
+        "role": "embed",
+        "repo": "ggml-org/embeddinggemma-300M-GGUF",
+        "revision": "0f741b5a6585bd53aeb15cd1372c56f2a0f65e12",
+        "file": "embeddinggemma-300M-Q8_0.gguf",
+        "xetHash": "9d3a58b91b634fdcebab88da61e696ba4a5512eee4182581a60f8c59234dc1f4",
+        "lfs_sha256": "b5ce9d77a3fc4b3b39ccb5643c36777911cc4eb46a66962eadfa3f5f60490d63",
+        "size": 333590944,
+        "cached_etag_equals_xetHash": true,
+        "cached_etag_equals_sha256": false,
+        "receipt_sha256_equals_lfs_sha256": true
+      },
+      {
+        "role": "generate",
+        "repo": "tobil/qmd-query-expansion-1.7B-gguf",
+        "revision": "7816de0b72572c6c860ca1eddf97ba9e7fb8cc65",
+        "file": "qmd-query-expansion-1.7B-q4_k_m.gguf",
+        "xetHash": "c3815846a946bfc89f95aeed122539a3286c91800084dd71398bcbf19a73f872",
+        "lfs_sha256": "000dfb1c06efa6a049e9f64ba921c3740e2454f62abab6fa10e77bd30bb2bcc0",
+        "size": 1282438912,
+        "cached_etag_equals_xetHash": true,
+        "cached_etag_equals_sha256": false,
+        "receipt_sha256_equals_lfs_sha256": true
+      },
+      {
+        "role": "rerank",
+        "repo": "ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF",
+        "revision": "a02f48bb4f057028298c21fa033da2b30d7742d5",
+        "file": "qwen3-reranker-0.6b-q8_0.gguf",
+        "xetHash": "19585ec8f4865d3bcb33b4e26b1cde1e6eb62b69ed02f53f718be293b7379ed7",
+        "lfs_sha256": "22c9979ce4fbcdc5acdc310c6641c32797eff1aa980b8f7a2db8a8ea23429a48",
+        "size": 639153184,
+        "cached_etag_equals_xetHash": true,
+        "cached_etag_equals_sha256": false,
+        "receipt_sha256_equals_lfs_sha256": true
+      }
+    ]
+  },
+  "qmd_package_check": {
+    "evidence_class": "independent_observation",
+    "observed_at_utc": "2026-09-26T05:24:57Z",
+    "tarball_url": "https://registry.npmjs.org/@tobilu/qmd/-/qmd-2.8.3.tgz",
+    "tarball_sha256": "2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0",
+    "pin_sha256": "2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0",
+    "pin_source": "adoption/pins-linux-x86_64.json (id qmd, version 2.8.3)",
+    "tarball_matches_pin": true,
+    "installed_package": "~/.local/share/codex-ecosystem/tools/qmd-2.8.3/lib/node_modules/@tobilu/qmd",
+    "tarball_files_compared": 53,
+    "files_differing_or_missing": [],
+    "installed_only_top_level": [
+      "node_modules"
+    ],
+    "method": "Fetched the tarball from the registry, extracted it and compared the sha256 of every file under package/ with the installed file at the same relative path.",
+    "upstream_src_llm_ts": {
+      "url": "https://raw.githubusercontent.com/tobi/qmd/facd35e01359e59d938bc9418e93fb9318addee3/src/llm.ts",
+      "sha256": "d7555f1edcb3042c01b591633d33f2c3e84a96b4e752a62f9fb8acb8a2abf9c7",
+      "line_495": "export async function pullModels(",
+      "line_508": "const filename = model.split(\"/\").pop();",
+      "line_517": "const etagPath = join(cacheDir, `${filename}.etag`);",
+      "line_546": "const etagPath = join(cacheDir, `${filename}.etag`);",
+      "line_547": "writeFileSync(etagPath, remoteEtag + \"\\n\", \"utf-8\");"
+    },
+    "upstream_anchors": {
+      "evidence_class": "independent_observation",
+      "tag_v2_8_3_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "method": "Fetched each file the README links from raw.githubusercontent.com at the pinned commit and read the linked line.",
+      "readme_anchors": [
+        {
+          "anchor": "README.md#L1058",
+          "line": "### Benchmarking"
+        },
+        {
+          "anchor": "src/cli/qmd.ts#L4715",
+          "line": "case \"bench\": {"
+        },
+        {
+          "anchor": "src/bench/bench.ts#L325",
+          "line": "export async function runBenchmark("
+        },
+        {
+          "anchor": "src/bench/score.ts#L12",
+          "line": "export function normalizePath(p: string): string {"
+        },
+        {
+          "anchor": "src/store.ts#L636",
+          "line": "export function getDefaultDbPath(indexName: string = \"index\"): string {"
+        },
+        {
+          "anchor": "src/collections.ts#L112",
+          "line": "export function getConfigDir(): string {"
+        },
+        {
+          "anchor": "src/store.ts#L2341",
+          "line": "export function getDocid(hash: string): string {"
+        },
+        {
+          "anchor": "bin/qmd#L175",
+          "line": "const child = spawn(runner, args, {"
+        }
+      ]
+    }
+  },
+  "receipt_harness": {
+    "evidence_class": "structural_validation",
+    "receipts": {
+      "results-20260926T022931Z.json": "efba31d53c4a36ac482e71d796146d600c76299952055c72005b5b27196f6004",
+      "results-20260926T024558Z.json": "efba31d53c4a36ac482e71d796146d600c76299952055c72005b5b27196f6004"
+    },
+    "patch": "run-efba31d5.patch",
+    "patch_sha256": "6a197ab9155d158feb048f311fc72760c7434f92dde3e7da7de8adaefeae2629",
+    "applies_to_run_py_sha256": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7",
+    "git_apply": {
+      "exit_code": 0,
+      "result_sha256": "efba31d53c4a36ac482e71d796146d600c76299952055c72005b5b27196f6004"
+    },
+    "gnu_patch": {
+      "exit_code": 0,
+      "result_sha256": "efba31d53c4a36ac482e71d796146d600c76299952055c72005b5b27196f6004"
+    },
+    "reproduces_efba31d5": true,
+    "scoring_code_unchanged": "The functions that parse, verify and score responses and compute the bootstrap and the decision (parse_hits, resolve_repository_path except its docstring, compute_query_metrics, dcg, summarize_arm, paired_bootstrap_ci, decide, audit_native_bench, build_bench_fixture) have the same syntax trees in efba31d5 and the committed run.py; run_arm differs only in appending each scored query to a list the receipt already holds."
+  },
+  "real_qmd_checks": {
+    "evidence_class": "local_integration",
+    "note": "The committed run.py against the installed QMD 2.8.3 (qmd --version: 'qmd 2.8.3 (facd35e)'), Arm A only or stopped in Arm B's qmd pull, so no model was loaded. Outputs stayed in scratch; their sha256 values are kept here.",
+    "retained_outputs": {
+      "note": "Committed after this record, in repair-review-20260926/: each check's results, native and report files, byte-identical to the files that the three check entries below hash (results_sha256 and native_sha256), and the drivers that ran the checks. realqmd.py ran decoy_routing_variables and sigterm_while_qmd_search_ran; realqmd_pull.py, with realqmd_lib.py, ran sigterm_during_qmd_pull. The drivers counted qmd processes by scanning /proc for the check's index name; those counts are not in the run outputs. The check entries' values were taken from the checks.json the drivers wrote, with the interpreter path sanitized to <SCRATCH>; that file was not committed.",
+      "files": [
+        {
+          "path": "repair-review-20260926/realqmd.py",
+          "role": "driver: decoy_routing_variables and sigterm_while_qmd_search_ran",
+          "sha256": "5d61d7bae4db086f1a4f285ff2edeebd174bb6e9bbc8f6357a2dcacce3283306",
+          "bytes": 5719,
+          "as_run_sha256": "5d61d7bae4db086f1a4f285ff2edeebd174bb6e9bbc8f6357a2dcacce3283306",
+          "as_run_bytes": 5719,
+          "sanitization": [
+            "none: byte-identical to the file that ran"
+          ]
+        },
+        {
+          "path": "repair-review-20260926/realqmd_lib.py",
+          "role": "helper imported by realqmd_pull.py (qmd process scan, summary)",
+          "sha256": "e0cb7ae790403979d265e93e5ad982de22ea69e61f0e8c4268270a7a4de717a3",
+          "bytes": 2794,
+          "as_run_sha256": "e0cb7ae790403979d265e93e5ad982de22ea69e61f0e8c4268270a7a4de717a3",
+          "as_run_bytes": 2794,
+          "sanitization": [
+            "none: byte-identical to the file that ran"
+          ]
+        },
+        {
+          "path": "repair-review-20260926/realqmd_pull.py",
+          "role": "driver: sigterm_during_qmd_pull",
+          "sha256": "47a81b23ae7004d85882b6be90e85f472a3be116fd9650afe7820a9ac949d833",
+          "bytes": 2359,
+          "as_run_sha256": "47a81b23ae7004d85882b6be90e85f472a3be116fd9650afe7820a9ac949d833",
+          "as_run_bytes": 2359,
+          "sanitization": [
+            "none: byte-identical to the file that ran"
+          ]
+        },
+        {
+          "path": "repair-review-20260926/results-20260926T050504Z.json",
+          "role": "decoy_routing_variables: run.py 0792745e's results output",
+          "sha256": "9892079e283169d388abf8ea55924a357dba1ed769fbbd832d22ea94da272124",
+          "bytes": 31418,
+          "as_run_sha256": "9892079e283169d388abf8ea55924a357dba1ed769fbbd832d22ea94da272124",
+          "as_run_bytes": 31418,
+          "sanitization": [
+            "none: byte-identical to the file that ran"
+          ]
+        },
+        {
+          "path": "repair-review-20260926/native-20260926T050504Z.json",
+          "role": "decoy_routing_variables: run.py 0792745e's native output",
+          "sha256": "17bc0c7ebc7b486749e7ae279a8900ba5f22924557e4d52dca12867fcb1d427c",
+          "bytes": 53365,
+          "as_run_sha256": "17bc0c7ebc7b486749e7ae279a8900ba5f22924557e4d52dca12867fcb1d427c",
+          "as_run_bytes": 53365,
+          "sanitization": [
+            "none: byte-identical to the file that ran"
+          ]
+        },
+        {
+          "path": "repair-review-20260926/report-20260926T050504Z.md",
+          "role": "decoy_routing_variables: run.py 0792745e's report output",
+          "sha256": "64efc8bc6e2fb909b6e001d971327d625132000a47e77ef08f6a59615360c50a",
+          "bytes": 4868,
+          "as_run_sha256": "64efc8bc6e2fb909b6e001d971327d625132000a47e77ef08f6a59615360c50a",
+          "as_run_bytes": 4868,
+          "sanitization": [
+            "none: byte-identical to the file that ran"
+          ]
+        },
+        {
+          "path": "repair-review-20260926/results-20260926T050511Z.json",
+          "role": "sigterm_while_qmd_search_ran: run.py 0792745e's results output",
+          "sha256": "686bf3a114524d9301fac28d642a89c2a4a3b567ee8b7b03797fa986a23d9690",
+          "bytes": 12679,
+          "as_run_sha256": "686bf3a114524d9301fac28d642a89c2a4a3b567ee8b7b03797fa986a23d9690",
+          "as_run_bytes": 12679,
+          "sanitization": [
+            "none: byte-identical to the file that ran"
+          ]
+        },
+        {
+          "path": "repair-review-20260926/native-20260926T050511Z.json",
+          "role": "sigterm_while_qmd_search_ran: run.py 0792745e's native output",
+          "sha256": "b2c2dd48e2ed36bb1ecd79d8f03b3e71600854416ec53782438be70f87f461f3",
+          "bytes": 12014,
+          "as_run_sha256": "b2c2dd48e2ed36bb1ecd79d8f03b3e71600854416ec53782438be70f87f461f3",
+          "as_run_bytes": 12014,
+          "sanitization": [
+            "none: byte-identical to the file that ran"
+          ]
+        },
+        {
+          "path": "repair-review-20260926/report-20260926T050511Z.md",
+          "role": "sigterm_while_qmd_search_ran: run.py 0792745e's report output",
+          "sha256": "0b48da4a52aa8a880eaca03f7c22ff3c9878cf87d238a29552c89875202ce45f",
+          "bytes": 3649,
+          "as_run_sha256": "0b48da4a52aa8a880eaca03f7c22ff3c9878cf87d238a29552c89875202ce45f",
+          "as_run_bytes": 3649,
+          "sanitization": [
+            "none: byte-identical to the file that ran"
+          ]
+        },
+        {
+          "path": "repair-review-20260926/results-20260926T050555Z.json",
+          "role": "sigterm_during_qmd_pull: run.py 0792745e's results output",
+          "sha256": "0d9e4ea7384273690a44eec62b8c4e86b481a88ec70e9f14e11833484572219c",
+          "bytes": 30692,
+          "as_run_sha256": "0d9e4ea7384273690a44eec62b8c4e86b481a88ec70e9f14e11833484572219c",
+          "as_run_bytes": 30692,
+          "sanitization": [
+            "none: byte-identical to the file that ran"
+          ]
+        },
+        {
+          "path": "repair-review-20260926/native-20260926T050555Z.json",
+          "role": "sigterm_during_qmd_pull: run.py 0792745e's native output",
+          "sha256": "e31ee0d51112fcc6b060ee867f49219677b333805573215f2df5d4adadf4e9f3",
+          "bytes": 54623,
+          "as_run_sha256": "e31ee0d51112fcc6b060ee867f49219677b333805573215f2df5d4adadf4e9f3",
+          "as_run_bytes": 54623,
+          "sanitization": [
+            "none: byte-identical to the file that ran"
+          ]
+        },
+        {
+          "path": "repair-review-20260926/report-20260926T050555Z.md",
+          "role": "sigterm_during_qmd_pull: run.py 0792745e's report output",
+          "sha256": "ee1a65fa090854c9b64982ecd79f043ab354c1537c87f6f926af9baa2652ac9a",
+          "bytes": 3815,
+          "as_run_sha256": "ee1a65fa090854c9b64982ecd79f043ab354c1537c87f6f926af9baa2652ac9a",
+          "as_run_bytes": 3815,
+          "sanitization": [
+            "none: byte-identical to the file that ran"
+          ]
+        }
+      ]
+    },
+    "decoy_routing_variables": {
+      "run_id": "20260926T050504Z",
+      "argv": [
+        "<SCRATCH>/ci-venv/bin/python",
+        "<STACK_REPO>/blueprints/retrieval-quality-v2/run.py",
+        "--repo",
+        "<STACK_REPO>",
+        "--scratch-home",
+        "<CHECK>/decoy-home",
+        "--output-dir",
+        "<CHECK>/decoy-out",
+        "--run-id",
+        "20260926T050504Z",
+        "--skip-arm-b",
+        "--skip-native-bench"
+      ],
+      "exit_status": 0,
+      "stdout_first_line": "status: completed_arm_b_not_run",
+      "stderr_tail": "",
+      "results_sha256": "9892079e283169d388abf8ea55924a357dba1ed769fbbd832d22ea94da272124",
+      "native_sha256": "17bc0c7ebc7b486749e7ae279a8900ba5f22924557e4d52dca12867fcb1d427c",
+      "report_exists": true,
+      "status": "completed_arm_b_not_run",
+      "harness_sha256": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7",
+      "qmd_version_raw": "qmd 2.8.3 (facd35e)",
+      "caller_qmd_variables_not_inherited": [
+        "INDEX_PATH",
+        "PWD",
+        "QMD_CONFIG_DIR",
+        "WSL_DISTRO_NAME",
+        "WSL_INTEROP"
+      ],
+      "index_documents_verified": 33,
+      "arm_a_status": "evaluated",
+      "arm_a_scored_queries": 30,
+      "arm_a_mean_ndcg_at_10": 0.2227878901522255,
+      "arm_b_status": "not_run",
+      "native_bench_status": "not_run",
+      "interruption": null,
+      "signals_received": [],
+      "abort_reason": null,
+      "native_records": 36,
+      "last_native_record": {
+        "id": "arm_a:pa-10",
+        "exit_code": 0,
+        "timed_out": false,
+        "interrupted_by": null,
+        "process_group_killed": false,
+        "output_complete": true,
+        "elapsed_ms": 161.1,
+        "stdout_raw_bytes": 3,
+        "stderr_raw_bytes": 0
+      },
+      "caller_set": [
+        "INDEX_PATH=<CHECK>/decoy-host/host.sqlite",
+        "QMD_CONFIG_DIR=<CHECK>/decoy-host/config"
+      ],
+      "decoy_directory_exists_after_run": false
+    },
+    "sigterm_while_qmd_search_ran": {
+      "run_id": "20260926T050511Z",
+      "argv": [
+        "<SCRATCH>/ci-venv/bin/python",
+        "<STACK_REPO>/blueprints/retrieval-quality-v2/run.py",
+        "--repo",
+        "<STACK_REPO>",
+        "--scratch-home",
+        "<CHECK>/sigterm-home",
+        "--output-dir",
+        "<CHECK>/sigterm-out",
+        "--run-id",
+        "20260926T050511Z",
+        "--index-name",
+        "rqv2-sigterm-check",
+        "--skip-arm-b",
+        "--skip-native-bench"
+      ],
+      "exit_status": -15,
+      "stdout_first_line": "status: aborted_interrupted",
+      "stderr_tail": "",
+      "results_sha256": "686bf3a114524d9301fac28d642a89c2a4a3b567ee8b7b03797fa986a23d9690",
+      "native_sha256": "b2c2dd48e2ed36bb1ecd79d8f03b3e71600854416ec53782438be70f87f461f3",
+      "report_exists": true,
+      "status": "aborted_interrupted",
+      "harness_sha256": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7",
+      "qmd_version_raw": "qmd 2.8.3 (facd35e)",
+      "caller_qmd_variables_not_inherited": [
+        "PWD",
+        "WSL_DISTRO_NAME",
+        "WSL_INTEROP"
+      ],
+      "index_documents_verified": 33,
+      "arm_a_status": "interrupted",
+      "arm_a_scored_queries": 1,
+      "arm_a_mean_ndcg_at_10": null,
+      "arm_b_status": "not_reached",
+      "native_bench_status": "not_reached",
+      "interruption": {
+        "signal": "SIGTERM",
+        "received_at_utc": "2026-09-26T05:05:13.420Z",
+        "phase_when_received": "arm_a",
+        "acted_on_at_utc": "2026-09-26T05:05:13.556Z",
+        "in_flight_native_record_id": null
+      },
+      "signals_received": [
+        {
+          "signal": "SIGTERM",
+          "received_at_utc": "2026-09-26T05:05:13.420Z",
+          "phase": "arm_a"
+        }
+      ],
+      "abort_reason": "stopped by SIGTERM during arm_a; no qmd call was in flight",
+      "native_records": 7,
+      "last_native_record": {
+        "id": "arm_a:nl-01",
+        "exit_code": 0,
+        "timed_out": false,
+        "interrupted_by": null,
+        "process_group_killed": false,
+        "output_complete": true,
+        "elapsed_ms": 156.6,
+        "stdout_raw_bytes": 3,
+        "stderr_raw_bytes": 0
+      },
+      "qmd_search_pids_seen_before_signal": 1,
+      "qmd_processes_for_index_after_run": 0,
+      "seen_pids_alive_after_run": 0,
+      "correction": "This run's receipt wrongly says 'no qmd call was in flight'. Its native record arm_a:nl-01 ran from 2026-09-26T05:05:13.400Z to 2026-09-26T05:05:13.556Z, across the SIGTERM received at 2026-09-26T05:05:13.420Z; run.py 0792745e named only a call that it killed itself. The check shows that the stop was recorded and acted on, that all three outputs were written and that no qmd process was left behind. It does not show that the receipt named the running call. The committed run.py names that call in interruption.qmd_call_running_when_received (verification-review-20260926.json, finding V4)."
+    },
+    "sigterm_during_qmd_pull": {
+      "run_id": "20260926T050555Z",
+      "argv": [
+        "<SCRATCH>/ci-venv/bin/python",
+        "<STACK_REPO>/blueprints/retrieval-quality-v2/run.py",
+        "--repo",
+        "<STACK_REPO>",
+        "--scratch-home",
+        "<CHECK>/pull-home",
+        "--output-dir",
+        "<CHECK>/pull-out",
+        "--run-id",
+        "20260926T050555Z",
+        "--index-name",
+        "rqv2-sigterm-pull-check",
+        "--skip-native-bench"
+      ],
+      "exit_status": -15,
+      "stdout_first_line": "status: aborted_interrupted",
+      "stderr_tail": "",
+      "results_sha256": "0d9e4ea7384273690a44eec62b8c4e86b481a88ec70e9f14e11833484572219c",
+      "native_sha256": "e31ee0d51112fcc6b060ee867f49219677b333805573215f2df5d4adadf4e9f3",
+      "report_exists": true,
+      "status": "aborted_interrupted",
+      "harness_sha256": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7",
+      "qmd_version_raw": "qmd 2.8.3 (facd35e)",
+      "index_documents_verified": 33,
+      "arm_a_status": "evaluated",
+      "arm_a_mean_ndcg_at_10": 0.2227878901522255,
+      "arm_b_status": "interrupted",
+      "arm_b_model_provenance_recorded": false,
+      "native_bench_status": "not_reached",
+      "interruption": {
+        "signal": "SIGTERM",
+        "received_at_utc": "2026-09-26T05:06:02.351Z",
+        "phase_when_received": "arm_b_pull",
+        "acted_on_at_utc": "2026-09-26T05:06:02.437Z",
+        "in_flight_native_record_id": "arm_b:pull"
+      },
+      "signals_received": [
+        {
+          "signal": "SIGTERM",
+          "received_at_utc": "2026-09-26T05:06:02.351Z",
+          "phase": "arm_b_pull"
+        }
+      ],
+      "abort_reason": "stopped by SIGTERM during arm_b_pull; the qmd call in flight (arm_b:pull) was killed with its process group and is kept in native-20260926T050555Z.json with its partial output",
+      "native_records": 37,
+      "last_native_record": {
+        "id": "arm_b:pull",
+        "exit_code": null,
+        "timed_out": false,
+        "interrupted_by": "SIGTERM",
+        "process_group_killed": true,
+        "output_complete": true,
+        "elapsed_ms": 409.0,
+        "stdout_raw_bytes": 15,
+        "stderr_raw_bytes": 0
+      },
+      "model_cache": "hardlinked from the 2026-09-26 restart's scratch HOME (3 GGUF files and their .etag files)",
+      "qmd_pull_pids_seen_before_signal": 2,
+      "qmd_processes_for_index_after_run": 0,
+      "seen_pids_alive_after_run": 0
+    }
+  },
+  "discriminating_controls": {
+    "recorded_at_utc": "2026-09-26T05:20:46Z",
+    "python": "3.13.15",
+    "harness_sha256": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7",
+    "tests_sha256": "75cde97957787ef99b80d2d453f0e452885739b09ec58b78bdbbcdee688c4a83",
+    "method": "Each mutant changes one repair in a copy of the committed run.py (the patch below); the named tests from tests/test_retrieval_quality_v2.py then run against that copy, one `python -m unittest <test>` each, and must fail. The same tests first run against an unmodified copy and must pass.",
+    "baseline": [
+      {
+        "test": "test_committed_receipts_rederive_from_their_native_output",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.011s",
+        "unittest_summary": "OK",
+        "seconds": 0.2
+      },
+      {
+        "test": "test_env_binds_owned_storage_and_drops_caller_routing",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.054s",
+        "unittest_summary": "OK",
+        "seconds": 0.1
+      },
+      {
+        "test": "test_index_content_mismatch_aborts_before_any_arm",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.436s",
+        "unittest_summary": "OK",
+        "seconds": 0.5
+      },
+      {
+        "test": "test_no_qmd_call_follows_the_callers_routing_variables",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.907s",
+        "unittest_summary": "OK",
+        "seconds": 1.0
+      },
+      {
+        "test": "test_a_callers_own_sigint_handler_still_leaves_an_interrupted_receipt",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.876s",
+        "unittest_summary": "OK",
+        "seconds": 1.0
+      },
+      {
+        "test": "test_an_ignored_sighup_is_left_alone",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 3.847s",
+        "unittest_summary": "OK",
+        "seconds": 3.9
+      },
+      {
+        "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.929s",
+        "unittest_summary": "OK",
+        "seconds": 1.0
+      },
+      {
+        "test": "test_sigterm_to_the_runner_and_then_its_group_like_gnu_timeout",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.713s",
+        "unittest_summary": "OK",
+        "seconds": 0.8
+      },
+      {
+        "test": "test_stop_requests_record_every_signal_and_raise_only_at_a_checkpoint",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.105s",
+        "unittest_summary": "OK",
+        "seconds": 0.2
+      },
+      {
+        "test": "test_qmd_cached_etag_is_read_from_its_uri_file_name",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.767s",
+        "unittest_summary": "OK",
+        "seconds": 0.9
+      },
+      {
+        "test": "test_unresolved_revision_fails_arm_b_closed",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.575s",
+        "unittest_summary": "OK",
+        "seconds": 0.7
+      },
+      {
+        "test": "test_bench_runs_on_the_same_index_with_a_derived_fixture_and_an_exact_audit",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.799s",
+        "unittest_summary": "OK",
+        "seconds": 0.9
+      },
+      {
+        "test": "test_every_scored_query_links_to_its_retained_native_output",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.998s",
+        "unittest_summary": "OK",
+        "seconds": 1.1
+      },
+      {
+        "test": "test_existing_output_is_never_overwritten",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.041s",
+        "unittest_summary": "OK",
+        "seconds": 0.2
+      },
+      {
+        "test": "test_docid_must_match_the_pinned_content_hash",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.032s",
+        "unittest_summary": "OK",
+        "seconds": 0.1
+      },
+      {
+        "test": "test_malformed_and_unverifiable_responses_score_zero_and_the_arm_continues",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.858s",
+        "unittest_summary": "OK",
+        "seconds": 1.0
+      },
+      {
+        "test": "test_one_unverifiable_hit_rejects_the_whole_query",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.791s",
+        "unittest_summary": "OK",
+        "seconds": 0.9
+      },
+      {
+        "test": "test_embed_timeout_marks_arm_b_not_evaluated",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 1.594s",
+        "unittest_summary": "OK",
+        "seconds": 1.7
+      },
+      {
+        "test": "test_pull_timeout_marks_arm_b_not_evaluated_and_kills_the_process_group",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 5.527s",
+        "unittest_summary": "OK",
+        "seconds": 5.6
+      }
+    ],
+    "baseline_all_passed": true,
+    "mutants": [
+      {
+        "mutant": "F1-inherit-caller-env",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -501,3 +501,3 @@\n     tmp_dir = scratch_home / \"tmp\"\n-    env = {key: caller[key] for key in QMD_ENV_PASSTHROUGH if key in caller}\n+    env = dict(caller)\n     env.update(\n@@ -509,4 +509,2 @@\n             \"TMPDIR\": str(tmp_dir),\n-            \"INDEX_PATH\": str(cache_home / \"qmd\" / f\"{index_name}.sqlite\"),\n-            \"QMD_CONFIG_DIR\": str(config_home / \"qmd\"),\n             # Hard-rule CPU boundary: the GPU is shared and must not be\n",
+        "tests": [
+          {
+            "test": "test_no_qmd_call_follows_the_callers_routing_variables",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.861s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.0,
+            "result": "failed_as_required"
+          },
+          {
+            "test": "test_env_binds_owned_storage_and_drops_caller_routing",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.060s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.2,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F2-revision-fail-open",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1095,2 +1095,3 @@\n     if not isinstance(revision, str) or not HF_REVISION_RE.fullmatch(revision):\n+        return {\"revision\": None, \"lfs_sha256\": None, \"lfs_size\": None}\n         raise RunFailure(\n",
+        "tests": [
+          {
+            "test": "test_unresolved_revision_fails_arm_b_closed",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 1.010s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.1,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F3-docid-unchecked",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -916,3 +916,4 @@\n         return None, f\"resolved path {repository_path!r} is not one of the pinned corpus files\"\n-    match = DOCID_RE.fullmatch(docid_field) if isinstance(docid_field, str) else None\n+    return repository_path, \"ok\"\n+    match = None\n     if match is None:\n",
+        "tests": [
+          {
+            "test": "test_docid_must_match_the_pinned_content_hash",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.057s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.2,
+            "result": "failed_as_required"
+          },
+          {
+            "test": "test_malformed_and_unverifiable_responses_score_zero_and_the_arm_continues",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.851s",
+            "unittest_summary": "FAILED (errors=1)",
+            "seconds": 1.0,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F3c-unverifiable-hit-scored-as-grade-0",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1025,3 +1025,3 @@\n                     ranked_paths.append(path)\n-                if rejected_hits:\n+                if False:\n                     error = (\n",
+        "tests": [
+          {
+            "test": "test_one_unverifiable_hit_rejects_the_whole_query",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.821s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.0,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F3b-index-content-unverified",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -799,3 +799,3 @@\n         indexed[f\"{prefix}/{path}\"] = digest\n-    pinned = {d[\"path\"]: d[\"sha256\"] for d in corpus}\n+    pinned = dict(indexed)\n     missing = sorted(set(pinned) - set(indexed))\n",
+        "tests": [
+          {
+            "test": "test_index_content_mismatch_aborts_before_any_arm",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.730s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F4-json-shape-unchecked",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -933,6 +933,8 @@\n         return None, f\"malformed JSON output: {exc}\"\n-    if not isinstance(doc, list):\n+    if doc is None:\n+        return [],\n+    if False:\n         return None, f\"malformed JSON response: expected an array of hits, got {type(doc).__name__}\"\n     for rank, hit in enumerate(doc, start=1):\n-        if not isinstance(hit, dict):\n+        if False:\n             return None, f\"malformed hit at rank {rank}: expected an object, got {type(hit).__name__}\"\n",
+        "tests": [
+          {
+            "test": "test_malformed_and_unverifiable_responses_score_zero_and_the_arm_continues",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.358s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.5,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F5a-timeout-propagates",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -606,3 +606,5 @@\n             remaining = deadline - time.monotonic()\n-            if stopping or remaining <= 0:\n+            if remaining <= 0 and not stopping:\n+                raise subprocess.TimeoutExpired(argv, timeout)\n+            if stopping:\n                 _kill_process_group(proc)\n",
+        "tests": [
+          {
+            "test": "test_embed_timeout_marks_arm_b_not_evaluated",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 1.487s",
+            "unittest_summary": "FAILED (errors=1)",
+            "seconds": 1.6,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F5b-kill-launcher-only",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -560,3 +560,3 @@\n     with contextlib.suppress(ProcessLookupError, PermissionError):\n-        os.killpg(proc.pid, signal.SIGKILL)\n+        proc.kill()\n \n",
+        "tests": [
+          {
+            "test": "test_pull_timeout_marks_arm_b_not_evaluated_and_kills_the_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 25.543s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 25.7,
+            "result": "failed_as_required"
+          },
+          {
+            "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 20.986s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 21.1,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F6-overwrite-outputs",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1766,3 +1766,3 @@\n     \"\"\"Creates ``path``; raises FileExistsError rather than replacing anything.\"\"\"\n-    with open(path, \"x\", encoding=\"utf-8\") as fh:\n+    with open(path, \"w\", encoding=\"utf-8\") as fh:\n         fh.write(text)\n@@ -1853,3 +1853,3 @@\n     outputs = run_outputs(output_dir, run_id)\n-    existing = [p.name for p in outputs.values() if p.exists()]\n+    existing = []\n     if existing:\n",
+        "tests": [
+          {
+            "test": "test_existing_output_is_never_overwritten",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.771s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F7-no-native-retention",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -720,3 +720,2 @@\n         record.update(stderr_fields)\n-        self.records.append(record)\n         return record, stdout, stderr\n",
+        "tests": [
+          {
+            "test": "test_every_scored_query_links_to_its_retained_native_output",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.725s",
+            "unittest_summary": "FAILED (errors=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "evidence-receipt-hand-edited",
+        "patch": "results-20260926T024558Z.json: arm_b.per_query[0].ranked_paths rotated by one position (first path moved to the end); run.py unchanged",
+        "tests": [
+          {
+            "test": "test_committed_receipts_rederive_from_their_native_output",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.007s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.1,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "bench-audit-trusts-native",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1306,3 +1306,3 @@\n             gold = expected.get(result.get(\"id\"), [])\n-            exact_recall5 = (sum(1 for g in gold if g in top[:5]) / len(gold)) if gold else 0.0\n+            exact_recall5 = backend_result.get(\"recall_at_5\")\n             first = next((i for i, p in enumerate(top) if p is not None and p in gold), None)\n",
+        "tests": [
+          {
+            "test": "test_bench_runs_on_the_same_index_with_a_derived_fixture_and_an_exact_audit",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.746s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I1-no-stop-handlers",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -306,3 +306,3 @@\n     def arm(self) -> None:\n-        for signum in self.signals():\n+        for signum in ():\n             default = signal.default_int_handler if signum == signal.SIGINT else signal.SIG_DFL\n",
+        "tests": [
+          {
+            "test": "test_sigterm_to_the_runner_and_then_its_group_like_gnu_timeout",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.592s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.7,
+            "result": "failed_as_required"
+          },
+          {
+            "test": "test_stop_requests_record_every_signal_and_raise_only_at_a_checkpoint",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.086s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.2,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I2-stop-not-polled",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -604,3 +604,3 @@\n         while True:\n-            stopping = stop is not None and stop()\n+            stopping = False\n             remaining = deadline - time.monotonic()\n",
+        "tests": [
+          {
+            "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 120.751s",
+            "unittest_summary": "FAILED (errors=1)",
+            "seconds": 120.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I3-stopped-call-not-recorded",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -687,5 +687,5 @@\n             raise\n-        record, stdout, stderr = self._append(record_id, phase, argv, started_at, start, timeout, result, None)\n         if result.stopped:\n             self.checkpoint()\n+        record, stdout, stderr = self._append(record_id, phase, argv, started_at, start, timeout, result, None)\n         return NativeCall(record, stdout, stderr)\n",
+        "tests": [
+          {
+            "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 1.105s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.3,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I4-group-not-killed-on-stop",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -607,3 +607,4 @@\n             if stopping or remaining <= 0:\n-                _kill_process_group(proc)\n+                if not stopping:\n+                    _kill_process_group(proc)\n                 stdout, stderr, complete = _collect_after_kill(proc)\n",
+        "tests": [
+          {
+            "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 22.141s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 22.3,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I5-no-interrupted-status",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1970,3 +1970,3 @@\n         name = signal_name(signum)\n-        receipt[\"status\"] = \"aborted_interrupted\"\n+        receipt[\"status\"] = \"started\"\n         receipt[\"interruption\"] = {\n",
+        "tests": [
+          {
+            "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 1.127s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.2,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I6-statuses-not-settled",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -2198,3 +2198,2 @@\n         try:\n-            settle_statuses(receipt)\n             receipt.pop(\"status_note\", None)\n",
+        "tests": [
+          {
+            "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.984s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.1,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I7-script-exits-with-a-code",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -2277,2 +2277,2 @@\n if __name__ == \"__main__\":\n-    exit_process(main())\n+    sys.exit(main())\n",
+        "tests": [
+          {
+            "test": "test_sigterm_to_the_runner_and_then_its_group_like_gnu_timeout",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.834s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.0,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I8-caller-dispositions-replaced",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -308,4 +308,2 @@\n             default = signal.default_int_handler if signum == signal.SIGINT else signal.SIG_DFL\n-            if signal.getsignal(signum) is not default:\n-                continue\n             try:\n",
+        "tests": [
+          {
+            "test": "test_an_ignored_sighup_is_left_alone",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.731s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          },
+          {
+            "test": "test_a_callers_own_sigint_handler_still_leaves_an_interrupted_receipt",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.852s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.0,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I9-exception-leaves-group-running",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -618,5 +618,4 @@\n     except BaseException as exc:\n-        _kill_process_group(proc)\n         try:\n-            stdout, stderr, complete = _collect_after_kill(proc)\n+            stdout, stderr, complete = b\"\", b\"\", False\n         except BaseException:  # anything further while collecting: keep stopping\n",
+        "tests": [
+          {
+            "test": "test_a_callers_own_sigint_handler_still_leaves_an_interrupted_receipt",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 10.869s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 11.0,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "E1-etag-at-downloaded-file-name",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1181,3 +1181,3 @@\n         pin = resolve_hf_pin(hf_repo_id, filename, file_sha256, size_bytes)\n-        etag_path = qmd_etag_path(model_cache_dir, uri)\n+        etag_path = local_path.with_name(local_path.name + \".etag\")\n         hf_content_etag = etag_path.read_text(encoding=\"utf-8\").strip() if etag_path.is_file() else None\n",
+        "tests": [
+          {
+            "test": "test_qmd_cached_etag_is_read_from_its_uri_file_name",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.774s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      }
+    ],
+    "all_mutants_caught": true
+  },
+  "corrections": [
+    {
+      "recorded_at_utc": "2026-09-26T09:52:05Z",
+      "reason": "An independent session's review (needs_changes) found two problems. The SIGTERM-during-search check was counted for D1 although its receipt misreported the running call. The real-qmd outputs and the drivers that counted qmd processes existed only in scratch.",
+      "as_recorded_sha256": "8faa7e3df690413a0a734e21fcee37aaba9d4c4c01cdcff823f614b240252a5c",
+      "as_recorded_bytes": 46436,
+      "changed": [],
+      "added": [
+        "real_qmd_checks.retained_outputs",
+        "real_qmd_checks.sigterm_while_qmd_search_ran.correction",
+        "corrections"
+      ],
+      "unchanged": "Every other key and value is as recorded.",
+      "reconstruct": "Delete the added keys and write json.dumps(document, indent=2, ensure_ascii=False) followed by a newline. The result is the as-recorded file, byte for byte."
+    }
+  ]
+}
