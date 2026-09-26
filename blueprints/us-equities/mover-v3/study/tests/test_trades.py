@@ -568,6 +568,80 @@ class RenamedActions(unittest.TestCase):
                 if no_record is not None:
                     self.assertEqual(result["no_merger_record"], no_record)
 
+    def test_terminal_zero_chained_rename_is_counted_and_rerequested(self):
+        """Round 17 F2 re-review: use the dated issuer chain from Ctx.issuer_records at 1961e23f,
+        including an entry-day transition that is itself outside the diagnostic interval."""
+        cal, d = self.cal, self.d
+        for first_day, successor in ((d[1], "NEW"), (d[3], "MID")):
+            with self.subTest(first_day=first_day):
+                # Reverse provider order must not change the issuer's transition order.
+                actions = [self._rename("MID", "NEW", d[3]), self._rename("OLD", "MID", first_day)]
+                store = Store()
+                tr = resolve(self.ev, "b_lane", ctx_for(cal, actions=actions), store,
+                             {"OLD": [book(cal, d[1], "09:35")],
+                              successor: [book(cal, d[5], "15:55", 10.5, 10.6)]})
+                self.assertEqual((tr["exit"], tr["nets"]["primary"]), ("terminal_zero", -1.0))
+                self.assertTrue(tr["rename_record_in_window"])
+                self.assertEqual(tr["rename_sensitivity"]["new_symbol"], successor)
+                self.assertEqual(tr["rename_sensitivity"]["status"], "fill")
+                self.assertEqual(tr["rename_sensitivity"]["fill_session"], d[5])
+                requests = [r for r in store.req.values() if r["kind"] == "quote_rename"]
+                self.assertEqual([(r["params"]["symbols"], r["params"]["asof"]) for r in requests],
+                                 [(successor, d[3])])
+
+    def test_terminal_zero_single_rename_requests_successor_asof_process_date(self):
+        cal, d = self.cal, self.d
+        store = Store()
+        tr = resolve(self.ev, "b_lane", ctx_for(cal, actions=[self._rename("OLD", "NEW", d[3])]), store,
+                     {"OLD": [book(cal, d[1], "09:35")], "NEW": [book(cal, d[5], "15:55", 10.5, 10.6)]})
+        self.assertEqual((tr["exit"], tr["nets"]["primary"]), ("terminal_zero", -1.0))
+        self.assertTrue(tr["rename_record_in_window"])
+        self.assertEqual(tr["rename_sensitivity"]["new_symbol"], "NEW")
+        self.assertEqual(tr["rename_sensitivity"]["status"], "fill")
+        self.assertAlmostEqual(tr["rename_sensitivity"]["fill_mid"], 10.55)
+        requests = [r for r in store.req.values() if r["kind"] == "quote_rename"]
+        self.assertEqual([(r["params"]["symbols"], r["params"]["asof"]) for r in requests], [("NEW", d[3])])
+
+    def test_terminal_zero_rename_diagnostic_keeps_strict_date_window(self):
+        cal, d = self.cal, self.d
+        cases = ((cal.offset(self.t, -1), False), (self.t, False), (d[1], False),
+                 (d[2], True), (d[10], True), (d[11], False), (None, False))
+        for day, counted in cases:
+            with self.subTest(day=day):
+                store = Store()
+                tr = resolve(self.ev, "b_lane", ctx_for(cal, actions=[self._rename("OLD", "NEW", day)]), store,
+                             {"OLD": [book(cal, d[1], "09:35")]})
+                self.assertEqual((tr["exit"], tr["nets"]["primary"]), ("terminal_zero", -1.0))
+                self.assertEqual(tr["rename_record_in_window"], counted)
+                self.assertEqual("rename_sensitivity" in tr, counted)
+                requests = [r for r in store.req.values() if r["kind"] == "quote_rename"]
+                self.assertEqual(bool(requests), counted)
+                if counted:
+                    self.assertEqual({(r["params"]["symbols"], r["params"]["asof"]) for r in requests},
+                                     {("NEW", day)})
+
+    def test_terminal_zero_rename_diagnostic_rejects_other_issuers(self):
+        cal, d = self.cal, self.d
+        cases = [
+            # OLD is reused after the held issuer has renamed away on entry day.
+            [self._rename("OLD", "MID", d[1]), self._rename("OLD", "OTHER", d[3])],
+            # A pre-t (or t-day) rename belongs to an earlier holder of OLD.
+            [self._rename("OLD", "MID", cal.offset(self.t, -1)), self._rename("MID", "NEW", d[3])],
+            [self._rename("OLD", "MID", self.t), self._rename("MID", "NEW", d[3])],
+            # Matching only new_symbol would attach an unrelated issuer to the holding.
+            [self._rename("OTHER", "OLD", d[3])],
+            [self._rename("OLD", "MID", d[1]), self._rename("OTHER", "MID", d[3])],
+        ]
+        for actions in cases:
+            with self.subTest(actions=actions):
+                store = Store()
+                tr = resolve(self.ev, "b_lane", ctx_for(cal, actions=actions), store,
+                             {"OLD": [book(cal, d[1], "09:35")]})
+                self.assertEqual((tr["exit"], tr["nets"]["primary"]), ("terminal_zero", -1.0))
+                self.assertFalse(tr["rename_record_in_window"])
+                self.assertNotIn("rename_sensitivity", tr)
+                self.assertFalse(any(r["kind"] == "quote_rename" for r in store.req.values()))
+
 
 def _entry_store(cal, ev, d):
     store = Store()

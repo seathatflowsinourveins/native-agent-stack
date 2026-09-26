@@ -41,20 +41,25 @@ class Ctx:
     def issuer_records(self, typ_set, symbol_field, symbol, asof):
         """Match the issuer of an asof=t request at each action's effective date (universe_and_identity.asof
         and corporate_action_dates). Only later renames move its ticker: earlier holders and a reused ticker
-        after it renames away must not be joined by an undated alias set. A process date starts the new name."""
+        after it renames away must not be joined by an undated alias set. A process date starts the new name.
+        Requested name_change records match old_symbol before each followed transition; other actions match
+        the symbol after the whole same-date chain."""
         records = sorted(self.records((*typ_set, "name_change")), key=lambda r: r.get("date") or "")
         for day, rows in groupby(records, key=lambda r: r.get("date") or ""):
             rows = list(rows)
             if day > asof:
-                renames = {r["old_symbol"]: r["new_symbol"] for r in rows
+                renames = {r["old_symbol"]: r for r in rows
                            if r["type"] == "name_change" and r.get("old_symbol") and r.get("new_symbol")}
                 # Resolve a same-date chain before actions, independently of provider row order.
                 seen = set()
                 while symbol in renames and symbol not in seen:
                     seen.add(symbol)
-                    symbol = renames[symbol]
+                    rename = renames[symbol]
+                    if "name_change" in typ_set and rename.get(symbol_field) == symbol:
+                        yield rename
+                    symbol = rename["new_symbol"]
             for r in rows:
-                if r["type"] in typ_set and r.get(symbol_field) == symbol:
+                if r["type"] != "name_change" and r["type"] in typ_set and r.get(symbol_field) == symbol:
                     yield r
 
 
@@ -225,7 +230,7 @@ def trade(ev: dict, arm: str, ctx: Ctx, store) -> dict:
         back = (bkind, bhit)
     rename_hits = []
     if kind == "none":
-        rename_hits = [r for r in ctx.records(("name_change",), old_symbol=sym)
+        rename_hits = [r for r in ctx.issuer_records(("name_change",), "old_symbol", sym, t)
                        if r.get("date") and d1 < r["date"] <= (search_last or r["date"]) and r.get("new_symbol")]
         for r in rename_hits[:1]:
             asof = cal.next_on_or_after(r["date"])
