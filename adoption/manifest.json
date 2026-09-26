@@ -6,8 +6,8 @@
     "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
     "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
     "baseline_meaning": "Parent accepted publication before this adoption addition; local revision is always git rev-parse HEAD. This commit predates adoption/ and tools/adoption/ entirely and must never be the checkout target for a new machine (see release_tag/release_commit below, and adoption/bootstrap.md step 0; Codex cross-family review finding, codex-review-72).",
-    "release_tag": "v2026.09.26",
-    "release_commit": "ff20470b8fc00fee288916f309123586b15668ec",
+    "release_tag": "v2026.09.26.1",
+    "release_commit": "5008c30cd6676c72fe1159c7221309feba460b08",
     "release_meaning": "The attested release tag adoption/bootstrap.md step 0 checks out on a new machine (or a later tag): published with SLSA build provenance by .github/workflows/publish-catalog.yml, and contains both adoption/ and tools/adoption/ (unlike baseline_commit above)."
   },
   "supported_platforms": [

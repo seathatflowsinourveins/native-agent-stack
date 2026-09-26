@@ -3554,8 +3554,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "fa8313792673f2c1e3acd3e0703f11e28954b0fb00c00e64528ab34b75ed03f6",
-      "bytes": 19226
+      "sha256": "d0ad57ef606dd9b7d9e2f58477f9cddaf112cbda80a196b27f0aa3f6623f2943",
+      "bytes": 19228
     },
     {
       "path": "adoption/paired/README.md",
@@ -3604,8 +3604,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "1e8d64a35da17af80b73b3039fc576011c8333c1d4d61ae84d099110ac8e2ee2",
-      "bytes": 52630
+      "sha256": "aaa3390129a4057d5c6705534356bccde7e73db44dc61a75c5fdd545052a0d3a",
+      "bytes": 52621
     },
     {
       "path": "adoption/pre-login-observation.json",

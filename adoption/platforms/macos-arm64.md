@@ -53,12 +53,12 @@ release, the note is history and the step is in your checkout (`test -e
    [`adoption/hardware-profiles.json`](../hardware-profiles.json).
 2. `bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation`
    (usage and exit codes below). Use `macos-arm64-foundation`, the profile
-   this page documents and the hosted smoke job runs. At `v2026.09.26`
-   `foundation-cpu` exits 3 here because `qmd` and `rtk` have no macOS pin;
-   `adoption/pins-macos-arm64.json` changed after `v2026.09.26` to pin both,
-   with the rest of `token-efficiency` (the darwin-arm64 pinned release
-   archives table below), so on main every component of both profiles has a
-   pin and `--plan` resolves them without exit 3. That is a `--plan` result
+   this page documents and the hosted smoke job runs.
+   `adoption/pins-macos-arm64.json` changed after `v2026.09.26` to pin `qmd`
+   and `rtk`, whose missing macOS pins made `foundation-cpu` exit 3 at that
+   tag, together with the rest of `token-efficiency` (the darwin-arm64 pinned
+   release archives table below). Every component of both profiles now has a
+   pin, and `--plan` resolves them without exit 3. That is a `--plan` result
    under a `uname`/`sw_vers` shim on Linux (`TokenEfficiencyPlanTests` in
    `tests/test_adoption_bootstrap_macos.py`): no Mac has installed those eight
    pins or run their install paths, and the hosted macOS jobs run only
