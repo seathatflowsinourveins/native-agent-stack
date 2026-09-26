@@ -72,6 +72,15 @@ class CalibrationAcceptance(unittest.TestCase):
                 with self.assertRaisesRegex(guards.Refused, kind):
                     check_calibration(output, underbounded)
 
+    def test_invalid_page_maxima_refuse_with_no_valid_page_calibration(self):
+        """check_dry_run_bound requires a mapping of nonnegative integer page maxima, excluding booleans."""
+        for maxima in (None, [], 1, "pages", {"quote_entry": 1, "event_minute": -1},
+                       {"quote_entry": True}, {"quote_entry": 1.0}, {"quote_entry": "1"}):
+            with self.subTest(maxima=maxima):
+                with self.assertRaisesRegex(guards.Refused,
+                                            "^the native dry run has no valid page calibration$"):
+                    check_calibration({"measured": {**FR.MEASURED, "pages_per_request_max": maxima}})
+
     def test_missing_quote_measurements_cannot_bound_unmeasured_kinds(self):
         for maxima in ({}, {"screen_daily_raw": 1}, {"screen_daily_raw": 1, "quote_exit": 0}):
             with self.subTest(maxima=maxima):

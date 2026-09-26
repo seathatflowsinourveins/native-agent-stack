@@ -19,13 +19,13 @@ from core import driver
 from core import formulas as FM
 from core import identity, plan
 from core.calendar import year_of
-from core.canon import dumps, sha256_bytes
+from core.canon import dumps, sha256_bytes, sha256_file
 from core.coverage_rule import (checked_thresholds, fetch_margin, identity_limited, item_rule, probe_decision,
                                 rule_sha256, year_decision)
 from core.fills import fill_at
 from core.params import FETCH, SAMPLING, T
 from core.records import MERGER_TYPES
-from core.store import Store
+from core.store import SealError, Store
 from pinned.sessions_io_copy import official_price
 
 PART1_RANGE = ("2016-01-04", "2020-12-31")
@@ -470,12 +470,27 @@ def dry_run(cal, sessions: list, symbols: list, transports: dict, snapshot_root,
     seal and counted (counts only; run.py dry-run writes the output with its run-log line). progress, when given,
     receives the snapshot sha256 as soon as it is sealed, so a run that fails afterwards still logs it (review round
     12, F3)."""
-    dry_run_requests(cal, sessions, symbols)            # refuses before any fetch (review round 11, C1)
-    store = Store()
+    reqs = dry_run_requests(cal, sessions, symbols)     # refuses before any fetch (review round 11, C1)
+    store, sha = Store(), None
     root = Path(snapshot_root) / "dry-run"
-    driver.stage_fetch(lambda st: dry_run_requests(cal, sessions, symbols), transports, store, fetch_date,
-                       clock=clock)
-    sha = store.write(root)
+    # core.holdout.collect's recover-if-matching pattern (803bc351): validate before adopting a seal or fetching.
+    seal_identity = {"sessions": list(sessions), "symbols": list(symbols), "fetch_date": fetch_date,
+                "requests": sorted(plan.record(r) for r in reqs)}
+    if (root / "ledger.jsonl").exists():
+        sha = sha256_file(root / "ledger.jsonl")
+        try:
+            store = Store.read(root, sha)
+        except (OSError, ValueError, KeyError, EOFError) as exc:
+            raise SealError("dry-run snapshot is invalid or partially written") from exc
+        if store.binding != {"identity": seal_identity}:
+            raise SealError("dry-run snapshot binding differs from the requested dry run")
+        if store.request_records() != seal_identity["requests"] or set(store.state) != set(store.req):
+            raise SealError("dry-run snapshot is partially written: requests or completion stamps differ")
+    elif (root / "pages").exists():
+        raise SealError("dry-run snapshot is partially written: cannot overwrite or fetch it again")
+    if sha is None:
+        driver.stage_fetch(lambda st: reqs, transports, store, fetch_date, clock=clock)
+        sha = store.write(root, binding={"identity": seal_identity})
     if progress is not None:
         progress["dry-run"] = sha
     return dry_run_output(snapshot_root, sha, sessions, symbols)
