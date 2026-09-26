@@ -188,9 +188,14 @@ locally with `GH_TOKEN` set and no `--offline`, using
   37 listed lockfiles (the excluded fixture is not among them) exited 0,
   "No issues found", 175 local packages filtered. #99's relock of
   `tools/mlx-smoke` (mlx-lm 0.31.3) removed the six base-commit advisories.
-- **Ignores.** None. `.github/osv-scanner.toml` documents the policy: `id`,
+- **Ignores.** `.github/osv-scanner.toml` documents the policy: `id`,
   a concrete `reason`, and `ignoreUntil` no more than 90 days away, all
-  enforced by the unit test.
+  enforced by the unit test. Since 2026-09-26 two time-boxed entries (until
+  2026-12-24) cover only the evaluation-only Lumibot 4.6.1 lock of the SPY
+  one_zero engine trial, never installed outside that trial:
+  GHSA-8mgp-746c-j5xp (nltk 3.10.3, no patched release) and
+  GHSA-h35f-9h28-mq5c (setuptools 80.10.2; the environment was installed
+  binary-only on Linux). Evidence: `blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json`.
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
   check. Off PRs, the same scan writes SARIF, which the job keeps as a 1-day

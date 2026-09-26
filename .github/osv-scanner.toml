@@ -15,3 +15,13 @@
 # id = "GHSA-xxxx-xxxx-xxxx"
 # ignoreUntil = 2026-12-21
 # reason = "Why the vulnerable code is unreachable here, with the evidence path."
+
+[[IgnoredVulns]]
+id = "GHSA-8mgp-746c-j5xp"
+ignoreUntil = 2026-12-24
+reason = "nltk 3.10.3 is a transitive pin (google-adk, llama-index-core) of the evaluation-only Lumibot 4.6.1 environment frozen in blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock; no trial code calls the affected model import/export APIs, the runs were offline under bwrap, and no patched release exists. Evidence: blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json"
+
+[[IgnoredVulns]]
+id = "GHSA-h35f-9h28-mq5c"
+ignoreUntil = 2026-12-24
+reason = "setuptools 80.10.2 in the same frozen evaluation lock; the advisory needs an sdist build on macOS APFS/HFS+, while this environment was installed binary-only on Linux (--no-build) and its one source build used setuptools 84.0.0; relocking would change the recorded environment. Evidence: blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json"
