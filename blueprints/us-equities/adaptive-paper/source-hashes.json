@@ -21,7 +21,7 @@
   "blueprints/us-equities/adaptive-paper/mover_runner.py": "ff1baf36baf4dd319cd0ed549cc5258194536548a098892bd203f8ab61c13bcd",
   "blueprints/us-equities/adaptive-paper/mover_simulation.py": "8ac5955de1e814bb26fbfbca068a5719b9033b2bae0d8e50e78d7a78a546761e",
   "blueprints/us-equities/adaptive-paper/mover_strategy.py": "4730c5e535aa480030d6484669a9d8565ca25e4e1ea50ea12a45bd1892536cba",
-  "blueprints/us-equities/adaptive-paper/native_adapter.py": "fd0aa91d432978849956c3b76a6be9ae8f696772f900e24151ea9aa88d91a33f",
+  "blueprints/us-equities/adaptive-paper/native_adapter.py": "fe544c95ea2ee066052e1009e2f75a90e00ac5aaa34304f0264a00e5bc313b75",
   "blueprints/us-equities/adaptive-paper/native_strategy.py": "bc102eb6c4456cb651510fe59cf5f92decf3b70b31e0da1c833e7a27d6f1a226",
   "blueprints/us-equities/adaptive-paper/receipts/adaptive_policy_v1.golden.json": "5cb4b21c7d2159e496093c67b3b358810db4e225d9c5ee1c633258050973556e",
   "blueprints/us-equities/adaptive-paper/recovery.py": "5cf7dcea572efbda6979a2726eebf6d676f6bd62263900c7b6626da8b45c1215",

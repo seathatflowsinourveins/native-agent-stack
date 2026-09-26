@@ -876,7 +876,27 @@ class AlpacaExecutionClient(ExecutionClient):
             if prior is None:
                 ins, qty, filled, avg = self._normalized(row)
                 prior = self._new_state(row["id"])
+                sink_observation = getattr(self.session.port, "sink_observation", None)
+                notional = Decimal(0)
                 for execution in await self._adopted_executions(row):
+                    cum = execution["cum"]
+                    notional += execution["qty"] * execution["price"]
+                    if sink_observation is not None:
+                        # NautilusTrader 2.0.0rc5 installed contract:
+                        # live/clients.py:_generate_fill_reports and model/__init__.pyi:
+                        # FillReport(trade_id, last_qty, last_px), ExecutionMassStatus.add_fill_reports.
+                        # Reconciliation consumes these per-execution reports; persist them
+                        # through the same observation hook as activity recovery before
+                        # exposing them to native reconciliation (or caching booking state).
+                        average = avg if cum == filled else (notional / cum).quantize(Decimal("0.000001"))
+                        status = row["status"] if cum == filled else "partially_filled"
+                        result = sink_observation(dict(row, status=status, filled_qty=str(cum),
+                            filled_avg_price=str(average), updated_at_ns=execution["ts"],
+                            event="fill" if status == "filled" else "partial_fill",
+                            execution_id=execution["trade_id"], event_qty=str(execution["qty"]),
+                            event_price=str(execution["price"])))
+                        if inspect.isawaitable(result):
+                            await result
                     prior["executions"][execution["cum"]] = {"qty": execution["qty"], "price": execution["price"],
                                                              "trade_id": execution["trade_id"], "source": "activity",
                                                              "ts": execution["ts"]}
