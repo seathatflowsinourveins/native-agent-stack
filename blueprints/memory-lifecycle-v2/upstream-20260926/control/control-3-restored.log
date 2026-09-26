@@ -1,0 +1,11 @@
+   Compiling ai-memory-store v2.4.1 (/work/ai-memory/crates/ai-memory-store)
+   Compiling ai-memory-wiki v2.4.1 (/work/ai-memory/crates/ai-memory-wiki)
+   Compiling ai-memory-consolidate v2.4.1 (/work/ai-memory/crates/ai-memory-consolidate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.00s
+     Running unittests src/lib.rs (target/debug/deps/ai_memory_consolidate-497374af9fefba90)
+
+running 1 test
+test integration::lifecycle::ttl_expiry_lifecycle_end_to_end ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 303 filtered out; finished in 0.34s
+

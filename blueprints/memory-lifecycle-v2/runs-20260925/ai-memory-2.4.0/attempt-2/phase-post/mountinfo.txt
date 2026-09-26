@@ -1,0 +1,26 @@
+583 46 0:40 /newroot / rw,nosuid,nodev,relatime - tmpfs tmpfs rw,uid=1000,gid=1000
+584 583 8:96 /usr /usr ro,nosuid,nodev,relatime - ext4 /dev/sdg rw,discard,errors=remount-ro,data=ordered
+585 584 0:36 / /usr/lib/wsl/drivers ro,nosuid,nodev,noatime - 9p drivers ro,aname=drivers;fmask=222;dmask=222,cache=0x5,access=client,msize=65536,trans=fd,rfd=8,wfd=8
+586 584 0:128 / /usr/lib/wsl/lib ro,nosuid,nodev,noatime - overlay none rw,lowerdir=/gpu_lib_packaged:/gpu_lib_inbox,upperdir=/gpu_lib/rw/upper,workdir=/gpu_lib/rw/work,uuid=on
+587 584 0:31 / /usr/lib/modules/6.18.33.2-microsoft-standard-WSL2 ro,nosuid,nodev,noatime - overlay none rw,lowerdir=/modules,upperdir=/lib/modules/6.18.33.2-microsoft-standard-WSL2/rw/upper,workdir=/lib/modules/6.18.33.2-microsoft-standard-WSL2/rw/work,uuid=on
+588 583 8:96 /usr/lib /lib ro,nosuid,nodev,relatime - ext4 /dev/sdg rw,discard,errors=remount-ro,data=ordered
+589 588 0:36 / /lib/wsl/drivers ro,nosuid,nodev,noatime - 9p drivers ro,aname=drivers;fmask=222;dmask=222,cache=0x5,access=client,msize=65536,trans=fd,rfd=8,wfd=8
+592 588 0:128 / /lib/wsl/lib ro,nosuid,nodev,noatime - overlay none rw,lowerdir=/gpu_lib_packaged:/gpu_lib_inbox,upperdir=/gpu_lib/rw/upper,workdir=/gpu_lib/rw/work,uuid=on
+596 588 0:31 / /lib/modules/6.18.33.2-microsoft-standard-WSL2 ro,nosuid,nodev,noatime - overlay none rw,lowerdir=/modules,upperdir=/lib/modules/6.18.33.2-microsoft-standard-WSL2/rw/upper,workdir=/lib/modules/6.18.33.2-microsoft-standard-WSL2/rw/work,uuid=on
+599 583 8:96 /usr/lib64 /lib64 ro,nosuid,nodev,relatime - ext4 /dev/sdg rw,discard,errors=remount-ro,data=ordered
+623 583 8:96 /etc/ld.so.cache /etc/ld.so.cache ro,nosuid,nodev,relatime - ext4 /dev/sdg rw,discard,errors=remount-ro,data=ordered
+625 583 8:96 ~/.local/share/codex-ecosystem/tools/ai-memory-2.4.0/ai-memory /ai-memory ro,nosuid,nodev,relatime - ext4 /dev/sdg rw,discard,errors=remount-ro,data=ordered
+631 583 8:96 <scratch>/wt-w3/blueprints/memory-lifecycle-v2/exercise.py /exercise.py ro,nosuid,nodev,relatime - ext4 /dev/sdg rw,discard,errors=remount-ro,data=ordered
+691 583 8:96 <run>/phase-post /run rw,nosuid,nodev,relatime - ext4 /dev/sdg rw,discard,errors=remount-ro,data=ordered
+692 691 8:96 <run>/data /run/data rw,nosuid,nodev,relatime - ext4 /dev/sdg rw,discard,errors=remount-ro,data=ordered
+693 691 8:96 <run>/handoff /run/handoff rw,nosuid,nodev,relatime - ext4 /dev/sdg rw,discard,errors=remount-ro,data=ordered
+695 583 0:41 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw
+696 583 0:42 / /dev rw,nosuid,nodev,relatime - tmpfs tmpfs rw,mode=755,uid=1000,gid=1000
+697 696 0:6 /null /dev/null rw,nosuid,relatime master:376 - devtmpfs none rw,size=53556328k,nr_inodes=13389082,mode=755
+698 696 0:6 /zero /dev/zero rw,nosuid,relatime master:376 - devtmpfs none rw,size=53556328k,nr_inodes=13389082,mode=755
+703 696 0:6 /full /dev/full rw,nosuid,relatime master:376 - devtmpfs none rw,size=53556328k,nr_inodes=13389082,mode=755
+704 696 0:6 /random /dev/random rw,nosuid,relatime master:376 - devtmpfs none rw,size=53556328k,nr_inodes=13389082,mode=755
+705 696 0:6 /urandom /dev/urandom rw,nosuid,relatime master:376 - devtmpfs none rw,size=53556328k,nr_inodes=13389082,mode=755
+706 696 0:6 /tty /dev/tty rw,nosuid,relatime master:376 - devtmpfs none rw,size=53556328k,nr_inodes=13389082,mode=755
+707 696 0:43 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,mode=620,ptmxmode=666
+708 583 0:44 / /tmp rw,nosuid,nodev,relatime - tmpfs tmpfs rw,mode=755,uid=1000,gid=1000

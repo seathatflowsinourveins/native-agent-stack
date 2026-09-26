@@ -1,0 +1,24 @@
+   Compiling ai-memory-store v2.4.1 (/work/ai-memory/crates/ai-memory-store)
+   Compiling ai-memory-wiki v2.4.1 (/work/ai-memory/crates/ai-memory-wiki)
+   Compiling ai-memory-consolidate v2.4.1 (/work/ai-memory/crates/ai-memory-consolidate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 23.51s
+     Running unittests src/lib.rs (target/debug/deps/ai_memory_consolidate-497374af9fefba90)
+
+running 1 test
+test integration::lifecycle::ttl_expiry_lifecycle_end_to_end ... FAILED
+
+failures:
+
+---- integration::lifecycle::ttl_expiry_lifecycle_end_to_end stdout ----
+
+thread 'integration::lifecycle::ttl_expiry_lifecycle_end_to_end' (102) panicked at crates/ai-memory-consolidate/src/../tests/suite/lifecycle.rs:599:10:
+search: Sqlite(InvalidParameterCount(5, 4))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    integration::lifecycle::ttl_expiry_lifecycle_end_to_end
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 303 filtered out; finished in 0.36s
+
+error: test failed, to rerun pass `-p ai-memory-consolidate --lib`

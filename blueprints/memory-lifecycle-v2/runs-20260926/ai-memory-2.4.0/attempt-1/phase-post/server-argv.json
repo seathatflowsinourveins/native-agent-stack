@@ -1,0 +1,15 @@
+[
+  "/ai-memory",
+  "--data-dir",
+  "/run/data",
+  "--config",
+  "/run/config.toml",
+  "serve",
+  "--transport",
+  "stdio",
+  "--no-watcher",
+  "--workspace",
+  "lifecycle-v2",
+  "--project",
+  "alpha"
+]

@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "scope": "Every file under history/ except this record. published_files binds each file copied from a private file to the sha256 and size of that source and names the transformation; other_files says what binds each of the rest.",
+  "substitutions": [
+    "private session scratch root (the directory holding the private worktrees and run directories) -> <scratch>"
+  ],
+  "scratch_root_characters": 100,
+  "published_files": [
+    {
+      "path": "preregistration-freeze-20260926.txt",
+      "sha256": "91d701f620f8d9c3852491410c73421891091769313310ec519dabb3b7a4624d",
+      "bytes": 632,
+      "source": "<scratch>/g4/preregistration-freeze-20260926.txt",
+      "source_sha256": "91d701f620f8d9c3852491410c73421891091769313310ec519dabb3b7a4624d",
+      "source_bytes": 632,
+      "transform": "none: byte-identical copy",
+      "changed_by_transform": false
+    },
+    {
+      "path": "preregistration-sha256-20260925.txt",
+      "sha256": "69ace31c2e0acabc231d5b3c0faecab2d01159b000ff0342af0eb76da24076ca",
+      "bytes": 1009,
+      "source": "<scratch>/w3/preregistration-sha256.txt",
+      "source_sha256": "6428d940b1efae32a166bb43249f6537fc4335e97a0f83202422cf1609c2a858",
+      "source_bytes": 1191,
+      "transform": "private session scratch root -> <scratch> in the two sha256sum path fields (lines 1 and 6); no other byte changed",
+      "placeholder_lines": [
+        1,
+        6
+      ],
+      "changed_by_transform": true
+    },
+    {
+      "path": "upstream-final-round-driver-20260926.log",
+      "sha256": "051d4137e74628b76d16b5f919e379615c7fc4f392ba3ea77edb03474a68a169",
+      "bytes": 1765,
+      "source": "<scratch>/g4/upstream/out/run_round2.log",
+      "source_sha256": "d53e3ba27302e0d8a5aa2ea2b74350630b321cf2e8ca8da9e3adb7c25d08941f",
+      "source_bytes": 1947,
+      "transform": "private session scratch root -> <scratch> in its paths; no other byte changed",
+      "placeholder_lines": [
+        2,
+        3
+      ],
+      "changed_by_transform": true,
+      "note": "The driver's output: the two sha256 lines at the start of the final round (02:35:52Z), each run's summary line, and control.py's summary. Its \"exit=\" fields are always 0 and are not the exit statuses of the runs: in the driver's echo, $? is expanded after the $(date ...) substitution, which resets it. The exit codes are in the receipts."
+    },
+    {
+      "path": "upstream-final-round-driver-20260926.sh",
+      "sha256": "27b5ebd6edb92a3cf8fefdb61b5f47889abb89a0131957f6658f5dfab288ba00",
+      "bytes": 1218,
+      "source": "<scratch>/g4/upstream/run_round2.sh",
+      "source_sha256": "32a4db1519cfb1b6cb44b437ea65ba6e056c44dc7cf7f15d495eb24a54fbb7fa",
+      "source_bytes": 2674,
+      "transform": "private session scratch root -> <scratch> in its paths; no other byte changed",
+      "placeholder_lines": [
+        3,
+        5,
+        7,
+        10,
+        12,
+        14
+      ],
+      "changed_by_transform": true,
+      "note": "The script that ran the final upstream round after waiting for round 1 to finish: it logged the sha256 of run_upstream_tests.py and control.py, ran the three all-targets suites and the v2.4.1 --doc step, then ran control.py."
+    },
+    {
+      "path": "upstream-scripts-as-run-20260926/control.py",
+      "sha256": "574201369882e31139edcb68bbbd99a83c08159eeac025d38684871307324db4",
+      "bytes": 3893,
+      "source": "<scratch>/wt-g4/blueprints/memory-lifecycle-v2/upstream-20260926/control.py",
+      "source_sha256": "574201369882e31139edcb68bbbd99a83c08159eeac025d38684871307324db4",
+      "source_bytes": 3893,
+      "transform": "none: byte-identical copy of the script as it ran",
+      "changed_by_transform": false,
+      "run_time_sha256": {
+        "record": "upstream-final-round-driver-20260926.log",
+        "line": 3
+      },
+      "note": "control.py as it ran for the four runs under upstream-20260926/control/. The final round's driver (upstream-final-round-driver-20260926.sh) logged this sha256 when the round started (run_time_sha256) and then ran control.py from that path; the last summary line of its log is upstream-20260926/control/control-summary.json. The committed upstream-20260926/control.py was changed afterwards to refuse existing output and to exit 1 unless the runs gave pass, fail, fail, pass and the file was restored."
+    },
+    {
+      "path": "upstream-scripts-as-run-20260926/run_upstream_tests.py",
+      "sha256": "9b062549242768209a8e59d3aa83e7d8c9728dada5ba2aa211a20c3e522a788e",
+      "bytes": 9404,
+      "source": "<scratch>/wt-g4/blueprints/memory-lifecycle-v2/upstream-20260926/run_upstream_tests.py",
+      "source_sha256": "9b062549242768209a8e59d3aa83e7d8c9728dada5ba2aa211a20c3e522a788e",
+      "source_bytes": 9404,
+      "transform": "none: byte-identical copy of the script as it ran",
+      "changed_by_transform": false,
+      "run_time_sha256": {
+        "record": "upstream-final-round-driver-20260926.log",
+        "line": 2
+      },
+      "note": "The runner of the final round and the control. The final round's driver logged this sha256 when the round started (run_time_sha256), and it is the runner_sha256 of every retained upstream-20260926/v*/ and control/ receipt. The committed runner was changed afterwards to refuse an existing log or receipt and to print, not rewrite, a reparsed receipt."
+    },
+    {
+      "path": "upstream-scripts-as-run-20260926/setup.sh",
+      "sha256": "d4779f67f69ddcb695e76b633d954ac065bdee7624bbe2fb23d7d386b804f10a",
+      "bytes": 1837,
+      "source": "<scratch>/g4/upstream/setup.sh",
+      "source_sha256": "d4779f67f69ddcb695e76b633d954ac065bdee7624bbe2fb23d7d386b804f10a",
+      "source_bytes": 1837,
+      "transform": "none: byte-identical copy of the script as it ran",
+      "changed_by_transform": false,
+      "run_time_sha256": null,
+      "source_modified_utc": "2026-09-26T02:04:38.959184+00:00",
+      "as_run_basis": "No hash of setup.sh was recorded when it ran. Its private source was last modified at source_modified_utc, before the first line of upstream-20260926/setup.log (02:04:51Z), and every timestamped line of setup.log is a line this script's log() writes.",
+      "note": "setup.sh as it ran; upstream-20260926/setup.log is its output. Its header says the rustup-init checksum was verified before the script ran, which no retained record shows; the committed setup.sh differs from it only in that header comment."
+    }
+  ],
+  "other_files": {
+    "PREREGISTRATION-20260925-amended.md": "Recovered the same way. Its sha256 is the hash on line 6 of preregistration-sha256-20260925.txt and equals PR #292's committed PREREGISTRATION.md.",
+    "PREREGISTRATION-20260925-original.md": "Recovered on 2026-09-26 by replaying the recorded edits (attempts-20260925.json). Its sha256 is the first hash in preregistration-sha256-20260925.txt (line 1), recorded before any run.",
+    "attempts-20260925.json": "Assembled on 2026-09-26. Its source field names its sources and declares its own <scratch> substitution.",
+    "recheck-20260925.json": "Output of recheck_20260925.py. tests/test_memory_lifecycle_v2.py reruns the script and requires equality.",
+    "recheck_20260925.py": "Committed script.",
+    "reproduce_review_20260926.py": "Committed script.",
+    "review-repair-controls-20260926.txt": "Output of review_repair_controls_20260926.py.",
+    "review-reproduction-20260926.txt": "Output of reproduce_review_20260926.py.",
+    "review_repair_controls_20260926.py": "Committed script.",
+    "verification-repair-controls-20260926.txt": "Output of verification_repair_controls_20260926.py.",
+    "verification_repair_controls_20260926.py": "Committed script."
+  }
+}

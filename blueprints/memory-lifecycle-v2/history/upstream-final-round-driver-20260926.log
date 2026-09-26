@@ -1,0 +1,14 @@
+2026-09-26T02:35:52Z round 2 start
+9b062549242768209a8e59d3aa83e7d8c9728dada5ba2aa211a20c3e522a788e  <scratch>/wt-g4/blueprints/memory-lifecycle-v2/upstream-20260926/run_upstream_tests.py
+574201369882e31139edcb68bbbd99a83c08159eeac025d38684871307324db4  <scratch>/wt-g4/blueprints/memory-lifecycle-v2/upstream-20260926/control.py
+{"tag": "v2.3.2", "upstream_command": ["cargo", "test", "--workspace", "--all-targets"], "exit_code": 0, "duration_seconds": 276.7, "totals": {"passed": 3357, "failed": 0, "ignored": 11, "test_binaries": 15}, "failed_tests": []}
+2026-09-26T02:40:29Z end v2.3.2 exit=0
+{"tag": "v2.4.0", "upstream_command": ["cargo", "test", "--workspace", "--all-targets"], "exit_code": 0, "duration_seconds": 256.9, "totals": {"passed": 3515, "failed": 0, "ignored": 14, "test_binaries": 15}, "failed_tests": []}
+2026-09-26T02:44:46Z end v2.4.0 exit=0
+{"tag": "v2.4.1", "upstream_command": ["cargo", "test", "--workspace", "--all-targets"], "exit_code": 0, "duration_seconds": 361.9, "totals": {"passed": 3615, "failed": 0, "ignored": 14, "test_binaries": 15}, "failed_tests": []}
+2026-09-26T02:50:49Z end v2.4.1 exit=0
+{"tag": "v2.4.1", "upstream_command": ["cargo", "test", "--workspace", "--doc"], "exit_code": 0, "duration_seconds": 6.4, "totals": {"passed": 0, "failed": 0, "ignored": 0, "test_binaries": 11}, "failed_tests": []}
+2026-09-26T02:50:55Z end v2.4.1 doc exit=0
+{"target": "crates/ai-memory-store/src/reader.rs", "original_sha256": "712c9a02a50898ea02b02664de54fde69c150c57ab5f22f08771b97b9c16ace0", "runs": {"control-0-unmodified": 0, "control-1-empty-fragment": 1, "control-2-filter-always-true": 1, "control-3-restored": 0}, "restored_sha256_matches": true}
+2026-09-26T02:53:15Z end control exit=0
+2026-09-26T02:53:15Z round 2 done

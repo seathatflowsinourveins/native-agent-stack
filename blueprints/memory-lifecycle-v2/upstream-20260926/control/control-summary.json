@@ -1,0 +1,11 @@
+{
+  "target": "crates/ai-memory-store/src/reader.rs",
+  "original_sha256": "712c9a02a50898ea02b02664de54fde69c150c57ab5f22f08771b97b9c16ace0",
+  "runs": {
+    "control-0-unmodified": 0,
+    "control-1-empty-fragment": 1,
+    "control-2-filter-always-true": 1,
+    "control-3-restored": 0
+  },
+  "restored_sha256_matches": true
+}

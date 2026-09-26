@@ -9,6 +9,10 @@ Standard library only, and the bubblewrap recipe/CLI shape is v1's
 (blueprints/us-equities/memory-lifecycle/run.py), reused by attribution: never import a
 host store, never touch a real home/account/memory directory, reject a non-fresh output
 directory, reject an output path under the binary's own install directory.
+
+A failed attempt keeps its output directory: run.json at its top level records how far it
+got and why it stopped, and acceptance.json records an analysis error instead of losing it.
+Never delete an attempt's directory; run the next attempt with a new --out.
 """
 import argparse
 import datetime
@@ -70,6 +74,8 @@ def run_phase(phase, binary, exercise_script, output, shared_data, shared_handof
                 '--setenv', 'LANG', 'C.UTF-8',
                 '/usr/bin/python3', '/exercise.py', '--phase', phase]
     receipt = {'argv': command, 'phase': phase,
+               'bwrap_version': subprocess.run(['/usr/bin/bwrap', '--version'], capture_output=True,
+                                               text=True).stdout.strip(),
                'started_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
                'binary_sha256_before': digest(binary)}
     with (phase_dir / 'driver.stdout').open('w') as stdout, \
@@ -106,25 +112,40 @@ def main():
     shared_data.mkdir(mode=0o700)
     shared_handoff.mkdir(mode=0o700)
     exercise_script = Path(__file__).resolve().with_name('exercise.py')
-
-    pre_dir = run_phase('pre', binary, exercise_script, output, shared_data, shared_handoff)
-    # The bwrap invocation above has returned: that process tree, including the native
-    # server it launched, has fully exited before this line runs (subprocess.run blocks).
-    post_dir = run_phase('post', binary, exercise_script, output, shared_data, shared_handoff)
-
-    outcomes_pre = json.loads((pre_dir / 'outcomes.json').read_text())
-    outcomes_post = json.loads((post_dir / 'outcomes.json').read_text())
-    handoff = json.loads((shared_handoff / 'fixture-state.json').read_text())
-    pre_result = analyze.summarize_pre(outcomes_pre)
-    post_result = analyze.summarize_post(outcomes_post, handoff)
-    acceptance = {'passed': pre_result['passed'] and post_result['passed'],
-                  'binary_sha256': digest(binary),
-                  'pre': pre_result, 'post': post_result}
-    (output / 'acceptance.json').write_text(json.dumps(acceptance, indent=2) + '\n')
-    print(json.dumps({'acceptance_passed': acceptance['passed'],
-                      'pre_checks': len(pre_result['checks']), 'pre_tool_calls': pre_result['tool_calls'],
-                      'post_checks': len(post_result['checks']), 'post_tool_calls': post_result['tool_calls']}))
-    if not acceptance['passed']:
+    state = {'binary_sha256': digest(binary), 'exercise_sha256': digest(exercise_script),
+             'analyze_sha256': digest(Path(analyze.__file__)),
+             'started_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+             'stage': 'phase-pre', 'passed': False}
+    try:
+        run_phase('pre', binary, exercise_script, output, shared_data, shared_handoff)
+        # The bwrap invocation above has returned: that process tree, including the native
+        # server it launched, has fully exited before this line runs (subprocess.run blocks).
+        state['stage'] = 'phase-post'
+        run_phase('post', binary, exercise_script, output, shared_data, shared_handoff)
+        state['stage'] = 'analysis'
+        try:
+            acceptance = analyze.summarize(output)
+        except Exception as error:  # a response the analyzer cannot interpret: keep it, fail closed
+            acceptance = {'passed': False, 'analysis_error': f'{type(error).__name__}: {error}'}
+        acceptance['binary_sha256'] = digest(binary)
+        (output / 'acceptance.json').write_text(json.dumps(acceptance, indent=2) + '\n')
+        state['stage'] = 'complete'
+        state['passed'] = acceptance['passed']
+        summary = {'acceptance_passed': acceptance['passed'],
+                   'analysis_error': acceptance.get('analysis_error')}
+        for phase in ('pre', 'post'):
+            if phase in acceptance:
+                summary[phase] = {'tool_calls': acceptance[phase]['tool_calls'],
+                                  'checks': len(acceptance[phase]['checks']),
+                                  'failed_checks': acceptance[phase]['failed_checks']}
+        print(json.dumps(summary))
+    except BaseException as error:
+        state['failure'] = f'{type(error).__name__}: {error}'
+        raise
+    finally:
+        state['finished_utc'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        (output / 'run.json').write_text(json.dumps(state, indent=2) + '\n')
+    if not state['passed']:
         raise SystemExit(1)
 
 
