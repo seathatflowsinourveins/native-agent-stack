@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 """Paired analysis of the six GPT-6 family arms and the preregistered routing recommendation.
 
-Standard library only. The filings, their header labels and the batch layout are rebuilt from the verified
-acquisition, exactly as run_arm.py builds them. Every attempt of every batch under --state-dir is read, so no
-call can be left out. That includes failed, retried, limit-stopped, interrupted and abandoned calls. Scoring
-reuses li26's own functions unchanged: per-filing counts, micro-F1, macro-F1 over codes with at least five
-labelled filings, and the paired percentile bootstrap. The decision file holds aggregates only: no filing text,
-no reply text and no accession numbers.
+Standard library only. Every frozen file (both scripts, the prompt, the schema and the reused li26 and path_safety
+code) is verified against plan.json before anything is read, so the analysis cannot run on changed code. The
+filings, their header labels and the batch layout are rebuilt from the verified acquisition, exactly as run_arm.py
+builds them. Every attempt of every batch under --state-dir is read, so no call can be left out. That includes
+failed, retried, limit, unavailable, interrupted and abandoned calls. Scoring reuses li26's own functions unchanged:
+per-filing counts, micro-F1, macro-F1 over codes with at least five labelled filings, and the paired percentile
+bootstrap. The decision file holds aggregates only: no filing text, no reply text and no accession numbers.
 
 Frozen rule: an arm is routable for mechanical extraction when the bootstrap 95% lower bound of
 micro-F1(arm) - micro-F1(A0) is at least -0.02, its JSON-valid rate is at least 0.98 and every batch completed.
-Among routable arms with complete usage, the recommendation is the lowest mean billed tokens per filing: uncached
-input plus output, where Codex's output already includes reasoning. Ties go to the lower median wall time of the
-arm's ok calls, then to plan order. Quota percentages are context only and never enter the rule.
+Cost is the mean billed tokens per filing: uncached input plus output, where Codex's output already includes
+reasoning. A candidate is recommended only when it is routable, its token use is fully known, and its cost is
+strictly below A0's; among such candidates the cheapest wins, ties going to the lower median wall time of ok calls,
+then to plan order. When some of A0's token use is unknown, A0's reported cost is a lower bound: a candidate below
+it is still recommended, and otherwise the result is inconclusive. Quota percentages are context only.
 """
 from __future__ import annotations
 
@@ -65,17 +68,19 @@ def usage_summary(records, n_filings):
     """Token totals and means per filing by kind, over every call of the arm.
 
     Codex reports input including cached input, and output including reasoning (docs/token-practice.md), so
-    billed = (input - cached input) + output. Adding reasoning again would count it twice. A call without
-    reported usage leaves the arm's usage incomplete, unless the usage limit ended it; such a call is counted
-    with whatever it reports.
+    billed = (input - cached input) + output. Adding reasoning again would count it twice. Every call that reported
+    usage counts, whatever its outcome. A call without a report counts as zero when no billed request can have run
+    (a launch failure, or a turn refused by the usage limit); any other such call (a timeout, an unavailable,
+    interrupted or abandoned call) leaves the arm's usage incomplete, so its totals are only a lower bound.
     """
     totals = {key: 0 for key in run_arm.USAGE_KEYS}
-    without, violations = 0, 0
+    without, violations = {}, 0
     for record in records:
         usage = record.get("usage")
         if not isinstance(usage, dict) or any(not isinstance(usage.get(key), int) for key in run_arm.CORE_USAGE_KEYS):
-            if record.get("outcome") != "limit":
-                without += 1
+            if not run_arm.usage_known({**record, "usage": None}):
+                outcome = str(record.get("outcome"))
+                without[outcome] = without.get(outcome, 0) + 1
             continue
         for key in run_arm.USAGE_KEYS:
             totals[key] += usage.get(key, 0) if isinstance(usage.get(key), int) else 0
@@ -90,7 +95,8 @@ def usage_summary(records, n_filings):
              "visible_output": totals["output_tokens"] - totals["reasoning_output_tokens"],
              "billed": uncached + totals["output_tokens"]}
     return {"totals": kinds, "per_filing": {key: value / n_filings for key, value in kinds.items()},
-            "calls_without_usage": without, "usage_complete": without == 0, "subset_violations": violations}
+            "calls_without_usage": sum(without.values()), "calls_without_usage_by_outcome": without,
+            "usage_complete": not without, "subset_violations": violations}
 
 
 def wall_summary(records, n_filings, elapsed):
@@ -156,12 +162,17 @@ def evaluate_arm(plan, plan_sha256, state_dir, arm, template, batches, version):
             for accession, (items, filing_status) in per_filing.items():
                 predicted[accession], status[accession] = items, filing_status
     outcomes = [record.get("outcome") for record in records]
+    reasons = {}
+    for record in records:
+        if record.get("reason"):
+            reasons[record["reason"]] = reasons.get(record["reason"], 0) + 1
     return {"arm": arm_id, "state": "incomplete" if "pending" in states else "complete",
             "records": records, "states": states, "predicted": predicted, "status": status,
             "unexpected_entries": unexpected, "problems": problems,
-            "calls": {"total": len(records), **{kind: outcomes.count(kind)
-                                                for kind in ("ok", "failed", "limit", "interrupted")},
-                      "abandoned": sum(record.get("reason") == "abandoned" for record in records)},
+            "calls": {"total": len(records), **{kind: outcomes.count(kind) for kind in
+                                                ("ok", "failed", "limit", "unavailable", "interrupted", "abandoned")},
+                      "by_reason": dict(sorted(reasons.items())),
+                      "tool_use": sum(record.get("reason") == "tool_use" for record in records)},
             "elapsed": arm_elapsed_seconds(arm_dir)}
 
 
@@ -202,7 +213,12 @@ def triples_of(result, rows):
 
 
 def decide(plan, results, summaries, bootstraps):
-    """The routable arms, the ranked arms and the recommendation, under the frozen rule."""
+    """The routable arms, the ranked candidates and the recommendation, under the frozen rule.
+
+    A0 is the reference, not a ranked candidate: a candidate is recommended only when its cost is known and strictly
+    below A0's. A0's cost counts even when some of its token use is unknown, as a lower bound of its true cost, so a
+    candidate below it is still certainly cheaper; if no ranked candidate is below it, the result is inconclusive,
+    because A0's true cost may lie above some of them."""
     rule = plan["decision_rule"]
     order = [arm["id"] for arm in plan["arms"]]
     control = results[CONTROL]
@@ -225,20 +241,34 @@ def decide(plan, results, summaries, bootstraps):
                             "json_valid_rate": summary["json_valid_rate"] >= rule["json_valid_min"],
                             "every_batch_completed": summary["every_batch_completed"]}
     routable = [arm_id for arm_id in order if arm_id in criteria and all(criteria[arm_id].values())]
-    ranked = [arm_id for arm_id in routable if summaries[arm_id]["tokens"]["usage_complete"]]
-    if not ranked:
-        return {"arm": None, "outcome": "no_ranked_arm", "routable": routable, "ranked": []}, criteria
+
+    def billed(arm_id):
+        return summaries[arm_id]["tokens"]["per_filing"]["billed"]
 
     def key(arm_id):
         wall = summaries[arm_id]["wall"]["median_ok_call_wall_seconds"]
-        return (summaries[arm_id]["tokens"]["per_filing"]["billed"], math.inf if wall is None else wall,
-                order.index(arm_id))
+        return billed(arm_id), math.inf if wall is None else wall, order.index(arm_id)
 
-    best = min(ranked, key=key)
-    arm = run_arm.arm_by_id(plan, best)
-    return {"arm": best, "model": arm["model"], "effort": arm["effort"],
-            "outcome": "keep_default" if best == CONTROL else "route_mechanical_extraction",
-            "routable": routable, "ranked": sorted(ranked, key=key)}, criteria
+    ranked = sorted((arm_id for arm_id in routable
+                     if arm_id != CONTROL and summaries[arm_id]["tokens"]["usage_complete"]), key=key)
+    control_known = control_summary["tokens"]["usage_complete"]
+    context = {"routable": routable, "ranked": ranked, "control_billed_per_filing": billed(CONTROL),
+               "control_usage_complete": control_known}
+    cheaper = [arm_id for arm_id in ranked if billed(arm_id) < billed(CONTROL)]
+    if cheaper:
+        best = cheaper[0]
+        arm = run_arm.arm_by_id(plan, best)
+        return {"arm": best, "model": arm["model"], "effort": arm["effort"],
+                "outcome": "route_mechanical_extraction", **context}, criteria
+    default = run_arm.arm_by_id(plan, CONTROL)
+    keep = {"arm": CONTROL, "model": default["model"], "effort": default["effort"], "outcome": "keep_default"}
+    if not any(arm_id != CONTROL for arm_id in routable):
+        return {**keep, "reason": "no_routable_candidate", **context}, criteria
+    if not ranked:
+        return {**keep, "reason": "no_candidate_with_known_usage", **context}, criteria
+    if not control_known:
+        return {"arm": None, "outcome": "inconclusive_control_usage_incomplete", **context}, criteria
+    return {**keep, "reason": "no_candidate_below_control", **context}, criteria
 
 
 def quota_context(path, plan):
@@ -263,6 +293,7 @@ def quota_context(path, plan):
 
 def analyze(plan, plan_sha256, acquisition, state_dir, quota_path=None):
     run_arm.check_plan(plan)
+    run_arm.verify_frozen(plan)  # the scripts, the reused li26 scorers, the prompt and the schema are unchanged
     template = run_arm.prompt_template(plan)
     rows = run_arm.load_rows(plan, acquisition)
     batches = run_arm.frozen_batches(plan, template, rows)
@@ -291,7 +322,8 @@ def analyze(plan, plan_sha256, acquisition, state_dir, quota_path=None):
             entry["criteria"] = criteria.get(arm["id"])
             entry["routable"] = arm["id"] in selected.get("routable", [])
         arms.append(entry)
-    return {"schema_version": 1, "kind": "gpt6_family_tiering_decision", "plan_sha256": plan_sha256,
+    return {"schema_version": 2, "kind": "gpt6_family_tiering_decision", "plan_sha256": plan_sha256,
+            "frozen_inputs": dict(sorted(plan["frozen_inputs"].items())), "frozen_inputs_verified": True,
             "inputs_sha256": plan["task"]["inputs_sha256"], "layout_sha256": run_arm.layout_sha256(batches),
             "n_filings": len(rows), "n_batches": len(batches), "codex_version": version,
             "rule": plan["decision_rule"]["text"], "no_document_text": True,

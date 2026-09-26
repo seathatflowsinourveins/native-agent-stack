@@ -7,29 +7,42 @@ load_inputs, cut greedily in accession order into batches of at most 15 filings 
 110,000 bytes. The layout's SHA-256 is frozen in plan.json. Each batch is one call:
 
   codex exec --ignore-user-config --skip-git-repo-check -s read-only -m <model> \
-    -c model_reasoning_effort="<effort>" --output-schema <schema> -o <reply> --json "<prompt>" </dev/null
+    -c model_reasoning_effort="<effort>" <ISOLATION overrides> --output-schema <schema> -o <reply> --json "<prompt>"
 
-It runs in an empty directory outside every repository, without --search. At most three calls run at once. Each
-call first takes one of the host's Codex slots, an fcntl.flock on <lock dir>/slot-1 to slot-3. These are the
-locks the landscape-sweep runner takes, so this arm and every other Codex job on the host together stay within
-the three-slot pool. codex inherits the slot lock and the arm's run lock, so a killed runner never frees them
-while its codex still runs.
+with stdin /dev/null and no --search. The overrides switch off, for codex-cli 0.157.1, everything the committed
+command still offered the model: web search, the shell, sub-agents, the sleep tool, image viewing, goals, hooks,
+plugins and apps; and Codex's unbounded reconnect, so an outage fails a call instead of hanging it
+(isolation-probe/results.json, a loopback probe). Each call gets its own CODEX_HOME inside its attempt directory,
+holding only a link to the native auth.json (never a copy), so no global AGENTS.md, skill, hook or config of the
+host reaches it and its session files stay private. Its HOME, TMPDIR and working directory are an empty scratch
+directory outside the state tree and every repository, removed after the call. Its environment is an allowlist:
+no API key, no RUST_LOG and none of the caller's other variables.
 
-A failed call is recorded, and its batch runs once more. A batch that fails twice is recorded as failed and never
-runs again. A usage-limit event stops the arm: Codex's own `error` or `turn.failed` event saying "hit your usage
-limit" (model content and stderr never count). Calls already running finish and are recorded, no new call
-starts, a LIMIT note is written to the state directory and the run exits 3. That call is account state, not a
-batch failure. After the reset, and after the coordinator removes the note, the next run sends that batch again
-without using its retry. SIGINT or SIGTERM stops the running calls, records them as interrupted (not counted)
-and exits 5.
+At most three calls run at once. Each call first takes one of the host's Codex slots, an fcntl.flock on
+<lock dir>/slot-1 to slot-3. These are the locks the landscape-sweep runner takes, so this arm and every other Codex
+job on the host together stay within the three-slot pool. codex inherits the slot lock and the arm's run lock, so a
+killed runner never frees them while its codex still runs. Calls start through a state-wide launch gate, which also
+guards the stop notes, so no call starts once a note is published.
+
+Outcomes. ok. failed: the model ran but the call is unusable (a timeout, a non-zero exit or turn.failed after a
+completed turn, a missing or invalid reply, or any tool call in Codex's session record); its batch runs once more,
+and a batch that fails twice is final. limit: Codex's own `error` or `turn.failed` event saying "hit your usage
+limit" (model content and stderr never count); the run publishes the LIMIT note as soon as the event appears, before
+the call ends, starts no further call and exits 3. unavailable: no completed turn without a limit event (network,
+sign-in, rate limit, server error, launch failure), or a completed turn whose session record is missing or holds an
+item type this plan does not know; the run publishes the UNAVAILABLE note and exits 4. interrupted (SIGINT or SIGTERM, exit 5) and abandoned (a runner died
+before recording the call). limit, unavailable, interrupted and abandoned calls never use a batch's retry; their
+batch runs again in a later run. A run whose arm has a failed batch and nothing pending exits 6.
 
 Everything a run writes stays in the private state directory, with 0700 directories and 0600 files: Codex
-events, stderr, replies and per-call records. Nothing is written to the repository. analyze.py reads it.
+events, stderr, replies, session files and per-call records. Nothing is written to the repository. analyze.py
+reads it.
 """
 from __future__ import annotations
 
 import argparse
 from collections import deque
+import contextlib
 import errno
 import fcntl
 import hashlib
@@ -43,6 +56,7 @@ import signal
 import stat
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 
@@ -58,10 +72,39 @@ OPEN_TAG, CLOSE_TAG = "<<<FILING", "<<<END FILING"
 ARMS = (("A0", "gpt-6-astra", "max"), ("A1", "gpt-6-astra", "medium"), ("S0", "gpt-6-sol", "max"),
         ("S1", "gpt-6-sol", "medium"), ("L0", "gpt-6-luna", "max"), ("L1", "gpt-6-luna", "medium"))
 CODEX_VERSION = "codex-cli 0.157.1"
+# Overrides that remove every tool the committed command still offered, measured on codex-cli 0.157.1 by
+# isolation-probe/probe.py: agents.enabled=false removes the sub-agent (collaboration) tools, which the model catalog
+# turns on whatever features.multi_agent says; web_search="disabled" the web search; shell_tool and unified_exec the
+# shell (code mode's exec_command); view_image, goals and sleep_tool the remaining nested tools; hooks, plugins and
+# apps anything a system layer or plugin sync could add; unbounded_connection_retries=false makes an outage fail the
+# call instead of "Reconnecting... waiting for network" until the timeout. The file credential store keeps any
+# token refresh in the native auth.json, written in place through the per-call link.
+ISOLATION = ("-c", "agents.enabled=false", "-c", 'web_search="disabled"', "-c", "features.shell_tool=false",
+             "-c", "features.unified_exec=false", "-c", "features.view_image=false", "-c", "features.goals=false",
+             "-c", "features.sleep_tool=false", "-c", "features.hooks=false", "-c", "features.plugins=false",
+             "-c", "features.apps=false", "-c", "features.unbounded_connection_retries=false",
+             "-c", 'cli_auth_credentials_store="file"')
 # The frozen argv after the codex binary; <...> are filled per call. No --search, never ultra.
 CODEX_ARGV = ("exec", "--ignore-user-config", "--skip-git-repo-check", "-s", "read-only", "-m", "<model>",
-              "-c", 'model_reasoning_effort="<effort>"', "--output-schema", "<schema>", "-o", "<reply>", "--json",
-              "<prompt>")
+              "-c", 'model_reasoning_effort="<effort>"', *ISOLATION, "--output-schema", "<schema>", "-o", "<reply>",
+              "--json", "<prompt>")
+# The only variables a call inherits (as codex_lane.py's CHILD_ENV_ALLOWLIST), besides CODEX_HOME, HOME and TMPDIR:
+# no API key (the native sign-in is used), no RUST_LOG (it could log model content to stderr).
+CHILD_ENV_ALLOWLIST = ("PATH", "LANG", "LC_ALL", "LC_CTYPE", "TERM", "SSL_CERT_FILE", "SSL_CERT_DIR", "HTTPS_PROXY",
+                       "HTTP_PROXY", "NO_PROXY", "ALL_PROXY", "https_proxy", "http_proxy", "no_proxy", "all_proxy")
+# System configuration layers that --ignore-user-config does not skip (codex-rs/config/src/loader/mod.rs at the
+# pinned tag); a run refuses to start while one exists.
+SYSTEM_CONFIG_FILES = ("/etc/codex/config.toml", "/etc/codex/requirements.toml", "/etc/codex/managed_config.toml")
+# Item types of a call's session record (rollout) and --json stream. Model items are expected; tool items fail the
+# call (tool_use), as the model used a tool; any other type stops the arm (unexpected_item) for inspection, so a
+# type this plan does not know can neither be scored nor spend every batch's retry.
+MODEL_ROLLOUT_ITEMS = frozenset({"message", "reasoning"})
+TOOL_ROLLOUT_ITEMS = frozenset({"function_call", "function_call_output", "custom_tool_call", "custom_tool_call_output",
+                                "local_shell_call", "local_shell_call_output", "web_search_call"})
+MODEL_JSON_ITEMS = frozenset({"agent_message", "reasoning", "error"})
+TOOL_JSON_ITEMS = frozenset({"command_execution", "web_search", "mcp_tool_call", "file_change", "todo_list",
+                             "collab_tool_call"})
+SCRATCH_PREFIX = "gt26-call-"
 FROZEN_BATCHING = {"max_filings": 15, "max_prompt_bytes": 110000}
 FROZEN_CALLS = {"max_concurrent": 3, "slots": 3, "retries_per_batch": 1, "timeout_seconds": 3000,
                 "slot_poll_seconds": 5, "kill_grace_seconds": 10}
@@ -73,7 +116,20 @@ USAGE_KEYS = ("input_tokens", "cached_input_tokens", "cache_write_input_tokens",
 CORE_USAGE_KEYS = ("input_tokens", "cached_input_tokens", "output_tokens")
 MAX_REPLY_BYTES = 1024 * 1024
 ATTEMPT_DIR = re.compile(r"attempt-([1-9][0-9]*)")
-EXIT_DONE, EXIT_ERROR, EXIT_REFUSED, EXIT_LIMIT, EXIT_INTERRUPTED = 0, 1, 2, 3, 5
+EXIT_DONE, EXIT_ERROR, EXIT_REFUSED, EXIT_LIMIT, EXIT_UNAVAILABLE, EXIT_INTERRUPTED, EXIT_FAILED_BATCHES = (
+    0, 1, 2, 3, 4, 5, 6)
+# Stop notes in the state directory, in precedence order: while one exists, no call starts in any arm.
+NOTES = {"LIMIT": EXIT_LIMIT, "UNAVAILABLE": EXIT_UNAVAILABLE}
+NEXT_STEPS = {
+    "LIMIT": "Tell the user the shared Codex usage limit was reached. After the reset, remove this file and run the "
+             "same arm again; its finished batches are kept, and the limited batch runs again without using its "
+             "retry.",
+    "UNAVAILABLE": "Codex ended a call without a completed turn (network, sign-in, rate limit, server error or a "
+                   "launch failure), or its session record is missing or holds an item type the plan does not know "
+                   "(the reason says which). Read that attempt's stderr.txt, events.jsonl and call.json, fix the "
+                   "cause (an unknown item type needs a plan amendment), then remove this file and run the same arm "
+                   "again; the call did not use its batch's retry.",
+}
 
 _SPEC = importlib.util.spec_from_file_location("gt26_li26_eval_arm", LI26 / "eval_arm.py")
 li26 = importlib.util.module_from_spec(_SPEC)
@@ -302,12 +358,7 @@ def reply_status(path, accessions):
     return "missing" if text is None else parse_reply(text, accessions)[0]
 
 
-def read_events(path):
-    """The JSON objects Codex printed with --json, one per line; other lines are ignored."""
-    try:
-        raw = Path(path).read_bytes()
-    except FileNotFoundError:
-        return []
+def parse_event_lines(raw):
     events = []
     for line in raw.decode("utf-8", "replace").splitlines():
         try:
@@ -317,6 +368,80 @@ def read_events(path):
         if isinstance(event, dict):
             events.append(event)
     return events
+
+
+def read_events(path):
+    """The JSON objects Codex printed with --json, one per line; other lines are ignored."""
+    try:
+        return parse_event_lines(Path(path).read_bytes())
+    except FileNotFoundError:
+        return []
+
+
+class EventTail:
+    """The complete new lines of a growing events file, read while its codex still runs."""
+
+    def __init__(self, path):
+        self.path, self.offset, self.partial = Path(path), 0, b""
+
+    def read(self):
+        try:
+            with open(self.path, "rb") as stream:
+                stream.seek(self.offset)
+                data = stream.read()
+        except FileNotFoundError:
+            return []
+        self.offset += len(data)
+        complete, _, self.partial = (self.partial + data).rpartition(b"\n")
+        return parse_event_lines(complete)
+
+
+def rollout_items(codex_home):
+    """Counts of the response item types in the call's session records (CODEX_HOME/sessions/**/rollout-*.jsonl),
+    or None when Codex wrote none. The record lists every tool call, including code mode's `exec` cells, which the
+    --json stream does not show (isolation-probe/results.json, case committed-code-mode)."""
+    sessions = Path(codex_home) / "sessions"
+    paths = []
+    for root, dirs, files in os.walk(sessions):  # never follows a symlinked directory
+        paths += [Path(root) / name for name in files if name.startswith("rollout-") and name.endswith(".jsonl")]
+    if not paths:
+        return None
+    counts = {}
+    for path in sorted(paths):
+        if path.is_symlink():
+            continue
+        for event in read_events(path):
+            payload = event.get("payload")
+            if event.get("type") == "response_item" and isinstance(payload, dict):
+                kind = str(payload.get("type"))
+                counts[kind] = counts.get(kind, 0) + 1
+    return counts
+
+
+def json_items(events):
+    """Counts of the item types in the --json stream, one per item id."""
+    seen = {}
+    for position, event in enumerate(events):
+        item = event.get("item")
+        if str(event.get("type", "")).startswith("item.") and isinstance(item, dict):
+            seen[item.get("id", position)] = str(item.get("type"))
+    counts = {}
+    for kind in seen.values():
+        counts[kind] = counts.get(kind, 0) + 1
+    return counts
+
+
+def item_check(rollout, items):
+    """(tool items, unexpected items) over the session record's response items and the --json items."""
+    tools = unexpected = 0
+    for counts, model, tool in (((rollout or {}), MODEL_ROLLOUT_ITEMS, TOOL_ROLLOUT_ITEMS),
+                                (items, MODEL_JSON_ITEMS, TOOL_JSON_ITEMS)):
+        for kind, count in counts.items():
+            if kind in tool:
+                tools += count
+            elif kind not in model:
+                unexpected += count
+    return tools, unexpected
 
 
 def turn_usage(events):
@@ -346,26 +471,57 @@ def limit_message(events):
     return None
 
 
-def classify(events, exit_code, timed_out, interrupted, status):
-    """(outcome, reason). Outcomes: ok, failed (counts toward the batch's retry), limit, interrupted."""
+def first_error(events):
+    """The first message of Codex's own error or turn.failed events, for a stop note."""
+    for event in events:
+        message = (event.get("message") if event.get("type") == "error" else
+                   (event.get("error") or {}).get("message") if event.get("type") == "turn.failed" else None)
+        if isinstance(message, str):
+            return message
+    return None
+
+
+def classify(events, exit_code, timed_out, interrupted, status, *, launch_error=False, rollout_found=True,
+             tools=0, unexpected=0):
+    """(outcome, reason).
+
+    Only `failed` counts toward the batch's retry: the model ran and the call is unusable. `limit` and
+    `unavailable` stop the run; `interrupted` (and `abandoned`, set by attempt_record) are the operator's or the
+    host's, not the arm's."""
     if limit_message(events) is not None:
         return "limit", "usage_limit"
     if interrupted:
         return "interrupted", "interrupted"
+    if launch_error:
+        return "unavailable", "launch_error"
     if timed_out:
         return "failed", "timeout"
+    types = {event.get("type") for event in events}
+    if "turn.completed" not in types:
+        return "unavailable", "no_turn_completed"
+    if not rollout_found:
+        return "unavailable", "rollout_missing"
+    if tools:
+        return "failed", "tool_use"
+    if unexpected:
+        return "unavailable", "unexpected_item"
     if exit_code != 0:
         return "failed", "exit"
-    types = {event.get("type") for event in events}
     if "turn.failed" in types:
         return "failed", "turn_failed"
-    if "turn.completed" not in types:
-        return "failed", "no_turn_completed"
     if status == "missing":
         return "failed", "reply_missing"
     if status == "invalid":
         return "failed", "reply_invalid"
     return "ok", None
+
+
+def usage_known(record):
+    """Whether a call's token use is known: Codex reported it, or no billed request can have run (the launch
+    failed, or Codex's usage-limit event refused the turn), which counts as zero. Any other call without a report
+    (a timeout, an unavailable, interrupted or abandoned call) may have spent unreported tokens."""
+    return (isinstance(record.get("usage"), dict) or record.get("outcome") == "limit"
+            or record.get("reason") == "launch_error")
 
 
 def event_counts(events):
@@ -374,22 +530,29 @@ def event_counts(events):
             "error_events": types.count("error")}
 
 
-def call_record(arm, index, batch, number, prompt, events, reply_path, **measured):
+def call_record(arm, index, batch, number, prompt, events, reply_path, codex_home, **measured):
     accessions = [row["accession"] for row in batch]
     status = reply_status(reply_path, accessions)
+    rollout, items = rollout_items(codex_home), json_items(events)
+    tools, unexpected = item_check(rollout, items)
+    launch_error = measured.pop("launch_error", False)
     outcome, reason = classify(events, measured.get("exit_code"), measured.get("timed_out", False),
-                               measured.get("interrupted", False), status)
-    if measured.pop("launch_error", False):
-        outcome, reason = "failed", "launch_error"
+                               measured.get("interrupted", False), status, launch_error=launch_error,
+                               rollout_found=rollout is not None, tools=tools, unexpected=unexpected)
     usage = turn_usage(events)
-    return {"schema_version": 1, "arm": arm["id"], "model": arm["model"], "effort": arm["effort"],
-            "batch": batch_id(index), "attempt": number, "accessions": accessions,
-            "prompt_sha256": sha256_bytes(prompt.encode("utf-8")), "prompt_bytes": len(prompt.encode("utf-8")),
-            "exit_code": None, "timed_out": False, "interrupted": False, "wall_seconds": None, "slot": None,
-            "slot_wait_seconds": None, "started_utc": None, "finished_utc": None, **measured,
-            **event_counts(events), "limit": outcome == "limit",
-            "usage": usage, "usage_status": "reported" if usage is not None else "unavailable",
-            "reply_status": status, "outcome": outcome, "reason": reason, "no_document_text": True}
+    record = {"schema_version": 2, "arm": arm["id"], "model": arm["model"], "effort": arm["effort"],
+              "batch": batch_id(index), "attempt": number, "accessions": accessions,
+              "prompt_sha256": sha256_bytes(prompt.encode("utf-8")), "prompt_bytes": len(prompt.encode("utf-8")),
+              "exit_code": None, "timed_out": False, "interrupted": False, "wall_seconds": None, "slot": None,
+              "slot_wait_seconds": None, "started_utc": None, "launched_unix_ns": None, "finished_utc": None,
+              "scratch_entries": None,
+              "credential_link": None, **measured, **event_counts(events), "limit": outcome == "limit",
+              "limit_noted": False, "session_record_found": rollout is not None, "session_items": rollout or {},
+              "json_items": items, "tool_items": tools, "unexpected_items": unexpected, "usage": usage,
+              "usage_status": "reported" if usage is not None else "none",
+              "reply_status": status, "outcome": outcome, "reason": reason, "no_document_text": True}
+    record["usage_known"] = usage_known(record)
+    return record
 
 
 def attempt_dirs(batch_dir):
@@ -406,8 +569,10 @@ def attempt_dirs(batch_dir):
 def attempt_record(arm, index, batch, number, attempt_dir, template):
     """The attempt's call.json, or, when the runner died before writing one, its abandoned record.
 
-    An abandoned attempt is a failed call that counts toward the batch's retry (or a limit call when Codex's
-    events show the usage limit), with whatever usage its events report.
+    An abandoned attempt never counts toward the batch's retry: the runner's death is not the arm's behaviour, and
+    the batch runs again. Its usage counts when Codex reported it. When its events show the usage limit it is a
+    limit call whose note was never published (limit_noted false), which the arm's next run publishes before any
+    call.
     """
     try:
         record = json.loads((Path(attempt_dir) / "call.json").read_bytes())
@@ -417,14 +582,15 @@ def attempt_record(arm, index, batch, number, attempt_dir, template):
         pass
     events = read_events(Path(attempt_dir) / "events.jsonl")
     record = call_record(arm, index, batch, number, build_prompt(template, batch), events,
-                         Path(attempt_dir) / "reply.json", exit_code=None)
+                         Path(attempt_dir) / "reply.json", Path(attempt_dir) / "codex-home", exit_code=None)
     if record["outcome"] != "limit":
-        record["outcome"], record["reason"] = "failed", "abandoned"
+        record["outcome"], record["reason"] = "abandoned", "abandoned"
+    record["usage_known"] = usage_known(record)
     return record
 
 
 def batch_state(records, retries):
-    """completed (an ok call), failed (more failed calls than retries) or pending."""
+    """completed (an ok call), failed (more failed calls than retries) or pending. Only `failed` calls count."""
     if any(record.get("outcome") == "ok" for record in records):
         return "completed"
     failures = sum(record.get("outcome") == "failed" for record in records)
@@ -521,17 +687,117 @@ def append_private(path, line):
         stream.write((json.dumps(line, sort_keys=True) + "\n").encode())
 
 
-def codex_env():
-    """The caller's environment without Rust tracing settings, which could log model content to stderr."""
-    return {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
+@contextlib.contextmanager
+def launch_gate(state_dir):
+    """The state-wide gate: a call starts, and a stop note is published, only while holding it, so no call of any
+    arm starts after a note exists. Each use opens its own descriptor, so threads exclude each other too."""
+    fd = open_lock(Path(state_dir) / "launch.lock", 0o600)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        yield
+    finally:
+        os.close(fd)
+
+
+def present_note(state_dir):
+    """The first stop note present in the state directory (LIMIT before UNAVAILABLE), or None."""
+    for name in NOTES:
+        if (Path(state_dir) / name).exists():
+            return name
+    return None
+
+
+def native_auth_path():
+    """The native Codex sign-in file, $CODEX_HOME/auth.json or ~/.codex/auth.json. It is never read here: each call's
+    own CODEX_HOME links to it."""
+    return Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex").expanduser().absolute() / "auth.json"
+
+
+def checked_native_auth(state_dir):
+    native = native_auth_path()
+    if not native.is_file():
+        raise ValueError(f"no native Codex sign-in file at {native}; sign in natively (the file store) first")
+    home, state = native.parent.resolve(), Path(state_dir).resolve()
+    if home == state or state in home.parents or home in state.parents:
+        raise ValueError("the native Codex home and the state directory must not contain each other")
+    return native
+
+
+def system_config_issue():
+    present = [path for path in SYSTEM_CONFIG_FILES if Path(path).exists()]
+    if present:
+        return f"system Codex configuration {', '.join(present)} applies despite --ignore-user-config"
+    return None
+
+
+def checked_scratch_root(state_dir):
+    """The system temporary directory that holds each call's scratch HOME, TMPDIR and working directory: outside the
+    state tree and every repository."""
+    root = Path(tempfile.gettempdir()).resolve()
+    state = Path(state_dir).resolve()
+    if root == state or state in root.parents or inside_repository(root) is not None:
+        raise ValueError(f"the temporary directory {root} must lie outside the state directory and every repository")
+    return root
+
+
+def call_env(codex_home, scratch):
+    """A call's whole environment: the allowlisted variables, its own CODEX_HOME, and the scratch HOME and TMPDIR."""
+    env = {key: value for key, value in os.environ.items() if key in CHILD_ENV_ALLOWLIST}
+    env.update({"CODEX_HOME": str(codex_home), "HOME": str(Path(scratch) / "home"),
+                "TMPDIR": str(Path(scratch) / "tmp")})
+    return env
+
+
+def prepare_call(attempt, native_auth, scratch_root):
+    """The call's CODEX_HOME (attempt/codex-home, holding only a link to the native auth.json) and its scratch
+    directory (home/, cwd/ and tmp/, all empty, 0700)."""
+    codex_home = Path(attempt) / "codex-home"
+    codex_home.mkdir(mode=0o700)
+    (codex_home / "auth.json").symlink_to(native_auth)
+    scratch = Path(tempfile.mkdtemp(prefix=SCRATCH_PREFIX, dir=scratch_root))
+    for sub in ("home", "cwd", "tmp"):
+        (scratch / sub).mkdir(mode=0o700)
+    if inside_repository(scratch / "cwd") is not None:
+        raise ValueError(f"{scratch} lies inside a repository")
+    return codex_home, scratch
+
+
+def finish_call(codex_home, scratch):
+    """Remove the call's credential link and its scratch directory. The state of the link (removed, missing or
+    replaced: Codex wrote a file in its place, which is never read or removed here) and the number of entries Codex
+    left in the scratch directory."""
+    link = Path(codex_home) / "auth.json"
+    if link.is_symlink():
+        link.unlink()
+        state = "removed"
+    else:
+        state = "replaced" if link.exists() else "missing"
+    entries = 0
+    if scratch is not None and Path(scratch).is_dir():
+        for sub in ("home", "cwd", "tmp"):
+            for _, dirs, files in os.walk(Path(scratch) / sub):
+                entries += len(dirs) + len(files)
+        shutil.rmtree(scratch)
+    return state, entries
+
+
+def remove_stale_link(codex_home):
+    """A dead runner's call may have left its credential link; only a symlink named auth.json is removed."""
+    link = Path(codex_home) / "auth.json"
+    if link.is_symlink():
+        link.unlink()
 
 
 def codex_version(codex):
-    try:
-        done = subprocess.run([codex, "--version"], stdin=subprocess.DEVNULL, capture_output=True, text=True,
-                              timeout=60, check=False, env=codex_env())
-    except (OSError, subprocess.SubprocessError):
-        return None
+    """The first line of `codex --version`, run with the allowlisted environment and a throwaway Codex home."""
+    with tempfile.TemporaryDirectory(prefix=SCRATCH_PREFIX) as scratch:
+        env = {key: value for key, value in os.environ.items() if key in CHILD_ENV_ALLOWLIST}
+        env.update({"CODEX_HOME": scratch, "HOME": scratch, "TMPDIR": scratch})
+        try:
+            done = subprocess.run([codex, "--version"], stdin=subprocess.DEVNULL, capture_output=True, text=True,
+                                  timeout=60, check=False, env=env, cwd=scratch)
+        except (OSError, subprocess.SubprocessError):
+            return None
     lines = (done.stdout or "").strip().splitlines()
     return lines[0].strip() if done.returncode == 0 and lines else None
 
@@ -583,14 +849,16 @@ def identity(plan, plan_sha256, arm, batches, version):
 class ArmRun:
     """The pending batches of one arm through at most `max_concurrent` workers sharing the host's slots."""
 
-    def __init__(self, *, plan, arm, batches, template, codex, state_dir, arm_dir, empty_dir, lock_dir,
-                 schema_path, run_lock_fd, poll_seconds, timeout_seconds, grace_seconds):
+    def __init__(self, *, plan, arm, batches, template, codex, state_dir, arm_dir, lock_dir, schema_path,
+                 run_lock_fd, native_auth, scratch_root, poll_seconds, timeout_seconds, grace_seconds):
         self.plan, self.arm, self.batches, self.template, self.codex = plan, arm, batches, template, codex
-        self.state_dir, self.arm_dir, self.empty_dir, self.lock_dir = state_dir, arm_dir, empty_dir, lock_dir
+        self.state_dir, self.arm_dir, self.lock_dir = state_dir, arm_dir, lock_dir
         self.schema_path, self.run_lock_fd = schema_path, run_lock_fd
+        self.native_auth, self.scratch_root = native_auth, scratch_root
         self.poll_seconds, self.timeout_seconds, self.grace_seconds = poll_seconds, timeout_seconds, grace_seconds
         self.retries = plan["calls"]["retries_per_batch"]
-        self.stop, self.interrupted, self.limited = threading.Event(), threading.Event(), threading.Event()
+        self.stop, self.interrupted = threading.Event(), threading.Event()
+        self.noted = {name: threading.Event() for name in NOTES}  # a stop note this run published or met
         self.mutex = threading.Lock()
         self.queue = deque()
         self.calls = 0
@@ -604,19 +872,50 @@ class ArmRun:
                 for number, path in attempt_dirs(self.batch_dir(index))]
 
     def finalize_abandoned(self):
-        """Give every attempt a runner left without call.json (it held the run lock, so nothing runs it now)."""
+        """Record every attempt a runner left without call.json (it held the run lock, so nothing runs it now) and
+        remove any credential link such a runner left behind."""
         for index, batch in enumerate(self.batches):
             for number, path in attempt_dirs(self.batch_dir(index)):
+                remove_stale_link(path / "codex-home")
                 if not (path / "call.json").exists():
                     record = attempt_record(self.arm, index, batch, number, path, self.template)
-                    write_private(path / "call.json", (json.dumps(record, indent=2, sort_keys=True) + "\n").encode(),
-                                  replace=True)
+                    write_record(path, record)
+
+    def unpublished_limit(self):
+        """(index, number, record) of the first recorded limit call whose LIMIT note was never published: its runner
+        died before it saw the event, or between publishing and recording it."""
+        for index in range(len(self.batches)):
+            for (number, path), record in zip(attempt_dirs(self.batch_dir(index)), self.records(index)):
+                if record.get("outcome") == "limit" and not record.get("limit_noted"):
+                    return index, number, path, record
+        return None
+
+    def restore_limit(self, found):
+        """Publish the LIMIT note of an unpublished limit call before any call, then mark the call noted."""
+        index, number, path, record = found
+        message = limit_message(read_events(path / "events.jsonl"))
+        self.publish("LIMIT", index, number, message, "usage_limit", recovered=True)
+        record["limit_noted"] = True
+        write_record(path, record)
 
     def states(self):
         return [batch_state(self.records(index), self.retries) for index in range(len(self.batches))]
 
     def interrupt(self, *_):
         self.interrupted.set()
+        self.stop.set()
+
+    def publish(self, name, index, number, message, reason, recovered=False):
+        """Write stop note `name` under the launch gate (never over an existing note) and stop this run."""
+        note = {"note": name, "arm": self.arm["id"], "model": self.arm["model"], "effort": self.arm["effort"],
+                "batch": batch_id(index), "attempt": number, "reason": reason, "recovered": recovered,
+                "observed_utc": li26.now_utc(), "codex_message": (message or "")[:500], "next_step": NEXT_STEPS[name]}
+        with launch_gate(self.state_dir):
+            try:
+                write_private(self.state_dir / name, (json.dumps(note, indent=2, sort_keys=True) + "\n").encode())
+            except FileExistsError:
+                pass
+        self.noted[name].set()
         self.stop.set()
 
     def run(self):
@@ -647,92 +946,111 @@ class ArmRun:
             self.stop.set()
 
     def call(self, index):
-        """One codex call for one batch in its own attempt directory; its outcome, or None if it never started."""
-        batch = self.batches[index]
+        """One codex call for one batch in its own attempt directory; its outcome, or None if it never started.
+        The host slot is released only after the call is recorded and any stop note is published."""
         waited = time.monotonic()
         slot_fd, slot = acquire_slot(self.lock_dir, self.plan["calls"]["slots"], self.poll_seconds, self.stop)
         if slot_fd is None:
             return None
         try:
-            if (self.state_dir / "LIMIT").exists():  # another arm's run met the shared limit meanwhile
-                self.limited.set()
-                self.stop.set()
-                return None
-            slot_wait = time.monotonic() - waited
-            with self.mutex:
-                batch_dir = self.batch_dir(index)
-                batch_dir.mkdir(mode=0o700, exist_ok=True)
-                number = 1 + max((n for n, _ in attempt_dirs(batch_dir)), default=0)
-                attempt = batch_dir / f"attempt-{number}"
-                attempt.mkdir(mode=0o700)
-                self.calls += 1
-            prompt = build_prompt(self.template, batch)
-            reply = attempt / "reply.json"
-            argv = codex_argv(self.codex, self.arm["model"], self.arm["effort"], self.schema_path, reply, prompt)
-            measured = {"slot": slot, "slot_wait_seconds": round(slot_wait, 3), "started_utc": li26.now_utc(),
-                        "exit_code": None, "timed_out": False, "interrupted": False}
-            started = time.monotonic()
-            events_fd = os.open(attempt / "events.jsonl", os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-            stderr_fd = os.open(attempt / "stderr.txt", os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-            try:
+            return self.call_in_slot(index, slot_fd, slot, round(time.monotonic() - waited, 3))
+        finally:
+            os.close(slot_fd)
+
+    def call_in_slot(self, index, slot_fd, slot, slot_wait):
+        batch = self.batches[index]
+        prompt = build_prompt(self.template, batch)
+        codex_home = scratch = process = None
+        events_fd = stderr_fd = None
+        measured = {"slot": slot, "slot_wait_seconds": slot_wait, "exit_code": None, "timed_out": False,
+                    "interrupted": False}
+        try:
+            with launch_gate(self.state_dir):
+                if self.stop.is_set():
+                    return None
+                note = present_note(self.state_dir)
+                if note is not None:  # another run published a stop note meanwhile
+                    self.noted[note].set()
+                    self.stop.set()
+                    return None
+                with self.mutex:
+                    batch_dir = self.batch_dir(index)
+                    batch_dir.mkdir(mode=0o700, exist_ok=True)
+                    number = 1 + max((n for n, _ in attempt_dirs(batch_dir)), default=0)
+                    attempt = batch_dir / f"attempt-{number}"
+                    attempt.mkdir(mode=0o700)
+                    self.calls += 1
+                codex_home, scratch = prepare_call(attempt, self.native_auth, self.scratch_root)
+                reply = attempt / "reply.json"
+                argv = codex_argv(self.codex, self.arm["model"], self.arm["effort"], self.schema_path, reply, prompt)
+                events_fd = os.open(attempt / "events.jsonl", os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+                stderr_fd = os.open(attempt / "stderr.txt", os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+                measured["started_utc"] = li26.now_utc()
+                started = time.monotonic()
                 try:
-                    process = subprocess.Popen(argv, cwd=self.empty_dir, stdin=subprocess.DEVNULL, stdout=events_fd,
+                    process = subprocess.Popen(argv, cwd=scratch / "cwd", stdin=subprocess.DEVNULL, stdout=events_fd,
                                                stderr=stderr_fd, pass_fds=(slot_fd, self.run_lock_fd),
-                                               start_new_session=True, env=codex_env())
+                                               start_new_session=True, env=call_env(codex_home, scratch))
+                    measured["launched_unix_ns"] = time.time_ns()  # still inside the gate: before any later note
                 except (OSError, ValueError) as error:
                     os.write(stderr_fd, f"launch failed: {type(error).__name__}\n".encode())
-                    process = None
                     measured["launch_error"] = True
-                deadline = started + self.timeout_seconds
-                while process is not None:
-                    try:
-                        measured["exit_code"] = process.wait(timeout=0.2)
-                        break
-                    except subprocess.TimeoutExpired:
-                        if self.interrupted.is_set():
-                            measured["interrupted"] = True
-                        elif time.monotonic() >= deadline:
-                            measured["timed_out"] = True
-                        else:
-                            continue
-                        stop_group(process, self.grace_seconds)
-                        measured["exit_code"] = process.returncode
-                        break
-            finally:
-                os.close(events_fd)
-                os.close(stderr_fd)
+            tail, limit_noted = EventTail(attempt / "events.jsonl"), False
+            deadline = started + self.timeout_seconds
+            while process is not None:
+                try:
+                    measured["exit_code"] = process.wait(timeout=0.2)
+                    break
+                except subprocess.TimeoutExpired:
+                    pass
+                if not limit_noted:  # publish the limit as soon as Codex reports it, before the call ends
+                    message = limit_message(tail.read())
+                    if message is not None:
+                        self.publish("LIMIT", index, number, message, "usage_limit")
+                        limit_noted = True
+                if self.interrupted.is_set():
+                    measured["interrupted"] = True
+                elif time.monotonic() >= deadline:
+                    measured["timed_out"] = True
+                else:
+                    continue
+                stop_group(process, self.grace_seconds)
+                measured["exit_code"] = process.returncode
+                break
             measured["wall_seconds"] = round(time.monotonic() - started, 3)
             measured["finished_utc"] = li26.now_utc()
             if reply.exists():
                 os.chmod(reply, 0o600)
         finally:
-            os.close(slot_fd)
+            for fd in (events_fd, stderr_fd):
+                if fd is not None:
+                    os.close(fd)
+            if codex_home is not None:
+                measured["credential_link"], measured["scratch_entries"] = finish_call(codex_home, scratch)
         events = read_events(attempt / "events.jsonl")
-        record = call_record(self.arm, index, batch, number, prompt, events, reply, **measured)
-        write_private(attempt / "call.json", (json.dumps(record, indent=2, sort_keys=True) + "\n").encode(),
-                      replace=True)
+        record = call_record(self.arm, index, batch, number, prompt, events, reply, codex_home, **measured)
         if record["outcome"] == "limit":
-            self.note_limit(index, number, limit_message(events))
+            if not limit_noted:
+                self.publish("LIMIT", index, number, limit_message(events), "usage_limit")
+            record["limit_noted"] = True
+        elif record["outcome"] == "unavailable":
+            self.publish("UNAVAILABLE", index, number, first_error(events), record["reason"])
+        write_record(attempt, record)
+        if record["credential_link"] == "replaced":
+            raise RuntimeError(f"Codex replaced the credential link of {batch_id(index)} attempt-{number} with a "
+                               "file; it was left untouched")
         return record["outcome"]
 
-    def note_limit(self, index, number, message):
-        note = {"arm": self.arm["id"], "model": self.arm["model"], "effort": self.arm["effort"],
-                "batch": batch_id(index), "attempt": number, "observed_utc": li26.now_utc(),
-                "codex_message": (message or "")[:500],
-                "next_step": "Tell the user the shared Codex usage limit was reached. After the reset, remove this "
-                             "file and run the same arm again; its finished batches are kept."}
-        with self.mutex:
-            try:
-                write_private(self.state_dir / "LIMIT", (json.dumps(note, indent=2, sort_keys=True) + "\n").encode())
-            except FileExistsError:
-                pass
-        self.limited.set()
-        self.stop.set()
+
+def write_record(attempt, record):
+    write_private(Path(attempt) / "call.json", (json.dumps(record, indent=2, sort_keys=True) + "\n").encode(),
+                  replace=True)
 
 
 def run_arm(plan_path, arm_id, acquisition, state_dir, lock_dir, *, codex=None, poll_seconds=None,
             timeout_seconds=None, grace_seconds=None, on_start=None, out=None):
-    """Run the arm's pending batches; the exit code (0 done, 3 usage limit, 5 interrupted, 1 runner error).
+    """Run the arm's pending batches; the exit code (0 done, 1 runner error, 3 usage limit, 4 unavailable,
+    5 interrupted, 6 done with a failed batch).
 
     `codex`, `poll_seconds`, `timeout_seconds` and `grace_seconds` exist for the offline tests; the command line
     always uses the codex on PATH and the plan's frozen values. `on_start` receives the ArmRun before any call
@@ -746,6 +1064,9 @@ def run_arm(plan_path, arm_id, acquisition, state_dir, lock_dir, *, codex=None, 
     rows = load_rows(plan, acquisition)
     batches = frozen_batches(plan, template, rows)
     lock_dir = checked_lock_dir(lock_dir)
+    issue = system_config_issue()
+    if issue:
+        raise ValueError(issue)
     codex = codex or shutil.which("codex")
     if codex is None:
         raise ValueError("codex is not on PATH")
@@ -753,12 +1074,12 @@ def run_arm(plan_path, arm_id, acquisition, state_dir, lock_dir, *, codex=None, 
     if version != plan["codex"]["version"]:
         raise ValueError(f"codex reports {version!r}; the plan is frozen for {plan['codex']['version']!r}")
     state_dir = private_dir(state_dir)
-    if (state_dir / "LIMIT").exists():
-        print(json.dumps({"arm": arm_id, "status": "limit_note_present", "exit": EXIT_LIMIT}), file=out)
-        return EXIT_LIMIT
-    empty_dir = private_dir(state_dir / "empty")
-    if any(empty_dir.iterdir()) or inside_repository(empty_dir) is not None:
-        raise ValueError(f"{empty_dir} must be empty and outside every repository")
+    native_auth = checked_native_auth(state_dir)
+    scratch_root = checked_scratch_root(state_dir)
+    note = present_note(state_dir)
+    if note is not None:
+        print(json.dumps({"arm": arm_id, "status": f"{note.lower()}_note_present", "exit": NOTES[note]}), file=out)
+        return NOTES[note]
     arm_dir = private_dir(private_dir(state_dir / "arms") / arm_id)
     private_dir(arm_dir / "batches")
     run_lock_fd = open_lock(arm_dir / "run.lock", 0o600)
@@ -779,26 +1100,34 @@ def run_arm(plan_path, arm_id, acquisition, state_dir, lock_dir, *, codex=None, 
         if li26.digest(schema_path) != plan["schema_sha256"]:
             raise ValueError("the arm's schema copy differs from the frozen schema")
         runner = ArmRun(plan=plan, arm=arm, batches=batches, template=template, codex=codex, state_dir=state_dir,
-                        arm_dir=arm_dir, empty_dir=empty_dir, lock_dir=lock_dir, schema_path=schema_path,
-                        run_lock_fd=run_lock_fd,
+                        arm_dir=arm_dir, lock_dir=lock_dir, schema_path=schema_path, run_lock_fd=run_lock_fd,
+                        native_auth=native_auth, scratch_root=scratch_root,
                         poll_seconds=plan["calls"]["slot_poll_seconds"] if poll_seconds is None else poll_seconds,
                         timeout_seconds=(plan["calls"]["timeout_seconds"] if timeout_seconds is None
                                          else timeout_seconds),
                         grace_seconds=plan["calls"]["kill_grace_seconds"] if grace_seconds is None else grace_seconds)
         runner.finalize_abandoned()
-        if on_start is not None:
-            on_start(runner)
         started_utc, started = li26.now_utc(), time.monotonic()
-        runner.run()
+        found = runner.unpublished_limit()
+        if found is not None:  # a dead runner's limit call: restore the stop before any call
+            runner.restore_limit(found)
+        else:
+            if on_start is not None:
+                on_start(runner)
+            runner.run()
         states = runner.states()
         if runner.errors:
             status, code = "runner_error", EXIT_ERROR
-        elif runner.limited.is_set():
+        elif runner.noted["LIMIT"].is_set():
             status, code = "limit_stopped", EXIT_LIMIT
+        elif runner.noted["UNAVAILABLE"].is_set():
+            status, code = "unavailable_stopped", EXIT_UNAVAILABLE
         elif runner.interrupted.is_set():
             status, code = "interrupted", EXIT_INTERRUPTED
         elif "pending" in states:
             status, code = "runner_error", EXIT_ERROR
+        elif "failed" in states:
+            status, code = "complete_with_failed_batches", EXIT_FAILED_BATCHES
         else:
             status, code = "complete", EXIT_DONE
         summary = {"arm": arm_id, "status": status, "exit": code, "calls": runner.calls,
