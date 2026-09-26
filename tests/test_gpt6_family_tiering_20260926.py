@@ -55,6 +55,19 @@ FROZEN_OPTIONS = ["-c", "agents.enabled=false", "-c", 'web_search="disabled"', "
                   "-c", 'cli_auth_credentials_store="file"']
 ONLY_TOOLS_LEFT = ["namespace:functions[exec,wait,request_user_input,request_user_input_async]"]
 
+
+def passed_env(names):
+    """The variable names a call was given, from the names the fake codex saw in its own environment.
+
+    macOS adds CoreFoundation's __CF_* keys (__CF_USER_TEXT_ENCODING) and VERSIONER_* keys to a process's own
+    environment even when exec received an explicit one, so the Python fake reports them although run_arm.py never
+    passed them. CPython's suite ignores the same names for the same reason (Lib/test/test_subprocess.py,
+    test_empty_env's is_env_var_to_ignore). Other platforms keep the exact comparison.
+    """
+    if sys.platform != "darwin":
+        return set(names)
+    return {name for name in names if "__CF" not in name and "VERSIONER" not in name}
+
 FAKE_CODEX = r'''#!{python}
 import json, os, re, sys, time
 SELF = os.path.abspath(__file__)
@@ -498,7 +511,7 @@ class RunnerTests(unittest.TestCase):
         self.assertTrue(scratch.name.startswith("gt26-call-"))
         self.assertNotIn(fixture.state.resolve(), scratch.resolve().parents)
         self.assertFalse(scratch.exists())
-        self.assertEqual(set(seen["env"]) - set(RUN.CHILD_ENV_ALLOWLIST), {"CODEX_HOME", "HOME", "TMPDIR"})
+        self.assertEqual(passed_env(seen["env"]) - set(RUN.CHILD_ENV_ALLOWLIST), {"CODEX_HOME", "HOME", "TMPDIR"})
         self.assertNotIn("RUST_LOG", seen["env"])
         self.assertNotIn("OPENAI_API_KEY", seen["env"])
         self.assertTrue(seen["stdin_devnull"])
