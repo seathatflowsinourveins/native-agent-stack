@@ -120,14 +120,74 @@ class FrozenPlan(unittest.TestCase):
             f"{REL}/window.sh", "blueprints/us-equities/catalyst-provenance/catalyst.py",
             "scripts/path_safety.py"]))
 
-    def test_planned_record_validates_without_observations(self):
+    def test_recorded_record_validates_and_keeps_its_failed_attempts(self):
         result = validate_record(ROOT, f"{REL}/experiment.json")
         self.assertTrue(result["valid"], result["errors"])
         record = json.loads((HERE / "experiment.json").read_text())
-        self.assertEqual((record["status"], record["lane"], record["observations"]), ("planned", "local-inference", []))
+        self.assertEqual((record["status"], record["lane"]), ("observed", "local-inference"))
         self.assertEqual(PLAN["status"], "preregistered")
         plan_input = [entry for entry in record["frozen_inputs"]["inputs"] if entry["path"].endswith("plan.json")]
         self.assertEqual(plan_input[0]["sha256"], PLAN_SHA)
+        self.assertEqual((record["decision_and_scope"]["decision"], record["decision_and_scope"]["qualification_run_ids"]),
+                         ("adopt_within_scope", ["li26-c2-w3"]))
+        # The acquisition's first refusal and C2's admission refusal stay recorded beside M's failed criterion.
+        self.assertEqual({entry["run_id"] for entry in record["failures_and_skips"]},
+                         {"li26-acq-attempt-1", "li26-c2-w2-admission-refused", "li26-m-w2"})
+
+    def test_recorded_results_hold_no_document_text(self):
+        results = HERE / "results"
+        decision = json.loads((results / "decision.json").read_text())
+        self.assertEqual((decision["final"], decision["selected"], decision["no_document_text"], decision["plan_sha256"]),
+                         (True, {"arm": "C2", "outcome": "change_serving_profile"}, True, PLAN_SHA))
+        self.assertEqual(decision["rule"], PLAN["decision_rule"]["text"])
+        accession = re.compile(r"\d{10}-\d{2}-\d{6}")
+
+        def strings(value):
+            if isinstance(value, str):
+                yield value
+            elif isinstance(value, dict):
+                for key, item in value.items():
+                    yield key
+                    yield from strings(item)
+            elif isinstance(value, list):
+                for item in value:
+                    yield from strings(item)
+
+        files = sorted(path for path in results.rglob("*") if path.is_file())
+        self.assertEqual(len(files), 11)
+        for path in files:
+            relative = path.relative_to(results)
+            with self.subTest(path=relative.as_posix()):
+                text = path.read_text(encoding="utf-8")
+                self.assertIsNone(accession.search(text))
+                if path.suffix != ".json":
+                    continue
+                data = json.loads(text)
+                self.assertEqual([item for item in strings(data) if len(item) > 200 and item != decision["rule"]], [])
+                if relative.parts[0] == "runs":
+                    self.assertEqual(data["window"], relative.parts[1])
+                    if path.name == "window.json":
+                        self.assertEqual(data["arm"], relative.parts[2])
+
+    def test_host_receipt_commands_only_read(self):
+        # Both llama-cpp receipts say their commands only read. The use receipt's unpublished first recording
+        # ran analyze.py --out into a mktemp directory inside the checkout and removed it, so no command may
+        # create, write, move or remove a path, and one that loads repository modules must not write bytecode.
+        writes = re.compile(r"\bmktemp\b|\brm\b|\bmv\b|\bcp\b|\btee\b|\btouch\b|\bmkdir\b|--out\b|>>?\s*[^&\s]")
+        hosts = ROOT / "evidence/hosts/nativestack-5975wx-20260925"
+        receipts = {stage: json.loads((hosts / f"nativestack-5975wx-20260925--llama-cpp--{stage}--20260926.json")
+                                      .read_text()) for stage in ("install", "use")}
+        for stage, receipt in receipts.items():
+            for index, command in enumerate(receipt["commands"], 1):
+                with self.subTest(stage=stage, command=index):
+                    self.assertEqual(command["exit"], 0)
+                    self.assertIsNone(writes.search(command["cmd"]))
+                    if "exec_module" in command["cmd"]:
+                        self.assertTrue(command["cmd"].startswith("python3 -B "))
+        # The in-memory re-derivation prints the SHA-256 of the committed decision.json.
+        self.assertEqual(receipts["use"]["commands"][5]["output_excerpt"].splitlines(),
+                         ['{"final": true, "selected": {"arm": "C2", "outcome": "change_serving_profile"}}',
+                          hashlib.sha256((HERE / "results/decision.json").read_bytes()).hexdigest()])
 
     def test_changed_frozen_values_are_refused(self):
         for path, bad in [(("serving", "context"), 4096), (("serving", "port"), 18232),

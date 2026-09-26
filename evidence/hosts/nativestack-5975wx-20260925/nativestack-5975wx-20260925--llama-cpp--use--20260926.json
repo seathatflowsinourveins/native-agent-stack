@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--llama-cpp--use--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "2e771442ec3585f70d22346e722b891b55579c22",
+  "recorded_by": {
+    "identity_sha256": "1acdb6c10d2024f9f9d290019d4bb0894f1f115068419f1e575c32f8bf2925f7",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "llama-cpp",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "curl -fsS -m 10 http://127.0.0.1:18232/health && echo && systemctl --user show -p ActiveState -p SubState -p NRestarts -p ActiveEnterTimestamp -p DropInPaths nativestack-generation.service",
+      "exit": 0,
+      "duration_s": 0.023,
+      "output_sha256": "5f804ec863e1ef873335346ad0efb29b32737f14cdae445b1c4558361b7ac1b4",
+      "output_excerpt": "{\"status\":\"ok\"}\nNRestarts=0\nActiveState=active\nSubState=running\nDropInPaths=~/.config/systemd/user/nativestack-generation.service.d/li26-c2-serving-profile.conf\nActiveEnterTimestamp=Sat 2026-09-26 07:05:41 EDT\n"
+    },
+    {
+      "cmd": "systemctl --user show -p ExecStart --value nativestack-generation.service | python3 -c 'import re,shlex,sys; a=shlex.split(re.search(r\"argv\\[\\]=(.*?) ;\", sys.stdin.read()).group(1)); keep=(\"--ctx-size\",\"--parallel\",\"--gpu-layers\",\"--n-cpu-ffn\",\"--fit\",\"--sleep-idle-seconds\",\"--spec-type\",\"--spec-draft-n-max\"); print(a[0]); print(a[a.index(\"--model\") + 1]); print(\" \".join(a[i] + \" \" + a[i + 1] for i in range(1, len(a) - 1) if a[i] in keep)); print(\"other options not shown:\", sum(1 for x in a[1:] if x.startswith(\"-\") and x not in keep and x != \"--model\"))'",
+      "exit": 0,
+      "duration_s": 0.023,
+      "output_sha256": "319dc1d12a8658cb68d2dfd043392aed1adde18b4d51f2950105a8501d658261",
+      "output_excerpt": "~/.local/share/codex-ecosystem/tools/llama-cpp-b11146-cuda12.8/llama-server\n~/.local/share/codex-ecosystem/models/qwen3.8-27b-4ca7207/Qwen3.8-27B-UD-Q4_K_M.gguf\n--ctx-size 8192 --parallel 1 --gpu-layers 99 --n-cpu-ffn 20 --fit off --sleep-idle-seconds 600 --spec-type draft-mtp --spec-draft-n-max 3\nother options not shown: 18\n"
+    },
+    {
+      "cmd": "m=$(systemctl --user show -p ExecStart --value nativestack-generation.service | python3 -c 'import re,shlex,sys; a=shlex.split(re.search(r\"argv\\[\\]=(.*?) ;\", sys.stdin.read()).group(1)); print(a[a.index(\"--model\") + 1])') && stat -c '%s bytes' \"$m\" && sha256sum \"$m\"",
+      "exit": 0,
+      "duration_s": 9.956,
+      "output_sha256": "1d805524195b4327700c4dc66c03206510f551596bf0c869250c5c429e4ce009",
+      "output_excerpt": "16464440224 bytes\n322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482  ~/.local/share/codex-ecosystem/models/qwen3.8-27b-4ca7207/Qwen3.8-27B-UD-Q4_K_M.gguf\n"
+    },
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/checks.py llama-cpp",
+      "exit": 0,
+      "duration_s": 2.887,
+      "output_sha256": "a25f014fb9526d99a14d744454f85256823e410c62d3aa6d9ee178293f9d2886",
+      "output_excerpt": "{\"structured_answer\": 42, \"usage\": {\"completion_tokens\": 7, \"prompt_tokens\": 20, \"total_tokens\": 27, \"prompt_tokens_details\": {\"cached_tokens\": 0}}}\n"
+    },
+    {
+      "cmd": "nvidia-smi --query-gpu=name,memory.total,memory.used,memory.free,driver_version --format=csv,noheader",
+      "exit": 0,
+      "duration_s": 0.044,
+      "output_sha256": "d55e218333830cd3316d989c2fa8e7c045eb3e19afadace51058db77b2f0e36d",
+      "output_excerpt": "NVIDIA GeForce RTX 4090, 24564 MiB, 19750 MiB, 4393 MiB, 616.64\n"
+    },
+    {
+      "cmd": "python3 -B -c 'import hashlib, importlib.util, json, sys; from pathlib import Path; spec = importlib.util.spec_from_file_location(\"li26_analyze\", \"blueprints/convergence-practice/local-inference-latest-20260926/analyze.py\"); m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); raw = m.PLAN.read_bytes(); d = m.analyze(json.loads(raw), hashlib.sha256(raw).hexdigest(), Path(sys.argv[1])); print(json.dumps({\"selected\": d[\"selected\"], \"final\": d[\"final\"]}, sort_keys=True)); print(hashlib.sha256((json.dumps(d, indent=2, sort_keys=True) + \"\\n\").encode()).hexdigest())' \"$HOME/.local/state/native-agent-stack/local-inference-latest-20260926\"",
+      "exit": 0,
+      "duration_s": 2.107,
+      "output_sha256": "a66a0955ad0cb5304d4bfc1c09f1427c6752c45cfc7babbada01f038656bad51",
+      "output_excerpt": "{\"final\": true, \"selected\": {\"arm\": \"C2\", \"outcome\": \"change_serving_profile\"}}\n672be297908b9832b77949d2c8e15b3972f3acc4fbd12c92cef717f61d05d3e4\n"
+    }
+  ],
+  "tool_versions": {
+    "llama-cpp": "b11146 (0.5.0-dev)"
+  },
+  "observed_at_utc": "2026-09-26T12:41:06Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), the production generation unit nativestack-generation.service was active with 0 restarts and /health returned ok, with the drop-in li26-c2-serving-profile.conf in effect (first command). Its ExecStart runs the b11146 llama-server on Qwen3.8-27B-UD-Q4_K_M.gguf with the li26 C2 serving profile --gpu-layers 99 --n-cpu-ffn 20 --spec-type draft-mtp --spec-draft-n-max 3 at --ctx-size 8192 --parallel 1 (second command). The served file is 16,464,440,224 bytes with SHA-256 322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482, the unsloth/Qwen3.8-27B-GGUF revision 4ca7207 pin (third command). The bounded structured check through the production API returned the answer 42 as JSON and printed only usage (fourth command); nvidia-smi then reported whole-device memory with the model loaded (fifth command). In memory, without writing a file, the frozen analyze.py's analyze() re-derived the li26 decision from the retained private state: final, C2 selected, change_serving_profile; serialized as analyze.py's main() writes it, the decision has SHA-256 672be297908b9832b77949d2c8e15b3972f3acc4fbd12c92cef717f61d05d3e4 (sixth command), the SHA-256 of the experiment's committed results/decision.json.",
+  "limitations": [
+    "The qualified_models bars come from the li26 frozen experiment (blueprints/convergence-practice/local-inference-latest-20260926/results/): native execution on this host, one run per arm, frozen protocol (360 SEC 8-K filings of 2020-03-02, greedy non-thinking, labels are the filer-declared header ITEMS). This receipt's own commands exercise only the served C2 profile; M is not served, was not rerun here, and its entry records a measured failure of the frozen non-inferiority bar.",
+    "Speed figures are this host's under its load at the time (a shared WSL2 desktop with the Windows-side GPU applications closed for the windows), not isolated benchmarks. Production keeps its own sampling and reasoning defaults, while the experiment measured greedy non-thinking replies of about 17 tokens; C2's decode gain and its MTP draft acceptance are not established for production's sampled or thinking workloads.",
+    "C2's measured peak whole-device use was 20,314 MiB (minimum 3,829 MiB free) with the Windows-side GPU applications closed. Production has no free-memory guard of its own, so reopening Windows-side GPU applications can exhaust device memory. Rollback removes the drop-in, runs systemctl --user daemon-reload, restarts the unit and checks /health.",
+    "The structured check (evidence/artifacts/nativestack-20260924/checks.py llama-cpp) reads the generation key itself and prints only the parsed answer and usage; the recorder neither read nor printed a credential value. The second and third commands print only the executable, the model path and the named profile options of the unit's ExecStart and count the others without printing them.",
+    "The sixth command runs under python3 -B, so not even a bytecode cache is written: it loads the frozen analyze.py, calls its analyze() with the plan.json that main() would read, and hashes the decision serialized as main() writes it (two-space indent, sorted keys, final newline), all in memory; it prints only the selected arm, the final flag and that SHA-256. The private state it reads (window records, memory samples and metrics) stays outside the repository.",
+    "This recording replaces an unpublished first recording of this receipt (observed 2026-09-26T11:26:21Z) whose sixth command ran analyze.py --out into a temporary directory inside the checkout and then removed it, which contradicted its read-only statement. Its first five commands were the same as here.",
+    "The catalog pin for llama-cpp stays b11057 (0.4.1-dev) in manifests/stack.json and catalogs/sota-convergence; this receipt records b11146 (0.5.0-dev), the build this host serves, and does not rebind that pin. llama-cpp has no landscape winner row: its catalog row is the conditional foundation/observation-inference alternative.",
+    "Recorded from a Claude Code session in a git worktree at origin/main (the catalog_revision); every command uses only files present at that revision and host tools. The commands only read: none writes a file or changes the unit, its drop-in or a model file. The structured check sends one bounded request, which the running unit serves as it would any client's.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T12:41:06Z",
+      "reviewer": {
+        "identity_sha256": "1acdb6c10d2024f9f9d290019d4bb0894f1f115068419f1e575c32f8bf2925f7",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "headless independent review 2026-09-26 (li26 results PR)",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T12:57:39Z",
+      "reviewer": {
+        "identity_sha256": "d9bbb3ba309f8ba122c153f7c20c48da9ea50d0ac371c03f240be6877b6eb27e",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "observation-inference"
+    }
+  ],
+  "qualified_models": [
+    {
+      "model_id": "unsloth/Qwen3.8-27B-GGUF",
+      "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+      "runtime": "llama.cpp llama-server CUDA 12.8, file Qwen3.8-27B-UD-Q4_K_M.gguf; li26 C2 serving profile: --gpu-layers 99 --n-cpu-ffn 20 --spec-type draft-mtp --spec-draft-n-max 3, 8192 context, one slot",
+      "runtime_version": "b11146 (0.5.0-dev)",
+      "bars": "li26 frozen rule, 360 SEC 8-K filings of 2020-03-02, greedy non-thinking: micro-F1 0.9909, same item sets as the C0 control on all 360 (bootstrap 95% lower bound 0.0 >= -0.02); JSON-valid 1.0; median decode 26.28 tokens/s against C0's 5.25; no memory or deadline failure; selected over C1. One run per arm on this host; plus this receipt's structured check.",
+      "result": "pass"
+    },
+    {
+      "model_id": "ggml-org/MiMo-V2.6-Distill-Qwen-9B-GGUF",
+      "revision": "81baddc39bc48924a88e87b8d31aceb03058e559",
+      "runtime": "llama.cpp llama-server CUDA 12.8, file MiMo-V2.6-Distill-Qwen-9B-Q8_0.gguf; li26 arm M: every layer on the GPU, 8192 context, one slot; measured, not selected, not served",
+      "runtime_version": "b11146 (0.5.0-dev)",
+      "bars": "li26 frozen rule on the same 360 filings: micro-F1 0.9670 against C0's 0.9909; paired bootstrap 95% lower bound -0.0560, below the -0.02 margin, so criterion 1 failed; JSON-valid 1.0; median decode 80.16 tokens/s; no memory or deadline failure. Measured and not selected; production does not serve it and this receipt did not rerun it.",
+      "result": "fail"
+    }
+  ]
+}

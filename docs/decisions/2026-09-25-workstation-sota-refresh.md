@@ -174,8 +174,9 @@ and the receipt's addendum.
 **Decision.** 2.4.0 served `nativestack-memory.service` and all ai-memory hooks on this
 host from the 2026-09-25 cold-copy cutover until 2026-09-26, when 2.4.1 replaced it (see the
 update below). 2.4.0 and the private cold V66 copy are kept for rollback. The Codex trust
-step for the 7 changed hook commands is the user's and still pending. Embeddings stay local
-all-MiniLM-L6-v2.
+step for the 7 changed hook commands is the user's and still pending (update 2026-09-26: the
+user reported trusting them, and a retained `codex exec` probe then wrote six observation kinds
+through 2.4.1, with PreCompact unverified; see the receipt's addendum). Embeddings stay local all-MiniLM-L6-v2.
 
 **Evidence.** [Release v2.4.0](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.0)
 (2026-09-21, tag commit `b1b25219`, no artifact attestation, not immutable),
