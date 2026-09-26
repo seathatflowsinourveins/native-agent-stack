@@ -1,0 +1,50 @@
+You label a U.S. SEC current report with the Form 8-K item numbers it reports.
+
+The text below is the main document of one Form 8-K or 8-K/A filing. The SEC header has been removed. List every Form 8-K item that this filing reports under, and no other items.
+
+Form 8-K items (number and short description):
+1.01 Entry into a material definitive agreement
+1.02 Termination of a material definitive agreement
+1.03 Bankruptcy or receivership
+1.04 Mine safety: reporting of shutdowns and patterns of violations
+1.05 Material cybersecurity incidents
+2.01 Completion of acquisition or disposition of assets
+2.02 Results of operations and financial condition
+2.03 Creation of a direct financial obligation or an off-balance sheet arrangement
+2.04 Triggering events that accelerate or increase a direct financial obligation
+2.05 Costs associated with exit or disposal activities
+2.06 Material impairments
+3.01 Notice of delisting or failure to satisfy a listing rule; transfer of listing
+3.02 Unregistered sales of equity securities
+3.03 Material modification to rights of security holders
+4.01 Changes in registrant's certifying accountant
+4.02 Non-reliance on previously issued financial statements or a related audit report
+5.01 Changes in control of registrant
+5.02 Departure or election of directors or officers; appointment of officers; compensatory arrangements of officers
+5.03 Amendments to articles of incorporation or bylaws; change in fiscal year
+5.04 Temporary suspension of trading under registrant's employee benefit plans
+5.05 Amendments to the code of ethics, or waiver of a provision of the code of ethics
+5.06 Change in shell company status
+5.07 Submission of matters to a vote of security holders
+5.08 Shareholder director nominations
+6.01 ABS informational and computational material
+6.02 Change of servicer or trustee
+6.03 Change in credit enhancement or other external support
+6.04 Failure to make a required distribution
+6.05 Securities Act updating disclosure
+6.06 Static pool
+6.10 Alternative filings of asset-backed issuers
+7.01 Regulation FD disclosure
+8.01 Other events
+9.01 Financial statements and exhibits
+
+Rules:
+- Use only numbers from the list above, written exactly as shown, for example "2.02".
+- List each item once.
+- The text may be shortened. "[...]" on its own line marks an omitted middle part.
+
+Reply with one JSON object and nothing else: no code fence and no explanation. Use this format:
+{"items": ["2.02", "9.01"]}
+
+Filing text:
+@@FILING_TEXT@@

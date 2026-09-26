@@ -1,0 +1,484 @@
+{
+  "schema_version": 1,
+  "kind": "frozen_local_inference_arm_comparison_plan",
+  "status": "preregistered",
+  "frozen_before_inference": true,
+  "preregistered_on": "2026-09-26",
+  "source_base": "ff20470b8fc00fee288916f309123586b15668ec",
+  "scope_source": "Coordinator task of 2026-09-26, which reports that the user approved GPU windows and restricted arms to the latest models (the Qwen3.8 family and releases from the past weeks). This plan records that scope; it does not itself establish the approval.",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform": "WSL2 Ubuntu 24.04.5 x86_64; systemd 255 user manager with the cpu, memory and pids controllers delegated",
+    "cpu": "AMD Ryzen Threadripper PRO 5975WX, 32 cores, 48 WSL processors, AVX2 without AVX-512",
+    "memory": "104,613 MiB WSL total and 74,027 MiB available at planning (2026-09-26T01:45Z), shared with the Polaris distribution",
+    "gpu": "NVIDIA GeForce RTX 4090, 24,564 MiB, compute capability 8.9 (Ada: FP8 yes, NVFP4 no), Windows driver 616.64",
+    "observation_scope": "Read-only facts seen while planning. Each window measures memory again and relies on nothing here."
+  },
+  "runtime": {
+    "repository": "ggml-org/llama.cpp",
+    "tag": "b11146",
+    "release_channel": "prerelease",
+    "published_at": "2026-09-23T18:36:37Z",
+    "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b",
+    "license": "MIT",
+    "archive": "llama-b11146-bin-ubuntu-cuda-12.8-x64.tar.gz",
+    "archive_sha256": "c2ab9e19838513ff69d1af8d999ad717dd3c7ee4714ac04c7ed5ab9077c50e4e",
+    "cudart_archive": "cudart-llama-b11146-bin-ubuntu-cuda-12.8-x64.tar.gz",
+    "cudart_archive_sha256": "1466daea60aad1144819e151b2bae19d54556cf1da6c129c4f55a5ded2637c25",
+    "archive_digest_source": "GitHub release API asset digests, read 2026-09-26; the installed directory was not re-extracted for this plan",
+    "install": "~/.local/share/codex-ecosystem/tools/llama-cpp-b11146-cuda12.8 (the production unit's runtime)",
+    "server_sha256": "376626f953efd7bbf16dee112747196d2b1de26717bcd1d37e203340dc5c043c",
+    "runtime_manifest_sha256": "e035f0a74d8641936b80361ff8674a7bbfb5903ebc31625818c79f37185deb1e",
+    "runtime_manifest_method": "SHA-256 of the `sha256sum` lines of the 54 regular files in the install directory (symlinks excluded), sorted by name",
+    "version_output": "version: 0.5.0-dev (build 11146, commit 7fe450e19)",
+    "help_evidence": [
+      "llama-server --help (b11146, read 2026-09-26 with CUDA hidden, read-only):",
+      "-ngl,  --gpu-layers, --n-gpu-layers N   max. number of layers to store in VRAM, either an exact number, 'auto', or 'all' (default: auto)",
+      "-fit,  --fit [on|off]   whether to adjust unset arguments to fit in device memory ('on' or 'off', default: 'on')",
+      "-cram, --cache-ram N   set the maximum cache size in MiB (default: 8192, -1 - no limit, 0 - disable)",
+      "--offline   Offline mode: forces use of cache, prevents network access",
+      "--spec-type none,draft-simple,draft-eagle3,draft-mtp,draft-dflash,draft-dspark,ngram-simple,ngram-map-k,ngram-map-k4v,ngram-mod,ngram-cache   comma-separated list of types of speculative decoding to use (default: none)",
+      "--spec-draft-model, -md, --model-draft FNAME   draft model for speculative decoding (default: unused)",
+      "--spec-draft-ngl, -ngld, --gpu-layers-draft, --n-gpu-layers-draft N   max. number of draft model layers to store in VRAM, either an exact number, 'auto', or 'all' (default: auto)",
+      "--spec-draft-n-max N   number of tokens to draft for speculative decoding (default: 3)",
+      "-rea,  --reasoning [on|off|auto]   Use reasoning/thinking in the chat ('on', 'off', or 'auto', default: 'auto' (detect from template))"
+    ],
+    "source_evidence": [
+      "docs/speculative.md at 7fe450e: draft-mtp is 'Use Multi Token Prediction (MTP) heads from the main model'.",
+      "common/speculative.cpp at 7fe450e (common_speculative_init_result): with --spec-draft-model the draft file is loaded and an MTP-type context is created on it with the target context as ctx_other; without it the MTP context is created on the target model.",
+      "tools/server/server-common.cpp at 7fe450e: a request's chat_template_kwargs.enable_thinking=false overrides the server's reasoning default.",
+      "tools/server/server-task.cpp at 7fe450e: a non-streamed chat reply carries timings.prompt_n, prompt_ms, predicted_n, predicted_ms and predicted_per_second, plus draft_n and draft_n_accepted when drafting.",
+      "tools/server/server-http.cpp at 7fe450e: /health is a public endpoint that needs no API key.",
+      "ggml/src/ggml.c at 7fe450e: the type-name table has q1_0, q2_0, tq1_0, tq2_0, mxfp4 and nvfp4 and no pq2_0 or ptq1_0; the installed libggml-base.so.0.25.1 string table agrees.",
+      "src/llama-arch.cpp at 7fe450e: architecture names include qwen35 and qwen35moe and no xing4_0.",
+      "Production GGUF header (read-only parse, 2026-09-26): architecture qwen35, block_count 65, qwen35.nextn_predict_layers 1 with blk.64.nextn tensors; its chat template emits an empty think block when enable_thinking is false."
+    ],
+    "argv_parse_check": "2026-09-26, installed b11146 with CUDA hidden: each runnable arm's argv from eval_arm.py (nonexistent model paths, --help appended) exits 0; the negative controls --spec-draft-ngl-bogus 1, --spec-type draft-bogus and --fit maybe exit 1. The parser validates flags and values before --help exits; no model was loaded and no server started."
+  },
+  "serving": {
+    "host": "127.0.0.1",
+    "port": 18299,
+    "context": 8192,
+    "parallel": 1,
+    "batch": 512,
+    "ubatch": 128,
+    "threads": 16,
+    "threads_batch": 24,
+    "fit": "off",
+    "cache_ram_mib": 0,
+    "flags": [
+      "--no-webui",
+      "--offline"
+    ],
+    "alias": "li26-<arm id in lower case>",
+    "same_as_production": "runtime b11146, the C0 model file, --gpu-layers 36 for C0, --ctx-size 8192, --parallel 1, --fit off, --threads 16, --threads-batch 24, --batch-size 512, --ubatch-size 128",
+    "differs_from_production": [
+      "Loopback port 18299 instead of 18232; no --api-key-file, CORS or --metrics flags.",
+      "No --sleep-idle-seconds.",
+      "No server-level sampling or reasoning defaults: the frozen request sets sampling and disables thinking, and a request's enable_thinking=false overrides --reasoning on.",
+      "--cache-ram 0 and request cache_prompt=false, so every filing starts from an empty cache regardless of order.",
+      "--no-webui and --offline."
+    ]
+  },
+  "sampling": {
+    "seed": 0,
+    "temperature": 0.0,
+    "top_k": 1,
+    "top_p": 1.0,
+    "max_tokens": 256,
+    "stream": false,
+    "cache_prompt": false,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "response_format": null,
+    "messages": "one user message: prompt.txt with @@FILING_TEXT@@ replaced by the filing input",
+    "scope": "The same deterministic non-thinking settings for every arm; not the publishers' recommended sampling. No grammar or response_format, so JSON validity is measured rather than enforced."
+  },
+  "arms": [
+    {
+      "id": "C0",
+      "role": "control",
+      "support_status": "runnable",
+      "runtime": {
+        "tag": "b11146",
+        "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b"
+      },
+      "model": {
+        "repository": "unsloth/Qwen3.8-27B-GGUF",
+        "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+        "filename": "Qwen3.8-27B-UD-Q4_K_M.gguf",
+        "sha256": "322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482",
+        "bytes": 16464440224,
+        "local_dir": "qwen3.8-27b-4ca7207",
+        "architecture": "qwen35",
+        "license": "Apache-2.0 (model card); base Qwen/Qwen3.8-27B is Apache-2.0 at 1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+        "released": "repository created 2026-08-13; this revision last modified 2026-08-20 (still main on 2026-09-26)",
+        "pin_evidence": "Hugging Face tree API LFS oid and size (2026-09-26) equal the production receipt and a read-only local SHA-256 of the installed production file (2026-09-26)"
+      },
+      "profile": {
+        "gpu_layers": 36,
+        "draft": null,
+        "summary": "The production model and runtime with 36 of 65 layers on the GPU and an 8192-token context."
+      },
+      "estimated_device_mib": 9728,
+      "estimate_basis": "Blocks 29-64 hold 8,052.7 MiB of weights (GGUF header offsets); about 1.6 GiB more for KV and recurrent state, compute buffers and the CUDA context.",
+      "admission_free_mib": 16384
+    },
+    {
+      "id": "C1",
+      "role": "serving_profile_candidate",
+      "support_status": "runnable_if_admitted",
+      "runtime": {
+        "tag": "b11146",
+        "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b"
+      },
+      "model": {
+        "repository": "unsloth/Qwen3.8-27B-GGUF",
+        "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+        "filename": "Qwen3.8-27B-UD-Q4_K_M.gguf",
+        "sha256": "322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482",
+        "bytes": 16464440224,
+        "local_dir": "qwen3.8-27b-4ca7207",
+        "architecture": "qwen35",
+        "license": "Apache-2.0 (model card); base Qwen/Qwen3.8-27B is Apache-2.0 at 1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+        "released": "repository created 2026-08-13; this revision last modified 2026-08-20 (still main on 2026-09-26)",
+        "pin_evidence": "Hugging Face tree API LFS oid and size (2026-09-26) equal the production receipt and a read-only local SHA-256 of the installed production file (2026-09-26)"
+      },
+      "profile": {
+        "gpu_layers": 99,
+        "draft": null,
+        "summary": "C0 with every layer and the output head on the GPU (--gpu-layers 99)."
+      },
+      "estimated_device_mib": 16896,
+      "estimate_basis": "All 65 blocks (14,014.5 MiB) and the output head (994.6 MiB); about 1.9 GiB more for state, buffers and context.",
+      "admission_free_mib": 19968
+    },
+    {
+      "id": "C2",
+      "role": "serving_profile_candidate",
+      "support_status": "runnable_if_admitted",
+      "runtime": {
+        "tag": "b11146",
+        "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b"
+      },
+      "model": {
+        "repository": "unsloth/Qwen3.8-27B-GGUF",
+        "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+        "filename": "Qwen3.8-27B-UD-Q4_K_M.gguf",
+        "sha256": "322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482",
+        "bytes": 16464440224,
+        "local_dir": "qwen3.8-27b-4ca7207",
+        "architecture": "qwen35",
+        "license": "Apache-2.0 (model card); base Qwen/Qwen3.8-27B is Apache-2.0 at 1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+        "released": "repository created 2026-08-13; this revision last modified 2026-08-20 (still main on 2026-09-26)",
+        "pin_evidence": "Hugging Face tree API LFS oid and size (2026-09-26) equal the production receipt and a read-only local SHA-256 of the installed production file (2026-09-26)"
+      },
+      "profile": {
+        "gpu_layers": 99,
+        "draft": {
+          "type": "draft-mtp",
+          "repository": "unsloth/Qwen3.8-27B-GGUF",
+          "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+          "filename": "MTP/mtp-Qwen3.8-27B-Q4_0.gguf",
+          "sha256": "50d9ce5a6da381bbcfb31061cf73df94a90e6faf8efeddee379a9cb8f1501c6e",
+          "bytes": 1369590656,
+          "local_dir": "qwen3.8-27b-4ca7207",
+          "gpu_layers": 99,
+          "n_max": 3,
+          "license": "Apache-2.0 (same repository)"
+        },
+        "summary": "C1 plus the official MTP draft file: --spec-type draft-mtp --spec-draft-model <MTP file> --spec-draft-ngl 99 --spec-draft-n-max 3."
+      },
+      "estimated_device_mib": 18944,
+      "estimate_basis": "C1 plus the 1,306 MiB draft file and about 0.7 GiB for the draft context.",
+      "admission_free_mib": 22016,
+      "load_check": "At run time. A failure to load the draft or to create the MTP context is recorded as runtime-unsupported-draft and not retried.",
+      "note": "The main UD-Q4_K_M file already carries one MTP layer, so b11146 can also run draft-mtp without a draft file. That cheaper profile is not an arm of this plan."
+    },
+    {
+      "id": "B",
+      "role": "model_candidate",
+      "support_status": "runtime_unsupported",
+      "runtime": {
+        "tag": "b11146",
+        "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b"
+      },
+      "model": {
+        "repository": "prism-ml/Ternary-Bonsai-2-27B-gguf",
+        "revision": "b072e1d3b35a0a630cece372c2127528e0994386",
+        "filename": "Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+        "sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+        "bytes": 5946648928,
+        "local_dir": "ternary-bonsai-2-27b-b072e1d",
+        "architecture": "qwen35 (Hugging Face GGUF metadata)",
+        "license": "Apache-2.0 (model card and LICENSE); base Qwen/Qwen3.8-27B",
+        "released": "repository created 2026-09-16; this revision last modified 2026-09-25"
+      },
+      "file_choice": "PTQ1_0 rather than PQ2_0: the card's RTX 4090 row gives PTQ1_0 the faster decode (91.1 against 81.2 tokens/s, tg128) and the smaller file (5.95 against 7.21 GB). Both need the same kernels.",
+      "profile": {
+        "gpu_layers": null,
+        "draft": null,
+        "summary": "Not run."
+      },
+      "support_evidence": [
+        "The b11146 type-name table (ggml/src/ggml.c at 7fe450e and the installed libggml-base.so.0.25.1) has no ptq1_0 or pq2_0.",
+        "The pinned model card and KNOWN_ISSUES.md: stock llama.cpp rejects PQ2_0 and PTQ1_0 as unknown types; only the PrismML-Eng/llama.cpp fork runs them."
+      ],
+      "load_check": "Not run: not downloaded, because the pinned runtime cannot represent the tensor type.",
+      "reopen_condition": "A pinned, attested PrismML-Eng/llama.cpp release, or mainline support for PTQ1_0, under a new frozen plan with its own runtime pin.",
+      "estimated_device_mib": null,
+      "admission_free_mib": null
+    },
+    {
+      "id": "M",
+      "role": "model_candidate",
+      "support_status": "runnable",
+      "runtime": {
+        "tag": "b11146",
+        "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b"
+      },
+      "model": {
+        "repository": "ggml-org/MiMo-V2.6-Distill-Qwen-9B-GGUF",
+        "revision": "81baddc39bc48924a88e87b8d31aceb03058e559",
+        "filename": "MiMo-V2.6-Distill-Qwen-9B-Q8_0.gguf",
+        "sha256": "de6dae10334e088876358ef9f574835bb3b401ea2ecf5d6a9473f37894df6b73",
+        "bytes": 9527498048,
+        "local_dir": "mimo-v2.6-distill-qwen-9b-81baddc",
+        "architecture": "qwen35 (Hugging Face GGUF metadata), the production architecture",
+        "license": "MIT (model card); base XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B is MIT at 2367e865d009c13ac81713a2878291d33ab28177, distilled onto Qwen/Qwen3.5-9B (Apache-2.0)",
+        "released": "repository created 2026-09-21; this revision last modified 2026-09-22",
+        "conversion": "ggml-org/convert automatic conversion; its .src_sha names primary revision 2367e865d009c13ac81713a2878291d33ab28177"
+      },
+      "file_choice": "Q8_0 is the only language-model quant in the official ggml-org repository; Q4_K_M exists only in third-party repositories. Q8_0 is near-lossless and its 9,086 MiB fit entirely on the GPU within the 16,384 MiB admission floor.",
+      "profile": {
+        "gpu_layers": 99,
+        "draft": null,
+        "summary": "Every layer on the GPU."
+      },
+      "estimated_device_mib": 9728,
+      "estimate_basis": "The 9,086 MiB file less the CPU-resident token embedding, plus about 1.3 GiB for state, buffers and context.",
+      "admission_free_mib": 16384,
+      "template_check": "The GGUF chat template (Hugging Face metadata) emits an empty think block when enable_thinking is false."
+    },
+    {
+      "id": "X",
+      "role": "model_candidate",
+      "support_status": "runtime_unsupported",
+      "runtime": {
+        "tag": "b11146",
+        "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b"
+      },
+      "model": {
+        "repository": "XingChen-AGI/Xing4.0-29B-A4B-GGUF",
+        "revision": "b8cd0a75f3d3dfa992bd8423ee22041b987eaf44",
+        "filename": "xing4_0-29b-IQ4_NL.gguf",
+        "sha256": "9c9c81cf83b6ce974d3440088318de83b727c0064124ca6c3c919289adadb4dd",
+        "bytes": 20104012544,
+        "local_dir": "xing4.0-29b-a4b-b8cd0a7",
+        "architecture": "xing4_0 (Hugging Face GGUF metadata)",
+        "license": "Apache-2.0 (model card); base XingChen-AGI/Xing4.0-29B-A4B is Apache-2.0 at baae3c3e813cad5f888f1f485cfff659c89076c5",
+        "released": "repository created 2026-09-16; this revision last modified 2026-09-20"
+      },
+      "file_choice": "The repository's only GGUF (IQ4_NL).",
+      "profile": {
+        "gpu_layers": null,
+        "draft": null,
+        "summary": "Not run."
+      },
+      "support_evidence": [
+        "src/llama-arch.cpp at 7fe450e has no xing4_0 architecture name.",
+        "The publisher's llama.cpp guide (XingChen-AGI/Xing4.0-29B-A4B, tutorial/llama.cpp/README_EN.md) builds a separate xing4_0-port branch or ships a Windows build; neither is mainline b11146."
+      ],
+      "load_check": "Not run: not downloaded, because the pinned runtime has no loader for the architecture.",
+      "reopen_condition": "Mainline llama.cpp support for xing4_0 in a pinned release, under a new frozen plan.",
+      "estimated_device_mib": null,
+      "admission_free_mib": null
+    }
+  ],
+  "not_arms": [
+    {
+      "name": "Qwen3.8-Flash-Next",
+      "status": "resource_infeasible",
+      "repository": "unsloth/Qwen3.8-Flash-Next-GGUF",
+      "revision": "38bb39ee97821de2c9009abb7e93950eec396e66",
+      "parameters": 176943899520,
+      "architecture": "qwen4exp",
+      "license": "qwen-community-1.0 (other)",
+      "smallest_4bit_gguf": {
+        "quant": "UD-IQ4_XS",
+        "bytes": 93682584224
+      },
+      "q4_k_xl_gguf": {
+        "quant": "UD-Q4_K_XL",
+        "bytes": 111334654784
+      },
+      "smallest_gguf": {
+        "quant": "UD-IQ1_S",
+        "bytes": 72546461344
+      },
+      "reason": "The smallest 4-bit file (93.7 GB) exceeds the 77.6 GB of available WSL memory (74,027 MiB, shared with the Polaris distribution) plus what the 24 GiB GPU can hold beside the other services and the 3 GiB reserve; UD-Q4_K_XL (111.3 GB) exceeds WSL's total memory (104,613 MiB). Serving would page weights from disk. Not an arm."
+    }
+  ],
+  "downloads": [
+    {
+      "arm": "C2",
+      "command": "hf download unsloth/Qwen3.8-27B-GGUF MTP/mtp-Qwen3.8-27B-Q4_0.gguf --revision 4ca720788d1e01f1bff70c033e0d0028fd02e502 --local-dir \"$MODELS_DIR/qwen3.8-27b-4ca7207\""
+    },
+    {
+      "arm": "M",
+      "command": "hf download ggml-org/MiMo-V2.6-Distill-Qwen-9B-GGUF MiMo-V2.6-Distill-Qwen-9B-Q8_0.gguf --revision 81baddc39bc48924a88e87b8d31aceb03058e559 --local-dir \"$MODELS_DIR/mimo-v2.6-distill-qwen-9b-81baddc\""
+    }
+  ],
+  "task": {
+    "id": "sec-8k-item-extraction-20200302",
+    "description": "Predict the Form 8-K item codes a filing declares, from the text of its primary document.",
+    "cohort": {
+      "day": "2020-03-02",
+      "index_url": "https://www.sec.gov/Archives/edgar/daily-index/2020/QTR1/master.20200302.idx",
+      "index_sha256": "5865f91e3d68590389b08760ea256fbaa1693fbc1b0e1350142fc3634a9c3383",
+      "index_bytes": 630238,
+      "rows": 371,
+      "accessions": 360,
+      "rows_8k": 362,
+      "rows_8ka": 9,
+      "anchor": "blueprints/us-equities/catalyst-dataset/README.md (accepted run native-format-confirmed-20260919)"
+    },
+    "unit": "One accession. Co-filers share one filing and one label set, so n is at most 360.",
+    "acquisition": {
+      "runtime": "catalyst-provenance SDK Python with EdgarTools 5.58.0 (the version is checked)",
+      "edgartools": "5.58.0",
+      "http": "EdgarTools get_with_retry with the contact as its User-Agent (EDGAR_IDENTITY in the process only) and a private per-run cache (EDGAR_LOCAL_DATA_DIR)",
+      "max_requests_per_second": 5,
+      "rate_control": "EDGAR_RATE_LIMIT_PER_SEC=5 before import, plus a local pacer that starts at most five requests per second",
+      "automatic_retries": 0,
+      "requests": "one daily index, then per accession its .hdr.sgml header (labels) and full submission .txt (document)",
+      "stop_on": [
+        "http_403",
+        "http_429",
+        "more than 36 failed accessions (failure_budget_exhausted)"
+      ],
+      "contact": "Read from the file named by the SEC_CONTACT_ENV pointer (--env-file); owner-only regular file; never printed, stored or hashed into outputs",
+      "retention": "~/.local/state/native-agent-stack/local-inference-latest-20260926/sec/<run-id>/ (0700 directories, 0600 files); manifest.json lists SHA-256, bytes and first observation per file",
+      "max_acquisition_failures": 36,
+      "complete_when": "the index hash and cohort counts match, no refusal stopped the run, at most 36 acquisition failures, and at least one eligible filing"
+    },
+    "labels": {
+      "source": "FilingHeader.parse_from_sgml_text(<.hdr.sgml text>).filing_metadata['ITEMS'], split on commas",
+      "format": "unique codes matching ^[1-9]\\.[0-9]{2}$, sorted",
+      "caveat": "Filer-declared header metadata: not hand-checked and not frontier-model labels."
+    },
+    "input": {
+      "document": "The first SGML <DOCUMENT> after </SEC-HEADER> whose <TYPE> equals the filing's form (8-K or 8-K/A).",
+      "header": "The whole <SEC-HEADER> block is dropped, including its ITEM INFORMATION lines, which would reveal the labels.",
+      "html": "Tags removed with html.parser; script, style, head, title and ix:header content dropped; block tags become line breaks; plain-text documents lose <PAGE> lines.",
+      "whitespace": "Zero-width characters removed; each line collapsed to single spaces; empty lines dropped.",
+      "head_chars": 12000,
+      "tail_chars": 4000,
+      "marker": "\n[...]\n",
+      "cap_rule": "A normalized text longer than 16,000 characters keeps its first 12,000 and last 4,000 characters joined by the marker.",
+      "cap_justification": "C0 has one 8,192-token slot. The frozen prompt is 2,470 characters without the filing (about 700 tokens with the chat template, estimated at 3.5 characters per token) and the output cap is 256 tokens, which leaves about 7,200 tokens. 16,000 characters overflow only below about 2.2 characters per token; English SEC prose runs near 4 with Qwen-family tokenizers and dense numeric tables near 3. The last 4,000 characters keep the closing items (usually 9.01) and the signature block of long documents. A request the server still rejects for length is scored as an invalid output, not excluded."
+    },
+    "exclusions": [
+      {
+        "reason": "acquisition_failure",
+        "definition": "The header or submission request failed, was refused, exceeded its size cap or was not attempted after a refusal stop; or the bytes failed the native header parser, the repository's strict header identity and acceptance check, or the submission identity check; or ITEMS were malformed or repeated."
+      },
+      {
+        "reason": "empty_primary_document",
+        "definition": "No document of the filing's form type, or its normalized text is empty."
+      },
+      {
+        "reason": "zero_declared_items",
+        "definition": "The native header declares no ITEMS."
+      }
+    ],
+    "exclusion_order": "The first matching reason in the listed order; every accession gets at most one.",
+    "n": "Every eligible accession of the frozen cohort; all runnable arms score exactly the same filings."
+  },
+  "metrics": {
+    "per_filing": "precision tp/(tp+fp), 0 when nothing valid is predicted; recall tp/(tp+fn); F1 2tp/(2tp+fp+fn); exact match when the predicted set equals the declared set",
+    "micro_f1": "2*sum(tp)/(2*sum(tp)+sum(fp)+sum(fn)) over all eligible filings",
+    "macro_f1": "Mean per-code F1 over the codes declared by at least 5 eligible filings; the code set comes from the labels and is the same for every arm",
+    "json_valid_rate": "Share of eligible filings whose whole reply is exactly one JSON object {\"items\": [...]} of unique code strings",
+    "fenced_json": "A reply wrapped in one markdown code fence is scored for F1 but does not count as JSON-valid",
+    "invalid_output": "Unparseable, wrong schema, server error or not attempted: the predicted set is empty",
+    "decode_tokens_per_second": "timings.predicted_per_second per filing; the median over filings with an HTTP 200 reply and predicted_n >= 1",
+    "ttft_ms": "timings.prompt_ms, the prompt processing time before the first generated token",
+    "cold_load_seconds": "From starting the server process to its first /health 200",
+    "peak_device_memory": "The largest whole-device memory.used in the 1 Hz nvidia-smi samples while the arm's server runs; shared-device observation, not per-process attribution"
+  },
+  "decision_rule": {
+    "text": "An arm replaces C0 as the production generation model only if (1) the paired bootstrap (10,000 resamples, seed 20260926) 95% lower bound of micro-F1(arm) - micro-F1(C0) is at least -0.02, (2) its median decode tokens/s exceeds C0's, (3) its JSON-valid rate is at least 0.98, and (4) it had no memory or deadline failure. Inference speed alone does not pass. C1 or C2 passing means keep the model and change only the serving profile.",
+    "noninferiority_margin": -0.02,
+    "json_valid_min": 0.98,
+    "bootstrap": {
+      "resamples": 10000,
+      "seed": 20260926,
+      "alpha": 0.05,
+      "method": "Paired percentile bootstrap over filings in accession order: each resample is random.Random(20260926).choices over the filing indices, applied to both arms; micro-F1 is recomputed for each.",
+      "lower_bound": "Nearest-rank 2.5th percentile: the 250th smallest of the 10,000 differences."
+    },
+    "failure_free": "No guard event (device reserve, monitor failure, memory limit not verified, startup failure or deadline), no request or arm deadline, no server exit or unavailability, and both the window record and the evaluation completed",
+    "control_validity": "If C0 is not evaluated or has any failure, no arm replaces it and the result is inconclusive.",
+    "selection": "Among passing arms the highest median decode tokens/s is selected; ties go to the higher micro-F1, then to plan order.",
+    "outcomes": {
+      "C1": "change_serving_profile",
+      "C2": "change_serving_profile",
+      "M": "replace_model"
+    }
+  },
+  "window": {
+    "coordination_line": "GPU trials: TRIALS DONE",
+    "coordination_rule": "window.sh refuses to start unless README.md contains that exact line; another session owns GPU trials until it is recorded.",
+    "production_unit": "nativestack-generation.service",
+    "production_health": "http://127.0.0.1:18232/health",
+    "untouched": "native-stack-embeddings.service and every other unit, Windows applications and WSL distributions (never wsl --terminate or --shutdown; never the Polaris distribution)",
+    "admission_floor_mib": 16384,
+    "minimum_free_mib": 3072,
+    "admission_rule": "Whole-device memory.free >= max(16384, estimated_device_mib + 3072) MiB immediately before load, else the arm is recorded as admission-refused.",
+    "guard": "nvidia-smi whole-device memory.free every second; below 3,072 MiB only the arm's own scope is stopped.",
+    "memory_max": "20G",
+    "memory_swap_max": "0",
+    "isolation": "systemd-run --user --scope with MemoryMax and MemorySwapMax, verified through systemctl show before the arm counts",
+    "window_seconds": 10800,
+    "arm_seconds": 9000,
+    "startup_seconds": 300,
+    "request_seconds": 180,
+    "restore_reserve_seconds": 900,
+    "suggested_windows": [
+      [
+        "C0"
+      ],
+      [
+        "C1",
+        "C2",
+        "M"
+      ]
+    ],
+    "retention": "~/.local/state/native-agent-stack/local-inference-latest-20260926/runs/<window>/ holds private server logs and raw replies; window-summary.json, window.json, memory.csv, eval/metrics.json and the analysis output carry no document text."
+  },
+  "failure_rule": "Retain every refused, failed and stopped attempt. No silent retry, no changed profile and no re-run to improve a result. A guard, host-memory, startup or deadline failure ends that arm and fails criterion (4). Changing any frozen value needs a new plan.",
+  "claims_excluded": [
+    "frontier-model parity",
+    "hand-checked or frontier-label accuracy",
+    "the catalyst-extraction acceptance gate in catalogs/us-equities/local-model-workloads-20260924.json",
+    "reopening any skip_not_local decision",
+    "historical point-in-time availability",
+    "catalyst, incentive or trading-signal value of item codes",
+    "thinking-mode, long-context or general quality",
+    "isolated benchmark throughput on an unshared device",
+    "token or cost savings",
+    "any result for arms B or X"
+  ],
+  "prompt_sha256": "faf9273a6807e982154667a8654ec2cff637cf57c8d85c34093e615876ae1d58",
+  "frozen_inputs": {
+    "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py": "e17c6ba368febff43f22f57f3bbc6a841eb64b3b29cb2f9d7de3582cb8c4d200",
+    "blueprints/convergence-practice/local-inference-latest-20260926/analyze.py": "ea6e0ee157c451c636c36ca28bf0b3e46b30d017f5af0a8ceb6eadf992be46e6",
+    "blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py": "40699cd89bcfa2703c57b3f65caf49bfd6fad8f29807890502208ab41a1b0b61",
+    "blueprints/convergence-practice/local-inference-latest-20260926/prompt.txt": "faf9273a6807e982154667a8654ec2cff637cf57c8d85c34093e615876ae1d58",
+    "blueprints/convergence-practice/local-inference-latest-20260926/window.sh": "71c73ce3edd9916d497e00724d1863de443a955121769547e5542c6c1c525b62",
+    "blueprints/us-equities/catalyst-provenance/catalyst.py": "26a85df727df99a67c800be1c1ed792eec05ec488f65186ac179acb9b1acd13e",
+    "scripts/path_safety.py": "228edf3968176c04c557078c59502b2d90141e000e1acf2917e87cc67316e703"
+  }
+}
