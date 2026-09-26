@@ -20,7 +20,7 @@ Each winner shows, for linux-wsl2-x86_64 / macos-arm64, its `e2e_state` and host
 
 | Layer | Independent review | Winners: e2e_state [receipts] (linux-wsl2-x86_64 / macos-arm64) |
 | --- | --- | --- |
-| `foundation/agent-sdks` | dual_lane_same_winner | codex (host_verified [8/0/4/0] dissented 3 / untested [0/0/0/0]) |
+| `foundation/agent-sdks` | dual_lane_same_winner | codex (host_verified [8/0/5/0] dissented 3 / untested [0/0/0/0]) |
 | `foundation/ci-supply-chain` | dual_lane_same_winner | zizmor (host_verified [2/0/2/0] / untested [0/0/0/0]); syft (host_verified [2/0/2/0] / untested [0/0/0/0]); candidate:actions-attest (accepted [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/code-navigation` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-code-navigation-20260922.json`) | serena (host_verified [3/0/2/0] dissented 1 / untested [0/0/0/0]) |
 | `foundation/document-retrieval` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-document-retrieval-20260922.json`) | qmd (host_verified [2/0/2/0] / untested [1/0/0/0]); markitdown (host_verified [2/0/2/0] / untested [0/0/0/0]); poppler (host_verified [4/0/3/0] dissented 1 / untested [0/0/0/0]) |
@@ -30,7 +30,7 @@ Each winner shows, for linux-wsl2-x86_64 / macos-arm64, its `e2e_state` and host
 | `foundation/instructions-skills` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-instructions-skills-20260922.json`) | affaan-m/ECC (conditional [2/0/1/0] dissented 1 / untested [0/0/0/0]); candidate:typesafe-ai-skills (conditional [0/0/0/0] / untested [0/0/0/0]); candidate:openai-skills (conditional [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/isolation` | dual_lane_same_winner | worktrunk (host_verified [2/0/2/0] / host_verified [1/0/1/0]); sandbox-runtime (host_verified [1/0/1/0] / untested [0/0/0/0]) |
 | `foundation/mcp-surfaces` | dual_lane_same_winner | mcporter (host_verified [6/0/2/0] dissented 4 / untested [0/0/0/0]); mcp-inspector (host_verified [2/0/1/0] dissented 1 / untested [0/0/0/0]) |
-| `foundation/native-clients` | dual_lane_same_winner | claude-code (accepted [1/0/1/0] / untested [0/0/0/0]); codex (host_verified [8/0/4/0] dissented 3 / untested [0/0/0/0]) |
+| `foundation/native-clients` | dual_lane_same_winner | claude-code (accepted [1/0/1/0] / untested [0/0/0/0]); codex (host_verified [8/0/5/0] dissented 3 / untested [0/0/0/0]) |
 | `foundation/observation-inference` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-observation-inference-20260922.json`) | opentelemetry-collector-contrib (host_verified [2/0/2/0] / untested [0/0/0/0]); prometheus (host_verified [2/0/2/0] / untested [0/0/0/0]); loki (host_verified [2/0/2/0] / untested [0/0/0/0]) |
 | `foundation/quality-evaluation` | dual_lane_same_winner | promptfoo (host_verified [6/0/2/0] dissented 4 / untested [0/0/0/0]); playwright-test (conditional [0/0/0/0] / untested [1/0/0/0] dissented 1) |
 | `foundation/recovery-portability` | dual_lane_same_winner | restic (host_verified [3/0/3/0] / untested [1/0/0/0]); candidate:astral-sh-uv (conditional [0/0/0/0] / untested [0/0/0/0]) |
