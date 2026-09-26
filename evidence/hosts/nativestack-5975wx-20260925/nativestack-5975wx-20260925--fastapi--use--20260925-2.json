@@ -73,6 +73,16 @@
         "identity_sha256": "a90718ea66d62d8044adb44ee9593c75a88ff91c19671770f1f96bc1a8be7a73",
         "model": "claude-sonnet-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session (claude-opus-5-5); adequacy-checked points 3 and 4 against the receipt JSON, plus a live check of the cleanup. Defects confirmed. (1) Cleanup runs 'fuser -k -TERM \"$PORT\"/tcp', which signals every process holding that port, not only the server the command started; in the not-ready branch the port can belong to another process. Live: a separately started Python listener on a free loopback port was terminated by exactly that fuser form (rc 0). (2) The claim says 'Both pins match the stack and winner pins' and command 1 prints that both pins match manifests/stack.json and the landscape winner pin, but command 1 compares only fastapi's stack and winner pins; manifests/stack.json and catalogs/landscape have no uvicorn entry or winner pin at all, so the Uvicorn pin claim is unbacked (point 3). Successor: fastapi--use--20260926-2.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T10:22:36Z",
+      "reviewer": {
+        "identity_sha256": "e3e758a4ec14358c858079587aca14d44770aa531b79a646a6b6de49de90efdc",
+        "model": "claude-opus-5-5"
+      }
     }
   ],
   "supersedes": "nativestack-5975wx-20260925--fastapi--use--20260925"

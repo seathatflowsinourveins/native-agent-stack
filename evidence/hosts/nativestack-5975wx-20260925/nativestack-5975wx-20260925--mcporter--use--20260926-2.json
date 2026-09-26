@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--mcporter--use--20260926-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "5c1961e49b89dd56ef5626950a5448735caabe4c",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "mcporter",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "P=\"$HOME/.local/share/codex-ecosystem/tools/mcporter-0.13.13\"\nT=\"$HOME/.local/share/codex-ecosystem/downloads/mcporter-0.13.13.tgz\"\nv=$(\"$P/bin/mcporter\" --version) || { echo \"MCPORTER_INSTALL_FAIL: retained 0.13.13 launcher did not run\"; exit 1; }\ndv=$(mcporter --version) || { echo \"MCPORTER_INSTALL_FAIL: default mcporter did not run\"; exit 1; }\npython3 - \"$v\" \"$dv\" \"$P\" \"$T\" <<'PY'\nimport glob, hashlib, io, json, subprocess, sys, tarfile\nsys.path.insert(0, 'scripts')\nfrom host_receipts import pin_matches\nv, default_v, prefix, tgz = sys.argv[1:5]\nwinner = sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers', []) for w in (l.get('winners') or []) if w.get('component_id') == 'mcporter'})\nstack = [c['version'] for c in json.load(open('manifests/stack.json'))['components'] if c['id'] == 'mcporter']\nadoption_now = [t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id'] == 'mcporter']\nbefore = json.loads(subprocess.run(['git', 'show', 'ff20470b8fc00fee288916f309123586b15668ec^:adoption/pins-linux-x86_64.json'], capture_output=True, text=True, check=True).stdout)\nold = [t for t in before['tools'] if t['id'] == 'mcporter'][0]\ndata = open(tgz, 'rb').read()\ntar_sha = hashlib.sha256(data).hexdigest()\nmember = tarfile.open(fileobj=io.BytesIO(data)).extractfile('package/package.json').read()\ninstalled = open(prefix + '/lib/node_modules/mcporter/package.json', 'rb').read()\nls = subprocess.run(['npm', 'ls', '--global', '--prefix', prefix, '--depth=0'], capture_output=True, text=True, timeout=30).stdout\nbound = bool(winner) and all(pin_matches(v, p) for p in winner)\nsource_ok = old['version'] == v and tar_sha == old['sha256'] and member == installed and ('mcporter@' + v) in ls\nprint('MCPORTER_INSTALL_' + ('OK' if bound and source_ok else 'FAIL'), '| ran', v, '(tools/mcporter-0.13.13) | winner pins', winner, 'pin_matches:', bound, '| default mcporter on PATH:', default_v, '| manifests/stack.json', stack, '| adoption pin now', adoption_now)\nprint('install source: downloads/mcporter-0.13.13.tgz sha256 == pre-#307 (ff20470b^) adoption pin', old['version'] + ':', tar_sha == old['sha256'], '| its package/package.json == installed:', member == installed, '| npm ls:', ls.strip().splitlines()[-1].strip())\nprint('tarball sha256', tar_sha)\nsys.exit(0 if bound and source_ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 0.527,
+      "output_sha256": "553a6307279c8698359433e59c1c91a7438836512be0d20a5574ce1f8619c075",
+      "output_excerpt": "MCPORTER_INSTALL_OK | ran 0.13.13 (tools/mcporter-0.13.13) | winner pins ['0.13.13'] pin_matches: True | default mcporter on PATH: 0.14.1 | manifests/stack.json ['0.14.1'] | adoption pin now ['0.14.1']\ninstall source: downloads/mcporter-0.13.13.tgz sha256 == pre-#307 (ff20470b^) adoption pin 0.13.13: True | its package/package.json == installed: True | npm ls: \u2514\u2500\u2500 mcporter@0.13.13\ntarball sha256 c"
+    },
+    {
+      "cmd": "T=\"$HOME/.local/share/codex-ecosystem/downloads/qmd-2.8.3.tgz\"\nv=$(qmd --version) || { echo \"QMD_FAIL: qmd --version did not run\"; exit 1; }\npython3 - \"$v\" \"$T\" <<'PY'\nimport hashlib, json, sys\nv, tgz = sys.argv[1:3]\npin = [t for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id'] == 'qmd'][0]\ntar_sha = hashlib.sha256(open(tgz, 'rb').read()).hexdigest()\nok = v.split()[:2] == ['qmd', pin['version']] and tar_sha == pin['sha256']\nprint('QMD_' + ('OK' if ok else 'FAIL'), '| qmd --version:', v, '| adoption pin', pin['version'], '| downloads/qmd-2.8.3.tgz sha256 equals the pin sha256:', tar_sha == pin['sha256'])\nsys.exit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 0.156,
+      "output_sha256": "4387ae602d3db74fdae81f702d2dcb02b6db0dd92294472e844920b80ff2047b",
+      "output_excerpt": "QMD_OK | qmd --version: qmd 2.8.3 (facd35e) | adoption pin 2.8.3 | downloads/qmd-2.8.3.tgz sha256 equals the pin sha256: True\n"
+    },
+    {
+      "cmd": "d=$(mktemp -d) || exit 1\ntrap 'rm -rf \"$d\"' EXIT\nmkdir -p \"$d/fakehome\" \"$d/fixture\"\nprintf '%s\\n' '{\"mcpServers\":{},\"imports\":[]}' > \"$d/mcporter.json\"\nprintf '%s\\n' '{\"mcpServers\":{\"nsrenvcanary\":{\"command\":\"false\"}},\"imports\":[]}' > \"$d/canary.json\"\ncat > \"$d/fixture/zqxjv-note.md\" <<'FIXTURE_EOF'\n# zqxjv fixture note\n\nThe unique token nsrqmdfixture42 appears exactly once in this corpus.\nFIXTURE_EOF\ncat > \"$d/run.sh\" <<'RUN_EOF'\nd=$1\nw=$2\nM=\"$HOME/.local/share/codex-ecosystem/tools/mcporter-0.13.13/bin/mcporter\"\nrun() { env -i PATH=\"$PATH\" HOME=\"$d/fakehome\" LANG=C.UTF-8 \"$@\"; }\nrun timeout 15 qmd collection add \"$d/fixture\" > \"$d/add.out\" 2>&1 || { echo \"MCPORTER_BRIDGE_FAIL: qmd collection add failed\"; exit 1; }\nrun timeout 20 \"$M\" --config \"$d/mcporter.json\" config list > \"$d/config.out\" 2>&1; cec=$?\nrun timeout 20 \"$M\" --config \"$d/mcporter.json\" list --stdio qmd --stdio-arg mcp --env \"HOME=$d/fakehome\" --cwd \"$w\" --name qmdtest --json --no-oauth > \"$d/list.json\" 2> \"$d/list.err\"; lec=$?\nrun timeout 20 \"$M\" --config \"$d/mcporter.json\" call --stdio qmd --stdio-arg mcp --env \"HOME=$d/fakehome\" --cwd \"$w\" --name qmdtest --no-oauth --output json query --args '{\"searches\":[{\"type\":\"lex\",\"query\":\"nsrqmdfixture42\"}],\"rerank\":false}' > \"$d/hit.json\" 2> \"$d/hit.err\"; hec=$?\nrun timeout 20 \"$M\" --config \"$d/mcporter.json\" call --stdio qmd --stdio-arg mcp --env \"HOME=$d/fakehome\" --cwd \"$w\" --name qmdtest --no-oauth --output json query --args '{\"searches\":[{\"type\":\"lex\",\"query\":\"zzzqnonexistentbogus99\"}],\"rerank\":false}' > \"$d/miss.json\" 2> \"$d/miss.err\"; mec=$?\npython3 - \"$d\" \"$cec\" \"$lec\" \"$hec\" \"$mec\" <<'PY'\nimport json, os, sys\nd, cec, lec, hec, mec = sys.argv[1], *map(int, sys.argv[2:6])\nconfig = open(d + '/config.out').read()\nselected = [line.replace(d, '<tmp>') for line in config.splitlines() if line.startswith('Selected config:')]\nisolated = cec == 0 and selected == ['Selected config: <tmp>/mcporter.json'] and 'No local servers' in config\ninherited = os.environ.get('MCPORTER_CONFIG', '').replace(d, '<tmp>')\nL = json.load(open(d + '/list.json'))\nH = json.load(open(d + '/hit.json'))\nM = json.load(open(d + '/miss.json'))\nnames = sorted(t['name'] for t in L['tools'])\nhfiles = [r['file'] for r in H['results']]\nhit_tok = any('nsrqmdfixture42' in (r.get('snippet') or '') for r in H['results'])\nok = (isolated and lec == hec == mec == 0 and names == ['get', 'multi_get', 'query', 'status'] and L['status'] == 'ok'\n      and hfiles == ['fixture/zqxjv-note.md'] and hit_tok and len(M['results']) == 0)\nprint('MCPORTER_BRIDGE_' + ('OK' if ok else 'FAIL'), '| list/hit/miss exit', lec, hec, mec, '| tools', names, 'status', L['status'], '| hit ->', hfiles, 'token in snippet:', hit_tok, '| miss -> results:', len(M['results']))\nprint('config isolation in this run: inherited MCPORTER_CONFIG =', inherited, '(canary, dropped by env -i) |', '; '.join(selected), '| no servers configured:', 'No local servers' in config)\nsys.exit(0 if ok else 1)\nPY\nRUN_EOF\nMCPORTER_CONFIG=\"$d/canary.json\" timeout 90 bwrap --unshare-net --die-with-parent --ro-bind / / --bind /tmp /tmp --dev /dev --proc /proc /bin/sh \"$d/run.sh\" \"$d\" \"$PWD\"",
+      "exit": 0,
+      "duration_s": 2.732,
+      "output_sha256": "100a1778dd74862e8f12d27e442f66ee2d8cf0a47c3871bfbf815b21dac34e54",
+      "output_excerpt": "MCPORTER_BRIDGE_OK | list/hit/miss exit 0 0 0 | tools ['get', 'multi_get', 'query', 'status'] status ok | hit -> ['fixture/zqxjv-note.md'] token in snippet: True | miss -> results: 0\nconfig isolation in this run: inherited MCPORTER_CONFIG = <tmp>/canary.json (canary, dropped by env -i) | Selected config: <tmp>/mcporter.json | no servers configured: True\n"
+    },
+    {
+      "cmd": "d=$(mktemp -d) || exit 1\ntrap 'rm -rf \"$d\"' EXIT\nmkdir -p \"$d/fakehome\"\nprintf '%s\\n' '{\"mcpServers\":{},\"imports\":[]}' > \"$d/mcporter.json\"\nM=\"$HOME/.local/share/codex-ecosystem/tools/mcporter-0.13.13/bin/mcporter\"\ntimeout 30 bwrap --unshare-net --die-with-parent --ro-bind / / --bind /tmp /tmp --dev /dev --proc /proc env -i PATH=\"$PATH\" HOME=\"$d/fakehome\" LANG=C.UTF-8 timeout 20 \"$M\" --config \"$d/mcporter.json\" call --stdio qmd --stdio-arg mcp --env \"HOME=$d/fakehome\" --name qmdtest --no-oauth --output json nsr_no_such_tool_zqxjv --args '{}' > \"$d/out.txt\" 2>&1\nec=$?\npython3 - \"$d/out.txt\" \"$ec\" <<'PY'\nimport json, sys\nraw = open(sys.argv[1]).read()\nec = int(sys.argv[2])\nstart = raw.find('{')\nobj = json.JSONDecoder().raw_decode(raw[start:])[0] if start >= 0 else {}\nok = ec == 1 and obj.get('tool') == 'nsr_no_such_tool_zqxjv' and 'not found' in str(obj.get('error', '')).lower()\nprint('MCPORTER_UNKNOWN_TOOL_CONTROL_' + ('OK' if ok else 'FAIL'), '| call exit', ec, '| error:', obj.get('error'))\nsys.exit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 0.808,
+      "output_sha256": "f819b2f6cfebf221142abe286e2b98e3ee1b924f6ee9240db1120f984adac867",
+      "output_excerpt": "MCPORTER_UNKNOWN_TOOL_CONTROL_OK | call exit 1 | error: Tool nsr_no_such_tool_zqxjv not found\n"
+    },
+    {
+      "cmd": "d=$(mktemp -d) || exit 1\ntrap 'rm -rf \"$d\"' EXIT\nM=\"$HOME/.local/share/codex-ecosystem/tools/mcporter-0.13.13/bin/mcporter\"\nmkdir -p \"$d/fakehome/.mcporter\"\nprintf '%s\\n' '{\"mcpServers\":{},\"imports\":[]}' > \"$d/mcporter.json\"\nprintf '%s\\n' '{\"mcpServers\":{\"nsrhomecanary\":{\"command\":\"false\"}},\"imports\":[]}' > \"$d/fakehome/.mcporter/mcporter.json\"\nprintf '%s\\n' '{\"mcpServers\":{\"nsrenvcanary\":{\"command\":\"false\"}},\"imports\":[]}' > \"$d/canary.json\"\nB=\"timeout 30 bwrap --unshare-net --die-with-parent --ro-bind / / --bind /tmp /tmp --dev /dev --proc /proc\"\n$B env -u MCPORTER_CONFIG HOME=\"$d/fakehome\" timeout 20 \"$M\" config list --json > \"$d/a1.json\" 2>&1; a1=$?\nMCPORTER_CONFIG=\"$d/canary.json\" $B env HOME=\"$d/fakehome\" timeout 20 \"$M\" config list --json > \"$d/a2.json\" 2>&1; a2=$?\nMCPORTER_CONFIG=\"$d/canary.json\" $B env -i PATH=\"$PATH\" HOME=\"$d/fakehome\" LANG=C.UTF-8 timeout 20 \"$M\" --config \"$d/mcporter.json\" config list --json > \"$d/b.json\" 2>&1; b=$?\npython3 - \"$d\" \"$a1\" \"$a2\" \"$b\" <<'PY'\nimport json, sys\nd = sys.argv[1]\na1, a2, b = map(int, sys.argv[2:5])\ndef names(name):\n    return sorted(s['name'] for s in json.load(open(d + '/' + name))['servers'])\nn1, n2, nb = names('a1.json'), names('a2.json'), names('b.json')\nok = a1 == a2 == b == 0 and n1 == ['nsrhomecanary'] and n2 == ['nsrenvcanary'] and nb == []\nprint('MCPORTER_CONFIG_ISOLATION_' + ('OK' if ok else 'FAIL'), '| uncontrolled, temporary HOME holding a canary ~/.mcporter/mcporter.json:', n1, '| uncontrolled, same HOME plus an inherited canary MCPORTER_CONFIG:', n2, '| controlled (env -i, --config empty temporary file) with both canaries present:', nb, '| exits', a1, a2, b)\nsys.exit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 0.647,
+      "output_sha256": "8f51c0c1518e54441c965fb2d8656cbf082298657ec8f444bb48d3ed4d4de6dc",
+      "output_excerpt": "MCPORTER_CONFIG_ISOLATION_OK | uncontrolled, temporary HOME holding a canary ~/.mcporter/mcporter.json: ['nsrhomecanary'] | uncontrolled, same HOME plus an inherited canary MCPORTER_CONFIG: ['nsrenvcanary'] | controlled (env -i, --config empty temporary file) with both canaries present: [] | exits 0 0 0\n"
+    }
+  ],
+  "tool_versions": {
+    "mcporter": "0.13.13"
+  },
+  "observed_at_utc": "2026-09-26T04:56:20Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), MCPorter 0.13.13, the mcp-surfaces winner, bridges a real MCP server under an explicit, empty MCPorter configuration. The run uses this host's retained tools/mcporter-0.13.13 install by its full path, because the default mcporter on PATH reports 0.14.1, the version that manifests/stack.json and the current adoption pin name since #307. The bootstrap tarball's sha256 equals the adoption pin that preceded #307, its package/package.json is byte-identical to the installed one, npm ls reports mcporter@0.13.13, and the reported version matches the winner pin under host_receipts.pin_matches. qmd --version reports 2.8.3, and its retained tarball matches the adoption pin. In the bridge run and the nonexistent-tool control, with networking unshared, every MCPorter and QMD call runs under env -i with a temporary HOME, and MCPorter gets --config naming a temporary file {\"mcpServers\":{},\"imports\":[]}. The bridge run also exports a canary MCPORTER_CONFIG, and MCPorter reports the temporary file as its selected config, with no servers. It spawns a fresh QMD MCP stdio server over a one-file fixture collection, lists its tools (get, multi_get, query, status) and calls query twice with lexical search and rerank disabled. The fixture's unique token returns the fixture file with the token in its snippet, and an absent token returns 0 results. Calling a nonexistent tool exits 1 with a JSON error naming it (positive control). A configuration-isolation control shows the discriminating cases: without these controls, a canary ~/.mcporter/mcporter.json in the temporary HOME is loaded, and an inherited canary MCPORTER_CONFIG overrides that HOME; with them, neither canary is loaded. Every command exits 0 on its own assertions.",
+  "limitations": [
+    "Supersedes nativestack-5975wx-20260925--mcporter--use--20260926 (generation 1 of this date), which is kept. The independent review of that repair found that its limitation about the host's default mcporter (0.14.1) rested on command 1's third output line, which the retained excerpt (the first 400 characters of its output) does not include, and that the command's OK status did not depend on it. Command 1 now prints the default mcporter's version, the stack version and the current adoption pin in its status line; its checks are otherwise unchanged, and commands 2 to 5 are unchanged. Generation 1 also discloses a first recording that was discarded before publication.",
+    "Generation 1 replaced nativestack-5975wx-20260925--mcporter--use--20260925-3 as this host's latest MCPorter use receipt. The cross-family review of #277 found that -3's claim that a temporary HOME keeps host MCPorter configuration from loading was false, because an inherited MCPORTER_CONFIG overrides it (command 5 reproduces this). This receipt drops the inherited environment with env -i, selects an explicit empty temporary config with imports disabled, and retains the isolation control. record --supersedes links generations only within one date, so the 2026-09-25 receipts stay unchanged and keep counting in scripts/platform_status.py unless a reviewer records needs_changes on them.",
+    "The landscape winner pin stays 0.13.13 until a new verdict wave; this receipt says nothing about mcporter 0.14.1.",
+    "The bridged server uses a temporary lexical index; no production MCP server and no HTTP or OAuth transport is exercised. The fixture, canary configs and assertions are this receipt's own; the bridge and the QMD server are the installed upstream packages.",
+    "Install source: the bootstrap's pinned npm tarball (downloads/mcporter-0.13.13.tgz, sha256 equal to the adoption/pins-linux-x86_64.json pin at the parent of ff20470b) installed into ~/.local/share/codex-ecosystem/tools/mcporter-0.13.13 (command 1). Recorded by the workstation coordinator Claude Code session, through a repair worker that shares its session id, from a git worktree at published origin/main (the catalog_revision).",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T04:56:20Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session. Reproduce: Re-ran once in a throwaway cp -a copy of the worktree via host_receipts.run_command. All 5 commands exit 0 with output sha256 identical to the recorded ones. Adequacy: (1) mcp-surfaces role: MCPorter 0.13.13 spawns a real QMD 2.8.3 MCP stdio server, lists its tools (get, multi_get, query, status) and calls query (hit returns the fixture file with its token, miss returns 0), under env -i, --config naming an empty temp file, bwrap --unshare-net. (2) controls: nonexistent tool exits 1 naming it; isolation control shows the home canary loaded, the env canary overriding it, and neither under the controls; retained control 05 shows the bridge FAILs (exit 1) without env -i/--config. (3) backed: every claim is in the excerpts, including default mcporter 0.14.1 = stack = adoption pin in the status line, tarball sha256 = pre-#307 pin, package.json identical, npm ls. (4) bound: tool_versions 0.13.13 pin_matches the mcp-surfaces winner pin; LIM2 says 0.14.1 is not covered. Class native_proven correct: real bridge and real MCP server; the one-file corpus is only QMD input and is disclosed. Fail-closed (git show check=True; every exit asserted); sanitized; gitleaks clean.",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T06:15:13Z",
+      "reviewer": {
+        "identity_sha256": "f07a9dfbc09d23994b3810ea11bc96fd931f69f88b9e1b02d24261f4b8dcad04",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--mcporter--use--20260926"
+}

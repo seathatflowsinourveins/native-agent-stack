@@ -81,6 +81,16 @@
         "identity_sha256": "739ff768866f471b76d2597625e6fdcdc20a33829e1c3b6df3b3c8aa754cc057",
         "model": "claude-sonnet-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session, judged against GPT-6 finding 281-3. Reproduce: Re-ran once in a throwaway cp -a copy of the worktree via host_receipts.run_command. cmd1, cmd3 and cmd4 byte-identical output sha256; cmd2 same result (differs only in timing). Reproduction does not bear on the class. needs_changes (evidence class / point 3): docs/contributing-evidence.md section 2 defines local_integration as a run against this repository own fixtures or a synthetic stand-in, not the full real target. cmd3 runs this repository blueprints/us-equities/data/promotion_gate.py on its bundled four-row fixtures/good.csv, and cmd4 is an in-command SchemaError probe that calls the gate private helpers (_schema, _prepare, _load_frame) on a one-cell-corrupted copy. That is repository integration code over repository fixtures (\"Our integration\" in docs/acceptance-evidence-policy.md), yet the receipt is labelled native_proven and its claim says pandera \"gates real repository data\" on a \"real fixture\". LIM3 generic install-source sentence is also imprecise (281-6). The unchanged-upstream-test receipt data-pandera--use--20260926-2 (agreed in this review) replaces this evidence; this dissent stops this receipt from counting as a qualifying native_proven use pass.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T06:15:15Z",
+      "reviewer": {
+        "identity_sha256": "f07a9dfbc09d23994b3810ea11bc96fd931f69f88b9e1b02d24261f4b8dcad04",
+        "model": "claude-opus-5-5"
+      }
     }
   ]
 }

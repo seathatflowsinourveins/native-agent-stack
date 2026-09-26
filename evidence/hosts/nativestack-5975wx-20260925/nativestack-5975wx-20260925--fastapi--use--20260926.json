@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--fastapi--use--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "a74dd1b60ad5f055cee3e1489a490b7e6e6b056f",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "fastapi",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 - <<'PY'\nimport glob, hashlib, json, sys, tomllib, urllib.request\nstack = [x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id'] == 'fastapi']\nwinners = sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers', []) for w in (l.get('winners') or []) if w.get('component_id') == 'fastapi'})\nuvicorn_stack = [x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id'] == 'uvicorn']\nuvicorn_winners = sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers', []) for w in (l.get('winners') or []) if w.get('component_id') == 'uvicorn'})\nlock = tomllib.load(open('blueprints/convergence-practice/application-delivery/uv.lock', 'rb'))\npkgs = {p['name']: p for p in lock['package']}\nrows = []\nfor name in ('fastapi', 'uvicorn'):\n    p = pkgs[name]\n    wheel = p['wheels'][0]\n    want = wheel['hash'].removeprefix('sha256:')\n    got = hashlib.sha256(urllib.request.urlopen(wheel['url'], timeout=30).read()).hexdigest()\n    rows.append((name, p['version'], want, got))\nok = (stack == ['0.141.1'] and winners == ['0.141.1'] and rows[0][1] == '0.141.1' and rows[1][1] == '0.53.0'\n      and all(want == got for _n, _v, want, got in rows))\nprint('FASTAPI_PINS_' + ('OK' if ok else 'FAIL'), '| fastapi: manifests/stack.json', stack, 'landscape winner', winners, 'uv.lock', rows[0][1], '| uvicorn: uv.lock', rows[1][1], '(stack entries', uvicorn_stack, 'winner pins', uvicorn_winners, ') | locked wheel sha256 equals the downloaded wheel:', {n: want == got for n, _v, want, got in rows})\nfor name, version, want, got in rows:\n    print(name, version, 'uv.lock sha256', want, 'downloaded', got)\nsys.exit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 0.255,
+      "output_sha256": "76ca21c62d6fd17726aa8e1af119bc7b8aeab6ff2052e7b85de5b3b6fee0b0ef",
+      "output_excerpt": "FASTAPI_PINS_OK | fastapi: manifests/stack.json ['0.141.1'] landscape winner ['0.141.1'] uv.lock 0.141.1 | uvicorn: uv.lock 0.53.0 (stack entries [] winner pins [] ) | locked wheel sha256 equals the downloaded wheel: {'fastapi': True, 'uvicorn': True}\nfastapi 0.141.1 uv.lock sha256 bfb91aa2d334c61cb35ba9a116fc123b3d3df31640b801cf57a7a78ec3f603b3 downloaded bfb91aa2d334c61cb35ba9a116fc123b3d3df3164"
+    },
+    {
+      "cmd": "D=$(mktemp -d) || exit 1\nSPID=\nstop_server() {\n  [ -n \"$SPID\" ] || return 0\n  /bin/kill -TERM -- \"-$SPID\" 2>/dev/null\n  n=0\n  while [ \"$n\" -lt 50 ] && pgrep -g \"$SPID\" > /dev/null 2>&1; do n=$((n + 1)); sleep 0.1; done\n  kill_needed=0\n  if pgrep -g \"$SPID\" > /dev/null 2>&1; then kill_needed=1; /bin/kill -KILL -- \"-$SPID\" 2>/dev/null; sleep 0.2; fi\n  if pgrep -g \"$SPID\" > /dev/null 2>&1; then left=1; else left=0; fi\n  SPID=\n}\ntrap 'stop_server; rm -rf \"$D\"' EXIT\ncd blueprints/convergence-practice/application-delivery || exit 1\nUV_PROJECT_ENVIRONMENT=\"$D/venv\" timeout 300 uv sync --frozen --no-build > \"$D/sync.log\" 2>&1 || { echo \"FASTAPI_SERVE_FAIL: uv sync --frozen --no-build failed\"; tail -20 \"$D/sync.log\"; exit 1; }\nversions=$(\"$D/venv/bin/python\" -c \"import importlib.metadata as m; print(m.version('fastapi'), m.version('uvicorn'))\") || exit 1\nPORT=$(\"$D/venv/bin/python\" -c \"import socket\ns = socket.socket()\ns.bind(('127.0.0.1', 0))\nprint(s.getsockname()[1])\ns.close()\") || exit 1\nDATABASE_URL='postgresql://postgres@127.0.0.1:1/unused' PYTHONDONTWRITEBYTECODE=1 setsid \"$D/venv/bin/python\" -m uvicorn backend.app:app --host 127.0.0.1 --port \"$PORT\" > \"$D/server.log\" 2>&1 < /dev/null &\nSPID=$!\nPGID=$(ps -o pgid= -p \"$SPID\" | tr -d ' ')\n[ \"$PGID\" = \"$SPID\" ] || { echo \"FASTAPI_SERVE_FAIL: server pid $SPID is not its own process group leader (pgid $PGID)\"; exit 1; }\ni=0\nready=0\nwhile [ \"$i\" -lt 90 ]; do\n  if curl -fsS --max-time 3 -o \"$D/schema.json\" \"http://127.0.0.1:$PORT/openapi.json\" 2>/dev/null; then ready=1; break; fi\n  i=$((i + 1))\n  sleep 1\ndone\n[ \"$ready\" = \"1\" ] || { echo \"FASTAPI_SERVE_FAIL: server did not become ready\"; tail -20 \"$D/server.log\"; exit 1; }\ncode_empty=$(curl -s --max-time 5 -o \"$D/empty.json\" -w '%{http_code}' -X POST \"http://127.0.0.1:$PORT/runs\" -H 'content-type: application/json' -d '{\"title\": \"\"}')\ncode_extra=$(curl -s --max-time 5 -o \"$D/extra.json\" -w '%{http_code}' -X POST \"http://127.0.0.1:$PORT/runs\" -H 'content-type: application/json' -d '{\"title\": \"ok\", \"admin\": true}')\ncode_uuid=$(curl -s --max-time 5 -o \"$D/uuid.json\" -w '%{http_code}' -X PATCH \"http://127.0.0.1:$PORT/runs/not-a-uuid\" -H 'content-type: application/json' -d '{\"status\": \"passed\", \"expected_revision\": 1}')\ncode_docs=$(curl -s --max-time 5 -o /dev/null -w '%{http_code}' \"http://127.0.0.1:$PORT/docs\")\nowned=$SPID\nstop_server\nif curl -fsS --max-time 1 -o /dev/null \"http://127.0.0.1:$PORT/openapi.json\" 2>/dev/null; then port_open=1; else port_open=0; fi\npython3 - \"$D\" \"$code_empty\" \"$code_extra\" \"$code_uuid\" \"$code_docs\" \"$left\" \"$port_open\" \"$versions\" \"$owned\" \"$kill_needed\" <<'PY'\nimport json, sys\nd, ce, cx, cu, cd, left, port_open, versions, owned, kill_needed = sys.argv[1:11]\nschema = json.load(open(d + '/schema.json'))\ncommitted = json.load(open('openapi.json'))\nempty = json.load(open(d + '/empty.json'))\nextra = json.load(open(d + '/extra.json'))\nbadid = json.load(open(d + '/uuid.json'))\nrun_create = schema['components']['schemas']['RunCreate']\nrun_status = schema['components']['schemas']['RunStatus']\ntitle_field = run_create['properties']['title']\nchecks = {\n    'serving environment fastapi 0.141.1 uvicorn 0.53.0': versions.split() == ['0.141.1', '0.53.0'],\n    'live /openapi.json == checked-in openapi.json': schema == committed,\n    'RunCreate.title minLength 1 maxLength 120': title_field.get('minLength') == 1 and title_field.get('maxLength') == 120,\n    'RunCreate forbids extra properties': run_create.get('additionalProperties') is False,\n    'RunStatus enum matches app.py': run_status.get('enum') == ['planned', 'running', 'passed', 'failed'],\n    'POST empty title -> 422': ce == '422',\n    'POST extra field admin -> 422': cx == '422',\n    'PATCH invalid uuid path -> 422': cu == '422',\n    'GET /docs -> 200': cd == '200',\n    'empty-title error names field title': any('title' in str(item.get('loc')) for item in empty.get('detail', [])),\n    'extra-field error type extra_forbidden': any(item.get('type') == 'extra_forbidden' for item in extra.get('detail', [])),\n    'invalid-uuid error type mentions uuid': any('uuid' in str(item.get('type', '')) for item in badid.get('detail', [])),\n    'owned process group empty after signalling only it': left == '0',\n    'port no longer accepts connections': port_open == '0',\n}\nfailed = [k for k, v in checks.items() if not v]\nprint('FASTAPI_SERVE_' + ('OK' if not failed else 'FAIL'), '|', len(checks) - len(failed), 'of', len(checks), 'checks pass | env from uv sync --frozen --no-build: fastapi/uvicorn', versions, '| 422 codes', ce, cx, cu, '| /docs', cd, '| stopped only its own process group (setsid leader, pgid == pid ' + owned + '): processes left', left, '(KILL needed after TERM:', kill_needed + ') | failed:', failed)\nfor k, v in checks.items():\n    print('PASS' if v else 'FAIL', '-', k)\nraise SystemExit(0 if not failed else 1)\nPY",
+      "exit": 0,
+      "duration_s": 2.847,
+      "output_sha256": "2063aa0913f7284265676897510091e6d0d0364de0505e92259af464fddb10bb",
+      "output_excerpt": "FASTAPI_SERVE_OK | 14 of 14 checks pass | env from uv sync --frozen --no-build: fastapi/uvicorn 0.141.1 0.53.0 | 422 codes 422 422 422 | /docs 200 | stopped only its own process group (setsid leader, pgid == pid 3959455): processes left 0 (KILL needed after TERM: 0) | failed: []\nPASS - serving environment fastapi 0.141.1 uvicorn 0.53.0\nPASS - live /openapi.json == checked-in openapi.json\nPASS - Ru"
+    }
+  ],
+  "tool_versions": {
+    "fastapi": "0.141.1"
+  },
+  "observed_at_utc": "2026-09-26T02:47:04Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), FastAPI 0.141.1, a hosting-services winner, serves the repository's application-delivery backend. FastAPI 0.141.1 matches manifests/stack.json, the landscape winner pin and blueprints/convergence-practice/application-delivery/uv.lock; Uvicorn 0.53.0 matches uv.lock and has no stack entry or winner pin. The wheels downloaded from both locked URLs match the lock's sha256. The serving environment is built by the project's own uv sync --frozen --no-build into a temporary directory and reports fastapi 0.141.1 and uvicorn 0.53.0. Uvicorn serves the app on a loopback port as the leader of its own process group (setsid; pgid equals pid). Its live /openapi.json equals the checked-in openapi.json, the RunCreate and RunStatus schema constraints hold, and /docs returns 200. An empty title, an extra field and an invalid UUID path are each rejected with 422 and the expected error type (positive controls). Stopping signals only that process group, which is then empty, and the port then refuses connections. Every command exits 0 on its own assertions.",
+  "limitations": [
+    "Replaces nativestack-5975wx-20260925--fastapi--use--20260925-2 as this host's latest FastAPI use receipt. It is a new dated receipt, not a further generation: record --supersedes links generations only within one date, and the 2026-09-25 receipts stay unchanged. They still count in scripts/platform_status.py, which counts every independently agreed native_proven pass, unless a reviewer records needs_changes on them. The cross-family review of #281 found that its cleanup ran fuser -k -TERM on the port number, which selects any process using that port, not only the probe's server, and that its claim said both pins match the stack and winner pins although Uvicorn has neither. Here the server runs under setsid, the explicit stop and the EXIT trap signal only its process group (/bin/kill -TERM -- -PGID, then KILL if needed), and the claim states each package's actual pin source.",
+    "The server runs without a database (DATABASE_URL points at a closed port) and every request exercised is rejected at validation, so no persistent service, database write, auth or TLS is exercised.",
+    "Install source: an ephemeral environment built per run by uv sync --frozen --no-build (the project Makefile's setup step) from the application-delivery uv.lock into a temporary UV_PROJECT_ENVIRONMENT; nothing persistent is installed. Command 1 fetches the locked wheels from PyPI over the network. Recorded by the workstation coordinator Claude Code session, through a repair worker that shares its session id, from a git worktree at published origin/main (the catalog_revision).",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T02:47:04Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session. Reproduce: Re-ran once in a throwaway cp -a copy of the worktree via host_receipts.run_command. cmd1 byte-identical output sha256 (both locked wheels match uv.lock); cmd2 14 of 14 checks, 422/422/422, /docs 200, own setsid group empty after the stop, port closed (hash differs only by pid). Adequacy: (1) hosting-services: uvicorn serves the repository typed run-ledger backend (a real application, not a fixture) over loopback HTTP, observed through /openapi.json, /docs and requests; (2) positive controls: empty title, extra field and invalid UUID are each rejected with 422 and the expected error type; (3) backed: every claim is in the excerpt or asserted by the 14 named checks; the project Makefile setup step is uv sync --frozen --no-build; the failed first dry run (dash builtin kill) is disclosed in evidence/artifacts/receipt-repairs-20260926/README.md, and its cause and the trap cleanup are retained as controls 07 and 06 (sha256 matches the manifest); (4) bound: tool_versions 0.141.1 pin_matches the hosting-services winner; uvicorn has no pin, as the claim says. Class native_proven acceptable: real framework and real app; LIM1 discloses no database and validation-only paths. Signals only its own process group; fail-closed; sanitized; gitleaks clean.",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T06:15:14Z",
+      "reviewer": {
+        "identity_sha256": "f07a9dfbc09d23994b3810ea11bc96fd931f69f88b9e1b02d24261f4b8dcad04",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session (claude-opus-5-5); adequacy-checked the evidence class against docs/contributing-evidence.md section 2 and docs/acceptance-evidence-policy.md. Defect confirmed: command 2 serves this repository's own application-delivery backend, whose receipt.json limitation calls it a 'local synthetic vertical slice', with DATABASE_URL pointed at a closed port, and judges it with a handwritten 14-check oracle. That is execution against this repository's own fixture with a local oracle, which section 2 classes as local_integration and the policy table labels a local integration check, never an upstream test; the receipt records it as native_proven, so it must not count as native acceptance. Successor: fastapi--use--20260926-2 (unchanged upstream suite, fault control, upstream example); the blueprint check is kept as local_integration in evidence/artifacts/receipt-repairs-20260926/fastapi-blueprint-local-integration.txt.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T10:22:36Z",
+      "reviewer": {
+        "identity_sha256": "e3e758a4ec14358c858079587aca14d44770aa531b79a646a6b6de49de90efdc",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

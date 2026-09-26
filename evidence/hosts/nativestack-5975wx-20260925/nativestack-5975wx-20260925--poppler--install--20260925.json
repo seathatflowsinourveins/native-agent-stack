@@ -73,6 +73,16 @@
         "identity_sha256": "739ff768866f471b76d2597625e6fdcdc20a33829e1c3b6df3b3c8aa754cc057",
         "model": "claude-sonnet-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session (claude-opus-5-5); adequacy-checked point 3 against the receipt JSON and re-ran command 2 once in a throwaway cp -a copy. Defect confirmed as stated: the claim says gpg reports GOODSIG and VALIDSIG for the publisher fingerprint, but command 2's retained excerpt ends at the 400-character cap before that line, so no retained output shows the signature result. Mitigation for readers: command 2 is one && chain, and my re-run printed the GOODSIG+VALIDSIG line with an output sha256 equal to the recorded output_sha256, so the recording did print it; this is a retention defect, not a false claim. Held at needs_changes for consistency with this repository's point-3 practice (systemd--use--20260925 was held for a claim shown only past the excerpt). Successor with the line retained: poppler--install--20260926.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T10:22:36Z",
+      "reviewer": {
+        "identity_sha256": "e3e758a4ec14358c858079587aca14d44770aa531b79a646a6b6de49de90efdc",
+        "model": "claude-opus-5-5"
+      }
     }
   ]
 }
