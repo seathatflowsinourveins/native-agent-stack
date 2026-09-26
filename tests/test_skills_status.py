@@ -543,21 +543,21 @@ class SkillsStatusTests(unittest.TestCase):
 
     def test_non_enum_claude_listing_value_is_never_echoed(self):
         """skillOverrides[name] is foreign input and may hold any string, not just the four
-        documented states; a secret-shaped one must never reach either output mode."""
+        documented states; an arbitrary one must never reach either output mode."""
         manifest, alpha, beta = self.setup_pair()
-        secret = "SENTINEL-NOT-AN-ENUM-VALUE-" + os.urandom(12).hex()
-        self.write_claude_settings({"beta-skill": secret})  # manifest pins beta at "name-only"
+        foreign_value = "SENTINEL-NOT-AN-ENUM-VALUE-" + os.urandom(12).hex()
+        self.write_claude_settings({"beta-skill": foreign_value})  # manifest pins beta at "name-only"
         report = self.report(manifest)
         self.assertEqual(self.skill_result(report, "beta-skill")["claude_listing"],
                          {"state": "mismatch", "actual": "invalid_value"})
         self.assertFalse(self.skill_result(report, "beta-skill")["pass"])
         dumped = json.dumps(report) + ss.render_text(report)
-        self.assertNotIn(secret, dumped)
+        self.assertNotIn(foreign_value, dumped)
         for args in ((), ("--json",)):
             with self.subTest(args=args):
                 result = self.run_cli(manifest, *args)
-                self.assertNotIn(secret, result.stdout)
-                self.assertNotIn(secret, result.stderr)
+                self.assertNotIn(foreign_value, result.stdout)
+                self.assertNotIn(foreign_value, result.stderr)
 
     def test_non_string_claude_listing_value_does_not_crash(self):
         """overrides.get(name) can be an unhashable JSON value (a list/dict); the enum
