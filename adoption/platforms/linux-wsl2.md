@@ -97,7 +97,7 @@ itself evidence the WSL UVA gap closed.
    stdin instead, so run such a release's script with `</dev/null` (step 2 of
    [`adoption/bootstrap.md`](../bootstrap.md) has the details and the
    `mcp-inspector` case).
-   The script and its rtk and markitdown pins changed after `v2026.09.25.2`: on main they are 0.50.0 and 0.1.8, and after installing rtk the script prints a reminder when `~/.config/rtk/config.toml` lacks the Claude-hook `exclude_commands` from [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks); it never writes that file.
+   The script and its rtk and markitdown pins changed after `v2026.09.25.2` (#291): at that tag rtk was pinned at 0.49.0 and the script printed no such reminder at all; after that tag the pin became 0.50.0 and, after installing rtk, the script started printing a reminder unless `~/.config/rtk/config.toml` already has the Claude-hook `exclude_commands` key. It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here the reminder fires unless the key appears exactly once with all four entries from [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks) are present, exactly once. The script never writes that file.
    Its pins file also changed after `v2026.09.25.2` in a second way:
    `pins-linux-x86_64.json` now pins `repomix`, `toon`,
    `headroom`, `ccusage`, `serena` and `socraticode` too, completing the

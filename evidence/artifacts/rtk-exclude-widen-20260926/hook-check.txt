@@ -1,0 +1,133 @@
+# rtk hook check: widened + subcommand-anchored exclude_commands, recorded 2026-09-26T02:36:53Z
+# rtk 0.50.0, pinned prefix ~/.local/share/codex-ecosystem/tools/rtk-0.50.0-r20260925
+# binary sha256   23433a2a50bdeb12199cadd4b94b639238d6c38529fcba1c30c9295db5fa9517
+#   (the binary extracted from the upstream rtk-ai/rtk v0.50.0 release asset tarball
+#   rtk-x86_64-unknown-linux-musl.tar.gz, asset sha256 bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89,
+#   per evidence/receipts/rtk-050-qualification-20260925.json)
+# config sha256   1f6126b4fd0e63d089f2869440d2c80533e6af5b121d655353c5af182cfcccef
+#
+# Scratch XDG_CONFIG_HOME held only $XDG_CONFIG_HOME/rtk/config.toml, set to exactly:
+#
+#   [hooks]
+#   exclude_commands = [
+#     "^git show [^ ]*:",
+#     "diff",
+#     '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:',
+#     '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)',
+#   ]
+#
+# (byte-identical to recipes/README.md#native-context-mode-and-hooks's fenced block; no other
+# keys, so none of this host's other production exclusions could interfere). A scratch
+# RTK_DB_PATH kept the run off the production history.db.
+#
+# Below is the raw capture of `rtk hook check <command>`: exit code, then stdout, then stderr,
+# for each command in the order run. Exit 1 with "No rewrite for: ..." on stderr = the native
+# command runs; exit 0 with the rewritten form on stdout = rewritten to `rtk ...`.
+
+CMD: git show HEAD:x
+EXIT: 1
+STDOUT:
+STDERR: No rewrite for: git show HEAD:x
+---
+CMD: git -C /p show HEAD:x
+EXIT: 1
+STDOUT:
+STDERR: No rewrite for: git -C /p show HEAD:x
+---
+CMD: git -C p show --format=%H HEAD:a/b
+EXIT: 1
+STDOUT:
+STDERR: No rewrite for: git -C p show --format=%H HEAD:a/b
+---
+CMD: git show HEAD:x | tail -n 5
+EXIT: 1
+STDOUT:
+STDERR: No rewrite for: git show HEAD:x | tail -n 5
+---
+CMD: git --no-pager show HEAD:x
+EXIT: 1
+STDOUT:
+STDERR: No rewrite for: git --no-pager show HEAD:x
+---
+CMD: git branch -a
+EXIT: 1
+STDOUT:
+STDERR: No rewrite for: git branch -a
+---
+CMD: git -C p branch
+EXIT: 1
+STDOUT:
+STDERR: No rewrite for: git -C p branch
+---
+CMD: git --no-pager branch -vv
+EXIT: 1
+STDOUT:
+STDERR: No rewrite for: git --no-pager branch -vv
+---
+CMD: git --git-dir /r/.git show HEAD:x
+EXIT: 1
+STDOUT:
+STDERR: No rewrite for: git --git-dir /r/.git show HEAD:x
+---
+CMD: git --work-tree /w branch -a
+EXIT: 1
+STDOUT:
+STDERR: No rewrite for: git --work-tree /w branch -a
+---
+CMD: diff a.txt missing.txt
+EXIT: 1
+STDOUT:
+STDERR: No rewrite for: diff a.txt missing.txt
+---
+CMD: git show --stat HEAD
+EXIT: 0
+STDOUT: rtk git show --stat HEAD
+STDERR:
+---
+CMD: git show HEAD~1
+EXIT: 0
+STDOUT: rtk git show HEAD~1
+STDERR:
+---
+CMD: git status
+EXIT: 0
+STDOUT: rtk git status
+STDERR:
+---
+CMD: git log -3
+EXIT: 0
+STDOUT: rtk git log -3
+STDERR:
+---
+CMD: git push origin branch
+EXIT: 0
+STDOUT: rtk git push origin branch
+STDERR:
+---
+CMD: git commit -m "update branch docs"
+EXIT: 0
+STDOUT: rtk git commit -m "update branch docs"
+STDERR:
+---
+CMD: git --git-dir /r/.git status
+EXIT: 0
+STDOUT: rtk git --git-dir /r/.git status
+STDERR:
+---
+CMD: ls -la
+EXIT: 0
+STDOUT: rtk ls -la
+STDERR:
+---
+#
+# rtk hook claude PreToolUse JSON probes, same scratch config:
+#
+# excluded command -> no rewrite, hook prints nothing (exit 0, empty stdout):
+#   in:  {"tool_name":"Bash","tool_input":{"command":"git show HEAD:x"}}
+#   out: (empty)
+#
+# included command -> hook returns updatedInput (exit 0):
+#   in:  {"tool_name":"Bash","tool_input":{"command":"git status"}}
+#   out: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecisionReason":"RTK auto-rewrite","updatedInput":{"command":"rtk git status"}}}
+#
+rtk verify: 154/154 tests passed

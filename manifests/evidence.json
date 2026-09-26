@@ -3393,8 +3393,8 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "3616b329e91fa37cdfd3d9d35d7158d202227a2bbe1261789bac8c831387e59c",
-      "bytes": 33544
+      "sha256": "8b096b8245c7eb34eca1ca50140cfeb7044c8f6918f2773cdbc61f2ad8db21e9",
+      "bytes": 35016
     },
     {
       "path": "adoption/bootstrap-macos.sh",
@@ -3403,8 +3403,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "df3c83db62476a6a9b09a3ccc26c2d4ce44739cc4e15ead87801028a30b320a3",
-      "bytes": 31163
+      "sha256": "9d1c17ff5a16f3f541b4a4f64b4fd6c4d07b1e61f73d3350aacc888e747cc07f",
+      "bytes": 32936
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3508,13 +3508,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "b1b3fce801006e7b4b1a26fd56e5024a2adfeeb393debdebc19def1a01349e9f",
-      "bytes": 13608
+      "sha256": "edb87fad513ce21e65989189254c3ea07e2102082a3b7fe433c366dfcd9d915a",
+      "bytes": 14015
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "4128314986dcc154a6523a68055f7c3382685d581c1aec27060e51ad2fbca33f",
-      "bytes": 42321
+      "sha256": "da9c805f8848413daaf42893cbe20efd62ac019ca02dda1adf33babbea79ad69",
+      "bytes": 42710
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -28208,6 +28208,16 @@
       "bytes": 2166
     },
     {
+      "path": "evidence/artifacts/rtk-exclude-widen-20260926/README.md",
+      "sha256": "e5b2c01ac176cf57bb4179d513cc30a40b90c5ecb8dbc7a921b1f69f2e3e2498",
+      "bytes": 3355
+    },
+    {
+      "path": "evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt",
+      "sha256": "dd2e7455b7a9b791730242dec4bf0eb369e6b2d10e1834dd91aeefe8cf6e9092",
+      "bytes": 3721
+    },
+    {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",
       "sha256": "e494120421102202312b567d699025c96e85c0e925a88a143c4ea11af2a791a2",
       "bytes": 169217
@@ -31619,8 +31629,8 @@
     },
     {
       "path": "evidence/receipts/rtk-050-qualification-20260925.json",
-      "sha256": "62f5e2b2ab3fb47fb072486da7c145be7398ba84b5cf6bfc1d69b025b2bcec8d",
-      "bytes": 23956
+      "sha256": "584b22a5d8a9f4c2f268f3b9facf6488372f425e83abaad35d3293539ce531c9",
+      "bytes": 27699
     },
     {
       "path": "evidence/receipts/runtime-tools.json",
@@ -32234,8 +32244,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "4a5475cabcd213c9d2a5d81db1cc6eb99aeb090b9dc2b67e948c3c972b1ac40f",
-      "bytes": 69563
+      "sha256": "d44208d27c29506f71adf2073a634dd9366e99519b2a2e9107ca4cc5bcf5abfb",
+      "bytes": 73168
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -32574,8 +32584,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "2533ef6ac5cf3e5ca9a6582a6c904534c8dd2c07afd0d8a3c5890d1a1b386856",
-      "bytes": 48679
+      "sha256": "7ad4e130e8d9a50fe46bbe5d3de0b4b50f3ca34bf076b8d48488b5902c2b1e7a",
+      "bytes": 55065
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",

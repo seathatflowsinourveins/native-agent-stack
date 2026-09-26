@@ -423,15 +423,32 @@ install_uv_tool_from_git() {
 
 # rtk 0.50.0's Claude hook windows `git show <rev>:<path>` blobs (a piped
 # `| tail` then reads the window, not the file's end), and a rewritten `diff`
-# exits 1 instead of 2 on a missing file. recipes/README.md#native-context-mode-and-hooks
-# excludes both through rtk's own config. Print-only: never writes that file.
+# exits 1 instead of 2 on a missing file. The bare "^git show [^ ]*:" pattern
+# misses a `git -C <dir> show HEAD:path` form (still windowed), and separately
+# `git branch -a`'s filter_branch_output always keeps git's `+ ` prefix on a
+# local branch checked out in a linked worktree, but only misreports it as
+# remote-only when a remote-tracking branch of the same name also exists.
+# The two added patterns anchor to the git subcommand position (only
+# -C/-c/--git-dir/--work-tree with a value, or another --flag, may precede
+# show/branch -- the same global options rtk's own discovery strips before
+# dispatch), so an ordinary command that merely mentions "show" or "branch"
+# as an argument is not misclassified.
+# recipes/README.md#native-context-mode-and-hooks excludes all four through
+# rtk's own config (evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt).
+# A duplicate exclude_commands key is invalid TOML and rtk silently falls back
+# to defaults, so the reminder fires on a duplicate too and says to replace,
+# not add, the line.
+# Print-only: never writes that file.
 rtk_config_reminder() {
   local config="${XDG_CONFIG_HOME:-$HOME/.config}/rtk/config.toml"
-  if [[ -f "$config" ]] && grep -Eq '^[[:space:]]*exclude_commands[[:space:]]*=' "$config" \
-    && grep -Fq '"^git show [^ ]*:"' "$config" && grep -Fq '"diff"' "$config"; then
+  if [[ -f "$config" ]] \
+    && [[ $(grep -Ec '^[[:space:]]*exclude_commands[[:space:]]*=' "$config") -eq 1 ]] \
+    && grep -Fq '"^git show [^ ]*:"' "$config" && grep -Fq '"diff"' "$config" \
+    && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:'" "$config" \
+    && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|\$)'" "$config"; then
     return 0
   fi
-  printf 'Reminder: for the Claude hook, %s needs [hooks] exclude_commands = ["^git show [^ ]*:", "diff"] (recipes/README.md#native-context-mode-and-hooks); this script does not write it.\n' "$config"
+  printf 'Reminder: for the Claude hook, replace any existing exclude_commands line in %s with [hooks] exclude_commands = ["^git show [^ ]*:", "diff", '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\\n]*\s)?[^\s]*:'"'"', '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"'"'] (a duplicate key is invalid TOML and rtk silently loads defaults; recipes/README.md#native-context-mode-and-hooks); this script does not write it.\n' "$config"
 }
 
 install_pin() {

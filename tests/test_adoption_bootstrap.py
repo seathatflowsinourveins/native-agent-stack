@@ -804,13 +804,63 @@ class RtkConfigReminderTests(unittest.TestCase):
     """2026-09-25: rtk 0.50.0's Claude hook needs `[hooks] exclude_commands = ["^git show [^ ]*:",
     "diff"]` in rtk's own config (recipes/README.md#native-context-mode-and-hooks), which the
     bootstrap does not write. After a successful rtk install, install_pin prints a one-line reminder
-    unless that config already carries the key. install_pin, fetch, install_single_binary_tarball
-    and rtk_config_reminder are extracted verbatim from bootstrap-linux.sh and run against a one-pin
+    unless that config already carries the key exactly once. Widened 2026-09-26: the laptop's
+    ultracode E2E found the bare `"^git show [^ ]*:"` pattern misses a `git -C <dir> show HEAD:path`
+    form (still windowed to 8,261 of 22,907 bytes in that fixture), and `git branch -a`'s branch-name
+    compaction (`filter_branch_output`, src/cmds/git/git_cmd.rs:3185-3244) always keeps git's
+    local-worktree `+ ` prefix (git_cmd.rs:3209-3211), but only misreports that branch as remote-only
+    when a remote-tracking branch of the same name also exists (git_cmd.rs:3224-3227) -- 31 vs 6 real
+    in one fixture. Both added patterns anchor to the git subcommand position (only
+    `-C`/`-c`/`--git-dir`/`--work-tree` with a value, or another `--flag`, may precede `show`/`branch`
+    -- the same global options rtk's own discovery strips, GIT_GLOBAL_OPT, src/discover/registry.rs:78),
+    so a command that merely mentions "show", "branch" or a colon as an ordinary argument
+    (`git commit -m "update branch docs"`, `git push origin branch`, `git diff main branch`) is no
+    longer wrongly excluded, while a `--git-dir`/`--work-tree` form (`git --git-dir /r/.git
+    show HEAD:x`, `git --work-tree /w branch -a`) is now excluded instead of missed. The reminder now says to replace, not add, the
+    existing `exclude_commands` line, and fires on a duplicate key too: a duplicate is invalid TOML
+    and rtk silently loads defaults (`Config::load().unwrap_or_default()`, src/core/config.rs:278-281).
+    Retained verification of these patterns on the pinned binary (the one extracted from the upstream
+    rtk-ai/rtk v0.50.0 release asset) is a raw capture in
+    evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt, not the E2E receipt (sibling PR #316's
+    evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json is cited only for the
+    discovery). The reminder fires unless all four entries are present exactly once, including for a
+    config that still has only the original two, or the original two plus a second, four-entry line.
+    install_pin, fetch, install_single_binary_tarball and
+    rtk_config_reminder are extracted verbatim from bootstrap-linux.sh and run against a one-pin
     fixture whose synthetic tarball is pre-seeded in the download cache with its real sha256, so
     fetch() verifies it and never downloads. HOME is a temporary directory; the reminder must never
     create or change the config."""
 
-    CONFIGURED = '[hooks]\nexclude_commands = ["^git show [^ ]*:", "diff"]\n'
+    ENTRY_1 = '"^git show [^ ]*:"'
+    ENTRY_2 = '"diff"'
+    ENTRY_3 = r"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:'"
+    ENTRY_4 = r"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"
+    ENTRIES = (ENTRY_1, ENTRY_2, ENTRY_3, ENTRY_4)
+    EXCLUDE_ITEMS = "[" + ", ".join(ENTRIES) + "]"
+    # Matches recipes/README.md's pretty-printed, one-entry-per-line block exactly
+    # (test_the_recipes_exact_block_gets_no_reminder asserts the two stay identical).
+    CONFIGURED = "[hooks]\nexclude_commands = [\n" + "".join(f"  {entry},\n" for entry in ENTRIES) + "]\n"
+    OLD_TWO_ENTRY = f"[hooks]\nexclude_commands = [{ENTRY_1}, {ENTRY_2}]\n"
+
+    @staticmethod
+    def config_with(*entries: str) -> str:
+        return f"[hooks]\nexclude_commands = [{', '.join(entries)}]\n"
+
+    @classmethod
+    def expected_reminder(cls, config) -> str:
+        return (f"Reminder: for the Claude hook, replace any existing exclude_commands line in "
+                f"{config} with [hooks] exclude_commands = {cls.EXCLUDE_ITEMS} "
+                "(a duplicate key is invalid TOML and rtk silently loads defaults; "
+                "recipes/README.md#native-context-mode-and-hooks); this script does not write it.")
+
+    @staticmethod
+    def recipe_exclude_block() -> str:
+        """The exact ```toml [hooks] exclude_commands fenced block from recipes/README.md."""
+        text = (ROOT / "recipes/README.md").read_text(encoding="utf-8")
+        match = re.search(r"```toml\n(\[hooks\]\nexclude_commands = \[.*?\n\])\n```", text, re.S)
+        if match is None:
+            raise AssertionError("recipes/README.md: could not find the [hooks] exclude_commands block")
+        return match.group(1) + "\n"
 
     def _run(self, tmp_path: Path, tool_id="rtk", xdg_config_home=None):
         for tool in ["jq"] if sha256sum_checks_like_gnu() else ["jq", "shasum"]:
@@ -872,10 +922,7 @@ class RtkConfigReminderTests(unittest.TestCase):
                 with self.subTest(attempt=attempt):
                     result, home = self._run(Path(tmp))
                     config = home / ".config/rtk/config.toml"
-                    self.assertEqual(self.reminders(result.stdout), [
-                        f"Reminder: for the Claude hook, {config} needs [hooks] exclude_commands = "
-                        '["^git show [^ ]*:", "diff"] (recipes/README.md#native-context-mode-and-hooks); '
-                        "this script does not write it."])
+                    self.assertEqual(self.reminders(result.stdout), [self.expected_reminder(config)])
                     self.assertFalse((home / ".config").exists(), "the reminder must not create the config")
 
     def test_a_config_with_the_exclusions_gets_no_reminder(self):
@@ -888,20 +935,65 @@ class RtkConfigReminderTests(unittest.TestCase):
             self.assertEqual(config.read_text(), self.CONFIGURED)
 
     def test_a_config_without_the_key_is_reminded_and_left_unchanged(self):
-        for text in ("[hooks]\n", '[hooks]\nexclude_commands = ["diff"]\n', "# exclude_commands\n"):
+        for text in ("[hooks]\n", '[hooks]\nexclude_commands = ["diff"]\n', "# exclude_commands\n",
+                     # a config that still has only the pre-widen recommendation is now incomplete too.
+                     self.OLD_TWO_ENTRY):
             with self.subTest(text=text), tempfile.TemporaryDirectory() as tmp:
                 config = Path(tmp) / "home/.config/rtk/config.toml"
                 config.parent.mkdir(parents=True)
                 config.write_bytes(text.encode())
                 result, _home = self._run(Path(tmp))
-                self.assertEqual(len(self.reminders(result.stdout)), 1, result.stdout)
+                self.assertEqual(self.reminders(result.stdout), [self.expected_reminder(config)])
                 self.assertEqual(config.read_bytes(), text.encode(), "the reminder must never write the config")
+
+    def test_each_missing_entry_gets_exactly_one_reminder(self):
+        """Leave-one-out: three of the four entries present, one missing -- exactly one reminder,
+        naming all four (the recommendation to replace, never just append)."""
+        for index in range(len(self.ENTRIES)):
+            remaining = self.ENTRIES[:index] + self.ENTRIES[index + 1:]
+            text = self.config_with(*remaining)
+            with self.subTest(missing_entry=index + 1), tempfile.TemporaryDirectory() as tmp:
+                config = Path(tmp) / "home/.config/rtk/config.toml"
+                config.parent.mkdir(parents=True)
+                config.write_text(text)
+                result, _home = self._run(Path(tmp))
+                self.assertEqual(self.reminders(result.stdout), [self.expected_reminder(config)])
+                self.assertEqual(config.read_text(), text, "the reminder must never write the config")
+
+    def test_a_duplicate_exclude_commands_key_is_reminded(self):
+        """A second exclude_commands line is invalid TOML (rtk silently loads defaults), so the
+        reminder must fire even though, read alone, either line would be complete: the old
+        two-entry line plus a correct new four-entry line, and the new line duplicated verbatim."""
+        old_plus_new = f"[hooks]\nexclude_commands = [{self.ENTRY_1}, {self.ENTRY_2}]\n{self.CONFIGURED}"
+        new_plus_new = self.CONFIGURED + self.CONFIGURED
+        for text in (old_plus_new, new_plus_new):
+            with self.subTest(text=text), tempfile.TemporaryDirectory() as tmp:
+                config = Path(tmp) / "home/.config/rtk/config.toml"
+                config.parent.mkdir(parents=True)
+                config.write_text(text)
+                result, _home = self._run(Path(tmp))
+                self.assertEqual(self.reminders(result.stdout), [self.expected_reminder(config)])
+                self.assertEqual(config.read_text(), text, "the reminder must never write the config")
+
+    def test_the_recipes_exact_block_gets_no_reminder(self):
+        block = self.recipe_exclude_block()
+        self.assertEqual(block, self.CONFIGURED,
+                          "recipes/README.md's [hooks] exclude_commands block no longer matches "
+                          "this test's CONFIGURED constant; update whichever one drifted")
+        with tempfile.TemporaryDirectory() as tmp:
+            config = Path(tmp) / "home/.config/rtk/config.toml"
+            config.parent.mkdir(parents=True)
+            config.write_text(block)
+            result, _home = self._run(Path(tmp))
+            self.assertEqual(self.reminders(result.stdout), [])
+            self.assertEqual(config.read_text(), block)
 
     def test_xdg_config_home_selects_the_config_rtk_reads(self):
         with tempfile.TemporaryDirectory() as tmp:
             xdg = Path(tmp) / "xdg"
             result, _home = self._run(Path(tmp), xdg_config_home=xdg)
-            self.assertIn(f"{xdg}/rtk/config.toml needs", self.reminders(result.stdout)[0])
+            self.assertIn(f"replace any existing exclude_commands line in {xdg}/rtk/config.toml with",
+                          self.reminders(result.stdout)[0])
             (xdg / "rtk").mkdir(parents=True)
             (xdg / "rtk/config.toml").write_text(self.CONFIGURED)
             result, _home = self._run(Path(tmp), xdg_config_home=xdg)
