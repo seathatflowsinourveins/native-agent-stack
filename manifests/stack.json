@@ -2072,16 +2072,41 @@
       ]
     },
     {
-      "id": "ggml-org/Qwen3.8-27B-GGUF",
-      "revision": "efbb3b1f70a21d97fd4495240648405f7228554f",
+      "id": "unsloth/Qwen3.8-27B-GGUF",
+      "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
       "license": "Apache-2.0",
       "runtime": "llama-cpp",
-      "quantization": "Q4_K_M",
+      "runtime_version": "b11146 (0.5.0-dev, commit 7fe450e19305b828c199d602c23a8337aaa1f03b)",
+      "quantization": "UD-Q4_K_M",
+      "file": "Qwen3.8-27B-UD-Q4_K_M.gguf",
+      "file_bytes": 16464440224,
       "base_model": "Qwen/Qwen3.8-27B",
       "base_revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
-      "file_sha256": "c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747",
+      "file_sha256": "322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482",
+      "serving_profile": {
+        "id": "li26-c2",
+        "host": "nativestack-5975wx-20260925",
+        "unit": "nativestack-generation.service with the drop-in li26-c2-serving-profile.conf",
+        "flags": [
+          "--gpu-layers 99",
+          "--n-cpu-ffn 20",
+          "--spec-type draft-mtp",
+          "--spec-draft-n-max 3",
+          "--ctx-size 8192",
+          "--parallel 1",
+          "--fit off",
+          "--threads 16",
+          "--threads-batch 24",
+          "--batch-size 512",
+          "--ubatch-size 128",
+          "--sleep-idle-seconds 600"
+        ],
+        "changed_from": "C0: --gpu-layers 36 with no --n-cpu-ffn and no MTP drafting; the base unit keeps it, so removing the drop-in restores it",
+        "selected_by": "blueprints/convergence-practice/local-inference-latest-20260926/results/decision.json"
+      },
+      "note": "Corrected on 2026-09-26 to the artifact production serves: the path was read from the unit's ExecStart and the file hashed. This replaces the ggml-org/Qwen3.8-27B-GGUF Q4_K_M entry at efbb3b1f70a21d97fd4495240648405f7228554f (file sha256 c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747), the 2026-09-20 trial file of native-gpu-patch-20260920, which production does not serve. The llama-cpp component pin stays b11057 (0.4.1-dev), while production runs b11146.",
       "evidence_ids": [
-        "native-gpu-patch-20260920"
+        "local-inference-c2-serving-switch-20260926"
       ]
     },
     {

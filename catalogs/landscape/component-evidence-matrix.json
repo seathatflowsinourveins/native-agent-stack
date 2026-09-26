@@ -1712,7 +1712,7 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "llama.cpp optional local inference",
           "repository": "https://github.com/ggml-org/llama.cpp"
