@@ -154,10 +154,12 @@ launcher without `ps` on its `PATH` has to run the daemon; an SDK release bundle
 `fast-uri` 3.1.8 or later (then re-qualify for the fix).
 
 **Correction (2026-09-26).** The cutover record was wrong on two points. It said that no
-daemon ran before the switch and that the next call started a 0.14.1 daemon. In fact the
-coordinator's own pre-switch baseline call, `mcporter list socraticode`, ran through 0.13.13
-in the same command as the relink and auto-started a 0.13.13 daemon on the production socket
-at 20:09:44Z. The earlier precondition check was therefore stale by the time of the switch.
+daemon ran before the switch and that the next call started a 0.14.1 daemon. On 2026-09-26 a
+0.13.13 daemon was found on the production socket; its own `startedAt` is 20:09:44Z on 09-25.
+According to the coordinator's session record, which is not retained, the coordinator's
+pre-switch baseline call, `mcporter list socraticode`, ran through 0.13.13 in the same command
+as the relink, 30 s after a precondition check had found no daemon. That call would have
+started the daemon, so the precondition was stale by the time of the switch.
 For about 18.8 h, 0.14.1 clients that went through the daemon reached that 0.13.13 daemon.
 Its two keep-alive servers show no use after 20:09:45Z. On 2026-09-26 at 14:56Z it was
 drained (0 active calls) and stopped with the native `mcporter daemon stop`. A production
@@ -273,9 +275,13 @@ How coordination works:
   ([lock.ts:30-33](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/lock.ts#L30-L33),
   [:112](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/lock.ts#L112)).
   Servers therefore coordinate only when they share a `TMPDIR`.
-- **Watcher.** Each project has exactly one watcher, whatever its version
+- **Watcher.** Within one lock directory, the `watch` lock admits one watcher per project
+  at a time, whatever its version
   ([watcher.ts:260-265](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/watcher.ts#L260-L265)).
-- **Writes.** Mixing versions steals no locks and duplicates no writes.
+- **Writes.** Index and graph writes that go through the `index` and `graph` locks queue
+  behind each other within one lock directory. The protocol is the same in both versions, so
+  a version difference alone lets no lock be taken over. Startup generation cleanup is not
+  covered by these locks; see the cleanup race below.
 
 What mixing versions does cause:
 - **Graph flip-flop.** The graph rebuild check is a strict inequality on the builder's
@@ -291,24 +297,31 @@ What mixing versions does cause:
   A server that starts while another is building may delete that build's staging
   generation. This comes from reading the code and was not reproduced;
   `codebase_graph_build` recovers from it.
-- **`codebase_stop`.** It SIGTERMs whichever process holds the index lock, even one that
-  belongs to another session
-  ([index-tools.ts:497-499](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/tools/index-tools.ts#L497-L499)).
+- **`codebase_stop`.** If the calling server is itself indexing, it cancels that run
+  cooperatively. Otherwise it SIGTERMs the process that holds the `index` lock, which may be
+  another session's server
+  ([index-tools.ts:478-499](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/tools/index-tools.ts#L478-L499)).
 
-Host state on 2026-09-26: ten 1.14.0 servers had this checkout as their working directory.
-Eight were started by Claude Code and two by the mcporter daemon. That daemon was a leftover
+Host state on 2026-09-26, from a read-only process listing by the coordinator (not retained):
+ten 1.14.0 servers had this checkout as their working directory. Eight were started by
+Claude Code and two by the mcporter daemon. That daemon was a leftover
 0.13.13; it has since been retired and replaced, as the mcporter section records.
 
 Cutover procedure, for use no earlier than 2026-10-01T11:01Z:
 1. Point every launcher at the 1.15.0 prefix with the same environment and no `TMPDIR`
    override: the Claude Code MCP entry, `config/mcporter.json` and the Codex config.
 2. Close the 1.14.0 client sessions normally, and restart the mcporter daemon with
-   `mcporter daemon stop`. Avoid `kill -9`, which leaves locks held for 120 s, and don't use
-   `codebase_stop` to force the handover.
+   `mcporter daemon stop`. A normal exit releases locks. Avoid `kill -9`: it leaves the lock
+   directory in place, and that directory is only removed as stale when some later
+   acquisition runs at least 120 s after the last refresh
+   ([proper-lockfile v4.1.2 lockfile.js:67-86](https://github.com/moxystudio/node-proper-lockfile/blob/v4.1.2/lib/lockfile.js#L67-L86)).
+   Don't use `codebase_stop` to force the handover.
 3. End the watch-lock holder only when no `<projectId>-index.lock` or `<projectId>-graph.lock`
    directory exists.
-4. Wait until no `<projectId>-*.lock` directory remains and no 1.14.0 server has this
-   checkout as its working directory.
+4. Wait until no 1.14.0 server has this checkout as its working directory. A live holder
+   refreshes its lock directory every 30 s. So a `<projectId>-*.lock` directory that hasn't
+   been refreshed for more than 120 s is abandoned: the next acquisition removes it as stale,
+   and it doesn't block the cutover.
 5. Start one 1.15.0 session. Check that the watch-lock PID runs from the 1.15.0 prefix and
    that `codebase_graph_status` reports "Built by: v1.15.0".
 6. Start further sessions one at a time, and not while a graph lock is held.

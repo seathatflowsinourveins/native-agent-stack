@@ -15,8 +15,10 @@ while `bin/mcporter` pointed at 0.14.1:
 - `mcporter daemon status --json` reported `startedAt` 1790366984036 ms (20:09:44Z).
 - The socket's mtime is 2026-09-25 16:09:44 -0400.
 - The process command line ran `tools/mcporter-0.13.13/.../cli.js daemon start --foreground`.
-- Its two keep-alive servers were socraticode 1.14.0. Their `lastUsedAt` values were
-  1790366984477 and 1790366985598 ms (20:09:44Z and 20:09:45Z), and `activeCalls` was 0.
+- It had two keep-alive servers, with `lastUsedAt` 1790366984477 and 1790366985598 ms
+  (20:09:44Z and 20:09:45Z) and `activeCalls` 0. `retire.txt` keeps only their child PIDs.
+  The coordinator's read-only process listing before the run, which is not retained, showed
+  both children running socraticode 1.14.0.
 
 ## Cause (coordinator's session record, not retained here)
 
