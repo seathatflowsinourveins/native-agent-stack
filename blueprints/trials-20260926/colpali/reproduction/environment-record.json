@@ -1,0 +1,966 @@
+{
+  "schema_version": 1,
+  "what": "Data record of the exact Python environment in which the ColPali trial's slice runs and its self-contained CPU reproduction ran. It replaces the installable reproduction/requirements-lock.txt: every pinned line is kept byte-for-byte below, with the original file's sha256 and size, so reproduction/regenerate_lock.py can rebuild an identical lock into a temporary directory, and only when its caller passes --accept-known-advisories.",
+  "recorded": "2026-09-26",
+  "why_not_a_lockfile": "The environment pins torch 2.8.0 and transformers 4.53.1, which carry the known advisories listed below (1 Critical, 15 High, 4 Medium). colpali-engine 0.3.13, the version vidore-benchmark 5.0.0's colpali-engine extra resolved to, requires torch<2.9.0 and transformers>=4.53.1,<4.58.0 (source-review.json#colpali-engine-deps); every fixed version OSV lists for these advisories is torch 2.9.0 or later or transformers 5.0.0rc3 (a 5.0.0 pre-release) or later, and nine list no fixed version. No patched environment exists inside that range, so the repository keeps what ran as data instead of shipping an installable known-vulnerable environment. No OSV-Scanner ignore was added.",
+  "original_lock": {
+    "historical_path": "reproduction/requirements-lock.txt",
+    "git_revision": "603027b617b4561363a7a79995c9d349de3ea5de",
+    "status": "removed from the tree on 2026-09-26 (PR #337 final fixes); its bytes are the requirements[].line values below joined with LF plus a final LF",
+    "bytes": 1834,
+    "sha256": "0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9",
+    "line_count": 94,
+    "format": "uv pip freeze output: one name==version per line, LF line endings, final newline; no --hash options, comments, environment markers or index options (so every requirements[].hashes is empty)",
+    "same_bytes": "The historical reproduction/run-20260926T0412Z/installed-freeze.txt was the reproduction's own `uv pip freeze` of the installed set (steps.log: 'installed set equals requirements-lock.txt'). It was byte-identical: 1834 bytes with the same sha256. Both files are removed; this record retains their content and provenance."
+  },
+  "requirements": [
+    {
+      "line": "accelerate==1.15.0",
+      "name": "accelerate",
+      "version": "1.15.0",
+      "hashes": []
+    },
+    {
+      "line": "aiohappyeyeballs==2.7.1",
+      "name": "aiohappyeyeballs",
+      "version": "2.7.1",
+      "hashes": []
+    },
+    {
+      "line": "aiohttp==3.14.3",
+      "name": "aiohttp",
+      "version": "3.14.3",
+      "hashes": []
+    },
+    {
+      "line": "aiosignal==1.4.0",
+      "name": "aiosignal",
+      "version": "1.4.0",
+      "hashes": []
+    },
+    {
+      "line": "annotated-doc==0.0.5",
+      "name": "annotated-doc",
+      "version": "0.0.5",
+      "hashes": []
+    },
+    {
+      "line": "annotated-types==0.8.0",
+      "name": "annotated-types",
+      "version": "0.8.0",
+      "hashes": []
+    },
+    {
+      "line": "anyio==4.15.1",
+      "name": "anyio",
+      "version": "4.15.1",
+      "hashes": []
+    },
+    {
+      "line": "attrs==26.1.0",
+      "name": "attrs",
+      "version": "26.1.0",
+      "hashes": []
+    },
+    {
+      "line": "certifi==2026.7.22",
+      "name": "certifi",
+      "version": "2026.7.22",
+      "hashes": []
+    },
+    {
+      "line": "charset-normalizer==3.5.1",
+      "name": "charset-normalizer",
+      "version": "3.5.1",
+      "hashes": []
+    },
+    {
+      "line": "cloudpickle==3.1.2",
+      "name": "cloudpickle",
+      "version": "3.1.2",
+      "hashes": []
+    },
+    {
+      "line": "colpali-engine==0.3.13",
+      "name": "colpali-engine",
+      "version": "0.3.13",
+      "hashes": []
+    },
+    {
+      "line": "datasets==5.0.1",
+      "name": "datasets",
+      "version": "5.0.1",
+      "hashes": []
+    },
+    {
+      "line": "dill==0.4.1",
+      "name": "dill",
+      "version": "0.4.1",
+      "hashes": []
+    },
+    {
+      "line": "eval-type-backport==0.4.0",
+      "name": "eval-type-backport",
+      "version": "0.4.0",
+      "hashes": []
+    },
+    {
+      "line": "filelock==4.0.3",
+      "name": "filelock",
+      "version": "4.0.3",
+      "hashes": []
+    },
+    {
+      "line": "frozenlist==1.8.0",
+      "name": "frozenlist",
+      "version": "1.8.0",
+      "hashes": []
+    },
+    {
+      "line": "fsspec==2026.6.0",
+      "name": "fsspec",
+      "version": "2026.6.0",
+      "hashes": []
+    },
+    {
+      "line": "gputil==1.4.0",
+      "name": "gputil",
+      "version": "1.4.0",
+      "hashes": []
+    },
+    {
+      "line": "h11==0.16.0",
+      "name": "h11",
+      "version": "0.16.0",
+      "hashes": []
+    },
+    {
+      "line": "hf-xet==1.6.0",
+      "name": "hf-xet",
+      "version": "1.6.0",
+      "hashes": []
+    },
+    {
+      "line": "httpcore==1.0.9",
+      "name": "httpcore",
+      "version": "1.0.9",
+      "hashes": []
+    },
+    {
+      "line": "httpx==0.28.1",
+      "name": "httpx",
+      "version": "0.28.1",
+      "hashes": []
+    },
+    {
+      "line": "huggingface-hub==0.36.2",
+      "name": "huggingface-hub",
+      "version": "0.36.2",
+      "hashes": []
+    },
+    {
+      "line": "idna==3.20",
+      "name": "idna",
+      "version": "3.20",
+      "hashes": []
+    },
+    {
+      "line": "jinja2==3.1.6",
+      "name": "jinja2",
+      "version": "3.1.6",
+      "hashes": []
+    },
+    {
+      "line": "joblib==1.6.0",
+      "name": "joblib",
+      "version": "1.6.0",
+      "hashes": []
+    },
+    {
+      "line": "markdown-it-py==4.2.0",
+      "name": "markdown-it-py",
+      "version": "4.2.0",
+      "hashes": []
+    },
+    {
+      "line": "markupsafe==3.0.3",
+      "name": "markupsafe",
+      "version": "3.0.3",
+      "hashes": []
+    },
+    {
+      "line": "mdurl==0.1.2",
+      "name": "mdurl",
+      "version": "0.1.2",
+      "hashes": []
+    },
+    {
+      "line": "mpmath==1.3.0",
+      "name": "mpmath",
+      "version": "1.3.0",
+      "hashes": []
+    },
+    {
+      "line": "mteb==1.16.5",
+      "name": "mteb",
+      "version": "1.16.5",
+      "hashes": []
+    },
+    {
+      "line": "multidict==6.9.1",
+      "name": "multidict",
+      "version": "6.9.1",
+      "hashes": []
+    },
+    {
+      "line": "multiprocess==0.70.19",
+      "name": "multiprocess",
+      "version": "0.70.19",
+      "hashes": []
+    },
+    {
+      "line": "narwhals==2.26.0",
+      "name": "narwhals",
+      "version": "2.26.0",
+      "hashes": []
+    },
+    {
+      "line": "networkx==3.6.1",
+      "name": "networkx",
+      "version": "3.6.1",
+      "hashes": []
+    },
+    {
+      "line": "numpy==2.4.6",
+      "name": "numpy",
+      "version": "2.4.6",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-cublas-cu12==12.8.4.1",
+      "name": "nvidia-cublas-cu12",
+      "version": "12.8.4.1",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-cuda-cupti-cu12==12.8.90",
+      "name": "nvidia-cuda-cupti-cu12",
+      "version": "12.8.90",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-cuda-nvrtc-cu12==12.8.93",
+      "name": "nvidia-cuda-nvrtc-cu12",
+      "version": "12.8.93",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-cuda-runtime-cu12==12.8.90",
+      "name": "nvidia-cuda-runtime-cu12",
+      "version": "12.8.90",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-cudnn-cu12==9.10.2.21",
+      "name": "nvidia-cudnn-cu12",
+      "version": "9.10.2.21",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-cufft-cu12==11.3.3.83",
+      "name": "nvidia-cufft-cu12",
+      "version": "11.3.3.83",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-cufile-cu12==1.13.1.3",
+      "name": "nvidia-cufile-cu12",
+      "version": "1.13.1.3",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-curand-cu12==10.3.9.90",
+      "name": "nvidia-curand-cu12",
+      "version": "10.3.9.90",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-cusolver-cu12==11.7.3.90",
+      "name": "nvidia-cusolver-cu12",
+      "version": "11.7.3.90",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-cusparse-cu12==12.5.8.93",
+      "name": "nvidia-cusparse-cu12",
+      "version": "12.5.8.93",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-cusparselt-cu12==0.7.1",
+      "name": "nvidia-cusparselt-cu12",
+      "version": "0.7.1",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-nccl-cu12==2.27.3",
+      "name": "nvidia-nccl-cu12",
+      "version": "2.27.3",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-nvjitlink-cu12==12.8.93",
+      "name": "nvidia-nvjitlink-cu12",
+      "version": "12.8.93",
+      "hashes": []
+    },
+    {
+      "line": "nvidia-nvtx-cu12==12.8.90",
+      "name": "nvidia-nvtx-cu12",
+      "version": "12.8.90",
+      "hashes": []
+    },
+    {
+      "line": "packaging==26.3",
+      "name": "packaging",
+      "version": "26.3",
+      "hashes": []
+    },
+    {
+      "line": "pandas==3.0.6",
+      "name": "pandas",
+      "version": "3.0.6",
+      "hashes": []
+    },
+    {
+      "line": "peft==0.17.1",
+      "name": "peft",
+      "version": "0.17.1",
+      "hashes": []
+    },
+    {
+      "line": "pillow==12.3.0",
+      "name": "pillow",
+      "version": "12.3.0",
+      "hashes": []
+    },
+    {
+      "line": "polars==1.44.2",
+      "name": "polars",
+      "version": "1.44.2",
+      "hashes": []
+    },
+    {
+      "line": "polars-runtime-32==1.44.2",
+      "name": "polars-runtime-32",
+      "version": "1.44.2",
+      "hashes": []
+    },
+    {
+      "line": "propcache==0.5.4",
+      "name": "propcache",
+      "version": "0.5.4",
+      "hashes": []
+    },
+    {
+      "line": "psutil==7.2.2",
+      "name": "psutil",
+      "version": "7.2.2",
+      "hashes": []
+    },
+    {
+      "line": "pyarrow==25.0.1",
+      "name": "pyarrow",
+      "version": "25.0.1",
+      "hashes": []
+    },
+    {
+      "line": "pydantic==2.13.5",
+      "name": "pydantic",
+      "version": "2.13.5",
+      "hashes": []
+    },
+    {
+      "line": "pydantic-core==2.46.5",
+      "name": "pydantic-core",
+      "version": "2.46.5",
+      "hashes": []
+    },
+    {
+      "line": "pygments==2.21.0",
+      "name": "pygments",
+      "version": "2.21.0",
+      "hashes": []
+    },
+    {
+      "line": "python-dateutil==2.9.0.post0",
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "hashes": []
+    },
+    {
+      "line": "python-dotenv==1.2.3",
+      "name": "python-dotenv",
+      "version": "1.2.3",
+      "hashes": []
+    },
+    {
+      "line": "pytrec-eval-terrier==0.5.10",
+      "name": "pytrec-eval-terrier",
+      "version": "0.5.10",
+      "hashes": []
+    },
+    {
+      "line": "pyyaml==6.0.3",
+      "name": "pyyaml",
+      "version": "6.0.3",
+      "hashes": []
+    },
+    {
+      "line": "regex==2026.9.10",
+      "name": "regex",
+      "version": "2026.9.10",
+      "hashes": []
+    },
+    {
+      "line": "requests==2.34.2",
+      "name": "requests",
+      "version": "2.34.2",
+      "hashes": []
+    },
+    {
+      "line": "rich==15.0.0",
+      "name": "rich",
+      "version": "15.0.0",
+      "hashes": []
+    },
+    {
+      "line": "safetensors==0.8.0",
+      "name": "safetensors",
+      "version": "0.8.0",
+      "hashes": []
+    },
+    {
+      "line": "scikit-learn==1.9.1",
+      "name": "scikit-learn",
+      "version": "1.9.1",
+      "hashes": []
+    },
+    {
+      "line": "scipy==1.17.1",
+      "name": "scipy",
+      "version": "1.17.1",
+      "hashes": []
+    },
+    {
+      "line": "sentence-transformers==3.4.1",
+      "name": "sentence-transformers",
+      "version": "3.4.1",
+      "hashes": []
+    },
+    {
+      "line": "sentencepiece==0.2.2",
+      "name": "sentencepiece",
+      "version": "0.2.2",
+      "hashes": []
+    },
+    {
+      "line": "setuptools==84.0.0",
+      "name": "setuptools",
+      "version": "84.0.0",
+      "hashes": []
+    },
+    {
+      "line": "shellingham==1.5.4",
+      "name": "shellingham",
+      "version": "1.5.4",
+      "hashes": []
+    },
+    {
+      "line": "six==1.17.0",
+      "name": "six",
+      "version": "1.17.0",
+      "hashes": []
+    },
+    {
+      "line": "sympy==1.14.0",
+      "name": "sympy",
+      "version": "1.14.0",
+      "hashes": []
+    },
+    {
+      "line": "tenacity==9.1.4",
+      "name": "tenacity",
+      "version": "9.1.4",
+      "hashes": []
+    },
+    {
+      "line": "threadpoolctl==3.7.0",
+      "name": "threadpoolctl",
+      "version": "3.7.0",
+      "hashes": []
+    },
+    {
+      "line": "tokenizers==0.21.4",
+      "name": "tokenizers",
+      "version": "0.21.4",
+      "hashes": []
+    },
+    {
+      "line": "torch==2.8.0",
+      "name": "torch",
+      "version": "2.8.0",
+      "hashes": []
+    },
+    {
+      "line": "torchvision==0.23.0",
+      "name": "torchvision",
+      "version": "0.23.0",
+      "hashes": []
+    },
+    {
+      "line": "tqdm==4.70.1",
+      "name": "tqdm",
+      "version": "4.70.1",
+      "hashes": []
+    },
+    {
+      "line": "transformers==4.53.1",
+      "name": "transformers",
+      "version": "4.53.1",
+      "hashes": []
+    },
+    {
+      "line": "triton==3.4.0",
+      "name": "triton",
+      "version": "3.4.0",
+      "hashes": []
+    },
+    {
+      "line": "typer==0.27.2",
+      "name": "typer",
+      "version": "0.27.2",
+      "hashes": []
+    },
+    {
+      "line": "typing-extensions==4.16.0",
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "hashes": []
+    },
+    {
+      "line": "typing-inspection==0.4.4",
+      "name": "typing-inspection",
+      "version": "0.4.4",
+      "hashes": []
+    },
+    {
+      "line": "urllib3==2.8.0",
+      "name": "urllib3",
+      "version": "2.8.0",
+      "hashes": []
+    },
+    {
+      "line": "vidore-benchmark==5.0.0",
+      "name": "vidore-benchmark",
+      "version": "5.0.0",
+      "hashes": []
+    },
+    {
+      "line": "xxhash==4.0.1",
+      "name": "xxhash",
+      "version": "4.0.1",
+      "hashes": []
+    },
+    {
+      "line": "yarl==1.25.1",
+      "name": "yarl",
+      "version": "1.25.1",
+      "hashes": []
+    }
+  ],
+  "regeneration": {
+    "tool": "reproduction/regenerate_lock.py --accept-known-advisories",
+    "rule": "requirements[].line joined with LF, plus a final LF; validate the name, version and all hash fields and check original_lock.bytes and original_lock.sha256 before writing requirements-lock.txt into a new private temporary directory outside any Git work tree. The caller removes that directory after use. No arbitrary output directory is accepted.",
+    "used_by": "reproduction/reproduce-cpu.sh --accept-known-advisories <output-dir>"
+  },
+  "known_advisories": {
+    "source": "osv-scanner 2.6.0, the release binary pinned by .github/workflows/security-scan.yml (sha256 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108, checked before use), run as `osv-scanner scan source --config <copy of .github/osv-scanner.toml> --no-resolve --lockfile=requirements.txt:<temporary copy of the lock> --format json`, which queries the OSV API; ids, aliases, maximum CVSS score, GitHub-reviewed severity, fixed versions and summaries are taken from that JSON report (sha256 cdbb291fe83d991a566e045b6de47159163f020e81dea33338d9017ce8d04b8e, not published). Not gathered from the GitHub advisory API.",
+    "observed": "2026-09-26T13:06:41Z",
+    "retained_output": "native-outputs/osv-scanner-requirements-lock-20260926T130641Z.txt (the same scan's table output)",
+    "scanner_summary": "Total 2 packages affected by 20 known vulnerabilities (1 Critical, 15 High, 4 Medium, 0 Low, 0 Unknown) from 1 ecosystem.",
+    "counts_by_severity": {
+      "High": 15,
+      "Medium": 4,
+      "Critical": 1
+    },
+    "severity_rule": "severity is OSV-Scanner's rating of each group's maximum CVSS score (Critical >= 9.0, High >= 7.0, Medium >= 4.0), the same grouping as its summary line; github_reviewed_severity is the GitHub-reviewed advisory's own rating where the group has one (it can differ)",
+    "fixed_within_colpali_engine_0_3_13_range": false,
+    "advisories": [
+      {
+        "ids": [
+          "PYSEC-2025-203"
+        ],
+        "aliases": [
+          "BIT-pytorch-2025-55551",
+          "CVE-2025-55551",
+          "PYSEC-2025-203"
+        ],
+        "package": "torch",
+        "version": "2.8.0",
+        "max_cvss_score": "7.5",
+        "severity": "High",
+        "github_reviewed_severity": null,
+        "fixed_versions": [
+          "2.9.0"
+        ],
+        "summary": null
+      },
+      {
+        "ids": [
+          "PYSEC-2025-204"
+        ],
+        "aliases": [
+          "BIT-pytorch-2025-55552",
+          "CVE-2025-55552",
+          "PYSEC-2025-204"
+        ],
+        "package": "torch",
+        "version": "2.8.0",
+        "max_cvss_score": "7.5",
+        "severity": "High",
+        "github_reviewed_severity": null,
+        "fixed_versions": [
+          "2.9.0"
+        ],
+        "summary": null
+      },
+      {
+        "ids": [
+          "PYSEC-2025-206"
+        ],
+        "aliases": [
+          "BIT-pytorch-2025-55554",
+          "CVE-2025-55554",
+          "PYSEC-2025-206"
+        ],
+        "package": "torch",
+        "version": "2.8.0",
+        "max_cvss_score": "5.3",
+        "severity": "Medium",
+        "github_reviewed_severity": null,
+        "fixed_versions": [
+          "2.9.0"
+        ],
+        "summary": null
+      },
+      {
+        "ids": [
+          "PYSEC-2026-139"
+        ],
+        "aliases": [
+          "BIT-pytorch-2026-4538",
+          "CVE-2026-4538",
+          "PYSEC-2026-139"
+        ],
+        "package": "torch",
+        "version": "2.8.0",
+        "max_cvss_score": "7.8",
+        "severity": "High",
+        "github_reviewed_severity": null,
+        "fixed_versions": [],
+        "summary": null
+      },
+      {
+        "ids": [
+          "PYSEC-2026-2286"
+        ],
+        "aliases": [
+          "BIT-pytorch-2026-24747",
+          "CVE-2026-24747",
+          "GHSA-63cw-57p8-fm3p",
+          "PYSEC-2026-1856",
+          "PYSEC-2026-2286"
+        ],
+        "package": "torch",
+        "version": "2.8.0",
+        "max_cvss_score": "8.8",
+        "severity": "High",
+        "github_reviewed_severity": null,
+        "fixed_versions": [
+          "2.10.0"
+        ],
+        "summary": null
+      },
+      {
+        "ids": [
+          "GHSA-qfhq-4f3w-5fph"
+        ],
+        "aliases": [
+          "BIT-pytorch-2025-3001",
+          "CVE-2025-3001",
+          "GHSA-qfhq-4f3w-5fph",
+          "PYSEC-2025-195"
+        ],
+        "package": "torch",
+        "version": "2.8.0",
+        "max_cvss_score": "5.3",
+        "severity": "Medium",
+        "github_reviewed_severity": "LOW",
+        "fixed_versions": [
+          "2.10.0"
+        ],
+        "summary": "PyTorch is vulnerable to memory corruption through its torch.lstm_cell function"
+      },
+      {
+        "ids": [
+          "GHSA-rrmf-rvhw-rf47"
+        ],
+        "aliases": [
+          "BIT-pytorch-2025-3000",
+          "CVE-2025-3000",
+          "GHSA-rrmf-rvhw-rf47",
+          "PYSEC-2025-194"
+        ],
+        "package": "torch",
+        "version": "2.8.0",
+        "max_cvss_score": "5.3",
+        "severity": "Medium",
+        "github_reviewed_severity": "LOW",
+        "fixed_versions": [
+          "2.13.0"
+        ],
+        "summary": "PyTorch is vulnerable to memory corruption through its torch.jit.script function"
+      },
+      {
+        "ids": [
+          "GHSA-vgrw-7cvw-pwgx"
+        ],
+        "aliases": [
+          "BIT-pytorch-2025-2999",
+          "CVE-2025-2999",
+          "GHSA-vgrw-7cvw-pwgx",
+          "PYSEC-2025-193"
+        ],
+        "package": "torch",
+        "version": "2.8.0",
+        "max_cvss_score": "5.3",
+        "severity": "Medium",
+        "github_reviewed_severity": "MODERATE",
+        "fixed_versions": [
+          "2.9.1"
+        ],
+        "summary": "PyTorch is vulnerable to memory corruption through its unpack_sequence function"
+      },
+      {
+        "ids": [
+          "PYSEC-2025-211"
+        ],
+        "aliases": [
+          "CVE-2025-14920",
+          "PYSEC-2025-211"
+        ],
+        "package": "transformers",
+        "version": "4.53.1",
+        "max_cvss_score": "7.8",
+        "severity": "High",
+        "github_reviewed_severity": null,
+        "fixed_versions": [],
+        "summary": null
+      },
+      {
+        "ids": [
+          "PYSEC-2025-212"
+        ],
+        "aliases": [
+          "CVE-2025-14921",
+          "PYSEC-2025-212"
+        ],
+        "package": "transformers",
+        "version": "4.53.1",
+        "max_cvss_score": "7.8",
+        "severity": "High",
+        "github_reviewed_severity": null,
+        "fixed_versions": [],
+        "summary": null
+      },
+      {
+        "ids": [
+          "PYSEC-2025-213"
+        ],
+        "aliases": [
+          "CVE-2025-14924",
+          "PYSEC-2025-213"
+        ],
+        "package": "transformers",
+        "version": "4.53.1",
+        "max_cvss_score": "7.8",
+        "severity": "High",
+        "github_reviewed_severity": null,
+        "fixed_versions": [],
+        "summary": null
+      },
+      {
+        "ids": [
+          "PYSEC-2025-214"
+        ],
+        "aliases": [
+          "CVE-2025-14926",
+          "PYSEC-2025-214"
+        ],
+        "package": "transformers",
+        "version": "4.53.1",
+        "max_cvss_score": "7.8",
+        "severity": "High",
+        "github_reviewed_severity": null,
+        "fixed_versions": [],
+        "summary": null
+      },
+      {
+        "ids": [
+          "PYSEC-2025-215"
+        ],
+        "aliases": [
+          "CVE-2025-14927",
+          "PYSEC-2025-215"
+        ],
+        "package": "transformers",
+        "version": "4.53.1",
+        "max_cvss_score": "7.8",
+        "severity": "High",
+        "github_reviewed_severity": null,
+        "fixed_versions": [],
+        "summary": null
+      },
+      {
+        "ids": [
+          "PYSEC-2025-216"
+        ],
+        "aliases": [
+          "CVE-2025-14928",
+          "PYSEC-2025-216"
+        ],
+        "package": "transformers",
+        "version": "4.53.1",
+        "max_cvss_score": "7.8",
+        "severity": "High",
+        "github_reviewed_severity": null,
+        "fixed_versions": [],
+        "summary": null
+      },
+      {
+        "ids": [
+          "PYSEC-2025-217"
+        ],
+        "aliases": [
+          "CVE-2025-14929",
+          "PYSEC-2025-217"
+        ],
+        "package": "transformers",
+        "version": "4.53.1",
+        "max_cvss_score": "7.8",
+        "severity": "High",
+        "github_reviewed_severity": null,
+        "fixed_versions": [],
+        "summary": null
+      },
+      {
+        "ids": [
+          "PYSEC-2025-218"
+        ],
+        "aliases": [
+          "CVE-2025-14930",
+          "PYSEC-2025-218"
+        ],
+        "package": "transformers",
+        "version": "4.53.1",
+        "max_cvss_score": "7.8",
+        "severity": "High",
+        "github_reviewed_severity": null,
+        "fixed_versions": [],
+        "summary": null
+      },
+      {
+        "ids": [
+          "PYSEC-2026-2288",
+          "GHSA-69w3-r845-3855"
+        ],
+        "aliases": [
+          "CVE-2026-1839",
+          "GHSA-69w3-r845-3855",
+          "PYSEC-2026-2288"
+        ],
+        "package": "transformers",
+        "version": "4.53.1",
+        "max_cvss_score": "7.8",
+        "severity": "High",
+        "github_reviewed_severity": "MODERATE",
+        "fixed_versions": [
+          "5.0.0",
+          "5.0.0rc3"
+        ],
+        "summary": "HuggingFace Transformers allows for arbitrary code execution in the `Trainer` class"
+      },
+      {
+        "ids": [
+          "PYSEC-2026-2289",
+          "GHSA-29pf-2h5f-8g72"
+        ],
+        "aliases": [
+          "CVE-2026-4372",
+          "GHSA-29pf-2h5f-8g72",
+          "PYSEC-2026-2289"
+        ],
+        "package": "transformers",
+        "version": "4.53.1",
+        "max_cvss_score": "7.8",
+        "severity": "High",
+        "github_reviewed_severity": "HIGH",
+        "fixed_versions": [
+          "5.3.0"
+        ],
+        "summary": "HuggingFace transformers vulnerable to remote code execution"
+      },
+      {
+        "ids": [
+          "PYSEC-2026-2290",
+          "GHSA-fgcw-684q-jj6r"
+        ],
+        "aliases": [
+          "CVE-2026-5241",
+          "GHSA-fgcw-684q-jj6r",
+          "PYSEC-2026-2290"
+        ],
+        "package": "transformers",
+        "version": "4.53.1",
+        "max_cvss_score": "9.6",
+        "severity": "Critical",
+        "github_reviewed_severity": "HIGH",
+        "fixed_versions": [
+          "5.5.0"
+        ],
+        "summary": "huggingface/transformers: Arbitrary Code Execution During Model Initialization in the LightGlue Model Loading Path"
+      },
+      {
+        "ids": [
+          "PYSEC-2026-3929",
+          "GHSA-xrqw-3rrv-vx5w"
+        ],
+        "aliases": [
+          "CVE-2026-9856",
+          "GHSA-xrqw-3rrv-vx5w",
+          "PYSEC-2026-3929"
+        ],
+        "package": "transformers",
+        "version": "4.53.1",
+        "max_cvss_score": "7.1",
+        "severity": "High",
+        "github_reviewed_severity": "HIGH",
+        "fixed_versions": [
+          "5.10.0"
+        ],
+        "summary": "Transformers save_pretrained path traversal allows arbitrary file writes through chat template names"
+      }
+    ]
+  }
+}

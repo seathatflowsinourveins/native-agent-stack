@@ -1,0 +1,68 @@
+
+> byterover-cli@3.16.1 test
+> mocha --forbid-only "test/**/*.test.ts"
+
+(node:2680167) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("ts-node/esm", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2680167) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+
+  Connectors Command
+[... lines 13-139 of 11142 omitted from this published excerpt ...]
+      ✔ should have internal description
+
+  Init Command
+    successful initialization
+      - should display ready message when project is newly initialized
+      - should display already initialized message and stop when project exists
+    sub-command delegation
+      - should call vc:init after local init
+      - should call providers:connect when no provider configured
+      - should skip providers:connect when provider already configured
+      - should call connectors:install after local init
+      - should not call sub-commands if local init fails
+      - should stop after providers:connect is cancelled by user
+    force flag
+      - should pass force flag to init:local
+    connection errors
+      - should handle daemon not running
+
+  Locations Command
+[... lines 159-895 of 11142 omitted from this published excerpt ...]
+          ✔ should save memory via create()
+          ✔ should save updated memory via update()
+        load logic
+          ✔ should load existing memory via get()
+          - should load all memories via list()
+          ✔ should handle missing memory gracefully
+          - should list memories with all options (limit, offset, source, pinned, combined)
+          - should sort memories by updatedAt descending
+        delete logic
+          ✔ should delete a memory
+[... lines 906-4109 of 11142 omitted from this published excerpt ...]
+      ✔ outside any ALS scope falls back to config file
+
+  File System Tools
+    read_file
+      - should read file content successfully
+      ✔ should handle pagination parameters
+      - should return pagination metadata when file is truncated
+      - should return truncatedLineCount when lines are too long
+      ✔ should propagate file not found error
+      ✔ should propagate file too large error
+[... lines 4120-11129 of 11142 omitted from this published excerpt ...]
+      ✔ does not leak `undefined` when no context is supplied
+      ✔ ignores context for non-function overrides
+
+  toastVcError
+    ✔ attaches a "Set identity" action for ERR_VC_CONFIG_KEY_NOT_SET
+    ✔ attaches a "Set remote" action for ERR_VC_NO_REMOTE
+    ✔ calls toast.error with no action for an unknown error code
+
+
+  8340 passing (39s)
+  16 pending
+
+npm_test_exit=0

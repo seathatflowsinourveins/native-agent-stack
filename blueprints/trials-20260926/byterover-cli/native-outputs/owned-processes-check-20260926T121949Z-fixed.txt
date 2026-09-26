@@ -1,0 +1,10 @@
+{"case": "graceful", "record_exit": 0, "recorded_roles": ["daemon", "descendant of the daemon"], "daemon_pgrp_and_session_equal_its_pid": true, "stop_exit": 0, "signals_sent": {"daemon": ["SIGTERM"], "descendant of the daemon": []}, "all_gone": true, "stop_seconds": 0.1, "decoy_alive": true, "expectation_held": true}
+{"case": "stubborn", "record_exit": 0, "recorded_roles": ["daemon", "descendant of the daemon"], "daemon_pgrp_and_session_equal_its_pid": true, "stop_exit": 0, "signals_sent": {"daemon": ["SIGTERM", "SIGKILL"], "descendant of the daemon": ["SIGKILL"]}, "all_gone": true, "stop_seconds": 10.13, "decoy_alive": true, "expectation_held": true}
+{"case": "foreign-file", "record_exit": 1, "ledger_written": false, "decoy_alive": true, "expectation_held": true}
+{"case": "unreadable", "record_exit": 1, "ledger_written": false, "expectation_held": true}
+{"case": "reused-pid", "stop_exit": 0, "signals_sent": [[]], "bystander_alive": true, "expectation_held": true}
+{"case": "preflight", "preflight_exit": 0, "expectation_held": true}
+{"case": "pidfd-open-missing", "stop_exit": 1, "signals_sent": [], "sleeper_alive": true, "preflight_exit": 1, "expectation_held": true}
+{"case": "pidfd-open-enosys", "stop_exit": 1, "signals_sent": [], "sleeper_alive": true, "preflight_exit": 1, "expectation_held": true}
+{"case": "pidfd-send-missing", "stop_exit": 1, "signals_sent": [], "sleeper_alive": true, "preflight_exit": 1, "expectation_held": true}
+{"cases": 9, "all_expectations_held": true}

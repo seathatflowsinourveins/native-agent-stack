@@ -1,0 +1,2 @@
+{"command":"curate","data":{"event":"thinking","taskId":"<uuid>"},"success":true,"timestamp":"2026-09-26T01:29:55.868Z"}
+{"command":"curate","data":{"event":"error","logId":"cur-1790386195164","message":"request (12351 tokens) exceeds the available context size (8192 tokens), try increasing it","status":"error"},"success":false,"timestamp":"2026-09-26T01:30:07.921Z"}

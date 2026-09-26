@@ -8020,8 +8020,1378 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "a75270b3de92574d1b8136b73d56015dee601d8f951641ba63f44493129471a8",
-      "bytes": 481873
+      "sha256": "659415aa9b276a6abf6d24d2243cc1f17c13dcc8d5af26863bfea85f9daa7c55",
+      "bytes": 481964
+    },
+    {
+      "path": "blueprints/trials-20260926/README.md",
+      "sha256": "3c63b60362ef79568d972ff5a6fbf72743be39ea79820310364451469e914f03",
+      "bytes": 20422
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/README.md",
+      "sha256": "1a6f5134e5b89dee59f06b6890d4b01aad370a1d8511e5afb5253d776ffaf0e8",
+      "bytes": 26367
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/local-integration/connect-local-llm-safe.sh",
+      "sha256": "5b2c54943172b988155f2db9992bc870f7eaf490f20a4ab00e3fb8c5f11eae5f",
+      "bytes": 3796
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/local-integration/connect-local-llm.sh",
+      "sha256": "0917197eaf8580286b36c68eeec7643e20ee5e00207627a9784979d0320831f0",
+      "bytes": 2076
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/local-integration/credential-argv-probe.py",
+      "sha256": "9bcb436009e4ae32e7d5be3e023c610cfba3055ad879239bf3761dad4b08363a",
+      "bytes": 6065
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/local-integration/fixed/connect-local-llm-safe.sh",
+      "sha256": "7b7d8b043132cb31aa71e0255053ca781c6d4821d983543f8defc7a2d53fcc36",
+      "bytes": 4574
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/local-integration/fixed/credential-argv-probe.py",
+      "sha256": "016b6f34e8043fbf6792199ee318eb1ea110e239bb18be60f715ced0b06287f3",
+      "bytes": 7845
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/local-integration/testsuite-self-contained-cmd.sh",
+      "sha256": "4206dc66f29bfcbfe14db392600685bbd17184487bb981cb66f7a350b5235b5c",
+      "bytes": 382
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/local-integration/withdrawn-grep-use-check.sh",
+      "sha256": "f9e62c1fdb85536110ef8cb1e1a58576624341c1b31ed00c587d93c108d97cf7",
+      "bytes": 849
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/credential-argv-probe-20260926T111651Z.txt",
+      "sha256": "9a2a8b03bd66f1acaca17a495514969e2332f0944d7c6a82c584032ff63b9c7c",
+      "bytes": 504
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/credential-argv-probe-20260926T121653Z-as-run.txt",
+      "sha256": "184a5643df8f27a683f309416c92c59574b8f7d8ddc57edc12779e8c95d74002",
+      "bytes": 1356
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/credential-argv-probe-20260926T121709Z-fixed.txt",
+      "sha256": "52817a3c108e6b7dca673f9e398b51f480b451fbb6a8423a4952bcb271281178",
+      "bytes": 1355
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/curate-context-error.ndjson",
+      "sha256": "d9731fb7a1dc2367df8cdc9e833375b85c1a72e68563a1e5516d20af5f9f1a10",
+      "bytes": 370
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/daemon-log-0129Z.log",
+      "sha256": "1a7d60f3dd5ea819c013438e40eecec6886102be74e5929ffba04546bf4415d5",
+      "bytes": 19394
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/daemon-log-0308Z.log",
+      "sha256": "dec3dae5c672d2f48c4596b7eae7c1e880e934c67a81c98a14aa04d48d48934c",
+      "bytes": 11830
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/llamacpp-v1-models.json",
+      "sha256": "15b56a02fdbc586f20d70d3caa41bf7996e8f456ef8002eca03d8d037005b114",
+      "bytes": 625
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/npm-ci-tag-v3.16.1.log",
+      "sha256": "b048831761daa94ac140acf073f912c23cbaa32786fd997d112dd2ffb2e9f133",
+      "bytes": 1509
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/npm-install-global-3.16.1.log",
+      "sha256": "5bc9d6b4cb2dc9adc657b9015193aa150069d067750047fbfd74ef93baabe310",
+      "bytes": 1231
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/npm-test-self-contained-rerun.log",
+      "sha256": "35644197f13f0d5758607a8812bc13189f605c9ef441a0763952be02488c1d30",
+      "bytes": 118
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/npm-test-tag-v3.16.1-excerpt.log",
+      "sha256": "0b2dbc5192f6ccd77b57896e5a13b74fb467f123ef7f6cd606b89da54b80854f",
+      "bytes": 2924
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/oclif-autoupdate.log",
+      "sha256": "c06d4665ef65ac53ee40278798bc4df817dd0598ee3cfa6d54e53fb8b8685ce9",
+      "bytes": 367
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/owned-processes-check-20260926T110019Z.txt",
+      "sha256": "622a3afd97b25ea9af67cfe34e13b22fc6323b18c591847c8697ed3cdcebbbc6",
+      "bytes": 1023
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/owned-processes-check-20260926T121929Z-as-run.txt",
+      "sha256": "aa93a46619d63158ff4b255ea9a2cdec756e479e40a5dffdd878bad159b012b5",
+      "bytes": 1527
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/owned-processes-check-20260926T121949Z-fixed.txt",
+      "sha256": "447681841c85c9ebd597a52e682c2a1da98e60200f641d7a5a451652723cc3a5",
+      "bytes": 1502
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/ownership-failure-check-20260926T122516Z-as-run.txt",
+      "sha256": "45919dbe5e8a85f31fb5542ab17a7f6556058f926c05072f61e37541692699ff",
+      "bytes": 1566
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/ownership-failure-check-20260926T122520Z-fixed.txt",
+      "sha256": "8eadb5ee1b34de2e0cb410d154a7edad8cf92646384365e90fb8038347ecd751",
+      "bytes": 2226
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/query-tier2-no-match.json",
+      "sha256": "398cfde8cd98355d45235000ddcef23c6409d64ebc21ae767d9a8d2f78fc90c9",
+      "bytes": 594
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/task-records/01-curate-context-error.json",
+      "sha256": "b128647a26de16a4cc051465349c75efb9c271b70f6ba8d08262be37501939d0",
+      "bytes": 953
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/task-records/02-query-tier2-before-commit.json",
+      "sha256": "3caa9a5c35ce53cc28910cd2072169ba2fc64c66334a23aee956446261e9f91c",
+      "bytes": 928
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/task-records/03-search-empty-tree.json",
+      "sha256": "b2755afda96d97a8c3a069b80741ad5059c1eef81c59b26f7524196b78c65714",
+      "bytes": 623
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/task-records/04-search-rate-limiter.json",
+      "sha256": "a98f8d1bbd6fdb62b5a20e7b12c4f45f28fedde8eec0c25d498b2c55d1865110",
+      "bytes": 938
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/task-records/05-search-nonexistent.json",
+      "sha256": "f15753e4b3fa1b301960f5c03c0e9ab2367ae33df7205f63ea97dcdfe7ab5fb3",
+      "bytes": 671
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/task-records/06-query-tier2-after-commit.json",
+      "sha256": "3250b9b7df01d37d8defcdd8206d48a0aff429c370bcf38a9cfbf80494d08081",
+      "bytes": 928
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/task-records/07-query-context-error.json",
+      "sha256": "b1d5b4c9a3f4f619a54d17da2faf7909141e21e050d2e7f83c50cdcdae612896",
+      "bytes": 820
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/task-records/08-curate-log.json",
+      "sha256": "f0a431290b1fe695bc0eaa7ccd953a1fb6064a489ebbacca548b374f7b75f2e2",
+      "bytes": 572
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/task-records/09-query-log-tier2-1.json",
+      "sha256": "f045cba2654efb84b210e50a36d25ef929d6dbaf1880f4ffdaa64b0c351701c3",
+      "bytes": 754
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/task-records/10-query-log-tier2-2.json",
+      "sha256": "a6281f98925ebfa2801cea3aa2b77e9f8751d2750fd561f5190e0497e186294f",
+      "bytes": 754
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/task-records/11-query-log-context-error.json",
+      "sha256": "35f01d905f67916a3d52c8f82d0c6d8b973c49bf43db834ca2280ad7d7e54a35",
+      "bytes": 309
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/check_search.py",
+      "sha256": "bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534",
+      "bytes": 3144
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/fixed/check_search.py",
+      "sha256": "bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534",
+      "bytes": 3144
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/fixed/owned_processes.py",
+      "sha256": "f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631",
+      "bytes": 10680
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/fixed/owned_processes_check.py",
+      "sha256": "e89ea78a7b6272fd1457a8b3873fa3286a889aed12b242defc215dbc67408ac0",
+      "bytes": 11162
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/fixed/ownership_failure_check.py",
+      "sha256": "6d23646bb5b80253300870f580bb5725ca97dc291be7e411727bdc8fa9671607",
+      "bytes": 11642
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/fixed/reproduce-vc-search.sh",
+      "sha256": "fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39",
+      "bytes": 11787
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/owned_processes.py",
+      "sha256": "e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3",
+      "bytes": 8323
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/owned_processes_check.py",
+      "sha256": "42e90ec48c75b8d06beeca4aa85672703c39dbf5d3754d7673bd53add0f3fc91",
+      "bytes": 7805
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/reproduce-vc-search.sh",
+      "sha256": "619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799",
+      "bytes": 9124
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/as-run-0454Z/probe.log",
+      "sha256": "2d0e2344422263522ee6371cbb14de84baaa00239708ee9782dc42dc21a2e36d",
+      "bytes": 1214
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/as-run-0454Z/run-90-restart.stdout",
+      "sha256": "12c0a5e2f1dfeefed4c6fdd1a8f5a37956ae457445c93853bfd6b7e5f4ba751e",
+      "bytes": 82
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/as-run-0454Z/run-steps.log",
+      "sha256": "1243d5ca41fe516f54ebc7a6dd335c644ea4f9b2c6dc6bd7f9f98a516962ad09",
+      "bytes": 2397
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/current/probe.log",
+      "sha256": "170aa66425236ae7feda1802264814e3947255ff38b37951a40e4c73f399f0c6",
+      "bytes": 1280
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/current/run-80-owned-processes.stdout",
+      "sha256": "9eb3e277b298c755e99b9fbe5f08b6ff9d57e5b9127df2373ceb491ac43343fe",
+      "bytes": 307
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/current/run-90-stop.stdout",
+      "sha256": "8199ae647b91469030743a640539592c50082373f06c4a1a767274573ed9cb67",
+      "bytes": 285
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/current/run-steps.log",
+      "sha256": "44256313f3b79650ecde52b412621fa057e57ea0cd66f62e9989235f77906092",
+      "bytes": 2847
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/fixed/probe.log",
+      "sha256": "525e6c5c10a4d3d3fd11f0b14c3e7da10dbf9978814b2eafc9e6c552b5feb647",
+      "bytes": 1280
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/fixed/run-00-pidfd-preflight.stdout",
+      "sha256": "38ba697e03f57483794b7f581e5d94ca89e537799c057e3e9715c00d964f1d96",
+      "bytes": 81
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/fixed/run-80-owned-processes.stdout",
+      "sha256": "09adc72a403be4df91a6a6a6ddd42f171c253efe88c364745d382a0ac3ff43b4",
+      "bytes": 307
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/fixed/run-90-stop.stdout",
+      "sha256": "2459820dea28a8cfbca7ddcaa9d547c0b0e6ccbc5b2141b831e672819c8df879",
+      "bytes": 285
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/fixed/run-steps.log",
+      "sha256": "f8d9e4da87369d1140f363b85cd7a1859c31520247dc87839ea5daa75cefb929",
+      "bytes": 2864
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe.sh",
+      "sha256": "1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26",
+      "bytes": 4695
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/00-npm-view.stdout",
+      "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c",
+      "bytes": 96
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/01-npm-pack.stderr",
+      "sha256": "ddd7f32134d6aec5e8c0d73e169c0b70cb348086ff89b4860efe499990ab690d",
+      "bytes": 591
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/01-npm-pack.stdout",
+      "sha256": "e6e55341bae0b8f80c2fd8a2c47e06c3a88ad8b7ee32fe093e1225c5f3384d28",
+      "bytes": 25
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/02-tarball-integrity.stdout",
+      "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c",
+      "bytes": 96
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/03-npm-install.stderr",
+      "sha256": "f06923a31a1dd49b8c527e423fc9f3922c930d104f0f9a22e02d51af6b88025e",
+      "bytes": 1190
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/03-npm-install.stdout",
+      "sha256": "421352c5a3af79693d687a79c52798873f96712e4010e9e43f7798aae0ff726d",
+      "bytes": 26
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/04-version.stdout",
+      "sha256": "fe02064f4a2c875b0bc6b4abd672e1e4f031a1abfe24bbdf9114e53f65a1031b",
+      "bytes": 43
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/10-vc-init.stdout",
+      "sha256": "da589371c6812334e110452d5228e30e8adba635351326c97e1dff9444cb7e59",
+      "bytes": 92
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/11-vc-add.stdout",
+      "sha256": "5abbc1a501f89c95fd1eaedaa30e1557ec67f28e30dcdc731a90a26c9292e7c7",
+      "bytes": 18
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/12-vc-config-name.stdout",
+      "sha256": "367a2d69df5781c6e4babaaa01cf0b2bce228f3a849c6ae1e41205f369bd301f",
+      "bytes": 12
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/13-vc-config-email.stdout",
+      "sha256": "f7ac839f3122157c392822ea517f7a2a2c42d56b4b068555e7310e590cd552c6",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/14-vc-commit.stdout",
+      "sha256": "c5656e49fe2e662f4cff63d6b177371b30ce5fe9dd21d6493293f8ce5c8d7898",
+      "bytes": 37
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/15-vc-log.stdout",
+      "sha256": "644fb83b1541376bf733f38127e2f017b5b376674c8c4d554ae33b3cca6c8ca4",
+      "bytes": 119
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/16-status.stdout",
+      "sha256": "e310be7586b55d0ac2f2beaa89c540e3a79a5ed697749c873e0d3984c9b04529",
+      "bytes": 330
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/20-search-positive.stdout",
+      "sha256": "6b8f202c4afb6a7f3655c1e296d6c1c80a165780284c5e50017174c78e8fc046",
+      "bytes": 481
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/21-search-second-positive.stdout",
+      "sha256": "77ef41f60fe5d8512372dba2cece33b7964c4675e24d8fe735a668bee5ced5f9",
+      "bytes": 461
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/22-search-negative.stdout",
+      "sha256": "75cad80c20b38133b389d209c8c7fbccfe71ee7ffa4cedebc375d87790fa4e8d",
+      "bytes": 240
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/30-check-positive.stdout",
+      "sha256": "fa5688ce288288f3704d1d266ab2cdac8403676dc24c843761fd08355a281bd4",
+      "bytes": 286
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/31-check-second-positive.stdout",
+      "sha256": "317cb2a8b118bfb83d4424f871b2362586fc4f376cae93f7dee82bd87590ab7d",
+      "bytes": 290
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/32-check-negative.stdout",
+      "sha256": "0ecd6c193f53f755db8c2d10441cfb6f66825f46f7f42c3d170907a0745700aa",
+      "bytes": 237
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/33-check-wrong-path-must-fail.stdout",
+      "sha256": "dd3f37712c04584f98b05ac0aa72809c26b94605e4ee9c32d4001100b5afe816",
+      "bytes": 408
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/34-check-wrong-count-must-fail.stdout",
+      "sha256": "9ecf4a397d69f51be95e72ba6c56e4c8109be5f1cd8d8f4d911d5a0b6a72c91b",
+      "bytes": 366
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/90-restart.stdout",
+      "sha256": "9dcbe926e78dad78d31abe0533e58c1cc3b07f2c76ed2bdca1d2d49158c80aef",
+      "bytes": 86
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/check_search.py",
+      "sha256": "bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534",
+      "bytes": 3144
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/reproduce-vc-search.sh",
+      "sha256": "970c5923e00763c20a63e060bad13a70f6e9447df2ab98aac19499ec0ffd87cd",
+      "bytes": 5379
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0424Z/steps.log",
+      "sha256": "08b4fecd53181c2b5b77f2fe324b48e6188d2ab8fe8cf3b3cb8fc532ab62a79f",
+      "bytes": 1963
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/00-npm-view.stdout",
+      "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c",
+      "bytes": 96
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/01-npm-pack.stderr",
+      "sha256": "ddd7f32134d6aec5e8c0d73e169c0b70cb348086ff89b4860efe499990ab690d",
+      "bytes": 591
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/01-npm-pack.stdout",
+      "sha256": "e6e55341bae0b8f80c2fd8a2c47e06c3a88ad8b7ee32fe093e1225c5f3384d28",
+      "bytes": 25
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/02-tarball-integrity.stdout",
+      "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c",
+      "bytes": 96
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/03-npm-install.stderr",
+      "sha256": "f06923a31a1dd49b8c527e423fc9f3922c930d104f0f9a22e02d51af6b88025e",
+      "bytes": 1190
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/03-npm-install.stdout",
+      "sha256": "421352c5a3af79693d687a79c52798873f96712e4010e9e43f7798aae0ff726d",
+      "bytes": 26
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/04-version.stdout",
+      "sha256": "fe02064f4a2c875b0bc6b4abd672e1e4f031a1abfe24bbdf9114e53f65a1031b",
+      "bytes": 43
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/10-vc-init.stdout",
+      "sha256": "8eb415f14438ea11bfc95d17a28565a25160da6f4cb932d03b011634912811c4",
+      "bytes": 92
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/11-vc-add.stdout",
+      "sha256": "5abbc1a501f89c95fd1eaedaa30e1557ec67f28e30dcdc731a90a26c9292e7c7",
+      "bytes": 18
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/12-vc-config-name.stdout",
+      "sha256": "367a2d69df5781c6e4babaaa01cf0b2bce228f3a849c6ae1e41205f369bd301f",
+      "bytes": 12
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/13-vc-config-email.stdout",
+      "sha256": "f7ac839f3122157c392822ea517f7a2a2c42d56b4b068555e7310e590cd552c6",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/14-vc-commit.stdout",
+      "sha256": "fbb050c0544545e2068151182232d26433819f59bad6265c34cf4b380605da26",
+      "bytes": 37
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/15-vc-log.stdout",
+      "sha256": "a18f5134f21651ad475f42e1a4b104713cb2a43bb055177f8fd3e00aa13ea78a",
+      "bytes": 119
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/16-status.stdout",
+      "sha256": "7ba10b247bd779e89c866ddc121b6fdeacf4282d612e2c05bb81a8f2a3ce22bb",
+      "bytes": 330
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/20-search-positive.stdout",
+      "sha256": "002e74e81918eb7afa6fbb1743ac7f4b21e6e89a53ca062f6a2c27a4b566735a",
+      "bytes": 481
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/21-search-second-positive.stdout",
+      "sha256": "4310443539ca342f88838af1910f7297999aae7135e597407f30ced8d0e87667",
+      "bytes": 461
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/22-search-negative.stdout",
+      "sha256": "2379a2cf255d107aa41a4497f43b505dd13d886f718df2506b3d420b08d746b9",
+      "bytes": 240
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/30-check-positive.stdout",
+      "sha256": "95510e0783f1d9970f2a0628b0eb5f572335462b164502f384763dbb52fb5e9e",
+      "bytes": 288
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/31-check-second-positive.stdout",
+      "sha256": "e020101a83d15926a1cfa21d9dfd0fa67f8941078ae753130f77b73740133cef",
+      "bytes": 292
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/32-check-negative.stdout",
+      "sha256": "ff84912b3850f546852b483412c43a9c71847e906eed92027b00e205b71e9d5e",
+      "bytes": 239
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/33-check-wrong-path-must-fail.stdout",
+      "sha256": "adde44f16f1dcf84a9a05554a792d18dc28194c3aa84fb55eaf9cc2ea6d1c2cf",
+      "bytes": 410
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/34-check-wrong-count-must-fail.stdout",
+      "sha256": "dcf63a64b0c47785146f00a04cb54d6a5a5399a69b67a57f7aba4f976657de4a",
+      "bytes": 368
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/90-restart.stdout",
+      "sha256": "5b961858a31bc95d2ee4a2d2ee377266e28e9253e673cfd998fdf9066fae6d99",
+      "bytes": 86
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/host-state-observation.txt",
+      "sha256": "706c78b16928a5589541df781289ed4565653ae763dab83aff0ad515a174b304",
+      "bytes": 408
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/reproduce-vc-search.sh",
+      "sha256": "685342c9aea27b2604f0a3000717a7f292323ca63e752e98e4901e42514f875f",
+      "bytes": 5743
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T0454Z/steps.log",
+      "sha256": "0a2ab31443fbf7882f4e997c6b4b2d5f0e40b316a1f80f2d61408e11db3428aa",
+      "bytes": 1963
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/00-npm-view.stdout",
+      "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c",
+      "bytes": 96
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/01-npm-pack.stderr",
+      "sha256": "ddd7f32134d6aec5e8c0d73e169c0b70cb348086ff89b4860efe499990ab690d",
+      "bytes": 591
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/01-npm-pack.stdout",
+      "sha256": "e6e55341bae0b8f80c2fd8a2c47e06c3a88ad8b7ee32fe093e1225c5f3384d28",
+      "bytes": 25
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/02-tarball-integrity.stdout",
+      "sha256": "9ebadd0663f0e1300ca4d28b91d55de9f92c392c25c5c9550820baeac55f286c",
+      "bytes": 96
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/03-npm-install.stderr",
+      "sha256": "f06923a31a1dd49b8c527e423fc9f3922c930d104f0f9a22e02d51af6b88025e",
+      "bytes": 1190
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/03-npm-install.stdout",
+      "sha256": "6804b8e0437308d2824c3a595cc7e136c9ce2b237af7597a711d46713b0e4d49",
+      "bytes": 26
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/04-version.stdout",
+      "sha256": "fe02064f4a2c875b0bc6b4abd672e1e4f031a1abfe24bbdf9114e53f65a1031b",
+      "bytes": 43
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/05-npm-ls.stderr",
+      "sha256": "4dd8c5fa90f67da6b7bee63ed4f83899f011d8748c4b5c49250fe00209e8f79c",
+      "bytes": 344
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/05-npm-ls.stdout",
+      "sha256": "3f95fcf714a5f5bd2b49d989702c73a51786ba0ef7ea43aa8154dcac56ea4c02",
+      "bytes": 419
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/10-vc-init.stdout",
+      "sha256": "cb941e387e2d6401399a179ff780644997b86fc12c6f1d9c32654b5aceadf2b3",
+      "bytes": 118
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/11-vc-add.stdout",
+      "sha256": "5abbc1a501f89c95fd1eaedaa30e1557ec67f28e30dcdc731a90a26c9292e7c7",
+      "bytes": 18
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/12-vc-config-name.stdout",
+      "sha256": "367a2d69df5781c6e4babaaa01cf0b2bce228f3a849c6ae1e41205f369bd301f",
+      "bytes": 12
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/13-vc-config-email.stdout",
+      "sha256": "f7ac839f3122157c392822ea517f7a2a2c42d56b4b068555e7310e590cd552c6",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/14-vc-commit.stdout",
+      "sha256": "59e7f22061ccc45b385ade5f978f19412e3d7853d2ab68864c767aac9dbe51d5",
+      "bytes": 37
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/15-vc-log.stdout",
+      "sha256": "469a87336893468fe0ce084b7249cee26c6be582170481b06380e2b2b23f8e6a",
+      "bytes": 120
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/16-status.stdout",
+      "sha256": "5782b000b5981b56f0b6117d81e3dd69573b4b6862336e5bdc8ec0df2d7a12c8",
+      "bytes": 408
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/20-search-positive.stdout",
+      "sha256": "3a5812e714cce371702b75fe830f5218afd4bfd415a1b4f4b9c7dd5ccdf8b057",
+      "bytes": 481
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/21-search-second-positive.stdout",
+      "sha256": "12c662f0be9fd16c68c5bd699427cf2ae056dfc41be01a8a25dbd6ac0b4fcd77",
+      "bytes": 461
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/22-search-negative.stdout",
+      "sha256": "63ea287cd4cd06b2b86a5eb3ed3b96ddfff1e65f529b975a334a8a285e5e8013",
+      "bytes": 240
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/30-check-positive.stdout",
+      "sha256": "1eea0ee00ae11a03f4b36ee229ec38e56a98578ff219e0e8bb3cee27fd94f642",
+      "bytes": 303
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/31-check-second-positive.stdout",
+      "sha256": "5bf751b90f3b0291c004614fda537a4ef3dd6e08b79d5f8a36480f55618356d4",
+      "bytes": 307
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/32-check-negative.stdout",
+      "sha256": "5d93ad4a0a9084e0cc005387f6955c98fce4261ba9b2c8981f655748bacf788f",
+      "bytes": 254
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/33-check-wrong-path-must-fail.stdout",
+      "sha256": "83e18524bdb775fe8bd38ced0fb265c21209c1fad4658a1253d1641470824f95",
+      "bytes": 425
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/34-check-wrong-count-must-fail.stdout",
+      "sha256": "2b4db63b3c3843bbdbced697d44c601f0f06cfe3443d65388a6a2ca8fd07267a",
+      "bytes": 383
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/80-owned-processes.stdout",
+      "sha256": "a3e7165054e8999bc4f0041274da25151d8da0778c3a21ef96694e89d3483fee",
+      "bytes": 341
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/90-stop.stdout",
+      "sha256": "174d363381b1725fbb1234c057c09f7a6bf7024427d34ea97022175dfc6c49e5",
+      "bytes": 293
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/host-state-observation.txt",
+      "sha256": "dfe1f869375324281861e807ed730f8e67052ca2d35cc52d5b7e29ccd47c0fa3",
+      "bytes": 655
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-20260926T1131Z/steps.log",
+      "sha256": "36a2435b8ed59a463f8a1c3a9bea4b2c1ac3c00ce7b77260e730ab0905a135f1",
+      "bytes": 2757
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/run-with-host-observation.sh",
+      "sha256": "87a9eb84ae5161075e6a1f8a18645dfc5564f9c15cb449b6659bc0895b97c723",
+      "bytes": 1944
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/results-20260926.json",
+      "sha256": "ec7b11e218a2f8019f6babc24a2c29ca78114aa06507e4671285580ca455a399",
+      "bytes": 31569
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/retained-outputs.json",
+      "sha256": "c2b15f44ff8610bb171cdedfa50831ff959333c7fe21d1ed5d9a77d2acaf4683",
+      "bytes": 159717
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/source-review.json",
+      "sha256": "39afa1ef89edb03ca8a0b1f331461b39d7dcc7f62f3970294816f39a344aff2d",
+      "bytes": 61142
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/withdrawn-host-receipts/nativestack-5975wx-20260925--byterover-cli--install--20260926.json",
+      "sha256": "80282697e4795068f192ee83eaabae26f2274b4bd8887d2f55e19c82e679ab18",
+      "bytes": 3891
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/withdrawn-host-receipts/nativestack-5975wx-20260925--byterover-cli--use--20260926.json",
+      "sha256": "d09e875b948adaf73362dfd9e1ce288494222729b811d2b76af9ec036abb32d1",
+      "bytes": 3688
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/README.md",
+      "sha256": "1bab87f5e83f528680e6e0ecd27e4e2f2cb886cdc77c089cb6c43b568df5dd20",
+      "bytes": 16943
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/local-integration/colqwen_processor_probe.py",
+      "sha256": "777c7f180d53ecae113f5571fd7351d42e77bcf244fb178d5c277dbeecd1926a",
+      "bytes": 4594
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/local-integration/hf-chat-template-files.sh",
+      "sha256": "8e2492463d3de95e04fb4b2dbe62abe25206fa0e5b00178575c5d6697eba4c9a",
+      "bytes": 1390
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/local-integration/recorder-colpali_use_dryrun.sh",
+      "sha256": "d0e48d0f13233fd20823b67b8336ccf5c34339271ce277a74939c325664ee6c0",
+      "bytes": 975
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/local-integration/run_eval.sh",
+      "sha256": "ee6e4f045ff542fded8ffa537849bc5fa52d62578c04030d5a8cea69a976dbcb",
+      "bytes": 626
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/local-integration/run_eval_colpali.sh",
+      "sha256": "57ef3790e1ce20139b28e46f0250d5bd0acc8996b4dca70b04118ab477d36d57",
+      "bytes": 602
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/local-integration/run_eval_colpali_small.sh",
+      "sha256": "a68c755b57f26aa35195271c2331ce61d854b721761c364c22e69a96cb7c5097",
+      "bytes": 609
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/local-integration/run_eval_combined.sh",
+      "sha256": "7b9fceab6d066b3bd7daf8b00e14a3016c41dc8fa1f3b01e2e87279261f85d3d",
+      "bytes": 604
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/local-integration/run_eval_dummy.sh",
+      "sha256": "cbf937cf4c9833592e74a3a4156f1ff0cc92dc918bc9c296de6bac66f692061e",
+      "bytes": 552
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/local-integration/run_eval_dummy_small.sh",
+      "sha256": "98b1f105ac512ed3805402ee76128594e5fb0e7d022ced7f6fb9fc298d427f87",
+      "bytes": 559
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/colqwen-processor-probe-20260926T0634Z.ndjson",
+      "sha256": "7b9657a21c247630cddffe41ba5995181e79458b21911f01ecf46994d2d911c4",
+      "bytes": 1910
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/colqwen-processor-probe-20260926T0634Z.stderr",
+      "sha256": "b5054417b7abcc2c4c70dd355e2c0eaf121cde36c803f2fb8c2639e2e3bcbf41",
+      "bytes": 324
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/eval-colpali-v1.3-full280-cpu-interrupted.log",
+      "sha256": "4f15088db3691414d9ceaf9170b6934e82fcab7ee999cba349d88677c8799ac4",
+      "bytes": 11022
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/eval-colpali-v1.3-slice12-cpu-original.log",
+      "sha256": "cadc106ff9eff49ff308b80381625086a5841148b4268b43ef028e2ce9c1c694",
+      "bytes": 3767
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/eval-colqwen2-v1.0-attempt1-missing-extra.log",
+      "sha256": "ea8cbda9b71814d189648a61e7462a379a44935e8665bfedae1290ce891481c7",
+      "bytes": 6634
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/eval-colqwen2-v1.0-attempt2.log",
+      "sha256": "5137011de468f6256515f4ea978627357631b273b9d430364bc25778829a507f",
+      "bytes": 21277
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/eval-colqwen2-v1.0-attempt3.log",
+      "sha256": "9ba70aec32abe97ddf353769cd1a233426c26757fbbf40122b70e1fd3a6fb09a",
+      "bytes": 9125
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/eval-colqwen2-v1.0-attempt4.log",
+      "sha256": "20ac740d592cfe8c6f3a72deb4de4b5e476eb5f7dd097e66fb00a67903f0967f",
+      "bytes": 9180
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/eval-colqwen2-v1.0-attempt5.log",
+      "sha256": "32f36acc152e5c6a87214236685d4a65099b9916497db4b8edf91072c3eb0055",
+      "bytes": 10565
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/eval-colqwen2-v1.0-attempt6.log",
+      "sha256": "91e283091f646becbe99f3d0076537ad8bb051d968d00f32d891ca7884f07636",
+      "bytes": 10449
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/eval-dummy-full280-cpu.log",
+      "sha256": "0adb9926b6c5bdda24174318cdaf9fe16c2b3f234b3f5dc2f415cb126d49d04d",
+      "bytes": 2495
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/eval-dummy-slice12-cpu-original.log",
+      "sha256": "60e74c8677cfd172e1adb9e632855f95a0067cea3cd1a4062e0db89f73349af3",
+      "bytes": 1867
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/hf-chat-template-files.txt",
+      "sha256": "515b0e9ddf9b5123d69cef5c99cd78d66d9db847e471cb517926b841c1791343",
+      "bytes": 3994
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/hf-download-base-main.log",
+      "sha256": "2dbd5e150ae016a8ed95627d017287e0a6cdb53d33eb34b82f3d832220d4fbc2",
+      "bytes": 123
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/hf-download-base.log",
+      "sha256": "515e04b71422ae7851236bb9b1c8208ddce03c5335dfa44b543ad6df09a3d0e2",
+      "bytes": 261
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/hf-download-colpali-adapter.log",
+      "sha256": "df097e6a7ac4bf7f2b3162d8510341664a57565ccb5b0aa1e7925c11acbfebbd",
+      "bytes": 260
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/hf-download-colpali-base.log",
+      "sha256": "ea310dbd97faf60ea436e1730bde6b8303f259ab397e81565974cffffa84939d",
+      "bytes": 275
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/hf-download-dataset-main.log",
+      "sha256": "f1c31b9873549014feb5f190b0e95b9b3f33afa0e88ac3adb4fea529c742d204",
+      "bytes": 136
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/hf-download-dataset.log",
+      "sha256": "7a959cb12b30d8c8f6b8123d0cc538008aee674e77db1f5318865ba8201574cf",
+      "bytes": 274
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/hf-download-model-main.log",
+      "sha256": "95932dc86abe3f6cfe1849b77a0779590911285feaa3f8fc3ccd553f44de0dff",
+      "bytes": 261
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/hf-download-model.log",
+      "sha256": "88bb0082efaea12764858f8294b57743f99583d99202bac261d3fe3f2affa0d6",
+      "bytes": 476
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/hf-license-chain.txt",
+      "sha256": "2171c52ae13be5f5827f3332ff588b8a158fea240dada61db985c71df92d94fc",
+      "bytes": 1113
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/install-colpali-engine-0.3.18-with-vidore-benchmark-5.0.0-conflict.log",
+      "sha256": "783d62b7c0f3de33bf126070f98a9b17cf728ea0c8bd42b15eaca3a4caf7b506",
+      "bytes": 897
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/install-mteb-2.21.8-colpali-engine-0.3.18.log",
+      "sha256": "90e14bd4300e1972ca25bb50817ec125b758ee42c25221a4b2a73b4918d67e7e",
+      "bytes": 3202
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/install-transformers-4.53.1.log",
+      "sha256": "c72ccfa86a5b3356b280085bfc204bada744e7707afeb5fb9eb7f6333dec6d07",
+      "bytes": 380
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/install-vidore-benchmark-5.0.0-colpali-engine-extra.log",
+      "sha256": "b7aa96b907b8d0bf850736bd22800a0d71a9f2cdd3eed67154ff7a0f7eb9786f",
+      "bytes": 3312
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/install-vidore-benchmark-5.0.0-without-extras.log",
+      "sha256": "cb997481eb190233e976bdee3a659b46449c993ddc35a4158d8a0539ec634720",
+      "bytes": 2712
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/lock-regeneration-check-20260926-final.txt",
+      "sha256": "c5ffe177fa28b894fc604b6e380b87d4d4ca5740a1b71254c8b53d938c0bda5f",
+      "bytes": 5028
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/lock-regeneration-check-20260926T131542Z.txt",
+      "sha256": "854f6fe4e37928bf21cdd04430355501b979408e37cc94e38c37d074d5a26544",
+      "bytes": 7380
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/metrics-colpali-v1.3-slice12-unpinned-device-0314Z.json",
+      "sha256": "331c251c6388efc2862b69af074a521d7e510b2b5a1d412ebcf95a4831c56a2a",
+      "bytes": 2282
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/metrics-dummy-full280.json",
+      "sha256": "f0cbfc50993c5ae681cae479f9399d61ad26ee9e364796bce1b17b6299a390dd",
+      "bytes": 2589
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/metrics-dummy-slice12-0314Z.json",
+      "sha256": "18ac9333960c0ea0080106138908bc57ce96d020a4a70252b8c9d00a64a3897d",
+      "bytes": 2382
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/osv-scanner-requirements-lock-20260926T130641Z.txt",
+      "sha256": "d55531ec0c3a1961fea664001c40b61189a83e2f6cf24ede7565735fdd3fc3f8",
+      "bytes": 5174
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/recorder-dryrun-slice12-unpinned-device.log",
+      "sha256": "3a883c742c51fe02497177f89ab03480238cf0228a95d0ce873f56ea3cf72df1",
+      "bytes": 5859
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/venv-combined-create.log",
+      "sha256": "bd3994fd6bbc072d03333b2f3823416d987878191faabfbe4981c4df7124c1bb",
+      "bytes": 120
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/venv-vidore-create.log",
+      "sha256": "25469fb2df9e2afe27b17e0551bb6c8385b9cbac7e76b806cdf282ef8cff3674",
+      "bytes": 116
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/build_slice.py",
+      "sha256": "820395f24cf955491448586bfcd0d8328d5edd11612bdbeed58ee093808d7fbc",
+      "bytes": 2681
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/environment-record.json",
+      "sha256": "c1939781e6a0f0f67136fb1bf292f69800e543fadb0461a71b42b812ea83fff8",
+      "bytes": 25051
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/lock_regeneration_check.sh",
+      "sha256": "cb8654e34aa556752047cb8e7ba5e66110b23afc57ed700f5b61f8ea390ab606",
+      "bytes": 5766
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/regenerate_lock.py",
+      "sha256": "24d9cac3898f25af15b9d6afefe0c221effd4608e596322167cc3a0a3f0a66b1",
+      "bytes": 4639
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/reproduce-cpu.sh",
+      "sha256": "35a07ba345f43878f6b61824a6cb6cb0f61b4f1c116e8ad592c1f369a2a9f4b8",
+      "bytes": 5229
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/colpali.log",
+      "sha256": "bd3607bd5fbbc16235d74492a53cc9d0bc86718866beec387e4fd3e87ae316c4",
+      "bytes": 3341
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/colpali.time.txt",
+      "sha256": "087515140af73ef061a1e7d1674be623ae03184e69f9918d7dbdb12b17f93def",
+      "bytes": 1047
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/colpali_vidore_colpali-v1.3_metrics.json",
+      "sha256": "5ea0562e3e82090530252ba48a5649ca638e470ee0f317f1b9ba1fff67f312c8",
+      "bytes": 2263
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/device-check.txt",
+      "sha256": "9424d79b6fb956b27fa8c07c320365c4db64e0e536282f357e366f1a0fc61c03",
+      "bytes": 54
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/dummy.log",
+      "sha256": "fce4b6af1184d43147c24f826c7a0a9d0f1a9bda3972d3d3c30f2b3cefff2c72",
+      "bytes": 1490
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/dummy.time.txt",
+      "sha256": "0f439167190de785608c7ced3c2f0abea5be03ae777f0836c5bb4307e72cdce7",
+      "bytes": 1012
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/dummy_vision_retriever_metrics.json",
+      "sha256": "77c742f34b1c8f1222f6f88e60ee148583954b16208da064de314c2fc60434f1",
+      "bytes": 2362
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/hf-download-adapter.log",
+      "sha256": "e6a2f1999c171522aa6fd601770ff3db4ebfe86fb965b4727a3ddbc1e18dba16",
+      "bytes": 6084
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/hf-download-base.log",
+      "sha256": "3e0be52fe60f67f94570327bbf123bd0555fcdc8db6d26494b1f575a1dc50ecb",
+      "bytes": 3883
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/hf-download-dataset.log",
+      "sha256": "132c4c1bdffbb12f404ccbdd6d55c2644c496dac1991d8f2ccbe0fb24e5cecbe",
+      "bytes": 1418
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/install.log",
+      "sha256": "7c7c170dd769ccbd957a437b2df84526a5c2038d36582d08ba85293d6bada121",
+      "bytes": 2239
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/slice-build.log",
+      "sha256": "3bff7410b4ab30015abfce542617022711182fbe19a583ed64bf401ce8668d00",
+      "bytes": 351
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/slice-summary.json",
+      "sha256": "dd66f65d8975570699472c6f021410038bdb69f5ca9f5471cf04f3c4189a4bd5",
+      "bytes": 2850
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/steps.log",
+      "sha256": "9db244911d1ba673705d93832f6e0fc84eadf9774b74f3cadd92030b13051d94",
+      "bytes": 578
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/venv.log",
+      "sha256": "6788a902d5b2e53a8ec46658065f1f01206e2ba1aa04d57d6ed47d3b3a89f1d5",
+      "bytes": 140
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/slice-expected.json",
+      "sha256": "50164febc1cc925bc8691e130cc372c3ec15e718bad13cc24c6a57ce1b3cd835",
+      "bytes": 3160
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/results-20260926.json",
+      "sha256": "9d99885c2a347368578fc6f137ee6a8594bb3a52a5e0363abb9edf9cb9cd77b2",
+      "bytes": 25184
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/retained-outputs.json",
+      "sha256": "01fb3952d06ab53aca057f9dd81649b7f6b63ae3f2eed7cfe75de957dd0924df",
+      "bytes": 68434
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/source-review.json",
+      "sha256": "e17475e68db8d76ecaf1a5fbfde4b90da8b0f1a9f064d6c703d4f2d132a36548",
+      "bytes": 42205
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/withdrawn-host-receipts/nativestack-5975wx-20260925--colpali-engine--install--20260926.json",
+      "sha256": "0d19d30b7ac21b26a14622d0e8ecd4891cfdeb93fb4dd410fc8ec743108cc440",
+      "bytes": 2868
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/withdrawn-host-receipts/nativestack-5975wx-20260925--colpali-engine--use--20260926.json",
+      "sha256": "f880597448749ddabd8209acda556666ca2e84dc2867616dc8fd0385e6e15cda",
+      "bytes": 4364
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/withdrawn-host-receipts/nativestack-5975wx-20260925--vidore-benchmark--install--20260926.json",
+      "sha256": "370dd7a9f7cd36560ebe5ef678bf3f1b2426907e87afcebaf9109c79450fb39f",
+      "bytes": 3335
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/withdrawn-host-receipts/nativestack-5975wx-20260925--vidore-benchmark--use--20260926.json",
+      "sha256": "9744841803f44a548e9ebc30fbb2c65fd62ecbc29b98182ad0697689097833ea",
+      "bytes": 4115
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/cleanup-apply.log",
+      "sha256": "c59728c16a0844a20fd7fd9749fe4576f53131902470a77aa39ebcefa2f9ab0b",
+      "bytes": 13766
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/cleanup-plan.log",
+      "sha256": "94ea52bcc00936543e6741cbf22d3b881f5b9377e63f20a57ac39f830e6c975f",
+      "bytes": 11552
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/first-pass-scratch-trees/capture-facts.sh",
+      "sha256": "15548e365486d91684994f21f99cabb92f80e77e25dd013a4ca6dc9f918ec626",
+      "bytes": 6092
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/first-pass-scratch-trees/delete-first-pass-trees.sh",
+      "sha256": "9e85958763c6ad6e475a263c93273532beb5e0773606ebec73a1626dfe1a5978",
+      "bytes": 2778
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/first-pass-scratch-trees/first-pass-trees-apply.log",
+      "sha256": "fd93d372c6da647507a9ffdacb5069a25413d32561b0cfce0174c197ac75f3e7",
+      "bytes": 1002
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/first-pass-scratch-trees/first-pass-trees-plan.log",
+      "sha256": "8458ef3d55fdb833becd0fe3711c2cc3c1f06c4d0a3873f740bc88fe00d8e052",
+      "bytes": 560
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/first-pass-scratch-trees/host-state-attribution.txt",
+      "sha256": "2d9766d508519e64574f8b553e2dce664f8c4e91246e8610e21ed1da3e188ee8",
+      "bytes": 2524
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/first-pass-scratch-trees/host-state-inventory.txt",
+      "sha256": "7097e4c9a4d6d1973f6d0c94c05a8a8b728b0e99eb502928ddd9e80cb1488e78",
+      "bytes": 3078
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/first-pass-scratch-trees/inventory-after.sh",
+      "sha256": "28dc0dd5e987a1a1b7ffd673f975e6bb0d7707fb1ed640cc8dfd66cf69bcd384",
+      "bytes": 3217
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/first-pass-scratch-trees/trees-before.txt",
+      "sha256": "c9cc3f82203df8310245ef3b45b736f04af3279c08d447e63d32c2c5e0fc2643",
+      "bytes": 8622
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/host-cleanup.sh",
+      "sha256": "f11f4b6cbaabdf46d20a6c324efc898a87a32253e22b85b16b8bcf50540e8068",
+      "bytes": 6420
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/remaining-host-state/host-state-inventory.txt",
+      "sha256": "26a6b3df627313e55d3cb6934c58d5822d6960415883861cb55dd6962b8c5800",
+      "bytes": 5316
+    },
+    {
+      "path": "blueprints/trials-20260926/host-cleanup-20260926/remaining-host-state/inventory-remaining.sh",
+      "sha256": "62774415ce45c0969f2085fae813b81f5e5248bd2d73688527150687f3d61ee9",
+      "bytes": 5763
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/README.md",
+      "sha256": "95b13eb5dad8d4617b413e4c0cf7cd2a05970be023ea903e1ba467c334b007b8",
+      "bytes": 14809
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/local-integration/check_main_bounded_poll.sh",
+      "sha256": "a62204b566a3e9f889bd779a8496792cf3fbf5b2ebf0e92ed48d275df035e4d5",
+      "bytes": 1467
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/local-integration/check_v016_bounded_poll.sh",
+      "sha256": "cd601adf26f6a0ed59da60ed0350e455ea88e399a531795739c6787086bf955f",
+      "bytes": 1668
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/local-integration/config-mirix_local.yaml",
+      "sha256": "f7444103baf061746a58f99f83a8a801dbc39ecba26bdaec19e53f69b8da48c3",
+      "bytes": 1368
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/local-integration/config-mirix_local_bm25.yaml",
+      "sha256": "c517f90ee343404cd3848ebe156dbf943f7f09cfaa158584277b8e23c44eb036",
+      "bytes": 1369
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/local-integration/config-mirix_main_local_bm25.yaml",
+      "sha256": "f44f775a26e73677ec4c9b94e1afca2c5a3542d081d74af1e8b6553d688efb52",
+      "bytes": 1645
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/local-integration/gen_key_main.py",
+      "sha256": "447f4260309984b6f6f54adb00cb9721c9b1d0f6868c6d921fefea824ca399d2",
+      "bytes": 4459
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/local-integration/gen_key_main_check.py",
+      "sha256": "485e57714d162efc6d6c40933228f89eeb0a537f29b219a79bf5b585a6c162c5",
+      "bytes": 8078
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/local-integration/quickstart_add_retrieve.py",
+      "sha256": "e35ab0d3743eda13b6d7cb4d70a3337678b354a6987c5776e55fc5c083026671",
+      "bytes": 1693
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/local-integration/quickstart_add_retrieve_async.py",
+      "sha256": "416d253f87f0f7eac5d00c4743b84ae61bb433635b48ed76c1e73b941cda6f42",
+      "bytes": 2539
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/check-v0.1.6-bounded-poll.log",
+      "sha256": "43112e373aea06147e73735ef9f39f122174892aa46e740f23ea4f70afd72693",
+      "bytes": 4909
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/gen-key-main-check-20260926.txt",
+      "sha256": "430a230399ad2fd8c1c0963d8968359616be6a00827e3496148a03820f0c1cbb",
+      "bytes": 896
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/install-main-8cb06a62.log",
+      "sha256": "aacb740704106a4636c0d8e313922c59022271c3414ea0f4a041a50960bef981",
+      "bytes": 4813
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/pgserver-bundled-versions.txt",
+      "sha256": "5916c4e18aab9b71f3c0c63a02f4ff68020984483878377577df10e63e2a01dd",
+      "bytes": 818
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/pypi-mirix-0.1.7-wheel-contents.txt",
+      "sha256": "38bb9fceca9d39c5be47b25c437e5b71d945983c3184f1116c2679d1e50831ac",
+      "bytes": 3281
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/pypi-mirix-client-check.txt",
+      "sha256": "d64fa3a15147164946d3faab792a7f8c223c181ec5fa4df162a6e4690e6af2eb",
+      "bytes": 716
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/pytest-v0.1.6-full.log",
+      "sha256": "d1786b5f530d0a3a9d276dcb44bd78fbbf593548b6ce50ab5ec22fba7458aca5",
+      "bytes": 67201
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/pytest-v0.1.6-test_search_all_users-rerun.log",
+      "sha256": "bc581ce273c878fe81c503edd76a942ec14bb6b532b2e4e09f6a67234a3cbbe0",
+      "bytes": 11225
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/quickstart-main-run1-sync-calls.log",
+      "sha256": "3a8e7e7ec1cd97d9bba03fefdf36f02184f2c652b95df5a546bbc82a2519dd39",
+      "bytes": 567
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/quickstart-main-run2-list-content.log",
+      "sha256": "b409caaf76629ccaa95bde80b86be71295ae426c9b9cbd80629aca3c8d275a04",
+      "bytes": 3986
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/quickstart-main-run3-string-content.log",
+      "sha256": "bed1f8f955ec058f90fe851d73febf2033731a2c484bcc449a25ed7170f9b8dc",
+      "bytes": 2573
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/quickstart-v0.1.6-attempt1-embeddings-on.log",
+      "sha256": "a82b45261742aeb14d52f2827fe70309b108634b19e7d2e24fc876d59d90db8e",
+      "bytes": 1428
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/quickstart-v0.1.6-attempt2-bm25.log",
+      "sha256": "a269affedbeb01a55c9ec0c6558ce1b603e8bb999351da8a6850f5fd60af37fb",
+      "bytes": 2590
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/server-main-8cb06a62-port18533.log",
+      "sha256": "3b6c1e02e4fa8f55b724538099c8395c35e6f49a95dc69ed99c6c000603869d9",
+      "bytes": 243037
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/server-v0.1.6-port18000-tests.log",
+      "sha256": "16b492da2ec542d1aa83920a87103d106d35d834b014c8404473ece1f2f82991",
+      "bytes": 2752
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/server-v0.1.6-port18531.log",
+      "sha256": "6a083796f58807b268a769d546edc8cd8a31fd571705c8e2c7b43a269548527c",
+      "bytes": 46015
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/results-20260926.json",
+      "sha256": "54500a5121cc7f67a616277c2caa28813a21238f935e290a2502cbf02378c498",
+      "bytes": 18852
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/retained-outputs.json",
+      "sha256": "b0606249022734c1d490153bdf0cb3bbc739d287324dc666b4d56ae0e2c8ba83",
+      "bytes": 29625
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/skipped-receipt-specs.json",
+      "sha256": "7e0fe7e63452893dcf1e19d885afc7c32fbbe5ccb89fa8ae134a8d67790b68be",
+      "bytes": 6733
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/source-review.json",
+      "sha256": "4cfeabe894e8fda993634c7c321dbaec29a05e146d90ea870eb090fd54701aa9",
+      "bytes": 24309
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/withdrawn-host-receipts/nativestack-5975wx-20260925--mirix--install--20260926.json",
+      "sha256": "ee6d3d2ffd55915b2542e17f6372b38f8e4e14800a250062e13b672022090f7e",
+      "bytes": 3058
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/withdrawn-host-receipts/nativestack-5975wx-20260925--mirix--use--20260926.json",
+      "sha256": "53532c496efd4983a9724243dfc15100610d4d189e9e9cc7f7365df51709a9fa",
+      "bytes": 3864
+    },
+    {
+      "path": "blueprints/trials-20260926/provenance/run-20260926T045833Z-attempt1/verify-pins.log",
+      "sha256": "039f0ac1eba9f373c2598ae629ed5aa8e7f1702bd5977e88d6cf42926a02753d",
+      "bytes": 5718
+    },
+    {
+      "path": "blueprints/trials-20260926/provenance/run-20260926T045833Z-attempt1/verify-pins.sh",
+      "sha256": "c9323cd06e9a73909e7a4ea861020f2fcc042a191bf47d87b339b363affe838d",
+      "bytes": 7568
+    },
+    {
+      "path": "blueprints/trials-20260926/provenance/run-20260926T045833Z-attempt1/verify-pins.stderr",
+      "sha256": "5b9475d5ba6ac64673ab1a64a1dbd8dbe4ded7791d29e5d6d52616d45bc3cc83",
+      "bytes": 4476
+    },
+    {
+      "path": "blueprints/trials-20260926/provenance/run-20260926T045856Z/verify-pins.log",
+      "sha256": "4350a4ff7a6ad9f2110889dca8b166bd13cd8b0cea77c23e8e99939bfcc69271",
+      "bytes": 5924
+    },
+    {
+      "path": "blueprints/trials-20260926/provenance/source_excerpts.py",
+      "sha256": "8f71c03c3757731ccd60fdd8c8c19d9fd6ae6f95b2ee839b1b290c6050fc61f8",
+      "bytes": 2912
+    },
+    {
+      "path": "blueprints/trials-20260926/provenance/verify-pins.sh",
+      "sha256": "5badf0e6087a6de46ba36b62d27537f0c8baf3af8932f602bbe2cd148bc5529c",
+      "bytes": 7698
+    },
+    {
+      "path": "blueprints/trials-20260926/retained-outputs.json",
+      "sha256": "7e71bb48af87214467f4aa8f414624e135dda9dd8b09760f02f2de859a61b2a1",
+      "bytes": 23800
+    },
+    {
+      "path": "blueprints/trials-20260926/security-repair-sources.md",
+      "sha256": "487b926e13453efeb0796532fc3bb14e3b93aab273b6b1bc5cb80d794826c84c",
+      "bytes": 5106
+    },
+    {
+      "path": "blueprints/trials-20260926/withdrawn-host-receipts-validate.txt",
+      "sha256": "6ce65be2f109ac882fe3b4be42b1d746808e963cb3bf14cb44c0e19ae71ec101",
+      "bytes": 2124
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -11675,8 +13045,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "2af07f25e616ccddbbaf8a54806e329f8759a971c8f6bdfc42f5befbe7490a8a",
-      "bytes": 753100
+      "sha256": "7c435e409c43857e429b369367469fd75e662a6fd8bc9f7a226b381f2afcf1ed",
+      "bytes": 755876
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -11730,7 +13100,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "943035b598ceccb8e5d37cca7d1e50c1db49f9071b9a6dd8da9ecb26d867cde5",
+      "sha256": "6c63c214d8784920231b55099cfaf50aa05e2cce4fd249c34f102ad1b7271fe2",
       "bytes": 3215
     },
     {
@@ -34800,8 +36170,8 @@
     },
     {
       "path": "manifests/candidates.json",
-      "sha256": "2018acf74aa98911106cf895c224b7435fea17b66fb7fe6fdd17660e69af5b41",
-      "bytes": 42046
+      "sha256": "58832b3c13b6b7c5f85a1ddbdaec7305b6d05273f8cebef35b4b8bfd4f8bca9e",
+      "bytes": 54594
     },
     {
       "path": "manifests/landscape.json",
@@ -35215,8 +36585,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "fa80b84deed3ac547a05ba2a069d2854c4cf4d30b926fae3458f2bcf886e3e31",
-      "bytes": 25377
+      "sha256": "e379c0c1e9ef6d30c5c9a5beb2781d7d09bcab19ad33f9c050b2fadb0541d379",
+      "bytes": 26206
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -35502,6 +36872,11 @@
       "path": "tests/test_catalog_decisions.py",
       "sha256": "e24efa328daf0a3536ee8416bcf5c1ac406e207202f559c3ad5ca11155e4110e",
       "bytes": 9953
+    },
+    {
+      "path": "tests/test_catalog_freshness_propose.py",
+      "sha256": "f8b2828f3024757b3320f11e946b9e6fbd11db76280b90394e1668cbc394a60a",
+      "bytes": 55311
     },
     {
       "path": "tests/test_catalogs.py",
@@ -36000,8 +37375,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "256c09db4467486f89fb4350725ebef42ea8512bef17062c974b6b6623228f88",
-      "bytes": 28026
+      "sha256": "a4236a158789418581150b454b996df3ae2d17826e89728e56f1cffbfa019b60",
+      "bytes": 29398
     },
     {
       "path": "tests/test_worker_recovery.py",

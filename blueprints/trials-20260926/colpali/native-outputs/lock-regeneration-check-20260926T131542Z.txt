@@ -1,0 +1,126 @@
+original lock: 1834 bytes, sha256 0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9
+record: environment-record.json sha256 56a8280b6efd4c87b789561f8047e967962dd30521cd02b371f808e1c92df3e1
+== case 1: python3 regenerate_lock.py
+exit 2
+20 known advisories in this environment (Total 2 packages affected by 20 known vulnerabilities (1 Critical, 15 High, 4 Medium, 0 Low, 0 Unknown) from 1 ecosystem.):
+  PYSEC-2025-203 (torch 2.8.0, High)
+  PYSEC-2025-204 (torch 2.8.0, High)
+  PYSEC-2025-206 (torch 2.8.0, Medium)
+  PYSEC-2026-139 (torch 2.8.0, High)
+  PYSEC-2026-2286 (torch 2.8.0, High)
+  GHSA-qfhq-4f3w-5fph (torch 2.8.0, Medium)
+  GHSA-rrmf-rvhw-rf47 (torch 2.8.0, Medium)
+  GHSA-vgrw-7cvw-pwgx (torch 2.8.0, Medium)
+  PYSEC-2025-211 (transformers 4.53.1, High)
+  PYSEC-2025-212 (transformers 4.53.1, High)
+  PYSEC-2025-213 (transformers 4.53.1, High)
+  PYSEC-2025-214 (transformers 4.53.1, High)
+  PYSEC-2025-215 (transformers 4.53.1, High)
+  PYSEC-2025-216 (transformers 4.53.1, High)
+  PYSEC-2025-217 (transformers 4.53.1, High)
+  PYSEC-2025-218 (transformers 4.53.1, High)
+  PYSEC-2026-2288 / GHSA-69w3-r845-3855 (transformers 4.53.1, High)
+  PYSEC-2026-2289 / GHSA-29pf-2h5f-8g72 (transformers 4.53.1, High)
+  PYSEC-2026-2290 / GHSA-fgcw-684q-jj6r (transformers 4.53.1, Critical)
+  PYSEC-2026-3929 / GHSA-xrqw-3rrv-vx5w (transformers 4.53.1, High)
+refusing: this environment has known vulnerabilities; rerun with --accept-known-advisories to write its lock into a temporary directory
+TMPDIR entries: 0
+== case 2: python3 regenerate_lock.py --accept-known-advisories
+exit 0
+20 known advisories in this environment (Total 2 packages affected by 20 known vulnerabilities (1 Critical, 15 High, 4 Medium, 0 Low, 0 Unknown) from 1 ecosystem.):
+  PYSEC-2025-203 (torch 2.8.0, High)
+  PYSEC-2025-204 (torch 2.8.0, High)
+  PYSEC-2025-206 (torch 2.8.0, Medium)
+  PYSEC-2026-139 (torch 2.8.0, High)
+  PYSEC-2026-2286 (torch 2.8.0, High)
+  GHSA-qfhq-4f3w-5fph (torch 2.8.0, Medium)
+  GHSA-rrmf-rvhw-rf47 (torch 2.8.0, Medium)
+  GHSA-vgrw-7cvw-pwgx (torch 2.8.0, Medium)
+  PYSEC-2025-211 (transformers 4.53.1, High)
+  PYSEC-2025-212 (transformers 4.53.1, High)
+  PYSEC-2025-213 (transformers 4.53.1, High)
+  PYSEC-2025-214 (transformers 4.53.1, High)
+  PYSEC-2025-215 (transformers 4.53.1, High)
+  PYSEC-2025-216 (transformers 4.53.1, High)
+  PYSEC-2025-217 (transformers 4.53.1, High)
+  PYSEC-2025-218 (transformers 4.53.1, High)
+  PYSEC-2026-2288 / GHSA-69w3-r845-3855 (transformers 4.53.1, High)
+  PYSEC-2026-2289 / GHSA-29pf-2h5f-8g72 (transformers 4.53.1, High)
+  PYSEC-2026-2290 / GHSA-fgcw-684q-jj6r (transformers 4.53.1, Critical)
+  PYSEC-2026-3929 / GHSA-xrqw-3rrv-vx5w (transformers 4.53.1, High)
+WARNING: regenerating a known-vulnerable environment (torch 2.8.0, transformers 4.53.1) for trial reproduction only; install it only into a disposable, isolated environment.
+regenerated requirements-lock.txt: 1834 bytes, sha256 0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9 (equals the original lock)
+stdout: <check>/tmp/colpali-trial-lock-gczy8nqu/requirements-lock.txt
+regenerated: 1834 bytes, sha256 0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9
+cmp: regenerated lock is byte-identical to the original
+TMPDIR entries: 0
+== case 3: python3 regenerate_lock.py --accept-known-advisories --into <dir inside a Git work tree>
+exit 2
+WARNING: regenerating a known-vulnerable environment (torch 2.8.0, transformers 4.53.1) for trial reproduction only; install it only into a disposable, isolated environment.
+refusing: --into <check>/repo is inside a Git work tree
+files written there: 0
+== case 4: python3 regenerate_lock.py --accept-known-advisories --into <dir> --record <copy with torch==2.8.0 changed to torch==2.8.1>
+exit 1
+MISMATCH: regenerated 1834 bytes sha256 831c5ef34ecf6b6790f822afeec5fa6687f7a15727bf1df9a2b6e7f8616291cb; record says 1834 bytes sha256 0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9; removed the file
+files left in the target: 0
+== case 5: sh fixed/reproduce-cpu.sh <out5>
+exit 2
+20 known advisories in this environment (Total 2 packages affected by 20 known vulnerabilities (1 Critical, 15 High, 4 Medium, 0 Low, 0 Unknown) from 1 ecosystem.):
+  PYSEC-2025-203 (torch 2.8.0, High)
+  PYSEC-2025-204 (torch 2.8.0, High)
+  PYSEC-2025-206 (torch 2.8.0, Medium)
+  PYSEC-2026-139 (torch 2.8.0, High)
+  PYSEC-2026-2286 (torch 2.8.0, High)
+  GHSA-qfhq-4f3w-5fph (torch 2.8.0, Medium)
+  GHSA-rrmf-rvhw-rf47 (torch 2.8.0, Medium)
+  GHSA-vgrw-7cvw-pwgx (torch 2.8.0, Medium)
+  PYSEC-2025-211 (transformers 4.53.1, High)
+  PYSEC-2025-212 (transformers 4.53.1, High)
+  PYSEC-2025-213 (transformers 4.53.1, High)
+  PYSEC-2025-214 (transformers 4.53.1, High)
+  PYSEC-2025-215 (transformers 4.53.1, High)
+  PYSEC-2025-216 (transformers 4.53.1, High)
+  PYSEC-2025-217 (transformers 4.53.1, High)
+  PYSEC-2025-218 (transformers 4.53.1, High)
+  PYSEC-2026-2288 / GHSA-69w3-r845-3855 (transformers 4.53.1, High)
+  PYSEC-2026-2289 / GHSA-29pf-2h5f-8g72 (transformers 4.53.1, High)
+  PYSEC-2026-2290 / GHSA-fgcw-684q-jj6r (transformers 4.53.1, Critical)
+  PYSEC-2026-3929 / GHSA-xrqw-3rrv-vx5w (transformers 4.53.1, High)
+refusing: this environment has known vulnerabilities; rerun with --accept-known-advisories to write its lock into a temporary directory
+usage: sh reproduce-cpu.sh --accept-known-advisories <output-dir>
+output directory not created
+TMPDIR entries: 0
+== case 6: PATH=<stub uv that exits 1>:$PATH sh fixed/reproduce-cpu.sh --accept-known-advisories <out6> (synthetic fixture)
+exit 1
+-- terminal output
+20 known advisories in this environment (Total 2 packages affected by 20 known vulnerabilities (1 Critical, 15 High, 4 Medium, 0 Low, 0 Unknown) from 1 ecosystem.):
+  PYSEC-2025-203 (torch 2.8.0, High)
+  PYSEC-2025-204 (torch 2.8.0, High)
+  PYSEC-2025-206 (torch 2.8.0, Medium)
+  PYSEC-2026-139 (torch 2.8.0, High)
+  PYSEC-2026-2286 (torch 2.8.0, High)
+  GHSA-qfhq-4f3w-5fph (torch 2.8.0, Medium)
+  GHSA-rrmf-rvhw-rf47 (torch 2.8.0, Medium)
+  GHSA-vgrw-7cvw-pwgx (torch 2.8.0, Medium)
+  PYSEC-2025-211 (transformers 4.53.1, High)
+  PYSEC-2025-212 (transformers 4.53.1, High)
+  PYSEC-2025-213 (transformers 4.53.1, High)
+  PYSEC-2025-214 (transformers 4.53.1, High)
+  PYSEC-2025-215 (transformers 4.53.1, High)
+  PYSEC-2025-216 (transformers 4.53.1, High)
+  PYSEC-2025-217 (transformers 4.53.1, High)
+  PYSEC-2025-218 (transformers 4.53.1, High)
+  PYSEC-2026-2288 / GHSA-69w3-r845-3855 (transformers 4.53.1, High)
+  PYSEC-2026-2289 / GHSA-29pf-2h5f-8g72 (transformers 4.53.1, High)
+  PYSEC-2026-2290 / GHSA-fgcw-684q-jj6r (transformers 4.53.1, Critical)
+  PYSEC-2026-3929 / GHSA-xrqw-3rrv-vx5w (transformers 4.53.1, High)
+WARNING: regenerating a known-vulnerable environment (torch 2.8.0, transformers 4.53.1) for trial reproduction only; install it only into a disposable, isolated environment.
+regenerated requirements-lock.txt: 1834 bytes, sha256 0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9 (equals the original lock)
+-- steps.log (timestamps removed)
+start; workspace is a fresh mktemp directory; nproc=48
+requirements-lock.txt regenerated from environment-record.json with the original sha256
+FAIL: uv venv
+-- venv.log
+stub uv: venv --python 3.11.16 <check>/tmp/<workspace>/venv
+-- files in <out6>: lock-regeneration.log steps.log venv.log 
+TMPDIR entries: 0

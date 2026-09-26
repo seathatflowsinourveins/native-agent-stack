@@ -1,0 +1,22 @@
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]Downloading 'README.md' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/e73fae6507bff3bb021a94fe2c3f0ea6bf94a6c4.incomplete'
+Downloading '.gitattributes' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/52373fe24473b1aa44333d318f578ae6bf04b49b.incomplete'
+Downloading 'config.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/215b7db759e4eb301814d79e17f657360737b8f8.incomplete'
+Downloading 'model-00001-of-00002.safetensors' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/c128f5670d7a66942a194be6e2d324dc329c0de19e99c6f047513878e14f988e.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/52373fe24473b1aa44333d318f578ae6bf04b49b
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/215b7db759e4eb301814d79e17f657360737b8f8
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/e73fae6507bff3bb021a94fe2c3f0ea6bf94a6c4
+Downloading 'model-00002-of-00002.safetensors' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/8352c38e4d1785c4a35547d13f4d8d5562faab6fe8e9a30b1f5d8039d355a409.incomplete'
+Downloading 'model.safetensors.index.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/687a8b6860ea98f3464f5346f3fd02360f14239a.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/687a8b6860ea98f3464f5346f3fd02360f14239a
+Downloading 'tokenizer.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/ffd310e50986db7a039948ab83441d612689e7f989198e31b5c8984ca458adf6.incomplete'
+Downloading 'preprocessor_config.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/77bc692dcae67acc343539d9f0659d7de3c302b1.incomplete'
+Downloading 'special_tokens_map.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/f48cea75e45286da1529fb88a24e851bc1a3c882.incomplete'
+Downloading 'tokenizer_config.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/21c69ca1de1111a31f1b50bd59a2e39de7ed3ece.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/77bc692dcae67acc343539d9f0659d7de3c302b1
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/f48cea75e45286da1529fb88a24e851bc1a3c882
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/21c69ca1de1111a31f1b50bd59a2e39de7ed3ece
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/ffd310e50986db7a039948ab83441d612689e7f989198e31b5c8984ca458adf6
+Fetching 10 files:  80%|████████  | 8/10 [00:04<00:01,  1.76it/s]Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/8352c38e4d1785c4a35547d13f4d8d5562faab6fe8e9a30b1f5d8039d355a409
+Fetching 10 files:  90%|█████████ | 9/10 [00:20<00:02,  2.22s/it]Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/blobs/c128f5670d7a66942a194be6e2d324dc329c0de19e99c6f047513878e14f988e
+Fetching 10 files: 100%|██████████| 10/10 [00:22<00:00,  2.27s/it]Fetching 10 files: 100%|██████████| 10/10 [00:22<00:00,  2.27s/it]
+/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpaligemma-3b-pt-448-base/snapshots/30ab955d073de4a91dc5a288e8c97226647e3e5a

@@ -1,0 +1,17 @@
+{
+  "clientCwd": "<scratch>/trial-byterover/brv-project",
+  "content": "{\"limit\":10,\"query\":\"rate limiter\"}",
+  "createdAt": 1790386744875,
+  "id": "tsk-<uuid>",
+  "model": "qwen3.8-27b-local",
+  "projectPath": "<scratch>/trial-byterover/brv-project",
+  "provider": "openai-compatible",
+  "schemaVersion": 1,
+  "taskId": "<uuid>",
+  "type": "search",
+  "worktreeRoot": "<scratch>/trial-byterover/brv-project",
+  "completedAt": 1790386744894,
+  "result": "{\"message\":\"Found 1 result(s). Use read_file to view full content.\",\"results\":[{\"excerpt\":\"Auth uses a fixed-window rate limiter and issues a JWT-like token with a\\n24 hour (86400s) expiry via `issueToken()` in `src/auth.ts`.\",\"path\":\"auth/notes.md\",\"score\":0.68,\"title\":\"Auth\",\"backlinkCount\":0,\"origin\":\"local\",\"symbolKind\":\"context\",\"symbolPath\":\"auth/notes.md\"}],\"totalFound\":1}",
+  "startedAt": 1790386744883,
+  "status": "completed"
+}

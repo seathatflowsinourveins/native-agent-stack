@@ -1,0 +1,89 @@
+# PyPI mirix 0.1.7 wheel contents (2026-09-26T06:37:31Z)
+# The wheel the first pass downloaded from PyPI on 2026-09-26 01:24Z into <scratch>/trial-mirix.
+$ sha256sum mirix-0.1.7-py3-none-any.whl
+ead9e0ecd33218164a319749281d3bb3d5de677e5ab1afad6ccaa3910139af45  mirix-0.1.7-py3-none-any.whl
+$ METADATA fields (Name, Version, Summary, Requires-Dist)
+Name: mirix
+Version: 0.1.7
+Summary: Mirix Client - Lightweight Python client for Mirix server
+Requires-Dist: requests>=2.31.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: pydantic-settings>=2.0.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: jinja2>=3.1.0
+Requires-Dist: demjson3>=3.0.0
+Requires-Dist: json-repair>=0.25.0
+Requires-Dist: pytz>=2024.1
+Requires-Dist: typing_extensions>=4.8.0
+Requires-Dist: pyyaml>=6.0.0
+Requires-Dist: pytest>=6.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: isort; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+$ file listing (62 entries; size in bytes)
+1434 mirix/__init__.py
+9194 mirix/constants.py
+5768 mirix/log.py
+12482 mirix/settings.py
+5257 mirix/system.py
+366 mirix/client/__init__.py
+69991 mirix/client/remote_client.py
+784 mirix/client/utils.py
+78 mirix/helpers/__init__.py
+13504 mirix/helpers/converters.py
+2633 mirix/helpers/datetime_helpers.py
+1222 mirix/helpers/json_helpers.py
+2571 mirix/helpers/message_helpers.py
+6542 mirix/helpers/tool_rule_solver.py
+24 mirix/schemas/__init__.py
+18780 mirix/schemas/agent.py
+5138 mirix/schemas/block.py
+3554 mirix/schemas/client.py
+3197 mirix/schemas/client_api_key.py
+977 mirix/schemas/cloud_file_mapping.py
+4162 mirix/schemas/embedding_config.py
+1706 mirix/schemas/enums.py
+2573 mirix/schemas/environment_variables.py
+6283 mirix/schemas/episodic_memory.py
+2211 mirix/schemas/file.py
+139 mirix/schemas/health.py
+6308 mirix/schemas/knowledge.py
+7758 mirix/schemas/llm_config.py
+13588 mirix/schemas/memory.py
+2099 mirix/schemas/memory_agent_tool_call.py
+2076 mirix/schemas/memory_agent_trace.py
+2067 mirix/schemas/memory_queue_trace.py
+54056 mirix/schemas/message.py
+3859 mirix/schemas/mirix_base.py
+13640 mirix/schemas/mirix_message.py
+6815 mirix/schemas/mirix_message_content.py
+1392 mirix/schemas/mirix_request.py
+7191 mirix/schemas/mirix_response.py
+886 mirix/schemas/oauth_identity.py
+1120 mirix/schemas/organization.py
+5630 mirix/schemas/procedural_memory.py
+1657 mirix/schemas/providers.py
+5028 mirix/schemas/resource_memory.py
+4447 mirix/schemas/sandbox_config.py
+5952 mirix/schemas/semantic_memory.py
+3050 mirix/schemas/source.py
+1826 mirix/schemas/step.py
+12827 mirix/schemas/tool.py
+6877 mirix/schemas/tool_rule.py
+1166 mirix/schemas/usage.py
+3363 mirix/schemas/user.py
+24 mirix/schemas/openai/__init__.py
+3443 mirix/schemas/openai/chat_completion_request.py
+5653 mirix/schemas/openai/chat_completion_response.py
+3616 mirix/schemas/openai/chat_completions.py
+357 mirix/schemas/openai/embedding_response.py
+8394 mirix/schemas/openai/openai.py
+10758 mirix-0.1.7.dist-info/licenses/LICENSE
+4818 mirix-0.1.7.dist-info/METADATA
+92 mirix-0.1.7.dist-info/WHEEL
+6 mirix-0.1.7.dist-info/top_level.txt
+5242 mirix-0.1.7.dist-info/RECORD
+$ subpackages under mirix/: client, helpers, schemas
+server or agent modules present: False

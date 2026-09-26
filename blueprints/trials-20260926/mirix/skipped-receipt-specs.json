@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "description": "The two MIRIX v0.1.6 use-stage receipt specs of the first trial pass that were never recorded. Its recorder (exec/run_spec.py, not published) dry-ran each spec's commands under /bin/sh from the worktree root and recorded a receipt only when every command exited 0; otherwise it printed 'DECISION: SKIP RECORD' and wrote nothing. Both specs below were skipped that way. Their dry-run console output was not written to a file; the retained native outputs listed per spec are the same commands' earlier runs at the same pin, and the server log of the skipped quickstart dry run. They cannot be recorded now either: scripts/host_receipts.py validate rejects any receipt whose component_id ('mirix') is neither a manifests/stack.json component nor a landscape winner.",
+  "decision_rule": "record only when every dry-run command exits 0 (exec/run_spec.py: 'if not all_zero: DECISION: SKIP RECORD')",
+  "skipped": [
+    {
+      "component_id": "mirix",
+      "stage": "use",
+      "evidence_class": "native_proven",
+      "component_version": "0.1.6 (git tag; commit 0f3fbdb5e085ccceb6254e2a4a128a8957dac55a)",
+      "cmds": [
+        "bash -c 'cd <scratch>/trial-mirix && VIRTUAL_ENV=\"$PWD/venv\" PATH=\"$VIRTUAL_ENV/bin:$PATH\" MIRIX_API_URL=http://127.0.0.1:18531 python quickstart_add_retrieve.py config/mirix_local_bm25.yaml'  # requires MIRIX_API_KEY freshly exported from: python mirix-src/samples/generate_demo_api_key.py",
+        "timeout 300 sh <scratch>/trial-mirix/receipt_check_v016_use.sh"
+      ],
+      "dry_run_exits": [
+        0,
+        1
+      ],
+      "claim": "add()/retrieve() at the HTTP layer both return 200 (exit 0) against this host's local llama.cpp+vLLM+pgserver stack, but the component's actual job -- writing and later retrieving a real memory -- never happens. The bounded poll-and-assert reproduction (cmd 2) exits 1; the full unrushed run captured earlier (results-20260926.json: quickstart_v0.1.6.attempt_2_build_embeddings_for_memory_false) shows the background queue worker exhausting all 3 retries with the identical Pydantic ValidationError on every attempt (usage.prompt_tokens_details.audio_tokens is a non-Optional int but llama.cpp's response sends it as null), then logging 'Retries exhausted and no valid response received.' No memory of any type is ever persisted. POSITIVE CONTROL: the identical local llama.cpp model, same host, same day, DOES successfully power topic extraction and a real structured tool call once pointed at MIRIX main branch commit 8cb06a62 (sibling receipt below) -- proving this is a v0.1.6-specific schema defect, not 'the local model doesn't work'.",
+      "limitations": [
+        "cmd 2's own 60s HTTP read-timeout (not its 280s internal deadline) is what produced its exit 1 in this specific dry run, because this worktree's shared single-slot (--parallel 1) local llama.cpp was heavily contended by concurrent sibling trial agents at that moment; the root-caused failure signature itself was captured cleanly, without that contention confound, in the earlier full run cited in the claim.",
+        "No cloud LLM/embedding backend was configured or tested (out of scope per host policy); this is local-model-only evidence.",
+        "Recorded receipt covers only the listed commands; it does not establish full component functional acceptance beyond what these commands exercise."
+      ],
+      "first_pass_spec_index": 1,
+      "dry_run_exits_hint": [
+        0,
+        1
+      ],
+      "retained_outputs": [
+        "native-outputs/quickstart-v0.1.6-attempt2-bm25.log",
+        "native-outputs/check-v0.1.6-bounded-poll.log",
+        "native-outputs/server-v0.1.6-port18531.log"
+      ],
+      "what_happened": "Command 1 (the README Option B call shape through the self-written wrapper) returns HTTP 200 at every step while the queued memory write fails server-side; command 2 (the self-written bounded check) exits 1. The v0.1.6 server log shows the skipped dry run's add at 23:18 local (03:18Z) failing on F1 at every attempt until 'Retries exhausted' at 23:35 local, as the 21:37 add did; the 22:01 add also hit F1 at 22:08 and then ended on a 503 'Loading model' while the host llama.cpp service restarted at 22:15."
+    },
+    {
+      "component_id": "mirix",
+      "stage": "use",
+      "evidence_class": "native_proven",
+      "component_version": "0.1.6 (git tag; commit 0f3fbdb5e085ccceb6254e2a4a128a8957dac55a)",
+      "cmds": [
+        "bash -c 'cd <scratch>/trial-mirix/mirix-src && MIRIX_PG_URI=postgresql+psycopg2://postgres:@/mirix_tests?host=/run/user/1000/python_PostgresServer/2dcf3c6d23 <scratch>/trial-mirix/venv/bin/python -m pytest -v'"
+      ],
+      "dry_run_exits": [
+        1
+      ],
+      "claim": "Upstream's own documented test command (tests/README.md: `pytest -v`) run against a real, freshly-created Postgres+pgvector database on this host: 193 collected -- 88 passed (real DB-backed manager/service coverage: users, auth provider, deletion APIs, credit system, client isolation, temporal queries, message handling, queue, memory decay), 1 failed (a concurrency-timing assertion, `assert 57==100`, unrelated to local-model integration), 88 skipped (correctly gated behind GEMINI_API_KEY/Redis, neither configured per host policy), 16 errors (confirmed root-caused: tests/test_search_all_users.py calls initialize_meta_agent(config_path=...), a keyword argument MirixClient.initialize_meta_agent() does not have in this same release -- an internal test/client API mismatch, not an environment gap; re-verified by re-running that file alone with MIRIX_API_KEY/MIRIX_API_URL correctly set against a fresh server+DB and getting the identical TypeError).",
+      "limitations": [
+        "Exit code 1 reflects the 1 failed + 16 errors; the majority of the suite (88/193, plus 88 legitimately-skipped) exercised real infrastructure without issue.",
+        "Does not include the eval scripts (evals/ does not exist at this pinned tag) or the desktop-agent branch.",
+        "The mirix_tests database is separate from the one used by the quickstart receipts, to avoid cross-contamination between manual and automated runs."
+      ],
+      "first_pass_spec_index": 3,
+      "dry_run_exits_hint": [
+        1
+      ],
+      "retained_outputs": [
+        "native-outputs/pytest-v0.1.6-full.log",
+        "native-outputs/pytest-v0.1.6-test_search_all_users-rerun.log"
+      ],
+      "what_happened": "Upstream's unchanged suite at the tag: 193 collected; 1 failed, 88 passed, 88 skipped, 5 warnings, 16 errors (exit 1). Without MIRIX_API_KEY the 16 errors are 'api_key is required'; with the key and a fresh server the same 16 tests error on the config_path TypeError (F6)."
+    }
+  ]
+}

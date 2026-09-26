@@ -1,0 +1,12 @@
+2026-09-26T12:26:04Z probe is PID 1 in PID namespace pid:[4026532184]; the caller's is pid:[4026532558]
+2026-09-26T12:26:04Z script under test: reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39
+2026-09-26T12:26:04Z decoy control: pid 10 with argument /probe-decoys/unrelated-tool/worker.js
+2026-09-26T12:26:04Z decoy other_client: pid 12 with argument /probe-decoys/other-install/bin/brv
+2026-09-26T12:26:04Z decoy other_daemon: pid 14 with argument /probe-decoys/other-install/dist/server/infra/daemon/brv-server.js
+2026-09-26T12:26:04Z decoy unrelated_agent: pid 16 with argument /probe-decoys/unrelated-tool/agent-process.js
+2026-09-26T12:27:52Z reproduce-vc-search.sh exit status: 0
+2026-09-26T12:27:52Z decoy control: RUNNING after the script; stopped by the probe now (wait status 143)
+2026-09-26T12:27:52Z decoy other_client: RUNNING after the script; stopped by the probe now (wait status 143)
+2026-09-26T12:27:52Z decoy other_daemon: RUNNING after the script; stopped by the probe now (wait status 143)
+2026-09-26T12:27:52Z decoy unrelated_agent: RUNNING after the script; stopped by the probe now (wait status 143)
+2026-09-26T12:27:52Z processes left in this namespace besides the probe and its lister (pid:state:name): none

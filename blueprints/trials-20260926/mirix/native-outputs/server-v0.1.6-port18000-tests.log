@@ -1,0 +1,50 @@
+Starting Mirix server in DEVELOPMENT mode...
+  Host: 0.0.0.0
+  Port: 18000
+  Log level: info
+  Auto-reload: False
+
+Server will be available at:
+  http://0.0.0.0:18000
+  http://localhost:18000 (if host is 0.0.0.0)
+
+API documentation available at:
+  http://localhost:18000/docs (Swagger UI)
+  http://localhost:18000/redoc (ReDoc)
+
+Press CTRL+C to stop the server
+
+2026-09-25 21:47:24 - Mirix - INFO - Logging to: console (level: INFO)
+2026-09-25 21:47:27 - Mirix - INFO - Redis is disabled (MIRIX_REDIS_ENABLED=false)
+2026-09-25 21:47:27 - Mirix - INFO - Redis integration disabled or unavailable
+INFO:     Started server process [2823903]
+INFO:     Waiting for application startup.
+2026-09-25 21:47:27 - Mirix - INFO - Starting Mirix REST API server
+2026-09-25 21:47:27 - Mirix - INFO - Creating SyncServer instance
+2026-09-25 21:47:28 - Mirix - INFO - SyncServer initialized
+2026-09-25 21:47:28 - Mirix - INFO - 🚀 Initializing queue manager: type=memory, num_workers=1, server=provided
+2026-09-25 21:47:28 - Mirix - INFO - 📝 Creating queue instance...
+2026-09-25 21:47:28 - Mirix - INFO - ✅ Queue created: type=MemoryQueue
+2026-09-25 21:47:28 - Mirix - INFO - 👷 Creating single background worker...
+2026-09-25 21:47:28 - Mirix - INFO - ▶️  Starting 1 background worker thread(s)...
+2026-09-25 21:47:28 - Mirix - INFO - 🚀 Starting queue worker thread...
+2026-09-25 21:47:28 - Mirix - INFO - 📝 Creating daemon thread for message consumption...
+2026-09-25 21:47:28 - Mirix - INFO - ✅ Thread created: <Thread(QueueWorker, initial daemon)>
+2026-09-25 21:47:28 - Mirix - INFO - ▶️  Starting thread...
+2026-09-25 21:47:28 - Mirix - INFO - 🎯 Queue worker thread ENTERED _consume_messages()
+2026-09-25 21:47:28 - Mirix - INFO -    _running=True, _server=True
+2026-09-25 21:47:28 - Mirix - INFO - ✅ Thread.start() called, is_alive=True
+2026-09-25 21:47:28 - Mirix - INFO - ✅ Queue worker thread started successfully
+2026-09-25 21:47:28 - Mirix - INFO - 🔍 Worker status: running=1/1, threads_alive=1/1
+2026-09-25 21:47:28 - Mirix - INFO - ✅ All 1 queue worker(s) started successfully!
+2026-09-25 21:47:28 - Mirix - INFO - ✅ Queue manager initialized successfully
+2026-09-25 21:47:28 - Mirix - INFO - Queue service started with SyncServer integration (num_workers=1)
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:18000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:27147 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-09-26 00:53:57 - Mirix - INFO - Shutting down Mirix REST API server
+2026-09-26 00:53:57 - Mirix - INFO - Queue service stopped
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2823903]

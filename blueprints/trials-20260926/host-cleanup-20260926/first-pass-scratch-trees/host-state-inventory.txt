@@ -1,0 +1,40 @@
+# Host-state inventory after the polish pass (2026-09-26T06:39:48Z); times are host local (UTC-4)
+## First-pass scratch trees deleted by the polish pass (expected absent)
+absent				<scratch>/trial-colpali
+absent				<scratch>/trial-mirix
+absent				<scratch>/trial-byterover
+absent				<scratch>/exec
+## Trial-owned state outside the scratch directory (not deleted: outside this pass's scope)
+directory	5962852003	birth 2026-09-25 22:43:55	mtime 2026-09-25 22:43:55	~/.cache/huggingface/hub
+directory	113471575	birth 2026-09-25 22:43:55	mtime 2026-09-25 22:44:36	~/.cache/huggingface/hub/models--vidore--colpali-v1.3
+directory	5849380428	birth 2026-09-25 22:43:55	mtime 2026-09-25 22:44:15	~/.cache/huggingface/hub/models--vidore--colpaligemma-3b-pt-448-base
+directory	0	birth 2026-09-25 22:43:55	mtime 2026-09-25 22:43:55	~/.cache/huggingface/hub/.locks
+directory	0	birth 2026-09-25 22:43:55	mtime 2026-09-25 22:44:36	~/.cache/huggingface/hub/.locks/models--vidore--colpali-v1.3
+directory	0	birth 2026-09-25 22:43:55	mtime 2026-09-25 22:43:55	~/.cache/huggingface/hub/.locks/models--vidore--colpaligemma-3b-pt-448-base
+directory	10907450	birth 2026-09-25 22:14:42	mtime 2026-09-25 22:14:42	~/.cache/huggingface/datasets
+regular empty file	0	birth 2026-09-25 22:14:42	mtime 2026-09-25 23:16:39	~/.cache/huggingface/datasets/_home_<user>_.cache_huggingface_datasets_local-tabfquad-subset_default_0.0.0_151538e80d111958.lock
+directory	10907450	birth 2026-09-25 22:14:42	mtime 2026-09-25 22:14:42	~/.cache/huggingface/datasets/local-tabfquad-subset
+directory	0	birth 2026-09-25 21:29:06	mtime 2026-09-25 21:29:06	~/.cache/mteb
+directory	344628	birth 2026-09-25 21:30:29	mtime 2026-09-25 23:04:34	~/.mirix
+regular file	484	~/.mirix/config
+regular file	303104	~/.mirix/sqlite.db
+regular file	32768	~/.mirix/sqlite.db-shm
+regular file	8272	~/.mirix/sqlite.db-wal
+directory	4096	~/.mirix/tmp
+directory	0	birth 2026-09-25 21:29:36	mtime 2026-09-25 21:29:37	/run/user/<uid>/python_PostgresServer
+regular empty file	0	birth 2026-09-25 21:29:36	mtime 2026-09-25 21:29:36	/run/user/<uid>/python_PostgresServer/.lockfile
+directory	0	birth 2026-09-25 21:29:37	mtime 2026-09-25 23:37:40	/run/user/<uid>/python_PostgresServer/2dcf3c6d23
+## Scratch trees that remain (not first-pass trial trees)
+directory	193227040	birth 2026-09-25 23:58:03	mtime 2026-09-26 01:44:42	<scratch>/trials-2
+directory	117860321	birth 2026-09-25 21:18:32	mtime 2026-09-25 21:59:09	<scratch>/wt-trials
+directory	31870140	birth 2026-09-26 02:33:47	mtime 2026-09-26 02:39:23	<scratch>/trials-pol
+directory	135294043	birth 2026-09-25 23:56:16	mtime 2026-09-26 01:35:50	<scratch>/wt-trials2
+git worktree branch of <scratch>/wt-trials: claude/p1-trials-mirix-byterover-colpali-20260926
+uncommitted entries in <scratch>/wt-trials: 11
+## Other session scratch directories under the same root (names withheld)
+      2 session scratch dir, mtime 2026-09-24
+     10 session scratch dir, mtime 2026-09-25
+## Trial processes and ports
+no MIRIX, ByteRover or pgserver process
+ports 18531, 18000, 18533 and 7700 closed
+brv not on PATH

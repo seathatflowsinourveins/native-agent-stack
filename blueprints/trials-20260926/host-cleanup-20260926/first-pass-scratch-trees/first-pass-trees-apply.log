@@ -1,0 +1,18 @@
+2026-09-26T06:38:49Z mode=apply
+2026-09-26T06:38:49Z == assertions
+2026-09-26T06:38:52Z ok <scratch>/trial-colpali: real directory, not in use, 31053661034 apparent bytes
+2026-09-26T06:38:55Z ok <scratch>/trial-mirix: real directory, not in use, 985386322 apparent bytes
+2026-09-26T06:38:58Z ok <scratch>/trial-byterover: real directory, not in use, 19121145 apparent bytes
+2026-09-26T06:39:01Z ok <scratch>/exec: real directory, not in use, 54849 apparent bytes
+2026-09-26T06:39:01Z all literal targets asserted
+2026-09-26T06:39:01Z == delete
+2026-09-26T06:39:03Z removed <scratch>/trial-colpali
+2026-09-26T06:39:04Z removed <scratch>/trial-mirix
+2026-09-26T06:39:04Z removed <scratch>/trial-byterover
+2026-09-26T06:39:04Z removed <scratch>/exec
+2026-09-26T06:39:04Z == after
+2026-09-26T06:39:04Z absent <scratch>/trial-colpali
+2026-09-26T06:39:04Z absent <scratch>/trial-mirix
+2026-09-26T06:39:04Z absent <scratch>/trial-byterover
+2026-09-26T06:39:04Z absent <scratch>/exec
+2026-09-26T06:39:04Z done
