@@ -128,8 +128,9 @@ GitHub-hosted macOS runner; see
    The scripts install only components that have a pin in
    [`pins-linux-x86_64.json`](pins-linux-x86_64.json) or
    [`pins-macos-arm64.json`](pins-macos-arm64.json). On main that covers
-   `foundation-cpu` on Linux/WSL2 and `macos-arm64-foundation` on macOS in
-   full; every other profile is partly or wholly unpinned (the "Linux pins" and
+   `foundation-cpu` and `token-efficiency` on both platforms and
+   `macos-arm64-foundation` on macOS in full; every other profile is partly or
+   wholly unpinned (the "Linux pins" and
    "macOS pins" columns of [the profile table](README.md#choose-a-small-starting-profile),
    which also give the pinned release's coverage where it differs).
    For a partly pinned profile the script first exits 3 and prints the
@@ -160,9 +161,8 @@ GitHub-hosted macOS runner; see
    `pins-linux-x86_64.json` and `adoption/bootstrap-linux.sh` changed after `v2026.09.25.2`.
    The Linux pins file gained `repomix`, `toon`,
    `headroom`, `ccusage`, `serena` and `socraticode`, taking the `token-efficiency` row's
-   "Linux pins" column from 8 of 14 to all 14 (the "macOS pins" column stays
-   partly unpinned; see [the profile table](README.md#choose-a-small-starting-profile)).
-   `install_pin`'s `*-uv-tool` case now reads an optional pin `package` field
+   "Linux pins" column from 8 of 14 to all 14. `install_pin`'s `*-uv-tool` case now reads an
+   optional pin `package` field
    (falling back to its own `id` for every other uv-tool pin, unchanged) so a
    PyPI distribution name that differs from the component id, like headroom's
    `headroom-ai[mcp]`, installs correctly; a new `uv-tool-from-git` kind
@@ -170,6 +170,21 @@ GitHub-hosted macOS runner; see
    to pin a sha256 against) and re-verifies that commit against the
    resulting `uv-receipt.toml`. At that tag and every earlier one, the Linux
    pins file has no entry for any of those six ids.
+   `adoption/pins-macos-arm64.json` and `adoption/bootstrap-macos.sh` changed after `v2026.09.26`:
+   the macOS pins file gained `rtk`, `qmd`, `repomix`, `toon`, `ccusage`, `headroom`,
+   `markitdown` and `serena` at their Linux versions, taking the "macOS pins" column from
+   6 of 14 to all 14 for `token-efficiency` and from 5 of 7 to all 7 for `foundation-cpu`
+   ([the profile table](README.md#choose-a-small-starting-profile)), and the macOS script
+   gained the Linux script's `uv-tool` and `uv-tool-from-git` kinds, copied verbatim, and,
+   after installing rtk, prints a reminder unless `~/Library/Application Support/rtk/config.toml`,
+   the only config file rtk 0.50.0 reads on macOS (it ignores `XDG_CONFIG_HOME` there;
+   `evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt`), holds step
+   4a's four-entry `exclude_commands` key exactly once; its `--plan` prints serena's pinned
+   commit instead of a sha256. At that tag and every earlier one, the macOS pins file has no entry
+   for any of those eight ids, so on macOS either profile exits 3 and names them; pass them
+   in `--allow-unpinned` and install them through their recipes, or wait for the next
+   re-pin. The digests were re-checked against fresh upstream downloads on 2026-09-26
+   (`evidence/artifacts/macos-token-pins-20260926/digest-check.txt`).
 
    Both scripts and both claude-code pins changed after `v2026.09.24.1`: at
    that tag the pins are 2.1.280 and `adoption/bootstrap-linux.sh` and
@@ -359,7 +374,7 @@ GitHub-hosted macOS runner; see
    template does not mention is kept), writes atomically and
    preserves the original file's mode bits. Never touches `~/.claude.json`
    or any credential store.
-   The template registers the `rtk hook claude` Bash hook, so with the rtk 0.50.0 pin also **replace** any existing `[hooks] exclude_commands` line in `~/.config/rtk/config.toml` with `exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)']` (a duplicate `exclude_commands` key is invalid TOML, and rtk then silently falls back to defaults, `src/core/config.rs:278-281`, rather than erroring): 0.50.0's hook windows `git show <rev>:<path>` blobs, so a piped `| tail` reads the window instead of the file's end, and a rewritten `diff` exits 1 instead of 2 on a missing file; the bare `"^git show [^ ]*:"` pattern misses a `git -C <dir> show HEAD:path` form, which is still windowed (8,261 of 22,907 bytes in one fixture), so the third entry anchors to the git subcommand position, matching `git show REV:path` in a bare, `-C`/`-c`/`--git-dir`/`--work-tree` or other `--flag` global-option form (the same global options rtk's own discovery strips, `GIT_GLOBAL_OPT`, `src/discover/registry.rs:78`) without also excluding a command that merely mentions "show" as an ordinary argument; and `git branch -a`'s branch-name compaction keeps git's local-worktree `+ ` prefix unconditionally ([`src/cmds/git/git_cmd.rs:3185-3244`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/cmds/git/git_cmd.rs#L3185-L3244), specifically `git_cmd.rs:3209-3211`, unchanged on `develop`), but only misreports that branch as remote-only when a remote-tracking branch of the same name also exists (`git_cmd.rs:3224-3227`) -- 31 vs 6 real in one fixture -- so the fourth entry similarly anchors `git branch` to native git ([RTK hook recipe](../recipes/README.md#native-context-mode-and-hooks); retained check `evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt`). At `v2026.09.25.2` rtk was pinned at 0.49.0 and `adoption/bootstrap-linux.sh` printed no reminder at all -- the reminder was added after that tag (#291). It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here it requires all four entries, exactly once, to be present. It also changed after `v2026.09.26` in a second way (#314): once the text matches, it runs the installed `rtk hook check` on `git show HEAD:x | tail -n 5`, `git -C . show --no-color HEAD:x | tail -n 5`, `diff a missing`, `git branch -a` and `git -C . branch`, and still reminds unless each answers `No rewrite for: ...` with exit 1, because rtk can ignore a TOML-valid file with the exact text (a `[tracking]` table without `history_days` fails `TrackingConfig`, `src/core/config.rs:152-158`); check the file the same way after any edit. A single-regex alternative tested on 2026-09-26 is retained as evidence only; the adopted recipe is the four-entry set.
+   The template registers the `rtk hook claude` Bash hook, so with the rtk 0.50.0 pin also **replace** any existing `[hooks] exclude_commands` line in rtk's config file (`~/.config/rtk/config.toml` on Linux, or `$XDG_CONFIG_HOME/rtk/config.toml` when that is set to an absolute path; `~/Library/Application Support/rtk/config.toml` on macOS, where rtk ignores `XDG_CONFIG_HOME`; `rtk config` prints the file on its first line, `evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt`) with `exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)']` (a duplicate `exclude_commands` key is invalid TOML, and rtk then silently falls back to defaults, `src/core/config.rs:278-281`, rather than erroring): 0.50.0's hook windows `git show <rev>:<path>` blobs, so a piped `| tail` reads the window instead of the file's end, and a rewritten `diff` exits 1 instead of 2 on a missing file; the bare `"^git show [^ ]*:"` pattern misses a `git -C <dir> show HEAD:path` form, which is still windowed (8,261 of 22,907 bytes in one fixture), so the third entry anchors to the git subcommand position, matching `git show REV:path` in a bare, `-C`/`-c`/`--git-dir`/`--work-tree` or other `--flag` global-option form (the same global options rtk's own discovery strips, `GIT_GLOBAL_OPT`, `src/discover/registry.rs:78`) without also excluding a command that merely mentions "show" as an ordinary argument; and `git branch -a`'s branch-name compaction keeps git's local-worktree `+ ` prefix unconditionally ([`src/cmds/git/git_cmd.rs:3185-3244`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/cmds/git/git_cmd.rs#L3185-L3244), specifically `git_cmd.rs:3209-3211`, unchanged on `develop`), but only misreports that branch as remote-only when a remote-tracking branch of the same name also exists (`git_cmd.rs:3224-3227`) -- 31 vs 6 real in one fixture -- so the fourth entry similarly anchors `git branch` to native git ([RTK hook recipe](../recipes/README.md#native-context-mode-and-hooks); retained check `evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt`). At `v2026.09.25.2` rtk was pinned at 0.49.0 and `adoption/bootstrap-linux.sh` printed no reminder at all -- the reminder was added after that tag (#291). It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here it requires all four entries, exactly once, to be present. It also changed after `v2026.09.26` in a second way (#314): once the text matches, it runs the installed `rtk hook check` on `git show HEAD:x | tail -n 5`, `git -C . show --no-color HEAD:x | tail -n 5`, `diff a missing`, `git branch -a` and `git -C . branch`, and still reminds unless each answers `No rewrite for: ...` with exit 1, because rtk can ignore a TOML-valid file with the exact text (a `[tracking]` table without `history_days` fails `TrackingConfig`, `src/core/config.rs:152-158`); check the file the same way after any edit. A single-regex alternative tested on 2026-09-26 is retained as evidence only; the adopted recipe is the four-entry set.
    The agent definitions in `adoption/agents/claude/` changed after `v2026.09.24.1`:
    at that tag `source-scout` and `isolated-builder` declare `effort: medium`
    (`source-scout` also `maxTurns: 40`), `evidence-reviewer`,

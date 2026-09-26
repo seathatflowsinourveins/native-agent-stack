@@ -1,0 +1,139 @@
+=== negative_control.py adoption/pins-macos-arm64.json <scratch>/negctl: stdout (exit 0) ===
+rtk: sha256 -> 9e4d41e2aa94b12422898a7786bfce2e4aa7ea93f37aff45f4a8091931f18208
+qmd: sha256 -> 02d30f6af443c526a42235110bc671bd66a535998948d88be6c71c264276313e
+repomix: sha256 -> 9bee85b1f30f8001c13545c72a3fb7afc4fde83a47c65038db80f80fe4721e9b
+toon: sha256 -> 64de0d2d4fac2f5ea55ee2ef5ef3be369225281b4938c2becca759cc4894cf98
+ccusage: sha256 -> 5aa22dab64317eedd647edfdccc892370d422687f203b00a79d75a478950ced6
+headroom: sha256 -> bd58366e93630894f1e3da5a0f6309a6a9efdfdffd0cc4894fcda95a24e4f146
+markitdown: sha256 -> 38ff04a0ac4ebeb0a20816ca1af564827193416bb1cc91d4254d01b93e822f11
+serena: commit -> c6fbd1c5932df2494ffa0020af5a9fbe80b82144
+wrote pins-macos-arm64.json sha256 aabcf6db113ba07adc16fedb61b92f3466e3c7a132057983b1f3347912a97ee5
+=== verify_pins.py <scratch>/negctl/pins-macos-arm64.json adoption/pins-linux-x86_64.json <empty scratch directory>: stdout (exit 1) ===
+# macOS token-efficiency pin re-verification, 2026-09-26T04:51:38Z
+# Every download below was fetched fresh into an empty scratch directory for this run.
+# macOS pins checked: pins-macos-arm64.json sha256 aabcf6db113ba07adc16fedb61b92f3466e3c7a132057983b1f3347912a97ee5
+# Linux pins checked: pins-linux-x86_64.json sha256 59bdb4cf3f1c6431483300663f1ad2cbbbb439d5e124886d1ef4a739c7590612
+
+## rtk 0.50.0 (tarball)
+  gh api repos/rtk-ai/rtk/releases/tags/v0.50.0: asset rtk-aarch64-apple-darwin.tar.gz size=4122143 digest=sha256:fe54761a9950266e3a78ddb66a8af5e067251169da306a288e0751de63d836fe
+  checksums.txt line: fe54761a9950266e3a78ddb66a8af5e067251169da306a288e0751de63d836fe  rtk-aarch64-apple-darwin.tar.gz
+  downloaded rtk-aarch64-apple-darwin.tar.gz: 4122143 bytes, sha256 fe54761a9950266e3a78ddb66a8af5e067251169da306a288e0751de63d836fe
+  MISMATCH: rtk: computed sha256 == pin
+  MISMATCH: rtk: checksums.txt line == pin
+  MISMATCH: rtk: GitHub API asset digest == pin
+  tar -tzf members (name, regular file, mode): [('rtk', True, '0o755')]
+  MATCH: rtk: archive holds exactly one bare 'rtk' regular file
+
+## qmd 2.8.3 (npm, npm @tobilu/qmd)
+  MATCH: qmd: registry document is @tobilu/qmd@2.8.3
+  npm view @tobilu/qmd@2.8.3 dist.tarball = https://registry.npmjs.org/@tobilu/qmd/-/qmd-2.8.3.tgz
+  npm view dist.integrity = sha512-zjfVwrObPB618B6x8SdhlGv/tX9OxRHsbQnr5DUtBvqPK6HGQ27lM+9/BAY5okpjrHVnW56hLyDkqoTcsrVLzA==
+  npm view dist.shasum = 7e1515b1daf349a1dc88cff53da925d34f89c948
+  npm view optionalDependencies = {"sqlite-vec-darwin-arm64": "0.1.9", "sqlite-vec-darwin-x64": "0.1.9", "sqlite-vec-linux-arm64": "0.1.9", "sqlite-vec-linux-x64": "0.1.9", "sqlite-vec-windows-x64": "0.1.9"}
+  MATCH: qmd: pin url == registry dist.tarball
+  downloaded: 255569 bytes, sha256 2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0
+  MATCH: qmd: computed sha512 == dist.integrity
+  MATCH: qmd: computed sha1 == dist.shasum
+  MISMATCH: qmd: computed sha256 == pin
+  MATCH: qmd: pin sha512 quoted in checksum_ref == dist.integrity
+  MISMATCH: qmd: Linux pin is the same version and sha256
+  MATCH: qmd: optionalDependencies has sqlite-vec-darwin-arm64
+  sqlite-vec builds listed: ['sqlite-vec-darwin-arm64', 'sqlite-vec-darwin-x64', 'sqlite-vec-linux-arm64', 'sqlite-vec-linux-x64', 'sqlite-vec-windows-x64']
+
+## repomix 1.18.1 (npm, npm repomix)
+  MATCH: repomix: registry document is repomix@1.18.1
+  npm view repomix@1.18.1 dist.tarball = https://registry.npmjs.org/repomix/-/repomix-1.18.1.tgz
+  npm view dist.integrity = sha512-XtV1qD6akJSigQ3fBRex5v+rWcGa4i9cm2FL/M/PEtzO3u1uDiso3CtNbhlZiMIqJstAdy8mj2m1ynOzNnNB3g==
+  npm view dist.shasum = cb543d57d9021c1f43e0f484900ffc70aaa03ae3
+  npm view optionalDependencies = {}
+  MATCH: repomix: pin url == registry dist.tarball
+  downloaded: 161233 bytes, sha256 d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f
+  MATCH: repomix: computed sha512 == dist.integrity
+  MATCH: repomix: computed sha1 == dist.shasum
+  MISMATCH: repomix: computed sha256 == pin
+  MATCH: repomix: pin sha512 quoted in checksum_ref == dist.integrity
+  MISMATCH: repomix: Linux pin is the same version and sha256
+  MATCH: repomix: no optionalDependencies
+
+## toon 4.1.1 (npm, npm @toon-format/cli)
+  MATCH: toon: registry document is @toon-format/cli@4.1.1
+  npm view @toon-format/cli@4.1.1 dist.tarball = https://registry.npmjs.org/@toon-format/cli/-/cli-4.1.1.tgz
+  npm view dist.integrity = sha512-64wRbxe8C8k0D70gAdYZkiv0Atp/I4D0VlKQkc+IJ591hX8D54+///l/+4QM/Ato9+RJ1xJbNdfCaylcmpaLvQ==
+  npm view dist.shasum = fb096d6d22e0e1cfdd931a30aba7aa6fcaf7f248
+  npm view optionalDependencies = {}
+  MATCH: toon: pin url == registry dist.tarball
+  downloaded: 29911 bytes, sha256 93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6
+  MATCH: toon: computed sha512 == dist.integrity
+  MATCH: toon: computed sha1 == dist.shasum
+  MISMATCH: toon: computed sha256 == pin
+  MATCH: toon: pin sha512 quoted in checksum_ref == dist.integrity
+  MISMATCH: toon: Linux pin is the same version and sha256
+  MATCH: toon: no optionalDependencies
+
+## ccusage 20.0.24 (npm, npm ccusage)
+  MATCH: ccusage: registry document is ccusage@20.0.24
+  npm view ccusage@20.0.24 dist.tarball = https://registry.npmjs.org/ccusage/-/ccusage-20.0.24.tgz
+  npm view dist.integrity = sha512-sHq7axM0ucbFS4m5xFzS7NxYSmOP1+PSDup3nVb+pitI3eEuwEiGObhsXvu47DSvB2hHpEts/quA3/0EE5i1Zw==
+  npm view dist.shasum = faf8ce5fdc5a1d0eeed5c41bdcf067c8e0ebc820
+  npm view optionalDependencies = {"@ccusage/ccusage-darwin-arm64": "20.0.24", "@ccusage/ccusage-darwin-x64": "20.0.24", "@ccusage/ccusage-linux-arm64": "20.0.24", "@ccusage/ccusage-linux-x64": "20.0.24", "@ccusage/ccusage-win32-arm64": "20.0.24", "@ccusage/ccusage-win32-x64": "20.0.24"}
+  MATCH: ccusage: pin url == registry dist.tarball
+  downloaded: 24216 bytes, sha256 69787a0aa2269cd14f3d0f41d179b80744d5384e912ee11852897ecd0bf91183
+  MATCH: ccusage: computed sha512 == dist.integrity
+  MATCH: ccusage: computed sha1 == dist.shasum
+  MISMATCH: ccusage: computed sha256 == pin
+  MATCH: ccusage: pin sha512 quoted in checksum_ref == dist.integrity
+  MISMATCH: ccusage: Linux pin is the same version and sha256
+  MATCH: ccusage: optionalDependencies has @ccusage/ccusage-darwin-arm64
+  native builds listed: ['@ccusage/ccusage-darwin-arm64', '@ccusage/ccusage-darwin-x64', '@ccusage/ccusage-linux-arm64', '@ccusage/ccusage-linux-x64', '@ccusage/ccusage-win32-arm64', '@ccusage/ccusage-win32-x64']
+
+## headroom 0.37.0 (uv-tool, PyPI headroom-ai)
+  https://pypi.org/pypi/headroom-ai/0.37.0/json lists 6 files:
+    headroom_ai-0.37.0-cp310-abi3-macosx_10_12_x86_64.whl (bdist_wheel, 13799033 bytes) sha256 d89fd5858e701ada53d01849f73039d891fad84d9eb370f952d56581962d9cf8
+    headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl (bdist_wheel, 13780628 bytes) sha256 b4392f68a8d02d74c62c1734cf5bf327511dcc72678f01669f44f0612944d59c
+    headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_aarch64.whl (bdist_wheel, 13816313 bytes) sha256 bc30d31a6b9336155d62bbdd99f3c2f6c5a1ed3882a8730ea0cd8ede4c40fa19
+    headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl (bdist_wheel, 13961835 bytes) sha256 2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46
+    headroom_ai-0.37.0-cp310-abi3-win_amd64.whl (bdist_wheel, 13903214 bytes) sha256 e961f892786f7577e75f2c26229f11e2609fc007083dae24d336e76fc4c72e58
+    headroom_ai-0.37.0.tar.gz (sdist, 2842752 bytes) sha256 7ffdecba91ce44dd02f1601499f6c935c47374b7cb6ec61e569b816a4bb78a26
+  MATCH: headroom: pinned file headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl is listed
+  MATCH: headroom: pin url == PyPI url
+  MISMATCH: headroom: PyPI digests.sha256 == pin
+  downloaded headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl: 13780628 bytes, sha256 b4392f68a8d02d74c62c1734cf5bf327511dcc72678f01669f44f0612944d59c
+  MISMATCH: headroom: computed sha256 == pin
+  MATCH: headroom: downloaded size == PyPI size
+  macOS wheels listed: ['headroom_ai-0.37.0-cp310-abi3-macosx_10_12_x86_64.whl', 'headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl']
+  arm64-compatible macOS wheels (arm64 or universal2): ['headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl']
+  MATCH: headroom: the pinned wheel is the only arm64-compatible macOS wheel
+  MATCH: headroom: no py3-none-any wheel
+  downloaded headroom_ai-0.37.0.tar.gz: 2842752 bytes, sha256 7ffdecba91ce44dd02f1601499f6c935c47374b7cb6ec61e569b816a4bb78a26
+  MATCH: headroom: sdist re-hash == PyPI digest
+  sdist pyproject.toml: build-backend = "maturin"; 101 .rs files in the archive
+  MATCH: headroom: the sdist is a maturin (Rust) build, not a pure-Python artifact
+  MATCH: headroom: macOS pin differs from the Linux manylinux pin
+  info.requires_python = >=3.10
+  MATCH: headroom: requires_python admits 3.13 (the bootstrap's --python 3.13)
+
+## markitdown 0.1.8 (uv-tool, PyPI markitdown)
+  https://pypi.org/pypi/markitdown/0.1.8/json lists 2 files:
+    markitdown-0.1.8-py3-none-any.whl (bdist_wheel, 89737 bytes) sha256 de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab
+    markitdown-0.1.8.tar.gz (sdist, 69112 bytes) sha256 17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed
+  MATCH: markitdown: pinned file markitdown-0.1.8.tar.gz is listed
+  MATCH: markitdown: pin url == PyPI url
+  MISMATCH: markitdown: PyPI digests.sha256 == pin
+  downloaded markitdown-0.1.8.tar.gz: 69112 bytes, sha256 17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed
+  MISMATCH: markitdown: computed sha256 == pin
+  MATCH: markitdown: downloaded size == PyPI size
+  wheel uv installs: markitdown-0.1.8-py3-none-any.whl
+  downloaded markitdown-0.1.8-py3-none-any.whl: 89737 bytes, sha256 de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab
+  MATCH: markitdown: wheel re-hash == PyPI digest
+  MATCH: markitdown: wheel sha256 quoted in install_note
+  MISMATCH: markitdown: Linux pin is the same url and sha256
+
+## serena 2.0.0.dev0 (uv-tool-from-git)
+=== verify_pins.py stderr (the checkout path is replaced by <checkout>) ===
+Traceback (most recent call last):
+  File "<checkout>/evidence/artifacts/macos-token-pins-20260926/verify_pins.py", line 221, in <module>
+    api = json.loads(run("gh", "api", f"repos/oraios/serena/commits/{commit}"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<checkout>/evidence/artifacts/macos-token-pins-20260926/verify_pins.py", line 47, in run
+    raise RuntimeError(f"{' '.join(argv[:3])} ... exited {result.returncode}: {result.stderr.strip()[:300]}")
+RuntimeError: gh api repos/oraios/serena/commits/c6fbd1c5932df2494ffa0020af5a9fbe80b82144 ... exited 1: gh: No commit found for SHA: c6fbd1c5932df2494ffa0020af5a9fbe80b82144 (HTTP 422)

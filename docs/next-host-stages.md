@@ -80,7 +80,10 @@ and treat the projection as superseded guidance rather than looking for it to ha
    `wsl-workstation-20261015`); this writes the measured report and adds the entry to the
    hardware profiles for you, replacing the earlier by-hand edit.
 4. Profiles in order: `foundation-cpu`, `research-runtime`, `observability`, `semantic-rag`,
-   `recovery`, `trading-nautilus` (see the grand list's setup order).
+   `recovery`, `trading-nautilus` (see the grand list's setup order). `token-efficiency` is fully
+   pinned on this platform too (`adoption/README.md`'s profile table); follow
+   [`docs/token-session-handbook.md`](token-session-handbook.md#new-pc-either-platform-the-complete-token-efficiency-practice)
+   for its bootstrap, Codex user-scope MCP servers and coverage-check order.
 5. Record each component that ran with `python3 scripts/host_receipts.py record`
    (`--qualified-model` for any local runtime model you qualified there), then
    `python3 scripts/component_matrix.py --write` and `python3 scripts/new_host_grand_list.py --write`.
@@ -106,6 +109,11 @@ The 24 GB Mac is being replaced (see the upgrade table below). On the replacemen
    prerequisite install, the `socraticode`, darwin-binary and embedding-model pins, the launchd
    agents and the embedding acceptance script), so every step on the
    [macOS page](../adoption/platforms/macos-arm64.md) runs from the pinned checkout.
+   `token-efficiency` is a separate profile, fully pinned on this platform on main
+   (`adoption/README.md`'s profile table); its last eight macOS pins came after the pinned
+   `v2026.09.26`, so at that tag pass them in `--allow-unpinned` and use their recipes. Follow
+   [`docs/token-session-handbook.md`](token-session-handbook.md#new-pc-either-platform-the-complete-token-efficiency-practice)
+   for its own bootstrap, Codex user-scope MCP servers and coverage check.
 2. `python3 scripts/hardware_profile.py --record-host <host-id>` and the MLX smoke; this writes
    and registers the measured profile.
 3. `macos-arm64-foundation` profile; re-qualify any local model on MLX or llama.cpp Metal: a vLLM

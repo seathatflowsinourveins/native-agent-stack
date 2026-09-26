@@ -1,0 +1,235 @@
+# fail-closed controls for the rtk check and the red/green harness, 2026-09-26T11:08:26Z
+# Python 3.13.15; the scratch directory is shown as <work>
+# --rtk-check <repo>/evidence/artifacts/macos-token-pins-20260926/rtk_config_path_check.sh sha256 928589cf3f050c8d0bc6b2e8258b5397c1923e1edd2aa1c70db6231cd9686a9b
+# --red-green <repo>/evidence/artifacts/macos-token-pins-20260926/reminder_path_red_green.py sha256 d3508d4f3826db63560cc30e3f2986fea5397f060c50429cc88f4205085dae39
+
+## crate: the rtk check against altered crates
+$ cd <repo> && PATH=<work>/crate-shim:$PATH bash <repo>/evidence/artifacts/macos-token-pins-20260926/rtk_config_path_check.sh <work>/crate
+# rtk 0.50.0 config path on macOS: source read and pinned-binary read-back, 2026-09-26T11:08:26Z
+# scratch directory shown as <scratch>; the network was used read-only and nothing was installed.
+
+## the v0.50.0 tag
+$ git ls-remote https://github.com/rtk-ai/rtk.git refs/tags/v0.50.0 refs/tags/v0.50.0^{}
+1d87b8e719ce0a50c223cd93ca64dd16921f9aec	refs/tags/v0.50.0
+[exit 0]
+[check: tag v0.50.0 resolves to 1d87b8e719ce0a50c223cd93ca64dd16921f9aec: ok]
+$ git -C <scratch>/rtk-src log -1 --format=%H %s
+1d87b8e719ce0a50c223cd93ca64dd16921f9aec Merge pull request #4220 from rtk-ai/release-please--branches--master--components--rtk
+[exit 0]
+[check: the fetched tree is commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec: ok]
+
+## src/core/config.rs at the tag: get_config_path() and show_config()
+495: fn get_config_path() -> Result<PathBuf> {
+496:     let config_dir = dirs::config_dir().unwrap_or_else(|| PathBuf::from("."));
+497:     Ok(config_dir.join(RTK_DATA_DIR).join(CONFIG_TOML))
+498: }
+499: 
+500: pub fn show_config() -> Result<()> {
+501:     let path = get_config_path()?;
+502:     println!("Config: {}", path.display());
+503:     println!();
+
+## src/core/config.rs at the tag: Config::load() reads only that path
+315:     pub fn load() -> Result<Self> {
+316:         let path = get_config_path()?;
+317: 
+318:         if path.exists() {
+319:             let content = std::fs::read_to_string(&path)?;
+320:             Self::from_toml(&content)
+321:         } else {
+322:             Ok(Config::default())
+323:         }
+324:     }
+
+## environment variables rtk reads by literal name (none selects its config path)
+BUILDKITE CI CLAUDE_CONFIG_DIR CODEX_HOME COMPOSER_BIN_DIR GEMINI_CLI_TRUST_WORKSPACE GITHUB_ACTIONS GITLAB_CI HERMES_HOME HOME JENKINS_URL PATH RTK_AUDIT_DIR RTK_DB_PATH RTK_HOOK_AUDIT RTK_NO_TOML RTK_RECALL RTK_RECALL_DB RTK_SUPPRESS_HOOK_WARNING RTK_TEE RTK_TEE_DIR RTK_TOML_DEBUG RTK_TRUST_PROJECT_FILTERS 
+
+## environment reads through a named constant
+src/core/telemetry_cmd.rs:97:    std::env::var(TELEMETRY_DISABLED_ENV).unwrap_or_default() == TELEMETRY_DISABLED_VALUE
+src/hooks/init.rs:3713:    resolve_droid_dir_from_env(dirs::home_dir(), std::env::var_os(DROID_HOME_ENV))
+src/hooks/init.rs:4173:    if let Ok(dir) = std::env::var(PI_CODING_AGENT_DIR_ENV)
+src/hooks/init.rs:5134:    if let Ok(dir) = std::env::var(PI_CODING_AGENT_DIR_ENV)
+src/hooks/init.rs:7280:    if let Ok(custom) = std::env::var(COPILOT_HOME_ENV) {
+src/hooks/permissions.rs:312:    if let Some(home) = std::env::var_os(DROID_HOME_ENV)
+
+## Cargo.lock at the tag: the dirs crates
+303:name = "dirs"
+304-version = "5.0.1"
+305-source = "registry+https://github.com/rust-lang/crates.io-index"
+306-checksum = "44c45a9d03d6676652bcb5e724c7e988de1acad23a711b5217ab9cbecbec2225"
+--
+312:name = "dirs-sys"
+313-version = "0.4.1"
+314-source = "registry+https://github.com/rust-lang/crates.io-index"
+315-checksum = "520f05a5cbd335fae5a99ff7a6ab8627577660ee5cfd6a94a6a929b52ff0321c"
+[check: Cargo.lock holds exactly one dirs entry, 5.0.1 with a sha256 checksum: ok]
+dirs-5.0.1.crate sha256 a25360738d2e774df65447a9ab47c3690bf312e4188bec39c3e17cb41bc18333; Cargo.lock checksum 44c45a9d03d6676652bcb5e724c7e988de1acad23a711b5217ab9cbecbec2225: MISMATCH
+[check: Cargo.lock holds exactly one dirs-sys entry, 0.4.1 with a sha256 checksum: ok]
+dirs-sys-0.4.1.crate sha256 f079e6903b3a02abf26953686c2ccdc153c821c6222a6e6c4ecee9955b7065d2; Cargo.lock checksum 520f05a5cbd335fae5a99ff7a6ab8627577660ee5cfd6a94a6a929b52ff0321c: MISMATCH
+[check: both crates match their Cargo.lock checksums (neither is extracted otherwise): FAILED]
+FAIL: an integrity check failed, so the run stops here
+[exit 1]
+the curl shim's log (crate, sha256 as fetched, sha256 as handed on):
+dirs-5.0.1.crate 44c45a9d03d6676652bcb5e724c7e988de1acad23a711b5217ab9cbecbec2225 a25360738d2e774df65447a9ab47c3690bf312e4188bec39c3e17cb41bc18333
+dirs-sys-0.4.1.crate 520f05a5cbd335fae5a99ff7a6ab8627577660ee5cfd6a94a6a929b52ff0321c f079e6903b3a02abf26953686c2ccdc153c821c6222a6e6c4ecee9955b7065d2
+[check: the curl shim altered both crates: ok]
+[check: the harness compared the altered dirs-5.0.1.crate with Cargo.lock's checksum, the unaltered crate's, and printed MISMATCH: ok]
+[check: the harness compared the altered dirs-sys-0.4.1.crate with Cargo.lock's checksum, the unaltered crate's, and printed MISMATCH: ok]
+[check: the harness exited nonzero: ok]
+[check: the harness extracted neither crate: ok]
+
+## bash5: the red/green harness given a bash that is not 3.2
+host bash: /usr/bin/bash (GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu))
+[check: the host bash is not bash 3.2: ok]
+$ cd <repo> && python3 <repo>/evidence/artifacts/macos-token-pins-20260926/reminder_path_red_green.py --bash32 /usr/bin/bash
+[stderr]
+usage: reminder_path_red_green.py [-h] --bash32 BASH32 [--before BEFORE]
+reminder_path_red_green.py: error: --bash32 must print a GNU bash 3.2 version line; with any other bash the bash 3.2 tests are skipped or dropped
+[exit 2]
+[check: the harness exited nonzero: ok]
+[check: the harness did not report PASS: ok]
+
+## skip: the red/green harness with a real bash 3.2, every bash 3.2 test skipped
+--bash32: <bash-3.2.57> (GNU bash, version 3.2.57(1)-release (x86_64-unknown-linux-gnu))
+[check: --bash32 is GNU bash 3.2: ok]
+[check: tests/test_adoption_bootstrap_macos.py declares PortedFunctionsUnderRealBash32Tests exactly once: ok]
+<work>/skip-tree is this tree with one line added to tests/test_adoption_bootstrap_macos.py (line 1123, above the PortedFunctionsUnderRealBash32Tests class): @unittest.skip("fail-closed control: every bash 3.2 test skipped")
+$ cd <work>/skip-tree && python3 <repo>/evidence/artifacts/macos-token-pins-20260926/reminder_path_red_green.py --bash32 <bash-3.2.57>
+# macOS rtk reminder config path: red/green with the repository's own tests, 2026-09-26T11:08:29Z
+# Python 3.13.15; BASH32_BINARY=<bash-3.2.57> (GNU bash, version 3.2.57(1)-release (x86_64-unknown-linux-gnu))
+# the test file is byte-identical in every tree: sha256 0a80b0165b0518d9a7a33def09bcbf9a8bdc22f26953b8eb6893d6bf4a050b6e
+# every tree must run the 12 tests the fixed tree's loader counts in the two classes, none skipped or erroring; the fixed tree must pass and every other tree must fail
+
+## mutant: adoption/bootstrap-macos.sh sha256 f6e19bd44ff581e1e6ad4d2ca95e2a291fab56121077a35d7e5f6f142a1636db; tests/test_adoption_bootstrap_macos.py sha256 0a80b0165b0518d9a7a33def09bcbf9a8bdc22f26953b8eb6893d6bf4a050b6e
+## rtk_config_reminder: local config="${XDG_CONFIG_HOME:-$HOME/.config}/rtk/config.toml"
+$ cd <mutant> && BASH32_BINARY=<bash-3.2.57> python3 -m unittest -v tests.test_adoption_bootstrap_macos.RtkConfigPathTests tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests
+test_every_macos_instruction_names_the_file_rtk_reads (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_every_macos_instruction_names_the_file_rtk_reads) ... ok
+test_the_path_was_read_from_source_for_the_pinned_rtk_version (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_path_was_read_from_source_for_the_pinned_rtk_version) ... ok
+test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder) ... 
+  test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder) (bash='bash') ... FAIL
+  test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder) (bash='<bash-3.2.57>') ... FAIL
+test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says) ... 
+  test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says) (bash='bash', xdg=None) ... FAIL
+  test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says) (bash='bash', xdg='xdg') ... FAIL
+  test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says) (bash='<bash-3.2.57>', xdg=None) ... FAIL
+  test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says) (bash='<bash-3.2.57>', xdg='xdg') ... FAIL
+test_the_reminder_resolves_the_path_as_rtk_does_on_macos (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_reminder_resolves_the_path_as_rtk_does_on_macos) ... FAIL
+test_a_missing_config_gets_the_recipes_four_entries_and_is_not_created (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_a_missing_config_gets_the_recipes_four_entries_and_is_not_created) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+test_an_incomplete_or_duplicated_key_is_reminded_and_left_unchanged (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_an_incomplete_or_duplicated_key_is_reminded_and_left_unchanged) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+test_install_uv_tool_from_git_accepts_only_a_receipt_with_the_pinned_commit (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_install_uv_tool_from_git_accepts_only_a_receipt_with_the_pinned_commit) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+test_install_uv_tool_installs_the_pins_package_spec_into_the_ecosystem_dirs (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_install_uv_tool_installs_the_pins_package_spec_into_the_ecosystem_dirs) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+test_installing_the_rtk_pin_prints_the_reminder_and_other_pins_do_not (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_installing_the_rtk_pin_prints_the_reminder_and_other_pins_do_not) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+test_the_recipes_exact_block_gets_no_reminder_and_is_left_unchanged (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_the_recipes_exact_block_gets_no_reminder_and_is_left_unchanged) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+test_token_efficiency_plan_runs_clean_under_real_bash_32 (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_token_efficiency_plan_runs_clean_under_real_bash_32) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+
+======================================================================
+FAIL: test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder) (bash='bash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<mutant>/tests/test_adoption_bootstrap_macos.py", line 1074, in test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder
+    self.assertEqual(result.stdout, _expected_rtk_reminder(tmp_path / FAKE_HOME / MAC_RTK_CONFIG))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '' != 'Reminder: for the Claude hook, replace an[504 chars]t.\n'
++ Reminder: for the Claude hook, replace any existing exclude_commands line in <tmp>/fake-home/Library/Application Support/rtk/config.toml with [hooks] exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'] (a duplicate key is invalid T ...[cut: 117 more characters]
+
+
+======================================================================
+FAIL: test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder) (bash='<bash-3.2.57>')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<mutant>/tests/test_adoption_bootstrap_macos.py", line 1074, in test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder
+    self.assertEqual(result.stdout, _expected_rtk_reminder(tmp_path / FAKE_HOME / MAC_RTK_CONFIG))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '' != 'Reminder: for the Claude hook, replace an[504 chars]t.\n'
++ Reminder: for the Claude hook, replace any existing exclude_commands line in <tmp>/fake-home/Library/Application Support/rtk/config.toml with [hooks] exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'] (a duplicate key is invalid T ...[cut: 117 more characters]
+
+
+======================================================================
+FAIL: test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says) (bash='bash', xdg=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<mutant>/tests/test_adoption_bootstrap_macos.py", line 1085, in test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says
+    self.assertEqual(result.stdout, "")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: 'Reminder: for the Claude hook, replace an[484 chars]t.\n' != ''
+- Reminder: for the Claude hook, replace any existing exclude_commands line in <tmp>/fake-home/.config/rtk/config.toml with [hooks] exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'] (a duplicate key is invalid TOML and rtk silently ...[cut: 97 more characters]
+
+
+======================================================================
+FAIL: test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says) (bash='bash', xdg='xdg')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<mutant>/tests/test_adoption_bootstrap_macos.py", line 1085, in test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says
+    self.assertEqual(result.stdout, "")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: 'Reminder: for the Claude hook, replace an[470 chars]t.\n' != ''
+- Reminder: for the Claude hook, replace any existing exclude_commands line in <tmp>/xdg/rtk/config.toml with [hooks] exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'] (a duplicate key is invalid TOML and rtk silently loads default ...[cut: 83 more characters]
+
+
+======================================================================
+FAIL: test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says) (bash='<bash-3.2.57>', xdg=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<mutant>/tests/test_adoption_bootstrap_macos.py", line 1085, in test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says
+    self.assertEqual(result.stdout, "")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: 'Reminder: for the Claude hook, replace an[484 chars]t.\n' != ''
+- Reminder: for the Claude hook, replace any existing exclude_commands line in <tmp>/fake-home/.config/rtk/config.toml with [hooks] exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'] (a duplicate key is invalid TOML and rtk silently ...[cut: 97 more characters]
+
+
+======================================================================
+FAIL: test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says) (bash='<bash-3.2.57>', xdg='xdg')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<mutant>/tests/test_adoption_bootstrap_macos.py", line 1085, in test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says
+    self.assertEqual(result.stdout, "")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: 'Reminder: for the Claude hook, replace an[470 chars]t.\n' != ''
+- Reminder: for the Claude hook, replace any existing exclude_commands line in <tmp>/xdg/rtk/config.toml with [hooks] exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'] (a duplicate key is invalid TOML and rtk silently loads default ...[cut: 83 more characters]
+
+
+======================================================================
+FAIL: test_the_reminder_resolves_the_path_as_rtk_does_on_macos (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_reminder_resolves_the_path_as_rtk_does_on_macos)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<mutant>/tests/test_adoption_bootstrap_macos.py", line 1089, in test_the_reminder_resolves_the_path_as_rtk_does_on_macos
+    self.assertIn(f'local config="$HOME/{MAC_RTK_CONFIG}"', function)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'local config="$HOME/Library/Application Support/rtk/config.toml"' not found in 'rtk_config_reminder() {\n  local config="${XDG_CONFIG_HOME:-$HOME/.config}/rtk/config.toml"\n  if [[ -f "$config" ]] \\\n    && [[ $(grep -Ec \'^[[:space:]]*exclude_commands[[:space:]]*=\' "$config") -eq 1 ]] \\\n    && grep -Fq \'"^git show [^ ]*:"\' "$config" && grep -Fq \'"diff"\' "$config" \\\n     ...[cut: 812 more characters]
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.050s
+
+FAILED (failures=7, skipped=7)
+[exit 1; expected nonzero]
+[verdict: FAILED: 7 skipped]
+
+## fixed: adoption/bootstrap-macos.sh sha256 2f2e37beac2d01944e3f69637091958c6165ab7f951a7dd4428639ae49a345a4; tests/test_adoption_bootstrap_macos.py sha256 0a80b0165b0518d9a7a33def09bcbf9a8bdc22f26953b8eb6893d6bf4a050b6e
+## rtk_config_reminder: local config="$HOME/Library/Application Support/rtk/config.toml"
+$ cd <fixed> && BASH32_BINARY=<bash-3.2.57> python3 -m unittest -v tests.test_adoption_bootstrap_macos.RtkConfigPathTests tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests
+test_every_macos_instruction_names_the_file_rtk_reads (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_every_macos_instruction_names_the_file_rtk_reads) ... ok
+test_the_path_was_read_from_source_for_the_pinned_rtk_version (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_path_was_read_from_source_for_the_pinned_rtk_version) ... ok
+test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder) ... ok
+test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says) ... ok
+test_the_reminder_resolves_the_path_as_rtk_does_on_macos (tests.test_adoption_bootstrap_macos.RtkConfigPathTests.test_the_reminder_resolves_the_path_as_rtk_does_on_macos) ... ok
+test_a_missing_config_gets_the_recipes_four_entries_and_is_not_created (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_a_missing_config_gets_the_recipes_four_entries_and_is_not_created) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+test_an_incomplete_or_duplicated_key_is_reminded_and_left_unchanged (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_an_incomplete_or_duplicated_key_is_reminded_and_left_unchanged) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+test_install_uv_tool_from_git_accepts_only_a_receipt_with_the_pinned_commit (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_install_uv_tool_from_git_accepts_only_a_receipt_with_the_pinned_commit) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+test_install_uv_tool_installs_the_pins_package_spec_into_the_ecosystem_dirs (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_install_uv_tool_installs_the_pins_package_spec_into_the_ecosystem_dirs) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+test_installing_the_rtk_pin_prints_the_reminder_and_other_pins_do_not (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_installing_the_rtk_pin_prints_the_reminder_and_other_pins_do_not) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+test_the_recipes_exact_block_gets_no_reminder_and_is_left_unchanged (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_the_recipes_exact_block_gets_no_reminder_and_is_left_unchanged) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+test_token_efficiency_plan_runs_clean_under_real_bash_32 (tests.test_adoption_bootstrap_macos.PortedFunctionsUnderRealBash32Tests.test_token_efficiency_plan_runs_clean_under_real_bash_32) ... skipped 'fail-closed control: every bash 3.2 test skipped'
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.057s
+
+OK (skipped=7)
+[exit 0; expected 0]
+[verdict: FAILED: 7 skipped]
+
+# result: FAIL (2 of 2 trees did not meet their verdict)
+[exit 1]
+[check: the harness exited nonzero: ok]
+[check: the harness did not report PASS: ok]
+
+# result: PASS (controls held: crate, bash5, skip; did not hold: none)
