@@ -22,7 +22,12 @@ import urllib.request
 
 LOKI = "http://127.0.0.1:13100/loki/api/v1/push"
 LIMIT = 1024 * 1024
-REPORT_LIMIT = 16 * LIMIT
+# An explicit consumer ceiling, not a producer maximum: the token report bounds its
+# returned-results attachments (16 MiB in total, tools/token-report/README.md) but not its
+# other sections. It embeds each attachment twice, as base64 and as JSON-escaped UTF-8 text
+# (up to six bytes per control byte), so the attachments alone can approach 117 MiB; a
+# larger report stays unavailable and its rows unknown.
+REPORT_LIMIT = 128 * LIMIT
 SAFE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,100}\Z")
 ANSI = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
 # Dated public inventory, not arbitrary names copied from a private input file.
