@@ -458,6 +458,84 @@ class SkillsStatusTests(unittest.TestCase):
         self.assertEqual(self.skill_result(report, "alpha-skill")["lock"]["state"], "missing_entry")
         self.assertEqual(report["result"], "fail")
 
+    # -- folder tree (informational) --------------------------------------------
+
+    def populate_tree(self, name: str) -> Path:
+        """A canonical folder with a regular file, an executable, a nested file and a symlink."""
+        folder = self.home / ".agents" / "skills" / name
+        (folder / "scripts" / "lib").mkdir(parents=True, exist_ok=True)
+        (folder / "references").mkdir(exist_ok=True)
+        (folder / "empty-dir").mkdir(exist_ok=True)  # git omits empty directories
+        (folder / "references" / "notes.md").write_text("notes\n")
+        # Git sorts the directory "scripts" as "scripts/", after this file; a plain name sort
+        # would put the directory first and produce a different tree SHA.
+        (folder / "scripts.md").write_text("index of scripts\n")
+        tool = folder / "scripts" / "run.sh"
+        tool.write_text("#!/bin/sh\necho run\n")
+        tool.chmod(0o755)
+        (folder / "scripts" / "lib" / "helper.py").write_text("VALUE = 1\n")
+        (folder / "scripts" / "run-link.sh").symlink_to("run.sh")
+        return folder
+
+    def git_write_tree(self, folder: Path) -> str:
+        """Git itself as the oracle: index the folder in a scratch repository, write its tree."""
+        repo = self.tmp / "oracle-repo"
+        shutil.rmtree(repo, ignore_errors=True)
+        shutil.copytree(folder, repo, symlinks=True)
+        git_env = {**os.environ, "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1"}
+        for args in (["init", "-q"], ["config", "core.fileMode", "true"], ["config", "core.symlinks", "true"],
+                     ["add", "-A"]):
+            subprocess.run(["git", "-C", str(repo), *args], check=True, env=git_env, capture_output=True)
+        return subprocess.run(["git", "-C", str(repo), "write-tree"], check=True, env=git_env,
+                              capture_output=True, text=True).stdout.strip()
+
+    @unittest.skipUnless(shutil.which("git"), "git is the oracle for the tree hash")
+    def test_git_tree_sha_matches_git_write_tree(self):
+        skill = self.make_skill("tree-skill")
+        folder = self.populate_tree("tree-skill")
+        self.assertEqual(ss.git_tree_sha(folder), self.git_write_tree(folder))
+        # A mode flip alone changes git's tree, and the recomputation follows it.
+        (folder / "scripts" / "run.sh").chmod(0o644)
+        self.assertEqual(ss.git_tree_sha(folder), self.git_write_tree(folder))
+        self.assertTrue(skill["skill_md_sha256"])
+
+    def test_folder_tree_states_are_reported_without_changing_the_result(self):
+        manifest, alpha, beta = self.setup_pair()
+        folder = self.populate_tree("alpha-skill")
+        alpha["tree_sha"] = ss.git_tree_sha(folder)
+        self.write_lock(self.lock_entries_for([alpha, beta]))
+        report = self.report(manifest)
+        self.assertEqual(self.skill_result(report, "alpha-skill")["folder_tree"], {"state": "ok"})
+        # beta keeps the fixture's placeholder tree_sha, so its on-disk tree cannot match.
+        self.assertEqual(self.skill_result(report, "beta-skill")["folder_tree"], {"state": "drift"})
+        self.assertEqual(report["result"], "ok")
+
+        # What a skill's own `uv run` leaves behind: a project venv and bytecode caches.
+        (folder / "scripts" / ".venv" / "bin").mkdir(parents=True)
+        (folder / "scripts" / ".venv" / "pyvenv.cfg").write_text("home = /usr/bin\n")
+        (folder / "scripts" / ".venv" / "bin" / "python").symlink_to("/usr/bin/python3")
+        (folder / "scripts" / "lib" / "__pycache__").mkdir()
+        (folder / "scripts" / "lib" / "__pycache__" / "helper.cpython-312.pyc").write_bytes(b"\x00pyc")
+        report = self.report(manifest)
+        self.assertEqual(self.skill_result(report, "alpha-skill")["folder_tree"], {"state": "runtime_artifacts"})
+        self.assertEqual(report["folder_trees"]["runtime_artifacts"], ["alpha-skill"])
+        self.assertEqual(report["result"], "ok")
+
+        # A pinned file rewritten in place (as `uv run` rewrote a pinned uv.lock) is drift.
+        (folder / "references" / "notes.md").write_text("notes, rewritten after install\n")
+        report = self.report(manifest)
+        self.assertEqual(self.skill_result(report, "alpha-skill")["folder_tree"], {"state": "drift"})
+        self.assertEqual(report["folder_trees"]["drift"], ["alpha-skill", "beta-skill"])
+        self.assertEqual(report["result"], "ok")
+        self.assertIn("drift=alpha-skill,beta-skill", ss.render_text(report))
+
+    def test_folder_tree_missing_folder(self):
+        manifest, alpha, beta = self.setup_pair()
+        shutil.rmtree(self.home / ".agents" / "skills" / "beta-skill")
+        report = self.report(manifest)
+        self.assertEqual(self.skill_result(report, "beta-skill")["folder_tree"], {"state": "missing"})
+        self.assertEqual(report["folder_trees"]["missing"], ["beta-skill"])
+
     # -- --json shape -----------------------------------------------------------
 
     def test_json_shape(self):
@@ -466,11 +544,12 @@ class SkillsStatusTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         data = json.loads(result.stdout)
         self.assertEqual(set(data), {"schema_version", "lock", "claude_settings", "codex_config", "skills",
-                                     "extra_skills", "unlocked_folders", "budget", "result"})
+                                     "extra_skills", "unlocked_folders", "budget", "folder_trees", "result"})
+        self.assertEqual(set(data["folder_trees"]), {"ok", "runtime_artifacts", "drift", "missing", "unreadable"})
         self.assertEqual(len(data["skills"]), 2)
         for skill in data["skills"]:
             self.assertEqual(set(skill), {"name", "pass", "canonical", "lock", "claude_link",
-                                          "claude_listing", "codex_disable"})
+                                          "claude_listing", "codex_disable", "folder_tree"})
             self.assertEqual(set(skill["claude_link"]), {"state", "kind"})
         self.assertEqual(data["result"], "ok")
         # The CLI's JSON matches a direct call for the same fixture.

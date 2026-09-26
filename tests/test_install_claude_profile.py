@@ -197,6 +197,178 @@ class ShippedAgentEffortTests(unittest.TestCase):
                     self.assertNotEqual(effort_lines, ["effort: max"])
 
 
+class ShippedAgentFrontmatterTests(unittest.TestCase):
+    """Every shipped agent's frontmatter parses as a YAML mapping, uses only documented subagent
+    fields with documented types and values, and names an explicit model beside its effort (the
+    repository rule: effort max with an explicit model).
+
+    Source: the "Frontmatter reference" table and "Subagent files Claude Code skips" section of
+    https://code.claude.com/docs/en/sub-agents, read 2026-09-26 against Claude Code 2.1.283. Claude
+    Code ignores a field it does not recognize without an error and skips a user or project agent
+    whose YAML does not parse, while `claude plugin validate --strict` 2.1.283 passed an agents
+    directory holding an unknown field and unparseable YAML (evidence/artifacts/
+    skills-agents-layer-20260926), so a misspelled key such as ``omitClaudeMD`` would silently drop
+    its setting and a broken value would silently drop the agent; these are the checks that see it.
+    The text reader runs everywhere; the YAML checks skip where PyYAML is absent, as the
+    repository's other YAML checks do (the Linux validate job has it). A field added to the docs
+    later belongs in DOCUMENTED_FIELDS, and in the type table below, before an agent uses it.
+    """
+
+    DOCUMENTED_FIELDS = frozenset({
+        "name", "description", "tools", "disallowedTools", "model", "permissionMode", "maxTurns",
+        "skills", "mcpServers", "hooks", "memory", "background", "omitClaudeMd", "effort",
+        "isolation", "color", "initialPrompt", "experimental"})
+    MODEL_ALIASES = frozenset({"sonnet", "opus", "haiku", "fable"})
+    ENUMS = {
+        "permissionMode": {"default", "acceptEdits", "auto", "dontAsk", "bypassPermissions", "plan", "manual"},
+        "memory": {"user", "project", "local"},
+        "effort": {"low", "medium", "high", "xhigh", "max"},
+        "isolation": {"worktree"},
+        "color": {"red", "blue", "green", "yellow", "purple", "orange", "pink", "cyan"},
+        "background": {"true", "false"},
+        "omitClaudeMd": {"true", "false"},
+    }
+    # Types by the docs table and its examples: strings; `tools` and `disallowedTools` as a
+    # comma-separated string or a list; `skills` as a list of names; `mcpServers` as a list of server
+    # names or one-key inline definitions; `hooks` and `experimental` as maps; `maxTurns` as a
+    # positive integer; `background` and `omitClaudeMd` as booleans.
+    STRING_FIELDS = frozenset({"name", "description", "model", "permissionMode", "memory", "effort",
+                               "isolation", "color", "initialPrompt"})
+
+    @staticmethod
+    def yaml_frontmatter(path: Path, yaml):
+        """(mapping or other parsed value, None) or (None, reason) for the text between the markers."""
+        lines = path.read_text(encoding="utf-8").splitlines()
+        if not lines or lines[0] != "---" or "---" not in lines[1:]:
+            return None, "no frontmatter between --- markers on the first lines"
+        try:
+            return yaml.safe_load("\n".join(lines[1:lines.index("---", 1)])), None
+        except yaml.YAMLError as error:
+            return None, f"frontmatter does not parse as YAML ({type(error).__name__})"
+
+    def yaml_problems(self, path: Path, yaml) -> list[str]:
+        data, reason = self.yaml_frontmatter(path, yaml)
+        if reason:
+            return [reason]
+        if not isinstance(data, dict):
+            return [f"frontmatter parses to {type(data).__name__}, not a mapping"]
+
+        def strings(value):
+            return isinstance(value, list) and all(isinstance(item, str) for item in value)
+
+        valid = {
+            "tools": lambda v: isinstance(v, str) or strings(v),
+            "disallowedTools": lambda v: isinstance(v, str) or strings(v),
+            "skills": strings,
+            "mcpServers": lambda v: isinstance(v, list) and all(
+                isinstance(item, str) or (isinstance(item, dict) and len(item) == 1) for item in v),
+            "hooks": lambda v: isinstance(v, dict),
+            "experimental": lambda v: isinstance(v, dict),
+            "maxTurns": lambda v: isinstance(v, int) and not isinstance(v, bool) and v > 0,
+            "background": lambda v: isinstance(v, bool),
+            "omitClaudeMd": lambda v: isinstance(v, bool),
+            **{key: (lambda v: isinstance(v, str)) for key in self.STRING_FIELDS},
+        }
+        found = [f"{key} has the undocumented type {type(value).__name__}"
+                 for key, value in data.items() if key in valid and not valid[key](value)]
+        if set(data) != set(self.top_level_fields(path)):
+            found.append("the YAML keys and the text reader's keys differ")
+        return found
+
+    @staticmethod
+    def top_level_fields(path: Path) -> dict[str, str]:
+        """Column-0 ``key: value`` lines of the frontmatter (list items and nested maps are
+        indented and belong to the key above them)."""
+        lines = path.read_text(encoding="utf-8").splitlines()
+        if not lines or lines[0] != "---" or "---" not in lines[1:]:
+            return {}
+        fields: dict[str, str] = {}
+        for line in lines[1:lines.index("---", 1)]:
+            if line[:1].isalpha():
+                key, _, value = line.partition(":")
+                fields[key.strip()] = value.strip()
+        return fields
+
+    def problems(self, path: Path) -> list[str]:
+        fields = self.top_level_fields(path)
+        found = [f"undocumented field {key!r}" for key in sorted(set(fields) - self.DOCUMENTED_FIELDS)]
+        for key in ("name", "description", "model"):
+            if not fields.get(key):
+                found.append(f"missing {key}")
+        name = fields.get("name", "")
+        if ":" in name or name.startswith("-"):
+            found.append("name must not contain ':' or start with '-'")
+        model = fields.get("model", "")
+        if model and model not in self.MODEL_ALIASES and not model.startswith("claude-"):
+            found.append(f"model {model!r} is neither an alias nor a full model ID (inherit is not explicit)")
+        for key, allowed in self.ENUMS.items():
+            if key in fields and fields[key] not in allowed:
+                found.append(f"{key} value {fields[key]!r} is not documented")
+        if "maxTurns" in fields and not (fields["maxTurns"].isdigit() and int(fields["maxTurns"]) > 0):
+            found.append("maxTurns must be a positive integer")
+        return found
+
+    def test_each_shipped_agent_uses_documented_fields_and_an_explicit_model(self):
+        agents = sorted(icp.AGENTS_SRC_DIR.glob("*.md"))
+        self.assertTrue(agents)
+        for path in agents:
+            with self.subTest(agent=path.name):
+                self.assertEqual(self.problems(path), [])
+                self.assertEqual(self.top_level_fields(path)["name"], path.stem)
+
+    def test_the_check_rejects_a_misspelled_field_an_inherited_model_and_a_bad_value(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for body in ("---\nname: a\ndescription: d\nmodel: opus\neffort: max\nomitClaudeMD: true\n---\nx\n",
+                         "---\nname: a\ndescription: d\nmodel: inherit\neffort: max\n---\nx\n",
+                         "---\nname: a\ndescription: d\neffort: max\n---\nx\n",
+                         "---\nname: a\ndescription: d\nmodel: opus\neffort: max\ncolor: magenta\n---\nx\n",
+                         "---\nname: a:b\ndescription: d\nmodel: opus\neffort: max\n---\nx\n"):
+                path = Path(tmp) / "a.md"
+                path.write_text(body, encoding="utf-8")
+                with self.subTest(body=body):
+                    self.assertNotEqual(self.problems(path), [])
+
+    def test_each_shipped_agent_parses_as_a_yaml_mapping_with_documented_types(self):
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML not installed; the text reader alone checked the frontmatter")
+        agents = sorted(icp.AGENTS_SRC_DIR.glob("*.md"))
+        self.assertTrue(agents)
+        for path in agents:
+            with self.subTest(agent=path.name):
+                self.assertEqual(self.yaml_problems(path, yaml), [])
+
+    def test_the_yaml_check_rejects_unparseable_yaml_a_non_mapping_and_wrong_types(self):
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML not installed; the text reader alone checked the frontmatter")
+        head = "---\nname: a\ndescription: d\nmodel: opus\neffort: max\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "a.md"
+            # A positive control first: every documented shape, lists and maps included, passes both checks.
+            path.write_text(head + "tools:\n  - Read\n  - Grep\nskills:\n  - s\nmcpServers:\n  - github\n"
+                            "  - local:\n      type: stdio\n      command: c\nhooks:\n  PreToolUse: []\n"
+                            "experimental:\n  cacheTtl: 1h\nmaxTurns: 5\nomitClaudeMd: true\n---\nx\n", encoding="utf-8")
+            self.assertEqual(self.problems(path), [])
+            self.assertEqual(self.yaml_problems(path, yaml), [])
+            # Each fails the YAML check; all but the list-shaped one pass the text reader alone, which
+            # is the gap the YAML check closes (a quoted key is invisible to the text reader).
+            for body, text_reader_passes in (
+                    ("---\nname: a\ndescription: [unclosed\nmodel: opus\neffort: max\n---\nx\n", True),
+                    ("---\n- name: a\n---\nx\n", False),
+                    (head + "tools: {Read: true}\n---\nx\n", True),
+                    (head + "skills: [1, 2]\n---\nx\n", True),
+                    (head + "mcpServers: github\n---\nx\n", True),
+                    (head + "hooks: [PreToolUse]\n---\nx\n", True),
+                    (head + "\"omitClaudeMD\": true\n---\nx\n", True)):
+                path.write_text(body, encoding="utf-8")
+                with self.subTest(body=body):
+                    self.assertNotEqual(self.yaml_problems(path, yaml), [])
+                    self.assertEqual(self.problems(path) == [], text_reader_passes)
+
+
 class McpMatchTests(unittest.TestCase):
     def test_http_server_matches_on_url_and_type(self):
         existing = "ai-memory:\n  Type: http\n  URL: http://127.0.0.1:49374/mcp\n"

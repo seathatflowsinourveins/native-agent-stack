@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "skills_trial_manifest",
-  "checked_at": "2026-09-25",
+  "checked_at": "2026-09-26",
   "decision_record": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
   "cli": {
     "package": "skills",
@@ -18,7 +18,8 @@
     "notes": [
       "`check` runs the same code path as `update` and can write; always pass -g for global scope.",
       "The global lock's skillFolderHash is the upstream git tree SHA of the skill folder; a tree-URL install at a 40-hex ref stays at that ref on update.",
-      "DISABLE_TELEMETRY=1 (or DO_NOT_TRACK=1) disables both the telemetry event and the add-time audit call."
+      "DISABLE_TELEMETRY=1 (or DO_NOT_TRACK=1) disables both the telemetry event and the add-time audit call.",
+      "skills.sh's documented /api/v1 requires a Vercel OIDC token (https://skills.sh/docs/api, read 2026-09-26); discovery uses `skills find <query>` (the CLI's unauthenticated /api/search) and the site pages, and the raw audit risks behind the page labels come from https://add-skill.vercel.sh/audit?source=<owner/repo>&skills=<names>, the endpoint the CLI calls at add time when telemetry is on."
     ]
   },
   "trial": {
@@ -395,7 +396,7 @@
       "tree_sha": "7503c4bec67cbe758ee488a2bd4caaf618facbfb",
       "skill_md_sha256": "04df36a7685632ee39271aa432a4d32e1203b326e4a8091e6f5c0eb191ef90f1",
       "skill_md_bytes": 15531,
-      "description_chars": 709,
+      "description_chars": 707,
       "upstream_disable_model_invocation": false,
       "license": "CC-BY-SA-4.0 (referenced by pin, never vendored)",
       "official": false,
@@ -420,7 +421,7 @@
       "tree_sha": "1490253d767cc2c5e48f1245a681ee59cc52eb4f",
       "skill_md_sha256": "1a6d919ff80f83b262daf650552af6eb6d2c32b19d0c529b70efe0c116b675cf",
       "skill_md_bytes": 18600,
-      "description_chars": 753,
+      "description_chars": 751,
       "upstream_disable_model_invocation": false,
       "license": "CC-BY-SA-4.0 (referenced by pin, never vendored)",
       "official": false,
@@ -545,7 +546,7 @@
       "tree_sha": "4fe407da56e118c68fd9bcc16603a38cf6116562",
       "skill_md_sha256": "cc5f008f40ffb8a1ae03ebd32d7234de43e828293955a0bc251b76ba249554fa",
       "skill_md_bytes": 17925,
-      "description_chars": 375,
+      "description_chars": 373,
       "upstream_disable_model_invocation": false,
       "license": "CC-BY-SA-4.0 (referenced by pin, never vendored)",
       "official": false,
@@ -685,13 +686,66 @@
       "gap": "User-invoked registry search; anything it finds must still be pinned in this manifest before install.",
       "claude_listing": "user-invocable-only",
       "codex_enabled": false
+    },
+    {
+      "name": "variant-analysis",
+      "source": "trailofbits/skills",
+      "url": "https://github.com/trailofbits/skills/tree/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/variant-analysis/skills/variant-analysis",
+      "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "path": "plugins/variant-analysis/skills/variant-analysis",
+      "tree_sha": "583d7addbf5e04108cc5fece9c99a4d9c6db5ce9",
+      "skill_md_sha256": "7b6b78e499bcb88d05c68254ffc91ebc28edabf4e9808adcc40e2628ebb9407e",
+      "skill_md_bytes": 3903,
+      "description_chars": 566,
+      "upstream_disable_model_invocation": false,
+      "license": "CC-BY-SA-4.0 (referenced by pin, never vendored)",
+      "official": false,
+      "audits": {
+        "gen_agent_trust_hub": "Pass",
+        "socket": "Pass",
+        "snyk": "Pass",
+        "url": "https://skills.sh/trailofbits/skills/variant-analysis",
+        "checked_at": "2026-09-26"
+      },
+      "status": "trial",
+      "gap": "Post-merge review keeps finding siblings of defects already fixed: #314 (2026-09-26) widened #291's rtk blob exclusion and closed a blind-packet leak through sentences the #269 filter did not match. fp-check verifies one finding and says it is not for hunting; no installed procedure searches a fixed bug's variants before merge.",
+      "claude_listing": "on",
+      "codex_enabled": false,
+      "added": "2026-09-26"
+    },
+    {
+      "name": "writing-for-agents",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/writing-for-agents",
+      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "path": "skills/productivity/writing-for-agents",
+      "tree_sha": "ad2925850efb8973a72d2e666f7a975f9a2d4a9b",
+      "skill_md_sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+      "skill_md_bytes": 10886,
+      "description_chars": 103,
+      "upstream_disable_model_invocation": false,
+      "license": "MIT",
+      "official": false,
+      "audits": {
+        "gen_agent_trust_hub": "Pass",
+        "socket": "Pass",
+        "snyk": "Pass",
+        "url": "https://skills.sh/mattpocock/skills/writing-for-agents",
+        "checked_at": "2026-09-26"
+      },
+      "status": "trial",
+      "gap": "AGENTS.md (160 lines, 11,708 bytes) loads into every Claude and Codex session and every worker that keeps project instructions, and changed in 28 commits from 2026-09-12 to 2026-09-26; six of its paragraphs are dated wave chronology. No installed procedure covers context load, a single source of truth or pruning when agents edit AGENTS.md or CLAUDE.md. Skill authoring stays with anthropic-skills:skill-creator and Codex .system/skill-creator; the description also triggers on skill edits, a trial confound, so only AGENTS.md and CLAUDE.md uses count toward this gap.",
+      "claude_listing": "on",
+      "codex_enabled": true,
+      "added": "2026-09-26"
     }
   ],
   "budget": {
-    "claude_on_description_chars": 6746,
+    "claude_on_description_chars": 7409,
     "claude_on_cap": 8000,
-    "codex_enabled_description_chars": 2951,
-    "codex_default_budget_chars": 8000
+    "codex_enabled_description_chars": 3054,
+    "codex_default_budget_chars": 8000,
+    "description_chars_method": "Unicode code points of the SKILL.md frontmatter description parsed with PyYAML, surrounding whitespace stripped (2026-09-26; semgrep, codeql and sarif-parsing corrected from 709, 753 and 375)."
   },
   "excluded": [
     {
@@ -771,6 +825,90 @@
       "source": "various",
       "reason": "Off-domain for this repository's layers.",
       "overturn": "The repository adds that domain."
+    },
+    {
+      "skills": "skill-security",
+      "source": "superagent-ai/skills",
+      "reason": "Deferred after review (2026-09-26): its file discovery follows symlinks with no containment check (scripts/analyzers.py discover() and read_text() at 0da315b), so a skill that links to a readable file outside itself makes the scanner read that file as the skill's own and print a matching line of up to 120 characters; the m7 fixture confirmed both under an open() trace, with no symlink finding. A scanner for untrusted skills that can print a credential file into the transcript fails the credential rule. It led on the fixtures (at least one high or critical finding on 6 of 7 against 4 of 7), but its own default verdict was DO NOT INSTALL only for m1, REVIEW MANUALLY for five, and LIKELY SAFE (score 0) for instruction-only memory poisoning (m6).",
+      "overturn": "An upstream pin, or an enforced wrapper, that rejects symlinks resolving outside the target before reading, shown on the m7 fixture under the open() trace; then delta.json proposal P9 decides the trial slot."
+    },
+    {
+      "skills": "skill-scanner",
+      "source": "getsentry/skills",
+      "reason": "Same capability as skill-security (deferred above) and the same out-of-target read: on the m7 symlink fixture (2026-09-26) it reported the outside symlink as critical but still read the file behind it and printed a line of it. It returned at least one high or critical finding on 4 of 7 synthetic malicious fixtures (skill-security 6 of 7), missing the settings.json permission grant in m2 and the environment-variable harvesting in m3; neither scanner flags instruction-only memory poisoning (m6).",
+      "overturn": "An upstream pin that reports and does not read through symlinks resolving outside the target (m7 under the open() trace in delta.json), then a frozen fixture set on which it matches or beats the other scanner."
+    },
+    {
+      "skills": "agents-md, claude-settings-audit, gha-security-review",
+      "source": "getsentry/skills",
+      "reason": "agents-md directs symlinking CLAUDE.md to AGENTS.md and caps the file at 100 lines, which conflicts with this repository's CLAUDE.md import layout (writing-for-agents is the trial winner); claude-settings-audit duplicates the bundled /fewer-permission-prompts; gha-security-review has a skills.sh Gen Agent Trust Hub Fail (2026-09-26).",
+      "overturn": "The canonical instructions adopt a single-file layout, or a later audit passes and agentic-actions-auditor misses a workflow finding it catches."
+    },
+    {
+      "skills": "agent-development, hook-development and the other plugin-dev and hookify skills",
+      "source": "anthropics/claude-code",
+      "reason": "Last changed 2025-11-17. agent-development documents five frontmatter fields and marks model and color required, where the 2.1.283 docs list eighteen and require only name and description; hook-development names no PostToolUseFailure, SubagentStart, PermissionRequest or UserPromptExpansion event. LICENSE.md reserves all rights. The code.claude.com docs are the current primary source.",
+      "overturn": "Upstream refreshes the skills against the current docs under a license, or they show a gap the docs do not cover."
+    },
+    {
+      "skills": "paper-trading, paper-trading-cli, paper-trading-mcp, backtest and the broker-api skills",
+      "source": "alpacahq/alpaca-skills",
+      "reason": "The paper-trading skills have the model preview and submit orders, against the AGENTS.md rule that deterministic code owns order state; backtest runs agent-written backtests beside the selected NautilusTrader engine and has a Gen Agent Trust Hub Warn; the broker-api skills target Alpaca's Broker API, not the Trading API paper lane.",
+      "overturn": "The paper-lane policy admits model-submitted paper orders, or the Alpaca adapter work shows a Trading API gap its own documentation does not cover."
+    },
+    {
+      "skills": "second-opinion, post-patch-validation, dimensional-analysis and the smart-contract, fuzzing-handbook, trailmark, C/C++/Rust and cryptography skills",
+      "source": "trailofbits/skills",
+      "reason": "second-opinion duplicates the installed codex plugin and tools/sota-convergence/codex_lane.py; post-patch-validation duplicates verification-before-completion and fp-check (Socket Warn); dimensional-analysis targets DeFi arithmetic with no unit-bug history here; the rest are off-domain or need the uninstalled trailmark tool.",
+      "overturn": "A concrete gap appears (a unit-mismatch defect in numeric or order code, a native fuzzing target) and the skill passes its audits."
+    },
+    {
+      "skills": "ask-matt, grilling, grill-with-docs, implement, implement-spec, to-spec, prototype, wizard, domain-modeling, claude-handoff, handoff, loop-me, retro, teach, to-questionnaire, wait-what, pr, writing-beats, writing-fragments, writing-shape, git-guardrails-claude-code, setup-pre-commit, setup-ts-deep-modules, migrate-to-shoehorn, scaffold-exercises",
+      "source": "mattpocock/skills",
+      "reason": "ask-matt, grilling, grill-with-docs, loop-me, to-questionnaire, wait-what, teach, retro, implement, implement-spec, to-spec and prototype are interview, spec or process flows that conflict with the no-intake rule or duplicate grill-me; claude-handoff and handoff duplicate ai-memory handoffs; domain-modeling writes CONTEXT.md and ADRs beside docs/decisions; git-guardrails-claude-code edits hook settings the adoption profile owns; setup-pre-commit, setup-ts-deep-modules, migrate-to-shoehorn and scaffold-exercises target TypeScript projects or course exercises; wizard, pr and the three writing-* skills have no named gap here.",
+      "overturn": "The canonical instructions drop the conflicting rule, or a named gap appears that the kept skills and ai-memory do not cover."
+    },
+    {
+      "skills": "discernment-nudge, academy-guide, web-artifacts-builder, algorithmic-art, brand-guidelines, canvas-design, internal-comms, slack-gif-creator, theme-factory",
+      "source": "anthropics/skills",
+      "reason": "discernment-nudge appends follow-up questions to substantive replies, against the concise-handoff rule; academy-guide and web-artifacts-builder duplicate the bundled claude-api skill and the native Artifact tool; the rest are off-domain design and communications skills.",
+      "overturn": "Never while the native copies exist; discernment-nudge only if the canonical instructions ask for follow-up questions."
+    },
+    {
+      "skills": "security-ownership-map, define-goal, cli-creator, migrate-to-codex, yeet, openai-docs, skill-installer, plugin-creator, playwright-interactive, screenshot, imagegen, chatgpt-apps, aspnet-core, winui-app, hatch-pet, speech, transcribe, linear, sentry, the figma and notion skills and the cloudflare, netlify, render and vercel deploy skills",
+      "source": "openai/skills",
+      "reason": "security-ownership-map measures bus factor across maintainers; define-goal is an intake step; cli-creator has no named gap; migrate-to-codex rewrites instruction and MCP config the adoption profile owns; yeet commits and pushes in one flow; openai-docs, skill-installer and plugin-creator duplicate Codex .system skills; playwright-interactive and screenshot duplicate agent-browser; the rest target services, platforms or media this repository does not use.",
+      "overturn": "The repository adds that service or domain, or a named gap appears."
+    },
+    {
+      "skills": "semgrep, code-security, llm-security",
+      "source": "semgrep/skills",
+      "reason": "Semgrep Rules License v1.0, not an OSI license; trailofbits semgrep is the trial winner for ruleset scanning, and llm-security's 593-character description asks to be consulted for any code that calls an LLM, which is most work here.",
+      "overturn": "An OSI license is published and the trailofbits semgrep skill shows a gap on the same scans."
+    },
+    {
+      "skills": "context-engineering",
+      "source": "addyosmani/agent-skills",
+      "reason": "Context-setup guidance that duplicates docs/token-practice.md and the kept iterative-retrieval and search-first winners.",
+      "overturn": "A frozen context task on which the kept retrieval skills and token-practice lanes lose to it."
+    },
+    {
+      "skills": "diagnosing-superpowers",
+      "source": "obra/superpowers",
+      "reason": "Diagnoses superpowers plugin sessions; the plugin is not installed.",
+      "overturn": "The superpowers plugin is adopted."
+    },
+    {
+      "skills": "composition-patterns, deploy-to-vercel, react-best-practices, react-native-skills, react-view-transitions, vercel-cli-with-tokens, vercel-optimize",
+      "source": "vercel-labs/agent-skills",
+      "reason": "GitHub reports no license for the repository at 063bee9, and there is no React or Vercel code here.",
+      "overturn": "A license is published and a React or Vercel gap appears."
+    },
+    {
+      "skills": "agentcore, core, derive-client, dogfood, electron, protected-vercel-deployments, slack, vercel-sandbox, webmcp-gen",
+      "source": "vercel-labs/agent-browser (skill-data/)",
+      "reason": "Served by the pinned agent-browser CLI through `agent-browser skills get <name>` at the installed CLI version; the pinned agent-browser SKILL.md is the stub that points there.",
+      "overturn": "The CLI stops serving them."
     }
   ]
 }
