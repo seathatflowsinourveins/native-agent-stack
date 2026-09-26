@@ -39,14 +39,18 @@ stack agents).
    own "covered" outcome (`HookOutcome::is_covered`, rtk v0.50.0 `src/core/tracking.rs`).
    `curl`/`wget` counts only in command position of the text a shell runs, also behind a shell
    keyword such as `do` or `then`: quoted strings and heredoc bodies count only under `sh -c`,
-   `eval`, `ssh` or a heredoc fed to a shell. The marker is `<context_window_protection>`, the
+   `eval`, `ssh` or a heredoc fed to a shell. Escaped characters and comments never count, and
+   `$(...)` or backticks inside double quotes or an unquoted heredoc do (bash(1) QUOTING, COMMENTS
+   and Here Documents). The marker is `<context_window_protection>`, the
    opening tag of Context Mode 1.0.169's routing block. It is looked for only in the first prompt
    and in SubagentStart hook context, never in tool input or output.
 2. **Codex.** `python3 tools/skill-usage/skill_usage.py --lanes --codex-root <codex home>/sessions
    --since … --until … --json`. It counts `item_completed` items (McpToolCall, CommandExecution,
-   Extension, FileChange) and `function_call` records. Those events depend on the rollout's history
-   mode, so the report also gives each session's `history_mode` and the sessions with model tool
-   calls but no `item_completed` event. Sessions that did not load the user config
+   Extension, FileChange) and `function_call` records, one tool call per id in the window of its
+   first record; a call's shell, MCP and fetch lanes count in the window of its item. Those events
+   depend on the rollout's history mode, so the report also gives each session's `history_mode`
+   and the sessions with model tool calls but no `item_completed` event. Sessions that did not
+   load the user config
    (`--ignore-user-config`: the landscape sweep and blind lanes) are negative controls. They are
    identified from the session's own skill catalog. Codex applies skill enable/disable rules only
    from the User and SessionFlags config layers (`codex-rs/config/src/skills_config.rs`,
@@ -68,7 +72,12 @@ stack agents).
    review then found ten more. The repair round fixed them and regenerated every file at 18:58Z.
    On this window that changed the Claude `curl`/`wget` counts (calls after a shell keyword now
    count) and the invoke-rate report's Codex `counts` (the unsplit measurement again), and added
-   the groups named above. `provenance.json` lists every changed figure.
+   the groups named above. `provenance.json` lists every changed figure. A read-only cross-family
+   review (GPT-6) of the repaired change found two more: a Codex call whose request and completion
+   fell on opposite sides of a window edge counted in both windows, and the `curl`/`wget` rule read
+   escaped characters and comments as commands and skipped command substitutions in unquoted
+   heredocs. A second repair round fixed both and regenerated every file at 20:14Z. No figure
+   changed: only the `limits` text and the capture-time fields differ.
 
 ## Results: Claude children (639 in 7 sessions)
 
@@ -194,16 +203,18 @@ No skill is a prune candidate yet: every skill is under 30 days old.
 - **Lexical detection.** `curl`/`wget` counts only in command position of the text a shell runs,
   optionally behind the shell keywords `do`, `then`, `else`, `elif`, `if`, `while`, `until`, `!`
   and `{` and behind `rtk`, `sudo`, `env`, `command`, `exec`, `time`, `nice`, `nohup` or
-  `timeout N`. It is not a shell parser: other wrappers and nested quoting are missed. The fetch
+  `timeout N`. It is not a shell parser: other wrappers and nested quoting are missed, and a
+  quoted string after `sh -c`, `eval` or `ssh <host>` counts as run even where that word is an
+  argument (`echo sh -c '…'`). The fetch
   shares compare three lanes only: a fetch inside Context Mode's sandbox, a `gh api` call or an
   HTTP call in a script is in none. The Codex `rtk` prefix is the first word of the shell script.
 - **Codex classification.** It needs the trial's rendered disable list in the host's user config;
   without it, sessions read as `applied` or `unknown`. A spawned sub-agent's rollout begins with
   its parent's developer messages, so its marker reflects inherited context. Shell, MCP and fetch
   counts need `item_completed` events, which a rollout persists depending on its history mode.
-- **Invoke-rate regeneration.** `skill-invoke-rate.json` was regenerated at 18:58Z with `--now`
+- **Invoke-rate regeneration.** `skill-invoke-rate.json` was regenerated at 20:14Z with `--now`
   pinned to 17:07:04Z, so a rollout record written later counts in no window; its
-  `files_scanned` (442) counts the rollout files present at 18:58Z.
+  `files_scanned` (496) counts the rollout files present at 20:14Z.
 - **Reproduction horizon.** The transcripts are retained by the clients (Claude Code's
   `cleanupPeriodDays`, 30 days by default). RTK prunes `hook_decisions` after 90 days. A rerun
   reproduces these groups only while both still hold the window.

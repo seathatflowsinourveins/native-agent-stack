@@ -14273,18 +14273,18 @@
     },
     {
       "path": "evidence/artifacts/child-lane-baseline-20260926/README.md",
-      "sha256": "9fb665fdfce426822e6b4d99466f447e576e59ee94017706301d18fceef78e5b",
-      "bytes": 14905
+      "sha256": "ae1705c4a65295be6dd6d43d1437d7e56f861d37e2735b1708093cd5d4570d9f",
+      "bytes": 15824
     },
     {
       "path": "evidence/artifacts/child-lane-baseline-20260926/claude-lanes.json",
-      "sha256": "7922a095a27923752fc0213b1231bd480af43fc36fcf9105128096e2f14b49b7",
-      "bytes": 59053
+      "sha256": "6d6edeba9fc66ce19af0def7489f21ac3b36368155bd0aa7955b4d8d326e84a1",
+      "bytes": 59208
     },
     {
       "path": "evidence/artifacts/child-lane-baseline-20260926/codex-lanes.json",
-      "sha256": "11845745ff78e35c061a2572947fc39af6d351257f9fff0cfd9041fd0a3bd167",
-      "bytes": 10391
+      "sha256": "8ace84012fd67cfeeb3a08c8a20f650a7833d21aa8298083694c75d5c61a18b4",
+      "bytes": 10823
     },
     {
       "path": "evidence/artifacts/child-lane-baseline-20260926/cross-check.json",
@@ -14298,12 +14298,12 @@
     },
     {
       "path": "evidence/artifacts/child-lane-baseline-20260926/provenance.json",
-      "sha256": "94d77e293b556a130905678b6de181b3b6c1902227b0d1c9843c26f0da15cbc2",
-      "bytes": 5769
+      "sha256": "a37476a08b2b654a6c5a3b742ecfcbeae49a059a1aa9f23c8cce55763264622e",
+      "bytes": 6454
     },
     {
       "path": "evidence/artifacts/child-lane-baseline-20260926/skill-invoke-rate.json",
-      "sha256": "706af97d167ce2800f6bf492360f8253c7394870117c7aa839ad9252cae10d3f",
+      "sha256": "5c1e13b427dd9c8818721a1788eab19d55ef0ceef269d5eb644c25557760238b",
       "bytes": 39479
     },
     {
@@ -36663,12 +36663,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "922c318492bcb54e8ff5ab89b6fd543b59c8c189808741bcc00893dddd26b63e",
-      "bytes": 23669
+      "sha256": "3e5f57a8e16a2083dafcae6de3d22df7fcd87a0296cbc38a16311706648ae036",
+      "bytes": 23842
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "bc3e04438f128302ff75963b02a0d3af02ad4d9fc139a4431a47636eefc6f46c",
+      "sha256": "22806ae61c77afb5cdac280145860d37af9e9366386dbce028fc857c157bdfdb",
       "bytes": 1129
     },
     {
@@ -36678,8 +36678,8 @@
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
-      "sha256": "c367ea0e56d155692099051e5a64c5ba753fcd1a410d75d260bc8cec3cc75018",
-      "bytes": 45221
+      "sha256": "f5ea9c3a1b47cab91e90a515f455bcf6a960fb696db89717e04b7424e4ff42a0",
+      "bytes": 46586
     },
     {
       "path": "examples/claude-native/workflows/codex-cross-review.mjs",
@@ -36703,8 +36703,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
-      "sha256": "92bb57aa261c359127df879e98da68463052c9203ba007547ea39f4a1e0fe48f",
-      "bytes": 48208
+      "sha256": "07d9b6553ea5535f005c68830047c99bdec8d26d6b7edd86406028f4dd8a7cab",
+      "bytes": 49742
     },
     {
       "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
@@ -38068,8 +38068,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "b9651032c2847b9a5986057c89e2a9f055455c6c83a9050e6ede930f5d696336",
-      "bytes": 51223
+      "sha256": "996d235b48dbc7a2d6be74b8c5e737ab688716b99661f7144cc7a70beb307551",
+      "bytes": 55700
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -38188,13 +38188,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "da56a9e8145809da587855dbc51d9789e522c2891101472060fa5495df81342b",
-      "bytes": 14918
+      "sha256": "5e18f1ff2cd1850260e59aa02949c97ea202c0b5326afe8354078141252d1607",
+      "bytes": 15487
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "676900f751d54c070ae41509af136b7ca76a44cd34b79595513a4f418d16e775",
-      "bytes": 62993
+      "sha256": "b979fea4714817223b66b08af557faf62a37faffe665865b764bfb957fca438f",
+      "bytes": 65407
     },
     {
       "path": "tools/sota-convergence/README.md",

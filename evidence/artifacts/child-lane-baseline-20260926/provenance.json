@@ -10,10 +10,10 @@
     "bounds": "half-open [since, until)"
   },
   "catalog_base_revision": "dde28cc2005bff54e4be61195e76d63b166db4f4",
-  "tool_bytes_note": "The tools ran from the change that adds them, at its repair-round state with no uncommitted edits; the sha256 values identify the exact bytes, which that change commits unchanged.",
+  "tool_bytes_note": "The tools ran from the change that adds them, at its second repair-round state (after the cross-family review) with no uncommitted edits; the sha256 values identify the exact bytes, which that change commits unchanged.",
   "tools": {
-    "examples/claude-native/workflows/child-usage.mjs": "c367ea0e56d155692099051e5a64c5ba753fcd1a410d75d260bc8cec3cc75018",
-    "tools/skill-usage/skill_usage.py": "676900f751d54c070ae41509af136b7ca76a44cd34b79595513a4f418d16e775",
+    "examples/claude-native/workflows/child-usage.mjs": "f5ea9c3a1b47cab91e90a515f455bcf6a960fb696db89717e04b7424e4ff42a0",
+    "tools/skill-usage/skill_usage.py": "b979fea4714817223b66b08af557faf62a37faffe665865b764bfb957fca438f",
     "adoption/skills/manifest.json": "002312220e4ebe1c920a0d1a2230100498983d4165440ce73e8d09c667f91807",
     "evidence/artifacts/child-lane-baseline-20260926/cross_check.py": "49b396ea406a707e78b3fe0bd1cc8c21db0ef4b0e5abb025ffc67f0ca19da747"
   },
@@ -28,14 +28,14 @@
   "steps": [
     {
       "output": "claude-lanes.json",
-      "started_at": "2026-09-26T18:58:35Z",
+      "started_at": "2026-09-26T20:13:52Z",
       "command": "node examples/claude-native/workflows/child-usage.mjs --lanes-sweep --root <claude config>/projects --since 2026-09-25T17:18:00Z --until 2026-09-26T15:05:00Z --rtk-db <rtk data dir>/history.db",
       "exit": 0,
       "stderr_bytes": 0
     },
     {
       "output": "codex-lanes.json",
-      "started_at": "2026-09-26T18:58:47Z",
+      "started_at": "2026-09-26T20:13:58Z",
       "command": "python3 tools/skill-usage/skill_usage.py --lanes --codex-root <codex home>/sessions --since 2026-09-25T17:18:00Z --until 2026-09-26T15:05:00Z --json --out <outside the checkout>/codex-lanes.json",
       "exit": 0,
       "stderr_bytes": 0
@@ -54,23 +54,23 @@
     },
     {
       "output": "skill-invoke-rate.json",
-      "started_at": "2026-09-26T18:58:50Z",
+      "started_at": "2026-09-26T20:14:00Z",
       "command": "python3 tools/skill-usage/skill_usage.py --claude-skill-doctor <outside the checkout>/skill-doctor.json --codex-root <codex home>/sessions --now 2026-09-26T17:07:04Z --json --out <outside the checkout>/skill-invoke-rate.json",
       "exit": 0,
       "stderr_bytes": 0,
-      "note": "--now pins the first generation's capture instant, so a rollout record written later counts in no window; files_scanned counts the rollout files present at 18:58Z."
+      "note": "--now pins the first generation's capture instant, so a rollout record written later counts in no window; files_scanned counts the rollout files present at 20:14Z."
     },
     {
       "output": "cross-check.json",
       "command": "python3 evidence/artifacts/child-lane-baseline-20260926/cross_check.py --claude-root <claude config>/projects --codex-root <codex home>/sessions --rtk-db <rtk data dir>/history.db --since 2026-09-25T17:18:00Z --until 2026-09-26T15:05:00Z",
       "exit": 0,
-      "started_at": "2026-09-26T18:58:54Z",
+      "started_at": "2026-09-26T20:14:02Z",
       "stderr_bytes": 0
     }
   ],
   "reproduction": {
-    "generations": "First generation: the pre-repair tools at 17:06Z and again at 17:08Z, with identical groups. Repair-round regeneration: the tools above at 18:58Z, after an adversarial review of the change. Against the first generation only these figures changed: Claude curl/wget 614 -> 662 and loopback-only 96 -> 100 (curl/wget after a shell keyword such as do or then now counts), so ctx_fetch_and_index_share 0.0145 -> 0.0141, with the same calls moving in the by_spawn, by_agent_type and by_session groups that hold them; and skill-invoke-rate.json's Codex counts are the trial's unsplit measurement again: counts minus of_which_user_config_ignored minus of_which_copied_from_parent equals the first generation's counts for every skill and window, and of_which_user_config_ignored equals its excluded counts, which sets security-threat-model's zero_on_evaluated_clients back to false. New fields: groups.by_spawn_and_agent_type (Claude), sessions_by_history_mode (paginated 239) and sessions_with_tool_calls_but_no_item_events (0) (Codex). Every other group figure is unchanged, the RTK hook rewrites and decisions included. Capture-time fields (generated_at, rtk_db.rows, transcripts_found, files_scanned) differ by design.",
-    "cross_check": "cross-check.json, from a separate implementation, was byte-identical at 17:07Z and at 18:58Z and equals the reports on every figure it computes: Claude children 639 (42 Agent-tool, 597 workflow), Bash calls 24,776, RTK decisions (ask 8,325, defer 16,290, deny 137, not logged 24), Skill calls 353, MCP calls per server, the marker in 42 first prompts (all Agent-tool); Codex sessions split by the marker in developer messages 132 / 107, the same split the skill-catalog classification gives, with equal MCP calls per server, shell calls (482 / 110), rtk-prefixed shell calls (195 / 64) and hosted page opens (5 / 1,006)."
+    "generations": "First generation: the pre-repair tools at 17:06Z and again at 17:08Z, with identical groups. Repair-round regeneration: the first repair round's tools (child-usage.mjs c367ea0e, skill_usage.py 676900f7) at 18:58Z, after an adversarial review of the change. Against the first generation only these figures changed: Claude curl/wget 614 -> 662 and loopback-only 96 -> 100 (curl/wget after a shell keyword such as do or then now counts), so ctx_fetch_and_index_share 0.0145 -> 0.0141, with the same calls moving in the by_spawn, by_agent_type and by_session groups that hold them; and skill-invoke-rate.json's Codex counts are the trial's unsplit measurement again: counts minus of_which_user_config_ignored minus of_which_copied_from_parent equals the first generation's counts for every skill and window, and of_which_user_config_ignored equals its excluded counts, which sets security-threat-model's zero_on_evaluated_clients back to false. New fields: groups.by_spawn_and_agent_type (Claude), sessions_by_history_mode (paginated 239) and sessions_with_tool_calls_but_no_item_events (0) (Codex). Every other group figure is unchanged, the RTK hook rewrites and decisions included. Capture-time fields (generated_at, rtk_db.rows, transcripts_found, files_scanned) differ by design. Second repair-round regeneration: the tools above at 20:14Z, after a read-only cross-family (GPT-6) review; a Codex tool call is now one call per id counted in the window of its first record, and the curl/wget rule reads escaped characters, comments and unquoted-heredoc command substitutions as bash(1) does. Against the 18:58Z files no figure changed: only the limits text and the capture-time fields differ (generated_at; rtk_db.rows 62160 -> 65845; transcripts_found 1883 -> 1979; codex-lanes files_scanned 366 -> 420; skill-invoke-rate codex.files_scanned 442 -> 496).",
+    "cross_check": "cross-check.json, from a separate implementation, was byte-identical at 17:07Z, 18:58Z and 20:14Z and equals the reports on every figure it computes: Claude children 639 (42 Agent-tool, 597 workflow), Bash calls 24,776, RTK decisions (ask 8,325, defer 16,290, deny 137, not logged 24), Skill calls 353, MCP calls per server, the marker in 42 first prompts (all Agent-tool); Codex sessions split by the marker in developer messages 132 / 107, the same split the skill-catalog classification gives, with equal MCP calls per server, shell calls (482 / 110), rtk-prefixed shell calls (195 / 64) and hosted page opens (5 / 1,006)."
   },
   "privacy": "Every retained file holds names, counts and token figures only: no host paths, session, run, agent or tool-use ids, labels, prompts or transcript text. Sessions appear as ordinals (session-01 ... session-07) in order of their earliest child row in the window. Paths in commands are placeholders."
 }
