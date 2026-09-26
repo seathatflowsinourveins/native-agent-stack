@@ -1036,7 +1036,7 @@
       "purpose": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
       "upstream_commands": {
         "install": [
-          "gh release download v2.3.2 --repo akitaonrails/ai-memory --pattern ai-memory-linux-x86_64.tar.gz --dir \"$DOWNLOAD_DIR\"",
+          "gh release download v2.4.1 --repo akitaonrails/ai-memory --pattern ai-memory-linux-x86_64.tar.gz --dir \"$DOWNLOAD_DIR\"",
           "tar -xf \"$DOWNLOAD_DIR/ai-memory-linux-x86_64.tar.gz\" -C \"$PREFIX\""
         ],
         "use": [
@@ -1048,7 +1048,7 @@
           "memory_status({})"
         ],
         "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
-        "install_note": "Official [akitaonrails/ai-memory v2.3.2](https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2) archive; `gh release view v2.3.2 --repo akitaonrails/ai-memory --json assets`; retain its native hooks and packaging files",
+        "install_note": "Official [akitaonrails/ai-memory v2.4.1](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1) archive; `gh release view v2.4.1 --repo akitaonrails/ai-memory --json assets`; retain its native hooks and packaging files. An existing store migrates forward-only when 2.4.1 first serves it; follow the recipe's \"Upgrading an existing store\" (at-rest copy first, then `install-hooks` and the Codex `/hooks` trust step).",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
       "returned_result_summary": "2026-09-20 official 2.3.2 maintenance: publisher checksum, active service executable, native status, 3-hit scoped search and direct MCP status passed after private backup. Current Desktop loaded MCP returned active exact session and bounded observations. Earlier native Claude/Codex page reads returned correct heading and disabled-feature facts; those dated model receipts retain 2.3.1 scope.",
@@ -1493,14 +1493,14 @@
       "purpose": "Native CLI bridge with persistent MCP daemon connection",
       "upstream_commands": {
         "install": [
-          "npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.13.13\" mcporter@0.13.13"
+          "npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.14.1\" mcporter@0.14.1"
         ],
         "use": [
           "mcporter --config \"$MCPORTER_CONFIG\" list socraticode --brief --no-oauth",
           "mcporter call --stdio jcodemunch-mcp --env \"CODE_INDEX_PATH=$HOME/.code-index\" --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth"
         ],
         "statistics": [],
-        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.13.13\" mcporter@0.13.13`",
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.14.1\" mcporter@0.14.1`; `ps` must be on the PATH of whatever launches the daemon.",
         "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
       },
       "returned_result_summary": "2026-09-20 native CLI bridge returned jCodeMunch's 29, 820 estimated retained total and Context Mode's actual project-file hash/length. This is a transport bridge, not an additional savings source; do not credit the same payload reduction again.",

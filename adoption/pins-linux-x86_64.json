@@ -114,11 +114,11 @@
     },
     {
       "id": "ai-memory",
-      "version": "2.3.2",
+      "version": "2.4.1",
       "kind": "tarball",
-      "url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.3.2/ai-memory-linux-x86_64.tar.gz",
-      "sha256": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
-      "install_note": "Verified against the release's ai-memory-linux-x86_64.tar.gz.sha256 sidecar fetched 2026-09-22, following the upstream source named in blueprints/convergence-practice/wsl-native-tools/pins.json's convention and recipes/README.md's ai-memory row (official akitaonrails/ai-memory v2.3.2 archive).",
+      "url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.4.1/ai-memory-linux-x86_64.tar.gz",
+      "sha256": "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+      "install_note": "Verified 2026-09-25 against three upstream values that agree (by the qualification run at 22:43Z and its independent verifier at 23:10Z): the v2.4.1 release's ai-memory-linux-x86_64.tar.gz.sha256 sidecar, the GitHub API asset digest (16,026,020 bytes) and the checksum list in the release body; the API digest was re-checked on 2026-09-26 before the cutover; the archive's ai-memory binary has sha256 dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd, and the release has no artifact attestation (HTTP 404), an unsigned tag and is not immutable. Matches recipes/README.md's ai-memory row (official akitaonrails/ai-memory v2.4.1 archive, tag commit 433a19f3d54dea287571b1423591db2a89965fa9). On nativestack-5975wx-20260925, 2.4.0 replaced 2.3.2 on 2026-09-25 and 2.4.1 replaced 2.4.0 on 2026-09-26, each after a rehearsal on restored copies and a cold-copy cutover (evidence/receipts/ai-memory-240-qualification-20260925.json and ai-memory-241-qualification-20260925.json); that is one host's state, not evidence about any other Linux host. Migrations are forward-only: 2.4.1 migrates a 2.3.2 store V64 -> V67 and a 2.4.0 store V66 -> V67 when `serve` first opens it, an older binary then refuses that store, and no automatic pre-migration archive is written for a 2.x store. On a host with an existing store, stop the service and take an at-rest copy of the data directory before the service restarts on this binary, then re-run `ai-memory install-hooks --apply` for each client (the hook commands name the versioned prefix).",
       "version_probe": {
         "method": "exec",
         "command": "ai-memory",
@@ -129,11 +129,11 @@
     },
     {
       "id": "mcporter",
-      "version": "0.13.13",
+      "version": "0.14.1",
       "kind": "npm",
-      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.13.13.tgz",
-      "sha256": "ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d",
-      "install_note": "npm dist.integrity sha512-rgltHjpmdsBzErnWfAlNsW6Sn5B3y3Qli8phNtKkgn7s/Lk3Uf1YWLpqJXrIXjhxzBR67Oi5Z3+wxptn/vxFkA== matched. `npm install --global --prefix tools/mcporter-0.13.13 mcporter@0.13.13`, matching recipes/README.md. Requires Node >=24.",
+      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz",
+      "sha256": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2",
+      "install_note": "npm dist.integrity sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ== matched, and the sha256 above equals the GitHub release v0.14.1 asset digest and its checksums.txt (checked 2026-09-25); `npm audit signatures` verified the registry signatures and mcporter's SLSA provenance (release.yml at refs/tags/v0.14.1, commit 93e0916cafe2d624b94271e31b75ca681a016514). `npm install --global --prefix tools/mcporter-0.14.1 mcporter@0.14.1`, matching recipes/README.md. Requires Node >=24, and `ps` on the PATH of whatever launches the mcporter daemon: 0.14.x runs `ps` from PATH (0.13.13 ran /bin/ps), and without it the daemon cannot connect keep-alive servers and `mcporter daemon stop` refuses. Qualified against 0.13.13 and switched on nativestack-5975wx-20260925 (evidence/receipts/mcporter-0141-qualification-20260925.json); that is one host's state, not evidence about any other Linux host.",
       "version_probe": {
         "method": "exec",
         "command": "mcporter",

@@ -150,6 +150,11 @@ GitHub-hosted macOS runner; see
    that runs the Claude RTK hook at 0.50.0 also needs the `exclude_commands`
    config in [the RTK hook recipe](../recipes/README.md#native-context-mode-and-hooks),
    which the script does not write.
+   It also changed after `v2026.09.25.2` in its `ai-memory` (2.3.2 to 2.4.1)
+   and `mcporter` (0.13.13 to 0.14.1) entries, so a host at that tag installs
+   the earlier two of those as well; on a host with an existing ai-memory
+   store, 2.4.1 migrates it forward-only at the next service start, so take
+   the at-rest copy in [the recipe's upgrade steps](../recipes/README.md#upgrading-an-existing-store) first.
 
    `pins-linux-x86_64.json` and `adoption/bootstrap-linux.sh` changed after `v2026.09.25.2`.
    The Linux pins file gained `repomix`, `toon`,
@@ -212,6 +217,14 @@ GitHub-hosted macOS runner; see
    changed after `v2026.09.24.1`: its `serena` server runs
    `${ECO_ROOT}/bin/serena` (installed in step 4a), where the tag's copy names
    `${ECO_ROOT}/bin/serena-context`, a wrapper nothing in this catalog installs.
+   `claude.settings.template.json` changed after `v2026.09.25.2`: its eight
+   ai-memory hook commands name `tools/ai-memory-2.4.1`, the Linux pin; on
+   macOS, whose pin is still 2.3.2, see
+   [ai-memory hook paths on macOS](platforms/macos-arm64.md#ai-memory-hook-paths-on-macos).
+   The rendered `codex.config.toml` keeps the source host's `trusted_hash`
+   entries for the ai-memory commands in `~/.codex/hooks.json`, recorded before
+   those commands moved to 2.4.x; Codex treats the changed commands as
+   untrusted until they are reviewed in `/hooks`.
 
    **Trust-state warning.** The rendered `codex.config.toml` (user-level)
    carries this source host's accumulated Codex `[projects."..."]

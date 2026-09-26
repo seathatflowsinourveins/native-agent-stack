@@ -116,6 +116,10 @@ git checkout "$tag"
 1. If a pin file or `adoption/manifest.json` profile changed, rerun the
    bootstrap for each profile this host installed
    ([bootstrap step 2](bootstrap.md)); it installs the new pinned versions.
+   It also repoints each tool's `bin/` link at once, so when the ai-memory pin
+   changed on a host with an existing store, stop the service and take the
+   at-rest copy in [upgrading an existing store](../recipes/README.md#upgrading-an-existing-store)
+   before this re-run.
 2. If `adoption/templates/` changed, render again and compare before
    overwriting ([bootstrap step 4](bootstrap.md), `render_config.py --check`).
 3. Rerun `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --json`.

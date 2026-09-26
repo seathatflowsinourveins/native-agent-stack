@@ -256,39 +256,39 @@
       "component_id": "ai-memory",
       "repository": "https://github.com/akitaonrails/ai-memory",
       "selected_repository_url": "https://github.com/akitaonrails/ai-memory",
-      "selected_version": "2.3.2",
-      "selected_source_pin": "353841d91618d20b110b208de284a74d0b960379",
+      "selected_version": "2.4.1",
+      "selected_source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
       "checks": [
         {
           "endpoint": "repos/akitaonrails/ai-memory",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:32.363809+00:00",
-          "ended_at": "2026-09-21T22:30:32.784144+00:00",
-          "stdout_sha256": "2f32e269b288866198cb841bad62cd636ee0d650ffac75e7b3434c2e7704cd61",
+          "started_at": "2026-09-26T00:36:31.603656+00:00",
+          "ended_at": "2026-09-26T00:36:32.129935+00:00",
+          "stdout_sha256": "6418922ae9861a8128cc577b5de7e04b61e6654659a2332c705423954e2161e3",
           "status": "ok"
         },
         {
           "endpoint": "repos/akitaonrails/ai-memory/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:32.784250+00:00",
-          "ended_at": "2026-09-21T22:30:33.135046+00:00",
-          "stdout_sha256": "b7a1a1aea37d5177f5947e5d91086f556fb9e80a2300b9546dfd5803c1567c12",
+          "started_at": "2026-09-26T00:36:32.130031+00:00",
+          "ended_at": "2026-09-26T00:36:32.472342+00:00",
+          "stdout_sha256": "62ae741e1dc65ebb7979a5c68f8cd38a48921cd4452a9bf2ce156d0bc002be26",
           "status": "ok"
         },
         {
-          "endpoint": "repos/akitaonrails/ai-memory/commits/353841d91618d20b110b208de284a74d0b960379",
+          "endpoint": "repos/akitaonrails/ai-memory/commits/433a19f3d54dea287571b1423591db2a89965fa9",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:33.135218+00:00",
-          "ended_at": "2026-09-21T22:30:33.572233+00:00",
-          "stdout_sha256": "fac1b61a99d429fc64cc986b2491429deeaafc04cd6e4c8a2b62137e0aa3f099",
+          "started_at": "2026-09-26T00:36:32.472571+00:00",
+          "ended_at": "2026-09-26T00:36:32.760258+00:00",
+          "stdout_sha256": "0c1f21d23aa97f548e2c01d3eaa3c71b7b6d5c233ee812b9d1fa2ea11b2c4145",
           "status": "ok"
         },
         {
-          "endpoint": "repos/akitaonrails/ai-memory/commits/v2.3.2",
+          "endpoint": "repos/akitaonrails/ai-memory/commits/v2.4.1",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:33.572357+00:00",
-          "ended_at": "2026-09-21T22:30:33.925799+00:00",
-          "stdout_sha256": "fac1b61a99d429fc64cc986b2491429deeaafc04cd6e4c8a2b62137e0aa3f099",
+          "started_at": "2026-09-26T00:36:32.760378+00:00",
+          "ended_at": "2026-09-26T00:36:33.116897+00:00",
+          "stdout_sha256": "0c1f21d23aa97f548e2c01d3eaa3c71b7b6d5c233ee812b9d1fa2ea11b2c4145",
           "status": "ok"
         }
       ],
@@ -296,27 +296,27 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-21T22:24:05Z",
+      "pushed_at": "2026-09-25T21:17:46Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v2.3.2",
-        "published_at": "2026-09-20T02:34:33Z",
-        "html_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2",
+        "tag_name": "v2.4.1",
+        "published_at": "2026-09-25T21:46:32Z",
+        "html_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "353841d91618d20b110b208de284a74d0b960379",
-        "sha": "353841d91618d20b110b208de284a74d0b960379",
-        "html_url": "https://github.com/akitaonrails/ai-memory/commit/353841d91618d20b110b208de284a74d0b960379",
-        "committed_at": "2026-09-20T02:06:28Z"
+        "ref": "433a19f3d54dea287571b1423591db2a89965fa9",
+        "sha": "433a19f3d54dea287571b1423591db2a89965fa9",
+        "html_url": "https://github.com/akitaonrails/ai-memory/commit/433a19f3d54dea287571b1423591db2a89965fa9",
+        "committed_at": "2026-09-25T21:01:14Z"
       },
       "latest_release_source": {
-        "ref": "v2.3.2",
-        "sha": "353841d91618d20b110b208de284a74d0b960379",
-        "html_url": "https://github.com/akitaonrails/ai-memory/commit/353841d91618d20b110b208de284a74d0b960379",
-        "committed_at": "2026-09-20T02:06:28Z"
+        "ref": "v2.4.1",
+        "sha": "433a19f3d54dea287571b1423591db2a89965fa9",
+        "html_url": "https://github.com/akitaonrails/ai-memory/commit/433a19f3d54dea287571b1423591db2a89965fa9",
+        "committed_at": "2026-09-25T21:01:14Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
@@ -1316,32 +1316,32 @@
     {
       "component_id": "mcporter",
       "repository": "https://github.com/openclaw/mcporter",
-      "selected_repository_url": "https://github.com/openclaw/mcporter/tree/v0.13.13",
-      "selected_version": "0.13.13",
+      "selected_repository_url": "https://github.com/openclaw/mcporter/tree/v0.14.1",
+      "selected_version": "0.14.1",
       "selected_source_pin": null,
       "checks": [
         {
           "endpoint": "repos/openclaw/mcporter",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:43.118326+00:00",
-          "ended_at": "2026-09-21T22:31:43.534228+00:00",
-          "stdout_sha256": "54d685b8520f44dde20fb3775f033ca479f8ffa304864fed32cc04c8114bf4b5",
+          "started_at": "2026-09-25T20:59:21.515671+00:00",
+          "ended_at": "2026-09-25T20:59:21.923837+00:00",
+          "stdout_sha256": "b3f524e759af70b735b18ba3265fd11367d905d57137133f3d8b5a0e6e8f6b98",
           "status": "ok"
         },
         {
           "endpoint": "repos/openclaw/mcporter/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:43.534319+00:00",
-          "ended_at": "2026-09-21T22:31:43.845268+00:00",
-          "stdout_sha256": "409981550a826fecabbb2c4ef0e435ed3ff53fb78aa068005dfe754d5f7a6b7d",
+          "started_at": "2026-09-25T20:59:21.924008+00:00",
+          "ended_at": "2026-09-25T20:59:22.256453+00:00",
+          "stdout_sha256": "849eaa7722b314c1c79ace3ac1bd374b6a4f6b24a78c3cd24b2077d4fe7f050c",
           "status": "ok"
         },
         {
-          "endpoint": "repos/openclaw/mcporter/commits/v0.13.13",
+          "endpoint": "repos/openclaw/mcporter/commits/v0.14.1",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:43.845439+00:00",
-          "ended_at": "2026-09-21T22:31:44.268231+00:00",
-          "stdout_sha256": "6b95c2c67ec0871773b8267b497daa791e0b9a64d57a34ddf339cbc4bbebafc7",
+          "started_at": "2026-09-25T20:59:22.256612+00:00",
+          "ended_at": "2026-09-25T20:59:22.618318+00:00",
+          "stdout_sha256": "d3d837ff22ae29f38338f6d5fd42009829326f89457a9c7fe73f29970f98904d",
           "status": "ok"
         }
       ],
@@ -1349,21 +1349,21 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-15T07:35:11Z",
+      "pushed_at": "2026-09-25T11:19:38Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v0.13.13",
-        "published_at": "2026-09-14T15:21:47Z",
-        "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.13.13",
+        "tag_name": "v0.14.1",
+        "published_at": "2026-09-24T13:16:08Z",
+        "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.13.13",
-        "sha": "e4cb002200e44460279d414b0d1dec597b978f06",
-        "html_url": "https://github.com/openclaw/mcporter/commit/e4cb002200e44460279d414b0d1dec597b978f06",
-        "committed_at": "2026-09-14T15:08:21Z"
+        "ref": "v0.14.1",
+        "sha": "93e0916cafe2d624b94271e31b75ca681a016514",
+        "html_url": "https://github.com/openclaw/mcporter/commit/93e0916cafe2d624b94271e31b75ca681a016514",
+        "committed_at": "2026-09-24T11:06:02Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
