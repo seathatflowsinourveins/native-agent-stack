@@ -73,6 +73,27 @@ take the 0.50.1 or 0.51.0 release candidates (prereleases; nothing needed is onl
 (then qualify it and drop the matching exclusion); a correctly configured 0.50.0
 reproduces the 0.49.0 head-window or stderr loss; an advisory is published against 0.50.0.
 
+**2026-09-26 correction.** A Codex post-merge review of #291 showed that
+`"^git show [^ ]*:"` misses ordinary spellings: `git show --no-color HEAD:x`,
+`git -C . show HEAD:x`, `git show  HEAD:x` (two spaces) and `git --no-pager show HEAD:x`
+were still rewritten into the blob window. rtk tests an entry that starts with `^` as a
+raw regex against each command segment
+([`registry.rs:1540-1569`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/discover/registry.rs#L1540-L1569)).
+An alternative single-regex pattern was tested that day,
+`[hooks] exclude_commands = ['^git(\s+\S+)*\s+show(\s+\S+)*\s+(:\S|[^\s-]\S*:)', "diff"]`:
+its [re-test](../../evidence/artifacts/sota-refresh-20260925/rtk/out/mitigation-20260926.out)
+excluded 14 of 14 blob-read and `diff` spellings on 0.50.0 and 0.49.0, where the earlier
+pattern excluded 8, left 8 of 8 other commands rewritten, and every executed blob tail
+matched native git byte for byte. The adopted recipe is instead #318's four-entry set in
+[recipes/README.md](../../recipes/README.md#native-context-mode-and-hooks), which also
+routes `git branch` natively and anchors both new entries to the git subcommand position
+([retained check](../../evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt)); this
+host runs it. The bootstrap reminder now checks the text and asks the installed
+`rtk hook check`, since rtk can ignore a TOML-valid file (a `[tracking]` table without
+`history_days`, [`out/config-rejection-20260926.out`](../../evidence/artifacts/sota-refresh-20260925/rtk/out/config-rejection-20260926.out)).
+Overturn: a blob-read or `git branch` spelling that the four entries miss, or a
+non-blob command they wrongly exclude that loses needed savings.
+
 ### markitdown 0.1.7 to 0.1.8
 
 **Decision.** 0.1.8 serves `bin/markitdown` on this host (base package, no extras); 0.1.7

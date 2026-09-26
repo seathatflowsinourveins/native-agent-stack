@@ -438,17 +438,34 @@ install_uv_tool_from_git() {
 # A duplicate exclude_commands key is invalid TOML and rtk silently falls back
 # to defaults, so the reminder fires on a duplicate too and says to replace,
 # not add, the line.
-# Print-only: never writes that file.
+# The text check alone is not enough (2026-09-26, Codex review of #314): rtk
+# also ignores a TOML-valid file that does not deserialize, for example a
+# [tracking] table without history_days (TrackingConfig, src/core/config.rs
+# at 1d87b8e7), and then rewrites everything. So once the text matches, the
+# installed rtk must answer `rtk hook check` with exactly "No rewrite for:
+# <probe>" and exit 1 for every probe, under the caller's own environment
+# (XDG_CONFIG_HOME included); any other answer keeps the reminder.
+# Print-only: never writes that file (`rtk hook check` writes nothing either).
 rtk_config_reminder() {
   local config="${XDG_CONFIG_HOME:-$HOME/.config}/rtk/config.toml"
+  local hint="" probe out status
   if [[ -f "$config" ]] \
     && [[ $(grep -Ec '^[[:space:]]*exclude_commands[[:space:]]*=' "$config") -eq 1 ]] \
     && grep -Fq '"^git show [^ ]*:"' "$config" && grep -Fq '"diff"' "$config" \
     && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:'" "$config" \
     && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|\$)'" "$config"; then
-    return 0
+    for probe in 'git show HEAD:x | tail -n 5' 'git -C . show --no-color HEAD:x | tail -n 5' 'diff a missing' \
+      'git branch -a' 'git -C . branch'; do
+      status=0
+      out="$(timeout 30 "$bin_dir/rtk" hook check "$probe" </dev/null 2>&1)" || status=$?
+      if [[ "$status" -ne 1 || "$out" != "No rewrite for: $probe" ]]; then
+        hint=" The file holds that line, but the installed rtk hook check still rewrites or fails on: $probe; rtk ignores a config it cannot load (for example a [tracking] table without history_days)."
+        break
+      fi
+    done
+    [[ -n "$hint" ]] || return 0
   fi
-  printf 'Reminder: for the Claude hook, replace any existing exclude_commands line in %s with [hooks] exclude_commands = ["^git show [^ ]*:", "diff", '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\\n]*\s)?[^\s]*:'"'"', '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"'"'] (a duplicate key is invalid TOML and rtk silently loads defaults; recipes/README.md#native-context-mode-and-hooks); this script does not write it.\n' "$config"
+  printf 'Reminder: for the Claude hook, replace any existing exclude_commands line in %s with [hooks] exclude_commands = ["^git show [^ ]*:", "diff", '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\\n]*\s)?[^\s]*:'"'"', '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"'"'] (a duplicate key is invalid TOML and rtk silently loads defaults; recipes/README.md#native-context-mode-and-hooks); this script does not write it.%s\n' "$config" "$hint"
 }
 
 install_pin() {

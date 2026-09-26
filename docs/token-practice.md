@@ -47,6 +47,13 @@ once per profile, then prove use through returned native task results. Stable
 Codex uses explicit RTK commands; native Claude supports Bash rewriting. An
 explicit-command profile can instead carry the relevant RTK instruction in its
 task envelope. An installed executable alone does not prove either behavior.
+A host that runs the Claude hook at RTK 0.50.0 also needs the recipe's four
+`exclude_commands` entries, which keep blob reads, `git branch` and `diff` native.
+The recipe explains how RTK anchors each entry. On 2026-09-26 it grew from two
+entries to four: `^git show [^ ]*:` alone missed spellings such as
+`git -C . show HEAD:x`. Confirm the file with `rtk hook check`, since RTK can ignore
+a TOML-valid file. The exclusions cover only hook rewrites, never an explicit `rtk`
+command.
 Preserve canonical generated instructions and the host's hook policy; historical
 hook acceptance is not authorization to enable capture on every runtime.
 

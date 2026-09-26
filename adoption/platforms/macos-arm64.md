@@ -291,7 +291,9 @@ rtk-only, Linux-only check with no macOS equivalent (rtk has no
 `adoption/pins-macos-arm64.json` entry): its post-install reminder now
 requires all four `[hooks] exclude_commands` entries from
 [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks),
-exactly once, instead of the tag's original two.
+exactly once, instead of the tag's original two, and it also asks the installed
+`rtk hook check` whether rtk honours that file. `adoption/pins-linux-x86_64.json`
+changed after `v2026.09.26` in its rtk `install_note` text only.
 The script and both claude-code pins (2.1.281, which fixes a recursive `rm` of
 command-substitution output running unprompted in auto and bypass mode)
 changed after `v2026.09.24.1`: at that tag the pins are 2.1.280 and the script
