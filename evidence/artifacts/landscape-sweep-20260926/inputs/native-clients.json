@@ -1,0 +1,190 @@
+{
+ "catalog": "foundation",
+ "layer_id": "native-clients",
+ "title": "Native clients",
+ "requirement": "Run coding and bounded research with existing native accounts, client tools, model choices and resumable sessions.",
+ "research_status": "on_requirement_change",
+ "next_action": "Compare a native client and supported SDK only for a missing event, tool or recovery requirement; freeze identical task/account/effect checks.",
+ "requirement_sha256": "05399edb0f84f790f19a312272324d5ee9682d751e92721e929ec7a706928e87",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "claude-code",
+   "repository": "https://github.com/anthropics/claude-code",
+   "pin": "2.1.278",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "codex",
+   "repository": "https://github.com/openai/codex",
+   "pin": "0.155.1",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "MCPorter native bridge",
+   "repository": "https://github.com/openclaw/mcporter",
+   "disposition": "out_of_scope"
+  },
+  {
+   "name": "Claude Agent SDK",
+   "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+   "disposition": "conditional"
+  },
+  {
+   "name": "OpenAI Agents SDK",
+   "repository": "https://github.com/openai/openai-agents-python",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "Letta Code",
+   "repository": "https://github.com/letta-ai/letta-code",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "Letta V1 legacy server",
+   "repository": "https://github.com/letta-ai/letta",
+   "disposition": "out_of_scope"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "ai-memory",
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "pin": "2.3.2",
+   "upstream": {
+    "latest": "v2.4.1",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 8428,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "claude-code",
+   "repository": "https://github.com/anthropics/claude-code",
+   "pin": "2.1.278",
+   "upstream": {
+    "latest": "v2.1.283",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 148105,
+    "license": null,
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "codex",
+   "repository": "https://github.com/openai/codex",
+   "pin": "0.155.1",
+   "upstream": {
+    "latest": "rust-v0.157.0",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 126487,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "context-mode",
+   "repository": "https://github.com/mksglu/context-mode",
+   "pin": "1.0.169",
+   "upstream": {
+    "latest": "v1.0.169",
+    "released_at": "2026-06-29",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 24069,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "qmd",
+   "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+   "pin": "2.8.3",
+   "upstream": {
+    "latest": "v2.8.3",
+    "released_at": "2026-08-16",
+    "prerelease": false,
+    "pushed_at": "2026-09-09",
+    "stars": 30039,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "rtk",
+   "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+   "pin": "0.50.0",
+   "upstream": {
+    "latest": "v0.50.0",
+    "released_at": "2026-09-24",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 81724,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "Codex resume ran on macOS with codex-cli 0.155.0-alpha.9.2 (native-recovery/receipt.json native_version and platform), not on the pinned 0.155.1 or on WSL. Same-thread resume is not established for the pinned version on this host.",
+  "Claude resume ran with only Bash available and MCP tools denied (native-recovery/claude/README.md lines 40-43), using an explicit claude-opus-5/ultracode scoped to that trial (claude/receipt.json limitations). Resume with the full MCP tool set, and with the default model, is not established.",
+  "The research task was one run per client with no matched baseline (native-client-results.json limitations; docs/full-stack-convergence.md line 37). It establishes neither a model-quality ranking nor a causal token difference between the clients.",
+  "The Codex 'ultra' effort for the research task is stated only in docs/full-stack-convergence.md. native-client-results.json records the model but not the effort.",
+  "Remote provider cancellation, cessation of billing, independent-host recovery and power-loss durability are not qualified for either client (both recovery receipts' limitations)."
+ ],
+ "overturn_when": "A required structured-event, custom-tool or application state capability is unavailable through the native path and a supported SDK implementation passes the same task, account, effect and recovery checks.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/anomalyco/opencode",
+   "https://github.com/google-gemini/gemini-cli"
+  ]
+ },
+ "known_repositories": [
+  "anomalyco/opencode",
+  "anthropics/claude-agent-sdk-python",
+  "anthropics/claude-code",
+  "google-gemini/gemini-cl",
+  "letta-ai/letta",
+  "letta-ai/letta-code",
+  "openai/codex",
+  "openai/openai-agents-python",
+  "openclaw/mcporter"
+ ],
+ "seeded_candidates_20260926": []
+}

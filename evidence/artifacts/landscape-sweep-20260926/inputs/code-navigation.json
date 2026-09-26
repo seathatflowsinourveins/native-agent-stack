@@ -1,0 +1,243 @@
+{
+ "catalog": "foundation",
+ "layer_id": "code-navigation",
+ "title": "Code navigation",
+ "requirement": "Retrieve exact source and references for changes with a conceptual or structural index only when it answers the actual question.",
+ "research_status": "on_requirement_change",
+ "next_action": "Seal representative target-language questions with exact source/reference answers; include index build/update cost and known-source reads in the comparison.",
+ "requirement_sha256": "1ef34f38eebd4497e961ecb5b4447d098d4ba7d136f56dc60e51c39606c99ad8",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "serena",
+   "repository": "https://github.com/oraios/serena",
+   "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "ast-grep",
+   "repository": "https://github.com/ast-grep/ast-grep",
+   "disposition": "conditional"
+  },
+  {
+   "name": "CodeGraph",
+   "repository": "https://github.com/colbymchenry/codegraph",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "jCodeMunch",
+   "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+   "disposition": "measured_tradeoff"
+  },
+  {
+   "name": "codebase-memory-mcp",
+   "repository": "https://github.com/DeusData/codebase-memory-mcp",
+   "disposition": "conditional"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "ast-grep",
+   "repository": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+   "pin": "0.45.3",
+   "upstream": {
+    "latest": "0.45.3",
+    "released_at": "2026-08-31",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 16038,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "codebase-memory-mcp",
+   "repository": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+   "pin": "0.11.0",
+   "upstream": {
+    "latest": "v0.11.0",
+    "released_at": "2026-09-15",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 44931,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "jcodemunch-mcp",
+   "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+   "pin": "1.108.319",
+   "upstream": {
+    "latest": "v1.108.319",
+    "released_at": "2026-09-16",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 2714,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "mcp-inspector",
+   "repository": "https://github.com/modelcontextprotocol/inspector",
+   "pin": "2.7.0",
+   "upstream": {
+    "latest": "2.8.0",
+    "released_at": "2026-09-23",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 10960,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "mcporter",
+   "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
+   "pin": "0.13.13",
+   "upstream": {
+    "latest": "v0.14.1",
+    "released_at": "2026-09-24",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 5028,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "qdrant",
+   "repository": "https://github.com/qdrant/qdrant",
+   "pin": "1.19.1",
+   "upstream": {
+    "latest": "v1.19.1",
+    "released_at": "2026-09-04",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 34827,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "repomix",
+   "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+   "pin": "1.18.1",
+   "upstream": {
+    "latest": "v1.18.1",
+    "released_at": "2026-09-21",
+    "prerelease": false,
+    "pushed_at": "2026-09-23",
+    "stars": 28494,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "serena",
+   "repository": "https://github.com/oraios/serena",
+   "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+   "upstream": {
+    "latest": "v1.7.0",
+    "released_at": "2026-08-09",
+    "prerelease": false,
+    "pushed_at": "2026-09-24",
+    "stars": 29807,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  },
+  {
+   "id": "socraticode",
+   "repository": "https://github.com/giancarloerra/SocratiCode",
+   "pin": "1.14.0",
+   "upstream": {
+    "latest": "v1.15.0",
+    "released_at": "2026-09-24",
+    "prerelease": false,
+    "pushed_at": "2026-09-24",
+    "stars": 3317,
+    "license": "AGPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "toon",
+   "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+   "pin": "4.1.1",
+   "upstream": {
+    "latest": "v4.1.1",
+    "released_at": "2026-08-05",
+    "prerelease": false,
+    "pushed_at": "2026-09-03",
+    "stars": 25426,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "No matched cross-candidate benchmark establishes source/reference completeness and total cost across representative languages and repositories.",
+  "The reviewed evidence does not establish symbol-update/deletion correctness for every index or language server.",
+  "Artifact token comparisons use different tasks and accounting boundaries; they cannot establish causal provider savings or a global ranking.",
+  "Static graph results do not establish dynamic runtime behavior.",
+  "lanes disagreed: claude=codebase-memory-mcp,jcodemunch-mcp,serena; codex=serena; adjudicated by evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-code-navigation-20260922.json"
+ ],
+ "overturn_when": "A sealed task set in the target languages shows a challenger returning more correct source/references at an acceptable total indexing, retrieval and maintenance cost.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/scip-code/scip",
+   "https://github.com/sourcegraph/zoekt",
+   "https://github.com/universal-ctags/ctags"
+  ]
+ },
+ "known_repositories": [
+  "ast-grep/ast-grep",
+  "colbymchenry/codegraph",
+  "deusdata/codebase-memory-mcp",
+  "jgravelle/jcodemunch-mcp",
+  "oraios/serena",
+  "scip-code/scip",
+  "sourcegraph/zoek",
+  "universal-ctags/ctags"
+ ],
+ "seeded_candidates_20260926": []
+}

@@ -480,6 +480,8 @@ returns list any skill, so these counts do not measure GPT-6 skill use.
 
 ## Files
 
+- `inputs/` (added 2026-09-26 after the record merged): the 32 layer-input files exactly as this run read them (written 2026-09-25 21:30-22:44 local, before the run), with `inputs/SHA256SUMS` (`cd inputs && sha256sum -c SHA256SUMS`). They show lane limit 2's truncated known-repository slugs as the workers saw them. The verdict wave's GPT-6 fit re-votes for the 27 not-adjudicated entries use these originals rather than rebuilt inputs.
+
 - **`returns.json`.** The output of `convert.py`, redacted as described below. It holds the discovery returns with
   the frozen scope hashes, the facts and two-family fit votes, the raw family returns, the retained failures,
   `skills_usage` and `gpt6_usage`. The ledger's `returns_ref` points to it.

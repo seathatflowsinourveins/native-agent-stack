@@ -1,0 +1,90 @@
+{
+ "catalog": "foundation",
+ "layer_id": "agent-sdks",
+ "title": "Agent SDKs and runtime workers",
+ "requirement": "Give a worker structured events, custom tools or session control through a supported SDK when the native CLI's bounded review is not enough.",
+ "research_status": "on_requirement_change",
+ "next_action": "Qualify a concrete application need (durable multi-host state, explicit graph checkpoints, a remote/container worker or programmatic Claude session control) before promoting a deferred SDK alternative; the SDK table in docs/foundation-closure-20260921.md (lines 78-84) has not been revisited by any lane since 2026-09-21.",
+ "requirement_sha256": "e2a4bef5dcc9f4e1c0e06df41f5bf6ba27d9a18fb81ded371ac77bed163f36c4",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "codex",
+   "repository": "https://github.com/openai/codex",
+   "pin": "0.155.1",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Claude Agent SDK",
+   "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+   "disposition": "conditional"
+  },
+  {
+   "name": "OpenHands SDK",
+   "repository": "https://github.com/openhands/software-agent-sdk",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Temporal",
+   "repository": "https://github.com/temporalio/temporal",
+   "disposition": "out_of_scope"
+  },
+  {
+   "name": "LangGraph",
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "disposition": "unqualified"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "codex",
+   "repository": "https://github.com/openai/codex",
+   "pin": "0.155.1",
+   "upstream": {
+    "latest": "rust-v0.157.0",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 126487,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "The only executed Codex SDK vs Claude Agent SDK comparison is unresolved and publication-ineligible, with 'no arm accepted as a winner' (evidence/artifacts/comparison-progress-20260922/summary.json lines 133-151). Recovery was not run and artifact acceptance has no pinned judge.",
+  "The Codex cancel submission has no native returned receipt: arm_status no_receipt, usage not_requested (worker-receipts-followup.json lines 152-176). Claude Agent SDK interruption reports usage as unavailable. Neither shows actual provider consumption.",
+  "c4 isolation is unverified. The SDK overlays env onto the parent environment, and read-only permissions do not make inherited MCP servers or hooks read-only (blueprints/us-equities/workers/README.md lines 53-57; receipt.json line 110). The recorded tool events came from the host's Context Mode serve",
+  "native_worker.py line 77 creates ephemeral threads, so the c4 integration has not shown multi-turn resume. Custom-tool registration through the SDK is also unobserved. The 'start/run/resume' wording in the foundation closure is a project description, not an observation.",
+  "In the c4 receipt, two of three native turns failed their extraction task, blocked by the project root and by approval policy (receipt.json lines 132-220)."
+ ],
+ "overturn_when": "A concrete application needs durable multi-host state/replay (Temporal), explicit graph checkpoints (LangGraph), a remote/container worker (OpenHands SDK) or programmatic Claude session control (Claude Agent SDK), and a matched comparison passes.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/google/adk-python",
+   "https://github.com/pydantic/pydantic-ai",
+   "https://github.com/strands-agents/harness-sdk"
+  ]
+ },
+ "known_repositories": [
+  "anthropics/claude-agent-sdk-python",
+  "google/adk-python",
+  "langchain-ai/langgraph",
+  "openai/codex",
+  "openhands/software-agent-sdk",
+  "pydantic/pydantic-a",
+  "strands-agents/harness-sdk",
+  "temporalio/temporal"
+ ],
+ "seeded_candidates_20260926": []
+}

@@ -1,0 +1,218 @@
+{
+ "catalog": "foundation",
+ "layer_id": "ci-supply-chain",
+ "title": "CI and supply chain",
+ "requirement": "Publish reproducible changes with scoped workflow permissions, pinned dependencies, actual runtime inventory and attributable hosted checks.",
+ "research_status": "on_requirement_change",
+ "next_action": "Use the installed CI skill when a real Actions check fails; qualify log recovery and repair. Add vulnerability tooling only for a defined artifact/database gap.",
+ "requirement_sha256": "7541357e60b31124c35f70256419b2c5f3868940ecc53412239d96d3603c7e34",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "zizmor",
+   "repository": "https://github.com/zizmorcore/zizmor",
+   "pin": "1.30.1",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "syft",
+   "repository": "https://github.com/anchore/syft",
+   "pin": "1.52.0",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "candidate:actions-attest",
+   "repository": "https://github.com/actions/attest",
+   "pin": "unpinned",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "actionlint",
+   "repository": "https://github.com/rhysd/actionlint",
+   "disposition": "overlap"
+  },
+  {
+   "name": "Trivy",
+   "repository": "https://github.com/aquasecurity/trivy",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "Dependabot",
+   "repository": "https://github.com/dependabot/dependabot-core",
+   "disposition": "conditional"
+  },
+  {
+   "name": "gitleaks",
+   "repository": "https://github.com/gitleaks/gitleaks",
+   "disposition": "overlap"
+  },
+  {
+   "name": "Grype",
+   "repository": "https://github.com/anchore/grype",
+   "disposition": "conditional"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "gitleaks",
+   "repository": "https://github.com/gitleaks/gitleaks",
+   "pin": "8.30.1",
+   "upstream": {
+    "latest": "v8.30.1",
+    "released_at": "2026-03-21",
+    "prerelease": false,
+    "pushed_at": "2026-09-23",
+    "stars": 29486,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "qmd",
+   "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+   "pin": "2.8.3",
+   "upstream": {
+    "latest": "v2.8.3",
+    "released_at": "2026-08-16",
+    "prerelease": false,
+    "pushed_at": "2026-09-09",
+    "stars": 30039,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "repomix",
+   "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+   "pin": "1.18.1",
+   "upstream": {
+    "latest": "v1.18.1",
+    "released_at": "2026-09-21",
+    "prerelease": false,
+    "pushed_at": "2026-09-23",
+    "stars": 28494,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "rtk",
+   "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+   "pin": "0.50.0",
+   "upstream": {
+    "latest": "v0.50.0",
+    "released_at": "2026-09-24",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 81724,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "syft",
+   "repository": "https://github.com/anchore/syft",
+   "pin": "1.52.0",
+   "upstream": {
+    "latest": "v1.52.0",
+    "released_at": "2026-09-17",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 9609,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "toon",
+   "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+   "pin": "4.1.1",
+   "upstream": {
+    "latest": "v4.1.1",
+    "released_at": "2026-08-05",
+    "prerelease": false,
+    "pushed_at": "2026-09-03",
+    "stars": 25426,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "zizmor",
+   "repository": "https://github.com/zizmorcore/zizmor",
+   "pin": "1.30.1",
+   "upstream": {
+    "latest": "v1.30.1",
+    "released_at": "2026-09-09",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 6578,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "No retained zizmor negative control shows it rejecting over-broad workflow permissions. The unsafe fixture declares contents: read, and the tests assert only template-injection and unpinned-uses. The scoped-permissions axis rests on configuration and source review (docs/catalog-provenance.md lines 2",
+  "The hosted 0/1/0 attestation qualification is for run 35541322881 at d0fe136c (2026-09-20). On 2026-09-22, publish-catalog.yml added a tag trigger, a changed job condition, a Syft SBOM step and a second attest step (catalogs/foundation/automation.json@92bb279 scheduled_report_only_lanes[source=.gith",
+  "The hosted sbom-vuln job in supply-chain.yml has no recorded run ID. Syft's native inventory evidence comes from a local run on one host against one SDK prefix, not whole-host or whole-runtime coverage.",
+  "The Syft install checked checksums only. Signature and build provenance were not verified (blueprints/us-equities/supply-chain/README.md lines 51-52).",
+  "Dependabot's weekly timing and nonempty minor/patch grouping are unobserved. Python and binary pins have no automated updater; the report-only catalog-freshness drift table stands in for one."
+ ],
+ "overturn_when": "A specific dependency/update or vulnerability gap is demonstrated and one alternative covers it with pinned database/provenance, manageable findings and no duplicate ownership of the same dependency.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/ossf/allstar"
+  ]
+ },
+ "known_repositories": [
+  "actions/attes",
+  "anchore/grype",
+  "anchore/syf",
+  "aquasecurity/trivy",
+  "dependabot/dependabot-core",
+  "gitleaks/gitleaks",
+  "nvidia/skillspector",
+  "ossf/allstar",
+  "rhysd/actionlin",
+  "snyk/agent-scan",
+  "zizmorcore/zizmor"
+ ],
+ "seeded_candidates_20260926": []
+}
