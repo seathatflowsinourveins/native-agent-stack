@@ -493,22 +493,25 @@ def dry_run_output(snapshot_root, sha: str, sessions: list, symbols: list) -> di
 def dry_run_measured(sealed) -> dict:
     """Review round 15, F12: what the native dry run measured for the fetch-time budget, from its seal alone (so an
     adopted output reproduces): the largest page count of one request per kind, and the achieved serial seconds per
-    page, the span from the first to the last page vintage over every page fetched. No price or row."""
-    from core.calendar import parse_utc
-    pages_max, total, stamps = {}, 0, []
+    page. Sum complete transport-call durations, including pagination, pacing, retries and re-fetches, over every
+    page fetched; inter-request planning and storage are outside this measurement. Missing duration metadata is
+    unknown, never zero. No price or row."""
+    pages_max, total, elapsed, timed = {}, 0, 0.0, bool(sealed.state)
     for key, st in sealed.state.items():
         kind = sealed.req[key]["kind"]
-        n = len(st["pages"])
-        pages_max[kind] = max(pages_max.get(kind, 0), n)
-        total += n
-        stamps.append(parse_utc(st["vintage"]))
-    for h in sealed.history.values():
-        for st in h:
-            total += len(st["pages"])
-            stamps.append(parse_utc(st["vintage"]))
-    elapsed = (max(stamps) - min(stamps)) if stamps else 0.0
+        for attempt in sealed.history.get(key, []) + [st]:
+            n = len(attempt["pages"])
+            pages_max[kind] = max(pages_max.get(kind, 0), n)
+            total += n
+            duration = attempt.get("elapsed_seconds")
+            if _number(duration, positive=False):
+                elapsed += duration
+            else:
+                timed = False
+    if not timed:
+        elapsed = None
     return {"pages_per_request_max": dict(sorted(pages_max.items())), "pages": total, "elapsed_seconds": elapsed,
-            "seconds_per_page": (elapsed / total) if total else None}
+            "seconds_per_page": (elapsed / total) if total and elapsed is not None else None}
 
 
 def dry_run_counts(store) -> dict:

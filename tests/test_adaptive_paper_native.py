@@ -11,6 +11,7 @@ import tempfile
 import time
 import uuid
 import unittest
+from unittest.mock import patch
 
 NATIVE = importlib.util.find_spec("nautilus_trader") is not None
 if NATIVE:
@@ -1057,6 +1058,218 @@ class PerExecutionBooking(unittest.TestCase):
         self.assertEqual(str(ADAPTER.execution_trade_id(trade_id)), trade_id)
         with self.assertRaises(ValueError):   # NautilusTrader refuses a 37-character TradeId
             ADAPTER.TradeId("x" * 37)
+
+
+@unittest.skipUnless(NATIVE, "requires pinned Nautilus 2.0.0rc5 runtime")
+class StartupFillDurability(unittest.TestCase):
+    """Synthetic rc5 reports -> real transport observation hook -> reopened Ledger.
+
+    References: StartupFillReports and PerExecutionLedger's rounded-average replay;
+    no transport is started and its HTTP boundary fails if accidentally reached.
+    """
+
+    def setUp(self):
+        from runner import Controller
+        from safety import Ledger, Quote, RiskLimits
+
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.path = Path(tmp.name) / "ledger.sqlite3"
+        self.limits = RiskLimits(max_order_qty=Decimal(100), max_spread_bps=Decimal(100))
+        self.ledger = Ledger(self.path, self.limits)
+        self.addCleanup(lambda: self.ledger.close())
+        self.now = time.time()
+        self.ledger.start_trial(self.now)
+        self.controller = Controller(self.ledger, self.now + 3600, market_open=True)
+
+        def reserve(cid, symbol, side, qty, limit, bid, ask):
+            self.ledger.reserve_intent(cid, symbol, side, qty, limit,
+                quote=Quote(symbol, bid, ask, self.now), now=self.now, market_open=True,
+                session_close=self.now + 3600, stop_file=Path(tmp.name) / "STOP")
+
+        reserve("held-buy", "APUS", "buy", "29", "5.64", "5.61", "5.62")
+        self.ledger.record_order("held-buy", "held-order", "filled", "29", "5.64",
+            execution={"execution_id": "held-fill", "qty": "29", "price": "5.64"})
+        reserve("startup-sell", "APUS", "sell", "29", "5.60", "5.61", "5.62")
+        reserve("startup-buy", "SPY", "buy", "3", "100.01", "100.00", "100.01")
+
+        self.orders, self.deliveries, self.activities = [], [], {}
+        for cid, symbol, side, qty, limit, fills in (
+                ("startup-sell", "APUS", "sell", "29", "5.60",
+                 (("26", "26", "5.62", "5.62"), ("28", "2", "5.61", "5.619286"))),
+                ("startup-buy", "SPY", "buy", "3", "100.01",
+                 (("1", "1", "100.01", "100.01"), ("2", "1", "100.00", "100.005")))):
+            row = dict(client_order_id=cid, id=str(uuid.uuid4()), symbol=symbol, side=side,
+                       qty=qty, limit_price=limit, filled_qty=fills[-1][0],
+                       filled_avg_price=fills[-1][3], status="partially_filled",
+                       updated_at_ns=time.time_ns())
+            self.orders.append(row)
+            activities = []
+            for index, (cum, size, price, average) in enumerate(fills):
+                activity = TRANSPORT.normalize_fill_activity(fill_activity(row["id"], cum, size, price,
+                    side=side, symbol=symbol, total=int(qty), index=index), row["id"])
+                activities.append(activity)
+                self.deliveries.append(dict(row, filled_qty=cum, filled_avg_price=average,
+                    updated_at_ns=activity["transaction_time_ns"], event="partial_fill",
+                    execution_id=activity["trade_id"], event_qty=size, event_price=price))
+            self.activities[row["id"]] = TRANSPORT.tiled_executions(activities)
+            # A startup REST snapshot already booked quantities, but only at rounded
+            # cumulative averages; the activities still have to become durable.
+            self.controller.observe(row)
+        self.make_port()
+
+    def make_port(self):
+        self.port = TRANSPORT.AlpacaPaperTransport("fixture-key", "fixture-secret", ["APUS", "SPY"],
+            before_request=lambda *args: self.fail("unexpected broker request"),
+            before_submit=lambda *args: self.fail("unexpected broker submission"),
+            sink_observation=self.controller.observe)
+        port = self.port
+        self.addCleanup(lambda: asyncio.run(port.stop()))
+        guard = patch.object(port._client._session._session, "request",
+                             side_effect=AssertionError("unexpected HTTP request"))
+        guard.start()
+        self.addCleanup(guard.stop)
+        activities = patch.object(port, "fill_activities",
+                                  side_effect=lambda order_id: self.activities[order_id])
+        activities.start()
+        self.addCleanup(activities.stop)
+        self.assertFalse(hasattr(port, "controller"))
+
+    def session(self):
+        session = ADAPTER.build_node(self.port, [{"symbol": "APUS"}, {"symbol": "SPY"}], [],
+            session_policy={"extended_hours": True, "overnight_holds": True,
+                            "overnight_gross_multiple": Decimal(1)})
+        session.snapshot_state = {"account": {}, "orders": self.orders, "positions": []}
+        self.addCleanup(session.node.dispose)
+        return session
+
+    def reports(self, session=None):
+        return asyncio.run((session or self.session()).execution._generate_fill_reports(None))
+
+    def reopen(self):
+        from safety import Ledger
+        self.ledger.close()
+        self.ledger = Ledger(self.path, self.limits)
+        self.controller.ledger = self.ledger
+
+    def executions(self):
+        # Ledger exposes no execution reader; inspect its durable per-execution
+        # records just as PerExecutionLedger inspects the durable event journal.
+        return {(r["client_id"], r["execution_id"]): (Decimal(r["qty"]), Decimal(r["price"]))
+                for r in self.ledger.db.execute("SELECT * FROM executions WHERE client_id != 'held-buy'")}
+
+    def expected_executions(self):
+        return {(r["client_order_id"], r["execution_id"]):
+                (Decimal(r["event_qty"]), Decimal(r["event_price"])) for r in self.deliveries}
+
+    def assert_exact_accounting(self):
+        state = self.ledger.accounting()
+        # Held APUS cost 163.56; sell proceeds 157.34; SPY buys cost 200.01.
+        self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                          state.cumulative_realized_loss_usd, state.gross_loss_usd),
+                         (Decimal("-206.23"), Decimal("-0.58"), Decimal("0.58"), Decimal("0.62")))
+        self.assertEqual({k: (p.qty, p.cost_basis_usd) for k, p in self.ledger.positions().items()},
+                         {"APUS": (Decimal(1), Decimal("5.64")),
+                          "SPY": (Decimal(2), Decimal("200.01"))})
+
+    def durable_state(self):
+        return (self.ledger.accounting(), self.ledger.positions(), self.executions(),
+                self.ledger.db.execute("SELECT COUNT(*) FROM events WHERE kind='execution_recorded'").fetchone()[0])
+
+    def deliver(self, rows):
+        async def exercise():
+            for row in rows:
+                await self.port._observe(dict(row))
+        asyncio.run(exercise())
+
+    def test_startup_reports_survive_reopen_without_later_observation(self):
+        self.assertEqual(len(self.reports()), 4)
+        # Discard the Ledger connection immediately: no stream/REST observation,
+        # recovery or subsequent reconciliation gets a chance to repair the state.
+        self.reopen()
+        self.assertEqual(self.executions(), self.expected_executions())
+        self.assert_exact_accounting()
+
+    def test_restart_does_not_double_book_previously_recorded_startup_fills(self):
+        self.deliver(self.deliveries)
+        self.assert_exact_accounting()
+        before = self.durable_state()
+        session = self.session()
+        self.assertEqual(len(self.reports(session)), 4)
+        self.assertEqual(len(self.reports(session)), 4)
+        self.reopen()
+        self.make_port()  # discard transport deduplication as well as adapter memory
+        self.assertEqual(len(self.reports()), 4)
+        self.assertEqual(self.durable_state(), before)
+        self.assertEqual(self.executions(), self.expected_executions())
+
+    def test_startup_report_quantities_and_prices_match_durable_executions(self):
+        reports = self.reports()
+        reported = {(str(r.client_order_id), str(r.trade_id)):
+                    (Decimal(str(r.last_qty)), Decimal(str(r.last_px))) for r in reports}
+        self.assertEqual(len(reports), 4)
+        self.assertEqual(reported, self.expected_executions())
+        self.assertEqual(reported, self.executions())
+
+    def test_fresh_snapshot_adoption_records_history_without_rebooking_positions(self):
+        from safety import Ledger
+        self.ledger.close()
+        self.path = self.path.with_name("adopted.sqlite3")
+        self.ledger = Ledger(self.path, self.limits)
+        self.controller.ledger = self.ledger
+        self.ledger.start_trial(self.now)
+        self.ledger.adopt_broker_snapshot({"orders": self.orders, "positions": [
+            {"symbol": "APUS", "qty": "1", "avg_entry_price": "5.64"},
+            {"symbol": "SPY", "qty": "2", "avg_entry_price": "100.005"}]}, self.now)
+        before = self.ledger.accounting(), self.ledger.positions()
+        self.assertEqual(len(self.reports()), 4)
+        self.assertEqual((self.ledger.accounting(), self.ledger.positions()), before)
+        self.assertEqual(self.executions(), self.expected_executions())
+        self.reopen()
+        self.make_port()
+        self.assertEqual(len(self.reports()), 4)
+        self.assertEqual((self.ledger.accounting(), self.ledger.positions()), before)
+        self.assertEqual(self.executions(), self.expected_executions())
+
+    def test_stream_and_rest_redelivery_after_startup_is_idempotent(self):
+        self.assertEqual(len(self.reports()), 4)
+        before = self.durable_state()
+        # REST ahead, stale/out-of-order stream executions, repeats, then another
+        # REST read. Stream IDs can differ from FILL activity IDs for the same fill.
+        stream = list(reversed(self.deliveries))
+        self.deliver(self.orders + stream + stream +
+                     [dict(r, execution_id=str(uuid.uuid4())) for r in stream] + self.orders)
+        self.assertEqual(self.durable_state(), before)
+        self.assertEqual(self.executions(), self.expected_executions())
+        self.assert_exact_accounting()
+
+    def test_startup_awaits_async_observation_sink(self):
+        async def observe(row):
+            await asyncio.sleep(0)
+            self.controller.observe(row)
+        self.port.sink_observation = observe
+        self.assertEqual(len(self.reports()), 4)
+        self.reopen()
+        self.assertEqual(self.executions(), self.expected_executions())
+        self.assert_exact_accounting()
+
+    def test_startup_sink_failure_aborts_reports_and_retry_is_idempotent(self):
+        calls = 0
+        def observe(row):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                raise RuntimeError("synthetic persistence failure")
+            self.controller.observe(row)
+        self.port.sink_observation = observe
+        session = self.session()
+        with self.assertRaisesRegex(RuntimeError, "synthetic persistence failure"):
+            self.reports(session)
+        self.assertEqual(len(self.executions()), 1)
+        self.port.sink_observation = self.controller.observe
+        self.assertEqual(len(self.reports(session)), 4)
+        self.assertEqual(self.executions(), self.expected_executions())
+        self.assert_exact_accounting()
 
 
 @unittest.skipUnless(NATIVE, "requires pinned Nautilus 2.0.0rc5 runtime")

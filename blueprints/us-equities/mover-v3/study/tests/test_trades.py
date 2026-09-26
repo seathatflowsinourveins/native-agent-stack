@@ -433,6 +433,216 @@ class Round15Accounting(unittest.TestCase):
             self.assertEqual(h3c_event(ev, ctx_for(cal, mode=mode))["status"], "undefined_factor", mode)
 
 
+class RenamedActions(unittest.TestCase):
+    """Action symbols follow the issuer of the asof=t request, with dated ticker-reuse boundaries."""
+
+    def setUp(self):
+        self.cal = synth.calendar()
+        self.t = "2020-06-01"
+        self.d = [self.cal.offset(self.t, k) for k in range(12)]
+        self.ev = make_event(self.cal, self.t, sym="OLD")
+
+    def _rename(self, old, new, day):
+        return {"type": "name_change", "old_symbol": old, "new_symbol": new, "date": day}
+
+    def _assert_statuses(self, actions, excluded=None):
+        cal, d = self.cal, self.d
+        qs = {"OLD": [book(cal, d[1], "09:35"), book(cal, d[5], "15:55")]}
+        for mode in ("read", "count"):
+            with self.subTest(mode=mode, path="trade"):
+                result = resolve(self.ev, "b_lane", ctx_for(cal, actions=actions, mode=mode), Store(), qs)
+                self.assertEqual(result["status"], excluded or ("filled" if mode == "read" else "counted"))
+                if excluded:
+                    self.assertNotIn("nets", result)
+            with self.subTest(mode=mode, path="h3c"):
+                result = h3c_event(self.ev, ctx_for(cal, actions=actions, mode=mode))
+                self.assertEqual(result["status"], excluded or ("complete" if mode == "read" else "counted"))
+                if excluded or mode == "count":
+                    self.assertNotIn("value", result)
+
+    def test_successor_spin_off_excludes_trade_and_h3c_in_both_paths(self):
+        d = self.d
+        spin = {"type": "spin_off", "source_symbol": "NEW", "new_symbol": "SPUN", "date": d[3]}
+        chains = [[self._rename("OLD", "NEW", d[2])],
+                  [self._rename("MID", "NEW", d[2]), self._rename("OLD", "MID", d[1])],
+                  [self._rename("MID", "NEW", d[2]), self._rename("OLD", "MID", d[2])]]
+        for chain in chains:
+            with self.subTest(chain=chain):
+                self._assert_statuses([spin, *chain], "spin_off_record_excluded")
+        # Same-session intraday holds and another issuer's entitlement remain eligible.
+        self._assert_statuses([*chains[0], dict(spin, source_symbol="ELSE")])
+        for mode in ("read", "count"):
+            tr = resolve(self.ev, "a_intraday", ctx_for(self.cal, actions=[spin, *chains[0]], mode=mode), Store(),
+                         {"OLD": [book(self.cal, d[1], "09:35"), book(self.cal, d[1], "15:55")]})
+            self.assertEqual(tr["status"], "filled" if mode == "read" else "counted")
+
+    def test_successor_unadjusted_splits_exclude_trade_and_h3c_in_both_paths(self):
+        cal, d = self.cal, self.d
+        for typ, ratio in (("forward_split", 2.0), ("reverse_split", 0.5)):
+            with self.subTest(split_type=typ):
+                raw, split, allc = synth.series(cal, cal.offset(self.t, -60), cal.offset(self.t, 12),
+                                                lambda s: 10.0 if s < d[3] else 10.0 / ratio)
+                self.ev.update(raw=raw, split=split, all=allc, prints=synth.prints_from(raw))
+                rec = {"type": typ, "symbol": "NEW", "date": d[3], "new_rate": ratio, "old_rate": 1}
+                self._assert_statuses([rec, self._rename("OLD", "NEW", d[2])], "split_record_excluded")
+
+    def test_successor_actions_during_delayed_exit_exclude_the_read(self):
+        cal, d = self.cal, self.d
+        for typ, field, excluded in (("spin_off", "source_symbol", "spin_off_record_excluded"),
+                                     ("forward_split", "symbol", "split_record_excluded"),
+                                     ("reverse_split", "symbol", "split_record_excluded")):
+            with self.subTest(action=typ):
+                actions = [self._rename("OLD", "NEW", d[2]), {"type": typ, field: "NEW", "date": d[7]}]
+                qs = {"OLD": [book(cal, d[1], "09:35"), book(cal, d[7], "10:00", 5.0, 5.01)]}
+                count = resolve(self.ev, "b_lane", ctx_for(cal, actions=actions, mode="count"), Store(), qs)
+                self.assertEqual(count["status"], "counted")  # count knows only the planned exit, d[5]
+                self.assertEqual(h3c_event(self.ev, ctx_for(cal, actions=actions))["status"], "complete")
+                read = resolve(self.ev, "b_lane", ctx_for(cal, actions=actions), Store(), qs)
+                self.assertEqual((read["status"], read["exit_session"]), (excluded, d[7]))
+                self.assertNotIn("nets", read)
+
+    def test_successor_terminal_mergers_book_the_last_bid_or_flag_no_bid(self):
+        cal, d = self.cal, self.d
+        chain = [self._rename("MID", "NEW", d[2]), self._rename("OLD", "MID", d[1])]
+        for typ in ("cash_merger", "stock_merger", "stock_and_cash_merger"):
+            for has_bid in (True, False):
+                with self.subTest(merger_type=typ, has_bid=has_bid):
+                    actions = [{"type": typ, "acquiree_symbol": "NEW", "acquirer_symbol": "BIG", "date": d[3]},
+                               *chain]
+                    qs = [book(cal, d[1], "09:35")]
+                    if has_bid:
+                        qs.append(book(cal, d[3], "15:59", 11.9, 11.95))
+                    count = resolve(self.ev, "b_lane", ctx_for(cal, actions=actions, mode="count"), Store(), {"OLD": qs})
+                    self.assertEqual(count["status"], "counted")
+                    read = resolve(self.ev, "b_lane", ctx_for(cal, actions=actions), Store(), {"OLD": qs})
+                    if has_bid:
+                        self.assertEqual(read["exit"], "terminal_merger")
+                        self.assertEqual((read["terminal_booking"], read["exit_session"]), ("merger", d[3]))
+                        self.assertEqual(read["primary_parts"][2], 11.9)
+                        self.assertEqual(read["primary_parts"][6], 0.0)  # no exit spread or impact
+                    else:
+                        self.assertTrue(read.get("merger_without_bid"))
+                        self.assertEqual((read["exit"], read["nets"]["primary"]), ("terminal_zero", -1.0))
+
+    def test_action_exclusions_respect_dated_rename_and_ticker_reuse_boundaries(self):
+        d = self.d
+        for typ, field, excluded in (("spin_off", "source_symbol", "spin_off_record_excluded"),
+                                     ("forward_split", "symbol", "split_record_excluded"),
+                                     ("reverse_split", "symbol", "split_record_excluded")):
+            rec = {"type": typ, field: "OLD", "date": d[3]}
+            cases = [
+                # After OLD becomes NEW, a reused OLD is a different issuer, even if OLD renames again.
+                ([self._rename("OLD", "NEW", d[2]), self._rename("OLD", "OTHER", d[3])], rec, None),
+                # A future successor's action does not belong to the holding before the rename.
+                ([self._rename("OLD", "NEW", d[4])], dict(rec, **{field: "NEW"}), None),
+                # OLD still owns its action before its own rename.
+                ([self._rename("OLD", "NEW", d[4])], rec, excluded),
+                # A previous holder of OLD renamed before asof=t; the current OLD is a new issuer.
+                ([self._rename("OLD", "PREVIOUS", self.cal.offset(self.t, -1))], rec, excluded),
+                ([self._rename("OLD", "PREVIOUS", self.cal.offset(self.t, -1))],
+                 dict(rec, **{field: "PREVIOUS"}), None),
+                # The process date is the start of the successor symbol's interval.
+                ([self._rename("OLD", "NEW", d[3])], dict(rec, **{field: "NEW"}), excluded),
+                ([self._rename("OLD", "NEW", d[3])], rec, None),
+                # An undated rename cannot attach a successor action to this issuer.
+                ([self._rename("OLD", "NEW", None)], dict(rec, **{field: "NEW"}), None),
+            ]
+            for chain, action, want in cases:
+                with self.subTest(action=action, chain=chain):
+                    self._assert_statuses([action, *chain], want)
+
+    def test_terminal_merger_identity_respects_reuse_dates_and_acquiree_role(self):
+        cal, d = self.cal, self.d
+        rename = self._rename("OLD", "NEW", d[2])
+        merger = {"type": "cash_merger", "acquiree_symbol": "NEW", "acquirer_symbol": "BIG", "date": d[3]}
+        cases = [(dict(merger, acquiree_symbol="OLD"), "terminal_zero", True),
+                 (dict(merger, acquiree_symbol="ELSE", acquirer_symbol="NEW"), "terminal_zero", True),
+                 (dict(merger, date=d[1]), "terminal_zero", True),
+                 (dict(merger, date=d[10]), "terminal_merger", None),
+                 (dict(merger, date=d[11]), "terminal_zero", False)]
+        qs = {"OLD": [book(cal, d[1], "09:35"), book(cal, d[3], "15:59", 11.9, 11.95)]}
+        for action, exit_kind, no_record in cases:
+            with self.subTest(action=action):
+                result = resolve(self.ev, "b_lane", ctx_for(cal, actions=[action, rename]), Store(), qs)
+                self.assertEqual(result["exit"], exit_kind)
+                if no_record is not None:
+                    self.assertEqual(result["no_merger_record"], no_record)
+
+    def test_terminal_zero_chained_rename_is_counted_and_rerequested(self):
+        """Round 17 F2 re-review: use the dated issuer chain from Ctx.issuer_records at 1961e23f,
+        including an entry-day transition that is itself outside the diagnostic interval."""
+        cal, d = self.cal, self.d
+        for first_day, successor in ((d[1], "NEW"), (d[3], "MID")):
+            with self.subTest(first_day=first_day):
+                # Reverse provider order must not change the issuer's transition order.
+                actions = [self._rename("MID", "NEW", d[3]), self._rename("OLD", "MID", first_day)]
+                store = Store()
+                tr = resolve(self.ev, "b_lane", ctx_for(cal, actions=actions), store,
+                             {"OLD": [book(cal, d[1], "09:35")],
+                              successor: [book(cal, d[5], "15:55", 10.5, 10.6)]})
+                self.assertEqual((tr["exit"], tr["nets"]["primary"]), ("terminal_zero", -1.0))
+                self.assertTrue(tr["rename_record_in_window"])
+                self.assertEqual(tr["rename_sensitivity"]["new_symbol"], successor)
+                self.assertEqual(tr["rename_sensitivity"]["status"], "fill")
+                self.assertEqual(tr["rename_sensitivity"]["fill_session"], d[5])
+                requests = [r for r in store.req.values() if r["kind"] == "quote_rename"]
+                self.assertEqual([(r["params"]["symbols"], r["params"]["asof"]) for r in requests],
+                                 [(successor, d[3])])
+
+    def test_terminal_zero_single_rename_requests_successor_asof_process_date(self):
+        cal, d = self.cal, self.d
+        store = Store()
+        tr = resolve(self.ev, "b_lane", ctx_for(cal, actions=[self._rename("OLD", "NEW", d[3])]), store,
+                     {"OLD": [book(cal, d[1], "09:35")], "NEW": [book(cal, d[5], "15:55", 10.5, 10.6)]})
+        self.assertEqual((tr["exit"], tr["nets"]["primary"]), ("terminal_zero", -1.0))
+        self.assertTrue(tr["rename_record_in_window"])
+        self.assertEqual(tr["rename_sensitivity"]["new_symbol"], "NEW")
+        self.assertEqual(tr["rename_sensitivity"]["status"], "fill")
+        self.assertAlmostEqual(tr["rename_sensitivity"]["fill_mid"], 10.55)
+        requests = [r for r in store.req.values() if r["kind"] == "quote_rename"]
+        self.assertEqual([(r["params"]["symbols"], r["params"]["asof"]) for r in requests], [("NEW", d[3])])
+
+    def test_terminal_zero_rename_diagnostic_keeps_strict_date_window(self):
+        cal, d = self.cal, self.d
+        cases = ((cal.offset(self.t, -1), False), (self.t, False), (d[1], False),
+                 (d[2], True), (d[10], True), (d[11], False), (None, False))
+        for day, counted in cases:
+            with self.subTest(day=day):
+                store = Store()
+                tr = resolve(self.ev, "b_lane", ctx_for(cal, actions=[self._rename("OLD", "NEW", day)]), store,
+                             {"OLD": [book(cal, d[1], "09:35")]})
+                self.assertEqual((tr["exit"], tr["nets"]["primary"]), ("terminal_zero", -1.0))
+                self.assertEqual(tr["rename_record_in_window"], counted)
+                self.assertEqual("rename_sensitivity" in tr, counted)
+                requests = [r for r in store.req.values() if r["kind"] == "quote_rename"]
+                self.assertEqual(bool(requests), counted)
+                if counted:
+                    self.assertEqual({(r["params"]["symbols"], r["params"]["asof"]) for r in requests},
+                                     {("NEW", day)})
+
+    def test_terminal_zero_rename_diagnostic_rejects_other_issuers(self):
+        cal, d = self.cal, self.d
+        cases = [
+            # OLD is reused after the held issuer has renamed away on entry day.
+            [self._rename("OLD", "MID", d[1]), self._rename("OLD", "OTHER", d[3])],
+            # A pre-t (or t-day) rename belongs to an earlier holder of OLD.
+            [self._rename("OLD", "MID", cal.offset(self.t, -1)), self._rename("MID", "NEW", d[3])],
+            [self._rename("OLD", "MID", self.t), self._rename("MID", "NEW", d[3])],
+            # Matching only new_symbol would attach an unrelated issuer to the holding.
+            [self._rename("OTHER", "OLD", d[3])],
+            [self._rename("OLD", "MID", d[1]), self._rename("OTHER", "MID", d[3])],
+        ]
+        for actions in cases:
+            with self.subTest(actions=actions):
+                store = Store()
+                tr = resolve(self.ev, "b_lane", ctx_for(cal, actions=actions), store,
+                             {"OLD": [book(cal, d[1], "09:35")]})
+                self.assertEqual((tr["exit"], tr["nets"]["primary"]), ("terminal_zero", -1.0))
+                self.assertFalse(tr["rename_record_in_window"])
+                self.assertNotIn("rename_sensitivity", tr)
+                self.assertFalse(any(r["kind"] == "quote_rename" for r in store.req.values()))
+
+
 def _entry_store(cal, ev, d):
     store = Store()
     req = plan.entry_window(cal, "MOVR", ev["t"], "b_lane")
@@ -486,6 +696,54 @@ class H3c(unittest.TestCase):
     def setUp(self):
         self.cal = synth.calendar()
         self.t = "2020-06-01"
+
+    def _split_event(self, ratios, adjusted):
+        """Official prices reflect every split; adjusted bars carry only the selected records."""
+        import math
+        cal, t = self.cal, self.t
+        ev = make_event(cal, t)
+        raw, split, allc = synth.series(
+            cal, cal.offset(t, -60), cal.offset(t, 12),
+            lambda s: 10.0 / math.prod(r for day, r in ratios.items() if day <= s), split_at=adjusted)
+        ev.update(raw=raw, split=split, all=allc, prints=synth.prints_from(raw))
+        records = [{"type": "forward_split" if ratio > 1 else "reverse_split", "symbol": "MOVR", "date": day,
+                    "new_rate": ratio, "old_rate": 1} for day, ratio in ratios.items()]
+        return ev, records
+
+    def _assert_split_eligibility(self, ratios, missing, no_record_value):
+        adjusted, records = self._split_event(ratios, ratios)
+        unadjusted, _ = self._split_event(ratios, {day: r for day, r in ratios.items() if day not in missing})
+        # Without a retained record a price move is an outcome, never a primary ratio-rule exclusion.
+        self.assertAlmostEqual(h3c_event(unadjusted, ctx_for(self.cal))["value"], no_record_value, places=12)
+        for mode, status in (("read", "complete"), ("count", "counted")):
+            with self.subTest(mode=mode, adjusted=True):
+                result = h3c_event(adjusted, ctx_for(self.cal, actions=records, mode=mode))
+                self.assertEqual(result["status"], status)
+                if mode == "read":
+                    self.assertAlmostEqual(result["value"], 0.0, places=12)
+                else:
+                    self.assertNotIn("value", result)
+            with self.subTest(mode=mode, adjusted=False):
+                result = h3c_event(unadjusted, ctx_for(self.cal, actions=records, mode=mode))
+                self.assertEqual(result["status"], "split_record_excluded")
+                self.assertNotIn("value", result)
+
+    def test_forward_split_record_excludes_unadjusted_h3c_in_both_paths(self):
+        """A retained 2:1 split on t+3 must not produce log(0.5)/4 from $10 -> $5 prints."""
+        day = self.cal.offset(self.t, 3)
+        self._assert_split_eligibility({day: 2.0}, {day}, -0.17328679513998632)
+
+    def test_reverse_split_record_excludes_unadjusted_h3c_in_both_paths(self):
+        """A retained 1:2 split on t+3 must not produce log(2)/4 from $10 -> $20 prints."""
+        day = self.cal.offset(self.t, 3)
+        self._assert_split_eligibility({day: 0.5}, {day}, 0.17328679513998632)
+
+    def test_h3c_checks_each_split_when_another_split_is_adjusted(self):
+        """An adjustment on one overnight leg cannot conceal an unadjusted split on another."""
+        days = [self.cal.offset(self.t, k) for k in (2, 4)]
+        for missing in days:
+            with self.subTest(missing=missing):
+                self._assert_split_eligibility(dict.fromkeys(days, 2.0), {missing}, -0.17328679513998632)
 
     def test_legs_decompose_close_to_close(self):
         cal, t = self.cal, self.t

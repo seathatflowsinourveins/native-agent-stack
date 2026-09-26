@@ -3,13 +3,17 @@ and normalized read access (core.records). Evaluation code; nothing here is unde
 
 Ledger lines (JSON): {"event": "request", <request record fields>}; {"event": "page", "key", "attempt", "file",
 "status": 200, "sha256", "bytes", "asof", "vintage"}; {"event": "stamp_complete" | "stamp_incomplete", "key",
-"kind", "attempt", "pages", "asof", "vintage", "error"}. The asof (the request's session) and the vintage (the
-fetch time, UTC) are separate fields. A request's latest attempt governs.
+"kind", "attempt", "pages", "asof", "vintage", "error", "elapsed_seconds"}. The asof (the request's session)
+and vintage (the fetch start, UTC) are separate from the complete monotonic duration of each attempt. A request's
+latest attempt governs. Legacy records without a duration remain readable but cannot calibrate throughput.
+An optional leading {"event": "snapshot", "binding": {...}} binds a collection seal to its authorization and
+batch inputs, including its original start time, for recovery before the completion logs are written.
 """
 from __future__ import annotations
 
 import gzip
 import json
+import os
 from pathlib import Path
 
 from core import records
@@ -29,18 +33,21 @@ def normalized_sha256(parser: str, raw: bytes) -> str:
 class Store:
     def __init__(self):
         self.req = {}       # key -> request
-        self.state = {}     # key -> {"status", "pages": [bytes], "vintage", "attempt", "error"}
+        self.state = {}     # key -> {"status", "pages": [bytes], "vintage", "attempt", "error", "elapsed_seconds"}
         self.history = {}   # key -> earlier attempts (the ledger is append-only)
         self.page_norm = {}  # (key, attempt) -> sealed normalized sha256 per page (read from a ledger)
+        self.binding = None  # authorization and batch identity, when the caller supplies one
         self._cache = {}
 
     # ------------------------------------------------------------ writing
-    def put(self, req: dict, complete: bool, pages: list, vintage: str, attempt: int = 0, error=None):
+    def put(self, req: dict, complete: bool, pages: list, vintage: str, attempt: int = 0, error=None,
+            elapsed_seconds: float | None = None):
         self.req[req["key"]] = req
         if req["key"] in self.state:
             self.history.setdefault(req["key"], []).append(self.state[req["key"]])
         self.state[req["key"]] = {"status": "complete" if complete else "incomplete", "pages": list(pages),
-                                  "vintage": vintage, "attempt": attempt, "error": error}
+                                  "vintage": vintage, "attempt": attempt, "error": error,
+                                  "elapsed_seconds": elapsed_seconds}
         self._cache.pop(req["key"], None)
 
     # ------------------------------------------------------------ reading
@@ -104,12 +111,19 @@ class Store:
         return sorted(record(r) for r in self.req.values())
 
     # ------------------------------------------------------------ disk
-    def write(self, directory) -> str:
-        """Write the ledger and pages; returns the snapshot sha256 (the ledger's sha256; the ledger carries every
-        page's sha256)."""
+    def write(self, directory, *, binding: dict | None = None) -> str:
+        """Write once; publish the ledger only after all pages. Returns its sha256, which binds every page and
+        any supplied authorization identity. Existing sealed or partially written snapshots are never overwritten.
+        Publication follows canon.atomic_write_results's temporary-file, fsync, rename pattern."""
         d = Path(directory)
-        (d / "pages").mkdir(parents=True, exist_ok=True)
-        lines = []
+        if (d / "ledger.jsonl").exists():
+            raise SealError("snapshot ledger already exists: cannot overwrite a sealed snapshot")
+        try:
+            (d / "pages").mkdir(parents=True, exist_ok=False)
+        except FileExistsError as exc:
+            raise SealError("snapshot pages already exist: cannot overwrite a snapshot") from exc
+        self.binding = self.binding if binding is None else binding
+        lines = [dumps({"event": "snapshot", "binding": self.binding})] if self.binding is not None else []
         for key in sorted(self.req):
             req = self.req[key]
             lines.append(dumps({"event": "request", **json.loads(record(req))}))
@@ -117,7 +131,16 @@ class Store:
             for st in self.history.get(key, []) + [self.state[key]]:
                 lines.extend(self._attempt_lines(d, key, req, name, st))
         data = ("\n".join(lines) + "\n").encode("utf-8")
-        (d / "ledger.jsonl").write_bytes(data)
+        with (d / "ledger.jsonl.tmp").open("xb") as f:
+            f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(d / "ledger.jsonl.tmp", d / "ledger.jsonl")
+        fd = os.open(d, os.O_RDONLY)
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
         return sha256_bytes(data)
 
     @staticmethod
@@ -132,7 +155,8 @@ class Store:
                                 "asof": req["params"].get("asof"), "vintage": st["vintage"]}))
         lines.append(dumps({"event": "stamp_complete" if st["status"] == "complete" else "stamp_incomplete",
                             "key": key, "kind": req["kind"], "attempt": st["attempt"], "pages": len(st["pages"]),
-                            "asof": req["params"].get("asof"), "vintage": st["vintage"], "error": st["error"]}))
+                            "asof": req["params"].get("asof"), "vintage": st["vintage"], "error": st["error"],
+                            "elapsed_seconds": st.get("elapsed_seconds")}))
         return lines
 
     @classmethod
@@ -147,7 +171,11 @@ class Store:
                 continue   # the ledger of a snapshot that sealed no new request (a later holdout count)
             rec = json.loads(line)
             ev = rec.pop("event")
-            if ev == "request":
+            if ev == "snapshot":
+                if store.binding is not None or store.req or not isinstance(rec.get("binding"), dict):
+                    raise SealError("invalid snapshot binding")
+                store.binding = rec["binding"]
+            elif ev == "request":
                 store.req[rec["key"]] = rec
             elif ev == "page":
                 raw = gzip.decompress((d / rec["file"]).read_bytes())
@@ -160,5 +188,6 @@ class Store:
                     store.history.setdefault(rec["key"], []).append(store.state[rec["key"]])
                 store.state[rec["key"]] = {"status": "complete" if ev == "stamp_complete" else "incomplete",
                                            "pages": pages.get((rec["key"], rec["attempt"]), []),
-                                           "vintage": rec["vintage"], "attempt": rec["attempt"], "error": rec["error"]}
+                                           "vintage": rec["vintage"], "attempt": rec["attempt"], "error": rec["error"],
+                                           "elapsed_seconds": rec.get("elapsed_seconds")}
         return store
