@@ -176,6 +176,7 @@ hooks = true
 # 0.157.x otherwise copies itself into CODEX_HOME/packages/app-server-daemon on its first interactive launch and
 # starts a self-updating background app-server outside the pinned prefix
 # (evidence/receipts/codex-01571-qualification-20260926.json); 0.155.1 accepts the key.
+# Changed after `v2026.09.26.2` (the key is absent at that tag).
 daemon_auto_start = false
 
 # Local ecosystem observation; content is removed before collector persistence.
