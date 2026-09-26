@@ -99,10 +99,14 @@ python3 scripts/skills_status.py --skills-bin <tools-root>/skills-1.7.0/bin/skil
 
 This puts both skills in the global lock (`~/.agents/.skill-lock.json`, or
 `$XDG_STATE_HOME/skills/.skill-lock.json` when that variable is set), with the canonical copy at
-`~/.agents/skills/search-first/` and `~/.agents/skills/iterative-retrieval/`. Claude gets a
-**relative** symlink, `~/.claude/skills/<name> -> ../../.agents/skills/<name>`, created
-automatically; Codex reads `~/.agents/skills` directly with no separate link, and neither client
-needs a manual linking step any more. Compare the lock's `skillFolderHash` for each skill against
+`~/.agents/skills/search-first/` and `~/.agents/skills/iterative-retrieval/`. On a host with no
+earlier link, Claude gets a **relative** symlink, `~/.claude/skills/<name> ->
+../../.agents/skills/<name>`, created automatically. A host that already had this recipe's earlier
+manual **absolute** links keeps them: the CLI leaves an existing link that resolves to the
+canonical folder (measured on nativestack-5975wx-20260925, 2026-09-25), and
+`scripts/skills_status.py` reports `link=ok(absolute)`, which works the same. Codex reads
+`~/.agents/skills` directly with no separate link, and neither client needs a manual linking step
+any more. Compare the lock's `skillFolderHash` for each skill against
 the manifest's `tree_sha`; a mismatch means a later, uncompared install moved the copy off the
 reviewed revision.
 
