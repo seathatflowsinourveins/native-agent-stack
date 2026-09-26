@@ -426,6 +426,335 @@
         "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md",
         "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/LICENSE"
       ]
+    },
+    {
+      "repository": "langchain-ai/langmem",
+      "url": "https://github.com/langchain-ai/langmem",
+      "version": "source pin (no tagged GitHub release as of audit)",
+      "reviewed_commit": "9d033b47d9ce53e37e92c92241b0496c0278932e",
+      "license": "MIT",
+      "status": "registered for next sweep",
+      "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog (candidates.json, saturation ledger, landscape/research-state). Register as a foundation/durable-memory candidate for the next landscape-sweep discovery step; a facts and fit refuter still gate any survival. Metadata-level registration only: no install attempted, no model-requirements review performed.",
+      "priority": "P2",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "durable-memory"
+        }
+      ],
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T01:27:26Z",
+        "method": "gh api repos/langchain-ai/langmem; gh api repos/langchain-ai/langmem/releases/latest",
+        "license_spdx_id": "MIT",
+        "stargazers_count": 1684,
+        "pushed_at": "2026-09-09T06:44:43Z",
+        "archived": false,
+        "latest_release": null
+      },
+      "sources": [
+        "https://github.com/langchain-ai/langmem/tree/9d033b47d9ce53e37e92c92241b0496c0278932e",
+        "https://langchain-ai.github.io/langmem/"
+      ]
+    },
+    {
+      "repository": "OSU-NLP-Group/HippoRAG",
+      "url": "https://github.com/OSU-NLP-Group/HippoRAG",
+      "version": "v1.0.0",
+      "reviewed_commit": "1438aba3fc44ff10573e5a5e1e7cc3c7f9794aff",
+      "license": "MIT",
+      "status": "registered for next sweep",
+      "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Register as a foundation/semantic-rag candidate (multi-hop graph RAG: knowledge graph plus personalized PageRank over LLM-extracted triples) for the next landscape-sweep discovery step; a facts and fit refuter still gate any survival. Metadata-level registration only: no install attempted, no model-requirements review performed.",
+      "priority": "P2",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "semantic-rag"
+        }
+      ],
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T01:27:26Z",
+        "method": "gh api repos/OSU-NLP-Group/HippoRAG; gh api repos/OSU-NLP-Group/HippoRAG/releases/latest",
+        "license_spdx_id": "MIT",
+        "stargazers_count": 4024,
+        "pushed_at": "2026-09-03T12:15:39Z",
+        "archived": false,
+        "latest_release": {
+          "tag_name": "v1.0.0",
+          "published_at": "2025-02-27T17:29:48Z"
+        }
+      },
+      "sources": [
+        "https://github.com/OSU-NLP-Group/HippoRAG/tree/1438aba3fc44ff10573e5a5e1e7cc3c7f9794aff",
+        "https://arxiv.org/abs/2405.14831"
+      ]
+    },
+    {
+      "repository": "lightonai/pylate",
+      "url": "https://github.com/lightonai/pylate",
+      "version": "v1.6.0",
+      "reviewed_commit": "3389837ce465ee66e46f369a3f821a96788b7f29",
+      "license": "MIT",
+      "status": "registered for next sweep",
+      "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Register as a foundation/semantic-rag candidate (late-interaction/ColBERT-style dense retrieval training and inference) for the next landscape-sweep discovery step; a facts and fit refuter still gate any survival. Metadata-level registration only: no install attempted, no model-requirements review performed.",
+      "priority": "P2",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "semantic-rag"
+        }
+      ],
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T01:27:26Z",
+        "method": "gh api repos/lightonai/PyLate; gh api repos/lightonai/PyLate/releases/latest",
+        "license_spdx_id": "MIT",
+        "stargazers_count": 895,
+        "pushed_at": "2026-07-23T14:59:38Z",
+        "archived": false,
+        "latest_release": {
+          "tag_name": "v1.6.0",
+          "published_at": "2026-06-11T09:27:06Z"
+        }
+      },
+      "sources": [
+        "https://github.com/lightonai/pylate/tree/3389837ce465ee66e46f369a3f821a96788b7f29",
+        "https://lightonai.github.io/pylate/"
+      ]
+    },
+    {
+      "repository": "FlagOpen/FlagEmbedding",
+      "url": "https://github.com/FlagOpen/FlagEmbedding",
+      "version": "v1.4.2",
+      "reviewed_commit": "fd1a2bdf69488ffebe0327999d4400d8c8058a0b",
+      "license": "MIT",
+      "status": "registered for next sweep",
+      "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Register as a foundation/semantic-rag candidate (BGE-M3: unified dense/sparse/multi-vector embeddings, 100+ languages, 8192-token input) for the next landscape-sweep discovery step; a facts and fit refuter still gate any survival. Metadata-level registration only: no install attempted, no model-requirements review performed.",
+      "priority": "P2",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "semantic-rag"
+        }
+      ],
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T01:27:26Z",
+        "method": "gh api repos/FlagOpen/FlagEmbedding; gh api repos/FlagOpen/FlagEmbedding/releases/latest",
+        "license_spdx_id": "MIT",
+        "stargazers_count": 12196,
+        "pushed_at": "2026-08-24T02:57:42Z",
+        "archived": false,
+        "latest_release": {
+          "tag_name": "v1.4.2",
+          "published_at": "2026-08-24T02:55:16Z"
+        }
+      },
+      "sources": [
+        "https://github.com/FlagOpen/FlagEmbedding/tree/fd1a2bdf69488ffebe0327999d4400d8c8058a0b",
+        "https://arxiv.org/pdf/2402.03216.pdf"
+      ]
+    },
+    {
+      "repository": "EleutherAI/lm-evaluation-harness",
+      "url": "https://github.com/EleutherAI/lm-evaluation-harness",
+      "version": "v0.4.13",
+      "reviewed_commit": "d6de81643928d653435c431bae19945d41d32520",
+      "license": "MIT",
+      "status": "registered for next sweep",
+      "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Register as both a us-equities/evaluation-experiments and a foundation/quality-evaluation candidate (few-shot LM evaluation harness; the task named both layers) for the next landscape-sweep discovery step; a facts and fit refuter still gate any survival. Metadata-level registration only: no install attempted, no model-requirements review performed.",
+      "priority": "P2",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "us-equities",
+          "layer_id": "evaluation-experiments"
+        },
+        {
+          "catalog": "foundation",
+          "layer_id": "quality-evaluation"
+        }
+      ],
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T01:27:26Z",
+        "method": "gh api repos/EleutherAI/lm-evaluation-harness; gh api repos/EleutherAI/lm-evaluation-harness/releases/latest",
+        "license_spdx_id": "MIT",
+        "stargazers_count": 14077,
+        "pushed_at": "2026-09-14T10:51:06Z",
+        "archived": false,
+        "latest_release": {
+          "tag_name": "v0.4.13",
+          "published_at": "2026-08-31T20:42:30Z"
+        }
+      },
+      "sources": [
+        "https://github.com/EleutherAI/lm-evaluation-harness/tree/d6de81643928d653435c431bae19945d41d32520",
+        "https://github.com/EleutherAI/lm-evaluation-harness/blob/d6de81643928d653435c431bae19945d41d32520/docs/README.md"
+      ]
+    },
+    {
+      "repository": "traceloop/openllmetry",
+      "url": "https://github.com/traceloop/openllmetry",
+      "version": "0.62.3",
+      "reviewed_commit": "f7082c8a99effcd1fcad5099db43bdca7b1ccf4d",
+      "license": "Apache-2.0",
+      "status": "registered for next sweep",
+      "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Register as a foundation/observation-inference candidate (OpenTelemetry-based GenAI tracing/observability SDK) for the next landscape-sweep discovery step; a facts and fit refuter still gate any survival. Metadata-level registration only: no install attempted, no model-requirements review performed.",
+      "priority": "P2",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "observation-inference"
+        }
+      ],
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T01:27:26Z",
+        "method": "gh api repos/traceloop/openllmetry; gh api repos/traceloop/openllmetry/releases/latest",
+        "license_spdx_id": "Apache-2.0",
+        "stargazers_count": 7447,
+        "pushed_at": "2026-09-24T08:07:03Z",
+        "archived": false,
+        "latest_release": {
+          "tag_name": "0.62.3",
+          "published_at": "2026-08-10T08:49:01Z"
+        }
+      },
+      "sources": [
+        "https://github.com/traceloop/openllmetry/tree/f7082c8a99effcd1fcad5099db43bdca7b1ccf4d",
+        "https://www.traceloop.com/openllmetry"
+      ]
+    },
+    {
+      "repository": "NVIDIA/TensorRT-LLM",
+      "url": "https://github.com/NVIDIA/TensorRT-LLM",
+      "version": "v1.2.1",
+      "reviewed_commit": "923c24fdd0beb9424d4d1a3202eac79562ff8f64",
+      "license": "Apache-2.0 (first-party; GitHub's automatic license detector reports NOASSERTION because LICENSE bundles third-party license text alongside the Apache-2.0 grant)",
+      "status": "watch",
+      "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Watch only: catalogs/landscape/foundation.json has no dedicated local-inference layer, so this is filed under foundation/semantic-rag as the closest established layer, the same layer the 2026-09-23 sweep used for ollama/ollama and huggingface/text-embeddings-inference (local inference/embedding serving). The host already runs vLLM (:18231) and llama.cpp (:18232) for local inference; this is a comparison candidate only, not a next-sweep commitment. Metadata-level registration only: no install attempted, no model-requirements review performed.",
+      "priority": "P3",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "semantic-rag"
+        }
+      ],
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T01:27:26Z",
+        "method": "gh api repos/NVIDIA/TensorRT-LLM; gh api repos/NVIDIA/TensorRT-LLM/releases/latest",
+        "license_spdx_id": "NOASSERTION",
+        "stargazers_count": 14715,
+        "pushed_at": "2026-09-26T00:31:46Z",
+        "archived": false,
+        "latest_release": {
+          "tag_name": "v1.2.1",
+          "published_at": "2026-04-20T11:51:33Z"
+        }
+      },
+      "sources": [
+        "https://github.com/NVIDIA/TensorRT-LLM/tree/923c24fdd0beb9424d4d1a3202eac79562ff8f64",
+        "https://nvidia.github.io/TensorRT-LLM"
+      ]
+    },
+    {
+      "repository": "Cinnamon/kotaemon",
+      "url": "https://github.com/Cinnamon/kotaemon",
+      "version": "v0.12.0",
+      "reviewed_commit": "9ad3e4e49aa35b8acddd235918a5d9753c1cfdf9",
+      "license": "Apache-2.0",
+      "status": "watch",
+      "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Watch as a foundation/document-retrieval candidate (open-source RAG UI for chatting with a document corpus); no current requirement for a document-chat UI layer, so this is not registered for the next sweep. Metadata-level registration only: no install attempted, no model-requirements review performed.",
+      "priority": "P3",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "document-retrieval"
+        }
+      ],
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T01:27:26Z",
+        "method": "gh api repos/Cinnamon/kotaemon; gh api repos/Cinnamon/kotaemon/releases/latest",
+        "license_spdx_id": "Apache-2.0",
+        "stargazers_count": 25777,
+        "pushed_at": "2026-07-14T16:53:59Z",
+        "archived": false,
+        "latest_release": {
+          "tag_name": "v0.12.0",
+          "published_at": "2026-05-31T04:45:39Z"
+        }
+      },
+      "sources": [
+        "https://github.com/Cinnamon/kotaemon/tree/9ad3e4e49aa35b8acddd235918a5d9753c1cfdf9",
+        "https://cinnamon.github.io/kotaemon/"
+      ]
+    },
+    {
+      "repository": "Helicone/helicone",
+      "url": "https://github.com/Helicone/helicone",
+      "version": "v2025.08.21-1",
+      "reviewed_commit": "067d9290acb4f1fc9320e902fc67b4b399b50363",
+      "license": "Apache-2.0",
+      "status": "watch",
+      "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Watch as a foundation/observation-inference candidate (hosted/self-hostable LLM observability gateway: logging, cost, sessions, evaluation); the current native-only observation stack (Grafana/Dagu/otel-tui) has no defined gap this would close, so this is not registered for the next sweep. Metadata-level registration only: no install attempted, no model-requirements review performed.",
+      "priority": "P3",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "observation-inference"
+        }
+      ],
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T01:27:26Z",
+        "method": "gh api repos/Helicone/helicone; gh api repos/Helicone/helicone/releases/latest",
+        "license_spdx_id": "Apache-2.0",
+        "stargazers_count": 6176,
+        "pushed_at": "2026-09-16T19:29:27Z",
+        "archived": false,
+        "latest_release": {
+          "tag_name": "v2025.08.21-1",
+          "published_at": "2025-08-21T18:47:38Z"
+        }
+      },
+      "sources": [
+        "https://github.com/Helicone/helicone/tree/067d9290acb4f1fc9320e902fc67b4b399b50363",
+        "https://docs.helicone.ai/"
+      ]
+    },
+    {
+      "repository": "open-telemetry/semantic-conventions-genai",
+      "url": "https://github.com/open-telemetry/semantic-conventions-genai",
+      "version": "source pin (no tagged GitHub release as of audit)",
+      "reviewed_commit": "e57c543b4889619eb2a05702471937db5119165d",
+      "license": "Apache-2.0",
+      "status": "watch",
+      "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Watch as a foundation/observation-inference candidate (the maintained OpenTelemetry GenAI semantic-conventions schema, status Development at the pin, that openllmetry/Helicone-style tracing implements against). The GenAI conventions moved here from open-telemetry/semantic-conventions: at 094950f2ccfb17c68d11aecc03937111dd22ca77 that repository's docs/gen-ai pages are 'Moved' notices and its model/gen-ai keeps only deprecated YAML, so this maintained repository, not open-telemetry/semantic-conventions, is the registered candidate. No current requirement to adopt a schema/spec repository as a running component, so this is not registered for the next sweep. Metadata-level registration only: no install attempted, no model-requirements review performed.",
+      "priority": "P3",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "observation-inference"
+        }
+      ],
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T02:13:11Z",
+        "method": "gh api repos/open-telemetry/semantic-conventions-genai; gh api repos/open-telemetry/semantic-conventions-genai/releases/latest (HTTP 404: no releases); gh api repos/open-telemetry/semantic-conventions-genai/tags (empty)",
+        "license_spdx_id": "Apache-2.0",
+        "stargazers_count": 392,
+        "pushed_at": "2026-09-26T00:35:23Z",
+        "archived": false,
+        "latest_release": null
+      },
+      "sources": [
+        "https://github.com/open-telemetry/semantic-conventions-genai/tree/e57c543b4889619eb2a05702471937db5119165d",
+        "https://github.com/open-telemetry/semantic-conventions-genai/blob/e57c543b4889619eb2a05702471937db5119165d/docs/gen-ai/README.md",
+        "https://github.com/open-telemetry/semantic-conventions/blob/094950f2ccfb17c68d11aecc03937111dd22ca77/docs/gen-ai/README.md"
+      ]
     }
   ]
 }

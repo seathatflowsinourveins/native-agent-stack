@@ -6679,8 +6679,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "782a15a3f7b398e56b70ebd14432f39bac10664a11c40d65f5645fd632151dec",
-      "bytes": 481087
+      "sha256": "759560688ee2344247e92fe7b4d72db4de7d2ec868e9fb9c9668453e71265210",
+      "bytes": 481248
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -10169,8 +10169,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "d40f497a2bb12a7392fbc32e6f0c44cc450278bc5e7faeb75a67456aaa7b6a86",
-      "bytes": 744533
+      "sha256": "2af07f25e616ccddbbaf8a54806e329f8759a971c8f6bdfc42f5befbe7490a8a",
+      "bytes": 753100
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -10224,7 +10224,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "59d93891eb5e10cdf71e2e43c58cc8b55ba55dbb1cf8b9884a8a29ec7a50a9ed",
+      "sha256": "943035b598ceccb8e5d37cca7d1e50c1db49f9071b9a6dd8da9ecb26d867cde5",
       "bytes": 3215
     },
     {
@@ -31974,8 +31974,8 @@
     },
     {
       "path": "manifests/candidates.json",
-      "sha256": "5b214b52322b6aaf3d6d63c28f2bded9f478534723ce5070454e739d8743b6e9",
-      "bytes": 25490
+      "sha256": "2018acf74aa98911106cf895c224b7435fea17b66fb7fe6fdd17660e69af5b41",
+      "bytes": 42046
     },
     {
       "path": "manifests/landscape.json",
