@@ -13603,8 +13603,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "d154b6988cad8329b783a62e88e26a97d1ad75656d029699b48df1838f7ad4ec",
-      "bytes": 23636
+      "sha256": "fae68dcf4cc8900efdb8f041041157d6bf45fca2ea3886007f1ff4349b34d411",
+      "bytes": 25771
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -36598,8 +36598,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "59c5a45ad4b2ca625faf78d6b172c55b99fe96f1d92f307cc7d122d2cd1a4109",
-      "bytes": 6152
+      "sha256": "b97c5417023f3fd521b7cc5e81f3708d3ad020e3bcb55b493b0bfcd804fa5ca0",
+      "bytes": 6347
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",

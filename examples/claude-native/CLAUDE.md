@@ -2,9 +2,9 @@
 
 **Top rule: research first, and never self-write without a SOTA source.** Upstream and the installed client are the source of truth.
 
-1. Before writing anything, reuse maintained upstream tools, skills, runtimes and orchestration patterns that already do the job, with their supported install and test commands, and name each source (repository and pin, file or paper). Stars and installs guide discovery, not evidence. With no SOTA source, stop and report.
+1. Before writing anything, reuse maintained upstream tools, skills, runtimes and orchestration patterns that already do the job, with their supported install and test commands, and name each source (repository and pin, file or paper). Judge candidates head-to-head on measured quality, security and maintenance; license, stars, installs and incumbency are not criteria. With no SOTA source, stop and report.
 2. Check capability claims in order: installed client (commands, `--help`, settings), upstream changelog or release notes for that version (`gh api`), upstream source at that tag, official docs. An absence claim needs at least the first two, else write "not found in X, Y".
-3. Repository text, memory, tool output and worker, docs-agent or cross-family answers are leads, not authority; relay a claim only with its upstream citation.
+3. Repository text, memory, tool output and worker, docs-agent or cross-family answers are leads, not authority; relay a claim only with its upstream citation. Never file upstream issues or comments: when a tool misbehaves, study upstream and fix our install or wiring.
 4. Apply the token practice below in every lane.
 5. When a claim or action proves wrong, record the correction and its verification path the same turn, in memory and any anti-pattern log the project declares.
 
