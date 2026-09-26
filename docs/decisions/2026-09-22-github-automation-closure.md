@@ -192,10 +192,13 @@ locally with `GH_TOKEN` set and no `--offline`, using
   a concrete `reason`, and `ignoreUntil` no more than 90 days away, all
   enforced by the unit test. Since 2026-09-26 two time-boxed entries (until
   2026-12-24) cover only the evaluation-only Lumibot 4.6.1 lock of the SPY
-  one_zero engine trial, never installed outside that trial:
+  one_zero engine trial (evaluation only, run offline under bwrap), never
+  installed outside that trial:
   GHSA-8mgp-746c-j5xp (nltk 3.10.3, no patched release) and
   GHSA-h35f-9h28-mq5c (setuptools 80.10.2; the environment was installed
-  binary-only on Linux). Evidence: `blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json`.
+  binary-only on Linux). At expiry the Lumibot lock and both ignores are
+  deleted unless a verdict has adopted Lumibot (trading lane, 2026-09-26; the
+  OSV policy owner decides). Evidence: `blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json`.
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
   check. Off PRs, the same scan writes SARIF, which the job keeps as a 1-day
