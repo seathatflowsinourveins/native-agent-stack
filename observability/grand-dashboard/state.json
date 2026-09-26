@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-26T12:19:40Z",
+  "recorded_at_utc": "2026-09-26T18:18:50Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -14,7 +14,7 @@
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "engine P0 + cancel identity + margin financing model merged 2026-09-25 / fault rerun and 1x ladder blocked (paper keys HTTP 401 - rotation needed) / flat",
+      "state": "engine P0 + cancel identity + margin model 09-25 / cross-family fixes + startup fills + per-fill loss 09-26 / 1x ladder blocked (paper keys HTTP 401) / flat",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
     },
     {
@@ -261,8 +261,8 @@
       "kind": "gate",
       "id": "mover-early-entry-studies",
       "title": "Mover early-entry studies v1 to v3",
-      "state": "v1 768 and v2 244 rule-exits no development pass / holdout unread / v3 core merged 2026-09-25 not frozen (cross-family review after 09-30)",
-      "evidence_ref": "blueprints/us-equities/mover-early-entry/README.md"
+      "state": "v1 768 and v2 244 rule-exits no development pass / holdout unread / v3 round 17 GPT-6 ready to freeze 09-26 / not frozen (dry run needs data keys)",
+      "evidence_ref": "blueprints/us-equities/mover-v3/README.md"
     },
     {
       "kind": "gate",
