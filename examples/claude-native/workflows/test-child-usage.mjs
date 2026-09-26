@@ -2,8 +2,8 @@
 // OFFLINE check of child-usage.mjs against SYNTHETIC transcript rows (no provider
 // call, not native evidence). Real runs are checked by passing their directory;
 // stored receipts from real runs are bound to the documentation by test-usage-receipts.mjs.
-import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel, webSearch } from './child-usage.mjs'
-import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync } from 'node:fs'
+import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel, webSearch, childLanes, aggregateLanes, sweepLanes, fetchKind, mcpServer, safeKey, tokenStats, parseArgs, loadRtkDecisions, DEFAULT_MARKER } from './child-usage.mjs'
+import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync, readFileSync, chmodSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { tmpdir } from 'node:os'
@@ -172,5 +172,148 @@ try {
   utimesSync(join(runs[0], 'journal.jsonl'), 1000, 1000); utimesSync(join(runs[1], 'journal.jsonl'), 2000, 2000); utimesSync(join(runs[2], 'journal.jsonl'), 3000, 3000)
   expect('latest: newest wf_ run with a journal is selected', latestRunDir(cwd, cfg) === runs[1])
 } finally { rmSync(dir, { recursive: true, force: true }) }
+
+// Lanes: synthetic rows shaped like Claude Code 2.1.283 child transcripts (tool_use blocks, tool_result
+// tool_reference blocks, hook_success / hook_additional_context attachments); not native evidence.
+const T = (minute, day = 25) => '2026-09-' + day + 'T18:' + String(minute).padStart(2, '0') + ':00.000Z'
+const tokens = (input, read, write) => ({ input_tokens: input, output_tokens: 5, cache_read_input_tokens: read, cache_creation_input_tokens: write })
+const ask = (text, minute) => ({ type: 'user', timestamp: T(minute), message: { role: 'user', content: text } })
+const call = (id, name, input, minute, usage) => ({ type: 'assistant', timestamp: T(minute), message: { id: 'msg-' + id, model: 'claude-sonnet-5', content: [{ type: 'tool_use', id, name, input }], ...(usage ? { usage } : {}) } })
+const toolResult = (id, content, minute) => ({ type: 'user', timestamp: T(minute), message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: id, content }] } })
+const attach = (attachment, minute) => ({ type: 'attachment', timestamp: T(minute), attachment })
+const bashHook = (id, command, stdout, minute) => attach({ type: 'hook_success', hookName: 'PreToolUse:Bash', hookEvent: 'PreToolUse', toolUseID: id, command, stdout, stderr: '', exitCode: 0 }, minute)
+const rewrite = JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', updatedInput: { command: 'rtk git status' } } })
+const agentTool = [
+  ask('Task packet.\n' + DEFAULT_MARKER + '\nrouting text', 0),
+  attach({ type: 'hook_success', hookName: 'SubagentStart:general-purpose', hookEvent: 'SubagentStart', toolUseID: 'start', command: 'memory-hook subagent-start', stdout: '{}', stderr: '', exitCode: 0 }, 1),
+  call('t1', 'Bash', { command: 'git status' }, 2, tokens(10, 1000, 200)),
+  bashHook('t1', '/opt/tools/rtk hook claude', rewrite, 2),
+  call('t1', 'Bash', { command: 'git status' }, 2),
+  call('t2', 'Bash', { command: 'rtk ls -la' }, 3),
+  bashHook('t2', 'python3 other-hook.py', rewrite, 3),
+  call('t3', 'Bash', { command: 'cd work && curl -sS https://example.com/a | head' }, 4),
+  call('t4', 'Bash', { command: 'curl -s http://127.0.0.1:9090/api/v1/query' }, 5),
+  call('t5', 'Bash', { command: 'echo curl is not run; grep -c wget notes.txt' }, 6),
+  bashHook('t5', 'rtk hook claude', '', 6),
+  call('t6', 'mcp__plugin_context-mode_context-mode__ctx_execute', { language: 'shell', code: 'ls' }, 7),
+  call('t7', 'mcp__plugin_context-mode_context-mode__ctx_fetch_and_index', { url: 'https://example.com/doc' }, 8),
+  call('t8', 'mcp__qmd__query', { searches: [] }, 9),
+  call('t9', 'Skill', { skill: 'tdd' }, 10),
+  call('t10', 'ToolSearch', { query: 'select:mcp__qmd__query,WebFetch', max_results: 5 }, 11),
+  toolResult('t10', [{ type: 'tool_reference', tool_name: 'mcp__qmd__query' }, { type: 'tool_reference', tool_name: 'WebFetch' }], 11),
+  call('t11', 'WebFetch', { url: 'https://example.com/b' }, 12),
+]
+const lanesA = childLanes(agentTool)
+expect('lanes: tool_use blocks count once per id, Bash and MCP calls per server prefix', lanesA.tool_calls === 11 && lanesA.bash_calls === 5 && JSON.stringify(lanesA.mcp_calls) === JSON.stringify({ 'plugin_context-mode_context-mode': 2, qmd: 1 }))
+expect('lanes: Skill calls by skill and ToolSearch loads grouped by server or built-in', JSON.stringify(lanesA.skill_calls) === '{"tdd":1}' && lanesA.tool_search.calls === 1 && lanesA.tool_search.loaded.qmd === 1 && lanesA.tool_search.loaded['built-in'] === 1)
+expect('lanes: only an `rtk hook` row whose stdout carries updatedInput is a rewrite; a typed rtk prefix is counted apart', lanesA.rtk.hook_rewrites === 1 && lanesA.rtk.model_typed === 1 && lanesA.rtk.decisions === null)
+expect('lanes: fetch routing counts WebFetch, ctx_fetch_and_index, remote and loopback-only curl/wget', JSON.stringify(lanesA.fetch) === JSON.stringify({ webfetch: 1, ctx_fetch_and_index: 1, bash_curl_wget: 1, bash_curl_wget_loopback: 1 }))
+expect('lanes: the marker in the first prompt is found, the SubagentStart type is recorded and an empty hook stdout is no context', lanesA.injected_block.in_first_prompt && !lanesA.injected_block.in_subagent_start_context && JSON.stringify(lanesA.subagent_start) === '{"types":["general-purpose"],"additional_context":false}')
+expect('lanes: first_prompt_tokens is the first request prompt and equals first_request_prompt_tokens', lanesA.first_prompt_tokens === 1210 && summarizeChild(started, done, { model: 'sonnet' }, agentTool).first_request_prompt_tokens === 1210 && summarizeChild(started, done, { model: 'sonnet' }, agentTool).lanes.first_prompt_tokens === 1210)
+const decisions = new Map([['t1', 'ask'], ['t2', 'defer'], ['t3', 'deny'], ['t4', 'allow'], ['elsewhere', 'ask']])
+expect('lanes: hook_decisions join by tool_use_id counts each Bash call once, unlogged calls as not_logged', JSON.stringify(childLanes(agentTool, { rtkDecisions: decisions }).rtk.decisions) === JSON.stringify({ allow: 1, ask: 1, defer: 1, deny: 1, not_logged: 1, other: 0 }))
+expect('lanes: an unknown decision value is kept as other', childLanes(agentTool, { rtkDecisions: new Map([['t1', 'bypass']]) }).rtk.decisions.other === 1)
+const injected = childLanes([ask('plain workflow packet', 0), attach({ type: 'hook_additional_context', hookName: 'SubagentStart:workflow-subagent', hookEvent: 'SubagentStart', toolUseID: 'start', content: ['lanes\n' + DEFAULT_MARKER] }, 0), call('b1', 'Read', { file_path: 'a' }, 1, tokens(5, 0, 100))])
+expect('lanes: SubagentStart hook_additional_context carrying the marker is an injected block', !injected.injected_block.in_first_prompt && injected.injected_block.in_subagent_start_context && injected.subagent_start.additional_context && injected.subagent_start.types.join() === 'workflow-subagent')
+const viaStdout = childLanes([ask('packet', 0), attach({ type: 'hook_success', hookName: 'SubagentStart:general-purpose', hookEvent: 'SubagentStart', toolUseID: 'start', command: 'lanes-hook', stdout: JSON.stringify({ hookSpecificOutput: { hookEventName: 'SubagentStart', additionalContext: 'block ' + DEFAULT_MARKER } }), stderr: '', exitCode: 0 }, 0)])
+expect('lanes: SubagentStart additionalContext in hook stdout is an injected block too', viaStdout.injected_block.in_subagent_start_context && viaStdout.subagent_start.additional_context)
+const quoted = childLanes([ask('no block here', 0), call('d1', 'Bash', { command: 'grep -c "' + DEFAULT_MARKER + '" hooks.mjs' }, 1), toolResult('d1', 'match ' + DEFAULT_MARKER, 1)])
+expect('lanes: the marker in tool input or output is never an injected block', !quoted.injected_block.in_first_prompt && !quoted.injected_block.in_subagent_start_context)
+expect('lanes: another marker is looked for when given', childLanes([ask('nonce-7f3', 0)], { marker: 'nonce-7f3' }).injected_block.in_first_prompt && !childLanes([ask('nonce-7f3', 0)]).injected_block.in_first_prompt)
+const windowed = childLanes(agentTool, { window: { since: Date.parse(T(3)), until: Date.parse(T(9)) } })
+expect('window: only rows inside [since, until) are counted', windowed.tool_calls === 6 && windowed.bash_calls === 4 && windowed.rtk.hook_rewrites === 0 && windowed.rtk.model_typed === 1 && windowed.mcp_calls['plugin_context-mode_context-mode'] === 2 && !windowed.mcp_calls.qmd)
+expect('window: a first request before since has no first_prompt_tokens, while first-prompt properties still hold', windowed.first_prompt_tokens === null && windowed.injected_block.in_first_prompt && windowed.subagent_start.types.join() === 'general-purpose')
+expect('window: rows at or after until are never read, properties included', !childLanes(agentTool, { window: { since: -Infinity, until: Date.parse(T(0)) } }).injected_block.in_first_prompt)
+expect('fetch: curl/wget only in command position, loopback-only apart', JSON.stringify(['curl -s https://x.org', 'rtk curl https://x.org', 'timeout 5 wget http://localhost:8080/', 'curl "$URL"', 'echo curl', 'grep curl f', 'x=$(curl -s http://[::1]:9/)', 'curl http://127.0.0.1/ https://example.org', 'ls\ncurl -I https://x.org'].map(fetchKind)) === JSON.stringify(['fetch', 'fetch', 'loopback', 'fetch', null, null, 'loopback', 'fetch', 'fetch']))
+expect('fetch: quoted strings and heredoc bodies are data unless a shell runs them', JSON.stringify([
+  "echo 'hello; curl https://example.com'", 'printf "%s" "curl https://x.org"', "bash -c 'curl -s https://x.org'", 'sh -lc "wget http://localhost/"',
+  "ssh host 'curl https://x.org'", "cat > s.sh <<'EOF'\ncurl https://x.org\nEOF\nls", "bash <<'EOF'\ncurl https://x.org\nEOF", 'x="$(curl -s https://x.org)"',
+  'cat <<< "curl https://x.org"', 'curl "http://127.0.0.1:9090/api"', "python3 - <<'PY'\nos.system('curl https://x.org')\nPY", 'grep -c "curl" notes.txt; curl -s https://x.org',
+].map(fetchKind)) === JSON.stringify([null, null, 'fetch', 'loopback', 'fetch', null, 'fetch', 'fetch', null, 'loopback', null, 'fetch']))
+expect('mcp: the server is the segment between mcp__ and the next __', mcpServer('mcp__plugin_context-mode_context-mode__ctx_execute') === 'plugin_context-mode_context-mode' && mcpServer('mcp__qmd__query') === 'qmd' && mcpServer('Bash') === null && mcpServer('mcp__') === null)
+{
+  const odd = childLanes([ask('packet', 0), call('p1', 'mcp__constructor__query', {}, 1), call('p2', 'Skill', { skill: '/home/example/private/SKILL.md' }, 2), call('p3', 'Skill', { skill: 'tdd' }, 3), attach({ type: 'hook_success', hookName: 'SubagentStart:has space', hookEvent: 'SubagentStart', toolUseID: 's', command: 'x', stdout: '', stderr: '', exitCode: 0 }, 0)])
+  expect('keys: a prototype name is an ordinary counter, and a path or text in a name is counted as (other)', JSON.stringify(odd.mcp_calls) === '{"constructor":1}' && JSON.stringify(odd.skill_calls) === '{"(other)":1,"tdd":1}' && odd.subagent_start.types.join() === '(other)' && safeKey('codex:codex-cli-runtime') === 'codex:codex-cli-runtime' && safeKey('user@example.com') === '(other)')
+}
+{
+  // A streamed duplicate straddling since, and a ToolSearch whose result lands after since.
+  const straddle = [ask('packet', 0), call('s1', 'Bash', { command: 'ls' }, 2), call('s1', 'Bash', { command: 'ls' }, 4), call('q1', 'ToolSearch', { query: 'select:mcp__qmd__query' }, 2), toolResult('q1', [{ type: 'tool_reference', tool_name: 'mcp__qmd__query' }], 4)]
+  const early = childLanes(straddle, { window: { since: Date.parse(T(0)), until: Date.parse(T(3)) } })
+  const late = childLanes(straddle, { window: { since: Date.parse(T(3)), until: Date.parse(T(9)) } })
+  const whole = childLanes(straddle, { window: { since: Date.parse(T(0)), until: Date.parse(T(9)) } })
+  expect('window: adjacent windows partition calls and loads the way one window over both counts them', early.bash_calls + late.bash_calls === whole.bash_calls && whole.bash_calls === 1 && early.tool_search.calls === 1 && late.tool_search.calls === 0 && late.tool_search.loaded.qmd === 1 && !early.tool_search.loaded.qmd && whole.tool_search.loaded.qmd === 1)
+}
+expect('stats: nearest-rank percentiles, null ignored', JSON.stringify(tokenStats([100, null, 90, 80, 70, 60, 50, 40, 30, 20, 10])) === JSON.stringify({ n: 10, min: 10, p10: 10, median: 50, p90: 90, max: 100 }) && tokenStats([null]).n === 0)
+const agg = aggregateLanes([{ lanes: lanesA }, { lanes: injected }])
+expect('aggregate: children using a lane, marker positions and SubagentStart types are counted per child', agg.children === 2 && agg.children_using_bash === 1 && agg.children_using_mcp_server.qmd === 1 && JSON.stringify(agg.injected_block) === '{"in_first_prompt":1,"in_subagent_start_context":1,"either":2}' && JSON.stringify(agg.subagent_start.types) === '{"general-purpose":1,"workflow-subagent":1}')
+expect('aggregate: shares use named denominators and stay null without data', agg.fetch.ctx_fetch_and_index_share === 0.3333 && agg.rtk.hook_rewrite_share_of_bash === 0.2 && agg.rtk.decisions === null && agg.rtk.covered_share_of_bash === null && aggregateLanes([]).fetch.ctx_fetch_and_index_share === null)
+{
+  const withDecisions = aggregateLanes([{ lanes: childLanes(agentTool, { rtkDecisions: decisions }) }])
+  expect('aggregate: covered share is (allow + ask) / Bash calls', withDecisions.rtk.covered_share_of_bash === 0.4 && withDecisions.rtk.decisions.not_logged === 1)
+}
+const sweepRoot = mkdtempSync(join(tmpdir(), 'child-lanes-'))
+try {
+  // Each file's mtime is set after the window, as a real transcript's is after its own rows, so the
+  // sweep's skip of files not modified since the window start does not depend on today's date.
+  const written = new Date('2026-09-27T00:00:00Z')
+  const put = (rel, rows, meta) => {
+    const file = join(sweepRoot, rel)
+    mkdirSync(join(file, '..'), { recursive: true })
+    writeFileSync(file, rows.map((r) => typeof r === 'string' ? r : JSON.stringify(r)).join('\n') + '\n')
+    utimesSync(file, written, written)
+    if (meta) writeFileSync(file.replace(/\.jsonl$/, '.meta.json'), JSON.stringify(meta))
+    return file
+  }
+  put('proj/sess-one/subagents/agent-a1.jsonl', agentTool, { agentType: 'general-purpose', description: 'secret task text' })
+  put('proj/sess-one/subagents/workflows/wf_run1/agent-b1.jsonl', [ask('packet', 20), call('w1', 'Bash', { command: 'ls' }, 21, tokens(3, 40, 0)), 'not json'], { agentType: 'workflow-subagent', model: 'sonnet' })
+  put('proj/sess-one/subagents/workflows/wf_run1/journal.jsonl', [{ type: 'started', agentId: 'b1' }])
+  put('proj/sess-two/subagents/workflows/wf_run2/agent-c1.jsonl', [ask('verdict packet', 30), call('c1', 'Bash', { command: 'cat x' }, 31, tokens(1, 1, 1))], { agentType: 'blind-lane-reviewer' })
+  put('proj/sess-two/subagents/agent-before.jsonl', [{ ...ask('earlier', 0), timestamp: '2026-09-24T10:00:00.000Z' }], { agentType: 'Explore' })
+  const stale = put('proj/sess-two/subagents/agent-stale.jsonl', [ask('stale', 40)], { agentType: 'Explore' })
+  utimesSync(stale, new Date('2026-09-01T00:00:00Z'), new Date('2026-09-01T00:00:00Z'))
+  put('proj/sess-one.jsonl', [ask('top-level session, not a child', 0)])
+  const window = { since: Date.parse('2026-09-25T17:18:00Z'), until: Date.parse('2026-09-26T15:05:00Z') }
+  const report = sweepLanes([sweepRoot], window)
+  expect('sweep: every child transcript under the root is found, a stale one is skipped unread and a top-level session is not a child', report.transcripts_found === 5 && report.transcripts_skipped_unmodified === 1 && report.children_in_window === 3 && report.parse_errors === 1)
+  expect('sweep: groups by spawn path and agent type, blind-* children are negative controls outside workers', report.groups.all.children === 3 && report.groups.workers.children === 2 && report.groups.negative_controls.children === 1 && report.groups.negative_controls.bash_calls === 1 && JSON.stringify(Object.keys(report.groups.by_spawn)) === '["agent_tool","workflow"]' && JSON.stringify(Object.keys(report.groups.by_agent_type)) === '["blind-lane-reviewer","general-purpose","workflow-subagent"]')
+  expect('sweep: sessions are ordinals by earliest child row, never ids', report.sessions_in_window === 2 && JSON.stringify(Object.keys(report.groups.by_session)) === '["session-01","session-02"]' && report.groups.by_session['session-01'].children === 2)
+  const text = JSON.stringify(report)
+  expect('sweep: the report carries no path, session, run or agent id, label, meta description or prompt text', !['child-lanes-', sweepRoot, 'sess-one', 'sess-two', 'wf_run', 'agent-a1', 'a1"', 'secret task', 'Task packet', 'verdict packet'].some((s) => text.includes(s)))
+  const script = fileURLToPath(new URL('./child-usage.mjs', import.meta.url))
+  const run = (...a) => spawnSync(process.execPath, [script, ...a], { encoding: 'utf8' })
+  const ok = run('--lanes-sweep', '--root', sweepRoot, '--since', '2026-09-25T17:18:00Z', '--until', '2026-09-26T15:05:00Z')
+  const parsed = ok.status === 0 ? JSON.parse(ok.stdout) : null
+  expect('cli: --lanes-sweep prints key-sorted JSON and exits 0', parsed && parsed.kind === 'claude_child_lane_usage' && parsed.children_in_window === 3 && JSON.stringify(Object.keys(parsed)) === JSON.stringify(Object.keys(parsed).sort()))
+  expect('cli: a sweep without --root, with a transcript dir, with --require-effort, or --root without --lanes-sweep exits 2', [run('--lanes-sweep'), run('--lanes-sweep', '--root', sweepRoot, 'extra'), run('--lanes-sweep', '--root', sweepRoot, '--require-effort', 'max'), run('--root', sweepRoot, 'dir')].every((r) => r.status === 2))
+  expect('cli: a bad or reversed window, an unknown option, a blank marker, a missing --rtk-db or a missing --root exits 2', [run('--lanes-sweep', '--root', sweepRoot, '--since', 'yesterday'), run('--lanes-sweep', '--root', sweepRoot, '--since', '2026-09-26T00:00:00Z', '--until', '2026-09-25T00:00:00Z'), run('--lanes-sweep', '--root', sweepRoot, '--bogus'), run('--lanes-sweep', '--root', sweepRoot, '--marker', ' '), run('--lanes-sweep', '--root', sweepRoot, '--rtk-db', join(sweepRoot, 'missing.db')), run('--lanes-sweep', '--root', join(sweepRoot, 'no-such-dir'))].every((r) => r.status === 2))
+  if (typeof process.getuid === 'function' && process.getuid() !== 0) {
+    const locked = join(sweepRoot, 'proj', 'locked')
+    mkdirSync(locked)
+    chmodSync(locked, 0o000)
+    try {
+      const partial = sweepLanes([sweepRoot], window)
+      expect('sweep: an unreadable directory is counted, and the readable ones are still swept', partial.unreadable_directories === 1 && partial.children_in_window === 3)
+    } finally { chmodSync(locked, 0o700) }
+  } else console.log('SKIP sweep: unreadable-directory check needs a non-root user')
+  expect('args: repeated single-value options are refused, --root repeats', parseArgs(['--lanes-sweep', '--root', 'a', '--root', 'b']).roots.length === 2 && Boolean(parseArgs(['x', '--marker', 'a', '--marker', 'b']).error) && Boolean(parseArgs(['--lanes-sweep', '--lanes-sweep', '--root', 'a']).error))
+  let sqlite = null
+  try { sqlite = await import('node:sqlite') } catch { sqlite = null }
+  if (!sqlite) console.log('SKIP rtk-db: node:sqlite is not available in this Node (' + process.version + '); the join logic is covered above')
+  else {
+    // The upstream table (rtk v0.50.0 src/core/tracking.rs), filled with synthetic rows.
+    const db = join(sweepRoot, 'history.db')
+    const w = new sqlite.DatabaseSync(db)
+    w.exec("CREATE TABLE hook_decisions (id INTEGER PRIMARY KEY, timestamp TEXT NOT NULL, session_id TEXT NOT NULL, tool_use_id TEXT NOT NULL, project_path TEXT DEFAULT '', raw_cmd TEXT NOT NULL, decision TEXT NOT NULL, rewritten_cmd TEXT, rtk_version TEXT NOT NULL)")
+    const insert = w.prepare('INSERT INTO hook_decisions (timestamp, session_id, tool_use_id, raw_cmd, decision, rewritten_cmd, rtk_version) VALUES (?, ?, ?, ?, ?, ?, ?)')
+    for (const [id, decision] of [['t1', 'defer'], ['t1', 'ask'], ['t2', 'defer'], ['t3', 'deny'], ['w1', 'allow']]) insert.run(T(2), 's', id, 'cmd', decision, decision === 'ask' || decision === 'allow' ? 'rtk cmd' : null, '0.50.0')
+    w.close()
+    const before = readFileSync(db)
+    const loaded = await loadRtkDecisions(db)
+    expect('rtk-db: rows load read-only, the latest row per tool_use_id wins and duplicates are counted', loaded.rows === 5 && loaded.duplicates === 1 && loaded.map.get('t1') === 'ask' && readFileSync(db).equals(before))
+    const joined = run('--lanes-sweep', '--root', sweepRoot, '--since', '2026-09-25T17:18:00Z', '--until', '2026-09-26T15:05:00Z', '--rtk-db', db)
+    const all = joined.status === 0 ? JSON.parse(joined.stdout).groups.all : null
+    expect('rtk-db: the sweep joins every Bash call in the window, and the database is unchanged', all && JSON.stringify(all.rtk.decisions) === JSON.stringify({ allow: 1, ask: 1, defer: 1, deny: 1, not_logged: 3, other: 0 }) && all.rtk.covered_share_of_bash === 0.2857 && readFileSync(db).equals(before))
+  }
+} finally { rmSync(sweepRoot, { recursive: true, force: true }) }
 console.log('SUMMARY passed=' + passed + ' failed=' + failed + ' total=' + (passed + failed))
 process.exit(failed ? 1 : 0)

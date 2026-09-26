@@ -5,6 +5,7 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -95,6 +96,16 @@ class SkillDoctorParsing(unittest.TestCase):
                 "  context = this skill's one-line listing in the system prompt\n"
                 "5 skills loaded but never invoked.\n")
         self.assertEqual(S.parse_skill_doctor_text(text), {})
+
+    def test_less_than_listing_cost_is_a_bound_not_part_of_the_source(self):
+        # Claude Code 2.1.283 prints a name-only listing's cost as "< 20".
+        rows = S.parse_skill_doctor_text(
+            "  typesafe-ai                        userSettings       < 20          -     0×  never\n"
+            "  search-first                       userSettings       < 20       <20    36×  today\n")
+        self.assertEqual(rows["typesafe-ai"]["source"], "userSettings")
+        self.assertEqual(rows["typesafe-ai"]["context_tokens"], 20)
+        self.assertEqual((rows["search-first"]["tokens_7d"], rows["search-first"]["uses"]), (20, 36))
+        self.assertEqual(S.parse_approx_count("< 20"), 20)
 
     def test_source_column_may_contain_a_space(self):
         rows = S.parse_skill_doctor_text(
@@ -563,6 +574,244 @@ class RenderTextAndCli(unittest.TestCase):
         self.assertFalse(report["claude"]["measured"])
         self.assertTrue(report["claude"]["refused"])
         self.assertIn("skill_usage:", stderr.getvalue())
+
+
+LANES_SINCE = "2026-10-20T00:00:00Z"
+LANES_UNTIL = "2026-10-21T00:00:00Z"
+
+
+def materialize_lanes_root(dest: Path) -> Path:
+    """tests/fixtures/skill_usage/codex_lanes/*.jsonl.fixture -> dest/codex_lanes/*.jsonl. The rollouts
+    are synthetic, shaped from codex-cli 0.157.1 rollout records (session_meta, response_item,
+    world_state, event_msg token_count / item_completed), with cwd REDACTED and made-up ids. Each
+    copy's mtime is set after the fixture window, as a real rollout's is after its own records, so
+    the scan's skip of files not modified since the window start does not depend on today's date."""
+    root = dest / "codex_lanes"
+    root.mkdir(parents=True, exist_ok=True)
+    written = S.parse_iso("2026-10-22T00:00:00Z").timestamp()
+    for fixture_path in (FIXTURES / "codex_lanes").glob("*.jsonl.fixture"):
+        target = root / fixture_path.with_suffix("").name
+        shutil.copyfile(fixture_path, target)
+        os.utime(target, (written, written))
+    return root
+
+
+class CodexLanes(unittest.TestCase):
+    def setUp(self):
+        self.manifest = load_fixture_manifest()
+        self.names = fixture_names()
+        self.codex_off = [s["name"] for s in self.manifest["skills"] if s["codex_enabled"] is False]
+        self.codex_on = [s["name"] for s in self.manifest["skills"] if s["codex_enabled"] is True]
+        self.since, self.until = S.parse_iso(LANES_SINCE), S.parse_iso(LANES_UNTIL)
+        self.root = materialize_lanes_root(Path(self.enterContext(tempfile.TemporaryDirectory())))
+
+    def session(self, stem: str) -> tuple[dict, int, int]:
+        path = next(self.root.glob(f"rollout-*-lanes-{stem}.jsonl"))
+        return S.scan_lanes_file(path, self.names, since=self.since, until=self.until,
+                                 marker=S.DEFAULT_LANES_MARKER, codex_off=self.codex_off,
+                                 codex_on=self.codex_on)
+
+    def scan(self) -> dict:
+        return S.scan_codex_lanes([self.root], self.manifest, since=self.since, until=self.until,
+                                  marker=S.DEFAULT_LANES_MARKER)
+
+    def test_worker_session_counts_each_lane(self):
+        session, parse_errors, untimed = self.session("worker")
+        self.assertEqual((session["kind"], session["originator"]), ("exec", "codex_exec"))
+        self.assertEqual(session["mcp_calls"], {"context-mode": 3, "qmd": 1})
+        self.assertEqual(session["mcp_failed"], {"context-mode": 1})
+        self.assertEqual((session["shell_calls"], session["rtk_prefixed"]), (5, 1))
+        # The quoted `echo 'curl ...'` command is not a fetch.
+        self.assertEqual(session["fetch"], {"web_open_page": 1, "web_search": 1, "web_other": 0,
+                                            "ctx_fetch_and_index": 1, "shell_curl_wget": 1,
+                                            "shell_curl_wget_loopback": 1})
+        # 5 shell + 4 MCP + 3 extensions (clock.sleep included) + 1 file change + 1 spawn_agent; the
+        # exec_command function_call shares its call_id with a CommandExecution item: one call.
+        self.assertEqual(session["tool_calls"], 14)
+        self.assertEqual(session["function_calls"], {"exec_command": 1, "spawn_agent": 1})
+        self.assertEqual(session["skill_md_reads"], {"tdd": 1})  # the call payload, not the item
+        self.assertTrue(session["marker"])
+        self.assertEqual(S.user_config_state(session), "applied")
+        self.assertEqual(session["first_prompt_tokens"], 19000)  # first token_count with usage
+        self.assertTrue(session["ran_past_window_end"])  # the serena call at until is not counted
+        self.assertEqual((parse_errors, untimed), (1, 1))
+
+    def test_subagent_rollout_takes_its_own_meta_not_the_repeated_parent_meta(self):
+        session, _, _ = self.session("subagent")
+        self.assertEqual(session["kind"], "subagent")
+        self.assertTrue(session["marker"])  # inherited developer context is part of its prompt
+        self.assertEqual(S.user_config_state(session), "applied")
+        self.assertEqual(session["first_prompt_tokens"], 21000)
+
+    def test_records_copied_from_the_parent_are_not_the_subagents_calls(self):
+        # Ordinals below subagent_history_start_ordinal (4) hold the parent's exec_command read.
+        session, _, _ = self.session("subagent")
+        self.assertEqual(session["skill_md_reads"], {})
+        self.assertEqual(session["function_calls"], {})
+        self.assertEqual(session["tool_calls"], 2)  # its own MCP call and shell command
+
+    def test_user_config_is_ignored_when_a_codex_disabled_skill_is_in_the_catalog(self):
+        isolated, _, _ = self.session("isolated")
+        self.assertEqual(S.user_config_state(isolated), "ignored")
+        self.assertFalse(isolated["marker"])
+        self.assertEqual(S.user_config_state(self.session("nocatalog")[0]), "unknown")
+
+    def test_window_counts_only_records_inside_and_keeps_session_properties(self):
+        straddle, _, _ = self.session("straddle")
+        self.assertTrue(straddle["started_before_window"])
+        self.assertEqual(straddle["mcp_calls"], {"serena": 1})  # the 23:30 call is before since
+        self.assertIsNone(straddle["first_prompt_tokens"])  # its first request is before since
+        self.assertEqual(S.user_config_state(straddle), "applied")  # catalog read before since
+        self.assertFalse(self.session("before")[0]["in_window"])
+
+    def test_report_keeps_negative_controls_out_of_workers(self):
+        scan = self.scan()
+        self.assertEqual(scan["sessions_in_window"], 5)
+        self.assertEqual({k: scan["user_config"][k] for k in ("applied", "ignored", "unknown")},
+                         {"applied": 3, "ignored": 1, "unknown": 1})
+        groups = scan["groups"]
+        self.assertEqual(groups["workers"]["sessions"], 3)
+        self.assertNotIn("codex", groups["workers"]["mcp_calls"])
+        self.assertEqual(groups["negative_controls"]["mcp_calls"], {"codex": 1})
+        self.assertEqual(groups["negative_controls"]["marker_sessions"], 0)
+        self.assertEqual(groups["unclassified"]["rtk_prefixed_shell_calls"], 1)
+        self.assertEqual({kind: g["sessions"] for kind, g in groups["workers_by_kind"].items()},
+                         {"exec": 2, "subagent": 1})
+        self.assertEqual((scan["sessions_started_before_window"], scan["sessions_ran_past_window_end"]),
+                         (1, 1))
+        self.assertEqual((scan["parse_errors"], scan["records_without_timestamp"]), (1, 1))
+
+    def test_worker_aggregate_shares_and_first_prompt_stats(self):
+        workers = self.scan()["groups"]["workers"]
+        self.assertEqual((workers["shell_calls"], workers["rtk_prefixed_shell_calls"]), (6, 1))
+        self.assertEqual(workers["rtk_prefix_share"], 0.1667)
+        # ctx_fetch_and_index / (web_open_page + ctx_fetch_and_index + remote curl/wget); loopback apart.
+        self.assertEqual(workers["fetch"]["ctx_fetch_and_index_share"], 0.3333)
+        self.assertEqual(workers["marker_sessions"], 2)
+        self.assertEqual(workers["sessions_using_mcp_server"], {"context-mode": 2, "qmd": 1, "serena": 1})
+        self.assertEqual(workers["first_prompt_tokens"],
+                         {"n": 2, "min": 19000, "p10": 19000, "median": 19000, "p90": 21000, "max": 21000})
+
+    def test_report_contains_no_ids_paths_or_text(self):
+        scan = self.scan()
+        dumped = json.dumps(scan)
+        for leaked in ("lanes-worker", "lanes-subagent", "REDACTED", "/home/example", "Synthetic worker",
+                       "synthetic routing", str(self.root), "rollout-", "/private/host", "item_16"):
+            self.assertNotIn(leaked, dumped)
+        # An originator that is not name-shaped is counted, never printed.
+        self.assertEqual(scan["sessions_by_originator"], {"(other)": 1, "codex_exec": 4})
+
+    def test_invoke_rate_classification_ignores_catalogs_after_now(self):
+        root = Path(self.enterContext(tempfile.TemporaryDirectory())) / "later"
+        root.mkdir()
+        records = [
+            {"timestamp": "2026-10-20T05:00:00Z", "type": "session_meta", "payload": {"id": "s", "source": "exec"}},
+            {"timestamp": "2026-10-20T05:01:00Z", "type": "response_item", "payload": {
+                "type": "function_call", "name": "exec_command", "call_id": "c1",
+                "arguments": "{\"cmd\": \"cat /home/example/.agents/skills/tdd/SKILL.md\"}"}},
+            {"timestamp": "2026-11-05T00:00:00Z", "type": "response_item", "payload": {
+                "type": "message", "role": "developer", "content": [{"type": "input_text", "text":
+                "<skills_instructions>- grill-me (file: /home/example/.agents/skills/grill-me/SKILL.md)"
+                "</skills_instructions>"}]}},
+        ]
+        (root / "rollout-2026-10-20T05-00-00-later.jsonl").write_text(
+            "\n".join(json.dumps(record) for record in records) + "\n")
+        scan = S.scan_codex_roots([root], self.names, now=S.parse_iso(NOW), windows=(30,),
+                                  codex_off=self.codex_off)
+        self.assertEqual(scan["sessions_excluded_user_config_ignored"], 0)
+        self.assertEqual(scan["counts"]["tdd"][30]["skill_md_reads"], 1)
+
+    def test_files_not_modified_since_the_window_start_are_skipped_unread(self):
+        stale = next(self.root.glob("rollout-*-lanes-isolated.jsonl"))
+        old = S.parse_iso("2026-10-01T00:00:00Z").timestamp()
+        os.utime(stale, (old, old))
+        scan = self.scan()
+        self.assertEqual(scan["files_skipped_unmodified"], 1)
+        self.assertEqual(scan["user_config"]["ignored"], 0)
+
+    def test_invoke_rate_counts_leave_out_sessions_that_ignored_the_user_config(self):
+        now = S.parse_iso(NOW)
+        scan = S.scan_codex_roots([self.root], self.names, now=now, windows=(30,), codex_off=self.codex_off)
+        self.assertEqual(scan["sessions_excluded_user_config_ignored"], 1)
+        self.assertEqual(scan["counts"]["tdd"][30]["skill_md_reads"], 1)  # the worker's read
+        self.assertEqual(scan["excluded_counts"]["tdd"][30]["skill_md_reads"], 1)  # the isolated one
+        report = S.build_report(self.manifest, claude=None, codex_scan=scan, lock_installed_at={},
+                                now=now, windows=(30,))
+        self.assertEqual(report["codex"]["sessions_excluded_user_config_ignored"], 1)
+        tdd = next(entry for entry in report["skills"] if entry["name"] == "tdd")
+        self.assertEqual(tdd["codex"]["counts"]["30"]["skill_md_reads"], 1)
+        self.assertEqual(tdd["codex"]["excluded_user_config_ignored"]["30"]["skill_md_reads"], 1)
+        # Without a codex_off list nothing can be classified, so nothing is left out.
+        legacy = S.scan_codex_roots([self.root], self.names, now=now, windows=(30,))
+        self.assertEqual((legacy["counts"]["tdd"][30]["skill_md_reads"],
+                          legacy["sessions_excluded_user_config_ignored"]), (2, 0))
+
+    def test_fetch_kind_and_shell_script(self):
+        self.assertEqual([S.fetch_kind(c) for c in (
+            "curl -s https://x.org", "rtk curl https://x.org", "timeout 5 wget http://localhost:8080/",
+            'curl "$URL"', "echo curl", "grep curl f", "x=$(curl -s http://[::1]:9/)",
+            "curl http://127.0.0.1/ https://example.org", "ls\ncurl -I https://x.org")],
+            ["fetch", "fetch", "loopback", "fetch", None, None, "loopback", "fetch", "fetch"])
+        # The same cases child-usage.mjs pins: quoted strings and heredoc bodies are data unless a
+        # shell runs them (sh -c, eval, ssh, a heredoc fed to a shell).
+        self.assertEqual([S.fetch_kind(c) for c in (
+            "echo 'hello; curl https://example.com'", 'printf "%s" "curl https://x.org"',
+            "bash -c 'curl -s https://x.org'", 'sh -lc "wget http://localhost/"',
+            "ssh host 'curl https://x.org'", "cat > s.sh <<'EOF'\ncurl https://x.org\nEOF\nls",
+            "bash <<'EOF'\ncurl https://x.org\nEOF", 'x="$(curl -s https://x.org)"',
+            'cat <<< "curl https://x.org"', 'curl "http://127.0.0.1:9090/api"',
+            "python3 - <<'PY'\nos.system('curl https://x.org')\nPY",
+            'grep -c "curl" notes.txt; curl -s https://x.org')],
+            [None, None, "fetch", "loopback", "fetch", None, "fetch", "fetch", None, "loopback", None, "fetch"])
+        self.assertEqual((S.safe_key("codex:codex-cli-runtime"), S.safe_key("/private/x"),
+                          S.safe_key("user@example.com")), ("codex:codex-cli-runtime", "(other)", "(other)"))
+        self.assertEqual(S.shell_script(["bash", "-lc", "rtk ls"]), "rtk ls")
+        self.assertEqual(S.shell_script(["ls", "-la"]), "ls -la")
+        self.assertEqual(S.shell_script(None), "")
+
+    def test_token_stats_nearest_rank(self):
+        self.assertEqual(S.token_stats([100, None, 90, 80, 70, 60, 50, 40, 30, 20, 10]),
+                         {"n": 10, "min": 10, "p10": 10, "median": 50, "p90": 90, "max": 100})
+        self.assertEqual(S.token_stats([])["n"], 0)
+
+    def run_main(self, extra):
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = S.main(["--manifest", str(FIXTURES / "manifest.json"), "--now", NOW, *extra])
+        return code, stdout.getvalue(), stderr.getvalue()
+
+    def test_cli_lanes_json_and_text(self):
+        window = ["--since", LANES_SINCE, "--until", LANES_UNTIL]
+        code, out, _ = self.run_main(["--lanes", "--codex-root", str(self.root), *window, "--json"])
+        self.assertEqual(code, 0)
+        report = json.loads(out)
+        self.assertEqual(report["kind"], "codex_lane_usage_report")
+        self.assertEqual(report["window"]["since"], "2026-10-20T00:00:00+00:00")
+        self.assertEqual(report["groups"]["workers"]["sessions"], 3)
+        code, out, _ = self.run_main(["--lanes", "--codex-root", str(self.root), *window])
+        self.assertEqual(code, 0)
+        self.assertIn("user_config: applied=3 ignored=1 unknown=1", out)
+
+    def test_cli_lanes_refusals(self):
+        root = ["--codex-root", str(self.root)]
+        for args in (["--lanes"],
+                     ["--lanes", *root, "--claude-skill-doctor", str(FIXTURES / "skill-doctor-sample.json")],
+                     ["--lanes", *root, "--since", LANES_UNTIL, "--until", LANES_SINCE],
+                     ["--lanes", *root, "--since", "yesterday"],
+                     ["--lanes", *root, "--marker", " "],
+                     [*root, "--since", LANES_SINCE]):
+            with self.subTest(args=args):
+                self.assertEqual(self.run_main(args)[0], 2)
+
+    def test_cli_lanes_out_inside_the_repository_is_refused(self):
+        refused = ROOT / "tools" / "skill-usage" / "_lanes_should_never_be_written.json"
+        try:
+            code, _, _ = self.run_main(["--lanes", "--codex-root", str(self.root), "--out", str(refused)])
+            self.assertEqual(code, 2)
+            self.assertFalse(refused.exists())
+        finally:
+            if refused.exists():
+                refused.unlink()
 
 
 if __name__ == "__main__":

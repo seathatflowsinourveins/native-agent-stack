@@ -1,0 +1,2 @@
+{"timestamp": "2026-10-20T04:00:00Z", "type": "session_meta", "payload": {"id": "lanes-nocatalog", "timestamp": "2026-10-20T04:00:00Z", "cwd": "REDACTED", "originator": "/private/host/reviewer-run-123", "cli_version": "0.157.1", "source": "exec"}}
+{"timestamp": "2026-10-20T04:01:00Z", "type": "event_msg", "payload": {"type": "item_completed", "item": {"type": "CommandExecution", "id": "item_1", "command": ["bash", "-lc", "rtk ls"], "source": "unified_exec_startup", "status": "completed", "exit_code": 0}}}
