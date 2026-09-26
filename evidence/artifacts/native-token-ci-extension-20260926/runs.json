@@ -1,0 +1,2117 @@
+{
+  "schema_version": 1,
+  "kind": "native_cli_e2e",
+  "evidence_class": "local_integration",
+  "host": "nativestack-5975wx-20260925",
+  "base_revision": "9c1669c7ee474fd995988166e8e0a006fe85c44d",
+  "harness": {
+    "path": "scripts/native_token_ci.py",
+    "sha256": "142120505edbb52646b84782a560d5daf773e28a7ef908eff13193a93cd94fe5",
+    "tests": "tests/test_native_token_ci.py",
+    "tests_sha256": "67a69f2ed3f24d37747e662be6c5c6c4d9562aef2d6177a9f17cf77f07736b9e",
+    "controls_driver": "controls_driver.py",
+    "controls_driver_sha256": "c8fb1284ea5ff14b7a4fd614641322b28bd43fa63d4c9a97f1960e2916177d64"
+  },
+  "evidence_boundary": "Local integration evidence of upstream native operations: every fixture runs the pinned tool's own CLI or MCP commands and this repository's checks assert on what they return. The one upstream test in the harness is rtk verify --require-all, the inline tests of RTK's built-in TOML filters shipped in its release binary (154 of 154 passed in each run below). No other pinned tool documents an offline self-test command (upstream_self_test_survey). Upstream test-suite qualification of a component belongs in its per-host receipts, evidence/hosts/<host>/<host>--<component>--<stage>--<date>.json, recorded with scripts/host_receipts.py and summarized in docs/component-evidence-matrix.md; the receipts recorded so far for these eleven tools run install and use commands, not upstream suites.",
+  "final_runs": {
+    "note": "Two consecutive --install runs of the final harness, after the GPT-6 repair round. This round could write only inside the checkout and one session scratch directory, whose path is long, so TMPDIR was a new directory inside it. codebase-memory-mcp's rendezvous socket would then not fit a Unix socket address (with a 4-digit uid, TMPDIR may be at most 36 bytes), and the harness's own require_cbm_socket_fits refused that fixture, as designed, after installation and the --version check but before any other codebase-memory-mcp command. Every other check passed. The codebase-memory-mcp fixture therefore last ran in the pre_polish_runs below; see codebase_memory_fixture_unchanged.",
+    "harness_sha256": "142120505edbb52646b84782a560d5daf773e28a7ef908eff13193a93cd94fe5",
+    "wrapper": {
+      "path": "clean_env_run.sh",
+      "sha256": "78bffc9742e41ab8e3ec1da19ca3d77260e5fddda5bca56d83e5b3294e2bd660"
+    },
+    "invocation": "env -i PATH=<node 24.21.0 bin>:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin HOME=<new empty 0700 directory> TMPDIR=<new empty 0700 directory> LANG=C.UTF-8 MCP_AUTO_OPEN_ENABLED=false PYTHONDONTWRITEBYTECODE=1 python3.13 scripts/native_token_ci.py --install --output <new directory>",
+    "clean_path_refusal": "The wrapper refuses to start if rtk, qmd, repomix, toon, markitdown, ast-grep, ccusage, codebase-memory-mcp, headroom, jcodemunch-mcp, mcporter, uv or uvx resolves on that PATH, as on a fresh hosted runner.",
+    "runs": [
+      {
+        "receipt": "final-harness-run-1.receipt.json",
+        "receipt_sha256": "d0af00d5cac1c2e369614214e1bb39d88f7091ccf2162dabf6b4a29e3e31fc80",
+        "wrapper_started_utc": "2026-09-26T11:05:35Z",
+        "wrapper_finished_utc": "2026-09-26T11:06:55Z",
+        "exit": "rc=1",
+        "stdout_summary": {
+          "status": "failed",
+          "commands": 83,
+          "checks": 30,
+          "failures": [
+            {
+              "component": "codebase-memory-mcp",
+              "error": "codebase-memory-mcp rendezvous socket path exceeds the Unix socket address limit; set TMPDIR to a shorter directory"
+            }
+          ],
+          "cleanup": {
+            "owned_temporary_directory_absent": true,
+            "retained_output_exists": true
+          }
+        },
+        "stderr_bytes": 0,
+        "tmpdir_bytes": 126,
+        "captured_at": "2026-09-26T11:05:35.164002+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "failed",
+        "commands": 83,
+        "checks": 30,
+        "checks_passed": 30,
+        "failures": [
+          {
+            "component": "codebase-memory-mcp",
+            "error": "codebase-memory-mcp rendezvous socket path exceeds the Unix socket address limit; set TMPDIR to a shorter directory"
+          }
+        ],
+        "harness_sha256": "142120505edbb52646b84782a560d5daf773e28a7ef908eff13193a93cd94fe5",
+        "versions": {
+          "rtk": "rtk 0.50.0",
+          "qmd": "qmd 2.8.3 (facd35e)",
+          "repomix": "1.18.1",
+          "toon": "4.1.1",
+          "markitdown": "markitdown 0.1.8",
+          "ast-grep": "ast-grep 0.45.3",
+          "ccusage": "ccusage 20.0.24",
+          "codebase-memory-mcp": "codebase-memory-mcp 0.11.0",
+          "headroom": "headroom, version 0.37.0",
+          "mcporter": "0.14.1",
+          "jcodemunch-mcp": "jcodemunch-mcp 1.108.319"
+        },
+        "mcporter_stdio_servers": {
+          "headroom-compress-json-records": "<TOOL:headroom> mcp serve --proxy-url http://127.0.0.1:1",
+          "jcodemunch-index-folder": "<TOOL:jcodemunch-mcp>"
+        },
+        "checks_added_or_changed_in_the_repair_round": {
+          "rtk-upstream-inline-filter-tests-pass": {
+            "passed": true,
+            "argv": [
+              "<TOOL:rtk>",
+              "verify",
+              "--require-all"
+            ],
+            "exit": 0,
+            "stdout_lines": [
+              "SKIP  RTK hook not installed",
+              "      Run `rtk init -g` to install.",
+              "PASS  data directory is owner-only",
+              "154/154 tests passed"
+            ],
+            "stderr_bytes": 0
+          },
+          "headroom-compress-json-records-saves-tokens": {
+            "passed": true,
+            "records_input": {
+              "path": "fixtures/headroom-records.json",
+              "bytes": 2969
+            },
+            "compress": {
+              "original_tokens": 826,
+              "compressed_tokens": 511,
+              "tokens_saved": 315,
+              "savings_percent": 38.1,
+              "transforms": [
+                "router:smart_crusher:0.42"
+              ]
+            },
+            "compressed_text_differs_from_input": true,
+            "compressed_text_bytes": 1565,
+            "retrieved_original_equals_input": true,
+            "short_note": {
+              "original_tokens": 49,
+              "compressed_tokens": 49,
+              "tokens_saved": 0,
+              "transforms": [
+                "router:noop"
+              ]
+            },
+            "short_note_returned_unchanged": true
+          },
+          "headroom-retrieve-exact-original-records": {
+            "passed": true
+          },
+          "headroom-short-note-stored-unchanged": {
+            "passed": true
+          },
+          "jcodemunch-get-symbol-source-exact-content": {
+            "passed": true,
+            "response": {
+              "id": "fixtures/after.py::greeting#function",
+              "kind": "function",
+              "name": "greeting",
+              "file": "fixtures/after.py",
+              "line": 1,
+              "end_line": 2,
+              "source": "def greeting(name):\n    return \"Hello, \" + name + \"!\""
+            }
+          }
+        },
+        "checks_changed_in_the_polish_pass": {
+          "ast-grep-matches-only-the-real-calls-in-fixture": {
+            "passed": true,
+            "ast_grep_call_lines": [
+              9,
+              13
+            ],
+            "grep_text_lines": [
+              9,
+              16,
+              17
+            ]
+          },
+          "jcodemunch-index-inside-run": {
+            "passed": true,
+            "repo": "local/wt-ws2b-f056036f",
+            "index_file_listed_under_code_index_path": true,
+            "server_home_entries": [
+              ".code-index/"
+            ]
+          }
+        },
+        "jcodemunch_negative_control_shape": "parsed JSON object",
+        "state_observations": {
+          "headroom-workspace": [
+            "ccr_store.db",
+            "savings_events.jsonl",
+            "session_stats.jsonl"
+          ],
+          "headroom-tiktoken-cache": [
+            "fb374d419588a4632f3f557e76b4b70aebbca790"
+          ],
+          "jcodemunch-mcp-index": [
+            "_processes/",
+            "_session_live.json",
+            "_transcript_roots.json",
+            "config.jsonc",
+            "last_seen_version",
+            "local-wt-ws2b-f056036f.db",
+            "local-wt-ws2b-f056036f/",
+            "local-wt-ws2b-f056036f/fixtures/",
+            "local-wt-ws2b-f056036f/fixtures/after.py",
+            "local-wt-ws2b-f056036f/fixtures/ast_grep_calls.py",
+            "local-wt-ws2b-f056036f/fixtures/before.py",
+            "local-wt-ws2b-f056036f/fixtures/example.sh",
+            "surface_offer_state.json"
+          ],
+          "jcodemunch-mcp-server-home": [
+            ".code-index/"
+          ],
+          "mcporter-daemon-dir": []
+        },
+        "independent_observations": {
+          "throwaway_home_entries_after_run": [],
+          "tmpdir_entries_after_run": [],
+          "processes_left_from_run_directory": [],
+          "checkout_git_status_unchanged": true,
+          "account_default_cbm_rendezvous_entry_names_unchanged": true
+        }
+      },
+      {
+        "receipt": "final-harness-run-2.receipt.json",
+        "receipt_sha256": "357e2eb1764628b3b2e9a747c6a39cfe6a78b340ca788f41ba1e54d18b595ff6",
+        "wrapper_started_utc": "2026-09-26T11:06:55Z",
+        "wrapper_finished_utc": "2026-09-26T11:08:14Z",
+        "exit": "rc=1",
+        "stdout_summary": {
+          "status": "failed",
+          "commands": 83,
+          "checks": 30,
+          "failures": [
+            {
+              "component": "codebase-memory-mcp",
+              "error": "codebase-memory-mcp rendezvous socket path exceeds the Unix socket address limit; set TMPDIR to a shorter directory"
+            }
+          ],
+          "cleanup": {
+            "owned_temporary_directory_absent": true,
+            "retained_output_exists": true
+          }
+        },
+        "stderr_bytes": 0,
+        "tmpdir_bytes": 126,
+        "captured_at": "2026-09-26T11:06:55.526730+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "failed",
+        "commands": 83,
+        "checks": 30,
+        "checks_passed": 30,
+        "failures": [
+          {
+            "component": "codebase-memory-mcp",
+            "error": "codebase-memory-mcp rendezvous socket path exceeds the Unix socket address limit; set TMPDIR to a shorter directory"
+          }
+        ],
+        "harness_sha256": "142120505edbb52646b84782a560d5daf773e28a7ef908eff13193a93cd94fe5",
+        "versions": {
+          "rtk": "rtk 0.50.0",
+          "qmd": "qmd 2.8.3 (facd35e)",
+          "repomix": "1.18.1",
+          "toon": "4.1.1",
+          "markitdown": "markitdown 0.1.8",
+          "ast-grep": "ast-grep 0.45.3",
+          "ccusage": "ccusage 20.0.24",
+          "codebase-memory-mcp": "codebase-memory-mcp 0.11.0",
+          "headroom": "headroom, version 0.37.0",
+          "mcporter": "0.14.1",
+          "jcodemunch-mcp": "jcodemunch-mcp 1.108.319"
+        },
+        "mcporter_stdio_servers": {
+          "headroom-compress-json-records": "<TOOL:headroom> mcp serve --proxy-url http://127.0.0.1:1",
+          "jcodemunch-index-folder": "<TOOL:jcodemunch-mcp>"
+        },
+        "checks_added_or_changed_in_the_repair_round": {
+          "rtk-upstream-inline-filter-tests-pass": {
+            "passed": true,
+            "argv": [
+              "<TOOL:rtk>",
+              "verify",
+              "--require-all"
+            ],
+            "exit": 0,
+            "stdout_lines": [
+              "SKIP  RTK hook not installed",
+              "      Run `rtk init -g` to install.",
+              "PASS  data directory is owner-only",
+              "154/154 tests passed"
+            ],
+            "stderr_bytes": 0
+          },
+          "headroom-compress-json-records-saves-tokens": {
+            "passed": true,
+            "records_input": {
+              "path": "fixtures/headroom-records.json",
+              "bytes": 2969
+            },
+            "compress": {
+              "original_tokens": 826,
+              "compressed_tokens": 511,
+              "tokens_saved": 315,
+              "savings_percent": 38.1,
+              "transforms": [
+                "router:smart_crusher:0.42"
+              ]
+            },
+            "compressed_text_differs_from_input": true,
+            "compressed_text_bytes": 1565,
+            "retrieved_original_equals_input": true,
+            "short_note": {
+              "original_tokens": 49,
+              "compressed_tokens": 49,
+              "tokens_saved": 0,
+              "transforms": [
+                "router:noop"
+              ]
+            },
+            "short_note_returned_unchanged": true
+          },
+          "headroom-retrieve-exact-original-records": {
+            "passed": true
+          },
+          "headroom-short-note-stored-unchanged": {
+            "passed": true
+          },
+          "jcodemunch-get-symbol-source-exact-content": {
+            "passed": true,
+            "response": {
+              "id": "fixtures/after.py::greeting#function",
+              "kind": "function",
+              "name": "greeting",
+              "file": "fixtures/after.py",
+              "line": 1,
+              "end_line": 2,
+              "source": "def greeting(name):\n    return \"Hello, \" + name + \"!\""
+            }
+          }
+        },
+        "checks_changed_in_the_polish_pass": {
+          "ast-grep-matches-only-the-real-calls-in-fixture": {
+            "passed": true,
+            "ast_grep_call_lines": [
+              9,
+              13
+            ],
+            "grep_text_lines": [
+              9,
+              16,
+              17
+            ]
+          },
+          "jcodemunch-index-inside-run": {
+            "passed": true,
+            "repo": "local/wt-ws2b-f056036f",
+            "index_file_listed_under_code_index_path": true,
+            "server_home_entries": [
+              ".code-index/"
+            ]
+          }
+        },
+        "jcodemunch_negative_control_shape": "parsed JSON object",
+        "state_observations": {
+          "headroom-workspace": [
+            "ccr_store.db",
+            "savings_events.jsonl",
+            "session_stats.jsonl"
+          ],
+          "headroom-tiktoken-cache": [
+            "fb374d419588a4632f3f557e76b4b70aebbca790"
+          ],
+          "jcodemunch-mcp-index": [
+            "_processes/",
+            "_session_live.json",
+            "_transcript_roots.json",
+            "config.jsonc",
+            "last_seen_version",
+            "local-wt-ws2b-f056036f.db",
+            "local-wt-ws2b-f056036f/",
+            "local-wt-ws2b-f056036f/fixtures/",
+            "local-wt-ws2b-f056036f/fixtures/after.py",
+            "local-wt-ws2b-f056036f/fixtures/ast_grep_calls.py",
+            "local-wt-ws2b-f056036f/fixtures/before.py",
+            "local-wt-ws2b-f056036f/fixtures/example.sh",
+            "surface_offer_state.json"
+          ],
+          "jcodemunch-mcp-server-home": [
+            ".code-index/"
+          ],
+          "mcporter-daemon-dir": []
+        },
+        "independent_observations": {
+          "throwaway_home_entries_after_run": [],
+          "tmpdir_entries_after_run": [],
+          "processes_left_from_run_directory": [],
+          "checkout_git_status_unchanged": true,
+          "account_default_cbm_rendezvous_entry_names_unchanged": true
+        }
+      }
+    ],
+    "third_run_same_harness": {
+      "note": "A first --install run of the same final harness, started the same way minutes earlier; not committed.",
+      "private_receipt_sha256": "c4eb74889005ba3cf4eb43f979250274b83aff12132fa74440f8703fdbf63ab9",
+      "captured_at": "2026-09-26T11:03:14.787841+00:00",
+      "installation": "fresh-upstream-prefix",
+      "status": "failed",
+      "commands": 83,
+      "checks": 30,
+      "checks_passed": 30,
+      "failures": [
+        {
+          "component": "codebase-memory-mcp",
+          "error": "codebase-memory-mcp rendezvous socket path exceeds the Unix socket address limit; set TMPDIR to a shorter directory"
+        }
+      ],
+      "harness_sha256": "142120505edbb52646b84782a560d5daf773e28a7ef908eff13193a93cd94fe5",
+      "wrapper_started_utc": "2026-09-26T11:03:14Z",
+      "wrapper_finished_utc": "2026-09-26T11:04:35Z",
+      "exit": "rc=1",
+      "tmpdir_bytes": 126,
+      "independent_observations": {
+        "throwaway_home_entries_after_run": [],
+        "tmpdir_entries_after_run": [],
+        "processes_left_from_run_directory": [],
+        "checkout_git_status_unchanged": true,
+        "account_default_cbm_rendezvous_entry_names_unchanged": true
+      }
+    }
+  },
+  "codebase_memory_fixture_unchanged": {
+    "method": "sha256 of each definition's exact source text (ast.get_source_segment): the fixture, its helpers and constants, and every method of Run; tests/test_native_token_ci.py recomputes the pre-polish digests from the retained source",
+    "pre_polish_harness": {
+      "path": "pre-polish-native_token_ci.py",
+      "sha256": "3cec918f28724ba09d57c2dbcee227182b1566ef13ff5397e84a612084d889c8",
+      "note": "Byte-identical copy of the harness the pre_polish_runs ran; their receipts record this hash for scripts/native_token_ci.py."
+    },
+    "final_harness_sha256": "142120505edbb52646b84782a560d5daf773e28a7ef908eff13193a93cd94fe5",
+    "digests": [
+      {
+        "definition": "CBM_SOCKET_NAME",
+        "pre_polish_sha256": "702f30c3c30fb79b4c198cc843ef82191ff4bc24d857fb0e6faa20025e5975b8",
+        "final_sha256": "702f30c3c30fb79b4c198cc843ef82191ff4bc24d857fb0e6faa20025e5975b8"
+      },
+      {
+        "definition": "GITHUB_RELEASES",
+        "pre_polish_sha256": "9e5e4aa967e9229fd364c7174368701add0c6725dae2cfdc2bc49a83c45b58b0",
+        "final_sha256": "9e5e4aa967e9229fd364c7174368701add0c6725dae2cfdc2bc49a83c45b58b0"
+      },
+      {
+        "definition": "Run.__init__",
+        "pre_polish_sha256": "d0a84d2568f7f7970e2ad1c301f4c8733b8685b1d14787556a9940e2440213f2",
+        "final_sha256": "5db96045b6269689bf0311340375b1d07d1bc4e595bcf5ac42dd94ad451f3e88"
+      },
+      {
+        "definition": "Run.artifact",
+        "pre_polish_sha256": "2654ce9458f0bc5c39f975b56090940d2258aec2806b6b57aa934671eaabd052",
+        "final_sha256": "2654ce9458f0bc5c39f975b56090940d2258aec2806b6b57aa934671eaabd052"
+      },
+      {
+        "definition": "Run.check",
+        "pre_polish_sha256": "9a140a7da1840eed15148c02ed20e9a2e3bcb66c5c8d678779ce1327b738efce",
+        "final_sha256": "9a140a7da1840eed15148c02ed20e9a2e3bcb66c5c8d678779ce1327b738efce"
+      },
+      {
+        "definition": "Run.clean",
+        "pre_polish_sha256": "364ed79bee682b56ac9685560095662b2047a3b56b00676b13fda58db2f57c0c",
+        "final_sha256": "364ed79bee682b56ac9685560095662b2047a3b56b00676b13fda58db2f57c0c"
+      },
+      {
+        "definition": "Run.command",
+        "pre_polish_sha256": "da0901e60bde0579c625d74089adf1e3d33e257b2175f5a58585762a76b40cc6",
+        "final_sha256": "da0901e60bde0579c625d74089adf1e3d33e257b2175f5a58585762a76b40cc6"
+      },
+      {
+        "definition": "Run.ensure_uv",
+        "pre_polish_sha256": "9c998b280b63e90d1b6b4fb6468c9d5b1970e4d975d25208b581743c55d21309",
+        "final_sha256": "9c998b280b63e90d1b6b4fb6468c9d5b1970e4d975d25208b581743c55d21309"
+      },
+      {
+        "definition": "Run.flush",
+        "pre_polish_sha256": "e971fae147860b9da26b30ef09b707bae1c55af258416e34af8e220c9b868f49",
+        "final_sha256": "e971fae147860b9da26b30ef09b707bae1c55af258416e34af8e220c9b868f49"
+      },
+      {
+        "definition": "Run.install",
+        "pre_polish_sha256": "3a23018996117652a2b1721a3bf9a9606c6da37d83a4ead5ef1b0a23e4a405ff",
+        "final_sha256": "3a23018996117652a2b1721a3bf9a9606c6da37d83a4ead5ef1b0a23e4a405ff"
+      },
+      {
+        "definition": "Run.observe",
+        "pre_polish_sha256": "5ea13595fce709f44c28ac3175603a23ce8e65012658197bb50bc0a6df0c4b21",
+        "final_sha256": "5ea13595fce709f44c28ac3175603a23ce8e65012658197bb50bc0a6df0c4b21"
+      },
+      {
+        "definition": "UNIX_SOCKET_PATH_MAX",
+        "pre_polish_sha256": "04ea6ada2826245652060786cd16365d3347a91ebdf6ef5a272a5ce7547b4fdd",
+        "final_sha256": "04ea6ada2826245652060786cd16365d3347a91ebdf6ef5a272a5ce7547b4fdd"
+      },
+      {
+        "definition": "cbm_listed_total",
+        "pre_polish_sha256": "fe1c7641a830eb8ab5fe7ff551e85b6a5e19fe78790bc267a77a260fa7b47e7e",
+        "final_sha256": "fe1c7641a830eb8ab5fe7ff551e85b6a5e19fe78790bc267a77a260fa7b47e7e"
+      },
+      {
+        "definition": "codebase_memory_mcp_fixture",
+        "pre_polish_sha256": "1d1ef804c0bdf87f9020839575d7ef682a384746e61b0d1a9d7aa247dc98f5bb",
+        "final_sha256": "1d1ef804c0bdf87f9020839575d7ef682a384746e61b0d1a9d7aa247dc98f5bb"
+      },
+      {
+        "definition": "require_cbm_socket_fits",
+        "pre_polish_sha256": "2d636e0592583e2cd64a43934a81e7342566ab0d8e0a92fefd891162abd4b29a",
+        "final_sha256": "2d636e0592583e2cd64a43934a81e7342566ab0d8e0a92fefd891162abd4b29a"
+      }
+    ],
+    "identical": [
+      "CBM_SOCKET_NAME",
+      "GITHUB_RELEASES",
+      "Run.artifact",
+      "Run.check",
+      "Run.clean",
+      "Run.command",
+      "Run.ensure_uv",
+      "Run.flush",
+      "Run.install",
+      "Run.observe",
+      "UNIX_SOCKET_PATH_MAX",
+      "cbm_listed_total",
+      "codebase_memory_mcp_fixture",
+      "require_cbm_socket_fits"
+    ],
+    "changed": [
+      "Run.__init__"
+    ],
+    "note": "Run.__init__ changed only in its limits text, the mcporter_error attribute and the source_files list; none of these reaches a codebase-memory-mcp command or its environment."
+  },
+  "controls": {
+    "note": "Local-integration controls from controls_driver.py, run through clean_env_run.sh with the same environment as final_runs. Each control changes one setting or input and must fail exactly the check it targets; each as-harness arm must pass; the driver exits 1 otherwise. Every arm and the installation ran with a HOME inside its own work directory (driver_owned_home), and the caller's HOME, here the wrapper's throwaway HOME, stayed empty. The second controls run of this round; the first is in superseded_repair_round.",
+    "driver": {
+      "path": "controls_driver.py",
+      "sha256": "c8fb1284ea5ff14b7a4fd614641322b28bd43fa63d4c9a97f1960e2916177d64"
+    },
+    "harness_sha256": "142120505edbb52646b84782a560d5daf773e28a7ef908eff13193a93cd94fe5",
+    "receipt": "controls.json",
+    "receipt_sha256": "cc7097a3d638fd2577462237401cb90bb188275b710e6650f30c5b5c912da8aa",
+    "wrapper": {
+      "path": "clean_env_run.sh",
+      "sha256": "78bffc9742e41ab8e3ec1da19ca3d77260e5fddda5bca56d83e5b3294e2bd660"
+    },
+    "wrapper_started_utc": "2026-09-26T11:21:26Z",
+    "wrapper_finished_utc": "2026-09-26T11:22:58Z",
+    "exit": "rc=0",
+    "stderr_bytes": 0,
+    "tmpdir_bytes": 129,
+    "independent_observations": {
+      "throwaway_home_entries_after_run": [],
+      "tmpdir_entries_after_run": [],
+      "processes_left_from_run_directory": [],
+      "checkout_git_status_unchanged": true,
+      "account_default_cbm_rendezvous_entry_names_unchanged": true
+    },
+    "status": "as_expected",
+    "cleanup": {
+      "owned_temporary_directory_absent": true
+    },
+    "arms": [
+      {
+        "tool": "rtk",
+        "arm": "as-harness",
+        "change": null,
+        "status": "passed",
+        "failed_checks": [],
+        "failures": [],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "rtk_verify": {
+            "exit": 0,
+            "stdout_lines": [
+              "SKIP  RTK hook not installed",
+              "      Run `rtk init -g` to install.",
+              "PASS  data directory is owner-only",
+              "154/154 tests passed"
+            ],
+            "stderr_lines": [],
+            "RTK_TRUST_PROJECT_FILTERS": null
+          }
+        }
+      },
+      {
+        "tool": "rtk",
+        "arm": "control",
+        "change": "a project filter whose one inline test expects the wrong output, trusted with RTK_TRUST_PROJECT_FILTERS=1 under CI, added to the fixture repository just before rtk verify",
+        "status": "failed",
+        "failed_checks": [],
+        "failures": [
+          {
+            "component": "rtk",
+            "error": "rtk-verify-inline-filter-tests: unexpected exit 1"
+          }
+        ],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "rtk_verify": {
+            "exit": 1,
+            "stdout_lines": [
+              "SKIP  RTK hook not installed",
+              "      Run `rtk init -g` to install.",
+              "PASS  data directory is owner-only",
+              "154/155 tests passed"
+            ],
+            "stderr_lines": [
+              "FAIL [native-ci-control] expects the stripped noise line to survive",
+              "  expected: \"noise line\\nkept line\"",
+              "  actual:   \"kept line\"",
+              "rtk: 1 test(s) failed"
+            ],
+            "RTK_TRUST_PROJECT_FILTERS": "1"
+          }
+        }
+      },
+      {
+        "tool": "headroom",
+        "arm": "as-harness",
+        "change": null,
+        "status": "passed",
+        "failed_checks": [],
+        "failures": [],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "headroom-workspace": [
+            "ccr_store.db",
+            "savings_events.jsonl",
+            "session_stats.jsonl"
+          ],
+          "headroom-default-workspace-under-home": [],
+          "passthrough_loaded": false,
+          "compress": {
+            "original_tokens": 826,
+            "compressed_tokens": 511,
+            "tokens_saved": 315,
+            "transforms": [
+              "router:smart_crusher:0.42"
+            ]
+          },
+          "compressed_text_equals_input": false,
+          "server": "<TOOL:headroom> mcp serve --proxy-url http://127.0.0.1:1",
+          "server_env_flags": [
+            "HEADROOM_WORKSPACE_DIR=<WORK>/data/headroom",
+            "HEADROOM_CONFIG_DIR=<WORK>/config/headroom"
+          ]
+        }
+      },
+      {
+        "tool": "headroom",
+        "arm": "control",
+        "change": "HEADROOM_WORKSPACE_DIR removed from the MCP server's environment",
+        "status": "failed",
+        "failed_checks": [
+          "headroom-compression-store-inside-run"
+        ],
+        "failures": [
+          {
+            "component": "headroom",
+            "error": "headroom-compression-store-inside-run"
+          }
+        ],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [
+            ".headroom/",
+            ".headroom/ccr_store.db",
+            ".headroom/savings_events.jsonl",
+            ".headroom/session_stats.jsonl"
+          ],
+          "headroom-workspace": [],
+          "headroom-default-workspace-under-home": [
+            "ccr_store.db",
+            "savings_events.jsonl",
+            "session_stats.jsonl"
+          ],
+          "passthrough_loaded": false,
+          "compress": {
+            "original_tokens": 826,
+            "compressed_tokens": 511,
+            "tokens_saved": 315,
+            "transforms": [
+              "router:smart_crusher:0.42"
+            ]
+          },
+          "compressed_text_equals_input": false,
+          "server": "<TOOL:headroom> mcp serve --proxy-url http://127.0.0.1:1",
+          "server_env_flags": [
+            "HEADROOM_CONFIG_DIR=<WORK>/config/headroom"
+          ]
+        }
+      },
+      {
+        "tool": "headroom",
+        "arm": "control",
+        "change": "compression disabled: Headroom's compress() made its documented optimize=False passthrough in the MCP server process",
+        "status": "failed",
+        "failed_checks": [
+          "headroom-compress-json-records-saves-tokens"
+        ],
+        "failures": [
+          {
+            "component": "headroom",
+            "error": "headroom-compress-json-records-saves-tokens"
+          }
+        ],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "headroom-workspace": null,
+          "headroom-default-workspace-under-home": [],
+          "passthrough_loaded": true,
+          "compress": {
+            "original_tokens": 0,
+            "compressed_tokens": 0,
+            "tokens_saved": 0,
+            "transforms": []
+          },
+          "compressed_text_equals_input": true,
+          "server": "<TOOL:headroom> mcp serve --proxy-url http://127.0.0.1:1",
+          "server_env_flags": [
+            "HEADROOM_WORKSPACE_DIR=<WORK>/data/headroom",
+            "HEADROOM_CONFIG_DIR=<WORK>/config/headroom",
+            "PYTHONPATH=<WORK>/headroom-passthrough-site",
+            "NATIVE_CI_PASSTHROUGH_MARKER=<WORK>/passthrough-loaded"
+          ]
+        }
+      },
+      {
+        "tool": "jcodemunch-mcp",
+        "arm": "as-harness",
+        "change": null,
+        "status": "passed",
+        "failed_checks": [],
+        "failures": [],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "jcodemunch-mcp-index": [
+            "_processes/",
+            "_session_live.json",
+            "_transcript_roots.json",
+            "config.jsonc",
+            "last_seen_version",
+            "local-wt-ws2b-f056036f.db",
+            "local-wt-ws2b-f056036f/",
+            "local-wt-ws2b-f056036f/fixtures/",
+            "local-wt-ws2b-f056036f/fixtures/after.py",
+            "local-wt-ws2b-f056036f/fixtures/ast_grep_calls.py",
+            "local-wt-ws2b-f056036f/fixtures/before.py",
+            "local-wt-ws2b-f056036f/fixtures/example.sh",
+            "surface_offer_state.json"
+          ],
+          "jcodemunch-mcp-server-home": [
+            ".code-index/"
+          ],
+          "pre_polish_index_check_would_pass": true
+        }
+      },
+      {
+        "tool": "jcodemunch-mcp",
+        "arm": "control",
+        "change": "CODE_INDEX_PATH removed from the MCP server's environment",
+        "status": "failed",
+        "failed_checks": [
+          "jcodemunch-index-inside-run"
+        ],
+        "failures": [
+          {
+            "component": "jcodemunch-mcp",
+            "error": "jcodemunch-index-inside-run"
+          }
+        ],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "jcodemunch-mcp-index": [
+            "config.jsonc"
+          ],
+          "jcodemunch-mcp-server-home": [
+            ".code-index/",
+            ".code-index/_processes/",
+            ".code-index/_session_live.json",
+            ".code-index/_transcript_roots.json",
+            ".code-index/config.jsonc",
+            ".code-index/last_seen_version",
+            ".code-index/local-wt-ws2b-f056036f.db",
+            ".code-index/local-wt-ws2b-f056036f/",
+            ".code-index/local-wt-ws2b-f056036f/fixtures/",
+            ".code-index/local-wt-ws2b-f056036f/fixtures/after.py",
+            ".code-index/local-wt-ws2b-f056036f/fixtures/ast_grep_calls.py",
+            ".code-index/local-wt-ws2b-f056036f/fixtures/before.py",
+            ".code-index/local-wt-ws2b-f056036f/fixtures/example.sh"
+          ],
+          "pre_polish_index_check_would_pass": true
+        }
+      },
+      {
+        "tool": "ccusage",
+        "arm": "as-harness",
+        "change": null,
+        "status": "passed",
+        "failed_checks": [],
+        "failures": [],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "exit": 0,
+          "totals": {
+            "inputTokens": 1900,
+            "outputTokens": 380,
+            "totalTokens": 2430,
+            "totalCost": 0.032799999999999996
+          }
+        }
+      },
+      {
+        "tool": "ccusage",
+        "arm": "control",
+        "change": "CLAUDE_CONFIG_DIR is an empty directory",
+        "status": "failed",
+        "failed_checks": [],
+        "failures": [
+          {
+            "component": "ccusage",
+            "error": "ccusage-claude-daily-synthetic-fixture: unexpected exit 1"
+          }
+        ],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "exit": 1,
+          "stderr": "Error: CliError(\"No valid Claude data directories found in CLAUDE_CONFIG_DIR. Expected each path to be a Claude config directory containing 'projects/', or the 'projects/' directory itself: <WORK>/empty-claude-config\")"
+        }
+      },
+      {
+        "tool": "ccusage",
+        "arm": "control",
+        "change": "first assistant record's output_tokens 300 -> 301 in a copy of the log",
+        "status": "failed",
+        "failed_checks": [
+          "ccusage-synthetic-fixture-token-totals"
+        ],
+        "failures": [
+          {
+            "component": "ccusage",
+            "error": "ccusage-synthetic-fixture-token-totals"
+          }
+        ],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "exit": 0,
+          "totals": {
+            "inputTokens": 1900,
+            "outputTokens": 381,
+            "totalTokens": 2431,
+            "totalCost": 0.032799999999999996
+          }
+        }
+      },
+      {
+        "tool": "ccusage",
+        "arm": "control",
+        "change": "first assistant record's costUSD 0.0271 -> 0.0371 in a copy of the log",
+        "status": "failed",
+        "failed_checks": [
+          "ccusage-synthetic-fixture-cost-total"
+        ],
+        "failures": [
+          {
+            "component": "ccusage",
+            "error": "ccusage-synthetic-fixture-cost-total"
+          }
+        ],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "exit": 0,
+          "totals": {
+            "inputTokens": 1900,
+            "outputTokens": 380,
+            "totalTokens": 2430,
+            "totalCost": 0.042800000000000005
+          }
+        }
+      },
+      {
+        "tool": "markitdown",
+        "arm": "as-harness",
+        "change": null,
+        "status": "passed",
+        "failed_checks": [],
+        "failures": [],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "commands": [
+            {
+              "label": "markitdown-html-fixture",
+              "input": "<CHECKOUT>/fixtures/greeting.html",
+              "exit": 0
+            },
+            {
+              "label": "markitdown-txt-passthrough",
+              "input": "<WORK>/markitdown-plain.txt",
+              "exit": 0
+            }
+          ],
+          "outputs": {
+            "greeting.md": "Local browser command check\n\n# Local browser command check\n\nNameGreet\n\nReady",
+            "markitdown-plain-converted.txt": "Native CI markitdown passthrough fixture line one.\nLine two stays unchanged.\n"
+          }
+        }
+      },
+      {
+        "tool": "markitdown",
+        "arm": "control",
+        "change": "the fixture's <h1> heading turned into a <p> paragraph in a copy",
+        "status": "failed",
+        "failed_checks": [
+          "markitdown-html-heading-present"
+        ],
+        "failures": [
+          {
+            "component": "markitdown",
+            "error": "markitdown-html-heading-present"
+          }
+        ],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "commands": [
+            {
+              "label": "markitdown-html-fixture",
+              "input": "<WORK>/greeting-heading-as-paragraph.html",
+              "exit": 0
+            }
+          ],
+          "outputs": {
+            "greeting.md": "Local browser command check\n\nLocal browser command check\n\nNameGreet\n\nReady"
+          }
+        }
+      },
+      {
+        "tool": "markitdown",
+        "arm": "control",
+        "change": "the plain-text input given to MarkItDown as a .csv file",
+        "status": "failed",
+        "failed_checks": [
+          "markitdown-txt-passthrough-unchanged"
+        ],
+        "failures": [
+          {
+            "component": "markitdown",
+            "error": "markitdown-txt-passthrough-unchanged"
+          }
+        ],
+        "as_expected": true,
+        "observed": {
+          "driver_owned_home": [],
+          "commands": [
+            {
+              "label": "markitdown-html-fixture",
+              "input": "<CHECKOUT>/fixtures/greeting.html",
+              "exit": 0
+            },
+            {
+              "label": "markitdown-txt-passthrough",
+              "input": "<WORK>/markitdown-plain.csv",
+              "exit": 0
+            }
+          ],
+          "outputs": {
+            "greeting.md": "Local browser command check\n\n# Local browser command check\n\nNameGreet\n\nReady",
+            "markitdown-plain-converted.txt": "| Native CI markitdown passthrough fixture line one. |\n| --- |\n| Line two stays unchanged. |"
+          }
+        }
+      }
+    ],
+    "without_a_recorded_failing_control": [
+      {
+        "checks": [
+          "codebase-memory-mcp-settings-and-rendezvous-inside-run",
+          "codebase-memory-mcp-lists-only-the-fixture-project"
+        ],
+        "reason": "codebase-memory-mcp could not run in this pass (see final_runs.note), and the draft's runs predate both checks. A control would point CBM_CACHE_DIR and CBM_RUNTIME_DIR at another run-owned directory, never at the account-wide defaults."
+      },
+      {
+        "checks": [
+          "codebase-memory-mcp-ui-disabled",
+          "codebase-memory-mcp-indexed-status",
+          "codebase-memory-mcp-search-found-both-fixture-files",
+          "codebase-memory-mcp-project-deleted",
+          "codebase-memory-mcp-no-leaked-projects",
+          "headroom-retrieve-exact-original-records",
+          "jcodemunch-indexed-fixtures-symbols",
+          "jcodemunch-get-symbol-source-exact-content"
+        ],
+        "reason": "Exact-content or status checks with no separate failing run of the real tools; the fixtures' own negative controls (a bogus hash, the unchanged short note, a nonexistent symbol or call) run beside them. tests/test_native_token_ci.py fails the Headroom retrieval and jCodeMunch source checks on stand-in responses (unit_test_controls)."
+      },
+      {
+        "checks": [
+          "rtk-upstream-inline-filter-tests-pass"
+        ],
+        "reason": "Its real control (a failing trusted inline filter test) fails the harness at rtk verify's exit 1, before the check parses the count; the unit tests fail the check itself on failed, empty and zero-count outputs."
+      }
+    ]
+  },
+  "unit_test_controls": {
+    "tests_sha256": "67a69f2ed3f24d37747e662be6c5c6c4d9562aef2d6177a9f17cf77f07736b9e",
+    "method": "The final tests/test_native_token_ci.py run in a copy of the checkout holding every file of this change as the polish pass left it (harness, controls driver, runs.json and the rest of this directory), except the final tests and the new fixture fixtures/headroom-records.json; then in the checkout itself.",
+    "against_pre_repair_files": {
+      "harness_sha256": "02afd5b2befc5dfdd12870fbd457e24ed755dbc2d765706fbd49885d9697fe11",
+      "controls_driver_sha256": "4b1b273704cedf1a80caa65afac57d13fa94fd1e4cd337ec3328a4fc564ff789",
+      "ran": 26,
+      "result": "FAILED (failures=23, errors=2)",
+      "failing_tests": [
+        "test_codebase_memory_comparison_is_reproducible_from_the_retained_pre_polish_source",
+        "test_controls_driver_never_gives_a_tool_the_callers_home",
+        "test_headroom_fixture_requires_a_real_saving_and_exact_recovery",
+        "test_jcodemunch_source_check_rejects_empty_partial_or_other_symbols",
+        "test_rtk_fixture_runs_the_upstream_inline_filter_tests"
+      ]
+    },
+    "against_final_files": {
+      "harness_sha256": "142120505edbb52646b84782a560d5daf773e28a7ef908eff13193a93cd94fe5",
+      "controls_driver_sha256": "c8fb1284ea5ff14b7a4fd614641322b28bd43fa63d4c9a97f1960e2916177d64",
+      "ran": 26,
+      "result": "OK",
+      "failing_tests": []
+    },
+    "reproduced_review_finding": "Against the pre-repair harness, the jCodeMunch check accepted an empty source reported at line=end_line=999 and the body line alone at line=end_line=2 (the stand-in responses of test_jcodemunch_source_check_rejects_empty_partial_or_other_symbols)."
+  },
+  "unit_test_controls_polish_pass": {
+    "note": "The polish pass's record, unchanged: its tests (sha256 below) against its own harness revisions.",
+    "tests_sha256": "b5d17742b3bcd8cd4378a2c14f14f2ecf3482a5c1cd9970ebfd9610bab68cb70",
+    "method": "The final tests/test_native_token_ci.py run in a copy of the checkout whose harness is replaced by the pre-polish revision, then in the checkout itself.",
+    "against_pre_polish_harness": {
+      "harness_sha256": "3cec918f28724ba09d57c2dbcee227182b1566ef13ff5397e84a612084d889c8",
+      "ran": 21,
+      "result": "FAILED (failures=2, errors=5)",
+      "failing_tests": [
+        "test_ast_grep_outcome_is_frozen_and_structural",
+        "test_jcodemunch_index_check_needs_the_index_file_jcodemunch_writes",
+        "test_later_fixture_reports_the_first_mcporter_failure",
+        "test_limits_name_every_unlocked_installer",
+        "test_receipt_lists_source_hashes_as_path_and_digest_objects"
+      ]
+    },
+    "against_final_harness": {
+      "harness_sha256": "02afd5b2befc5dfdd12870fbd457e24ed755dbc2d765706fbd49885d9697fe11",
+      "ran": 21,
+      "result": "OK",
+      "failing_tests": []
+    },
+    "against_unreshaped_pre_polish_receipts": {
+      "harness_sha256": "02afd5b2befc5dfdd12870fbd457e24ed755dbc2d765706fbd49885d9697fe11",
+      "receipts": "local-install-run-1/2.receipt.json replaced by their private originals (keyed source hashes)",
+      "ran": 21,
+      "result": "FAILED (failures=3)",
+      "failing_tests": [
+        "test_committed_receipts_differ_from_their_originals_only_in_source_hash_shape",
+        "test_no_committed_evidence_json_keys_a_digest_by_path"
+      ]
+    },
+    "gitleaks": {
+      "tool": "gitleaks 8.30.1, gitleaks dir <file> --config .gitleaks.toml --max-target-megabytes 2 --redact",
+      "private_original_receipts": [
+        {
+          "private_original_sha256": "ad937a9a6f790d05cec3c6da73335eb43d59c03380feb4f6993630824497a87b",
+          "findings": [
+            [
+              "generic-api-key",
+              2173
+            ],
+            [
+              "generic-api-key",
+              2174
+            ]
+          ]
+        },
+        {
+          "private_original_sha256": "10a194ce374af829ede3b6855d3e982c4cc9b49faca7ade7332746ffcbe765bd",
+          "findings": [
+            [
+              "generic-api-key",
+              2173
+            ],
+            [
+              "generic-api-key",
+              2174
+            ]
+          ]
+        }
+      ],
+      "committed_files_findings": 0
+    }
+  },
+  "upstream_source_checks": [
+    {
+      "claim": "jcodemunch-mcp keeps a repository's index at {CODE_INDEX_PATH}/{owner}-{name}.db, each part sanitized by _safe_repo_component; the harness's jcodemunch_index_file reproduces the name",
+      "source": "jcodemunch_mcp/storage/sqlite_store.py (_db_path, _repo_slug, _safe_repo_component, _default_base_path)",
+      "artifact": "jcodemunch_mcp-1.108.319-py3-none-any.whl, sha256 ca0f8e984eea119e6997008574a538506a7cc526d4b30dc51b80f503f29c67a4 (matches PyPI's published digest)"
+    },
+    {
+      "claim": "jcodemunch-mcp sends compact MUNCH text only when it is at least 15% smaller than the JSON (default server_output adaptive = auto, DEFAULT_THRESHOLD 0.15); otherwise JSON text",
+      "source": "jcodemunch_mcp/encoding/__init__.py (encode_response, default_format), jcodemunch_mcp/encoding/gate.py, jcodemunch_mcp/server.py",
+      "artifact": "the same wheel",
+      "measurement": {
+        "method": "encode_response('search_symbols', response) from the wheel, run offline with HOME and CODE_INDEX_PATH set to new empty directories",
+        "results": [
+          {
+            "response": "the zero-result search_symbols response every local run received (_meta.absence_evidence citable false)",
+            "encoding": "json",
+            "json_bytes": 227,
+            "munch_bytes": 350
+          },
+          {
+            "response": "{\"result_count\": 0, \"results\": []}",
+            "encoding": "json",
+            "json_bytes": 31,
+            "munch_bytes": 145
+          }
+        ]
+      }
+    },
+    {
+      "claim": "MCPorter 0.14.1 --output json prints JSON text content as the parsed object, and falls back to the raw result (with its content list) when no content parses as JSON",
+      "source": "dist/cli/output-utils.js (resolveRenderableOutput, printRaw), dist/result-utils.js (json())",
+      "artifact": "mcporter-0.14.1.tgz, sha1 8dbc86c05013e4dfbfdc155555202a36a3936015 and the registry's sha512 integrity"
+    },
+    {
+      "claim": "The installed copies read in earlier passes are byte-identical to these artifacts for every file above",
+      "method": "cmp of each file"
+    },
+    {
+      "claim": "Headroom's headroom_compress runs compress() on the content as one tool message; compress() leaves content under CompressConfig.min_tokens_to_compress (default 250) unchanged, and its optimize flag is documented as 'Whether to actually compress (False = passthrough for A/B testing)'. SmartCrusher is the JSON compressor ('universal JSON: arrays of dicts').",
+      "source": "headroom/ccr/mcp_server.py (_compress_content), headroom/compress.py (compress, CompressConfig), README.md",
+      "artifact": "headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl, sha256 2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46, and headroom_ai-0.37.0.tar.gz, sha256 7ffdecba91ce44dd02f1601499f6c935c47374b7cb6ec61e569b816a4bb78a26 (both match PyPI's published digests)"
+    },
+    {
+      "claim": "With HEADROOM_OFFLINE=1 and DO_NOT_TRACK=1 the MCP compression beacon is disabled; Headroom counts claude-* tokens with tiktoken's o200k_base vocabulary, which tiktoken downloads on first use into TMPDIR/data-gym-cache under the sha1 of its URL (fb374d41...) and checks against its pinned sha256 446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d",
+      "source": "headroom/offline.py, headroom/telemetry/beacon.py, headroom/tokenizers/registry.py, tiktoken_ext/openai_public.py",
+      "artifact": "the same wheel; tiktoken 0.14.0 as installed by uv tool install headroom-ai[mcp]==0.37.0"
+    },
+    {
+      "claim": "rtk verify runs RTK's inline TOML filter tests and, with --require-all, also fails when a filter has no tests; without --filter it first checks hook integrity at $CLAUDE_CONFIG_DIR, or ~/.claude when unset, and skips when no hook is installed",
+      "source": "src/hooks/verify_cmd.rs, src/hooks/integrity.rs (run_verify, report_hook_status), src/hooks/init.rs (resolve_claude_dir), src/main.rs (Commands::Verify)",
+      "artifact": "rtk-ai/rtk tag v0.50.0 source archive, sha256 428702395b6593268df073e7724a548fdc98be4a3cdf61656a6678e304a690a8"
+    },
+    {
+      "claim": "MarkItDown 0.1.8 constructs magika.Magika() and runs identify_stream on each input; magika 0.6.3 bundles models/standard_v3_3/model.onnx (3,163,737 bytes), run on CPU by onnxruntime",
+      "source": "markitdown/_markitdown.py, magika-0.6.3.dist-info/RECORD",
+      "artifact": "the markitdown 0.1.8 uv tool environment installed by the harness's own method"
+    }
+  ],
+  "upstream_self_test_survey": {
+    "method": "Every pinned tool's --help, run from a copy installed with the harness's own --install methods in a scratch directory, searched for a documented command that tests the tool itself offline; candidates were run with a new HOME and TMPDIR.",
+    "added": [
+      {
+        "tool": "rtk 0.50.0",
+        "command": "rtk verify --require-all",
+        "help": "verify         Verify hook integrity and run TOML filter inline tests",
+        "observed": "exit 0 in 0.05 s, 154/154 tests passed, hook check SKIP"
+      }
+    ],
+    "considered_not_added": [
+      {
+        "tool": "headroom 0.37.0",
+        "command": "headroom evals adversarial",
+        "reason": "Offline and deterministic (its help: 'no LLM, no API key, no model download'), 2.4 s, but a robustness measurement: it printed a grid and a FLAG line and exited 0, with no pass/fail verdict to assert."
+      },
+      {
+        "tool": "headroom 0.37.0",
+        "command": "headroom doctor",
+        "reason": "Checks a running Headroom proxy and client routing; not an offline self-test."
+      },
+      {
+        "tool": "ast-grep 0.45.3",
+        "command": "ast-grep test",
+        "reason": "Runs a project's own rule tests; the release ships none for the tool itself."
+      },
+      {
+        "tool": "rtk 0.50.0",
+        "command": "rtk test",
+        "reason": "Wraps a project's test runner."
+      },
+      {
+        "tool": "jcodemunch-mcp 1.108.319",
+        "command": "jcodemunch-mcp health",
+        "reason": "Prints a repository's health report, not a test of the tool."
+      },
+      {
+        "tool": "qmd 2.8.3",
+        "command": "qmd status",
+        "reason": "Index and collection status; the harness already runs it."
+      }
+    ],
+    "none_found": [
+      "repomix 1.18.1",
+      "toon 4.1.1",
+      "markitdown 0.1.8",
+      "ccusage 20.0.24",
+      "codebase-memory-mcp 0.11.0",
+      "mcporter 0.14.1"
+    ]
+  },
+  "host_default_headroom_workspace_observation": {
+    "observed_utc": "2026-09-26T10:41:28Z",
+    "method": "Read-only stat of the workstation's default Headroom workspace (names, birth and modification times; no content read), for the paths a Headroom control without HEADROOM_WORKSPACE_DIR writes.",
+    "entries": [
+      {
+        "path": "~/.headroom/",
+        "born_utc": "2026-09-24T03:48:32Z",
+        "modified_utc": "2026-09-26T02:33:08Z"
+      },
+      {
+        "path": "~/.headroom/ccr_store.db",
+        "born_utc": "2026-09-24T03:52:59Z",
+        "modified_utc": "2026-09-26T02:32:52Z"
+      },
+      {
+        "path": "~/.headroom/session_stats.jsonl",
+        "born_utc": "2026-09-24T03:52:59Z",
+        "modified_utc": "2026-09-26T02:32:52Z"
+      },
+      {
+        "path": "~/.headroom/savings_events.jsonl",
+        "born_utc": "2026-09-24T03:52:59Z",
+        "modified_utc": "2026-09-26T01:36:50Z"
+      },
+      {
+        "path": "~/.headroom/config/",
+        "born_utc": "2026-09-25T20:51:59Z",
+        "modified_utc": "2026-09-25T20:51:59Z"
+      },
+      {
+        "path": "~/.headroom/config/install_id",
+        "modified_utc": "2026-09-25T20:51:59Z"
+      },
+      {
+        "path": "~/.headroom/update_check.json",
+        "born_utc": "2026-09-25T20:45:18Z",
+        "modified_utc": "2026-09-25T20:45:18Z"
+      }
+    ],
+    "created_on_2026_09_26": [],
+    "modified_after_2026_09_26T02_33_09Z": [],
+    "removed": [],
+    "note": "The controls driver never wrote there: each of its runs, the polish pass's three and this round's two, went through clean_env_run.sh with a throwaway HOME (the first at 06:50:13Z), and nothing under ~/.headroom changed after 02:33:08Z. No file there was created by this change, so none was removed. The first draft's six --install runs that reached Headroom (01:51 to 02:32Z) had no HEADROOM_WORKSPACE_DIR and kept the native HOME (draft_runs_with_account_default_cbm_state), and the store and session stats were last modified at 02:32:52Z, during the last of them; those draft runs most likely added entries to these pre-existing files. The files belong to the workstation's own Headroom and were left unchanged."
+  },
+  "superseded_repair_round": [
+    {
+      "what": "the polish pass's two final-harness runs",
+      "harness_sha256": "02afd5b2befc5dfdd12870fbd457e24ed755dbc2d765706fbd49885d9697fe11",
+      "runs": [
+        {
+          "receipt_sha256": "ab6a9c8606cca446fbfdff1268a30100247b195ca9350defee19ef16a4ea8eb9",
+          "captured_at": "2026-09-26T09:49:22.728162+00:00",
+          "status": "failed",
+          "commands": 81,
+          "checks": 28,
+          "checks_passed": 28
+        },
+        {
+          "receipt_sha256": "72ecd4b5375358777e8a69ef04cd174868603680dde52625b7cea6c45b649c85",
+          "captured_at": "2026-09-26T09:50:53.993333+00:00",
+          "status": "failed",
+          "commands": 81,
+          "checks": 28,
+          "checks_passed": 28
+        }
+      ],
+      "reason": "Superseded by the repair round's harness: its Headroom input was never compressed (router:noop, 0 tokens saved), its jCodeMunch source check took the expected lines from the response's own bounds, and it ran no upstream test."
+    },
+    {
+      "what": "this round's first controls run (twelve arms, all as expected)",
+      "driver_sha256": "dc50b57ed1e13e8f17577dee14cb9c32e730f153e7f9c9da1cf8169e1673e495",
+      "harness_sha256": "142120505edbb52646b84782a560d5daf773e28a7ef908eff13193a93cd94fe5",
+      "private_report_sha256": "f9be056fd7ef136471ac188f9c5526f2135b4ddef1ac5ad031007205a7fd5402",
+      "wrapper_started_utc": "2026-09-26T11:08:15Z",
+      "wrapper_finished_utc": "2026-09-26T11:09:46Z",
+      "exit": "rc=0",
+      "independent_observations": {
+        "throwaway_home_entries_after_run": [],
+        "tmpdir_entries_after_run": [],
+        "processes_left_from_run_directory": [],
+        "checkout_git_status_unchanged": true,
+        "account_default_cbm_rendezvous_entry_names_unchanged": true
+      },
+      "status": "as_expected",
+      "reason": "Superseded by the record's controls run, whose driver adds the two RTK arms: a real failing control for rtk-upstream-inline-filter-tests-pass. Its other twelve arms are the same, and ended the same way."
+    },
+    {
+      "what": "the polish pass's controls run (eleven arms)",
+      "driver_sha256": "4b1b273704cedf1a80caa65afac57d13fa94fd1e4cd337ec3328a4fc564ff789",
+      "harness_sha256": "02afd5b2befc5dfdd12870fbd457e24ed755dbc2d765706fbd49885d9697fe11",
+      "report_sha256": "b133a4908af0aaa79e1e485eada28c24d2341454b31c7ca6f716c95bccaa6f69",
+      "throwaway_home_entries_after_run": [
+        "./.headroom",
+        "./.headroom/ccr_store.db",
+        "./.headroom/session_stats.jsonl"
+      ],
+      "reason": "Its HEADROOM_WORKSPACE_DIR control let Headroom fall back to the caller's HOME: through the wrapper that was a throwaway HOME, which received .headroom/ccr_store.db and session_stats.jsonl; the documented direct invocation would have written into the real ~/.headroom. It also had no compression control."
+    }
+  ],
+  "superseded_polish_attempts": [
+    {
+      "what": "--install run of an intermediate harness of this pass",
+      "harness_sha256": "7bb965df1051ff42a026b6176b9e277ff8425d498a6119bde010c5489ebabe0d",
+      "private_receipt_sha256": "397a566fde5247c02ac751b3e8be3a2cdb86501af390e677c0ceb9b6c53a37d5",
+      "captured_at": "2026-09-26T06:48:14.375032+00:00",
+      "installation": "fresh-upstream-prefix",
+      "status": "failed",
+      "commands": 81,
+      "checks": 28,
+      "checks_passed": 28,
+      "failures": [
+        {
+          "component": "codebase-memory-mcp",
+          "error": "codebase-memory-mcp rendezvous socket path exceeds the Unix socket address limit; set TMPDIR to a shorter directory"
+        }
+      ],
+      "wrapper_started_utc": "2026-09-26T06:48:14Z",
+      "wrapper_finished_utc": "2026-09-26T06:49:43Z",
+      "exit": "rc=1",
+      "tmpdir_bytes": 122,
+      "reason": "The same outcome as final_runs (codebase-memory-mcp refused by the socket check, everything else passed); superseded because the harness's limits text and one comment changed after it."
+    },
+    {
+      "what": "first controls run (six arms)",
+      "private_report_sha256": "99940f69e4fa7fd0bb797b7df36533e3d60502948a4f18ac157922fa2fe0eb8b",
+      "driver_sha256": "294f3421342b0f084aadf0ae9f44bb598ba885228a53d2ab0adfef4bb8d3078b",
+      "harness_sha256": "7bb965df1051ff42a026b6176b9e277ff8425d498a6119bde010c5489ebabe0d",
+      "wrapper_started_utc": "2026-09-26T06:50:13Z",
+      "wrapper_finished_utc": "2026-09-26T06:51:27Z",
+      "exit": "rc=0",
+      "summary": [
+        {
+          "tool": "headroom",
+          "arm": "as-harness",
+          "setting_taken_away": null,
+          "status": "passed",
+          "failed_checks": [],
+          "failures": []
+        },
+        {
+          "tool": "headroom",
+          "arm": "control",
+          "setting_taken_away": "HEADROOM_WORKSPACE_DIR",
+          "status": "failed",
+          "failed_checks": [
+            "headroom-compression-store-inside-run"
+          ],
+          "failures": [
+            {
+              "component": "headroom",
+              "error": "headroom-compression-store-inside-run"
+            }
+          ]
+        },
+        {
+          "tool": "jcodemunch-mcp",
+          "arm": "as-harness",
+          "setting_taken_away": null,
+          "status": "passed",
+          "failed_checks": [],
+          "failures": []
+        },
+        {
+          "tool": "jcodemunch-mcp",
+          "arm": "control",
+          "setting_taken_away": "CODE_INDEX_PATH",
+          "status": "failed",
+          "failed_checks": [
+            "jcodemunch-index-inside-run"
+          ],
+          "failures": [
+            {
+              "component": "jcodemunch-mcp",
+              "error": "jcodemunch-index-inside-run"
+            }
+          ]
+        },
+        {
+          "tool": "ccusage",
+          "arm": "as-harness",
+          "setting_taken_away": null,
+          "status": "passed",
+          "failed_checks": [],
+          "failures": []
+        },
+        {
+          "tool": "ccusage",
+          "arm": "control",
+          "setting_taken_away": "CLAUDE_CONFIG_DIR",
+          "status": "failed",
+          "failed_checks": [],
+          "failures": [
+            {
+              "component": "ccusage",
+              "error": "ccusage-claude-daily-synthetic-fixture: unexpected exit 1"
+            }
+          ]
+        }
+      ],
+      "reason": "Its headroom and jcodemunch-mcp controls failed exactly their target checks, but its only ccusage control (an empty CLAUDE_CONFIG_DIR) stopped at ccusage's exit 1 before either ccusage check, and it had no MarkItDown arm. The driver gained one control per check and a self-check of every arm's outcome."
+    },
+    {
+      "what": "second controls run (eleven arms)",
+      "private_report_sha256": "85f3795bb30ba10c2f58cc00622ba6416a9f898239ffe8ee64b9a5520b9e97a9",
+      "driver_sha256": "dee9177838355c2f48fa444733a023a85034c2468fa566677b0c17fb08f71e18",
+      "harness_sha256": "02afd5b2befc5dfdd12870fbd457e24ed755dbc2d765706fbd49885d9697fe11",
+      "wrapper_started_utc": "2026-09-26T09:52:29Z",
+      "wrapper_finished_utc": "2026-09-26T09:53:57Z",
+      "exit": "rc=1",
+      "status": "not_as_expected",
+      "not_as_expected": [
+        {
+          "tool": "markitdown",
+          "arm": "control",
+          "change": "the plain-text input given to MarkItDown as an .html file",
+          "status": "passed",
+          "failed_checks": [],
+          "failures": [],
+          "as_expected": false
+        }
+      ],
+      "reason": "Ten arms as expected. The MarkItDown pass-through control gave the plain text to MarkItDown as an .html file, and its HTML conversion returned the text unchanged, so the check passed and that control did not discriminate. The control now uses a .csv file, which MarkItDown 0.1.8's CsvConverter turns into a Markdown table; the driver also retains MarkItDown's outputs."
+    }
+  ],
+  "pre_polish_runs": {
+    "note": "The port's two passing --install runs of the pre-polish harness, 89 commands and 36 of 36 checks each, codebase-memory-mcp included, with TMPDIR unset (/tmp). That harness wrote source hashes as a map keyed by file path, a shape gitleaks' generic-api-key rule reports under the repository's .gitleaks.toml (two findings per receipt). The committed receipts hold the same entries as the source_files list of {path, sha256} objects that the final harness writes itself, at the same position; nothing else differs. tests/test_native_token_ci.py rebuilds the map and checks private_original_sha256.",
+    "harness_sha256": "3cec918f28724ba09d57c2dbcee227182b1566ef13ff5397e84a612084d889c8",
+    "tests_sha256_then": "79e9098212e07d942f15e6de684eedcd947db21e8bc24e1119ef5338f17e259f",
+    "wrapper": {
+      "path": "install_run.sh",
+      "sha256": "41701ff4221214b40a92d8ffdd91cf703982fc64925f8c31c1c31071d91da392",
+      "runs_in_place": false,
+      "note": "Kept unchanged as the script that started these runs. It hardcodes the scratch layout it was written in (checkout ../wt-ws2b, interpreter ../ci-venv) and writes its outputs next to itself, so it does not run from this directory; clean_env_run.sh takes every location as an argument."
+    },
+    "invocation": {
+      "wrapper": "install_run.sh (this directory; /bin/sh, run serially)",
+      "command": "env -i PATH=<node 24.21.0 bin>:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin HOME=<new empty 0700 directory> LANG=C.UTF-8 MCP_AUTO_OPEN_ENABLED=false python3.13 scripts/native_token_ci.py --install --output <new directory>",
+      "clean_path_refusal": "The wrapper refuses to start if rtk, qmd, repomix, toon, markitdown, ast-grep, ccusage, codebase-memory-mcp, headroom, jcodemunch-mcp, mcporter, uv or uvx resolves on that PATH, as on a fresh hosted runner.",
+      "tmpdir": "unset (Python's default /tmp)"
+    },
+    "runs": [
+      {
+        "receipt": "local-install-run-1.receipt.json",
+        "receipt_sha256": "bfd920e1272b67d3db47e09e6ed7258d4d8af635b4a66419920b7c337359dbee",
+        "wrapper_started_utc": "2026-09-26T05:32:19Z",
+        "wrapper_finished_utc": "2026-09-26T05:34:18Z",
+        "exit": "rc=0",
+        "stdout_summary": {
+          "status": "passed",
+          "commands": 89,
+          "checks": 36,
+          "failures": [],
+          "cleanup": {
+            "owned_temporary_directory_absent": true,
+            "retained_output_exists": true
+          }
+        },
+        "stderr_bytes": 0,
+        "captured_at": "2026-09-26T05:32:19.743897+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "passed",
+        "commands": 89,
+        "checks": 36,
+        "checks_passed": 36,
+        "failures": [],
+        "harness_sha256": "3cec918f28724ba09d57c2dbcee227182b1566ef13ff5397e84a612084d889c8",
+        "versions": {
+          "rtk": "rtk 0.50.0",
+          "qmd": "qmd 2.8.3 (facd35e)",
+          "repomix": "1.18.1",
+          "toon": "4.1.1",
+          "markitdown": "markitdown 0.1.8",
+          "ast-grep": "ast-grep 0.45.3",
+          "ccusage": "ccusage 20.0.24",
+          "codebase-memory-mcp": "codebase-memory-mcp 0.11.0",
+          "headroom": "headroom, version 0.37.0",
+          "mcporter": "0.14.1",
+          "jcodemunch-mcp": "jcodemunch-mcp 1.108.319"
+        },
+        "mcporter_stdio_servers": {
+          "headroom-compress": "<TOOL:headroom> mcp serve --proxy-url http://127.0.0.1:1",
+          "jcodemunch-index-folder": "<TOOL:jcodemunch-mcp>"
+        },
+        "codebase_memory_index_seconds": 6.374,
+        "state_observations": {
+          "codebase-memory-mcp-cache-after-config": [
+            "_config.db",
+            "config.json"
+          ],
+          "codebase-memory-mcp-cache-after-cleanup": [
+            "_config.db",
+            "config.json",
+            "logs/",
+            "logs/cbm-daemon.log"
+          ],
+          "codebase-memory-mcp-rendezvous": [
+            "cbm-daemon-1000/",
+            "cbm-daemon-1000/cbm-6c98475802a59fdef3c26595c95bf47614a6cea09179e9113a1fb933575ae78f.rw",
+            "cbm-daemon-1000/cbm-6c98475802a59fdef3c26595c95bf47614a6cea09179e9113a1fb933575ae78f.turn",
+            "cbm-daemon-1000/cbm-c888acc3ae367a1e.anc",
+            "cbm-daemon-1000/cbm-c888acc3ae367a1e.lifetime.lock",
+            "cbm-daemon-1000/cbm-c888acc3ae367a1e.lock",
+            "cbm-daemon-1000/cbm-c888acc3ae367a1e.sock",
+            "cbm-daemon-1000/cbm-c888acc3ae367a1e.sock.identity",
+            "cbm-daemon-1000/cbm-c888acc3ae367a1e.startup-v2.lock",
+            "cbm-daemon-1000/cbm-f7e51f02927ace932c0afef07fee76d32b7bb9e58aa8b4a118a9f534eb2aa11a.rw",
+            "cbm-daemon-1000/cbm-f7e51f02927ace932c0afef07fee76d32b7bb9e58aa8b4a118a9f534eb2aa11a.turn",
+            "cbm-daemon-1000/cbm-version-cohort-admission-v1.lock",
+            "cbm-daemon-1000/cbm-version-cohort-daemon-v1.lock",
+            "cbm-daemon-1000/cbm-version-cohort-lifetime-v1.lock",
+            "cbm-daemon-1000/cbm-version-cohort-maintenance-v1.lock"
+          ],
+          "headroom-workspace": [
+            "ccr_store.db",
+            "session_stats.jsonl"
+          ],
+          "jcodemunch-mcp-index": [
+            "_processes/",
+            "_session_live.json",
+            "_transcript_roots.json",
+            "config.jsonc",
+            "last_seen_version",
+            "local-wt-ws2b-f056036f.db",
+            "local-wt-ws2b-f056036f/",
+            "local-wt-ws2b-f056036f/fixtures/",
+            "local-wt-ws2b-f056036f/fixtures/after.py",
+            "local-wt-ws2b-f056036f/fixtures/before.py",
+            "local-wt-ws2b-f056036f/fixtures/example.sh",
+            "surface_offer_state.json"
+          ],
+          "jcodemunch-mcp-server-home": [
+            ".code-index/"
+          ],
+          "mcporter-daemon-dir": []
+        },
+        "independent_observations": {
+          "throwaway_home_entries_after_run": [],
+          "processes_left_from_run_directory": [],
+          "checkout_git_status_unchanged": true,
+          "account_default_cbm_rendezvous_entry_names_unchanged": true
+        },
+        "private_original_sha256": "ad937a9a6f790d05cec3c6da73335eb43d59c03380feb4f6993630824497a87b",
+        "cbm_cache_and_runtime_dir_set": true,
+        "codebase_memory_index_repository": {
+          "exit": 0,
+          "seconds": 6.374
+        }
+      },
+      {
+        "receipt": "local-install-run-2.receipt.json",
+        "receipt_sha256": "41307611b19dbcf7213534b392ea4dc2852435c85fade5680c4e68539cdaaf0b",
+        "wrapper_started_utc": "2026-09-26T05:34:19Z",
+        "wrapper_finished_utc": "2026-09-26T05:36:12Z",
+        "exit": "rc=0",
+        "stdout_summary": {
+          "status": "passed",
+          "commands": 89,
+          "checks": 36,
+          "failures": [],
+          "cleanup": {
+            "owned_temporary_directory_absent": true,
+            "retained_output_exists": true
+          }
+        },
+        "stderr_bytes": 0,
+        "captured_at": "2026-09-26T05:34:19.480027+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "passed",
+        "commands": 89,
+        "checks": 36,
+        "checks_passed": 36,
+        "failures": [],
+        "harness_sha256": "3cec918f28724ba09d57c2dbcee227182b1566ef13ff5397e84a612084d889c8",
+        "versions": {
+          "rtk": "rtk 0.50.0",
+          "qmd": "qmd 2.8.3 (facd35e)",
+          "repomix": "1.18.1",
+          "toon": "4.1.1",
+          "markitdown": "markitdown 0.1.8",
+          "ast-grep": "ast-grep 0.45.3",
+          "ccusage": "ccusage 20.0.24",
+          "codebase-memory-mcp": "codebase-memory-mcp 0.11.0",
+          "headroom": "headroom, version 0.37.0",
+          "mcporter": "0.14.1",
+          "jcodemunch-mcp": "jcodemunch-mcp 1.108.319"
+        },
+        "mcporter_stdio_servers": {
+          "headroom-compress": "<TOOL:headroom> mcp serve --proxy-url http://127.0.0.1:1",
+          "jcodemunch-index-folder": "<TOOL:jcodemunch-mcp>"
+        },
+        "codebase_memory_index_seconds": 6.04,
+        "state_observations": {
+          "codebase-memory-mcp-cache-after-config": [
+            "_config.db",
+            "config.json"
+          ],
+          "codebase-memory-mcp-cache-after-cleanup": [
+            "_config.db",
+            "config.json",
+            "logs/",
+            "logs/cbm-daemon.log"
+          ],
+          "codebase-memory-mcp-rendezvous": [
+            "cbm-daemon-1000/",
+            "cbm-daemon-1000/cbm-6c98475802a59fdef3c26595c95bf47614a6cea09179e9113a1fb933575ae78f.rw",
+            "cbm-daemon-1000/cbm-6c98475802a59fdef3c26595c95bf47614a6cea09179e9113a1fb933575ae78f.turn",
+            "cbm-daemon-1000/cbm-c888acc3ae367a1e.anc",
+            "cbm-daemon-1000/cbm-c888acc3ae367a1e.lifetime.lock",
+            "cbm-daemon-1000/cbm-c888acc3ae367a1e.lock",
+            "cbm-daemon-1000/cbm-c888acc3ae367a1e.sock",
+            "cbm-daemon-1000/cbm-c888acc3ae367a1e.sock.identity",
+            "cbm-daemon-1000/cbm-c888acc3ae367a1e.startup-v2.lock",
+            "cbm-daemon-1000/cbm-f7e51f02927ace932c0afef07fee76d32b7bb9e58aa8b4a118a9f534eb2aa11a.rw",
+            "cbm-daemon-1000/cbm-f7e51f02927ace932c0afef07fee76d32b7bb9e58aa8b4a118a9f534eb2aa11a.turn",
+            "cbm-daemon-1000/cbm-version-cohort-admission-v1.lock",
+            "cbm-daemon-1000/cbm-version-cohort-daemon-v1.lock",
+            "cbm-daemon-1000/cbm-version-cohort-lifetime-v1.lock",
+            "cbm-daemon-1000/cbm-version-cohort-maintenance-v1.lock"
+          ],
+          "headroom-workspace": [
+            "ccr_store.db",
+            "session_stats.jsonl"
+          ],
+          "jcodemunch-mcp-index": [
+            "_processes/",
+            "_session_live.json",
+            "_transcript_roots.json",
+            "config.jsonc",
+            "last_seen_version",
+            "local-wt-ws2b-f056036f.db",
+            "local-wt-ws2b-f056036f/",
+            "local-wt-ws2b-f056036f/fixtures/",
+            "local-wt-ws2b-f056036f/fixtures/after.py",
+            "local-wt-ws2b-f056036f/fixtures/before.py",
+            "local-wt-ws2b-f056036f/fixtures/example.sh",
+            "surface_offer_state.json"
+          ],
+          "jcodemunch-mcp-server-home": [
+            ".code-index/"
+          ],
+          "mcporter-daemon-dir": []
+        },
+        "independent_observations": {
+          "throwaway_home_entries_after_run": [],
+          "processes_left_from_run_directory": [],
+          "checkout_git_status_unchanged": true,
+          "account_default_cbm_rendezvous_entry_names_unchanged": true
+        },
+        "private_original_sha256": "10a194ce374af829ede3b6855d3e982c4cc9b49faca7ade7332746ffcbe765bd",
+        "cbm_cache_and_runtime_dir_set": true,
+        "codebase_memory_index_repository": {
+          "exit": 0,
+          "seconds": 6.04
+        }
+      }
+    ]
+  },
+  "superseded_runs": [
+    {
+      "note": "Same wrapper and invocation, earlier harness revision: both passed, but their receipts retained the run-owned directory home/jcodemunch-mcp under <WORK>, a shape the repository's publication scan (scripts/validate.py PRIVATE_CONTENT) rejects as a personal home path. The directory is now jcodemunch-mcp-home, with a regression test; the pre-polish and final runs use it. These receipts also used the renamed archive key described in the third entry.",
+      "runs": [
+        {
+          "captured_at": "2026-09-26T04:49:02.202954+00:00",
+          "installation": "fresh-upstream-prefix",
+          "status": "passed",
+          "commands": 89,
+          "checks": 36,
+          "checks_passed": 36,
+          "failures": [],
+          "harness_sha256": "6e2ec796444ce4761238ba58321a597331690a6f4420b8ed71d1536c0c672d39",
+          "report_archive_hash_keys": [
+            "archive_sha256"
+          ],
+          "cbm_cache_and_runtime_dir_set": true,
+          "codebase_memory_index_repository": {
+            "exit": 0,
+            "seconds": 5.725
+          }
+        },
+        {
+          "captured_at": "2026-09-26T04:50:49.531668+00:00",
+          "installation": "fresh-upstream-prefix",
+          "status": "passed",
+          "commands": 89,
+          "checks": 36,
+          "checks_passed": 36,
+          "failures": [],
+          "harness_sha256": "6e2ec796444ce4761238ba58321a597331690a6f4420b8ed71d1536c0c672d39",
+          "report_archive_hash_keys": [
+            "archive_sha256"
+          ],
+          "cbm_cache_and_runtime_dir_set": true,
+          "codebase_memory_index_repository": {
+            "exit": 0,
+            "seconds": 5.964
+          }
+        }
+      ]
+    },
+    {
+      "note": "Same wrapper and invocation, with harness ab722d78, which had also renamed rtk_archive_sha256 (see the third entry), not the final pre-polish harness 3cec918f: both passed, but the checkout still carried the first draft's timeout-minutes 20 -> 30 edit to .github/workflows/native-token-e2e.yml, whose bytes tests/test_workflow_hardening.py pins to retained evidence. The edit was reverted, so these receipts record a workflow hash that is not committed.",
+      "runs": [
+        {
+          "captured_at": "2026-09-26T04:57:18.861300+00:00",
+          "installation": "fresh-upstream-prefix",
+          "status": "passed",
+          "commands": 89,
+          "checks": 36,
+          "checks_passed": 36,
+          "failures": [],
+          "harness_sha256": "ab722d78461df5136bfc079052cd902472bdb7c1f179a0b8fccb9c8a323a4bda",
+          "workflow_sha256": "18d61b208b99327a39a77380297046e164b8dcfb4f335591954c539559c69d50",
+          "report_archive_hash_keys": [
+            "archive_sha256"
+          ],
+          "cbm_cache_and_runtime_dir_set": true,
+          "codebase_memory_index_repository": {
+            "exit": 0,
+            "seconds": 6.373
+          }
+        },
+        {
+          "captured_at": "2026-09-26T04:59:13.158939+00:00",
+          "installation": "fresh-upstream-prefix",
+          "status": "passed",
+          "commands": 89,
+          "checks": 36,
+          "checks_passed": 36,
+          "failures": [],
+          "harness_sha256": "ab722d78461df5136bfc079052cd902472bdb7c1f179a0b8fccb9c8a323a4bda",
+          "workflow_sha256": "18d61b208b99327a39a77380297046e164b8dcfb4f335591954c539559c69d50",
+          "report_archive_hash_keys": [
+            "archive_sha256"
+          ],
+          "cbm_cache_and_runtime_dir_set": true,
+          "codebase_memory_index_repository": {
+            "exit": 0,
+            "seconds": 6.034
+          }
+        }
+      ]
+    },
+    {
+      "note": "Same wrapper and invocation, with the committed workflow: both passed, but that harness had renamed the report key rtk_archive_sha256, which the retained reproduction evidence/artifacts/sota-refresh-20260925/rtk/native_token_ci_rtk_only.py reads, so a rerun of it printed no archive hash. Each release-tarball tool now keeps its own <name>_archive_sha256 key, with a regression test. During the second of these runs the account-default rendezvous lost the workstation daemon's endpoint entries (.anc, .sock, .sock.identity): that daemon, from the workstation's own installation and started at 05:01:09Z, had exited by 05:20:55Z, as had a frontend of the same installation that appeared with it; neither belonged to the run.",
+      "runs": [
+        {
+          "captured_at": "2026-09-26T05:16:36.863312+00:00",
+          "installation": "fresh-upstream-prefix",
+          "status": "passed",
+          "commands": 89,
+          "checks": 36,
+          "checks_passed": 36,
+          "failures": [],
+          "harness_sha256": "ab722d78461df5136bfc079052cd902472bdb7c1f179a0b8fccb9c8a323a4bda",
+          "account_default_cbm_rendezvous_entry_names_unchanged": true,
+          "report_archive_hash_keys": [
+            "archive_sha256"
+          ],
+          "cbm_cache_and_runtime_dir_set": true,
+          "codebase_memory_index_repository": {
+            "exit": 0,
+            "seconds": 6.053
+          }
+        },
+        {
+          "captured_at": "2026-09-26T05:18:35.556878+00:00",
+          "installation": "fresh-upstream-prefix",
+          "status": "passed",
+          "commands": 89,
+          "checks": 36,
+          "checks_passed": 36,
+          "failures": [],
+          "harness_sha256": "ab722d78461df5136bfc079052cd902472bdb7c1f179a0b8fccb9c8a323a4bda",
+          "account_default_cbm_rendezvous_entry_names_unchanged": false,
+          "report_archive_hash_keys": [
+            "archive_sha256"
+          ],
+          "cbm_cache_and_runtime_dir_set": true,
+          "codebase_memory_index_repository": {
+            "exit": 0,
+            "seconds": 7.014
+          }
+        }
+      ]
+    }
+  ],
+  "earlier_runs_of_this_port": {
+    "note": "Runs by an earlier pass of this port with a throwaway HOME; their PATH was not retained. The first predates the jcodemunch-mcp server HOME override and left an empty .code-index directory in its throwaway HOME, which prompted that override.",
+    "runs": [
+      {
+        "captured_at": "2026-09-26T04:18:55.083990+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "passed",
+        "commands": 89,
+        "checks": 36,
+        "checks_passed": 36,
+        "failures": [],
+        "harness_sha256": "bdca42a23c8226c9e5d5e6495a648ce159750621578d1c3cdece757e4a8f1619",
+        "throwaway_home_entries_after_run": [
+          ".code-index"
+        ],
+        "cbm_cache_and_runtime_dir_set": true,
+        "codebase_memory_index_repository": {
+          "exit": 0,
+          "seconds": 7.445
+        }
+      },
+      {
+        "captured_at": "2026-09-26T04:24:12.664733+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "passed",
+        "commands": 89,
+        "checks": 36,
+        "checks_passed": 36,
+        "failures": [],
+        "harness_sha256": "90c4d92aa8ebdca74a207bb1f0b753b52254842f87bd804fb0b12feadf3a1d04",
+        "throwaway_home_entries_after_run": [],
+        "cbm_cache_and_runtime_dir_set": true,
+        "codebase_memory_index_repository": {
+          "exit": 0,
+          "seconds": 6.028
+        }
+      },
+      {
+        "captured_at": "2026-09-26T04:26:17.659110+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "passed",
+        "commands": 89,
+        "checks": 36,
+        "checks_passed": 36,
+        "failures": [],
+        "harness_sha256": "90c4d92aa8ebdca74a207bb1f0b753b52254842f87bd804fb0b12feadf3a1d04",
+        "throwaway_home_entries_after_run": [],
+        "cbm_cache_and_runtime_dir_set": true,
+        "codebase_memory_index_repository": {
+          "exit": 0,
+          "seconds": 5.766
+        }
+      }
+    ]
+  },
+  "discriminating_controls": {
+    "note": "Recorded by the port against its then-final harness 3cec918f (the pre-polish harness); 'against_final_harness' below means that revision. All three unit tests also pass against this pass's final harness (unit_test_controls).",
+    "bare_stdio_server_names": {
+      "what": "The first draft's harness (bare headroom / jcodemunch-mcp --stdio names), installing headroom-ai, jcodemunch-mcp and MCPorter through its own --install path, then running only its headroom and jcodemunch fixtures with no ambient copy of either tool on PATH.",
+      "draft_harness_sha256": "916d2308321c6c745d88be78a860fff30e291d59812b3926937519a11d52d86b",
+      "status": "failed",
+      "failures": [
+        {
+          "component": "headroom",
+          "error": "headroom-compress: unexpected exit 1"
+        },
+        {
+          "component": "jcodemunch-mcp",
+          "error": "jcodemunch-index-folder: unexpected exit 1"
+        }
+      ],
+      "mcporter_stdout_error": {
+        "headroom-compress": "spawn headroom ENOENT",
+        "jcodemunch-index-folder": "spawn jcodemunch-mcp ENOENT"
+      },
+      "private_receipt_sha256": "2a932281a02c016e6fd6470f9f771870a67d0c67ddb4edcbd4035f5a957da202"
+    },
+    "unit_tests": [
+      {
+        "test": "test_mcp_fixtures_spawn_the_copy_install_just_placed_not_a_path_lookup",
+        "against_draft_harness": "FAIL: spawned the ambient-bin decoys instead of <work>/install/uv-tools-bin copies",
+        "against_final_harness": "OK"
+      },
+      {
+        "test": "test_retained_mcp_command_lines_pass_the_publication_scan",
+        "against_harness_with_work_home_jcodemunch_path": "FAIL: personal home path match on the run-owned home/jcodemunch-mcp directory",
+        "against_final_harness": "OK"
+      },
+      {
+        "test": "test_release_archive_hash_keeps_the_key_retained_reproductions_read",
+        "against_harness_with_renamed_archive_key": "ERROR: KeyError 'rtk_archive_sha256'",
+        "against_final_harness": "OK"
+      }
+    ],
+    "retained_reproduction_rerun": {
+      "script": "evidence/artifacts/sota-refresh-20260925/rtk/native_token_ci_rtk_only.py",
+      "harness_sha256": "3cec918f28724ba09d57c2dbcee227182b1566ef13ff5397e84a612084d889c8",
+      "invocation": "same clean PATH and a new throwaway HOME, from the checkout root",
+      "result": "version rtk 0.50.0; archive sha256 bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89; 6 of 6 rtk checks passed; failures []"
+    }
+  },
+  "draft_runs_with_account_default_cbm_state": {
+    "note": "The first draft left codebase-memory-mcp's cache and daemon rendezvous at the account-wide defaults (~/.cache/codebase-memory-mcp, /tmp/cbm-daemon-<uid>) that the workstation's own codebase-memory-mcp processes use, with the native HOME preserved.",
+    "runs": [
+      {
+        "captured_at": "2026-09-26T01:51:44.417365+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "failed",
+        "commands": 83,
+        "checks": 25,
+        "checks_passed": 24,
+        "failures": [
+          {
+            "component": "ast-grep",
+            "error": "ast-grep-matches-grep-count-in-scripts"
+          },
+          {
+            "component": "codebase-memory-mcp",
+            "error": "codebase-memory-mcp-index-repository: unexpected exit 1"
+          },
+          {
+            "component": "jcodemunch-mcp",
+            "error": "'content'"
+          }
+        ],
+        "harness_sha256": "abb28af4c9fcaf7f8486311c0e785eeae1000db9920954ee34154008be42c1a5",
+        "cbm_cache_or_runtime_dir_set": false,
+        "native_home_preserved": true,
+        "codebase_memory_index_repository": {
+          "exit": 1,
+          "seconds": 31.987,
+          "stderr_first_line": "codebase-memory-mcp: CBM daemon endpoint is held by pid 870053 but that process answered no rendezvous within 30000 ms; the daemon runtime is likely dead — stop that process, then retry"
+        },
+        "private_receipt_sha256": "7e29bffdd3cfcbae1e50dfbc9b7772886a72c214bea2307905239632637c0585",
+        "run": "e2e-run-1",
+        "headroom_workspace_dir_set": false,
+        "headroom_calls": 3
+      },
+      {
+        "captured_at": "2026-09-26T02:00:19.988433+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "failed",
+        "commands": 84,
+        "checks": 26,
+        "checks_passed": 26,
+        "failures": [
+          {
+            "component": "ast-grep",
+            "error": "ast-grep-negative-control: unexpected exit 1"
+          },
+          {
+            "component": "codebase-memory-mcp",
+            "error": "codebase-memory-mcp-index-repository: unexpected exit 1"
+          }
+        ],
+        "harness_sha256": "d4925ab6d72750c70b14102c9c5c534f12f091187b345b6df18ded9b73e8fbf8",
+        "cbm_cache_or_runtime_dir_set": false,
+        "native_home_preserved": true,
+        "codebase_memory_index_repository": {
+          "exit": 1,
+          "seconds": 32.422,
+          "stderr_first_line": "codebase-memory-mcp: CBM daemon endpoint is held by pid 2975721 but that process answered no rendezvous within 30000 ms; the daemon runtime is likely dead — stop that process, then retry"
+        },
+        "private_receipt_sha256": "cc488e7178152c50a36de29d1c823c73c8abd64abb524327df992cb9b3ff50ab",
+        "run": "e2e-run-2",
+        "headroom_workspace_dir_set": false,
+        "headroom_calls": 3
+      },
+      {
+        "captured_at": "2026-09-26T02:05:48.503888+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "passed",
+        "commands": 88,
+        "checks": 32,
+        "checks_passed": 32,
+        "failures": [],
+        "harness_sha256": "08213cd65bc4102d56cc903c7d49ef8729454abc1bd8d3f138f2a959b79fbec2",
+        "cbm_cache_or_runtime_dir_set": false,
+        "native_home_preserved": true,
+        "codebase_memory_index_repository": {
+          "exit": 0,
+          "seconds": 11.657,
+          "stderr_first_line": ""
+        },
+        "private_receipt_sha256": "bd894e1da4ea35c9fa155da3df5911d669f12e9a2a9514178be9573777b097c7",
+        "run": "e2e-run-3",
+        "headroom_workspace_dir_set": false,
+        "headroom_calls": 3
+      },
+      {
+        "captured_at": "2026-09-26T02:10:05.175164+00:00",
+        "installation": "existing-executables",
+        "status": "failed",
+        "commands": 54,
+        "checks": 29,
+        "checks_passed": 29,
+        "failures": [
+          {
+            "component": "headroom",
+            "error": "Installed mcporter differs from its manifest pin"
+          }
+        ],
+        "harness_sha256": "08213cd65bc4102d56cc903c7d49ef8729454abc1bd8d3f138f2a959b79fbec2",
+        "cbm_cache_or_runtime_dir_set": false,
+        "native_home_preserved": true,
+        "codebase_memory_index_repository": {
+          "exit": 0,
+          "seconds": 9.315,
+          "stderr_first_line": ""
+        },
+        "private_receipt_sha256": "2c1b3d26bef5a2c4a133043dc13d85baaee1e0642be9833bdef2dbf368a8cf37",
+        "run": "e2e-run-existing",
+        "mcporter_pin": "0.13.13",
+        "mcporter_version_output": [
+          "0.14.1"
+        ],
+        "headroom_workspace_dir_set": false,
+        "headroom_calls": 0
+      },
+      {
+        "captured_at": "2026-09-26T02:11:54.041002+00:00",
+        "installation": "existing-executables",
+        "status": "failed",
+        "commands": 51,
+        "checks": 26,
+        "checks_passed": 26,
+        "failures": [
+          {
+            "component": "headroom",
+            "error": "Installed mcporter differs from its manifest pin"
+          },
+          {
+            "component": "jcodemunch-mcp",
+            "error": "Installed mcporter differs from its manifest pin"
+          }
+        ],
+        "harness_sha256": "916d2308321c6c745d88be78a860fff30e291d59812b3926937519a11d52d86b",
+        "cbm_cache_or_runtime_dir_set": false,
+        "native_home_preserved": true,
+        "codebase_memory_index_repository": {
+          "exit": 0,
+          "seconds": 11.215,
+          "stderr_first_line": ""
+        },
+        "private_receipt_sha256": "f2e82b740afda70a8249427a956b1dff9bdb2d6a4c88c2801fab26e1b65a90f8",
+        "run": "e2e-run-existing2",
+        "mcporter_pin": "0.13.13",
+        "mcporter_version_output": [
+          "0.14.1"
+        ],
+        "headroom_workspace_dir_set": false,
+        "headroom_calls": 0
+      },
+      {
+        "captured_at": "2026-09-26T02:12:58.134338+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "passed",
+        "commands": 88,
+        "checks": 32,
+        "checks_passed": 32,
+        "failures": [],
+        "harness_sha256": "916d2308321c6c745d88be78a860fff30e291d59812b3926937519a11d52d86b",
+        "cbm_cache_or_runtime_dir_set": false,
+        "native_home_preserved": true,
+        "codebase_memory_index_repository": {
+          "exit": 0,
+          "seconds": 8.786,
+          "stderr_first_line": ""
+        },
+        "private_receipt_sha256": "18367e89b295ccd083d17c78df36f8fd915ea91848eb002ccac29efad2166e14",
+        "run": "e2e-run-final",
+        "headroom_workspace_dir_set": false,
+        "headroom_calls": 3
+      },
+      {
+        "captured_at": "2026-09-26T02:22:30.870390+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "failed",
+        "commands": 84,
+        "checks": 27,
+        "checks_passed": 27,
+        "failures": [
+          {
+            "component": "codebase-memory-mcp",
+            "error": "codebase-memory-mcp-index-repository: unexpected exit 1"
+          }
+        ],
+        "harness_sha256": "916d2308321c6c745d88be78a860fff30e291d59812b3926937519a11d52d86b",
+        "cbm_cache_or_runtime_dir_set": false,
+        "native_home_preserved": true,
+        "codebase_memory_index_repository": {
+          "exit": 1,
+          "seconds": 32.73,
+          "stderr_first_line": "codebase-memory-mcp: CBM daemon endpoint is held by pid 3302497 but that process answered no rendezvous within 30000 ms; the daemon runtime is likely dead — stop that process, then retry"
+        },
+        "private_receipt_sha256": "966c215947bdb9bc112037bde5292ec294ba3ae7d07936c53087b8547950c9c5",
+        "run": "e2e-run-verify-final",
+        "headroom_workspace_dir_set": false,
+        "headroom_calls": 3
+      },
+      {
+        "captured_at": "2026-09-26T02:31:02.425764+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "passed",
+        "commands": 88,
+        "checks": 32,
+        "checks_passed": 32,
+        "failures": [],
+        "harness_sha256": "916d2308321c6c745d88be78a860fff30e291d59812b3926937519a11d52d86b",
+        "cbm_cache_or_runtime_dir_set": false,
+        "native_home_preserved": true,
+        "codebase_memory_index_repository": {
+          "exit": 0,
+          "seconds": 8.354,
+          "stderr_first_line": ""
+        },
+        "private_receipt_sha256": "165371a255e71bab0bbc46bbfb911ea2bef923e2eb3fba1c85b390cd608f7721",
+        "run": "e2e-run-conclusive",
+        "headroom_workspace_dir_set": false,
+        "headroom_calls": 3
+      }
+    ]
+  },
+  "host_default_cbm_ui_config_observation": {
+    "path": "~/.cache/codebase-memory-mcp/config.json",
+    "modified_utc": "2026-09-26T02:31:54Z",
+    "ui_enabled": false,
+    "note": "Read-only stat and field read on 2026-09-26. The file was rewritten during the draft run captured at 02:31:02Z, whose `config set ui_enabled false` targeted this default cache. Its value before the draft runs was not recorded; it was not changed back."
+  },
+  "host_default_rendezvous_observation": {
+    "observed_utc": "2026-09-26T05:03:44Z",
+    "method": "ss -xlp (listening Unix sockets), read-only",
+    "listener": "a codebase-memory-mcp daemon of the workstation's own installation listens on /tmp/cbm-daemon-<uid>/cbm-c888acc3ae367a1e.anc",
+    "same_endpoint_names_in_run_owned_rendezvous": true,
+    "note": "The endpoint names do not depend on the rendezvous directory, so a process using the default directory addresses the same endpoint as the workstation's own daemon."
+  }
+}

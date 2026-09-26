@@ -243,6 +243,99 @@ Three passed only on a second attempt, each after a real binding constraint:
 
 **Not run.** Codex workers could not run: the account is at its usage limit until 2026-09-30. OmniRoute stays excluded, because it reroutes model traffic.
 
+## Hosted CI coverage (2026-09-26)
+
+The [hosted workflow](../.github/workflows/native-token-e2e.yml) (`native-token-tools`,
+`ubuntu-24.04`) installs pinned upstream artifacts into a fresh temporary prefix and runs
+[the harness](../scripts/native_token_ci.py) on relevant pushes and pull requests and on
+manual dispatch. Of the sixteen tools in the subagent run above, it now exercises nine
+through their own CLI or MCP surface: RTK, QMD, Repomix and TOON (since 2026-09-20), and
+MarkItDown, ast-grep, codebase-memory-mcp, Headroom and jCodeMunch (added). It also
+exercises ccusage, which that list does not include, against a committed synthetic usage
+log. Headroom and jCodeMunch are reached through a pinned MCPorter `--stdio` bridge, which
+the harness installs and version-checks but gives no fixture of its own. MarkItDown,
+Headroom and jCodeMunch install with `uv tool install <name>==<version>`, run by a uv whose
+archive is checked against a hash pinned in the harness. Their own PyPI dependencies resolve
+at installation with no lockfile or pinned hashes, as the npm packages' dependencies do.
+codebase-memory-mcp installs like RTK, from a GitHub release tarball matched against its
+published checksums.
+
+The other seven of the sixteen have no hosted fixture and were not attempted in this pass:
+Context Mode, Serena, SocratiCode, ai-memory, Context Hub, agentsview and otel-tui.
+Whether each could run on a hosted runner is untested.
+
+Each fixture runs the tool's own CLI or MCP commands, upstream native operations, and
+this repository's own checks assert on the returned JSON or text. So the receipt labels
+itself `local_integration`: evidence of upstream native operations, not of upstream test
+suites. The one upstream test is `rtk verify --require-all`, which runs the inline tests
+of RTK's built-in filters from its release binary. No other pinned tool documents an
+offline self-test command; the run record lists what was checked. Upstream test-suite
+qualification of a component belongs in its per-host receipts under
+`evidence/hosts/<host>/`, summarized in
+[the component evidence matrix](component-evidence-matrix.md), and none recorded so far
+for these tools runs an upstream suite. Each version is checked against
+`manifests/stack.json`. Each tool's state goes to the run's temporary directory through
+that tool's documented settings, listed in [the CI guide](native-token-ci.md). That is
+configuration, not an operating-system sandbox; the receipt records what each tool wrote
+there. No hosted run of the extended job is recorded yet, and the local runs below are
+not hosted results.
+
+Findings from wiring these in follow.
+[The local run record](../evidence/artifacts/native-token-ci-extension-20260926/README.md)
+lists which checks have a recorded failing control and which do not yet.
+
+- **Installed copies, not `PATH`.** `--install` puts Headroom and jCodeMunch in
+  `UV_TOOL_BIN_DIR`, which is not on `PATH`, and MCPorter looks up a bare `--stdio`
+  server name on `PATH`. The first draft passed bare names. With no other copy on `PATH`,
+  as on a fresh runner, both of its MCP fixtures failed with `spawn ... ENOENT`; on a
+  workstation with its own copies on `PATH` it would have run those unverified copies.
+  The harness now passes the absolute path of the copy it installed.
+- **codebase-memory-mcp was flaky while it shared the account's state.** The first draft
+  left codebase-memory-mcp's cache and daemon rendezvous at the account-wide defaults,
+  where the workstation's own codebase-memory-mcp daemon also listens. In its six local
+  `--install` runs, `index_repository` failed three times with the upstream message "CBM
+  daemon endpoint is held by pid N but that process answered no rendezvous within
+  30000 ms". The draft's `config set ui_enabled false` also rewrote the workstation's
+  default UI setting, whose earlier value was not recorded. The harness now sets the
+  documented `CBM_CACHE_DIR` and `CBM_RUNTIME_DIR` to directories inside the run. It
+  checks that the settings and the rendezvous appear there and that the project listing
+  holds only the fixture project. All eleven of the port's later local `--install` runs
+  passed with those settings. In the two final-harness runs a long `TMPDIR` kept
+  codebase-memory-mcp from starting, as the run record explains. The cause of the three
+  failures was not isolated beyond the shared endpoint, and eleven passes do not
+  establish a failure rate. Neither of these two state checks has a recorded failing
+  control yet.
+- **ast-grep.** The draft compared ast-grep's match count with a `grep` count over the
+  live `scripts/` tree, so an unrelated script could change the outcome, and equal counts
+  could not show a structural match. The check now reads a frozen fixture,
+  `fixtures/ast_grep_calls.py`: ast-grep must return exactly its two `subprocess.run`
+  calls, one written `subprocess.run (`, while grep's text baseline finds the other call
+  plus a comment and a string literal. ast-grep exits 1, not 0, when nothing matches, as
+  grep does.
+- **Headroom compressed nothing at first.** The first fixture gave `headroom_compress`
+  only a 49-token note, under the 250-token minimum of Headroom's `compress()`, so every
+  run got it back unchanged (`router:noop`, 0 tokens saved): storage and retrieval were
+  exercised, compression was not. The fixture now also compresses a compact JSON array
+  of 24 records, the input Headroom's SmartCrusher handles: 826 tokens became 511
+  (`router:smart_crusher:0.42`), and retrieval from a new server process returned the
+  original exactly. A control that turns `compress()` into its documented
+  `optimize=False` passthrough fails that check; the note stays as the in-run negative
+  control.
+- **jCodeMunch's source check.** The first version sliced the expected source with the
+  line bounds the response itself reported, so an empty source at `line=end_line=999`,
+  or the body line alone, passed. The check now compares the symbol's identity, bounds
+  and complete source with a frozen oracle, which a unit test checks against Python's
+  own parser.
+- **jCodeMunch.** Version 1.108.319 sends its compact MUNCH text only when that is at
+  least 15% smaller than the JSON (upstream `encoding/gate.py`); otherwise it sends JSON
+  text, which MCPorter's `--output json` prints as the parsed object. The first draft
+  expected the text form for its zero-result search and failed. Every local run got
+  JSON. Measured with the upstream encoder, the MUNCH form of the observed zero-result
+  response, and of a minimal one without metadata, was larger than the JSON (350 against
+  227 bytes, and 145 against 31), so the text branch that the harness still accepts has
+  not been observed. The observed response marked the absence as not citable because the
+  worktree had uncommitted changes, which changes only the size of that metadata.
+
 ## Reproduce on another PC
 
 1. Clone the canonical repository and open the offline HTML. Choose the relevant

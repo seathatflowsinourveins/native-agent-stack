@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
-"""Real, scoped native-tool fixtures; no providers, account reads, LLM or embedding models.
+"""Real, scoped native-tool fixtures; no providers, account reads or model commands.
 
 Only sanitized fixture outputs survive cleanup. --install uses upstream commands
 in a new temporary prefix; omission reuses explicit installed executables. Every
 measured tool, including an MCP server that MCPorter spawns, runs from its resolved
 absolute path, never a PATH lookup, so --install exercises exactly the copy it
 fetched; only plumbing (git, grep, curl, sha256sum, tar, npm and the Node runtime of
-npm-installed tools) comes from PATH. Each fixture runs the pinned tool's own CLI or
-MCP commands (upstream native operations) and this repository's checks assert on what
-they return: local integration evidence of upstream native operations. The one
-upstream test is `rtk verify --require-all`, which runs the inline filter tests built
-into RTK's release binary.
+npm-installed tools) comes from PATH. The checks are this repository's assertions
+over upstream output: local integration evidence, not upstream test suites.
 """
 
 from __future__ import annotations
@@ -64,29 +61,6 @@ UV_TOOLS = {"markitdown": "markitdown", "headroom": "headroom-ai[mcp]",
 UV_PIN = {"version": "0.12.17",
           "url": "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz",
           "sha256": "fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63"}
-# Harness, workflow, pin manifest and fixture inputs whose bytes each receipt records.
-SOURCE_FILES = ("scripts/native_token_ci.py", ".github/workflows/native-token-e2e.yml",
-                "manifests/stack.json", "fixtures/rag-note.md", "fixtures/records.json",
-                "fixtures/before.py", "fixtures/after.py", "fixtures/greeting.html",
-                "fixtures/headroom-note.txt", "fixtures/headroom-records.json",
-                "fixtures/ccusage-synthetic-claude/projects/native-ci-synthetic-project/synthetic-session.jsonl",
-                "fixtures/ast_grep_calls.py")
-# Frozen ast-grep input and outcome (1-based lines): the two real subprocess.run calls,
-# one written with a space before its argument list, versus a plain-text grep for the
-# call prefix, which finds the first call plus a comment and a string literal instead.
-AST_GREP_FIXTURE = "fixtures/ast_grep_calls.py"
-AST_GREP_CALL_LINES = [9, 13]
-AST_GREP_TEXT_LINES = [9, 16, 17]
-# Headroom inputs. The records are a compact JSON array of objects, the input its SmartCrusher
-# compresses (upstream README: "SmartCrusher — universal JSON: arrays of dicts"). The note is
-# below compress()'s default min_tokens_to_compress (250), which Headroom stores unchanged.
-HEADROOM_RECORDS = "fixtures/headroom-records.json"
-HEADROOM_NOTE = "fixtures/headroom-note.txt"
-# Frozen jCodeMunch source-recovery oracle: the identity, 1-based bounds and complete source of
-# the function in fixtures/after.py, taken from the committed fixture, never from a response.
-JCODEMUNCH_SYMBOL = {"id": "fixtures/after.py::greeting#function", "kind": "function", "name": "greeting",
-                     "file": "fixtures/after.py", "line": 1, "end_line": 2}
-JCODEMUNCH_SYMBOL_SOURCE = 'def greeting(name):\n    return "Hello, " + name + "!"'
 
 
 def digest(data: bytes) -> str:
@@ -180,40 +154,6 @@ def cbm_listed_total(stdout: str) -> int:
     return int(totals[0])
 
 
-def rtk_inline_tests_passed(stdout: str) -> bool:
-    """`rtk verify` prints one `P/T tests passed` line for RTK's built-in filter tests."""
-    totals = re.findall(r"^([0-9]+)/([0-9]+) tests passed$", stdout, re.MULTILINE)
-    return len(totals) == 1 and totals[0][0] == totals[0][1] and int(totals[0][1]) > 0
-
-
-def headroom_compressed(result: dict, original: str) -> bool:
-    """headroom_compress really compressed: a retrieval hash, a changed text, fewer tokens by the
-    reported saving and a SmartCrusher route, not `router:noop` or a passthrough."""
-    before, after = result.get("original_tokens"), result.get("compressed_tokens")
-    return (bool(result.get("hash")) and isinstance(result.get("compressed"), str)
-            and result["compressed"] != original and type(before) is int and type(after) is int
-            and 0 < after < before and result.get("tokens_saved") == before - after
-            and any(str(route).startswith("router:smart_crusher:") for route in result.get("transforms") or []))
-
-
-def jcodemunch_symbol_exact(response: dict) -> bool:
-    """get_symbol_source returned the frozen symbol: its identity, bounds and complete source."""
-    return (all(response.get(key) == value for key, value in JCODEMUNCH_SYMBOL.items())
-            and response.get("source") == JCODEMUNCH_SYMBOL_SOURCE)
-
-
-def jcodemunch_index_file(repo: str) -> str:
-    """Name of the SQLite index jcodemunch-mcp 1.108.319 writes for an `owner/name` repo id:
-    storage/sqlite_store.py `_db_path` is `{base_path}/{owner}-{name}.db`, each part
-    sanitized by `_safe_repo_component` (characters outside [A-Za-z0-9._-] become one
-    hyphen, outer hyphens stripped). The harness never writes this file itself."""
-    parts = repo.split("/")
-    require(len(parts) == 2, "jcodemunch repo id is not owner/name")
-    safe = [re.sub(r"-+", "-", re.sub(r"[^A-Za-z0-9._-]", "-", part)).strip("-") for part in parts]
-    require(all(part not in {"", ".", ".."} for part in safe), "jcodemunch repo id has an empty part")
-    return f"{safe[0]}-{safe[1]}.db"
-
-
 class Run:
     def __init__(self, output: Path, work: Path):
         self.output, self.work = output, work
@@ -221,8 +161,6 @@ class Run:
         # main() overrides this from --install; direct construction (e.g. tests) defaults to
         # resolving dependencies (mcporter) from PATH rather than installing a fresh copy.
         self.fresh_install = False
-        # First failure to provide MCPorter, repeated to every later fixture that needs it.
-        self.mcporter_error: str | None = None
         self.report = {
             "schema_version": 1, "kind": "native_cli_e2e", "evidence_class": "local_integration",
             "captured_at": datetime.now(timezone.utc).isoformat(),
@@ -230,16 +168,8 @@ class Run:
             "failures": [], "artifacts": {},
             "scope": "Fresh Linux fixture state; selected upstream CLIs, no native model task",
             "limits": ["Not a new-PC, native Codex/Claude, GPU or provider acceptance",
-                       "Local integration evidence of upstream native operations: each fixture runs the pinned "
-                       "tool's own CLI or MCP commands and this repository's checks assert on their output; the "
-                       "one upstream test is rtk verify --require-all (RTK's inline filter tests, built into its "
-                       "release binary)",
-                       "No LLM or embedding model: MarkItDown runs the ONNX file-type classifier bundled in its "
-                       "magika dependency, and Headroom's token counter downloads tiktoken's o200k_base "
-                       "vocabulary into TMPDIR at run time",
-                       "Top-level package pins only: npm and uv tool (PyPI) dependencies resolve at "
-                       "installation without a lockfile or pinned hashes; the uv archive is the only "
-                       "download checked against a hash pinned in this harness",
+                       "Checks are this repository's assertions over upstream output, not upstream test suites",
+                       "Top-level package pins; npm transitive ranges resolve at installation",
                        "RTK counters are fixture-local estimates, not provider savings",
                        "ccusage reads a committed synthetic usage log, not account history",
                        "No token-saving requirement: fidelity may need the larger representation",
@@ -291,12 +221,14 @@ class Run:
         self.report["environment"] = {key: self.clean(value) for key, value in self.env.items()
                                       if key not in {"HOME", "PATH"}}
         self.report["native_home_preserved"] = self.env.get("HOME") == os.environ.get("HOME")
-        # {path, sha256} objects, not a map keyed by path: a key such as
-        # "scripts/native_token_ci.py" beside a 64-hex value is the keyed-credential shape
-        # gitleaks' generic-api-key rule reports ("token" in the key), and receipts are
-        # committed as evidence under the repository's secret scan.
-        self.report["source_files"] = [{"path": name, "sha256": digest((ROOT / name).read_bytes())}
-                                       for name in SOURCE_FILES]
+        self.report["source_sha256"] = {
+            name: digest((ROOT / name).read_bytes()) for name in (
+                "scripts/native_token_ci.py", ".github/workflows/native-token-e2e.yml",
+                "manifests/stack.json", "fixtures/rag-note.md", "fixtures/records.json",
+                "fixtures/before.py", "fixtures/after.py", "fixtures/greeting.html",
+                "fixtures/headroom-note.txt",
+                "fixtures/ccusage-synthetic-claude/projects/native-ci-synthetic-project/synthetic-session.jsonl")
+        }
         self.flush()
 
     def clean(self, value: str) -> str:
@@ -450,12 +382,6 @@ def rtk_fixture(run: Run) -> None:
     run.check("rtk-retained-fixture-database", Path(run.env["RTK_DB_PATH"]).is_file())
     run.check("rtk-native-statistics-returned", isinstance(after, dict) and bool(after))
     run.check("rtk-three-command-counter-increment", after["summary"]["total_commands"] == 3)
-    # Upstream tests, unlike the checks above: `rtk verify` runs the inline tests of RTK's built-in
-    # TOML filters, compiled into the release binary, and --require-all (its CI mode) also fails
-    # when a filter has none. Its hook-integrity step reads $CLAUDE_CONFIG_DIR, here the committed
-    # fixture directory, finds no hook and skips, so no client configuration is consulted.
-    verify = run.command("rtk-verify-inline-filter-tests", [tool, "verify", "--require-all"], repo)
-    run.check("rtk-upstream-inline-filter-tests-pass", rtk_inline_tests_passed(verify))
 
 
 def qmd_fixture(run: Run) -> None:
@@ -550,27 +476,21 @@ def markitdown_fixture(run: Run) -> None:
 
 
 def ast_grep_fixture(run: Run) -> None:
-    # A frozen fixture, not the live scripts/ tree: its outcome cannot drift with unrelated
-    # scripts, and it separates a structural match from a textual one. ast-grep must return
-    # exactly the two real calls, including the one spelled `subprocess.run (`, which a text
-    # search misses; grep's text baseline must find the first call plus the comment and
-    # string decoys, which are not calls.
+    # This file's own --pattern argument below is a text match for grep's naive scan, even
+    # though it is a string literal rather than a real call; exclude the harness's own
+    # source so both tools count the same real-call corpus (grep would otherwise read 21).
     binary = run.tools["ast-grep"]
-    matches = json.loads(run.command("ast-grep-fixture-subprocess-run", [binary, "run", "--lang", "python",
-                         "--pattern", "subprocess.run($$$ARGS)", AST_GREP_FIXTURE, "--json=compact"],
-                         cwd=ROOT))
-    text = run.command("ast-grep-text-baseline-grep", ["grep", "-n", "-o", r"subprocess\.run(",
-                       AST_GREP_FIXTURE], cwd=ROOT)
-    text_lines = [int(line.split(":", 1)[0]) for line in text.splitlines() if line]
-    # ast-grep's JSON range lines are 0-based.
-    call_lines = sorted(match["range"]["start"]["line"] + 1 for match in matches)
-    run.check("ast-grep-matches-only-the-real-calls-in-fixture",
-              {match["file"] for match in matches} == {AST_GREP_FIXTURE}
-              and call_lines == AST_GREP_CALL_LINES and text_lines == AST_GREP_TEXT_LINES)
+    matches = json.loads(run.command("ast-grep-scripts-subprocess-run", [binary, "run", "--lang", "python",
+                         "--pattern", "subprocess.run($$$ARGS)", "--globs", "!native_token_ci.py",
+                         "scripts/", "--json=compact"], cwd=ROOT))
+    grep_output = run.command("ast-grep-cross-check-grep", ["grep", "-rho", r"subprocess\.run(",
+                              "scripts/", "--include=*.py", "--exclude=native_token_ci.py"], cwd=ROOT)
+    grep_count = len([line for line in grep_output.splitlines() if line])
+    run.check("ast-grep-matches-grep-count-in-scripts", grep_count > 0 and len(matches) == grep_count)
     # ast-grep exits 1 (not 0) on zero matches, matching grep/ripgrep convention; it still
     # prints the empty JSON array.
     none = json.loads(run.command("ast-grep-negative-control", [binary, "run", "--lang", "python",
-                      "--pattern", "zzz_native_ci_nonexistent_call($$$ARGS)", AST_GREP_FIXTURE,
+                      "--pattern", "zzz_native_ci_nonexistent_call($$$ARGS)", "scripts/",
                       "--json=compact"], cwd=ROOT, nonzero=True))
     run.check("ast-grep-negative-control-zero-matches", none == [])
 
@@ -641,18 +561,11 @@ def ensure_mcporter(run: Run) -> str:
     but it is pinned and version-checked the same way."""
     if "mcporter" in run.tools:
         return run.tools["mcporter"]
-    # A later fixture must report the first failure's real cause: retrying would repeat a
-    # pin mismatch, or, after a failed --install, stop at install()'s existing prefix.
-    require(run.mcporter_error is None, f"MCPorter unavailable after an earlier failure: {run.mcporter_error}")
-    try:
-        binary = run.install("mcporter") if run.fresh_install else shutil.which("mcporter")
-        require(bool(binary), "Missing native executable: mcporter")
-        version = run.command("version-mcporter", [str(binary), "--version"])
-        require(re.search(rf"(?<![\d.]){re.escape(PINS['mcporter'])}(?![\d.])", version) is not None,
-                "Installed mcporter differs from its manifest pin")
-    except Exception as error:
-        run.mcporter_error = f"{type(error).__name__}: {error}"
-        raise
+    binary = run.install("mcporter") if run.fresh_install else shutil.which("mcporter")
+    require(bool(binary), "Missing native executable: mcporter")
+    version = run.command("version-mcporter", [str(binary), "--version"])
+    require(re.search(rf"(?<![\d.]){re.escape(PINS['mcporter'])}(?![\d.])", version) is not None,
+            "Installed mcporter differs from its manifest pin")
     # Only cache a version-checked binary: an earlier fixture's failed pin check must not
     # leave a mismatched mcporter memoized for a later fixture (headroom, jcodemunch-mcp)
     # to silently reuse without its own check.
@@ -677,8 +590,7 @@ def headroom_fixture(run: Run) -> None:
     ensure_mcporter(run)
     workspace = Path(run.env["HEADROOM_WORKSPACE_DIR"])
     server = stdio_command(run.tools["headroom"], "mcp", "serve", "--proxy-url", "http://127.0.0.1:1")
-    records = (ROOT / HEADROOM_RECORDS).read_text()
-    note = (ROOT / HEADROOM_NOTE).read_text()
+    content = (ROOT / "fixtures/headroom-note.txt").read_text()
 
     def call(label: str, tool: str, args: dict) -> dict:
         # Headroom's workspace (default ~/.headroom) holds its compression store, session
@@ -687,22 +599,16 @@ def headroom_fixture(run: Run) -> None:
                                    ("HEADROOM_WORKSPACE_DIR", "HEADROOM_CONFIG_DIR", "HEADROOM_OFFLINE",
                                     "DO_NOT_TRACK"), 20000)
 
-    compressed = call("headroom-compress-json-records", "headroom_compress", {"content": records})
-    run.check("headroom-compress-json-records-saves-tokens", headroom_compressed(compressed, records))
+    compressed = call("headroom-compress", "headroom_compress", {"content": content})
+    content_hash = compressed.get("hash")
+    run.check("headroom-compress-returned-hash", isinstance(content_hash, str) and bool(content_hash))
     # Each call starts a new server process, so this round trip also crosses processes.
-    retrieved = call("headroom-retrieve-json-records", "headroom_retrieve", {"hash": compressed["hash"]})
-    run.check("headroom-retrieve-exact-original-records", retrieved.get("original_content") == records)
-    # The in-run negative control for the saving check: short content stays unchanged, but stored.
-    short = call("headroom-compress-short-note", "headroom_compress", {"content": note})
-    run.check("headroom-short-note-stored-unchanged", short.get("compressed") == note
-              and short.get("tokens_saved") == 0 and bool(short.get("hash")))
+    retrieved = call("headroom-retrieve-exact-round-trip", "headroom_retrieve", {"hash": content_hash})
+    run.check("headroom-retrieve-exact-content-match", retrieved.get("original_content") == content)
     negative = call("headroom-retrieve-bogus-hash", "headroom_retrieve", {"hash": "0" * 24})
     run.check("headroom-bogus-hash-reports-error", "error" in negative)
     run.check("headroom-compression-store-inside-run",
               "ccr_store.db" in run.observe("headroom-workspace", workspace))
-    # Headroom counts tokens with tiktoken's o200k_base vocabulary, which tiktoken downloads into
-    # its cache under TMPDIR on first use; recorded, not checked.
-    run.observe("headroom-tiktoken-cache", Path(run.env["TMPDIR"]) / "data-gym-cache")
 
 
 def jcodemunch_mcp_fixture(run: Run) -> None:
@@ -730,36 +636,28 @@ def jcodemunch_mcp_fixture(run: Run) -> None:
         "follow_symlinks": False, "context_providers": False}, "allow_state_change": True})
     require(indexed.get("success") is True, "jcodemunch index_folder did not report success")
     run.check("jcodemunch-indexed-fixtures-symbols", indexed.get("symbol_count", 0) >= 2)
+    run.check("jcodemunch-index-inside-run", bool(run.observe("jcodemunch-mcp-index", index_path)))
     repo = indexed["repo"]
-    # The repository's own index file, which only jcodemunch-mcp writes, must be under
-    # CODE_INDEX_PATH and absent from the server HOME's ~/.code-index fallback. A non-empty
-    # directory alone proves nothing: the harness itself wrote config.jsonc there.
-    index_file = jcodemunch_index_file(repo)
-    run.check("jcodemunch-index-inside-run",
-              index_file in run.observe("jcodemunch-mcp-index", index_path)
-              and not any(server_home.rglob(index_file)))
 
     found = order("jcodemunch-search-symbols-greeting", {"action": "search_symbols",
                   "args": {"repo": repo, "query": "greeting", "kind": "function", "max_results": 5}})
     search_text = found["content"][0]["text"]
     symbol_ids = [line.split(",")[1] for line in search_text.splitlines() if line.startswith("s,")]
-    require(JCODEMUNCH_SYMBOL["id"] in symbol_ids, "jcodemunch did not return the after.py greeting symbol")
+    after_id = next((sid for sid in symbol_ids if sid.startswith("fixtures/after.py::")), None)
+    require(after_id is not None, "jcodemunch did not return the after.py greeting symbol")
 
     source = order("jcodemunch-get-symbol-source", {"action": "get_symbol_source",
-                   "args": {"repo": repo, "symbol_id": JCODEMUNCH_SYMBOL["id"]}})
-    # Compared with the frozen oracle, never with the bounds the response itself reports: an
-    # empty or partial source must not pass with matching wrong bounds.
-    run.check("jcodemunch-get-symbol-source-exact-content", jcodemunch_symbol_exact(source))
+                   "args": {"repo": repo, "symbol_id": after_id}})
+    expected_lines = "\n".join((ROOT / "fixtures/after.py").read_text()
+                                .splitlines()[source["line"] - 1:source["end_line"]])
+    run.check("jcodemunch-get-symbol-source-exact-content", source["source"] == expected_lines)
 
     absent = order("jcodemunch-search-symbols-negative-control", {"action": "search_symbols",
                    "args": {"repo": repo, "query": "zzz_native_ci_nonexistent_symbol",
                             "kind": "function", "max_results": 5}})
-    # jcodemunch-mcp 1.108.319 answers in its compact MUNCH text only when that is at least
-    # 15% smaller than the JSON (encoding/__init__.py encode_response, encoding/gate.py
-    # DEFAULT_THRESHOLD); otherwise it sends JSON text. MCPorter 0.14.1's `--output json`
-    # prints JSON text as the parsed object and other text inside the raw result's content
-    # list. Every local run got the JSON for this zero-result search (the upstream encoder's
-    # MUNCH form of a zero-result response is larger than its JSON); both shapes are accepted.
+    # A zero-result search returns the usual content-wrapped text envelope, unless jcodemunch
+    # judges the absence non-citable (e.g. uncommitted changes in the scanned scope, as in a
+    # dirty worktree), in which case it returns the structured result directly instead.
     if "content" in absent:
         run.check("jcodemunch-negative-control-zero-results", "result_count=0" in absent["content"][0]["text"])
     else:
