@@ -28,7 +28,7 @@
   "blueprints/us-equities/adaptive-paper/registry.json": "60da73b985e718bd1dece7a3350f34636bda0fb38e766a44ae71c5a8c532282a",
   "blueprints/us-equities/adaptive-paper/requirements.txt": "518afe4b77f901e87abd3a5d6faa126aa7e211db77eecec80cfe7ef42d82e07a",
   "blueprints/us-equities/adaptive-paper/runner.py": "27bc3fdc80472c3ee218d3723e506288ebc6eef536dafc8365b30474213a6ae4",
-  "blueprints/us-equities/adaptive-paper/safety.py": "72abaaca3b21091f2be9df7ad3649d8349c90e13bd89babf467702f2a9b31d3d",
+  "blueprints/us-equities/adaptive-paper/safety.py": "e0ba9233af4b740d2dd7f1dea764bfc62348d0c06dc82a63d174a03e8aff0634",
   "blueprints/us-equities/adaptive-paper/scheduled_trial.sh": "58a5b656875bda629443768cd0c69a4be28cbf90dfc9f5ae8782d7dcf3ac7d76",
   "blueprints/us-equities/adaptive-paper/selector.py": "28de8ebf66b6e7135979554f73692ede772167682007d8c6ba41da6fb6fb39b3",
   "blueprints/us-equities/adaptive-paper/sessions.py": "95f0affee512e88dd44f196fa72bb7471e00899356793bdbb12f15c4ed84e64d",
