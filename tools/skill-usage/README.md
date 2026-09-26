@@ -170,6 +170,10 @@ also records whether a developer message carries the injected block's marker (de
 `<context_window_protection>`, the opening tag of Context Mode's routing block; `--marker` for
 another). A spawned sub-agent's rollout begins with records copied from its parent (ordinals below
 `subagent_history_start_ordinal`); they count toward its marker and catalog, never as its calls.
+A tool call counts once per id (a `function_call`'s `call_id` is its item's id), in the window of
+its first record, as `child-usage.mjs` counts `tool_use` ids: a call requested before `--since`
+and completed inside is not counted again, so adjacent windows add up. Its shell, MCP and fetch
+lanes come from its `item_completed` event and count in that event's window.
 
 Shell, MCP and fetch counts come from `item_completed` events, an event whose persistence depends
 on the rollout's history mode (`codex-rs/rollout/src/policy.rs`); `response_item` records are
@@ -181,7 +185,9 @@ as zero. `ctx_fetch_and_index_share` compares three lanes only (hosted page open
 (`ctx_execute` code), a `gh api` call and `fetch()` or an HTTP library in a script are in no lane.
 `curl`/`wget` also counts behind the shell keywords `do`, `then`, `else`, `elif`, `if`, `while`,
 `until`, `!` and `{` and behind `rtk`, `sudo`, `env`, `command`, `exec`, `time`, `nice`, `nohup`
-or `timeout N`.
+or `timeout N`. Escaped characters and comments are data, and `$(...)` or backticks inside double
+quotes or in the body of a heredoc with an unquoted delimiter still run (bash(1) QUOTING, COMMENTS
+and Here Documents).
 
 Sessions that did not load the user config are negative controls, never workers. Rollouts do not
 record `--ignore-user-config` itself, so the report classifies each session by its skill catalog:

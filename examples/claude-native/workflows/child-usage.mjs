@@ -120,6 +120,13 @@ const RUN_QUOTED = /(?:^|[\s;&|(])(?:(?:(?:ba|z|da|k)?sh|su)(?:\s+-[A-Za-z]+)*\s
 const SHELL_WORD = /^(?:(?:ba|z|da|k)?sh|ssh)$/
 const HEREDOC = /(?<!<)<<(?!<)-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/
 const WRAPPERS = new Set(['sudo', 'env', 'command', 'exec', 'nice', 'nohup', 'time', 'rtk'])
+// Shell text is read by bash(1) (GNU bash 5.2) QUOTING, COMMENTS and Here Documents: an escaped character is literal and
+// \<newline> is a line continuation; a word beginning with # ends the line as a comment; inside double quotes, and in the
+// body of a heredoc whose delimiter is unquoted, $(...) and `...` still run, while \$ and \` are literal.
+const DOUBLE_QUOTED_DATA = /\\[\s\S]|\$\([^()]*\)|`[^`]*`|[;&|()`\n]/g
+const SUBSTITUTION = /\\[\s\S]|\$\([^()]*\)|`[^`]*`/g
+const ESCAPED_DATA = new Set([...' \t;&|()<>`$\'"\\#{}!']) // escaped, these become the data character _
+const WORD_BREAK = new Set([...' \t\n;&|()<>']) // bash metacharacters: a # after one begins a comment
 // The program of the last simple command in `prefix`: assignments, options, wrappers and a timeout duration skipped.
 const programOf = (prefix) => {
   const words = prefix.split(/[;&|(]/).pop().trim().split(/\s+/).filter(Boolean)
@@ -130,28 +137,42 @@ const programOf = (prefix) => {
   }
   return ''
 }
-// The command text a shell would run: a heredoc body is data unless the heredoc feeds a shell, and a quoted
-// string is data unless a shell runs it (RUN_QUOTED); inside double quotes, $(...) and `...` still run.
-// Data keeps its words (so URL arguments stay) but loses the separators that would put a word in command position.
+// The command text a shell would run: a heredoc body is data unless the heredoc feeds a shell, though with an
+// unquoted delimiter its command substitutions still run; a quoted string is data unless a shell runs it (RUN_QUOTED),
+// though inside double quotes $(...) and `...` still run; an escaped character and a comment are data, and
+// \<newline> joins lines. Data keeps its words (so URL arguments stay) but loses the separators that would put a
+// word in command position.
 export function executedText(command) {
   const lines = String(command || '').split('\n'), kept = []
   for (let i = 0; i < lines.length; i++) {
     kept.push(lines[i])
     const m = HEREDOC.exec(lines[i])
     if (!m || SHELL_WORD.test(programOf(lines[i].slice(0, m.index)))) continue
-    while (i + 1 < lines.length && lines[i + 1].replace(/^\t+/, '') !== m[2]) { i++; kept.push('') }
+    while (i + 1 < lines.length && lines[i + 1].replace(/^\t+/, '') !== m[2]) {
+      i++
+      kept.push(m[1] ? '' : (lines[i].match(SUBSTITUTION) || []).filter((s) => s[0] !== '\\').join(' '))
+    }
   }
   const text = kept.join('\n')
   let out = ''
   for (let i = 0; i < text.length; i++) {
     const ch = text[i]
-    if (ch === '\\') { out += text.slice(i, i + 2); i++; continue }
+    if (ch === '\\') {
+      const next = text[i + 1]
+      if (next !== undefined && next !== '\n') out += ESCAPED_DATA.has(next) ? '_' : next
+      i++
+      continue
+    }
+    if (ch === '#' && (out === '' || WORD_BREAK.has(out[out.length - 1]))) {
+      while (i + 1 < text.length && text[i + 1] !== '\n') i++
+      continue
+    }
     if (ch !== "'" && ch !== '"') { out += ch; continue }
     let j = i + 1
     while (j < text.length && text[j] !== ch) j += ch === '"' && text[j] === '\\' ? 2 : 1
     const inner = text.slice(i + 1, j)
     if (RUN_QUOTED.test(out)) out += ';' + inner + ';'
-    else if (ch === '"') out += '"' + inner.replace(/\$\([^()]*\)|`[^`]*`|[;&|()`\n]/g, (s) => s.length > 1 ? s : ' ') + '"'
+    else if (ch === '"') out += '"' + inner.replace(DOUBLE_QUOTED_DATA, (s) => s[0] === '\\' ? '_' : s.length > 1 ? s : ' ') + '"'
     else out += "'" + inner.replace(/[;&|()`$\n]/g, ' ') + "'"
     i = j
   }
@@ -361,7 +382,7 @@ export function findChildTranscripts(roots, unreadable = { count: 0 }) {
   return [...found].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([path, spawn]) => ({ path, spawn }))
 }
 
-const LANES_LIMITS = 'Counts come from native transcript rows inside [since, until); rows at or after until are never read. A tool call (tool_use blocks deduplicated by id) counts in the window of its first row, a ToolSearch load (tool_reference blocks in its result) in the window of the result row, and an RTK rewrite (a PreToolUse:Bash row from `rtk hook` whose stdout carries updatedInput, for a Bash call whose tool_use row came before until) in the window of its hook row, so adjacent windows add up. RTK decisions (with --rtk-db) are hook_decisions rows joined 1:1 by tool_use_id to the Bash calls counted in the window; covered = allow + ask. A call whose hook row falls on the other side of a window edge therefore counts in hook_rewrites and in decisions of different windows. The marker is looked for only in the first prompt and in SubagentStart hook context, never in tool input or output. first_prompt_tokens is provider-returned (input + cache read + cache creation) and counted only for children whose first request is inside the window. curl/wget counts only in command position of the text a shell runs (quoted strings and heredoc bodies are data unless sh -c, eval, ssh or a shell heredoc runs them), optionally behind the shell keywords do, then, else, elif, if, while, until, ! and { and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N; a call whose literal URLs are all loopback is counted apart. ctx_fetch_and_index_share is ctx_fetch_and_index / (WebFetch + ctx_fetch_and_index + remote curl/wget): a fetch run inside a Context Mode sandbox (ctx_execute or ctx_batch_execute code), a gh api call and fetch() or an HTTP library in a script are in no lane. Names that are not name-shaped are counted under (other). Transcripts not modified since the window start are skipped unread. Every child transcript is a child, so a Workflow call the runtime re-ran under the same key (superseded_attempts in the per-run report) is one child per attempt. Children whose agent type starts with blind- are negative controls and are left out of workers; by_spawn_and_agent_type compares spawn paths within one agent type.'
+const LANES_LIMITS = 'Counts come from native transcript rows inside [since, until); rows at or after until are never read. A tool call (tool_use blocks deduplicated by id) counts in the window of its first row, a ToolSearch load (tool_reference blocks in its result) in the window of the result row, and an RTK rewrite (a PreToolUse:Bash row from `rtk hook` whose stdout carries updatedInput, for a Bash call whose tool_use row came before until) in the window of its hook row, so adjacent windows add up. RTK decisions (with --rtk-db) are hook_decisions rows joined 1:1 by tool_use_id to the Bash calls counted in the window; covered = allow + ask. A call whose hook row falls on the other side of a window edge therefore counts in hook_rewrites and in decisions of different windows. The marker is looked for only in the first prompt and in SubagentStart hook context, never in tool input or output. first_prompt_tokens is provider-returned (input + cache read + cache creation) and counted only for children whose first request is inside the window. curl/wget counts only in command position of the text a shell runs (quoted strings, heredoc bodies, escaped characters and comments are data unless sh -c, eval, ssh or a shell heredoc runs them, though $(...) and `...` inside double quotes or an unquoted heredoc still run: bash(1) QUOTING, COMMENTS and Here Documents), optionally behind the shell keywords do, then, else, elif, if, while, until, ! and { and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N; a call whose literal URLs are all loopback is counted apart. ctx_fetch_and_index_share is ctx_fetch_and_index / (WebFetch + ctx_fetch_and_index + remote curl/wget): a fetch run inside a Context Mode sandbox (ctx_execute or ctx_batch_execute code), a gh api call and fetch() or an HTTP library in a script are in no lane. Names that are not name-shaped are counted under (other). Transcripts not modified since the window start are skipped unread. Every child transcript is a child, so a Workflow call the runtime re-ran under the same key (superseded_attempts in the per-run report) is one child per attempt. Children whose agent type starts with blind- are negative controls and are left out of workers; by_spawn_and_agent_type compares spawn paths within one agent type.'
 
 // Lane use of every child transcript under the roots that has a row inside [since, until).
 export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT_MARKER, rtk = null } = {}) {

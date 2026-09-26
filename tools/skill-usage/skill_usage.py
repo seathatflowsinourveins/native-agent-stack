@@ -628,7 +628,14 @@ RUN_QUOTED = re.compile(r"(?:^|[\s;&|(])(?:(?:(?:ba|z|da|k)?sh|su)(?:\s+-[A-Za-z
 SHELL_WORD = re.compile(r"^(?:(?:ba|z|da|k)?sh|ssh)$")
 HEREDOC = re.compile(r"(?<!<)<<(?!<)-?\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
 SHELL_WRAPPERS = {"sudo", "env", "command", "exec", "nice", "nohup", "time", "rtk"}
-DOUBLE_QUOTED_DATA = re.compile(r"\$\([^()]*\)|`[^`]*`|[;&|()`\n]")
+# Shell text is read by bash(1) (GNU bash 5.2) QUOTING, COMMENTS and Here Documents: an escaped
+# character is literal and \<newline> is a line continuation; a word beginning with # ends the line
+# as a comment; inside double quotes, and in the body of a heredoc whose delimiter is unquoted,
+# $(...) and `...` still run, while \$ and \` are literal.
+DOUBLE_QUOTED_DATA = re.compile(r"\\[\s\S]|\$\([^()]*\)|`[^`]*`|[;&|()`\n]")
+SUBSTITUTION = re.compile(r"\\[\s\S]|\$\([^()]*\)|`[^`]*`")
+ESCAPED_DATA = frozenset(" \t;&|()<>`$'\"\\#{}!")  # escaped, these become the data character _
+WORD_BREAK = frozenset(" \t\n;&|()<>")  # bash metacharacters: a # after one begins a comment
 # Report keys that come from rollouts (server, function and originator names) must be name-shaped;
 # anything else (a path, text, an address) is counted under "(other)".
 SAFE_KEY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:+-]{0,79}$")
@@ -645,9 +652,12 @@ USER_CONFIG_METHOD = (
 TOOL_ITEM_TYPES = ("McpToolCall", "CommandExecution", "Extension", "FileChange")
 LANES_LIMITS = (
     "Counts come from rollout records inside [since, until): item_completed McpToolCall, "
-    "CommandExecution, Extension and FileChange items plus function_call records whose call_id is "
-    "not also an item id (the rollout shape of codex-cli 0.155.1 and 0.157.1), token_count for the "
-    "first prompt (input tokens, cached included) and response_item calls for SKILL.md reads. "
+    "CommandExecution, Extension and FileChange items and function_call records, one tool call per "
+    "id (a function_call's call_id is its item's id in the rollouts of codex-cli 0.155.1 and "
+    "0.157.1) counted in the window of the call's first record before until, so a call requested "
+    "before since and completed inside is not counted again and adjacent windows add up, while its "
+    "shell, MCP and fetch lanes count in the window of its item_completed event; token_count for "
+    "the first prompt (input tokens, cached included) and response_item calls for SKILL.md reads. "
     "Shell, MCP and fetch counts therefore need item_completed events, an EventMsg whose "
     "persistence depends on the rollout's history mode (codex-rs/rollout/src/policy.rs): "
     "sessions_by_history_mode reports session_meta.history_mode, and "
@@ -658,8 +668,10 @@ LANES_LIMITS = (
     "subagent_history_start_ordinal) count toward those properties only, never as the child's "
     "calls. The marker is looked for in developer messages only. The rtk prefix is the first word "
     "of the shell script; curl/wget counts only in command position of the text a shell runs "
-    "(quoted strings and heredoc bodies are data unless sh -c, eval, ssh or a shell heredoc runs "
-    "them), optionally behind the shell keywords do, then, else, elif, if, while, until, ! and { "
+    "(quoted strings, heredoc bodies, escaped characters and comments are data unless sh -c, eval, "
+    "ssh or a shell heredoc runs them, though $(...) and `...` inside double quotes or an unquoted "
+    "heredoc still run: bash(1) QUOTING, COMMENTS and Here Documents), optionally behind the shell "
+    "keywords do, then, else, elif, if, while, until, ! and { "
     "and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N, and a call whose "
     "literal URLs are all loopback is counted apart. ctx_fetch_and_index_share is "
     "ctx_fetch_and_index / (web page opens + ctx_fetch_and_index + remote curl/wget): a fetch run "
@@ -690,11 +702,18 @@ def _program_of(prefix: str) -> str:
     return ""
 
 
+def _double_quoted_data(match: re.Match) -> str:
+    text = match.group(0)
+    return "_" if text[0] == "\\" else text if len(text) > 1 else " "
+
+
 def executed_text(command: str) -> str:
     """The command text a shell would run (child-usage.mjs executedText): a heredoc body is data
-    unless the heredoc feeds a shell, and a quoted string is data unless a shell runs it
-    (RUN_QUOTED); inside double quotes, $(...) and `...` still run. Data keeps its words, so URL
-    arguments stay, but loses the separators that would put a word in command position."""
+    unless the heredoc feeds a shell, though with an unquoted delimiter its command substitutions
+    still run; a quoted string is data unless a shell runs it (RUN_QUOTED), though inside double
+    quotes $(...) and `...` still run; an escaped character and a comment are data, and
+    \\<newline> joins lines. Data keeps its words, so URL arguments stay, but loses the separators
+    that would put a word in command position."""
     lines, kept, index = (command or "").split("\n"), [], 0
     while index < len(lines):
         kept.append(lines[index])
@@ -702,14 +721,21 @@ def executed_text(command: str) -> str:
         if match and not SHELL_WORD.match(_program_of(lines[index][:match.start()])):
             while index + 1 < len(lines) and lines[index + 1].lstrip("\t") != match.group(2):
                 index += 1
-                kept.append("")
+                kept.append("" if match.group(1) else " ".join(
+                    found.group(0) for found in SUBSTITUTION.finditer(lines[index]) if found.group(0)[0] != "\\"))
         index += 1
     text, out, index = "\n".join(kept), "", 0
     while index < len(text):
         char = text[index]
         if char == "\\":
-            out += text[index:index + 2]
+            following = text[index + 1:index + 2]
+            if following and following != "\n":
+                out += "_" if following in ESCAPED_DATA else following
             index += 2
+            continue
+        if char == "#" and (not out or out[-1] in WORD_BREAK):
+            end = text.find("\n", index)
+            index = len(text) if end < 0 else end
             continue
         if char not in "'\"":
             out += char
@@ -722,7 +748,7 @@ def executed_text(command: str) -> str:
         if RUN_QUOTED.search(out):
             out += ";" + inner + ";"
         elif char == '"':
-            out += '"' + DOUBLE_QUOTED_DATA.sub(lambda m: m.group(0) if len(m.group(0)) > 1 else " ", inner) + '"'
+            out += '"' + DOUBLE_QUOTED_DATA.sub(_double_quoted_data, inner) + '"'
         else:
             out += "'" + re.sub(r"[;&|()`$\n]", " ", inner) + "'"
         index = end + 1
@@ -794,13 +820,25 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
     A spawned sub-agent's rollout starts with records copied from its parent: those whose ordinal
     is below session_meta.subagent_history_start_ordinal. They count toward session properties
     (the marker and the catalog are part of the child's context) but never as the child's calls.
-    A function_call whose call_id is also an item_completed id is one tool call, not two."""
+    A tool call is a function_call record or a tool item_completed event, one call per id (a
+    function_call's call_id is its item's id), and counts in the window of its first record before
+    until, like child-usage.mjs tool_use ids: a call requested before since and completed inside
+    is not counted again, so adjacent windows add up. Its shell, MCP and fetch lanes come from the
+    item_completed event and count in that event's window."""
     session = _new_lanes_session()
     parse_errors = untimed = 0
     first_usage_seen = False
     history_start = None
-    item_ids: set = set()
-    call_ids: list = []
+    call_ids: set = set()
+
+    def first_record(call_id) -> bool:
+        """Whether a record is its call's first (a record without an id is a call of its own)."""
+        if call_id is None:
+            return True
+        if call_id in call_ids:
+            return False
+        call_ids.add(call_id)
+        return True
 
     def catalog(text: str) -> None:
         session["catalog_off"] |= any(f"/{name}/SKILL.md" in text for name in codex_off)
@@ -854,18 +892,21 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
                 payload_type = payload.get("type")
                 if payload_type in CALL_PAYLOAD_TYPES and not inherited:
                     session["own_model_calls"] += 1
+                new_call = payload_type == "function_call" and not inherited and first_record(payload.get("call_id"))
                 if payload_type == "message" and payload.get("role") == "developer":
                     session["marker"] |= marker in message_text(payload)
                 elif counted and payload_type in CALL_PAYLOAD_TYPES:
                     for name in skillmd_hits(payload, names):
                         _bump(session["skill_md_reads"], name)
                     if payload_type == "function_call":
-                        call_ids.append(payload.get("call_id"))
+                        session["tool_calls"] += new_call
                         _bump(session["function_calls"], safe_key(payload["name"]) if payload.get("name") else "(none)")
             elif kind == "event_msg" and not inherited:
                 payload_type = payload.get("type")
-                if (payload_type == "item_completed" and isinstance(payload.get("item"), dict)
-                        and payload["item"].get("type") in TOOL_ITEM_TYPES):
+                item = payload.get("item") if isinstance(payload.get("item"), dict) else {}
+                tool_item = payload_type == "item_completed" and item.get("type") in TOOL_ITEM_TYPES
+                new_call = tool_item and first_record(item.get("id"))
+                if tool_item:
                     session["own_tool_items"] += 1
                 if payload_type == "token_count" and not first_usage_seen:
                     info = payload.get("info") if isinstance(payload.get("info"), dict) else {}
@@ -875,26 +916,24 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
                         if counted:
                             session["first_prompt_tokens"] = last["input_tokens"]
                 elif payload_type == "item_completed" and counted:
-                    _score_lane_item(session, payload.get("item") if isinstance(payload.get("item"), dict) else {},
-                                     item_ids)
-    session["tool_calls"] += sum(1 for call_id in call_ids if call_id is None or call_id not in item_ids)
+                    _score_lane_item(session, item, new_call)
     return session, parse_errors, untimed
 
 
-def _score_lane_item(session: dict, item: dict, item_ids: set) -> None:
+def _score_lane_item(session: dict, item: dict, new_call: bool) -> None:
+    """One item_completed event inside the window: its lane, and a tool call when the event is its
+    call's first record."""
     item_type = item.get("type")
-    if item_type in TOOL_ITEM_TYPES and item.get("id") is not None:
-        item_ids.add(item.get("id"))
+    if item_type in TOOL_ITEM_TYPES:
+        session["tool_calls"] += new_call
     if item_type == "McpToolCall":
         server = safe_key(item["server"]) if item.get("server") else "(none)"
-        session["tool_calls"] += 1
         _bump(session["mcp_calls"], server)
         if item.get("status") == "failed":
             _bump(session["mcp_failed"], server)
         if item.get("tool") == "ctx_fetch_and_index":
             session["fetch"]["ctx_fetch_and_index"] += 1
     elif item_type == "CommandExecution":
-        session["tool_calls"] += 1
         session["shell_calls"] += 1
         script = shell_script(item.get("command"))
         if RTK_FIRST_WORD.match(script):
@@ -903,14 +942,12 @@ def _score_lane_item(session: dict, item: dict, item_ids: set) -> None:
         if kind:
             session["fetch"]["shell_curl_wget_loopback" if kind == "loopback" else "shell_curl_wget"] += 1
     elif item_type == "Extension":
-        session["tool_calls"] += 1
         action = item.get("action") if isinstance(item.get("action"), dict) else {}
         if item.get("kind") == "web.search":
             action_type = action.get("type")
             session["fetch"]["web_open_page" if action_type == "openPage" else
                              "web_search" if action_type == "search" else "web_other"] += 1
     elif item_type == "FileChange":
-        session["tool_calls"] += 1
         session["file_changes"] += 1
 
 

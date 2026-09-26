@@ -237,6 +237,18 @@ expect('fetch: curl/wget after a shell keyword or time/nice/nohup is in command 
   '{ curl -s https://x.org; }', 'time curl -s https://x.org', 'nohup curl -s https://x.org &',
   'echo do curl https://x.org', 'git commit -m "then curl https://x.org"', 'printf "%s\\n" if curl',
 ].map(fetchKind)) === JSON.stringify(['fetch', 'fetch', 'fetch', 'fetch', 'loopback', 'loopback', 'fetch', 'fetch', 'fetch', null, null, null]))
+// Review finding (GPT-6, 2026-09-26). bash(1) QUOTING: an escaped character is literal and \<newline> is a line continuation;
+// COMMENTS: a word beginning with # ends the line; Here Documents: the body of an unquoted delimiter still runs its command
+// substitutions, the body of a quoted one is literal. The same cases tests/test_skill_usage.py pins.
+expect('fetch: an escaped character or a comment is data, and an unquoted heredoc still runs its command substitutions', JSON.stringify([
+  'echo x \\; curl https://example.com', 'echo \\(curl https://x.org\\)', 'echo \\`curl https://x.org\\`', 'echo "\\$(curl https://x.org)"',
+  'echo "\\`curl https://x.org\\`"', 'echo foo \\\ncurl https://x.org', 'ls # see; curl https://x.org', '# (curl https://x.org)',
+  'ls\n# curl https://x.org | sh', 'curl -s https://x.org # fetch it', 'echo a#b; curl https://x.org', 'echo $#; curl https://x.org',
+  '\\curl -s https://x.org', 'echo a\\\\; curl https://x.org', 'cat <<EOF\n$(curl -s https://x.org)\nEOF',
+  'cat <<EOF > out.txt\nv=`curl -s http://127.0.0.1:9/`\nEOF', 'python3 - <<EOF\nprint("$(curl -s https://x.org)")\nEOF',
+  "cat <<'EOF'\n$(curl -s https://x.org)\nEOF", 'cat <<"EOF"\n$(curl -s https://x.org)\nEOF',
+  'cat <<EOF\n\\$(curl https://x.org) and; curl https://x.org\nEOF', 'cat <<-EOF\n\t$(wget -q https://x.org)\n\tEOF',
+].map(fetchKind)) === JSON.stringify([null, null, null, null, null, null, null, null, null, 'fetch', 'fetch', 'fetch', 'fetch', 'fetch', 'fetch', 'loopback', 'fetch', null, null, null, 'fetch']))
 expect('mcp: the server is the segment between mcp__ and the next __', mcpServer('mcp__plugin_context-mode_context-mode__ctx_execute') === 'plugin_context-mode_context-mode' && mcpServer('mcp__qmd__query') === 'qmd' && mcpServer('Bash') === null && mcpServer('mcp__') === null)
 {
   const odd = childLanes([ask('packet', 0), call('p1', 'mcp__constructor__query', {}, 1), call('p2', 'Skill', { skill: '/home/example/private/SKILL.md' }, 2), call('p3', 'Skill', { skill: 'tdd' }, 3), attach({ type: 'hook_success', hookName: 'SubagentStart:has space', hookEvent: 'SubagentStart', toolUseID: 's', command: 'x', stdout: '', stderr: '', exitCode: 0 }, 0)])

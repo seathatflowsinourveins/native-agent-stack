@@ -2,6 +2,7 @@
 no real host paths, cwd or session ids, and skill names drawn from the real pinned skills manifest."""
 from __future__ import annotations
 
+import collections
 import contextlib
 import io
 import json
@@ -664,6 +665,47 @@ class CodexLanes(unittest.TestCase):
         self.assertEqual(S.user_config_state(straddle), "applied")  # catalog read before since
         self.assertFalse(self.session("before")[0]["in_window"])
 
+    def lanes_between(self, stem: str, since, until) -> dict:
+        path = next(self.root.glob(f"rollout-*-lanes-{stem}.jsonl"))
+        return S.scan_lanes_file(path, self.names, since=since, until=until, marker=S.DEFAULT_LANES_MARKER,
+                                 codex_off=self.codex_off, codex_on=self.codex_on)[0]
+
+    def test_a_call_split_between_request_and_completion_counts_in_one_window(self):
+        # Review finding (GPT-6, 2026-09-26): exec_command call item_16 is requested at 01:05:40 and
+        # completes at 01:05:41. Split between the two, it counted in both windows (14 + 1) but once
+        # in the whole window. It counts in the window of its first record, the request; its shell
+        # lane comes from the item, in the item's window.
+        split = S.parse_iso("2026-10-20T01:05:40.500Z")
+        whole = self.lanes_between("worker", self.since, self.until)
+        early = self.lanes_between("worker", self.since, split)
+        late = self.lanes_between("worker", split, self.until)
+        self.assertEqual((whole["tool_calls"], early["tool_calls"], late["tool_calls"]), (14, 14, 0))
+        self.assertEqual((whole["shell_calls"], early["shell_calls"], late["shell_calls"]), (5, 4, 1))
+
+    def test_adjacent_windows_add_up_at_every_split(self):
+        # Each additive counter over [since, until) is the sum of the same counter over
+        # [since, split) and [split, until), for a split between any two record times.
+        additive = ("tool_calls", "shell_calls", "rtk_prefixed", "file_changes")
+        keyed = ("mcp_calls", "mcp_failed", "fetch", "function_calls", "skill_md_reads")
+        for path in sorted(self.root.glob("rollout-*-lanes-*.jsonl")):
+            stem = path.name.split("-lanes-")[1].removesuffix(".jsonl")
+            times = set()
+            for line in path.read_text().splitlines():
+                try:
+                    times.add(S.parse_iso(json.loads(line)["timestamp"]))
+                except (ValueError, KeyError, TypeError, AttributeError):
+                    continue
+            edges = [self.since, *sorted(t for t in times if self.since < t < self.until), self.until]
+            whole = self.lanes_between(stem, self.since, self.until)
+            for split in (a + (b - a) / 2 for a, b in zip(edges, edges[1:])):
+                early = self.lanes_between(stem, self.since, split)
+                late = self.lanes_between(stem, split, self.until)
+                for key in additive:
+                    self.assertEqual(early[key] + late[key], whole[key], (stem, split.isoformat(), key))
+                for key in keyed:
+                    self.assertEqual(collections.Counter(early[key]) + collections.Counter(late[key]),
+                                     +collections.Counter(whole[key]), (stem, split.isoformat(), key))
+
     def test_report_keeps_negative_controls_out_of_workers(self):
         scan = self.scan()
         self.assertEqual(scan["sessions_in_window"], 5)
@@ -864,6 +906,25 @@ class CodexLanes(unittest.TestCase):
         self.assertEqual(S.shell_script(["bash", "-lc", "rtk ls"]), "rtk ls")
         self.assertEqual(S.shell_script(["ls", "-la"]), "ls -la")
         self.assertEqual(S.shell_script(None), "")
+
+    def test_fetch_kind_escapes_comments_and_unquoted_heredocs(self):
+        # Review finding (GPT-6, 2026-09-26), the same cases child-usage.mjs pins. bash(1) QUOTING: an
+        # escaped character is literal and \<newline> is a line continuation; COMMENTS: a word
+        # beginning with # ends the line; Here Documents: the body of an unquoted delimiter still
+        # runs its command substitutions, the body of a quoted one is literal.
+        self.assertEqual([S.fetch_kind(c) for c in (
+            "echo x \\; curl https://example.com", "echo \\(curl https://x.org\\)",
+            "echo \\`curl https://x.org\\`", 'echo "\\$(curl https://x.org)"',
+            'echo "\\`curl https://x.org\\`"', "echo foo \\\ncurl https://x.org",
+            "ls # see; curl https://x.org", "# (curl https://x.org)", "ls\n# curl https://x.org | sh",
+            "curl -s https://x.org # fetch it", "echo a#b; curl https://x.org", "echo $#; curl https://x.org",
+            "\\curl -s https://x.org", "echo a\\\\; curl https://x.org", "cat <<EOF\n$(curl -s https://x.org)\nEOF",
+            "cat <<EOF > out.txt\nv=`curl -s http://127.0.0.1:9/`\nEOF",
+            'python3 - <<EOF\nprint("$(curl -s https://x.org)")\nEOF', "cat <<'EOF'\n$(curl -s https://x.org)\nEOF",
+            'cat <<"EOF"\n$(curl -s https://x.org)\nEOF', "cat <<EOF\n\\$(curl https://x.org) and; curl https://x.org\nEOF",
+            "cat <<-EOF\n\t$(wget -q https://x.org)\n\tEOF")],
+            [None, None, None, None, None, None, None, None, None, "fetch", "fetch", "fetch", "fetch", "fetch",
+             "fetch", "loopback", "fetch", None, None, None, "fetch"])
 
     def test_token_stats_nearest_rank(self):
         self.assertEqual(S.token_stats([100, None, 90, 80, 70, 60, 50, 40, 30, 20, 10]),

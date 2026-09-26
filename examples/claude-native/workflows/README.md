@@ -130,7 +130,9 @@ row from `rtk hook` whose stdout carries `updatedInput`) and `rtk` commands the 
 typed itself, fetch routing (`WebFetch`, `ctx_fetch_and_index`, `curl`/`wget` in command
 position of the text a shell runs, also behind a shell keyword such as `do` or `then`,
 so quoted text and heredoc bodies count only under `sh -c`, `eval`, `ssh` or a shell
-heredoc, with loopback-only calls apart; a fetch run inside a Context Mode sandbox, a
+heredoc, escaped characters and comments never count, and `$(...)` or backticks inside
+double quotes or an unquoted heredoc still run (bash(1) QUOTING, COMMENTS and Here
+Documents), with loopback-only calls apart; a fetch run inside a Context Mode sandbox, a
 `gh api` call or an HTTP call in a script is in no lane, so `ctx_fetch_and_index_share`
 compares those three lanes only), the
 SubagentStart hook types, and whether an
