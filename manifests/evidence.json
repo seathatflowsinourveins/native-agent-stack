@@ -9555,8 +9555,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/metrics.py",
-      "sha256": "7ff02ea7feb7449573cd41cffd44faac98e16e4019d9739ba2e1e39dc48c740d",
-      "bytes": 27462
+      "sha256": "437fce8aaca350b9d8fe5d5b68212879d82e118f01d93fdcd333233709b80397",
+      "bytes": 27982
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover.py",
@@ -9700,8 +9700,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
-      "sha256": "33311b032fd156f406e85118805c0c09b8bc0a831487e37d6e2e69f8b4a5fcb1",
-      "bytes": 50100
+      "sha256": "c457a92aef2b3cb32c38f90e5e6f98109776e9adb34caf1ab9ecec0b12d161ae",
+      "bytes": 51741
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
@@ -9735,13 +9735,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "f157be180d0cf19393137e41871318476db24aea775d05a5b3b95ea8bd5dc1a6",
-      "bytes": 151392
+      "sha256": "27bc3fdc80472c3ee218d3723e506288ebc6eef536dafc8365b30474213a6ae4",
+      "bytes": 150357
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
-      "sha256": "7e00d5bb60db2f214ffab5966d086e1d2c705ef40489fa147ec24884b802d3ed",
-      "bytes": 71008
+      "sha256": "72abaaca3b21091f2be9df7ad3649d8349c90e13bd89babf467702f2a9b31d3d",
+      "bytes": 74892
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/selector.py",
@@ -9760,7 +9760,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "075dab0e4f736fc78cc1ce2213ec007445da52bd8c9c9b45da248365ea18419a",
+      "sha256": "dcdded22290c9646e7261923ba9db6c06a15dbb2cc26caa5bfd5660305133bfa",
       "bytes": 6969
     },
     {
@@ -9775,8 +9775,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "2653682b325f3349465abe1f7d324c49e89e8ae48697c1f4d8802a6cc55d86dc",
-      "bytes": 82257
+      "sha256": "76c8a83d327545b2dd88a0bed416d857066d5389debaeddfce4137cc8ed5e484",
+      "bytes": 82686
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -12410,8 +12410,8 @@
     },
     {
       "path": "blueprints/us-equities/sim-capacity/experiment.json",
-      "sha256": "17820f5bd58b0e480f363adc09f1cf025277b947b3beb35ebf8d46aa272f6ece",
-      "bytes": 29136
+      "sha256": "47dd59bbcfaf35c0cfcf6ed568b047b49b78bba5b360712da7e01fab342908ea",
+      "bytes": 29681
     },
     {
       "path": "blueprints/us-equities/sim-capacity/fee_model.py",
@@ -12535,13 +12535,13 @@
     },
     {
       "path": "blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json",
-      "sha256": "bfae3b9a08a8223bdc36b6cb7476360413fb22d7ce6153f8cef1af90cb0dc0d6",
+      "sha256": "45dd2f15f0576098b87d73b8771b1d518868b3fc12d23e7262c00c18251d8646",
       "bytes": 55327
     },
     {
       "path": "blueprints/us-equities/sim-paper-compare/replay_compare.py",
-      "sha256": "3d5b4e9d1188709d11127609265a027de9f96d18ade8ae81966fd771f4cc7f11",
-      "bytes": 72280
+      "sha256": "a4c62c276451ceb82518d3385fcf42df49cafd58d7481e3a4aaaaae9b06ba4ba",
+      "bytes": 72413
     },
     {
       "path": "blueprints/us-equities/simulation-research/README.md",
@@ -36355,8 +36355,8 @@
     },
     {
       "path": "observability/backends/configure.py",
-      "sha256": "4d8c94bc4812d4a2f976d6828715277b94464c90b4223e3c8ce7560fd4ff212e",
-      "bytes": 8225
+      "sha256": "91fee36a38b1d11d9344169ce59ec7303aa50e5793ef7f4cc55e94017432de24",
+      "bytes": 8894
     },
     {
       "path": "observability/backends/install.py",
@@ -36890,8 +36890,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_metrics.py",
-      "sha256": "4e80ecdb3af5c5303b9dd6d2b3ea0f589e2bcb3ae6360fc0e19a80502340315b",
-      "bytes": 30222
+      "sha256": "1d6eaf940021fbaba3ac687a3d3a2d9f6e5492e85a5a372621299d4363ec3ee5",
+      "bytes": 32823
     },
     {
       "path": "tests/test_adaptive_paper_mover.py",
@@ -36915,18 +36915,18 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "bf8304a377e0c4fb43047c0065721da877f4b226bd354b3d5951b491586bab6e",
-      "bytes": 261081
+      "sha256": "29c4c48a8103cadb7906719d7145a9b14192b7d35486bb9eaa934faad5eac0b7",
+      "bytes": 265454
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
-      "sha256": "cbcc6c2387987109f39603e9620c4ad120cb030e4621a1b2678a057a66493632",
-      "bytes": 56895
+      "sha256": "c333dba9069bc1f73efc0f6e8badfd31c8e0379eed3e9af5675b21a4071a7975",
+      "bytes": 60298
     },
     {
       "path": "tests/test_adaptive_paper_sessions.py",
-      "sha256": "b0f32069da4f823ad0ce0bdbba6de98b30bec3d49b3a21582e8b5c7c61cd462b",
-      "bytes": 113800
+      "sha256": "1e8b33ec8b496807468067112f5b7f0a2a6d6ce897ac7412605678b94984fc6a",
+      "bytes": 113271
     },
     {
       "path": "tests/test_adaptive_paper_strategies.py",
@@ -36935,8 +36935,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "92cc3171370c449d361c6517b3652bc2880cea5c307615b65a2107cb62adc03b",
-      "bytes": 93175
+      "sha256": "6a9a17afa9aaee7ffab1625133655c9916e341a45f21e5a020ef3a027e9860ae",
+      "bytes": 94796
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
@@ -37345,8 +37345,8 @@
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
-      "sha256": "e0aaa5ec9d4962e86e8d5ba083046c978d6cb9020609ed49d1d2aa16ebef10ec",
-      "bytes": 13822
+      "sha256": "e3e1a3330829fe62cee922ebcf0a8a47816a0b4160f0da03b83c0667a7429084",
+      "bytes": 16141
     },
     {
       "path": "tests/test_offhost_app_state.py",
@@ -37470,8 +37470,8 @@
     },
     {
       "path": "tests/test_sim_paper_compare.py",
-      "sha256": "593ae7f23e9ad1327e25af964a80abbe524e44d08b00aadbd00ea56f9e5d3699",
-      "bytes": 100792
+      "sha256": "49c7d7725a9a03711e4ea8c0bc0cc3ccc9593866922ecce8e4051d3d82d89c88",
+      "bytes": 102049
     },
     {
       "path": "tests/test_skill_usage.py",

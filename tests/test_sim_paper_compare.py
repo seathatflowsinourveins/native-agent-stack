@@ -1182,6 +1182,25 @@ class PinnedRuntimeTests(unittest.TestCase):
         self.assertEqual(sim["status"], "CANCELED")
         self.assertEqual(sim["filled_qty"], 0)
 
+    def test_named_cancel_before_submit_is_rejected_by_replay(self):
+        t0 = 3_000_000_000_000
+        paper_orders = [self._order("trial-1", "BUY", t0 + 100_000_000, "10.00",
+                                    status="canceled", filled_qty=0)]
+        paper_output = {"requests": [
+            {"kind": "cancel", "timestamp": 3000.090, "client_id": "trial-1"},
+        ]}
+        quotes = {"ZZZZ": [
+            {"symbol": "ZZZZ", "ts_ns": t0, "bid": "9.80", "ask": "10.20", "bid_size": 100, "ask_size": 100},
+            {"symbol": "ZZZZ", "ts_ns": t0 + 140_000_000, "bid": "9.95", "ask": "10.00", "bid_size": 100, "ask_size": 100},
+            {"symbol": "ZZZZ", "ts_ns": t0 + 200_000_000, "bid": "9.95", "ask": "10.00", "bid_size": 100, "ask_size": 100},
+        ]}
+        cancel_resolution = C.resolve_cancel_timestamps(paper_orders, paper_output, 10)
+        # The old replay recorded this cancel as applied before the order existed,
+        # then filled the supposedly canceled share on the 3000.140s quote.
+        with self.assertRaisesRegex(ValueError, "cancel_before_submit:trial-1"):
+            C.run_replay(paper_orders, quotes, out_dir=self.tmp / "cancel-before-submit",
+                         cancel_resolution=cancel_resolution)
+
     def test_current_no_partial_fill_configuration_ignores_quoted_size(self):
         # This documents, rather than assumes, a real boundary of the declared
         # baseline configuration (module docstring / README "Reuse and

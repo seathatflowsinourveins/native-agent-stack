@@ -992,6 +992,68 @@ class Ledger:
             total, previous = total + qty * price, cum
         return total if previous == high else None
 
+    def _reconcile_execution_accounting(self, client_id, filled):
+        """Replace provisional money once Alpaca's exact qty/price executions cover
+        the observed quantity. Replay the durable booking journal so a late buy also
+        corrects the basis of later sales; quantities and broker averages stay intact.
+        Runs inside record_order's transaction, including across a process restart."""
+        key = "execution_accounting:" + client_id
+        if (not filled or self._get(key) == _canonical(filled)
+                or self._executions_notional(client_id, ZERO, filled) is None):
+            return False
+        self._set(key, _canonical(filled))
+        bookings = [json.loads(row[0]) for row in self.db.execute(
+            "SELECT payload FROM events WHERE kind='order_observed' AND client_id=?", (client_id,))]
+        if not any(D(row["delta_qty"]) and row.get("booking") != "executions" for row in bookings):
+            return False
+
+        positions = {}
+        cash = realized = loss = ZERO
+        for row in self.db.execute(
+                "SELECT e.kind,e.client_id,e.payload,i.symbol,i.side FROM events e "
+                "LEFT JOIN intents i ON i.client_id=e.client_id "
+                "WHERE e.kind IN ('order_observed','position_adopted') ORDER BY e.id"):
+            data = json.loads(row["payload"])
+            if row["kind"] == "position_adopted":
+                qty = D(data["qty"])
+                positions[data["symbol"]] = (qty, qty * D(data["avg_price"]))
+                continue
+            delta = D(data["delta_qty"])
+            if not delta:
+                continue
+            high = D(data["filled_qty"])
+            notional = self._executions_notional(row["client_id"], high - delta, high)
+            if notional is None:
+                notional = D(data["delta_notional"])
+            qty, cost = positions.get(row["symbol"], (ZERO, ZERO))
+            if row["side"] == "buy":
+                qty, cost, cash = qty + delta, cost + notional, cash - notional
+            else:
+                if delta > qty:
+                    raise SafetyError("accounting_replay_would_make_short_position")
+                basis = cost / qty * delta
+                pnl = notional - basis
+                qty, cost, cash = qty - delta, cost - basis, cash + notional
+                realized, loss = realized + pnl, loss + max(ZERO, -pnl)
+            positions[row["symbol"]] = (qty, cost if qty else ZERO)
+
+        changed = False
+        for row in self.db.execute("SELECT symbol,qty,cost_basis FROM positions").fetchall():
+            qty, cost = positions.get(row["symbol"], (ZERO, ZERO))
+            if qty != D(row["qty"]):
+                raise SafetyError("accounting_replay_quantity_mismatch")
+            if cost != D(row["cost_basis"]):
+                changed = True
+                self.db.execute("UPDATE positions SET cost_basis=? WHERE symbol=?", (str(cost), row["symbol"]))
+        for name, amount in (("cash_delta", cash), ("realized", realized), ("realized_loss", loss)):
+            if amount != D(self._get(name)):
+                changed = True
+                self._set(name, amount)
+        if changed:
+            self._event("execution_accounting_reconciled", client_id, filled_qty=filled,
+                        cash_delta=cash, realized=realized, realized_loss=loss)
+        return changed
+
     def record_order(self, client_id, broker_id, status, cumulative_qty, average_price, *, timestamp=None,
                      execution=None):
         """Apply one broker observation of an owned order. ``execution`` (see
@@ -1000,7 +1062,8 @@ class Ledger:
         the advance is booked at their exact prices, each checked against the limit.
         Otherwise (a REST read ahead of the stream, a missing or reordered execution) the
         advance is booked from the cumulative averages, whose limit check allows Alpaca's
-        6-decimal average rounding."""
+        6-decimal average rounding. Complete late execution coverage corrects that
+        provisional accounting, including the cost basis of subsequent sales."""
         if (type(broker_id) is not str or not broker_id or len(broker_id) > 128
                 or type(status) is not str or status not in RANK or status in ("reserved", "not_sent", "broker_refused")):
             raise SafetyError("invalid_broker_order_identity_or_status")
@@ -1027,21 +1090,26 @@ class Ledger:
                 raise SafetyError("broker_order_identity_changed")
             if filled > old.qty or (status == "filled" and filled != old.qty):
                 raise SafetyError("broker_filled_quantity_invalid")
+            reconciled = False
             if execution is not None:
                 # Recorded even when a REST read already advanced the cumulative quantity.
                 self._record_execution(old, filled, execution["execution_id"], execution_qty, execution_price, at)
+                if filled <= old.filled_qty:
+                    reconciled = self._reconcile_execution_accounting(client_id, old.filled_qty)
+                    if reconciled:
+                        self._refresh_risk(at)
             if filled < old.filled_qty:
-                return False  # Delayed cumulative snapshot, never subtract fills.
+                return reconciled  # Delayed cumulative snapshot, never subtract fills.
             if filled == old.filled_qty and old.average_price != average:
                 raise SafetyError("same_quantity_conflicting_average_price")
             if old.terminal and (filled != old.filled_qty or status != old.status):
                 if filled == old.filled_qty and status not in TERMINAL:
-                    return False
+                    return reconciled
                 raise SafetyError("terminal_order_contradiction")
             if filled == old.filled_qty and RANK[status] < RANK[old.status]:
-                return False
+                return reconciled
             if filled == old.filled_qty and status == old.status and old.broker_id == broker_id:
-                return False
+                return reconciled
             delta = filled - old.filled_qty
             delta_notional, booking = ZERO, None
             if delta:
@@ -1082,6 +1150,8 @@ class Ledger:
             self._event("order_observed", client_id, broker_id=broker_id, status=status, filled_qty=filled,
                         average_price=average, at=at, delta_qty=delta, delta_notional=delta_notional,
                         booking=booking)
+            if execution is not None:
+                self._reconcile_execution_accounting(client_id, filled)
             self._refresh_risk(at)
             return True
 

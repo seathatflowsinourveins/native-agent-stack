@@ -548,8 +548,10 @@ def build_decisions(paper_orders: list[dict], cancel_resolution: dict | None = N
     decisions = [{"ts_ns": o["submitted_at_ns"], "action": "submit", "order": o} for o in paper_orders]
     for o in paper_orders:
         if o["status"] == "canceled" and o["client_order_id"] in cancel_resolution:
-            decisions.append({"ts_ns": cancel_resolution[o["client_order_id"]]["cancel_ts_ns"],
-                               "action": "cancel", "order": o})
+            cancel_ns = cancel_resolution[o["client_order_id"]]["cancel_ts_ns"]
+            if cancel_ns < o["submitted_at_ns"]:
+                raise ValueError(f"cancel_before_submit:{o['client_order_id']}")
+            decisions.append({"ts_ns": cancel_ns, "action": "cancel", "order": o})
     decisions.sort(key=lambda d: (d["ts_ns"], 0 if d["action"] == "submit" else 1))
     return decisions
 

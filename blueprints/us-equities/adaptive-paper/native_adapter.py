@@ -688,6 +688,29 @@ class AlpacaExecutionClient(ExecutionClient):
         limit = self._terminal_limit(prior)
         if limit is not None and any(execution["cum"] > limit for execution, _ in executions):
             raise ValueError("post_terminal_fill_requires_reconciliation")
+        controller = getattr(self.session.port, "controller", None)
+        if controller is not None:
+            # The port normally persists observations before forwarding them here.
+            # FILL activities bypass that path. Persist the entire recovered prefix
+            # before rc5 generate_order_filled queues any strategy callbacks.
+            notional, covered = Decimal(0), Decimal(0)
+            for execution, stamp in executions:
+                cum = execution["cum"]
+                if cum - execution["qty"] != covered:
+                    raise ValueError("fill_activity_ledger_incomplete")
+                covered = cum
+                notional += execution["qty"] * execution["price"]
+                status = "filled" if cum == dec(str(order.quantity)) else "partially_filled"
+                if limit is not None and cum == limit:
+                    status = prior["terminal"] or prior["pending_terminal"][0]
+                # Retain reported averages where available; Alpaca reports new ones
+                # to six decimals. Exact execution prices drive ledger accounting.
+                average = prior["averages"].get(cum, (notional / cum).quantize(Decimal("0.000001")))
+                controller.observe({"client_order_id": cid, "id": prior["id"], "status": status,
+                    "filled_qty": str(cum), "filled_avg_price": str(average), "updated_at_ns": stamp,
+                    "event": "fill" if status == "filled" else "partial_fill",
+                    "execution_id": execution["trade_id"], "event_qty": str(execution["qty"]),
+                    "event_price": str(execution["price"])})
         for execution, stamp in executions:
             if self._book(order, prior, execution, broker_id, stamp):
                 self.session.execution_stats["activity_executions_booked"] += 1

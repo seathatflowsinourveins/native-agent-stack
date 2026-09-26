@@ -8,6 +8,7 @@ are touched.
 """
 from __future__ import annotations
 
+import io
 import json
 import os
 import re
@@ -493,6 +494,34 @@ class FileSdRegistrationTests(unittest.TestCase):
         self.assertEqual(self.stop(process), 0)
         self.assertNotIn(target, self.listed())
 
+    def test_a_clean_stop_keeps_a_replacement_registered_after_the_listener_closes(self):
+        self.write_phase("finished", status="passed")
+        make_server = m.make_server
+        server = make_server(self.ledger_path, self.trial_path, port=0)
+        close = server.server_close
+        self.addCleanup(close)
+        port = server.server_address[1]
+        target = f"127.0.0.1:{port}"
+        replacements = []
+
+        def close_and_replace():
+            close()
+            replacement = make_server(self.ledger_path, self.trial_path, port=port)
+            self.addCleanup(replacement.server_close)
+            replacements.append(replacement)
+            m.update_file_sd(self.targets, target, registered=True)
+
+        with patch.object(m, "make_server", return_value=server), \
+                patch.object(m.signal, "signal"), \
+                patch.object(server, "serve_forever", side_effect=m._CleanStop), \
+                patch.object(server, "server_close", side_effect=close_and_replace):
+            self.assertEqual(m.main(["--ledger", str(self.ledger_path), "--port", str(port),
+                                     "--file-sd", str(self.targets)]), 0)
+
+        self.assertEqual(len(replacements), 1)
+        self.assertGreaterEqual(replacements[0].fileno(), 0)
+        self.assertIn(target, self.listed(), "shutdown removed the replacement exporter's registration")
+
     def test_a_clean_stop_of_an_unfinished_trial_stays_registered(self):
         for phase, status in (("starting", None), ("needs_attention", "needs_attention"),
                               ("held_overnight", "held_overnight"), ("finished", "needs_attention"),
@@ -525,7 +554,9 @@ class FileSdRegistrationTests(unittest.TestCase):
         self.assertNotIn(target, self.listed())
 
     def test_other_groups_and_a_concurrent_exporter_are_kept(self):
-        other = {"targets": ["127.0.0.1:9"], "labels": {"note": "another writer"}}
+        # Prometheus v3.15.0 accepts UTF-8 names, empty strings and JSON null label values.
+        other = {"targets": ["127.0.0.1:9"],
+                 "labels": {"note": "another writer", "nullable": None, "étiquette": "café", "9 owner": ""}}
         self.targets.write_text(json.dumps([other]))
         self.write_phase("finished", status="passed")
         first, _ = self.start()
@@ -551,6 +582,21 @@ class FileSdRegistrationTests(unittest.TestCase):
                                           "--file-sd", str(self.targets))
                 self.assertEqual(result.returncode, 2, result.stderr)
                 self.assertIn("refused", result.stderr)
+                self.assertEqual(self.targets.read_text(), content)
+
+    def test_malformed_file_sd_labels_refuse_startup_and_leave_the_list_unchanged(self):
+        for labels in ({"owner": {}}, {"owner": []}, {"owner": 1}, {"owner": True}, {"": "owner"}):
+            with self.subTest(labels=labels):
+                content = json.dumps([{"targets": ["127.0.0.1:9"], "labels": labels}])
+                self.targets.write_text(content)
+                with patch.object(m.signal, "signal"), \
+                        patch.object(m.ThreadingHTTPServer, "serve_forever") as serve, \
+                        patch.object(m.sys, "stderr", new_callable=io.StringIO) as stderr:
+                    result = m.main(["--ledger", str(self.ledger_path), "--port", "0",
+                                     "--file-sd", str(self.targets)])
+                self.assertEqual(result, 2, "malformed file_sd labels must refuse startup")
+                serve.assert_not_called()
+                self.assertIn("refused", stderr.getvalue())
                 self.assertEqual(self.targets.read_text(), content)
 
     def test_a_list_in_a_missing_directory_refuses_to_start(self):

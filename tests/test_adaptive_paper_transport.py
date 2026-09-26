@@ -593,6 +593,40 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([(c.args, c.kwargs) for c in cancels],
                          [((self.port.before_request, "cancel"), {"client_id": "trial-1"})])
 
+    async def test_task_cancellation_preserves_worker_cancel_identity(self):
+        self.port.adopt_intents([intent()])
+        await self.port._observe(t.normalize_order(order()))
+        loop = asyncio.get_running_loop()
+        worker_started = asyncio.Event()
+        worker_finished = asyncio.Event()
+        native_cancel = self.port._client.cancel_order_by_id
+
+        def cancel_in_worker(order_id):
+            loop.call_soon_threadsafe(worker_started.set)
+            try:
+                return native_cancel(order_id)
+            finally:
+                loop.call_soon_threadsafe(worker_finished.set)
+
+        with patch.object(self.port._client, "cancel_order_by_id", side_effect=cancel_in_worker), \
+                patch.object(self.port._client._session._session, "request",
+                             return_value=response(None, 204)) as request:
+            self.port._http_lock.acquire()
+            try:
+                task = asyncio.create_task(self.port.cancel("trial-1"))
+                await asyncio.wait_for(worker_started.wait(), 2)
+                task.cancel()
+                with self.assertRaises(asyncio.CancelledError):
+                    await task
+                request.assert_not_called()
+            finally:
+                self.port._http_lock.release()
+                await asyncio.wait_for(worker_finished.wait(), 2)
+
+        self.assertEqual([call.args[0] for call in request.call_args_list], ["DELETE"])
+        self.assertEqual([entry[:2] for entry in self.budgets], [("cancel", "trial-1")])
+        self.assertIsNone(self.port._client._session._cancel_expectation)
+
     async def test_replayed_id_cannot_change_intent(self):
         self.port.adopt_intents([intent()])
         with patch.object(self.port._client._session._session, "request") as request:

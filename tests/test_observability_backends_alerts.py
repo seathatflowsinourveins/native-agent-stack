@@ -10,12 +10,17 @@ fails, when those binaries are absent on the host.
 """
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
+import fcntl
 import json
 import re
+import runpy
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES = ROOT / "observability/backends/templates"
@@ -145,6 +150,43 @@ class ConfigureTargetsTests(unittest.TestCase):
             targets.write_text(registered)
             self.render(root)
             self.assertEqual(targets.read_text(), registered)
+
+    def test_initialization_keeps_a_registration_created_after_observing_an_absent_list(self):
+        update_file_sd = runpy.run_path(str(ROOT / "blueprints/us-equities/adaptive-paper/metrics.py"))[
+            "update_file_sd"]
+        with tempfile.TemporaryDirectory() as tmp, ThreadPoolExecutor(max_workers=1) as workers:
+            root = Path(tmp)
+            targets = root / "config" / "adaptive-paper-targets.json"
+            registrations = []
+            exists = Path.exists
+
+            def exists_then_register(path):
+                observed = exists(path)
+                if path == targets and not observed and not registrations:
+                    # Inject the exporter after the absence check. If configure holds the sibling lock,
+                    # the real exporter writer must wait until initialization releases it.
+                    with open(targets.with_name(targets.name + ".lock"), "a") as probe:
+                        try:
+                            fcntl.flock(probe, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                        except BlockingIOError:
+                            locked = True
+                        else:
+                            locked = False
+                    registration = workers.submit(update_file_sd, targets, "127.0.0.1:18890", registered=True)
+                    registrations.append(registration)
+                    if not locked:
+                        registration.result(timeout=10)
+                return observed
+
+            argv = [str(CONFIGURE), "--tools-root", str(root / "tools"), "--config-root", str(root / "config"),
+                    "--data-root", str(root / "data"), "--unit-root", str(root / "unit")]
+            with patch.object(sys, "argv", argv), patch.object(Path, "exists", exists_then_register):
+                runpy.run_path(str(CONFIGURE), run_name="__main__")
+            self.assertEqual(len(registrations), 1)
+            registrations[0].result(timeout=10)
+            self.assertEqual(json.loads(targets.read_text()),
+                             [{"targets": ["127.0.0.1:18890"], "labels": {}}],
+                             "initialization erased the concurrent exporter's registration")
 
 
 class AlertmanagerTemplateTests(unittest.TestCase):
