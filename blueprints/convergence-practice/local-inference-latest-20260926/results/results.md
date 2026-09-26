@@ -219,10 +219,15 @@ configuration directory.
   restart `nativestack-generation.service`, and check that `/health` returns
   200. The base unit file (36 GPU layers) is unchanged, and the model file stays
   installed.
-- **11:26Z.** The llama-cpp install and use host receipts were recorded read-only
-  under `evidence/hosts/nativestack-5975wx-20260925/`. The use receipt re-reads
-  the served profile and the model hash, and runs `analyze.py` again, which
-  reproduces `decision.json`. The switch is recorded in
+- **11:26Z and 12:41Z.** The llama-cpp install host receipt (11:26Z) and use
+  host receipt (12:41Z) were recorded read-only under
+  `evidence/hosts/nativestack-5975wx-20260925/`. The use receipt re-reads the
+  served profile and the model hash. It also re-derives the decision in memory
+  with the frozen `analyze.py` under `python3 -B`, writing no file, and gets the
+  SHA-256 of `decision.json`. It replaces an unpublished first recording from
+  11:26Z, whose analysis step wrote `decision.json` into a temporary directory
+  inside the checkout and then removed it. Review found that step at odds with
+  the receipt's read-only statement. The switch is recorded in
   [`evidence/receipts/local-inference-c2-serving-switch-20260926.json`](../../../../evidence/receipts/local-inference-c2-serving-switch-20260926.json).
 
 ## Retained private state

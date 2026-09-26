@@ -169,6 +169,26 @@ class FrozenPlan(unittest.TestCase):
                     if path.name == "window.json":
                         self.assertEqual(data["arm"], relative.parts[2])
 
+    def test_host_receipt_commands_only_read(self):
+        # Both llama-cpp receipts say their commands only read. The use receipt's unpublished first recording
+        # ran analyze.py --out into a mktemp directory inside the checkout and removed it, so no command may
+        # create, write, move or remove a path, and one that loads repository modules must not write bytecode.
+        writes = re.compile(r"\bmktemp\b|\brm\b|\bmv\b|\bcp\b|\btee\b|\btouch\b|\bmkdir\b|--out\b|>>?\s*[^&\s]")
+        hosts = ROOT / "evidence/hosts/nativestack-5975wx-20260925"
+        receipts = {stage: json.loads((hosts / f"nativestack-5975wx-20260925--llama-cpp--{stage}--20260926.json")
+                                      .read_text()) for stage in ("install", "use")}
+        for stage, receipt in receipts.items():
+            for index, command in enumerate(receipt["commands"], 1):
+                with self.subTest(stage=stage, command=index):
+                    self.assertEqual(command["exit"], 0)
+                    self.assertIsNone(writes.search(command["cmd"]))
+                    if "exec_module" in command["cmd"]:
+                        self.assertTrue(command["cmd"].startswith("python3 -B "))
+        # The in-memory re-derivation prints the SHA-256 of the committed decision.json.
+        self.assertEqual(receipts["use"]["commands"][5]["output_excerpt"].splitlines(),
+                         ['{"final": true, "selected": {"arm": "C2", "outcome": "change_serving_profile"}}',
+                          hashlib.sha256((HERE / "results/decision.json").read_bytes()).hexdigest()])
+
     def test_changed_frozen_values_are_refused(self):
         for path, bad in [(("serving", "context"), 4096), (("serving", "port"), 18232),
                           (("sampling", "temperature"), 0.7), (("sampling", "max_tokens"), 1024),

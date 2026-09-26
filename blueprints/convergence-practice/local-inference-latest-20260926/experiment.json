@@ -156,7 +156,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/results.md",
-          "sha256": "796ce485b2506b282137eb1f0b8956e30e06f66aeab43469a068ccf99abda861"
+          "sha256": "0f42a99d031e72d4c7e31d240b734936d68b776a982b968a7ec483401274b294"
         },
         {
           "path": "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py",
