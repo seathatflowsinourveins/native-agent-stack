@@ -211,6 +211,29 @@ qmd --index native-agent-stack-catalog search "native worker" \
 
 Use `qmd get` on the exact returned document URI with a bounded range. [Native catalog setup](../catalogs/us-equities/native-workflows.md) records explicit collections; do not index the whole home or authentication directories. The frozen retrieval evaluation retains its original corpus and queries even when the live index grows. A generation-model upgrade does not automatically change embeddings or retrieval quality.
 
+## Apply the skills manifest
+
+On a host that has adopted [`adoption/skills/manifest.json`](skills/manifest.json) (added after
+`v2026.09.25.2`; see [the trial record](../docs/decisions/2026-09-25-skills-trial-and-usage.md)):
+
+```sh
+SKILLS=<tools-root>/skills-1.7.0/bin/skills
+npm install --global --prefix <tools-root>/skills-1.7.0 skills@1.7.0    # the manifest's cli.install (pinned, isolated)
+python3 tools/adoption/install_skills.py --skills-bin "$SKILLS" --dry-run   # prints what would change, changes nothing
+python3 tools/adoption/install_skills.py --skills-bin "$SKILLS"             # installs every manifest entry at its pinned ref
+python3 tools/adoption/install_skills.py --print-codex-config              # [[skills.config]] lines for ~/.codex/config.toml
+python3 scripts/skills_status.py --skills-bin "$SKILLS"                    # per-skill ref, lock, links, listing state, Codex config
+claude -p "/skill-doctor" --output-format json                             # native per-skill use count, 0 API tokens
+```
+
+Run the dry run first on a host that has never applied this manifest, and compare its printed
+changes against the manifest before running `--write`. The status script and `/skill-doctor` are
+both read-only and safe to re-run by hand on any schedule; neither installs, removes or updates
+anything, and `/skill-doctor` costs 0 API tokens (`num_turns` 0, model `<synthetic>`). Do not
+wrap either read-only command in a systemd/launchd timer: this project's `automatic_model_calls`
+policy is `false`, and a timer that invokes a model command is exactly what that policy
+excludes, whatever the command's own token cost.
+
 ## Current next moves
 
 The current entry point is the [20-layer research queue](../catalogs/landscape/research-state.json)

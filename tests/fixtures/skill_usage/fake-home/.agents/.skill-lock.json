@@ -1,0 +1,60 @@
+{
+  "version": 3,
+  "skills": {
+    "gh-fix-ci": {
+      "source": "openai/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/openai/skills.git",
+      "skillPath": "skills/.curated/gh-fix-ci/SKILL.md",
+      "skillFolderHash": "3f99938c9464393f27cc4cc00e4ba17387517803",
+      "installedAt": "2026-10-25T00:00:00.000Z",
+      "updatedAt": "2026-10-25T00:00:00.000Z"
+    },
+    "typesafe-ai": {
+      "source": "typesafe-ai/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/typesafe-ai/skills.git",
+      "skillPath": "skills/typesafe-ai/SKILL.md",
+      "skillFolderHash": "678c375b883794bf4292715a43acbba5c84681aa",
+      "installedAt": "2026-09-20T00:00:00.000Z",
+      "updatedAt": "2026-09-20T00:00:00.000Z"
+    },
+    "tdd": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/engineering/tdd/SKILL.md",
+      "skillFolderHash": "79288be15c67b849f22b6572056601090fd20913",
+      "installedAt": "2026-09-15T00:00:00.000Z",
+      "updatedAt": "2026-09-15T00:00:00.000Z"
+    },
+    "diagnosing-bugs": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/engineering/diagnosing-bugs/SKILL.md",
+      "skillFolderHash": "99bd56983e42bc752c52da67f1112e4121781cd1",
+      "installedAt": "2026-10-29T00:00:00.000Z",
+      "updatedAt": "2026-10-29T00:00:00.000Z"
+    },
+    "grill-me": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/productivity/grill-me/SKILL.md",
+      "skillFolderHash": "3df14e2d3a89459bf300614be9247e3ce74798f8",
+      "installedAt": "2026-09-01T00:00:00.000Z",
+      "updatedAt": "2026-09-01T00:00:00.000Z"
+    },
+    "semgrep": {
+      "source": "trailofbits/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/trailofbits/skills.git",
+      "skillPath": "plugins/static-analysis/skills/semgrep/SKILL.md",
+      "skillFolderHash": "7503c4bec67cbe758ee488a2bd4caaf618facbfb",
+      "installedAt": "2026-08-01T00:00:00.000Z",
+      "updatedAt": "2026-08-01T00:00:00.000Z"
+    }
+  },
+  "dismissed": {}
+}

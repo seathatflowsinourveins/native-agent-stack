@@ -3450,9 +3450,14 @@
       "bytes": 77578
     },
     {
+      "path": "adoption/skills/manifest.json",
+      "sha256": "131a5385467308c90dd25aaa52be381858a0231ec5b9a3995270a8e3a823ff61",
+      "bytes": 35461
+    },
+    {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "e06ca5d1102a8f78c7a2d26e603de20a6706a9563258be39ee8019c52b6350b5",
-      "bytes": 7684
+      "sha256": "d9297f73792125dd4478f8b5bb6680cd0af1ef7d7d910b214dd9637d8de87bd3",
+      "bytes": 8559
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -3486,8 +3491,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "7a1cae2502167096ebc666e9e6dace7cf1c7d6a96440a7628240638bdcbc6120",
-      "bytes": 17264
+      "sha256": "452d462164951ca1f3f2399788c47dc0a512f8f73189a02d706a697bb1204557",
+      "bytes": 18903
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -6497,8 +6502,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
-      "sha256": "f171739544379d3e69bdc0001911776584e1b0b0775f4f37e6b7737c106c4996",
-      "bytes": 5271
+      "sha256": "677485cd57c195519cc6a3ed81f2eab30c8f70c41b981c152d28fe8b6b044f05",
+      "bytes": 7930
     },
     {
       "path": "blueprints/native-skill-practice/cases.json",
@@ -10369,6 +10374,11 @@
       "path": "docs/decisions/2026-09-24-secret-storage.md",
       "sha256": "fce32c03fe3dde94c76ea874e5e2327409f73eca65b51ce1297382416a350137",
       "bytes": 14083
+    },
+    {
+      "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
+      "sha256": "a88c50a9bd15d1a0e3a5557d79c41fd20f34c1fb7785f4183347e895222f2820",
+      "bytes": 26123
     },
     {
       "path": "docs/direct-results.md",
@@ -28106,6 +28116,11 @@
       "bytes": 248046
     },
     {
+      "path": "evidence/artifacts/skills-trial-20260925/nativestack-5975wx-20260925.json",
+      "sha256": "0f3d4e68227108db70730487a65991c71bad01544147962263b3b996f722e2f2",
+      "bytes": 11280
+    },
+    {
       "path": "evidence/artifacts/sota-convergence-review-20260922/manifest-citation-review.json",
       "sha256": "97ffac75c1208a58d9700ad5e30d1c0aa0f3decfc3199f10ce4d88135b7d10e4",
       "bytes": 90508
@@ -31012,8 +31027,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "54619b59d9ae542ef05830728417038cd0c610ed0f921cdb105ea2e677c25286",
-      "bytes": 18584
+      "sha256": "c242ec3669f715896534d27226dc6f0da3a5643dc1fccc542f584b9798dd9c80",
+      "bytes": 19929
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -31121,6 +31136,11 @@
       "bytes": 13776
     },
     {
+      "path": "scripts/skills_status.py",
+      "sha256": "33f8c515a15ad9a3888f0f61d5646e8db3aa0fdaa678da82f90237d0c77e79bb",
+      "bytes": 21259
+    },
+    {
       "path": "scripts/trading_gates.py",
       "sha256": "06aadfbca9ee50371aac6e620fcda087f5843508afb3b81124b053673875a152",
       "bytes": 24948
@@ -31194,6 +31214,46 @@
       "path": "tests/fixtures/host-receipts/wrong-platform.json",
       "sha256": "a9b24a022c5bd2edf654ebddd8d6077bf2fc2aebe797191afebe416f63fe8782",
       "bytes": 1041
+    },
+    {
+      "path": "tests/fixtures/skill_usage/codex_root_a/nested/rollout-2026-10-10T00-00-00-session-fixture-b.jsonl.fixture",
+      "sha256": "84be3b25685fcf5ee3314c65680ee21fdc57cd822340e8bbd24c5eb65392137b",
+      "bytes": 346
+    },
+    {
+      "path": "tests/fixtures/skill_usage/codex_root_a/rollout-2026-10-28T12-00-00-session-fixture-a.jsonl.fixture",
+      "sha256": "6998412fe3a4bea67286db1ab4915a914a63166c25c387d0c297368a5b509e75",
+      "bytes": 1218
+    },
+    {
+      "path": "tests/fixtures/skill_usage/codex_root_b/rollout-2026-10-27T09-00-00-session-fixture-c.jsonl.fixture",
+      "sha256": "7b4d7bdce2fc30ef9a6b078b1ab0e5c08fa7a6c437c2dc158c60289135b84985",
+      "bytes": 484
+    },
+    {
+      "path": "tests/fixtures/skill_usage/fake-home/.agents/.skill-lock.json",
+      "sha256": "09c9c6194b667df183ba47735a56709ca27a6a30fa68dfb19aa120f52845a15e",
+      "bytes": 2328
+    },
+    {
+      "path": "tests/fixtures/skill_usage/manifest.json",
+      "sha256": "516cf5f378feca79fade10864f7c73aa199d63c0e9f9393d8f4fbaee6d60c68c",
+      "bytes": 2411
+    },
+    {
+      "path": "tests/fixtures/skill_usage/skill-doctor-nonzero-cost.json",
+      "sha256": "6a1689992126635cd3412065b4a65c875c9cc48c8f69b660751c0c1a29803aef",
+      "bytes": 2899
+    },
+    {
+      "path": "tests/fixtures/skill_usage/skill-doctor-sample.json",
+      "sha256": "3de48a40ce5d0ed4021427c787eca5e1b4798f1bae56d70c0773e2debe92e5ad",
+      "bytes": 2895
+    },
+    {
+      "path": "tests/fixtures/skill_usage/skill-doctor-sample.txt",
+      "sha256": "52638820faeaf6b7e5ff1ea0e14f2d97c16b6b0b79f04b4c6022e208a3bccd68",
+      "bytes": 1029
     },
     {
       "path": "tests/fixtures/workflow-security/unsafe.yml.txt",
@@ -31541,6 +31601,11 @@
       "bytes": 24818
     },
     {
+      "path": "tests/test_install_skills.py",
+      "sha256": "94ee9f6484a8b80fe98e0de45fbb71cfae1624c2bbad4bc61091c64586a71b5d",
+      "bytes": 25577
+    },
+    {
       "path": "tests/test_job_recovery.py",
       "sha256": "a985c9971492a945d8add60abf9fc77c5feab337c7f1fcd413643545024c4c20",
       "bytes": 3534
@@ -31781,6 +31846,21 @@
       "bytes": 100792
     },
     {
+      "path": "tests/test_skill_usage.py",
+      "sha256": "d217bcec59d0906cc1cd136ac5f4f8cbcafdf278c1647217f78923fb339cda5a",
+      "bytes": 28245
+    },
+    {
+      "path": "tests/test_skills_manifest.py",
+      "sha256": "711f14f03fa9a8950f582ef98e1fdc8f78a539b0475901b8b7c699322770126d",
+      "bytes": 10490
+    },
+    {
+      "path": "tests/test_skills_status.py",
+      "sha256": "64a9070d12f30b735de3f793d0238697f8a67ba5f3c199d2545a2e665c5c422f",
+      "bytes": 34447
+    },
+    {
       "path": "tests/test_sota_convergence.py",
       "sha256": "cb197ddbe88b82bfc110bcf77da80ab59197f371407c93674643718b8469dcf1",
       "bytes": 163940
@@ -31866,6 +31946,11 @@
       "bytes": 8209
     },
     {
+      "path": "tools/adoption/install_skills.py",
+      "sha256": "e2660484c3c094f27c1a4780945ec0a65572ae974139ceeb092939b36e94bf8a",
+      "bytes": 13136
+    },
+    {
       "path": "tools/adoption/render_config.py",
       "sha256": "d9502772cb2e58b452ea5fa03584719f16b226ef341ebe18a90dae815c3e8b82",
       "bytes": 11803
@@ -31874,6 +31959,16 @@
       "path": "tools/adoption/render_launchd.py",
       "sha256": "253a3f4591fa1eb22314a7d085988464f3a3c7c009c7a52b5ee2566d160f0749",
       "bytes": 5605
+    },
+    {
+      "path": "tools/skill-usage/README.md",
+      "sha256": "3a13a5e01c2960612013a4566d130611ff5075368e0d3ce67cb1a42bd8135a2a",
+      "bytes": 9567
+    },
+    {
+      "path": "tools/skill-usage/skill_usage.py",
+      "sha256": "8aac3a9c1c1cc69d1c7cdbf093d531124dcb27513f767113160f1d3f1eabd607",
+      "bytes": 30633
     },
     {
       "path": "tools/sota-convergence/README.md",
