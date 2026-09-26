@@ -203,6 +203,103 @@ class NativeIntegration(unittest.TestCase):
         asyncio.run(exercise())
         return port, strategy, session
 
+    def test_activity_recovery_persists_through_transport_observation_hook(self):
+        """Use AlpacaPaperTransport's callback shape, without SimulatedPort.controller."""
+        from runner import Controller
+        from safety import Ledger, RiskLimits
+
+        class MissingStreamPort(FakePort):
+            def __init__(self, *, before_submit, sink_quote, sink_observation):
+                super().__init__()
+                self.before_submit = before_submit
+                self.sink_quote, self.sink_observation = sink_quote, sink_observation
+                self.ready = True
+
+            async def start(self, on_quote, on_order):
+                def quote(row):
+                    self.sink_quote(row)
+                    on_quote(row)
+                await super().start(quote, on_order)
+
+            async def submit(self, payload):
+                self.before_submit(payload)
+                self.submissions.append(payload)
+                stamp = time.time_ns()
+                row = dict(payload, id="paper-buy", status="partially_filled", filled_qty="1",
+                           filled_avg_price="100.01", updated_at_ns=stamp)
+                self.sink_observation(row)
+                self.activities = [
+                    {"trade_id": str(uuid.uuid4()), "qty": "1", "price": price,
+                     "cum_qty": str(cum), "symbol": "SPY", "side": "buy",
+                     "transaction_time_ns": stamp + cum}
+                    for cum, price in enumerate(("100.01", "100.01", "100.00"), 1)]
+                return row
+
+            async def fill_activities(self, order_id):
+                self.activity_reads.append(order_id)
+                return self.activities
+
+        class RecoveryWatcher(Strategy):
+            def __new__(cls, ledger):
+                return super().__new__(cls, StrategyConfig(log_events=False, log_commands=False))
+
+            def __init__(self, ledger):
+                self.ledger, self.order = ledger, None
+                self.filled = Decimal(0)
+                self.durable_at_callback = []
+
+            def on_start(self):
+                self.subscribe_quotes(InstrumentId.from_str("SPY.ALPACA"))
+
+            def on_quote(self, tick):
+                if self.order is None:
+                    self.order = self.order_factory.limit(tick.instrument_id, OrderSide.BUY,
+                        Quantity.from_int(3), tick.ask_price, time_in_force=TimeInForce.DAY)
+                    self.submit_order(self.order)
+
+            def on_order_filled(self, event):
+                self.filled += Decimal(str(event.last_qty))
+                intent = self.ledger.intents()[0]
+                self.durable_at_callback.append((intent.filled_qty, intent.status,
+                    len(self.ledger.unresolved()), self.ledger.positions()["SPY"].cost_basis_usd))
+                if self.filled == 3:
+                    self.shutdown_system("activity recovery complete")
+
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "ledger.db"
+            limits = RiskLimits(max_order_qty=Decimal(3))
+            ledger = Ledger(path, limits)
+            self.addCleanup(ledger.close)
+            now = time.time()
+            ledger.start_trial(now)
+            controller = Controller(ledger, now + 3600, market_open=True)
+            port = MissingStreamPort(before_submit=controller.before_submit,
+                                     sink_quote=controller.quote, sink_observation=controller.observe)
+            controller.port = port
+            self.assertFalse(hasattr(port, "controller"))
+            watcher = RecoveryWatcher(ledger)
+            session = ADAPTER.build_node(port, [{"symbol": "SPY"}], [watcher])
+            session.fill_gap_grace_seconds = .01
+
+            async def exercise():
+                await asyncio.wait_for(session.run_async(), timeout=5)
+
+            asyncio.run(exercise())
+            self.assertEqual(session.errors, [])
+            self.assertEqual(port.activity_reads, ["paper-buy"])
+            self.assertEqual(watcher.filled, Decimal(3))
+            self.assertEqual(ledger.intents()[0].filled_qty, watcher.filled)
+            self.assertEqual(watcher.durable_at_callback,
+                             [(Decimal(3), "filled", 0, Decimal("300.02"))] * 3)
+            self.assertEqual(ledger.accounting().cash_delta_usd, Decimal("-300.02"))
+            ledger.close()
+            reopened = Ledger(path, limits)
+            self.addCleanup(reopened.close)
+            self.assertEqual(reopened.intents()[0].filled_qty, Decimal(3))
+            self.assertEqual(reopened.positions()["SPY"].cost_basis_usd, Decimal("300.02"))
+            self.assertEqual(reopened.accounting().cash_delta_usd, Decimal("-300.02"))
+            self.assertEqual(reopened.unresolved(), [])
+
     def test_real_native_roundtrip_partial_and_duplicate_events(self):
         port, strategy, session = self.run_node("fills")
         self.assertEqual(session.errors, [])
@@ -812,6 +909,27 @@ class PerExecutionBooking(unittest.TestCase):
         session = self.run_script(port, ExecutionScript())
         self.assertEqual(session.errors, ["fill_gap_unresolved_after_activities", "fill_gap_open_at_stop"])
         self.assertEqual(len(port.activity_reads), 1)
+
+    def test_incomplete_activity_tiling_is_refused_before_observation_or_native_booking(self):
+        for keep, reason in (((0, 2), "fill_gap_fill_activity_ledger_incomplete"),
+                             ((0, 1), "fill_gap_unresolved_after_activities")):
+            with self.subTest(activities=keep):
+                class IncompleteActivities(ScriptedPort):
+                    async def fill_activities(self, order_id):
+                        rows = await super().fill_activities(order_id)
+                        return [rows[index] for index in keep]
+
+                observations = []
+                port = IncompleteActivities(
+                    sell_rows=lambda order: [rest_row(apus_stream_rows(order)[-1])],
+                    activities=apus_activities)
+                port.sink_observation = observations.append
+                strategy = ExecutionScript()
+                session = self.run_script(port, strategy)
+                self.assertEqual(session.errors, [reason, "fill_gap_open_at_stop"])
+                self.assertEqual(observations, [])
+                self.assertEqual(self.sells(strategy), [])
+                self.assertEqual(session.execution_stats["activity_executions_booked"], 0)
 
     def test_a_failing_activities_read_freezes_with_its_error(self):
         class Failing(ScriptedPort):

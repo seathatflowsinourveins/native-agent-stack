@@ -20,6 +20,7 @@ import hashlib
 from datetime import datetime, timezone
 from decimal import Decimal
 import importlib.metadata
+import inspect
 from pathlib import Path
 import re
 import sys
@@ -688,17 +689,22 @@ class AlpacaExecutionClient(ExecutionClient):
         limit = self._terminal_limit(prior)
         if limit is not None and any(execution["cum"] > limit for execution, _ in executions):
             raise ValueError("post_terminal_fill_requires_reconciliation")
-        controller = getattr(self.session.port, "controller", None)
-        if controller is not None:
-            # The port normally persists observations before forwarding them here.
-            # FILL activities bypass that path. Persist the entire recovered prefix
-            # before rc5 generate_order_filled queues any strategy callbacks.
-            notional, covered = Decimal(0), Decimal(0)
-            for execution, stamp in executions:
+        sink_observation = getattr(self.session.port, "sink_observation", None)
+        if sink_observation is not None:
+            # Use the same hook as AlpacaPaperTransport._observe_locked. Validate
+            # the whole prefix before persisting any of it; FILL activities bypass
+            # the normal observation path and must precede native fill callbacks.
+            covered = Decimal(0)
+            for execution, _ in executions:
                 cum = execution["cum"]
                 if cum - execution["qty"] != covered:
                     raise ValueError("fill_activity_ledger_incomplete")
                 covered = cum
+            if covered < target and self._covered(prior, target) < target:
+                raise ValueError("fill_gap_unresolved_after_activities")
+            notional = Decimal(0)
+            for execution, stamp in executions:
+                cum = execution["cum"]
                 notional += execution["qty"] * execution["price"]
                 status = "filled" if cum == dec(str(order.quantity)) else "partially_filled"
                 if limit is not None and cum == limit:
@@ -706,11 +712,13 @@ class AlpacaExecutionClient(ExecutionClient):
                 # Retain reported averages where available; Alpaca reports new ones
                 # to six decimals. Exact execution prices drive ledger accounting.
                 average = prior["averages"].get(cum, (notional / cum).quantize(Decimal("0.000001")))
-                controller.observe({"client_order_id": cid, "id": prior["id"], "status": status,
+                result = sink_observation({"client_order_id": cid, "id": prior["id"], "status": status,
                     "filled_qty": str(cum), "filled_avg_price": str(average), "updated_at_ns": stamp,
                     "event": "fill" if status == "filled" else "partial_fill",
                     "execution_id": execution["trade_id"], "event_qty": str(execution["qty"]),
                     "event_price": str(execution["price"])})
+                if inspect.isawaitable(result):
+                    await result
         for execution, stamp in executions:
             if self._book(order, prior, execution, broker_id, stamp):
                 self.session.execution_stats["activity_executions_booked"] += 1

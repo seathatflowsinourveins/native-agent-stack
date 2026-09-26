@@ -1029,6 +1029,45 @@ class PerExecutionLedger(unittest.TestCase):
                 else:
                     self.assertEqual(self.ledger.positions()["APUS"].cost_basis_usd, D("162.95"))
 
+    def test_accounting_replay_quantity_mismatch_rolls_back_late_execution(self):
+        self.reserve("buy-1", "buy", "29", "5.64")
+        self.ledger.record_order("buy-1", "b-buy", "filled", "29", "5.618966")
+        # A damaged materialized position disagrees with the durable booking journal.
+        self.ledger.db.execute("UPDATE positions SET qty='28' WHERE symbol='APUS'")
+        before = tuple(self.ledger.db.iterdump())
+
+        with self.assertRaisesRegex(s.SafetyError, "^accounting_replay_quantity_mismatch$"):
+            self.ledger.record_order("buy-1", "b-buy", "filled", "29", "5.618966",
+                                     execution={"execution_id": "late-buy", "qty": "29", "price": "5.61"})
+
+        # The new execution, replay checkpoint, accounting and journal all roll back.
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+
+    def test_accounting_replay_short_position_rolls_back_late_execution(self):
+        self.reserve("buy-1", "buy", "29", "5.64")
+        self.ledger.record_order("buy-1", "b-buy", "filled", "29", "5.618966")
+        self.reserve("sell-1", "sell", "29", "5.60")
+        self.ledger.record_order("sell-1", "b-sell", "filled", "29", "5.62",
+                                 execution={"execution_id": "sale", "qty": "29", "price": "5.62"})
+        # Corrupt the journal order so the sale precedes its buy. Late execution
+        # coverage must refuse a replay whose first booking would create a short.
+        self.ledger.db.execute(
+            "UPDATE events SET id=(SELECT MAX(id)+1 FROM events) "
+            "WHERE kind='order_observed' AND client_id='buy-1'")
+        before = tuple(self.ledger.db.iterdump())
+
+        with self.assertRaisesRegex(s.SafetyError, "^accounting_replay_would_make_short_position$"):
+            self.ledger.record_order("buy-1", "b-buy", "filled", "29", "5.618966",
+                                     execution={"execution_id": "late-buy", "qty": "29", "price": "5.61"})
+
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+
     def test_rounded_average_at_the_limit_does_not_freeze_either_path(self):
         # 26 @ 5.62 then 3 @ 5.60 against a 5.60 sell limit: Alpaca reports 5.617931 (162.92/29
         # rounded), and the old derivation priced the last 3 at 5.599999, below the limit.

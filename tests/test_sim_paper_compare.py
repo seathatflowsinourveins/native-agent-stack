@@ -345,6 +345,21 @@ class CancelTimestampResolutionTests(unittest.TestCase):
 
 
 class BuildDecisionsTests(unittest.TestCase):
+    def test_cancel_before_submit_is_rejected(self):
+        order = {"symbol": "AAPL", "side": "BUY", "status": "canceled", "submitted_at_ns": 10,
+                 "client_order_id": "trial-1", "qty": 1, "limit_price": "1", "time_in_force": "DAY",
+                 "filled_qty": 0, "filled_avg_price": None, "filled_at_ns": None}
+        with self.assertRaisesRegex(ValueError, "^cancel_before_submit:trial-1$"):
+            C.build_decisions([order], {"trial-1": {"cancel_ts_ns": 9}})
+
+    def test_cancel_at_submit_timestamp_is_accepted_after_submit(self):
+        order = {"symbol": "AAPL", "side": "BUY", "status": "canceled", "submitted_at_ns": 10,
+                 "client_order_id": "trial-1", "qty": 1, "limit_price": "1", "time_in_force": "DAY",
+                 "filled_qty": 0, "filled_avg_price": None, "filled_at_ns": None}
+        self.assertEqual(C.build_decisions([order], {"trial-1": {"cancel_ts_ns": 10}}),
+                         [{"ts_ns": 10, "action": "submit", "order": order},
+                          {"ts_ns": 10, "action": "cancel", "order": order}])
+
     def test_cancel_uses_the_resolved_timestamp(self):
         orders = C.load_paper_orders(json.loads((TRIAL / "broker-orders.json").read_text()))
         paper_output = json.loads((TRIAL / "paper-output.json").read_text())

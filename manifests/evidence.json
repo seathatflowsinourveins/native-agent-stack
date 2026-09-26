@@ -9700,8 +9700,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
-      "sha256": "c457a92aef2b3cb32c38f90e5e6f98109776e9adb34caf1ab9ecec0b12d161ae",
-      "bytes": 51741
+      "sha256": "fd0aa91d432978849956c3b76a6be9ae8f696772f900e24151ea9aa88d91a33f",
+      "bytes": 52107
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
@@ -9755,12 +9755,12 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/simulation.py",
-      "sha256": "ae7bdc2b9ca3bfe3a0d91098b836da65dd96b34d9a91f8d407f7add6bf196199",
-      "bytes": 4841
+      "sha256": "0119e0efe3b498be3c415eee9c1a0be922c9b5b17e3b774aa7528668c4eb0b30",
+      "bytes": 4939
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "dcdded22290c9646e7261923ba9db6c06a15dbb2cc26caa5bfd5660305133bfa",
+      "sha256": "89ad3c2e236f5a8813bb23ac920d66c98e3d50ee0ed46bafc784087b792c67d4",
       "bytes": 6969
     },
     {
@@ -36905,8 +36905,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_native.py",
-      "sha256": "d1a78c53fa19a7d13e90fc6f15fa96555f9f7bdf27c21876f6b27f5057d25302",
-      "bytes": 66226
+      "sha256": "fdf65c43768a78ca24ecd9a5f87dbe054c5289c6215e9da159769fdc13d6e66f",
+      "bytes": 72246
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
@@ -36920,8 +36920,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
-      "sha256": "c333dba9069bc1f73efc0f6e8badfd31c8e0379eed3e9af5675b21a4071a7975",
-      "bytes": 60298
+      "sha256": "c3d0bd01fccf8842e89d20e52b76da6bc5d53aa205962ac550408840b4e48dbd",
+      "bytes": 62641
     },
     {
       "path": "tests/test_adaptive_paper_sessions.py",
@@ -37470,8 +37470,8 @@
     },
     {
       "path": "tests/test_sim_paper_compare.py",
-      "sha256": "49c7d7725a9a03711e4ea8c0bc0cc3ccc9593866922ecce8e4051d3d82d89c88",
-      "bytes": 102049
+      "sha256": "9814a743a9c5b1f27d78fbfe5e788156752dfdba21bc8945b9069ac11a88cda4",
+      "bytes": 103131
     },
     {
       "path": "tests/test_skill_usage.py",

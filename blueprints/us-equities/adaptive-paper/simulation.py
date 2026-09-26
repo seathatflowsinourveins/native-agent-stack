@@ -36,6 +36,10 @@ class SimulatedPort:
         self.on_quote = self.on_order = None
         self.task = None
 
+    @property
+    def sink_observation(self):
+        return self.controller.observe
+
     async def start(self, on_quote, on_order):
         self.on_quote, self.on_order = on_quote, on_order
         self.started += 1
@@ -86,7 +90,7 @@ class SimulatedPort:
                                          "cum_qty": str(qty), "symbol": symbol, "side": side,
                                          "transaction_time_ns": order["updated_at_ns"], "source": "activity"}]
         fill = dict(order, event="fill", execution_id=execution_id, event_qty=str(qty), event_price=str(price))
-        self.controller.observe(dict(fill))
+        await invoke(self.sink_observation, dict(fill))
         await invoke(self.on_order, dict(fill))
         return dict(order)
 
