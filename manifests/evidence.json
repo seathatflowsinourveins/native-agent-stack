@@ -36668,8 +36668,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "e0c460de1afc90f65184286a593073324fb0643ce6fb1cadd99a754dfd572d64",
-      "bytes": 15505
+      "sha256": "385f8b39aa1b1d3295c5233ad48795f913d412871bf14c926f15d93b03a04f81",
+      "bytes": 15507
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
