@@ -191,9 +191,13 @@ locally with `GH_TOKEN` set and no `--offline`, using
 - **Ignores.** `.github/osv-scanner.toml` documents the policy: `id`,
   a concrete `reason`, and `ignoreUntil` no more than 90 days away, all
   enforced by the unit test. Since 2026-09-26 two time-boxed entries (until
-  2026-12-24) cover only the evaluation-only Lumibot 4.6.1 lock of the SPY
-  one_zero engine trial (evaluation only, run offline under bwrap), never
-  installed outside that trial:
+  2026-12-24) exist for the evaluation-only Lumibot 4.6.1 lock of the SPY
+  one_zero engine trial (run offline under bwrap, never installed outside
+  that trial). osv-scanner 2.6.0 matches `[[IgnoredVulns]]` by id in every
+  scanned lockfile (one `--config` for the whole inventory), so both apply
+  repo-wide. Today only the Lumibot lock pins an affected version, and
+  `tests/test_osv_lockfile_coverage.py` fails if any other inventory lockfile
+  pins nltk at any version or setuptools below 83.0.0:
   GHSA-8mgp-746c-j5xp (nltk 3.10.3, no patched release) and
   GHSA-h35f-9h28-mq5c (setuptools 80.10.2; the environment was installed
   binary-only on Linux). At expiry the Lumibot lock and both ignores are
