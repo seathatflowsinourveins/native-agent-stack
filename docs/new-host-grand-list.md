@@ -28,7 +28,7 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 
 | Host | Evidence | Generation tier | Semantic-RAG tier | Concurrency cap | Measured |
 | --- | --- | --- | --- | --- | --- |
-| This host (measured) | native_proven | large-32b-q4 | standard | 16 | cpu_brand=Intel(R) Core(TM) Ultra 9 275HX; cores=24; effective_ram_gb=47.0 |
+| WSL2 authoring laptop, 2026-09-23 measurement (see wsl-authoring-20260923) | native_proven | large-32b-q4 | standard | 16 | cpu_brand=Intel(R) Core(TM) Ultra 9 275HX; cores=24; effective_ram_gb=47.0 |
 | 128 GB WSL workstation (labelled projection) | labelled_projection | large-32b-q4 | headroom | 16 | — |
 | macOS arm64, 48 GB unified memory (labelled projection) | labelled_projection | large-32b-q4 | full | 10 | — |
 | macOS arm64, 64 GB unified memory (labelled projection) | labelled_projection | large-32b-q4 | full | 12 | — |
@@ -36,6 +36,7 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 | macOS arm64, Apple M5 Pro, 18 cores, 24 GB unified memory (measured) | native_proven | mid-14b-q4-or-8b-q8 | light | 16 | cpu_brand=Apple M5 Pro; cores=18; unified_memory_gb=24.0; effective_ram_gb=24.0 |
 | WSL2 x86_64 workstation, AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, RTX 4090 24 GB (measured) | native_proven | large-32b-q4 | headroom | 16 | cpu_brand=AMD Ryzen Threadripper PRO 5975WX 32-Cores; cores=48; effective_ram_gb=102.2 |
 | macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory (measured) | native_proven | large-32b-q4 | full | 16 | cpu_brand=Apple M5 Pro; cores=18; unified_memory_gb=64.0; effective_ram_gb=64.0 |
+| WSL2 authoring laptop (measured) | native_proven | large-32b-q4 | standard | 16 | cpu_brand=Intel(R) Core(TM) Ultra 9 275HX; cores=24; effective_ram_gb=47.0 |
 
 ## Qualified local models
 
