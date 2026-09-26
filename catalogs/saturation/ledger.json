@@ -2732,7 +2732,7 @@
    "workflow_run": "wf_a874897e-af1",
    "status": "stopped",
    "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
-   "manifest_sha256": "56e4db54ed89b6362bb315eeaa56897c71d42bd01874093ac6ded08a2ef21b79",
+   "manifest_sha256": "96419356fc76839dd833836d3a60ccfdda0293d5d25a291b6512df90ec67db99",
    "lane": "landscape-sweep-20260926",
    "prompts_sha256": "1b7844800af40911484591d738a86741fd4a68cbb58339bc8126418c4c6a8783",
    "usage_ref": "evidence/artifacts/landscape-sweep-20260926-attempts/child-usage-wf_a874897e-af1.json",
@@ -2834,7 +2834,7 @@
    "workflow_run": "wf_8397ada1-777",
    "status": "completed",
    "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
-   "manifest_sha256": "56e4db54ed89b6362bb315eeaa56897c71d42bd01874093ac6ded08a2ef21b79",
+   "manifest_sha256": "96419356fc76839dd833836d3a60ccfdda0293d5d25a291b6512df90ec67db99",
    "lane": "landscape-sweep-20260926",
    "prompts_sha256": "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4",
    "usage_ref": "evidence/artifacts/landscape-sweep-20260926-attempts/child-usage-wf_8397ada1-777.json",
@@ -2846,11 +2846,12 @@
     "Ran on the 2026-09-26 scratchpad prototype of the lane; prompts_sha256 is the prototype's prompts_sha256.txt, which the packaged templates reproduce. The run's lane limits, incidents included, are catalogs/sota-convergence/manifest-20260926.json#/lane_limits/landscape-sweep-20260926.",
     "Survival is two-family on fit: the facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra) must vote not refuted. In the nine layers whose first-round GPT-6 fit votes did not return, the missing vote counts as refuted, so no proposal there survived or counts as two-family agreement. The 27 proposals that no returned vote refutes are refuted by absence, not on merit: each layer's votes_note names them, their fit ref's gpt6 member is {missing: true}, and saturation_ledger.py (refuted_by_absence) and build_inputs.py do not count them as adjudicated. Each such layer is reopened (retained_failure).",
     "The coordinator session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION, default 200, across the session and every subagent) was reached at 04:10:13Z: 46 of this run's 200 WebSearch calls were capped, in 30 workers (the usage record's web_search), and no Claude refuter, follow-up discovery worker or critic search returned results. Every capped worker is a web_search_capped retained failure of its layer, and the critic's counts for every layer, so every layer is reopened (lane limit 10).",
+    "Every GPT-6-Astra lane, discovery and fit, searched Codex's cached web index, not the live web: the runner started each job as codex --search exec, and a top-level --search does not reach exec, which keeps its cached mode (the Codex qualification of 2026-09-26, #332). GPT-6 discoveries and votes rest on that index, and the release and activity facts they cite may lag upstream. With the WebSearch cap, no lane after 04:10:13Z had live web search except through gh api and WebFetch (lane limit 11).",
     "Reopen entries other than retained_failure copy the saturation report's current triggers at append time (this checkout's receipt staleness and the run's catalog-freshness artifact 36205743492).",
     "Earlier attempts: landscape-sweep-20260926-attempt-1 (wf_a874897e-af1, stopped) is its own record; the one-layer smoke wf_1753e674-5dc is retained under evidence/artifacts/landscape-sweep-20260926-attempts/ without a ledger record.",
     "Proposals and refuter votes plus upstream source reviews only: nothing was installed and no winner changed; winner pins move only through the verdict wave."
    ],
-   "prev_sha256": "ea8155ca3516993bdf0236242659c46963dcac665b3b26412df5a7ef366985ee",
+   "prev_sha256": "a223342a5d2387653ae5fdc4df8efe2f5598a8790c17a71bd37ce8a869b22ad5",
    "layers": [
     {
      "catalog": "foundation",
@@ -7690,5 +7691,5 @@
    ]
   }
  ],
- "head_sha256": "e2badb334ff3508f4c824a522488eb769fe06fe082dac6ea35f6df57a16ee0c5"
+ "head_sha256": "af45a3bba6d9d013f6f53d75c893acbf0ca43588249760b8d5c05bc60741c910"
 }

@@ -17,8 +17,8 @@ The run used the 2026-09-26 scratchpad prototype of the lane. The same lane is n
 run's `prompts_sha256` is `3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4`, the sha256 of the
 prototype's staged templates. The packaged templates, filled with this run's values, give the same hash (a local check
 in `tests/test_landscape_sweep_harness.py`). The packaged tools produced the returns, lanes, layers, usage records,
-manifest and source reviews. `tavily-leads.json` and the attempts' compact records were written for this record,
-and each states its method.
+manifest and source reviews. `tavily-leads.json`, the lead-vetting addendum `tavily-leads-vetting.json` and the
+attempts' compact records were written for this record, and each states its method.
 
 | Run | Window (UTC) | Outcome |
 | --- | --- | --- |
@@ -52,7 +52,8 @@ counts:
 - **Discovery calls.** These counts cover discovery only, as each worker reported them. Claude: 170 web searches,
   240 page fetches and 1,004 GitHub API calls. GPT-6: 396, 264 and 748. The Claude web search figure counts capped
   calls as searches. Measured from the transcripts, Claude discovery made 169 WebSearch calls: 154 returned results
-  and 15 were capped (see [WebSearch session cap](#websearch-session-cap)).
+  and 15 were capped (see [WebSearch session cap](#websearch-session-cap)). The GPT-6 searches used Codex's cached
+  web index, not the live web (see [GPT-6 cached web search](#gpt-6-cached-web-search)).
 - **WebSearch cap.** From 04:10:13Z the session's WebSearch cap refused every Claude WebSearch call: 46 of this
   run's 200, in 30 workers. Every layer is reopened for it, so no layer counts as clean.
 
@@ -122,7 +123,8 @@ in 30 workers. The usage record counts each worker's calls and capped calls (`we
 No WebSearch call of a Claude refuter, a follow-up discovery worker or the critic returned results. 42 of the 43
 facts-refuter attempts, 42 of the 43 Claude fit-refuter attempts, the critic (10:55Z to 11:26Z) and all 8 follow-up
 discovery workers started after 04:10:13Z. The refuters that made no WebSearch call never met the notice. The GPT-6
-lanes search through Codex, outside this cap.
+lanes search through Codex, outside this cap, but only in Codex's cached mode (see
+[GPT-6 cached web search](#gpt-6-cached-web-search)).
 
 **Votes.** Ten vote reasonings mention the cap:
 
@@ -146,6 +148,42 @@ count of 1:
 The refuters judged every survivor without search results. The verdict wave that starts from this manifest should
 not read those votes as search-verified. The harness README (Coordination) now says how to raise the cap before a
 full sweep. The lane's budgets allow 1,120 Claude searches (40 × 12 discovery, 80 × 8 refutation).
+
+## GPT-6 cached web search
+
+Every GPT-6-Astra lane of this run, discovery and fit, searched Codex's cached web index, not the live web (lane
+limit 11).
+
+- **The runner's command.** The prototype runner started each job as `codex --search exec`. Its script stays in the
+  coordinator's private work directory. The script file's timestamps show that the version with that line was in use
+  from 05:42:45Z until 16:36:56Z, when the line became `codex exec ... -c web_search="live"`. The version before
+  05:42:45Z is not retained; the table below shows that exec searches cached with or without `--search`.
+- **What `--search` does to `exec`.** The Codex qualification of 2026-09-26 (#332) measured three cases on Codex
+  0.155.1 and 0.157.1 against a local stand-in provider
+  ([`websearch-0.155.1.json`](../sota-refresh-20260926/codex/results/websearch-0.155.1.json),
+  [`websearch-0.157.1.json`](../sota-refresh-20260926/codex/results/websearch-0.157.1.json)). Both versions behave
+  the same, and the run's returns do not record which one ran.
+
+| Case | Command | `external_web_access` in each search request |
+| --- | --- | --- |
+| W1 | `codex --search exec ...` | false |
+| W2 | `codex exec ...` | false |
+| W3 | `codex exec -c web_search="live" ...` | true |
+
+A top-level `--search` does not reach `exec`, which keeps its default cached mode. That the OpenAI provider behaves
+the same rests on source reading, as the
+[qualification receipt](../../receipts/codex-01571-qualification-20260926.json) states, not on a live measurement.
+On 2026-09-26 the coordinator observed a real `codex` 0.157.1 `exec` with `-c web_search="live"` make a live search.
+That observation is not retained.
+
+**Consequence.** GPT-6 discoveries and votes rested on the provider's cached web index, so the release and activity
+facts that GPT-6 cited (latest release, release date, `pushed_at`, stars) may lag upstream. The web search that the
+method limits give the GPT-6 lanes was this cached mode. Together with the Claude WebSearch cap, no lane after
+04:10:13Z had live web search except through `gh api` and WebFetch. The limit changes no vote, survivor or reopen
+entry.
+
+**Next runs.** Future runs pass `-c web_search="live"`. The packaged `codex_job.py` still passes `--search`; its fix
+follows in a separate pull request.
 
 ## Survivors and reopened layers
 
@@ -234,7 +272,7 @@ counting as refuted on merit. These proposals are the first candidates for a sec
 ## Lane limits
 
 The manifest's `lane_limits/landscape-sweep-20260926` holds the four method limits that `convert.py` writes and the
-ten run-specific limits below. Each was passed as `--limit`.
+eleven run-specific limits below. Each was passed as `--limit`.
 
 1. Harness: this run used the 2026-09-26 scratchpad prototype of the lane, not the packaged
    tools/sota-convergence/landscape-sweep/ harness merged afterwards (#324). Its prompts_sha256
@@ -307,6 +345,22 @@ ten run-specific limits below. Each was passed as `--limit`.
     search (returns votes/identity-provenance/3/facts). Every capped worker is a web_search_capped retained failure
     of its layer and the critic's counts for every layer, so every layer is reopened and no layer counts as clean.
     The GPT-6 lanes search through Codex, outside this cap.
+11. GPT-6 web search: every GPT-6-Astra lane of this run, discovery and fit, searched Codex's cached web index, not
+    the live web. The prototype runner started each job as codex --search exec: its script, kept in the coordinator's
+    private work directory, holds that line from 05:42:45Z until 16:36:56Z, when it became -c web_search="live" (the
+    version before 05:42:45Z is not retained). The Codex qualification of 2026-09-26 (#332) measured on Codex 0.155.1
+    and 0.157.1, against a local stand-in provider, that a top-level --search does not reach exec: with --search
+    before exec (case W1) and with no flag (case W2) every search request carried external_web_access: false, and
+    only -c web_search="live" (case W3) sent true
+    (evidence/artifacts/sota-refresh-20260926/codex/results/websearch-0.155.1.json and websearch-0.157.1.json; that
+    the OpenAI provider behaves the same rests on source reading, per
+    evidence/receipts/codex-01571-qualification-20260926.json). The run's returns do not record the Codex version;
+    both versions behave the same. On 2026-09-26 the coordinator observed a real codex 0.157.1 exec with -c
+    web_search="live" make a live search; that observation is not retained. The web search that the method limits
+    give the GPT-6 lanes was therefore cached: GPT-6 discoveries and votes rested on the provider's cached web index,
+    and the release and activity facts GPT-6 cited (latest release, release date, pushed_at, stars) may lag upstream.
+    Together with limit 10, no lane after 04:10:13Z had live web search except through gh api and WebFetch. Future
+    runs pass -c web_search="live"; the fix of the packaged codex_job.py follows in a separate pull request.
 
 Notes on limit 3:
 
@@ -335,7 +389,7 @@ follows:
 - **64 remain leads.**
 
 Some leads are not repositories at all, such as `assets/img` and `docs/codeql-overview`. The verdict wave checks each
-lead before using it.
+lead before using it. The [lead vetting](#tavily-lead-vetting-addendum) below screened all 136 after the sweep.
 
 | Layer | Leads |
 | --- | --- |
@@ -364,6 +418,30 @@ lead before using it.
 | token-efficiency | bowang-lab/vllm, flashinfer-ai/flashinfer, zilliztech/gptcache |
 | web-research | alphaxiv/openresearch-cli, alxdr3k/tavily-cli |
 | workers | microsoft/sico |
+
+## Tavily lead vetting (addendum)
+
+After the sweep, Workflow run `wf_6a6cb7b8-c22` (14:11:51Z to 15:27:54Z) vetted all 136 leads that the cross-check
+counted as missed. `tavily-leads-vetting.json` keeps the result. It is discovery-completeness evidence, not a
+verdict: it is not a ledger record, it changes no layer count, and the verdict wave still checks each candidate.
+
+- **Screen.** One Claude screener per layer (Sonnet) was told to check each lead through `gh api` and its README.
+  The screeners dismissed 100 leads with a reason and wrote 36 proposals in the sweep's discovery format. 7 are
+  labelled `not_adopted`, so 29 were kept, in 15 layers.
+- **Votes.** The sweep's facts refuter (Claude Sonnet) and both fit refuters (Claude Opus and GPT-6-Astra) voted on
+  the 29 kept proposals, with the sweep's templates and survival rule. No vote was missing.
+- **Result.** No proposal survived. The Claude fit refuter refuted all 29, the GPT-6 fit refuter 21 and the facts
+  refuter 4. In 8 cases GPT-6 did not refute but Claude did: apache/airflow (which the facts refuter refuted too),
+  grobidorg/grobid, kbrdn1/gwm-cli, peter-evans/create-pull-request, abiosoft/colima, google/nsjail,
+  victoriametrics/victorialogs and victoriametrics/victoriametrics.
+- **Limitations.** The vetting has the run's two search limits. Its Claude workers had no WebSearch: the session cap
+  refused both of its WebSearch calls (screen:semantic-rag and refute-fit:observation-inference:leads). Its GPT-6
+  fit jobs searched Codex's cached index (lane limit 11). The sweep's templates tell a refuter to default to refuted
+  when uncertain, so the missing search may have pushed Claude votes toward refuted. The 8 split cases are the first
+  leads to recheck once both families search live.
+- **Usage.** `child-usage-wf_6a6cb7b8-c22.json` measures 75 Claude children, all at effort max, with complete usage:
+  claude-sonnet-5 60 children (output 1,626,358 tokens) and claude-opus-5-5 15 (output 532,024). The 15 GPT-6 jobs
+  reported input 8,401,965 tokens (cached 7,047,936) and output 105,625 (reasoning 74,715). The two are never summed.
 
 ## skills_usage
 
@@ -398,6 +476,12 @@ returns list any skill, so these counts do not measure GPT-6 skill use.
 - **`gpt6-jobs.json`.** The GPT-6 job timeline, the stuck-runner observation and the cited coordinator incident-log
   entries that support lane limit 3. It holds no model text and no host paths.
 - **`tavily-leads.json`.** Discovery leads only.
+- **`tavily-leads-vetting.json`.** The lead-vetting addendum, discovery-completeness evidence rather than a verdict.
+  Per layer it keeps the leads, the screen's dismissals and proposals, and each refuter's vote on the kept proposals
+  (refuted, confidence, a reasoning excerpt of at most 300 characters and refs). Its method, limitations, totals and
+  usage are in the file.
+- **`child-usage-wf_6a6cb7b8-c22.json`.** The lead-vetting run's Claude usage and WebSearch counts, from
+  `usage_record.py`.
 - **`independent-review.json`.** The two review rounds' findings and their repairs.
 - **The attempts directory.**
   - `child-usage-wf_8397ada1-777.json`: this run's usage and per-worker WebSearch counts.
@@ -430,11 +514,15 @@ returns list any skill, so these counts do not measure GPT-6 skill use.
   this exact file. Any other 40-hex value, an uppercase variant or an `sgp_` token stays detected. It follows the
   2026-09-23 pin allowlist of `manifest-20260923.json` and comes with regression tests `test_d3` and `test_d4` in
   `tests/test_gitleaks_config.py`.
+- **Lead-vetting addendum.** One facts refuter's ref named this repository's checkout path; it reads `<checkout>`.
+  `sanitize()` then ran on every string of `tavily-leads-vetting.json`, and the private-content check found nothing.
+  The file names sourcegraph/* leads, so its 23 40-hex ids (22 commit ids in refs and the usage measurement's
+  `tool_commit`) are shortened to 12 characters as above; the usage record keeps the full `tool_commit`.
 
 **Verification.** After a simulated registration of every new and changed file,
-`scripts/saturation_ledger.py --check --base origin/main` and `scripts/validate.py` passed. The pinned gitleaks
-8.30.1 found nothing with the repository configuration. The coordinator registers the files in
-`manifests/evidence.json`.
+`scripts/saturation_ledger.py --check --base origin/main` and `scripts/validate.py` passed, and they passed again
+after lane limit 11 and the lead-vetting addendum. The pinned gitleaks 8.30.1 found nothing with the repository
+configuration. The coordinator registers the files in `manifests/evidence.json`.
 
 **Independent review.** There were two review rounds, each followed by one repair round. Both reviews were
 same-family: no Codex review was run.
@@ -454,6 +542,9 @@ appending. That was not done. Those votes would come from a new model run, hours
 runner, so they would not be this run's votes. The verdict wave, which the coordinator owns, is where they belong,
 and the 27 proposals are listed above as its first candidates. `independent-review.json` records each finding and its
 disposition.
+
+Lane limit 11, the [GPT-6 cached web search](#gpt-6-cached-web-search) section and the lead-vetting addendum were
+added after both rounds and have not been reviewed.
 
 ## Attempts
 
