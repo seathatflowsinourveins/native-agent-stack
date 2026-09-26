@@ -138,5 +138,12 @@
       "sha256": "7d3ecb48739520d53a7c6de0c2a4933909e117aaf481a73fd0c4d1a90dfac0f7",
       "byte_identical_to_run_copy": false
     }
+  ],
+  "addenda": [
+    {
+      "recorded_date_utc": "2026-09-26",
+      "note": "limitations[0] (Codex capture pending the user's /hooks trust) is resolved on this host. The user trusted the 7 rewritten Codex ai-memory hook commands in Codex /hooks on 2026-09-26. A retained probe the same day (capture.txt, 14:46:02Z-14:46:14Z UTC) confirmed ai-memory 2.4.1 and codex-cli 0.157.1, with 7 ~/.codex/hooks.json commands on tools/ai-memory-2.4.1 and 0 on any other prefix. It ran `codex exec -s read-only -m gpt-6-astra` from the repository checkout with one echo command; Codex exited 0 with the expected output line. A read-only count over the production store (schema V67) then found 1 Codex session with one observation of each of session-start, user-prompt, pre-tool-use, post-tool-use, stop and session-end. codex-stderr-hook-lines.txt shows the SessionStart, UserPromptSubmit, PreToolUse, PostToolUse and Stop hooks each started and completed. A first attempt from a directory outside any git repository is kept as a failed attempt: Codex exited 1 on its own directory-trust check before any session or hook ran. Not covered: the seventh hook (PreCompact) was not exercised, observation content was not inspected, and the Codex CLI is 0.157.1, not the version present at qualification. Original limitations, data.cutover.pending and the claim are left as recorded.",
+      "evidence": "evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md"
+    }
   ]
 }
