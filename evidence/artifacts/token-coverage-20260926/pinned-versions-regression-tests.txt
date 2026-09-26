@@ -1,0 +1,138 @@
+# --pinned-versions regression tests: discriminating control (2026-09-26, nativestack-5975wx-20260925)
+#
+# Command, run in each tree with Python 3.13.15:
+#   python -m unittest -v \
+#     tests.test_adoption_status.PinnedVersionProbeTests.test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin \
+#     tests.test_adoption_status.PinnedVersionProbeTests.test_stdout_and_stderr_are_searched_as_two_streams \
+#     tests.test_adoption_status.PinnedVersionProbeTests.test_a_timeout_kills_the_probe_s_whole_process_group \
+#     tests.test_adoption_status.PinnedVersionProbeTests.test_a_probe_s_leftover_descendants_are_killed_once_it_exits \
+#     tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group \
+#
+# Tests file in both runs: this repair's tests/test_adoption_status.py (sha256 972006349a77442153e4c16d31595e527147a3ba4b439e13b0e807af765059a2).
+# Run 1, 02:43:53Z to 02:44:45Z, exit 1: a scratch tree holding scripts/adoption_status.py from a74dd1b6, before the repair
+#   (sha256 9da040c4f73eb7c87e972b04a79125a1964bd6a945243fefca480aa5b8c532a4), and the two test files.
+# Run 2, 02:44:45Z to 02:44:47Z, exit 0: the repair worktree, scripts/adoption_status.py sha256 6ad15fb0d3889265c82669bac565e623dba449eae14ce29846cab158912ac3a6.
+# Scratch paths are replaced with <old-tree>, <repair-tree> and <tmp>.
+
+===== Run 1: pre-repair script =====
+test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin (tests.test_adoption_status.PinnedVersionProbeTests.test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin) ... 
+  test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin (tests.test_adoption_status.PinnedVersionProbeTests.test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin) (stream='stdout') ... FAIL
+  test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin (tests.test_adoption_status.PinnedVersionProbeTests.test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin) (stream=' >&2') ... FAIL
+test_stdout_and_stderr_are_searched_as_two_streams (tests.test_adoption_status.PinnedVersionProbeTests.test_stdout_and_stderr_are_searched_as_two_streams) ... FAIL
+test_a_timeout_kills_the_probe_s_whole_process_group (tests.test_adoption_status.PinnedVersionProbeTests.test_a_timeout_kills_the_probe_s_whole_process_group) ... FAIL
+test_a_probe_s_leftover_descendants_are_killed_once_it_exits (tests.test_adoption_status.PinnedVersionProbeTests.test_a_probe_s_leftover_descendants_are_killed_once_it_exits) ... FAIL
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... 
+  test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) (signal='SIGINT') ... FAIL
+  test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) (signal='SIGTERM') ... FAIL
+  test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) (signal='SIGHUP') ... FAIL
+
+======================================================================
+FAIL: test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin (tests.test_adoption_status.PinnedVersionProbeTests.test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin) (stream='stdout')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<old-tree>/tests/test_adoption_status.py", line 472, in test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin
+    self.assertEqual(probe_pinned_version(entry),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     {"pinned_version": "1.2.3", "checked": True, "matches_pin": False})
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'pinned_version': '1.2.3', 'checked': True, 'matches_pin': True} != {'pinned_version': '1.2.3', 'checked': True, 'matches_pin': False}
+- {'checked': True, 'matches_pin': True, 'pinned_version': '1.2.3'}
+?                                  ^^^
+
++ {'checked': True, 'matches_pin': False, 'pinned_version': '1.2.3'}
+?                                  ^^^^
+
+
+======================================================================
+FAIL: test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin (tests.test_adoption_status.PinnedVersionProbeTests.test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin) (stream=' >&2')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<old-tree>/tests/test_adoption_status.py", line 472, in test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin
+    self.assertEqual(probe_pinned_version(entry),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     {"pinned_version": "1.2.3", "checked": True, "matches_pin": False})
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'pinned_version': '1.2.3', 'checked': True, 'matches_pin': True} != {'pinned_version': '1.2.3', 'checked': True, 'matches_pin': False}
+- {'checked': True, 'matches_pin': True, 'pinned_version': '1.2.3'}
+?                                  ^^^
+
++ {'checked': True, 'matches_pin': False, 'pinned_version': '1.2.3'}
+?                                  ^^^^
+
+
+======================================================================
+FAIL: test_stdout_and_stderr_are_searched_as_two_streams (tests.test_adoption_status.PinnedVersionProbeTests.test_stdout_and_stderr_are_searched_as_two_streams)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<old-tree>/tests/test_adoption_status.py", line 481, in test_stdout_and_stderr_are_searched_as_two_streams
+    self.assertTrue(probe_pinned_version(entry)["matches_pin"])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_a_timeout_kills_the_probe_s_whole_process_group (tests.test_adoption_status.PinnedVersionProbeTests.test_a_timeout_kills_the_probe_s_whole_process_group)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<old-tree>/tests/test_adoption_status.py", line 491, in test_a_timeout_kills_the_probe_s_whole_process_group
+    self.assertTrue(descendant.gone(), "the probe's background child outlived the timeout")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : the probe's background child outlived the timeout
+
+======================================================================
+FAIL: test_a_probe_s_leftover_descendants_are_killed_once_it_exits (tests.test_adoption_status.PinnedVersionProbeTests.test_a_probe_s_leftover_descendants_are_killed_once_it_exits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<old-tree>/tests/test_adoption_status.py", line 501, in test_a_probe_s_leftover_descendants_are_killed_once_it_exits
+    self.assertEqual(probe_pinned_version(entry), {"pinned_version": "1.2.3", "checked": True, "matches_pin": True})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'pinned_version': '1.2.3', 'checked': False, 'matches_pin': None} != {'pinned_version': '1.2.3', 'checked': True, 'matches_pin': True}
+- {'checked': False, 'matches_pin': None, 'pinned_version': '1.2.3'}
+?             ^^^^                  ^^^
+
++ {'checked': True, 'matches_pin': True, 'pinned_version': '1.2.3'}
+?             ^^^                  ^^^
+
+
+======================================================================
+FAIL: test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) (signal='SIGINT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<old-tree>/tests/test_adoption_status.py", line 681, in test_an_interrupted_check_kills_the_running_probe_s_process_group
+    self.assertTrue(descendant.gone(), f"the probe's background child outlived {signum.name}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : the probe's background child outlived SIGINT
+
+======================================================================
+FAIL: test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) (signal='SIGTERM')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<old-tree>/tests/test_adoption_status.py", line 681, in test_an_interrupted_check_kills_the_running_probe_s_process_group
+    self.assertTrue(descendant.gone(), f"the probe's background child outlived {signum.name}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : the probe's background child outlived SIGTERM
+
+======================================================================
+FAIL: test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) (signal='SIGHUP')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<old-tree>/tests/test_adoption_status.py", line 681, in test_an_interrupted_check_kills_the_running_probe_s_process_group
+    self.assertTrue(descendant.gone(), f"the probe's background child outlived {signum.name}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : the probe's background child outlived SIGHUP
+
+----------------------------------------------------------------------
+Ran 5 tests in 51.718s
+
+FAILED (failures=8)
+
+===== Run 2: repaired script =====
+test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin (tests.test_adoption_status.PinnedVersionProbeTests.test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin) ... ok
+test_stdout_and_stderr_are_searched_as_two_streams (tests.test_adoption_status.PinnedVersionProbeTests.test_stdout_and_stderr_are_searched_as_two_streams) ... ok
+test_a_timeout_kills_the_probe_s_whole_process_group (tests.test_adoption_status.PinnedVersionProbeTests.test_a_timeout_kills_the_probe_s_whole_process_group) ... ok
+test_a_probe_s_leftover_descendants_are_killed_once_it_exits (tests.test_adoption_status.PinnedVersionProbeTests.test_a_probe_s_leftover_descendants_are_killed_once_it_exits) ... ok
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 1.725s
+
+OK

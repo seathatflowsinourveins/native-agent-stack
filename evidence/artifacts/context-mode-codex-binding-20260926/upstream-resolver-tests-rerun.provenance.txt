@@ -1,0 +1,13 @@
+# upstream rerun with retained provenance (2026-09-26)
+provenance_rerun.py sha256 1df810e5175b1d09781eb8f6fdce38d46e0a252d4c0eef175e9861c33f0cdc36
+copied the plugin clone ~/.codex/plugins/cache/context-mode/context-mode/1.0.169 to <work>/clone
+copy of the plugin clone: git rev-parse HEAD: 6f0cc6841c687e754059f36714a11233fda1a02b
+git status --porcelain before the restore: [' M .claude-plugin/plugin.json', ' M hooks/hooks.json']
+restored from HEAD: ['.claude-plugin/plugin.json', 'hooks/hooks.json']
+git status --porcelain before the run: []
+node v24.21.0, npm 11.19.0
+command (working directory: <work>/clone): npm test -- tests/util/codex-session-cwd-resolution.test.ts tests/util/project-dir.test.ts tests/integration/project-dir-strict.test.ts --reporter=verbose
+environment (nothing else): PATH=<node-dir>:/usr/bin:/bin, HOME=<work-home>, TMPDIR=<work>/tmp, LANG=C.UTF-8, TZ=UTC, NO_COLOR=1, npm_config_update_notifier=false
+UTC: 2026-09-26T06:50:03Z to 2026-09-26T06:50:09Z; exit status: 0
+git status --porcelain after the run: [' M cli.bundle.mjs', ' M server.bundle.mjs']
+npm stdout and stderr: upstream-resolver-tests-rerun.txt, sha256 4d4b8372f579c722719f090fbad350d29ac71d2cef74f1be411e938019fe5239

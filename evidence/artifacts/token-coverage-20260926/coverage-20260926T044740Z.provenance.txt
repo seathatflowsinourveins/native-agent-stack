@@ -1,0 +1,9 @@
+exit status: 0
+project .codex/config.toml present before the run: False
+report: coverage-20260926T044740Z.json, sha256 494f9cf91c84eda06dc790c207bb0fe8878720da9e7d14913097c022cf3f79f5, 7008 bytes
+stderr: 0 bytes
+command (working directory: the checkout): python scripts/adoption_status.py --profile token-efficiency --client-wiring --pinned-versions --json
+interpreter: Python 3.13.15
+checkout HEAD: 5c1961e49b89dd56ef5626950a5448735caabe4c; paths changed from HEAD (git status --porcelain): 27
+scripts/adoption_status.py sha256: 3f530026ca977b1effe9f0cf0dc3e4c94ec12caf5b5d0b53b6802d2286e7c74d
+UTC: 2026-09-26T04:47:40Z to 2026-09-26T04:47:42Z

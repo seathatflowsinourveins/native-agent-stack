@@ -1,0 +1,185 @@
+# --pinned-versions interrupt window: discriminating control (2026-09-26)
+# Python 3.13.15 on Linux x86_64; driver sha256 cbffdad3e28f2718c19f453faa8593f8a6b1afee97ef6eddd529fea0c0b3ec15
+# pre-fix scripts/adoption_status.py sha256 3f530026ca977b1effe9f0cf0dc3e4c94ec12caf5b5d0b53b6802d2286e7c74d
+# fixed scripts/adoption_status.py sha256 cd1229719768632b045e53e5dc7ee0d4c24ea2c36084589d28f8886329c349a6
+# tests/test_adoption_status.py sha256 9cd40bac64eb427d18220ac449d60938e3abd28426387ba76c7e17920b2d6a07 (both trees)
+
+# exit statuses, runs A to D: [1, 0, 0, 0]
+
+===== Run A: the pre-fix script =====
+# tree: <pre-fix-tree>
+# runner: default; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests tests.test_adoption_status.ProbeSignalDispositionTests
+# 2026-09-26T06:40:45Z to 2026-09-26T06:41:47Z, exit 1
+test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) ... 
+  test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) (second_signal='SIGINT') ... FAIL
+  test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) (second_signal='SIGTERM') ... FAIL
+  test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) (second_signal='SIGHUP') ... FAIL
+test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) ... ok
+test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) ... 
+  test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) (signal='SIGINT') ... FAIL
+  test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) (signal='SIGTERM') ... FAIL
+  test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) (signal='SIGHUP') ... FAIL
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+test_a_default_signal_ends_the_check_through_system_exit_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_default_signal_ends_the_check_through_system_exit_and_is_restored) ... ok
+test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place) ... ok
+test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored) ... ok
+test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends) ... ERROR
+test_sigint_still_raises_keyboard_interrupt_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_sigint_still_raises_keyboard_interrupt_and_is_restored) ... 
+  test_sigint_still_raises_keyboard_interrupt_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_sigint_still_raises_keyboard_interrupt_and_is_restored) (starting='default_int_handler') ... FAIL
+  test_sigint_still_raises_keyboard_interrupt_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_sigint_still_raises_keyboard_interrupt_and_is_restored) (starting='SIG_DFL') ... FAIL
+
+======================================================================
+ERROR: test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pre-fix-tree>/tests/test_adoption_status.py", line 893, in test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends
+    with adoption_status.held_interrupts():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'scripts.adoption_status' has no attribute 'held_interrupts'
+
+======================================================================
+FAIL: test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) (second_signal='SIGINT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pre-fix-tree>/tests/test_adoption_status.py", line 839, in test_a_second_signal_as_the_group_kill_begins_does_not_stop_it
+    self.assertTrue(descendant.gone(),
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+                    f"the probe's background child outlived a second signal, {signum.name}")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : the probe's background child outlived a second signal, SIGINT
+
+======================================================================
+FAIL: test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) (second_signal='SIGTERM')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pre-fix-tree>/tests/test_adoption_status.py", line 839, in test_a_second_signal_as_the_group_kill_begins_does_not_stop_it
+    self.assertTrue(descendant.gone(),
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+                    f"the probe's background child outlived a second signal, {signum.name}")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : the probe's background child outlived a second signal, SIGTERM
+
+======================================================================
+FAIL: test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) (second_signal='SIGHUP')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pre-fix-tree>/tests/test_adoption_status.py", line 839, in test_a_second_signal_as_the_group_kill_begins_does_not_stop_it
+    self.assertTrue(descendant.gone(),
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+                    f"the probe's background child outlived a second signal, {signum.name}")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : the probe's background child outlived a second signal, SIGHUP
+
+======================================================================
+FAIL: test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) (signal='SIGINT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pre-fix-tree>/tests/test_adoption_status.py", line 821, in test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group
+    self.assertTrue(descendant.gone(),
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+                    f"the probe's background child outlived {signum.name} while its process was created")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : the probe's background child outlived SIGINT while its process was created
+
+======================================================================
+FAIL: test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) (signal='SIGTERM')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pre-fix-tree>/tests/test_adoption_status.py", line 821, in test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group
+    self.assertTrue(descendant.gone(),
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+                    f"the probe's background child outlived {signum.name} while its process was created")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : the probe's background child outlived SIGTERM while its process was created
+
+======================================================================
+FAIL: test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) (signal='SIGHUP')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pre-fix-tree>/tests/test_adoption_status.py", line 821, in test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group
+    self.assertTrue(descendant.gone(),
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+                    f"the probe's background child outlived {signum.name} while its process was created")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : the probe's background child outlived SIGHUP while its process was created
+
+======================================================================
+FAIL: test_sigint_still_raises_keyboard_interrupt_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_sigint_still_raises_keyboard_interrupt_and_is_restored) (starting='default_int_handler')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pre-fix-tree>/tests/test_adoption_status.py", line 882, in test_sigint_still_raises_keyboard_interrupt_and_is_restored
+    self.assertIsNot(handler, starting)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly identical: <built-in function default_int_handler>
+
+======================================================================
+FAIL: test_sigint_still_raises_keyboard_interrupt_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_sigint_still_raises_keyboard_interrupt_and_is_restored) (starting='SIG_DFL')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pre-fix-tree>/tests/test_adoption_status.py", line 881, in test_sigint_still_raises_keyboard_interrupt_and_is_restored
+    self.assertTrue(callable(handler))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 9 tests in 61.847s
+
+FAILED (failures=8, errors=1)
+
+===== Run B: the fixed script =====
+# tree: <fixed-tree>
+# runner: default; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests tests.test_adoption_status.ProbeSignalDispositionTests
+# 2026-09-26T06:41:47Z to 2026-09-26T06:41:49Z, exit 0
+test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) ... ok
+test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) ... ok
+test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) ... ok
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+test_a_default_signal_ends_the_check_through_system_exit_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_default_signal_ends_the_check_through_system_exit_and_is_restored) ... ok
+test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place) ... ok
+test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored) ... ok
+test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends) ... ok
+test_sigint_still_raises_keyboard_interrupt_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_sigint_still_raises_keyboard_interrupt_and_is_restored) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.798s
+
+OK
+
+===== Run C: the fixed script, under nohup =====
+# tree: <fixed-tree>
+# runner: nohup; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests tests.test_adoption_status.ProbeSignalDispositionTests
+# 2026-09-26T06:41:49Z to 2026-09-26T06:41:51Z, exit 0
+test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) ... ok
+test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) ... ok
+test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) ... ok
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+test_a_default_signal_ends_the_check_through_system_exit_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_default_signal_ends_the_check_through_system_exit_and_is_restored) ... ok
+test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place) ... ok
+test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored) ... ok
+test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends) ... ok
+test_sigint_still_raises_keyboard_interrupt_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_sigint_still_raises_keyboard_interrupt_and_is_restored) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.877s
+
+OK
+
+===== Run D: the fixed script, as a background job =====
+# tree: <fixed-tree>
+# runner: background; command: <python> -m unittest -v tests.test_adoption_status.PinnedVersionInterruptionTests tests.test_adoption_status.ProbeSignalDispositionTests
+# 2026-09-26T06:41:51Z to 2026-09-26T06:41:53Z, exit 0
+test_a_second_signal_as_the_group_kill_begins_does_not_stop_it (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_second_signal_as_the_group_kill_begins_does_not_stop_it) ... ok
+test_a_signal_ignored_on_entry_leaves_the_check_running (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_ignored_on_entry_leaves_the_check_running) ... ok
+test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group) ... ok
+test_an_interrupted_check_kills_the_running_probe_s_process_group (tests.test_adoption_status.PinnedVersionInterruptionTests.test_an_interrupted_check_kills_the_running_probe_s_process_group) ... ok
+test_a_default_signal_ends_the_check_through_system_exit_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_default_signal_ends_the_check_through_system_exit_and_is_restored) ... ok
+test_a_handler_installed_by_someone_else_is_left_in_place (tests.test_adoption_status.ProbeSignalDispositionTests.test_a_handler_installed_by_someone_else_is_left_in_place) ... ok
+test_an_ignored_signal_stays_ignored (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_ignored_signal_stays_ignored) ... ok
+test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends (tests.test_adoption_status.ProbeSignalDispositionTests.test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends) ... ok
+test_sigint_still_raises_keyboard_interrupt_and_is_restored (tests.test_adoption_status.ProbeSignalDispositionTests.test_sigint_still_raises_keyboard_interrupt_and_is_restored) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 2.001s
+
+OK
+
