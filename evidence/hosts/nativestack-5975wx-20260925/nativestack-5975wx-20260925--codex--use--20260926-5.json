@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--codex--use--20260926-5",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "68726c0d9c64c6c90fa1523220d2ab7db262cf91",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "codex",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "A=evidence/artifacts/codex-use-20260926-5 && D=$(mktemp -d) && mkdir -p \"$A\" && printf '%s' '{\"type\":\"object\",\"properties\":{\"layer_count\":{\"type\":\"integer\"}},\"required\":[\"layer_count\"],\"additionalProperties\":false}' > \"$D/s1.json\" && printf '%s' '{\"type\":\"object\",\"properties\":{\"first_layer\":{\"type\":\"string\"}},\"required\":[\"first_layer\"],\"additionalProperties\":false}' > \"$D/s2.json\" && timeout 900 codex exec --json --output-schema \"$D/s1.json\" -o \"$D/l1.json\" -m gpt-6-astra -c model_reasoning_effort=max --sandbox read-only --skip-git-repo-check \"Open catalogs/landscape/foundation.json with your own shell tools and count the entries of its top-level layers array. Return the count as layer_count.\" < /dev/null > \"$D/e1.jsonl\" 2> \"$D/x1\" && tid=$(python3 -c \"import json,sys;print(next(json.loads(l)['thread_id'] for l in open(sys.argv[1]) if l.strip() and json.loads(l).get('type')=='thread.started'))\" \"$D/e1.jsonl\") && timeout 900 codex exec resume \"$tid\" -c sandbox_mode=read-only --json --output-schema \"$D/s2.json\" -o \"$D/l2.json\" -m gpt-6-astra -c model_reasoning_effort=max --skip-git-repo-check \"In that same layers array, return the layer_id of the first entry as first_layer.\" < /dev/null > \"$D/e2.jsonl\" 2> \"$D/x2\" && python3 - \"$D\" \"$A\" \"$(codex --version)\" <<'PY'\nimport hashlib, json, pathlib, sys\nsys.path.insert(0, \"scripts\")\nimport host_receipts\nD, A, version = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2]), sys.argv[3]\ndef events(p): return [json.loads(l) for l in p.read_text().splitlines() if l.strip()]\ne1, e2 = events(D / \"e1.jsonl\"), events(D / \"e2.jsonl\")\nl1, l2 = json.loads((D / \"l1.json\").read_text()), json.loads((D / \"l2.json\").read_text())\nlayers = json.loads(pathlib.Path(\"catalogs/landscape/foundation.json\").read_text())[\"layers\"]\ntid = next(e[\"thread_id\"] for e in e1 if e.get(\"type\") == \"thread.started\")\nlim = any(\"usage limit\" in (D / x).read_text().lower() for x in (\"x1\", \"x2\"))\ndef check(e1, e2, l1, l2, count, first):\n    items1 = [e[\"item\"][\"type\"] for e in e1 if e.get(\"type\") == \"item.completed\"]\n    tid2 = [e.get(\"thread_id\") for e in e2 if e.get(\"type\") == \"thread.started\"]\n    return (not lim and \"command_execution\" in items1\n            and any(e.get(\"type\") == \"turn.completed\" for e in e1)\n            and any(e.get(\"type\") == \"turn.completed\" for e in e2)\n            and tid2 in ([tid], [])\n            and l1 == {\"layer_count\": count} and l2 == {\"first_layer\": first})\ncount, first = len(layers), layers[0][\"layer_id\"]\nok = check(e1, e2, l1, l2, count, first)\ne2_missing = [e for e in e2 if e.get(\"type\") != \"turn.completed\"]\ncontrols = {\"wrong count\": check(e1, e2, l1, l2, count + 1, first),\n            \"wrong first layer\": check(e1, e2, l1, l2, count, first + \"-x\"),\n            \"missing turn.completed\": check(e1, e2_missing, l1, l2, count, first)}\nrejected = sum(1 for v in controls.values() if not v)\nretain = {\"turn1-events.jsonl\": (D / \"e1.jsonl\").read_text(), \"turn1-output.json\": (D / \"l1.json\").read_text(),\n          \"turn1-schema.json\": (D / \"s1.json\").read_text(), \"turn1-stderr.txt\": (D / \"x1\").read_text(),\n          \"turn2-resume-events.jsonl\": (D / \"e2.jsonl\").read_text(), \"turn2-output.json\": (D / \"l2.json\").read_text(),\n          \"turn2-schema.json\": (D / \"s2.json\").read_text(), \"turn2-stderr.txt\": (D / \"x2\").read_text()}\nCLIENT = (\"~/.codex\", \"~/.claude\", \"/.codex/\", \"/.claude/\", \"plugins/cache/\")\ndef withhold_client_config(text):\n    lines = []\n    for line in text.splitlines():\n        if not line.strip():\n            continue\n        e = json.loads(line)\n        it = e.get(\"item\")\n        if isinstance(it, dict) and it.get(\"type\") == \"command_execution\" and any(c in (it.get(\"command\") or \"\") for c in CLIENT):\n            raw = it.get(\"aggregated_output\") or \"\"\n            if raw:\n                it[\"aggregated_output\"] = f\"[client configuration output withheld: {len(raw.encode())} bytes, sha256 {hashlib.sha256(raw.encode()).hexdigest()}]\"\n        lines.append(json.dumps(e, ensure_ascii=False))\n    return \"\\n\".join(lines) + \"\\n\"\nfor name in (\"turn1-events.jsonl\", \"turn2-resume-events.jsonl\"):\n    retain[name] = withhold_client_config(retain[name])\nsums = []\nfor name, text in retain.items():\n    data = host_receipts.sanitize(text).encode()\n    (A / name).write_bytes(data)\n    sums.append(f\"{hashlib.sha256(data).hexdigest()}  {name}\")\n(A / \"SHA256SUMS\").write_text(\"\\n\".join(sums) + \"\\n\")\nmanifest = hashlib.sha256((A / \"SHA256SUMS\").read_bytes()).hexdigest()\nverdict = \"CODEX_SDK_SURFACES_VERIFIED\" if ok and rejected == len(controls) else \"CODEX_SDK_SURFACES_FAILED\"\nprint(f\"{verdict} | {version} | negative controls rejected {rejected}/{len(controls)} | retained {len(retain)} native files, SHA256SUMS sha256={manifest}\")\nprint(\"turn 1 structured output:\", l1, \"| independent count:\", count, \"| items:\", sorted(dict.fromkeys(e[\"item\"][\"type\"] for e in e1 if e.get(\"type\") == \"item.completed\")))\nprint(\"turn 2 exec resume structured output:\", l2, \"| independent first layer_id:\", first, \"| items:\", sorted(dict.fromkeys(e[\"item\"][\"type\"] for e in e2 if e.get(\"type\") == \"item.completed\")))\nprint(\"negative controls (checker must reject):\", {k: (\"rejected\" if not v else \"ACCEPTED\") for k, v in controls.items()})\nprint(\"\\n\".join(sums))\nsys.exit(0 if verdict.endswith(\"VERIFIED\") else 1)\nPY",
+      "exit": 0,
+      "duration_s": 46.354,
+      "output_sha256": "ad3128aec109875714a93c56bf986e247f495ba7d05ffa9c1818d146e5c0075a",
+      "output_excerpt": "CODEX_SDK_SURFACES_VERIFIED | codex-cli 0.155.1 | negative controls rejected 3/3 | retained 8 native files, SHA256SUMS sha256=53551a67e891ae810f390adb9848574ba4b686e42069b9c47f5009c9f7c2f138\nturn 1 structured output: {'layer_count': 20} | independent count: 20 | items: ['agent_message', 'command_execution']\nturn 2 exec resume structured output: {'first_layer': 'native-clients'} | independent first"
+    }
+  ],
+  "tool_versions": {
+    "codex": "0.155.1"
+  },
+  "observed_at_utc": "2026-09-26T06:03:50Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), Codex CLI 0.155.1 (its own --version, first output line) is driven through its non-interactive SDK surfaces with -m gpt-6-astra -c model_reasoning_effort=max as command flags. Turn 1 runs codex exec --json --sandbox read-only with an --output-schema; its events include a command_execution item and its schema output equals an independent count of catalogs/landscape/foundation.json layers. Turn 2 runs codex exec resume on the same thread with -c sandbox_mode=read-only under a second schema and returns the file's first layer_id. The same checker rejects three negative controls (wrong count, wrong first layer, a removed turn.completed event), and the command exits 0 only when the positive check passes and all three controls are rejected. The eight native Codex outputs (both event streams, both schema outputs, both schemas, both stderr streams) are retained, sanitized, under evidence/artifacts/codex-use-20260926-5/ with a SHA256SUMS file whose own sha256 is printed on the first output line.",
+  "limitations": [
+    "Supersedes generation -4, whose independent review held point 3: its two event streams were excluded by the repository's *.jsonl ignore rule and one contained local client configuration text read by Codex (so they are not published). This generation writes to its own artifact directory with an explicit .gitignore exception, and replaces the aggregated output of any command_execution item that reads client configuration paths (~/.codex, ~/.claude, plugin caches) with its byte count and sha256 before hashing. Earlier, a GPT-6 cross-family review of -3 found its retained output covered only the checker's summary, no failing control had run, and the unscoped receipt promoted the workers-layer alternative 'Codex native workers'. This generation retains the native outputs with hashes, runs three negative controls through the same checker, and is scoped with layer_refs to foundation/native-clients and foundation/agent-sdks (the roles exercised: a CLI running a real read-only task, and its --json/--output-schema/exec-resume programmatic surfaces). It makes no claim about owned writing children or worktrees.",
+    "The checker is a local comparison of Codex's native outputs against independent facts (local_integration logic); the native evidence is the retained Codex event streams and schema outputs themselves.",
+    "MCP servers registered at Codex user scope (for example context-mode) can run tools outside the Codex sandbox; read-only covers Codex's own shell commands only. The output lists each turn's item types, so whether a turn answered through an mcp_tool_call is retained.",
+    "Two bounded turns on one file; answer quality across tasks, write access, custom tools and cost are not measured.",
+    "Recorded by the workstation coordinator Claude Code session from a detached git worktree at origin/main (the catalog_revision); codex is this host's existing install.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T06:03:50Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked (all four points) and reproduced. Re-ran the receipt's one command once via sh -c in a throwaway git-archive copy of 7a664f7f (2026-09-26T06:12:26Z-06:13:05Z, rc 0, TMPDIR pinned to inspect the raw streams): CODEX_SDK_SURFACES_VERIFIED, codex-cli 0.155.1, layer_count 20 = independent 20 (turn 1 items agent_message+command_execution), exec resume first_layer native-clients = independent, turn 2 items agent_message+mcp_tool_call, negative controls 3/3 rejected; the 6 deterministic files hashed identically to the recorded SHA256SUMS, both event streams differ (expected per model run); raw turn-1/turn-2 thread_id equal; raw-to-retained differed only in the redacted thread_id. (1) Layer role MET for both layers: native-clients = a bounded read-only research task on the native account with Codex's own shell tool, a model flag and same-thread resume; agent-sdks = --json events consumed programmatically, --output-schema structured output and exec resume session control (catalog current_choice 'Codex SDK/CLI for supported start/run/resume'; codex 0.155.1 exec --help and exec resume --help list --json, --output-schema and resume). (2) Controls MET: positive check of both schema outputs against independently computed facts, plus three executed negative controls (wrong count, wrong first layer, removed turn.completed) through the same check(), with exit gated on all three rejected. (3) Backed claims MET: sha256sum of SHA256SUMS = 53551a67...f138 equals the excerpt; all 8 files verify in the worktree and in a clean git-archive of HEAD, where validate.py also passes (not masked by ignored files). The 400-char excerpt stops before turn 2's item list, but the full stdout rebuilt from the retained artifacts and the catalog hashes exactly to output_sha256 ad3128ae...075a, binding the recorded lines 'items: [agent_message, command_execution, mcp_tool_call]', 'independent first layer_id: native-clients' and the per-control dict; turn2-resume-events.jsonl shows item_4 mcp_tool_call context-mode ctx_execute_file, backing the MCP limitation. Withholding: the -5 turn-2 event and key sequence equals -4's local unpublished stream; only the two client-path command_execution completions (a plugin SKILL.md and the Codex user-scope RTK.md) carry markers, and their byte counts and sha256 (10713/3871bf1e..., 1121/278274ef...) equal this host's actual files; turn 1 and the mcp_tool_call are untouched. The -3 facts in limitation 0 match its committed receipt (no layer_refs, no controls, summary-only excerpt); the hw profile file exists. (4) Bound MET: tool_versions codex 0.155.1; pin_matches True against the native-clients and agent-sdks pins 0.155.1; catalog_revision 68726c0d is origin/main. Publication and sanitization: 9 files under evidence/artifacts/codex-use-20260926-5 are in git ls-files (.gitignore line 21 exception); -4's two jsonl streams are ignored, were never added in any ref, and manifests/evidence.json does not register them; the artifacts and the receipt contain no home path, user name or UUID (thread ids redacted). component_matrix.py --check rc 0 with 'Codex native workers' receipts_recorded; a simulated agree on -5 in a throwaway copy moves codex to host_verified in native-clients and agent-sdks only, and the workers alternative stays receipts_recorded. Non-blocking notes: limitation 2 stays generic although turn 2 answered through context-mode's MCP tool outside Codex's sandbox in both the recorded run and the re-run, and read client configuration through its shell; the GPT-6 review of -3 is not published in the repository or on PR #312; 'eight native outputs' counts the two input schemas; no control covers a thread-id mismatch (the check also accepts a turn 2 without thread.started).",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T06:17:19Z",
+      "reviewer": {
+        "identity_sha256": "7539831d7d768299b762401faa5cb9b37f128e97c64b799c862c9a20fc883376",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "native-clients"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "agent-sdks"
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--codex--use--20260926-4"
+}
