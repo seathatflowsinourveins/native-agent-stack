@@ -103,6 +103,66 @@ paths. An `rtk_database` path also enables RTK's client-visible view (see below)
 `inspect_hook_history` additionally inspects the configured Context Mode roots'
 hook metadata. Both default to false and are unnecessary for counters.
 
+## Optional Loki provider-usage denominator (read-only)
+
+Set `loki_url` (for example `"http://127.0.0.1:3100"`) to add a read-only
+provider-usage reconciliation beside the counters above. Absent `loki_url`,
+`refresh` runs exactly as before: no network call is attempted, and the
+`loki_provider_usage` section of the JSON manifest (and the optional full
+template, `token_manifest.full.html.in`; the smaller portable default template
+has no Loki section) states `configured: false`.
+
+When set, `refresh` issues one bounded `GET /loki/api/v1/query` (Loki's
+documented instant-query endpoint) for the *last completed UTC calendar day*
+(never the still-arriving current day), summing the `api_request` event's
+`cache_read_tokens` field by its `query_source` label/attribute (see
+[monitoring-usage](https://code.claude.com/docs/en/monitoring-usage) for both).
+The response is grouped into:
+
+- `by_query_source`: the raw per-source breakdown (nothing excluded);
+- `total_all_sources`: their sum;
+- `excluded_total`: the subset from `loki_excluded_query_sources` (default
+  `["agent_summary"]` — that query_source is a summarization fork, not a
+  session's own usage);
+- `net_total`: `total_all_sources - excluded_total`.
+
+This is a **usage denominator, not a savings counter**: it is never written to
+this reporter's ledger and never summed with the RTK/Headroom/jCodeMunch/
+Context Mode/TOON figures above, with another host's `net_total`, or across
+days. A query or connection failure is recorded as an issue (`refresh` still
+completes). Every refresh replaces the JSON manifest's `loki_provider_usage`
+section wholesale (like every other section of `output_json`): a failed or
+later refresh does not preserve an earlier successful reconciliation there.
+The exact raw response and a request receipt (URL, LogQL query, requested
+time, HTTP status, started/completed timestamps and an `artifact()` SHA-256 of
+the body) are saved separately, under `captures/<run>/loki-provider-usage/`,
+so the figures in any one refresh's manifest can always be traced back to the
+literal bytes Loki returned for that refresh.
+
+To compare `net_total` against the **`cacheReadTokens` value of the
+`ccusage daily --timezone UTC -O -j` entry for that same UTC date** (or
+another already-known transcript-based total for that same field), set
+`loki_reference_totals`: a mapping of UTC `"YYYY-MM-DD"` date strings to
+integers, one entry per day you have a reference figure for (the *last
+completed UTC day* of each refresh, `loki_last_completed_day`, moves forward
+daily, so a single undated reference would silently compare against the wrong
+day once that day has passed). The matching reference command is
+`ccusage daily --timezone UTC -O -j` for that same date (ccusage's own default
+local-date grouping is not UTC; see the catalog's `--timezone UTC` usage
+elsewhere). Optionally also set `loki_reference_label` and
+`loki_reconciliation_tolerance_pct` (default `1.0`); both `loki_reference_totals`
+and `loki_reconciliation_tolerance_pct` are validated up front, alongside
+`loki_url` and `loki_excluded_query_sources`, so a malformed value is always a
+configuration issue, never a same-day query failure. When today's window date
+has no matching entry in `loki_reference_totals`, `reconciliation` reports
+`{"status": "no reference for <date>", "window_date": ..., "timezone": "UTC",
+"field": "cache_read_tokens", "available_dates": [...]}` instead of comparing
+against a stale figure for a different day; a real comparison's `reconciliation`
+also repeats `field` alongside `window_date` and `timezone`, so a saved manifest
+names the compared field without cross-referencing `loki_provider_usage.field`.
+This tool does not run `ccusage` or parse its output itself — only the
+comparison arithmetic and the `within_tolerance` flag are computed here.
+
 ## Exact artifact comparisons
 
 Install the pinned tokenizer only if you need retained-text comparisons:
@@ -167,6 +227,12 @@ comparison against compact JSON, with that result stored separately.
   include repeated verification reads. Its schema-size estimate is a separate field.
 - Exact artifact counts use `o200k_base`; they are not provider billing or measured
   causal lifetime savings. Imported provider studies retain their original scope.
+- `loki_provider_usage` is a **usage denominator, not a savings counter**: it
+  measures the prior day's `api_request` volume, so never add it to the
+  RTK/Headroom/jCodeMunch/Context Mode/TOON figures above, to another host's
+  `net_total`, or across days. `excluded_total` (default: `agent_summary`) is
+  subtracted before `net_total` for the same reason a transcript-based total
+  excludes summarization forks; `total_all_sources` keeps every `query_source`.
 
 Each refresh saves complete command output, exits and hashes under `captures/`.
 Native failures return a nonzero reporter exit while still writing the report;

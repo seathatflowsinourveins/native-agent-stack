@@ -103,7 +103,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <div class="token-section" id="token-topic-section"><h3>The token-efficiency stack: upstream commands and results</h3><p id="token-topic-scope"></p><div id="token-topic"></div></div>
 <div class="token-section"><h3>Choose the smaller complete path for the task</h3><p>A correct upstream installation does not guarantee a reduction on every input. These choices retain the stated quality checks and include comparisons that grew.</p><div id="selection-policy"></div></div>
 <div class="token-section"><h3>Retained artifact baselines</h3><p>These are individual dated text comparisons, not amounts to add together. Positive differences mean fewer retained tokens; negative differences mean the candidate grew. Whole-task provider costs and equal answer quality require separate evidence.</p><div id="artifact-baselines"></div></div>
-<div class="token-section"><h3>Upstream returned fields and client observations</h3><p>These public receipts retain sanitized upstream results, commands and scope. They are historical observations from the source host. Complete private stdout and stderr belong in that PC's token report; this offline page reads no current counters.</p><div id="token-receipts"></div></div>
+<div class="token-section"><h3>Upstream returned fields and client observations</h3><p>These public receipts retain sanitized upstream results, commands and scope. They are historical observations from each receipt's own recorded source host. Complete private stdout and stderr belong in that PC's token report; this offline page reads no current counters.</p><p id="host-receipts-boundary" class="small muted"></p><div id="token-receipts"></div></div>
 <div id="policy-grid" class="policy-grid"></div>
 <div class="section-head"><div><div class="eyebrow">One discipline / native implementations</div><h2>Keep each runtime in its lane.</h2></div></div>
 <div class="runtimes"><article class="runtime"><h3>Codex</h3><p>Use native task context, compaction, cache, skills and collaboration. Select independent subagents and isolated writing worktrees; return source paths and concise verification.</p></article><article class="runtime"><h3>Claude Code</h3><p>Use native skills, subagents, scoped project instructions and isolated worktrees. Preserve native caching and compaction; keep account setup and active tool discovery specific to the host.</p></article><article class="runtime"><h3>Research workers</h3><p>Give each worker a bounded input packet, purpose and output contract. Preserve usage and failure evidence. Keep numerical state and permitted execution in deterministic code.</p></article></div>
@@ -499,8 +499,15 @@ function receiptButton(id, label = "Open returned commands and artifacts") {
 }
 function receiptContent(parent, item) {
   const receipt = item.record;
-  add(parent, make("p", "small muted", item.kind + " · " + (receipt.recorded_at_utc || receipt.recorded_at || "Dated evidence") + ". Historical source-host evidence; this page performs no native execution."), make("p", "", receipt.claim || "Inspect the returned record below."));
-  listLimits(parent, receipt.limitations);
+  // Prefer this row's own claim/limitations/date (set by build_ecosystem.py for every receipt
+  // kind that has one, including host_acceptance and the whole-stack subagent E2E kind, whose
+  // linked receipt.json carries no claim/limitations/date fields of its own) and fall back to
+  // the linked record's own fields only when the row itself carries none.
+  const date = item.recorded_at_utc || item.observed_at_utc || receipt.recorded_at_utc || receipt.recorded_at || "Dated evidence";
+  const claim = item.claim || receipt.claim || "Inspect the returned record below.";
+  const limitations = "limitations" in item ? item.limitations : receipt.limitations;
+  add(parent, make("p", "small muted", item.kind + " · " + date + ". Historical evidence from its recorded source host; this page performs no native execution."), make("p", "", claim));
+  listLimits(parent, limitations);
   const components = setup.components.filter(row => item.component_ids.includes(row.id));
   components.forEach(row => add(parent, add(make("p", "small"), link(row.id + " · official upstream repository ↗", row.repository))));
   add(parent, link("Published receipt ↗", item.url));
@@ -659,9 +666,11 @@ data.efficiency.selection_policy.forEach(row => {
 });
 if(!data.efficiency.selection_policy.length) add($("selection-policy"), make("p", "small muted", "Use each retained comparison's task boundary below; keep the original when the candidate grows or loses required information."));
 add($("artifact-baselines"), baselineTable(data.efficiency.comparisons, true));
+$("host-receipts-boundary").textContent = data.efficiency.host_receipts_boundary;
 data.efficiency.receipts.forEach(item => {
   const receipt = item.record;
-  const block = add(make("details", "token-receipt"), make("summary", "", receipt.id + " · " + (receipt.recorded_at_utc || "Dated receipt") + " · " + item.artifacts.length + " attached files"));
+  const date = item.recorded_at_utc || item.observed_at_utc || receipt.recorded_at_utc || "Dated receipt";
+  const block = add(make("details", "token-receipt"), make("summary", "", item.id + " · " + date + " · " + item.artifacts.length + " attached files"));
   receiptContent(block, item);
   add($("token-receipts"), block);
 });

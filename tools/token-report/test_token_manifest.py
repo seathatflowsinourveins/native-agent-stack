@@ -5,7 +5,10 @@ import copy
 import importlib.util
 import json
 from pathlib import Path
+import re
+import shutil
 import sqlite3
+import subprocess
 import tempfile
 import unittest
 
@@ -768,6 +771,404 @@ class LedgerContract(unittest.TestCase):
                 self.assertNotIn("client_visible",latest["metrics"])
                 self.assertTrue(any(i.startswith(expected) for i in issues),issues)
                 self.assertFalse(any(i.startswith("rtk-global:") for i in issues),issues)
+
+    @contextmanager
+    def loki_fixture_server(self,body,status=200,record=None):
+        """A local, ephemeral HTTP server standing in for Loki (never the live service)."""
+        import http.server,threading
+        payload=json.dumps(body).encode()
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                if record is not None:
+                    record.append(self.path)
+                self.send_response(status)
+                self.send_header("Content-Type","application/json")
+                self.end_headers()
+                self.wfile.write(payload)
+            def log_message(self,*a):pass
+        server=http.server.HTTPServer(("127.0.0.1",0),Handler)
+        thread=threading.Thread(target=server.serve_forever,daemon=True)
+        thread.start()
+        try:
+            yield "http://127.0.0.1:"+str(server.server_address[1])
+        finally:
+            server.shutdown();thread.join();server.server_close()
+
+    def test_loki_instant_query_is_a_bounded_read_only_get(self):
+        paths=[]
+        body={"status":"success","data":{"resultType":"vector","result":[
+            {"metric":{"query_source":"main"},"value":[1758758400,"12"]}]}}
+        at=m.datetime(2026,9,25,tzinfo=m.timezone.utc)
+        with self.loki_fixture_server(body,record=paths) as base_url:
+            result=m.loki_instant_query(base_url,m.loki_api_request_query("cache_read_tokens"),at)
+        self.assertEqual(result,[{"metric":{"query_source":"main"},"value":[1758758400,"12"]}])
+        self.assertEqual(len(paths),1)
+        self.assertTrue(paths[0].startswith("/loki/api/v1/query?"))
+        self.assertIn("time="+str(int(at.timestamp())*1_000_000_000),paths[0])
+        self.assertIn("direction=forward",paths[0])
+        from urllib.parse import urlsplit,parse_qs
+        decoded=parse_qs(urlsplit(paths[0]).query)
+        self.assertEqual(decoded["query"][0],m.loki_api_request_query("cache_read_tokens"))
+        self.assertEqual(decoded["query"][0],
+            'sum by (query_source) (sum_over_time({service_name="claude-code"}'
+            ' | event_name="api_request" | unwrap cache_read_tokens[24h]))')
+
+    def test_loki_instant_query_rejects_non_success_status_or_missing_vector(self):
+        with self.loki_fixture_server({"status":"error","error":"boom"}) as base_url:
+            with self.assertRaisesRegex(ValueError,"status success"):
+                m.loki_instant_query(base_url,"query",m.datetime(2026,9,25,tzinfo=m.timezone.utc))
+        with self.loki_fixture_server({"status":"success","data":{"resultType":"scalar","result":[0,"1"]}}) as base_url:
+            with self.assertRaisesRegex(ValueError,"instant vector"):
+                m.loki_instant_query(base_url,"query",m.datetime(2026,9,25,tzinfo=m.timezone.utc))
+
+    def test_loki_last_completed_day_is_always_a_full_day_behind(self):
+        start,end=m.loki_last_completed_day(m.datetime(2026,9,25,17,42,9,tzinfo=m.timezone.utc))
+        self.assertEqual((start.isoformat(),end.isoformat()),("2026-09-24T00:00:00+00:00","2026-09-25T00:00:00+00:00"))
+        start,end=m.loki_last_completed_day(m.datetime(2026,9,25,0,0,0,tzinfo=m.timezone.utc))
+        self.assertEqual((start.isoformat(),end.isoformat()),("2026-09-24T00:00:00+00:00","2026-09-25T00:00:00+00:00"))
+
+    def test_loki_provider_usage_skips_cleanly_when_not_configured(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        with patch.object(m,"loki_instant_query",side_effect=AssertionError("Unconfigured Loki queried")):
+            result=m.refresh(config)
+        self.assertEqual(result["issues"],[])
+        data=json.loads(Path(config["output_json"]).read_text())
+        usage=data["loki_provider_usage"]
+        self.assertFalse(usage["configured"])
+        self.assertNotIn("total_all_sources",usage)
+        self.assertIn("not configured",usage["boundary"])
+        self.assertFalse(any(row["tool"]=="loki" for row in data["native"]))
+        self.assertFalse(any(row["tool"]=="loki" for row in data["preserved_native_events"]))
+
+    def test_loki_provider_usage_sums_by_query_source_and_excludes_helper_forks_from_net(self):
+        from unittest.mock import patch
+        config=self.portable_config();config["loki_url"]="http://127.0.0.1:19099"
+        vector=[{"metric":{"query_source":"main"},"value":[1758758400,"7341600"]},
+                {"metric":{"query_source":"agent_summary"},"value":[1758758400,"438900"]}]
+        with patch.object(m,"loki_instant_query",return_value=vector) as mocked:
+            usage=m.provider_usage_denominator(config,[],now=m.datetime(2026,9,25,12,0,0,tzinfo=m.timezone.utc))
+        self.assertTrue(usage["configured"])
+        self.assertEqual(usage["by_query_source"],{"main":7341600,"agent_summary":438900})
+        self.assertEqual(usage["total_all_sources"],7780500)
+        self.assertEqual(usage["excluded_total"],438900)
+        self.assertEqual(usage["net_total"],7341600)
+        self.assertEqual(usage["excluded_sources"],["agent_summary"])
+        self.assertEqual(usage["window"],{"start_utc":"2026-09-24T00:00:00Z","end_utc":"2026-09-25T00:00:00Z"})
+        self.assertEqual(usage["field"],"cache_read_tokens")
+        self.assertEqual(usage["query"],m.loki_api_request_query("cache_read_tokens"))
+        self.assertNotIn("loki",[r["tool"] for r in self.db.native_views()])
+        at=mocked.call_args.args[2]
+        self.assertEqual(at.strftime("%Y-%m-%dT%H:%M:%SZ"),"2026-09-25T00:00:00Z")
+
+    def test_loki_provider_usage_never_added_to_a_savings_counter(self):
+        from unittest.mock import patch
+        config=self.portable_config();config["loki_url"]="http://127.0.0.1:19099"
+        vector=[{"metric":{"query_source":"main"},"value":[0,"500"]}]
+        # refresh() (unlike a direct provider_usage_denominator call) always has a real capture
+        # directory and passes it through, so it calls loki_instant_query_captured, not
+        # loki_instant_query; mock the function refresh() actually reaches.
+        with patch.object(m,"loki_instant_query_captured",return_value=vector):
+            result=m.refresh(config)
+        self.assertEqual(result["issues"],[])
+        data=json.loads(Path(config["output_json"]).read_text())
+        self.assertEqual(data["native"],[])
+        self.assertEqual(data["preserved_native_events"],[])
+        self.assertEqual(data["comparisons"],[])
+        self.assertEqual(data["loki_provider_usage"]["net_total"],500)
+
+    def test_loki_provider_usage_reconciles_against_an_optional_reference_total(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config.update(loki_url="http://127.0.0.1:19099",
+                      loki_reference_totals={"2026-09-24":7320300},
+                      loki_reference_label="ccusage daily --timezone UTC -O -j (test fixture)")
+        vector=[{"metric":{"query_source":"main"},"value":[0,"7341600"]},
+                {"metric":{"query_source":"agent_summary"},"value":[0,"438900"]}]
+        with patch.object(m,"loki_instant_query",return_value=vector):
+            usage=m.provider_usage_denominator(config,[],now=m.datetime(2026,9,25,12,0,0,tzinfo=m.timezone.utc))
+        recon=usage["reconciliation"]
+        self.assertEqual(recon["window_date"],"2026-09-24")
+        self.assertEqual(recon["timezone"],"UTC")
+        self.assertEqual(recon["field"],"cache_read_tokens")
+        self.assertEqual(recon["reference_total"],7320300)
+        self.assertEqual(recon["reference_label"],"ccusage daily --timezone UTC -O -j (test fixture)")
+        self.assertEqual(recon["difference"],7341600-7320300)
+        self.assertAlmostEqual(recon["difference_pct"],(7341600-7320300)/7320300*100)
+        self.assertLess(recon["difference_pct"],1.0)
+        self.assertTrue(recon["within_tolerance"])
+        config["loki_reconciliation_tolerance_pct"]=0.01
+        with patch.object(m,"loki_instant_query",return_value=vector):
+            usage=m.provider_usage_denominator(config,[],now=m.datetime(2026,9,25,12,0,0,tzinfo=m.timezone.utc))
+        self.assertFalse(usage["reconciliation"]["within_tolerance"])
+
+    def test_loki_provider_usage_reference_for_a_different_date_is_never_compared(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        # The reference is keyed to a day before the window this refresh reconciles (the last
+        # completed UTC day moves forward daily); it must never be silently compared as if it
+        # were today's figure.
+        config.update(loki_url="http://127.0.0.1:19099",loki_reference_totals={"2026-09-20":7320300})
+        vector=[{"metric":{"query_source":"main"},"value":[0,"7341600"]}]
+        with patch.object(m,"loki_instant_query",return_value=vector):
+            usage=m.provider_usage_denominator(config,[],now=m.datetime(2026,9,25,12,0,0,tzinfo=m.timezone.utc))
+        self.assertEqual(usage["net_total"],7341600)
+        recon=usage["reconciliation"]
+        self.assertEqual(recon["status"],"no reference for 2026-09-24")
+        self.assertEqual(recon["window_date"],"2026-09-24")
+        self.assertEqual(recon["field"],"cache_read_tokens")
+        self.assertEqual(recon["available_dates"],["2026-09-20"])
+        self.assertNotIn("within_tolerance",recon)
+
+    def test_loki_provider_usage_query_failure_is_an_issue_not_a_crash(self):
+        import socket
+        with closing(socket.socket()) as probe:
+            probe.bind(("127.0.0.1",0));port=probe.getsockname()[1]
+        config=self.portable_config();config["loki_url"]="http://127.0.0.1:"+str(port)
+        issues=[]
+        usage=m.provider_usage_denominator(config,issues,now=m.datetime(2026,9,25,12,0,0,tzinfo=m.timezone.utc))
+        self.assertTrue(usage["configured"])
+        self.assertNotIn("net_total",usage)
+        self.assertIn("error",usage)
+        self.assertTrue(any(i.startswith("Loki provider-usage query: ") for i in issues),issues)
+
+    def test_loki_provider_usage_captures_raw_response_and_receipt_under_captures(self):
+        config=self.portable_config()
+        body={"status":"success","data":{"resultType":"vector","result":[
+            {"metric":{"query_source":"main"},"value":[0,"12"]}]}}
+        with self.loki_fixture_server(body) as base_url:
+            config["loki_url"]=base_url
+            result=m.refresh(config)
+        self.assertEqual(result["issues"],[])
+        data=json.loads(Path(config["output_json"]).read_text())
+        usage=data["loki_provider_usage"]
+        self.assertEqual(usage["net_total"],12)
+        run_dirs=sorted(Path(config["state_dir"]).glob("captures/*"))
+        self.assertEqual(len(run_dirs),1)
+        capture_dir=run_dirs[0]/"loki-provider-usage"
+        self.assertEqual(usage["capture_dir"],str(capture_dir))
+        receipt=json.loads((capture_dir/"receipt.json").read_text())
+        response_bytes=(capture_dir/"response.json").read_bytes()
+        self.assertEqual(json.loads(response_bytes),body)
+        self.assertEqual(receipt["http_status"],200)
+        self.assertEqual(receipt["query"],m.loki_api_request_query("cache_read_tokens"))
+        self.assertIn(base_url,receipt["url"])
+        self.assertLessEqual(receipt["started_at"],receipt["completed_at"])
+        self.assertEqual(receipt["response"]["sha256"],m.digest(response_bytes))
+        self.assertEqual(receipt["response"]["bytes"],len(response_bytes))
+
+    def test_loki_provider_usage_configuration_error_becomes_an_issue_not_a_crash(self):
+        # loki_excluded_query_sources is checked even when loki_url is absent; either way, a bad
+        # loki_* setting must not discard the whole refresh (it used to propagate out of
+        # refresh() as an uncaught ValueError).
+        config=self.portable_config()
+        config["loki_excluded_query_sources"]=[]
+        result=m.refresh(config)
+        self.assertTrue(any(i.startswith("Loki provider-usage configuration: ") for i in result["issues"]),
+                        result["issues"])
+        data=json.loads(Path(config["output_json"]).read_text())
+        self.assertFalse(data["loki_provider_usage"]["configured"])
+
+    def test_loki_provider_usage_rejects_malformed_configuration(self):
+        config=self.portable_config();config["loki_url"]="not-a-url"
+        with self.assertRaisesRegex(ValueError,"http\\(s\\) URL"):
+            m.provider_usage_denominator(config,[])
+        config.update(loki_url="http://127.0.0.1:19099",loki_excluded_query_sources=[])
+        with self.assertRaisesRegex(ValueError,"loki_excluded_query_sources"):
+            m.provider_usage_denominator(config,[])
+
+    def test_loki_url_with_non_numeric_port_or_missing_hostname_is_a_configuration_error(self):
+        # http.client.InvalidURL (not an OSError) would otherwise be raised deep inside
+        # urlopen for a bad port; validating urlsplit(...).port/.hostname up front turns
+        # this into the same configuration ValueError as an unparseable scheme.
+        config=self.portable_config();config["loki_url"]="http://127.0.0.1:31OO"
+        with self.assertRaisesRegex(ValueError,"loki_url has an invalid port"):
+            m.provider_usage_denominator(config,[])
+        config["loki_url"]="http://:8080"
+        with self.assertRaisesRegex(ValueError,"loki_url must include a hostname"):
+            m.provider_usage_denominator(config,[])
+
+    def test_loki_reference_config_is_validated_before_any_network_attempt(self):
+        # loki_reference_totals/loki_reconciliation_tolerance_pct must be configuration
+        # errors even when loki_url is absent (so no query would ever run) -- never
+        # discovered only inside the query's own try, where they could coexist with a
+        # successful net_total from an earlier, differently-configured refresh.
+        config=self.portable_config()
+        config["loki_reference_totals"]={"2026-09-24":"not-an-int"}
+        with self.assertRaisesRegex(ValueError,"loki_reference_totals"):
+            m.provider_usage_denominator(config,[])
+        config.update(loki_reference_totals={"2026-09-24":1},loki_reconciliation_tolerance_pct=-1)
+        with self.assertRaisesRegex(ValueError,"loki_reconciliation_tolerance_pct"):
+            m.provider_usage_denominator(config,[])
+        # Reached through refresh(), the same malformed value is a labeled configuration
+        # issue, not a discarded report (mirrors loki_excluded_query_sources above).
+        del config["loki_reconciliation_tolerance_pct"]
+        config["loki_reference_totals"]={"2026-09-24":"not-an-int"}
+        result=m.refresh(config)
+        self.assertTrue(any(i.startswith("Loki provider-usage configuration: ") and "loki_reference_totals" in i
+                            for i in result["issues"]),result["issues"])
+        data=json.loads(Path(config["output_json"]).read_text())
+        self.assertFalse(data["loki_provider_usage"]["configured"])
+
+    def test_loki_provider_usage_records_capture_dir_and_receipt_even_on_query_failure(self):
+        import socket
+        with closing(socket.socket()) as probe:
+            probe.bind(("127.0.0.1",0));port=probe.getsockname()[1]
+        config=self.portable_config();config["loki_url"]="http://127.0.0.1:"+str(port)
+        run=self.root/"captures"/"run-under-test";run.mkdir(parents=True)
+        issues=[]
+        usage=m.provider_usage_denominator(config,issues,now=m.datetime(2026,9,25,12,0,0,tzinfo=m.timezone.utc),run=run)
+        self.assertNotIn("net_total",usage)
+        self.assertIn("error",usage)
+        capture_dir=run/"loki-provider-usage"
+        self.assertEqual(usage["capture_dir"],str(capture_dir))
+        receipt=json.loads((capture_dir/"receipt.json").read_text())
+        self.assertIn("error",receipt)
+        self.assertNotIn("response",receipt)
+        self.assertTrue(any(i.startswith("Loki provider-usage query: ") for i in issues),issues)
+
+    @contextmanager
+    def loki_truncated_server(self,status=200):
+        """Declares a larger Content-Length than the bytes actually written, over an
+        HTTP/1.0 (connection: close) response, so the client's read() raises
+        http.client.IncompleteRead -- not an OSError, ValueError or TypeError. At a 4xx/5xx
+        ``status`` this same truncation happens inside urllib.error.HTTPError's own exc.read(),
+        the inner branch that captures the error body for the receipt."""
+        import http.server,threading
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                self.send_response(status)
+                self.send_header("Content-Type","application/json")
+                self.send_header("Content-Length","1000")
+                self.end_headers()
+                self.wfile.write(b'{"stat')
+            def log_message(self,*a):pass
+        server=http.server.HTTPServer(("127.0.0.1",0),Handler)
+        thread=threading.Thread(target=server.serve_forever,daemon=True)
+        thread.start()
+        try:
+            yield "http://127.0.0.1:"+str(server.server_address[1])
+        finally:
+            server.shutdown();thread.join();server.server_close()
+
+    def test_loki_incomplete_read_is_captured_as_an_issue_not_a_crash(self):
+        config=self.portable_config()
+        run=self.root/"captures"/"incomplete-run";run.mkdir(parents=True)
+        issues=[]
+        with self.loki_truncated_server() as base_url:
+            config["loki_url"]=base_url
+            usage=m.provider_usage_denominator(config,issues,now=m.datetime(2026,9,25,12,0,0,tzinfo=m.timezone.utc),run=run)
+        self.assertNotIn("net_total",usage)
+        self.assertIn("error",usage)
+        self.assertTrue(any(i.startswith("Loki provider-usage query: ") for i in issues),issues)
+        receipt=json.loads((run/"loki-provider-usage"/"receipt.json").read_text())
+        self.assertIn("error",receipt)
+        self.assertNotIn("response",receipt)
+
+    def test_loki_http_error_status_and_body_are_captured_in_the_receipt(self):
+        # No test exercised the HTTPError branch before this: loki_fixture_server already
+        # accepted a `status` argument, but every existing test used the default 200.
+        config=self.portable_config()
+        run=self.root/"captures"/"http-error-run";run.mkdir(parents=True)
+        issues=[]
+        body={"status":"error","error":"loki: parse error"}
+        with self.loki_fixture_server(body,status=400) as base_url:
+            config["loki_url"]=base_url
+            usage=m.provider_usage_denominator(
+                config,issues,now=m.datetime(2026,9,25,12,0,0,tzinfo=m.timezone.utc),run=run)
+        self.assertNotIn("net_total",usage)
+        self.assertIn("error",usage)
+        self.assertTrue(any(i.startswith("Loki provider-usage query: ") for i in issues),issues)
+        receipt=json.loads((run/"loki-provider-usage"/"receipt.json").read_text())
+        self.assertEqual(receipt["http_status"],400)
+        self.assertIn("error_response",receipt)
+        error_bytes=(run/"loki-provider-usage"/"error-response.json").read_bytes()
+        self.assertEqual(json.loads(error_bytes),body)
+        self.assertEqual(receipt["error_response"]["sha256"],m.digest(error_bytes))
+
+    def test_loki_http_error_with_truncated_body_keeps_partial_bytes_not_a_crash(self):
+        # Regression: exc.read() inside the HTTPError branch used to catch only
+        # (OSError, ValueError, AttributeError). A truncated *error* body raises
+        # http.client.IncompleteRead -- an HTTPException, not an OSError -- which escaped that
+        # inner except and propagated out of loki_instant_query_captured before receipt.json was
+        # ever written, discarding the http_status this branch exists to keep.
+        config=self.portable_config()
+        run=self.root/"captures"/"truncated-error-run";run.mkdir(parents=True)
+        issues=[]
+        with self.loki_truncated_server(status=400) as base_url:
+            config["loki_url"]=base_url
+            usage=m.provider_usage_denominator(
+                config,issues,now=m.datetime(2026,9,25,12,0,0,tzinfo=m.timezone.utc),run=run)
+        self.assertNotIn("net_total",usage)
+        self.assertIn("error",usage)
+        self.assertTrue(any(i.startswith("Loki provider-usage query: ") for i in issues),issues)
+        receipt=json.loads((run/"loki-provider-usage"/"receipt.json").read_text())
+        self.assertEqual(receipt["http_status"],400)
+        self.assertIn("error_response",receipt)
+        # The IncompleteRead's own documented `.partial` attribute is kept rather than discarded.
+        error_bytes=(run/"loki-provider-usage"/"error-response.json").read_bytes()
+        self.assertEqual(error_bytes,b'{"stat')
+        self.assertEqual(receipt["error_response"]["sha256"],m.digest(error_bytes))
+
+    def test_loki_url_must_be_a_string(self):
+        # A non-string truthy loki_url (for example a bare port number from a config typo) used
+        # to bypass `if not loki_url` and then raise a bare TypeError out of re.match, which
+        # refresh() did not catch -- discarding the whole report instead of recording a labeled
+        # configuration issue.
+        config=self.portable_config();config["loki_url"]=3100
+        with self.assertRaisesRegex(ValueError,"loki_url must be an http\\(s\\) URL string"):
+            m.provider_usage_denominator(config,[])
+        config["loki_url"]=True
+        with self.assertRaisesRegex(ValueError,"loki_url must be an http\\(s\\) URL string"):
+            m.provider_usage_denominator(config,[])
+        config["loki_url"]=3100
+        result=m.refresh(config)
+        self.assertTrue(any(i.startswith("Loki provider-usage configuration: ") for i in result["issues"]),
+                        result["issues"])
+        data=json.loads(Path(config["output_json"]).read_text())
+        self.assertFalse(data["loki_provider_usage"]["configured"])
+
+    @unittest.skipUnless(shutil.which("node"),"reconciliation render check needs Node")
+    def test_full_template_reconciliation_render_covers_three_states(self):
+        """The full local template used to render a "no reference for <date>" reconciliation
+        object (no reference_total/difference/within_tolerance keys) as if it were a real
+        out-of-tolerance comparison: "Reference : Unavailable (difference Unavailable, n/a,
+        outside tolerance)." Execute the real `reconciliationText` helper from the shipped
+        template under Node, not a reimplementation, for: no reconciliation at all, no
+        reference for the window date, and a real comparison both within and outside tolerance."""
+        template=Path(__file__).with_name("token_manifest.full.html.in").read_text()
+        e=re.search(r"const e=.*?;\n",template)
+        n=re.search(r"const n=.*?;\n",template)
+        helper=re.search(r"function reconciliationText\(loki\)\{.*?\}\n",template)
+        self.assertIsNotNone(e,"e() escaping helper not found");self.assertIsNotNone(n,"n() number helper not found")
+        self.assertIsNotNone(helper,"reconciliationText helper not found in token_manifest.full.html.in")
+        harness=e.group(0)+n.group(0)+helper.group(0)+'''
+const cases = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
+process.stdout.write(JSON.stringify(cases.map(loki => reconciliationText(loki))));
+'''
+        cases=[
+            {},
+            {"reconciliation":{"status":"no reference for 2026-09-20","window_date":"2026-09-20",
+                               "timezone":"UTC","field":"cache_read_tokens","available_dates":["2026-09-18"]}},
+            {"reconciliation":{"window_date":"2026-09-24","timezone":"UTC","field":"cache_read_tokens",
+                               "reference_total":7320300,"reference_label":"ccusage (test)","difference":21300,
+                               "difference_pct":0.29,"tolerance_pct":1.0,"within_tolerance":True}},
+            {"reconciliation":{"window_date":"2026-09-24","timezone":"UTC","field":"cache_read_tokens",
+                               "reference_total":7130000,"reference_label":"ccusage (test)","difference":190000,
+                               "difference_pct":2.5,"tolerance_pct":1.0,"within_tolerance":False}},
+        ]
+        result=subprocess.run(["node","-e",harness],input=json.dumps(cases),
+                              capture_output=True,text=True,timeout=10)
+        self.assertEqual(result.returncode,0,result.stderr)
+        none_state,no_reference,within,outside=json.loads(result.stdout)
+        self.assertEqual(none_state,"")
+        self.assertIn("No reference total for 2026-09-20",no_reference)
+        self.assertIn("not compared",no_reference)
+        self.assertNotIn("Unavailable",no_reference)
+        self.assertNotIn("outside tolerance",no_reference)
+        self.assertIn("ccusage (test)",within)
+        self.assertIn("within tolerance",within)
+        self.assertIn("outside tolerance",outside)
 
 if __name__=="__main__":
     unittest.main()
