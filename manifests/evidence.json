@@ -13508,8 +13508,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "4668eb13eb33a7d2b78322453ea29fabbc11b04433d83892bb9af03c10ddb1b0",
-      "bytes": 36103
+      "sha256": "701d9482554ae3f0cbe84499649bd89a2e971598ac959681efcc977d31f8acda",
+      "bytes": 38568
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -13663,8 +13663,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "fae68dcf4cc8900efdb8f041041157d6bf45fca2ea3886007f1ff4349b34d411",
-      "bytes": 25771
+      "sha256": "dd7395c0dbc4ecb68cb4e6bdc1ca99693d1c51b773b097d40d1e9e59f20c9372",
+      "bytes": 26107
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -37668,8 +37668,8 @@
     },
     {
       "path": "recipes/tavily.md",
-      "sha256": "a039d9f50b8f1863c63a4e2d437a1c4d3c1c6af5c82bb6ea460dfe762cc95e6c",
-      "bytes": 8794
+      "sha256": "4d592482e246eb7cf02e34f6ad30322ea9b4b9f5d11e55fe31deda36509baf69",
+      "bytes": 9209
     },
     {
       "path": "scripts/adoption_status.py",
