@@ -226,5 +226,13 @@ class GrandDashboardTests(unittest.TestCase):
             self.assertIn(f'--dagu-bin {binary.resolve()} --dagu-home {root.resolve()}', service)
             with self.assertRaises(ValueError):installer.install(ROOT, root/'c', root/'u', root/'d', binary, None)
 
+    def test_activity_panel_includes_codex_exec_workers(self):
+        # codex exec workers log as service_name="codex_exec"; the regex once listed only the Desktop/App Server names.
+        expr = next(p for p in render.dashboard()['panels'] if p['id'] == 14)['targets'][0]['expr']
+        services = expr.split('"')[1].split('|')
+        for service in ('codex_exec', 'codex_cli_rs', 'codex-app-server', 'claude-code', 'claude-code-desktop'):
+            with self.subTest(service=service):
+                self.assertIn(service, services)
+
 
 if __name__=='__main__':unittest.main()

@@ -77,6 +77,35 @@ groups:
         annotations:
           summary: 'WSL root filesystem observations are missing'
           description: 'Missing data is unknown, not proof of available space.'
+  - name: native-telemetry-integrity
+    rules:
+      - alert: EcosystemTokenCounterResets
+        expr: 'max by (job) (resets({__name__=~"ecosystem_claude_code_token_usage_tokens_total|ecosystem_claude_code_cost_usage_USD_total"}[15m])) > 2'
+        for: 5m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'Claude token or cost counters of {{ $labels.job }} keep resetting'
+          description: 'Each writer needs its own series: the Collector makes session.id (OTEL_METRICS_INCLUDE_SESSION_ID=true) or a launcher service.instance.id the instance label. Repeated resets mean several processes write one cumulative series (instance="unscoped": a session started before session ids were enabled), so increase() and rate() over these counters are inflated. The rule counts the resets of each series and takes the most: a resumed session keeps its session.id in a new process, so each of its type and cost series resets once, which is expected. Use the Loki api_request events until the writers are scoped.'
+      - alert: EcosystemDeltaConversionDropped
+        expr: 'sum(increase(otelcol_deltatocumulative_datapoints{error!=""}[15m])) > 0'
+        for: 5m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'The Collector is dropping delta metric points'
+          description: 'delta_to_cumulative rejected points in the last 15 minutes (error=delta.ErrOutOfOrder or delta.ErrOlderStart when two writers share one stream, error=limit past max_streams). Shared streams come from Codex processes started without the identity launcher (instance="unscoped") or started directly from the real binary with an inherited service.instance.id (the launcher appends a fresh id to an inherited one). Codex counters in Prometheus undercount while this fires; Loki keeps the per-event usage.'
+      - alert: EcosystemUnscopedTokenWriters
+        expr: 'count by (job) (last_over_time({__name__=~"ecosystem_claude_code_token_usage_tokens_total|ecosystem_codex_turn_token_usage_count", instance="unscoped"}[15m])) > 0'
+        for: 5m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'Token counters of {{ $labels.job }} have no per-process writer identity'
+          description: 'These series are labelled instance="unscoped": a Claude process without session.id (a session that started before OTEL_METRICS_INCLUDE_SESSION_ID=true, or one that disables it) or a Codex process started without the identity launcher. Concurrent unscoped writers share one series, so the dashboards exclude them; restart the session or reinstall the launcher (observability/collector/README.md). The rule keeps 15 minutes of samples, longer than its 5-minute delay: a short Codex run''s series leaves the Collector''s exporter five minutes after its last export (metric_expiration), so it fires for such a run too and resolves 15 minutes after the last unscoped sample.'
   - name: equities-broker-path
     rules:
       - alert: EquitiesOrderStateDivergence

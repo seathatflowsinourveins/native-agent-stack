@@ -1,0 +1,166 @@
+{
+  "schema": "telemetry-writer-identity-synthetic/1",
+  "kind": "synthetic_local_integration",
+  "evidence_class": "synthetic OTLP input through private otelcol-contrib 0.161.0 and Prometheus 3.15.0 processes on loopback ports; not a model run and not host acceptance",
+  "recorded_at_utc": "2026-09-26T15:40:23Z",
+  "profiles": {
+    "old": "collector.yaml before this change; Claude points without session.id; Codex resources without service.instance.id; Prometheus with promql-extended-range-selectors only",
+    "new": "collector.yaml after this change; session.id on Claude points; service.instance.id on Codex resources; Prometheus with created-timestamp-zero-ingestion and promql-extended-range-selectors"
+  },
+  "writers": "Claude-like: three processes, cumulative sums, two agent.name or mcp_server.name streams each, one /clear (new session.id) and one late start; Codex-like: three overlapping processes, delta histograms and sums with collapsed phase and feature attributes. 30 exports at 5 s, scraped every 5 s.",
+  "expected": {
+    "claude": {
+      "input": 801,
+      "output": 13350,
+      "cacheRead": 1068000,
+      "cacheCreation": 186900
+    },
+    "codex": {
+      "input": 600082,
+      "cached_input": 450000,
+      "output": 13582,
+      "reasoning_output": 4500,
+      "total": 613664
+    },
+    "codex_feature_state": 18
+  },
+  "results": {
+    "old": {
+      "claude_increase_anchored": {
+        "cacheCreation": 91000.0,
+        "cacheRead": 520000.0,
+        "input": 390.0,
+        "output": 6500.0
+      },
+      "claude_increase": {
+        "cacheCreation": 93226.46666666666,
+        "cacheRead": 532722.6666666666,
+        "input": 399.542,
+        "output": 6659.033333333333
+      },
+      "claude_resets": 4.0,
+      "claude_instances": [
+        "unscoped"
+      ],
+      "codex_increase_anchored": {
+        "cached_input": 420000.0,
+        "input": 560079.0,
+        "output": 12679.0,
+        "reasoning_output": 4200.0,
+        "total": 572758.0
+      },
+      "codex_increase": {
+        "cached_input": 431303.6,
+        "input": 575152.59282,
+        "output": 13020.234153333333,
+        "reasoning_output": 4313.036,
+        "total": 588172.8269733334
+      },
+      "codex_instances": [
+        "unscoped"
+      ],
+      "codex_feature_state_anchored": 2.0,
+      "delta_to_cumulative_datapoints": {
+        "": 46.0,
+        "delta.ErrOutOfOrder": 24.0
+      },
+      "claude_error_pct_anchored": {
+        "input": -51.311,
+        "output": -51.311,
+        "cacheRead": -51.311,
+        "cacheCreation": -51.311
+      },
+      "claude_error_pct_increase": {
+        "input": -50.12,
+        "output": -50.12,
+        "cacheRead": -50.12,
+        "cacheCreation": -50.12
+      },
+      "codex_error_pct_anchored": {
+        "input": -6.666,
+        "cached_input": -6.667,
+        "output": -6.649,
+        "reasoning_output": -6.667,
+        "total": -6.666
+      },
+      "codex_error_pct_increase": {
+        "input": -4.154,
+        "cached_input": -4.155,
+        "output": -4.136,
+        "reasoning_output": -4.155,
+        "total": -4.154
+      }
+    },
+    "new": {
+      "claude_increase_anchored": {
+        "cacheCreation": 186900.0,
+        "cacheRead": 1068000.0,
+        "input": 801.0,
+        "output": 13350.0
+      },
+      "claude_increase": {
+        "cacheCreation": 192505.35645638796,
+        "cacheRead": 1100030.608322217,
+        "input": 825.0229562416628,
+        "output": 13750.38260402771
+      },
+      "claude_resets": 0.0,
+      "claude_instances": [
+        "synthetic-session-1",
+        "synthetic-session-1b",
+        "synthetic-session-2",
+        "synthetic-session-3"
+      ],
+      "codex_increase_anchored": {
+        "cached_input": 450000.0,
+        "input": 600082.0,
+        "output": 13582.0,
+        "reasoning_output": 4500.0,
+        "total": 613664.0
+      },
+      "codex_increase": {
+        "cached_input": 463520.7963377483,
+        "input": 618112.1578495181,
+        "output": 13990.053289319427,
+        "reasoning_output": 4635.207963377484,
+        "total": 632102.2111388375
+      },
+      "codex_instances": [
+        "synthetic-c1-0000-4000-8000-000000000000",
+        "synthetic-c2-0000-4000-8000-000000000000",
+        "synthetic-c3-0000-4000-8000-000000000000"
+      ],
+      "codex_feature_state_anchored": 18.0,
+      "delta_to_cumulative_datapoints": {
+        "": 46.0
+      },
+      "claude_error_pct_anchored": {
+        "input": 0.0,
+        "output": 0.0,
+        "cacheRead": 0.0,
+        "cacheCreation": 0.0
+      },
+      "claude_error_pct_increase": {
+        "input": 2.999,
+        "output": 2.999,
+        "cacheRead": 2.999,
+        "cacheCreation": 2.999
+      },
+      "codex_error_pct_anchored": {
+        "input": 0.0,
+        "cached_input": 0.0,
+        "output": 0.0,
+        "reasoning_output": 0.0,
+        "total": 0.0
+      },
+      "codex_error_pct_increase": {
+        "input": 3.005,
+        "cached_input": 3.005,
+        "output": 3.004,
+        "reasoning_output": 3.005,
+        "total": 3.005
+      }
+    }
+  },
+  "reproduce": "WT=<checkout> PY=<python with PyYAML> bash evidence/artifacts/telemetry-writer-identity-20260926/synthetic/run.sh"
+}

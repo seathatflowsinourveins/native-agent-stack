@@ -109,11 +109,11 @@ class RulesTemplateTests(unittest.TestCase):
         self.assertIn('job!~"acceptance-fixture|adaptive-paper"', match.group(1))
 
     @unittest.skipUnless(HAVE_YAML, "optional PyYAML structural check")
-    def test_rendered_yaml_is_well_formed_and_has_fourteen_rules(self):
+    def test_rendered_yaml_is_well_formed_and_has_seventeen_rules(self):
         placeholder = self.text.replace("@CONFIG_ROOT@", "/tmp/x").replace("@DATA_ROOT@", "/tmp/y")
         doc = yaml.safe_load(placeholder)
         rule_count = sum(len(group["rules"]) for group in doc["groups"])
-        self.assertEqual(rule_count, 14)
+        self.assertEqual(rule_count, 17)
         names = {rule["alert"] for group in doc["groups"] for rule in group["rules"] if "alert" in rule}
         self.assertTrue(EXPECTED_ALERTS.issubset(names))
 
@@ -237,7 +237,7 @@ class RenderedNativeValidationTests(unittest.TestCase):
             capture_output=True, text=True,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("14 rules found", result.stdout)
+        self.assertIn("17 rules found", result.stdout)
 
     def test_promtool_check_config(self):
         result = subprocess.run(

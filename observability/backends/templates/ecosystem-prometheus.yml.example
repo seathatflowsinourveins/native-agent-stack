@@ -12,6 +12,19 @@ scrape_configs:
     honor_labels: true
     static_configs:
       - targets: ['127.0.0.1:18889']
+    # Each Codex process is its own series set (observability/collector/README.md). Keep every histogram's _sum and
+    # _count and the token-usage buckets; drop the other Codex bucket series, which no dashboard or rule reads and
+    # which would multiply storage per process under the shared size-based retention.
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: ecosystem_codex_turn_token_usage_bucket
+        target_label: __tmp_keep_bucket
+        replacement: 'yes'
+      - source_labels: [__name__, __tmp_keep_bucket]
+        regex: 'ecosystem_codex_.+_bucket;'
+        action: drop
+      - regex: __tmp_keep_bucket
+        action: labeldrop
   - job_name: collector-health
     static_configs:
       - targets: ['127.0.0.1:18888']

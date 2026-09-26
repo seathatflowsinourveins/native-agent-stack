@@ -14,13 +14,23 @@ def latest(kind, entity=None):
             ' == on() group_left() max(last_over_time(' + marker + '))')
 
 
+WRITER_IDENTITY = ('Writers without a per-process identity (instance="unscoped": a Claude session without '
+                   'session.id, or a Codex process started without the identity launcher) are excluded, because '
+                   'concurrent writers of one series make its increase meaningless; see the native-telemetry-integrity '
+                   'alert rules.')
+CLAUDE_PER_MINUTE = ('60 * sum by (type) (rate(ecosystem_claude_code_token_usage_tokens_total{instance!="unscoped"}'
+                     '[$__rate_interval]))')
+CODEX_PER_MINUTE = ('60 * sum by (token_type) (rate(ecosystem_codex_turn_token_usage_sum{instance!="unscoped"}'
+                    '[$__rate_interval]))')
+
+
 def by_query_source(field):
     """Sum a claude-code api_request token field by query_source, a free-form string the
     client sets per request (recent examples observed live: repl_main_thread:outputStyle:Concise,
     agent:custom, agent:builtin:workflow-subagent, agent:builtin:general-purpose, agent_summary,
-    compact, away_summary -- not an exhaustive or fixed set). Closer to actual usage than the
-    Prometheus ecosystem_claude_code_token_usage_tokens_total counters, which have been observed
-    to undercount; still overlaps them (both read the same provider usage)."""
+    compact, away_summary -- not an exhaustive or fixed set). One event per API request; the
+    Prometheus ecosystem_claude_code_token_usage_tokens_total counters read the same provider
+    usage, so the two overlap and must never be added."""
     return ('sum by (query_source) (sum_over_time({service_name="claude-code"} | event_name="api_request"'
             ' | unwrap ' + field + ' [$__interval]))')
 
@@ -137,27 +147,25 @@ def dashboard():
     add(8, 'Native embedding-server completed requests', 'timeseries', 12, 44, 12, 8,
         'vllm:request_success_total{job="vllm"}', source='ecosystem-prometheus',
         description='Native process counters by completion reason; not token savings or lifetime across restarts.')
-    add(9, 'Codex provider telemetry · typed counters', 'timeseries', 0, 52, 12, 8,
-        'sum by (token_type) (ecosystem_codex_turn_token_usage_sum)', source='ecosystem-prometheus',
-        description='Native exported usage; overlapping cache/input/total fields must not be added. Not a counterfactual saving.')
-    add(10, 'Claude provider telemetry · typed counters (Prometheus; known to undercount)', 'timeseries', 12, 52, 12, 8,
-        'sum by (type) (ecosystem_claude_code_token_usage_tokens_total)', source='ecosystem-prometheus',
-        description='Only native exported samples in the selected range. This Prometheus counter has been '
-                    'observed to undercount actual usage against the Loki api_request panels below (about half '
-                    'the total on a measured day). The cause is identified (token-stack audit gap G1, '
-                    '2026-09-26): concurrent Claude Code processes export the same cumulative series, because the '
-                    'collector labels every one instance="unscoped" and OTEL_METRICS_INCLUDE_SESSION_ID is false, '
-                    'so each series holds whichever process wrote last and a raw sum drops the rest. '
-                    'Cross-check against the cache-read '
-                    'Loki panel below (id 15): for the completed 2026-09-24 EDT day it reconciled with '
-                    'transcript-based counters (ccusage) within about 1% once query_source=agent_summary was '
-                    'excluded. The other three query_source-split panels (input, output, cache-creation tokens) '
-                    'have not yet been reconciled this way. An inactive client may have no current series; use '
-                    'its archive/report for recorded usage.')
+    add(9, 'Codex provider telemetry · turn tokens per minute', 'timeseries', 0, 52, 12, 8,
+        CODEX_PER_MINUTE, source='ecosystem-prometheus',
+        description='Native per-turn histogram sums by token_type, one series per Codex process summed at query '
+                    'time; a turn is recorded when it ends. Overlapping cache/input/total fields must not be added. '
+                    'Not a counterfactual saving. ' + WRITER_IDENTITY)
+    add(10, 'Claude provider telemetry · tokens per minute (Prometheus)', 'timeseries', 12, 52, 12, 8,
+        CLAUDE_PER_MINUTE, source='ecosystem-prometheus',
+        description='Native cumulative counters by type, one series per Claude session summed at query time. '
+                    'Without session ids every Claude process wrote one shared series: a raw sum showed whichever '
+                    'process wrote last (the undercount this panel used to report), and increase() read the '
+                    'resulting resets as usage (73 to 193 times the Loki sums over one hour on the workstation on '
+                    '2026-09-26). '
+                    'Samples recorded before the writer-identity Collector profile '
+                    '(observability/collector/README.md) stay invalid; use the Loki api_request panels below for '
+                    'those hours. ' + WRITER_IDENTITY)
     table(11, 'coverage', 'All selected repositories · recorded acceptance, not live process status', 60, 18,
           ['title', 'coverage_status', 'canonical_receipt_count', 'state', 'source_updated_at', 'timestamp_basis', 'boundary'])
     add(12, 'Sanitized native client activity', 'logs', 0, 78, 24, 10,
-        '{service_name=~"Codex Desktop|codex-app-server|claude-code|codex-sdk-receipt"}',
+        '{service_name=~"Codex Desktop|codex-app-server|codex_exec|codex_cli_rs|claude-code|claude-code-desktop|codex-sdk-receipt"}',
         options={'showTime': True, 'sortOrder': 'Descending', 'wrapLogMessage': True},
         description='Existing native telemetry; prompt/tool bodies are removed upstream in the collector.')
 
@@ -171,28 +179,23 @@ def dashboard():
             description='Live claude-code api_request events unwrapped and split by query_source, a free-form '
                         'string the client sets per request (recent examples: repl_main_thread:outputStyle:Concise, '
                         'agent:custom, agent:builtin:workflow-subagent, agent:builtin:general-purpose, '
-                        'agent_summary, compact, away_summary). Closer to actual usage than the Prometheus '
-                        'typed-counters panel above; still overlaps it (both read the same underlying provider '
-                        'usage) and must not be summed with it or with the savings table. The legend sum equals '
+                        'agent_summary, compact, away_summary). One event per API request; it overlaps the '
+                        'Prometheus typed-counters panel above (both read the same underlying provider usage) '
+                        'and must not be summed with it or with the savings table. The legend sum equals '
                         'the range total only when the query step equals $__interval; verify that in Grafana '
                         'before reading it as a total.',
             options={'legend': {'displayMode': 'table', 'placement': 'bottom', 'calcs': ['sum']}})
-    add(19, 'Claude provider telemetry · effort split (Prometheus; overcounts while sessions overlap)', 'timeseries',
-        0, 104, 12, 8,
-        'sum by (effort) (increase(ecosystem_claude_code_token_usage_tokens_total[$__rate_interval]))',
+    add(19, 'Claude provider telemetry · effort split (Prometheus)', 'timeseries', 0, 104, 12, 8,
+        'sum by (effort) (increase(ecosystem_claude_code_token_usage_tokens_total{instance!="unscoped"}[$__rate_interval]))',
         source='ecosystem-prometheus',
         description='Per-interval increase, split by effort level (the metrics pipeline keeps the "effort" '
                     'datapoint attribute; see observability/collector/collector.yaml). increase() is used rather '
-                    'than a raw sum of the cumulative counter because the collector expires stale series '
-                    '(deltatocumulative max_stale 1h) and sets no metric_expiration, so exposed series appear and '
-                    'disappear with session activity; a plain sum by (effort) of the raw counter follows series '
-                    'lifetimes, not token use. The series collision behind the typed-counters panel\'s undercount '
-                    '(G1) makes increase() overcount instead: each drop from one process\'s cumulative value to '
-                    'another\'s reads as a counter reset, so while sessions overlap the increase can exceed actual '
-                    'usage many times over. Read it for effort-level shape only, never as a total, until G1 is '
-                    'fixed.')
+                    'than a raw sum of the cumulative counters because each session is its own series: series '
+                    'appear with a session and leave five minutes after it ends (the Prometheus exporter\'s '
+                    'default metric_expiration), so a raw sum follows series lifetimes, not token use. '
+                    + WRITER_IDENTITY)
     return dict(uid='native-foundation-data', title='Native foundation · memory, retrieval and savings',
-                schemaVersion=39, version=4, editable=False, preload=True, timezone='browser', refresh='30s',
+                schemaVersion=39, version=5, editable=False, preload=True, timezone='browser', refresh='30s',
                 time={'from': 'now-6h', 'to': 'now'}, tags=['ecosystem', 'native', 'memory', 'tokens'],
                 panels=panels)
 
