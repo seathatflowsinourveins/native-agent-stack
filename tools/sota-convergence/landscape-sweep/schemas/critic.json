@@ -1,0 +1,42 @@
+{
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "followup_layers",
+  "general"
+ ],
+ "properties": {
+  "followup_layers": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "layer_id",
+     "reason",
+     "search_directions"
+    ],
+    "properties": {
+     "layer_id": {
+      "type": "string"
+     },
+     "reason": {
+      "type": "string"
+     },
+     "search_directions": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  },
+  "general": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  }
+ }
+}

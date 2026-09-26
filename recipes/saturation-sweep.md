@@ -44,6 +44,22 @@ Merge the lane into a dated SOTA manifest with
 name. That work, and any edit under `catalogs/sota-convergence/` or `catalogs/landscape/`, stays
 with the lane owners and their review gates.
 
+## Run the lane in this repository (2026-09-26)
+
+[`tools/sota-convergence/landscape-sweep/`](../tools/sota-convergence/landscape-sweep/README.md) runs this lane
+from this repository on Linux/WSL2 or macOS, from freezing the scope through `RESULT.json`. Its lanes are
+two-family:
+
+- **Discovery.** Each layer gets a Claude Opus researcher (`discover:<layer>`) and a GPT-6-Astra researcher through
+  the Codex CLI (`gpt6-discover:<layer>`).
+- **Refutation.** A Sonnet facts refuter (`refute-facts:<layer>`) and two fit refuters, Claude Opus
+  (`refute-fit:<layer>`) and GPT-6-Astra (`gpt6-refute-fit:<layer>`), all run at effort max. A candidate survives
+  only when neither the facts refuter nor either fit refuter refutes it.
+
+The labels that `--check` reconciles are unchanged. The harness also writes what section 3 asks for: the retained
+returns, the sanitized `child-usage.mjs` record and `prompts_sha256`. An agent-lab coordinator session remains an
+alternative way to run the lane.
+
 ## 3. Keep the evidence
 
 Retain each of these under `evidence/artifacts/<lane>/` and `<lane>-attempts/`:

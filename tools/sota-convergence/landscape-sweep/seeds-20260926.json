@@ -1,0 +1,73 @@
+{
+ "instructions-skills": [
+  "skills.sh leaderboard (all-time, read 2026-09-26): find-skills (vercel-labs/skills, 3.6M installs), grill-me / teach / domain-modeling / codebase-design / setup-matt-pocock-skills (mattpocock/skills), agent-browser (vercel-labs/agent-browser), frontend-design (anthropics/skills), vercel-react-best-practices (vercel-labs/agent-skills), lark-* (open.feishu.cn), hyperframes-cli (heygen-com/hyperframes). Installs are not evidence; judge each on merit for this repository.",
+  "This repository's pinned 30-day skills trial: adoption/skills/manifest.json (26 skills: 5 kept verdict winners + 21 trial, 13 excluded groups with reasons), installed via the pinned skills CLI 1.7.0 (vercel-labs/skills; commands add/update/check/remove/init), invoke rate measured with native /skill-doctor and tools/skill-usage. Assess whether the kept winners (ECC search-first/iterative-retrieval, typesafe-ai, openai gh-fix-ci/security-best-practices) still earn it and whether any excluded or trial skill should change status.",
+  "obra/superpowers, trailofbits/skills, anthropics/skills, openai/skills curated, vercel-labs/agent-skills: evaluate the strongest skills of each on merit."
+ ],
+ "document-retrieval": [
+  "ColPali / vidore-benchmark (coordinator P1 trial)",
+  "kotaemon (coordinator P3 watch)",
+  "microsoft/markitdown v0.1.8 (already stack pin)"
+ ],
+ "semantic-rag": [
+  "PyLate (ColBERT late interaction; coordinator P2)",
+  "FlagEmbedding/BGE-M3 (coordinator P2)",
+  "HippoRAG (coordinator P2)",
+  "vLLM v0.30.0 already in production for embeddings (winner pin 0.25.0; re-verdict owned by coordinator)",
+  "giancarloerra/SocratiCode v1.15.0 (2026-09-24)"
+ ],
+ "durable-memory": [
+  "MIRIX (coordinator P1 trial, blueprints/trials-20260926/)",
+  "ByteRover CLI (coordinator P1 trial)",
+  "langmem (coordinator P2)",
+  "HippoRAG (coordinator P2)",
+  "mem0ai/mem0 v2.2.1 (2026-09-25; add() no longer reports vector-store-rejected writes as ADD)",
+  "topoteretes/cognee v1.6.1 (2026-09-24; local-model workflows; GLiNER removed from default image)",
+  "akitaonrails/ai-memory v2.4.1 (retained control; winner pin 2.3.2; owned by #307)",
+  "ai-memory is recorded as the RETAINED CONTROL, not a measured best (2026-09-25): on the Mac's LongMemEval-S run agentmemory D2 scored 0.821 vs the ai-memory C3 arm 0.570; the decisive R1 rerun (C3', C4', D2, D2h) is pending on the workstation (#274). Judge memory systems on measured retrieval/QA quality."
+ ],
+ "token-efficiency": [
+  "rtk-ai/rtk v0.50.0 (stack pin; winner pin 0.49.0)",
+  "headroomlabs-ai/headroom v0.39.0 (qualified by coordinator, #307)",
+  "yamadashy/repomix v1.18.1 (security fix GHSA-4p5g-gh74-q524)",
+  "mksglu/context-mode v1.0.169",
+  "jgravelle/jcodemunch-mcp"
+ ],
+ "quality-evaluation": [
+  "EleutherAI/lm-evaluation-harness v0.4.13 (coordinator P2)",
+  "UKGovernmentBEIS/inspect_ai 0.3.269 (2026-09-25, litellm-proxy provider; trading lane holds 0.3.266)",
+  "embeddings-benchmark/mteb 2.21.8 (2026-09-23)"
+ ],
+ "observation-inference": [
+  "openllmetry (coordinator P2)",
+  "helicone (coordinator P3 watch)",
+  "open-telemetry/semantic-conventions-genai (GenAI semantic conventions moved here from open-telemetry/semantic-conventions, whose docs/gen-ai/README.md at 094950f2 is a 'Moved' notice; HEAD e57c543b, Apache-2.0, no releases; coordinator P3 watch, corrected 2026-09-26)",
+  "NVIDIA/TensorRT-LLM v1.3.0rc28 (coordinator P3 watch; Ada relevance low)",
+  "ggml-org/llama.cpp v0.5.0 (2026-09-23; = b11146 already running; catalog pin b11057)",
+  "turboderp-org/exllamav3 v1.5.1 (2026-09-20; pinned-arena CPU offload; published 4090 numbers)",
+  "sgl-project/sglang v0.5.20",
+  "ollama/ollama v0.34.4"
+ ],
+ "mcp-surfaces": [
+  "openclaw/mcporter v0.14.1 (2026-09-24; generated-client hardening)"
+ ],
+ "market-data-reference": [
+  "databento-python v0.87.0 (2026-09-22): not adopted by the trading lane (e7, 2026-09-26); appears only in gap-wave2 comparison evidence"
+ ],
+ "research-factors-ml": [
+  "skfolio v1.3.4: trading lane (e7, 2026-09-26) keeps pin 1.2.9 — our code paths use MeanRisk variance, HRP, WalkForward, prices_to_returns; the 1.3.2-1.3.4 fixes (sample-weight carry-over, EVaR) do not reach them; the frozen research-evaluation study is bound to 1.2.9 WalkForward source sha256"
+ ],
+ "execution-broker": [
+  "nautilus-ibapi is ARCHIVED upstream (catalog-freshness 36205743492); rust-ibapi pin 3.3.0 vs upstream 4.2.0 (notice-2188 fix in v4.0.0); draft #280 uses official ibapi 10.45.1"
+ ],
+ "portfolio-risk": [
+  "skfolio v1.3.4: keep 1.2.9 (e7 assessment 2026-09-26, same reasons as research-factors-ml)"
+ ],
+ "evaluation-experiments": [
+  "inspect_ai: trading lane keeps 0.3.266 until the f1() change is released and qualified (e7, 2026-09-26)"
+ ],
+ "agents-models-workers": [
+  "Local models (latest only, user 2026-09-26): Qwen/Qwen3.8-27B (production), prism-ml/Ternary-Bonsai-2-27B-gguf (2026-09-16, Apache-2.0, 1.72 bpw), XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B (2026-09-21, MIT), XingChen-AGI/Xing4.0-29B-A4B (2026-09-16, Apache-2.0), Qwen3.8-Flash-Next (resource_infeasible on the workstation)",
+  "OpenAI GPT-6 family via Codex CLI: gpt-6-astra / gpt-6-sol / gpt-6-luna (codex debug models 2026-09-26)"
+ ]
+}
