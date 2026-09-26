@@ -1,0 +1,359 @@
+# cd <tree> && bash evidence/artifacts/bootstrap-integrity-20260926/drivers/upstream_checks.sh <tree> <work>
+# started 2026-09-26T10:03:13Z, ended 2026-09-26T10:03:39Z, exit 0; stderr 0 bytes (stdout follows). <tree> is this change's worktree,
+# <work> the driver's new scratch work directory, which the driver itself prints as <work>.
+
+checkout HEAD 5c1961e49b89dd56ef5626950a5448735caabe4c (working tree)
+driver sha256: upstream_checks.sh 114b1355f49085f80c4cd7f3923d835c50dd98843f281e9668abe80670f79f39, mcp_list_tools.mjs dfc8ac94b918150adba513ce4b2d61e072f1e99559faa62c5f3001e418ea1ad1, bootstrap_once.sh 58d8d60b51c71384b74f32b33dab37b97b2f8234c185d2477a2c25a7fc42a311, work_guard.sh b30c246008475e1aa5dec45ec967ec7deae1ff90750a922b81a5681b40f0b73e
+[upstream] script sha256 eb68717b4bf3f95bdfbba40c12a342d939ba4388dca7fd1584e7c90d9d423135
+[upstream] pins sha256   af8a2486915d911ea2430150e57278e54d53715bf43d2316d8e40e86760ed339
+[upstream] profile       ["headroom","socraticode"]
+[upstream] started       2026-09-26T10:03:13Z
+[upstream] ended         2026-09-26T10:03:32Z
+[upstream] bootstrap exit 0
+
+--- the version report the run wrote (installed-versions.txt)
+Version report at 2026-09-26T10:03:31Z for profile e2e
+Each installed pin is checked with its version_probe from pins-linux-x86_64.json; other executables are listed, not run (npm-metadata probes run only bin/npm).
+Ubuntu 24.04.5 LTS (x86_64)
+git version 2.43.0
+-- node 24.21.0: node --version --
+v24.21.0
+result: verified (exact 24.21.0)
+-- uv 0.12.17: uv --version --
+uv 0.12.17 (x86_64-unknown-linux-gnu)
+result: verified (exact 0.12.17)
+-- gh 2.101.0: gh --version --
+gh version 2.101.0 (2026-09-15)
+https://github.com/cli/cli/releases/tag/v2.101.0
+result: verified (exact 2.101.0)
+-- headroom 0.37.0: headroom --version --
+headroom, version 0.37.0
+result: verified (exact 0.37.0)
+-- socraticode 1.14.0: npm ls socraticode (package metadata; the package is not run) --
+socraticode@1.14.0
+result: verified (exact 1.14.0)
+-- every entry in bin with its link target (this listing runs nothing) --
+corepack -> tools/node-24.21.0/bin/corepack
+gh -> tools/gh-2.101.0/gh
+headroom -> python-tools/headroom-ai/bin/headroom
+node -> tools/node-24.21.0/bin/node
+npm -> tools/node-24.21.0/bin/npm
+npx -> tools/node-24.21.0/bin/npx
+socraticode -> tools/socraticode-1.14.0/bin/socraticode
+uv -> tools/uv-0.12.17/uv
+uvx -> tools/uv-0.12.17/uvx
+summary: 5 verified, 0 failed
+
+--- npm's own debug log of the socraticode install, read as check.py reads it
+argv: "install" "--global" "--no-audit" "--no-fund" "--prefix" "<work>/eco/tools/socraticode-1.14.0" "--ignore-scripts" "<work>/eco/downloads/socraticode-1.14.0.tgz"
+lifecycle scripts run (info run lines): 0
+
+=== the namespace the checks run in
+lo               DOWN           00:00:00:00:00:00 <LOOPBACK> 
+TCP connect to 1.1.1.1:443 fails: ENETUNREACH
+
+=== what the installed packages hold, and which upstream checks apply offline
+--- the headroom wheel (headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl), its entries and its README (METADATA)
+548 entries; RECORD: 548 rows, 547 with a hash
+entries whose path looks like a test: 3: headroom/testing/README.md headroom/testing/__init__.py headroom/testing/harness.py
+README: headroom doctor                         # health check — confirms routing is working
+README: Reproduce: `python -m headroom.evals suite --tier 1` · [Full benchmarks & methodology](https://headroom-docs.vercel.app/docs/benchmarks)
+README: uv sync --extra dev && uv run pytest
+--- $ headroom evals adversarial --help
+Usage: headroom evals adversarial [OPTIONS]
+
+  Measure compressor robustness against embedded adversarial payloads.
+
+  Offline and deterministic - no LLM, no API key, no model download.
+  Splices injection payloads (instruction overrides, fake system tags,
+  spoofed CCR retrieval markers, ...) into realistic tool outputs at
+  head/middle/tail, compresses each through ContentRouter, and reports
+  per payload class whether payloads survive compression more often
+  than benign content or suppress compression of their carrier.
+
+Options:
+  --json-output FILE  Optional machine-readable JSON report output.
+  -?, --help          Show this message and exit.
+--- $ headroom evals probes --help
+Usage: headroom evals probes [OPTIONS]
+
+  Score retention of recorded compression events (offline, no LLM).
+
+  Record sessions first by running the proxy with
+  HEADROOM_PROBE_RECORD_DIR set. Recordings contain full conversation
+  content in plaintext and stay on this machine.
+
+Options:
+  --recordings DIRECTORY  Directory of JSONL recordings written via
+                          HEADROOM_PROBE_RECORD_DIR.  [required]
+  --json-output FILE      Optional machine-readable JSON report output.
+  -?, --help              Show this message and exit.
+--- $ headroom doctor --help
+Usage: headroom doctor [OPTIONS]
+
+  Check that the Headroom proxy and client routing are working.
+
+  Exit codes:
+      0  everything healthy
+      1  warnings only (working, but not optimally wired)
+      2  at least one failure (proxy down / deployment down)
+
+Options:
+  -p, --port INTEGER RANGE  Proxy port to check (default: 8787, env:
+                            HEADROOM_PORT)  [1<=x<=65535]
+  --json                    Emit JSON instead of formatted output.
+  -?, --help                Show this message and exit.
+--- $ python -m headroom.evals suite --help (the tool environment's python)
+usage: __main__.py suite [-h] [--tier {1,2,3}] [--model MODEL]
+                         [--budget BUDGET] [--port PORT] [--ci] [--no-proxy]
+                         [-o OUTPUT]
+
+options:
+  -h, --help           show this help message and exit
+  --tier {1,2,3}       Max tier to run: 1=core (~$3), 2=extended (~$8), 3=full
+                       (~$17)
+  --model MODEL        Model (default: gpt-4o-mini)
+  --budget BUDGET      Budget in USD (default: $20)
+  --port PORT          Headroom proxy port
+  --ci                 CI mode: exit 1 on any failure
+  --no-proxy           Don't auto-start proxy
+  -o, --output OUTPUT  Output directory for reports
+--- socraticode 1.14.0: package.json files and test scripts
+{"files":["dist",".claude-plugin","skills","agents","hooks",".mcp.json","LICENSE","LICENSE-COMMERCIAL","README.md","THIRD-PARTY-LICENSES","socraticode_logo_thumbnail.png"],"test_scripts":{"test":"vitest run","test:unit":"vitest run tests/unit/","test:integration":"vitest run tests/integration/","test:e2e":"vitest run tests/e2e/","test:watch":"vitest","test:coverage":"vitest run --coverage"}}
+--- its README: a stdio launch as an MCP server, and the codebase_health row
+196:claude mcp add --scope user socraticode -- npx -y --prefer-online socraticode@latest
+797:Register `node /absolute/path/to/socraticode/dist/index.js` in the user or project scope supported by your MCP host, then restart the server or start a new 
+1264:| `codebase_health` | Check Docker, Qdrant, and embedding provider status |
+--- dist/services/startup.js: SOCRATICODE_AUTO_RESUME=off returns before the Docker and Qdrant checks
+59:        const resumeMode = process.env.SOCRATICODE_AUTO_RESUME?.trim();
+61:            logger.info("Auto-resume: disabled by SOCRATICODE_AUTO_RESUME=off");
+66:        if (QDRANT_MODE === "managed") {
+67:            if (!(await isDockerAvailable())) {
+--- codebase_health and codebase_about: dist/index.js, dist/tools/manage-tools.js, dist/services/docker.js
+282:server.tool("codebase_health", "Check the health of all infrastructure: Docker, Qdrant container, Ollama, and embedding model. Use this to diagnose setup issues.", {}, async (args) => ({
+33:            const docker = await isDockerAvailable();
+63:        case "codebase_health": {
+93:                const docker = await isDockerAvailable();
+189:        case "codebase_about": {
+190:            const infraStatus = await getInfraStatusSummary();
+24:        await run("docker", ["info"]);
+
+=== headroom (headroom, version 0.37.0)
+
+--- run 1: headroom evals adversarial --json-output <work>/adversarial-1.json
+started 2026-09-26T10:03:35Z, ended 2026-09-26T10:03:36Z, exit 0
+- stdout:
+Adversarial compression robustness grid
+  carriers=10  positions=head,middle,tail
+
+  payload class              cells  survival  benign  amplif.  suppr.  immune
+  benign_control                30     100%    81%     1.23  +0.018       0
+  ccr_inline_marker_spoof       30     100%    81%     1.23  +0.007       0
+  ccr_marker_spoof              30     100%    81%     1.23  +0.014       0
+  fake_system_tag               30     100%    91%     1.09  +0.208      15
+  fake_tool_directive           30      93%    81%     1.15  +0.019       0
+  instruction_override          30     100%    81%     1.23  +0.017       0
+  steering_imperative           30     100%    81%     1.23  +0.020       0
+
+  FLAG fake_system_tag: suppressed compression of its carrier in 15 cell(s) (possible compression immunity)
+
+Wrote JSON report: <work>/adversarial-1.json
+- stderr:
+Native content detection requires ONNX Runtime 1.24+; using pure-Python detection for this process.
+- JSON report: sha256 127ceb9c3d96c4299126dfe7203e7da6a9aea15900561bba78159c6a699268ad, 67373 bytes
+
+--- run 2: headroom evals adversarial --json-output <work>/adversarial-2.json
+started 2026-09-26T10:03:37Z, ended 2026-09-26T10:03:38Z, exit 0
+- stdout:
+Adversarial compression robustness grid
+  carriers=10  positions=head,middle,tail
+
+  payload class              cells  survival  benign  amplif.  suppr.  immune
+  benign_control                30     100%    81%     1.23  +0.018       0
+  ccr_inline_marker_spoof       30     100%    81%     1.23  +0.007       0
+  ccr_marker_spoof              30     100%    81%     1.23  +0.014       0
+  fake_system_tag               30     100%    91%     1.09  +0.208      15
+  fake_tool_directive           30      93%    81%     1.15  +0.019       0
+  instruction_override          30     100%    81%     1.23  +0.017       0
+  steering_imperative           30     100%    81%     1.23  +0.020       0
+
+  FLAG fake_system_tag: suppressed compression of its carrier in 15 cell(s) (possible compression immunity)
+
+Wrote JSON report: <work>/adversarial-2.json
+- stderr:
+Native content detection requires ONNX Runtime 1.24+; using pure-Python detection for this process.
+- JSON report: sha256 127ceb9c3d96c4299126dfe7203e7da6a9aea15900561bba78159c6a699268ad, 67373 bytes
+
+the two JSON reports are byte-identical
+
+=== socraticode 1.14.0: MCP initialize and tools/list over stdio, server <work>/eco/bin/socraticode
+client: @modelcontextprotocol/sdk 1.30.1 from node_modules/@modelcontextprotocol/sdk
+server command: <work>/eco/bin/socraticode
+initialize: server socraticode 1.14.0
+tools/list: 26 tool(s): codebase_about codebase_context codebase_context_index codebase_context_remove codebase_context_search codebase_flow codebase_graph_build codebase_graph_circular codebase_graph_query codebase_graph_remove codebase_graph_stats codebase_graph_status codebase_graph_visualize codebase_health codebase_impact codebase_index codebase_list_projects codebase_prune codebase_remove codebase_search codebase_status codebase_stop codebase_symbol codebase_symbols codebase_update codebase_watch
+README tool tables: 26 codebase_* tool(s)
+listed, not in those tables: none
+in those tables, not listed: none
+server stderr: 0 line(s)
+started 2026-09-26T10:03:38Z, ended 2026-09-26T10:03:39Z, exit 0
+- the server's own log (SOCRATICODE_LOG_FILE=<work>/socraticode.log):
+
+--- SocratiCode session started at 2026-09-26T10:03:38.944Z ---
+{"timestamp":"2026-09-26T10:03:39.022Z","level":"info","data":"Auto-resume: disabled by SOCRATICODE_AUTO_RESUME=off"}
+{"timestamp":"2026-09-26T10:03:39.048Z","level":"info","data":"Received stdin EOF, shutting down gracefully..."}
+{"timestamp":"2026-09-26T10:03:39.049Z","level":"info","data":"Graceful shutdown complete"}
+
+=== control: the same client, server a node process that exits at once
+client: @modelcontextprotocol/sdk 1.30.1 from node_modules/@modelcontextprotocol/sdk
+server command: <work>/eco/bin/node -e 
+FAILED: MCP error -32000: Connection closed
+server stderr: 0 line(s)
+exit 1
+
+--- the bootstrap run's own stdout and stderr (upstream.log)
+Installed node 24.21.0 (tarball)
+Installed uv 0.12.17 (tarball)
+Installed gh 2.101.0 (tarball)
+Resolved 73 packages in 616ms
+Downloading cryptography (4.5MiB)
+Downloading tokenizers (3.2MiB)
+Downloading pygments (1.2MiB)
+Downloading pydantic-core (2.0MiB)
+Downloading hf-xet (4.3MiB)
+Downloading tiktoken (1.1MiB)
+Downloading openai (1.6MiB)
+Downloading litellm (26.1MiB)
+Downloading aiohttp (1.7MiB)
+Downloading botocore (15.2MiB)
+Downloading ast-grep-cli (7.7MiB)
+ Downloaded tiktoken
+ Downloaded pygments
+ Downloaded aiohttp
+ Downloaded pydantic-core
+ Downloaded tokenizers
+ Downloaded hf-xet
+ Downloaded openai
+ Downloaded ast-grep-cli
+ Downloaded cryptography
+ Downloaded botocore
+ Downloaded litellm
+Prepared 73 packages in 1.26s
+Installed 73 packages in 911ms
+ + aiohappyeyeballs==2.7.1
+ + aiohttp==3.14.3
+ + aiosignal==1.4.0
+ + annotated-types==0.8.0
+ + anyio==4.15.1
+ + ast-grep-cli==0.45.3
+ + attrs==26.1.0
+ + boto3==1.43.103
+ + botocore==1.43.103
+ + certifi==2026.7.22
+ + cffi==2.1.1
+ + charset-normalizer==3.5.1
+ + click==8.5.0
+ + cryptography==50.0.1
+ + distro==1.9.0
+ + fastuuid==0.14.0
+ + filelock==4.0.3
+ + frozenlist==1.8.0
+ + fsspec==2026.9.0
+ + h11==0.16.0
+ + headroom-ai==0.37.0 (from file://<work>/eco/downloads/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl)
+ + hf-xet==1.6.0
+ + httpcore==1.0.9
+ + httpx==0.28.1
+ + httpx-sse==0.4.3
+ + huggingface-hub==1.33.0
+ + idna==3.20
+ + importlib-metadata==8.9.0
+ + jinja2==3.1.6
+ + jiter==0.17.0
+ + jmespath==1.1.0
+ + jsonschema==4.26.0
+ + jsonschema-specifications==2025.9.1
+ + litellm==1.102.1
+ + markdown-it-py==4.2.0
+ + markupsafe==3.0.3
+ + mcp==1.30.0
+ + mdurl==0.1.2
+ + multidict==6.9.1
+ + openai==2.54.0
+ + opentelemetry-api==1.45.0
+ + packaging==26.3
+ + propcache==0.5.4
+ + pycparser==3.0
+ + pydantic==2.13.5
+ + pydantic-core==2.46.5
+ + pydantic-settings==2.15.0
+ + pygments==2.21.0
+ + pyjwt==2.15.0
+ + python-dateutil==2.9.0.post0
+ + python-dotenv==1.2.3
+ + python-multipart==0.0.32
+ + pyyaml==6.0.3
+ + referencing==0.37.0
+ + regex==2026.9.10
+ + requests==2.34.2
+ + rich==15.0.0
+ + rpds-py==2026.6.3
+ + s3transfer==0.19.2
+ + six==1.17.0
+ + sniffio==1.3.1
+ + sse-starlette==3.4.11
+ + starlette==1.7.0
+ + tiktoken==0.14.0
+ + tokenizers==0.23.2
+ + tomlkit==0.15.1
+ + tqdm==4.70.1
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+ + urllib3==2.8.0
+ + uvicorn==0.54.0
+ + yarl==1.25.1
+ + zipp==4.1.0
+Installed 1 executable: headroom
+Installed headroom 0.37.0 (uv-tool)
+npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+Installed socraticode 1.14.0 (npm)
+Checking installed versions (at most 30s per probe unless its pin declares more)...
+Version report at 2026-09-26T10:03:31Z for profile e2e
+Each installed pin is checked with its version_probe from pins-linux-x86_64.json; other executables are listed, not run (npm-metadata probes run only bin/npm).
+Ubuntu 24.04.5 LTS (x86_64)
+git version 2.43.0
+-- node 24.21.0: node --version --
+v24.21.0
+result: verified (exact 24.21.0)
+-- uv 0.12.17: uv --version --
+uv 0.12.17 (x86_64-unknown-linux-gnu)
+result: verified (exact 0.12.17)
+-- gh 2.101.0: gh --version --
+gh version 2.101.0 (2026-09-15)
+https://github.com/cli/cli/releases/tag/v2.101.0
+result: verified (exact 2.101.0)
+-- headroom 0.37.0: headroom --version --
+headroom, version 0.37.0
+result: verified (exact 0.37.0)
+-- socraticode 1.14.0: npm ls socraticode (package metadata; the package is not run) --
+socraticode@1.14.0
+result: verified (exact 1.14.0)
+-- every entry in bin with its link target (this listing runs nothing) --
+corepack -> tools/node-24.21.0/bin/corepack
+gh -> tools/gh-2.101.0/gh
+headroom -> python-tools/headroom-ai/bin/headroom
+node -> tools/node-24.21.0/bin/node
+npm -> tools/node-24.21.0/bin/npm
+npx -> tools/node-24.21.0/bin/npx
+socraticode -> tools/socraticode-1.14.0/bin/socraticode
+uv -> tools/uv-0.12.17/uv
+uvx -> tools/uv-0.12.17/uvx
+summary: 5 verified, 0 failed
+
+Installation finished. Add <work>/eco/bin to PATH to use it in this shell.
+Next: sign into Codex, Claude, and GitHub using their native browser login flows.
+Validate the actual sandbox with Codex /permissions and Claude /sandbox before unattended work.
+No model request, project migration, shell-profile change, or account sign-in was performed.
+
+After native Claude sign-in, run:
+  python3 <work>/root-upstream/tools/adoption/install_claude_profile.py --eco-root <work>/eco --claude-bin <work>/eco/bin/claude
+to install the guard hook, agents and user-scope MCP servers (or re-run this script with --configure-claude-user-profile).

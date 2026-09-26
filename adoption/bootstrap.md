@@ -155,7 +155,7 @@ GitHub-hosted macOS runner; see
    the earlier two of those as well; on a host with an existing ai-memory
    store, 2.4.1 migrates it forward-only at the next service start, so take
    the at-rest copy in [the recipe's upgrade steps](../recipes/README.md#upgrading-an-existing-store) first.
-   `pins-linux-x86_64.json` (the rtk `install_note` only) and `adoption/bootstrap-linux.sh` (its rtk config reminder, which now also asks the installed `rtk hook check`) changed after `v2026.09.26`.
+   `pins-linux-x86_64.json` (the rtk and headroom `install_note` text only) and `adoption/bootstrap-linux.sh` changed after `v2026.09.26`: its rtk config reminder now also asks the installed `rtk hook check`; `install_npm` now adds `--ignore-scripts` for a pin with `ignore_scripts: true` (socraticode), a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree; and `install_uv_tool` now downloads a uv-tool pin's wheel `url` (headroom), verifies its `sha256` before uv runs and installs that file as `'headroom-ai[mcp] @ file://<percent-encoded path>'`, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index and never reads the wheel or its hash (the markitdown and tavily-cli sdist hashes stay cross-checks).
 
    `pins-linux-x86_64.json` and `adoption/bootstrap-linux.sh` changed after `v2026.09.25.2`.
    The Linux pins file gained `repomix`, `toon`,

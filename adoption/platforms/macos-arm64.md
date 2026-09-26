@@ -293,7 +293,8 @@ requires all four `[hooks] exclude_commands` entries from
 [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks),
 exactly once, instead of the tag's original two, and it also asks the installed
 `rtk hook check` whether rtk honours that file. `adoption/pins-linux-x86_64.json`
-changed after `v2026.09.26` in its rtk `install_note` text only.
+changed after `v2026.09.26` in its rtk and headroom `install_note` text only.
+The Linux script's `install_npm` and `install_uv_tool` changed after `v2026.09.26` as well: its `install_npm` now reads the socraticode pin's `ignore_scripts: true` and passes `--ignore-scripts`, as this page's script already does (the tag's Linux script ignores that field, so there npm runs every install script in socraticode's dependency tree), and its `install_uv_tool` now downloads, sha256-verifies and installs headroom's pinned wheel instead of resolving `headroom-ai[mcp]==0.37.0` from the index; headroom has no macOS pin.
 The script and both claude-code pins (2.1.281, which fixes a recursive `rm` of
 command-substitution output running unprompted in auto and bypass mode)
 changed after `v2026.09.24.1`: at that tag the pins are 2.1.280 and the script
