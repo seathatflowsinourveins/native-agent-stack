@@ -37,6 +37,71 @@ INFERRED = {"requirements.txt", "uv.lock", "package-lock.json", "pnpm-lock.yaml"
 PARSERS = {"requirements.txt", "packages.lock.json"}
 
 
+# osv-scanner 2.6.0 matches [[IgnoredVulns]] by id in every lockfile it scans (ShouldIgnore checks only the id and
+# ignoreUntil, and security-scan.yml passes one --config for the whole inventory). An ignore added for one lock is
+# therefore repo-wide. Each such ignore names the package versions it affects and the only locks allowed to pin them.
+IGNORE_SCOPES = {
+    # nltk: no patched release, so every version is affected.
+    "GHSA-8mgp-746c-j5xp": {"package": "nltk", "fixed": None},
+    "GHSA-h35f-9h28-mq5c": {"package": "setuptools", "fixed": (83, 0, 0)},
+}
+IGNORE_ALLOWED_LOCKS = {
+    "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+}
+REQUIREMENT = re.compile(r"^([A-Za-z0-9][A-Za-z0-9._-]*)\s*(?:\[[^\]]*\])?\s*(?:===?\s*([0-9][^\s;\\,]*))?")
+
+
+def canonical(name):
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def python_pins(path, parser=None):
+    """(package, version or None) for each requirement in a requirements-style file or uv.lock; nothing for the
+    npm and NuGet lock formats, which cannot pin a PyPI package."""
+    if path.name == "uv.lock":
+        data = tomllib.loads(path.read_text(encoding="utf-8"))
+        return [(canonical(p["name"]), p.get("version")) for p in data.get("package", []) if "name" in p]
+    if parser != "requirements.txt" and not path.name.endswith("requirements.txt"):
+        return []
+    pins = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.split(" #", 1)[0].strip()
+        if not line or line.startswith(("#", "-")):
+            continue
+        match = REQUIREMENT.match(line)
+        if match:
+            pins.append((canonical(match.group(1)), match.group(2)))
+    return pins
+
+
+def version_tuple(text):
+    parts = []
+    for piece in text.split("."):
+        digits = re.match(r"\d+", piece)
+        if not digits:
+            break
+        parts.append(int(digits.group()))
+    return tuple(parts)
+
+
+def affected_pins(entries, ignore_ids):
+    """(path, package, version, advisory) for each lock outside IGNORE_ALLOWED_LOCKS that pins a version an active
+    repo-wide ignore would hide: nltk at any version (or unpinned), setuptools below 83.0.0 (unpinned resolves to a
+    fixed release, so it is not counted)."""
+    found = []
+    for entry in entries:
+        if entry["path"] in IGNORE_ALLOWED_LOCKS:
+            continue
+        for package, version in python_pins(ROOT / entry["path"], entry.get("parser")):
+            for advisory in ignore_ids:
+                scope = IGNORE_SCOPES[advisory]
+                if package != scope["package"]:
+                    continue
+                if scope["fixed"] is None or (version is not None and version_tuple(version) < scope["fixed"]):
+                    found.append((entry["path"], package, version, advisory))
+    return found
+
+
 def tracked_files():
     environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
     listing = subprocess.run(
@@ -123,6 +188,28 @@ class IgnorePolicyTests(unittest.TestCase):
             if hasattr(until, "date"):
                 until = until.date()
             self.assertLessEqual(until, latest, f"{entry.get('id')}: ignoreUntil more than 90 days away")
+
+    def test_repo_wide_ignores_hide_nothing_outside_their_allowed_lock(self):
+        # 9a's condition on #336: the Lumibot-only ignores match repo-wide, so no other inventory lockfile may pin
+        # nltk (any version) or setuptools below 83.0.0 while they are active.
+        config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
+        active = [entry["id"] for entry in config.get("IgnoredVulns", [])]
+        unscoped = [advisory for advisory in active if advisory not in IGNORE_SCOPES]
+        self.assertEqual(unscoped, [], "every ignore needs an IGNORE_SCOPES entry naming the versions it affects")
+        entries = json.loads(INVENTORY.read_text(encoding="utf-8"))["lockfiles"]
+        self.assertEqual(affected_pins(entries, active), [])
+
+    def test_the_scope_guard_catches_a_mutant(self):
+        # A lock outside the allowed set that pins nltk, or setuptools below the fix, must be reported; a fixed
+        # setuptools and an unpinned setuptools must not.
+        import tempfile
+        with tempfile.TemporaryDirectory() as scratch:
+            lock = Path(scratch) / "requirements.lock"  # an absolute path: ROOT / path keeps it as is
+            lock.write_text("nltk==3.9.1 \\\n    --hash=sha256:00\nsetuptools==80.9.0\nSetuptools==84.0.0\n"
+                            "setuptools\n# nltk==1.0 in a comment\n", encoding="utf-8")
+            found = affected_pins([{"path": str(lock), "parser": "requirements.txt"}], list(IGNORE_SCOPES))
+        self.assertEqual(sorted((package, version) for _, package, version, _ in found),
+                         [("nltk", "3.9.1"), ("setuptools", "80.9.0")])
 
     def test_no_other_suppression_mechanism_bypasses_the_policy(self):
         config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))

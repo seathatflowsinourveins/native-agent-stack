@@ -1,0 +1,802 @@
+{
+  "all_expectations_met": true,
+  "asset": "SYN",
+  "bars": 49,
+  "distributions": [
+    {
+      "ex_date": "2021-03-08",
+      "per_share": "0.21",
+      "utc_seconds": 1615179600
+    },
+    {
+      "ex_date": "2021-03-12",
+      "per_share": "0.37",
+      "utc_seconds": 1615525200
+    }
+  ],
+  "evidence_class": "synthetic fixture under the run sandbox (engine executed through the port; no SPY rows, frozen inputs or LEAN data mount)",
+  "port_sha256": "d92cf90ce59f79dde1a7d5471a8a476d6105a2fee039992887010ee5a0b0c98e",
+  "probe": "Lumibot port mechanism probe (synthetic bars)",
+  "probe_sha256": "ffe5df9291d273f5a1e823dd1fd64ce44e5770be06b1b8eafffff0ace876b846",
+  "results": {
+    "after_market_closes": {
+      "all_expectations_met": true,
+      "cash_ledger": [
+        {
+          "cash": "100000.00",
+          "delta": "0.00",
+          "kind": "distribution",
+          "utc_seconds": 1615179600
+        },
+        {
+          "cash": "2130.3100",
+          "delta": "-97869.6900",
+          "kind": "fill",
+          "utc_seconds": 1615323600
+        },
+        {
+          "cash": "2486.6200",
+          "delta": "356.31",
+          "kind": "distribution",
+          "utc_seconds": 1615525200
+        },
+        {
+          "cash": "103534.2100",
+          "delta": "101047.5900",
+          "kind": "fill",
+          "utc_seconds": 1615838400
+        }
+      ],
+      "configuration_facts": {
+        "buy_trading_fees": 0,
+        "cash_financing_enabled": false,
+        "data_source_class": "PandasDataBacktesting",
+        "data_source_kind": "PANDAS",
+        "data_source_timestep": "hour",
+        "data_store_entries": 1,
+        "data_timestep": "hour",
+        "datetime_end": "2021-03-17T23:59:00-04:00",
+        "datetime_start": "2021-03-08T00:00:00-05:00",
+        "initialize_calls": 1,
+        "is_backtesting": true,
+        "market": "NASDAQ",
+        "minutes_before_closing": 5,
+        "minutes_before_opening": 60,
+        "quote_asset": {
+          "asset": "USD",
+          "asset_type": "forex"
+        },
+        "risk_free_rate": "float:0.0",
+        "sell_trading_fees": 0,
+        "sleeptime": "60M"
+      },
+      "distribution_ledger": [
+        {
+          "amount": "0.00",
+          "engine_posted": false,
+          "ex_date": "2021-03-08",
+          "lean_ex_date_instant_utc_seconds": 1615179600,
+          "per_share": "0.21",
+          "quantity": "0",
+          "source": "external fixture_strategy.distribution_ledger; the engine recorded no dividend cash event",
+          "utc_seconds": 1615179600
+        },
+        {
+          "amount": "356.31",
+          "engine_posted": false,
+          "ex_date": "2021-03-12",
+          "lean_ex_date_instant_utc_seconds": 1615525200,
+          "per_share": "0.37",
+          "quantity": "963",
+          "source": "external fixture_strategy.distribution_ledger; the engine recorded no dividend cash event",
+          "utc_seconds": 1615525200
+        }
+      ],
+      "expectations": {
+        "failed_guards_as_expected": true,
+        "fees_zero": true,
+        "fill_instants_and_prices": true,
+        "fill_quantities": true,
+        "intent_instants_are_decision_bar_ends": true,
+        "ledger_external_unposted": true,
+        "ledger_quantities_flat_then_held": true,
+        "native_end_cash_is_fill_path": true,
+        "two_intents_entry_then_exit": true
+      },
+      "fills": [
+        {
+          "fee": "0.0000",
+          "order_type": "market",
+          "price": "101.6300",
+          "quantity": 963,
+          "time_in_force": "gtc",
+          "utc_seconds": 1615323600
+        },
+        {
+          "fee": "0.0000",
+          "order_type": "market",
+          "price": "104.9300",
+          "quantity": -963,
+          "time_in_force": "gtc",
+          "utc_seconds": 1615838400
+        }
+      ],
+      "guards": [
+        {
+          "name": "engine_version",
+          "outcome": "pass"
+        },
+        {
+          "name": "backtest_configuration",
+          "outcome": "pass"
+        },
+        {
+          "name": "engine_rows_equal_converted_rows",
+          "outcome": "pass"
+        },
+        {
+          "name": "sessions_from_rows",
+          "outcome": "pass"
+        },
+        {
+          "name": "lifecycle_clock",
+          "outcome": "pass"
+        },
+        {
+          "name": "decision_bar_is_session_final",
+          "outcome": "pass"
+        },
+        {
+          "name": "decision_bar_visible_and_matches",
+          "outcome": "pass"
+        },
+        {
+          "name": "decision_bar_is_session_final",
+          "outcome": "pass"
+        },
+        {
+          "name": "decision_bar_visible_and_matches",
+          "outcome": "pass"
+        },
+        {
+          "name": "decisions_reached",
+          "outcome": "pass"
+        },
+        {
+          "name": "engine_cash_events",
+          "outcome": "pass"
+        },
+        {
+          "name": "causality",
+          "outcome": "fail"
+        },
+        {
+          "name": "final_state",
+          "outcome": "pass"
+        },
+        {
+          "name": "orders_filled_none_canceled",
+          "outcome": "pass"
+        },
+        {
+          "name": "submission_clock",
+          "outcome": "fail"
+        },
+        {
+          "name": "fill_at_next_session_first_bar",
+          "outcome": "fail"
+        },
+        {
+          "name": "fill_price_is_open_of_bar_indexed_at_fill_instant",
+          "outcome": "pass"
+        },
+        {
+          "name": "costs_zero",
+          "outcome": "pass"
+        },
+        {
+          "name": "fill_callbacks_match_trade_events",
+          "outcome": "pass"
+        },
+        {
+          "name": "engine_cash_changes_only_at_fills",
+          "outcome": "pass"
+        },
+        {
+          "name": "native_end_cash_equals_engine_event_path",
+          "outcome": "pass"
+        },
+        {
+          "name": "identifiers_recognized",
+          "outcome": "pass"
+        },
+        {
+          "name": "float_projection_noise_only",
+          "outcome": "pass"
+        }
+      ],
+      "intents": [
+        {
+          "decision_equity": "100000.0000",
+          "decision_price": "101.6800",
+          "order_type": "market",
+          "quantity": 963,
+          "reason": "entry",
+          "submission_status": "new",
+          "submitted_engine_clock_utc_seconds": 1615323600,
+          "time_in_force": "gtc",
+          "utc_seconds": 1615323600
+        },
+        {
+          "decision_equity": "103177.9000",
+          "decision_price": "104.9800",
+          "order_type": "market",
+          "quantity": -963,
+          "reason": "exit",
+          "submission_status": "new",
+          "submitted_engine_clock_utc_seconds": 1615838400,
+          "time_in_force": "gtc",
+          "utc_seconds": 1615838400
+        }
+      ],
+      "lifecycle_calls": {
+        "after_market_closes": 7,
+        "before_market_closes": 0,
+        "before_market_opens": 7,
+        "before_starting_trading": 7,
+        "on_trading_iteration": 42
+      },
+      "normalized_economic_sha256": "24c59c91d0a91df7facd5b362f8f8b213097e1f096f779bc8e809914402c67fa",
+      "projection": {
+        "max_abs_adjustment": "0.00000000001",
+        "noise_limit": "0.000001",
+        "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+        "values_projected": 9
+      },
+      "totals": {
+        "dividend_cash_usd": "356.31",
+        "engine_portfolio_value_repr": "103177.9",
+        "fees_usd": "0.0000",
+        "final_quantity": 0,
+        "native_end_cash_usd": "103177.9000",
+        "native_end_cash_usd_engine_repr": "103177.9",
+        "reconciled_end_cash_usd": "103534.2100"
+      },
+      "warnings": {
+        "categories": [],
+        "count": 0,
+        "distinct": 0,
+        "messages_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "before_market_opens": {
+      "all_expectations_met": true,
+      "cash_ledger": [
+        {
+          "cash": "100000.00",
+          "delta": "0.00",
+          "kind": "distribution",
+          "utc_seconds": 1615179600
+        },
+        {
+          "cash": "1687.3300",
+          "delta": "-98312.6700",
+          "kind": "fill",
+          "utc_seconds": 1615474800
+        },
+        {
+          "cash": "2043.6400",
+          "delta": "356.31",
+          "kind": "distribution",
+          "utc_seconds": 1615525200
+        },
+        {
+          "cash": "103091.2300",
+          "delta": "101047.5900",
+          "kind": "fill",
+          "utc_seconds": 1615899600
+        }
+      ],
+      "configuration_facts": {
+        "buy_trading_fees": 0,
+        "cash_financing_enabled": false,
+        "data_source_class": "PandasDataBacktesting",
+        "data_source_kind": "PANDAS",
+        "data_source_timestep": "hour",
+        "data_store_entries": 1,
+        "data_timestep": "hour",
+        "datetime_end": "2021-03-17T23:59:00-04:00",
+        "datetime_start": "2021-03-08T00:00:00-05:00",
+        "initialize_calls": 1,
+        "is_backtesting": true,
+        "market": "NASDAQ",
+        "minutes_before_closing": 5,
+        "minutes_before_opening": 60,
+        "quote_asset": {
+          "asset": "USD",
+          "asset_type": "forex"
+        },
+        "risk_free_rate": "float:0.0",
+        "sell_trading_fees": 0,
+        "sleeptime": "60M"
+      },
+      "distribution_ledger": [
+        {
+          "amount": "0.00",
+          "engine_posted": false,
+          "ex_date": "2021-03-08",
+          "lean_ex_date_instant_utc_seconds": 1615179600,
+          "per_share": "0.21",
+          "quantity": "0",
+          "source": "external fixture_strategy.distribution_ledger; the engine recorded no dividend cash event",
+          "utc_seconds": 1615179600
+        },
+        {
+          "amount": "356.31",
+          "engine_posted": false,
+          "ex_date": "2021-03-12",
+          "lean_ex_date_instant_utc_seconds": 1615525200,
+          "per_share": "0.37",
+          "quantity": "963",
+          "source": "external fixture_strategy.distribution_ledger; the engine recorded no dividend cash event",
+          "utc_seconds": 1615525200
+        }
+      ],
+      "expectations": {
+        "failed_guards_as_expected": true,
+        "fees_zero": true,
+        "fill_instants_and_prices": true,
+        "fill_quantities": true,
+        "intent_instants_are_decision_bar_ends": true,
+        "ledger_external_unposted": true,
+        "ledger_quantities_flat_then_held": true,
+        "native_end_cash_is_fill_path": true,
+        "two_intents_entry_then_exit": true
+      },
+      "fills": [
+        {
+          "fee": "0.0000",
+          "order_type": "market",
+          "price": "102.0900",
+          "quantity": 963,
+          "time_in_force": "gtc",
+          "utc_seconds": 1615474800
+        },
+        {
+          "fee": "0.0000",
+          "order_type": "market",
+          "price": "104.9300",
+          "quantity": -963,
+          "time_in_force": "gtc",
+          "utc_seconds": 1615899600
+        }
+      ],
+      "guards": [
+        {
+          "name": "engine_version",
+          "outcome": "pass"
+        },
+        {
+          "name": "backtest_configuration",
+          "outcome": "pass"
+        },
+        {
+          "name": "engine_rows_equal_converted_rows",
+          "outcome": "pass"
+        },
+        {
+          "name": "sessions_from_rows",
+          "outcome": "pass"
+        },
+        {
+          "name": "lifecycle_clock",
+          "outcome": "pass"
+        },
+        {
+          "name": "decision_bar_is_session_final",
+          "outcome": "pass"
+        },
+        {
+          "name": "decision_bar_visible_and_matches",
+          "outcome": "pass"
+        },
+        {
+          "name": "decision_bar_is_session_final",
+          "outcome": "pass"
+        },
+        {
+          "name": "decision_bar_visible_and_matches",
+          "outcome": "pass"
+        },
+        {
+          "name": "decisions_reached",
+          "outcome": "pass"
+        },
+        {
+          "name": "engine_cash_events",
+          "outcome": "pass"
+        },
+        {
+          "name": "causality",
+          "outcome": "pass"
+        },
+        {
+          "name": "final_state",
+          "outcome": "pass"
+        },
+        {
+          "name": "orders_filled_none_canceled",
+          "outcome": "pass"
+        },
+        {
+          "name": "submission_clock",
+          "outcome": "fail"
+        },
+        {
+          "name": "fill_at_next_session_first_bar",
+          "outcome": "fail"
+        },
+        {
+          "name": "fill_price_is_open_of_bar_indexed_at_fill_instant",
+          "outcome": "fail"
+        },
+        {
+          "name": "costs_zero",
+          "outcome": "pass"
+        },
+        {
+          "name": "fill_callbacks_match_trade_events",
+          "outcome": "pass"
+        },
+        {
+          "name": "engine_cash_changes_only_at_fills",
+          "outcome": "pass"
+        },
+        {
+          "name": "native_end_cash_equals_engine_event_path",
+          "outcome": "pass"
+        },
+        {
+          "name": "identifiers_recognized",
+          "outcome": "pass"
+        },
+        {
+          "name": "float_projection_noise_only",
+          "outcome": "pass"
+        }
+      ],
+      "intents": [
+        {
+          "decision_equity": "100000.0000",
+          "decision_price": "101.6800",
+          "order_type": "market",
+          "quantity": 963,
+          "reason": "entry",
+          "submission_status": "new",
+          "submitted_engine_clock_utc_seconds": 1615471200,
+          "time_in_force": "gtc",
+          "utc_seconds": 1615323600
+        },
+        {
+          "decision_equity": "102783.0700",
+          "decision_price": "104.9800",
+          "order_type": "market",
+          "quantity": -963,
+          "reason": "exit",
+          "submission_status": "new",
+          "submitted_engine_clock_utc_seconds": 1615899600,
+          "time_in_force": "gtc",
+          "utc_seconds": 1615838400
+        }
+      ],
+      "lifecycle_calls": {
+        "after_market_closes": 7,
+        "before_market_closes": 0,
+        "before_market_opens": 7,
+        "before_starting_trading": 7,
+        "on_trading_iteration": 42
+      },
+      "normalized_economic_sha256": "cacfe6b91ed05c93318a66c13fd098d5651392b7e2354a054a50121cf3e0fd30",
+      "projection": {
+        "max_abs_adjustment": "0",
+        "noise_limit": "0.000001",
+        "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+        "values_projected": 9
+      },
+      "totals": {
+        "dividend_cash_usd": "356.31",
+        "engine_portfolio_value_repr": "102734.92",
+        "fees_usd": "0.0000",
+        "final_quantity": 0,
+        "native_end_cash_usd": "102734.9200",
+        "native_end_cash_usd_engine_repr": "102734.92",
+        "reconciled_end_cash_usd": "103091.2300"
+      },
+      "warnings": {
+        "categories": [],
+        "count": 0,
+        "distinct": 0,
+        "messages_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "before_starting_trading": {
+      "all_expectations_met": true,
+      "cash_ledger": [
+        {
+          "cash": "100000.00",
+          "delta": "0.00",
+          "kind": "distribution",
+          "utc_seconds": 1615179600
+        },
+        {
+          "cash": "1687.3300",
+          "delta": "-98312.6700",
+          "kind": "fill",
+          "utc_seconds": 1615474800
+        },
+        {
+          "cash": "2043.6400",
+          "delta": "356.31",
+          "kind": "distribution",
+          "utc_seconds": 1615525200
+        },
+        {
+          "cash": "103649.7700",
+          "delta": "101606.1300",
+          "kind": "fill",
+          "utc_seconds": 1615903200
+        }
+      ],
+      "configuration_facts": {
+        "buy_trading_fees": 0,
+        "cash_financing_enabled": false,
+        "data_source_class": "PandasDataBacktesting",
+        "data_source_kind": "PANDAS",
+        "data_source_timestep": "hour",
+        "data_store_entries": 1,
+        "data_timestep": "hour",
+        "datetime_end": "2021-03-17T23:59:00-04:00",
+        "datetime_start": "2021-03-08T00:00:00-05:00",
+        "initialize_calls": 1,
+        "is_backtesting": true,
+        "market": "NASDAQ",
+        "minutes_before_closing": 5,
+        "minutes_before_opening": 60,
+        "quote_asset": {
+          "asset": "USD",
+          "asset_type": "forex"
+        },
+        "risk_free_rate": "float:0.0",
+        "sell_trading_fees": 0,
+        "sleeptime": "60M"
+      },
+      "distribution_ledger": [
+        {
+          "amount": "0.00",
+          "engine_posted": false,
+          "ex_date": "2021-03-08",
+          "lean_ex_date_instant_utc_seconds": 1615179600,
+          "per_share": "0.21",
+          "quantity": "0",
+          "source": "external fixture_strategy.distribution_ledger; the engine recorded no dividend cash event",
+          "utc_seconds": 1615179600
+        },
+        {
+          "amount": "356.31",
+          "engine_posted": false,
+          "ex_date": "2021-03-12",
+          "lean_ex_date_instant_utc_seconds": 1615525200,
+          "per_share": "0.37",
+          "quantity": "963",
+          "source": "external fixture_strategy.distribution_ledger; the engine recorded no dividend cash event",
+          "utc_seconds": 1615525200
+        }
+      ],
+      "expectations": {
+        "failed_guards_as_expected": true,
+        "fees_zero": true,
+        "fill_instants_and_prices": true,
+        "fill_quantities": true,
+        "intent_instants_are_decision_bar_ends": true,
+        "ledger_external_unposted": true,
+        "ledger_quantities_flat_then_held": true,
+        "native_end_cash_is_fill_path": true,
+        "two_intents_entry_then_exit": true
+      },
+      "fills": [
+        {
+          "fee": "0.0000",
+          "order_type": "market",
+          "price": "102.0900",
+          "quantity": 963,
+          "time_in_force": "gtc",
+          "utc_seconds": 1615474800
+        },
+        {
+          "fee": "0.0000",
+          "order_type": "market",
+          "price": "105.5100",
+          "quantity": -963,
+          "time_in_force": "gtc",
+          "utc_seconds": 1615903200
+        }
+      ],
+      "guards": [
+        {
+          "name": "engine_version",
+          "outcome": "pass"
+        },
+        {
+          "name": "backtest_configuration",
+          "outcome": "pass"
+        },
+        {
+          "name": "engine_rows_equal_converted_rows",
+          "outcome": "pass"
+        },
+        {
+          "name": "sessions_from_rows",
+          "outcome": "pass"
+        },
+        {
+          "name": "lifecycle_clock",
+          "outcome": "pass"
+        },
+        {
+          "name": "decision_bar_is_session_final",
+          "outcome": "pass"
+        },
+        {
+          "name": "decision_bar_visible_and_matches",
+          "outcome": "pass"
+        },
+        {
+          "name": "decision_bar_is_session_final",
+          "outcome": "pass"
+        },
+        {
+          "name": "decision_bar_visible_and_matches",
+          "outcome": "pass"
+        },
+        {
+          "name": "decisions_reached",
+          "outcome": "pass"
+        },
+        {
+          "name": "engine_cash_events",
+          "outcome": "pass"
+        },
+        {
+          "name": "causality",
+          "outcome": "pass"
+        },
+        {
+          "name": "final_state",
+          "outcome": "pass"
+        },
+        {
+          "name": "orders_filled_none_canceled",
+          "outcome": "pass"
+        },
+        {
+          "name": "submission_clock",
+          "outcome": "fail"
+        },
+        {
+          "name": "fill_at_next_session_first_bar",
+          "outcome": "pass"
+        },
+        {
+          "name": "fill_price_is_open_of_bar_indexed_at_fill_instant",
+          "outcome": "pass"
+        },
+        {
+          "name": "costs_zero",
+          "outcome": "pass"
+        },
+        {
+          "name": "fill_callbacks_match_trade_events",
+          "outcome": "pass"
+        },
+        {
+          "name": "engine_cash_changes_only_at_fills",
+          "outcome": "pass"
+        },
+        {
+          "name": "native_end_cash_equals_engine_event_path",
+          "outcome": "pass"
+        },
+        {
+          "name": "identifiers_recognized",
+          "outcome": "pass"
+        },
+        {
+          "name": "float_projection_noise_only",
+          "outcome": "pass"
+        }
+      ],
+      "intents": [
+        {
+          "decision_equity": "100000.0000",
+          "decision_price": "101.6800",
+          "order_type": "market",
+          "quantity": 963,
+          "reason": "entry",
+          "submission_status": "new",
+          "submitted_engine_clock_utc_seconds": 1615474800,
+          "time_in_force": "gtc",
+          "utc_seconds": 1615323600
+        },
+        {
+          "decision_equity": "103293.4600",
+          "decision_price": "104.9800",
+          "order_type": "market",
+          "quantity": -963,
+          "reason": "exit",
+          "submission_status": "new",
+          "submitted_engine_clock_utc_seconds": 1615903200,
+          "time_in_force": "gtc",
+          "utc_seconds": 1615838400
+        }
+      ],
+      "lifecycle_calls": {
+        "after_market_closes": 7,
+        "before_market_closes": 0,
+        "before_market_opens": 7,
+        "before_starting_trading": 7,
+        "on_trading_iteration": 42
+      },
+      "normalized_economic_sha256": "c49cb93f640077f0cdb3f244ef0ac54a54b1931658e6a880470135819f7c1ffb",
+      "projection": {
+        "max_abs_adjustment": "0",
+        "noise_limit": "0.000001",
+        "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+        "values_projected": 9
+      },
+      "totals": {
+        "dividend_cash_usd": "356.31",
+        "engine_portfolio_value_repr": "103293.46",
+        "fees_usd": "0.0000",
+        "final_quantity": 0,
+        "native_end_cash_usd": "103293.4600",
+        "native_end_cash_usd_engine_repr": "103293.46",
+        "reconciled_end_cash_usd": "103649.7700"
+      },
+      "warnings": {
+        "categories": [],
+        "count": 0,
+        "distinct": 0,
+        "messages_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    }
+  },
+  "runs": {
+    "after_market_closes": {
+      "blocked_host_lookups": 0,
+      "exit_code": 0,
+      "stderr_bytes": 0,
+      "wall_seconds": 3.146
+    },
+    "before_market_opens": {
+      "blocked_host_lookups": 0,
+      "exit_code": 0,
+      "stderr_bytes": 0,
+      "wall_seconds": 2.936
+    },
+    "before_starting_trading": {
+      "blocked_host_lookups": 0,
+      "exit_code": 0,
+      "stderr_bytes": 0,
+      "wall_seconds": 2.836
+    }
+  },
+  "sessions": [
+    "2021-03-08",
+    "2021-03-09",
+    "2021-03-11",
+    "2021-03-12",
+    "2021-03-15",
+    "2021-03-16",
+    "2021-03-17"
+  ]
+}

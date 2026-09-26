@@ -1,0 +1,1287 @@
+{
+  "arm": "lumibot",
+  "attribution_evidence": {
+    "converted_rows_sha256": "6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc",
+    "file": "converted-rows.private.json",
+    "note": "compare.py refuses a --bars file whose digest differs, and re-hashes its own re-derivation under --lean-data against this value.",
+    "serialization": "json.dumps(rows, indent=2, sort_keys=True, default=str) + newline"
+  },
+  "case": "one_zero",
+  "case_configuration": {
+    "account_type": "CASH",
+    "asset": "SPY",
+    "currency": "USD",
+    "determinism_note": "seed is null: the configuration has no stochastic fill, fee or latency component. use_random_ids is true as preregistered (the Order default is a uuid4 identifier); in backtests the pinned Strategy.create_order assigns sequential bt_<n> identifiers instead, which stay raw in the private determinism record, and any uuid4 identifier would be replaced by its ordinal.",
+    "entry_decision_date": "2019-12-31",
+    "exit_decision_date": "2020-04-29",
+    "fee_model": {
+      "buy_trading_fees": [],
+      "sell_trading_fees": []
+    },
+    "fee_usd": "0",
+    "fill_model": {
+      "bar_index": "bar_end_instant",
+      "fill_price": "bar_open",
+      "order_type": "market",
+      "slippage_model": "none",
+      "time_in_force": "gtc",
+      "timestep": "hour"
+    },
+    "initial_cash_usd": "100000",
+    "seed": null,
+    "sizing_buffer": "0.98",
+    "slippage": "0",
+    "target": "1",
+    "use_random_ids": true,
+    "window": {
+      "end": "2020-04-30",
+      "start": "2019-12-02",
+      "symbol": "SPY"
+    }
+  },
+  "cash_ledger": [
+    {
+      "cash": "100000.00",
+      "delta": "0.00",
+      "kind": "distribution",
+      "utc_seconds": 1576818000
+    },
+    {
+      "cash": "1631.6800",
+      "delta": "-98368.3200",
+      "kind": "fill",
+      "utc_seconds": 1577977200
+    },
+    {
+      "cash": "2060.3200",
+      "delta": "428.64",
+      "kind": "distribution",
+      "utc_seconds": 1584676800
+    },
+    {
+      "cash": "90734.0800",
+      "delta": "88673.7600",
+      "kind": "fill",
+      "utc_seconds": 1588255200
+    }
+  ],
+  "classification": "local historical replay on retained bundled sample data through Lumibot 4.6.1 (GPL-3.0, evaluation only); not an unchanged upstream test, a point-in-time dataset or any broker execution",
+  "conversion": {
+    "declared_short_sessions": {
+      "2019-12-24": 4
+    },
+    "extra_session_dates": [],
+    "full_session_rows": 7,
+    "hour_rows": 725,
+    "missing_session_dates": [],
+    "partial_sessions": {
+      "2019-12-24": 4
+    },
+    "sessions": 104
+  },
+  "decision_hook": {
+    "hook": "before_starting_trading",
+    "preregistered_example": "after_market_closes",
+    "primary": false,
+    "read_timeshift": 0
+  },
+  "declared_deviations": [
+    "D1_per_arm_mapping_manifest",
+    "D2_v1_contract_only",
+    "D3_lumibot_environment_and_working_directory"
+  ],
+  "derived_distributions": [
+    {
+      "ex_date": "2019-12-20",
+      "per_share": "1.57",
+      "utc_seconds": 1576818000
+    },
+    {
+      "ex_date": "2020-03-20",
+      "per_share": "1.41",
+      "utc_seconds": 1584676800
+    }
+  ],
+  "distribution_ledger": [
+    {
+      "amount": "0.00",
+      "engine_posted": false,
+      "ex_date": "2019-12-20",
+      "lean_ex_date_instant_utc_seconds": 1576818000,
+      "per_share": "1.57",
+      "quantity": "0",
+      "source": "external fixture_strategy.distribution_ledger; the engine recorded no dividend cash event",
+      "utc_seconds": 1576818000
+    },
+    {
+      "amount": "428.64",
+      "engine_posted": false,
+      "ex_date": "2020-03-20",
+      "lean_ex_date_instant_utc_seconds": 1584676800,
+      "per_share": "1.41",
+      "quantity": "304",
+      "source": "external fixture_strategy.distribution_ledger; the engine recorded no dividend cash event",
+      "utc_seconds": 1584676800
+    }
+  ],
+  "dividend_cash_usd": "428.64",
+  "engine": {
+    "built_from_source": {
+      "built_wheel_sha256": "664a4d01e9b47da023fde90630aa312d42b88f2f5f31c1adfd5d32f17debdcaf",
+      "installed_version": "9.81.1.post1",
+      "package": "ibapi",
+      "sdist_sha256": "49f6678bf4cced996920f32ad4b48e6897749ac30ba14a661082285f4ec09cd6",
+      "version": "9.81.1.post1"
+    },
+    "license": "GPL-3.0 (evaluation only; imported from the isolated environment, never vendored)",
+    "numpy": "2.4.6",
+    "package": "lumibot",
+    "pandas": "2.3.3",
+    "python": "3.12.3",
+    "upstream_commit": "2dfdda100cdc34e5acb46a7f13e8208a35aede72",
+    "upstream_repository": "https://github.com/Lumiwealth/lumibot",
+    "upstream_tag": "v4.6.1",
+    "version": "4.6.1",
+    "wheel_sha256": "d06b8feb32c8a23026628e9030b9f166a25f4ab3af510d241aaa915516554159"
+  },
+  "engine_configuration": {
+    "backtest_arguments": {
+      "analyze_backtest": false,
+      "benchmark_asset": null,
+      "budget": "float:100000.0",
+      "buy_trading_fees": [],
+      "minutes_before_closing": 5,
+      "minutes_before_opening": 60,
+      "name": "one_zero_port",
+      "quiet_logs": true,
+      "risk_free_rate": "float:0.0",
+      "save_logfile": false,
+      "save_stats_file": false,
+      "save_tearsheet": false,
+      "sell_trading_fees": [],
+      "show_indicators": false,
+      "show_plot": false,
+      "show_progress_bar": false,
+      "show_tearsheet": false,
+      "sleeptime": "60M"
+    },
+    "backtest_window_local": [
+      "2019-12-02T00:00:00",
+      "2020-04-30T23:59:00"
+    ],
+    "bar_index": "bar end instant (ts_event_ns), tz-aware",
+    "data_source": "PandasDataBacktesting",
+    "data_timestep": "hour",
+    "facts": {
+      "buy_trading_fees": 0,
+      "cash_financing_enabled": false,
+      "data_source_class": "PandasDataBacktesting",
+      "data_source_kind": "PANDAS",
+      "data_source_timestep": "hour",
+      "data_store_entries": 1,
+      "data_timestep": "hour",
+      "datetime_end": "2020-04-30T23:59:00-04:00",
+      "datetime_start": "2019-12-02T00:00:00-05:00",
+      "initialize_calls": 1,
+      "is_backtesting": true,
+      "market": "NASDAQ",
+      "minutes_before_closing": 5,
+      "minutes_before_opening": 60,
+      "quote_asset": {
+        "asset": "USD",
+        "asset_type": "forex"
+      },
+      "risk_free_rate": "float:0.0",
+      "sell_trading_fees": 0,
+      "sleeptime": "60M"
+    }
+  },
+  "engine_totals": {
+    "engine_portfolio_value_repr": "90305.44"
+  },
+  "evidence_class": "HIST",
+  "fees_usd": "0.0000",
+  "fills": [
+    {
+      "currency": "USD",
+      "fee": "0.0000",
+      "fee_engine_repr": "0.0",
+      "kind": "fill",
+      "order_ref": 1,
+      "order_type": "market",
+      "price": "323.5800",
+      "price_engine_repr": "323.58",
+      "price_source": null,
+      "quantity": 304,
+      "side": "BUY",
+      "time_in_force": "gtc",
+      "utc_seconds": 1577977200
+    },
+    {
+      "currency": "USD",
+      "fee": "0.0000",
+      "fee_engine_repr": "0.0",
+      "kind": "fill",
+      "order_ref": 2,
+      "order_type": "market",
+      "price": "291.6900",
+      "price_engine_repr": "291.69",
+      "price_source": null,
+      "quantity": -304,
+      "side": "SELL",
+      "time_in_force": "gtc",
+      "utc_seconds": 1588255200
+    }
+  ],
+  "final_quantity": 0,
+  "float_projection": {
+    "max_abs_adjustment": "0.00000000001",
+    "noise_limit": "0.000001",
+    "per_run": {
+      "run-1": {
+        "max_abs_adjustment": "0.00000000001",
+        "noise_limit": "0.000001",
+        "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+        "values_projected": 9
+      },
+      "run-2": {
+        "max_abs_adjustment": "0.00000000001",
+        "noise_limit": "0.000001",
+        "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+        "values_projected": 9
+      }
+    },
+    "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+    "values_projected": 9
+  },
+  "frozen_plan": {
+    "case": {
+      "adaptive": false,
+      "fee_usd": "0",
+      "id": "one_zero",
+      "reject": false,
+      "slippage": "0",
+      "target": "1"
+    },
+    "path": "blueprints/us-equities/historical-simulation/plan.json",
+    "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"
+  },
+  "gate_context": "Comparison arm beside gate G-a; changes no gate status.",
+  "guards": [
+    {
+      "detail": "only lo is visible",
+      "name": "network_isolation",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "detail": [
+        "compare.py",
+        "convert.py",
+        "fixture_strategy.py",
+        "tolerances.json"
+      ],
+      "name": "pinned_spy_parity_sources",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "detail": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632",
+      "name": "frozen_plan",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "detail": {
+        "projection_equals_binding": true,
+        "rows": 8
+      },
+      "name": "manifest_binding",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "detail": {
+        "inputs": 5,
+        "rows": 725,
+        "rows_sha256": "6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc"
+      },
+      "name": "frozen_inputs_and_rows",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "detail": {
+        "2019-12-31": 1577826000,
+        "2020-04-29": 1588190400
+      },
+      "name": "decision_rows_present",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "detail": {
+        "run-1": 0,
+        "run-2": 0
+      },
+      "name": "no_blocked_network_lookups",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "detail": {
+        "run-1": [
+          "logs",
+          "logs/data_provenance.json"
+        ],
+        "run-2": [
+          "logs",
+          "logs/data_provenance.json"
+        ]
+      },
+      "name": "no_relative_home_directory",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "detail": {
+        "ibapi": "9.81.1.post1",
+        "lumibot": "4.6.1",
+        "lumibot_module": "4.6.1"
+      },
+      "name": "engine_version",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "buy_trading_fees": 0,
+        "cash_financing_enabled": false,
+        "data_source_class": "PandasDataBacktesting",
+        "data_source_kind": "PANDAS",
+        "data_source_timestep": "hour",
+        "data_store_entries": 1,
+        "data_timestep": "hour",
+        "datetime_end": "2020-04-30T23:59:00-04:00",
+        "datetime_start": "2019-12-02T00:00:00-05:00",
+        "initialize_calls": 1,
+        "is_backtesting": true,
+        "market": "NASDAQ",
+        "minutes_before_closing": 5,
+        "minutes_before_opening": 60,
+        "quote_asset": {
+          "asset": "USD",
+          "asset_type": "forex"
+        },
+        "risk_free_rate": "float:0.0",
+        "sell_trading_fees": 0,
+        "sleeptime": "60M"
+      },
+      "name": "backtest_configuration",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "columns": [
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "return"
+        ],
+        "index_timezone": "America/New_York",
+        "rows_held_after_run": 725,
+        "rows_supplied": 725
+      },
+      "name": "engine_rows_equal_converted_rows",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "converted_sessions": 104,
+        "engine_sessions": 104
+      },
+      "name": "sessions_from_rows",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "after_market_closes": 104,
+        "before_market_closes": 0,
+        "before_market_opens": 104,
+        "before_starting_trading": 104,
+        "on_trading_iteration": 621
+      },
+      "name": "lifecycle_clock",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": "2019-12-31: next row opens 2020-01-02",
+      "name": "decision_bar_is_session_final",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "converted_close": "321.8600",
+        "decision_bar_end": 1577826000,
+        "decision_date": "2019-12-31",
+        "engine_bar_end": 1577826000,
+        "engine_close": "321.8600",
+        "timeshift": 0
+      },
+      "name": "decision_bar_visible_and_matches",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": "2020-04-29: next row opens 2020-04-30",
+      "name": "decision_bar_is_session_final",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "converted_close": "293.2100",
+        "decision_bar_end": 1588190400,
+        "decision_date": "2020-04-29",
+        "engine_bar_end": 1588190400,
+        "engine_close": "293.2100",
+        "timeshift": 0
+      },
+      "name": "decision_bar_visible_and_matches",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": [
+        "2019-12-31",
+        "2020-04-29"
+      ],
+      "name": "decisions_reached",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "cash_events": 0,
+        "distributions": [
+          "2019-12-20: 0 engine dividend cash events",
+          "2020-03-20: 0 engine dividend cash events"
+        ],
+        "dividend_cash_events": 0
+      },
+      "name": "engine_cash_events",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": "every fill strictly after its own decision instant; unattributed fills: 0",
+      "name": "causality",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": "flat; no open order; no pending intent",
+      "name": "final_state",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "canceled": 0,
+        "intents": 2,
+        "orders": 2,
+        "statuses": [
+          "fill",
+          "fill"
+        ],
+        "submission_statuses": [
+          "new",
+          "new"
+        ]
+      },
+      "name": "orders_filled_none_canceled",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": [
+        {
+          "decision": 1577826000,
+          "fills": [
+            1577977200
+          ],
+          "order_ref": 1,
+          "submitted_engine_clock": 1577977200
+        },
+        {
+          "decision": 1588190400,
+          "fills": [
+            1588255200
+          ],
+          "order_ref": 2,
+          "submitted_engine_clock": 1588255200
+        }
+      ],
+      "name": "submission_clock",
+      "outcome": "fail",
+      "scope": "run-1"
+    },
+    {
+      "detail": [
+        {
+          "fills": [
+            1577977200
+          ],
+          "next_session_first_bar_end": 1577977200,
+          "order_ref": 1
+        },
+        {
+          "fills": [
+            1588255200
+          ],
+          "next_session_first_bar_end": 1588255200,
+          "order_ref": 2
+        }
+      ],
+      "name": "fill_at_next_session_first_bar",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": [
+        {
+          "bar_indexed_at_fill_instant": {
+            "c": "323.8700",
+            "local_start": "09:00",
+            "o": "323.5800",
+            "session_date": "2020-01-02"
+          },
+          "fill_price": "323.5800",
+          "order_ref": 1
+        },
+        {
+          "bar_indexed_at_fill_instant": {
+            "c": "291.2350",
+            "local_start": "09:00",
+            "o": "291.6900",
+            "session_date": "2020-04-30"
+          },
+          "fill_price": "291.6900",
+          "order_ref": 2
+        }
+      ],
+      "name": "fill_price_is_open_of_bar_indexed_at_fill_instant",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": [
+        {
+          "fee_engine_repr": "0.0",
+          "order_ref": 1
+        },
+        {
+          "fee_engine_repr": "0.0",
+          "order_ref": 2
+        }
+      ],
+      "name": "costs_zero",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": [
+        {
+          "delivered_engine_clock_utc_seconds": 1577977200,
+          "order_ref": 1
+        },
+        {
+          "delivered_engine_clock_utc_seconds": 1588255200,
+          "order_ref": 2
+        }
+      ],
+      "name": "fill_callbacks_match_trade_events",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "expected_distinct_cash": [
+          "100000",
+          "1631.68",
+          "90305.44"
+        ],
+        "matches": true,
+        "observed_distinct_cash": [
+          "100000.0",
+          "1631.68",
+          "90305.44"
+        ],
+        "snapshots": 934
+      },
+      "name": "engine_cash_changes_only_at_fills",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "engine_cash": "90305.44",
+        "initial_plus_engine_events": "90305.44",
+        "last_snapshot_cash": "90305.44"
+      },
+      "name": "native_end_cash_equals_engine_event_path",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "rejected_types": [],
+        "sequential_backtest_identifiers_kept": 2,
+        "uuid4_hex_identifiers_normalized": 0
+      },
+      "name": "identifiers_recognized",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "max_abs_adjustment": "0.00000000001",
+        "noise_limit": "0.000001",
+        "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+        "values_projected": 9
+      },
+      "name": "float_projection_noise_only",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "detail": {
+        "ibapi": "9.81.1.post1",
+        "lumibot": "4.6.1",
+        "lumibot_module": "4.6.1"
+      },
+      "name": "engine_version",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": {
+        "buy_trading_fees": 0,
+        "cash_financing_enabled": false,
+        "data_source_class": "PandasDataBacktesting",
+        "data_source_kind": "PANDAS",
+        "data_source_timestep": "hour",
+        "data_store_entries": 1,
+        "data_timestep": "hour",
+        "datetime_end": "2020-04-30T23:59:00-04:00",
+        "datetime_start": "2019-12-02T00:00:00-05:00",
+        "initialize_calls": 1,
+        "is_backtesting": true,
+        "market": "NASDAQ",
+        "minutes_before_closing": 5,
+        "minutes_before_opening": 60,
+        "quote_asset": {
+          "asset": "USD",
+          "asset_type": "forex"
+        },
+        "risk_free_rate": "float:0.0",
+        "sell_trading_fees": 0,
+        "sleeptime": "60M"
+      },
+      "name": "backtest_configuration",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": {
+        "columns": [
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "return"
+        ],
+        "index_timezone": "America/New_York",
+        "rows_held_after_run": 725,
+        "rows_supplied": 725
+      },
+      "name": "engine_rows_equal_converted_rows",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": {
+        "converted_sessions": 104,
+        "engine_sessions": 104
+      },
+      "name": "sessions_from_rows",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": {
+        "after_market_closes": 104,
+        "before_market_closes": 0,
+        "before_market_opens": 104,
+        "before_starting_trading": 104,
+        "on_trading_iteration": 621
+      },
+      "name": "lifecycle_clock",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": "2019-12-31: next row opens 2020-01-02",
+      "name": "decision_bar_is_session_final",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": {
+        "converted_close": "321.8600",
+        "decision_bar_end": 1577826000,
+        "decision_date": "2019-12-31",
+        "engine_bar_end": 1577826000,
+        "engine_close": "321.8600",
+        "timeshift": 0
+      },
+      "name": "decision_bar_visible_and_matches",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": "2020-04-29: next row opens 2020-04-30",
+      "name": "decision_bar_is_session_final",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": {
+        "converted_close": "293.2100",
+        "decision_bar_end": 1588190400,
+        "decision_date": "2020-04-29",
+        "engine_bar_end": 1588190400,
+        "engine_close": "293.2100",
+        "timeshift": 0
+      },
+      "name": "decision_bar_visible_and_matches",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": [
+        "2019-12-31",
+        "2020-04-29"
+      ],
+      "name": "decisions_reached",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": {
+        "cash_events": 0,
+        "distributions": [
+          "2019-12-20: 0 engine dividend cash events",
+          "2020-03-20: 0 engine dividend cash events"
+        ],
+        "dividend_cash_events": 0
+      },
+      "name": "engine_cash_events",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": "every fill strictly after its own decision instant; unattributed fills: 0",
+      "name": "causality",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": "flat; no open order; no pending intent",
+      "name": "final_state",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": {
+        "canceled": 0,
+        "intents": 2,
+        "orders": 2,
+        "statuses": [
+          "fill",
+          "fill"
+        ],
+        "submission_statuses": [
+          "new",
+          "new"
+        ]
+      },
+      "name": "orders_filled_none_canceled",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": [
+        {
+          "decision": 1577826000,
+          "fills": [
+            1577977200
+          ],
+          "order_ref": 1,
+          "submitted_engine_clock": 1577977200
+        },
+        {
+          "decision": 1588190400,
+          "fills": [
+            1588255200
+          ],
+          "order_ref": 2,
+          "submitted_engine_clock": 1588255200
+        }
+      ],
+      "name": "submission_clock",
+      "outcome": "fail",
+      "scope": "run-2"
+    },
+    {
+      "detail": [
+        {
+          "fills": [
+            1577977200
+          ],
+          "next_session_first_bar_end": 1577977200,
+          "order_ref": 1
+        },
+        {
+          "fills": [
+            1588255200
+          ],
+          "next_session_first_bar_end": 1588255200,
+          "order_ref": 2
+        }
+      ],
+      "name": "fill_at_next_session_first_bar",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": [
+        {
+          "bar_indexed_at_fill_instant": {
+            "c": "323.8700",
+            "local_start": "09:00",
+            "o": "323.5800",
+            "session_date": "2020-01-02"
+          },
+          "fill_price": "323.5800",
+          "order_ref": 1
+        },
+        {
+          "bar_indexed_at_fill_instant": {
+            "c": "291.2350",
+            "local_start": "09:00",
+            "o": "291.6900",
+            "session_date": "2020-04-30"
+          },
+          "fill_price": "291.6900",
+          "order_ref": 2
+        }
+      ],
+      "name": "fill_price_is_open_of_bar_indexed_at_fill_instant",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": [
+        {
+          "fee_engine_repr": "0.0",
+          "order_ref": 1
+        },
+        {
+          "fee_engine_repr": "0.0",
+          "order_ref": 2
+        }
+      ],
+      "name": "costs_zero",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": [
+        {
+          "delivered_engine_clock_utc_seconds": 1577977200,
+          "order_ref": 1
+        },
+        {
+          "delivered_engine_clock_utc_seconds": 1588255200,
+          "order_ref": 2
+        }
+      ],
+      "name": "fill_callbacks_match_trade_events",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": {
+        "expected_distinct_cash": [
+          "100000",
+          "1631.68",
+          "90305.44"
+        ],
+        "matches": true,
+        "observed_distinct_cash": [
+          "100000.0",
+          "1631.68",
+          "90305.44"
+        ],
+        "snapshots": 934
+      },
+      "name": "engine_cash_changes_only_at_fills",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": {
+        "engine_cash": "90305.44",
+        "initial_plus_engine_events": "90305.44",
+        "last_snapshot_cash": "90305.44"
+      },
+      "name": "native_end_cash_equals_engine_event_path",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": {
+        "rejected_types": [],
+        "sequential_backtest_identifiers_kept": 2,
+        "uuid4_hex_identifiers_normalized": 0
+      },
+      "name": "identifiers_recognized",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "detail": {
+        "max_abs_adjustment": "0.00000000001",
+        "noise_limit": "0.000001",
+        "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+        "values_projected": 9
+      },
+      "name": "float_projection_noise_only",
+      "outcome": "pass",
+      "scope": "run-2"
+    }
+  ],
+  "guards_failed": [
+    "run-1:submission_clock",
+    "run-2:submission_clock"
+  ],
+  "id": "engine-trial-lumibot-spy-one-zero-20260926-hook-before_starting_trading",
+  "inputs": {
+    "data_root": "/data (read-only sandbox mount)",
+    "decoded": [
+      "equity/usa/hour/spy.zip",
+      "equity/usa/daily/spy.zip",
+      "equity/usa/map_files/spy.csv",
+      "equity/usa/factor_files/spy.csv"
+    ],
+    "forward_filled_rows": 0,
+    "map_rows": [
+      {
+        "date": "1998-01-02",
+        "exchange": "P",
+        "ticker": "spy"
+      },
+      {
+        "date": "2050-12-31",
+        "exchange": "P",
+        "ticker": "spy"
+      }
+    ],
+    "price_encoding": "integer deci-cents / 10000, raw normalization",
+    "session_source": "retained LEAN daily spy.zip rows in window",
+    "sha256": {
+      "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899",
+      "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+      "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+      "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+      "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf"
+    },
+    "volume_encoding": "integer shares"
+  },
+  "intents": [
+    {
+      "decision_equity": "100000.0000",
+      "decision_equity_engine_repr": "100000.0",
+      "decision_hook": "before_starting_trading",
+      "decision_price": "321.8600",
+      "kind": "intent",
+      "order_ref": 1,
+      "order_type": "market",
+      "quantity": 304,
+      "reason": "entry",
+      "session_date": "2019-12-31",
+      "submission_status": "new",
+      "submitted_engine_clock_utc_seconds": 1577977200,
+      "target": "1",
+      "time_in_force": "gtc",
+      "ts_event_ns": 1577826000000000000,
+      "utc_seconds": 1577826000
+    },
+    {
+      "decision_equity": "90305.4400",
+      "decision_equity_engine_repr": "90305.43999999999",
+      "decision_hook": "before_starting_trading",
+      "decision_price": "293.2100",
+      "kind": "intent",
+      "order_ref": 2,
+      "order_type": "market",
+      "quantity": -304,
+      "reason": "exit",
+      "session_date": "2020-04-29",
+      "submission_status": "new",
+      "submitted_engine_clock_utc_seconds": 1588255200,
+      "target": "0",
+      "time_in_force": "gtc",
+      "ts_event_ns": 1588190400000000000,
+      "utc_seconds": 1588190400
+    }
+  ],
+  "isolation": {
+    "argv": [
+      "/repo/blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/fixture_port.py",
+      "--lean-data",
+      "/data",
+      "--out",
+      "/out/port",
+      "--decision-hook",
+      "before_starting_trading"
+    ],
+    "cwd": "/repo",
+    "declared_additions": [
+      "LUMIBOT_CACHE_FOLDER",
+      "LUMIBOT_DISABLE_DOTENV"
+    ],
+    "environment_additions": [],
+    "environment_names": [
+      "LANG",
+      "LUMIBOT_CACHE_FOLDER",
+      "LUMIBOT_DISABLE_DOTENV",
+      "OMP_NUM_THREADS",
+      "OPENBLAS_NUM_THREADS",
+      "PATH",
+      "PWD",
+      "PYTHONDONTWRITEBYTECODE"
+    ],
+    "environment_values": {
+      "LANG": "C.UTF-8",
+      "LUMIBOT_CACHE_FOLDER": "/tmp/lumibot-cache",
+      "LUMIBOT_DISABLE_DOTENV": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "PATH": "/usr/bin:/bin",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "network_interfaces": [
+      [
+        1,
+        "lo"
+      ]
+    ],
+    "python_flags_isolated": 1,
+    "read_only": {
+      "data_root": true,
+      "port_source": true,
+      "python_prefix": true,
+      "spy_parity_sources": true
+    },
+    "uid_map": "      1000          0          1\n"
+  },
+  "limitations": [
+    "PandasData's pinned documentation names the minute and day raw timesteps only; this arm uses the hour timestep the Data entity accepts.",
+    "Bars are indexed at their END instant; the engine's market-order fill model prices at the open of the bar indexed at the current clock, which for END-indexed bars is the bar that has just completed.",
+    "Distributions are not posted by the engine in this configuration (row distributions_and_cash is unsupported); the receipt carries an external Decimal ledger with engine_posted false.",
+    "No margin model is configured or claimed (row margin_and_adaptive_state is blocked).",
+    "Bundled sample bytes are not an entitled, point-in-time or market-wide dataset."
+  ],
+  "local_source_sha256": {
+    "compare.py": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+    "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+    "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+    "tolerances.json": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a"
+  },
+  "mapping_manifest": {
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/mapping-manifest.json",
+    "schema_version": 1,
+    "sha256": "6b36b4f8babcfa5d3cb0c58fef22dc3be04699e80c75eba13342c76bdcc06af6"
+  },
+  "native_end_cash_usd": "90305.4400",
+  "native_end_cash_usd_engine_repr": "90305.44",
+  "observed_utc": "2026-09-26T06:27:41.076324+00:00",
+  "port_source_sha256": {
+    "note": "compare.py verifies only spy-parity files; the port's hash is bound by run.json and the trial README.",
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/fixture_port.py",
+    "sha256": "d92cf90ce59f79dde1a7d5471a8a476d6105a2fee039992887010ee5a0b0c98e",
+    "verified_by_compare_py": false
+  },
+  "pre_run_findings": [
+    "probes/hook-probe.json (synthetic bars): a GTC market order submitted in after_market_closes at a session's final bar end fills at that same instant at that bar's open, because the backtesting broker processes pending orders at the current clock when the strategy next awaits the open and prices a market order at the open of the bar indexed at that clock. This contradicts the preregistered market_on_open_proxy mechanism (predicted fill at the next session's first bar open, stamped 10:00 New York). The row stays resolved; the primary attempt runs the preregistered example hook.",
+    "probe-01 (without risk_free_rate) showed the strategy asking Yahoo for ^IRX when it dumps its statistics; the sandbox refused each lookup. The port passes risk_free_rate=0.0, which feeds statistics only (cash financing is off).",
+    "probe-03: in backtests the pinned Strategy.create_order assigns sequential bt_<n> order identifiers, not the uuid4 identifiers the preregistration expected; they stay raw in the private determinism record under the preregistered normalization rule."
+  ],
+  "preregistration": {
+    "commit": "a74ed16d7084a4d84cd31ce3116a95457baa913c",
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/preregistration.json",
+    "sha256": "73ea82e9007d92e1b00feb86ba190d5fb8842b7d14962c651b0caf74b8522b38"
+  },
+  "reconciled_end_cash_usd": "90734.0800",
+  "runs": [
+    {
+      "blocked_host_lookups": 0,
+      "cache_folder": "/tmp/lumibot-cache/run-1",
+      "cash_events": 0,
+      "engine_cwd_entries": [
+        "logs",
+        "logs/data_provenance.json"
+      ],
+      "exit_code": 0,
+      "final_quantity": 0,
+      "guards_failed": [
+        "submission_clock"
+      ],
+      "identifier_normalization": {
+        "fields": [
+          "identifier",
+          "parent_identifier",
+          "event_id",
+          "_identifier"
+        ],
+        "rejected": 0,
+        "sequential_kept": 2,
+        "uuid4_hex_normalized": 0
+      },
+      "label": "run-1",
+      "lifecycle_calls": {
+        "after_market_closes": 104,
+        "before_market_closes": 0,
+        "before_market_opens": 104,
+        "before_starting_trading": 104,
+        "on_trading_iteration": 621
+      },
+      "native_end_cash_usd": "90305.4400",
+      "normalized_economic_sha256": "12803112d0939382068872e1bb05c53a7c55e758412102b47a93bb4c1838e299",
+      "projection": {
+        "max_abs_adjustment": "0.00000000001",
+        "noise_limit": "0.000001",
+        "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+        "values_projected": 9
+      },
+      "raw_report_sha256": "2675dd12a996d7246c6356433a05d81d94da634b0ff82564089dec0256207757",
+      "reconciled_end_cash_usd": "90734.0800",
+      "stats_snapshots": 934,
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "3f288f4ffa4dcba4ed33ab14b7a20708e608b528ac70460651a7347ed7aec371",
+      "trade_events": 4,
+      "wall_seconds": 2.925,
+      "warnings": {
+        "categories": [],
+        "count": 0,
+        "distinct": 0,
+        "messages_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    {
+      "blocked_host_lookups": 0,
+      "cache_folder": "/tmp/lumibot-cache/run-2",
+      "cash_events": 0,
+      "engine_cwd_entries": [
+        "logs",
+        "logs/data_provenance.json"
+      ],
+      "exit_code": 0,
+      "final_quantity": 0,
+      "guards_failed": [
+        "submission_clock"
+      ],
+      "identifier_normalization": {
+        "fields": [
+          "identifier",
+          "parent_identifier",
+          "event_id",
+          "_identifier"
+        ],
+        "rejected": 0,
+        "sequential_kept": 2,
+        "uuid4_hex_normalized": 0
+      },
+      "label": "run-2",
+      "lifecycle_calls": {
+        "after_market_closes": 104,
+        "before_market_closes": 0,
+        "before_market_opens": 104,
+        "before_starting_trading": 104,
+        "on_trading_iteration": 621
+      },
+      "native_end_cash_usd": "90305.4400",
+      "normalized_economic_sha256": "12803112d0939382068872e1bb05c53a7c55e758412102b47a93bb4c1838e299",
+      "projection": {
+        "max_abs_adjustment": "0.00000000001",
+        "noise_limit": "0.000001",
+        "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+        "values_projected": 9
+      },
+      "raw_report_sha256": "2675dd12a996d7246c6356433a05d81d94da634b0ff82564089dec0256207757",
+      "reconciled_end_cash_usd": "90734.0800",
+      "stats_snapshots": 934,
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "6f51483023f1181fc1a38049a1484febfc62a9568836ab8aac5966155efe4c01",
+      "trade_events": 4,
+      "wall_seconds": 2.974,
+      "warnings": {
+        "categories": [],
+        "count": 0,
+        "distinct": 0,
+        "messages_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    }
+  ],
+  "schema_version": 1,
+  "started_utc": "2026-09-26T06:27:34.957868+00:00",
+  "tolerances": {
+    "limits": {
+      "cash_usd_abs": "0.01",
+      "dividend_usd_abs": "0",
+      "end_cash_usd_abs": "0.01",
+      "event_seconds_abs": "0",
+      "fees_usd_abs": "0",
+      "fill_price_usd_abs": "0",
+      "fill_quantity_abs": "0",
+      "final_quantity_abs": "0"
+    },
+    "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
+    "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+    "status": "default"
+  },
+  "trial": "spy-one-zero-engine-trials-20260926",
+  "two_run_determinism": {
+    "normalization_rule": "Only random uuid4 hex identifiers (fields identifier, parent_identifier, event_id, _identifier) are replaced by ordinals in order of first appearance, after format validation; the sequential bt_<n> identifiers Lumibot assigns in backtests stay raw. Timing, prices, quantities, fees, distributions, position transitions and decision order are never normalized, and the raw reports carry no run label or wall-clock value.",
+    "normalized_economic_sha256_equal": true,
+    "raw_field_paths_differing": [],
+    "raw_report_sha256_equal": true,
+    "runs": "two child processes of the port, each constructing a fresh engine with its own LUMIBOT_CACHE_FOLDER and working directory"
+  },
+  "two_run_records_equal": true,
+  "unsupported_mappings": [
+    "distributions_and_cash"
+  ]
+}

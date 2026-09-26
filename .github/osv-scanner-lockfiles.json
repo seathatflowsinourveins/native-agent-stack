@@ -148,6 +148,18 @@
     {
       "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock",
       "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
+      "parser": "requirements.txt"
     }
   ],
   "covered_by_lockfile": [
