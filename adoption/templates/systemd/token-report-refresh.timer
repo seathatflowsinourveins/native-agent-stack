@@ -1,0 +1,45 @@
+# Drafted, not run: see token-report-refresh.service in this directory for
+# the environment guard, the specifier notes and the deployment notes that
+# also apply here.
+[Unit]
+Description=Quiet-window-safe trigger for the token-report lifetime refresh
+
+[Timer]
+# Four fixed local times a day -- 03:15, 10:15, 16:15, 22:15 -- chosen so no
+# *on-schedule* run ever falls in a Sat/Sun 05:00-09:00 local quiet window
+# (or any other day's 05:00-09:00, since the schedule does not vary by
+# weekday): 03:15 is the last run before 05:00 and 10:15 is the first run
+# after 09:00, so the whole band sits strictly between two scheduled ticks.
+# `systemd-analyze calendar --iterations=12 --base-time="2026-09-25 20:30:00"
+# '*-*-* 03,10,16,22:15:00'` on this host (America/New_York, systemd
+# 255.4-1ubuntu8.17) confirms all 12 iterations from that base time through
+# Mon 2026-09-28 16:15 EDT fall only on :03,10,16,22:15, never inside
+# 05:00-09:00 (with 4 ticks/day, 8 iterations would only reach 2026-09-27
+# and cannot demonstrate coverage through the 28th; this file previously
+# understated the iteration count needed).
+OnCalendar=*-*-* 03,10,16,22:15:00
+# Left explicit rather than omitted (systemd's own default is already
+# false): Persistent=true would additionally fire a catch-up run right after
+# a reboot or resume from a fully stopped/powered-off state if a tick was
+# missed while the timer itself was inactive (`man systemd.timer` on this
+# host: "triggered ... immediately if it would have been triggered at least
+# once during the time when the timer was inactive"); that catch-up run is
+# not calendar-aligned and could land inside 05:00-09:00, so it stays off.
+#
+# Persistent= does NOT cover every way a run can slip into the window,
+# though: the same man page separately documents that a calendar timer which
+# elapses while the system is merely *sleeping* (suspend/hibernate, not
+# stopped) "will not be acted on immediately, but once the system is later
+# resumed it will catch up and process all timers that triggered while the
+# system was sleeping" -- unconditionally, regardless of this setting. A
+# host asleep at a scheduled tick that resumes between 05:00 and 09:00 would
+# still fire that catch-up run inside the quiet window. The paired
+# token-report-refresh.service's ExecCondition= is what actually enforces
+# the window at run time for that case; this comment only explains why
+# Persistent= alone is not that guard.
+Persistent=false
+AccuracySec=1min
+Unit=token-report-refresh.service
+
+[Install]
+WantedBy=timers.target

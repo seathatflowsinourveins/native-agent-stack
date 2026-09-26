@@ -160,6 +160,72 @@ class NativeDataTests(unittest.TestCase):
         visible_failed = {key: value for key, value in failed.items() if key in fields}
         self.assertEqual(visible_failed, {"state": "unknown"})
 
+    def test_claude_prometheus_typed_panel_discloses_the_undercount(self):
+        panel = next(panel for panel in R.dashboard()["panels"] if panel["id"] == 10)
+        self.assertIn("undercount", (panel["title"] + " " + panel["description"]).lower())
+        self.assertEqual(panel["targets"][0]["expr"], "sum by (type) (ecosystem_claude_code_token_usage_tokens_total)")
+        self.assertEqual(panel["datasource"]["uid"], "ecosystem-prometheus")
+
+    def test_loki_query_source_panels_cover_every_token_field(self):
+        panels = {panel["id"]: panel for panel in R.dashboard()["panels"]}
+        expected_fields = {
+            15: "cache_read_tokens",
+            16: "input_tokens",
+            17: "output_tokens",
+            18: "cache_creation_tokens",
+        }
+        # Pin the literal expression so a change to the aggregation function, the grouping
+        # dimension or the range-vector window (e.g. sum_over_time -> avg_over_time, "sum by"
+        # -> "avg by", "[$__interval]" -> "[5m]") fails this test even though the helper would
+        # still agree with itself.
+        self.assertEqual(
+            R.by_query_source("cache_read_tokens"),
+            'sum by (query_source) (sum_over_time({service_name="claude-code"} | event_name="api_request"'
+            ' | unwrap cache_read_tokens [$__interval]))')
+        seen_grid = set()
+        for pid, field in expected_fields.items():
+            panel = panels[pid]
+            expr = panel["targets"][0]["expr"]
+            self.assertEqual(expr, R.by_query_source(field))
+            self.assertTrue(expr.startswith('sum by (query_source) (sum_over_time('), expr)
+            self.assertTrue(expr.endswith(' [$__interval]))'), expr)
+            self.assertIn('service_name="claude-code"', expr)
+            self.assertIn('event_name="api_request"', expr)
+            self.assertIn("by (query_source)", expr)
+            self.assertIn("unwrap " + field, expr)
+            self.assertEqual(panel["datasource"]["uid"], "ecosystem-loki")
+            self.assertEqual(panel["type"], "timeseries")
+            self.assertEqual(panel["targets"][0]["queryType"], "range")
+            # The legend must show a per-series sum so a completed range's total is readable
+            # without manual summation in Inspect > Data (Grafana Inspect panel).
+            self.assertEqual(panel["options"]["legend"]["calcs"], ["sum"])
+            self.assertEqual(panel["options"]["legend"]["displayMode"], "table")
+            grid = panel["gridPos"]
+            seen_grid.add((grid["x"], grid["y"]))
+        self.assertEqual(len(seen_grid), len(expected_fields), "new Loki panels must not share a grid position")
+
+    def test_prometheus_effort_split_panel_present(self):
+        panel = next(panel for panel in R.dashboard()["panels"] if panel["id"] == 19)
+        self.assertEqual(panel["targets"][0]["expr"],
+                         "sum by (effort) (increase(ecosystem_claude_code_token_usage_tokens_total[$__rate_interval]))")
+        self.assertEqual(panel["datasource"]["uid"], "ecosystem-prometheus")
+        self.assertIn("effort", panel["title"].lower())
+
+    def test_dashboard_panel_grid_positions_never_overlap(self):
+        panels = R.dashboard()["panels"]
+        ids = [panel["id"] for panel in panels]
+        self.assertEqual(len(ids), len(set(ids)), "duplicate panel id in the rendered dashboard")
+
+        def rect(panel):
+            grid = panel["gridPos"]
+            return grid["x"], grid["y"], grid["x"] + grid["w"], grid["y"] + grid["h"]
+
+        rects = [rect(panel) for panel in panels]
+        for i, (ax0, ay0, ax1, ay1) in enumerate(rects):
+            for bx0, by0, bx1, by1 in rects[i + 1:]:
+                overlaps = ax0 < bx1 and bx0 < ax1 and ay0 < by1 and by0 < ay1
+                self.assertFalse(overlaps, f"panel {ids[i]} overlaps another panel's gridPos")
+
     def test_qmd_collection_selection_and_bm25_zero(self):
         r = M.qmd_metrics(QMD, "selected-collection")
         self.assertEqual(r["collection_files"], 67)
