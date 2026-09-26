@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "id": "nativestack-5975wx-20260925--llama-cpp--install--20260926",
+  "id": "nativestack-5975wx-20260925--llama-cpp--install--20260926-2",
   "kind": "host_acceptance",
   "host": {
     "host_id": "nativestack-5975wx-20260925",
@@ -10,7 +10,7 @@
     "second_physical_machine": true,
     "hardware_profile_ref": "nativestack-5975wx-20260925"
   },
-  "catalog_revision": "2e771442ec3585f70d22346e722b891b55579c22",
+  "catalog_revision": "38221784b15b5944ceed80edbfc1cd6fdf6c1150",
   "recorded_by": {
     "identity_sha256": "1acdb6c10d2024f9f9d290019d4bb0894f1f115068419f1e575c32f8bf2925f7",
     "model": "claude-opus-5-5"
@@ -21,14 +21,14 @@
     {
       "cmd": "CUDA_VISIBLE_DEVICES= \"$HOME/.local/share/codex-ecosystem/tools/llama-cpp-b11146-cuda12.8/llama-server\" --version",
       "exit": 0,
-      "duration_s": 0.155,
-      "output_sha256": "427e6e2d6910586a518eeb6b439d49bf4cc7c4f4f595bf65ed92863f6103ed07",
-      "output_excerpt": "0.00.000.378 I srv  llama_server: initializing ...\n0.00.119.581 E ggml_cuda_init: failed to initialize CUDA: no CUDA-capable device is detected\nversion: 0.5.0-dev (build 11146, commit 7fe450e19)\nbuilt with GNU 13.3.0 for Linux x86_64\n"
+      "duration_s": 0.179,
+      "output_sha256": "a55429d97dfaa69d257cd77a71bdee7cf12cd3cd0c2d1e28181cb4713cbf1a49",
+      "output_excerpt": "0.00.000.515 I srv  llama_server: initializing ...\n0.00.131.382 E ggml_cuda_init: failed to initialize CUDA: no CUDA-capable device is detected\nversion: 0.5.0-dev (build 11146, commit 7fe450e19)\nbuilt with GNU 13.3.0 for Linux x86_64\n"
     },
     {
-      "cmd": "python3 blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py verify-arms --arm C0 --arm M --runtime-dir \"$HOME/.local/share/codex-ecosystem/tools/llama-cpp-b11146-cuda12.8\" --models-dir \"$HOME/.local/share/codex-ecosystem/models\"",
+      "cmd": "python3 -B blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py verify-arms --arm C0 --arm M --runtime-dir \"$HOME/.local/share/codex-ecosystem/tools/llama-cpp-b11146-cuda12.8\" --models-dir \"$HOME/.local/share/codex-ecosystem/models\"",
       "exit": 0,
-      "duration_s": 15.641,
+      "duration_s": 17.893,
       "output_sha256": "d3cb41e3191215b134c3f9f7cd911bbcd11668025c56b872de0abd7e71912b38",
       "output_excerpt": "verified 2 model files\n"
     }
@@ -36,15 +36,15 @@
   "tool_versions": {
     "llama-cpp": "b11146 (0.5.0-dev)"
   },
-  "observed_at_utc": "2026-09-26T11:26:02Z",
+  "observed_at_utc": "2026-09-26T12:59:01Z",
   "result": "pass",
   "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), the llama.cpp install that nativestack-generation.service runs (tools/llama-cpp-b11146-cuda12.8) reported version 0.5.0-dev (build 11146, commit 7fe450e19) with CUDA hidden for the version call (first command). The li26 experiment's eval_arm.py verify-arms then matched that install's llama-server SHA-256 and its directory manifest to plan.json's runtime pins, and verified both model files the experiment ran, Qwen3.8-27B-UD-Q4_K_M.gguf (unsloth/Qwen3.8-27B-GGUF 4ca7207, arms C0, C1 and C2) and MiMo-V2.6-Distill-Qwen-9B-Q8_0.gguf (ggml-org/MiMo-V2.6-Distill-Qwen-9B-GGUF 81baddc, arm M), by size and SHA-256 against the plan's Hugging Face LFS pins (second command: verified 2 model files).",
   "limitations": [
     "A version and hash check establishes the installed bytes, not functional acceptance. The use receipt of the same date and the li26 experiment (blueprints/convergence-practice/local-inference-latest-20260926/results/) carry the functional evidence.",
-    "plan.json's runtime hashes were read from this installed directory while planning on 2026-09-26; equality shows the install is unchanged since then, not that it was re-extracted from the release archive (plan.json runtime.archive_digest_source). The model pins are the Hugging Face tree API LFS oids and sizes read on 2026-09-26.",
+    "plan.json's runtime hashes were read from this installed directory while planning on 2026-09-26; equality shows the install is unchanged since then, not that it was re-extracted from the release archive (plan.json runtime.archive_digest_source). plan.json records the Hugging Face tree API LFS oid and size as the source of the Qwen pin (arms C0, C1, C2); the MiMo pin (arm M) names no source in plan.json. verify-arms checked both files' size and sha256 either way.",
     "The version call ran with CUDA_VISIBLE_DEVICES empty so that it allocates no device memory beside production; its ggml_cuda_init line reports exactly that. The CUDA path itself is exercised by the use receipt.",
     "The catalog pin for llama-cpp stays b11057 (0.4.1-dev) in manifests/stack.json and catalogs/sota-convergence; this receipt records b11146 (0.5.0-dev), the build this host serves, and does not rebind that pin. llama-cpp has no landscape winner row: its catalog row is the conditional foundation/observation-inference alternative.",
-    "Recorded from a Claude Code session in a git worktree at origin/main (the catalog_revision); every command uses only files present at that revision and host tools. The commands are read-only checks: they changed no unit, file or model on the host.",
+    "Recorded from a Claude Code session in a clean git checkout detached at a commit published on origin/main (the catalog_revision; main may have moved on since). Every command uses only files present at that revision and host tools, and Python runs with -B, so no bytecode cache is written. The commands are read-only checks: they changed no unit, file or model on the host. This generation supersedes the first (11:26Z), whose verify-arms call ran without -B (independent review 2026-09-26: needs_changes).",
     "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review. This receipt changes no platform_status."
   ],
   "evidence_class": "native_proven",
@@ -53,7 +53,7 @@
       "kind": "self",
       "ref": "scripts/host_receipts.py record",
       "verdict": "agree",
-      "at_utc": "2026-09-26T11:26:02Z",
+      "at_utc": "2026-09-26T12:59:01Z",
       "reviewer": {
         "identity_sha256": "1acdb6c10d2024f9f9d290019d4bb0894f1f115068419f1e575c32f8bf2925f7",
         "model": "claude-opus-5-5"
@@ -61,13 +61,14 @@
     },
     {
       "kind": "independent_session",
-      "ref": "headless independent review 2026-09-26 (li26 results PR)",
-      "verdict": "needs_changes",
-      "at_utc": "2026-09-26T12:57:39Z",
+      "ref": "headless independent re-review 2026-09-26 (li26 results PR)",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T13:02:09Z",
       "reviewer": {
-        "identity_sha256": "d9bbb3ba309f8ba122c153f7c20c48da9ea50d0ac371c03f240be6877b6eb27e",
+        "identity_sha256": "6224ae967674700d39921ea70471b2c90a3bb9ac3aafdebe9ed8c369de8976a9",
         "model": "claude-opus-5-5"
       }
     }
-  ]
+  ],
+  "supersedes": "nativestack-5975wx-20260925--llama-cpp--install--20260926"
 }
