@@ -116,22 +116,35 @@ scratch copy whose `pins.json` holds only that entry; it still checks the
 archive against the pin and the publisher's checksum file. Then render the units
 with `configure.py` into a scratch root (the saved `port-overrides.json` or
 `--port-overrides`), substitute the live roots, and compare with the live unit:
-only the `ExecStart` prefix may differ. Install that unit, verify it, restart
-only that service and read it back; keep the previous prefix for rollback.
+only the `ExecStart` prefix may differ. Back up the live unit, install the new
+one, then verify, reload, restart only that service and read it back. Move the
+`bin/` links only after every step below has passed; keep the previous prefix
+for rollback.
 
 ```bash
+set -e
 systemd-analyze --user verify "$HOME/.config/systemd/user/ecosystem-prometheus.service"
 systemctl --user daemon-reload
+test "$(systemctl --user show -p NeedDaemonReload --value ecosystem-prometheus.service)" = no
 systemctl --user restart ecosystem-prometheus.service
-curl --fail --silent http://127.0.0.1:19090/-/ready
+curl --fail --silent --retry 60 --retry-connrefused --retry-delay 1 http://127.0.0.1:19090/-/ready
+curl --fail --silent http://127.0.0.1:19090/api/v1/status/buildinfo | grep -F '"version":"3.15.0"'
 "$STACK_TOOLS_ROOT/ecosystem-prometheus-3.15.0/promtool" query instant http://127.0.0.1:19090 up
 ```
 
-Rollback is the previous unit (its `ExecStart` names the old prefix), the same
-reload and restart, and the `bin/` links moved back. The WSL workstation moved
-Prometheus from 3.14.0 to 3.15.0 this way on 2026-09-26, after a side-by-side
-rehearsal on copies of its TSDB in which 3.14.0 also reopened the data 3.15.0
-had written ([receipt](../../evidence/receipts/prometheus-3150-qualification-20260926.json)).
+If a step fails, leave the links alone: put the backed-up unit back, run
+`daemon-reload` and `reset-failed` (a new server that keeps exiting exhausts
+the unit's start limit), restart, and read back the old version. Rollback is
+the same sequence with the old prefix in `ExecStart`, followed by moving the
+`bin/` links back.
+[`switch_gated.py`](../../evidence/artifacts/sota-refresh-20260926/prometheus/switch_gated.py)
+scripts this order with a gate at every step and the restore on failure; it was
+rehearsed with injected failures on a scratch unit, not on this service. The
+WSL workstation moved Prometheus from 3.14.0 to 3.15.0 on 2026-09-26 with an
+earlier script that logged the same checks without gating the link change on
+them (all passed), after a side-by-side rehearsal on copies of its TSDB in which
+3.14.0 also reopened the data 3.15.0 had written
+([receipt](../../evidence/receipts/prometheus-3150-qualification-20260926.json)).
 That is one host and one TSDB format generation, not a general downgrade promise.
 
 ## Data flow and dashboard

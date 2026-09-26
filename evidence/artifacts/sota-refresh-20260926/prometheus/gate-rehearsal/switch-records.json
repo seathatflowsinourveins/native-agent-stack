@@ -1,0 +1,1854 @@
+{
+  "G0": {
+    "procedure": "switch_gated.py",
+    "arguments": {
+      "unit": "sota-refresh-gate-rehearsal-prometheus.service",
+      "unit_file": "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service",
+      "expected_unit": "<scratch>/r3-verify/prom-work/G0/expected.service",
+      "bin_dir": "<scratch>/r3-verify/prom-work/bin",
+      "from_version": "3.13.0",
+      "from_prefix": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0",
+      "to_version": "3.15.0",
+      "to_revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "to_prefix": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0",
+      "out": "<scratch>/r3-verify/prom-work/G0/out",
+      "port": 29390,
+      "ready_timeout": 30.0,
+      "settle": 20.0
+    },
+    "steps": [
+      {
+        "step": "P0-preflight",
+        "utc": "2026-09-26T10:06:34Z",
+        "unit": {
+          "MainPID": "1564846",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:03:12 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "running": {
+          "version": "3.14.0",
+          "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        },
+        "to_versions": {
+          "prometheus": {
+            "argv": [
+              "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "prometheus, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          },
+          "promtool": {
+            "argv": [
+              "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "promtool, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          }
+        },
+        "promtool_check_config": {
+          "argv": [
+            "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool",
+            "check",
+            "config",
+            "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+          ],
+          "exit": 0,
+          "output": "Checking <scratch>/r3-verify/prom-work/config/prometheus.yml\n  SUCCESS: 1 rule files found\n SUCCESS: <scratch>/r3-verify/prom-work/config/prometheus.yml is valid prometheus config file syntax\n\nChecking <scratch>/r3-verify/prom-work/config/rules.yml\n  SUCCESS: 2 rules found"
+        },
+        "live_unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "expected_unit_sha256": "7c7fdd35fd8301120ace377e40256a0a6b9add6f755e72fef8e495dc149c0006"
+      }
+    ],
+    "gates": [
+      {
+        "gate": "unit-active",
+        "passed": true,
+        "value": [
+          "active",
+          "running"
+        ]
+      },
+      {
+        "gate": "unit-has-no-pending-change",
+        "passed": true,
+        "value": "no"
+      },
+      {
+        "gate": "unit-runs-from-prefix",
+        "passed": true,
+        "value": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+      },
+      {
+        "gate": "running-from-version",
+        "passed": false,
+        "value": "3.14.0"
+      },
+      {
+        "gate": "to-prefix-reports-to-version",
+        "passed": true
+      },
+      {
+        "gate": "to-promtool-check-config",
+        "passed": true,
+        "config": "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+      },
+      {
+        "gate": "expected-unit-changes-only-the-exec-prefix",
+        "passed": true
+      }
+    ],
+    "exit": 1
+  },
+  "G1": {
+    "procedure": "switch_gated.py",
+    "arguments": {
+      "unit": "sota-refresh-gate-rehearsal-prometheus.service",
+      "unit_file": "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service",
+      "expected_unit": "<scratch>/r3-verify/prom-work/G1/expected.service",
+      "bin_dir": "<scratch>/r3-verify/prom-work/bin",
+      "from_version": "3.14.0",
+      "from_prefix": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0",
+      "to_version": "3.15.0",
+      "to_revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "to_prefix": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0",
+      "out": "<scratch>/r3-verify/prom-work/G1/out",
+      "port": 29390,
+      "ready_timeout": 30.0,
+      "settle": 20.0
+    },
+    "steps": [
+      {
+        "step": "P0-preflight",
+        "utc": "2026-09-26T10:06:34Z",
+        "unit": {
+          "MainPID": "1564846",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:03:12 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "running": {
+          "version": "3.14.0",
+          "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        },
+        "to_versions": {
+          "prometheus": {
+            "argv": [
+              "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "prometheus, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          },
+          "promtool": {
+            "argv": [
+              "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "promtool, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          }
+        },
+        "promtool_check_config": {
+          "argv": [
+            "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool",
+            "check",
+            "config",
+            "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+          ],
+          "exit": 0,
+          "output": "Checking <scratch>/r3-verify/prom-work/config/prometheus.yml\n  SUCCESS: 1 rule files found\n SUCCESS: <scratch>/r3-verify/prom-work/config/prometheus.yml is valid prometheus config file syntax\n\nChecking <scratch>/r3-verify/prom-work/config/rules.yml\n  SUCCESS: 2 rules found"
+        },
+        "live_unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "expected_unit_sha256": "7c7fdd35fd8301120ace377e40256a0a6b9add6f755e72fef8e495dc149c0006"
+      },
+      {
+        "step": "P1-unit-installed",
+        "utc": "2026-09-26T10:06:34Z",
+        "backup": "<scratch>/r3-verify/prom-work/G1/out/backup/sota-refresh-gate-rehearsal-prometheus.service",
+        "mode": "0o644",
+        "sha256_before": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "sha256_after": "7c7fdd35fd8301120ace377e40256a0a6b9add6f755e72fef8e495dc149c0006"
+      },
+      {
+        "step": "P3-pre-state",
+        "utc": "2026-09-26T10:06:34Z",
+        "unit": {
+          "MainPID": "1564846",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:03:12 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+        },
+        "buildinfo": {
+          "version": "3.14.0",
+          "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        },
+        "up": [
+          [
+            "gate-rehearsal",
+            "127.0.0.1:29390",
+            "1"
+          ]
+        ],
+        "rules": {
+          "groups": 1,
+          "rules": 2,
+          "health": [
+            "ok"
+          ],
+          "firing": [
+            "GateRehearsalAlwaysFiring"
+          ]
+        },
+        "historical_up_6h": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "aeb0806d1b82d1266b0ddaa50ee8720d6c2fd9a731d754d6eed832e7023ad379"
+        }
+      },
+      {
+        "step": "P4-post-state",
+        "utc": "2026-09-26T10:06:55Z",
+        "unit": {
+          "MainPID": "1670339",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:35 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+        },
+        "buildinfo": {
+          "version": "3.15.0",
+          "revision": "5241a27fe3c6983549fccc32f6e65917408c63cd"
+        },
+        "up": [
+          [
+            "gate-rehearsal",
+            "127.0.0.1:29390",
+            "1"
+          ]
+        ],
+        "rules": {
+          "groups": 1,
+          "rules": 2,
+          "health": [
+            "ok"
+          ],
+          "firing": [
+            "GateRehearsalAlwaysFiring"
+          ]
+        },
+        "historical_up_6h": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "aeb0806d1b82d1266b0ddaa50ee8720d6c2fd9a731d754d6eed832e7023ad379"
+        }
+      },
+      {
+        "step": "P4-journal",
+        "utc": "2026-09-26T10:06:55Z",
+        "exit": 0,
+        "lines": 49,
+        "warnings": [
+          "time=2026-09-26T06:06:34.995-04:00 level=WARN source=main.go:1249 msg=\"Received an OS signal, exiting gracefully...\" signal=terminated"
+        ]
+      },
+      {
+        "step": "P5-bin-links",
+        "utc": "2026-09-26T10:06:55Z",
+        "prometheus": {
+          "before": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+          "after": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+        },
+        "promtool": {
+          "before": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool",
+          "after": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool"
+        }
+      }
+    ],
+    "gates": [
+      {
+        "gate": "unit-active",
+        "passed": true,
+        "value": [
+          "active",
+          "running"
+        ]
+      },
+      {
+        "gate": "unit-has-no-pending-change",
+        "passed": true,
+        "value": "no"
+      },
+      {
+        "gate": "unit-runs-from-prefix",
+        "passed": true,
+        "value": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+      },
+      {
+        "gate": "running-from-version",
+        "passed": true,
+        "value": "3.14.0"
+      },
+      {
+        "gate": "to-prefix-reports-to-version",
+        "passed": true
+      },
+      {
+        "gate": "to-promtool-check-config",
+        "passed": true,
+        "config": "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+      },
+      {
+        "gate": "expected-unit-changes-only-the-exec-prefix",
+        "passed": true
+      },
+      {
+        "gate": "unit-installed",
+        "passed": true
+      },
+      {
+        "gate": "verify",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemd-analyze",
+            "--user",
+            "verify",
+            "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "daemon-reload",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "unit-loaded",
+        "passed": true,
+        "need_daemon_reload": "no",
+        "exec_start": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+      },
+      {
+        "gate": "restart",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "restart",
+            "sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "ready",
+        "passed": true,
+        "seconds_after_restart_call": 0.63,
+        "timeout": 30.0
+      },
+      {
+        "gate": "new-main-pid",
+        "passed": true,
+        "before": "1564846",
+        "after": "1670339"
+      },
+      {
+        "gate": "version",
+        "passed": true,
+        "value": "3.15.0"
+      },
+      {
+        "gate": "revision",
+        "passed": true,
+        "value": "5241a27fe3c6983549fccc32f6e65917408c63cd"
+      },
+      {
+        "gate": "exec-start",
+        "passed": true,
+        "value": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+      },
+      {
+        "gate": "no-automatic-restart",
+        "passed": true,
+        "value": "0"
+      },
+      {
+        "gate": "same-targets",
+        "passed": true
+      },
+      {
+        "gate": "no-target-went-down",
+        "passed": true,
+        "down": []
+      },
+      {
+        "gate": "same-rule-counts",
+        "passed": true
+      },
+      {
+        "gate": "rule-health",
+        "passed": true,
+        "before": [
+          "ok"
+        ],
+        "after": [
+          "ok"
+        ]
+      },
+      {
+        "gate": "history-unchanged",
+        "passed": true,
+        "before": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "aeb0806d1b82d1266b0ddaa50ee8720d6c2fd9a731d754d6eed832e7023ad379"
+        },
+        "after": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "aeb0806d1b82d1266b0ddaa50ee8720d6c2fd9a731d754d6eed832e7023ad379"
+        }
+      },
+      {
+        "gate": "journal-has-no-error",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "gate": "links",
+        "passed": true
+      }
+    ],
+    "exit": 0
+  },
+  "G2": {
+    "procedure": "switch_gated.py",
+    "arguments": {
+      "unit": "sota-refresh-gate-rehearsal-prometheus.service",
+      "unit_file": "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service",
+      "expected_unit": "<scratch>/r3-verify/prom-work/G2/expected.service",
+      "bin_dir": "<scratch>/r3-verify/prom-work/bin",
+      "from_version": "3.15.0",
+      "from_prefix": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0",
+      "to_version": "3.14.0",
+      "to_revision": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+      "to_prefix": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0",
+      "out": "<scratch>/r3-verify/prom-work/G2/out",
+      "port": 29390,
+      "ready_timeout": 30.0,
+      "settle": 20.0
+    },
+    "steps": [
+      {
+        "step": "P0-preflight",
+        "utc": "2026-09-26T10:06:55Z",
+        "unit": {
+          "MainPID": "1670339",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:35 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+        },
+        "running": {
+          "version": "3.15.0",
+          "revision": "5241a27fe3c6983549fccc32f6e65917408c63cd"
+        },
+        "to_versions": {
+          "prometheus": {
+            "argv": [
+              "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "prometheus, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610)\n  build user:       root@f423027f4410\n  build date:       20260817-16:49:19\n  go version:       go1.26.6\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          },
+          "promtool": {
+            "argv": [
+              "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "promtool, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610)\n  build user:       root@f423027f4410\n  build date:       20260817-16:49:19\n  go version:       go1.26.6\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          }
+        },
+        "promtool_check_config": {
+          "argv": [
+            "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool",
+            "check",
+            "config",
+            "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+          ],
+          "exit": 0,
+          "output": "Checking <scratch>/r3-verify/prom-work/config/prometheus.yml\n  SUCCESS: 1 rule files found\n SUCCESS: <scratch>/r3-verify/prom-work/config/prometheus.yml is valid prometheus config file syntax\n\nChecking <scratch>/r3-verify/prom-work/config/rules.yml\n  SUCCESS: 2 rules found"
+        },
+        "live_unit_sha256": "7c7fdd35fd8301120ace377e40256a0a6b9add6f755e72fef8e495dc149c0006",
+        "expected_unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f"
+      },
+      {
+        "step": "P1-unit-installed",
+        "utc": "2026-09-26T10:06:55Z",
+        "backup": "<scratch>/r3-verify/prom-work/G2/out/backup/sota-refresh-gate-rehearsal-prometheus.service",
+        "mode": "0o644",
+        "sha256_before": "7c7fdd35fd8301120ace377e40256a0a6b9add6f755e72fef8e495dc149c0006",
+        "sha256_after": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f"
+      },
+      {
+        "step": "P3-pre-state",
+        "utc": "2026-09-26T10:06:56Z",
+        "unit": {
+          "MainPID": "1670339",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:35 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "buildinfo": {
+          "version": "3.15.0",
+          "revision": "5241a27fe3c6983549fccc32f6e65917408c63cd"
+        },
+        "up": [
+          [
+            "gate-rehearsal",
+            "127.0.0.1:29390",
+            "1"
+          ]
+        ],
+        "rules": {
+          "groups": 1,
+          "rules": 2,
+          "health": [
+            "ok"
+          ],
+          "firing": [
+            "GateRehearsalAlwaysFiring"
+          ]
+        },
+        "historical_up_6h": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "5bc668cc87647d6318885ba030554060403476c65d111acf693c17da3d00cb4d"
+        }
+      },
+      {
+        "step": "P4-post-state",
+        "utc": "2026-09-26T10:07:16Z",
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "buildinfo": {
+          "version": "3.14.0",
+          "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        },
+        "up": [
+          [
+            "gate-rehearsal",
+            "127.0.0.1:29390",
+            "1"
+          ]
+        ],
+        "rules": {
+          "groups": 1,
+          "rules": 2,
+          "health": [
+            "ok"
+          ],
+          "firing": [
+            "GateRehearsalAlwaysFiring"
+          ]
+        },
+        "historical_up_6h": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "5bc668cc87647d6318885ba030554060403476c65d111acf693c17da3d00cb4d"
+        }
+      },
+      {
+        "step": "P4-journal",
+        "utc": "2026-09-26T10:07:16Z",
+        "exit": 0,
+        "lines": 49,
+        "warnings": [
+          "time=2026-09-26T06:06:56.199-04:00 level=WARN source=main.go:1280 msg=\"Received an OS signal, exiting gracefully...\" signal=terminated"
+        ]
+      },
+      {
+        "step": "P5-bin-links",
+        "utc": "2026-09-26T10:07:16Z",
+        "prometheus": {
+          "before": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus",
+          "after": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "promtool": {
+          "before": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool",
+          "after": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool"
+        }
+      }
+    ],
+    "gates": [
+      {
+        "gate": "unit-active",
+        "passed": true,
+        "value": [
+          "active",
+          "running"
+        ]
+      },
+      {
+        "gate": "unit-has-no-pending-change",
+        "passed": true,
+        "value": "no"
+      },
+      {
+        "gate": "unit-runs-from-prefix",
+        "passed": true,
+        "value": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus"
+      },
+      {
+        "gate": "running-from-version",
+        "passed": true,
+        "value": "3.15.0"
+      },
+      {
+        "gate": "to-prefix-reports-to-version",
+        "passed": true
+      },
+      {
+        "gate": "to-promtool-check-config",
+        "passed": true,
+        "config": "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+      },
+      {
+        "gate": "expected-unit-changes-only-the-exec-prefix",
+        "passed": true
+      },
+      {
+        "gate": "unit-installed",
+        "passed": true
+      },
+      {
+        "gate": "verify",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemd-analyze",
+            "--user",
+            "verify",
+            "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "daemon-reload",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "unit-loaded",
+        "passed": true,
+        "need_daemon_reload": "no",
+        "exec_start": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+      },
+      {
+        "gate": "restart",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "restart",
+            "sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "ready",
+        "passed": true,
+        "seconds_after_restart_call": 0.59,
+        "timeout": 30.0
+      },
+      {
+        "gate": "new-main-pid",
+        "passed": true,
+        "before": "1670339",
+        "after": "1677075"
+      },
+      {
+        "gate": "version",
+        "passed": true,
+        "value": "3.14.0"
+      },
+      {
+        "gate": "revision",
+        "passed": true,
+        "value": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+      },
+      {
+        "gate": "exec-start",
+        "passed": true,
+        "value": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+      },
+      {
+        "gate": "no-automatic-restart",
+        "passed": true,
+        "value": "0"
+      },
+      {
+        "gate": "same-targets",
+        "passed": true
+      },
+      {
+        "gate": "no-target-went-down",
+        "passed": true,
+        "down": []
+      },
+      {
+        "gate": "same-rule-counts",
+        "passed": true
+      },
+      {
+        "gate": "rule-health",
+        "passed": true,
+        "before": [
+          "ok"
+        ],
+        "after": [
+          "ok"
+        ]
+      },
+      {
+        "gate": "history-unchanged",
+        "passed": true,
+        "before": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "5bc668cc87647d6318885ba030554060403476c65d111acf693c17da3d00cb4d"
+        },
+        "after": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "5bc668cc87647d6318885ba030554060403476c65d111acf693c17da3d00cb4d"
+        }
+      },
+      {
+        "gate": "journal-has-no-error",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "gate": "links",
+        "passed": true
+      }
+    ],
+    "exit": 0
+  },
+  "G3": {
+    "procedure": "switch_gated.py",
+    "arguments": {
+      "unit": "sota-refresh-gate-rehearsal-prometheus.service",
+      "unit_file": "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service",
+      "expected_unit": "<scratch>/r3-verify/prom-work/G3/expected.service",
+      "bin_dir": "<scratch>/r3-verify/prom-work/bin",
+      "from_version": "3.14.0",
+      "from_prefix": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0",
+      "to_version": "3.15.0",
+      "to_revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "to_prefix": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0",
+      "out": "<scratch>/r3-verify/prom-work/G3/out",
+      "port": 29390,
+      "ready_timeout": 30.0,
+      "settle": 20.0
+    },
+    "steps": [
+      {
+        "step": "P0-preflight",
+        "utc": "2026-09-26T10:07:17Z",
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "running": {
+          "version": "3.14.0",
+          "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        },
+        "to_versions": {
+          "prometheus": {
+            "argv": [
+              "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "prometheus, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          },
+          "promtool": {
+            "argv": [
+              "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "promtool, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          }
+        },
+        "promtool_check_config": {
+          "argv": [
+            "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool",
+            "check",
+            "config",
+            "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+          ],
+          "exit": 0,
+          "output": "Checking <scratch>/r3-verify/prom-work/config/prometheus.yml\n  SUCCESS: 1 rule files found\n SUCCESS: <scratch>/r3-verify/prom-work/config/prometheus.yml is valid prometheus config file syntax\n\nChecking <scratch>/r3-verify/prom-work/config/rules.yml\n  SUCCESS: 2 rules found"
+        },
+        "live_unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "expected_unit_sha256": "7c7fdd35fd8301120ace377e40256a0a6b9add6f755e72fef8e495dc149c0006"
+      },
+      {
+        "step": "P1-unit-installed",
+        "utc": "2026-09-26T10:07:17Z",
+        "backup": "<scratch>/r3-verify/prom-work/G3/out/backup/sota-refresh-gate-rehearsal-prometheus.service",
+        "mode": "0o644",
+        "sha256_before": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "sha256_after": "7c7fdd35fd8301120ace377e40256a0a6b9add6f755e72fef8e495dc149c0006"
+      },
+      {
+        "step": "P-failed",
+        "utc": "2026-09-26T10:07:17Z",
+        "error": "GateFailed('daemon-reload')",
+        "restarted": false,
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "yes",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        }
+      },
+      {
+        "step": "R-restore",
+        "utc": "2026-09-26T10:07:17Z",
+        "unit_equals_backup": true,
+        "daemon_reload": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 1,
+          "output": "gate rehearsal shim: simulated daemon-reload failure"
+        },
+        "restart_needed": false,
+        "version_after": "3.14.0",
+        "revision_after": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+        "unit_after": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "restored": true
+      }
+    ],
+    "gates": [
+      {
+        "gate": "unit-active",
+        "passed": true,
+        "value": [
+          "active",
+          "running"
+        ]
+      },
+      {
+        "gate": "unit-has-no-pending-change",
+        "passed": true,
+        "value": "no"
+      },
+      {
+        "gate": "unit-runs-from-prefix",
+        "passed": true,
+        "value": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+      },
+      {
+        "gate": "running-from-version",
+        "passed": true,
+        "value": "3.14.0"
+      },
+      {
+        "gate": "to-prefix-reports-to-version",
+        "passed": true
+      },
+      {
+        "gate": "to-promtool-check-config",
+        "passed": true,
+        "config": "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+      },
+      {
+        "gate": "expected-unit-changes-only-the-exec-prefix",
+        "passed": true
+      },
+      {
+        "gate": "unit-installed",
+        "passed": true
+      },
+      {
+        "gate": "verify",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemd-analyze",
+            "--user",
+            "verify",
+            "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "daemon-reload",
+        "passed": false,
+        "result": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 1,
+          "output": "gate rehearsal shim: simulated daemon-reload failure"
+        }
+      }
+    ],
+    "exit": 2
+  },
+  "G4": {
+    "procedure": "switch_gated.py",
+    "arguments": {
+      "unit": "sota-refresh-gate-rehearsal-prometheus.service",
+      "unit_file": "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service",
+      "expected_unit": "<scratch>/r3-verify/prom-work/G4/expected.service",
+      "bin_dir": "<scratch>/r3-verify/prom-work/bin",
+      "from_version": "3.14.0",
+      "from_prefix": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0",
+      "to_version": "3.15.0",
+      "to_revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "to_prefix": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0",
+      "out": "<scratch>/r3-verify/prom-work/G4/out",
+      "port": 29390,
+      "ready_timeout": 30.0,
+      "settle": 20.0
+    },
+    "steps": [
+      {
+        "step": "P0-preflight",
+        "utc": "2026-09-26T10:07:17Z",
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "running": {
+          "version": "3.14.0",
+          "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        },
+        "to_versions": {
+          "prometheus": {
+            "argv": [
+              "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "prometheus, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          },
+          "promtool": {
+            "argv": [
+              "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "promtool, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          }
+        },
+        "promtool_check_config": {
+          "argv": [
+            "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool",
+            "check",
+            "config",
+            "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+          ],
+          "exit": 0,
+          "output": "Checking <scratch>/r3-verify/prom-work/config/prometheus.yml\n  SUCCESS: 1 rule files found\n SUCCESS: <scratch>/r3-verify/prom-work/config/prometheus.yml is valid prometheus config file syntax\n\nChecking <scratch>/r3-verify/prom-work/config/rules.yml\n  SUCCESS: 2 rules found"
+        },
+        "live_unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "expected_unit_sha256": "7c7fdd35fd8301120ace377e40256a0a6b9add6f755e72fef8e495dc149c0006"
+      },
+      {
+        "step": "P1-unit-installed",
+        "utc": "2026-09-26T10:07:17Z",
+        "backup": "<scratch>/r3-verify/prom-work/G4/out/backup/sota-refresh-gate-rehearsal-prometheus.service",
+        "mode": "0o644",
+        "sha256_before": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "sha256_after": "7c7fdd35fd8301120ace377e40256a0a6b9add6f755e72fef8e495dc149c0006"
+      },
+      {
+        "step": "P-failed",
+        "utc": "2026-09-26T10:07:17Z",
+        "error": "GateFailed('unit-loaded')",
+        "restarted": false,
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "yes",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        }
+      },
+      {
+        "step": "R-restore",
+        "utc": "2026-09-26T10:07:17Z",
+        "unit_equals_backup": true,
+        "daemon_reload": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "restart_needed": false,
+        "version_after": "3.14.0",
+        "revision_after": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+        "unit_after": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "restored": true
+      }
+    ],
+    "gates": [
+      {
+        "gate": "unit-active",
+        "passed": true,
+        "value": [
+          "active",
+          "running"
+        ]
+      },
+      {
+        "gate": "unit-has-no-pending-change",
+        "passed": true,
+        "value": "no"
+      },
+      {
+        "gate": "unit-runs-from-prefix",
+        "passed": true,
+        "value": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+      },
+      {
+        "gate": "running-from-version",
+        "passed": true,
+        "value": "3.14.0"
+      },
+      {
+        "gate": "to-prefix-reports-to-version",
+        "passed": true
+      },
+      {
+        "gate": "to-promtool-check-config",
+        "passed": true,
+        "config": "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+      },
+      {
+        "gate": "expected-unit-changes-only-the-exec-prefix",
+        "passed": true
+      },
+      {
+        "gate": "unit-installed",
+        "passed": true
+      },
+      {
+        "gate": "verify",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemd-analyze",
+            "--user",
+            "verify",
+            "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "daemon-reload",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "unit-loaded",
+        "passed": false,
+        "need_daemon_reload": "yes",
+        "exec_start": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+      }
+    ],
+    "exit": 2
+  },
+  "G5": {
+    "procedure": "switch_gated.py",
+    "arguments": {
+      "unit": "sota-refresh-gate-rehearsal-prometheus.service",
+      "unit_file": "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service",
+      "expected_unit": "<scratch>/r3-verify/prom-work/G5/expected.service",
+      "bin_dir": "<scratch>/r3-verify/prom-work/bin",
+      "from_version": "3.14.0",
+      "from_prefix": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0",
+      "to_version": "3.15.0",
+      "to_revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "to_prefix": "<scratch>/r3-verify/prom-work/fake-start-fails",
+      "out": "<scratch>/r3-verify/prom-work/G5/out",
+      "port": 29390,
+      "ready_timeout": 30.0,
+      "settle": 20.0
+    },
+    "steps": [
+      {
+        "step": "P0-preflight",
+        "utc": "2026-09-26T10:07:17Z",
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "running": {
+          "version": "3.14.0",
+          "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        },
+        "to_versions": {
+          "prometheus": {
+            "argv": [
+              "<scratch>/r3-verify/prom-work/fake-start-fails/prometheus",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "prometheus, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          },
+          "promtool": {
+            "argv": [
+              "<scratch>/r3-verify/prom-work/fake-start-fails/promtool",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "promtool, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          }
+        },
+        "promtool_check_config": {
+          "argv": [
+            "<scratch>/r3-verify/prom-work/fake-start-fails/promtool",
+            "check",
+            "config",
+            "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+          ],
+          "exit": 0,
+          "output": "Checking <scratch>/r3-verify/prom-work/config/prometheus.yml\n  SUCCESS: 1 rule files found\n SUCCESS: <scratch>/r3-verify/prom-work/config/prometheus.yml is valid prometheus config file syntax\n\nChecking <scratch>/r3-verify/prom-work/config/rules.yml\n  SUCCESS: 2 rules found"
+        },
+        "live_unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "expected_unit_sha256": "549c49d67d3c273a444f51804402e029bb5e533bd903162c95a417b229823933"
+      },
+      {
+        "step": "P1-unit-installed",
+        "utc": "2026-09-26T10:07:17Z",
+        "backup": "<scratch>/r3-verify/prom-work/G5/out/backup/sota-refresh-gate-rehearsal-prometheus.service",
+        "mode": "0o644",
+        "sha256_before": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "sha256_after": "549c49d67d3c273a444f51804402e029bb5e533bd903162c95a417b229823933"
+      },
+      {
+        "step": "P3-pre-state",
+        "utc": "2026-09-26T10:07:18Z",
+        "unit": {
+          "MainPID": "1677075",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:06:56 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "<scratch>/r3-verify/prom-work/fake-start-fails/prometheus"
+        },
+        "buildinfo": {
+          "version": "3.14.0",
+          "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        },
+        "up": [
+          [
+            "gate-rehearsal",
+            "127.0.0.1:29390",
+            "1"
+          ]
+        ],
+        "rules": {
+          "groups": 1,
+          "rules": 2,
+          "health": [
+            "ok"
+          ],
+          "firing": [
+            "GateRehearsalAlwaysFiring"
+          ]
+        },
+        "historical_up_6h": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "a3980d979e680c55297e4f2ad32a19dc00599cbaea68df8dd29b51563cf92b7e"
+        }
+      },
+      {
+        "step": "P-failed",
+        "utc": "2026-09-26T10:07:48Z",
+        "error": "GateFailed('ready')",
+        "restarted": true,
+        "unit": {
+          "MainPID": "0",
+          "Result": "exit-code",
+          "NRestarts": "3",
+          "ActiveState": "failed",
+          "SubState": "failed",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:07:28 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "<scratch>/r3-verify/prom-work/fake-start-fails/prometheus"
+        }
+      },
+      {
+        "step": "R-restore",
+        "utc": "2026-09-26T10:07:48Z",
+        "unit_equals_backup": true,
+        "daemon_reload": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "restart_needed": true,
+        "reset_failed": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "reset-failed",
+            "sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "restart": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "restart",
+            "sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "ready_seconds": 0.57,
+        "version_after": "3.14.0",
+        "revision_after": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+        "unit_after": {
+          "MainPID": "1687659",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:07:48 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "restored": true
+      }
+    ],
+    "gates": [
+      {
+        "gate": "unit-active",
+        "passed": true,
+        "value": [
+          "active",
+          "running"
+        ]
+      },
+      {
+        "gate": "unit-has-no-pending-change",
+        "passed": true,
+        "value": "no"
+      },
+      {
+        "gate": "unit-runs-from-prefix",
+        "passed": true,
+        "value": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+      },
+      {
+        "gate": "running-from-version",
+        "passed": true,
+        "value": "3.14.0"
+      },
+      {
+        "gate": "to-prefix-reports-to-version",
+        "passed": true
+      },
+      {
+        "gate": "to-promtool-check-config",
+        "passed": true,
+        "config": "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+      },
+      {
+        "gate": "expected-unit-changes-only-the-exec-prefix",
+        "passed": true
+      },
+      {
+        "gate": "unit-installed",
+        "passed": true
+      },
+      {
+        "gate": "verify",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemd-analyze",
+            "--user",
+            "verify",
+            "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "daemon-reload",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "unit-loaded",
+        "passed": true,
+        "need_daemon_reload": "no",
+        "exec_start": "<scratch>/r3-verify/prom-work/fake-start-fails/prometheus"
+      },
+      {
+        "gate": "restart",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "restart",
+            "sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "ready",
+        "passed": false,
+        "seconds_after_restart_call": null,
+        "timeout": 30.0
+      }
+    ],
+    "exit": 2
+  },
+  "G6": {
+    "procedure": "switch_gated.py",
+    "arguments": {
+      "unit": "sota-refresh-gate-rehearsal-prometheus.service",
+      "unit_file": "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service",
+      "expected_unit": "<scratch>/r3-verify/prom-work/G6/expected.service",
+      "bin_dir": "<scratch>/r3-verify/prom-work/bin",
+      "from_version": "3.14.0",
+      "from_prefix": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0",
+      "to_version": "3.15.0",
+      "to_revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "to_prefix": "<scratch>/r3-verify/prom-work/fake-serves-3.14.0",
+      "out": "<scratch>/r3-verify/prom-work/G6/out",
+      "port": 29390,
+      "ready_timeout": 30.0,
+      "settle": 20.0
+    },
+    "steps": [
+      {
+        "step": "P0-preflight",
+        "utc": "2026-09-26T10:07:49Z",
+        "unit": {
+          "MainPID": "1687659",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:07:48 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "running": {
+          "version": "3.14.0",
+          "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        },
+        "to_versions": {
+          "prometheus": {
+            "argv": [
+              "<scratch>/r3-verify/prom-work/fake-serves-3.14.0/prometheus",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "prometheus, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          },
+          "promtool": {
+            "argv": [
+              "<scratch>/r3-verify/prom-work/fake-serves-3.14.0/promtool",
+              "--version"
+            ],
+            "exit": 0,
+            "output": "promtool, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets"
+          }
+        },
+        "promtool_check_config": {
+          "argv": [
+            "<scratch>/r3-verify/prom-work/fake-serves-3.14.0/promtool",
+            "check",
+            "config",
+            "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+          ],
+          "exit": 0,
+          "output": "Checking <scratch>/r3-verify/prom-work/config/prometheus.yml\n  SUCCESS: 1 rule files found\n SUCCESS: <scratch>/r3-verify/prom-work/config/prometheus.yml is valid prometheus config file syntax\n\nChecking <scratch>/r3-verify/prom-work/config/rules.yml\n  SUCCESS: 2 rules found"
+        },
+        "live_unit_sha256": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "expected_unit_sha256": "ba312e069b1e7134967bdee669f3b9f5dac62d133b54bd53343b224300932bce"
+      },
+      {
+        "step": "P1-unit-installed",
+        "utc": "2026-09-26T10:07:49Z",
+        "backup": "<scratch>/r3-verify/prom-work/G6/out/backup/sota-refresh-gate-rehearsal-prometheus.service",
+        "mode": "0o644",
+        "sha256_before": "f0c65b37ff33ba9a6ab56813cfabb58e8dec02b905ec1b97d63c8f6eca31383f",
+        "sha256_after": "ba312e069b1e7134967bdee669f3b9f5dac62d133b54bd53343b224300932bce"
+      },
+      {
+        "step": "P3-pre-state",
+        "utc": "2026-09-26T10:07:49Z",
+        "unit": {
+          "MainPID": "1687659",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:07:48 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "<scratch>/r3-verify/prom-work/fake-serves-3.14.0/prometheus"
+        },
+        "buildinfo": {
+          "version": "3.14.0",
+          "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        },
+        "up": [
+          [
+            "gate-rehearsal",
+            "127.0.0.1:29390",
+            "1"
+          ]
+        ],
+        "rules": {
+          "groups": 1,
+          "rules": 2,
+          "health": [
+            "unknown"
+          ],
+          "firing": []
+        },
+        "historical_up_6h": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "1d10957924185ed9e51c85dfe8cb2dc35309f99fb284202f031c23a227dbe926"
+        }
+      },
+      {
+        "step": "P4-post-state",
+        "utc": "2026-09-26T10:08:10Z",
+        "unit": {
+          "MainPID": "1688000",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:07:49 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "<scratch>/r3-verify/prom-work/fake-serves-3.14.0/prometheus"
+        },
+        "buildinfo": {
+          "version": "3.14.0",
+          "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+        },
+        "up": [
+          [
+            "gate-rehearsal",
+            "127.0.0.1:29390",
+            "1"
+          ]
+        ],
+        "rules": {
+          "groups": 1,
+          "rules": 2,
+          "health": [
+            "ok"
+          ],
+          "firing": [
+            "GateRehearsalAlwaysFiring"
+          ]
+        },
+        "historical_up_6h": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "1d10957924185ed9e51c85dfe8cb2dc35309f99fb284202f031c23a227dbe926"
+        }
+      },
+      {
+        "step": "P4-journal",
+        "utc": "2026-09-26T10:08:10Z",
+        "exit": 0,
+        "lines": 76,
+        "warnings": [
+          "time=2026-09-26T06:07:49.558-04:00 level=WARN source=main.go:1249 msg=\"Received an OS signal, exiting gracefully...\" signal=terminated"
+        ]
+      },
+      {
+        "step": "P-failed",
+        "utc": "2026-09-26T10:08:10Z",
+        "error": "GateFailed('acceptance')",
+        "restarted": true,
+        "unit": {
+          "MainPID": "1688000",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:07:49 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "<scratch>/r3-verify/prom-work/fake-serves-3.14.0/prometheus"
+        }
+      },
+      {
+        "step": "R-restore",
+        "utc": "2026-09-26T10:08:11Z",
+        "unit_equals_backup": true,
+        "daemon_reload": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "restart_needed": true,
+        "reset_failed": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "reset-failed",
+            "sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "restart": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "restart",
+            "sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        },
+        "ready_seconds": 0.59,
+        "version_after": "3.14.0",
+        "revision_after": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+        "unit_after": {
+          "MainPID": "1693224",
+          "Result": "success",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "SubState": "running",
+          "ActiveEnterTimestamp": "Sat 2026-09-26 06:08:10 EDT",
+          "NeedDaemonReload": "no",
+          "ExecStartPath": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+        },
+        "restored": true
+      }
+    ],
+    "gates": [
+      {
+        "gate": "unit-active",
+        "passed": true,
+        "value": [
+          "active",
+          "running"
+        ]
+      },
+      {
+        "gate": "unit-has-no-pending-change",
+        "passed": true,
+        "value": "no"
+      },
+      {
+        "gate": "unit-runs-from-prefix",
+        "passed": true,
+        "value": "~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus"
+      },
+      {
+        "gate": "running-from-version",
+        "passed": true,
+        "value": "3.14.0"
+      },
+      {
+        "gate": "to-prefix-reports-to-version",
+        "passed": true
+      },
+      {
+        "gate": "to-promtool-check-config",
+        "passed": true,
+        "config": "<scratch>/r3-verify/prom-work/config/prometheus.yml"
+      },
+      {
+        "gate": "expected-unit-changes-only-the-exec-prefix",
+        "passed": true
+      },
+      {
+        "gate": "unit-installed",
+        "passed": true
+      },
+      {
+        "gate": "verify",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemd-analyze",
+            "--user",
+            "verify",
+            "/run/user/1000/systemd/user/sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "daemon-reload",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "daemon-reload"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "unit-loaded",
+        "passed": true,
+        "need_daemon_reload": "no",
+        "exec_start": "<scratch>/r3-verify/prom-work/fake-serves-3.14.0/prometheus"
+      },
+      {
+        "gate": "restart",
+        "passed": true,
+        "result": {
+          "argv": [
+            "systemctl",
+            "--user",
+            "restart",
+            "sota-refresh-gate-rehearsal-prometheus.service"
+          ],
+          "exit": 0,
+          "output": ""
+        }
+      },
+      {
+        "gate": "ready",
+        "passed": true,
+        "seconds_after_restart_call": 0.6,
+        "timeout": 30.0
+      },
+      {
+        "gate": "new-main-pid",
+        "passed": true,
+        "before": "1687659",
+        "after": "1688000"
+      },
+      {
+        "gate": "version",
+        "passed": false,
+        "value": "3.14.0"
+      },
+      {
+        "gate": "revision",
+        "passed": false,
+        "value": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+      },
+      {
+        "gate": "exec-start",
+        "passed": true,
+        "value": "<scratch>/r3-verify/prom-work/fake-serves-3.14.0/prometheus"
+      },
+      {
+        "gate": "no-automatic-restart",
+        "passed": true,
+        "value": "0"
+      },
+      {
+        "gate": "same-targets",
+        "passed": true
+      },
+      {
+        "gate": "no-target-went-down",
+        "passed": true,
+        "down": []
+      },
+      {
+        "gate": "same-rule-counts",
+        "passed": true
+      },
+      {
+        "gate": "rule-health",
+        "passed": true,
+        "before": [
+          "unknown"
+        ],
+        "after": [
+          "ok"
+        ]
+      },
+      {
+        "gate": "history-unchanged",
+        "passed": true,
+        "before": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "1d10957924185ed9e51c85dfe8cb2dc35309f99fb284202f031c23a227dbe926"
+        },
+        "after": {
+          "series": 1,
+          "samples": 1,
+          "sha256": "1d10957924185ed9e51c85dfe8cb2dc35309f99fb284202f031c23a227dbe926"
+        }
+      },
+      {
+        "gate": "journal-has-no-error",
+        "passed": true,
+        "errors": []
+      }
+    ],
+    "exit": 2
+  }
+}
