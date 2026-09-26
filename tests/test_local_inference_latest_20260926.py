@@ -1108,11 +1108,11 @@ class FakeServer:
 
 
 class EvaluationRun(unittest.TestCase):
-    SECRET = "UNIQUE-SYNTHETIC-FILING-TEXT"
+    FILING_MARKER = "UNIQUE-SYNTHETIC-FILING-TEXT"
 
     def acquisition(self, temp, count=4):
         rows = [{"accession": f"0000000001-20-00000{index}", "labels": ["2.02", "9.01"],
-                 "input": f"{self.SECRET} {index} Item 2.02", "truncated": False} for index in range(count)]
+                 "input": f"{self.FILING_MARKER} {index} Item 2.02", "truncated": False} for index in range(count)]
         payload = b"".join(json.dumps(row, sort_keys=True).encode() + b"\n" for row in rows)
         digest = hashlib.sha256(payload).hexdigest()
         acquisition = Path(temp) / "acq"
@@ -1141,7 +1141,7 @@ class EvaluationRun(unittest.TestCase):
         self.assertIn("The items are", private)
         self.assertIn("exceeds the available context size", private)
         self.assertEqual((metrics["status"], metrics["events"], metrics["segment"]), ("completed", [], 1))
-        self.assertNotIn(self.SECRET, public)
+        self.assertNotIn(self.FILING_MARKER, public)
         self.assertNotIn("The items are", public)
         self.assertNotIn("exceeds the available", public)
         self.assertEqual([f["parse_status"] for f in metrics["filings"]], ["valid", "fenced_valid", "invalid", "invalid"])
@@ -1156,7 +1156,7 @@ class EvaluationRun(unittest.TestCase):
                          {"seed": 0, "temperature": 0.0, "top_k": 1, "top_p": 1.0, "max_tokens": 256,
                           "chat_template_kwargs": {"enable_thinking": False}, "cache_prompt": False, "stream": False})
         content = body["messages"][0]["content"]
-        self.assertIn(f"{self.SECRET} 0 Item 2.02", content)
+        self.assertIn(f"{self.FILING_MARKER} 0 Item 2.02", content)
         self.assertNotIn(EVAL.MARKER, content)
         self.assertTrue(content.startswith("You label a U.S. SEC current report"))
 
