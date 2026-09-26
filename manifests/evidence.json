@@ -12000,8 +12000,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
-      "sha256": "e2db3b75e9ada6acbb3983f37c6fe44dd7f75741479ec026666dd0beeba266ef",
-      "bytes": 32621
+      "sha256": "127a49a9980d02a01a3b917a4b9302fbd8a8c63442ab622cf37669f4df66ed54",
+      "bytes": 32620
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
@@ -12400,8 +12400,8 @@
     },
     {
       "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md",
-      "sha256": "b4f2d6890794c5aa1c19aa14f7b6f28882d985c8ca6494367553de6be5a96b62",
-      "bytes": 3682
+      "sha256": "abeb87a13e2851e37d94cedae01f66f50560a96ea2af41b157a867f75816ff2c",
+      "bytes": 3713
     },
     {
       "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/capture-attempt1-repro.txt",
@@ -34015,8 +34015,8 @@
     },
     {
       "path": "evidence/receipts/ai-memory-241-qualification-20260925.json",
-      "sha256": "4e839b4383fc89514811774c23a5c660f33a764aadfad6f6885684c6eb1fa5ae",
-      "bytes": 13984
+      "sha256": "b65978418ac704d54a1697daa3a527ee928894ec1749b25f883a28595f38a886",
+      "bytes": 14056
     },
     {
       "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
