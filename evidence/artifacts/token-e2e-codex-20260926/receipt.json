@@ -1,0 +1,629 @@
+{
+ "schema_version": 1,
+ "kind": "token_stack_codex_e2e",
+ "host_id": "nativestack-5975wx-20260925",
+ "client": {
+  "codex_cli": "0.155.1",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "max",
+  "invocation": "codex exec -C <dedicated worktree> --json --output-schema schema.json -o final.json <prompt> < /dev/null"
+ },
+ "catalog_revision": "c09dd6df",
+ "question": "Do the selected token-efficiency tools work inside native Codex sessions (the Codex side of #296), and what do Codex-returned usage, the tools' own counters and exact comparisons show?",
+ "window_utc": {
+  "before_capture": "2026-09-26T01:26:26Z",
+  "runs": [
+   "2026-09-26T01:26:43Z",
+   "2026-09-26T13:51:31Z"
+  ],
+  "after_capture": "2026-09-26T13:42:45Z"
+ },
+ "tools": [
+  {
+   "tool": "agentsview",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:52:34Z",
+   "end": "2026-09-26T02:00:15Z",
+   "channel": "CLI",
+   "worked_in_codex": true,
+   "quality_check_passed": true,
+   "answer_excerpt": "Yes. Agentsview reports 51 Codex sessions active on September 25, 2026 in America/New_York. The newest five include this session (codex:<id>). Its briefly autostarted daemon was stopped and confirmed absent.",
+   "notes_excerpt": "Agentsview v0.43.0. Direct no-daemon listing failed; normal listing succeeded with immediate daemon cleanup. Required environment exports and complete commands are recorded in W/run.json; application state stayed under W/data. Baseline is empty. PASS verifies that contract and saved tool evidence; token savings were not measured.",
+   "commands": [
+    "timeout 20 agentsview --help </dev/null",
+    "timeout 20 agentsview session list --help </dev/null",
+    "AGENTSVIEW_NO_DAEMON=1 timeout 120 agentsview sync </dev/null",
+    "timeout 45 agentsview session list --agent codex --active-since 2026-09-25T00:00:00-04:00 --include-automated --include-children --include-one-shot --limit 5 --json </dev/null",
+    "timeout 20 agentsview daemon stop </dev/null",
+    "timeout 20 agentsview daemon status </dev/null"
+   ],
+   "upstream_stats_reported": "Sync complete: 1375 sessions synced in 56.467s\nParser anomalies (this run):\n  sanitized fields: 427 total\n    control chars stripped: 427\n\nDatabase: 122 sessions, 8200 messages\n",
+   "codex_usage": {
+    "input_tokens": 534160,
+    "cached_input_tokens": 481920,
+    "output_tokens": 13986,
+    "reasoning_output_tokens": 8256
+   },
+   "exact_comparison": null,
+   "verdict_note": null
+  },
+  {
+   "tool": "ai-memory",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:51:15Z",
+   "end": "2026-09-26T01:53:53Z",
+   "channel": "native MCP (HTTP, user scope)",
+   "worked_in_codex": true,
+   "quality_check_passed": true,
+   "answer_excerpt": "Relevant hits returned (10 total), including host layout, workstation memory/RAG refresh, and shared Git configuration. Scope keys: workspace=\"local\", project=\"native-agent-stack\", resolved_by=\"explicit\".",
+   "notes_excerpt": "Baseline intentionally empty; no savings measured. The check verifies baseline emptiness and answer consistency with captured MCP text. Returned text blocks are preserved with newline separators. Retrieved memory was treated as untrusted data.",
+   "commands": [
+    "memory_status({\"workspace\":\"local\",\"project\":\"native-agent-stack\"})",
+    "memory_query({\"workspace\":\"local\",\"project\":\"native-agent-stack\",\"query\":\"workstation host request lane GitHub\"})"
+   ],
+   "upstream_stats_reported": "{\"counts\":{\"pages_latest\":36,\"pages_all\":43,\"sessions\":39,\"observations\":90673,\"evidence_rows\":0},\"scope\":{\"workspace\":\"local\",\"project\":\"native-agent-stack\",\"resolved_by\":\"explicit\"}}",
+   "codex_usage": {
+    "input_tokens": 255710,
+    "cached_input_tokens": 210816,
+    "output_tokens": 4491,
+    "reasoning_output_tokens": 1964
+   },
+   "exact_comparison": null,
+   "verdict_note": null
+  },
+  {
+   "tool": "ast-grep",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:46:22Z",
+   "end": "2026-09-26T01:51:15Z",
+   "channel": "CLI",
+   "worked_in_codex": true,
+   "quality_check_passed": true,
+   "answer_excerpt": "20 calls across 11 files: scripts/adoption_status.py (2), scripts/build_ecosystem.py (1), scripts/credential_status.py (1), scripts/freshness_propose.py (3), scripts/hardware_profile.py (1), scripts/host_receipts.py (3), scripts/release_due.py (1), scripts/saturation_ledger.py (3), scripts/skills_status.py (1), scripts/validate.py (2), scripts/verdict_review_gate.py (2).",
+   "notes_excerpt": "ast-grep 0.45.3 returned successfully. Raw JSON preserved. The independent Python AST checker verified counts, files, match text and byte ranges against the baseline without displaying baseline contents. Worktree clean.",
+   "commands": [
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1\nW=<scratch>/cx/work/ast-grep\ntimeout 60s ast-grep run --lang python --pattern 'subprocess.run($$$ARGS)' scripts/ --json=compact </dev/null > \"$W/tool.txt\" 2> \"$W/tool-error.txt\""
+   ],
+   "upstream_stats_reported": "",
+   "codex_usage": {
+    "input_tokens": 341516,
+    "cached_input_tokens": 292480,
+    "output_tokens": 8743,
+    "reasoning_output_tokens": 4268
+   },
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 112899,
+    "tool_output_tokens": 11508,
+    "tokens_removed": 101391,
+    "reduction_percent": 89.8,
+    "baseline_sha256": "6c783111a1bc97979b31d1d1200436399c116b6c6851b7c1c05573259a617ec9",
+    "tool_output_sha256": "8e9829b39cf9c4cd45fa72551eaf108fd4f62dbb2dbd4c9e5420cb8a0f3bebed",
+    "boundary": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's ast-grep task; answer verified against the baseline (PASS)",
+    "recorded_at": "2026-09-26T13:51:53.625127+00:00"
+   },
+   "verdict_note": null
+  },
+  {
+   "tool": "codebase-memory",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:30:39Z",
+   "end": "2026-09-26T01:38:14Z",
+   "channel": "native MCP (user scope)",
+   "worked_in_codex": true,
+   "quality_check_passed": true,
+   "answer_excerpt": "[answer.json](<scratch>/cx/work/codebase-memory/answer.json) \u2014 Ten direct callers across twelve call sites, with names, files, and line numbers.",
+   "notes_excerpt": "Trace missed three callers; the same server's search recovered them. All native responses were preserved, and project deletion was confirmed. The checker validates every call site against the baseline; caller names outside host_receipts.py rely on native symbol metadata. No token-savings claim is made.",
+   "commands": [
+    "index_repository(mode=\"full\", repo_path=\"<scratch>/e2e-codex-root\", name=\"e2e-codex-root-codebase-memory-642a1b80\")",
+    "search_graph(project=\"e2e-codex-root-codebase-memory-642a1b80\", name_pattern=\"^register_file$\")",
+    "trace_path(project=\"e2e-codex-root-codebase-memory-642a1b80\", function_name=\"e2e-codex-root-codebase-memory-642a1b80.scripts.host_receipts.register_file\", direction=\"inbound\", depth=1, include_tests=true, edge_types=[\"CALLS\"])",
+    "search_code(project=\"e2e-codex-root-codebase-memory-642a1b80\", pattern=\"register_file\", file_pattern=\"*.py\", mode=\"compact\")",
+    "search_code(project=\"e2e-codex-root-codebase-memory-642a1b80\", pattern=\"register_file\", file_pattern=\"*.py\", mode=\"full\")",
+    "delete_project(project=\"e2e-codex-root-codebase-memory-642a1b80\")"
+   ],
+   "upstream_stats_reported": "{\"index_repository\":{\"nodes\":149573,\"edges\":251110,\"not_indexed_files_count\":48,\"parse_partial_count\":12,\"parse_unusable_count\":0},\"trace_path\":{\"callers_total\":7},\"search_code\":{\"total_grep_matches\":19,\"total_results\":16,\"elapsed_ms\":271,\"dedup_ratio\":\"1.2x\"}}",
+   "codex_usage": {
+    "input_tokens": 585997,
+    "cached_input_tokens": 517376,
+    "output_tokens": 13438,
+    "reasoning_output_tokens": 7439
+   },
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 22445,
+    "tool_output_tokens": 16109,
+    "tokens_removed": 6336,
+    "reduction_percent": 28.2,
+    "baseline_sha256": "f8895c1e0c9e9a172e5055e151eca26e730ccd7a7aa1dc45a86150a5b4408855",
+    "tool_output_sha256": "53b4e4a70d199627b9d8ec6e0d5b4cc288c9f53e4a06671359abe2acd83f8cd4",
+    "boundary": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's codebase-memory task; answer verified against the baseline (PASS)",
+    "recorded_at": "2026-09-26T13:51:53.948236+00:00"
+   },
+   "verdict_note": null
+  },
+  {
+   "tool": "context-hub",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:45:25Z",
+   "end": "2026-09-26T01:52:34Z",
+   "channel": "CLI",
+   "worked_in_codex": false,
+   "quality_check_passed": false,
+   "answer_excerpt": "Context Hub explains reusing the Node.js idempotencyKey for retries to prevent duplicate operations. Its retrieved guides omit the HTTP header name and retention period, so the required answer cannot be established from tool output.",
+   "notes_excerpt": "All CLI commands exited 0; no execution error occurred. Coverage failure: chub get stripe/api --lang js omitted both required facts; supplemental guides did too. The checker validated the upstream baseline but rejected incomplete answer coverage. Baseline contents were never displayed. Commands used required environment exports, timeouts, and closed stdin.",
+   "commands": [
+    "chub --help",
+    "chub search stripe",
+    "chub get stripe/api --lang js",
+    "chub get stripe/payments --lang js",
+    "chub get stripe/package --lang py",
+    "chub cache status"
+   ],
+   "upstream_stats_reported": "Cache Status\n\n  default (remote)\n    Registry: yes\n    Last updated: 2026-09-26T01:47:23.024Z\n    Full bundle: no\n    Cached files: 3\n    Size: 89.6 KB\n",
+   "codex_usage": {
+    "input_tokens": 665800,
+    "cached_input_tokens": 605312,
+    "output_tokens": 12821,
+    "reasoning_output_tokens": 7347
+   },
+   "exact_comparison": null,
+   "verdict_note": "Content gap: chub's stripe/api and related entries do not state the idempotency header name or retention that the upstream page states."
+  },
+  {
+   "tool": "context-mode",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:38:14Z",
+   "end": "2026-09-26T01:41:47Z",
+   "channel": "native MCP (Context Mode plugin)",
+   "worked_in_codex": true,
+   "quality_check_passed": true,
+   "answer_excerpt": "10 headings; 96 lines matching /token/i. First 10 headings:\n## What qualifies a selection\n## Foundation selection by layer\n## Runtime workers, SDKs and research applications\n## Memory selection and the strongest relevant challengers\n## Setting up a new machine\n## Foundation to the north star\n## Hardware profiles\n## Repository automation and releases\n## How future sessions continue\n## Per-layer ver",
+   "notes_excerpt": "The baseline never entered context. tool.txt preserves the exact returned text, including the server wrapper. One independent checker verified both counts, heading order, and response preservation. W is the directory containing baseline_file.",
+   "commands": [
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1",
+    "timeout 10s mkdir -p \"$W\" </dev/null",
+    "timeout 10s cp docs/grand-catalog-handbook.md \"$W/base.txt\" </dev/null",
+    "ctx_execute_file: exact arguments saved in W/request.json",
+    "ctx_stats({})"
+   ],
+   "upstream_stats_reported": "v1.0.169 reports conversation totals: 544 KB without context-mode versus 652 B with it; estimated tokens 139.2K versus 163; 99.9% kept out. Historical total: 21.8 MB across 4,478 captures and 19 projects. These aggregates are not isolated measurements of this test. Exact stats response saved in W/stats.json.",
+   "codex_usage": {
+    "input_tokens": 226033,
+    "cached_input_tokens": 192000,
+    "output_tokens": 6049,
+    "reasoning_output_tokens": 3374
+   },
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 97952,
+    "tool_output_tokens": 204,
+    "tokens_removed": 97748,
+    "reduction_percent": 99.8,
+    "baseline_sha256": "0a6e88cc5c4776c433eb4af0414e30b970388204bb9e1d36ac73ce22f3db6eec",
+    "tool_output_sha256": "eb929523278301046275b892669abd3b1e41603ad02f10345f3aed3ed6376b37",
+    "boundary": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's context-mode task; answer verified against the baseline (PASS)",
+    "recorded_at": "2026-09-26T13:51:51.885008+00:00"
+   },
+   "verdict_note": null
+  },
+  {
+   "tool": "headroom",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:30:39Z",
+   "end": "2026-09-26T01:39:33Z",
+   "channel": "native MCP (user scope, HEADROOM_OFFLINE=1)",
+   "worked_in_codex": true,
+   "quality_check_passed": true,
+   "answer_excerpt": "774,521 bytes compressed to 56,622 bytes (210,323 \u2192 14,618 Headroom tokens). Retrieval returned 774,521 bytes, byte-identical to the original.",
+   "notes_excerpt": "Headroom 0.37.0. Two compressions: bounded stdio bootstrap and registered native Codex MCP. Lifetime counters include other calls, not just this test. Full commands, sources, and responses retained in W. Checkout unchanged.",
+   "commands": [
+    "git log --stat -150 > W/base.txt",
+    "headroom mcp serve --proxy-url http://127.0.0.1:1",
+    "mcp__headroom__headroom_compress",
+    "mcp__headroom__headroom_retrieve",
+    "headroom savings --json"
+   ],
+   "upstream_stats_reported": "{\"lifetime\":{\"tokens_saved\":579411,\"tokens_before\":662572,\"cost_usd\":1.738233,\"calls\":4,\"savings_percent\":87.4}}",
+   "codex_usage": {
+    "input_tokens": 1032825,
+    "cached_input_tokens": 967424,
+    "output_tokens": 15584,
+    "reasoning_output_tokens": 6524
+   },
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 210316,
+    "tool_output_tokens": 14611,
+    "tokens_removed": 195705,
+    "reduction_percent": 93.1,
+    "baseline_sha256": "5939b5451e55a3744b7a8f299733904979046974a5c2aea340ecb6b3b9149c2c",
+    "tool_output_sha256": "4bc061b8037e984059a9deb39d37a600aad11529c51686e76e765abcced38681",
+    "boundary": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's headroom task; answer verified against the baseline (PASS)",
+    "recorded_at": "2026-09-26T13:51:52.334458+00:00"
+   },
+   "verdict_note": null
+  },
+  {
+   "tool": "jcodemunch",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:30:39Z",
+   "end": "2026-09-26T01:33:18Z",
+   "channel": "native MCP expected; not exposed in this session",
+   "worked_in_codex": false,
+   "quality_check_passed": false,
+   "answer_excerpt": "Could not index scripts or retrieve register_file. Native discovery failed: resources/list failed: unknown MCP server 'jcodemunch'.",
+   "notes_excerpt": "Baseline redirected without displaying it. No index was created, so cleanup was unnecessary. No substitute retrieval tool used.",
+   "commands": [
+    "list_mcp_resources({\"server\":\"jcodemunch\"})"
+   ],
+   "upstream_stats_reported": "Unavailable: get_session_stats was not callable because jcodemunch is unavailable.",
+   "codex_usage": {
+    "input_tokens": 206047,
+    "cached_input_tokens": 167168,
+    "output_tokens": 4361,
+    "reasoning_output_tokens": 2316
+   },
+   "exact_comparison": null,
+   "verdict_note": "Not available to Codex in a fresh worktree: the session's tool list had no jcodemunch tools on both attempts. jCodeMunch is project-scoped by #240, so only the main checkout's project config registers it for Codex."
+  },
+  {
+   "tool": "jcodemunch",
+   "attempt": 2,
+   "exit": 0,
+   "start": "2026-09-26T13:43:35Z",
+   "end": "2026-09-26T13:46:14Z",
+   "channel": "native MCP expected; not exposed in this session",
+   "worked_in_codex": false,
+   "quality_check_passed": false,
+   "answer_excerpt": "jcodemunch tools are not exposed in this session. Matching tool list: []. Direct order invocation failed: TypeError: tools.mcp__jcodemunch__order is not a function. No symbol source was retrieved.",
+   "notes_excerpt": "tool.txt records the dispatch error, not a server response. No index was created. Baseline content was never displayed. The complete 161-tool inventory is saved in <scratch>/cx/work/jcodemunch-rerun/available-tools.json.",
+   "commands": [
+    "tools.mcp__jcodemunch__order({action:\"index_folder\",args:{path:\"<scratch>/e2e-codex-root/scripts\"}})",
+    "tools.mcp__jcodemunch__order({action:\"get_session_stats\",args:{}})"
+   ],
+   "upstream_stats_reported": "Unavailable: get_session_stats invocation failed with TypeError: tools.mcp__jcodemunch__order is not a function.",
+   "codex_usage": {
+    "input_tokens": 175984,
+    "cached_input_tokens": 141952,
+    "output_tokens": 4315,
+    "reasoning_output_tokens": 2030
+   },
+   "exact_comparison": null,
+   "verdict_note": "Not available to Codex in a fresh worktree: the session's tool list had no jcodemunch tools on both attempts. jCodeMunch is project-scoped by #240, so only the main checkout's project config registers it for Codex."
+  },
+  {
+   "tool": "markitdown",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:41:36Z",
+   "end": "2026-09-26T01:45:25Z",
+   "channel": "CLI",
+   "worked_in_codex": true,
+   "quality_check_passed": true,
+   "answer_excerpt": "Local, project, and user.",
+   "notes_excerpt": "Verified byte-identical baseline and all three scope headings. Complete MarkItDown output retained; terminal display was truncated. Raw HTML never entered context. Context-mode's reader rejected the output directory, so Markdown was read directly.",
+   "commands": [
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1",
+    "W=<scratch>/cx/work/markitdown",
+    "timeout 10s mkdir -p \"$W\" </dev/null",
+    "timeout 35s curl -sL --max-time 30 -o \"$W/base.html\" https://code.claude.com/docs/en/mcp </dev/null",
+    "timeout 10s cp \"$W/base.html\" \"$W/base.txt\" </dev/null",
+    "timeout 45s markitdown \"$W/base.html\" -o \"$W/tool.txt\" </dev/null"
+   ],
+   "upstream_stats_reported": "",
+   "codex_usage": {
+    "input_tokens": 269519,
+    "cached_input_tokens": 218880,
+    "output_tokens": 6934,
+    "reasoning_output_tokens": 3487
+   },
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 505768,
+    "tool_output_tokens": 29471,
+    "tokens_removed": 476297,
+    "reduction_percent": 94.2,
+    "baseline_sha256": "d9aa160bd37b04cbec36c313bb0b96d0030347d5fb7037aec2ca4033e4449b29",
+    "tool_output_sha256": "eff9d887a176776477e06b26a188373563a2d06267bac669098872dce424756d",
+    "boundary": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's markitdown task; answer verified against the baseline (PASS)",
+    "recorded_at": "2026-09-26T13:51:54.508225+00:00"
+   },
+   "verdict_note": null
+  },
+  {
+   "tool": "qmd",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:43:31Z",
+   "end": "2026-09-26T01:49:14Z",
+   "channel": "native MCP (user scope)",
+   "worked_in_codex": false,
+   "quality_check_passed": true,
+   "answer_excerpt": "Could not identify the document or step. QMD returned: No results found for \"release tag re-pin new machine\". Broader searches retrieved documents about release comparisons and dataset acquisition, without the requested re-pin instruction.",
+   "notes_excerpt": "PASS verifies the reported retrieval failure and retrieved text against the unread baseline; it does not establish task success. MCP status did not report the index name. Complete call trace saved in commands.json alongside the artifacts.",
+   "commands": [
+    "qmd.query({\"searches\":[{\"type\":\"lex\",\"query\":\"release tag re-pin new machine\"}],\"intent\":\"Find the new-machine release-tag re-pin step.\",\"limit\":1,\"rerank\":false})",
+    "qmd.get({\"file\":\"us-equities-catalog/source-followup.md\",\"fromLine\":1,\"maxLines\":80,\"lineNumbers\":true})",
+    "qmd.get({\"file\":\"us-equities-foundation/catalyst-dataset/README.md\",\"fromLine\":166,\"maxLines\":40,\"lineNumbers\":true})"
+   ],
+   "upstream_stats_reported": "QMD Index Status:\n  Total documents: 121\n  Needs embedding: 121\n  Vector index: no\n  Collections: 2\n    - us-equities-catalog: ~/code/native-agent-stack-live/catalogs/us-equities (22 docs)\n    - us-equities-foundation: ~/code/native-agent-stack-live/blueprints/us-equities (99 docs)",
+   "codex_usage": {
+    "input_tokens": 342880,
+    "cached_input_tokens": 298368,
+    "output_tokens": 10344,
+    "reasoning_output_tokens": 5659
+   },
+   "exact_comparison": null,
+   "verdict_note": "Not answerable from this index: the catalog index covers only the us-equities-catalog and us-equities-foundation collections (121 documents, BM25 only), while the release re-pin step lives in adoption/update.md, which is not indexed."
+  },
+  {
+   "tool": "qmd",
+   "attempt": 2,
+   "exit": 0,
+   "start": "2026-09-26T13:43:35Z",
+   "end": "2026-09-26T13:51:31Z",
+   "channel": "native MCP (user scope)",
+   "worked_in_codex": false,
+   "quality_check_passed": false,
+   "answer_excerpt": "QMD did not establish which document gives the new-machine release-pinning step. Broader queries retrieved release reviews; the exact new-machine hit concerned SEC acquisition.",
+   "notes_excerpt": "No runtime error occurred. The listed query returned exactly: No results found for \"re-pin release\". All 16 queries and returned result counts are recorded in W/queries.json; all 22 MCP calls and responses are in W/calls.json. The checker failed because no supported document and step were identified. No token-savings claim.",
+   "commands": [
+    "mcp__qmd__query({\"searches\":[{\"type\":\"lex\",\"query\":\"re-pin release\"}],\"collections\":[\"us-equities-catalog\",\"us-equities-foundation\"],\"intent\":\"Find the catalog document and exact step telling a new machine how to pin a release tag.\",\"limit\":5,\"rerank\":false})",
+    "mcp__qmd__get({\"file\":\"#c4e39f\",\"fromLine\":1,\"maxLines\":18,\"lineNumbers\":true})"
+   ],
+   "upstream_stats_reported": "QMD Index Status:\n  Total documents: 122\n  Needs embedding: 122\n  Vector index: no\n  Collections: 2\n    - us-equities-foundation: ~/code/native-agent-stack-live/blueprints/us-equities (100 docs)\n    - us-equities-catalog: ~/code/native-agent-stack-live/catalogs/us-equities (22 docs)",
+   "codex_usage": {
+    "input_tokens": 671363,
+    "cached_input_tokens": 605696,
+    "output_tokens": 14584,
+    "reasoning_output_tokens": 9810
+   },
+   "exact_comparison": null,
+   "verdict_note": "Not answerable from this index: the catalog index covers only the us-equities-catalog and us-equities-foundation collections (121 documents, BM25 only), while the release re-pin step lives in adoption/update.md, which is not indexed."
+  },
+  {
+   "tool": "repomix",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:49:14Z",
+   "end": "2026-09-26T01:55:50Z",
+   "channel": "CLI",
+   "worked_in_codex": false,
+   "quality_check_passed": false,
+   "answer_excerpt": "47 visible top-level declarations: clean, iso, parse_time, human_age, private_findings, load_roles, role_spec, requester_status, label_names, item_kind, repository_owner, trust, derive_state, _normalize_label, parse_body, render_body, request_fields, summarize, poll_record, diff_states, notice, check_notify_url, lane_hygiene, find_status_comment, planned_labels, check_actionable, label_plan, gh_en",
+   "notes_excerpt": "Repomix 1.18.1 exited 0 with no CLI error. The quality check exited 1: the visible declaration list differs from the baseline's top-level AST definitions. The pack references status_body without retaining its declaration. Baseline contents never entered context; only the checker read them.",
+   "commands": [
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1\nW=<scratch>/cx/work/repomix\ntimeout 10s cat scripts/host_requests.py scripts/credential_status.py > \"$W/base.txt\" </dev/null\ntimeout 10s wc -c scripts/host_requests.py > \"$W/baseline-host-size.txt\" </dev/null\ntimeout 120s repomix -"
+   ],
+   "upstream_stats_reported": "Total Files: 2 files\nTotal Tokens: 8,799 tokens\nTotal Chars: 33,331 chars\nscripts/host_requests.py (5,857 tokens, 21,868 chars, 66.6%)\nscripts/credential_status.py (2,479 tokens, 9,226 chars, 28.2%)",
+   "codex_usage": {
+    "input_tokens": 352044,
+    "cached_input_tokens": 294400,
+    "output_tokens": 12045,
+    "reasoning_output_tokens": 8357
+   },
+   "exact_comparison": null,
+   "verdict_note": "Lossy for this task: --compress dropped the declaration of status_body while keeping a reference to it, so the declaration list differs from the source's top-level definitions."
+  },
+  {
+   "tool": "rtk",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:41:47Z",
+   "end": "2026-09-26T01:46:22Z",
+   "channel": "standing RTK instructions (Codex has no RTK hook; ~/.codex/AGENTS.md + RTK.md)",
+   "worked_in_codex": true,
+   "quality_check_passed": true,
+   "answer_excerpt": "Newest commit: Host request lane: add the WSL authoring laptop (wsl-authoring-20260923) as a requesting peer (#306)\nUnittest: OK (skipped=1); 49 tests ran.",
+   "notes_excerpt": "tool.txt contains the exact concatenated output of the six measured RTK commands. The checker privately compares the commit subject, unittest result and test count with base.txt. RTK statistics are cumulative for the project, not an isolated run delta.",
+   "commands": [
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1; timeout 10s cat ~/.codex/RTK.md </dev/null",
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1; timeout 10s rtk cat ~/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md ~/.agents/skills/verification-before-completion/SKILL.md </dev/null",
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1; timeout 10s rtk --version </dev/null",
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1; timeout 10s rtk mkdir -p '<scratch>/cx/work/rtk' </dev/null",
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1; timeout 60s rtk git log -30 </dev/null",
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1; timeout 60s rtk git status </dev/null",
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1; timeout 60s rtk git diff HEAD~5 --stat </dev/null",
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1; timeout 60s rtk grep -rn \"def register_file\" scripts </dev/null"
+   ],
+   "upstream_stats_reported": "{\n  \"summary\": {\n    \"total_commands\": 41,\n    \"total_input\": 45522,\n    \"total_output\": 27740,\n    \"total_saved\": 17782,\n    \"avg_savings_pct\": 39.06243135187382,\n    \"total_time_ms\": 6571,\n    \"avg_time_ms\": 160\n  }\n}",
+   "codex_usage": {
+    "input_tokens": 316572,
+    "cached_input_tokens": 276480,
+    "output_tokens": 8088,
+    "reasoning_output_tokens": 3958
+   },
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 25386,
+    "tool_output_tokens": 4278,
+    "tokens_removed": 21108,
+    "reduction_percent": 83.1,
+    "baseline_sha256": "9c2e4e94e8b718541271823a9f6ec42653ed2f742d9d1c688eab3700ab73f330",
+    "tool_output_sha256": "4e8cb518f78cb024e28f9ed6e31eb832e3dbf33622cb171d441ed995df00b1c4",
+    "boundary": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's rtk task; answer verified against the baseline (PASS)",
+    "recorded_at": "2026-09-26T13:51:51.515471+00:00"
+   },
+   "verdict_note": null
+  },
+  {
+   "tool": "serena",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:33:18Z",
+   "end": "2026-09-26T01:41:36Z",
+   "channel": "native MCP (user scope, --project-from-cwd)",
+   "worked_in_codex": true,
+   "quality_check_passed": true,
+   "answer_excerpt": "Definition: scripts/host_receipts.py:643-660 (one-based, inclusive). 12 call sites across 6 files: scripts/component_matrix.py (2), scripts/freshness_propose.py (2), scripts/hardware_profile.py (1), scripts/host_receipts.py (2), scripts/new_host_grand_list.py (1), tests/test_host_receipts.py (4). Two import references excluded.",
+   "notes_excerpt": "All seven Serena responses retained unchanged as JSONL. Initial checker failures involved docstring parsing; corrected without changing the answer. Exact calls and check attempts are recorded beside the artifacts.",
+   "commands": [
+    "serena.find_symbol(name_path_pattern=\"register_file\", relative_path=\"scripts/host_receipts.py\", include_body=true)",
+    "serena.find_referencing_symbols(name_path=\"register_file\", relative_path=\"scripts/host_receipts.py\")"
+   ],
+   "upstream_stats_reported": "No stats output returned.",
+   "codex_usage": {
+    "input_tokens": 663883,
+    "cached_input_tokens": 609920,
+    "output_tokens": 14966,
+    "reasoning_output_tokens": 9028
+   },
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 22445,
+    "tool_output_tokens": 7810,
+    "tokens_removed": 14635,
+    "reduction_percent": 65.2,
+    "baseline_sha256": "7ae7f2347b23c2f6df35342c2526729e711b01976f15d8b8eaf7db80213e5abc",
+    "tool_output_sha256": "859d7145f9a514b5cedd3ce618b23bf21243cf4aff3f5594c401dd2a9ca26d06",
+    "boundary": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's serena task; answer verified against the baseline (PASS)",
+    "recorded_at": "2026-09-26T13:51:52.649759+00:00"
+   },
+   "verdict_note": null
+  },
+  {
+   "tool": "socraticode",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:39:33Z",
+   "end": "2026-09-26T01:43:31Z",
+   "channel": "native MCP (user scope)",
+   "worked_in_codex": true,
+   "quality_check_passed": true,
+   "answer_excerpt": "A request is trusted only if author_association == \"OWNER\", user.type == \"User\", performed_via_github_app is present and null, and user.login matches the resolved repository owner case-insensitively. Missing or failed checks reject trust. Labels, titles, body text, and requesting-host values do not grant trust.",
+   "notes_excerpt": "Source: scripts/host_requests.py:221-239, retrieved without reindexing. tool.txt preserves the complete MCP response as JSON. Baseline contents never entered context. The synthetic check matches the retrieved function against the baseline and verifies trust conditions; owner resolution is stubbed. This is local verification, not upstream acceptance.",
+   "commands": [
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1\ntimeout 10s mkdir -p <scratch>/cx/work/socraticode </dev/null\ntimeout 10s cat ~/code/native-agent-stack-live/scripts/host_requests.py ~/code/native-agent-stack-live/recipes/host-request-lane.md </dev/null > <scratch>/cx/work/socrat",
+    "socraticode.codebase_status({\"projectPath\":\"~/code/native-agent-stack-live\"})",
+    "socraticode.codebase_search({\"projectPath\":\"~/code/native-agent-stack-live\",\"query\":\"How does the host request lane decide whether a GitHub request is trusted? author_association user.type\",\"fileFilter\":\"scripts/host_requests.py\",\"limit\":3})"
+   ],
+   "upstream_stats_reported": "Project: ~/code/native-agent-stack-live\nCollection: codebase_9c518b2ee5c8\nStatus: green\nIndexed chunks: 72282\n\nFile watcher: active (watched by another process)\n\nCode graph: 1032 files, 409 edges\n  Last built: 197s ago",
+   "codex_usage": {
+    "input_tokens": 194846,
+    "cached_input_tokens": 161152,
+    "output_tokens": 7284,
+    "reasoning_output_tokens": 4077
+   },
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 16096,
+    "tool_output_tokens": 1505,
+    "tokens_removed": 14591,
+    "reduction_percent": 90.6,
+    "baseline_sha256": "9402b47b5ddaad9eb58187474d8b8d8c78e62f4395e2a5bac7869a247590c80a",
+    "tool_output_sha256": "e9ce35401283542159c7cfbc1d518ac1555ddae253b85a077b64afad7e8b38a5",
+    "boundary": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's socraticode task; answer verified against the baseline (PASS)",
+    "recorded_at": "2026-09-26T13:51:52.959568+00:00"
+   },
+   "verdict_note": null
+  },
+  {
+   "tool": "toon",
+   "attempt": 1,
+   "exit": 0,
+   "start": "2026-09-26T01:26:43Z",
+   "end": "2026-09-26T01:30:33Z",
+   "channel": "CLI",
+   "worked_in_codex": true,
+   "quality_check_passed": true,
+   "answer_excerpt": "60 rows. The strict round trip is exact.",
+   "notes_excerpt": "@toon-format/cli v4.1.1. Row count came from the TOON header; Python verified it and JSON equality against the baseline. Baseline contents never entered context.",
+   "commands": [
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1",
+    "W=<scratch>/cx/work/toon",
+    "timeout 30s toon \"$W/base.txt\" --stats -o \"$W/tool.txt\" </dev/null 2> \"$W/stats.txt\"",
+    "timeout 30s toon \"$W/tool.txt\" --decode --strict -o \"$W/roundtrip.json\" </dev/null"
+   ],
+   "upstream_stats_reported": "\u25cf Token estimates: ~2001 (JSON) \u2192 ~964 (TOON)\n\u2714 Saved ~1037 tokens (-51.8%)",
+   "codex_usage": {
+    "input_tokens": 249836,
+    "cached_input_tokens": 211968,
+    "output_tokens": 6873,
+    "reasoning_output_tokens": 4103
+   },
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 1642,
+    "tool_output_tokens": 907,
+    "tokens_removed": 735,
+    "reduction_percent": 44.8,
+    "baseline_sha256": "7bb4fc20e7af6ceefed74c84e5010dbc7ef62f352bab4240df3d371bec586817",
+    "tool_output_sha256": "a14e3fceed3744b56754524522a63f6b9332543a849a26229464132738ff2aeb",
+    "boundary": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's toon task; answer verified against the baseline (PASS)",
+    "recorded_at": "2026-09-26T13:51:53.255510+00:00"
+   },
+   "verdict_note": null
+  }
+ ],
+ "counters": {
+  "rtk_gain_codex_worktree_only": {
+   "before": {
+    "total_commands": 0,
+    "total_input": 0,
+    "total_output": 0,
+    "total_saved": 0,
+    "avg_savings_pct": 0.0,
+    "total_time_ms": 0,
+    "avg_time_ms": 0
+   },
+   "after": {
+    "total_commands": 41,
+    "total_input": 45522,
+    "total_output": 27740,
+    "total_saved": 17782,
+    "avg_savings_pct": 39.06243135187382,
+    "total_time_ms": 6571,
+    "avg_time_ms": 160
+   },
+   "note": "Isolated by working directory, so attributable to this run."
+  },
+  "headroom_savings_lifetime_host_wide": {
+   "before": {
+    "tokens_saved": 188001,
+    "tokens_before": 241926,
+    "cost_usd": 0.564003,
+    "calls": 2,
+    "savings_percent": 77.7
+   },
+   "after": {
+    "tokens_saved": 579411,
+    "tokens_before": 662572,
+    "cost_usd": 1.738233,
+    "calls": 4,
+    "savings_percent": 87.4
+   },
+   "note": "Host-wide. The after snapshot was taken about 12 hours after the runs, and other sessions compressed in between, so the delta is not attributable to this run."
+  },
+  "context_mode_codex_stats_delta_host_wide": {
+   "total_calls": 2001,
+   "kept_out": 62598492,
+   "bytes_returned": 19148957
+  }
+ },
+ "codex_usage_total": {
+  "input_tokens": 7085015,
+  "cached_input_tokens": 6253312,
+  "output_tokens": 164906,
+  "reasoning_output_tokens": 91997
+ },
+ "corrections_to_296": [
+  "QMD: the Claude worker's PASS verified only that the text it quoted exists in the document it retrieved. That document (catalogs/us-equities/engines-strategies.md) does not describe how a new machine pins a release; the catalog index does not include adoption/update.md, which does. The QMD row in #296 is therefore a retrieval that returned a wrong document for this question, not a correct answer."
+ ],
+ "retained_failures": [
+  "context-hub (attempt 1): Content gap: chub's stripe/api and related entries do not state the idempotency header name or retention that the upstream page states.",
+  "jcodemunch (attempt 1): Not available to Codex in a fresh worktree: the session's tool list had no jcodemunch tools on both attempts. jCodeMunch is project-scoped by #240, so only the main checkout's project config registers it for Codex.",
+  "jcodemunch (attempt 2): Not available to Codex in a fresh worktree: the session's tool list had no jcodemunch tools on both attempts. jCodeMunch is project-scoped by #240, so only the main checkout's project config registers it for Codex.",
+  "qmd (attempt 1): Not answerable from this index: the catalog index covers only the us-equities-catalog and us-equities-foundation collections (121 documents, BM25 only), while the release re-pin step lives in adoption/update.md, which is not indexed.",
+  "qmd (attempt 2): Not answerable from this index: the catalog index covers only the us-equities-catalog and us-equities-foundation collections (121 documents, BM25 only), while the release re-pin step lives in adoption/update.md, which is not indexed.",
+  "repomix (attempt 1): Lossy for this task: --compress dropped the declaration of status_body while keeping a reference to it, so the declaration list differs from the source's top-level definitions."
+ ]
+}

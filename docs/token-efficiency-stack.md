@@ -336,6 +336,14 @@ lists which checks have a recorded failing control and which do not yet.
   not been observed. The observed response marked the absence as not citable because the
   worktree had uncommitted changes, which changes only the size of that metadata.
 
+**Codex side (2026-09-26).** Native `codex exec` sessions on gpt-6-astra, at effort `max`, reached 11 of 15 tools with passing checks. RTK counted +17,782 saved for its run-only worktree. The four failures are real limits:
+- jCodeMunch is project-scoped (#240), so Codex in a fresh worktree does not have it.
+- QMD's catalog index does not include `adoption/`.
+- Repomix `--compress` dropped a declaration.
+- Context Hub lacked the facts upstream states.
+
+The run also corrects #296's QMD row. See [the Codex receipt](../evidence/artifacts/token-e2e-codex-20260926/README.md).
+
 ## Reproduce on another PC
 
 1. Clone the canonical repository and open the offline HTML. Choose the relevant
