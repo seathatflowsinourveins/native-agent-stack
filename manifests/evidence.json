@@ -3311,8 +3311,8 @@
     },
     {
       "path": "adoption/hardware-profiles.json",
-      "sha256": "1ae1b362bf1ee47c4513ef66d452dddc363aa011dd818f703fc7b4d9d3a224a4",
-      "bytes": 11640
+      "sha256": "ea6ac494269949a3d326297d2cb13fd06c91b39ce64a1e27e09e4313edf874ec",
+      "bytes": 11998
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -25094,6 +25094,11 @@
       "path": "evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json",
       "sha256": "72a7c81bbb51decff438f40d6ac1a5756b6b14dc8a691a58380d368f7c15028e",
       "bytes": 2069
+    },
+    {
+      "path": "evidence/artifacts/hw-profiles/wsl-authoring-20260923/profile.json",
+      "sha256": "c3926e64aa7bc852dd3ab2034aafb41486192584818b7303e8f0aa2508a9d51c",
+      "bytes": 2065
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",

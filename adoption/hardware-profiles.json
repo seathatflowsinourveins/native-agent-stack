@@ -203,6 +203,13 @@
       "evidence_class": "native_proven",
       "evidence": "evidence/artifacts/hw-profiles/mac-coordinator-64gb-20260925/profile.json",
       "note": "Actual scripts/hardware_profile.py output for this host, written by scripts/hardware_profile.py --record-host."
+    },
+    {
+      "id": "wsl-authoring-20260923",
+      "label": "WSL2 authoring laptop (measured)",
+      "evidence_class": "native_proven",
+      "evidence": "evidence/artifacts/hw-profiles/wsl-authoring-20260923/profile.json",
+      "note": "Actual scripts/hardware_profile.py output for this host, written by scripts/hardware_profile.py --record-host."
     }
   ]
 }
