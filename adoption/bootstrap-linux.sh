@@ -209,14 +209,24 @@ cleanup() {
 }
 trap cleanup EXIT
 
+verify_sha256() {
+  # Prefer macOS's native checker when available; Linux also supports the
+  # GNU coreutils fallback. Both consume checksum lines on standard input.
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 --check --status
+  else
+    sha256sum --check --status
+  fi
+}
+
 fetch() {
   local url="$1" checksum="$2" destination="$3"
-  if [[ -f "$destination" ]] && printf '%s  %s\n' "$checksum" "$destination" | sha256sum --check --status; then
+  if [[ -f "$destination" ]] && printf '%s  %s\n' "$checksum" "$destination" | verify_sha256; then
     return
   fi
   curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \
     "$url" --output "$destination.partial"
-  printf '%s  %s\n' "$checksum" "$destination.partial" | sha256sum --check --status || {
+  printf '%s  %s\n' "$checksum" "$destination.partial" | verify_sha256 || {
     printf 'Checksum mismatch: %s\n' "$url" >&2; exit 1
   }
   mv -- "$destination.partial" "$destination"
@@ -472,9 +482,9 @@ install_uv_tool_from_git() {
 # as an argument is not misclassified.
 # recipes/README.md#native-context-mode-and-hooks excludes all four through
 # rtk's own config (evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt).
-# A duplicate exclude_commands key is invalid TOML and rtk silently falls back
-# to defaults, so the reminder fires on a duplicate too and says to replace,
-# not add, the line.
+# A duplicate key or table is invalid TOML and rtk silently falls back to
+# defaults, so the reminder says to replace the whole value inside the existing
+# [hooks] table, adding the key or table only when missing.
 # The text check alone is not enough (2026-09-26, Codex review of #314): rtk
 # also ignores a TOML-valid file that does not deserialize, for example a
 # [tracking] table without history_days (TrackingConfig, src/core/config.rs
@@ -502,7 +512,7 @@ rtk_config_reminder() {
     done
     [[ -n "$hint" ]] || return 0
   fi
-  printf 'Reminder: for the Claude hook, replace any existing exclude_commands line in %s with [hooks] exclude_commands = ["^git show [^ ]*:", "diff", '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\\n]*\s)?[^\s]*:'"'"', '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"'"'] (a duplicate key is invalid TOML and rtk silently loads defaults; recipes/README.md#native-context-mode-and-hooks); this script does not write it.%s\n' "$config" "$hint"
+  printf 'Reminder: for the Claude hook, in %s, inside the existing [hooks] table replace the whole exclude_commands value (from "exclude_commands =" through its closing "]"), or add the key if the table lacks it. Add the [hooks] header line only when the file has no [hooks] table. Use: exclude_commands = ["^git show [^ ]*:", "diff", '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\\n]*\s)?[^\s]*:'"'"', '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"'"'] (a duplicate key or table is invalid TOML and rtk silently loads defaults; recipes/README.md#native-context-mode-and-hooks); this script does not write it.%s\n' "$config" "$hint"
 }
 
 install_pin() {

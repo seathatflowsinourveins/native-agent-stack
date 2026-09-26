@@ -2,7 +2,7 @@
   "schema_version": 1,
   "reviewed_at": "2026-09-22",
   "platform": "macos-arm64",
-  "source": "Drafted for the macos-arm64-foundation profile on 2026-09-22, updated 2026-09-23, from a Linux workstation: no macOS host executed anything here. Every sha256 below was obtained from the publisher, never guessed. Node, uv, gh and ai-memory come from the publisher's own checksum file or .sha256 sidecar; llama.cpp and Qdrant publish no checksum file for these assets, so each asset's GitHub release `digest` field was read via `gh api repos/<owner>/<repo>/releases/tags/<tag>` and the asset was additionally downloaded to a scratch directory under $TMPDIR and re-hashed with sha256sum (both agreed). The five npm registry tarballs (codex, claude-code, mcporter, context-mode, socraticode) are byte-identical to what `npm view <pkg>@<ver> dist.integrity` reports, cross-checked by downloading each tarball to a scratch directory and independently sha256- and sha512-hashing it; four of the five are also byte-identical to the ones pinned in adoption/pins-linux-x86_64.json (socraticode has no linux-x86_64 pins entry: recipes/README.md documents it there as a manual --ignore-scripts recipe rather than a pins-file entry). codex and claude-code each additionally carry a `platform_dependency`: the darwin-arm64 optional dependency npm itself resolves and installs alongside the pinned wrapper tarball, read 2026-09-23 with `npm view <pkg>@<ver> optionalDependencies` for its identity and `npm view <resolved-package>@<resolved-version> dist.tarball`/`dist.integrity` for its url/integrity, each independently re-downloaded and sha256/sha512-hashed to confirm. It is never installed by trusting npm's own automatic resolution of it (unverified) or by reading back npm's install state afterward (measured directly on this project's own host: npm 11.19.0's `--global --prefix` install writes no lockfile anywhere under the prefix and no package.json `_integrity` field, nests a platform-specific optional dependency under the wrapper's own node_modules regardless of --omit=optional/--no-optional/NPM_CONFIG_OMIT=optional, and overwrites a pre-placed nested copy during its own install pass). adoption/bootstrap-macos.sh's install_platform_dependency instead fetches and SHA-256 verifies the platform tarball itself with the same fetch() every other pin uses, then OVERWRITES the unverified nested copy npm's own install just fetched at the exact path Node's own require.resolve (scoped to the wrapper's own directory, and matched against the exact expected nested path -- never trusted if it resolves anywhere else, since require.resolve's GLOBAL_FOLDERS fallback can point outside the prefix entirely) finds it from, falling back to a top-level alias only when nothing is nested there at all; it then re-verifies both the resolved path and the resolved package's own name against this pin's `resolved_package` before running `npm rebuild` to trigger any lifecycle script the wrapper's own --ignore-scripts install deferred. Versions match pins-linux-x86_64.json wherever the component is the same.",
+  "source": "Drafted for the macos-arm64-foundation profile on 2026-09-22, updated 2026-09-23, from a Linux workstation: no macOS host executed anything here. Every sha256 below was obtained from the publisher, never guessed. Node, uv, gh and ai-memory come from the publisher's own checksum file or .sha256 sidecar; llama.cpp and Qdrant publish no checksum file for these assets, so each asset's GitHub release `digest` field was read via `gh api repos/<owner>/<repo>/releases/tags/<tag>` and the asset was additionally downloaded to a scratch directory under $TMPDIR and re-hashed with sha256sum (both agreed). The npm registry tarballs pinned here before 2026-09-26 (codex, mcporter, context-mode, socraticode; claude-code was a fifth until 2026-09-23, when it became a `native` pin whose own checksum_ref records its verification) are byte-identical to what `npm view <pkg>@<ver> dist.integrity` reports, cross-checked by downloading each tarball to a scratch directory and independently sha256- and sha512-hashing it. codex, context-mode and socraticode are also byte-identical to their adoption/pins-linux-x86_64.json entries (the Linux pins file gained its socraticode entry after v2026.09.25.2, later than this file's); mcporter was byte-identical when pinned, but its Linux entry has since moved to a newer version (the exception below). codex additionally carries a `platform_dependency` (claude-code carried one too until its move to the native pin): the darwin-arm64 optional dependency npm itself resolves and installs alongside the pinned wrapper tarball, read 2026-09-23 with `npm view <pkg>@<ver> optionalDependencies` for its identity and `npm view <resolved-package>@<resolved-version> dist.tarball`/`dist.integrity` for its url/integrity, each independently re-downloaded and sha256/sha512-hashed to confirm. It is never installed by trusting npm's own automatic resolution of it (unverified) or by reading back npm's install state afterward (measured directly on this project's own host: npm 11.19.0's `--global --prefix` install writes no lockfile anywhere under the prefix and no package.json `_integrity` field, nests a platform-specific optional dependency under the wrapper's own node_modules regardless of --omit=optional/--no-optional/NPM_CONFIG_OMIT=optional, and overwrites a pre-placed nested copy during its own install pass). adoption/bootstrap-macos.sh's install_platform_dependency instead fetches and SHA-256 verifies the platform tarball itself with the same fetch() every other pin uses, then OVERWRITES the unverified nested copy npm's own install just fetched at the exact path Node's own require.resolve (scoped to the wrapper's own directory, and matched against the exact expected nested path -- never trusted if it resolves anywhere else, since require.resolve's GLOBAL_FOLDERS fallback can point outside the prefix entirely) finds it from, falling back to a top-level alias only when nothing is nested there at all; it then re-verifies both the resolved path and the resolved package's own name against this pin's `resolved_package` before running `npm rebuild` to trigger any lifecycle script the wrapper's own --ignore-scripts install deferred. Versions match pins-linux-x86_64.json wherever the component is the same, except ai-memory (2.3.2 here, 2.4.1 there) and mcporter (0.13.13 here, 0.14.1 there), which stay at their earlier versions until a Mac qualifies the newer ones (tests/test_adoption_bootstrap_macos.py's MAC_PIN_LAGS_LINUX). 2026-09-26 addition, after the v2026.09.26 release: rtk, qmd, repomix, toon, ccusage, headroom, markitdown and serena close the rest of the `token-efficiency` profile's macOS pin gap (6 of its 14 components were pinned here before; adoption/README.md's coverage cell), each at its pins-linux-x86_64.json version. Each was re-verified on 2026-09-26 from a fresh download of the upstream artifact, retained in evidence/artifacts/macos-token-pins-20260926/digest-check.txt: rtk's darwin-arm64 tarball against the v0.50.0 release's own checksums.txt and the GitHub release asset digest; the four npm tarballs (qmd, repomix, toon, ccusage) against `npm view <pkg>@<ver>` dist.integrity (sha512) and dist.shasum (sha1), byte-identical to their Linux pins (the same registry-tarball cross-check the npm pins above use); headroom's and markitdown's PyPI files against the PyPI JSON API's own sha256 digests; serena's commit through the GitHub commits API. qmd's `sqlite-vec-darwin-arm64` and ccusage's `@ccusage/ccusage-darwin-arm64` optional dependencies are documented, unpinned gaps like the `rolldown` note in the mcporter entry's install_note below, not new install machinery. headroom pins its `macosx_11_0_arm64` wheel: headroom-ai 0.37.0 publishes compiled abi3 wheels per platform plus a maturin (Rust) sdist that would need a local Rust build, and that wheel is its only arm64-compatible macOS wheel, so it is what uv installs on Apple Silicon. markitdown pins the same platform-independent sdist as the Linux pin (pure Python; uv installs its py3-none-any wheel). The bootstrap downloads headroom's wheel and verifies its sha256 with `shasum -a 256` before uv installs that local file (install_uv_tool's wheel path, ported from adoption/bootstrap-linux.sh after its #334 change); uv resolves markitdown from PyPI by name and version and does not check its sdist sha256, which stays an independent artifact cross-check. Both satisfy this file's fail-closed null-sha256 refusal. serena has no PyPI release of its declared 2.0.0.dev0 version, so it repeats the Linux pin's source pin: the 40-hex commit c6fbd1c5932df2494ffa0020af5a9fbe80b82143 on oraios/serena with a null sha256, the one documented exception in this file, as in the Linux pins file. adoption/bootstrap-macos.sh gained the `uv-tool` and `uv-tool-from-git` install kinds, whose two functions are copied verbatim from adoption/bootstrap-linux.sh, and a post-install rtk reminder whose config check is that script's four-entry exclude_commands text check, applied to ~/Library/Application Support/rtk/config.toml, the file rtk 0.50.0 reads on macOS (the rtk entry's install_note); tests/test_adoption_bootstrap_macos.py runs all three functions under a real bash 3.2. None of the eight new version_probe entries starts a server.",
   "tools": [
     {
       "id": "node",
@@ -199,6 +199,145 @@
       "version_probe": {
         "method": "npm-metadata",
         "note": "No argument parsing at all: every invocation, --help and --version included, starts its MCP stdio server (dist/index.js never reads process.argv; observed 2026-09-25 with socraticode 1.14.0), so the package version is read from npm metadata instead."
+      }
+    },
+    {
+      "id": "rtk",
+      "version": "0.50.0",
+      "kind": "tarball",
+      "url": "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-aarch64-apple-darwin.tar.gz",
+      "sha256": "fe54761a9950266e3a78ddb66a8af5e067251169da306a288e0751de63d836fe",
+      "checksum_source": "publisher_checksum_file",
+      "checksum_ref": "rtk-ai/rtk release v0.50.0: the checksums.txt line for rtk-aarch64-apple-darwin.tar.gz and the release's GitHub API asset digest (`gh api repos/rtk-ai/rtk/releases/tags/v0.50.0`) both give this sha256; the asset (4,122,143 bytes) was downloaded fresh and re-hashed, matching both, on 2026-09-26 (evidence/artifacts/macos-token-pins-20260926/digest-check.txt). Same version and verification method as adoption/pins-linux-x86_64.json's rtk entry, for a different platform asset, so a different hash.",
+      "install_note": "2026-09-26 addition to complete the `token-efficiency` profile's macOS pin coverage (6 of 14 before; see adoption/README.md). The archive holds exactly one entry, the bare `rtk` executable with no wrapping directory (listed from the downloaded asset, evidence/artifacts/macos-token-pins-20260926/digest-check.txt), so the existing single-binary tarball installer (`install_single_binary_tarball`) applies unchanged. A host that runs the Claude RTK hook at this pin also needs the four-entry `[hooks] exclude_commands` value from recipes/README.md#native-context-mode-and-hooks in ~/Library/Application Support/rtk/config.toml, the only config file rtk 0.50.0 reads on macOS: its path is dirs::config_dir()/rtk/config.toml (src/core/config.rs:495-498 at the v0.50.0 tag commit), the dirs 5.0.1 crate its Cargo.lock pins resolves that to $HOME/Library/Application Support on macOS whatever XDG_CONFIG_HOME says, and rtk reads no config-path variable of its own (evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt). There, replace the key's whole value inside the existing `[hooks]` table, and add the `[hooks]` header only when the file has no `[hooks]` table (a second `[hooks]` header or `exclude_commands` key is invalid TOML and rtk silently loads defaults). After installing rtk this script prints a reminder unless that key appears exactly once with all four entries in that file; it never writes the file. `rtk config` prints the file rtk reads on its first line and exits 1 when rtk cannot load it, as the same retained check shows on the pinned Linux binary.",
+      "version_probe": {
+        "method": "exec",
+        "command": "rtk",
+        "args": [
+          "--version"
+        ]
+      }
+    },
+    {
+      "id": "qmd",
+      "version": "2.8.3",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/@tobilu/qmd/-/qmd-2.8.3.tgz",
+      "sha256": "2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0",
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "npm view @tobilu/qmd@2.8.3 dist.integrity = sha512-zjfVwrObPB618B6x8SdhlGv/tX9OxRHsbQnr5DUtBvqPK6HGQ27lM+9/BAY5okpjrHVnW56hLyDkqoTcsrVLzA==, dist.shasum = 7e1515b1daf349a1dc88cff53da925d34f89c948 (read 2026-09-26); the tarball was downloaded fresh and its sha512, sha1 and sha256 computed, all matching (evidence/artifacts/macos-token-pins-20260926/digest-check.txt). The sha256 equals adoption/pins-linux-x86_64.json's qmd entry (byte-identical, platform-independent npm package).",
+      "install_note": "2026-09-26 addition to complete the `token-efficiency` profile's macOS pin coverage. UNPINNED NATIVE OPTIONAL DEPENDENCY: `npm view @tobilu/qmd@2.8.3 optionalDependencies` (2026-09-26) lists `sqlite-vec-darwin-arm64@0.1.9` among five per-platform sqlite-vec builds; npm resolves the one matching this platform at install time, outside this hash -- the same documented, unpinned gap as this file's own `mcporter` pin's `rolldown`/`@rolldown/binding-darwin-arm64` note above. `npm install --global --prefix tools/qmd-2.8.3 @tobilu/qmd@2.8.3`, matching recipes/README.md and the Linux pin. Requires Node >=24, satisfied by the node pin above.",
+      "version_probe": {
+        "method": "exec",
+        "command": "qmd",
+        "args": [
+          "--version"
+        ]
+      }
+    },
+    {
+      "id": "repomix",
+      "version": "1.18.1",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/repomix/-/repomix-1.18.1.tgz",
+      "sha256": "d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f",
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "npm view repomix@1.18.1 dist.integrity = sha512-XtV1qD6akJSigQ3fBRex5v+rWcGa4i9cm2FL/M/PEtzO3u1uDiso3CtNbhlZiMIqJstAdy8mj2m1ynOzNnNB3g==, dist.shasum = cb543d57d9021c1f43e0f484900ffc70aaa03ae3 (read 2026-09-26); the tarball was downloaded fresh and its sha512, sha1 and sha256 computed, all matching (evidence/artifacts/macos-token-pins-20260926/digest-check.txt). The sha256 equals adoption/pins-linux-x86_64.json's repomix entry (byte-identical, platform-independent npm package; no optionalDependencies on the registry).",
+      "install_note": "2026-09-26 addition to complete the `token-efficiency` profile's macOS pin coverage. `npm install --global --prefix tools/repomix-1.18.1 repomix@1.18.1`, matching recipes/README.md and the exact version manifests/stack.json already pins.",
+      "version_probe": {
+        "method": "exec",
+        "command": "repomix",
+        "args": [
+          "--version"
+        ]
+      }
+    },
+    {
+      "id": "toon",
+      "version": "4.1.1",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/@toon-format/cli/-/cli-4.1.1.tgz",
+      "sha256": "93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6",
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "npm view @toon-format/cli@4.1.1 dist.integrity = sha512-64wRbxe8C8k0D70gAdYZkiv0Atp/I4D0VlKQkc+IJ591hX8D54+///l/+4QM/Ato9+RJ1xJbNdfCaylcmpaLvQ==, dist.shasum = fb096d6d22e0e1cfdd931a30aba7aa6fcaf7f248 (read 2026-09-26); the tarball was downloaded fresh and its sha512, sha1 and sha256 computed, all matching (evidence/artifacts/macos-token-pins-20260926/digest-check.txt). The sha256 equals adoption/pins-linux-x86_64.json's toon entry (byte-identical, platform-independent npm package; no optionalDependencies on the registry).",
+      "install_note": "2026-09-26 addition to complete the `token-efficiency` profile's macOS pin coverage. `npm install --global --prefix tools/toon-4.1.1 @toon-format/cli@4.1.1`, matching recipes/README.md and the exact version manifests/stack.json already pins.",
+      "version_probe": {
+        "method": "exec",
+        "command": "toon",
+        "args": [
+          "--version"
+        ]
+      }
+    },
+    {
+      "id": "ccusage",
+      "version": "20.0.24",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/ccusage/-/ccusage-20.0.24.tgz",
+      "sha256": "69787a0aa2269cd14f3d0f41d179b80744d5384e912ee11852897ecd0bf91183",
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "npm view ccusage@20.0.24 dist.integrity = sha512-sHq7axM0ucbFS4m5xFzS7NxYSmOP1+PSDup3nVb+pitI3eEuwEiGObhsXvu47DSvB2hHpEts/quA3/0EE5i1Zw==, dist.shasum = faf8ce5fdc5a1d0eeed5c41bdcf067c8e0ebc820 (read 2026-09-26); the tarball was downloaded fresh and its sha512, sha1 and sha256 computed, all matching (evidence/artifacts/macos-token-pins-20260926/digest-check.txt). The sha256 equals adoption/pins-linux-x86_64.json's ccusage entry (byte-identical, platform-independent npm package).",
+      "install_note": "2026-09-26 addition to complete the `token-efficiency` profile's macOS pin coverage. UNPINNED NATIVE OPTIONAL DEPENDENCY: `npm view ccusage@20.0.24 optionalDependencies` (2026-09-26) lists `@ccusage/ccusage-darwin-arm64@20.0.24` among six per-platform native builds; npm resolves the one matching this platform at install time, outside this hash -- the same documented, unpinned gap as this file's own `mcporter` pin's `rolldown`/`@rolldown/binding-darwin-arm64` note above. `npm install --global --prefix tools/ccusage-20.0.24 ccusage@20.0.24`, matching recipes/README.md and the exact version manifests/stack.json already pins.",
+      "version_probe": {
+        "method": "exec",
+        "command": "ccusage",
+        "args": [
+          "--version"
+        ]
+      }
+    },
+    {
+      "id": "headroom",
+      "version": "0.37.0",
+      "kind": "uv-tool",
+      "package": "headroom-ai[mcp]",
+      "url": "https://files.pythonhosted.org/packages/47/21/8a87b66e83498da89404cdba4ced6397e84331047df9e11a9ea6f3510b29/headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl",
+      "sha256": "b4392f68a8d02d74c62c1734cf5bf327511dcc72678f01669f44f0612944d59c",
+      "checksum_source": "pypi_json_digest_plus_local_rehash",
+      "checksum_ref": "PyPI JSON API https://pypi.org/pypi/headroom-ai/0.37.0/json urls[].digests.sha256 for headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl (13,780,628 bytes), read 2026-09-26; the wheel was downloaded fresh and re-hashed, matching exactly (evidence/artifacts/macos-token-pins-20260926/digest-check.txt).",
+      "install_note": "2026-09-26 addition to complete the `token-efficiency` profile's macOS pin coverage. PyPI package `headroom-ai` (repository headroomlabs-ai/headroom) 0.37.0 with the `[mcp]` extra, matching adoption/pins-linux-x86_64.json's version and package spec exactly. url/sha256 above are the darwin arm64 (`macosx_11_0_arm64`) wheel: headroom-ai 0.37.0 publishes compiled abi3 wheels for macOS arm64 and x86_64, manylinux x86_64 and aarch64 and Windows amd64, plus a maturin (Rust) sdist that would need a local Rust build (PyPI JSON read 2026-09-26), and this is its only arm64-compatible macOS wheel -- the arm64 counterpart of the Linux pin's manylinux wheel. `install_uv_tool` takes the optional pin `package` field and, since 2026-09-26 (re-ported verbatim from adoption/bootstrap-linux.sh after its #334 change), consumes a wheel url: fetch() downloads the wheel above and verifies this sha256 with `shasum -a 256`, exiting 1 before uv runs on a mismatch, so the installed spec is `uv tool install --python 3.13 'headroom-ai[mcp] @ file://<ECO_INSTALL_ROOT>/downloads/headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl'` (the path percent-encoded per segment), the same distribution, version and extra as recipes/README.md's `'headroom-ai[mcp]==0.37.0'`; the wheel's own dependencies still resolve from uv's index. No Mac has run this install: tests/test_adoption_bootstrap_macos.py runs it with a `uv` shim under a real bash 3.2. Registered at Codex/Claude user scope with `HEADROOM_OFFLINE=1` and `DO_NOT_TRACK=1` (docs/decisions/2026-09-25-codex-mcp-scope.md's addendum: headroom-ai 0.37.0 enables its usage beacon by default; `HEADROOM_OFFLINE` is its documented no-egress switch, `DO_NOT_TRACK` a second one in case a later release renames it).",
+      "version_probe": {
+        "method": "exec",
+        "command": "headroom",
+        "args": [
+          "--version"
+        ]
+      }
+    },
+    {
+      "id": "markitdown",
+      "version": "0.1.8",
+      "kind": "uv-tool",
+      "url": "https://files.pythonhosted.org/packages/11/60/2431842a40975524da12edd4d64dd7dc31ef56e209b4848ebf0b14ad1431/markitdown-0.1.8.tar.gz",
+      "sha256": "17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed",
+      "checksum_source": "pypi_json_digest_plus_local_rehash",
+      "checksum_ref": "PyPI JSON API https://pypi.org/pypi/markitdown/0.1.8/json urls[].digests.sha256 for the sdist markitdown-0.1.8.tar.gz (69,112 bytes), read 2026-09-26; the sdist was downloaded fresh and re-hashed, matching exactly (evidence/artifacts/macos-token-pins-20260926/digest-check.txt), and is byte-identical to adoption/pins-linux-x86_64.json's markitdown entry.",
+      "install_note": "2026-09-26 addition to complete the `token-efficiency` profile's macOS pin coverage: identical to adoption/pins-linux-x86_64.json's markitdown entry (same version, url and sha256), because markitdown is pure Python and this pin's sdist is platform-independent. The wheel uv actually installs, markitdown-0.1.8-py3-none-any.whl (89,737 bytes, sha256 de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab, PyPI JSON read 2026-09-26 and the wheel downloaded fresh and re-hashed, matching), is also py3-none-any -- the same wheel installs on every platform, unlike headroom above. install_pin's `*-uv-tool` case (`install_uv_tool`) runs `uv tool install --python 3.13 markitdown==0.1.8` into UV_TOOL_DIR/UV_TOOL_BIN_DIR; uv resolves the pinned version from PyPI and does not check this sha256, which is recorded here as an independent artifact cross-check and satisfies this file's fail-closed null-sha256 refusal.",
+      "version_probe": {
+        "method": "exec",
+        "command": "markitdown",
+        "args": [
+          "--version"
+        ]
+      }
+    },
+    {
+      "id": "serena",
+      "version": "2.0.0.dev0",
+      "kind": "uv-tool-from-git",
+      "package": "serena-agent",
+      "url": "https://github.com/oraios/serena",
+      "commit": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "sha256": null,
+      "checksum_source": "github_commit_existence_verified",
+      "checksum_ref": "Identical source pin to adoption/pins-linux-x86_64.json's serena entry: upstream's pyproject.toml at this commit declares `name = \"serena-agent\"` and `version = \"2.0.0.dev0\"`, and PyPI answers 404 for serena-agent 2.0.0.dev0, so there is no released archive to hash -- the exact 40-hex commit on oraios/serena is the integrity anchor instead. Re-read 2026-09-26: the GitHub commits API returns this commit, a depth-1 `git fetch` of it by hash from https://github.com/oraios/serena.git succeeds and `git cat-file -e <commit>^{commit}` accepts it (evidence/artifacts/macos-token-pins-20260926/digest-check.txt).",
+      "install_note": "2026-09-26 addition to complete the `token-efficiency` profile's macOS pin coverage, pinning the same commit adoption/bootstrap.md step 4a and recipes/README.md's serena row already install manually. `sha256` is null: kind `uv-tool-from-git` with a verified 40-hex `commit` is the one documented exception to this file's fail-closed null-sha256 refusal, exactly mirroring adoption/pins-linux-x86_64.json's own serena entry -- every other kind in this file still refuses a null sha256. `adoption/bootstrap-macos.sh`'s new `install_uv_tool_from_git` (copied verbatim from `adoption/bootstrap-linux.sh`; tests/test_adoption_bootstrap_macos.py runs it under a real bash 3.2 against a `uv` shim) runs `uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143` into the same UV_TOOL_DIR/UV_TOOL_BIN_DIR layout `install_uv_tool` uses, then reads back the resulting `uv-receipt.toml` and refuses (exit 1) unless it records this exact commit. `serena --version` printed exactly `Serena 2.0.0.dev0` from a fresh, non-editable install of this commit (adoption/pins-linux-x86_64.json's own qualification); no macOS host has run this script, matching this platform's drafted-not-accepted status.",
+      "version_probe": {
+        "method": "exec",
+        "command": "serena",
+        "args": [
+          "--version"
+        ]
       }
     }
   ],

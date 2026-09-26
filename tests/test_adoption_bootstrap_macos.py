@@ -13,11 +13,14 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
+import urllib.parse
 
 ROOT = Path(__file__).resolve().parents[1]
 PINS_PATH = ROOT / "adoption/pins-macos-arm64.json"
@@ -28,7 +31,12 @@ PAGE_PATH = ROOT / "adoption/platforms/macos-arm64.md"
 STACK_PATH = ROOT / "manifests/stack.json"
 
 SHA256_HEX = re.compile(r"[0-9a-f]{64}\Z")
-VALID_KINDS = {"tarball", "zip", "npm", "native"}
+COMMIT_HEX = re.compile(r"\A[0-9a-f]{40}\Z")
+# 2026-09-26: added "uv-tool" and "uv-tool-from-git" (headroom/markitdown and
+# serena, closing the token-efficiency profile's macOS pin gap), mirroring
+# tests/test_adoption_bootstrap.py's identical VALID_KINDS for the Linux pins
+# file, where both kinds already existed.
+VALID_KINDS = {"tarball", "zip", "npm", "native", "uv-tool", "uv-tool-from-git"}
 VALID_CHECKSUM_SOURCES = {
     "publisher_checksum_file",
     "publisher_checksum_sidecar",
@@ -38,6 +46,15 @@ VALID_CHECKSUM_SOURCES = {
     # against the release manifest.json plus an independent re-download and
     # re-hash of the actual served binary (see NativeClaudeCodePinTests).
     "manifest_crosscheck",
+    # 2026-09-26: headroom and markitdown are PyPI packages; their checksum
+    # is cross-checked against the PyPI JSON API's own published digest for
+    # the selected asset plus an independent re-download and re-hash (see
+    # TokenEfficiencyPinPortabilityTests).
+    "pypi_json_digest_plus_local_rehash",
+    # 2026-09-26: serena (kind uv-tool-from-git) has no released version to
+    # hash; its checksum_source instead names how the pinned commit itself
+    # was confirmed to exist upstream (see TokenEfficiencyPinPortabilityTests).
+    "github_commit_existence_verified",
 }
 PROFILE_ID = "macos-arm64-foundation"
 # Every macos-arm64-foundation component now has a pin (socraticode's npm pin
@@ -46,6 +63,19 @@ PROFILE_ID = "macos-arm64-foundation"
 # undocumented gap is still caught instead of silently reusing a stale list.
 DOCUMENTED_SKIPS = set()
 SHELLCHECK = shutil.which("shellcheck")
+# The file rtk reads on a Mac, relative to HOME. rtk 0.50.0's get_config_path() is
+# dirs::config_dir()/rtk/config.toml (src/core/config.rs:495-498 at the v0.50.0 tag commit
+# 1d87b8e7), and the dirs crate its Cargo.lock pins (5.0.1) answers $HOME/Library/Application
+# Support on macOS whatever XDG_CONFIG_HOME says (dirs src/mac.rs:7,10); rtk reads no config-path
+# variable of its own. evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt retains
+# that source read. Never ~/.config/rtk/config.toml, the Linux path.
+MAC_RTK_CONFIG = "Library/Application Support/rtk/config.toml"
+# The rtk versions whose macOS config path was read from source. A re-pin must re-read
+# get_config_path and the dirs crate its Cargo.lock pins before adding its version here.
+RTK_CONFIG_PATH_REVIEWED_VERSIONS = {"0.50.0"}
+# The temporary HOME the rtk reminder tests use: not "home", so a retained test output never
+# shows a "/home/<name>/" path, which scripts/validate.py reads as a personal home path.
+FAKE_HOME = "fake-home"
 
 
 def _find_bash32() -> str | None:
@@ -76,6 +106,21 @@ BASH32 = _find_bash32()
 
 def load(path: Path) -> dict:
     return json.loads(path.read_text())
+
+
+def planned_ids(profile_id: str = PROFILE_ID) -> set[str]:
+    """The pin ids a `--plan` run for `profile_id` actually prints: node/uv/gh
+    (installed by every run, ahead of the profile's own component_ids) plus
+    that profile's own selected component ids. 2026-09-26: pins-macos-arm64.json
+    now also carries token-efficiency-only pins (rtk, qmd, repomix, toon,
+    ccusage, headroom, markitdown, serena) that macos-arm64-foundation never
+    selects and a --plan run for it therefore never prints; tests that walk
+    "every pin in the file" against a --plan run's stdout must scope to this
+    instead, the same way pins-linux-x86_64.json has long held pins for more
+    than one profile at once."""
+    manifest = json.loads(MANIFEST_PATH.read_text())
+    profile = next(p for p in manifest["profiles"] if p["id"] == profile_id)
+    return {*profile["component_ids"], "node", "uv", "gh"}
 
 
 def macos_shim(directory: Path) -> Path:
@@ -144,11 +189,33 @@ class PinsSchemaTests(unittest.TestCase):
                 self.assertIsInstance(tool[field], str)
                 self.assertTrue(tool[field].strip(), f"{tool['id']} has an empty {field}")
 
-    def test_every_sha256_is_lowercase_hex_and_never_null(self):
+    def test_every_sha256_is_lowercase_hex_or_null_for_a_verified_git_commit(self):
+        # 2026-09-26: serena (kind uv-tool-from-git) has no released version
+        # to hash, so its sha256 is null; every other kind still fails closed
+        # on a null sha256, mirroring tests/test_adoption_bootstrap.py's
+        # identical exception for the Linux pins file.
         for tool in self.pins["tools"]:
+            if tool["kind"] == "uv-tool-from-git":
+                self.assertIsNone(tool["sha256"], f"{tool['id']}: uv-tool-from-git pins a commit, not a sha256")
+                continue
             self.assertIsNotNone(tool["sha256"], f"{tool['id']} has a null sha256")
             self.assertRegex(tool["sha256"], SHA256_HEX,
                              f"{tool['id']} sha256 is not 64 lowercase hex chars")
+
+    def test_a_uv_tool_wheel_url_names_the_pinned_version(self):
+        # The shared install_uv_tool refuses a wheel whose filename names another version
+        # (UvToolWheelPinUnderRealBash32Tests); mirrors tests/test_adoption_bootstrap.py's Linux check.
+        for tool in self.pins["tools"]:
+            if tool["kind"] == "uv-tool" and tool["url"].endswith(".whl"):
+                self.assertEqual(tool["url"].rsplit("/", 1)[1].split("-")[1], tool["version"], tool["id"])
+
+    def test_a_uv_tool_url_is_a_plain_wheel_or_sdist_file(self):
+        # install_uv_tool downloads and verifies a url ending in .whl and treats any other as an sdist
+        # cross-check, so a wheel url carrying a ?query or #sha256= fragment would silently fall back to
+        # an unverified index install; mirrors tests/test_adoption_bootstrap.py's Linux check.
+        for tool in self.pins["tools"]:
+            if tool["kind"] == "uv-tool":
+                self.assertRegex(tool["url"], r"\Ahttps://[^?#\s]+\.(?:whl|tar\.gz)\Z", tool["id"])
 
     def test_checksum_source_uses_the_declared_vocabulary(self):
         for tool in self.pins["tools"]:
@@ -156,10 +223,22 @@ class PinsSchemaTests(unittest.TestCase):
                           f"{tool['id']} has an unrecognized checksum_source")
 
     def test_urls_are_https_and_name_a_darwin_arm64_or_npm_asset(self):
+        # 2026-09-26: a uv-tool/uv-tool-from-git pin's own url need not itself
+        # encode darwin/arm64 -- uv resolves the right platform wheel (or a
+        # platform-independent sdist/py3-none-any wheel, or a git source with
+        # no filename at all) at install time, unlike a tarball/zip this
+        # script extracts directly. headroom still pins the darwin-arm64
+        # wheel where upstream ships one (TokenEfficiencyPinPortabilityTests
+        # checks that positively); markitdown's sdist and serena's bare repo
+        # URL are the two platform-independent counterexamples this carve-out
+        # exists for.
+        UV_KINDS = {"uv-tool", "uv-tool-from-git"}
         for tool in self.pins["tools"]:
             self.assertTrue(tool["url"].startswith("https://"), tool["id"])
             if tool["kind"] == "npm":
                 self.assertTrue(tool["url"].startswith("https://registry.npmjs.org/"), tool["id"])
+            elif tool["kind"] in UV_KINDS:
+                continue
             else:
                 asset = tool["url"].rsplit("/", 1)[-1]
                 # A native pin (2026-09-23: claude-code) encodes the platform
@@ -226,6 +305,154 @@ class PinsSchemaTests(unittest.TestCase):
         dep = by_id["codex"]["platform_dependency"]
         self.assertEqual(dep["name"], "@openai/codex-darwin-arm64")
         self.assertRegex(dep["sha256"], SHA256_HEX)
+
+
+class TokenEfficiencyPinPortabilityTests(unittest.TestCase):
+    """2026-09-26: rtk, qmd, repomix, toon, ccusage, headroom, markitdown and
+    serena close the `token-efficiency` profile's macOS pin gap (6 of 14
+    before; adoption/README.md's coverage cell). These ids are not part of
+    `macos-arm64-foundation`'s own component_ids -- ProfileCoverageTests
+    covers that profile specifically -- so this class checks the new pins
+    directly. Their digests were re-checked against fresh upstream downloads
+    on 2026-09-26 (evidence/artifacts/macos-token-pins-20260926/); these
+    tests read only the repository, never the network."""
+
+    NEW_IDS_AND_KINDS = {
+        "rtk": "tarball", "qmd": "npm", "repomix": "npm", "toon": "npm",
+        "ccusage": "npm", "headroom": "uv-tool", "markitdown": "uv-tool",
+        "serena": "uv-tool-from-git",
+    }
+    # Copied verbatim from bootstrap-linux.sh; PortedFunctionsUnderRealBash32Tests
+    # runs these copies (and rtk_config_reminder, whose config check alone is
+    # shared with the Linux reminder) under bash 3.2.
+    PORTED_FUNCTIONS = ("fetch", "verify_sha256", "install_uv_tool", "install_uv_tool_from_git")
+
+    def setUp(self):
+        self.pins = load(PINS_PATH)
+        self.by_id = {tool["id"]: tool for tool in self.pins["tools"]}
+        self.linux_by_id = {tool["id"]: tool for tool in load(LINUX_PINS_PATH)["tools"]}
+        self.script = SCRIPT_PATH.read_text()
+
+    def test_every_new_id_is_pinned_with_the_expected_kind(self):
+        for tool_id, kind in self.NEW_IDS_AND_KINDS.items():
+            self.assertIn(tool_id, self.by_id, f"{tool_id} has no macOS pin")
+            self.assertEqual(self.by_id[tool_id]["kind"], kind)
+
+    def test_new_ids_are_not_part_of_the_macos_arm64_foundation_profile(self):
+        # The class premise: these pins serve token-efficiency and foundation-cpu. The
+        # macos-arm64-foundation --plan tests look up each planned pin's sha256, which
+        # serena does not have, so adding one of these ids there needs those tests revisited.
+        manifest = json.loads(MANIFEST_PATH.read_text())
+        profile = next(p for p in manifest["profiles"] if p["id"] == PROFILE_ID)
+        self.assertFalse(set(self.NEW_IDS_AND_KINDS) & set(profile["component_ids"]))
+
+    def test_new_pins_keep_the_linux_version_and_version_probe(self):
+        for tool_id in self.NEW_IDS_AND_KINDS:
+            with self.subTest(tool=tool_id):
+                mac, linux = self.by_id[tool_id], self.linux_by_id[tool_id]
+                self.assertEqual(mac["version"], linux["version"])
+                self.assertEqual(mac["version_probe"], linux["version_probe"])
+                self.assertEqual(mac.get("package"), linux.get("package"))
+
+    def test_headroom_pins_the_darwin_arm64_wheel_not_the_linux_manylinux_one(self):
+        tool = self.by_id["headroom"]
+        self.assertIn("macosx", tool["url"])
+        self.assertIn("arm64", tool["url"])
+        self.assertNotIn("manylinux", tool["url"])
+        self.assertEqual(tool["package"], "headroom-ai[mcp]")
+        self.assertNotEqual(tool["sha256"], self.linux_by_id["headroom"]["sha256"],
+                            "headroom's macOS wheel must not reuse the Linux manylinux wheel's hash")
+        self.assertIn("HEADROOM_OFFLINE", tool["install_note"])
+        self.assertIn("DO_NOT_TRACK", tool["install_note"])
+        # PyPI also publishes a maturin sdist (evidence/artifacts/macos-token-pins-20260926/
+        # digest-check-run1.txt), so the note must not claim there is no platform-independent artifact.
+        self.assertNotIn("no platform-independent artifact", tool["install_note"] + self.pins["source"])
+        # 2026-09-26: install_uv_tool (re-ported from bootstrap-linux.sh after #334) now downloads this
+        # wheel and verifies this sha256 before uv runs, so the note must say so and no longer call the
+        # hash an unchecked cross-check (UvToolWheelPinUnderRealBash32Tests runs that path).
+        self.assertIn("verifies this sha256 with `shasum -a 256`, exiting 1 before uv runs", tool["install_note"])
+        self.assertNotIn("does not check this sha256", tool["install_note"])
+        self.assertIn("does not check this sha256", self.by_id["markitdown"]["install_note"])
+
+    def test_markitdown_is_the_identical_platform_independent_artifact_as_linux(self):
+        tool = self.by_id["markitdown"]
+        self.assertEqual(tool["url"], self.linux_by_id["markitdown"]["url"])
+        self.assertEqual(tool["sha256"], self.linux_by_id["markitdown"]["sha256"])
+
+    def test_serena_pins_the_same_verified_commit_as_linux(self):
+        tool = self.by_id["serena"]
+        self.assertIsNone(tool["sha256"])
+        self.assertRegex(tool["commit"], COMMIT_HEX)
+        self.assertEqual(tool["commit"], self.linux_by_id["serena"]["commit"])
+        self.assertEqual(tool["package"], self.linux_by_id["serena"]["package"])
+        self.assertEqual(tool["url"], self.linux_by_id["serena"]["url"])
+
+    def test_qmd_and_ccusage_document_their_unpinned_platform_optional_dependency(self):
+        # Mirrors test_mcporter_note_does_not_claim_its_tarball_is_the_whole_install
+        # below for the two new npm pins that also carry a per-platform native
+        # optionalDependency npm resolves outside this file's own hash.
+        self.assertIn("sqlite-vec-darwin-arm64", self.by_id["qmd"]["install_note"])
+        self.assertIn("UNPINNED", self.by_id["qmd"]["install_note"])
+        self.assertIn("@ccusage/ccusage-darwin-arm64", self.by_id["ccusage"]["install_note"])
+        self.assertIn("UNPINNED", self.by_id["ccusage"]["install_note"])
+
+    def test_every_new_checksum_ref_cites_the_retained_digest_check(self):
+        artifact = "evidence/artifacts/macos-token-pins-20260926/digest-check.txt"
+        self.assertTrue((ROOT / artifact).is_file())
+        for tool_id in self.NEW_IDS_AND_KINDS:
+            with self.subTest(tool=tool_id):
+                self.assertIn(artifact, self.by_id[tool_id]["checksum_ref"])
+
+    def test_bootstrap_macos_gained_the_uv_tool_dispatch_cases(self):
+        self.assertIn("*-uv-tool)", self.script)
+        self.assertIn("*-uv-tool-from-git)", self.script)
+
+    def test_ported_functions_are_byte_identical_to_bootstrap_linux(self):
+        linux = (ROOT / "adoption/bootstrap-linux.sh").read_text()
+        for name in self.PORTED_FUNCTIONS:
+            with self.subTest(function=name):
+                self.assertEqual(_shell_functions(self.script, name), _shell_functions(linux, name),
+                                 f"{name} drifted from adoption/bootstrap-linux.sh; port the change to both")
+
+    def test_the_rtk_reminder_checks_the_config_text_exactly_as_the_linux_reminder_does(self):
+        # Only the config-file text check (the `if` condition, from `if [[ -f "$config" ]]` to its
+        # `then`) is shared, line for line, so both scripts accept and reject the same file text; what
+        # each reminder does after that check is its own. PortedFunctionsUnderRealBash32Tests pins
+        # the macOS reminder's behaviour and output to recipes/README.md's exclude_commands block.
+        linux = _shell_functions((ROOT / "adoption/bootstrap-linux.sh").read_text(), "rtk_config_reminder")
+        mac_check = _config_text_check(_shell_functions(self.script, "rtk_config_reminder"))
+        # The file test, the exactly-once key count and the four entries' grep -F lines.
+        self.assertEqual(len(mac_check), 5, mac_check)
+        self.assertEqual(mac_check, _config_text_check(linux),
+                         "the rtk reminder's config check drifted from adoption/bootstrap-linux.sh's")
+
+    def test_uv_tool_from_git_commit_check_precedes_the_sha256_gate(self):
+        # Mirrors bootstrap-linux.sh's own install_pin ordering: the
+        # commit-shape check for kind uv-tool-from-git must run instead of,
+        # not after, the null-sha256 refusal, so serena's --plan line is
+        # reached rather than a spurious "no verified sha256" exit. Scoped
+        # to install_pin's own body: install_embed_model (unrelated) also
+        # contains the substring "pin has no verified sha256" for its own,
+        # different refusal.
+        install_pin_body = _shell_functions(self.script, "install_pin")
+        commit_check_index = install_pin_body.index('[[ "$kind" == "uv-tool-from-git" ]]')
+        sha_refusal_index = install_pin_body.index("pin has no verified sha256")
+        self.assertLess(commit_check_index, sha_refusal_index)
+
+    def test_install_pin_reminds_only_after_installing_rtk(self):
+        # After the "Installed" line, so neither --plan nor a kept native launcher reaches it;
+        # PortedFunctionsUnderRealBash32Tests runs the rtk and non-rtk paths.
+        install_pin_body = _shell_functions(self.script, "install_pin")
+        self.assertEqual(install_pin_body.count("rtk_config_reminder"), 1)
+        self.assertLess(install_pin_body.index("printf 'Installed %s %s (%s)\\n'"),
+                        install_pin_body.index('[[ "$id" != rtk ]] || rtk_config_reminder'))
+
+    def test_the_page_carries_the_recipes_exact_rtk_exclude_block(self):
+        # Any macOS rtk guidance uses recipes/README.md's own four-entry block, never a variant.
+        recipe = (ROOT / "recipes/README.md").read_text(encoding="utf-8")
+        match = re.search(r"```toml\n(\[hooks\]\nexclude_commands = \[.*?\n\])\n```", recipe, re.S)
+        self.assertIsNotNone(match, "recipes/README.md: no [hooks] exclude_commands block")
+        self.assertIn(f"```toml\n{match.group(1)}\n```", PAGE_PATH.read_text(encoding="utf-8"))
 
 
 class NativeClaudeCodePinTests(unittest.TestCase):
@@ -392,9 +619,12 @@ class ScriptStructureTests(unittest.TestCase):
 
     def test_script_uses_macos_native_tools_only(self):
         self.assertIn("shasum -a 256 --check --status", self.text)
+        # The byte-identical checksum helper has a GNU fallback for Linux;
+        # shasum is a required macOS prerequisite, so that branch is not used.
+        native_code = self.text.replace(_shell_functions(self.text, "verify_sha256"), "")
         # Comments may name the Linux tool they replace; only executable lines
         # are checked for a command a stock Mac does not ship.
-        code = "\n".join(line for line in self.text.splitlines()
+        code = "\n".join(line for line in native_code.splitlines()
                          if not line.lstrip().startswith("#"))
         for absent in ("sha256sum", "flock", "dpkg-query", "apt-get", "mapfile"):
             self.assertNotIn(absent, code, f"{absent} is not available on a stock Mac")
@@ -544,8 +774,9 @@ class ScriptBehaviorUnderRealBash32Tests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("nothing was downloaded or installed", result.stdout)
-            for tool in load(PINS_PATH)["tools"]:
-                self.assertIn(tool["sha256"], result.stdout, f"{tool['id']} sha256 not planned")
+            by_id = {tool["id"]: tool for tool in load(PINS_PATH)["tools"]}
+            for tool_id in planned_ids():
+                self.assertIn(by_id[tool_id]["sha256"], result.stdout, f"{tool_id} sha256 not planned")
 
     def test_unpinned_selected_component_still_exits_3_under_real_bash_32(self):
         # The exit-3 fail-closed path (a genuinely unpinned selected
@@ -620,9 +851,10 @@ class ScriptBehaviorTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             for core in ("node", "uv", "gh"):
                 self.assertRegex(result.stdout, rf"(?m)^plan {core}\s")
-            for tool in load(PINS_PATH)["tools"]:
-                self.assertIn(tool["sha256"], result.stdout, f"{tool['id']} sha256 not planned")
-                self.assertIn(tool["url"].rsplit("/", 1)[-1], result.stdout)
+            by_id = {tool["id"]: tool for tool in load(PINS_PATH)["tools"]}
+            for tool_id in planned_ids():
+                self.assertIn(by_id[tool_id]["sha256"], result.stdout, f"{tool_id} sha256 not planned")
+                self.assertIn(by_id[tool_id]["url"].rsplit("/", 1)[-1], result.stdout)
             for skipped in DOCUMENTED_SKIPS:
                 self.assertIn(f"No pin for component {skipped}", result.stderr)
             self.assertFalse(list(eco_root.glob("tools/*/*")),
@@ -741,6 +973,545 @@ class ScriptBehaviorTests(unittest.TestCase):
                              "no tool files should have been installed before the refusal")
 
 
+def _plan_run(bash: str, profile_id: str, tmp_path: Path, script: Path | None = None):
+    """A `--plan --skip-system-packages` run of `script` (default: the real one) under `bash`."""
+    shim = macos_shim(tmp_path)
+    return subprocess.run(
+        [bash, str(script or SCRIPT_PATH), "--plan", "--profile", profile_id, "--skip-system-packages"],
+        capture_output=True, text=True, timeout=60,
+        env={**os.environ, "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}",
+             "ECO_INSTALL_ROOT": str(tmp_path / "eco")},
+    )
+
+
+def _script_copy_with_pins(tmp_path: Path, edit) -> Path:
+    """A copy of the script beside the real manifest and a pins file changed by `edit(pins)`."""
+    adoption_dir = tmp_path / "adoption"
+    adoption_dir.mkdir()
+    (adoption_dir / "manifest.json").write_text(MANIFEST_PATH.read_text())
+    pins = load(PINS_PATH)
+    edit(pins)
+    (adoption_dir / "pins-macos-arm64.json").write_text(json.dumps(pins))
+    script_copy = adoption_dir / "bootstrap-macos.sh"
+    script_copy.write_text(SCRIPT_PATH.read_text())
+    script_copy.chmod(0o755)
+    return script_copy
+
+
+def _assert_full_plan(test: unittest.TestCase, result, profile_id: str) -> None:
+    """`result` planned every component `profile_id` selects (plus node/uv/gh) with its pinned
+    sha256, or serena's pinned commit, and needed no --allow-unpinned."""
+    test.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+    test.assertIn("nothing was downloaded or installed", result.stdout)
+    test.assertNotIn("Allowed unpinned", result.stdout)
+    test.assertNotIn("sha256=null", result.stdout)
+    by_id = {tool["id"]: tool for tool in load(PINS_PATH)["tools"]}
+    for tool_id in sorted(planned_ids(profile_id)):
+        tool = by_id[tool_id]
+        anchor = (f"commit={tool['commit']}" if tool["kind"] == "uv-tool-from-git"
+                  else f"sha256={tool['sha256']}")
+        test.assertRegex(result.stdout, rf"(?m)^plan {re.escape(tool_id)}\s.*{re.escape(anchor)}$",
+                         f"{profile_id}: {tool_id} not planned with {anchor}")
+
+
+class TokenEfficiencyPlanTests(unittest.TestCase):
+    """2026-09-26: with the eight new pins, `--plan` for `token-efficiency` and `foundation-cpu`
+    resolves every selected component with no `--allow-unpinned` (both exited 3 before), and
+    serena's line names its pinned commit. Runs under the host bash here; the same plan runs
+    under a real bash 3.2 in PortedFunctionsUnderRealBash32Tests. local_integration: a
+    uname/sw_vers shim on Linux, no network, nothing installed."""
+
+    def test_token_efficiency_and_foundation_cpu_plan_in_full(self):
+        for profile_id in ("token-efficiency", "foundation-cpu"):
+            with self.subTest(profile=profile_id), tempfile.TemporaryDirectory() as tmp:
+                result = _plan_run("bash", profile_id, Path(tmp))
+                _assert_full_plan(self, result, profile_id)
+                self.assertFalse(list((Path(tmp) / "eco").glob("tools/*/*")), "plan mode must not install anything")
+
+    def test_the_headroom_plan_line_names_the_wheel_install_uv_tool_verifies(self):
+        # install_uv_tool downloads and sha256-checks exactly this url's file, so the plan line names the
+        # darwin arm64 wheel and its sha256; plan mode itself downloads nothing (no wheel in the cache).
+        headroom = next(tool for tool in load(PINS_PATH)["tools"] if tool["id"] == "headroom")
+        wheel = headroom["url"].rsplit("/", 1)[1]
+        self.assertTrue(wheel.endswith("-macosx_11_0_arm64.whl"), wheel)
+        with tempfile.TemporaryDirectory() as tmp:
+            result = _plan_run("bash", "token-efficiency", Path(tmp))
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertRegex(result.stdout, rf"(?m)^plan headroom\s+0\.37\.0\s+uv-tool\s+{re.escape(wheel)} "
+                                            rf"sha256={headroom['sha256']}$")
+            self.assertFalse(list((Path(tmp) / "eco").glob("downloads/*.whl")), "plan mode must not download")
+
+    def test_a_uv_tool_from_git_pin_without_a_40_hex_commit_is_refused(self):
+        def short_commit(pins):
+            serena = next(tool for tool in pins["tools"] if tool["id"] == "serena")
+            serena["commit"] = serena["commit"][:12]
+        for bash in ("bash", *([BASH32] if BASH32 else [])):
+            with self.subTest(bash=bash), tempfile.TemporaryDirectory() as tmp:
+                script = _script_copy_with_pins(Path(tmp), short_commit)
+                result = _plan_run(bash, "token-efficiency", Path(tmp), script)
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn("Refusing to install serena 2.0.0.dev0: pin has no verified 40-hex commit",
+                              result.stderr)
+                self.assertNotIn("plan serena", result.stdout)
+
+
+def _recipe_rtk_block() -> str:
+    """recipes/README.md's own `[hooks] exclude_commands` block, with a trailing newline."""
+    recipe = (ROOT / "recipes/README.md").read_text(encoding="utf-8")
+    return re.search(r"```toml\n(\[hooks\]\nexclude_commands = \[.*?\n\])\n```", recipe, re.S).group(1) + "\n"
+
+
+def _expected_rtk_reminder(config: Path) -> str:
+    """The macOS rtk_config_reminder's whole output for `config`, built from the recipe's block."""
+    entries = [line.strip().rstrip(",") for line in _recipe_rtk_block().splitlines()[2:-1]]
+    return (f"Reminder: for the Claude hook, in {config}, inside the existing [hooks] table "
+            'replace the whole exclude_commands value (from "exclude_commands =" through its closing "]"), '
+            "or add the key if the table lacks it. Add the [hooks] header line only when the file "
+            f"has no [hooks] table. Use: exclude_commands = [{', '.join(entries)}] (a duplicate key or table is invalid TOML "
+            "and rtk silently loads defaults; recipes/README.md#native-context-mode-and-hooks); "
+            "this script does not write it.\n")
+
+
+def _run_rtk_reminder(bash: str, tmp_path: Path, files=None, xdg=None):
+    """Run the macOS script's own rtk_config_reminder under `bash`, with HOME=tmp_path/FAKE_HOME.
+
+    `files` maps a path relative to tmp_path to the text written there first. `xdg`, when given, is
+    a path relative to tmp_path exported as XDG_CONFIG_HOME; otherwise XDG_CONFIG_HOME is unset.
+    """
+    home = tmp_path / FAKE_HOME
+    home.mkdir(exist_ok=True)
+    for relative, text in (files or {}).items():
+        target = tmp_path / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(text)
+    harness = tmp_path / "reminder.sh"
+    harness.write_text("set -Eeuo pipefail\n" + _shell_functions(SCRIPT_PATH.read_text(), "rtk_config_reminder")
+                       + "rtk_config_reminder\n")
+    environment = {key: value for key, value in os.environ.items() if key != "XDG_CONFIG_HOME"}
+    environment["HOME"] = str(home)
+    if xdg is not None:
+        environment["XDG_CONFIG_HOME"] = str(tmp_path / xdg)
+    return subprocess.run([bash, str(harness)], capture_output=True, text=True, timeout=60, env=environment)
+
+
+class RtkConfigPathTests(unittest.TestCase):
+    """The macOS rtk reminder, and every macOS instruction for the recipe's exclusions, name the
+    file rtk 0.50.0 reads on a Mac, ~/Library/Application Support/rtk/config.toml (MAC_RTK_CONFIG),
+    never ~/.config/rtk/config.toml or $XDG_CONFIG_HOME/rtk/config.toml: a file there is never
+    loaded on macOS, so rtk would keep its defaults while a reminder that read it went quiet. The
+    reminder runs under the host bash (so Linux CI covers it) and, when one is reachable, a real
+    bash 3.2. local_integration: no rtk or Mac ran here, and HOME is a temporary directory."""
+
+    BASHES = ("bash", *([BASH32] if BASH32 else []))
+
+    def test_printed_assignment_preserves_valid_toml_for_each_edit_case(self):
+        # TOML 1.0.0 #table forbids duplicate tables. Exercise the printed assignment
+        # under both interpreters, preserving the recipe's values and an unrelated table.
+        cases = {
+            "single-line value": ('[hooks]\nexclude_commands = ["old"]\n', 'exclude_commands = ["old"]'),
+            "multiline value": ('[hooks]\nexclude_commands = [\n  "old",\n]\n',
+                                'exclude_commands = [\n  "old",\n]'),
+            "missing key": ("[hooks]\n", None),
+            "missing table": ("", None),
+        }
+        for bash in self.BASHES:
+            for name, (hooks, old_value) in cases.items():
+                with self.subTest(bash=bash, config=name), tempfile.TemporaryDirectory() as tmp:
+                    original = hooks + "[tracking]\nhistory_days = 30\n"
+                    config = Path(tmp) / FAKE_HOME / MAC_RTK_CONFIG
+                    result = _run_rtk_reminder(bash, Path(tmp), {f"{FAKE_HOME}/{MAC_RTK_CONFIG}": original})
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(result.stdout, _expected_rtk_reminder(config))
+                    match = re.search(r"Use: (exclude_commands = \[.*\]) \(a duplicate", result.stdout)
+                    self.assertIsNotNone(match, result.stdout)
+                    assignment = match.group(1)
+                    if old_value is not None:
+                        edited = original.replace(old_value, assignment, 1)
+                    elif hooks:
+                        edited = original.replace("[hooks]\n", f"[hooks]\n{assignment}\n", 1)
+                    else:
+                        edited = original + f"[hooks]\n{assignment}\n"
+                    parsed = tomllib.loads(edited)
+                    self.assertEqual(parsed["hooks"], tomllib.loads(_recipe_rtk_block())["hooks"])
+                    self.assertEqual(parsed["tracking"], {"history_days": 30})
+                    self.assertEqual(edited.count("[hooks]"), 1)
+                    self.assertEqual(config.read_text(), original, "the reminder must never write the config")
+
+    def test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder(self):
+        block = _recipe_rtk_block()
+        linux_files = {f"{FAKE_HOME}/.config/rtk/config.toml": block, "xdg/rtk/config.toml": block}
+        for bash in self.BASHES:
+            with self.subTest(bash=bash), tempfile.TemporaryDirectory() as tmp:
+                tmp_path = Path(tmp)
+                result = _run_rtk_reminder(bash, tmp_path, linux_files, xdg="xdg")
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.stdout, _expected_rtk_reminder(tmp_path / FAKE_HOME / MAC_RTK_CONFIG))
+                self.assertFalse((tmp_path / FAKE_HOME / "Library").exists(), "the reminder must not create the config")
+                for relative, text in linux_files.items():
+                    self.assertEqual((tmp_path / relative).read_text(), text, "the reminder must never write a config")
+
+    def test_the_recipe_block_at_the_macos_path_is_accepted_whatever_xdg_config_home_says(self):
+        for bash in self.BASHES:
+            for xdg in (None, "xdg"):
+                with self.subTest(bash=bash, xdg=xdg), tempfile.TemporaryDirectory() as tmp:
+                    result = _run_rtk_reminder(bash, Path(tmp), {f"{FAKE_HOME}/{MAC_RTK_CONFIG}": _recipe_rtk_block()}, xdg)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(result.stdout, "")
+
+    def test_the_reminder_resolves_the_path_as_rtk_does_on_macos(self):
+        function = _shell_functions(SCRIPT_PATH.read_text(), "rtk_config_reminder")
+        self.assertIn(f'local config="$HOME/{MAC_RTK_CONFIG}"', function)
+        self.assertNotIn("XDG_CONFIG_HOME", function)
+        self.assertNotIn(".config/rtk", function)
+
+    def test_the_path_was_read_from_source_for_the_pinned_rtk_version(self):
+        rtk = next(tool for tool in load(PINS_PATH)["tools"] if tool["id"] == "rtk")
+        self.assertIn(rtk["version"], RTK_CONFIG_PATH_REVIEWED_VERSIONS,
+                      "re-read rtk's get_config_path and its locked dirs crate for the new pin, then "
+                      "update MAC_RTK_CONFIG and RTK_CONFIG_PATH_REVIEWED_VERSIONS")
+
+    def test_every_macos_instruction_names_the_file_rtk_reads(self):
+        mac_path = f"~/{MAC_RTK_CONFIG}"
+        page = PAGE_PATH.read_text(encoding="utf-8")
+        self.assertIn(mac_path, page)
+        self.assertNotIn(".config/rtk/config.toml", page)
+        note = next(tool for tool in load(PINS_PATH)["tools"] if tool["id"] == "rtk")["install_note"]
+        self.assertIn(mac_path, note)
+        self.assertNotIn(".config/rtk", note)
+        bootstrap = (ROOT / "adoption/bootstrap.md").read_text(encoding="utf-8")
+        # Step 2's paragraph on the macOS pins and script, up to its blank line.
+        start = bootstrap.index("`adoption/pins-macos-arm64.json` and `adoption/bootstrap-macos.sh` changed after")
+        macos_paragraph = bootstrap[start:bootstrap.index("\n\n", start)]
+        self.assertIn(mac_path, macos_paragraph)
+        self.assertNotIn(".config/rtk", macos_paragraph)
+        # Step 4a's exclusion instruction serves both platforms, so it names both files.
+        step_4a = next(line for line in bootstrap.splitlines()
+                       if "The template registers the `rtk hook claude` Bash hook" in line)
+        self.assertIn(mac_path, step_4a)
+        recipe = next(line for line in (ROOT / "recipes/README.md").read_text(encoding="utf-8").splitlines()
+                      if line.startswith("**Claude hook exclusions at 0.50.0.**"))
+        self.assertIn(mac_path, recipe)
+
+
+@unittest.skipUnless(BASH32, "no real bash 3.2 binary reachable (set BASH32_BINARY, or run on a real Mac)")
+class PortedFunctionsUnderRealBash32Tests(unittest.TestCase):
+    """2026-09-26: install_uv_tool and install_uv_tool_from_git are copied verbatim from
+    bootstrap-linux.sh, and rtk_config_reminder shares that script's config text check
+    (TokenEfficiencyPinPortabilityTests checks both; tests/test_adoption_bootstrap.py runs the Linux
+    install_uv_tool_from_git and rtk_config_reminder under the host bash). Here the macOS copies run
+    under a real bash 3.2, the interpreter a stock Mac uses for this script, as do install_pin's rtk
+    path and a token-efficiency plan; RtkConfigPathTests runs the reminder's path cases under both.
+    `uv` is a shim that records its arguments and writes a chosen uv-receipt.toml; the rtk pin is
+    a synthetic one-file tarball pre-seeded in the download cache with its real sha256, so fetch()
+    verifies it with shasum and never downloads. The expected reminder is built from
+    recipes/README.md's own exclude_commands block. local_integration: no uv, rtk, network or Mac
+    ran, and HOME is a temporary directory."""
+
+    COMMIT = "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+
+    def _bash32(self, tmp_path: Path, body: str, path_prefix=None):
+        home = tmp_path / FAKE_HOME
+        home.mkdir(exist_ok=True)
+        harness = tmp_path / "harness.sh"
+        harness.write_text("set -Eeuo pipefail\n" + body)
+        path = os.environ["PATH"] if path_prefix is None else f"{path_prefix}{os.pathsep}{os.environ['PATH']}"
+        environment = {key: value for key, value in os.environ.items() if key != "XDG_CONFIG_HOME"}
+        environment.update(HOME=str(home), PATH=path)
+        return subprocess.run([BASH32, str(harness)], capture_output=True, text=True, timeout=60, env=environment)
+
+    def _reminder(self, tmp_path: Path, config_text=None):
+        """The reminder under bash 3.2 with `config_text` (if any) in the file rtk reads on a Mac."""
+        config = tmp_path / FAKE_HOME / MAC_RTK_CONFIG
+        files = {} if config_text is None else {f"{FAKE_HOME}/{MAC_RTK_CONFIG}": config_text}
+        result = _run_rtk_reminder(BASH32, tmp_path, files)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return result, config
+
+    def test_checksum_helper_prefers_shasum_and_has_a_linux_fallback(self):
+        # Isolate PATH to exercise both branches even on a Linux test host.
+        # The GNU-command shim delegates to real shasum so this also runs on
+        # stock macOS; it checks argv/selection and real bytes, not GNU itself.
+        shasum = shutil.which("shasum")
+        self.assertIsNotNone(shasum, "shasum is a macOS bootstrap prerequisite")
+        payload = b"fixture wheel bytes\n"
+        for checker in ("shasum", "sha256sum"):
+            for valid in (True, False):
+                with self.subTest(checker=checker, valid=valid), tempfile.TemporaryDirectory() as tmp:
+                    directory = Path(tmp)
+                    wheel, calls = directory / "fixture.whl", directory / "calls"
+                    wheel.write_bytes(payload if valid else b"corrupt wheel\n")
+                    shim = directory / "bin"
+                    shim.mkdir()
+                    (shim / checker).write_text(
+                        '#!/bin/sh\nprintf "%s\\n" "$@" > ' + shlex.quote(str(calls)) + "\n"
+                        + "exec " + shlex.quote(shasum)
+                        + (" -a 256" if checker == "sha256sum" else "") + ' "$@"\n')
+                    (shim / checker).chmod(0o755)
+                    if checker == "shasum":
+                        (shim / "sha256sum").write_text("#!/bin/sh\nexit 97\n")
+                        (shim / "sha256sum").chmod(0o755)
+                    body = ("set -Eeuo pipefail\n"
+                            + _shell_functions(SCRIPT_PATH.read_text(), "verify_sha256")
+                            + "verify_sha256\n")
+                    result = subprocess.run(
+                        [BASH32, "-c", body], input=f"{hashlib.sha256(payload).hexdigest()}  {wheel}\n",
+                        text=True, capture_output=True, timeout=10,
+                        env={"HOME": str(directory), "PATH": str(shim)})
+                    self.assertEqual(result.returncode, 0 if valid else 1, result.stderr)
+                    expected = (["-a", "256"] if checker == "shasum" else []) + ["--check", "--status"]
+                    self.assertEqual(calls.read_text().splitlines(), expected)
+
+    def test_a_missing_config_gets_the_recipes_four_entries_and_is_not_created(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, config = self._reminder(Path(tmp))
+            self.assertEqual(result.stdout, _expected_rtk_reminder(config))
+            self.assertFalse((Path(tmp) / FAKE_HOME / "Library").exists(), "the reminder must not create the config")
+
+    def test_the_recipes_exact_block_gets_no_reminder_and_is_left_unchanged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, config = self._reminder(Path(tmp), _recipe_rtk_block())
+            self.assertEqual(result.stdout, "")
+            self.assertEqual(config.read_text(), _recipe_rtk_block())
+
+    def test_an_incomplete_or_duplicated_key_is_reminded_and_left_unchanged(self):
+        block = _recipe_rtk_block()
+        entries = block.splitlines()[2:-1]
+        variants = {
+            "original two entries": '[hooks]\nexclude_commands = ["^git show [^ ]*:", "diff"]\n',
+            "fourth entry missing": "\n".join([*block.splitlines()[:2], *entries[:3], "]"]) + "\n",
+            "key duplicated": block + block,
+        }
+        for label, text in variants.items():
+            with self.subTest(config=label), tempfile.TemporaryDirectory() as tmp:
+                result, config = self._reminder(Path(tmp), text)
+                self.assertEqual(result.stdout, _expected_rtk_reminder(config))
+                self.assertEqual(config.read_text(), text, "the reminder must never write the config")
+
+    def _install_pin(self, tmp_path: Path, tool_id: str):
+        eco = tmp_path / "eco"
+        cache = eco / "downloads"
+        cache.mkdir(parents=True)
+        build = tmp_path / "build"
+        build.mkdir()
+        (build / tool_id).write_text(f"#!/bin/sh\necho '{tool_id} 0.50.0'\n")
+        (build / tool_id).chmod(0o755)
+        asset = f"{tool_id}-aarch64-apple-darwin.tar.gz"
+        subprocess.run(["tar", "-czf", str(cache / asset), "-C", str(build), tool_id], check=True)
+        pins_path = tmp_path / "pins.json"
+        pins_path.write_text(json.dumps({"tools": [{
+            "id": tool_id, "version": "0.50.0", "kind": "tarball", "url": f"https://example.invalid/v0.50.0/{asset}",
+            "sha256": hashlib.sha256((cache / asset).read_bytes()).hexdigest(), "install_note": "fixture",
+        }]}))
+        shim = tmp_path / "shim"
+        shim.mkdir()
+        (shim / "curl").write_text("#!/bin/sh\necho 'curl must not run: the cached archive verifies' >&2\nexit 97\n")
+        (shim / "curl").chmod(0o755)
+        body = (_shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_single_binary_tarball",
+                                 "rtk_config_reminder", "install_pin")
+                + f"pins_path={json.dumps(str(pins_path))}\necosystem_root={json.dumps(str(eco))}\n"
+                + f"bin_dir={json.dumps(str(eco / 'bin'))}\ncache_dir={json.dumps(str(cache))}\n"
+                + f"stage_dir={json.dumps(str(eco / 'staging'))}\n"
+                + 'plan_mode=0\nmkdir -p "$bin_dir" "$stage_dir"\ninstalled_pin_ids=()\n'
+                + f"install_pin {tool_id}\n")
+        result = self._bash32(tmp_path, body, path_prefix=str(shim))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn(f"Installed {tool_id} 0.50.0 (tarball)", result.stdout)
+        self.assertTrue((eco / "bin" / tool_id).exists())
+        return result
+
+    def test_installing_the_rtk_pin_prints_the_reminder_and_other_pins_do_not(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = self._install_pin(Path(tmp), "rtk")
+            self.assertIn(_expected_rtk_reminder(Path(tmp) / FAKE_HOME / MAC_RTK_CONFIG), result.stdout)
+        with tempfile.TemporaryDirectory() as tmp:
+            result = self._install_pin(Path(tmp), "qdrant")
+            self.assertNotIn("Reminder:", result.stdout)
+
+    def _uv(self, tmp_path: Path, call: str, receipt_rev=None, with_uv=True):
+        eco, bin_dir, shim = tmp_path / "eco", tmp_path / "bin", tmp_path / "shim"
+        for directory in (eco, bin_dir, shim):
+            directory.mkdir()
+        calls = tmp_path / "uv-calls.log"
+        if with_uv:
+            write = ("" if receipt_rev is None else
+                     'mkdir -p "$UV_TOOL_DIR/serena-agent"\n'
+                     f"printf '[tool]\\nrequirements = [{{ name = \"serena-agent\", git = \"https://github.com/oraios/serena?rev={receipt_rev}\" }}]\\n' "
+                     '> "$UV_TOOL_DIR/serena-agent/uv-receipt.toml"\n')
+            (shim / "uv").write_text('#!/bin/sh\nprintf "%s|%s|%s\\n" "$UV_TOOL_DIR" "$UV_TOOL_BIN_DIR" "$*" >> '
+                                     f"{json.dumps(str(calls))}\n{write}")
+            (shim / "uv").chmod(0o755)
+        body = (f"ecosystem_root={json.dumps(str(eco))}\nbin_dir={json.dumps(str(bin_dir))}\n"
+                + _shell_functions(SCRIPT_PATH.read_text(), "install_uv_tool", "install_uv_tool_from_git")
+                + call + "\n")
+        # PATH is the shim directory plus a directory of symlinks to the only two external commands
+        # these functions and the shim run (grep, mkdir), never /usr/bin or /bin themselves: a uv
+        # installed there (a distro package) must neither answer instead of the shim nor turn the
+        # "no uv" case into a real networked `uv tool install`.
+        tools = tmp_path / "tools"
+        tools.mkdir()
+        for utility in ("grep", "mkdir"):
+            found = shutil.which(utility)
+            self.assertIsNotNone(found, f"{utility} is needed on PATH to run this test")
+            (tools / utility).symlink_to(found)
+        environment_path = f"{shim}{os.pathsep}{tools}"
+        self.assertEqual(shutil.which("uv", path=environment_path), str(shim / "uv") if with_uv else None)
+        home = tmp_path / FAKE_HOME
+        home.mkdir()
+        harness = tmp_path / "harness.sh"
+        harness.write_text("set -Eeuo pipefail\n" + body)
+        result = subprocess.run([BASH32, str(harness)], capture_output=True, text=True, timeout=60,
+                                env={"HOME": str(home), "PATH": environment_path})
+        return result, (calls.read_text() if calls.exists() else ""), eco, bin_dir
+
+    def test_install_uv_tool_installs_an_sdist_pins_package_spec_into_the_ecosystem_dirs(self):
+        # An sdist url is not consumed (install_pin always passes the url and sha256): uv resolves
+        # "<package>==<version>" from its index. PATH has no curl, so a download attempt would fail;
+        # UvToolWheelPinUnderRealBash32Tests covers the wheel url path.
+        call = ("install_uv_tool headroom 0.37.0 'headroom-ai[mcp]' "
+                f"https://files.pythonhosted.org/packages/headroom_ai-0.37.0.tar.gz {'0' * 64}")
+        with tempfile.TemporaryDirectory() as tmp:
+            result, calls, eco, bin_dir = self._uv(Path(tmp), call)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(calls, f"{eco}/python-tools|{bin_dir}|tool install --python 3.13 headroom-ai[mcp]==0.37.0\n")
+
+    def test_install_uv_tool_from_git_accepts_only_a_receipt_with_the_pinned_commit(self):
+        call = f"install_uv_tool_from_git serena 2.0.0.dev0 https://github.com/oraios/serena {self.COMMIT} serena-agent"
+        cases = {
+            "pinned commit": (self.COMMIT, True, 0, ""),
+            "another commit": ("0" * 40, True, 1, f"does not record the pinned commit {self.COMMIT}"),
+            "no receipt": (None, True, 1, "no uv-receipt.toml"),
+            "no uv": (self.COMMIT, False, 1, "uv is required to install serena"),
+        }
+        for label, (rev, with_uv, code, message) in cases.items():
+            with self.subTest(case=label), tempfile.TemporaryDirectory() as tmp:
+                result, calls, eco, bin_dir = self._uv(Path(tmp), call, rev, with_uv)
+                self.assertEqual(result.returncode, code, result.stderr)
+                self.assertIn(message, result.stderr)
+                if with_uv:
+                    self.assertEqual(calls, f"{eco}/python-tools|{bin_dir}|tool install --python 3.13 "
+                                            f"git+https://github.com/oraios/serena@{self.COMMIT}\n")
+
+    def test_token_efficiency_plan_runs_clean_under_real_bash_32(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _assert_full_plan(self, _plan_run(BASH32, "token-efficiency", Path(tmp)), "token-efficiency")
+
+
+@unittest.skipUnless(BASH32, "no real bash 3.2 binary reachable (set BASH32_BINARY, or run on a real Mac)")
+class UvToolWheelPinUnderRealBash32Tests(unittest.TestCase):
+    """2026-09-26: install_uv_tool is re-ported verbatim from bootstrap-linux.sh after #334, so a
+    uv-tool pin whose url is a wheel (headroom's macosx_11_0_arm64 one) is downloaded, checked against
+    its sha256 by the shared fetch()/verify_sha256() helpers (`shasum -a 256` when available,
+    otherwise GNU sha256sum)
+    before uv runs, and installed as `<package> @ file://<wheel>` with each path segment
+    percent-encoded. Mirrors tests/test_adoption_bootstrap.py's UvToolWheelPinTests, but runs the
+    macOS script's own fetch, install_uv_tool and install_pin under a real bash 3.2 on the shipped
+    macOS pin, with only its sha256 swapped for the served fixture's. A `curl` shim logs each URL and
+    writes the fixture bytes; a `uv` shim records its environment and argv. local_integration: the
+    shims prove the argv and the ordering, not uv's handling of it, and no Mac ran anything."""
+
+    WHEEL = b"fixture wheel bytes\n"
+    _bash32 = PortedFunctionsUnderRealBash32Tests._bash32
+    # Each character a bare-path direct reference misreads, plus a literal "%" and a non-ASCII letter.
+    AWKWARD_ROOT = "eco #1 ;%é"
+
+    def _run(self, pin_id="headroom", eco_name="eco", **changes):
+        shipped = next(tool for tool in load(PINS_PATH)["tools"] if tool["id"] == pin_id)
+        pin = {**shipped, "sha256": hashlib.sha256(self.WHEEL).hexdigest(), **changes}
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        tmp_path = Path(tmp.name)
+        eco = tmp_path / eco_name
+        for directory in ("downloads", "bin"):
+            (eco / directory).mkdir(parents=True)
+        (tmp_path / "served").write_bytes(self.WHEEL)
+        logs = {name: tmp_path / f"{name}.log" for name in ("curl", "uv")}
+        shim = tmp_path / "shim"
+        shim.mkdir()
+        (shim / "curl").write_text(
+            "#!/bin/sh\n"
+            'out=""; prev=""\n'
+            'for arg in "$@"; do\n'
+            '  if [ "$prev" = "--output" ]; then out="$arg"; fi\n'
+            f'  case "$arg" in https://*) printf "%s\\n" "$arg" >> {shlex.quote(str(logs["curl"]))} ;; esac\n'
+            '  prev="$arg"\n'
+            "done\n"
+            f'cp {shlex.quote(str(tmp_path / "served"))} "$out"\n')
+        (shim / "uv").write_text(
+            '#!/bin/sh\nprintf "%s\\n" "UV_TOOL_DIR=$UV_TOOL_DIR" "UV_TOOL_BIN_DIR=$UV_TOOL_BIN_DIR" "$@" "<end>" '
+            f'>> {shlex.quote(str(logs["uv"]))}\n')
+        for tool in shim.iterdir():
+            tool.chmod(0o755)
+        pins_path = tmp_path / "pins.json"
+        pins_path.write_text(json.dumps({"tools": [pin]}))
+        body = (_shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_uv_tool", "install_pin")
+                + f"pins_path={shlex.quote(str(pins_path))}\n"
+                + f"ecosystem_root={shlex.quote(str(eco))}\n"
+                + f"bin_dir={shlex.quote(str(eco / 'bin'))}\n"
+                + f"cache_dir={shlex.quote(str(eco / 'downloads'))}\n"
+                + "plan_mode=0\ninstalled_pin_ids=()\n"
+                + f"install_pin {shlex.quote(pin['id'])}\n")
+        result = self._bash32(tmp_path, body, path_prefix=str(shim))
+        urls = logs["curl"].read_text().splitlines() if logs["curl"].exists() else []
+        text = logs["uv"].read_text() if logs["uv"].exists() else ""
+        uv_calls = [record.splitlines() for record in text.split("<end>\n") if record]
+        return pin, result, urls, uv_calls, eco
+
+    def uv_argv(self, eco: Path, spec: str) -> list:
+        return [f"UV_TOOL_DIR={eco}/python-tools", f"UV_TOOL_BIN_DIR={eco}/bin",
+                "tool", "install", "--python", "3.13", spec]
+
+    def assert_uv_installs_the_wheel_file(self, uv_calls: list, eco: Path, package: str, wheel: Path):
+        """One uv call whose spec is `<package> @ file://<url path>`: URI-safe characters and %XX
+        escapes only, decoding back to the downloaded wheel's path."""
+        self.assertEqual(len(uv_calls), 1, uv_calls)
+        spec = uv_calls[0][-1]
+        self.assertEqual(uv_calls[0], self.uv_argv(eco, spec))
+        name, separator, uri = spec.partition(" @ file://")
+        self.assertEqual((name, separator), (package, " @ file://"), spec)
+        self.assertRegex(uri, r"\A/[A-Za-z0-9._~!*'()/%-]+\Z")
+        self.assertEqual(urllib.parse.unquote(uri), str(wheel))
+
+    def test_the_darwin_arm64_wheel_pin_installs_the_verified_wheel_with_its_extras(self):
+        pin, result, urls, uv_calls, eco = self._run()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue(pin["url"].endswith("-macosx_11_0_arm64.whl") and pin["package"] == "headroom-ai[mcp]", pin)
+        wheel = eco / "downloads" / pin["url"].rsplit("/", 1)[1]
+        self.assertEqual(urls, [pin["url"]])
+        self.assertEqual(wheel.read_bytes(), self.WHEEL)
+        self.assert_uv_installs_the_wheel_file(uv_calls, eco, pin["package"], wheel)
+        self.assertIn(f"Installed headroom {pin['version']} (uv-tool)", result.stdout)
+
+    def test_an_install_root_with_uri_delimiters_is_percent_encoded_in_the_file_url(self):
+        pin, result, urls, uv_calls, eco = self._run(eco_name=self.AWKWARD_ROOT)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        wheel = eco / "downloads" / pin["url"].rsplit("/", 1)[1]
+        self.assertEqual(wheel.read_bytes(), self.WHEEL)
+        self.assert_uv_installs_the_wheel_file(uv_calls, eco, pin["package"], wheel)
+        self.assertIn("/eco%20%231%20%3B%25%C3%A9/downloads/", uv_calls[0][-1])
+
+    def test_a_wheel_that_fails_its_sha256_is_refused_before_uv_runs(self):
+        pin, result, urls, uv_calls, eco = self._run(sha256="0" * 64)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn(f"Checksum mismatch: {pin['url']}", result.stderr)
+        self.assertEqual(urls, [pin["url"]])
+        self.assertEqual(uv_calls, [], "uv must never be handed an unverified wheel")
+        self.assertFalse((eco / "downloads" / pin["url"].rsplit("/", 1)[1]).exists())
+        self.assertNotIn("Installed headroom", result.stdout)
+
+    def test_a_wheel_named_for_another_version_is_refused_before_any_download(self):
+        pin, result, urls, uv_calls, eco = self._run(version="0.0.0")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Refusing to install headroom 0.0.0: its pinned wheel", result.stderr)
+        self.assertEqual((urls, uv_calls), ([], []))
+
+    def test_the_markitdown_sdist_pin_is_still_resolved_from_the_index_by_name_and_version(self):
+        pin, result, urls, uv_calls, eco = self._run("markitdown")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue(pin["url"].endswith(".tar.gz"), pin["url"])
+        self.assertEqual(urls, [])
+        self.assertEqual(uv_calls, [self.uv_argv(eco, f"markitdown=={pin['version']}")])
+
+
 def _shell_functions(text: str, *names: str) -> str:
     """The source of top-level shell functions, from `name() {` to its `}`."""
     blocks = []
@@ -749,6 +1520,15 @@ def _shell_functions(text: str, *names: str) -> str:
         assert match, f"function {name} not found"
         blocks.append(match.group(0))
     return "".join(blocks)
+
+
+def _config_text_check(function_source: str) -> list[str]:
+    """An rtk_config_reminder's config-file check: its lines from `if [[ -f "$config" ]]` to the
+    first line ending in `; then`, each stripped of surrounding whitespace."""
+    lines = [line.strip() for line in function_source.splitlines()]
+    start = next(index for index, line in enumerate(lines) if line.startswith('if [[ -f "$config" ]]'))
+    end = next(index for index in range(start, len(lines)) if lines[index].endswith("; then"))
+    return lines[start:end + 1]
 
 
 def _signal_and_wait_for_exit(signal_name: str, indent: str = "    ", target_var: str = "ADOPTION_SCRIPT_PID") -> str:
@@ -928,7 +1708,7 @@ class NativeInstallFloorTests(unittest.TestCase):
         harness = tmp_path / "install-native-floor-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + _shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_native", "install_pin")
+            + _shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_native", "install_pin")
             + f"pins_path={json.dumps(str(pins_path))}\n"
             + f"bin_dir={json.dumps(str(eco / 'bin'))}\n"
             + f"cache_dir={json.dumps(str(eco / 'downloads'))}\n"
@@ -1028,7 +1808,7 @@ class EmbeddingModelInstallTests(unittest.TestCase):
         harness = tmp_path / "install-embed-model-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + _shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_embed_model")
+            + _shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_embed_model")
             + f'pins_path={json.dumps(str(pins_path))}\n'
             + f'ecosystem_root={json.dumps(str(eco_root))}\n'
             + "plan_mode=0\n"
@@ -1125,7 +1905,7 @@ class EmbeddingModelInstallTests(unittest.TestCase):
             harness = tmp_path / "harness.sh"
             harness.write_text(
                 "set -Eeuo pipefail\n"
-                + _shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_embed_model")
+                + _shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_embed_model")
                 + f'pins_path={json.dumps(str(pins_path))}\n'
                 + f'ecosystem_root={json.dumps(str(eco_root))}\n'
                 + "plan_mode=1\n"
@@ -2783,7 +3563,8 @@ class CIEmbedModelCacheOrderTests(unittest.TestCase):
         text = SCRIPT_PATH.read_text()
         fetch_body = re.search(r"(?ms)^fetch\(\) \{\n.*?^\}\n", text)
         self.assertIsNotNone(fetch_body, "fetch() not found")
-        self.assertIn('shasum -a 256 --check --status', fetch_body.group(0))
+        self.assertIn('verify_sha256', fetch_body.group(0))
+        self.assertIn('shasum -a 256 --check --status', _shell_functions(text, "verify_sha256"))
         self.assertIn("install_embed_model", text)
 
 
@@ -3165,7 +3946,13 @@ class PlatformPageTests(unittest.TestCase):
     def test_page_carries_the_pinned_table_not_a_name_pattern_table(self):
         self.assertNotIn("Expected darwin-arm64 asset name pattern", self.page)
         for tool in load(PINS_PATH)["tools"]:
-            self.assertIn(tool["sha256"], self.page, f"{tool['id']} sha256 missing from the page")
+            # 2026-09-26: serena (kind uv-tool-from-git) pins a verified
+            # commit instead of a sha256; the page must still carry that
+            # commit as its own integrity anchor.
+            if tool["sha256"] is None:
+                self.assertIn(tool["commit"], self.page, f"{tool['id']} commit missing from the page")
+            else:
+                self.assertIn(tool["sha256"], self.page, f"{tool['id']} sha256 missing from the page")
             self.assertIn(tool["checksum_source"], self.page)
 
     def test_page_bounds_what_a_hosted_run_proves(self):

@@ -749,7 +749,7 @@ def run_install_pin(test: unittest.TestCase, tmp_path: Path, pin: dict, served: 
     harness = tmp_path / "install-pin-harness.sh"
     harness.write_text(
         "set -Eeuo pipefail\n"
-        + shell_functions(SCRIPT_PATH.read_text(), "fetch", "npm_package_name", "install_npm",
+        + shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "npm_package_name", "install_npm",
                           "install_uv_tool", "install_pin")
         + f"pins_path={shlex.quote(str(pins_path))}\n"
         + f"ecosystem_root={shlex.quote(str(eco))}\n"
@@ -1089,7 +1089,7 @@ class NativeInstallFloorTests(unittest.TestCase):
         harness = tmp_path / "install-native-floor-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_native", "install_pin")
+            + shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_native", "install_pin")
             + f"pins_path={shlex.quote(str(pins_path))}\n"
             + f"bin_dir={shlex.quote(str(bin_dir))}\n"
             + f"cache_dir={shlex.quote(str(eco / 'downloads'))}\n"
@@ -1175,8 +1175,9 @@ class RtkConfigReminderTests(unittest.TestCase):
     so a command that merely mentions "show", "branch" or a colon as an ordinary argument
     (`git commit -m "update branch docs"`, `git push origin branch`, `git diff main branch`) is no
     longer wrongly excluded, while a `--git-dir`/`--work-tree` form (`git --git-dir /r/.git
-    show HEAD:x`, `git --work-tree /w branch -a`) is now excluded instead of missed. The reminder now says to replace, not add, the
-    existing `exclude_commands` line, and fires on a duplicate key too: a duplicate is invalid TOML
+    show HEAD:x`, `git --work-tree /w branch -a`) is now excluded instead of missed. The reminder says
+    to replace the whole `exclude_commands` value inside the existing table, adding the key or table
+    only when missing, and fires on a duplicate key too: a duplicate is invalid TOML
     and rtk silently loads defaults (`Config::load().unwrap_or_default()`, src/core/config.rs:278-281).
     Retained verification of these patterns on the pinned binary (the one extracted from the upstream
     rtk-ai/rtk v0.50.0 release asset) is a raw capture in
@@ -1225,9 +1226,11 @@ class RtkConfigReminderTests(unittest.TestCase):
 
     @classmethod
     def expected_reminder(cls, config) -> str:
-        return (f"Reminder: for the Claude hook, replace any existing exclude_commands line in "
-                f"{config} with [hooks] exclude_commands = {cls.EXCLUDE_ITEMS} "
-                "(a duplicate key is invalid TOML and rtk silently loads defaults; "
+        return (f"Reminder: for the Claude hook, in {config}, inside the existing [hooks] table "
+                'replace the whole exclude_commands value (from "exclude_commands =" through its closing "]"), '
+                "or add the key if the table lacks it. Add the [hooks] header line only when the file "
+                f"has no [hooks] table. Use: exclude_commands = {cls.EXCLUDE_ITEMS} "
+                "(a duplicate key or table is invalid TOML and rtk silently loads defaults; "
                 "recipes/README.md#native-context-mode-and-hooks); this script does not write it.")
 
     @staticmethod
@@ -1280,7 +1283,7 @@ class RtkConfigReminderTests(unittest.TestCase):
         harness = tmp_path / "rtk-reminder-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_single_binary_tarball",
+            + shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_single_binary_tarball",
                               "rtk_config_reminder", "install_pin")
             + f"pins_path={shlex.quote(str(pins_path))}\n"
             + f"ecosystem_root={shlex.quote(str(eco))}\n"
@@ -1321,6 +1324,40 @@ class RtkConfigReminderTests(unittest.TestCase):
             result, _home = self._run(Path(tmp), hook="excluded")
             self.assertEqual(self.reminders(result.stdout), [])
             self.assertEqual(config.read_text(), self.CONFIGURED)
+
+    def test_printed_assignment_preserves_valid_toml_for_each_edit_case(self):
+        # TOML 1.0.0 #table forbids duplicate tables; use the actual printed assignment
+        # and the recipe's values, with a trailing table to catch insertion in the wrong table.
+        cases = {
+            "single-line value": ('[hooks]\nexclude_commands = ["old"]\n', 'exclude_commands = ["old"]'),
+            "multiline value": ('[hooks]\nexclude_commands = [\n  "old",\n]\n',
+                                'exclude_commands = [\n  "old",\n]'),
+            "missing key": ("[hooks]\n", None),
+            "missing table": ("", None),
+        }
+        for name, (hooks, old_value) in cases.items():
+            with self.subTest(config=name), tempfile.TemporaryDirectory() as tmp:
+                original = hooks + "[tracking]\nhistory_days = 30\n"
+                config = Path(tmp) / "home/.config/rtk/config.toml"
+                config.parent.mkdir(parents=True)
+                config.write_text(original)
+                result, _home = self._run(Path(tmp))
+                reminder, = self.reminders(result.stdout)
+                self.assertEqual(reminder, self.expected_reminder(config))
+                match = re.search(r"Use: (exclude_commands = \[.*\]) \(a duplicate", reminder)
+                self.assertIsNotNone(match, reminder)
+                assignment = match.group(1)
+                if old_value is not None:
+                    edited = original.replace(old_value, assignment, 1)
+                elif hooks:
+                    edited = original.replace("[hooks]\n", f"[hooks]\n{assignment}\n", 1)
+                else:
+                    edited = original + f"[hooks]\n{assignment}\n"
+                parsed = tomllib.loads(edited)
+                self.assertEqual(parsed["hooks"], tomllib.loads(self.CONFIGURED)["hooks"])
+                self.assertEqual(parsed["tracking"], {"history_days": 30})
+                self.assertEqual(edited.count("[hooks]"), 1)
+                self.assertEqual(config.read_text(), original, "the reminder must never write the config")
 
     def test_a_config_without_the_key_is_reminded_and_left_unchanged(self):
         for text in ("[hooks]\n", '[hooks]\nexclude_commands = ["diff"]\n', "# exclude_commands\n",
@@ -1380,7 +1417,7 @@ class RtkConfigReminderTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             xdg = Path(tmp) / "xdg"
             result, _home = self._run(Path(tmp), xdg_config_home=xdg)
-            self.assertIn(f"replace any existing exclude_commands line in {xdg}/rtk/config.toml with",
+            self.assertIn(f"in {xdg}/rtk/config.toml, inside the existing [hooks] table",
                           self.reminders(result.stdout)[0])
             (xdg / "rtk").mkdir(parents=True)
             (xdg / "rtk/config.toml").write_text(self.CONFIGURED)
@@ -1499,6 +1536,77 @@ class RtkConfigReminderRealBinaryTests(unittest.TestCase):
                     self.assertFalse(config.exists(), "the reminder must not create the config")
                 else:
                     self.assertEqual(config.read_text(), text)
+
+
+class RtkExclusionInstructionTests(unittest.TestCase):
+    """2026-09-26 (GPT-6 verification of the macOS token pins): adoption/platforms/macos-arm64.md told
+    a reader to replace an existing `exclude_commands` line with the recipe's block, whose first line
+    is the `[hooks]` header. In a file that already has a `[hooks]` table that makes a second one,
+    which is invalid TOML: rtk 0.50.0 then loads its defaults and the hook keeps rewriting
+    (`duplicate key `hooks` in document root`; evidence/artifacts/macos-token-pins-20260926/
+    rtk-hooks-table-control.txt). Replacing a "line" also breaks the recipe's own multi-line value.
+    So every instruction that puts the four entries into rtk's config (the paragraph before each copy
+    of the recipe's block in a Markdown page outside evidence/, bootstrap.md step 4a and the macOS
+    rtk pin's install_note) says to replace the key's whole value inside the existing `[hooks]`
+    table and to add the header only when the file has no `[hooks]` table, and none says to replace
+    an `exclude_commands` line. Repository text only; nothing runs."""
+
+    OLD_LINE_INSTRUCTION = re.compile(
+        r"replace\**\s+(?:any\s+|the\s+)?existing\s+`?(?:\[hooks\]\s+)?exclude_commands`?\s+line", re.I)
+    REQUIRED = ("inside the existing `[hooks]` table", "only when the file has no `[hooks]` table")
+    BLOCK_FENCE = "```toml\n[hooks]\nexclude_commands = [\n"
+    # Retained evidence may quote an old instruction; hidden, dependency and cache directories hold no docs.
+    SKIPPED_DIRECTORIES = {"evidence", "node_modules", "venv", "__pycache__"}
+
+    def instructions(self) -> dict:
+        found = {}
+        for directory, subdirectories, names in os.walk(ROOT):
+            subdirectories[:] = sorted(name for name in subdirectories
+                                       if name not in self.SKIPPED_DIRECTORIES and not name.startswith("."))
+            for name in sorted(names):
+                if not name.endswith(".md"):
+                    continue
+                page = Path(directory) / name
+                text = page.read_text(encoding="utf-8", errors="replace")
+                start = text.find(self.BLOCK_FENCE)
+                while start != -1:
+                    # The block's instruction is the paragraph right before it.
+                    found[f"{page.relative_to(ROOT).as_posix()}, the paragraph before the block at offset {start}"] = (
+                        text[:start].rstrip("\n").rsplit("\n\n", 1)[-1])
+                    start = text.find(self.BLOCK_FENCE, start + 1)
+        bootstrap = (ROOT / "adoption/bootstrap.md").read_text(encoding="utf-8")
+        found["adoption/bootstrap.md step 4a"] = next(
+            line for line in bootstrap.splitlines() if "The template registers the `rtk hook claude` Bash hook" in line)
+        mac_pins = json.loads((ROOT / "adoption/pins-macos-arm64.json").read_text(encoding="utf-8"))
+        found["adoption/pins-macos-arm64.json rtk install_note"] = next(
+            tool["install_note"] for tool in mac_pins["tools"] if tool["id"] == "rtk")
+        return found
+
+    def test_every_instruction_sets_the_value_inside_the_one_hooks_table(self):
+        found = self.instructions()
+        pages = {label.split(",", 1)[0] for label in found}
+        # Not vacuous: the two pages that carry the recipe's block today are found.
+        self.assertLessEqual({"recipes/README.md", "adoption/platforms/macos-arm64.md"}, pages)
+        for label, text in found.items():
+            with self.subTest(label):
+                self.assertNotRegex(text, self.OLD_LINE_INSTRUCTION)
+                # Markdown wraps lines and a phrase may open a sentence.
+                words = " ".join(text.split()).lower()
+                for phrase in self.REQUIRED:
+                    self.assertIn(phrase.lower(), words)
+
+    def test_bootstrap_step_4a_keeps_the_four_entry_value_verbatim(self):
+        self.assertIn(f"`exclude_commands = {RtkConfigReminderTests.EXCLUDE_ITEMS}`",
+                      self.instructions()["adoption/bootstrap.md step 4a"])
+
+    def test_the_check_rejects_the_replaced_line_instructions(self):
+        # The four wordings this class replaced, as they stood before the fix.
+        for old in ("**Replace** any existing `exclude_commands` line in that file with this block",
+                    "**Replace** the existing `[hooks] exclude_commands` line in `~/.config/rtk/config.toml`",
+                    "also **replace** any existing `[hooks] exclude_commands` line in rtk's config file",
+                    "Replace any existing exclude_commands line there"):
+            with self.subTest(old):
+                self.assertRegex(old, self.OLD_LINE_INSTRUCTION)
 
 
 if __name__ == "__main__":

@@ -52,9 +52,21 @@ release, the note is history and the step is in your checkout (`test -e
    `python3 scripts/hardware_profile.py` to measure this Mac against
    [`adoption/hardware-profiles.json`](../hardware-profiles.json).
 2. `bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation`
-   (usage and exit codes below). Use `macos-arm64-foundation`, not
-   `foundation-cpu`: `qmd` and `rtk` have no macOS pin, so `foundation-cpu`
-   exits 3 here.
+   (usage and exit codes below). Use `macos-arm64-foundation`, the profile
+   this page documents and the hosted smoke job runs. At `v2026.09.26`
+   `foundation-cpu` exits 3 here because `qmd` and `rtk` have no macOS pin;
+   `adoption/pins-macos-arm64.json` changed after `v2026.09.26` to pin both,
+   with the rest of `token-efficiency` (the darwin-arm64 pinned release
+   archives table below), so on main every component of both profiles has a
+   pin and `--plan` resolves them without exit 3. That is a `--plan` result
+   under a `uname`/`sw_vers` shim on Linux (`TokenEfficiencyPlanTests` in
+   `tests/test_adoption_bootstrap_macos.py`): no Mac has installed those eight
+   pins or run their install paths, and the hosted macOS jobs run only
+   `macos-arm64-foundation`, which selects none of them.
+   `macos-arm64-foundation` stays this page's starting profile. Whatever the
+   profile, a run also fetches the pinned 334 MB embedding model and writes a
+   missing Qdrant config: those two steps are not gated on the selected
+   components ([embedding backend decision](#embedding-backend-decision)).
 3. Native sign-in and config rendering: [`adoption/bootstrap.md`](../bootstrap.md)
    steps 3–4 (Codex, Claude and GitHub device flows; `tools/adoption/render_config.py`
    with this host's own `adoption/hosts/<host>.json`). Its step 4a installs
@@ -149,7 +161,8 @@ bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation \
   [--skip-system-packages] [--allow-unpinned <id,id,...>] [--plan]
 ```
 
-`--plan` resolves and prints every pinned component (version, asset, SHA-256)
+`--plan` resolves and prints every pinned component (version, asset, SHA-256;
+for serena's `uv-tool-from-git` pin its commit instead, changed after `v2026.09.26`)
 with no network access and no installation. On this repository's Linux host it
 runs only under a `uname`/`sw_vers` shim. The full install path (no `--plan`,
 with `--skip-system-packages`) has run on real Darwin arm64 once, on the hosted
@@ -160,7 +173,7 @@ acceptance — remains unrun.
 | Exit | Meaning |
 | --- | --- |
 | 0 | The profile installed, or `--plan` finished printing it. |
-| 1 | Guard or refusal: not Darwin/arm64, run as root, no Homebrew for a real run, an unusable `ECO_INSTALL_ROOT`, another bootstrap holding the lock, a checksum mismatch, or a pin whose `sha256` is null (fail closed, in `--plan` too). |
+| 1 | Guard or refusal: not Darwin/arm64, run as root, no Homebrew for a real run, an unusable `ECO_INSTALL_ROOT`, another bootstrap holding the lock, a checksum mismatch, or a pin whose `sha256` is null (fail closed, in `--plan` too) unless it is a `uv-tool-from-git` pin with a 40-hex `commit`, which is refused without one. |
 | 2 | Usage error: missing `--profile`, an unknown argument, or a flag given without its value. |
 | 3 | A selected component has no pin at all in [`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json) and was not named in `--allow-unpinned`. Checked before anything is installed, and in `--plan` too; `--allow-unpinned <id,id,...>` skips the named ids instead and echoes them to the run log. |
 | 4 | A prerequisite (`curl`, `git`, `tar`, `shasum`, `unzip`, `jq`, `mktemp`) is still missing after the Homebrew step. With `--skip-system-packages` no `brew install` is attempted and the check lists what is missing. |
@@ -179,7 +192,9 @@ release's script with `</dev/null`.
 
 Every selected `macos-arm64-foundation` component, including
 `socraticode` (below), has a pin, so the shipped profile needs no
-`--allow-unpinned`.
+`--allow-unpinned`; on main that also holds for `foundation-cpu` and
+`token-efficiency`, whose remaining eight pins were added after the
+`v2026.09.26` release.
 Exit codes 3 and 4 and the `--allow-unpinned` flag mirror
 [`adoption/bootstrap-linux.sh`](../bootstrap-linux.sh). One difference is
 disclosed rather than hidden: the script keeps a `documented_unpinned_ids=()`
@@ -192,9 +207,17 @@ silently reusing a stale skip; `--plan` is also macOS-only.
 These components are installed from upstream `darwin-arm64` (or `darwin-arm64`-equivalent)
 release archives rather than Homebrew, matching the archive convention in
 [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions).
-Every SHA-256 below was read from the publisher on 2026-09-22 — a checksum file,
-a `.sha256` sidecar, or (where the publisher ships neither) the GitHub release
-asset `digest` plus an independent re-hash of the downloaded asset. None was
+Every SHA-256 below was read from the publisher on 2026-09-22, or on 2026-09-26
+for the eight rows from `rtk` down — a checksum file, a `.sha256` sidecar, a
+registry or PyPI digest, or (where the publisher ships none) the GitHub release
+asset `digest` plus an independent re-hash of the downloaded asset. `headroom`,
+`markitdown` and `serena` are not archives this script extracts: uv installs them.
+`headroom`'s row is the wheel uv installs on Apple Silicon, and the script downloads
+that wheel, verifies the row's sha256 with `shasum -a 256` (exit 1 before uv runs on a
+mismatch) and hands uv the local file; `markitdown`'s is its platform-independent sdist,
+while uv resolves its `py3-none-any` wheel from PyPI (that wheel's sha256 is in the pin's
+`install_note`) and checks neither hash, so both are cross-checks; `serena`'s is the
+commit uv builds. None was
 guessed, and none was produced on a Mac: reading a publisher checksum is
 `source_review`/independent observation, not an installation receipt. The
 machine-readable copy with each `checksum_source` and `checksum_ref` is
@@ -213,6 +236,90 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `llama-cpp` | b11057 | `llama-b11057-bin-macos-arm64.tar.gz` | `443eadead90d44c3925b7163012430b2df4934df881cf72a4d94fc71d1380da1` | `github_release_asset_digest_plus_local_rehash` |
 | `qdrant` | 1.19.1 | `qdrant-aarch64-apple-darwin.tar.gz` | `e060209dfefc9d977ddcec48521349f505f8fd1ce21f2a3db444140870522fe4` | `github_release_asset_digest_plus_local_rehash` |
 | `socraticode` | 1.14.0 | `socraticode-1.14.0.tgz` | `3dbb106c876be4214048289cef31094eb0e48e97007fb90180270edc4eed7c46` | `npm_registry_integrity_crosscheck` |
+| `rtk` | 0.50.0 | `rtk-aarch64-apple-darwin.tar.gz` | `fe54761a9950266e3a78ddb66a8af5e067251169da306a288e0751de63d836fe` | `publisher_checksum_file` |
+| `qmd` | 2.8.3 | `qmd-2.8.3.tgz` | `2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0` | `npm_registry_integrity_crosscheck` |
+| `repomix` | 1.18.1 | `repomix-1.18.1.tgz` | `d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f` | `npm_registry_integrity_crosscheck` |
+| `toon` | 4.1.1 | `cli-4.1.1.tgz` (`@toon-format/cli`) | `93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6` | `npm_registry_integrity_crosscheck` |
+| `ccusage` | 20.0.24 | `ccusage-20.0.24.tgz` | `69787a0aa2269cd14f3d0f41d179b80744d5384e912ee11852897ecd0bf91183` | `npm_registry_integrity_crosscheck` |
+| `headroom` | 0.37.0 | `headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl` | `b4392f68a8d02d74c62c1734cf5bf327511dcc72678f01669f44f0612944d59c` | `pypi_json_digest_plus_local_rehash` |
+| `markitdown` | 0.1.8 | `markitdown-0.1.8.tar.gz` (sdist, platform-independent) | `17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed` | `pypi_json_digest_plus_local_rehash` |
+| `serena` | 2.0.0.dev0 | git commit `c6fbd1c5932df2494ffa0020af5a9fbe80b82143` on oraios/serena (no released archive) | sha256 null; the commit above is the integrity anchor | `github_commit_existence_verified` |
+
+**`rtk`, `qmd`, `repomix`, `toon`, `ccusage`, `headroom`, `markitdown` and `serena` were
+added on 2026-09-26, after `v2026.09.26`** (`adoption/pins-macos-arm64.json` and
+`adoption/bootstrap-macos.sh` changed after `v2026.09.26`), closing the `token-efficiency`
+profile's macOS pin gap (6 of its 14 components were pinned before; see
+[the profile table](../README.md#choose-a-small-starting-profile)). `rtk` and `qmd` are also
+the two `foundation-cpu` components this file lacked. Each pin has the Linux pin's version,
+and each digest was re-checked against a fresh download of its upstream artifact on
+2026-09-26 ([`digest-check.txt`](../../evidence/artifacts/macos-token-pins-20260926/digest-check.txt),
+a local harness; its failed earlier runs and a negative control that it fails on wrong pins
+are kept beside it). The `rtk` archive holds one bare
+`rtk` executable, so the existing single-binary tarball installer applies unchanged. `qmd`,
+`repomix`, `toon` and `ccusage` are the same npm registry tarballs as their Linux pins;
+`qmd`'s `sqlite-vec-darwin-arm64` and `ccusage`'s `@ccusage/ccusage-darwin-arm64` optional
+dependencies are unpinned, like the `rolldown` dependency in `mcporter`'s `install_note` in
+[`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json). `headroom` and
+`markitdown` use the new `uv-tool` kind and `serena` the new `uv-tool-from-git` kind, whose
+functions `adoption/bootstrap-macos.sh` copies verbatim from `adoption/bootstrap-linux.sh`.
+`headroom` pins its `macosx_11_0_arm64` wheel: headroom-ai 0.37.0 publishes compiled abi3
+wheels per platform plus a maturin (Rust) sdist that would need a local Rust build, and this
+is its only arm64-compatible macOS wheel. `markitdown` pins the same platform-independent
+sdist as the Linux pin. `adoption/bootstrap-macos.sh` changed after `v2026.09.26` to carry
+the Linux `install_uv_tool` from #334 and its byte-identical download/checksum helpers.
+It consumes a wheel `url`: `fetch()` downloads headroom's wheel into
+`$ECO_INSTALL_ROOT/downloads/`, verifies its sha256 through `verify_sha256()` (preferring
+`shasum -a 256`, with GNU `sha256sum` as the Linux fallback) and exits 1 before uv runs on a mismatch; a wheel whose filename names
+another version is refused before any download, and uv installs
+`'headroom-ai[mcp] @ file://<percent-encoded wheel path>'`, keeping the `[mcp]` extra; the
+wheel's own dependencies still resolve from uv's index. uv resolves `markitdown==0.1.8` from
+PyPI and does not check its sdist sha256, which the pin records as a cross-check. No Mac has
+run either install; `tests/test_adoption_bootstrap_macos.py` runs the wheel path with a `uv`
+shim under a real bash 3.2. `headroom` is registered at Codex/Claude user scope with
+`HEADROOM_OFFLINE=1` and `DO_NOT_TRACK=1` (the addendum in
+[`docs/decisions/2026-09-25-codex-mcp-scope.md`](../../docs/decisions/2026-09-25-codex-mcp-scope.md)).
+`serena` has no PyPI release of its declared `2.0.0.dev0`, so, as on Linux, it pins the
+commit in the table with a null sha256 -- the one exception to this file's fail-closed
+refusal -- and `install_uv_tool_from_git` refuses the install unless the resulting
+`uv-receipt.toml` records that commit. Not in this table: `gitleaks`, `syft` and `dagu`,
+which are not in the `macos-arm64-foundation` component list.
+
+A Mac that runs the Claude RTK hook at the rtk 0.50.0 pin needs the exclusions from
+[the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks) in
+`~/Library/Application Support/rtk/config.toml`, the only config file rtk 0.50.0 reads on
+macOS. It reads `dirs::config_dir()/rtk/config.toml`, which on macOS is under
+`$HOME/Library/Application Support` whatever `XDG_CONFIG_HOME` says, and it reads no
+config-path variable of its own, so a file at the Linux location under `~/.config` is never
+loaded here (the source, and rtk's own README and configuration guide, are retained in
+[`rtk-config-path.txt`](../../evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt)).
+The block below is that file's `[hooks]` table holding the recipe's `exclude_commands` value.
+Inside the existing `[hooks]` table, **replace** the key's whole value, from
+`exclude_commands =` through its closing `]` (or add the key when the table lacks it), and add
+the `[hooks]` header line only when the file has no `[hooks]` table. Keep the file's other keys
+and tables. A second `[hooks]` header or `exclude_commands` key is invalid TOML, and rtk then
+silently loads its defaults
+([`rtk-hooks-table-control.txt`](../../evidence/artifacts/macos-token-pins-20260926/rtk-hooks-table-control.txt):
+on the pinned Linux binary a second `[hooks]` header makes `rtk config` exit 1 while the hook
+keeps rewriting, and this edit loads with the four entries):
+
+```toml
+[hooks]
+exclude_commands = [
+  "^git show [^ ]*:",
+  "diff",
+  '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:',
+  '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)',
+]
+```
+
+The recipe explains each entry. `adoption/bootstrap-macos.sh` never writes that file; after
+installing rtk it prints a reminder unless the key appears exactly once with all four
+entries in that file. That check reads only the file's text, so after editing the file ask
+rtk itself: `rtk config` prints the file it reads on its first line and exits 1 when it
+cannot load that file (a duplicate key, or a `[tracking]` table without `history_days`),
+and the recipe's `rtk hook check` commands show whether the hook applies the exclusions.
+The same retained check shows both on the pinned Linux binary; no Mac has run either.
+At `v2026.09.26` macOS has no rtk pin, and that script prints no reminder.
 
 `socraticode` is installed with `--ignore-scripts` (the pin's own
 `ignore_scripts: true` field, read by the script's `install_npm`), the same
@@ -224,9 +331,7 @@ coverage alongside new `repomix`, `toon`, `headroom`, `ccusage` and `serena`
 entries (the last through a new `uv-tool-from-git` pin kind, since Serena
 has no released version to pin a sha256 against); at that tag and every
 earlier one, the Linux pins file had no `socraticode` entry, only that
-documented manual recipe. Not in this table:
-`gitleaks`, `syft` and `dagu`, which are not in the `macos-arm64-foundation`
-component list.
+documented manual recipe.
 
 One pin, `codex`, still carries an additional `platform_dependency`, not
 covered by the hash above. The `@openai/codex` npm tarball is byte-identical
@@ -276,9 +381,11 @@ pin is unchanged. It changed after `v2026.09.25.2` again: its `rtk`,
 `markitdown`, `ai-memory` and `mcporter` entries moved to newer versions, and
 new `ccusage`, `headroom`, `repomix`, `serena`, `socraticode` and `toon`
 entries were added. Of those ten, only `ai-memory`, `mcporter` and `socraticode`
-have an entry in `adoption/pins-macos-arm64.json`, which is unchanged: it keeps
-ai-memory 2.3.2 and mcporter 0.13.13 until a Mac qualifies the new versions
-itself, and its socraticode entry matches the new Linux one.)
+have an entry in `adoption/pins-macos-arm64.json` at that tag and at `v2026.09.26`;
+it keeps ai-memory 2.3.2 and mcporter 0.13.13 until a Mac qualifies the new
+versions itself, and its socraticode entry matches the new Linux one. It changed
+after `v2026.09.26`, gaining the other seven of those ten and `qmd` at their Linux
+versions; its `claude-code` pin is unchanged.)
 
 The pin is a floor: when `~/.local/bin/claude --version` already reports the
 pinned version or newer, `install_native` keeps that launcher, downloads and
@@ -286,15 +393,15 @@ installs nothing, and logs `Kept installed claude-code <version>`; only a
 missing, older or unreadable launcher gets the verified install, so re-running
 the bootstrap never moves a native auto-updated Claude Code back to the pin
 (`adoption/bootstrap-linux.sh` runs the same `install_native`).
-`adoption/bootstrap-linux.sh` changed after `v2026.09.26` too, in an
-rtk-only, Linux-only check with no macOS equivalent (rtk has no
-`adoption/pins-macos-arm64.json` entry): its post-install reminder now
+`adoption/bootstrap-linux.sh` changed after `v2026.09.26` too, in its rtk
+post-install reminder (the macOS script's own reminder, added with its rtk pin,
+is described in the RTK paragraph above): the Linux reminder now
 requires all four `[hooks] exclude_commands` entries from
 [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks),
 exactly once, instead of the tag's original two, and it also asks the installed
 `rtk hook check` whether rtk honours that file. `adoption/pins-linux-x86_64.json`
 changed after `v2026.09.26` in its rtk and headroom `install_note` text only.
-The Linux script's `install_npm` and `install_uv_tool` changed after `v2026.09.26` as well: its `install_npm` now reads the socraticode pin's `ignore_scripts: true` and passes `--ignore-scripts`, as this page's script already does (the tag's Linux script ignores that field, so there npm runs every install script in socraticode's dependency tree), and its `install_uv_tool` now downloads, sha256-verifies and installs headroom's pinned wheel instead of resolving `headroom-ai[mcp]==0.37.0` from the index; headroom has no macOS pin.
+The Linux script's `install_npm` and `install_uv_tool` changed after `v2026.09.26` as well: its `install_npm` now reads the socraticode pin's `ignore_scripts: true` and passes `--ignore-scripts`, as this page's script already does (the tag's Linux script ignores that field, so there npm runs every install script in socraticode's dependency tree), and its `install_uv_tool` now downloads, sha256-verifies and installs headroom's pinned wheel instead of resolving `headroom-ai[mcp]==0.37.0` from the index. This page's script carries that same `install_uv_tool` for its own headroom pin, whose `macosx_11_0_arm64` wheel it downloads and verifies the same way (both added after `v2026.09.26`; the pins paragraph above).
 The script and both claude-code pins (2.1.281, which fixes a recursive `rm` of
 command-substitution output running unprompted in auto and bypass mode)
 changed after `v2026.09.24.1`: at that tag the pins are 2.1.280 and the script

@@ -1,0 +1,35 @@
+# macOS token-efficiency pin re-verification, 2026-09-26T04:02:35Z
+# Every download below was fetched fresh into an empty scratch directory for this run.
+
+## rtk 0.50.0 (tarball)
+  gh api repos/rtk-ai/rtk/releases/tags/v0.50.0: asset rtk-aarch64-apple-darwin.tar.gz size=4122143 digest=sha256:fe54761a9950266e3a78ddb66a8af5e067251169da306a288e0751de63d836fe
+  checksums.txt line: fe54761a9950266e3a78ddb66a8af5e067251169da306a288e0751de63d836fe  rtk-aarch64-apple-darwin.tar.gz
+  downloaded rtk-aarch64-apple-darwin.tar.gz: 4122143 bytes, sha256 fe54761a9950266e3a78ddb66a8af5e067251169da306a288e0751de63d836fe
+  MATCH: rtk: computed sha256 == pin
+  MATCH: rtk: checksums.txt line == pin
+  MATCH: rtk: GitHub API asset digest == pin
+  tar -tzf members (name, regular file, mode): [('rtk', True, '0o755')]
+  MATCH: rtk: archive holds exactly one bare 'rtk' regular file
+
+## qmd 2.8.3 (npm, npm @tobilu/qmd)
+  npm view @tobilu/qmd@2.8.3 dist.tarball = https://registry.npmjs.org/@tobilu/qmd/-/qmd-2.8.3.tgz
+  npm view dist.integrity = sha512-zjfVwrObPB618B6x8SdhlGv/tX9OxRHsbQnr5DUtBvqPK6HGQ27lM+9/BAY5okpjrHVnW56hLyDkqoTcsrVLzA==
+  npm view dist.shasum = 7e1515b1daf349a1dc88cff53da925d34f89c948
+  npm view optionalDependencies = {"sqlite-vec-darwin-arm64": "0.1.9", "sqlite-vec-darwin-x64": "0.1.9", "sqlite-vec-linux-arm64": "0.1.9", "sqlite-vec-linux-x64": "0.1.9", "sqlite-vec-windows-x64": "0.1.9"}
+  MATCH: qmd: pin url == registry dist.tarball
+  downloaded: 255569 bytes, sha256 2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0
+  MATCH: qmd: computed sha512 == dist.integrity
+  MATCH: qmd: computed sha1 == dist.shasum
+  MATCH: qmd: computed sha256 == pin
+  MATCH: qmd: pin sha512 quoted in checksum_ref == dist.integrity
+  MATCH: qmd: Linux pin is the same version and sha256
+  MATCH: qmd: optionalDependencies has sqlite-vec-darwin-arm64
+  sqlite-vec builds listed: ['sqlite-vec-darwin-arm64', 'sqlite-vec-darwin-x64', 'sqlite-vec-linux-arm64', 'sqlite-vec-linux-x64', 'sqlite-vec-windows-x64']
+
+## repomix 1.18.1 (npm, npm repomix)
+--- stderr ---
+Traceback (most recent call last):
+  File "<scratch>/verify_pins.py", line 112, in <module>
+    dist = meta["dist"]
+           ~~~~^^^^^^^^
+KeyError: 'dist'

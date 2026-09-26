@@ -3474,23 +3474,23 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "14d361f249250e74b4bb74184e2e3a7ee70425137d91bb4807f0979b2c7b496f",
-      "bytes": 16859
+      "sha256": "0e5ffc6c16d1614cd88c5cbc2807231fd3220a72898ef478242a9560d374ef77",
+      "bytes": 16867
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "eb68717b4bf3f95bdfbba40c12a342d939ba4388dca7fd1584e7c90d9d423135",
-      "bytes": 38451
+      "sha256": "45e0badf2951a47a843c902272b34f57faa1106f655532101cfdfd1074d6ce75",
+      "bytes": 38949
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "fb86575b8a90bc9a0406cbc6c7e1122462b56ea4d38a6d5641392ba920d46446",
-      "bytes": 70070
+      "sha256": "6202815923dc34ca6d9b3c1ed7043640be0bba9280b4df9d828f1ad0abe7e26d",
+      "bytes": 79682
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "dc187c8f474d07fbcb13554e9a21d56eead7e61f262986b9d9280a48521fc896",
-      "bytes": 34875
+      "sha256": "b971a04054aef72604c7fa11aff65cd6861691097aca61ecf2619fe37a7eacf7",
+      "bytes": 36954
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3594,8 +3594,8 @@
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "23076e65f0f2014396ea64c4aa71701942c8e26b0dfe328037f591d461dba8fa",
-      "bytes": 20590
+      "sha256": "7bd12ba2f0cc5cf06c59de3b4418a6e640ce26292613ee1fd2309403b04dd3f7",
+      "bytes": 39075
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -3604,8 +3604,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "042e973b99b797c27e1aa87bcd324238eedfd33afcc27249ce922ba3c51efe05",
-      "bytes": 43435
+      "sha256": "1e8d64a35da17af80b73b3039fc576011c8333c1d4d61ae84d099110ac8e2ee2",
+      "bytes": 52630
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -12850,8 +12850,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "0ae1570d8fb5e9747e19a000b066e1894ccc5d1e09b248352cc522c02e4b874d",
-      "bytes": 287111
+      "sha256": "bfef40d5740506a491e4d41307fe521ae7bc5609b6342ed3db6b7779e3ed2d3b",
+      "bytes": 287241
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -13635,8 +13635,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "9c90256cf2907f48fb55f0062bbea7af03e32791f22c0df9aac083b8972dbd01",
-      "bytes": 18070
+      "sha256": "9002f6945abe186c8c23c3d129a15aeedfbce4d0d42d1a0a77d2d0a2fa0757be",
+      "bytes": 18181
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -13645,8 +13645,8 @@
     },
     {
       "path": "docs/next-host-stages.md",
-      "sha256": "1c579ccebcebb8830bfbd0f50053ed5894bf54d4e0ca24fc011ce4693c3c1067",
-      "bytes": 13452
+      "sha256": "1088ed35d0da2fc4ec63d18b5b0bee974e705a1fc93106b80402eab7db386ca0",
+      "bytes": 14233
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -13755,8 +13755,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "d4928b7474ce9ce66200e99074d6e2b911ab81ec45f00be53e23890a00c887f0",
-      "bytes": 36659
+      "sha256": "380e7a3fe32da05fe06c75eeab7d91fb19ac6f6a76ad9cfcf6b96377a05ec035",
+      "bytes": 42359
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -29279,6 +29279,156 @@
       "bytes": 1304
     },
     {
+      "path": "evidence/artifacts/macos-token-pins-20260926/README.md",
+      "sha256": "0f607a0202545fe25deca5d9cff8f90900ba59079b107d0ec133c57dfa8bf1df",
+      "bytes": 35374
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/digest-check-attempt0.txt",
+      "sha256": "ccd7772c5898136fa0e343ed76d5dcb0011c2c2ceeb366140875e109ba424286",
+      "bytes": 2229
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/digest-check-negative-control.txt",
+      "sha256": "818837a4afdc43396a3ca91db4c7a6d80c021297d39835af08cd9739ebcbfaa7",
+      "bytes": 10686
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/digest-check-run1.txt",
+      "sha256": "f09e7ed39b85bbc834c32fdb4533b64027db0a8ca1ffbf4995fd8a61d001c351",
+      "bytes": 9009
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/digest-check-run2.txt",
+      "sha256": "a35de85e35da41a967d83d8a9b65d9692bbcfe6fe1826094c08c4abbd351c85a",
+      "bytes": 9544
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/digest-check-run3.txt",
+      "sha256": "44d707364f18f3a32c03ec577121e0063fbd3fe8955e2da22d9cc4668c7db447",
+      "bytes": 9777
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/digest-check-run5.txt",
+      "sha256": "f381f60dac3f7cbcc3706985074f4f5dd32855f6e635ef1295352dd906730e8e",
+      "bytes": 9902
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/digest-check.txt",
+      "sha256": "25331df4ce58817c1c2c70e9153da08b0bd31af63546f1c6fc0648a832f2688a",
+      "bytes": 9777
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/fail-closed-controls-before.txt",
+      "sha256": "78bc2159b79341902f675b558e65bb7e08fcff545bbe985e84bf29ce065c21d3",
+      "bytes": 44026
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/fail-closed-controls.txt",
+      "sha256": "f1176e8a87d74234c8c77462fb7da5c6ed16dbfef8882b1ff7abf0d10651cca2",
+      "bytes": 24094
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/fail_closed_controls.py",
+      "sha256": "98a0d58e06244c2543b8cdf7382f9115f3a309ad4ceb4f536d7cacc0ecb5b713",
+      "bytes": 11330
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/instruction-test-red-green.txt",
+      "sha256": "f7a6836abf96a29ac26128d95c7fba02a1b21e290eb6240dedba53a53efb9385",
+      "bytes": 14421
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/negative_control.py",
+      "sha256": "83b7edd86b7e67bf5e462e31a215eba06f78c59ef27af098357cd34a286576c8",
+      "bytes": 1723
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/packaging-control.txt",
+      "sha256": "6c5912aea487c1c767fddbeb1c06b7c51bba5d66d45f6e08cdc1d91e4b0746e9",
+      "bytes": 10772
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/packaging_control.py",
+      "sha256": "cac64f12a6f4ad52bb655ccc9f3146b72641dc93097c2b45311ed260452f6128",
+      "bytes": 4458
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/pin-fields-since-run4.txt",
+      "sha256": "8e6f316c890bd1a723b63a42252e9fc8cb9d30e9e43280462eb3f0024df7e3bd",
+      "bytes": 1770
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/pin_fields.py",
+      "sha256": "ff7e890a897fc017aab6010dff855a16723e30b239b45155c08bae57b4f0bd3d",
+      "bytes": 3213
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/reminder-path-red-green-run1.txt",
+      "sha256": "cfacedefa54cad54ee8d4a84d48a70b5cb248ddda3f5112d437c640eabe0b396",
+      "bytes": 43992
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/reminder-path-red-green.txt",
+      "sha256": "7e8dc88895562ac7f7cb6c8d9015721d4b1fba475b6d548a196990f24a561552",
+      "bytes": 44289
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/reminder_path_red_green-run1.py",
+      "sha256": "a93340069813f8fc27f77221c3da600e9b64920bfe835f1fdd83a22e576d5a77",
+      "bytes": 6348
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/reminder_path_red_green.py",
+      "sha256": "d3508d4f3826db63560cc30e3f2986fea5397f060c50429cc88f4205085dae39",
+      "bytes": 10545
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/rtk-config-path-run1.txt",
+      "sha256": "9e3a31f754f1566a37b20be6ba1ffcfa5c8b9bae47f0462e8b04dcab3da54b43",
+      "bytes": 10712
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt",
+      "sha256": "1bfc8e0c1314dc63482ae765b5c170c8f1b6f088002d665a5336fa8d51cbbe45",
+      "bytes": 12106
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/rtk-hooks-table-control.txt",
+      "sha256": "5d4920f69daddd3fe787a2ca2807cdba26ec5402ed71869346b4f80b0080be7a",
+      "bytes": 12496
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/rtk_config_path_check-run1.sh",
+      "sha256": "428d5065307e5444f894898c6919bba26955e921578e25f9b710d50b5ce53be4",
+      "bytes": 7291
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/rtk_config_path_check.sh",
+      "sha256": "928589cf3f050c8d0bc6b2e8258b5397c1923e1edd2aa1c70db6231cd9686a9b",
+      "bytes": 11449
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/rtk_hooks_table_control.py",
+      "sha256": "2085c5e5f2b72747c99afe4acf3fbaf99a4a7c75689c4d8067fff26935389847",
+      "bytes": 10789
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/verify_pins-run1.py",
+      "sha256": "faba292ade472c87ffb1305e4a52040afc831017428f24360a8ed3ae8413c3e3",
+      "bytes": 11744
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/verify_pins.py",
+      "sha256": "565f7032ee0fb62977e40700039af999794e8b1379e969333b38e5db93f7770c",
+      "bytes": 14413
+    },
+    {
+      "path": "evidence/artifacts/macos-token-pins-20260926/verify_pins_fail_closed.py",
+      "sha256": "16a90804f3246f7ed35269e50cebed99eda4860eba66864d142413b4264212ec",
+      "bytes": 15432
+    },
+    {
       "path": "evidence/artifacts/memory-landscape-20260921/catalog-memory-guide.png",
       "sha256": "bca87e44e3375122ac2078115a82d5c69fd574335ca0408394a46cfaeb5c5ab7",
       "bytes": 125442
@@ -36440,8 +36590,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "1c0c99e7ffd5e290cc488c699d2f8fb93efe5368b6cd97d249c6efaebf7e180f",
-      "bytes": 79038
+      "sha256": "7030b83e97da90886e7eca8226f3f100cb53495cdb2ca0a50da8aa92ec87b22e",
+      "bytes": 79558
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -36790,13 +36940,13 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "8d3b9fe379933f29af4b4402c850b983779cc3c222d08b9336cd9e693a908f57",
-      "bytes": 86376
+      "sha256": "938cc58061739a239f944a5668336d1cf6d96276f460a7faf437ce85bd1e3942",
+      "bytes": 93507
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "989431e6b248e9cbf40c947be7bf79a2859e3b4548b9fc873f0c66477ec9ef6a",
-      "bytes": 176377
+      "sha256": "195532912908592be1fe150fd73840e0a969e72248b5ce6ee2bfeadf15b75871",
+      "bytes": 226378
     },
     {
       "path": "tests/test_adoption_contract.py",

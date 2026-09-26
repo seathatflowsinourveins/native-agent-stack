@@ -24,7 +24,9 @@ usage() {
     'ECO_INSTALL_ROOT (default ~/.local/share/codex-ecosystem), each in an' \
     'isolated tools/<name>-<version> prefix with bin/ symlinks. Every archive' \
     'is SHA-256 verified with shasum -a 256 before extraction; a pin with a' \
-    'null sha256 refuses to install (fail closed). A selected component with' \
+    'null sha256 refuses to install (fail closed), except a uv-tool-from-git' \
+    'pin (serena), which has no archive to hash and instead pins and verifies' \
+    'an exact git commit. A selected component with' \
     'no pin at all also fails closed (exit 3) before installing anything, and' \
     'in --plan mode too, unless it is named in --allow-unpinned, in which case' \
     'it is skipped and echoed to the run log.' \
@@ -38,8 +40,9 @@ usage() {
     'Never edits a shell profile.' \
     '' \
     '  --plan  resolve and print each pinned component (version, asset,' \
-    '          sha256) without any network access or installation; still' \
-    '          exits 1 on a pin with no verified sha256 and 3 on a selected' \
+    '          sha256, or the commit of a uv-tool-from-git pin) without any' \
+    '          network access or installation; still exits 1 on a pin with' \
+    '          no verified sha256 (or 40-hex commit) and 3 on a selected' \
     '          component with no pin at all.'
 }
 
@@ -336,14 +339,24 @@ else
 fi
 stage_dir="$(mktemp -d "$ecosystem_root/staging.XXXXXXXX")"
 
+verify_sha256() {
+  # Prefer macOS's native checker when available; Linux also supports the
+  # GNU coreutils fallback. Both consume checksum lines on standard input.
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 --check --status
+  else
+    sha256sum --check --status
+  fi
+}
+
 fetch() {
   local url="$1" checksum="$2" destination="$3"
-  if [[ -f "$destination" ]] && printf '%s  %s\n' "$checksum" "$destination" | shasum -a 256 --check --status; then
+  if [[ -f "$destination" ]] && printf '%s  %s\n' "$checksum" "$destination" | verify_sha256; then
     return
   fi
   curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \
     "$url" --output "$destination.partial"
-  printf '%s  %s\n' "$checksum" "$destination.partial" | shasum -a 256 --check --status || {
+  printf '%s  %s\n' "$checksum" "$destination.partial" | verify_sha256 || {
     printf 'Checksum mismatch: %s\n' "$url" >&2; exit 1
   }
   mv -- "$destination.partial" "$destination"
@@ -1094,6 +1107,131 @@ install_native() {
   chmod 0755 "$bin_dir/$bin_name"
 }
 
+# install_uv_tool and install_uv_tool_from_git below (with the comments
+# between them) are copied verbatim from adoption/bootstrap-linux.sh, and
+# rtk_config_reminder's config-file check is the Linux reminder's own
+# four-entry text check, applied to the file rtk reads on macOS (not the
+# Linux path); all three were added here 2026-09-26 for the macOS
+# headroom/markitdown (uv-tool), serena (uv-tool-from-git) and rtk pins.
+# tests/test_adoption_bootstrap_macos.py asserts the two install functions
+# and their checksum/download helpers stay byte-identical to the Linux ones
+# and the reminder's text check matches
+# the Linux reminder's line for line, and runs all three under a real bash
+# 3.2: they use no mapfile, associative array or ${var,,}.
+# install_uv_tool was re-ported on 2026-09-26 after bootstrap-linux.sh's
+# (#334) started downloading and sha256-verifying a wheel url (headroom's
+# darwin arm64 wheel here) before uv runs. The shared fetch() and
+# verify_sha256() helpers prefer `shasum -a 256`, with a GNU sha256sum
+# fallback on Linux; both exit 1 on a mismatch before uv runs. jq is a
+# checked prerequisite and cache_dir is this script's download directory.
+install_uv_tool() {
+  # $3 (always given: install_pin below passes the pin's "package" field,
+  # falling back to its own "id" in the jq expression itself) is the actual
+  # installable spec when it differs from the component id -- e.g.
+  # headroom's PyPI distribution is "headroom-ai[mcp]", not "headroom".
+  # $4 and $5 are the pin's url and sha256. A wheel url (headroom) is
+  # consumed: fetch downloads that wheel and verifies its sha256 (exit 1 on
+  # a mismatch, before uv runs), and uv installs the local file as the
+  # direct reference "<package> @ file://<wheel>", which keeps the extras and
+  # which uv refuses when the wheel's filename names another distribution. A
+  # direct reference carries no ==version, so the filename's version must
+  # equal the pin's first. The wheel's own dependencies still resolve from
+  # uv's index, and uv's receipt records the wheel's path under downloads/.
+  # An sdist url (markitdown, tavily-cli) is not consumed: uv resolves
+  # "$package==$version" from its index, and that sha256 remains the
+  # cross-check its install_note describes.
+  local id="$1" version="$2" package="$3" url="$4" sha256="$5"
+  command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
+  local spec="${package}==${version}"
+  if [[ "$url" == *.whl ]]; then
+    # {distribution}-{version}(-{build tag})?-{python}-{abi}-{platform}.whl;
+    # neither the escaped distribution name nor the version contains "-".
+    local wheel_file="${url##*/}" wheel_version wheel_uri
+    wheel_version="${wheel_file#*-}"
+    wheel_version="${wheel_version%%-*}"
+    [[ "$wheel_version" == "$version" ]] || {
+      printf 'Refusing to install %s %s: its pinned wheel %s is version %s.\n' \
+        "$id" "$version" "$wheel_file" "$wheel_version" >&2
+      exit 1
+    }
+    fetch "$url" "$sha256" "$cache_dir/$wheel_file"
+    # PEP 508 reads a URI after "@", so the wheel is named by a file:// URL
+    # with each path segment percent-encoded (jq's @uri). As a bare path, a
+    # "#" in ECO_INSTALL_ROOT would start a fragment and a " ;" a marker, and
+    # uv would refuse the install.
+    wheel_uri="file://$(jq -rn --arg path "$cache_dir/$wheel_file" '$path | split("/") | map(@uri) | join("/")')"
+    spec="${package} @ ${wheel_uri}"
+  fi
+  UV_TOOL_DIR="$ecosystem_root/python-tools" UV_TOOL_BIN_DIR="$bin_dir" \
+    uv tool install --python 3.13 "$spec"
+}
+
+# Installs a uv tool pinned to an exact upstream git commit instead of a
+# released version (serena: upstream ships no PyPI release of its current
+# 2.0.0.dev0). The 40-hex commit is itself the integrity anchor -- git
+# refuses to resolve a rev that is not that exact object -- so there is no
+# downloaded archive to sha256; install_pin's own fail-closed gate checks
+# the commit's shape for this kind instead of a sha256. After install this
+# also reads back UV_TOOL_DIR's own uv-receipt.toml and refuses (exit 1)
+# unless uv actually resolved that same commit, so a stale prior install of
+# a different revision under the same tool name can never pass silently.
+install_uv_tool_from_git() {
+  # $5 is always given: install_pin below passes the pin's "package" field,
+  # falling back to its own "id" in the jq expression itself.
+  local id="$1" version="$2" repo_url="$3" commit="$4" package="$5"
+  command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
+  UV_TOOL_DIR="$ecosystem_root/python-tools" UV_TOOL_BIN_DIR="$bin_dir" \
+    uv tool install --python 3.13 "git+${repo_url}@${commit}"
+  local receipt="$ecosystem_root/python-tools/$package/uv-receipt.toml"
+  [[ -f "$receipt" ]] || {
+    printf 'Refusing %s %s: no uv-receipt.toml at %s after install; cannot verify the resolved commit.\n' \
+      "$id" "$version" "$receipt" >&2
+    exit 1
+  }
+  grep -Fq "rev=${commit}" "$receipt" || {
+    printf 'Refusing %s %s: %s does not record the pinned commit %s.\n' "$id" "$version" "$receipt" "$commit" >&2
+    exit 1
+  }
+}
+
+# rtk 0.50.0's Claude hook windows `git show <rev>:<path>` blobs (a piped
+# `| tail` then reads the window, not the file's end), and a rewritten `diff`
+# exits 1 instead of 2 on a missing file. The bare "^git show [^ ]*:" pattern
+# misses a `git -C <dir> show HEAD:path` form (still windowed), and separately
+# `git branch -a`'s filter_branch_output always keeps git's `+ ` prefix on a
+# local branch checked out in a linked worktree, but only misreports it as
+# remote-only when a remote-tracking branch of the same name also exists.
+# The two added patterns anchor to the git subcommand position (only
+# -C/-c/--git-dir/--work-tree with a value, or another --flag, may precede
+# show/branch -- the same global options rtk's own discovery strips before
+# dispatch), so an ordinary command that merely mentions "show" or "branch"
+# as an argument is not misclassified.
+# recipes/README.md#native-context-mode-and-hooks excludes all four through
+# rtk's own config (evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt).
+# A duplicate key or table is invalid TOML and rtk silently falls back to
+# defaults, so the reminder says to replace the whole value inside the existing
+# [hooks] table, adding the key or table only when missing.
+# The file is the one rtk reads on a Mac, not the Linux reminder's
+# ${XDG_CONFIG_HOME:-$HOME/.config}/rtk/config.toml: rtk 0.50.0's
+# get_config_path() is dirs::config_dir()/rtk/config.toml
+# (src/core/config.rs:495-498 at the v0.50.0 tag commit 1d87b8e7), and the
+# dirs crate its Cargo.lock pins (5.0.1) answers $HOME/Library/Application
+# Support on macOS whatever XDG_CONFIG_HOME says (src/mac.rs:7,10); rtk reads
+# no config-path variable of its own, and its README gives the same macOS
+# path (evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt).
+# Print-only: never writes that file.
+rtk_config_reminder() {
+  local config="$HOME/Library/Application Support/rtk/config.toml"
+  if [[ -f "$config" ]] \
+    && [[ $(grep -Ec '^[[:space:]]*exclude_commands[[:space:]]*=' "$config") -eq 1 ]] \
+    && grep -Fq '"^git show [^ ]*:"' "$config" && grep -Fq '"diff"' "$config" \
+    && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:'" "$config" \
+    && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|\$)'" "$config"; then
+    return 0
+  fi
+  printf 'Reminder: for the Claude hook, in %s, inside the existing [hooks] table replace the whole exclude_commands value (from "exclude_commands =" through its closing "]"), or add the key if the table lacks it. Add the [hooks] header line only when the file has no [hooks] table. Use: exclude_commands = ["^git show [^ ]*:", "diff", '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\\n]*\s)?[^\s]*:'"'"', '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"'"'] (a duplicate key or table is invalid TOML and rtk silently loads defaults; recipes/README.md#native-context-mode-and-hooks); this script does not write it.\n' "$config"
+}
+
 install_pin() {
   local id="$1"
   local entry
@@ -1102,19 +1240,31 @@ install_pin() {
     printf 'No pin for component %s in %s; skipping.\n' "$id" "$pins_path" >&2
     return 0
   fi
-  local version kind url sha256 note ignore_scripts
+  local version kind url sha256 note ignore_scripts commit
   version="$(jq -r '.version' <<<"$entry")"
   kind="$(jq -r '.kind' <<<"$entry")"
   url="$(jq -r '.url' <<<"$entry")"
   sha256="$(jq -r '.sha256' <<<"$entry")"
   note="$(jq -r '.install_note' <<<"$entry")"
   ignore_scripts="$(jq -r '.ignore_scripts // false' <<<"$entry")"
-  if [[ "$sha256" == "null" || -z "$sha256" ]]; then
+  if [[ "$kind" == "uv-tool-from-git" ]]; then
+    commit="$(jq -r '.commit' <<<"$entry")"
+    [[ "$commit" =~ ^[0-9a-f]{40}$ ]] || {
+      printf 'Refusing to install %s %s: pin has no verified 40-hex commit (%s)\n' "$id" "$version" "$note" >&2
+      exit 1
+    }
+  elif [[ "$sha256" == "null" || -z "$sha256" ]]; then
     printf 'Refusing to install %s %s: pin has no verified sha256 (%s)\n' "$id" "$version" "$note" >&2
     exit 1
   fi
   if [[ "$plan_mode" == 1 ]]; then
-    printf 'plan %-13s %-10s %-9s %s sha256=%s\n' "$id" "$version" "$kind" "${url##*/}" "$sha256"
+    # A uv-tool-from-git pin (serena) has no archive and a null sha256; its
+    # plan line names the commit it pins instead of printing "sha256=null".
+    if [[ "$kind" == "uv-tool-from-git" ]]; then
+      printf 'plan %-13s %-10s %-9s %s commit=%s\n' "$id" "$version" "$kind" "${url##*/}" "$commit"
+    else
+      printf 'plan %-13s %-10s %-9s %s sha256=%s\n' "$id" "$version" "$kind" "${url##*/}" "$sha256"
+    fi
     return 0
   fi
   # install_native sets this when it keeps an installed launcher at or above
@@ -1128,6 +1278,8 @@ install_pin() {
     *-tarball) install_single_binary_tarball "$id" "$version" "$url" "$sha256" ;;
     *-npm) install_npm "$id" "$version" "$url" "$sha256" "$ignore_scripts" ;;
     *-native) install_native "$id" "$version" "$url" "$sha256" "$(jq -r '.bin // .id' <<<"$entry")" ;;
+    *-uv-tool) install_uv_tool "$id" "$version" "$(jq -r '.package // .id' <<<"$entry")" "$url" "$sha256" ;;
+    *-uv-tool-from-git) install_uv_tool_from_git "$id" "$version" "$url" "$commit" "$(jq -r '.package // .id' <<<"$entry")" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
   esac
   # A kept native launcher (at or above its floor) is still an installed
@@ -1135,6 +1287,7 @@ install_pin() {
   installed_pin_ids+=("$id")
   [[ -z "$native_floor_kept" ]] || return 0
   printf 'Installed %s %s (%s)\n' "$id" "$version" "$kind"
+  [[ "$id" != rtk ]] || rtk_config_reminder
 }
 
 # The pins this run installed, in install order; the version report below
