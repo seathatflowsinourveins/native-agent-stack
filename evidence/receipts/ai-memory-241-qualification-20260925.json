@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "id": "ai-memory-241-qualification-20260925",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-26T00:58:41Z",
+  "component_ids": [
+    "ai-memory"
+  ],
+  "claim": "On host nativestack-5975wx-20260925, ai-memory 2.4.1 was qualified against production 2.4.0 on 2026-09-25 and switched into production on 2026-09-26. The v2.4.1 asset ai-memory-linux-x86_64.tar.gz (16,026,020 bytes, sha256 15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4) matched the release body, the .sha256 sidecar and the GitHub API digest before extraction into a new tools/ai-memory-2.4.1 prefix (binary sha256 dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd, 'ai-memory 2.4.1'). On separate restored copies of one online backup taken through the live 2.4.0 service (store V66), the 2.4.0 arm passed 26 of 26 checks and the 2.4.1 arm 28 of 28: /healthz 200, GET /mcp 405 with allow POST, 23 identical MCP tools with scope explicit, an unchanged known-page body, the write/query/read/delete round-trip, allowlist --check-capture, same-version and cross-version hook capture in both directions, and migration V66 -> V67 (67 rows) with 0 pages missing or changed and 0 observations missing; 2.4.0 then refused the V67 copy with rc 1 ('memory database schema is newer than this ai-memory build: the store has migration V67 (managed_run_session_link) applied, but this build only ships migrations through V66…'), and a fresh copy reopened under 2.4.0 at V66. Re-applying install-hooks with 2.4.1 changed only the binary path on 8 Claude and 7 Codex lines. In a private network namespace, 2.4.1 set keepalive on 65 of 65 accepted sockets and reclaimed all 60 vanished peers by t=75 s, while 2.4.0 held all 60 at t=100 s (#792). During qualification the production store schema (V66) and all pre-existing pages and observations were unchanged. An independent verifier reproduced these with its own code and agreed. The coordinator then performed the user-approved cutover: the service stopped at 2026-09-26T00:14:12Z; the quiescent store read V66 (66 rows), quick_check ok, 40 pages and 86,219 observations; an at-rest cold copy (378 files) fingerprint-matched it; bin/ai-memory was relinked to 2.4.1; install-hooks --apply changed only the binary path on 8 Claude and 7 Codex lines; the service started at 00:19:51Z and applied V67__managed_run_session_link; /healthz returned 200 with NRestarts 0; the fingerprint compare V66 -> V67 passed with 0 pages changed, 0 observations missing and 86,219 after; status --json reported 2.4.1; memory_status returned scope resolved_by explicit; the known page's body was unchanged; keepalive timers were on 2 of 2 established sockets; and a fresh headless claude -p session captured session-start, pre-tool-use, post-tool-use, stop and session-end. A read-only read-back at 2026-09-26T00:30:40Z found bin/ai-memory on tools/ai-memory-2.4.1, 8 Claude plus 7 Codex hook commands on 2.4.1 and the installed-versions record at 2.4.1.",
+  "limitations": [
+    "Pending, user-only: Codex skips changed hooks until they are trusted, so the 7 rewritten Codex ai-memory commands capture nothing through 2.4.1 until the user re-trusts them in Codex /hooks. Real Codex capture through 2.4.1 was not observed.",
+    "V67 is forward-only: after it, 2.4.0 refuses the store with rc 1. Rollback is the coordinator's private at-rest cold V66 copy, a relink to the retained tools/ai-memory-2.4.0 prefix and the installer's .bak-1790381983/.bak-1790381984 hook files (or a re-run of install-hooks with 2.4.0, which leaves unrelated settings edits alone); writes made after the cold copy would be lost from the live store. The rollback was not exercised on production.",
+    "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the durable-memory winner pin ai-memory 2.3.2 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 2.4.1 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
+    "Linux x86_64 only: adoption/pins-macos-arm64.json keeps ai-memory 2.3.2 and is unchanged; nothing here is macOS evidence. The shared Claude settings template names tools/ai-memory-2.4.1, so a Mac that renders it must point the hook commands at its installed 2.3.2 prefix.",
+    "The R1/A17 memory-stack rerun keeps official 2.4.0 as its control build, run in isolation, per the user's decision relayed by the token-efficiency session and recorded in issue #274 (https://github.com/seathatflowsinourveins/native-agent-stack/issues/274: the NativeStack rerun uses the official ai-memory v2.4.0 as the control build); this production move does not change that preregistered control.",
+    "Cutover caveat: the quiesce loop used `pgrep -f`, matched its own command line and waited its full 5 minutes. The service stop was synchronous before the loop, and the service was afterwards confirmed inactive (dead) with 0 ai-memory processes and 0 database users.",
+    "Evidence class: our own integration checks (the locally authored aimem2_accept.py and the verifier's verify_aimem.py) on restored copies, plus coordinator observations exported as aggregates in cutover.json; upstream tests were not re-run (no Rust toolchain), and upstream CI on 433a19f3 (57/57 success) is cited. The cold copy and fingerprint files stay private and were not read by the writing worker.",
+    "Integrity rests on three matching upstream checksum values plus the local download hash: the asset has no artifact attestation (HTTP 404), the tag is unsigned and the release is not immutable.",
+    "#792 was measured only for peers whose kernel answers keepalive probes with RST (TCP_REPAIR close in a private namespace, server as namespace root, not under the systemd unit); a blackholed peer would take about 10 minutes with kernel-default probes and was not measured. The #917 repair was a no-op here (0 latest pages with expires_at). #859 (embedding prefixes) is not in 2.4.1.",
+    "One host (NativeStack, WSL2). During qualification ~/.claude/settings.json was edited by other actors at 22:38:28Z and 22:51:48Z (feedbackDrafts and skillOverrides only; the hooks subtree was unchanged), so its whole-file sha256 in the snapshots is not a stable fingerprint."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; production paths under ~/.local/share/codex-ecosystem"
+  },
+  "data": {
+    "observed_at_utc": "2026-09-25/2026-09-26",
+    "previous_version": "2.4.0",
+    "version": "2.4.1",
+    "release": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1",
+    "tag_commit": "433a19f3d54dea287571b1423591db2a89965fa9",
+    "asset": "https://github.com/akitaonrails/ai-memory/releases/download/v2.4.1/ai-memory-linux-x86_64.tar.gz",
+    "asset_sha256": "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+    "binary_sha256": "dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd",
+    "baseline_binary_sha256": "360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344",
+    "acceptance_scripts": {
+      "aimem2_accept.py": "3cd8acfb6d210598c71c670c5574f4bb593d57caed8441e839743e2bff686c3a",
+      "verify/verify_aimem.py": "86fb8b7aaf9ae651372222983bbbefc166882ee60226c11261dcd022f610bdcc"
+    },
+    "checks_passed": {
+      "2.4.0 arm": "26/26",
+      "2.4.1 arm": "28/28",
+      "production before/after (qualification)": "22/22"
+    },
+    "cutover": {
+      "stopped_utc": "2026-09-26T00:14:12Z",
+      "started_utc": "2026-09-26T00:19:51Z",
+      "quiescent": "V66 (66 rows), quick_check ok, 40 pages, 86,219 observations",
+      "after": "V67, 0 pages changed, 0 observations missing, 86,219 observations",
+      "hooks": "8 Claude and 7 Codex lines, binary path only",
+      "keepalive": "timers on 2 of 2 established sockets on :49474",
+      "pending": "Codex /hooks re-trust for the 7 changed commands (user-only)"
+    },
+    "previous_receipt": "evidence/receipts/ai-memory-240-qualification-20260925.json (history)",
+    "independent_review": "verdict agree, production_touched false, 8 minor defects (artifact results.json verifier section)",
+    "artifacts": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/"
+  },
+  "provenance": [
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/aimem2_accept.py",
+      "sha256": "3cd8acfb6d210598c71c670c5574f4bb593d57caed8441e839743e2bff686c3a",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/verify_aimem.py",
+      "sha256": "86fb8b7aaf9ae651372222983bbbefc166882ee60226c11261dcd022f610bdcc",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/review-v2.4.0-v2.4.1.json",
+      "sha256": "719c3b3d1de157802b66bdfd15191689d6fad2ea6733f72c82f6dc31392d80d8",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step0-install.json",
+      "sha256": "aaa8e9962ea20e8ecd4fab7e53bfcdd181c6454b58a9a0666928fba2cb55945c",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step3-baseline.json",
+      "sha256": "bc67d40677c316d52632031cb91df082f61aa209c5a31de8e2d85cbacf28c722",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step4-rehearsal.json",
+      "sha256": "e1224a5c9d2bb358b31b0d58fb3863c4eae6a76c42f55b7dd05aa76fbefdd766",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step5-rollback-check.json",
+      "sha256": "fba848158d6dcb934ebae2d0f5d96322181e4a6b22b8749983669cb957e371a3",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step6-hooks-render.json",
+      "sha256": "8e094b9314b22996116350515edc1c3298eaf94b16421fe82833f7b9495d0b3d",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step7-fdprobe-base.json",
+      "sha256": "860dbfa16175ab044594a35930a6ce386c5c1bc63a34f3caddbe63bc1c4b2006",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step7-fdprobe-rehearsal.json",
+      "sha256": "526b71b523e0a7468c1416ff148fcbdb2d7ff2c36fb3dd7dd69d16c71bde81b1",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/prod-compare-before-after.json",
+      "sha256": "3991144a3d1f264aa081ad678edba228bcafe8f38fee6b429b9d9841ebdd1ce1",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/integrity.json",
+      "sha256": "68a790d652e07b1aa9fd12aa40f8151c146f8e1a9be479bf560a4330edfb4604",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/arm-cand.json",
+      "sha256": "93ec1cf188f9b9ae51a6cfcdc49b3421ab5ceb3a9e36e5f9b2a2364286c5914f",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/cutover.json",
+      "sha256": "beb76f36f360a8ba7793e33a6ae7c7f2c7f353f95a4f532a5cf196eb424b95fa",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/out/readback.out",
+      "sha256": "014d482bd8bd3650778f7dd5ad4aa7dabb56ee8578216eaa2662902d502392e7",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results.json",
+      "sha256": "7d3ecb48739520d53a7c6de0c2a4933909e117aaf481a73fd0c4d1a90dfac0f7",
+      "byte_identical_to_run_copy": false
+    }
+  ]
+}

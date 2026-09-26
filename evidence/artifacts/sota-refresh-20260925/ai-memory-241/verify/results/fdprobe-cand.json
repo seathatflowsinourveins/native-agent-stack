@@ -1,0 +1,140 @@
+{
+ "at": "2026-09-25T23:13:06Z",
+ "rc": 0,
+ "inner": {
+  "arm": "cand",
+  "uid_in_ns": 0,
+  "ready": {
+   "ready": true,
+   "seconds": 0.6
+  },
+  "s0": {
+   "t": 0.0,
+   "fds": 24,
+   "vanished_after_response": {
+    "est": 0,
+    "keepalive": 0,
+    "ka_when_min_max": null
+   },
+   "vanished_connect_only": {
+    "est": 0,
+    "keepalive": 0,
+    "ka_when_min_max": null
+   },
+   "live_idle": {
+    "est": 0,
+    "keepalive": 0,
+    "ka_when_min_max": null
+   }
+  },
+  "samples": [
+   {
+    "t": 3.0,
+    "fds": 89,
+    "vanished_after_response": {
+     "est": 40,
+     "keepalive": 40,
+     "ka_when_min_max": [
+      56.95,
+      56.96
+     ]
+    },
+    "vanished_connect_only": {
+     "est": 20,
+     "keepalive": 20,
+     "ka_when_min_max": [
+      56.96,
+      56.96
+     ]
+    },
+    "live_idle": {
+     "est": 5,
+     "keepalive": 5,
+     "ka_when_min_max": [
+      56.96,
+      56.99
+     ]
+    }
+   },
+   {
+    "t": 50.0,
+    "fds": 89,
+    "vanished_after_response": {
+     "est": 40,
+     "keepalive": 40,
+     "ka_when_min_max": [
+      9.92,
+      9.93
+     ]
+    },
+    "vanished_connect_only": {
+     "est": 20,
+     "keepalive": 20,
+     "ka_when_min_max": [
+      9.93,
+      9.94
+     ]
+    },
+    "live_idle": {
+     "est": 5,
+     "keepalive": 5,
+     "ka_when_min_max": [
+      9.94,
+      9.97
+     ]
+    }
+   },
+   {
+    "t": 70.0,
+    "fds": 29,
+    "vanished_after_response": {
+     "est": 0,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    },
+    "vanished_connect_only": {
+     "est": 0,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    },
+    "live_idle": {
+     "est": 5,
+     "keepalive": 5,
+     "ka_when_min_max": [
+      50.83,
+      50.83
+     ]
+    }
+   },
+   {
+    "t": 100.1,
+    "fds": 29,
+    "vanished_after_response": {
+     "est": 0,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    },
+    "vanished_connect_only": {
+     "est": 0,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    },
+    "live_idle": {
+     "est": 5,
+     "keepalive": 5,
+     "ka_when_min_max": [
+      20.81,
+      20.81
+     ]
+    }
+   }
+  ],
+  "healthz_after": 200,
+  "stop": {
+   "rc": 0,
+   "pid_gone": true,
+   "port_closed": true
+  }
+ },
+ "leftovers": []
+}

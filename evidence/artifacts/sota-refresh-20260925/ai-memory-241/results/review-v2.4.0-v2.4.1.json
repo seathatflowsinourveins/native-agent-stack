@@ -1,0 +1,110 @@
+{
+ "fetched_at_utc_first": "2026-09-25T22:27:58Z",
+ "repository": "https://github.com/akitaonrails/ai-memory",
+ "release": {
+  "tag": "v2.4.1",
+  "published_at": "2026-09-25T21:46:32Z",
+  "prerelease": false,
+  "draft": false,
+  "immutable": false,
+  "target_commitish": "main",
+  "tag_object": "1e11aa43fe04f8d453f5dbbec66c71f081b90dbf",
+  "tag_commit": "433a19f3d54dea287571b1423591db2a89965fa9",
+  "tag_signature": "unsigned"
+ },
+ "linux_x86_64": {
+  "sha256": "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+  "bytes": 16026020,
+  "sources_agreeing": [
+   "release body checksum block",
+   "ai-memory-linux-x86_64.tar.gz.sha256 sidecar (LF)",
+   "GitHub API asset digest"
+  ],
+  "attestation": "none (attestations API 404)"
+ },
+ "compare_v2.4.0_v2.4.1": {
+  "status": "ahead",
+  "ahead_by": 126,
+  "behind_by": 0,
+  "files_changed": 101,
+  "files_added": [
+   "crates/ai-memory-consolidate/src/path_sanitize.rs",
+   "crates/ai-memory-store/migrations/V67__managed_run_session_link.sql",
+   "docs/design-windows-ci.md",
+   "docs/security-boundaries.md"
+  ],
+  "files_removed": 0
+ },
+ "byte_identical_between_tags": [
+  "crates/ai-memory-cli/src/cli.rs",
+  "lib.rs",
+  "main.rs",
+  "commands/hook.rs",
+  "commands/hook_spool.rs",
+  "commands/hook_capture.rs",
+  "commands/hook_drain_process.rs",
+  "commands/backup.rs",
+  "commands/restore.rs",
+  "commands/status.rs",
+  "marker.rs",
+  "http_client.rs",
+  "crates/ai-memory-store/src/error.rs",
+  "crates/ai-memory-wiki/src/backup.rs",
+  "crates/ai-memory-llm/src/local.rs",
+  "crates/ai-memory-llm/src/lib.rs"
+ ],
+ "changed_but_test_only_or_non_linux": {
+  "crates/ai-memory-store/src/migrations.rs": "test fixtures only (occurred_at: None)",
+  "crates/ai-memory-core/src/sanitize.rs": "test fixtures only",
+  "crates/ai-memory-cli/src/commands/render_shared.rs": "Windows Grok call operator only",
+  "crates/ai-memory-cli/src/commands/install_hooks.rs": "generated TypeScript integrations only (OpenCode/Pi/OMP/OpenClaw)",
+  "crates/ai-memory-cli/src/process_guard.rs": "adds test-only AI_MEMORY_TEST_FORCE_SIBLING_PIDS injection"
+ },
+ "migrations": {
+  "new": "V67__managed_run_session_link.sql: ALTER TABLE managed_runs ADD COLUMN native_session_linked_at INTEGER (nullable, no backfill)",
+  "forward_only": true
+ },
+ "startup_data_passes": {
+  "#917": "repair_date_only_stale_after: rewrites frontmatter_json of latest pages whose stale_after equals a date-only expires_at, in place (same row, updated_at, body) plus the page file and one wiki commit; idempotent"
+ },
+ "defaults_changed": [
+  "tcp_keepalive_secs=60 (new key; AI_MEMORY_TCP_KEEPALIVE_SECS=0 disables); socket2 TcpKeepalive with_time(60s).with_interval(60s), probe count left at kernel default",
+  "default log filter: reconcile summary to debug, rmcp capped at warn unless log_level is quieter (#894/#896)",
+  "unauthenticated non-loopback bind banner printed with eprintln (#903); loopback bind prints nothing",
+  "memory_query embeds via embed_query (#861); the local MiniLM embedder has no override, so vectors are unchanged",
+  "/hook body accepts top-level occurred_at; backfill stamps original event times (#919)"
+ ],
+ "reverted_before_release": [
+  "#904 status HTTP exposure",
+  "#911",
+  "#884 input_token_safety_margin",
+  "#873 jev reranker docs"
+ ],
+ "792": {
+  "fix_commit": "00aa6ee8634b6d26ccf8691319d83e10a6517cf0",
+  "in_v2.4.1": "yes (compare 00aa6ee863...v2.4.1 ahead, behind 0)",
+  "issue_state": "closed 2026-09-22T17:59:20Z"
+ },
+ "859": {
+  "merge_commit": "7552d4fd39",
+  "base": "release/2.5",
+  "in_v2.4.1": "no (compare 7552d4fd...v2.4.1 diverged, behind 32)",
+  "prefix_keys_in_v2.4.1_config": 0
+ },
+ "dependencies": {
+  "registry_crates_v2.4.1": 492,
+  "registry_set_identical_to_v2.4.0": true,
+  "socket2": "0.6.3 (already in lock; now a direct dep of ai-memory-cli)",
+  "rmcp": "2.2.0"
+ },
+ "advisories": {
+  "github_reviewed_rust_advisories_for_v2.4.1_lock": 0,
+  "positive_control_rmcp@1.7.0": 3,
+  "repo_security_advisories": 0
+ },
+ "upstream_ci_on_tag_commit": {
+  "total": 57,
+  "success": 57
+ },
+ "new_issues_since_2026-09-25T21:00Z": 0
+}

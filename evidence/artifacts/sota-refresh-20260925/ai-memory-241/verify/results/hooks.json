@@ -1,0 +1,36 @@
+{
+ "at": "2026-09-25T23:11:31Z",
+ "rc": 0,
+ "inner": {
+  "uid_in_ns": 0,
+  "2.4.0-claude-code-rc": 0,
+  "2.4.0-codex-rc": 0,
+  "2.4.1-claude-code-rc": 0,
+  "2.4.1-codex-rc": 0
+ },
+ "claude-code": {
+  "path_only": true,
+  "lines_changed": 8,
+  "cmds_2.4.0_render": 8,
+  "cmds_2.4.1_render": 8,
+  "2.4.1_render_mentions_2.4.0": 0,
+  "prod_cmds_2.4.0": 8,
+  "prod_equals_2.4.0_render": true,
+  "prod_path_swapped_equals_2.4.1_render": true,
+  "neg_flag_change_detected": true,
+  "neg_leftover_old_path_detected": true
+ },
+ "codex": {
+  "path_only": true,
+  "lines_changed": 7,
+  "cmds_2.4.0_render": 7,
+  "cmds_2.4.1_render": 7,
+  "2.4.1_render_mentions_2.4.0": 0,
+  "prod_cmds_2.4.0": 7,
+  "prod_equals_2.4.0_render": true,
+  "prod_path_swapped_equals_2.4.1_render": true,
+  "neg_flag_change_detected": true,
+  "neg_leftover_old_path_detected": true
+ },
+ "scratch_home_entries": []
+}
