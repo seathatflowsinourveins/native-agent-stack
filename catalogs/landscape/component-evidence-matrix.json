@@ -119,8 +119,9 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "gitleaks",
           "repository": "https://github.com/gitleaks/gitleaks"
         },
@@ -301,8 +302,9 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "codebase-memory-mcp",
           "repository": "https://github.com/DeusData/codebase-memory-mcp"
         }
@@ -1539,8 +1541,9 @@
       "alternatives": [
         {
           "disposition": "out_of_scope",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "local_integration",
+          "layer_scope_needed": true,
           "name": "MCPorter native bridge",
           "repository": "https://github.com/openclaw/mcporter"
         },
@@ -1917,15 +1920,17 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "Difftastic",
           "repository": "https://github.com/Wilfred/difftastic"
         },
         {
           "disposition": "conditional",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "MCP Inspector",
           "repository": "https://github.com/modelcontextprotocol/inspector"
         },
@@ -3296,8 +3301,9 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "vllm",
           "repository": "https://github.com/vllm-project/vllm"
         },
@@ -3317,8 +3323,9 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "Serena",
           "repository": "https://github.com/oraios/serena"
         },
@@ -3338,15 +3345,17 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "RTK",
           "repository": "https://github.com/rtk-ai/rtk"
         },
         {
           "disposition": "overlap",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "foundation-codebase-memory-mcp",
           "repository": "https://github.com/DeusData/codebase-memory-mcp"
         },
@@ -3359,8 +3368,9 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "Qdrant",
           "repository": "https://github.com/qdrant/qdrant"
         },
@@ -3836,8 +3846,9 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "local_integration",
+          "layer_scope_needed": true,
           "name": "promptfoo",
           "repository": "https://github.com/promptfoo/promptfoo"
         }
@@ -4006,8 +4017,9 @@
         },
         {
           "disposition": "out_of_scope",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "foundation-socraticode",
           "repository": "https://github.com/giancarloerra/SocratiCode"
         },
@@ -4399,8 +4411,9 @@
       "alternatives": [
         {
           "disposition": "conditional",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "foundation-qmd",
           "repository": "https://github.com/tobi/qmd"
         },
@@ -4448,8 +4461,9 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "vllm",
           "repository": "https://github.com/vllm-project/vllm"
         },
@@ -4504,8 +4518,9 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "host_verified",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
+          "layer_scope_needed": true,
           "name": "foundation-markitdown",
           "repository": "https://github.com/microsoft/markitdown"
         },

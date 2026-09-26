@@ -444,8 +444,10 @@ class AlternativeHostVerifiedTests(unittest.TestCase):
     accepted only on one (platform_status.ACCEPTING_STAGES)."""
 
     def _state(self, stages):
-        summary = {"components": {"widget": {"platforms": {"linux-wsl2-x86_64": {
-            "independently_reviewed_native_proven_pass_stages": stages}}}}}
+        summary = {"components": {"widget": {"platforms": {"linux-wsl2-x86_64": {"receipts": [
+            {"path": f"evidence/hosts/h-20260922/{stage}.json", "stage": stage,
+             "independently_reviewed_native_proven_pass": True, "layer_scope": None, "supersedes_path": None}
+            for stage in stages]}}}}}
         return cm.build_alternative({"name": "Widget", "repository": "https://github.com/acme/widget"},
                                     cm.repository_to_component_id({"components": [
                                         {"id": "widget", "repository": "https://github.com/acme/widget"}]}),
@@ -455,6 +457,106 @@ class AlternativeHostVerifiedTests(unittest.TestCase):
         self.assertEqual(self._state(["install"]), "receipts_recorded")
         self.assertEqual(self._state([]), "receipts_recorded")
         self.assertEqual(self._state(["install", "use"]), "host_verified")
+
+
+CODEX = "https://github.com/openai/codex"
+
+
+class LayerScopeTests(unittest.TestCase):
+    """GPT-6 cross-family review: a use receipt must verify only the rows whose role it exercised. Codex wins
+    foundation/native-clients and foundation/agent-sdks and is the foundation/workers alternative "Codex native
+    workers"; a read-only exec receipt (the native-clients role) must not verify that workers alternative, whose
+    owned writing child and worktree it never exercises."""
+
+    def _document(self, *receipts):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        layers = [
+            _layer("native-clients", winners=[_winner("codex", repository=CODEX, linux="conditional")]),
+            _layer("agent-sdks", winners=[_winner("codex", repository=CODEX, linux="conditional")]),
+            _layer("workers", alternatives=[{"name": "Codex native workers", "repository": CODEX,
+                                             "disposition": "conditional", "evidence_class": "native_proven"},
+                                            {"name": "Widget", "repository": "https://github.com/example/widget",
+                                             "disposition": "overlap", "evidence_class": "native_proven"}]),
+        ]
+        _init_root(root, layers)
+        _write_json(root / "manifests" / "stack.json", {"schema_version": 1, "components": [
+            {"id": "codex", "repository": CODEX, "version": "1.0.0"},
+            {"id": "widget", "repository": "https://github.com/example/widget", "version": "1.0.0"}]})
+        for receipt in receipts:
+            _write_receipt(root, receipt)
+        document, flip_violations = cm.build_document(root)
+        self.assertEqual(flip_violations, [])
+        rows = {row["layer_id"]: row for row in document["rows"]}
+        return rows
+
+    @staticmethod
+    def _codex_use(*layers, **overrides):
+        receipt = _receipt("codex", "linux-wsl2-x86_64", **overrides)
+        if layers:
+            receipt["layer_refs"] = [{"catalog": "foundation", "layer_id": layer} for layer in layers]
+        return receipt
+
+    @staticmethod
+    def _winner_state(rows, layer):
+        return rows[layer]["winners"][0]["platforms"]["linux-wsl2-x86_64"]["e2e_state"]
+
+    @staticmethod
+    def _alternative(rows, name):
+        return next(alt for alt in rows["workers"]["alternatives"] if alt["name"] == name)
+
+    def test_an_unscoped_use_receipt_does_not_verify_the_workers_alternative(self):
+        rows = self._document(self._codex_use())
+        # Unchanged for winners: the receipt was recorded against the codex id and pin both winner rows share.
+        self.assertEqual(self._winner_state(rows, "native-clients"), "host_verified")
+        self.assertEqual(self._winner_state(rows, "agent-sdks"), "host_verified")
+        codex_workers = self._alternative(rows, "Codex native workers")
+        self.assertEqual(codex_workers["e2e_state"], "receipts_recorded")
+        self.assertTrue(codex_workers["layer_scope_needed"])
+
+    def test_a_receipt_scoped_to_another_layer_verifies_only_that_layer(self):
+        rows = self._document(self._codex_use("native-clients"))
+        self.assertEqual(self._winner_state(rows, "native-clients"), "host_verified")
+        self.assertEqual(self._winner_state(rows, "agent-sdks"), "conditional")
+        codex_workers = self._alternative(rows, "Codex native workers")
+        self.assertEqual(codex_workers["e2e_state"], "receipts_recorded")
+        self.assertNotIn("layer_scope_needed", codex_workers)
+
+    def test_a_receipt_scoped_to_the_workers_layer_verifies_the_alternative(self):
+        rows = self._document(self._codex_use("workers"))
+        self.assertEqual(self._alternative(rows, "Codex native workers")["e2e_state"], "host_verified")
+        self.assertEqual(self._winner_state(rows, "native-clients"), "conditional")
+        self.assertEqual(self._winner_state(rows, "agent-sdks"), "conditional")
+
+    def test_an_unscoped_receipt_still_verifies_a_single_layer_alternative(self):
+        rows = self._document(_receipt("widget", "linux-wsl2-x86_64"))
+        widget = self._alternative(rows, "Widget")
+        self.assertEqual(widget["e2e_state"], "host_verified")
+        self.assertNotIn("layer_scope_needed", widget)
+
+    def test_a_superseded_generation_verifies_nothing(self):
+        # Generation 1 was agreed; generation 2 supersedes it and carries a standing needs_changes review.
+        first = self._codex_use("workers")
+        second = self._codex_use("workers", review_verdict="needs_changes", observed_at="2026-09-22T02:00:00Z")
+        second["id"] = first["id"] + "-2"
+        second["supersedes"] = first["id"]
+        rows = self._document(first, second)
+        self.assertEqual(self._alternative(rows, "Codex native workers")["e2e_state"], "receipts_recorded")
+        # And the same for a winner: an agreed superseded receipt no longer makes it host_verified.
+        first_unscoped, second_unscoped = self._codex_use(), self._codex_use(
+            review_verdict="needs_changes", observed_at="2026-09-22T02:00:00Z")
+        second_unscoped["id"] = first_unscoped["id"] + "-2"
+        second_unscoped["supersedes"] = first_unscoped["id"]
+        rows = self._document(first_unscoped, second_unscoped)
+        self.assertEqual(self._winner_state(rows, "native-clients"), "conditional")
+
+    def test_a_mismatched_supersedes_link_retires_nothing(self):
+        first = self._codex_use("workers")
+        other = _receipt("widget", "linux-wsl2-x86_64", review_verdict="needs_changes")
+        other["supersedes"] = first["id"]   # another component's id: not a supersede chain
+        rows = self._document(first, other)
+        self.assertEqual(self._alternative(rows, "Codex native workers")["e2e_state"], "host_verified")
 
 
 class QualifiedModelsSurfacingTests(unittest.TestCase):

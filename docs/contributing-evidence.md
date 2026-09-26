@@ -33,7 +33,10 @@ winner, records a landscape verdict, or flips a `platform_status`):
    `--qualified-model '{"model_id": ..., "revision": ..., "runtime": ..., "runtime_version": ..., "bars": "<short text>", "result": "pass"|"fail"}'`
    (repeatable) or `--qualified-models-file <path to a JSON array of such
    objects>`. This is optional and additive to the receipt; it records which
-   weights you qualified, not a platform acceptance.
+   weights you qualified, not a platform acceptance. A `use` receipt of a
+   component that several layers list also names the layer(s) it exercised
+   with `--layer-ref <catalog>/<layer_id>` (section 3 step 3;
+   changed after `v2026.09.26`).
 4. **Refresh the derived views.** `python3 scripts/component_matrix.py
    --write`, then `python3 scripts/new_host_grand_list.py --write` (section 5
    below). The grand list's "Qualified local models" section is built from
@@ -144,6 +147,7 @@ Every receipt also names one `stage`. Two decide a platform status:
      --host-id <your-host-id-yyyymmdd> \
      --platform-id <linux-wsl2-x86_64|macos-arm64> \
      --component-id <the winner component_id from docs/component-evidence-matrix.md> \
+     --layer-ref <that matrix row's catalog/layer_id> \
      --stage use \
      --evidence-class native_proven \
      --cmd "<a command that makes the component do its job>"
@@ -158,6 +162,7 @@ Every receipt also names one `stage`. Two decide a platform status:
      --host-id <your-host-id-yyyymmdd> \
      --platform-id <linux-wsl2-x86_64|macos-arm64> \
      --component-id <the winner component_id from docs/component-evidence-matrix.md> \
+     --layer-ref <that matrix row's catalog/layer_id> \
      --stage use \
      --evidence-class native_proven \
      --identity "$identity" \
@@ -247,7 +252,18 @@ Every receipt also names one `stage`. Two decide a platform status:
    exists is refused, naming the actual latest), writes the next free `-N`
    generation of the base id (for example, once `X-2` exists, superseding it
    writes `X-3`, not another `X-2`), records `supersedes` in the new
-   receipt, and leaves the original file byte-identical.
+   receipt, and leaves the original file byte-identical. When both record
+   the same component version, the superseded receipt then supports no
+   status, whatever its reviews: only the latest generation speaks for that
+   host/component/stage/date. A receipt retires the nearest earlier
+   generation of the chain at its own version: a re-record at another
+   version retires nothing there, since it records a different version and
+   the pin binding decides which one counts, while a later run at the first
+   version still retires the earlier one through it (v1, then v2, then v1:
+   the third retires the first). A superseded `native_proven` fail still blocks until a
+   later native pass (Section 5). A chain stays linear: `validate` rejects
+   two receipts that supersede the same one, and a forked chain supports no
+   status from the fork on.
    `--os`/`--architecture` default to the actual host's values
    but can be overridden; nothing in this repository can verify from the
    receipt's JSON alone that a claimed `platform_id`,
@@ -256,6 +272,24 @@ Every receipt also names one `stage`. Two decide a platform status:
    and recorder identities are self-declared too: the checks below stop a
    session from reviewing its own receipt by accident or by default, not a
    contributor who deliberately passes a false `--identity`.
+
+   `--layer-ref <catalog>/<layer_id>` (repeatable) names the
+   `catalogs/landscape/{foundation,us-equities}.json` layer(s) whose role the
+   commands exercise and writes them as the receipt's `layer_refs`; the
+   receipt then counts only for rows (winners and alternatives) in those
+   layers. One tool can play a different role in each layer that lists it: a
+   read-only `codex exec` does the native-clients job, not the workers
+   layer's owned writing child. So `record` refuses (exit 2, listing the
+   layers) a `--stage use` receipt without `--layer-ref` for a component that
+   more than one layer catalogues, by `component_id` or repository. An
+   unscoped receipt, such as every one recorded before the flag, still binds
+   to each layer its `component_id` wins, and verifies an alternative only
+   when that alternative's repository is catalogued in one layer. Name a layer
+   only when the commands do that layer's job; step 8 checks it.
+   Changed after `v2026.09.26`: that release's schema already defines
+   `layer_refs`, but its recorder has no `--layer-ref`, nothing there scopes a
+   receipt by it, and a superseded receipt still counted, so record from current
+   `main` (step 1).
 4. **Sanitize and scan.** Re-read the receipt file yourself before opening a
    PR: sanitization is best-effort, not a guarantee. Then run the guarded
    secret scanner over just the files you touched:
@@ -312,7 +346,9 @@ Every receipt also names one `stage`. Two decide a platform status:
    1. **Layer role.** The commands make the component do the job its layer
       names, not just run. A server is observed serving, through a query or
       a request. A build's output is served or used. A verifier's verdict is
-      read.
+      read. With `layer_refs`, that is the job of every layer it names; a
+      layer whose job the commands do not do is a `needs_changes`
+      (changed after `v2026.09.26`, whose recorder cannot write `layer_refs`).
    2. **Positive control.** Where a clean result proves nothing (a scanner,
       a test runner, a linter, a gate), the receipt also shows the component
       failing on a deliberate fault, as #185's gitleaks fixture does.
@@ -445,13 +481,20 @@ for running them.
   to the winner's current pin, independently reviewed (step 8) with no
   standing dissent, declares `host.second_physical_machine: true`, and has
   `host.os`/`host.architecture` consistent with `adoption/manifest.json`'s
-  `platform_profiles[]` entry for that platform id. The same receipt at stage
+  `platform_profiles[]` entry for that platform id, and counts for the
+  winner's layer: no later generation at the same version supersedes it,
+  it is not on a forked chain, and its `layer_refs`,
+  if any, name that layer (changed after `v2026.09.26`, where a superseded
+  receipt still counted and `layer_refs` scoped nothing). The same receipt at stage
   `install` (for example a version call) supports `conditional` at most: it
   shows the binary resolves, not that the component does its layer's job
   ([decision 2026-09-24](decisions/2026-09-24-accepted-needs-use-stage.md)).
   A `native_proven` fail at `use` or `install` that is the latest receipt for
-  its host and stage is *blocking*, whatever its review, until that host
-  records a later pass. The two platforms then differ:
+  its host and stage is *blocking*, whatever its review and even once
+  superseded, until that host records a later current `native_proven` pass
+  at the same pin, platform, stage and layer; a superseding partial,
+  `synthetic` or other-platform receipt does not clear it. The two platforms
+  then differ:
 
   - **`macos-arm64`.** `accepted` needs a qualifying receipt and no blocking
     fail; there is no other route. `conditional` needs a pin-bound,
@@ -464,7 +507,9 @@ for running them.
     winner whose own `evidence_class` is `native_proven` or
     `measured_comparison` and whose `evidence_refs` cite at least one
     `evidence/` file registered in `manifests/evidence.json` (not a sealed
-    layer-verdict packet, lane return or adjudication), and in both cases no
+    layer-verdict packet, lane return or adjudication, and not a host receipt
+    under `evidence/hosts/`, which counts only as a receipt, with the checks
+    above; changed after `v2026.09.26`), and in both cases no
     blocking fail. The second route needs no host receipt and no second
     physical machine, so a single WSL host's receipt is not what makes a
     Linux winner `accepted`; it can only add a passing receipt (towards
