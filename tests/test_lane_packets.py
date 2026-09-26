@@ -899,6 +899,33 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
         self.assertEqual([c["name"] for c in built["candidates"]], ["ECC skills", "Tool", "Plain", "Other"])
 
 
+class RealLedgerIncumbentBlindnessTests(unittest.TestCase):
+    """Codex post-merge review of #269 (P2): dated durable-memory limitations named the incumbent's build (19b6429),
+    its releases (2.3.2, 2.4.0, 2.4.1) and its 'production control' role without naming a candidate, so the prose
+    filter kept them and a blind reviewer could recover the incumbent. The real ledger keeps those facts; its withheld
+    durable-memory packet must carry none of them, in the default build and with the blind export's parameters."""
+
+    IDENTIFIERS = ("19b6429", "2.3.2", "2.4.0", "2.4.1", "production control")
+    BUILDS = {
+        "default": dict(catalogs=["foundation"], seed="20260926", checked_at="2026-09-26", withhold=True),
+        "blind export": dict(catalogs=["foundation", "us-equities"], seed="20260923", checked_at="2026-09-23",
+                             trading_candidates="manifest", withhold=True,
+                             manifest="catalogs/sota-convergence/manifest-20260923.json", registered_receipts=True),
+    }
+
+    def test_the_withheld_durable_memory_packet_names_no_incumbent_build_or_release(self):
+        for label, kwargs in self.BUILDS.items():
+            with self.subTest(label):
+                text = lane_packets.build_all_packets(ROOT, **kwargs)["foundation__durable-memory.json"].lower()
+                self.assertEqual([identifier for identifier in self.IDENTIFIERS if identifier in text], [])
+
+    def test_the_ledger_still_records_those_facts(self):
+        ledger = json.loads((ROOT / "catalogs/landscape/foundation.json").read_text(encoding="utf-8"))
+        row = next(row for row in ledger["layers"] if row["layer_id"] == "durable-memory")
+        facts = " ".join(row["limitations"]).lower()
+        self.assertEqual([identifier for identifier in self.IDENTIFIERS if identifier not in facts], [])
+
+
 class WithheldProseTests(unittest.TestCase):
     """Codex review of #145: the ledger's shared prose named the incumbent ("Use the selected NautilusTrader
     destination...") before a blind lane read any evidence."""
