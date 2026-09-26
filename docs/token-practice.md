@@ -220,6 +220,39 @@ Run role-specific acceptance where applicable; guidance and research catalog
 entries are not implied executable deployments. Preserve failed quality gates
 when importing new matched-task or retrieval evaluations.
 
+## Shared Codex quota (2026-09-26)
+
+`scripts/codex_quota.py` reads the Codex account's usage snapshot through the
+native app-server method `account/rateLimits/read` (the openai/codex app-server
+protocol, the same at rust-v0.155.1 and rust-v0.157.1): one short `codex app-server`
+over stdio in an empty directory, with no model turn, session transcript or
+credential file. `--json` prints one object; `--gate PERCENT` exits 3 when a
+window's `used_percent` reaches PERCENT, `rateLimitReachedType` is set or
+`ordinaryUsageAllowed` is false, and 2 when no snapshot arrives. On
+nativestack-5975wx-20260925 after the 2026-09-26 switch to 0.157.1, the
+coordinator's reads returned `used_percent` 61 to 63 of a 10,080-minute (weekly)
+window resetting 2026-10-03T01:28Z on plan `prolite`, and started no app-server
+daemon; one read of the hardened probe at 14:28Z returned 63, a single `codex`
+bucket, in 0.77 s. The [host receipt](../evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--codex--install--20260926.json)
+records 0.157.1 on PATH, `daemon_auto_start` false and no daemon process or package
+at 14:34Z. The percentage is the backend's whole-account figure, not a token count:
+every session and host signed in to the account draws on it, so the difference
+between two reads does not price one task, and it is never added to a token counter.
+
+The user decided on 2026-09-26 to spend the GPT-6 weekly quota now, in priority
+order, and to be told when the limit is hit so they can reset it. While it lasts:
+
+- Treat the host's Codex capacity as one slot pool. Concurrent sweeps share one
+  `--lock-dir`; interactive Codex, reviews and other lanes use the same budget
+  without holding a slot, so lower `--slots` while they run.
+- The verdict wave gets the budget first; other GPT-6 lanes take what it leaves.
+- Read the probe before a large dispatch. Stage sweeps with
+  `build_args.py --quota-stop-percent` when a reserve should stop jobs early (the
+  [harness README](../tools/sota-convergence/landscape-sweep/README.md#coordination)).
+- When the gate or a real usage-limit error writes `LIMIT`, stop dispatching and
+  tell the user the reason and the reset time. Do not sign in again from a
+  workflow; remove `LIMIT` only after the user's reset.
+
 ## Coverage and future acceptance
 
 The [current component lifecycle matrix](token-native-saturation.md) links each

@@ -293,7 +293,7 @@
     {
       "id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.155.1",
+      "version": "0.157.1",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Native subscription coding client",
@@ -333,13 +333,15 @@
         "broad-universe-research-20260921",
         "ultracode-token-routing-20260921",
         "portable-claude-native-qualification-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "codex-01571-qualification-20260926"
       ],
       "upstream_sources": [
-        "https://github.com/openai/codex"
+        "https://github.com/openai/codex",
+        "https://github.com/openai/codex/releases/tag/rust-v0.157.1"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "freshness": "0.157.1 serves bin/codex on the NativeStack WSL2 host since 2026-09-26, switched with the qualification receipt's data.switch commands after a matched comparison against 0.155.1 in a loopback sandbox (the landscape-sweep lane argv, the 429 usage-limit mapping, --search and state migration behaved the same); automatic start of the 0.157.x self-updating app-server daemon is off (daemon_auto_start false, also in adoption/templates/codex.config.template.toml). 0.155.1 is kept for rollback, the macOS pin stays 0.155.1 until its own qualification, and the landscape winner pin stays 0.155.1 until a new verdict wave."
     },
     {
       "id": "codex-for-claude",
