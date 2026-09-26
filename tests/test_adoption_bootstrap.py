@@ -6,10 +6,16 @@ behavior are exercised via `bash -c`, using a stub HOME and no real download,
 plus the native-install functions extracted verbatim and run against stub
 downloads and a temporary HOME (InstallNativeLauncherTests,
 NativeInstallFloorTests).
+The exceptions are the optional real-binary classes (RtkConfigReminderRealBinaryTests,
+UvToolWheelRealUvTests, NpmIgnoreScriptsRealNpmTests): each runs an already
+installed pinned rtk, uv or npm when one is present and skips otherwise, and the
+uv and npm ones install a locally built fixture, offline, into a temporary directory.
 """
 
+import base64
 import functools
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -18,9 +24,13 @@ import re
 import shutil
 import subprocess
 import sys
+import tarfile
 import tempfile
+import tomllib
 import shlex
 import unittest
+import urllib.parse
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 PINS_PATH = ROOT / "adoption/pins-linux-x86_64.json"
@@ -93,6 +103,28 @@ class PinsSchemaTests(unittest.TestCase):
                 self.assertIsNone(tool["sha256"], f"{tool['id']}: uv-tool-from-git pins a commit, not a sha256")
                 self.assertRegex(tool.get("commit") or "", COMMIT_HEX,
                                  f"{tool['id']} missing a verified 40-hex commit")
+
+    def test_ignore_scripts_is_a_boolean_on_an_npm_pin(self):
+        # install_pin hands ignore_scripts to install_npm only; on another kind it would be silently
+        # ignored, as it once was on every Linux pin (#299 review, NpmIgnoreScriptsTests).
+        for tool in self.pins["tools"]:
+            if "ignore_scripts" in tool:
+                self.assertIsInstance(tool["ignore_scripts"], bool, tool["id"])
+                self.assertEqual(tool["kind"], "npm", f"{tool['id']}: only npm pins read ignore_scripts")
+
+    def test_a_uv_tool_wheel_url_names_the_pinned_version(self):
+        # install_uv_tool refuses a wheel whose filename names another version (UvToolWheelPinTests).
+        for tool in self.pins["tools"]:
+            if tool["kind"] == "uv-tool" and tool["url"].endswith(".whl"):
+                self.assertEqual(tool["url"].rsplit("/", 1)[1].split("-")[1], tool["version"], tool["id"])
+
+    def test_a_uv_tool_url_is_a_plain_wheel_or_sdist_file(self):
+        # install_uv_tool downloads and verifies a url ending in .whl and treats any other as an sdist
+        # cross-check, so a wheel url carrying a ?query or a #sha256= fragment (as index links do) would
+        # silently fall back to an unverified index install.
+        for tool in self.pins["tools"]:
+            if tool["kind"] == "uv-tool":
+                self.assertRegex(tool["url"], r"\Ahttps://[^?#\s]+\.(?:whl|tar\.gz)\Z", tool["id"])
 
     def test_all_pins_in_this_pr_have_a_verified_hash(self):
         # This PR fetched and hashed every pinned artifact from its official
@@ -662,6 +694,333 @@ class InstallUvToolFromGitTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("uv is required", result.stderr)
         self.assertEqual(calls, "")
+
+
+def shipped_pin(pin_id: str) -> dict:
+    return next(tool for tool in load_pins()["tools"] if tool["id"] == pin_id)
+
+
+def run_install_pin(test: unittest.TestCase, tmp_path: Path, pin: dict, served: bytes, eco_name: str = "eco",
+                    real: dict | None = None, env: dict | None = None):
+    """Runs bootstrap-linux.sh's own install_pin on a one-pin fixture, with fetch, npm_package_name,
+    install_npm and install_uv_tool extracted verbatim. The `curl` shim logs each URL and writes
+    `served`, so fetch() really compares those bytes with the pin's sha256 (through `shasum` where this
+    host's sha256sum lacks GNU's --check --status). The `npm` and `uv` shims record each invocation's
+    argv, one argument per line (uv's preceded by the UV_TOOL_DIR and UV_TOOL_BIN_DIR it was given), and
+    then exec the real binary `real` maps that name to, if any. The ecosystem root is
+    `tmp_path/eco_name`; `env` adds to the harness's environment.
+    Returns the result, the fetched URLs, the npm and uv invocations and the ecosystem root."""
+    for tool in ["jq"] if sha256sum_checks_like_gnu() else ["jq", "shasum"]:
+        if shutil.which(tool) is None:
+            test.skipTest(f"{tool} is not on PATH")
+    real = real or {}
+    eco = tmp_path / eco_name
+    for directory in ("downloads", "tools", "bin"):
+        (eco / directory).mkdir(parents=True)
+    (tmp_path / "served").write_bytes(served)
+    logs = {name: tmp_path / f"{name}.log" for name in ("curl", "npm", "uv")}
+    shim = tmp_path / "shim"
+    shim.mkdir()
+    (shim / "curl").write_text(
+        "#!/bin/sh\n"
+        'out=""; prev=""\n'
+        'for arg in "$@"; do\n'
+        '  if [ "$prev" = "--output" ]; then out="$arg"; fi\n'
+        f'  case "$arg" in https://*) printf "%s\\n" "$arg" >> {shlex.quote(str(logs["curl"]))} ;; esac\n'
+        '  prev="$arg"\n'
+        "done\n"
+        f'cp {shlex.quote(str(tmp_path / "served"))} "$out"\n'
+    )
+
+    def then_exec(name):
+        return f'exec {shlex.quote(str(real[name]))} "$@"\n' if name in real else ""
+
+    (shim / "npm").write_text(f'#!/bin/sh\nprintf "%s\\n" "$@" "<end>" >> {shlex.quote(str(logs["npm"]))}\n'
+                              + then_exec("npm"))
+    (shim / "uv").write_text(
+        '#!/bin/sh\nprintf "%s\\n" "UV_TOOL_DIR=$UV_TOOL_DIR" "UV_TOOL_BIN_DIR=$UV_TOOL_BIN_DIR" "$@" "<end>" '
+        f'>> {shlex.quote(str(logs["uv"]))}\n' + then_exec("uv"))
+    if not sha256sum_checks_like_gnu():
+        (shim / "sha256sum").write_text('#!/bin/sh\nexec shasum -a 256 "$@"\n')
+    for tool in shim.iterdir():
+        tool.chmod(0o755)
+    pins_path = tmp_path / "pins.json"
+    pins_path.write_text(json.dumps({"tools": [pin]}))
+    harness = tmp_path / "install-pin-harness.sh"
+    harness.write_text(
+        "set -Eeuo pipefail\n"
+        + shell_functions(SCRIPT_PATH.read_text(), "fetch", "npm_package_name", "install_npm",
+                          "install_uv_tool", "install_pin")
+        + f"pins_path={shlex.quote(str(pins_path))}\n"
+        + f"ecosystem_root={shlex.quote(str(eco))}\n"
+        + f"bin_dir={shlex.quote(str(eco / 'bin'))}\n"
+        + f"cache_dir={shlex.quote(str(eco / 'downloads'))}\n"
+        + "installed_pin_ids=()\n"
+        + f"install_pin {shlex.quote(pin['id'])}\n"
+    )
+    env = {**os.environ, **(env or {})}
+    result = subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=120,
+                            env={**env, "PATH": f"{shim}{os.pathsep}{env['PATH']}"})
+
+    def invocations(name):
+        text = logs[name].read_text() if logs[name].exists() else ""
+        return [record.splitlines() for record in text.split("<end>\n") if record]
+
+    urls = logs["curl"].read_text().splitlines() if logs["curl"].exists() else []
+    return result, urls, invocations("npm"), invocations("uv"), eco
+
+
+class NpmIgnoreScriptsTests(unittest.TestCase):
+    """2026-09-26, #299 review: socraticode's pin sets `ignore_scripts: true`, but install_pin never
+    passed the field on and install_npm never added --ignore-scripts, so npm ran every lifecycle script
+    in the package's dependency tree. install_pin now reads it as bootstrap-macos.sh's does. Runs the
+    shipped socraticode entry through install_pin (run_install_pin), with only its sha256 swapped for
+    the served fixture's, and compares npm's whole argv. The end-to-end run with the real tarball, and
+    npm's own log of which scripts ran, are in evidence/artifacts/bootstrap-integrity-20260926/."""
+
+    ARCHIVE = b"fixture npm tarball\n"
+
+    def _npm_argv(self, **changes):
+        pin = {**shipped_pin("socraticode"), "sha256": hashlib.sha256(self.ARCHIVE).hexdigest(), **changes}
+        pin = {key: value for key, value in pin.items() if value is not None}
+        with tempfile.TemporaryDirectory() as tmp:
+            result, urls, npm_calls, uv_calls, eco = run_install_pin(self, Path(tmp), pin, self.ARCHIVE)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual((urls, uv_calls), ([pin["url"]], []))
+        self.assertEqual(len(npm_calls), 1, npm_calls)
+        prefix = eco / f"tools/{pin['id']}-{pin['version']}"
+        archive = eco / f"downloads/{pin['id']}-{pin['version']}.tgz"
+        return npm_calls[0], ["install", "--global", "--no-audit", "--no-fund", "--prefix", str(prefix)], str(archive)
+
+    def test_the_shipped_socraticode_pin_installs_with_ignore_scripts(self):
+        self.assertIs(shipped_pin("socraticode")["ignore_scripts"], True)
+        argv, head, archive = self._npm_argv()
+        self.assertEqual(argv, [*head, "--ignore-scripts", archive])
+
+    def test_a_pin_without_ignore_scripts_true_runs_npm_without_the_flag(self):
+        for value in (None, False):  # absent, as on every other npm pin, or explicitly false
+            with self.subTest(ignore_scripts=value):
+                argv, head, archive = self._npm_argv(ignore_scripts=value)
+                self.assertEqual(argv, [*head, archive])
+
+
+class UvToolWheelPinTests(unittest.TestCase):
+    """2026-09-26, #299 review: headroom's pin names a wheel url and sha256 that install_uv_tool never
+    read; uv resolved `headroom-ai[mcp]==0.37.0` from its index, so nothing tied the installed files to
+    the reviewed wheel. A uv-tool pin whose url is a wheel is now fetched and sha256-verified, and uv
+    installs that local file with the pin's extras (`<package> @ file://<wheel>`, each path segment
+    percent-encoded: as a bare path, a `#` or ` ;` in ECO_INSTALL_ROOT reaches uv as a URI fragment or
+    a PEP 508 marker, and the pinned uv 0.12.17 refuses the install). Runs the shipped headroom entry
+    through install_pin (run_install_pin), with only its sha256 swapped for the served fixture's; the
+    `uv` shim stands in for uv, so this proves the argv, not uv's handling of it (UvToolWheelRealUvTests
+    runs the pinned uv where one is installed; evidence/artifacts/bootstrap-integrity-20260926/ keeps
+    the uv form trials and an end-to-end run with the real wheel)."""
+
+    WHEEL = b"fixture wheel bytes\n"
+    # An install root whose path holds each character a bare-path direct reference misreads, plus a
+    # literal "%" and a non-ASCII letter, which the file URL must encode too.
+    AWKWARD_ROOT = "eco #1 ;%é"
+
+    def _run(self, pin_id="headroom", eco_name="eco", **changes):
+        pin = {**shipped_pin(pin_id), "sha256": hashlib.sha256(self.WHEEL).hexdigest(), **changes}
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        return (pin, *run_install_pin(self, Path(tmp.name), pin, self.WHEEL, eco_name=eco_name))
+
+    def uv_argv(self, eco: Path, spec: str) -> list:
+        return [f"UV_TOOL_DIR={eco}/python-tools", f"UV_TOOL_BIN_DIR={eco}/bin",
+                "tool", "install", "--python", "3.13", spec]
+
+    def assert_uv_installs_the_wheel_file(self, uv_calls: list, eco: Path, package: str, wheel: Path):
+        """One uv call with the exact argv, whose spec is `<package> @ file://<url path>`: a URL path of
+        URI-safe characters and %XX escapes only (no raw space, "#", ";" or non-ASCII byte left for a
+        PEP 508 parser to misread) that decodes back to the downloaded wheel's path."""
+        self.assertEqual(len(uv_calls), 1, uv_calls)
+        spec = uv_calls[0][-1]
+        self.assertEqual(uv_calls[0], self.uv_argv(eco, spec))
+        name, separator, uri = spec.partition(" @ file://")
+        self.assertEqual((name, separator), (package, " @ file://"), spec)
+        self.assertRegex(uri, r"\A/[A-Za-z0-9._~!*'()/%-]+\Z")
+        self.assertEqual(urllib.parse.unquote(uri), str(wheel))
+
+    def test_a_wheel_pin_installs_the_verified_wheel_with_its_extras(self):
+        pin, result, urls, npm_calls, uv_calls, eco = self._run()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue(pin["url"].endswith(".whl") and pin["package"].endswith("[mcp]"), pin)
+        wheel = eco / "downloads" / pin["url"].rsplit("/", 1)[1]
+        self.assertEqual(urls, [pin["url"]])
+        self.assertEqual(wheel.read_bytes(), self.WHEEL)
+        self.assert_uv_installs_the_wheel_file(uv_calls, eco, pin["package"], wheel)
+        self.assertEqual(npm_calls, [])
+        self.assertIn(f"Installed headroom {pin['version']} (uv-tool)", result.stdout)
+
+    def test_an_install_root_with_uri_delimiters_is_percent_encoded_in_the_file_url(self):
+        pin, result, urls, npm_calls, uv_calls, eco = self._run(eco_name=self.AWKWARD_ROOT)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        wheel = eco / "downloads" / pin["url"].rsplit("/", 1)[1]
+        self.assertEqual(wheel.read_bytes(), self.WHEEL)
+        self.assert_uv_installs_the_wheel_file(uv_calls, eco, pin["package"], wheel)
+        self.assertIn("/eco%20%231%20%3B%25%C3%A9/downloads/", uv_calls[0][-1])
+
+    def test_a_wheel_that_fails_its_sha256_is_refused_before_uv_runs(self):
+        pin, result, urls, npm_calls, uv_calls, eco = self._run(sha256="0" * 64)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn(f"Checksum mismatch: {pin['url']}", result.stderr)
+        self.assertEqual(urls, [pin["url"]])
+        self.assertEqual(uv_calls, [], "uv must never be handed an unverified wheel")
+        self.assertFalse((eco / "downloads" / pin["url"].rsplit("/", 1)[1]).exists())
+        self.assertNotIn("Installed headroom", result.stdout)
+
+    def test_a_wheel_named_for_another_version_is_refused_before_any_download(self):
+        # A direct reference carries no ==version, so the pin's version is checked against the filename.
+        pin, result, urls, npm_calls, uv_calls, eco = self._run(version="0.0.0")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Refusing to install headroom 0.0.0: its pinned wheel", result.stderr)
+        self.assertEqual((urls, uv_calls), ([], []))
+
+    def test_an_sdist_pin_is_still_resolved_from_the_index_by_name_and_version(self):
+        # markitdown's sha256 is the cross-check its install_note describes; its sdist is not fetched.
+        pin, result, urls, npm_calls, uv_calls, eco = self._run("markitdown")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue(pin["url"].endswith(".tar.gz"), pin["url"])
+        self.assertEqual(urls, [])
+        self.assertEqual(uv_calls, [self.uv_argv(eco, f"markitdown=={pin['version']}")])
+
+
+def fixture_wheel(dist: str = "demo-tool", version: str = "1.0.0") -> tuple[str, bytes]:
+    """A minimal pure-Python wheel with no dependencies, one console script `<dist>` that prints
+    "<dist> <version>", and an empty `mcp` extra. Returns its filename and bytes."""
+    module = dist.replace("-", "_")
+    info = f"{module}-{version}.dist-info"
+    files = {
+        f"{module}/__init__.py": f"def main():\n    print('{dist} {version}')\n",
+        f"{info}/METADATA": f"Metadata-Version: 2.1\nName: {dist}\nVersion: {version}\nProvides-Extra: mcp\n",
+        f"{info}/WHEEL": "Wheel-Version: 1.0\nGenerator: fixture\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
+        f"{info}/entry_points.txt": f"[console_scripts]\n{dist} = {module}:main\n",
+    }
+    record = "".join(
+        f"{path},sha256={base64.urlsafe_b64encode(hashlib.sha256(text.encode()).digest()).rstrip(b'=').decode()},"
+        f"{len(text.encode())}\n" for path, text in files.items()) + f"{info}/RECORD,,\n"
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        for path, text in {**files, f"{info}/RECORD": record}.items():
+            archive.writestr(path, text)
+    return f"{module}-{version}-py3-none-any.whl", buffer.getvalue()
+
+
+def fixture_npm_tarball(name: str = "demo-scripted", version: str = "1.0.0") -> bytes:
+    """An npm package tarball with no dependencies whose own postinstall script writes `postinstall-ran`
+    into the package directory, so a real npm shows whether it ran lifecycle scripts."""
+    manifest = json.dumps({"name": name, "version": version, "scripts": {
+        "postinstall": "node -e \"require('fs').writeFileSync('postinstall-ran', '')\""}}).encode()
+    buffer = io.BytesIO()
+    with tarfile.open(fileobj=buffer, mode="w:gz") as archive:
+        member = tarfile.TarInfo("package/package.json")
+        member.size, member.mode = len(manifest), 0o644
+        archive.addfile(member, io.BytesIO(manifest))
+    return buffer.getvalue()
+
+
+def installed_pinned_binary(test: unittest.TestCase, pin_id: str, relative: str) -> Path:
+    """`relative` inside the pinned release's tools/<pin_id>-<version>/ under $ECO_INSTALL_ROOT (else
+    ~/.local/share/codex-ecosystem), where bootstrap-linux.sh installs it; skips the test if absent."""
+    version = shipped_pin(pin_id)["version"]
+    root = Path(os.environ.get("ECO_INSTALL_ROOT") or Path.home() / ".local/share/codex-ecosystem")
+    binary = root / f"tools/{pin_id}-{version}" / relative
+    if not os.access(binary, os.X_OK):
+        test.skipTest(f"no installed {pin_id} {version} at {binary}")
+    return binary
+
+
+@LINUX_X86_64_ONLY
+class UvToolWheelRealUvTests(unittest.TestCase):
+    """Optional, skipped where the pinned uv is not installed (as in CI): UvToolWheelPinTests' install_pin
+    run with the `uv` shim handing its argv on to the pinned uv (installed_pinned_binary), offline
+    (UV_OFFLINE, UV_NO_CONFIG, UV_PYTHON_DOWNLOADS=never, a scratch UV_CACHE_DIR), against a locally
+    built, dependency-free fixture wheel (fixture_wheel) under UvToolWheelPinTests.AWKWARD_ROOT. The
+    percent-encoded file URL installs the wheel with its extra from that root, and uv still refuses a
+    package name the wheel's filename does not carry, the check install_uv_tool's comment relies on.
+    A local integration check of uv's handling, not an upstream uv test."""
+
+    def _install(self, tmp_path: Path, package: str):
+        uv = installed_pinned_binary(self, "uv", "uv")
+        env = {"UV_CACHE_DIR": str(tmp_path / "uv-cache"), "UV_NO_CONFIG": "1", "UV_OFFLINE": "1",
+               "UV_PYTHON_DOWNLOADS": "never"}
+        found = subprocess.run([str(uv), "python", "find", "3.13"], capture_output=True, text=True, timeout=60,
+                               env={**os.environ, **env})
+        if found.returncode != 0:
+            self.skipTest("the pinned uv finds no Python 3.13 without downloading one")
+        filename, wheel = fixture_wheel()
+        pin = {"id": "demo", "version": "1.0.0", "kind": "uv-tool", "package": package,
+               "url": f"https://files.pythonhosted.org/packages/fixture/{filename}",
+               "sha256": hashlib.sha256(wheel).hexdigest(), "install_note": "fixture"}
+        result, _urls, _npm_calls, uv_calls, eco = run_install_pin(
+            self, tmp_path, pin, wheel, UvToolWheelPinTests.AWKWARD_ROOT, real={"uv": uv}, env=env)
+        return result, uv_calls, eco, eco / "downloads" / filename
+
+    def test_the_pinned_uv_installs_the_encoded_wheel_url_with_its_extra(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, uv_calls, eco, wheel = self._install(Path(tmp), "demo-tool[mcp]")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Installed demo 1.0.0 (uv-tool)", result.stdout)
+            self.assertIn("/eco%20%231%20%3B%25%C3%A9/downloads/", uv_calls[0][-1])
+            receipt = tomllib.loads((eco / "python-tools/demo-tool/uv-receipt.toml").read_text(encoding="utf-8"))
+            self.assertEqual(receipt["tool"]["requirements"],
+                             [{"name": "demo-tool", "extras": ["mcp"], "path": str(wheel)}])
+            run = subprocess.run([str(eco / "bin/demo-tool")], capture_output=True, text=True, timeout=60,
+                                 stdin=subprocess.DEVNULL)
+            self.assertEqual((run.returncode, run.stdout), (0, "demo-tool 1.0.0\n"), run.stderr)
+
+    def test_the_pinned_uv_refuses_a_package_name_the_wheel_does_not_carry(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, _uv_calls, eco, _wheel = self._install(Path(tmp), "demo[mcp]")
+            self.assertNotEqual(result.returncode, 0, result.stdout)
+            self.assertIn("does not match `demo-tool` in the distribution filename", result.stderr)
+            self.assertNotIn("Installed demo", result.stdout)
+            self.assertFalse((eco / "bin/demo-tool").exists())
+
+
+@LINUX_X86_64_ONLY
+class NpmIgnoreScriptsRealNpmTests(unittest.TestCase):
+    """Optional, skipped where the pinned node is not installed (as in CI): NpmIgnoreScriptsTests'
+    install_pin run with the `npm` shim handing its argv on to the pinned node's npm
+    (installed_pinned_binary), offline with a scratch cache and an empty user config, against a local
+    fixture package whose own postinstall writes a marker (fixture_npm_tarball). With the pin's
+    `ignore_scripts: true`, socraticode's setting, the marker stays absent; the same install without the
+    field runs the script, so the first check can fail. A local integration check of npm's handling, not
+    an upstream npm test."""
+
+    ARCHIVE = fixture_npm_tarball()
+
+    def _install(self, tmp_path: Path, **changes):
+        npm = installed_pinned_binary(self, "node", "bin/npm")
+        (tmp_path / "npmrc").write_text("")
+        env = {"PATH": f"{npm.parent}{os.pathsep}{os.environ['PATH']}",  # the pinned node runs npm and the script
+               "npm_config_cache": str(tmp_path / "npm-cache"), "NPM_CONFIG_USERCONFIG": str(tmp_path / "npmrc"),
+               "npm_config_offline": "true", "npm_config_update_notifier": "false",
+               "npm_config_ignore_scripts": "false"}  # a caller's own setting must not decide the control
+        pin = {"id": "demo-scripted", "version": "1.0.0", "kind": "npm",
+               "url": "https://registry.npmjs.org/demo-scripted/-/demo-scripted-1.0.0.tgz",
+               "sha256": hashlib.sha256(self.ARCHIVE).hexdigest(), "install_note": "fixture", **changes}
+        result, _urls, npm_calls, _uv_calls, eco = run_install_pin(
+            self, tmp_path, pin, self.ARCHIVE, real={"npm": npm}, env=env)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Installed demo-scripted 1.0.0 (npm)", result.stdout)
+        package = eco / "tools/demo-scripted-1.0.0/lib/node_modules/demo-scripted"
+        self.assertTrue((package / "package.json").is_file(), result.stdout + result.stderr)
+        return npm_calls, (package / "postinstall-ran").exists()
+
+    def test_the_pinned_npm_runs_no_lifecycle_script_for_an_ignore_scripts_pin(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            npm_calls, ran = self._install(Path(tmp), ignore_scripts=True)
+        self.assertFalse(ran, "npm ran the package's postinstall although the pin sets ignore_scripts: true")
+        self.assertIn("--ignore-scripts", npm_calls[0])
+
+    def test_the_same_install_without_the_field_runs_the_script(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            npm_calls, ran = self._install(Path(tmp))
+        self.assertTrue(ran, "the fixture's postinstall never ran, so the check above could not fail")
+        self.assertNotIn("--ignore-scripts", npm_calls[0])
 
 
 class NativeInstallFloorTests(unittest.TestCase):

@@ -279,8 +279,12 @@ npm_package_name() {
   printf '%s\n' "$rest"
 }
 
+# $5 is the pin's ignore_scripts field as install_pin reads it ("true" or
+# "false"): "true" adds --ignore-scripts, so npm runs no lifecycle script of
+# the package or of any dependency (socraticode), as bootstrap-macos.sh's
+# install_npm does.
 install_npm() {
-  local id="$1" version="$2" url="$3" sha256="$4"
+  local id="$1" version="$2" url="$3" sha256="$4" ignore_scripts="${5:-false}"
   command -v npm >/dev/null || { printf 'npm is required to install %s; install node first.\n' "$id" >&2; exit 1; }
   local archive="$cache_dir/${id}-${version}.tgz"
   fetch "$url" "$sha256" "$archive"
@@ -288,7 +292,11 @@ install_npm() {
   mkdir -p "$prefix"
   local package
   package="$(npm_package_name "$url")"
-  npm install --global --no-audit --no-fund --prefix "$prefix" "$archive" >/dev/null
+  local npm_install_args=(--global --no-audit --no-fund --prefix "$prefix")
+  if [[ "$ignore_scripts" == "true" ]]; then
+    npm_install_args+=(--ignore-scripts)
+  fi
+  npm install "${npm_install_args[@]}" "$archive" >/dev/null
   local linked=0 executable
   if [[ -d "$prefix/bin" ]]; then
     for executable in "$prefix/bin"/*; do
@@ -385,12 +393,41 @@ install_uv_tool() {
   # falling back to its own "id" in the jq expression itself) is the actual
   # installable spec when it differs from the component id -- e.g.
   # headroom's PyPI distribution is "headroom-ai[mcp]", not "headroom".
-  # Every existing uv-tool pin has no "package" field and keeps installing
-  # "$id==$version" exactly as before.
-  local id="$1" version="$2" package="$3"
+  # $4 and $5 are the pin's url and sha256. A wheel url (headroom) is
+  # consumed: fetch downloads that wheel and verifies its sha256 (exit 1 on
+  # a mismatch, before uv runs), and uv installs the local file as the
+  # direct reference "<package> @ file://<wheel>", which keeps the extras and
+  # which uv refuses when the wheel's filename names another distribution. A
+  # direct reference carries no ==version, so the filename's version must
+  # equal the pin's first. The wheel's own dependencies still resolve from
+  # uv's index, and uv's receipt records the wheel's path under downloads/.
+  # An sdist url (markitdown, tavily-cli) is not consumed: uv resolves
+  # "$package==$version" from its index, and that sha256 remains the
+  # cross-check its install_note describes.
+  local id="$1" version="$2" package="$3" url="$4" sha256="$5"
   command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
+  local spec="${package}==${version}"
+  if [[ "$url" == *.whl ]]; then
+    # {distribution}-{version}(-{build tag})?-{python}-{abi}-{platform}.whl;
+    # neither the escaped distribution name nor the version contains "-".
+    local wheel_file="${url##*/}" wheel_version wheel_uri
+    wheel_version="${wheel_file#*-}"
+    wheel_version="${wheel_version%%-*}"
+    [[ "$wheel_version" == "$version" ]] || {
+      printf 'Refusing to install %s %s: its pinned wheel %s is version %s.\n' \
+        "$id" "$version" "$wheel_file" "$wheel_version" >&2
+      exit 1
+    }
+    fetch "$url" "$sha256" "$cache_dir/$wheel_file"
+    # PEP 508 reads a URI after "@", so the wheel is named by a file:// URL
+    # with each path segment percent-encoded (jq's @uri). As a bare path, a
+    # "#" in ECO_INSTALL_ROOT would start a fragment and a " ;" a marker, and
+    # uv would refuse the install.
+    wheel_uri="file://$(jq -rn --arg path "$cache_dir/$wheel_file" '$path | split("/") | map(@uri) | join("/")')"
+    spec="${package} @ ${wheel_uri}"
+  fi
   UV_TOOL_DIR="$ecosystem_root/python-tools" UV_TOOL_BIN_DIR="$bin_dir" \
-    uv tool install --python 3.13 "${package}==${version}"
+    uv tool install --python 3.13 "$spec"
 }
 
 # Installs a uv tool pinned to an exact upstream git commit instead of a
@@ -476,12 +513,13 @@ install_pin() {
     printf 'No pin for component %s in %s; skipping.\n' "$id" "$pins_path" >&2
     return 0
   fi
-  local version kind url sha256 note commit
+  local version kind url sha256 note commit ignore_scripts
   version="$(jq -r '.version' <<<"$entry")"
   kind="$(jq -r '.kind' <<<"$entry")"
   url="$(jq -r '.url' <<<"$entry")"
   sha256="$(jq -r '.sha256' <<<"$entry")"
   note="$(jq -r '.install_note' <<<"$entry")"
+  ignore_scripts="$(jq -r '.ignore_scripts // false' <<<"$entry")"
   if [[ "$kind" == "uv-tool-from-git" ]]; then
     commit="$(jq -r '.commit' <<<"$entry")"
     [[ "$commit" =~ ^[0-9a-f]{40}$ ]] || {
@@ -499,10 +537,10 @@ install_pin() {
     node-tarball) install_node "$version" "$url" "$sha256" ;;
     uv-tarball) install_uv "$version" "$url" "$sha256" ;;
     *-tarball) install_single_binary_tarball "$id" "$version" "$url" "$sha256" ;;
-    *-npm) install_npm "$id" "$version" "$url" "$sha256" ;;
+    *-npm) install_npm "$id" "$version" "$url" "$sha256" "$ignore_scripts" ;;
     *-native) install_native "$id" "$version" "$url" "$sha256" "$(jq -r '.bin // .id' <<<"$entry")" ;;
     *-pip) install_pip "$id" "$version" ;;
-    *-uv-tool) install_uv_tool "$id" "$version" "$(jq -r '.package // .id' <<<"$entry")" ;;
+    *-uv-tool) install_uv_tool "$id" "$version" "$(jq -r '.package // .id' <<<"$entry")" "$url" "$sha256" ;;
     *-uv-tool-from-git) install_uv_tool_from_git "$id" "$version" "$url" "$commit" "$(jq -r '.package // .id' <<<"$entry")" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
   esac

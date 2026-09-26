@@ -3460,8 +3460,8 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "458fb9c4329d54ca206ceda75d2d2a7d063a7b707897af0857e2a890930ef456",
-      "bytes": 36209
+      "sha256": "eb68717b4bf3f95bdfbba40c12a342d939ba4388dca7fd1584e7c90d9d423135",
+      "bytes": 38451
     },
     {
       "path": "adoption/bootstrap-macos.sh",
@@ -3470,8 +3470,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "fdf87a296434c9a104e13ef4f08bd00d70a4e304116dc70e5323b379933893df",
-      "bytes": 34294
+      "sha256": "dc187c8f474d07fbcb13554e9a21d56eead7e61f262986b9d9280a48521fc896",
+      "bytes": 34875
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3565,8 +3565,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "a274e88827dac55cf827eb8ac6db9451ba110739b2069ee00b9b041cf95772ac",
-      "bytes": 26853
+      "sha256": "af8a2486915d911ea2430150e57278e54d53715bf43d2316d8e40e86760ed339",
+      "bytes": 27217
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -3575,13 +3575,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "fa39267466a1a80560bcb9869f3a9b3fac6f6bd19a997f1b487bbc38f61fed19",
-      "bytes": 14326
+      "sha256": "bf38d3820a86c37c762ba81ca58b61402ac2b7b41319dd0592569ecdc04d11a1",
+      "bytes": 14890
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "f4d69b71c2689475d3df1849a1dcc5a29213fa71150caf3e7eff7201b30904e5",
-      "bytes": 42888
+      "sha256": "042e973b99b797c27e1aa87bcd324238eedfd33afcc27249ce922ba3c51efe05",
+      "bytes": 43435
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -12498,6 +12498,111 @@
       "path": "evidence/artifacts/blind-comparison-20260923/wfemu.py",
       "sha256": "4765600792da23c3e9c3efe598a2052a7e0fa27ff9da4a2b2dbbb45f8d6b7719",
       "bytes": 11363
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/README.md",
+      "sha256": "8acaaa2e4235b39271a860c4394563c960e47516aabbd770c807a3217d58296a",
+      "bytes": 28627
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/bootstrap-runs.log",
+      "sha256": "f2d63c15ec2e9acfc784c0c4d99614b8a150cc1322d44f94788134643c2d1e83",
+      "bytes": 20023
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/checker-runs/run-2.txt",
+      "sha256": "7290830ac45270e956fe37920a5ba0c211817a30974ea80e054242cc5bc86156",
+      "bytes": 8012
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/checker-runs/run-3.txt",
+      "sha256": "7c5c46efd667a1be08f6749ed3f2dd9e7ef9ef4941f766842cd030ad41e9fbd1",
+      "bytes": 9984
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/checker-runs/run-4.txt",
+      "sha256": "34e871c630eeb585b58a8b20f22c31daa15030ac8930308efe57581165af1bcd",
+      "bytes": 11746
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/drivers/as-run/bootstrap_once.sh",
+      "sha256": "867f4f163571bc94b3c35c36e21315b436fbfa2ca62917ec0cf3c7e738464cf0",
+      "bytes": 2969
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/drivers/as-run/e2e.sh",
+      "sha256": "6324b2d6cffacd018b91325a6f59b46b5fe86a9bbf9d2c9f6703dc7b5d458314",
+      "bytes": 2406
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/drivers/as-run/uv_forms.sh",
+      "sha256": "706260004cdbab2bde23d30e1bc39e422cb7c8876dea38a4611399a72cefe701",
+      "bytes": 4061
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/drivers/bootstrap_once.sh",
+      "sha256": "58d8d60b51c71384b74f32b33dab37b97b2f8234c185d2477a2c25a7fc42a311",
+      "bytes": 3258
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/drivers/check.py",
+      "sha256": "4b21e69adc7209630faa614b230a473981cf74210662707d71f1c9566fa1c267",
+      "bytes": 12991
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/drivers/e2e.sh",
+      "sha256": "16d584796dac98948ea8743072962360e2d914351210181d9a91e551ebd71382",
+      "bytes": 2637
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/drivers/mcp_list_tools.mjs",
+      "sha256": "dfc8ac94b918150adba513ce4b2d61e072f1e99559faa62c5f3001e418ea1ad1",
+      "bytes": 3402
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/drivers/native_probe.cjs",
+      "sha256": "54c4e6e6c55abb36faf256968930bac9847cd2327e24290eebafa0924f66f326",
+      "bytes": 4889
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/drivers/upstream_checks.sh",
+      "sha256": "114b1355f49085f80c4cd7f3923d835c50dd98843f281e9668abe80670f79f39",
+      "bytes": 9489
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/drivers/uv_forms.sh",
+      "sha256": "c8dd7fb2de7db5f2f434eb1c1ddeaff63a47b0519f663eec56cd15203e4f24da",
+      "bytes": 4333
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/drivers/work_guard.sh",
+      "sha256": "b30c246008475e1aa5dec45ec967ec7deae1ff90750a922b81a5681b40f0b73e",
+      "bytes": 2298
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/e2e-check.txt",
+      "sha256": "d3137a10b36835938f8acfdd6e422994e8ff9fe476ec0c1d454ef3b570e9fca8",
+      "bytes": 14428
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/lint-and-tests.txt",
+      "sha256": "3c6fa6965942b460f82ec8d3e07018fa3a325e50697b729e0a1c814bebf05b36",
+      "bytes": 7668
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/upstream-checks.txt",
+      "sha256": "975392bf627732adaa991dfdc0029ab9c70bdf5d39b00acbbcb3c1818bb97719",
+      "bytes": 16910
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/uv-forms.txt",
+      "sha256": "5a705940f5f718cabbbd282d7925a19d00e5cf3e33aee4760bbdea16e31ddc4a",
+      "bytes": 9223
+    },
+    {
+      "path": "evidence/artifacts/bootstrap-integrity-20260926/work-guard-tests.txt",
+      "sha256": "b390f53e3676942038c629bb29115b91c8bc88ed686c5914434b60b3bcbf4ca1",
+      "bytes": 66970
     },
     {
       "path": "evidence/artifacts/catalog-clean-install-20260921/04-locked-sdk-sync.log",
@@ -35176,8 +35281,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "e50ee707b7285cc4543e0b681ed6fec17a3542dd3409859b820ad27aaeabba03",
-      "bytes": 64243
+      "sha256": "8d3b9fe379933f29af4b4402c850b983779cc3c222d08b9336cd9e693a908f57",
+      "bytes": 86376
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
@@ -35233,6 +35338,11 @@
       "path": "tests/test_blind_layer_decisions.py",
       "sha256": "327f104fc335a2b25f2a910e8cae44661fe9439764f4ab778412dbf3beeaea99",
       "bytes": 2827
+    },
+    {
+      "path": "tests/test_bootstrap_integrity_drivers.py",
+      "sha256": "5d1db3ac65ec37ce71934eebe971d6276321e7f0b33137e8a5f33d668e91bd3a",
+      "bytes": 14613
     },
     {
       "path": "tests/test_broad_universe_coverage.py",

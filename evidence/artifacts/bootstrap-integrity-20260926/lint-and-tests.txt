@@ -1,0 +1,111 @@
+# bash -n and ShellCheck on the PR's and HEAD's adoption/bootstrap-linux.sh, then the new tests
+# (red checks against HEAD's script and a bare-path variant, the green module run, and a bash 3.2.57 run),
+# then the adoption test modules. Test summaries are unittest's own stderr lines.
+
+== bash --version
+GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)
+== shellcheck --version
+version: 0.11.0
+== fixed adoption/bootstrap-linux.sh sha256 eb68717b4bf3f95bdfbba40c12a342d939ba4388dca7fd1584e7c90d9d423135
+bash -n rc=0
+shellcheck rc=0
+== head adoption/bootstrap-linux.sh sha256 458fb9c4329d54ca206ceda75d2d2a7d063a7b707897af0857e2a890930ef456
+bash -n rc=0
+shellcheck rc=0
+
+# tests/test_adoption_bootstrap.py sha256 8d3b9fe379933f29af4b4402c850b983779cc3c222d08b9336cd9e693a908f57 (the PR's copy, run in each tree below)
+# python: Python 3.13.15
+
+== red check: the 14 new tests against head adoption/bootstrap-linux.sh (sha256 458fb9c4329d54ca206ceda75d2d2a7d063a7b707897af0857e2a890930ef456)
+test_ignore_scripts_is_a_boolean_on_an_npm_pin [PinsSchemaTests] ... ok
+test_a_uv_tool_wheel_url_names_the_pinned_version [PinsSchemaTests] ... ok
+test_a_uv_tool_url_is_a_plain_wheel_or_sdist_file [PinsSchemaTests] ... ok
+test_a_pin_without_ignore_scripts_true_runs_npm_without_the_flag [NpmIgnoreScriptsTests] ... ok
+test_the_shipped_socraticode_pin_installs_with_ignore_scripts [NpmIgnoreScriptsTests] ... FAIL
+test_a_wheel_named_for_another_version_is_refused_before_any_download [UvToolWheelPinTests] ... FAIL
+test_a_wheel_pin_installs_the_verified_wheel_with_its_extras [UvToolWheelPinTests] ... FAIL
+test_a_wheel_that_fails_its_sha256_is_refused_before_uv_runs [UvToolWheelPinTests] ... FAIL
+test_an_install_root_with_uri_delimiters_is_percent_encoded_in_the_file_url [UvToolWheelPinTests] ... ERROR
+test_an_sdist_pin_is_still_resolved_from_the_index_by_name_and_version [UvToolWheelPinTests] ... ok
+test_the_pinned_uv_installs_the_encoded_wheel_url_with_its_extra [UvToolWheelRealUvTests] ... FAIL
+test_the_pinned_uv_refuses_a_package_name_the_wheel_does_not_carry [UvToolWheelRealUvTests] ... FAIL
+test_the_pinned_npm_runs_no_lifecycle_script_for_an_ignore_scripts_pin [NpmIgnoreScriptsRealNpmTests] ... FAIL
+test_the_same_install_without_the_field_runs_the_script [NpmIgnoreScriptsRealNpmTests] ... ok
+Ran 14 tests in 1.171s
+FAILED (failures=7, errors=1)
+exit 1
+
+== red check: the 14 new tests against bare adoption/bootstrap-linux.sh (sha256 cdd3fe656d6df37f10466e9e6e0b22c25ed1805f4d4f28f1bae7c7664cccaf7c)
+test_ignore_scripts_is_a_boolean_on_an_npm_pin [PinsSchemaTests] ... ok
+test_a_uv_tool_wheel_url_names_the_pinned_version [PinsSchemaTests] ... ok
+test_a_uv_tool_url_is_a_plain_wheel_or_sdist_file [PinsSchemaTests] ... ok
+test_a_pin_without_ignore_scripts_true_runs_npm_without_the_flag [NpmIgnoreScriptsTests] ... ok
+test_the_shipped_socraticode_pin_installs_with_ignore_scripts [NpmIgnoreScriptsTests] ... ok
+test_a_wheel_named_for_another_version_is_refused_before_any_download [UvToolWheelPinTests] ... ok
+test_a_wheel_pin_installs_the_verified_wheel_with_its_extras [UvToolWheelPinTests] ... FAIL
+test_a_wheel_that_fails_its_sha256_is_refused_before_uv_runs [UvToolWheelPinTests] ... ok
+test_an_install_root_with_uri_delimiters_is_percent_encoded_in_the_file_url [UvToolWheelPinTests] ... FAIL
+test_an_sdist_pin_is_still_resolved_from_the_index_by_name_and_version [UvToolWheelPinTests] ... ok
+test_the_pinned_uv_installs_the_encoded_wheel_url_with_its_extra [UvToolWheelRealUvTests] ... FAIL
+test_the_pinned_uv_refuses_a_package_name_the_wheel_does_not_carry [UvToolWheelRealUvTests] ... FAIL
+test_the_pinned_npm_runs_no_lifecycle_script_for_an_ignore_scripts_pin [NpmIgnoreScriptsRealNpmTests] ... ok
+test_the_same_install_without_the_field_runs_the_script [NpmIgnoreScriptsRealNpmTests] ... ok
+Ran 14 tests in 1.271s
+FAILED (failures=4)
+exit 1
+
+== green: the whole module against the PR's adoption/bootstrap-linux.sh (sha256 eb68717b4bf3f95bdfbba40c12a342d939ba4388dca7fd1584e7c90d9d423135), default bash 5.2.21(1)-release (x86_64-pc-linux-gnu)
+test_the_pinned_npm_runs_no_lifecycle_script_for_an_ignore_scripts_pin [NpmIgnoreScriptsRealNpmTests] ... ok
+test_the_same_install_without_the_field_runs_the_script [NpmIgnoreScriptsRealNpmTests] ... ok
+test_a_pin_without_ignore_scripts_true_runs_npm_without_the_flag [NpmIgnoreScriptsTests] ... ok
+test_the_shipped_socraticode_pin_installs_with_ignore_scripts [NpmIgnoreScriptsTests] ... ok
+test_a_uv_tool_url_is_a_plain_wheel_or_sdist_file [PinsSchemaTests] ... ok
+test_a_uv_tool_wheel_url_names_the_pinned_version [PinsSchemaTests] ... ok
+test_all_pins_in_this_pr_have_a_verified_hash [PinsSchemaTests] ... ok
+test_every_tool_has_required_fields [PinsSchemaTests] ... ok
+test_ignore_scripts_is_a_boolean_on_an_npm_pin [PinsSchemaTests] ... ok
+test_no_duplicate_ids [PinsSchemaTests] ... ok
+test_schema_version_and_platform [PinsSchemaTests] ... ok
+test_sha256_is_hex_or_null_with_reason [PinsSchemaTests] ... ok
+test_tools_is_nonempty_list [PinsSchemaTests] ... ok
+test_uv_tool_from_git_pins_a_verified_commit_instead_of_a_hash [PinsSchemaTests] ... ok
+test_a_wheel_named_for_another_version_is_refused_before_any_download [UvToolWheelPinTests] ... ok
+test_a_wheel_pin_installs_the_verified_wheel_with_its_extras [UvToolWheelPinTests] ... ok
+test_a_wheel_that_fails_its_sha256_is_refused_before_uv_runs [UvToolWheelPinTests] ... ok
+test_an_install_root_with_uri_delimiters_is_percent_encoded_in_the_file_url [UvToolWheelPinTests] ... ok
+test_an_sdist_pin_is_still_resolved_from_the_index_by_name_and_version [UvToolWheelPinTests] ... ok
+test_the_pinned_uv_installs_the_encoded_wheel_url_with_its_extra [UvToolWheelRealUvTests] ... ok
+test_the_pinned_uv_refuses_a_package_name_the_wheel_does_not_carry [UvToolWheelRealUvTests] ... ok
+Ran 72 tests in 4.323s
+OK
+exit 0
+
+== the 11 new install_pin tests with bash 3.2.57 first on PATH (the extracted functions under macOS's /bin/bash version)
+test_a_pin_without_ignore_scripts_true_runs_npm_without_the_flag [NpmIgnoreScriptsTests] ... ok
+test_the_shipped_socraticode_pin_installs_with_ignore_scripts [NpmIgnoreScriptsTests] ... ok
+test_a_wheel_named_for_another_version_is_refused_before_any_download [UvToolWheelPinTests] ... ok
+test_a_wheel_pin_installs_the_verified_wheel_with_its_extras [UvToolWheelPinTests] ... ok
+test_a_wheel_that_fails_its_sha256_is_refused_before_uv_runs [UvToolWheelPinTests] ... ok
+test_an_install_root_with_uri_delimiters_is_percent_encoded_in_the_file_url [UvToolWheelPinTests] ... ok
+test_an_sdist_pin_is_still_resolved_from_the_index_by_name_and_version [UvToolWheelPinTests] ... ok
+test_the_pinned_uv_installs_the_encoded_wheel_url_with_its_extra [UvToolWheelRealUvTests] ... ok
+test_the_pinned_uv_refuses_a_package_name_the_wheel_does_not_carry [UvToolWheelRealUvTests] ... ok
+test_the_pinned_npm_runs_no_lifecycle_script_for_an_ignore_scripts_pin [NpmIgnoreScriptsRealNpmTests] ... ok
+test_the_same_install_without_the_field_runs_the_script [NpmIgnoreScriptsRealNpmTests] ... ok
+Ran 11 tests in 1.289s
+OK
+
+# The adoption test modules (test_adoption_bootstrap, _bootstrap_macos, _version_probes, _contract, _docs_consistency,
+# _status, _guarded_runners, _launchd, test_release_pin_contents, test_catalog_freshness_pins) on this tree.
+== adoption modules (10), default PATH (no shellcheck, no BASH32_BINARY)
+exit 0
+Ran 446 tests in 108.883s
+OK (skipped=16)
+== adoption modules (10) with ShellCheck 0.11.0 on PATH and BASH32_BINARY=bash 3.2.57
+exit 0
+Ran 446 tests in 134.029s
+OK (skipped=1)
+== the gated macOS, launchd and guarded-runner modules alone, with ShellCheck and bash 3.2
+exit 0
+Ran 225 tests in 73.819s
+OK

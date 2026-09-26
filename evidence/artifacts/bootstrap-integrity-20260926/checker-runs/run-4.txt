@@ -1,0 +1,89 @@
+== pass: fixed script, the checkout's pins, profile {headroom, socraticode}
+PASS bootstrap exit: 0
+PASS run log line: Installed headroom 0.37.0 (uv-tool)
+PASS run log line: Installed socraticode 1.14.0 (npm)
+PASS version report (headroom): headroom 0.37.0: headroom --version -- / headroom, version 0.37.0 / result: verified (exact 0.37.0)
+PASS version report (socraticode): socraticode 1.14.0: npm ls socraticode (package metadata; the package is not run) -- / socraticode@1.14.0 / result: verified (exact 1.14.0)
+PASS version report summary: ['summary: 5 verified, 0 failed']
+PASS downloaded wheel sha256 equals the pin: headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl 2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46
+PASS uv-receipt.toml requirement: {'name': 'headroom-ai', 'extras': ['mcp'], 'path': '<work>/eco-pass/downloads/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl'}
+PASS direct_url.json url is the wheel's file URL: file://<work>/eco-pass/downloads/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl
+PASS tool environment metadata: headroom-ai and mcp (the [mcp] extra) versions: 0.37.0 1.30.0
+PASS installed files matching the wheel's own RECORD hashes: 547 of 547
+PASS upstream `headroom --version` from the installed bin/: exit 0: headroom, version 0.37.0
+PASS upstream `npm ls` of the socraticode prefix: socraticode@1.14.0
+PASS npm's own debug log: the install argv npm received: "install" "--global" "--no-audit" "--no-fund" "--prefix" "<work>/eco-pass/tools/socraticode-1.14.0" "--ignore-scripts" "<work>/eco-pass/downloads/socraticode-1.14.0.tgz"
+PASS npm's own debug log: lifecycle scripts run (info run lines): 0
+INFO socraticode tree: 187 installed packages; 18 declare install scripts, none of which npm ran: socraticode/node_modules/@ast-grep/lang-bash (postinstall); socraticode/node_modules/@ast-grep/lang-c (postinstall); socraticode/node_modules/@ast-grep/lang-cpp (postinstall); socraticode/node_modules/@ast-grep/lang-csharp (postinstall); socraticode/node_modules/@ast-grep/lang-dart (postinstall); socraticode/node_modules/@ast-grep/lang-elixir (postinstall); socraticode/node_modules/@ast-grep/lang-go (postinstall); socraticode/node_modules/@ast-grep/lang-java (postinstall); socraticode/node_modules/@ast-grep/lang-kotlin (postinstall); socraticode/node_modules/@ast-grep/lang-lua (postinstall); socraticode/node_modules/@ast-grep/lang-php (postinstall); socraticode/node_modules/@ast-grep/lang-python (postinstall); socraticode/node_modules/@ast-grep/lang-ruby (postinstall); socraticode/node_modules/@ast-grep/lang-rust (postinstall); socraticode/node_modules/@ast-grep/lang-scala (postinstall); socraticode/node_modules/@ast-grep/lang-swift (postinstall); socraticode/node_modules/@parcel/watcher (install); socraticode/node_modules/tree-sitter-gdscript (install)
+INFO   ok @ast-grep/lang-bash: parsed "echo hi" -> program (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-bash/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-c: parsed "int main(void) { return 0; }" -> translation_unit (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-c/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-cpp: parsed "int main() { return 0; }" -> translation_unit (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-cpp/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-csharp: parsed "class A {}" -> compilation_unit (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-csharp/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-dart: parsed "void main() {}" -> program (2 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-dart/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-elixir: parsed "x = 1" -> source (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-elixir/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-go: parsed "package main" -> source_file (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-go/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-java: parsed "class A {}" -> program (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-java/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-kotlin: parsed "fun main() {}" -> source_file (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-kotlin/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-lua: parsed "local x = 1" -> chunk (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-lua/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-php: parsed "<?php echo 1;" -> program (2 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-php/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-python: parsed "x = 1" -> module (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-python/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-ruby: parsed "x = 1" -> program (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-ruby/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-rust: parsed "fn main() {}" -> source_file (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-rust/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-scala: parsed "object A" -> compilation_unit (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-scala/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok @ast-grep/lang-swift: parsed "let x = 1" -> source_file (1 child node(s), 0 ERROR node(s)) from node_modules/@ast-grep/lang-swift/prebuilds/prebuild-Linux-X64/parser.so
+INFO   ok tree-sitter-gdscript: socraticode's gdscript-preflight.cjs printed "PREFLIGHT: OK node_modules/tree-sitter-gdscript/prebuilds/linux-x64/tree-sitter-gdscript.node"
+INFO   ok @parcel/watcher: subscribe and unsubscribe through its native binding
+INFO   ok control: a 64-byte parser.so is refused (child SIGABRT): TODO: OpenLib(DlOpen { source: "<work>/probe-scratch/lang-bash-truncated/prebuilds/prebuild-Linux-X64/parser.so: cannot read file data" })
+INFO   0 failure(s)
+PASS each package whose install script npm skipped still works natively (parse, preflight or subscribe): 18 of 18 (node exit 0)
+PASS control: a 64-byte copy of a grammar's parser.so is refused: ok control: a 64-byte parser.so is refused (child SIGABRT): TODO: OpenLib(DlOpen { source: "<work>/probe-scratch/lang-bash-truncated/prebuilds/prebuild-Linux-X64/parser.so: cannot read file data" })
+== fixed-bad-hash: fixed script, headroom sha256 set to 64 zeros, profile {headroom}
+PASS bootstrap exit: 1
+PASS refusal line in the run log: Checksum mismatch: https://files.pythonhosted.org/packages/72/b8/16878cf4fe6fc390a0d22025b671468619db690ff14c1b103ace4b5e35f9/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl
+PASS no headroom tool environment: False
+PASS no verified wheel left in downloads/: False
+PASS no 'Installed headroom' line: False
+== head-bad-hash: HEAD's script, the same zeroed pins, profile {headroom, socraticode}
+PASS bootstrap exit (installs although the pinned hash is wrong): 0
+PASS run log line: Installed headroom 0.37.0 (uv-tool)
+PASS pinned wheel never downloaded: False
+PASS uv-receipt.toml requirement (resolved from the index): {'name': 'headroom-ai', 'extras': ['mcp'], 'specifier': '==0.37.0'}
+PASS npm's own debug log: the install argv npm received: "install" "--global" "--no-audit" "--no-fund" "--prefix" "<work>/eco-head-bad-hash/tools/socraticode-1.14.0" "<work>/eco-head-bad-hash/downloads/socraticode-1.14.0.tgz"
+PASS npm's own debug log: lifecycle scripts run (info run lines): 18
+INFO   ran: @parcel/watcher@2.6.0 install node_modules/socraticode/node_modules/@parcel/watcher node scripts/build-from-source.js
+INFO   ran: tree-sitter-gdscript@6.1.0 install node_modules/socraticode/node_modules/tree-sitter-gdscript node-gyp-build
+INFO   ran: @ast-grep/lang-bash@0.0.7 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-bash node postinstall.js
+INFO   ran: @ast-grep/lang-c@0.0.5 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-c node postinstall.js
+INFO   ran: @ast-grep/lang-cpp@0.0.5 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-cpp node postinstall.js
+INFO   ran: @ast-grep/lang-csharp@0.0.5 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-csharp node postinstall.js
+INFO   ran: @ast-grep/lang-dart@0.0.7 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-dart node postinstall.js
+INFO   ran: @ast-grep/lang-elixir@0.0.7 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-elixir node postinstall.js
+INFO   ran: @ast-grep/lang-go@0.0.5 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-go node postinstall.js
+INFO   ran: @ast-grep/lang-java@0.0.6 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-java node postinstall.js
+INFO   ran: @ast-grep/lang-kotlin@0.0.6 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-kotlin node postinstall.js
+INFO   ran: @ast-grep/lang-lua@0.0.7 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-lua node postinstall.js
+INFO   ran: @ast-grep/lang-php@0.0.6 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-php node postinstall.js
+INFO   ran: @ast-grep/lang-python@0.0.5 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-python node postinstall.js
+INFO   ran: @ast-grep/lang-ruby@0.0.6 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-ruby node postinstall.js
+INFO   ran: @ast-grep/lang-rust@0.0.6 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-rust node postinstall.js
+INFO   ran: @ast-grep/lang-scala@0.0.6 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-scala node postinstall.js
+INFO   ran: @ast-grep/lang-swift@0.0.7 postinstall node_modules/socraticode/node_modules/@ast-grep/lang-swift node postinstall.js
+== transition: one ECO_INSTALL_ROOT, profile {headroom}: HEAD's script, then the fixed script twice
+PASS t1-head bootstrap exit: 0
+INFO   t1-head uv: Resolved 73 packages in 15ms
+INFO   t1-head uv: Installed 73 packages in 428ms
+INFO   t1-head uv:  + headroom-ai==0.37.0
+PASS t2-fixed bootstrap exit: 0
+INFO   t2-fixed uv: Resolved 73 packages in 15ms
+INFO   t2-fixed uv: Prepared 1 package in 73ms
+INFO   t2-fixed uv: Uninstalled 1 package in 15ms
+INFO   t2-fixed uv: Installed 1 package in 35ms
+INFO   t2-fixed uv:  - headroom-ai==0.37.0
+INFO   t2-fixed uv:  + headroom-ai==0.37.0 (from file://<work>/eco-transition/downloads/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl)
+PASS t3-fixed bootstrap exit: 0
+INFO   t3-fixed uv: `headroom-ai[mcp] @ file://<work>/eco-transition/downloads/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl` is already installed
+PASS t1-head installs headroom-ai from the index: ['Resolved 73 packages in 15ms', 'Installed 73 packages in 428ms', ' + headroom-ai==0.37.0']
+PASS t2-fixed replaces it with the verified wheel: ['Resolved 73 packages in 15ms', 'Prepared 1 package in 73ms', 'Uninstalled 1 package in 15ms', 'Installed 1 package in 35ms', ' - headroom-ai==0.37.0', ' + headroom-ai==0.37.0 (from file://<work>/eco-transition/downloads/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl)']
+PASS t3-fixed finds it already installed: ['`headroom-ai[mcp] @ file://<work>/eco-transition/downloads/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl` is already installed']
+PASS final uv-receipt.toml requirement: {'name': 'headroom-ai', 'extras': ['mcp'], 'path': '<work>/eco-transition/downloads/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl'}
+== 0 check(s) failed

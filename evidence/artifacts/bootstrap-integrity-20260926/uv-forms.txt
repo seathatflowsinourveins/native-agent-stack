@@ -1,0 +1,153 @@
+# drivers/uv_forms.sh <uv> <work>, run with the uv 0.12.17 binary the pass run above installed from its
+# pinned, sha256-verified release tarball. Sanitized: the scratch work directory is printed as <work>.
+
+uv: uv 0.12.17 (x86_64-unknown-linux-gnu)
+jq: jq-1.7
+fixture wheel sha256: 70076a558d07f179a41044b72e2d7da5782d17bdfa58d85b1dd48230e59183e2
+
+=== t1 root plain, form bare: exit 0
+spec: demo-tool[mcp] @ <work>/t1/plain/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t1/plain/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t1/plain/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+
+=== t2 root plain, form encoded: exit 0
+spec: demo-tool[mcp] @ file://<work>/t2/plain/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t2/plain/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t2/plain/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+same spec again: exit 0: 1 'is already installed' line(s)
+
+=== t3 root eco#1, form bare: exit 1
+spec: demo-tool[mcp] @ <work>/t3/eco#1/downloads/demo_tool-1.0.0-py3-none-any.whl
+error: Distribution not found at: file://<work>/t3/eco#1/downloads/demo_tool-1.0.0-py3-none-any.whl
+
+=== t4 root eco#1, form encoded: exit 0
+spec: demo-tool[mcp] @ file://<work>/t4/eco%231/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t4/eco%231/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t4/eco#1/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+same spec again: exit 0: 1 'is already installed' line(s)
+
+=== t5 root eco\ \;1, form bare: exit 2
+spec: demo-tool[mcp] @ <work>/t5/eco ;1/downloads/demo_tool-1.0.0-py3-none-any.whl
+error: Failed to parse: `demo-tool[mcp] @ <work>/t5/eco ;1/downloads/demo_tool-1.0.0-py3-none-any.whl`
+  cause: Expected a quoted string or a valid marker name, found `1/downloads/demo_tool-1.0.0-py3-none-any.whl`
+
+=== t6 root eco\ \;1, form encoded: exit 0
+spec: demo-tool[mcp] @ file://<work>/t6/eco%20%3B1/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t6/eco%20;1/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t6/eco ;1/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+same spec again: exit 0: 1 'is already installed' line(s)
+
+=== t7 root eco\ #1, form bare: exit 1
+spec: demo-tool[mcp] @ <work>/t7/eco #1/downloads/demo_tool-1.0.0-py3-none-any.whl
+error: Distribution not found at: file://<work>/t7/eco
+
+=== t8 root eco\ #1, form encoded: exit 0
+spec: demo-tool[mcp] @ file://<work>/t8/eco%20%231/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t8/eco%20%231/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t8/eco #1/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+same spec again: exit 0: 1 'is already installed' line(s)
+
+=== t9 root eco\ 1, form bare: exit 0
+spec: demo-tool[mcp] @ <work>/t9/eco 1/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t9/eco%201/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t9/eco 1/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+
+=== t10 root eco\ 1, form encoded: exit 0
+spec: demo-tool[mcp] @ file://<work>/t10/eco%201/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t10/eco%201/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t10/eco 1/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+same spec again: exit 0: 1 'is already installed' line(s)
+
+=== t11 root eco\;1, form bare: exit 0
+spec: demo-tool[mcp] @ <work>/t11/eco;1/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t11/eco;1/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t11/eco;1/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+
+=== t12 root eco\;1, form encoded: exit 0
+spec: demo-tool[mcp] @ file://<work>/t12/eco%3B1/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t12/eco;1/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t12/eco;1/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+same spec again: exit 0: 1 'is already installed' line(s)
+
+=== t13 root eco%231, form bare: exit 0
+spec: demo-tool[mcp] @ <work>/t13/eco%231/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t13/eco%25231/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t13/eco%231/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+
+=== t14 root eco%231, form encoded: exit 0
+spec: demo-tool[mcp] @ file://<work>/t14/eco%25231/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t14/eco%25231/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t14/eco%231/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+same spec again: exit 0: 1 'is already installed' line(s)
+
+=== t15 root écho, form bare: exit 0
+spec: demo-tool[mcp] @ <work>/t15/écho/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t15/%C3%A9cho/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t15/écho/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+
+=== t16 root écho, form encoded: exit 0
+spec: demo-tool[mcp] @ file://<work>/t16/%C3%A9cho/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t16/%C3%A9cho/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t16/écho/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+same spec again: exit 0: 1 'is already installed' line(s)
+
+=== t17 root a\!b\*c\'d\(e\)f, form bare: exit 0
+spec: demo-tool[mcp] @ <work>/t17/a!b*c'd(e)f/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t17/a!b*c'd(e)f/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t17/a!b*c'd(e)f/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+
+=== t18 root a\!b\*c\'d\(e\)f, form encoded: exit 0
+spec: demo-tool[mcp] @ file://<work>/t18/a%21b%2Ac%27d%28e%29f/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t18/a!b*c'd(e)f/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t18/a!b*c'd(e)f/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+same spec again: exit 0: 1 'is already installed' line(s)
+
+=== t19 root eco\ #1\ \;%é, form bare: exit 1
+spec: demo-tool[mcp] @ <work>/t19/eco #1 ;%é/downloads/demo_tool-1.0.0-py3-none-any.whl
+error: Distribution not found at: file://<work>/t19/eco
+
+=== t20 root eco\ #1\ \;%é, form encoded: exit 0
+spec: demo-tool[mcp] @ file://<work>/t20/eco%20%231%20%3B%25%C3%A9/downloads/demo_tool-1.0.0-py3-none-any.whl
+ + demo-tool==1.0.0 (from file://<work>/t20/eco%20%231%20;%25%C3%A9/downloads/demo_tool-1.0.0-py3-none-any.whl)
+Installed 1 executable: demo-tool
+receipt: requirements = [{ name = "demo-tool", extras = ["mcp"], path = "<work>/t20/eco #1 ;%é/downloads/demo_tool-1.0.0-py3-none-any.whl" }]
+run: demo-tool 1.0.0
+same spec again: exit 0: 1 'is already installed' line(s)
+
+=== t21 root eco#1, form raw: exit 1
+spec: demo-tool[mcp] @ file://<work>/t21/eco#1/downloads/demo_tool-1.0.0-py3-none-any.whl
+error: Distribution not found at: file://<work>/t21/eco#1/downloads/demo_tool-1.0.0-py3-none-any.whl
+
+=== t22 root eco\ #1\ \;%é, form encoded: exit 1
+spec: demo[mcp] @ file://<work>/t22/eco%20%231%20%3B%25%C3%A9/downloads/demo_tool-1.0.0-py3-none-any.whl
+error: Requested package name `demo` does not match `demo-tool` in the distribution filename: file://<work>/t22/eco%20%231%20%3B%25%C3%A9/downloads/demo_tool-1.0.0-py3-none-any.whl
