@@ -282,9 +282,15 @@ macOS. It reads `dirs::config_dir()/rtk/config.toml`, which on macOS is under
 config-path variable of its own, so a file at the Linux location under `~/.config` is never
 loaded here (the source, and rtk's own README and configuration guide, are retained in
 [`rtk-config-path.txt`](../../evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt)).
-**Replace** any existing `exclude_commands` line in that file with this block, keeping the
-file's other keys, since a duplicate `exclude_commands` key is invalid TOML and rtk then
-silently loads its defaults:
+The block below is that file's `[hooks]` table holding the recipe's `exclude_commands` value.
+Inside the existing `[hooks]` table, **replace** the key's whole value, from
+`exclude_commands =` through its closing `]` (or add the key when the table lacks it), and add
+the `[hooks]` header line only when the file has no `[hooks]` table. Keep the file's other keys
+and tables. A second `[hooks]` header or `exclude_commands` key is invalid TOML, and rtk then
+silently loads its defaults
+([`rtk-hooks-table-control.txt`](../../evidence/artifacts/macos-token-pins-20260926/rtk-hooks-table-control.txt):
+on the pinned Linux binary a second `[hooks]` header makes `rtk config` exit 1 while the hook
+keeps rewriting, and this edit loads with the four entries):
 
 ```toml
 [hooks]

@@ -1501,5 +1501,76 @@ class RtkConfigReminderRealBinaryTests(unittest.TestCase):
                     self.assertEqual(config.read_text(), text)
 
 
+class RtkExclusionInstructionTests(unittest.TestCase):
+    """2026-09-26 (GPT-6 verification of the macOS token pins): adoption/platforms/macos-arm64.md told
+    a reader to replace an existing `exclude_commands` line with the recipe's block, whose first line
+    is the `[hooks]` header. In a file that already has a `[hooks]` table that makes a second one,
+    which is invalid TOML: rtk 0.50.0 then loads its defaults and the hook keeps rewriting
+    (`duplicate key `hooks` in document root`; evidence/artifacts/macos-token-pins-20260926/
+    rtk-hooks-table-control.txt). Replacing a "line" also breaks the recipe's own multi-line value.
+    So every instruction that puts the four entries into rtk's config (the paragraph before each copy
+    of the recipe's block in a Markdown page outside evidence/, bootstrap.md step 4a and the macOS
+    rtk pin's install_note) says to replace the key's whole value inside the existing `[hooks]`
+    table and to add the header only when the file has no `[hooks]` table, and none says to replace
+    an `exclude_commands` line. Repository text only; nothing runs."""
+
+    OLD_LINE_INSTRUCTION = re.compile(
+        r"replace\**\s+(?:any\s+|the\s+)?existing\s+`?(?:\[hooks\]\s+)?exclude_commands`?\s+line", re.I)
+    REQUIRED = ("inside the existing `[hooks]` table", "only when the file has no `[hooks]` table")
+    BLOCK_FENCE = "```toml\n[hooks]\nexclude_commands = [\n"
+    # Retained evidence may quote an old instruction; hidden, dependency and cache directories hold no docs.
+    SKIPPED_DIRECTORIES = {"evidence", "node_modules", "venv", "__pycache__"}
+
+    def instructions(self) -> dict:
+        found = {}
+        for directory, subdirectories, names in os.walk(ROOT):
+            subdirectories[:] = sorted(name for name in subdirectories
+                                       if name not in self.SKIPPED_DIRECTORIES and not name.startswith("."))
+            for name in sorted(names):
+                if not name.endswith(".md"):
+                    continue
+                page = Path(directory) / name
+                text = page.read_text(encoding="utf-8", errors="replace")
+                start = text.find(self.BLOCK_FENCE)
+                while start != -1:
+                    # The block's instruction is the paragraph right before it.
+                    found[f"{page.relative_to(ROOT).as_posix()}, the paragraph before the block at offset {start}"] = (
+                        text[:start].rstrip("\n").rsplit("\n\n", 1)[-1])
+                    start = text.find(self.BLOCK_FENCE, start + 1)
+        bootstrap = (ROOT / "adoption/bootstrap.md").read_text(encoding="utf-8")
+        found["adoption/bootstrap.md step 4a"] = next(
+            line for line in bootstrap.splitlines() if "The template registers the `rtk hook claude` Bash hook" in line)
+        mac_pins = json.loads((ROOT / "adoption/pins-macos-arm64.json").read_text(encoding="utf-8"))
+        found["adoption/pins-macos-arm64.json rtk install_note"] = next(
+            tool["install_note"] for tool in mac_pins["tools"] if tool["id"] == "rtk")
+        return found
+
+    def test_every_instruction_sets_the_value_inside_the_one_hooks_table(self):
+        found = self.instructions()
+        pages = {label.split(",", 1)[0] for label in found}
+        # Not vacuous: the two pages that carry the recipe's block today are found.
+        self.assertLessEqual({"recipes/README.md", "adoption/platforms/macos-arm64.md"}, pages)
+        for label, text in found.items():
+            with self.subTest(label):
+                self.assertNotRegex(text, self.OLD_LINE_INSTRUCTION)
+                # Markdown wraps lines and a phrase may open a sentence.
+                words = " ".join(text.split()).lower()
+                for phrase in self.REQUIRED:
+                    self.assertIn(phrase.lower(), words)
+
+    def test_bootstrap_step_4a_keeps_the_four_entry_value_verbatim(self):
+        self.assertIn(f"`exclude_commands = {RtkConfigReminderTests.EXCLUDE_ITEMS}`",
+                      self.instructions()["adoption/bootstrap.md step 4a"])
+
+    def test_the_check_rejects_the_replaced_line_instructions(self):
+        # The four wordings this class replaced, as they stood before the fix.
+        for old in ("**Replace** any existing `exclude_commands` line in that file with this block",
+                    "**Replace** the existing `[hooks] exclude_commands` line in `~/.config/rtk/config.toml`",
+                    "also **replace** any existing `[hooks] exclude_commands` line in rtk's config file",
+                    "Replace any existing exclude_commands line there"):
+            with self.subTest(old):
+                self.assertRegex(old, self.OLD_LINE_INSTRUCTION)
+
+
 if __name__ == "__main__":
     unittest.main()
