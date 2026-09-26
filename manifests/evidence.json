@@ -3131,6 +3131,86 @@
         "One host (NativeStack, WSL2). The first post-switch run aborted before any leg because its run directory already existed; the retained 10-of-10 result is the rerun into a new directory. This receipt, not the 2026-09-23 qualification in evidence/artifacts/sota-refresh-20260923/pins-mem/markitdown.json (another host, another install kind, a non-discriminating check), is the basis for the 0.1.8 pin."
       ],
       "path": "evidence/receipts/markitdown-018-qualification-20260925.json"
+    },
+    {
+      "id": "ai-memory-240-qualification-20260925",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-25, ai-memory 2.4.0 was qualified against the installed 2.3.2 and then switched into production. The release asset ai-memory-linux-x86_64.tar.gz (15,969,555 bytes, sha256 590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076) matched the release .sha256 sidecar, the GitHub API asset digest and the release body before it was extracted into a new tools/ai-memory-2.4.0 prefix (binary sha256 360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344, 'ai-memory 2.4.0'). On restored copies of an online backup of the live store, the 2.3.2 baseline passed 16/16 checks on its second attempt (the first failed only its embedding-status probe) and the 2.4.0 rehearsal passed 19/19: migration V64 -> V66 (66 rows) with quick_check ok, 0 pages missing or changed and 0 observations missing; /healthz 200; GET /mcp 405 with allow: POST; protocol 2024-11-05 with 23 tools named as in 2.3.2; the known page's body sha256 equal to the 2.3.2 read; unchanged allowlist check-capture; both the 2.4.0 and the 2.3.2 hook clients captured into the 2.4.0 server; no pre-migration archive; and 2.3.2 serve on the migrated copy exited 1 with 'memory database schema is newer than this ai-memory build'. An independent verifier reproduced these with its own probe code and agreed. The coordinator then performed the user-approved cutover: the service stopped at 20:43:48Z and quiesced (0 ai-memory processes, 0 database users); the quiescent store read V64 (64 rows), quick_check ok, 36 pages and 77,213 observations; an at-rest cold copy (336 files) fingerprint-matched it; bin/ai-memory was relinked to 2.4.0; the upstream install-hooks --apply changed only the binary path on 8 Claude and 7 Codex commands; the service started at 20:44:37Z and applied V65__page_compacted_marker and V66__auto_improve_claim_attempts; /healthz returned 200 with NRestarts 0; the fingerprint compare V64 -> V66 passed (66 rows, quick_check ok, 36 pages with 0 missing or changed, 0 observations missing, 77,330 after); status --json reported 2.4.0; memory_status returned scope resolved_by explicit; a known page's body was unchanged (sha256 prefix 98eb1dfb4fc6b0f5); and a fresh headless claude -p session at 20:45:10Z produced session-start, pre-tool-use, post-tool-use, stop and session-end observations. A read-only read-back at 20:54:04Z found bin/ai-memory on tools/ai-memory-2.4.0, /healthz 200 and 8 Claude plus 7 Codex hook commands on 2.4.0.",
+      "limitations": [
+        "Pending, user-only: Codex skips changed hooks until they are trusted, so the 7 rewritten Codex ai-memory commands capture nothing until the user reviews and trusts them in Codex /hooks; Codex is usage-limited until 2026-09-30. Real Codex capture and Codex-format hook payloads through 2.4.0 were not observed. The rendered adoption/templates/codex.config.template.toml still carries the trusted_hash entries recorded for the pre-switch commands.",
+        "The migration is forward-only: after V65 and V66, 2.3.2 refuses the store with DataSchemaAhead, and 2.4.0 writes no automatic pre-migration archive for a store created by 2.x (snapshot_before_db_migration is gated to the 1.x to 2.0 upgrade). Rollback is the coordinator's private at-rest cold copy, a relink to the retained tools/ai-memory-2.3.2 prefix and the installer's .bak-1790369060 hook files; writes made after the cold copy would be lost from the live store. The rollback was not exercised on production, and `ai-memory restore --force` was not run.",
+        "GHSA-9pj6-vhgr-3mwh (CVE-2026-63128, rmcp < 2.0.0 Streamable-HTTP session-table leak), fixed by rmcp 2.2.0 in 2.4.0, was not reachable here: the service runs stateless (no --http-stateful; GET /mcp returns 405 with allow: POST) and the leak is in the stateful create_session path. The upgrade removes the three rmcp advisories from the dependency set; it did not close an exposed path on this host, and no exploit was attempted on either version.",
+        "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the durable-memory winner pin ai-memory 2.3.2 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 2.4.0 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
+        "Linux x86_64 only: adoption/pins-macos-arm64.json keeps ai-memory 2.3.2 (the macos-aarch64 archive) and is unchanged; nothing here is macOS evidence. The shared Claude settings template now names tools/ai-memory-2.4.0, so a Mac that renders it must point the hook commands at its installed 2.3.2 prefix until a Mac qualifies 2.4.0 itself.",
+        "Evidence class: our own integration checks (the locally authored aimem_accept.py driver and the verifier's rerun.py) plus coordinator observations; upstream unit and integration tests were not re-run (no Rust toolchain). The cutover facts are coordinator observations exported as aggregates in cutover.json; the cold copy and fingerprint files stay private and were not read by the writing worker.",
+        "Integrity rests on three matching upstream checksum values plus the local download hash: the asset has no artifact attestation (HTTP 404) and the release is not immutable.",
+        "At the writing worker's 20:54:04Z read-back, the host's installed-versions.txt ai-memory record still read 'ai-memory 2.3.2' (the mcporter record had been updated), so tools that read that record misreport this host until it is updated.",
+        "The qualification's own production before/after compare failed 1 of its 19 checks (results/prod-compare-before-after.json, pass false): claude_settings_unchanged, because ~/.claude/settings.json changed at 19:01:59Z during the qualification window. The writer was not identified, and nothing ties the change to this unit: no scratch ai-memory process existed then, install-hooks was not run, and the file's ai-memory hook lines stayed 8 on 2.3.2. Production hook and config files were otherwise fingerprinted only by hash and hook-path counts.",
+        "Not observed: whether Claude Code sessions that were already running reload the rewritten hooks (the capture check used a fresh session), 2.4.0 behaviour over time (decay, access reinforcement, scheduler ticks), web UI behaviour beyond /healthz, and the #792 fix, not in 2.4.0 (released in v2.4.1 at 2026-09-25T21:46:32Z). One host (NativeStack, WSL2); the rehearsal used an online backup that is SQLite-consistent but not proven atomic across db, wiki and config, and its scratch servers ran for seconds."
+      ],
+      "path": "evidence/receipts/ai-memory-240-qualification-20260925.json"
+    },
+    {
+      "id": "mcporter-0141-qualification-20260925",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "mcporter"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-25, mcporter 0.14.1 was qualified against the installed 0.13.13 and then switched into production. The npm tarball https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz (464,028 bytes) had sha256 8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2, equal to the GitHub release v0.14.1 asset digest and checksums.txt, and integrity sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ==, equal to npm dist.integrity; npm audit signatures reported 41 packages with verified registry signatures and 13 with verified attestations, including mcporter@0.14.1's SLSA provenance from release.yml at refs/tags/v0.14.1, commit 93e0916cafe2d624b94271e31b75ca681a016514. It was installed from that verified file into a new tools/mcporter-0.14.1 prefix. The same 37-step acceptance, run in isolated MCPORTER_DAEMON_DIR namespaces with a scratch config against the live Qdrant, embedding and ai-memory services, passed 37/37 on 0.14.1 and 37/37 on the matched 0.13.13 baseline with identical per-step outcomes and exit codes. It covered the retained mcporter install receipt and the socraticode, jcodemunch-mcp and context-mode use receipts; ctx_doctor; list ai-memory (23 tools) and list jcodemunch (6 tools); the token-report one-off stdio call; daemon status with protocolVersion 3; ctx_execute_file and ctx_execute; keep-alive persistence; ai-memory memory_status; daemon stop, relaunch and restart; the SIGKILL refusal ('Previous daemon exited unexpectedly ... No replacement was launched.') and deliberate recovery ('Single-user daemon started.', bridge-recovered); and a held startup lock failing with 'did not become ready within 45 seconds' and recovering after the holder exited. The resolved dependency trees differ only in rolldown 1.2.8 -> 1.2.9 (@oxc-project/types 0.149.0 -> 0.150.0) and string-width 8.2.2 -> 8.3.0. An independent verifier re-ran the candidate arm, bound all 40 installed dependencies to their registry tarballs, verified 41 of 41 registry signatures with openssl and agreed; it also measured that with no ps on the daemon's PATH 0.14.1 fails a keep-alive call and `mcporter daemon stop` while 0.13.13 passes both. With no daemon running, the coordinator relinked bin/mcporter to tools/mcporter-0.14.1/bin/mcporter at about 20:12Z; with the host config, `list socraticode --brief --no-oauth` listed 26 tools, `call socraticode.codebase_health` printed the health check with Qdrant reachable, and the next call started a 0.14.1 daemon. A read-only read-back at 20:54:04Z found bin/mcporter on tools/mcporter-0.14.1, `mcporter --version` 0.14.1 and the installed-versions.txt mcporter record 0.14.1.",
+      "limitations": [
+        "0.14.x runs `ps` from PATH (0.13.13 ran /bin/ps). The verifier measured that when the daemon's PATH has no ps, 0.14.1 cannot connect a keep-alive server ('Transport ownership could not be verified') and `mcporter daemon stop` refuses ('Retirement is unverified'), while 0.13.13 does both; the 37-step acceptance ran with ps on PATH and cannot detect this. It works on this host because the daemon inherits the launching shell's PATH and no systemd unit, crontab or client hook launches mcporter. Any unit, agent or container that launches the daemon needs ps on its PATH, and a 0.14.1 daemon started without it must be retired by signal.",
+        "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the mcp-surfaces winner pin mcporter 0.13.13 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 0.14.1 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
+        "Linux x86_64 only: adoption/pins-macos-arm64.json keeps mcporter 0.13.13 and is unchanged. The npm tarball is platform-independent, but a Mac needs its own acceptance; nothing here is macOS evidence.",
+        "The qualification ran with a scratch config (serena and headroom dropped; SOCRATICODE_WATCHER=off and SOCRATICODE_AUTO_RESUME=off), context-mode's server bundle inside bwrap with arm-private state and jcodemunch with a private copy of ~/.code-index, from a git-archive snapshot of the repository at 7783682f. The host config itself was exercised only by the coordinator's post-switch list and codebase_health calls.",
+        "Not exercised: a mixed-version daemon cutover (no daemon was running at the switch), the shared ~/.mcporter namespace under load, the unresponsive-daemon (SIGSTOP), scoped-registration-cleanup and changed-process-root lifecycle stages, OAuth (every call used --no-oauth), emit-ts/generate-cli, --persist, --tail-log and the Chrome relay. In the SIGKILL stage no transport outlived the daemon, so the manual orphan-TERM step had nothing to act on.",
+        "Local integration evidence, not the unchanged upstream suite: `pnpm check` and `pnpm test` at v0.14.1 were not run on this host; upstream CI on the tag commit is research-reported. One run per arm on the final harness, plus a retained baseline attempt that failed from a harness TMPDIR artifact; timings and the order of tied search results are run-level values.",
+        "The sha256 pin covers mcporter's own tarball only: npm resolves the dependency ranges at install time and the package ships no shrinkwrap, so a later install can differ from the qualified tree (verify/npm-ls-0.14.1.txt). The fast-uri 3.1.0 copy bundled in @modelcontextprotocol/client 2.1.0, on the output-schema validation path, has open advisories in both 0.13.13 and 0.14.1; it was not re-verified here, and no SDK release ships a fixed bundle.",
+        "Production hook and config files were not fingerprinted before and after the qualification; ~/.claude/settings.json and ~/.codex/config.toml changed during or just after the window; the writer was not identified, and nothing ties the change to this unit. The Qdrant snapshot create and delete counters rose by 5 each in the window, from the socraticode unit's snapshot copy; point upserts and deletes did not move until after the run."
+      ],
+      "path": "evidence/receipts/mcporter-0141-qualification-20260925.json"
+    },
+    {
+      "id": "ai-memory-241-qualification-20260925",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory"
+      ],
+      "claim": "On host nativestack-5975wx-20260925, ai-memory 2.4.1 was qualified against production 2.4.0 on 2026-09-25 and switched into production on 2026-09-26. The v2.4.1 asset ai-memory-linux-x86_64.tar.gz (16,026,020 bytes, sha256 15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4) matched the release body, the .sha256 sidecar and the GitHub API digest before extraction into a new tools/ai-memory-2.4.1 prefix (binary sha256 dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd, 'ai-memory 2.4.1'). On separate restored copies of one online backup taken through the live 2.4.0 service (store V66), the 2.4.0 arm passed 26 of 26 checks and the 2.4.1 arm 28 of 28: /healthz 200, GET /mcp 405 with allow POST, 23 identical MCP tools with scope explicit, an unchanged known-page body, the write/query/read/delete round-trip, allowlist --check-capture, same-version and cross-version hook capture in both directions, and migration V66 -> V67 (67 rows) with 0 pages missing or changed and 0 observations missing; 2.4.0 then refused the V67 copy with rc 1 ('memory database schema is newer than this ai-memory build: the store has migration V67 (managed_run_session_link) applied, but this build only ships migrations through V66\u2026'), and a fresh copy reopened under 2.4.0 at V66. Re-applying install-hooks with 2.4.1 changed only the binary path on 8 Claude and 7 Codex lines. In a private network namespace, 2.4.1 set keepalive on 65 of 65 accepted sockets and reclaimed all 60 vanished peers by t=75 s, while 2.4.0 held all 60 at t=100 s (#792). During qualification the production store schema (V66) and all pre-existing pages and observations were unchanged. An independent verifier reproduced these with its own code and agreed. The coordinator then performed the user-approved cutover: the service stopped at 2026-09-26T00:14:12Z; the quiescent store read V66 (66 rows), quick_check ok, 40 pages and 86,219 observations; an at-rest cold copy (378 files) fingerprint-matched it; bin/ai-memory was relinked to 2.4.1; install-hooks --apply changed only the binary path on 8 Claude and 7 Codex lines; the service started at 00:19:51Z and applied V67__managed_run_session_link; /healthz returned 200 with NRestarts 0; the fingerprint compare V66 -> V67 passed with 0 pages changed, 0 observations missing and 86,219 after; status --json reported 2.4.1; memory_status returned scope resolved_by explicit; the known page's body was unchanged; keepalive timers were on 2 of 2 established sockets; and a fresh headless claude -p session captured session-start, pre-tool-use, post-tool-use, stop and session-end. A read-only read-back at 2026-09-26T00:30:40Z found bin/ai-memory on tools/ai-memory-2.4.1, 8 Claude plus 7 Codex hook commands on 2.4.1 and the installed-versions record at 2.4.1.",
+      "limitations": [
+        "Pending, user-only: Codex skips changed hooks until they are trusted, so the 7 rewritten Codex ai-memory commands capture nothing through 2.4.1 until the user re-trusts them in Codex /hooks. Real Codex capture through 2.4.1 was not observed.",
+        "V67 is forward-only: after it, 2.4.0 refuses the store with rc 1. Rollback is the coordinator's private at-rest cold V66 copy, a relink to the retained tools/ai-memory-2.4.0 prefix and the installer's .bak-1790381983/.bak-1790381984 hook files (or a re-run of install-hooks with 2.4.0, which leaves unrelated settings edits alone); writes made after the cold copy would be lost from the live store. The rollback was not exercised on production.",
+        "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the durable-memory winner pin ai-memory 2.3.2 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 2.4.1 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
+        "Linux x86_64 only: adoption/pins-macos-arm64.json keeps ai-memory 2.3.2 and is unchanged; nothing here is macOS evidence. The shared Claude settings template names tools/ai-memory-2.4.1, so a Mac that renders it must point the hook commands at its installed 2.3.2 prefix.",
+        "The R1/A17 memory-stack rerun keeps official 2.4.0 as its control build, run in isolation, per the user's decision relayed by the token-efficiency session and recorded in issue #274 (https://github.com/seathatflowsinourveins/native-agent-stack/issues/274: the NativeStack rerun uses the official ai-memory v2.4.0 as the control build); this production move does not change that preregistered control.",
+        "Cutover caveat: the quiesce loop used `pgrep -f`, matched its own command line and waited its full 5 minutes. The service stop was synchronous before the loop, and the service was afterwards confirmed inactive (dead) with 0 ai-memory processes and 0 database users.",
+        "Evidence class: our own integration checks (the locally authored aimem2_accept.py and the verifier's verify_aimem.py) on restored copies, plus coordinator observations exported as aggregates in cutover.json; upstream tests were not re-run (no Rust toolchain), and upstream CI on 433a19f3 (57/57 success) is cited. The cold copy and fingerprint files stay private and were not read by the writing worker.",
+        "Integrity rests on three matching upstream checksum values plus the local download hash: the asset has no artifact attestation (HTTP 404), the tag is unsigned and the release is not immutable.",
+        "#792 was measured only for peers whose kernel answers keepalive probes with RST (TCP_REPAIR close in a private namespace, server as namespace root, not under the systemd unit); a blackholed peer would take about 10 minutes with kernel-default probes and was not measured. The #917 repair was a no-op here (0 latest pages with expires_at). #859 (embedding prefixes) is not in 2.4.1.",
+        "One host (NativeStack, WSL2). During qualification ~/.claude/settings.json was edited by other actors at 22:38:28Z and 22:51:48Z (feedbackDrafts and skillOverrides only; the hooks subtree was unchanged), so its whole-file sha256 in the snapshots is not a stable fingerprint."
+      ],
+      "path": "evidence/receipts/ai-memory-241-qualification-20260925.json"
+    },
+    {
+      "id": "headroom-039-qualification-20260925",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "headroom"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-25, headroom-ai 0.39.0 was qualified against the pinned 0.37.0 and not switched; production stays on 0.37.0. Tag v0.39.0 is 66f426171bab32692cf93d2b656a8e4be9004186 and contains d971f7c3 (#3748; compare behind_by 0). Its manylinux_2_28_x86_64 wheel (14,199,952 bytes, sha256 8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74) matched PyPI JSON, the PyPI simple API and the GitHub release asset, and was installed with uv into the new prefix tools/headroom-ai-0.39.0; 555 of 555 headroom/ RECORD digests match the verified wheel and `headroom --version` printed 'headroom, version 0.39.0'. The unchanged upstream test file tests/test_transforms/test_content_detector_timestamp_search.py (blob 23b66a27) passed 6 of 6 on 0.39.0 and 4 of 6 on 0.37.0. Through `headroom mcp serve --proxy-url http://127.0.0.1:1` over stdio, 0.39.0 listed headroom_compress, headroom_retrieve and headroom_stats; compressed the 600-line ISO-timestamped fixture A 16820 -> 257 tokens with ['router:log:0.02'] (0.37.0: 16820 -> 11429 with ['router:search:0.68'], a lossless fold), showing 7 verbatim rows including the planted CRITICAL line 313 and then '[593 lines omitted: 1 ERROR]'; compressed fixture B 39064 -> 3292 with the same output as 0.37.0; returned both originals byte-exact; resolved the summary's 'Retrieve more' hash f681f64d7ad6f5b3c5fc56c7 to the exact original; and reported compressions 2. `headroom savings --json` reported schema_version 2, calls 2 and tokens_saved 52335; `headroom telemetry --json` reported beacon_enabled false. Each version retrieved the other's stored fixtures byte-exact. ~/.headroom, the pinned prefix, the shared bin links and the running user services were unchanged. An independent verifier reproduced these with its own code and agreed. At v0.39.0 the level counts in the '[N lines omitted: ...]' notice are taken over all input lines (log_compressor.py:461-487, _format_output; log_compressor.rs format_output), so the notice reports the kept CRITICAL line as omitted.",
+      "limitations": [
+        "Not switched: 0.37.0 is retained. The omission notice's level counts include kept lines (source-verified at v0.39.0; the same code is at v0.37.0, and #3748's routing now sends the stack's timestamped logs to it), the Rust content detector still lacks the #3736 timestamp guard, #299 pins 0.37.0 in the Linux bootstrap and the token-efficiency lane's end-to-end counters (#296) run at 0.37.0. Overturn when upstream counts levels over the omitted lines only, or a measured answer-quality comparison on log inputs shows net value.",
+        "Fixture A's summary is no longer lossless in 0.39.0: 0.37.0's grep fold rebuilt all 600 rows, while 0.39.0 shows 7 rows, an omission notice and a retrievable marker; the byte-exact original is available only through headroom_retrieve. This is upstream's intended post-#3748 routing.",
+        "The fix was observed only on the pure-Python detector (no onnxruntime in the tool env; both servers logged the fallback). The native path, enabled by onnxruntime>=1.24 or ORT_DYLIB_PATH, was not executed.",
+        "The beacon defaults on in both 0.37.0 and 0.39.0 (BEACON_DEFAULT_ON = True). The opt-out (HEADROOM_OFFLINE=1, DO_NOT_TRACK=1) is owned by the token-efficiency lane (#303, #304); ~/.headroom/config/install_id already existed before this run.",
+        "The landscape ledger's token-efficiency winner pin stays headroom 0.37.0 (sealed 2026-09-22 packets); a receipt at 0.39.0 does not bind to it. Linux x86_64 only; no macOS evidence.",
+        "The fixtures are synthetic (fixture A from the use receipt's generator at 6752ede5; fixture B the retained mcp-tool-listing.json), token counts are headroom's own estimates, and only one upstream test file ran, under a minimal runner; the broader suite is evidenced only by CI on the release commit (137 success, 8 skipped, 1 failure in notify-release on a missing Slack secret).",
+        "No build provenance (no PEP 740 attestation; attestations API 404); integrity rests on three agreeing digests plus RECORD binding, and the 72 dependency wheels were resolved from PyPI with exclude-newer 2026-09-25T22:00:00Z, not individually hash-pinned.",
+        "State compatibility was measured on scratch stores only; the in-place migration of the real ~/.headroom/ccr_store.db was not exercised. During the window other sessions wrote ~/.claude/settings.json and ~/.codex/config.toml, and another session's 0.37.0 MCP server ran throughout; ~/.headroom stayed unchanged."
+      ],
+      "path": "evidence/receipts/headroom-039-qualification-20260925.json"
     }
   ],
   "files": [
@@ -3301,8 +3381,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "fee60f155ffe12599dd18112f849e4d4bc26e6d60e2532000e786268bd8121e4",
-      "bytes": 30190
+      "sha256": "df3c83db62476a6a9b09a3ccc26c2d4ce44739cc4e15ead87801028a30b320a3",
+      "bytes": 31163
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3396,8 +3476,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "14395538823ee79dba6246c078a086a79ef067acd87910ea00283ce69758fd10",
-      "bytes": 24622
+      "sha256": "59bdb4cf3f1c6431483300663f1ad2cbbbb439d5e124886d1ef4a739c7590612",
+      "bytes": 26557
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -3406,13 +3486,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "47429e237a464f3d5f73e4165747e6b4078732e0685611998cf37b304b0cf517",
-      "bytes": 13347
+      "sha256": "b1b3fce801006e7b4b1a26fd56e5024a2adfeeb393debdebc19def1a01349e9f",
+      "bytes": 13608
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "cd6007da211981327ea57d315cef6b19320b3e9947a6389800ee1b4f964ada03",
-      "bytes": 40660
+      "sha256": "4128314986dcc154a6523a68055f7c3382685d581c1aec27060e51ad2fbca33f",
+      "bytes": 42321
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3456,7 +3536,7 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "d9297f73792125dd4478f8b5bb6680cd0af1ef7d7d910b214dd9637d8de87bd3",
+      "sha256": "512d3f6485ce0c6e5da29baea947a40d9882203f4586c13818da9c8560e5e4f7",
       "bytes": 8559
     },
     {
@@ -3491,8 +3571,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "452d462164951ca1f3f2399788c47dc0a512f8f73189a02d706a697bb1204557",
-      "bytes": 18903
+      "sha256": "e2aa6552f2c6c4a084a2420bd860d1a00b6cd88c16621d5b05d9522118fefb4e",
+      "bytes": 19179
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -6577,8 +6657,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "ef6e3407a61b83ff32f83c1a4204ed82b1e16b3e32e3a98a1f1cd42e341cfa17",
-      "bytes": 480480
+      "sha256": "782a15a3f7b398e56b70ebd14432f39bac10664a11c40d65f5645fd632151dec",
+      "bytes": 481087
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -9822,8 +9902,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "6ab0bc9a52ed96196e1c9f10937fb5c0e67cd1b20a502c22425cdd59a93df346",
-      "bytes": 472512
+      "sha256": "b6c9582cd263137aae3d96246b47fb972097cee476ec5cfb8b00bd3f04b036ac",
+      "bytes": 473150
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -9872,8 +9952,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "44576a98fdea868e70e852640692910f21007dba1785e995563a4598755b6bb5",
-      "bytes": 287103
+      "sha256": "b8ffb29755c7efe809c81c97671a08e96662d1eb346db3be88b9fec034ec0c0b",
+      "bytes": 287102
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9882,8 +9962,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "40d0fc8f16b1af51995877b2990a4992e1542b3c2ec13028dfdee3f7ab105fa4",
-      "bytes": 248554
+      "sha256": "2c02c97b082ad834df0db09757313dbbc85ad2185c750031f787740da5224809",
+      "bytes": 248548
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -10376,9 +10456,19 @@
       "bytes": 14083
     },
     {
+      "path": "docs/decisions/2026-09-25-ai-memory-2-4-0-release-review.md",
+      "sha256": "8c705db0a4c61d7dfb7493d1ef1cca690719a0b79b2d69dd5d636422dba58c43",
+      "bytes": 17752
+    },
+    {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
       "sha256": "a88c50a9bd15d1a0e3a5557d79c41fd20f34c1fb7785f4183347e895222f2820",
       "bytes": 26123
+    },
+    {
+      "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
+      "sha256": "46a535ddd1687fa24ac6994006c3223842b0a3c451051fd412571331c9a4fb1b",
+      "bytes": 30688
     },
     {
       "path": "docs/direct-results.md",
@@ -10632,8 +10722,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "19ae98a0ba964ef97bf60f11b65472eb99b9fe92e40a5e2c29e4c7ed0c43d3d6",
-      "bytes": 18039
+      "sha256": "fce38c0daa13419e4fc00018110a3a575f227b34a35fa93e3a6f971ac16a2386",
+      "bytes": 18038
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -10732,8 +10822,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "bd560e9cae461823d2b1ed7f5beb56c437768de8f746e776e16baf12b3ec1577",
-      "bytes": 157440
+      "sha256": "99b19cfdce38fc36bcfbc711a1a6147ed00e25ae3e4cb9f9299a2c8c3746b569",
+      "bytes": 157694
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -28391,6 +28481,641 @@
       "bytes": 2564
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/advisories.py",
+      "sha256": "dd6b1e120d0bc07f2ff4d1d2708fb2f0c5e6f1f2cd46f2bd0fdf3574c9c4f7f5",
+      "bytes": 1340
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/aimem2_accept.py",
+      "sha256": "3cd8acfb6d210598c71c670c5574f4bb593d57caed8441e839743e2bff686c3a",
+      "bytes": 76362
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/cutover.json",
+      "sha256": "beb76f36f360a8ba7793e33a6ae7c7f2c7f353f95a4f532a5cf196eb424b95fa",
+      "bytes": 4894
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/fetch_src.py",
+      "sha256": "4a2bd85e0aa1677742f04c060c4e203dd7eb69cf93b86dfe087a98649175453d",
+      "bytes": 807
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/out/readback.out",
+      "sha256": "014d482bd8bd3650778f7dd5ad4aa7dabb56ee8578216eaa2662902d502392e7",
+      "bytes": 967
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results.json",
+      "sha256": "7d3ecb48739520d53a7c6de0c2a4933909e117aaf481a73fd0c4d1a90dfac0f7",
+      "bytes": 75764
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/advisories-v2.4.0.json",
+      "sha256": "aa5ab9125feb50fdb17defd4a255ea2767b8f338de0bed8594ea59cc2a062dd3",
+      "bytes": 118
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/advisories-v2.4.1.json",
+      "sha256": "776187a63e8d3560a6ce5cca0b3536a59a1c457c170cd6088ab17b1f5df2dc02",
+      "bytes": 118
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/prod-compare-before-after.json",
+      "sha256": "3991144a3d1f264aa081ad678edba228bcafe8f38fee6b429b9d9841ebdd1ce1",
+      "bytes": 1162
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/prod-compare.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/prod-compare.stdout",
+      "sha256": "05aaa83986e82299cfdea06a5d5b0bd8cfb277bd1c71419b7909999c9d17152a",
+      "bytes": 1096
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/prod-snapshot-after.json",
+      "sha256": "d81876eed388ff1322dadb7004affe466b9f5508b56c39e403a7c8a2d9c53986",
+      "bytes": 1626
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/prod-snapshot-after.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/prod-snapshot-after.stdout",
+      "sha256": "8f49eb4d0cd650e332d3cc7cb48ccc247cdc0030c95f97a062fdd617f29dbb80",
+      "bytes": 1523
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/prod-snapshot-before.json",
+      "sha256": "bba7a7404e4dbc2fbf55436ff6c032038df90b41cbccef3eaf46a35ce8440d2e",
+      "bytes": 1628
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/prod-snapshot-before.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/prod-snapshot-before.stdout",
+      "sha256": "1d5126253e16ab6cb5a81f1922f09037f94ff5edcce132e47fcab8e77941df50",
+      "bytes": 1525
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/review-v2.4.0-v2.4.1.json",
+      "sha256": "719c3b3d1de157802b66bdfd15191689d6fad2ea6733f72c82f6dc31392d80d8",
+      "bytes": 4118
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step0-install.json",
+      "sha256": "aaa8e9962ea20e8ecd4fab7e53bfcdd181c6454b58a9a0666928fba2cb55945c",
+      "bytes": 1715
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step0-install.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step0-install.stdout",
+      "sha256": "9470ca7d2a0519f4fffa146d21478ce7b3bd67954ba1f838412d307e2180e061",
+      "bytes": 1574
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step1-preflight.json",
+      "sha256": "71b31ab4f8d60061d226fb87a5224d55b40c8bf3d01f364fe0813620f5b95396",
+      "bytes": 522
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step1-preflight.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step1-preflight.stdout",
+      "sha256": "16306ba7fdda1d5aa515dbcf67436fdfd12808aa9fd2e42fc30892ab6e152f06",
+      "bytes": 485
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step2-backup.json",
+      "sha256": "5bb7803db1b379c1be98776447e61156d8e6722ec083e9b750561e2a1920b7e0",
+      "bytes": 572
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step2-backup.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step2-backup.stdout",
+      "sha256": "70822647d2941255f974b2ad5f35b09792ca2f41b4469f9d9cc43493b15a5f29",
+      "bytes": 525
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step3-baseline.json",
+      "sha256": "bc67d40677c316d52632031cb91df082f61aa209c5a31de8e2d85cbacf28c722",
+      "bytes": 8455
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step3-baseline.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step3-baseline.stdout",
+      "sha256": "5b7518e31b715c54325b867c8ca903d1e6a38775cf3d1e0405e5ee8b5edb173c",
+      "bytes": 7419
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step4-rehearsal.json",
+      "sha256": "e1224a5c9d2bb358b31b0d58fb3863c4eae6a76c42f55b7dd05aa76fbefdd766",
+      "bytes": 9151
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step4-rehearsal.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step4-rehearsal.stdout",
+      "sha256": "2189f26353a2858a6a3c127fde0aca379c5500b7a7817ec80ed95b28913726de",
+      "bytes": 8092
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step5-rollback-check.json",
+      "sha256": "fba848158d6dcb934ebae2d0f5d96322181e4a6b22b8749983669cb957e371a3",
+      "bytes": 2091
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step5-rollback-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step5-rollback-check.stdout",
+      "sha256": "91db6a4ee5f6c493bd79a1f23f39365768d13997c61ac8a52dbf7a5a3ac94c8b",
+      "bytes": 1875
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step6-hooks-render.json",
+      "sha256": "8e094b9314b22996116350515edc1c3298eaf94b16421fe82833f7b9495d0b3d",
+      "bytes": 902
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step6-hooks-render.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step6-hooks-render.stdout",
+      "sha256": "00b92764c711ba6ffc5a51acba88c59708554d47cd5520b5273d2a794c117205",
+      "bytes": 802
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step7-fdprobe-base.json",
+      "sha256": "860dbfa16175ab044594a35930a6ce386c5c1bc63a34f3caddbe63bc1c4b2006",
+      "bytes": 3481
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step7-fdprobe-base.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step7-fdprobe-base.stdout",
+      "sha256": "c29625d9d69906c116e7a8fce7c5fb8a6075e4732e3ef9fd0cae01fab4a005d3",
+      "bytes": 2755
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step7-fdprobe-rehearsal.json",
+      "sha256": "526b71b523e0a7468c1416ff148fcbdb2d7ff2c36fb3dd7dd69d16c71bde81b1",
+      "bytes": 3483
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step7-fdprobe-rehearsal.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step7-fdprobe-rehearsal.stdout",
+      "sha256": "5377103bbf4cebc85d2ad55aba45f5d86b80deba787004d41d179536b42ac820",
+      "bytes": 2757
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step8-discrimination.json",
+      "sha256": "89bd40891ffef73f6c59bb167256ef88f6dd2472ba0923106f5d537953207cca",
+      "bytes": 313
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/results/step9-wiki-drift.json",
+      "sha256": "aa6fb263d66d818a80845c84c6e18bfbee0053403ad39fe6f1e7e21ca66c533e",
+      "bytes": 665
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/active-units.txt",
+      "sha256": "63858f19a31e80d4a5969aaa426e180a0bb5ec1a329521f411b33a305d83e062",
+      "bytes": 311
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/format_probe.py",
+      "sha256": "9556e9fc4137e769ea25ec2862d611dba4b2f26a44e43a49750b24a028e36a0c",
+      "bytes": 3921
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/hooks_history_check.py",
+      "sha256": "05fc6bf50456c49156acb21772264e47abaa18c4c844d0ca4bf6dfeb6f8ac4ff",
+      "bytes": 1164
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/impl_residue_check.py",
+      "sha256": "347a926ba3dd7f57204a9eafb78d29d8bfb2689d34d80a8b4e130e8cf10cf4e3",
+      "bytes": 2810
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/prod_format_check.py",
+      "sha256": "5e3936bd5242eaf51059945cb11b0f86f17275b46971f814c612f6e40f12a3e9",
+      "bytes": 1105
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/arm-base.json",
+      "sha256": "9b690c6d6e627b5ca08a4648a5680f3642a4434c8df1584035fe5a46971d691f",
+      "bytes": 1280
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/arm-cand.json",
+      "sha256": "93ec1cf188f9b9ae51a6cfcdc49b3421ab5ceb3a9e36e5f9b2a2364286c5914f",
+      "bytes": 4025
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/backup-vs-live-after.json",
+      "sha256": "df9d14a3fe119939b33dff09f7001375f296122369ecd3d9e4a78323c0c697e6",
+      "bytes": 683
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/backup-vs-live-before.json",
+      "sha256": "7579e2410cd95609b800b9734320bae804c9482baec1c09463fa0fa2033a6faf",
+      "bytes": 683
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/fdprobe-base.json",
+      "sha256": "711f6e9f8ac5143cc40a5856870a7c6960b09941dc249538a6644029445d9023",
+      "bytes": 1971
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/fdprobe-base.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/fdprobe-base.stdout",
+      "sha256": "2153492f2722fb196ba2ebed3e0d57cfcaafadb727cbf93b048bd23b784fb3f9",
+      "bytes": 1487
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/fdprobe-cand.json",
+      "sha256": "f9f63dc518daeb4900c0483663bf337fc5d038cb341c7caeb703545677ef3a64",
+      "bytes": 2197
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/fdprobe-cand.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/fdprobe-cand.stdout",
+      "sha256": "80f80e3cc2b7c41bbc4cd42bc196314a103d2c10711fbbebf4ed18de47b5cec0",
+      "bytes": 1561
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/hooks.json",
+      "sha256": "7fe040f87e57235ab0d4f3616b127fef8afc81b4dc3cca7d99731264192c39e4",
+      "bytes": 882
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/integrity.json",
+      "sha256": "68a790d652e07b1aa9fd12aa40f8151c146f8e1a9be479bf560a4330edfb4604",
+      "bytes": 1248
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/prod-after.json",
+      "sha256": "279d543e114bd0c3ee5b9ee8b5983daa7544d31c63a003aeff856eb5beacbf3e",
+      "bytes": 4163
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/prod-before.json",
+      "sha256": "650f23159a7e78c6982aec4f2bff35ce5e95e1fb4284a939836e5c8e5075aa4b",
+      "bytes": 4164
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/prod-compare-before-after.json",
+      "sha256": "c06bb378425d3257120d21beacd560c43c287e0749df9b8c3b32e14710bcea39",
+      "bytes": 1480
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/results/upstream.json",
+      "sha256": "c1ca49321e80798eba4437e48ad90af4d017b8f6d91a1ee15c66fca270a60479",
+      "bytes": 1576
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/review_spot_checks.py",
+      "sha256": "c620756f7c54b7be739194b6b7256fb47b5333cdad7f202d3f5fb073adf5b7fe",
+      "bytes": 4476
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/settings_diff.py",
+      "sha256": "cb52eb6332585b876006fd82c30cb2c9bffd6935a46fbc846f529bb97623540a",
+      "bytes": 1969
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory-241/verify/verify_aimem.py",
+      "sha256": "86fb8b7aaf9ae651372222983bbbefc166882ee60226c11261dcd022f610bdcc",
+      "bytes": 50320
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/aimem_accept.py",
+      "sha256": "20c88e7f5601fee499e219afed12c46f8e832c2c6f008b64ad90f7953fea8ec5",
+      "bytes": 52527
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/cutover.json",
+      "sha256": "34b8603fee0d7ef12220a2dcdbd7d7ddccd3f8facd2e107c988dcd187fb7e4bd",
+      "bytes": 4860
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/fetch_src.py",
+      "sha256": "00682bdf556636ce4c140026199b225133480c0c8f271eef7eac7a20a23c77aa",
+      "bytes": 1668
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/out/attest.err",
+      "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/out/readback.out",
+      "sha256": "390daa56b88e4f69a899ee72891cb1a67839307181603d6905d7250ef7b324df",
+      "bytes": 912
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results.json",
+      "sha256": "0a4c493e99c2656cc1642c6fbcdf6bf582abfb38d6c5d5435cbf8119598d7125",
+      "bytes": 65332
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/prod-compare-before-after.json",
+      "sha256": "9f4fd4de3017b8d68f64e22820163950200fb45f9dbcdc41621cfc45e626227a",
+      "bytes": 1086
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/prod-snapshot-after.json",
+      "sha256": "b40b6f75ab887c7b2fe916a9775aeaf9d4121e6ecefdb1edac10b7ac98234f09",
+      "bytes": 1267
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/prod-snapshot-before.json",
+      "sha256": "fed7a70bf9f1e4292cb206c0a028a7b8bb27908063b02bf6aebbb02d74f37920",
+      "bytes": 1269
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step0-install.json",
+      "sha256": "b195bc8be63515c30be6c42cc9438d4efa62288dc5daaa6ad577504b1dfc3e02",
+      "bytes": 1508
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step1-preflight.json",
+      "sha256": "77eaffe5d6dd95fe26a66828c843458c68cbd00feeb75ef4f4f715f1e35385c8",
+      "bytes": 731
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step2-backup.json",
+      "sha256": "58980896a62d6b5138355bd3f49041c0bef96514d02f0d0f56fbf22f84f8e6fd",
+      "bytes": 566
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step3-baseline-attempt1.json",
+      "sha256": "f02198f80a498fbf6adf1ac76acc6bace8a596ca08250a84832d848e04967a0d",
+      "bytes": 5221
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step3-baseline-attempt1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step3-baseline-attempt1.stdout",
+      "sha256": "f3b410fa8291af4667ab65d9a1a39542e7cf747ab6d08bc89e70da1e7cd5a3ad",
+      "bytes": 4578
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step3-baseline.json",
+      "sha256": "17628877993779332062f8a3eb2b46c931e6d2f5ca6c267326c74a09eca82ec8",
+      "bytes": 6215
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step3-baseline.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step3-baseline.stdout",
+      "sha256": "3f8622be0bdc5d4cceca5fb6b4aa42c0d353ca8f0b97e98fe6fb72f61ee9d0a4",
+      "bytes": 5438
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step4-rehearsal.json",
+      "sha256": "9dc40ad1ad470653c70a578f2d9bf27dfee489b79b8489547ac7c257eca38bf3",
+      "bytes": 7518
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step4-rehearsal.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step4-rehearsal.stdout",
+      "sha256": "33c6a3b4fa6a38690c07b50cc2b1309f0605fde4200d6172f6704e5ef9ab5d39",
+      "bytes": 6594
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step4-rollback-check.json",
+      "sha256": "718a475cbade2fabb5d6afbb90517d73d71794d5f7b9c6548e38ee9ee4abe8c4",
+      "bytes": 1710
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step4-rollback-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step4-rollback-check.stdout",
+      "sha256": "68928b45983da3ef3783a4b1f6fa08886a85c0b99b728a21510c4de91463e666",
+      "bytes": 1528
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/integrity.json",
+      "sha256": "1c6a380b0c278024b6767c1c25abc77e97e4111ff2876e7f93edb0a0f0d2cd24",
+      "bytes": 1415
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/integrity.py",
+      "sha256": "a0dff6a3b174d7bddc02d74b8c5395838bbba70cb55c7c9d4ea32edfd1125ba2",
+      "bytes": 6337
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/prod-check-after-verify.json",
+      "sha256": "91598269e537b6ee734ace22db22e439fe216a1805010b578b04ad375f7728a0",
+      "bytes": 939
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/prod-check-before-verify.json",
+      "sha256": "d1845283c89d8c0f5b6da406f7c4d0fb67160c7426c4c6523415b3f3024aa8ee",
+      "bytes": 940
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/prod_check.py",
+      "sha256": "f9e5537d35893e52ef0267f7612ab403b8f3504c7cbdaf2b413bf18415a77a54",
+      "bytes": 4777
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/rerun.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/rerun.json",
+      "sha256": "da99a610d55b3679b7a55904492fbf9326cc5aeb47f9ee40c75c8823a1c66436",
+      "bytes": 6414
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/rerun.py",
+      "sha256": "0ac1a3364e31a9542fcc4060978aaeeadcfbfec26cc4042105f1aff82b7e1947",
+      "bytes": 32452
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/0.37.0/result-session.json",
+      "sha256": "76a0a565cabb1676b1fff4380683529608941cdc96c3d3b230636dd5e65f544c",
+      "bytes": 1855
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/0.37.0/savings.json",
+      "sha256": "7a0f669093d7f39845bcb86d085625402417fb9d6298f4c62ea7a340ff7b8806",
+      "bytes": 1177
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/0.39.0/compressed-A.txt",
+      "sha256": "d09c822e7eb7d9a50893a180ec031e8756079a35e8b069d1eba4cc446bd01d86",
+      "bytes": 666
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/0.39.0/result-session.json",
+      "sha256": "796e1a1cb451eb37e19d99d6e1a2ad4b424c5424942157596788f292268be5e7",
+      "bytes": 1848
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/0.39.0/savings.json",
+      "sha256": "63747bf4ff3ae1dafae176ef1db8046f9ac486470de3e6192be2abbd7c82fa63",
+      "bytes": 1949
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/0.39.0/telemetry.json",
+      "sha256": "ea060ea1d406848dd37ecf24875fc665e29339c921b4c6c185ab604af7c5e9c8",
+      "bytes": 4381
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/criteria.json",
+      "sha256": "b270530c8c4bc1bd761b1d76a65c39043b9f7b2a49219b1165bd3a8d26dc3c95",
+      "bytes": 1049
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/readback.out",
+      "sha256": "5d1ec3fe191cb3e289a8872ea0a827774d0f06fac933ad648420e2d6d88b9b91",
+      "bytes": 259
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/run-outputs.json",
+      "sha256": "6b3bb8bcdba5576a91d054c094d7adeea408329126814b8f2468a28735a697a7",
+      "bytes": 117447
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/proof/snapshot.sh",
+      "sha256": "7ab9a1aa629411767af23fc15ec94eb08667b6c537f17bdfec3b3969b64e89d5",
+      "bytes": 2055
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/results.json",
+      "sha256": "269d606fb623ee09f5ab22e4b76b7d3576f963f3fd94208da878df1c211bab38",
+      "bytes": 70010
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/steps/G",
+      "sha256": "c419b3af27337cf6edb3e21af11d0de3064930f7327d28dbb9314cf3c9f9b129",
+      "bytes": 820
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/steps/mcp_retrieve.py",
+      "sha256": "edb7c2d2628bb831ceee9d7df821b63c39d74569ef8064473bfabb9418497068",
+      "bytes": 3272
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/steps/mcp_session.py",
+      "sha256": "dbf2d0ed74fdf174585218dc18ca1315c589a2f8188e58ec64b838abb2edfbb9",
+      "bytes": 6907
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/steps/record_bind.py",
+      "sha256": "819368b66c939501d671d9e112f80e2f0927a282d33429e9a3a074e865cd1ff8",
+      "bytes": 1457
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/steps/run_upstream_tests.py",
+      "sha256": "29aff31fef58348a082f9b05cb77b3913191180dce328f2ec9921af4df3263b1",
+      "bytes": 1672
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/verifier/run-outputs.json",
+      "sha256": "f1784028d4afa961f20b44b494676ea0881adba742d2524932e030a318239ec6",
+      "bytes": 129168
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/verify/steps/VG",
+      "sha256": "48f36c715aa69b5b427ddaacc020e7991b559785b40a51296b6d572dbccaefbf",
+      "bytes": 436
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/verify/steps/snap.sh",
+      "sha256": "1f3c658a6ebf734675b5b5af1c05f13055cdde71b5471e82ef8d00ddeead040d",
+      "bytes": 2613
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/verify/steps/vbind.py",
+      "sha256": "2313854956d7db3ad6538db4a25e5923bd8a9600276f692455a8e20b0f6f088f",
+      "bytes": 2421
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/verify/steps/vsession.py",
+      "sha256": "a005261f95ce096ddecc6a09abcc996ec8683aa29a4e76a75e96ca32a1adddce",
+      "bytes": 7091
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/verify/steps/vstate.py",
+      "sha256": "657d0997de467f8d7005d3fb8c56ea656a3139ac035cb989431021dd6db1f671",
+      "bytes": 2276
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/verify/steps/vtests.py",
+      "sha256": "0c9d31b7cd15a2c34df562c8350ef7a7501eb75a7c1fa5404e1035cf4955630c",
+      "bytes": 1250
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/verify/steps/vtests_shim.py",
+      "sha256": "e6aaff5de592a0c3212993a51936ceccabaab18c46ba1f9b987b5d927ac91b80",
+      "bytes": 867
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/ab-compare.json",
       "sha256": "2e1c587cdba41bcf55acdcfcfa255b0d8d580f6b1d7edd9580f5f9d18121d59d",
       "bytes": 11224
@@ -28444,6 +29169,396 @@
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/steps-candidate.json",
       "sha256": "c6f510ae62b6fecd900e8338c599243cc8c1f6985f92337a3275fefae26ab1b2",
       "bytes": 4699
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/accept.py",
+      "sha256": "7465585d5d7218929061e455392d87b4deb5d0c94e328e25bffcd759d549c3be",
+      "bytes": 29107
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/compare.json",
+      "sha256": "a483e6fc57ee723d781cc2e64038c4a4d9a65c221bace164c0f95619f1a16b89",
+      "bytes": 5491
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/compare.py",
+      "sha256": "c9828b4cab09212b52dba46fa084f43405c77e4df214e773570cc91a56a5401f",
+      "bytes": 4019
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/cutover.json",
+      "sha256": "329bf9cc65d9446219c71ed41c45ac898953c230f8e22a64f524e31454d2a3d0",
+      "bytes": 2343
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/emit_steps.py",
+      "sha256": "0e544016abb8667e009b370577910eb9f41d43369127af81df9cfa83c7516192",
+      "bytes": 5581
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/fingerprint.py",
+      "sha256": "ca20ef5430a326543bcb5804f15aed63a57bf4b4221e5aa4aa24f62af1b6f9f8",
+      "bytes": 6087
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/fp/after-x.json",
+      "sha256": "33bdafa7e38786f7d8d7bce6e50432d02b996d995272cec27692a0399d90befa",
+      "bytes": 5484
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/fp/after-y-attempt1.json",
+      "sha256": "fa78c08453a66c84a021747a7a5f821363c45f5506a103a63f3e7ad279d77143",
+      "bytes": 5493
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/fp/after-y.json",
+      "sha256": "1c94cb7de486235df7c7dde13bcf2f054939c615b63cf0d2d701dcccf0096b61",
+      "bytes": 5484
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/fp/before.json",
+      "sha256": "b48e03059503d2c68460f2187cf4153855e06ab5f8fa541231ba5669aca1702b",
+      "bytes": 5478
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/fp/final.json",
+      "sha256": "08ff1f557b3f6d61f066cb409696f11222806f00adfeefe588e0983e9a18794c",
+      "bytes": 5482
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/fpdiff.py",
+      "sha256": "2698114c681de749a5af36f7b57f8ba15f54ee495de3947f58d460eef66e5691",
+      "bytes": 1039
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/normalized-diff.txt",
+      "sha256": "d787839abd1e53659fa85e07eb8becd8a243289ace743ec83e8caaa7ac0854ae",
+      "bytes": 725
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/fp-after-x.log",
+      "sha256": "e7f03088cd287024a7820be06bbeaa8df630676c0935070fd2686e76ba4d6cc5",
+      "bytes": 1065
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/fp-after-y.log",
+      "sha256": "d23f4ead335be594e44e32679fec3cd665438e63691dea701211dda33be9b4d2",
+      "bytes": 1065
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/fp-diff.txt",
+      "sha256": "f8190053a940ed52cf985b8b03e9e5bd8d9283cd9754712788d52d7d248dbcaa",
+      "bytes": 5178
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/fp-final.log",
+      "sha256": "a320cc1f5b49809e1cf2aae8188d4018a777172855dd7b477cd7c324801c3ad7",
+      "bytes": 1063
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "sha256": "ff54fe3399ad9eb1abbac842f0faa22ba756ad14bc67fb2629efe7d95f8b4932",
+      "bytes": 252450
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/readback.out",
+      "sha256": "46d728a6218c204b528394abd96edf052de593f7899a654668edd05eee391f36",
+      "bytes": 490
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/run-x.log",
+      "sha256": "3dcf328c9dc66b4a9ac8a4ca737c480598b6f72f68c3cd063a768849068f91a8",
+      "bytes": 2613
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/run-y-attempt1.log",
+      "sha256": "de7e1ea26dfd1de8ab25d9b5cefad8f8eb18f48a999e77a77cbbfcc0e83cbd03",
+      "bytes": 2543
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/run-y.log",
+      "sha256": "27fba477cd85a1c43e74a44de62b50bdbb548095eeb5e766ddf5c8353e12a605",
+      "bytes": 2602
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "sha256": "482930b8859afb3e7a93847cd24e682b28925f241a779cc7b253f96483606b67",
+      "bytes": 38157
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json",
+      "sha256": "1de264f7dc79c35132f62a7d047c340460a6960a523c6eef4d3fb45766474d32",
+      "bytes": 37697
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "sha256": "70c7d7c8b6a5165e815a12db4f35b307b0dacd967ffc9bf4475bc05b08155bd5",
+      "bytes": 38206
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results.json",
+      "sha256": "9812876512d979f15156e56a5f01a880f82d6727844ab241d7747af6b2111e3b",
+      "bytes": 98620
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/scratch-config-x.sanitized.json",
+      "sha256": "0bc234b3178b0277464842e513e49e346603fdd04844adee6dbf624194e8bb89",
+      "bytes": 2732
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/scratch-config-y.sanitized.json",
+      "sha256": "9e2cda00062c17412eed8313e7a57a4accbf7b671c1a5694a8595fb4ec2da55b",
+      "bytes": 2732
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/stage/audit-signatures.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/stage/audit-signatures.txt",
+      "sha256": "5d87568bf472ee68df3e9ec1a3f9f32cdf4e5d425327ac1b2d09913fe0e62cf8",
+      "bytes": 178
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/stage/install.log",
+      "sha256": "524aa6f967adcc9f2dc758dccb09630b298d7830d613c3b59d355958e3508b1f",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/stage/package-lock.evidence.json",
+      "sha256": "dcb1aba4869171f48ead9ef5429ccf5ea61b66099ca9f5f8afdef4af5c9f7c62",
+      "bytes": 26677
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/stage/package.evidence.json",
+      "sha256": "b98bd6ac5329299f4df5f30d1de2490e5c2cb43c1308f5c8c21f04e694176fcf",
+      "bytes": 100
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/steps-for-result.json",
+      "sha256": "9cf2cf586e554899b77aa1bca033d7a7fe252d0bd8cf06dfbb3159cd31b634ad",
+      "bytes": 32250
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/fingerprint.py",
+      "sha256": "c6679e72cfeb499ea613eeb0faac3ed695e27d0e4a1f17423dd0628f2ec560ff",
+      "bytes": 8353
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/fp/v-after.ext.json",
+      "sha256": "866e571e00bdbc5c80ced58122a690ea8885610a527f96084a90ce773ff95d9d",
+      "bytes": 3306
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/fp/v-after.json",
+      "sha256": "63dd9881d5c60d13f5cf1398f814dc1f7c6c4edbae8471a8ed3ed41cffbd1fea",
+      "bytes": 5484
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/fp/v-before.ext.json",
+      "sha256": "866e571e00bdbc5c80ced58122a690ea8885610a527f96084a90ce773ff95d9d",
+      "bytes": 3306
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/fp/v-before.json",
+      "sha256": "2882ff57f68ad55ed778bbb7c808d6a47631572180371cea134afa3690fcebe9",
+      "bytes": 5485
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/fp/v-final.ext.json",
+      "sha256": "866e571e00bdbc5c80ced58122a690ea8885610a527f96084a90ce773ff95d9d",
+      "bytes": 3306
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/fp/v-final.json",
+      "sha256": "f0f55368defc422e6383ded9d43e5a753ac248847da1adc1c7afaaf916c9dd30",
+      "bytes": 5484
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/fp/v-mid.ext.json",
+      "sha256": "866e571e00bdbc5c80ced58122a690ea8885610a527f96084a90ce773ff95d9d",
+      "bytes": 3306
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/fp/v-mid.json",
+      "sha256": "0433a2f0a8091f6af432c19713590fc1861b828467d0c1650232e8b17082aa4e",
+      "bytes": 5482
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/integrity/attestations.json",
+      "sha256": "81bbe8dac67da694a62437f3f3ba42ca27337c58a581a3599e142d00e440f414",
+      "bytes": 14907
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/integrity/checksums.txt",
+      "sha256": "9a32d073672a275327e4b7446f82b403db5da3fd44e8c274300298e99064c777",
+      "bytes": 373
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/integrity/deps-binding.json",
+      "sha256": "f01339c769236d6474d630b3138acb4b34a624d8d239c4296968f2307b6a1f20",
+      "bytes": 6830
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/integrity/diff-r.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/integrity/fetched_at.txt",
+      "sha256": "9a763410728c3a2f1fb9e4283b1a902504c695dacd019dc3d7eea865f8e7d5d0",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/integrity/gh-release.json",
+      "sha256": "a0c14aa480918db73b5e69205a2a7c96991db73b73c7af77d06a71bd4dbe0503",
+      "bytes": 12301
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/integrity/installed-deps.json",
+      "sha256": "5af2f26395aa9df8c00b1fef4002265b211cc50765b92f77691b3b0b22580e7f",
+      "bytes": 1601
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/integrity/integrity-verifier.json",
+      "sha256": "83d9ab368c9d4d0c3fa7b6457241cd66fcf668d114676079a28f25fdee0fef13",
+      "bytes": 814
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/integrity/registry-0.14.1.json",
+      "sha256": "5a88e48562ae314102bfad1b16cd27849a1fc1939265468cfcea189c43e4761e",
+      "bytes": 4468
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/integrity/sigs-result.json",
+      "sha256": "21f173e653991ab9d3d0558c721062743328cfbdfa7816587f5142b331129696",
+      "bytes": 46
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/integrity/sigs/msg.txt",
+      "sha256": "3442e59e9792a51070824c031707ab44f23c0127294762fa0fefaac8c206fd26",
+      "bytes": 105
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/privbase-created.txt",
+      "sha256": "24a9a3ef6efc2a793f0bf5f5f5647cbce2813628d24bf70c713ec3c33e440eac",
+      "bytes": 41
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/raw-outputs.json",
+      "sha256": "94588ea8a8368775be55c280b61530db004ec3c25ca410277d58922fba570c1d",
+      "bytes": 53597
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/run-pa.log",
+      "sha256": "b567b2ca3d348bfbf07ff0d00d10bc97e589665bcddd3cb6a2825e09fa684347",
+      "bytes": 810
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/run-pb.log",
+      "sha256": "7ba368b6226442d55489bed3eb7627b646e2f86654d670dc5cfabffdf0aa1df9",
+      "bytes": 712
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/run-vf.log",
+      "sha256": "56ee1689cd60d5c95154b22c3cdf6668fde5eab2aa1ce1630d1905ae03d2df90",
+      "bytes": 2593
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/run-vs.log",
+      "sha256": "469f5ac0a9dad779d252be6cb960d0291ee697fdbbbb5ae2c20b6f3381e73f99",
+      "bytes": 860
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vaccept.py",
+      "sha256": "6c65ec54a36b107feeb6dd37ff8ec4938ed94110b18e1f09f30c3b5852779fce",
+      "bytes": 28746
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vfpdiff.py",
+      "sha256": "21a7f85a8e44ad1fe2fd9c1b1c6ad19ccf5faeba49ac8be3aaaeb86e0ab383e0",
+      "bytes": 2847
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-pa.json",
+      "sha256": "b6d57483c00963c4a36d6cbd8cd369aa65f0a922ca1c4b6a1628d0ef59a35ca1",
+      "bytes": 3779
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-pb.json",
+      "sha256": "8b78751ae0700d62f2254b378536dc0f5c92509ea261449aeb0383a9c1c718af",
+      "bytes": 2338
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-vf.json",
+      "sha256": "c56f2c9d4d5bf26c39e14b4cb6df80b80ed92f4bc05c9ff09afc6fc6dcb0013b",
+      "bytes": 28921
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-vs.json",
+      "sha256": "3465994e47441f38c8250da4f5e755204636a5c496053715ca7b5f873b810726",
+      "bytes": 6305
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/bin-link-before.txt",
+      "sha256": "54f9f581064d76168a09abbd325cf006d81eaafb8ff847b9747afab9926587c6",
+      "bytes": 67
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/checksums-v0.14.1.txt",
+      "sha256": "9a32d073672a275327e4b7446f82b403db5da3fd44e8c274300298e99064c777",
+      "bytes": 373
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/fetched_at.txt",
+      "sha256": "aeab71c2738d9a88dbf186b80e16b0d1ce4e6cf26676f8e9e89f2f04de971cd0",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/gh-release-v0.14.1.json",
+      "sha256": "f3d566a51dc994f5952ba8e13794c99e98e77ad0bb203e79a35e8c6403070d72",
+      "bytes": 10433
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/gh.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/install_started_at.txt",
+      "sha256": "eafbe2896ee53d35f472c1d5b1bd7fdb9d0e2c0d1f4645b52eb9c8779195698d",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/integrity-compare.txt",
+      "sha256": "99945aa9743da57e6e2b9b35fc9954e03d3c5bf7c13c8598cbd6b9c1b3a8b536",
+      "bytes": 1170
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/npm-install.log",
+      "sha256": "d2c482f2be6a770ae29f10f46bca08ee7fd31dced46c97cc4ec2b4178a1e0e3a",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/npm-ls-0.13.13.txt",
+      "sha256": "689a0ba431747e5a745f0b5a7d30316fb26eb3bae5bb494e243364a450b3a2ab",
+      "bytes": 2961
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/npm-ls-0.14.1.txt",
+      "sha256": "b48758aae687a8653d7c73c811c976a9329a9ac4af36e3ef7d4d75fcbc5b8cb8",
+      "bytes": 2959
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/provenance-mcporter-0.14.1.txt",
+      "sha256": "38e794586ec27f2f78b43f35c949ccd62e94dddb4e2320db2f27b2c447eda922",
+      "bytes": 973
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/registry-0.14.1.json",
+      "sha256": "5a88e48562ae314102bfad1b16cd27849a1fc1939265468cfcea189c43e4761e",
+      "bytes": 4468
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/a2.py",
@@ -29996,6 +31111,16 @@
       "bytes": 4676
     },
     {
+      "path": "evidence/receipts/ai-memory-240-qualification-20260925.json",
+      "sha256": "43ae37dc3431135b047f05069f72c12252740f0cb73ec80c83e681a5b7671615",
+      "bytes": 12596
+    },
+    {
+      "path": "evidence/receipts/ai-memory-241-qualification-20260925.json",
+      "sha256": "6662b134659528ff6ae3ce5c424a3312c85aee75463b361860ad716506b74a62",
+      "bytes": 12208
+    },
+    {
       "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
       "sha256": "dc77da98626554db016f1b519eba1db891a76af9b5f49849aad8aad2c126d461",
       "bytes": 866
@@ -30136,6 +31261,11 @@
       "bytes": 43255
     },
     {
+      "path": "evidence/receipts/headroom-039-qualification-20260925.json",
+      "sha256": "3a8e162765fa57f4aa6c06cb30b2a28e7ad7d32aaf0920f46720075e234b061d",
+      "bytes": 9318
+    },
+    {
       "path": "evidence/receipts/hf-memory-models-20260921.json",
       "sha256": "aed4f45ee65ac469ad7ecabf2ed7e1c2bcb028d0a6011f7f81dffdd4a00a17aa",
       "bytes": 3678
@@ -30154,6 +31284,11 @@
       "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
       "sha256": "04c4223b75c7007419773db9008e62e69358c51e6a39b9c0a72a58be396661a4",
       "bytes": 9976
+    },
+    {
+      "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
+      "sha256": "3161038aa1fb8dcd5c3cf6d05249d69ea0066c8c38120787f5cd54fa5fc059ba",
+      "bytes": 12907
     },
     {
       "path": "evidence/receipts/memory-landscape-20260921.json",
@@ -30767,8 +31902,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "f85c6c7435939a3dc7f9a26207db154c05201a201831fe68ae3bbee5818b8522",
-      "bytes": 89024
+      "sha256": "e1bc2ef472b6126975a420304a5d94a5100d02ab5b2af6d615c07fd1ec9aa2f9",
+      "bytes": 89639
     },
     {
       "path": "observability/README.md",
@@ -30972,7 +32107,7 @@
     },
     {
       "path": "observability/native-data/README.md",
-      "sha256": "613b656d2c0277e18dc9f2241f1d9ba6ef4ffd6ecda9a97cecb2b02a8c39855b",
+      "sha256": "082c2466d172de3bf144a1c07ac29a5beef13d2cc9e0b0fba97f72cf45bb3e80",
       "bytes": 9913
     },
     {
@@ -31027,8 +32162,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "7f7d65858a4e35ab3729c2d7decdd516dcd8a6866b7cedae6dd30cc50ebc822e",
-      "bytes": 65781
+      "sha256": "4a5475cabcd213c9d2a5d81db1cc6eb99aeb090b9dc2b67e948c3c972b1ac40f",
+      "bytes": 69563
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -31372,8 +32507,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "5eeb204fb2cbce0371e6e5e0002592fc8d3a53c24af44764cf82fe968518275e",
-      "bytes": 174837
+      "sha256": "989431e6b248e9cbf40c947be7bf79a2859e3b4548b9fc873f0c66477ec9ef6a",
+      "bytes": 176377
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -32027,8 +33162,8 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "ba2942ccbe7ee31439e9f0bf7fd4c2a34aa4dfa9e36e608bbaaa16275a891e83",
-      "bytes": 12439
+      "sha256": "a3daadc82d2c100444c7fc65842bea033182e26b8819ba66a556e54aa3f41e71",
+      "bytes": 12436
     },
     {
       "path": "tools/token-report/config.example.json",
