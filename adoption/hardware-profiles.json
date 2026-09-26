@@ -87,7 +87,7 @@
   "hosts": [
     {
       "id": "this-host-20260923",
-      "label": "This host (measured)",
+      "label": "WSL2 authoring laptop, 2026-09-23 measurement (see wsl-authoring-20260923)",
       "evidence_class": "native_proven",
       "evidence": "evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json",
       "note": "Actual scripts/hardware_profile.py output for the host this unit ran on."
@@ -209,7 +209,7 @@
       "label": "WSL2 authoring laptop (measured)",
       "evidence_class": "native_proven",
       "evidence": "evidence/artifacts/hw-profiles/wsl-authoring-20260923/profile.json",
-      "note": "Actual scripts/hardware_profile.py output for this host, written by scripts/hardware_profile.py --record-host."
+      "note": "Actual scripts/hardware_profile.py output for the WSL2 authoring laptop, written by scripts/hardware_profile.py --record-host; the same machine as this-host-20260923 (2026-09-23 measurement) and receipt host rtx5090-laptop-20260923."
     }
   ]
 }
