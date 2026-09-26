@@ -1,5 +1,7 @@
 # Decision: ai-memory 2.4.0 release review; no upgrade yet (2026-09-25)
 
+> **Added 2026-09-25 and 2026-09-26:** two statements below were wrong, the upgrade was then performed, and production moved on to v2.4.1 on 2026-09-26; see [Correction and outcome](#correction-and-outcome-added-2026-09-25-later-the-same-day).
+
 **Decided by:** a Claude Code writer session for the workstation lane, wave A, on
 branch `claude/workstation-lane-wave-a-20260925`. The doc was first written against
 `origin/main@720e294b`. It was revised on 2026-09-25 after an independent review and a
@@ -219,3 +221,65 @@ upstream documents at the tag. The compare API returned no patch for 31 files, m
 documentation, the `evals/` retrieval crate and `ai-memory-wiki/src/wiki.rs`. Their content
 was not reviewed beyond the changelog entries. No 2.4.0 binary was downloaded or run on this
 host.
+
+## Correction and outcome (added 2026-09-25, later the same day)
+
+The text above is kept as written. A later research pass on 2026-09-25 (primary sources:
+the v2.4.0 and v2.3.2 source trees, the rmcp 1.7.0 and 2.2.0 transport code and the
+GHSA-9pj6-vhgr-3mwh advisory text) and the rehearsal that followed found two statements
+wrong:
+
+- **GHSA-9pj6-vhgr-3mwh is not reachable on this host.** The section on breaking changes
+  says it "applies to the transport in use", and alternative 3 says staying on 2.3.2 keeps
+  it on the loopback transport. The advisory's session-table leak is in rmcp's stateful
+  `create_session` path. `serve` enables that path only with `--http-stateful`
+  ([`serve.rs` at v2.4.0](https://github.com/akitaonrails/ai-memory/blob/v2.4.0/crates/ai-memory-cli/src/commands/serve.rs)
+  passes `args.http_stateful` to `with_stateful_mode`), and `nativestack-memory.service`
+  does not pass it: `GET /mcp` returns 405 with `allow: POST`, which is rmcp's stateless
+  mode, and the stateless branch of rmcp 1.7.0's `tower.rs` never creates a session. The
+  upgrade removed the three rmcp advisories from the dependency set; it did not close an
+  exposed path here.
+- **2.4.0 writes no automatic pre-migration archive for a store created by 2.3.2.** The
+  "Migrations" section says `serve` writes a pre-migration safety archive, step 1 of the
+  window names "the automatic pre-migration archive" as a rollback path, and step 4
+  expects the archive and its `pre-migration-backup.json` receipt to exist. At v2.4.0,
+  `serve` calls `snapshot_before_db_migration`, which
+  [`m2026_09_okf_conformance.rs`](https://github.com/akitaonrails/ai-memory/blob/v2.4.0/crates/ai-memory-wiki/src/migrations/m2026_09_okf_conformance.rs)
+  gates to the real 1.x to 2.0 upgrade. The rehearsal on a restored copy of this host's
+  store wrote no archive and no receipt. The only rollback artifact is one the operator
+  takes; the window used an at-rest copy taken with the service stopped.
+
+The same rehearsal also contradicted the 2026-09-23 finding cited under "Migrations" that
+stock 2.3.2 hook binaries abort on a store migrated to 2.4.0: a 2.3.2 hook client posting
+to a 2.4.0 server was captured (its nonce was found by `session_id`). The hook client talks
+to the server over HTTP and does not open the store.
+
+**The upgrade was performed on 2026-09-25.** 2.4.0 was installed into a fresh
+`tools/ai-memory-2.4.0` prefix, rehearsed against the installed 2.3.2 on restored copies
+(2.3.2 baseline 16/16, 2.4.0 rehearsal 19/19, independent verifier agreed), and then
+switched in a user-approved window: service stopped at 20:43:48Z, at-rest cold copy,
+`bin/ai-memory` relinked, the upstream `install-hooks --apply` changed only the binary
+path on 8 Claude Code and 7 Codex commands, service started at 20:44:37Z with V65 and V66
+applied, and the store fingerprint compared V64 to V66 with 0 pages missing or changed and
+0 observations missing. A fresh Claude Code session captured observations after the
+restart. The Codex trust step in `/hooks` for the 7 changed commands is still pending and
+is the user's to take; Codex captures nothing until then. `manifests/stack.json`,
+`adoption/pins-linux-x86_64.json` and `adoption/templates/claude.settings.template.json`
+named 2.4.0 (as of the 2.4.0 cutover on 2026-09-25; superseded by 2.4.1, below); the landscape winner pin stays 2.3.2 until a new verdict wave, and
+`adoption/pins-macos-arm64.json` stays 2.3.2 until a Mac qualifies 2.4.0. #859 is still
+in no release, so this host keeps local MiniLM embeddings. Evidence:
+[`ai-memory-240-qualification-20260925.json`](../../evidence/receipts/ai-memory-240-qualification-20260925.json)
+and [its artifacts](../../evidence/artifacts/sota-refresh-20260925/ai-memory/); the
+workstation refresh record is
+[`2026-09-25-workstation-sota-refresh.md`](2026-09-25-workstation-sota-refresh.md).
+
+**v2.4.1 (noted 2026-09-25; updated 2026-09-26).**
+[v2.4.1](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1) was published at
+2026-09-25T21:46:32Z. It contains the #792 file-descriptor-leak fix (`00aa6ee8`) and a new
+forward-only migration, `V67__managed_run_session_link`, and it does not contain #859. That
+meets the refresh record's "a 2.4.1 appears" overturn condition. Because V67 is forward-only
+like V65 and V66, 2.4.1 got its own rehearsal on restored copies against production 2.4.0 on
+2026-09-25, and with the user's approval production was cut over to it on 2026-09-26 (service
+stopped at 00:14:12Z and started at 00:19:51Z, V66 to V67 with 0 pages changed and 0
+observations missing). 2.4.1 is now the pin; evidence:
+[`ai-memory-241-qualification-20260925.json`](../../evidence/receipts/ai-memory-241-qualification-20260925.json).
