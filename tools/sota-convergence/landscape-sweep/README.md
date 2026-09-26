@@ -26,7 +26,7 @@ the merged manifest, stay with the lane owners.
 | `templates.json`, `schemas/` | staged | The prompts, with `<<DATE>>`, `<<LAYER_COUNT>>` and `<<SKILLS_CHECKED_AT>>` open, and the strict return schemas. `probe.json` is for the one-call lane probe. |
 | `usage_record.py` | checkout | Runs the vendored `examples/claude-native/workflows/child-usage.mjs` over the run's transcripts and writes the sanitized usage record. |
 | `convert.py` | checkout | Converts the run record into `returns.json`, `lanes.json`, `layers.json` and `survivors.json`. |
-| `source_reviews.py` | checkout | Writes one upstream-provenance review per survivor (`gh api` only). |
+| `source_reviews.py` | checkout | Writes one upstream-provenance review per survivor (`gh api`; the public Hugging Face Hub API for a model repository). |
 | `make_result.py` | checkout | Assembles `RESULT.json` for `saturation_ledger.py --append`. |
 | `sweep_common.py` | checkout | Helpers shared by the checkout-run tools. |
 | `seeds-20260926.json` | checkout | The seeds the 2026-09-26 run gave its workers. It is a record, and an example of the `--seeds` format. |
@@ -127,7 +127,12 @@ provides it.
 - **Source reviews.** Each survivor needs one registered source review whose `layers` names the layer.
   `source_reviews.py` names a review `<owner>-<repo>.json`, as the 2026-09-23 reviews are named. When two survivors
   share that name (`acme/a-b` and `acme-a/b`), each gets a suffix of 10 hex characters of the sha256 of its
-  `owner/repo`. A file that already reviews another repository is never overwritten.
+  `owner/repo`. A file that already reviews another repository is never overwritten. A model layer can keep a
+  Hugging Face model repository (the 2026-09-26 sweep kept one), which `gh` cannot read. Its review,
+  `hf-<namespace>-<name>.json`, pins the commit of the repository's default revision from the Hub's model-info
+  endpoint `/api/models/<repo_id>` (the endpoint `huggingface_hub`'s `HfApi.model_info` calls). It reads the model
+  card at that commit through the documented "Resolve a file" endpoint, anonymously, without the card's YAML
+  metadata block.
 - **Registration.** Every cited file is registered in `manifests/evidence.json`.
 
 ## Run it

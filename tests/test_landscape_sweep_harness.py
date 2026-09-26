@@ -1,17 +1,19 @@
 """Synthetic-fixture tests for tools/sota-convergence/landscape-sweep (no network, no codex, no model calls).
 
-A fake `codex` (and a fake `gh`) early on PATH stands in for the real CLI; sweep.js runs under node with stubbed
-agent(), parallel() and pipeline() (skipped without node); convert.py's evidence is appended to a synthetic
-saturation ledger checkout with scripts/saturation_ledger.py itself. Optional: BASH32_BINARY (a real bash 3.2, as
-on macOS) and shellcheck.
+A fake `codex` (and a fake `gh`) early on PATH stands in for the real CLI, and a stubbed Hugging Face Hub fetch
+for source_reviews.py; sweep.js runs under node with stubbed agent(), parallel() and pipeline() (skipped without
+node); convert.py's evidence is appended to a synthetic saturation ledger checkout with scripts/saturation_ledger.py
+itself. Optional: BASH32_BINARY (a real bash 3.2, as on macOS) and shellcheck.
 """
 
 from __future__ import annotations
 
 import base64
+import contextlib
 import copy
 import hashlib
 import importlib.util
+import io
 import json
 import os
 import re
@@ -24,6 +26,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 HARNESS = ROOT / "tools" / "sota-convergence" / "landscape-sweep"
@@ -1708,6 +1711,47 @@ class SourceReviewTests(unittest.TestCase):
         for repository, path in written.items():
             review = json.loads((work / "reviews" / path).read_text())
             self.assertEqual((review["repository"], review["id"]), (repository, f"source-review-{path[:-5]}"))
+
+    def test_a_hugging_face_model_survivor_is_reviewed_at_its_hub_commit(self):
+        # The 2026-09-26 sweep kept a Hugging Face model repository in agents-models-workers, which gh cannot read.
+        # Its review reads the Hub's model-info endpoint for the default revision's commit and the model card at that
+        # commit; the card's YAML metadata block is not an excerpt. A dataset URL is no model repository.
+        source_reviews = load("source_reviews")
+        sha = "a" * 40
+        card = ("---\nlicense: apache-2.0\nlibrary_name: transformers\n---\n\n# Model 1.5\n\n"
+                + "A long enough paragraph about what the model does and how it was trained. " * 2)
+        answers = {"api/models/Org/Model-1.5": {"id": "Org/Model-1.5", "sha": sha, "cardData": {"license": "apache-2.0"},
+                                                "tags": ["license:apache-2.0"], "likes": 7, "gated": False,
+                                                "disabled": False, "lastModified": "2026-10-20T00:00:00.000Z"},
+                   f"Org/Model-1.5/resolve/{sha}/README.md": card}
+        requested = []
+
+        def hub_get(path, text=False):
+            requested.append(path)
+            if path not in answers:
+                raise source_reviews.HubError(f"GET {path}: HTTP Error 404: Not Found")
+            return answers[path]
+
+        work = temp_dir(self)
+        survivors = write_json(work / "survivors.json", [
+            {"layer_id": "agents-models-workers", "repository": "https://huggingface.co/Org/Model-1.5"},
+            {"layer_id": "agents-models-workers", "repository": "https://huggingface.co/datasets/org/data"}])
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.object(source_reviews, "hub_get", hub_get), contextlib.redirect_stdout(out), \
+                contextlib.redirect_stderr(err):
+            code = source_reviews.main(["--survivors", str(survivors), "--out", str(work / "reviews"), "--lane", LANE])
+        self.assertEqual(code, 1)
+        self.assertIn("https://huggingface.co/datasets/org/data", err.getvalue())
+        self.assertEqual(json.loads(out.getvalue()), [{"repository": "https://huggingface.co/Org/Model-1.5",
+                                                       "path": "hf-org-model-1-5.json",
+                                                       "layers": ["agents-models-workers"]}])
+        review = json.loads((work / "reviews/hf-org-model-1-5.json").read_text())
+        self.assertEqual((review["id"], review["reviewed_commit"], review["license"], review["readme_path"]),
+                         ("source-review-hf-org-model-1-5", sha, "apache-2.0", "README.md"))
+        self.assertEqual(review["documentation_excerpts"][0]["source"], f"README.md@{sha}")
+        self.assertNotIn("library_name", json.dumps(review["documentation_excerpts"]))
+        self.assertIn(f"Survived the {LANE} facts refuter and both fit refuters", review["claim"])
+        self.assertEqual(requested, ["api/models/Org/Model-1.5", f"Org/Model-1.5/resolve/{sha}/README.md"])
 
 
 # --------------------------------------------------------------------------- sweep.js under node
