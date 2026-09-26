@@ -142,7 +142,10 @@ class AppServer:
 
     def __init__(self, codex: str, cwd: str):
         env = {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
-        self.process = subprocess.Popen([codex, "app-server"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+        # A read-only sandbox: the probe only reads account state, so the server prepares no writable roots
+        # (a workspace-write sandbox protects .git mount points inside roots such as /tmp).
+        self.process = subprocess.Popen([codex, "-c", 'sandbox_mode="read-only"', "app-server"],
+                                        stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=subprocess.DEVNULL, cwd=cwd, env=env, bufsize=0,
                                         start_new_session=True)
         self.selector = selectors.DefaultSelector()

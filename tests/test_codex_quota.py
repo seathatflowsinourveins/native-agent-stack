@@ -31,7 +31,7 @@ RESETS_AT = 1790990880  # 2026-10-03T01:28:00Z
 FAKE_CODEX = """#!{python}
 import json, os, signal, subprocess, sys, time
 config = json.load(open(os.environ["FAKE_QUOTA_CONFIG"]))
-if sys.argv[1:] != ["app-server"]:
+if sys.argv[1:] != ["-c", 'sandbox_mode="read-only"', "app-server"]:  # the probe asks for no writable roots
     sys.exit(64)
 state = {{"pid": os.getpid(), "cwd": os.getcwd(), "rust_log": sorted(k for k in os.environ if k.startswith("RUST_LOG")),
          "received": []}}

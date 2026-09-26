@@ -527,7 +527,7 @@ import json, os, sys, time
 if sys.argv[1:] == ["--version"]:
     print("codex-cli 0.0.0-fixture")
     sys.exit(0)
-if sys.argv[1:] == ["app-server"]:  # the quota probe: initialize, initialized, account/rateLimits/read
+if sys.argv[1:] == ["-c", 'sandbox_mode="read-only"', "app-server"]:  # the quota probe: initialize, initialized, account/rateLimits/read
     quota = json.load(open(os.environ["FAKE_CODEX_CONFIG"])).get("quota") or {{}}
     if quota.get("log"):
         with open(quota["log"], "a") as log:
