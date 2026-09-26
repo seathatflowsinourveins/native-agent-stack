@@ -2,9 +2,11 @@
 no real host paths, cwd or session ids, and skill names drawn from the real pinned skills manifest."""
 from __future__ import annotations
 
+import collections
 import contextlib
 import io
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -95,6 +97,16 @@ class SkillDoctorParsing(unittest.TestCase):
                 "  context = this skill's one-line listing in the system prompt\n"
                 "5 skills loaded but never invoked.\n")
         self.assertEqual(S.parse_skill_doctor_text(text), {})
+
+    def test_less_than_listing_cost_is_a_bound_not_part_of_the_source(self):
+        # Claude Code 2.1.283 prints a name-only listing's cost as "< 20".
+        rows = S.parse_skill_doctor_text(
+            "  typesafe-ai                        userSettings       < 20          -     0×  never\n"
+            "  search-first                       userSettings       < 20       <20    36×  today\n")
+        self.assertEqual(rows["typesafe-ai"]["source"], "userSettings")
+        self.assertEqual(rows["typesafe-ai"]["context_tokens"], 20)
+        self.assertEqual((rows["search-first"]["tokens_7d"], rows["search-first"]["uses"]), (20, 36))
+        self.assertEqual(S.parse_approx_count("< 20"), 20)
 
     def test_source_column_may_contain_a_space(self):
         rows = S.parse_skill_doctor_text(
@@ -563,6 +575,400 @@ class RenderTextAndCli(unittest.TestCase):
         self.assertFalse(report["claude"]["measured"])
         self.assertTrue(report["claude"]["refused"])
         self.assertIn("skill_usage:", stderr.getvalue())
+
+
+LANES_SINCE = "2026-10-20T00:00:00Z"
+LANES_UNTIL = "2026-10-21T00:00:00Z"
+
+
+def materialize_lanes_root(dest: Path) -> Path:
+    """tests/fixtures/skill_usage/codex_lanes/*.jsonl.fixture -> dest/codex_lanes/*.jsonl. The rollouts
+    are synthetic, shaped from codex-cli 0.157.1 rollout records (session_meta, response_item,
+    world_state, event_msg token_count / item_completed), with cwd REDACTED and made-up ids. Each
+    copy's mtime is set after the fixture window, as a real rollout's is after its own records, so
+    the scan's skip of files not modified since the window start does not depend on today's date."""
+    root = dest / "codex_lanes"
+    root.mkdir(parents=True, exist_ok=True)
+    written = S.parse_iso("2026-10-22T00:00:00Z").timestamp()
+    for fixture_path in (FIXTURES / "codex_lanes").glob("*.jsonl.fixture"):
+        target = root / fixture_path.with_suffix("").name
+        shutil.copyfile(fixture_path, target)
+        os.utime(target, (written, written))
+    return root
+
+
+class CodexLanes(unittest.TestCase):
+    def setUp(self):
+        self.manifest = load_fixture_manifest()
+        self.names = fixture_names()
+        self.codex_off = [s["name"] for s in self.manifest["skills"] if s["codex_enabled"] is False]
+        self.codex_on = [s["name"] for s in self.manifest["skills"] if s["codex_enabled"] is True]
+        self.since, self.until = S.parse_iso(LANES_SINCE), S.parse_iso(LANES_UNTIL)
+        self.root = materialize_lanes_root(Path(self.enterContext(tempfile.TemporaryDirectory())))
+
+    def session(self, stem: str) -> tuple[dict, int, int]:
+        path = next(self.root.glob(f"rollout-*-lanes-{stem}.jsonl"))
+        return S.scan_lanes_file(path, self.names, since=self.since, until=self.until,
+                                 marker=S.DEFAULT_LANES_MARKER, codex_off=self.codex_off,
+                                 codex_on=self.codex_on)
+
+    def scan(self) -> dict:
+        return S.scan_codex_lanes([self.root], self.manifest, since=self.since, until=self.until,
+                                  marker=S.DEFAULT_LANES_MARKER)
+
+    def test_worker_session_counts_each_lane(self):
+        session, parse_errors, untimed = self.session("worker")
+        self.assertEqual((session["kind"], session["originator"]), ("exec", "codex_exec"))
+        self.assertEqual(session["mcp_calls"], {"context-mode": 3, "qmd": 1})
+        self.assertEqual(session["mcp_failed"], {"context-mode": 1})
+        self.assertEqual((session["shell_calls"], session["rtk_prefixed"]), (5, 1))
+        # The quoted `echo 'curl ...'` command is not a fetch.
+        self.assertEqual(session["fetch"], {"web_open_page": 1, "web_search": 1, "web_other": 0,
+                                            "ctx_fetch_and_index": 1, "shell_curl_wget": 1,
+                                            "shell_curl_wget_loopback": 1})
+        # 5 shell + 4 MCP + 3 extensions (clock.sleep included) + 1 file change + 1 spawn_agent; the
+        # exec_command function_call shares its call_id with a CommandExecution item: one call.
+        self.assertEqual(session["tool_calls"], 14)
+        self.assertEqual(session["function_calls"], {"exec_command": 1, "spawn_agent": 1})
+        self.assertEqual(session["skill_md_reads"], {"tdd": 1})  # the call payload, not the item
+        self.assertTrue(session["marker"])
+        self.assertEqual(S.user_config_state(session), "applied")
+        self.assertEqual(session["first_prompt_tokens"], 19000)  # first token_count with usage
+        self.assertTrue(session["ran_past_window_end"])  # the serena call at until is not counted
+        self.assertEqual((parse_errors, untimed), (1, 1))
+
+    def test_subagent_rollout_takes_its_own_meta_not_the_repeated_parent_meta(self):
+        session, _, _ = self.session("subagent")
+        self.assertEqual(session["kind"], "subagent")
+        self.assertTrue(session["marker"])  # inherited developer context is part of its prompt
+        self.assertEqual(S.user_config_state(session), "applied")
+        self.assertEqual(session["first_prompt_tokens"], 21000)
+
+    def test_records_copied_from_the_parent_are_not_the_subagents_calls(self):
+        # Ordinals below subagent_history_start_ordinal (4) hold the parent's exec_command read.
+        session, _, _ = self.session("subagent")
+        self.assertEqual(session["skill_md_reads"], {})
+        self.assertEqual(session["function_calls"], {})
+        self.assertEqual(session["tool_calls"], 2)  # its own MCP call and shell command
+
+    def test_user_config_is_ignored_when_a_codex_disabled_skill_is_in_the_catalog(self):
+        isolated, _, _ = self.session("isolated")
+        self.assertEqual(S.user_config_state(isolated), "ignored")
+        self.assertFalse(isolated["marker"])
+        self.assertEqual(S.user_config_state(self.session("nocatalog")[0]), "unknown")
+
+    def test_window_counts_only_records_inside_and_keeps_session_properties(self):
+        straddle, _, _ = self.session("straddle")
+        self.assertTrue(straddle["started_before_window"])
+        self.assertEqual(straddle["mcp_calls"], {"serena": 1})  # the 23:30 call is before since
+        self.assertIsNone(straddle["first_prompt_tokens"])  # its first request is before since
+        self.assertEqual(S.user_config_state(straddle), "applied")  # catalog read before since
+        self.assertFalse(self.session("before")[0]["in_window"])
+
+    def lanes_between(self, stem: str, since, until) -> dict:
+        path = next(self.root.glob(f"rollout-*-lanes-{stem}.jsonl"))
+        return S.scan_lanes_file(path, self.names, since=since, until=until, marker=S.DEFAULT_LANES_MARKER,
+                                 codex_off=self.codex_off, codex_on=self.codex_on)[0]
+
+    def test_a_call_split_between_request_and_completion_counts_in_one_window(self):
+        # Review finding (GPT-6, 2026-09-26): exec_command call item_16 is requested at 01:05:40 and
+        # completes at 01:05:41. Split between the two, it counted in both windows (14 + 1) but once
+        # in the whole window. It counts in the window of its first record, the request; its shell
+        # lane comes from the item, in the item's window.
+        split = S.parse_iso("2026-10-20T01:05:40.500Z")
+        whole = self.lanes_between("worker", self.since, self.until)
+        early = self.lanes_between("worker", self.since, split)
+        late = self.lanes_between("worker", split, self.until)
+        self.assertEqual((whole["tool_calls"], early["tool_calls"], late["tool_calls"]), (14, 14, 0))
+        self.assertEqual((whole["shell_calls"], early["shell_calls"], late["shell_calls"]), (5, 4, 1))
+
+    def test_adjacent_windows_add_up_at_every_split(self):
+        # Each additive counter over [since, until) is the sum of the same counter over
+        # [since, split) and [split, until), for a split between any two record times.
+        additive = ("tool_calls", "shell_calls", "rtk_prefixed", "file_changes")
+        keyed = ("mcp_calls", "mcp_failed", "fetch", "function_calls", "skill_md_reads")
+        for path in sorted(self.root.glob("rollout-*-lanes-*.jsonl")):
+            stem = path.name.split("-lanes-")[1].removesuffix(".jsonl")
+            times = set()
+            for line in path.read_text().splitlines():
+                try:
+                    times.add(S.parse_iso(json.loads(line)["timestamp"]))
+                except (ValueError, KeyError, TypeError, AttributeError):
+                    continue
+            edges = [self.since, *sorted(t for t in times if self.since < t < self.until), self.until]
+            whole = self.lanes_between(stem, self.since, self.until)
+            for split in (a + (b - a) / 2 for a, b in zip(edges, edges[1:])):
+                early = self.lanes_between(stem, self.since, split)
+                late = self.lanes_between(stem, split, self.until)
+                for key in additive:
+                    self.assertEqual(early[key] + late[key], whole[key], (stem, split.isoformat(), key))
+                for key in keyed:
+                    self.assertEqual(collections.Counter(early[key]) + collections.Counter(late[key]),
+                                     +collections.Counter(whole[key]), (stem, split.isoformat(), key))
+
+    def test_report_keeps_negative_controls_out_of_workers(self):
+        scan = self.scan()
+        self.assertEqual(scan["sessions_in_window"], 5)
+        self.assertEqual({k: scan["user_config"][k] for k in ("applied", "ignored", "unknown")},
+                         {"applied": 3, "ignored": 1, "unknown": 1})
+        groups = scan["groups"]
+        self.assertEqual(groups["workers"]["sessions"], 3)
+        self.assertNotIn("codex", groups["workers"]["mcp_calls"])
+        self.assertEqual(groups["negative_controls"]["mcp_calls"], {"codex": 1})
+        self.assertEqual(groups["negative_controls"]["marker_sessions"], 0)
+        self.assertEqual(groups["unclassified"]["rtk_prefixed_shell_calls"], 1)
+        self.assertEqual({kind: g["sessions"] for kind, g in groups["workers_by_kind"].items()},
+                         {"exec": 2, "subagent": 1})
+        self.assertEqual((scan["sessions_started_before_window"], scan["sessions_ran_past_window_end"]),
+                         (1, 1))
+        self.assertEqual((scan["parse_errors"], scan["records_without_timestamp"]), (1, 1))
+
+    def test_worker_aggregate_shares_and_first_prompt_stats(self):
+        workers = self.scan()["groups"]["workers"]
+        self.assertEqual((workers["shell_calls"], workers["rtk_prefixed_shell_calls"]), (6, 1))
+        self.assertEqual(workers["rtk_prefix_share"], 0.1667)
+        # ctx_fetch_and_index / (web_open_page + ctx_fetch_and_index + remote curl/wget); loopback apart.
+        self.assertEqual(workers["fetch"]["ctx_fetch_and_index_share"], 0.3333)
+        self.assertEqual(workers["marker_sessions"], 2)
+        self.assertEqual(workers["sessions_using_mcp_server"], {"context-mode": 2, "qmd": 1, "serena": 1})
+        self.assertEqual(workers["first_prompt_tokens"],
+                         {"n": 2, "min": 19000, "p10": 19000, "median": 19000, "p90": 21000, "max": 21000})
+
+    def test_report_contains_no_ids_paths_or_text(self):
+        scan = self.scan()
+        dumped = json.dumps(scan)
+        for leaked in ("lanes-worker", "lanes-subagent", "REDACTED", "/home/example", "Synthetic worker",
+                       "synthetic routing", str(self.root), "rollout-", "/private/host", "item_16"):
+            self.assertNotIn(leaked, dumped)
+        # An originator that is not name-shaped is counted, never printed.
+        self.assertEqual(scan["sessions_by_originator"], {"(other)": 1, "codex_exec": 4})
+
+    def test_invoke_rate_classification_ignores_catalogs_after_now(self):
+        root = Path(self.enterContext(tempfile.TemporaryDirectory())) / "later"
+        root.mkdir()
+        records = [
+            {"timestamp": "2026-10-20T05:00:00Z", "type": "session_meta", "payload": {"id": "s", "source": "exec"}},
+            {"timestamp": "2026-10-20T05:01:00Z", "type": "response_item", "payload": {
+                "type": "function_call", "name": "exec_command", "call_id": "c1",
+                "arguments": "{\"cmd\": \"cat /home/example/.agents/skills/tdd/SKILL.md\"}"}},
+            {"timestamp": "2026-11-05T00:00:00Z", "type": "response_item", "payload": {
+                "type": "message", "role": "developer", "content": [{"type": "input_text", "text":
+                "<skills_instructions>- grill-me (file: /home/example/.agents/skills/grill-me/SKILL.md)"
+                "</skills_instructions>"}]}},
+        ]
+        (root / "rollout-2026-10-20T05-00-00-later.jsonl").write_text(
+            "\n".join(json.dumps(record) for record in records) + "\n")
+        scan = S.scan_codex_roots([root], self.names, now=S.parse_iso(NOW), windows=(30,),
+                                  codex_off=self.codex_off)
+        self.assertEqual(scan["sessions_user_config_ignored"], 0)
+        self.assertEqual(scan["counts"]["tdd"][30]["skill_md_reads"], 1)
+        self.assertEqual(scan["of_which_user_config_ignored"]["tdd"][30]["skill_md_reads"], 0)
+
+    def test_files_not_modified_since_the_window_start_are_skipped_unread(self):
+        stale = next(self.root.glob("rollout-*-lanes-isolated.jsonl"))
+        old = S.parse_iso("2026-10-01T00:00:00Z").timestamp()
+        os.utime(stale, (old, old))
+        scan = self.scan()
+        self.assertEqual(scan["files_skipped_unmodified"], 1)
+        self.assertEqual(scan["user_config"]["ignored"], 0)
+
+    # Review findings 4 and 5 (2026-09-26): the trial pins `counts` as every session's records, so `counts`
+    # stays that measurement and the two parts a within-listing-state comparison would leave out are
+    # broken out beside it, never subtracted from it: own records of sessions that ignored the user
+    # config, and records a spawned sub-agent's rollout copied from its parent.
+    def test_invoke_rate_counts_keep_every_session_and_break_out_two_parts(self):
+        now = S.parse_iso(NOW)
+        scan = S.scan_codex_roots([self.root], self.names, now=now, windows=(30,), codex_off=self.codex_off)
+        self.assertEqual(scan["sessions_user_config_ignored"], 1)
+        # tdd SKILL.md reads: the worker's own, the isolated session's own and the one the sub-agent copied.
+        self.assertEqual(scan["counts"]["tdd"][30]["skill_md_reads"], 3)
+        self.assertEqual(scan["of_which_user_config_ignored"]["tdd"][30]["skill_md_reads"], 1)
+        self.assertEqual(scan["of_which_copied_from_parent"]["tdd"][30]["skill_md_reads"], 1)
+        report = S.build_report(self.manifest, claude=None, codex_scan=scan, lock_installed_at={},
+                                now=now, windows=(30,))
+        self.assertEqual(report["codex"]["sessions_user_config_ignored"], 1)
+        tdd = next(entry for entry in report["skills"] if entry["name"] == "tdd")
+        self.assertEqual(tdd["codex"]["counts"]["30"]["skill_md_reads"], 3)
+        self.assertEqual(tdd["codex"]["of_which_user_config_ignored"]["30"]["skill_md_reads"], 1)
+        self.assertEqual(tdd["codex"]["of_which_copied_from_parent"]["30"]["skill_md_reads"], 1)
+        # Without a codex_off list no session is classified; counts are the same either way.
+        legacy = S.scan_codex_roots([self.root], self.names, now=now, windows=(30,))
+        self.assertEqual((legacy["counts"]["tdd"][30]["skill_md_reads"], legacy["sessions_user_config_ignored"]),
+                         (3, 0))
+
+    def breakout_root(self) -> Path:
+        """A sub-agent rollout that copied a $tdd mention from its parent and adds its own, and a session
+        that ignored the user config (its catalog lists codex_enabled=false grill-me) and is the only
+        reader of codeql's SKILL.md."""
+        root = Path(self.enterContext(tempfile.TemporaryDirectory())) / "breakout"
+        root.mkdir()
+        user = lambda text: {"type": "message", "role": "user", "content": [{"type": "input_text", "text": text}]}
+        rollouts = {
+            "rollout-2026-10-25T06-00-00-sub.jsonl": [
+                {"timestamp": "2026-10-25T06:00:00Z", "type": "session_meta", "ordinal": 0, "payload": {
+                    "id": "sub", "source": {"subagent": {"thread_spawn": {"parent_thread_id": "p", "depth": 1}}},
+                    "subagent_history_start_ordinal": 2}},
+                {"timestamp": "2026-10-25T06:00:01Z", "type": "response_item", "ordinal": 1,
+                 "payload": user("parent: use $tdd here")},
+                {"timestamp": "2026-10-25T06:00:02Z", "type": "response_item", "ordinal": 2,
+                 "payload": user("own: and $tdd again")}],
+            "rollout-2026-10-25T07-00-00-iso.jsonl": [
+                {"timestamp": "2026-10-25T07:00:00Z", "type": "session_meta", "payload": {"id": "iso", "source": "exec"}},
+                {"timestamp": "2026-10-25T07:00:01Z", "type": "response_item", "payload": {
+                    "type": "message", "role": "developer", "content": [{"type": "input_text", "text":
+                    "<skills_instructions>- grill-me (file: /home/example/.agents/skills/grill-me/SKILL.md)"
+                    "</skills_instructions>"}]}},
+                {"timestamp": "2026-10-25T07:01:00Z", "type": "response_item", "payload": {
+                    "type": "function_call", "name": "exec_command", "call_id": "c1",
+                    "arguments": "{\"cmd\": \"cat /home/example/.agents/skills/codeql/SKILL.md\"}"}}],
+        }
+        for name, records in rollouts.items():
+            (root / name).write_text("\n".join(json.dumps(record) for record in records) + "\n")
+        return root
+
+    def test_a_copied_mention_is_counted_and_broken_out_so_the_parts_add_up(self):
+        scan = S.scan_codex_roots([self.breakout_root()], self.names, now=S.parse_iso(NOW), windows=(7, 30),
+                                  codex_off=self.codex_off)
+        for window in (7, 30):
+            self.assertEqual(scan["counts"]["tdd"][window]["name_mentions"], 2)
+            self.assertEqual(scan["of_which_copied_from_parent"]["tdd"][window]["name_mentions"], 1)
+            self.assertEqual(scan["of_which_user_config_ignored"]["tdd"][window]["name_mentions"], 0)
+        for name in self.names:  # each part is inside counts, and the two parts never overlap
+            for window in (7, 30):
+                for metric in ("skill_md_reads", "name_mentions"):
+                    parts = (scan["of_which_user_config_ignored"][name][window][metric]
+                             + scan["of_which_copied_from_parent"][name][window][metric])
+                    self.assertLessEqual(parts, scan["counts"][name][window][metric])
+
+    def test_the_breakout_changes_no_trial_flag(self):
+        # codeql is codex-enabled and read only in the session that ignored the user config: the trial's
+        # measurement counts that read, so codeql is not zero on Codex.
+        now = S.parse_iso(NOW)
+        scan = S.scan_codex_roots([self.breakout_root()], self.names, now=now, windows=(30,), codex_off=self.codex_off)
+        report = S.build_report(self.manifest, claude=None, codex_scan=scan, lock_installed_at={},
+                                now=now, windows=(30,))
+        codeql = next(entry for entry in report["skills"] if entry["name"] == "codeql")
+        self.assertEqual(codeql["codex"]["counts"]["30"]["skill_md_reads"], 1)
+        self.assertEqual(codeql["codex"]["of_which_user_config_ignored"]["30"]["skill_md_reads"], 1)
+        self.assertIs(codeql["zero_on_evaluated_clients"], False)
+        self.assertEqual(report["codex"]["sessions_user_config_ignored"], 1)
+
+    # Review finding 10 (2026-09-26): shell, MCP and fetch lanes come from item_completed events, whose
+    # persistence depends on the rollout's history mode; a session with calls but no such events is shown.
+    def test_history_mode_and_sessions_with_calls_but_no_item_events_are_reported(self):
+        root = Path(self.enterContext(tempfile.TemporaryDirectory())) / "modes"
+        root.mkdir()
+        records = [
+            {"timestamp": "2026-10-20T05:00:00Z", "type": "session_meta",
+             "payload": {"id": "m", "source": "exec", "originator": "codex_exec", "history_mode": "other-mode"}},
+            {"timestamp": "2026-10-20T05:01:00Z", "type": "response_item", "payload": {
+                "type": "function_call", "name": "exec_command", "call_id": "c1", "arguments": "{\"cmd\": \"ls\"}"}},
+        ]
+        rollout = root / "rollout-2026-10-20T05-00-00-modes.jsonl"
+        rollout.write_text("\n".join(json.dumps(record) for record in records) + "\n")
+        written = S.parse_iso("2026-10-22T00:00:00Z").timestamp()
+        os.utime(rollout, (written, written))
+        scan = S.scan_codex_lanes([root, self.root], self.manifest, since=self.since, until=self.until,
+                                  marker=S.DEFAULT_LANES_MARKER)
+        self.assertEqual(scan["sessions_by_history_mode"], {"(none)": 5, "other-mode": 1})
+        self.assertEqual(scan["sessions_with_tool_calls_but_no_item_events"], 1)
+        fixtures_only = self.scan()
+        self.assertEqual(fixtures_only["sessions_with_tool_calls_but_no_item_events"], 0)
+
+    def test_fetch_kind_and_shell_script(self):
+        self.assertEqual([S.fetch_kind(c) for c in (
+            "curl -s https://x.org", "rtk curl https://x.org", "timeout 5 wget http://localhost:8080/",
+            'curl "$URL"', "echo curl", "grep curl f", "x=$(curl -s http://[::1]:9/)",
+            "curl http://127.0.0.1/ https://example.org", "ls\ncurl -I https://x.org")],
+            ["fetch", "fetch", "loopback", "fetch", None, None, "loopback", "fetch", "fetch"])
+        # The same cases child-usage.mjs pins: quoted strings and heredoc bodies are data unless a
+        # shell runs them (sh -c, eval, ssh, a heredoc fed to a shell).
+        self.assertEqual([S.fetch_kind(c) for c in (
+            "echo 'hello; curl https://example.com'", 'printf "%s" "curl https://x.org"',
+            "bash -c 'curl -s https://x.org'", 'sh -lc "wget http://localhost/"',
+            "ssh host 'curl https://x.org'", "cat > s.sh <<'EOF'\ncurl https://x.org\nEOF\nls",
+            "bash <<'EOF'\ncurl https://x.org\nEOF", 'x="$(curl -s https://x.org)"',
+            'cat <<< "curl https://x.org"', 'curl "http://127.0.0.1:9090/api"',
+            "python3 - <<'PY'\nos.system('curl https://x.org')\nPY",
+            'grep -c "curl" notes.txt; curl -s https://x.org')],
+            [None, None, "fetch", "loopback", "fetch", None, "fetch", "fetch", None, "loopback", None, "fetch"])
+        self.assertEqual((S.safe_key("codex:codex-cli-runtime"), S.safe_key("/private/x"),
+                          S.safe_key("user@example.com")), ("codex:codex-cli-runtime", "(other)", "(other)"))
+        # Review finding 8 (2026-09-26): curl/wget after a shell keyword (the same cases child-usage.mjs pins).
+        self.assertEqual([S.fetch_kind(c) for c in (
+            'for u in a b; do curl -s "$u"; done', "if curl -s https://x.org; then echo ok; fi",
+            "if true; then wget -q https://x.org; fi", "if false; then :; else curl https://x.org; fi",
+            "while ! curl -s http://localhost:9/; do sleep 1; done",
+            "until wget -q http://127.0.0.1:8080/; do sleep 1; done", "{ curl -s https://x.org; }",
+            "time curl -s https://x.org", "nohup curl -s https://x.org &", "echo do curl https://x.org",
+            'git commit -m "then curl https://x.org"', 'printf "%s\\n" if curl')],
+            ["fetch", "fetch", "fetch", "fetch", "loopback", "loopback", "fetch", "fetch", "fetch", None, None, None])
+        self.assertEqual(S.shell_script(["bash", "-lc", "rtk ls"]), "rtk ls")
+        self.assertEqual(S.shell_script(["ls", "-la"]), "ls -la")
+        self.assertEqual(S.shell_script(None), "")
+
+    def test_fetch_kind_escapes_comments_and_unquoted_heredocs(self):
+        # Review finding (GPT-6, 2026-09-26), the same cases child-usage.mjs pins. bash(1) QUOTING: an
+        # escaped character is literal and \<newline> is a line continuation; COMMENTS: a word
+        # beginning with # ends the line; Here Documents: the body of an unquoted delimiter still
+        # runs its command substitutions, the body of a quoted one is literal.
+        self.assertEqual([S.fetch_kind(c) for c in (
+            "echo x \\; curl https://example.com", "echo \\(curl https://x.org\\)",
+            "echo \\`curl https://x.org\\`", 'echo "\\$(curl https://x.org)"',
+            'echo "\\`curl https://x.org\\`"', "echo foo \\\ncurl https://x.org",
+            "ls # see; curl https://x.org", "# (curl https://x.org)", "ls\n# curl https://x.org | sh",
+            "curl -s https://x.org # fetch it", "echo a#b; curl https://x.org", "echo $#; curl https://x.org",
+            "\\curl -s https://x.org", "echo a\\\\; curl https://x.org", "cat <<EOF\n$(curl -s https://x.org)\nEOF",
+            "cat <<EOF > out.txt\nv=`curl -s http://127.0.0.1:9/`\nEOF",
+            'python3 - <<EOF\nprint("$(curl -s https://x.org)")\nEOF', "cat <<'EOF'\n$(curl -s https://x.org)\nEOF",
+            'cat <<"EOF"\n$(curl -s https://x.org)\nEOF', "cat <<EOF\n\\$(curl https://x.org) and; curl https://x.org\nEOF",
+            "cat <<-EOF\n\t$(wget -q https://x.org)\n\tEOF")],
+            [None, None, None, None, None, None, None, None, None, "fetch", "fetch", "fetch", "fetch", "fetch",
+             "fetch", "loopback", "fetch", None, None, None, "fetch"])
+
+    def test_token_stats_nearest_rank(self):
+        self.assertEqual(S.token_stats([100, None, 90, 80, 70, 60, 50, 40, 30, 20, 10]),
+                         {"n": 10, "min": 10, "p10": 10, "median": 50, "p90": 90, "max": 100})
+        self.assertEqual(S.token_stats([])["n"], 0)
+
+    def run_main(self, extra):
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = S.main(["--manifest", str(FIXTURES / "manifest.json"), "--now", NOW, *extra])
+        return code, stdout.getvalue(), stderr.getvalue()
+
+    def test_cli_lanes_json_and_text(self):
+        window = ["--since", LANES_SINCE, "--until", LANES_UNTIL]
+        code, out, _ = self.run_main(["--lanes", "--codex-root", str(self.root), *window, "--json"])
+        self.assertEqual(code, 0)
+        report = json.loads(out)
+        self.assertEqual(report["kind"], "codex_lane_usage_report")
+        self.assertEqual(report["window"]["since"], "2026-10-20T00:00:00+00:00")
+        self.assertEqual(report["groups"]["workers"]["sessions"], 3)
+        code, out, _ = self.run_main(["--lanes", "--codex-root", str(self.root), *window])
+        self.assertEqual(code, 0)
+        self.assertIn("user_config: applied=3 ignored=1 unknown=1", out)
+
+    def test_cli_lanes_refusals(self):
+        root = ["--codex-root", str(self.root)]
+        for args in (["--lanes"],
+                     ["--lanes", *root, "--claude-skill-doctor", str(FIXTURES / "skill-doctor-sample.json")],
+                     ["--lanes", *root, "--since", LANES_UNTIL, "--until", LANES_SINCE],
+                     ["--lanes", *root, "--since", "yesterday"],
+                     ["--lanes", *root, "--marker", " "],
+                     [*root, "--since", LANES_SINCE]):
+            with self.subTest(args=args):
+                self.assertEqual(self.run_main(args)[0], 2)
+
+    def test_cli_lanes_out_inside_the_repository_is_refused(self):
+        refused = ROOT / "tools" / "skill-usage" / "_lanes_should_never_be_written.json"
+        try:
+            code, _, _ = self.run_main(["--lanes", "--codex-root", str(self.root), "--out", str(refused)])
+            self.assertEqual(code, 2)
+            self.assertFalse(refused.exists())
+        finally:
+            if refused.exists():
+                refused.unlink()
 
 
 if __name__ == "__main__":

@@ -127,10 +127,85 @@ native output, it is not an unchanged upstream test and not a synthetic fixture 
   `tools/token-report`'s RTK/Headroom/Context-Mode counters — those measure retrieval and context
   savings on a completely different basis, and the codebase's rule against summing overlapping
   counters applies here too.
+- **Codex `counts` stay the trial's measurement; two parts of them are broken out beside them.**
+  `counts` holds every rollout record of every session, as the skills trial pins it, and every flag
+  (`zero_on_evaluated_clients`, `prune_eligible`) reads it. Two disjoint parts of it are reported per
+  skill and window, never subtracted from it:
+  - `of_which_user_config_ignored`: the own records of sessions that did not load the user config.
+    A session launched with `--ignore-user-config` (the landscape sweep and blind lanes) lists every
+    installed skill, the trial's `codex_enabled: false` ones included, so it is a different listing
+    state. The report detects it from the session's own skill catalog as of `--now` (see
+    [Codex lane report](#codex-lane-report---lanes)) and counts such sessions in
+    `codex.sessions_user_config_ignored`.
+  - `of_which_copied_from_parent`: the records a spawned sub-agent's rollout copied from its parent
+    (ordinals below `subagent_history_start_ordinal`); the parent's own rollout holds them too.
+
+  `counts` minus both parts is the own records of every other session. Whether the trial should
+  compare only within one listing state is the trial owner's rule to record; until then no flag
+  reads the parts.
 - **Codex counts are two distinct signals, never merged.** `skill_md_reads` (a tool/function call
   whose command or arguments named that skill's `SKILL.md`) and `name_mentions` (a user message
   containing `$<name>`) are reported side by side; a prune decision at the trial window treats
   either being nonzero as "used".
+
+## Codex lane report (`--lanes`)
+
+`--lanes` reports which lanes Codex sessions actually used, the Codex counterpart of
+`examples/claude-native/workflows/child-usage.mjs --lanes-sweep` (which reads Claude child
+transcripts). It reads the same explicitly passed rollout roots, never a default path:
+
+```sh
+python3 tools/skill-usage/skill_usage.py --lanes --codex-root ~/.codex/sessions \
+  --since 2026-09-25T17:18:00Z --until 2026-09-26T15:05:00Z --json
+```
+
+Per rollout session it counts, from records inside `[--since, --until)`: MCP calls and failures
+per server (`item_completed` `McpToolCall`), shell commands (`CommandExecution`) and how many start
+with `rtk`, fetch routing (hosted `web.search` page opens and searches, Context Mode
+`ctx_fetch_and_index`, `curl`/`wget` in command position of the text a shell runs, with
+loopback-only calls apart), file changes, function calls such as `spawn_agent` (one tool call
+when an item shares its `call_id`), SKILL.md reads (the same call-payload signal as the
+invoke-rate report) and the first prompt's input tokens (the first `token_count` with usage). It
+also records whether a developer message carries the injected block's marker (default
+`<context_window_protection>`, the opening tag of Context Mode's routing block; `--marker` for
+another). A spawned sub-agent's rollout begins with records copied from its parent (ordinals below
+`subagent_history_start_ordinal`); they count toward its marker and catalog, never as its calls.
+A tool call counts once per id (a `function_call`'s `call_id` is its item's id), in the window of
+its first record, as `child-usage.mjs` counts `tool_use` ids: a call requested before `--since`
+and completed inside is not counted again, so adjacent windows add up. Its shell, MCP and fetch
+lanes come from its `item_completed` event and count in that event's window.
+
+Shell, MCP and fetch counts come from `item_completed` events, an event whose persistence depends
+on the rollout's history mode (`codex-rs/rollout/src/policy.rs`); `response_item` records are
+persisted in every mode. The report therefore gives `sessions_by_history_mode`
+(`session_meta.history_mode`) and `sessions_with_tool_calls_but_no_item_events`, the sessions
+whose own records hold model tool calls but no such event: their shell, MCP and fetch lanes read
+as zero. `ctx_fetch_and_index_share` compares three lanes only (hosted page opens,
+`ctx_fetch_and_index` and remote `curl`/`wget`); a fetch run inside a Context Mode sandbox
+(`ctx_execute` code), a `gh api` call and `fetch()` or an HTTP library in a script are in no lane.
+`curl`/`wget` also counts behind the shell keywords `do`, `then`, `else`, `elif`, `if`, `while`,
+`until`, `!` and `{` and behind `rtk`, `sudo`, `env`, `command`, `exec`, `time`, `nice`, `nohup`
+or `timeout N`. Escaped characters and comments are data, and `$(...)` or backticks inside double
+quotes or in the body of a heredoc with an unquoted delimiter still run (bash(1) QUOTING, COMMENTS
+and Here Documents).
+
+Sessions that did not load the user config are negative controls, never workers. Rollouts do not
+record `--ignore-user-config` itself, so the report classifies each session by its skill catalog:
+Codex applies skill enable/disable rules only from the User and SessionFlags config layers
+(`codex-rs/config/src/skills_config.rs` at `rust-v0.157.1`), and `--ignore-user-config` loads the
+User layer as an empty table (`codex-rs/config/src/loader/mod.rs`). A catalog that lists the
+SKILL.md of a manifest skill with `codex_enabled: false` therefore means the trial's
+`enabled = false` entries in the user config did not apply (`user_config: ignored`); a catalog
+listing only enabled manifest skills is `applied`; no catalog is `unknown`. This needs the
+rendered disable list in the host's user config; a host without it reports every session as
+`applied` or `unknown`. `groups.workers` covers `applied` sessions (also split into top-level `exec`
+sessions and spawned `subagent` sessions), `groups.negative_controls` the `ignored` ones.
+
+The lane report keeps the same privacy boundary: server, tool-kind and skill names, counts and
+token figures only, with sessions never named by id or path; a server, function or originator
+name that is not name-shaped is counted as `(other)`. Rollout files not modified since
+`--since` are skipped unread (counted as `files_skipped_unmodified`). Evidence from it is a
+`local_integration` measurement of native transcripts, not a model run.
 
 ## Verify the bundle
 
@@ -142,6 +217,8 @@ Fixtures under `tests/fixtures/skill_usage/` are entirely synthetic: a hand-buil
 skills-lock reusing real pinned skill names, a sanitized `/skill-doctor` capture (no real cwd,
 session id or host path), and hand-built `rollout-*.jsonl` lines shaped from the upstream
 `codex-rs` protocol (`RolloutLine` / `RolloutItem` / `ResponseItem`, `openai/codex` at tag
-`rust-v0.155.1`), not a captured transcript. They are committed as `rollout-*.jsonl.fixture`
+`rust-v0.155.1`), not a captured transcript. The `codex_lanes/` rollouts for `--lanes` follow the
+codex-cli 0.157.1 record shapes (`session_meta`, `world_state`, `event_msg` `token_count` and
+`item_completed`), also hand-built. They are committed as `rollout-*.jsonl.fixture`
 (the repository's `.gitignore` has a blanket `*.jsonl` rule); the test suite materializes each
 one under its real name into a temporary directory before scanning it.

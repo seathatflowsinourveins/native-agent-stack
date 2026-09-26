@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Per-child requested/resolved model, effort and provider usage for one native
+// Per-child requested/resolved model, effort, provider usage and lane use for one native
 // Workflow run. Reads the run's transcript directory (journal.jsonl,
 // agent-<id>.meta.json, agent-<id>.jsonl) and changes nothing.
 //   node .claude/workflows/child-usage.mjs <transcriptDir>   (the "Transcript dir" the Workflow tool prints)
@@ -7,6 +7,13 @@
 //   add --require-effort max to also fail (exit 1) when any child ran at another effort
 //   (docs/tasks/2026-09-23-max-effort-default.md: a stage without effort inherits the
 //   coordinator's xhigh, and CLAUDE_CODE_EFFORT_LEVEL overrides every stage).
+//   add --rtk-db <RTK history.db> to join each child Bash call to RTK's hook_decisions row by
+//   tool_use_id (opened read-only through node:sqlite), and --marker <text> to look for another
+//   injected block than Context Mode's routing block (DEFAULT_MARKER below).
+// Lane sweep over explicit roots (a Claude config's projects/ directory, one project or one session):
+//   node .claude/workflows/child-usage.mjs --lanes-sweep --root <dir> [--root <dir> ...] --since <ISO> --until <ISO>
+//   aggregates the lanes of every workflow and Agent-tool child transcript under the roots, counting only
+//   rows inside [since, until), and prints names and counts only: no paths, ids, labels or transcript text.
 // Streamed assistant lines repeat a message id, so usage is counted once per id
 // (largest output_tokens wins). Counters are provider-returned and kept per type;
 // they are not comparable to RTK/Context Mode/jCodeMunch/Headroom estimates.
@@ -33,7 +40,18 @@ import { homedir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 
 const COUNTERS = ['input_tokens', 'output_tokens', 'cache_read_input_tokens', 'cache_creation_input_tokens']
-const lines = (file) => readFileSync(file, 'utf8').split('\n').filter((l) => l.trim()).map((l) => { try { return JSON.parse(l) } catch { return null } }).filter(Boolean)
+const PROMPT_COUNTERS = ['input_tokens', 'cache_read_input_tokens', 'cache_creation_input_tokens']
+const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max']
+const readRows = (file) => {
+  let errors = 0
+  const rows = []
+  for (const l of readFileSync(file, 'utf8').split('\n')) {
+    if (!l.trim()) continue
+    try { rows.push(JSON.parse(l)) } catch { errors++ }
+  }
+  return { rows, errors }
+}
+const lines = (file) => readRows(file).rows.filter(Boolean)
 // Client-written rows (an API error such as a usage-limit notice) carry this model; the
 // family check still reports them, and the two fallback checks below ignore them.
 const SYNTHETIC = '<synthetic>'
@@ -87,7 +105,349 @@ export function webSearch(transcript) {
   return { calls: calls.size, capped: cappedAt.length, first_capped_at: times[0] ?? null }
 }
 
-export function summarizeChild(started, result, meta, transcript, transcriptFound = true) {
+// ------------------------------------------------------------------ lanes
+// The injected-block marker: the opening tag of Context Mode's routing block (context-mode 1.0.169,
+// hooks/routing-block.mjs createRoutingBlock), which its PreToolUse hook writes into Agent-tool prompts.
+export const DEFAULT_MARKER = '<context_window_protection>'
+// curl or wget in command position: at a line start or after ; & | ( ` or $(, optionally behind the shell
+// keywords do, then, else, elif, if, while, until, ! and {, and behind rtk, sudo, env, command, exec, time, nice,
+// nohup or `timeout <n>`. Other wrappers (xargs, env VAR=x, nice -n N) are not recognized.
+const FETCH_WORD = /(?:^|[;&|(`]|\$\()\s*(?:(?:do|then|else|elif|if|while|until|!|\{|rtk|sudo|env|command|exec|time|nice|nohup|timeout\s+\S+)\s+)*(?:curl|wget)(?=\s|$)/m
+const URL_HOST = /\bhttps?:\/\/(\[[^\]\s]*\]|[^\s/:'"`<>)?#\]]+)/gi
+const LOOPBACK = /^(?:localhost|127(?:\.\d{1,3}){3}|\[::1\]|0\.0\.0\.0)$/i
+// A quoted string a shell runs: the argument of sh/bash/zsh/dash/ksh/su ... -c, of eval, or of ssh <host>.
+const RUN_QUOTED = /(?:^|[\s;&|(])(?:(?:(?:ba|z|da|k)?sh|su)(?:\s+-[A-Za-z]+)*\s+-[A-Za-z]*c|eval|ssh(?:\s+-\S+)*\s+\S+)\s*$/
+const SHELL_WORD = /^(?:(?:ba|z|da|k)?sh|ssh)$/
+const HEREDOC = /(?<!<)<<(?!<)-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/
+const WRAPPERS = new Set(['sudo', 'env', 'command', 'exec', 'nice', 'nohup', 'time', 'rtk'])
+// Shell text is read by bash(1) (GNU bash 5.2) QUOTING, COMMENTS and Here Documents: an escaped character is literal and
+// \<newline> is a line continuation; a word beginning with # ends the line as a comment; inside double quotes, and in the
+// body of a heredoc whose delimiter is unquoted, $(...) and `...` still run, while \$ and \` are literal.
+const DOUBLE_QUOTED_DATA = /\\[\s\S]|\$\([^()]*\)|`[^`]*`|[;&|()`\n]/g
+const SUBSTITUTION = /\\[\s\S]|\$\([^()]*\)|`[^`]*`/g
+const ESCAPED_DATA = new Set([...' \t;&|()<>`$\'"\\#{}!']) // escaped, these become the data character _
+const WORD_BREAK = new Set([...' \t\n;&|()<>']) // bash metacharacters: a # after one begins a comment
+// The program of the last simple command in `prefix`: assignments, options, wrappers and a timeout duration skipped.
+const programOf = (prefix) => {
+  const words = prefix.split(/[;&|(]/).pop().trim().split(/\s+/).filter(Boolean)
+  for (let i = 0; i < words.length; i++) {
+    if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(words[i]) || words[i].startsWith('-') || WRAPPERS.has(words[i])) continue
+    if (words[i] === 'timeout') { i++; continue }
+    return words[i].split('/').pop()
+  }
+  return ''
+}
+// The command text a shell would run: a heredoc body is data unless the heredoc feeds a shell, though with an
+// unquoted delimiter its command substitutions still run; a quoted string is data unless a shell runs it (RUN_QUOTED),
+// though inside double quotes $(...) and `...` still run; an escaped character and a comment are data, and
+// \<newline> joins lines. Data keeps its words (so URL arguments stay) but loses the separators that would put a
+// word in command position.
+export function executedText(command) {
+  const lines = String(command || '').split('\n'), kept = []
+  for (let i = 0; i < lines.length; i++) {
+    kept.push(lines[i])
+    const m = HEREDOC.exec(lines[i])
+    if (!m || SHELL_WORD.test(programOf(lines[i].slice(0, m.index)))) continue
+    while (i + 1 < lines.length && lines[i + 1].replace(/^\t+/, '') !== m[2]) {
+      i++
+      kept.push(m[1] ? '' : (lines[i].match(SUBSTITUTION) || []).filter((s) => s[0] !== '\\').join(' '))
+    }
+  }
+  const text = kept.join('\n')
+  let out = ''
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]
+    if (ch === '\\') {
+      const next = text[i + 1]
+      if (next !== undefined && next !== '\n') out += ESCAPED_DATA.has(next) ? '_' : next
+      i++
+      continue
+    }
+    if (ch === '#' && (out === '' || WORD_BREAK.has(out[out.length - 1]))) {
+      while (i + 1 < text.length && text[i + 1] !== '\n') i++
+      continue
+    }
+    if (ch !== "'" && ch !== '"') { out += ch; continue }
+    let j = i + 1
+    while (j < text.length && text[j] !== ch) j += ch === '"' && text[j] === '\\' ? 2 : 1
+    const inner = text.slice(i + 1, j)
+    if (RUN_QUOTED.test(out)) out += ';' + inner + ';'
+    else if (ch === '"') out += '"' + inner.replace(DOUBLE_QUOTED_DATA, (s) => s[0] === '\\' ? '_' : s.length > 1 ? s : ' ') + '"'
+    else out += "'" + inner.replace(/[;&|()`$\n]/g, ' ') + "'"
+    i = j
+  }
+  return out
+}
+// 'loopback' when every literal URL in an executed curl/wget command is a loopback host, 'fetch' for any
+// other executed curl/wget command (a remote URL, or no literal URL), null when the command runs neither.
+export function fetchKind(command) {
+  const text = executedText(command)
+  if (!FETCH_WORD.test(text)) return null
+  const hosts = [...text.matchAll(URL_HOST)].map((m) => m[1])
+  return hosts.length && hosts.every((h) => LOOPBACK.test(h)) ? 'loopback' : 'fetch'
+}
+// Report keys come from transcripts (a model can pass any skill name); only name-shaped strings are kept,
+// anything else (a path, text, an address) is counted under '(other)'.
+const SAFE_KEY = /^[A-Za-z0-9][A-Za-z0-9_.:+-]{0,79}$/
+export const safeKey = (value) => SAFE_KEY.test(String(value)) ? String(value) : '(other)'
+// mcp__<server>__<tool> -> <server> (plugin servers keep their native plugin_<plugin>_<server> segment).
+export const mcpServer = (name) => { const m = /^mcp__(.+?)__./.exec(String(name || '')); return m ? safeKey(m[1]) : null }
+const textOf = (content) => typeof content === 'string' ? content
+  : Array.isArray(content) ? content.map((b) => typeof b === 'string' ? b : b && typeof b.text === 'string' ? b.text : '').join('\n') : ''
+const timeOf = (row) => { const t = Date.parse(row && row.timestamp); return Number.isFinite(t) ? t : null }
+// Count maps have no prototype, so a key such as "constructor" is an ordinary counter.
+const counter = () => Object.create(null)
+const bump = (counts, key) => { counts[key] = (counts[key] || 0) + 1 }
+
+// One child's lane use. Counted: tool_use blocks (deduplicated by id), the tool_reference blocks a
+// ToolSearch result returned, and PreToolUse:Bash hook rows from `rtk hook` whose stdout carries
+// hookSpecificOutput.updatedInput (a rewrite). Properties: the marker in the first prompt or in
+// SubagentStart hook context (never tool input or output), the SubagentStart hook types, and the
+// provider-returned first-request prompt size. With a window, rows at or after until are never read;
+// a tool call counts in the window of its first row, a ToolSearch load in the window of its result
+// row, and an RTK rewrite in the window of its first hook row when its Bash call's tool_use row came
+// before until (the hook row follows the call, so a cut between the two splits no rewrite: adjacent
+// windows add up); first_prompt_tokens is null unless the first request is inside. rtkDecisions maps
+// tool_use_id -> hook_decisions.decision and is joined to the Bash calls counted in the window;
+// covered = allow + ask (rtk v0.50.0 src/core/tracking.rs HookOutcome::is_covered).
+export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions = null, window = null } = {}) {
+  const lanes = {
+    tool_calls: 0, bash_calls: 0, mcp_calls: counter(), skill_calls: counter(),
+    tool_search: { calls: 0, loaded: counter() },
+    rtk: { hook_rewrites: 0, model_typed: 0, decisions: rtkDecisions ? { allow: 0, ask: 0, defer: 0, deny: 0, not_logged: 0, other: 0 } : null },
+    fetch: { webfetch: 0, ctx_fetch_and_index: 0, bash_curl_wget: 0, bash_curl_wget_loopback: 0 },
+    injected_block: { marker, in_first_prompt: false, in_subagent_start_context: false },
+    subagent_start: { types: [], additional_context: false },
+    first_prompt_tokens: null,
+  }
+  // bash: Bash calls counted in the window (the --rtk-db join); bashSeen: every Bash call before until;
+  // rewrites: tool_use_id -> whether its first rewrite hook row is inside the window.
+  const seen = new Set(), bash = new Set(), bashSeen = new Set(), searches = new Set(), rewrites = new Map(), types = new Set()
+  let prompt = false, firstRequest = false
+  for (const row of transcript) {
+    if (!row || typeof row !== 'object') continue
+    const at = window ? timeOf(row) : null
+    if (window && (at === null || at >= window.until)) continue
+    const counted = !window || at >= window.since
+    if (row.type === 'user') {
+      const content = row.message && row.message.content
+      if (!prompt && !row.isMeta && (typeof content === 'string' || (Array.isArray(content) && content.some((b) => b && b.type === 'text')))) {
+        prompt = true
+        if (textOf(content).includes(marker)) lanes.injected_block.in_first_prompt = true
+      }
+      if (!counted || !Array.isArray(content)) continue
+      for (const b of content) {
+        if (!b || b.type !== 'tool_result' || !searches.has(b.tool_use_id) || !Array.isArray(b.content)) continue
+        for (const ref of b.content) if (ref && ref.type === 'tool_reference' && ref.tool_name) bump(lanes.tool_search.loaded, mcpServer(ref.tool_name) || 'built-in')
+      }
+    } else if (row.type === 'assistant' && row.message) {
+      const usage = row.message.usage
+      if (!firstRequest && usage && typeof usage === 'object' && COUNTERS.some((k) => typeof usage[k] === 'number')) {
+        firstRequest = true
+        if (counted) lanes.first_prompt_tokens = PROMPT_COUNTERS.reduce((n, k) => n + (usage[k] || 0), 0)
+      }
+      if (!Array.isArray(row.message.content)) continue
+      for (const b of row.message.content) {
+        // A tool_use id seen before since was counted in an earlier window, never again here.
+        if (!b || b.type !== 'tool_use' || seen.has(b.id)) continue
+        seen.add(b.id)
+        const name = String(b.name || ''), input = b.input && typeof b.input === 'object' ? b.input : {}
+        if (name === 'ToolSearch') searches.add(b.id)
+        if (name === 'Bash') bashSeen.add(b.id)
+        if (!counted) continue
+        lanes.tool_calls++
+        const server = mcpServer(name)
+        if (server) {
+          bump(lanes.mcp_calls, server)
+          if (name.endsWith('__ctx_fetch_and_index')) lanes.fetch.ctx_fetch_and_index++
+        } else if (name === 'Bash') {
+          lanes.bash_calls++
+          bash.add(b.id)
+          const command = String(input.command || '')
+          if (/^\s*rtk\s/.test(command)) lanes.rtk.model_typed++
+          const kind = fetchKind(command)
+          if (kind === 'loopback') lanes.fetch.bash_curl_wget_loopback++
+          else if (kind) lanes.fetch.bash_curl_wget++
+        } else if (name === 'Skill') bump(lanes.skill_calls, input.skill || input.command ? safeKey(input.skill || input.command) : '(unnamed)')
+        else if (name === 'ToolSearch') lanes.tool_search.calls++
+        else if (name === 'WebFetch') lanes.fetch.webfetch++
+      }
+    } else if (row.type === 'attachment' && row.attachment && typeof row.attachment === 'object') {
+      const a = row.attachment, hookName = String(a.hookName || '')
+      if (a.hookEvent === 'SubagentStart' || hookName.startsWith('SubagentStart')) {
+        if (hookName.includes(':')) types.add(safeKey(hookName.slice(hookName.indexOf(':') + 1)))
+        let context = ''
+        if (a.type === 'hook_additional_context') context = textOf(a.content)
+        else if (a.type === 'hook_success') {
+          try { const out = JSON.parse(a.stdout || ''); const c = out && out.hookSpecificOutput && out.hookSpecificOutput.additionalContext; context = typeof c === 'string' ? c : '' } catch { context = '' }
+        }
+        if (context.trim()) lanes.subagent_start.additional_context = true
+        if (context.includes(marker)) lanes.injected_block.in_subagent_start_context = true
+      } else if (a.type === 'hook_success' && hookName === 'PreToolUse:Bash' && /\brtk\s+hook\b/.test(String(a.command || ''))) {
+        try { const out = JSON.parse(a.stdout || ''); if (out && out.hookSpecificOutput && out.hookSpecificOutput.updatedInput && !rewrites.has(a.toolUseID)) rewrites.set(a.toolUseID, counted) } catch { /* no rewrite */ }
+      }
+    }
+  }
+  lanes.rtk.hook_rewrites = [...rewrites].filter(([id, inWindow]) => inWindow && bashSeen.has(id)).length
+  if (rtkDecisions) {
+    for (const id of bash) {
+      const decision = rtkDecisions.get(id)
+      lanes.rtk.decisions[decision === undefined ? 'not_logged' : ['allow', 'ask', 'defer', 'deny'].includes(decision) ? decision : 'other']++
+    }
+  }
+  lanes.subagent_start.types = [...types].sort()
+  return lanes
+}
+
+// Nearest-rank percentiles of the numbers in values (null entries are ignored).
+export function tokenStats(values) {
+  const v = values.filter((x) => typeof x === 'number').sort((a, b) => a - b)
+  const rank = (percent) => v[Math.max(0, Math.ceil((percent * v.length) / 100) - 1)] // the ceil(percent * n / 100)-th smallest
+  return v.length ? { n: v.length, min: v[0], p10: rank(10), median: rank(50), p90: rank(90), max: v[v.length - 1] } : { n: 0, min: null, p10: null, median: null, p90: null, max: null }
+}
+const share = (part, whole) => whole ? Math.round((part / whole) * 10000) / 10000 : null
+
+// Sum of the children's lanes plus the number of children using each lane.
+export function aggregateLanes(children) {
+  const add = (target, source) => { for (const [k, n] of Object.entries(source)) target[k] = (target[k] || 0) + n }
+  const out = {
+    children: children.length, tool_calls: 0, bash_calls: 0, children_using_bash: 0,
+    mcp_calls: counter(), children_using_mcp_server: counter(), skill_calls: counter(), children_with_skill_call: 0,
+    tool_search: { calls: 0, children_calling: 0, loaded: counter() },
+    rtk: { hook_rewrites: 0, hook_rewrite_share_of_bash: null, model_typed: 0, decisions: null, covered_share_of_bash: null },
+    fetch: { webfetch: 0, ctx_fetch_and_index: 0, bash_curl_wget: 0, bash_curl_wget_loopback: 0, ctx_fetch_and_index_share: null },
+    injected_block: { in_first_prompt: 0, in_subagent_start_context: 0, either: 0 },
+    subagent_start: { types: counter(), additional_context: 0 },
+    first_prompt_tokens: null,
+  }
+  for (const { lanes: l } of children) {
+    out.tool_calls += l.tool_calls
+    out.bash_calls += l.bash_calls
+    if (l.bash_calls) out.children_using_bash++
+    add(out.mcp_calls, l.mcp_calls)
+    for (const s of Object.keys(l.mcp_calls)) bump(out.children_using_mcp_server, s)
+    add(out.skill_calls, l.skill_calls)
+    if (Object.keys(l.skill_calls).length) out.children_with_skill_call++
+    out.tool_search.calls += l.tool_search.calls
+    if (l.tool_search.calls) out.tool_search.children_calling++
+    add(out.tool_search.loaded, l.tool_search.loaded)
+    out.rtk.hook_rewrites += l.rtk.hook_rewrites
+    out.rtk.model_typed += l.rtk.model_typed
+    if (l.rtk.decisions) add(out.rtk.decisions = out.rtk.decisions || counter(), l.rtk.decisions)
+    for (const k of ['webfetch', 'ctx_fetch_and_index', 'bash_curl_wget', 'bash_curl_wget_loopback']) out.fetch[k] += l.fetch[k]
+    const ib = l.injected_block
+    if (ib.in_first_prompt) out.injected_block.in_first_prompt++
+    if (ib.in_subagent_start_context) out.injected_block.in_subagent_start_context++
+    if (ib.in_first_prompt || ib.in_subagent_start_context) out.injected_block.either++
+    for (const t of l.subagent_start.types) bump(out.subagent_start.types, t)
+    if (l.subagent_start.additional_context) out.subagent_start.additional_context++
+  }
+  out.rtk.hook_rewrite_share_of_bash = share(out.rtk.hook_rewrites, out.bash_calls)
+  if (out.rtk.decisions) out.rtk.covered_share_of_bash = share((out.rtk.decisions.allow || 0) + (out.rtk.decisions.ask || 0), out.bash_calls)
+  out.fetch.ctx_fetch_and_index_share = share(out.fetch.ctx_fetch_and_index, out.fetch.webfetch + out.fetch.ctx_fetch_and_index + out.fetch.bash_curl_wget)
+  out.first_prompt_tokens = tokenStats(children.map((c) => c.lanes.first_prompt_tokens))
+  return out
+}
+
+// RTK's hook_decisions log (tool_use_id -> decision), opened read-only; needs node:sqlite (Node >= 22.13).
+export async function loadRtkDecisions(path) {
+  if (!existsSync(path) || !statSync(path).isFile()) throw Object.assign(new Error('no such file'), { code: 'ENOENT' })
+  const { DatabaseSync } = await import('node:sqlite')
+  const db = new DatabaseSync(path, { readOnly: true, timeout: 5000 })
+  try {
+    const map = new Map()
+    let duplicates = 0
+    const rows = db.prepare('SELECT tool_use_id, decision FROM hook_decisions ORDER BY id').all()
+    for (const r of rows) { if (map.has(r.tool_use_id)) duplicates++; map.set(r.tool_use_id, r.decision) }
+    return { map, rows: rows.length, duplicates }
+  } finally { db.close() }
+}
+
+// Every child transcript (agent-<id>.jsonl under a subagents/ directory) below the roots, with its spawn
+// path: a workflow child sits in subagents/workflows/wf_<run>/, an Agent-tool child directly in subagents/.
+// Symbolic links are not followed; each directory that cannot be read adds one to unreadable.count.
+export function findChildTranscripts(roots, unreadable = { count: 0 }) {
+  const found = new Map()
+  const walk = (dir) => {
+    let entries
+    try { entries = readdirSync(dir, { withFileTypes: true }) } catch { unreadable.count++; return }
+    for (const entry of entries) {
+      const full = join(dir, entry.name)
+      if (entry.isDirectory()) { walk(full); continue }
+      const m = entry.isFile() && /\/subagents\/(workflows\/wf_[^/]+\/)?agent-[^/]+\.jsonl$/.exec(full.split('\\').join('/'))
+      if (m && !found.has(full)) found.set(full, m[1] ? 'workflow' : 'agent_tool')
+    }
+  }
+  for (const root of roots) walk(resolve(root))
+  return [...found].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([path, spawn]) => ({ path, spawn }))
+}
+
+const LANES_LIMITS = 'Counts come from native transcript rows inside [since, until); rows at or after until are never read. A tool call (tool_use blocks deduplicated by id) counts in the window of its first row, a ToolSearch load (tool_reference blocks in its result) in the window of the result row, and an RTK rewrite (a PreToolUse:Bash row from `rtk hook` whose stdout carries updatedInput, for a Bash call whose tool_use row came before until) in the window of its hook row, so adjacent windows add up. RTK decisions (with --rtk-db) are hook_decisions rows joined 1:1 by tool_use_id to the Bash calls counted in the window; covered = allow + ask. A call whose hook row falls on the other side of a window edge therefore counts in hook_rewrites and in decisions of different windows. The marker is looked for only in the first prompt and in SubagentStart hook context, never in tool input or output. first_prompt_tokens is provider-returned (input + cache read + cache creation) and counted only for children whose first request is inside the window. curl/wget counts only in command position of the text a shell runs (quoted strings, heredoc bodies, escaped characters and comments are data unless sh -c, eval, ssh or a shell heredoc runs them, though $(...) and `...` inside double quotes or an unquoted heredoc still run: bash(1) QUOTING, COMMENTS and Here Documents), optionally behind the shell keywords do, then, else, elif, if, while, until, ! and { and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N; a call whose literal URLs are all loopback is counted apart. ctx_fetch_and_index_share is ctx_fetch_and_index / (WebFetch + ctx_fetch_and_index + remote curl/wget): a fetch run inside a Context Mode sandbox (ctx_execute or ctx_batch_execute code), a gh api call and fetch() or an HTTP library in a script are in no lane. Names that are not name-shaped are counted under (other). Transcripts not modified since the window start are skipped unread. Every child transcript is a child, so a Workflow call the runtime re-ran under the same key (superseded_attempts in the per-run report) is one child per attempt. Children whose agent type starts with blind- are negative controls and are left out of workers; by_spawn_and_agent_type compares spawn paths within one agent type.'
+
+// Lane use of every child transcript under the roots that has a row inside [since, until).
+export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT_MARKER, rtk = null } = {}) {
+  const window = { since: since ?? -Infinity, until: until ?? Infinity }
+  const unreadable = { count: 0 }
+  const files = findChildTranscripts(roots, unreadable)
+  const children = []
+  let parseErrors = 0, skipped = 0
+  for (const file of files) {
+    if (Number.isFinite(window.since)) {
+      try { if (statSync(file.path).mtimeMs < window.since) { skipped++; continue } } catch { continue }
+    }
+    const { rows, errors } = readRows(file.path)
+    parseErrors += errors
+    let first = Infinity, last = -Infinity, inside = false
+    for (const row of rows) {
+      const t = timeOf(row)
+      if (t === null) continue
+      if (t < first) first = t
+      if (t > last) last = t
+      if (t >= window.since && t < window.until) inside = true
+    }
+    if (!inside) continue
+    let meta = null
+    try { meta = JSON.parse(readFileSync(file.path.replace(/\.jsonl$/, '.meta.json'), 'utf8')) } catch { meta = null }
+    children.push({
+      spawn: file.spawn, session: file.path.split('\\').join('/').replace(/\/subagents\/.*$/, ''), first,
+      agent_type: meta && typeof meta.agentType === 'string' && meta.agentType ? safeKey(meta.agentType) : '(none)',
+      started_before_window: first < window.since, ran_past_window_end: last >= window.until,
+      lanes: childLanes(rows, { marker, rtkDecisions: rtk ? rtk.map : null, window }),
+    })
+  }
+  // Sessions are reported as session-01, session-02 ... in order of their earliest child row, never by id.
+  const firstBySession = new Map()
+  for (const c of children) firstBySession.set(c.session, Math.min(firstBySession.get(c.session) ?? Infinity, c.first))
+  const ordinal = new Map([...firstBySession].sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : 1)).map(([s], i) => [s, 'session-' + String(i + 1).padStart(2, '0')]))
+  for (const c of children) c.session_ordinal = ordinal.get(c.session)
+  const group = (keep) => aggregateLanes(children.filter(keep))
+  const byKey = (key, among = children) => Object.fromEntries([...new Set(among.map((c) => c[key]))].sort().map((v) => [v, aggregateLanes(among.filter((c) => c[key] === v))]))
+  // Spawn-path totals mix agent types (an Agent-tool Explore child and a workflow general-purpose child differ
+  // in their tools), so a lane is compared between spawn paths within one agent type.
+  const bySpawnAndType = Object.fromEntries([...new Set(children.map((c) => c.spawn))].sort().map((s) => [s, byKey('agent_type', children.filter((c) => c.spawn === s))]))
+  const blind = (c) => c.agent_type.startsWith('blind-')
+  const iso = (t) => Number.isFinite(t) ? new Date(t).toISOString() : null
+  return {
+    kind: 'claude_child_lane_usage', schema_version: 1,
+    window: { since: iso(window.since), until: iso(window.until) }, marker,
+    roots_count: roots.length, unreadable_directories: unreadable.count,
+    transcripts_found: files.length, transcripts_skipped_unmodified: skipped,
+    children_in_window: children.length, sessions_in_window: ordinal.size, parse_errors: parseErrors,
+    children_started_before_window: children.filter((c) => c.started_before_window).length,
+    children_ran_past_window_end: children.filter((c) => c.ran_past_window_end).length,
+    rtk_db: rtk ? { joined: true, rows: rtk.rows, duplicate_tool_use_ids: rtk.duplicates } : { joined: false },
+    groups: {
+      all: group(() => true), workers: group((c) => !blind(c)), negative_controls: group(blind),
+      by_spawn: byKey('spawn'), by_agent_type: byKey('agent_type'), by_spawn_and_agent_type: bySpawnAndType, by_session: byKey('session_ordinal'),
+    },
+    limits: LANES_LIMITS,
+  }
+}
+
+// Stable, key-sorted JSON (objects only; array order is kept).
+export const sortedJson = (value) => JSON.stringify(value, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)) : v, 2)
+
+export function summarizeChild(started, result, meta, transcript, transcriptFound = true, lanesOptions = {}) {
   const byId = new Map()
   const counted = (u) => u && typeof u === 'object' && COUNTERS.some((k) => typeof u[k] === 'number')
   const withoutUsage = new Set()
@@ -147,12 +507,14 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
     first_request_cache_read: messages.length ? messages[0].message.usage.cache_read_input_tokens || 0 : null,
     // Whole first prompt (system, tool definitions, injected instructions, packet):
     // the fixed cost of spawning this child before it does any work.
-    first_request_prompt_tokens: messages.length ? ['input_tokens', 'cache_read_input_tokens', 'cache_creation_input_tokens'].reduce((n, k) => n + (messages[0].message.usage[k] || 0), 0) : null,
+    first_request_prompt_tokens: messages.length ? PROMPT_COUNTERS.reduce((n, k) => n + (messages[0].message.usage[k] || 0), 0) : null,
     complete: issues.length === 0, issues, ...(usageIssues.length ? { usage_issues: usageIssues } : {}),
+    // Tool lanes, hook rewrites and the injected-block marker (childLanes above); names and counts only.
+    lanes: childLanes(transcript, lanesOptions),
   }
 }
 
-export function summarizeRun(dir) {
+export function summarizeRun(dir, lanesOptions = {}) {
   const journalPath = join(dir, 'journal.jsonl')
   if (!existsSync(journalPath)) return { status: 'incomplete', reason: 'journal.jsonl not found in ' + dir, children: [] }
   const journal = lines(journalPath)
@@ -174,7 +536,7 @@ export function summarizeRun(dir) {
     let meta = null
     try { meta = existsSync(metaPath) ? JSON.parse(readFileSync(metaPath, 'utf8')) : null } catch { meta = null }
     const found = existsSync(logPath)
-    const child = summarizeChild(s, results.get(s.agentId) || null, meta, found ? lines(logPath) : [], found)
+    const child = summarizeChild(s, results.get(s.agentId) || null, meta, found ? lines(logPath) : [], found, lanesOptions)
     return supersededBy.has(s.agentId) ? { ...child, superseded_by: supersededBy.get(s.agentId) } : child
   })
   const children = attempts.filter((c) => !c.superseded_by)
@@ -231,19 +593,66 @@ export function latestRunDir(cwd, configDir) {
   return best ? best.dir : null
 }
 
+const USAGE = 'usage: child-usage.mjs <workflow transcript dir> | --latest [--require-effort <level>] [--rtk-db <history.db>] [--marker <text>]\n' +
+  '       child-usage.mjs --lanes-sweep --root <dir> [--root <dir> ...] [--since <ISO>] [--until <ISO>] [--rtk-db <history.db>] [--marker <text>]'
+// { error } or the parsed options. An option value may not start with "--"; each option but --root is given once.
+export function parseArgs(argv) {
+  const o = { positional: [], roots: [], sweep: false }
+  const valued = { '--require-effort': 'required', '--rtk-db': 'rtkDb', '--marker': 'marker', '--since': 'since', '--until': 'until' }
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i]
+    if (a === '--root' || Object.hasOwn(valued, a)) {
+      const v = argv[i + 1]
+      if (v === undefined || v.startsWith('--')) return { error: a === '--require-effort' ? '--require-effort needs one of ' + EFFORTS.join(', ') : a + ' needs a value' }
+      if (a === '--root') o.roots.push(v)
+      else if (o[valued[a]] !== undefined) return { error: a + ' may be given once' }
+      else o[valued[a]] = v
+      i++
+    } else if (a === '--lanes-sweep') {
+      if (o.sweep) return { error: '--lanes-sweep may be given once' }
+      o.sweep = true
+    } else if (a.startsWith('--') && a !== '--latest') return { error: 'unknown option ' + a + '\n' + USAGE }
+    else o.positional.push(a)
+  }
+  if (o.required !== undefined && !EFFORTS.includes(o.required)) return { error: '--require-effort needs one of ' + EFFORTS.join(', ') }
+  if (o.marker !== undefined && !o.marker.trim()) return { error: '--marker needs non-blank text' }
+  for (const k of ['since', 'until']) if (o[k] !== undefined && !Number.isFinite(Date.parse(o[k]))) return { error: '--' + k + ' needs an ISO-8601 time' }
+  if (o.since !== undefined && o.until !== undefined && Date.parse(o.since) >= Date.parse(o.until)) return { error: '--since must be earlier than --until' }
+  if (o.sweep) {
+    if (!o.roots.length) return { error: '--lanes-sweep needs at least one --root' }
+    if (o.positional.length) return { error: '--lanes-sweep takes --root directories, not a transcript dir' }
+    if (o.required !== undefined) return { error: '--require-effort checks one run; it does not apply to --lanes-sweep' }
+  } else {
+    if (o.roots.length || o.since !== undefined || o.until !== undefined) return { error: '--root, --since and --until need --lanes-sweep' }
+    if (o.positional.length !== 1) return { error: USAGE }
+  }
+  return o
+}
+
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
-  const argv = process.argv.slice(2)
-  const ri = argv.indexOf('--require-effort')
-  const required = ri >= 0 ? argv[ri + 1] : null
-  if (ri >= 0 && !['low', 'medium', 'high', 'xhigh', 'max'].includes(required)) { console.error('--require-effort needs one of low, medium, high, xhigh, max'); process.exit(2) }
-  if (argv.filter((a) => a === '--require-effort').length > 1) { console.error('--require-effort may be given once'); process.exit(2) }
-  const target = argv.filter((_, i) => i !== ri && i !== ri + 1 || ri < 0)[0]
-  const dir = target === '--latest' ? latestRunDir(process.cwd(), process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')) : target
-  if (target === '--latest' && !dir) { console.error('no native Workflow run found for ' + process.cwd()); process.exit(2) }
-  if (!dir) { console.error('usage: child-usage.mjs <workflow transcript dir> | --latest [--require-effort <level>]'); process.exit(2) }
-  const out = { transcript_dir: dir, ...summarizeRun(dir) }
-  if (required) out.effort_mismatches = effortMismatches(out, required)
-  console.log(JSON.stringify(out, null, 2))
-  // exitCode, not process.exit(): process.exit() drops stdout writes still pending, and a pipe takes 64 KiB at once.
-  process.exitCode = out.status === 'complete' && !(required && out.effort_mismatches.length) ? 0 : 1
+  const o = parseArgs(process.argv.slice(2))
+  if (o.error) { console.error(o.error); process.exit(2) }
+  let rtk = null
+  if (o.rtkDb) {
+    try { rtk = await loadRtkDecisions(o.rtkDb) } catch (e) { console.error('--rtk-db: cannot read the hook_decisions table read-only (' + (e.code || e.message) + ')'); process.exit(2) }
+  }
+  const marker = o.marker ?? DEFAULT_MARKER
+  // Output goes out through stdout.write and process.exitCode, never process.exit(): process.exit() drops stdout
+  // writes still pending, and a pipe takes 64 KiB at once. Only the short error messages above exit directly.
+  if (o.sweep) {
+    const notDirs = o.roots.filter((r) => { try { return !statSync(r).isDirectory() } catch { return true } })
+    if (notDirs.length) { console.error('--root is not a readable directory: ' + notDirs.join(', ')); process.exit(2) }
+    process.stdout.write(sortedJson(sweepLanes(o.roots, { since: o.since === undefined ? null : Date.parse(o.since), until: o.until === undefined ? null : Date.parse(o.until), marker, rtk })) + '\n')
+    process.exitCode = 0
+  } else {
+    const target = o.positional[0]
+    const required = o.required ?? null
+    const dir = target === '--latest' ? latestRunDir(process.cwd(), process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')) : target
+    if (target === '--latest' && !dir) { console.error('no native Workflow run found for ' + process.cwd()); process.exit(2) }
+    const out = { transcript_dir: dir, ...summarizeRun(dir, { marker, rtkDecisions: rtk ? rtk.map : null }) }
+    if (rtk) out.rtk_db = { joined: true, rows: rtk.rows, duplicate_tool_use_ids: rtk.duplicates }
+    if (required) out.effort_mismatches = effortMismatches(out, required)
+    process.stdout.write(JSON.stringify(out, null, 2) + '\n')
+    process.exitCode = out.status === 'complete' && !(required && out.effort_mismatches.length) ? 0 : 1
+  }
 }

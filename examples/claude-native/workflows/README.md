@@ -122,6 +122,42 @@ child returned null, was substituted, resolved no model or inherited the
 coordinator model. The counters are provider-returned and are not comparable
 to RTK, Context Mode, jCodeMunch or Headroom estimates.
 
+Each child also carries a `lanes` object read from its own transcript
+(`child-usage.mjs` changed after `v2026.09.26.2` to add it): tool calls,
+Bash calls, MCP calls per server (`mcp__<server>__<tool>`), Skill calls by skill,
+ToolSearch calls and the tools they loaded, RTK hook rewrites (a `PreToolUse:Bash`
+row from `rtk hook` whose stdout carries `updatedInput`) and `rtk` commands the model
+typed itself, fetch routing (`WebFetch`, `ctx_fetch_and_index`, `curl`/`wget` in command
+position of the text a shell runs, also behind a shell keyword such as `do` or `then`,
+so quoted text and heredoc bodies count only under `sh -c`, `eval`, `ssh` or a shell
+heredoc, escaped characters and comments never count, and `$(...)` or backticks inside
+double quotes or an unquoted heredoc still run (bash(1) QUOTING, COMMENTS and Here
+Documents), with loopback-only calls apart; a fetch run inside a Context Mode sandbox, a
+`gh api` call or an HTTP call in a script is in no lane, so `ctx_fetch_and_index_share`
+compares those three lanes only), the
+SubagentStart hook types, and whether an
+injected block's marker (default `<context_window_protection>`, the opening tag of
+Context Mode's routing block; `--marker <text>` for another) sits in the first
+prompt or in SubagentStart hook context. A marker inside tool input or output does
+not count. `--rtk-db <RTK history.db>` also joins each Bash call to RTK's
+`hook_decisions` row by `tool_use_id`, opened read-only through `node:sqlite`
+(Node 22.13 or later); `allow` plus `ask` is RTK's own "covered" outcome.
+
+`--lanes-sweep --root <dir> [--root <dir> ...] --since <ISO> --until <ISO>` aggregates
+the same lanes over every workflow and Agent-tool child transcript under explicit
+roots (a Claude config's `projects/` directory, one project or one session),
+counting only rows inside the window: a call counts in the window of its first row,
+a ToolSearch load in the window of its result and an RTK rewrite in the window of its
+hook row, so adjacent windows add up. It groups by spawn path, agent type, spawn path
+within agent type (`by_spawn_and_agent_type`: spawn-path totals mix agent types, so
+compare a lane between spawn paths within one agent type) and anonymous session
+ordinal, keeps `blind-*`
+children apart as negative controls, and prints names and counts only: no paths,
+ids, labels or transcript text, and a name that is not name-shaped (a path passed as
+a skill name, say) is counted as `(other)`. There is no default root, and a root that
+is not a readable directory exits 2. The Codex counterpart is `tools/skill-usage/skill_usage.py --lanes`
+in this catalog.
+
 `codex-cross-review.mjs` drives the official Codex companion's tracked-job
 lifecycle for a read-only cross-family review (lane C in the cooperation recipe).
 

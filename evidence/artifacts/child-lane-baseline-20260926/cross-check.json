@@ -1,0 +1,55 @@
+{
+  "claude": {
+    "bash_calls": 24776,
+    "children": 639,
+    "children_agent_tool": 42,
+    "children_workflow": 597,
+    "first_prompt_marker_by_spawn": {
+      "agent_tool": 42
+    },
+    "mcp_calls_by_server": {
+      "ai-memory": 6,
+      "codebase-memory": 1,
+      "headroom": 3,
+      "jcodemunch": 12,
+      "plugin_context-mode_context-mode": 1744,
+      "qmd": 3,
+      "serena": 6,
+      "socraticode": 6
+    },
+    "rtk_decisions": {
+      "ask": 8325,
+      "defer": 16290,
+      "deny": 137,
+      "not_logged": 24
+    },
+    "skill_calls": 353
+  },
+  "codex": {
+    "marker_sessions": {
+      "mcp_calls_by_server": {
+        "ai-memory": 2,
+        "codebase-memory": 6,
+        "context-mode": 1856,
+        "headroom": 3,
+        "jcodemunch": 2,
+        "qmd": 30,
+        "serena": 7,
+        "socraticode": 2
+      },
+      "rtk_prefixed": 195,
+      "sessions": 132,
+      "shell_calls": 482,
+      "web_open_page": 5
+    },
+    "no_marker_sessions": {
+      "mcp_calls_by_server": {
+        "codex": 150
+      },
+      "rtk_prefixed": 64,
+      "sessions": 107,
+      "shell_calls": 110,
+      "web_open_page": 1006
+    }
+  }
+}
