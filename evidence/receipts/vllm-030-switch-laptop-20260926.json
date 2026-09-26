@@ -1,0 +1,295 @@
+{
+ "schema_version": 1,
+ "id": "vllm-030-switch-laptop-20260926",
+ "kind": "native_model_e2e",
+ "component_ids": [
+  "vllm",
+  "socraticode",
+  "ai-memory"
+ ],
+ "claim": "vLLM 0.30.0 was qualified on this laptop (WSL2, RTX 5090 Laptop GPU 24GB) as a drop-in candidate for the production Nemotron-3-Embed-1B-BF16 embedder (vLLM 0.25.0), then switched into production by a systemd --user drop-in that changes only the ExecStart binary path and PATH. Of the six qualification gates: (a) gate-text cosine, (c) batch invariance and (e) ai-memory vector reconstruction passed their pass bars; (b) mini-corpus retrieval and (d) live-code-index retrieval met top-10 SET identity on every query and trial (b: 40/40, d: 20/20 query-trials) but failed their strict top-10 ORDER bar in 3 of 4 trials each; (f) latency is report-only, with no pass bar. A prod-vs-prod control run (candidate never started) shows the same order-swap behavior already exists in production alone: gate b had 6 of 50 mismatched query-trials for the candidate (including an earlier, superseded run) against 10 of 80 for production compared with itself; gate d had 3 of 20 against 4 of 40; production against itself even had a worse single trial (6 of 10 identical) than any candidate trial. Gate (c)'s batch-invariance minimum cosine (0.9999562552851937) was bit-for-bit identical between production alone and the candidate, on the same minimizing text. The production switch itself re-checked only 30 gate texts (cosine 0.9999999999999998 before vs after) and confirmed dependents (ai-memory's vector stream, SocratiCode search); it did not re-run a post-switch top-10 retrieval check.",
+ "limitations": [
+  "One host (laptop, RTX 5090 Laptop GPU 24GB, WSL2) and one model/route (/v1/embeddings with Nemotron-3-Embed-1B-BF16); not a claim about other GPUs, models or the /v2/embed route. NVIDIA's model card still names vllm==0.25.0 for BF16 /v2/embed serving.",
+  "Retrieval equality covers 30 gate texts (a), a 50-paragraph mini-corpus over 10 queries (b), and 5 live code-index queries (d), not an aggregate retrieval-quality benchmark. Gates b and d met top-10 content-SET identity on every query and trial (b: 40/40 query-trials across the 4 recorded trials, plus full set overlap on one earlier superseded run; d: 20/20 query-trials) but did not meet strict top-10 ORDER identity on every trial (that earlier superseded run's own order count was 9 of 10). Counting every recorded run: gate b had 6 of 50 candidate query-trials with an order mismatch against 10 of 80 for a prod-vs-prod control (candidate never started, run twice -- an earlier, superseded control and the current one -- both included since only the second run's own prod_score diagnostic sub-field needed a fix, not its order counts); gate d had 3 of 20 against 4 of 40. Production compared with itself had a worse single trial (6 of 10 identical, i.e. 4 mismatched) than any candidate trial (worst: 7 of 10 identical, 3 mismatched), so this order-swap behavior is pre-existing production batching noise, not attributable to the 0.30.0 upgrade. The swap-gap range is 3.5e-05 to 8.2e-04 across all 23 recorded swaps (candidate run and both control runs combined), far smaller than the ~0.02-0.05 gaps between other adjacent ranks in the same rankings.",
+  "The reference receipt's own qualification-time number for this style of check (mini_corpus_top10_overlap, '10/10 on each of 10 queries') is a content-SET overlap claim, not a strict-order claim; it does not report whether its own order matched on every query, so gate (b)'s order tracking here is additional detail, not a comparison against a reported order result. The reference receipt's one reported ORDER number (production_switch.code_queries_identical_top10_order, '5/5') comes from its own post-switch production check with 5 live code queries, a different procedure from this run's own gate (d) qualification check (5 queries against the live SocratiCode index, run before any switch); the two are not directly comparable, and this run made no post-switch top-10 check of its own (see production_switch below: only 30 gate texts and a cosine value were re-checked after the switch) -- unlike the reference, which also re-checked 5 code queries' top-10 order after its own switch (that same code_queries_identical_top10_order, '5/5').",
+  "0.30.0 relies on its pinned-memory fallback for WSL (vllm-project/vllm PR #56908, the same warning the reference receipt's owned instance logged); the 0.29.0 UVA failure recorded in vllm-compatibility remains true for 0.29.0.",
+  "The 0.25.0 unit is kept for rollback; only a drop-in override (nemotron-embed-agent-lab.service.d, ExecStart and PATH only) points production at 0.30.0.",
+  "A diagnostic-only bug in this run's own gate (b) script (prod_scores_by_idx had score and index reversed) made the order_diff_detail[].prod_score sub-field in every candidate-vs-prod gate (b) file (gate_b_result.json and gate_b_trial{1,2,3}.json) and in the first, superseded prod-vs-prod control unreliable; it did not affect any cosine value, top-10 set, or pass/fail boolean -- only that one diagnostic sub-field -- and was fixed before the second, current prod-vs-prod control run. See raw/ERRATUM-gate_b-order_diff_detail-prod_score-bug.txt.",
+  "results.json's own generated prose has two internal inconsistencies against its own structured fields, corrected in this receipt from the underlying per-trial gate files (raw/gate_b_result.json, gate_b_trial{1,2,3}.json, gate_d_result.json, gate_d_trial{1,2,3}.json): its gate (b) finding text lists strict-order counts as '9, 7, 9 and 10' where the adjacent structured array and the per-file queries_with_identical_order fields agree on '10, 9, 7 and 9' (same four numbers, wrong order in the prose only); its gate (d) finding text says strict order held on '3, 5, 4 and 4' of 5 queries where the adjacent structured array and the per-file queries_identical_count fields agree on '4, 5, 4 and 4'.",
+  "The laptop's vllm-0.30.0 prefix pre-existed this run (never pip-installed into by this task, per its own instructions), so no direct_url.json or install log exists on this host to independently re-hash its wheel; the pin identity below is the value the workstation's own switch receipt recorded for the same pinned release, reused for cross-host comparison, not independently re-verified here. What IS independently verified on this host: both production (0.25.0) and the candidate (0.30.0) point at the identical, single model directory (same absolute path in both /v1/models responses), and this host's own sha256 of that directory's model.safetensors is recorded below.",
+  "independent_review: an independent reviewer subagent checked this receipt against the retained raw files (recomputed the reported counts, re-hashed the model file, compared production's before/after flags) and re-ran no gate; that review produced every correction listed above."
+ ],
+ "data": {
+  "host": "wsl-authoring-20260923",
+  "gpu": "RTX 5090 Laptop GPU 24GB (WSL2)",
+  "observed_at_utc_range": [
+   "2026-09-26T01:05:53Z",
+   "2026-09-26T01:25:35Z"
+  ],
+  "observed_at_utc_range_note": "Widened from the qualification-only window (01:05:53Z-01:16:00Z, results.json's own observed_at_utc_range) to also cover the prod-vs-prod control runs (superseded run ~01:19:40Z, current run ~01:23:15Z) and the production switch (switched_at_utc 01:24:54Z, healthy_at_utc 01:25:35Z), all part of this same evidence-gathering pass on this host.",
+  "purpose": "Qualify vLLM 0.30.0 as a drop-in replacement candidate for the production Nemotron-3-Embed-1B embedder (vLLM 0.25.0) on this laptop, following the reference procedure and pass bars from the workstation's own switch receipt, then (a separate, later step) switch production to it. During the qualification window itself (01:05:53Z-01:16:00Z) production was never started, stopped or edited and the candidate ran only as a transient systemd --user unit on a different port, since torn down; production was subsequently switched at 01:24:54Z, as its own separate, later step (see production_switch below) -- this qualification-only description does not extend past that window.",
+  "reference_source": {
+   "receipt": "nas-e2e-R (origin/main) evidence/receipts/vllm-030-switch-20260925.json, id vllm-030-switch-20260925",
+   "receipt_previous_version": "0.25.0",
+   "receipt_previous_source_pin": "702f4814fe54fabff350d43cb753ae3e47c0c276",
+   "receipt_candidate_version": "0.30.0",
+   "receipt_candidate_source_pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+   "receipt_candidate_wheel_sha256": "ef52ee58c410ead0b8afb190838fa4cbcb52075596f67862a03859d984966ac4",
+   "receipt_pass_bars": {
+    "gate_min_cosine": ">= 0.99999",
+    "retrieval_top10": "identical on every query",
+    "batch_invariance_min_cosine": ">= 0.9999"
+   },
+   "receipt_workstation_numbers": {
+    "gate_min_cosine_vs_prod": 0.9999999999999998,
+    "mini_corpus_top10_overlap": "10/10 on each of 10 queries (10 x 50 corpus)",
+    "batch_invariance_min_cosine": 0.9999657391042198
+   },
+   "style_and_scaffolding_reused": [
+    "nas-e2e-R tools/adoption/embed_acceptance.py: stdlib-only urllib/json HTTP client, hand-written cosine_similarity, JSON-result-not-traceback contract (adapted, not invoked directly -- its own reference-vector shape is for a different macOS llama.cpp use case, not this vLLM gate-set/retrieval-equality shape).",
+    "nas-e2e-R evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py: read-only-against-a-live-server discipline, norm/dimension checks, discriminating-control pattern."
+   ],
+   "no_literal_reusable_script_found": "origin/main of nas-e2e-R was grepped for a qualif*/gate*/cosine* script matching this exact gate set (a-f); none exists as a committed, reusable script for the vllm-030-switch receipt itself (its own results.json/pre.json/post.json/install.log/test-server.log are 'retained privately on the host', per the receipt's own provenance array, not committed to the repo). The two committed scripts above were reused for style and as reference checks; this run's own gate scripts under scripts/ were written from that combination, following the top rule (cite the source, never self-write without one)."
+  },
+  "model_identity": {
+   "served_model_name": "nvidia/Nemotron-3-Embed-1B-BF16",
+   "model_root_identical_prod_vs_candidate": true,
+   "model_root_evidence": "Both /v1/models responses (raw/03-prod-v1-models.txt, raw/08-candidate-v1-models.txt) name the exact same absolute model directory as `root`.",
+   "model_safetensors_sha256": "f959c3b04e66b42de280bfb97c140cb7e0bfe25e3ecb0b4464c68a8436b2d04f",
+   "model_safetensors_sha256_method": "sha256sum of model.safetensors inside that one shared directory, computed directly on this host while assembling this receipt (not an install-time artifact); since prod and candidate share one directory there is only one file to hash, not a prod-vs-candidate diff."
+  },
+  "production": {
+   "unit": "nemotron-embed-agent-lab.service",
+   "port": 8231,
+   "vllm_version_before": "0.25.0",
+   "left_untouched_during_qualification": true,
+   "restarts_before_and_after_qualification": [
+    0,
+    0
+   ],
+   "health_before_and_after_qualification": [
+    "200",
+    "200"
+   ],
+   "note": "These qualification-phase observations (left untouched, 0 restarts, health 200/200) describe the window before the separate production_switch below, not a claim that production was never subsequently changed."
+  },
+  "candidate_isolated_instance": {
+   "transient_unit": "vllm030-qual-20260926.service",
+   "port": 38231,
+   "vllm_version": "0.30.0",
+   "torch_version": "2.13.0+cu130",
+   "flags": "serve <model_dir> --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 --host 127.0.0.1 --port 38231 --max-model-len 8192 --max-num-seqs 4 --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests",
+   "isolation_proof": "Identical to prod's own /proc/<PID>/exe target. This is expected, not a leak: both vllm-0.25.0/bin/python and vllm-0.30.0/bin/python are uv-managed symlinks to the SAME shared base CPython interpreter (verified via ls -la on both venvs' bin/python). Isolation is proven instead by (1) PATH's first entry being vllm-0.30.0/bin, so any subprocess/helper the process launches by bare name resolves there first, and (2) the running process's own `import vllm` resolving to vllm-0.30.0/lib/python3.13/site-packages/vllm/__init__.py, version 0.30.0 -- distinct from prod's vllm-0.25.0/lib/python3.13/site-packages/vllm, version 0.25.0.",
+   "startup_seconds": 30,
+   "wsl_pinned_memory_fallback_warning": "WARNING 09-25 21:06:19 [buffer_utils.py:47] Pinned memory is not available on this platform; falling back to device memory for UVA buffers. -- matches the expected vllm-project/vllm PR #56908 behavior on WSL2, same as the reference receipt's owned instance.",
+   "errors_in_unit_journal": "none observed in the full unit journal (99 lines, journalctl --user -u vllm030-qual-20260926.service)"
+  },
+  "qualification_gates": {
+   "a_gate_texts": {
+    "n_texts": 30,
+    "min_cosine": 0.9999999999999998,
+    "pass_bar": 0.99999,
+    "passed": true
+   },
+   "b_retrieval_equality": {
+    "corpus_size": 50,
+    "n_queries": 10,
+    "trials_run": 4,
+    "content_set_identity": "100% (40/40 query-trials across the 4 recorded trials)",
+    "identical_order_count_per_trial": [
+     10,
+     9,
+     7,
+     9
+    ],
+    "identical_order_count_per_trial_source": "[gate_b_result.json, gate_b_trial1.json, gate_b_trial2.json, gate_b_trial3.json] in that order, each file's own queries_with_identical_order field.",
+    "identical_order_out_of": 10,
+    "passed_strict_order": false,
+    "passed_content_set_only": true,
+    "earlier_superseded_run": {
+     "diagnostic_written_at_utc": "2026-09-26T01:13:13Z",
+     "predates": "gate_b_result.json (mtime 2026-09-26T01:12:53Z-ish): the diagnostic file itself (not gate_b_result.json) describes this earlier run and says a second full run, saved as gate_b_result.json, reproduced 10/10 identical order; gate_b_result.json's own content says nothing about an earlier run.",
+     "source": "raw/gate_b_near_tie_diagnostic_run1.txt",
+     "full_set_overlap": true,
+     "identical_order_out_of_10": 9,
+     "note": "A rank-9/10 swap between two passages with a prod-side score gap of 0.00018 (candidate-side gap 0.00066); the retrieved top-10 SET was still 100% identical to prod on this run. A second full run (saved as gate_b_result.json) reproduced 10/10 identical order. Included here as a real, distinct run rather than silently dropped."
+    },
+    "finding": "Across the 4 recorded trials (gate_b_result.json, then trial1-3), the retrieved SET of top-10 passages was 100% identical to prod on every one of 10 queries, every trial (40/40 query-trials). Strict ORDER identity held on 10, 9, 7 and 9 of 10 queries across those 4 trials, in that trial order (corrected here from results.json's own finding text, which listed the same four counts as '9, 7, 9 and 10' -- a different, non-matching order; verified against each file's own queries_with_identical_order field). Including the one earlier, superseded run above (9/10), the candidate had 6 mismatched query-trials out of 50 total (5 trials x 10 queries). Every order mismatch found was a swap between two adjacent ranks at a near-tie score gap (see control_prod_vs_prod below for the observed gap range), far smaller than the ~0.02-0.05 gaps between other adjacent ranks in the same ranking -- i.e. floating-point-level near-ties, not a missing/extra/wrongly-ranked document. The reference receipt reported '10/10' top-10 OVERLAP (content-set identity) for this style of check on its own qualification instance; it is a set metric, not a strict-order claim, so it is not a reported order result to differ from."
+   },
+   "c_batch_invariance": {
+    "n_texts": 30,
+    "min_cosine": 0.9999562552851937,
+    "pass_bar": 0.9999,
+    "passed": true
+   },
+   "d_socraticode_live_index": {
+    "collection_points_count": 1974,
+    "n_queries": 5,
+    "trials_run": 4,
+    "content_set_identity": "100% (20/20 query-trials)",
+    "identical_count_per_trial": [
+     "4/5",
+     "5/5",
+     "4/5",
+     "4/5"
+    ],
+    "identical_count_per_trial_source": "[gate_d_result.json, gate_d_trial1.json, gate_d_trial2.json, gate_d_trial3.json] in that order, each file's own queries_identical_count field.",
+    "passed_strict_order": false,
+    "passed_content_set_only": true,
+    "finding": "Across 4 independent trials against the live, prod-embedded codebase_72cfa87c5abf collection (1974 points, untouched by this run), the retrieved SET of top-10 hits was 100% identical between prod-vector and candidate-vector queries on every one of 5 queries, every trial (20/20 query-trials). Strict ORDER identity held on 4, 5, 4 and 4 of 5 queries across the 4 trials, in that trial order (corrected here from results.json's own finding text, which said '3, 5, 4 and 4' -- verified against each file's own queries_identical_count field in raw/gate_d_result.json and raw/gate_d_trial{1,2,3}.json). Every mismatch was an adjacent-rank swap at a score gap recorded in order_diff_score_gap_prod (raw files); this gate's own swaps are part of the 20 total recorded swaps whose combined range is 3.5e-05 to 8.2e-04 (see control_prod_vs_prod below). This gate's own qualification-time check (run before any switch, against the live index as it already stood) is a different procedure from the reference receipt's post-switch production check (production_switch.code_queries_identical_top10_order, '5/5', which the workstation ran only after actually switching production); the two are not directly comparable, so no comparison is drawn between them here."
+   },
+   "e_ai_memory_vectors": {
+    "feasible": true,
+    "sample_size": 20,
+    "reconstruction_method": "embedding_document_prefix \"passage: \" + raw page body (empirically verified at cosine 1.000000 against prod on 3 pilot pages before this run; see script docstring)",
+    "candidate_vs_stored_min_cosine": 0.9999999999999925,
+    "pass_bar": 0.99999,
+    "passed": true
+   },
+   "f_latency_report_only": {
+    "n_requests": 100,
+    "prod": {
+     "n_requests": 100,
+     "p50_ms": 19.57,
+     "p95_ms": 26.61,
+     "min_ms": 15.01,
+     "max_ms": 99.73,
+     "mean_ms": 21.36
+    },
+    "candidate": {
+     "n_requests": 100,
+     "p50_ms": 16.26,
+     "p95_ms": 22.97,
+     "min_ms": 12.86,
+     "max_ms": 27.3,
+     "mean_ms": 17.01
+    },
+    "report_only_no_pass_bar": true
+   }
+  },
+  "control_prod_vs_prod": {
+   "purpose": "Determine whether the top-10 order swaps seen candidate-vs-prod in gates (b) and (d) are request-level batching/numeric noise already present when production is compared against itself, or specific to the 0.25.0-vs-0.30.0 comparison.",
+   "method": "Both sides of gates (b) and (d) pointed at production 127.0.0.1:8231 (vLLM 0.25.0); the candidate (38231) was NOT started for this control. Same corpus, same queries, same gate texts, same batching pattern as the original candidate-vs-prod runs (each trial = one separate top-level script invocation issuing separate HTTP requests per trial). There were two separate control runs (the first, superseded one and the current one below), each with its own 4 trials for (b) and (d) and its own gate (c) batch-invariance run against production alone (8 b/d trials and 2 gate-c runs in total).",
+   "runs": {
+    "first_superseded_run": {
+     "recorded_at_utc": "2026-09-26T01:19:40Z",
+     "source": "raw/superseded-buggy-prod_score-diagnostic/control_prod_vs_prod_summary.json",
+     "note": "This run's own order_diff_detail[].prod_score sub-field for gate (b) carries the same reversed-dict bug described in the erratum (it predates the fix), so its diagnostic gap values for gate (b) are not used; its order COUNTS (from queries_with_identical_order / queries_identical_count, a different, unaffected code path) are valid and reported below. Gate (d)'s diagnostic (order_diff_score_gap_prod) never had this bug, so this run's gate (d) gap values are used directly.",
+     "b_retrieval_equality_identical_order_count_per_trial": [
+      7,
+      6,
+      10,
+      9
+     ],
+     "d_socraticode_identical_count_per_trial": [
+      "4/5",
+      "4/5",
+      "5/5",
+      "5/5"
+     ],
+     "d_swap_gaps": {
+      "trial_1": 4.768e-05,
+      "trial_2": 0.00082424
+     }
+    },
+    "current_run": {
+     "recorded_at_utc": "2026-09-26T01:23:15Z",
+     "source": "raw/control_prod_vs_prod_summary.json (plus raw/control_prod_vs_prod_b_trial{1,2,3,4}.json)",
+     "note": "Generated after the erratum fix; both gate (b) and gate (d) diagnostic sub-fields are reliable in this run.",
+     "b_retrieval_equality_identical_order_count_per_trial": [
+      9,
+      10,
+      10,
+      9
+     ],
+     "d_socraticode_identical_count_per_trial": [
+      "5/5",
+      "4/5",
+      "4/5",
+      "5/5"
+     ],
+     "d_swap_gaps": {
+      "trial_2": 0.00082424,
+      "trial_3": 3.53e-05
+     }
+    }
+   },
+   "totals": {
+    "gate_b": "candidate: 6 mismatched query-trials of 50 (5 trials x 10 queries: the 4 recorded trials plus the one earlier superseded run). production-vs-production (both control runs combined, 8 trials x 10 queries): 10 mismatched query-trials of 80. Production compared with itself had a worse single trial (6 of 10 identical, i.e. 4 mismatched, first-superseded-run trial 2) than any candidate trial (worst: 7 of 10 identical, 3 mismatched).",
+    "gate_d": "candidate: 3 mismatched query-trials of 20 (4 trials x 5 queries). production-vs-production (both control runs combined, 8 trials x 5 queries): 4 mismatched query-trials of 40.",
+    "swap_gap_range_all_runs": "3.5e-05 to 8.2e-04 across all 23 recorded swaps (candidate run and both control runs combined). Gate (d)'s own order_diff_score_gap_prod diagnostic was never affected by the erratum and is used throughout. Gate (b)'s per-query order_diff_detail.prod_score is only usable where it postdates the erratum fix (the current control run); the earlier superseded run's own gap (0.00018, from raw/gate_b_near_tie_diagnostic_run1.txt, a separate script that never went through the buggy code path) is used for that one run instead. The other 13 gate (b) swaps (candidate trials 1-3 and the superseded control run) use the candidate-side score, which the erratum never affected. All 23 swaps are single adjacent-rank swaps and fall inside the stated range."
+   },
+   "c_batch_invariance_prod_alone": {
+    "min_cosine": 0.9999562552851937,
+    "candidate_min_cosine_for_comparison": 0.9999562552851937,
+    "bit_identical_to_candidate": true,
+    "same_minimizing_text": true,
+    "minimizing_text": "passage: CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS sets the per-run concurrent-..."
+   },
+   "conclusion": "The top-10 order swaps observed candidate-vs-prod in gates (b) and (d) are NOT specific to vLLM 0.30.0: running the identical gates with BOTH sides on production alone (across two separate control runs) reproduces order swaps at a comparable or worse rate (gate b: 10/80 mismatched query-trials prod-vs-prod against 6/50 for the candidate, with production's own worst single trial, 6/10 identical, worse than the candidate's worst trial, 7/10 identical; gate d: 4/40 against 3/20) and the same tiny score-gap magnitude (3.5e-05 to 8.2e-04 throughout). Gate (c)'s batch-invariance minimum cosine is bit-for-bit IDENTICAL between production alone and the candidate (0.9999562552851937, same minimizing text in both), showing the batching-induced floating-point noise floor is a property already present in production's own request-level batching, unchanged by the 0.30.0 upgrade. This directly answers the coordinator's question: the order-swap noise is pre-existing production batching noise, not a 0.30.0 regression.",
+   "erratum": "A diagnostic-only bug in scripts/gate_b_retrieval.py's order_diff_detail[].prod_score field (a reversed score->index dict instead of index->score) made that one sub-field unreliable in every candidate-vs-prod gate (b) file and in the first, superseded prod-vs-prod control run; it did not affect any cosine value, top-10 set, or pass/fail boolean, and was fixed before the second, current control run. See raw/ERRATUM-gate_b-order_diff_detail-prod_score-bug.txt."
+  },
+  "teardown": {
+   "transient_unit_stopped": true,
+   "transient_unit_confirmed_removed": "systemctl --user status vllm030-qual-20260926 -> 'could not be found'",
+   "candidate_port_after_stop": "connection refused (curl http_code=000)",
+   "production_health_after": "200, ActiveState=active, SubState=running, NRestarts=0",
+   "production_untouched": "unit file, ExecStart, environment and process were never modified, restarted or stopped by this run's QUALIFICATION phase (before the separate, later production_switch below)",
+   "gpu_memory_baseline_mib": 6997,
+   "gpu_memory_baseline_mib_note": "Only one baseline reading has a raw record (raw/01-nvidia-smi-baseline.txt: '6997 MiB, 24463 MiB, 17 %'). results.json / scripts/build_results.py:259 additionally reports a second baseline value, 7007 MiB, that does not appear in any raw capture this receipt could find; dropped here rather than republished without a source.",
+   "gpu_memory_with_both_running_mib": 9968,
+   "gpu_memory_after_stop_mib": 7054,
+   "gpu_memory_returned_to_baseline": true
+  },
+  "production_switch": {
+   "switched_at_utc": "2026-09-26T01:24:54Z",
+   "healthy_at_utc": "2026-09-26T01:25:35Z",
+   "unit": "nemotron-embed-agent-lab.service",
+   "method": "systemd --user drop-in zz-vllm-030.conf overriding ExecStart (binary path only) and Environment=PATH (vllm-0.30.0/bin first), per catalog evidence/receipts/vllm-030-switch-20260925.json and peer note on the unit PATH",
+   "live_version_before_after": [
+    "0.25.0",
+    "0.30.0"
+   ],
+   "gate_texts": 30,
+   "gate_min_cosine_before_vs_after": 0.9999999999999998,
+   "no_post_switch_top10_check": "The production switch's own check (switch/after-gate.json) re-ran only the 30 gate texts (min_cosine_before_vs_after above); it did not repeat a top-10 retrieval (gate b/d style) comparison after the switch. Any top-10/order finding in this receipt is from the pre-switch qualification gates above, not a post-switch measurement.",
+   "process_proof": "MainPID cmdline runs tools/vllm-0.30.0/bin/python; /proc/<pid>/environ PATH starts with tools/vllm-0.30.0/bin",
+   "nrestarts": 0,
+   "dependents_after": {
+    "ai_memory_query": "vector stream active (streams_active includes vector), identity +dp1-707ad539ebca7d87 unchanged, 0 latest pages missing",
+    "socraticode_search": "returned ranked results on collection codebase_72cfa87c5abf (1974 chunks, status green)"
+   },
+   "gpu_used_mib_after": 6799,
+   "rollback": "rm ~/.config/systemd/user/nemotron-embed-agent-lab.service.d/zz-vllm-030.conf; systemctl --user daemon-reload; systemctl --user restart nemotron-embed-agent-lab.service",
+   "advisories_closed_per_reference": [
+    "GHSA-25q3-v2hm-8vpf (high, patched 0.28.0)",
+    "GHSA-5fj9-pfhr-6j48 (medium, patched 0.30.0)"
+   ]
+  },
+  "pin_identity_from_reference": {
+   "note": "This laptop's vllm-0.30.0 prefix pre-existed this run and was never pip-installed into by it (per the task's own instructions), so there is no direct_url.json or install log on this host to independently re-hash its wheel. The values below are what the workstation's own switch receipt (vllm-030-switch-20260925) recorded for the same pinned release; reused here for cross-host identity, not independently re-verified on this host.",
+   "previous_source_pin": "702f4814fe54fabff350d43cb753ae3e47c0c276",
+   "source_pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+   "wheel": "vllm-0.30.0-cp38-abi3-manylinux_2_28_x86_64.whl",
+   "wheel_sha256": "ef52ee58c410ead0b8afb190838fa4cbcb52075596f67862a03859d984966ac4",
+   "release_date": "2026-09-22",
+   "security_advisories_closed": {
+    "GHSA-25q3-v2hm-8vpf": "high; negative token id in /v1/embeddings or /pooling kills the engine; patched 0.28.0",
+    "GHSA-5fj9-pfhr-6j48": "medium; unbounded Prometheus label cardinality in the Rust frontend; patched 0.30.0"
+   }
+  },
+  "independent_review": "An independent reviewer subagent checked this receipt against the retained raw files (recomputed the reported counts, re-hashed the model file, compared production's before/after flags) and re-ran no gate."
+ },
+ "provenance": [
+  {
+   "name": "results.json",
+   "sha256": "22ba6abb7786f23b4b9878c6d725b9c32604564027825c745594f8f22fcf01b6",
+   "disclosure": "Machine output retained privately on the host; only factual results exported."
+  },
+  {
+   "name": "switch/switch-record.json",
+   "sha256": "f4178ef3988184cbd3ab80200220b36a68d7b864710bcb4c203faf0ee0ce8e4d",
+   "disclosure": "Machine output retained privately on the host; only factual results exported."
+  }
+ ]
+}

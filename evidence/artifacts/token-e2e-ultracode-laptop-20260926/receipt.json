@@ -1,0 +1,975 @@
+{
+ "schema_version": 1,
+ "kind": "token_stack_subagent_e2e",
+ "host_id": "wsl-authoring-20260923",
+ "recorded_at_utc": "2026-09-26T01:13:57Z",
+ "catalog_revision": "9a8257cd",
+ "question": "Does each of 13 of the workstation's 16 catalog-evidence tools (PR #296) run inside an Ultracode workflow subagent on this WSL2 authoring laptop, reusing that reference's own tasks for those 13 unchanged, and do the tools' own counters, an exact tokenizer, and a second, independent verifier subagent agree?",
+ "method": [
+  "The 13 tools and their tasks are reused unchanged from the workstation's own catalog evidence (evidence/artifacts/token-e2e-ultracode-20260925/receipt.json, PR #296), recorded verbatim on this host as reference-tasks.json. Each subagent's own computed task is a host adaptation of that same reference task where the reference's exact target does not exist on this host or this host's own instructions name a different one; every such change is recorded per tool under deviations_from_reference. Only 13 of the reference's 16 tools were run: codebase-memory-mcp, agentsview and otel-tui are not among the 13 (see retained_failures_and_gaps for why each was left out).",
+  "One Sonnet 5 workflow subagent per tool (label e2e:<tool>) did real work against a disposable detached worktree R = nas-e2e-R at commit 9a8257cd (origin/main), or the session project root (agent-lab) where a tool is bound to it. It wrote the baseline only by shell redirect or an equivalent read-only extraction, read only the tool's own output, answered from that output, and ran one deterministic PASS/FAIL check of the answer against the baseline.",
+  "A second, independent Opus 5.5 workflow subagent per tool (label verify:<tool>) reproduced the check from the same, unchanged pair files, re-ran the tool's own channel where feasible, checked the channel and binary provenance against upstream, and returned a verdict (confirmed or refuted) plus supporting notes; recorded per tool under verifier.",
+  "Upstream lifetime counters (rtk gain --format json, once project-scoped and once global; headroom savings --json; jCodeMunch get_session_stats/persistent ledger; Context Mode stats files) were captured immediately before (2026-09-26T00:35:58Z) and after (2026-09-26T01:13:57Z) the workflow run.",
+  "Each baseline/tool-output pair was compared exactly with the pinned o200k_base tokenizer (gpt-tokenizer) and recorded in a private host-side ledger (token-evidence/ledger.sqlite3); each exact_comparison.recorded_at below is that comparison's own ledger timestamp.",
+  "Provider consumption of every child comes from child-usage.mjs over this workflow's own transcript (wf_0893832e-937).",
+  "Three role-scoped probe subagents (source-scout, evidence-reviewer, isolated-builder) each tried the same set of lanes (RTK, QMD, Serena, SocratiCode, jCodeMunch, Context Mode, ai-memory, and for one role a ToolSearch/deferred-schema lane) to record which lanes each role's own tool allowlist can reach; recorded under role_access_probes."
+ ],
+ "evidence_classes": {
+  "subagent_tool_use": "native_proven on this host for all 13 tools (each marked worked_in_subagent: true): the tool ran for real inside the e2e subagent and its answer was checked against a baseline; a second, independent verify subagent reproduced the check and returned its own verdict.",
+  "exact_comparisons": "local_integration: exact o200k_base artifact token counts for one task each, from this host's pinned tokenizer via the private ledger; they are not provider-billed savings and must not be summed with upstream estimates or with each other.",
+  "baseline_kind": "counterfactual_raw pairs (baseline.txt is the actual raw content -- a real file, or the same commands' unfiltered output -- that the tool made unnecessary to read in full) may be read as a reduction when tokens_removed is positive. check_ground_truth pairs (baseline.txt is a minimal derived fixture -- a grep/SQL/API excerpt built only to verify the tool's answer, never the real counterfactual) are never a reduction claim, regardless of the sign of tokens_removed. 5 of 13 tools here are check_ground_truth (context-mode, repomix, serena, socraticode, ai-memory) and all 5 show a negative tokens_removed, exactly as expected for that category; 3 more counterfactual_raw tools (headroom, qmd, toon) also show a negative number because their captured tool-output artifact bundles more than the efficient representation alone (headroom's tool-output.txt holds the compress AND retrieve AND stats responses together; qmd's holds the preceding search listing plus qmd's own per-line numbering overhead on top of the retrieved document; toon's holds both the encoded TOON body and the decoded-back JSON from the round-trip check) -- see the README for the full worked classification.",
+  "upstream_counters": "upstream_estimate: each tool's own accounting. rtk's project-scoped and global gain, headroom's lifetime ledger, jCodeMunch's persistent ledger and Context Mode's stats files are host-wide over the window (or, for Context Mode, drawn from two different sessions entirely) and include other concurrent activity, so their deltas are not cleanly attributable to this run alone. Of these, only jCodeMunch's persistent-ledger delta isolates to this run's own commands, and even that is labelled an estimate (its own savings_provenance basis is a benchmark citation, not a per-call measurement -- see the jcodemunch tool entry's verifier notes). rtk's project-scoped gain does NOT isolate: it is still host-wide across every session bound to this project (see counters.rtk_gain_project_scoped below), not a per-run figure.",
+  "verifier_review": "second_pass: an independent Opus 5.5 subagent (verify:<tool>) reproduced each check from the unchanged pair files, re-ran the tool's own channel where feasible, and checked upstream provenance; its verdict (confirmed/refuted) and notes are recorded per tool. 'confirmed' means the e2e subagent's report is accurate about what it found -- not that the tool itself passed cleanly; rtk (refuted on two specific factual claims despite a passing check) and, within their own narrower checks, serena and repomix (both confirmed as accurate reports of a check that itself failed or partially failed) illustrate the difference.",
+  "consumption": "provider-returned usage per child (child-usage.mjs)."
+ },
+ "tools": [
+  {
+   "tool": "rtk",
+   "component_id": "rtk",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove, from inside this real Ultracode subagent, that rtk (a) is actually applied by the PreToolUse hook to plain Bash git/grep/ls/test commands run against a disposable worktree R, and (b) shows real measured E2E savings vs raw/upstream output, by building W/tool.txt (rtk-filtered) and W/base.txt (rtk proxy, raw) for 6 commands, answering from tool.txt only, verifying the answer against base.txt with one deterministic PASS/FAIL check (base.txt never read into context), and recording rtk's own n",
+   "answer_excerpt": "Yes on every part. `rtk verify` confirms the native PreToolUse hook (`rtk hook claude`) is registered and its 154 inline filter tests pass. `rtk hook check` dry-run shows git status/branch/show/ls/grep rewritten to `rtk <verb> ...`, while git log, find and `git show <rev>:<path>` (bare colon form) are left as \"No rewrite\". A direct hook-processor invocation with a Claude-Code-shaped PreToolUse JSON payload reproduces the same rewrite. Aggregate measured savings across the 6 commands: 59,756 / 1,045,432 bytes (94.3%), 1,000 / 2,065 lines (51.6%).",
+   "quality_check": {
+    "passed": true,
+    "output": "OVERALL: PASS (13/13 checks passed). Aggregate size (6 commands): tool-output.txt=59,756B/1,000L, baseline.txt=1,045,432B/2,065L; measured E2E savings bytes 94.3%, lines 51.6%."
+   },
+   "baseline_kind": "counterfactual_raw",
+   "upstream_stats_reported_by_worker": "rtk's own internal usage/adoption counters for this project and session (`rtk session`, `rtk gain --project`, `rtk gain --all` daily/weekly/monthly rollups); this session's row was already 2,949 Cmds / 731 RTK / 25% adoption before the dedicated 6-command test and grew further with every command in the transcript.",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 267536,
+    "baseline_bytes": 1045432,
+    "baseline_sha256": "492b9a8b797feb3a19f9bd1d0d6e446407e8f6172fe898c21a4f3df8d35877d8",
+    "tool_output_tokens": 17289,
+    "tool_output_bytes": 59756,
+    "tool_output_sha256": "9d8584a1a4e814ab4fc0a2b30fce01c9eb2270394d28aaffd8edebc8559bc0d0",
+    "tokens_removed": 250247,
+    "reduction_percent": 93.5,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 rtk: check_passed=True verifier=refuted; question: Inside this real Ultracode subagent, does rtk's PreToolUse hook (`rtk hook claude`) actually rewrite plain Bash git/ls/grep commands run against the disposable worktree R before they execute, does it correctly leave hooks.exclude_commands (git log, git show <rev>:<path>, diff, find) untouched, and d",
+    "recorded_at": "2026-09-26T01:16:48.483137+00:00"
+   },
+   "deviations_from_reference": [
+    "Chose 6 commands (git status, git branch -a, git log --oneline -8, git show HEAD --stat, ls -la, grep -rn) rather than a different literal set; the reference-tasks.json entry for rtk is itself truncated mid-sentence in the source file, so the missing tail was inferred from the host's own adaptation note."
+   ],
+   "verifier": {
+    "verdict": "refuted",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "Evidence is in ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/rtk/verify/. The pair files were not changed: sha256-before.txt and sha256-after.txt match. R is also unchanged (HEAD 9a8257cdca7595bac014066a6377156529e57302, porcelain empty), and neither ~/.config/rtk/config.toml nor ~/.claude/settings.json was touched.",
+     "The producer's check reproduces. I re-ran its unchanged check_rtk.py and the output (verify/check-rerun.txt) is byte-identical to check.txt, 13/13 PASS. Savings also reproduce: 59,756 B / 1,000 L against 1,045,432 B / 2,065 L, which is 94.3% of bytes and 51.6% of lines saved.",
+     "The baseline really is raw output and tool-output.txt really is rtk's output. I recaptured all six commands at 2026-09-25T21:05-04:00 with verify/recapture.py (argv subprocess, no shell hook). Plain git/ls/grep and `rtk proxy` produce whole-file identical output. Against the producer's files, 5 of 6 sections are byte-identical for both raw and rtk. CMD2 differs on both sides by one line: local branch 'pr307', created after the producer's run (verify/compare-recapture.txt). The recapture shows the same savings: 94.3% of bytes and 51.5% of lines.",
+     "The channel is genuine. The installed binary's sha256 23433a2a... equals the binary in the upstream rtk-ai/rtk v0.50.0 release asset. That tarball's sha256 bc2b8902... matches checksums.txt and the release API digest. `rtk hook claude` is registered as the PreToolUse Bash hook. `rtk verify` shows the hook PASS and 154/154 tests passed.",
+     "Hook behaviour reproduces (verify/hook-checks.txt). `rtk hook check` and a `rtk hook claude` JSON probe rewrite git status, git branch -a, git show --stat, ls and grep. They pass through git -C R log, find, diff, git -C R diff and file-target `>` redirects. The redirect refusal is intended upstream: v0.50.0 src/hooks/decision.rs lines 44-52.",
+     "Live check in this subagent: my plain `git -C R status` came back in rtk's compact form. rtk's own hook_decisions table (queried read-only) logs it as rewritten at 01:08:56Z and my plain git log as defer at 01:08:59Z. The same table also shows the producer's live ls, grep and git status rewrites between 00:39Z and 00:48Z (verify/hook-decisions-readonly.txt).",
+     "Reason for refutation 1 (facts are lost). rtk's CMD2 output says 'remote-only (31)', but the raw output has only 6 remote branches with no local branch. 25 of the 31, including 8 of the 10 names shown, are local branches that git marks with '+'; per the git-branch man page, '+' means checked out in a linked worktree. One example is claude/alpaca-engine-h2h-20260925, which the same output also lists as local '+ ...'.",
+     "Upstream source confirms the cause. In rtk v0.50.0, filter_branch_output (src/cmds/git/git_cmd.rs lines 3185-3244) keeps the '+ ' prefix in its local entries, so `local.contains(r)` never matches these branches. Running that logic on the raw output gives exactly 31 and the same first ten names. The develop branch (c75f159, 2026-09-26) has the identical function. The upstream test comment at line 4951 says branches that are 'already local' should be excluded, and no test covers the '+' marker.",
+     "The producer's check could not catch this. It only tested 31 <= 36 and that 3 sampled names exist as remotes. So 'Yes on every part' and 'the compaction lost no fact it reported' do not follow from the output. My stricter check scores 19/21, with both failures on CMD2, on the original pair and on the fresh recapture (verify/independent-check.txt, verify/independent-check-recapture.txt).",
+     "Reason for refutation 2 (one exclusion does not hold). The host pattern '^git show [^ ]*:' only matches the bare form. `git -C R show HEAD:README.md`, the -C style every R command uses, is rewritten by `rtk hook check`, and it was also rewritten live by the real hook in this subagent (hook_decisions at 01:09:14Z). rtk then truncates the file: 8,261 of 22,907 B, 117 of 274 lines, ending in '+157 lines' with an `rtk proxy` recovery hint (verify/git-show-blob-check.txt). The producer never tested the -C form of this exclusion.",
+     "Other inaccuracies. The per-command sizes in answer.txt are wrong. Actual tool/raw bytes are CMD1 47/67, CMD2 14,987/15,850, CMD4 21,647/21,647, CMD5 481/1,611 and CMD6 21,422/1,005,152. It claimed 67/73, ~9.9K/~13.9K, ~11.8K for both, 638/~1.1K and ~7.6K/~1.02M. The aggregate totals are correct.",
+     "Recall pointers cover every hidden grep match: 200 shown plus 1,047 recalled equals the 1,247 raw matches, with no overlap. However, 599 of the recalled lines are shortened excerpts around the match, even with --full. The 21 elided branch names have no recall pointer. The shortened path '/.../sota-convergence/README.md' matches 2 different raw files (verify/check-recall.txt).",
+     "What does hold: the hook rewrites plain git/ls/grep; git log, find and diff pass through; the excluded git log output is byte-identical; the measured savings are real; and fidelity holds for CMD1 and CMD3-6. A narrower claim limited to those points would stand. My upstream issue search found no report of the '+' marker problem; #2137 is a different branch -a bug.",
+     "Side effects: every explicit rtk run I made used RTK_DB_PATH and RTK_RECALL_DB (supported upstream) pointed into verify/. The harness's live rtk hook still writes rtk's own ~/.local/share/rtk store for every hooked Bash call, including mine. That is rtk's own state and cannot be avoided."
+    ]
+   }
+  },
+  {
+   "tool": "context-mode",
+   "component_id": "context-mode",
+   "channel": "native MCP tool, schema loaded via ToolSearch(\"select:...ctx_execute_file,...ctx_stats\") then called directly (no Bash/c",
+   "worked_in_subagent": true,
+   "task": "Rerun context-mode's ctx_execute_file against a real, larger repository file that sits under the actual MCP project root (the first attempt had targeted a file under the disposable e2e worktree and was refused with \\\"File access blocked, resolves outside project root\\\"). Target: ~/code/native-agent-stack/docs/grand-catalog-handbook.md (644 lines, 416.1K, read-only/detached checkout). Code must print only: (1) count of lines starting with \\\"## \\\", (2) the first 10 such headings, (3) count of line",
+   "answer_excerpt": "11 lines in ~/code/agent-lab/docs/full-stack-evidence.md start with \"## \"; the first 10 are: \"Latest model and repository refresh\", \"New shared memory and research adoption\", \"New automatic code RAG and runtime layers\", \"What is actually loaded\", \"Memory that exists today\", \"Measured savings and provider usage\", \"Models and the earlier semantic-retrieval gap\", \"Installed and adopted repository matrix\", \"Supporting runtimes and separate Windows components\", \"Missing memory/RAG candidates: current source review\" (verbatim, with the \"## \" prefix, in the tool's own output).",
+   "quality_check": {
+    "passed": true,
+    "output": "PASS: answer.txt (derived solely from ctx_execute_file's own output) matches baseline.txt (independent grep redirect) exactly, byte for byte."
+   },
+   "baseline_kind": "check_ground_truth",
+   "upstream_stats_reported_by_worker": "context-mode's own ctx_stats (per-chat capture count / MB kept out of context, and the lifetime all-project capture count), incremented by its PostToolUse hook on every MCP call; sampled once after the calls (this chat: 1,000 captures / 49.1MB; lifetime: 23,287 captures / 81.1MB across 552 projects) -- no \"before\" snapshot was taken for this one call.",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 102,
+    "baseline_bytes": 461,
+    "baseline_sha256": "fdbef2d15b72f8a0a005f75e64a3747859fd6ce95f3bc2431cdd9b8e9b7fb39f",
+    "tool_output_tokens": 207,
+    "tool_output_bytes": 777,
+    "tool_output_sha256": "9b3238bc7d33262a8ecc9c08cd319e3024d22c274fd696f1411ab30308471804",
+    "tokens_removed": -105,
+    "reduction_percent": -102.9,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 context-mode: check_passed=True verifier=confirmed; question: Against ~/code/agent-lab/docs/full-stack-evidence.md -- a real, git-clean, tracked, heading-structured repo file (814 lines / 73,495 bytes) sitting under context-mode's actual bound MCP project root (this session's cwd, agent-lab) -- via ctx_execute_file: (1) how many lines start with \"## ",
+    "recorded_at": "2026-09-26T01:16:47.003409+00:00"
+   },
+   "deviations_from_reference": [
+    "The reference task's exact target file (~/code/native-agent-stack/docs/grand-catalog-handbook.md) is not under this host's bound MCP project root; substituted the largest git-clean, tracked, heading-structured doc actually under that root, docs/full-stack-evidence.md (814 lines / 73,495 bytes / 11 '## ' headings). [Verifier correction: 'largest' holds only outside docs/tasks/ -- two larger, equally clean and tracked heading-structured docs exist there (up to 199,698 bytes); this does not affect the deterministic check, which is exact regardless of file size.]"
+   ],
+   "verifier": {
+    "verdict": "confirmed",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "Check reproduced (raw, via rtk proxy). baseline.txt and answer.txt are byte-identical: sha256 fdbef2d15b72f8a0a005f75e64a3747859fd6ce95f3bc2431cdd9b8e9b7fb39f, 461 B, cmp exit 0, diff -u exit 0 with 0 lines. I rebuilt three independent baselines: the subagent's exact grep recipe, an awk version, and Python over the committed blob from `git show HEAD:docs/full-stack-evidence.md`. All three hash to the same value. Evidence: ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/context-mode/verify/check-rerun.txt and verify/baseline-{grep-rerun,awk,headblob-py}.txt",
+     "Target is stable. ~/code/agent-lab/docs/full-stack-evidence.md is tracked and clean: worktree blob equals HEAD blob 2a6e76004d65bedd62cff1baafd78bb1c1dd4f80. It has 814 lines, 73,495 B, sha256 694004c814b61d2eac535660cf53fc41d1696b1e8887dd460acc9b46847a9d77, and no CR characters.",
+     "The answer follows from the tool output. tool-output.txt is byte-identical (777 B, sha256 9b3238bc7d33...) to the real tool_result in the E2E subagent's transcript at e2e:context-mode's own transcript (this workflow run). That transcript shows the tool_use mcp__plugin_context-mode_context-mode__ctx_execute_file at 2026-09-26T00:42:01.698Z with the result at 00:42:01.765Z, not an error. answer.txt equals the output section of that result byte for byte. Evidence: verify/transcript-ctx_execute_file-result.txt and verify/tool-output-section.txt",
+     "The baseline was independent. baseline.txt was written by a pure printf/grep redirect at 00:41:57Z, 4 s before the only ctx_execute_file call. The subagent's recorded commands are extracted to verify/transcript-commands.txt",
+     "Channel confirmed by my own call. I loaded the ctx_execute_file schema with ToolSearch and called it once (00:55:22.985Z, no error) with the same derivation. It returned the identical 13-line block. Hashes computed inside the tool's sandbox matched without relying on transcription: output block sha256 fdbef2d1... (461 B), FILE_CONTENT sha256 694004c8... (73,495 B, 814 newlines), equal to the on-disk values. Evidence: verify/rerun-ctx_execute_file-result.txt and verify/rerun-output-block.txt",
+     "Misreported check command. The actual command was `rtk proxy bash -c 'if diff -u baseline.txt answer.txt >/dev/null; then echo PASS...; fi' | tee check.txt`, not `diff -u ... > check.txt`. Its logged exit=0 was tee's status, not diff's. PASS is printed only when diff exits 0, and my rerun reproduces diff exit 0, so the conclusion stands.",
+     "Deviation 1 is imprecise but justified. The literal reference path ~/code/native-agent-stack/docs/grand-catalog-handbook.md is missing on this host. A handbook with that name does exist in ~/code/native-agent-stack-token-practice-review/docs/ and ~/code/nas-e2e-R/docs/ (2,321 lines / 426,080 B each: about 416.1 KiB, which matches the reference size, but not its 644-line count). So 'did not exist on this host' is imprecise. Both copies sit outside the bound project root (agent-lab). The installed upstream context-mode 1.0.169, src/server.ts:1164-1207 (checkProjectBoundary, issue #852), refuses such paths unless a permissions.allow Read(...) rule exists. No such rule exists in user or project settings, so moving to an in-root file matches the reference's stated intent.",
+     "The 'largest' claim is inaccurate. Larger clean, tracked, heading-structured docs exist under agent-lab/docs/tasks/: 2026-09-22-executed-comparisons.md (199,698 B, 11 H2) and 2026-09-21-sota-catalog-independent-review.md (192,715 B, 12 H2). full-stack-evidence.md is the largest heading-structured file only outside docs/tasks/, and at 73 KB it is smaller than the reference's 416 KB. This does not affect the deterministic check.",
+     "Disclosure gap on blindness. Besides the disclosed `grep -c '^### '` at 00:41:17Z, the subagent's candidate loop at 00:40:38Z also printed the target's '## ' count (11) before the tool call. Its `head -5` of the file contained no '## ' lines. This has no effect, because answer.txt equals the real tool_result byte for byte.",
+     "Deviation 2 confirmed. reference-tasks.json tools[1] is truncated in the file itself: the task ends at 'count of line' and the channel field at 'no Bash/c'. Completing item 3 as the '### ' count is a disclosed reconstruction.",
+     "Counter delta not measured. The ctx_stats/ctx_doctor calls are real (transcript shows 00:42:37Z, v1.0.169, hooks PASS). No before snapshot was taken, so the task's delta on context-mode's own counters remains unmeasured, as the subagent stated. ctx_stats figures are the tool's self-reported aggregates, not task evidence.",
+     "Evidence class and scope. This is a local integration E2E of the installed upstream plugin (context-mode 1.0.169) through its native MCP channel, on a real repo file under the bound project root. It is not an upstream test-suite run. I changed nothing in the pair dir outside verify/: the four original files keep their hashes and mtimes, and verify/SHA256SUMS lists the new evidence. Side effects: context-mode's own session state from my single sanctioned ctx_execute_file call, and RTK hook history from Bash calls."
+    ]
+   }
+  },
+  {
+   "tool": "headroom",
+   "component_id": "headroom",
+   "channel": "mcporter bridge in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove headroom's MCP compress/retrieve round-trip works end-to-end inside this subagent, using only the tool's own returned output in context (baseline captured via shell redirect only), and report compressed-vs-original size plus retrieve exactness with a deterministic PASS/FAIL check against the saved baseline.",
+   "answer_excerpt": "Yes. headroom_compress on a real 24,855-byte JSON file from the read-only catalog worktree (nas-e2e-R/observability/memory-scheduled-results-20260923.json) returned hash=2893695fe5319cc59949f375, transform router:mixed:0.89, original_tokens=7281 -> compressed_tokens=6491 (tokens_saved=790, 10.9%), with the compressed payload itself 22,062 bytes vs the 24,855-byte original. headroom_retrieve on that same hash returned the original content byte-for-byte identical to the saved baseline.",
+   "quality_check": {
+    "passed": true,
+    "output": "5/5 deterministic PASS lines: hash prefix matches, retrieve is byte-exact vs baseline, retrieve hash matches the compress hash, compressed-vs-original size direction is consistent, and headroom_stats reflects exactly this compress+retrieve call. OVERALL: PASS."
+   },
+   "baseline_kind": "counterfactual_raw",
+   "upstream_stats_reported_by_worker": "headroom_stats' own session counters: sub_agents.compressions (0->1), sub_agents.retrievals (0->1), combined.total_compressions (0->1), combined.total_tokens_saved (0->790), combined.savings_percent (0->10.9), combined.estimated_cost_saved_usd (0->0.0024).",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 7274,
+    "baseline_bytes": 24855,
+    "baseline_sha256": "2893695fe5319cc59949f375b71f70065dff878dcf213fc2a868d3cd3a3acf89",
+    "tool_output_tokens": 16911,
+    "tool_output_bytes": 53870,
+    "tool_output_sha256": "45ab120825ff33b0a9b59ba32fcc3dfb0d610db4e2d48063815a853028b83070",
+    "tokens_removed": -9637,
+    "reduction_percent": -132.5,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 headroom: check_passed=True verifier=confirmed; question: Does headroom's MCP compress/retrieve round-trip work end-to-end through the MCPorter stdio bridge (offline, private workspace, no proxy running), and what are the compressed-vs-original size and retrieve exactness?",
+    "recorded_at": "2026-09-26T01:16:47.201263+00:00"
+   },
+   "deviations_from_reference": [
+    "The reference task names no specific content; a naive first choice (plain prose, then a JSON file whose text happened to contain the word 'error') both hit real no-op protective routes in the installed source rather than exercising compression; a third, larger real JSON file from the read-only catalog worktree was used instead."
+   ],
+   "verifier": {
+    "verdict": "confirmed",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "Deliverable integrity: pairs/headroom/ holds exactly answer.txt, baseline.txt, check.txt and tool-output.txt, and their sha256 hashes were the same before and after verification. baseline.txt (24,855 B, sha256 2893695fe5319cc59949f375b71f70065dff878dcf213fc2a868d3cd3a3acf89) is byte-identical to ~/code/nas-e2e-R/observability/memory-scheduled-results-20260923.json, which is git-tracked and unmodified at native-agent-stack worktree HEAD 9a8257c. It is valid JSON: 24,853 chars, 1 non-ASCII char.",
+     "Re-ran the original check. verify/orig_check_rerun.py is a copy of the subagent's scratchpad headroom_check.py with only the 3 raw-JSON paths pointed at the preserved scratch _compress/_retrieve/_stats.json. Its output (verify/orig_check_rerun.out) is byte-identical to check.txt: 5/5 PASS, OVERALL PASS.",
+     "Independent check: verify/verify_check.py (stdlib only) wrote verify/verify-check.txt with 36/36 PASS. It parses tool-output.txt itself, and each of the 3 sections equals the prior raw JSON. hash = sha256(baseline)[:24], per upstream cache/compression_store.py:343. The recorded retrieve is byte-exact against the baseline (24,855 B) with source=local. The compressed payload is 22,062 B against 24,855 B (-2,793 B, 11.24%). tokens_saved, savings_percent, sub_agents and combined percent/cost all match the upstream formulas in ccr/mcp_server.py:447 and 875-882. All 12 numeric claims in answer.txt appear in the file and are true. A negative control (one byte flipped) breaks both the hash and the byte-equality checks.",
+     "Channel reproduced only via MCPorter 0.13.13 ad-hoc stdio: mcporter list/call --stdio \"headroom mcp serve\" with --env HEADROOM_WORKSPACE_DIR=verify/ws.8vljib (fresh mktemp, 0700, empty after list), HEADROOM_UPDATE_CHECK=off, HEADROOM_OFFLINE=1 and DO_NOT_TRACK=1, against headroom-ai 0.37.0. list reported transport 'STDIO headroom mcp serve', source <adhoc>, 3 tools (compress(content), retrieve(hash), stats()). compress, retrieve and stats all exited 0. My raw outputs verify/compress.json, retrieve.json and stats.json are byte-identical to the prior run's raw outputs: 25,178 B, 27,690 B and 840 B respectively.",
+     "Private workspace evidence (verify/workspace-state.txt): session_stats.jsonl holds the compress and retrieve events from 2 distinct server PIDs, one per mcporter call. That explains why the stats top-level counters read 0 while sub_agents reads 1/1: upstream aggregates events from other PIDs (mcp_server.py:858-882). savings_events.jsonl records client=mcporter, source=mcp. ccr_store.db is the upstream default SQLite store (compression_store._create_default_ccr_backend).",
+     "Host isolation (verify/host-state-before.txt and host-state-after.txt): ~/.headroom was last modified 2026-09-25 17:18, before the E2E window of 20:38-20:49, and has no files newer than my run. ~/.mcporter has no newer files. No config/mcporter.json was written. Nothing listens on 8787/8788 and no headroom servers were left running. mcporter has no configured servers, so every call was ad hoc.",
+     "Upstream source basis: the installed headroom files I relied on (ccr/mcp_server.py, cache/compression_store.py, cache/backends/sqlite.py, paths.py, transforms/content_router.py, offline.py, compress.py) all MATCH the wheel's dist-info RECORD hashes, so they are the unmodified upstream release from github.com/chopratejas/headroom. All state paths honor HEADROOM_WORKSPACE_DIR (paths.py). HEADROOM_OFFLINE and DO_NOT_TRACK disable the beacon and telemetry (telemetry/beacon.py).",
+     "Nuance, not a contradiction: the compression is lossy with a retrieval marker. The compressed payload ends in '<<ccr:e5418a450694 1_rows_offloaded>>' (strategy smart_sample(10->9)), and the store holds that second 12-char key, which is sha256[:12] as upstream documents. The full original comes back through the 24-char hash. The answer never claims the compressed payload is lossless.",
+     "Minor inaccuracies in answer.txt that do not affect the claims: (a) it says the proxy was reported unreachable 'on every call', but only compress and stats carry a proxy field; retrieve returns before any proxy probe on a local hit (mcp_server.py:473-482). (b) It says 'no ONNX/ML packages are installed'. onnx, onnxruntime, torch, transformers and sentence_transformers are absent, but tokenizers 0.23.2 and huggingface_hub 1.32.0 are present. The Kompress quote is verbatim at content_router.py:3721, and router:mixed:0.89 is emitted by the f'router:{strategy}:{ratio:.2f}' format with strategy MIXED. (c) The 'standalone... no proxy needed' wording is in the mcp_server.py class docstring, not in `headroom mcp --help`; the help text documents on-demand compress/retrieve/stats and CCR.",
+     "My own deviations: I ran `headroom --version` directly without the guard env, and `headroom mcp --help` / `mcp serve --help` with HEADROOM_WORKSPACE_DIR set to a nonexistent path that was never created. Neither changed anything in ~/.headroom. Every verification tool call went through MCPorter. The private workspace verify/ws.8vljib is kept as evidence and contains a stored copy of the baseline. Nothing was written outside pairs/headroom/verify/.",
+     "Evidence class: this is a local integration check, meaning actual tool execution on this host through the MCPorter bridge. It is not upstream's own test suite and not a provider-level E2E. The 127.0.0.1:8787 ConnectTimeout (a timeout rather than a refusal) comes from this environment and appeared in both runs. The stats call took about 21 s because of the proxy probes."
+    ]
+   }
+  },
+  {
+   "tool": "jcodemunch",
+   "component_id": "jcodemunch-mcp",
+   "channel": "native MCP in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove jcodemunch MCP works end-to-end inside this subagent on real repo code: index only R/scripts, search_symbols for \"register_file\", retrieve its source with get_symbol_source, verify the returned source against a shell-redirected baseline (cat of host_receipts.py, never read into context), capture get_session_stats, then invalidate the scratch folder's index.",
+   "answer_excerpt": "register_file is defined at scripts/host_receipts.py lines 643-660 (18 lines), symbol_id scripts/host_receipts.py::register_file#function, inside the indexed folder R/scripts. Signature: `def register_file(root: Path, relative_path: str) -> None`. It updates relative_path's entry in manifests/evidence.json's files[] with its current sha256/bytes, replacing an existing entry for that path or inserting a new one at its sorted (bisect) position so files[] stays sorted.",
+   "quality_check": {
+    "passed": true,
+    "output": "exact_match=True, stripped_match=True, signature_line_match=True; sha256 of the tool's normalized source equals the sha256 of the baseline's normalized 643-660 slice (both 18 lines); exactly one `def register_file(` in the 1,786-line baseline file. VERDICT=PASS."
+   },
+   "baseline_kind": "counterfactual_raw",
+   "upstream_stats_reported_by_worker": "get_session_stats' session_tokens_saved / total_tokens_saved, specifically lifetime_by_tool.get_symbol_source. This session: session_tokens_saved=23,575 (100% attributed to the single get_symbol_source(register_file) call). Lifetime: total_tokens_saved=83,215, all under get_symbol_source. [Verifier correction: 23,575 is exactly upstream's estimate_savings formula, (95,432 raw bytes - 1,130 symbol bytes)//4; upstream's own get_session_stats description calls this an estimate ('modelled estimates ... not per-call measurements', tool_surface.estimator 'bytes/4'), not a tokenizer-measured saving, contrary to a savings_provenance field this tool also exposes.]",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 22043,
+    "baseline_bytes": 95432,
+    "baseline_sha256": "90cfe1316bcb2ead4c9bad46b2636341b88cb3b6d38cb1bd8b6364bae22fd20a",
+    "tool_output_tokens": 443,
+    "tool_output_bytes": 1812,
+    "tool_output_sha256": "ef48ea2058acd7fe05d0623c29d97f7395a8f339c330dc8a8d3a2150284a6a85",
+    "tokens_removed": 21600,
+    "reduction_percent": 98.0,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 jcodemunch: check_passed=True verifier=confirmed; question: Using jcodemunch MCP end-to-end in this subagent (index_folder(R/scripts) -> search_symbols(\"register_file\") -> get_symbol_source) on repo local/nas-e2e-R-76abf77a, what is register_file's signature, source location, and behavior?",
+    "recorded_at": "2026-09-26T01:16:47.402558+00:00"
+   },
+   "deviations_from_reference": [
+    "Used the catalog's index_folder action (a local filesystem path) rather than index_repo (which requires a URL), since R/scripts is a local path, not a change of scope."
+   ],
+   "verifier": {
+    "verdict": "confirmed",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "Check reproduced (deterministic local check): I re-ran the subagent's own check (scratchpad/check_jcodemunch.py). It exits 0, and its output (verify/rerun-original-check.txt) is byte-identical to check.txt (sha256 eaa67f93...). My separate check, verify/check_verify.py (report in verify/check-verify.txt), passes every mandatory item with VERDICT=PASS. baseline.txt (sha256 90cfe131..., 95432 bytes, 1786 lines) is identical to both R/scripts/host_receipts.py and R's HEAD blob. The tool source equals baseline lines 643-660 exactly. Python's ast finds exactly one register_file def, at 643-660, and its raw docstring, signature and empty decorator list match the tool's.",
+     "The answer follows from the tool output. Every claim in answer.txt is present in the fields of tool-output.txt: symbol id, file, lines 643-660 (18 lines), signature, verbatim docstring, the sha256+bytes record, manifests/evidence.json files[], replace on the same path, otherwise insert with bisect.bisect_left, and the write-back. As a synthetic-fixture local test, I ran the baseline's own register_file on a scratch root inside verify/behavior-root, with bytecode writes disabled. It inserted at the sorted position and replaced existing entries in place, as the answer states.",
+     "tool-output.txt is the tool's real output. It is byte-identical to the native MCP tool_result in the subagent transcript, plus the heredoc's trailing newline. The transcript is e2e:jcodemunch's own transcript (this workflow run); the call is mcp__jcodemunch__order get_symbol_source at 2026-09-26T00:40:55Z. session-stats.json is a field subset of the transcript's get_session_stats result. The top1 line in search-symbols-output.txt equals the transcript line. Extracts are in verify/transcript-*.txt.",
+     "The native MCP channel was genuinely used. (1) The transcript has tool_use blocks for mcp__jcodemunch__order (index_folder, search_symbols, get_symbol_source, get_session_stats, invalidate_cache, list_repos), and the harness recorded attributionMcpServer=jcodemunch on the following turns. (2) State written by the jcodemunch server itself (pid 867728) matches the call timestamps: session_stats.json last_updated 00:41:01.449Z matches the get_session_stats call; _session_live.json 00:42:42.512Z matches list_repos; _savings.json daily 2026-09-25=23575. (3) The scratch repo is absent from ~/.code-index now.",
+     "Independent re-run through the tool's own MCP stdio channel, using MCPorter 0.13.13 and the same upstream server binary, with HOME and CODE_INDEX_PATH isolated under verify/jcm-home. It reproduced repo id local/nas-e2e-R-76abf77a with 30 files and 1079 symbols, byte-identical search_symbols MUNCH text, and get_symbol_source with every non-_meta field and field order equal (verify/compare-rerun.txt, VERDICT=PASS). There were only two differences. First, _meta.already_delivered is absent: it is a session-scoped advisory, and each MCPorter call is a fresh process. Second, discovery_skip_counts.skip_dir went from 0 to 1 because of a git-ignored R/scripts/__pycache__ created at 20:45:45 by another process after the E2E ended; neither the E2E nor I created it.",
+     "Upstream resolution: the installed jcodemunch-mcp 1.108.319 is the latest upstream release (jgravelle/jcodemunch-mcp v1.108.319, published 2026-09-16; also the latest on PyPI). Seven source files have git blob shas identical to upstream at that tag: server.py, tools/get_symbol.py, storage/token_tracker.py, tools/index_folder.py, tools/search_symbols.py, tools/invalidate_cache.py and tools/get_session_stats.py. The baseline's blob sha b9779c6d... equals upstream native-agent-stack scripts/host_receipts.py at R HEAD 9a8257c and at current main e833e3e.",
+     "The counter moved, and 23575 is exactly upstream estimate_savings, (95432 raw bytes - 1130 symbol bytes)//4. The isolated re-run's ledger reads 47150, which is 2 x 23575 for my two calls. Correction to the subagent's report: it says savings_provenance reports this saving as measured rather than estimated. Upstream source contradicts this. savings_provenance is a hard-coded benchmark citation (retrieval/provenance.py: average_pct 99.6, task_runs 15). Upstream's own get_session_stats description says 'Savings are modelled estimates ... not per-call measurements', and tool_surface.estimator is 'bytes/4'. Record 23575 as an estimate-class number, not a tokenizer-measured saving.",
+     "Deviations the subagent did not disclose: (1) Before any jcodemunch call, its Bash grep (transcript call #3) printed 'host_receipts.py:643:def register_file(root: Path, relative_path: str) -> None:' and the call sites from the raw source. So the signature and line number entered its context outside the tool channel. baseline.txt itself was never read, and answer.txt was built mechanically from tool-output.txt fields, so the answer still follows from the tool output. (2) It made an unlisted read-only menu(limit=60) call. Disclosed deviation: its helper scripts were written to the session scratchpad, outside the prompt's pairs/<tool>/ write scope.",
+     "Session stats cover the whole shared server process (up 7130 s), not only the subagent. Its search_symbols=2 includes a 'parse_codex' search from another caller. Crediting all 23575 session tokens to the single get_symbol_source call is still correct.",
+     "Nothing changed outside verify/. Snapshots verify/pre-state.json and verify/post-state.json show zero differences across ~/.code-index (66 files), ~/.mcporter, the pair files outside verify/, R's git index, HEAD and status, and R/scripts. I redirected HOME for the re-run because upstream token_tracker._savings_path writes to Path.home()/.code-index when no base_path is passed. The E2E itself changed ~/.code-index state (indexing, then invalidating the scratch repo, plus the ledger and session files), which its prompt allowed."
+    ]
+   }
+  },
+  {
+   "tool": "qmd",
+   "component_id": "qmd",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove qmd works end-to-end inside this subagent against the real native-agent-stack-catalog qmd index: list collections, search \"release tag re-pin new machine\" in the foundation/adoption-equivalent collection, get the top result, answer which document says how a new machine pins a release and the step, and verify the answer deterministically against a shell-redirected baseline of the full document.",
+   "answer_excerpt": "docs/tasks/2026-09-23-grand-catalog-readiness.md (top BM25 hit in the agent-lab-docs index, 90%). The step is \"Step 0, once, from a fresh clone of main\": run `git checkout \"$(python3 -c \"import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])\")\"` -- read the tag named in adoption/manifest.json's source.release_tag field and check it out (resolves to v2026.09.23 in the 2026-09-23 snapshot, re-pinned to v2026.09.24.1 the next day).",
+   "quality_check": {
+    "passed": true,
+    "output": "Check 1 (byte-level fidelity): qmd's `get` output, with its own line-number prefixes stripped, is sha256-identical to the raw file over the real 249-line content range. Check 2: every one of 7 concrete claims in answer.txt is a literal substring of the untouched baseline. Overall verdict: PASS."
+   },
+   "baseline_kind": "counterfactual_raw",
+   "upstream_stats_reported_by_worker": "No dedicated token-savings counter exists for qmd (unlike rtk's gain ledger); the nearest observable counter is `qmd status --index agent-lab-docs`'s Documents/Vectors/Updated fields, confirmed unchanged (183 docs, 0/183 embedded) since `search`/`get` are read-only.",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 6698,
+    "baseline_bytes": 24710,
+    "baseline_sha256": "bb87172464ff6a1c84230dceb06967ce2278069e1a5dca0e58f82a50d208c5d8",
+    "tool_output_tokens": 8126,
+    "tool_output_bytes": 28545,
+    "tool_output_sha256": "337478e85f5147f80ab1f670a68defbd576a041251a204bcbb9798dd52a8fe0d",
+    "tokens_removed": -1428,
+    "reduction_percent": -21.3,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 qmd: check_passed=True verifier=confirmed; question: Search \"release tag re-pin new machine\" in the agent-lab-docs qmd index (BM25 only), get the top result, and answer which document says how a new machine pins a release and the step.",
+    "recorded_at": "2026-09-26T01:16:47.970518+00:00"
+   },
+   "deviations_from_reference": [
+    "Redirected from the workstation's native-agent-stack-catalog qmd index to this host's own agent-lab-docs index (183 files, pre-existing), per this host's explicit adaptation note; kept the same query text for parity."
+   ],
+   "verifier": {
+    "verdict": "confirmed",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "The baseline is genuine. ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/qmd/baseline.txt (24710 bytes, 249 lines, sha256 bb87172464ff6a1c84230dceb06967ce2278069e1a5dca0e58f82a50d208c5d8) matches byte for byte (cmp) both the on-disk ~/code/agent-lab/docs/tasks/2026-09-23-grand-catalog-readiness.md and its git HEAD blob. The source file is git-clean; its last commit is 200643d.",
+     "The deterministic check reproduces. (a) The subagent's own method (sed -n '46,$p' tool-output.txt, strip the 'N: ' prefix, head -n 249, diff against baseline) exits 0 with identical sha256 bb871724...d8. (b) A stricter rebuild of all 250 numbered lines, which checks that the prefixes run 1..250 in order and joins the lines with newline, gives back the exact 24710-byte file (same sha256). The only difference over the full range is the trailing '250: ' line (diff 250d249).",
+     "The trailing '250: ' line is lossless, not a defect. The installed upstream source, @tobilu/qmd 2.8.3 (repo github.com/tobi/qmd), numbers lines in dist/store.js:4292-4295 (addLineNumbers) with text.split('\\n'). A file that ends in a newline therefore gets one final empty numbered line. The subagent's 'cosmetic' description is correct.",
+     "The tool's own channel was genuinely used. I re-ran the same binary raw (~/.local/share/codex-ecosystem/bin/qmd, which resolves to tools/qmd-2.8.3/node_modules/@tobilu/qmd/bin/qmd, reporting qmd 2.8.3 (facd35e)). `qmd search \"release tag re-pin new machine\" --index agent-lab-docs -c agent-lab-docs -n 5 --explain` exited 0 with empty stderr and matches recorded tool-output.txt lines 1-40 byte for byte (sha256 5961fb9b...d8ef). `qmd get \"#bb8717\" --index agent-lab-docs` exited 0 with empty stderr and matches recorded lines 43-295 byte for byte. The qmd-specific formatting (qmd:// URIs with ?index=...:line, docids, Score %, @@ hunk headers) reproduces exactly, so the recorded output is real qmd output, not a copy of the file.",
+     "In verify-log.txt the first search comparison (C1) fails and the overall exit is 1. That failure came from my own split point, which included line 41, a blank line before the separator the subagent echoed at line 42. C1b, appended to the same log, shows byte identity for lines 1-40 and confirms line 41 is empty.",
+     "BM25-only is confirmed. Native `qmd --help` describes `search` as 'Full-text BM25 keywords (no LLM)'. `qmd status --index agent-lab-docs` shows 183 files and 0 vectors embedded both before and after, differing only in relative-time text. The index sqlite mtime stayed at 20:39:08 across search, get and status, so the calls were read-only. The index was created 2026-09-18, so this run did not create it, and its collection path is ~/code/agent-lab/docs.",
+     "The answer follows from the tool output. All 7 check phrases appear in both baseline.txt and tool-output.txt (grep -cF). Every other claim traces to a source line in the qmd get output: line 200 ('New WSL2 PC' item 2, the Step 0 git checkout of manifest source.release_tag, resolving to v2026.09.23 in the 2026-09-23 snapshot); line 87 (step 0 now resolves to v2026.09.24.1; the no-git path gh release download -> verify-asset -> attestation verify --source-ref/--source-digest, with gh signed in); lines 12-13 (tag ec94e8a6 -> 81385fe6; #171 merged as 8e386e38); line 116 (#114 bb5228d -> v2026.09.23/4970ba0); lines 120-124 (a tag cannot contain its own commit; the run-once rule). The answered document is the rank-1 search hit, as the question requires.",
+     "Minor, non-blocking inaccuracies: (1) answer.txt says 'rank 1 of 5', but the search returned only 4 results for -n 5, both in the recorded run and in my fresh run. (2) It says repeating step 0 'is called out as one of two still-open consequences'. That is a loose paraphrase: lines 120-124 give the stale manifest inside the tag as the consequence and the run-once rule as the fix. (3) The reported scratch/reconstructed-from-qmd.txt is not in the pair directory; I rebuilt it independently in verify/. (4) The echoed separator line is missing from the reported command list.",
+     "Scope deviation, disclosed by the subagent: ~/codex-ecosystem/state/token-e2e-laptop-20260926/reference-tasks.json (source: the catalog receipt from PR #296, workstation) names 'the real native-agent-stack-catalog qmd index' and includes a 'list collections' step. That index exists on this host (~/.cache/qmd/native-agent-stack-catalog.sqlite, 5 collections, last updated 2026-09-21). The same query there returns 'No results found.' (read-only; mtime unchanged), so moving to agent-lab-docs is a host adaptation that works. I did not see the host adaptation note itself; it is not in reference-tasks.json. What is proven is qmd BM25 search and get end to end on agent-lab-docs, not parity with the reference corpus. The pair has no explicit `qmd collection list`, though status prints the Collections section.",
+     "I cannot verify from the files the claim that baseline.txt was not read before the answer was written (answer.txt mtime 20:45:13 is after baseline.txt 20:43:58). It does not affect the verdict: the qmd get block and the baseline are byte-identical, so checking the answer against either gives the same result. qmd has no savings counter; 'counter_expected_to_move: none' is consistent with status being unchanged.",
+     "I wrote only under ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/qmd/verify/ (verify.sh, reconstruct.py, verify-log.txt, rerun-search.txt, rerun-get.txt, ref-index-search.txt, ref-index-and-source.txt, grounding-extra.txt, indexes.txt, status-before.txt, status-after.txt, post-state.txt and others). post-state.txt confirms that every ~/.cache/qmd index mtime, the four pair files and the git state of the source doc are unchanged."
+    ]
+   }
+  },
+  {
+   "tool": "serena",
+   "component_id": "serena",
+   "channel": "mcp",
+   "worked_in_subagent": true,
+   "task": "Rerun: prove Serena (bound to session project ~/code/native-agent-stack via --project-from-cwd, no project switch) works inside this subagent by running find_symbol(register_file, with body) and find_referencing_symbols(register_file) against that bound project, then deterministically quality-check the definition line and referencing-call-site count against a grep/cat baseline.",
+   "answer_excerpt": "From tool-output.txt alone: summarizeRun is a Function in .claude/workflows/child-usage.mjs, body_location.start_line=240 (Serena's line numbers are 0-based, so 1-based line 241), end_line=264 (->265). find_referencing_symbols returned exactly 2 references, both inside the same file: one at 0-based line 390 (391 1-based) and one at 446 (447). No references were reported in any other file, even though .claude/workflows/test-child-usage.mjs also imports and calls summarizeRun repeatedly.",
+   "quality_check": {
+    "passed": false,
+    "output": "CHECK_1 (definition line 241): PASS. CHECK_2 (2 references within the definition file): PASS. CHECK_3 (8 references project-wide expected; tool returned 2): FAIL. OVERALL_find_symbol=PASS, OVERALL_find_referencing_symbols=PARTIAL (correct within the definition file, incomplete project-wide)."
+   },
+   "baseline_kind": "check_ground_truth",
+   "upstream_stats_reported_by_worker": "Serena has no MCP-exposed numeric \"tokens saved\" stat. The counter that actually moved: agent-lab/.serena/cache/{bash,python,typescript}/document_symbols.pkl and raw_document_symbols.pkl, all freshly written (mtimes ~93 seconds before the post-call check) by the find_symbol/find_referencing_symbols calls.",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 455,
+    "baseline_bytes": 1649,
+    "baseline_sha256": "2c23d73db43e37d9e55c61301842483f638f4f10a0227380c0db2117f1e5ec87",
+    "tool_output_tokens": 1154,
+    "tool_output_bytes": 4193,
+    "tool_output_sha256": "fcf554cf8006afd0be4883c3ba96e7e152e098f47df9ad658c3cde12baedc5d7",
+    "tokens_removed": -699,
+    "reduction_percent": -153.6,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 serena: check_passed=False verifier=confirmed; question: Per serena's own find_symbol(summarizeRun, include_body=true) and find_referencing_symbols(summarizeRun), bound to agent-lab via --project-from-cwd: what line is summarizeRun defined on in .claude/workflows/child-usage.mjs, and how many symbols reference it project-wide?",
+    "recorded_at": "2026-09-26T01:16:48.658580+00:00"
+   },
+   "deviations_from_reference": [
+    "Bound project changed from ~/code/native-agent-stack to ~/code/agent-lab (this session's cwd), confirmed by Serena's own active-project banner. Probe symbol changed from register_file (Python) to summarizeRun (JavaScript, .claude/workflows/child-usage.mjs), the host-adaptation's named analogue."
+   ],
+   "verifier": {
+    "verdict": "confirmed",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "Meaning of 'confirmed': the subagent's report is accurate. Serena's E2E check FAILS on this host as configured. find_symbol is exact, but find_referencing_symbols misses every cross-file reference. It does not mean Serena passed.",
+     "Channel, from the subagent transcript e2e:serena's own transcript (this workflow run): at 2026-09-26T00:43:33Z it issued native tool_use calls mcp__serena__initial_instructions, find_symbol(summarizeRun, .claude/workflows/child-usage.mjs, include_body=true) and find_referencing_symbols(summarizeRun, same file). None of its 22 Bash calls invoked a Serena CLI. Its tool_result payloads are deep-equal to tool-output.txt (verify/transcript-compare.txt). The .serena/cache pkl mtime 1790383413 is the same second.",
+     "Live re-run: I loaded the schemas via ToolSearch and called the same tools on the running MCP server. Both returns are deep-equal to tool-output.txt (verify/rerun-find_symbol.json, verify/rerun-find_referencing_symbols.json, verify/compare_rerun.out). The returned body equals source lines 241-265 (sha256 1e331223...). initial_instructions returned the same 'agent-lab ... bash, python, typescript' banner and the verbatim note 'Line numbers returned by Serena's tools are 0-based!'.",
+     "Deterministic check reproduced two ways. (1) The subagent's own script, preserved as verify/serena_check.subagent-copy.mjs, re-run on the pair files gives output byte-identical to check.txt (sha256 05be3f0f...). (2) My independent re-implementation (verify/check_rerun.py -> check-rerun.txt) compares exact line sets, not just counts. Against both the subagent's baseline.txt and my own raw git-grep baseline it gives CHECK_1 PASS (241=241), CHECK_2 PASS ([391,447]=[391,447]) and CHECK_3 FAIL (2 vs 8; missed test-child-usage.mjs lines 108, 112, 124, 140, 239, 241).",
+     "The baseline is correct. Raw git grep -w and rg --hidden agree: child-usage.mjs has the definition at 241, comments at 375 and 386, and calls at 391 and 447; test-child-usage.mjs has the import at line 5 and six calls, for 8 call sites in total. The naive-grep overcount the subagent discarded is real: the literal pattern matches 150 lines in 52 files, 50 of them inside the 26 gitignored .claude/worktrees checkouts (verify/independent-baseline-raw.txt).",
+     "Root cause measured against upstream. verify/lsp_probe.py (results in verify/lsp-probe-results.json) ran upstream solidlsp from oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143, the installed pin, with Serena's exact arguments (serena/symbol.py:864, include_file_symbols=True) against the installed typescript 5.9.3 and typescript-language-server 5.1.3, on byte-identical copies of the two files. Case A (no config): 2 references, same as the reported result. Case B (jsconfig including '.claude/workflows/*.mjs'): 9 references, all 6 test call sites plus the line-5 import. Case C (jsconfig with default include): 2 references. The cause is confirmed: in tsserver's inferred-project mode the importing file is never loaded. The subagent's 'Root cause verified' was an overstatement, because it had only checked that the config files are absent, not the causal link.",
+     "Corrections to the root cause. package.json plays no part. A root tsconfig or jsconfig with the default include does NOT fix this layout, because TypeScript's include wildcards skip dot-directories such as .claude (case C); an explicit .claude include is required (case B). Upstream typescript_language_server.py _find_representative_source_file only triggers project loading from tsconfig.json or .ts/.tsx files, and agent-lab has none. Serena's own filtering is not the cause: with include_file_symbols=True, a reference with no containing symbol falls back to a File symbol instead of being dropped (4 of the 9 references in case B came through that fallback).",
+     "CHECK_3 design caveat for future runs: a correctly configured Serena returns 9 entries (8 call sites plus the line-5 import via the File-symbol fallback), not 8. The count-equality criterion would therefore still FAIL on a working setup. Compare call-site line sets (tool must cover the baseline) instead of counts. The current FAIL is still genuine (2 < 8).",
+     "Minor protocol points, not refuting: answer.txt (mtime 1790383768) was written after baseline.txt (1790383706) and check.txt (1790383759). It also includes one fact from outside the tool output ('even though that file imports summarizeRun'), which is true (line 5). The core answer (definition at line 241 1-based, 2 references in the same file) follows from tool-output.txt alone. tool-output.txt was written at 1790383740, after the baseline, but it equals the transcript's tool_result.",
+     "Side effects: my three MCP calls wrote nothing (no file under agent-lab/.serena is newer than verify/state-before.txt). The probe ran with solidlsp_dir, project_data_path and TMPDIR all inside verify/; no file in serena-home, the serena venv or agent-lab/.serena is newer than the probe's start marker. agent-lab git status is identical to the 15-line initial snapshot. All evidence is in ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/serena/verify/ (412K). The probe's symlink to the TS install and its temp files were removed afterwards; re-running lsp_probe.py recreates them."
+    ]
+   }
+  },
+  {
+   "tool": "socraticode",
+   "component_id": "socraticode",
+   "channel": "native MCP in this subagent",
+   "worked_in_subagent": true,
+   "task": "Using SocratiCode MCP codebase_search against the already-indexed projectPath ~/code/native-agent-stack-live, answer how the host request lane decides GitHub-request trust, naming the author_association and user.type conditions; verify against a shell-redirected baseline never read into context.",
+   "answer_excerpt": "fallback_guard() resolves the installed client's real path (readlink -f, falling back to the given path) then runs: `grep -a -q -E '![A-Za-z_$][A-Za-z0-9_$]*\\.CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK&&' \"$real\"`. If that regex matches (the guard is present), it prints a \"still reads CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK\" message and returns 0; if it does not match, it prints a \"NOT FOUND\" message and returns 3.",
+   "quality_check": {
+    "passed": true,
+    "output": "PASS: the exact regex literal from answer.txt appears byte-for-byte in baseline.txt; baseline's own structural order holds; the FOUND_RETURN=0 / NOT_FOUND_RETURN=3 mapping in answer.txt matches the source."
+   },
+   "baseline_kind": "check_ground_truth",
+   "upstream_stats_reported_by_worker": "No token-savings/byte-filter counter applies to SocratiCode (a semantic-retrieval MCP tool, same category as ai-memory); the nearest observable signal is codebase_status' own chunk/graph counts, confirmed unchanged before and after (green, 1,974 chunks, graph 145 files / 89 edges).",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 227,
+    "baseline_bytes": 703,
+    "baseline_sha256": "7fea06884a7a46aa71f266213013a07b27053db4c45156b305e695b7daf34b4d",
+    "tool_output_tokens": 1949,
+    "tool_output_bytes": 7416,
+    "tool_output_sha256": "5670f4feabaed1bf4e5f22cddddd6a5a3e1dab02bccd40e91fb1822b45c7d396",
+    "tokens_removed": -1722,
+    "reduction_percent": -758.6,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 socraticode: check_passed=True verifier=confirmed; question: Adapted from the reference task (whose subject -- how a host-request lane decides GitHub-request trust via author_association/user.type -- exists only in the un-indexed, read-only nas-e2e-R catalog worktree, not in agent-lab): using SocratiCode MCP codebase_search against the already-indexed project",
+    "recorded_at": "2026-09-26T01:16:48.853018+00:00"
+   },
+   "deviations_from_reference": [
+    "Project path changed from ~/code/native-agent-stack-live (not indexed on this host) to ~/code/agent-lab. The reference question's exact subject (a host-request lane's GitHub-trust decision) has no match in agent-lab; retargeted to an equally precise, present, indexed decision function (fallback_guard()) that preserves the reference task's spirit."
+   ],
+   "verifier": {
+    "verdict": "confirmed",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "Check reproduced. I wrote an independent check, verify/verify_check.py (sha256 2d9e7df4...). It derives the expected facts from the structure of baseline.txt and passes with exit 0 (verify/verify-check.txt). The facts are: the regex literal ![A-Za-z_$][A-Za-z0-9_$]*\\.CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK&&; a match prints the 'still reads' message and returns 0; no match prints the 'NOT FOUND' message and returns 3; the path is resolved with readlink -f \"$claude_bin\". These facts are identical in baseline.txt, the raw SocratiCode top hit and answer.txt.",
+     "The check is not vacuous. Four wrong answers (swapped returns, regex without &&, changed NOT FOUND message, realpath instead of readlink) all fail on the expected check (verify/mutants/).",
+     "Baseline reproduces byte for byte. A fresh raw 'rtk proxy grep -n -A 12 ^fallback_guard()' gives verify/baseline-rerun.txt with sha256 7fea0688..., the same as baseline.txt. The source file tools/compare/effort/max-ultracode-probe.sh is committed and clean (last commit 2ce7d8b).",
+     "The producer's own check, re-run raw with rtk proxy, exits 0 and its output is byte-identical to check.txt (verify/producer-check-rerun.txt). The report said the script was under pairs/socraticode/, but it is actually in the session scratchpad: /tmp/claude-1000/-home-<user>-code-agent-lab/[redacted]/scratchpad/check_socraticode.py.",
+     "The channel was genuinely used. The producer transcript (e2e:socraticode's own transcript (this workflow run)) records a native mcp__socraticode__codebase_search call at 2026-09-26T00:45:31Z with the exact query, limit 5 and minScore 0. The raw result the harness recorded (9304 chars, sha256 8c707fa0...) is byte-identical to my own re-run of the same call through the ToolSearch-loaded schema at 00:56:44Z (verify/producer-raw-search-result.txt and verify/verifier-raw-search-result.txt). Both return the same 5 hits in the same order with the same scores (1.0000, 0.3958, 0.3333, 0.2935, 0.2833). The raw top hit (max-ultracode-probe.sh lines 87-105, score 1.0000) matches committed source lines 87-105 byte for byte.",
+     "The answer came only from the tool's own output. The producer's brief never mentions fallback_guard, the regex or max-ultracode-probe. It first saw the function body in an earlier SocratiCode search (#11 at 00:43:28Z, where the fallback_guard chunk scored 0.5588). No Read or grep result before the answer contained the function body, and the baseline redirect showed only its exit code, line count and byte size. Caveat: the final query reused the function's own comment wording after #11 had surfaced it, so the 1.0000 hit confirms a known location rather than being a blind discovery.",
+     "Caveat on tool-output.txt (7416 bytes): the producer typed it out with the Write tool; it is not a raw capture. It abridges lower-ranked hits 2, 4 and 5 without saying so (4, 5 and 16 raw lines dropped, with one docstring shortened to '...'), and it ends with a stray '</content>' line (answer.txt has the same). The top hit, which is the only one the answer uses, and every hit's path, line range and score are exact. The raw capture is now saved at verify/producer-raw-search-result.txt.",
+     "Minor flaw in answer.txt: its 'REGEX:' field has backslash-escaped brackets, which would be a different pattern as a regex. The grep command line quoted in the same answer is exact, and all the checks use that one.",
+     "The retargeted question was allowed. The producer's brief says 'SocratiCode: use projectPath ~/code/agent-lab'. ~/code/native-agent-stack-live does not exist on this host. codebase_list_projects shows only agent-lab (171 files) and one worktree subfolder (semantic-rag-corpus). author_association has 0 hits in agent-lab and 5 files in nas-e2e-R. So this confirms SocratiCode end to end on this host with a substitute question, not the original reference question.",
+     "The producer's INCLUDE_DOT_FILES explanation holds up against the installed upstream SocratiCode 1.14.0 (github.com/giancarloerra/socraticode, at ~/.local/share/codex-ecosystem/tools/socraticode-1.14.0). In dist/services/indexer.js getIndexableFiles, the file glob includes dot-paths only when INCLUDE_DOT_FILES is true. In dist/services/code-graph.js the walk() function descends into dot-directories, and the upstream comment at lines 825-829 calls files under a dot-directory 'a separate, pre-existing divergence'. .mcp.json sets INCLUDE_DOT_FILES=false. So .claude/** shows up in the code graph and symbols but not in the search index, which is why codebase_search cannot return .claude/workflows/child-usage.mjs. The raw results confirm both fileFilter searches returned 'No results found' and codebase_symbols returned 25 symbols including summarizeChild@120.",
+     "Minor, non-material errors in the report: its command log paraphrased the two fileFilter query strings, left out call #13 (the unfiltered 'resolved model outside requested family' search, limit 8), and listed 3 nas-e2e-R files where there are 5.",
+     "No side effects. SocratiCode status was identical before and after my calls (green, 1974 chunks, graph 145 files/89 edges, same last incremental update; only the elapsed seconds changed). The pair files' hashes are unchanged. In agent-lab, tools/ and .claude/ show only the two untracked files that were already there. nas-e2e-R is clean. Everything I wrote is under pairs/socraticode/verify/.",
+     "The report's counter_expected_to_move is about how a future manifest will count tools; I did not verify it. No bytes-saved counter applies to SocratiCode here."
+    ]
+   }
+  },
+  {
+   "tool": "ai-memory",
+   "component_id": "ai-memory",
+   "channel": "native MCP in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove the ai-memory MCP tool works inside an Ultracode subagent on real repo work: load its deferred schema via ToolSearch, call memory_status and memory_query (workspace=\"local\", project=\"native-agent-stack\", query=\"workstation host request lane GitHub\") against the running server (reported v2.4.0), save only the tool-returned text to W/tool.txt (heredoc, never read into context beforehand), leave W/base.txt empty per instructions (no savings counter exists for this tool), then answer from tool",
+   "answer_excerpt": "(1) Per memory_status(workspace=\"agent-lab\", project=\"agent-lab\"): pages_latest=206, pages_all=619, sessions=314, observations=446598 (at call time). (2) Per memory_query(...,query=\"cached input percentage token savings\"): the top-ranked durable wiki page (agreed by both the FTS and vector streams) is gotchas/prompt-cache-is-not-token-savings.md, \"Prompt-cache share is not the same as net token savings\" -- a high cached-input percentage only describes how the provider's billing classified the input tokens; it does not by itself show lower total tokens, cost, or better task efficiency.",
+   "quality_check": {
+    "passed": true,
+    "output": "9/9 deterministic sub-checks PASS: pages_all, pages_latest and sessions matched memory_status exactly against independent COUNT(*) queries on ai-memory's own SQLite store; observations differed by +325 because it is a live, monotonically increasing counter (expected and checked as monotonic, not exact-equal)."
+   },
+   "baseline_kind": "check_ground_truth",
+   "upstream_stats_reported_by_worker": "observations -- memory_status's live, monotonically increasing counter fed by this multi-session host's ongoing lifecycle-hook capture; it moved 446,598 -> 446,923 (+325) in about a minute of wall time between the tool call and the later baseline sample, as expected on a shared host, as originally reported. [Verifier correction: the tool-call-to-baseline gap was actually about 4 minutes (00:48:45Z to 00:52:44Z), not about a minute; separately, this is one observed step in a counter that kept climbing well past that snapshot (448,166, then 448,198, within roughly the next 15 minutes), so +325 is not the total drift for this call, only the first one measured.]",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 488,
+    "baseline_bytes": 1703,
+    "baseline_sha256": "71722851e1ab3dafe0cdfd769a67bb709de2239743ae6ec8a51ab9b6eadfcc0a",
+    "tool_output_tokens": 2577,
+    "tool_output_bytes": 8825,
+    "tool_output_sha256": "2adc0cecda28e8ace6bf76f5a75cb4929609124eae12e1384efec7155159b892",
+    "tokens_removed": -2089,
+    "reduction_percent": -428.1,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 ai-memory: check_passed=True verifier=confirmed; question: (1) Per memory_status(workspace=\"agent-lab\", project=\"agent-lab\"), what are pages_latest / pages_all / sessions / observations? (2) Per memory_query(workspace=\"agent-lab\", project=\"agent-lab\", query=\"cached input percentage token savings\"), which durable wiki page ranks first, and what does it say a",
+    "recorded_at": "2026-09-26T01:16:46.202752+00:00"
+   },
+   "deviations_from_reference": [
+    "Scope changed from workspace=local/project=native-agent-stack to workspace=agent-lab/project=agent-lab, read directly from this project's own .ai-memory.toml. Query term changed since the reference's term is specific to the other project's content; the query actually used surfaced a real, on-topic durable wiki page."
+   ],
+   "verifier": {
+    "verdict": "confirmed",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "Channel (subagent transcript e2e:ai-memory's own transcript (this workflow run)): ToolSearch(select:mcp__ai-memory__memory_status,mcp__ai-memory__memory_query) ran at 00:45:18Z. Then memory_status and memory_query('star curation') ran at 00:48:44Z and memory_query('cached input percentage token savings') at 00:49:25Z, all with scope agent-lab/agent-lab and none is_error. All 3 blocks recorded in tool-output.txt deep-equal the raw tool_results (verify/compare-transcript-vs-tooloutput.txt). CALL 1 is byte-verbatim; CALLs 2 and 3 were re-indented only, which contradicts the file header's 'no reformatting' claim.",
+     "My own call (ToolSearch-loaded schemas, same args): memory_query returned raw text (2827 chars) byte-identical to the subagent's raw CALL 3, including fts_score -30.806764287077392 and cosine 0.5648415. memory_status returned 206/619/314 with observations 448166 (≥ 446598). Raw results were taken from my own transcript (verify/verifier-mcp-calls.json, verify/compare-verifier-call.txt).",
+     "The MCP endpoint is genuine. Claude's ai-memory entry is http://127.0.0.1:49374/mcp (~/.claude.json and agent-lab/.mcp.json), and that port is held by pid 1176305, running ~/.local/share/ai-memory-builds/2.3.2-prefix-a11c26f0/ai-memory (sha256 e26a7014…). That hash matches the reviewed v2.3.2 + PR #859 build recorded in docs/tasks/2026-09-23-local-model-alignment.md.",
+     "Upstream anchoring: akitaonrails/ai-memory tag v2.3.2 (tag eaec117, tree 353841d), crates/ai-memory-store/src/reader.rs. The four COUNT(*) queries in status_counts_for_project (L8002) and the find_workspace/find_project name lookups (L7379/L7404) equal the subagent's baseline SQL after placeholder normalization. PR #859 (merged into release/2.5) changes server.rs only for embed_query/model_identity, not the counts or scope resolution. Downloaded sources: verify/upstream/.",
+     "Re-ran the subagent's check: a byte-identical copy (verify/aimemory_check.orig.sh, sha256 6e93acd6…) gave output byte-identical to check.txt, 9/9 PASS (verify/check-rerun.txt). Regenerating its baseline read-only differs from baseline.txt only in the live raw_observations counter (446923 → 448264; verify/baseline-regenerated.txt).",
+     "Independent sandwich against the live store (mode=ro, upstream SQL; verify/db-samples.jsonl): T0 at 01:04:43Z = my MCP memory_status = 206/619/314/448166; T2 at 01:04:57Z = 206/619/314/448198. The observations timeline is monotonic: 446598 (tool, 00:48:45Z) ≤ 446923 (baseline, 00:52:44Z) ≤ 448166 ≤ 448198.",
+     "My deterministic check verify/verify_check.py passed 16/16 (verify/verify-check.txt). It covers tool-output genuineness, upstream-SQL equality, the sandwich, and the page row: agent-lab scope, is_latest=1, path/title equal to CALL 3 hits[0], stored body_sha256 equal to sha256(body) (44eed3b9…), and the CALL 2/3 snippets are verbatim prefixes of the raw 661-char body. Three negative controls (a count altered in tool-output, the answer's observations off by 1, the top-hit title altered) each FAIL as expected (verify/negctl/negctl-results.txt).",
+     "The answer follows from the tool output. A1 (206/619/314/446598) equals the CALL 1 counts. A2's id [redacted], path gotchas/prompt-cache-is-not-token-savings.md and title equal CALL 3 hits[0] with fts_rank=1 and vector_rank=1. Imprecision: A2's content details come from the CALL 2 snippet of the same page id, because the CALL 3 snippet is truncated, yet answer.txt says A2 derives from CALL 3. The answer also paraphrases 'provider accounting' as 'provider's billing'. Neither is a factual error.",
+     "Protocol: answer.txt was written at 00:51:19Z, before the first baseline run at 00:51:48Z, and was never edited. The command before the tool calls (00:48:03Z) dumped only schema, no counts. Undisclosed deviation: the subagent Read baseline.txt at 00:51:54Z and 00:52:47Z before writing its check. That conflicts with the computed task's 'read ONLY the tool's output' and meant its observations invariant (baseline ≥ tool) was chosen after seeing the values. It did not affect the answer, and my independent sandwich confirms exact tool/DB agreement.",
+     "Disclosed deviations were verified as stated. The scope agent-lab/agent-lab was explicitly ordered in the subagent's computed task. The reference query was replaced, and the second query was picked after seeing CALL 2's top hit. The baseline is non-empty although the reference said to leave it empty; it is anchored on upstream SQL. The ai-memory-retrieval skill was not loaded. Minor narrative error: the report says '+325 in roughly a minute', but the actual tool→baseline gap was about 4 minutes (00:48:45Z → 00:52:44Z).",
+     "Side effects: my single sanctioned memory_query triggers upstream spawn_access_bump (access counters on the 3 returned pages), as the subagent's calls did. The host's hooks automatically capture my tool calls as observations. All SQLite reads were mode=ro and the gh api calls were read-only. Writes went only to ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/ai-memory/verify/ (sealed in verify/SHA256SUMS, 42 files). The four pair files are unchanged (mtimes 00:51:07–00:53:33Z)."
+    ]
+   }
+  },
+  {
+   "tool": "repomix",
+   "component_id": "repomix",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Pack R/scripts/host_requests.py and R/scripts/credential_status.py with repomix (--include, --compress, --style xml, --output W/tool.txt), read only tool.txt, answer the top-level function names in host_requests.py, and verify each against a shell-redirected baseline (W/base.txt) never read into context.",
+   "answer_excerpt": "From tool-output.txt alone: 53 total def/class lines appear for host_requests.py (--compress strips indentation, so nesting isn't visible from whitespace). Classified 5 as classes and 6 defs as methods via the `self`-as-first-parameter signal, both excluded since the question asks for functions -- leaving 47 names. (One further top-level function, status_body, is silently absent from the pack itself; see retained_failures_and_gaps.)",
+   "quality_check": {
+    "passed": false,
+    "output": "FAIL. baseline.txt's `grep -n '^def '` ground truth has 48 top-level function lines; answer.txt (derived only from the compressed pack) has 47. Exact and only difference: `status_body` is present in baseline.txt, absent from answer.txt."
+   },
+   "baseline_kind": "check_ground_truth",
+   "upstream_stats_reported_by_worker": "This session's `rtk session` row (Cmds=3,050, RTK-filtered=767, 25% adoption); repomix itself has no savings counter of its own, only its own printed Pack Summary (2 files, 8,799 tokens, 33,331 chars for the pair packed).",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 741,
+    "baseline_bytes": 2708,
+    "baseline_sha256": "35624936da920337849bd445fc92da2f562fc96ab00b6ec04ae39660ee600c60",
+    "tool_output_tokens": 8799,
+    "tool_output_bytes": 33873,
+    "tool_output_sha256": "439c67e816ce95568f9baf99c2982581221fee8e7ed114c50b60f338ed6f21d7",
+    "tokens_removed": -8058,
+    "reduction_percent": -1087.4,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 repomix: check_passed=False verifier=confirmed; question: What are the top-level (module-scope) function names defined in scripts/host_requests.py, answered only from repomix's --compress --style xml pack of it (plus scripts/credential_status.py)?",
+    "recorded_at": "2026-09-26T01:16:48.155310+00:00"
+   },
+   "deviations_from_reference": [
+    "Used this host's mandated file names (baseline.txt/tool-output.txt/answer.txt/check.txt) rather than the reference-tasks.json entry's own shorthand W/base.txt/W/tool.txt -- same 4-file method, just the host's naming."
+   ],
+   "verifier": {
+    "verdict": "confirmed",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "The verdict 'confirmed' confirms the reported FAIL (check_passed=false). It does not mean repomix passed. repomix 1.18.1 --compress silently left the top-level function status_body out of the pack, so the answer taken from the pack has 47 names while the real file has 48.",
+     "The tool channel is genuine. I re-ran the same command with the same installed repomix 1.18.1 (~/.local/share/codex-ecosystem/tools/repomix-1.18.1), with TMPDIR and NODE_DISABLE_COMPILE_CACHE=1 keeping its writes inside verify/. It exited 0 and reported 2 files, 8,799 tokens and 33,331 chars. ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/repomix/verify/tool-output.rerun.txt is byte-identical to tool-output.txt (sha256 439c67e816ce95568f9baf99c2982581221fee8e7ed114c50b60f338ed6f21d7). The source worktree R (~/code/nas-e2e-R, detached at 9a8257cd) was clean before and after.",
+     "The check reproduced two ways. (a) Re-running the original scratchpad check_repomix.py gave exit 1, with output byte-identical to check.txt. (b) My own check, verify/check_verify.py, gave exit 1 with only_in_baseline=['status_body'] and only_in_answer=[]. The ground truth was checked three ways: the recorded baseline.txt is byte-identical to my re-run of the same grep, and Python's ast parser finds the same 48 module-scope functions (none async).",
+     "The answer follows from the tool output. The host_requests.py section of the pack has 53 def lines; removing the 6 whose first parameter is self leaves exactly answer.txt's 47 names, in the same order. The ast parser confirms those 6 are the file's only methods and that there are no other nested functions. One small wording slip in the report: '53 total def/class lines' is really 53 def lines plus 5 class lines.",
+     "Root cause, checked against upstream code. In the installed lib/core/treeSitter/parseStrategies/PythonParseStrategy.js, getFunctionSignature tests the regex /def\\s+(\\w+)\\s*\\((.*?)\\)(\\s*->\\s*[^:]+)?:/ against only the def's first physical line. When that fails it returns createNullResult, so the whole def is dropped. The stray 'lines = [MARKER...' line at pack L561 comes from a separate query capture for assignments. Applying that regex to all 54 defs in the file predicts exactly ['status_body'] dropped, which matches what was observed. Upstream src/core/treeSitter/parseStrategies/PythonParseStrategy.ts is identical in v1.18.1 (the latest release, 2026-09-21) and on main at 3fe3447785ac (2026-09-23); it last changed on 2025-11-24 (3fafe71d4aa4). Upstream's tests/core/treeSitter/parseFile.python.test.ts covers only single-line signatures. My gh searches of upstream issues and PRs found no report of this.",
+     "The gap is wider than the report says. The same pack also drops the top-level function inspect from credential_status.py (a 2-line signature at source line 357; its stray 'entries = [inspect_entry(...' line is at pack L258). I also ran the installed binary on a small test file, verify/fixture/mod.py. It dropped every multi-line signature I tried, with no marker: the Black/ruff style 'def f(\\n a,\\n) -> None:', a signature split after '*,', a split signature with no return type, and a split method signature. Single-line defs and an async def were kept.",
+     "A peer session made a mistake. The workstation reference receipt (~/code/native-agent-stack-token-practice-review/evidence/artifacts/token-e2e-ultracode-20260925/receipt.json, PR #296) records repomix as passed ('count=47 PASS') on this same task, with the same pack stats (8,799 tokens, 33,331 chars). Its check only confirmed that each answered name exists in the baseline, which cannot catch missing names. This host's answer also passes that weaker test (all 47 names are real) but fails on completeness (48 real). This host's full name-set comparison is the right test for 'what are the names', so the workstation PASS should be treated as a false pass. Its tool_output_sha256 (0ca00c22...) differs from this host's (439c67e8...) even though both files are 33,873 bytes; I did not look into why.",
+     "The report's claim that output went only to tool-output.txt is incomplete. The original run also wrote repomix's token-count cache under /tmp/repomix/cache (token-counts.json plus a seen/ marker) and Node's compile cache at /tmp/node-compile-cache/v24.21.0-x64-964aae3f-1000, which bin/repomix.cjs turns on. All three are stamped 2026-09-25 20:46:54 -0400, matching the pack. These are only host temp caches; R and the pair files were not touched. My re-runs wrote only under verify/, and those /tmp timestamps did not change.",
+     "Not re-measured: the rtk session counters (a shared session row that keeps moving, and not about repomix itself), and the claim that pairs/repomix did not exist before the run. My verification did not change the pair files; their sha256 values still start with 9397dc34 (answer), 35624936 (baseline), 6e95b584 (check) and 439c67e8 (tool-output).",
+     "All verifier files are under ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/repomix/verify/: check_verify.py, check.verify.txt, check.original-rerun.txt, baseline.regen.txt, tool-output.rerun.txt, rerun.log, fixture/mod.py, fixture-output.txt, fixture-run.log, upstream/PythonParseStrategy.v1.18.1.ts, upstream/PythonParseStrategy.main.ts, upstream/parseFile.python.test.ts, and tmp/ (the contained repomix cache)."
+    ]
+   }
+  },
+  {
+   "tool": "toon",
+   "component_id": "toon",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove the toon CLI (encode JSON->TOON with --stats, then strict decode TOON->JSON) works end-to-end inside this subagent on a real tabular array pulled from the native-agent-stack repo, with only toon's own output entering context and a deterministic PASS/FAIL check against a redirect-only baseline.",
+   "answer_excerpt": "Yes, end-to-end, using only toon's own output. catalogs/foundation/manifest.json's .layers array (20 rows x 7 string columns) from the read-only detached catalog worktree was auto-detected as uniform and encoded to one tabular TOON block (14,341 bytes). `toon -e --stats` reported ~4003 (JSON) -> ~3436 (TOON) estimated tokens (-14.2%), and `toon -d --strict` decoded it back to exactly the original 20 rows with no data loss.",
+   "quality_check": {
+    "passed": true,
+    "output": "[1] round-trip correctness: PASS, baseline rows=20 == decoded rows=20. [2] strict-decode exit code 0: PASS. [3] TOON body (14,341B) smaller than the compact-JSON baseline (15,998B) by 1,657 bytes (10.36%) as originally reported here. OVERALL: PASS. [Verifier correction: the raw byte delta is actually 1,656 B (10.35%) -- toon emits 14,342 B and 16,959 B including trailing newlines that this check's shell capture had stripped from each before counting.]"
+   },
+   "baseline_kind": "counterfactual_raw",
+   "upstream_stats_reported_by_worker": "No lifetime/session counter file exists for toon; the measurement this run contributes is toon's own `--stats` delta for this one fixture: ~567 estimated tokens saved (-14.2%) and 1,657 raw bytes saved (10.36%) for the compact-JSON-vs-TOON comparison, as originally reported. [Verifier correction: the raw byte figure is 1,656 B (10.35%); see the quality_check.output annotation for the reason.]",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 2911,
+    "baseline_bytes": 15998,
+    "baseline_sha256": "ae7b4da21ee246e19ac88cb4a1a35aa005954e5a9048a0696e8936e80f4cbfba",
+    "tool_output_tokens": 6172,
+    "tool_output_bytes": 31936,
+    "tool_output_sha256": "6f9089198ee6d83190f5d151d904f33409594e4d70d8b4c17ba34e5eee854bbe",
+    "tokens_removed": -3261,
+    "reduction_percent": -112.0,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 toon: check_passed=True verifier=confirmed; question: Does the toon CLI (encode JSON->TOON with --stats, then strict decode TOON->JSON) work end-to-end on a real tabular array from the native-agent-stack repo, and is TOON or compact JSON smaller?",
+    "recorded_at": "2026-09-26T01:16:49.045006+00:00"
+   },
+   "deviations_from_reference": [
+    "reference-tasks.json names no specific fixture for toon beyond 'a real tabular array'; instantiated it as catalogs/foundation/manifest.json's .layers array (20 rows, 7 uniform string columns) from the read-only detached catalog worktree, chosen after scanning about 15 candidate uniform arrays for a genuinely flat, real table of reasonable size."
+   ],
+   "verifier": {
+    "verdict": "confirmed",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "The independent verifier passed all 36 checks with 4 notes (exit 0). Script: ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/toon/verify/verify.py. Report: ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/toon/verify/verify-report.txt. Artifact hashes: verify/SHA256SUMS. The first run, whose 3 FAILs were my own exact-number assertions that came out 1 byte off, is kept as verify/verify-report.run1.txt.",
+     "The channel is genuine. Re-running the installed toon gave byte-identical output for every recorded section: --version (4.1.1), the TOON body (sha256 bac654fa18d199aa...), the --stats stderr banner (~4003 JSON -> ~3436 TOON, saved ~567, -14.2%) and the strict-decoded JSON (sha256 17fc15b6bc8c8c23...). A literal pipe and a file input both decoded with exit 0 to the same bytes.",
+     "The upstream anchor holds. ~/.local/share/codex-ecosystem/bin/toon points to @toon-format/cli 4.1.1. Its dist/index.mjs, bin/toon.mjs and package.json are byte-identical to the npm registry tarball, and the tarball's SRI matches both the lockfile and the registry metadata. 4.1.1 is the npm latest dist-tag and has SLSA provenance attestations. GitHub toon-format/toon release v4.1.1 (2026-08-05) is the latest release.",
+     "The baseline is real repo data. baseline.txt is byte-identical to `jq -c .layers` of catalogs/foundation/manifest.json in both the clean detached worktree ~/code/nas-e2e-R and origin/main. The manifest blob is 210914e2, the same as in the canonical checkout. It holds 20 rows with 7 string columns in the claimed order and is 15998 B including jq's trailing newline.",
+     "The round trip passes a stricter test than the subagent used. Their check compared jq -S sorted-key JSON. `jq -c .` of the decoded output is byte-identical to baseline.txt without sorting, and the key order in every row is preserved.",
+     "Strict decode is actually enforced. As negative controls, a [21] header over 20 rows and a [20] header over 19 rows both exit 1 ('Expected N tabular rows, but got M'), while --no-strict accepts the 19-row input. The comparator also catches a 1-character mutation.",
+     "The token metric is valid for this comparison. Upstream source (installed dist lines 2658-2680 and GitHub v4.1.1 packages/cli/src/conversion.ts) shows --stats estimates JSON tokens from the raw input text using the tokenx heuristic. The input here was the compact baseline, so -14.2% compares TOON to compact JSON. These are heuristic estimates, not real tokenizer counts. The banner goes to stderr (console.error), as the subagent reported.",
+     "Correction: the raw-byte delta is 1656 B (10.35%), not 1657 B (10.36%). toon emits 14342 B for the TOON output and 16959 B for the decoded JSON, each including a trailing newline. toon-run.sh lines 14-15 counted the text after `$(...)` had stripped that newline, giving 14341 and 16958. toon-check.sh line 59 counted baseline.txt with its newline (15998). Compared like for like, the delta is 1656 B either way. TOON is still smaller by raw bytes.",
+     "Minor description gap: the tool-output header says `toon -e BASELINE | toon -d --strict -`. toon-run.sh line 24 actually decoded `printf '%s' \"$ENCODE_BODY\"`, the newline-stripped captured text. A true pipe and a file input give byte-identical results, so the outcome is the same.",
+     "Minor imprecision in answer.txt: it says toon quotes only fields that contain the delimiter. One field (hosting-services next_gap) is quoted because it contains a colon and no comma. Upstream isSafeUnquoted also quotes on ':', quote characters, brackets, and a leading '-' or '#'. No unquoted field contains ',' or ':', so the encoding is unambiguous.",
+     "Process observation: answer.txt was modified 31.3 s after check.txt, although it describes check.txt as a later confirmation. The answer contains no figure derived from the baseline and defers the byte comparison to check.txt, so no leak of the baseline into the answer is visible. Every figure answer.txt quotes appears in tool-output.txt.",
+     "Nothing changed outside verify/. The sha256 of answer.txt, baseline.txt, check.txt and tool-output.txt is unchanged, and nas-e2e-R is still clean. I read the original toon-check.sh but did not run it, because it rewrites check.txt; I re-derived its check independently instead. The only network access was read-only: npm registry metadata and tarball (saved in verify/) and the GitHub API."
+    ]
+   }
+  },
+  {
+   "tool": "ast-grep",
+   "component_id": "ast-grep",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove ast-grep works end-to-end inside this subagent on real repo work: use `ast-grep run --lang python --pattern 'subprocess.run($$$ARGS)' scripts/ --json=compact` to find every subprocess.run call in R/scripts/*.py, save tool output to W/tool.txt (redirect only), build an independent baseline (cat of matching files) into W/base.txt (redirect only, never read), answer call-count+files from the tool output alone, then run one deterministic PASS/FAIL quality check against the baseline.",
+   "answer_excerpt": "20 subprocess.run(...) calls across 11 files in R/scripts/*.py: adoption_status.py (2), build_ecosystem.py (1), credential_status.py (1), freshness_propose.py (3), hardware_profile.py (1), host_receipts.py (3), release_due.py (1), saturation_ledger.py (3), skills_status.py (1), validate.py (2), verdict_review_gate.py (2). Derived solely from the real ast-grep 0.45.3 binary's own compact-JSON output.",
+   "quality_check": {
+    "passed": true,
+    "output": "CHECK A (tool match count 20 == independent literal-substring occurrence count 20 over the raw files): PASS. CHECK B (tool's 11-file set == independent `grep -rl` file set): PASS. OVERALL: PASS."
+   },
+   "baseline_kind": "counterfactual_raw",
+   "upstream_stats_reported_by_worker": "No ast-grep-specific savings/usage counter analogous to rtk's own filtered-command ledger exists; this run's leaf commands (ast-grep, grep, cat) were all wrapped in `rtk proxy` specifically to avoid mixing rtk's own compaction into an ast-grep-attributed number.",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 112899,
+    "baseline_bytes": 489320,
+    "baseline_sha256": "f09e3a2e2d538eb81a449e9d06dd481cf724d8f014c8bd3834d101f6e1901ebc",
+    "tool_output_tokens": 11508,
+    "tool_output_bytes": 39103,
+    "tool_output_sha256": "b1e5017f745533c74d4da839811795248b74b4aa89a6f88d721d7db158a6b2c6",
+    "tokens_removed": 101391,
+    "reduction_percent": 89.8,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 ast-grep: check_passed=True verifier=confirmed; question: How many subprocess.run(...) calls exist under R/scripts (the read-only native-agent-stack catalog worktree at ~/code/nas-e2e-R, detached HEAD at commit 9a8257cd), and in which files, per the real ast-grep tool's own output?",
+    "recorded_at": "2026-09-26T01:16:46.462046+00:00"
+   },
+   "deviations_from_reference": [
+    "Renamed W/tool.txt -> tool-output.txt and W/base.txt -> baseline.txt per this host's path/naming adaptation. Wrapped every leaf invocation (ast-grep, grep, cat) in `rtk proxy` after confirming the PreToolUse hook would otherwise rewrite them into RTK's own compacting equivalents, which the host's own instructions call for running raw where a filter would hide output."
+   ],
+   "verifier": {
+    "verdict": "confirmed",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "The answer matches the tool output. tool-output.txt (39103 B, sha256 b1e5017f...) parses as 20 ast-grep compact-JSON matches across 11 files. Its per-file counts equal answer.txt and the reported answer exactly: adoption_status 2, build_ecosystem 1, credential_status 1, freshness_propose 3, hardware_profile 1, host_receipts 3, release_due 1, saturation_ledger 3, skills_status 1, validate 2, verdict_review_gate 2.",
+     "The original check reproduces exactly. I ran a redirected copy of the subagent's own checker (it survives only at /tmp/claude-1000/-home-<user>-code-agent-lab/[redacted]/scratchpad/ast_grep_check.py). Its deleted input .matching-files.tmp was replaced by a fresh /usr/bin/grep -rl list. It regenerated check.txt byte-identical (sha256 bf1a6bd2...), giving CHECK A 20==20 PASS and CHECK B PASS.",
+     "My own checker (verify/verify_check.py) passed 16 of 16 checks. CPython's ast parser finds exactly the same 20 (file, start_byte, end_byte) ranges as ast-grep, with 0 parse errors across 29 Python sources. All 20 ast-grep byteOffset ranges slice the worktree files to exactly the reported text. A raw-byte scan of all 34 files under scripts/ (including the ignored .pyc files, the .cjs file and git-hooks/pre-commit) finds the literal only in the same 11 files with the same counts. No aliased imports exist (from subprocess import run, or import subprocess as X).",
+     "The baseline is exactly what was claimed. baseline.txt (489320 B, sha256 f09e3a2e...) splits byte-for-byte into the 11 files in grep -rl order, each used once with nothing left over. All 11 files hash to their git blobs at HEAD 9a8257cdca75 (detached, no tracked changes). The literal count over baseline.txt is 20, and the CPython-ast count over its segments is also 20.",
+     "The tool channel is genuine. The ast-grep link resolves to .../tools/ast-grep-0.45.3/lib/node_modules/@ast-grep/cli/ast-grep, a real ELF reporting 'ast-grep 0.45.3' (sha256 7a5ab301...). It is byte-identical to package/ast-grep in the upstream npm tarball @ast-grep/cli-linux-x64-gnu@0.45.3 from github.com/ast-grep/ast-grep; the registry sha512 integrity and sha1 shasum both verified, and the sg binary matches too. Record: verify/upstream-npm-provenance.json.",
+     "I re-ran the recorded command two ways: through rtk proxy (verify/rerun-rtk-proxy.json) and directly from Python against the ELF with no RTK in the path (verify/rerun-direct.json). Both exited 0 with empty stderr and 39103 B, and returned 20 match objects identical field-for-field to the recorded output after sorting.",
+     "The re-runs are not byte-identical to the recorded file, and that is expected. ast-grep's parallel file walker emits files in a different order each time: 5 extra direct runs gave 5 distinct file orders. Length and byte multiset are the same, and the contents are identical once the order is normalized.",
+     "One claim in the report's reasoning is overstated. rtk rewrite does confirm that the hook turns a bare 'ast-grep run' into 'rtk ast-grep' (and grep into 'rtk grep'). But under RTK 0.50.0, 'rtk ast-grep ... --json=compact' passed the same 20-object JSON through unchanged (verify/rtk-filtered-variant.txt, equal after sorting). So the 'compacting/group-by-file' rewrite does not happen for this call; rtk proxy was harmless rather than required for ast-grep. This does not change the result.",
+     "Worktree state. ~/code/nas-e2e-R has an ignored scripts/__pycache__/ directory (3 .pyc files) created 2026-09-25 20:45:45 -0400, before the 20:52 ast-grep run, so this subagent did not create it; it contains no literal hits. The report's claim that 'git status --porcelain=v1' is empty is accurate, since that command excludes ignored files. The report's commands use shortened relative redirect paths (for example '> pairs/ast-grep/tool-output.txt 2>stderr.txt' after cd into the worktree) that cannot have been run literally, because no stray files exist in the worktree. This is imprecise wording in the report only.",
+     "Counters. ast-grep has no usage counter of its own. The subagent said it took no pre-run snapshot, but the coordinator's state-root before-rtk-gain.json (total_commands 90775 at 2026-09-26T00:38Z) does exist. Because RTK's ledger is host-wide and shared across sessions, neither snapshot is per-tool evidence, which agrees with the subagent's conclusion.",
+     "Retention gap. The pair directory keeps neither the original checker script nor its .matching-files.tmp input. verify/ now holds a runnable copy (original_check_rerun.py), grep-rl.txt and check-rerun-original-script.txt.",
+     "Evidence class: actual tool execution on real repository content, plus an upstream registry provenance check. No synthetic fixture was used.",
+     "Side effects. I wrote only under ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/ast-grep/verify/. The sha256 of answer.txt, baseline.txt, check.txt and tool-output.txt is unchanged from the start. Creating verify/ bumped the pair directory's mtime, my rtk proxy calls were added to RTK's host-wide usage ledger, and the npm tarball was downloaded into memory only."
+    ]
+   }
+  },
+  {
+   "tool": "context-hub",
+   "component_id": "context-hub",
+   "channel": "Bash-invoked CLI (`chub search`, `chub get`); baseline via `curl -sL`",
+   "worked_in_subagent": true,
+   "task": "Rerun the context-hub (chub) token-efficiency proof with content the curated registry actually has (prior attempt: \"Anthropic prompt caching\" returned nothing). Run `chub --help`, search 2-3 likely topics, `chub get` one returned doc into W/tool.txt, fetch its cited/canonical upstream page raw via curl into W/base.txt (shell-redirect only, never read into context), answer one concrete factual question from the tool output, run one deterministic PASS/FAIL quality-check command comparing the answe",
+   "answer_excerpt": "Default automatic-retry count is 2, triggered by connection errors, HTTP 408, HTTP 409, HTTP 429, and HTTP >=500. Default request timeout is 10 minutes. (Source: chub's `anthropic/package` doc, \"## Configuration\" section, read in isolation before the upstream baseline page was fetched or viewed.)",
+   "quality_check": {
+    "passed": true,
+    "output": "Both concrete claims (retry count/conditions; timeout) were found verbatim in the untouched upstream baseline page, directly under that page's own \"Retries\" and \"Timeouts\" headings, not a coincidental keyword hit elsewhere on the page. Overall verdict: PASS."
+   },
+   "baseline_kind": "counterfactual_raw",
+   "upstream_stats_reported_by_worker": "chub's own local cache state at ~/.chub/sources/default/: \"Cached files\" 2 -> 3 and cache \"Size\" 16.2 KB -> 27.9 KB, a new file (data/anthropic/docs/package/python/DOC.md) written by `chub get`; the cache's \"Last updated\" timestamp advanced to this run.",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 259649,
+    "baseline_bytes": 761734,
+    "baseline_sha256": "5d4013a1b19eb5fbe339c8cbdacf9de7d847c58d73d329524f0317ebdad518ff",
+    "tool_output_tokens": 2980,
+    "tool_output_bytes": 12343,
+    "tool_output_sha256": "adf64097ab572861726193ed130829d3657e23302e54f1930fb01e74fa6d8d44",
+    "tokens_removed": 256669,
+    "reduction_percent": 98.9,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 context-hub: check_passed=True verifier=confirmed; question: According to context-hub's `anthropic/package` doc (chub get anthropic/package --lang py, v0.105.2): what is the Anthropic Python SDK's default automatic-retry count and which error conditions trigger it, and what is the SDK's default request timeout?",
+    "recorded_at": "2026-09-26T01:16:46.776112+00:00"
+   },
+   "deviations_from_reference": [
+    "The reference task says 'fetch its cited/canonical upstream page' (singular); tool-output.txt's doc actually cites 5 upstream sources. The first, most obvious one (a GitHub raw README) was real but too short to contain the needed detail; switched, before writing any baseline content, to the doc's own next-listed, more specific citation (the platform.claude.com SDK docs page), which did contain it, as originally reported. [Verifier correction: that citation is not 'next-listed' -- it is the doc's own first-listed citation (tool-output.txt line 405); answer.txt itself already states this correctly, only this deviation note's own wording was off. Separately: this baseline (761,734 bytes) is the raw HTML of that live page, scripts included, not isolated prose; the verifier's own check, like the worker's, was scoped to whether the two cited facts appear verbatim in that page, not to a token-savings measurement -- see retained_failures_and_gaps for how that bears on this tool's tokens_removed figure.]"
+   ],
+   "verifier": {
+    "verdict": "confirmed",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "Artifact integrity: tool-output.txt sha256 adf64097...8d44 (417 lines, 12343 B) and baseline.txt sha256 5d4013a1...18ff (761734 B) match the report. The original answer.txt, baseline.txt, check.txt and tool-output.txt re-hash unchanged after verification.",
+     "Channel is genuine (evidence class: actual tool execution against the live CDN). I re-ran the same wrapper (~/.local/share/codex-ecosystem/bin/chub -> @aisuite/chub 0.1.4, git-661f708) with CHUB_DIR set to a private empty dir under verify/. Upstream src/lib/config.js getChubDir() honours CHUB_DIR, and the package has no dist/ bundle, so registry and doc were fetched fresh from cdn.aichub.org. `chub get anthropic/package --lang py` exit 0 was byte-identical to tool-output.txt (cmp IDENTICAL, same sha256).",
+     "Search results reproduce: anthropic returns 5 hits in the reported order (anthropic/package, anthropic/claude-api, langchain/agents, litellm/package, instructor/package); stripe 3; openai 15. Registry has 1597 docs. The fresh CDN DOC.md sha256 (607d59af...) equals the cached ~/.chub copy, whose mtime equals tool-output.txt's to the nanosecond (20:52:18.8229563990), so both were written by the same `chub get` run.",
+     "The answer follows from the tool output. Every element is verbatim in tool-output.txt: lines 326-336 (retries on connection errors, HTTP 408/409/429/>=500; default count 2) and line 353 (default timeout 10 minutes). No claim in answer.txt or the reported answer goes beyond the tool output. check.py section 2 passes all 16 assertions.",
+     "The deterministic check reproduces. verify/check.py extracts rendered prose only (no script/style), and its result in verify/check-result.txt is VERDICT PASS, exit 0, on both the original baseline.txt and my independent re-fetch (verify/baseline-refetch.txt: HTTP 200, 761719 B, redirected to /docs/en/cli-sdks-libraries/sdks/python; hash differs, facts identical). The page title is 'Python SDK - Claude Platform Docs'. 'Certain errors are automatically retried 2 times by default' sits under a Retries heading with the trigger items [Connection errors, 408, 409, 429, >=500] in the same order, and 'By default requests time out after 10 minutes' sits under a Timeouts heading.",
+     "Negative control: a mutated baseline (2->3 retries, 10->5 min, 409 removed) produces 3 FAILs, exit 1, so the check discriminates. Disclosure: my first checker run (v1) failed because its regex double-counted the '500' inside '>=500 Internal'. That was a checker bug, not a content mismatch; I fixed it in v2 and kept the v1 output as verify/check-result-v1-extractor-bug.txt.",
+     "Corroborated against the upstream SDK source at the doc's pinned tag v0.105.2 and at main (raw.githubusercontent.com/anthropics/anthropic-sdk-python, src/anthropic/_constants.py and _base_client.py, saved in verify/upstream-sdk/). DEFAULT_MAX_RETRIES = 2 and DEFAULT_TIMEOUT = Timeout(timeout=10 * 60, connect=5.0). _should_retry returns True for 408, 409, 429 and >=500, and connection/timeout exceptions are retried while remaining_retries > 0. One nuance the answer omits but the question did not ask for: a server 'x-should-retry' header can override the default.",
+     "Counter move reproduces. A read-only `chub cache status` on the real ~/.chub shows 3 files, 27.9 KB, lastUpdated 2026-09-26T00:51:39.909Z. The two pre-existing DOC.md files total 16591 B (16.2 KB), consistent with the reported 2->3 files and 16.2->27.9 KB. I did not verify the rtk gain +445 delta: the counter is global and the report itself says it is not attributable.",
+     "Non-material inaccuracies in the report. (a) The reported `chub cache status` exit code 1 did not reproduce: exit 0 on both the isolated and the real dir, and the status code path has no exit(1). (b) check.txt says '>=500' appears a second time unescaped in the RSC payload; in fact both occurrences are '&gt;=500' and none are unescaped. check.txt's grep -c counts do reproduce (max_retries 4, 429 4, '10 minutes' 4). (c) check.txt gives the content type as text/plain; curl reports text/html. (d) The deviation text calls the platform page 'next-listed', but it is the first-listed citation (tool-output.txt line 405); answer.txt states this correctly.",
+     "Blindness caveat. File mtimes show baseline.txt (20:54:34) was written 30 s before answer.txt (20:55:04). check.txt says the baseline was only touched with grep -c before the answer was written. That cannot be proven from the artifacts, but it does not matter here because every answer element is verbatim in tool-output.txt. The rejected first-candidate README claim reproduces (1146 B, 55 lines, 0 hits for max_retries/408/429/Retries/Timeouts), so switching the baseline was justified, not baseline shopping.",
+     "Isolation: ~/.chub snapshots before and after are identical (verify/real-chub-before.lst == real-chub-after.lst). All writes are confined to ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/context-hub/verify/ (commands.log, check.py, check-result*.txt, negative-control-*, rerun-*, chub-home/, upstream-sdk/, SHA256SUMS). The only other home-dir change was ~/.claude.json, which is Claude Code's own client state. Scope: one doc and one question, not a token-savings measurement."
+    ]
+   }
+  },
+  {
+   "tool": "markitdown",
+   "component_id": "markitdown",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove markitdown works E2E inside an Ultracode subagent on real repository work: fetch the live Claude Code MCP docs page as an HTML baseline via curl (redirect-only, never read into context), convert it to Markdown with markitdown, answer a factual question (the three MCP installation scopes) from ONLY the tool's Markdown output, then run one deterministic PASS/FAIL check verifying that answer against the untouched HTML baseline.",
+   "answer_excerpt": "Per tool-output.txt (markitdown's Markdown conversion; the raw HTML baseline was never opened): MCP servers configure at three scopes. (1) Local (default) -- current project only, not shared, stored in ~/.claude.json, `--scope local` or omitted. (2) Project -- current project only, shared via version control, stored in .mcp.json at the project root, `--scope project`. (3) User -- all of the user's projects, not shared, stored in ~/.claude.json, `--scope user`.",
+   "quality_check": {
+    "passed": true,
+    "output": "19 of 19 deterministic PASS assertions across 4 sections: the untouched baseline contains the scope names/paths/examples; every claim in answer.txt is corroborated in the baseline; markitdown performed a real transform (the raw HTML <table> tag is gone, replaced by an equivalent Markdown pipe table) rather than a pass-through. VERDICT: PASS."
+   },
+   "baseline_kind": "counterfactual_raw",
+   "upstream_stats_reported_by_worker": "This host's lifetime/E2E-manifest counter (before-refresh.json), not a per-tool savings ratio; markitdown has no savings snapshot of its own the way rtk/ai-memory/ast-grep do.",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 505753,
+    "baseline_bytes": 1506895,
+    "baseline_sha256": "ddced6498a7e6e8765f44a8aaae6d8bd0e3f6ac9edb7ca4882dc85f47188a3c1",
+    "tool_output_tokens": 29471,
+    "tool_output_bytes": 125887,
+    "tool_output_sha256": "eff9d887a176776477e06b26a188373563a2d06267bac669098872dce424756d",
+    "tokens_removed": 476282,
+    "reduction_percent": 94.2,
+    "boundary": "laptop wsl-authoring-20260923 ultracode E2E wf_0893832e-937 markitdown: check_passed=True verifier=confirmed; question: From the live Claude Code MCP docs page (https://code.claude.com/docs/en/mcp, reached via both docs.claude.com and docs.anthropic.com redirects), what are the three MCP installation scopes?",
+    "recorded_at": "2026-09-26T01:16:47.758081+00:00"
+   },
+   "deviations_from_reference": [
+    "Followed this host's own baseline.txt/tool-output.txt/answer.txt/check.txt naming rather than the reference's generic W/tool.txt/W/base.txt. The reference task does not give an exact URL for 'the live Claude Code MCP docs page'; resolved it by probing HTTP status only (no body read) and confirmed both docs.claude.com and docs.anthropic.com redirect to https://code.claude.com/docs/en/mcp."
+   ],
+   "verifier": {
+    "verdict": "confirmed",
+    "reproduced_check": true,
+    "channel_genuine": true,
+    "notes": [
+     "Tool channel reproduced (real run on this host): re-running the subagent's exact command `markitdown -x .html baseline.txt -o verify/rerun-x-html.md` gives sha256 eff9d887...756d, identical to tool-output.txt. Converting a .html copy and converting from stdin (`-x html`) give the same bytes apart from the one trailing newline the CLI adds on stdout. Without the hint, markitdown passes the raw HTML through (1,506,886 bytes, 5 '<table' hits), so the reported `-x .html` deviation was necessary.",
+     "The installed tool is the current upstream release, unmodified. markitdown 0.1.8 is installed in a uv venv, and 0.1.8 is the latest release on PyPI and GitHub (v0.1.8, published 2026-09-21). All 42 package files are byte-identical to the PyPI wheel (its sha256 de7375a5... matches PyPI's digest) and to the microsoft/markitdown source at tag v0.1.8 (commit b8f79c57). pip's RECORD check passes 48/48.",
+     "Upstream's own tests, unchanged (tag v0.1.8), run against the installed package: test_html_converter.py, test_module_vectors.py, test_cli_misc.py and test_cli_vectors.py, with GITHUB_ACTIONS=1 so remote-URL tests are skipped as in upstream CI. Totals: 99 passed, 63 failed, 27 skipped. Every HTML-related test passed: 44 passed, 3 skipped (remote URLs), 0 failed. test_cli_misc passed 3/3. All 63 failures are on non-HTML inputs that need the [all] extras this base install lacks: 55 are missing-dependency errors, and 8 are test_files.zip asserting text from its docx member, which the zip converter silently skips. docx, xlsx, xls, pptx, msg and pdf conversion are therefore untested here; HTML is covered. Results are in verify/upstream-pytest.xml and verify/upstream-pytest-classified.txt.",
+     "The subagent's check reproduces: markitdown_check.sh, re-run unchanged with its temp file kept in verify/, gives 19 passed, 0 failed, VERDICT: PASS. Its output (verify/rerun-orig-check.txt) is identical to check.txt apart from the Note the subagent appended by hand.",
+     "That script is weak in two places. Section A matches a tag-stripped copy of the page that still contains the inline script payload. Section B only checks that words appear, not that each fact is attached to the right scope. I therefore also wrote verify/independent_check.py, which uses Python's standard-library HTML parser rather than markitdown's BeautifulSoup/markdownify pipeline and ignores script and style content.",
+     "Independent check result: 30/30 PASS (verify/independent-check.txt). The rendered scopes table reads Local | Current project only | No | ~/.claude.json; Project | Current project only | Yes, via version control | .mcp.json in project root; User | All your projects | No | ~/.claude.json. All three `claude mcp add ... --scope local/project/user` commands are present, as are 'Local scope is the default' and the precedence order Local > Project > User > plugin-provided servers > claude.ai connectors. markitdown's Markdown table matches the independently parsed HTML table cell for cell, and each answer claim is attached to the correct scope.",
+     "Negative controls for the independent check: all four mutated inputs fail on the intended assertions. The mutations were: answer precedence reversed, answer Project path changed to ~/.claude.json, the baseline User row edited, and the tool-output precedence list reordered.",
+     "The answer follows from the tool output. I read tool-output.txt lines 608-715 directly: every claim in answer.txt is on lines 614-707, and the line ranges it cites are accurate. Its 'in most interactive sessions' qualifier matches the exceptions listed on line 678.",
+     "The baseline is a real capture of the live page. A fresh fetch of https://code.claude.com/docs/en/mcp at 2026-09-26T01:06:56Z is the same 1,506,895 bytes and differs from baseline.txt in only 80 bytes, all of them deployment and build IDs inside the script payload. markitdown's conversion of the fresh fetch has sha256 eff9d887..., identical to tool-output.txt.",
+     "The explanation for the first run's `--scope local` failure is correct. The raw page has 0/4/6 hits for --scope local/project/user and the tag-stripped copy has 1/5/7. In the raw HTML, the syntax highlighter wraps ` --scope` and ` local` in separate `<span>` elements.",
+     "The subagent followed its process. Its transcript (e2e:markitdown's own transcript (this workflow run)) has exactly two Read calls, both on tool-output.txt (offset 610 limit 75, and offset 685 limit 30), and none on baseline.txt. Its commands on the baseline printed only file metadata, grep counts and check verdicts; its one attempt to print a small excerpt failed with a ugrep complexity error and printed nothing.",
+     "Minor inaccuracies in the subagent's report that do not change the verdict. (a) It said both old doc URLs return 302, but its probe followed redirects (`curl -L`) and printed only the final 200. The first hop is actually 301 for both docs.claude.com and docs.anthropic.com. (b) The figures labelled 'occurrences' (5/5/5/12) are `grep -c` line counts; the true occurrence counts are 8/8/8/26. (c) The 'one HTML tag between' --scope and local is in fact a closing `</span>` followed by an opening `<span>`.",
+     "Counter: before-refresh.json does say native_scopes=7 and unique_comparisons=47. The ledger (agent-lab docs/token-savings-lifetime-results.json) holds 47 comparisons with 47 unique hash ids, two of them earlier markitdown entries from 2026-09-20. The predicted move from 47 to 48 is still unverified: the regenerator has not been run, and I did not run it because it writes outside verify/.",
+     "Side effects: the four pair files still have their original hashes, and agent-lab's git status matches the session-start snapshot. My one write outside verify/ was to onnxruntime's existing cache file ~/.cache/Microsoft/DeveloperTools/.onnxruntime/onnxruntime.db (created 2026-09-18). markitdown's file-type detector runs on onnxruntime, which updates that file on every markitdown conversion, the subagent's own included. I removed my temporary caches from verify/, and verify/SHA256SUMS lists hashes for 19 evidence files."
+    ]
+   }
+  }
+ ],
+ "counters": {
+  "window_utc": [
+   "2026-09-26T00:35:58Z",
+   "2026-09-26T01:13:57Z"
+  ],
+  "rtk_version": "rtk 0.50.0",
+  "rtk_gain_global_all_sessions": {
+   "command": "rtk gain --format json",
+   "source": "captures/20260926T003558-c727fd76/rtk-global/stdout.txt (before), captures/20260926T011357-76d5ee71/rtk-global/stdout.txt (after) -- both from this run's own paired before/after capture, not a separately-timed snapshot.",
+   "before": {
+    "total_commands": 90770,
+    "total_input": 999042030,
+    "total_output": 228071863,
+    "total_saved": 774191511,
+    "avg_savings_pct": 77.49338744036625,
+    "total_time_ms": 218292029,
+    "avg_time_ms": 2404
+   },
+   "after": {
+    "total_commands": 91709,
+    "total_input": 1004334822,
+    "total_output": 232704961,
+    "total_saved": 774851215,
+    "avg_savings_pct": 77.1506870046571,
+    "total_time_ms": 219257335,
+    "avg_time_ms": 2390
+   },
+   "delta": {
+    "total_commands": 939,
+    "total_saved": 659704
+   },
+   "note": "Host-wide lifetime counter; other live sessions ran commands in the same window, so this delta (+939 commands, +659,704 saved) is not attributable to this run alone."
+  },
+  "rtk_gain_project_scoped": {
+   "before": {
+    "total_commands": 35332,
+    "total_input": 722769927,
+    "total_output": 88118865,
+    "total_saved": 634655820,
+    "avg_savings_pct": 87.80883048555506,
+    "total_time_ms": 41093066,
+    "avg_time_ms": 1163
+   },
+   "after": {
+    "total_commands": 35939,
+    "total_input": 727554936,
+    "total_output": 92259600,
+    "total_saved": 635300094,
+    "avg_savings_pct": 87.31987958088708,
+    "total_time_ms": 41497599,
+    "avg_time_ms": 1154
+   },
+   "note": "Project-scoped (agent-lab) rtk gain; still host-wide across every session bound to this project, not isolated to this run's own commands."
+  },
+  "headroom_savings_lifetime": {
+   "before": {
+    "tokens_saved": 0,
+    "tokens_before": 0,
+    "cost_usd": 0.0,
+    "calls": 0,
+    "savings_percent": 0.0
+   },
+   "after": {
+    "tokens_saved": 0,
+    "tokens_before": 0,
+    "cost_usd": 0.0,
+    "calls": 0,
+    "savings_percent": 0.0
+   },
+   "note": "Headroom's lifetime savings ledger is absent (0) on both sides. The e2e:headroom subagent reached the tool only through a private, throwaway MCPorter workspace (HEADROOM_WORKSPACE_DIR under mktemp), which is the correct isolation per this host's own instructions, but it also means the one real compress/retrieve call this task verified never wrote into ~/.headroom/savings_events.jsonl, so this lifetime counter records zero calls rather than the one real call the subagent made."
+  },
+  "jcodemunch_persistent_ledger": {
+   "before_total_tokens_saved": 59640,
+   "after_total_tokens_saved": 83215,
+   "delta": 23575,
+   "after_lifetime_by_tool": {
+    "get_symbol_source": 83215,
+    "search_symbols": 0
+   },
+   "note": "The delta (23,575) equals exactly the e2e:jcodemunch subagent's own get_session_stats session_tokens_saved for its single get_symbol_source(register_file) call, confirming the persistent ledger did capture this run's session (unlike the workstation reference, where the ledger had not yet flushed at read time)."
+  },
+  "context_mode_stats_snapshot": {
+   "before": {
+    "session_start_epoch_ms": 1790376139000,
+    "total_calls": 73,
+    "bytes_returned": 320023,
+    "kept_out": 75913646,
+    "tokens_saved_session": 18978412,
+    "tokens_saved_lifetime": 5961216
+   },
+   "after": {
+    "session_start_epoch_ms": 1790298618000,
+    "total_calls": 1906,
+    "bytes_returned": 10502811,
+    "kept_out": 8624741945,
+    "tokens_saved_session": 2156185486,
+    "tokens_saved_lifetime": 5961472
+   },
+   "note": "The before and after context-Native-Claude.json snapshots come from two DIFFERENT sessions (session_start differs: 1790376139000 vs 1790298618000), so this is not a before/after delta on one session -- each side is that session's own lifetime-to-date snapshot, not a measurement of this run's own consumption. tokens_saved_lifetime moved only +256 across the two snapshots, consistent with them being two points on the same shared lifetime counter rather than two ends of this run's window."
+  },
+  "before_aimemory_snapshot": {
+   "accepted": 71359,
+   "last_write_ago": "1m 37s",
+   "note": "before-aimemory.txt's own accepted-observations counter at run start; ai-memory's own memory_status later in the run reported observations=446598 for the agent-lab project scope specifically, a different (project-scoped) counter."
+  }
+ },
+ "workflow_consumption": {
+  "e2e_and_verify_and_probes": {
+   "workflow_run": "wf_0893832e-937",
+   "status": "complete",
+   "reason": "every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result",
+   "by_resolved_model": {
+    "claude-sonnet-5": {
+     "children": 15,
+     "input_tokens": 574,
+     "output_tokens": 663198,
+     "cache_read_input_tokens": 24263402,
+     "cache_creation_input_tokens": 1601354
+    },
+    "claude-opus-5-5": {
+     "children": 14,
+     "input_tokens": 944,
+     "output_tokens": 697167,
+     "cache_read_input_tokens": 45993657,
+     "cache_creation_input_tokens": 1650908
+    }
+   },
+   "children": 29,
+   "multi_model_children": [],
+   "efforts_recorded": [
+    "max"
+   ],
+   "note": "15 Sonnet 5 children (13 e2e:<tool> workers plus probe:source-scout and probe:isolated-builder) and 14 Opus 5.5 children (13 verify:<tool> reviewers plus probe:evidence-reviewer); every child complete with no issues."
+  }
+ },
+ "role_access_probes": {
+  "kind": "role_access_probe",
+  "note": "Not present in the workstation's PR #296 receipt; added here as a clearly-named new field. Three role-scoped subagents each tried the same lanes with their own tool allowlist (per docs/native-token-workflow.md's role routing table) to record which lanes each role can actually reach, distinct from whether the tool itself works.",
+  "roles": {
+   "source-scout": [
+    {
+     "lane": "RTK",
+     "reachable": true,
+     "called": "Bash: git status",
+     "ok": true,
+     "detail": "Ran `git status` via Bash. Returned RTK's condensed status form (branch header plus M/?? list); read-only; nothing changed."
+    },
+    {
+     "lane": "QMD",
+     "reachable": true,
+     "called": "Bash: qmd --index agent-lab-docs search 'token' -n 2",
+     "ok": true,
+     "detail": "Command returned exactly 2 hits (n=2 honored): (1) qmd://agent-lab-docs/tasks/2026-09-20-token-savings-manifest.md, Title 'Token practice and upstream evidence HTML manifest', Score 0%; (2) qmd://agent-lab-docs/tasks/2026-09-20-post-restart-token-session.md, Title 'Post-restart Codex token workflow', Score 0%. Read-only search; nothing changed."
+    },
+    {
+     "lane": "Serena find_symbol",
+     "reachable": false,
+     "called": "not called",
+     "ok": false,
+     "detail": "No Serena tool (find_symbol or initial_instructions) is present in this session's function/tool list (only Read, Bash, StructuredOutput were defined at session start). A generic 'serena' MCP instruction block appeared in context telling agents to call initial_instructions first, but no matching callable function was offered to this role, so per task instruction ('do not try to work around your allowlist') it was not attempted."
+    },
+    {
+     "lane": "SocratiCode codebase_search",
+     "reachable": false,
+     "called": "not called",
+     "ok": false,
+     "detail": "No SocratiCode tool is present in this session's function/tool list (only Read, Bash, StructuredOutput). No SocratiCode MCP instruction block appeared in context either. Not attempted."
+    },
+    {
+     "lane": "jCodeMunch order search_symbols",
+     "reachable": false,
+     "called": "not called",
+     "ok": false,
+     "detail": "A 'jcodemunch' MCP instruction block appeared in context describing route/menu/order verbs reachable via a ToolSearch lookup, but neither a jcodemunch tool nor ToolSearch is present in this session's function/tool list (only Read, Bash, StructuredOutput). Not attempted, per instruction not to work around the allowlist."
+    },
+    {
+     "lane": "Context Mode ctx_search/ctx_execute",
+     "reachable": false,
+     "called": "not called",
+     "ok": false,
+     "detail": "No Context Mode tool (ctx_search or ctx_execute) is present in this session's function/tool list (only Read, Bash, StructuredOutput), and no corresponding MCP instruction block appeared in context. Not attempted."
+    },
+    {
+     "lane": "ai-memory memory_query (scope agent-lab/agent-lab)",
+     "reachable": false,
+     "called": "not called",
+     "ok": false,
+     "detail": "An 'ai-memory' MCP instruction block appeared in context (describing workspace/project scoping rules), but no memory_query or other ai-memory tool is present in this session's function/tool list (only Read, Bash, StructuredOutput). Not attempted, per instruction not to work around the allowlist."
+    },
+    {
+     "lane": "ToolSearch (MCP schema loading)",
+     "reachable": false,
+     "called": "not called",
+     "ok": false,
+     "detail": "No ToolSearch function is present in this session's function/tool list (only Read, Bash, StructuredOutput were defined at session start), so the deferred jcodemunch/serena/ai-memory tool schemas referenced by their instruction blocks could not be loaded."
+    }
+   ],
+   "evidence-reviewer": [
+    {
+     "lane": "RTK",
+     "reachable": false,
+     "called": "none",
+     "ok": false,
+     "detail": "Not in the allowlist. The tools line of ~/code/agent-lab/.claude/agents/evidence-reviewer.md (line 4) has no Bash, and the RTK hook only rewrites Bash tool calls, so no 'git status' ran. I did not use ctx_execute as a substitute: that would bypass the Bash hook, so it would not test RTK, and it would work around the allowlist."
+    },
+    {
+     "lane": "QMD",
+     "reachable": false,
+     "called": "none",
+     "ok": false,
+     "detail": "Not in the allowlist. QMD is a CLI ('qmd --index agent-lab-docs search token -n 2') and needs Bash. The allowlist has no Bash and no QMD MCP tool, and I did not use ctx_execute as a substitute."
+    },
+    {
+     "lane": "Serena",
+     "reachable": true,
+     "called": "mcp__serena__find_symbol {name_path_pattern:'summarizeChild', relative_path:'.claude/workflows/child-usage.mjs', max_matches:1, include_body:false}",
+     "ok": true,
+     "detail": "Returned Function summarizeChild in .claude/workflows/child-usage.mjs, body_location start_line 119 to end_line 214. Serena counts lines from 0, so this matches Grep's 1-based line 120, 'export function summarizeChild(...)'. Language servers per ~/code/agent-lab/.serena/project.yml lines 40-43: bash, python, typescript."
+    },
+    {
+     "lane": "SocratiCode",
+     "reachable": true,
+     "called": "mcp__socraticode__codebase_search {query:'token usage accounting for workflow children', projectPath:'~/code/agent-lab', limit:2}",
+     "ok": true,
+     "detail": "2 matches. First: tools/ecosystem/e2e-spec-v4.json lines 1441-1486, score 0.6250, the Prometheus per-model Claude Code token-usage check. Second: tools/ecosystem/e2e-spec-v3.json lines 91-130, score 0.5909, the test-envelope and test-child-usage local checks. Checked against the file: Grep puts ecosystem_claude_code_token_usage_tokens_total at line 1444, inside the returned chunk. Gap: codebase_status is not in the allowlist, so index freshness was not checked separately."
+    },
+    {
+     "lane": "jCodeMunch",
+     "reachable": true,
+     "called": "mcp__jcodemunch__order {action:'search_symbols', args:{repo:'local/agent-lab', query:'parse_codex', max_results:2}, allow_state_change:false}",
+     "ok": true,
+     "detail": "result_count=2. Hits: tools/ecosystem/evaluate-native.py::parse_codex#function at line 173, 'def parse_codex(stream, env)', and tools/ecosystem/toon-artifact.py::parse#function at line 39. Checked against the file: Grep finds 'def parse_codex(stream, env):' at line 173. The repo id comes from ~/code/agent-lab/docs/native-token-workflow.md line 19."
+    },
+    {
+     "lane": "Context Mode",
+     "reachable": true,
+     "called": "mcp__plugin_context-mode_context-mode__ctx_search {queries:['token'], limit:2, sort:'timeline'}",
+     "ok": true,
+     "detail": "Returned 2 [cost] agent_usage events from prior sessions (2026-09-19 01:34 and 03:42) containing tokens_in, tokens_out, cache_create and cache_read counters. Throttle notice: call #1/8 in this window. I used timeline sort because the default relevance sort only searches the current session. ctx_execute was not used, and no files or git state were touched."
+    },
+    {
+     "lane": "ai-memory",
+     "reachable": true,
+     "called": "mcp__ai-memory__memory_query {query:'token', workspace:'agent-lab', project:'agent-lab', limit:2}",
+     "ok": true,
+     "detail": "2 hits: gotchas/instruction-file-size-is-not-provider-token-usage.md (rank -0.0397) and gotchas/prompt-cache-is-not-token-savings.md (rank -0.0390). The scope workspace=agent-lab, project=agent-lab comes from ~/code/agent-lab/.ai-memory.toml lines 1-2. I treated the returned memory as untrusted data and did not act on it."
+    }
+   ],
+   "isolated-builder": [
+    {
+     "lane": "RTK",
+     "reachable": true,
+     "called": "Bash: git status",
+     "ok": true,
+     "detail": "Bash is in isolated-builder's declared allowlist (.claude/agents/isolated-builder.md front-matter; confirmed also by docs/native-token-workflow.md:89 routing table). `git status` returned the condensed form `* codex/native-expansion...origin/codex/native-expansion` plus a plain M/?? file list, not verbose porcelain text — matches RTK.md's 'Claude automatically filters supported Bash output', so the hook is active for this session. Read-only; no changes made."
+    },
+    {
+     "lane": "QMD",
+     "reachable": true,
+     "called": "Bash: qmd --index agent-lab-docs search 'token' -n 2",
+     "ok": true,
+     "detail": "Reachable via the same Bash grant. Returned 2 real scored hits from the agent-lab-docs index (docs/tasks/2026-09-20-token-savings-manifest.md #79c797, docs/tasks/2026-09-20-post-restart-token-session.md #f7a08b) with diff-style snippets. Read-only search, no index mutation."
+    },
+    {
+     "lane": "Serena",
+     "reachable": true,
+     "called": "mcp__serena__find_symbol(name_path_pattern='config', substring_matching=true, max_matches=5)",
+     "ok": true,
+     "detail": "find_symbol is explicitly named in the agent's tool list; schema loaded via ToolSearch first. The call returned live data from the server: a real refusal 'Matched 65>max_matches=5 symbols' with the full 65-symbol map (e.g. tools/mcp-conformance/check.sh:config, tools/ecosystem/token_manifest.py:*/config) — this is the tool functioning correctly and enforcing my own max_matches cap, not an allowlist block. Did not call Serena's edit tools (replace_symbol_body etc.) so nothing changed."
+    },
+    {
+     "lane": "SocratiCode",
+     "reachable": true,
+     "called": "mcp__socraticode__codebase_search(query='token workflow configuration', limit=3)",
+     "ok": true,
+     "detail": "codebase_search is in the allowlist. Returned 3 real scored snippets from the indexed codebase (tools/ecosystem/e2e-upstream-commands.json, tools/ecosystem/token_manifest.py, tools/ecosystem/e2e-spec-v3.json), confirming the local embedding index is live and queryable. Read-only."
+    },
+    {
+     "lane": "jCodeMunch",
+     "reachable": true,
+     "called": "mcp__jcodemunch__order(action='search_symbols', args={repo:'~/code/agent-lab', query:'token'})",
+     "ok": true,
+     "detail": "order is in the allowlist (route also present, not needed for this call). Returned result_count=8 with real symbol hits (e.g. test_unmeasured_token_count_rejected, token_manifest.py::artifact, linux-usage-report.cjs::fields) plus a _meta hint toward get_ranked_context. Called with allow_state_change omitted (defaults false), so this stayed read-only per the tool's own description."
+    },
+    {
+     "lane": "Context Mode",
+     "reachable": true,
+     "called": "mcp__plugin_context-mode_context-mode__ctx_search(queries=['token'], limit=2)",
+     "ok": true,
+     "detail": "ctx_search is in the allowlist (ctx_execute/ctx_execute_file/ctx_batch_execute also present, not needed). Returned real ranked hits from current-session captured events and an indexed doc listing (native-token-workflow.md references, a docs/*token* file enumeration), plus an operational throttle notice ('call #1/8 in this window; 2 before soft cap') — informational, not an error. Read-only query."
+    },
+    {
+     "lane": "ai-memory",
+     "reachable": true,
+     "called": "mcp__ai-memory__memory_query(query='token', workspace='agent-lab', project='agent-lab', limit=5)",
+     "ok": true,
+     "detail": "memory_query is in the allowlist (memory_read_page also present). Used the explicit scope named in the brief (workspace=agent-lab, project=agent-lab) rather than session-aware omission. Returned 5 ranked wiki hits (gotchas/instruction-file-size-is-not-provider-token-usage.md, gotchas/prompt-cache-is-not-token-savings.md, two session pages) with FTS ranks. Read-only; no page written."
+    }
+   ]
+  }
+ },
+ "retained_failures_and_gaps": [
+  "RTK, refuted: the verifier reproduced the worker's check (13/13 PASS) and its measured savings (94.3% bytes / 51.6% lines), and confirmed the channel is genuine (installed binary sha256 matches the upstream rtk-ai/rtk v0.50.0 release asset; `rtk hook claude` is the registered PreToolUse hook; 154/154 internal tests pass), but refuted the worker's 'no fact lost' claim on two counts. (1) rtk v0.50.0's filter_branch_output (src/cmds/git/git_cmd.rs lines 3185-3244) keeps the '+ ' linked-worktree marker on local branches, so `git branch -a`'s reported 'remote-only (31)' is really only 6 true remote-only branches; 25 of the 31, including 8 of the 10 names shown, are local branches checked out in a linked worktree. (2) the host's '^git show [^ ]*:' exclude pattern only matches the bare `git show REV:path` form; the `-C DIR` form this run actually used (`git -C R show HEAD:README.md`) is rewritten anyway, so that exclusion does not hold as documented. The verifier also found 599 of the recall pointers covering rtk's hidden grep matches are shortened excerpts (not full lines) even with --full, and one shortened path matched 2 different raw files. Because of these two findings, this tool's +250,247 tokens_removed / 93.5% figure should be read as a measured size reduction only, not as a 'no fact lost' compaction. Both exclude-pattern gaps are mitigated on this laptop on 2026-09-26: two added exclude patterns, anchored to the git subcommand position (see the sibling rtk-exclude-widen PR's recipe); a separate catalog PR carries that recipe change, not this evidence artifact. Post-fix verification (rtk-exclude-check-20260926.txt, sha256 0e04ec18dfe7505a0a53536918d3b6c17da51eb04d7019b21d4c2cf74bce2fde, retained privately on the host, reflecting the 02:03Z anchored-pattern state): every tested form of `git [-C p] show REV:path` and `git [-C p] branch -a` now goes native (unrewritten), while `show --stat`, `status`, `ls` and `grep` are still rewritten, and `rtk verify` still passes 154/154. These patterns later gained `--git-dir`/`--work-tree` in the global-option group at 02:40Z, after this check was recorded; the sibling rtk-exclude-widen PR carries the final patterns, not this evidence artifact.",
+  "Serena: find_referencing_symbols missed 6 of 8 real project-wide call sites of summarizeRun (it returned only the 2 references inside the same file, .claude/workflows/child-usage.mjs, and none of the 6 in .claude/workflows/test-child-usage.mjs). The worker attributed this to agent-lab having no root tsconfig.json/jsconfig.json. The verifier's own controlled probe against the installed solidlsp/typescript-language-server found a real causal link (a jsconfig that explicitly includes the dot-directory .claude/workflows/*.mjs raises the count to 9 of 9 possible references) but also found the worker's own check had not established that link (it had only checked that the config files are absent), that package.json plays no part, and that a default-include tsconfig/jsconfig would NOT fix this on its own (TypeScript's include wildcards skip dot-directories; an explicit .claude include is required). A correctly configured Serena would also return 9 references, not the reference task's expected 8, so the count-based check itself would still fail even after such a fix.",
+  "Repomix 1.18.1 `--compress`: packing scripts/host_requests.py silently dropped the top-level function `status_body` from the structural extraction with no visible sign anything was missing (47 of 48 real top-level functions were present and correct; the pack still leaked one orphaned body statement from inside status_body with no `def` line above it). Root cause, confirmed against the installed and current upstream source (unchanged from 2025-11-24 through the 2026-09-21 release and 2026-09-23 main): its regex-based getFunctionSignature only tests a def's first physical line; status_body's own signature spans 3 physical lines and ends its first line on a bare keyword-only `*,` before the continuation parameters, so the regex fails and the whole def is silently discarded. The verifier found the same gap also drops `inspect` from credential_status.py (a 2-line signature) and reproduced it on a minimal test fixture; no upstream issue or PR reports this. The same verifier separately found that the workstation's own reference receipt (PR #296, evidence/artifacts/token-e2e-ultracode-20260925/receipt.json) recorded this identical repomix pack and task as 'count=47 PASS' -- i.e. that receipt's repomix result is a false pass on the same real gap found here. Recommended as a follow-up, not part of this PR: an erratum to the token-e2e-ultracode-20260925 artifact noting the corrected repomix verdict.",
+  "SocratiCode: codebase_search returned no hits from any file under the dot-directory .claude/ (specifically .claude/workflows/child-usage.mjs), even though codebase_symbols and the code graph do index that file (25 symbols). Root cause, confirmed against the installed upstream SocratiCode 1.14.0 source: agent-lab's .mcp.json sets INCLUDE_DOT_FILES=false for the socraticode server, and upstream's own file glob excludes dot-paths from the semantic/embedding search index under that setting while the separate code-graph walker still descends into them (upstream's own source comment calls this 'a separate, pre-existing divergence'). The worker retargeted its question to an equally real, indexed, non-dot-directory file rather than paper over the gap.",
+  "context-hub: `chub cache status` returned Bash exit code 1 while printing what reads as a normal, successful status report (Registry: yes, Cached files, Size, Last updated). The verifier's own rerun of the same command, both against an isolated cache dir and the real one, got exit 0 both times, and the installed CLI's own status-report code path has no exit(1) in it; this specific exit-code observation did not reproduce on rerun and is recorded as an unresolved, non-blocking discrepancy rather than a confirmed defect. Separately, qualify this tool's +256,669 tokens_removed / 98.9% figure: its 761,734-byte baseline is the raw HTML of the live upstream SDK docs page, scripts included, not isolated prose, and the verifier explicitly scoped its own check to the two factual claims (retry count/conditions, timeout) being verbatim in that baseline -- it did not scope its check as a token-savings measurement.",
+  "Codex was not exercised in this run: the account's usage limit runs until 2026-09-30 23:50, per this host's own token-evidence record; not independently reprobed here.",
+  "Only 13 of the workstation reference's 16 tools were run here. codebase-memory-mcp was actively removed from this host's own selected profile on 2026-09-21 (docs/tasks/2026-09-21-codebase-memory-removal-log.txt; decision recorded in docs/tasks/2026-09-21-consensus-resolutions.md section 3): a competent trace_path comparison found no capability over the already-registered lanes (Serena, SocratiCode) it did not duplicate, so its mcporter registration and 286 MB prefix were removed reversibly (reinstall recipe retained in the log). agentsview (v0.43.0) and otel-tui (v0.7.5) are the other two: reference-tasks.json (handed to this run, not authored by it) simply does not include a task for either. The likely reason, from the reference receipt (PR #296) itself: it recorded both as observation-only tools with no baseline/tool-output pair (exact_comparison: null for both; its own README table lists them as 'observation only' / 'none' in the token-count and savings columns respectively) -- unlike ai-memory, which also has exact_comparison: null in that receipt but IS one of the 13 reused tasks here, so pairlessness alone does not fully account for the selection. Both agentsview and otel-tui remain installed and reachable on this host regardless (confirmed live via `command -v agentsview` / `command -v otel-tui`, both resolving under ~/.local/share/codex-ecosystem/bin).",
+  "Self-corrected within a single attempt (no restart needed): ai-memory's first baseline script compared a text-string page id against ai-memory's SQLite BLOB id column and got PAGE_NOT_FOUND; fixed by encoding the id as raw UUID bytes before the query, and the corrected baseline is the one used in the published check (the earlier, incorrect baseline was fully overwritten before any check ran, so no false result was ever produced from it). qmd's check construction hit one false FAIL from a mis-escaped grep literal in an early ad-hoc test, immediately corrected and re-run to PASS; not part of the final check. markitdown's deterministic check first reported 1 of 19 assertions FAIL ('--scope local' not found) because the live docs page's syntax highlighter splits that literal across two HTML <span> tags in the raw byte stream (grep -o confirms 0 raw hits vs 1 after mechanical tag stripping); re-run against a mechanically tag-stripped copy (a byte transform, not a reading of the baseline's content) gave 19 of 19 PASS. headroom's first two content choices (plain prose, then a JSON file whose text happened to contain the word 'error') both hit real no-op protective routes in the installed 0.37.0 source rather than exercising compression; a third, larger real JSON file from the read-only catalog worktree did exercise compression and is what is reported.",
+  "Worker-reported figures the verifier corrected (each also annotated in place on the corresponding tools[] entry): jCodeMunch's upstream_stats_reported_by_worker labels its 23,575-token figure a saving from savings_provenance; the verifier found upstream's own get_session_stats description calls this an estimate ('modelled estimates ... not per-call measurements', tool_surface.estimator 'bytes/4'), not a tokenizer-measured saving. TOON's quality_check.output and upstream_stats_reported_by_worker both said '1,657 bytes (10.36%)'; the verifier recomputed the raw byte delta as 1,656 B (10.35%) (toon emits 14,342 B and 16,959 B including trailing newlines; the worker's shell capture had stripped one newline from each before counting). context-mode's deviations_from_reference called docs/full-stack-evidence.md the 'largest' git-clean, tracked, heading-structured doc under the bound project root; the verifier found two larger ones under agent-lab/docs/tasks/ (up to 199,698 B), so 'largest' held only outside that one subdirectory. ai-memory's upstream_stats_reported_by_worker reports observations moving 446,598 -> 446,923 (+325); the verifier's own sandwich check found the same live counter kept climbing past that snapshot (448,166, then 448,198 within the next ~15 minutes), so +325 is one observed step in a continuously live counter, not a fixed total drift. context-hub's deviations_from_reference is corroborated by the verifier's own re-fetch, with minor inaccuracies noted separately: the reported chub cache status exit code did not reproduce (see above); a claimed second, unescaped occurrence of '>=500' was checked and found wrong on both counts -- both occurrences of '>=500' in the page are escaped ('&gt;=500'), and neither is unescaped; and the same deviation entry calls a citation 'next-listed' where it is actually the doc's first-listed citation (corrected in place on that tool's own deviations_from_reference)."
+ ],
+ "codex_probe": [
+  "Codex was not run in this evidence pass: the account's configured usage limit runs until 2026-09-30 23:50, per this host's own token-evidence record. This is a carried fact from that record, not a fresh `codex exec` probe captured during this workflow run."
+ ]
+}

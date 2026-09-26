@@ -3211,6 +3211,28 @@
         "State compatibility was measured on scratch stores only; the in-place migration of the real ~/.headroom/ccr_store.db was not exercised. During the window other sessions wrote ~/.claude/settings.json and ~/.codex/config.toml, and another session's 0.37.0 MCP server ran throughout; ~/.headroom stayed unchanged."
       ],
       "path": "evidence/receipts/headroom-039-qualification-20260925.json"
+    },
+    {
+      "id": "vllm-030-switch-laptop-20260926",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "vllm",
+        "socraticode",
+        "ai-memory"
+      ],
+      "claim": "vLLM 0.30.0 was qualified on this laptop (WSL2, RTX 5090 Laptop GPU 24GB) as a drop-in candidate for the production Nemotron-3-Embed-1B-BF16 embedder (vLLM 0.25.0), then switched into production by a systemd --user drop-in that changes only the ExecStart binary path and PATH. Of the six qualification gates: (a) gate-text cosine, (c) batch invariance and (e) ai-memory vector reconstruction passed their pass bars; (b) mini-corpus retrieval and (d) live-code-index retrieval met top-10 SET identity on every query and trial (b: 40/40, d: 20/20 query-trials) but failed their strict top-10 ORDER bar in 3 of 4 trials each; (f) latency is report-only, with no pass bar. A prod-vs-prod control run (candidate never started) shows the same order-swap behavior already exists in production alone: gate b had 6 of 50 mismatched query-trials for the candidate (including an earlier, superseded run) against 10 of 80 for production compared with itself; gate d had 3 of 20 against 4 of 40; production against itself even had a worse single trial (6 of 10 identical) than any candidate trial. Gate (c)'s batch-invariance minimum cosine (0.9999562552851937) was bit-for-bit identical between production alone and the candidate, on the same minimizing text. The production switch itself re-checked only 30 gate texts (cosine 0.9999999999999998 before vs after) and confirmed dependents (ai-memory's vector stream, SocratiCode search); it did not re-run a post-switch top-10 retrieval check.",
+      "limitations": [
+        "One host (laptop, RTX 5090 Laptop GPU 24GB, WSL2) and one model/route (/v1/embeddings with Nemotron-3-Embed-1B-BF16); not a claim about other GPUs, models or the /v2/embed route. NVIDIA's model card still names vllm==0.25.0 for BF16 /v2/embed serving.",
+        "Retrieval equality covers 30 gate texts (a), a 50-paragraph mini-corpus over 10 queries (b), and 5 live code-index queries (d), not an aggregate retrieval-quality benchmark. Gates b and d met top-10 content-SET identity on every query and trial (b: 40/40 query-trials across the 4 recorded trials, plus full set overlap on one earlier superseded run; d: 20/20 query-trials) but did not meet strict top-10 ORDER identity on every trial (that earlier superseded run's own order count was 9 of 10). Counting every recorded run: gate b had 6 of 50 candidate query-trials with an order mismatch against 10 of 80 for a prod-vs-prod control (candidate never started, run twice -- an earlier, superseded control and the current one -- both included since only the second run's own prod_score diagnostic sub-field needed a fix, not its order counts); gate d had 3 of 20 against 4 of 40. Production compared with itself had a worse single trial (6 of 10 identical, i.e. 4 mismatched) than any candidate trial (worst: 7 of 10 identical, 3 mismatched), so this order-swap behavior is pre-existing production batching noise, not attributable to the 0.30.0 upgrade. The swap-gap range is 3.5e-05 to 8.2e-04 across all 23 recorded swaps (candidate run and both control runs combined), far smaller than the ~0.02-0.05 gaps between other adjacent ranks in the same rankings.",
+        "The reference receipt's own qualification-time number for this style of check (mini_corpus_top10_overlap, '10/10 on each of 10 queries') is a content-SET overlap claim, not a strict-order claim; it does not report whether its own order matched on every query, so gate (b)'s order tracking here is additional detail, not a comparison against a reported order result. The reference receipt's one reported ORDER number (production_switch.code_queries_identical_top10_order, '5/5') comes from its own post-switch production check with 5 live code queries, a different procedure from this run's own gate (d) qualification check (5 queries against the live SocratiCode index, run before any switch); the two are not directly comparable, and this run made no post-switch top-10 check of its own (see production_switch below: only 30 gate texts and a cosine value were re-checked after the switch) -- unlike the reference, which also re-checked 5 code queries' top-10 order after its own switch (that same code_queries_identical_top10_order, '5/5').",
+        "0.30.0 relies on its pinned-memory fallback for WSL (vllm-project/vllm PR #56908, the same warning the reference receipt's owned instance logged); the 0.29.0 UVA failure recorded in vllm-compatibility remains true for 0.29.0.",
+        "The 0.25.0 unit is kept for rollback; only a drop-in override (nemotron-embed-agent-lab.service.d, ExecStart and PATH only) points production at 0.30.0.",
+        "A diagnostic-only bug in this run's own gate (b) script (prod_scores_by_idx had score and index reversed) made the order_diff_detail[].prod_score sub-field in every candidate-vs-prod gate (b) file (gate_b_result.json and gate_b_trial{1,2,3}.json) and in the first, superseded prod-vs-prod control unreliable; it did not affect any cosine value, top-10 set, or pass/fail boolean -- only that one diagnostic sub-field -- and was fixed before the second, current prod-vs-prod control run. See raw/ERRATUM-gate_b-order_diff_detail-prod_score-bug.txt.",
+        "results.json's own generated prose has two internal inconsistencies against its own structured fields, corrected in this receipt from the underlying per-trial gate files (raw/gate_b_result.json, gate_b_trial{1,2,3}.json, gate_d_result.json, gate_d_trial{1,2,3}.json): its gate (b) finding text lists strict-order counts as '9, 7, 9 and 10' where the adjacent structured array and the per-file queries_with_identical_order fields agree on '10, 9, 7 and 9' (same four numbers, wrong order in the prose only); its gate (d) finding text says strict order held on '3, 5, 4 and 4' of 5 queries where the adjacent structured array and the per-file queries_identical_count fields agree on '4, 5, 4 and 4'.",
+        "The laptop's vllm-0.30.0 prefix pre-existed this run (never pip-installed into by this task, per its own instructions), so no direct_url.json or install log exists on this host to independently re-hash its wheel; the pin identity below is the value the workstation's own switch receipt recorded for the same pinned release, reused for cross-host comparison, not independently re-verified here. What IS independently verified on this host: both production (0.25.0) and the candidate (0.30.0) point at the identical, single model directory (same absolute path in both /v1/models responses), and this host's own sha256 of that directory's model.safetensors is recorded below.",
+        "independent_review: an independent reviewer subagent checked this receipt against the retained raw files (recomputed the reported counts, re-hashed the model file, compared production's before/after flags) and re-ran no gate; that review produced every correction listed above."
+      ],
+      "path": "evidence/receipts/vllm-030-switch-laptop-20260926.json"
     }
   ],
   "files": [
@@ -30166,6 +30188,16 @@
       "bytes": 51728
     },
     {
+      "path": "evidence/artifacts/token-e2e-ultracode-laptop-20260926/README.md",
+      "sha256": "c281ab5d9f94b4fa41eac527f48f6350cb69c9917d9e9b853dcaf663afb55bdb",
+      "bytes": 23238
+    },
+    {
+      "path": "evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json",
+      "sha256": "f186f4a192efafb3182185093abf87a7bb7d5b157bfe0d783dfe5df83f38c9f8",
+      "bytes": 147636
+    },
+    {
       "path": "evidence/artifacts/ultracode-token-routing-20260921/audit-verifier-wf_d0d741b1-9c6.json",
       "sha256": "5e86863b7f6b6c94ec21c712de3f505f95b8a7b02a54ab693b5281e85dbe4fe5",
       "bytes": 25523
@@ -31619,6 +31651,11 @@
       "path": "evidence/receipts/vllm-030-switch-20260925.json",
       "sha256": "dba0b77c509986c6c89128da954b653478ce33a08790fe105e5bf282c18297e7",
       "bytes": 5190
+    },
+    {
+      "path": "evidence/receipts/vllm-030-switch-laptop-20260926.json",
+      "sha256": "fa03068472ba45ed877d444f7cff3f7001b321f90b25b089727b73991f4803b5",
+      "bytes": 28905
     },
     {
       "path": "evidence/receipts/vllm-compatibility.json",
