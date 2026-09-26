@@ -112,7 +112,8 @@ provides it.
   - `proposed` must equal the set of adjudicated repositories, and every proposal gets both votes.
 - **`prompts_sha256`.** This is `sha256(json.dumps(T, sort_keys=True, ensure_ascii=False))` of the run's frozen,
   dated templates. `build_args.py` writes it to `prompts_sha256.txt`. With the 2026-09-26 values filled in, the
-  templates here reproduce that run's `3adfbed7…18d4` (tested).
+  templates here give `3adfbed7…18d4` (tested), the value computed on 2026-09-26 from that run's staged
+  `templates.json`. That is a local check; the run's registered record is the evidence of what it used.
 - **Manifest.** `manifest_ref` is the dated SOTA manifest built from `lanes.json`. The record's `date` is its
   `checked_at`, and the manifest's rows for this lane must equal each layer's proposals and survival.
 - **Source reviews.** Each survivor needs one registered source review whose `layers` names the layer.

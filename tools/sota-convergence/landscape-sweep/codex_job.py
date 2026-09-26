@@ -275,17 +275,32 @@ def codex_argv(codex: str, directory: Path, model: str, prompt: str) -> list[str
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json", prompt]
 
 
+def retire(directory: Path) -> None:
+    """Archive a finished attempt without starting a new one (skipped while a runner holds the job)."""
+    lock_fd = open_lock(directory / "job.lock")
+    try:
+        if try_lock(lock_fd):
+            archive_attempt(directory)
+            fcntl.flock(lock_fd, fcntl.LOCK_UN)
+    finally:
+        os.close(lock_fd)
+
+
 def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
     directory = job_dir(base, job)
     prompt_bytes = Path(prompt_file).read_bytes()
     schema_bytes = Path(schema_file).read_bytes()
     inputs = job_inputs(prompt_bytes, schema_bytes, settings(base)["model"])  # also refuses a broken staged.json
+    changed = False
     if (directory / "done").exists() and exit_code(directory) == 0:
         if read_json(directory / "inputs.json") == inputs:
             print(f"already done: {job}")
             return 0
+        changed = True
         print(f"inputs changed since {job} finished; its attempt is kept under attempts/")
     if (base / "LIMIT").exists():
+        if changed:
+            retire(directory)  # a refused start must not leave another claim's output as this job's result
         print(f"LIMIT marker present; refusing to start {job}")
         return EXIT_LIMIT
     directory.mkdir(parents=True, exist_ok=True)

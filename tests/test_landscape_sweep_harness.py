@@ -704,6 +704,15 @@ class RunnerTests(RunnerCase):
                          [(0, COMPLETED["usage"], first["inputs"])])
         self.assertEqual(self.call("start", "gpt6-fit-alpha", self.prompt, self.schema).stdout.strip(),
                          "already done: gpt6-fit-alpha")
+        # Changed inputs while the usage limit is set: refused, and the old claim's output is no longer served.
+        (self.work / "LIMIT").touch()
+        self.prompt.write_text("Reply in JSON about a third set of proposals.\n", encoding="utf-8")
+        refused = self.call("start", "gpt6-fit-alpha", self.prompt, self.schema)
+        self.assertEqual(refused.returncode, 3)
+        stale = json.loads(self.call("result", "gpt6-fit-alpha").stdout)
+        self.assertEqual((stale["status"], stale["exit"], stale["output_text"]), ("not_running", None, None))
+        self.assertEqual([a["exit"] for a in stale["attempts"]], [0, 0])
+        (self.work / "LIMIT").unlink()
         self.settings({"model": "gpt-6-sol"})  # a different model is a different claim too
         self.assertIn("started gpt6-fit-alpha", self.call("start", "gpt6-fit-alpha", self.prompt, self.schema).stdout)
         self.assertTrue(self.call("wait", "gpt6-fit-alpha", "20").stdout.startswith("done exit=0"))
