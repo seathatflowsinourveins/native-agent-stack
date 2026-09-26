@@ -1,0 +1,111 @@
+Usage: inspector-cli [options] [target...]
+
+Arguments:
+  target                       Command and arguments or URL of the MCP server
+                               (or use --config and --server)
+
+Options:
+  --catalog <path>             Writable catalog file (created if missing;
+                               default: ~/.mcp-inspector/mcp.json, or
+                               MCP_CATALOG_PATH)
+  --config <path>              Read-only session config file (served as-is,
+                               never written or seeded; errors if absent)
+  --server <name>              Server name from config/catalog file
+  -e <env>                     Environment variables for the server (KEY=VALUE)
+                               (default: {})
+  --method <method>            Method to invoke
+  --tool-name <toolName>       Tool name (for tools/call method)
+  --tool-arg <pairs...>        Tool argument as key=value pair (default: {})
+  --uri <uri>                  URI of the resource (resources/read,
+                               resources/directory/read) or of the skill
+                               (skills/get)
+  --cursor <cursor>            Opaque pagination cursor (for
+                               resources/directory/read; pass back the
+                               nextCursor from the previous page).
+  --prompt-name <promptName>   Name of the prompt (for prompts/get method)
+  --prompt-args <pairs...>     Prompt arguments as key=value pairs (default: {})
+  --log-level <level>          Logging level (for logging/setLevel method)
+  --cwd <path>                 Working directory for stdio server process
+  --transport <type>           Transport type (sse, http, or stdio).
+                               Auto-detected from URL: /mcp → http, /sse → sse,
+                               commands → stdio
+  --server-url <url>           Server URL for SSE/HTTP transport
+  --header <headers...>        HTTP headers as "HeaderName: Value" pairs (for
+                               HTTP/SSE transports) (default: {})
+  --metadata <pairs...>        General metadata as key=value pairs (applied to
+                               all methods) (default: {})
+  --tool-metadata <pairs...>   Tool-specific metadata as key=value pairs (for
+                               tools/call method only) (default: {})
+  --app-info                   Probe the tool's MCP App UI metadata
+                               (resourceUri, csp, permissions, domain) and emit
+                               it as one JSON line; exit 2 when the tool has no
+                               app. Use with --method tools/call --tool-name
+                               <name> (the tool itself is not invoked) or
+                               --method tools/list (one NDJSON line per tool).
+  --strict                     Report tool-schema portability problems in full
+                               (path, issue, suggested fix) on stderr, and exit
+                               6 if any is error-severity. Use with --method
+                               tools/list. Without it, a one-line count is
+                               printed instead.
+  --verify                     Run the SEP-2640 conformance and digest checks
+                               over the skills returned, emit one JSON report
+                               per skill on stdout, and exit 7 if any fails or 8
+                               if any could not be fully checked within the read
+                               bounds. Use with --method skills/list or --method
+                               skills/get.
+  --connect-timeout <ms>       Connection timeout in ms (default 15000 for
+                               ad-hoc --server-url / target invocations; 0 = no
+                               timeout).
+  --protocol-era <era>         Protocol era to negotiate: legacy, auto, or
+                               modern. Overrides the file-level protocolEra for
+                               --catalog/--config runs; ad-hoc --server-url /
+                               target runs otherwise default to legacy.
+  --format <format>            Output format: text (default; pretty-printed) or
+                               json (one JSON object on stdout, no banners).
+  --tool-args-json <json>      Tool arguments as a single JSON object (e.g.
+                               '{"zip":"10001"}'). Values are passed verbatim —
+                               no key=value coercion. Mutually exclusive with
+                               --tool-arg.
+  --client-config <path>       Install-level client config (default:
+                               ~/.mcp-inspector/storage/client.json, or
+                               MCP_CLIENT_CONFIG_PATH)
+  --client-id <id>             OAuth client ID (static client) for HTTP servers
+  --client-secret <secret>     OAuth client secret (for confidential clients)
+  --client-metadata-url <url>  OAuth Client ID Metadata Document URL (CIMD) for
+                               HTTP servers
+  --callback-url <url>         OAuth redirect/callback listener URL; must be
+                               loopback (default:
+                               http://127.0.0.1:6276/oauth/callback, or
+                               MCP_OAUTH_CALLBACK_URL)
+  --use-stored-auth            Read the OAuth access token for --server-url from
+                               the OAuth state file (written by the web
+                               inspector) and inject it as Authorization:
+                               Bearer.
+  --stored-auth-only           Never start interactive OAuth; use the shared
+                               store if present, otherwise fail with
+                               auth_required. Preferred for CI/non-interactive
+                               runs. No-op when the server does not require
+                               auth.
+  --relogin                    Delete stored OAuth for this server URL from the
+                               shared store before connect (HTTP/SSE URL keys
+                               only); interactive login runs only if the server
+                               requires auth. Rejected for stdio (no URL-keyed
+                               store entry)
+  --no-revoke                  Requires --relogin. Skips the RFC 7009 revocation
+                               request that would otherwise end the grant at the
+                               authorization server when the local state is
+                               deleted. Also skipped when the server entry sets
+                               oauth.revokeOnClear to false.
+  --wait-for-auth <sec>        Poll the OAuth state file until a token for
+                               --server-url appears (or the timeout elapses),
+                               then proceed as if --use-stored-auth were set.
+                               Use after handing off to a human to complete
+                               OAuth in a browser.
+  --list-stored-auth           Print the server URLs that have a stored OAuth
+                               token (one JSON object on stdout) and exit. No
+                               server connection is made.
+  --print-handoff              Print a JSON handoff block (deepLink,
+                               portForwardCmd, oauthStatePath, apiToken) for
+                               --server-url and exit. No server connection is
+                               made.
+  -h, --help                   display help for command
