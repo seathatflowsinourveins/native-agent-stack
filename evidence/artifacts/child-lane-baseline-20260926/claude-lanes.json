@@ -19,10 +19,10 @@
       },
       "children_with_skill_call": 122,
       "fetch": {
-        "bash_curl_wget": 614,
-        "bash_curl_wget_loopback": 96,
+        "bash_curl_wget": 662,
+        "bash_curl_wget_loopback": 100,
         "ctx_fetch_and_index": 24,
-        "ctx_fetch_and_index_share": 0.0145,
+        "ctx_fetch_and_index_share": 0.0141,
         "webfetch": 1016
       },
       "first_prompt_tokens": {
@@ -305,10 +305,10 @@
         },
         "children_with_skill_call": 2,
         "fetch": {
-          "bash_curl_wget": 149,
-          "bash_curl_wget_loopback": 34,
+          "bash_curl_wget": 154,
+          "bash_curl_wget_loopback": 37,
           "ctx_fetch_and_index": 15,
-          "ctx_fetch_and_index_share": 0.0833,
+          "ctx_fetch_and_index_share": 0.0811,
           "webfetch": 16
         },
         "first_prompt_tokens": {
@@ -500,10 +500,10 @@
         },
         "children_with_skill_call": 120,
         "fetch": {
-          "bash_curl_wget": 452,
-          "bash_curl_wget_loopback": 54,
+          "bash_curl_wget": 495,
+          "bash_curl_wget_loopback": 55,
           "ctx_fetch_and_index": 5,
-          "ctx_fetch_and_index_share": 0.0034,
+          "ctx_fetch_and_index_share": 0.0033,
           "webfetch": 1000
         },
         "first_prompt_tokens": {
@@ -659,8 +659,8 @@
         },
         "children_with_skill_call": 0,
         "fetch": {
-          "bash_curl_wget": 120,
-          "bash_curl_wget_loopback": 47,
+          "bash_curl_wget": 142,
+          "bash_curl_wget_loopback": 48,
           "ctx_fetch_and_index": 0,
           "ctx_fetch_and_index_share": 0,
           "webfetch": 3
@@ -730,10 +730,10 @@
         },
         "children_with_skill_call": 2,
         "fetch": {
-          "bash_curl_wget": 148,
-          "bash_curl_wget_loopback": 28,
+          "bash_curl_wget": 153,
+          "bash_curl_wget_loopback": 31,
           "ctx_fetch_and_index": 13,
-          "ctx_fetch_and_index_share": 0.0734,
+          "ctx_fetch_and_index_share": 0.0714,
           "webfetch": 16
         },
         "first_prompt_tokens": {
@@ -877,10 +877,10 @@
         },
         "children_with_skill_call": 120,
         "fetch": {
-          "bash_curl_wget": 276,
+          "bash_curl_wget": 297,
           "bash_curl_wget_loopback": 15,
           "ctx_fetch_and_index": 4,
-          "ctx_fetch_and_index_share": 0.0045,
+          "ctx_fetch_and_index_share": 0.0044,
           "webfetch": 614
         },
         "first_prompt_tokens": {
@@ -1155,10 +1155,10 @@
         },
         "children_with_skill_call": 122,
         "fetch": {
-          "bash_curl_wget": 601,
-          "bash_curl_wget_loopback": 80,
+          "bash_curl_wget": 649,
+          "bash_curl_wget_loopback": 84,
           "ctx_fetch_and_index": 8,
-          "ctx_fetch_and_index_share": 0.0049,
+          "ctx_fetch_and_index_share": 0.0048,
           "webfetch": 1016
         },
         "first_prompt_tokens": {
@@ -1238,6 +1238,713 @@
         }
       }
     },
+    "by_spawn_and_agent_type": {
+      "agent_tool": {
+        "Explore": {
+          "bash_calls": 398,
+          "children": 13,
+          "children_using_bash": 10,
+          "children_using_mcp_server": {
+            "plugin_context-mode_context-mode": 12
+          },
+          "children_with_skill_call": 0,
+          "fetch": {
+            "bash_curl_wget": 0,
+            "bash_curl_wget_loopback": 4,
+            "ctx_fetch_and_index": 4,
+            "ctx_fetch_and_index_share": 1,
+            "webfetch": 0
+          },
+          "first_prompt_tokens": {
+            "max": 19496,
+            "median": 16791,
+            "min": 16564,
+            "n": 13,
+            "p10": 16570,
+            "p90": 19127
+          },
+          "injected_block": {
+            "either": 13,
+            "in_first_prompt": 13,
+            "in_subagent_start_context": 0
+          },
+          "mcp_calls": {
+            "plugin_context-mode_context-mode": 353
+          },
+          "rtk": {
+            "covered_share_of_bash": 0.196,
+            "decisions": {
+              "allow": 0,
+              "ask": 78,
+              "defer": 320,
+              "deny": 0,
+              "not_logged": 0,
+              "other": 0
+            },
+            "hook_rewrite_share_of_bash": 0.196,
+            "hook_rewrites": 78,
+            "model_typed": 0
+          },
+          "skill_calls": {},
+          "subagent_start": {
+            "additional_context": 0,
+            "types": {
+              "Explore": 13
+            }
+          },
+          "tool_calls": 773,
+          "tool_search": {
+            "calls": 13,
+            "children_calling": 12,
+            "loaded": {
+              "built-in": 3,
+              "plugin_context-mode_context-mode": 52
+            }
+          }
+        },
+        "Plan": {
+          "bash_calls": 158,
+          "children": 3,
+          "children_using_bash": 3,
+          "children_using_mcp_server": {
+            "plugin_context-mode_context-mode": 2
+          },
+          "children_with_skill_call": 0,
+          "fetch": {
+            "bash_curl_wget": 12,
+            "bash_curl_wget_loopback": 0,
+            "ctx_fetch_and_index": 0,
+            "ctx_fetch_and_index_share": 0,
+            "webfetch": 0
+          },
+          "first_prompt_tokens": {
+            "max": 20079,
+            "median": 19370,
+            "min": 16825,
+            "n": 3,
+            "p10": 16825,
+            "p90": 20079
+          },
+          "injected_block": {
+            "either": 3,
+            "in_first_prompt": 3,
+            "in_subagent_start_context": 0
+          },
+          "mcp_calls": {
+            "plugin_context-mode_context-mode": 69
+          },
+          "rtk": {
+            "covered_share_of_bash": 0.1329,
+            "decisions": {
+              "allow": 0,
+              "ask": 21,
+              "defer": 136,
+              "deny": 1,
+              "not_logged": 0,
+              "other": 0
+            },
+            "hook_rewrite_share_of_bash": 0.1329,
+            "hook_rewrites": 21,
+            "model_typed": 0
+          },
+          "skill_calls": {},
+          "subagent_start": {
+            "additional_context": 0,
+            "types": {
+              "Plan": 3
+            }
+          },
+          "tool_calls": 230,
+          "tool_search": {
+            "calls": 2,
+            "children_calling": 2,
+            "loaded": {
+              "plugin_context-mode_context-mode": 7
+            }
+          }
+        },
+        "evidence-reviewer": {
+          "bash_calls": 0,
+          "children": 10,
+          "children_using_bash": 0,
+          "children_using_mcp_server": {
+            "plugin_context-mode_context-mode": 9
+          },
+          "children_with_skill_call": 0,
+          "fetch": {
+            "bash_curl_wget": 0,
+            "bash_curl_wget_loopback": 0,
+            "ctx_fetch_and_index": 0,
+            "ctx_fetch_and_index_share": null,
+            "webfetch": 0
+          },
+          "first_prompt_tokens": {
+            "max": 16362,
+            "median": 15627,
+            "min": 15334,
+            "n": 9,
+            "p10": 15334,
+            "p90": 16362
+          },
+          "injected_block": {
+            "either": 10,
+            "in_first_prompt": 10,
+            "in_subagent_start_context": 0
+          },
+          "mcp_calls": {
+            "plugin_context-mode_context-mode": 346
+          },
+          "rtk": {
+            "covered_share_of_bash": null,
+            "decisions": {
+              "allow": 0,
+              "ask": 0,
+              "defer": 0,
+              "deny": 0,
+              "not_logged": 0,
+              "other": 0
+            },
+            "hook_rewrite_share_of_bash": null,
+            "hook_rewrites": 0,
+            "model_typed": 0
+          },
+          "skill_calls": {},
+          "subagent_start": {
+            "additional_context": 0,
+            "types": {
+              "evidence-reviewer": 10
+            }
+          },
+          "tool_calls": 585,
+          "tool_search": {
+            "calls": 8,
+            "children_calling": 8,
+            "loaded": {
+              "plugin_context-mode_context-mode": 30
+            }
+          }
+        },
+        "general-purpose": {
+          "bash_calls": 1295,
+          "children": 14,
+          "children_using_bash": 12,
+          "children_using_mcp_server": {
+            "plugin_context-mode_context-mode": 6
+          },
+          "children_with_skill_call": 0,
+          "fetch": {
+            "bash_curl_wget": 1,
+            "bash_curl_wget_loopback": 8,
+            "ctx_fetch_and_index": 12,
+            "ctx_fetch_and_index_share": 0.9231,
+            "webfetch": 0
+          },
+          "first_prompt_tokens": {
+            "max": 41019,
+            "median": 37476,
+            "min": 35175,
+            "n": 14,
+            "p10": 35780,
+            "p90": 39555
+          },
+          "injected_block": {
+            "either": 14,
+            "in_first_prompt": 14,
+            "in_subagent_start_context": 0
+          },
+          "mcp_calls": {
+            "plugin_context-mode_context-mode": 49
+          },
+          "rtk": {
+            "covered_share_of_bash": 0.3792,
+            "decisions": {
+              "allow": 0,
+              "ask": 491,
+              "defer": 801,
+              "deny": 3,
+              "not_logged": 0,
+              "other": 0
+            },
+            "hook_rewrite_share_of_bash": 0.3792,
+            "hook_rewrites": 491,
+            "model_typed": 2
+          },
+          "skill_calls": {},
+          "subagent_start": {
+            "additional_context": 0,
+            "types": {
+              "general-purpose": 14
+            }
+          },
+          "tool_calls": 1631,
+          "tool_search": {
+            "calls": 12,
+            "children_calling": 9,
+            "loaded": {
+              "built-in": 8,
+              "plugin_context-mode_context-mode": 29
+            }
+          }
+        },
+        "isolated-builder": {
+          "bash_calls": 164,
+          "children": 1,
+          "children_using_bash": 1,
+          "children_using_mcp_server": {},
+          "children_with_skill_call": 0,
+          "fetch": {
+            "bash_curl_wget": 0,
+            "bash_curl_wget_loopback": 4,
+            "ctx_fetch_and_index": 0,
+            "ctx_fetch_and_index_share": null,
+            "webfetch": 0
+          },
+          "first_prompt_tokens": {
+            "max": 19810,
+            "median": 19810,
+            "min": 19810,
+            "n": 1,
+            "p10": 19810,
+            "p90": 19810
+          },
+          "injected_block": {
+            "either": 1,
+            "in_first_prompt": 1,
+            "in_subagent_start_context": 0
+          },
+          "mcp_calls": {},
+          "rtk": {
+            "covered_share_of_bash": 0.372,
+            "decisions": {
+              "allow": 0,
+              "ask": 61,
+              "defer": 103,
+              "deny": 0,
+              "not_logged": 0,
+              "other": 0
+            },
+            "hook_rewrite_share_of_bash": 0.372,
+            "hook_rewrites": 61,
+            "model_typed": 1
+          },
+          "skill_calls": {},
+          "subagent_start": {
+            "additional_context": 0,
+            "types": {
+              "isolated-builder": 1
+            }
+          },
+          "tool_calls": 193,
+          "tool_search": {
+            "calls": 1,
+            "children_calling": 1,
+            "loaded": {
+              "plugin_context-mode_context-mode": 4
+            }
+          }
+        },
+        "source-scout": {
+          "bash_calls": 21,
+          "children": 1,
+          "children_using_bash": 1,
+          "children_using_mcp_server": {},
+          "children_with_skill_call": 0,
+          "fetch": {
+            "bash_curl_wget": 0,
+            "bash_curl_wget_loopback": 0,
+            "ctx_fetch_and_index": 0,
+            "ctx_fetch_and_index_share": null,
+            "webfetch": 0
+          },
+          "first_prompt_tokens": {
+            "max": 10035,
+            "median": 10035,
+            "min": 10035,
+            "n": 1,
+            "p10": 10035,
+            "p90": 10035
+          },
+          "injected_block": {
+            "either": 1,
+            "in_first_prompt": 1,
+            "in_subagent_start_context": 0
+          },
+          "mcp_calls": {},
+          "rtk": {
+            "covered_share_of_bash": 0.4286,
+            "decisions": {
+              "allow": 0,
+              "ask": 9,
+              "defer": 11,
+              "deny": 1,
+              "not_logged": 0,
+              "other": 0
+            },
+            "hook_rewrite_share_of_bash": 0.4286,
+            "hook_rewrites": 9,
+            "model_typed": 0
+          },
+          "skill_calls": {},
+          "subagent_start": {
+            "additional_context": 0,
+            "types": {
+              "source-scout": 1
+            }
+          },
+          "tool_calls": 26,
+          "tool_search": {
+            "calls": 0,
+            "children_calling": 0,
+            "loaded": {}
+          }
+        }
+      },
+      "workflow": {
+        "evidence-reviewer": {
+          "bash_calls": 0,
+          "children": 23,
+          "children_using_bash": 0,
+          "children_using_mcp_server": {
+            "plugin_context-mode_context-mode": 23
+          },
+          "children_with_skill_call": 0,
+          "fetch": {
+            "bash_curl_wget": 0,
+            "bash_curl_wget_loopback": 0,
+            "ctx_fetch_and_index": 0,
+            "ctx_fetch_and_index_share": null,
+            "webfetch": 0
+          },
+          "first_prompt_tokens": {
+            "max": 18688,
+            "median": 17721,
+            "min": 15092,
+            "n": 23,
+            "p10": 15615,
+            "p90": 18191
+          },
+          "injected_block": {
+            "either": 0,
+            "in_first_prompt": 0,
+            "in_subagent_start_context": 0
+          },
+          "mcp_calls": {
+            "plugin_context-mode_context-mode": 724
+          },
+          "rtk": {
+            "covered_share_of_bash": null,
+            "decisions": {
+              "allow": 0,
+              "ask": 0,
+              "defer": 0,
+              "deny": 0,
+              "not_logged": 0,
+              "other": 0
+            },
+            "hook_rewrite_share_of_bash": null,
+            "hook_rewrites": 0,
+            "model_typed": 0
+          },
+          "skill_calls": {},
+          "subagent_start": {
+            "additional_context": 0,
+            "types": {
+              "evidence-reviewer": 23
+            }
+          },
+          "tool_calls": 1519,
+          "tool_search": {
+            "calls": 26,
+            "children_calling": 23,
+            "loaded": {
+              "plugin_context-mode_context-mode": 32,
+              "serena": 2
+            }
+          }
+        },
+        "general-purpose": {
+          "bash_calls": 8970,
+          "children": 93,
+          "children_using_bash": 93,
+          "children_using_mcp_server": {
+            "ai-memory": 4,
+            "codebase-memory": 1,
+            "headroom": 3,
+            "jcodemunch": 3,
+            "plugin_context-mode_context-mode": 12,
+            "qmd": 3,
+            "serena": 1,
+            "socraticode": 2
+          },
+          "children_with_skill_call": 2,
+          "fetch": {
+            "bash_curl_wget": 153,
+            "bash_curl_wget_loopback": 29,
+            "ctx_fetch_and_index": 3,
+            "ctx_fetch_and_index_share": 0.0174,
+            "webfetch": 16
+          },
+          "first_prompt_tokens": {
+            "max": 63674,
+            "median": 38145,
+            "min": 35444,
+            "n": 93,
+            "p10": 36687,
+            "p90": 41701
+          },
+          "injected_block": {
+            "either": 0,
+            "in_first_prompt": 0,
+            "in_subagent_start_context": 0
+          },
+          "mcp_calls": {
+            "ai-memory": 4,
+            "codebase-memory": 1,
+            "headroom": 3,
+            "jcodemunch": 5,
+            "plugin_context-mode_context-mode": 137,
+            "qmd": 3,
+            "serena": 1,
+            "socraticode": 4
+          },
+          "rtk": {
+            "covered_share_of_bash": 0.3832,
+            "decisions": {
+              "allow": 0,
+              "ask": 3437,
+              "defer": 5426,
+              "deny": 93,
+              "not_logged": 14,
+              "other": 0
+            },
+            "hook_rewrite_share_of_bash": 0.3832,
+            "hook_rewrites": 3437,
+            "model_typed": 10
+          },
+          "skill_calls": {
+            "claude-api": 1,
+            "workflow-authoring": 1
+          },
+          "subagent_start": {
+            "additional_context": 0,
+            "types": {
+              "general-purpose": 93
+            }
+          },
+          "tool_calls": 11112,
+          "tool_search": {
+            "calls": 73,
+            "children_calling": 53,
+            "loaded": {
+              "ai-memory": 7,
+              "built-in": 66,
+              "codebase-memory": 1,
+              "headroom": 3,
+              "jcodemunch": 7,
+              "plugin_context-mode_context-mode": 39,
+              "qmd": 3,
+              "serena": 1,
+              "socraticode": 3
+            }
+          }
+        },
+        "isolated-builder": {
+          "bash_calls": 33,
+          "children": 2,
+          "children_using_bash": 2,
+          "children_using_mcp_server": {},
+          "children_with_skill_call": 0,
+          "fetch": {
+            "bash_curl_wget": 1,
+            "bash_curl_wget_loopback": 0,
+            "ctx_fetch_and_index": 0,
+            "ctx_fetch_and_index_share": 0,
+            "webfetch": 0
+          },
+          "first_prompt_tokens": {
+            "max": null,
+            "median": null,
+            "min": null,
+            "n": 0,
+            "p10": null,
+            "p90": null
+          },
+          "injected_block": {
+            "either": 0,
+            "in_first_prompt": 0,
+            "in_subagent_start_context": 0
+          },
+          "mcp_calls": {},
+          "rtk": {
+            "covered_share_of_bash": 0.3939,
+            "decisions": {
+              "allow": 0,
+              "ask": 13,
+              "defer": 20,
+              "deny": 0,
+              "not_logged": 0,
+              "other": 0
+            },
+            "hook_rewrite_share_of_bash": 0.3939,
+            "hook_rewrites": 13,
+            "model_typed": 0
+          },
+          "skill_calls": {},
+          "subagent_start": {
+            "additional_context": 0,
+            "types": {
+              "isolated-builder": 2
+            }
+          },
+          "tool_calls": 41,
+          "tool_search": {
+            "calls": 0,
+            "children_calling": 0,
+            "loaded": {}
+          }
+        },
+        "source-scout": {
+          "bash_calls": 679,
+          "children": 14,
+          "children_using_bash": 14,
+          "children_using_mcp_server": {},
+          "children_with_skill_call": 0,
+          "fetch": {
+            "bash_curl_wget": 0,
+            "bash_curl_wget_loopback": 0,
+            "ctx_fetch_and_index": 0,
+            "ctx_fetch_and_index_share": null,
+            "webfetch": 0
+          },
+          "first_prompt_tokens": {
+            "max": 10178,
+            "median": 9988,
+            "min": 9436,
+            "n": 14,
+            "p10": 9471,
+            "p90": 10174
+          },
+          "injected_block": {
+            "either": 0,
+            "in_first_prompt": 0,
+            "in_subagent_start_context": 0
+          },
+          "mcp_calls": {},
+          "rtk": {
+            "covered_share_of_bash": 0.3991,
+            "decisions": {
+              "allow": 0,
+              "ask": 271,
+              "defer": 407,
+              "deny": 1,
+              "not_logged": 0,
+              "other": 0
+            },
+            "hook_rewrite_share_of_bash": 0.3991,
+            "hook_rewrites": 271,
+            "model_typed": 0
+          },
+          "skill_calls": {},
+          "subagent_start": {
+            "additional_context": 0,
+            "types": {
+              "source-scout": 14
+            }
+          },
+          "tool_calls": 790,
+          "tool_search": {
+            "calls": 0,
+            "children_calling": 0,
+            "loaded": {}
+          }
+        },
+        "workflow-subagent": {
+          "bash_calls": 13058,
+          "children": 465,
+          "children_using_bash": 453,
+          "children_using_mcp_server": {
+            "ai-memory": 1,
+            "jcodemunch": 1,
+            "plugin_context-mode_context-mode": 9,
+            "serena": 2,
+            "socraticode": 1
+          },
+          "children_with_skill_call": 120,
+          "fetch": {
+            "bash_curl_wget": 495,
+            "bash_curl_wget_loopback": 55,
+            "ctx_fetch_and_index": 5,
+            "ctx_fetch_and_index_share": 0.0033,
+            "webfetch": 1000
+          },
+          "first_prompt_tokens": {
+            "max": 91937,
+            "median": 44026,
+            "min": 37684,
+            "n": 454,
+            "p10": 40338,
+            "p90": 52159
+          },
+          "injected_block": {
+            "either": 0,
+            "in_first_prompt": 0,
+            "in_subagent_start_context": 0
+          },
+          "mcp_calls": {
+            "ai-memory": 2,
+            "jcodemunch": 7,
+            "plugin_context-mode_context-mode": 66,
+            "serena": 5,
+            "socraticode": 2
+          },
+          "rtk": {
+            "covered_share_of_bash": 0.302,
+            "decisions": {
+              "allow": 0,
+              "ask": 3944,
+              "defer": 9066,
+              "deny": 38,
+              "not_logged": 10,
+              "other": 0
+            },
+            "hook_rewrite_share_of_bash": 0.302,
+            "hook_rewrites": 3944,
+            "model_typed": 14
+          },
+          "skill_calls": {
+            "codex:codex-cli-runtime": 1,
+            "fp-check": 61,
+            "iterative-retrieval": 43,
+            "mcp-builder": 1,
+            "property-based-testing": 3,
+            "search-first": 46,
+            "supply-chain-risk-auditor": 87,
+            "verification-before-completion": 108,
+            "workflow-authoring": 1
+          },
+          "subagent_start": {
+            "additional_context": 0,
+            "types": {
+              "workflow-subagent": 465
+            }
+          },
+          "tool_calls": 17737,
+          "tool_search": {
+            "calls": 236,
+            "children_calling": 202,
+            "loaded": {
+              "ai-memory": 2,
+              "built-in": 350,
+              "codebase-memory": 2,
+              "jcodemunch": 6,
+              "plugin_context-mode_context-mode": 34,
+              "serena": 26,
+              "socraticode": 4
+            }
+          }
+        }
+      }
+    },
     "negative_controls": {
       "bash_calls": 0,
       "children": 0,
@@ -1300,10 +2007,10 @@
       },
       "children_with_skill_call": 122,
       "fetch": {
-        "bash_curl_wget": 614,
-        "bash_curl_wget_loopback": 96,
+        "bash_curl_wget": 662,
+        "bash_curl_wget_loopback": 100,
         "ctx_fetch_and_index": 24,
-        "ctx_fetch_and_index_share": 0.0145,
+        "ctx_fetch_and_index_share": 0.0141,
         "webfetch": 1016
       },
       "first_prompt_tokens": {
@@ -1386,18 +2093,18 @@
     }
   },
   "kind": "claude_child_lane_usage",
-  "limits": "Counts come from native transcript rows inside [since, until); rows at or after until are never read. A tool call (tool_use blocks deduplicated by id) counts in the window of its first row, a ToolSearch load (tool_reference blocks in its result) in the window of the result row, and an RTK rewrite (a PreToolUse:Bash row from `rtk hook` whose stdout carries updatedInput) with its Bash call. The marker is looked for only in the first prompt and in SubagentStart hook context, never in tool input or output. first_prompt_tokens is provider-returned (input + cache read + cache creation) and counted only for children whose first request is inside the window. curl/wget counts only in command position of the text a shell runs (quoted strings and heredoc bodies are data unless sh -c, eval, ssh or a shell heredoc runs them), optionally behind rtk, sudo, env, command, exec or timeout N; a call whose literal URLs are all loopback is counted apart and left out of ctx_fetch_and_index_share. RTK decisions (with --rtk-db) are hook_decisions rows joined 1:1 by tool_use_id; covered = allow + ask. Names that are not name-shaped are counted under (other). Transcripts not modified since the window start are skipped unread. Children whose agent type starts with blind- are negative controls and are left out of workers.",
+  "limits": "Counts come from native transcript rows inside [since, until); rows at or after until are never read. A tool call (tool_use blocks deduplicated by id) counts in the window of its first row, a ToolSearch load (tool_reference blocks in its result) in the window of the result row, and an RTK rewrite (a PreToolUse:Bash row from `rtk hook` whose stdout carries updatedInput, for a Bash call whose tool_use row came before until) in the window of its hook row, so adjacent windows add up. RTK decisions (with --rtk-db) are hook_decisions rows joined 1:1 by tool_use_id to the Bash calls counted in the window; covered = allow + ask. A call whose hook row falls on the other side of a window edge therefore counts in hook_rewrites and in decisions of different windows. The marker is looked for only in the first prompt and in SubagentStart hook context, never in tool input or output. first_prompt_tokens is provider-returned (input + cache read + cache creation) and counted only for children whose first request is inside the window. curl/wget counts only in command position of the text a shell runs (quoted strings and heredoc bodies are data unless sh -c, eval, ssh or a shell heredoc runs them), optionally behind the shell keywords do, then, else, elif, if, while, until, ! and { and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N; a call whose literal URLs are all loopback is counted apart. ctx_fetch_and_index_share is ctx_fetch_and_index / (WebFetch + ctx_fetch_and_index + remote curl/wget): a fetch run inside a Context Mode sandbox (ctx_execute or ctx_batch_execute code), a gh api call and fetch() or an HTTP library in a script are in no lane. Names that are not name-shaped are counted under (other). Transcripts not modified since the window start are skipped unread. Every child transcript is a child, so a Workflow call the runtime re-ran under the same key (superseded_attempts in the per-run report) is one child per attempt. Children whose agent type starts with blind- are negative controls and are left out of workers; by_spawn_and_agent_type compares spawn paths within one agent type.",
   "marker": "<context_window_protection>",
   "parse_errors": 0,
   "roots_count": 1,
   "rtk_db": {
     "duplicate_tool_use_ids": 0,
     "joined": true,
-    "rows": 55968
+    "rows": 62160
   },
   "schema_version": 1,
   "sessions_in_window": 7,
-  "transcripts_found": 1767,
+  "transcripts_found": 1883,
   "transcripts_skipped_unmodified": 1004,
   "unreadable_directories": 0,
   "window": {

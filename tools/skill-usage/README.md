@@ -130,17 +130,19 @@ native output, it is not an unchanged upstream test and not a synthetic fixture 
 - **Codex `counts` stay the trial's measurement; two parts of them are broken out beside them.**
   `counts` holds every rollout record of every session, as the skills trial pins it, and every flag
   (`zero_on_evaluated_clients`, `prune_eligible`) reads it. Two disjoint parts of it are reported per
-  skill and window and never subtracted from it:
-  `of_which_user_config_ignored`, the own records of sessions that did not load the user config
-  (launched with `--ignore-user-config`, as the landscape sweep and blind lanes are, a session lists
-  every installed skill, the trial's `codex_enabled: false` ones included, so it is a different
-  listing state; the report detects it from the session's own skill catalog as of `--now`, see
-  [Codex lane report](#codex-lane-report---lanes), and counts such sessions in
-  `codex.sessions_user_config_ignored`), and `of_which_copied_from_parent`, the records a spawned
-  sub-agent's rollout copied from its parent (ordinals below `subagent_history_start_ordinal`; the
-  parent's own rollout holds the same records). `counts` minus both parts is the own records of
-  every other session. Whether the trial should compare only within one listing state is the trial
-  owner's rule to record; until then no flag reads the parts.
+  skill and window, never subtracted from it:
+  - `of_which_user_config_ignored`: the own records of sessions that did not load the user config.
+    A session launched with `--ignore-user-config` (the landscape sweep and blind lanes) lists every
+    installed skill, the trial's `codex_enabled: false` ones included, so it is a different listing
+    state. The report detects it from the session's own skill catalog as of `--now` (see
+    [Codex lane report](#codex-lane-report---lanes)) and counts such sessions in
+    `codex.sessions_user_config_ignored`.
+  - `of_which_copied_from_parent`: the records a spawned sub-agent's rollout copied from its parent
+    (ordinals below `subagent_history_start_ordinal`); the parent's own rollout holds them too.
+
+  `counts` minus both parts is the own records of every other session. Whether the trial should
+  compare only within one listing state is the trial owner's rule to record; until then no flag
+  reads the parts.
 - **Codex counts are two distinct signals, never merged.** `skill_md_reads` (a tool/function call
   whose command or arguments named that skill's `SKILL.md`) and `name_mentions` (a user message
   containing `$<name>`) are reported side by side; a prune decision at the trial window treats

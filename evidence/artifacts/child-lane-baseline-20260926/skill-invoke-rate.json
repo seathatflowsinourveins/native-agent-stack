@@ -7,20 +7,20 @@
     "total_cost_usd": 0
   },
   "codex": {
-    "files_scanned": 383,
+    "files_scanned": 442,
     "measured": true,
     "parse_errors": 0,
     "roots_count": 1,
-    "sessions_excluded_user_config_ignored": 118
+    "sessions_user_config_ignored": 118
   },
-  "generated_at": "2026-09-26T17:07:04.150617+00:00",
+  "generated_at": "2026-09-26T17:07:04+00:00",
   "kind": "skill_invoke_rate_report",
-  "limits": "Claude 'uses' from /skill-doctor is not windowed by --window (only its '7d tokens' column is): the same lifetime count is reused for every window's zero-usage check, a documented gap, not a measured per-window value. Codex counts are windowed from each rollout line's own timestamp, and a session that did not load the user config (its catalog lists a codex_enabled=false skill, as under --ignore-user-config) is a different listing state: its counts are reported under excluded_user_config_ignored, never in counts. A skill with no measured, enabled/listed client is excluded from prune_candidates and verdict_recheck, never read as zero usage. The measured listing cost (claude.context_tokens) is its own counter: never mix it into tools/token-report's token-efficiency ledger.",
+  "limits": "Claude 'uses' from /skill-doctor is not windowed by --window (only its '7d tokens' column is): the same lifetime count is reused for every window's zero-usage check, a documented gap, not a measured per-window value. Codex counts are windowed from each rollout line's own timestamp and hold every session's records, the measurement the trial pins; every flag reads them. Two disjoint parts of them are reported beside them, never subtracted: of_which_user_config_ignored (own records of sessions whose catalog lists a codex_enabled=false skill, as under --ignore-user-config: a different listing state) and of_which_copied_from_parent (records a spawned sub-agent's rollout copied from its parent, which the parent's rollout also holds). A skill with no measured, enabled/listed client is excluded from prune_candidates and verdict_recheck, never read as zero usage. The measured listing cost (claude.context_tokens) is its own counter: never mix it into tools/token-report's token-efficiency ledger.",
   "prune_candidates": [],
   "schema_version": 1,
   "skills": [
     {
-      "age_days": 1.5361976460300928,
+      "age_days": 1.5361959027777778,
       "claude": {
         "context_tokens": 20,
         "in_table": true,
@@ -40,7 +40,17 @@
           }
         },
         "enabled": true,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -63,7 +73,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 1.5361058289004628,
+      "age_days": 1.5361040856481483,
       "claude": {
         "context_tokens": 110,
         "in_table": true,
@@ -83,7 +93,17 @@
           }
         },
         "enabled": true,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -106,7 +126,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 1.536105805752315,
+      "age_days": 1.5361040625,
       "claude": {
         "context_tokens": 140,
         "in_table": true,
@@ -117,16 +137,26 @@
       "codex": {
         "counts": {
           "30": {
-            "name_mentions": 0,
+            "name_mentions": 1,
             "skill_md_reads": 39
           },
           "7": {
-            "name_mentions": 0,
+            "name_mentions": 1,
             "skill_md_reads": 39
           }
         },
         "enabled": true,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 1,
             "skill_md_reads": 0
@@ -149,7 +179,7 @@
       "zero_on_evaluated_clients": false
     },
     {
-      "age_days": 0.7613140812152779,
+      "age_days": 0.7613123379629629,
       "claude": {
         "context_tokens": 20,
         "in_table": true,
@@ -161,6 +191,17 @@
         "counts": {
           "30": {
             "name_mentions": 0,
+            "skill_md_reads": 15
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 15
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
             "skill_md_reads": 0
           },
           "7": {
@@ -168,8 +209,7 @@
             "skill_md_reads": 0
           }
         },
-        "enabled": true,
-        "excluded_user_config_ignored": {
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 15
@@ -192,7 +232,7 @@
       "zero_on_evaluated_clients": false
     },
     {
-      "age_days": 0.7612703659375001,
+      "age_days": 0.7612686226851851,
       "claude": {
         "context_tokens": 20,
         "in_table": true,
@@ -203,16 +243,26 @@
       "codex": {
         "counts": {
           "30": {
-            "name_mentions": 0,
-            "skill_md_reads": 100
+            "name_mentions": 4,
+            "skill_md_reads": 123
           },
           "7": {
-            "name_mentions": 0,
-            "skill_md_reads": 100
+            "name_mentions": 4,
+            "skill_md_reads": 123
           }
         },
         "enabled": true,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 3,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 3,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 1,
             "skill_md_reads": 23
@@ -235,7 +285,7 @@
       "zero_on_evaluated_clients": false
     },
     {
-      "age_days": 0.761256002511574,
+      "age_days": 0.7612542592592593,
       "claude": {
         "context_tokens": 60,
         "in_table": true,
@@ -255,7 +305,17 @@
           }
         },
         "enabled": true,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -278,7 +338,7 @@
       "zero_on_evaluated_clients": false
     },
     {
-      "age_days": 0.761245527974537,
+      "age_days": 0.7612437847222223,
       "claude": {
         "context_tokens": 50,
         "in_table": true,
@@ -298,7 +358,17 @@
           }
         },
         "enabled": true,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -321,7 +391,7 @@
       "zero_on_evaluated_clients": false
     },
     {
-      "age_days": 0.7612347756597223,
+      "age_days": 0.7612330324074074,
       "claude": {
         "context_tokens": 100,
         "in_table": true,
@@ -341,7 +411,17 @@
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -363,7 +443,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.7612242779745371,
+      "age_days": 0.7612225347222221,
       "claude": {
         "context_tokens": 30,
         "in_table": true,
@@ -383,7 +463,17 @@
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -405,7 +495,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.7612138844560185,
+      "age_days": 0.7612121412037037,
       "claude": {
         "context_tokens": null,
         "in_table": true,
@@ -425,7 +515,17 @@
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -447,7 +547,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.7612035719560185,
+      "age_days": 0.7612018287037038,
       "claude": {
         "context_tokens": null,
         "in_table": true,
@@ -467,7 +567,17 @@
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -489,7 +599,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.7611908636226852,
+      "age_days": 0.7611891203703705,
       "claude": {
         "context_tokens": 90,
         "in_table": true,
@@ -500,16 +610,26 @@
       "codex": {
         "counts": {
           "30": {
-            "name_mentions": 0,
-            "skill_md_reads": 102
+            "name_mentions": 7,
+            "skill_md_reads": 142
           },
           "7": {
-            "name_mentions": 0,
-            "skill_md_reads": 102
+            "name_mentions": 7,
+            "skill_md_reads": 142
           }
         },
         "enabled": true,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 7,
             "skill_md_reads": 40
@@ -532,7 +652,7 @@
       "zero_on_evaluated_clients": false
     },
     {
-      "age_days": 0.7611767664004631,
+      "age_days": 0.7611750231481481,
       "claude": {
         "context_tokens": 150,
         "in_table": true,
@@ -543,6 +663,17 @@
       "codex": {
         "counts": {
           "30": {
+            "name_mentions": 1,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 1,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
           },
@@ -551,8 +682,7 @@
             "skill_md_reads": 0
           }
         },
-        "enabled": true,
-        "excluded_user_config_ignored": {
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 1,
             "skill_md_reads": 0
@@ -572,10 +702,10 @@
       "name": "security-threat-model",
       "prune_eligible": false,
       "status": "trial",
-      "zero_on_evaluated_clients": true
+      "zero_on_evaluated_clients": false
     },
     {
-      "age_days": 0.7611646714930557,
+      "age_days": 0.7611629282407407,
       "claude": {
         "context_tokens": 60,
         "in_table": true,
@@ -595,7 +725,17 @@
           }
         },
         "enabled": true,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -618,7 +758,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.7611358520486111,
+      "age_days": 0.7611341087962962,
       "claude": {
         "context_tokens": 240,
         "in_table": true,
@@ -630,6 +770,17 @@
         "counts": {
           "30": {
             "name_mentions": 0,
+            "skill_md_reads": 1
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 1
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
             "skill_md_reads": 0
           },
           "7": {
@@ -637,8 +788,7 @@
             "skill_md_reads": 0
           }
         },
-        "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 1
@@ -660,7 +810,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.7611075534374999,
+      "age_days": 0.7611058101851852,
       "claude": {
         "context_tokens": 250,
         "in_table": true,
@@ -680,7 +830,17 @@
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -702,7 +862,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.7610830279745371,
+      "age_days": 0.7610812847222221,
       "claude": {
         "context_tokens": 130,
         "in_table": true,
@@ -713,16 +873,26 @@
       "codex": {
         "counts": {
           "30": {
-            "name_mentions": 0,
-            "skill_md_reads": 0
+            "name_mentions": 5,
+            "skill_md_reads": 26
           },
           "7": {
-            "name_mentions": 0,
-            "skill_md_reads": 0
+            "name_mentions": 5,
+            "skill_md_reads": 26
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 3,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 3,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 2,
             "skill_md_reads": 26
@@ -744,7 +914,7 @@
       "zero_on_evaluated_clients": false
     },
     {
-      "age_days": 0.7610590696412036,
+      "age_days": 0.7610573263888889,
       "claude": {
         "context_tokens": 200,
         "in_table": true,
@@ -764,7 +934,17 @@
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -786,7 +966,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.7610372872337963,
+      "age_days": 0.7610355439814815,
       "claude": {
         "context_tokens": 290,
         "in_table": true,
@@ -806,7 +986,17 @@
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -828,7 +1018,7 @@
       "zero_on_evaluated_clients": false
     },
     {
-      "age_days": 0.7610166738078703,
+      "age_days": 0.7610149305555556,
       "claude": {
         "context_tokens": 60,
         "in_table": true,
@@ -848,7 +1038,17 @@
           }
         },
         "enabled": true,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -871,7 +1071,7 @@
       "zero_on_evaluated_clients": false
     },
     {
-      "age_days": 0.7609982478819445,
+      "age_days": 0.7609965046296296,
       "claude": {
         "context_tokens": 130,
         "in_table": true,
@@ -891,7 +1091,17 @@
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -913,7 +1123,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.7609802733449075,
+      "age_days": 0.7609785300925925,
       "claude": {
         "context_tokens": 120,
         "in_table": true,
@@ -924,6 +1134,17 @@
       "codex": {
         "counts": {
           "30": {
+            "name_mentions": 1,
+            "skill_md_reads": 24
+          },
+          "7": {
+            "name_mentions": 1,
+            "skill_md_reads": 24
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
           },
@@ -932,8 +1153,7 @@
             "skill_md_reads": 0
           }
         },
-        "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 1,
             "skill_md_reads": 24
@@ -955,7 +1175,7 @@
       "zero_on_evaluated_clients": false
     },
     {
-      "age_days": 0.7609661876967593,
+      "age_days": 0.7609644444444443,
       "claude": {
         "context_tokens": 100,
         "in_table": true,
@@ -975,7 +1195,17 @@
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -997,7 +1227,7 @@
       "zero_on_evaluated_clients": false
     },
     {
-      "age_days": 0.7609540696412036,
+      "age_days": 0.7609523263888889,
       "claude": {
         "context_tokens": 70,
         "in_table": true,
@@ -1017,7 +1247,17 @@
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -1039,7 +1279,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.7609241506597223,
+      "age_days": 0.7609224074074074,
       "claude": {
         "context_tokens": 20,
         "in_table": true,
@@ -1059,7 +1299,17 @@
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 0
@@ -1081,7 +1331,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.7609116506597222,
+      "age_days": 0.7609099074074074,
       "claude": {
         "context_tokens": null,
         "in_table": true,
@@ -1093,15 +1343,25 @@
         "counts": {
           "30": {
             "name_mentions": 0,
-            "skill_md_reads": 22
+            "skill_md_reads": 26
           },
           "7": {
             "name_mentions": 0,
-            "skill_md_reads": 22
+            "skill_md_reads": 26
           }
         },
         "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 4
@@ -1123,7 +1383,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.3149061298263889,
+      "age_days": 0.3149043865740741,
       "claude": {
         "context_tokens": 200,
         "in_table": true,
@@ -1135,6 +1395,17 @@
         "counts": {
           "30": {
             "name_mentions": 0,
+            "skill_md_reads": 7
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 7
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
             "skill_md_reads": 0
           },
           "7": {
@@ -1142,8 +1413,7 @@
             "skill_md_reads": 0
           }
         },
-        "enabled": false,
-        "excluded_user_config_ignored": {
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 7
@@ -1165,7 +1435,7 @@
       "zero_on_evaluated_clients": true
     },
     {
-      "age_days": 0.31489256501157403,
+      "age_days": 0.31489082175925925,
       "claude": {
         "context_tokens": 40,
         "in_table": true,
@@ -1177,6 +1447,17 @@
         "counts": {
           "30": {
             "name_mentions": 0,
+            "skill_md_reads": 2
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 2
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
             "skill_md_reads": 0
           },
           "7": {
@@ -1184,8 +1465,7 @@
             "skill_md_reads": 0
           }
         },
-        "enabled": true,
-        "excluded_user_config_ignored": {
+        "of_which_user_config_ignored": {
           "30": {
             "name_mentions": 0,
             "skill_md_reads": 2
