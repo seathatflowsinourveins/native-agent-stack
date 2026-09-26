@@ -695,13 +695,52 @@ or managed settings file, and the flags are not in the process environment.
 The same was true of the two retained settings backups from 2026-09-23. The
 earlier text of this page said the user settings enabled tool-content and
 raw-body logging; this measurement does not support that statement, so it is
-withdrawn. The settings template sets all five to `"false"`, so
-`apply_claude_settings.py` writes them off on a new host.
+withdrawn. The settings template sets four of them to `"false"`, so
+`apply_claude_settings.py` writes them off on a new host. `OTEL_LOG_TOOL_DETAILS`
+is `"1"` since the [invoke-rate change](decisions/2026-09-26-tool-invoke-rates.md),
+under the dated exception below. The checker still reports
+`claude_telemetry_logs_content: true`, because it reads the client flag.
 
 Recommendation, as a user decision: keep tool-content and raw-body logging
-(and tool details) off for as long as broker keys exist on the host. Turning
-any of them on is a deliberate choice to copy tool traffic into the local
-store; the checker then reports `claude_telemetry_logs_content: true`.
+off for as long as broker keys exist on the host, and tool details too,
+except for the dated exception below. Turning any of them on is a deliberate
+choice to copy tool traffic into the local store; the checker then reports
+`claude_telemetry_logs_content: true`.
+
+**Exception: tool details (user decision, 2026-09-26).** Asked in the
+workstation coordinator session whether to enable `OTEL_LOG_TOOL_DETAILS=1`
+with name-only filtering in the Collector, the user answered "1 and full sota
+convergence practice we proceed". `adoption/templates/claude.settings.template.json`
+changed after `v2026.09.26.2` accordingly: it sets the flag to `"1"`, where a
+host at that tag writes `"false"`. Bash commands and tool input still reach the
+local Collector, so the control sits there
+([decision record](decisions/2026-09-26-tool-invoke-rates.md)):
+
+- `transform/tool_names`, in both logs pipelines before `transform/privacy`,
+  copies out of `tool_parameters` only the MCP server and tool names and the
+  Agent tool's `subagent_type`, plus one boolean, `shell_rtk`, from the first
+  word of `bash_command`. It never reads `full_command`. Skill names come only
+  from Claude Code's own `skill_activated` event. MCP server, MCP tool and
+  skill names that are not a short identifier become `other`, and an agent
+  type outside Claude Code's built-in agents and the workflow child becomes
+  `custom`.
+- `tool_parameters` (which carries `full_command`) and `tool_input` are
+  deleted in that processor. None of them, nor `user.email`, the Skill tool's
+  `skill_name` or a workflow name, is on any `transform/privacy` allowlist, so
+  none is exported to Loki or `events.jsonl`.
+- Canary proof (local integration, 2026-09-26): a scratch replay of real
+  Claude Code and Codex captures plus 31 synthetic records, through the
+  pinned otelcol-contrib 0.161.0 and a scratch Loki 3.7.8, looked for 72
+  known strings: Bash commands, prompts, a workflow script, search queries,
+  Codex arguments and output, and agent messages (31 from the captures, 41
+  synthetic). None reached the file exporter or Loki, and no
+  `tool_parameters`, `tool_input` or `user.*` key was exported (109 of 109
+  checks). The host proof repeats the check on production after the apply:
+  no sentence of either probe prompt and no probe command may appear in Loki
+  or in the Collector's `events*.jsonl`. It has not run yet.
+
+Only sessions started after the flag changes carry names. The other four
+flags stay `"false"`, and the recommendation above still covers them.
 
 ### Measured on this host (2026-09-24, Claude Code 2.1.281, headless `bypassPermissions`)
 

@@ -182,6 +182,70 @@ id of its own: `unscoped`, or the id it inherited, shared with its parent. A
 Codex version switch re-links `bin/codex` and removes the launcher until it is
 installed again.
 
+## Tool, MCP, skill and subagent invoke rates
+
+Proposed after the writer-identity change (see the
+[decision record](../../docs/decisions/2026-09-26-tool-invoke-rates.md)). Both logs pipelines run
+`transform/tool_names` just before `transform/privacy`. Metrics are unchanged: no name joins the
+metric allowlist, so the writer identity above is untouched.
+
+- **Claude Code names need `OTEL_LOG_TOOL_DETAILS=1`.** For user-configured MCP servers the event's
+  `tool_name` is always `mcp_tool`. The server and tool names and the Agent tool's `subagent_type`
+  appear only in `tool_parameters`, a JSON string that also holds whole Bash commands
+  ([monitoring](https://code.claude.com/docs/en/monitoring-usage)). Both client examples set the flag.
+  The processor parses `tool_parameters` into its statement cache and copies only `mcp_server_name`,
+  `mcp_tool_name` and `subagent_type`, as `mcp_server.name`, `mcp_tool.name` and `subagent_type`.
+  From `bash_command`, the command's first word, it keeps one boolean, `shell_rtk`. It never reads
+  `full_command`. Skill names come from `skill_activated`, which Claude Code logs only for a skill it
+  loaded; the Skill tool's `skill_name` is what the model typed and is not copied.
+- **Codex needs no setting.** codex-cli 0.157.1 logs `mcp_server`, `agent_name` (`/root` or
+  `/root/<task>`) and `originator` on `codex.tool_result`, and `kind`, `state` and both thread ids on
+  `codex.agent_communication`. The server name is copied and the communication fields are kept.
+  `agent_name` only decides `actor`: the task name in the path is chosen by the model, so the path is
+  not exported. `shell_rtk` comes from `exec_command`'s `cmd`.
+- **`client` tells front-ends apart.** Every Codex app-server front-end exports `service.name`
+  `codex-app-server`, so for that service `client` is the thread's `originator`; otherwise it is
+  `service.name`. First-party `Codex <App>` originators become `codex_<app>`. One app-server process
+  gives new threads the originator of the first client that initialized it, so two front-ends on
+  one process still share a `client`.
+- **Content is deleted twice.** This processor deletes `tool_parameters`, `tool_input`, `arguments`,
+  `output`, `content` and `error`, and none of them is on the allowlist. `error_mode: silent` keeps a
+  failed parse from writing its input to the Collector log; such a record carries
+  `tool_details="unparsed"`.
+- **Registry names are checked.** MCP server and tool names, skill names, `originator` and `client`
+  are written by Claude Code or Codex from their own configuration. Each must match
+  `^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$` and must not contain a run of 24 or more letters and digits.
+  Anything else is exported as `other`: text with spaces, paths, addresses and key- or token-shaped
+  strings.
+- **Agent types are a closed list.** `subagent_type`, `agent.name` and `agent_type` keep only the
+  built-in agents of the [subagent docs](https://code.claude.com/docs/en/sub-agents) (`general-purpose`,
+  `Explore`, `Plan`, `claude`, `statusline-setup`, `claude-code-guide`), the workflow child
+  (`workflow-subagent`) and `custom`. Any other value becomes `custom`, as Claude Code reports
+  user-defined agents without the flag. Add a name to the list in `transform/tool_names` to count it.
+- **Values the model types are not exported.** The Skill tool's `skill_name`, `workflow.name` (a
+  workflow script's own name) and Codex agent paths never leave the Collector, whatever their shape.
+- **Enumerations and ids are checked.** Derived values, `invocation_trigger`, `kind`, `state` and the
+  ids must match their enumeration or pattern, or they are deleted.
+- **Derived keys come only from this processor.** It first deletes any incoming `tool_family`, `actor`,
+  `shell_rtk`, `tool_details` or `client`. SDK receipts share the allowlist, so for them the processor
+  deletes every invoke-rate key.
+- **Derived values are bounded.** `tool_family` is one of shell, read, edit, mcp, skill, toolsearch, web,
+  agent, code_mode or other. `actor` is `main` or `subagent` for Codex (from `agent_name`). For Claude
+  tool events it is `workflow` when the event has `workflow.run_id`, else `main_or_subagent`; Claude API
+  requests get `main`, `subagent`, `workflow` or `auxiliary` from `query_source`.
+- **Loki stores them as structured metadata** (its OTLP default; the template indexes only
+  `service.name`), with dots as underscores: `mcp_server_name`, `skill_name`, `workflow_run_id`.
+  Session, conversation, workflow run and thread ids stay structured metadata, and no panel groups by
+  them.
+
+Limits: Claude Code marks workflow children on their tool events but not Agent-tool subagents
+(`agent_id` is a trace-span attribute, and traces stay off), so their calls count as
+`main_or_subagent`. The dashboard adds each subagent's `total_tool_uses` from `subagent_completed`
+and the per-actor MCP attribution of `api_request`; the latter counts requests, so several MCP
+results consumed by one request count once. Codex `functions/exec` and `functions/wait` are the
+code-mode wrapper (`code_mode`), and the calls inside it are counted as well. Claude sessions started
+before the flag change carry no names. Custom agents count as `custom` until their names are added.
+
 ## SDK result receipts
 
 `file_log/sdk_receipts` uses the upstream file receiver and JSON parser to ingest

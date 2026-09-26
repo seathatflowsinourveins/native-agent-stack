@@ -178,6 +178,16 @@ provider invoices or estimates of tokens saved. A missing series is not zero
 usage, and cached tokens may be a subset of input tokens. An empty panel before
 a real client exports data is expected.
 
+The row **Tool, MCP, skill and subagent invoke rates (Loki)** counts `tool_result`,
+`codex.tool_result`, `tool_decision`, `skill_activated`, `subagent_completed`, `api_request` and
+`codex.agent_communication` events with LogQL over the Collector's structured metadata
+(`tool_family`, `actor`, `client`, `mcp_server_name`, `skill_name`, `subagent_type`, `shell_rtk`). It
+shows calls per minute by family, MCP server, skill, client and actor, subagent and workflow launches
+(Claude's accepted `tool_decision`, logged before the tool runs), MCP-consuming API requests, the MCP
+share, ctx and rtk adoption, and an integrity panel whose values should be 0. Every query uses
+`[$__auto]` and `keep`, so per-line timestamps and ids never become series
+([Collector names](../collector/README.md#tool-mcp-skill-and-subagent-invoke-rates)).
+
 Prometheus runs with `--enable-feature=created-timestamp-zero-ingestion,promql-extended-range-selectors`
 (changed after `v2026.09.26.2`). The first makes Prometheus negotiate the
 protobuf scrape format first and inject a zero sample at each counter's start

@@ -2,7 +2,7 @@
   "uid": "ecosystem-native",
   "title": "Native agent ecosystem",
   "schemaVersion": 39,
-  "version": 9,
+  "version": 10,
   "links": [
     {
       "type": "link",
@@ -577,6 +577,555 @@
         "textMode": "auto",
         "colorMode": "value",
         "graphMode": "none"
+      }
+    },
+    {
+      "id": 28,
+      "type": "row",
+      "title": "Tool, MCP, skill and subagent invoke rates (Loki)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 56,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 29,
+      "type": "timeseries",
+      "title": "Claude tool calls per minute by family",
+      "description": "Executed Claude Code tool calls (tool_result events) per minute. Families: shell = Bash/PowerShell, read = Read/Grep/Glob, edit = Edit/Write/MultiEdit/NotebookEdit, mcp = every MCP tool, skill = Skill, toolsearch = ToolSearch, web = WebFetch/WebSearch, agent = Agent/Task/Workflow, other = the rest. Includes subagents and workflow children. Names are Loki structured metadata written by the Collector's transform/tool_names; no label is added. Claude MCP server names and subagent types need OTEL_LOG_TOOL_DETAILS=1 in Claude Code; sessions started without it show an empty name (see the integrity panel). Agent types outside Claude Code's built-in agents show as custom. client is the Codex originator for codex-app-server front-ends, else the service name.",
+      "gridPos": {
+        "x": 0,
+        "y": 57,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ecosystem-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by (tool_family) (rate({service_name=~\"claude-code.*\"} | event_name=\"tool_result\" | keep tool_family [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "{{tool_family}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "custom": {
+            "axisLabel": "calls/min"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        }
+      }
+    },
+    {
+      "id": 30,
+      "type": "timeseries",
+      "title": "Codex tool calls per minute by family",
+      "description": "Codex codex.tool_result events per minute, all front-ends and sub-agents. code_mode is the functions/exec and functions/wait wrapper: Codex also records every call made inside it, so do not add code_mode to the other families. mcp = tool_namespace mcp__<server>; agent = the collaboration namespace. Names are Loki structured metadata written by the Collector's transform/tool_names; no label is added. Claude MCP server names and subagent types need OTEL_LOG_TOOL_DETAILS=1 in Claude Code; sessions started without it show an empty name (see the integrity panel). Agent types outside Claude Code's built-in agents show as custom. client is the Codex originator for codex-app-server front-ends, else the service name.",
+      "gridPos": {
+        "x": 12,
+        "y": 57,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ecosystem-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by (tool_family) (rate({service_name=~\".+\"} | event_name=\"codex.tool_result\" | keep tool_family [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "{{tool_family}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "custom": {
+            "axisLabel": "calls/min"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        }
+      }
+    },
+    {
+      "id": 31,
+      "type": "timeseries",
+      "title": "MCP calls per minute by client and server",
+      "description": "MCP tool results per minute by client and server. Claude names come from tool_parameters (OTEL_LOG_TOOL_DETAILS=1); Codex names come from its native mcp_server field. Every Codex app-server front-end reports service.name codex-app-server, so client uses the thread's originator there. One app-server process gives new threads the originator of the first client that initialized it. A series without a server name is a Claude session without tool details. Names are Loki structured metadata written by the Collector's transform/tool_names; no label is added. Claude MCP server names and subagent types need OTEL_LOG_TOOL_DETAILS=1 in Claude Code; sessions started without it show an empty name (see the integrity panel). Agent types outside Claude Code's built-in agents show as custom. client is the Codex originator for codex-app-server front-ends, else the service name.",
+      "gridPos": {
+        "x": 0,
+        "y": 65,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ecosystem-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by (client, mcp_server_name) (rate({service_name=~\".+\"} | event_name=~\"tool_result|codex.tool_result\" | tool_family=\"mcp\" | keep client, mcp_server_name [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "{{client}} \u00b7 {{mcp_server_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "custom": {
+            "axisLabel": "calls/min"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        }
+      }
+    },
+    {
+      "id": 32,
+      "type": "timeseries",
+      "title": "Skill activations per minute by name",
+      "description": "Claude Code skill_activated events: model-invoked (claude-proactive, nested-skill) and /skill (user-slash). User-defined skills are named custom_skill unless OTEL_LOG_TOOL_DETAILS=1. Codex loads skills as instructions and emits no skill event. Names are Loki structured metadata written by the Collector's transform/tool_names; no label is added. Claude MCP server names and subagent types need OTEL_LOG_TOOL_DETAILS=1 in Claude Code; sessions started without it show an empty name (see the integrity panel). Agent types outside Claude Code's built-in agents show as custom. client is the Codex originator for codex-app-server front-ends, else the service name.",
+      "gridPos": {
+        "x": 12,
+        "y": 65,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ecosystem-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by (skill_name, invocation_trigger) (rate({service_name=~\"claude-code.*\"} | event_name=\"skill_activated\" | keep skill_name, invocation_trigger [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "{{skill_name}} \u00b7 {{invocation_trigger}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "custom": {
+            "axisLabel": "calls/min"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        }
+      }
+    },
+    {
+      "id": 33,
+      "type": "timeseries",
+      "title": "Subagent and workflow launches per minute",
+      "description": "Launches, counted when they start. Claude: accepted tool_decision events for Agent/Task (by subagent_type) and Workflow, which Claude Code logs before the tool runs; an Agent call's tool_result arrives only when its subagent finishes, and a rejected call never launches. Codex: spawn messages (codex.agent_communication kind=spawn, state=send), which carry no originator, so app-server front-ends share one series; sender and receiver thread ids stay as structured metadata for drill-down. Names are Loki structured metadata written by the Collector's transform/tool_names; no label is added. Claude MCP server names and subagent types need OTEL_LOG_TOOL_DETAILS=1 in Claude Code; sessions started without it show an empty name (see the integrity panel). Agent types outside Claude Code's built-in agents show as custom. client is the Codex originator for codex-app-server front-ends, else the service name.",
+      "gridPos": {
+        "x": 0,
+        "y": 73,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ecosystem-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by (subagent_type) (rate({service_name=~\"claude-code.*\"} | event_name=\"tool_decision\" | decision=\"accept\" | tool_name=~\"Agent|Task\" | keep subagent_type [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "Claude Agent launches \u00b7 {{subagent_type}}"
+        },
+        {
+          "refId": "B",
+          "expr": "60 * sum by (service_name) (rate({service_name=~\"claude-code.*\"} | event_name=\"tool_decision\" | decision=\"accept\" | tool_name=\"Workflow\" | keep service_name [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "Claude Workflow launches"
+        },
+        {
+          "refId": "C",
+          "expr": "60 * sum by (service_name) (rate({service_name=~\".+\"} | event_name=\"codex.agent_communication\" | kind=\"spawn\" | state=\"send\" | keep service_name [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "{{service_name}} sub-agent spawns"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "custom": {
+            "axisLabel": "calls/min"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        }
+      }
+    },
+    {
+      "id": 34,
+      "type": "timeseries",
+      "title": "Tool calls per minute by client and actor",
+      "description": "By client (the Codex originator for codex-app-server front-ends, else the service name). Codex: actor main (agent_name /root) or subagent (/root/<task>); the agent path itself is not exported. Claude: workflow children carry workflow.run_id (actor workflow); Agent-tool subagents are not marked on tool events, so their calls fall in main_or_subagent. The second query adds Claude's own per-subagent total_tool_uses, reported when a subagent completes: a lagged subset of main_or_subagent, never an addition to it. Names are Loki structured metadata written by the Collector's transform/tool_names; no label is added. Claude MCP server names and subagent types need OTEL_LOG_TOOL_DETAILS=1 in Claude Code; sessions started without it show an empty name (see the integrity panel). Agent types outside Claude Code's built-in agents show as custom. client is the Codex originator for codex-app-server front-ends, else the service name.",
+      "gridPos": {
+        "x": 12,
+        "y": 73,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ecosystem-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by (client, actor) (rate({service_name=~\".+\"} | event_name=~\"tool_result|codex.tool_result\" | tool_family!=\"code_mode\" | keep client, actor [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "{{client}} \u00b7 {{actor}}"
+        },
+        {
+          "refId": "B",
+          "expr": "60 * sum by (agent_type) (rate({service_name=~\"claude-code.*\"} | event_name=\"subagent_completed\" | keep agent_type, total_tool_uses | unwrap total_tool_uses | __error__=\"\" [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "Claude subagent {{agent_type}} \u00b7 tool uses at completion"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "custom": {
+            "axisLabel": "calls/min"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        }
+      }
+    },
+    {
+      "id": 35,
+      "type": "stat",
+      "title": "MCP share of tool calls (selected range)",
+      "description": "MCP tool results over all tool results in the selected range. Codex code-mode wrappers are excluded from the denominator because the calls inside them are counted.",
+      "gridPos": {
+        "x": 0,
+        "y": 81,
+        "w": 8,
+        "h": 6
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ecosystem-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(sum(count_over_time({service_name=~\"claude-code.*\"} | event_name=\"tool_result\" | tool_family=\"mcp\" | keep service_name [$__auto])) or vector(0)) / sum(count_over_time({service_name=~\"claude-code.*\"} | event_name=\"tool_result\" | keep service_name [$__auto]))",
+          "queryType": "instant",
+          "legendFormat": "Claude"
+        },
+        {
+          "refId": "B",
+          "expr": "(sum(count_over_time({service_name=~\".+\"} | event_name=\"codex.tool_result\" | tool_family=\"mcp\" | keep service_name [$__auto])) or vector(0)) / sum(count_over_time({service_name=~\".+\"} | event_name=\"codex.tool_result\" | tool_family!=\"code_mode\" | keep service_name [$__auto]))",
+          "queryType": "instant",
+          "legendFormat": "Codex"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "noValue": "no calls",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 36,
+      "type": "stat",
+      "title": "ctx and rtk adoption (selected range)",
+      "description": "ctx: context-mode MCP calls over context-mode + shell + read + web calls. rtk: shell calls whose command starts with rtk over shell calls with a known command start (shell_rtk is computed in the Collector from Claude's bash_command or Codex's exec_command cmd; the command text itself is deleted).",
+      "gridPos": {
+        "x": 8,
+        "y": 81,
+        "w": 8,
+        "h": 6
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ecosystem-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(sum(count_over_time({service_name=~\"claude-code.*\"} | event_name=\"tool_result\" | mcp_server_name=~\"context-mode|plugin_context-mode_context-mode\" | keep service_name [$__auto])) or vector(0)) / sum(count_over_time({service_name=~\"claude-code.*\"} | event_name=\"tool_result\" | tool_family=~\"shell|read|web\" or mcp_server_name=~\"context-mode|plugin_context-mode_context-mode\" | keep service_name [$__auto]))",
+          "queryType": "instant",
+          "legendFormat": "Claude ctx"
+        },
+        {
+          "refId": "B",
+          "expr": "(sum(count_over_time({service_name=~\".+\"} | event_name=\"codex.tool_result\" | mcp_server_name=~\"context-mode|plugin_context-mode_context-mode\" | keep service_name [$__auto])) or vector(0)) / sum(count_over_time({service_name=~\".+\"} | event_name=\"codex.tool_result\" | tool_family=~\"shell|read|web\" or mcp_server_name=~\"context-mode|plugin_context-mode_context-mode\" | keep service_name [$__auto]))",
+          "queryType": "instant",
+          "legendFormat": "Codex ctx"
+        },
+        {
+          "refId": "C",
+          "expr": "(sum(count_over_time({service_name=~\"claude-code.*\"} | event_name=\"tool_result\" | shell_rtk=\"true\" | keep service_name [$__auto])) or vector(0)) / sum(count_over_time({service_name=~\"claude-code.*\"} | event_name=\"tool_result\" | shell_rtk!=\"\" | keep service_name [$__auto]))",
+          "queryType": "instant",
+          "legendFormat": "Claude rtk"
+        },
+        {
+          "refId": "D",
+          "expr": "(sum(count_over_time({service_name=~\".+\"} | event_name=\"codex.tool_result\" | shell_rtk=\"true\" | keep service_name [$__auto])) or vector(0)) / sum(count_over_time({service_name=~\".+\"} | event_name=\"codex.tool_result\" | shell_rtk!=\"\" | keep service_name [$__auto]))",
+          "queryType": "instant",
+          "legendFormat": "Codex rtk"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "noValue": "no calls",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 37,
+      "type": "stat",
+      "title": "Invoke-rate telemetry integrity (selected range)",
+      "description": "All three should be 0. MCP calls without a server name come from Claude sessions started without OTEL_LOG_TOOL_DETAILS=1. Unparsed: tool_parameters that were not a JSON object (names lost, content still deleted). Replaced names failed the Collector's name pattern (for example text with spaces) and are exported as other. Agent types outside Claude Code's built-in agents are custom by design and are not counted here.",
+      "gridPos": {
+        "x": 16,
+        "y": 81,
+        "w": 8,
+        "h": 6
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ecosystem-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({service_name=~\"claude-code.*\"} | event_name=\"tool_result\" | tool_family=\"mcp\" | mcp_server_name=\"\" | keep service_name [$__auto])) or vector(0)",
+          "queryType": "instant",
+          "legendFormat": "Claude MCP calls without a server name"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(count_over_time({service_name=~\".+\"} | tool_details=\"unparsed\" | keep service_name [$__auto])) or vector(0)",
+          "queryType": "instant",
+          "legendFormat": "Unparsed tool_parameters"
+        },
+        {
+          "refId": "C",
+          "expr": "sum(count_over_time({service_name=~\".+\"} | mcp_server_name=\"other\" or mcp_tool_name=\"other\" or skill_name=\"other\" or originator=\"other\" or client=\"other\" | keep service_name [$__auto])) or vector(0)",
+          "queryType": "instant",
+          "legendFormat": "Names replaced by the name pattern"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "no calls",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 38,
+      "type": "timeseries",
+      "title": "MCP-consuming API requests per minute by actor",
+      "description": "Claude api_request events that consumed an MCP tool result, by the requesting actor (query_source: main, subagent, workflow, auxiliary) and server. This is the only per-call link between an Agent-tool subagent and its MCP calls. It counts requests: several MCP results consumed by one request count once, so as a count of MCP calls it is a lower bound. Names are Loki structured metadata written by the Collector's transform/tool_names; no label is added. Claude MCP server names and subagent types need OTEL_LOG_TOOL_DETAILS=1 in Claude Code; sessions started without it show an empty name (see the integrity panel). Agent types outside Claude Code's built-in agents show as custom. client is the Codex originator for codex-app-server front-ends, else the service name.",
+      "gridPos": {
+        "x": 0,
+        "y": 87,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ecosystem-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by (actor, mcp_server_name) (rate({service_name=~\"claude-code.*\"} | event_name=\"api_request\" | mcp_server_name!=\"\" | keep actor, mcp_server_name [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "{{actor}} \u00b7 {{mcp_server_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "custom": {
+            "axisLabel": "requests/min"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        }
       }
     }
   ]
