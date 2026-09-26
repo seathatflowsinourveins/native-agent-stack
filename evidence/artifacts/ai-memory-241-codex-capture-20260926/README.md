@@ -25,13 +25,14 @@ addendum. It does not record the trust action itself.
   how many are not ai-memory commands. The seven events are SessionStart, UserPromptSubmit,
   PreToolUse, PostToolUse, PreCompact, Stop and SessionEnd, with one 2.4.1 command each.
 - `capture-attempt1-untrusted-dir.txt` is the first attempt, kept as a failed attempt. It
-  ran from a scratch directory. Codex exited 1, and 0 Codex sessions wrote observations.
-  Its stderr was not retained, because the second attempt overwrote the scratch file.
-- `capture-attempt1-repro.txt` repeats the first attempt's condition (a directory outside
-  any git repository) with the complete stderr kept. Codex exited 1 with no stdout. Its
-  stderr was "Reading additional input from stdin..." followed by "Not inside a trusted
-  directory and --skip-git-repo-check was not specified.". 0 Codex sessions wrote
-  observations. This is a reproduction; the original's stderr is not retained.
+  records that Codex exited 1 and that 0 Codex sessions wrote observations. It does not
+  record the attempt's working directory or stderr.
+- `capture-attempt1-repro.txt` is a later, separate run from a directory outside any git
+  repository, with complete stderr: Codex exited 1 with no stdout, and its stderr was
+  "Reading additional input from stdin..." followed by "Not inside a trusted directory and
+  --skip-git-repo-check was not specified.". 0 Codex sessions wrote observations. It shows
+  one condition that ends `codex exec` before any session; it establishes only its own
+  failure, not the cause of the first attempt's.
 - `codex_capture_count.py` is the read-only SQLite query (`mode=ro`) over the production
   store. It counts, per observation kind, the observations created at or after the probe
   start whose session has `agent_kind = 'codex'`. It also prints the store's schema version.
