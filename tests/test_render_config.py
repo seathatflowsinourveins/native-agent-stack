@@ -108,6 +108,17 @@ class RenderConfigTests(unittest.TestCase):
         self.assertLessEqual(offline.items(), user["mcp_servers"]["headroom"]["env"].items())
         self.assertNotIn("context-mode", rendered("project.codex.config.template.toml").get("mcp_servers", {}))
 
+    def test_claude_template_turns_off_claudeai_skill_sync_and_mcp_servers(self):
+        # docs/decisions/2026-09-25-skills-trial-and-usage.md, addendum "claude.ai skill sync and MCP
+        # servers off": syncClaudeAiSkills is a settings boolean (Claude Code 2.1.275) and
+        # ENABLE_CLAUDEAI_MCP_SERVERS an environment variable whose opt-out value is the string "false"
+        # (2.1.63). tools/adoption/apply_claude_settings.py never deletes a key, so a template that
+        # dropped either line would leave applied hosts off but turn both back on for every new host.
+        text = (TEMPLATES / "claude.settings.template.json").read_text(encoding="utf-8")
+        settings = json.loads(string.Template(text).substitute(FIXTURE_VALUES))
+        self.assertIs(settings["syncClaudeAiSkills"], False)
+        self.assertEqual(settings["env"]["ENABLE_CLAUDEAI_MCP_SERVERS"], "false")
+
     def test_render_out_writes_three_files(self):
         out_dir = self.tmp_path / "out"
         result = run("--host", "test-fixture-host", "--out", str(out_dir))

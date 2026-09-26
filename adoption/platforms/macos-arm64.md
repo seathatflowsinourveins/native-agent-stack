@@ -81,6 +81,7 @@ release, the note is history and the step is in your checkout (`test -e
    ai-memory hook commands name `tools/ai-memory-2.4.1`, where the tag's name `tools/ai-memory-2.3.2`.
    Before using the rendered settings, follow
    [ai-memory hook paths on macOS](#ai-memory-hook-paths-on-macos).
+   The template changed after `v2026.09.26.2` again: it turns off the claude.ai skill sync (`syncClaudeAiSkills`) and the claude.ai MCP servers (`ENABLE_CLAUDEAI_MCP_SERVERS`) ([decision](../../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-09-26-claudeai-skill-sync-and-mcp-servers-off)).
 4. launchd services and the embedding acceptance ("launchd services" and
    "Embedding backend decision" below).
 5. `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile macos-arm64-foundation --json`
