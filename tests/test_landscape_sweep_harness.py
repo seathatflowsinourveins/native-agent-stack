@@ -14,6 +14,8 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
+import shlex
 import shutil
 import stat
 import subprocess
@@ -160,6 +162,41 @@ def synthetic_result():
             "followups": [beta_followup], "lost_first": ["gamma"]}
 
 
+def healthy_result():
+    """One layer whose every worker returned: both discovery families, and all three votes on each proposal. A1 is
+    refuted by facts and A4 by the Claude fit refuter, so nothing survives: a clean layer."""
+    alpha = {"layer_id": "alpha", "catalog": "foundation", "round": "first", "followup_reason": None,
+             "claude_discover": discovery("alpha", [A1]), "gpt6_discover": gpt6_entry(discovery("alpha", [A4])),
+             "merged": [merged_row(A1, ["claude"]), merged_row(A4, ["gpt6"])], "dropped": [],
+             "facts": votes("alpha", "facts", {A1: True, A4: False}),
+             "fit_claude": votes("alpha", "fit", {A1: False, A4: True}),
+             "fit_gpt6": gpt6_entry(votes("alpha", "fit", {A1: False, A4: False}))}
+    return {"sweep": "landscape-sweep-20261026", "first": [alpha], "critic": {"followup_layers": [], "general": []},
+            "followups": [], "lost_first": []}
+
+
+def fail_gpt6_fit(res):
+    """Every GPT-6 fit job failed (any non-limit failure: auth, a missing model, a timeout, a lossy wrapper)."""
+    for entry in res["first"] + [e for e in res.get("followups") or [] if e]:
+        if not entry.get("lost"):
+            entry["fit_gpt6"] = gpt6_entry(None, "failed_exit_1")
+    return res
+
+
+def write_codex_files(work: Path, res: dict) -> None:
+    """The gpt6/<job>/last.json and exit files a faithful run leaves for each GPT-6 output the workflow received."""
+    for entry in res["first"] + [e for e in res.get("followups") or [] if e]:
+        if entry.get("lost"):
+            continue
+        suffix = "-followup" if entry.get("round") == "followup" else ""
+        for name, key in (("discover", "gpt6_discover"), ("fit", "fit_gpt6")):
+            job = entry.get(key)
+            if job and job.get("status") == "ok":
+                directory = work / "gpt6" / f"gpt6-{name}-{entry['layer_id']}{suffix}"
+                write_json(directory / "last.json", job["output"])
+                (directory / "exit").write_text("0\n", encoding="utf-8")
+
+
 def scope_for(layers=(("foundation", "alpha"), ("us-equities", "beta"), ("foundation", "gamma"))):
     return {"platform_profiles_sha256": PLAT,
             "requirement_sha256": {f"{catalog}/{layer_id}": REQ for catalog, layer_id in layers}}
@@ -259,6 +296,32 @@ class MakePromptTests(unittest.TestCase):
             make_prompt.compose(build_args.load_templates(), "discover", self.LAYER)
 
 
+# --------------------------------------------------------------------------- repository canonicalization
+
+CANONICAL = {
+    "https://github.com/httpie/cli/tree/main": "https://github.com/httpie/cli",
+    "https://github.com/HTTPie/CLI.git": "https://github.com/httpie/cli",
+    "http://www.github.com/http-party/http-server/": "https://github.com/http-party/http-server",
+    "github.com/o/r#readme": "https://github.com/o/r",
+    " https://github.com/o/r ": "https://github.com/o/r",
+    "https://github.com/o/pages.github.io": "https://github.com/o/pages.github.io",
+    "httpie/cli": "https://github.com/httpie/cli",
+    "HTTPie/cli.git": "https://github.com/httpie/cli",
+    "http-party/http-server/": "https://github.com/http-party/http-server",
+}
+NOT_GITHUB = ["https://gitlab.com/o/r", "https://example.com", "gitlab.com/o", "https://github.com/o", "not a repo", ""]
+
+
+class CanonTests(unittest.TestCase):
+    def test_github_urls_and_bare_slugs_are_canonical_whatever_the_owner_is_called(self):
+        for value, expected in CANONICAL.items():
+            self.assertEqual(sweep_common.canon(value), expected, value)
+            self.assertEqual(sweep_common.slug(value), expected[len("https://github.com/"):], value)
+        for value in NOT_GITHUB:
+            self.assertEqual(sweep_common.canon(value), value, value)
+        self.assertIsNone(sweep_common.canon(None))
+
+
 # --------------------------------------------------------------------------- build_inputs
 
 
@@ -341,8 +404,8 @@ class BuildInputsTests(unittest.TestCase):
 # --------------------------------------------------------------------------- build_args
 
 
-def stage_work(case, layers=("alpha", "beta", "gamma")):
-    work = temp_dir(case)
+def stage_work(case, layers=("alpha", "beta", "gamma"), work=None):
+    work = work or temp_dir(case)
     catalogs = {"alpha": "foundation", "beta": "us-equities", "gamma": "foundation"}
     rows = []
     for layer_id in layers:
@@ -446,6 +509,11 @@ class BuildArgsTests(unittest.TestCase):
                     "2026-10-26"])
         self.assertEqual(done.returncode, 2)
         self.assertIn("inside the git repository", done.stderr)
+        newline = temp_dir(self) / "line\nbreak"
+        newline.mkdir()
+        done = build(stage_work(self, ("alpha",), work=newline))
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("control character", done.stderr)
 
 
 # --------------------------------------------------------------------------- the GPT-6 runner
@@ -801,9 +869,140 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual((vote["facts"]["model"], vote["fit"]["claude"]["model"], vote["fit"]["gpt6"]["model"]),
                          ("claude-sonnet-5", "claude-opus-5-5", "gpt-6-astra"))
 
-    def cli(self, work, res, *extra):
+    def test_failed_gpt6_fit_lanes_reopen_every_affected_layer(self):
+        out = self.convert(fail_gpt6_fit(synthetic_result()))
+        self.assertEqual(out["survivors"], [])  # every proposal lacks its GPT-6 fit vote, so each counts as refuted
+        for layer in out["layers"]:
+            layer_id = layer["layer_id"]
+            self.assertEqual(layer["reopen"], [{"trigger": "retained_failure", "ref": f"@RETURNS@#/failures/{layer_id}"}])
+            failures = sl.resolve_pointer(out["returns"], f"/failures/{layer_id}")
+            gpt6 = [f for f in failures if f["cause"] == "vote_missing" and f["role"] == "fit_gpt6"]
+            self.assertTrue(gpt6, layer_id)
+            self.assertTrue(all(f["status"] == "failed_exit_1" for f in gpt6))
+            voted = {r for f in gpt6 for r in f["repositories"]}
+            self.assertEqual(voted, set(layer["proposed"]))
+        self.assertEqual(out["summary"]["reopened_layers"], ["alpha", "beta"])
+
+    def test_only_a_layer_with_retained_failures_is_reopened(self):
+        out = self.convert(healthy_result())
+        self.assertEqual((out["layers"][0]["reopen"], out["returns"]["failures"]), ([], {}))
+        out = self.convert()
+        # alpha: A3 has no GPT-6 fit vote; beta: the first round lacks the GPT-6 discovery and B1's facts vote.
+        self.assertEqual(out["summary"]["retained_failures"], {
+            "alpha": ["first:vote_missing"],
+            "beta": ["first:discovery_missing", "first:vote_missing"]})
+        beta = out["returns"]["failures"]["beta"]
+        self.assertEqual((beta[0]["family"], beta[0]["status"]), ("gpt6", "failed_exit_1"))
+        self.assertEqual((beta[1]["role"], beta[1]["repositories"]), ("facts", [B1]))
+
+    def test_a_reproposal_takes_the_later_rounds_proposal_and_all_three_votes(self):
+        x = "https://github.com/o/x"
+
+        def layer_round(rnd, label, facts, fit_claude, fit_gpt6):
+            return {"layer_id": "alpha", "catalog": "foundation", "round": rnd,
+                    "followup_reason": {"reason": "r"} if rnd == "followup" else None,
+                    "claude_discover": discovery("alpha", [x]), "gpt6_discover": gpt6_entry(discovery("alpha", [x])),
+                    "merged": [merged_row(x, ["claude", "gpt6"], label)], "dropped": [],
+                    "facts": facts, "fit_claude": fit_claude, "fit_gpt6": fit_gpt6}
+
+        critic = {"followup_layers": [{"layer_id": "alpha", "reason": "r", "search_directions": []}], "general": []}
+        # (a) refuted as a targeted_candidate, proposed again as keep_but_compare and passed by all three refuters
+        first = layer_round("first", "targeted_candidate", votes("alpha", "facts", {x: False}),
+                            votes("alpha", "fit", {x: True}), gpt6_entry(votes("alpha", "fit", {x: True})))
+        follow = layer_round("followup", "keep_but_compare", votes("alpha", "facts", {x: False}),
+                             votes("alpha", "fit", {x: False}), gpt6_entry(votes("alpha", "fit", {x: False})))
+        follow["fit_claude"]["votes"][0]["reasoning"] = "follow-up fit"
+        out = self.convert({"sweep": LANE, "first": [first], "critic": critic, "followups": [follow]})
+        self.assertEqual(out["returns"]["discovery"]["alpha"]["proposed"], [x])
+        self.assertEqual([e["repo"] for e in out["layers"][0]["survived"]], [x])
+        candidate = out["lanes"]["lanes"][0]["result"]["layers"][0]["new_candidates"][0]
+        self.assertEqual((candidate["proposed_label"], candidate["demonstrated_gap"]), ("keep_but_compare", f"gap of {x}"))
+        vote = out["returns"]["votes"]["alpha"][0]
+        self.assertEqual((vote["facts"]["round"], vote["fit"]["round"], vote["fit"]["claude"]["reasoning"]),
+                         ("followup", "followup", "follow-up fit"))
+        self.assertEqual(out["returns"]["failures"], {})
+        # (b) the follow-up's Claude fit refuter returned nothing: the round-1 Claude vote is never reused
+        first = layer_round("first", "keep_but_compare", votes("alpha", "facts", {x: False}),
+                            votes("alpha", "fit", {x: False}), gpt6_entry(votes("alpha", "fit", {x: True})))
+        follow = layer_round("followup", "keep_but_compare", votes("alpha", "facts", {x: False}), None,
+                             gpt6_entry(votes("alpha", "fit", {x: False})))
+        out = self.convert({"sweep": LANE, "first": [first], "critic": critic, "followups": [follow]})
+        self.assertEqual([e["repo"] for e in out["layers"][0]["refuted"]], [x])
+        vote = out["returns"]["votes"]["alpha"][0]
+        self.assertTrue(vote["fit"]["claude"]["missing"])
+        self.assertEqual((vote["fit"]["gpt6"]["refuted"], vote["fit"]["refuted"]), (False, True))
+        self.assertIn("Claude fit vote missing (counted as refuted)", vote["fit"]["notes"])
+        self.assertEqual([(f["round"], f["cause"], f["role"]) for f in out["returns"]["failures"]["alpha"]],
+                         [("followup", "vote_missing", "fit_claude")])
+        self.assertEqual(out["layers"][0]["reopen"][0]["trigger"], "retained_failure")
+
+    def test_a_vote_refutes_unless_it_says_false(self):
+        res = healthy_result()
+        alpha = res["first"][0]
+        alpha["facts"] = votes("alpha", "facts", {A1: False, A4: False})
+        alpha["facts"]["votes"][1]["refuted"] = None  # A4: no boolean (a falsy value never passes a proposal)
+        alpha["fit_claude"] = votes("alpha", "fit", {A1: True, A4: False})
+        alpha["fit_claude"]["votes"].append(dict(alpha["fit_claude"]["votes"][0], refuted=False))  # A1 voted twice
+        out = self.convert(res)
+        votes_alpha = {v["facts"]["repository"]: v for v in out["returns"]["votes"]["alpha"]}
+        self.assertTrue(votes_alpha[sweep_common.canon(A4)]["facts"]["refuted"])
+        self.assertTrue(votes_alpha[sweep_common.canon(A1)]["fit"]["claude"]["refuted"])  # the refuting vote wins
+        self.assertEqual(out["survivors"], [])
+
+    def test_lost_and_unrun_followups_and_a_lost_critic_are_retained_failures(self):
+        res = synthetic_result()
+        res["followups"] = [None]  # a lost follow-up round, as the prototype returned it
+        out = self.convert(res)
+        self.assertIn("beta:followup", out["summary"]["lost"])
+        self.assertEqual(out["returns"]["raw"]["beta"]["followup"]["lost"], True)
+        self.assertIn("followup:round_lost", out["summary"]["retained_failures"]["beta"])
+        self.assertEqual(out["returns"]["discovery"]["beta"]["proposed"], [B1])  # the first round only
+        unattributed = dict(synthetic_result(), followups=[None])
+        del unattributed["critic"]
+        with self.assertRaisesRegex(ValueError, "no critic"):
+            self.convert(unattributed)
+        with self.assertRaisesRegex(ValueError, "do not match the critic"):
+            self.convert(dict(synthetic_result(), followups=[]))
+        out = self.convert(dict(synthetic_result(), critic=None, followups=[]))
+        self.assertTrue(out["summary"]["critic_lost"])
+        for layer in out["layers"]:
+            self.assertIn("critic:critic_lost", out["summary"]["retained_failures"][layer["layer_id"]])
+        # A critic-flagged layer beyond the follow-up cap got no round: it cannot count as clean either.
+        ids = [f"layer-{i}" for i in range(convert.FOLLOWUP_CAP + 1)]
+
+        def empty_round(layer_id, rnd):
+            return {"layer_id": layer_id, "catalog": "foundation", "round": rnd, "followup_reason": None,
+                    "claude_discover": discovery(layer_id, []), "gpt6_discover": gpt6_entry(discovery(layer_id, [])),
+                    "merged": [], "dropped": [], "facts": None, "fit_claude": None, "fit_gpt6": None}
+
+        critic = {"followup_layers": [{"layer_id": i, "reason": "r", "search_directions": []} for i in ids], "general": []}
+        res = {"sweep": LANE, "first": [empty_round(i, "first") for i in ids], "critic": critic,
+               "followups": [empty_round(i, "followup") for i in ids[:convert.FOLLOWUP_CAP]]}
+        out = convert.convert(res, scope_for([("foundation", i) for i in ids]), LANE, convert.resolved_models(None))
+        self.assertEqual(out["summary"]["retained_failures"], {ids[-1]: ["critic:followup_not_run"]})
+
+    def test_vote_models_and_efforts_come_from_each_workers_usage(self):
+        document = usage_record.record(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS), 0, "cmd", ROOT)
+        for child in document["child_usage"]["children"]:
+            if child["label"] == "refute-fit:alpha":
+                child["efforts"] = ["xhigh"]
+        out = convert.convert(synthetic_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        vote = out["returns"]["votes"]["alpha"][0]
+        self.assertEqual((vote["facts"]["effort"], vote["fit"]["claude"]["effort"], vote["fit"]["gpt6"]["effort"]),
+                         ("max", "xhigh", "max"))
+        followup_vote = out["returns"]["votes"]["beta"][1]
+        self.assertEqual((followup_vote["facts"]["round"], followup_vote["facts"]["effort"],
+                          followup_vote["facts"]["model"]), ("followup", "max", "claude-sonnet-5"))
+        # Without a usage record nothing was measured: the requested alias, and effort null rather than a claimed max.
+        vote = self.convert()["returns"]["votes"]["alpha"][0]
+        self.assertEqual((vote["facts"]["model"], vote["facts"]["effort"], vote["fit"]["claude"]["effort"]),
+                         ("sonnet", None, None))
+
+    def cli(self, work, res, *extra, codex_files=True):
         run_file = write_json(work / "run.json", {"runId": "wf_fixture-1", "status": "completed", "result": res})
         write_json(work / "scope.json", scope_for())
+        if codex_files:
+            write_codex_files(work, res)
         return run([sys.executable, HARNESS / "convert.py", "--workflow-output", run_file, "--work-dir", work,
                     "--out", work / "out", *extra])
 
@@ -828,19 +1027,41 @@ class ConvertTests(unittest.TestCase):
     def test_cli_compares_each_gpt6_output_with_the_file_codex_wrote(self):
         work = temp_dir(self)
         res = synthetic_result()
-        write_json(work / "gpt6/gpt6-fit-alpha/last.json", res["first"][0]["fit_gpt6"]["output"])
         done = self.cli(work, res)
         self.assertEqual(done.returncode, 0, done.stderr)
-        checks = json.loads(done.stdout)["gpt6_copy_check"]
-        self.assertEqual((checks.get("match"), checks.get("mismatch")), (1, None))
-        self.assertEqual(checks.get("no_file"), 4)  # outputs received for which this work dir holds no file
+        self.assertEqual(json.loads(done.stdout)["gpt6_copy_check"], {"match": 5})
         altered = copy.deepcopy(res["first"][0]["gpt6_discover"]["output"])
         altered["proposed"][0]["demonstrated_gap"] = "changed by the wrapper"
-        write_json(work / "gpt6/gpt6-discover-alpha/last.json", altered)
-        done = self.cli(work, res)
-        self.assertEqual(done.returncode, 4)
-        returns = json.loads((work / "out/returns.json").read_text())
-        self.assertEqual(returns["raw"]["alpha"]["first"]["gpt6_copy_check"], {"discover": "mismatch", "fit": "match"})
+        beta_discover = work / "gpt6/gpt6-discover-beta"  # that job failed: the workflow received no output
+        cases = [  # (change to a faithful run's files, the job, its expected check)
+            (lambda: write_json(work / "gpt6/gpt6-discover-alpha/last.json", altered), "gpt6-discover-alpha", "mismatch"),
+            (lambda: (work / "gpt6/gpt6-fit-alpha/last.json").unlink(), "gpt6-fit-alpha", "no_file"),
+            (lambda: (work / "gpt6/gpt6-fit-alpha/last.json").write_text("{not json"), "gpt6-fit-alpha", "file_unparseable"),
+            (lambda: (write_json(beta_discover / "last.json", discovery("beta", [B2])),
+                      (beta_discover / "exit").write_text("0\n")), "gpt6-discover-beta", "file_only"),
+        ]
+        for change, job, expected in cases:
+            shutil.rmtree(work / "gpt6", ignore_errors=True)
+            write_codex_files(work, res)
+            change()
+            done = self.cli(work, res, codex_files=False)
+            self.assertEqual(done.returncode, 4, (expected, done.stderr))
+            self.assertIn(expected, done.stderr)
+            summary = json.loads(done.stdout)
+            self.assertEqual(summary["gpt6_copy_check"].get(expected), 1, expected)
+            layer = job.split("-")[-1]
+            returns = json.loads((work / "out/returns.json").read_text())
+            self.assertIn({"round": "first", "cause": "gpt6_copy", "job": job, "check": expected},
+                          returns["failures"][layer])
+            layers = {x["layer_id"]: x for x in json.loads((work / "out/layers.json").read_text())}
+            self.assertEqual(layers[layer]["reopen"][0]["trigger"], "retained_failure")
+        # A failed job that wrote a file anyway is not a copy problem: the workflow rightly did not use it.
+        shutil.rmtree(work / "gpt6")
+        write_codex_files(work, res)
+        write_json(beta_discover / "last.json", discovery("beta", [B2]))
+        (beta_discover / "exit").write_text("1\n")
+        done = self.cli(work, res, codex_files=False)
+        self.assertEqual(done.returncode, 0, done.stderr)
 
 
 # --------------------------------------------------------------------------- usage record, result and ledger
@@ -877,6 +1098,20 @@ class UsageRecordTests(unittest.TestCase):
                     "--out", work / "usage2.json"])
         self.assertEqual(done.returncode, 3)
         self.assertFalse((work / "usage2.json").exists())
+
+    def test_effort_drift_fails_even_when_the_usage_is_complete(self):
+        # child-usage.mjs --require-effort max exits 1 and lists the child when one ran at another effort.
+        work = temp_dir(self)
+        drifted = json.loads(child_usage_raw("wf_fixture-4", ["discover:alpha"]))
+        drifted["children"][0]["efforts"] = ["xhigh"]
+        drifted["effort_mismatches"] = [{"child": "discover:alpha", "efforts": ["xhigh"]}]
+        (work / "raw.json").write_text(json.dumps(drifted))
+        for code in ("1", "0"):  # the tool's exit code, and the mismatch list on its own
+            done = run([sys.executable, HARNESS / "usage_record.py", "--raw-output", work / "raw.json", "--exit-code",
+                        code, "--out", work / "usage.json"])
+            self.assertEqual(done.returncode, 1, code)
+            self.assertEqual(json.loads(done.stdout)["effort_mismatches"], drifted["effort_mismatches"])
+            self.assertEqual(json.loads((work / "usage.json").read_text())["child_usage"]["status"], "complete")
 
 
 LANE = "landscape-sweep-20261026"
@@ -934,9 +1169,31 @@ class LedgerIntegrationTests(unittest.TestCase):
                       manifest={"checked_at": "2026-10-26"}, sweep_id=LANE, lane=LANE,
                       returns_ref=f"{self.base}/returns.json",
                       usage_ref=f"{self.base}-attempts/child-usage-wf_fixture-1.json",
-                      manifest_ref="catalogs/sota-convergence/manifest-20261026.json", prompts_sha256="c" * 64)
+                      manifest_ref="catalogs/sota-convergence/manifest-20261026.json", prompts_sha256="c" * 64,
+                      returns=json.loads((self.root / self.base / "returns.json").read_text()))
         values.update(overrides)
         return make_result.build_result(**values)
+
+    def clean_counts(self, res):
+        out, reviews = self.evidence(res)
+        ledger = sl.append(self.root, json.loads((self.root / sl.LEDGER).read_text()), self.result(out, reviews))
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        return {key[1]: value for key, value in sl.derive(ledger).items()}
+
+    def test_a_layer_whose_workers_all_returned_counts_as_clean(self):
+        state = self.clean_counts(healthy_result())
+        self.assertEqual((state["alpha"]["count"], state["alpha"]["reset"]), (1, []))
+
+    def test_a_sweep_whose_gpt6_fit_lane_failed_never_counts_as_clean(self):
+        # The reviewers' reproduction: every GPT-6 fit job failed, so every proposal is refuted and nothing
+        # survives. Before the repair both layers derived as clean (count 1); the retained failures now reset them.
+        state = self.clean_counts(fail_gpt6_fit(synthetic_result()))
+        for layer_id in ("alpha", "beta"):
+            self.assertEqual(state[layer_id]["count"], 0, layer_id)
+            self.assertIn({"trigger": "retained_failure", "ref": f"{self.base}/returns.json#/failures/{layer_id}"},
+                          state[layer_id]["reset"])
+        state = self.clean_counts(fail_gpt6_fit(healthy_result()))  # the same failure in an otherwise clean layer
+        self.assertEqual(state["alpha"]["count"], 0)
 
     def test_converted_evidence_appends_and_checks(self):
         out, reviews = self.evidence(synthetic_result())
@@ -969,6 +1226,32 @@ class LedgerIntegrationTests(unittest.TestCase):
             self.result(out, reviews, usage=usage)
         with self.assertRaisesRegex(ValueError, "did not cover"):
             self.result(out, reviews, reopen={"zeta": [{"trigger": "retained_failure", "ref": "x"}]})
+        # Effort drift: a failed measurement, a listed mismatch, or a child not measured at max alone.
+        for change, message in (
+                (lambda u: u["measurement"].update(exit_code=1), "measurement.exit_code"),
+                (lambda u: u["child_usage"].update(effort_mismatches=[{"child": "critic", "efforts": ["xhigh"]}]),
+                 "effort_mismatches"),
+                (lambda u: u["child_usage"]["children"][0].update(efforts=["max", "xhigh"]), "effort max only")):
+            drifted = copy.deepcopy(usage)
+            drifted["child_usage"]["status"] = "complete"
+            change(drifted)
+            with self.assertRaisesRegex(ValueError, message):
+                self.result(out, reviews, usage=drifted)
+        # A layer with retained failures must keep its retained_failure reopen entry.
+        stripped = copy.deepcopy(out["layers"])
+        stripped[0]["reopen"] = []
+        with self.assertRaisesRegex(ValueError, r"no retained_failure reopen entry.*alpha"):
+            self.result(dict(out, layers=stripped), reviews)
+
+    def test_hand_written_reopen_entries_are_added_to_the_retained_failures(self):
+        out, reviews = self.evidence(synthetic_result())
+        extra = {"trigger": "pin_moved", "ref": "evidence/receipts/x.json"}
+        result = self.result(out, reviews, reopen={"alpha": [extra], "beta": [extra]})
+        for layer in result["layers"]:
+            self.assertEqual(layer["reopen"], [
+                {"trigger": "retained_failure", "ref": f"{self.base}/returns.json#/failures/{layer['layer_id']}"}, extra])
+        ledger = sl.append(self.root, json.loads((self.root / sl.LEDGER).read_text()), result)
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
 
 
 # --------------------------------------------------------------------------- source reviews
@@ -1014,6 +1297,37 @@ class SourceReviewTests(unittest.TestCase):
         self.assertIn(f"Survived the {LANE} facts refuter and both fit refuters", review["claim"])
         self.assertEqual(review["documentation_excerpts"][0]["source"], f"README.md@{'f' * 40}")
 
+    def test_repositories_sharing_a_readable_name_get_distinct_files_and_none_is_overwritten(self):
+        work, bin_dir = temp_dir(self), temp_dir(self)
+        answers = {}
+        for full in ("acme/a-b", "acme-a/b", "o/alpha-one"):
+            answers[f"repos/{full}"] = {"full_name": full, "default_branch": "main", "license": None,
+                                        "description": "", "stargazers_count": 1, "pushed_at": "2026-10-20",
+                                        "archived": False}
+            answers[f"repos/{full}/commits/main"] = {"sha": "e" * 40}
+        gh = bin_dir / "gh"
+        gh.write_text(FAKE_GH.format(python=sys.executable, answers=repr(answers)), encoding="utf-8")
+        gh.chmod(0o755)
+        survivors = write_json(work / "survivors.json", [
+            {"layer_id": "alpha", "repository": "https://github.com/acme/a-b"},
+            {"layer_id": "beta", "repository": "https://github.com/acme-a/b"},
+            {"layer_id": "alpha", "repository": "https://github.com/o/alpha-one"}])
+        other = write_json(work / "reviews/o-alpha-one.json", {"repository": "https://github.com/someone/else"})
+        before = other.read_bytes()
+        env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '')}"}
+        done = run([sys.executable, HARNESS / "source_reviews.py", "--survivors", survivors, "--out", work / "reviews",
+                    "--lane", LANE], env=env)
+        self.assertEqual(done.returncode, 1)
+        self.assertIn("already holds a review of another repository", done.stderr)
+        self.assertEqual(other.read_bytes(), before)
+        written = {item["repository"]: item["path"] for item in json.loads(done.stdout)}
+        digest = {full: hashlib.sha256(full.encode()).hexdigest()[:10] for full in ("acme/a-b", "acme-a/b")}
+        self.assertEqual(written, {"https://github.com/acme/a-b": f"acme-a-b-{digest['acme/a-b']}.json",
+                                   "https://github.com/acme-a/b": f"acme-a-b-{digest['acme-a/b']}.json"})
+        for repository, path in written.items():
+            review = json.loads((work / "reviews" / path).read_text())
+            self.assertEqual((review["repository"], review["id"]), (repository, f"source-review-{path[:-5]}"))
+
 
 # --------------------------------------------------------------------------- sweep.js under node
 
@@ -1031,10 +1345,17 @@ const agent = async (prompt, opts = {}) => {
   return r === undefined ? null : r
 }
 const parallel = async (thunks) => Promise.all(thunks.map(async (t) => { try { return await t() } catch (e) { return null } }))
-const pipeline = async (items, ...stages) => Promise.all(items.map(async (item, i) => {
-  let v = item
-  try { for (const s of stages) v = await s(v, item, i); return v } catch (e) { return null }
-}))
+// fixture.lose_pipeline {"<n>": [item index, ...]}: the n-th pipeline() call returns null for those items, as the
+// runtime does for an item whose stage failed.
+let pipelineCall = 0
+const pipeline = async (items, ...stages) => {
+  const lose = (fixture.lose_pipeline || {})[String(pipelineCall++)] || []
+  return Promise.all(items.map(async (item, i) => {
+    if (lose.includes(i)) return null
+    let v = item
+    try { for (const s of stages) v = await s(v, item, i); return v } catch (e) { return null }
+  }))
+}
 const fn = new AsyncFunction('args', 'agent', 'parallel', 'pipeline', 'phase', 'log', 'budget', 'workflow', src)
 fn(args, agent, parallel, pipeline, (t) => phases.push(t), (m) => logs.push(m), { total: null }, null)
   .then((result) => process.stdout.write(JSON.stringify({ result, calls, logs, phases })))
@@ -1176,6 +1497,89 @@ class SweepScriptTests(unittest.TestCase):
         self.assertEqual(out["result"]["status"], "incomplete")
         self.assertEqual(out["calls"], [])
         self.assertTrue(any("S must be the absolute work directory" in i for i in out["result"]["argument_issues"]))
+        args = json.loads((self.work / "args.json").read_text())
+        for bad in (dict(args, S=args["S"] + "\nx"), dict(args, layers=[{"layer_id": "a;b", "catalog": "foundation"}])):
+            out = self.execute(HARNESS / "sweep.js", {"responses": {}}, bad)
+            self.assertEqual((out["result"]["status"], out["calls"]), ("incomplete", []))
+
+    def test_a_lost_followup_round_is_kept_as_a_lost_round_of_its_layer(self):
+        fixture, _, reason = node_fixture()
+        fixture["responses"]["gpt6-discover:beta"] = wrapper(discovery("beta", ["https://github.com/o/b1"]))
+        fixture["lose_pipeline"] = {"1": [0]}  # the second pipeline() call runs the follow-up rounds
+        out = self.execute(HARNESS / "sweep.js", fixture, json.loads((self.work / "args.json").read_text()))
+        result = out["result"]
+        self.assertEqual(result["followups"], [{
+            "layer_id": "beta", "catalog": "us-equities", "round": "followup", "lost": True,
+            "followup_reason": {"reason": reason, "search_directions": ["d1", "d2"],
+                                "already": ["https://github.com/o/b1"]}}])
+        self.assertEqual(result["lost_followups"], ["beta"])
+        self.assertIn("follow-up round lost layers: beta", out["logs"])
+        converted = convert.convert(result, scope_for(), LANE, convert.resolved_models(None))
+        self.assertEqual(converted["summary"]["lost"], ["beta:followup"])
+        self.assertEqual(converted["summary"]["retained_failures"], {"beta": ["followup:round_lost"]})
+        beta = next(layer for layer in converted["layers"] if layer["layer_id"] == "beta")
+        self.assertEqual(beta["reopen"], [{"trigger": "retained_failure", "ref": "@RETURNS@#/failures/beta"}])
+
+    def test_a_layer_the_critic_names_twice_gets_one_followup_round(self):
+        fixture, _, _ = node_fixture()
+        fixture["responses"]["critic"]["followup_layers"].append(
+            {"layer_id": "beta", "reason": "again", "search_directions": []})
+        out = self.execute(HARNESS / "sweep.js", fixture, json.loads((self.work / "args.json").read_text()))
+        self.assertIn("critic named layers more than once, repeats ignored: beta", out["logs"])
+        self.assertEqual([c["label"] for c in out["calls"]].count("discover:beta:followup"), 1)
+        self.assertEqual(len(out["result"]["followups"]), 1)
+        convert.convert(out["result"], scope_for(), LANE, convert.resolved_models(None))  # the plan matches
+
+    def test_commands_quote_a_work_directory_with_spaces_and_shell_metacharacters(self):
+        odd = temp_dir(self) / "sweep run $HOME;touch pwned&(x) 'q' \"d\""
+        odd.mkdir()
+        work = stage_work(self, ("alpha",), work=odd)
+        self.assertEqual(build(work).returncode, 0)
+        staged = json.loads((work / "staged.json").read_text())
+        staged["codex"].update(wait_poll_s=0.05, slot_poll_s=0.05)
+        write_json(work / "staged.json", staged)
+        fixture, _, _ = node_fixture()
+        prompts = {c["label"]: c["prompt"] for c in
+                   self.execute(HARNESS / "sweep.js", fixture, json.loads((work / "args.json").read_text()))["calls"]}
+        S = str(work)
+        discover, fit = prompts["gpt6-discover:alpha"], prompts["gpt6-refute-fit:alpha"]
+        start = re.search(r"^Then run: (bash .*)$", discover, re.M).group(1)
+        wait = re.search(r"^Then run `(bash [^`]*)` with the Bash tool", discover, re.M).group(1)
+        result = re.search(r"^Then run `(bash [^`]*)` and return", discover, re.M).group(1)
+        make = re.search(r"^2\. Run: (python3 .*)$", fit, re.M).group(1)
+        self.assertEqual(shlex.split(start), ["bash", f"{S}/codex_call.sh", "start", "gpt6-discover-alpha",
+                                              f"{S}/prompts/gpt6-discover-alpha.txt", f"{S}/schemas/discover.json"])
+        self.assertEqual(shlex.split(make), ["python3", f"{S}/make_prompt.py", "fit", f"{S}/inputs/alpha.json",
+                                             f"{S}/gpt6/props-alpha.json", ">", f"{S}/prompts/gpt6-fit-alpha.txt"])
+        self.assertIn(f"Use the Write tool to create {S}/gpt6/props-alpha.json", fit)  # a tool path, not shell
+        # The commands run as the wrapper agent would run them, against a fake codex.
+        bin_dir, cwd = temp_dir(self), temp_dir(self)
+        (bin_dir / "codex").write_text(FAKE_CODEX.format(python=sys.executable), encoding="utf-8")
+        (bin_dir / "codex").chmod(0o755)
+        config = write_json(bin_dir / "config.json", {"last": LAST, "events": [COMPLETED]})
+        env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '')}",
+               "FAKE_CODEX_CONFIG": str(config)}
+        env.pop("SWEEP_WORK_DIR", None)
+        done = run(["bash", "-c", start], env=env, cwd=cwd)
+        self.assertEqual((done.returncode, done.stdout.strip()), (0, "started gpt6-discover-alpha"), done.stderr)
+        self.assertTrue(run(["bash", "-c", wait], env=env, cwd=cwd).stdout.startswith("done exit=0"))
+        self.assertEqual(json.loads(run(["bash", "-c", result], env=env, cwd=cwd).stdout)["exit"], 0)
+        write_json(work / "gpt6/props-alpha.json", [{"repository": "https://github.com/o/a1"}])
+        done = run(["bash", "-c", make], env=env, cwd=cwd)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn('"repository": "https://github.com/o/a1"', (work / "prompts/gpt6-fit-alpha.txt").read_text())
+        self.assertEqual(list(cwd.iterdir()), [])  # no word of the path ran as a command
+
+    def test_slug_is_the_same_function_as_sweep_common_slug(self):
+        source = (HARNESS / "sweep.js").read_text(encoding="utf-8")
+        function = re.search(r"^function slug\(u\) \{$.*?^\}$", source, re.M | re.S).group(0)
+        cases = [*CANONICAL, *NOT_GITHUB, "Owner/Repo.GIT/", "https://github.com/O/a1.git", None]
+        script = self.work / "slug.cjs"
+        script.write_text(function + f"\nprocess.stdout.write(JSON.stringify({json.dumps(cases)}.map(slug)))\n",
+                          encoding="utf-8")
+        done = run(["node", script])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(json.loads(done.stdout), [sweep_common.slug(case) for case in cases])
 
 
 if __name__ == "__main__":

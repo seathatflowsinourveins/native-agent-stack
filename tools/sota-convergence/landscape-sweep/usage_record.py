@@ -14,8 +14,10 @@ evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-*.json:
   child_usage  the tool's output with transcript_dir rewritten to <session-transcripts>/subagents/workflows/<run id>
 The ledger needs child_usage.status "complete" for a completed sweep, reads workflow_run from the last segment of
 transcript_dir, and requires lost_workers to equal the incomplete children. Refuses to write (exit 3) when the
-sanitized record still matches a scripts/validate.py PRIVATE_CONTENT pattern. Exit 1 when the usage is incomplete
-(the record is still written: a stopped run keeps it as a lower bound).
+sanitized record still matches a scripts/validate.py PRIVATE_CONTENT pattern. Exit 1, with the record still written
+(a stopped run keeps it as a lower bound), when the usage is incomplete, when child-usage.mjs exited non-zero, or
+when a child ran at another effort than --require-effort (effort_mismatches): every worker of this lane runs at
+effort max, and make_result.py refuses such a record.
 """
 
 from __future__ import annotations
@@ -112,11 +114,13 @@ def main(argv=None) -> int:
     write_json(args.out, document)
     usage = document["child_usage"]
     children = usage.get("children") or []
+    mismatches = usage.get("effort_mismatches") or []
     print(json.dumps({"out": str(args.out), "status": usage.get("status"), "exit_code": code,
                       "workflow_run": usage["transcript_dir"].rsplit("/", 1)[-1], "children": len(children),
-                      "incomplete": [c.get("label") for c in children if isinstance(c, dict) and c.get("complete") is not True]},
+                      "incomplete": [c.get("label") for c in children if isinstance(c, dict) and c.get("complete") is not True],
+                      "effort_mismatches": mismatches},
                      indent=1))
-    return 0 if usage.get("status") == "complete" else 1
+    return 0 if usage.get("status") == "complete" and code == 0 and not mismatches else 1
 
 
 if __name__ == "__main__":

@@ -7,19 +7,28 @@
 The shape follows evidence/artifacts/landscape-sweep-20260923/*.json: schema_version, id, kind, evidence_class,
 repository, reviewed_commit, readme_path, license, layers, claim, observed, documentation_excerpts. A repository
 surviving in several layers gets one review listing every layer. Prints [{repository, path, layers}] (make_result.py
---reviews reads it). A repository gh cannot read is reported and skipped (exit 1 after the others are written).
-`gh auth status` must already pass.
+--reviews reads it). A review is named <owner>-<repo>.json, lowercased with every other character run as "-", like
+the 2026-09-23 reviews; when two repositories share that name (acme/a-b and acme-a/b), each gets a suffix of 10 hex
+characters of the sha256 of its owner/repo, so no review overwrites another. A repository gh cannot read, or whose
+file name already holds a review of another repository, is reported and skipped (exit 1 after the others are
+written). `gh auth status` must already pass.
 """
 
 from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import json
 import re
 import subprocess
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from sweep_common import slug  # noqa: E402
+
+OWNER_REPO = re.compile(r"[a-z0-9-]+/[a-z0-9._-]+")
 
 
 class GhError(RuntimeError):
@@ -33,11 +42,28 @@ def gh(path: str) -> dict:
     return json.loads(done.stdout)
 
 
+def review_name(full_name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", full_name.lower()).strip("-")
+
+
+def unique_stems(names: dict) -> dict:
+    """owner/repo -> file stem: its readable name, or, for a name two repositories share, that name plus 10 hex
+    characters of the sha256 of the owner/repo."""
+    groups: dict[str, list] = {}
+    for key, name in names.items():
+        groups.setdefault(name, []).append(key)
+    stems = {key: name if len(groups[name]) == 1 else f"{name}-{hashlib.sha256(key.encode('utf-8')).hexdigest()[:10]}"
+             for key, name in names.items()}
+    if len(set(stems.values())) != len(stems):
+        raise ValueError(f"review file names still collide: {sorted(stems.values())}")
+    return stems
+
+
 def review(repository: str, layers: list, lane: str, fit_models: str) -> dict:
-    match = re.search(r"github\.com/([^/]+)/([^/#?]+)", repository)
-    if not match:
+    owner_repo = slug(repository)
+    if not OWNER_REPO.fullmatch(owner_repo):
         raise GhError(f"{repository} is not a GitHub repository URL")
-    meta = gh(f"repos/{match.group(1)}/{match.group(2)}")
+    meta = gh(f"repos/{owner_repo}")
     full, branch = meta["full_name"], meta["default_branch"]
     commit = gh(f"repos/{full}/commits/{branch}")["sha"]
     license_id = (meta.get("license") or {}).get("spdx_id") or "NOASSERTION"
@@ -52,8 +78,7 @@ def review(repository: str, layers: list, lane: str, fit_models: str) -> dict:
     except GhError:
         pass
     description = (meta.get("description") or "").strip()
-    name = re.sub(r"[^a-z0-9]+", "-", full.lower()).strip("-")
-    return {"schema_version": 1, "id": f"source-review-{name}", "kind": "upstream_provenance",
+    return {"schema_version": 1, "id": f"source-review-{review_name(full)}", "kind": "upstream_provenance",
             "evidence_class": "source_review", "repository": f"https://github.com/{full}", "reviewed_commit": commit,
             "readme_path": readme_path, "license": license_id, "layers": sorted(set(layers)),
             "claim": (f"Source and documentation review of {full} at commit {commit} (license {license_id}), read from "
@@ -75,18 +100,35 @@ def main(argv=None) -> int:
                         help="the two fit refuters' resolved models, as the claim names them")
     args = parser.parse_args(argv)
     survivors = json.loads(args.survivors.read_text(encoding="utf-8"))
-    by_repo: dict[str, list] = {}
+    by_repo: dict[str, dict] = {}  # owner/repo -> the survivor URL first seen and every layer it survived in
     for survivor in survivors:
-        by_repo.setdefault(survivor["repository"], []).append(survivor["layer_id"])
-    args.out.mkdir(parents=True, exist_ok=True)
-    written, failed = [], []
-    for repository, layers in sorted(by_repo.items()):
+        item = by_repo.setdefault(slug(survivor["repository"]), {"repository": survivor["repository"], "layers": []})
+        item["layers"].append(survivor["layer_id"])
+    written, failed, docs = [], [], {}
+    for key, item in sorted(by_repo.items()):
         try:
-            doc = review(repository, layers, args.lane, args.fit_models)
+            docs[key] = review(item["repository"], item["layers"], args.lane, args.fit_models)
         except (GhError, KeyError, ValueError) as error:
-            failed.append(f"{repository}: {error}")
-            continue
-        path = args.out / f"{doc['id'][len('source-review-'):]}.json"
+            failed.append(f"{item['repository']}: {error}")
+    try:
+        stems = unique_stems({key: doc["id"][len("source-review-"):] for key, doc in docs.items()})
+    except ValueError as error:
+        print(f"source_reviews.py: {error}", file=sys.stderr)
+        return 2
+    args.out.mkdir(parents=True, exist_ok=True)
+    for key, doc in sorted(docs.items()):
+        doc["id"] = f"source-review-{stems[key]}"
+        path = args.out / f"{stems[key]}.json"
+        if path.is_file():
+            try:
+                previous = json.loads(path.read_text(encoding="utf-8"))
+            except ValueError:
+                previous = None
+            reviewed = previous.get("repository", "") if isinstance(previous, dict) else ""
+            if str(reviewed).lower().rstrip("/") != doc["repository"].lower():
+                failed.append(f"{by_repo[key]['repository']}: {path} already holds a review of another repository; "
+                              "not overwritten")
+                continue
         path.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
         written.append({"repository": doc["repository"], "path": path.name, "layers": doc["layers"]})
     print(json.dumps(written, indent=1))

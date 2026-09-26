@@ -13,9 +13,12 @@ source_review path source_reviews.py wrote for it (--reviews is that script's st
 relative to the returns file's directory); reads workflow_run from the usage record's child_usage.transcript_dir
 (its last segment, as the ledger binds it), lost_workers from that record's incomplete children, and date from the
 manifest's checked_at. prompts_sha256 comes from --prompts-sha256 or <work-dir>/prompts_sha256.txt. --reopen is an
-optional {"<layer_id>": [{"trigger": ..., "ref": ...}]} of reopen entries (recipes/saturation-sweep.md section 4).
+optional {"<layer_id>": [{"trigger": ..., "ref": ...}]} of reopen entries (recipes/saturation-sweep.md section 4),
+added to the retained_failure entries convert.py wrote, never replacing them.
 Computed fields (prev_sha256, the hashes, known, new) are left to --append. A stopped run is recorded by hand
-(recipe section 4); this tool refuses usage that is not complete. Paths are repository-relative and must exist.
+(recipe section 4). This tool refuses: usage that is not complete, a usage measurement whose child-usage.mjs exit
+code is not 0, a child that did not run at effort max only, and a layer whose retained failures (returns.json
+failures/<layer>) lack their retained_failure reopen entry. Paths are repository-relative and must exist.
 """
 
 from __future__ import annotations
@@ -29,10 +32,11 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from sweep_common import REPO_ROOT, canon, load_json  # noqa: E402
+from sweep_common import REPO_ROOT, canon, load_json, pointer_token  # noqa: E402
 
 PLACEHOLDER = "@RETURNS@"
 HEX64 = re.compile(r"[0-9a-f]{64}")
+REQUIRED_EFFORT = "max"  # every agent() call of sweep.js names effort 'max'
 
 
 def substitute(value, returns_ref: str):
@@ -45,13 +49,29 @@ def substitute(value, returns_ref: str):
     return value
 
 
-def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sweep_id: str, lane: str,
-                 returns_ref: str, usage_ref: str, manifest_ref: str, prompts_sha256: str, reopen=None,
-                 notes=()) -> dict:
+def check_usage(usage: dict, usage_ref: str) -> dict:
+    """The usage record's child_usage, when it shows a complete run measured at effort max throughout."""
     child_usage = usage.get("child_usage") or {}
     if child_usage.get("status") != "complete":
         raise ValueError(f"{usage_ref}: child_usage.status is {child_usage.get('status')!r}; a completed sweep needs "
                          "complete usage (record a stopped run by hand, recipe section 4)")
+    exit_code = (usage.get("measurement") or {}).get("exit_code")
+    if exit_code != 0:
+        raise ValueError(f"{usage_ref}: measurement.exit_code is {exit_code!r}; child-usage.mjs reported incomplete "
+                         "usage or an effort mismatch")
+    if child_usage.get("effort_mismatches"):
+        raise ValueError(f"{usage_ref}: effort_mismatches {child_usage['effort_mismatches']}")
+    off = [child.get("label") for child in child_usage.get("children") or []
+           if isinstance(child, dict) and child.get("efforts") != [REQUIRED_EFFORT]]
+    if off:
+        raise ValueError(f"{usage_ref}: children that did not run at effort {REQUIRED_EFFORT} only: {off}")
+    return child_usage
+
+
+def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sweep_id: str, lane: str,
+                 returns_ref: str, usage_ref: str, manifest_ref: str, prompts_sha256: str, reopen=None,
+                 notes=(), returns: dict | None = None) -> dict:
+    child_usage = check_usage(usage, usage_ref)
     transcript_dir = str(child_usage.get("transcript_dir") or "")
     run = transcript_dir.rstrip("/").rsplit("/", 1)[-1]
     if not run.startswith("wf_"):
@@ -62,11 +82,12 @@ def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sw
     by_repo = {}
     for review in reviews:
         by_repo.setdefault(canon(review["repository"]).lower(), []).append(review)
-    reopen = reopen or {}
+    reopen = substitute(reopen or {}, returns_ref)
     unknown = sorted(set(reopen) - {layer.get("layer_id") for layer in layers})
     if unknown:
         raise ValueError(f"--reopen names layers this sweep did not cover: {unknown}")
-    out_layers, missing = [], []
+    failures = (returns or {}).get("failures") or {}
+    out_layers, missing, unreopened = [], [], []
     for layer in substitute(layers, returns_ref):
         for entry in layer.get("survived") or []:
             matches = [r for r in by_repo.get(canon(entry["repo"]).lower(), []) if layer["layer_id"] in r.get("layers", [])]
@@ -74,10 +95,20 @@ def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sw
                 missing.append(f"{layer['layer_id']}: {entry['repo']}")
                 continue
             entry["source_review"] = f"{base}/{matches[0]['path']}"
-        layer["reopen"] = list(reopen.get(layer["layer_id"], layer.get("reopen") or []))
+        entries = list(layer.get("reopen") or [])
+        entries += [item for item in reopen.get(layer["layer_id"], []) if item not in entries]
+        layer["reopen"] = entries
+        failure_ref = f"{returns_ref}#/failures/{pointer_token(layer['layer_id'])}"
+        if failures.get(layer["layer_id"]) and not any(
+                isinstance(item, dict) and item.get("trigger") == "retained_failure" and item.get("ref") == failure_ref
+                for item in entries):
+            unreopened.append(layer["layer_id"])
         out_layers.append(layer)
     if missing:
         raise ValueError(f"survivors without a source review in --reviews: {missing}")
+    if unreopened:
+        raise ValueError(f"layers with retained failures but no retained_failure reopen entry (a failed lane never "
+                         f"counts as clean; use convert.py's layers.json): {unreopened}")
     lost = [child.get("label") for child in child_usage.get("children") or []
             if isinstance(child, dict) and child.get("complete") is not True]
     result = {"sweep_id": sweep_id, "date": manifest.get("checked_at"), "workflow_run": run, "status": "completed",
@@ -120,7 +151,8 @@ def main(argv=None) -> int:
                               usage=load_json(repo / args.usage_ref), manifest=load_json(repo / args.manifest_ref),
                               sweep_id=args.sweep_id, lane=args.lane or args.sweep_id, returns_ref=args.returns_ref,
                               usage_ref=args.usage_ref, manifest_ref=args.manifest_ref, prompts_sha256=digest,
-                              reopen=load_json(args.reopen) if args.reopen else None, notes=args.note)
+                              reopen=load_json(args.reopen) if args.reopen else None, notes=args.note,
+                              returns=load_json(repo / args.returns_ref))
     except (ValueError, OSError, KeyError) as error:
         print(f"make_result.py: {error}", file=sys.stderr)
         return 2

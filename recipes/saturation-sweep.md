@@ -56,6 +56,10 @@ two-family:
   (`refute-fit:<layer>`) and GPT-6-Astra (`gpt6-refute-fit:<layer>`), all run at effort max. A candidate survives
   only when neither the facts refuter nor either fit refuter refutes it.
 
+A failed part of the lane never leaves a clean layer. A lost round, a discovery family or a vote that did not
+return, and a lost critic each give the layer a `retained_failure` reopen entry pointing at its listed failures in
+the retained returns.
+
 The labels that `--check` reconciles are unchanged. The harness also writes what section 3 asks for: the retained
 returns, the sanitized `child-usage.mjs` record and `prompts_sha256`. An agent-lab coordinator session remains an
 alternative way to run the lane.

@@ -15,20 +15,29 @@ HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parents[2]
 MANIFEST_SECTION = {"foundation": "foundation", "us-equities": "trading"}
 GITHUB_SLUG = re.compile(r"github\.com/([^/#?\s]+/[^/#?\s]+)", re.IGNORECASE)
+# A bare owner/repo (GitHub owners hold only letters, digits and hyphens), with an optional .git or trailing slash.
+BARE_SLUG = re.compile(r"([A-Za-z0-9-]+/[A-Za-z0-9._-]+?)(?:\.git)?/?", re.IGNORECASE)
 
 
 def slug(url) -> str:
-    """owner/repo, lowercased and without .git, for a GitHub URL; otherwise the lowercased string (sweep.js slug)."""
-    match = GITHUB_SLUG.search(url or "")
-    if not match:
-        return (url or "").lower()
-    return re.sub(r"\.git$", "", match.group(1), flags=re.IGNORECASE).lower()
+    """owner/repo, lowercased and without .git, for a GitHub URL or a bare owner/repo; otherwise the lowercased
+    string. sweep.js slug() is the same function (a test keeps them in step)."""
+    text = str(url or "").strip()
+    match = GITHUB_SLUG.search(text)
+    if match:
+        return re.sub(r"\.git$", "", match.group(1), flags=re.IGNORECASE).lower()
+    bare = BARE_SLUG.fullmatch(text)
+    return bare.group(1).lower() if bare else text.lower()
 
 
 def canon(url) -> str:
-    """https://github.com/<owner>/<repo> for a GitHub URL or a bare owner/repo; any other URL unchanged."""
-    value = slug(url)
-    return f"https://github.com/{value}" if "/" in value and not value.startswith("http") else url
+    """https://github.com/<owner>/<repo> for a GitHub URL (any path after the repository dropped) or a bare
+    owner/repo; any other value unchanged. A URL is told from a bare slug before the slug is taken, so owners whose
+    names start with "http" (httpie/cli) are canonical too."""
+    text = str(url or "").strip()
+    if GITHUB_SLUG.search(text) or BARE_SLUG.fullmatch(text):
+        return f"https://github.com/{slug(text)}"
+    return url
 
 
 def sha256_bytes(raw: bytes) -> str:
@@ -56,10 +65,13 @@ def inside_repository(path: Path) -> Path | None:
 
 
 def work_dir(value, must_exist: bool = True) -> Path:
-    """The sweep's private work directory: given, absolute after resolution, outside every git repository."""
+    """The sweep's private work directory: given, absolute after resolution, outside every git repository, and free
+    of control characters (its path goes into the workers' prompts; sweep.js refuses such a path too)."""
     if not value:
         raise ValueError("no work directory: pass --work-dir or set SWEEP_WORK_DIR")
     path = Path(value).expanduser().resolve()
+    if re.search(r"[\x00-\x1f\x7f]", str(path)):
+        raise ValueError(f"work directory {str(path)!r} holds a control character")
     if must_exist and not path.is_dir():
         raise ValueError(f"work directory {path} does not exist")
     repo = inside_repository(path)

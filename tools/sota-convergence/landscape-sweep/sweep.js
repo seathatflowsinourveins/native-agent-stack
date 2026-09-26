@@ -21,6 +21,9 @@ export const meta = {
 //   layers    [{layer_id, catalog}] in sweep order; the first-round GPT-6 prompts W/prompts/gpt6-discover-<id>.txt
 //             are already written
 //   test      optional; true returns after the first round (the one-layer smoke run)
+// Returns {sweep, first, critic, followups, lost_first, lost_followups} ({sweep, first, lost_first} for a smoke run).
+// A round that returned nothing is kept as {layer_id, catalog, round, lost: true} in first or followups, so
+// convert.py can record it as a retained failure of that layer.
 // Worker labels follow recipes/saturation-sweep.md, so scripts/saturation_ledger.py --check reconciles them with
 // the child-usage output: discover:<layer>, refute-facts:<layer>, refute-fit:<layer> (':followup' appended in the
 // follow-up round); the GPT-6 wrappers are gpt6-discover:<layer> and gpt6-refute-fit:<layer>; the critic is critic.
@@ -30,18 +33,20 @@ const MAX_FOLLOWUPS = 8
 const TEMPLATE_KEYS = ['common', 'discover', 'facts', 'fit', 'critic', 'followup']
 const WRAP_SCHEMA = { type: 'object', additionalProperties: false, required: ['result_json'], properties: { result_json: { type: 'string' } } }
 const LABEL_RANK = { targeted_candidate: 0, keep_but_compare: 1, not_adopted: 2 }
+// Layer ids become GPT-6 job ids (codex_job.py JOB_ID, at most 128 characters with their prefix and suffix).
+const LAYER_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/
 
 const nonblank = (v) => typeof v === 'string' && v.length > 0
 const issues = []
 if (!A || typeof A !== 'object') issues.push('args must be the object build_args.py writes')
 else {
-  if (!nonblank(A.S) || !A.S.startsWith('/')) issues.push('S must be the absolute work directory')
+  if (!nonblank(A.S) || !A.S.startsWith('/') || /[\x00-\x1f\x7f]/.test(A.S)) issues.push('S must be the absolute work directory, without control characters')
   if (!nonblank(A.sweep_id)) issues.push('sweep_id is required')
   if (A.stars != null && !nonblank(A.stars)) issues.push('stars must be a path or null')
   if (!A.T || TEMPLATE_KEYS.some((k) => !nonblank(A.T[k]))) issues.push('T must hold the templates ' + TEMPLATE_KEYS.join(', '))
   if (!A.schemas || ['discover', 'votes', 'critic'].some((k) => !A.schemas[k] || typeof A.schemas[k] !== 'object')) issues.push('schemas must hold discover, votes and critic')
-  const ids = Array.isArray(A.layers) ? A.layers.map((L) => (L && nonblank(L.layer_id) && nonblank(L.catalog) ? L.layer_id : null)) : []
-  if (!ids.length || ids.includes(null) || new Set(ids).size !== ids.length) issues.push('layers must be a nonempty list of distinct {layer_id, catalog}')
+  const ids = Array.isArray(A.layers) ? A.layers.map((L) => (L && nonblank(L.layer_id) && LAYER_ID.test(L.layer_id) && nonblank(L.catalog) ? L.layer_id : null)) : []
+  if (!ids.length || ids.includes(null) || new Set(ids).size !== ids.length) issues.push('layers must be a nonempty list of distinct {layer_id, catalog}, each layer_id matching ' + LAYER_ID.source)
 }
 if (issues.length) { for (const i of issues) log('argument issue: ' + i); return { status: 'incomplete', argument_issues: issues } }
 const T = A.T
@@ -51,9 +56,19 @@ const S = A.S
 function fill(template, values) {
   return template.replace(/<<([A-Z_]+)>>/g, (m, k) => (Object.prototype.hasOwnProperty.call(values, k) ? String(values[k]) : m))
 }
+// owner/repo for a GitHub URL or a bare owner/repo (lowercased, .git dropped); sweep_common.slug is the same function.
 function slug(u) {
-  const m = /github\.com\/([^/#?\s]+\/[^/#?\s]+)/i.exec(u || '')
-  return m ? m[1].replace(/\.git$/i, '').toLowerCase() : String(u || '').toLowerCase()
+  const text = String(u || '').trim()
+  const m = /github\.com\/([^/#?\s]+\/[^/#?\s]+)/i.exec(text)
+  if (m) return m[1].replace(/\.git$/i, '').toLowerCase()
+  const b = /^([A-Za-z0-9-]+\/[A-Za-z0-9._-]+?)(?:\.git)?\/?$/i.exec(text)
+  return b ? b[1].toLowerCase() : text.toLowerCase()
+}
+// POSIX shell quoting for every argument and redirection target of a generated command (Python's shlex.quote):
+// safe words stay as they are, anything else is single-quoted, so a work directory may hold spaces or '$;&'.
+function shq(s) {
+  const text = String(s)
+  return /^[A-Za-z0-9@%+=:,./_-]+$/.test(text) ? text : "'" + text.replace(/'/g, "'\"'\"'") + "'"
 }
 function inputPath(lid) { return `${S}/inputs/${lid}.json` }
 
@@ -64,10 +79,12 @@ function claudeDiscoverPrompt(L, fu) {
   return T.common + '\n\n' + body
 }
 
+// Shell commands quote every argument (shq); the Write tool steps name their path as it is, since no shell parses it.
 function wrapperPrompt(job, steps, promptFile, schema) {
-  return `You run one GPT-6 (Codex CLI) job for a sweep and return its raw result. Do exactly these steps and nothing else; do not interpret the output.\n${steps}\nThen run: bash ${S}/codex_call.sh start ${job} ${promptFile} ${S}/schemas/${schema}.json\n` +
-    `Then run \`bash ${S}/codex_call.sh wait ${job} 540\` with the Bash tool (timeout 600000 ms) repeatedly until it prints a line starting with "done" (at most 8 times).\n` +
-    `Then run \`bash ${S}/codex_call.sh result ${job}\` and return its complete stdout, unmodified, as result_json. If any step fails, still run the result command and return its stdout.`
+  const call = `bash ${shq(`${S}/codex_call.sh`)}`
+  return `You run one GPT-6 (Codex CLI) job for a sweep and return its raw result. Do exactly these steps and nothing else; do not interpret the output.\n${steps}\nThen run: ${call} start ${shq(job)} ${shq(promptFile)} ${shq(`${S}/schemas/${schema}.json`)}\n` +
+    `Then run \`${call} wait ${shq(job)} 540\` with the Bash tool (timeout 600000 ms) repeatedly until it prints a line starting with "done" (at most 8 times).\n` +
+    `Then run \`${call} result ${shq(job)}\` and return its complete stdout, unmodified, as result_json. If any step fails, still run the result command and return its stdout.`
 }
 
 async function gpt6Discover(L, suffix, fu, phaseName) {
@@ -75,8 +92,9 @@ async function gpt6Discover(L, suffix, fu, phaseName) {
   let steps, promptFile
   if (fu) {
     promptFile = `${S}/prompts/${job}.txt`
-    steps = `1. Use the Write tool to create ${S}/gpt6/fu-${L.layer_id}.json with exactly this content:\n${JSON.stringify(fu)}\n` +
-      `2. Run: python3 ${S}/make_prompt.py discover ${inputPath(L.layer_id)} - ${S}/gpt6/fu-${L.layer_id}.json > ${promptFile}\n` +
+    const fuFile = `${S}/gpt6/fu-${L.layer_id}.json`
+    steps = `1. Use the Write tool to create ${fuFile} with exactly this content:\n${JSON.stringify(fu)}\n` +
+      `2. Run: python3 ${shq(`${S}/make_prompt.py`)} discover ${shq(inputPath(L.layer_id))} - ${shq(fuFile)} > ${shq(promptFile)}\n` +
       `Prompt file: ${promptFile} ; schema: discover`
   } else {
     promptFile = `${S}/prompts/gpt6-discover-${L.layer_id}.txt`
@@ -90,8 +108,9 @@ async function gpt6Discover(L, suffix, fu, phaseName) {
 async function gpt6Fit(L, suffix, proposals, phaseName) {
   const job = `gpt6-fit-${L.layer_id}${suffix}`
   const promptFile = `${S}/prompts/${job}.txt`
-  const steps = `1. Use the Write tool to create ${S}/gpt6/props-${L.layer_id}${suffix}.json with exactly this content:\n${JSON.stringify(proposals)}\n` +
-    `2. Run: python3 ${S}/make_prompt.py fit ${inputPath(L.layer_id)} ${S}/gpt6/props-${L.layer_id}${suffix}.json > ${promptFile}\n` +
+  const propsFile = `${S}/gpt6/props-${L.layer_id}${suffix}.json`
+  const steps = `1. Use the Write tool to create ${propsFile} with exactly this content:\n${JSON.stringify(proposals)}\n` +
+    `2. Run: python3 ${shq(`${S}/make_prompt.py`)} fit ${shq(inputPath(L.layer_id))} ${shq(propsFile)} > ${shq(promptFile)}\n` +
     `Prompt file: ${promptFile} ; schema: votes`
   const r = await agent(wrapperPrompt(job, steps, promptFile, 'votes'),
     { label: `gpt6-refute-fit:${L.layer_id}${suffix ? ':followup' : ''}`, phase: phaseName, model: 'sonnet', effort: 'max', schema: WRAP_SCHEMA })
@@ -174,17 +193,25 @@ const critic = await agent(T.common + '\n\n' + fill(T.critic, { SUMMARY: `Layer 
 const named = (critic && critic.followup_layers) || []
 const unknown = named.filter((f) => !A.layers.some((x) => x.layer_id === f.layer_id)).map((f) => String(f.layer_id))
 if (unknown.length) log(`critic named layers outside this sweep, ignored: ${unknown.join(', ')}`)
-const known = named.filter((f) => A.layers.some((x) => x.layer_id === f.layer_id))
+// One follow-up round per layer: a repeated layer would reuse the first round's GPT-6 job ids (convert.py mirrors this).
+const firstIndex = (f) => named.findIndex((g) => g.layer_id === f.layer_id)
+const repeated = named.filter((f, i) => firstIndex(f) !== i).map((f) => String(f.layer_id))
+if (repeated.length) log(`critic named layers more than once, repeats ignored: ${repeated.join(', ')}`)
+const known = named.filter((f, i) => A.layers.some((x) => x.layer_id === f.layer_id) && firstIndex(f) === i)
 const flagged = known.slice(0, MAX_FOLLOWUPS)
 if (known.length > MAX_FOLLOWUPS) log(`critic flagged ${known.length} layers; only the first ${MAX_FOLLOWUPS} get a follow-up round: ${known.slice(MAX_FOLLOWUPS).map((f) => f.layer_id).join(', ')} dropped`)
 log(`follow-up layers: ${flagged.map((f) => f.layer_id).join(', ') || 'none'}`)
 
 phase('Follow-up')
-const follow = await pipeline(flagged, (f) => {
+const plans = flagged.map((f) => {
   const L = A.layers.find((x) => x.layer_id === f.layer_id)
   const r0 = firstOk.find((x) => x.layer_id === f.layer_id)
-  const fu = { reason: f.reason, search_directions: f.search_directions, already: ((r0 && r0.merged) || []).map((p) => p.repository) }
-  return runLayer(L, fu, 'Follow-up', 'Follow-up')
+  return { L, fu: { reason: f.reason, search_directions: f.search_directions, already: ((r0 && r0.merged) || []).map((p) => p.repository) } }
 })
+const follow = await pipeline(plans, (p) => runLayer(p.L, p.fu, 'Follow-up', 'Follow-up'))
+// A follow-up round that returned nothing stays visible as a lost round of its layer, like a lost first round.
+const followups = plans.map((p, i) => follow[i] || { layer_id: p.L.layer_id, catalog: p.L.catalog, round: 'followup', followup_reason: p.fu, lost: true })
+const lostFollowups = followups.filter((r) => r.lost).map((r) => r.layer_id)
+if (lostFollowups.length) log(`follow-up round lost layers: ${lostFollowups.join(', ')}`)
 
-return { sweep: A.sweep_id, first: firstOk, critic, followups: follow, lost_first: lostFirst }
+return { sweep: A.sweep_id, first: firstOk, critic, followups, lost_first: lostFirst, lost_followups: lostFollowups }

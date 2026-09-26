@@ -45,7 +45,10 @@ tests). The runner uses no `flock`, `setsid` or `timeout` commands, so it runs u
 | `critic` | Claude `opus`, max | Completeness critic. It flags at most 8 layers for the follow-up round, whose labels end in `:followup`. |
 
 Survival is two-family on fit. A proposal survives only when the facts refuter, the Claude fit refuter and the
-GPT-6 fit refuter all vote not refuted. Every refuter defaults to refuted, and a missing vote counts as refuted.
+GPT-6 fit refuter all vote not refuted. Every refuter defaults to refuted, and `convert.py` reads a vote the same
+way: a missing vote, a vote whose `refuted` is not `false`, and a repository voted on twice with one refuting vote
+all count as refuted. When the follow-up round proposes a repository again, that round's proposal and all three of
+its votes replace the first round's; a vote missing from the follow-up is never taken from the first round.
 
 Why the roles are split this way:
 
@@ -56,7 +59,11 @@ Why the roles are split this way:
 This split is the design of the 2026-09-26 prototype. No measured comparison has tested it.
 
 Every `agent()` call names its model and `effort: 'max'`, so no stage inherits the coordinator's `xhigh`
-([max-effort decision](../../../docs/decisions/2026-09-23-max-effort-default.md)).
+([max-effort decision](../../../docs/decisions/2026-09-23-max-effort-default.md)). The vote objects in
+`returns.json` name the model and effort each Claude refuter was measured at (its own child in the usage record),
+not the requested ones. Without `--usage`, `convert.py` writes the requested alias and effort `null`.
+`usage_record.py` exits 1 when a child ran at another effort (`CLAUDE_CODE_EFFORT_LEVEL` would override every
+child), and `make_result.py` refuses such a record.
 
 The Sonnet wrappers only run three commands and return the raw result. `convert.py` checks each copy against the
 file Codex wrote.
@@ -89,6 +96,12 @@ provides it.
   For a completed sweep, `child_usage.status` must be `complete`. `workflow_run` must equal the last segment of
   `child_usage.transcript_dir`, which `usage_record.py` rewrites to
   `<session-transcripts>/subagents/workflows/<run id>`. `lost_workers` must list exactly the incomplete children.
+  `make_result.py` also needs `measurement.exit_code` 0 and every child measured at effort `max` alone.
+- **Failures.** A failed part of the lane never leaves a clean layer. `convert.py` lists each layer's retained
+  failures under `failures/<layer>` in `returns.json`: a lost round, a discovery family that did not return, a
+  missing vote, a lost critic, a critic-flagged layer beyond the follow-up cap, and a GPT-6 copy problem. It gives
+  that layer the reopen entry `{"trigger": "retained_failure", "ref": "<returns_ref>#/failures/<layer>"}`, which
+  resets the layer's clean count. `make_result.py` refuses a layer whose failures lack that entry.
 - **Returns.** In `returns.json`:
   - `discovery/<layer>` holds `{catalog, layer_id, proposed[], requirement_sha256, platform_profiles_sha256}`,
     with the two hashes copied from the scope frozen before the run.
@@ -103,6 +116,9 @@ provides it.
 - **Manifest.** `manifest_ref` is the dated SOTA manifest built from `lanes.json`. The record's `date` is its
   `checked_at`, and the manifest's rows for this lane must equal each layer's proposals and survival.
 - **Source reviews.** Each survivor needs one registered source review whose `layers` names the layer.
+  `source_reviews.py` names a review `<owner>-<repo>.json`, as the 2026-09-23 reviews are named. When two survivors
+  share that name (`acme/a-b` and `acme-a/b`), each gets a suffix of 10 hex characters of the sha256 of its
+  `owner/repo`. A file that already reviews another repository is never overwritten.
 - **Registration.** Every cited file is registered in `manifests/evidence.json`.
 
 ## Run it
@@ -171,9 +187,11 @@ Claude Code keeps the record there, as `tools/sota-convergence/transcript_audit.
 
 ```sh
 # 7. Usage (needs node): the vendored child-usage.mjs over the run's transcripts, sanitized.
+#    Exit 1: incomplete usage or a child not at effort max. The record is still written; make_result.py refuses it.
 python3 $H/usage_record.py --transcript-dir "$T" --out "$W/child-usage-$RUN.json"
 
-# 8. Convert. Exit 3: possible private content, redact first. Exit 4: a wrapper's GPT-6 copy differs from Codex's file.
+# 8. Convert. Exit 3: possible private content, redact first. Exit 4: a GPT-6 output the workflow used is not
+#    exactly the file Codex wrote, or a finished Codex output never reached the workflow (see the summary).
 python3 $H/convert.py --workflow-output "$W/run-$RUN.json" --work-dir "$W" --usage "$W/child-usage-$RUN.json" \
   --out "$W/out" --limit "<run-specific note, e.g. usage figures or incidents>"
 
@@ -203,16 +221,21 @@ python3 scripts/saturation_ledger.py --check --base origin/main
 python3 -m unittest tests.test_saturation_ledger tests.test_landscape_sweep_harness
 ```
 
-`make_result.py` takes `--reopen reopen.json` (`{"<layer_id>": [{"trigger", "ref"}]}`) for the reopen entries the
-recipe asks for. Add them after reading the report and the run. Record a stopped run by hand, as recipe section 4
-describes (`status: stopped`, `lower_bound_usage: true`, `votes: not_returned`, `lost_workers`). Retain the smoke's
-usage record under `$A-attempts/` as a run of its own.
+`make_result.py` takes `--reopen reopen.json` (`{"<layer_id>": [{"trigger", "ref"}]}`) for the other reopen entries
+the recipe asks for, such as the report's current `pin_moved` or `stale_receipt` triggers. Add them after reading
+the report and the run; they are added to the `retained_failure` entries `convert.py` wrote, never in their place.
+Record a stopped run by hand, as recipe section 4 describes (`status: stopped`, `lower_bound_usage: true`,
+`votes: not_returned`, `lost_workers`). Retain the smoke's usage record under `$A-attempts/` as a run of its own.
 
-`convert.py` reports three kinds of layer problem, and each needs a decision before appending:
+Read these fields of `convert.py`'s summary before appending:
 
-- **`excluded_layers`**: every round of the layer was lost. Such a layer is never recorded as clean.
-- **`degraded_discovery`**: one family's discovery did not return.
-- **Missing votes**: these are listed in each vote's `notes`.
+- **`retained_failures`** and **`reopened_layers`**: each layer's failures (`<round>:<cause>`), all of them reopened.
+  `degraded_discovery`, `critic_lost` and each vote's `notes` give the detail.
+- **`excluded_layers`**: every round of the layer was lost. Such a layer is left out of the record, so it neither
+  counts nor resets.
+- **`lost`**: every lost round, first or follow-up, as `<layer>:<round>`. `sweep.js` returns a lost follow-up round
+  as `{lost: true}` too. `convert.py` refuses a return whose follow-up rounds do not match the critic's requests,
+  so no round can go missing silently.
 
 ## Cost reference
 
@@ -248,8 +271,9 @@ that number of rounds is a first planning estimate, not a measurement. The recip
   while they are busy.
 - **Agent concurrency.** `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS` bounds the Workflow's agents (this host
   starts at 8), and a layer uses up to three agents at a time. A GPT-6 wrapper waits at most 8 × 540 s for its job
-  and then returns the job as unfinished. The vote then counts as missing, so keep the number of queued GPT-6 jobs
-  small relative to the slots.
+  and then returns the job as unfinished. The vote then counts as missing and the layer is reopened, and a job that
+  finishes later makes `convert.py` exit 4 (`file_only`). Keep the number of queued GPT-6 jobs small relative to the
+  slots.
 - **Usage limit.** A real Codex usage-limit error writes `<W>/LIMIT`. After that no job starts, and jobs still
   waiting for a slot end with exit 3. Stop the Workflow and tell the user the reset time, which the job's
   `stderr.txt` or its `error` event gives. Do not sign in again (provider state is shared). Record the stopped run
@@ -304,6 +328,19 @@ The deliberate changes:
   - Degraded discovery is reported.
   - Votes carry resolved model names from the usage record and per-round skills.
   - It adds `gpt6_usage`, the wrapper copy check and the method's lane limits.
+- **Review repairs (2026-09-26).** A Claude Opus and GPT-6-Astra review of the first package found these, each now
+  covered by a test:
+  - A layer with a failed lane (every GPT-6 fit job failed, say) derived as clean. Retained failures now reopen it.
+  - A repository proposed again in the follow-up kept its first-round proposal but took later votes one by one.
+    The later round's proposal and all three of its votes now travel together.
+  - A lost follow-up round vanished. `sweep.js` now keeps it as `{lost: true}`, and the critic's repeated layers
+    get one round.
+  - Vote efforts were written as max whatever was measured, and effort drift passed `usage_record.py`.
+  - Wrapper commands did not quote the work directory. Every argument and redirection target is now
+    POSIX-quoted.
+  - `canon()` left owners whose names start with `http` (`httpie/cli`) uncanonical.
+  - Two repositories could share one source-review file.
+  - `make_result.py --reopen` replaced a layer's reopen entries instead of adding to them.
 
 ## Tests
 
