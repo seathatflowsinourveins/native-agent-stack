@@ -3457,8 +3457,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "9ec05b297a30cb2a5f84b247602ea62a9321d5078d3198125d5fd3c8435d34c3",
-      "bytes": 30273
+      "sha256": "cdb25ac04ece3a3d99ea3d5abb6d3e10e31842ae1f26981f8aa6fe1cad75739a",
+      "bytes": 30652
     },
     {
       "path": ".gitleaksignore",
@@ -28683,8 +28683,8 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926/README.md",
-      "sha256": "70c2e9a40a9152638ca678b629f1685847312a76bfd1e400f04b3db9e390f638",
-      "bytes": 50536
+      "sha256": "30905c3f3202617e4d366825e7c30f58aeedcd855eca9bc509a315c1d6927637",
+      "bytes": 50975
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926/anthropics-claude-code.json",
@@ -28855,6 +28855,171 @@
       "path": "evidence/artifacts/landscape-sweep-20260926/independent-review.json",
       "sha256": "b57c773cf0754d0471870797087ec1b003bf4182f4ddaaad47c36d0a48e563da",
       "bytes": 11641
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/SHA256SUMS",
+      "sha256": "c026bdf60c8971465b962d181a218e3ad6d75321e8d48cceb03a18e12a9dd251",
+      "bytes": 2847
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/agent-sdks.json",
+      "sha256": "7c4f1eeb9ea3aa74c9288c10d05802edee640bb9ff633ad7a466c9f038bb7dea",
+      "bytes": 4157
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/agents-models-workers.json",
+      "sha256": "8037e618a0b516c2918d64d9c5dc65546060f5fb0594ddb4da2c3b2faf1e3b7f",
+      "bytes": 7483
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/backtesting-engine.json",
+      "sha256": "26e0fb77d7921a572bd3d47a77f0bfd84d7d376182b53f73f457a3f1b3c2e72c",
+      "bytes": 4600
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/ci-supply-chain.json",
+      "sha256": "9a5f61f9649a1ee6319ab3203f24ee936fc498520309992657d16561dbb75362",
+      "bytes": 6746
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/code-navigation.json",
+      "sha256": "24b52b2a76adf530b43ea24bb8217872d44dc5d51e93ba85658cc3980f3c8254",
+      "bytes": 7080
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/data-quality-orchestration.json",
+      "sha256": "cca7206bce26686fd932b11c6e20773e22b6f8fa5c679be821484813e2b6e1ea",
+      "bytes": 4221
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/document-retrieval.json",
+      "sha256": "96aab9e8a66ba7807083285fc48464cdd7b8df0a885917fb61c87dbbf419629d",
+      "bytes": 5519
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/durable-memory.json",
+      "sha256": "b5dad1db5a24534df6d5dfc35ae9ea7e15ab3283dd06562edccfbc2791f0715f",
+      "bytes": 7140
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/evaluation-experiments.json",
+      "sha256": "d784ad58726c563a77ed48e492aee82253eabde50af455d3c6106b87e28db1da",
+      "bytes": 5035
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/execution-broker.json",
+      "sha256": "7e38decf48aed4c541ca812a449b4aee492f438998f16033627fb00d55716f53",
+      "bytes": 2792
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/git-github-automation.json",
+      "sha256": "91d2edd2c135e92cb5f71da922c12ca8d77a67fcc8a442f4b19d2e66e7cfc356",
+      "bytes": 6752
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/hosting-services.json",
+      "sha256": "6e04a36d216974159f5d68c863a3607deb865287311ac37f8c6f7cdfdbea7db6",
+      "bytes": 7775
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/identity-provenance.json",
+      "sha256": "95086a2fb61cc03344117b0cf11ddb47c822e3271280f7c0b01a921930452258",
+      "bytes": 4645
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/instructions-skills.json",
+      "sha256": "9df1adbd661dc2d950801fbf5550deffc192eec256859d8d92578866ab13061f",
+      "bytes": 10743
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/isolation.json",
+      "sha256": "151cf43901bb1c289918075787142f79545ccdce4faff629bcb27ecf69f61d77",
+      "bytes": 4990
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/market-data-reference.json",
+      "sha256": "e506bfd42e94b6d381f4ab52ec90e05f0245ebbcc4670b2945872a24e8977c20",
+      "bytes": 5687
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/mcp-surfaces.json",
+      "sha256": "f92ea6cd00782ecbe4561ef289932288457493fb60393a05065fdb25b7f88324",
+      "bytes": 4367
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/native-clients.json",
+      "sha256": "5392a70f60bab1e93c9ea4cfd9b28ba63cc5bbd61f78202337241db4a888445d",
+      "bytes": 6155
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/observability-hosting.json",
+      "sha256": "17f1e04ca07ceccdcc3d28ac1372cc9de5a3fc0ab42a429db4f60c42c8f33941",
+      "bytes": 2411
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/observation-inference.json",
+      "sha256": "70988c23ac44461529c02f6f9c40e15cf0add7c22a73a736f40876c940fa2fe8",
+      "bytes": 11791
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/portfolio-risk.json",
+      "sha256": "d53d1e4a04b4ef050e617013a1be43fe540ec872c476f9a756af70a387180937",
+      "bytes": 3942
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/quality-evaluation.json",
+      "sha256": "cfdcf508cd3ee149b3f52616af4e65ed2103e93b07d8f89a10a4867d633289aa",
+      "bytes": 9120
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/recovery-portability.json",
+      "sha256": "354adf9685dd3e249f4285d7f70309aa5df6f4085c8df7e250371b14a498beca",
+      "bytes": 6764
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/research-factors-ml.json",
+      "sha256": "2e13695ab1eefcc03f5d9fdfd29f85a9ba4296f96c8af342c2a46569315e251f",
+      "bytes": 7633
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/scheduling-supervision.json",
+      "sha256": "6ef7b1cd4a4d9d781ba5dbe0a2f442aa6acf451263782ffecd628dfae7a70186",
+      "bytes": 5476
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/secrets-credentials.json",
+      "sha256": "4eabe9d79a5b1455a03661dad2ba2fcf50adf74c00b192c32e473319611bbafb",
+      "bytes": 4213
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/security-supply-chain.json",
+      "sha256": "e055147a459841afdf06d47a54f91196b5f4d676897f313b66238f9cb1e6c31c",
+      "bytes": 4132
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/semantic-rag.json",
+      "sha256": "50b17e0d8e409a637e77f272ff80b551f65a4ff8f14b267cbe92454adcd3234a",
+      "bytes": 6904
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/storage-compute.json",
+      "sha256": "4fd50cf2a8915bf883562494cd75b7425214f9042f7dfcac223caad96068a47f",
+      "bytes": 4683
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/token-efficiency.json",
+      "sha256": "a6e48d749059a28cf0b95b829888f53426879bfcaed20ce80b7deb3414d89ace",
+      "bytes": 7330
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/web-research.json",
+      "sha256": "4fe346ad204784a0e4490fd21794a758ede0ddd16ead253145af011f4f491a88",
+      "bytes": 5969
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/inputs/workers.json",
+      "sha256": "66632940ce41135ad47c7096749bfdc2c89f79267a4e2d332116ab0cbb4f2f73",
+      "bytes": 7040
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926/lanes.json",
@@ -37663,8 +37828,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "a2f36d90c935b45edc1ce60b5fe4d527fede77b774a1acb02afd41ba2206c439",
-      "bytes": 48053
+      "sha256": "26d7dcdfe7a91c6a6554d6ef75e8d6029a1ab2b015fe35b666404282e95580ae",
+      "bytes": 49211
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
