@@ -300,6 +300,13 @@ class NativeIntegration(unittest.TestCase):
             self.assertEqual(reopened.positions()["SPY"].cost_basis_usd, Decimal("300.02"))
             self.assertEqual(reopened.accounting().cash_delta_usd, Decimal("-300.02"))
             self.assertEqual(reopened.unresolved(), [])
+            # https://docs.alpaca.markets/docs/account-activities: FILL's
+            # transaction_time is the execution time. Adjacent nanoseconds
+            # must survive the recovery hook, Controller and SQLite reopen.
+            executions = reopened.db.execute("SELECT * FROM executions ORDER BY cum_qty").fetchall()
+            self.assertIn("execution_time_ns", executions[0].keys())
+            self.assertEqual([r["execution_time_ns"] for r in executions],
+                             [r["transaction_time_ns"] for r in port.activities])
 
     def test_real_native_roundtrip_partial_and_duplicate_events(self):
         port, strategy, session = self.run_node("fills")
@@ -1189,6 +1196,24 @@ class StartupFillDurability(unittest.TestCase):
         self.reopen()
         self.assertEqual(self.executions(), self.expected_executions())
         self.assert_exact_accounting()
+
+    def test_startup_execution_times_are_durable_before_any_later_observation(self):
+        # Startup has a separate _adopted_executions -> sink_observation loop.
+        # Alpaca FILL transaction_time (account-activities) and rc5 FillReport
+        # must describe the same execution, including the last nanosecond.
+        expected = {}
+        for activities in self.activities.values():
+            for index, activity in enumerate(activities):
+                stamp = TRANSPORT.timestamp_ns("2026-09-24T15:00:21.12345678%dZ" % index)
+                activity["transaction_time_ns"] = stamp
+                expected[activity["trade_id"]] = stamp
+        reports = self.reports()
+        self.reopen()
+        rows = self.ledger.db.execute("SELECT * FROM executions WHERE client_id != 'held-buy'").fetchall()
+        self.assertEqual(len(rows), 4)
+        self.assertIn("execution_time_ns", rows[0].keys())
+        self.assertEqual({r["execution_id"]: r["execution_time_ns"] for r in rows}, expected)
+        self.assertEqual({str(r.trade_id): r.ts_event for r in reports}, expected)
 
     def test_restart_does_not_double_book_previously_recorded_startup_fills(self):
         self.deliver(self.deliveries)

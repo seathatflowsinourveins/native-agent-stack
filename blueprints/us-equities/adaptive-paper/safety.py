@@ -52,6 +52,7 @@ SUB_PENNY_REFUSAL = "sub_penny_minimum_price_variance"
 # from two such averages is checked against the limit only beyond that bound.
 AVERAGE_ROUNDING = D("0.0000005")
 EXECUTION_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9:_.\-]{0,127}")
+EXECUTION_ACCOUNTING_RULE = "v4-symbol-execution-time-fallback"
 
 
 def execution_from_observation(row):
@@ -63,7 +64,14 @@ def execution_from_observation(row):
     values = [row.get(key) for key in ("execution_id", "event_qty", "event_price")]
     if any(value in (None, "") for value in values):
         return None
-    return {"execution_id": str(values[0]), "qty": str(values[1]), "price": str(values[2])}
+    execution = {"execution_id": str(values[0]), "qty": str(values[1]), "price": str(values[2])}
+    # Alpaca https://docs.alpaca.markets/docs/websocket-streaming: the top-level
+    # fill/partial_fill timestamp is execution time, separate from order.updated_at.
+    # Recovery/startup use FILL transaction_time:
+    # https://docs.alpaca.markets/docs/account-activities
+    if row.get("execution_time_ns") is not None:
+        execution["timestamp_ns"] = row["execution_time_ns"]
+    return execution
 
 
 def _canonical(value):
@@ -432,12 +440,24 @@ class Ledger:
                     raise SafetyError("persisted_risk_limits_differ")
                 self._set("limits", frozen)
                 version = self._get("schema_version")
-                if version not in (None, "1"):
+                if version not in (None, "1", "2"):
                     raise SafetyError("unsupported_ledger_schema")
-                self._set("schema_version", "1")
+                if version in (None, "1"):
+                    # Old `at` is the observation's floating-point order.updated_at,
+                    # never evidence of an execution time. Keep those fills untimed.
+                    self.db.execute("ALTER TABLE executions ADD COLUMN execution_time_ns INTEGER")
+                self._set("schema_version", "2")
+                self.db.execute("CREATE INDEX IF NOT EXISTS intents_symbol ON intents(symbol,client_id)")
+                self.db.execute("CREATE INDEX IF NOT EXISTS events_client_kind ON events(client_id,kind,id)")
+                self.db.execute("CREATE INDEX IF NOT EXISTS events_adopted_symbol ON "
+                                "events(json_extract(payload,'$.symbol'),id) WHERE kind='position_adopted'")
                 for key in ("realized", "cash_delta", "realized_loss", "peak_pnl"):
                     if self._get(key) is None:
                         self._set(key, "0")
+                # Re-derive before _begin_trial can inspect the loss budget. An
+                # unversioned/v1/v2 or prior replay-rule checkpoint is not current.
+                if self._get("execution_accounting:rule") != EXECUTION_ACCOUNTING_RULE:
+                    self._rederive_execution_accounting()
             fd = os.open(self.path.parent, os.O_RDONLY | os.O_DIRECTORY)
             try:
                 os.fsync(fd)
@@ -951,17 +971,21 @@ class Ledger:
                         evidence_required="submission_http_refusal_then_client_id_404", **extra)
             return True
 
-    def _record_execution(self, old, cum_qty, execution_id, qty, price, at):
+    def _record_execution(self, old, cum_qty, execution_id, qty, price, at, execution_time_ns):
         """Durably record one broker execution of ``old`` (the cumulative quantity after
         it is its key, as for FILL activities). A repeat of a recorded execution is a
         no-op; the same key or id with other values, an overlap, or a price beyond the
         order's limit fails closed. The limit check uses the execution's own price."""
         key = _canonical(cum_qty)
-        existing = self.db.execute("SELECT qty, price FROM executions WHERE client_id=? AND cum_qty=?",
+        existing = self.db.execute("SELECT qty, price, execution_time_ns FROM executions WHERE client_id=? AND cum_qty=?",
                                    (old.client_id, key)).fetchone()
         if existing is not None:
             if (D(existing["qty"]), D(existing["price"])) != (qty, price):
                 raise SafetyError("execution_conflict_requires_reconciliation")
+            if existing["execution_time_ns"] is None and execution_time_ns is not None:
+                self.db.execute("UPDATE executions SET execution_time_ns=? WHERE client_id=? AND cum_qty=?",
+                                (execution_time_ns, old.client_id, key))
+                return True
             return False
         if self.db.execute("SELECT 1 FROM executions WHERE client_id=? AND execution_id=?",
                            (old.client_id, execution_id)).fetchone():
@@ -972,95 +996,166 @@ class Ledger:
                 raise SafetyError("execution_overlap_requires_reconciliation")
         if (old.side == "buy" and price > old.limit_price) or (old.side == "sell" and price < old.limit_price):
             raise SafetyError("incremental_fill_violates_limit")
-        self.db.execute("INSERT INTO executions VALUES (?,?,?,?,?,?)",
-                        (old.client_id, key, _canonical(qty), _canonical(price), execution_id, at))
+        self.db.execute("INSERT INTO executions(client_id,cum_qty,qty,price,execution_id,at,execution_time_ns) "
+                        "VALUES (?,?,?,?,?,?,?)",
+                        (old.client_id, key, _canonical(qty), _canonical(price), execution_id, at, execution_time_ns))
         self._event("execution_recorded", old.client_id, execution_id=execution_id, cum_qty=cum_qty,
-                    qty=qty, price=price, at=at)
+                    qty=qty, price=price, at=at, execution_time_ns=execution_time_ns)
         return True
 
     def _execution_fills(self, client_id, low, high):
-        """Exact (quantity, notional) fills tiling (low, high], or None when
+        """Exact (quantity, notional, execution ns) fills tiling (low, high], or None when
         coverage is incomplete. Keep execution boundaries for gross-loss accounting."""
-        rows = sorted((D(r["cum_qty"]), D(r["qty"]), D(r["price"])) for r in self.db.execute(
-            "SELECT cum_qty, qty, price FROM executions WHERE client_id=?", (client_id,)))
+        rows = sorted((D(r["cum_qty"]), D(r["qty"]), D(r["price"]), r["execution_time_ns"]) for r in self.db.execute(
+            "SELECT cum_qty, qty, price, execution_time_ns FROM executions WHERE client_id=?", (client_id,)))
         fills, previous = [], low
-        for cum, qty, price in rows:
+        for cum, qty, price, stamp in rows:
             if cum <= low or cum > high:
                 continue
             if cum - qty != previous:
                 return None
-            fills.append((qty, qty * price))
+            fills.append((qty, qty * price, stamp))
             previous = cum
         return fills if previous == high else None
 
     def _executions_notional(self, client_id, low, high):
         fills = self._execution_fills(client_id, low, high)
-        return sum((notional for _, notional in fills), ZERO) if fills is not None else None
+        return sum((notional for _, notional, _ in fills), ZERO) if fills is not None else None
 
-    def _reconcile_execution_accounting(self, client_id, filled):
-        """Replace provisional money once Alpaca's exact qty/price executions cover
-        the observed quantity. Replay the durable booking journal so a late buy also
-        corrects the basis of later sales; quantities and broker averages stay intact.
-        Runs inside record_order's transaction, including across a process restart."""
-        # Versioned: a ledger replayed before per-execution booking re-derives once (#355 review F3).
-        key = "execution_accounting:v2:" + client_id
-        if (not filled or self._get(key) == _canonical(filled)
-                or self._executions_notional(client_id, ZERO, filled) is None):
-            return False
-        self._set(key, _canonical(filled))
-        bookings = [json.loads(row[0]) for row in self.db.execute(
-            "SELECT payload FROM events WHERE kind='order_observed' AND client_id=?", (client_id,))]
-        if not any(D(row["delta_qty"]) and row.get("booking") != "executions" for row in bookings):
-            return False
+    def _symbol_money(self, symbol):
+        value = self._get("symbol_accounting:" + symbol)
+        return tuple(D(v) for v in json.loads(value)) if value is not None else (ZERO, ZERO, ZERO)
 
-        positions = {}
-        cash = realized = loss = ZERO
-        for row in self.db.execute(
-                "SELECT e.kind,e.client_id,e.payload,i.symbol,i.side FROM events e "
-                "LEFT JOIN intents i ON i.client_id=e.client_id "
-                "WHERE e.kind IN ('order_observed','position_adopted') ORDER BY e.id"):
+    def _set_symbol_money(self, symbol, money):
+        self._set("symbol_accounting:" + symbol, json.dumps([str(v) for v in money]))
+
+    def _add_symbol_money(self, symbol, cash, realized, loss):
+        delta = (cash, realized, loss)
+        self._set_symbol_money(symbol, tuple(a + b for a, b in zip(self._symbol_money(symbol), delta)))
+        for name, amount in zip(("cash_delta", "realized", "realized_loss"), delta):
+            self._set(name, D(self._get(name)) + amount)
+
+    def _replay_symbol(self, symbol):
+        """Substitute timed fills only into timed journal slots. Adoptions, untimed
+        fills and uncovered provisional bookings retain their observation positions.
+        B2: if substitution shorts, use this symbol's feasible observation pass.
+        The journal is immutable; only derived cost/P&L changes."""
+        journal = []
+        rows = self.db.execute(
+            "SELECT e.id,e.kind,e.client_id,e.payload,i.side FROM intents i JOIN events e "
+            "ON e.client_id=i.client_id WHERE i.symbol=? AND e.kind='order_observed' "
+            "UNION ALL SELECT id,kind,client_id,payload,NULL FROM events "
+            "WHERE kind='position_adopted' AND json_extract(payload,'$.symbol')=? ORDER BY id",
+            (symbol, symbol))
+        for row in rows:
             data = json.loads(row["payload"])
             if row["kind"] == "position_adopted":
                 qty = D(data["qty"])
-                positions[data["symbol"]] = (qty, qty * D(data["avg_price"]))
-                continue
-            delta = D(data["delta_qty"])
-            if not delta:
-                continue
-            high = D(data["filled_qty"])
-            fills = self._execution_fills(row["client_id"], high - delta, high)
-            if fills is None:
-                fills = [(delta, D(data["delta_notional"]))]
-            qty, cost = positions.get(row["symbol"], (ZERO, ZERO))
-            # QuantConnect/Lean 985ef30: SecurityPortfolioModel.cs computes P&L
-            # per closing fill; TradeStatistics.cs accumulates losses separately.
-            for delta, notional in fills:
-                if row["side"] == "buy":
+                journal.append(("adopt", qty, qty * D(data["avg_price"]), None))
+            else:
+                delta = D(data["delta_qty"])
+                if not delta:
+                    continue
+                high = D(data["filled_qty"])
+                fills = self._execution_fills(row["client_id"], high - delta, high)
+                if fills is None:
+                    fills = [(delta, D(data["delta_notional"]), None)]
+                journal.extend((row["side"], qty, notional, stamp) for qty, notional, stamp in fills)
+
+        def replay(bookings):
+            qty = cost = cash = realized = loss = ZERO
+            for side, delta, notional, _ in bookings:
+                if side == "adopt":
+                    qty, cost = delta, notional
+                elif side == "buy":
                     qty, cost, cash = qty + delta, cost + notional, cash - notional
                 else:
                     if delta > qty:
-                        raise SafetyError("accounting_replay_would_make_short_position")
+                        return None
                     basis = cost / qty * delta
                     pnl = notional - basis
                     qty, cost, cash = qty - delta, cost - basis, cash + notional
+                    # QuantConnect/Lean 985ef30 Common/Securities/SecurityPortfolioModel.cs:
+                    # closing P&L is calculated per fill against average cost.
+                    # TradeStatistics.cs keeps losing P&L separate from gains.
                     realized, loss = realized + pnl, loss + max(ZERO, -pnl)
-            positions[row["symbol"]] = (qty, cost if qty else ZERO)
+                if not qty:
+                    cost = ZERO
+            return qty, cost, cash, realized, loss
 
+        # Python's stable sort keeps journal order for tied timestamps. No
+        # floating-point conversion: adjacent ns must remain distinguishable.
+        timed = iter(sorted((entry for entry in journal if entry[3] is not None), key=lambda entry: entry[3]))
+        result = replay(next(timed) if entry[3] is not None else entry for entry in journal)
+        fallback = result is None
+        if fallback:
+            result = replay(journal)
+        if result is None:
+            raise SafetyError("accounting_replay_would_make_short_position")
+        row = self.db.execute("SELECT qty,cost_basis FROM positions WHERE symbol=?", (symbol,)).fetchone()
+        if result[0] != (D(row["qty"]) if row else ZERO):
+            raise SafetyError("accounting_replay_quantity_mismatch")
+        return result, fallback
+
+    def _rederive_execution_accounting(self):
+        """One atomic open-time upgrade, including pre-v2 netted losses. Populate
+        per-symbol contributions so later corrections never replay another symbol."""
+        totals = [ZERO, ZERO, ZERO]
         changed = False
-        for row in self.db.execute("SELECT symbol,qty,cost_basis FROM positions").fetchall():
-            qty, cost = positions.get(row["symbol"], (ZERO, ZERO))
-            if qty != D(row["qty"]):
-                raise SafetyError("accounting_replay_quantity_mismatch")
-            if cost != D(row["cost_basis"]):
+        symbols = [r[0] for r in self.db.execute("SELECT symbol FROM positions UNION SELECT symbol FROM intents")]
+        for symbol in symbols:
+            (_, cost, *money), _ = self._replay_symbol(symbol)
+            row = self.db.execute("SELECT cost_basis FROM positions WHERE symbol=?", (symbol,)).fetchone()
+            if row and cost != D(row[0]):
+                self.db.execute("UPDATE positions SET cost_basis=? WHERE symbol=?", (str(cost), symbol))
                 changed = True
-                self.db.execute("UPDATE positions SET cost_basis=? WHERE symbol=?", (str(cost), row["symbol"]))
-        for name, amount in (("cash_delta", cash), ("realized", realized), ("realized_loss", loss)):
-            if amount != D(self._get(name)):
-                changed = True
-                self._set(name, amount)
+            self._set_symbol_money(symbol, money)
+            totals = [a + b for a, b in zip(totals, money)]
+        for name, amount in zip(("cash_delta", "realized", "realized_loss"), totals):
+            changed |= amount != D(self._get(name))
+            self._set(name, amount)
+        self.db.execute("DELETE FROM meta WHERE key LIKE 'execution_accounting:%'")
+        self._set("execution_accounting:rule", EXECUTION_ACCOUNTING_RULE)
+        if changed:
+            self._event("execution_accounting_reconciled", rule=EXECUTION_ACCOUNTING_RULE,
+                        cash_delta=totals[0], realized=totals[1], realized_loss=totals[2])
+
+    def _reconcile_execution_accounting(self, client_id, filled):
+        """Called only for new execution evidence, inside the booking transaction.
+        B4: ordinary monotone exact fills do not replay; a correction reads only
+        the triggering symbol's journal and adjusts only its money contribution."""
+        if not filled:
+            return False
+        symbol = self.db.execute("SELECT symbol FROM intents WHERE client_id=?", (client_id,)).fetchone()[0]
+        bookings = [json.loads(row[0]) for row in self.db.execute(
+            "SELECT payload FROM events WHERE kind='order_observed' AND client_id=?", (client_id,))]
+        provisional = any(D(row["delta_qty"]) and row.get("booking") != "executions" for row in bookings)
+        earliest = self.db.execute("SELECT MIN(execution_time_ns) FROM executions WHERE client_id=?",
+                                   (client_id,)).fetchone()[0]
+        earlier = earliest is not None and self.db.execute(
+            "SELECT 1 FROM intents i JOIN executions x ON x.client_id=i.client_id "
+            "WHERE i.symbol=? AND i.client_id!=? AND x.execution_time_ns>? "
+            "AND EXISTS (SELECT 1 FROM events e WHERE e.client_id=i.client_id "
+            "AND e.kind='order_observed' AND CAST(json_extract(e.payload,'$.delta_qty') AS NUMERIC)>0) LIMIT 1",
+            (symbol, client_id, earliest)).fetchone() is not None
+        if not provisional and not earlier:
+            return False
+        (_, cost, cash, realized, loss), fallback = self._replay_symbol(symbol)
+        changed = False
+        row = self.db.execute("SELECT cost_basis FROM positions WHERE symbol=?", (symbol,)).fetchone()
+        if row and cost != D(row[0]):
+            changed = True
+            self.db.execute("UPDATE positions SET cost_basis=? WHERE symbol=?", (str(cost), symbol))
+        previous = self._symbol_money(symbol)
+        money = (cash, realized, loss)
+        if money != previous:
+            changed = True
+            self._add_symbol_money(symbol, *(a - b for a, b in zip(money, previous)))
         if changed:
             self._event("execution_accounting_reconciled", client_id, filled_qty=filled,
-                        cash_delta=cash, realized=realized, realized_loss=loss)
+                        symbol=symbol, observation_fallback=fallback,
+                        cash_delta=self._get("cash_delta"), realized=self._get("realized"),
+                        realized_loss=self._get("realized_loss"))
         return changed
 
     def record_order(self, client_id, broker_id, status, cumulative_qty, average_price, *, timestamp=None,
@@ -1071,8 +1166,8 @@ class Ledger:
         the advance is booked at their exact prices, each checked against the limit.
         Otherwise (a REST read ahead of the stream, a missing or reordered execution) the
         advance is booked from the cumulative averages, whose limit check allows Alpaca's
-        6-decimal average rounding. Complete late execution coverage corrects that
-        provisional accounting, including the cost basis of subsequent sales."""
+        6-decimal average rounding. Late executions correct each covered booking,
+        including the cost basis of subsequent sales; uncovered bookings stay put."""
         if (type(broker_id) is not str or not broker_id or len(broker_id) > 128
                 or type(status) is not str or status not in RANK or status in ("reserved", "not_sent", "broker_refused")):
             raise SafetyError("invalid_broker_order_identity_or_status")
@@ -1086,6 +1181,10 @@ class Ledger:
             execution_qty, execution_price = decimal(execution.get("qty")), decimal(execution.get("price"))
             if execution_qty > filled:
                 raise SafetyError("execution_exceeds_cumulative_quantity")
+            execution_time_ns = execution.get("timestamp_ns")
+            if execution_time_ns is not None and (type(execution_time_ns) is not int
+                                                  or not 0 < execution_time_ns < 2**63):
+                raise SafetyError("invalid_execution_timestamp_ns")
         with self._transaction():
             row = self.db.execute("SELECT * FROM intents WHERE client_id=?", (client_id,)).fetchone()
             if row is None:
@@ -1099,11 +1198,12 @@ class Ledger:
                 raise SafetyError("broker_order_identity_changed")
             if filled > old.qty or (status == "filled" and filled != old.qty):
                 raise SafetyError("broker_filled_quantity_invalid")
-            reconciled = False
+            reconciled = recorded = False
             if execution is not None:
                 # Recorded even when a REST read already advanced the cumulative quantity.
-                self._record_execution(old, filled, execution["execution_id"], execution_qty, execution_price, at)
-                if filled <= old.filled_qty:
+                recorded = self._record_execution(old, filled, execution["execution_id"], execution_qty,
+                                                  execution_price, at, execution_time_ns)
+                if recorded and filled <= old.filled_qty:
                     reconciled = self._reconcile_execution_accounting(client_id, old.filled_qty)
                     if reconciled:
                         self._refresh_risk(at)
@@ -1134,7 +1234,7 @@ class Ledger:
                             (old.side == "sell" and delta_notional < delta * old.limit_price - tolerance)):
                         raise SafetyError("incremental_fill_violates_limit")
                 position = self._positions().get(old.symbol, Position(old.symbol, ZERO, ZERO))
-                realized = ZERO
+                realized = realized_loss = ZERO
                 if old.side == "buy":
                     new_qty, cost = position.qty + delta, position.cost_basis_usd + delta_notional
                     cash_delta = -delta_notional
@@ -1144,13 +1244,17 @@ class Ledger:
                     basis = position.average_cost * delta
                     new_qty, cost = position.qty - delta, position.cost_basis_usd - basis
                     realized, cash_delta = delta_notional - basis, delta_notional
+                    # LEAN 985ef30 SecurityPortfolioModel.cs: each closing fill
+                    # has its own P&L, even when one observation covers several.
+                    fills = self._execution_fills(client_id, old.filled_qty, filled)
+                    realized_loss = (sum((max(ZERO, position.average_cost * qty - notional)
+                                          for qty, notional, _ in fills), ZERO)
+                                     if fills is not None else max(ZERO, -realized))
                 if new_qty == 0:
                     cost = ZERO
                 self.db.execute("INSERT INTO positions VALUES (?,?,?) ON CONFLICT(symbol) DO UPDATE SET "
                                 "qty=excluded.qty,cost_basis=excluded.cost_basis", (old.symbol, str(new_qty), str(cost)))
-                self._set("cash_delta", D(self._get("cash_delta")) + cash_delta)
-                self._set("realized", D(self._get("realized")) + realized)
-                self._set("realized_loss", D(self._get("realized_loss")) + max(ZERO, -realized))
+                self._add_symbol_money(old.symbol, cash_delta, realized, realized_loss)
             # A delayed partial-fill snapshot can add a valid fill after a newer
             # pending-cancel status. Apply its quantity without reversing status.
             effective_status = old.status if RANK[old.status] > RANK[status] else status
@@ -1159,7 +1263,7 @@ class Ledger:
             self._event("order_observed", client_id, broker_id=broker_id, status=status, filled_qty=filled,
                         average_price=average, at=at, delta_qty=delta, delta_notional=delta_notional,
                         booking=booking)
-            if execution is not None:
+            if recorded and delta:
                 self._reconcile_execution_accounting(client_id, filled)
             self._refresh_risk(at)
             return True
