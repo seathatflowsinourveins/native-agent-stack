@@ -372,20 +372,33 @@ Alpaca paper pair and the other inventory entries stay in their files,
 because their loaders read `--env-file` and because an unattended or
 scheduled run cannot rely on a key that a kernel restart erases.
 
-**Store it** in your own terminal, never through an agent. The value goes in
-on standard input, never on a command line:
+**Store it** in your own terminal, never through an agent. Run `store`
+without a pipe: it turns echo off, prompts, and reads one pasted line, so the
+value never passes through your shell, its history or a command line:
 
 ```sh
-read -rs K && printf %s "$K" | python3 scripts/kernel_keyring.py store tavily_api_key; unset K
+python3 scripts/kernel_keyring.py store tavily_api_key     # paste at the hidden prompt, then press Enter
 python3 scripts/kernel_keyring.py status tavily_api_key    # tavily_api_key: present
 ```
 
+`store` also reads a value piped in from another program. Do not stage the
+value in a shell variable while shell tracing is on: with `set -x`, bash
+printed the expanded `printf %s "$K"`, value included, on stderr (measured
+with a canary on 2026-09-26). Where the hidden prompt cannot turn echo off,
+use a subshell that turns tracing off first; `K` ends with the subshell:
+
+```sh
+( set +x; read -rs K && printf %s "$K" | python3 scripts/kernel_keyring.py store tavily_api_key )
+```
+
 `read -rs` reads without echo, and `printf` is a shell builtin in bash and
-zsh, so the value never appears in any process's arguments. Run without a
-pipe, `store` turns echo off and then prompts for the value. It refuses a name
-that is already stored; `--replace` revokes the old key and then stores the
-new one, which is also how to rotate. Names use lowercase letters, digits,
-`.`, `_` and `-`.
+zsh, so the value never appears in any process's arguments. `store` refuses
+a name that is already stored; `--replace` revokes the old key and then
+stores the new one, which is also how to rotate. It checks for an existing
+key before the prompt and again after the value was read, under a lock that
+`revoke` also takes, so two stores of one name that run at once cannot both
+succeed without `--replace`. The lock is a Linux abstract socket name for
+your uid, not a file. Names use lowercase letters, digits, `.`, `_` and `-`.
 
 **Use it** through `exec`, which reads the key and starts the command with
 one variable set, in that command's environment only:
@@ -396,14 +409,21 @@ python3 scripts/kernel_keyring.py revoke tavily_api_key    # remove it
 ```
 
 Agents and workflow steps run the same line from the checkout root, so
-nothing goes into a shell startup file, a unit file or a prompt. `exec`
-refuses a variable name that is not `[A-Z_][A-Z0-9_]*`, or that the dynamic
-loader or a shell reads at startup (`LD_*`, `DYLD_*`, `PATH`, `IFS`, `ENV`,
-`BASH_ENV`, `PS4`, `SHELLOPTS`, `BASHOPTS`): ld.so prints a value it cannot
-use in its error message, and a shell sources, traces or splits on the
-others. No subcommand prints the value; errors name the key or an errno only. `scripts/credential_status.py` inspects files, so it
-does not report keyring entries; `status` is the check. The Tavily commands
-are in [`recipes/tavily.md`](../recipes/tavily.md).
+nothing goes into a shell startup file, a unit file or a prompt. `exec` sets
+only a credential variable: a name of the form `[A-Z_][A-Z0-9_]*` that ends
+in `KEY`, `KEY_ID`, `TOKEN`, `SECRET`, `PASSWORD` or `PASSPHRASE`, such as
+`TAVILY_API_KEY`, and does not start with `LD_`, `DYLD_` or `PYTHON`. A
+program that reads a variable at startup can print its value in an error
+message, even when the command itself prints nothing. Measured with a canary
+on 2026-09-26: Python printed the values of `PYTHONWARNINGS`, `PYTHONHOME`
+and `PYTHONIOENCODING`, bash printed `LC_ALL`, `tput` printed `TERM`, git
+printed `GIT_TRACE`, and `PYTHONPYCACHEPREFIX` made Python create a directory
+named after the value. The script never prints the value; its errors name
+the key or an errno only. The command that `exec` starts can print it, so
+give `exec` only commands that use the key without printing it.
+`scripts/credential_status.py` inspects files, so it does not report keyring
+entries; `status` is the check. The Tavily commands are in
+[`recipes/tavily.md`](../recipes/tavily.md).
 
 **Lifetime.** The key stays until it is revoked or the kernel stops. The
 kernel keeps a user keyring for as long as its user namespace exists, whether
@@ -444,9 +464,19 @@ on a Mac.
 
 - Any process of the same uid can read the key: `exec` with any command, a
   few lines of Python, or `keyctl print` where keyutils is installed. That
-  includes every agent session running as you, and the guard hook and the
-  deny rules do not cover the keyring. It is the residual risk the file store
-  already has (see [the threat model](#threat-model-and-what-each-guard-stops)),
+  includes every agent session running as you. The guard hook and the deny
+  rules do not cover the keyring. On 2026-09-26 the guard's `check()` passed
+  `keyctl print`, `keyctl pipe` and `keyctl read`. It also passed every
+  command given to `exec`, because it does not look past `exec ... --` and
+  `TAVILY_API_KEY` is not one of its secret names:
+  `exec tavily_api_key TAVILY_API_KEY -- env`, `-- printenv TAVILY_API_KEY`
+  and `-- sh -c 'echo $TAVILY_API_KEY'` all passed, while a bare `env` or
+  `printenv TAVILY_API_KEY` is blocked. The threat-model row's "dump the
+  environment; reference a secret variable" therefore does not reach commands
+  started through `exec`. Until a change to the guard covers these forms, give
+  `exec` only the commands in [`recipes/tavily.md`](../recipes/tavily.md).
+  It is the residual risk the file store already has (see
+  [the threat model](#threat-model-and-what-each-guard-stops)),
   without the file: nothing to commit, back up, sync or read through
   `\\wsl.localhost` from Windows. A Windows process can still start a command
   in the distribution as you with `wsl.exe`. Root can read the key too.
@@ -472,16 +502,22 @@ are local integration checks, not an upstream test.
 generated throwaway values under names unique to each run and covers: the
 store, status, exec and revoke round trip; that the child gets the value in
 its environment and not on its command line; that no subcommand prints a test
-value; `--replace`; refused names and variables; hidden terminal input; and a
-session keyring that does not link the user keyring (as with systemd
-`KeyringMode=private`). Such a session does not possess keys in the user
+value; `--replace`; two stores of one name at once, the first held at its
+hidden prompt while the second completes (the first is then refused, or with
+`--replace` revokes the second's key); `store` and `revoke` waiting while the
+lock is held; refused names and variables, including the startup variables
+above, with a positive control in which Python prints a `PYTHONWARNINGS`
+value; hidden terminal input; and a session keyring that does not link the
+user keyring (as with systemd `KeyringMode=private`). Such a session does not
+possess keys in the user
 keyring. `store` still sets the permissions there, because it creates the key
 in its own process keyring and links it into the user keyring only
 afterwards; `revoke` invalidates the key, because only a process that
 possesses a key may revoke it. The first prototype of the script ignored the
 permission call's result: in such a session its key kept the kernel default
-(same uid: view only), and a later `exec` failed with `EACCES`. The
-committed script finds the key stored on 2026-09-26:
+(same uid: view only), and a later `exec` failed with `EACCES`. Run against
+the script's first committed version, the race, lock and startup-variable
+tests fail. The committed script finds the key stored on 2026-09-26:
 `exec tavily_api_key TAVILY_API_KEY -- tvly auth --json` returned
 `"authenticated": true, "method": "env"`, and `tvly auth --json` without
 `exec` returned `"authenticated": false`, so this host holds no Tavily

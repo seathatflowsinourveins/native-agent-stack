@@ -6,8 +6,11 @@ its own keyctl calls, independent of the script under test; no other key is read
 subcommand's stdout and stderr are checked for each test value. Some commands run under a wrapper that
 first joins a new session keyring: ``private`` does not link the user keyring (as with systemd
 ``KeyringMode=private``), so the process does not possess the stored key; ``linked`` links it, as
-pam_keyinit does, so it does. Skipped unless Linux x86_64/aarch64, and when this environment blocks
-the keyring system calls (for example a container seccomp profile).
+pam_keyinit does, so it does. Two stores of one name race by holding the first at its hidden-input
+prompt on a pseudo-terminal while the second completes. The lock tests hold the script's per-uid lock
+for about a second, so a real ``store`` or ``revoke`` of this uid run at that moment waits. Skipped
+unless Linux x86_64/aarch64, and when this environment blocks the keyring system calls (for example a
+container seccomp profile).
 """
 from __future__ import annotations
 
@@ -20,6 +23,7 @@ import platform
 import re
 import secrets
 import select
+import socket
 import subprocess
 import sys
 import tempfile
@@ -34,7 +38,8 @@ SUPPORTED = platform.system() == "Linux" and platform.machine() in KEYCTL_NR
 PREFIX = "native-agent-stack:"
 KEY_SPEC_USER_KEYRING = -4
 KEYCTL_DESCRIBE, KEYCTL_UNLINK, KEYCTL_SEARCH, KEYCTL_READ, KEYCTL_INVALIDATE = 6, 9, 10, 11, 21
-VARIABLE = "KK_TEST_VALUE"
+VARIABLE = "KK_TEST_API_KEY"
+HOLD_SECONDS = 1.0  # how long a lock test holds the lock; well under the script's LOCK_WAIT_SECONDS
 
 # Checks, printing nothing, that the variable named in argv[1] holds bytes with the SHA-256 in argv[2],
 # that those bytes are not on the child's own command line, and that the rest of the environment
@@ -119,6 +124,20 @@ def drain(fd: int) -> bytes:
     return data
 
 
+def load_script():
+    """The script as a module, not __main__, so it does not re-execute itself."""
+    spec = importlib.util.spec_from_file_location("kernel_keyring_under_test", SCRIPT)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def stop(process: subprocess.Popen) -> None:
+    if process.poll() is None:
+        process.kill()
+    process.communicate()
+
+
 @unittest.skipUnless(SUPPORTED, "the kernel keyring script supports Linux x86_64/aarch64 only")
 class KernelKeyringTests(unittest.TestCase):
     @classmethod
@@ -153,25 +172,49 @@ class KernelKeyringTests(unittest.TestCase):
         self.values.append(value)
         return value
 
+    def assert_no_value(self, output: bytes, label: str = "output") -> None:
+        for secret in self.values:
+            self.assertNotIn(secret, output, f"a test value appeared in {label}")
+
     def cli(self, *args: str, value: bytes = b"", session: str | None = None, env=None, cwd=None):
         prefix = [sys.executable, "-c", SESSION, session] if session else []
         result = subprocess.run([*prefix, sys.executable, str(SCRIPT), *args], input=value,
                                 capture_output=True, env=env, cwd=cwd, timeout=60)
-        for secret in self.values:
-            self.assertNotIn(secret, result.stdout, f"{args[:1]} printed a test value on stdout")
-            self.assertNotIn(secret, result.stderr, f"{args[:1]} printed a test value on stderr")
+        self.assert_no_value(result.stdout, f"{args[:1]} stdout")
+        self.assert_no_value(result.stderr, f"{args[:1]} stderr")
         return result
 
-    def assert_child_sees(self, name: str, value: bytes, session: str | None = None, env=None, cwd=None):
+    def terminal_store(self, *args: str, session: str | None = None):
+        """Start `store` reading a new pseudo-terminal; return once its hidden-input prompt is shown.
+
+        By then the script has checked for an existing key and is waiting for the value, which the
+        caller writes to the returned terminal master.
+        """
+        try:
+            master, slave = os.openpty()
+        except OSError as error:
+            self.skipTest(f"no pseudo-terminal ({error})")
+        self.addCleanup(os.close, master)
+        self.addCleanup(os.close, slave)
+        prefix = [sys.executable, "-c", SESSION, session] if session else []
+        process = subprocess.Popen([*prefix, sys.executable, str(SCRIPT), "store", *args], stdin=slave,
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.addCleanup(stop, process)  # runs first: the process ends before its terminal is closed
+        prompt = read_until(process.stderr.fileno(), b"input hidden", 30)
+        self.assertIn(b"input hidden", prompt)
+        return process, master, prompt
+
+    def assert_child_sees(self, name: str, value: bytes, session: str | None = None, env=None, cwd=None,
+                          variable: str = VARIABLE):
         environment = dict(os.environ if env is None else env)
-        environment.pop(VARIABLE, None)
+        environment.pop(variable, None)
         environment["KK_TEST_MARKER"] = "inherited"
-        result = self.cli("exec", name, VARIABLE, "--", sys.executable, "-c", CHILD, VARIABLE,
+        result = self.cli("exec", name, variable, "--", sys.executable, "-c", CHILD, variable,
                           hashlib.sha256(value).hexdigest(), session=session, env=environment, cwd=cwd)
         self.assertEqual(result.returncode, 0, "child check failed (10 missing, 11 wrong value, "
                          "12 value on its command line, 13 environment not inherited)")
         self.assertEqual(result.stdout, b"")
-        self.assertNotIn(VARIABLE, os.environ)
+        self.assertNotIn(variable, os.environ)
 
     def test_round_trip_store_status_exec_revoke(self):
         name, value = self.new_name("roundtrip"), self.new_value()
@@ -244,10 +287,87 @@ class KernelKeyringTests(unittest.TestCase):
         self.assertFalse(self.kernel.readable(serial))
         self.assertLessEqual(self.kernel.search(name), 0)
 
+    def test_a_store_finished_during_another_stores_input_is_not_overwritten(self):
+        name, first, second = self.new_name("race"), self.new_value(), self.new_value()
+        waiting, master, prompt = self.terminal_store(name)  # found no key; now waits for the value
+        other = self.cli("store", name, value=second)
+        self.assertEqual(other.returncode, 0, other.stderr)
+        serial = self.kernel.search(name)
+        os.write(master, first + b"\n")
+        out, err = waiting.communicate(timeout=30)
+        self.assert_no_value(prompt + out + err, "the waiting store's output")
+        self.assertEqual(waiting.returncode, 1, err)
+        self.assertIn(b"already stored; pass --replace", err)
+        self.assertEqual(out, b"")
+        self.assertEqual(self.kernel.search(name), serial)
+        self.assert_child_sees(name, second)
+
+    def test_replace_revokes_a_key_stored_during_its_input(self):
+        name, first, second = self.new_name("racereplace"), self.new_value(), self.new_value()
+        waiting, master, prompt = self.terminal_store("--replace", name, session="linked")
+        self.assertEqual(self.cli("store", name, value=second).returncode, 0)
+        meanwhile = self.kernel.search(name)
+        self.assertGreater(meanwhile, 0)
+        os.write(master, first + b"\n")
+        out, err = waiting.communicate(timeout=30)
+        self.assert_no_value(prompt + out + err, "the waiting store's output")
+        self.assertEqual(waiting.returncode, 0, err)
+        self.assertIn(b"(memory only; the previous key was revoked)", out)
+        self.assertFalse(self.kernel.readable(meanwhile))
+        self.assertNotEqual(self.kernel.search(name), meanwhile)
+        self.assert_child_sees(name, first)
+
+    def hold_lock(self, module) -> socket.socket:
+        lock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+        try:
+            lock.bind(module._lock_address())
+        except OSError as error:
+            lock.close()
+            self.skipTest(f"cannot hold the lock here ({errno.errorcode.get(error.errno, error.errno)})")
+        return lock
+
+    def test_store_and_revoke_wait_while_the_lock_is_held(self):
+        module = load_script()
+        name, value = self.new_name("lock"), self.new_value()
+        for args, stdin, before in ((("store", name), value, False), (("revoke", name), b"", True)):
+            with self.subTest(command=args[0]):
+                lock = self.hold_lock(module)
+                try:
+                    process = subprocess.Popen([sys.executable, str(SCRIPT), *args], stdin=subprocess.PIPE,
+                                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    self.addCleanup(stop, process)
+                    process.stdin.write(stdin)
+                    process.stdin.close()
+                    time.sleep(HOLD_SECONDS)
+                    self.assertIsNone(process.poll(), f"{args[0]} did not wait for the lock")
+                    self.assertEqual(self.kernel.search(name) > 0, before)  # nothing changed yet
+                finally:
+                    lock.close()
+                out, err = process.communicate(timeout=30)
+                self.assert_no_value(out + err, f"{args[0]} output")
+                self.assertEqual(process.returncode, 0, err)
+                self.assertEqual(self.kernel.search(name) > 0, not before)
+
+    def test_the_lock_gives_up_with_a_message_and_is_released(self):
+        module = load_script()
+        module.LOCK_WAIT_SECONDS = 0.3
+        lock = self.hold_lock(module)
+        try:
+            with self.assertRaises(module.KeyringError) as caught:
+                with module._exclusive():
+                    self.fail("took a lock that is held")
+            self.assertIn("another store or revoke is still running", str(caught.exception))
+        finally:
+            lock.close()
+        with module._exclusive():
+            with self.assertRaises(module.KeyringError):
+                with module._exclusive():
+                    self.fail("took the lock twice")
+        with module._exclusive():  # released on leaving the block
+            pass
+
     def test_a_failed_permission_or_link_step_is_reported_and_leaves_no_key(self):
-        spec = importlib.util.spec_from_file_location("kernel_keyring_under_test", SCRIPT)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)  # not __main__: no re-exec
+        module = load_script()
         for step in (module.KEYCTL_SETPERM, module.KEYCTL_LINK):
             with self.subTest(step=step):
                 name, value = self.new_name(f"step{step}"), self.new_value()
@@ -285,14 +405,44 @@ class KernelKeyringTests(unittest.TestCase):
         name, value = self.new_name("envname"), self.new_value()
         self.assertEqual(self.cli("store", name, value=value).returncode, 0)
         with tempfile.TemporaryDirectory() as directory:
-            marker = Path(directory, "ran")
-            for variable in ("", "lower", "Mixed_Case", "1ABC", "A-B", "A=B", "A B", "LD_PRELOAD",
-                             "LD_LIBRARY_PATH", "PATH", "IFS", "ENV", "BASH_ENV", "PS4"):
+            for index, variable in enumerate((
+                    "", "lower", "Mixed_Case", "1ABC", "A-B", "A=B", "A B", "kk_test_api_key",
+                    "KK_TEST_VALUE", "KK_TEST_API_KEY_FILE", "LD_PRELOAD", "LD_LIBRARY_PATH",
+                    "PATH", "IFS", "ENV", "BASH_ENV", "PS4", "SHELLOPTS", "BASHOPTS",
+                    "PYTHONWARNINGS", "PYTHONHOME", "PYTHONIOENCODING", "PYTHONPYCACHEPREFIX",
+                    "PYTHONSTARTUP", "LANG", "LC_ALL", "TERM", "GIT_TRACE", "NODE_OPTIONS",
+                    "JAVA_TOOL_OPTIONS", "SSLKEYLOGFILE", "SSH_AUTH_SOCK",
+                    "PYTHON_API_KEY", "LD_AUDIT_TOKEN", "DYLD_SECRET")):
                 with self.subTest(variable=variable):
+                    marker = Path(directory, f"ran-{index}")
                     result = self.cli("exec", name, variable, "--", sys.executable, "-c", TOUCH, str(marker))
                     self.assertEqual(result.returncode, 2)
                     self.assertIn(b"ENV_VAR", result.stderr)
                     self.assertFalse(marker.exists())
+
+    def test_exec_accepts_credential_variable_names(self):
+        name, value = self.new_name("credname"), self.new_value()
+        self.assertEqual(self.cli("store", name, value=value).returncode, 0)
+        for variable in ("KK_TEST_KEY", "KK_TEST_API_KEY_ID", "KK_TEST_TOKEN", "KK_TEST_AUTHTOKEN",
+                         "KK_TEST_SECRET", "KKTESTPASSWORD", "KK_TEST_PASSPHRASE", "_KK_TEST_KEY"):
+            with self.subTest(variable=variable):
+                self.assert_child_sees(name, value, variable=variable)
+
+    def test_exec_refuses_a_startup_variable_that_a_quiet_child_would_print(self):
+        name, value = self.new_name("startup"), self.new_value()
+        self.assertEqual(self.cli("store", name, value=value).returncode, 0)
+        # Positive control, without the script: a child that prints nothing itself still prints a
+        # PYTHONWARNINGS value it cannot parse, while it starts.
+        control = subprocess.run([sys.executable, "-c", "pass"], capture_output=True, timeout=60,
+                                 env={**os.environ, "PYTHONWARNINGS": value.decode()})
+        self.assertIn(value, control.stderr)
+        for variable in ("PYTHONWARNINGS", "PYTHONHOME", "PYTHONIOENCODING", "LC_ALL", "TERM", "GIT_TRACE"):
+            with self.subTest(variable=variable):
+                refused = self.cli("exec", name, variable, "--", sys.executable, "-c", "pass")
+                self.assertEqual(refused.returncode, 2)
+                self.assertIn(b"refused ENV_VAR", refused.stderr)
+        quiet = self.cli("exec", name, VARIABLE, "--", sys.executable, "-c", "pass")
+        self.assertEqual((quiet.returncode, quiet.stdout, quiet.stderr), (0, b"", b""))
 
     def test_invalid_key_names_are_refused_and_not_echoed(self):
         run = self.run_id
@@ -333,8 +483,8 @@ class KernelKeyringTests(unittest.TestCase):
     def test_store_and_exec_write_no_file(self):
         name, value = self.new_name("nofile"), self.new_value()
         with tempfile.TemporaryDirectory() as home:
-            env = {**os.environ, "HOME": home, "TMPDIR": home, "XDG_CONFIG_HOME": home,
-                   "XDG_CACHE_HOME": home, "XDG_STATE_HOME": home, "XDG_DATA_HOME": home}
+            env = {**os.environ, "HOME": home, "TMPDIR": home, "XDG_CONFIG_HOME": home, "XDG_CACHE_HOME": home,
+                   "XDG_STATE_HOME": home, "XDG_DATA_HOME": home, "XDG_RUNTIME_DIR": home}
             self.assertEqual(self.cli("store", name, value=value, env=env, cwd=home).returncode, 0)
             self.assert_child_sees(name, value, env=env, cwd=home)
             self.assertEqual(sorted(os.listdir(home)), [])

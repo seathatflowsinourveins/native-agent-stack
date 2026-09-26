@@ -6,20 +6,24 @@
   kernel_keyring.py exec <name> <ENV_VAR> -- <cmd...>     run cmd with ENV_VAR set to the value, only for that child
   kernel_keyring.py revoke <name>                         revoke the key and unlink it
 
-`store` reads the value from stdin: pipe it in, or run it in a terminal and paste at the prompt, which
-turns echo off first. It refuses a name that is already stored unless --replace, which revokes the old
-key before storing the new one. The value is stripped of surrounding whitespace and may not contain a
-control character or line break. `exec` puts the value into the environment of that one child only
-(os.execvpe; never on a command line) and refuses an ENV_VAR that is not [A-Z_][A-Z0-9_]* or that the
-dynamic loader or a shell reads at startup.
+`store` reads the value from stdin: run it in a terminal and paste at the prompt, which turns echo off
+first, or pipe it in. It refuses a name that is already stored unless --replace, which revokes the old
+key before storing the new one; it checks again after the value was read, under a per-uid lock that
+`revoke` also takes, so two stores running at once cannot both succeed without --replace. The value is
+stripped of surrounding whitespace and may not contain a control character or line break. `exec` puts
+the value into the environment of that one child only (os.execvpe; never on a command line). ENV_VAR
+must be a credential variable name, [A-Z_][A-Z0-9_]* ending in KEY, KEY_ID, TOKEN, SECRET, PASSWORD or
+PASSPHRASE (such as TAVILY_API_KEY), and not one the dynamic loader or Python reads (LD_*, DYLD_*,
+PYTHON*): a program that interprets a variable at startup can print its value in an error message.
 
 The key lives in the calling user's user keyring (KEY_SPEC_USER_KEYRING) as type "user" with the
 description "native-agent-stack:<name>": readable by every process of this uid on this kernel, gone when
 the kernel restarts (for WSL2: `wsl --shutdown`, a Windows restart, or the VM stopping), and never
 written to a file by this script. Permissions 0x3F0B0000: possessor all, same-uid user view/read/search,
-nobody else. No value is printed or logged; messages name the key or an errno, never its content, and
-no traceback is printed. Linux only (x86_64 and aarch64 syscall numbers); on macOS use the login
-Keychain instead (docs/secret-storage.md).
+nobody else. This script never prints or logs the value; messages name the key or an errno, never its
+content, and no traceback is printed. The command that `exec` starts can print it, so give `exec` only
+commands that use the key without printing it. Linux only (x86_64 and aarch64 syscall numbers); on
+macOS use the login Keychain instead (docs/secret-storage.md).
 """
 from __future__ import annotations
 
@@ -31,10 +35,13 @@ if __name__ == "__main__" and not sys.flags.isolated:
     # user site-packages cannot shadow a module this tool imports or hook its error output.
     os.execv(sys.executable, [sys.executable, "-I", os.path.abspath(__file__), *sys.argv[1:]])
 
+import contextlib  # noqa: E402
 import ctypes  # noqa: E402
 import errno  # noqa: E402
 import platform  # noqa: E402
 import re  # noqa: E402
+import socket  # noqa: E402
+import time  # noqa: E402
 
 SYSCALLS = {"x86_64": (248, 250), "aarch64": (217, 219)}  # (add_key, keyctl)
 KEY_SPEC_PROCESS_KEYRING, KEY_SPEC_USER_KEYRING = -2, -4
@@ -43,12 +50,17 @@ KEYCTL_SEARCH, KEYCTL_READ, KEYCTL_INVALIDATE = 10, 11, 21
 PERM = 0x3F0B0000  # possessor: all; user: view|read|search; group/other: none
 PREFIX = "native-agent-stack:"
 MAX_VALUE_BYTES = 32767  # the kernel's limit for a "user" key payload
+LOCK_WAIT_SECONDS = 10.0
 # Lowercase only: a pasted API key almost always has an uppercase letter, so it is refused as a name.
 NAME = re.compile(r"[a-z0-9][a-z0-9_.-]{0,63}")
 ENV_NAME = re.compile(r"[A-Z_][A-Z0-9_]*")
-# Read by the dynamic loader or a shell at startup: ld.so prints a value it cannot use in its error
-# message, and a shell sources, traces or splits on the others.
-RESERVED_ENV = re.compile(r"(?:LD|DYLD)_[A-Z0-9_]*|PATH|IFS|ENV|BASH_ENV|PS4|SHELLOPTS|BASHOPTS")
+# `exec` sets only a credential variable, the kind a provider SDK reads. A variable that a program
+# interprets at startup can make it print the value: measured with a canary on 2026-09-26, Python
+# printed PYTHONWARNINGS, PYTHONHOME and PYTHONIOENCODING values, bash LC_ALL, tput TERM and git
+# GIT_TRACE, and PYTHONPYCACHEPREFIX made Python create a directory named after the value.
+CREDENTIAL_ENV = re.compile(r".*(?:KEY|KEY_ID|TOKEN|SECRET|PASSWORD|PASSPHRASE)")
+# Refused even with such an ending: ld.so prints a value it cannot use, and Python reads PYTHON*.
+RESERVED_ENV = re.compile(r"(?:LD_|DYLD_|PYTHON).*")
 # Linux errno values, spelled out so importing this file never fails on another platform.
 ABSENT = {getattr(errno, "ENOKEY", 126), getattr(errno, "EKEYEXPIRED", 127), getattr(errno, "EKEYREVOKED", 128)}
 USAGE = """usage:
@@ -56,7 +68,9 @@ USAGE = """usage:
   kernel_keyring.py status <name>
   kernel_keyring.py exec <name> <ENV_VAR> -- <command> [args...]
   kernel_keyring.py revoke <name>
-<name>: lowercase letters, digits, '.', '_' or '-' (at most 64). See docs/secret-storage.md."""
+<name>: lowercase letters, digits, '.', '_' or '-' (at most 64).
+<ENV_VAR>: the provider's key variable, such as TAVILY_API_KEY: [A-Z_][A-Z0-9_]* ending in KEY, KEY_ID,
+TOKEN, SECRET, PASSWORD or PASSPHRASE, and not LD_*, DYLD_* or PYTHON*. See docs/secret-storage.md."""
 
 
 class UsageError(Exception):
@@ -164,6 +178,39 @@ def _description(name: str) -> bytes:
     return (PREFIX + name).encode()
 
 
+def _lock_address() -> str:
+    """A Linux abstract Unix socket name: no file, no payload, one per uid (per network namespace)."""
+    return f"\0{PREFIX}kernel_keyring:uid={os.getuid()}"
+
+
+@contextlib.contextmanager
+def _exclusive():
+    """Run a store's final check-and-insert, or a revoke, one at a time for this uid.
+
+    The lock is the bound socket name above. The kernel releases it when this process exits, however
+    it exits, so no stale lock is left behind. `store` takes it only after the value was read, so a
+    store waiting for input never holds up another. Another uid that binds the name first can only
+    make these commands wait and then give up.
+    """
+    deadline = time.monotonic() + LOCK_WAIT_SECONDS
+    while True:
+        lock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+        try:
+            lock.bind(_lock_address())
+            break
+        except OSError as error:
+            lock.close()
+            if error.errno != errno.EADDRINUSE:
+                raise KeyringError(f"cannot take the store/revoke lock ({_errname(error.errno or 0)})") from None
+            if time.monotonic() >= deadline:
+                raise KeyringError("another store or revoke is still running; try again") from None
+            time.sleep(0.05)
+    try:
+        yield
+    finally:
+        lock.close()
+
+
 def _hidden_line() -> bytes:
     """One line from the terminal on stdin, with echo turned off before the prompt is shown."""
     import termios
@@ -205,15 +252,19 @@ def _store(arguments: list[str]) -> int:
         raise UsageError("store takes one key name and optionally --replace")
     name = rest[0]
     description = _description(name)
+    already = f"{name} is already stored; pass --replace to revoke it and store the new value"
     keyring = Keyring()
-    existing = keyring.search(description)
-    if existing and not replace:
-        raise KeyringError(f"{name} is already stored; pass --replace to revoke it and store the new value")
+    if not replace and keyring.search(description):  # before the prompt, so no value is typed in vain
+        raise KeyringError(already)
     value = _read_value()
-    note = ""
-    if existing:  # revoke first, then store: never two live keys under one name
-        note = f"; the previous key was {keyring.revoke(existing)}"
-    keyring.add(description, value)
+    with _exclusive():
+        existing = keyring.search(description)  # again: another store may have finished during the read
+        if existing and not replace:
+            raise KeyringError(already)
+        note = ""
+        if existing:  # revoke first, then store: never two live keys under one name
+            note = f"; the previous key was {keyring.revoke(existing)}"
+        keyring.add(description, value)
     print(f"stored {name} in the kernel user keyring (memory only{note})")
     return 0
 
@@ -225,8 +276,9 @@ def _exec(arguments: list[str]) -> int:
     description = _description(name)
     if not ENV_NAME.fullmatch(variable):
         raise UsageError("invalid ENV_VAR: use [A-Z_][A-Z0-9_]*")
-    if RESERVED_ENV.fullmatch(variable):
-        raise UsageError("refused ENV_VAR: the dynamic loader or a shell reads it at startup")
+    if not CREDENTIAL_ENV.fullmatch(variable) or RESERVED_ENV.fullmatch(variable):
+        raise UsageError("refused ENV_VAR: use the provider's key variable, a name ending in KEY, KEY_ID, "
+                         "TOKEN, SECRET, PASSWORD or PASSPHRASE; LD_*, DYLD_* and PYTHON* are read at startup")
     keyring = Keyring()
     serial = keyring.search(description)
     if not serial:
@@ -261,13 +313,16 @@ def _run(argv: list[str]) -> int:
     name = arguments[0]
     description = _description(name)
     keyring = Keyring()
-    serial = keyring.search(description)
     if command == "status":
+        serial = keyring.search(description)
         print(f"{name}: {'present' if serial else 'absent'}")
         return 0 if serial else 1
-    if not serial:
-        raise KeyringError(f"{name} is not in the kernel user keyring")
-    print(f"{keyring.revoke(serial)} {name}")
+    with _exclusive():
+        serial = keyring.search(description)
+        if not serial:
+            raise KeyringError(f"{name} is not in the kernel user keyring")
+        action = keyring.revoke(serial)
+    print(f"{action} {name}")
     return 0
 
 
