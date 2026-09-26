@@ -33081,8 +33081,8 @@
     },
     {
       "path": "tests/test_kernel_keyring.py",
-      "sha256": "17ce2b973c36b6b90510bde6d20771c9725100cd291a836ed32861129adc3f25",
-      "bytes": 28682
+      "sha256": "2874d628c1bc513b51cc23329dfa6a7844ac55e43396317b72f0d5e967941b24",
+      "bytes": 29049
     },
     {
       "path": "tests/test_landscape.py",
