@@ -3,15 +3,201 @@
 Gate: `native-fault-behaviour` in `catalogs/us-equities/gates-20260922.json`
 (receipt path `blueprints/us-equities/adaptive-paper/native-faults/receipt.json`).
 This directory holds the harness, its frozen `plan.json`, this note, the current
-live receipt `receipt.json` (the 2026-09-24 18:58Z run on the order-contract
-engine), the retained receipt of the first passing run,
+live receipt `receipt.json` (the 2026-09-25 18:25Z run on the released engine),
+the retained receipt of the 2026-09-24 18:58Z run on the order-contract engine,
+`receipt-20260924t185811.json`, the retained receipt of the first passing run,
 `receipt-20260924t143905.json` (2026-09-24 14:39Z), the retained receipt of the
 earlier incomplete run, `receipt-20260923.json`, and under `evidence/` the
-independent observations of both 2026-09-24 runs' broker orders. The offline
+independent observations of the three passing runs' broker orders, a second,
+standard-library observation of the 2026-09-25 run by a separate session, the
+sanitized run record of the 2026-09-25 run, and that run's host-clock evidence
+(five `chrony-20260925t*.txt` snapshots, `host-clock-diagnosis-20260925.txt` and
+`host-clock-process-view-20260925t224915z.txt`). The offline
 suite `tests/test_native_faults_min.py` is a local synthetic fixture with a fake
 transport; it drives the real `runner.Controller` and `safety.Ledger`.
 
-## Native run of 2026-09-24 18:58Z on the order-contract engine: `native_faults_passed`
+## Native run of 2026-09-25 18:25Z on the released engine: `native_faults_passed`
+
+One live Alpaca paper run at 2026-09-25 18:25:13Z to 18:25:15Z, started by the
+native-fault gate-lane worker of that day's live-gates workflow from a clean
+worktree at origin/main ae3d3d37, with the pinned runtime (Python 3.12.3,
+alpaca-py 0.44.0, nautilus_trader 2.0.0rc5), against the paper account assigned
+to that lane as its only order writer. No account id, credential or host path
+is recorded. Before the run, one `chronyc tracking` answer put the system clock
+0.0009 s from PHC0, the Hyper-V clock that carries the Windows host's time, which
+was itself about 0.29 s fast. During the run the host clock was in fact 0.22 to
+0.35 s ahead of Alpaca's (**Host clock** below). The offline suite passed under
+the pinned runtime (its 24
+tests, run together with the 7 of
+`tests/test_adaptive_paper_source_hashes_manifest.py`: 31 OK); and GET requests
+showed the account active, flat, with zero open orders and the market open.
+The process exit code, 0, was retained this time. The raw stdout (135 bytes,
+the status line, sha256 `27ca2ff1...`) and stderr (181 bytes, two alpaca-py
+stream warnings on a code-1000 socket close, sha256 `9a43dcad...`) stay
+private; `evidence/run-20260925t182513.json` records them with the tree
+binding, the runtime, the clock check, the offline tests, the GET checks and a
+readback of the run's ledger events.
+
+The receipt binds the released engine. Its `harness_sha256` (19d0a9b9...) and
+`plan_sha256` (f276b26c...) are unchanged since the 18:58Z run. Its
+`engine_sources_sha256` for runner.py (f157be18...), safety.py (7e00d5bb...) and
+transport.py (2653682b...) equal the engine entries in `../source-hashes.json`
+at ae3d3d37, where all 57 entries of that manifest matched the tree, and
+`../order-contract/order_contract.py` (57405f75...) is unchanged. This is the
+re-run that the 2026-09-24 binding amendment below requires before the
+`native-fault-behaviour` gate is cited for the released engine.
+`c04_pre_send_exemption` names both exemptions for the single
+`nf-20260925t182513-9a1b9a-c04` client id.
+
+**Binding check (2026-09-25, after review).** `scripts/trading_gates.py` now
+compares the six sha256 values this receipt binds with the files in the tree:
+`engine_sources_sha256` for runner.py, safety.py, transport.py and
+`../order-contract/order_contract.py`, plus `harness_sha256` and `plan_sha256`.
+For the three files that `../source-hashes.json` lists, it also compares them with
+that manifest. The output gives `source_bindings` counts and lists each difference
+under `warnings`. The check is report-only: a stale binding never changes this
+gate's status, rung readiness, `errors` or the exit code, so a later engine change
+does not fail CI because of this receipt. The warning stays until a re-run
+rebinds the receipt. A dated amendment in the gate note does not clear it,
+because the receipt still binds the older bytes. `tests/test_trading_gates_bindings.py`
+covers the check with synthetic fixtures, and it prints any stale binding in this
+tree to stderr without failing.
+
+This is a keep-but-compare choice. Two alternatives were rejected:
+- A failing check (an error, or a binding member in the flip condition). Every
+  later engine change would then fail CI until a new paper run rebinds the
+  receipt.
+- A unit test alone. Nobody reads its output at a gate decision.
+
+Overturn condition: make a stale binding an error for this established gate if a
+gate decision cites this receipt while the checker lists its binding as stale, or
+if the user makes a current binding a rung requirement.
+
+| Case | Outcome | Evidence class | Broker requests |
+|---|---|---|---|
+| C01 accept resting buy (SPY 1 @ 385.67, bid 771.35) | passed | native_paper | submit 200, `pending_new`, broker id recorded |
+| C02 cancel resting | passed | native_paper | cancel 204 plus five reads 200; ledger and fresh snapshot `canceled`, zero filled |
+| C05 cancel again | passed | native_paper | DELETE sent (`delete_sent: true`), answered 204, then one read 200; no new freeze reason; `ledger_before` equals `ledger_after` (`canceled`, zero filled) |
+| C04 definitive rejection (308.5401, bid 771.35) | passed | native_paper | submit 422, then client-id read 404; ledger `broker_refused` with `{"http_status": 422, "refusal": "sub_penny_minimum_price_variance"}` |
+
+`posts_reserved` was 2 of 4, with one transport build, no stop error and no
+interruption. Cleanup proved flat with `runner.reconcile` over a fresh snapshot:
+zero open orders, zero positions, cash delta 0.00. The `IN_FLIGHT` marker was
+removed and no `CLEANUP_REQUIRED` marker was written. GET requests after the run
+again showed zero positions and zero open orders, with cash and equity
+unchanged. The ledger readback shows the trial start, the c01 reservation and
+three order observations, and the c04 reservation followed by `broker_refused`
+(422, `sub_penny_minimum_price_variance`), with no client id outside this run's
+prefix. The outcomes repeat both 2026-09-24 passing runs case for case. C05's
+second DELETE was again answered 204, so the engine's handling of a 404 or 422
+cancel refusal is still offline-tested only, and C04's 422 remains
+paper-endpoint evidence.
+
+**Independent observation.**
+`evidence/independent-observation-20260925t182513.json` records a listing at
+18:25:42Z by the same separate method as the 2026-09-24 observations (the
+unchanged `evidence/observe-native-faults-20260924.py`, alpaca-py 0.44.0,
+Python 3.12.3). Its stdout is retained byte-identical as
+`evidence/observe-native-faults-20260925t182513.stdout.json` (sha256
+14d71155...); stderr was empty and the exit code 0. The lane's env file uses
+`export NAME=value` lines, which `runner.credentials()` accepts but the
+observer's parser does not, so the observer read it through a `sed` pipe that
+removed the leading `export ` (no copy on disk). For prefix
+`nf-20260925t182513-9a1b9a-` since the receipt's `started_at` it saw one broker
+order, `c01`, `canceled` with filled quantity 0, and no other order at all in
+that window; the `c04` client-id lookup returned 404; 0 open orders and 0
+positions. These match the receipt. The same claim boundary applies as for the
+earlier observations: independent of the harness and engine code, not of the
+broker, and made by the session that started the run.
+
+**Second independent observation, by a separate session.**
+`evidence/observe-native-fault-20260925t184220z.stdout.json` (sha256
+19ce56c3...) is the retained stdout of
+`evidence/observe-native-fault-20260925t184220z.py` (sha256 6b9cf045...), run
+at 18:46:44Z to 18:46:45Z by a subagent session that did not start the run,
+with an empty stderr and exit code 0. The script uses only the Python standard
+library (`urllib`, Python 3.12.3 run with `-I -B`) and imports no harness,
+engine, order-contract or alpaca-py code; it sends only GET requests, refuses
+redirects, and exits 3 after one request if the credentials belong to another
+account. It sent 9 GETs, all answered 200 except the expected 404 for `c04`,
+and matched the receipt on 29 of 29 checks (`all_match: true`, no mismatches):
+a complete order listing since the receipt's `started_at` minus 300 s held
+exactly one order, `c01` (SPY buy 1 limit 385.67 day, not extended hours),
+canceled at 18:25:14.525Z inside the receipt window with filled quantity 0 and
+no fill activity; the `c04` client-id lookup returned 404; there was no fill
+activity on the account since then, 0 open orders and 0 positions; cash and
+equity equal the pre-run GET probe (compared, not printed); and `plan.json`
+equals the receipt's `plan_sha256`. A read-only, immutable open of the run's
+private ledger (sha256 1930c84a...) found `c01`'s recorded broker id equal to
+the broker's order, `c04` `broker_refused` with no broker id, intents exactly
+`c01` and `c04`, and no foreign intent, execution or position row; that
+cross-check reads the engine's own record. The 8 fields the 18:25:42Z alpaca-py
+observer also reports have identical values. Limits: GET requests cannot show
+the run's own HTTP answers (the C01 200, the C02 and C05 DELETE 204s, the C04
+422 body) or their order; the observer uses the same broker API and account as
+the harness; and its synthetic self-test (24 of 24 passed: a matching world
+exits 0, 12 injected mismatches exit 1, a wrong account exits 3, an unsafe env
+file exits 2 without a request, a redirect is refused, only GET is sent) stays
+in the lane's private scratch and is not committed.
+
+**Host clock (added 2026-09-25 after review).** During the run the host clock was
+0.22 to 0.35 s ahead of Alpaca's clock. The ledger reserved c01's submit at
+18:25:14.702Z, before the POST was sent, and Alpaca stamped that order
+`submitted_at` 18:25:14.480Z. The GET probes' broker-clock readings, 33 s before
+and 27 s after the run, cap the offset at 0.35 s at those times.
+
+The pre-run reading of 0.0009 s does not contradict this. Two chronyd daemons
+were steering the one kernel clock:
+- One follows PHC0, the Hyper-V PTP clock that carries the Windows host's time.
+  That clock was about 0.27 to 0.29 s fast. Between the other daemon's steps the
+  clock was pulled forward again, toward PHC0 time: before each of its steps
+  sampled from 18:54Z to 18:57Z, the other daemon measured it about 0.28 s ahead
+  again. How this daemon moves the clock (slewing or stepping) was not captured.
+  The 0.0009 s snapshot (`evidence/chrony-20260925t182439z-before-run.txt`, all
+  13 lines) was this daemon's answer. The same snapshot also shows RMS offset
+  0.083 s, Frequency 12.063 ppm slow and Residual freq -3087.581 ppm.
+- The other is this distribution's own chronyd, which follows internet NTP
+  servers. It was restarted at 18:09:44Z with clock control on and
+  `makestep 0.1 -1`. From then to 19:00Z it stepped the clock back 45 times by
+  0.10 to 0.50 s, about once a minute, and forward once (+0.124 s at 18:46:23Z).
+  The lane's unsaved 18:22:44Z reading (38.28.93.135, last offset +0.375 s,
+  4012 ppm fast) was this daemon's answer, at its -0.375 s step.
+
+No step reached the run. The last step before it was at 18:24:55Z and the next at
+18:25:56Z, and the ledger's 21 request times increase monotonically. The engine's
+0.25 s clock check (`validate_preflight`, `runner.py:703-704`) is not part of this
+harness (`harness.py:42`, `harness.py:296-314`), so the run neither passed nor
+failed it. No case outcome depends on the offset. A clock that runs ahead makes
+quotes look older, not future-dated. Both observations compared broker timestamps
+with the receipt window, and both fall inside it. On host time, `submitted_at` is
+1.146 s after the window opens and `canceled_at` 0.599 s before it closes.
+Corrected for the host's 0.22 to 0.35 s lead, those margins are 1.37 to 1.50 s
+and 0.25 to 0.38 s.
+
+The evidence is in these files:
+- The other four `evidence/chrony-20260925t*.txt` snapshots. Like the pre-run
+  snapshot, they are byte-identical copies of the lanes' private files under
+  `~/.local/state/native-agent-stack/live-gates-20260925/`, including
+  `ladder-1x/chrony-series.txt`.
+- `evidence/host-clock-diagnosis-20260925.txt`, captured at 21:37Z. It holds the
+  Hyper-V clock name, the configuration change, two command sockets per loopback
+  address, ten queries alternating between the two daemons, and the journal.
+- `evidence/host-clock-process-view-20260925t224915z.txt`, captured at 22:49Z
+  after the second review, because the 21:37Z capture holds no `ps` output. Only
+  this distribution's chronyd (systemd MainPID 2546733, started 18:09:44Z, the PID
+  in the journal) and one child process of it are visible here, while both
+  sockets and the alternating answers remain. That the PHC0 daemon runs outside
+  this distribution's process view is an inference from these observations.
+- The `host` section of the run record.
+
+Time sync was not changed. Before the next timed paper run on this host, it must
+be made single-source, because a backward step during a run raises
+`request_clock_moved_backward` (`safety.py:1100-1101`).
+
+## Run of 2026-09-24 18:58Z on the order-contract engine, retained as `receipt-20260924t185811.json`
+
+This run's receipt was `receipt.json` until the 2026-09-25 run replaced it; it
+is kept byte-for-byte as `receipt-20260924t185811.json` (sha256 d7f1cf2f...).
 
 One live Alpaca paper run at 2026-09-24 18:58:11Z to 18:58:12Z, started by the
 workflow coordinator from the #198 branch head 81cbb06e after the order-contract
@@ -23,7 +209,7 @@ stream-restart line and the status line, neither with a timestamp). The exit
 code was not retained; by harness design `native_faults_passed` is the exit-0
 status.
 
-The receipt binds main's tree. Its `harness_sha256` (19d0a9b9...), `plan_sha256`
+That receipt binds main's tree at 3b7ae710. Its `harness_sha256` (19d0a9b9...), `plan_sha256`
 (f276b26c...) and `engine_sources_sha256` for runner.py (8bb8d577...), safety.py
 (ad520fc4...), transport.py (34e6c4e6...) and `../order-contract/order_contract.py`
 (57405f75...) equal the SHA-256 of those files on main after #198 merged (checked
@@ -43,7 +229,8 @@ this receipt exercised; it did not change harness.py, plan.json or
 safety and transport values no longer equal `../source-hashes.json`, so the
 receipt qualifies the order-contract engine before that release. Before the
 `native-fault-behaviour` gate is cited for the released engine, this plan (C01,
-C02, C05, C04) must run again on it and bind its source hashes.
+C02, C05, C04) must run again on it and bind its source hashes. The 2026-09-25
+run (top of this note) did so.
 
 | Case | Outcome | Evidence class | Broker requests |
 |---|---|---|---|
@@ -55,7 +242,7 @@ C02, C05, C04) must run again on it and bind its source hashes.
 `posts_reserved` was 2 of 4, with one transport build, no stop error and no
 interruption. Cleanup proved flat with `runner.reconcile` over a fresh snapshot:
 zero open orders, zero positions, cash delta 0.00, and the `IN_FLIGHT` marker
-was removed. The outcomes repeat the 14:39Z run case for case, now through the
+was removed. The outcomes repeated the 14:39Z run case for case, now through the
 order-contract boundary: the transport sends a POST only after `build_envelope()`
 and the body-equals-envelope wire check pass, so C01's 200 and C04's 422 both
 followed those checks, and C04 carried its exact sub-penny price only through
@@ -74,7 +261,9 @@ Its stdout is retained byte-identical as
 order, `c01`, `canceled` with filled quantity 0; the `c04` client-id lookup
 returned 404; 0 open orders and 0 positions. These match the receipt. The same
 claim boundary applies as for the 14:39Z observation: independent of the harness
-and engine code, not of the broker.
+and engine code, not of the broker. Its `subject_receipt` names `receipt.json`,
+which held this run's receipt when the observation was made; its client-id
+prefix identifies the run, now retained as `receipt-20260924t185811.json`.
 
 ## First passing native run (2026-09-24 14:39Z), retained as `receipt-20260924t143905.json`
 
@@ -148,8 +337,12 @@ dated commit on 2026-09-24, whose note cites the receipt, the independent
 observation and the Codex review of 8051464. The engine's handling of a 422
 cancel refusal stays offline-tested only, and the C04 422 is paper-endpoint
 evidence only. The 18:58Z run above re-established the same status on the
-order-contract engine; the gate's `receipt_path` now resolves to that run's
-receipt, whose `/status` is also `native_faults_passed`.
+order-contract engine, and the 2026-09-25 run on the released engine; the
+gate's `receipt_path` now resolves to the 2026-09-25 receipt, whose `/status`
+is also `native_faults_passed`. The flip condition checks only that `/status`.
+The binding to the released engine rests on the hash comparison in
+`evidence/run-20260925t182513.json`, and `scripts/trading_gates.py` repeats that
+comparison on every run as a report-only warning (**Binding check** above).
 
 ## Independent observation of the 14:39Z run
 
@@ -236,22 +429,63 @@ This change edits `transport.py`, `runner.py` and `harness.py`. The retained
 (a6101294...) and transport.py (b92e8752...) do not equal the files here.
 safety.py (ad520fc4...) is unchanged. `receipt-20260923.json` already bound an
 older engine. The wired boundary was first exercised natively by the 18:58Z run
-(`receipt.json`, top of this note), which binds the current harness, runner,
-transport, safety and order-contract files. Any later change to one of those
-files leaves that receipt binding the older file until a new run is recorded.
+(now `receipt-20260924t185811.json`); the engine release then changed runner.py,
+safety.py and transport.py. The 2026-09-25 run (`receipt.json`, top of this
+note) binds the current harness, runner, transport, safety and order-contract
+files. Any later change to one of those files leaves that receipt binding the
+older file until a new run is recorded, and until then `scripts/trading_gates.py`
+lists the difference under `warnings`.
 
 ## Run
 
-```
-~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python \
-  blueprints/us-equities/adaptive-paper/native-faults/harness.py run \
-  --env-file ~/.config/<private>/alpaca-paper.env \
-  --state-root ~/.local/state/native-agent-stack/native-faults \
-  --out blueprints/us-equities/adaptive-paper/native-faults/receipt.json
-```
+The harness has no expected-account input. It takes the engine's account-writer
+lock for whichever account the env file names (`harness.py:296-301`) and refuses
+only a non-flat account (`harness.py:308-310`), so a flat env file of another
+lane would send the C01 and C04 POSTs to that lane's account. Follow these
+steps (added 2026-09-25 after the second review of PR #278). The run record
+shows that the 2026-09-25 run followed steps 1, 4 and 5 and step 3's private
+`--out` and retained exit code (`get_checks`, `harness.argv_redacted`,
+`harness.exit_code`, `harness.receipt_copy`). Step 2 and step 3's no-ladder
+condition were not recorded separately: that run used a fresh state root, its
+accepted C01 buy shows that no `STOP` file was present, and the run lane reported
+that no harness or engine process was running before it (a worker report, not
+part of the run record). Keep every account value private; none is committed.
 
-Run it during regular hours, at least five minutes before the close. The
-harness uses these interfaces:
+1. Confirm the account with GET requests only. Load the env file of the paper
+   account assigned to this gate lane through `runner.credentials()` and read
+   the account, clock, positions and open orders. Compare the first 12 hex digits
+   of sha256(account id) with the value the lane keeps privately for its
+   assigned account, and stop before any further request on a mismatch.
+   Continue only if the account is `ACTIVE` and not trading- or account-blocked,
+   holds zero positions and zero open orders, and the clock says the market is
+   open.
+2. Check that no marker exists: no engine `STOP` file
+   (`~/.local/state/native-agent-stack/alpaca-paper/STOP`, `safety.py:39`; while
+   it exists the ledger refuses the C01 buy with `stop_blocks_entry`), and no
+   `IN_FLIGHT` or `CLEANUP_REQUIRED` in any earlier harness state root used for
+   this account. The harness checks only the state root it is given, and refuses
+   with exit 2 when a marker is there.
+3. Run inside the regular session, at least five minutes before the close, and
+   never while a ladder session runs on this host: both use the engine's `STOP`
+   file and account-writer lock namespace (`safety.py:39`, `safety.py:366`).
+   Write the receipt to a private path, not to the tracked `receipt.json`, and
+   keep the exit code:
+
+   ```
+   ~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python \
+     blueprints/us-equities/adaptive-paper/native-faults/harness.py run \
+     --env-file ~/.config/<private>/alpaca-paper.env \
+     --state-root ~/.local/state/native-agent-stack/native-faults \
+     --out ~/.local/state/native-agent-stack/<private-lane-dir>/receipt.json
+   echo $? > ~/.local/state/native-agent-stack/<private-lane-dir>/harness.exit
+   ```
+4. Repeat the GET probe of step 1 after the run: same account, zero positions,
+   zero open orders.
+5. Retain the current `receipt.json` under a dated name, copy the private receipt
+   to `receipt.json` byte for byte, and check that both copies have the same
+   sha256.
+
+The harness uses these interfaces:
 
 - Credentials come from `runner.credentials()`. The file must be mode 0600,
   owned by you and outside any Git worktree, and is read only in-process.
@@ -400,7 +634,8 @@ answers. Meeting the list makes the receipt
 a flip candidate. The dated flip commit still needs the manual qualification
 described under "Gate status" above. The 18:58Z receipt meets the same items on
 the order-contract engine, with the same C05 204 and without a retained exit
-code.
+code. The 2026-09-25 receipt meets them on the released engine, with the same
+C05 204, and its exit code 0 is retained in `evidence/run-20260925t182513.json`.
 
 A receipt can flip the gate only when it shows all of the following, bound to
 this tree's plan, harness and engine hashes:

@@ -77,8 +77,10 @@ limit-order mechanism guarantees a flat finish.
   pricing criteria" (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md: such
   orders "will be rejected"). That page documents the body, not the HTTP status;
   the 422 was inferred from the code prefix and the POST /v2/orders 422 entry. It
-  was observed once on the paper endpoint in the 2026-09-24 native-fault run
-  (`native-faults/receipt.json`, C04: submit 422, then lookup 404). The same body
+  was first observed on the paper endpoint in the 2026-09-24 14:39Z native-fault
+  run (`native-faults/receipt-20260924t143905.json`, C04: submit 422, then lookup
+  404), and again in the 18:58Z run that day (`native-faults/receipt-20260924t185811.json`)
+  and the 2026-09-25 18:25Z run (`native-faults/receipt.json`). The same body
   under any other status still stays ambiguous. The message, not the code, is the discriminator. The ledger also requires the intent's own durable
   limit price to violate the minimum price variance (`refusal_contradicts_intent_price`
   otherwise). Any other 422, including "client_order_id must be unique", stays

@@ -1,0 +1,29 @@
+{
+ "method": "alpaca-py TradingClient.get_orders(status=all, after=receipt.started_at) filtered by the receipt's client_id_prefix; get_order_by_client_id for c01 and c04; get_all_positions; open orders",
+ "alpaca_py_version": "0.44.0",
+ "python": "3.12.3",
+ "observed_at": "2026-09-25T14:25:42.571885-04:00",
+ "receipt_started_at": "2026-09-25T18:25:13.333821+00:00",
+ "orders_listed_since_start": 1,
+ "orders_with_prefix": 1,
+ "by_suffix": {
+  "c01": {
+   "status": "canceled",
+   "filled_qty": "0"
+  }
+ },
+ "lookup_c01": {
+  "found": true,
+  "status": "canceled",
+  "filled_qty": "0"
+ },
+ "lookup_c04": {
+  "found": false,
+  "http_status": 404
+ },
+ "status_counts": {
+  "canceled": 1
+ },
+ "positions_now": 0,
+ "open_orders_now": 0
+}

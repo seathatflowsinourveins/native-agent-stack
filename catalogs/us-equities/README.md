@@ -98,7 +98,7 @@ The latest [architecture wave](architecture/README.md) reviews 40 finalist recor
 
 ## Read the layer you need
 
-Gate ladder: [`gates-20260922.json`](gates-20260922.json) records the sim → paper → live gates with owner, evidence class, receipt path and flip condition; `python3 scripts/trading_gates.py --check` verifies them arithmetically (nothing is flipped by the checker).
+Gate ladder: [`gates-20260922.json`](gates-20260922.json) records the sim → paper → live gates with owner, evidence class, receipt path and flip condition; `python3 scripts/trading_gates.py --check` verifies them arithmetically (nothing is flipped by the checker). For each gate listed in `SOURCE_BINDINGS` in that script (currently `native-fault-behaviour`), it also lists under `warnings` every source file whose sha256 recorded in the receipt differs from the tree (or is missing there) or from the release manifest (`source-hashes.json`) where that manifest lists the file, and any binding it cannot check; this is report-only and never fails the check.
 
 | Layer | Cards | Guide / structured manifest |
 | --- | ---: | --- |
