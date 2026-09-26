@@ -19,6 +19,7 @@ action whose local clock is earlier than origin/main's tip (M2).
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 from core import chronology as CH
@@ -81,8 +82,10 @@ def governing_count_only_line(run_log: list, output_sha256: str) -> dict:
 def check_dry_run_bound(repo, protocol: dict, run_log: list, allowance: dict) -> dict:
     """Review round 15, F12: the native dry run the freeze needs (freeze_preconditions[8]) is committed with its first
     complete 'dry_run' line, ran from the tree the freeze pins, and bounds the pinned pipeline allowance: the pinned
-    seconds per page is at least the measured one, and the pinned pages per request of every kind the dry run fetched
-    is at least the largest it observed. Returns the dry-run output."""
+    seconds per page is at least the measured one, and each page bound is at least its observed maximum. Per
+    pipeline_allowance.rule, unmeasured kinds inherit the largest observed quote bound. Missing or unsuccessful
+    calibration cannot authorize the freeze. Returns the dry-run output."""
+    from core.count_only import PAGE_KINDS
     from core.params import DRY_RUN_OUTPUT
     path = Path(repo) / DRY_RUN_OUTPUT
     if not path.exists():
@@ -95,13 +98,24 @@ def check_dry_run_bound(repo, protocol: dict, run_log: list, allowance: dict) ->
     tree = (protocol.get("run_discipline", {}).get("study_code") or {}).get("tree")
     if lines[0].get("study_tree") != tree:
         raise guards.Refused("the native dry run ran from a tree other than the frozen study tree")
-    measured = json.loads(raw).get("measured") or {}
-    short = sorted(k for k, n in (measured.get("pages_per_request_max") or {}).items()
-                   if n > allowance["pages_per_request"].get(k, 0))
-    if short or (measured.get("seconds_per_page") or 0.0) > allowance["seconds_per_page"]:
+    out = json.loads(raw)
+    measured = out.get("measured") or {}
+    pages, seconds, elapsed = (measured.get(k) for k in ("pages", "seconds_per_page", "elapsed_seconds"))
+    if type(pages) is not int or pages <= 0 or any(
+            type(v) not in (int, float) or not math.isfinite(v) or v <= 0 for v in (seconds, elapsed)):
+        raise guards.Refused("the native dry run has no successful, timed calibration")
+    maxima = measured.get("pages_per_request_max")
+    if not isinstance(maxima, dict) or any(type(n) is not int or n < 0 for n in maxima.values()):
+        raise guards.Refused("the native dry run has no valid page calibration")
+    quote_max = max((maxima.get(k, 0) for k in PAGE_KINDS if k.startswith("quote_")), default=0)
+    if quote_max <= 0:
+        raise guards.Refused("the native dry run has no quote calibration for unmeasured kinds")
+    bounds = {k: maxima.get(k) or quote_max for k in PAGE_KINDS}
+    short = sorted(k for k, n in bounds.items() if n > allowance["pages_per_request"].get(k, 0))
+    if short or seconds > allowance["seconds_per_page"]:
         raise guards.Refused(f"the pinned pipeline allowance is below the dry run's measurement: pages per request of "
                              f"{short}, or the seconds per page")
-    return json.loads(raw)
+    return out
 
 
 def check_coverage_decision(repo, protocol: dict, run_log: list | None = None) -> dict:

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
+from itertools import groupby
 
 from core import costs, fills, plan
 from core import formulas as FM
@@ -36,6 +37,25 @@ class Ctx:
         for r in self.actions:
             if r.get("type") in typ_set and all(r.get(k) == v for k, v in match.items()):
                 yield r
+
+    def issuer_records(self, typ_set, symbol_field, symbol, asof):
+        """Match the issuer of an asof=t request at each action's effective date (universe_and_identity.asof
+        and corporate_action_dates). Only later renames move its ticker: earlier holders and a reused ticker
+        after it renames away must not be joined by an undated alias set. A process date starts the new name."""
+        records = sorted(self.records((*typ_set, "name_change")), key=lambda r: r.get("date") or "")
+        for day, rows in groupby(records, key=lambda r: r.get("date") or ""):
+            rows = list(rows)
+            if day > asof:
+                renames = {r["old_symbol"]: r["new_symbol"] for r in rows
+                           if r["type"] == "name_change" and r.get("old_symbol") and r.get("new_symbol")}
+                # Resolve a same-date chain before actions, independently of provider row order.
+                seen = set()
+                while symbol in renames and symbol not in seen:
+                    seen.add(symbol)
+                    symbol = renames[symbol]
+            for r in rows:
+                if r["type"] in typ_set and r.get(symbol_field) == symbol:
+                    yield r
 
 
 def _quotes(ctx, store, req, symbol):
@@ -117,10 +137,12 @@ def record_exclusion(ctx: Ctx, ev: dict, sym: str, e: str, x: str):
     spin_off record of the held symbol (source_symbol) effective (ex_date) on a session of (e, x]
     ('spin_off_record_excluded', populations.corporate_actions: a spin-off's entitlement is shares of another issuer,
     which the cash term does not book). None when neither applies."""
-    if any(r.get("date") and e < r["date"] <= x for r in ctx.records(SPLIT_TYPES, symbol=sym)) and \
+    if any(r.get("date") and e < r["date"] <= x
+           for r in ctx.issuer_records(SPLIT_TYPES, "symbol", sym, ev["t"])) and \
             _factor(ev, e, x) == 1.0:
         return "split_record_excluded"
-    if any(r.get("date") and e < r["date"] <= x for r in ctx.records(SPIN_OFF_TYPES, source_symbol=sym)):
+    if any(r.get("date") and e < r["date"] <= x
+           for r in ctx.issuer_records(SPIN_OFF_TYPES, "source_symbol", sym, ev["t"])):
         return "spin_off_record_excluded"
     return None
 
@@ -258,7 +280,8 @@ def trade(ev: dict, arm: str, ctx: Ctx, store) -> dict:
         exit_kind = ("censored_delayed" if delayed else "censored") if censored else ("delayed" if delayed else "normal")
         res = {**out, "status": "filled", "exit": exit_kind, **booked}
     else:
-        merger = [r for r in ctx.records(MERGER_TYPES, acquiree_symbol=sym)
+        merger_records = list(ctx.issuer_records(MERGER_TYPES, "acquiree_symbol", sym, t))
+        merger = [r for r in merger_records
                   if r.get("date") and d1 <= r["date"] <= (search_last or r["date"])]
         bkind, bhit = back
         last_bid = bhit if bkind == "bid" else None
@@ -278,7 +301,7 @@ def trade(ev: dict, arm: str, ctx: Ctx, store) -> dict:
         else:
             res = {**out, "status": "filled", "exit": "censored_terminal" if censored else "terminal_zero",
                    "nets": {m: costs.TERMINAL_ZERO_NET for m in ("primary", "c0.5", "c2.0", "table_only", "stress")},
-                   "no_merger_record": not any(ctx.records(MERGER_TYPES, acquiree_symbol=sym)),
+                   "no_merger_record": not merger_records,
                    "rename_record_in_window": bool(rename_hits)}
             if last_bid is not None:
                 rebook = book(last_bid[0], et_date(last_bid[1]), lambda mode, im: 0.0)
@@ -336,10 +359,12 @@ def h3c_event(ev: dict, ctx: Ctx) -> dict:
     if missing:
         later = [k for k in range(min(missing) + 1, 6) if opens.get(k) is not None or closes.get(k) is not None]
         return {**out, "status": "terminal" if not later else "missing_leg"}
-    # review round 15, F01 and F05: the count and the read share the event's accounting eligibility: no spin-off
-    # record of the symbol in (t+1, t+5], and every overnight leg's share factor and cash term defined
-    if any(r.get("date") and d[1] < r["date"] <= d[5] for r in ctx.records(SPIN_OFF_TYPES, source_symbol=ev["symbol"])):
-        return {**out, "status": "spin_off_record_excluded"}
+    # Every overnight leg shares the trade's recorded-action exclusions before either counting or booking.
+    # Check each interval: an adjusted split elsewhere in the event cannot mask an unadjusted one here.
+    for k in range(1, 5):
+        excluded = record_exclusion(ctx, ev, ev["symbol"], d[k], d[k + 1])
+        if excluded:
+            return {**out, "status": excluded}
     if not all(accounting_defined(ctx, ev, d[k], d[k + 1]) for k in range(1, 5)):
         return {**out, "status": "undefined_factor"}
     if ctx.mode == "count":

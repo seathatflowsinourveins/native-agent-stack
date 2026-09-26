@@ -209,9 +209,9 @@ class FetchBudget(unittest.TestCase):
         cal = synth.calendar()
         store = Store()
         req = plan.screen_requests(cal, "2020-06-02", ["AAA"])[0]
-        store.put(req, True, [b"{}", b"{}", b"{}"], "2026-09-25T10:00:00Z")
+        store.put(req, True, [b"{}", b"{}", b"{}"], "2026-09-25T10:00:00Z", elapsed_seconds=6.0)
         store.put(plan.quote_request("quote_exit", "AAA", "2020-06-01", 1.6e9, 1.6e9 + 60), True, [b"{}"],
-                  "2026-09-25T10:00:08Z")
+                  "2026-09-25T10:00:06Z", elapsed_seconds=2.0)
         m = CO.dry_run_measured(store)
         self.assertEqual(m["pages_per_request_max"], {"quote_exit": 1, "screen_daily_raw": 3})
         self.assertEqual((m["pages"], m["elapsed_seconds"], m["seconds_per_page"]), (4, 8.0, 2.0))
