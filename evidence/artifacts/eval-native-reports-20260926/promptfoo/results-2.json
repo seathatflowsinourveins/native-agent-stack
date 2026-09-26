@@ -1,0 +1,958 @@
+{
+  "evalId": "eval-JGw-2026-09-26T04:57:42",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-09-26T04:57:42.382Z",
+    "prompts": [
+      {
+        "id": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "raw": "{{query}}",
+        "label": "{{query}}",
+        "provider": "openai:chat:qwen3.8-27b-local",
+        "metrics": {
+          "score": 4,
+          "testPassCount": 4,
+          "testFailCount": 1,
+          "testErrorCount": 0,
+          "assertPassCount": 4,
+          "assertFailCount": 1,
+          "totalLatencyMs": 4782,
+          "tokenUsage": {
+            "prompt": 124,
+            "completion": 12,
+            "cached": 0,
+            "total": 136,
+            "numRequests": 5,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 104,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "namedScores": {},
+          "namedScoresCount": {},
+          "namedScoreWeights": {},
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "equals",
+                "value": "4"
+              }
+            }
+          ]
+        },
+        "id": "[redacted]",
+        "latencyMs": 1200,
+        "namedScores": {},
+        "prompt": {
+          "raw": "What is 2+2? Reply with only the digit, nothing else.",
+          "label": "{{query}}",
+          "config": {}
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:qwen3.8-27b-local",
+          "label": ""
+        },
+        "response": {
+          "output": "4",
+          "tokenUsage": {
+            "prompt": 28,
+            "completion": 2,
+            "cached": 0,
+            "total": 30,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 24,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false,
+          "latencyMs": 1200,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "content-length": "613",
+                "content-type": "application/json; charset=utf-8",
+                "keep-alive": "timeout=5, max=100",
+                "server": "llama.cpp"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "query": "What is 2+2? Reply with only the digit, nothing else."
+          },
+          "assert": [
+            {
+              "type": "equals",
+              "value": "4"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "tokenUsage": {
+          "prompt": 28,
+          "completion": 2,
+          "cached": 0,
+          "total": 30,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 24,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "query": "What is 2+2? Reply with only the digit, nothing else."
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "content-length": "613",
+              "content-type": "application/json; charset=utf-8",
+              "keep-alive": "timeout=5, max=100",
+              "server": "llama.cpp"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "Paris"
+              }
+            }
+          ]
+        },
+        "id": "[redacted]",
+        "latencyMs": 816,
+        "namedScores": {},
+        "prompt": {
+          "raw": "Name the capital of France. Reply with just the city name, nothing else.",
+          "label": "{{query}}",
+          "config": {}
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:qwen3.8-27b-local",
+          "label": ""
+        },
+        "response": {
+          "output": "Paris",
+          "tokenUsage": {
+            "prompt": 28,
+            "completion": 2,
+            "cached": 0,
+            "total": 30,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 24,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false,
+          "latencyMs": 816,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "content-length": "618",
+                "content-type": "application/json; charset=utf-8",
+                "keep-alive": "timeout=5, max=100",
+                "server": "llama.cpp"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "query": "Name the capital of France. Reply with just the city name, nothing else."
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "Paris"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "tokenUsage": {
+          "prompt": 28,
+          "completion": 2,
+          "cached": 0,
+          "total": 30,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 24,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "query": "Name the capital of France. Reply with just the city name, nothing else."
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "content-length": "618",
+              "content-type": "application/json; charset=utf-8",
+              "keep-alive": "timeout=5, max=100",
+              "server": "llama.cpp"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "javascript",
+                "value": "/\\byes\\b/i.test(output)"
+              }
+            }
+          ]
+        },
+        "id": "[redacted]",
+        "latencyMs": 846,
+        "namedScores": {},
+        "prompt": {
+          "raw": "Is 7 a prime number? Reply with only yes or no.",
+          "label": "{{query}}",
+          "config": {}
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:qwen3.8-27b-local",
+          "label": ""
+        },
+        "response": {
+          "output": "yes",
+          "tokenUsage": {
+            "prompt": 26,
+            "completion": 2,
+            "cached": 0,
+            "total": 28,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 22,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false,
+          "latencyMs": 846,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "content-length": "614",
+                "content-type": "application/json; charset=utf-8",
+                "keep-alive": "timeout=5, max=100",
+                "server": "llama.cpp"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "query": "Is 7 a prime number? Reply with only yes or no."
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "/\\byes\\b/i.test(output)"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 2,
+        "tokenUsage": {
+          "prompt": 26,
+          "completion": 2,
+          "cached": 0,
+          "total": 28,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 22,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "query": "Is 7 a prime number? Reply with only yes or no."
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "content-length": "614",
+              "content-type": "application/json; charset=utf-8",
+              "keep-alive": "timeout=5, max=100",
+              "server": "llama.cpp"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "PONG"
+              }
+            }
+          ]
+        },
+        "id": "[redacted]",
+        "latencyMs": 1094,
+        "namedScores": {},
+        "prompt": {
+          "raw": "Reply with exactly the single word: PONG",
+          "label": "{{query}}",
+          "config": {}
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:qwen3.8-27b-local",
+          "label": ""
+        },
+        "response": {
+          "output": "PONG",
+          "tokenUsage": {
+            "prompt": 21,
+            "completion": 3,
+            "cached": 0,
+            "total": 24,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 17,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false,
+          "latencyMs": 1094,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "content-length": "613",
+                "content-type": "application/json; charset=utf-8",
+                "keep-alive": "timeout=5, max=100",
+                "server": "llama.cpp"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "query": "Reply with exactly the single word: PONG"
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "PONG"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 3,
+        "tokenUsage": {
+          "prompt": 21,
+          "completion": 3,
+          "cached": 0,
+          "total": 24,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 17,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "query": "Reply with exactly the single word: PONG"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "content-length": "613",
+              "content-type": "application/json; charset=utf-8",
+              "keep-alive": "timeout=5, max=100",
+              "server": "llama.cpp"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "error": "Expected output \"PONG\" to equal \"DEFINITELY_WRONG_TOKEN_never_matches\"",
+        "gradingResult": {
+          "pass": false,
+          "score": 0,
+          "reason": "Expected output \"PONG\" to equal \"DEFINITELY_WRONG_TOKEN_never_matches\"",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": false,
+              "score": 0,
+              "reason": "Expected output \"PONG\" to equal \"DEFINITELY_WRONG_TOKEN_never_matches\"",
+              "assertion": {
+                "type": "equals",
+                "value": "DEFINITELY_WRONG_TOKEN_never_matches"
+              }
+            }
+          ]
+        },
+        "id": "[redacted]",
+        "latencyMs": 826,
+        "namedScores": {},
+        "prompt": {
+          "raw": "Reply with exactly the single word: PONG",
+          "label": "{{query}}",
+          "config": {}
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:qwen3.8-27b-local",
+          "label": ""
+        },
+        "response": {
+          "output": "PONG",
+          "tokenUsage": {
+            "prompt": 21,
+            "completion": 3,
+            "cached": 0,
+            "total": 24,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 17,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false,
+          "latencyMs": 826,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "content-length": "615",
+                "content-type": "application/json; charset=utf-8",
+                "keep-alive": "timeout=5, max=100",
+                "server": "llama.cpp"
+              }
+            }
+          }
+        },
+        "score": 0,
+        "success": false,
+        "testCase": {
+          "description": "positive control: deliberately wrong assertion, must fail",
+          "vars": {
+            "query": "Reply with exactly the single word: PONG"
+          },
+          "assert": [
+            {
+              "type": "equals",
+              "value": "DEFINITELY_WRONG_TOKEN_never_matches"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 4,
+        "tokenUsage": {
+          "prompt": 21,
+          "completion": 3,
+          "cached": 0,
+          "total": 24,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 17,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "query": "Reply with exactly the single word: PONG"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "content-length": "615",
+              "content-type": "application/json; charset=utf-8",
+              "keep-alive": "timeout=5, max=100",
+              "server": "llama.cpp"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 1
+      }
+    ],
+    "stats": {
+      "successes": 4,
+      "failures": 1,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 124,
+        "completion": 12,
+        "cached": 0,
+        "total": 136,
+        "numRequests": 5,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 104,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "durationMs": 4837,
+      "evaluationDurationMs": 4837
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "native-agent-stack promptfoo use receipt: local llama.cpp Qwen3.8-27B eval",
+    "prompts": [
+      "{{query}}"
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:qwen3.8-27b-local",
+        "config": {
+          "apiBaseUrl": "http://127.0.0.1:18232/v1",
+          "apiKeyEnvar": "[REDACTED]",
+          "temperature": 0,
+          "max_tokens": 32,
+          "passthrough": {
+            "chat_template_kwargs": {
+              "enable_thinking": false
+            }
+          }
+        }
+      }
+    ],
+    "tests": [
+      {
+        "vars": {
+          "query": "What is 2+2? Reply with only the digit, nothing else."
+        },
+        "assert": [
+          {
+            "type": "equals",
+            "value": "4"
+          }
+        ]
+      },
+      {
+        "vars": {
+          "query": "Name the capital of France. Reply with just the city name, nothing else."
+        },
+        "assert": [
+          {
+            "type": "contains",
+            "value": "Paris"
+          }
+        ]
+      },
+      {
+        "vars": {
+          "query": "Is 7 a prime number? Reply with only yes or no."
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "/\\byes\\b/i.test(output)"
+          }
+        ]
+      },
+      {
+        "vars": {
+          "query": "Reply with exactly the single word: PONG"
+        },
+        "assert": [
+          {
+            "type": "contains",
+            "value": "PONG"
+          }
+        ]
+      },
+      {
+        "description": "positive control: deliberately wrong assertion, must fail",
+        "vars": {
+          "query": "Reply with exactly the single word: PONG"
+        },
+        "assert": [
+          {
+            "type": "equals",
+            "value": "DEFINITELY_WRONG_TOKEN_never_matches"
+          }
+        ]
+      }
+    ],
+    "env": {},
+    "sharing": false,
+    "outputPath": [
+      "<tmp>/results.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.123.1",
+    "nodeVersion": "v24.21.0",
+    "platform": "linux",
+    "arch": "x64",
+    "exportedAt": "2026-09-26T04:57:47.240Z",
+    "evaluationCreatedAt": "2026-09-26T04:57:42.382Z"
+  },
+  "vars": [
+    "query"
+  ],
+  "runtimeOptions": {
+    "eventSource": "cli",
+    "showProgressBar": false,
+    "repeat": 1,
+    "maxConcurrency": 1,
+    "cache": false
+  }
+}

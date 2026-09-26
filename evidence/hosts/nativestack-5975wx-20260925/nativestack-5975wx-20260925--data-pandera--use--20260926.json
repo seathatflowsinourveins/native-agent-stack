@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--data-pandera--use--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "a74dd1b60ad5f055cee3e1489a490b7e6e6b056f",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "data-pandera",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "V=\"$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv\"\nsync=$(timeout 60 uv pip sync --dry-run --offline --python \"$V/bin/python3\" blueprints/us-equities/data/requirements.lock 2>&1) || { echo \"PANDERA_INSTALL_FAIL: uv pip sync --dry-run failed\"; printf '%s\\n' \"$sync\" | tail -5; exit 1; }\npv=$(\"$V/bin/python3\" -s -c \"import importlib.metadata as m; print(m.version('pandera'))\") || { echo \"PANDERA_INSTALL_FAIL: pandera not importable metadata\"; exit 1; }\ntag=$(timeout 30 git ls-remote https://github.com/unionai-oss/pandera 'refs/tags/v0.33.1' 'refs/tags/v0.33.1^{}' | awk '{print $1}' | tail -1)\npython3 - \"$sync\" \"$pv\" \"$tag\" <<'PY'\nimport glob, json, re, sys\nsync, pv, tag = sys.argv[1:4]\npins = sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers', []) for w in (l.get('winners') or []) if w.get('component_id') == 'data-pandera'})\ncommits = {c for p in pins for c in re.findall(r'[0-9a-f]{40}', p)}\nlock = open('blueprints/us-equities/data/requirements.lock').read()\nlocked = re.findall(r'^pandera==(\\S+)', lock, re.M)\nunchanged = 'Would make no changes' in sync\nok = len(commits) == 1 and tag in commits and pv == '0.33.1' and locked == ['0.33.1'] and unchanged\nprint('PANDERA_INSTALL_' + ('OK' if ok else 'FAIL'), '| winner pin', pins, '| upstream tag v0.33.1 ->', tag, '| promotion-gate venv pandera', pv, '| requirements.lock pandera', locked, '| uv pip sync --dry-run --offline against the hash-pinned lock:', sync.strip().splitlines()[-1])\nsys.exit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 0.497,
+      "output_sha256": "d5d85a090254c5f6076898af7253b2da68e25e6429773ca59eee035d47709aad",
+      "output_excerpt": "PANDERA_INSTALL_OK | winner pin ['v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6'] | upstream tag v0.33.1 -> 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6 | promotion-gate venv pandera 0.33.1 | requirements.lock pandera ['0.33.1'] | uv pip sync --dry-run --offline against the hash-pinned lock: Would make no changes\n"
+    },
+    {
+      "cmd": "V=\"$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv\"\nPIN=62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6\nFILES=\"tests/pandas/test_schemas.py tests/pandas/test_checks.py tests/pandas/test_checks_builtin.py tests/pandas/test_schema_components.py tests/pandas/test_errors.py tests/pandas/test_model.py\"\nD=$(mktemp -d) || exit 1\ntrap 'rm -rf \"$D\"' EXIT\ntimeout 120 git clone -q --depth 1 --branch v0.33.1 https://github.com/unionai-oss/pandera \"$D/src\" > \"$D/clone.log\" 2>&1 || { echo \"PANDERA_UPSTREAM_TESTS_FAIL: clone of v0.33.1 failed\"; exit 1; }\nhead=$(git -C \"$D/src\" rev-parse HEAD)\n[ \"$head\" = \"$PIN\" ] || { echo \"PANDERA_UPSTREAM_TESTS_FAIL: v0.33.1 checkout $head is not the winner pin commit\"; exit 1; }\nmkdir -p \"$D/run\" && cp -a \"$D/src/tests\" \"$D/src/pyproject.toml\" \"$D/run/\" || exit 1\ncd \"$D/run\" || exit 1\nPYTHONDONTWRITEBYTECODE=1 timeout 300 uv run -q --no-project --python \"$V/bin/python3\" --with pytest==9.1.1 --with hypothesis==6.168.1 -- python -c \"import pandera, pytest, hypothesis; print(pandera.__file__); print(pandera.__version__, pytest.__version__, hypothesis.__version__)\" > \"$D/where.txt\" 2>&1 || { echo \"PANDERA_UPSTREAM_TESTS_FAIL: test environment did not start\"; cat \"$D/where.txt\"; exit 1; }\nPYTHONDONTWRITEBYTECODE=1 timeout 900 uv run -q --no-project --python \"$V/bin/python3\" --with pytest==9.1.1 --with hypothesis==6.168.1 -- python -m pytest -p no:cacheprovider $FILES > \"$D/pytest.log\" 2>&1\nrc=$?\npython3 - \"$D\" \"$rc\" \"$V\" \"$head\" \"$FILES\" <<'PY'\nimport re, sys\nd, rc, venv, head, files = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5].split()\nwhere = open(d + '/where.txt').read().split('\\n')\nlog = open(d + '/pytest.log').read()\nsummary = [line for line in log.splitlines() if re.match(r'^=+ .* in [0-9.]+s', line)]\ncounts = {k: int(n) for n, k in re.findall(r'(\\d+) (passed|failed|errors?|skipped|xfailed|xpassed|deselected)', summary[-1] if summary else '')}\nconfig = [line.replace(d, '<tmp>') for line in log.splitlines() if line.startswith(('platform ', 'configfile:', 'collected '))]\nfrom_venv = where[0].startswith(venv + '/lib/') and '/site-packages/pandera/' in where[0]\nok = rc == 0 and bool(summary) and counts.get('passed', 0) > 0 and counts.get('failed', 0) == 0 and counts.get('error', 0) == 0 and counts.get('errors', 0) == 0 and from_venv and where[1].split()[0] == '0.33.1'\nprint('PANDERA_UPSTREAM_TESTS_' + ('OK' if ok else 'FAIL'), '| pytest exit', rc, '|', summary[-1].strip('= ') if summary else 'no summary', '| unionai-oss/pandera v0.33.1 checkout', head, '| pandera imported from the promotion-gate venv:', from_venv)\nprint('upstream files run unchanged:', ' '.join(files), '|', ' | '.join(config), '| pandera/pytest/hypothesis', where[1])\nsys.exit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 13.2,
+      "output_sha256": "5f93ff58ac3ab9ed7a75e07f77b29900b731c691d127259d79c3c71cdccd8530",
+      "output_excerpt": "PANDERA_UPSTREAM_TESTS_OK | pytest exit 0 | 737 passed, 2 xfailed, 1 warning in 6.92s | unionai-oss/pandera v0.33.1 checkout 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6 | pandera imported from the promotion-gate venv: True\nupstream files run unchanged: tests/pandas/test_schemas.py tests/pandas/test_checks.py tests/pandas/test_checks_builtin.py tests/pandas/test_schema_components.py tests/pandas/test_"
+    },
+    {
+      "cmd": "V=\"$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv\"\nPIN=62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6\nFILES=\"tests/pandas/test_schemas.py tests/pandas/test_checks.py tests/pandas/test_checks_builtin.py tests/pandas/test_schema_components.py tests/pandas/test_errors.py tests/pandas/test_model.py\"\nD=$(mktemp -d) || exit 1\ntrap 'rm -rf \"$D\"' EXIT\ntimeout 120 git clone -q --depth 1 --branch v0.33.1 https://github.com/unionai-oss/pandera \"$D/src\" > \"$D/clone.log\" 2>&1 || { echo \"PANDERA_DISARMED_CONTROL_FAIL: clone of v0.33.1 failed\"; exit 1; }\nhead=$(git -C \"$D/src\" rev-parse HEAD)\n[ \"$head\" = \"$PIN\" ] || { echo \"PANDERA_DISARMED_CONTROL_FAIL: v0.33.1 checkout $head is not the winner pin commit\"; exit 1; }\nmkdir -p \"$D/run\" \"$D/plugin\" && cp -a \"$D/src/tests\" \"$D/src/pyproject.toml\" \"$D/run/\" || exit 1\ncat > \"$D/plugin/nsr_disarm.py\" <<'PLUGIN'\nimport pandera.api.base.error_handler as error_handler\n\n\ndef _disarmed_collect_error(self, *args, **kwargs):\n    return None\n\n\nerror_handler.ErrorHandler.collect_error = _disarmed_collect_error\nPLUGIN\ncd \"$D/run\" || exit 1\nPYTHONPATH=\"$D/plugin\" PYTHONDONTWRITEBYTECODE=1 timeout 900 uv run -q --no-project --python \"$V/bin/python3\" --with pytest==9.1.1 --with hypothesis==6.168.1 -- python -m pytest -p no:cacheprovider -p nsr_disarm $FILES > \"$D/pytest.log\" 2>&1\nrc=$?\npython3 - \"$D\" \"$rc\" <<'PY'\nimport re, sys\nd, rc = sys.argv[1], int(sys.argv[2])\nlog = open(d + '/pytest.log').read()\nsummary = [line for line in log.splitlines() if re.match(r'^=+ .* in [0-9.]+s', line)]\ncounts = {k: int(n) for n, k in re.findall(r'(\\d+) (passed|failed|errors?|skipped|xfailed|xpassed|deselected)', summary[-1] if summary else '')}\nok = rc == 1 and counts.get('failed', 0) > 0\nprint('PANDERA_DISARMED_CONTROL_' + ('OK' if ok else 'FAIL'), '| same upstream files with pandera ErrorHandler.collect_error replaced by a no-op (pytest -p nsr_disarm): pytest exit', rc, '(expected 1) |', summary[-1].strip('= ') if summary else 'no summary')\nsys.exit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 19.325,
+      "output_sha256": "05db379edd06b33ef7b1366541b6e64e47ac217573a15b466d0b4d301b4a0bae",
+      "output_excerpt": "PANDERA_DISARMED_CONTROL_OK | same upstream files with pandera ErrorHandler.collect_error replaced by a no-op (pytest -p nsr_disarm): pytest exit 1 (expected 1) | 232 failed, 505 passed, 2 xfailed, 1 warning in 15.52s\n"
+    }
+  ],
+  "tool_versions": {
+    "data-pandera": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6"
+  },
+  "observed_at_utc": "2026-09-26T02:47:13Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), pandera 0.33.1, the data-quality-orchestration winner, passes upstream's own tests on this host's install. The promotion-gate environment reports pandera 0.33.1, and uv pip sync --dry-run --offline would make no changes against the hash-pinned blueprints/us-equities/data/requirements.lock. The upstream tag unionai-oss/pandera v0.33.1 resolves to the winner pin commit 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6. From a shallow clone at that commit, six unchanged upstream test files for the pandas backend (tests/pandas/test_schemas.py, test_checks.py, test_checks_builtin.py, test_schema_components.py, test_errors.py and test_model.py), run with upstream's pyproject pytest settings, import pandera from the promotion-gate environment and pass: 737 passed, 2 xfailed, none failed. With pandera's ErrorHandler.collect_error replaced by a no-op, so that validation no longer reports errors, the same tests fail with pytest exit 1 (discriminating control). Every command exits 0 on its own assertions.",
+  "limitations": [
+    "Replaces nativestack-5975wx-20260925--data-pandera--use--20260925 as this host's latest pandera use receipt. It is a new dated receipt, not a further generation: record --supersedes links generations only within one date, and the 2026-09-25 receipts stay unchanged. The cross-family review of #281 found that the 2026-09-25 receipt classed as native_proven a locally authored check (the repository's promotion gate and an in-command SchemaError probe) over the repository's four-row good.csv fixture; docs/contributing-evidence.md classes execution against this repository's own fixtures as local_integration. This receipt replaces that evidence with upstream's own unchanged tests at the pinned tag, run against this host's pinned install, and is native_proven on that basis only.",
+    "Consequence for the 2026-09-25 receipt: receipts are immutable, and scripts/platform_status.py counts every independently agreed native_proven use pass, superseded or not. It therefore keeps supporting this winner's host_verified state until a reviewer records needs_changes on it; this receipt does not withdraw it.",
+    "Selection and omissions: six files of upstream's tests/pandas directory, which the upstream CI runs as a whole for the pandas backend. The other files were not run; four of them do not import in this environment (test_multithreaded.py and test_pandas_parallel.py need joblib, test_pandas_engine.py needs pytz, test_docs_setting_column_widths.py imports upstream's docs tree). tests/core and the other backends (polars, pyspark, dask, modin, ibis, geopandas) are out of scope, and the CI's coverage flags are omitted.",
+    "Test tooling: pytest 9.1.1 and hypothesis 6.168.1 from PyPI in a temporary uv overlay (uv run --no-project --with) on top of the promotion-gate environment, which supplies pandera and its dependencies unchanged. The tag lookup and the clone use GitHub over the network. The disarming plugin is this receipt's own control, not an upstream test.",
+    "Scope: the schema-validation half of the data-quality-orchestration layer, on upstream's test data; orchestration (scheduling or ingest runs) is not exercised and no market data is validated.",
+    "Install source: the promotion-gate virtual environment at ~/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv, which matches the hash-pinned blueprints/us-equities/data/requirements.lock exactly (command 1). Recorded by the workstation coordinator Claude Code session, through a repair worker that shares its session id, from a git worktree at published origin/main (the catalog_revision).",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T02:47:13Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session. Reproduce: Re-ran once in a throwaway cp -a copy of the worktree via host_receipts.run_command. cmd2 737 passed, 2 xfailed, configfile pyproject.toml in the full output; cmd1 is identical to -2 and reproduced there. Points 1, 2 and 4 hold as in -2. needs_changes (point 3): (a) the claim says the tests ran with upstream pyproject pytest settings; the configfile line is past the 400-character excerpt and not asserted by the OK status. (b) LIM2 names four files that do not import here (joblib, pytz, docs), but no command of this receipt collects them, so the statement has no retained command (the -2 collect-only command shows it is true). Superseded by -2, which asserts the configfile, runs every importable file and retains the collection.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T06:15:14Z",
+      "reviewer": {
+        "identity_sha256": "f07a9dfbc09d23994b3810ea11bc96fd931f69f88b9e1b02d24261f4b8dcad04",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

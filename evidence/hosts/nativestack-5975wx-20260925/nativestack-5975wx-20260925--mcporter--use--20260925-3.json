@@ -80,6 +80,16 @@
         "identity_sha256": "2719d754cf21664597938532f98cb8bd036f134f8b5dc942b873a48f4ee955c3",
         "model": "claude-sonnet-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session (claude-opus-5-5); adequacy-checked point 3 against the receipt JSON and the pinned MCPorter 0.13.13 source, plus a live check. Defect confirmed: the claim says MCPorter runs under a temporary HOME 'so no host MCPorter configuration can load', but command 3's bwrap does not clear the environment, and 0.13.13 dist/config/read-config.js loadConfigLayers and dist/config/path-discovery.js take options.configPath ?? process.env.MCPORTER_CONFIG before any HOME lookup (dist/paths.js also prefers an inherited XDG_CONFIG_HOME over HOME); createRuntime loads config on every run, ad-hoc --stdio included. Live with pinned 0.13.13 and a temporary HOME: an inherited MCPORTER_CONFIG canary became the 'Selected config', and an unparseable canary made the receipt's own 'list --stdio ... --json --no-oauth' form exit 1 with a JSON parse error from loadConfigLayers. The isolation claim is unbacked. Successor with explicit --config and env -i: mcporter--use--20260926-2.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T10:22:35Z",
+      "reviewer": {
+        "identity_sha256": "e3e758a4ec14358c858079587aca14d44770aa531b79a646a6b6de49de90efdc",
+        "model": "claude-opus-5-5"
+      }
     }
   ],
   "supersedes": "nativestack-5975wx-20260925--mcporter--use--20260925-2"
