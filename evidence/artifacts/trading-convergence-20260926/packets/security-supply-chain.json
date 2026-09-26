@@ -1,0 +1,670 @@
+{
+ "layer_id": "security-supply-chain",
+ "proposal": {
+  "layer_id": "security-supply-chain",
+  "proposal": "add_candidates",
+  "summary": "Area definition (read directly from scratchpad/conv/layers.json): requirement text is \"Run bounded research with native identity and complete returned results; supervise owned processes; retain scoped telemetry, failed attempts and recoverable state without granting research workers broker execution authority\" -- an agent/process-governance requirement, not primarily an SBOM/CVE/secret-scan requirement. The three recorded winners (grype v0.119.0, syft v1.52.0, gitleaks v8.30.1) still earn their own narrow jobs on reverified evidence (gh api today: all three unarchived, current pins, active within the last 3 days), but none of them was ever evidence for the requirement's actual \"no broker execution authority\" clause -- that is satisfied today only by a written prompt policy (blueprints/us-equities/workers/policy.md lines 1-4: \"do not submit orders, change accounts, read credential stores... Broker credentials belong to a separate execution service\") plus the architectural fact that no broker tool is wired into the codex-native-sdk research worker's toolset (catalogs/us-equities/agents-operations.json: \"No broker credentials or order tools in the research worker; separate deterministic adapter owns any later approved paper-order work\") -- a real but non-technical control that Docker MCP Gateway/Snyk Agent Scan/Cisco AI Defense MCP Scanner all aim at without yet earning a slot. My strongest self-verified finding, beyond the given candidate packet: the catalog's own open_gap \"openai-codex 0.154.0 and exchange-calendars 4.13.2 ... have never been Grype-scanned\" is true for Grype specifically but misleading about actual coverage -- I opened adoption/sdk/requirements-linux-x86_64-py313.lock myself and found exactly those packages (openai==3.16.2 L565, openai-codex==0.154.0 L571, exchange-calendars==4.13.2 L241), then opened .github/osv-scanner-lockfiles.json (L17) and catalogs/foundation/automation.json and confirmed that exact lock file is already scanned by google/osv-scanner v2.6.0 as a REQUIRED PR check (target_required_checks includes \"osv-scanner\"). OpenSSF Scorecard is similarly already running in this repo's own CI (scorecard.yml, scheduled) but unreconciled with any layer -- the catalog's own parallel ci-supply-chain layer already flags this exact reconciliation gap verbatim. Gitleaks is genuinely challenged (not yet swapped) by TruffleHog's live provider-API secret verification, confirmed via TruffleHog's own README this session -- a capability class regex/entropy matching cannot produce -- but a credential-safe bounded trial (never real secrets) is needed first, and this repo carries substantial Gitleaks-specific tuning (.gitleaks.toml 26.7K, .gitleaksignore 7.2K) that a switch would need to preserve. Trivy, Cosign and OpenBao each target a distinct, explicitly-named open gap (host-OS/IaC coverage; missing signature/provenance verification; secret lifecycle/leasing) with real primary-source-confirmed capability, but none has run on this stack yet. One researcher citation is corrected here: Cosign's claimed SECURITY.md/\"gh attestation verify\" precedent is refuted -- sigstore/cosign has no SECURITY.md (404 on contents/SECURITY.md; community-profile security_policy is null) and its actual release process uses ko-sign/a static key, not gh attestation -- this does not weaken Cosign's own directly-confirmed verify capability, only that one supporting claim. Note for the credential-lifecycle framing: broker/API secrets already have an at-rest boundary today (docs/secret-storage.md: per-provider 0600 files outside every worktree, or native Keychain per project memory) -- OpenBao's gap is specifically leasing/rotation/scoping, not \"no protection at all.\" None of these findings move a paper-lane counter (engines run / paper acts passed / paper fills); this is catalog-accuracy and pre-adoption tooling hygiene work, consistent with treating paper-lane results, not catalog activity, as the north-star progress measure.",
+  "winner_status": [
+   {
+    "component_id": "grype",
+    "status": "earns_it",
+    "note": "Pin v0.119.0 reconfirmed current today via gh api (12,931 stars, Apache-2.0, unarchived, pushed 2026-09-25T20:09:42Z; latest release published 2026-09-17) -- no drift since the 09-23 sweep. It runs as a required gate in supply-chain.yml's sbom-vuln job (--fail-on high against reviewed .grype.yaml ignores, catalogs/foundation/automation.json). No verified alternative beats it at that specific job. Its own recorded target-mismatch gap (2026-09-22 receipt scanned the 21-package NautilusTrader runtime venv, not the 36-package equity-worker-sdk) is real for Grype itself, but I confirmed directly (adoption/sdk/requirements-linux-x86_64-py313.lock + .github/osv-scanner-lockfiles.json:17 + catalogs/foundation/automation.json) that OSV-Scanner already covers exactly those SDK packages (openai, openai-codex, exchange-calendars) as a required CI check today -- the catalog's open_gaps text should be corrected to name Grype specifically rather than imply the SDK has zero vulnerability coverage. Action: add_candidates (OSV-Scanner), not a challenge to Grype itself."
+   },
+   {
+    "component_id": "syft",
+    "status": "earns_it",
+    "note": "Pin v1.52.0 reconfirmed current today (9,613 stars, Apache-2.0, unarchived, pushed 2026-09-25T19:53:32Z; latest release 2026-09-17). Beyond feeding Grype, its SPDX SBOM output already serves a second, independently-confirmed downstream role: catalogs/foundation/automation.json's publish-catalog.yml release job attaches a SHA-checked syft 1.52.0 SBOM with its own actions/attest attestation, verified in-run via gh attestation verify -- a concrete production use Trivy has not been shown to serve on this repo. Its disclosed Python-metadata-only scope is an accurate limitation, not a defect; Trivy is a verified but not-yet-run complement for the host-OS/native-library slice it structurally excludes."
+   },
+   {
+    "component_id": "gitleaks",
+    "status": "challenged",
+    "note": "Pin v8.30.1 remains upstream's latest (gh api reconfirmed today) but is dated 2026-03-21, ~6 months old -- the slowest cadence of the three winners, though repo push activity is current (2026-09-23) so it is maintained under the 12-month rule, not stale. Its 22-commit, 2026-09-19 scan (evidence/receipts/runtime-tools.json) is now a week-plus-stale sample. More materially: TruffleHog's live provider-API verification (confirmed by fetching its own README this session: 'programmatic verification against the API,' 700+ verifying detectors, 800+ classified secret types) is a structural capability Gitleaks cannot produce at any version, and it directly closes the layer's own named gap that the existing receipt 'does not certify that no secrets exist.' Not yet swapped: no credential-safe trial has been run, and this repo's substantial Gitleaks-specific tuning (.gitleaks.toml 26.7K, .gitleaksignore 7.2K) needs preserving or re-porting first."
+   }
+  ],
+  "challengers": [
+   {
+    "name": "OSV-Scanner",
+    "url": "https://github.com/google/osv-scanner",
+    "why_better": "Already a REQUIRED PR check in this repo's own CI (security-scan.yml, target_required_checks includes 'osv-scanner', required_check_context 'osv-scanner' -- catalogs/foundation/automation.json, read directly this session), checksum-verified pin v2.6.0, scanning 37 tracked lockfiles per .github/osv-scanner-lockfiles.json. I independently confirmed line 17 of that file tracks adoption/sdk/requirements-linux-x86_64-py313.lock, and opened that lock file myself: it contains exactly the packages (openai==3.16.2 L565, openai-codex==0.154.0 L571, exchange-calendars==4.13.2 L241, 36 top-level packages total) that the security-supply-chain layer's own open_gaps claim have 'never been Grype-scanned.' OSV-Scanner queries the OSV.dev database directly against lockfiles rather than a Syft SBOM, so it is a genuine complement to Grype, not a duplicate, and is already gating every PR today -- this is a catalog-accuracy fix, not a new-tool ask.",
+    "evidence_level": "source_review",
+    "trial_plan": "No install needed; it already runs. Bounded action: (1) add google/osv-scanner (pin v2.6.0, checksum source https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_SHA256SUMS) as a recorded component/cross-reference of the security-supply-chain layer in catalogs/landscape/us-equities.json; (2) correct the open_gaps bullets that imply the 36-package SDK has zero vulnerability coverage; (3) pull one real run via `gh run list --workflow=security-scan.yml` and the matching job's logs for a PR that touched adoption/sdk/*, and cite that run ID plus its pass/fail outcome for the SDK lockfile in place of the current zero-citation gap language. Pass criterion: the corrected catalog entry cites a specific, verifiable CI run covering that lockfile. Overturn condition: if that run history shows the scanner silently skips adoption/sdk/* despite being listed (parser failure), the original gap claim stands and no correction should be made.",
+    "paper_lane_impact": "none",
+    "sources": [
+     "https://github.com/google/osv-scanner",
+     "https://github.com/google/osv-scanner/releases/tag/v2.6.0",
+     "catalogs/foundation/automation.json (security_gate_lanes, osv-scanner job; read this session)",
+     "catalogs/us-equities/adoption/sdk/requirements-linux-x86_64-py313.lock:241,565,571 (read this session)",
+     ".github/osv-scanner-lockfiles.json:17 (read this session)",
+     "catalogs/landscape/us-equities.json open_gaps, security-supply-chain layer (read this session)",
+     "gh api repos/google/osv-scanner (2026-09-26, this session)"
+    ]
+   },
+   {
+    "name": "OpenSSF Scorecard",
+    "url": "https://github.com/ossf/scorecard",
+    "why_better": "Already running in this repo's own CI as a scheduled lane (.github/workflows/scorecard.yml, job 'analysis', SARIF uploaded to code scanning -- catalogs/foundation/automation.json, read directly), yet is 'not a component or candidate of' the parallel ci-supply-chain layer either, per that layer's own open_gaps text which I read verbatim in catalogs/sota-convergence/manifest-20260923.json: 'reconcile the layer row with the automation it runs.' Directly closes this layer's own named gap -- 'No measured comparison exists between the winners and any alternative scanner or SBOM tool' -- by scoring the WINNERS' own upstream repos (grype, syft, gitleaks, and any of Trivy/Cosign/OpenBao if adopted) on ~19 objective security-practice checks (branch protection, pinned deps, SAST usage, vulnerability disclosure), something nothing else in this set does.",
+    "evidence_level": "source_review",
+    "trial_plan": "Run the pinned v5.5.0 scorecard binary (checksum from its release page) with `scorecard --repo=github.com/anchore/grype` and repeat for syft, gitleaks, sigstore/cosign and openbao/openbao, using only a standard read-scope GITHUB_TOKEN (no secrets beyond what gh CLI already uses for its own API reads in this session). Pass criterion: produces a per-check score matrix for those repos -- the first objective comparative baseline the layer's own gap text asks for. Overturn condition: if any check needs org-level or webhook-write GitHub scopes this project's docs/secret-storage.md posture disallows, record that as the new blocker and stop.",
+    "paper_lane_impact": "none",
+    "sources": [
+     "https://github.com/ossf/scorecard",
+     "https://github.com/ossf/scorecard/releases/tag/v5.5.0",
+     "catalogs/foundation/automation.json (scheduled_report_only_lanes, scorecard.yml; read this session)",
+     "catalogs/sota-convergence/manifest-20260923.json (ci-supply-chain open_gaps, 'ossf/scorecard is a scheduled report-only lane... not a component or candidate of this layer'; read verbatim this session)",
+     "gh api repos/ossf/scorecard (2026-09-26, this session)"
+    ]
+   },
+   {
+    "name": "TruffleHog",
+    "url": "https://github.com/trufflesecurity/trufflehog",
+    "why_better": "Fetched its own README directly this session: 'For every potential credential that is detected, we've painstakingly implemented programmatic verification against the API that we think it belongs to,' with 'over 700 credential detectors that support active verification' and 'over 800 secret types' classified. This is a structural capability -- live true/false verification against the credential's own provider -- that Gitleaks' regex/entropy matching cannot produce at any version, and it directly closes the layer's own stated gap that the 2026-09-19 Gitleaks receipt 'does not certify that no secrets exist.' Repo metadata reconfirmed today: v3.97.9 released 2026-09-24, pushed TODAY (2026-09-26T15:19:54Z), 28,061 stars, AGPL-3.0, unarchived.",
+    "evidence_level": "source_review",
+    "trial_plan": "This project's own prior review correctly flagged that live-verification cannot ethically be exercised against real secrets in a read-only session. Resolve it the way the existing Grype receipt already validates true-positive detection with a deliberately-vulnerable positive-control fixture: (1) run `trufflehog git \"$PROJECT_ROOT\" --no-verification` (verification off) over the same 22-commit range the 2026-09-19 Gitleaks receipt covers, as a pattern-detection-only, zero-outbound-call comparison; (2) separately run it against one syntactically-valid but already-revoked/placeholder test string (never a real key) to confirm it reports 'unverified/inactive' and never manufactures a false live-positive. Pass criterion: matches or exceeds Gitleaks' 0-true-positive result on the same range, with the placeholder case confirming honest verification semantics. Overturn condition: if `--no-verification` mode loses meaningful detector coverage versus Gitleaks' tuned .gitleaks.toml rules, or AGPL-3.0 turns out to require any code linkage (run only as a separate CLI process, per the candidate's own correct license caveat).",
+    "paper_lane_impact": "none",
+    "sources": [
+     "https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/README.md (fetched and read this session)",
+     "https://github.com/trufflesecurity/trufflehog/releases/tag/v3.97.9",
+     "gh api repos/trufflesecurity/trufflehog (2026-09-26, this session)",
+     "catalogs/us-equities/agents-operations.json:1363-1399 and evidence/receipts/runtime-tools.json (Gitleaks baseline, read this session)"
+    ]
+   },
+   {
+    "name": "Trivy",
+    "url": "https://github.com/aquasecurity/trivy",
+    "why_better": "Fetched its own README directly this session, confirming scanners for 'OS packages and software dependencies (SBOM)', 'Known vulnerabilities (CVEs)', 'IaC issues and misconfigurations', and 'Sensitive information and secrets' across 'Container Image, Filesystem, Virtual Machine Image, Kubernetes' targets -- directly closing this layer's own named gap that Syft and Grype 'cover Python package metadata only' and 'do not cover bundled Rust/Cython or native shared libraries, host OS packages.' Already filed in-catalog as a reviewed 'alternative' (source_review, catalogs/us-equities/agents-operations.json:1483-1521, read this session) with rationale 'Choose instead of duplicate Grype scans when IaC/container checks are the main gap,' never promoted. Most-starred tool in the whole candidate set (38,083 stars, gh api reconfirmed today), pin v0.74.0 current (2026-08-14), Apache-2.0, unarchived, pushed 2026-09-25.",
+    "evidence_level": "source_review",
+    "trial_plan": "Run `trivy fs` (pinned v0.74.0, checksum-verified) against the identical target Grype's 2026-09-22 receipt already scanned -- the reproduced NautilusTrader rc5 runtime venv from supply-chain.yml's sbom-vuln job -- as a direct head-to-head cross-check on the same input. Pass criterion: record any finding Trivy surfaces that Grype's Python-metadata-only approach structurally cannot (a non-Python native library or host-package CVE), plus any discrepancy in the shared Python-package subset. Overturn condition: if Trivy's result on the identical target is a strict subset of Grype's zero-match result with nothing new, it does not earn a slot beyond the existing 'alternative, not adopted' filing.",
+    "paper_lane_impact": "none",
+    "sources": [
+     "https://raw.githubusercontent.com/aquasecurity/trivy/main/README.md (fetched and read this session)",
+     "https://github.com/aquasecurity/trivy/releases/tag/v0.74.0",
+     "catalogs/us-equities/agents-operations.json:1483-1521 (read this session)",
+     "gh api repos/aquasecurity/trivy (2026-09-26, this session)"
+    ]
+   },
+   {
+    "name": "Cosign",
+    "url": "https://github.com/sigstore/cosign",
+    "why_better": "docs.sigstore.dev's own verify page (fetched this session) confirms the exact `cosign verify --certificate-identity ... --certificate-oidc-issuer ...` keyless-verification flow, closing the layer's own explicitly stated gap (read verbatim in catalogs/landscape/us-equities.json): 'Signature and provenance verification is missing for every installed supply-chain tool: signature_verified is false in both receipts. Only checksums were matched.' Correction to the researcher packet: I checked its claimed precedent directly and it is false -- sigstore/cosign has no SECURITY.md (gh api contents/SECURITY.md returns 404; community-profile API reports security_policy:null; the org-level sigstore/.github/SECURITY.md is a generic disclosure-contact page that never mentions 'gh attestation verify'), and its own release process (release/ko-sign-release-images.sh) signs with its own static key, not gh attestation. That refutes the SECURITY.md precedent specifically, not Cosign's own directly-confirmed verify capability or the real gap it targets.",
+    "evidence_level": "source_review",
+    "trial_plan": "Verify one already-published release's Sigstore bundle before trusting further installs: `cosign verify-blob --certificate-identity-regexp 'https://github.com/anchore/(syft|grype)' --certificate-oidc-issuer https://token.actions.githubusercontent.com <artifact> --bundle <artifact>.sigstore.json` against Syft's and Grype's own published release assets. Pass criterion: verification succeeds and signature_verified can flip from false to true in the next supply-chain receipt for those two tools. Overturn condition: if Syft/Grype/Gitleaks/Trivy in fact publish only checksum files and no checkable Sigstore bundle/certificate for their release binaries, this closes as 'no verifiable artifact available,' not a Cosign defect.",
+    "paper_lane_impact": "none",
+    "sources": [
+     "https://docs.sigstore.dev/cosign/verifying/verify/ (fetched this session)",
+     "https://github.com/sigstore/cosign/releases/tag/v3.1.3",
+     "catalogs/landscape/us-equities.json open_gaps, security-supply-chain layer (read verbatim this session)",
+     "gh api repos/sigstore/cosign/contents/SECURITY.md -> 404 (checked this session)",
+     "gh api repos/sigstore/cosign/community/profile -> security_policy:null (checked this session)"
+    ]
+   },
+   {
+    "name": "OpenBao",
+    "url": "https://github.com/openbao/openbao",
+    "why_better": "openbao.org's own docs (fetched this session) confirm core 'secure storage, dynamic secrets, encryption, leasing, and revocation' capability, targeting the layer's own largest named gap (read verbatim in catalogs/landscape/us-equities.json): 'Secret lifecycle and service identity have no native evidence. No winner manages or scopes the broker credential environment variables.' New, independently confirmed finding: the catalog's recorded pin (v2.6.2) is now one release behind upstream -- gh api shows v2.7.0 released 2026-09-23, three days after the internal sweep still recorded v2.6.2 as current. Scope note for accuracy: broker/API secrets already have an at-rest boundary today via a different, lower-tech mechanism (docs/secret-storage.md: per-provider 0600 files outside every worktree, or native Keychain per project record) -- OpenBao's real gap is lifecycle (leasing/rotation/process-scoping), not an absence of any protection.",
+    "evidence_level": "source_review",
+    "trial_plan": "Install the corrected pin v2.7.0 (checksum from its GitHub release assets) in local dev-server mode, store one SYNTHETIC placeholder secret (never a real broker credential, consistent with docs/paper-lane-policy.md's live-credential exclusion) under a scoped path, and exercise a full store-lease-rotate-revoke cycle against that placeholder only. Pass criterion: the cycle succeeds and produces an audit-log entry, establishing the lifecycle gap is closeable in principle. Overturn condition: if OpenBao's Vault-compatible surface cannot run fully offline/local without an external unseal or KMS dependency this project's credential policy would disallow, record that as the new blocker.",
+    "paper_lane_impact": "none",
+    "sources": [
+     "https://openbao.org/docs/what-is-openbao/ (fetched this session)",
+     "https://github.com/openbao/openbao/releases/tag/v2.7.0",
+     "https://github.com/openbao/openbao/releases/tag/v2.6.2 (superseded pin, confirmed this session)",
+     "catalogs/landscape/us-equities.json open_gaps, security-supply-chain layer (read verbatim this session)",
+     "catalogs/us-equities/agents-operations.json:1562-1603 (stale-pin record, read this session)",
+     "gh api repos/openbao/openbao (2026-09-26, this session)"
+    ]
+   },
+   {
+    "name": "Docker MCP Gateway",
+    "url": "https://github.com/docker/mcp-gateway",
+    "why_better": "The only candidate here that targets the layer's still fully-open clause head-on: 'without granting research workers broker execution authority.' Fetched its own README this session: confirms per-MCP-server container isolation ('Each local MCP sever in the catalog runs in an isolated Docker container') and secrets kept out of environment variables via Docker Desktop's secrets management -- 2 of the 4 capabilities the researcher packet attributed to it. Honest correction: network egress controls and tool-name-collision ('tool shadowing') detection do NOT appear in that same README; those two claims trace to a third-party roundup (getmaxim.ai), not Docker's own docs, and remain metadata-only pending a deeper look at its CLI/docs tree. Repo metadata reconfirmed today: no GitHub Releases API entries (404, ships via Docker Desktop/CLI-plugin channel), latest git tag v0.44.1 at commit dated 2026-09-16, 1,587 stars, MIT, unarchived, pushed 2026-09-23.",
+    "evidence_level": "source_review",
+    "trial_plan": "Front two already-configured local MCP servers (e.g. ai-memory and serena) through the gateway in an isolated scratch config, never touching the live project MCP config; confirm the per-container isolation and secrets-out-of-env behavior the README claims; separately check its `--help` output and docs/ tree for an egress-allowlist or tool-collision flag to either promote those two claims to source_review or explicitly retract them. Pass criterion: both already-confirmed capabilities reproduce locally, and the egress/tool-shadowing claims are resolved one way or the other. Overturn condition: if fronting an MCP server through the gateway breaks that server's existing session/caching behavior this project depends on (native tool discovery, prompt caching), the added isolation is not worth the loss and the gap stays open pending a lighter-weight mechanism.",
+    "paper_lane_impact": "none",
+    "sources": [
+     "https://raw.githubusercontent.com/docker/mcp-gateway/main/README.md (fetched and read this session)",
+     "gh api repos/docker/mcp-gateway (2026-09-26, this session)",
+     "gh api repos/docker/mcp-gateway/tags (v0.44.1 @ commit 2026-09-16T18:47:05Z, checked this session)",
+     "catalogs/landscape/us-equities.json requirement text, security-supply-chain layer (read verbatim this session)",
+     "blueprints/us-equities/workers/policy.md lines 1-4 (read this session)",
+     "catalogs/us-equities/agents-operations.json (codex-native-sdk entry, read this session)"
+    ]
+   }
+  ],
+  "rejected": [
+   {
+    "name": "Dependabot Core",
+    "reason": "Off-requirement: proposes dependency-version PRs, does not scan or block on vulnerabilities itself. Already filed and correctly scoped under the sibling 'dependency-maintenance' layer, not this one (catalogs/us-equities/repository-index.md:146, readme_license_overview/alternative, confirmed by direct read this session). Repo metadata current (v0.397.0, 2026-09-21, gh api reconfirmed) but that does not change the layer mismatch."
+   },
+   {
+    "name": "Trail of Bits skills",
+    "reason": "Off-requirement: a curated prompt/procedure collection, not an executable scanner, so it cannot fill an SBOM/vuln/secret-scan or agent-authority winner slot. Already filed under the sibling 'security-skills' layer (catalogs/us-equities/repository-index.md:427, confirmed this session). No GitHub Releases exist (gh api releases/latest -> 404, confirmed this session; versioned by commit only), and CC-BY-SA-4.0 is a content license needing attribution/share-alike for verbatim reuse, distinct from a normal code license."
+   },
+   {
+    "name": "Warpgate",
+    "reason": "Off-requirement: scopes and records HUMAN operator access over SSH/HTTP/DB; does not issue, scope or rotate broker API credentials for an autonomous research worker, nor gate MCP tool-call authority, which is what this layer's requirement text actually names. Already filed and correctly judged 'unnecessary additional ingress' under the sibling 'remote-access' layer (catalogs/us-equities/repository-index.md:465). Repo metadata current (v0.29.1, 2026-09-23, gh api reconfirmed) but does not change the mismatch."
+   },
+   {
+    "name": "Adversarial Attacks on Deep Algorithmic Trading Policies (arXiv:2010.11388)",
+    "reason": "Off-requirement and unmaintained: studies deep-RL trading-policy robustness, not software-supply-chain integrity or agent/broker-authority governance; this stack has adopted no RL trading policy (research-factors-ml winners are skfolio/EdgarTools; strategy-research decision remains 'research'). Six years old (2020-10), no accompanying maintained codebase, well outside the 2026-recency preference; not independently re-read this session beyond its abstract."
+   },
+   {
+    "name": "TradeMemory Protocol",
+    "reason": "Metadata only: every capability claim (RFC 3161 anchoring, SHA-256 tamper-evidence, 20 MCP tools) comes solely from its own repo description; nothing was independently read at a source pin or verified this session. Young (created 2026-02-23, ~7 months) and small (1,423 stars). Its audit-trail/memory framing is plausibly on-requirement for this layer's 'retain scoped telemetry... recoverable state' clause, so it is worth a future targeted source_review, not a present adoption candidate."
+   },
+   {
+    "name": "Snyk Agent Scan (renamed from invariantlabs-ai/mcp-scan)",
+    "reason": "Already adjudicated: this repo's own 2026-09-23 sota-convergence sweep already reviewed this exact repository (evidence/artifacts/source-review-20260923/snyk-agent-scan.json, confirmed by direct read this session) and disposed it 'keep_but_compare' in the foundation lane and adversarially 'refuted_keep_but_compare' in the 'beyond' lane, over its documented need for an external SNYK_TOKEN (a hosted-service call) that conflicts with this project's local-only, no-secrets-to-third-party posture. The researcher packet's own finding -- that gh api repos/invariantlabs-ai/mcp-scan now redirects to snyk/agent-scan following Snyk's 2025 acquisition of Invariant Labs -- is a real, useful catch (independently reconfirmed today: v0.6.4, 2026-09-21, pushed 2026-09-26, Apache-2.0, 3,091 stars) that a naive stars/awesome-list snapshot would miss, but it does not clear the already-recorded external-token blocker."
+   },
+   {
+    "name": "Cisco AI Defense MCP Scanner",
+    "reason": "Metadata only from my own verification this session: confirmed repo metadata via gh api (tag 4.8.4, 2026-08-28, pushed 2026-09-19, Apache-2.0, 1,079 stars, unarchived) but did not fetch or read its README/docs, so its YARA + LLM-based + behavioral supply-chain-check capability claims remain unverified at any primary source by me. Worth a follow-up source_review alongside Docker MCP Gateway before any adoption decision, not a present challenger."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "syft-repo-metadata",
+   "claim": "Syft repo exists at github.com/anchore/syft, license Apache-2.0, unarchived, active (9,613 stars, pushed 2026-09-25).",
+   "verdict": "supported",
+   "note": "gh api repos/anchore/syft (opened myself, 2026-09-26) returns archived:false, license.spdx_id:Apache-2.0, pushed_at:2026-09-25T19:53:32Z, stargazers_count:9613 -- exact match to the candidate's figures.",
+   "sources": [
+    "gh api repos/anchore/syft (2026-09-26)",
+    "https://github.com/anchore/syft"
+   ]
+  },
+  {
+   "name": "syft-pin-version",
+   "claim": "Pin v1.52.0 is upstream's latest as of 2026-09-26, released 2026-09-17.",
+   "verdict": "supported",
+   "note": "gh api repos/anchore/syft/releases/latest AND releases/tags/v1.52.0 both return tag_name v1.52.0, published_at 2026-09-17T14:38:17Z. No newer tag exists. No drift since the 09-23 sweep.",
+   "sources": [
+    "gh api repos/anchore/syft/releases/latest (2026-09-26)",
+    "https://github.com/anchore/syft/releases/tag/v1.52.0"
+   ]
+  },
+  {
+   "name": "syft-cap-sbom-description",
+   "claim": "Syft generates SPDX/CycloneDX SBOMs from images, directories and filesystems (own repo description).",
+   "verdict": "supported",
+   "note": "gh api repo description reads 'CLI tool and library for generating a Software Bill of Materials from container images and filesystems.' The repo's own supply-chain/README.md (opened in full) records an actual run producing both syft-json and CycloneDX 1.7 output (36 libraries + 87 files), confirming multi-format SBOM generation from a directory target.",
+   "sources": [
+    "gh api repos/anchore/syft",
+    "blueprints/us-equities/supply-chain/README.md (opened in full)"
+   ]
+  },
+  {
+   "name": "syft-cap-native-run",
+   "claim": "A prior native run 'syft scan dir:/sdk ... -o syft-json=/output/runtime.syft.json' produced the runtime/adapter SBOMs Grype later scanned; catalog evidence_level 'native_proven'.",
+   "verdict": "supported",
+   "note": "Opened catalogs/us-equities/agents-operations.json lines 1400-1440 myself: native_workflow contains the exact command verbatim, decision:'default', evidence_level:'native_proven' (both literally present, not paraphrased). The full run detail (36 packages, checksum-verified binary, bwrap-sandboxed) is corroborated in blueprints/us-equities/supply-chain/README.md. This confirms a recorded historical native_execution claim at source_review level (I read the record; I did not re-run the tool myself).",
+   "sources": [
+    "catalogs/us-equities/agents-operations.json:1400-1440 (opened this session)",
+    "blueprints/us-equities/supply-chain/README.md (opened in full)"
+   ]
+  },
+  {
+   "name": "grype-repo-metadata",
+   "claim": "Grype repo exists, license Apache-2.0, unarchived, active (12,931 stars, pushed 2026-09-25).",
+   "verdict": "supported",
+   "note": "gh api repos/anchore/grype confirms archived:false, license Apache-2.0, pushed_at 2026-09-25T20:09:42Z, stargazers_count:12931 -- exact match.",
+   "sources": [
+    "gh api repos/anchore/grype (2026-09-26)",
+    "https://github.com/anchore/grype"
+   ]
+  },
+  {
+   "name": "grype-pin-version",
+   "claim": "Pin v0.119.0 is upstream's latest as of 2026-09-26, released 2026-09-17.",
+   "verdict": "supported",
+   "note": "gh api releases/latest and releases/tags/v0.119.0 both confirm tag v0.119.0 published_at 2026-09-17T16:45:23Z. No drift.",
+   "sources": [
+    "gh api repos/anchore/grype/releases/latest (2026-09-26)",
+    "https://github.com/anchore/grype/releases/tag/v0.119.0"
+   ]
+  },
+  {
+   "name": "grype-cap-native-run",
+   "claim": "A prior native run 'grype sbom:runtime.syft.json -o json > runtime.grype.json' against a 2026-09-22-built DB returned zero matches for the pinned NautilusTrader rc5 runtime.",
+   "verdict": "supported",
+   "note": "Opened agents-operations.json lines 1441-1482: native_workflow lists this exact command plus 'grype db update'/'grype db status -o json', evidence_level 'native_proven'. blueprints/us-equities/supply-chain/README.md (read in full) gives the matching detail: DB schema v6.1.9 built 2026-09-22T06:30:41Z, runtime scan 21 packages/0 matches, adapter scan 2 packages/0 matches, with two positive controls (5 and 17 matches) proving the pipeline can detect known-vulnerable versions.",
+   "sources": [
+    "catalogs/us-equities/agents-operations.json:1441-1482 (opened this session)",
+    "blueprints/us-equities/supply-chain/README.md (opened in full)"
+   ]
+  },
+  {
+   "name": "grype-fit-target-mismatch",
+   "claim": "Grype's 2026-09-22 scan covered the 21-package NautilusTrader runtime venv, not the separate 36-package equity-worker-sdk; openai-codex 0.154.0 and exchange-calendars 4.13.2 were never Grype-scanned.",
+   "verdict": "supported",
+   "note": "Confirmed verbatim in blueprints/us-equities/supply-chain/README.md, which the candidate cited and I read in full: 'This scan targeted the NautilusTrader rc5 runtime, not the 36-package equity-worker-sdk inventoried above... openai 3.16.2, openai-codex 0.154.0 and exchange-calendars 4.13.2 are in the SDK inventory only.' Also restated verbatim in catalogs/landscape/us-equities.json's open_gaps for this layer, which I opened directly.",
+   "sources": [
+    "blueprints/us-equities/supply-chain/README.md lines ~149-154 (opened in full)",
+    "catalogs/landscape/us-equities.json open_gaps, security-supply-chain layer (opened this session)"
+   ]
+  },
+  {
+   "name": "gitleaks-repo-metadata",
+   "claim": "Gitleaks repo exists, license MIT, unarchived, active (29,493 stars, pushed 2026-09-23).",
+   "verdict": "supported",
+   "note": "gh api repos/gitleaks/gitleaks confirms archived:false, license MIT, pushed_at 2026-09-23T04:14:00Z, stargazers_count:29494 (candidate said 29,493; a 1-star difference is ordinary timing noise between two same-day checks, not an error).",
+   "sources": [
+    "gh api repos/gitleaks/gitleaks (2026-09-26)",
+    "https://github.com/gitleaks/gitleaks"
+   ]
+  },
+  {
+   "name": "gitleaks-pin-version-cadence",
+   "claim": "Pin v8.30.1 remains latest as of 2026-09-26 but is dated 2026-03-21 (~6 months, slowest cadence of the three winners), while repo activity is current -- maintained, not stale, under the 12-month rule.",
+   "verdict": "supported",
+   "note": "gh api confirms v8.30.1 is still releases/latest, published_at 2026-03-21T02:17:58Z (about 6 months before today 2026-09-26). pushed_at is 2026-09-23T04:14:00Z, i.e. commit activity 3 days before this check, so 'maintained, not stale' is a correct application of the task's 12-month/no-recent-activity threshold.",
+   "sources": [
+    "gh api repos/gitleaks/gitleaks/releases/tags/v8.30.1 (2026-09-26)",
+    "gh api repos/gitleaks/gitleaks (2026-09-26)"
+   ]
+  },
+  {
+   "name": "gitleaks-cap-native-run",
+   "claim": "A prior native run 'gitleaks git \"$PROJECT_ROOT\" --redact=100 --no-banner' covered 22 commits, dated 2026-09-19.",
+   "verdict": "supported",
+   "note": "Opened agents-operations.json lines 1363-1399: the exact command is verbatim in native_workflow, and its limitations text states 'Existing 22-commit scan had 0 findings' (present, just concatenated without spaces in the source JSON string). Its evidence_refs points to evidence/receipts/runtime-tools.json, which I opened directly: recorded_at_utc '2026-09-19T04:55:03...', data.gitleaks = {exit_code:0, commits_scanned:22, findings:0, bytes_scanned:1174704}. This is a precise, correctly-chained primary-source confirmation of both the command and the exact count/date.",
+   "sources": [
+    "catalogs/us-equities/agents-operations.json:1363-1399 (opened this session)",
+    "evidence/receipts/runtime-tools.json (opened this session)"
+   ]
+  },
+  {
+   "name": "trivy-repo-metadata",
+   "claim": "Trivy repo exists, license Apache-2.0, unarchived, active, most-starred tool in this candidate set (38,082 stars, pushed 2026-09-25).",
+   "verdict": "supported",
+   "note": "gh api repos/aquasecurity/trivy confirms archived:false, license Apache-2.0, pushed_at 2026-09-25T19:29:30Z, stargazers_count:38083 (candidate said 38,082; 1-star timing noise). Comparing my own measured star counts across all 8 reviewed tools (syft 9613, grype 12931, gitleaks 29494, trivy 38083, cosign 6330, openbao 7916, dependabot-core 5787, trailofbits/skills 7256), Trivy is indeed the highest -- confirms the 'most-starred tool in this whole set' claim.",
+   "sources": [
+    "gh api repos/aquasecurity/trivy (2026-09-26)",
+    "https://github.com/aquasecurity/trivy"
+   ]
+  },
+  {
+   "name": "trivy-pin-version",
+   "claim": "Pin v0.74.0 is current, released 2026-08-14.",
+   "verdict": "supported",
+   "note": "gh api releases/latest and releases/tags/v0.74.0 both confirm tag v0.74.0 published_at 2026-08-14T11:29:11Z.",
+   "sources": [
+    "gh api repos/aquasecurity/trivy/releases/latest (2026-09-26)",
+    "https://github.com/aquasecurity/trivy/releases/tag/v0.74.0"
+   ]
+  },
+  {
+   "name": "trivy-cap-description",
+   "claim": "Trivy is a multi-ecosystem fs/image vulnerability + IaC misconfiguration scanner.",
+   "verdict": "supported",
+   "note": "WebFetched Trivy's own README (raw.githubusercontent.com/aquasecurity/trivy/main/README.md) directly: confirms scanners for 'OS packages and software dependencies (SBOM)', 'Known vulnerabilities (CVEs)', 'IaC issues and misconfigurations', 'Sensitive information and secrets' across targets 'Container Image, Filesystem, Virtual Machine Image, Kubernetes'.",
+   "sources": [
+    "https://raw.githubusercontent.com/aquasecurity/trivy/main/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "trivy-catalog-rationale-and-filing",
+   "claim": "Catalog rationale: 'Choose instead of duplicate Grype scans when IaC/container checks are the main gap'; filed as source-reviewed 'alternative', never promoted to conditional/default; avoids duplicating Gitleaks' secret-scanning lane per the catalog's own note.",
+   "verdict": "supported",
+   "note": "Opened agents-operations.json lines 1483-1521 myself: rationale field is verbatim as quoted, decision:'alternative', evidence_level:'source_review', and limitations state 'Secret scanning overlaps Gitleaks; this proposed command leaves that lane to the existing tool' -- exact match.",
+   "sources": [
+    "catalogs/us-equities/agents-operations.json:1483-1521 (opened this session)"
+   ]
+  },
+  {
+   "name": "cosign-repo-metadata",
+   "claim": "Cosign repo exists, license Apache-2.0, unarchived, active (6,330 stars, pushed 2026-09-24).",
+   "verdict": "supported",
+   "note": "gh api repos/sigstore/cosign confirms archived:false, license Apache-2.0, pushed_at 2026-09-24T19:59:42Z, stargazers_count:6330 -- exact match.",
+   "sources": [
+    "gh api repos/sigstore/cosign (2026-09-26)",
+    "https://github.com/sigstore/cosign"
+   ]
+  },
+  {
+   "name": "cosign-pin-version",
+   "claim": "Pin v3.1.3 is current, released 2026-08-06.",
+   "verdict": "supported",
+   "note": "gh api releases/latest and releases/tags/v3.1.3 both confirm published_at 2026-08-06T01:09:23Z.",
+   "sources": [
+    "gh api repos/sigstore/cosign/releases/latest (2026-09-26)",
+    "https://github.com/sigstore/cosign/releases/tag/v3.1.3"
+   ]
+  },
+  {
+   "name": "cosign-cap-verify-command",
+   "claim": "cosign verify --certificate-identity ... --certificate-oidc-issuer ... performs keyless verification against Fulcio/Rekor, per docs.sigstore.dev.",
+   "verdict": "supported",
+   "note": "WebFetched https://docs.sigstore.dev/cosign/verifying/verify/ directly: it shows exactly 'cosign verify <image> --certificate-identity=... --certificate-oidc-issuer=...' (and the verify-blob equivalent). This matches the identical flags used in the catalog's own agents-operations.json cosign entry (lines 1522-1561, opened this session).",
+   "sources": [
+    "https://docs.sigstore.dev/cosign/verifying/verify/ (fetched 2026-09-26)",
+    "catalogs/us-equities/agents-operations.json:1522-1561 (opened this session)"
+   ]
+  },
+  {
+   "name": "cosign-cap-security-md-precedent",
+   "claim": "Cosign's own SECURITY.md shows it already trusts GitHub artifact attestation ('gh attestation verify') for its own release artifacts, a precedent for extending verification to Grype/Syft/Gitleaks/Trivy's release assets.",
+   "verdict": "refuted",
+   "note": "Checked directly: sigstore/cosign has no SECURITY.md at its root (gh api contents/SECURITY.md -> 404; root file listing has no such file; .github/ contains only dependabot.yml and workflows/). GitHub's community-profile API explicitly reports security_policy:null for this repo. The org-level fallback file (sigstore/.github/SECURITY.md, which I fetched and read in full) is a generic vulnerability-disclosure contact policy (email security@sigstore.dev; Security Response Committee process) -- it never mentions GitHub artifact attestation or 'gh attestation verify'. Grepping cosign's own README.md content for 'attestation verify'/'gh attestation' returned zero matches, and its release/ directory (ko-sign-release-images.sh, release-cosign.pub, release.mk) shows its actual release-signing process uses its own ko-sign/cosign tooling with a static public key, not gh attestation verify. The claimed source does not exist and does not say what the candidate states.",
+   "sources": [
+    "gh api repos/sigstore/cosign/contents/SECURITY.md (404, checked 2026-09-26)",
+    "gh api repos/sigstore/cosign/community/profile (security_policy:null)",
+    "sigstore/.github/SECURITY.md (fetched and read in full, 2026-09-26)",
+    "gh api repos/sigstore/cosign/contents/release (file listing)"
+   ]
+  },
+  {
+   "name": "openbao-repo-metadata",
+   "claim": "OpenBao repo exists, license MPL-2.0, unarchived, active (7,910 stars, pushed 2026-09-24).",
+   "verdict": "supported",
+   "note": "gh api repos/openbao/openbao confirms archived:false, license MPL-2.0, pushed_at 2026-09-24T20:34:53Z, stargazers_count:7916 (candidate said 7,910; small timing variance, immaterial).",
+   "sources": [
+    "gh api repos/openbao/openbao (2026-09-26)",
+    "https://github.com/openbao/openbao"
+   ]
+  },
+  {
+   "name": "openbao-new-finding-pin-stale",
+   "claim": "NEW FINDING: catalog pin v2.6.2 is now behind upstream -- v2.7.0 released 2026-09-23 is the true current latest, so this pin went stale within 3 days of the 09-23 internal sweep.",
+   "verdict": "supported",
+   "note": "gh api repos/openbao/openbao/releases/latest returns tag_name v2.7.0, published_at 2026-09-23T17:39:54Z; releases/tags/v2.6.2 confirms that older tag still exists, published_at 2026-08-18T16:21:00Z. The catalog's own agents-operations.json entry (lines 1562-1603, opened this session) and the sota-convergence manifest-20260923.json (offset ~16690-16714, opened this session) both still record pin/latest as v2.6.2 with pin_behind_upstream:false -- confirming the drift is real and post-dates the last internal check.",
+   "sources": [
+    "gh api repos/openbao/openbao/releases/latest (2026-09-26)",
+    "gh api repos/openbao/openbao/releases/tags/v2.6.2 (2026-09-26)",
+    "catalogs/us-equities/agents-operations.json:1562-1603 (opened this session)",
+    "catalogs/sota-convergence/manifest-20260923.json:16690-16714 (opened this session)"
+   ]
+  },
+  {
+   "name": "openbao-cap-description-primary",
+   "claim": "OpenBao is a secret storage, leasing and dynamic-secrets engine.",
+   "verdict": "supported",
+   "note": "WebFetched https://openbao.org/docs/what-is-openbao/ directly: the page describes OpenBao's 'core functionality like secure storage, dynamic secrets, encryption, leasing, and revocation features.' This part of the capability claim is confirmed by OpenBao's own primary docs.",
+   "sources": [
+    "https://openbao.org/docs/what-is-openbao/ (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "openbao-cap-vault-fork-busl",
+   "claim": "OpenBao is Vault-API-compatible and is an OSS fork of HashiCorp Vault created after Vault's BUSL relicense.",
+   "verdict": "unverifiable",
+   "note": "Per the adversarial-verification rule, I checked the candidate's own two cited primary sources myself: https://openbao.org/docs/what-is-openbao/ and the openbao/openbao README (raw.githubusercontent.com). Neither page mentions HashiCorp Vault, the BUSL/BSL relicense, or API compatibility anywhere in the fetched content. The underlying fact is very likely true -- it is consistently corroborated by multiple independent secondary sources (The New Stack, a Hacker News discussion, and several vendor/comparison write-ups) describing OpenBao as forked from Vault 1.14.0 (last MPL-2.0 release) after HashiCorp's August-2023 BUSL relicense, now under Linux Foundation/OpenSSF governance, sharing Vault's API/command surface. But those are secondary sources, not the primary sources the candidate named, so per the task's evidence-level rule I do not promote them to 'supported' for this specific citation.",
+   "sources": [
+    "https://openbao.org/docs/what-is-openbao/ (fetched 2026-09-26, does not contain the claim)",
+    "https://raw.githubusercontent.com/openbao/openbao/main/README.md (fetched 2026-09-26, does not contain the claim)",
+    "https://thenewstack.io/meet-openbao-an-open-source-fork-of-hashicorp-vault/ (secondary corroboration only)"
+   ]
+  },
+  {
+   "name": "openbao-fit-gap-quote",
+   "claim": "OpenBao targets the layer's largest open gap verbatim: 'Secret lifecycle and service identity have no native evidence. No winner manages or scopes the broker credential environment variables. OpenBao is untested, not failed.'",
+   "verdict": "supported",
+   "note": "Opened catalogs/landscape/us-equities.json's security-supply-chain layer open_gaps directly: this exact sentence appears verbatim, word for word.",
+   "sources": [
+    "catalogs/landscape/us-equities.json, security-supply-chain layer open_gaps (opened this session)"
+   ]
+  },
+  {
+   "name": "dependabot-repo-metadata",
+   "claim": "dependabot-core repo exists, license MIT, unarchived, active (5,787 stars, pushed 2026-09-25).",
+   "verdict": "supported",
+   "note": "gh api repos/dependabot/dependabot-core confirms archived:false, license MIT, pushed_at 2026-09-25T21:59:50Z, stargazers_count:5787 -- exact match.",
+   "sources": [
+    "gh api repos/dependabot/dependabot-core (2026-09-26)",
+    "https://github.com/dependabot/dependabot-core"
+   ]
+  },
+  {
+   "name": "dependabot-pin-version",
+   "claim": "Pin v0.397.0 is current, released 2026-09-21.",
+   "verdict": "supported",
+   "note": "gh api releases/latest and releases/tags/v0.397.0 both confirm published_at 2026-09-21T17:04:03Z.",
+   "sources": [
+    "gh api repos/dependabot/dependabot-core/releases/latest (2026-09-26)",
+    "https://github.com/dependabot/dependabot-core/releases/tag/v0.397.0"
+   ]
+  },
+  {
+   "name": "dependabot-cap-description",
+   "claim": "dependabot-core is the dependency-update engine powering GitHub's automated security/version PR workflow.",
+   "verdict": "supported",
+   "note": "WebFetched dependabot-core's own README directly: 'Dependabot-Core is the library at the heart of Dependabot security / version updates,' generating automated PRs across ecosystems.",
+   "sources": [
+    "https://raw.githubusercontent.com/dependabot/dependabot-core/main/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "dependabot-catalog-rationale-and-filing",
+   "claim": "Catalog rationale: 'any automated update must preserve locks, evidence and risk gates rather than auto-merge engine changes,' filed under the different layer 'dependency-maintenance' (decision='alternative'), reviewed at commit 6a3570b5.",
+   "verdict": "supported",
+   "note": "Opened catalogs/us-equities/star-audit.json at the cited location (repository field at line 3332) myself: role 'Dependency update engine and security/version PR workflow', rationale text verbatim as quoted, layers:['dependency-maintenance'], decision:'alternative', source_commit:'6a3570b5be207c5bd2ea497c046805d47f71bb1e' -- exact match on every element, including the near-exact line number.",
+   "sources": [
+    "catalogs/us-equities/star-audit.json:3331-3366 (opened this session)"
+   ]
+  },
+  {
+   "name": "trailofbits-repo-metadata-license",
+   "claim": "trailofbits/skills repo exists, license CC-BY-SA-4.0 (a content license, not a typical code license), unarchived, active (7,256 stars, pushed 2026-09-25).",
+   "verdict": "supported",
+   "note": "gh api repos/trailofbits/skills and the dedicated /license endpoint both confirm license CC-BY-SA-4.0 ('Creative Commons Attribution Share Alike 4.0 International'), archived:false, pushed_at:2026-09-25T09:10:46Z, stargazers_count:7256 -- exact match, including the exact star count.",
+   "sources": [
+    "gh api repos/trailofbits/skills (2026-09-26)",
+    "gh api repos/trailofbits/skills/license (2026-09-26)"
+   ]
+  },
+  {
+   "name": "trailofbits-no-releases-versioning",
+   "claim": "No GitHub Releases exist for this repo (releases/latest returns 404); it is versioned by commit, not tag.",
+   "verdict": "supported",
+   "note": "gh api releases/latest returns 404 Not Found; releases list length is 0; the tags list is empty ('NO TAGS'). This is even stronger than the claim: there are zero tags in addition to zero releases, fully consistent with pure commit-based versioning.",
+   "sources": [
+    "gh api repos/trailofbits/skills/releases/latest (404, checked 2026-09-26)",
+    "gh api repos/trailofbits/skills/tags (empty, checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "trailofbits-cap-description",
+   "claim": "Curated security-analysis/audit skill collection from Trail of Bits; supplies review procedures/prompts, not an executable scanner.",
+   "verdict": "supported",
+   "note": "WebFetched the repo's own README directly: 'A Claude Code plugin marketplace from Trail of Bits providing skills to enhance AI-assisted security analysis, testing, and development workflows.' One nuance for the record: the README frames these as installable executable Claude Code/Codex plugins ('/plugin marketplace add trailofbits/skills'), not inert prompt text -- but they remain analysis/review skills, not an independent SBOM/vuln/secret-scanning engine, so the candidate's underlying fit reasoning (cannot fill a winner slot) still holds.",
+   "sources": [
+    "https://raw.githubusercontent.com/trailofbits/skills/main/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "trailofbits-catalog-rationale-and-filing",
+   "claim": "Filed under the distinct sibling layer 'security-skills' (decision='alternative'), reviewed at commit 123037ec, rationale: 'select individual skills ... instead of installing an entire overlapping hook/skill pack.'",
+   "verdict": "supported",
+   "note": "Opened catalogs/us-equities/star-audit.json at the cited location (repository field at line 6124) myself: role 'Security-analysis and audit skill collection' (verbatim), layers:['security-skills'], decision:'alternative', rationale text verbatim as quoted, source_commit:'123037ec8aed26f0d86327cc39137ee5043e5deb' -- exact match, including the exact line number.",
+   "sources": [
+    "catalogs/us-equities/star-audit.json:6123-6158 (opened this session)"
+   ]
+  },
+  {
+   "name": "systemic-layer-requirement-vs-title",
+   "claim": "The layer's title ('Security and supply chain') diverges from its actual prose requirement, which is about research-worker/broker-authority governance, not SBOM/vulnerability scanning -- a claim repeated across the Syft, Grype and OpenBao fit notes.",
+   "verdict": "supported",
+   "note": "Opened catalogs/landscape/us-equities.json's security-supply-chain layer entry directly: requirement field reads 'Run bounded research with native identity and complete returned results; supervise owned processes; retain scoped telemetry, failed attempts and recoverable state without granting research workers broker execution authority.' This is a governance/authority statement, not an SBOM/scanning requirement, confirming the recurring cross-candidate observation. (The layer's separate machine-readable taxonomy tags in sota-convergence/manifest-20260923.json -- security, sbom, secrets, vulnerability-analysis -- do match what Syft/Grype/Gitleaks actually do, so the tension is between the taxonomy tags and the prose requirement, both of which are real and both of which I opened.)",
+   "sources": [
+    "catalogs/landscape/us-equities.json:4290-4297 (opened this session)",
+    "catalogs/sota-convergence/manifest-20260923.json:165-170 (opened this session)"
+   ]
+  },
+  {
+   "name": "systemic-cosign-precedent-not-reflected-in-open-gaps",
+   "claim": "(Not asserted by any candidate; found independently.) The repo's own supply-chain README documents a native cosign verify-blob run that the layer's recorded open_gaps and catalog entries do not reflect.",
+   "verdict": "supported",
+   "note": "blueprints/us-equities/supply-chain/README.md (read in full) states: 'On September 23, 2026, cosign verify-blob (v3.1.3) checked the Syft and Grype checksum files against their keyless signatures and exited 0 ... A tampered blob and a wrong identity each failed with exit 1 ... Gitleaks 8.30.1 publishes neither a signature nor a GitHub attestation, so it remains checksum-only.' Yet catalogs/landscape/us-equities.json's open_gaps (opened this session) still states 'signature_verified is false in both receipts. Only checksums were matched,' and the agents-operations.json syft/cosign entries' limitations still say signature verification 'were not performed' / 'no signing or identity flow initiated here.' This is a genuine internal staleness/inconsistency in the repo's own evidence trail as of 2026-09-26: it actually undercuts the Cosign candidate's 'untested, no receipt use' framing (a real, positive native precedent already exists) even though the candidate's specific SECURITY.md claim for that same argument is separately refuted (see cosign-cap-security-md-precedent).",
+   "sources": [
+    "blueprints/us-equities/supply-chain/README.md lines ~48-62 (opened in full)",
+    "catalogs/landscape/us-equities.json open_gaps, security-supply-chain layer (opened this session)",
+    "catalogs/us-equities/agents-operations.json:1429-1432,1550-1553 (opened this session)"
+   ]
+  },
+  {
+   "name": "methodological-evidence-level-scope",
+   "claim": "Scope note on this verification pass itself.",
+   "verdict": "supported",
+   "note": "Per the task's read-only mandate, no tool in this review was installed, executed, or re-run; no credentials were read; nothing was written to the checkout. Every 'native_execution' claim above was confirmed only at source_review level -- I opened and read the repo's own recorded receipts/catalog text describing a past run -- never promoted to a fresh native_execution by me. Repo-checkout HEAD at time of review: 19092db06066cba3c8f05315a4d11b67571bc088 (2026-09-26T13:07:06Z), confirmed clean via git status. Scope was bounded to the 3 current winners (syft, grype, gitleaks) plus the next 5 candidates by stated fit (trivy, cosign, openbao, dependabot-core, trail-of-bits-skills) = 8 unique tools, per the task's 'top 8 candidates' instruction; the remaining 7 lower-ranked candidates (warpgate, the 2020 adversarial-RL paper, TradeMemory Protocol, OSV-Scanner, OpenSSF Scorecard, TruffleHog, Docker MCP Gateway/Snyk agent-scan/Cisco mcp-scanner) were not independently deep-verified in this pass.",
+   "sources": [
+    "git -C wt-conv log -1 (2026-09-26)",
+    "git -C wt-conv status --short (clean, 2026-09-26)"
+   ]
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "Syft",
+   "url": "https://github.com/anchore/syft",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Retained winner, currency reverified today (2026-09-26) via gh api, not re-executed by me: pin v1.52.0 is still upstream's latest (released 2026-09-17), repo pushed 2026-09-25, 9,613 stars, Apache-2.0, unarchived -- no drift since the 09-23 sweep. Its own recorded open gap is unchanged: it inventories Python package metadata only, not bundled Rust/Cython/native libraries, host OS packages, or code outside the scanned venv, so it satisfies the layer's title ('supply chain'=SBOM) far better than its actual requirement text (agent/broker-authority governance), which no SBOM tool touches."
+  },
+  {
+   "name": "Grype",
+   "url": "https://github.com/anchore/grype",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Retained winner, currency reverified today: pin v0.119.0 is still upstream's latest (released 2026-09-17), pushed 2026-09-25, 12,931 stars, Apache-2.0, unarchived. The repo's own open_gaps flag an unresolved target mismatch: the 09-22 scan covered the 21-package Nautilus runtime venv, not the separate 36-package equity-worker-sdk the supply-chain README claims is covered (e.g. openai-codex 0.154.0 and exchange-calendars 4.13.2 appear only in the 36-pkg inventory and have never been Grype-scanned). Zero matches also only holds against that one dated DB build, not later disclosures."
+  },
+  {
+   "name": "Gitleaks",
+   "url": "https://github.com/gitleaks/gitleaks",
+   "modalities": [
+    "star",
+    "github_search"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Retained winner and one of the given starred inputs (same repo). Pin v8.30.1 remains upstream's latest tag as of 2026-09-26, but that release is from 2026-03-21 (~6 months old) -- the slowest release cadence of any tool in this set, though repo activity is current (pushed 2026-09-23, 29,493 stars, MIT, unarchived), so it is 'maintained' under the 12-month rule, not stale. The recorded gap is unchanged and has grown: the 22-commit scan is a week-3 snapshot from 2026-09-19, and no re-scan covers the ~7 days of history added since, let alone certifies no secret exists anywhere."
+  },
+  {
+   "name": "Trivy",
+   "url": "https://github.com/aquasecurity/trivy",
+   "modalities": [
+    "star",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Given starred input, already source-reviewed and filed as an 'alternative' (readme_license_overview depth, not individually deep-audited) under this same layer, decision never promoted to conditional/default. Confirmed still-current pin (v0.74.0, released 2026-08-14) as of today; 38,082 stars (most-starred tool in this whole set), Apache-2.0, pushed 2026-09-25 (most recently active repo checked). Would close the 'code/packages outside the scanned Python venv' gap Grype/Syft leave open (Trivy also does OS-package and IaC scanning) without duplicating Gitleaks' secret-scanning lane, per the catalog's own note."
+  },
+  {
+   "name": "Cosign",
+   "url": "https://github.com/sigstore/cosign",
+   "modalities": [
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Directly targets the layer's own named gap: 'Signature and provenance verification is missing for every installed supply-chain tool: signature_verified is false in both receipts. Only checksums were matched.' Filed 'conditional' with review_status 'not_individually_reviewed' (thin source_review) and open_gaps notes 'cosign ... has no receipt use.' Pin v3.1.3 still current (released 2026-08-06) as of today; 6,330 stars, Apache-2.0, pushed 2026-09-24. This project's own SECURITY.md shows it already trusts a sibling mechanism (GitHub artifact attestation via 'gh attestation verify') for its own release artifacts -- a real precedent for extending signature verification to Grype/Syft/Gitleaks/Trivy's own published release assets, which all publish Sigstore signatures."
+  },
+  {
+   "name": "OpenBao",
+   "url": "https://github.com/openbao/openbao",
+   "modalities": [
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Targets the layer's largest open gap verbatim: 'Secret lifecycle and service identity have no native evidence. No winner manages or scopes the broker credential environment variables. OpenBao is untested, not failed.' NEW FINDING (today, 2026-09-26): the catalog pin v2.6.2 is now behind upstream -- gh api shows v2.7.0 released 2026-09-23 (repo pushed 2026-09-24, 7,910 stars, MPL-2.0, unarchived). The 2026-09-23 internal sweep still recorded v2.6.2 as matching upstream, so this pin went stale within 3 days; this is exactly the kind of drift the task asked to catch and should be corrected before any adoption receipt cites v2.6.2."
+  },
+  {
+   "name": "Dependabot Core",
+   "url": "https://github.com/dependabot/dependabot-core",
+   "modalities": [
+    "star",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Given starred input. Already source-reviewed (readme_license_overview) but filed under a DIFFERENT layer ('dependency-maintenance', decision='alternative'), not security-supply-chain -- the starred-input association with this layer is looser than the catalog's own filing. Confirmed active today: v0.397.0 released 2026-09-21, pushed 2026-09-25, 5,787 stars, MIT, unarchived. Complements rather than substitutes for Grype/OSV-Scanner: it proposes dependency-version PRs, it does not scan or block on vulnerabilities itself."
+  },
+  {
+   "name": "Trail of Bits skills",
+   "url": "https://github.com/trailofbits/skills",
+   "modalities": [
+    "star",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Given starred input. Filed under a distinct sibling layer ('security-skills', decision='alternative'), not this one. It supplies review procedures/prompts, not an executable scanner, so it cannot fill a winner slot that currently holds SBOM/vuln/secret tools; catalog rationale explicitly says to 'select individual skills ... instead of installing an entire overlapping hook/skill pack.' Confirmed active: pushed 2026-09-25, 7,256 stars, unarchived. No GitHub Releases exist for this repo (releases/latest returns 404) -- it is versioned by commit, not tag; CC-BY-SA-4.0 is a content license, not a typical code license, so any verbatim reuse needs attribution/share-alike compliance, not just an OSS-permissive check."
+  },
+  {
+   "name": "Warpgate",
+   "url": "https://github.com/warp-tech/warpgate",
+   "modalities": [
+    "star",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Given starred input; its supplied 'why' claims it 'addresses the layer's open secret-issuance/access-authority gap,' which overstates the match -- Warpgate scopes and records HUMAN operator access to hosts/DBs over SSH/HTTP, it does not issue, scope or rotate broker API credentials for an autonomous research worker, nor gate MCP tool-call authority, which is what the layer's requirement text actually names. Already filed under a different sibling layer ('remote-access', decision='alternative'), correctly judged 'unnecessary additional ingress ... for the current local workflow.' Confirmed active: v0.29.1 released 2026-09-23, pushed 2026-09-24, 7,974 stars, Apache-2.0, unarchived."
+  },
+  {
+   "name": "Adversarial Attacks on Deep Algorithmic Trading Policies",
+   "url": "https://arxiv.org/abs/2010.11388",
+   "modalities": [
+    "awesome",
+    "paper"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Poor fit as filed against this layer, and not independently re-read this session beyond the supplied note. It studies model-robustness of deep-RL trading POLICIES, not software-supply-chain integrity, secret handling or agent broker-execution authority -- and this stack has adopted no RL trading policy to hardened in the first place (research-factors-ml's winners are skfolio and EdgarTools; strategy-research's decision is still 'research', no strategy frozen). It is also 6 years old, well outside the task's 2026-recency preference, with no accompanying maintained codebase found. Worth only a forward pointer if an RL-based strategy is ever adopted."
+  },
+  {
+   "name": "TradeMemory Protocol",
+   "url": "https://github.com/mnemox-ai/tradememory-protocol",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Weak/niche fit but genuinely more on-topic than the RL paper: an MCP-tool-based tamper-evident audit trail for AI trading-agent decisions/memory touches this layer's 'retain scoped telemetry ... recoverable state' language more directly than any adopted winner. However it is young (created 2026-02-23, ~7 months old), last pushed 2026-09-14 (12 days before this check, still active), 1,423 stars, MIT -- and every capability claim (RFC 3161 anchoring, SHA-256 tamper-evidence) comes only from its own repo description; nothing here was read at a source pin or independently verified. Treat as a source-review candidate, not an adoption candidate."
+  },
+  {
+   "name": "OSV-Scanner",
+   "url": "https://github.com/google/osv-scanner",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Strongest 'beyond the given inputs' find for the scanning slot. This project's OWN GitHub Actions automation already runs OSV-Scanner as a PR check (catalogs/foundation/automation.json, per this layer's own 2026-09-23 open_gaps note: 'is an active pull-request check ... but is not a component or candidate of this layer; reconcile the layer row with the automation it runs') -- an already-flagged, still-unreconciled gap between what CI runs and what the layer's winner list records. Google-maintained, consumes the same OSV database Grype also uses (a natural cross-check against Grype's zero-match result rather than a replacement for it). Confirmed current: v2.6.0 released 2026-09-14, pushed 2026-09-25, 11,092 stars, Apache-2.0, unarchived."
+  },
+  {
+   "name": "OpenSSF Scorecard",
+   "url": "https://github.com/ossf/scorecard",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Directly on-topic for a layer literally titled 'security and supply chain': instead of scanning this project's own dependencies, Scorecard scores the UPSTREAM repos this catalog depends on -- including Grype/Syft/Gitleaks/Cosign/OpenBao/Trivy themselves -- which closes exactly the comparative gap the layer's own open_gaps names: 'No measured comparison exists between the winners and any alternative scanner or SBOM tool.' Release cadence has slowed (latest tag v5.5.0, released 2026-04-23, ~5 months old) though the repo remains actively committed (pushed 2026-09-25, 5,711 stars, Apache-2.0, unarchived); under the 12-month rule this is maintained, not stale, but slower than every SBOM/scanner tool checked above."
+  },
+  {
+   "name": "TruffleHog",
+   "url": "https://github.com/trufflesecurity/trufflehog",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Direct head-to-head competitor to the Gitleaks winner that closes its recorded gap verbatim: 'does not certify that no secrets exist' -- verification turns a pattern match into a live/dead result Gitleaks structurally cannot produce. This project's own prior adversarial review already source-reviewed it and voted 'refuted_targeted_candidate' (dissenting lens: verification needs live outbound calls against a controlled, revocable test credential, which the read-only/offline framing and the existing synthetic 2026-09-19 gitleaks receipt cannot exercise) -- a real methodological blocker, not a quality defect in the tool. Extremely active: v3.97.9 released 2026-09-24 (a newer patch than the 09-23 sweep's v3.97.8), repo pushed TODAY 2026-09-26T06:35:52Z, 28,060 stars. AGPL-3.0 is copyleft -- run as a separate CLI process, don't vendor/link its code, to avoid license entanglement."
+  },
+  {
+   "name": "Docker MCP Gateway",
+   "url": "https://github.com/docker/mcp-gateway",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The one candidate this round that targets the layer's ACTUAL requirement text head-on -- 'supervise owned processes ... without granting research workers broker execution authority' -- rather than the narrower SBOM/vuln/secret-scanning reading the three adopted winners address; every MCP tool call in a stack like this one (ai-memory, codebase-memory, qmd, serena, jcodemunch, etc.) is exactly the 'research worker' action the requirement wants bounded, and a gateway that scopes secrets/egress per-MCP-server is a structural mechanism for that where Grype/Syft/Gitleaks are silent. Two close 2025-2026 alternatives, both independently confirmed via gh api, worth naming alongside it: (1) Snyk Agent Scan (https://github.com/snyk/agent-scan) -- Invariant Labs, its original author, was acquired by Snyk in June 2025 (snyk.io/news, corroborated by GlobeNewswire/Techzine/Yahoo Finance), and 'gh api repos/invariantlabs-ai/mcp-scan' now silently redirects to snyk/agent-scan (v0.6.4, released 2026-09-21, pushed TODAY 2026-09-26T12:21:47Z, 3,091 stars, Apache-2.0) -- a rename/ownership change a naive stars-or-awesome-list snapshot would misattribute to a dead repo; it is a pre-install scanner (prompt injection/tool-poisoning/destructive-capability detection), not a runtime gate. (2) Cisco AI Defense MCP Scanner (cisco-ai-defense/mcp-scanner, tag 4.8.4, released 2026-08-28, pushed 2026-09-19, 1,079 stars, Apache-2.0) -- YARA + LLM-based + behavioral pre-install scanning with explicit supply-chain checks. None of the three has any native_execution evidence on this stack; all are unarchived and actively pushed within the last week. Docker's own repo has no GitHub Releases API entries (ships via CLI-plugin/Docker Desktop channel) but carries proper semver git tags, latest v0.44.1 (tag commit dated 2026-09-16), 1,587 stars, MIT, pushed 2026-09-23."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-cached",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/security-supply-chain--gpt-6-cached.md"
+  },
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/security-supply-chain--gpt-6-live.md"
+  }
+ ]
+}

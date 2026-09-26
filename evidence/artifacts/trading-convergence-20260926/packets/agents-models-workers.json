@@ -1,0 +1,616 @@
+{
+ "layer_id": "agents-models-workers",
+ "proposal": {
+  "layer_id": "agents-models-workers",
+  "proposal": "add_candidates",
+  "summary": "Judged strictly on verified (supported) evidence, none of the 15 researched candidates reaches native_execution-level proof of being better than the three incumbents on this stack's own tasks. The layer's own repeated finding stands even after this sweep: \"No non-adopted candidate in this packet has retained comparative evidence sufficient to prefer it\" (conv/layers.json open_gaps, and independently corroborated in catalogs/sota-convergence/manifest-20260923.json's uncited_claims/next_steps). Recommendation is add_candidates, not a bare keep and not challenge: register one concrete, evidence-backed trial candidate (Claude Agent SDK) for the sdk/native-workers facet, log two genuinely new-to-this-repo finds as tracked references, and fix two verified pin-hygiene gaps the sweep surfaced.\n\nWinner-by-winner (verified directly against repo files, not just the researcher's paraphrase): codex-native-sdk's recorded pin (CLI rust-v0.155.1 / PyPI openai-codex 0.154.0) is genuinely stale -- gh api and PyPI JSON, both dated 2026-09-26, show 4 non-prerelease CLI releases (156.0, 156.1, 157.0, 157.1) and 5 PyPI releases (155.1, 156.0, 156.1, 157.0, 157.1) have shipped since the pin (the packet's \"two releases behind\" claim is refuted; the real gap is larger). I independently read catalogs/sota-convergence/manifest-20260923.json and found this pin already flagged pin_behind_upstream on 2026-09-23 -- the gap has been open and widening for at least three days -- and manifests/stack.json's own version field (read directly) still says \"0.155.1\" with no cutover note, unlike ai-memory's entry. This is a live operational lag, not paperwork; status: stale. foundation-ai-memory's catalog pin text (v2.3.1, in both conv/layers.json and catalogs/landscape/us-equities.json) is stale by three upstream releases (latest v2.4.1, 2026-09-25), but manifests/stack.json's version field, read directly, already says \"2.4.1\" with a dated freshness note describing an approved, rehearsed cutover on this host \"since 2026-09-26\" -- independently corroborated by this session's own memory index line (\"ai-memory 2.4.1 switched (#291, #307)\"). The operational component matches upstream HEAD; only the two catalog pin fields need a refresh commit. No alternative (Mem0/Hindsight/Graphiti/Cognee/Letta Code/Supermemory) has matched-task evidence against it, so status: earns_it. foundation-socraticode is one release behind (v1.14.0 vs v1.15.0 -- an exact +1 gap per gh api, zero intervening tags), a gap that only opened in the last two days (the 09-23 sweep still showed v1.14.0 as upstream-current) and is a recorded, deliberate user deferral (\">=10-01\" per this session's memory index), not neglect; repo remains actively pushed (2026-09-24). No alternative conceptual-code-search candidate was proposed or verified; status: earns_it.\n\nHighest-priority unfinished action, ahead of any external candidate: catalogs/landscape/us-equities.json's own verdict_overturn_when already fully specifies (exact CLI commands with file:line citations) a same-task, matched-budget trial across codex-native-sdk, DeerFlow-via-codex-acp and OmniRoute. Preliminary, uncontrolled numbers in conv/layers.json's open_gaps look favorable to the DeerFlow/codex-acp arm (1 of 1 tasks completed, 0 blocked, 42,345 cumulative tokens, vs. codex-native-sdk's 1 of 3 completed, 2 blocked, up to 204,091 tokens) -- but that same source explicitly disqualifies the comparison (\"c19 read files with head -c, while c20's task required Context Mode extraction, so the numbers are not comparable\"). This is not a verified advantage, so codex-acp/DeerFlow and OmniRoute stay in \"rejected\" rather than \"challengers\" -- but running the already-specified trial is the single cheapest, most-ready next step in the whole packet.\n\nRejections were made on today's own verified facts, not incumbency: OpenAI Agents SDK's cadence (last tag 09-17, nine days before this check) trails both Codex's own upstream and Claude Agent SDK's near-daily cadence, and this repo's own prior source_review (catalogs/us-equities/agents-operations.json, checked 2026-09-19) already notes it needs a wholly separate, metered OpenAI API entitlement, not the existing Codex subscription flow -- so it was rejected, not promoted, despite also being an official first-party SDK. Complementary lanes not formally in winners[] but worth noting: Serena's installed version (2.0.0.dev0 @ c6fbd1c5, per manifests/stack.json) differs from its catalogued pin (v1.7.0) and carries a split MIT (SolidLSP) / GPL-3.0-or-later (application) license; QMD showed a fresh, dated live-status call today. Neither is a rejected candidate -- both are adopted infrastructure -- so neither appears in winner_status (scoped to the three formal winners[] entries) or rejected.\n\nTwo 2026 papers (InKH, arXiv:2606.01886; KTD-Fin, arXiv:2605.28359) speak directly to this layer's own retrieval-quality-measurement gap but have no located public code (confirmed absent from every catalog/manifest file grepped), so they are tracked as method references for the layer's own preregistered held-out trial, not as installable candidates or rejections. TradeMemory Protocol is the most literally on-point new find (financial-agent memory with an audit trail) but is self-declared \"feature-complete, in maintenance mode... no new features... planned\" -- rejected as a frozen design reference, not a growing contender.\n\nPaper-lane impact across this entire layer is none: every candidate here sits in the research/memory/worker-SDK lane, which this repo's own policy (blueprints/us-equities/workers/policy.md: \"no orders or credential stores\") and north-star rule (\"models stay in research\"; paper orders go only through the separate deterministic adaptive-paper engine) wall off from engines-run, paper-acts-passed and paper-fills counts.",
+  "winner_status": [
+   {
+    "component_id": "codex-native-sdk",
+    "status": "stale",
+    "note": "Pin (CLI rust-v0.155.1 / PyPI openai-codex 0.154.0) is verified 4-5 releases behind upstream as of 2026-09-26 (gh api non-prerelease tags rust-v0.156.0/156.1/157.0/157.1 after the pin; PyPI JSON: 155.1/156.0/156.1/157.0/157.1 after 0.154.0) -- the adversarial check's 'two releases' figure is refuted, the true gap is larger. catalogs/sota-convergence/manifest-20260923.json (read directly) already flagged this pin_behind_upstream on 2026-09-23, so the gap has been open and widening for 3+ days. manifests/stack.json's version field (read directly) still reads '0.155.1' with no cutover note, unlike ai-memory's entry -- this is a live operational lag, not a stale document. Upstream itself remains excellently maintained (Apache-2.0, archived:false, pushed same day); the one completed native_execution research-task proof (workers/receipt.json) is still anchored to the old pin. No alternative SDK has matched or exceeded it on a real task. Action: refresh the pin and re-run the existing frozen c20 task at rust-v0.157.1/0.157.1, not a component swap."
+   },
+   {
+    "component_id": "foundation-ai-memory",
+    "status": "earns_it",
+    "note": "Catalog pin text (v2.3.1 in both conv/layers.json and catalogs/landscape/us-equities.json) is stale by 3 upstream releases (latest v2.4.1, published 2026-09-25, MIT, archived:false -- gh api). But manifests/stack.json's version field, read directly by me, already says '2.4.1', with a freshness note describing an approved, rehearsed cutover to 2.4.1 on this host 'since 2026-09-26' after a 2.4.0 cutover on 09-25 -- independently corroborated by this session's own memory index ('ai-memory 2.4.1 switched (#291, #307)'). The operational component matches upstream HEAD; only the two catalog pin fields lag. No candidate (Mem0/Hindsight/Graphiti/Cognee/Letta Code/Supermemory) has native_execution or a matched-task comparison against it -- all are source_review/requirement_fit only per this repo's own candidate entries in catalogs/landscape/us-equities.json. Action: a documentation refresh commit on the two catalog pin fields, not a component change."
+   },
+   {
+    "component_id": "foundation-socraticode",
+    "status": "earns_it",
+    "note": "Pin v1.14.0 is exactly one release behind upstream v1.15.0 (published 2026-09-24T10:58:58Z per gh api, zero intervening tags). This gap only opened in the last ~2 days: catalogs/sota-convergence/manifest-20260923.json (read directly) shows v1.14.0 was still upstream-current as of 2026-09-23. manifests/stack.json confirms the installed version is still '1.14.0' (no stealth upgrade, unlike ai-memory). This is a recorded, deliberate deferral, not neglect -- this session's memory index states 'socraticode deferred >=10-01'. Repo remains actively maintained (AGPL-3.0, archived:false, pushed 2026-09-24). No alternative conceptual-code-search candidate was proposed or verified in this packet."
+   }
+  ],
+  "challengers": [
+   {
+    "name": "Claude Agent SDK (claude-agent-sdk-python)",
+    "url": "https://github.com/anthropics/claude-agent-sdk-python",
+    "why_better": "Verified as the least pin-drifted official first-party worker SDK checked in this sweep: v0.2.160 released 2026-09-25 (GitHub tag and PyPI upload, gh api + PyPI JSON both confirm, about a minute apart -- an automated same-day dual release), part of a documented near-daily release cadence -- unlike the installed codex-native-sdk pin, verified 4-5 releases behind its own upstream as of today. This repo's own prior source_review (catalogs/us-equities/agents-operations.json, checked_at 2026-09-19, decision=alternative) already read its README at the then-current v0.2.156 and names it a direct comparator for exactly this facet (tagged 'sdk','native-workers'). This is a maintenance/freshness advantage only, verified at the source_review tier for the older pin and at the metadata tier for today's v0.2.160 refresh -- it is NOT a claim of functional superiority: no task-level run of this SDK exists anywhere in this repo, so that is exactly what the trial below would establish, not assume.",
+    "evidence_level": "source_review",
+    "trial_plan": "(1) Resolve the authentication gate first: this repo's own prior source_review (catalogs/us-equities/agents-operations.json, id=claude-agent-sdk) flags that Anthropic's docs prohibit wiring a personal claude.ai/Claude Code login into an automated third-party product without prior approval (code.claude.com/docs/en/agent-sdk/overview) -- confirm a sanctioned SDK authentication route before any code runs; do not reuse existing native OAuth stores. (2) Install the pinned upstream in an isolated venv, outside the tracked stack: `python -m pip install claude-agent-sdk==0.2.160`. (3) Reuse the exact frozen fixture already in the repo -- the same prompt, 180s deadline and read_only sandbox policy from blueprints/us-equities/workers/receipt.json's c20 run and blueprints/us-equities/workers/policy.md -- but drive it through claude_agent_sdk instead of the Codex CLI subprocess, writing a receipt in the same schema so results are field-comparable. (4) Pass criterion: match c20's one successful research-task result (same returned engine/DeerFlow facts) while also completing the two currently-blocked file-extraction follow-ups, under an equally strict read-only sandbox, at equal-or-lower total and failed-attempt token counts than the c20 baseline (135,311 tokens for the completed task; 204,091 across all three turns with 2 blocked). (5) Overturn condition: failure to enforce the same read-only boundary, a need for materially broader tool/file/network scope, inability to clear step 1's approval gate, or worse completion/token results than the c20 baseline on the identical frozen task.",
+    "paper_lane_impact": "none -- this is a research-worker/SDK swap confined to the research lane; per workers/policy.md ('no orders or credential stores') and this repository's own north-star rule (models stay in research; paper orders go only through the separate deterministic adaptive-paper engine), it cannot move engines-run, paper-acts-passed or paper-fills counts.",
+    "sources": [
+     "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.160",
+     "https://pypi.org/project/claude-agent-sdk/0.2.160/",
+     "gh api repos/anthropics/claude-agent-sdk-python (checked 2026-09-26T14:58Z per the research packet; archived:false, license MIT, pushed_at 2026-09-25)",
+     "catalogs/us-equities/agents-operations.json (id=claude-agent-sdk, read directly at repo HEAD 19092db0; checked_at 2026-09-19, decision=alternative, evidence_level=source_review, README read at v0.2.156)",
+     "blueprints/us-equities/workers/receipt.json (c20 baseline: 1 completed task, 2 blocked, 135311/204091 tokens; cited in conv/layers.json open_gaps)",
+     "https://code.claude.com/docs/en/agent-sdk/overview"
+    ]
+   }
+  ],
+  "rejected": [
+   {
+    "name": "OpenAI Agents SDK (openai-agents-python)",
+    "reason": "Metadata only for today's refresh (existence/license/version/maintained), no verified functional advantage. This repo's own prior source_review (catalogs/us-equities/agents-operations.json, checked 2026-09-19) states it 'does not inherit Codex account entitlement' -- trialing it needs a separate, metered/paid OpenAI API surface, not the existing Codex subscription flow. Release cadence (last tag 2026-09-17, 9 days before this check) also trails both Codex's own upstream HEAD and Claude Agent SDK's near-daily cadence."
+   },
+   {
+    "name": "Mem0",
+    "reason": "evidence_kind is 'requirement_fit' in this repo's own candidate list (catalogs/landscape/us-equities.json) -- unexercised fit, not a demonstrated win; no native_execution or matched-task comparison against ai-memory exists."
+   },
+   {
+    "name": "Graphiti",
+    "reason": "Source_review only. This repo's own alternatives entry (catalogs/landscape/us-equities.json) states 'no graph deployment and no extraction-accuracy proof, and default examples need model API credentials' -- a design match to the layer's dated-source language, but unqualified on the layer's own bar."
+   },
+   {
+    "name": "Cognee",
+    "reason": "Source_review only ('conditional' disposition in this repo's own candidate list); no retained run against this stack's own corpus. Fast release velocity (v1.6.1, 2026-09-24) is a maintenance signal, not a capability comparison."
+   },
+   {
+    "name": "Hindsight",
+    "reason": "Source_review only. This repo's own candidate entry notes upstream documents local/native-subscription providers so missing API credentials is not itself disqualifying, but 'published benchmarks are not a matched test of our project recall, source fidelity, boundaries or operating cost' -- the researcher read the README's claim and the paper's existence, not the benchmark numbers themselves."
+   },
+   {
+    "name": "Letta Code",
+    "reason": "Source_review only; this repo's own candidate entry calls it 'a broader runtime-and-memory architecture, not only a drop-in store' -- native-account behavior, recall, lifecycle and migration remain uncompared before any replacement could be considered."
+   },
+   {
+    "name": "Supermemory",
+    "reason": "Source_review only; the cloud-only exclusion is stale (it has a documented local/Ollama route), but the actual selected-implementation provider calls, licensing and retrieval quality remain unconfirmed on this stack."
+   },
+   {
+    "name": "TradeMemory Protocol",
+    "reason": "The most literally on-point new find (financial-trading-agent memory with a tamper-evident audit trail), but its own README states, dated August 2026, that it is 'feature-complete, in maintenance mode... no new features or hosted service are planned.' Treat as a frozen design reference / MCP drop-in, not a growing SOTA contender; also off this layer's literal requirement (durable project knowledge, exact code and dated financial-source retrieval for native harness clients), since it targets per-trade audit trails instead."
+   },
+   {
+    "name": "OmniRoute (as a worker-backend substitute)",
+    "reason": "native_proven evidence_class, but this repo's own astra-receipt.json records two failed attempts (HTTP 400 requiring a newer Codex version; a gateway 499 with no usage reported) before one minimal 136-token completion. Tool/compaction/deferred-tool/full-context/worker parity are explicitly still unproved per routing/README.md -- no verified advantage over codex-native-sdk."
+   },
+   {
+    "name": "codex-acp / DeerFlow (as the alternate worker-backend arm)",
+    "reason": "Not verified as better. conv/layers.json's own open_gaps record preliminary c19+c21 numbers that look favorable (1 of 1 tasks completed, 0 blocked, 42,345 cumulative tokens) against codex-native-sdk's c20 run (1 of 3 completed, 2 blocked, up to 204,091 tokens), but the same source explicitly disqualifies the comparison: 'c19 read files with head -c, while c20's task required Context Mode extraction, so the numbers are not comparable.' catalogs/landscape/us-equities.json's verdict_overturn_when already fully specifies the matched-task trial (exact commands, all three arms) -- running it, not this preliminary data, is the real next step."
+   },
+   {
+    "name": "TradingAgents",
+    "reason": "Off-requirement for this layer -- a multi-agent trading-strategy framework, not a memory/retrieval/worker-SDK component. Already catalogued under a different layer (catalogs/us-equities/repository-index.md: 'engines-strategies: watch'). Best assessed against research-factors-ml / strategy-research, not adopted here."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "scope of this review",
+   "claim": "\"Top 8 candidates by fit\" = the first 8 candidates as submitted (Codex, ai-memory, SocratiCode, Claude Agent SDK, OpenAI Agents SDK, Serena, QMD, Mem0); candidates 9-15 (Graphiti, Cognee, Hindsight, TradeMemory Protocol, TradingAgents, InKH paper, KTD-Fin paper) were treated as the submitter's own \"new finds\" tier and not independently re-verified here.",
+   "verdict": "supported",
+   "note": "Candidates 1-8 are each already present in this layer's existing current_choice/alternatives structure (catalogs/landscape/us-equities.json, catalogs/us-equities/agents-operations.json); candidates 9-15 are explicitly framed by the submitter as outside or adjacent to the catalogued layer (e.g. TradingAgents: \"sits outside this layer's literal requirement text\"; Graphiti/Cognee/Hindsight: no retained execution, source-review only). This ordering is the fit ranking used below.",
+   "sources": [
+    "catalogs/landscape/us-equities.json (layer agents-models-workers, current_choice field, read at repo HEAD 19092db0)"
+   ]
+  },
+  {
+   "name": "winner codex-native-sdk: CLI tag freshness",
+   "claim": "GitHub's latest non-prerelease tag is rust-v0.157.1, published 2026-09-26T01:02:31Z, Apache-2.0, repo not archived, pushed the same day.",
+   "verdict": "supported",
+   "note": "gh api repos/openai/codex returned license Apache-2.0, archived:false, pushed_at 2026-09-26T06:34:53Z. gh api repos/openai/codex/releases confirms rust-v0.157.1 as the newest non-prerelease tag, published_at 2026-09-26T01:02:31Z exactly (three later tags in the list -- rust-v0.159.0-alpha.4/rust-v0.158.0-alpha.2.1/rust-v0.158.0-alpha.15.1 -- are all prerelease:true).",
+   "sources": [
+    "gh api repos/openai/codex",
+    "gh api repos/openai/codex/releases",
+    "https://github.com/openai/codex/releases/tag/rust-v0.157.1"
+   ]
+  },
+  {
+   "name": "winner codex-native-sdk: PyPI freshness",
+   "claim": "PyPI's openai-codex latest is 0.157.1, uploaded 2026-09-26T01:14:33Z.",
+   "verdict": "supported",
+   "note": "curl https://pypi.org/pypi/openai-codex/json gives info.version=0.157.1 and the 0.157.1 file's upload_time_iso_8601 = 2026-09-26T01:14:33.348975Z, matching the claim to the second. A direct GET of https://pypi.org/pypi/openai-codex/0.157.1/json also returns HTTP 200.",
+   "sources": [
+    "https://pypi.org/pypi/openai-codex/json",
+    "https://pypi.org/project/openai-codex/0.157.1/"
+   ]
+  },
+  {
+   "name": "winner codex-native-sdk: \"two releases behind\" count",
+   "claim": "The installed pin (CLI rust-v0.155.1 / PyPI openai-codex 0.154.0) is exactly two releases behind upstream on both surfaces.",
+   "verdict": "refuted",
+   "note": "Enumerating gh api repos/openai/codex/releases (non-prerelease only) between the pin and HEAD gives four releases after rust-v0.155.1 (2026-09-18T20:03:04Z): rust-v0.156.0 (09-22), rust-v0.156.1 (09-23), rust-v0.157.0 (09-25), rust-v0.157.1 (09-26). PyPI's own release history (fetched from the same JSON payload) shows five releases after 0.154.0 (2026-09-10): 0.155.1, 0.156.0, 0.156.1, 0.157.0, 0.157.1. Even under the most generous reading (\"point release\" = minor version only, ignoring patch bumps), the CLI is 2 minor versions behind (156, 157) but the PyPI package is 3 minor versions behind (155, 156, 157) -- \"two\" does not hold for both surfaces as claimed.",
+   "sources": [
+    "gh api repos/openai/codex/releases",
+    "https://pypi.org/pypi/openai-codex/json",
+    "manifests/stack.json (codex id, version field \"0.155.1\", read at repo HEAD)"
+   ]
+  },
+  {
+   "name": "winner foundation-ai-memory: release freshness",
+   "claim": "GitHub confirms v2.4.1 as ai-memory's current head, published 2026-09-25T21:46:32Z, MIT license, not archived, repo pushed 2026-09-25.",
+   "verdict": "supported",
+   "note": "gh api repos/akitaonrails/ai-memory returned license MIT, archived:false, pushed_at 2026-09-25T21:17:46Z. gh api .../releases shows v2.4.1 as the newest entry, published_at 2026-09-25T21:46:32Z exactly, ahead of v2.4.0 (09-21), v2.3.2 (09-20) and v2.3.1 (09-17).",
+   "sources": [
+    "gh api repos/akitaonrails/ai-memory",
+    "gh api repos/akitaonrails/ai-memory/releases",
+    "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1"
+   ]
+  },
+  {
+   "name": "winner foundation-ai-memory: catalog pin is v2.3.1 and stale",
+   "claim": "The layer's own recorded pin for ai-memory is v2.3.1, and it is stale relative to upstream.",
+   "verdict": "supported",
+   "note": "catalogs/landscape/us-equities.json winners[] entry for component_id foundation-ai-memory literally reads \"pin\": \"v2.3.1\". The same file's open_gaps list states \"Its pin (v2.3.1) is behind upstream (v2.4.0)\" (checked_at 2026-09-22) -- and upstream has since moved one further release to v2.4.1 (2026-09-25), so the snapshot is now stale by two releases, not one.",
+   "sources": [
+    "catalogs/landscape/us-equities.json (winners[].component_id=foundation-ai-memory, and open_gaps array)"
+   ]
+  },
+  {
+   "name": "winner foundation-ai-memory: \"manifests/stack.json already recorded 2.3.2\"",
+   "claim": "manifests/stack.json already recorded ai-memory version 2.3.2 (i.e. ahead of the landscape file's v2.3.1 but behind the 2.4.1 the host switched to).",
+   "verdict": "refuted",
+   "note": "Reading manifests/stack.json directly, the ai-memory entry's \"version\" field is \"2.4.1\", not \"2.3.2\". 2.3.2 appears only inside that entry's prose \"freshness\" note as a superseded historical state (\"2.4.0 had replaced 2.3.2 there on 2026-09-25\") and as the separately-tracked Mac-host pin (\"The Mac pin stays 2.3.2\"). The file also asserts \"the landscape winner pin stays 2.3.2\" -- which itself conflicts with what catalogs/landscape/us-equities.json actually contains (\"v2.3.1\", not 2.3.2), a pre-existing internal inconsistency independent of this candidate claim. Under a literal reading of \"stack.json recorded 2.3.2\", the primary source I opened does not support it.",
+   "sources": [
+    "manifests/stack.json (id=ai-memory block, read at repo HEAD 19092db0)"
+   ]
+  },
+  {
+   "name": "winner foundation-ai-memory: host memory records same-day switch to 2.4.1",
+   "claim": "This host's own memory index (workstation-sota-refresh-20260925 entry) records switching to ai-memory 2.4.1 the same day upstream published it.",
+   "verdict": "supported",
+   "note": "The user's MEMORY.md contains the line: \"[Workstation SOTA refresh 2026-09-25] -- rtk/markitdown/mcporter/ai-memory 2.4.1 switched (#291, #307); socraticode deferred >=10-01; ...\", matching the claim verbatim. manifests/stack.json's freshness note independently corroborates a 2.4.1 cutover on this host, though it dates the concrete WSL2 cutover to \"since 2026-09-26\" rather than 2026-09-25 -- a same-session/near-midnight-UTC nuance worth flagging, but the cited memory entry itself says what the claim says it says.",
+   "sources": [
+    "<private-memory> (workstation-sota-refresh-20260925 line, given verbatim in this session's system context)",
+    "manifests/stack.json (id=ai-memory, freshness field)"
+   ]
+  },
+  {
+   "name": "winner foundation-socraticode: release freshness",
+   "claim": "Pin v1.14.0 is one release behind; GitHub's latest tag is v1.15.0, published 2026-09-24T10:58:58Z, AGPL-3.0, not archived, repo pushed 2026-09-24.",
+   "verdict": "supported",
+   "note": "gh api repos/giancarloerra/SocratiCode returned license AGPL-3.0, archived:false, pushed_at 2026-09-24T21:37:20Z. gh api .../releases confirms v1.15.0 published_at 2026-09-24T10:58:58Z exactly, and it is literally the very next release after v1.14.0 (2026-09-16T14:26:47Z) with no intermediate tag -- so \"one release behind\" is precisely correct, not just directionally correct.",
+   "sources": [
+    "gh api repos/giancarloerra/SocratiCode",
+    "gh api repos/giancarloerra/SocratiCode/releases",
+    "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0"
+   ]
+  },
+  {
+   "name": "winner foundation-socraticode: deliberate deferral",
+   "claim": "This host's memory (2026-09-25) records a deliberate decision to defer any new SocratiCode release until on/after 2026-10-01.",
+   "verdict": "supported",
+   "note": "MEMORY.md's workstation-sota-refresh-20260925 entry reads \"...socraticode deferred >=10-01; dagu held; ...\", matching the claim verbatim.",
+   "sources": [
+    "<private-memory> (workstation-sota-refresh-20260925 line)"
+   ]
+  },
+  {
+   "name": "C1 Codex: official first-party SDK, used as this repo's worker",
+   "claim": "Official OpenAI coding-agent CLI/runtime with a first-party Python SDK (PyPI: openai-codex), used in this repo as the native research-worker backend.",
+   "verdict": "supported",
+   "note": "PyPI JSON info.author=\"OpenAI\"; repo description \"Lightweight coding agent that runs in your terminal\" under github.com/openai (official org). catalogs/landscape/us-equities.json's winners[] why_selected text independently states codex-native-sdk \"is the only adopted candidate that ran a native worker model through the official SDK with an explicit read_only sandbox\", and blueprints/us-equities/workers/receipt.json is cited there as the native run record.",
+   "sources": [
+    "https://pypi.org/pypi/openai-codex/json",
+    "gh api repos/openai/codex",
+    "catalogs/landscape/us-equities.json (winners[].component_id=codex-native-sdk, why_selected)"
+   ]
+  },
+  {
+   "name": "C1 Codex: existence/license/version/maintained",
+   "claim": "license Apache-2.0; latest_version rust-v0.157.1 (CLI)/0.157.1 (PyPI); latest_release_date 2026-09-26; maintained true.",
+   "verdict": "supported",
+   "note": "All fields confirmed exactly: gh api license.spdx_id=Apache-2.0, archived:false, pushed_at 2026-09-26; gh releases latest non-prerelease tag rust-v0.157.1 published 2026-09-26T01:02:31Z; PyPI info.version 0.157.1 uploaded 2026-09-26T01:14:33Z.",
+   "sources": [
+    "gh api repos/openai/codex",
+    "gh api repos/openai/codex/releases",
+    "https://pypi.org/pypi/openai-codex/json"
+   ]
+  },
+  {
+   "name": "C1 Codex: \"two point releases ahead\" of the pin",
+   "claim": "Both surfaces are two point releases ahead of the pinned rust-v0.155.1 / 0.154.0.",
+   "verdict": "refuted",
+   "note": "Same finding as the codex-native-sdk winner check: 4 non-prerelease CLI releases and 5 PyPI releases actually sit between the stated pin and HEAD (see that check for the enumerated list). \"Two\" undercounts both surfaces.",
+   "sources": [
+    "gh api repos/openai/codex/releases",
+    "https://pypi.org/pypi/openai-codex/json"
+   ]
+  },
+  {
+   "name": "C2 ai-memory: capability description and prior native proof",
+   "claim": "Project-scoped shared long-term memory server (auto capture, briefing, LLM consolidation, handoff, disposable-memory lifecycle); already native_execution-proven in this repo at earlier pins (evidence/receipts/native-memory.json).",
+   "verdict": "supported",
+   "note": "evidence/receipts/native-memory.json exists and records both Codex 0.155.1 and Claude 2.1.277 retrieving the same scoped page, with the Claude result text explicitly stating \"ai-memory 2.3.1 runs on loopback port 49374\" -- i.e. native execution proof at an earlier pin, exactly as claimed. This session's own ai-memory MCP server exposes memory_briefing, memory_consolidate, memory_auto_improve, memory_handoff_begin/accept and memory_forget_sweep tools, directly corroborating the briefing/LLM-consolidation/handoff/disposable-lifecycle feature list.",
+   "sources": [
+    "evidence/receipts/native-memory.json (repo checkout, read at HEAD)",
+    "this session's loaded mcp__ai-memory__* tool roster"
+   ]
+  },
+  {
+   "name": "C2 ai-memory: existence/license/version/maintained",
+   "claim": "license MIT; latest_version v2.4.1; latest_release_date 2026-09-25; maintained true.",
+   "verdict": "supported",
+   "note": "gh api repos/akitaonrails/ai-memory: license MIT, archived:false, pushed_at 2026-09-25T21:17:46Z; releases[0] tag v2.4.1 published_at 2026-09-25T21:46:32Z.",
+   "sources": [
+    "gh api repos/akitaonrails/ai-memory",
+    "gh api repos/akitaonrails/ai-memory/releases"
+   ]
+  },
+  {
+   "name": "C3 SocratiCode: capability description and prior native proof",
+   "claim": "Local-embedding conceptual code search/indexing with a file watcher, paired with Qdrant; native_execution already proven in this repo (evidence/receipts/foundation-native-20260920.json, evidence/receipts/native-rag.json).",
+   "verdict": "supported",
+   "note": "SocratiCode's README (raw, main branch) states \"The file watcher keeps the index automatically updated at every file change\" and describes itself as \"The first Qdrant-based MCP/... hybrid semantic + BM25 (RRF-fused) code search\", confirming both the Qdrant pairing and the file-watcher claim verbatim. Both cited receipt files exist in the checkout and reference socraticode: evidence/receipts/native-rag.json documents an actual mcp__socraticode__codebase_search call (score 0.6429, 35 files/139 chunks, real 2048-dim local embeddings) and foundation-native-20260920.json documents a Serena/SocratiCode-focused native check.",
+   "sources": [
+    "https://raw.githubusercontent.com/giancarloerra/SocratiCode/main/README.md",
+    "evidence/receipts/native-rag.json (repo checkout)",
+    "evidence/receipts/foundation-native-20260920.json (repo checkout)"
+   ]
+  },
+  {
+   "name": "C3 SocratiCode: existence/license/version/maintained",
+   "claim": "license AGPL-3.0; latest_version v1.15.0; latest_release_date 2026-09-24; maintained true.",
+   "verdict": "supported",
+   "note": "gh api repos/giancarloerra/SocratiCode: license AGPL-3.0, archived:false, pushed_at 2026-09-24T21:37:20Z; releases[0] tag v1.15.0 published_at 2026-09-24T10:58:58Z.",
+   "sources": [
+    "gh api repos/giancarloerra/SocratiCode",
+    "gh api repos/giancarloerra/SocratiCode/releases"
+   ]
+  },
+  {
+   "name": "C3 SocratiCode: \"one release ahead\" of the pin",
+   "claim": "v1.15.0 is one release ahead of the pinned v1.14.0 (2026-09-16).",
+   "verdict": "supported",
+   "note": "gh releases list has v1.15.0 (2026-09-24T10:58:58Z) immediately followed, going backward, by v1.14.0 (2026-09-16T14:26:47Z) with zero intervening non-prerelease tags -- an exact +1 release gap.",
+   "sources": [
+    "gh api repos/giancarloerra/SocratiCode/releases"
+   ]
+  },
+  {
+   "name": "C4 Claude Agent SDK: official SDK, catalog-reviewed already",
+   "claim": "Official first-party Anthropic Python SDK; already catalog_reviewed in this repo as claude-agent-sdk.",
+   "verdict": "supported",
+   "note": "Repo is under the anthropics GitHub org, license MIT. catalogs/us-equities/agents-operations.json contains an id:\"claude-agent-sdk\" entry with evidence_level:\"source_review\" (the repo's own term for what the candidate paraphrases as \"catalog_reviewed\"), decision \"alternative\", tied explicitly to Codex-account-entitlement caveats.",
+   "sources": [
+    "gh api repos/anthropics/claude-agent-sdk-python",
+    "catalogs/us-equities/agents-operations.json (id=claude-agent-sdk)"
+   ]
+  },
+  {
+   "name": "C4 Claude Agent SDK: same-day release, \"within a minute\"",
+   "claim": "v0.2.160 released on GitHub and PyPI both on 2026-09-25, matching timestamps within a minute of each other.",
+   "verdict": "refuted",
+   "note": "Same calendar day is confirmed (GitHub release published_at 2026-09-25T22:32:31Z; PyPI upload_time_iso_8601 2026-09-25T22:31:24.616384Z), but the two timestamps are 1 minute 7 seconds apart, not within 60 seconds as literally claimed. The substantive point -- a tightly-coupled, likely-automated same-day dual release -- is otherwise accurate; only the specific \"within a minute\" figure is off (by 7 seconds).",
+   "sources": [
+    "gh api repos/anthropics/claude-agent-sdk-python/releases",
+    "https://pypi.org/pypi/claude-agent-sdk/json"
+   ]
+  },
+  {
+   "name": "C4 Claude Agent SDK: existence/license/version/maintained",
+   "claim": "license MIT; latest_version v0.2.160; latest_release_date 2026-09-25; maintained true.",
+   "verdict": "supported",
+   "note": "gh api license MIT, archived:false, pushed_at 2026-09-25T22:32:29Z; releases[0] v0.2.160 published_at 2026-09-25T22:32:31Z. PyPI JSON info.version=0.2.160, info.license=MIT.",
+   "sources": [
+    "gh api repos/anthropics/claude-agent-sdk-python",
+    "https://pypi.org/pypi/claude-agent-sdk/json"
+   ]
+  },
+  {
+   "name": "C5 OpenAI Agents SDK: official SDK, catalog-reviewed, direct analog to Codex",
+   "claim": "Official multi-agent workflow SDK (handoffs, guardrails, tracing); already catalog_reviewed in this repo (openai-agents-sdk), named as a direct analog to the codex-native-sdk winner.",
+   "verdict": "supported",
+   "note": "catalogs/us-equities/agents-operations.json has id:\"openai-agents-sdk\" (evidence_level source_review, decision \"alternative\"), whose own rationale text is framed directly against Codex (\"do not treat it as a subscription-backed Codex replacement\"). A separate gap-resolution file groups claude-agent-sdk and openai-agents together as the two SDK comparators to run head-to-head, matching the \"direct analog\" framing.",
+   "sources": [
+    "catalogs/us-equities/agents-operations.json (id=openai-agents-sdk)",
+    "catalogs/landscape/gap-wave2-20260923+gap-wave3-20260923--gap-resolution.json (next_check field)"
+   ]
+  },
+  {
+   "name": "C5 OpenAI Agents SDK: release date matches PyPI",
+   "claim": "v0.22.3 released 2026-09-17, matching PyPI upload the same day.",
+   "verdict": "supported",
+   "note": "gh releases[0] tag v0.22.3 published_at 2026-09-17T22:19:05Z; PyPI upload_time_iso_8601 2026-09-17T22:20:42.768493Z -- same calendar day, ~97s apart (claim only asserts same day, which holds).",
+   "sources": [
+    "gh api repos/openai/openai-agents-python/releases",
+    "https://pypi.org/pypi/openai-agents/json"
+   ]
+  },
+  {
+   "name": "C5 OpenAI Agents SDK: existence/license/version/maintained",
+   "claim": "license MIT; latest_version v0.22.3; latest_release_date 2026-09-17; maintained true.",
+   "verdict": "supported",
+   "note": "gh api license MIT, archived:false, pushed_at 2026-09-25T22:05:16Z (repo activity continues after the last release tag). releases[0] v0.22.3 published_at 2026-09-17T22:19:05Z.",
+   "sources": [
+    "gh api repos/openai/openai-agents-python",
+    "gh api repos/openai/openai-agents-python/releases"
+   ]
+  },
+  {
+   "name": "C6 Serena: language-server retrieval and prior native proof",
+   "claim": "Exact-symbol/reference retrieval via language servers (SolidLSP) across many languages; native_execution already proven in this repo for Python/TypeScript (evidence/receipts/foundation-native-20260920.json).",
+   "verdict": "supported",
+   "note": "The repo's own LICENSE file (fetched raw) describes SolidLSP as \"the language-server client library that provides the basis for Serena's free code-intelligence backend\", confirming the SolidLSP/language-server claim in Serena's own words. evidence/receipts/foundation-native-20260920.json contains a dedicated \"serena\" object and text \"Fresh native server contexts picked up the Python/TypeScript repair\", directly matching the Python/TypeScript native-proof claim.",
+   "sources": [
+    "https://raw.githubusercontent.com/oraios/serena/main/LICENSE",
+    "evidence/receipts/foundation-native-20260920.json (repo checkout)"
+   ]
+  },
+  {
+   "name": "C6 Serena: split license, GitHub NOASSERTION",
+   "claim": "Repository is split-licensed: SolidLSP under MIT, the Serena application under GPL-3.0-or-later; GitHub's UI reports the non-standard \"NOASSERTION\".",
+   "verdict": "supported",
+   "note": "gh api repos/oraios/serena returns license.spdx_id=\"NOASSERTION\" exactly. The raw LICENSE file states verbatim: \"This repository is licensed per component: SolidLSP under the MIT License and the Serena application under GPL-3.0-or-later.\" Both halves of the claim confirmed from primary sources I opened directly.",
+   "sources": [
+    "gh api repos/oraios/serena",
+    "https://raw.githubusercontent.com/oraios/serena/main/LICENSE"
+   ]
+  },
+  {
+   "name": "C6 Serena: existence/version/maintained",
+   "claim": "latest_version v1.7.0; latest_release_date 2026-08-09; maintained true (repo pushed 2026-09-24, 48 days after the last tag but well inside 12 months).",
+   "verdict": "supported",
+   "note": "gh api archived:false, pushed_at 2026-09-24T08:57:40Z. releases[0] v1.7.0 published_at 2026-08-09T18:38:06Z. 2026-09-26 minus 2026-08-09 = 48 days, matching the candidate's own arithmetic.",
+   "sources": [
+    "gh api repos/oraios/serena",
+    "gh api repos/oraios/serena/releases"
+   ]
+  },
+  {
+   "name": "C7 QMD: local BM25/vec/HyDE description",
+   "claim": "Local BM25 (plus optional vec/HyDE) search engine over markdown docs, no server or model weights required for the lexical lane, per its own repo description.",
+   "verdict": "supported",
+   "note": "gh api description: \"mini cli search engine for your docs, knowledge bases, meeting notes, whatever. Tracking current sota approaches while being all local\" -- confirms the local/no-server framing. The installed qmd MCP server's own instructions (visible in this session) list exactly the claimed modes: \"type:'lex' -- BM25 keyword search... type:'vec' -- semantic vector search... type:'hyde' -- hypothetical document\", and state vector search is not yet enabled (\"No vector embeddings yet\"), matching \"optional\" for vec/HyDE.",
+   "sources": [
+    "gh api repos/tobi/qmd",
+    "this session's qmd MCP server instructions"
+   ]
+  },
+  {
+   "name": "C7 QMD: live status call reproduced",
+   "claim": "Live-executed on this host via mcp__qmd__status: 122 indexed documents across 2 collections (us-equities-foundation: 100, us-equities-catalog: 22), timestamps 2026-09-26T11:42:16Z / 2026-09-26T00:04:51Z; vector index not yet built.",
+   "verdict": "supported",
+   "note": "I called mcp__qmd__status myself in this session and it returned totalDocuments:122, needsEmbedding:122, hasVectorIndex:false, collections us-equities-foundation (100 docs, lastUpdated 2026-09-26T11:42:16.833Z) and us-equities-catalog (22 docs, lastUpdated 2026-09-26T00:04:51.860Z) -- an exact match to the claim, reproduced independently rather than taken on trust.",
+   "sources": [
+    "mcp__qmd__status tool call (this session, 2026-09-26)"
+   ]
+  },
+  {
+   "name": "C7 QMD: existence/license/version/maintained",
+   "claim": "license MIT; latest_version v2.8.3; latest_release_date 2026-08-16; maintained true.",
+   "verdict": "supported",
+   "note": "gh api license MIT, archived:false, pushed_at 2026-09-09T20:51:56Z. releases[0] v2.8.3 published_at 2026-08-16T22:30:34Z. 41 days between latest tag and today, 17 days between last push and today -- both figures the candidate cites check out.",
+   "sources": [
+    "gh api repos/tobi/qmd",
+    "gh api repos/tobi/qmd/releases"
+   ]
+  },
+  {
+   "name": "C8 Mem0: self-description as \"memory layer for personalized AI\"",
+   "claim": "Self-described \"memory layer for personalized AI\".",
+   "verdict": "supported",
+   "note": "The README's top banner image alt text (raw main-branch README) reads verbatim: \"Mem0 - The Memory Layer for Personalized AI\". Note the repo's separate one-line GitHub description field instead reads \"The Memory Layer for AI Agents\" -- both phrasings coexist in the project's own material, so the specific quoted phrase is genuinely present.",
+   "sources": [
+    "https://raw.githubusercontent.com/mem0ai/mem0/main/README.md",
+    "gh api repos/mem0ai/mem0"
+   ]
+  },
+  {
+   "name": "C8 Mem0: README confirms LangChain integration",
+   "claim": "README confirms LangChain-style integration ecosystem.",
+   "verdict": "refuted",
+   "note": "A full case-insensitive search of the current main-branch README.md for \"langchain\" returns zero matches. Whatever LangChain integration Mem0 may offer elsewhere (docs site, separate integrations page), it is not evidenced by the README itself as the claim states.",
+   "sources": [
+    "https://raw.githubusercontent.com/mem0ai/mem0/main/README.md (grep -ico langchain -> 0)"
+   ]
+  },
+  {
+   "name": "C8 Mem0: README confirms CrewAI integration and hosted/self-hosted split",
+   "claim": "README confirms CrewAI-style integration ecosystem and a hosted+self-hosted split.",
+   "verdict": "supported",
+   "note": "README contains a \"CrewAI Integration: Tailor CrewAI outputs with Mem0\" bullet, and a Library / Self-Hosted Server / Cloud Platform comparison table with the line \"Just testing? Use the library. Building for a team? Self-hosted. Want zero ops? Cloud.\" -- both confirmed directly.",
+   "sources": [
+    "https://raw.githubusercontent.com/mem0ai/mem0/main/README.md"
+   ]
+  },
+  {
+   "name": "C8 Mem0: same-day Python + TS releases",
+   "claim": "Python package mem0ai 2.2.1 uploaded to PyPI 2026-09-25; a separate Node/TS SDK (tag ts-v3.3.1) shipped the same day.",
+   "verdict": "supported",
+   "note": "PyPI JSON: info.version=2.2.1, upload_time_iso_8601=2026-09-25T17:36:07.480270Z. Git tag ts-v3.3.1 resolves to commit 94c3fe9, committed 2026-09-25T17:34:12Z with message \"chore(release): bump Python SDK to 2.2.1 and TypeScript SDK to 3.3.1 (#7456)\" -- an explicit, same-commit confirmation that both SDKs were bumped together the same day (the two timestamps are 115s apart, both within the same release commit).",
+   "sources": [
+    "https://pypi.org/pypi/mem0ai/json",
+    "gh api repos/mem0ai/mem0/git/refs/tags/ts-v3.3.1",
+    "gh api repos/mem0ai/mem0/commits/94c3fe9f238f3dbf29c9ce98643bd71eb13077cd"
+   ]
+  },
+  {
+   "name": "C8 Mem0: existence/license/maintained",
+   "claim": "license Apache-2.0; latest_version mem0ai 2.2.1 (Python/PyPI); latest_release_date 2026-09-25; maintained true.",
+   "verdict": "supported",
+   "note": "gh api license Apache-2.0, archived:false, pushed_at 2026-09-25T17:36:35Z (28s after the PyPI upload timestamp, consistent with an automated release pipeline).",
+   "sources": [
+    "gh api repos/mem0ai/mem0",
+    "https://pypi.org/pypi/mem0ai/json"
+   ]
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "Codex (native SDK: CLI + openai-codex Python package)",
+   "url": "https://github.com/openai/codex",
+   "modalities": [
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "This is the pinned worker SDK for the layer's native-workers/sdk facet, and this repo's own workers/receipt.json already establishes native_execution at the old pin (1 completed research task, 2 blocked follow-ups per the layer's open_gaps). Today's freshness check is metadata/source-review only -- gh api + PyPI JSON, not a re-run at rust-v0.157.1 -- and shows the pin is 2 releases behind on both the CLI and Python surfaces as of 2026-09-26. No measured comparison against Claude Agent SDK or OpenAI Agents SDK on this stack's own retrieval/code/financial-source tasks exists, which is exactly the gap the layer's overturn_when condition names."
+  },
+  {
+   "name": "ai-memory",
+   "url": "https://github.com/akitaonrails/ai-memory",
+   "modalities": [
+    "star",
+    "github_search"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Adopted memory-of-record for 'durable project knowledge... across native clients.' layers.json's stated pin (v2.3.1) is stale on two counts -- manifests/stack.json already recorded 2.3.2, and this host's memory shows a same-day upgrade to 2.4.1 matching today's upstream latest -- so the real gap here is a stale catalog snapshot, not neglected maintenance. No preregistered held-out financial/code retrieval comparison against Mem0/Cognee/Graphiti/Hindsight has been run, which is the overturn condition this layer names."
+  },
+  {
+   "name": "SocratiCode",
+   "url": "https://github.com/giancarloerra/SocratiCode",
+   "modalities": [
+    "star",
+    "github_search"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Adopted conceptual-search lane. The one-release drift is a recorded, deliberate deferral (this host's memory: 'socraticode deferred >=10-01'), not an overlooked gap. AGPL-3.0 is the licensing fact worth carrying forward -- it is the only copyleft (network-use-triggering) license among the SDK/memory candidates checked here, versus MIT/Apache-2.0 elsewhere, which matters if this component is ever redistributed rather than run purely in-house."
+  },
+  {
+   "name": "Claude Agent SDK (claude-agent-sdk-python)",
+   "url": "https://github.com/anthropics/claude-agent-sdk-python",
+   "modalities": [
+    "star",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Direct comparator to codex-native-sdk on the layer's native-workers/sdk facet; release cadence (daily point releases) is the fastest of any candidate checked. My check today is metadata only (gh api + PyPI JSON, no README/docs read), so this does not establish capability superiority -- only that it is at least as actively maintained as the pinned Codex SDK. No head-to-head run against codex-native-sdk on this stack's own tasks exists, which the layer's overturn condition requires before any replacement."
+  },
+  {
+   "name": "OpenAI Agents SDK (openai-agents-python)",
+   "url": "https://github.com/openai/openai-agents-python",
+   "modalities": [
+    "star",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Second direct worker-SDK comparator. Slower cadence than Codex or Claude Agent SDK checked here (9 days since last tag on 2026-09-26 vs. same-day for the other two) but comfortably inside the 12-month maintained bar and not archived. As with Claude Agent SDK, no measured comparison against the pinned codex-native-sdk on this stack's actual tasks exists yet."
+  },
+  {
+   "name": "Serena",
+   "url": "https://github.com/oraios/serena",
+   "modalities": [
+    "star",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Already the adopted exact-symbol lane in current_choice. Latest tagged release v1.7.0 is from 2026-08-09 (48 days old versus today), but the repo itself was pushed 2026-09-24, so development continues between tags -- still well inside the 12-month maintained bar. The GPL-3.0-or-later half of the license is a real fact to weigh only if this component is ever bundled/redistributed rather than run in place."
+  },
+  {
+   "name": "QMD",
+   "url": "https://github.com/tobi/qmd",
+   "modalities": [
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Adopted BM25 document lane in current_choice. This is the freshest, most direct evidence in this whole set -- a live, dated, first-party status call on this host today -- but it only proves the index is populated and FTS5-backed, not retrieval quality; the layer's own 8/12 exact-source-recall diagnostic was not re-run. Latest GitHub tag v2.8.3 (2026-08-16) is 41 days old against a repo last pushed 2026-09-09 (17 days old): comfortably maintained, but the slowest release cadence of any candidate checked here."
+  },
+  {
+   "name": "Mem0",
+   "url": "https://github.com/mem0ai/mem0",
+   "modalities": [
+    "star",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Cataloged in this repo as 'overlap' disposition with requirement_fit-level evidence against the adopted ai-memory lane -- unexercised fit, not a demonstrated win. Also checked but not separately slotted here for redundancy with this candidate and Cognee: Supermemory (github.com/supermemoryai/supermemory, MIT, pushed 2026-09-25) and Letta Code (github.com/letta-ai/letta-code, Apache-2.0, v0.33.2 released 2026-09-25) -- both are actively maintained generic agent-memory tools with no retained execution on this stack either."
+  },
+  {
+   "name": "Graphiti",
+   "url": "https://github.com/getzep/graphiti",
+   "modalities": [
+    "github_search",
+    "paper",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Of every candidate checked, this is the one whose stated design most directly targets the layer's own 'dated' language -- explicit bi-temporal fact tracking with source provenance -- which none of the three current winners claim as a core primitive. Cataloged 'conditional' in this repo's landscape file with no retained execution on this stack's financial-source corpus, so the fit is a documented design match, not a measured win. Release cadence: v0.30.2 (2026-09-08), repo pushed today."
+  },
+  {
+   "name": "Cognee",
+   "url": "https://github.com/topoteretes/cognee",
+   "modalities": [
+    "star",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Already catalog-listed here ('conditional' disposition; in_catalog in the starred input). Strong maintenance/velocity signal but, like Mem0 and Graphiti, no retained run against this stack's own held-out financial/code corpus exists, so it cannot yet be preferred over ai-memory under the layer's own overturn rule (a preregistered held-out comparison at matched context budget)."
+  },
+  {
+   "name": "Hindsight",
+   "url": "https://github.com/vectorize-io/hindsight",
+   "modalities": [
+    "star",
+    "awesome",
+    "github_search",
+    "pypi",
+    "paper",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The clearest candidate whose own marketing targets this layer's 'dated financial sources... measurable retrieval quality' language directly, and the only memory system checked here that ships a public benchmark page rather than prose claims alone -- though I read the README's claim and the paper's existence, not the benchmark numbers themselves, so its 'state-of-the-art' framing is source-reviewed, not independently reproduced on this stack. hindsight-api and hindsight-client on PyPI both track v0.10.1 (2026-09-21); repo pushed today."
+  },
+  {
+   "name": "TradeMemory Protocol",
+   "url": "https://github.com/mnemox-ai/tradememory-protocol",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The single most literally on-point new find for 'dated financial sources... measurable retrieval quality' among finance-specific agent-memory tools surfaced by the awesome lists. But its own maintainers have frozen the feature set -- the only 2026 release (v0.5.5, 2026-09-08) is a security hotfix, not new capability, and the repo's own status line says no further features are planned. Passes the 12-month maintained test but is explicitly not under active development; treat as a design reference / candidate MCP drop-in rather than a growing SOTA contender."
+  },
+  {
+   "name": "TradingAgents",
+   "url": "https://github.com/TauricResearch/TradingAgents",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "paper",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "This is a worker/agent framework for trading strategy research, not a memory-retrieval component of the harness itself, so it sits outside this layer's literal requirement text (durable project knowledge / code / dated-financial-source retrieval for native clients). It is included because it is the best-evidenced, most actively engineered 'agents' framework across three independent awesome lists in this task's own inputs -- monthly versioned releases through all of 2026, an academic paper, and its own point-in-time/look-ahead bug fixes logged in CHANGELOG.md are a genuine SOTA signal for the layer's plain-English 'agents' reading, but it is better assessed against this repo's research-factors-ml / strategy-research layers than adopted here."
+  },
+  {
+   "name": "InKH -- Absorbing Complexity: An Interaction-Native Knowledge Harness for Financial LLM Agents",
+   "url": "https://arxiv.org/abs/2606.01886",
+   "modalities": [
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "A new-in-2026 (submitted 2026-06-01) design that speaks almost point-for-point to this layer's requirement text -- durable knowledge, staleness/'dated'-ness handling via maturity decay, and an auditable source-recovery surface -- found only via open web search, in none of this task's starred-repo or awesome-list inputs. Evaluated on the authors' own synthetic benchmark against their own baseline, not an independent or market-native holdout, and no accompanying open-source implementation was found to source-review further. Track for a future comparison; do not treat the reported numbers as reproduced."
+  },
+  {
+   "name": "KTD-Fin -- From Knowing to Doing: A Memory-Controlled Benchmark for LLM Trading Agents on Stock Markets",
+   "url": "https://arxiv.org/abs/2605.28359",
+   "modalities": [
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The strongest 'measurable retrieval/memory quality' evidence surfaced in this sweep: a purpose-built, adversarial test of whether an agent's memory of dated market information actually drives skill versus disguised beta exposure -- directly on point for the layer's own overturn_when condition (a preregistered, representative held-out retrieval/decision set). It targets Chinese A-shares (CSI300), not US equities, and no public code was located to source-review further, but its method is the closest primary-source template found for this layer's evaluation gap, and its skeptical finding (little persistent alpha net of exposure) is exactly the kind of result that should be surfaced rather than glossed over when judging trading-agent memory claims."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-cached",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/agents-models-workers--gpt-6-cached.md"
+  },
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/agents-models-workers--gpt-6-live.md"
+  }
+ ]
+}

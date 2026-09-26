@@ -1,0 +1,801 @@
+{
+ "layer_id": "data-quality-orchestration",
+ "proposal": {
+  "layer_id": "data-quality-orchestration",
+  "proposal": "challenge",
+  "summary": "Both winners verified real/unarchived/active via gh api 2026-09-26: dagu (github.com/dagucloud/dagu, pin v2.16.6) and data-pandera (github.com/unionai-oss/pandera, pin v0.33.1). Cross-checked the workflow's conv/layers.json extract against the repo's own catalogs/landscape/us-equities.json — consistent; the extract is a faithful derivation, not a fabricated citation (resolves a false-positive in the input packet's adversarial pass, which searched for a literal file named \"layers.json\" inside the repo checkout and found none).\n\nPANDERA earns_it. Pin v0.33.1 is bit-for-bit current: gh api releases/latest and PyPI both show v0.33.1, GitHub published_at and PyPI upload_time both 2026-09-01 (independently verified, not just cited). Its fail-closed gate has now run against one real bounded Alpaca ingest — 24 symbols, 20 sessions, 2026-08-25 to 2026-09-22, 480 rows, 12/12 checks passing — gating one real paper trial on 2026-09-24 (gates-20260922.json \"snapshot-promotion-gate\" note and blueprints/us-equities/data/fixtures/good-gate-result.json, both read directly). That is more than the layer's own open_gaps text still says (\"synthetic fixtures only\" — stale). Its strongest challenger, Great Expectations (github.com/fivetran/great_expectations; genuine org-transfer from great-expectations/great_expectations confirmed independently via gh api, matching repo id 103071520, and separately by this repo's own manifest), was already source-reviewed by this repo's 2026-09-23 sota-convergence manifest (read directly, not just the packet's quotes) and correctly held back as heavier with \"no demonstrated need,\" naming the exact unexecuted overturn test. I found no new evidence to overturn that.\n\nDAGU is challenged, narrowly, on one axis. Upstream itself is healthy (4117 stars, GPL-3.0, pushed 2026-09-25) but the pin is 3 releases behind latest v2.17.2/2026-09-25 (independently reconfirmed via gh api, not just the packet's stale v2.17.0 citation), and manifest-20260923.json already names re-qualifying it on the newer release as a still-open internal action item. More structurally: this layer's requirement text explicitly asks for \"recoverable state,\" and the same manifest cites a dedicated pin-qualification record (evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json) stating Dagu's in-flight self-healing is \"inconclusive because no scheduler was started\" — untested, not passed. That manifest independently names three real, current, verified Dagu alternatives targeting exactly this gap that were NOT in my input candidate packet: Nukesor/pueue, windmill-labs/windmill, and dbos-inc/dbos-transact-py. My input packet's own candidate, temporalio/temporal, targets the identical gap with full durable-execution semantics at higher operational cost. All four are real/current/verified but untested on this stack — none has actually beaten Dagu in a bounded trial yet, so this is a scoped, evidence-grounded challenge to register and test, not a replacement recommendation.\n\nFive packet candidates — purged-cross-validation (PyPI name \"purgedcv,\" v0.1.8 uploaded 2026-09-26, verified; JOSS paper + CITATION.cff confirmed present via direct repo-contents listing), factor-qc (PyPI v0.1.3 confirmed; DSR/PBO/Harvey-Liu claims verbatim-confirmed), quantraunak/leakprobe (README fetched directly, upgrading it from the packet's own \"metadata only\" to source_review: the 9/9 headline is real but is an unreleased/untagged improvement over the PyPI-published v0.1.0, which the same README says scored only 6/9 — a reproducibility gap the packet missed because it never opened the README), HephaestLab/TraderHarness (README + LICENSE fetched directly, confirming Apache-2.0 despite GitHub's NOASSERTION metadata, and confirming its own smoke-test caveat verbatim), and the arXiv paper \"A Grammar of Machine Learning Workflows\" (arxiv.org/abs/2603.10742, confirmed real via direct fetch, with a live matching PyPI package \"mlw\" and github.com/epagogy/ml) — are all genuinely real and evidenced, but every one answers a DIFFERENT, already-documented gap: this stack's own research-factors-ml and portfolio-risk layers state, verbatim and independently in both (catalogs/landscape/us-equities.json, read directly), \"WalkForward purge and embargo default to zero... development labels can cross fold boundaries.\" That is exactly what these tools exist to catch. None addresses THIS layer's actual requirement (process supervision, telemetry, recoverable state, broker-execution-authority isolation for research workers). Rejecting all five here as off-requirement and flagging them for research-factors-ml/portfolio-risk instead, where a real, already-recorded gap already names the trial they would close.\n\nRay, pydantic and dbt-labs/dbt were independently reconfirmed real/current/maintained via gh api but each is a different sub-capability already catalogued elsewhere (Ray→\"ray-serve\"), complementary not competing (pydantic), or adjacent SQL tooling with its own unresolved internal version-track ambiguity (dbt) — all correctly self-assessed as partial fits by the packet itself. Checked evidence/artifacts/alpaca-platform-landscape-20260926/ for relevance (README.md, landscape.json, tavily-research-pro.json all present, dated 2026-09-26) — its content did not surface in any dagu/pandera/dagster/temporal/prefect/great_expectations grep, so it appears scoped to market-data/execution-broker layers, not this one; not read in full.",
+  "winner_status": [
+   {
+    "component_id": "dagu",
+    "status": "challenged",
+    "note": "Upstream healthy (4117 stars, GPL-3.0, pushed 2026-09-25, gh api verified) but pin is 3 releases behind latest v2.17.2/2026-09-25 (gh api releases/latest, independently verified). manifest-20260923.json already names re-qualifying the pin as a still-open action item, and separately cites a dedicated pin-qualification record marking Dagu's in-flight self-healing 'inconclusive because no scheduler was started' -- the layer's own 'recoverable state' requirement is untested, not passed. Four real, current, verified alternatives (Temporal, DBOS, Windmill, Pueue) target exactly that gap; none has run on this stack."
+   },
+   {
+    "component_id": "data-pandera",
+    "status": "earns_it",
+    "note": "Pin v0.33.1 exactly matches upstream latest on GitHub and PyPI (2026-09-01, independently verified). Fail-closed gate now exercised on one real bounded Alpaca ingest (24 symbols/20 sessions) gating a real paper trial on 2026-09-24 (gates-20260922.json, read directly) -- more than the layer's own open_gaps text claims. Strongest challenger (Great Expectations) already source-reviewed and correctly held back by this repo's own 2026-09-23 manifest pending one specific unexecuted seeded-defect trial; no new evidence found to overturn that."
+   }
+  ],
+  "challengers": [
+   {
+    "name": "Temporal (temporalio/temporal + temporalio Python SDK)",
+    "url": "https://github.com/temporalio/temporal",
+    "why_better": "Durable execution / automatic checkpoint-replay is a real, verified core primitive that resumes in-flight workflows across crashes -- directly on the axis (recoverable state) this repo's own dedicated Dagu pin-qualification record marks 'inconclusive,' not passed.",
+    "evidence_level": "source_review",
+    "trial_plan": "Install pinned server v1.32.0 + temporalio SDK 1.33.0 (both independently verified current, 2026-09-26). Reimplement the already-qualified 3-step bounded workflow from blueprints/us-equities/hosting/receipt.json as a Temporal workflow; kill the worker mid-step-2; confirm resume from the exact interrupted step with zero duplicated broker/model calls, judged on the same failure/cancellation/output/identity/usage contract the layer's overturn_when clause names. Pass: resume beats or matches Dagu's own recorded failed/aborted/retained-history behavior on an equivalent induced failure. Overturn/reject if no specified long-running or host-loss-recovery requirement currently justifies the added server+persistence-store operational surface.",
+    "paper_lane_impact": "none directly (infrastructure reliability); would protect an in-progress run's recoverable state rather than add to engines run / paper acts passed / paper fills.",
+    "sources": [
+     "https://github.com/temporalio/temporal (gh api, checked 2026-09-26: MIT, 23303 stars, pushed_at 2026-09-26)",
+     "https://github.com/temporalio/temporal/releases/tags/v1.32.0 (published_at 2026-09-11, independently reconfirmed)",
+     "https://pypi.org/pypi/temporalio/json (1.33.0, uploaded 2026-09-15)",
+     "catalogs/sota-convergence/manifest-20260923.json (pins-runtime/dagu.json citation, read directly 2026-09-26)"
+    ]
+   },
+   {
+    "name": "DBOS (dbos-inc/dbos-transact-py)",
+    "url": "https://github.com/dbos-inc/dbos-transact-py",
+    "why_better": "This repo's own 2026-09-23 manifest -- not my input packet -- already names DBOS as resuming 'from the exact interrupted step with no duplicated side effects versus dagu/systemd's coarser whole-task restart,' a lighter Postgres-backed alternative to a full Temporal server for the same gap.",
+    "evidence_level": "metadata",
+    "trial_plan": "Stand up local Postgres; reimplement the same bounded workflow as DBOS @DBOS.workflow steps; induce the identical mid-step failure; measure step-level resume with no duplicated side effects; record the added Postgres dependency and code-restructuring cost against the benefit, per the manifest's own comparison framing. Pass: step resumes with no duplicate broker/model calls. Overturn/reject if the required code restructuring is too invasive versus Dagu's zero-code-change YAML wrapping.",
+    "paper_lane_impact": "none directly; same infrastructure-reliability rationale as Temporal at lower operational weight.",
+    "sources": [
+     "https://github.com/dbos-inc/dbos-transact-py (gh api, checked 2026-09-26: MIT, 1591 stars, pushed_at 2026-09-25)",
+     "catalogs/sota-convergence/manifest-20260923.json (DBOS fit/comparison text, read directly 2026-09-26)"
+    ]
+   },
+   {
+    "name": "Windmill (windmill-labs/windmill)",
+    "url": "https://github.com/windmill-labs/windmill",
+    "why_better": "Already named in this repo's own manifest as a direct Dagu competitor for workflows needing real polyglot application code rather than shell/SSH/container steps in a static YAML DAG, with its own named comparison test.",
+    "evidence_level": "metadata",
+    "trial_plan": "Per the manifest's own comparison_that_would_overturn: run the same frozen local-workload fixtures under Windmill, measuring cancel-to-stop latency and step-recovery behavior after a killed worker, against Dagu on the identical workload, including the added Postgres+worker footprint Windmill requires that Dagu's single static binary avoids. Overturn/reject if that footprint isn't justified, or if the licensing concern below isn't resolved.",
+    "paper_lane_impact": "none directly.",
+    "sources": [
+     "https://github.com/windmill-labs/windmill (gh api, checked 2026-09-26: license field NOASSERTION, 18035 stars, pushed_at 2026-09-26)",
+     "catalogs/sota-convergence/manifest-20260923.json (Windmill fit/comparison text, and a separate note that CE binaries include proprietary code that bars wrapping -- license needs a direct LICENSE-file read before adoption, not done this pass)"
+    ]
+   },
+   {
+    "name": "Pueue (Nukesor/pueue)",
+    "url": "https://github.com/Nukesor/pueue",
+    "why_better": "Already named in this repo's own manifest as a lighter Dagu alternative that 'sidesteps the open gap that Dagu upstream v2.17.0 is newer than the accepted 2.16.6 pin and has not been re-qualified'; Apache-2.0 (cleaner than Dagu's GPL-3.0, though GPL-3.0 is low-stakes for this stack's private internal use).",
+    "evidence_level": "metadata",
+    "trial_plan": "Per the manifest's own comparison_that_would_overturn: run the same frozen local-workload fixtures under Pueue, measuring pueue kill cancellation latency and whether daemon-restart truly recovers persisted history, against Dagu on the identical workload.",
+    "paper_lane_impact": "none directly.",
+    "sources": [
+     "https://github.com/Nukesor/pueue (gh api, checked 2026-09-26: Apache-2.0, 6352 stars, pushed_at 2026-09-09)",
+     "catalogs/sota-convergence/manifest-20260923.json (Pueue fit/comparison text, read directly 2026-09-26)"
+    ]
+   },
+   {
+    "name": "Dagster",
+    "url": "https://github.com/dagster-io/dagster",
+    "why_better": "Asset-centric model puts data-quality checks as graph nodes next to the assets they gate, matching this layer's own overturn_when trigger for 'asset/backfill lineage' -- the escalation condition this candidate maps to most literally. Pin 1.13.24 is current, independently reconfirmed against upstream.",
+    "evidence_level": "source_review",
+    "trial_plan": "Model the existing Pandera-gated daily-bar ingest (blueprints/us-equities/data/ingest_snapshot.py) as a Dagster software-defined asset with the Pandera check as an attached asset check; run a backfill over the same 24-symbol/20-session window already exercised in trial adaptive-20260923g; compare lineage/backfill bookkeeping against the current bespoke script. Pass: reproduces the same 12/12-check gate result while adding queryable lineage/backfill history the current setup lacks. Overturn/reject if no concrete backfill/lineage requirement currently justifies the added webserver+daemon+metadata-DB footprint.",
+    "paper_lane_impact": "none directly.",
+    "sources": [
+     "https://github.com/dagster-io/dagster (gh api, checked 2026-09-26: Apache-2.0, 16202 stars, pushed_at 2026-09-25)",
+     "https://github.com/dagster-io/dagster/releases/tags/1.13.24 (published_at 2026-09-21, independently reconfirmed)",
+     "https://pypi.org/pypi/dagster/json"
+    ]
+   },
+   {
+    "name": "Great Expectations",
+    "url": "https://github.com/fivetran/great_expectations",
+    "why_better": "Larger expectation-suite feature set and community than Pandera; genuine org transfer confirmed independently (same repo id 103071520 under both slugs). Not yet shown better in practice -- this repo's own 2026-09-23 manifest already ran this exact comparison and held it back.",
+    "evidence_level": "source_review",
+    "trial_plan": "Per this repo's own manifest: run Pandera's current gate and a Great Expectations 1.23.2 suite against the same real snapshot the licensed-vendor/SEC pull already produces (today only exercises Pandera on a synthetic 4-row CSV), with deliberately planted eligibility violations. Measure (1) whether each fails closed on an unknown/out-of-window record, (2) whether GE catches a defect Pandera's ~12-dependency check misses on a real record, (3) added code/dependency cost versus the existing DuckDB+Pandera pipeline. Pass criterion for keeping Pandera: a custom Pandera check achieves the same fail-closed + auditable outcome for materially less added complexity. Overturn: GE catches a concrete defect class Pandera misses.",
+    "paper_lane_impact": "indirect at best (could prevent a bad snapshot from passing the gate and reaching a paper act/fill); no evidence yet that this has happened -- none until the trial runs.",
+    "sources": [
+     "https://github.com/fivetran/great_expectations (gh api, checked 2026-09-26: Apache-2.0, 11844 stars, pushed_at 2026-09-25, repo id 103071520 matches old great-expectations/great_expectations slug)",
+     "https://github.com/fivetran/great_expectations/releases/tags/1.23.1 (published_at 2026-09-18, independently reconfirmed)",
+     "https://pypi.org/pypi/great-expectations/json (1.23.2, uploaded 2026-09-25 -- one patch ahead of the latest tagged GitHub Release)",
+     "catalogs/sota-convergence/manifest-20260923.json (GE-vs-Pandera comparison text, read directly 2026-09-26)",
+     "gates-20260922.json 'snapshot-promotion-gate' and blueprints/us-equities/data/fixtures/good-gate-result.json (read directly)"
+    ]
+   }
+  ],
+  "rejected": [
+   {
+    "name": "Apache Airflow",
+    "reason": "Real, current (v3.3.2, 2026-09-17, independently verified), genuinely absent from this repo's whole catalog (coverage.json/repository-index.md/landscape json all zero hits for 'airflow', confirmed by direct grep) despite Dagu's own GitHub description self-describing as an 'Alternative to Airflow' (verified verbatim via gh api). A real catalog gap worth recording, but no verified evidence it closes a concrete gap Dagu leaves open at this stack's current bounded/local scope; heavier scheduler+webserver+metadata-DB footprint than the layer's stated scope. Register as known-but-not-prioritized."
+   },
+   {
+    "name": "Prefect",
+    "reason": "Real, current (v3.8.6, 2026-09-14/15, independently verified via gh api release tag + PyPI). Pure-Python workflow definitions are a genuine ergonomic advantage over Dagu's YAML DAG, but no specific documented Dagu gap (unlike recoverable-state or asset lineage) points to Prefect specifically. Already tagged 'agents-operations: alternative / already_covered' in this repo's own repository-index.md. Register as known-but-not-prioritized."
+   },
+   {
+    "name": "Ray",
+    "reason": "Real, current, heavily maintained (43929 stars, pushed 2026-09-26, independently verified), but this repo's coverage.json already catalogues ray-project/ray under catalog_entry_id 'ray-serve' -- a different sub-capability (model serving) than the packet's actual framing (general actor/task fan-out). The packet's own fit note admits full fault-tolerance claims need a docs-level, not README-level, read. Off-requirement as framed."
+   },
+   {
+    "name": "pydantic",
+    "reason": "Real, current, independently verified (28884 stars, pushed 2026-09-25). Row/object-level type validation is complementary to, not competitive with, Pandera's dataframe-level statistical gate. Off-requirement as a Pandera substitute."
+   },
+   {
+    "name": "dbt (dbt-labs/dbt / dbt-core)",
+    "reason": "Real, current, independently verified (13933 stars, pushed 2026-09-26). Covers SQL-transform testing/lineage, adjacent to a DuckDB SQL layer that doesn't exist at that scale yet, not a substitute for either current winner. Also carries an unresolved internal ambiguity the packet itself flagged: the dbt-labs/dbt meta-repo's GitHub tag (v2.0.5) and the dbt-core PyPI engine package (1.12.5) are on diverging version tracks -- needs disambiguation before any pin."
+   },
+   {
+    "name": "purged-cross-validation / purgedcv",
+    "reason": "Genuinely well-evidenced and current (PyPI name 'purgedcv' v0.1.8 uploaded 2026-09-26, matching the GitHub release exactly; JOSS paper and CITATION.cff confirmed present via direct repo-contents listing). Off-requirement for data-quality-orchestration specifically: answers 'does my cross-validation leak future information,' which this stack's own research-factors-ml and portfolio-risk layers already name, verbatim and independently in both, as an open gap ('WalkForward purge and embargo default to zero'). Recommend registering it there instead."
+   },
+   {
+    "name": "factor-qc",
+    "reason": "Real (PyPI v0.1.3 confirmed; DSR/PBO/Harvey-Liu/MinTRL claims and its own 'battle-tested... self-reported' language verbatim-confirmed via direct README read), but 0 GitHub stars, single-maintainer, no independent adopters found. Off-requirement for this layer for the same reason as purged-cross-validation -- belongs near research-factors-ml/evaluation-experiments, not process-supervision/telemetry."
+   },
+   {
+    "name": "leakprobe",
+    "reason": "Upgraded from the packet's 'metadata only' rating to source_review by directly fetching its README this pass: the 9-of-9 catch-rate headline is real but is an unreleased/untagged improvement over the PyPI-published v0.1.0, which the same README says scored only 6 of 9 -- a real reproducibility gap. 0 stars, unreleased. Off-requirement for this layer."
+   },
+   {
+    "name": "HephaestLab/TraderHarness",
+    "reason": "Real and well-built; its smoke-test caveat verbatim-confirmed via direct README fetch, and its LICENSE file directly confirms Apache-2.0 despite GitHub metadata showing NOASSERTION. Off-requirement today: shipped dataset is China A-share only with no US-equities adapter (this stack's explicit north star), and its design lets the LLM agent both decide and place its own simulated orders inside one harness, unlike this stack's deliberate separation of research (models) from execution (the deterministic adaptive-paper engine only). Interesting prior art for point-in-time masking, not a fit today."
+   },
+   {
+    "name": "A Grammar of Machine Learning Workflows (mlw / ml, arXiv:2603.10742)",
+    "reason": "Confirmed real via direct fetch (Simon Roth, v1 2026-03-11 / v4 2026-05-29, cs.LG) with a matching live PyPI package ('mlw' v1.1.2) and GitHub repo (epagogy/ml, MIT). Off-requirement for this layer: a call-time-enforced evaluate/assess-boundary grammar for ML methodology, closer to research-factors-ml's concerns. Also the quietest upstream checked this pass -- last pushed 2026-05-24, about four months before this review; not yet over the 12-month unmaintained threshold but worth watching."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "top8-selection-method",
+   "claim": "Which 8 of the 15 supplied candidates count as 'top 8 by fit' (the packet does not pre-rank them).",
+   "verdict": "unverifiable",
+   "note": "This is a researcher judgment call, not a checkable fact. I ranked by how unhedged each candidate's own 'fit' paragraph is: Dagster, Apache Airflow, Temporal, Prefect, Great Expectations, purged-cross-validation, factor-qc and TraderHarness all claim a direct/structural fit. Excluded as weaker/hedged fits: Ray ('needs a docs-level read before promotion'), pydantic ('only partly right... complementary rather than head-to-head'), dbt ('partial, adjacent fit... not a substitute'), leakprobe (metadata-only, README not opened by the original researcher), the mlw/ml paper (general-ML, not finance-specific, quiet upstream), Apache Hamilton ('confirmed weak fit... not an orchestrator' by its own README), and pypbo (metadata-only, superseded framing, AGPL friction). All 8 selected candidates were adversarially checked below.",
+   "sources": [
+    "candidate packet fit/evidence_level fields for all 15 entries, read directly"
+   ]
+  },
+  {
+   "name": "dagu-repo-license-archived",
+   "claim": "Winner Dagu: repo exists at github.com/dagucloud/dagu, GPL-3.0, not archived.",
+   "verdict": "supported",
+   "note": "gh api repos/dagucloud/dagu returns full_name dagucloud/dagu, license GPL-3.0, archived:false, fork:false. Matches the candidate packet's truncated citation ('github.com/daguclou...') and the repo's own catalogs/landscape/us-equities.json winners[0].repository and manifests/stack.json line 1328-1329.",
+   "sources": [
+    "gh api repos/dagucloud/dagu (checked 2026-09-26)",
+    "manifests/stack.json:1328-1329 (repo-relative, read directly)"
+   ]
+  },
+  {
+   "name": "dagu-latest-version-date",
+   "claim": "Upstream latest is v2.17.2, released 2026-09-25.",
+   "verdict": "supported",
+   "note": "gh api repos/dagucloud/dagu/releases/latest returns tag_name v2.17.2, published_at 2026-09-25T06:05:53Z. Exact match.",
+   "sources": [
+    "gh api repos/dagucloud/dagu/releases/latest (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "dagu-maintenance-stars-pushed",
+   "claim": "Repo pushed today (2026-09-26), 4,114 stars, not archived.",
+   "verdict": "supported",
+   "note": "gh api shows pushed_at 2026-09-25T06:14:31Z (one calendar day before the task's 'today', not literally same-day in UTC) and stargazers_count 4116 (claim said 4114, +2 live-counter drift, immaterial). archived:false confirmed. Core maintenance signal (very recent push, correct star ballpark, not archived) holds; the 'today' framing is off by ~1 day.",
+   "sources": [
+    "gh api repos/dagucloud/dagu (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "dagu-three-patch-gap",
+   "claim": "Pin v2.16.6 is behind by at least three patch releases (v2.17.0, v2.17.1, v2.17.2).",
+   "verdict": "supported",
+   "note": "gh api repos/dagucloud/dagu/tags lists v2.17.2, v2.17.1, v2.17.0, v2.16.6 in that order; releases confirm v2.17.0 published 2026-09-21 and v2.17.2 published 2026-09-25. v2.17.1 exists as a tag but gh api repos/dagucloud/dagu/releases/tags/v2.17.1 returns 404 (no GitHub Release object was published for it, only a tag) -- a minor nuance the winner note glosses over by saying it 'shipped' as if a full release.",
+   "sources": [
+    "gh api repos/dagucloud/dagu/tags",
+    "gh api repos/dagucloud/dagu/releases",
+    "gh api repos/dagucloud/dagu/releases/tags/v2.17.1 -> 404 Not Found"
+   ]
+  },
+  {
+   "name": "dagu-sota-manifest-v217-crosscite",
+   "claim": "The 2026-09-23 sota-convergence sweep already recorded upstream at v2.17.0 (released 2026-09-21).",
+   "verdict": "supported",
+   "note": "Read directly: catalogs/sota-convergence/manifest-20260923.json dagu entry has upstream.latest 'v2.17.0', released_at '2026-09-21', stars 4062, license GPL-3.0.",
+   "sources": [
+    "catalogs/sota-convergence/manifest-20260923.json (repo-relative, dagu entry, read directly)"
+   ]
+  },
+  {
+   "name": "dagu-evidence-level-native-proven",
+   "claim": "The manifest rates Dagu's evidence_level as native_proven versus Pandera's source_review.",
+   "verdict": "supported",
+   "note": "Confirmed directly in the same manifest: dagu row has 'evidence_level': 'native_proven'; the data-pandera row(s) have 'evidence_level': 'source_review'.",
+   "sources": [
+    "catalogs/sota-convergence/manifest-20260923.json (dagu and data-pandera entries, read directly)"
+   ]
+  },
+  {
+   "name": "dagu-wired-into-receipts",
+   "claim": "Wired into blueprints/us-equities/hosting/receipt.json and manifests/stack.json.",
+   "verdict": "supported",
+   "note": "Opened both files directly (not just trusting the manifest's own citation): manifests/stack.json:1328-1329 has id 'dagu', repository dagucloud/dagu, with real CLI commands; blueprints/us-equities/hosting/receipt.json:5-6 has upstream dagucloud/dagu, version '2.16.6', plus recorded native_command invocations (dagu stop/server/start).",
+   "sources": [
+    "manifests/stack.json:1328-1337 (read directly)",
+    "blueprints/us-equities/hosting/receipt.json:5-125 (read directly)"
+   ]
+  },
+  {
+   "name": "dagu-no-breaking-change",
+   "claim": "No breaking-change or security note was found in the three-release gap this pass.",
+   "verdict": "supported",
+   "note": "gh api release body for v2.17.2 (features only: human-task push-back/rewind, browser automation actions) contains no 'break'/'BREAKING'/'migrat' keyword on grep. v2.17.1 has no published release body to check (no Release object exists, only a tag). v2.17.0's body was not independently re-read in this pass beyond the sota-convergence manifest's own citation. Supported within that limited scope, not an exhaustive changelog audit.",
+   "sources": [
+    "gh api repos/dagucloud/dagu/releases/tags/v2.17.2 (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "dagu-auth-mode-gap-content",
+   "claim": "Hosting/dashboard receipt's auth-mode already disagrees between two retained records, per the layer's own open_gaps.",
+   "verdict": "supported",
+   "note": "Verbatim in catalogs/landscape/us-equities.json layers[data-quality-orchestration].open_gaps: 'The two Dagu records disagree on dashboard authentication. The hosting receipt (2026-09-19) records basic auth with anonymous 401 and authenticated 200 after restart. The current hosting README says the dashboard now uses upstream auth.mode none...' Content is accurate; see separate check on the 'layers.json' filename this and other candidates cite.",
+   "sources": [
+    "catalogs/landscape/us-equities.json layers[data-quality-orchestration].open_gaps (read directly)"
+   ]
+  },
+  {
+   "name": "literal-layers-json-does-not-exist",
+   "claim": "Cross-cutting: the winner note and the Dagster, Temporal and Great Expectations candidates all cite a file literally named 'layers.json'.",
+   "verdict": "refuted",
+   "note": "`find . -iname layers.json` over the whole checkout returns nothing -- no such file exists anywhere in the repo. The content these four citations quote (open_gaps text, 'no local execution... untested, not failed', 'synthetic fixtures only') is real, but it lives in catalogs/landscape/us-equities.json under the layers[] array, not in a file called layers.json. Citation-path defect, not a content fabrication.",
+   "sources": [
+    "find . -iname 'layers.json' (repo root, 2026-09-26) -> no results",
+    "catalogs/landscape/us-equities.json layers[] (the actual location of the quoted text)"
+   ]
+  },
+  {
+   "name": "dagster-repo-license-archived",
+   "claim": "Dagster: repo exists at github.com/dagster-io/dagster, Apache-2.0, not archived, 16202 stars, pushed 2026-09-25.",
+   "verdict": "supported",
+   "note": "gh api repos/dagster-io/dagster: full_name dagster-io/dagster, license Apache-2.0, archived:false, stargazers_count 16202 (exact match to claim), pushed_at 2026-09-25T17:44:40Z (matches claimed date exactly).",
+   "sources": [
+    "gh api repos/dagster-io/dagster (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "dagster-latest-version-date",
+   "claim": "Pin 1.13.24 matches both the GitHub release and PyPI upload exactly (2026-09-21).",
+   "verdict": "supported",
+   "note": "gh api repos/dagster-io/dagster/releases/tags/1.13.24 -> published_at 2026-09-21T23:53:17Z. PyPI JSON for dagster: version 1.13.24, upload_time 2026-09-21T23:16:50Z. Both confirm.",
+   "sources": [
+    "gh api repos/dagster-io/dagster/releases/tags/1.13.24",
+    "https://pypi.org/pypi/dagster/json (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "dagster-quote-python-functions-assets",
+   "claim": "README: 'declare -- as Python functions -- the data assets that you want to build', with integrated lineage and observability.",
+   "verdict": "supported",
+   "note": "Verbatim at python_modules/dagster/README.md (tag 1.13.24): 'With Dagster, you declare—as Python functions—the data assets that you want to build,' and 'Dagster is a cloud-native data pipeline orchestrator for the whole development lifecycle, with integrated lineage and observability.' The candidate's added phrase 'a unified metadata control plane' does not appear in this text; that clause is unverified/likely an embellishment.",
+   "sources": [
+    "https://raw.githubusercontent.com/dagster-io/dagster/1.13.24/python_modules/dagster/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "dagster-quote-lifecycle-stages",
+   "claim": "README: built for every stage of the data development lifecycle -- local development, unit tests, integration tests, staging environments, up to production.",
+   "verdict": "supported",
+   "note": "Verbatim match found by direct grep: 'Dagster is built to be used at every stage of the data development lifecycle - local development, unit tests, integration tests, staging environments, all the way up to production.'",
+   "sources": [
+    "https://raw.githubusercontent.com/dagster-io/dagster/1.13.24/python_modules/dagster/README.md line 75 (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "dagster-catalog-citation",
+   "claim": "Already cited in this repo's catalog as 'agents-operations: alternative'.",
+   "verdict": "supported",
+   "note": "catalogs/us-equities/repository-index.md:136 reads verbatim '[dagster-io/dagster](...) | Beyond stars | [agents-operations: alternative](agents-operations.json) | ...'. Note a cross-file nuance: catalogs/landscape/us-equities.json's own data-quality-orchestration layer lists Dagster's disposition as 'conditional', not 'alternative' -- the two catalog files use different labels for the same candidate, though both tag it under the agents-operations group. The specific claim (what repository-index.md says) is accurate.",
+   "sources": [
+    "catalogs/us-equities/repository-index.md:136 (read directly)",
+    "catalogs/us-equities/coverage.json:2362-2366 (read directly, cross-references catalog_entry_ids ['dagster'] without repeating the label)",
+    "catalogs/landscape/us-equities.json layers[data-quality-orchestration].candidates (Dagster disposition: 'conditional')"
+   ]
+  },
+  {
+   "name": "airflow-repo-license-archived",
+   "claim": "Airflow: repo exists at github.com/apache/airflow, Apache-2.0, not archived, 46,985 stars, pushed today.",
+   "verdict": "supported",
+   "note": "gh api repos/apache/airflow: full_name apache/airflow, license Apache-2.0, archived:false, stargazers_count 46986 (claim said 46,985, off by 1, live drift), pushed_at 2026-09-26T14:06:39Z (genuinely today, unlike the Dagu claim).",
+   "sources": [
+    "gh api repos/apache/airflow (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "airflow-latest-version-date",
+   "claim": "Pin 3.3.2 matches both GitHub release and PyPI exactly, released 2026-09-17.",
+   "verdict": "supported",
+   "note": "gh api repos/apache/airflow/releases/tags/3.3.2 -> published_at 2026-09-17T11:10:15Z. PyPI apache-airflow JSON: version 3.3.2, upload_time 2026-09-17T08:38:26Z.",
+   "sources": [
+    "gh api repos/apache/airflow/releases/tags/3.3.2",
+    "https://pypi.org/pypi/apache-airflow/json (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "airflow-quote-pipelines-scheduler",
+   "claim": "README: 'Pipelines are defined in code...dynamic dag generation and parameterization' and 'the Airflow scheduler executes your tasks on an array of workers...'",
+   "verdict": "supported",
+   "note": "Both verbatim in the fetched README (tag 3.3.2): 'Pipelines are defined in code, enabling dynamic dag generation and parameterization.' and 'The Airflow scheduler executes your tasks on an array of workers while following the specified dependencies.'",
+   "sources": [
+    "https://raw.githubusercontent.com/apache/airflow/3.3.2/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "airflow-quote-asf-governance",
+   "claim": "Official source code releases follow the ASF Release Policy -- strongest governance tier checked.",
+   "verdict": "supported",
+   "note": "Confirmed verbatim: README states releases 'Follow the ASF Release Policy' and 'Are officially voted on by the PMC members during the Release Approval Process.'",
+   "sources": [
+    "https://raw.githubusercontent.com/apache/airflow/3.3.2/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "airflow-quote-ui-grid-graph",
+   "claim": "Web UI with Grid/Graph views for visualizing pipelines in production, monitoring progress, troubleshooting.",
+   "verdict": "supported",
+   "note": "Verbatim: 'The rich user interface makes it easy to visualize pipelines running in production, monitor progress, and troubleshoot issues when needed.' Direct grep of the README also confirms a 'Grid' view section ('Grid: Grid representation of a Dag that spans across time.'). A distinct 'Graph' view was not independently re-confirmed by name in this pass (plausible but not directly grepped).",
+   "sources": [
+    "https://raw.githubusercontent.com/apache/airflow/3.3.2/README.md lines 49, 244 (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "airflow-catalog-absence-gap",
+   "claim": "Airflow is conspicuously absent from this repo's own catalog (no 'airflow' hit in coverage.json or repository-index.md).",
+   "verdict": "supported",
+   "note": "grep -in 'airflow' over catalogs/us-equities/coverage.json and catalogs/us-equities/repository-index.md returns zero matches. Also checked catalogs/landscape/us-equities.json (the primary landscape file) for completeness: zero matches there too. Genuine catalog gap confirmed across all three files.",
+   "sources": [
+    "grep -in 'airflow' catalogs/us-equities/coverage.json catalogs/us-equities/repository-index.md catalogs/landscape/us-equities.json (repo-relative, run directly, 2026-09-26)"
+   ]
+  },
+  {
+   "name": "airflow-dagu-crossref",
+   "claim": "Dagu's own README self-describes as an 'Alternative to Airflow / Cron / Job Scheduler'.",
+   "verdict": "supported",
+   "note": "Confirmed verbatim, though the exact phrase lives in the GitHub repo description field rather than deep in the README body: gh api repos/dagucloud/dagu .description reads 'Self-hostable workflow orchestrator for teams whose main work isn't orchestration. ... Alternative to Airflow / Cron / Job Scheduler.' The README itself also contrasts Dagu against Airflow/cron/Temporal in a comparison section.",
+   "sources": [
+    "gh api repos/dagucloud/dagu --jq .description (checked 2026-09-26)",
+    "https://raw.githubusercontent.com/dagucloud/dagu/v2.17.2/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "temporal-repo-license-archived",
+   "claim": "Temporal: repo exists at github.com/temporalio/temporal, MIT, not archived, 23,303 stars, pushed today.",
+   "verdict": "supported",
+   "note": "gh api repos/temporalio/temporal: full_name temporalio/temporal, license MIT, archived:false, stargazers_count 23303 (exact match), pushed_at 2026-09-26T12:22:25Z (genuinely today).",
+   "sources": [
+    "gh api repos/temporalio/temporal (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "temporal-server-sdk-versions",
+   "claim": "Server v1.32.0 (2026-09-11) and Python SDK temporalio 1.33.0 (PyPI, 2026-09-15).",
+   "verdict": "supported",
+   "note": "gh api repos/temporalio/temporal/releases/tags/v1.32.0 -> published_at 2026-09-11T16:10:29Z. PyPI temporalio JSON: version 1.33.0, upload_time 2026-09-15T00:52:51Z. Both confirmed.",
+   "sources": [
+    "gh api repos/temporalio/temporal/releases/tags/v1.32.0",
+    "https://pypi.org/pypi/temporalio/json (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "temporal-quote-durable-execution",
+   "claim": "README: Temporal 'executes units of application logic called Workflows in a resilient manner that automatically handles intermittent failures, and retries failed operations,' and 'a mature technology that originated as a fork of Uber's Cadence.'",
+   "verdict": "supported",
+   "note": "Both quotes confirmed verbatim in the fetched README at tag v1.32.0.",
+   "sources": [
+    "https://raw.githubusercontent.com/temporalio/temporal/v1.32.0/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "temporal-catalog-citation",
+   "claim": "Already listed in this repo's own catalog as 'agents-operations: conditional'.",
+   "verdict": "supported",
+   "note": "catalogs/us-equities/repository-index.md:412 reads verbatim '[temporalio/temporal](...) | Beyond stars | [agents-operations: conditional](agents-operations.json) | ...'. Also independently confirmed in catalogs/landscape/us-equities.json layers[data-quality-orchestration].candidates: Temporal disposition 'conditional', evidence_kind 'source_review' -- consistent across both files (unlike the Dagster case).",
+   "sources": [
+    "catalogs/us-equities/repository-index.md:412 (read directly)",
+    "catalogs/landscape/us-equities.json layers[data-quality-orchestration].candidates (Temporal entry, read directly)"
+   ]
+  },
+  {
+   "name": "temporal-gap-note-crossref",
+   "claim": "Matches the layer's own gap note that Temporal has 'no local execution... untested, not failed.'",
+   "verdict": "supported",
+   "note": "Close paraphrase of the real open_gaps text: 'Temporal and modal have no local execution, failure, cancellation, recovery or telemetry evidence. Their capabilities are untested, not failed.' Content confirmed; filename cited as 'layers.json' does not exist (see cross-cutting finding) -- the real file is catalogs/landscape/us-equities.json.",
+   "sources": [
+    "catalogs/landscape/us-equities.json layers[data-quality-orchestration].open_gaps (read directly)"
+   ]
+  },
+  {
+   "name": "prefect-repo-license-archived",
+   "claim": "Prefect: repo exists at github.com/PrefectHQ/prefect, Apache-2.0, not archived, 23,930 stars, pushed today.",
+   "verdict": "supported",
+   "note": "gh api repos/PrefectHQ/prefect: full_name PrefectHQ/prefect, license Apache-2.0, archived:false, stargazers_count 23930 (exact match), pushed_at 2026-09-26T08:18:02Z (genuinely today).",
+   "sources": [
+    "gh api repos/PrefectHQ/prefect (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "prefect-latest-version-date",
+   "claim": "Pin 3.8.6 matches both GitHub release and PyPI exactly (2026-09-14/15).",
+   "verdict": "supported",
+   "note": "gh api repos/PrefectHQ/prefect/releases/tags/3.8.6 -> published_at 2026-09-14T14:18:53Z. PyPI prefect JSON: version 3.8.6, upload_time 2026-09-15T00:34:43Z. The candidate correctly hedged between the two adjacent dates.",
+   "sources": [
+    "gh api repos/PrefectHQ/prefect/releases/tags/3.8.6",
+    "https://pypi.org/pypi/prefect/json (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "prefect-quote-automate-recover",
+   "claim": "README: 'automate any data process with features such as scheduling, caching, retries, and event-based automations,' flows that 'react to the world around them and recover from unexpected changes.'",
+   "verdict": "supported",
+   "note": "Both phrases found verbatim as substrings of longer sentences in the current README (fetched from the main branch, not re-pinned to tag 3.8.6 specifically -- a minor methodological gap, though the pin is only ~2 weeks old and README marketing copy is unlikely to have shifted).",
+   "sources": [
+    "https://raw.githubusercontent.com/PrefectHQ/prefect/main/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "prefect-catalog-citation",
+   "claim": "Supplied as a starred-repo input already marked in_catalog:true elsewhere in this stack's catalog.",
+   "verdict": "supported",
+   "note": "The literal string 'in_catalog:true' was not found (that field name likely belongs to a separate upstream input packet not present in this checkout). But the substance is confirmed: catalogs/us-equities/repository-index.md:347 marks it 'agents-operations: alternative ... already_covered', and coverage.json:1540 has disposition 'catalog_reviewed' with catalog_entry_ids ['prefect']. Both corroborate 'already in the catalog' even though the exact field name differs.",
+   "sources": [
+    "catalogs/us-equities/repository-index.md:347 (read directly)",
+    "catalogs/us-equities/coverage.json:1536-1545 (read directly)"
+   ]
+  },
+  {
+   "name": "ge-org-transfer",
+   "claim": "Repository moved under github.com/fivetran/great_expectations; the old great-expectations/great_expectations slug now redirects there.",
+   "verdict": "supported",
+   "note": "gh api repos/great-expectations/great_expectations and gh api repos/fivetran/great_expectations both resolve to full_name 'fivetran/great_expectations', same repo id 103071520 -- confirmed genuine org transfer, not a fork/duplicate.",
+   "sources": [
+    "gh api repos/great-expectations/great_expectations (checked 2026-09-26)",
+    "gh api repos/fivetran/great_expectations (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "ge-license-stars-pushed",
+   "claim": "11,844 stars, Apache-2.0, pushed 2026-09-25.",
+   "verdict": "supported",
+   "note": "gh api repos/fivetran/great_expectations: license Apache-2.0, archived:false, stargazers_count 11844 (exact match), pushed_at 2026-09-25T19:16:55Z (exact match).",
+   "sources": [
+    "gh api repos/fivetran/great_expectations (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "ge-versions-github-pypi",
+   "claim": "1.23.1 GitHub release (2026-09-18); 1.23.2 PyPI, one patch ahead (2026-09-25).",
+   "verdict": "supported",
+   "note": "gh api repos/fivetran/great_expectations/releases/latest -> tag 1.23.1, published_at 2026-09-18T15:21:41Z. PyPI great-expectations JSON: version 1.23.2, upload_time 2026-09-25T18:48:25Z. Both dates and both version numbers match exactly.",
+   "sources": [
+    "gh api repos/fivetran/great_expectations/releases/latest",
+    "https://pypi.org/pypi/great-expectations/json (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "ge-manifest-quote-heavier-no-need",
+   "claim": "This stack's 2026-09-23 sota-convergence manifest already concluded 'Great Expectations 1.23.1 is heavier and has no demonstrated need,' naming an unexecuted overturn test (run both on a real broad-universe bar snapshot and see whether GX catches a defect Pandera misses).",
+   "verdict": "supported",
+   "note": "Verbatim quote confirmed at catalogs/sota-convergence/manifest-20260923.json, trading[3]/entries[0] (id data-pandera) -> other_lane_reviews[0] (lane 'critic-trading') -> lane_item.why_selected: '...Great Expectations 1.23.1 is heavier and has no demonstrated need.' The same lane_item's comparison_that_would_overturn reads: 'Run the promotion gate once on a real broad-universe bar snapshot (critic next_step). If it misses a defect that a Great Expectations 1.23.1 suite on the same snapshot catches, the choice is overturned.' -- matches the claim closely. Note: the candidate's cited JSON path 'data-pandera.other_lane_reviews.critic-trading' is a reasonable informal pointer but there are actually two separate data-pandera entries in this manifest (one with other_lane_reviews, one without, per its own citation_review fix note); the quote lives specifically in the second one's other_lane_reviews.",
+   "sources": [
+    "catalogs/sota-convergence/manifest-20260923.json line 12108 and surrounding lane_item block (read directly, 2026-09-26)"
+   ]
+  },
+  {
+   "name": "ge-gates-real-ingest",
+   "claim": "catalogs/us-equities/gates-20260922.json lines 68-83 show a real (not only synthetic) 24-symbol/20-session Alpaca ingest passed the pandera gate on 2026-09-24.",
+   "verdict": "supported",
+   "note": "Confirmed by direct read: the snapshot-promotion-gate block spans lines 69-83 (claim said 68-83, off by one line, immaterial). Its note states verbatim: '...Real ingest, recorded 2026-09-24... Trial adaptive-20260923g...retained its ingest-receipt.json (24 symbols, 20 sessions 2026-08-25 to 2026-09-22, 480 rows...) and gate-result.json (status pass, 12 of 12 checks pass...)'. Matches the claim closely; evidence_class on the gate itself remains 'synthetic' by classification even though a real ingest is now also recorded.",
+   "sources": [
+    "catalogs/us-equities/gates-20260922.json lines 69-83 (read directly, 2026-09-26)"
+   ]
+  },
+  {
+   "name": "ge-more-current-than-synthetic-framing",
+   "claim": "More current than the 'synthetic fixtures only' framing in the layer's own gaps text.",
+   "verdict": "supported",
+   "note": "catalogs/landscape/us-equities.json layer open_gaps (checked_at 2026-09-22) still reads 'pandera: evidence covers synthetic CSV fixtures only.' The gates-20260922.json real-ingest note is dated 2026-09-24, i.e. two days more recent than that open_gaps framing -- the claim's chronology checks out. (Citation again uses the nonexistent 'layers.json' filename; see cross-cutting finding.)",
+   "sources": [
+    "catalogs/landscape/us-equities.json (checked_at 2026-09-22, open_gaps)",
+    "catalogs/us-equities/gates-20260922.json snapshot-promotion-gate note (dated 2026-09-24)"
+   ]
+  },
+  {
+   "name": "pcv-repo-license-stars",
+   "claim": "purged-cross-validation: repo exists at github.com/eslazarev/purged-cross-validation, MIT, 35 stars, pushed_at 2026-09-26, release v0.1.8 dated 2026-09-26.",
+   "verdict": "supported",
+   "note": "gh api repos/eslazarev/purged-cross-validation: license MIT, archived:false, stargazers_count 35 (exact match), pushed_at 2026-09-26T12:30:42Z. Release v0.1.8 published_at 2026-09-26T12:30:42Z -- identical timestamp to pushed_at, meaning this release literally is the repo's most recent push, exactly as claimed ('a release literally dated the day of this research').",
+   "sources": [
+    "gh api repos/eslazarev/purged-cross-validation (checked 2026-09-26)",
+    "gh api repos/eslazarev/purged-cross-validation/releases/tags/v0.1.8"
+   ]
+  },
+  {
+   "name": "pcv-quote-sklearn-splitters",
+   "claim": "scikit-learn-compatible splitters (Purged K-Fold, embargo, walk-forward, Combinatorial Purged CV) usable inside cross_val_score/GridSearchCV/Pipeline.",
+   "verdict": "supported",
+   "note": "README (tag v0.1.8) confirms verbatim: 'All four splitters (WalkForwardSplit, PurgedKFold, PurgedGroupKFold, CombinatorialPurgedCV) satisfy the sklearn splitter protocol and work inside cross_val_score, GridSearchCV, and Pipeline.' Minor looseness: 'embargo' is a parameter of PurgedKFold, not a separate fifth splitter as the phrasing could imply.",
+   "sources": [
+    "https://raw.githubusercontent.com/eslazarev/purged-cross-validation/v0.1.8/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "pcv-quote-dsr-psr-pbo-joss",
+   "claim": "Ships Deflated/Probabilistic Sharpe Ratio and CSCV-based PBO; ships a JOSS paper submission and CITATION.cff.",
+   "verdict": "supported",
+   "note": "README API table lists probabilistic_sharpe_ratio, deflated_sharpe_ratio, deflated_sharpe_ratio_full, probability_of_backtest_overfitting. README also links CITATION.cff and paper/paper.md explicitly labeled '(JOSS paper)'.",
+   "sources": [
+    "https://raw.githubusercontent.com/eslazarev/purged-cross-validation/v0.1.8/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "pcv-numeric-examples",
+   "claim": "Naive KFold reports R^2~0.91 on synthetic unpredictable target while PurgedKFold collapses below zero; real-world holdout shows 6.6% lower prediction error.",
+   "verdict": "supported",
+   "note": "README table shows RandomForest naive-KFold R^2 0.91 vs PurgedKFold -1.87 (below zero, as claimed). Separately: 'The honest-selected model deploys at 6.6% lower MAE on the 12 unseen households' (LCL electricity dataset) -- matches the '6.6% lower prediction error' claim exactly.",
+   "sources": [
+    "https://raw.githubusercontent.com/eslazarev/purged-cross-validation/v0.1.8/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "pcv-ai-disclosure-author",
+   "claim": "README discloses AI coding assistants were used during development; solo-authored by Evgenii Lazarev.",
+   "verdict": "supported",
+   "note": "AI disclosure confirmed verbatim: 'This project was developed with the help of AI coding assistants. They were used to draft and refactor implementation code, expand the test suite, and edit documentation.' The full author name 'Evgenii Lazarev' was not found stated in the README text itself; it is consistent with (but only indirectly evidenced by) the GitHub owner login 'eslazarev'.",
+   "sources": [
+    "https://raw.githubusercontent.com/eslazarev/purged-cross-validation/v0.1.8/README.md (fetched 2026-09-26)",
+    "gh api repos/eslazarev/purged-cross-validation (owner login eslazarev)"
+   ]
+  },
+  {
+   "name": "fqc-repo-license-stars",
+   "claim": "factor-qc: repo exists at github.com/holdout-labs/factor-qc, MIT, 0 stars, pushed_at 2026-09-08, release v0.1.2 dated 2026-09-03.",
+   "verdict": "supported",
+   "note": "gh api repos/holdout-labs/factor-qc: license MIT, archived:false, stargazers_count 0 (exact match), pushed_at 2026-09-08T14:24:35Z (exact match). Release v0.1.2 published_at 2026-09-03T13:09:00Z (exact match).",
+   "sources": [
+    "gh api repos/holdout-labs/factor-qc (checked 2026-09-26)",
+    "gh api repos/holdout-labs/factor-qc/releases/tags/v0.1.2"
+   ]
+  },
+  {
+   "name": "fqc-pypi-package",
+   "claim": "PyPI shows v0.1.3 (alpha per README), NumPy-only, Python 3.11+.",
+   "verdict": "supported",
+   "note": "PyPI factor-qc JSON: version 0.1.3, uploaded 2026-09-04T16:50:38Z, requires_python '>=3.11', summary text matching the GitHub project ('Fail-closed quality gate for quantitative backtests: DSR, PBO, Harvey-Liu haircut, and MinTRL in one NumPy engine...') -- confirms same project, not a namesquat.",
+   "sources": [
+    "https://pypi.org/pypi/factor-qc/json (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "fqc-quote-stats-and-gate",
+   "claim": "Computes DSR, PBO via CSCV (12,870 splits by default), Harvey-Liu haircut (Bonferroni/Holm/BHY), MinTRL, secondary PSR/sample-length/trial-count/moment checks; P0/P1/P2 severity with a process exit code; NumPy-only, Python 3.11+.",
+   "verdict": "supported",
+   "note": "All confirmed verbatim in the README (tag v0.1.2): '...Combinatorially-Symmetric Cross-Validation (12,870 splits at n_blocks=16)'; 'Multiple-testing haircut of the Sharpe ratio (Bonferroni/Holm/BHY)'; 'Minimum Track Record Length...'; PSR/sample-length/trial-count/moment checks graded P1/P2; 'graded P0/P1/P2' and 'qc check exits non-zero on any P0 failure'; 'Python 3.11+, one dependency (numpy)...'.",
+   "sources": [
+    "https://raw.githubusercontent.com/holdout-labs/factor-qc/v0.1.2/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "fqc-companion-repo-timing",
+   "claim": "Part of a two-repo Holdout toolkit alongside holdout-labs/lookahead-free; both created the same week (2026-08-18), released together.",
+   "verdict": "supported",
+   "note": "README explicitly names 'Holdout -- a toolchain against self-deception in quantitative research' listing lookahead-free as a companion. gh api confirms both repos' created_at: factor-qc 2026-08-18T13:43:26Z and lookahead-free 2026-08-18T13:44:41Z (75 seconds apart) -- actually the same minute, stronger than 'same week'. Their pushed_at timestamps are also within 5 seconds of each other (2026-09-08T14:24:30Z / :35Z), consistent with 'released together'.",
+   "sources": [
+    "gh api repos/holdout-labs/factor-qc --jq .created_at",
+    "gh api repos/holdout-labs/lookahead-free (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "fqc-battle-tested-self-report",
+   "claim": "Docs state the statistics are 'battle-tested inside a production research pipeline and validated against published reference values' -- self-reported, not independently verified.",
+   "verdict": "supported",
+   "note": "Verbatim in README. The candidate's own framing ('self-reported, not independently verified') is an accurate characterization: no external adopter, citation or independent benchmark naming this claim was found anywhere in this research pass.",
+   "sources": [
+    "https://raw.githubusercontent.com/holdout-labs/factor-qc/v0.1.2/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "th-repo-license-nuance",
+   "claim": "License is Apache-2.0 per the repository LICENSE file even though GitHub API's license field reads NOASSERTION.",
+   "verdict": "supported",
+   "note": "gh api repos/HephaestLab/TraderHarness confirms license.spdx_id is literally 'NOASSERTION', exactly as the candidate flagged. Fetching the actual LICENSE file content directly (gh api .../contents/LICENSE, base64-decoded) shows the full standard Apache License, Version 2.0 text. README footer also states 'Apache-2.0 © HephaestLab'. Both parts of this nuanced claim confirmed.",
+   "sources": [
+    "gh api repos/HephaestLab/TraderHarness --jq .license (checked 2026-09-26)",
+    "gh api repos/HephaestLab/TraderHarness/contents/LICENSE, base64-decoded (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "th-stars-pushed-release",
+   "claim": "40 stars, pushed 2026-08-22, release v1.1.0 dated 2026-07-19.",
+   "verdict": "supported",
+   "note": "gh api repos/HephaestLab/TraderHarness: stargazers_count 40 (exact match), pushed_at 2026-08-22T17:06:47Z (exact match), archived:false. Release v1.1.0 published_at 2026-07-19T16:58:00Z (exact match).",
+   "sources": [
+    "gh api repos/HephaestLab/TraderHarness (checked 2026-09-26)",
+    "gh api repos/HephaestLab/TraderHarness/releases/tags/v1.1.0"
+   ]
+  },
+  {
+   "name": "th-quote-masking-replay-export",
+   "claim": "Point-in-time masking, entity/date anonymization, fingerprinted replay, training-trajectory export.",
+   "verdict": "supported",
+   "note": "README (Chinese-language, tag v1.1.0) confirms all four mechanisms: enforced point-in-time masking at every data egress plus deterministic date/entity anonymization; '--record-replay' produces a fingerprint-verified cassette for deterministic no-API-key replay; 'traderharness export sft' exports an OpenAI-style JSONL training-trajectory file.",
+   "sources": [
+    "https://raw.githubusercontent.com/HephaestLab/TraderHarness/v1.1.0/README.md (fetched directly and grepped, 2026-09-26)"
+   ]
+  },
+  {
+   "name": "th-dataset-china-a-share",
+   "claim": "Ships five years of daily/5-minute candles, announcements, news, fundamentals, valuations, dividends -- China A-share only.",
+   "verdict": "supported",
+   "note": "README confirms verbatim (Chinese): '五年全市场日线与5分钟线、公告、政策快讯、基本面、估值、分红以及沪深300基准' (five years market-wide daily and 5-minute lines, announcements, policy news, fundamentals, valuations, dividends, plus the CSI 300 benchmark) -- CSI 300 confirms China A-share scope.",
+   "sources": [
+    "https://raw.githubusercontent.com/HephaestLab/TraderHarness/v1.1.0/README.md (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "th-benchmark-four-llms-drawdown",
+   "claim": "Includes a benchmark of four LLMs (Claude Opus, Kimi K2.6, Qwen 3.7-Max, DeepSeek V4-Pro) over 21 trading days spanning a -9.12% drawdown, with the authors' own 'small sample, single Agent style smoke test... not constituting model rankings or investment advice' caveat.",
+   "verdict": "refuted",
+   "note": "Directly fetched and grepped the full 355-line README at tag v1.1.0. The actual benchmark table (lines ~111-137) runs FOUR AGENT/STRATEGY PRESETS (quality-compounder, trend-breakout, event-hawk, quant-researcher) under a SINGLE model, deepseek-v4-pro, over 2024-03-04 to 2024-03-29 -- not four different LLMs. Reported cumulative returns are +0.52%, +0.09%, -0.70%, -1.33% and max drawdowns 0.76%/1.07%/0.93%/1.73%; the CSI 300 benchmark itself is -0.10%. No figure anywhere near -9.12% appears in the document (grep for '9.12' = zero hits). Grepping the whole README case-insensitively for 'Kimi', 'Qwen', and 'Claude Opus' returns zero hits; the only model name present is deepseek-v4-pro, used for all four rows, not one-of-four. No 'smoke test' caveat (English or an obvious Chinese equivalent) is attached to this table; the only nearby disclaimers are generic project-scope statements ('TraderHarness is research infrastructure, not investment advice, nor a brokerage system'; 'not a goal: public leaderboards...'). This specific capability claim does not survive verification against the primary source it cites.",
+   "sources": [
+    "https://raw.githubusercontent.com/HephaestLab/TraderHarness/v1.1.0/README.md (fetched and grepped directly, 2026-09-26): lines 111-137 (results table), full-file grep for '9.12', 'Kimi', 'Qwen', 'Claude Opus', 'smoke' all return no matches"
+   ]
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "Dagster",
+   "url": "https://github.com/dagster-io/dagster",
+   "modalities": [
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Dagster's asset-centric model fuses this layer's two separately-adopted winners (Dagu for orchestration, Pandera for validation) into one graph where data-quality checks are nodes next to the assets they gate -- structurally closer to 'supervise owned processes... retain... recoverable state' than a pure task-runner. Apache-2.0 (vs Dagu's GPL-3.0) is a licensing plus. Against it: heavier deployment (webserver+daemon+DB) than Dagu's single static binary -- exactly the profile Dagu's own README targets ('teams whose main work isn't orchestration'); no native run on this stack exists, so this is documented, not demonstrated."
+  },
+  {
+   "name": "Apache Airflow",
+   "url": "https://github.com/apache/airflow",
+   "modalities": [
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The incumbent industry-standard workflow scheduler, and conspicuously absent from this repository's own catalog (no 'airflow' hit in coverage.json or repository-index.md) despite Dagu's own README self-describing as an 'Alternative to Airflow / Cron / Job Scheduler' -- the stack adopted a lightweight Dagu without a recorded comparison against the incumbent it explicitly positions against. Genuine catalog gap. Against adoption: Airflow's scheduler+webserver+metadata-DB footprint is heavy relative to the layer's stated 'bounded... local command workflows' scope, and nothing here shows it closes a concrete gap Dagu leaves open."
+  },
+  {
+   "name": "Temporal",
+   "url": "https://github.com/temporalio/temporal",
+   "modalities": [
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Of every workflow engine checked, Temporal's core primitive -- automatic checkpoint/replay of in-progress workflow state across crashes -- maps most literally onto this layer's own requirement wording ('supervise owned processes; retain... recoverable state'), closer than Dagu's completed-history-only restart (layers.json's own gap: Dagu's 'completed-history restart is not recovery of in-flight work'). The concrete next step this stack's own materials already imply: one bounded local Temporal workflow with an induced mid-run failure, compared against Dagu on the same failure/cancellation/output contract per this layer's overturn_when clause."
+  },
+  {
+   "name": "Prefect",
+   "url": "https://github.com/PrefectHQ/prefect",
+   "modalities": [
+    "star",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Supplied as a starred-repo input already marked in_catalog:true elsewhere in this stack's catalog; converges again here as a Python-native (workflow logic in the same language as the research code it supervises, unlike Dagu's YAML DSL) alternative with first-class retries/caching/event triggers. Strongest pure-Python orchestration candidate, at the cost of a heavier server/DB deployment than Dagu's single binary."
+  },
+  {
+   "name": "Ray",
+   "url": "https://github.com/ray-project/ray",
+   "modalities": [
+    "awesome",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Matches the input packet's own framing exactly: a general distributed actor/task substrate for supervising bounded parallel research workers with retries, rather than a DAG/YAML scheduler like Dagu. Weaker than Dagster/Airflow/Temporal/Prefect for host-loss recovery (Ray's fault tolerance is opt-in and cluster-lifecycle-bound, not durable-execution-by-default), but a stronger fit for fine-grained fan-out of many short-lived research-worker tasks with backpressure/retry -- closer to this stack's actual Ultracode-style worker pattern than a cron-like DAG. Full fault-tolerance claims need a docs-level (not README-level) read before promotion."
+  },
+  {
+   "name": "Great Expectations",
+   "url": "https://github.com/fivetran/great_expectations",
+   "modalities": [
+    "awesome",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Direct Pandera competitor with a larger community and richer tooling, but already source-reviewed and provisionally rejected by this stack's own prior convergence pass as unnecessary weight given Pandera already backs an established fail-closed snapshot-promotion gate -- confirmed firsthand in catalogs/us-equities/gates-20260922.json lines 68-83, which also shows a real (not only synthetic) 24-symbol/20-session Alpaca ingest passed that gate on 2026-09-24, more current than the 'synthetic fixtures only' framing in layers.json's own gaps text. Merit verdict: keep Pandera unless the named seeded-defect comparison shows GX catching something it misses."
+  },
+  {
+   "name": "pydantic",
+   "url": "https://github.com/pydantic/pydantic",
+   "modalities": [
+    "star",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Validates Python objects/dicts against type-hinted schemas -- a different primary object model from Pandera's dataframe/column statistical checks. The input packet's framing ('same role as the adopted Pandera') is only partly right: Pandera can itself use pydantic models as an underlying schema layer in recent releases, making these complementary rather than head-to-head substitutes. Fits as a row-level/config-object validation layer alongside Pandera's dataframe-level gate, not a replacement."
+  },
+  {
+   "name": "dbt",
+   "url": "https://github.com/dbt-labs/dbt",
+   "modalities": [
+    "star",
+    "awesome",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Covers SQL-transform testing/lineage rather than Python dataframe validation or process orchestration -- a partial, adjacent fit for a pipeline whose DuckDB layer grows SQL-modeled transforms that want declarative tests alongside Pandera's Python-side gate. Not a substitute for either current winner."
+  },
+  {
+   "name": "purged-cross-validation",
+   "url": "https://github.com/eslazarev/purged-cross-validation",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The strongest-evidenced tool in the quant-specific leakage/overfitting-gate niche: real algorithmic breadth in one sklearn-compatible package, a release literally dated the day of this research (v0.1.8, 2026-09-26), and a JOSS submission absent from every other niche candidate. Extends what Pandera's gate does not do -- Pandera checks schema/values, this checks whether a cross-validation split itself leaks future information into training -- a genuine capability gap, not a redundant reimplementation. Older, more battle-tested but AGPL-3.0-licensed prior art for the same math exists (esvhd/pypbo, separately listed)."
+  },
+  {
+   "name": "factor-qc",
+   "url": "https://github.com/holdout-labs/factor-qc",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The most statistically comprehensive single fail-closed gate found for backtest-overfitting detection (DSR+PBO+Harvey-Liu+MinTRL in one tool); its P0/P1/P2 exit-code contract is a close structural match to a CI-style orchestration gate. Against it: zero GitHub stars, a two-repo single-maintainer org with no independent adopters found, and the 'battle-tested' claim is self-reported with no named external user. A promising, unadopted, single-maintainer tool, not yet SOTA by community validation."
+  },
+  {
+   "name": "leakprobe",
+   "url": "https://github.com/quantraunak/leakprobe",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Addresses a genuinely different sub-problem than the PBO/DSR tools: checking whether the feature-pipeline code itself leaks future information, rather than auditing a backtest's results after the fact -- complements rather than duplicates factor-qc/purged-cross-validation. Notable convergence: this and holdout-labs/lookahead-free were created within about three weeks of each other (2026-08-18 and 2026-09-10) with near-identical framing, suggesting multiple small teams are independently discovering this specific capability gap right now. Zero stars, unreleased, and the headline catch-rate claim came from a search snippet, not a verified README -- needs a direct source_review before real weight is placed on it."
+  },
+  {
+   "name": "TraderHarness",
+   "url": "https://github.com/HephaestLab/TraderHarness",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The candidate whose stated purpose most literally matches this layer's own requirement text -- 'native identity and complete returned results... without granting research workers broker execution authority' is essentially what point-in-time masking, anonymization and fingerprinted replay exist to guarantee for an LLM research worker, directly relevant to how this stack already uses Claude/Codex as research workers. Held back by: A-share-only data today (a US-equities adapter would need building), and a benchmark the authors themselves label a smoke test, not a validated result."
+  },
+  {
+   "name": "A Grammar of Machine Learning Workflows: Rejecting Data Leakage at Call Time (mlw / ml)",
+   "url": "https://arxiv.org/abs/2603.10742",
+   "modalities": [
+    "paper",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "General-purpose ML methodology, not finance-specific, but directly on point for this layer's own requirement language around complete, recoverable, non-leaking research results -- a call-time structural constraint is a stronger guarantee than any post-hoc statistical or metamorphic checker above. Against adoption: the reference-implementation repo (epagogy/ml) has only 9 stars and was last pushed 2026-05-24, over four months before this check -- quieter than any finance-specific tool above, and integrating a general-ML grammar into a trading-specific pipeline would itself be nontrivial engineering. Marked maintained:false on that 4+ month push-silence signal, though it is still under the 12-month archival threshold."
+  },
+  {
+   "name": "Apache Hamilton (incubating)",
+   "url": "https://github.com/apache/hamilton",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Confirmed weak fit for this layer's process-supervision half by the project's own README ('not an orchestrator'), but a real, actively-developed dataflow/lineage/testability layer that could sit inside an orchestrator (Dagu, Dagster, Airflow, Temporal, Prefect) rather than replace one. The ASF-incubation move is a genuine positive governance signal worth tracking, but the release process is still incubating-RC only, not a stable GA cadence."
+  },
+  {
+   "name": "pypbo",
+   "url": "https://github.com/esvhd/pypbo",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The oldest and most-starred prior art for this exact niche, valuable as the baseline every newer tool should be checked against for correctness of the underlying statistics. AGPL-3.0 is a materially more restrictive copyleft license than every other MIT/Apache candidate here -- AGPL's network-use disclosure trigger is normally not implicated by a local, non-networked research library, but it is a real legal-review item this stack has not needed for any other adopted component, and is a concrete reason a newer MIT-licensed reimplementation (purged-cross-validation) may be preferable even if statistically equivalent."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/data-quality-orchestration--gpt-6-live.md"
+  }
+ ]
+}

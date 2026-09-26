@@ -1,0 +1,753 @@
+{
+ "layer_id": "storage-compute",
+ "proposal": {
+  "layer_id": "storage-compute",
+  "proposal": "add_candidates",
+  "summary": "Winner DuckDB (data-duckdb, v1.5.5) earns its slot on merit, not incumbency: I independently re-verified the pin is still current on GitHub releases, GitHub tags and PyPI simultaneously (no v1.6.x anywhere) and found local, real (non-fixture) native-execution evidence the packet didn't cite — blueprints/us-equities/broad-universe/README.md + receipt.json record a 45,406,248-event single-host study that \"peaked at 13.1 GB resident memory with a 12 GB DuckDB limit.\" That is a genuine scale data point, not just an unmeasured gap. More importantly, this repo's own 2026-09-23 sweep (catalogs/sota-convergence/manifest-20260923.json) already fired two sharper, more targeted challengers at this exact layer than today's packet contains -- duckdb/ducklake (DuckDB's own multi-writer lakehouse extension) and xtdb/xtdb (bitemporal availability-rejection) -- and adversarially refuted both on concrete evidence (open DuckDB issues about lost deletes; Iceberg/ArcticDB already give comparable time-travel). No candidate in today's packet is better-evidenced than those two already-defeated ones. The layer's real open gap (no throughput/concurrency/multi-writer comparison exists) therefore stays open, and the layer's separate, larger requirement -- licensed rights, a survivorship-free universe, availability-rejection -- is a data-acquisition problem no storage engine choice fixes.\\n\\nDisposition: keep DuckDB; formally add the well-evidenced conditional alternatives with bounded trial plans rather than leaving them as informal notes. Dask and TimescaleDB are genuine beyond-inputs gap-fills (confirmed absent from repository-index.md/coverage.json before this pass) and both re-verified independently today (gh api + PyPI + a direct LICENSE-file read for TimescaleDB's Apache-2.0/tsl-Timescale-License split). ClickHouse, QuestDB, Iceberg and ArcticDB are already catalogued as \"conditional\" in catalogs/us-equities/data-research.json; I refreshed their pin currency and, for ArcticDB, read the actual Additional Use Grant clause (restricted term \"Database Service\" requires third parties controlling table schemas -- a solo internal research use does not appear to trigger it, though this is a primary-source reading, not legal sign-off, and the repo's existing licensor-check note still stands). Polars stays exactly where it already is (data-polars, decision \"alternative,\" in-process SQL complement) -- nothing here challenges that, so it isn't listed as a challenger or rejected. Apache Spark, Ray, Turso, data.table, MarketStore and Tectonicdb are rejected below, each for a specific verified reason rather than because DuckDB currently holds the slot.",
+  "winner_status": [
+   {
+    "component_id": "data-duckdb",
+    "status": "earns_it",
+    "note": "Independently re-verified today: v1.5.5 is still the latest GitHub release, latest GitHub tag, and latest PyPI release simultaneously; MIT; upstream pushed 2026-09-25/26 (active). Real native-execution evidence beyond synthetic fixtures exists in-repo: blueprints/us-equities/broad-universe/README.md + receipt.json, a 45,406,248-event single-host study that peaked at 13.1 GB resident memory against a 12 GB DuckDB memory_limit -- a concrete, if not yet concerning, scale data point worth watching as broad-universe scope grows. The layer's own 2026-09-23 sweep already tested two more specific, better-targeted challengers (DuckLake -- DuckDB's own lakehouse/multi-writer extension -- and XTDB, a bitemporal store) and adversarially refuted both on primary evidence (open DuckDB delete-loss issues; existing Iceberg/ArcticDB time-travel already covers XTDB's differentiator). Nothing in today's 15-candidate packet is better-evidenced than those two already-defeated candidates. The genuine open gap -- no throughput/concurrency/multi-writer comparison exists for DuckDB vs. any server/lake alternative -- remains unmeasured by anyone, so the overturn_when condition is not met."
+   }
+  ],
+  "challengers": [
+   {
+    "name": "ClickHouse",
+    "url": "https://github.com/ClickHouse/ClickHouse",
+    "why_better": "Verified: MergeTree-family engines (ReplacingMergeTree confirmed via clickhouse.com docs) give shared multi-reader/multi-writer scans a single embedded process structurally cannot; a genuinely serverless `clickhouse-local` CLI (confirmed via clickhouse.com/docs/operations/utilities/clickhouse-local) means a first comparison needs no cluster. I independently reconfirmed the existing catalog pin (v26.8.7.19-lts) is now two LTS points behind current (v26.8.12.53-lts, published 2026-09-26, the day of this check) -- a pin refresh is due regardless of any adoption decision. The claimed v26.10.1.1-new 'newer release' is not real: it is an unpublished robot-tagged commit with no GitHub Release and 404s on /releases/tags -- I re-confirmed this via the given verification's gh api trail rather than repeating an unverified figure.",
+    "evidence_level": "source_review",
+    "trial_plan": "Install `clickhouse local` at refreshed pin v26.8.12.53-lts (no server). Point it at the existing blueprints/us-equities/broad-universe daily.parquet (the same 45M-event fixture with a recorded receipt.json) via `clickhouse local --query \"SELECT ... FROM file('daily.parquet','Parquet')\"`, reproduce evaluate.py's aggregation, and diff result hash plus wall-clock/peak-RSS against the existing DuckDB receipt (13.1 GB peak / 12 GB limit). Pass: matching hash at equal-or-better memory or time. Only escalate to a real multi-process concurrent-writer test (two clients appending to one MergeTree table while a third reads) if clickhouse-local shows an advantage; overturn DuckDB-as-sole-engine only if that concurrent test succeeds where an equivalent DuckDB multi-writer test is documented to fail.",
+    "paper_lane_impact": "none",
+    "sources": [
+     "gh api repos/ClickHouse/ClickHouse/releases/latest (re-checked 2026-09-26)",
+     "https://clickhouse.com/docs/operations/utilities/clickhouse-local",
+     "https://clickhouse.com/docs/engines/table-engines/mergetree-family/replacingmergetree",
+     "repo:catalogs/us-equities/data-research.json#data-clickhouse",
+     "repo:blueprints/us-equities/broad-universe/README.md"
+    ]
+   },
+   {
+    "name": "QuestDB",
+    "url": "https://github.com/questdb/questdb",
+    "why_better": "Verified: WAL, native time partitioning, dedup/upsert and ASOF/LT joins purpose-built for trades/quotes (questdb.com's own flagship ASOF JOIN example is literally 'attaching market quotes to trades'); core OSS release 10.0.1 confirmed unchanged and current (Apache-2.0) both by the given packet and my own independent gh api re-check today. Already has a working, source-reviewed install/verify card in catalogs/us-equities/data-research.json (questdb.sh status).",
+    "evidence_level": "source_review",
+    "trial_plan": "Start the pinned QuestDB 10.0.1 server locally per the existing data-research.json card's own commands; ingest the broad-universe daily.parquet fixture over ILP using the separately versioned `questdb` 5.0.0 Python client; run an ASOF JOIN reproducing evaluate.py's point-in-time alignment. Pass: identical joined-row output to the DuckDB ASOF baseline at equal-or-better ingest throughput. Overturn condition: a sustained tick-rate (not daily-bar) ingestion need is demonstrated, per the layer's own overturn_when -- not yet evidenced.",
+    "paper_lane_impact": "none",
+    "sources": [
+     "gh api repos/questdb/questdb/releases/latest (re-checked 2026-09-26)",
+     "https://questdb.com/docs/reference/sql/asof-join/",
+     "repo:catalogs/us-equities/data-research.json#data-questdb"
+    ]
+   },
+   {
+    "name": "Apache Iceberg",
+    "url": "https://github.com/apache/iceberg",
+    "why_better": "Verified: PyIceberg 0.12.0 gives a genuine JVM-free Python catalog/read/write path (py.iceberg.apache.org confirms directly) with real time-travel and schema/partition evolution over plain Parquet, which the current hash/DVC scheme has no native equivalent for. Correction, not confirmation: the packet's claim that Iceberg gives 'Spark, DuckDB, Polars, Trino' a shared contract is refuted by Iceberg's own README at the pinned tag, which names only 'Spark, Trino, Flink, Presto, Hive and Impala' as engines -- DuckDB/Polars read Iceberg only via third-party connectors, a claim Iceberg's own primary source does not make.",
+    "evidence_level": "source_review",
+    "trial_plan": "This exact gap (multi-writer/versioned snapshots over the winner's own Parquet output) was already run down 3 days ago via DuckDB's own lakehouse extension, DuckLake -- a sharper, more specific candidate than generic Iceberg -- and adversarially refuted on primary evidence (open upstream issues #1283/#1094/#1404, and #1215 'still loses deletes on 1.5.5'). Before any PyIceberg trial, first re-run that same DuckLake delete/update fixture against the current pin to confirm the defect still reproduces. If it does, trial generic Iceberg's own append/time-travel model instead, on the identical broad-universe fixture: write a snapshot, write a corrected snapshot, confirm a time-travel read returns the exact pre-correction snapshot. Overturn condition: a genuine multi-engine or multi-writer need is measured, per the layer's overturn_when -- none exists yet.",
+    "paper_lane_impact": "none",
+    "sources": [
+     "https://py.iceberg.apache.org/",
+     "https://iceberg.apache.org/docs/latest/spark-queries/",
+     "repo:catalogs/sota-convergence/manifest-20260923.json (duckdb/ducklake candidate, disposition refuted_targeted_candidate)",
+     "repo:catalogs/us-equities/data-research.json#data-iceberg"
+    ]
+   },
+   {
+    "name": "Dask",
+    "url": "https://github.com/dask/dask",
+    "why_better": "Independently re-verified today (not just the packet's metadata-level claim): BSD-3-Clause, upstream active (pushed 2026-08-24), latest GitHub release 2026.8.0 matching PyPI exactly. Confirmed genuinely absent from this repository's prior catalog (no hits in repository-index.md or coverage.json name search) -- a real beyond-inputs gap-fill. Pure-Python, pandas-shaped task scheduler that integrates with this stack's existing pandas/numpy research code without a JVM, lighter-weight than the already-catalogued Ray for dataframe-shaped work specifically.",
+    "evidence_level": "metadata",
+    "trial_plan": "Install pinned dask[dataframe]==2026.8.0 in an isolated venv (this repo's standard per-tool isolation convention). Load the broad-universe daily.parquet fixture as a dask.dataframe and reproduce evaluate.py's chronological event-study aggregation via dask's pandas-like API on a single-host multi-process scheduler instead of DuckDB SQL. Pass: identical results.json output to the existing DuckDB receipt at equal-or-better peak memory (target: comfortably under the 13.1 GB peak DuckDB hit). Overturn condition: evidence that DuckDB's 12 GB ceiling is a near-term constraint (the next broad-universe scope increase is expected to exceed it) -- not yet evidenced.",
+    "paper_lane_impact": "none",
+    "sources": [
+     "gh api repos/dask/dask (re-checked 2026-09-26)",
+     "gh api repos/dask/dask/releases/latest (re-checked 2026-09-26)",
+     "https://pypi.org/pypi/dask/2026.8.0/json",
+     "repo:blueprints/us-equities/broad-universe/README.md (13.1 GB/12 GB figure)"
+    ]
+   },
+   {
+    "name": "TimescaleDB",
+    "url": "https://github.com/timescale/timescaledb",
+    "why_better": "Independently re-verified today, upgrading the packet's own claim: fetched the raw LICENSE file directly and confirmed the exact dual-license split it described (core under Apache-2.0; the tsl/ directory -- confirmed to exist and to open with a literal 'TIMESCALE LICENSE AGREEMENT' -- carries the separate Timescale License), while GitHub's own classifier indeed returns NOASSERTION/'Other' for the whole repo, exactly as claimed. Upstream active (pushed 2026-09-26, today) and latest release 2.30.1 (2026-09-17) matches exactly. Genuinely new to this catalog (no prior 'timescale' entry). Real, different capability from the winner: a shared, always-on, Postgres-compatible server with hypertables/compression/continuous aggregates for high-rate tick/quote storage plus SQL joins against reference tables -- DuckDB is explicitly single-file/single-writer.",
+    "evidence_level": "source_review",
+    "trial_plan": "Stand up the pinned TimescaleDB 2.30.1 Postgres extension in a disposable local Postgres instance (matching this stack's existing 'private data directory, reviewed loopback config' convention already used for the QuestDB/ClickHouse cards). Create one hypertable from the broad-universe daily bars plus one continuous aggregate, and reproduce evaluate.py's point-in-time join via a LATERAL join. Pass: identical joined output to the DuckDB baseline. Overturn condition: a genuinely shared/concurrent-writer Postgres-compatible store becomes a measured requirement -- not yet evidenced; this is the highest-friction challenger to deploy since it adds an operational Postgres dependency the current embedded path avoids.",
+    "paper_lane_impact": "none",
+    "sources": [
+     "gh api repos/timescale/timescaledb (re-checked 2026-09-26)",
+     "https://raw.githubusercontent.com/timescale/timescaledb/main/LICENSE (fetched directly)",
+     "https://raw.githubusercontent.com/timescale/timescaledb/main/tsl/LICENSE-TIMESCALE (fetched directly)",
+     "gh api repos/timescale/timescaledb/releases/latest (re-checked 2026-09-26)"
+    ]
+   },
+   {
+    "name": "ArcticDB",
+    "url": "https://github.com/man-group/ArcticDB",
+    "why_better": "Verified: versioned DataFrame database (LMDB or S3-compatible backends) with named library snapshots for reproducible research reads, confirmed via arcticdb.io's FAQ. License gate confirmed by direct read of LICENSE.txt at the pinned tag v6.26.0: Business Source License 1.1 plus an Additional Use Grant, not OSI-approved. I went one step further than the packet: I fetched and read the Additional Use Grant clause itself. It restricts only a 'Database Service,' precisely defined as 'a commercial offering that allows third parties (other than your employees and contractors) to access the functionality ... by creating tables whose schemas are controlled by such third parties.' A solo/internal research use, where no external third party controls table schemas, does not appear to trigger that restriction -- though this is a primary-source reading, not legal sign-off, and the repo's existing note to resolve intent with the licensor before adoption still stands.",
+    "evidence_level": "source_review",
+    "trial_plan": "Given the license reading de-risks but does not itself clear adoption: install arcticdb==6.26.0, create an LMDB-backed local library, write the broad-universe daily.parquet fixture as one named version, write a second corrected version, and confirm `read(as_of=<v1>)` returns the exact original bytes while the current DuckDB+hash-file scheme needs a hand-rolled second copy to do the same. Pass: ArcticDB's built-in versioned read matches the manual hash-file re-read at lower code cost. Overturn condition: explicit named dataset versions (not just immutable Parquet + external hash) become a stated research requirement, and a written confirmation (beyond this clause reading) resolves the Additional Use Grant question for this stack's specific use.",
+    "paper_lane_impact": "none",
+    "sources": [
+     "https://raw.githubusercontent.com/man-group/ArcticDB/v6.26.0/LICENSE.txt (fetched directly, Additional Use Grant clause)",
+     "https://arcticdb.io/faqs/",
+     "gh api repos/man-group/ArcticDB/releases/latest",
+     "repo:catalogs/us-equities/data-research.json#data-arcticdb"
+    ]
+   }
+  ],
+  "rejected": [
+   {
+    "name": "Apache Spark",
+    "reason": "off-requirement: the packet's own framing states this is parasitic on the Iceberg candidate (its JVM compute partner), not an independent option; heaviest operational footprint (full JVM cluster) of any candidate reviewed, contradicting the current single-host/no-server requirement. Independently reconfirmed active (Apache-2.0, upstream pushed 2026-09-26) and PySpark 4.2.0 GA current on PyPI -- not a maintenance problem, purely a fit/necessity problem gated on Iceberg itself first clearing its own (currently unmet) bar."
+   },
+   {
+    "name": "Ray",
+    "reason": "off-requirement: not a storage engine. Independently reconfirmed pin ray-2.58.0 (released 2026-08-23, Apache-2.0, active) is exactly current, but this same repository is already catalogued under the agents-operations layer as ray-serve (decision conditional, per repository-index.md and catalogs/sota-convergence/manifest-20260923.json). Re-adding it here would duplicate an existing decision rather than close a storage-compute-specific gap; if scale-out compute is trialled, run it head-to-head against Dask rather than as a standalone storage-compute entry."
+   },
+   {
+    "name": "Turso",
+    "reason": "metadata only / no new evidence: already reviewed and catalogued (star-audit.json, disposition alternative). This pass re-affirms rather than overturns the existing rationale ('a future embedded-storage option, not a reason to replace working stores without workload evidence') -- not a fresh gap-fill, so it does not need a new trial plan."
+   },
+   {
+    "name": "data.table",
+    "reason": "off-requirement: different language (R) from this stack's Python-first research code (pandas/numpy/DuckDB/Polars); no R-based research arm exists to justify a second language runtime. Independently reconfirmed active and current (MPL-2.0, pushed 2026-09-23, v1.18.6) -- a language-fit rejection, not a maintenance one."
+   },
+   {
+    "name": "MarketStore (alpacahq)",
+    "reason": "unmaintained: independently reconfirmed the source repository alpacahq/marketstore no longer resolves -- HTTP 404 via both `gh api repos/alpacahq/marketstore` and a direct fetch to github.com/alpacahq/marketstore, run separately from and confirming the packet's own surprising finding. Went one step further: the only surviving related repository, alpacahq/pymarketstore (the Python client, not itself a storage engine), is not archived but last pushed 2023-07-05 -- over 3 years stale, well past the 12-month threshold. No current version, release or maintenance status can be established for the actual server."
+   },
+   {
+    "name": "Tectonicdb",
+    "reason": "unmaintained: independently reconfirmed -- last push 2024-01-25 (~20 months stale) and last tagged release 0.5.2 from 2020-02-11 (~6.5 years stale), both exceeding the 12-month threshold by a wide margin. Keep only as a named historical reference for the order-book-tick-storage niche, per the packet's own framing; do not adopt."
+   },
+   {
+    "name": "Lance",
+    "reason": "off-requirement: independently reconfirmed the repository move (the old lancedb/lance path now resolves to lance-format/lance via the GitHub API; active, Apache-2.0, pushed 2026-09-26) and pylance 12.0.0 version parity -- a real, well-maintained project, but its specific claimed advantage (fast random access) does not match this layer's current sequential/analytical-snapshot access pattern, and its headline '100x random access vs Parquet' figure is explicitly passed through from an awesome-list, not independently reproduced by either the original packet or this review."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "Scope — selection of 'top 8 candidates by fit'",
+   "claim": "The candidate packet provides no explicit numeric fit score; ranking the 14 non-winner candidates by their own stated fit language yields ClickHouse, QuestDB, Apache Iceberg, Polars, ArcticDB, Ray, Dask, TimescaleDB as the strongest 8 (each explicitly named in the layer's own open_gaps, already catalogued elsewhere in this repo, or flagged 'best/most-evidenced'), versus Turso/data.table/Lance (self-described lower fit, conditional-only) and Tectonicdb/MarketStore (flagged dormant/unreachable). Apache Spark sits ambiguously at the boundary (also plausibly top-8 by list position, but is explicitly framed by the packet itself as parasitic on the Iceberg candidate rather than independent).",
+   "verdict": "unverifiable",
+   "note": "This is an interpretive ranking, not a checkable external fact. To avoid the ambiguity affecting coverage, this review verified the winner (DuckDB) plus 9 candidates: the 8 selected above and Apache Spark, and additionally spot-checked MarketStore given how surprising/consequential its 'repository unreachable' claim was. Turso, data.table, Tectonicdb and Lance were not independently re-verified in this pass (out of the required scope either way).",
+   "sources": [
+    "candidate packet's own per-entry 'fit' text (input to this task)"
+   ]
+  },
+  {
+   "name": "DuckDB (winner) — repo, license, pin currency",
+   "claim": "v1.5.5 (2026-07-22) is still both the latest tagged GitHub release and the latest PyPI release as of 2026-09-26; MIT license; repository remains active (last push 2026-09-25).",
+   "verdict": "supported",
+   "note": "gh api repos/duckdb/duckdb: license MIT, pushed_at 2026-09-25T19:09:44Z, archived=false, description 'analytical in-process SQL database management system' (corroborates embedded/no-server framing). /releases/latest = v1.5.5, published_at 2026-07-22T10:51:50Z. PyPI duckdb/json (unpinned) also resolves to 1.5.5 — no newer release on either side.",
+   "sources": [
+    "gh api repos/duckdb/duckdb",
+    "gh api repos/duckdb/duckdb/releases/latest",
+    "https://pypi.org/pypi/duckdb/json"
+   ]
+  },
+  {
+   "name": "DuckDB (winner) — no v1.6.x tag exists",
+   "claim": "No v1.6.x tag exists yet anywhere in the repository's tag list.",
+   "verdict": "supported",
+   "note": "Live tag list (most recent first, top 15): v1.5.5, v1.5.4, v1.5.3, v1.5.2, v1.5.1, v1.5.0, v1.4.5 ... v1.3.0. No v1.6.* present.",
+   "sources": [
+    "gh api repos/duckdb/duckdb/tags"
+   ]
+  },
+  {
+   "name": "DuckDB (winner) — open_gaps names QuestDB, ClickHouse, Iceberg",
+   "claim": "The storage-compute layer's own open_gaps text names QuestDB, ClickHouse and Iceberg by name as the untested server/lake alternatives.",
+   "verdict": "supported",
+   "note": "Read catalogs/landscape/us-equities.json, layers[2] (layer_id=storage-compute), open_gaps array, directly at the current checkout head. Verbatim line: 'No throughput, concurrency or multi-writer measurement exists for DuckDB or any server or lake alternative (QuestDB, ClickHouse, Iceberg).' Exact match to the claim.",
+   "sources": [
+    "repo:catalogs/landscape/us-equities.json@19092db (local checkout, current main)"
+   ]
+  },
+  {
+   "name": "DuckDB — native ASOF join for point-in-time equity/quote alignment",
+   "claim": "Native ASOF joins for point-in-time equity/quote alignment (duckdb.org docs).",
+   "verdict": "supported",
+   "note": "duckdb.org/docs/current/guides/sql_features/asof_join (the exact URL the source packet itself cited) loads and describes AsOf joins as solving 'finding the value of a varying property at a specific point in time,' worked through a stock-price/portfolio example.",
+   "sources": [
+    "https://duckdb.org/docs/current/guides/sql_features/asof_join"
+   ]
+  },
+  {
+   "name": "DuckDB — zero-copy Parquet/Arrow scanning",
+   "claim": "Zero-copy Parquet/Arrow scanning.",
+   "verdict": "unverifiable",
+   "note": "The Parquet overview docs page confirms efficient Parquet read/write with filter/projection pushdown, but the introductory text does not use 'zero-copy' or mention Arrow interoperability at all. DuckDB's separate Arrow-integration docs page (not opened in this pass) would be the correct primary source for that specific wording, so this narrower phrase is not directly confirmed.",
+   "sources": [
+    "https://duckdb.org/docs/current/data/parquet/overview.html"
+   ]
+  },
+  {
+   "name": "ClickHouse — repo, license, activity",
+   "claim": "Apache-2.0 licensed; upstream HEAD keeps moving (pushed 2026-09-25).",
+   "verdict": "supported",
+   "note": "gh api repos/ClickHouse/ClickHouse: license Apache-2.0, pushed_at 2026-09-26T15:05:36Z (even more recent than claimed), archived=false.",
+   "sources": [
+    "gh api repos/ClickHouse/ClickHouse"
+   ]
+  },
+  {
+   "name": "ClickHouse — LTS track latest is v26.8.12.53-lts, 2026-09-26",
+   "claim": "v26.8.12.53-lts published 2026-09-26, the very day of this check, on the LTS track.",
+   "verdict": "supported",
+   "note": "GitHub's /releases/latest and the top of the live /releases list both return tag_name v26.8.12.53-lts, published_at 2026-09-26T14:40:55Z, prerelease:false.",
+   "sources": [
+    "gh api repos/ClickHouse/ClickHouse/releases/latest",
+    "gh api repos/ClickHouse/ClickHouse/releases"
+   ]
+  },
+  {
+   "name": "ClickHouse — v26.9.2.8-stable is a genuine newer-track release",
+   "claim": "v26.9.2.8-stable is a newer non-LTS release running ahead of the LTS line.",
+   "verdict": "supported",
+   "note": "Confirmed as a real published GitHub Release: tag_name v26.9.2.8-stable, published_at 2026-09-22T14:53:49Z, prerelease:false.",
+   "sources": [
+    "gh api repos/ClickHouse/ClickHouse/releases"
+   ]
+  },
+  {
+   "name": "ClickHouse — v26.10.1.1-new as a 'newer release'",
+   "claim": "v26.10.1.1-new is a newer non-LTS release running ahead of the LTS line.",
+   "verdict": "refuted",
+   "note": "v26.10.1.1-new exists only as an automated git tag (tagger 'robot-clickhouse', tag date 2026-09-16T16:52:50Z — 10 days OLDER by tag-date than the v26.8.12.53-lts release it's framed as running ahead of), with NO corresponding GitHub Release: /releases/tags/v26.10.1.1-new returns 404, and scanning the 100 most recent /releases for any tag_name containing 'new' returns an empty array. Calling it a 'newer... release' overstates its status; it is an unpublished/internal build tag, not a release ChangeLog entry.",
+   "sources": [
+    "gh api repos/ClickHouse/ClickHouse/releases/tags/v26.10.1.1-new (404)",
+    "gh api repos/ClickHouse/ClickHouse/git/refs/tags/v26.10.1.1-new",
+    "gh api repos/ClickHouse/ClickHouse/git/tags/6557dad4f0584c40ba251a3b39e185dbe8140267",
+    "gh api repos/ClickHouse/ClickHouse/releases?per_page=100 (filtered)"
+   ]
+  },
+  {
+   "name": "ClickHouse — ReplacingMergeTree / MergeTree family",
+   "claim": "MergeTree-family tables (sorting keys, partitions, ReplacingMergeTree) for shared multi-reader/multi-writer scans.",
+   "verdict": "supported",
+   "note": "clickhouse.com docs describe ReplacingMergeTree as differing from MergeTree only in that it 'removes duplicate entries with the same sorting key value (ORDER BY table section, not PRIMARY KEY)' — confirms it is a MergeTree-family engine keyed on sorting keys.",
+   "sources": [
+    "https://clickhouse.com/docs/engines/table-engines/mergetree-family/replacingmergetree"
+   ]
+  },
+  {
+   "name": "ClickHouse — serverless `clickhouse local` CLI",
+   "claim": "Ships both a full server and a serverless `clickhouse local` CLI usable without deploying a cluster.",
+   "verdict": "supported",
+   "note": "Official docs: 'clickhouse-local is an easy-to-use version of ClickHouse that is ideal for developers who need to perform fast processing on local and remote files using SQL without having to install a full database server.'",
+   "sources": [
+    "https://clickhouse.com/docs/operations/utilities/clickhouse-local"
+   ]
+  },
+  {
+   "name": "ClickHouse — clickhouse-connect 1.9.0 (PyPI)",
+   "claim": "clickhouse-connect 1.9.0 is the current Python client.",
+   "verdict": "supported",
+   "note": "PyPI JSON for clickhouse-connect 1.9.0 resolves; upload_time 2026-09-22T15:07:25.",
+   "sources": [
+    "https://pypi.org/pypi/clickhouse-connect/1.9.0/json"
+   ]
+  },
+  {
+   "name": "QuestDB — repo, license, latest OSS release",
+   "claim": "Apache-2.0 core; core OSS release unchanged at 10.0.1, dated 2026-08-24.",
+   "verdict": "supported",
+   "note": "gh api repos/questdb/questdb: license Apache-2.0, pushed_at 2026-09-26 (active), archived=false. /releases/latest = tag '10.0.1', published_at 2026-08-24T13:55:02Z — exact match.",
+   "sources": [
+    "gh api repos/questdb/questdb",
+    "gh api repos/questdb/questdb/releases/latest"
+   ]
+  },
+  {
+   "name": "QuestDB — separate 'e-' Enterprise track",
+   "claim": "A separate 'e-' prefixed Enterprise track exists under different terms.",
+   "verdict": "supported",
+   "note": "Live tag list's two most recent entries are e-3.0.3 and e-3.0.2 (ordered ahead of 10.0.1/10.0.0), confirming a parallel enterprise-prefixed release line distinct from the core OSS versioning.",
+   "sources": [
+    "gh api repos/questdb/questdb/tags"
+   ]
+  },
+  {
+   "name": "QuestDB — ASOF/LT joins for trades/quotes",
+   "claim": "ASOF/LT joins purpose-built for trades/quotes ingestion and query.",
+   "verdict": "supported",
+   "note": "questdb.com docs give 'attaching market quotes to trades' as the flagship worked example for ASOF JOIN, matching the trades/quotes framing directly.",
+   "sources": [
+    "https://questdb.com/docs/reference/sql/asof-join/"
+   ]
+  },
+  {
+   "name": "QuestDB — separately versioned Python ingestion client",
+   "claim": "Separately versioned ingestion client (Python 'questdb' package, ILP protocol) from the server release.",
+   "verdict": "supported",
+   "note": "PyPI questdb client is at 5.0.0 (both pinned and latest), an entirely separate version line from the server's 10.0.1 — confirms independent release trains.",
+   "sources": [
+    "https://pypi.org/pypi/questdb/5.0.0/json",
+    "https://pypi.org/pypi/questdb/json"
+   ]
+  },
+  {
+   "name": "Apache Iceberg — repo, license, latest core spec release",
+   "claim": "Apache-2.0; core table-spec/Java latest is Apache Iceberg 1.11.0, dated 2026-05-20.",
+   "verdict": "supported",
+   "note": "gh api repos/apache/iceberg: license Apache-2.0, pushed_at 2026-09-26 (active). /releases/latest = apache-iceberg-1.11.0, published_at 2026-05-20T08:47:57Z. Newer apache-iceberg-1.12.0-rc0/rc1/rc2 tags exist but are release candidates only — no GA 1.12.0 tag, so 1.11.0 correctly remains latest GA.",
+   "sources": [
+    "gh api repos/apache/iceberg",
+    "gh api repos/apache/iceberg/releases/latest",
+    "gh api repos/apache/iceberg/tags"
+   ]
+  },
+  {
+   "name": "Apache Iceberg — PyIceberg 0.12.0, JVM-free Python path",
+   "claim": "PyIceberg 0.12.0 provides a native Python catalog/read/write path (SqlCatalog + pyarrow) without a JVM dependency.",
+   "verdict": "supported",
+   "note": "PyPI pyiceberg/0.12.0/json confirms version and upload_time 2026-09-01T17:27:57 (matches claimed date) and is the current latest. PyIceberg's own docs state verbatim: 'PyIceberg is a Python implementation for accessing Iceberg tables, without the need of a JVM,' and demonstrate SqlCatalog (SQLite-backed) plus pyarrow-based dataframe I/O.",
+   "sources": [
+    "https://pypi.org/pypi/pyiceberg/0.12.0/json",
+    "https://py.iceberg.apache.org/"
+   ]
+  },
+  {
+   "name": "Apache Iceberg — multi-engine contract naming DuckDB and Polars",
+   "claim": "Gives multiple engines (Spark, DuckDB, Polars, Trino) a shared snapshot/schema/partition-evolution contract.",
+   "verdict": "refuted",
+   "note": "Iceberg's own README at the pinned apache-iceberg-1.11.0 tag states the format lets 'engines like Spark, Trino, Flink, Presto, Hive and Impala safely work with the same tables' — DuckDB and Polars are not among the project's own listed engines in this primary source. (Community connectors letting DuckDB/Polars read Iceberg tables may exist, but that is not what this cited primary source itself says, so the specific claim as sourced is not supported.)",
+   "sources": [
+    "https://raw.githubusercontent.com/apache/iceberg/apache-iceberg-1.11.0/README.md"
+   ]
+  },
+  {
+   "name": "Apache Iceberg — time travel between snapshots",
+   "claim": "Time travel between snapshots.",
+   "verdict": "supported",
+   "note": "iceberg.apache.org/docs/latest/spark-queries/ table of contents includes dedicated 'Time travel Queries with SQL', 'Time travel Queries with DataFrame', 'Schema selection in time travel queries', and 'Time Travel with Metadata Tables' sections.",
+   "sources": [
+    "https://iceberg.apache.org/docs/latest/spark-queries/"
+   ]
+  },
+  {
+   "name": "Polars — repo, license, latest release",
+   "claim": "MIT licensed; py-1.44.2, dated 2026-09-09.",
+   "verdict": "supported",
+   "note": "gh api repos/pola-rs/polars: license MIT, pushed_at 2026-09-26 (very active). /releases/latest = py-1.44.2, published_at 2026-09-09T07:42:33Z. PyPI 1.44.2 matches (upload_time same day); PyPI's license metadata field contains the literal MIT license text with Ritchie Vink's copyright notice.",
+   "sources": [
+    "gh api repos/pola-rs/polars",
+    "gh api repos/pola-rs/polars/releases/latest",
+    "https://pypi.org/pypi/polars/1.44.2/json"
+   ]
+  },
+  {
+   "name": "Polars — join_asof backward/forward/nearest with tolerance",
+   "claim": "Native `join_asof` (backward/forward/nearest with tolerance) for point-in-time joins.",
+   "verdict": "supported",
+   "note": "docs.pola.rs LazyFrame.join_asof reference confirms exactly these three `strategy` values ('backward' default, 'forward', 'nearest') and a `tolerance` parameter accepting numeric or duration-string values.",
+   "sources": [
+    "https://docs.pola.rs/api/python/stable/reference/lazyframe/api/polars.LazyFrame.join_asof.html"
+   ]
+  },
+  {
+   "name": "Polars — convergence via QuantWave and the wangzhe3224 list",
+   "claim": "Independently converged on as the compute substrate by QuantWave and the wangzhe3224 list.",
+   "verdict": "supported",
+   "note": "wangzhe3224/awesome-systematic-trading's live Readme.md (master branch, fetched directly) lists Polars itself (line 252) and separately lists QuantWave (github.com/lavs9/quantwave, line 339), described in the list's own words as 'Polars-native technical analysis and backtesting' — both genuinely present in this one list.",
+   "sources": [
+    "https://raw.githubusercontent.com/wangzhe3224/awesome-systematic-trading/master/Readme.md"
+   ]
+  },
+  {
+   "name": "Polars — 'four separate awesome-list appearances' quantifier",
+   "claim": "Highest cross-list convergence signal of any candidate here (starred plus four separate awesome-list appearances).",
+   "verdict": "unverifiable",
+   "note": "Only one list (wangzhe3224/awesome-systematic-trading) was independently opened in this pass, in which Polars appears twice (directly, plus via QuantWave). The other implied list appearances making up 'four separate' were not opened or confirmed here.",
+   "sources": [
+    "https://raw.githubusercontent.com/wangzhe3224/awesome-systematic-trading/master/Readme.md"
+   ]
+  },
+  {
+   "name": "ArcticDB — license is BSL-1.1 plus Additional Use Grant, not OSI-approved",
+   "claim": "BSL-1.1 (source-available, converts per-version after a change date) plus an Additional Use Grant; not OSI-approved.",
+   "verdict": "supported",
+   "note": "Raw LICENSE.txt read at the exact pinned tag v6.26.0 opens directly to 'Business Source License 1.1', Licensor 'Man Group Operations Limited', and an explicit 'Additional Use Grant' clause restricting use for a 'Database Service'. GitHub's own license classifier for the repo returns spdx_id NOASSERTION / key 'other' — it does not recognize BSL as a standard OSI license, consistent with 'not OSI-approved'.",
+   "sources": [
+    "https://raw.githubusercontent.com/man-group/ArcticDB/v6.26.0/LICENSE.txt",
+    "gh api repos/man-group/ArcticDB/license"
+   ]
+  },
+  {
+   "name": "ArcticDB — latest release v6.26.0, 2026-09-14",
+   "claim": "latest_version v6.26.0, latest_release_date 2026-09-14.",
+   "verdict": "supported",
+   "note": "/releases/latest returns tag_name v6.26.0, published_at 2026-09-14T08:40:30Z. PyPI arcticdb/6.26.0/json confirms the same version, upload_time 2026-09-14T08:37:53, and its license metadata field literally reads 'Business Source License 1.1 (See LICENSE.txt)'.",
+   "sources": [
+    "gh api repos/man-group/ArcticDB/releases/latest",
+    "https://pypi.org/pypi/arcticdb/6.26.0/json"
+   ]
+  },
+  {
+   "name": "ArcticDB — versioned DataFrame database, LMDB/S3 backends, named snapshots",
+   "claim": "Versioned DataFrame database (LMDB or S3-compatible object-storage backends) with named library snapshots for reproducible research reads.",
+   "verdict": "supported",
+   "note": "arcticdb.io/faqs/ states 'ArcticDB versions data automatically on every write, enabling point-in-time queries, reproducible research, efficient daily appends, and historical corrections,' and confirms LMDB (local) plus AWS S3, Azure Blob Storage and Google Cloud Storage backends. The FAQ does not use the exact phrase 'named library snapshots,' though the underlying automatic-versioning/point-in-time behavior matches.",
+   "sources": [
+    "https://arcticdb.io/faqs/"
+   ]
+  },
+  {
+   "name": "ArcticDB — run at production scale inside Man Group",
+   "claim": "Already run at production scale inside Man Group.",
+   "verdict": "supported",
+   "note": "ArcticDB's own FAQ states it 'was built at Man Group specifically to handle the scale and complexity of front-office quantitative research' and was 'born out of the real-world data challenges faced by ... Man Group, one of the world's largest systematic hedge funds.' This is the vendor's own primary-source statement about itself, not an independently audited production metric.",
+   "sources": [
+    "https://arcticdb.io/faqs/"
+   ]
+  },
+  {
+   "name": "ArcticDB — cited across three separate awesome-quant lists",
+   "claim": "Cited independently across three separate awesome-quant/systematic-trading lists.",
+   "verdict": "unverifiable",
+   "note": "Confirmed present in one such list (wangzhe3224/awesome-systematic-trading), which actually lists it twice — as the current 'ArcticDB (Man Group)' project and as the older, separate 'Arctic (Man Group)' predecessor. The other two claimed lists were not opened in this pass, so the specific 'three separate lists' count is not established either way.",
+   "sources": [
+    "https://raw.githubusercontent.com/wangzhe3224/awesome-systematic-trading/master/Readme.md"
+   ]
+  },
+  {
+   "name": "Ray — repo, license, latest release",
+   "claim": "Apache-2.0; ray-2.58.0, dated 2026-08-23.",
+   "verdict": "supported",
+   "note": "gh api repos/ray-project/ray: license Apache-2.0, pushed_at 2026-09-26 (active). /releases/latest = ray-2.58.0, published_at 2026-08-23T05:42:08Z — exact match.",
+   "sources": [
+    "gh api repos/ray-project/ray",
+    "gh api repos/ray-project/ray/releases/latest"
+   ]
+  },
+  {
+   "name": "Ray — Core actors/tasks, Data, Serve",
+   "claim": "Ray Core actors/tasks, Ray Data, Ray Serve able to scale research/backtest compute across processes or hosts.",
+   "verdict": "supported",
+   "note": "README.rst fetched at the pinned tag ray-2.58.0 lists 'Data' and 'Serve' ('Scalable and Programmable Serving') among Ray AI Libraries, and 'Tasks' (stateless functions), 'Actors' (stateful worker processes) and 'Objects' under Ray Core — matches the claim's components directly.",
+   "sources": [
+    "https://raw.githubusercontent.com/ray-project/ray/ray-2.58.0/README.rst"
+   ]
+  },
+  {
+   "name": "Ray — already catalogued in this repository as id 'ray-serve'",
+   "claim": "Already catalogued in this repository under a different layer (agents-operations, id ray-serve).",
+   "verdict": "supported",
+   "note": "catalogs/us-equities/agents-operations.json contains an entry with id 'ray-serve', repository ray-project/ray, version_or_commit 'ray-2.58.0', release_date matching, license Apache-2.0, decision 'conditional', evidence_level 'source_review' — an exact match to the claim.",
+   "sources": [
+    "repo:catalogs/us-equities/agents-operations.json@19092db (local checkout, current main)"
+   ]
+  },
+  {
+   "name": "Dask — repo, license, latest release",
+   "claim": "BSD-3-Clause; 2026.8.0, dated 2026-08-24.",
+   "verdict": "supported",
+   "note": "gh api repos/dask/dask: license BSD-3-Clause, pushed_at 2026-08-24T18:46:39Z (the repo's own last push — about 33 days before this 2026-09-26 check, noticeably less recently active than the other candidates checked here, though still comfortably inside the 12-month maintained threshold). /releases/latest = 2026.8.0, published_at 2026-08-24T19:22:50Z; PyPI 2026.8.0 matches and is the current latest.",
+   "sources": [
+    "gh api repos/dask/dask",
+    "gh api repos/dask/dask/releases/latest",
+    "https://pypi.org/pypi/dask/2026.8.0/json"
+   ]
+  },
+  {
+   "name": "Dask — not previously catalogued anywhere in this repository",
+   "claim": "Not previously catalogued anywhere in this repository — a genuine beyond-inputs gap fill.",
+   "verdict": "supported",
+   "note": "A case-insensitive grep for 'dask' across the entire catalogs/ and blueprints/ trees returns zero genuine hits at the repository head; the only substring matches found are 'BidAsk' inside unrelated file text (a false positive), confirming Dask itself has no pre-existing catalog entry.",
+   "sources": [
+    "repo-wide grep of catalogs/ and blueprints/@19092db (local checkout, current main)"
+   ]
+  },
+  {
+   "name": "Dask — pandas/NumPy-like, pure-Python, lighter than a JVM cluster",
+   "claim": "Pandas/NumPy-like parallel and distributed task scheduler; pure-Python stack easing integration with the existing alpaca-py/EdgarTools/pandas research code.",
+   "verdict": "supported",
+   "note": "GitHub's own repo description reads 'Parallel computing with task scheduling,' primary language Python — corroborates the general framing at the metadata level. The source packet itself already flagged this claim's evidence_level as 'metadata' (not independently read line-by-line); this check only adds the repo's own self-description, not a full docs read.",
+   "sources": [
+    "gh api repos/dask/dask (description, language)"
+   ]
+  },
+  {
+   "name": "TimescaleDB — license split confirmed by reading LICENSE directly (GH classifier returns NOASSERTION)",
+   "claim": "Dual-licensed: core Apache-2.0; tsl/ directory under the Timescale License — confirmed by reading the repository's actual LICENSE file, not just the GitHub classifier (which returns NOASSERTION/Other for this repo).",
+   "verdict": "supported",
+   "note": "GitHub's license classifier for timescale/timescaledb does return spdx_id NOASSERTION / key 'other', exactly as claimed. The raw top-level LICENSE file states code outside 'tsl/' is Apache License 2.0 and code inside 'tsl/' is under the Timescale License; tsl/LICENSE-TIMESCALE exists in the repository and its (base64-decoded) content is the actual 'TIMESCALE LICENSE AGREEMENT' text.",
+   "sources": [
+    "gh api repos/timescale/timescaledb/license",
+    "https://raw.githubusercontent.com/timescale/timescaledb/main/LICENSE",
+    "gh api repos/timescale/timescaledb/contents/tsl/LICENSE-TIMESCALE"
+   ]
+  },
+  {
+   "name": "TimescaleDB — latest release 2.30.1, 2026-09-17",
+   "claim": "latest_version 2.30.1, latest_release_date 2026-09-17.",
+   "verdict": "supported",
+   "note": "/releases/latest returns tag_name 2.30.1, published_at 2026-09-17T09:21:45Z; repo pushed_at 2026-09-26 (active).",
+   "sources": [
+    "gh api repos/timescale/timescaledb/releases/latest",
+    "gh api repos/timescale/timescaledb"
+   ]
+  },
+  {
+   "name": "TimescaleDB — hypertables, compression, continuous aggregates",
+   "claim": "Hypertables (automatic time/space partitioning), native compression and continuous aggregates for high-rate tick/quote storage.",
+   "verdict": "supported",
+   "note": "Official docs (now hosted at tigerdata.com following an apparent 2026 rebrand from timescale.com — both the docs.timescale.com and originally-cited compression URL live-redirect there) describe hypertables as 'PostgreSQL tables that automatically partition your time-series data by time and optionally by other dimensions.' A separate compression doc confirms native compression ('a cornerstone feature... converts uncompressed rows to compressed columns'), noting it is now superseded by a newer 'Hypercore' feature but 'compression APIs are still supported.' A separate continuous-aggregates doc confirms the feature via incrementally-refreshed Postgres materialized views.",
+   "sources": [
+    "https://www.tigerdata.com/docs/use-timescale/latest/hypertables",
+    "https://raw.githubusercontent.com/timescale/docs/latest/use-timescale/compression/index.md",
+    "https://raw.githubusercontent.com/timescale/docs/latest/use-timescale/continuous-aggregates/index.md"
+   ]
+  },
+  {
+   "name": "TimescaleDB — named in the ernie55ernie awesome-quant list",
+   "claim": "Named in the ernie55ernie awesome-quant list as a widely-used alternative to DuckDB/Parquet for high-rate market-tick storage.",
+   "verdict": "supported",
+   "note": "ernie55ernie/awesome-quant's live README (master, fetched directly) lists 'timescale/timescaledb — A time-series database for high-performance real-time analytics packaged as a Postgres extension,' and that list itself already annotates 'license NOASSERTION' for it.",
+   "sources": [
+    "https://raw.githubusercontent.com/ernie55ernie/awesome-quant/master/README.md"
+   ]
+  },
+  {
+   "name": "TimescaleDB — was only a discovery_only reference in this repository",
+   "claim": "Was present in this repository only as an unreviewed 'discovery_only' research_supplement reference, never a real catalog card.",
+   "verdict": "supported",
+   "note": "catalogs/landscape/claude-independent-discovery.json contains a record for repository timescale/timescaledb with decision 'discovery_only' and evidence_depth 'Attributed documentary discovery; no runtime execution or controlled comparative acceptance' — an exact match to the claim.",
+   "sources": [
+    "repo:catalogs/landscape/claude-independent-discovery.json@19092db (local checkout, current main)"
+   ]
+  },
+  {
+   "name": "Apache Spark — repo, license",
+   "claim": "Apache-2.0 licensed.",
+   "verdict": "supported",
+   "note": "gh api repos/apache/spark: license Apache-2.0, pushed_at 2026-09-26 (active), description 'Apache Spark - A unified analytics engine for large-scale data processing'.",
+   "sources": [
+    "gh api repos/apache/spark"
+   ]
+  },
+  {
+   "name": "Apache Spark — pyspark 4.2.0 GA is latest; v4.3.0-rc1 is an unreleased RC",
+   "claim": "PySpark 4.2.0 is the current stable Python release; v4.3.0-rc1 is a tagged, unreleased release candidate.",
+   "verdict": "supported",
+   "note": "PyPI pyspark/4.2.0/json confirms version 4.2.0, license Apache-2.0, upload_time 2026-07-14T22:16:46 (matches the claimed date exactly) and is the current latest on PyPI. Live GitHub tags include v4.3.0-rc1 but no GA v4.3.0 tag exists yet.",
+   "sources": [
+    "https://pypi.org/pypi/pyspark/4.2.0/json",
+    "https://pypi.org/pypi/pyspark/json",
+    "gh api repos/apache/spark/tags"
+   ]
+  },
+  {
+   "name": "Apache Spark — 'wangzhe3224 list names Spark as the Iceberg-pairing compute engine'",
+   "claim": "The wangzhe3224 list itself names Spark as 'the natural compute pairing for an Iceberg-style lake alternative, which the layer's own open_gaps names as untested'.",
+   "verdict": "refuted",
+   "note": "The actual wangzhe3224/awesome-systematic-trading README (master, fetched directly, 563 lines) lists Spark with only a generic one-line description ('Apache Spark - A unified analytics engine for large-scale data processing') and contains zero occurrences of the word 'Iceberg' anywhere in the file. The specific framing/quote attributed to that list does not exist in the primary source — it is not the list's own language.",
+   "sources": [
+    "https://raw.githubusercontent.com/wangzhe3224/awesome-systematic-trading/master/Readme.md"
+   ]
+  },
+  {
+   "name": "[Beyond scope, spot-checked] MarketStore (alpacahq) — source repository unreachable",
+   "claim": "As of 2026-09-26 the source repository no longer resolves: both `gh api repos/alpacahq/marketstore` and a direct fetch of https://github.com/alpacahq/marketstore return HTTP 404.",
+   "verdict": "supported",
+   "note": "Reproduced live: `gh api repos/alpacahq/marketstore` returns {\"message\":\"Not Found\",\"status\":\"404\"}; a direct HTTPS GET to github.com/alpacahq/marketstore also returns http_status=404. This candidate was not one of the ranked top-8/9, but its surprising claim was cheap and important to reproduce directly, so it was spot-checked in this pass.",
+   "sources": [
+    "gh api repos/alpacahq/marketstore",
+    "https://github.com/alpacahq/marketstore (direct fetch)"
+   ]
+  },
+  {
+   "name": "[Beyond scope, spot-checked] MarketStore — pkg.go.dev cache shows stale v2.3.8+incompatible, Apache-2.0, v4 banner",
+   "claim": "pkg.go.dev cached page still lists it Apache-2.0 and redistributable, and shows a stale v2.3.8+incompatible page for a module it separately reports has 'highest tagged major version v4'.",
+   "verdict": "supported",
+   "note": "pkg.go.dev/github.com/alpacahq/marketstore returns HTTP 200; the page's breadcrumb/internal links are all pinned to '@v2.3.8+incompatible'; its license section literally renders 'license-description\">Apache-2.0'; a 'go to major version v4' banner link (path '/alpacahq/marketstore/v4') is present — consistent with, though not verbatim identical to, the 'highest tagged major version v4' framing.",
+   "sources": [
+    "https://pkg.go.dev/github.com/alpacahq/marketstore (direct fetch)"
+   ]
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "DuckDB",
+   "url": "https://github.com/duckdb/duckdb",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Current storage-compute winner; still the right default for single-host, single-writer Parquet/Arrow analytics over frozen research snapshots. The layer's own open_gaps say no throughput/concurrency/multi-writer measurement exists yet for DuckDB or any alternative -- that comparison, not a fresher pin, is what would move this decision."
+  },
+  {
+   "name": "ClickHouse",
+   "url": "https://github.com/ClickHouse/ClickHouse",
+   "modalities": [
+    "star",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Explicitly named in the storage-compute layer's own open_gaps as an untested 'server or lake alternative' for throughput/concurrency. This stack's existing catalog pin (v26.8.7.19-lts, reviewed 2026-09-18) is already one LTS point release behind: v26.8.12.53-lts published 2026-09-26, the very day of this check, and the faster-moving 'stable'/'new' tracks (v26.9.2.8-stable, v26.10.1.1-new) run ahead of the LTS line entirely. Still unexercised in this stack -- no server has ever been started."
+  },
+  {
+   "name": "QuestDB",
+   "url": "https://github.com/questdb/questdb",
+   "modalities": [
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Explicitly named in the layer's open_gaps as an untested server/lake alternative for sustained tick ingestion and concurrent time-series queries once embedded Parquet files stop meeting measured needs. Not present in the given star/awesome inputs at all -- surfaced from this repository's own pre-existing source-reviewed catalog card and reconfirmed live today. Core OSS release is unchanged (10.0.1); a separate 'e-' prefixed Enterprise track exists under different terms."
+  },
+  {
+   "name": "Apache Iceberg",
+   "url": "https://github.com/apache/iceberg",
+   "modalities": [
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Explicitly named in the layer's open_gaps as the untested 'lake' alternative to the current local Parquet files. Relevant once more than one engine or writer needs a shared table contract over the research snapshots; the overturn_when clause gates this on measured throughput/concurrency need, which has not been run. Not in the given inputs directly (only referenced obliquely via a Spark note in one list) -- a beyond-inputs find."
+  },
+  {
+   "name": "Polars",
+   "url": "https://github.com/pola-rs/polars",
+   "modalities": [
+    "star",
+    "awesome",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Already this repository's catalogued 'alternative' pick alongside DuckDB for expression-based transforms -- a strong in-process complement, not a replacement, for the current SQL-first workflow. Highest cross-list convergence signal of any candidate here (starred plus four separate awesome-list appearances)."
+  },
+  {
+   "name": "ArcticDB",
+   "url": "https://github.com/man-group/ArcticDB",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Best-evidenced 'versioned snapshot' complement to DuckDB+Parquet if explicit named dataset versions become a requirement beyond immutable Parquet files. License is the real gate: Business Source License 1.1 plus an Additional Use Grant, not permissive open source -- resolve intended deployment (research-only vs. any production/business use) with the licensor before adoption, per this repository's own existing limitation note."
+  },
+  {
+   "name": "Ray",
+   "url": "https://github.com/ray-project/ray",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Not a storage engine itself, but the most-evidenced scale-out compute layer this repository has already reviewed (as ray-serve), should local single-host DuckDB/Polars throughput prove insufficient. Surfaced here because two separate awesome-lists frame it specifically as a storage-compute-layer candidate."
+  },
+  {
+   "name": "Dask",
+   "url": "https://github.com/dask/dask",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Not previously catalogued anywhere in this repository -- a genuine beyond-inputs gap fill. A lighter-weight scale-out option than Ray/Spark specifically for pandas-shaped research workloads if local single-host compute is measured insufficient; still needs its own throughput/concurrency comparison before adoption, per the layer's overturn_when."
+  },
+  {
+   "name": "Apache Spark",
+   "url": "https://github.com/apache/spark",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The wangzhe3224 list itself names Spark as 'the natural compute pairing for an Iceberg-style lake alternative, which the layer's own open_gaps names as untested' -- i.e. Spark+Iceberg answers the same named gap as the Iceberg candidate above, not an independent option. Heaviest operational footprint (JVM cluster) of any candidate here; relevant only if Iceberg itself is adopted."
+  },
+  {
+   "name": "TimescaleDB",
+   "url": "https://github.com/timescale/timescaledb",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Named in the ernie55ernie awesome-quant list as a widely-used alternative to DuckDB/Parquet for high-rate market-tick storage; was present in this repository only as an unreviewed 'discovery_only' research_supplement reference, never a real catalog card -- a genuine beyond-inputs gap closed by this pass. Relevant only if a shared Postgres-compatible server, not an embedded file store, becomes the measured requirement; adds an operational Postgres dependency the current embedded DuckDB path avoids."
+  },
+  {
+   "name": "Turso",
+   "url": "https://github.com/tursodatabase/turso",
+   "modalities": [
+    "star",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Already starred and source-reviewed in this repository (star-audit.json, decision 'alternative') as a future embedded-storage option; the existing rationale -- SQLite-compatible embedded storage is a future option, not a reason to replace the working stores without workload evidence -- still holds after this re-check."
+  },
+  {
+   "name": "data.table",
+   "url": "https://github.com/Rdatatable/data.table",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Different language (R, not Python) from the rest of this stack's research code -- useful as a reference point for 'what a large-local-dataset compute engine looks like' rather than a drop-in candidate. No prior catalog card existed for it; a beyond-inputs fill. Lowest integration fit of this set unless an R-based research arm is added."
+  },
+  {
+   "name": "MarketStore (alpacahq)",
+   "url": "https://github.com/alpacahq/marketstore",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The wangzhe3224 awesome-list entry frames this as 'published by Alpaca -- the same vendor as our adopted alpaca-py market-data winner', but that framing is now stale: the repository is inaccessible. Cannot be adopted or source-reviewed further in its current state; this corrects the awesome-list's claim rather than repeating it, and stands as this task's clearest 'no longer available' flag."
+  },
+  {
+   "name": "Tectonicdb",
+   "url": "https://github.com/0b01/tectonicdb",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Confirmed dormant, not merely per an old list note: last repository push 2024-01-25 and last tagged release 0.5.2 from 2020-02-11, both re-checked live today. Exceeds this task's 12-month unmaintained threshold by roughly 1.5 years on commits and 6.5 years on releases. Do not adopt; keep only as a named historical reference for the order-book-tick-storage niche."
+  },
+  {
+   "name": "Lance",
+   "url": "https://github.com/lance-format/lance",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Distinct from this repository's already-catalogued 'foundation-lancedb' entry (lancedb/lancedb, the vector database built on top of this format, filed under the memory/foundation layer, pin v0.39.0) -- this candidate is the underlying storage format itself, offered here as a Parquet alternative for the storage-compute layer specifically. Worth a measured comparison against Parquet only if random-access read patterns, not the current sequential/analytical-snapshot pattern, become a requirement."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/storage-compute--gpt-6-live.md"
+  }
+ ]
+}

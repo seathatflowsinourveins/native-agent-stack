@@ -1,0 +1,814 @@
+{
+ "layer_id": "execution-broker",
+ "proposal": {
+  "layer_id": "execution-broker",
+  "proposal": "challenge",
+  "summary": "Most of this layer keeps its current picks on verified merit, not incumbency: NautilusTrader's engine pin, alpaca-py, and LEAN-as-oracle all reconfirm current/maintained/no-drift on 2026-09-26 primary sources. Reading current main (not just the frozen 2026-09-22 adjudication) resolves one open_gap and sharpens the other. (1) adaptive-paper-alpaca-adapter (c5) now earns_it: it passed a real native paper-broker trial on 2026-09-23 (5 orders, 4 fills, cash-reconciled) that did not exist at adjudication time, and it is the *only* Alpaca path into Nautilus, since NautilusTrader carries zero upstream Alpaca code (RFC nautechsystems/nautilus_trader#3374 open since 2026-01-01, PR #3375 closed unmerged same day). (2) nautilus-ibkr-adapter (c7) is genuinely challenged: I independently confirmed via `gh api` (2026-09-26) that github.com/nautechsystems/nautilus_trader#4983 is still open, and its own title states the pinned v2.0.0rc5 Rust adapter's \"execution client venue `IB` never matches instrument venue `SMART`, so every stock order is denied locally\" -- a verified, currently-unpatched defect, not merely an untested boundary. The one visible fix candidate, PR #5041, is open/unmerged/\"dirty\" as of today. Meanwhile this repo's own receipt-20260923-passed.json shows the same project's older, non-pinned NautilusTrader 1.231.0 Python IBKR adapter already completing a real paper-Gateway accept/cancel/fill/flatten cycle with a reconciled-flat proof -- a zero-new-dependency interim path. Going beyond the given candidate list, per today's own alpaca-platform-landscape-20260926 artifact plus my direct gh api/PyPI checks: ml4t/backtest+data+live (MIT, pushed within the last 1-2 days, built-in LEAN-parity preset, same author lineage as this catalog's zipline-reloaded) is a fresher, better-licensed comparison-engine candidate than the already-catalogued Lumibot (GPL-3.0, reconfirmed) or StrateQueue (AGPL-3.0), worth a bounded parity trial using the existing frozen SPY fixture. Independently reconfirmed via `gh api`: LEAN's 17-commit drift beyond its pin is not capability-neutral as earlier framed -- it added combo orders (#9822) and OCO/OTO/OUO/bracket contingent orders (#9828, tests #9833) to LEAN's own Alpaca brokerage model.",
+  "winner_status": [
+   {
+    "component_id": "nautilustrader",
+    "status": "earns_it",
+    "note": "Engine pin verified still-current 2026-09-26 via my own gh api check: v2.0.0rc5 remains the top GitHub release (prerelease=true, no rc6/GA), matching https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5. Native synthetic execution evidence (evidence/receipts/native-nautilus-v2-20260920.json, local checkout) is unchanged. This status covers the engine choice itself; its bundled IBKR execution boundary is tracked separately below as challenged, since engine currency does not extend to that specific adapter's correctness."
+   },
+   {
+    "component_id": "alpaca-py",
+    "status": "earns_it",
+    "note": "Pin v0.44.0 still latest on GitHub+PyPI, zero drift. Both 2026-09-22 adjudication lanes already agreed on this component (evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json, local checkout, read directly: 'A and B agree on c4 (alpaca-py)'). Native execution evidence (blueprints/us-equities/paper-e2e-20260921/paper-receipt.json, local checkout: write_attempts 2, cash_delta_usd -0.08, positions 0) unaffected by any new finding."
+   },
+   {
+    "component_id": "lean",
+    "status": "earns_it",
+    "note": "Retained comparison oracle only, not a live destination (catalogs/landscape/us-equities.json, local checkout, disposition 'selected' for that role; evidence_kind native_execution via blueprints/us-equities/historical-simulation/receipt.json). New finding, independently reconfirmed via `gh api repos/QuantConnect/Lean/commits` on 2026-09-26: the pin's 17-commit drift is not capability-neutral as earlier framed -- it includes 'feature: support combo orders in the alpaca brokerage model' (#9822, 2026-09-23) and 'Add contingent orders: OCO, OTO, OUO and brackets' (#9828, 2026-09-25) with matching tests (#9833). This doesn't change the oracle role, but the pin (985ef30a) is now missing real order-type capability upstream in LEAN's own Alpaca brokerage adapter -- worth a pin refresh before that adapter is used for anything beyond pure SPY/LEAN parity."
+   },
+   {
+    "component_id": "adaptive-paper-alpaca-adapter",
+    "status": "earns_it",
+    "note": "This is c5 from the split 2-2 adjudication; both lanes already kept it, but at that time (evidence/artifacts/layer-verdicts-20260922/.../adjudication json, local checkout) its own broker evidence was 'not_started' / 0 broker_connections. Reading current main closes that gap: blueprints/us-equities/adaptive-paper/receipt.json (local checkout) records trial adaptive-20260923g, source_commit 843dc8f -- which I confirmed is a real commit in this checkout's git log ('Fix three engine defects exposed by live SIP paper trials...#123') -- with orders_submitted 5, cancels 1, native_fill_events 4, two completed round-trips (INTC, GOOGL), and reconciliation cash_delta_usd -0.28 with cash_match true / positions_match true / open_orders 0. This is dated native_execution evidence from 2026-09-23. It is also the only Alpaca path into NautilusTrader: NautilusTrader carries zero upstream Alpaca adapter code (RFC nautechsystems/nautilus_trader#3374 open since 2026-01-01, PR #3375 closed unmerged the same day, per evidence/artifacts/alpaca-platform-landscape-20260926/landscape.json's facts_check section, local checkout, dated 2026-09-26)."
+   },
+   {
+    "component_id": "nautilus-ibkr-adapter",
+    "status": "challenged",
+    "note": "This is c7, the other half of the split 2-2 adjudication. Sharper primary-source finding, independently confirmed via `gh api` on 2026-09-26: github.com/nautechsystems/nautilus_trader/issues/4983 is still OPEN (last updated 2026-09-12, so unworked for two weeks), and its own title states the defect directly -- 'execution client venue `IB` never matches instrument venue `SMART`, so every stock order is denied locally' -- on the exact pinned v2.0.0rc5 Rust adapter this layer needs for US-equity IBKR execution. This is stronger than the prior 'not yet run' framing in evidence/receipts/native-nautilus-v2-20260920.json and catalogs/us-equities/runtime-target.json's broker_boundaries.ibkr block (local checkout): it is a verified, currently-unpatched defect, not just an untested boundary. The one visible upstream work here, PR #5041 ('Refactor Interactive Brokers adapter and add execution client order identity hooks'), is open, unmerged, and shows mergeable_state 'dirty' as of 2026-09-26 (gh api pulls/5041); it touches the same adapter's connection/enums/symbology files (gh api pulls/5041/files) but is not confirmed to close #4983 and should not be assumed to. A verified-working alternative already exists in this project's own history with zero new dependency: blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json (local checkout) shows the same project's older, non-pinned NautilusTrader 1.231.0 Python IBKR adapter completing accept-resting/cancel/fill/flatten against a real paper IB Gateway (port 4002) with an independent official-ibapi flat-proof (0 positions, 0 open orders). The managed-gateway dependency itself, gnzsnz/ib-gateway-docker, is unaffected -- the #4983 defect lives in Nautilus's own Rust execution-client code, not the container. Status is 'challenged' rather than 'unverified' because the incumbent pinned path's failure mode is now verified, not merely unproven."
+   }
+  ],
+  "challengers": [
+   {
+    "name": "NautilusTrader 1.231.0 Python IBKR adapter (in-project dual-track/rollback, same upstream)",
+    "url": "https://github.com/nautechsystems/nautilus_trader/releases/tag/v1.231.0",
+    "why_better": "Already has a passed native-paper IBKR execution receipt in this repo (accept/cancel/fill/flatten, real commissions, reconciled-flat proof) while the currently pinned v2.0.0rc5 Rust adapter has a confirmed-open blocking defect (nautechsystems/nautilus_trader#4983, verified open on 2026-09-26) that denies every stock order locally, with no merged fix (PR #5041 open/unmerged/'dirty' as of 2026-09-26).",
+    "evidence_level": "native_execution",
+    "trial_plan": "Rerun the existing, already-committed blueprints/us-equities/engine-nautilus/ibkr-paper-orders harness (run.py/plan.json, same repo, no new install) unchanged against the pinned v2.0.0rc5 Rust adapter first, to reconfirm the #4983 denial is still live today. Pass criterion for keeping 1.231.0 as the qualified interim IBKR path: rc5 reproduces the denial while 1.231.0 continues to pass the identical accept/cancel/fill/flatten/reconcile contract it already passed on 2026-09-23 (receipt-20260923-passed.json). Overturn condition: rc5 (or a later tag) passes this same fixture once #4983 is closed by a merged fix -- at that point re-pin to rc5/GA and retire the 1.231.0 dual-track.",
+    "paper_lane_impact": "paper acts passed / paper fills for the IBKR broker boundary specifically -- currently the layer's only fully-blocked broker boundary; unblocks it using an existing in-repo fixture and an already-qualified older pin, zero new installs.",
+    "sources": [
+     "https://github.com/nautechsystems/nautilus_trader/issues/4983 (confirmed open, checked via gh api 2026-09-26)",
+     "https://github.com/nautechsystems/nautilus_trader/pull/5041 (open, unmerged, mergeable_state=dirty, checked via gh api 2026-09-26)",
+     "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json (local checkout)",
+     "catalogs/us-equities/runtime-target.json broker_boundaries.ibkr block (local checkout)"
+    ]
+   },
+   {
+    "name": "ml4t (ml4t-backtest + ml4t-data + ml4t-live)",
+    "url": "https://github.com/ml4t/backtest",
+    "why_better": "MIT across all three packages (cleaner license fit than Lumibot's confirmed GPL-3.0 or StrateQueue's AGPL-3.0), verified actively maintained within the last 1-2 days as of this check (ml4t/backtest pushed 2026-09-24 with a same-day v0.1.12 release, 28 stars; ml4t/data pushed 2026-09-25, 50 stars; ml4t/live pushed 2026-09-24, 22 stars, latest commit 'Make Live workflows and book links verifiable #106'), and ships a purpose-built LEAN-parity preset plus its own shadow-to-paper-to-live broker runtime (ml4t/live) -- a closer match to this layer's own preregistered SPY/LEAN-parity and broker-boundary requirements than the more generic Lumibot/StrateQueue wrappers already in the catalog. Same author lineage (ml4trading.io) as this catalog's already-accepted zipline-reloaded.",
+    "evidence_level": "metadata",
+    "trial_plan": "Run the existing frozen SPY 'one_zero' parity fixture through ml4t-backtest's own 'lean' preset via the already-in-repo blueprints/us-equities/engine-nautilus/spy-parity/compare.py, exactly as already proposed in evidence/artifacts/alpaca-platform-landscape-20260926/README.md's 'Recommended next steps' (local checkout, dated 2026-09-26). Pass criterion: same preregistered parity tolerance already used for the Nautilus/LEAN comparison. Only after a pass would a single Alpaca paper round trip ever run, under the existing alpaca-paper-smoke contract with one owned writer. Overturn condition: fails preregistered parity tolerance, or pre-1.0 API instability (0.1.x, 44 PyPI releases in under a year) breaks the frozen fixture -- then it stays reference-only.",
+    "paper_lane_impact": "none yet -- this is a second independent comparison/oracle candidate, not a proposed execution destination; no paper-lane number moves until/unless a parity pass promotes it further.",
+    "sources": [
+     "GitHub API repos/ml4t/backtest, /ml4t/data, /ml4t/live (checked 2026-09-26)",
+     "https://pypi.org/pypi/ml4t-backtest/json",
+     "evidence/artifacts/alpaca-platform-landscape-20260926/landscape.json and README.md (local checkout, dated 2026-09-26)"
+    ]
+   }
+  ],
+  "rejected": [
+   {
+    "name": "ib_async",
+    "reason": "metadata only -- no local execution/reliability comparison in this stack shows an advantage over the project's own IBKR paths; the in-project 1.231.0 dual-track already has native_execution evidence at zero new-dependency cost. Remains a reasonable future option if both the 1.231.0 rollback and the upstream #4983 fix stall."
+   },
+   {
+    "name": "ib_insync",
+    "reason": "unmaintained -- confirmed archived=true, last push 2024-03-14, last PyPI upload 0.9.86 on 2023-07-02 (github.com/erdewit/ib_insync); dead, explicitly superseded by ib_async."
+   },
+   {
+    "name": "ibapi (PyPI mirror)",
+    "reason": "unmaintained -- PyPI mirror frozen since 2020-12-06 (9.81.1.post1); IBKR's own docs page self-flags as an outdated version and redirects to IBKR Campus."
+   },
+   {
+    "name": "Lumibot",
+    "reason": "license -- GPL-3.0 confirmed throughout v4.6.1 on PyPI, reconfirmed independently 2026-09-26 via evidence/artifacts/alpaca-platform-landscape-20260926 (which also debunked a false 'GPL vs MIT' claim in one of its own raw research returns). Needs an explicit fit check against this stack's LGPL/Apache mix, and no local comparison shows a need for a second broker-agnostic engine."
+   },
+   {
+    "name": "StrateQueue",
+    "reason": "license and metadata only -- AGPL-3.0 (stronger copyleft than Lumibot), PyPI release lagging ~13 months behind source HEAD, 214 stars; a deployment shim wrapping an existing strategy, not a demonstrated execution-boundary advantage."
+   },
+   {
+    "name": "alpaca-mcp-server",
+    "reason": "off-requirement -- wraps the same alpaca-py calls this project already owns as a single writer; adds an agent-facing order-entry surface, not a new execution capability, and would need its own duplicate-writer ownership guard before any use."
+   },
+   {
+    "name": "IB_MCP",
+    "reason": "off-requirement (same agent-surface reasoning as alpaca-mcp-server), plus borderline unmaintained -- last commit 2025-10-23, about 11 months old as of 2026-09-26; worth rechecking soon."
+   },
+   {
+    "name": "ThetaGang",
+    "reason": "off-requirement -- an options-wheel strategy bot, not reusable for this project's equity-extreme-mover focus; valuable only as an implementation-pattern reference, not a component to adopt."
+   },
+   {
+    "name": "tastytrade (tastyware SDK)",
+    "reason": "off-requirement -- this project's broker scope is explicitly Alpaca + IBKR only; zero presence in this project's catalog or receipts today. A discovery note for a possible future third broker, not a current adoption case."
+   },
+   {
+    "name": "schwab-py",
+    "reason": "unmaintained -- main branch HEAD and the last tagged release are both over 13 months old; the repo's recent-looking pushed_at metadata lands on side/patch branches, not main. Also off-requirement, since Schwab is outside current project scope."
+   },
+   {
+    "name": "Clear Street API",
+    "reason": "off-requirement -- requires opening and funding a real institutional brokerage account plus an options-suitability questionnaire, which contradicts this project's paper-lane-only research scope and this task's own no-live-account/no-order constraint. Not an installable OSS SDK, so it cannot be evaluated further without opening an account."
+   },
+   {
+    "name": "QuantRocket",
+    "reason": "off-requirement -- surfaced in evidence/artifacts/alpaca-platform-landscape-20260926 (local checkout, 2026-09-26). Its paper-trading route requires first validating a real live account, which this project's explicit paper-lane-only policy forbids; also proprietary/commercial and self-hosted, not an OSS SDK comparison."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "methodology.top8_selection",
+   "claim": "Per instructions, checked the 3 current-winner upstream notes (NautilusTrader, alpaca-py, LEAN) plus the top 8 of the remaining 12 candidates by strength/actionability of their stated 'fit'.",
+   "verdict": "supported",
+   "note": "Ranked the 12 non-winner candidates by how concrete/actionable their fit narrative was and selected: gnzsnz/ib-gateway-docker, ib_async, Lumibot, ThetaGang, alpaca-mcp-server, tastyware/tastytrade, StrateQueue, IB_MCP as the top 8. The 4 lowest-fit candidates (ib_insync, ibapi, schwab-py, Clear Street API — all explicitly flagged by the researcher as dead/stale/out-of-scope/uninstallable) were also verified opportunistically below since evidence was cheap to obtain, giving 15/15 candidates checked.",
+   "sources": []
+  },
+  {
+   "name": "nautilustrader.repo_exists_license",
+   "claim": "Repo exists at github.com/nautechsystems/nautilus_trader; license LGPL-3.0-or-later.",
+   "verdict": "supported",
+   "note": "gh api repos/nautechsystems/nautilus_trader confirms full_name, archived=false, default_branch=develop. GitHub's license detector returns spdx_id 'LGPL-3.0' (the short code) and the raw LICENSE file at the v2.0.0rc5 tag is the standard LGPLv3 (29 June 2007) text; I could not find an explicit '-only' vs '-or-later' classifier string in pyproject.toml, so the exact suffix is unverifiable from primary source, but the core LGPLv3 family claim is confirmed.",
+   "sources": [
+    "https://github.com/nautechsystems/nautilus_trader",
+    "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/v2.0.0rc5/LICENSE"
+   ]
+  },
+  {
+   "name": "nautilustrader.pin_is_latest_release",
+   "claim": "v2.0.0rc5 (commit 1b0a49d, 2026-09-15) is the current latest GitHub release; no rc6 or 2.0.0 GA exists yet.",
+   "verdict": "supported",
+   "note": "gh api releases list top entry is v2.0.0rc5, prerelease=true, published_at 2026-09-15T06:17:23Z, tag commit sha=1b0a49d2792a9432a3aca3fcb617ce7a630d905e (exact match). No rc6/2.0.0 GA present in releases list or WebSearch results dated 2026-09-26.",
+   "sources": [
+    "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5",
+    "https://github.com/nautechsystems/nautilus_trader/releases"
+   ]
+  },
+  {
+   "name": "nautilustrader.pypi_dual_latest_nuance",
+   "claim": "v2.0.0rc5 (prerelease) is chronologically latest on PyPI; v1.231.0 is latest non-prerelease.",
+   "verdict": "supported",
+   "note": "PyPI JSON info.version = '1.231.0' (PyPI shows the latest final release as canonical), while releases dict's newest key is '2.0.0rc5' (uploaded 2026-09-15, after 1.231.0's 2026-08-02 GitHub release date). Matches the candidate's own nuanced framing exactly.",
+   "sources": [
+    "https://pypi.org/pypi/nautilus-trader/json"
+   ]
+  },
+  {
+   "name": "nautilustrader.cadence_biweekly",
+   "claim": "rc3(08-21)->rc4(09-02)->rc5(09-15) cadence is roughly biweekly.",
+   "verdict": "supported",
+   "note": "Confirmed gaps: rc3 2026-08-21 -> rc4 2026-09-02 = 12 days; rc4 -> rc5 2026-09-15 = 13 days.",
+   "sources": [
+    "https://github.com/nautechsystems/nautilus_trader/releases"
+   ]
+  },
+  {
+   "name": "nautilustrader.develop_head_and_drift",
+   "claim": "develop branch HEAD is 2026-09-26, 11 days past the rc5 tag (unreleased work, not a missed release).",
+   "verdict": "supported",
+   "note": "develop HEAD commit cd417b8, date 2026-09-26T13:36:21Z; rc5 tag date 2026-09-15T06:17:23Z = exactly 11 days elapsed. Caveat: the actual volume of unreleased work is large -- gh api compare v2.0.0rc5...develop reports ahead_by=216, behind_by=65 (216 new commits, plus 65 commits present on the tag but not reachable from develop, suggesting rc5 was cut from a release-prep branch that has since partially diverged from develop). The claim's '11 days' reading (elapsed time, not commit count) holds; readers should not infer only ~11 commits.",
+   "sources": [
+    "https://github.com/nautechsystems/nautilus_trader/compare/v2.0.0rc5...develop",
+    "https://github.com/nautechsystems/nautilus_trader/commits/develop"
+   ]
+  },
+  {
+   "name": "nautilustrader.ibkr_docs_capability_quote",
+   "claim": "Pinned docs/integrations/interactive_brokers.md (v2.0.0rc5) states the adapter provides 'live market data, execution, historical data, instrument loading, and optional Dockerized IB Gateway management'.",
+   "verdict": "supported",
+   "note": "Fetched the raw file at the exact pinned tag myself; it reads verbatim: 'The adapter provides live market data, execution, historical data, instrument loading, and optional Dockerized IB Gateway management through the same Rust implementation and Python bindings.' Exact quote match.",
+   "sources": [
+    "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/v2.0.0rc5/docs/integrations/interactive_brokers.md"
+   ]
+  },
+  {
+   "name": "nautilustrader.names_gnzsnz_dependency",
+   "claim": "The same pinned docs name gnzsnz/ib-gateway-docker as the managed-gateway dependency.",
+   "verdict": "supported",
+   "note": "Confirmed in the same fetch: the doc references the 'gnzsnz IB Gateway container' / 'gnzsnz/ib-gateway-docker' repository as the containerized-gateway dependency.",
+   "sources": [
+    "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/v2.0.0rc5/docs/integrations/interactive_brokers.md"
+   ]
+  },
+  {
+   "name": "nautilustrader.native_execution_status_unchanged",
+   "claim": "native-nautilus-v2-20260920.json still records 'No IBKR Gateway/TWS authentication, data entitlement, adapter connectivity' as a limitation, unchanged since the pin -- the docs claim is only source_review, not an upgraded native_execution capability.",
+   "verdict": "supported",
+   "note": "Read evidence/receipts/native-nautilus-v2-20260920.json directly in the checkout: limitations[2] reads 'No IBKR Gateway/TWS authentication, data entitlement, adapter connectivity or Alpaca integration acceptance.' (candidate's quote is an exact, if truncated, substring). scope confirms 'no broker ... acceptance'; this receipt only covers an offline synthetic EUR/USD quickstart on the same pinned commit 1b0a49d.",
+   "sources": [
+    "evidence/receipts/native-nautilus-v2-20260920.json (local checkout)"
+   ]
+  },
+  {
+   "name": "nautilustrader.stars_and_push_today",
+   "claim": "29,418 stars and a push today (2026-09-26).",
+   "verdict": "supported",
+   "note": "gh api reports stargazers_count=29419 (off by 1 from live counter drift, immaterial) and pushed_at=2026-09-26T14:16:50Z, i.e. pushed today.",
+   "sources": [
+    "https://github.com/nautechsystems/nautilus_trader"
+   ]
+  },
+  {
+   "name": "nautilustrader.layers_json_winners_empty_and_split",
+   "claim": "layers.json's winners array for this layer is empty (claude/codex adjudication split 2-2, unresolved).",
+   "verdict": "supported",
+   "note": "Read catalogs/landscape/us-equities.json directly: the execution-broker entry has \"winners\": [] and current_choice names NautilusTrader 2.0.0rc5 as the user-selected destination. Read evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json directly: why field states 'The counterbalanced adjudication split 2-2 ... the pick followed the presentation order rather than the evidence' and winner_lane is null.",
+   "sources": [
+    "catalogs/landscape/us-equities.json (local checkout)",
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json (local checkout)"
+   ]
+  },
+  {
+   "name": "alpaca-py.repo_exists_license",
+   "claim": "Repo exists at github.com/alpacahq/alpaca-py; license Apache-2.0.",
+   "verdict": "supported",
+   "note": "gh api confirms full_name, archived=false, license.spdx_id=Apache-2.0; PyPI JSON info.license also = 'Apache-2.0'.",
+   "sources": [
+    "https://github.com/alpacahq/alpaca-py",
+    "https://pypi.org/pypi/alpaca-py/json"
+   ]
+  },
+  {
+   "name": "alpaca-py.pin_is_latest_release_both",
+   "claim": "v0.44.0 (2026-08-11) is the current latest release on both GitHub and PyPI; zero drift.",
+   "verdict": "supported",
+   "note": "GitHub releases top entry: v0.44.0, published_at 2026-08-11T10:11:55Z, next-newest v0.43.5 (2026-07-02). PyPI JSON info.version = '0.44.0'. Exact match both places.",
+   "sources": [
+    "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0",
+    "https://pypi.org/pypi/alpaca-py/json"
+   ]
+  },
+  {
+   "name": "alpaca-py.master_head_matches_pushed_at",
+   "claim": "master branch HEAD commit verified directly at 2026-09-23, matching pushed_at exactly.",
+   "verdict": "supported",
+   "note": "commits/master date = 2026-09-23T08:14:10Z; repo pushed_at = 2026-09-23T08:14:11Z -- 1 second apart, effectively exact.",
+   "sources": [
+    "https://github.com/alpacahq/alpaca-py/commits/master"
+   ]
+  },
+  {
+   "name": "alpaca-py.stars_1532",
+   "claim": "1,532 stars.",
+   "verdict": "supported",
+   "note": "gh api stargazers_count=1532, exact match.",
+   "sources": [
+    "https://github.com/alpacahq/alpaca-py"
+   ]
+  },
+  {
+   "name": "alpaca-py.paper_receipt_details_unaffected",
+   "claim": "Project's own paper-e2e receipt (one reconciled long-to-flat SPY roundtrip, write_attempts 2, cash_delta_usd -0.08) is unaffected by this upstream check.",
+   "verdict": "supported",
+   "note": "Read blueprints/us-equities/paper-e2e-20260921/paper-receipt.json directly: write_attempts=2, orders=[SPY buy then sell, both filled], fresh_reconciliation.cash_delta_usd='-0.08', positions=0 (flat), passed=true. Matches the claim's figures exactly.",
+   "sources": [
+    "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json (local checkout)"
+   ]
+  },
+  {
+   "name": "alpaca-py.agreed_component_in_split_adjudication",
+   "claim": "alpaca-py (c4) is one of the two component_ids both lanes agreed on in the split adjudication.",
+   "verdict": "supported",
+   "note": "Read evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json: all 4 judgments state 'A and B agree on c4 (alpaca-py) and c5 (adaptive-paper-alpaca-adapter). They differ only on c7 [Nautilus IBKR adapter]'.",
+   "sources": [
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json (local checkout)"
+   ]
+  },
+  {
+   "name": "lean.repo_exists_license",
+   "claim": "Repo exists at github.com/QuantConnect/Lean; license Apache-2.0.",
+   "verdict": "supported",
+   "note": "gh api confirms full_name, archived=false, license.spdx_id=Apache-2.0.",
+   "sources": [
+    "https://github.com/QuantConnect/Lean"
+   ]
+  },
+  {
+   "name": "lean.pinned_commit_date",
+   "claim": "Pinned commit 985ef30a is dated 2026-09-18.",
+   "verdict": "supported",
+   "note": "gh api commits/985ef30ad3... returns committer date 2026-09-18T14:03:24Z, exact match.",
+   "sources": [
+    "https://github.com/QuantConnect/Lean/commit/985ef30ad3ac774218c5ac516b4cb0aa2655730f"
+   ]
+  },
+  {
+   "name": "lean.master_17_commits_ahead",
+   "claim": "master is 17 commits ahead of the pin as of 2026-09-26 (8-day drift).",
+   "verdict": "supported",
+   "note": "gh api compare 985ef30a...master returns ahead_by=17, behind_by=0 exactly. Pin date 2026-09-18T14:03 to master HEAD 2026-09-25T20:02 = ~7.25 days, close to the claimed '8-day' (rounding to 2026-09-26 'as of' date makes it 8 days).",
+   "sources": [
+    "https://github.com/QuantConnect/Lean/compare/985ef30ad3ac774218c5ac516b4cb0aa2655730f...master"
+   ]
+  },
+  {
+   "name": "lean.drift_all_routine_no_capability_change",
+   "claim": "All 17 drift commits are routine fixes, e.g. a daily-history bar-count fix for lunch-break markets, with no capability-relevant change.",
+   "verdict": "refuted",
+   "note": "Fetched the full 17-commit message list myself. No commit mentions daily-history bar counts or lunch-break markets at all (the closest unrelated commit is 'Fix market close for Cboe indices (#9830)') -- the cited example does not exist in the actual diff. Worse, the range includes genuine execution-capability changes directly relevant to this layer: 'feature: support combo orders in the alpaca brokerage model (#9822)' (a new order-type feature added specifically to LEAN's Alpaca brokerage model) and 'Add contingent orders: OCO, OTO, OUO and brackets (#9828)' with matching live/paper tests (#9833). These are capability additions to broker/order-execution behavior, contradicting 'no capability-relevant change'.",
+   "sources": [
+    "https://github.com/QuantConnect/Lean/compare/985ef30ad3ac774218c5ac516b4cb0aa2655730f...master (commit list, checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "lean.no_release_since_2017",
+   "claim": "LEAN has cut no GitHub Release since v2.4.0.1 in 2017; versions via its own build/Docker pipeline rather than tags.",
+   "verdict": "supported",
+   "note": "gh api releases: count=8 total, newest is v2.4.0.1 published 2017-08-08T20:57:57Z; tags list top entries are the same historical set (v2.4.0.1, v2.4.0.0, v2.3.0.3...). No newer release object exists.",
+   "sources": [
+    "https://github.com/QuantConnect/Lean/releases"
+   ]
+  },
+  {
+   "name": "lean.companion_repos_same_day_push",
+   "claim": "Lean.Brokerages.Alpaca (18 stars) and Lean.Brokerages.InteractiveBrokers (79 stars) both pushed the same day (2026-09-25) as part of the monorepo submodule cascade; neither cuts independent releases.",
+   "verdict": "supported",
+   "note": "gh api confirms QuantConnect/Lean.Brokerages.Alpaca stargazers_count=18, pushed_at=2026-09-25T20:08:30Z; QuantConnect/Lean.Brokerages.InteractiveBrokers stargazers_count=79, pushed_at=2026-09-25T20:08:30Z -- identical to-the-second timestamp as the main QuantConnect/Lean repo's own pushed_at, strongly confirming a coordinated monorepo cascade. Both companion repos' /releases endpoints return an empty list (0 releases), confirming 'neither cuts independent releases'.",
+   "sources": [
+    "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
+    "https://github.com/QuantConnect/Lean.Brokerages.InteractiveBrokers"
+   ]
+  },
+  {
+   "name": "ib-gateway-docker.repo_exists_license",
+   "claim": "Repo exists at github.com/gnzsnz/ib-gateway-docker; license MIT; 1,255 stars; 9 open issues.",
+   "verdict": "supported",
+   "note": "gh api confirms full_name, license.spdx_id=MIT, stargazers_count=1255 (exact), open_issues_count=9 (exact), archived=false.",
+   "sources": [
+    "https://github.com/gnzsnz/ib-gateway-docker"
+   ]
+  },
+  {
+   "name": "ib-gateway-docker.latest_release",
+   "claim": "Latest release 'IB Gateway stable 10.50.1e' published 2026-09-23.",
+   "verdict": "supported",
+   "note": "gh api releases/latest returns tag_name='ibgateway-stable@10.50.1e', name='IB Gateway stable 10.50.1e', published_at=2026-09-23T11:04:47Z. Exact match.",
+   "sources": [
+    "https://github.com/gnzsnz/ib-gateway-docker/releases"
+   ]
+  },
+  {
+   "name": "ib-gateway-docker.master_head_matches_pushed_at",
+   "claim": "master branch HEAD commit verified directly at 2026-09-23, matching pushed_at exactly.",
+   "verdict": "refuted",
+   "note": "master HEAD commit date is 2026-09-23T17:07:27Z (sha 8a22deaa, 'Update stable to 10.50.1e (#453)'), but the repo's own pushed_at is 2026-09-25T12:15:46Z -- a ~43-hour gap, not an exact match. I checked all listed branches (no develop/dev branch exists, none of the ~28 branches showed a commit dated 2026-09-25) and the tags list; nothing found explains the later pushed_at. This is a direct primary-source refutation of the specific 'matching pushed_at exactly' claim, though the repo's overall freshness/maintenance is otherwise well evidenced by real commits through 2026-09-20 and 2026-09-23.",
+   "sources": [
+    "https://github.com/gnzsnz/ib-gateway-docker/commits/master",
+    "https://github.com/gnzsnz/ib-gateway-docker/branches (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "ib-gateway-docker.default_image_and_dependency_role",
+   "claim": "Default image ghcr.io/gnzsnz/ib-gateway:stable; already named in the project's own landscape catalog as a 'Dockerized IB Gateway' candidate.",
+   "verdict": "supported",
+   "note": "Fetched the repo's own README docker-compose block directly: contains 'ghcr.io/gnzsnz/ib-gateway:stable' as the image. Grepped catalogs/landscape/us-equities.json directly: 'Dockerized IB Gateway' / 'https://github.com/gnzsnz/ib-gateway-docker' appears multiple times (4+ occurrences) as a named candidate entry.",
+   "sources": [
+    "https://raw.githubusercontent.com/gnzsnz/ib-gateway-docker/master/README.md",
+    "catalogs/landscape/us-equities.json (local checkout)"
+   ]
+  },
+  {
+   "name": "ib_async.repo_exists_license_successor_positioning",
+   "claim": "BSD-2-Clause; community sync/async Python framework for IBKR TWS/Gateway API; positioned successor to archived ib_insync.",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=BSD-2-Clause. GitHub's own repo description reads 'Python sync/async framework for Interactive Brokers API (replaces ib_insync)'. README confirms the lineage narrative (renamed from ib_insync after original maintainer's 2024 passing). ib_insync itself independently confirmed archived=true (see separate check).",
+   "sources": [
+    "https://github.com/ib-api-reloaded/ib_async",
+    "https://raw.githubusercontent.com/ib-api-reloaded/ib_async/main/README.md"
+   ]
+  },
+  {
+   "name": "ib_async.pypi_2.1.0_and_main_head_age",
+   "claim": "PyPI 2.1.0 uploaded 2025-12-08; main branch HEAD verified directly at 2025-12-06 (~9.7 months old at check time).",
+   "verdict": "supported",
+   "note": "PyPI JSON: version=2.1.0, upload_time=2025-12-08T01:42:30. commits/main date=2025-12-06T15:32:58Z. 2025-12-06 to 2026-09-26 = ~9 months 20 days, matching '~9.7 months'.",
+   "sources": [
+    "https://pypi.org/pypi/ib_async/json",
+    "https://github.com/ib-api-reloaded/ib_async/commits/main"
+   ]
+  },
+  {
+   "name": "ib_async.misleading_pushed_at_side_branches",
+   "claim": "pushed_at (2026-08-19) is misleading -- it lands on gh-pages/next/next-protobuf branches, not main.",
+   "verdict": "supported",
+   "note": "Repo pushed_at=2026-08-19T03:04:44Z. Checked all 4 branches directly: main HEAD=2025-12-06 (does not match); gh-pages HEAD=2025-12-08 (does not match); next HEAD=2026-07-14 (does not match); next-protobuf HEAD=2026-08-18T12:58:32Z (within ~14 hours of pushed_at -- the plausible source). Net effect confirmed: pushed_at reflects non-main branch activity, not main, though of the three branches named only next-protobuf actually lines up closely with the date.",
+   "sources": [
+    "https://github.com/ib-api-reloaded/ib_async/branches",
+    "https://github.com/ib-api-reloaded/ib_async/commits/next-protobuf"
+   ]
+  },
+  {
+   "name": "ib_async.single_github_release",
+   "claim": "GitHub /releases/latest only lists one formal release (v2.0.1, 2025-06-22).",
+   "verdict": "supported",
+   "note": "gh api releases/latest returns tag_name=v2.0.1, published_at=2025-06-22T16:58:29Z, and the full releases list has exactly 1 entry total.",
+   "sources": [
+    "https://github.com/ib-api-reloaded/ib_async/releases"
+   ]
+  },
+  {
+   "name": "ib_async.stars_1745",
+   "claim": "1,745 stars.",
+   "verdict": "supported",
+   "note": "gh api stargazers_count=1745, exact match.",
+   "sources": [
+    "https://github.com/ib-api-reloaded/ib_async"
+   ]
+  },
+  {
+   "name": "lumibot.repo_exists_license",
+   "claim": "Repo exists at github.com/Lumiwealth/lumibot; license GPL-3.0.",
+   "verdict": "supported",
+   "note": "gh api confirms full_name, license.spdx_id=GPL-3.0, archived=false.",
+   "sources": [
+    "https://github.com/Lumiwealth/lumibot"
+   ]
+  },
+  {
+   "name": "lumibot.capability_same_code_12_brokers",
+   "claim": "Same-code backtest/live strategy framework placing orders across 12+ brokers including Alpaca, Interactive Brokers, Tradier and Schwab.",
+   "verdict": "supported",
+   "note": "GitHub description: '...12 brokers, real backtests, stocks options futures forex crypto and prediction markets.' README explicitly lists supported brokers including 'Alpaca, Interactive Brokers and Interactive Brokers REST, Tradier, Schwab, Tradovate, TopstepX ... Bitunix, Polymarket ... CCXT crypto paths' and describes a single reusable Strategy lifecycle across them.",
+   "sources": [
+    "https://github.com/Lumiwealth/lumibot",
+    "https://raw.githubusercontent.com/Lumiwealth/lumibot/dev/README.md"
+   ]
+  },
+  {
+   "name": "lumibot.release_today_matching_pypi_and_head",
+   "claim": "v4.6.1 released today (2026-09-26) on both GitHub and PyPI, matching a dev-branch HEAD commit at the same timestamp.",
+   "verdict": "supported",
+   "note": "GitHub release v4.6.1 published_at=2026-09-26T01:07:52Z; PyPI upload_time=2026-09-26T01:07:45; dev branch HEAD commit date=2026-09-26T01:01:17Z. All same day within minutes of each other.",
+   "sources": [
+    "https://github.com/Lumiwealth/lumibot/releases/tag/v4.6.1",
+    "https://pypi.org/pypi/lumibot/json"
+   ]
+  },
+  {
+   "name": "lumibot.stars_and_issues",
+   "claim": "2,091 stars, 93 open issues.",
+   "verdict": "supported",
+   "note": "gh api stargazers_count=2092 (off by 1, live-counter drift, immaterial), open_issues_count=93 (exact match).",
+   "sources": [
+    "https://github.com/Lumiwealth/lumibot"
+   ]
+  },
+  {
+   "name": "thetagang.repo_exists_license_capability",
+   "claim": "AGPL-3.0; automated IBKR options-selling ('wheel'/theta) bot with a concrete order-submission/reconciliation loop.",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=AGPL-3.0. README: 'ThetaGang is an IBKR trading bot that started as a basic implementation of \"The Wheel\" strategy...' and documents fill reconciliation from IBKR's execution-detail event stream, backfilled idempotently.",
+   "sources": [
+    "https://github.com/brndnmtthws/thetagang",
+    "https://raw.githubusercontent.com/brndnmtthws/thetagang/main/README.md"
+   ]
+  },
+  {
+   "name": "thetagang.release_and_head_dates",
+   "claim": "v2.1.0 released 2026-08-29; main branch HEAD verified directly at 2026-09-16, matching pushed_at exactly.",
+   "verdict": "supported",
+   "note": "Release published_at=2026-08-29T21:39:58Z (exact match). commits/main date=2026-09-16T14:53:53Z vs pushed_at=2026-09-16T14:53:55Z, 2 seconds apart -- effectively exact.",
+   "sources": [
+    "https://github.com/brndnmtthws/thetagang/releases/tag/v2.1.0",
+    "https://github.com/brndnmtthws/thetagang/commits/main"
+   ]
+  },
+  {
+   "name": "thetagang.stars_and_issues",
+   "claim": "2,735 stars, only 2 open issues.",
+   "verdict": "supported",
+   "note": "gh api stargazers_count=2735 (exact), open_issues_count=2 (exact).",
+   "sources": [
+    "https://github.com/brndnmtthws/thetagang"
+   ]
+  },
+  {
+   "name": "alpaca-mcp-server.repo_and_capability",
+   "claim": "Official Alpaca-published MCP server for natural-language trading of US stocks/ETFs/options/crypto over the same account the pinned alpaca-py SDK uses; MIT license.",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=MIT, org=alpacahq (official vendor). GitHub description: 'trade stocks, ETFs, crypto, and options ... in plain English'. README confirms per-asset-class tool coverage for stocks/ETFs/options/crypto.",
+   "sources": [
+    "https://github.com/alpacahq/alpaca-mcp-server",
+    "https://raw.githubusercontent.com/alpacahq/alpaca-mcp-server/main/README.md"
+   ]
+  },
+  {
+   "name": "alpaca-mcp-server.release_and_head_dates",
+   "claim": "v2.3.2 released 2026-09-15; main branch HEAD verified directly at 2026-09-25, matching pushed_at exactly.",
+   "verdict": "supported",
+   "note": "Release published_at=2026-09-15T14:13:25Z (exact). commits/main date=2026-09-25T12:52:24Z vs pushed_at=2026-09-25T12:52:26Z, 2 seconds apart.",
+   "sources": [
+    "https://github.com/alpacahq/alpaca-mcp-server/releases/tag/v2.3.2",
+    "https://github.com/alpacahq/alpaca-mcp-server/commits/main"
+   ]
+  },
+  {
+   "name": "alpaca-mcp-server.stars_and_issues",
+   "claim": "994 stars, 22 open issues.",
+   "verdict": "supported",
+   "note": "gh api stargazers_count=994 (exact), open_issues_count=22 (exact).",
+   "sources": [
+    "https://github.com/alpacahq/alpaca-mcp-server"
+   ]
+  },
+  {
+   "name": "tastytrade.repo_and_capability",
+   "claim": "Unofficial but actively maintained typed async Python SDK for the Tastytrade broker: account, positions, orders, streaming market data, options with Greeks; MIT; 258 stars.",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=MIT, stargazers_count=258 (exact), archived=false. README confirms 'Powerful websocket implementation for account alerts and data streaming' with a live Quote/Greeks subscription example, plus positions and order-placement sections.",
+   "sources": [
+    "https://github.com/tastyware/tastytrade",
+    "https://raw.githubusercontent.com/tastyware/tastytrade/master/README.md"
+   ]
+  },
+  {
+   "name": "tastytrade.release_cadence",
+   "claim": "PyPI 13.2.3 and the matching GitHub release both dated 2026-08-07, with two more releases (13.2.1, 13.2.2) in the two weeks before that.",
+   "verdict": "supported",
+   "note": "GitHub releases: v13.2.3 published 2026-08-07T21:12:30Z, v13.2.2 2026-07-27T23:25:30Z, v13.2.1 2026-07-24T20:15:19Z (11-14 days before 13.2.3). PyPI upload_time for 13.2.3 = 2026-08-07T21:13:05, essentially identical to the GitHub release timestamp.",
+   "sources": [
+    "https://github.com/tastyware/tastytrade/releases",
+    "https://pypi.org/pypi/tastytrade/json"
+   ]
+  },
+  {
+   "name": "tastytrade.discovery_zero_catalog_presence",
+   "claim": "Zero presence in this project's own catalog or receipts today (a discovery note, not an adoption recommendation).",
+   "verdict": "unverifiable",
+   "note": "Grepped the whole checkout for 'tastytrade|tastyware' (case-insensitive): exactly 2 hits, both in evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json and claude-source-review.json -- but both mentions are incidental references to 'Tastytrade' the broker in a description of LEAN's adapter breadth ('IB, Alpaca, Tradier, TradeStation, Tastytrade, Wolverine'), not any catalog/decision-index entry for the tastyware/tastytrade SDK itself. catalogs/us-equities/ has zero hits. So the substantive claim (no adoption-status entry for this specific SDK) holds, but the literal 'zero presence... in this project's own catalog' is not perfectly precise since the word does appear (in an unrelated context) -- marking unverifiable-as-literally-stated rather than a clean supported/refuted.",
+   "sources": [
+    "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json (local checkout)",
+    "catalogs/us-equities/ (grep, local checkout)"
+   ]
+  },
+  {
+   "name": "stratequeue.repo_and_capability",
+   "claim": "Broker-agnostic strategy-to-live/paper deployment layer with built-in safety controls; wraps an existing backtest codebase rather than replacing the engine; AGPL-3.0; 214 stars.",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=AGPL-3.0, stargazers_count=214 (exact). README confirms: 'StrateQueue lets you deploy any Python trading strategy (backtrader, zipline, vectorbt, etc.) to any broker with one command,' with an unchanged existing strategy class as the example. However, README documents only one specific safety feature ('Signals-only mode by default. No accidental trades') -- not a broader documented set of controls (no position-limit/kill-switch language found), so the plural 'safety controls' is only partially evidenced.",
+   "sources": [
+    "https://github.com/StrateQueue/StrateQueue",
+    "https://raw.githubusercontent.com/StrateQueue/StrateQueue/main/README.md"
+   ]
+  },
+  {
+   "name": "stratequeue.version_and_freshness_gap",
+   "claim": "git tag v0.5.1 matches PyPI 0.5.1; main branch HEAD verified at 2025-12-30 (~9 months, under the 12-month bar), but PyPI upload is from 2025-08-21 (~13 months, over the bar) -- source outpacing tagged releases.",
+   "verdict": "supported",
+   "note": "Tag v0.5.1 exists (sha 8c354e0). commits/main date=2025-12-30T10:33:37Z (~9 months to 2026-09-26). PyPI JSON: version=0.5.1, upload_time=2025-08-21T21:01:12 (~13 months to 2026-09-26). Both figures match exactly.",
+   "sources": [
+    "https://github.com/StrateQueue/StrateQueue/releases/tag/v0.5.1",
+    "https://pypi.org/pypi/stratequeue/json"
+   ]
+  },
+  {
+   "name": "stratequeue.dependabot_branches",
+   "claim": "Several open dependabot branches (numpy/pydantic/vectorbt/yfinance bumps) still pending.",
+   "verdict": "supported",
+   "note": "gh api branches list includes dependabot/pip/numpy-gte-1.21-and-lt-2.3, dependabot/pip/pydantic-gte-2.0-and-lt-2.14, dependabot/pip/vectorbt-gte-0.26-and-lt-1.1, dependabot/pip/yfinance-1.3.0, plus an additional numba branch not mentioned in the claim.",
+   "sources": [
+    "https://github.com/StrateQueue/StrateQueue/branches"
+   ]
+  },
+  {
+   "name": "ib_mcp.repo_exists_license",
+   "claim": "Repo exists at github.com/rcontesti/IB_MCP; MIT; 141 stars; 4 open issues; no GitHub Releases cut.",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=MIT, stargazers_count=141 (exact), open_issues_count=4 (exact), archived=false; releases endpoint returns 0 entries.",
+   "sources": [
+    "https://github.com/rcontesti/IB_MCP"
+   ]
+  },
+  {
+   "name": "ib_mcp.capability_tws_gateway_150_markets",
+   "claim": "Community MCP server for IBKR TWS/Gateway live trading across 150 markets.",
+   "verdict": "refuted",
+   "note": "Fetched the current main-branch README directly: it contains no mention of '150 markets' anywhere, and explicitly positions the project AGAINST TWS/Gateway: 'The Web API is standalone. It does not require you to run the TWS desktop software or IB Gateway,' with a comparison table marking the Web API path as 'Standalone (does not require TWS/Gateway)'. The project's own architecture description directly contradicts labeling it a 'TWS/Gateway' server, and the specific '150 markets' figure could not be found anywhere in the README.",
+   "sources": [
+    "https://raw.githubusercontent.com/rcontesti/IB_MCP/main/README.md"
+   ]
+  },
+  {
+   "name": "ib_mcp.commit_recency",
+   "claim": "Last push and last three commits all dated 2025-10-23/2025-10-22 (~11 months old at check time).",
+   "verdict": "supported",
+   "note": "gh api commits list top 3: 2025-10-23T19:49:51Z, 2025-10-23T19:29:23Z, 2025-10-22T01:03:23Z -- exact match. repo pushed_at also 2025-10-23T19:49:51Z. 2025-10-23 to 2026-09-26 = ~11 months, matching the claim and remaining under the 12-month unmaintained bar.",
+   "sources": [
+    "https://github.com/rcontesti/IB_MCP/commits"
+   ]
+  },
+  {
+   "name": "ib_insync.archived_and_stale",
+   "claim": "Author-archived: GitHub archived=true, last push 2024-03-14; last PyPI upload 0.9.86 on 2023-07-02; 3,282 stars.",
+   "verdict": "supported",
+   "note": "gh api confirms archived=true, pushed_at=2024-03-14T19:50:06Z (exact), stargazers_count=3282 (exact). PyPI JSON: version=0.9.86, upload_time=2023-07-02T12:43:29 (exact).",
+   "sources": [
+    "https://github.com/erdewit/ib_insync",
+    "https://pypi.org/pypi/ib-insync/json"
+   ]
+  },
+  {
+   "name": "ibapi.pypi_stale_and_ibkr_docs_deprecated",
+   "claim": "PyPI mirror unmaintained since 2020 (9.81.1.post1, 2020-12-06); IBKR's own docs page self-flags as outdated and redirects to IBKR Campus.",
+   "verdict": "supported",
+   "note": "PyPI JSON: version=9.81.1.post1, upload_time=2020-12-06T03:18:39 (exact), license string 'IB API Non-Commercial License or the IB API Commercial License' (near-verbatim match). Fetched interactivebrokers.github.io/tws-api/introduction.html directly: 'This documentation is now deprecated. Please switch to the IBKR Campus ... for up-to-date information regarding IBKR's API solutions.' -- exact quote confirming the self-flag and redirect.",
+   "sources": [
+    "https://pypi.org/pypi/ibapi/json",
+    "https://interactivebrokers.github.io/tws-api/introduction.html"
+   ]
+  },
+  {
+   "name": "schwab-py.same_author_as_tda_api_and_tda_stale",
+   "claim": "From the same author as the now-retired tda-api; tda-api last pushed 2024-06-16.",
+   "verdict": "supported",
+   "note": "gh api repos/alexgolec/tda-api confirms pushed_at=2024-06-16T22:04:20Z, exact match; same GitHub org/user (alexgolec) as schwab-py.",
+   "sources": [
+    "https://github.com/alexgolec/tda-api"
+   ]
+  },
+  {
+   "name": "schwab-py.pushed_at_misleading_main_stale",
+   "claim": "pushed_at (2026-08-26) is misleading -- lands on side/patch branches, not main; main branch HEAD is 2025-08-04; last release v1.5.0/PyPI 1.5.1 (2025-06-30); both over 13 months old.",
+   "verdict": "supported",
+   "note": "repo pushed_at=2026-08-26T01:49:14Z but commits/main date=2025-08-04T12:34:48Z (>13 months old, exact match to claim). Branches list confirms many non-main branches (alexgolec-patch-1..5, add-token-revocation, collab-support, etc.) including one named 'add-images-to-getting-started-docs' -- the claim's paraphrase 'get-images-to-getting-started-docs' is a minor misquote of this same branch, not a separate branch. Release v1.5.0 published_at=2025-06-30T15:06:35Z; PyPI version=1.5.1, upload_time=2025-06-30T15:07:55 -- both exact matches, both >13 months before 2026-09-26.",
+   "sources": [
+    "https://github.com/alexgolec/schwab-py/commits/main",
+    "https://github.com/alexgolec/schwab-py/branches",
+    "https://github.com/alexgolec/schwab-py/releases/tag/v1.5.0",
+    "https://pypi.org/pypi/schwab-py/json"
+   ]
+  },
+  {
+   "name": "schwab-py.stars_license_unmaintained_flag",
+   "claim": "469 stars, MIT license, not archived, but no release or main-branch commit in the last 12 months (flagged UNMAINTAINED).",
+   "verdict": "supported",
+   "note": "gh api stargazers_count=469 (exact), license.spdx_id=MIT, archived=false. Both the release (2025-06-30) and main HEAD (2025-08-04) are >12 months before 2026-09-26, consistent with the 'maintained: false' flag the candidate itself assigns.",
+   "sources": [
+    "https://github.com/alexgolec/schwab-py"
+   ]
+  },
+  {
+   "name": "clear-street.docs_confirm_capability_and_scope_limit",
+   "claim": "Live docs confirm order execution (stocks/options), account/position/balance/margin/P&L, instrument reference, bearer-token REST at api.clearstreet.com; docs state additional asset classes are 'planned for future releases'.",
+   "verdict": "supported",
+   "note": "Fetched docs.clearstreet.com directly: confirms orders endpoint for stocks/options, a Balances endpoint (trade_cash, buying_power, equity, maintenance_margin_requirement), Positions and Portfolio History endpoints, 'Authorization: Bearer <api_key>' against 'https://api.clearstreet.com', and the exact quoted sentence: 'Currently, the Trading API supports long and short trading of stocks and options. Support for additional asset classes is planned for future releases.'",
+   "sources": [
+    "https://docs.clearstreet.com/"
+   ]
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "NautilusTrader",
+   "url": "https://github.com/nautechsystems/nautilus_trader",
+   "modalities": [
+    "star",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Already the selected destination; upstream check confirms the pin is current with zero drift. The IBKR adapter's own docs (read directly at the pin) claim full execution capability, but this is a source_review claim -- the project's own receipt (native-nautilus-v2-20260920.json) still records 'No IBKR Gateway/TWS authentication, data entitlement, adapter connectivity', so the IBKR execution boundary itself remains not_established, unchanged since the pin. 29,418 stars and a push today make it the most actively maintained engine in this set."
+  },
+  {
+   "name": "alpaca-py",
+   "url": "https://github.com/alpacahq/alpaca-py",
+   "modalities": [
+    "star",
+    "pypi"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Already the selected official Alpaca SDK; confirmed current with no upstream drift or notable interface change since the pin. The project's own paper-e2e receipt (one reconciled long-to-flat SPY roundtrip) is unaffected by this check. 1,532 stars, Apache-2.0, actively maintained."
+  },
+  {
+   "name": "LEAN (QuantConnect)",
+   "url": "https://github.com/QuantConnect/Lean",
+   "modalities": [
+    "docs",
+    "github_search"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Retained oracle only; this check found no capability change since the pin, just routine upstream drift. 21,787 stars, Apache-2.0, pushed daily -- clearly maintained, just not release-tagged in the GitHub sense."
+  },
+  {
+   "name": "ib_async",
+   "url": "https://github.com/ib-api-reloaded/ib_async",
+   "modalities": [
+    "awesome",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Strongest maintained community alternative to the archived ib_insync for any code path needing a Python-native IBKR client outside Nautilus's own bundled adapter. 1,745 stars, BSD-2-Clause. No local broker/recovery comparison in this stack shows a need to switch from Nautilus's adapter."
+  },
+  {
+   "name": "ib_insync",
+   "url": "https://github.com/erdewit/ib_insync",
+   "modalities": [
+    "awesome",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Confirmed dead upstream -- do not adopt. Historical reference only; kept in this list solely to document what ib_async replaced, matching the awesome-list notes' own flag."
+  },
+  {
+   "name": "ibapi (official Interactive Brokers TWS API, Python client)",
+   "url": "https://pypi.org/project/ibapi/",
+   "modalities": [
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Relevant as ground truth for IBKR wire-protocol behavior, but nobody should depend on the PyPI mirror directly given the multi-year staleness; Nautilus's own adapter and ib_async are the practical current interfaces built on top of it."
+  },
+  {
+   "name": "Lumibot",
+   "url": "https://github.com/Lumiwealth/lumibot",
+   "modalities": [
+    "star",
+    "awesome",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The strongest broker-agnostic strategy-execution alternative to a bespoke per-broker adapter found in this search. Still needs the same data/risk/order-recovery/accounting comparison the layer's overturn_when clause requires before it could replace the selected NautilusTrader destination, and its GPL-3.0 license needs an explicit fit check against the rest of the stack's licenses before any adoption."
+  },
+  {
+   "name": "StrateQueue",
+   "url": "https://github.com/StrateQueue/StrateQueue",
+   "modalities": [
+    "awesome",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "A lighter-weight deployment shim than Lumibot for wrapping an existing strategy. The PyPI release lag and much smaller community make it a secondary option, not a leading alternative to the selected destination."
+  },
+  {
+   "name": "alpaca-mcp-server",
+   "url": "https://github.com/alpacahq/alpaca-mcp-server",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Relevant only if an LLM-agent-driven order-entry surface is wanted on top of the existing Alpaca account. It wraps the same alpaca-py calls the project already owns as a single writer, so it adds an agent-facing interface rather than a new execution capability, and would need its own ownership/duplicate-writer guard before use."
+  },
+  {
+   "name": "IB_MCP",
+   "url": "https://github.com/rcontesti/IB_MCP",
+   "modalities": [
+    "awesome"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The only IBKR-side MCP found; relevant if an agent-facing IBKR order-entry surface is wanted to mirror alpaca-mcp-server, but its ~11-month commit gap versus alpaca-mcp-server's days-old cadence, and its much smaller community, are real maintenance-risk signals to re-check before adoption -- borderline on the unmaintained flag and worth rechecking in a few months."
+  },
+  {
+   "name": "ib-gateway-docker (gnzsnz)",
+   "url": "https://github.com/gnzsnz/ib-gateway-docker",
+   "modalities": [
+    "docs",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Not a broker SDK itself but the infrastructure every IBKR execution path in this stack (Nautilus's optional DockerizedIBGateway, or any ib_async script) depends on to run headless. Already named in the project's own landscape catalog as a 'Dockerized IB Gateway' candidate; independently confirmed here as current and as the exact dependency Nautilus's own docs point to."
+  },
+  {
+   "name": "ThetaGang",
+   "url": "https://github.com/brndnmtthws/thetagang",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Not directly reusable (options wheel strategy, not the equity-extreme-mover focus), but the strongest concrete, currently-maintained reference found for what a real-money IBKR execution loop looks like end-to-end -- a useful implementation-pattern check against this project's own unqualified nautilus-ibkr-adapter path."
+  },
+  {
+   "name": "tastytrade (tastyware/tastytrade)",
+   "url": "https://github.com/tastyware/tastytrade",
+   "modalities": [
+    "pypi",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "New find beyond the given star/awesome-list inputs. Tastytrade is a modern, API-friendly US options/equities broker with a much faster-moving community SDK than either ib_async or schwab-py checked here; worth tracking as a lower-friction third broker option if the IBKR adapter's not_established broker acceptance or Alpaca's scope ever becomes a blocker -- but it has zero presence in this project's own catalog or receipts today, so this is a discovery note, not a recommendation to adopt."
+  },
+  {
+   "name": "schwab-py",
+   "url": "https://github.com/alexgolec/schwab-py",
+   "modalities": [
+    "pypi",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "New find beyond the given lists, nominally the successor ecosystem to the dead tda-api, but flag UNMAINTAINED by this task's 12-month rule despite an active-looking repository page -- the apparent August 2026 activity is confined to non-main branches. Not in this project's current scope (Alpaca + IBKR only); if Schwab is ever considered, re-verify freshness before relying on this specific wrapper."
+  },
+  {
+   "name": "Clear Street API",
+   "url": "https://docs.clearstreet.com/",
+   "modalities": [
+    "awesome",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "An institutional-grade alternative broker beyond the retail-focused Alpaca/IBKR/Schwab/Tastytrade set, with reference data and corporate events in the same surface as execution. Interesting for a later production-scale destination, but it is a commercial account relationship rather than an installable OSS SDK, so it cannot be evaluated further without opening an account -- out of scope for this read-only research pass."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/execution-broker--gpt-6-live.md"
+  }
+ ]
+}

@@ -12973,8 +12973,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "6c94bd6d4eaefeab854b76f715dba5b7efdb13678a950ebf740a4e66a1e13312",
-      "bytes": 16994
+      "sha256": "94f2eba417d719cdaafb97a3e3950886dd94b0d0ff01621ed8a1e25697ca1f8b",
+      "bytes": 17552
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -13040,6 +13040,16 @@
       "path": "catalogs/us-equities/authenticated-data-review.md",
       "sha256": "ebe7bdcdbd2173ce25a355f74621aa690398fd641d02ffa69971d991ca62006b",
       "bytes": 9134
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.json",
+      "sha256": "9a5b72041df5a2b837b8802ed0dff42eb1831cee3560518b3d00f15503ce6039",
+      "bytes": 881249
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.md",
+      "sha256": "b830d33253d29b419a0623f1ee1b42cfa36efd2d3865ca47edeac44433dfd223",
+      "bytes": 5990
     },
     {
       "path": "catalogs/us-equities/convergence-program/foundation.json",
@@ -34525,6 +34535,186 @@
       "path": "evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json",
       "sha256": "f186f4a192efafb3182185093abf87a7bb7d5b157bfe0d783dfe5df83f38c9f8",
       "bytes": 147636
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/README.md",
+      "sha256": "a973cbc47274143f7c307fe3bc28a3607013e042f1889316d2514dcd1a8b09c4",
+      "bytes": 1397
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/agents-models-workers--gpt-6-cached.md",
+      "sha256": "f0eddeda4c0d4e0c2eba8e4d7ace863ae433b039cc38bf1fb4a0c7a0e9d55833",
+      "bytes": 7171
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/agents-models-workers--gpt-6-live.md",
+      "sha256": "7efe56e8a7e997db07b29da98c18a7213e25b7fe8db3be2d0acdba5b71850537",
+      "bytes": 6522
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/backtesting-engine--gpt-6-cached.md",
+      "sha256": "a5cd64063b806b4887bcfd76a3b3b9d08d2a506e209f7e42e2eec695aa3bdaec",
+      "bytes": 5384
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/backtesting-engine--gpt-6-live.md",
+      "sha256": "0d579a8c17cf220ea48dfefdbf7b97765c3ab6c2f02b104d583dd6de393520df",
+      "bytes": 5731
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/data-quality-orchestration--gpt-6-live.md",
+      "sha256": "a7b1ca6728fa8304264e7983cdbb4ba2da3aaa11942fba65567741da5fddeab1",
+      "bytes": 4860
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/evaluation-experiments--gpt-6-cached.md",
+      "sha256": "105861545ba295119a99cd7a5d8a1ade1ba60d45cad3f942dc1703c2c27b6aa2",
+      "bytes": 6314
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/evaluation-experiments--gpt-6-live.md",
+      "sha256": "07ba1a0938868441a6b93027fb0c57114d2e3359a23da86e5afc62207b45473a",
+      "bytes": 7641
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/execution-broker--gpt-6-live.md",
+      "sha256": "ac82cd6c9bba958abda0d18ce0f3c28097742b3f6ac8c4ea3dc8915ddbd60a84",
+      "bytes": 6860
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/identity-provenance--gpt-6-live.md",
+      "sha256": "2de8ed417d66a1c390a237e55a9bd4b804b2a3db8d6bf73f62a3c5b868e9ee41",
+      "bytes": 8385
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/market-data-reference--gpt-6-cached.md",
+      "sha256": "4e1dd3e6f8fef2007fd075a7e941a6ea35df86cf083682088526b1752926186c",
+      "bytes": 7312
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/market-data-reference--gpt-6-live.md",
+      "sha256": "b97ffb73c02a744c515ed5bae516882bd7a8db5ccea236dbdbc25705b1747768",
+      "bytes": 7873
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/observability-hosting--gpt-6-cached.md",
+      "sha256": "756251fb5e8b0e65d6f8244f2af7392db98503ea3b11cf9d6ab773e20f9d8065",
+      "bytes": 5371
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/observability-hosting--gpt-6-live.md",
+      "sha256": "f3a49492bae9ecbef4845f1716c6f23a69de70ddaaa21a105b158cbb1062f458",
+      "bytes": 5846
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/portfolio-risk--gpt-6-live.md",
+      "sha256": "667c7a8b0c73ce3f3acd0ea0f4d52e4fab88b8e1eb9bc5a8c47d06a628d32dbf",
+      "bytes": 7169
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/research-factors-ml--gpt-6-cached.md",
+      "sha256": "1e93200be91cf7c715de85c505bb60fc56b5e450c955b9f74df951083c6b8490",
+      "bytes": 5524
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/research-factors-ml--gpt-6-live.md",
+      "sha256": "9c1856f8391b249b2b5cd61ddb842ed5fb74b73cc8e12759c4df3c3ecaf0c274",
+      "bytes": 5991
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/security-supply-chain--gpt-6-cached.md",
+      "sha256": "090b3f5c09d5dcf6fc9cb9072a4cf3b70efba6753ed97603b11764250f040845",
+      "bytes": 7290
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/security-supply-chain--gpt-6-live.md",
+      "sha256": "32c02c54fc1faecc73114f26bf75ed197bde3a720d4d1a19c64e901401cd454a",
+      "bytes": 8303
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/storage-compute--gpt-6-live.md",
+      "sha256": "2deeb1ee9bc659a638bca10ac8d4c1724a09863001906f26600778542a71b52c",
+      "bytes": 6689
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/strategy-research--gpt-6-cached.md",
+      "sha256": "d994b4b53bb388da9ae848f153d8e29064ed77e13b722a3e0dd58a81208dc910",
+      "bytes": 7924
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/strategy-research--gpt-6-live.md",
+      "sha256": "8ef6205ecfc6c1fe9293cb33bc43849c480fdca89ceeaf5096c85ab296402b0c",
+      "bytes": 7275
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/agents-models-workers.json",
+      "sha256": "caffb4e02270428fd6132f073d5e62fc017775c665b9bc67a9c1f8c0aee6697d",
+      "bytes": 55472
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/backtesting-engine.json",
+      "sha256": "fb2e29654a9698c47b6d33037599f503037f6904ecefcc1377e99ca3cfcc0abc",
+      "bytes": 56743
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/data-quality-orchestration.json",
+      "sha256": "71d7064bbb056a37546211c4a2c91db9b63775c91a1e39d47cc29c40dab70233",
+      "bytes": 70422
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/evaluation-experiments.json",
+      "sha256": "eea3e2c2511baa65391ea4762654dc45e76fe94bab34c2739163413bb3311d29",
+      "bytes": 53092
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/execution-broker.json",
+      "sha256": "374336eac7109f6070ba9b064bc90e83497c9aa67e78d5d9294ab5bda719a2b9",
+      "bytes": 59056
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/identity-provenance.json",
+      "sha256": "e03c3ab07f32155f9bdc72989e5f8bf3716ac3f52fb7a5bba3e2e48e5b47b150",
+      "bytes": 68116
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/market-data-reference.json",
+      "sha256": "4b5f0f73cd58683fff6ba1f35bc7c0b9667029aa660da241f664503a20f13406",
+      "bytes": 62733
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/observability-hosting.json",
+      "sha256": "d7caee35e3812263db8e8be8d25cf5b40f40289332cb0a8cee56dff4c7b193a1",
+      "bytes": 66830
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/portfolio-risk.json",
+      "sha256": "2a39483cd16861fdd85590cbd6c885be6e682592001dbdfe71829da9ce185df8",
+      "bytes": 59400
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/research-factors-ml.json",
+      "sha256": "c6e65f2c27893472955984b200845c7e0e831dfe47ed07c8b344847b54b43535",
+      "bytes": 50217
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/security-supply-chain.json",
+      "sha256": "13d979f9e87f0ff99be096a0ef024540ce19ae6bf3126e0c2458879fa4562437",
+      "bytes": 70342
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/storage-compute.json",
+      "sha256": "e73193fc27b7c63852866dc6a93b6d6c696a94a45d97fcbb42e6700bc7fdf873",
+      "bytes": 58884
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/strategy-research.json",
+      "sha256": "1f04733b31f06069a2888458d944467e63f9e8ee1e3b50b13e00ee45301d35c9",
+      "bytes": 51850
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/papers-strategy.md",
+      "sha256": "189a1b80b559e74fc12d0b7e73f6415e4829041bfe8f03d89ca5a18fb11be4f5",
+      "bytes": 30252
     },
     {
       "path": "evidence/artifacts/ultracode-token-routing-20260921/audit-verifier-wf_d0d741b1-9c6.json",
