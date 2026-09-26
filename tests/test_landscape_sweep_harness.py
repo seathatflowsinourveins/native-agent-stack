@@ -1753,6 +1753,42 @@ class SourceReviewTests(unittest.TestCase):
         self.assertIn(f"Survived the {LANE} facts refuter and both fit refuters", review["claim"])
         self.assertEqual(requested, ["api/models/Org/Model-1.5", f"Org/Model-1.5/resolve/{sha}/README.md"])
 
+    def test_hub_reviews_survive_truncated_responses_trailing_slashes_and_indented_card_metadata(self):
+        # Review repairs (2026-09-26): http.client.HTTPException is not an OSError, so a truncated Hub response
+        # escaped as a traceback; the same model with and without a trailing slash got two reviews; a card whose
+        # metadata block follows a blank line (huggingface_hub repocard.REGEX_YAML_BLOCK allows it) was excerpted.
+        source_reviews = load("source_reviews")
+        with mock.patch.object(source_reviews.urllib.request, "urlopen",
+                               side_effect=source_reviews.http.client.IncompleteRead(b"")):
+            with self.assertRaises(source_reviews.HubError):
+                source_reviews.hub_get("api/models/Org/M")
+        sha = "b" * 40
+        card = "\n---\nlicense: mit\nbase_model: some/model\n---\n\n" + "A long enough paragraph about the model itself. " * 3
+        answers = {"api/models/Org/M": {"id": "Org/M", "sha": sha, "cardData": {"license": "mit"}},
+                   f"Org/M/resolve/{sha}/README.md": card}
+        work = temp_dir(self)
+        survivors = write_json(work / "survivors.json", [
+            {"layer_id": "alpha", "repository": "https://huggingface.co/Org/M"},
+            {"layer_id": "beta", "repository": "https://huggingface.co/Org/M/"}])
+        out = io.StringIO()
+        with mock.patch.object(source_reviews, "hub_get", lambda path, text=False: answers[path]), \
+                contextlib.redirect_stdout(out):
+            code = source_reviews.main(["--survivors", str(survivors), "--out", str(work / "reviews"), "--lane", LANE])
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(out.getvalue()), [{"repository": "https://huggingface.co/Org/M",
+                                                       "path": "hf-org-m.json", "layers": ["alpha", "beta"]}])
+        excerpts = json.loads((work / "reviews/hf-org-m.json").read_text())["documentation_excerpts"]
+        self.assertTrue(excerpts and not any("base_model" in item["text"] for item in excerpts))
+        # make_result.py finds that review for a survivor recorded with the trailing slash, as the ledger compares.
+        usage = usage_record.record(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS), 0, "cmd", ROOT)
+        layer = {"catalog": "us-equities", "layer_id": "beta", "reopen": [],
+                 "survived": [{"repo": "https://huggingface.co/Org/M/"}]}
+        result = make_result.build_result(
+            layers=[layer], reviews=json.loads(out.getvalue()), usage=usage, manifest={"checked_at": "2026-10-26"},
+            sweep_id=LANE, lane=LANE, returns_ref=f"evidence/artifacts/{LANE}/returns.json", usage_ref="u.json",
+            manifest_ref="m.json", prompts_sha256=PROMPTS_SHA256_20260926, returns={"failures": {}})
+        self.assertEqual(result["layers"][0]["survived"][0]["source_review"], f"evidence/artifacts/{LANE}/hf-org-m.json")
+
 
 # --------------------------------------------------------------------------- sweep.js under node
 

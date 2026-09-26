@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import base64
 import hashlib
+import http.client
 import json
 import re
 import subprocess
@@ -45,6 +46,8 @@ HUB_MODEL = re.compile(r"https://huggingface\.co/([A-Za-z0-9][A-Za-z0-9_.-]*/[A-
 HUB_SECTIONS = {"api", "blog", "buckets", "collections", "containers", "datasets", "docs", "models", "organizations",
                 "papers", "settings", "spaces"}
 HUB_DEFAULT_REVISION = "main"  # huggingface_hub constants.DEFAULT_REVISION
+# huggingface_hub repocard.REGEX_YAML_BLOCK: the card's metadata block, which may follow leading whitespace.
+CARD_METADATA = re.compile(r"^(\s*---(?:\r\n|\r|\n))([\S\s]*?)((?:\r\n|\r|\n)---[ \t]*(\r\n|\n|$))")
 HEX40 = re.compile(r"[0-9a-f]{40}")
 
 
@@ -70,8 +73,10 @@ def hub_get(path: str, text: bool = False):
         with urllib.request.urlopen(request, timeout=60) as response:
             body = response.read()
         return body.decode("utf-8", "replace") if text else json.loads(body)
-    except (urllib.error.URLError, OSError, ValueError) as error:
-        raise HubError(f"GET {HUB}/{path}: {error}") from None
+    except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError) as error:
+        # http.client.HTTPException (IncompleteRead, BadStatusLine) is not an OSError; without it one truncated
+        # response would abort the whole run before any review is written.
+        raise HubError(f"GET {HUB}/{path}: {error!r}") from None
 
 
 def hub_model(repository: str) -> str | None:
@@ -80,6 +85,13 @@ def hub_model(repository: str) -> str | None:
     if match and match.group(1).split("/", 1)[0].lower() not in HUB_SECTIONS:
         return match.group(1)
     return None
+
+
+def repository_key(repository: str) -> str:
+    """One key per repository: the lowercased owner/repo for GitHub (sweep_common.slug) and hf:<namespace>/<name>
+    for a Hugging Face model, so the same model with and without a trailing slash gets one review."""
+    repo_id = hub_model(repository)
+    return f"hf:{repo_id.lower()}" if repo_id else slug(repository)
 
 
 def excerpts_from(text: str, source: str) -> list:
@@ -106,6 +118,8 @@ def hub_license(meta: dict) -> str:
 
 def hub_review(repo_id: str, layers: list, lane: str, fit_models: str) -> dict:
     meta = hub_get(f"api/models/{urllib.parse.quote(repo_id, safe='/')}")
+    if not isinstance(meta, dict):
+        raise HubError(f"{HUB}/{repo_id}: the Hub's model info is not a JSON object")
     full, commit = meta.get("id") or repo_id, meta.get("sha")
     if not (isinstance(full, str) and isinstance(commit, str) and HEX40.fullmatch(commit)):
         raise HubError(f"{HUB}/{repo_id}: the Hub reported no model id and commit")
@@ -114,10 +128,8 @@ def hub_review(repo_id: str, layers: list, lane: str, fit_models: str) -> dict:
     try:
         card = hub_get(f"{urllib.parse.quote(full, safe='/')}/resolve/{commit}/README.md", text=True)
         readme_path = "README.md"
-        if card.startswith("---"):  # the model card's YAML metadata block
-            end = card.find("\n---", 3)
-            card = card[end + 4:] if end >= 0 else card
-        excerpts = excerpts_from(card, f"{readme_path}@{commit}")
+        metadata = CARD_METADATA.search(card)  # the model card's YAML metadata block
+        excerpts = excerpts_from(card[metadata.end():] if metadata else card, f"{readme_path}@{commit}")
     except HubError:
         pass
     return {"schema_version": 1, "id": f"source-review-hf-{review_name(full)}", "kind": "upstream_provenance",
@@ -192,9 +204,10 @@ def main(argv=None) -> int:
                         help="the two fit refuters' resolved models, as the claim names them")
     args = parser.parse_args(argv)
     survivors = json.loads(args.survivors.read_text(encoding="utf-8"))
-    by_repo: dict[str, dict] = {}  # owner/repo -> the survivor URL first seen and every layer it survived in
+    by_repo: dict[str, dict] = {}  # repository key -> the survivor URL first seen and every layer it survived in
     for survivor in survivors:
-        item = by_repo.setdefault(slug(survivor["repository"]), {"repository": survivor["repository"], "layers": []})
+        item = by_repo.setdefault(repository_key(survivor["repository"]),
+                                  {"repository": survivor["repository"], "layers": []})
         item["layers"].append(survivor["layer_id"])
     written, failed, docs = [], [], {}
     for key, item in sorted(by_repo.items()):

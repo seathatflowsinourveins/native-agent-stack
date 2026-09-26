@@ -51,6 +51,12 @@ def substitute(value, returns_ref: str):
     return value
 
 
+def review_key(repository: str) -> str:
+    """A survivor's and a review's repository compared as the ledger compares them (saturation_ledger.norm_repo:
+    no trailing slash, lowercased), after canon() for GitHub URLs; a Hugging Face model URL keeps its host."""
+    return canon(repository).strip().rstrip("/").lower()
+
+
 def check_usage(usage: dict, usage_ref: str, returns: dict | None = None) -> dict:
     """The usage record's child_usage, when it shows a complete run measured at effort max throughout, or whose
     every worker measured at another effort is an effort_deviation retained failure in the returns (convert.py
@@ -94,7 +100,7 @@ def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sw
     base = returns_ref.rsplit("/", 1)[0]
     by_repo = {}
     for review in reviews:
-        by_repo.setdefault(canon(review["repository"]).lower(), []).append(review)
+        by_repo.setdefault(review_key(review["repository"]), []).append(review)
     reopen = substitute(reopen or {}, returns_ref)
     unknown = sorted(set(reopen) - {layer.get("layer_id") for layer in layers})
     if unknown:
@@ -103,7 +109,7 @@ def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sw
     out_layers, missing, unreopened = [], [], []
     for layer in substitute(layers, returns_ref):
         for entry in layer.get("survived") or []:
-            matches = [r for r in by_repo.get(canon(entry["repo"]).lower(), []) if layer["layer_id"] in r.get("layers", [])]
+            matches = [r for r in by_repo.get(review_key(entry["repo"]), []) if layer["layer_id"] in r.get("layers", [])]
             if not matches:
                 missing.append(f"{layer['layer_id']}: {entry['repo']}")
                 continue
