@@ -613,5 +613,67 @@ class McpGetOutputTests(unittest.TestCase):
                              Path("/home/example/.local/share/codex-ecosystem"))
 
 
+class PortableTopRuleTests(unittest.TestCase):
+    """The portable user instructions (examples/claude-native/CLAUDE.md, merged into the user-level
+    ~/.claude/CLAUDE.md by recipes/claude-native-profile.md) open with the top rule as an
+    upstream-verification procedure. It was added on 2026-09-26, after a docs subagent's "no native
+    advisor" claim was relayed although the installed client's upstream CHANGELOG documents
+    `/advisor`. The file loads into every session and every child that reads CLAUDE.md, so the
+    procedure replaced text instead of adding to it: the file stays within 5% of the 881 words
+    (`wc -w`) it had before. docs/harness-defaults.md#upstream-verification-and-compounding-learning
+    holds the long form."""
+
+    TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
+    BASELINE_WORDS = 881  # wc -w of the template at dde28cc2, before the procedure
+    # Upstream as the source of truth and reuse, the check order and the absence wording, worker
+    # answers as leads, the token practice in every lane, and recording a proven mistake.
+    PROCEDURE_PHRASES = (
+        "never self-write without a SOTA source",
+        "source of truth",
+        "orchestration patterns",
+        "installed client",
+        "upstream changelog or release notes",
+        "upstream source at that tag",
+        "official docs",
+        "absence claim needs at least the first two",
+        '"not found in X, Y"',
+        "leads, not authority",
+        "upstream citation",
+        "token practice below in every lane",
+        "same turn",
+        "anti-pattern log",
+    )
+
+    @staticmethod
+    def top_rule(text: str) -> str:
+        """The text from the bold top rule to the first section heading."""
+        start = text.find("**Top rule:")
+        end = text.find("\n## ", start)
+        return text[start:end] if 0 <= start < end else ""
+
+    @classmethod
+    def ceiling(cls) -> int:
+        return int(cls.BASELINE_WORDS * 1.05)
+
+    @classmethod
+    def errors(cls, text: str) -> list[str]:
+        rule = cls.top_rule(text)
+        errors = [f"the top rule lacks {phrase!r}" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]
+        words = len(text.split())  # the same whitespace-separated count as `wc -w`
+        if words > cls.ceiling():
+            errors.append(f"{words} words, over {cls.ceiling()} ({cls.BASELINE_WORDS} + 5%)")
+        return errors
+
+    def test_the_template_states_the_procedure_within_the_word_budget(self):
+        self.assertEqual(self.errors(self.TEMPLATE.read_text(encoding="utf-8")), [])
+
+    def test_the_check_rejects_a_missing_step_and_a_padded_template(self):
+        text = self.TEMPLATE.read_text(encoding="utf-8")
+        self.assertEqual(len(self.errors(text.replace("upstream citation", "citation"))), 1)
+        padded = text + " word" * max(1, self.ceiling() + 1 - len(text.split()))
+        self.assertEqual(len(self.errors(padded)), 1)
+        self.assertEqual(len(self.errors("# Native engineering defaults\n\nNo rule.\n")), len(self.PROCEDURE_PHRASES))
+
+
 if __name__ == "__main__":
     unittest.main()
