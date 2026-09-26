@@ -4267,6 +4267,56 @@
       "bytes": 3223
     },
     {
+      "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/README.md",
+      "sha256": "1f3c93d9092cb1ed97b4e5ba01f253f204f3c6258f8305c1c7ec1126c62cfa81",
+      "bytes": 21446
+    },
+    {
+      "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/analyze.py",
+      "sha256": "a563b2e53b6891efa92c7eb8d81a722d58ea434581c7c9e3091a4ef6ec3d866e",
+      "bytes": 21356
+    },
+    {
+      "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
+      "sha256": "4857d3fa7b1295b63246306860613bdf225f86dccefec98a81acbb1ac6be19f5",
+      "bytes": 14264
+    },
+    {
+      "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/isolation-probe/fake_tool_calls.py",
+      "sha256": "8454a061fdd97abbb4f407a91d23c2951e7ee3300cd29e79efae362e29b592e1",
+      "bytes": 4249
+    },
+    {
+      "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/isolation-probe/probe.py",
+      "sha256": "17c3cb9306a892fb5a41dbe22555c2b26c1675cf9f9f99ae448508354d616d32",
+      "bytes": 10226
+    },
+    {
+      "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/isolation-probe/results.json",
+      "sha256": "0e0efad8001c8fb76c3c11eb640c93e2f464f4ebd342846920364ffa7d2c44de",
+      "bytes": 23833
+    },
+    {
+      "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/plan.json",
+      "sha256": "455e38df43e6bcc9e6e89c5e9399657f93a0a8cebcbf779c1d22c28afe370532",
+      "bytes": 35917
+    },
+    {
+      "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/prompt.txt",
+      "sha256": "1861b55a72932fc9a94eee727f9bba20b84f4f543d2b04125c4778b5ad785ce7",
+      "bytes": 2945
+    },
+    {
+      "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/response.schema.json",
+      "sha256": "e8aaebf24a89d487e146bce23a66ceb528cc7dd47d77bfaa0330ac372094d301",
+      "bytes": 1411
+    },
+    {
+      "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py",
+      "sha256": "af411b98af0869a37a5d6225a00d12ea0773ac2d4f6c4a59f8120712dfd372ad",
+      "bytes": 57901
+    },
+    {
       "path": "blueprints/convergence-practice/gpu-inference/.gitignore",
       "sha256": "1587a87c71d95435e7a1c4e0a6c431b3c65db6370b41179b75b58a39ae3301c2",
       "bytes": 65
@@ -37312,6 +37362,11 @@
       "bytes": 13339
     },
     {
+      "path": "tests/test_gpt6_family_tiering_20260926.py",
+      "sha256": "d7bbd63f6d7868dcaf909667c0ac735eae66dc448234110af2cc3662a6974020",
+      "bytes": 64988
+    },
+    {
       "path": "tests/test_gpu_inference.py",
       "sha256": "1e15d3750823bc9aad9a160f303d49be69fc04fd282f5673ef65bd8665127ee1",
       "bytes": 4753
@@ -37960,6 +38015,7 @@
     "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
     "evidence/artifacts/local-model-workloads-20260924/experiment.json",
     "evidence/artifacts/memory-stack-20260925/experiment.json",
-    "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json"
+    "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json"
   ]
 }
