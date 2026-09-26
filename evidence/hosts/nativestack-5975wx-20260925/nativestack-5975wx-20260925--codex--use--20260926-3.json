@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--codex--use--20260926-3",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "c09dd6dfc68d2e17ed79aca436f6beaa6927a78d",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "codex",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "D=$(mktemp -d) && printf '%s' '{\"type\":\"object\",\"properties\":{\"layer_count\":{\"type\":\"integer\"}},\"required\":[\"layer_count\"],\"additionalProperties\":false}' > \"$D/s1.json\" && printf '%s' '{\"type\":\"object\",\"properties\":{\"first_layer\":{\"type\":\"string\"}},\"required\":[\"first_layer\"],\"additionalProperties\":false}' > \"$D/s2.json\" && timeout 900 codex exec --json --output-schema \"$D/s1.json\" -o \"$D/l1.json\" -m gpt-6-astra -c model_reasoning_effort=max --sandbox read-only --skip-git-repo-check \"Open catalogs/landscape/foundation.json with your own shell tools and count the entries of its top-level layers array. Return the count as layer_count.\" < /dev/null > \"$D/e1.jsonl\" 2> \"$D/x1\" && tid=$(python3 -c \"import json,sys;print(next(json.loads(l)['thread_id'] for l in open(sys.argv[1]) if l.strip() and json.loads(l).get('type')=='thread.started'))\" \"$D/e1.jsonl\") && timeout 900 codex exec resume \"$tid\" -c sandbox_mode=read-only --json --output-schema \"$D/s2.json\" -o \"$D/l2.json\" -m gpt-6-astra -c model_reasoning_effort=max --skip-git-repo-check \"In that same layers array, return the layer_id of the first entry as first_layer.\" < /dev/null > \"$D/e2.jsonl\" 2> \"$D/x2\" && python3 -c \"\nimport json, sys\nD = sys.argv[1]\ndef events(p): return [json.loads(l) for l in open(p) if l.strip()]\ne1, e2 = events(D + '/e1.jsonl'), events(D + '/e2.jsonl')\nlayers = json.load(open('catalogs/landscape/foundation.json'))['layers']\ntid = next(e['thread_id'] for e in e1 if e.get('type') == 'thread.started')\nitems1 = [e['item']['type'] for e in e1 if e.get('type') == 'item.completed']\nitems2 = [e['item']['type'] for e in e2 if e.get('type') == 'item.completed']\ntid2 = [e.get('thread_id') for e in e2 if e.get('type') == 'thread.started']\nl1, l2 = json.load(open(D + '/l1.json')), json.load(open(D + '/l2.json'))\nlim = any('usage limit' in open(D + '/' + x).read().lower() for x in ('x1', 'x2'))\nok = (not lim and 'command_execution' in items1 and any(e.get('type') == 'turn.completed' for e in e1)\n      and l1 == {'layer_count': len(layers)} and l2 == {'first_layer': layers[0]['layer_id']}\n      and any(e.get('type') == 'turn.completed' for e in e2) and tid2 == [tid])\nprint('CODEX_SDK_SURFACES_VERIFIED' if ok else 'CODEX_SDK_SURFACES_FAILED', '| codex', sys.argv[2], '| same thread resumed:', tid2 == [tid])\nprint('turn1 json events', sorted(dict.fromkeys(e.get('type') for e in e1)), 'items', sorted(dict.fromkeys(items1)), 'schema out', l1, 'vs python', len(layers))\nprint('turn2 exec resume items', sorted(dict.fromkeys(items2)), 'schema out', l2, 'vs python', layers[0]['layer_id'])\nsys.exit(0 if ok else 1)\n\" \"$D\" \"$(codex --version | awk '{print $2}')\"",
+      "exit": 0,
+      "duration_s": 33.52,
+      "output_sha256": "594c8ba18dc7479cbc55862044e4ad5e5c35118284ec8c49e50522db6eb8c3cf",
+      "output_excerpt": "CODEX_SDK_SURFACES_VERIFIED | codex 0.155.1 | same thread resumed: True\nturn1 json events ['item.completed', 'item.started', 'thread.started', 'turn.completed', 'turn.started'] items ['agent_message', 'command_execution'] schema out {'layer_count': 20} vs python 20\nturn2 exec resume items ['agent_message', 'mcp_tool_call'] schema out {'first_layer': 'native-clients'} vs python native-clients\n"
+    }
+  ],
+  "tool_versions": {
+    "codex": "0.155.1"
+  },
+  "observed_at_utc": "2026-09-26T01:43:01Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), Codex CLI 0.155.1 (the version its own --version reports in the retained output) is driven through its SDK-grade exec surfaces. The command selects -m gpt-6-astra and -c model_reasoning_effort=max as flags; the event stream does not echo the model. Turn 1 runs codex exec --json with --sandbox read-only and an --output-schema. Its event stream contains thread.started, turn.started, item.started, item.completed and turn.completed events, including a command_execution item. Its schema output {layer_count: 20} equals an independent Python count of catalogs/landscape/foundation.json. Turn 2 uses session control: codex exec resume, with -c sandbox_mode=read-only, continues the same thread (the same thread_id in its thread.started event) under a second output schema and returns {first_layer: native-clients}, equal to the file's first layer_id. The command exits 0 only when every one of these checks holds and no usage-limit error appears.",
+  "limitations": [
+    "Supersedes generation -2. Its independent review agreed on layer role, control and pin binding, but held point 3: the model, effort and version were not in retained output, turn 2 was called read-only without a sandbox setting, and the same-thread check could pass vacuously. This generation echoes codex --version, words the model and effort as command flags, passes sandbox_mode=read-only to exec resume, requires the same thread_id, and prints the verdict line first.",
+    "MCP servers registered at Codex user scope, such as context-mode, can run tools outside the Codex sandbox; turn 2 used an mcp_tool_call, so read-only covers Codex's own shell commands only.",
+    "Two bounded turns on one file; answer quality across tasks, write access, custom tools and cost are not measured.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision); codex is this host's existing install.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T01:43:01Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session review (final re-check) at catalog_revision c09dd6df. REPRODUCE: re-ran the one command once from the worktree root through host_receipts.run_command (/bin/sh): exit 0, 37.4 s, raw-output sha256 equal to output_sha256 (594c8ba1...); the whole 395-char output equals the retained excerpt, verdict line first; git status unchanged afterwards. Own-run inspection: turn 1's command_execution read catalogs/landscape/foundation.json with python3 json; turn 2's single thread.started carries turn 1's thread_id; turn 2's mcp_tool_call was context-mode ctx_execute_file; the --json events carry no model, effort or sandbox key, as the claim states; the run's local Codex rollout turn_context (only those fields read) shows model gpt-6-astra, effort max and sandbox_policy read-only for both turns, so -c sandbox_mode=read-only takes effect on exec resume. PRIOR GAPS (-2 held needs_changes on point 3), each fixed: the version is now printed from codex --version (0.155.1) in retained output; model and effort are reworded as command flags, with the event stream's silence stated; resume passes -c sandbox_mode=read-only (exec resume has no --sandbox option per 0.155.1 --help) and a limitation states that MCP tools run outside the sandbox; the thread gate is tid2 == [tid], no longer vacuous; the full output fits the 400-char excerpt. ADEQUACY: (1) layer role PASSES: --json structured events, --output-schema structured output and exec resume on the same thread are the agent-sdks layer's structured-events and session-control surfaces (current_choice 'supported start/run/resume'), exercised on a real repository-reading task through Codex's own shell tool. (2) control SUFFICIENT: both answers are compared with independent Python reads of the file; a wrong or missing answer, a missing command_execution or turn.completed, a thread mismatch or a usage-limit line exits 1, and a correct specific answer here is positive evidence, unlike a scanner's clean pass. (3) backed claims PASSES: version, event types, command_execution, {layer_count: 20} = 20, the same thread, {first_layer: native-clients} and the exit-0 gate are in retained output; model, effort and sandbox are claimed only as flags of the retained command. Minor, not blocking: the gate does not itself assert turn.started/item.started or the version value (both printed), and the limitation's 'such as context-mode' is corroborated by my run, not by the retained output. (4) bound to the winner PASSES: component_id codex is the agent-sdks winner (also native-clients) with pin 0.155.1 in both; pin_matches('0.155.1', '0.155.1') is True; codex --version prints codex-cli 0.155.1. Host consistent: WSL2 x86_64 kernel and an AMD Ryzen Threadripper PRO 5975WX CPU, matching its hardware profile; second_physical_machine remains declared.",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T01:47:04Z",
+      "reviewer": {
+        "identity_sha256": "de28dc147029adb2dbb884e950f541038898b515a7095eaaaae5bcb79cc99d85",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--codex--use--20260926-2"
+}

@@ -59,16 +59,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 3,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T05:38:16Z",
-                "pass": 1
+                "independently_reviewed_pass": 4,
+                "latest": "2026-09-26T06:42:45Z",
+                "pass": 7
               },
               "qualified_models": []
             },
@@ -1652,16 +1652,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 3,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T05:38:16Z",
-                "pass": 1
+                "independently_reviewed_pass": 4,
+                "latest": "2026-09-26T06:42:45Z",
+                "pass": 7
               },
               "qualified_models": []
             },

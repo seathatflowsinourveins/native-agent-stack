@@ -17,6 +17,9 @@ node_modules/
 # committed and pushed (blueprints/us-equities/mover-v3/protocol-core-draft.json, run_discipline).
 !blueprints/us-equities/mover-v3/*.jsonl
 !blueprints/us-equities/mover-v3/data/*.jsonl
+# Sanitized Codex --json event streams retained as receipt evidence (client configuration output withheld).
+!evidence/artifacts/codex-use-20260926-5/*.jsonl
+!evidence/artifacts/codex-use-20260926-6/*.jsonl
 adoption/hosts/*.json
 !adoption/hosts/example.json
 !adoption/hosts/macos-example.json

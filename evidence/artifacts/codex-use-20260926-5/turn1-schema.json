@@ -1,0 +1,1 @@
+{"type":"object","properties":{"layer_count":{"type":"integer"}},"required":["layer_count"],"additionalProperties":false}
