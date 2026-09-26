@@ -1,0 +1,183 @@
+Codex background-server source checks (2026-09-26 repair round)
+fetched with gh api (Accept: application/vnd.github.raw) repos/openai/codex/contents/<path>?ref=<tag>
+rust-v0.157.1: annotated tag object ac0e23e5232692b95268583c8278c50b8c436d2b -> commit 36650394c5b38c2990ccf2a3457165ca3e9d9726 (verified=false)
+rust-v0.155.1: annotated tag object 4e21628f9ec9ee656650cd2b62ef92225725b5ac -> commit be2951ea34f0d295ed0becf97079f92fa5f6950e
+
+== rust-v0.157.1 codex-rs/features/src/lib.rs sha256 db6dad91fd2ea65d0c976c812be325c6109e97f6275410c6cfaae2d20a5cd3f9 (64214 bytes)
+   (stable, on by default)
+  941          id: Feature::DaemonAutoStart,
+  942          key: "daemon_auto_start",
+  943          stage: Stage::Stable,
+  944          default_enabled: true,
+
+== rust-v0.155.1 codex-rs/features/src/lib.rs sha256 f52a1c2ce33ffed3fb32610d4a3bf5f273207dd8f24e0733f62a20d2deab4981 (62017 bytes)
+   lines matching /daemon_auto_start|DaemonAutoStart/: 0 (the feature does not exist at 0.155.1)
+
+== rust-v0.155.1 codex-rs/tui/src/daemon_startup.rs: HTTP 404 from the contents API (file absent at the tag)
+
+== rust-v0.157.1 codex-rs/tui/src/daemon_startup.rs sha256 72e5dbe4019170f722ea65273b2c941fb9d57b021a5ceb976f623845d7fa7ef9 (6970 bytes)
+   (launches that never start the server: --no-daemon, --oss, workload identity, CODEX_EXEC_SERVER_URL, --profile, then config_exclusion (-c overrides other than a few allowed keys, a custom loader, --strict-config, --dangerously-bypass-hook-trust))
+   24  pub(super) fn exclusion(
+   25      cli: &Cli,
+   26      cli_kv_overrides: &[(String, toml::Value)],
+   27      loader_overrides: &LoaderOverrides,
+   28      workload_identity_selected: bool,
+   29      exec_server_url: Option<&std::ffi::OsStr>,
+   30  ) -> Option<&'static str> {
+   31      if cli.no_daemon {
+   32          Some("--no-daemon")
+   33      } else if cli.oss {
+   34          Some("--oss")
+   35      } else if workload_identity_selected {
+   36          Some("workload identity")
+   37      } else if exec_server_url.is_some() {
+   38          Some("executor selection (CODEX_EXEC_SERVER_URL)")
+   39      } else if cli.agents_overview {
+   40          None
+   41      } else if cli.config_profile_v2.is_some() {
+   42          Some("--profile")
+   43      } else {
+   44          config_exclusion(
+   45              cli_kv_overrides,
+   46              loader_overrides,
+   47              cli.strict_config,
+   48              cli.bypass_hook_trust,
+   49          )
+
+== rust-v0.157.1 codex-rs/tui/src/startup_orchestration.rs sha256 8a02fe50341b57c866038a56ada5808e50aac373302f0e8d5695757eb2156ce4 (35152 bytes)
+   (the TUI starts the server when the feature is on and --no-daemon is absent)
+  494      let auto_start_daemon = config.features.enabled(Feature::DaemonAutoStart)
+  495          && !cli.agents_overview
+  496          && !cli.no_daemon
+  497          && !app_server_target.uses_remote_workspace();
+
+== rust-v0.157.1 codex-rs/tui/src/startup_orchestration.rs sha256 8a02fe50341b57c866038a56ada5808e50aac373302f0e8d5695757eb2156ce4 (35152 bytes)
+  525      if auto_start_daemon && daemon_exclusion.is_none() {
+  526          startup_draft.flush_pending_events().await?;
+  527          let output = startup_draft
+  528              .tui_mut()
+  529              .with_restored(|| async {
+  530                  // Package installation may print progress; keep ordinary Ctrl+C handling.
+  531                  crossterm::terminal::disable_raw_mode()?;
+  532                  let result = codex_app_server_daemon::start_with_features(&daemon_features).await;
+  533                  daemon_telemetry::record_start(&config, &result).await;
+
+== rust-v0.155.1 codex-rs/tui/src/startup_orchestration.rs sha256 12b07cc286571743470958b90bce59a79875fe67538ccb0087f5c934c8ea03da (25284 bytes)
+   (0.155.1 reuses a running local server for a plain launch)
+  153      let reuse_implicit_local_daemon = !cli.shared.worktree
+  154          && !cli.oss
+  155          && !workload_identity_selected
+  156          && (cli.agents_overview
+  157              || can_reuse_implicit_local_daemon(
+  158                  &cli_kv_overrides,
+  159                  &launch_loader_overrides,
+  160                  strict_config,
+  161                  cli.bypass_hook_trust,
+  162              ));
+
+== rust-v0.155.1 codex-rs/tui/src/startup_orchestration.rs sha256 12b07cc286571743470958b90bce59a79875fe67538ccb0087f5c934c8ea03da (25284 bytes)
+  195      let default_daemon = if explicit_remote_endpoint.is_none() && reuse_implicit_local_daemon {
+  196          startup_draft
+  197              .run_until(maybe_probe_default_daemon_socket(&codex_home))
+  198              .await?
+  199      } else {
+  200          None
+  201      };
+  202      let app_server_target = app_server_target_for_launch(
+  203          explicit_remote_endpoint,
+  204          default_daemon,
+  205          reuse_implicit_local_daemon,
+  206          workload_identity_selected,
+  207          std::env::var_os(codex_exec_server::CODEX_EXEC_SERVER_URL_ENV_VAR).as_deref(),
+  208      )?;
+
+== rust-v0.157.1 codex-rs/app-server-daemon/src/managed_install.rs sha256 80d61f06c6be1fae957b9fa32ddcd275bbe94b2d322b820cc19770676be22b2b (7341 bytes)
+   (0.157.1 daemon package root)
+   20  pub(crate) fn package_root(codex_home: &Path) -> PathBuf {
+   21      let dedicated = codex_home.join("packages/app-server-daemon");
+   22      if !matches!(dedicated.join("current").symlink_metadata(),
+
+== rust-v0.155.1 codex-rs/app-server-daemon/src/managed_install.rs sha256 2378536cb0b9383927f09b6aaead3422651f7ff2b028bff03fd8bcb4b621bfb7 (5636 bytes)
+   lines matching /packages/app-server-daemon/: 0 (0.155.1 manages packages/standalone only)
+
+== rust-v0.157.1 codex-rs/app-server-daemon/src/prepare_install.rs sha256 37605c4de361e1a2e031dc431e239f78b4da0d7ec06e63d2cd786a3a0b8705cd (19298 bytes)
+   (an automatic first install of a stable release follows the latest channel)
+  269      let follows_latest = mode == InstallMode::Missing
+  270          && stable
+  271          && (standalone.join("current").canonicalize().ok().as_deref()
+  272              != Some(canonical_source.as_path())
+  273              || std::fs::read_to_string(standalone.join("auto-update-version"))
+  274                  .ok()
+  275                  .as_deref()
+  276                  == canonical_source.file_name().and_then(|name| name.to_str()));
+
+== rust-v0.157.1 codex-rs/app-server-daemon/src/prepare_install.rs sha256 37605c4de361e1a2e031dc431e239f78b4da0d7ec06e63d2cd786a3a0b8705cd (19298 bytes)
+  327      let marker = root.join("auto-update-version");
+  328      if follows_latest {
+  329          let temporary = tempfile::NamedTempFile::new_in(&root)?;
+  330          std::fs::write(temporary.path(), &name)?;
+  331          temporary.persist(marker)?;
+  332      } else if marker.exists() {
+  333          std::fs::remove_file(marker)?;
+  334      }
+
+== rust-v0.157.1 codex-rs/app-server-daemon/src/settings.rs sha256 18f31688ebd807957a454f7a84997632f54306256ec39ed727911503cb573d5c (7923 bytes)
+   14  pub(crate) const DEFAULT_UPDATE_INTERVAL_MINUTES: u32 = 60;
+
+== rust-v0.157.1 codex-rs/app-server-daemon/src/settings.rs sha256 18f31688ebd807957a454f7a84997632f54306256ec39ed727911503cb573d5c (7923 bytes)
+   (the updater is on unless settings say otherwise)
+   87  fn default_auto_update_enabled() -> bool {
+   88      true
+   89  }
+
+== rust-v0.157.1 codex-rs/app-server-daemon/src/update_loop.rs sha256 5a83cb7c3d5ac22435efa029d6f9c5de8025fe922cfce6ad0092a92f3cbc103f (26484 bytes)
+   (first scheduled check five minutes after start; the installer script URL)
+   63  const INITIAL_UPDATE_DELAY: Duration = Duration::from_secs(5 * 60);
+   64  const RESTART_RETRY_INTERVAL: Duration = Duration::from_millis(50);
+   65  #[cfg(unix)]
+   66  const INSTALL_URL: &str = "https://chatgpt.com/codex/install.sh";
+   67  #[cfg(windows)]
+
+== rust-v0.157.1 codex-rs/app-server-daemon/src/update_loop.rs sha256 5a83cb7c3d5ac22435efa029d6f9c5de8025fe922cfce6ad0092a92f3cbc103f (26484 bytes)
+   (a scheduled update fetches the installer and requires its latest-only and daemon-only guards)
+  346      let script = tokio::select! {
+  347          result = fetch_installer_script(http) => result?,
+  348          _ = terminate.recv() => return Ok((UpdateLoopControl::Stop, None)),
+  349      };
+  350      anyhow::ensure!(
+  351          script
+  352              .windows(installer_guard.len())
+  353              .any(|window| window == installer_guard.as_bytes()),
+  354          "standalone installer does not support {installer_guard} guarded updates"
+  355      );
+  356      if package_root.ends_with("app-server-daemon") {
+  357          anyhow::ensure!(
+  358              script
+  359                  .windows(b"CODEX_INSTALL_DAEMON_ONLY".len())
+  360                  .any(|window| window == b"CODEX_INSTALL_DAEMON_ONLY"),
+  361              "installer does not support daemon-owned packages"
+  362          );
+  363      }
+  364      if trigger == UpdateTrigger::Scheduled
+  365          && !UpdaterSettings::load(&daemon.settings_file)
+  366              .await?
+  367              .auto_update_enabled
+
+== rust-v0.157.1 codex-rs/app-server-daemon/src/update_loop.rs sha256 5a83cb7c3d5ac22435efa029d6f9c5de8025fe922cfce6ad0092a92f3cbc103f (26484 bytes)
+   (then runs it on the daemon's package root)
+  380          run_installer_script(&script, installer_mode, &package_root, terminate.recv()).await?,
+  381          UpdateLoopControl::Stop
+  382      ) {
+
+== rust-v0.157.1 codex-rs/app-server-daemon/src/backend/mod.rs sha256 7d28eb80fbd5038bdf333f1a71864e732e02a5af5a9c63c9727fd0c94774bf69 (1457 bytes)
+   (the only process backend on Linux: detached processes with pid files, no systemd unit)
+   15  pub enum BackendKind {
+   16      Pid,
+   17  }
+
+== rust-v0.157.1 codex-rs/exec/src/lib.rs sha256 a7bb98cf5d7e1a1881254c82315736be4c2aa0ecd605f5cb00ca5d9bf89a7ea5 (86168 bytes)
+   lines matching /(?i)daemon/: 0 (codex exec has no background-server code)
+
+== rust-v0.155.1 codex-rs/exec/src/lib.rs sha256 8f4e9c1e1198f8d85f75123e25fc4847391a14b8426f93c8ac18dace0a790a3c (85408 bytes)
+   lines matching /(?i)daemon/: 0 (codex exec has no background-server code)
+

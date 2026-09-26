@@ -2,18 +2,19 @@
   "schema_version": 1,
   "id": "codex-01571-qualification-20260926",
   "kind": "native_cli_e2e",
-  "recorded_at_utc": "2026-09-26T05:34:17Z",
+  "recorded_at_utc": "2026-09-26T10:11:46Z",
   "component_ids": [
     "codex"
   ],
-  "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, Codex CLI 0.157.1 was installed beside 0.155.1 and qualified but not switched: bin/codex still names tools/codex-0.155.1, because the landscape-sweep GPT-6 lanes and other sessions use it. The npm wrapper @openai/codex@0.157.1 (4,904 bytes, sha256 813e2a944f4474b7e1826d9ce8bf696ad8d80c68f43f7a7067beec51fa8f5b73) and its platform package @openai/codex@0.157.1-linux-x64 (150,336,017 bytes, sha256 7f12677740f439fe4884c7031d9d703e571cecf5ea9fa3a05abd1bbccc2162a8) matched npm dist.integrity; `npm audit signatures` verified both registry signatures and both attestations, whose SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.157.1, commit 36650394c5b38c2990ccf2a3457165ca3e9d9726; and the native binary in the platform package (sha256 3e2584f3...) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the API digest. The verified wrapper was installed into a new tools/codex-0.157.1 prefix whose files are byte-identical to both tarballs. In a bwrap sandbox with a private loopback-only network, a read-only root and a fresh scratch CODEX_HOME per case (no credential read, ~/.codex untouched), `codex --version` printed codex-cli 0.157.1 (baseline: 0.155.1), `codex exec --help` was byte-identical between the versions and `codex --help` differed only by the new --no-daemon flag. Against a loopback fake Responses provider set only through -c overrides, the landscape-sweep lane's argv (top-level --search, then exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra -c model_reasoning_effort=\"max\" --output-schema -o --json, stdin /dev/null) behaved the same on both versions: a success turn emitted thread.started, turn.started, item.completed and turn.completed with usage input 11, cached 3, output 7 and reasoning 2, wrote the -o file, and sent reasoning effort max and a json_schema text format equal to the --output-schema file; a 429 usage_limit_reached answer ended with exit 1 and an error event plus a turn.failed event whose message says 'You’ve hit your usage limit. Try again later.', which the sweep's limit rule detects. With the fake provider marked as supporting standalone web search, `codex --search exec` sent external_web_access false to the search endpoint on both versions, the same as no flag, and only `codex exec -c web_search=\"live\"` sent true; 0.157.1 reported the literal-URL open as action open_page with results, where 0.155.1 reported it as other without results. A scratch CODEX_HOME that 0.157.1 had migrated (state_5.sqlite 55 to 57 migrations, thread_history_1.sqlite 6 to 7) still served a 0.155.1 exec turn. At the two tags, the exec --json event schema differs only by an optional web_search `results` field and exec/src/cli.rs is identical.",
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, Codex CLI 0.157.1 was installed beside 0.155.1 and qualified but not switched: bin/codex still names tools/codex-0.155.1, because the landscape-sweep GPT-6 lanes and other sessions use it. The npm wrapper @openai/codex@0.157.1 (4,904 bytes, sha256 813e2a944f4474b7e1826d9ce8bf696ad8d80c68f43f7a7067beec51fa8f5b73) and its platform package @openai/codex@0.157.1-linux-x64 (150,336,017 bytes, sha256 7f12677740f439fe4884c7031d9d703e571cecf5ea9fa3a05abd1bbccc2162a8) matched npm dist.integrity; `npm audit signatures` verified both registry signatures and both attestations, whose SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.157.1, commit 36650394c5b38c2990ccf2a3457165ca3e9d9726; and the native binary in the platform package (sha256 3e2584f3...) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the API digest. The verified wrapper was installed into a new tools/codex-0.157.1 prefix whose files are byte-identical to both tarballs. In a bwrap sandbox with a private loopback-only network, a read-only root and a fresh scratch CODEX_HOME per case (no credential read, ~/.codex untouched), `codex --version` printed codex-cli 0.157.1 (baseline: 0.155.1), `codex exec --help` was byte-identical between the versions and `codex --help` differed only by the new --no-daemon flag. Against a loopback fake Responses provider set only through -c overrides, the landscape-sweep lane's argv (top-level --search, then exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra -c model_reasoning_effort=\"max\" --output-schema -o --json, stdin /dev/null) behaved the same on both versions: a success turn emitted thread.started, turn.started, item.completed and turn.completed with usage input 11, cached 3, output 7 and reasoning 2, wrote the -o file, and sent reasoning effort max and a json_schema text format equal to the --output-schema file; a 429 usage_limit_reached answer ended with exit 1 and an error event plus a turn.failed event whose message says 'You’ve hit your usage limit. Try again later.', which the sweep's limit rule detects. With the fake provider marked as supporting standalone web search, `codex --search exec` sent external_web_access false to the search endpoint on both versions, the same as no flag, and only `codex exec -c web_search=\"live\"` sent true; 0.157.1 reported the literal-URL open as action open_page with results, where 0.155.1 reported it as other without results. A scratch CODEX_HOME that 0.157.1 had migrated (state_5.sqlite 55 to 57 migrations, thread_history_1.sqlite 6 to 7) still served a 0.155.1 exec turn. At the two tags, the exec --json event schema differs only by an optional web_search `results` field and exec/src/cli.rs is identical. A later probe in the same kind of sandbox (results/daemon.json) covered the background server that 0.157.0 starts for eligible interactive sessions: a plain interactive 0.157.1 launch copied its 391,126,382-byte package into CODEX_HOME/packages/app-server-daemon and started the app-server and its updater loop from that copy, and both outlived the TUI; a plain 0.155.1 launch while that server ran connected to it; `codex app-server daemon stop` stopped the server but not the updater loop, which SIGTERM ended; and --no-daemon, or `codex features disable daemon_auto_start`, prevented the copy and both processes, while 0.155.1 read the resulting config.toml in an exec turn and started its TUI with it. The switch commands therefore turn automatic start off before any interactive 0.157.1 launch, and the rollback stops such a server and its updater loop before relinking.",
   "limitations": [
-    "Not independently reviewed: the qualification, the switch and this receipt come from one worker session (Claude Opus 5.5); the refresh coordinator owns the independent-review round, and no cross-family review ran.",
+    "Reviewed once: a review round of the refresh coordinator (Claude Opus and GPT-6 Astra reviewers) reported that the rollback relinked bin/codex only and the switch checked only for 0.155.1 processes, so a background server started by 0.157.x would outlive a rollback; this revision repairs it (daemon_probe.py, results/daemon.json, stage/daemon-source-checks.txt and corrected switch and rollback commands). The repair itself has not been re-reviewed, and the qualification and this receipt still come from one worker family (Claude Opus 5.5).",
     "Staged, not switched, and no live model call ran on 0.157.1: a live call would either copy the ChatGPT credential into an isolated CODEX_HOME (not allowed; docs/secret-storage.md) or run the newer binary against the shared ~/.codex while the sweep runs 0.155.1. GPT-6 turns through 0.157.1 are unmeasured until the coordinator's post-switch probe (results.json switch_commands_for_the_coordinator).",
     "The fake provider is a stand-in. It exercises request construction, SSE parsing, event emission, -o, the 429 mapping and the web-search extension's settings; it does not exercise the OpenAI provider, ChatGPT authentication, the real usage-limit payload (which named a reset time on 2026-09-24 and 2026-09-26), streamed deltas, reasoning items, sandboxed tool execution, compaction or long multi-turn sessions.",
     "The --search result was measured with a custom provider marked supports_standalone_web_search. That the OpenAI provider behaves the same rests on source reading (the same web-search extension and mode resolution; stage/source-checks.txt), not on a live measurement, and exec --json does not expose the effective mode (openai/codex issue #35415, open). It is a pre-existing 0.155.1 behaviour, not a regression.",
     "The count of 32 openPage and 6 search actions in the sweep lane gpt6-discover-workers comes from that lane's private local Codex session file, read for action counts only and not published.",
-    "The rollback state probe is one exec turn in a scratch home. The TUI, resume, the background server that 0.157.0 starts automatically for eligible interactive sessions, and the Codex desktop app were not tried against a migrated ~/.codex.",
+    "The rollback state probe is one exec turn in a scratch home; resume, the Codex desktop app and a TUI session on a migrated ~/.codex were not tried.",
+    "The background-server probe ran only in the sandbox: fresh homes, no sign-in, no network beyond loopback, and under a minute of server life per case. The updater's self-update is source reading, not measurement: at rust-v0.157.1 it is on by default and, five minutes after start and then every 60 minutes, fetches https://chatgpt.com/codex/install.sh and runs it to install the latest release into the daemon's package copy (stage/daemon-source-checks.txt), so a server started on this host would leave the integrity-checked prefix without a pin change.",
     "No pin moves: adoption/pins-linux-x86_64.json, adoption/pins-macos-arm64.json and manifests/stack.json keep codex 0.155.1, and catalogs/landscape/foundation.json keeps the native-clients and agent-sdks winner pins at 0.155.1; this receipt is unbound until a switch and a verdict wave. catalogs/landscape/upstream-snapshot.json now lists codex in newer_stable_release_review_queue.",
     "Upstream tests (cargo test) were not run on this host, and both tags are unsigned. The rust-v0.157.1 release body says its highlights could not be generated; its five commits after rust-v0.157.0 were read from the compare API (all Windows console and daemon-launch fixes).",
     "Linux x86_64 only, one host; nothing here is macOS evidence."
@@ -42,20 +43,43 @@
     "install": "npm install --global --no-audit --no-fund --prefix ~/.local/share/codex-ecosystem/tools/codex-0.157.1 <verified codex-0.157.1.tgz>",
     "switch": [
       "grep -l 'codex-0[.]155[.]1/' /proc/[0-9]*/cmdline 2>/dev/null; ls -l /proc/[0-9]*/exe 2>/dev/null | grep -c 'tools/codex-0[.]155[.]1/'   # after the sweep: no file names and 0",
+      "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex features disable daemon_auto_start   # before any interactive 0.157.1 launch: Disabled feature `daemon_auto_start` in config.toml.",
+      "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex features list | grep '^daemon_auto_start '   # daemon_auto_start  stable  false",
       "ln -sfn ~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex ~/.local/share/codex-ecosystem/bin/.codex.new && mv -T ~/.local/share/codex-ecosystem/bin/.codex.new ~/.local/share/codex-ecosystem/bin/codex",
       "codex --version   # codex-cli 0.157.1",
       "codex exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra -c model_reasoning_effort=\"max\" --json 'Reply with the word PROBE-OK.' < /dev/null   # from an empty directory outside every repository; this first run migrates ~/.codex state_5 55->57 and thread_history_1 6->7",
+      "ls -l /proc/[0-9]*/exe 2>/dev/null | grep -cF \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon/\"   # 0, and again after the first interactive launch",
+      "test -e \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon\" && echo present || echo absent   # absent",
       "sed -i '/^-- codex --$/{n;s/^codex-cli .*/codex-cli 0.157.1/}' ~/.local/share/codex-ecosystem/installed-versions.txt"
     ],
     "rollback": [
+      "ls -l /proc/[0-9]*/exe 2>/dev/null | grep -cF \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon/\"   # 0 when the switch's features step ran; otherwise run the next three lines first",
+      "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex app-server daemon stop   # stops the server; its updater loop keeps running",
+      "for p in /proc/[0-9]*; do case \"$(readlink \"$p/exe\" 2>/dev/null)\" in \"${CODEX_HOME:-$HOME/.codex}\"/packages/app-server-daemon/*) echo \"TERM ${p#/proc/} $(readlink \"$p/exe\")\"; kill -TERM \"${p#/proc/}\";; esac; done   # ends the updater loop",
+      "ls -l /proc/[0-9]*/exe 2>/dev/null | grep -cF \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon/\"   # 0",
       "ln -sfn ~/.local/share/codex-ecosystem/tools/codex-0.155.1/bin/codex ~/.local/share/codex-ecosystem/bin/.codex.new && mv -T ~/.local/share/codex-ecosystem/bin/.codex.new ~/.local/share/codex-ecosystem/bin/codex",
       "codex --version   # codex-cli 0.155.1",
       "sed -i '/^-- codex --$/{n;s/^codex-cli .*/codex-cli 0.155.1/}' ~/.local/share/codex-ecosystem/installed-versions.txt"
     ],
     "sweep_finding": "codex --search exec keeps web_search cached on 0.155.1 and 0.157.1; add -c web_search=\"live\" to the lane argv (tools/sota-convergence/landscape-sweep/codex_job.py codex_argv) if live search is intended",
     "after_switch_repository_followups": "move adoption/pins-linux-x86_64.json codex to the wrapper above, manifests/stack.json codex to 0.157.1 with this receipt, the recipes/README.md codex rows (codex-package asset API digest sha256:0e211868c9fd73cb49ad35ac675b5eafdf6b9f453df8a493df980c59a590fe5f); the Mac pin waits for its own qualification",
-    "overturn_when": "the post-switch live GPT-6 probe fails or differs from 0.155.1, a later stable release changes exec --json events or flags the lanes use, or an advisory lands against 0.157.1",
-    "artifacts": "evidence/artifacts/sota-refresh-20260926/codex/"
+    "overturn_when": "the post-switch live GPT-6 probe fails or differs from 0.155.1, a later stable release changes exec --json events, the flags the lanes use or the background server's start or update defaults, or an advisory lands against 0.157.1",
+    "artifacts": "evidence/artifacts/sota-refresh-20260926/codex/",
+    "background_server": {
+      "probe": "daemon_probe.py in sandbox_daemon.sh, 2026-09-26T09:50:43Z to 2026-09-26T09:53:22Z; results/daemon.json",
+      "plain_interactive_launch_0.157.1": "copies the package (391,126,382 bytes) into CODEX_HOME/packages/app-server-daemon, writes its auto-update-version marker, and starts `app-server --listen unix:// --managed-daemon` and `app-server daemon pid-update-loop` from that copy; both outlive the TUI",
+      "plain_launch_0.155.1_while_it_runs": "connects to it: the other end of the connection the server accepted runs the 0.155.1 binary",
+      "daemon_stop": "stops the server and leaves the updater loop; SIGTERM ends the loop",
+      "prevention": "--no-daemon, or daemon_auto_start = false written by `codex features disable daemon_auto_start` (appended to the existing [features] table); 0.155.1 read that config.toml in an exec turn, sending its reasoning effort, and started its TUI",
+      "codex_exec": "no background-server code at either tag; none of the 21 scratch homes of the first qualification holds a packages directory",
+      "updater_source_only": "on by default; first check five minutes after start, then every 60 minutes; fetches https://chatgpt.com/codex/install.sh and runs it on the daemon's package copy (stage/daemon-source-checks.txt)"
+    },
+    "review_repair": {
+      "first_recorded_at_utc": "2026-09-26T05:34:17Z",
+      "finding": "data.rollback only relinked bin/codex and data.switch only checked for 0.155.1 processes; neither handled the background server that 0.157.x starts for interactive launches, which runs from CODEX_HOME/packages outside the pinned prefix",
+      "repair": "the background-server probe and source checks; switch turns daemon_auto_start off before any interactive launch and checks for a server and a package copy; rollback stops the server and its updater loop first; results.json carries the same commands",
+      "re_reviewed": false
+    }
   },
   "provenance": [
     {
@@ -66,6 +90,11 @@
     {
       "path": "evidence/artifacts/sota-refresh-20260926/codex/accept_codex_ws.py",
       "sha256": "a8cbf8bee3c3cbc59a09e63db2c3dcd9351599ffbcd1117ae7a1269979bda899",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/daemon_probe.py",
+      "sha256": "9462d7aefe71aef07fabcd6eb728f2c3fc14fb47b08404a3d5e1e5eeb03ca664",
       "byte_identical_to_run_copy": true
     },
     {
@@ -109,6 +138,11 @@
       "byte_identical_to_run_copy": false
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/out/daemon-raw-outputs.json",
+      "sha256": "1db90997fe21aad6faff9d3bfb7f8c0f8215aa5606e2a1d1e69dc9051466791a",
+      "byte_identical_to_run_copy": false
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260926/codex/out/provider-requests.json",
       "sha256": "bb5fd7f5451def665d33ad795d38bf7f8658d9aa496ff92690c2f79cde8f56b4",
       "byte_identical_to_run_copy": false
@@ -116,6 +150,11 @@
     {
       "path": "evidence/artifacts/sota-refresh-20260926/codex/out/raw-outputs.json",
       "sha256": "56a9a9683c5afec31d3087477b1122a910ea14ff4c00edcace06beaaa0a7f350",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/results/daemon.json",
+      "sha256": "e1fd466e20b71dea55509158ea277e39d0903b011e0db4f5a59bdceb5c8c643d",
       "byte_identical_to_run_copy": false
     },
     {
@@ -145,7 +184,7 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260926/codex/results.json",
-      "sha256": "2c53bbbe86ac3964b8bf7d8a6422d632bb60f43bbee124c770859625740e94e3",
+      "sha256": "34ff3f1a949224269c9829af4b233e69ddfeb3d9cf2f5c506d671f9ba968b78d",
       "byte_identical_to_run_copy": false
     },
     {
@@ -159,6 +198,11 @@
       "byte_identical_to_run_copy": true
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/sandbox_daemon.sh",
+      "sha256": "8a86ddbc3e08162d887c94466f1a92490dad4b145dca3e248bef0bc54bd23185",
+      "byte_identical_to_run_copy": true
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260926/codex/stage/audit-signatures.txt",
       "sha256": "3c2cc035d4df25ba3fa6193ec985197886b734011b82101e8701a4f00f21ab54",
       "byte_identical_to_run_copy": false
@@ -166,6 +210,11 @@
     {
       "path": "evidence/artifacts/sota-refresh-20260926/codex/stage/binary-crosscheck.txt",
       "sha256": "00b0baa8172c1c7f7ea811df39821adff13370bc1d152a660094a5a0c94c6ae9",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/stage/daemon-source-checks.txt",
+      "sha256": "6a025304594074a88f30e4cbca3daebd17dbdb667b1c08d7ae6f96f02bc76c17",
       "byte_identical_to_run_copy": false
     },
     {

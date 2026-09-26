@@ -54,7 +54,9 @@
       "fake_responses.py": "c2ef316539b49678ad6b7d68decdf25c0c547b73b8b5b0ba67818785df993fa4",
       "fake_websearch.py": "050df77e50628a02c72058327ec8aad278069854845cf9fbcc4c68285df2d995",
       "rollback_probe.py": "a3457c620649093840eeed7a77ed0e3a8dc48726a251cddb463ec6c3ef191b65",
-      "sandbox.sh": "6b020b3c62a2f3f4a7b42e2025fcf6cedfe4958863b828603dcbdbe15f4ae5be"
+      "sandbox.sh": "6b020b3c62a2f3f4a7b42e2025fcf6cedfe4958863b828603dcbdbe15f4ae5be",
+      "daemon_probe.py": "9462d7aefe71aef07fabcd6eb728f2c3fc14fb47b08404a3d5e1e5eeb03ca664",
+      "sandbox_daemon.sh": "8a86ddbc3e08162d887c94466f1a92490dad4b145dca3e248bef0bc54bd23185"
     },
     "isolation": "sandbox.sh: bwrap with a private network namespace (loopback only: no request could reach a real provider or the internet), / read-only, /mnt hidden, and a fresh scratch CODEX_HOME per case, so no run read the ChatGPT credential or touched ~/.codex (auth, state databases, sessions)",
     "provider": "a loopback fake Responses provider configured only through -c overrides (model_provider=fakeprov, wire_api=responses, retries 0); no credential or API key variable was set",
@@ -529,29 +531,141 @@
           ]
         }
       }
-    ]
+    ],
+    "background_server_probe": {
+      "window_utc": [
+        "2026-09-26T09:50:43Z",
+        "2026-09-26T09:53:22Z"
+      ],
+      "isolation": "sandbox_daemon.sh: sandbox.sh plus an empty /run/user (no host session bus or systemd user manager), a scratch XDG_RUNTIME_DIR and a private PID namespace, so a detached server ends with the sandbox; no network beyond loopback, fresh CODEX_HOME per case, no sign-in",
+      "T1_plain_launch_0.157.1": {
+        "screen_starts_with": "Installing daemon from CLI version 0.157.1 into <arm>/home-T1/packages/app-server-daemon..",
+        "processes_after_the_tui_stopped": [
+          [
+            "app-server",
+            "--listen",
+            "unix://",
+            "--managed-daemon"
+          ],
+          [
+            "app-server",
+            "daemon",
+            "pid-update-loop"
+          ]
+        ],
+        "package_copy": {
+          "releases": [
+            "0.157.1-x86_64-unknown-linux-musl"
+          ],
+          "auto_update_version": "0.157.1-x86_64-unknown-linux-musl",
+          "bytes": 391126382
+        },
+        "tui_peer_on_control_socket_runs_from": [
+          "codex-0.157.1"
+        ],
+        "CHECK": "2",
+        "PACKAGE": "present"
+      },
+      "T3_plain_launch_0.155.1_while_that_server_runs": {
+        "peer_of_the_server_connection_runs_from": [
+          "codex-0.155.1"
+        ],
+        "server_socket_descriptors": [
+          4,
+          5
+        ]
+      },
+      "T4_daemon_stop_0.157.1": {
+        "status": "stopped",
+        "still_running": [
+          [
+            "app-server",
+            "daemon",
+            "pid-update-loop"
+          ]
+        ],
+        "CHECK": "1"
+      },
+      "T5_TERM_LOOP": {
+        "output": "TERM 436 <arm>/home-T1/packages/app-server-daemon/releases/0.157.1-x86_64-unknown-linux-musl/bin/codex",
+        "CHECK": "0"
+      },
+      "T6_no_daemon_launch_0.157.1": {
+        "CHECK": "0",
+        "PACKAGE": "absent",
+        "daemon_stop_when_none_runs": [
+          0,
+          "notRunning"
+        ],
+        "daemon_version_when_none_runs_exit": 1,
+        "features_list_default": [
+          "daemon_auto_start                        stable             true"
+        ]
+      },
+      "T7_features_disable_then_plain_launch_0.157.1": {
+        "disable_output": "Disabled feature `daemon_auto_start` in config.toml.",
+        "config_toml_after": "# synthetic pre-existing settings: this comment, the top-level key and the [features] entry must stay\nmodel_reasoning_effort = \"high\"\n\n[features]\nhooks = true\ndaemon_auto_start = false\n",
+        "seeded_lines_kept_in_order": true,
+        "features_list": [
+          "daemon_auto_start                        stable             false"
+        ],
+        "CHECK": "0",
+        "PACKAGE": "absent"
+      },
+      "T8_0.155.1_on_that_config": {
+        "features_list_lines": [],
+        "exec_exit": 0,
+        "exec_events": [
+          "thread.started",
+          "turn.started",
+          "item.completed",
+          "turn.completed"
+        ],
+        "reasoning_effort_sent_from_config_toml": [
+          "high"
+        ]
+      },
+      "T9_plain_launch_0.155.1_on_that_config": {
+        "banner": "OpenAI Codex (v0.155.1)",
+        "screen_error_words": [],
+        "CHECK": "0"
+      }
+    }
   },
   "findings": {
     "search_flag_not_forwarded_to_exec": "Measured on both 0.155.1 and 0.157.1: `codex --search exec ...` sends settings.external_web_access false to the search endpoint, the same as no flag, while `codex exec -c web_search=\"live\" ...` sends true. Source: the Exec branch of codex-rs/cli/src/main.rs forwards only the shared root options and -c overrides, and core config defaults the mode to cached (stage/source-checks.txt). The sweep's GPT-6 lanes therefore searched in cached mode; add -c web_search=\"live\" to codex_argv if live search is intended. Measured with a fake provider marked supports_standalone_web_search; the OpenAI provider uses the same extension and mode resolution (source reading, not a live-provider measurement).",
     "exec_json_web_search_items": "0.157.1 reports an open of a literal URL as action type open_page and attaches `results`; 0.155.1 reported the same call as `other` without results. The lane rollout of gpt6-discover-workers (0.155.1) holds 32 openPage and 6 search web actions, which its exec --json stream reported as other and search. Consumers that count web_search actions see different types after the switch; codex_job.py ignores item.* content and is unaffected.",
-    "state_migration": "0.157.1 applies two new state_5.sqlite migrations (55 -> 57) and one thread_history_1.sqlite migration (6 -> 7) on first use; ~/.codex is at 55 and 6 now. In a scratch CODEX_HOME, 0.155.1 still completed an exec turn after 0.157.1 had migrated it (M3); the migrations stay applied."
+    "state_migration": "0.157.1 applies two new state_5.sqlite migrations (55 -> 57) and one thread_history_1.sqlite migration (6 -> 7) on first use; ~/.codex is at 55 and 6 now. In a scratch CODEX_HOME, 0.155.1 still completed an exec turn after 0.157.1 had migrated it (M3); the migrations stay applied.",
+    "background_server": "Measured in the sandbox (results/daemon.json): a plain interactive 0.157.1 launch printed `Installing daemon from CLI version 0.157.1 into <home>/packages/app-server-daemon`, copied the 391,126,382-byte package there, and started `app-server --listen unix:// --managed-daemon` and `app-server daemon pid-update-loop` from that copy; both outlived the TUI. A plain 0.155.1 launch on the same home connected to that server: the process at the other end of the connection the server accepted runs the 0.155.1 binary. `codex app-server daemon stop` (0.157.1) stopped the server and left the updater loop running; SIGTERM ended it. `--no-daemon`, and `codex features disable daemon_auto_start` (which appended daemon_auto_start = false to the existing [features] table), each prevented the copy and both processes; 0.155.1 read that config.toml, applied its other settings in an exec turn and started its TUI. Source only, not measured (the sandbox had no network and each server lived under a minute): the updater is on by default and, five minutes after start and then every 60 minutes, fetches https://chatgpt.com/codex/install.sh and runs it to install the latest release into the daemon's package copy (stage/daemon-source-checks.txt). A server started on this host would therefore run outside the integrity-checked prefix and move to later releases without a pin change. `codex exec`, which the sweep lanes use, has no background-server code at either tag, and none of the 21 scratch homes of the first qualification (14 of them with exec-turn state) holds a packages directory."
   },
   "switch_commands_for_the_coordinator": [
     "# 1. After the sweep: confirm no Codex 0.155.1 process runs (the bracketed pattern cannot match its own grep):",
     "grep -l 'codex-0[.]155[.]1/' /proc/[0-9]*/cmdline 2>/dev/null; ls -l /proc/[0-9]*/exe 2>/dev/null | grep -c 'tools/codex-0[.]155[.]1/'   # expect no file names and 0",
-    "# 2. Switch the link atomically:",
+    "# 2. Before any interactive 0.157.1 launch, turn off the background server's automatic start in ~/.codex/config.toml with the staged binary; a plain `codex` launch (for example the pending /hooks trust step) otherwise starts a self-updating server from a package copy under ~/.codex (results/daemon.json T1, T7):",
+    "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex features disable daemon_auto_start   # Disabled feature `daemon_auto_start` in config.toml.",
+    "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex features list | grep '^daemon_auto_start '   # daemon_auto_start  stable  false",
+    "# 3. Switch the link atomically:",
     "ln -sfn ~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex ~/.local/share/codex-ecosystem/bin/.codex.new && mv -T ~/.local/share/codex-ecosystem/bin/.codex.new ~/.local/share/codex-ecosystem/bin/codex",
     "codex --version   # codex-cli 0.157.1",
-    "# 3. One live probe from an empty directory outside every repository (this first 0.157.1 run migrates ~/.codex state_5 55->57, thread_history_1 6->7):",
+    "# 4. One live probe from an empty directory outside every repository (exec never starts the server; this first 0.157.1 run migrates ~/.codex state_5 55->57, thread_history_1 6->7):",
     "codex exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra -c model_reasoning_effort=\"max\" --json 'Reply with the word PROBE-OK.' < /dev/null",
-    "# 4. Record the installed version:",
+    "# 5. No background server and no package copy; run these again after the first interactive launch:",
+    "ls -l /proc/[0-9]*/exe 2>/dev/null | grep -cF \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon/\"   # 0",
+    "test -e \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon\" && echo present || echo absent   # absent",
+    "# 6. Record the installed version:",
     "sed -i '/^-- codex --$/{n;s/^codex-cli .*/codex-cli 0.157.1/}' ~/.local/share/codex-ecosystem/installed-versions.txt"
   ],
   "rollback_commands": [
+    "# 1. A server left running would keep serving 0.155.1's TUI after the relink (T3), and `daemon stop` leaves its updater loop running (T4); when the check prints more than 0, stop both and check again (T5):",
+    "ls -l /proc/[0-9]*/exe 2>/dev/null | grep -cF \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon/\"   # 0 when switch step 2 ran first",
+    "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex app-server daemon stop   # {\"status\":\"stopped\",...}, or {\"status\":\"notRunning\",...} when none runs (T6)",
+    "for p in /proc/[0-9]*; do case \"$(readlink \"$p/exe\" 2>/dev/null)\" in \"${CODEX_HOME:-$HOME/.codex}\"/packages/app-server-daemon/*) echo \"TERM ${p#/proc/} $(readlink \"$p/exe\")\"; kill -TERM \"${p#/proc/}\";; esac; done",
+    "ls -l /proc/[0-9]*/exe 2>/dev/null | grep -cF \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon/\"   # 0",
+    "# 2. Switch the link back and record it:",
     "ln -sfn ~/.local/share/codex-ecosystem/tools/codex-0.155.1/bin/codex ~/.local/share/codex-ecosystem/bin/.codex.new && mv -T ~/.local/share/codex-ecosystem/bin/.codex.new ~/.local/share/codex-ecosystem/bin/codex",
     "codex --version   # codex-cli 0.155.1",
     "sed -i '/^-- codex --$/{n;s/^codex-cli .*/codex-cli 0.155.1/}' ~/.local/share/codex-ecosystem/installed-versions.txt",
-    "# the ~/.codex migrations stay applied; 0.155.1 ran an exec turn on a migrated scratch home (M3), while the TUI, resume and the app-server were not tried on one"
+    "# The ~/.codex migrations stay applied (0.155.1 ran an exec turn on a migrated scratch home, M3). The daemon_auto_start = false line can stay: 0.155.1 read that config.toml in an exec turn (T8) and its TUI started with it (T9). A ~/.codex/packages/app-server-daemon copy is inert once no process runs from it; 0.155.1 manages only packages/standalone (stage/daemon-source-checks.txt)."
   ],
   "repository_followups_after_the_switch": [
     "adoption/pins-linux-x86_64.json codex: url https://registry.npmjs.org/@openai/codex/-/codex-0.157.1.tgz, sha256 813e2a944f4474b7e1826d9ce8bf696ad8d80c68f43f7a7067beec51fa8f5b73, integrity above",
@@ -561,11 +675,13 @@
   "not_published": [
     "the npm tarballs, the GitHub asset and extracted trees (public at the URLs above)",
     "full provider request bodies (they carry Codex's own base instructions); out/provider-requests.json keeps their shape, selected fields and sha256",
-    "the scratch CODEX_HOME directories (state databases, sessions)"
+    "the scratch CODEX_HOME directories (state databases, sessions)",
+    "the background-server probe's scratch homes (391 MB package copies, daemon state files) and its fake-provider request bodies; results/daemon.json keeps the measurements"
   ],
   "files": [
     "accept_codex.py",
     "accept_codex_ws.py",
+    "daemon_probe.py",
     "fake_responses.py",
     "fake_websearch.py",
     "help/0.155.1/exec-help.out",
@@ -574,8 +690,10 @@
     "help/0.157.1/exec-help.out",
     "help/0.157.1/help.out",
     "help/0.157.1/version.out",
+    "out/daemon-raw-outputs.json",
     "out/provider-requests.json",
     "out/raw-outputs.json",
+    "results/daemon.json",
     "results/exec-0.155.1.json",
     "results/exec-0.157.1.json",
     "results/rollback.json",
@@ -583,11 +701,19 @@
     "results/websearch-0.157.1.json",
     "rollback_probe.py",
     "sandbox.sh",
+    "sandbox_daemon.sh",
     "stage/audit-signatures.txt",
     "stage/binary-crosscheck.txt",
+    "stage/daemon-source-checks.txt",
     "stage/install.log",
     "stage/integrity.txt",
     "stage/provenance-codex-0.157.1.txt",
     "stage/source-checks.txt"
+  ],
+  "revisions": [
+    {
+      "date_utc": "2026-09-26",
+      "change": "repair round after review: the switch commands now turn off daemon_auto_start before any interactive 0.157.1 launch and check that no background server or package copy exists; the rollback commands stop a server and its updater loop before relinking; background_server_probe and the background_server finding added from daemon_probe.py. The first qualification's run outputs are unchanged."
+    }
   ]
 }
