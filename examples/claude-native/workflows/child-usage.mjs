@@ -109,9 +109,10 @@ export function webSearch(transcript) {
 // The injected-block marker: the opening tag of Context Mode's routing block (context-mode 1.0.169,
 // hooks/routing-block.mjs createRoutingBlock), which its PreToolUse hook writes into Agent-tool prompts.
 export const DEFAULT_MARKER = '<context_window_protection>'
-// curl or wget in command position: at a line start or after ; & | ( ` or $(, optionally behind rtk,
-// sudo, env, command, exec or `timeout <n>`. Other wrappers (xargs, env VAR=x) are not recognized.
-const FETCH_WORD = /(?:^|[;&|(`]|\$\()\s*(?:(?:rtk|sudo|env|command|exec|timeout\s+\S+)\s+)*(?:curl|wget)(?=\s|$)/m
+// curl or wget in command position: at a line start or after ; & | ( ` or $(, optionally behind the shell
+// keywords do, then, else, elif, if, while, until, ! and {, and behind rtk, sudo, env, command, exec, time, nice,
+// nohup or `timeout <n>`. Other wrappers (xargs, env VAR=x, nice -n N) are not recognized.
+const FETCH_WORD = /(?:^|[;&|(`]|\$\()\s*(?:(?:do|then|else|elif|if|while|until|!|\{|rtk|sudo|env|command|exec|time|nice|nohup|timeout\s+\S+)\s+)*(?:curl|wget)(?=\s|$)/m
 const URL_HOST = /\bhttps?:\/\/(\[[^\]\s]*\]|[^\s/:'"`<>)?#\]]+)/gi
 const LOOPBACK = /^(?:localhost|127(?:\.\d{1,3}){3}|\[::1\]|0\.0\.0\.0)$/i
 // A quoted string a shell runs: the argument of sh/bash/zsh/dash/ksh/su ... -c, of eval, or of ssh <host>.
@@ -183,9 +184,11 @@ const bump = (counts, key) => { counts[key] = (counts[key] || 0) + 1 }
 // SubagentStart hook context (never tool input or output), the SubagentStart hook types, and the
 // provider-returned first-request prompt size. With a window, rows at or after until are never read;
 // a tool call counts in the window of its first row, a ToolSearch load in the window of its result
-// row, and an RTK rewrite with its Bash call; first_prompt_tokens is null unless the first request is
-// inside. rtkDecisions maps tool_use_id -> hook_decisions.decision; covered = allow + ask
-// (rtk v0.50.0 src/core/tracking.rs HookOutcome::is_covered).
+// row, and an RTK rewrite in the window of its first hook row when its Bash call's tool_use row came
+// before until (the hook row follows the call, so a cut between the two splits no rewrite: adjacent
+// windows add up); first_prompt_tokens is null unless the first request is inside. rtkDecisions maps
+// tool_use_id -> hook_decisions.decision and is joined to the Bash calls counted in the window;
+// covered = allow + ask (rtk v0.50.0 src/core/tracking.rs HookOutcome::is_covered).
 export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions = null, window = null } = {}) {
   const lanes = {
     tool_calls: 0, bash_calls: 0, mcp_calls: counter(), skill_calls: counter(),
@@ -196,7 +199,9 @@ export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions =
     subagent_start: { types: [], additional_context: false },
     first_prompt_tokens: null,
   }
-  const seen = new Set(), bash = new Set(), searches = new Set(), rewritten = new Set(), types = new Set()
+  // bash: Bash calls counted in the window (the --rtk-db join); bashSeen: every Bash call before until;
+  // rewrites: tool_use_id -> whether its first rewrite hook row is inside the window.
+  const seen = new Set(), bash = new Set(), bashSeen = new Set(), searches = new Set(), rewrites = new Map(), types = new Set()
   let prompt = false, firstRequest = false
   for (const row of transcript) {
     if (!row || typeof row !== 'object') continue
@@ -227,6 +232,7 @@ export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions =
         seen.add(b.id)
         const name = String(b.name || ''), input = b.input && typeof b.input === 'object' ? b.input : {}
         if (name === 'ToolSearch') searches.add(b.id)
+        if (name === 'Bash') bashSeen.add(b.id)
         if (!counted) continue
         lanes.tool_calls++
         const server = mcpServer(name)
@@ -257,11 +263,11 @@ export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions =
         if (context.trim()) lanes.subagent_start.additional_context = true
         if (context.includes(marker)) lanes.injected_block.in_subagent_start_context = true
       } else if (a.type === 'hook_success' && hookName === 'PreToolUse:Bash' && /\brtk\s+hook\b/.test(String(a.command || ''))) {
-        try { const out = JSON.parse(a.stdout || ''); if (out && out.hookSpecificOutput && out.hookSpecificOutput.updatedInput) rewritten.add(a.toolUseID) } catch { /* no rewrite */ }
+        try { const out = JSON.parse(a.stdout || ''); if (out && out.hookSpecificOutput && out.hookSpecificOutput.updatedInput && !rewrites.has(a.toolUseID)) rewrites.set(a.toolUseID, counted) } catch { /* no rewrite */ }
       }
     }
   }
-  lanes.rtk.hook_rewrites = [...rewritten].filter((id) => bash.has(id)).length
+  lanes.rtk.hook_rewrites = [...rewrites].filter(([id, inWindow]) => inWindow && bashSeen.has(id)).length
   if (rtkDecisions) {
     for (const id of bash) {
       const decision = rtkDecisions.get(id)
@@ -355,7 +361,7 @@ export function findChildTranscripts(roots, unreadable = { count: 0 }) {
   return [...found].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([path, spawn]) => ({ path, spawn }))
 }
 
-const LANES_LIMITS = 'Counts come from native transcript rows inside [since, until); rows at or after until are never read. A tool call (tool_use blocks deduplicated by id) counts in the window of its first row, a ToolSearch load (tool_reference blocks in its result) in the window of the result row, and an RTK rewrite (a PreToolUse:Bash row from `rtk hook` whose stdout carries updatedInput) with its Bash call. The marker is looked for only in the first prompt and in SubagentStart hook context, never in tool input or output. first_prompt_tokens is provider-returned (input + cache read + cache creation) and counted only for children whose first request is inside the window. curl/wget counts only in command position of the text a shell runs (quoted strings and heredoc bodies are data unless sh -c, eval, ssh or a shell heredoc runs them), optionally behind rtk, sudo, env, command, exec or timeout N; a call whose literal URLs are all loopback is counted apart and left out of ctx_fetch_and_index_share. RTK decisions (with --rtk-db) are hook_decisions rows joined 1:1 by tool_use_id; covered = allow + ask. Names that are not name-shaped are counted under (other). Transcripts not modified since the window start are skipped unread. Children whose agent type starts with blind- are negative controls and are left out of workers.'
+const LANES_LIMITS = 'Counts come from native transcript rows inside [since, until); rows at or after until are never read. A tool call (tool_use blocks deduplicated by id) counts in the window of its first row, a ToolSearch load (tool_reference blocks in its result) in the window of the result row, and an RTK rewrite (a PreToolUse:Bash row from `rtk hook` whose stdout carries updatedInput, for a Bash call whose tool_use row came before until) in the window of its hook row, so adjacent windows add up. RTK decisions (with --rtk-db) are hook_decisions rows joined 1:1 by tool_use_id to the Bash calls counted in the window; covered = allow + ask. A call whose hook row falls on the other side of a window edge therefore counts in hook_rewrites and in decisions of different windows. The marker is looked for only in the first prompt and in SubagentStart hook context, never in tool input or output. first_prompt_tokens is provider-returned (input + cache read + cache creation) and counted only for children whose first request is inside the window. curl/wget counts only in command position of the text a shell runs (quoted strings and heredoc bodies are data unless sh -c, eval, ssh or a shell heredoc runs them), optionally behind the shell keywords do, then, else, elif, if, while, until, ! and { and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N; a call whose literal URLs are all loopback is counted apart. ctx_fetch_and_index_share is ctx_fetch_and_index / (WebFetch + ctx_fetch_and_index + remote curl/wget): a fetch run inside a Context Mode sandbox (ctx_execute or ctx_batch_execute code), a gh api call and fetch() or an HTTP library in a script are in no lane. Names that are not name-shaped are counted under (other). Transcripts not modified since the window start are skipped unread. Every child transcript is a child, so a Workflow call the runtime re-ran under the same key (superseded_attempts in the per-run report) is one child per attempt. Children whose agent type starts with blind- are negative controls and are left out of workers; by_spawn_and_agent_type compares spawn paths within one agent type.'
 
 // Lane use of every child transcript under the roots that has a row inside [since, until).
 export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT_MARKER, rtk = null } = {}) {
@@ -394,7 +400,10 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
   const ordinal = new Map([...firstBySession].sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : 1)).map(([s], i) => [s, 'session-' + String(i + 1).padStart(2, '0')]))
   for (const c of children) c.session_ordinal = ordinal.get(c.session)
   const group = (keep) => aggregateLanes(children.filter(keep))
-  const byKey = (key) => Object.fromEntries([...new Set(children.map((c) => c[key]))].sort().map((v) => [v, group((c) => c[key] === v)]))
+  const byKey = (key, among = children) => Object.fromEntries([...new Set(among.map((c) => c[key]))].sort().map((v) => [v, aggregateLanes(among.filter((c) => c[key] === v))]))
+  // Spawn-path totals mix agent types (an Agent-tool Explore child and a workflow general-purpose child differ
+  // in their tools), so a lane is compared between spawn paths within one agent type.
+  const bySpawnAndType = Object.fromEntries([...new Set(children.map((c) => c.spawn))].sort().map((s) => [s, byKey('agent_type', children.filter((c) => c.spawn === s))]))
   const blind = (c) => c.agent_type.startsWith('blind-')
   const iso = (t) => Number.isFinite(t) ? new Date(t).toISOString() : null
   return {
@@ -408,7 +417,7 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
     rtk_db: rtk ? { joined: true, rows: rtk.rows, duplicate_tool_use_ids: rtk.duplicates } : { joined: false },
     groups: {
       all: group(() => true), workers: group((c) => !blind(c)), negative_controls: group(blind),
-      by_spawn: byKey('spawn'), by_agent_type: byKey('agent_type'), by_session: byKey('session_ordinal'),
+      by_spawn: byKey('spawn'), by_agent_type: byKey('agent_type'), by_spawn_and_agent_type: bySpawnAndType, by_session: byKey('session_ordinal'),
     },
     limits: LANES_LIMITS,
   }
@@ -607,20 +616,22 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
     try { rtk = await loadRtkDecisions(o.rtkDb) } catch (e) { console.error('--rtk-db: cannot read the hook_decisions table read-only (' + (e.code || e.message) + ')'); process.exit(2) }
   }
   const marker = o.marker ?? DEFAULT_MARKER
+  // Output goes out through stdout.write and process.exitCode, never process.exit(): process.exit() drops stdout
+  // writes still pending, and a pipe takes 64 KiB at once. Only the short error messages above exit directly.
   if (o.sweep) {
     const notDirs = o.roots.filter((r) => { try { return !statSync(r).isDirectory() } catch { return true } })
     if (notDirs.length) { console.error('--root is not a readable directory: ' + notDirs.join(', ')); process.exit(2) }
-    console.log(sortedJson(sweepLanes(o.roots, { since: o.since === undefined ? null : Date.parse(o.since), until: o.until === undefined ? null : Date.parse(o.until), marker, rtk })))
-    process.exit(0)
+    process.stdout.write(sortedJson(sweepLanes(o.roots, { since: o.since === undefined ? null : Date.parse(o.since), until: o.until === undefined ? null : Date.parse(o.until), marker, rtk })) + '\n')
+    process.exitCode = 0
+  } else {
+    const target = o.positional[0]
+    const required = o.required ?? null
+    const dir = target === '--latest' ? latestRunDir(process.cwd(), process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')) : target
+    if (target === '--latest' && !dir) { console.error('no native Workflow run found for ' + process.cwd()); process.exit(2) }
+    const out = { transcript_dir: dir, ...summarizeRun(dir, { marker, rtkDecisions: rtk ? rtk.map : null }) }
+    if (rtk) out.rtk_db = { joined: true, rows: rtk.rows, duplicate_tool_use_ids: rtk.duplicates }
+    if (required) out.effort_mismatches = effortMismatches(out, required)
+    process.stdout.write(JSON.stringify(out, null, 2) + '\n')
+    process.exitCode = out.status === 'complete' && !(required && out.effort_mismatches.length) ? 0 : 1
   }
-  const target = o.positional[0]
-  const required = o.required ?? null
-  const dir = target === '--latest' ? latestRunDir(process.cwd(), process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')) : target
-  if (target === '--latest' && !dir) { console.error('no native Workflow run found for ' + process.cwd()); process.exit(2) }
-  const out = { transcript_dir: dir, ...summarizeRun(dir, { marker, rtkDecisions: rtk ? rtk.map : null }) }
-  if (rtk) out.rtk_db = { joined: true, rows: rtk.rows, duplicate_tool_use_ids: rtk.duplicates }
-  if (required) out.effort_mismatches = effortMismatches(out, required)
-  console.log(JSON.stringify(out, null, 2))
-  // exitCode, not process.exit(): process.exit() drops stdout writes still pending, and a pipe takes 64 KiB at once.
-  process.exitCode = out.status === 'complete' && !(required && out.effort_mismatches.length) ? 0 : 1
 }

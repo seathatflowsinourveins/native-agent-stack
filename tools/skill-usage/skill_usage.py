@@ -284,19 +284,21 @@ def _score_line(record: dict, names, mention_patterns: dict, now: datetime, wind
 
 
 def scan_rollout_file(path: Path, names, mention_patterns: dict, now: datetime, windows,
-                      codex_off=()) -> tuple[dict, int, bool]:
-    """(counts, parse errors, user config ignored). The last is True when the session's skill
-    catalog, as of `now`, lists a skill in codex_off (see USER_CONFIG_METHOD); the caller keeps its
-    counts apart. Records a spawned sub-agent's rollout copied from its parent (ordinal below
-    session_meta.subagent_history_start_ordinal) are the parent's and are not scored again."""
+                      codex_off=()) -> tuple[dict, dict, int, bool]:
+    """(own counts, copied counts, parse errors, user config ignored). Records a spawned sub-agent's
+    rollout copied from its parent (ordinal below session_meta.subagent_history_start_ordinal) are
+    scored into the copied counts, apart from the session's own records; both are part of the
+    trial's measurement. The last value is True when the session's skill catalog, as of `now`,
+    lists a skill in codex_off (see USER_CONFIG_METHOD)."""
     counts = _empty_counts(names, windows)
+    copied = _empty_counts(names, windows)
     parse_errors = 0
     ignored = False
     history_start, first_meta = None, True
     try:
         handle = path.open(encoding="utf-8", errors="replace")
     except OSError:
-        return counts, 1, False
+        return counts, copied, 1, False
     with handle:
         for raw_line in handle:
             raw_line = raw_line.strip()
@@ -314,13 +316,12 @@ def scan_rollout_file(path: Path, names, mention_patterns: dict, now: datetime, 
                 if codex_off and not ignored and _at_or_before(record, now):
                     ignored = any(f"/{name}/SKILL.md" in text for text in catalog_texts(record)
                                   for name in codex_off)
-                if (history_start is not None and isinstance(record.get("ordinal"), int)
-                        and record["ordinal"] < history_start):
-                    continue
-                _score_line(record, names, mention_patterns, now, windows, counts)
+                inherited = (history_start is not None and isinstance(record.get("ordinal"), int)
+                             and record["ordinal"] < history_start)
+                _score_line(record, names, mention_patterns, now, windows, copied if inherited else counts)
             except Exception:
                 parse_errors += 1
-    return counts, parse_errors, ignored
+    return counts, copied, parse_errors, ignored
 
 
 def _at_or_before(record: dict, now: datetime) -> bool:
@@ -332,29 +333,36 @@ def _at_or_before(record: dict, now: datetime) -> bool:
 
 
 def scan_codex_roots(roots, names, *, now: datetime, windows, codex_off=()) -> dict:
-    """Invoke-rate counts over rollout files. A session whose user config was not loaded (its
-    catalog lists a codex_off skill, as under --ignore-user-config) is a different listing state:
-    its counts go to excluded_user_config_ignored, never into counts."""
+    """Invoke-rate counts over rollout files. `counts` holds every record of every session, the
+    measurement the skills trial pins. Two disjoint parts of it are reported beside it and never
+    subtracted from it: of_which_user_config_ignored, the own records of sessions whose catalog lists
+    a codex_off skill (a different listing state, as under --ignore-user-config), and
+    of_which_copied_from_parent, the records a spawned sub-agent's rollout copied from its parent
+    (the parent's rollout holds them too)."""
     windows = tuple(sorted(set(windows)))
     mention_patterns = {name: re.compile(r"\$" + re.escape(name) + r"\b") for name in names}
     totals = _empty_counts(names, windows)
-    excluded = _empty_counts(names, windows)
+    ignored_own = _empty_counts(names, windows)
+    copied_all = _empty_counts(names, windows)
     files = iter_rollout_files(roots)
-    parse_errors = excluded_sessions = 0
+    parse_errors = ignored_sessions = 0
     for path in files:
-        file_counts, file_errors, ignored = scan_rollout_file(path, names, mention_patterns, now,
+        own, copied, file_errors, ignored = scan_rollout_file(path, names, mention_patterns, now,
                                                               windows, codex_off)
         parse_errors += file_errors
-        excluded_sessions += ignored
-        target = excluded if ignored else totals
+        ignored_sessions += ignored
         for name in names:
             for window in windows:
-                target[name][window]["skill_md_reads"] += file_counts[name][window]["skill_md_reads"]
-                target[name][window]["name_mentions"] += file_counts[name][window]["name_mentions"]
+                for metric in ("skill_md_reads", "name_mentions"):
+                    totals[name][window][metric] += own[name][window][metric] + copied[name][window][metric]
+                    copied_all[name][window][metric] += copied[name][window][metric]
+                    if ignored:
+                        ignored_own[name][window][metric] += own[name][window][metric]
     return {"roots_count": len(roots or []), "files_scanned": len(files),
             "parse_errors": parse_errors, "windows": list(windows), "counts": totals,
-            "sessions_excluded_user_config_ignored": excluded_sessions,
-            "excluded_counts": excluded}
+            "sessions_user_config_ignored": ignored_sessions,
+            "of_which_user_config_ignored": ignored_own,
+            "of_which_copied_from_parent": copied_all}
 
 
 # --------------------------------------------------------------------------- manifest and lock
@@ -481,13 +489,14 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
                     if window in codex_scanned_windows else None)
                 for window in windows
             }
-            excluded_counts = codex_scan.get("excluded_counts", {})
+            def part(key: str) -> dict:
+                return {str(window): (codex_scan.get(key, {}).get(name, {}).get(
+                            window, {"skill_md_reads": 0, "name_mentions": 0})
+                            if window in codex_scanned_windows else None)
+                        for window in windows}
             codex_out = {"enabled": codex_enabled, "counts": per_window,
-                         "excluded_user_config_ignored": {
-                             str(window): (excluded_counts.get(name, {}).get(
-                                 window, {"skill_md_reads": 0, "name_mentions": 0})
-                                 if window in codex_scanned_windows else None)
-                             for window in windows}}
+                         "of_which_user_config_ignored": part("of_which_user_config_ignored"),
+                         "of_which_copied_from_parent": part("of_which_copied_from_parent")}
             codex_evaluated = codex_enabled
             if isinstance(trial_window_days, int) and trial_window_days in codex_scanned_windows:
                 trial_counts = per_window[str(trial_window_days)]
@@ -537,8 +546,7 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
         "codex": {"measured": codex_measured, "roots_count": codex_scan["roots_count"],
                    "files_scanned": codex_scan["files_scanned"],
                    "parse_errors": codex_scan["parse_errors"],
-                   "sessions_excluded_user_config_ignored":
-                       codex_scan.get("sessions_excluded_user_config_ignored", 0)},
+                   "sessions_user_config_ignored": codex_scan.get("sessions_user_config_ignored", 0)},
         "skills": skills_out,
         "prune_candidates": prune_candidates,
         "verdict_recheck": verdict_recheck,
@@ -546,10 +554,12 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
             "Claude 'uses' from /skill-doctor is not windowed by --window (only its '7d tokens' "
             "column is): the same lifetime count is reused for every window's zero-usage check, "
             "a documented gap, not a measured per-window value. Codex counts are windowed from "
-            "each rollout line's own timestamp, and a session that did not load the user config "
-            "(its catalog lists a codex_enabled=false skill, as under --ignore-user-config) is a "
-            "different listing state: its counts are reported under excluded_user_config_ignored, "
-            "never in counts. A skill with no measured, enabled/listed client "
+            "each rollout line's own timestamp and hold every session's records, the measurement "
+            "the trial pins; every flag reads them. Two disjoint parts of them are reported beside "
+            "them, never subtracted: of_which_user_config_ignored (own records of sessions whose "
+            "catalog lists a codex_enabled=false skill, as under --ignore-user-config: a different "
+            "listing state) and of_which_copied_from_parent (records a spawned sub-agent's rollout "
+            "copied from its parent, which the parent's rollout also holds). A skill with no measured, enabled/listed client "
             "is excluded from prune_candidates and verdict_recheck, never read as zero usage. "
             "The measured listing cost (claude.context_tokens) is its own counter: never mix it "
             "into tools/token-report's token-efficiency ledger."
@@ -572,7 +582,7 @@ def render_text(report: dict) -> str:
     lines.append(f"codex: {'measured' if codex['measured'] else 'not-measured (pass --codex-root)'} "
                  f"roots_count={codex['roots_count']} files_scanned={codex['files_scanned']} "
                  f"parse_errors={codex['parse_errors']} "
-                 f"excluded_user_config_ignored={codex['sessions_excluded_user_config_ignored']}")
+                 f"user_config_ignored_sessions={codex['sessions_user_config_ignored']}")
     lines.append("")
     windows = report["windows_days"]
     lines.append(f"{'skill':<34} {'status':<6} {'age_days':>9} {'claude_uses':>11} "
@@ -603,9 +613,12 @@ def render_text(report: dict) -> str:
 # The opening tag of Context Mode's routing block; its SessionStart hook adds the block to a Codex
 # session's developer context (context-mode 1.0.169, hooks/routing-block.mjs createRoutingBlock).
 DEFAULT_LANES_MARKER = "<context_window_protection>"
-# curl or wget in command position, the rule examples/claude-native/workflows/child-usage.mjs uses.
+# curl or wget in command position, the rule examples/claude-native/workflows/child-usage.mjs uses:
+# at a line start or after ; & | ( ` or $(, optionally behind the shell keywords do, then, else, elif,
+# if, while, until, ! and {, and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N.
 FETCH_WORD = re.compile(
-    r"(?:^|[;&|(`]|\$\()\s*(?:(?:rtk|sudo|env|command|exec|timeout\s+\S+)\s+)*(?:curl|wget)(?=\s|$)", re.M)
+    r"(?:^|[;&|(`]|\$\()\s*(?:(?:do|then|else|elif|if|while|until|!|\{|rtk|sudo|env|command|exec|time|nice"
+    r"|nohup|timeout\s+\S+)\s+)*(?:curl|wget)(?=\s|$)", re.M)
 URL_HOST = re.compile(r"\bhttps?://(\[[^\]\s]*\]|[^\s/:'\"`<>)?#\]]+)", re.I)
 LOOPBACK = re.compile(r"^(?:localhost|127(?:\.\d{1,3}){3}|\[::1\]|0\.0\.0\.0)$", re.I)
 RTK_FIRST_WORD = re.compile(r"\s*rtk\s")
@@ -629,21 +642,32 @@ USER_CONFIG_METHOD = (
     "(codex-rs/config/src/loader/mod.rs), so the trial's enabled=false entries in the user config "
     "stop applying. applied: the catalog lists manifest skills, none of them codex_enabled=false. "
     "unknown: no catalog.")
+TOOL_ITEM_TYPES = ("McpToolCall", "CommandExecution", "Extension", "FileChange")
 LANES_LIMITS = (
     "Counts come from rollout records inside [since, until): item_completed McpToolCall, "
     "CommandExecution, Extension and FileChange items plus function_call records whose call_id is "
     "not also an item id (the rollout shape of codex-cli 0.155.1 and 0.157.1), token_count for the "
     "first prompt (input tokens, cached included) and response_item calls for SKILL.md reads. "
-    "Session properties (kind, originator, user_config, marker) use every record before until. "
-    "Records a spawned sub-agent's rollout copied from its parent (ordinal below "
+    "Shell, MCP and fetch counts therefore need item_completed events, an EventMsg whose "
+    "persistence depends on the rollout's history mode (codex-rs/rollout/src/policy.rs): "
+    "sessions_by_history_mode reports session_meta.history_mode, and "
+    "sessions_with_tool_calls_but_no_item_events counts sessions whose own records before until "
+    "hold model tool calls but no such event, whose shell, MCP and fetch lanes read as zero. "
+    "Session properties (kind, originator, history mode, user_config, marker) use every record "
+    "before until. Records a spawned sub-agent's rollout copied from its parent (ordinal below "
     "subagent_history_start_ordinal) count toward those properties only, never as the child's "
     "calls. The marker is looked for in developer messages only. The rtk prefix is the first word "
     "of the shell script; curl/wget counts only in command position of the text a shell runs "
     "(quoted strings and heredoc bodies are data unless sh -c, eval, ssh or a shell heredoc runs "
-    "them), and a call whose literal URLs are all loopback is counted apart and left out of "
-    "ctx_fetch_and_index_share. Server, function and originator names that are not name-shaped "
-    "are counted under (other). Sessions whose user config was ignored are negative controls, "
-    "never workers. Rollout files not modified since the window start are skipped unread.")
+    "them), optionally behind the shell keywords do, then, else, elif, if, while, until, ! and { "
+    "and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N, and a call whose "
+    "literal URLs are all loopback is counted apart. ctx_fetch_and_index_share is "
+    "ctx_fetch_and_index / (web page opens + ctx_fetch_and_index + remote curl/wget): a fetch run "
+    "inside a Context Mode sandbox (ctx_execute or ctx_batch_execute code), a gh api call and "
+    "fetch() or an HTTP library in a script are in no lane. Server, function, originator and "
+    "history-mode names that are not name-shaped are counted under (other). Sessions whose user "
+    "config was ignored are negative controls, never workers. Rollout files not modified since the "
+    "window start are skipped unread.")
 
 
 def safe_key(value) -> str:
@@ -751,12 +775,12 @@ def catalog_texts(record: dict) -> list[str]:
 
 
 def _new_lanes_session() -> dict:
-    return {"kind": None, "originator": None, "marker": False, "catalog_off": False,
+    return {"kind": None, "originator": None, "history_mode": None, "marker": False, "catalog_off": False,
             "catalog_on": False, "in_window": False, "started_before_window": False,
             "ran_past_window_end": False, "tool_calls": 0, "mcp_calls": {}, "mcp_failed": {},
             "shell_calls": 0, "rtk_prefixed": 0, "fetch": dict.fromkeys(FETCH_KEYS, 0),
             "skill_md_reads": {}, "function_calls": {}, "file_changes": 0,
-            "first_prompt_tokens": None}
+            "first_prompt_tokens": None, "own_model_calls": 0, "own_tool_items": 0}
 
 
 def _bump(counts: dict, key: str, by: int = 1) -> None:
@@ -821,11 +845,15 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
                     session["kind"] = ("subagent" if isinstance(source, dict) and "subagent" in source
                                        else "exec" if source == "exec" else "other")
                     session["originator"] = safe_key(payload["originator"]) if payload.get("originator") else "(none)"
+                    session["history_mode"] = (safe_key(payload["history_mode"]) if payload.get("history_mode")
+                                               else "(none)")
                     session["started_before_window"] = since is not None and when < since
                     start = payload.get("subagent_history_start_ordinal")
                     history_start = start if isinstance(start, int) and not isinstance(start, bool) else None
             elif kind == "response_item":
                 payload_type = payload.get("type")
+                if payload_type in CALL_PAYLOAD_TYPES and not inherited:
+                    session["own_model_calls"] += 1
                 if payload_type == "message" and payload.get("role") == "developer":
                     session["marker"] |= marker in message_text(payload)
                 elif counted and payload_type in CALL_PAYLOAD_TYPES:
@@ -836,6 +864,9 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
                         _bump(session["function_calls"], safe_key(payload["name"]) if payload.get("name") else "(none)")
             elif kind == "event_msg" and not inherited:
                 payload_type = payload.get("type")
+                if (payload_type == "item_completed" and isinstance(payload.get("item"), dict)
+                        and payload["item"].get("type") in TOOL_ITEM_TYPES):
+                    session["own_tool_items"] += 1
                 if payload_type == "token_count" and not first_usage_seen:
                     info = payload.get("info") if isinstance(payload.get("info"), dict) else {}
                     last = info.get("last_token_usage") if isinstance(info.get("last_token_usage"), dict) else {}
@@ -852,7 +883,7 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
 
 def _score_lane_item(session: dict, item: dict, item_ids: set) -> None:
     item_type = item.get("type")
-    if item_type in ("McpToolCall", "CommandExecution", "Extension", "FileChange") and item.get("id") is not None:
+    if item_type in TOOL_ITEM_TYPES and item.get("id") is not None:
         item_ids.add(item.get("id"))
     if item_type == "McpToolCall":
         server = safe_key(item["server"]) if item.get("server") else "(none)"
@@ -975,6 +1006,9 @@ def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str) -> dic
         "sessions_started_before_window": sum(s["started_before_window"] for s in sessions),
         "sessions_ran_past_window_end": sum(s["ran_past_window_end"] for s in sessions),
         "sessions_by_kind": count_by("kind"), "sessions_by_originator": count_by("originator"),
+        "sessions_by_history_mode": count_by("history_mode"),
+        "sessions_with_tool_calls_but_no_item_events": sum(
+            1 for s in sessions if s["own_model_calls"] and not s["own_tool_items"]),
         "user_config": {**{state: sum(s["user_config"] == state for s in sessions)
                            for state in ("applied", "ignored", "unknown")}, "method": USER_CONFIG_METHOD},
         "groups": {
@@ -999,7 +1033,9 @@ def render_lanes_text(report: dict) -> str:
              f"sessions={report['sessions_in_window']} files_scanned={report['files_scanned']} "
              f"parse_errors={report['parse_errors']}",
              "user_config: " + " ".join(f"{state}={report['user_config'][state]}"
-                                        for state in ("applied", "ignored", "unknown"))]
+                                        for state in ("applied", "ignored", "unknown")),
+             "history_mode: " + " ".join(f"{mode}={count}" for mode, count in report["sessions_by_history_mode"].items())
+             + f" tool_calls_but_no_item_events={report['sessions_with_tool_calls_but_no_item_events']}"]
     for label, group in (("workers", report["groups"]["workers"]),
                          ("negative_controls", report["groups"]["negative_controls"]),
                          ("unclassified", report["groups"]["unclassified"])):

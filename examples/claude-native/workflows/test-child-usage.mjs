@@ -230,6 +230,13 @@ expect('fetch: quoted strings and heredoc bodies are data unless a shell runs th
   "ssh host 'curl https://x.org'", "cat > s.sh <<'EOF'\ncurl https://x.org\nEOF\nls", "bash <<'EOF'\ncurl https://x.org\nEOF", 'x="$(curl -s https://x.org)"',
   'cat <<< "curl https://x.org"', 'curl "http://127.0.0.1:9090/api"', "python3 - <<'PY'\nos.system('curl https://x.org')\nPY", 'grep -c "curl" notes.txt; curl -s https://x.org',
 ].map(fetchKind)) === JSON.stringify([null, null, 'fetch', 'loopback', 'fetch', null, 'fetch', 'fetch', null, 'loopback', null, 'fetch']))
+// Review finding 8 (2026-09-26): 52 Bash calls in the baseline window ran curl/wget after a shell keyword, 50 after `do`.
+expect('fetch: curl/wget after a shell keyword or time/nice/nohup is in command position; the same word as an argument is not', JSON.stringify([
+  'for u in a b; do curl -s "$u"; done', 'if curl -s https://x.org; then echo ok; fi', 'if true; then wget -q https://x.org; fi',
+  'if false; then :; else curl https://x.org; fi', 'while ! curl -s http://localhost:9/; do sleep 1; done', 'until wget -q http://127.0.0.1:8080/; do sleep 1; done',
+  '{ curl -s https://x.org; }', 'time curl -s https://x.org', 'nohup curl -s https://x.org &',
+  'echo do curl https://x.org', 'git commit -m "then curl https://x.org"', 'printf "%s\\n" if curl',
+].map(fetchKind)) === JSON.stringify(['fetch', 'fetch', 'fetch', 'fetch', 'loopback', 'loopback', 'fetch', 'fetch', 'fetch', null, null, null]))
 expect('mcp: the server is the segment between mcp__ and the next __', mcpServer('mcp__plugin_context-mode_context-mode__ctx_execute') === 'plugin_context-mode_context-mode' && mcpServer('mcp__qmd__query') === 'qmd' && mcpServer('Bash') === null && mcpServer('mcp__') === null)
 {
   const odd = childLanes([ask('packet', 0), call('p1', 'mcp__constructor__query', {}, 1), call('p2', 'Skill', { skill: '/home/example/private/SKILL.md' }, 2), call('p3', 'Skill', { skill: 'tdd' }, 3), attach({ type: 'hook_success', hookName: 'SubagentStart:has space', hookEvent: 'SubagentStart', toolUseID: 's', command: 'x', stdout: '', stderr: '', exitCode: 0 }, 0)])
@@ -242,6 +249,17 @@ expect('mcp: the server is the segment between mcp__ and the next __', mcpServer
   const late = childLanes(straddle, { window: { since: Date.parse(T(3)), until: Date.parse(T(9)) } })
   const whole = childLanes(straddle, { window: { since: Date.parse(T(0)), until: Date.parse(T(9)) } })
   expect('window: adjacent windows partition calls and loads the way one window over both counts them', early.bash_calls + late.bash_calls === whole.bash_calls && whole.bash_calls === 1 && early.tool_search.calls === 1 && late.tool_search.calls === 0 && late.tool_search.loaded.qmd === 1 && !early.tool_search.loaded.qmd && whole.tool_search.loaded.qmd === 1)
+}
+{
+  // Review finding 6 (2026-09-26): a Bash call's tool_use row before a cut and its `rtk hook` row after it (observed:
+  // 13:59:59.646Z and 14:00:00.134Z) was lost from both windows. The rewrite counts in the window of its hook row;
+  // the hook_decisions join still counts each call once, in the window of the call.
+  const cut = [ask('packet', 0), call('r1', 'Bash', { command: 'git status' }, 2), bashHook('r1', 'rtk hook claude', rewrite, 4), call('r2', 'Bash', { command: 'git log' }, 5), bashHook('r2', 'rtk hook claude', rewrite, 5)]
+  const joined = new Map([['r1', 'ask'], ['r2', 'ask']])
+  const lanesIn = (since, until) => childLanes(cut, { rtkDecisions: joined, window: { since: Date.parse(T(since)), until: Date.parse(T(until)) } })
+  const [early, late, whole] = [lanesIn(0, 3), lanesIn(3, 9), lanesIn(0, 9)]
+  expect('window: an RTK rewrite whose hook row follows the cut counts in the window of that row, so adjacent windows add up', early.rtk.hook_rewrites + late.rtk.hook_rewrites === whole.rtk.hook_rewrites && whole.rtk.hook_rewrites === 2 && late.rtk.hook_rewrites === 2)
+  expect('window: the hook_decisions join still counts each Bash call once, in the window of the call', early.rtk.decisions.ask === 1 && late.rtk.decisions.ask === 1 && whole.rtk.decisions.ask === 2 && early.bash_calls === 1 && late.bash_calls === 1)
 }
 expect('stats: nearest-rank percentiles, null ignored', JSON.stringify(tokenStats([100, null, 90, 80, 70, 60, 50, 40, 30, 20, 10])) === JSON.stringify({ n: 10, min: 10, p10: 10, median: 50, p90: 90, max: 100 }) && tokenStats([null]).n === 0)
 const agg = aggregateLanes([{ lanes: lanesA }, { lanes: injected }])
@@ -277,6 +295,9 @@ try {
   expect('sweep: every child transcript under the root is found, a stale one is skipped unread and a top-level session is not a child', report.transcripts_found === 5 && report.transcripts_skipped_unmodified === 1 && report.children_in_window === 3 && report.parse_errors === 1)
   expect('sweep: groups by spawn path and agent type, blind-* children are negative controls outside workers', report.groups.all.children === 3 && report.groups.workers.children === 2 && report.groups.negative_controls.children === 1 && report.groups.negative_controls.bash_calls === 1 && JSON.stringify(Object.keys(report.groups.by_spawn)) === '["agent_tool","workflow"]' && JSON.stringify(Object.keys(report.groups.by_agent_type)) === '["blind-lane-reviewer","general-purpose","workflow-subagent"]')
   expect('sweep: sessions are ordinals by earliest child row, never ids', report.sessions_in_window === 2 && JSON.stringify(Object.keys(report.groups.by_session)) === '["session-01","session-02"]' && report.groups.by_session['session-01'].children === 2)
+  // Review finding 7 (2026-09-26): spawn-path totals mix agent types, so a lane is compared within one agent type.
+  const nested = Object.fromEntries(Object.entries(report.groups.by_spawn_and_agent_type || {}).map(([spawn, types]) => [spawn, Object.fromEntries(Object.entries(types).map(([type, g]) => [type, g.children]))]))
+  expect('sweep: groups by spawn path within agent type', JSON.stringify(nested) === JSON.stringify({ agent_tool: { 'general-purpose': 1 }, workflow: { 'blind-lane-reviewer': 1, 'workflow-subagent': 1 } }))
   const text = JSON.stringify(report)
   expect('sweep: the report carries no path, session, run or agent id, label, meta description or prompt text', !['child-lanes-', sweepRoot, 'sess-one', 'sess-two', 'wf_run', 'agent-a1', 'a1"', 'secret task', 'Task packet', 'verdict packet'].some((s) => text.includes(s)))
   const script = fileURLToPath(new URL('./child-usage.mjs', import.meta.url))
@@ -286,6 +307,24 @@ try {
   expect('cli: --lanes-sweep prints key-sorted JSON and exits 0', parsed && parsed.kind === 'claude_child_lane_usage' && parsed.children_in_window === 3 && JSON.stringify(Object.keys(parsed)) === JSON.stringify(Object.keys(parsed).sort()))
   expect('cli: a sweep without --root, with a transcript dir, with --require-effort, or --root without --lanes-sweep exits 2', [run('--lanes-sweep'), run('--lanes-sweep', '--root', sweepRoot, 'extra'), run('--lanes-sweep', '--root', sweepRoot, '--require-effort', 'max'), run('--root', sweepRoot, 'dir')].every((r) => r.status === 2))
   expect('cli: a bad or reversed window, an unknown option, a blank marker, a missing --rtk-db or a missing --root exits 2', [run('--lanes-sweep', '--root', sweepRoot, '--since', 'yesterday'), run('--lanes-sweep', '--root', sweepRoot, '--since', '2026-09-26T00:00:00Z', '--until', '2026-09-25T00:00:00Z'), run('--lanes-sweep', '--root', sweepRoot, '--bogus'), run('--lanes-sweep', '--root', sweepRoot, '--marker', ' '), run('--lanes-sweep', '--root', sweepRoot, '--rtk-db', join(sweepRoot, 'missing.db')), run('--lanes-sweep', '--root', join(sweepRoot, 'no-such-dir'))].every((r) => r.status === 2))
+  {
+    // Review finding 1 (2026-09-26): a sweep report larger than a pipe buffer (64 KiB on Linux) lost everything past
+    // it when the sweep called process.exit() after console.log, so a piped reader got invalid JSON.
+    const wide = mkdtempSync(join(tmpdir(), 'child-lanes-wide-'))
+    try {
+      for (let i = 0; i < 120; i++) {
+        const file = join(wide, 'proj', 'sess-' + i, 'subagents', 'agent-w' + i + '.jsonl')
+        mkdirSync(join(file, '..'), { recursive: true })
+        writeFileSync(file, [ask('packet', 20), call('w' + i, 'Bash', { command: 'ls' }, 21, tokens(3, 40, 0))].map((r) => JSON.stringify(r)).join('\n') + '\n')
+        utimesSync(file, written, written)
+        writeFileSync(file.replace(/\.jsonl$/, '.meta.json'), JSON.stringify({ agentType: 'type-' + i }))
+      }
+      const piped = spawnSync(process.execPath, [script, '--lanes-sweep', '--root', wide, '--since', '2026-09-25T17:18:00Z', '--until', '2026-09-26T15:05:00Z'], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+      let whole = null
+      try { whole = JSON.parse(piped.stdout) } catch { whole = null }
+      expect('cli: a --lanes-sweep report larger than a pipe buffer arrives whole through a pipe and exits 0', piped.stdout.length > 65536 && piped.status === 0 && whole !== null && whole.children_in_window === 120)
+    } finally { rmSync(wide, { recursive: true, force: true }) }
+  }
   if (typeof process.getuid === 'function' && process.getuid() !== 0) {
     const locked = join(sweepRoot, 'proj', 'locked')
     mkdirSync(locked)

@@ -127,14 +127,20 @@ native output, it is not an unchanged upstream test and not a synthetic fixture 
   `tools/token-report`'s RTK/Headroom/Context-Mode counters — those measure retrieval and context
   savings on a completely different basis, and the codebase's rule against summing overlapping
   counters applies here too.
-- **Codex sessions that did not load the user config are a different listing state.** A session
-  launched with `--ignore-user-config` (the landscape sweep and blind lanes) lists every installed
-  skill, including the trial's `codex_enabled: false` ones, so its reads are not evidence about the
-  configured listing. The report detects such a session from its own skill catalog as of `--now`
-  (see [Codex lane report](#codex-lane-report---lanes)), leaves its counts out of `counts` and reports
-  them under `excluded_user_config_ignored` per skill, with the number of sessions in
-  `codex.sessions_excluded_user_config_ignored`; `counts` plus the excluded counts is the
-  unsplit total earlier reports gave.
+- **Codex `counts` stay the trial's measurement; two parts of them are broken out beside them.**
+  `counts` holds every rollout record of every session, as the skills trial pins it, and every flag
+  (`zero_on_evaluated_clients`, `prune_eligible`) reads it. Two disjoint parts of it are reported per
+  skill and window and never subtracted from it:
+  `of_which_user_config_ignored`, the own records of sessions that did not load the user config
+  (launched with `--ignore-user-config`, as the landscape sweep and blind lanes are, a session lists
+  every installed skill, the trial's `codex_enabled: false` ones included, so it is a different
+  listing state; the report detects it from the session's own skill catalog as of `--now`, see
+  [Codex lane report](#codex-lane-report---lanes), and counts such sessions in
+  `codex.sessions_user_config_ignored`), and `of_which_copied_from_parent`, the records a spawned
+  sub-agent's rollout copied from its parent (ordinals below `subagent_history_start_ordinal`; the
+  parent's own rollout holds the same records). `counts` minus both parts is the own records of
+  every other session. Whether the trial should compare only within one listing state is the trial
+  owner's rule to record; until then no flag reads the parts.
 - **Codex counts are two distinct signals, never merged.** `skill_md_reads` (a tool/function call
   whose command or arguments named that skill's `SKILL.md`) and `name_mentions` (a user message
   containing `$<name>`) are reported side by side; a prune decision at the trial window treats
@@ -162,6 +168,18 @@ also records whether a developer message carries the injected block's marker (de
 `<context_window_protection>`, the opening tag of Context Mode's routing block; `--marker` for
 another). A spawned sub-agent's rollout begins with records copied from its parent (ordinals below
 `subagent_history_start_ordinal`); they count toward its marker and catalog, never as its calls.
+
+Shell, MCP and fetch counts come from `item_completed` events, an event whose persistence depends
+on the rollout's history mode (`codex-rs/rollout/src/policy.rs`); `response_item` records are
+persisted in every mode. The report therefore gives `sessions_by_history_mode`
+(`session_meta.history_mode`) and `sessions_with_tool_calls_but_no_item_events`, the sessions
+whose own records hold model tool calls but no such event: their shell, MCP and fetch lanes read
+as zero. `ctx_fetch_and_index_share` compares three lanes only (hosted page opens,
+`ctx_fetch_and_index` and remote `curl`/`wget`); a fetch run inside a Context Mode sandbox
+(`ctx_execute` code), a `gh api` call and `fetch()` or an HTTP library in a script are in no lane.
+`curl`/`wget` also counts behind the shell keywords `do`, `then`, `else`, `elif`, `if`, `while`,
+`until`, `!` and `{` and behind `rtk`, `sudo`, `env`, `command`, `exec`, `time`, `nice`, `nohup`
+or `timeout N`.
 
 Sessions that did not load the user config are negative controls, never workers. Rollouts do not
 record `--ignore-user-config` itself, so the report classifies each session by its skill catalog:

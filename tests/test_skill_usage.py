@@ -718,8 +718,9 @@ class CodexLanes(unittest.TestCase):
             "\n".join(json.dumps(record) for record in records) + "\n")
         scan = S.scan_codex_roots([root], self.names, now=S.parse_iso(NOW), windows=(30,),
                                   codex_off=self.codex_off)
-        self.assertEqual(scan["sessions_excluded_user_config_ignored"], 0)
+        self.assertEqual(scan["sessions_user_config_ignored"], 0)
         self.assertEqual(scan["counts"]["tdd"][30]["skill_md_reads"], 1)
+        self.assertEqual(scan["of_which_user_config_ignored"]["tdd"][30]["skill_md_reads"], 0)
 
     def test_files_not_modified_since_the_window_start_are_skipped_unread(self):
         stale = next(self.root.glob("rollout-*-lanes-isolated.jsonl"))
@@ -729,22 +730,108 @@ class CodexLanes(unittest.TestCase):
         self.assertEqual(scan["files_skipped_unmodified"], 1)
         self.assertEqual(scan["user_config"]["ignored"], 0)
 
-    def test_invoke_rate_counts_leave_out_sessions_that_ignored_the_user_config(self):
+    # Review findings 4 and 5 (2026-09-26): the trial pins `counts` as every session's records, so `counts`
+    # stays that measurement and the two parts a within-listing-state comparison would leave out are
+    # broken out beside it, never subtracted from it: own records of sessions that ignored the user
+    # config, and records a spawned sub-agent's rollout copied from its parent.
+    def test_invoke_rate_counts_keep_every_session_and_break_out_two_parts(self):
         now = S.parse_iso(NOW)
         scan = S.scan_codex_roots([self.root], self.names, now=now, windows=(30,), codex_off=self.codex_off)
-        self.assertEqual(scan["sessions_excluded_user_config_ignored"], 1)
-        self.assertEqual(scan["counts"]["tdd"][30]["skill_md_reads"], 1)  # the worker's read
-        self.assertEqual(scan["excluded_counts"]["tdd"][30]["skill_md_reads"], 1)  # the isolated one
+        self.assertEqual(scan["sessions_user_config_ignored"], 1)
+        # tdd SKILL.md reads: the worker's own, the isolated session's own and the one the sub-agent copied.
+        self.assertEqual(scan["counts"]["tdd"][30]["skill_md_reads"], 3)
+        self.assertEqual(scan["of_which_user_config_ignored"]["tdd"][30]["skill_md_reads"], 1)
+        self.assertEqual(scan["of_which_copied_from_parent"]["tdd"][30]["skill_md_reads"], 1)
         report = S.build_report(self.manifest, claude=None, codex_scan=scan, lock_installed_at={},
                                 now=now, windows=(30,))
-        self.assertEqual(report["codex"]["sessions_excluded_user_config_ignored"], 1)
+        self.assertEqual(report["codex"]["sessions_user_config_ignored"], 1)
         tdd = next(entry for entry in report["skills"] if entry["name"] == "tdd")
-        self.assertEqual(tdd["codex"]["counts"]["30"]["skill_md_reads"], 1)
-        self.assertEqual(tdd["codex"]["excluded_user_config_ignored"]["30"]["skill_md_reads"], 1)
-        # Without a codex_off list nothing can be classified, so nothing is left out.
+        self.assertEqual(tdd["codex"]["counts"]["30"]["skill_md_reads"], 3)
+        self.assertEqual(tdd["codex"]["of_which_user_config_ignored"]["30"]["skill_md_reads"], 1)
+        self.assertEqual(tdd["codex"]["of_which_copied_from_parent"]["30"]["skill_md_reads"], 1)
+        # Without a codex_off list no session is classified; counts are the same either way.
         legacy = S.scan_codex_roots([self.root], self.names, now=now, windows=(30,))
-        self.assertEqual((legacy["counts"]["tdd"][30]["skill_md_reads"],
-                          legacy["sessions_excluded_user_config_ignored"]), (2, 0))
+        self.assertEqual((legacy["counts"]["tdd"][30]["skill_md_reads"], legacy["sessions_user_config_ignored"]),
+                         (3, 0))
+
+    def breakout_root(self) -> Path:
+        """A sub-agent rollout that copied a $tdd mention from its parent and adds its own, and a session
+        that ignored the user config (its catalog lists codex_enabled=false grill-me) and is the only
+        reader of codeql's SKILL.md."""
+        root = Path(self.enterContext(tempfile.TemporaryDirectory())) / "breakout"
+        root.mkdir()
+        user = lambda text: {"type": "message", "role": "user", "content": [{"type": "input_text", "text": text}]}
+        rollouts = {
+            "rollout-2026-10-25T06-00-00-sub.jsonl": [
+                {"timestamp": "2026-10-25T06:00:00Z", "type": "session_meta", "ordinal": 0, "payload": {
+                    "id": "sub", "source": {"subagent": {"thread_spawn": {"parent_thread_id": "p", "depth": 1}}},
+                    "subagent_history_start_ordinal": 2}},
+                {"timestamp": "2026-10-25T06:00:01Z", "type": "response_item", "ordinal": 1,
+                 "payload": user("parent: use $tdd here")},
+                {"timestamp": "2026-10-25T06:00:02Z", "type": "response_item", "ordinal": 2,
+                 "payload": user("own: and $tdd again")}],
+            "rollout-2026-10-25T07-00-00-iso.jsonl": [
+                {"timestamp": "2026-10-25T07:00:00Z", "type": "session_meta", "payload": {"id": "iso", "source": "exec"}},
+                {"timestamp": "2026-10-25T07:00:01Z", "type": "response_item", "payload": {
+                    "type": "message", "role": "developer", "content": [{"type": "input_text", "text":
+                    "<skills_instructions>- grill-me (file: /home/example/.agents/skills/grill-me/SKILL.md)"
+                    "</skills_instructions>"}]}},
+                {"timestamp": "2026-10-25T07:01:00Z", "type": "response_item", "payload": {
+                    "type": "function_call", "name": "exec_command", "call_id": "c1",
+                    "arguments": "{\"cmd\": \"cat /home/example/.agents/skills/codeql/SKILL.md\"}"}}],
+        }
+        for name, records in rollouts.items():
+            (root / name).write_text("\n".join(json.dumps(record) for record in records) + "\n")
+        return root
+
+    def test_a_copied_mention_is_counted_and_broken_out_so_the_parts_add_up(self):
+        scan = S.scan_codex_roots([self.breakout_root()], self.names, now=S.parse_iso(NOW), windows=(7, 30),
+                                  codex_off=self.codex_off)
+        for window in (7, 30):
+            self.assertEqual(scan["counts"]["tdd"][window]["name_mentions"], 2)
+            self.assertEqual(scan["of_which_copied_from_parent"]["tdd"][window]["name_mentions"], 1)
+            self.assertEqual(scan["of_which_user_config_ignored"]["tdd"][window]["name_mentions"], 0)
+        for name in self.names:  # each part is inside counts, and the two parts never overlap
+            for window in (7, 30):
+                for metric in ("skill_md_reads", "name_mentions"):
+                    parts = (scan["of_which_user_config_ignored"][name][window][metric]
+                             + scan["of_which_copied_from_parent"][name][window][metric])
+                    self.assertLessEqual(parts, scan["counts"][name][window][metric])
+
+    def test_the_breakout_changes_no_trial_flag(self):
+        # codeql is codex-enabled and read only in the session that ignored the user config: the trial's
+        # measurement counts that read, so codeql is not zero on Codex.
+        now = S.parse_iso(NOW)
+        scan = S.scan_codex_roots([self.breakout_root()], self.names, now=now, windows=(30,), codex_off=self.codex_off)
+        report = S.build_report(self.manifest, claude=None, codex_scan=scan, lock_installed_at={},
+                                now=now, windows=(30,))
+        codeql = next(entry for entry in report["skills"] if entry["name"] == "codeql")
+        self.assertEqual(codeql["codex"]["counts"]["30"]["skill_md_reads"], 1)
+        self.assertEqual(codeql["codex"]["of_which_user_config_ignored"]["30"]["skill_md_reads"], 1)
+        self.assertIs(codeql["zero_on_evaluated_clients"], False)
+        self.assertEqual(report["codex"]["sessions_user_config_ignored"], 1)
+
+    # Review finding 10 (2026-09-26): shell, MCP and fetch lanes come from item_completed events, whose
+    # persistence depends on the rollout's history mode; a session with calls but no such events is shown.
+    def test_history_mode_and_sessions_with_calls_but_no_item_events_are_reported(self):
+        root = Path(self.enterContext(tempfile.TemporaryDirectory())) / "modes"
+        root.mkdir()
+        records = [
+            {"timestamp": "2026-10-20T05:00:00Z", "type": "session_meta",
+             "payload": {"id": "m", "source": "exec", "originator": "codex_exec", "history_mode": "other-mode"}},
+            {"timestamp": "2026-10-20T05:01:00Z", "type": "response_item", "payload": {
+                "type": "function_call", "name": "exec_command", "call_id": "c1", "arguments": "{\"cmd\": \"ls\"}"}},
+        ]
+        rollout = root / "rollout-2026-10-20T05-00-00-modes.jsonl"
+        rollout.write_text("\n".join(json.dumps(record) for record in records) + "\n")
+        written = S.parse_iso("2026-10-22T00:00:00Z").timestamp()
+        os.utime(rollout, (written, written))
+        scan = S.scan_codex_lanes([root, self.root], self.manifest, since=self.since, until=self.until,
+                                  marker=S.DEFAULT_LANES_MARKER)
+        self.assertEqual(scan["sessions_by_history_mode"], {"(none)": 5, "other-mode": 1})
+        self.assertEqual(scan["sessions_with_tool_calls_but_no_item_events"], 1)
+        fixtures_only = self.scan()
+        self.assertEqual(fixtures_only["sessions_with_tool_calls_but_no_item_events"], 0)
 
     def test_fetch_kind_and_shell_script(self):
         self.assertEqual([S.fetch_kind(c) for c in (
@@ -765,6 +852,15 @@ class CodexLanes(unittest.TestCase):
             [None, None, "fetch", "loopback", "fetch", None, "fetch", "fetch", None, "loopback", None, "fetch"])
         self.assertEqual((S.safe_key("codex:codex-cli-runtime"), S.safe_key("/private/x"),
                           S.safe_key("user@example.com")), ("codex:codex-cli-runtime", "(other)", "(other)"))
+        # Review finding 8 (2026-09-26): curl/wget after a shell keyword (the same cases child-usage.mjs pins).
+        self.assertEqual([S.fetch_kind(c) for c in (
+            'for u in a b; do curl -s "$u"; done', "if curl -s https://x.org; then echo ok; fi",
+            "if true; then wget -q https://x.org; fi", "if false; then :; else curl https://x.org; fi",
+            "while ! curl -s http://localhost:9/; do sleep 1; done",
+            "until wget -q http://127.0.0.1:8080/; do sleep 1; done", "{ curl -s https://x.org; }",
+            "time curl -s https://x.org", "nohup curl -s https://x.org &", "echo do curl https://x.org",
+            'git commit -m "then curl https://x.org"', 'printf "%s\\n" if curl')],
+            ["fetch", "fetch", "fetch", "fetch", "loopback", "loopback", "fetch", "fetch", "fetch", None, None, None])
         self.assertEqual(S.shell_script(["bash", "-lc", "rtk ls"]), "rtk ls")
         self.assertEqual(S.shell_script(["ls", "-la"]), "ls -la")
         self.assertEqual(S.shell_script(None), "")
