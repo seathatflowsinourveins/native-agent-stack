@@ -20,9 +20,11 @@ from urllib.parse import quote, urlsplit
 try:
     from .catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
     from .landscape import build_landscape
+    from .host_receipts import review_state
 except ImportError:
     from catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
     from landscape import build_landscape
+    from host_receipts import review_state
 
 
 CONFIG = "docs/ecosystem/manifest.json"
@@ -61,6 +63,24 @@ RETURNED_RECEIPT_FAMILIES = {
     "broad-universe-research", "adaptive-paper-practice",
     "claude-repository-evidence",
 }
+# Hosts allowed onto the public token-efficiency receipts: the WSL authoring laptop (#270,
+# lifetime RTK/Headroom/jCodeMunch/Context Mode counters) and the workstation (#296, 16/16 tools
+# inside Ultracode subagents). This allowlist is not auto-derived from the evidence/hosts/
+# directory listing, so an unrelated host directory can never surface in the published token
+# receipts -- but it is necessary, not sufficient, for build_host_token_receipts's host_acceptance
+# rows: each individual receipt there is also gated on scripts/host_receipts.py's own
+# review_state(receipt) == "agree" (a receipt on an allowed host with no standing independent
+# review, or a standing dissent, still never surfaces). build_host_subagent_e2e_receipts's
+# whole-stack row has no per-receipt review field of its own yet (see its docstring), so for that
+# kind this host allowlist is the only gate today.
+TOKEN_HOST_RECEIPT_HOSTS = ("nativestack-5975wx-20260925", "wsl-authoring-20260923")
+# Kind of the whole-stack, per-tool subagent E2E receipt written under evidence/artifacts/
+# (for example evidence/artifacts/token-e2e-ultracode-20260925/receipt.json): one Sonnet
+# workflow subagent per selected tool did real work, and each tool's own upstream lifetime
+# counter was read immediately before and after. Distinct from host_acceptance (one component x
+# one host x one lifecycle stage, under evidence/hosts/<host_id>/): this kind is host-wide and
+# spans every tool in one file, so it is read separately (build_host_subagent_e2e_receipts).
+TOKEN_STACK_SUBAGENT_E2E_KIND = "token_stack_subagent_e2e"
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
 NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
@@ -323,6 +343,179 @@ def build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url, r
     return {"foundation": foundation, "trading": trading}
 
 
+HOST_RECEIPTS_BOUNDARY = (
+    "Each host_acceptance row below is the latest independently reviewed (review_state agree) "
+    "evidence/hosts/ receipt for one host, one token-efficiency component and one lifecycle "
+    "stage (adoption/host-receipt.schema.json, recorded by scripts/host_receipts.py); a newer "
+    "receipt for that same host/component/stage that is unreviewed or carries a standing "
+    "dissent is simply not shown here. An install-stage receipt observed later than a "
+    "use-stage receipt for the same component never hides the use-stage row, because they are "
+    "different lifecycle stages. Never sum a row's counters across hosts, components/tools or "
+    "stages: a host's own claim and limitations text states what its numbers do and do not "
+    "cover, and a component missing here simply has no independently reviewed receipt on that "
+    "host yet. A separate whole-stack subagent E2E row (kind token_stack_subagent_e2e) covers "
+    "only the tools actually listed in that specific receipt for one host in a single file, not "
+    "necessarily every selected token-efficiency component, each with its own counters and "
+    "scope note; that row's own limitations state whether each counter is scoped to the run or "
+    "host-wide (a missing note is not evidence either way), and its figures are never summed "
+    "across tools, across hosts, or with the per-component host_acceptance rows above.")
+
+
+def build_host_token_receipts(root, host_ids, component_ids, read, file_url):
+    """The latest evidence/hosts/<host_id>/*.json receipt for each (host, token component, stage)
+    triple, restricted to ``host_ids`` (TOKEN_HOST_RECEIPT_HOSTS) and ``component_ids`` (the
+    selected token-efficiency components carried in docs/token-efficiency-stack.json), and
+    further gated on scripts/host_receipts.py's own ``review_state(receipt) == "agree"``: a
+    receipt with no standing independent review, or a standing ``disagree``/``needs_changes``
+    dissent, is excluded even though its host is allowlisted -- and this exclusion runs before
+    the max-observed_at selection below, so "latest" means the latest receipt that already
+    carries an agreed review, not simply the latest observed_at. A newer receipt in the same
+    (host, component, stage) bucket that is unreviewed or carries a standing dissent therefore
+    neither hides, nor is hidden by, the older agreed reading kept here. One row per host x
+    component x stage: this never sums a counter across hosts, components/tools or stages, and a
+    host, component or stage with no matching independently reviewed receipt is simply absent
+    from the result (missing stays visible rather than becoming a manufactured zero or an
+    aggregate)."""
+    latest = {}
+    for host_id in host_ids:
+        host_dir = root / "evidence" / "hosts" / host_id
+        if not host_dir.is_dir():
+            continue
+        for path in sorted(host_dir.glob("*.json")):
+            relative = path.relative_to(root).as_posix()
+            receipt = read(relative)
+            require(isinstance(receipt, dict), "host receipt must be a JSON object: " + relative)
+            component_id = receipt.get("component_id")
+            if component_id not in component_ids:
+                continue
+            host = receipt.get("host") if isinstance(receipt.get("host"), dict) else {}
+            observed_at = receipt.get("observed_at_utc")
+            stage = receipt.get("stage")
+            require(host.get("host_id") == host_id, "host receipt host_id must match its directory: " + relative)
+            require(isinstance(observed_at, str) and bool(observed_at), "host receipt needs observed_at_utc: " + relative)
+            require(receipt.get("kind") == "host_acceptance", "host receipt must declare kind host_acceptance: " + relative)
+            require(isinstance(stage, str) and bool(stage), "host receipt needs a stage: " + relative)
+            if review_state(receipt) != "agree":
+                # The host allowlist (TOKEN_HOST_RECEIPT_HOSTS) is necessary but not sufficient:
+                # this individual receipt has no standing independent "agree" review of its own
+                # (scripts/host_receipts.py review_state), so it never reaches the public page
+                # even though its host directory is allowed.
+                continue
+            # Keyed by (host, component, stage): an `install` receipt observed later than a
+            # `use` receipt for the same component must never hide the `use` row, since they are
+            # different lifecycle stages (scripts/host_receipts.py: "One receipt is one
+            # component x one host x one lifecycle stage"). The review-state filter above already
+            # ran, so only receipts with review_state(receipt) == "agree" ever reach this bucket;
+            # within one (host, component, stage) bucket, picking the max observed_at among those
+            # therefore selects the latest *agreed* generation, not necessarily the latest
+            # generation that exists in host_receipts.py's `--supersedes` chain. A newer
+            # generation that is unreviewed or carries a standing dissent is simply absent from
+            # `latest`, so it neither replaces nor is replaced by the older agreed reading kept
+            # here.
+            key = (host_id, component_id, stage)
+            current = latest.get(key)
+            if current is None or observed_at > current[0]:
+                latest[key] = (observed_at, relative, receipt)
+    rows = []
+    for (host_id, component_id, _stage), (observed_at, relative, receipt) in sorted(latest.items()):
+        rows.append({
+            "id": receipt.get("id"), "host_id": host_id, "component_id": component_id,
+            "component_ids": [component_id], "kind": receipt["kind"],
+            "stage": receipt.get("stage"), "result": receipt.get("result"),
+            "evidence_class": receipt.get("evidence_class"),
+            "observed_at_utc": observed_at, "claim": receipt.get("claim", ""),
+            "limitations": [item for item in receipt.get("limitations", []) if isinstance(item, str)],
+            # docs/ecosystem/template.html's receiptContent() reads this row's own claim,
+            # limitations and observed_at_utc/recorded_at_utc for display (falling back to
+            # record's own fields only for receipt kinds that carry none of their own), so record
+            # is exactly the linked file's parsed content, with nothing added.
+            "record": receipt,
+            "url": file_url(relative), "artifacts": [], "returned_results": False,
+        })
+    return rows
+
+
+def build_host_subagent_e2e_receipts(root, host_ids, read, file_url):
+    """The latest evidence/artifacts/token-e2e-*/receipt.json of kind
+    TOKEN_STACK_SUBAGENT_E2E_KIND for each host in ``host_ids`` (the TOKEN_HOST_RECEIPT_HOSTS
+    allowlist). Unlike build_host_token_receipts's host_acceptance rows, this whole-stack receipt
+    kind has no per-receipt independent-review field of its own, so inclusion here reflects only
+    the host allowlist, not a reviewed verdict on this specific receipt; the glob is narrowed to
+    the ``token-e2e-`` directory-naming convention file_url already relies on, so an unrelated
+    evidence/artifacts/ bundle with its own unrelated receipt.json is never even parsed as a
+    candidate.
+
+    Unlike build_host_token_receipts (one row per host x component x stage, from
+    evidence/hosts/), this whole-stack receipt covers only the tools actually listed in that
+    receipt's own ``tools`` array for one host in a single file -- not necessarily every selected
+    token-efficiency component (docs/token-efficiency-stack.json's full row set can be larger) --
+    so it surfaces as one row per host holding each of those tools' own counters exactly as
+    captured (see the file's own ``counters`` object, each entry keeping its own scope note where
+    it has one, and ``retained_failures_and_gaps``/``evidence_classes`` for what the run did not
+    cover): a workstation subagent-E2E run's own RTK/Headroom/jCodeMunch/Context Mode/ccusage
+    counters never get folded into, or replace, a host's evidence/hosts/ host_acceptance row for
+    the same tool -- both can appear side by side, and neither is summed across hosts or tools."""
+    artifacts_root = root / "evidence" / "artifacts"
+    latest = {}
+    if artifacts_root.is_dir():
+        for path in sorted(artifacts_root.glob("token-e2e-*/receipt.json")):
+            relative = path.relative_to(root).as_posix()
+            receipt = read(relative)
+            require(isinstance(receipt, dict), "artifact receipt must be a JSON object: " + relative)
+            if receipt.get("kind") != TOKEN_STACK_SUBAGENT_E2E_KIND:
+                continue
+            host_id = receipt.get("host_id")
+            if host_id not in host_ids:
+                continue
+            recorded_at = receipt.get("recorded_at_utc")
+            require(isinstance(recorded_at, str) and bool(recorded_at),
+                    TOKEN_STACK_SUBAGENT_E2E_KIND + " receipt needs recorded_at_utc: " + relative)
+            current = latest.get(host_id)
+            if current is None or recorded_at > current[0]:
+                latest[host_id] = (recorded_at, relative, receipt)
+    rows = []
+    for host_id, (recorded_at, relative, receipt) in sorted(latest.items()):
+        component_ids = sorted({tool["component_id"] for tool in receipt.get("tools", [])
+                                 if isinstance(tool, dict) and tool.get("component_id")})
+        row_id = host_id + "--" + TOKEN_STACK_SUBAGENT_E2E_KIND + "--" + recorded_at[:10].replace("-", "")
+        tool_count = len(component_ids)
+        # Every string in the receipt's own retained_failures_and_gaps, plus a labeled note for
+        # each of its evidence_classes entries (for example upstream_counters: "RTK is isolated
+        # to this run by working directory; other counters are host-wide over the window"),
+        # reaches this row's limitations -- not just the generic per-task-token-counts caption
+        # below -- so the receipt's real, dated gaps and scope notes are visible on the page
+        # itself, not only inside the collapsed complete-receipt JSON dump.
+        evidence_classes = receipt.get("evidence_classes")
+        evidence_class_notes = [
+            "Evidence class '%s': %s" % (name, note)
+            for name, note in sorted(evidence_classes.items())
+            if isinstance(note, str) and note
+        ] if isinstance(evidence_classes, dict) else []
+        gaps = [item for item in receipt.get("retained_failures_and_gaps", []) if isinstance(item, str)]
+        rows.append({
+            "id": row_id, "host_id": host_id, "component_ids": component_ids,
+            "kind": receipt["kind"], "recorded_at_utc": recorded_at,
+            "counters": receipt.get("counters", {}),
+            "claim": ("Per-tool upstream counters (see 'counters' in the complete receipt below) captured"
+                      " immediately before and after real Ultracode workflow subagents did work with each"
+                      " of the %d tools listed in this receipt's own 'tools' array (not necessarily every"
+                      " selected token-efficiency component; see this row's limitations for what it does"
+                      " not cover). Every counter keeps its own scope note where it has one; none is"
+                      " summed across tools, across hosts, or with the RTK/Headroom/jCodeMunch/Context"
+                      " Mode/TOON figures elsewhere on this page." % tool_count),
+            "limitations": evidence_class_notes + gaps + [
+                             "Exact-comparison figures are per-task token counts, not provider billing or a"
+                             " lifetime savings claim."],
+            # docs/ecosystem/template.html reads this row's own id/recorded_at_utc/claim/
+            # limitations for display (this receipt kind has no "id" field of its own, unlike a
+            # host_acceptance receipt), so record is exactly the linked file's parsed content,
+            # with nothing added.
+            "record": receipt,
+            "url": file_url(relative), "artifacts": [], "returned_results": False,
+        })
+    return rows
+
+
 def build_data(root):
     documents, inputs = {}, {}
     current_public_paths = set()
@@ -363,6 +556,15 @@ def build_data(root):
         new_practice = path.startswith(("blueprints/native-skill-practice/", "examples/codex-native/agents/semantic-", "examples/claude-native/agents/semantic-"))
         # Artifact bundles that arrived with this packet do not exist at the immutable base.
         new_catalog = new_catalog or path.startswith(("evidence/artifacts/ultracode-token-routing-20260921/", "evidence/artifacts/portable-claude-native-qualification-20260921/", "evidence/artifacts/blind-catalog-convergence-20260921/", "blueprints/blind-catalog-convergence/", "blueprints/memory-lifecycle-probe/", "evidence/artifacts/memory-lifecycle-probe-20260921/", "evidence/receipts/memory-lifecycle-probe-"))
+        # evidence/hosts/<host_id>/ receipts are appended over time by scripts/host_receipts.py and
+        # are not expected to exist at the immutable source_revision snapshot; always resolve them
+        # at publication_ref so the link is never broken by a stale pin.
+        new_catalog = new_catalog or any(path.startswith(f"evidence/hosts/{host_id}/") for host_id in TOKEN_HOST_RECEIPT_HOSTS)
+        # evidence/artifacts/token-e2e-*/receipt.json (build_host_subagent_e2e_receipts) is the
+        # same situation: each dated whole-stack subagent E2E receipt is appended after the
+        # immutable base snapshot, under a directory named by convention rather than one fixed
+        # date, so this checks the naming convention instead of hardcoding today's date.
+        new_catalog = new_catalog or (path.startswith("evidence/artifacts/token-e2e-") and path.endswith("/receipt.json"))
         revision = publication_ref if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or new_practice or path in current_public_paths else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 
@@ -665,6 +867,12 @@ def build_data(root):
                 item["sources"].append({"path": path, "url": file_url(path)})
             topic_rows.append(item)
         token_topic = {**topic_source, "rows": topic_rows, "url": file_url(TOKEN_TOPIC)}
+    token_component_ids = {row["component_id"] for row in token_topic["rows"]}
+    host_token_receipts = build_host_token_receipts(root, TOKEN_HOST_RECEIPT_HOSTS, token_component_ids, read, file_url)
+    host_subagent_e2e_receipts = build_host_subagent_e2e_receipts(root, TOKEN_HOST_RECEIPT_HOSTS, read, file_url)
+    efficiency_receipts = token_receipts + host_token_receipts + host_subagent_e2e_receipts
+    require(len({row["id"] for row in efficiency_receipts}) == len(efficiency_receipts),
+            "duplicate efficiency receipt identity")
     grand_catalogs = build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url, root)
     landscape = None
     if config.get("landscape_manifest"):
@@ -687,9 +895,10 @@ def build_data(root):
                       "stack_scope": stack.get("scope", ""), "audit_scope": saturation.get("scope", ""),
                       "audit_date": stamp(saturation),
                       "missing_audit_count": sum(row["audit_status"] == "missing" for row in selected)},
-            "efficiency": {"comparisons": comparisons, "receipts": token_receipts,
+            "efficiency": {"comparisons": comparisons, "receipts": efficiency_receipts,
                            "counter_policy": saturation.get("counter_policy", {}),
-                           "selection_policy": selection_policy, "topic": token_topic},
+                           "selection_policy": selection_policy, "topic": token_topic,
+                           "host_receipts_boundary": HOST_RECEIPTS_BOUNDARY},
             "inputs": sorted(inputs.values(), key=lambda row: row["path"]), **curated}
 
 

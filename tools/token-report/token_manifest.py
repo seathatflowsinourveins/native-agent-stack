@@ -3,7 +3,7 @@
 import argparse
 import base64
 from contextlib import closing
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import os
@@ -16,7 +16,10 @@ import tempfile
 import tomllib
 import uuid
 import shutil
-from urllib.parse import urlsplit
+import http.client
+import urllib.error
+import urllib.request
+from urllib.parse import urlsplit, urlencode
 
 # Claude Code 2.1.282 defaults: bashOutputMaxChars shows up to 30000 characters of a Bash result inline;
 # longer output is saved to a file and shown as a preview of at most 2000 characters (Rwe=2000).
@@ -586,6 +589,209 @@ def empty_audit():
     return {"operations":[],"coverage":[],"comparisons":[],"provider_pairs":[],
             "provider_runs":[],"headroom":{"fixtures":[]}}
 
+# Native OTel provider-usage denominator (read-only Loki reconciliation), kept entirely
+# separate from Ledger/native counters. code.claude.com/docs/en/monitoring-usage documents the
+# api_request event's query_source attribute ("Subsystem that issued the request, such as
+# repl_main_thread, compact, or a subagent name") and its token-count fields; grafana.com/docs
+# for Loki documents the read-only GET /loki/api/v1/query instant-query endpoint this uses.
+LOKI_API_REQUEST_SELECTOR='{service_name="claude-code"}'
+LOKI_DEFAULT_EXCLUDED_QUERY_SOURCES=("agent_summary",)
+LOKI_QUERY_TIMEOUT_S=20
+
+def loki_last_completed_day(now):
+    """[start, end) of the most recently completed UTC calendar day at `now`: end is the most
+    recent UTC midnight at or before `now`, start is 24h earlier. Always a full day behind, so a
+    still-arriving day's partial totals are never read as if they were complete."""
+    end=now.astimezone(timezone.utc).replace(hour=0,minute=0,second=0,microsecond=0)
+    return end-timedelta(days=1),end
+
+def loki_api_request_query(field):
+    """LogQL for the sum of `field` (an api_request unwrap target such as cache_read_tokens),
+    grouped by query_source, over the 24h ending at the query's `time` parameter. This never
+    filters query_source itself: exclusions (for example agent_summary) are applied afterward in
+    Python, so the raw per-source breakdown stays visible alongside the excluded net total."""
+    return ("sum by (query_source) (sum_over_time("+LOKI_API_REQUEST_SELECTOR+
+            ' | event_name="api_request" | unwrap '+field+"[24h]))")
+
+def loki_instant_query(base_url,query,at,timeout=LOKI_QUERY_TIMEOUT_S):
+    """Read-only GET against Loki's instant-query HTTP API; one bounded request, never a
+    mutation. `at` is evaluated at Loki's documented nanosecond-since-epoch `time` parameter, so
+    the query's own [24h] range selects exactly the last completed day computed by the caller."""
+    params=urlencode({"query":query,"time":str(int(at.timestamp())*1_000_000_000),"direction":"forward"})
+    url=base_url.rstrip("/")+"/loki/api/v1/query?"+params
+    request=urllib.request.Request(url,method="GET")
+    with urllib.request.urlopen(request,timeout=timeout) as response:
+        payload=json.loads(response.read().decode("utf-8"))
+    if not isinstance(payload,dict) or payload.get("status")!="success":
+        raise ValueError("Loki query did not return status success")
+    data=payload.get("data") if isinstance(payload.get("data"),dict) else {}
+    if data.get("resultType")!="vector":
+        raise ValueError("Loki query did not return an instant vector")
+    result=data.get("result")
+    if not isinstance(result,list):
+        raise ValueError("Loki query response is missing its vector result")
+    return result
+
+def loki_instant_query_captured(base_url,query,at,capture_dir,timeout=LOKI_QUERY_TIMEOUT_S):
+    """Same bounded read-only GET as loki_instant_query, but the exact raw response body and a
+    request/response receipt (url, query, time, HTTP status, started/completed, and an artifact()
+    sha256 of the body) are written under `capture_dir` first (mode 0700/0600), exactly like every
+    other native capture in this reporter, so the parsed totals can always be traced back to the
+    literal bytes Loki returned -- even after a later refresh replaces the JSON manifest."""
+    capture_dir=Path(capture_dir)
+    capture_dir.mkdir(mode=0o700)
+    params=urlencode({"query":query,"time":str(int(at.timestamp())*1_000_000_000),"direction":"forward"})
+    url=base_url.rstrip("/")+"/loki/api/v1/query?"+params
+    receipt=dict(url=url,query=query,time_utc=at.strftime("%Y-%m-%dT%H:%M:%SZ"),started_at=now())
+    try:
+        request=urllib.request.Request(url,method="GET")
+        with urllib.request.urlopen(request,timeout=timeout) as response:
+            status=response.status
+            raw=response.read()
+        response_path=capture_dir/"response.json"
+        response_path.write_bytes(raw)
+        response_path.chmod(0o600)
+        receipt.update(completed_at=now(),http_status=status,response=artifact(response_path))
+        write(capture_dir/"receipt.json",json.dumps(receipt,indent=2))
+    except (OSError,ValueError,TypeError,http.client.HTTPException) as exc:
+        # urllib.error.HTTPError (Loki answering with a 4xx/5xx status) is itself an OSError, so
+        # it is already caught above; unlike a plain OSError it also carries the exact status
+        # code and an error body worth keeping, so both are captured here before the generic
+        # str(exc) receipt below (which stays the only record for every other exception, for
+        # example http.client.IncompleteRead on a truncated response).
+        if isinstance(exc,urllib.error.HTTPError):
+            try:
+                error_body=exc.read()
+            except (OSError,ValueError,AttributeError,http.client.HTTPException) as read_exc:
+                # exc.read() reads from the same live HTTPResponse a truncated body would raise
+                # http.client.IncompleteRead from (a HTTPException, not an OSError/ValueError, so
+                # it is listed here explicitly); keep whatever bytes IncompleteRead itself already
+                # captured (its documented `.partial` attribute) rather than discarding them.
+                error_body=getattr(read_exc,"partial",b"") or b""
+            error_path=capture_dir/"error-response.json"
+            error_path.write_bytes(error_body)
+            error_path.chmod(0o600)
+            receipt.update(http_status=exc.code,error_response=artifact(error_path))
+        receipt.update(completed_at=now(),error=str(exc))
+        write(capture_dir/"receipt.json",json.dumps(receipt,indent=2))
+        raise
+    payload=json.loads(raw.decode("utf-8"))
+    if not isinstance(payload,dict) or payload.get("status")!="success":
+        raise ValueError("Loki query did not return status success")
+    data=payload.get("data") if isinstance(payload.get("data"),dict) else {}
+    if data.get("resultType")!="vector":
+        raise ValueError("Loki query did not return an instant vector")
+    result=data.get("result")
+    if not isinstance(result,list):
+        raise ValueError("Loki query response is missing its vector result")
+    return result
+
+def parse_loki_vector_by_label(vector,label):
+    """{label value: summed float value} from a Loki/Prometheus instant-vector result list."""
+    totals={}
+    for entry in vector:
+        if not isinstance(entry,dict):
+            raise ValueError("Loki vector entry must be an object")
+        metric=entry.get("metric") if isinstance(entry.get("metric"),dict) else {}
+        key=metric.get(label) or "unknown"
+        value=entry.get("value")
+        if not(isinstance(value,list) and len(value)==2):
+            raise ValueError("Loki vector entry needs a [time, value] pair")
+        totals[key]=totals.get(key,0)+int(round(float(value[1])))
+    return totals
+
+def provider_usage_denominator(config,issues,now=None,run=None):
+    """Read-only Loki reconciliation for the last completed UTC day: api_request
+    cache_read_tokens summed by query_source. This is a usage denominator, not a savings
+    counter (acceptance-evidence-policy.md: 'Keep actual upstream counters, artifact-size
+    comparisons and provider usage separate'): the result is never written to Ledger and never
+    summed with the rtk/headroom/jcodemunch/context-mode/toon figures above, across hosts, or
+    across days. Skipped cleanly (no network call, no issue recorded) when loki_url is absent,
+    so a host with no Loki configured still refreshes normally. When `run` (this refresh's own
+    capture directory) is given and loki_url is configured, the exact raw response and a request
+    receipt are written under captures/<run>/loki-provider-usage/ (loki_instant_query_captured);
+    a direct caller that passes no `run` (for example a unit test of the reconciliation
+    arithmetic alone) simply skips that capture step."""
+    start,end=loki_last_completed_day(now or datetime.now(timezone.utc))
+    window=dict(start_utc=start.strftime("%Y-%m-%dT%H:%M:%SZ"),end_utc=end.strftime("%Y-%m-%dT%H:%M:%SZ"))
+    window_date=start.strftime("%Y-%m-%d")
+    configured_excluded=config.get("loki_excluded_query_sources")
+    excluded=configured_excluded if configured_excluded is not None else list(LOKI_DEFAULT_EXCLUDED_QUERY_SOURCES)
+    if not(isinstance(excluded,list) and excluded and all(isinstance(x,str) and x for x in excluded)):
+        raise ValueError("loki_excluded_query_sources must be a nonempty list of nonempty strings")
+    # Validated here, next to loki_url and the exclusion list above and before the network try
+    # below, so a malformed reference/tolerance is always a configuration error (refresh()'s
+    # caller labels it "Loki provider-usage configuration: ..."), even when loki_url is absent
+    # or unreachable -- never discovered only on a day Loki happens to answer, and never left to
+    # coexist with a successful net_total and a stale "error" key from an earlier code path.
+    reference_totals=config.get("loki_reference_totals")
+    if reference_totals is not None and not(isinstance(reference_totals,dict) and all(
+            isinstance(k,str) and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}",k)
+            and type(v) is int and v>=0 for k,v in reference_totals.items())):
+        raise ValueError("loki_reference_totals must be a mapping of YYYY-MM-DD date strings to nonnegative integers")
+    tolerance=config.get("loki_reconciliation_tolerance_pct",1.0)
+    if type(tolerance) not in (int,float) or tolerance<0:
+        raise ValueError("loki_reconciliation_tolerance_pct must be a nonnegative number")
+    field="cache_read_tokens"
+    boundary=("Read-only Loki HTTP query (GET /loki/api/v1/query, "+str(LOKI_QUERY_TIMEOUT_S)+"s timeout), api_request "
+      +field+" summed by query_source over the last completed UTC calendar day ("+window["start_utc"]+" to "
+      +window["end_utc"]+"). This is a usage denominator, not a savings counter: never written to this reporter's"
+      " ledger, never summed with the rtk/headroom/jcodemunch/context-mode/toon figures above, with another host,"
+      " or across days. A transcript-based total (for example `ccusage daily --timezone UTC -O -j` for "
+      +window_date+", the same UTC date as this window) excludes "+", ".join(excluded)+" forks and other helper"
+      " query_source values before comparison; only those configured sources are excluded here into net_total --"
+      " other helper query_source values remain in net_total and may explain any residual difference. Both totals"
+      " still describe only this one host's local Loki retention window.")
+    result=dict(configured=False,window=window,excluded_sources=list(excluded),field=field,boundary=boundary)
+    loki_url=config.get("loki_url")
+    if not loki_url:
+        result["boundary"]="loki_url is not configured on this host; no query ran. "+boundary
+        return result
+    if not(isinstance(loki_url,str) and re.match(r"^https?://",loki_url)):
+        raise ValueError("loki_url must be an http(s) URL string")
+    parsed_loki_url=urlsplit(loki_url)
+    try:
+        parsed_loki_url.port  # raises ValueError for a non-numeric or out-of-range port
+    except ValueError as exc:
+        raise ValueError("loki_url has an invalid port: "+str(exc)) from exc
+    if not parsed_loki_url.hostname:
+        raise ValueError("loki_url must include a hostname")
+    query=loki_api_request_query(field)
+    result.update(configured=True,url=loki_url,query=query)
+    try:
+        if run is not None:
+            capture_dir=Path(run)/"loki-provider-usage"
+            # Set before the request (not only on success), so a receipt written under this
+            # exact path -- including one that records only an error, per
+            # loki_instant_query_captured's except clause -- is always traceable from here.
+            result["capture_dir"]=str(capture_dir)
+            vector=loki_instant_query_captured(loki_url,query,end,capture_dir)
+        else:
+            vector=loki_instant_query(loki_url,query,end)
+        by_source=parse_loki_vector_by_label(vector,"query_source")
+        total=sum(by_source.values())
+        excluded_total=sum(value for key,value in by_source.items() if key in excluded)
+        net=total-excluded_total
+        result.update(by_query_source=by_source,total_all_sources=total,
+                      excluded_total=excluded_total,net_total=net)
+        if reference_totals is not None:
+            reference=reference_totals.get(window_date)
+            if reference is None:
+                result["reconciliation"]=dict(status="no reference for "+window_date,
+                  window_date=window_date,timezone="UTC",field=field,available_dates=sorted(reference_totals))
+            else:
+                difference=net-reference
+                pct=(abs(difference)/reference*100) if reference else (0.0 if difference==0 else None)
+                result["reconciliation"]=dict(
+                  window_date=window_date,timezone="UTC",field=field,reference_total=reference,
+                  reference_label=config.get("loki_reference_label") or "configured reference total",
+                  difference=difference,difference_pct=pct,tolerance_pct=tolerance,
+                  within_tolerance=(pct is not None and pct<=tolerance))
+    except (OSError,ValueError,TypeError,KeyError,OverflowError,http.client.HTTPException) as exc:
+        issues.append("Loki provider-usage query: "+str(exc))
+        result["error"]=str(exc)
+    return result
+
 def load_config(path):
     path=Path(path).expanduser().resolve()
     config=json.loads(path.read_text())
@@ -797,13 +1003,24 @@ def refresh(config,context_file=None):
                 component["canonical_receipts"]=[r for r in registry["result"]["receipts"] if component["id"] in r.get("component_ids",[])]
         except (OSError,ValueError,KeyError) as exc:
             issues.append("Canonical acceptance registry: "+str(exc))
+        try:
+            loki_provider_usage=provider_usage_denominator(config,issues,run=run)
+        except (ValueError,OverflowError) as exc:
+            # A malformed loki_* setting (bad URL scheme, empty exclusion list, non-integer
+            # reference total) is a configuration error, not a query failure; catching it here
+            # (rather than letting it propagate out of refresh()) keeps a typo from discarding
+            # the whole report. A real query failure is already turned into an issue inside
+            # provider_usage_denominator itself and never reaches this except.
+            issues.append("Loki provider-usage configuration: "+str(exc))
+            loki_provider_usage=dict(configured=False,error=str(exc),
+                boundary="A loki_* setting is misconfigured, so no query ran: "+str(exc))
         data=dict(schema_version=1,generated_at=now(),state_directory=str(root),database=str(root/"ledger.sqlite3"),
           native=ledger.native_views(),preserved_native_events=ledger.event_totals(),comparisons=ledger.comparisons(),
           context_direct=context_capture,toon=toon_result,commands=commands,audit=audit,
           catalog=index,stack=stack,gaps=gaps,issues=issues,configuration=config,
           coverage_matrix=matrix,repository_coverage=repository_coverage(index,matrix),project_counters=projects,
           additional_evidence=extra,dollar_explanation=dollar_explanation(context_capture),
-          hook_inventory=hooks,
+          hook_inventory=hooks,loki_provider_usage=loki_provider_usage,
           scope=str(len(stack["components"]))+" selected stack components plus explicit support runtimes; catalog research coverage is separate. No exact full-PC lifetime provider saving is established.",
           setup={"refresh_command":config.get("refresh_command","python3 tools/token-report/token_manifest.py refresh --config YOUR_CONFIG.json"),"native_hooks":"No client configuration, hooks, telemetry exporter or scheduler is installed by this reporter.",
                  "history":"Append-only local snapshots and deduplicated native events preserve observations across sessions. Missing/expired records cannot be reconstructed. Refresh within source retention windows.",

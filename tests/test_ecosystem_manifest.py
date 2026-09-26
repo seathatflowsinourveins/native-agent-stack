@@ -281,6 +281,100 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
         self.assertEqual(resolved[7], "about:blank", "file: URI must not pass through")
         self.assertEqual(resolved[8], "about:blank", "mailto: URI must not pass through")
 
+    @unittest.skipUnless(shutil.which("node"), "receiptContent render check needs Node")
+    def test_receipt_content_shows_row_level_claim_and_limitations_not_only_the_record(self):
+        """Finding: receiptContent() used to read claim/limitations/date only from
+        `item.record` (the linked receipt.json's own parsed content). The whole-stack
+        subagent E2E row's linked file has none of those keys, so it rendered the generic
+        placeholder with no limitations even though build_ecosystem.py already computed a
+        real claim and limitations for that row. Execute the real, committed `receiptContent`
+        (and its real helpers) under Node, not a reimplementation."""
+        template = (ROOT / "docs/ecosystem/template.html").read_text()
+
+        def extract(pattern, flags=0):
+            match = re.search(pattern, template, flags)
+            self.assertIsNotNone(match, pattern)
+            return match.group(0)
+
+        helpers = "".join([
+            extract(r"const stringify = .*?;\n"), extract(r"const codeBlock = .*?;\n"),
+            extract(r"const make = .*?;\n"), extract(r"const add = .*?;\n"),
+            extract(r"const safeHref = .*?;\n"), extract(r"const link = .*?;\n"),
+            extract(r"function listLimits\(.*?\}\n"),
+            extract(r"function receiptContent\(.*?^\}", re.S | re.M) + "\n",
+        ])
+        harness = helpers + r'''
+const location = {href: "https://catalog.example/page"};
+const setup = {components: []};
+function makeNode(tag) {
+  return {tagName: tag, className: "", textContent: "", children: [],
+    appendChild(child) { this.children.push(child); return child; }};
+}
+const document = {createElement: makeNode};
+function allText(node) {
+  return [node.textContent || "", ...node.children.map(allText)].join(" | ");
+}
+const cases = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
+const out = {};
+for (const [label, item] of Object.entries(cases)) {
+  const root = document.createElement("div");
+  receiptContent(root, item);
+  out[label] = allText(root);
+}
+process.stdout.write(JSON.stringify(out));
+'''
+        cases = {
+            "e2e_row_without_claim_or_limitations_in_its_record": {
+                "kind": "token_stack_subagent_e2e", "component_ids": [],
+                "recorded_at_utc": "2026-09-25T21:15:10Z",
+                "claim": "ROW LEVEL CLAIM TEXT FROM BUILD_ECOSYSTEM",
+                "limitations": ["ROW LEVEL LIMITATION TEXT FROM BUILD_ECOSYSTEM"],
+                "record": {"schema_version": 1, "kind": "token_stack_subagent_e2e",
+                           "host_id": "nativestack-5975wx-20260925",
+                           "recorded_at_utc": "2026-09-25T21:15:10Z", "counters": {}},
+                "url": "https://example.test/receipt-e2e", "artifacts": [], "returned_results": False,
+            },
+            "family_receipt_without_row_level_fields_falls_back_to_its_record": {
+                "kind": "historical_inventory", "component_ids": [],
+                "record": {"id": "x", "recorded_at_utc": "2026-09-20T00:00:00Z",
+                           "claim": "RECORD LEVEL CLAIM TEXT", "limitations": ["RECORD LEVEL LIMITATION TEXT"]},
+                "url": "https://example.test/receipt-family", "artifacts": [], "returned_results": False,
+            },
+        }
+        result = subprocess.run(["node", "-e", harness], input=json.dumps(cases),
+                                capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        rendered = json.loads(result.stdout)
+        e2e_text = rendered["e2e_row_without_claim_or_limitations_in_its_record"]
+        self.assertIn("ROW LEVEL CLAIM TEXT FROM BUILD_ECOSYSTEM", e2e_text)
+        self.assertIn("ROW LEVEL LIMITATION TEXT FROM BUILD_ECOSYSTEM", e2e_text)
+        self.assertNotIn("Inspect the returned record below", e2e_text)
+        family_text = rendered["family_receipt_without_row_level_fields_falls_back_to_its_record"]
+        self.assertIn("RECORD LEVEL CLAIM TEXT", family_text)
+        self.assertIn("RECORD LEVEL LIMITATION TEXT", family_text)
+
+    @unittest.skipUnless(shutil.which("node"), "host_receipts_boundary render check needs Node")
+    def test_host_receipts_boundary_statement_renders_the_efficiency_boundary_text(self):
+        """Finding: `data.efficiency.host_receipts_boundary` existed only in the embedded JSON,
+        never rendered above #token-receipts. Execute the real, committed assignment statement
+        under Node, not a reimplementation, against a stubbed `$`/`data`."""
+        template = (ROOT / "docs/ecosystem/template.html").read_text()
+        self.assertIn('id="host-receipts-boundary"', template)
+        match = re.search(
+            r'\$\("host-receipts-boundary"\)\.textContent = data\.efficiency\.host_receipts_boundary;\n',
+            template)
+        self.assertIsNotNone(match, "host-receipts-boundary render statement not found in template.html")
+        harness = r'''
+const node = {textContent: ""};
+const $ = id => { if (id !== "host-receipts-boundary") throw Error("unexpected id " + id); return node; };
+const data = {efficiency: {host_receipts_boundary: "BOUNDARY TEXT FIXTURE"}};
+''' + match.group(0) + r'''
+process.stdout.write(JSON.stringify(node.textContent));
+'''
+        result = subprocess.run(["node", "-e", harness], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout), "BOUNDARY TEXT FIXTURE")
+
     def test_useful_execution_requires_a_linked_receipt_and_keeps_limits(self):
         self.evidence["receipts"][0].update(kind="native_cli_e2e", claim="Exact query returned",
                                              limitations=["One historical fixture only"])
@@ -691,6 +785,320 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
         result = self.run_generator("--write")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("must be selected and unique", result.stdout)
+
+    def write_token_topic_row(self, component_id="search"):
+        self.write("docs/token-efficiency-stack.json", {"schema_version": 1, "scope": "Dated topic evidence",
+            "rows": [{"component_id": component_id, "group": "core", "purpose": "Find exact source",
+                      "upstream_commands": {"use": "search --native"},
+                      "returned_result_summary": "Exact source returned",
+                      "session_statistics": {"value": None, "summary": "Not provided by upstream"},
+                      "lifetime_statistics": {"value": None, "summary": "No cumulative savings counter"},
+                      "baseline_summary": "Baseline retained", "baseline_tokens_removed": 0,
+                      "lifecycle_summary": "Existing dated acceptance",
+                      "source_paths": ["evidence/history.json"]}]})
+
+    def write_host_receipt(self, host_id, component_id, identifier, observed_at, claim="Retained savings observed",
+                           kind="host_acceptance", host_id_field=None, limitations=None, stage="use",
+                           reviews=None):
+        # Defaults to a well-formed independent "agree" review (a differing reviewer identity,
+        # a valid at_utc not older than observed_at) alongside the record-time self review, so
+        # scripts/host_receipts.py review_state(...) == "agree" by default, matching every real
+        # evidence/hosts/ receipt build_host_token_receipts selects today. Pass `reviews`
+        # explicitly to exercise an unreviewed or dissenting receipt instead.
+        self_and_independent_agree = [
+            {"kind": "self", "ref": "x", "verdict": "agree", "at_utc": observed_at},
+            {"kind": "independent_session", "reviewer": {"identity_sha256": "2" * 64},
+             "verdict": "agree", "at_utc": observed_at}]
+        path = "evidence/hosts/%s/%s.json" % (host_id, identifier)
+        self.write(path, {"schema_version": 1, "id": identifier, "kind": kind,
+            "host": {"host_id": host_id_field if host_id_field is not None else host_id,
+                     "platform_id": "linux-wsl2-x86_64", "os": "linux", "architecture": "x86_64",
+                     "second_physical_machine": False},
+            "catalog_revision": "a" * 40, "component_id": component_id, "stage": stage,
+            "commands": [{"cmd": "search --native", "exit": 0, "duration_s": 0.01,
+                          "output_sha256": "b" * 64, "output_excerpt": "ok"}],
+            "tool_versions": {component_id: "1.0"}, "observed_at_utc": observed_at, "result": "pass",
+            "claim": claim, "limitations": limitations if limitations is not None else
+            ["Counts this host only; may not be summed with another host or tool's counter."],
+            "evidence_class": "native_proven", "recorded_by": {"identity_sha256": "1" * 64},
+            "reviews": reviews if reviews is not None else self_and_independent_agree})
+        return path
+
+    def write_subagent_e2e_receipt(self, host_id, recorded_at_utc, tools=("rtk",), directory=None,
+                                   counters=None, retained_failures_and_gaps=None, evidence_classes=None):
+        directory = directory or ("token-e2e-fixture-" + host_id)
+        path = "evidence/artifacts/%s/receipt.json" % directory
+        payload = {"schema_version": 1, "kind": "token_stack_subagent_e2e", "host_id": host_id,
+            "recorded_at_utc": recorded_at_utc, "catalog_revision": "a" * 40,
+            "question": "Fixture question", "method": ["Fixture method"],
+            "tools": [{"tool": tool, "component_id": tool, "channel": "CLI",
+                       "worked_in_subagent": True, "task": "Fixture task",
+                       "answer_excerpt": "ok", "quality_check": {"passed": True, "output": "PASS"},
+                       "upstream_stats_reported_by_worker": "{}", "attempts": []} for tool in tools],
+            "counters": counters if counters is not None else {"rtk_gain_global_all_sessions": {
+                "before": {"total_saved": 10790973}, "after": {"total_saved": 10896793},
+                "note": "Host-wide lifetime counter; other live sessions ran commands in the same window."}}}
+        if retained_failures_and_gaps is not None:
+            payload["retained_failures_and_gaps"] = retained_failures_and_gaps
+        if evidence_classes is not None:
+            payload["evidence_classes"] = evidence_classes
+        self.write(path, payload)
+        return path
+
+    def test_host_token_receipts_render_latest_per_host_and_component_without_totals(self):
+        self.write_token_topic_row("search")
+        older = self.write_host_receipt("wsl-authoring-20260923", "search",
+            "wsl-authoring-20260923--search--use--20260925", "2026-09-25T18:31:58Z",
+            claim="Older generation reading")
+        newer = self.write_host_receipt("wsl-authoring-20260923", "search",
+            "wsl-authoring-20260923--search--use--20260925-2", "2026-09-25T18:58:47Z",
+            claim="Newer generation reading, supersedes the first")
+        self.write_host_receipt("wsl-authoring-20260923", "unselected-tool",
+            "wsl-authoring-20260923--unselected-tool--use--20260925", "2026-09-25T19:00:00Z")
+        workstation = self.write_host_receipt("nativestack-5975wx-20260925", "search",
+            "nativestack-5975wx-20260925--search--use--20260925", "2026-09-25T20:00:00Z",
+            claim="Workstation reading")
+        page, _ = self.build()
+        data = json.loads(page.data)
+        host_rows = [row for row in data["efficiency"]["receipts"] if "host_id" in row]
+        by_host = {row["host_id"]: row for row in host_rows}
+        self.assertEqual(set(by_host), {"wsl-authoring-20260923", "nativestack-5975wx-20260925"})
+        laptop = by_host["wsl-authoring-20260923"]
+        self.assertEqual(laptop["observed_at_utc"], "2026-09-25T18:58:47Z")
+        self.assertEqual(laptop["claim"], "Newer generation reading, supersedes the first")
+        self.assertEqual(laptop["component_id"], "search")
+        self.assertIn("/blob/main/" + newer, laptop["url"])
+        self.assertNotIn("/blob/" + "a" * 40 + "/", laptop["url"])
+        workstation_row = by_host["nativestack-5975wx-20260925"]
+        self.assertEqual(workstation_row["claim"], "Workstation reading")
+        self.assertIn("/blob/main/" + workstation, workstation_row["url"])
+        # The older generation and the unselected-component receipt never surface as rows.
+        ids = {row["id"] for row in data["efficiency"]["receipts"]}
+        self.assertNotIn("wsl-authoring-20260923--search--use--20260925", ids)
+        self.assertNotIn("wsl-authoring-20260923--unselected-tool--use--20260925", ids)
+        # A boundary caption is present and never invents a cross-host or cross-tool total.
+        boundary = data["efficiency"]["host_receipts_boundary"]
+        self.assertIn("Never sum", boundary)
+        for row in host_rows:
+            self.assertEqual(row["component_ids"], [row["component_id"]])
+            self.assertFalse(row["returned_results"])
+            self.assertEqual(row["artifacts"], [])
+            self.assertIn("may not be summed", " ".join(row["limitations"]))
+            # The public template's receiptContent() reads this row's own observed_at_utc/
+            # claim/limitations for display; record is exactly the linked file's parsed
+            # content, with nothing added (no page-injected recorded_at_utc alias).
+            self.assertNotIn("recorded_at_utc", row["record"])
+            self.assertEqual(row["record"]["observed_at_utc"], row["observed_at_utc"])
+        self.assertIn(older, [r["path"] for r in data["inputs"]])  # still hashed, even though superseded
+
+    def test_host_token_receipts_absent_when_no_host_directory_or_topic(self):
+        page, _ = self.build()
+        data = json.loads(page.data)
+        self.assertFalse(any("host_id" in row for row in data["efficiency"]["receipts"]))
+        self.assertIn("Never sum", data["efficiency"]["host_receipts_boundary"])
+
+    def test_host_token_receipt_host_id_must_match_its_directory(self):
+        self.write_token_topic_row("search")
+        self.write_host_receipt("wsl-authoring-20260923", "search",
+            "wsl-authoring-20260923--search--use--20260925", "2026-09-25T18:31:58Z",
+            host_id_field="nativestack-5975wx-20260925")
+        result = self.run_generator("--write")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("host_id must match its directory", result.stdout)
+
+    def test_host_token_receipt_id_cannot_collide_with_a_registered_evidence_receipt(self):
+        self.write_token_topic_row("search")
+        path = self.write_host_receipt("wsl-authoring-20260923", "search",
+            "wsl-authoring-20260923--search--use--20260925", "2026-09-25T18:31:58Z")
+        # Already registered in setUp() via TOKEN_RECEIPTS; force the host receipt's own "id"
+        # field to collide with it (the id inside the file, not just its filename, is what
+        # build_ecosystem.py's duplicate check compares).
+        payload = json.loads((self.root / path).read_text())
+        payload["id"] = self.token_ids[0]
+        self.write(path, payload)
+        result = self.run_generator("--write")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("duplicate efficiency receipt identity", result.stdout)
+
+    def test_host_token_receipts_keep_a_later_stage_beside_an_earlier_one(self):
+        # A later `install` receipt must never hide an earlier `use` receipt for the same
+        # (host, component): they are different lifecycle stages and both remain visible.
+        self.write_token_topic_row("search")
+        self.write_host_receipt("wsl-authoring-20260923", "search",
+            "wsl-authoring-20260923--search--use--20260925", "2026-09-25T16:35:09Z",
+            claim="Use-stage reading", stage="use")
+        self.write_host_receipt("wsl-authoring-20260923", "search",
+            "wsl-authoring-20260923--search--install--20260925", "2026-09-25T19:02:21Z",
+            claim="Install-stage reading, observed later", stage="install")
+        page, _ = self.build()
+        data = json.loads(page.data)
+        rows = [row for row in data["efficiency"]["receipts"] if row.get("host_id") == "wsl-authoring-20260923"]
+        by_stage = {row["stage"]: row for row in rows}
+        self.assertEqual(set(by_stage), {"use", "install"})
+        self.assertEqual(by_stage["use"]["claim"], "Use-stage reading")
+        self.assertEqual(by_stage["install"]["claim"], "Install-stage reading, observed later")
+
+    def test_host_token_receipts_show_the_latest_agreed_receipt_not_a_newer_dissented_one(self):
+        # Finding: the review-state filter runs before the per-bucket max-observed_at selection,
+        # so within one (host, component, stage) bucket "latest" means the latest *agreed*
+        # receipt, not simply the latest observed_at. A newer generation that stands dissented
+        # (or is not yet reviewed) must not make the whole bucket disappear -- the older, already
+        # agreed reading stays visible, matching behaviour (b) in the fix note.
+        self.write_token_topic_row("search")
+        self.write_host_receipt("wsl-authoring-20260923", "search",
+            "wsl-authoring-20260923--search--use--20260925-agreed", "2026-09-25T16:00:00Z",
+            claim="Older agreed generation")
+        self.write_host_receipt("wsl-authoring-20260923", "search",
+            "wsl-authoring-20260923--search--use--20260925-dissented", "2026-09-25T19:00:00Z",
+            claim="Newer generation, standing dissent",
+            reviews=[{"kind": "self", "ref": "x", "verdict": "agree", "at_utc": "2026-09-25T19:00:00Z"},
+                     {"kind": "independent_session", "reviewer": {"identity_sha256": "2" * 64},
+                      "verdict": "disagree", "at_utc": "2026-09-25T19:00:00Z"}])
+        page, _ = self.build()
+        data = json.loads(page.data)
+        rows = [row for row in data["efficiency"]["receipts"] if row.get("host_id") == "wsl-authoring-20260923"]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["claim"], "Older agreed generation")
+
+    def test_host_subagent_e2e_receipt_adds_its_own_row_beside_host_acceptance_receipts(self):
+        # A22's acceptance: the laptop and workstation RTK counters must show as separate rows.
+        self.write_token_topic_row("search")
+        self.write_host_receipt("wsl-authoring-20260923", "search",
+            "wsl-authoring-20260923--search--use--20260925", "2026-09-25T18:58:47Z",
+            claim="Laptop host_acceptance reading")
+        e2e_path = self.write_subagent_e2e_receipt("nativestack-5975wx-20260925", "2026-09-25T21:15:10Z",
+            tools=("rtk", "headroom"))
+        page, _ = self.build()
+        data = json.loads(page.data)
+        laptop_rows = [row for row in data["efficiency"]["receipts"] if row.get("host_id") == "wsl-authoring-20260923"]
+        workstation_rows = [row for row in data["efficiency"]["receipts"]
+                            if row.get("host_id") == "nativestack-5975wx-20260925"]
+        self.assertEqual(len(laptop_rows), 1)
+        self.assertEqual(laptop_rows[0]["kind"], "host_acceptance")
+        self.assertEqual(len(workstation_rows), 1)
+        workstation = workstation_rows[0]
+        self.assertEqual(workstation["kind"], "token_stack_subagent_e2e")
+        self.assertEqual(set(workstation["component_ids"]), {"rtk", "headroom"})
+        self.assertEqual(
+            workstation["counters"]["rtk_gain_global_all_sessions"]["after"]["total_saved"], 10896793)
+        self.assertIn("/blob/main/" + e2e_path, workstation["url"])
+        # record is exactly the linked file's parsed content: this receipt kind has no "id"
+        # field of its own, and none is injected; the page reads workstation["id"] instead.
+        self.assertNotIn("id", workstation["record"])
+        self.assertEqual(workstation["record"]["recorded_at_utc"], "2026-09-25T21:15:10Z")
+        # Never sum: the underlying file's own counters are preserved verbatim, not combined
+        # with the laptop's host_acceptance row or with any other host.
+        self.assertEqual(workstation["record"]["counters"]["rtk_gain_global_all_sessions"]["before"]["total_saved"],
+                          10790973)
+
+    def test_host_subagent_e2e_receipt_limitations_come_from_its_own_gaps_and_evidence_classes(self):
+        # Finding: the row's claim/limitations used to be two generic hard-coded strings,
+        # including "Host-wide unless a counter's own note says otherwise" -- wrong for a counter
+        # like rtk_gain_e2e_worktree_only, which is run-scoped and carries no note at all -- and
+        # the claim said the receipt covers "every selected tool" even though a real receipt
+        # (evidence/artifacts/token-e2e-ultracode-20260925/receipt.json) lists only 16 of the 24
+        # selected token-efficiency components. This pins both fixes against a realistic fixture,
+        # not a synthetic render-only string.
+        self.write_token_topic_row("search")
+        gaps = ["Codex workers were not run: `codex exec` returned the account usage limit.",
+                "OmniRoute was not exercised: it needs a provider credential, a user decision."]
+        evidence_classes = {
+            "upstream_counters": ("upstream_estimate: each tool's own accounting; RTK is isolated to this run"
+                                  " by working directory; other counters are host-wide over the window"),
+            "consumption": "provider-returned usage per child (child-usage.mjs)",
+        }
+        e2e_path = self.write_subagent_e2e_receipt(
+            "nativestack-5975wx-20260925", "2026-09-25T21:15:10Z", tools=("rtk", "headroom"),
+            counters={"rtk_gain_e2e_worktree_only": {"before": {"total_saved": 0}, "after": {"total_saved": 56527}}},
+            retained_failures_and_gaps=gaps, evidence_classes=evidence_classes)
+        page, _ = self.build()
+        data = json.loads(page.data)
+        row = next(row for row in data["efficiency"]["receipts"] if row["kind"] == "token_stack_subagent_e2e")
+        self.assertIn(e2e_path, row["url"])
+        # (1) Coverage: the claim names the actual tool count from this receipt (2), never an
+        # unqualified "every selected tool" / "each selected tool" claim.
+        self.assertIn("2 tools listed in this receipt", row["claim"])
+        self.assertNotIn("every selected tool", row["claim"])
+        self.assertNotIn("each selected tool", row["claim"])
+        # (2) Scope: the boundary text never asserts a default direction for an unnoted counter.
+        boundary = data["efficiency"]["host_receipts_boundary"]
+        self.assertNotIn("host-wide unless a counter's own note says otherwise", boundary)
+        self.assertNotIn("every selected tool", boundary)
+        # (3) Real limitations: every retained_failures_and_gaps string and the evidence_classes
+        # notes reach row["limitations"], not only the collapsed complete-receipt JSON dump.
+        joined = " ".join(row["limitations"])
+        for gap in gaps:
+            self.assertIn(gap, joined)
+        self.assertIn(evidence_classes["upstream_counters"], joined)
+        self.assertIn(evidence_classes["consumption"], joined)
+
+    def test_host_subagent_e2e_receipt_without_gaps_or_evidence_classes_still_has_limitations(self):
+        # Backward compatibility: a receipt with neither field (the existing fixture default,
+        # and any older real receipt) must still render a non-empty, accurate limitations list.
+        self.write_token_topic_row("search")
+        self.write_subagent_e2e_receipt("nativestack-5975wx-20260925", "2026-09-25T21:15:10Z", tools=("rtk",))
+        page, _ = self.build()
+        data = json.loads(page.data)
+        row = next(row for row in data["efficiency"]["receipts"] if row["kind"] == "token_stack_subagent_e2e")
+        self.assertTrue(row["limitations"])
+        self.assertIn("per-task token counts", " ".join(row["limitations"]))
+        self.assertIn("1 tools listed in this receipt", row["claim"])
+
+    def test_host_subagent_e2e_receipt_ignores_unlisted_host_and_wrong_kind_and_keeps_latest(self):
+        self.write_token_topic_row("search")
+        # Unlisted host: never surfaces even though the file is well formed.
+        self.write_subagent_e2e_receipt("some-other-host-20260101", "2026-09-25T21:15:10Z",
+            directory="token-e2e-other-host")
+        # Wrong kind: a receipt.json under evidence/artifacts/ that isn't this kind is ignored.
+        self.write(
+            "evidence/artifacts/token-e2e-wrong-kind/receipt.json",
+            {"schema_version": 1, "kind": "historical_inventory", "host_id": "nativestack-5975wx-20260925",
+             "recorded_at_utc": "2026-09-25T21:15:10Z"})
+        older = self.write_subagent_e2e_receipt("nativestack-5975wx-20260925", "2026-09-25T20:00:00Z",
+            directory="token-e2e-older", counters={"rtk_gain_global_all_sessions": {
+                "before": {"total_saved": 1}, "after": {"total_saved": 2}}})
+        newer = self.write_subagent_e2e_receipt("nativestack-5975wx-20260925", "2026-09-25T21:15:10Z",
+            directory="token-e2e-newer", counters={"rtk_gain_global_all_sessions": {
+                "before": {"total_saved": 10790973}, "after": {"total_saved": 10896793}}})
+        page, _ = self.build()
+        data = json.loads(page.data)
+        rows = [row for row in data["efficiency"]["receipts"] if row["kind"] == "token_stack_subagent_e2e"]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["host_id"], "nativestack-5975wx-20260925")
+        self.assertEqual(rows[0]["recorded_at_utc"], "2026-09-25T21:15:10Z")
+        self.assertIn("/blob/main/" + newer, rows[0]["url"])
+        self.assertNotIn("/blob/main/" + older, rows[0]["url"])
+
+    def test_host_token_receipt_without_independent_review_never_surfaces_on_an_allowed_host(self):
+        # The host allowlist (TOKEN_HOST_RECEIPT_HOSTS) is necessary but not sufficient: a
+        # receipt with only a "self" review, or with a standing dissent, must never surface
+        # even though its host directory is allowed.
+        self.write_token_topic_row("search")
+        self.write_host_receipt("wsl-authoring-20260923", "search",
+            "wsl-authoring-20260923--search--use--20260925", "2026-09-25T18:31:58Z",
+            reviews=[{"kind": "self", "ref": "x", "verdict": "agree", "at_utc": "2026-09-25T18:31:58Z"}])
+        self.write_host_receipt("nativestack-5975wx-20260925", "search",
+            "nativestack-5975wx-20260925--search--use--20260925", "2026-09-25T20:00:00Z",
+            reviews=[{"kind": "self", "ref": "x", "verdict": "agree", "at_utc": "2026-09-25T20:00:00Z"},
+                     {"kind": "independent_session", "reviewer": {"identity_sha256": "2" * 64},
+                      "verdict": "disagree", "at_utc": "2026-09-25T20:00:00Z"}])
+        page, _ = self.build()
+        data = json.loads(page.data)
+        self.assertFalse(any("host_id" in row for row in data["efficiency"]["receipts"]))
+
+    def test_host_subagent_e2e_receipt_glob_is_narrowed_to_the_naming_convention(self):
+        # A receipt.json of the right kind and an allowed host, but under a directory that does
+        # not follow the token-e2e- naming convention file_url() relies on, must never surface:
+        # build_data() would otherwise resolve its published link at the immutable
+        # source_revision, where such a late-appended directory does not exist.
+        self.write_token_topic_row("search")
+        self.write("evidence/artifacts/unrelated-bundle-20260925/receipt.json",
+            {"schema_version": 1, "kind": "token_stack_subagent_e2e",
+             "host_id": "nativestack-5975wx-20260925", "recorded_at_utc": "2026-09-25T21:15:10Z",
+             "catalog_revision": "a" * 40, "question": "q", "method": ["m"], "tools": [], "counters": {}})
+        page, _ = self.build()
+        data = json.loads(page.data)
+        self.assertFalse(any(row["kind"] == "token_stack_subagent_e2e" for row in data["efficiency"]["receipts"]))
 
     def grand_catalog_fixture(self):
         self.config["grand_catalogs"] = {
