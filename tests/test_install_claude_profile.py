@@ -197,6 +197,87 @@ class ShippedAgentEffortTests(unittest.TestCase):
                     self.assertNotEqual(effort_lines, ["effort: max"])
 
 
+class ShippedAgentFrontmatterTests(unittest.TestCase):
+    """Every shipped agent uses only documented subagent frontmatter fields and values, and names
+    an explicit model beside its effort (the repository rule: effort max with an explicit model).
+
+    Source: the "Frontmatter reference" table of https://code.claude.com/docs/en/sub-agents, read
+    2026-09-26 against Claude Code 2.1.283. Claude Code ignores a field it does not recognize
+    without an error, and `claude plugin validate --strict` 2.1.283 passed an agents directory
+    holding an unknown field and unparseable YAML (evidence/artifacts/skills-agents-layer-20260926),
+    so a misspelled key such as ``omitClaudeMD`` would silently drop its setting; this is the check
+    that sees it. A field added to the docs later belongs in DOCUMENTED_FIELDS before an agent uses it.
+    """
+
+    DOCUMENTED_FIELDS = frozenset({
+        "name", "description", "tools", "disallowedTools", "model", "permissionMode", "maxTurns",
+        "skills", "mcpServers", "hooks", "memory", "background", "omitClaudeMd", "effort",
+        "isolation", "color", "initialPrompt", "experimental"})
+    MODEL_ALIASES = frozenset({"sonnet", "opus", "haiku", "fable"})
+    ENUMS = {
+        "permissionMode": {"default", "acceptEdits", "auto", "dontAsk", "bypassPermissions", "plan", "manual"},
+        "memory": {"user", "project", "local"},
+        "effort": {"low", "medium", "high", "xhigh", "max"},
+        "isolation": {"worktree"},
+        "color": {"red", "blue", "green", "yellow", "purple", "orange", "pink", "cyan"},
+        "background": {"true", "false"},
+        "omitClaudeMd": {"true", "false"},
+    }
+
+    @staticmethod
+    def top_level_fields(path: Path) -> dict[str, str]:
+        """Column-0 ``key: value`` lines of the frontmatter (list items and nested maps are
+        indented and belong to the key above them)."""
+        lines = path.read_text(encoding="utf-8").splitlines()
+        if not lines or lines[0] != "---" or "---" not in lines[1:]:
+            return {}
+        fields: dict[str, str] = {}
+        for line in lines[1:lines.index("---", 1)]:
+            if line[:1].isalpha():
+                key, _, value = line.partition(":")
+                fields[key.strip()] = value.strip()
+        return fields
+
+    def problems(self, path: Path) -> list[str]:
+        fields = self.top_level_fields(path)
+        found = [f"undocumented field {key!r}" for key in sorted(set(fields) - self.DOCUMENTED_FIELDS)]
+        for key in ("name", "description", "model"):
+            if not fields.get(key):
+                found.append(f"missing {key}")
+        name = fields.get("name", "")
+        if ":" in name or name.startswith("-"):
+            found.append("name must not contain ':' or start with '-'")
+        model = fields.get("model", "")
+        if model and model not in self.MODEL_ALIASES and not model.startswith("claude-"):
+            found.append(f"model {model!r} is neither an alias nor a full model ID (inherit is not explicit)")
+        for key, allowed in self.ENUMS.items():
+            if key in fields and fields[key] not in allowed:
+                found.append(f"{key} value {fields[key]!r} is not documented")
+        if "maxTurns" in fields and not (fields["maxTurns"].isdigit() and int(fields["maxTurns"]) > 0):
+            found.append("maxTurns must be a positive integer")
+        return found
+
+    def test_each_shipped_agent_uses_documented_fields_and_an_explicit_model(self):
+        agents = sorted(icp.AGENTS_SRC_DIR.glob("*.md"))
+        self.assertTrue(agents)
+        for path in agents:
+            with self.subTest(agent=path.name):
+                self.assertEqual(self.problems(path), [])
+                self.assertEqual(self.top_level_fields(path)["name"], path.stem)
+
+    def test_the_check_rejects_a_misspelled_field_an_inherited_model_and_a_bad_value(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for body in ("---\nname: a\ndescription: d\nmodel: opus\neffort: max\nomitClaudeMD: true\n---\nx\n",
+                         "---\nname: a\ndescription: d\nmodel: inherit\neffort: max\n---\nx\n",
+                         "---\nname: a\ndescription: d\neffort: max\n---\nx\n",
+                         "---\nname: a\ndescription: d\nmodel: opus\neffort: max\ncolor: magenta\n---\nx\n",
+                         "---\nname: a:b\ndescription: d\nmodel: opus\neffort: max\n---\nx\n"):
+                path = Path(tmp) / "a.md"
+                path.write_text(body, encoding="utf-8")
+                with self.subTest(body=body):
+                    self.assertNotEqual(self.problems(path), [])
+
+
 class McpMatchTests(unittest.TestCase):
     def test_http_server_matches_on_url_and_type(self):
         existing = "ai-memory:\n  Type: http\n  URL: http://127.0.0.1:49374/mcp\n"

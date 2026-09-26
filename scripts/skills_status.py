@@ -20,10 +20,19 @@ this checks, under a given home directory:
 
 It also reports (informationally; these never affect the exit code): skills present
 under ``~/.agents/skills`` or in the lock but absent from the manifest; canonical
-folders with no lock entry at all; and the pinned Claude/Codex description-character
-budget compared against a fresh sum over the manifest.
+folders with no lock entry at all; the pinned Claude/Codex description-character
+budget compared against a fresh sum over the manifest; and, per skill, whether the
+canonical folder's on-disk git tree SHA-1 still equals the manifest's ``tree_sha``.
+The lock's ``skillFolderHash`` is written at install time and never recomputed, so it
+cannot see a file changed after install (a skill whose own ``uv run`` creates
+``scripts/.venv`` and rewrites ``scripts/uv.lock`` inside its installed folder, for
+example); the folder check recomputes the tree from disk, and separates ``runtime_artifacts``
+(the tree matches once ``__pycache__``, ``.venv``, ``node_modules`` and tool caches are
+left out) from ``drift`` (pinned content itself differs). It stays informational because
+normal use of such a skill recreates the artifacts and ``tools/adoption/install_skills.py``
+does not reinstall a folder whose SKILL.md and lock entry still match.
 
-Nonmutating: it only ever reads (os.readlink/is_file/iterdir/read_bytes/read_text) and
+Nonmutating: it only ever reads (os.readlink/lstat/listdir/is_file/iterdir/read_bytes/read_text) and
 never writes, installs, removes or touches a lock, a symlink or a client setting. It
 opens no credential store. Output never includes a setting's value except the fixed
 ``skillOverrides`` state strings (on/name-only/user-invocable-only/off) -- a value that
@@ -47,6 +56,7 @@ import json
 import os
 from pathlib import Path
 import re
+import stat
 import subprocess
 import sys
 
@@ -63,6 +73,12 @@ DEFAULT_CLAUDE_LISTING = "on"
 # a dict...) since settings.json is foreign input; a value that is not one of the four
 # strings above is reported as this fixed placeholder, never echoed verbatim.
 INVALID_CLAUDE_LISTING = "invalid_value"
+
+# Directories a skill's own tooling creates inside its installed folder at run time
+# (interpreter caches, a project virtualenv, package installs, tool caches). Upstream
+# trees do not carry them; the folder check leaves them out for its runtime_artifacts state.
+RUNTIME_ARTIFACT_DIRS = frozenset({"__pycache__", ".venv", "node_modules", ".pytest_cache",
+                                   ".ruff_cache", ".mypy_cache"})
 
 NAME_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*\Z")
 SHA1_RE = re.compile(r"[0-9a-f]{40}\Z")
@@ -125,6 +141,43 @@ def sha256_file(path: Path) -> str | None:
         return hashlib.sha256(path.read_bytes()).hexdigest()
     except OSError:
         return None
+
+
+def git_tree_sha(folder: Path, skip: frozenset[str] = frozenset()) -> str | None:
+    """The git tree SHA-1 of an on-disk folder, hashed the way git hashes a tree object.
+
+    A regular file is a blob with mode 100755 when its owner-execute bit is set, else
+    100644; a symlink is a blob of its target bytes with mode 120000 (never followed); a
+    subdirectory is a 40000 tree; an empty directory is omitted, as git omits it. Entries
+    sort by name bytes, a directory's name compared with a trailing "/". Names in ``skip``
+    are left out at every level. Returns None for a folder with nothing to hash; raises
+    OSError when an entry cannot be read. Only digests leave this function.
+    """
+    entries = []
+    for name in os.listdir(folder):
+        if name in skip:
+            continue
+        path = folder / name
+        info = os.lstat(path)
+        raw_name = os.fsencode(name)
+        if stat.S_ISLNK(info.st_mode):
+            entries.append((raw_name, b"120000", _git_blob_sha(os.readlink(os.fsencode(path))), False))
+        elif stat.S_ISDIR(info.st_mode):
+            subtree = git_tree_sha(path, skip)
+            if subtree is not None:
+                entries.append((raw_name, b"40000", bytes.fromhex(subtree), True))
+        elif stat.S_ISREG(info.st_mode):
+            mode = b"100755" if info.st_mode & stat.S_IXUSR else b"100644"
+            entries.append((raw_name, mode, _git_blob_sha(path.read_bytes()), False))
+    if not entries:
+        return None
+    entries.sort(key=lambda entry: entry[0] + b"/" if entry[3] else entry[0])
+    body = b"".join(mode + b" " + raw_name + b"\0" + digest for raw_name, mode, digest, _ in entries)
+    return hashlib.sha1(b"tree %d\0" % len(body) + body).hexdigest()
+
+
+def _git_blob_sha(data: bytes) -> bytes:
+    return hashlib.sha1(b"blob %d\0" % len(data) + data).digest()
 
 
 def resolve_lock_path(home: Path, env) -> tuple[Path, str]:
@@ -210,6 +263,37 @@ def check_canonical(agents_skills: Path, skill: dict) -> dict:
     if path.exists() or path.is_symlink():
         return {"state": "not_a_file"}
     return {"state": "missing"}
+
+
+def check_folder_tree(agents_skills: Path, skill: dict) -> dict:
+    """Informational: the canonical folder's on-disk git tree against the manifest tree_sha.
+
+    ok -- the whole folder hashes to tree_sha; runtime_artifacts -- it does once
+    RUNTIME_ARTIFACT_DIRS are left out; drift -- pinned content differs even then;
+    missing / unreadable -- no folder, or an entry could not be read.
+    """
+    folder = agents_skills / skill["name"]
+    if not folder.is_dir():
+        return {"state": "missing"}
+    try:
+        if git_tree_sha(folder) == skill["tree_sha"]:
+            return {"state": "ok"}
+        if git_tree_sha(folder, RUNTIME_ARTIFACT_DIRS) == skill["tree_sha"]:
+            return {"state": "runtime_artifacts"}
+    except (OSError, RecursionError):
+        return {"state": "unreadable"}
+    return {"state": "drift"}
+
+
+def folder_tree_summary(skills_report: list[dict]) -> dict:
+    summary = {"ok": 0, "runtime_artifacts": [], "drift": [], "missing": [], "unreadable": []}
+    for skill in skills_report:
+        state = skill["folder_tree"]["state"]
+        if state == "ok":
+            summary["ok"] += 1
+        else:
+            summary[state].append(skill["name"])
+    return summary
 
 
 def check_lock_entry(lock_data: dict | None, lock_state: str, skill: dict) -> dict:
@@ -345,7 +429,7 @@ def inspect(manifest: dict, home: Path, env=None, skills_bin: str | None = None)
             "codex_disable": check_codex_disable(codex_config, codex_config_state, skill),
         }
         skills_report.append({"name": name, "pass": all(item["state"] == "ok" for item in checks.values()),
-                              **checks})
+                              **checks, "folder_tree": check_folder_tree(agents_skills, skill)})
 
     dir_names = list_agent_skill_dirs(agents_skills)
     lock_names = set(lock_data["skills"]) if lock_state == "ok" else set()
@@ -362,6 +446,7 @@ def inspect(manifest: dict, home: Path, env=None, skills_bin: str | None = None)
         "extra_skills": extra_skills(dir_names, lock_names, manifest_names),
         "unlocked_folders": unlocked_folders(dir_names, lock_names),
         "budget": budget_report(manifest),
+        "folder_trees": folder_tree_summary(skills_report),
     }
     required_pass = all(item["pass"] for item in skills_report)
     if skills_bin:
@@ -379,12 +464,16 @@ def render_text(report: dict) -> str:
             f"{'ok' if skill['pass'] else 'fail':<5} {skill['name']:<32} "
             f"canonical={skill['canonical']['state']} lock={skill['lock']['state']} "
             f"link={link['state']}({link['kind']}) listing={listing['state']}({listing['actual']}) "
-            f"codex={skill['codex_disable']['state']}")
+            f"codex={skill['codex_disable']['state']} tree={skill['folder_tree']['state']}")
     extra = report["extra_skills"]
     lines.append("extra skills not in manifest: " + (", ".join(
         f"{item['name']}(agents_dir={item['in_agents_dir']},lock={item['in_lock']})" for item in extra
     ) or "none"))
     lines.append("unlocked folders: " + (", ".join(report["unlocked_folders"]) or "none"))
+    trees = report["folder_trees"]
+    lines.append(f"folder trees (informational): ok={trees['ok']} "
+                 + " ".join(f"{state}={','.join(trees[state]) or 'none'}"
+                            for state in ("runtime_artifacts", "drift", "missing", "unreadable")))
     budget = report["budget"]
     claude_chars, codex_chars = budget["claude_on_description_chars"], budget["codex_enabled_description_chars"]
     lines.append(f"budget: claude_on computed={claude_chars['computed']} manifest={claude_chars['manifest']} "
