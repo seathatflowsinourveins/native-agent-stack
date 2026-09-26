@@ -8,6 +8,7 @@ hook for a security boundary.
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import unittest
@@ -152,6 +153,104 @@ BLOCKED = {
     "hf auth login --token $HF_TOKEN": "secret_variable_reference",
 }
 
+# The documented kernel keyring form (docs/secret-storage.md, recipes/tavily.md), and the same with a
+# variable that is not one of the guard's secret names, so only the keyring rules can catch it.
+EXEC = "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY --"
+DEMO_EXEC = "python3 scripts/kernel_keyring.py exec kk_demo KK_DEMO_TOKEN --"
+
+KEYRING_BLOCKED = {
+    # keyctl(1) subcommands that print a payload, in every position the other rules cover.
+    "keyctl print %user:native-agent-stack:tavily_api_key": "keyring_payload_read",
+    "keyctl pipe %user:native-agent-stack:tavily_api_key | base64": "keyring_payload_read",
+    "keyctl read 123456789": "keyring_payload_read",
+    "keyctl dh_compute 11 22 33": "keyring_payload_read",
+    "sudo keyctl print 123456789": "keyring_payload_read",
+    "bash -c 'keyctl pipe %user:native-agent-stack:tavily_api_key'": "keyring_payload_read",
+    "echo $(keyctl pipe %user:native-agent-stack:tavily_api_key)": "keyring_payload_read",
+    "echo `keyctl print 123456789`": "keyring_payload_read",
+    # A payload read in inline interpreter code: a raw keyctl system call with KEYCTL_READ (11), the
+    # constant's name, libkeyutils' or python-keyutils' reader, or this repository's keyring module.
+    "python3 -c 'import ctypes; l = ctypes.CDLL(None); print(l.syscall(250, 11, 123, None, 0))'": "keyring_payload_read",
+    "python3 -c 'import ctypes as c; c.CDLL(None).syscall(c.c_long(250), c.c_long(11), 1, None, 0)'":
+        "keyring_payload_read",
+    "python3 - <<'EOF'\nKEYCTL_READ = 11\nEOF": "keyring_payload_read",
+    "perl -e 'syscall(250, 11, $id, $buf, 64)'": "keyring_payload_read",
+    "python3 -c 'import keyutils; print(keyutils.read_key(123))'": "keyring_payload_read",
+    "uv run python -c 'import ctypes; ctypes.CDLL(\"libkeyutils.so.1\").keyctl_read_alloc(1, None)'":
+        "keyring_payload_read",
+    "python3 -c 'from kernel_keyring import Keyring; print(Keyring().read(1))'": "keyring_payload_read",
+    "python3 -c 'import scripts.kernel_keyring as k'": "keyring_payload_read",
+    "python3 -c 'import subprocess; subprocess.run([\"keyctl\", \"print\", \"123\"])'": "keyring_payload_read",
+    # The command that exec starts names the injected variable: any mention beyond exec's own.
+    f"{EXEC} printenv TAVILY_API_KEY": "keyring_variable_reference",
+    f"{EXEC} tvly search \"TAVILY_API_KEY rotation\" --json": "keyring_variable_reference",
+    f"{EXEC} sh -c 'echo $TAVILY_API_KEY'": "secret_variable_reference",
+    f"{DEMO_EXEC} sh -c 'echo \"$KK_DEMO_TOKEN\"'": "keyring_variable_reference",
+    f"{DEMO_EXEC} sh -c 'echo ${{KK_DEMO_TOKEN}}'": "keyring_variable_reference",
+    f"{DEMO_EXEC} python3 -c 'import os; print(os.environ[\"KK_DEMO_TOKEN\"])'": "keyring_variable_reference",
+    f"{DEMO_EXEC} python3 -c 'import os; print(os.getenv(\"KK_DEMO_TOKEN\"))'": "keyring_variable_reference",
+    f"{DEMO_EXEC} cmd.exe /c echo %KK_DEMO_TOKEN%": "keyring_variable_reference",
+    f"echo 'import os; print(os.environ[\"KK_DEMO_TOKEN\"])' | {DEMO_EXEC} python3 -": "keyring_variable_reference",
+    # The command that exec starts dumps the environment it inherits.
+    f"{EXEC} env": "environment_dump_in_keyring_exec",
+    f"{EXEC} env -0": "environment_dump_in_keyring_exec",
+    f"{EXEC} nohup env": "environment_dump_in_keyring_exec",
+    f"{EXEC} printenv": "environment_dump_in_keyring_exec",
+    f"{EXEC} ps eww": "environment_dump_in_keyring_exec",
+    f"{EXEC} bash -c 'set'": "environment_dump_in_keyring_exec",
+    f"{EXEC} bash -c 'export -p'": "environment_dump_in_keyring_exec",
+    f"{EXEC} bash -c 'declare -p'": "environment_dump_in_keyring_exec",
+    f"{EXEC} bash -c 'tvly search x && env'": "environment_dump_in_keyring_exec",
+    f"{EXEC} bash -c 'for v in ${{!TAV*}}; do echo \"${{!v}}\"; done'": "environment_dump_in_keyring_exec",
+    f"{EXEC} python3 -c 'import os; print(dict(os.environ))'": "environment_dump_in_keyring_exec",
+    f"{EXEC} python3 -c 'import subprocess; subprocess.run([\"env\"])'": "environment_dump_in_keyring_exec",
+    f"{DEMO_EXEC} python3 - <<'EOF'\nimport os\nprint(os.environ)\nEOF": "environment_dump_in_keyring_exec",
+    f"{DEMO_EXEC} node -e 'console.log(process.env)'": "environment_dump_in_keyring_exec",
+    f"{EXEC} perl -e 'print map {{\"$_=$ENV{{$_}}\\n\"}} keys %ENV'": "environment_dump_in_keyring_exec",
+    f"{EXEC} ruby -e 'p ENV.to_h'": "environment_dump_in_keyring_exec",
+    f"{EXEC} php -r 'print_r($_ENV);'": "environment_dump_in_keyring_exec",
+    f"{EXEC} awk 'BEGIN {{ for (k in ENVIRON) print k, ENVIRON[k] }}'": "environment_dump_in_keyring_exec",
+    f"{EXEC} jq -n env": "environment_dump_in_keyring_exec",
+    f"{EXEC} jq -n '$ENV'": "environment_dump_in_keyring_exec",
+    f"{EXEC} python3 -c 'import os; print(os.environb)'": "environment_dump_in_keyring_exec",
+    f"{EXEC} python3 -c 'import os; os.system(\"set\")'": "environment_dump_in_keyring_exec",
+    f"{EXEC} ruby -e 'p ENV'": "environment_dump_in_keyring_exec",
+    f"{EXEC} deno eval 'console.log(Deno.env.toObject())'": "environment_dump_in_keyring_exec",
+    f"{EXEC} pwsh -c 'Get-ChildItem Env:'": "environment_dump_in_keyring_exec",
+    # env or printenv as another program's argument: launchers the guard does not model.
+    f"{EXEC} find /tmp -maxdepth 0 -exec env ';'": "environment_dump_in_keyring_exec",
+    f"{EXEC} stdbuf -o0 printenv": "environment_dump_in_keyring_exec",
+    f"{EXEC} watch -n 5 /usr/bin/env": "environment_dump_in_keyring_exec",
+    # The price of that rule: a one-word query `env` is blocked too; a longer query passes (ALLOWED).
+    f"{EXEC} tvly search env --json": "environment_dump_in_keyring_exec",
+    # Any path to the script, any launcher, and an exec inside a shell.
+    "python3 -I ~/.local/share/codex-ecosystem/bin/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- env":
+        "environment_dump_in_keyring_exec",
+    "uv run python scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- env":
+        "environment_dump_in_keyring_exec",
+    "timeout 60 python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- env":
+        "environment_dump_in_keyring_exec",
+    "bash -c 'python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- printenv'":
+        "environment_dump_in_keyring_exec",
+    # Every other rule applies to the started command (test_every_rule_applies_to_a_keyring_exec
+    # repeats this for all of BLOCKED).
+    f"{EXEC} cat .env": "dotenv_read",
+    f"{EXEC} strace -f tvly search x": "process_trace",
+    f"{EXEC} cat /proc/self/environ": "process_environment",
+    # tvly auth without JSON output prints the key's first eight and last four characters.
+    "tvly auth": "native_token_print",
+    "~/.local/bin/tvly auth > /tmp/auth.txt": "native_token_print",
+    f"{EXEC} tvly auth": "native_token_print",
+    "tvly-keyring auth": "native_token_print",
+    "sh adoption/tools/tvly-keyring auth": "native_token_print",
+    # tavily-cli's own credential file, and the variable name as a secret name.
+    "cat ~/.tavily/config.json": "native_store_path",
+    f"{EXEC} jq . ~/.tavily/config.json": "native_store_path",
+    "rg -n TAVILY_API_KEY": "secret_name_search",
+    "echo \"$TAVILY_API_KEY\"": "secret_variable_reference",
+    "python3 -c 'import os; print(os.environ[\"TAVILY_API_KEY\"])'": "secret_variable_reference",
+}
+
 ALLOWED = [
     "python3 runner.py paper --env-file \"$PAPER_ENV_FILE\" --output out.json",
     "python3 scripts/credential_status.py --json",
@@ -182,6 +281,37 @@ ALLOWED = [
     "hf cache ls --revisions",
     "stat -c '%a %U' \"$HF_TOKEN_PATH\"",
     "env -u HF_TOKEN -u HUGGING_FACE_HUB_TOKEN python3 run.py",
+    # The kernel keyring: store, status and revoke, and the documented exec and tvly-keyring forms.
+    "python3 scripts/kernel_keyring.py store tavily_api_key",
+    "python3 scripts/kernel_keyring.py store --replace tavily_api_key",
+    "python3 scripts/kernel_keyring.py status tavily_api_key",
+    "python3 scripts/kernel_keyring.py revoke tavily_api_key",
+    "( set +x; read -rs K && printf %s \"$K\" | python3 scripts/kernel_keyring.py store tavily_api_key )",
+    f"{EXEC} tvly auth --json",
+    f"{EXEC} tvly --json auth",
+    f"{EXEC} tvly search \"<query>\" --depth basic --max-results 5 --json",
+    f"{EXEC} tvly extract \"<url>\" --extract-depth basic --json",
+    f"{EXEC} tvly research run \"<question>\" --model pro --json",
+    f"{EXEC} tvly research poll \"<request_id>\" --json",
+    f"{EXEC} tvly search \"python os.environ versus getenv\" --json",
+    f"{EXEC} tvly search \"env var best practice\" --json",
+    f"{EXEC} env -u OTHER_TOKEN tvly search x --json",
+    f"{EXEC} tvly research run \"q\" --model pro --json "
+    "| python3 -c 'import json, sys; print(json.load(sys.stdin)[\"status\"])'",
+    "python3 \"$SP/kernel_keyring.py\" exec tavily_api_key TAVILY_API_KEY -- tvly research run --model pro --json "
+    "--citation-format numbered --timeout 1500 --client-name native-agent-stack -o \"$out\" \"$q\" < /dev/null "
+    "> \"$S/tavily/$lid.stdout\" 2> \"$S/tavily/$lid.stderr\"",
+    f"{DEMO_EXEC} python3 run.py",
+    "tvly-keyring search \"<query>\" --json",
+    "tvly-keyring research run \"<question>\" --model pro --json",
+    "tvly-keyring auth --json",
+    "tvly auth --json",
+    "tvly auth --help",
+    "tvly --status",
+    "keyctl show @u",
+    "keyctl describe %user:native-agent-stack:tavily_api_key",
+    "keyctl request user native-agent-stack:tavily_api_key",
+    "keyctl request2 user native-agent-stack:tavily_api_key callout-info",
 ]
 
 # Negative corpus: ordinary repository and shell work that must never be blocked.
@@ -268,6 +398,19 @@ SAFE_CORPUS = [
     "git clone https://github.com/huggingface/tokenizers",
     "hf download huggingface/token-classification-demo --local-dir demo",
     "pip download huggingface_hub",
+    # Work on the keyring code itself: a search or a commit message that names KEYCTL_READ or keyctl
+    # print runs no interpreter, and tvly without a key or through the wrapper's install.
+    "grep -n KEYCTL_READ scripts/kernel_keyring.py",
+    "git commit -m 'Block keyctl print and KEYCTL_READ in the guard'",
+    "git commit -m 'Guard: tvly auth prints part of the key'",
+    "python3 -m unittest tests.test_kernel_keyring tests.test_tvly_keyring",
+    "python3 -m pytest -k keyctl_read",
+    "install -m 0755 adoption/tools/tvly-keyring scripts/kernel_keyring.py \"$HOME/.local/share/codex-ecosystem/bin/\"",
+    "sh -n adoption/tools/tvly-keyring",
+    "cat adoption/tools/tvly-keyring",
+    "tvly search \"agent harness\" --depth basic --max-results 4 --json",
+    "tvly --version",
+    "ls ~/.tavily",
 ]
 
 # Known heuristic gaps, asserted so a change that closes one is noticed.
@@ -294,6 +437,13 @@ EXPECTED_PASS_THROUGH = [
     # A trailing `/.` on $HF_HOME copies its contents but does not match HF_HOME_ROOT's
     # anchored `(?:/\\**)?$` suffix.
     "cp -r \"$HF_HOME/.\" /tmp/exfil",
+    # Kernel keyring: a shell or interpreter that exec starts reads its commands from a pipe or a
+    # file the guard never sees; a copy of kernel_keyring.py under another name is not recognised;
+    # and a raw keyctl system call whose number is held in a variable is not KEYRING_READ_CODE.
+    f"printf 'env\\n' | {EXEC} sh",
+    f"{EXEC} python3 run_report.py",
+    "cp scripts/kernel_keyring.py /tmp/kk.py && python3 /tmp/kk.py exec tavily_api_key TAVILY_API_KEY -- env",
+    "python3 -c 'import ctypes; n = 250; ctypes.CDLL(None).syscall(n, 11, 1, None, 0)'",
 ]
 
 
@@ -302,11 +452,37 @@ def run_hook(payload):
                           capture_output=True, text=True, timeout=30)
 
 
+def fenced_lines(path):
+    """Lines of the fenced code blocks of a Markdown file."""
+    return [line for block in re.findall(r"^```[^\n]*\n(.*?)^```", path.read_text(encoding="utf-8"), re.M | re.S)
+            for line in block.splitlines()]
+
+
 class SecretPathGuardTests(unittest.TestCase):
     def test_blocked_commands(self):
-        for command, reason in BLOCKED.items():
+        for command, reason in {**BLOCKED, **KEYRING_BLOCKED}.items():
             with self.subTest(command=command):
                 self.assertEqual(guard.check(command), reason)
+
+    def test_every_rule_applies_to_a_keyring_exec(self):
+        # Every blocked command stays blocked, for the same reason, when kernel_keyring.py exec starts
+        # its first segment. An environment dump in the started command gets the keyring's own reason,
+        # because the key is in that environment; one in a later segment keeps its own.
+        for command, reason in BLOCKED.items():
+            with self.subTest(command=command):
+                expected = {reason, "environment_dump_in_keyring_exec"} if reason.startswith("environment_dump") \
+                    else {reason}
+                self.assertIn(guard.check(f"{EXEC} {command}"), expected)
+
+    def test_documented_keyring_commands_pass(self):
+        # The keyring commands in the fenced blocks of the pages that document them.
+        documented = [line for page in ("recipes/tavily.md", "docs/secret-storage.md", "adoption/tools/README.md")
+                      for line in fenced_lines(ROOT / page)
+                      if "kernel_keyring.py" in line or "tvly-keyring" in line]
+        self.assertGreaterEqual(len(documented), 10)
+        for command in documented:
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
 
     def test_allowed_commands(self):
         for command in ALLOWED:
@@ -362,6 +538,11 @@ class SecretPathGuardTests(unittest.TestCase):
         self.assertEqual(blocked.stderr.count("\n"), 1)
         allowed = run_hook({"tool_name": "Bash", "tool_input": {"command": "git status"}})
         self.assertEqual((allowed.returncode, allowed.stdout, allowed.stderr), (0, "", ""))
+        keyring = run_hook({"tool_name": "Bash", "tool_input": {"command": f"{EXEC} env # SENTINEL-9c2e"}})
+        self.assertEqual(keyring.returncode, 2)
+        self.assertIn("environment_dump_in_keyring_exec", keyring.stderr)
+        self.assertNotIn("SENTINEL-9c2e", keyring.stderr + keyring.stdout)
+        self.assertEqual(keyring.stderr.count("\n"), 1)
         other_tool = run_hook({"tool_name": "Read", "tool_input": {"file_path": "x"}})
         self.assertEqual(other_tool.returncode, 0)
         malformed = subprocess.run([sys.executable, str(HOOK)], input="not json",

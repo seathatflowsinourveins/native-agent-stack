@@ -5,7 +5,7 @@ Use the official [agent setup skill](https://tavily.com/agent-setup/SKILL.md) an
 For ordinary work, run the selected Search/Extract command when `tvly` is
 available, as its upstream skills instruct. Since 2026-09-26 the key stays out
 of files: on Linux and WSL2 run every `tvly` command through
-`scripts/kernel_keyring.py exec`, as in
+`scripts/kernel_keyring.py exec` or the installed `tvly-keyring` wrapper, as in
 [Memory-only key on Linux and WSL2](#memory-only-key-on-linux-and-wsl2-2026-09-26),
 and on macOS through `secret run`. For installation or a concrete
 authentication failure, inspect `command -v tvly`, `tvly --version` and
@@ -65,6 +65,22 @@ python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly res
 python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly research poll "<request_id>" --json
 ```
 
+Where [`adoption/tools/tvly-keyring`](../adoption/tools/tvly-keyring) is
+installed next to a copy of `kernel_keyring.py`
+([adoption/tools/README.md](../adoption/tools/README.md#tvly-keyring-2026-09-26)),
+`tvly-keyring <args>` runs that same `exec` for `tvly <args>`, from any
+directory. It checks `status` first and exits 2, without starting `tvly`,
+when the key is absent. Install the pair from the checkout root into one
+directory on `PATH`:
+
+```sh
+install -m 0755 adoption/tools/tvly-keyring "$HOME/.local/share/codex-ecosystem/bin/tvly-keyring"
+install -m 0644 scripts/kernel_keyring.py "$HOME/.local/share/codex-ecosystem/bin/kernel_keyring.py"
+tvly-keyring auth --json
+tvly-keyring search "<query>" --depth basic --max-results 5 --json
+tvly-keyring research run "<question>" --model pro --json
+```
+
 - `tvly auth --json` prints only `authenticated`, `method` and `source`;
   through `exec` it reports `"method": "env"`. Plain `tvly auth` also prints
   the first eight and last four characters of the key, so use `--json`.
@@ -76,9 +92,11 @@ python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly res
   The CLI's own hints (`tvly login --api-key tvly-YOUR_KEY`,
   `export TAVILY_API_KEY=...`) do not apply here.
 - Never give `exec` a command that prints the environment or the key, such
-  as `env`, `printenv`, an `echo` of the variable or a plain `tvly auth`. The
-  guard hook does not stop these through `exec`
-  ([secret-storage.md](../docs/secret-storage.md#memory-only-option-linux-kernel-keyring-2026-09-26)).
+  as `env`, `printenv`, an `echo` of the variable or a plain `tvly auth`.
+  Since a later change on 2026-09-26 the guard hook blocks these through
+  `exec` and `tvly-keyring` too, once a host's user-level copy of the hook is
+  replaced. It is a text heuristic with recorded gaps
+  ([secret-storage.md](../docs/secret-storage.md#guard-coverage-2026-09-26)).
 - Without `exec`, `search` and `extract` still run, in keyless mode with a
   rate-limit cap, while `map`, `crawl` and `research` stop and ask for a key.
   A missing key therefore shows up as capped searches rather than an error.
@@ -92,7 +110,12 @@ python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly res
   `secret run TAVILY_API_KEY -- tvly ...` (see secret-storage.md).
 
 The Research endpoint (`tvly research run --model pro`) was first used on
-2026-09-26, for the Alpaca platform landscape. Its qualification receipt will
-be recorded separately; this recipe does not claim that Research qualified.
-Map, Crawl and Research remain separately selected capabilities, as stated
-above.
+2026-09-26, for the Alpaca platform landscape, and then for one report per
+catalog layer of that day's landscape sweep. The
+[qualification receipt](../evidence/receipts/tavily-research-qualification-20260926.json)
+records native provider execution through the keyring exec: 33 reports, all
+`completed`, with response times from 168.49 to 367.68 s (median 248.85) and
+11 to 32 sources per report. It makes no quality comparison with another
+research endpoint. The runs used a prototype of `kernel_keyring.py`, before
+the committed script. Map and Crawl remain separately selected capabilities,
+as stated above.

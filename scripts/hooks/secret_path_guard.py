@@ -12,7 +12,12 @@ variable, tracing a process, printing a native token (`gh auth token`,
 `hf auth token`, or through a git credential helper), reading or searching
 credential files or secret variable names, reading or copying the whole
 Hugging Face home, tracing a shell while it sources a
-credential file, and dumping the environment after sourcing one. It is not a
+credential file, and dumping the environment after sourcing one. For a key
+held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
+`pipe`, `read` and `dh_compute`, and a keyring read in inline interpreter
+code), checks the command that `kernel_keyring.py exec` or `tvly-keyring`
+starts with every rule above, and blocks that command when it names the
+injected variable or dumps the environment it inherits. It is not a
 security boundary. A process that imports a loader, or a renamed or
 obfuscated path, passes; see docs/secret-storage.md "Threat model" for the
 residual risk.
@@ -40,6 +45,8 @@ STORE_PATHS = (
     # ${HF_HOME:-...} form, a closing quote allowed before the slash; tokenizers/ and hub/ pass.
     (re.compile(r"(?:huggingface|HF_HOME(?::-[^}\s]*)?)\}?[\"']?/(?:token|stored_tokens)(?![\w-])"),
      "native_store_path"),
+    # tavily-cli's own store (`tvly login` or `tvly init` write the key or an OAuth token there).
+    (re.compile(r"\.tavily/config\.json"), "native_store_path"),
     (re.compile(r"ecosystem-grafana\.env"), "service_secret_path"),
     (re.compile(r"nativestack/generation\.key"), "service_secret_path"),
     (re.compile(r"/proc/(?:[^/\s]+/)*environ\b"), "process_environment"),
@@ -63,6 +70,7 @@ SECRET_NAMES = (
     "CODEX_API_KEY", "OPENROUTER_API_KEY", "MISTRAL_API_KEY", "QDRANT_API_KEY",
     "PREFECT_API_KEY", "MC_API_KEY", "MSB_API_KEY", "PAPERCLIP_API_KEY",
     "TWS_USERNAME", "TWS_PASSWORD", "TWS_ACCOUNT", "IBKR_ACCOUNT_ID",
+    "TAVILY_API_KEY",
 )
 _NAMES = "|".join(SECRET_NAMES)
 SECRET_NAME = re.compile(r"\b(?:" + _NAMES + r")\b")
@@ -102,12 +110,56 @@ PS_ARG_OPTIONS = {"-o", "-O", "-p", "-u", "-U", "-C", "-g", "-G", "-t", "-q", "-
 ENV_ARG_OPTIONS = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
 TRACE_OPTIONS = {"xtrace", "verbose"}
 MAX_DEPTH = 3
+# The Linux kernel keyring (docs/secret-storage.md, "Memory-only option"). `kernel_keyring.py exec
+# <name> <ENV_VAR> -- <command...>` puts a stored key into that command's environment only, and
+# adoption/tools/tvly-keyring runs `tvly` the same way with TAVILY_API_KEY. expand() unwraps both, so
+# every rule applies to the command they start; keyring_reason() also blocks that command when it
+# names the injected variable or dumps the environment it inherits.
+KEYRING_SCRIPT = "kernel_keyring.py"
+KEYRING_WRAPPERS = {"tvly-keyring": ("TAVILY_API_KEY", "tvly")}
+ENV_NAME = re.compile(r"[A-Z_][A-Z0-9_]*")
+# keyctl(1) subcommands that print a payload (keyutils Git, as published on man7.org on 2026-08-04):
+# `print`, `pipe` and `read` output it, and `dh_compute` prints base ^ private (mod prime) computed from
+# three keys' payloads, which with a private key of 1 is the base key's own payload. `request`,
+# `request2` and `prequest2` print a key ID only.
+KEYCTL_PAYLOAD_COMMANDS = {"print", "pipe", "read", "dh_compute"}
+# Inline code that reads a payload: the operation's name, libkeyutils' and python-keyutils' readers,
+# this repository's keyring module, a raw keyctl system call (x86_64 250, aarch64 219) with
+# operation 11 (KEYCTL_READ), or keyctl(1) run as a subprocess. Checked only when the command runs an
+# interpreter (INTERPRETER), so a commit message or a code search that mentions KEYCTL_READ passes.
+KEYRING_READ_CODE = re.compile(
+    r"\bKEYCTL_READ\b|\bkeyctl_read(?:_alloc)?\s*\(|\bkeyutils\s*\.\s*read_key\b"
+    r"|\b(?:import|from)\s+(?:scripts\s*\.\s*)?kernel_keyring\b"
+    r"|\bsyscall\s*\(\s*(?:[\w.]*c_u?(?:long|int)\s*\(\s*)?(?:250|219)\b[^;\n]{0,40}?\b11\b"
+    r"|\bkeyctl[\"',\s]+(?:print|pipe|read|dh_compute)\b")
+# Programs that run inline code, and launchers that start one (`uv run python -c ...`).
+INTERPRETER = re.compile(
+    r"(?:python|pypy|perl|ruby|php|lua|tclsh)[0-9.]*|node|nodejs|deno|bun|luajit|Rscript|julia"
+    r"|osascript|pwsh|powershell|uv|uvx|pipx|npx|pnpm|poetry|pdm|hatch|conda|mamba|pixi")
+AWKS = {"awk", "gawk", "mawk", "nawk"}
+JQS = {"jq", "gojq", "jaq", "yq"}
+# Environment access in code that a keyring exec starts: ENVIRONMENT_ACCESS plus Python's environb,
+# Ruby's and Julia's bare ENV, Deno.env and Bun.env, PHP's $_ENV and $_SERVER, PowerShell's env: drive,
+# awk's ENVIRON, and a quoted env, printenv, set, export or declare -p handed to a subprocess.
+KEYRING_ENVIRONMENT_ACCESS = re.compile(
+    ENVIRONMENT_ACCESS.pattern
+    + r"|\benvironb\b|\bENV\b|\b(?:Deno|Bun)\.env\b|\$_ENV\b|\$_SERVER\b|(?i:\benv:)|\bENVIRON\b"
+    + r"|[\"'](?:/usr/bin/)?(?:env|printenv|set|export(?: -p)?|declare -[px])[\"']")
+JQ_ENVIRONMENT = re.compile(r"(?<![\w.$])env\b|\$ENV\b")
+SHELL_INDIRECTION = re.compile(r"\$\{!")
+ENVIRONMENT_PRINTERS = {"env", "printenv"}
 
 HINTS = {
     "secret_name_search": "search repository code with the Grep tool instead of a shell search for a "
                           "secret variable name",
     "trace_while_sourcing": "shell tracing prints every assignment of a sourced credential file",
     "environment_dump_after_source": "after sourcing a credential file the environment holds its values",
+    "keyring_payload_read": "a key in the kernel keyring stays in memory; check it with kernel_keyring.py "
+                            "status and hand it to one command with kernel_keyring.py exec",
+    "keyring_variable_reference": "the command that kernel_keyring.py exec starts holds the key in its "
+                                  "environment; run a client that reads the variable itself, without naming it",
+    "environment_dump_in_keyring_exec": "the command that kernel_keyring.py exec starts holds the key in "
+                                        "its environment",
 }
 
 
@@ -192,8 +244,32 @@ def shell_parts(words: list[str]) -> tuple[bool, str | None]:
     return traces, inline
 
 
+def keyring_exec(words: list[str]) -> tuple[str | None, list[str], bool] | None:
+    """(injected variable, started command, variable spelled in the command) for a keyring exec.
+
+    `kernel_keyring.py exec <name> <ENV_VAR> -- <command...>` is found at any position, so any path
+    to the script and any launcher (python3 -I, uv run python, sudo ...) counts; the variable is None
+    when it is not a literal name. `tvly-keyring <args>` starts `tvly <args>` with TAVILY_API_KEY.
+    """
+    for position, word in enumerate(words):
+        name = word.rsplit("/", 1)[-1]
+        if name == KEYRING_SCRIPT and words[position + 1:position + 2] == ["exec"]:
+            arguments = words[position + 2:]
+            if "--" not in arguments:
+                return None  # kernel_keyring.py refuses to start anything without the separator
+            separator = arguments.index("--")
+            variable = arguments[separator - 1] if separator else None
+            return (variable if variable and ENV_NAME.fullmatch(variable) else None,
+                    arguments[separator + 1:], True)
+        if name in KEYRING_WRAPPERS and (position == 0 or program_of(words) in SHELLS):
+            variable, target = KEYRING_WRAPPERS[name]
+            return variable, [target, *words[position + 1:]], False
+    return None
+
+
 def expand(command: str, depth: int = 0) -> list[list[str]]:
-    """Command segments, including those of `sh -c '...'`, `eval ...` and `env ... command`."""
+    """Command segments, including those of `sh -c '...'`, `eval ...`, `env ... command` and of
+    the command that a keyring exec starts."""
     result: list[list[str]] = []
     for raw in segments(tokenize(command)):
         words = strip_prefix(raw)
@@ -205,6 +281,10 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
                 if start is None:
                     break
                 words = strip_prefix(words[start:])
+                continue
+            started = keyring_exec(words)
+            if started is not None:
+                words = strip_prefix(started[1])
                 continue
             if depth < MAX_DEPTH:
                 if program in SHELLS:
@@ -341,12 +421,50 @@ def prints_helper_credential(words: list[str]) -> bool:
     return False
 
 
+def tvly_prints_key(words: list[str]) -> bool:
+    """`tvly auth` without JSON output prints the key's first eight and last four characters
+    (tavily-cli 0.1.8 commands/auth.py); `tvly auth --json` and `tvly --json auth` print no key."""
+    positional = [w for w in words[1:] if not w.startswith("-")]
+    return program_of(words) == "tvly" and positional[:1] == ["auth"] \
+        and "--json" not in words[1:] and "--help" not in words[1:]
+
+
+def keyring_reason(command: str, words_list: list[list[str]]) -> str | None:
+    """Payload reads in inline code, and what a keyring exec's command does with the key it inherits."""
+    if any(INTERPRETER.fullmatch(program_of(words)) for words in words_list) and KEYRING_READ_CODE.search(command):
+        return "keyring_payload_read"
+    started = [parsed for parsed in map(keyring_exec, words_list) if parsed is not None]
+    # Each `kernel_keyring.py exec` spells its variable once; any further mention names it, whether
+    # in the started command, in code piped into it or in a here-document it reads.
+    for variable in {variable for variable, _command, _spelled in started if variable}:
+        spelled = sum(1 for other, _command, is_spelled in started if other == variable and is_spelled)
+        if len(re.findall(rf"(?<![A-Za-z0-9_]){re.escape(variable)}(?![A-Za-z0-9_])", command)) > spelled:
+            return "keyring_variable_reference"
+    for _variable, started_command, _spelled in started:
+        inner = expand(shlex.join(started_command)) if started_command else []
+        # A dump in program position, or env or printenv as another program's argument, which is how a
+        # launcher the guard does not model (find -exec, stdbuf, watch ...) would run it.
+        if any(dumps_after_source(words) or any(program_of([word]) in ENVIRONMENT_PRINTERS for word in words[1:])
+               for words in inner):
+            return "environment_dump_in_keyring_exec"
+        programs = {program_of(words) for words in inner}
+        if (any(INTERPRETER.fullmatch(program) for program in programs) or programs & AWKS) \
+                and KEYRING_ENVIRONMENT_ACCESS.search(command):
+            return "environment_dump_in_keyring_exec"
+        if (programs & JQS and JQ_ENVIRONMENT.search(command)) \
+                or (programs & SHELLS and SHELL_INDIRECTION.search(command)):
+            return "environment_dump_in_keyring_exec"
+    return None
+
+
 def segment_reason(words: list[str]) -> str | None:
     program = program_of(words)
     if is_environment_dump(words):
         return "environment_dump"
-    if prints_helper_credential(words):
+    if prints_helper_credential(words) or tvly_prints_key(words):
         return "native_token_print"
+    if program == "keyctl" and next((w for w in words[1:] if not w.startswith("-")), None) in KEYCTL_PAYLOAD_COMMANDS:
+        return "keyring_payload_read"
     if program in TRACERS:
         return "process_trace"
     if any(word in {"<", "<<<", "<>"} and position + 1 < len(words) and POINTER_VARIABLE.search(words[position + 1])
@@ -375,6 +493,9 @@ def check(command: str) -> str | None:
     if SECRET_EXPANSION.search(command) or SECRET_LOOKUP.search(command):
         return "secret_variable_reference"
     words_list = expand(command)
+    reason = keyring_reason(command, words_list)
+    if reason:
+        return reason
     if any(sources_credential_file(words) for words in words_list):
         if "xtrace" in command or re.search(r"\bSHELLOPTS=", command) \
                 or any(traces(words) for words in words_list):

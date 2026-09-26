@@ -9,6 +9,8 @@ it prints path templates, variable names and reason codes, never values or
 expanded host paths. Environment checks report variable NAMES that are set,
 never their values. That includes a native store's path override (such as
 HF_TOKEN_PATH), which moves the store away from the path this checker inspects.
+A kernel keyring entry (memory only, scripts/kernel_keyring.py) has no file:
+it is validated and reported as `unchecked`, and the keyring is never queried.
 
 Exit status is 1 when any credential file that exists is unsafe (whatever the
 entry's status, since a stored optional or paid key leaks just as badly), and 2
@@ -37,6 +39,10 @@ STORE_ROOT = "${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack"
 
 LOCAL_KINDS = {"private_env_file", "private_file", "native_store"}
 NONLOCAL_KINDS = {"interactive_login", "github_actions"}
+# Held in memory by the Linux kernel, never in a file (scripts/kernel_keyring.py). The checker validates
+# the entry and never queries the keyring; `kernel_keyring.py status <key_name>` is the presence check.
+MEMORY_KINDS = {"kernel_keyring"}
+KEYRING_KEY_NAME = re.compile(r"[a-z0-9][a-z0-9_.-]{0,63}")  # the names scripts/kernel_keyring.py accepts
 STATUSES = {"required", "optional", "user_only_paid", "generated_local", "native",
             "interactive_only", "ci_only"}
 CLASSES = {"broker_api_key_pair", "contact_identity", "provider_api_key",
@@ -91,7 +97,7 @@ def inventory_errors(inventory, root: Path | None = None) -> list[str]:
         if entry["class"] not in CLASSES:
             errors.append(f"{label}: unknown class")
         store = entry["store"]
-        if not isinstance(store, dict) or store.get("kind") not in LOCAL_KINDS | NONLOCAL_KINDS:
+        if not isinstance(store, dict) or store.get("kind") not in LOCAL_KINDS | NONLOCAL_KINDS | MEMORY_KINDS:
             errors.append(f"{label}: unknown store kind")
         else:
             template = store.get("path_template")
@@ -101,6 +107,9 @@ def inventory_errors(inventory, root: Path | None = None) -> list[str]:
                     errors.append(f"{label}: local store needs a home-anchored path template")
             elif template != "":
                 errors.append(f"{label}: non-local store must have an empty path template")
+            key_name = store.get("key_name")
+            if store["kind"] in MEMORY_KINDS and not (isinstance(key_name, str) and KEYRING_KEY_NAME.fullmatch(key_name)):
+                errors.append(f"{label}: kernel keyring store needs a key_name that scripts/kernel_keyring.py accepts")
         for key in ("variables", "optional_variables", "pointer_variables"):
             names = entry[key]
             if not isinstance(names, list) or not all(isinstance(n, str) and NAME.match(n) for n in names):
@@ -182,6 +191,11 @@ def inspect_entry(entry: dict, env, uid: int, now: float) -> dict:
         report["warnings"].append("store_path_overridden")
     if store["kind"] in NONLOCAL_KINDS:
         report["state"] = "not_local"
+        return report
+    if store["kind"] in MEMORY_KINDS:
+        # No file to inspect, and the keyring is not queried: the state says so rather than guessing.
+        report["state"] = "unchecked"
+        report["key_name"] = store["key_name"]
         return report
     path = expand_template(store["path_template"], env)
     try:
@@ -395,7 +409,9 @@ def render_text(report: dict) -> str:
         warn = f" warnings={','.join(entry['warnings'])}" if entry["warnings"] else ""
         exported = entry["variables_in_environment"]
         env_note = f" exported={','.join(exported)}" if exported else ""
-        lines.append(f"{entry['state']:<9} {entry['id']:<27} {entry['status']:<16} {entry['path'] or '(not local)'}"
+        location = entry["path"] or (f"(kernel keyring {entry['key_name']}; check: kernel_keyring.py status)"
+                                     if "key_name" in entry else "(not local)")
+        lines.append(f"{entry['state']:<9} {entry['id']:<27} {entry['status']:<16} {location}"
                      f"{extra} findings={detail}{warn}{env_note}")
     env_names = report["environment"]["must_not_be_set_present"]
     lines.append("environment must_not_be_set present: " + (",".join(env_names) or "none"))

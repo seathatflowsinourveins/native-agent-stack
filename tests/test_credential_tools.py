@@ -97,7 +97,8 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(list(target.iterdir()), [])
 
     def test_only_operator_supplied_stored_entries(self):
-        for entry in ("alpaca-live", "grafana-admin", "claude-native", "no-such-entry"):
+        # tavily lives in the kernel keyring only (operator decision 2026-09-26), never in a file.
+        for entry in ("alpaca-live", "grafana-admin", "claude-native", "tavily", "no-such-entry"):
             with self.subTest(entry=entry), self.assertRaises(store_mod.Refused):
                 store_mod.load_entry(entry, env=self.env)
         self.assertEqual(store_mod.load_entry("typesafe", env=self.env)["id"], "typesafe")
