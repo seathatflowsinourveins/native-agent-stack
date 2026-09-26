@@ -83,7 +83,10 @@ the user's existing `~/.claude/CLAUDE.md`, preserving independent preferences an
 managed imports. Since the [2026-09-26 cleanup](../docs/decisions/2026-09-26-harness-rules-cleanup.md)
 the example states each rule once under section headings, so replace an earlier
 merged copy of it as a whole instead of merging line by line, which would state
-rules twice. Keep project-specific tests, memory scope and domain policy in
+rules twice. The example changed after `v2026.09.26.2`: its top rule became the
+five-step [upstream-verification procedure](../docs/harness-defaults.md#upstream-verification-and-compounding-learning)
+at about the same length, so a host at that tag merges the earlier text; replace
+it the same way. Keep project-specific tests, memory scope and domain policy in
 that project's `CLAUDE.md`/`AGENTS.md`. Do not preload this catalog or duplicate
 the installed tool inventory in every worker.
 
