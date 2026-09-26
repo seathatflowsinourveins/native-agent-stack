@@ -46,8 +46,10 @@ class NativeTokenCIContracts(unittest.TestCase):
                     stack.enter_context(patch.object(ci.shutil, "which", side_effect=lambda name: f"/stub/{name}"))
                     stack.enter_context(patch.object(ci.Run, "command", side_effect=lambda label, *_args, **_kw: ci.PINS[label.removeprefix("version-")]))
                     stack.enter_context(patch.object(ci, "rtk_fixture", side_effect=failure))
+                    later = stack.enter_context(patch.object(ci, "rtk_long_log_fixture"))
                     for name in ("qmd_fixture", "repomix_fixture", "toon_fixture", "markitdown_fixture",
-                                "ast_grep_fixture", "ccusage_fixture", "codebase_memory_mcp_fixture",
+                                "markitdown_multi_element_fixture", "ast_grep_fixture", "ast_grep_shell_fixture",
+                                "ccusage_fixture", "codebase_memory_mcp_fixture",
                                 "headroom_fixture", "jcodemunch_mcp_fixture"):
                         stack.enter_context(patch.object(ci, name))
                     stack.enter_context(redirect_stdout(io.StringIO()))
@@ -56,6 +58,8 @@ class NativeTokenCIContracts(unittest.TestCase):
                             ci.main()
                     else:
                         self.assertEqual(ci.main(), 1)
+                        # A tool's later fixture still runs after its first one fails.
+                        self.assertEqual(later.call_count, 1)
                 result = json.loads((output / "receipt.json").read_text())
                 self.assertEqual(result["status"], "failed")
                 self.assertEqual(result["evidence_class"], "local_integration")
@@ -645,6 +649,231 @@ class NativeTokenCIContracts(unittest.TestCase):
         finally:
             process.kill()
             process.wait()
+
+    # Discriminating inputs: each check below must reject what a passthrough or plain-text tool returns.
+
+    @staticmethod
+    def _rtk_compact(numbers, trailers=False):
+        """RTK 0.50.0's documented git log compaction applied to the fixture messages, written
+        independently of the harness's regex: header, first three non-empty non-trailer body lines,
+        then `[+N lines omitted]`."""
+        blocks = []
+        for number in numbers:
+            subject, _, body = ci.rtk_log_message(number).partition("\n\n")
+            kept = [line for line in body.splitlines() if line
+                    and (trailers or not line.startswith(("Signed-off-by:", "Co-authored-by:")))]
+            block = [f"{number:07x} {subject} (3 seconds ago) <Native CI Fixture>"]
+            block += [f"  {line}" for line in kept[:3]] + [f"  [+{len(kept) - 3} lines omitted]"]
+            blocks.append("\n".join(block))
+        return "\n".join(blocks) + "\n"
+
+    @staticmethod
+    def _raw_git_log(numbers):
+        return "\n".join(f"commit {number:040x}\nAuthor: Native CI Fixture <ci@example.invalid>\n"
+                         f"Date:   Sat Sep 26 16:00:00 2026 +0000\n\n"
+                         + "".join(f"    {line}\n" if line else "\n" for line in ci.rtk_log_message(number).splitlines())
+                         for number in numbers)
+
+    def _run_rtk_long_log(self, root: Path, outputs=None, gains=None):
+        """Run the long-log fixture against stand-in outputs. `outputs` replaces commands' stdout by
+        label; `gains` replaces the three (commands, input, output, saved) ledger readings."""
+        newest = ci.RTK_LOG_COMMITS - 1
+        every, window = range(newest, -1, -1), range(newest, newest - ci.RTK_LOG_DEFAULT_LIMIT, -1)
+        raw = self._raw_git_log(every)
+        outputs = {"git-long-log-baseline": raw, "rtk-long-git-log": self._rtk_compact(every),
+                   "rtk-long-proxy-git-log": raw, "rtk-long-default-git-log": self._rtk_compact(window),
+                   **(outputs or {})}
+        gains = iter(gains or [(0, 0, 0, 0), (1, 1284, 720, 564), (2, 2934, 2370, 564)])
+        run = self._new_run(root)
+        run.tools["rtk"] = "/stub/rtk"
+
+        def command(label, argv, *_args, **_kwargs):
+            if label.startswith("rtk-long-gain-"):
+                commands, used, emitted, saved = next(gains)
+                return json.dumps({"summary": {"total_commands": commands, "total_input": used,
+                                               "total_output": emitted, "total_saved": saved}})
+            return outputs.get(label, "")
+
+        with patch.object(run, "command", side_effect=command):
+            ci.rtk_long_log_fixture(run)
+        return run
+
+    def test_rtk_long_log_checks_need_compaction_a_default_window_and_a_filter_only_saving(self):
+        newest = ci.RTK_LOG_COMMITS - 1
+        every = range(newest, -1, -1)
+        # The harness regex agrees with the documented rule and rejects raw git output.
+        self.assertTrue(ci.rtk_compacted_log(self._rtk_compact(every), newest, ci.RTK_LOG_COMMITS))
+        self.assertFalse(ci.rtk_compacted_log(self._raw_git_log(every), newest, ci.RTK_LOG_COMMITS))
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._run_rtk_long_log(Path(directory))
+        self.assertTrue(all(check["passed"] for check in run.report["checks"]))
+        self.assertEqual(len(run.report["checks"]), 6)
+        self.assertGreater(run.report["rtk_long_log"]["raw_bytes"], run.report["rtk_long_log"]["rtk_bytes"])
+        raw, compact = self._raw_git_log(every), self._rtk_compact(every)
+        for name, replace, failing in (
+                ("filter returned git's own output", {"outputs": {"rtk-long-git-log": raw}},
+                 "rtk-long-log-compacts-every-commit"),
+                ("trailers kept", {"outputs": {"rtk-long-git-log": self._rtk_compact(every, trailers=True)}},
+                 "rtk-long-log-compacts-every-commit"),
+                ("one commit missing", {"outputs": {"rtk-long-git-log": self._rtk_compact(range(newest, 0, -1))}},
+                 "rtk-long-log-compacts-every-commit"),
+                ("proxy returned the compact form", {"outputs": {"rtk-long-proxy-git-log": compact}},
+                 "rtk-long-log-proxy-exact-stdout"),
+                ("filtered call not in the ledger", {"gains": [(0, 0, 0, 0), (0, 0, 0, 0), (1, 1650, 1650, 0)]},
+                 "rtk-long-log-ledger-records-the-filter-saving"),
+                ("proxy recorded a saving", {"gains": [(0, 0, 0, 0), (1, 1284, 720, 564), (2, 2934, 2000, 934)]},
+                 "rtk-long-log-ledger-records-no-proxy-saving"),
+                ("default showed every commit", {"outputs": {"rtk-long-default-git-log": compact}},
+                 "rtk-long-log-default-window-ten-newest-commits")):
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as directory:
+                with self.assertRaisesRegex(AssertionError, f"^{failing}$"):
+                    self._run_rtk_long_log(Path(directory), **replace)
+
+    MARKITDOWN_EXPECTED = (
+        "# Release checklist\n\nRun the **pinned** tools with *scoped* state and read the "
+        "[upgrade guide](https://example.invalid/guide) first.\n\n## Pinned tools\n\n"
+        "| Tool | Version | Check |\n| --- | --- | --- |\n| rtk | 0.50.0 | inline filter tests |\n"
+        "| markitdown | 0.1.8 | structure oracle |\n| ast-grep | 0.45.3 | call-site oracle |\n\n### Steps\n\n"
+        "1. Install into a fresh prefix\n2. Run each fixture\n3. Keep only sanitized output\n\n"
+        "* Record every command\n  + including failures\n* Never read account state\n\n"
+        "> Evidence is not authority.\n\n```\nrtk git log -20\nmarkitdown page.html\n```\n\n"
+        "Tom & Jerry use `--offline` mode.\n\n![Pipeline diagram](diagram.png)\n")
+
+    def test_markitdown_element_checks_accept_markdownify_spellings_and_reject_html(self):
+        html = (ci.ROOT / ci.MARKITDOWN_MULTI_ELEMENT).read_text()
+        self.assertTrue(all(ci.markdown_elements(self.MARKITDOWN_EXPECTED).values()))
+        other_spellings = (self.MARKITDOWN_EXPECTED.replace("* Record", "- Record").replace("  + including", "    - including")
+                           .replace("*scoped*", "_scoped_")
+                           .replace("```\nrtk git log -20\nmarkitdown page.html\n```",
+                                    "    rtk git log -20\n    markitdown page.html"))
+        self.assertTrue(all(ci.markdown_elements(other_spellings).values()))
+        for baseline in (html, ci.tag_stripped_text(html)):
+            self.assertFalse(any(ci.markdown_elements(baseline).values()))
+            self.assertTrue(any(text in baseline for text in ci.MARKITDOWN_HIDDEN_TEXT))
+        without_table = "\n".join(line for line in self.MARKITDOWN_EXPECTED.splitlines() if not line.startswith("|"))
+        self.assertEqual([key for key, value in ci.markdown_elements(without_table).items() if not value], ["table"])
+
+    def _run_markitdown_multi_element(self, root: Path, markdown: str | None):
+        """The fixture with a stand-in converter that writes `markdown`, or copies the HTML when None."""
+        run = self._new_run(root)
+        run.tools["markitdown"] = "/stub/markitdown"
+
+        def command(label, argv, *_args, **_kwargs):
+            target = Path(argv[argv.index("-o") + 1])
+            target.write_text(Path(argv[1]).read_text() if markdown is None else markdown)
+            return ""
+
+        with patch.object(run, "command", side_effect=command):
+            ci.markitdown_multi_element_fixture(run)
+        return run
+
+    def test_markitdown_multi_element_fixture_rejects_passthrough_and_leaked_script_text(self):
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._run_markitdown_multi_element(Path(directory), self.MARKITDOWN_EXPECTED)
+        self.assertTrue(all(check["passed"] for check in run.report["checks"]))
+        for name, markdown, failing in (
+                ("HTML copied through", None, "markitdown-multi-element-structure-converted"),
+                ("script text kept", self.MARKITDOWN_EXPECTED + "\nvar marker = \"NativeCiScriptBody\";\n",
+                 "markitdown-script-style-and-comment-text-dropped"),
+                # markdownify escapes Markdown characters in text it keeps; the check reads through that.
+                ("comment text kept with an escape", self.MARKITDOWN_EXPECTED + "\nNativeCi\\HtmlComment\n",
+                 "markitdown-script-style-and-comment-text-dropped")):
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as directory:
+                with self.assertRaisesRegex(AssertionError, f"^{failing}$"):
+                    self._run_markitdown_multi_element(Path(directory), markdown)
+
+    def test_ast_grep_shell_outcome_is_frozen_and_structural(self):
+        # The oracle comes from Python's own parser and a regex over the frozen fixture's lines.
+        source = (ci.ROOT / ci.AST_GREP_SHELL_FIXTURE).read_text()
+        calls = sorted([node.lineno, node.end_lineno] for node in ast.walk(ast.parse(source))
+                       if isinstance(node, ast.Call) and ast.unparse(node.func) == "subprocess.run"
+                       and any(keyword.arg == "shell" and isinstance(keyword.value, ast.Constant)
+                               and keyword.value.value is True for keyword in node.keywords))
+        every = sorted([node.lineno, node.end_lineno] for node in ast.walk(ast.parse(source))
+                       if isinstance(node, ast.Call) and ast.unparse(node.func) == "subprocess.run")
+        text = [number for number, line in enumerate(source.splitlines(), 1)
+                if re.search(ci.AST_GREP_SHELL_TEXT_REGEX, line)]
+        self.assertEqual(calls, ci.AST_GREP_SHELL_CALL_RANGES)
+        self.assertEqual(text, ci.AST_GREP_SHELL_TEXT_LINES)
+        self.assertTrue(any(end > start for start, end in calls), "one match must span several lines")
+
+        def outputs(ranges):
+            def command(label, argv, *_args, **_kwargs):
+                seen.append(argv)
+                if label == "ast-grep-shell-true-calls":
+                    return json.dumps([{"file": ci.AST_GREP_SHELL_FIXTURE,
+                                        "range": {"start": {"line": start - 1}, "end": {"line": end - 1}}}
+                                       for start, end in ranges])
+                return "".join(f"{line}:subprocess.run(\n" for line in ci.AST_GREP_SHELL_TEXT_LINES)
+            return command
+
+        for name, ranges, passes in (("structural matches", calls, True),
+                                     ("the regex's lines", [[line, line] for line in text], False),
+                                     ("every subprocess.run call", every, False)):
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as directory:
+                run = self._new_run(Path(directory))
+                run.tools["ast-grep"] = "/stub/ast-grep"
+                seen = []
+                with patch.object(run, "command", side_effect=outputs(ranges)):
+                    if passes:
+                        ci.ast_grep_shell_fixture(run)
+                    else:
+                        with self.assertRaisesRegex(AssertionError, "^ast-grep-shell-true-calls-match-across-lines$"):
+                            ci.ast_grep_shell_fixture(run)
+                self.assertTrue(all(ci.AST_GREP_SHELL_FIXTURE in argv for argv in seen))
+
+    @staticmethod
+    def _pack(files: dict) -> str:
+        from xml.sax.saxutils import escape
+        return "<repomix><files>" + "".join(f'<file path="{path}">\n{escape(text)}\n</file>'
+                                            for path, text in files.items()) + "</files></repomix>"
+
+    def test_repomix_compress_check_rejects_an_uncompressed_pack(self):
+        originals = {name: (ci.ROOT / "fixtures" / name).read_text() for name in ("before.py", "after.py")}
+        signatures = {name: "def greeting(name)" for name in originals}
+        for name, structure, passes in (("signatures only", signatures, True), ("uncompressed", originals, False)):
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as directory:
+                run = self._new_run(Path(directory))
+                run.tools["repomix"] = "/stub/repomix"
+
+                def command(label, argv, *_args, _structure=structure, **_kwargs):
+                    packed = originals if label == "repomix-selected-originals" else _structure
+                    Path(argv[argv.index("--output") + 1]).write_text(self._pack(packed))
+                    return ""
+
+                with patch.object(run, "command", side_effect=command):
+                    if passes:
+                        ci.repomix_fixture(run)
+                    else:
+                        with self.assertRaisesRegex(AssertionError, "^repomix-compress-keeps-signatures-drops-bodies$"):
+                            ci.repomix_fixture(run)
+                # The earlier structural check passes either way: it could not tell the two apart.
+                self.assertIn({"label": "repomix-structural-output-only", "passed": True}, run.report["checks"])
+
+    def test_toon_tabular_check_rejects_copied_json_and_another_delimiter(self):
+        # The stand-in decoder always returns the records, isolating the tabular check. The real TOON
+        # 4.1.1 decoder reads a copied JSON file as one key and a string, so the round trip rejects
+        # that case first; a pipe-delimited block round-trips and only the tabular check rejects it.
+        records = (ci.ROOT / "fixtures/records.json").read_text()
+        piped = "items[2|]{name|enabled|count}:\n  alpha|true|2\n  beta|false|3\n"
+        for name, encoded, passes in (("tabular", ci.TOON_TABULAR_RECORDS + "\n", True),
+                                      ("JSON copied through", records, False), ("pipe delimiter", piped, False)):
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as directory:
+                run = self._new_run(Path(directory))
+                run.tools["toon"] = "/stub/toon"
+
+                def command(label, argv, *_args, _encoded=encoded, **_kwargs):
+                    if "-o" in argv:
+                        output = Path(argv[argv.index("-o") + 1])
+                        output.write_text(_encoded if label == "toon-encode-statistics" else records)
+                    return ""
+
+                with patch.object(run, "command", side_effect=command):
+                    if passes:
+                        ci.toon_fixture(run)
+                    else:
+                        with self.assertRaisesRegex(AssertionError, "^toon-tabular-encoding-smaller-than-json$"):
+                            ci.toon_fixture(run)
 
 
 if __name__ == "__main__":

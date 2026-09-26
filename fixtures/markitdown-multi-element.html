@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Native CI conversion fixture</title>
+<style>.NativeCiStyleBody { color: red; }</style>
+<script>var marker = "NativeCiScriptBody";</script>
+</head>
+<body>
+<!-- NativeCiHtmlComment -->
+<h1>Release checklist</h1>
+<p>Run the <strong>pinned</strong> tools with <em>scoped</em> state and read the <a href="https://example.invalid/guide">upgrade guide</a> first.</p>
+<h2>Pinned tools</h2>
+<table>
+<thead><tr><th>Tool</th><th>Version</th><th>Check</th></tr></thead>
+<tbody>
+<tr><td>rtk</td><td>0.50.0</td><td>inline filter tests</td></tr>
+<tr><td>markitdown</td><td>0.1.8</td><td>structure oracle</td></tr>
+<tr><td>ast-grep</td><td>0.45.3</td><td>call-site oracle</td></tr>
+</tbody>
+</table>
+<h3>Steps</h3>
+<ol>
+<li>Install into a fresh prefix</li>
+<li>Run each fixture</li>
+<li>Keep only sanitized output</li>
+</ol>
+<ul>
+<li>Record every command
+<ul><li>including failures</li></ul>
+</li>
+<li>Never read account state</li>
+</ul>
+<blockquote><p>Evidence is not authority.</p></blockquote>
+<pre><code>rtk git log -20
+markitdown page.html</code></pre>
+<p>Tom &amp; Jerry use <code>--offline</code> mode.</p>
+<img src="diagram.png" alt="Pipeline diagram">
+</body>
+</html>

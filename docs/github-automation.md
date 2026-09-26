@@ -268,7 +268,10 @@ changed" and "frozen local source differs". `native-token-e2e.yml` is bound by n
 test, but its current SHA-256 is recorded in four execution receipts and artifacts, so
 an edit would detach the file from its dated run evidence. A cosmetic comment does not
 justify re-freezing a plan or detaching a receipt, so those six comments wait for the
-next functional change. The
+next functional change. (Update 2026-09-26, changed after `v2026.09.26.2`: that change came
+with the `harden-runner` step for all three files, so the six comments now name exact releases
+(`# v7.0.1`, `# v8.0.1`), see
+[`docs/decisions/2026-09-26-token-workflow-hardening.md`](decisions/2026-09-26-token-workflow-hardening.md).) The
 publication job's two write permissions now carry explanatory comments. No SHA,
 permission, trigger or step changed. Convention since then (restored 2026-09-25 for
 `catalog-freshness.yml:propose` and the three `saturation-tracking.yml` jobs): every
@@ -712,30 +715,40 @@ workflow artifact (`scorecard-results-<run_id>`, 5-day retention).
 the full commit SHA of its latest release `v2.21.1`
 (`e14015d583714f6e62063499dc959a02595150a1`, from
 `gh api repos/step-security/harden-runner/releases/latest`), runs as the
-*first* step, before checkout, with `egress-policy: audit` (never `block`),
-on 21 of 25 `ubuntu-24.04` jobs (measured 2026-09-23 at HEAD: every job across
-`.github/workflows/*.yml` whose `runs-on` is a literal `ubuntu-` label, using
-`tests/test_workflow_hardening.py`'s own job/first-step parser -- 25 such jobs
-total, 4 in the hash-frozen exemptions below, and all 21 remaining jobs start
-with `harden-runner` in audit mode, per
-`test_every_ubuntu_job_starts_with_harden_runner_in_audit_mode`). The four exempt jobs are those whose
-workflows are byte-pinned by retained evidence: `source` and `destination`
-(`native-offhost-app-state.yml`, pinned in
-`blueprints/convergence-practice/offhost-app-state/plan.json`'s
-`frozen_sources`), `synthetic-restore` (`native-offhost-restore.yml`, pinned
-in `blueprints/convergence-practice/offhost-restore/hosted-plan.json`) and
+*first* step, before checkout, with `egress-policy: audit` (never `block`).
+Measured 2026-09-26 with `tests/test_workflow_hardening.py`'s own job/first-step
+parser (changed after `v2026.09.26.2`): all 32 jobs across `.github/workflows/*.yml`
+whose `runs-on` is a literal `ubuntu-` label start with it, and so do 3 of the 4
+`macos-` jobs, because the pinned release also supports GitHub-hosted macOS runners
+in audit mode. The one job without it is `hardware-profile-smoke.yml`'s
+`macos-profile`, a named ownership exemption (another task owns that file), not a
+platform one. `test_every_ubuntu_and_macos_job_starts_with_harden_runner_in_audit_mode`
+fails on any other `ubuntu` or `macos` job without the step, and on a job whose
+runner label is neither.
+
+Until 2026-09-26 four `ubuntu` jobs were exempt because retained evidence pinned
+their workflows' exact bytes: `source` and `destination`
+(`native-offhost-app-state.yml`, `frozen_sources` of
+`blueprints/convergence-practice/offhost-app-state/plan.json`),
+`synthetic-restore` (`native-offhost-restore.yml`,
+`blueprints/convergence-practice/offhost-restore/hosted-plan.json`) and
 `native-token-tools` (`native-token-e2e.yml`, recorded in four dated execution
-receipts). Adding a step to one of those needs the evidence re-run and
-re-pinned. `bootstrap-macos` runs on `macos-15`, which `harden-runner` does not
-support. `tests/test_workflow_hardening.py` classifies every job: an unhardened
-`ubuntu` job outside the named exemptions fails, an unrecognized runner label
-fails, and each exemption fails as soon as its workflow drifts from the pinned
-hash. The exemptions and their overturn condition are recorded in the
-"Integration follow-up" of
+receipts). The exemptions and their overturn condition are in the "Integration
+follow-up" of
 [`docs/decisions/2026-09-22-actions-hardening-fix-round.md`](decisions/2026-09-22-actions-hardening-fix-round.md).
-Audit mode only logs
-observed egress; it cannot fail a job or block a network call, so it changes
-no existing pass/fail behavior.
+All four now start with the step
+([`docs/decisions/2026-09-26-token-workflow-hardening.md`](decisions/2026-09-26-token-workflow-hardening.md)):
+`HASH_FROZEN` in the test is empty, and
+`test_formerly_exempt_workflows_stay_hardened` keeps the four jobs hardened. No run
+has executed the step in them yet. Local `--install` runs, which call
+`scripts/native_token_ci.py` directly, re-recorded the `native-token-tools` harness
+receipts against the new workflow bytes (`fb06cf92…`,
+[evidence](../evidence/artifacts/token-workflow-hardening-20260926/README.md)); the
+pull request's hosted run of that job is the step's first execution there. The three
+off-host jobs got the step with a refresh of only their plans' prospective bindings,
+as on 2026-09-20, so each workflow's next dispatch is its first run with the step.
+Audit mode only logs observed egress; it cannot fail a job or block a network call,
+so it changes no existing pass/fail behavior.
 
 **`dependency-review.yml` (actions/dependency-review-action).** Pinned to
 the full commit SHA of its latest release `v5.0.0`

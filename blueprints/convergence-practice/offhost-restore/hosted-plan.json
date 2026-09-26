@@ -9,7 +9,8 @@
     "Preserve failed hosted run35536387838. Separate negative-key file from commands/<label> directories; regression uses actual initialization and exact unchanged ciphertext.",
     "Run seven selected unchanged pinned upstream restic tests with upstream-selected Go1.25.10, separately typed source-built upstream evidence; private-key transfer fixture remains local acceptance.",
     "Record attempted command, scoped cwd, timestamps, duration and launch errors before propagating missing/denied executable failures; correct official CI line reference to149-153.",
-    "Refresh only the prospective workflow binding after PR26 native-output tee logging and PR31 independently qualified Action pins. Accepted run35537533416 retains its original execution revision and hosted-plan digest; no new recovery execution is claimed."
+    "Refresh only the prospective workflow binding after PR26 native-output tee logging and PR31 independently qualified Action pins. Accepted run35537533416 retains its original execution revision and hosted-plan digest; no new recovery execution is claimed.",
+    "Refresh only the prospective workflow binding again on 2026-09-26: step-security/harden-runner in audit mode as the job's first step, as on every other ubuntu job, and the upload-artifact comment naming its exact release (v7.0.1). No new recovery execution is claimed; the next dispatch is the first run with the step."
   ],
   "changed_sources_since_preparation": [
     {
@@ -30,7 +31,7 @@
     {
       "path": ".github/workflows/native-offhost-restore.yml",
       "preparation_sha256": "24a495d0d66e50f30b3a87d8b18efe2d6db282811637af6aba97a5ca2b3dd569",
-      "hosted_sha256": "91ecb7bdc3bcc139e9b2574c1bbe164ada48c9e31971a4920f4d41d37fcedf03"
+      "hosted_sha256": "b74a83686367f7d63112c7ab4fec84d7b60fbfe2f448a0a1b040b3081da39fb2"
     }
   ],
   "frozen_sources": [
@@ -92,7 +93,7 @@
     },
     {
       "path": ".github/workflows/native-offhost-restore.yml",
-      "sha256": "91ecb7bdc3bcc139e9b2574c1bbe164ada48c9e31971a4920f4d41d37fcedf03"
+      "sha256": "b74a83686367f7d63112c7ab4fec84d7b60fbfe2f448a0a1b040b3081da39fb2"
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/upstream_tests.py",

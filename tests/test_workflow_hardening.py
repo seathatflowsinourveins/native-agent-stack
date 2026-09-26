@@ -27,14 +27,21 @@ UPLOAD_SARIF = "github/codeql-action/upload-sarif@"
 # Workflows whose exact bytes are pinned by retained evidence; editing them would detach that
 # evidence from the file, so their jobs stay unhardened until the evidence is re-run. Each maps
 # to a file that records the workflow's current SHA-256.
-HASH_FROZEN = {
-    # plan.json frozen_sources, enforced by tests/test_active_recovery_plans.py
-    "native-offhost-app-state.yml": "blueprints/convergence-practice/offhost-app-state/plan.json",
-    # hosted-plan.json, enforced by tests/test_active_recovery_plans.py
-    "native-offhost-restore.yml": "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
-    # four dated execution receipts record it (docs/github-automation-evidence.json)
-    "native-token-e2e.yml": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install/receipt.json",
-}
+HASH_FROZEN = {}
+# Empty since 2026-09-26 (docs/decisions/2026-09-26-token-workflow-hardening.md); the filters that read
+# it stay for a future named exemption. native-token-e2e.yml left it when local --install runs
+# re-recorded its harness receipts against the new workflow bytes (evidence/artifacts/
+# token-workflow-hardening-20260926/); those runs call scripts/native_token_ci.py directly, so the
+# pull request's hosted run is the step's first execution and completes the overturn named in
+# docs/decisions/2026-09-22-actions-hardening-fix-round.md. The two off-host workflows gained the step
+# with a refresh of only their recovery plans' prospective bindings (plan.json, hosted-plan.json, still
+# enforced by tests/test_active_recovery_plans.py), as on 2026-09-20; their next dispatch is the first
+# run with it. Putting one of the three back here also means dropping it from FORMERLY_HASH_FROZEN.
+FORMERLY_HASH_FROZEN = ("native-offhost-app-state.yml", "native-offhost-restore.yml", "native-token-e2e.yml")
+# An exact release in a pin's comment, such as `# v7.0.1`. A major-only `# v7` names a tag that
+# moves: zizmor's online ref-version-mismatch audit (a Medium finding at the regular persona, which
+# fails the validate job) reports it as soon as upstream moves that tag off the pinned commit.
+EXACT_RELEASE_COMMENT = re.compile(r"#\s*v\d+\.\d+\.\d+\s*$")
 # step-security/harden-runner's pinned version supports macOS runners too,
 # in audit mode -- its README, read at this exact pinned commit
 # (e14015d583714f6e62063499dc959a02595150a1) on 2026-09-23: "GitHub-hosted
@@ -154,9 +161,37 @@ class HardenRunnerTests(unittest.TestCase):
         self.assertIn("egress-policy: audit", step)
 
     def test_hash_frozen_exemptions_are_still_pinned(self):
+        if not HASH_FROZEN:
+            # Reported as skipped rather than passed: with no exemption there is nothing to check.
+            self.skipTest("no workflow is hash-frozen (empty since 2026-09-26)")
         for name, pin in HASH_FROZEN.items():
             digest = hashlib.sha256((WORKFLOWS / name).read_bytes()).hexdigest()
             self.assertIn(digest, (ROOT / pin).read_text(encoding="utf-8"), f"{name} is no longer pinned by {pin}")
+
+    def test_formerly_exempt_workflows_stay_hardened(self):
+        # Regression guard: none of the three returns to HASH_FROZEN, and each of their four jobs
+        # starts with the audit step.
+        found = []
+        for name in FORMERLY_HASH_FROZEN:
+            self.assertNotIn(name, HASH_FROZEN)
+            for job_id, job_text in jobs((WORKFLOWS / name).read_text(encoding="utf-8")).items():
+                step = first_step(job_text)
+                self.assertIn(HARDEN, step, f"{name}:{job_id}")
+                self.assertIn("egress-policy: audit", step, f"{name}:{job_id}")
+                found.append(f"{name}:{job_id}")
+        self.assertEqual(sorted(found), ["native-offhost-app-state.yml:destination", "native-offhost-app-state.yml:source",
+                                         "native-offhost-restore.yml:synthetic-restore", "native-token-e2e.yml:native-token-tools"])
+
+    def test_github_automation_cites_only_existing_tests(self):
+        # docs/github-automation.md cites tests as the proof of its hardening claims. After the
+        # ubuntu-only test was renamed for macOS coverage, the page kept citing the old name for a
+        # test that no longer existed (2026-09-26 review).
+        cited = set(re.findall(r"`(test_\w+)`", (ROOT / "docs/github-automation.md").read_text(encoding="utf-8")))
+        defined = {name for path in (ROOT / "tests").glob("test_*.py")
+                   for name in re.findall(r"(?m)^\s*(?:async\s+)?def (test_\w+)\(", path.read_text(encoding="utf-8"))}
+        self.assertIn("test_every_ubuntu_and_macos_job_starts_with_harden_runner_in_audit_mode", defined)
+        self.assertTrue(cited, "the page cites no test by name")
+        self.assertEqual(sorted(cited - defined), [], "tests cited in docs/github-automation.md but not defined")
 
     def test_job_parser_matches_yaml_when_available(self):
         try:
@@ -697,6 +732,25 @@ class PinningTests(unittest.TestCase):
                 if not re.fullmatch(r"[\w.-]+/[\w./-]+@[0-9a-f]{40}", match.group(1)):
                     unpinned.append(f"{path.name}:{line_number}: {match.group(1)}")
         self.assertEqual(unpinned, [])
+
+    @staticmethod
+    def imprecise_comments(name, text):
+        """SHA-pinned `uses:` lines whose comment does not name an exact release."""
+        return [f"{name}:{number}: {line.strip()}" for number, line in enumerate(text.splitlines(), 1)
+                if re.search(r"uses:\s*[\w.-]+/[\w./-]+@[0-9a-f]{40}", line) and not EXACT_RELEASE_COMMENT.search(line)]
+
+    def test_pin_comments_name_an_exact_release_outside_hash_frozen_workflows(self):
+        # Offline guard for zizmor's online ref-version-mismatch audit. A HASH_FROZEN workflow would keep
+        # its recorded bytes until its own evidence is re-run; none is frozen since 2026-09-26.
+        found = [error for path in sorted(WORKFLOWS.glob("*.yml")) if path.name not in HASH_FROZEN
+                 for error in self.imprecise_comments(path.name, path.read_text(encoding="utf-8"))]
+        self.assertEqual(found, [])
+
+    def test_the_comment_check_rejects_a_major_only_or_missing_comment(self):
+        sha = "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+        text = "\n".join(f"      - uses: actions/upload-artifact@{sha}{comment}"
+                         for comment in (" # v7.0.1", " # v7", "", " # latest"))
+        self.assertEqual([error.split(":", 2)[1] for error in self.imprecise_comments("x.yml", text)], ["2", "3", "4"])
 
 
 

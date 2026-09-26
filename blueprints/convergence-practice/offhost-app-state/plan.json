@@ -61,7 +61,7 @@
   "frozen_sources": [
     {
       "path": ".github/workflows/native-offhost-app-state.yml",
-      "sha256": "76a49ffe92288eb5e5c337523797770e2474b23c6e0b58a4fc5e80a5ce7acd70"
+      "sha256": "6ee7179ed42fcae2a5e45eb1b597f1926f9576112c836c6db2db7c99d8147d8c"
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/memory-oracle.json",
