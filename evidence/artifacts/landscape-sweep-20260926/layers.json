@@ -3,6 +3,7 @@
   "catalog": "foundation",
   "layer_id": "native-clients",
   "votes": "retained",
+  "votes_note": "1 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: earendil-works/pi.",
   "discovery_ref": "@RETURNS@#/discovery/native-clients",
   "calls": {
    "web_search": 2,
@@ -124,6 +125,7 @@
   "catalog": "foundation",
   "layer_id": "instructions-skills",
   "votes": "retained",
+  "votes_note": "1 of 15 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: mattpocock/skills.",
   "discovery_ref": "@RETURNS@#/discovery/instructions-skills",
   "calls": {
    "web_search": 8,
@@ -330,6 +332,7 @@
   "catalog": "foundation",
   "layer_id": "workers",
   "votes": "retained",
+  "votes_note": "2 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: openai/codex, sipyourdrink-ltd/bernstein.",
   "discovery_ref": "@RETURNS@#/discovery/workers",
   "calls": {
    "web_search": 2,
@@ -451,6 +454,7 @@
   "catalog": "foundation",
   "layer_id": "isolation",
   "votes": "retained",
+  "votes_note": "2 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: superradcompany/microsandbox, boxlite-ai/boxlite.",
   "discovery_ref": "@RETURNS@#/discovery/isolation",
   "calls": {
    "web_search": 3,
@@ -572,6 +576,7 @@
   "catalog": "foundation",
   "layer_id": "code-navigation",
   "votes": "retained",
+  "votes_note": "2 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: anthropics/claude-plugins-official, abhigyanpatwari/gitnexus.",
   "discovery_ref": "@RETURNS@#/discovery/code-navigation",
   "calls": {
    "web_search": 5,
@@ -693,6 +698,7 @@
   "catalog": "foundation",
   "layer_id": "document-retrieval",
   "votes": "retained",
+  "votes_note": "5 of 7 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: opendatalab/mineru, docling-project/docling, cinnamon/kotaemon, huggingface/sentence-transformers, arabold/docs-mcp-server.",
   "discovery_ref": "@RETURNS@#/discovery/document-retrieval",
   "calls": {
    "web_search": 4,
@@ -802,6 +808,7 @@
   "catalog": "foundation",
   "layer_id": "semantic-rag",
   "votes": "retained",
+  "votes_note": "5 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: osu-nlp-group/hipporag, lightonai/next-plaid, minishlab/semble, ollama/ollama, giancarloerra/socraticode.",
   "discovery_ref": "@RETURNS@#/discovery/semantic-rag",
   "calls": {
    "web_search": 7,
@@ -923,6 +930,7 @@
   "catalog": "foundation",
   "layer_id": "durable-memory",
   "votes": "retained",
+  "votes_note": "5 of 14 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: campfirein/byterover-cli, rohitg00/agentmemory, mempalace/mempalace, vshulcz/deja-vu, vbcherepanov/total-agent-memory.",
   "discovery_ref": "@RETURNS@#/discovery/durable-memory",
   "calls": {
    "web_search": 5,
@@ -1117,6 +1125,7 @@
   "catalog": "foundation",
   "layer_id": "web-research",
   "votes": "retained",
+  "votes_note": "4 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: exa-labs/exa-mcp-server, unclecode/crawl4ai, adbar/trafilatura, openai/codex.",
   "discovery_ref": "@RETURNS@#/discovery/web-research",
   "calls": {
    "web_search": 6,
@@ -1348,7 +1357,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/token-efficiency"
+   }
+  ]
  },
  {
   "catalog": "foundation",
@@ -1537,7 +1551,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/quality-evaluation"
+   }
+  ]
  },
  {
   "catalog": "foundation",
@@ -1654,7 +1673,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/ci-supply-chain"
+   }
+  ]
  },
  {
   "catalog": "foundation",
@@ -1771,7 +1795,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/scheduling-supervision"
+   }
+  ]
  },
  {
   "catalog": "foundation",
@@ -1887,7 +1916,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/hosting-services"
+   }
+  ]
  },
  {
   "catalog": "foundation",
@@ -2003,7 +2037,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/recovery-portability"
+   }
+  ]
  },
  {
   "catalog": "foundation",
@@ -2192,7 +2231,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/observation-inference"
+   }
+  ]
  },
  {
   "catalog": "foundation",
@@ -2308,7 +2352,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/agent-sdks"
+   }
+  ]
  },
  {
   "catalog": "foundation",
@@ -2425,7 +2474,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/mcp-surfaces"
+   }
+  ]
  },
  {
   "catalog": "foundation",
@@ -2530,7 +2584,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/secrets-credentials"
+   }
+  ]
  },
  {
   "catalog": "foundation",
@@ -2647,7 +2706,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/git-github-automation"
+   }
+  ]
  },
  {
   "catalog": "us-equities",
@@ -2740,7 +2804,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/market-data-reference"
+   }
+  ]
  },
  {
   "catalog": "us-equities",
@@ -2967,7 +3036,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/storage-compute"
+   }
+  ]
  },
  {
   "catalog": "us-equities",
@@ -3375,7 +3449,12 @@
     }
    }
   ],
-  "reopen": []
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/backtesting-engine"
+   }
+  ]
  },
  {
   "catalog": "us-equities",

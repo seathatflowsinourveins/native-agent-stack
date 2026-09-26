@@ -2732,11 +2732,11 @@
    "workflow_run": "wf_a874897e-af1",
    "status": "stopped",
    "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
-   "manifest_sha256": "1210e6e79a776dacb86887e9f1bea82d27269723f50717478dd7ab3d12b34f27",
+   "manifest_sha256": "56e4db54ed89b6362bb315eeaa56897c71d42bd01874093ac6ded08a2ef21b79",
    "lane": "landscape-sweep-20260926",
    "prompts_sha256": "1b7844800af40911484591d738a86741fd4a68cbb58339bc8126418c4c6a8783",
    "usage_ref": "evidence/artifacts/landscape-sweep-20260926-attempts/child-usage-wf_a874897e-af1.json",
-   "usage_sha256": "9fbb1dd9d3558c28c59c22ce8d7d3bc4a15508a9a966fe5dda85f41c71704bcf",
+   "usage_sha256": "bcd6f3e14b8f2fb53092f2d13944f6b200745cd88749fb181d7ae3c60846c7b4",
    "lower_bound_usage": true,
    "record_ref": "evidence/artifacts/landscape-sweep-20260926-attempts/wf_a874897e-af1.json",
    "lost_workers": [
@@ -2834,22 +2834,23 @@
    "workflow_run": "wf_8397ada1-777",
    "status": "completed",
    "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
-   "manifest_sha256": "1210e6e79a776dacb86887e9f1bea82d27269723f50717478dd7ab3d12b34f27",
+   "manifest_sha256": "56e4db54ed89b6362bb315eeaa56897c71d42bd01874093ac6ded08a2ef21b79",
    "lane": "landscape-sweep-20260926",
    "prompts_sha256": "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4",
    "usage_ref": "evidence/artifacts/landscape-sweep-20260926-attempts/child-usage-wf_8397ada1-777.json",
-   "usage_sha256": "7d846ef272ff4d8190e50fbb5f527e788eeaee7e125d19adc6ad7adefae11699",
+   "usage_sha256": "efd48d9872a88c3e5214eabcc4c64455c3c1eced958794df42b9a03321a9b30f",
    "lower_bound_usage": false,
    "returns_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json",
-   "returns_sha256": "debe031db0607dd7dc6eaea86f3f7f0960909950614a15b65c8aac47f0cc0dd1",
+   "returns_sha256": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600",
    "notes": [
     "Ran on the 2026-09-26 scratchpad prototype of the lane; prompts_sha256 is the prototype's prompts_sha256.txt, which the packaged templates reproduce. The run's lane limits, incidents included, are catalogs/sota-convergence/manifest-20260926.json#/lane_limits/landscape-sweep-20260926.",
-    "Survival is two-family on fit: the facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra) must vote not refuted. In the nine layers whose first-round GPT-6 fit votes did not return, those proposals are recorded as refuted by the missing vote, not refuted on merit, and never as two-family agreement; each such layer is reopened (retained_failure).",
+    "Survival is two-family on fit: the facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra) must vote not refuted. In the nine layers whose first-round GPT-6 fit votes did not return, the missing vote counts as refuted, so no proposal there survived or counts as two-family agreement. The 27 proposals that no returned vote refutes are refuted by absence, not on merit: each layer's votes_note names them, their fit ref's gpt6 member is {missing: true}, and saturation_ledger.py (refuted_by_absence) and build_inputs.py do not count them as adjudicated. Each such layer is reopened (retained_failure).",
+    "The coordinator session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION, default 200, across the session and every subagent) was reached at 04:10:13Z: 46 of this run's 200 WebSearch calls were capped, in 30 workers (the usage record's web_search), and no Claude refuter, follow-up discovery worker or critic search returned results. Every capped worker is a web_search_capped retained failure of its layer, and the critic's counts for every layer, so every layer is reopened (lane limit 10).",
     "Reopen entries other than retained_failure copy the saturation report's current triggers at append time (this checkout's receipt staleness and the run's catalog-freshness artifact 36205743492).",
     "Earlier attempts: landscape-sweep-20260926-attempt-1 (wf_a874897e-af1, stopped) is its own record; the one-layer smoke wf_1753e674-5dc is retained under evidence/artifacts/landscape-sweep-20260926-attempts/ without a ledger record.",
     "Proposals and refuter votes plus upstream source reviews only: nothing was installed and no winner changed; winner pins move only through the verdict wave."
    ],
-   "prev_sha256": "a3a59b321890d3a3b59cfed066460ebe05fac306a51f08c981a05e54e2b06e55",
+   "prev_sha256": "ea8155ca3516993bdf0236242659c46963dcac665b3b26412df5a7ef366985ee",
    "layers": [
     {
      "catalog": "foundation",
@@ -2857,6 +2858,7 @@
      "requirement_sha256": "05399edb0f84f790f19a312272324d5ee9682d751e92721e929ec7a706928e87",
      "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
      "votes": "retained",
+     "votes_note": "1 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: earendil-works/pi.",
      "discovery_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/discovery/native-clients",
      "calls": {
       "web_search": 2,
@@ -2996,6 +2998,7 @@
      "requirement_sha256": "1a095568d89a07d2d08bacd559f0cd5e5e2a13f39247e09977d5a30b0b294137",
      "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
      "votes": "retained",
+     "votes_note": "1 of 15 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: mattpocock/skills.",
      "discovery_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/discovery/instructions-skills",
      "calls": {
       "web_search": 8,
@@ -3229,6 +3232,7 @@
      "requirement_sha256": "84c867267a451e87491d14819310ec956908c15dedc94809e631611a467c6bd0",
      "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
      "votes": "retained",
+     "votes_note": "2 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: openai/codex, sipyourdrink-ltd/bernstein.",
      "discovery_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/discovery/workers",
      "calls": {
       "web_search": 2,
@@ -3364,6 +3368,7 @@
      "requirement_sha256": "0bf4bf6c3c95d0db4a706e900c65c4d8bb7c745c26f6fdd6ae8c866945c4df49",
      "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
      "votes": "retained",
+     "votes_note": "2 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: superradcompany/microsandbox, boxlite-ai/boxlite.",
      "discovery_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/discovery/isolation",
      "calls": {
       "web_search": 3,
@@ -3499,6 +3504,7 @@
      "requirement_sha256": "1ef34f38eebd4497e961ecb5b4447d098d4ba7d136f56dc60e51c39606c99ad8",
      "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
      "votes": "retained",
+     "votes_note": "2 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: anthropics/claude-plugins-official, abhigyanpatwari/gitnexus.",
      "discovery_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/discovery/code-navigation",
      "calls": {
       "web_search": 5,
@@ -3637,6 +3643,7 @@
      "requirement_sha256": "9c18aa39fc1403f5dcff25d059ec77637d2a95df4c45faa6fc253cdacbf53a76",
      "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
      "votes": "retained",
+     "votes_note": "5 of 7 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: opendatalab/mineru, docling-project/docling, cinnamon/kotaemon, huggingface/sentence-transformers, arabold/docs-mcp-server.",
      "discovery_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/discovery/document-retrieval",
      "calls": {
       "web_search": 4,
@@ -3759,6 +3766,7 @@
      "requirement_sha256": "3f19f7ecc004bfd0a4a22e68146ddf26ce85e0eca4290a76f9124d4711cd80f9",
      "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
      "votes": "retained",
+     "votes_note": "5 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: osu-nlp-group/hipporag, lightonai/next-plaid, minishlab/semble, ollama/ollama, giancarloerra/socraticode.",
      "discovery_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/discovery/semantic-rag",
      "calls": {
       "web_search": 7,
@@ -3902,6 +3910,7 @@
      "requirement_sha256": "7e41c5c3a4b3de9cf7b3c58dc65a2b92b70245a1de65ad3c2f0ecd71572819c1",
      "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
      "votes": "retained",
+     "votes_note": "5 of 14 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: campfirein/byterover-cli, rohitg00/agentmemory, mempalace/mempalace, vshulcz/deja-vu, vbcherepanov/total-agent-memory.",
      "discovery_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/discovery/durable-memory",
      "calls": {
       "web_search": 5,
@@ -4122,6 +4131,7 @@
      "requirement_sha256": "c90c7296603e2905021600b07d55018b752fa8a02b017d57e946a1bc77fc75e6",
      "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
      "votes": "retained",
+     "votes_note": "4 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: exa-labs/exa-mcp-server, unclecode/crawl4ai, adbar/trafilatura, openai/codex.",
      "discovery_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/discovery/web-research",
      "calls": {
       "web_search": 6,
@@ -4379,7 +4389,12 @@
        }
       }
      ],
-     "reopen": []
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/token-efficiency"
+      }
+     ]
     },
     {
      "catalog": "foundation",
@@ -4592,7 +4607,12 @@
        }
       }
      ],
-     "reopen": []
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/quality-evaluation"
+      }
+     ]
     },
     {
      "catalog": "foundation",
@@ -4723,7 +4743,12 @@
        }
       }
      ],
-     "reopen": []
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/ci-supply-chain"
+      }
+     ]
     },
     {
      "catalog": "foundation",
@@ -4858,7 +4883,12 @@
        }
       }
      ],
-     "reopen": []
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/scheduling-supervision"
+      }
+     ]
     },
     {
      "catalog": "foundation",
@@ -4989,6 +5019,10 @@
       }
      ],
      "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/hosting-services"
+      },
       {
        "trigger": "selection_changed",
        "ref": "catalog-freshness:mcp-inspector (license None -> NOASSERTION)"
@@ -5123,6 +5157,10 @@
       }
      ],
      "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/recovery-portability"
+      },
       {
        "trigger": "pin_moved",
        "ref": "receipt_staleness:macos-arm64/ai-memory"
@@ -5343,6 +5381,10 @@
      ],
      "reopen": [
       {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/observation-inference"
+      },
+      {
        "trigger": "pin_moved",
        "ref": "receipt_staleness:linux-wsl2-x86_64/vllm"
       }
@@ -5475,7 +5517,12 @@
        }
       }
      ],
-     "reopen": []
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/agent-sdks"
+      }
+     ]
     },
     {
      "catalog": "foundation",
@@ -5610,6 +5657,10 @@
      ],
      "reopen": [
       {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/mcp-surfaces"
+      },
+      {
        "trigger": "selection_changed",
        "ref": "catalog-freshness:mcp-inspector (license None -> NOASSERTION)"
       }
@@ -5734,7 +5785,12 @@
        }
       }
      ],
-     "reopen": []
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/secrets-credentials"
+      }
+     ]
     },
     {
      "catalog": "foundation",
@@ -5865,7 +5921,12 @@
        }
       }
      ],
-     "reopen": []
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/git-github-automation"
+      }
+     ]
     },
     {
      "catalog": "us-equities",
@@ -5974,7 +6035,12 @@
        }
       }
      ],
-     "reopen": []
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/market-data-reference"
+      }
+     ]
     },
     {
      "catalog": "us-equities",
@@ -6229,7 +6295,12 @@
        }
       }
      ],
-     "reopen": []
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/storage-compute"
+      }
+     ]
     },
     {
      "catalog": "us-equities",
@@ -6692,7 +6763,12 @@
        }
       }
      ],
-     "reopen": []
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/backtesting-engine"
+      }
+     ]
     },
     {
      "catalog": "us-equities",
@@ -7614,5 +7690,5 @@
    ]
   }
  ],
- "head_sha256": "535d7ee0c7d31e55f4c5a02233931ca23e5901cee56361cb9af8b741f827a18b"
+ "head_sha256": "e2badb334ff3508f4c824a522488eb769fe06fe082dac6ea35f6df57a16ee0c5"
 }

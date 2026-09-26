@@ -35,6 +35,12 @@
     "cache_creation_input_tokens": 371980
    }
   },
+  "web_search": {
+   "calls": 1,
+   "capped": 0,
+   "capped_children": []
+  },
+  "web_search_note": "WebSearch calls and capped calls measured from the transcripts (child-usage.mjs web_search). They count toward the coordinator session's WebSearch cap, which wf_8397ada1-777 reached at 04:10:13Z.",
   "lower_bound": false
  },
  "gpt6_usage": {

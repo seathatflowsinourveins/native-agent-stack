@@ -4,7 +4,7 @@
  "kind": "independent_review",
  "reviewer": "a separate headless Claude Code session (claude -p, model opus) with read-only tools (Read, Grep, Glob, Bash; Edit, Write, Agent and Workflow disallowed)",
  "reviewed": "commits d89265a7 and 3a47b331, and the first versions of the gitleaks allowlist and of this record (both replaced on this branch by the repaired versions)",
- "review_round": "one review and one repair round; no second review",
+ "review_round": "two reviews, each followed by one repair round: the first at the top level of this file, the second under second_round",
  "verdict": "needs_changes",
  "checks_reported": 43,
  "findings": [
@@ -47,5 +47,29 @@
  ],
  "limitations": [
   "Same model family as the recorder; the Codex cross-family review was not run because another session's GPT-6 jobs were using the shared Codex account at the time."
- ]
+ ],
+ "second_round": {
+  "reviewer": "the coordinator's workflow reviewers (Claude Opus), reading the committed branch",
+  "reviewed": "commit 22dfcb45 (this record, its tools and the ledger append)",
+  "verdict": "needs_changes",
+  "findings": [
+   {
+    "severity": "high",
+    "file": "evidence/artifacts/landscape-sweep-20260926/README.md, the manifest's lane limits and the ledger note",
+    "claim": "The session's WebSearch budget (200 calls) ran out at 04:10:13Z and nothing in the record said so: 154 calls returned results and 46 were capped, in 30 workers, so the refutation phase, the critic and the follow-up round ran without WebSearch. votes/identity-provenance/3/facts refuted databento/databento-python for want of a search. refute-fit:agent-sdks was capped, yet agent-sdks counted as clean. The lane's budgets exceed the cap, and convert.py did not flag capped calls.",
+    "verification": "Reproduced from the transcripts by pairing every WebSearch tool_use with its tool_result: 200 calls, 154 with results, 46 capped (200 of 200), first 04:10:13.805Z, last 11:55:57.115Z. The cap and its env variable are documented (tools-reference, 'Session search limit'; env-vars), and the 2.1.283 client sets the default to 200.",
+    "disposition": "repaired in 1bd2416b and this record: child-usage.mjs counts capped calls; convert.py makes each capped worker a web_search_capped retained failure (the critic's for every layer), so every layer is reopened; make_result.py refuses uncovered capped workers; lane limit 10, the README section 'WebSearch session cap', a ledger note, and the harness README and recipe on raising the cap"
+   },
+   {
+    "severity": "medium",
+    "file": "catalogs/saturation/ledger.json",
+    "claim": "The ledger note said the nine layers' proposals are recorded as refuted by the missing vote, against the incident log's 'never as refuted-by-absence'. 27 proposals that passed facts and the Claude fit refuter sit under refuted, and build_inputs.py (previous_sweep.refuted) and saturation_ledger.py (adjudicated_repos) treat them as adjudicated.",
+    "verification": "Reproduced: 27 refuted entries in 9 layers whose only refuting vote is a missing GPT-6 member.",
+    "disposition": "repaired in 1bd2416b and this record: refutes_on_merit and refuted_by_absence read the missing marker, adjudicated_repos leaves such entries out, build_inputs.py lists them as not_adjudicated, convert.py names them in each layer's votes_note, and the ledger note says so. The offered alternative, collecting the nine GPT-6 fit votes before appending, was not taken: those would be votes of a new model run, not of this run; the verdict wave takes the 27 as its first candidates for a second-family fit vote."
+   }
+  ],
+  "limitations": [
+   "Same model family as the recorder; no Codex review of the repair was run."
+  ]
+ }
 }

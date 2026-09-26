@@ -45,6 +45,12 @@
     "cache_creation_input_tokens": 417985
    }
   },
+  "web_search": {
+   "calls": 25,
+   "capped": 0,
+   "capped_children": []
+  },
+  "web_search_note": "WebSearch calls and capped calls measured from the transcripts (child-usage.mjs web_search). They count toward the coordinator session's WebSearch cap, which wf_8397ada1-777 reached at 04:10:13Z.",
   "status": "incomplete",
   "lower_bound": true,
   "note": "Claude usage from the retained transcripts; the children stopped in flight end at the stop, so the figures are a lower bound."

@@ -2,19 +2,55 @@
  "schema_version": 1,
  "measurement": {
   "tool": "native-agent-stack examples/claude-native/workflows/child-usage.mjs",
-  "tool_commit": "23b2ab06587c982ae9d783494f2bd80e6fff2ead",
-  "tool_sha256": "71509f66e151fc5adcf48251ba9677127881928a77ed37b2ec3f884af2199480",
+  "tool_commit": "1bd2416b5434758f519ec617b66dfd7eeb0e0fff",
+  "tool_sha256": "d60d1df49f8653a123cea29c22da623b040ea3d07339d944f23df5f5dc55e056",
   "command": "node examples/claude-native/workflows/child-usage.mjs <session-transcripts>/subagents/workflows/wf_8397ada1-777 --require-effort max",
   "exit_code": 1,
-  "raw_output_sha256": "0f3a5d0f21db3cda5e48084295e7e76f8dcad4ae6e4cf61af9fa528157a94344",
-  "measured_at_utc": "2026-09-26T13:48:09Z",
-  "note": "Per-request provider usage of the Claude workflow children, from the retained native transcripts (message ids counted once). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and gpt6_usage); the two counters are never summed."
+  "raw_output_sha256": "13e509dbb51b5f81de0c1b0e67c9fa3b0ecc802d82b1177f17749776c9d1bc67",
+  "measured_at_utc": "2026-09-26T16:25:57Z",
+  "note": "Per-request provider usage of the Claude workflow children, from the retained native transcripts (message ids counted once). web_search counts each child's WebSearch calls and those the session's WebSearch cap refused (capped). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and gpt6_usage); the two counters are never summed."
  },
  "child_usage": {
   "transcript_dir": "<session-transcripts>/subagents/workflows/wf_8397ada1-777",
   "status": "complete",
   "reason": "every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result; 8 earlier attempt(s) that returned nothing were re-run under the same call key (superseded_attempts, whose usage by_resolved_model counts)",
   "multi_model_children": [],
+  "web_search": {
+   "calls": 200,
+   "capped": 46,
+   "capped_children": [
+    "discover:agents-models-workers",
+    "discover:observability-hosting",
+    "discover:security-supply-chain",
+    "refute-facts:instructions-skills",
+    "refute-facts:document-retrieval",
+    "refute-facts:durable-memory",
+    "refute-fit:durable-memory",
+    "refute-facts:web-research",
+    "refute-fit:web-research",
+    "refute-fit:hosting-services",
+    "refute-facts:observation-inference",
+    "refute-fit:agent-sdks",
+    "refute-facts:identity-provenance",
+    "refute-fit:identity-provenance",
+    "refute-facts:market-data-reference",
+    "refute-fit:market-data-reference",
+    "refute-facts:storage-compute",
+    "refute-fit:research-factors-ml",
+    "refute-fit:execution-broker",
+    "refute-fit:security-supply-chain",
+    "refute-fit:agents-models-workers",
+    "critic",
+    "discover:agents-models-workers:followup",
+    "discover:execution-broker:followup",
+    "discover:security-supply-chain:followup",
+    "discover:durable-memory:followup",
+    "discover:instructions-skills:followup",
+    "discover:quality-evaluation:followup",
+    "discover:research-factors-ml:followup",
+    "refute-fit:execution-broker:followup"
+   ]
+  },
   "children": [
    {
     "agent_id": "a9cd82b5dff87b67c",
@@ -28,6 +64,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 66,
     "usage": {
      "input_tokens": 132,
@@ -60,6 +101,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 4,
     "usage": {
      "input_tokens": 8,
@@ -92,6 +138,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 9,
     "usage": {
      "input_tokens": 18,
@@ -124,6 +175,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 5,
     "usage": {
      "input_tokens": 10,
@@ -156,6 +212,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 5,
     "usage": {
      "input_tokens": 10,
@@ -188,6 +249,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 6,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 55,
     "usage": {
      "input_tokens": 110,
@@ -220,6 +286,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 39,
     "usage": {
      "input_tokens": 78,
@@ -252,6 +323,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 3,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 57,
     "usage": {
      "input_tokens": 114,
@@ -284,6 +360,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 5,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 41,
     "usage": {
      "input_tokens": 82,
@@ -316,6 +397,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 4,
     "usage": {
      "input_tokens": 8,
@@ -348,6 +434,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 4,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 52,
     "usage": {
      "input_tokens": 104,
@@ -380,6 +471,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 6,
     "usage": {
      "input_tokens": 12,
@@ -412,6 +508,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 6,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 63,
     "usage": {
      "input_tokens": 126,
@@ -444,6 +545,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 5,
     "usage": {
      "input_tokens": 10,
@@ -476,6 +582,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 4,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 62,
     "usage": {
      "input_tokens": 124,
@@ -508,6 +619,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 4,
     "usage": {
      "input_tokens": 8,
@@ -540,6 +656,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 6,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 34,
     "usage": {
      "input_tokens": 68,
@@ -572,6 +693,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -604,6 +730,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 8,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 50,
     "usage": {
      "input_tokens": 100,
@@ -636,6 +767,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 4,
     "usage": {
      "input_tokens": 8,
@@ -668,6 +804,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 3,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 67,
     "usage": {
      "input_tokens": 134,
@@ -700,6 +841,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 4,
     "usage": {
      "input_tokens": 8,
@@ -732,6 +878,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 7,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 63,
     "usage": {
      "input_tokens": 126,
@@ -764,6 +915,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 4,
     "usage": {
      "input_tokens": 8,
@@ -796,6 +952,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 6,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 47,
     "usage": {
      "input_tokens": 94,
@@ -828,6 +989,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 4,
     "usage": {
      "input_tokens": 8,
@@ -860,6 +1026,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 50,
     "usage": {
      "input_tokens": 100,
@@ -892,6 +1063,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 10,
     "usage": {
      "input_tokens": 20,
@@ -924,6 +1100,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 5,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 48,
     "usage": {
      "input_tokens": 96,
@@ -956,6 +1137,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 9,
     "usage": {
      "input_tokens": 18,
@@ -988,6 +1174,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 4,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 44,
     "usage": {
      "input_tokens": 88,
@@ -1020,6 +1211,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 5,
     "usage": {
      "input_tokens": 10,
@@ -1052,6 +1248,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 9,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 55,
     "usage": {
      "input_tokens": 110,
@@ -1084,6 +1285,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 6,
     "usage": {
      "input_tokens": 12,
@@ -1116,6 +1322,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 4,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 32,
     "usage": {
      "input_tokens": 64,
@@ -1148,6 +1359,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 5,
     "usage": {
      "input_tokens": 10,
@@ -1180,6 +1396,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 4,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 44,
     "usage": {
      "input_tokens": 88,
@@ -1212,6 +1433,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 6,
     "usage": {
      "input_tokens": 12,
@@ -1244,6 +1470,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 8,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 57,
     "usage": {
      "input_tokens": 114,
@@ -1276,6 +1507,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 4,
     "usage": {
      "input_tokens": 8,
@@ -1308,6 +1544,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 9,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 57,
     "usage": {
      "input_tokens": 114,
@@ -1340,6 +1581,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 10,
     "usage": {
      "input_tokens": 20,
@@ -1373,6 +1619,11 @@
      "max",
      "low"
     ],
+    "web_search": {
+     "calls": 7,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 37,
     "usage": {
      "input_tokens": 74,
@@ -1405,6 +1656,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 6,
     "usage": {
      "input_tokens": 12,
@@ -1437,6 +1693,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 7,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 62,
     "usage": {
      "input_tokens": 124,
@@ -1469,6 +1730,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -1502,6 +1768,11 @@
      "max",
      "low"
     ],
+    "web_search": {
+     "calls": 5,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 42,
     "usage": {
      "input_tokens": 84,
@@ -1534,6 +1805,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 5,
     "usage": {
      "input_tokens": 10,
@@ -1566,6 +1842,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 6,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 53,
     "usage": {
      "input_tokens": 106,
@@ -1598,6 +1879,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 4,
     "usage": {
      "input_tokens": 8,
@@ -1630,6 +1916,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 6,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 58,
     "usage": {
      "input_tokens": 116,
@@ -1662,6 +1953,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 4,
     "usage": {
      "input_tokens": 8,
@@ -1694,6 +1990,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 3,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 34,
     "usage": {
      "input_tokens": 68,
@@ -1726,6 +2027,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 5,
     "usage": {
      "input_tokens": 10,
@@ -1758,6 +2064,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 5,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 54,
     "usage": {
      "input_tokens": 108,
@@ -1790,6 +2101,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 4,
     "usage": {
      "input_tokens": 8,
@@ -1822,6 +2138,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 4,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 68,
     "usage": {
      "input_tokens": 136,
@@ -1854,6 +2175,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 5,
     "usage": {
      "input_tokens": 10,
@@ -1886,6 +2212,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 4,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T04:10:13.805Z"
+    },
     "requests": 59,
     "usage": {
      "input_tokens": 118,
@@ -1918,6 +2249,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 3,
     "usage": {
      "input_tokens": 6,
@@ -1950,6 +2286,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T04:11:28.009Z"
+    },
     "requests": 62,
     "usage": {
      "input_tokens": 124,
@@ -1982,6 +2323,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 3,
     "usage": {
      "input_tokens": 6,
@@ -2014,6 +2360,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T04:11:02.428Z"
+    },
     "requests": 38,
     "usage": {
      "input_tokens": 76,
@@ -2046,6 +2397,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 5,
     "usage": {
      "input_tokens": 10,
@@ -2078,6 +2434,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 5,
     "usage": {
      "input_tokens": 10,
@@ -2110,6 +2471,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 33,
     "usage": {
      "input_tokens": 66,
@@ -2142,6 +2508,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 9,
     "usage": {
      "input_tokens": 18,
@@ -2174,6 +2545,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 5,
     "usage": {
      "input_tokens": 10,
@@ -2206,6 +2582,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 31,
     "usage": {
      "input_tokens": 62,
@@ -2238,6 +2619,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 31,
     "usage": {
      "input_tokens": 62,
@@ -2270,6 +2656,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T04:24:53.764Z"
+    },
     "requests": 9,
     "usage": {
      "input_tokens": 18,
@@ -2302,6 +2693,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 37,
     "usage": {
      "input_tokens": 74,
@@ -2334,6 +2730,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 16,
     "usage": {
      "input_tokens": 32,
@@ -2366,6 +2767,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 12,
     "usage": {
      "input_tokens": 24,
@@ -2398,6 +2804,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 38,
     "usage": {
      "input_tokens": 76,
@@ -2430,6 +2841,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 14,
     "usage": {
      "input_tokens": 28,
@@ -2462,6 +2878,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 14,
     "usage": {
      "input_tokens": 28,
@@ -2494,6 +2915,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 29,
     "usage": {
      "input_tokens": 58,
@@ -2526,6 +2952,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 14,
     "usage": {
      "input_tokens": 28,
@@ -2558,6 +2989,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T04:35:08.469Z"
+    },
     "requests": 6,
     "usage": {
      "input_tokens": 12,
@@ -2590,6 +3026,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 33,
     "usage": {
      "input_tokens": 66,
@@ -2622,6 +3063,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 13,
     "usage": {
      "input_tokens": 26,
@@ -2654,6 +3100,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 15,
     "usage": {
      "input_tokens": 30,
@@ -2686,6 +3137,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 21,
     "usage": {
      "input_tokens": 42,
@@ -2718,6 +3174,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 15,
     "usage": {
      "input_tokens": 30,
@@ -2750,6 +3211,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T05:03:48.064Z"
+    },
     "requests": 6,
     "usage": {
      "input_tokens": 12,
@@ -2782,6 +3248,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T05:08:14.704Z"
+    },
     "requests": 42,
     "usage": {
      "input_tokens": 84,
@@ -2814,6 +3285,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 15,
     "usage": {
      "input_tokens": 30,
@@ -2846,6 +3322,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T05:16:33.209Z"
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -2878,6 +3359,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T05:27:12.940Z"
+    },
     "requests": 34,
     "usage": {
      "input_tokens": 68,
@@ -2910,6 +3396,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 18,
     "usage": {
      "input_tokens": 36,
@@ -2942,6 +3433,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -2974,6 +3470,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 39,
     "usage": {
      "input_tokens": 78,
@@ -3006,6 +3507,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -3038,6 +3544,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 11,
     "usage": {
      "input_tokens": 22,
@@ -3070,6 +3581,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 35,
     "usage": {
      "input_tokens": 70,
@@ -3102,6 +3618,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -3134,6 +3655,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 12,
     "usage": {
      "input_tokens": 24,
@@ -3166,6 +3692,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 41,
     "usage": {
      "input_tokens": 82,
@@ -3198,6 +3729,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -3230,6 +3766,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 19,
     "usage": {
      "input_tokens": 38,
@@ -3262,6 +3803,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 43,
     "usage": {
      "input_tokens": 86,
@@ -3294,6 +3840,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -3326,6 +3877,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -3358,6 +3914,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 18,
     "usage": {
      "input_tokens": 36,
@@ -3390,6 +3951,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -3422,6 +3988,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 9,
     "usage": {
      "input_tokens": 18,
@@ -3454,6 +4025,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T06:26:11.481Z"
+    },
     "requests": 31,
     "usage": {
      "input_tokens": 62,
@@ -3486,6 +4062,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -3518,6 +4099,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T06:29:55.795Z"
+    },
     "requests": 9,
     "usage": {
      "input_tokens": 18,
@@ -3550,6 +4136,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 21,
     "usage": {
      "input_tokens": 42,
@@ -3582,6 +4173,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -3614,6 +4210,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 17,
     "usage": {
      "input_tokens": 34,
@@ -3646,6 +4247,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T06:45:46.681Z"
+    },
     "requests": 42,
     "usage": {
      "input_tokens": 84,
@@ -3678,6 +4284,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -3710,6 +4321,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -3742,6 +4358,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -3774,6 +4395,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 46,
     "usage": {
      "input_tokens": 92,
@@ -3806,6 +4432,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -3838,6 +4469,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -3870,6 +4506,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 36,
     "usage": {
      "input_tokens": 72,
@@ -3902,6 +4543,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 55,
     "usage": {
      "input_tokens": 110,
@@ -3934,6 +4580,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 10,
     "usage": {
      "input_tokens": 20,
@@ -3966,6 +4617,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T09:39:35.009Z"
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -3998,6 +4654,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 16,
     "usage": {
      "input_tokens": 32,
@@ -4030,6 +4691,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T09:49:24.718Z"
+    },
     "requests": 24,
     "usage": {
      "input_tokens": 48,
@@ -4062,6 +4728,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -4094,6 +4765,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 6,
+     "capped": 6,
+     "first_capped_at": "2026-09-26T09:49:52.728Z"
+    },
     "requests": 14,
     "usage": {
      "input_tokens": 28,
@@ -4126,6 +4802,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T09:55:19.892Z"
+    },
     "requests": 56,
     "usage": {
      "input_tokens": 112,
@@ -4158,6 +4839,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -4190,6 +4876,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 10,
     "usage": {
      "input_tokens": 20,
@@ -4223,6 +4914,11 @@
      "max",
      "low"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 29,
     "usage": {
      "input_tokens": 58,
@@ -4255,6 +4951,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -4287,6 +4988,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T10:06:35.885Z"
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -4319,6 +5025,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 34,
     "usage": {
      "input_tokens": 68,
@@ -4351,6 +5062,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 9,
     "usage": {
      "input_tokens": 18,
@@ -4383,6 +5099,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 12,
     "usage": {
      "input_tokens": 24,
@@ -4415,6 +5136,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 23,
     "usage": {
      "input_tokens": 46,
@@ -4447,6 +5173,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -4479,6 +5210,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 11,
     "usage": {
      "input_tokens": 22,
@@ -4511,6 +5247,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T10:20:33.457Z"
+    },
     "requests": 51,
     "usage": {
      "input_tokens": 102,
@@ -4543,6 +5284,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 9,
     "usage": {
      "input_tokens": 18,
@@ -4575,6 +5321,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 9,
     "usage": {
      "input_tokens": 18,
@@ -4607,6 +5358,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T10:22:30.414Z"
+    },
     "requests": 31,
     "usage": {
      "input_tokens": 62,
@@ -4639,6 +5395,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -4671,6 +5432,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 18,
     "usage": {
      "input_tokens": 36,
@@ -4703,6 +5469,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 32,
     "usage": {
      "input_tokens": 64,
@@ -4735,6 +5506,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 9,
     "usage": {
      "input_tokens": 18,
@@ -4767,6 +5543,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 10,
     "usage": {
      "input_tokens": 20,
@@ -4799,6 +5580,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T10:33:21.786Z"
+    },
     "requests": 52,
     "usage": {
      "input_tokens": 104,
@@ -4831,6 +5617,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 9,
     "usage": {
      "input_tokens": 18,
@@ -4863,6 +5654,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 3,
     "usage": {
      "input_tokens": 6,
@@ -4895,6 +5691,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T10:33:59.136Z"
+    },
     "requests": 45,
     "usage": {
      "input_tokens": 90,
@@ -4927,6 +5728,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 13,
     "usage": {
      "input_tokens": 26,
@@ -4959,6 +5765,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 14,
     "usage": {
      "input_tokens": 28,
@@ -4991,6 +5802,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 44,
     "usage": {
      "input_tokens": 88,
@@ -5023,6 +5839,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 10,
     "usage": {
      "input_tokens": 20,
@@ -5055,6 +5876,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 15,
     "usage": {
      "input_tokens": 30,
@@ -5087,6 +5913,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 31,
     "usage": {
      "input_tokens": 62,
@@ -5119,6 +5950,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 13,
     "usage": {
      "input_tokens": 26,
@@ -5151,6 +5987,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T11:06:45.743Z"
+    },
     "requests": 96,
     "usage": {
      "input_tokens": 192,
@@ -5183,6 +6024,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 3,
+     "capped": 3,
+     "first_capped_at": "2026-09-26T11:35:12.113Z"
+    },
     "requests": 48,
     "usage": {
      "input_tokens": 96,
@@ -5215,6 +6061,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 11,
     "usage": {
      "input_tokens": 22,
@@ -5247,6 +6098,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T11:31:50.249Z"
+    },
     "requests": 44,
     "usage": {
      "input_tokens": 88,
@@ -5279,6 +6135,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T11:35:48.926Z"
+    },
     "requests": 51,
     "usage": {
      "input_tokens": 102,
@@ -5311,6 +6172,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T11:33:56.473Z"
+    },
     "requests": 54,
     "usage": {
      "input_tokens": 108,
@@ -5343,6 +6209,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 9,
     "usage": {
      "input_tokens": 18,
@@ -5375,6 +6246,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -5407,6 +6283,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -5439,6 +6320,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T11:47:23.015Z"
+    },
     "requests": 74,
     "usage": {
      "input_tokens": 148,
@@ -5471,6 +6357,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -5503,6 +6394,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T11:49:01.145Z"
+    },
     "requests": 64,
     "usage": {
      "input_tokens": 128,
@@ -5535,6 +6431,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -5567,6 +6468,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 36,
     "usage": {
      "input_tokens": 72,
@@ -5599,6 +6505,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 10,
     "usage": {
      "input_tokens": 20,
@@ -5631,6 +6542,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T11:51:07.715Z"
+    },
     "requests": 65,
     "usage": {
      "input_tokens": 130,
@@ -5663,6 +6579,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -5695,6 +6616,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 12,
     "usage": {
      "input_tokens": 24,
@@ -5727,6 +6653,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T11:55:57.115Z"
+    },
     "requests": 43,
     "usage": {
      "input_tokens": 86,
@@ -5759,6 +6690,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -5791,6 +6727,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 10,
     "usage": {
      "input_tokens": 20,
@@ -5823,6 +6764,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 48,
     "usage": {
      "input_tokens": 96,
@@ -5855,6 +6801,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 10,
     "usage": {
      "input_tokens": 20,
@@ -5887,6 +6838,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 13,
     "usage": {
      "input_tokens": 26,
@@ -5919,6 +6875,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 30,
     "usage": {
      "input_tokens": 60,
@@ -5951,6 +6912,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 11,
     "usage": {
      "input_tokens": 22,
@@ -5983,6 +6949,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 13,
     "usage": {
      "input_tokens": 26,
@@ -6015,6 +6986,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 59,
     "usage": {
      "input_tokens": 118,
@@ -6047,6 +7023,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 10,
     "usage": {
      "input_tokens": 20,
@@ -6079,6 +7060,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 18,
     "usage": {
      "input_tokens": 36,
@@ -6111,6 +7097,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 53,
     "usage": {
      "input_tokens": 106,
@@ -6143,6 +7134,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 12,
     "usage": {
      "input_tokens": 24,
@@ -6175,6 +7171,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 14,
@@ -6207,6 +7208,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 20,
     "usage": {
      "input_tokens": 40,
@@ -6239,6 +7245,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -6271,6 +7282,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 14,
     "usage": {
      "input_tokens": 28,
@@ -6303,6 +7319,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 47,
     "usage": {
      "input_tokens": 94,
@@ -6335,6 +7356,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -6367,6 +7393,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,
@@ -6399,6 +7430,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 47,
     "usage": {
      "input_tokens": 94,
@@ -6431,6 +7467,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 10,
     "usage": {
      "input_tokens": 20,
@@ -6466,6 +7507,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 48,
     "usage": {
      "input_tokens": 94,
@@ -6509,6 +7555,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 11,
     "usage": {
      "input_tokens": 20,
@@ -6552,6 +7603,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 26,
     "usage": {
      "input_tokens": 50,
@@ -6595,6 +7651,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 6,
     "usage": {
      "input_tokens": 10,
@@ -6638,6 +7699,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 3,
     "usage": {
      "input_tokens": 4,
@@ -6681,6 +7747,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 7,
     "usage": {
      "input_tokens": 12,
@@ -6724,6 +7795,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 2,
     "usage": {
      "input_tokens": 2,
@@ -6767,6 +7843,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 2,
     "usage": {
      "input_tokens": 2,

@@ -2,19 +2,24 @@
  "schema_version": 1,
  "measurement": {
   "tool": "native-agent-stack examples/claude-native/workflows/child-usage.mjs",
-  "tool_commit": "23b2ab06587c982ae9d783494f2bd80e6fff2ead",
-  "tool_sha256": "71509f66e151fc5adcf48251ba9677127881928a77ed37b2ec3f884af2199480",
+  "tool_commit": "1bd2416b5434758f519ec617b66dfd7eeb0e0fff",
+  "tool_sha256": "d60d1df49f8653a123cea29c22da623b040ea3d07339d944f23df5f5dc55e056",
   "command": "node examples/claude-native/workflows/child-usage.mjs <session-transcripts>/subagents/workflows/wf_1753e674-5dc --require-effort max",
   "exit_code": 0,
-  "raw_output_sha256": "a6c2a4bcbdfc348c8b94cdb76cd73a19db3f7b6b9e47781179e94764aebbb381",
-  "measured_at_utc": "2026-09-26T13:48:10Z",
-  "note": "Per-request provider usage of the Claude workflow children, from the retained native transcripts (message ids counted once). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and gpt6_usage); the two counters are never summed."
+  "raw_output_sha256": "6c4088450ee29b2994ddd860fc9992d046b49afdb64271ecd94fa105310403fb",
+  "measured_at_utc": "2026-09-26T16:25:57Z",
+  "note": "Per-request provider usage of the Claude workflow children, from the retained native transcripts (message ids counted once). web_search counts each child's WebSearch calls and those the session's WebSearch cap refused (capped). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and gpt6_usage); the two counters are never summed."
  },
  "child_usage": {
   "transcript_dir": "<session-transcripts>/subagents/workflows/wf_1753e674-5dc",
   "status": "complete",
   "reason": "every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result",
   "multi_model_children": [],
+  "web_search": {
+   "calls": 1,
+   "capped": 0,
+   "capped_children": []
+  },
   "children": [
    {
     "agent_id": "ae34f5e5307f59c7d",
@@ -28,6 +33,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 1,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 66,
     "usage": {
      "input_tokens": 132,
@@ -60,6 +70,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 5,
     "usage": {
      "input_tokens": 10,
@@ -92,6 +107,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 18,
     "usage": {
      "input_tokens": 36,
@@ -124,6 +144,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 52,
     "usage": {
      "input_tokens": 104,
@@ -156,6 +181,11 @@
     "efforts": [
      "max"
     ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
     "requests": 8,
     "usage": {
      "input_tokens": 16,

@@ -255,6 +255,12 @@ Read these fields of `convert.py`'s summary before appending:
   `degraded_discovery`, `critic_lost`, `effort_deviations` and each vote's `notes` give the detail.
   `effort_deviations_unmapped` lists a worker at another effort whose label names no layer of this sweep;
   `make_result.py` refuses the record until it is resolved.
+- **`web_search`**, **`web_search_capped`** and **`web_search_capped_unmapped`**: the run's WebSearch calls and
+  capped calls, the workers with a capped call (each a retained failure of its layer), and any capped worker whose
+  label names no layer of this sweep (`make_result.py` refuses the record until it is resolved). A capped worker
+  means the session reached its WebSearch cap; say so in a lane limit.
+- **`refuted_by_absence`**: per layer, the proposals refuted only because a vote did not return. Their layer's
+  `votes_note` names them; they are candidates for the missing vote in a later sweep or the verdict wave.
 - **`excluded_layers`**: every round of the layer was lost. Such a layer is left out of the record, so it neither
   counts nor resets.
 - **`lost`**: every lost round, first or follow-up, as `<layer>:<round>`. `sweep.js` returns a lost follow-up round

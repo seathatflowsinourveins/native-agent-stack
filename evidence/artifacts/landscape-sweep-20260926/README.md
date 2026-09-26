@@ -50,14 +50,20 @@ counts:
 - **GPT-6 jobs.** 64 of 80 returned output. Each of those 64 outputs matches the file Codex wrote (copy check:
   `match` 64). The 16 failures are explained under the lane limits, and `gpt6-jobs.json` keeps each job's timeline.
 - **Discovery calls.** These counts cover discovery only, as each worker reported them. Claude: 170 web searches,
-  240 page fetches and 1,004 GitHub API calls. GPT-6: 396, 264 and 748.
+  240 page fetches and 1,004 GitHub API calls. GPT-6: 396, 264 and 748. The Claude web search figure counts capped
+  calls as searches. Measured from the transcripts, Claude discovery made 169 WebSearch calls: 154 returned results
+  and 15 were capped (see [WebSearch session cap](#websearch-session-cap)).
+- **WebSearch cap.** From 04:10:13Z the session's WebSearch cap refused every Claude WebSearch call: 46 of this
+  run's 200, in 30 workers. Every layer is reopened for it, so no layer counts as clean.
 
 ## Measured usage
 
 The two kinds of counters below are never summed.
 
 **Claude.** The source is `child-usage-wf_8397ada1-777.json` in the attempts directory. It was measured with
-`child-usage.mjs` at tool commit `23b2ab06` (sha256 `71509f66…9480`).
+`child-usage.mjs` at tool commit `1bd2416b` (sha256 `d60d1df4…e056`). That commit adds the per-child WebSearch
+count (`web_search`) and leaves every usage figure as the earlier measurement at `23b2ab06` gave it; the three
+usage records were re-measured together.
 
 | Resolved model | Attempts | Input | Output | Cache read | Cache creation |
 | --- | --- | --- | --- | --- | --- |
@@ -79,48 +85,114 @@ because of the three effort deviations, and each deviation is recorded as a reta
 - **Unreported jobs.** 16 jobs reported no usage. Two of them ran until the Codex usage-limit error, so their use is
   not in these figures.
 
+## WebSearch session cap
+
+Claude Code allows one session at most `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` WebSearch calls, 200 by default.
+The count covers the main conversation and every subagent, workflow children included. A capped call is not an
+error: it returns a notice that tells the worker to go on with what it has and not to search again (tools
+reference, ["Session search limit"](https://code.claude.com/docs/en/tools-reference#session-search-limit), read
+2026-09-26). The coordinator session ran with the default. The 2.1.283 client that wrote every capped row has the
+same default.
+
+**Where the budget went.** The session's four workflow runs of 2026-09-26 made exactly 200 WebSearch calls that
+returned results, between 01:45Z and 04:08Z:
+
+- the smoke `wf_1753e674-5dc`: 1;
+- run 1 `wf_a874897e-af1`: 25;
+- the session's separate workflow `wf_9dec7824-293`: 20;
+- this run: 154.
+
+The first two counts are in the attempts' usage records. The third was counted from that run's transcripts for this
+record and is not retained here. The session's 10 WebSearch calls of 2026-09-25 did not count toward the cap. The
+documented reset is `/clear`, and the client keeps the count in its process; the transcripts do not show which
+reset applied.
+
+**When and whom it capped.** The first capped call was at 04:10:13Z (`discover:agents-models-workers`) and the last
+at 11:55:57Z (`refute-fit:execution-broker:followup`). In between, 46 of this run's 200 WebSearch calls were capped,
+in 30 workers. The usage record counts each worker's calls and capped calls (`web_search`):
+
+| Role | WebSearch calls | Capped | Workers capped |
+| --- | --- | --- | --- |
+| first-round discovery | 158 | 4 | 3 of 32 |
+| follow-up discovery | 11 | 11 | 7 of 8 |
+| facts refuters | 17 | 17 | 8 of 40 |
+| Claude fit refuters | 12 | 12 | 11 of 40 |
+| critic | 2 | 2 | 1 of 1 |
+
+No WebSearch call of a Claude refuter, a follow-up discovery worker or the critic returned results. 42 of the 43
+facts-refuter attempts, 42 of the 43 Claude fit-refuter attempts, the critic (10:55Z to 11:26Z) and all 8 follow-up
+discovery workers started after 04:10:13Z. The refuters that made no WebSearch call never met the notice. The GPT-6
+lanes search through Codex, outside this cap.
+
+**Votes.** Ten vote reasonings mention the cap:
+
+- **One decides on it.** The identity-provenance facts refuter refuted `databento/databento-python`
+  (`returns.json#/votes/identity-provenance/3/facts`, confidence 0.45). Its page fetch of the corporate-actions
+  documentation returned nothing usable, its WebSearch call was capped, and its rule refutes an unverified claim
+  central to the demonstrated gap. The same repository survived in market-data-reference.
+- **Eight name a check the refuter could not make** and decide on other evidence.
+- **One discusses a candidate's own handling of the cap** (tavily-ai/skills in instructions-skills).
+
+**How the record treats it.** Every capped worker is a `web_search_capped` retained failure of its layer, which
+reopens the layer. 16 layers have a capped worker of their own. The critic's capped calls count for every layer, as
+its effort deviation would. Its two capped searches concerned DCGM on WSL2 and OpenFIGI, but the notice told it to
+stop searching, so it judged every layer's completeness without search. As a result, every layer is reopened and no
+layer counts as clean. Before this repair, `agent-sdks`, `backtesting-engine` and `token-efficiency` derived a clean
+count of 1:
+
+- `agent-sdks` has its own capped worker: its Claude fit refuter's only WebSearch call was capped at 06:45Z.
+- `backtesting-engine` and `token-efficiency` reopen through the critic alone.
+
+The refuters judged every survivor without search results. The verdict wave that starts from this manifest should
+not read those votes as search-verified. The harness README (Coordination) now says how to raise the cap before a
+full sweep. The lane's budgets allow 1,120 Claude searches (40 × 12 discovery, 80 × 8 refutation).
+
 ## Survivors and reopened layers
 
 | Layer | Proposed | Survived | Survivors | Reopen triggers |
 | --- | --- | --- | --- | --- |
-| foundation/native-clients | 8 | 0 | none | first:vote_missing (fit_gpt6); pin_moved (macos-arm64/ai-memory) |
-| foundation/instructions-skills | 15 | 2 | cisco-ai-defense/skill-scanner, anthropics/financial-services | first:vote_missing (fit_gpt6); pin_moved (macos-arm64/ai-memory) |
-| foundation/workers | 8 | 0 | none | first:vote_missing (fit_gpt6) |
-| foundation/isolation | 8 | 0 | none | first:vote_missing (fit_gpt6) |
-| foundation/code-navigation | 8 | 0 | none | first:vote_missing (fit_gpt6); selection_changed (mcp-inspector (license None -> NOASSERTION)) |
-| foundation/document-retrieval | 7 | 0 | none | first:vote_missing (fit_gpt6) |
-| foundation/semantic-rag | 8 | 0 | none | first:vote_missing (fit_gpt6); pin_moved (linux-wsl2-x86_64/vllm); pin_moved (macos-arm64/ai-memory) |
-| foundation/durable-memory | 14 | 2 | anthropics/claude-code, langchain-ai/langmem | first:vote_missing (fit_gpt6); pin_moved (macos-arm64/ai-memory) |
-| foundation/web-research | 8 | 0 | none | first:vote_missing (fit_gpt6) |
-| foundation/token-efficiency | 8 | 0 | none | none |
-| foundation/quality-evaluation | 14 | 5 | ukgovernmentbeis/inspect_ai, embeddings-benchmark/mteb, boxed/mutmut, sixty-north/cosmic-ray, comet-ml/opik | none |
-| foundation/ci-supply-chain | 8 | 1 | boostsecurityio/poutine | none |
-| foundation/scheduling-supervision | 8 | 4 | temporalio/temporal, dagucloud/dagu, earendil-works/absurd, microsoft/pg_durable | none |
-| foundation/hosting-services | 8 | 0 | none | selection_changed (mcp-inspector (license None -> NOASSERTION)) |
-| foundation/recovery-portability | 8 | 0 | none | pin_moved (macos-arm64/ai-memory) |
-| foundation/observation-inference | 14 | 5 | grafana/tempo, traceloop/openllmetry, ollama/ollama, utkuozdemir/nvidia_gpu_exporter, nvidia/dcgm-exporter | pin_moved (linux-wsl2-x86_64/vllm) |
-| foundation/agent-sdks | 8 | 0 | none | none |
-| foundation/mcp-surfaces | 8 | 2 | apify/mcpc, modelcontextprotocol/conformance | selection_changed (mcp-inspector (license None -> NOASSERTION)) |
-| foundation/secrets-credentials | 7 | 3 | betterleaks/betterleaks, praetorian-inc/noseyparker, gitguardian/ggshield | none |
-| foundation/git-github-automation | 8 | 1 | ataraxy-labs/sem | none |
-| us-equities/market-data-reference | 6 | 4 | databento/databento-python, massive-com/client-python, man-group/arcticdb, hydrosquall/tiingo-python | none |
-| us-equities/identity-provenance | 8 | 2 | oxen-ai/oxen, dfahrn/securities-master | first:effort_deviation (discover:identity-provenance) |
-| us-equities/storage-compute | 7 | 1 | chdb-io/chdb | none |
-| us-equities/data-quality-orchestration | 8 | 1 | flyteorg/flyte | first:effort_deviation (discover:data-quality-orchestration); first:effort_deviation (refute-fit:data-quality-orchestration) |
-| us-equities/research-factors-ml | 13 | 4 | bashtage/linearmodels, shiyu-coder/kronos, datadog/toto, lgai-research/exaone-forecast | first:discovery_missing (gpt6); pin_moved (linux-wsl2-x86_64/vllm) |
-| us-equities/backtesting-engine | 7 | 0 | none | none |
-| us-equities/execution-broker | 13 | 9 | ib-api-reloaded/ib_async, csingley/ibflex, wboayue/rust-ibapi, nautechsystems/nautilus_ibapi, gnzsnz/ib-gateway-docker, ibcalpha/ibc, extrange/ibkr-docker, nautechsystems/nautilus_trader, falk-brauer/kumo-nautilus-alpaca-adapter | first:discovery_missing (gpt6) |
-| us-equities/portfolio-risk | 6 | 1 | csingley/ibflex | first:discovery_missing (gpt6) |
-| us-equities/evaluation-experiments | 6 | 0 | none | first:discovery_missing (gpt6) |
-| us-equities/agents-models-workers | 11 | 1 | hf:XingChen-AGI/Xing4.0-29B-A4B | first:discovery_missing (gpt6); pin_moved (linux-wsl2-x86_64/vllm) |
-| us-equities/observability-hosting | 6 | 1 | restic/rest-server | first:discovery_missing (gpt6) |
-| us-equities/security-supply-chain | 13 | 7 | betterleaks/betterleaks, pypi/pypi-attestations, cli/cli, mongodb/kingfisher, datadog/guarddog, slsa-framework/slsa-verifier, chainguard-dev/malcontent | first:discovery_missing (gpt6) |
+| foundation/native-clients | 8 | 0 | none | first:vote_missing (fit_gpt6); critic:web_search_capped; pin_moved (macos-arm64/ai-memory) |
+| foundation/instructions-skills | 15 | 2 | cisco-ai-defense/skill-scanner, anthropics/financial-services | first:vote_missing (fit_gpt6); first:web_search_capped (refute-facts:instructions-skills); followup:web_search_capped (discover:instructions-skills:followup); critic:web_search_capped; pin_moved (macos-arm64/ai-memory) |
+| foundation/workers | 8 | 0 | none | first:vote_missing (fit_gpt6); critic:web_search_capped |
+| foundation/isolation | 8 | 0 | none | first:vote_missing (fit_gpt6); critic:web_search_capped |
+| foundation/code-navigation | 8 | 0 | none | first:vote_missing (fit_gpt6); critic:web_search_capped; selection_changed (mcp-inspector (license None -> NOASSERTION)) |
+| foundation/document-retrieval | 7 | 0 | none | first:vote_missing (fit_gpt6); first:web_search_capped (refute-facts:document-retrieval); critic:web_search_capped |
+| foundation/semantic-rag | 8 | 0 | none | first:vote_missing (fit_gpt6); critic:web_search_capped; pin_moved (linux-wsl2-x86_64/vllm); pin_moved (macos-arm64/ai-memory) |
+| foundation/durable-memory | 14 | 2 | anthropics/claude-code, langchain-ai/langmem | first:vote_missing (fit_gpt6); first:web_search_capped (refute-facts:durable-memory); first:web_search_capped (refute-fit:durable-memory); followup:web_search_capped (discover:durable-memory:followup); critic:web_search_capped; pin_moved (macos-arm64/ai-memory) |
+| foundation/web-research | 8 | 0 | none | first:vote_missing (fit_gpt6); first:web_search_capped (refute-facts:web-research); first:web_search_capped (refute-fit:web-research); critic:web_search_capped |
+| foundation/token-efficiency | 8 | 0 | none | critic:web_search_capped |
+| foundation/quality-evaluation | 14 | 5 | ukgovernmentbeis/inspect_ai, embeddings-benchmark/mteb, boxed/mutmut, sixty-north/cosmic-ray, comet-ml/opik | followup:web_search_capped (discover:quality-evaluation:followup); critic:web_search_capped |
+| foundation/ci-supply-chain | 8 | 1 | boostsecurityio/poutine | critic:web_search_capped |
+| foundation/scheduling-supervision | 8 | 4 | temporalio/temporal, dagucloud/dagu, earendil-works/absurd, microsoft/pg_durable | critic:web_search_capped |
+| foundation/hosting-services | 8 | 0 | none | first:web_search_capped (refute-fit:hosting-services); critic:web_search_capped; selection_changed (mcp-inspector (license None -> NOASSERTION)) |
+| foundation/recovery-portability | 8 | 0 | none | critic:web_search_capped; pin_moved (macos-arm64/ai-memory) |
+| foundation/observation-inference | 14 | 5 | grafana/tempo, traceloop/openllmetry, ollama/ollama, utkuozdemir/nvidia_gpu_exporter, nvidia/dcgm-exporter | first:web_search_capped (refute-facts:observation-inference); critic:web_search_capped; pin_moved (linux-wsl2-x86_64/vllm) |
+| foundation/agent-sdks | 8 | 0 | none | first:web_search_capped (refute-fit:agent-sdks); critic:web_search_capped |
+| foundation/mcp-surfaces | 8 | 2 | apify/mcpc, modelcontextprotocol/conformance | critic:web_search_capped; selection_changed (mcp-inspector (license None -> NOASSERTION)) |
+| foundation/secrets-credentials | 7 | 3 | betterleaks/betterleaks, praetorian-inc/noseyparker, gitguardian/ggshield | critic:web_search_capped |
+| foundation/git-github-automation | 8 | 1 | ataraxy-labs/sem | critic:web_search_capped |
+| us-equities/market-data-reference | 6 | 4 | databento/databento-python, massive-com/client-python, man-group/arcticdb, hydrosquall/tiingo-python | first:web_search_capped (refute-facts:market-data-reference); first:web_search_capped (refute-fit:market-data-reference); critic:web_search_capped |
+| us-equities/identity-provenance | 8 | 2 | oxen-ai/oxen, dfahrn/securities-master | first:effort_deviation (discover:identity-provenance); first:web_search_capped (refute-facts:identity-provenance); first:web_search_capped (refute-fit:identity-provenance); critic:web_search_capped |
+| us-equities/storage-compute | 7 | 1 | chdb-io/chdb | first:web_search_capped (refute-facts:storage-compute); critic:web_search_capped |
+| us-equities/data-quality-orchestration | 8 | 1 | flyteorg/flyte | first:effort_deviation (discover:data-quality-orchestration); first:effort_deviation (refute-fit:data-quality-orchestration); critic:web_search_capped |
+| us-equities/research-factors-ml | 13 | 4 | bashtage/linearmodels, shiyu-coder/kronos, datadog/toto, lgai-research/exaone-forecast | first:discovery_missing (gpt6); first:web_search_capped (refute-fit:research-factors-ml); followup:web_search_capped (discover:research-factors-ml:followup); critic:web_search_capped; pin_moved (linux-wsl2-x86_64/vllm) |
+| us-equities/backtesting-engine | 7 | 0 | none | critic:web_search_capped |
+| us-equities/execution-broker | 13 | 9 | ib-api-reloaded/ib_async, csingley/ibflex, wboayue/rust-ibapi, nautechsystems/nautilus_ibapi, gnzsnz/ib-gateway-docker, ibcalpha/ibc, extrange/ibkr-docker, nautechsystems/nautilus_trader, falk-brauer/kumo-nautilus-alpaca-adapter | first:discovery_missing (gpt6); first:web_search_capped (refute-fit:execution-broker); followup:web_search_capped (discover:execution-broker:followup); followup:web_search_capped (refute-fit:execution-broker:followup); critic:web_search_capped |
+| us-equities/portfolio-risk | 6 | 1 | csingley/ibflex | first:discovery_missing (gpt6); critic:web_search_capped |
+| us-equities/evaluation-experiments | 6 | 0 | none | first:discovery_missing (gpt6); critic:web_search_capped |
+| us-equities/agents-models-workers | 11 | 1 | hf:XingChen-AGI/Xing4.0-29B-A4B | first:discovery_missing (gpt6); first:web_search_capped (discover:agents-models-workers); first:web_search_capped (refute-fit:agents-models-workers); followup:web_search_capped (discover:agents-models-workers:followup); critic:web_search_capped; pin_moved (linux-wsl2-x86_64/vllm) |
+| us-equities/observability-hosting | 6 | 1 | restic/rest-server | first:discovery_missing (gpt6); first:web_search_capped (discover:observability-hosting); critic:web_search_capped |
+| us-equities/security-supply-chain | 13 | 7 | betterleaks/betterleaks, pypi/pypi-attestations, cli/cli, mongodb/kingfisher, datadog/guarddog, slsa-framework/slsa-verifier, chainguard-dev/malcontent | first:discovery_missing (gpt6); first:web_search_capped (discover:security-supply-chain); first:web_search_capped (refute-fit:security-supply-chain); followup:web_search_capped (discover:security-supply-chain:followup); critic:web_search_capped |
 
 Repositories without a host prefix are on GitHub. `hf:` marks a Hugging Face model repository.
 
 **Why a layer reopened.** Each retained failure gives its layer the reopen entry `retained_failure`, which points at
 `returns.json#/failures/<layer>`.
 
+- **`critic:web_search_capped`.** The critic's WebSearch calls were capped, and they count for every layer (32
+  layers; see [WebSearch session cap](#websearch-session-cap)).
+- **`first:web_search_capped` and `followup:web_search_capped`.** A worker of that layer and round had a capped
+  WebSearch call (16 layers).
 - **`first:vote_missing (fit_gpt6)`.** The first-round GPT-6 fit votes did not return (9 layers).
 - **`first:discovery_missing (gpt6)`.** The first-round GPT-6 discovery did not return (7 layers). These layers have
   Claude-only discovery, but their fit votes are two-family.
@@ -128,14 +200,23 @@ Repositories without a host prefix are on GitHub. `hf:` marks a Hugging Face mod
 - **`pin_moved` and `selection_changed`.** These entries copy the saturation report's current triggers at append
   time. The inputs were this checkout's receipt staleness and the run's catalog-freshness artifact 36205743492.
 
-18 layers reopened for retained failures, and 11 layers carry report triggers. Together, 22 layers carry at least one
-reopen entry. Seven more layers stay at 0 because they have survivors. After this record, `agent-sdks`,
-`backtesting-engine` and `token-efficiency` have a clean count of 1, and every other layer is at 0. No layer is a
-saturation candidate.
+All 32 layers reopened for retained failures, and 11 of them also carry report triggers. After this record every
+layer is at 0, and no layer is a saturation candidate.
 
-**Claude-only passes (not survivors).** In the 9 layers without first-round GPT-6 fit votes, 27 proposals passed the
-facts refuter and the Claude fit refuter. Their GPT-6 fit vote is missing, which counts as refuted. These proposals
-are neither refuted on merit nor two-family agreement. They are the first candidates for a second-family fit vote:
+**Refuted by absence (not survivors).** In the 9 layers without first-round GPT-6 fit votes, 27 proposals passed the
+facts refuter and the Claude fit refuter. Their GPT-6 fit vote is missing, and the survival rule counts a missing vote
+as refuted, so they are listed under `refuted`. They are neither refuted on merit nor two-family agreement:
+
+- The fit vote's `gpt6` member in `returns.json` is `{missing: true}`.
+- Each layer's `votes_note` in the ledger names them.
+- `saturation_ledger.py` (`refuted_by_absence`) does not count them as adjudicated, so a later sweep that proposes
+  them again lists them as new.
+- `build_inputs.py` shows them to the next discovery round as `previous_sweep.not_adjudicated`, not as refuted.
+
+The coordinator's incident log (its 03:47Z to 03:55Z entry) planned to record the affected layers "never as
+two-family agreement and never as refuted-by-absence". The ledger has no third outcome, so these proposals stay under
+`refuted`, as the survival rule requires. The missing marker, the `votes_note` and the two tools keep them from
+counting as refuted on merit. These proposals are the first candidates for a second-family fit vote:
 
 - native-clients: earendil-works/pi
 - instructions-skills: mattpocock/skills
@@ -153,7 +234,7 @@ are neither refuted on merit nor two-family agreement. They are the first candid
 ## Lane limits
 
 The manifest's `lane_limits/landscape-sweep-20260926` holds the four method limits that `convert.py` writes and the
-nine run-specific limits below. Each was passed as `--limit`.
+ten run-specific limits below. Each was passed as `--limit`.
 
 1. Harness: this run used the 2026-09-26 scratchpad prototype of the lane, not the packaged
    tools/sota-convergence/landscape-sweep/ harness merged afterwards (#324). Its prompts_sha256
@@ -173,10 +254,12 @@ nine run-specific limits below. Each was passed as `--limit`.
    embedded quote in its usage-limit event check (added at about 03:57Z, per the coordinator's incident log), which
    shifted its arguments, so its slot loop never obtained a slot; the next fit job started at 05:52Z. The seven
    layers without a GPT-6 discovery return have Claude-only discovery. In the nine layers without GPT-6 first-round
-   fit votes a missing vote counts as refuted: those proposals are not survivors, their only fit votes are Claude's,
-   and they are never counted as two-family agreement. Every affected layer is reopened (retained_failure). The false
-   usage-limit marker of 02:17Z (text in a cited README matched the prototype's check) fell in the stopped run 1, not
-   in this run.
+   fit votes a missing vote counts as refuted: those proposals are not survivors, and they are never counted as
+   two-family agreement. The 27 of them that the facts refuter and the Claude fit refuter both passed are refuted by
+   absence, not on merit: each layer's votes_note names them, their fit vote's gpt6 member is {missing: true}, and
+   saturation_ledger.py and build_inputs.py do not count them as adjudicated. Every affected layer is reopened
+   (retained_failure). The false usage-limit marker of 02:17Z (text in a cited README matched the prototype's check)
+   fell in the stopped run 1, not in this run.
 4. Seeds: the run's seeds (tools/sota-convergence/landscape-sweep/seeds-20260926.json) placed two candidates
    differently from manifests/candidates.json: NVIDIA/TensorRT-LLM under observation-inference (candidates.json:
    semantic-rag), and EleutherAI/lm-evaluation-harness under quality-evaluation only (candidates.json: also
@@ -195,9 +278,11 @@ nine run-specific limits below. Each was passed as `--limit`.
    calls under the same call keys. Their first attempts returned nothing and are recorded as superseded attempts,
    whose usage still counts; every call returned.
 7. Call counts cover discovery only (both families, as each worker reported them); refuter and critic calls are not
-   counted. Run wf_8397ada1-777 ran from 02:23Z to 12:51Z with 201 Claude children at effort max (40 discovery, 40
-   GPT-6 discovery wrappers, 40 facts refuters, 40 Claude fit refuters, 40 GPT-6 fit wrappers, 1 critic). Claude
-   usage per resolved model is in
+   counted. The workers' own Claude web_search total (170) counts capped calls as searches: measured from the
+   transcripts (web_search in the usage record), the Claude discovery workers made 169 WebSearch calls, and 15 of
+   them were capped (limit 10). Run wf_8397ada1-777 ran from 02:23Z to 12:51Z with 201 Claude children at effort max
+   (40 discovery, 40 GPT-6 discovery wrappers, 40 facts refuters, 40 Claude fit refuters, 40 GPT-6 fit wrappers, 1
+   critic). Claude usage per resolved model is in
    evidence/artifacts/landscape-sweep-20260926-attempts/child-usage-wf_8397ada1-777.json and GPT-6 usage in the
    returns' gpt6_usage; the two are never summed.
 8. Codex review: the Codex review step of recipes/sota-convergence-practice.md (step 5) is this run's GPT-6-Astra
@@ -208,6 +293,20 @@ nine run-specific limits below. Each was passed as `--limit`.
    stopped by the coordinator after 3 of its 11 started children returned, when the user asked for
    SOTA-skill-aligned, incumbency-neutral prompts. Both are retained under
    evidence/artifacts/landscape-sweep-20260926-attempts/; nothing from them is merged into this lane.
+10. WebSearch session cap: Claude Code allows one session at most CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION WebSearch
+    calls (default 200), counted across the coordinator and every subagent, workflow children included; a capped call
+    returns a notice that tells the worker to go on without searching (code.claude.com tools-reference, 'Session
+    search limit'). The coordinator session ran with the default, and its four workflow runs of 2026-09-26 used the
+    200 calls between 01:45Z and 04:08Z: the smoke 1, run 1 25, the session's separate workflow wf_9dec7824-293 20
+    (counted from its transcripts, not retained here) and this run 154. From 04:10:13Z
+    (discover:agents-models-workers) to 11:55:57Z (refute-fit:execution-broker:followup), 46 of this run's 200
+    WebSearch calls were capped, in 30 workers: 4 calls of 3 first-round discovery workers, 11 of 7 of the 8
+    follow-up discovery workers, 17 of 8 facts refuters, 12 of 11 Claude fit refuters and 2 of the critic. No Claude
+    refuter, follow-up discovery worker or critic WebSearch call returned results. One vote rests on the cap: the
+    identity-provenance facts refuter refuted databento/databento-python because it could not cross-check a claim by
+    search (returns votes/identity-provenance/3/facts). Every capped worker is a web_search_capped retained failure
+    of its layer and the critic's counts for every layer, so every layer is reopened and no layer counts as clean.
+    The GPT-6 lanes search through Codex, outside this cap.
 
 Notes on limit 3:
 
@@ -299,12 +398,14 @@ returns list any skill, so these counts do not measure GPT-6 skill use.
 - **`gpt6-jobs.json`.** The GPT-6 job timeline, the stuck-runner observation and the cited coordinator incident-log
   entries that support lane limit 3. It holds no model text and no host paths.
 - **`tavily-leads.json`.** Discovery leads only.
-- **`independent-review.json`.** The independent review's findings and their repairs.
+- **`independent-review.json`.** The two review rounds' findings and their repairs.
 - **The attempts directory.**
-  - `child-usage-wf_8397ada1-777.json`: this run's usage.
+  - `child-usage-wf_8397ada1-777.json`: this run's usage and per-worker WebSearch counts.
   - `child-usage-wf_a874897e-af1.json` and `wf_a874897e-af1.json`: run 1's lower-bound usage and its compact
     record, which is the ledger's `record_ref`.
   - `child-usage-wf_1753e674-5dc.json` and `wf_1753e674-5dc.json`: the smoke's usage and its compact record.
+  - Each compact record's `provider_usage.web_search` copies its run's measured WebSearch counts. Run 1 made 25
+    calls and the smoke 1, none capped.
 
 **Redactions.**
 
@@ -335,11 +436,24 @@ returns list any skill, so these counts do not measure GPT-6 skill use.
 8.30.1 found nothing with the repository configuration. The coordinator registers the files in
 `manifests/evidence.json`.
 
-**Independent review.** A separate headless Claude session (Opus, read-only tools) reviewed the first version of
-this record and of the tool and allowlist changes. It returned `needs_changes` with six low findings.
-`independent-review.json` records each finding and its repair. There was one review and one repair round.
-The review is same-family; no Codex review was run, because another session's GPT-6 jobs were using the shared
-Codex account at the time.
+**Independent review.** There were two review rounds, each followed by one repair round. Both reviews were
+same-family: no Codex review was run.
+
+1. **First round.** A separate headless Claude session (Opus, read-only tools) reviewed the first version of this
+   record and of the tool and allowlist changes. It returned `needs_changes` with six low findings. Codex was not
+   used because another session's GPT-6 jobs were using the shared Codex account at the time.
+2. **Second round.** The coordinator's workflow reviewers (Claude Opus) reviewed the committed record and reported
+   two findings. Both were verified against the transcripts, the returns and the ledger, and both were repaired:
+   - **High.** The session's WebSearch cap went unrecorded, and three layers derived as clean. It is now lane
+     limit 10 and the section above. `web_search_capped` retained failures now reopen every layer.
+   - **Medium.** The 27 proposals refuted only by the missing GPT-6 fit vote counted downstream as refuted on
+     merit. The ledger and the input builder now tell absence from merit.
+
+The reviewers also offered a second fix for the medium finding: collect the nine missing GPT-6 fit votes before
+appending. That was not done. Those votes would come from a new model run, hours after this run and on another
+runner, so they would not be this run's votes. The verdict wave, which the coordinator owns, is where they belong,
+and the 27 proposals are listed above as its first candidates. `independent-review.json` records each finding and its
+disposition.
 
 ## Attempts
 

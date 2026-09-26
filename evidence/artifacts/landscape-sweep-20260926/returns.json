@@ -31188,6 +31188,15 @@
  "failures": {
   "native-clients": [
    {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
     "round": "first",
     "cause": "vote_missing",
     "role": "fit_gpt6",
@@ -31208,6 +31217,33 @@
   "instructions-skills": [
    {
     "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-facts:instructions-skills",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T04:24:53.764Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "followup",
+    "cause": "web_search_capped",
+    "child": "discover:instructions-skills:followup",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:47:23.015Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "first",
     "cause": "vote_missing",
     "role": "fit_gpt6",
     "repositories": [
@@ -31225,6 +31261,15 @@
    }
   ],
   "workers": [
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
    {
     "round": "first",
     "cause": "vote_missing",
@@ -31245,6 +31290,15 @@
   ],
   "isolation": [
    {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
     "round": "first",
     "cause": "vote_missing",
     "role": "fit_gpt6",
@@ -31263,6 +31317,15 @@
    }
   ],
   "code-navigation": [
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
    {
     "round": "first",
     "cause": "vote_missing",
@@ -31284,6 +31347,24 @@
   "document-retrieval": [
    {
     "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-facts:document-retrieval",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T04:35:08.469Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "first",
     "cause": "vote_missing",
     "role": "fit_gpt6",
     "repositories": [
@@ -31300,6 +31381,15 @@
    }
   ],
   "semantic-rag": [
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
    {
     "round": "first",
     "cause": "vote_missing",
@@ -31321,6 +31411,42 @@
   "durable-memory": [
    {
     "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-facts:durable-memory",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T05:03:48.064Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-fit:durable-memory",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T05:08:14.704Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "followup",
+    "cause": "web_search_capped",
+    "child": "discover:durable-memory:followup",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T11:33:56.473Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "first",
     "cause": "vote_missing",
     "role": "fit_gpt6",
     "repositories": [
@@ -31340,6 +31466,33 @@
   "web-research": [
    {
     "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-facts:web-research",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T05:16:33.209Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-fit:web-research",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T05:27:12.940Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "first",
     "cause": "vote_missing",
     "role": "fit_gpt6",
     "repositories": [
@@ -31356,6 +31509,192 @@
     "status": "failed_exit_null"
    }
   ],
+  "token-efficiency": [
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "quality-evaluation": [
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "followup",
+    "cause": "web_search_capped",
+    "child": "discover:quality-evaluation:followup",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T11:49:01.145Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "ci-supply-chain": [
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "scheduling-supervision": [
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "hosting-services": [
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-fit:hosting-services",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T06:26:11.481Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "recovery-portability": [
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "observation-inference": [
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-facts:observation-inference",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T06:29:55.795Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "agent-sdks": [
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-fit:agent-sdks",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T06:45:46.681Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "mcp-surfaces": [
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "secrets-credentials": [
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "git-github-automation": [
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "market-data-reference": [
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-facts:market-data-reference",
+    "capped": 6,
+    "calls": 6,
+    "first_capped_at": "2026-09-26T09:49:52.728Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-fit:market-data-reference",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T09:55:19.892Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
   "identity-provenance": [
    {
     "round": "first",
@@ -31366,6 +31705,53 @@
      "low"
     ],
     "detail": "the worker did not run at effort max alone (child-usage.mjs --require-effort max); its return is kept as returned"
+   },
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-facts:identity-provenance",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T09:39:35.009Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-fit:identity-provenance",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T09:49:24.718Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "storage-compute": [
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-facts:storage-compute",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T10:06:35.885Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
    }
   ],
   "data-quality-orchestration": [
@@ -31388,6 +31774,15 @@
      "low"
     ],
     "detail": "the worker did not run at effort max alone (child-usage.mjs --require-effort max); its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
    }
   ],
   "research-factors-ml": [
@@ -31397,6 +31792,44 @@
     "family": "gpt6",
     "status": "failed_exit_1",
     "detail": "the gpt6 discovery researcher returned nothing usable"
+   },
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-fit:research-factors-ml",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T10:20:33.457Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "followup",
+    "cause": "web_search_capped",
+    "child": "discover:research-factors-ml:followup",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T11:51:07.715Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   }
+  ],
+  "backtesting-engine": [
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
    }
   ],
   "execution-broker": [
@@ -31406,6 +31839,42 @@
     "family": "gpt6",
     "status": "failed_exit_1",
     "detail": "the gpt6 discovery researcher returned nothing usable"
+   },
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-fit:execution-broker",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T10:22:30.414Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "followup",
+    "cause": "web_search_capped",
+    "child": "discover:execution-broker:followup",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T11:31:50.249Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "followup",
+    "cause": "web_search_capped",
+    "child": "refute-fit:execution-broker:followup",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T11:55:57.115Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
    }
   ],
   "portfolio-risk": [
@@ -31415,6 +31884,15 @@
     "family": "gpt6",
     "status": "failed_exit_3",
     "detail": "the gpt6 discovery researcher returned nothing usable"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
    }
   ],
   "evaluation-experiments": [
@@ -31424,6 +31902,15 @@
     "family": "gpt6",
     "status": "failed_exit_3",
     "detail": "the gpt6 discovery researcher returned nothing usable"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
    }
   ],
   "agents-models-workers": [
@@ -31433,6 +31920,42 @@
     "family": "gpt6",
     "status": "failed_exit_3",
     "detail": "the gpt6 discovery researcher returned nothing usable"
+   },
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "discover:agents-models-workers",
+    "capped": 1,
+    "calls": 4,
+    "first_capped_at": "2026-09-26T04:10:13.805Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-fit:agents-models-workers",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T10:33:59.136Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "followup",
+    "cause": "web_search_capped",
+    "child": "discover:agents-models-workers:followup",
+    "capped": 3,
+    "calls": 3,
+    "first_capped_at": "2026-09-26T11:35:12.113Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
    }
   ],
   "observability-hosting": [
@@ -31442,6 +31965,24 @@
     "family": "gpt6",
     "status": "failed_exit_3",
     "detail": "the gpt6 discovery researcher returned nothing usable"
+   },
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "discover:observability-hosting",
+    "capped": 1,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T04:11:28.009Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
    }
   ],
   "security-supply-chain": [
@@ -31451,6 +31992,42 @@
     "family": "gpt6",
     "status": "failed_exit_3",
     "detail": "the gpt6 discovery researcher returned nothing usable"
+   },
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "discover:security-supply-chain",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T04:11:02.428Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "first",
+    "cause": "web_search_capped",
+    "child": "refute-fit:security-supply-chain",
+    "capped": 1,
+    "calls": 1,
+    "first_capped_at": "2026-09-26T10:33:21.786Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "critic",
+    "cause": "web_search_capped",
+    "child": "critic",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:06:45.743Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
+   },
+   {
+    "round": "followup",
+    "cause": "web_search_capped",
+    "child": "discover:security-supply-chain:followup",
+    "capped": 2,
+    "calls": 2,
+    "first_capped_at": "2026-09-26T11:35:48.926Z",
+    "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused this worker's WebSearch calls counted here, and the notice told it to go on without searching; its return is kept as returned"
    }
   ]
  },
