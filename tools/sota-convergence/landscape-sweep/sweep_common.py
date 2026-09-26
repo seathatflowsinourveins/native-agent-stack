@@ -101,6 +101,23 @@ def pointer_token(key) -> str:
     return str(key).replace("~", "~0").replace("/", "~1")
 
 
+def deviation_rounds(deviations: list, layer_ids) -> tuple[dict, list]:
+    """(layer_id -> [(round, item)], unmapped items) for per-worker items (effort deviations, capped WebSearch calls):
+    a worker label <role>:<layer>[:followup] belongs to that layer's round, and the completeness critic to every
+    layer. convert.py records each item as a retained failure of those layers; make_result.py checks that it did."""
+    by_layer, unmapped = {}, []
+    for item in deviations:
+        parts = str(item.get("child")).split(":")
+        if parts == ["critic"]:
+            for layer_id in layer_ids:
+                by_layer.setdefault(layer_id, []).append(("critic", item))
+        elif len(parts) >= 2 and parts[1] in layer_ids and parts[2:] in ([], ["followup"]):
+            by_layer.setdefault(parts[1], []).append(("followup" if parts[2:] else "first", item))
+        else:
+            unmapped.append(item)
+    return by_layer, unmapped
+
+
 def private_findings(value, patterns, pointer: str = "") -> list[tuple[str, str]]:
     """(JSON pointer, kind) for every string, dict keys included, that matches a private-content pattern. The
     matched text is never returned, so a report cannot leak it."""

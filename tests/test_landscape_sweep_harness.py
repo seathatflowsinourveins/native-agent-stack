@@ -178,6 +178,18 @@ def healthy_result():
             "followups": [], "lost_first": []}
 
 
+def healthy_two_layers():
+    """healthy_result() plus an equally healthy us-equities layer beta: without a retained failure both are clean."""
+    res = healthy_result()
+    res["first"].append({"layer_id": "beta", "catalog": "us-equities", "round": "first", "followup_reason": None,
+                         "claude_discover": discovery("beta", [B1]), "gpt6_discover": gpt6_entry(discovery("beta", [B2])),
+                         "merged": [merged_row(B1, ["claude"]), merged_row(B2, ["gpt6"])], "dropped": [],
+                         "facts": votes("beta", "facts", {B1: True, B2: False}),
+                         "fit_claude": votes("beta", "fit", {B1: False, B2: True}),
+                         "fit_gpt6": gpt6_entry(votes("beta", "fit", {B1: False, B2: False}))})
+    return res
+
+
 def fail_gpt6_fit(res):
     """Every GPT-6 fit job failed (any non-limit failure: auth, a missing model, a timeout, a lossy wrapper)."""
     for entry in res["first"] + [e for e in res.get("followups") or [] if e]:
@@ -1716,6 +1728,64 @@ class LedgerIntegrationTests(unittest.TestCase):
         self.assertEqual(sl.check_ledger(self.root, ledger), [])
         # healthy_result's layer would be clean (count 1) without the capped critic.
         self.assertEqual({key[1]: value for key, value in sl.derive(ledger).items()}["alpha"]["count"], 0)
+
+    def omission(self, raw, exit_code, drop):
+        """Converted evidence of healthy_two_layers() measured by `raw`, then `drop(returns, layers)` applied in memory
+        before make_result: the result, or the ValueError make_result raised."""
+        out, reviews = self.evidence(healthy_two_layers(),
+                                     usage=usage_record.record(json.dumps(raw).encode("utf-8"), exit_code, "cmd", ROOT))
+        returns = json.loads((self.root / self.base / "returns.json").read_text())
+        layers = copy.deepcopy(out["layers"])
+        drop(returns["failures"], {layer["layer_id"]: layer for layer in layers})
+        try:
+            return self.result(dict(out, layers=layers), reviews, returns=returns)
+        except ValueError as error:
+            return error
+
+    def test_failure_coverage_is_checked_per_worker_and_per_layer(self):
+        # GPT-6 review of the 2026-09-26 record: with token-efficiency's critic-cap failure and its reopen entry removed,
+        # make_result passed, because another layer's "critic" failure satisfied a check over all layers, and the
+        # layer derived a clean count of 1. Each worker's failure must be in each of its layers: the critic's in every
+        # layer of the record, a <role>:<layer> worker's in its own.
+        self.assertEqual({k: v["count"] for k, v in self.clean_counts(healthy_two_layers()).items()},
+                         {"alpha": 1, "beta": 1})
+        baseline = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+
+        def drop_only_failure(layer_id, cause):
+            def drop(failures, layers):
+                failures[layer_id] = [f for f in failures[layer_id] if f["cause"] != cause]
+                self.assertEqual(failures[layer_id], [])  # it was the layer's only retained failure
+                del failures[layer_id]
+                layers[layer_id]["reopen"] = []
+            return drop
+
+        capped = copy.deepcopy(baseline)
+        next(c for c in capped["children"] if c["label"] == "critic")["web_search"] = {
+            "calls": 2, "capped": 2, "first_capped_at": "2026-10-26T11:06:45Z"}
+        low = copy.deepcopy(baseline)
+        next(c for c in low["children"] if c["label"] == "critic")["efforts"] = ["max", "low"]
+        low["effort_mismatches"] = [{"child": "critic", "efforts": ["max", "low"]}]
+        worker = copy.deepcopy(baseline)
+        next(c for c in worker["children"] if c["label"] == "refute-fit:alpha")["web_search"] = {
+            "calls": 1, "capped": 1, "first_capped_at": "2026-10-26T11:06:45Z"}
+
+        def move_to_beta(failures, layers):  # alpha's worker failure recorded under beta instead
+            failures["beta"] = failures.pop("alpha")
+            layers["beta"]["reopen"], layers["alpha"]["reopen"] = [
+                {"trigger": "retained_failure", "ref": f"{self.base}/returns.json#/failures/beta"}], []
+
+        for name, raw, exit_code, drop, message in (
+                ("critic cap", capped, 0, drop_only_failure("beta", "web_search_capped"),
+                 r"no web_search_capped retained failure.*critic in beta"),
+                ("critic effort", low, 1, drop_only_failure("beta", "effort_deviation"),
+                 r"no effort_deviation retained failure.*critic in beta"),
+                ("worker in another layer", worker, 0, move_to_beta,
+                 r"no web_search_capped retained failure.*refute-fit:alpha in alpha")):
+            with self.subTest(name):
+                self.assertIsInstance(self.omission(raw, exit_code, lambda failures, layers: None), dict)
+                refused = self.omission(raw, exit_code, drop)
+                self.assertIsInstance(refused, ValueError, "make_result accepted a record whose layer lost its failure")
+                self.assertRegex(str(refused), message)
 
     def test_refuted_by_absence_is_not_an_earlier_adjudication(self):
         # beta's B1 is refuted only by its missing facts vote; alpha's A3 by its returned facts vote.

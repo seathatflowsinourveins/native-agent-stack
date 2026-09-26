@@ -125,6 +125,10 @@ def main(argv=None) -> int:
                       "incomplete": [c.get("label") for c in children if isinstance(c, dict) and c.get("complete") is not True],
                       "superseded_attempts": [c.get("label") for c in usage.get("superseded_attempts") or []
                                               if isinstance(c, dict)],
+                      # A superseded attempt whose usage by_resolved_model cannot count makes the status incomplete.
+                      "superseded_usage_issues": {c.get("label") or c.get("agent_id"): c["usage_issues"]
+                                                  for c in usage.get("superseded_attempts") or []
+                                                  if isinstance(c, dict) and c.get("usage_issues")},
                       "effort_mismatches": mismatches,
                       "web_search": usage.get("web_search")},
                      indent=1))

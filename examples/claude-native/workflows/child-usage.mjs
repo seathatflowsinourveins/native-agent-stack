@@ -19,7 +19,10 @@
 // An attempt that returned nothing and whose journal key the runtime started again (a re-run
 // after a usage-limit pause) is listed under superseded_attempts with superseded_by, keeps its
 // issues and effort check, and its usage counts in by_resolved_model, whose `children` counter
-// counts attempts; `children` holds the final attempt of each call.
+// counts attempts; `children` holds the final attempt of each call. Its usage-integrity failures
+// (usage_issues: an assistant message without provider usage or without a resolved model, or no
+// transcript at all) leave the run incomplete, because by_resolved_model cannot count that usage;
+// its other issues (no result, the <synthetic> usage-limit row) are expected of such an attempt.
 // web_search (per attempt and per run) counts WebSearch calls and the capped ones: a session makes at
 // most CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION WebSearch calls (default 200), counted across the main
 // conversation and every subagent, and a capped call returns a notice instead of results (tools-reference,
@@ -84,7 +87,7 @@ export function webSearch(transcript) {
   return { calls: calls.size, capped: cappedAt.length, first_capped_at: times[0] ?? null }
 }
 
-export function summarizeChild(started, result, meta, transcript) {
+export function summarizeChild(started, result, meta, transcript, transcriptFound = true) {
   const byId = new Map()
   const counted = (u) => u && typeof u === 'object' && COUNTERS.some((k) => typeof u[k] === 'number')
   const withoutUsage = new Set()
@@ -105,14 +108,19 @@ export function summarizeChild(started, result, meta, transcript) {
   const efforts = [...new Set(messages.map((r) => r.effort).filter(Boolean))]
   const requested = meta && typeof meta.model === 'string' && meta.model ? meta.model : null
   const issues = []
+  // Usage-integrity failures: provider usage that by_resolved_model cannot count or attribute. They are issues of any
+  // attempt, and a superseded attempt keeps them as usage_issues (summarizeRun).
+  const usageIssues = []
   if (!result) issues.push('no result entry in journal')
   else if (result.result === null || result.result === undefined) issues.push('null result')
   if (!meta) issues.push('missing meta.json')
-  if (!messages.length) issues.push('no assistant usage in transcript')
+  if (!transcriptFound) usageIssues.push('no transcript file (usage unknown)')
   const neverCounted = [...withoutUsage].filter((id) => !byId.has(id)).length
-  if (neverCounted) issues.push(neverCounted + ' assistant message(s) without provider usage')
+  if (neverCounted) usageIssues.push(neverCounted + ' assistant message(s) without provider usage')
   const unresolved = messages.filter((r) => !r.message.model).length
-  if (unresolved) issues.push(unresolved + ' assistant message(s) without a resolved model')
+  if (unresolved) usageIssues.push(unresolved + ' assistant message(s) without a resolved model')
+  if (!messages.length) issues.push('no assistant usage in transcript')
+  issues.push(...usageIssues)
   if (!requested) issues.push('model not requested explicitly (inherits the coordinator model)')
   else if (!resolved.length || resolved.some((m) => !m.toLowerCase().includes(requested.toLowerCase()))) issues.push('resolved model outside requested family: ' + (resolved.join(',') || '(none resolved)'))
   // Classifier fallback (model-config doc, "Automatic model fallback"): after a flagged request the
@@ -140,7 +148,7 @@ export function summarizeChild(started, result, meta, transcript) {
     // Whole first prompt (system, tool definitions, injected instructions, packet):
     // the fixed cost of spawning this child before it does any work.
     first_request_prompt_tokens: messages.length ? ['input_tokens', 'cache_read_input_tokens', 'cache_creation_input_tokens'].reduce((n, k) => n + (messages[0].message.usage[k] || 0), 0) : null,
-    complete: issues.length === 0, issues,
+    complete: issues.length === 0, issues, ...(usageIssues.length ? { usage_issues: usageIssues } : {}),
   }
 }
 
@@ -165,7 +173,8 @@ export function summarizeRun(dir) {
     const logPath = join(dir, 'agent-' + s.agentId + '.jsonl')
     let meta = null
     try { meta = existsSync(metaPath) ? JSON.parse(readFileSync(metaPath, 'utf8')) : null } catch { meta = null }
-    const child = summarizeChild(s, results.get(s.agentId) || null, meta, existsSync(logPath) ? lines(logPath) : [])
+    const found = existsSync(logPath)
+    const child = summarizeChild(s, results.get(s.agentId) || null, meta, found ? lines(logPath) : [], found)
     return supersededBy.has(s.agentId) ? { ...child, superseded_by: supersededBy.get(s.agentId) } : child
   })
   const children = attempts.filter((c) => !c.superseded_by)
@@ -177,10 +186,15 @@ export function summarizeRun(dir) {
     for (const k of COUNTERS) byModel[m][k] += u[k]
   }
   const incomplete = children.filter((c) => !c.complete)
+  // A superseded attempt returned nothing by definition, but usage it holds that by_resolved_model cannot count
+  // (usage_issues) leaves the run's usage incomplete.
+  const uncounted = superseded.filter((c) => c.usage_issues)
   const rerun = superseded.length ? '; ' + superseded.length + ' earlier attempt(s) that returned nothing were re-run under the same call key (superseded_attempts, whose usage by_resolved_model counts)' : ''
+  const gaps = [incomplete.length ? incomplete.length + ' child(ren) incomplete' : null,
+    uncounted.length ? uncounted.length + ' superseded attempt(s) with usage by_resolved_model cannot count (usage_issues)' : null].filter(Boolean)
   return {
-    status: !children.length ? 'incomplete' : incomplete.length ? 'incomplete' : 'complete',
-    reason: (!children.length ? 'journal has no started children' : incomplete.length ? incomplete.length + ' child(ren) incomplete' : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result') + rerun,
+    status: !children.length || gaps.length ? 'incomplete' : 'complete',
+    reason: (!children.length ? 'journal has no started children' : gaps.length ? gaps.join('; ') : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result') + rerun,
     multi_model_children: children.filter((c) => c.resolved_models.length > 1).map((c) => c.label || c.agent_id),
     // Over every attempt (children and superseded attempts), like by_resolved_model.
     web_search: {

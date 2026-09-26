@@ -114,6 +114,30 @@ try {
   expect('rerun: the superseded attempt keeps its issues and its usage counts in the per-model totals', (sup.issues || []).includes('no result entry in journal') && re.by_resolved_model['claude-sonnet-5'].output_tokens === 23 && re.by_resolved_model['<synthetic>'].children === 1)
   expect('rerun: the cli passes --require-effort max for a re-run call', cli(rerun, '--require-effort', 'max') === 0)
   expect('rerun: --require-effort also checks superseded attempts', JSON.stringify(effortMismatches({ children: [{ label: 'a', efforts: ['max'] }], superseded_attempts: [{ label: 'a', agent_id: 'x1', superseded_by: 'x2', efforts: ['max', 'low'] }] }, 'max')) === JSON.stringify([{ child: 'a', efforts: ['max', 'low'], superseded_by: 'x2' }]))
+  // A superseded attempt keeps its usage-integrity failures (GPT-6 review of the 2026-09-26 record): usage the per-model
+  // totals cannot count or attribute leaves the run incomplete, although the re-run call returned. The attempt's other
+  // issues (no result entry, the <synthetic> usage-limit row outside the family) are expected and do not.
+  const rerunWith = (name, firstRows) => {
+    const d = join(dir, name); mkdirSync(d)
+    writeFileSync(join(d, 'journal.jsonl'), [{ type: 'launched' }, { ...started, key: 'v2:k1' }, { ...started, agentId: 'a3', label: 'review', key: 'v2:k2' },
+      { ...started, agentId: 'a2', key: 'v2:k1' }, { type: 'result', agentId: 'a2', result: { ok: true } }, { type: 'result', agentId: 'a3', result: { ok: true } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
+    for (const id of ['a1', 'a2', 'a3']) writeFileSync(join(d, 'agent-' + id + '.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' }))
+    if (firstRows) writeFileSync(join(d, 'agent-a1.jsonl'), firstRows.map((e) => JSON.stringify(e)).join('\n') + '\n')
+    writeFileSync(join(d, 'agent-a2.jsonl'), JSON.stringify(msg('m2', 'claude-sonnet-5', 11, 100, 0, 'max')) + '\n')
+    writeFileSync(join(d, 'agent-a3.jsonl'), JSON.stringify(msg('m3', 'claude-sonnet-5', 5, 100, 0, 'max')) + '\n')
+    return d
+  }
+  const uncountedRow = { type: 'assistant', effort: 'max', message: { id: 'm0', model: 'claude-sonnet-5' } }
+  const gap = rerunWith('rerun-missing-usage', [msg('m1', 'claude-sonnet-5', 7, 100, 0, 'max'), uncountedRow, limitRow])
+  const gr = summarizeRun(gap)
+  const gsup = (gr.superseded_attempts || [])[0] || {}
+  expect('rerun: a superseded attempt with an assistant message without provider usage leaves the run incomplete', gr.status === 'incomplete' && gr.children.length === 2 && gr.children.every((c) => c.complete) && gsup.superseded_by === 'a2' && (gsup.usage_issues || []).some((i) => i.includes('without provider usage')) && gr.reason.includes('1 superseded attempt(s) with usage'))
+  expect('rerun: the cli exits 1 for a superseded attempt whose usage was not counted', cli(gap, '--require-effort', 'max') === 1)
+  expect('rerun: a superseded attempt with usage but no resolved model leaves the run incomplete', summarizeRun(rerunWith('rerun-unresolved', [msg('m1', undefined, 7, 100, 0, 'max'), limitRow])).status === 'incomplete')
+  const noLog = summarizeRun(rerunWith('rerun-no-transcript', null))
+  expect('rerun: a superseded attempt without a transcript has unknown usage, so the run is incomplete', noLog.status === 'incomplete' && ((noLog.superseded_attempts || [])[0] || {}).usage_issues.some((i) => i.includes('no transcript')))
+  const quiet = summarizeRun(rerunWith('rerun-no-request', [{ type: 'user', message: { role: 'user', content: 'go' } }]))
+  expect('rerun: a superseded attempt that made no request (zero usage) leaves the run complete', quiet.status === 'complete' && !((quiet.superseded_attempts || [])[0] || {}).usage_issues)
   const capRun = join(dir, 'cap'); mkdirSync(capRun)
   writeFileSync(join(capRun, 'journal.jsonl'), [started, done, { ...started, agentId: 'a2', label: 'review' }, { type: 'result', agentId: 'a2', result: { ok: true } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
   for (const id of ['a1', 'a2']) writeFileSync(join(capRun, 'agent-' + id + '.meta.json'), JSON.stringify({ model: 'opus', agentType: 'workflow' }))

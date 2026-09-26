@@ -69,8 +69,9 @@ not the requested ones. Without `--usage`, `convert.py` writes the requested ali
 `usage_record.py` exits 1 when a child ran at another effort (`CLAUDE_CODE_EFFORT_LEVEL` would override every
 child; a skill whose frontmatter sets `effort`, such as `property-based-testing` with `effort: low`, lowers the
 turns after it loads). `convert.py --usage` records each such worker as an `effort_deviation` retained failure of
-its layer (the critic's of every layer), and `make_result.py` refuses the record unless every one is recorded so.
-The same holds for a worker whose WebSearch call the session's cap refused (`web_search_capped`, under Coordination).
+its layer (the critic's of every layer), and `make_result.py` refuses the record unless every one is recorded so in
+each of its layers. The same holds for a worker whose WebSearch call the session's cap refused (`web_search_capped`,
+under Coordination).
 
 The Sonnet wrappers only run three commands and return the raw result. `convert.py` checks each copy against the
 file Codex wrote.
@@ -105,11 +106,14 @@ provides it.
   `<session-transcripts>/subagents/workflows/<run id>`. `lost_workers` must list exactly the incomplete children.
   When a Workflow pauses at a Claude usage limit, it re-runs its waiting agents after the reset under the same
   journal key; `child-usage.mjs` lists each earlier attempt that returned nothing under `superseded_attempts`
-  (with `superseded_by`), not among the children, and still counts its usage in `by_resolved_model`.
+  (with `superseded_by`), not among the children, and still counts its usage in `by_resolved_model`. Usage such an
+  attempt holds that `by_resolved_model` cannot count (an assistant message without provider usage or without a
+  resolved model, or no transcript) is its `usage_issues` and makes the status `incomplete`.
   `make_result.py` also needs every child and superseded attempt measured at effort `max` alone, or recorded as an
   `effort_deviation` retained failure, and `measurement.exit_code` 0 (1 only for such recorded deviations). Every
   child and attempt must also carry a measured `web_search`, and each one with a capped WebSearch call must be a
-  `web_search_capped` retained failure.
+  `web_search_capped` retained failure. Both are checked per worker and per layer: a `<role>:<layer>` worker's
+  failure in its own layer, the critic's in every layer of the record.
 - **Failures.** A failed part of the lane never leaves a clean layer. `convert.py` lists each layer's retained
   failures under `failures/<layer>` in `returns.json`: a lost round, a discovery family that did not return, a
   missing vote, a lost critic, a critic-flagged layer beyond the follow-up cap, a GPT-6 copy problem, and (with
@@ -328,7 +332,7 @@ new run from the latest retained record, and say so when no record exists yet.
   the count, but not while a workflow is still running. `child-usage.mjs` counts each child's WebSearch calls and
   capped calls (`web_search`) from the transcripts. `convert.py --usage` records every capped worker as a
   `web_search_capped` retained failure of its layer; the critic's counts for every layer. `make_result.py` refuses a
-  record in which a capped worker is not recorded that way.
+  record in which a capped worker is not recorded that way in each of its layers.
 
 ## Privacy and token practice
 
@@ -404,6 +408,14 @@ The deliberate changes:
   - A proposal refuted only because the GPT-6 fit vote did not return counted downstream as refuted on merit: as
     known in later sweeps and as `previous_sweep.refuted` in the next discovery input. The ledger now reads the
     vote's missing marker.
+- **GPT-6 review repairs (2026-09-26).** A read-only GPT-6-Astra review of the record's checkout found two more,
+  each now covered by a regression test that failed before the repair:
+  - A superseded attempt's assistant message without provider usage left the run `complete`, although
+    `by_resolved_model` could not count it. `child-usage.mjs` now keeps such usage-integrity failures of superseded
+    attempts (`usage_issues`) and reports the run incomplete.
+  - `make_result.py` checked failure coverage over all layers at once, so one layer could lose its critic failure
+    and its reopen entry (and count as clean) while another layer's `critic` failure satisfied the check. Coverage
+    is now checked per worker and per layer.
 
 ## Tests
 

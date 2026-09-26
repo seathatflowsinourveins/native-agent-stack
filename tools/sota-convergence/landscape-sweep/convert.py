@@ -53,8 +53,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from sweep_common import (REPO_ROOT, canon, host_replacements, load_json, pointer_token,  # noqa: E402
-                          private_content, private_findings, sanitize, slug, write_json)
+from sweep_common import (REPO_ROOT, canon, deviation_rounds, host_replacements, load_json,  # noqa: E402
+                          pointer_token, private_content, private_findings, sanitize, slug, write_json)
 
 ALIASES = {"discover": "opus", "refute-facts": "sonnet", "refute-fit": "opus", "critic": "opus"}
 GPT6_DEFAULT = {"model": "gpt-6-astra", "effort": "max"}
@@ -158,23 +158,6 @@ def web_search_capped(usage: dict | None) -> list:
                 item["superseded_by"] = child["superseded_by"]
             out.append(item)
     return out
-
-
-def deviation_rounds(deviations: list, layer_ids) -> tuple[dict, list]:
-    """(layer_id -> [(round, item)], unmapped items) for per-worker items (effort deviations, capped WebSearch calls):
-    a worker label <role>:<layer>[:followup] belongs to that layer's round, and the completeness critic to every
-    layer."""
-    by_layer, unmapped = {}, []
-    for item in deviations:
-        parts = str(item.get("child")).split(":")
-        if parts == ["critic"]:
-            for layer_id in layer_ids:
-                by_layer.setdefault(layer_id, []).append(("critic", item))
-        elif len(parts) >= 2 and parts[1] in layer_ids and parts[2:] in ([], ["followup"]):
-            by_layer.setdefault(parts[1], []).append(("followup" if parts[2:] else "first", item))
-        else:
-            unmapped.append(item)
-    return by_layer, unmapped
 
 
 def measured(children: dict, label: str, fallback_model: str) -> tuple[str, str | None]:
