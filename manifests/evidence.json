@@ -38332,6 +38332,11 @@
       "bytes": 146176
     },
     {
+      "path": "tests/test_lane_packets.py",
+      "sha256": "940485c85045360783b344debc7bc92caf74ea203c739108a3b0a2800174011b",
+      "bytes": 98784
+    },
+    {
       "path": "tests/test_layer_verdicts.py",
       "sha256": "ee85d714bdd00edcc217e20441d0e59a2b3382c0533496428558d75b764c9267",
       "bytes": 30275
@@ -38637,6 +38642,11 @@
       "bytes": 29398
     },
     {
+      "path": "tests/test_verdict_lane_vendoring.py",
+      "sha256": "02465e7ca09a3d4ee72e3855084cc5b54ee223b209bb6169cb9deea1c5d9fdab",
+      "bytes": 12669
+    },
+    {
       "path": "tests/test_worker_recovery.py",
       "sha256": "9360d522838325f232d6f1d7a02dcefa36a9865a0fa02c22bec42db606a8dc0a",
       "bytes": 11589
@@ -38852,9 +38862,14 @@
       "bytes": 8214
     },
     {
+      "path": "tools/sota-convergence/lane-prompt.md",
+      "sha256": "d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4",
+      "bytes": 2220
+    },
+    {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "ca747c9808c723822c5ef970967ff885d33b2834f37bc5ff5ff07301ec7f2176",
-      "bytes": 8231
+      "sha256": "8281bcc79f76dcaf7427b76429613cd45597d990e747f49a917d3dae9c93d261",
+      "bytes": 9569
     },
     {
       "path": "tools/sota-convergence/reconciliations-20260922.json",

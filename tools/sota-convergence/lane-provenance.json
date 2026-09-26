@@ -88,6 +88,24 @@
    "workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
    "workflow_sha256": "fd77b74945e9d2bd0b26b7822aabcde00e7e650c327da16d852fdbfd5984c0d6",
    "transcript_audit_py_sha256": "5ed7a1b58d2046a8b7c788026769d4a8a340e1ae92e2acf7ed06f03f12736b92"
+  },
+  {
+   "agent_sha256": "a87a9883618b320c8b97a442a43c471c0994fb70ea9bb64ce0b5f513ba31500c",
+   "prompt_sha256": "d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4",
+   "registered_at": "2026-09-26",
+   "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+   "workflow_path": ".claude/workflows/layer-verdict-lane.js",
+   "workflow_sha256": "fd77b74945e9d2bd0b26b7822aabcde00e7e650c327da16d852fdbfd5984c0d6",
+   "transcript_audit_py_sha256": "5ed7a1b58d2046a8b7c788026769d4a8a340e1ae92e2acf7ed06f03f12736b92"
+  },
+  {
+   "agent_sha256": "a87a9883618b320c8b97a442a43c471c0994fb70ea9bb64ce0b5f513ba31500c",
+   "prompt_sha256": "d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4",
+   "registered_at": "2026-09-26",
+   "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+   "workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+   "workflow_sha256": "fd77b74945e9d2bd0b26b7822aabcde00e7e650c327da16d852fdbfd5984c0d6",
+   "transcript_audit_py_sha256": "5ed7a1b58d2046a8b7c788026769d4a8a340e1ae92e2acf7ed06f03f12736b92"
   }
  ],
  "codex": [
@@ -130,6 +148,11 @@
    "codex_lane_py_sha256": "a4bd8f47138448ee80b3fbde6c4bdbf0a22185643efedcdf1573a8b3c596069e",
    "prompt_sha256": "9b8a8364f13ff3fcb9fc690198c4ca8849c29cc12b81e8526121a46114517f54",
    "registered_at": "2026-09-24"
+  },
+  {
+   "codex_lane_py_sha256": "a4bd8f47138448ee80b3fbde6c4bdbf0a22185643efedcdf1573a8b3c596069e",
+   "prompt_sha256": "d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4",
+   "registered_at": "2026-09-26"
   }
  ],
  "schema_version": 1,

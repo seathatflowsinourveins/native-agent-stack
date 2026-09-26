@@ -15,6 +15,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import re
 import shutil
 import tempfile
 import unittest
@@ -47,6 +48,12 @@ LeakDetected = lane_packets.assert_no_leak.__globals__["LeakDetected"]
 
 # Seeded order of the manifest-mode fixture (seed 20260922, layer-b); newcomers have no component id.
 EXPECTED_SEEDED_COMPONENT_ORDER = [None, None, 'data-two', 'data-one', 'data-three']
+# Rule 2's merit sentence (2026-09-26 user directives, verdict-wave runbook D1): a winner earns it on what its
+# evidence shows was run, never on its status, license or popularity. Generic by design: the shared prompt names no
+# repository or product.
+MERIT_SENTENCE = ("Adoption, incumbency, installation, retained-control status, receipt count, packet position, "
+                  "license, stars and popularity are not evidence of fit; choose among adopted candidates on what "
+                  "their evidence shows was run.")
 
 
 class LanePacketsFixture(unittest.TestCase):
@@ -165,6 +172,8 @@ class BuildAllPacketsTests(LanePacketsFixture):
         self.assertEqual(len(packet["rules"]), 5)
         self.assertEqual(packet["rules"], lane_packets.load_rules())
         self.assertIn("Judge from retained evidence.", packet["rules"][0])
+        # Every packet carries the merit rule, so the refuters and judges who read the packet see it too.
+        self.assertIn(MERIT_SENTENCE, packet["rules"][1])
 
     def test_group_is_present_for_us_equities_and_null_for_foundation(self):
         self.assertIsNone(self.packet("foundation", "layer-a")["group"])
@@ -189,6 +198,23 @@ class LoadRulesFailureTests(unittest.TestCase):
             prompt.write_text("Intro text.\n\nRules\n1. One.\n2. Two.\n3. Three.\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "must have exactly five numbered rules, found 3"):
                 lane_packets.load_rules(prompt)
+
+
+class LanePromptMeritRuleTests(unittest.TestCase):
+    """The shared prompt's Rules section (2026-09-26, verdict-wave runbook D1): Rule 2 carries the merit sentence,
+    and the file numbers exactly five rules, 1 to 5, counted here apart from load_rules (which only counts them), so
+    dropping the sentence, moving it out of Rule 2, or adding, removing or renumbering a rule fails."""
+
+    def test_rule_2_states_the_merit_sentence(self):
+        rules = lane_packets.load_rules()
+        self.assertTrue(rules[1].startswith("The winner set is 1-3 adopted candidates (adopted == true)"), rules[1])
+        self.assertIn(MERIT_SENTENCE, rules[1])
+
+    def test_the_rules_section_numbers_exactly_five_rules(self):
+        text = (TOOL_DIR / "lane-prompt.md").read_text(encoding="utf-8")
+        _, separator, section = text.partition("\nRules\n")
+        self.assertTrue(separator, "lane-prompt.md must keep its Rules section")
+        self.assertEqual(re.findall(r"(?m)^(\d+)\.\s", section), ["1", "2", "3", "4", "5"])
 
 
 class ShuffleTests(LanePacketsFixture):
