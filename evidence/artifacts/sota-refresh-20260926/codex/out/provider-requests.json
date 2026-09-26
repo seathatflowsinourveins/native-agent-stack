@@ -1,0 +1,3544 @@
+{
+  "exec/0.155.1/K1-search-ok": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "c01cf7500a718c6b94aa83ca2b4961d535f7c280b53ec88d2b95cf458136299a"
+    }
+  ],
+  "exec/0.155.1/K2-no-search-ok": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "ccb910f25fa5ac4eac51cbc3747ab0d3cd82ac3e5f92842272e525a313bdcd42"
+    }
+  ],
+  "exec/0.155.1/K3-config-live-ok": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "3eddd56641a145c095819fd7daa6f1c1c00e29a63b9d9844f5f2aba283b8d8da"
+    }
+  ],
+  "exec/0.155.1/K4-search-limit": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "4e7252d8e76ead73ac3d1d0a57cc27b05db8dcbd0bc02ba46fa45ea27e4db563"
+    }
+  ],
+  "exec/0.157.1/K1-search-ok": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "f703ac12deb2860a52221814d6ee78a87547ad40fd45e1a84ad771a35fb5ff6c"
+    }
+  ],
+  "exec/0.157.1/K2-no-search-ok": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "307eff011e3330d049713115ed7509f27591568a18ae84095e33ad34a0b368bf"
+    }
+  ],
+  "exec/0.157.1/K3-config-live-ok": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "6f167b1db124ad806b4e5c6e118a4f4cad6ceba27149b330e871a4060918c21e"
+    }
+  ],
+  "exec/0.157.1/K4-search-limit": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "ed7e35f11ce7affac1a630436a99dc469cdb5c16f543635a1aa16ee5a3ab8201"
+    }
+  ],
+  "websearch/0.155.1/W1-search-flag": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "dbecdd4723873276d88da340d8b13f61a6dacbc435a88ea3c579d6801a8e738d"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/alpha/search",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "user-agent",
+        "x-codex-turn-metadata"
+      ],
+      "body_keys": [
+        "commands",
+        "id",
+        "input",
+        "max_output_tokens",
+        "model",
+        "settings"
+      ],
+      "model": "gpt-6-astra",
+      "settings": {
+        "allowed_callers": [
+          "direct"
+        ],
+        "external_web_access": false
+      },
+      "commands": {
+        "search_query": [
+          {
+            "q": "codex fake query"
+          }
+        ]
+      },
+      "max_output_tokens": 10000
+    },
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ]
+      ],
+      "function_call_outputs": 1,
+      "body_sha256": "7ac12bf7b984cc5f1489427b7d11d9b7889ffbafff62617b1d4c8d74868f4b39"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/alpha/search",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "user-agent",
+        "x-codex-turn-metadata"
+      ],
+      "body_keys": [
+        "commands",
+        "id",
+        "input",
+        "max_output_tokens",
+        "model",
+        "settings"
+      ],
+      "model": "gpt-6-astra",
+      "settings": {
+        "allowed_callers": [
+          "direct"
+        ],
+        "external_web_access": false
+      },
+      "commands": {
+        "open": [
+          {
+            "ref_id": "https://example.com/docs"
+          }
+        ]
+      },
+      "max_output_tokens": 10000
+    },
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ]
+      ],
+      "function_call_outputs": 2,
+      "body_sha256": "286ae15588065f9ad97b2f7c6691c1933fbaf6b6ffdb68f3a7d630980c9419d1"
+    }
+  ],
+  "websearch/0.155.1/W2-no-flag": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "bb3c0f945a5f9c4755f18c9f37f7030810d2910d2c5b6367e1de66fc86bd8088"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/alpha/search",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "user-agent",
+        "x-codex-turn-metadata"
+      ],
+      "body_keys": [
+        "commands",
+        "id",
+        "input",
+        "max_output_tokens",
+        "model",
+        "settings"
+      ],
+      "model": "gpt-6-astra",
+      "settings": {
+        "allowed_callers": [
+          "direct"
+        ],
+        "external_web_access": false
+      },
+      "commands": {
+        "search_query": [
+          {
+            "q": "codex fake query"
+          }
+        ]
+      },
+      "max_output_tokens": 10000
+    },
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ]
+      ],
+      "function_call_outputs": 1,
+      "body_sha256": "96508edf716fdbc01119ce2e1ef033a5145eaf2e3c4218a53ed4ed20510e02ab"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/alpha/search",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "user-agent",
+        "x-codex-turn-metadata"
+      ],
+      "body_keys": [
+        "commands",
+        "id",
+        "input",
+        "max_output_tokens",
+        "model",
+        "settings"
+      ],
+      "model": "gpt-6-astra",
+      "settings": {
+        "allowed_callers": [
+          "direct"
+        ],
+        "external_web_access": false
+      },
+      "commands": {
+        "open": [
+          {
+            "ref_id": "https://example.com/docs"
+          }
+        ]
+      },
+      "max_output_tokens": 10000
+    },
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ]
+      ],
+      "function_call_outputs": 2,
+      "body_sha256": "7c01b4e0ad73f043f8899b57c29df862159bf8c31f3a4472aac632e561ababd6"
+    }
+  ],
+  "websearch/0.155.1/W3-config-live": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "ee4883421fb523461fa4d5a19d9e7ec8ee1c1ca93bec77fea19e4f760d68740f"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/alpha/search",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "user-agent",
+        "x-codex-turn-metadata"
+      ],
+      "body_keys": [
+        "commands",
+        "id",
+        "input",
+        "max_output_tokens",
+        "model",
+        "settings"
+      ],
+      "model": "gpt-6-astra",
+      "settings": {
+        "allowed_callers": [
+          "direct"
+        ],
+        "external_web_access": true
+      },
+      "commands": {
+        "search_query": [
+          {
+            "q": "codex fake query"
+          }
+        ]
+      },
+      "max_output_tokens": 10000
+    },
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ]
+      ],
+      "function_call_outputs": 1,
+      "body_sha256": "1e65ca616c79174348213efa7d5cb4e9143d7a75ae7e5774d66348ad0cf21410"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/alpha/search",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "user-agent",
+        "x-codex-turn-metadata"
+      ],
+      "body_keys": [
+        "commands",
+        "id",
+        "input",
+        "max_output_tokens",
+        "model",
+        "settings"
+      ],
+      "model": "gpt-6-astra",
+      "settings": {
+        "allowed_callers": [
+          "direct"
+        ],
+        "external_web_access": true
+      },
+      "commands": {
+        "open": [
+          {
+            "ref_id": "https://example.com/docs"
+          }
+        ]
+      },
+      "max_output_tokens": 10000
+    },
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ]
+      ],
+      "function_call_outputs": 2,
+      "body_sha256": "e4661bd6376fd4600ca882126e0600035b596d1c61bfa8932ca87b5dbaba615f"
+    }
+  ],
+  "websearch/0.157.1/W1-search-flag": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "019e757fc71e3d5c2b26d82bf9d09f67ccfb2f8933bc1d2cba66bf817b12e8d8"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/alpha/search",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "user-agent",
+        "x-codex-turn-metadata"
+      ],
+      "body_keys": [
+        "commands",
+        "id",
+        "input",
+        "max_output_tokens",
+        "model",
+        "settings"
+      ],
+      "model": "gpt-6-astra",
+      "settings": {
+        "allowed_callers": [
+          "direct"
+        ],
+        "external_web_access": false
+      },
+      "commands": {
+        "search_query": [
+          {
+            "q": "codex fake query"
+          }
+        ]
+      },
+      "max_output_tokens": 10000
+    },
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ]
+      ],
+      "function_call_outputs": 1,
+      "body_sha256": "83aba0f0f287fd6b3a0835d9ab0a44db4d2990e95368e07b6f7f022948a567ad"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/alpha/search",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "user-agent",
+        "x-codex-turn-metadata"
+      ],
+      "body_keys": [
+        "commands",
+        "id",
+        "input",
+        "max_output_tokens",
+        "model",
+        "settings"
+      ],
+      "model": "gpt-6-astra",
+      "settings": {
+        "allowed_callers": [
+          "direct"
+        ],
+        "external_web_access": false
+      },
+      "commands": {
+        "open": [
+          {
+            "ref_id": "https://example.com/docs"
+          }
+        ]
+      },
+      "max_output_tokens": 10000
+    },
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ]
+      ],
+      "function_call_outputs": 2,
+      "body_sha256": "9c57e9b50ef044e7d38003c5c1219f46cc67df4c6630a7b9370d3ea26d13b547"
+    }
+  ],
+  "websearch/0.157.1/W2-no-flag": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "0f5973bb144687d930768ad9ad885d501295c9aac90023db4cea7c3e21baf9f5"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/alpha/search",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "user-agent",
+        "x-codex-turn-metadata"
+      ],
+      "body_keys": [
+        "commands",
+        "id",
+        "input",
+        "max_output_tokens",
+        "model",
+        "settings"
+      ],
+      "model": "gpt-6-astra",
+      "settings": {
+        "allowed_callers": [
+          "direct"
+        ],
+        "external_web_access": false
+      },
+      "commands": {
+        "search_query": [
+          {
+            "q": "codex fake query"
+          }
+        ]
+      },
+      "max_output_tokens": 10000
+    },
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ]
+      ],
+      "function_call_outputs": 1,
+      "body_sha256": "29ce9ede08e18c0aece2ebb6e60c39e1b2211973540246f6a96b1ad53bb23a34"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/alpha/search",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "user-agent",
+        "x-codex-turn-metadata"
+      ],
+      "body_keys": [
+        "commands",
+        "id",
+        "input",
+        "max_output_tokens",
+        "model",
+        "settings"
+      ],
+      "model": "gpt-6-astra",
+      "settings": {
+        "allowed_callers": [
+          "direct"
+        ],
+        "external_web_access": false
+      },
+      "commands": {
+        "open": [
+          {
+            "ref_id": "https://example.com/docs"
+          }
+        ]
+      },
+      "max_output_tokens": 10000
+    },
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ]
+      ],
+      "function_call_outputs": 2,
+      "body_sha256": "72bd71f0efed17f5c9542d7afcb1260a990df1244fa304230690739addb9afe4"
+    }
+  ],
+  "websearch/0.157.1/W3-config-live": [
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ]
+      ],
+      "function_call_outputs": 0,
+      "body_sha256": "be2c6c4a998186252b5f08a2f7fb7e3a1c73aeedbc2f464c7fa5f4aeb9db8baa"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/alpha/search",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "user-agent",
+        "x-codex-turn-metadata"
+      ],
+      "body_keys": [
+        "commands",
+        "id",
+        "input",
+        "max_output_tokens",
+        "model",
+        "settings"
+      ],
+      "model": "gpt-6-astra",
+      "settings": {
+        "allowed_callers": [
+          "direct"
+        ],
+        "external_web_access": true
+      },
+      "commands": {
+        "search_query": [
+          {
+            "q": "codex fake query"
+          }
+        ]
+      },
+      "max_output_tokens": 10000
+    },
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ]
+      ],
+      "function_call_outputs": 1,
+      "body_sha256": "66181f5b18c7baa9622a24b13cd52027774e565285d482d9d7dab0c19e5699fb"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/alpha/search",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "user-agent",
+        "x-codex-turn-metadata"
+      ],
+      "body_keys": [
+        "commands",
+        "id",
+        "input",
+        "max_output_tokens",
+        "model",
+        "settings"
+      ],
+      "model": "gpt-6-astra",
+      "settings": {
+        "allowed_callers": [
+          "direct"
+        ],
+        "external_web_access": true
+      },
+      "commands": {
+        "open": [
+          {
+            "ref_id": "https://example.com/docs"
+          }
+        ]
+      },
+      "max_output_tokens": 10000
+    },
+    {
+      "method": "POST",
+      "path": "/v1/responses",
+      "header_names": [
+        "accept",
+        "content-length",
+        "content-type",
+        "host",
+        "originator",
+        "session-id",
+        "thread-id",
+        "user-agent",
+        "x-client-request-id",
+        "x-codex-beta-features",
+        "x-codex-turn-metadata",
+        "x-codex-window-id",
+        "x-openai-internal-codex-responses-lite"
+      ],
+      "body_keys": [
+        "client_metadata",
+        "include",
+        "input",
+        "model",
+        "parallel_tool_calls",
+        "prompt_cache_key",
+        "reasoning",
+        "store",
+        "stream",
+        "text",
+        "tool_choice"
+      ],
+      "model": "gpt-6-astra",
+      "reasoning": {
+        "effort": "max",
+        "context": "all_turns"
+      },
+      "stream": true,
+      "store": false,
+      "tool_choice": "auto",
+      "parallel_tool_calls": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "text_format": {
+        "type": "json_schema",
+        "name": "codex_output_schema",
+        "strict": true,
+        "schema_sha256": "ef20ad0f1fd191656bc18a4eee408f1cfb4d5a1749c9ea7099d9a9163fb6d645"
+      },
+      "additional_tools": [
+        {
+          "type": "namespace",
+          "name": "functions",
+          "tools": [
+            "exec",
+            "wait",
+            "request_user_input",
+            "request_user_input_async"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "clock",
+          "tools": [
+            "sleep"
+          ]
+        },
+        {
+          "type": "namespace",
+          "name": "collaboration",
+          "tools": [
+            "followup_task",
+            "interrupt_agent",
+            "list_agents",
+            "send_message",
+            "spawn_agent",
+            "wait_agent"
+          ]
+        }
+      ],
+      "input_item_types": [
+        [
+          "additional_tools",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "developer"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "message",
+          "user"
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ],
+        [
+          "function_call",
+          null
+        ],
+        [
+          "function_call_output",
+          null
+        ]
+      ],
+      "function_call_outputs": 2,
+      "body_sha256": "e5ef2f7d2a366d91423afb86c4d0c5c5c9a775e6345b7c3d57f3c351889b0ac4"
+    }
+  ]
+}

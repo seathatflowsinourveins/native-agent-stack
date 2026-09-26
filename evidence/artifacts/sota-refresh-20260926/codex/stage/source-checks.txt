@@ -1,0 +1,73 @@
+Source reads at rust-v0.155.1 (be2951ea34f0d295ed0becf97079f92fa5f6950e) and rust-v0.157.1 (36650394c5b38c2990ccf2a3457165ca3e9d9726) through gh api contents; tag comparison: 657 commits ahead, 8 behind (diverged release branches).
+
+== codex-rs/exec/src/cli.rs: identical
+== codex-rs/utils/cli/src/shared_options.rs: identical
+
+== codex-rs/exec/src/exec_events.rs (0.155.1 -> 0.157.1)
+301a302,305
+>     /// Structured results returned by web search, when available.
+>     #[serde(default, skip_serializing_if = "Option::is_none")]
+>     #[ts(optional)]
+>     pub results: Option<Vec<JsonValue>>,
+
+== codex-rs/exec/src/event_processor_with_jsonl_output.rs (0.155.1 -> 0.157.1)
+15a16
+> use codex_app_server_protocol::WebSearchAction as ApiWebSearchAction;
+308,312c309,318
+<                         Some(action) => serde_json::from_value(
+<                             serde_json::to_value(action).unwrap_or_else(|_| json!("other")),
+<                         )
+<                         .unwrap_or(WebSearchAction::Other),
+<                         None => WebSearchAction::Other,
+---
+>                         Some(ApiWebSearchAction::Search { query, queries }) => {
+>                             WebSearchAction::Search { query, queries }
+>                         }
+>                         Some(ApiWebSearchAction::OpenPage { url }) => {
+>                             WebSearchAction::OpenPage { url }
+>                         }
+>                         Some(ApiWebSearchAction::FindInPage { url, pattern }) => {
+>                             WebSearchAction::FindInPage { url, pattern }
+>                         }
+>                         Some(ApiWebSearchAction::Other) | None => WebSearchAction::Other,
+313a320
+>                     results: item.results,
+
+== ThreadEvent type names at 0.157.1 (unchanged from 0.155.1)
+13:    #[serde(rename = "thread.started")]
+17:    #[serde(rename = "turn.started")]
+20:    #[serde(rename = "turn.completed")]
+23:    #[serde(rename = "turn.failed")]
+26:    #[serde(rename = "item.started")]
+29:    #[serde(rename = "item.updated")]
+32:    #[serde(rename = "item.completed")]
+35:    #[serde(rename = "error")]
+
+== codex-rs/cli/src/main.rs Exec branch at rust-v0.157.1 (identical at rust-v0.155.1, lines 1233-1247): root options reach exec only through inherit_exec_root_options (shared options, no web_search) and the root -c overrides; TuiCli.web_search (--search) is not consulted
+        Some(Subcommand::Exec(mut exec_cli)) => {
+            reject_remote_mode_for_subcommand(
+                root_remote.as_deref(),
+                root_remote_auth_token_env.as_deref(),
+                "exec",
+            )?;
+            exec_cli
+                .shared
+                .inherit_exec_root_options(&interactive.shared);
+            exec_cli.strict_config |= root_strict_config;
+            prepend_config_flags(
+                &mut exec_cli.config_overrides,
+                root_config_overrides.clone(),
+            );
+            codex_exec::run_main(exec_cli, arg0_paths.clone()).await?;
+
+== codex-rs/core/src/config/mod.rs default web search mode (rust-v0.157.1 line 3734; rust-v0.155.1 line 3700)
+3734:            resolve_web_search_mode(&cfg, &features).unwrap_or(WebSearchMode::Cached);
+
+== codex-rs/ext/web-search/src/extension.rs at rust-v0.155.1: mode -> external_web_access
+fn external_web_access_for_mode(web_search_mode: WebSearchMode) -> ExternalWebAccess {
+    match web_search_mode {
+        WebSearchMode::Disabled | WebSearchMode::Cached => ExternalWebAccess::Boolean(false),
+        WebSearchMode::Indexed => ExternalWebAccess::Mode(ExternalWebAccessMode::Indexed),
+        WebSearchMode::Live => ExternalWebAccess::Boolean(true),
+    }
+}
