@@ -263,8 +263,9 @@ path on 8 Claude Code and 7 Codex commands, service started at 20:44:37Z with V6
 applied, and the store fingerprint compared V64 to V66 with 0 pages missing or changed and
 0 observations missing. A fresh Claude Code session captured observations after the
 restart. The Codex trust step in `/hooks` for the 7 changed commands is still pending and
-is the user's to take; Codex captures nothing until then (update 2026-09-26: trusted after the
-2.4.1 cutover, and real Codex capture through 2.4.1 was then observed, per the addendum in
+is the user's to take; Codex captures nothing until then (update 2026-09-26: after the
+2.4.1 cutover the user reported trusting them, and a retained probe then observed real Codex
+capture through 2.4.1, per the addendum in
 [`ai-memory-241-qualification-20260925.json`](../../evidence/receipts/ai-memory-241-qualification-20260925.json)). `manifests/stack.json`,
 `adoption/pins-linux-x86_64.json` and `adoption/templates/claude.settings.template.json`
 named 2.4.0 (as of the 2.4.0 cutover on 2026-09-25; superseded by 2.4.1, below); the landscape winner pin stays 2.3.2 until a new verdict wave, and

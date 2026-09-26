@@ -159,8 +159,8 @@ launcher without `ps` on its `PATH` has to run the daemon; an SDK release bundle
 host from the 2026-09-25 cold-copy cutover until 2026-09-26, when 2.4.1 replaced it (see the
 update below). 2.4.0 and the private cold V66 copy are kept for rollback. The Codex trust
 step for the 7 changed hook commands is the user's and still pending (update 2026-09-26: the
-user trusted them, and a retained `codex exec` probe then wrote six observation kinds through
-2.4.1; see the receipt's addendum). Embeddings stay local all-MiniLM-L6-v2.
+user reported trusting them, and a retained `codex exec` probe then wrote six observation kinds
+through 2.4.1, with PreCompact unexercised; see the receipt's addendum). Embeddings stay local all-MiniLM-L6-v2.
 
 **Evidence.** [Release v2.4.0](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.0)
 (2026-09-21, tag commit `b1b25219`, no artifact attestation, not immutable),
