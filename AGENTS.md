@@ -21,7 +21,8 @@ Read `docs/token-practice.md` on demand for the selected context lane, native co
 
 - Load only the layer, capability, recipe or guide the current task needs; never preload the full catalog or the generated HTML guide into the startup instructions, a session or every worker.
 - Choose the cheapest measured representation that meets the task's information contract. Known-source reads, compact JSON and full-original reads remain valid defaults when an extra retrieval or compression step is larger or inadequate.
-- Keep client accounts, model routes, native caching and tool discovery intact. Do not rerun the full audit or model trials at startup.
+- Delegate a step when only its conclusion is needed, and return concise findings with source or artifact locations.
+- Keep client accounts, model routes, native caching, tool discovery and compaction intact. Do not rerun the full audit or model trials at startup.
 - Count once: never sum cumulative snapshots, overlapping artifact reductions or provider/cache subset counters, and keep native counter snapshots, exact artifact comparisons, cache reuse and complete provider usage separate.
 - Read `docs/token-session-handbook.md` on demand for Codex session environment, MCP reload or another PC. Use `tools/token-report/README.md` for a new host's lifetime JSON/HTML manifest, and keep its private state outside the checkout.
 - For catalog lookup on a host that adopted the named QMD index, refresh changed files with `qmd --index native-agent-stack-catalog update`, then use scoped `search` and `get` from `us-equities-catalog` or `us-equities-foundation`; `catalogs/us-equities/native-workflows.md` documents explicit setup for other checkouts. Do not index unrelated folders.
@@ -38,6 +39,8 @@ Read `docs/token-practice.md` on demand for the selected context lane, native co
 - Component pins remain in `manifests/stack.json`; general foundation limitations remain in `catalogs/foundation/manifest.json`, and trading limitations in `catalogs/us-equities/runtime-target.json` and its linked domain receipts. Historical receipts are reference evidence, never a new host's passed status.
 - Keep host paths and native sign-ins private, and do not fetch private state or authentication stores. Credentials follow `docs/secret-storage.md` (per-provider 0600 files outside every worktree, native sign-ins left native); check them with the value-free `scripts/credential_status.py`, and never read, print or copy a credential value.
 - Evidence belongs in compact sanitized receipts; no raw conversations, tokens, personal paths or machine-specific active client configuration.
+- Keep the public grand-dashboard checkpoint current when accepted work changes a lane, worker or gate. Its timer publishes bounded metadata; emitter freshness is distinct from checkpoint age and process liveness. Read `observability/grand-dashboard/README.md` only when operating that feature.
+- Normal local observation uses Grafana anonymous Viewer on loopback; native model clients retain their own sign-ins. Keep Dagu operator authentication distinct from the passwordless observation path; auth:none is not a global Viewer role.
 - The offline consolidated layer/setup guide `docs/ecosystem/index.html` is generated, not committed: build it with `python3 scripts/build_ecosystem.py --write`, or download it from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only).
 
 ## Trading north star
@@ -61,14 +64,6 @@ For architecture or research waves, read `blueprints/us-equities/architecture/RE
 and the matching source-review supplement. `catalogs/us-equities/decision-index.json`
 is the validated repository union; register new decision arrays explicitly with
 `scripts/catalog_decisions.py --write --supplement PATH.json#/collection`.
-
-Keep the public grand-dashboard checkpoint current when accepted work changes a
-lane, worker or gate. Its timer publishes bounded metadata; emitter freshness is
-distinct from checkpoint age and process liveness.
-Read `observability/grand-dashboard/README.md` only when operating that feature.
-Normal local observation uses Grafana anonymous Viewer on loopback; native model
-clients retain their own sign-ins. Keep Dagu operator authentication distinct from
-the passwordless observation path; auth:none is not a global Viewer role.
 
 The simulation-research wave adopts isolated EdgarTools and skfolio
 recipes. Read `blueprints/us-equities/simulation-research/README.md` for current

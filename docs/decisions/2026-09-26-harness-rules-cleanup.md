@@ -18,9 +18,12 @@ listed under Limitations for the user.
   wording, [record](2026-09-25-model-fallback-guard.md)).
 - The portable rules and `AGENTS.md` are grouped under headings with bullets, as the official memory guidance asks, and
   each gains a **Token practice (base layer)** section. The section keeps context small, delegates for conclusions,
-  asks for compact source-located results, preserves caching, deferred tool discovery and compaction, and counts
-  savings only from measured comparisons. It points to [`docs/token-practice.md`](../token-practice.md) instead of
-  restating it. `docs/harness-defaults.md` gains the same layer as a section that the other defaults run on.
+  asks for concise findings with source or artifact locations, preserves native caching, tool discovery and
+  compaction, and counts savings only from measured comparisons. It points to
+  [`docs/token-practice.md`](../token-practice.md) instead of restating it. `docs/harness-defaults.md` gains the same
+  layer as a section that the other defaults run on.
+- Headings set scope: `AGENTS.md` keeps trading-only rules under **Trading north star** and rules that bind both lanes
+  outside it.
 - Exact and near duplicates collapse into one statement each (coverage table below). The project `CLAUDE.md` keeps
   only its `@AGENTS.md` import and the one Claude-specific rule.
 
@@ -37,7 +40,8 @@ listed under Limitations for the user.
 | [agent-teams](https://code.claude.com/docs/en/agent-teams) | fetched | off by default; each teammate is a separate instance; subagent results are summarized back |
 | [memory](https://code.claude.com/docs/en/memory) | fetched | "Specific, concise, well-structured instructions work best"; headers and bullets; if two rules contradict, "Claude may pick one arbitrarily"; user and project rules both load and neither overrides; `@AGENTS.md` import |
 | [Codex AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md) (308 from developers.openai.com/codex/guides/agents-md) | fetched | Codex reads the Codex-home file and the project root-to-cwd chain up to `project_doc_max_bytes` (32 KiB default); it does not read CLAUDE.md |
-| Repository records | `d78d2de9` | [max-effort decision](2026-09-23-max-effort-default.md) (P2: a `max` session turns orchestration off, 2.1.281); [2026-09-22 rules convergence](../harness-rules-convergence-20260922.md) (CT-1 kept; MI-7 line budget rejected); [`docs/lanes.md`](../lanes.md) (`AGENTS.md` is a shared hot file); history of #196, #272, #294 |
+| `codex --version`, `codex features list` | 0.155.1 | `multi_agent` stable and enabled; `tool_search` and `search_tool` listed as removed |
+| Repository records | `d78d2de9` | [max-effort decision](2026-09-23-max-effort-default.md) (P2: a `max` session turns orchestration off, 2.1.281); [2026-09-22 rules convergence](../harness-rules-convergence-20260922.md) (CT-1 kept; MI-7 line budget rejected); [`docs/lanes.md`](../lanes.md) (`AGENTS.md` and `observability/grand-dashboard/state.json` are shared hot files; the latter's gates include foundation gates such as `token-efficiency-wiring`); history of #196, #272, #294 |
 
 Evidence classes: source review (docs, binary) and local checks (tests, counts). No model run was made or is claimed.
 
@@ -59,7 +63,7 @@ Evidence classes: source review (docs, binary) and local checks (tests, counts).
 | **AGENTS.md**: six "load only" rules ("Load only the layer…", "Select each capability…", "Read only the selected recipe…; do not preload the HTML payload", "Load detailed guides only…", the north-star "load only the layer…", "Do not load the entire catalog into every worker") | Token practice bullet 1 | one rule |
 | "Research existing upstream skills, examples, SDKs and automation before writing custom orchestration." | Top rule | subsumed |
 | "Use upstream executables and supported integration formats."; "Use supported installation and native test commands…" | Evidence bullet 2 | merged |
-| Three counting rules ("Never sum…", "Its native counter snapshots are separate…", "Keep artifact reductions, cache reuse and complete provider usage separate.") | Token practice bullet 4, "Count once" | one rule |
+| Three counting rules ("Never sum…", "Its native counter snapshots are separate…", "Keep artifact reductions, cache reuse and complete provider usage separate.") | Token practice bullet 5, "Count once" | one rule |
 | "…reuse matching acceptance and run only the missing check." | Evidence bullet 6 ("Reuse passing evidence…") | duplicate |
 | Three catalog-inclusion rules (install every alternative; not installed or accepted by inclusion; does not grant authority) | Opening paragraph | one rule; "live trading and paid hosting remain separate scopes" stays in the paper sentence |
 | "Metadata, pinned source review and native execution are different evidence levels." | Evidence bullet 4 | grouped with the other evidence-class distinction |
@@ -68,6 +72,8 @@ Evidence classes: source review (docs, binary) and local checks (tests, counts).
 | "For the latest bounded wave" | "For the catalyst-convergence wave" | stale: that wave was added on 2026-09-19, and 19 `blueprints/us-equities/` directories were added after it |
 | "The subsequent" and "The later" (four sentences) | dropped | narrative connectors, no rule |
 | "Run the repository validation command…" | "Run `python3 scripts/validate.py`…" | specific (README, lanes protocol) |
+| "Keep client accounts, model routes, native caching and tool discovery intact." | Token practice bullet 4 ("…native caching, tool discovery and compaction intact") and bullet 3 ("Delegate a step when only its conclusion is needed, and return concise findings with source or artifact locations.") | repair round: Codex reads `AGENTS.md` but not CLAUDE.md, so it lacked the portable delegation, findings and compaction rules. Codex 0.155.1 lists `multi_agent` as stable and enabled. "Deferred" is not added because its `tool_search` flags are listed as removed |
+| Grand-dashboard checkpoint and Grafana/Dagu observation sentences (under **Trading north star** after the first cleanup) | Hosts bullets 5–6, verbatim | repair round: they bind both lanes. `docs/lanes.md` lists `observability/grand-dashboard/state.json` as a shared hot file, and its gates include foundation gates |
 | **harness-defaults**: "…the same sentence opens agent-lab `AGENTS.md` …, the user-level Claude instructions and Codex's global `AGENTS.md` on the reference host." | top-rule pointer; the portable file carries the sentence after the top rule; agent-lab adopted it in PR #16 | stale: the portable file has opened with the top rule since #294, and this workstation's Codex global file is one import line with no core sentence |
 | "Define acceptance from the requested outcome." and "Start with the requested result, current repository state and a concrete acceptance condition." | one sentence | duplicate |
 | "Consult current primary documentation before adopting changing interfaces."; "Research before custom automation." | Core rule; top-rule pointer | subsumed |
@@ -86,19 +92,21 @@ These count artifacts, not Claude's tokenizer or billed usage. Words are whitesp
 | File | Loaded | Tokens | Words | Lines |
 | --- | --- | ---: | ---: | ---: |
 | `examples/claude-native/CLAUDE.md` | every Claude session and non-fork child on a host that merged it | 1,177 → 1,172 (−5) | 893 → 881 | 26 → 36 |
-| `AGENTS.md` | Claude (via `@AGENTS.md`) and Codex sessions in this repository | 2,332 → 2,237 (−95) | 1,444 → 1,401 | 160 → 105 |
+| `AGENTS.md` | Claude (via `@AGENTS.md`) and Codex sessions in this repository | 2,332 → 2,259 (−73) | 1,444 → 1,423 | 160 → 100 |
 | `CLAUDE.md` | Claude sessions in this repository | 85 → 30 (−55) | 58 → 18 | 7 → 4 |
 | `docs/harness-defaults.md` | on demand | 1,593 → 1,649 (+56) | 1,196 → 1,224 | 54 → 54 |
 | `recipes/claude-native-profile.md` | on demand | 4,667 → 4,717 (+50) | 2,552 → 2,574 | 340 → 342 |
 
-- A Claude session in this repository loads 3,594 → 3,439 tokens of these rules (−155), and so does each non-fork child
-  that loads the CLAUDE.md hierarchy. Codex here: −95.
-- The headings and bullets cost +40 tokens (portable file) and +53 (`AGENTS.md`) against the same sentences as flat
-  paragraphs; deduplication alone removed 45 and 148.
+- A Claude session in this repository loads 3,594 → 3,461 tokens of these rules (−133), and so does each non-fork child
+  that loads the CLAUDE.md hierarchy. Codex here: −73.
+- The headings and bullets cost +40 tokens (portable file) and +56 (`AGENTS.md`) against the same sentences as flat
+  paragraphs. The flat versions are 45 and 129 tokens below the base files (deduplication, net of the delegation
+  bullet added to `AGENTS.md`).
 - Sentence inventory (paragraphs and bullets split into sentences; pairs of sentences whose content-word Jaccard
-  similarity is ≥ 0.4): sentences 51/99/5/77 → 47/84/2/73 (portable, `AGENTS.md`, `CLAUDE.md`, harness defaults).
-  Within-file pairs 4 (1 exact) → 0. Cross-file pairs 23 → 16, all intentional: the top rule in both always-loaded
-  files for different loaders, and the on-demand defaults restating the portable summary.
+  similarity is ≥ 0.4): sentences 51/99/5/77 → 47/85/2/73 (portable, `AGENTS.md`, `CLAUDE.md`, harness defaults).
+  Within-file pairs 4 (1 exact) → 0. Cross-file pairs 23 → 17, all intentional: 6 between the two always-loaded files
+  for their different loaders (the four top-rule sentences, the coordinator effort rule and, since the repair round,
+  the delegation rule), and 11 where the on-demand defaults restate portable or `AGENTS.md` rules.
 
 ## Checks
 
@@ -107,18 +115,25 @@ These count artifacts, not Claude's tokenizer or billed usage. Words are whitesp
 - Discriminating control for the size-guideline binding: without the backticks in "`unrestricted` size guideline",
   `test-envelope.mjs` fails 1 of 214 on that check; the byte-identical restore passes 214/214.
 - `uv run --no-project --with jsonschema --with pyyaml python -m unittest tests.test_ecosystem_manifest
-  tests.test_blind_checkout tests.test_codex_lane` (the modules that name these files): 164 tests OK.
+  tests.test_blind_checkout tests.test_codex_lane` (the modules that name these files): 164 tests OK. They write
+  fixture copies, so they check the scripts that list these paths, not the rule text.
 - `python3 scripts/validate.py` exits 1 with only SHA-256 and byte-count mismatches for the five changed files, which
   are re-registered in `manifests/evidence.json` at merge.
+- Repair round: a sentence-level comparison of `AGENTS.md` with the first-round commit finds one sentence extended
+  (compaction) and one added (delegation). The five moved sentences are unchanged. The unittest run (164 OK) and
+  `validate.py` (the same mismatches only) were re-run, and `build_ecosystem.py --check` passed. The portable file is
+  byte-identical to the first round, so its workflow test results stand.
 
 ## Alternatives considered
 
 - **Delete exact duplicates only.** Rejected: it leaves six restatements of one loading rule in `AGENTS.md` and the
   one-paragraph Ultracode rule, against the official structure guidance.
-- **Flat paragraphs.** They would save 40 and 53 more tokens per load. Kept as the fallback because the official
+- **Flat paragraphs.** They would save 40 and 56 more tokens per load. Kept as the fallback because the official
   guidance favors headings and bullets and no local adherence measurement exists yet.
 - **Drop generic rules from `AGENTS.md` because the user file has them.** Rejected: Codex reads only the Codex-home
   file and the project chain, and this workstation's Codex global file is one import line.
+- **Correct this record instead of adding the delegation bullet (repair round).** Rejected: Codex sessions here would
+  keep lacking the base layer's delegation, findings and compaction rules.
 - **Path-scoped `.claude/rules/` files.** Deferred: still keep-but-compare (MI-5, 2026-09-22), and Codex does not read
   them.
 - **Reword the StructuredOutput sentence.** Rejected: its measured effect belongs to that wording.
@@ -127,7 +142,7 @@ These count artifacts, not Claude's tokenizer or billed usage. Words are whitesp
 
 - An interleaved A/B like G4 in the [model-fallback record](2026-09-25-model-fallback-guard.md): the same packets run
   under the structured and the flat versions of these rules on the same client version. If rule adherence shows no
-  difference, flatten both files, saving 40 and 53 tokens per load.
+  difference, flatten both files, saving 40 and 56 tokens per load.
 - An independent review that finds a constraint missing from the coverage table restores it verbatim.
 
 ## Limitations and questions for the user
