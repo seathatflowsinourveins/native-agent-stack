@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-massive-com-client-python",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/massive-com/client-python",
+ "reviewed_commit": "481e5c270ea85e8eae5e96f8b9fda34e5e2a674a",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "market-data-reference"
+ ],
+ "claim": "Source and documentation review of massive-com/client-python at commit 481e5c270ea85e8eae5e96f8b9fda34e5e2a674a (license MIT), read from README.md at that commit. Repository description: \"The official Python client library for the Massive.com REST and WebSocket API.\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1512,
+  "pushed_at": "2026-07-09T15:25:39Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@481e5c270ea85e8eae5e96f8b9fda34e5e2a674a",
+   "text": "# Massive (formerly Polygon.io) Python Client - WebSocket & RESTful APIs"
+  },
+  {
+   "source": "README.md@481e5c270ea85e8eae5e96f8b9fda34e5e2a674a",
+   "text": "Welcome to the official Python client library for the [Massive](https://massive.com/) REST and WebSocket API. To get started, please see the [Getting Started](https://massive.com/docs/stocks/getting-started) section in our documentation, view the [examples](./examples/) directory for code snippets."
+  },
+  {
+   "source": "README.md@481e5c270ea85e8eae5e96f8b9fda34e5e2a674a",
+   "text": "**Note:** Polygon.io has rebranded as [Massive.com](https://massive.com) on Oct 30, 2025. Existing API keys, accounts, and integrations continue to work exactly as before. The only change in this SDK is that it now defaults to the new API base at `api.massive.com`, while `api.polygon.io` remains supported for an extended period."
+  }
+ ]
+}

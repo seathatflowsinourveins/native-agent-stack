@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-sixty-north-cosmic-ray",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/sixty-north/cosmic-ray",
+ "reviewed_commit": "caf9a3193606ddd90cc37126b7fa95acefc47695",
+ "readme_path": "README.rst",
+ "license": "MIT",
+ "layers": [
+  "quality-evaluation"
+ ],
+ "claim": "Source and documentation review of sixty-north/cosmic-ray at commit caf9a3193606ddd90cc37126b7fa95acefc47695 (license MIT), read from README.rst at that commit. Repository description: \"Mutation testing for Python\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 658,
+  "pushed_at": "2026-08-09T14:57:30Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.rst@caf9a3193606ddd90cc37126b7fa95acefc47695",
+   "text": "Cosmic Ray: mutation testing for Python ======================================="
+  },
+  {
+   "source": "README.rst@caf9a3193606ddd90cc37126b7fa95acefc47695",
+   "text": "\"Four human beings -- changed by space-born cosmic rays into something more than merely human.\""
+  },
+  {
+   "source": "README.rst@caf9a3193606ddd90cc37126b7fa95acefc47695",
+   "text": "It makes small changes to your source code, running your test suite for each one. Here's how the mutations look:"
+  }
+ ]
+}

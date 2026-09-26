@@ -19,13 +19,22 @@ malformed vote counts as refuted and is noted. When a later round proposes a rep
 and all three of its votes replace the earlier round's; a vote missing from that round is never taken from an
 earlier one.
 Retained failures: a round that returned nothing, a discovery family that did not return, a missing vote, a lost
-completeness critic, a critic-flagged layer beyond the follow-up cap, and a GPT-6 copy problem are listed under
-failures/<layer>, and the layer gets the reopen entry {trigger: retained_failure, ref: @RETURNS@#/failures/<layer>},
-so it never counts as a clean layer. A layer none of whose rounds returned is left out of layers.json
-(excluded_layers in the summary).
+completeness critic, a critic-flagged layer beyond the follow-up cap, a GPT-6 copy problem and (with --usage) a worker
+measured at another effort than max (effort_deviation) or a worker with a WebSearch call the session's cap refused
+(web_search_capped: Claude Code allows CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION WebSearch calls per session, default
+200, across the coordinator and every subagent, and a capped call returns a notice telling the worker to go on
+without searching) are listed under failures/<layer>; the critic's effort_deviation or web_search_capped belongs to
+every layer. The layer gets the reopen entry {trigger: retained_failure, ref: @RETURNS@#/failures/<layer>}, so it
+never counts as a clean layer. A layer none of whose rounds returned is left out of layers.json (excluded_layers in
+the summary).
+Refuted by absence: a proposal that no returned vote refutes, but that is refuted because a vote did not return
+(the vote object, or a fit family member, is {missing: true}), is listed under refuted like any refuted proposal, and
+its layer's votes_note names it. saturation_ledger.py (refuted_by_absence) and build_inputs.py read the missing marker
+and do not treat such a proposal as adjudicated.
 Models and effort: each Claude vote names the resolved model and the effort its own worker ran at, from --usage
-(child-usage.mjs output); without it, the requested alias and effort null (not measured). The GPT-6 vote names the
-model and effort its job reported.
+(child-usage.mjs output; a call the runtime re-ran is measured by the attempt that returned, and the client-written
+<synthetic> rows name no model); without it, the requested alias and effort null (not measured). The GPT-6 vote
+names the model and effort its job reported.
 Privacy: work-dir, checkout and home paths become <work-dir>, <repo> and ~. Any string still matching
 scripts/validate.py PRIVATE_CONTENT is listed by pointer and kind (never its text), and the exit code is 3.
 Integrity: with --work-dir, every GPT-6 output is compared with the file Codex wrote (gpt6/<job>/last.json). Exit 4
@@ -44,8 +53,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from sweep_common import (REPO_ROOT, canon, host_replacements, load_json, pointer_token,  # noqa: E402
-                          private_content, private_findings, sanitize, slug, write_json)
+from sweep_common import (REPO_ROOT, canon, deviation_rounds, host_replacements, load_json,  # noqa: E402
+                          pointer_token, private_content, private_findings, sanitize, slug, write_json)
 
 ALIASES = {"discover": "opus", "refute-facts": "sonnet", "refute-fit": "opus", "critic": "opus"}
 GPT6_DEFAULT = {"model": "gpt-6-astra", "effort": "max"}
@@ -53,6 +62,8 @@ MERGE_CAP = 8        # sweep.js MAX_PROPOSALS
 FOLLOWUP_CAP = 8     # sweep.js MAX_FOLLOWUPS
 FIT_RULE = "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted"
 EXIT_PRIVATE, EXIT_COPY = 3, 4
+REQUIRED_EFFORT = "max"  # every agent() call of sweep.js names effort 'max'
+SYNTHETIC_MODEL = "<synthetic>"  # child-usage.mjs: the model of client-written rows, never a model that answered
 # Copy checks that mean the workflow's GPT-6 input is not exactly what Codex wrote (exit 4, and a retained failure).
 COPY_FAILURES = ("mismatch", "no_file", "file_unparseable", "file_only")
 VOTE_ROLES = (("facts", "facts"), ("fit_claude", "Claude fit"), ("fit_gpt6", "GPT-6 fit"))
@@ -93,23 +104,59 @@ def as_dict(value) -> dict:
 
 
 def resolved_models(usage: dict | None) -> dict:
-    """Role prefix -> resolved Claude model(s) from child-usage output; the requested alias without it."""
+    """Role prefix -> resolved Claude model(s) from child-usage output; the requested alias without it. The
+    client-written <synthetic> rows (an API error such as a usage-limit notice) name no model."""
     children = as_dict(as_dict(usage).get("child_usage")).get("children") or []
     out = {}
     for prefix, alias in ALIASES.items():
         found = sorted({model for child in children if isinstance(child, dict)
                         for model in (child.get("resolved_models") or [])
-                        if child.get("label") == prefix or str(child.get("label", "")).startswith(prefix + ":")})
+                        if model != SYNTHETIC_MODEL and (child.get("label") == prefix
+                                                         or str(child.get("label", "")).startswith(prefix + ":"))})
         out[prefix] = "+".join(found) if found else alias
     return out
 
 
 def usage_children(usage: dict | None) -> dict:
-    """Child label -> child of the child-usage output (the first child when a label repeats)."""
+    """Child label -> the child of the child-usage output that measured that worker. child-usage.mjs lists a re-run
+    call's earlier attempts under superseded_attempts; when a record still repeats a label among its children, the
+    first complete child is the attempt that returned, else the first child."""
     out = {}
     for child in as_dict(as_dict(usage).get("child_usage")).get("children") or []:
         if isinstance(child, dict) and isinstance(child.get("label"), str):
-            out.setdefault(child["label"], child)
+            label = child["label"]
+            if label not in out or (child.get("complete") is True and out[label].get("complete") is not True):
+                out[label] = child
+    return out
+
+
+def effort_deviations(usage: dict | None) -> list:
+    """{child, efforts[, superseded_by]} for every child and superseded attempt of the usage record that did not run
+    at effort max alone (as child-usage.mjs --require-effort max reports them)."""
+    child_usage = as_dict(as_dict(usage).get("child_usage"))
+    out = []
+    for child in [*(child_usage.get("children") or []), *(child_usage.get("superseded_attempts") or [])]:
+        if isinstance(child, dict) and child.get("efforts") != [REQUIRED_EFFORT]:
+            item = {"child": child.get("label") or child.get("agent_id"), "efforts": child.get("efforts")}
+            if child.get("superseded_by"):
+                item["superseded_by"] = child["superseded_by"]
+            out.append(item)
+    return out
+
+
+def web_search_capped(usage: dict | None) -> list:
+    """{child, capped, calls, first_capped_at[, superseded_by]} for every child and superseded attempt of the usage
+    record with a WebSearch call that the session's cap refused (child-usage.mjs web_search.capped)."""
+    child_usage = as_dict(as_dict(usage).get("child_usage"))
+    out = []
+    for child in [*(child_usage.get("children") or []), *(child_usage.get("superseded_attempts") or [])]:
+        search = as_dict(as_dict(child).get("web_search"))
+        if isinstance(search.get("capped"), int) and search["capped"] > 0:
+            item = {"child": child.get("label") or child.get("agent_id"), "capped": search["capped"],
+                    "calls": search.get("calls"), "first_capped_at": search.get("first_capped_at")}
+            if child.get("superseded_by"):
+                item["superseded_by"] = child["superseded_by"]
+            out.append(item)
     return out
 
 
@@ -117,7 +164,8 @@ def measured(children: dict, label: str, fallback_model: str) -> tuple[str, str 
     """(model, effort) of the Claude worker `label` as the usage record measured them; the role's model and effort
     None (not measured) when the record has no such child."""
     child = as_dict(children.get(label))
-    models = sorted({m for m in child.get("resolved_models") or [] if isinstance(m, str) and m})
+    models = sorted({m for m in child.get("resolved_models") or []
+                     if isinstance(m, str) and m and m != SYNTHETIC_MODEL})
     efforts = sorted({e for e in child.get("efforts") or [] if isinstance(e, str) and e})
     return ("+".join(models) if models else fallback_model), ("+".join(efforts) if efforts else None)
 
@@ -251,8 +299,17 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
     critic_lost = "critic" in res and not isinstance(res.get("critic"), dict)
     beyond_cap = {as_dict(item).get("layer_id"): item for item in
                   planned_followups(res.get("critic"), rounds_by_layer)[FOLLOWUP_CAP:]}
+    # A worker measured at another effort than max (a skill whose frontmatter sets `effort` lowers the turns after
+    # it loads) is a retained failure of its layer, like a lost vote: its return is kept and the layer is reopened.
+    deviations = effort_deviations(usage)
+    deviations_by_layer, deviations_unmapped = deviation_rounds(deviations, rounds_by_layer)
+    # A worker whose WebSearch call the session's cap refused went on without searching (the notice tells it to), so
+    # its layer's lane ran without a capability the prompts grant: a retained failure, like an effort deviation.
+    capped = web_search_capped(usage)
+    capped_by_layer, capped_unmapped = deviation_rounds(capped, rounds_by_layer)
 
     excluded, degraded = [], []
+    refuted_by_absence = {}
     for layer_id, rounds in rounds_by_layer.items():
         catalog = rounds[0]["catalog"]
         key = f"{catalog}/{layer_id}"
@@ -345,6 +402,15 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                              "reason": as_dict(beyond_cap[layer_id]).get("reason"),
                              "detail": f"the critic flagged this layer, but only the first {FOLLOWUP_CAP} flagged "
                                        "layers get a follow-up round"})
+        for rnd, item in deviations_by_layer.get(layer_id, []):
+            failures.append({"round": rnd, "cause": "effort_deviation", **item,
+                             "detail": f"the worker did not run at effort {REQUIRED_EFFORT} alone (child-usage.mjs "
+                                       f"--require-effort {REQUIRED_EFFORT}); its return is kept as returned"})
+        for rnd, item in capped_by_layer.get(layer_id, []):
+            failures.append({"round": rnd, "cause": "web_search_capped", **item,
+                             "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused "
+                                       "this worker's WebSearch calls counted here, and the notice told it to go on "
+                                       "without searching; its return is kept as returned"})
         for name, value in calls.items():
             calls_total[name] = calls_total.get(name, 0) + value
         merged = [final[repo_slug]["proposal"] for repo_slug in order]
@@ -357,6 +423,7 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
         returns["raw"][layer_id] = raw
         returns["votes"][layer_id] = []
         survived, refuted, new_candidates = [], [], []
+        absent = []  # (repository slug, roles whose missing vote alone refutes it)
         for index, repo_slug in enumerate(order):
             row = final[repo_slug]
             rnd, p = row["round"], row["proposal"]
@@ -387,6 +454,8 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                        "gpt6": {"model": gpt6_model, "effort": gpt6_effort,
                                 **({k: gv.get(k) for k in vote_fields} if gv else {"missing": True}),
                                 "skills_used": row["skills"]["fit_gpt6"]}}
+            if not fv:
+                facts_obj["missing"] = True
             if notes:
                 facts_obj["notes"] = notes
                 fit_obj["notes"] = notes
@@ -397,6 +466,10 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                      "fit": {"vote": "refuted" if fit_refuted else "not_refuted", "ref": f"@RETURNS@#/{ref}/fit"}}
             survives = not facts_refuted and not fit_refuted
             (survived if survives else refuted).append(entry)
+            # Refuted by absence: no returned vote refutes it; only a vote that did not return does (it counts as
+            # refuted). Such a proposal is not refuted on merit (saturation_ledger.py refuted_by_absence).
+            if not survives and not ((facts_refuted and fv) or (claude_refuted and cv) or (gpt6_refuted and gv)):
+                absent.append((repo_slug, [role for role, _ in VOTE_ROLES if not row[role]]))
             if survives:
                 survivors.append({"layer_id": layer_id, "repository": repository})
             new_candidates.append({"repository": repository, "source": f"{lane}: {p.get('source', '')}"[:600],
@@ -424,8 +497,15 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
             reopen.append({"trigger": "retained_failure", "ref": f"@RETURNS@#/failures/{pointer_token(layer_id)}"})
         lane_layers.append({"layer_id": layer_id, "selected": [], "alternatives_keep_but_compare": [],
                             "new_candidates": new_candidates})
-        ledger_layers.append({"catalog": catalog, "layer_id": layer_id, "votes": "retained",
-                              "discovery_ref": f"@RETURNS@#/discovery/{pointer_token(layer_id)}",
+        ledger_layer = {"catalog": catalog, "layer_id": layer_id, "votes": "retained"}
+        if absent:
+            refuted_by_absence[layer_id] = [repo_slug for repo_slug, _ in absent]
+            roles = sorted({dict(VOTE_ROLES)[role] for _, missing_roles in absent for role in missing_roles})
+            ledger_layer["votes_note"] = (
+                f"{len(absent)} of {len(proposed)} proposals are refuted only because a vote did not return "
+                f"({', '.join(roles)}; the vote is {{missing: true}} in the returns): no returned vote refutes them, "
+                f"so they are not refuted on merit and not adjudicated: {', '.join(r for r, _ in absent)}.")
+        ledger_layers.append({**ledger_layer, "discovery_ref": f"@RETURNS@#/discovery/{pointer_token(layer_id)}",
                               "calls": calls or None, "proposed": proposed, "survived": survived, "refuted": refuted,
                               "reopen": reopen})
     returns["skills_usage"] = skills_usage
@@ -441,6 +521,12 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
             "summary": {"lane": lane, "layers": len(ledger_layers), "proposals": len(proposals),
                         "survivors": len(survivors), "lost": lost, "excluded_layers": excluded,
                         "degraded_discovery": degraded, "critic_lost": critic_lost,
+                        "effort_deviations": [item["child"] for item in deviations],
+                        "effort_deviations_unmapped": [item["child"] for item in deviations_unmapped],
+                        "web_search": as_dict(as_dict(usage).get("child_usage")).get("web_search"),
+                        "web_search_capped": [item["child"] for item in capped],
+                        "web_search_capped_unmapped": [item["child"] for item in capped_unmapped],
+                        "refuted_by_absence": refuted_by_absence,
                         "retained_failures": failures_summary, "reopened_layers": sorted(failures_summary),
                         "calls": calls_total, "skills_usage": skills_usage, "gpt6_jobs": gpt6_usage["jobs"],
                         "gpt6_by_status": gpt6_usage["by_status"], "gpt6_copy_check": checks}}

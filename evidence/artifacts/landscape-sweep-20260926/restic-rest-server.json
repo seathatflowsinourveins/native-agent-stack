@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-restic-rest-server",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/restic/rest-server",
+ "reviewed_commit": "ca666baf9c65b18a6816ebd4f6ad5893e8921d61",
+ "readme_path": "README.md",
+ "license": "BSD-2-Clause",
+ "layers": [
+  "observability-hosting"
+ ],
+ "claim": "Source and documentation review of restic/rest-server at commit ca666baf9c65b18a6816ebd4f6ad5893e8921d61 (license BSD-2-Clause), read from README.md at that commit. Repository description: \"Rest Server is a high performance HTTP server that implements restic's REST backend API.\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1499,
+  "pushed_at": "2026-09-20T15:12:22Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@ca666baf9c65b18a6816ebd4f6ad5893e8921d61",
+   "text": "Rest Server is a high performance HTTP server that implements restic's [REST backend API](https://restic.readthedocs.io/en/latest/100_references.html#rest-backend). It provides secure and efficient way to backup data remotely, using [restic](https://github.com/restic/restic) backup client via the [rest: URL](https://restic.readthedocs.io/en/latest/030_preparing_a_new_repo.html#rest-server)."
+  },
+  {
+   "source": "README.md@ca666baf9c65b18a6816ebd4f6ad5893e8921d61",
+   "text": "Rest Server requires Go 1.24 or higher to build. The only tested compiler is the official Go compiler."
+  },
+  {
+   "source": "README.md@ca666baf9c65b18a6816ebd4f6ad5893e8921d61",
+   "text": "The required version of restic backup client to use with `rest-server` is [v0.7.1](https://github.com/restic/restic/releases/tag/v0.7.1) or higher."
+  }
+ ]
+}

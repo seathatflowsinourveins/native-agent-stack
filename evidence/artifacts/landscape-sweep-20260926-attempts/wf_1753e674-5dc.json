@@ -1,0 +1,87 @@
+{
+ "schema_version": 1,
+ "id": "landscape-sweep-20260926-smoke",
+ "workflow_run": "wf_1753e674-5dc",
+ "status": "completed",
+ "kind": "one-layer harness smoke (mcp-surfaces), before run 1",
+ "started_at": "2026-09-26T01:36:51Z",
+ "duration_ms": 1795019,
+ "harness": "the 2026-09-26 scratchpad prototype of the landscape-sweep lane",
+ "prompts_sha256": null,
+ "prompts_note": "not retained: the smoke's staged templates were replaced before run 1",
+ "children": [
+  "discover:mcp-surfaces",
+  "gpt6-discover:mcp-surfaces",
+  "refute-facts:mcp-surfaces",
+  "refute-fit:mcp-surfaces",
+  "gpt6-refute-fit:mcp-surfaces"
+ ],
+ "provider_usage": {
+  "source": "evidence/artifacts/landscape-sweep-20260926-attempts/child-usage-wf_1753e674-5dc.json",
+  "status": "complete",
+  "by_resolved_model": {
+   "claude-opus-5-5": {
+    "children": 2,
+    "input_tokens": 236,
+    "output_tokens": 150617,
+    "cache_read_input_tokens": 15441930,
+    "cache_creation_input_tokens": 428539
+   },
+   "claude-sonnet-5": {
+    "children": 3,
+    "input_tokens": 62,
+    "output_tokens": 82891,
+    "cache_read_input_tokens": 2325092,
+    "cache_creation_input_tokens": 371980
+   }
+  },
+  "web_search": {
+   "calls": 1,
+   "capped": 0,
+   "capped_children": []
+  },
+  "web_search_note": "WebSearch calls and capped calls measured from the transcripts (child-usage.mjs web_search). They count toward the coordinator session's WebSearch cap, which wf_8397ada1-777 reached at 04:10:13Z.",
+  "lower_bound": false
+ },
+ "gpt6_usage": {
+  "jobs": 2,
+  "by_status": {
+   "ok": 2
+  },
+  "usage": {
+   "input_tokens": 2971519,
+   "cached_input_tokens": 2680704,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 32472,
+   "reasoning_output_tokens": 18063
+  },
+  "usage_unavailable": 0,
+  "earlier_attempts": {
+   "attempts": 0,
+   "usage": {},
+   "usage_unavailable": 0
+  }
+ },
+ "conversion": {
+  "tool": "tools/sota-convergence/landscape-sweep/convert.py --scope (no --work-dir: the smoke's GPT-6 job files were archived, so the copy check did not run)",
+  "layers": 1,
+  "proposals": 8,
+  "survivors": 1,
+  "gpt6_by_status": {
+   "ok": 2
+  },
+  "calls": {
+   "web_search": 1,
+   "web_fetch": 6,
+   "gh_api": 128,
+   "gpt6_web_search": 15,
+   "gpt6_web_fetch": 44,
+   "gpt6_gh_api": 11
+  },
+  "skills_usage": null
+ },
+ "limitations": [
+  "A harness check, not a sweep of mcp-surfaces: its proposals and votes are not in the ledger or in manifest-20260926, whose mcp-surfaces rows come from wf_8397ada1-777.",
+  "Its templates predate skills_used reporting, so skills_usage is empty."
+ ]
+}

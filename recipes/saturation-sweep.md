@@ -57,8 +57,11 @@ two-family:
   only when neither the facts refuter nor either fit refuter refutes it.
 
 A failed part of the lane never leaves a clean layer. A lost round, a discovery family or a vote that did not
-return, and a lost critic each give the layer a `retained_failure` reopen entry pointing at its listed failures in
-the retained returns.
+return, a lost critic, and a Claude worker whose WebSearch call the session's cap refused each give the layer a
+`retained_failure` reopen entry pointing at its listed failures in the retained returns. The critic's failure
+counts for every layer. The lane's search budgets exceed Claude Code's default of 200 WebSearch calls per
+session, so start the coordinator session with `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` raised (harness README,
+Coordination).
 
 The labels that `--check` reconciles are unchanged. The harness also writes what section 3 asks for: the retained
 returns, the sanitized `child-usage.mjs` record and `prompts_sha256`. An agent-lab coordinator session remains an

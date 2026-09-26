@@ -2,7 +2,7 @@
 // OFFLINE check of child-usage.mjs against SYNTHETIC transcript rows (no provider
 // call, not native evidence). Real runs are checked by passing their directory;
 // stored receipts from real runs are bound to the documentation by test-usage-receipts.mjs.
-import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel } from './child-usage.mjs'
+import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel, webSearch } from './child-usage.mjs'
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -52,6 +52,25 @@ expect('fallback: an opus model name that cannot be compared fails closed', has(
 expect('fallback: model names parse to family and version, ignoring date and [1m] suffixes', JSON.stringify([modelGeneration('claude-opus-5-5'), modelGeneration('claude-opus-5'), modelGeneration('claude-haiku-4-5-20251001'), modelGeneration('claude-opus-5-5[1m]'), modelGeneration('claude-3-opus-20240229')]) === JSON.stringify([{ family: 'opus', version: [5, 5] }, { family: 'opus', version: [5] }, { family: 'haiku', version: [4, 5] }, { family: 'opus', version: [5, 5] }, null]))
 expect('fallback: the opus version table matches the documented boundaries', JSON.stringify(['2.1.153', '2.1.154', '2.1.218', '2.1.219', '2.1.279', '2.1.280', '2.1.281'].map((v) => expectedModel('opus', v))) === JSON.stringify([null, 'claude-opus-4-8', 'claude-opus-4-8', 'claude-opus-5', 'claude-opus-5', 'claude-opus-5-5', 'claude-opus-5-5']) && expectedModel('sonnet', '2.1.281') === null && expectedModel('opus', undefined) === null)
 
+// WebSearch session cap (tools-reference, "Session search limit"): a capped call returns a notice right after the
+// result header instead of results; page text that quotes the notice is not a capped call.
+const search = (id, ts) => ({ type: 'assistant', timestamp: ts, effort: 'max', message: { id: 'ws-' + id, model: 'claude-opus-5-5', usage: { input_tokens: 1, output_tokens: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 }, content: [{ type: 'tool_use', id, name: 'WebSearch', input: { query: 'q ' + id } }] } })
+const answer = (id, content, ts) => ({ type: 'user', timestamp: ts, message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: id, content }] } })
+const header = (id) => 'Web search results for query: "q ' + id + '"\n\n'
+const cappedText = 'Web search was not performed: this session has used its web search budget (200 of 200 WebSearch calls). Continue with the information already gathered instead of issuing more searches.'
+const searchRows = [
+  search('t1', '2026-09-26T04:08:00Z'), answer('t1', header('t1') + 'Links: [{"title":"x","url":"https://example.com"}]', '2026-09-26T04:08:01Z'),
+  search('t2', '2026-09-26T04:12:00Z'), answer('t2', [{ type: 'text', text: header('t2') + cappedText }], '2026-09-26T04:12:01Z'),
+  search('t3', '2026-09-26T04:10:13Z'), answer('t3', header('t3') + cappedText, '2026-09-26T04:10:13Z'),
+  search('t4', '2026-09-26T04:11:00Z'), answer('t4', header('t4') + 'Links: []\n\nA page quoting: ' + cappedText, '2026-09-26T04:11:01Z'),
+  search('t5', '2026-09-26T04:13:00Z'),
+]
+const ws = summarizeChild(started, done, { model: 'opus' }, searchRows)
+expect('web search: calls, capped calls (string or text-block results) and the earliest capped time are counted', ws.web_search.calls === 5 && ws.web_search.capped === 2 && ws.web_search.first_capped_at === '2026-09-26T04:10:13Z')
+expect('web search: a capped call leaves the child complete', ws.complete)
+expect('web search: a child without WebSearch calls reports zero', JSON.stringify(dup.web_search) === JSON.stringify({ calls: 0, capped: 0, first_capped_at: null }))
+expect('web search: a repeated tool_use row counts once', webSearch([search('t1', 'a'), search('t1', 'a'), answer('t1', header('t1') + cappedText, 'b')]).calls === 1)
+
 const dir = mkdtempSync(join(tmpdir(), 'child-usage-'))
 try {
   expect('missing journal fails closed', summarizeRun(dir).status === 'incomplete')
@@ -79,6 +98,72 @@ try {
   writeFileSync(join(fell, 'agent-a1.meta.json'), JSON.stringify({ model: 'opus', agentType: 'evidence-reviewer' }))
   writeFileSync(join(fell, 'agent-a1.jsonl'), [vmsg('m1', 'claude-opus-5-5', '2.1.281'), vmsg('m2', 'claude-opus-4-8', '2.1.281')].map((e) => JSON.stringify(e)).join('\n') + '\n')
   expect('cli: a run with a fallback child exits 1 and reports the run incomplete', cli(fell, '--require-effort', 'max') === 1 && summarizeRun(fell).status === 'incomplete')
+  // A call the runtime re-ran under the same journal key (a Workflow pauses at a usage limit and re-runs its waiting
+  // agents after the reset): the attempt that returned nothing is superseded, not lost, and its usage still counts.
+  const limitRow = { type: 'assistant', isApiErrorMessage: true, effort: 'max', message: { id: 'syn1', model: '<synthetic>', usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 } } }
+  const rerun = join(dir, 'rerun'); mkdirSync(rerun)
+  writeFileSync(join(rerun, 'journal.jsonl'), [{ type: 'launched' }, { ...started, key: 'v2:k1' }, { ...started, agentId: 'a3', label: 'review', key: 'v2:k2' },
+    { ...started, agentId: 'a2', key: 'v2:k1' }, { type: 'result', agentId: 'a2', result: { ok: true } }, { type: 'result', agentId: 'a3', result: { ok: true } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  for (const id of ['a1', 'a2', 'a3']) writeFileSync(join(rerun, 'agent-' + id + '.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' }))
+  writeFileSync(join(rerun, 'agent-a1.jsonl'), [msg('m1', 'claude-sonnet-5', 7, 100, 0, 'max'), limitRow].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  writeFileSync(join(rerun, 'agent-a2.jsonl'), JSON.stringify(msg('m2', 'claude-sonnet-5', 11, 100, 0, 'max')) + '\n')
+  writeFileSync(join(rerun, 'agent-a3.jsonl'), JSON.stringify(msg('m3', 'claude-sonnet-5', 5, 100, 0, 'max')) + '\n')
+  const re = summarizeRun(rerun)
+  const sup = (re.superseded_attempts || [])[0] || {}
+  expect('rerun: a no-result attempt whose call key started again is superseded and the run is complete', re.status === 'complete' && re.children.length === 2 && re.children.every((c) => c.complete) && (re.superseded_attempts || []).length === 1 && sup.agent_id === 'a1' && sup.superseded_by === 'a2' && sup.complete === false)
+  expect('rerun: the superseded attempt keeps its issues and its usage counts in the per-model totals', (sup.issues || []).includes('no result entry in journal') && re.by_resolved_model['claude-sonnet-5'].output_tokens === 23 && re.by_resolved_model['<synthetic>'].children === 1)
+  expect('rerun: the cli passes --require-effort max for a re-run call', cli(rerun, '--require-effort', 'max') === 0)
+  expect('rerun: --require-effort also checks superseded attempts', JSON.stringify(effortMismatches({ children: [{ label: 'a', efforts: ['max'] }], superseded_attempts: [{ label: 'a', agent_id: 'x1', superseded_by: 'x2', efforts: ['max', 'low'] }] }, 'max')) === JSON.stringify([{ child: 'a', efforts: ['max', 'low'], superseded_by: 'x2' }]))
+  // A superseded attempt keeps its usage-integrity failures (GPT-6 review of the 2026-09-26 record): usage the per-model
+  // totals cannot count or attribute leaves the run incomplete, although the re-run call returned. The attempt's other
+  // issues (no result entry, the <synthetic> usage-limit row outside the family) are expected and do not.
+  const rerunWith = (name, firstRows) => {
+    const d = join(dir, name); mkdirSync(d)
+    writeFileSync(join(d, 'journal.jsonl'), [{ type: 'launched' }, { ...started, key: 'v2:k1' }, { ...started, agentId: 'a3', label: 'review', key: 'v2:k2' },
+      { ...started, agentId: 'a2', key: 'v2:k1' }, { type: 'result', agentId: 'a2', result: { ok: true } }, { type: 'result', agentId: 'a3', result: { ok: true } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
+    for (const id of ['a1', 'a2', 'a3']) writeFileSync(join(d, 'agent-' + id + '.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' }))
+    if (firstRows) writeFileSync(join(d, 'agent-a1.jsonl'), firstRows.map((e) => JSON.stringify(e)).join('\n') + '\n')
+    writeFileSync(join(d, 'agent-a2.jsonl'), JSON.stringify(msg('m2', 'claude-sonnet-5', 11, 100, 0, 'max')) + '\n')
+    writeFileSync(join(d, 'agent-a3.jsonl'), JSON.stringify(msg('m3', 'claude-sonnet-5', 5, 100, 0, 'max')) + '\n')
+    return d
+  }
+  const uncountedRow = { type: 'assistant', effort: 'max', message: { id: 'm0', model: 'claude-sonnet-5' } }
+  const gap = rerunWith('rerun-missing-usage', [msg('m1', 'claude-sonnet-5', 7, 100, 0, 'max'), uncountedRow, limitRow])
+  const gr = summarizeRun(gap)
+  const gsup = (gr.superseded_attempts || [])[0] || {}
+  expect('rerun: a superseded attempt with an assistant message without provider usage leaves the run incomplete', gr.status === 'incomplete' && gr.children.length === 2 && gr.children.every((c) => c.complete) && gsup.superseded_by === 'a2' && (gsup.usage_issues || []).some((i) => i.includes('without provider usage')) && gr.reason.includes('1 superseded attempt(s) with usage'))
+  expect('rerun: the cli exits 1 for a superseded attempt whose usage was not counted', cli(gap, '--require-effort', 'max') === 1)
+  expect('rerun: a superseded attempt with usage but no resolved model leaves the run incomplete', summarizeRun(rerunWith('rerun-unresolved', [msg('m1', undefined, 7, 100, 0, 'max'), limitRow])).status === 'incomplete')
+  const noLog = summarizeRun(rerunWith('rerun-no-transcript', null))
+  expect('rerun: a superseded attempt without a transcript has unknown usage, so the run is incomplete', noLog.status === 'incomplete' && ((noLog.superseded_attempts || [])[0] || {}).usage_issues.some((i) => i.includes('no transcript')))
+  const quiet = summarizeRun(rerunWith('rerun-no-request', [{ type: 'user', message: { role: 'user', content: 'go' } }]))
+  expect('rerun: a superseded attempt that made no request (zero usage) leaves the run complete', quiet.status === 'complete' && !((quiet.superseded_attempts || [])[0] || {}).usage_issues)
+  const capRun = join(dir, 'cap'); mkdirSync(capRun)
+  writeFileSync(join(capRun, 'journal.jsonl'), [started, done, { ...started, agentId: 'a2', label: 'review' }, { type: 'result', agentId: 'a2', result: { ok: true } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  for (const id of ['a1', 'a2']) writeFileSync(join(capRun, 'agent-' + id + '.meta.json'), JSON.stringify({ model: 'opus', agentType: 'workflow' }))
+  writeFileSync(join(capRun, 'agent-a1.jsonl'), searchRows.map((e) => JSON.stringify(e)).join('\n') + '\n')
+  writeFileSync(join(capRun, 'agent-a2.jsonl'), JSON.stringify(msg('m9', 'claude-opus-5-5', 3, 0, 0, 'max')) + '\n')
+  const capped = summarizeRun(capRun)
+  expect('web search: the run totals calls and capped calls and names the capped children; usage stays complete', capped.status === 'complete' && JSON.stringify(capped.web_search) === JSON.stringify({ calls: 5, capped: 2, capped_children: ['inventory'] }))
+  expect('web search: capped calls do not change the exit code', cli(capRun, '--require-effort', 'max') === 0)
+  // Without a later attempt of its key, a no-result attempt stays an incomplete child; an attempt that returned is
+  // never superseded, even when its key starts again.
+  const lone = join(dir, 'lone'); mkdirSync(lone)
+  writeFileSync(join(lone, 'journal.jsonl'), [{ ...started, key: 'v2:k1' }, { ...started, agentId: 'a2', key: 'v2:k2' }, { type: 'result', agentId: 'a2', result: { ok: true } },
+    { ...started, agentId: 'a3', key: 'v2:k2' }].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  for (const id of ['a1', 'a2', 'a3']) { writeFileSync(join(lone, 'agent-' + id + '.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' })); writeFileSync(join(lone, 'agent-' + id + '.jsonl'), JSON.stringify(msg('m' + id, 'claude-sonnet-5', 3, 100, 0, 'max')) + '\n') }
+  const lr = summarizeRun(lone)
+  expect('rerun: an unrepeated no-result attempt and a re-started returned call are not superseded', lr.status === 'incomplete' && lr.children.length === 3 && !lr.superseded_attempts && !lr.children[0].complete && lr.children[1].complete && !lr.children[2].complete)
+  // Output larger than a pipe buffer (64 KiB on Linux) arrives whole: process.exit() right after console.log dropped
+  // the pending stdout writes when stdout was a pipe (Node.js process.exit() documentation).
+  const big = join(dir, 'big'); mkdirSync(big)
+  const many = 400
+  writeFileSync(join(big, 'journal.jsonl'), Array.from({ length: many }, (_, i) => [{ type: 'started', agentId: 'b' + i, label: 'stage-' + i, phase: 'Audit', key: 'v2:' + i }, { type: 'result', agentId: 'b' + i, result: { ok: true } }]).flat().map((e) => JSON.stringify(e)).join('\n') + '\n')
+  for (let i = 0; i < many; i++) { writeFileSync(join(big, 'agent-b' + i + '.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' })); writeFileSync(join(big, 'agent-b' + i + '.jsonl'), JSON.stringify(msg('m' + i, 'claude-sonnet-5', 3, 100, 0, 'max')) + '\n') }
+  const piped = spawnSync(process.execPath, [fileURLToPath(new URL('./child-usage.mjs', import.meta.url)), big, '--require-effort', 'max'], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+  let whole = null
+  try { whole = JSON.parse(piped.stdout) } catch { whole = null }
+  expect('cli: output larger than a pipe buffer arrives whole through a pipe', piped.stdout.length > 65536 && piped.status === 0 && whole !== null && whole.children.length === many)
   // --latest: newest journal under <config>/projects/<slug>/<session>/subagents/workflows/
   const cfg = join(dir, 'cfg'), cwd = '/work/agent-lab.x'
   expect('latest: unknown working directory returns null', latestRunDir(cwd, cfg) === null)

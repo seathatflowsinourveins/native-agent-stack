@@ -1,0 +1,4265 @@
+[
+ {
+  "catalog": "foundation",
+  "layer_id": "native-clients",
+  "votes": "retained",
+  "votes_note": "1 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: earendil-works/pi.",
+  "discovery_ref": "@RETURNS@#/discovery/native-clients",
+  "calls": {
+   "web_search": 2,
+   "web_fetch": 8,
+   "gh_api": 24,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "https://github.com/anthropics/claude-agent-sdk-python",
+   "https://github.com/openai/openai-agents-python",
+   "https://github.com/earendil-works/pi",
+   "https://github.com/agentclientprotocol/claude-agent-acp",
+   "https://github.com/letta-ai/letta-code",
+   "https://github.com/aaif-goose/goose",
+   "https://github.com/nousresearch/hermes-agent",
+   "https://github.com/anomalyco/opencode"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/anthropics/claude-agent-sdk-python",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/native-clients/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/native-clients/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/openai/openai-agents-python",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/native-clients/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/native-clients/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/earendil-works/pi",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/native-clients/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/native-clients/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/agentclientprotocol/claude-agent-acp",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/native-clients/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/native-clients/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/letta-ai/letta-code",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/native-clients/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/native-clients/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/aaif-goose/goose",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/native-clients/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/native-clients/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/nousresearch/hermes-agent",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/native-clients/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/native-clients/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/anomalyco/opencode",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/native-clients/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/native-clients/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/native-clients"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "instructions-skills",
+  "votes": "retained",
+  "votes_note": "1 of 15 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: mattpocock/skills.",
+  "discovery_ref": "@RETURNS@#/discovery/instructions-skills",
+  "calls": {
+   "web_search": 8,
+   "web_fetch": 8,
+   "gh_api": 51,
+   "gpt6_web_search": 24,
+   "gpt6_web_fetch": 16,
+   "gpt6_gh_api": 78
+  },
+  "proposed": [
+   "https://github.com/mattpocock/skills",
+   "https://github.com/agent-sh/agnix",
+   "https://github.com/openai/plugins",
+   "https://github.com/anthropics/skills",
+   "https://github.com/trailofbits/skills",
+   "https://github.com/obra/superpowers",
+   "https://github.com/anthropics/claude-plugins-official",
+   "https://github.com/microsoft/skillopt",
+   "https://github.com/cisco-ai-defense/skill-scanner",
+   "https://github.com/duckdb/duckdb-skills",
+   "https://github.com/anthropics/financial-services",
+   "https://github.com/dgunning/edgartools",
+   "https://github.com/tavily-ai/skills",
+   "https://github.com/tradermonty/claude-trading-skills",
+   "https://github.com/cisco-ai-defense/mcp-scanner"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/cisco-ai-defense/skill-scanner",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/8/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/8/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/anthropics/financial-services",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/10/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/10/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/mattpocock/skills",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/agent-sh/agnix",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/openai/plugins",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/anthropics/skills",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/trailofbits/skills",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/obra/superpowers",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/anthropics/claude-plugins-official",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/microsoft/skillopt",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/7/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/duckdb/duckdb-skills",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/9/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/9/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/dgunning/edgartools",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/11/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/tavily-ai/skills",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/12/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/12/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/tradermonty/claude-trading-skills",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/13/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/13/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/cisco-ai-defense/mcp-scanner",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/14/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/instructions-skills/14/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/instructions-skills"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "workers",
+  "votes": "retained",
+  "votes_note": "2 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: openai/codex, sipyourdrink-ltd/bernstein.",
+  "discovery_ref": "@RETURNS@#/discovery/workers",
+  "calls": {
+   "web_search": 2,
+   "web_fetch": 6,
+   "gh_api": 36,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 30
+  },
+  "proposed": [
+   "https://github.com/openai/codex",
+   "https://github.com/coleam00/archon",
+   "https://github.com/augani/agent-orchestrator",
+   "https://github.com/sipyourdrink-ltd/bernstein",
+   "https://github.com/loopx-project/loopx",
+   "https://github.com/openai/symphony",
+   "https://github.com/openhands/software-agent-sdk",
+   "https://github.com/langchain-ai/langgraph"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/openai/codex",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/workers/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/workers/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/coleam00/archon",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/workers/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/workers/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/augani/agent-orchestrator",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/workers/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/workers/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/sipyourdrink-ltd/bernstein",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/workers/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/workers/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/loopx-project/loopx",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/workers/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/workers/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/openai/symphony",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/workers/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/workers/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/openhands/software-agent-sdk",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/workers/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/workers/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/langchain-ai/langgraph",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/workers/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/workers/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/workers"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "isolation",
+  "votes": "retained",
+  "votes_note": "2 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: superradcompany/microsandbox, boxlite-ai/boxlite.",
+  "discovery_ref": "@RETURNS@#/discovery/isolation",
+  "calls": {
+   "web_search": 3,
+   "web_fetch": 3,
+   "gh_api": 30,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 8
+  },
+  "proposed": [
+   "https://github.com/superradcompany/microsandbox",
+   "https://github.com/boxlite-ai/boxlite",
+   "https://github.com/podman-container-tools/podman",
+   "https://github.com/apple/container",
+   "https://github.com/smol-machines/smolvm",
+   "https://github.com/multikernel/sandlock",
+   "https://github.com/nolabs-ai/nono",
+   "https://github.com/lensapp/lens-sandbox"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/superradcompany/microsandbox",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/isolation/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/isolation/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/boxlite-ai/boxlite",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/isolation/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/isolation/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/podman-container-tools/podman",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/isolation/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/isolation/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/apple/container",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/isolation/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/isolation/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/smol-machines/smolvm",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/isolation/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/isolation/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/multikernel/sandlock",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/isolation/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/isolation/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/nolabs-ai/nono",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/isolation/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/isolation/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/lensapp/lens-sandbox",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/isolation/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/isolation/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/isolation"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "code-navigation",
+  "votes": "retained",
+  "votes_note": "2 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: anthropics/claude-plugins-official, abhigyanpatwari/gitnexus.",
+  "discovery_ref": "@RETURNS@#/discovery/code-navigation",
+  "calls": {
+   "web_search": 5,
+   "web_fetch": 4,
+   "gh_api": 24,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 6
+  },
+  "proposed": [
+   "https://github.com/anthropics/claude-plugins-official",
+   "https://github.com/probelabs/probe",
+   "https://github.com/cocoindex-io/cocoindex-code",
+   "https://github.com/bug-ops/mcpls",
+   "https://github.com/zzet/gortex",
+   "https://github.com/tirth8205/code-review-graph",
+   "https://github.com/lemoncrow-lab/lemoncrow",
+   "https://github.com/abhigyanpatwari/gitnexus"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/anthropics/claude-plugins-official",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/probelabs/probe",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/cocoindex-io/cocoindex-code",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/bug-ops/mcpls",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/zzet/gortex",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/tirth8205/code-review-graph",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/lemoncrow-lab/lemoncrow",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/abhigyanpatwari/gitnexus",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/code-navigation/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/code-navigation"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "document-retrieval",
+  "votes": "retained",
+  "votes_note": "5 of 7 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: opendatalab/mineru, docling-project/docling, cinnamon/kotaemon, huggingface/sentence-transformers, arabold/docs-mcp-server.",
+  "discovery_ref": "@RETURNS@#/discovery/document-retrieval",
+  "calls": {
+   "web_search": 4,
+   "web_fetch": 8,
+   "gh_api": 24,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "https://github.com/opendatalab/mineru",
+   "https://github.com/illuin-tech/colpali",
+   "https://github.com/paddlepaddle/paddleocr",
+   "https://github.com/docling-project/docling",
+   "https://github.com/cinnamon/kotaemon",
+   "https://github.com/huggingface/sentence-transformers",
+   "https://github.com/arabold/docs-mcp-server"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/opendatalab/mineru",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/illuin-tech/colpali",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/paddlepaddle/paddleocr",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/docling-project/docling",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/cinnamon/kotaemon",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/huggingface/sentence-transformers",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/arabold/docs-mcp-server",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/document-retrieval/6/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/document-retrieval"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "semantic-rag",
+  "votes": "retained",
+  "votes_note": "5 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: osu-nlp-group/hipporag, lightonai/next-plaid, minishlab/semble, ollama/ollama, giancarloerra/socraticode.",
+  "discovery_ref": "@RETURNS@#/discovery/semantic-rag",
+  "calls": {
+   "web_search": 7,
+   "web_fetch": 5,
+   "gh_api": 9,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 29
+  },
+  "proposed": [
+   "https://github.com/flagopen/flagembedding",
+   "https://github.com/osu-nlp-group/hipporag",
+   "https://github.com/lightonai/next-plaid",
+   "https://github.com/minishlab/semble",
+   "https://github.com/yoanbernabeu/grepai",
+   "https://github.com/lightonai/pylate",
+   "https://github.com/ollama/ollama",
+   "https://github.com/giancarloerra/socraticode"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/flagopen/flagembedding",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/osu-nlp-group/hipporag",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/lightonai/next-plaid",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/minishlab/semble",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/yoanbernabeu/grepai",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/lightonai/pylate",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/ollama/ollama",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/giancarloerra/socraticode",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/semantic-rag/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/semantic-rag"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "durable-memory",
+  "votes": "retained",
+  "votes_note": "5 of 14 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: campfirein/byterover-cli, rohitg00/agentmemory, mempalace/mempalace, vshulcz/deja-vu, vbcherepanov/total-agent-memory.",
+  "discovery_ref": "@RETURNS@#/discovery/durable-memory",
+  "calls": {
+   "web_search": 5,
+   "web_fetch": 10,
+   "gh_api": 49,
+   "gpt6_web_search": 24,
+   "gpt6_web_fetch": 16,
+   "gpt6_gh_api": 54
+  },
+  "proposed": [
+   "https://github.com/mirix-ai/mirix",
+   "https://github.com/campfirein/byterover-cli",
+   "https://github.com/rohitg00/agentmemory",
+   "https://github.com/mempalace/mempalace",
+   "https://github.com/vshulcz/deja-vu",
+   "https://github.com/vectorize-io/hindsight",
+   "https://github.com/basicmachines-co/basic-memory",
+   "https://github.com/vbcherepanov/total-agent-memory",
+   "https://github.com/openai/codex",
+   "https://github.com/anthropics/claude-code",
+   "https://github.com/mem0ai/mem0",
+   "https://github.com/topoteretes/cognee",
+   "https://github.com/langchain-ai/langmem",
+   "https://github.com/osu-nlp-group/hipporag"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/anthropics/claude-code",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/9/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/9/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/langchain-ai/langmem",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/12/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/12/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/mirix-ai/mirix",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/campfirein/byterover-cli",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/rohitg00/agentmemory",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/mempalace/mempalace",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/vshulcz/deja-vu",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/vectorize-io/hindsight",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/basicmachines-co/basic-memory",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/vbcherepanov/total-agent-memory",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/7/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/openai/codex",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/8/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/8/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/mem0ai/mem0",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/10/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/topoteretes/cognee",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/11/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/osu-nlp-group/hipporag",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/13/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/durable-memory/13/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/durable-memory"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "web-research",
+  "votes": "retained",
+  "votes_note": "4 of 8 proposals are refuted only because a vote did not return (GPT-6 fit; the vote is {missing: true} in the returns): no returned vote refutes them, so they are not refuted on merit and not adjudicated: exa-labs/exa-mcp-server, unclecode/crawl4ai, adbar/trafilatura, openai/codex.",
+  "discovery_ref": "@RETURNS@#/discovery/web-research",
+  "calls": {
+   "web_search": 6,
+   "web_fetch": 8,
+   "gh_api": 26,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 32
+  },
+  "proposed": [
+   "https://github.com/exa-labs/exa-mcp-server",
+   "https://github.com/unclecode/crawl4ai",
+   "https://github.com/adbar/trafilatura",
+   "https://github.com/openai/codex",
+   "https://github.com/microsoft/playwright-cli",
+   "https://github.com/firecrawl/cli",
+   "https://github.com/knockoutez/wigolo",
+   "https://github.com/d4vinci/scrapling"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/exa-labs/exa-mcp-server",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/unclecode/crawl4ai",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/adbar/trafilatura",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/openai/codex",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/microsoft/playwright-cli",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/firecrawl/cli",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/knockoutez/wigolo",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/d4vinci/scrapling",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/web-research"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "token-efficiency",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/token-efficiency",
+  "calls": {
+   "web_search": 8,
+   "web_fetch": 8,
+   "gh_api": 28,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 16
+  },
+  "proposed": [
+   "https://github.com/juliusbrussee/caveman",
+   "https://github.com/headroomlabs-ai/headroom",
+   "https://github.com/rtk-ai/rtk",
+   "https://github.com/yamadashy/repomix",
+   "https://github.com/frederick-douglas-pearce/claude-code-sessions",
+   "https://github.com/dietrichgebert/ponytail",
+   "https://github.com/getagentseal/codeburn",
+   "https://github.com/mksglu/context-mode"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/juliusbrussee/caveman",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/headroomlabs-ai/headroom",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/rtk-ai/rtk",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/yamadashy/repomix",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/frederick-douglas-pearce/claude-code-sessions",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/dietrichgebert/ponytail",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/getagentseal/codeburn",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/mksglu/context-mode",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/token-efficiency/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/token-efficiency"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "quality-evaluation",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/quality-evaluation",
+  "calls": {
+   "web_search": 4,
+   "web_fetch": 5,
+   "gh_api": 36,
+   "gpt6_web_search": 24,
+   "gpt6_web_fetch": 16,
+   "gpt6_gh_api": 49
+  },
+  "proposed": [
+   "https://github.com/ukgovernmentbeis/inspect_ai",
+   "https://github.com/eleutherai/lm-evaluation-harness",
+   "https://github.com/anthropics/claude-code",
+   "https://github.com/alibaba/skill-up",
+   "https://github.com/nvidia/skillevaluator",
+   "https://github.com/harbor-framework/harbor",
+   "https://github.com/pydantic/pydantic-ai",
+   "https://github.com/embeddings-benchmark/mteb",
+   "https://github.com/boxed/mutmut",
+   "https://github.com/sixty-north/cosmic-ray",
+   "https://github.com/trailofbits/skills",
+   "https://github.com/mikelane/pytest-gremlins",
+   "https://github.com/trailofbits/mewt",
+   "https://github.com/comet-ml/opik"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/ukgovernmentbeis/inspect_ai",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/embeddings-benchmark/mteb",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/7/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/boxed/mutmut",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/8/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/8/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/sixty-north/cosmic-ray",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/9/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/9/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/comet-ml/opik",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/13/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/13/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/eleutherai/lm-evaluation-harness",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/anthropics/claude-code",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/alibaba/skill-up",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/nvidia/skillevaluator",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/harbor-framework/harbor",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/pydantic/pydantic-ai",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/trailofbits/skills",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/10/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/mikelane/pytest-gremlins",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/11/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/trailofbits/mewt",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/12/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/quality-evaluation/12/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/quality-evaluation"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "ci-supply-chain",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/ci-supply-chain",
+  "calls": {
+   "web_search": 7,
+   "web_fetch": 7,
+   "gh_api": 29,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 7
+  },
+  "proposed": [
+   "https://github.com/renovatebot/renovate",
+   "https://github.com/sigstore/cosign",
+   "https://github.com/aquasecurity/trivy",
+   "https://github.com/jdx/mise",
+   "https://github.com/cdxgen/cdxgen",
+   "https://github.com/rhysd/actionlint",
+   "https://github.com/anchore/grype",
+   "https://github.com/boostsecurityio/poutine"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/boostsecurityio/poutine",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/7/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/renovatebot/renovate",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/sigstore/cosign",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/aquasecurity/trivy",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/jdx/mise",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/cdxgen/cdxgen",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/rhysd/actionlint",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/anchore/grype",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/ci-supply-chain/6/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/ci-supply-chain"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "scheduling-supervision",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/scheduling-supervision",
+  "calls": {
+   "web_search": 6,
+   "web_fetch": 8,
+   "gh_api": 36,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 8
+  },
+  "proposed": [
+   "https://github.com/temporalio/temporal",
+   "https://github.com/hatchet-dev/hatchet",
+   "https://github.com/restatedev/restate",
+   "https://github.com/dagucloud/dagu",
+   "https://github.com/earendil-works/absurd",
+   "https://github.com/pixlcore/xyops",
+   "https://github.com/microsoft/pg_durable",
+   "https://github.com/kestra-io/kestra"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/temporalio/temporal",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/dagucloud/dagu",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/3/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/earendil-works/absurd",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/4/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/microsoft/pg_durable",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/6/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/6/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/hatchet-dev/hatchet",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/restatedev/restate",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/pixlcore/xyops",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/kestra-io/kestra",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/scheduling-supervision/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/scheduling-supervision"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "hosting-services",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/hosting-services",
+  "calls": {
+   "web_search": 2,
+   "web_fetch": 8,
+   "gh_api": 11,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 40
+  },
+  "proposed": [
+   "https://github.com/f1bonacc1/process-compose",
+   "https://github.com/vitejs/vite",
+   "https://github.com/systemd/systemd",
+   "https://github.com/cachix/devenv",
+   "https://github.com/microsoft/aspire",
+   "https://github.com/podman-container-tools/podman",
+   "https://github.com/docker/compose",
+   "https://github.com/apple/container"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/f1bonacc1/process-compose",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/vitejs/vite",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/systemd/systemd",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/cachix/devenv",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/microsoft/aspire",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/podman-container-tools/podman",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/docker/compose",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/apple/container",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/hosting-services/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/hosting-services"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "recovery-portability",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/recovery-portability",
+  "calls": {
+   "web_search": 5,
+   "web_fetch": 7,
+   "gh_api": 22,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 19
+  },
+  "proposed": [
+   "https://github.com/prefix-dev/pixi",
+   "https://github.com/jdx/mise",
+   "https://github.com/filosottile/age",
+   "https://github.com/benbjohnson/litestream",
+   "https://github.com/twpayne/chezmoi",
+   "https://github.com/creativeprojects/resticprofile",
+   "https://github.com/kopia/kopia",
+   "https://github.com/rustic-rs/rustic"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/prefix-dev/pixi",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/jdx/mise",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/1/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/filosottile/age",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/benbjohnson/litestream",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/twpayne/chezmoi",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/creativeprojects/resticprofile",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/kopia/kopia",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/rustic-rs/rustic",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/recovery-portability/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/recovery-portability"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "observation-inference",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/observation-inference",
+  "calls": {
+   "web_search": 4,
+   "web_fetch": 7,
+   "gh_api": 36,
+   "gpt6_web_search": 24,
+   "gpt6_web_fetch": 16,
+   "gpt6_gh_api": 42
+  },
+  "proposed": [
+   "https://github.com/grafana/tempo",
+   "https://github.com/turboderp-org/exllamav3",
+   "https://github.com/traceloop/openllmetry",
+   "https://github.com/jaegertracing/jaeger",
+   "https://github.com/ggml-org/llama.cpp",
+   "https://github.com/nijave/otel-agent-trace-connector",
+   "https://github.com/ollama/ollama",
+   "https://github.com/open-telemetry/semantic-conventions-genai",
+   "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+   "https://github.com/vladkens/macmon",
+   "https://github.com/nvidia/dcgm-exporter",
+   "https://github.com/ncabatoff/process-exporter",
+   "https://github.com/lablup/all-smi",
+   "https://github.com/prometheus-community/windows_exporter"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/grafana/tempo",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/traceloop/openllmetry",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/2/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/ollama/ollama",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/6/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/8/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/8/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/nvidia/dcgm-exporter",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/10/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/10/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/turboderp-org/exllamav3",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/jaegertracing/jaeger",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/ggml-org/llama.cpp",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/nijave/otel-agent-trace-connector",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/open-telemetry/semantic-conventions-genai",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/7/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/vladkens/macmon",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/9/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/9/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/ncabatoff/process-exporter",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/11/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/lablup/all-smi",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/12/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/12/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/prometheus-community/windows_exporter",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/13/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observation-inference/13/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/observation-inference"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "agent-sdks",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/agent-sdks",
+  "calls": {
+   "web_search": 9,
+   "web_fetch": 8,
+   "gh_api": 32,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 33
+  },
+  "proposed": [
+   "https://github.com/anthropics/claude-agent-sdk-python",
+   "https://github.com/openhands/software-agent-sdk",
+   "https://github.com/github/copilot-sdk",
+   "https://github.com/earendil-works/pi",
+   "https://github.com/agentclientprotocol/python-sdk",
+   "https://github.com/langchain-ai/deepagents",
+   "https://github.com/openai/openai-agents-python",
+   "https://github.com/langchain-ai/langgraph"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/anthropics/claude-agent-sdk-python",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/openhands/software-agent-sdk",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/github/copilot-sdk",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/earendil-works/pi",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/agentclientprotocol/python-sdk",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/langchain-ai/deepagents",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/openai/openai-agents-python",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/langchain-ai/langgraph",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agent-sdks/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/agent-sdks"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "mcp-surfaces",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/mcp-surfaces",
+  "calls": {
+   "web_search": 4,
+   "web_fetch": 2,
+   "gh_api": 31,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 25
+  },
+  "proposed": [
+   "https://github.com/apify/mcpc",
+   "https://github.com/neon-solutions/add-mcp",
+   "https://github.com/openclaw/mcporter",
+   "https://github.com/modelcontextprotocol/inspector",
+   "https://github.com/stacklok/toolhive",
+   "https://github.com/modelcontextprotocol/conformance",
+   "https://github.com/supercorp-ai/supergateway",
+   "https://github.com/mcpjam/inspector"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/apify/mcpc",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/modelcontextprotocol/conformance",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/5/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/5/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/neon-solutions/add-mcp",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/openclaw/mcporter",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/modelcontextprotocol/inspector",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/stacklok/toolhive",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/supercorp-ai/supergateway",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/mcpjam/inspector",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/mcp-surfaces/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/mcp-surfaces"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "secrets-credentials",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/secrets-credentials",
+  "calls": {
+   "web_search": 4,
+   "web_fetch": 6,
+   "gh_api": 36,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 14
+  },
+  "proposed": [
+   "https://github.com/betterleaks/betterleaks",
+   "https://github.com/mongodb/kingfisher",
+   "https://github.com/trufflesecurity/trufflehog",
+   "https://github.com/openbao/openbao",
+   "https://github.com/cachix/secretspec",
+   "https://github.com/praetorian-inc/noseyparker",
+   "https://github.com/gitguardian/ggshield"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/betterleaks/betterleaks",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/praetorian-inc/noseyparker",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/5/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/gitguardian/ggshield",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/6/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/6/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/mongodb/kingfisher",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/trufflesecurity/trufflehog",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/openbao/openbao",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/cachix/secretspec",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/secrets-credentials/4/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/secrets-credentials"
+   }
+  ]
+ },
+ {
+  "catalog": "foundation",
+  "layer_id": "git-github-automation",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/git-github-automation",
+  "calls": {
+   "web_search": 8,
+   "web_fetch": 5,
+   "gh_api": 16,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 24
+  },
+  "proposed": [
+   "https://github.com/ataraxy-labs/sem",
+   "https://github.com/alibaba/open-code-review",
+   "https://github.com/github/gh-stack",
+   "https://github.com/ataraxy-labs/weave",
+   "https://github.com/github/gh-aw",
+   "https://github.com/coderabbitai/git-worktree-runner",
+   "https://github.com/dlvhdr/gh-dash",
+   "https://github.com/abhinav/git-spice"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/ataraxy-labs/sem",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/0/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/alibaba/open-code-review",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/github/gh-stack",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/ataraxy-labs/weave",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/github/gh-aw",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/coderabbitai/git-worktree-runner",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/dlvhdr/gh-dash",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/abhinav/git-spice",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/git-github-automation/7/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/git-github-automation"
+   }
+  ]
+ },
+ {
+  "catalog": "us-equities",
+  "layer_id": "market-data-reference",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/market-data-reference",
+  "calls": {
+   "web_search": 9,
+   "web_fetch": 8,
+   "gh_api": 29,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 8
+  },
+  "proposed": [
+   "https://github.com/databento/databento-python",
+   "https://github.com/massive-com/client-python",
+   "https://github.com/alphavantage/alpha_vantage_mcp",
+   "https://github.com/duckdb/ducklake",
+   "https://github.com/man-group/arcticdb",
+   "https://github.com/hydrosquall/tiingo-python"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/databento/databento-python",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/market-data-reference/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/market-data-reference/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/massive-com/client-python",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/market-data-reference/1/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/market-data-reference/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/man-group/arcticdb",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/market-data-reference/4/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/market-data-reference/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/hydrosquall/tiingo-python",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/market-data-reference/5/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/market-data-reference/5/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/alphavantage/alpha_vantage_mcp",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/market-data-reference/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/market-data-reference/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/duckdb/ducklake",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/market-data-reference/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/market-data-reference/3/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/market-data-reference"
+   }
+  ]
+ },
+ {
+  "catalog": "us-equities",
+  "layer_id": "identity-provenance",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/identity-provenance",
+  "calls": {
+   "web_search": 7,
+   "web_fetch": 5,
+   "gh_api": 14,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 12
+  },
+  "proposed": [
+   "https://github.com/duckdb/ducklake",
+   "https://github.com/dolthub/dolt",
+   "https://github.com/xtdb/xtdb",
+   "https://github.com/databento/databento-python",
+   "https://github.com/oxen-ai/oxen",
+   "https://github.com/datalad/datalad",
+   "https://github.com/kamu-data/kamu-cli",
+   "https://github.com/dfahrn/securities-master"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/oxen-ai/oxen",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/4/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/dfahrn/securities-master",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/7/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/duckdb/ducklake",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/dolthub/dolt",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/xtdb/xtdb",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/databento/databento-python",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/datalad/datalad",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/kamu-data/kamu-cli",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/identity-provenance/6/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/identity-provenance"
+   }
+  ]
+ },
+ {
+  "catalog": "us-equities",
+  "layer_id": "storage-compute",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/storage-compute",
+  "calls": {
+   "web_search": 7,
+   "web_fetch": 4,
+   "gh_api": 27,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 4
+  },
+  "proposed": [
+   "https://github.com/man-group/arcticdb",
+   "https://github.com/databento/databento-python",
+   "https://github.com/quantco/dataframely",
+   "https://github.com/duckdb/duckdb-quack",
+   "https://github.com/delta-io/delta-rs",
+   "https://github.com/dolthub/dolt",
+   "https://github.com/chdb-io/chdb"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/chdb-io/chdb",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/6/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/6/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/man-group/arcticdb",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/databento/databento-python",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/quantco/dataframely",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/duckdb/duckdb-quack",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/delta-io/delta-rs",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/dolthub/dolt",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/storage-compute/5/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/storage-compute"
+   }
+  ]
+ },
+ {
+  "catalog": "us-equities",
+  "layer_id": "data-quality-orchestration",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/data-quality-orchestration",
+  "calls": {
+   "web_search": 5,
+   "web_fetch": 6,
+   "gh_api": 20,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 32
+  },
+  "proposed": [
+   "https://github.com/posit-dev/pointblank",
+   "https://github.com/quantco/dataframely",
+   "https://github.com/temporalio/temporal",
+   "https://github.com/restatedev/restate",
+   "https://github.com/earendil-works/absurd",
+   "https://github.com/prefecthq/prefect",
+   "https://github.com/sqlmesh/sqlmesh",
+   "https://github.com/flyteorg/flyte"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/flyteorg/flyte",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/7/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/posit-dev/pointblank",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/quantco/dataframely",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/temporalio/temporal",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/restatedev/restate",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/earendil-works/absurd",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/prefecthq/prefect",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/sqlmesh/sqlmesh",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/data-quality-orchestration/6/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/data-quality-orchestration"
+   }
+  ]
+ },
+ {
+  "catalog": "us-equities",
+  "layer_id": "research-factors-ml",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/research-factors-ml",
+  "calls": {
+   "web_search": 7,
+   "web_fetch": 13,
+   "gh_api": 30,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 12
+  },
+  "proposed": [
+   "https://github.com/awwesomeman/factrix",
+   "https://github.com/bashtage/linearmodels",
+   "https://github.com/eslazarev/purged-cross-validation",
+   "https://github.com/microsoft/rd-agent",
+   "https://github.com/shiyu-coder/kronos",
+   "https://github.com/priorlabs/tabpfn",
+   "https://github.com/autogluon/autogluon",
+   "https://github.com/datadog/toto",
+   "https://github.com/theforecastingcompany/tfc-t0",
+   "https://github.com/nvidia/cudf",
+   "https://github.com/lgai-research/exaone-forecast",
+   "https://github.com/nx-ai/tirex-2",
+   "https://github.com/nvidia/cuml"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/bashtage/linearmodels",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/1/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/shiyu-coder/kronos",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/4/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/datadog/toto",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/7/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/lgai-research/exaone-forecast",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/10/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/10/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/awwesomeman/factrix",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/eslazarev/purged-cross-validation",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/microsoft/rd-agent",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/priorlabs/tabpfn",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/autogluon/autogluon",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/theforecastingcompany/tfc-t0",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/8/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/8/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/nvidia/cudf",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/9/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/9/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/nx-ai/tirex-2",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/11/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/nvidia/cuml",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/12/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/research-factors-ml/12/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/research-factors-ml"
+   }
+  ]
+ },
+ {
+  "catalog": "us-equities",
+  "layer_id": "backtesting-engine",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/backtesting-engine",
+  "calls": {
+   "web_search": 6,
+   "web_fetch": 11,
+   "gh_api": 34,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 30
+  },
+  "proposed": [
+   "https://github.com/stefan-jansen/zipline-reloaded",
+   "https://github.com/lumiwealth/lumibot",
+   "https://github.com/edtechre/pybroker",
+   "https://github.com/cvxgrp/cvxportfolio",
+   "https://github.com/fidetolabs/qanat",
+   "https://github.com/falk-brauer/kumo-nautilus-alpaca-adapter",
+   "https://github.com/openbyteinc/quantdinger"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/stefan-jansen/zipline-reloaded",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/lumiwealth/lumibot",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/edtechre/pybroker",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/cvxgrp/cvxportfolio",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/fidetolabs/qanat",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/falk-brauer/kumo-nautilus-alpaca-adapter",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/openbyteinc/quantdinger",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/backtesting-engine/6/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/backtesting-engine"
+   }
+  ]
+ },
+ {
+  "catalog": "us-equities",
+  "layer_id": "execution-broker",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/execution-broker",
+  "calls": {
+   "web_search": 4,
+   "web_fetch": 16,
+   "gh_api": 80,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 12
+  },
+  "proposed": [
+   "https://github.com/ib-api-reloaded/ib_async",
+   "https://github.com/csingley/ibflex",
+   "https://github.com/wboayue/rust-ibapi",
+   "https://github.com/nautechsystems/nautilus_ibapi",
+   "https://github.com/gnzsnz/ib-gateway-docker",
+   "https://github.com/quantconnect/lean.brokerages.alpaca",
+   "https://github.com/code-hustler-ft3d/ibg-controller",
+   "https://github.com/ibcalpha/ibc",
+   "https://github.com/extrange/ibkr-docker",
+   "https://github.com/nautechsystems/nautilus_trader",
+   "https://github.com/alpacahq/cli",
+   "https://github.com/lcstyle/ibctl",
+   "https://github.com/falk-brauer/kumo-nautilus-alpaca-adapter"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/ib-api-reloaded/ib_async",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/csingley/ibflex",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/1/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/wboayue/rust-ibapi",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/2/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/nautechsystems/nautilus_ibapi",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/3/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/gnzsnz/ib-gateway-docker",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/4/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/ibcalpha/ibc",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/7/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/7/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/extrange/ibkr-docker",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/8/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/8/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/nautechsystems/nautilus_trader",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/9/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/9/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/falk-brauer/kumo-nautilus-alpaca-adapter",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/12/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/12/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/quantconnect/lean.brokerages.alpaca",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/code-hustler-ft3d/ibg-controller",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/alpacahq/cli",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/10/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/lcstyle/ibctl",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/execution-broker/11/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/execution-broker"
+   }
+  ]
+ },
+ {
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/portfolio-risk",
+  "calls": {
+   "web_search": 5,
+   "web_fetch": 6,
+   "gh_api": 18
+  },
+  "proposed": [
+   "https://github.com/pmorissette/ffn",
+   "https://github.com/bashtage/arch",
+   "https://github.com/csingley/ibflex",
+   "https://github.com/jebel-quant/jquantstats",
+   "https://github.com/nvidia-ai-blueprints/portfolio-optimization",
+   "https://github.com/pyportfolio/pyportfolioopt"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/csingley/ibflex",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/portfolio-risk/2/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/portfolio-risk/2/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/pmorissette/ffn",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/portfolio-risk/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/portfolio-risk/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/bashtage/arch",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/portfolio-risk/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/portfolio-risk/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/jebel-quant/jquantstats",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/portfolio-risk/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/portfolio-risk/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/nvidia-ai-blueprints/portfolio-optimization",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/portfolio-risk/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/portfolio-risk/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/pyportfolio/pyportfolioopt",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/portfolio-risk/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/portfolio-risk/5/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/portfolio-risk"
+   }
+  ]
+ },
+ {
+  "catalog": "us-equities",
+  "layer_id": "evaluation-experiments",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/evaluation-experiments",
+  "calls": {
+   "web_search": 4,
+   "web_fetch": 4,
+   "gh_api": 29
+  },
+  "proposed": [
+   "https://github.com/meridianlabs-ai/inspect_scout",
+   "https://github.com/harbor-framework/harbor",
+   "https://github.com/debu-sinha/inspect-mlflow",
+   "https://github.com/mlflow/skills",
+   "https://github.com/letta-ai/trajectory",
+   "https://github.com/karpathy/autoresearch"
+  ],
+  "survived": [],
+  "refuted": [
+   {
+    "repo": "https://github.com/meridianlabs-ai/inspect_scout",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/evaluation-experiments/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/evaluation-experiments/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/harbor-framework/harbor",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/evaluation-experiments/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/evaluation-experiments/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/debu-sinha/inspect-mlflow",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/evaluation-experiments/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/evaluation-experiments/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/mlflow/skills",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/evaluation-experiments/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/evaluation-experiments/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/letta-ai/trajectory",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/evaluation-experiments/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/evaluation-experiments/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/karpathy/autoresearch",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/evaluation-experiments/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/evaluation-experiments/5/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/evaluation-experiments"
+   }
+  ]
+ },
+ {
+  "catalog": "us-equities",
+  "layer_id": "agents-models-workers",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/agents-models-workers",
+  "calls": {
+   "web_search": 7,
+   "web_fetch": 16,
+   "gh_api": 45,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 31
+  },
+  "proposed": [
+   "https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf",
+   "https://github.com/deusdata/codebase-memory-mcp",
+   "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B",
+   "https://huggingface.co/XingChen-AGI/Xing4.0-29B-A4B",
+   "https://github.com/terrierteam/ir_measures",
+   "https://github.com/ikawrakow/ik_llama.cpp",
+   "https://github.com/vllm-project/vllm-metal",
+   "https://github.com/kvcache-ai/ktransformers",
+   "https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+   "https://github.com/ggml-org/llama.cpp",
+   "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF"
+  ],
+  "survived": [
+   {
+    "repo": "https://huggingface.co/XingChen-AGI/Xing4.0-29B-A4B",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/3/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/3/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/deusdata/codebase-memory-mcp",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/1/fit"
+    }
+   },
+   {
+    "repo": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/terrierteam/ir_measures",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/ikawrakow/ik_llama.cpp",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/vllm-project/vllm-metal",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/kvcache-ai/ktransformers",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/7/fit"
+    }
+   },
+   {
+    "repo": "https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/8/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/8/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/ggml-org/llama.cpp",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/9/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/9/fit"
+    }
+   },
+   {
+    "repo": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/agents-models-workers/10/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/agents-models-workers"
+   }
+  ]
+ },
+ {
+  "catalog": "us-equities",
+  "layer_id": "observability-hosting",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/observability-hosting",
+  "calls": {
+   "web_search": 2,
+   "web_fetch": 4,
+   "gh_api": 15
+  },
+  "proposed": [
+   "https://github.com/victoriametrics/victoriametrics",
+   "https://github.com/grafana/tempo",
+   "https://github.com/victoriametrics/victorialogs",
+   "https://github.com/openobserve/openobserve",
+   "https://github.com/superradcompany/microsandbox",
+   "https://github.com/restic/rest-server"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/restic/rest-server",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observability-hosting/5/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observability-hosting/5/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/victoriametrics/victoriametrics",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observability-hosting/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observability-hosting/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/grafana/tempo",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observability-hosting/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observability-hosting/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/victoriametrics/victorialogs",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observability-hosting/2/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observability-hosting/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/openobserve/openobserve",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observability-hosting/3/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observability-hosting/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/superradcompany/microsandbox",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/observability-hosting/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/observability-hosting/4/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/observability-hosting"
+   }
+  ]
+ },
+ {
+  "catalog": "us-equities",
+  "layer_id": "security-supply-chain",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/security-supply-chain",
+  "calls": {
+   "web_search": 4,
+   "web_fetch": 16,
+   "gh_api": 77,
+   "gpt6_web_search": 12,
+   "gpt6_web_fetch": 8,
+   "gpt6_gh_api": 13
+  },
+  "proposed": [
+   "https://github.com/betterleaks/betterleaks",
+   "https://github.com/google/osv-scanner",
+   "https://github.com/pypi/pypi-attestations",
+   "https://github.com/cli/cli",
+   "https://github.com/mongodb/kingfisher",
+   "https://github.com/aquasecurity/trivy",
+   "https://github.com/rustsec/rustsec",
+   "https://github.com/embarkstudios/cargo-deny",
+   "https://github.com/datadog/guarddog",
+   "https://github.com/ossf/malicious-packages",
+   "https://github.com/slsa-framework/slsa-verifier",
+   "https://github.com/sigstore/cosign",
+   "https://github.com/chainguard-dev/malcontent"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/betterleaks/betterleaks",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/0/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/pypi/pypi-attestations",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/2/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/cli/cli",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/3/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/mongodb/kingfisher",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/4/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/datadog/guarddog",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/8/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/8/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/slsa-framework/slsa-verifier",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/10/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/10/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/chainguard-dev/malcontent",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/12/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/12/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/google/osv-scanner",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/aquasecurity/trivy",
+    "facts": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/5/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/rustsec/rustsec",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/embarkstudios/cargo-deny",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/7/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/ossf/malicious-packages",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/9/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/9/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/sigstore/cosign",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/security-supply-chain/11/fit"
+    }
+   }
+  ],
+  "reopen": [
+   {
+    "trigger": "retained_failure",
+    "ref": "@RETURNS@#/failures/security-supply-chain"
+   }
+  ]
+ }
+]

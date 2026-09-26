@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-falk-brauer-kumo-nautilus-alpaca-adapter",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/FALK-BRAUER/kumo-nautilus-alpaca-adapter",
+ "reviewed_commit": "cdc698c2db289c230b7ab3bc9133e78b0d5312e5",
+ "readme_path": "README.md",
+ "license": "LGPL-3.0",
+ "layers": [
+  "execution-broker"
+ ],
+ "claim": "Source and documentation review of FALK-BRAUER/kumo-nautilus-alpaca-adapter at commit cdc698c2db289c230b7ab3bc9133e78b0d5312e5 (license LGPL-3.0), read from README.md at that commit. Repository description: \"Alpaca US-equity data and execution adapter for NautilusTrader\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 0,
+  "pushed_at": "2026-09-20T08:17:11Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@cdc698c2db289c230b7ab3bc9133e78b0d5312e5",
+   "text": "Alpaca US-equity data and execution clients for NautilusTrader 1.229.0. Python package: `kumo_nautilus_alpaca`. Python 3.13 is required."
+  },
+  {
+   "source": "README.md@cdc698c2db289c230b7ab3bc9133e78b0d5312e5",
+   "text": "- Historical raw OHLCV bars, paginated REST reads, and live bars/trades/quotes. - Equity definitions with canonical `SYMBOL.MIC` instrument IDs. - Order submission, native brackets, cancellation, modification, and reconciliation. - Per-execution fill reports with stable venue activity IDs. Fills arrive through reconciliation; an account trade-updates WebSocket is not implemented. - Broker account, equity curve, position drift, and skipped-order bus messages."
+  },
+  {
+   "source": "README.md@cdc698c2db289c230b7ab3bc9133e78b0d5312e5",
+   "text": "This extraction has offline tests. It has not completed an independent paper-account smoke test as a standalone package. Paper endpoints are the default; a host can explicitly configure other endpoints. The package never originates strategy orders."
+  }
+ ]
+}

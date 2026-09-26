@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-ukgovernmentbeis-inspect-ai",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+ "reviewed_commit": "0a55d2e25351515d76dbef74227d6a13dfe552af",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "quality-evaluation"
+ ],
+ "claim": "Source and documentation review of UKGovernmentBEIS/inspect_ai at commit 0a55d2e25351515d76dbef74227d6a13dfe552af (license MIT), read from README.md at that commit. Repository description: \"Inspect: A framework for large language model evaluations\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 2859,
+  "pushed_at": "2026-09-26T14:08:49Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@0a55d2e25351515d76dbef74227d6a13dfe552af",
+   "text": "[<img width=\"295\" src=\"https://inspect.aisi.org.uk/images/aisi-logo.svg\" />](https://aisi.gov.uk/)"
+  },
+  {
+   "source": "README.md@0a55d2e25351515d76dbef74227d6a13dfe552af",
+   "text": "Welcome to Inspect, a framework for large language model evaluations created by the [UK AI Security Institute](https://aisi.gov.uk/)."
+  },
+  {
+   "source": "README.md@0a55d2e25351515d76dbef74227d6a13dfe552af",
+   "text": "Inspect provides many built-in components, including facilities for prompt engineering, tool usage, multi-turn dialog, and model graded evaluations. Extensions to Inspect (e.g. to support new elicitation and scoring techniques) can be provided by other Python packages."
+  }
+ ]
+}

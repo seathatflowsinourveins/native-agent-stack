@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-comet-ml-opik",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/comet-ml/opik",
+ "reviewed_commit": "dab7b18667cf47f7fec768f1c2eb1101db524532",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "quality-evaluation"
+ ],
+ "claim": "Source and documentation review of comet-ml/opik at commit dab7b18667cf47f7fec768f1c2eb1101db524532 (license Apache-2.0), read from README.md at that commit. Repository description: \"Debug, evaluate, and monitor your LLM applications, RAG systems, and agentic workflows with comprehensive tracing, automated evaluations, and production-ready dashboards.\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 22249,
+  "pushed_at": "2026-09-26T13:42:43Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@dab7b18667cf47f7fec768f1c2eb1101db524532",
+   "text": "Opik covers the full LLM application lifecycle, from the first trace in development to production monitoring, for teams building LLM apps and AI agents. Key offerings include:"
+  },
+  {
+   "source": "README.md@dab7b18667cf47f7fec768f1c2eb1101db524532",
+   "text": "- **AI Agent Tracing & Observability**: Deep tracing of LLM calls, conversation logging, and agent activity, with full trace trees for multi-step agents and tool calls. - **LLM Evaluation**: Datasets, experiments, and LLM-as-a-judge metrics for hallucination detection, moderation, and RAG assessment. - **Prompt & Agent Optimization**: The Opik Agent Optimizer SDK to improve prompts and agents. - **Production-Ready Monitoring**: Scalable dashboards and online evaluation rules. - **Opik Guardrails"
+  },
+  {
+   "source": "README.md@dab7b18667cf47f7fec768f1c2eb1101db524532",
+   "text": "- **Development & Tracing:** - Track all LLM calls and traces with detailed context during development and in production ([Quickstart](https://www.comet.com/docs/opik/quickstart/?from=llm&utm_source=opik&utm_medium=github&utm_content=quickstart_link&utm_campaign=opik)). - Extensive 3rd-party integrations for easy observability: Seamlessly integrate with a growing list of frameworks, supporting many of the largest and most popular ones natively (including recent additions like **Google ADK**, **A"
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-dfahrn-securities-master",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/dfahrn/securities-master",
+ "reviewed_commit": "0016e04d5410dc317f71d8bede6fd58519ffe1ad",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "identity-provenance"
+ ],
+ "claim": "Source and documentation review of dfahrn/securities-master at commit 0016e04d5410dc317f71d8bede6fd58519ffe1ad (license NOASSERTION), read from README.md at that commit. Repository description: \"Securities master database for US cash equities: point-in-time identity, survivorship-bias-free universe construction, and honestly-measured coverage gaps.\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 0,
+  "pushed_at": "2026-09-23T03:11:26Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@0016e04d5410dc317f71d8bede6fd58519ffe1ad",
+   "text": "A securities master database for US cash equities, built to support quantitative research and backtesting. It exists to answer questions like \"what did ticker `XYZ` refer to on 2013-06-01\" and \"which securities existed on that date\" correctly, including for companies that have since been delisted, renamed, or recycled their ticker."
+  },
+  {
+   "source": "README.md@0016e04d5410dc317f71d8bede6fd58519ffe1ad",
+   "text": "- **Survivorship-bias freedom.** Delisted companies stay in the database with their delisting dates. - **Point-in-time correctness.** The system answers what was knowable on a given date, not only what is known now. - **Corporate action correctness.** Splits and dividends are modeled as events and price adjustment is derived from them, never trusted from a vendor."
+  },
+  {
+   "source": "README.md@0016e04d5410dc317f71d8bede6fd58519ffe1ad",
+   "text": "The live database currently holds 6,072 issuers and 7,696 listed securities derived from SEC EDGAR. Every known gap between what the schema claims and what the data delivers is recorded in the Approximation Ledger at the end of [docs/notes/phase-2a-issuer-model.md](docs/notes/phase-2a-issuer-model.md), with the phase expected to close it."
+  }
+ ]
+}

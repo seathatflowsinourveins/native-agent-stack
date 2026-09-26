@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-bashtage-linearmodels",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/bashtage/linearmodels",
+ "reviewed_commit": "ec0f288906af00e1bada43b5a802a0c7a746c292",
+ "readme_path": "README.md",
+ "license": "NCSA",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of bashtage/linearmodels at commit ec0f288906af00e1bada43b5a802a0c7a746c292 (license NCSA), read from README.md at that commit. Repository description: \"Additional linear models including instrumental variable and panel data models that are missing from statsmodels.\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1071,
+  "pushed_at": "2026-09-21T13:05:20Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@ec0f288906af00e1bada43b5a802a0c7a746c292",
+   "text": "Linear (regression) models for Python. Extends [statsmodels](http://www.statsmodels.org) with Panel regression, instrumental variable estimators, system estimators and models for estimating asset prices:"
+  },
+  {
+   "source": "README.md@ec0f288906af00e1bada43b5a802a0c7a746c292",
+   "text": "- **Panel models**: - Fixed effects (maximum two-way) - First difference regression - Between estimator for panel data - Pooled regression for panel data - Fama-MacBeth estimation of panel models"
+  },
+  {
+   "source": "README.md@ec0f288906af00e1bada43b5a802a0c7a746c292",
+   "text": "- **Instrumental Variable estimators** - Two-stage Least Squares - Limited Information Maximum Likelihood - k-class Estimators - Generalized Method of Moments, also with continuously updating"
+  }
+ ]
+}

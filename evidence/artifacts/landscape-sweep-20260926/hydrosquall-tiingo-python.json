@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-hydrosquall-tiingo-python",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/hydrosquall/tiingo-python",
+ "reviewed_commit": "4d9a9776a811efb5b70b3238e31363f84fabab94",
+ "readme_path": "README.rst",
+ "license": "MIT",
+ "layers": [
+  "market-data-reference"
+ ],
+ "claim": "Source and documentation review of hydrosquall/tiingo-python at commit 4d9a9776a811efb5b70b3238e31363f84fabab94 (license MIT), read from README.rst at that commit. Repository description: \"Python client for interacting with the Tiingo Financial Data API (stock ticker and news data)\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 319,
+  "pushed_at": "2025-12-14T05:20:08Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.rst@4d9a9776a811efb5b70b3238e31363f84fabab94",
+   "text": ".. image:: https://img.shields.io/pypi/v/tiingo.svg?maxAge=600 :target: https://pypi.python.org/pypi/tiingo"
+  },
+  {
+   "source": "README.rst@4d9a9776a811efb5b70b3238e31363f84fabab94",
+   "text": ".. image:: https://img.shields.io/codecov/c/github/hydrosquall/tiingo-python.svg?maxAge=600 :target: https://codecov.io/gh/hydrosquall/tiingo-python :alt: Coverage"
+  },
+  {
+   "source": "README.rst@4d9a9776a811efb5b70b3238e31363f84fabab94",
+   "text": ".. image:: https://readthedocs.org/projects/tiingo-python/badge/?version=latest&maxAge=600 :target: https://tiingo-python.readthedocs.io/en/latest/?badge=latest :alt: Documentation Status"
+  }
+ ]
+}

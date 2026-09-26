@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-databento-databento-python",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/databento/databento-python",
+ "reviewed_commit": "25eef4ee8e66559e2370166a57c20925ce244d49",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "market-data-reference"
+ ],
+ "claim": "Source and documentation review of databento/databento-python at commit 25eef4ee8e66559e2370166a57c20925ce244d49 (license Apache-2.0), read from README.md at that commit. Repository description: \"The official Python client library for Databento\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 302,
+  "pushed_at": "2026-09-25T02:03:36Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@25eef4ee8e66559e2370166a57c20925ce244d49",
+   "text": "The official Python client library for [Databento](https://databento.com)."
+  },
+  {
+   "source": "README.md@25eef4ee8e66559e2370166a57c20925ce244d49",
+   "text": "Key features include: - Fast, lightweight access to both live and historical data from [multiple markets](https://databento.com/docs/faqs/venues-and-publishers). - [Multiple schemas](https://databento.com/docs/schemas-and-data-formats/whats-a-schema?historical=python&live=python) such as MBO, MBP, top of book, OHLCV, last sale, and more. - [Fully normalized](https://databento.com/docs/standards-and-conventions/normalization?historical=python&live=python), i.e. identical message schemas for both "
+  },
+  {
+   "source": "README.md@25eef4ee8e66559e2370166a57c20925ce244d49",
+   "text": "## Documentation The best place to begin is with our [Getting started](https://databento.com/docs/quickstart?historical=python&live=python) guide."
+  }
+ ]
+}

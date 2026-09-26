@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-flyteorg-flyte",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/flyteorg/flyte",
+ "reviewed_commit": "15dc7d4a922bb34d4ee1cac23347bda7f88757ee",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "data-quality-orchestration"
+ ],
+ "claim": "Source and documentation review of flyteorg/flyte at commit 15dc7d4a922bb34d4ee1cac23347bda7f88757ee (license Apache-2.0), read from README.md at that commit. Repository description: \"Dynamic, resilient AI orchestration. Coordinate data, models, and compute as you build AI workflows.\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 7577,
+  "pushed_at": "2026-09-25T21:52:14Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@15dc7d4a922bb34d4ee1cac23347bda7f88757ee",
+   "text": "> [!IMPORTANT] > ## Flyte 2 is now generally available! > > Read more in the announcement [here](https://www.union.ai/blog-post/flyte-2-is-generally-available-the-durable-open-source-ai-runtime). > > Want to try Flyte 2 locally? Run the **[Devbox locally](https://www.union.ai/docs/v2/flyte/user-guide/get-started/run-modes/running-devbox/)**, > or you can try it on Github Codespaces. > > [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flyteorg/flyte-"
+  },
+  {
+   "source": "README.md@15dc7d4a922bb34d4ee1cac23347bda7f88757ee",
+   "text": "**Reliably orchestrate ML pipelines, models, and agents at scale — in pure Python.**"
+  },
+  {
+   "source": "README.md@15dc7d4a922bb34d4ee1cac23347bda7f88757ee",
+   "text": "Flyte is a Graduated project of the [LF AI & Data Foundation](https://lfaidata.foundation/projects/flyte/)."
+  }
+ ]
+}

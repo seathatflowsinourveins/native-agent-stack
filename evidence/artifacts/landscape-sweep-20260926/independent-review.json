@@ -1,0 +1,106 @@
+{
+ "schema_version": 1,
+ "id": "landscape-sweep-20260926-independent-review",
+ "kind": "independent_review",
+ "reviewer": "a separate headless Claude Code session (claude -p, model opus) with read-only tools (Read, Grep, Glob, Bash; Edit, Write, Agent and Workflow disallowed)",
+ "reviewed": "commits d89265a7 and 3a47b331, and the first versions of the gitleaks allowlist and of this record (both replaced on this branch by the repaired versions)",
+ "review_round": "three reviews, each followed by one repair round: the first at the top level of this file, the second under second_round, the third under third_round; the trading lane's correction is under trading_lane_correction",
+ "verdict": "needs_changes",
+ "checks_reported": 43,
+ "findings": [
+  {
+   "severity": "low",
+   "file": "tools/sota-convergence/landscape-sweep/source_reviews.py",
+   "claim": "hub_get catches only URLError, OSError and ValueError. http.client.HTTPException subclasses raised by getresponse() or response.read() (IncompleteRead, BadStatusLine) are not HubError or GhError. main() catches only (GhError, KeyError, ValueError) and writes files after the loop, so one truncated Hub response aborts the whole run with a traceback and writes no reviews, including the GitHub ones. The docstring promises the repository is 'reported and skipped'.",
+   "disposition": "repaired in 41f53cb1: hub_get also catches http.client.HTTPException"
+  },
+  {
+   "severity": "low",
+   "file": ".gitleaks.toml",
+   "claim": "The allowlist is rule-, path- and line-scoped, but it ignores the value. A pin line holding any bare 40-hex value is exempt: uppercase (not a git commit id), or free text such as 'sourcegraph legacy access token <hex>'. That is exactly the sourcegraph-access-token rule's bare [a-fA-F0-9]{40} alternative, the legacy token shape. Only underscore forms (sgp_...) stay caught. The 2026-09-23 entry required one lowercase 40-hex id, and the ai-memory entry pins values. This one could require \\b[0-9a-f]{40}\\b or pin the 60 reviewed ids.",
+   "disposition": "repaired in 9522b5cf: the allowlist pins the 39 reviewed commit ids by value (secret target) instead of a pin-line shape, so any other 40-hex value, an uppercase variant or an sgp_ token stays detected (test_d3/test_d4)"
+  },
+  {
+   "severity": "low",
+   "file": "tools/sota-convergence/landscape-sweep/source_reviews.py",
+   "claim": "by_repo is keyed by slug(), which for a Hugging Face URL returns the whole lowercased URL. HUB_MODEL accepts both https://huggingface.co/Org/M and .../Org/M/. If two layers keep the same model with and without the trailing slash, the tool writes two hash-suffixed reviews and exits 0, instead of one review whose layers names both. GitHub URLs are normalized by slug().",
+   "disposition": "repaired in 41f53cb1: survivors are grouped by repository_key (hf:<namespace>/<name>), and make_result.py matches reviews without trailing slashes"
+  },
+  {
+   "severity": "low",
+   "file": "tools/sota-convergence/landscape-sweep/source_reviews.py",
+   "claim": "The YAML front-matter strip requires the card to start with '---'. Upstream huggingface_hub repocard.REGEX_YAML_BLOCK allows leading whitespace (^\\s*---) and requires the closing '---' to end its line. A card with a leading newline keeps its metadata block, which is then excerpted, contrary to the docstring.",
+   "disposition": "repaired in 41f53cb1: the card metadata block is stripped with huggingface_hub's repocard.REGEX_YAML_BLOCK"
+  },
+  {
+   "severity": "low",
+   "file": "evidence/artifacts/landscape-sweep-20260926/README.md",
+   "claim": "The retained files do not support several timing observations. 'At 13:52Z they were still looping' appears in no retained file. The limit-3 times '04:15Z' (re-sign-in), '04:17Z to 05:35Z' (fit queue) and 'about 03:57Z' (runner change) appear only in the limit text copied into lanes.json and the manifest. The 8 never-started fit jobs have no started or finished times in returns.json. Only the 03:47-03:55Z interval is backed by job timestamps.",
+   "disposition": "repaired in the record: gpt6-jobs.json keeps the job timeline, the stuck-runner observation and the cited incident-log entries; lane limit 3 names its sources"
+  },
+  {
+   "severity": "low",
+   "file": "evidence/artifacts/landscape-sweep-20260926/README.md",
+   "claim": "Limit 4 says that of '46 seeds that name a repository' no worker proposed 11, but the count is GitHub-only without saying so. The agents-models-workers seed names Hugging Face model repositories. One of them, Qwen/Qwen3.8-27B, was proposed by no worker, including the capped 'dropped' lists, yet it is not among the 11. The README elsewhere treats hf: model repositories as repositories. The name-to-repository mapping behind '46' is not retained, so the count cannot be reproduced.",
+   "disposition": "repaired in the record: lane limit 4 counts the 50 seeds that name a GitHub or Hugging Face repository and lists Qwen/Qwen3.8-27B among the 12 no worker proposed"
+  }
+ ],
+ "limitations": [
+  "Same model family as the recorder; the Codex cross-family review was not run because another session's GPT-6 jobs were using the shared Codex account at the time."
+ ],
+ "second_round": {
+  "reviewer": "the coordinator's workflow reviewers (Claude Opus), reading the committed branch",
+  "reviewed": "commit 22dfcb45 (this record, its tools and the ledger append)",
+  "verdict": "needs_changes",
+  "findings": [
+   {
+    "severity": "high",
+    "file": "evidence/artifacts/landscape-sweep-20260926/README.md, the manifest's lane limits and the ledger note",
+    "claim": "The session's WebSearch budget (200 calls) ran out at 04:10:13Z and nothing in the record said so: 154 calls returned results and 46 were capped, in 30 workers, so the refutation phase, the critic and the follow-up round ran without WebSearch. votes/identity-provenance/3/facts refuted databento/databento-python for want of a search. refute-fit:agent-sdks was capped, yet agent-sdks counted as clean. The lane's budgets exceed the cap, and convert.py did not flag capped calls.",
+    "verification": "Reproduced from the transcripts by pairing every WebSearch tool_use with its tool_result: 200 calls, 154 with results, 46 capped (200 of 200), first 04:10:13.805Z, last 11:55:57.115Z. The cap and its env variable are documented (tools-reference, 'Session search limit'; env-vars), and the 2.1.283 client sets the default to 200.",
+    "disposition": "repaired in 1bd2416b and this record: child-usage.mjs counts capped calls; convert.py makes each capped worker a web_search_capped retained failure (the critic's for every layer), so every layer is reopened; make_result.py refuses uncovered capped workers; lane limit 10, the README section 'WebSearch session cap', a ledger note, and the harness README and recipe on raising the cap"
+   },
+   {
+    "severity": "medium",
+    "file": "catalogs/saturation/ledger.json",
+    "claim": "The ledger note said the nine layers' proposals are recorded as refuted by the missing vote, against the incident log's 'never as refuted-by-absence'. 27 proposals that passed facts and the Claude fit refuter sit under refuted, and build_inputs.py (previous_sweep.refuted) and saturation_ledger.py (adjudicated_repos) treat them as adjudicated.",
+    "verification": "Reproduced: 27 refuted entries in 9 layers whose only refuting vote is a missing GPT-6 member.",
+    "disposition": "repaired in 1bd2416b and this record: refutes_on_merit and refuted_by_absence read the missing marker, adjudicated_repos leaves such entries out, build_inputs.py lists them as not_adjudicated, convert.py names them in each layer's votes_note, and the ledger note says so. The offered alternative, collecting the nine GPT-6 fit votes before appending, was not taken: those would be votes of a new model run, not of this run; the verdict wave takes the 27 as its first candidates for a second-family fit vote."
+   }
+  ],
+  "limitations": [
+   "Same model family as the recorder; no Codex review of the repair was run."
+  ]
+ },
+ "third_round": {
+  "reviewer": "a read-only GPT-6-Astra review (Codex CLI, max effort, live web search) run by the coordinator",
+  "reviewed": "the record's checkout on branch claude/landscape-sweep-20260926-record after lane limit 11, the lead-vetting addendum and the registration commit",
+  "verdict": "NOT_READY",
+  "findings": [
+   {
+    "severity": "P2",
+    "file": "examples/claude-native/workflows/child-usage.mjs:179",
+    "claim": "A retry fixture returns status complete although a superseded attempt holds an assistant message without provider usage, so downstream usage can be marked complete falsely.",
+    "verification": "Reproduced: test-child-usage.mjs regressions for a superseded attempt with a message without provider usage, with usage but no resolved model, and without a transcript, and the CLI exit, failed before the repair (4 failed, 47 passed).",
+    "disposition": "repaired in 7760b1da: an attempt's usage-integrity failures are its usage_issues, and a superseded attempt with any makes the run incomplete (an attempt without requests still counts as zero usage). The three usage records were re-measured at 7760b1da: each child_usage is unchanged, wf_8397ada1-777 stays complete (none of its 8 superseded attempts has uncounted usage), so lower_bound_usage and the ledger outcome are unchanged; only the records' measurement fields and the ledger's usage hashes changed."
+   },
+   {
+    "severity": "P2",
+    "file": "tools/sota-convergence/landscape-sweep/make_result.py:98",
+    "claim": "With token-efficiency's critic-cap failure and its reopen entry removed in memory, the check still passes, because another layer's critic failure satisfies a global coverage check; the layer then derives a clean count of 1.",
+    "verification": "Reproduced in tests/test_landscape_sweep_harness.py (test_failure_coverage_is_checked_per_worker_and_per_layer): the critic's cap failure, then its effort deviation, dropped from one of two healthy layers, and a worker's failure moved to the other layer; make_result accepted all three before the repair.",
+    "disposition": "repaired in 7760b1da: effort_deviation and web_search_capped coverage is checked per worker and per layer with convert.py's mapping (deviation_rounds, moved to sweep_common.py); the critic's failure is required in every layer of the record. This record passes it: make_result.py builds the same RESULT.json."
+   }
+  ],
+  "limitations": [
+   "The review's own output is not retained here; the findings are as the coordinator reported them, and each was reproduced in this checkout before its repair.",
+   "No review of this repair round was run."
+  ]
+ },
+ "trading_lane_correction": {
+  "reviewer": "the trading lane's review of #357",
+  "claim": "The execution-broker proposal of wboayue/rust-ibapi (a re-pin through nautilus_trader PR #5041) says \"rc5 also stays blocked by open issue #4983\" and \"cases rc5 fails (the #4983 local order denial)\".",
+  "verification": "gh api, read 2026-09-26: #4983's body reports Version v1.227.0; commit 1b0a49d2 is identical to tag v2.0.0rc5, and there crates/adapters/interactive_brokers/src/execution/core.rs:493-495 overrides handles_order_venue to return true, so the ClientVenueMismatch denial behind crates/execution/src/engine/mod.rs:2222 cannot fire for the IB client; the open PR #280 reclassifies #4983 in catalogs/us-equities/runtime-target.json.",
+  "disposition": "lane limit 12, dated 2026-09-26: read instead that rc5 IBKR execution is unqualified (no rc5 stock order observed); the proposal text, its votes and its survival are unchanged."
+ }
+}

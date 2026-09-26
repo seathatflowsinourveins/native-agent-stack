@@ -1,0 +1,2893 @@
+{
+ "schema_version": 1,
+ "id": "landscape-sweep-20260926-tavily-leads-vetting",
+ "sweep_id": "landscape-sweep-20260926",
+ "kind": "discovery_completeness_addendum",
+ "evidence_class": "Discovery-completeness evidence, not a verdict: a screen of the Tavily Research leads the sweep missed and the sweep's refuter votes on the leads it kept. It is not a ledger record and changes no layer count; nothing was installed, run or benchmarked, and no winner changed.",
+ "workflow_run": "wf_6a6cb7b8-c22",
+ "workflow_status": "completed",
+ "window_utc": {
+  "first_transcript_event": "2026-09-26T14:11:51Z",
+  "last_transcript_event": "2026-09-26T15:27:54Z",
+  "gpt6_jobs_started": [
+   "2026-09-26T14:40:39Z",
+   "2026-09-26T15:20:52Z"
+  ],
+  "gpt6_jobs_finished": [
+   "2026-09-26T14:44:13Z",
+   "2026-09-26T15:25:34Z"
+  ]
+ },
+ "source": {
+  "return": "the Workflow run's return, read from the run record after the run; the coordinator's digest of it (scratchpad leads-result.json) equals that return",
+  "return_sha256": "77a95c45b216314898b162861f2708908d3899780c6439118b0afea7f0003e1d",
+  "return_sha256_note": "sha256 of the digest file's bytes; the file is not retained (it names private paths)",
+  "workflow_script_sha256": "51634051d7dc6f2913cd98deea35e9154ebbf587a642b2e9f994740bc0f319ed",
+  "workflow_script_note": "sha256 of the Workflow script the run record holds (name tavily-leads-vetting-20260926); not retained, because it names the private work directory",
+  "leads_ref": "evidence/artifacts/landscape-sweep-20260926/tavily-leads.json"
+ },
+ "method": {
+  "leads": "Every GitHub slug that the prototype tavily_crosscheck.py counted as missed: 136 in 30 layers (tavily-leads.json splits them into 11 in the layer input, 57 in this repository's catalogs, 4 proposed in another layer and 64 remaining leads). All 136 went to the screen.",
+  "screen": "One Claude screener per layer (requested sonnet, effort max) was told to check each lead through gh api and its README, to dismiss each non-candidate with a reason (documentation, lists, archived or dormant, off the requirement, a duplicate of a winner or known alternative, infeasible on the hosts) and to write a proposal in the sweep's discovery format for each other lead, labelled targeted_candidate, keep_but_compare or not_adopted.",
+  "refuters": "For each layer with a proposal other than not_adopted (15 layers), the sweep's three votes on those proposals, following the sweep's templates (templates.json 'common' plus 'facts' or 'fit') on the layer input: the facts refuter (requested sonnet, effort max), the Claude fit refuter (requested opus, effort max) and the GPT-6 fit refuter (gpt-6-astra through the Codex CLI at effort max, started by a sonnet wrapper through the sweep's prototype runner).",
+  "survival_rule": "As in the sweep: a proposal survives only when the facts refuter and both fit refuters vote not refuted, and a missing vote counts as refuted (no vote was missing).",
+  "repositories": "Lowercase owner/repo slugs, normalized as the coordinator's leads_votes.py does (github.com URL to owner/repo, .git and slashes stripped); votes are matched to proposals by that slug. The workflow's own matching (lowercased, trailing slash stripped) gives the same 0 survivors. Two screen entries name another repository than their lead, recorded under lead: the lead redirects to it or is its wrapper.",
+  "excerpts": "reasoning_excerpt and demonstrated_gap_excerpt keep the first 300 characters after sanitization, and a cut excerpt ends with …. Dismissal reasons and refs are kept whole. upstream_now is the screener's report, not a new check.",
+  "sanitization": "The scratch work directory and the checkout path were replaced with <work-dir>, <scratchpad> and <checkout>, then scripts/host_receipts.py sanitize() ran on every string. In the retained layers that left one <checkout> (a facts refuter's ref to a local grep of the checkout). Afterwards host_receipts.iter_receipt_strings() over the document finds no scripts/validate.py PRIVATE_CONTENT match and no host path. Every 40-hex id inside a string (23: 22 commit ids in refs and the usage measurement's tool_commit) is shortened to its first 12 characters, as in returns.json and lanes.json, because this file names sourcegraph/* leads and gitleaks' sourcegraph-access-token rule then reads a 40-hex value as a token; the usage record keeps the full tool_commit."
+ },
+ "limitations": [
+  "Claude without WebSearch: the vetting ran in the coordinator session after its WebSearch cap (lane limit 10 of catalogs/sota-convergence/manifest-20260926.json). Its two Claude WebSearch calls, by screen:semantic-rag and refute-fit:observation-inference:leads, were both capped (usage.claude.web_search), so no Claude screener or refuter had WebSearch results; their live upstream reads could go only through gh api and WebFetch. The sweep's templates tell a refuter to default to refuted when uncertain, so the missing search may have pushed Claude votes toward refuted. The Claude fit refuter refuted all 29 kept proposals.",
+  "GPT-6 cached web search: the 15 GPT-6 fit jobs ran through the sweep's prototype runner as codex --search exec (14:40:39Z to 15:25:34Z), before its change to -c web_search=\"live\" at 16:36:56Z, so they searched Codex's cached web index, not the live web (lane limit 11 of catalogs/sota-convergence/manifest-20260926.json). Release and activity facts they cite may lag upstream."
+ ],
+ "totals": {
+  "layers": 30,
+  "leads": 136,
+  "dismissed": 100,
+  "proposed": 36,
+  "not_adopted": 7,
+  "kept": 29,
+  "layers_with_kept": 15,
+  "votes": {
+   "facts": 29,
+   "fit_claude": 29,
+   "fit_gpt6": 29
+  },
+  "missing_votes": 0,
+  "refuted": {
+   "facts": 4,
+   "fit_claude": 29,
+   "fit_gpt6": 21
+  },
+  "survivors": 0,
+  "split_gpt6_not_refuted_claude_refuted": 8,
+  "split_cases": [
+   {
+    "layer_id": "data-quality-orchestration",
+    "repository": "apache/airflow",
+    "facts_refuted": true
+   },
+   {
+    "layer_id": "document-retrieval",
+    "repository": "grobidorg/grobid",
+    "facts_refuted": false
+   },
+   {
+    "layer_id": "git-github-automation",
+    "repository": "kbrdn1/gwm-cli",
+    "facts_refuted": false
+   },
+   {
+    "layer_id": "git-github-automation",
+    "repository": "peter-evans/create-pull-request",
+    "facts_refuted": false
+   },
+   {
+    "layer_id": "hosting-services",
+    "repository": "abiosoft/colima",
+    "facts_refuted": false
+   },
+   {
+    "layer_id": "isolation",
+    "repository": "google/nsjail",
+    "facts_refuted": false
+   },
+   {
+    "layer_id": "observation-inference",
+    "repository": "victoriametrics/victorialogs",
+    "facts_refuted": false
+   },
+   {
+    "layer_id": "observation-inference",
+    "repository": "victoriametrics/victoriametrics",
+    "facts_refuted": false
+   }
+  ],
+  "skills_usage": {
+   "screen": {},
+   "facts": {
+    "verification-before-completion": 2,
+    "fp-check": 1
+   },
+   "fit_claude": {
+    "verification-before-completion": 14,
+    "fp-check": 5,
+    "supply-chain-risk-auditor": 2
+   },
+   "fit_gpt6": {
+    "verification-before-completion": 11,
+    "fp-check": 11,
+    "supply-chain-risk-auditor": 10,
+    "search-first": 1,
+    "iterative-retrieval": 1
+   }
+  },
+  "skills_usage_note": "each worker's own skills_used report, counted per report; nothing else checked them"
+ },
+ "usage": {
+  "claude": {
+   "ref": "evidence/artifacts/landscape-sweep-20260926/child-usage-wf_6a6cb7b8-c22.json",
+   "status": "complete",
+   "children": 75,
+   "by_role": {
+    "gpt6-refute-fit": {
+     "children": 15,
+     "resolved_models": [
+      "claude-sonnet-5"
+     ],
+     "efforts": [
+      "max"
+     ]
+    },
+    "refute-facts": {
+     "children": 15,
+     "resolved_models": [
+      "claude-sonnet-5"
+     ],
+     "efforts": [
+      "max"
+     ]
+    },
+    "refute-fit": {
+     "children": 15,
+     "resolved_models": [
+      "claude-opus-5-5"
+     ],
+     "efforts": [
+      "max"
+     ]
+    },
+    "screen": {
+     "children": 30,
+     "resolved_models": [
+      "claude-sonnet-5"
+     ],
+     "efforts": [
+      "max"
+     ]
+    }
+   },
+   "by_resolved_model": {
+    "claude-sonnet-5": {
+     "children": 60,
+     "input_tokens": 850,
+     "output_tokens": 1626358,
+     "cache_read_input_tokens": 23948887,
+     "cache_creation_input_tokens": 3766516
+    },
+    "claude-opus-5-5": {
+     "children": 15,
+     "input_tokens": 482,
+     "output_tokens": 532024,
+     "cache_read_input_tokens": 17432041,
+     "cache_creation_input_tokens": 1442658
+    }
+   },
+   "web_search": {
+    "calls": 2,
+    "capped": 2,
+    "capped_children": [
+     "screen:semantic-rag",
+     "refute-fit:observation-inference:leads"
+    ]
+   },
+   "measurement": {
+    "tool": "native-agent-stack examples/claude-native/workflows/child-usage.mjs",
+    "tool_commit": "a8b6470ed80a",
+    "exit_code": 0,
+    "measured_at_utc": "2026-09-26T16:54:31Z"
+   }
+  },
+  "gpt6": {
+   "jobs": 15,
+   "exit_0": 15,
+   "input_tokens": 8401965,
+   "cached_input_tokens": 7047936,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 105625,
+   "reasoning_output_tokens": 74715,
+   "source": "the sum over the 15 jobs of each job's Codex counters (layers[].gpt6_fit_job.usage)"
+  },
+  "note": "Claude usage per resolved model from the retained usage record; GPT-6 usage from Codex's counters. cached_input_tokens is part of input_tokens and reasoning_output_tokens part of output_tokens. The Claude and Codex counters are never summed."
+ },
+ "layers": [
+  {
+   "layer_id": "agent-sdks",
+   "catalog": "foundation",
+   "leads": [
+    "deepset-ai/haystack",
+    "langchain-ai/langchain",
+    "langchain-ai/langgraphjs",
+    "microsoft/agent-framework",
+    "microsoft/autogen",
+    "tsharp/agent-runtime"
+   ],
+   "dismissed": [
+    {
+     "repository": "deepset-ai/haystack",
+     "reason": "RAG/search-app agent-building framework (retrieval, routing, generation; v3.2.0 released 2026-09-24) with a real Agent/tool-calling API, but built for constructing new RAG/QA/search applications, not for wrapping or controlling an existing native CLI coding-agent worker's session -- off-target for this layer's SDK-for-worker-session-control requirement."
+    },
+    {
+     "repository": "langchain-ai/langgraphjs",
+     "reason": "JS/TS runtime port of the already-tracked known alternative langchain-ai/langgraph ('unqualified'); same product and tagline ('build resilient language agents as graphs'), no capability distinct from the Python LangGraph already on record, and no Node-hosted worker need identified for this Python/Rust-centric stack's hosts."
+    },
+    {
+     "repository": "tsharp/agent-runtime",
+     "reason": "Solo-maintainer Rust crate (owner Travis Sharp holds 29 of 32 commits, the rest an automated Copilot bot; 0 watchers, 1 fork, 4 open issues) whose only tagged release (v0.4.0, 2026-05-16) is already behind its own later unreleased commits (2026-09-03) -- not a maintained software candidate despite being topically on point (MCP tool calls, unified event stream)."
+    }
+   ],
+   "not_adopted": [
+    {
+     "repository": "microsoft/autogen",
+     "upstream_now": {
+      "latest_release": "python-v0.7.5",
+      "released_at": "2025-09-30",
+      "pushed_at": "2026-04-15",
+      "archived": false,
+      "license": "CC-BY-4.0",
+      "stars": 61176
+     },
+     "demonstrated_gap_excerpt": "None versus the current winner or tracked alternatives: AutoGen's own README banner and CAUTION block state it is in maintenance mode, 'will not receive new features or enhancements,' and direct new users to microsoft/agent-framework. Its last functional commits are 2026-04-06 ('update maintenance …"
+    },
+    {
+     "repository": "langchain-ai/langchain",
+     "upstream_now": {
+      "latest_release": "langchain-core==1.6.5",
+      "released_at": "2026-09-24",
+      "pushed_at": "2026-09-26",
+      "archived": false,
+      "license": "MIT",
+      "stars": 147091
+     },
+     "demonstrated_gap_excerpt": "None beyond what the already-tracked alternative langchain-ai/langgraph covers: LangChain's own README states 'If you're looking for more advanced customization or agent orchestration, check out LangGraph, our framework for building controllable agent workflows' -- the exact 'session control' capab…"
+    }
+   ],
+   "kept": [
+    {
+     "repository": "microsoft/agent-framework",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "python-1.19.0",
+      "released_at": "2026-09-18",
+      "pushed_at": "2026-09-25",
+      "archived": false,
+      "license": "MIT",
+      "stars": 13810
+     },
+     "demonstrated_gap_excerpt": "Combines, in one MIT-licensed, actively maintained SDK (weekly Python releases: python-1.19.0 2026-09-18, python-1.18.0 2026-09-10, python-1.17.0 2026-09-03, python-1.16.0 2026-08-28; matching dotnet-1.20.0..1.22.0 track), two capabilities this layer currently tracks as separate, unresolved alterna…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.96,
+       "reasoning_excerpt": "Verified via `gh api repos/microsoft/agent-framework`: license MIT (spdx_id=MIT), archived=false, disabled=false, pushed_at=2026-09-25T19:09:24Z (exact), created_at=2025-04-28 (matches 'created 2025-04-28'), stargazers_count=13810 (exact match to '13,810 stars'). `gh api .../releases` confirms pyth…",
+       "refs": [
+        "https://github.com/microsoft/agent-framework",
+        "https://github.com/microsoft/agent-framework/releases",
+        "https://github.com/microsoft/agent-framework#readme",
+        "https://github.com/microsoft/autogen#readme"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.8,
+       "reasoning_excerpt": "Refuted on fit. The facts that check out (MIT license, archived=false, pushed 2026-09-25, weekly releases python-1.14.0 to 1.19.0, pure Python >=3.10 so it can run on both hosts) do not save it. (1) The main gap is credited to the wrong repository. Temporal-class durable multi-host state and replay…",
+       "refs": [
+        "https://github.com/microsoft/agent-framework",
+        "https://github.com/microsoft/agent-framework/releases",
+        "https://github.com/microsoft/agent-framework/blob/main/README.md",
+        "https://github.com/microsoft/agent-framework/tree/main/python/packages",
+        "https://github.com/microsoft/agent-framework/blob/main/python/packages/claude/pyproject.toml",
+        "https://github.com/microsoft/agent-framework/blob/main/python/packages/core/pyproject.toml",
+        "https://github.com/microsoft/agent-framework/blob/main/python/packages/core/agent_framework/_workflows/_checkpoint.py",
+        "https://github.com/microsoft/agent-framework/blob/main/python/packages/core/agent_framework/_workflows/_checkpoint_encoding.py",
+        "https://github.com/microsoft/agent-framework-durable-extension",
+        "https://github.com/microsoft/agent-framework-durable-extension/blob/main/README.md",
+        "https://github.com/microsoft/agent-framework-durable-extension/blob/main/python/packages/durabletask/pyproject.toml",
+        "https://learn.microsoft.com/en-us/azure/durable-task/scheduler/durable-task-scheduler",
+        "https://github.com/langchain-ai/langgraph/blob/main/README.md",
+        "https://github.com/microsoft/autogen",
+        "catalogs/landscape/candidate-quality-review.json#/candidates/4",
+        "catalogs/landscape/candidate-quality-review.json#/layer_coverage (foundation/workers challenger_repositories)",
+        "catalogs/sota-convergence/manifest-20260923.json#/foundation/16/candidates/0/adversarial_verification/votes/1",
+        "evidence/artifacts/comparison-progress-20260922/summary.json (lines 133-151)"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.9,
+       "reasoning_excerpt": "The proposal identifies orchestration capabilities, but no concrete worker need or incremental advantage over the already-known alternatives. LangGraph already documents checkpointed conversation continuity, human review, time travel and failure recovery, with SQLite/PostgreSQL persistence. [LangGr…",
+       "refs": [
+        "https://docs.langchain.com/oss/python/langgraph/persistence",
+        "https://learn.microsoft.com/en-us/agent-framework/workflows/checkpoints",
+        "https://github.com/microsoft/agent-framework-durable-extension",
+        "https://learn.microsoft.com/en-us/agent-framework/agents/providers/anthropic",
+        "https://github.com/microsoft/agent-framework/releases",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/comparison-progress-20260922/summary.json"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 659275,
+     "cached_input_tokens": 568832,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 6290,
+     "reasoning_output_tokens": 4315
+    }
+   }
+  },
+  {
+   "layer_id": "agents-models-workers",
+   "catalog": "us-equities",
+   "leads": [
+    "amikos-tech/chromadb-ops",
+    "bentoml/bentoml",
+    "chroma-core/chroma",
+    "huggingface/text-generation-inference",
+    "langchain-ai/langchain",
+    "predibase/lorax"
+   ],
+   "dismissed": [
+    {
+     "repository": "amikos-tech/chromadb-ops",
+     "reason": "Chroma maintenance/backup CLI, not a retrieval or memory system itself; dormant (gh api repos/amikos-tech/chromadb-ops, checked 2026-09-26: latest release 0.1.5 and last push both 2025-08-15T11:56:30Z, 19 stars) and Chroma is not an adopted store in this layer."
+    },
+    {
+     "repository": "bentoml/bentoml",
+     "reason": "General-purpose model-serving/packaging framework (inference APIs, job queues for arbitrary ML models; gh api repos/bentoml/BentoML, checked 2026-09-26: archived=false, pushed_at=2026-09-07T17:43:01Z, latest release v1.4.39 2026-05-07, Apache-2.0, 8865 stars) -- overlaps the already-considered vllm serving role and does not address this layer's stated requirement (durable project knowledge / exact-code / financial-source retrieval with source recovery)."
+    },
+    {
+     "repository": "huggingface/text-generation-inference",
+     "reason": "Archived (gh api repos/huggingface/text-generation-inference, checked 2026-09-26: archived=true; last push 2026-03-21T11:34:22Z, latest release v3.3.7 2025-12-19) -- no longer maintained."
+    },
+    {
+     "repository": "predibase/lorax",
+     "reason": "Multi-LoRA GPU inference-serving engine (many fine-tuned adapters sharing GPU memory; gh api repos/predibase/lorax, checked 2026-09-26: archived=false, pushed_at=2026-05-28T18:12:20Z, Apache-2.0, 3834 stars) -- a model-serving throughput concern like the already-considered vllm, not durable knowledge/code/financial-source retrieval with source recovery; unrelated to this layer's stated requirement."
+    }
+   ],
+   "not_adopted": [
+    {
+     "repository": "langchain-ai/langchain",
+     "upstream_now": {
+      "latest_release": "langchain-core==1.6.5",
+      "released_at": "2026-09-24T18:11:22Z",
+      "pushed_at": "2026-09-26T08:55:23Z",
+      "archived": false,
+      "license": "MIT",
+      "stars": 147091
+     },
+     "demonstrated_gap_excerpt": "langchain-ai/langchain ('the agent engineering platform' per its own README) ships retriever/vector-store/memory abstractions that are directly on-topic for this layer's retrieval requirement, and is far more active than the winners (pushed 2026-09-26, per-package release langchain-core==1.6.5 on 2…"
+    }
+   ],
+   "kept": [
+    {
+     "repository": "chroma-core/chroma",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "1.5.9",
+      "released_at": "2026-05-05T05:55:40Z",
+      "pushed_at": "2026-09-26T06:19:01Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 29386
+     },
+     "demonstrated_gap_excerpt": "This layer's open_gaps record that ai-memory's retrieval quality is unmeasured beyond a single limit-1 query (score 0.6429 in native-rag.json) -- not a holdout or recall measurement. chroma-core/chroma is an actively maintained (pushed 2026-09-26), Apache-2.0 embedded vector database purpose-built …",
+     "votes": {
+      "facts": {
+       "refuted": true,
+       "confidence": 0.8,
+       "reasoning_excerpt": "Verified via gh api + raw README (2026-09-26). Exact matches confirmed: archived=false, pushed_at=2026-09-26T06:19:01Z, stargazers_count=29386, license=Apache-2.0, and /releases/latest resolves to tag 1.5.9 published_at=2026-05-05T05:55:40Z -- all match the proposal's upstream_now and evidence #1 v…",
+       "refs": [
+        "https://api.github.com/repos/chroma-core/chroma",
+        "https://api.github.com/repos/chroma-core/chroma/releases/latest",
+        "https://api.github.com/repos/chroma-core/chroma/releases/tags/1.5.9",
+        "https://api.github.com/repos/chroma-core/chroma/tags",
+        "https://api.github.com/repos/chroma-core/chroma/git/refs/tags/js_release_2.4.6",
+        "https://api.github.com/repos/chroma-core/chroma/git/refs/tags/js_release_2.4.5",
+        "https://api.github.com/repos/chroma-core/chroma/commits/9516df7b6647",
+        "https://api.github.com/repos/chroma-core/chroma/commits/d94fb9fb15d5",
+        "https://raw.githubusercontent.com/chroma-core/chroma/main/README.md",
+        "https://github.com/chroma-core/chroma"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.85,
+       "reasoning_excerpt": "Refuted on fit. The keep_but_compare label does not hold up.\n\n(1) No evidence-backed advantage over the winners for this requirement. The gap the proposal cites is that this stack never measured ai-memory. That is not a Chroma capability, and the proposal cites no retrieval-quality evidence for Chr…",
+       "refs": [
+        "https://api.github.com/repos/chroma-core/chroma",
+        "https://api.github.com/repos/chroma-core/chroma/releases",
+        "https://pypi.org/pypi/chromadb/json",
+        "https://docs.trychroma.com/cloud/search-api/overview",
+        "https://github.com/chroma-core/chroma/blob/main/chromadb/config.py",
+        "https://github.com/chroma-core/chroma/blob/main/chromadb/utils/embedding_functions/onnx_mini_lm_l6_v2.py",
+        "https://api.github.com/repos/chroma-core/chroma-mcp",
+        "https://github.com/akitaonrails/ai-memory#readme",
+        "https://github.com/akitaonrails/ai-memory/blob/HEAD/docs/benchmarks/README.md",
+        "https://github.com/giancarloerra/SocratiCode#readme",
+        "https://github.com/qdrant/qdrant-client#readme",
+        "https://github.com/tobi/qmd#readme",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/HEAD/manifests/candidates.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/HEAD/evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json",
+        "https://github.com/MemPalace/mempalace/blob/HEAD/pyproject.toml"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.93,
+       "reasoning_excerpt": "Refuted for overlap without a demonstrated comparative gap. Qdrant, already known to this layer, documents serverless local persistence, CPU embeddings, source-bearing payloads and query-time filters—the principal advantages proposed for Chroma ([Qdrant client](https://github.com/qdrant/qdrant-clie…",
+       "refs": [
+        "https://github.com/chroma-core/chroma",
+        "https://docs.trychroma.com/reference/python/client",
+        "https://github.com/qdrant/qdrant-client#local-mode",
+        "https://github.com/akitaonrails/ai-memory"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 375228,
+     "cached_input_tokens": 299392,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 4538,
+     "reasoning_output_tokens": 2960
+    }
+   }
+  },
+  {
+   "layer_id": "backtesting-engine",
+   "catalog": "us-equities",
+   "leads": [
+    "fbertram/turingtrader",
+    "kernc/backtesting.py",
+    "mementum/backtrader",
+    "polakowo/vectorbt"
+   ],
+   "dismissed": [
+    {
+     "repository": "fbertram/turingtrader",
+     "reason": "Windows-only C#/.NET desktop app (README build steps require Visual Studio 2022 + .NET desktop/UWP workloads + WiX Toolset; distribution is a Windows setup file) with no Linux/WSL2 or macOS path; zero GitHub Releases and latest tag v0.14-wip dates to 2020-11-11 (gh api repos/fbertram/turingtrader, /tags, /commits/v0.14-wip); a standalone retail asset-allocation engine with no NautilusTrader/LEAN/IBKR/Alpaca integration -- infeasible on the declared hosts and unrelated to this layer's destination-architecture requirement."
+    },
+    {
+     "repository": "kernc/backtesting.py",
+     "reason": "Exact match already in this layer's known_repositories (confirmed live via gh api: archived=false, pushed_at 2026-08-05, 8,997 stars, AGPL-3.0) -- not a new discovery, no fresh evidence to add."
+    },
+    {
+     "repository": "mementum/backtrader",
+     "reason": "Exact match already in this layer's known_repositories (confirmed live via gh api: archived=false but pushed_at 2024-08-19, over a year with no push, 23,329 stars, GPL-3.0) -- not a new discovery."
+    },
+    {
+     "repository": "polakowo/vectorbt",
+     "reason": "Already present in this layer's known_repositories as 'polakowo/vectorb', the rstrip('.git')-truncated form of this exact slug (same bug pattern as the given qdrant/qdran example); confirmed live via gh api (archived=false, pushed_at 2026-09-26, 9,193 stars, license NOASSERTION) -- not a new discovery."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "ci-supply-chain",
+   "catalog": "foundation",
+   "leads": [
+    "actions/attest-build-provenance",
+    "anchore/sbom-action",
+    "attestplane/attestplane",
+    "cyclonedx/cdxgen-action",
+    "sbom-tool/sbom-tools-action",
+    "slsa-framework/slsa-github-generator",
+    "spdx/tools-golang"
+   ],
+   "dismissed": [
+    {
+     "repository": "actions/attest-build-provenance",
+     "reason": "Its own README (checked 2026-09-26) says 'As of version 4, actions/attest-build-provenance is simply a wrapper on top of actions/attest ... new implementations should use actions/attest instead' -- duplicate of the already-adopted winner actions/attest."
+    },
+    {
+     "repository": "anchore/sbom-action",
+     "reason": "Described by its own maintainer as a 'GitHub Action for creating software bill of materials using Syft' -- it only invokes the already-adopted winner anchore/syft; no capability beyond running the pinned syft binary directly -- duplicate of winner."
+    },
+    {
+     "repository": "attestplane/attestplane",
+     "reason": "README (checked 2026-09-26): a cryptographic evidence substrate for AI-agent runtime behavior under the EU AI Act/DORA/NIS2/GDPR, explicitly only 'architectural inspiration' from SLSA with 'not affiliation', and self-described as 'Not GA, not production-ready, not a compliance certification' -- unrelated to this layer's CI build/dependency/workflow supply-chain requirement."
+    },
+    {
+     "repository": "cyclonedx/cdxgen-action",
+     "reason": "gh api repos/CycloneDX/cdxgen-action (2026-09-26): archived=true, pushed_at 2023-02-06, latest release v1.0.0 from 2020-01-06 -- archived and dormant for years."
+    },
+    {
+     "repository": "slsa-framework/slsa-github-generator",
+     "reason": "Its own README (checked 2026-09-26) states 'This project is no longer actively maintained ... we suggest GitHub artifact attestations, a built-in solution for generating SLSA provenance on GitHub' -- points at the already-adopted winner actions/attest as its replacement; latest release v2.1.0 is from 2025-02-24 (19 months stale) -- dormant and a duplicate of the winner by upstream's own recommendation."
+    },
+    {
+     "repository": "spdx/tools-golang",
+     "reason": "A Go in-memory-model/reader-writer library for SPDX documents, not a standalone CI check or action; confirmed via gh api repos/anchore/syft/contents/go.mod (2026-09-26) that the winner syft already imports 'github.com/spdx/tools-golang v0.6.0-rc4' directly -- already inside the winner's own dependency tree, with no demonstrated CI-facing gap of its own."
+    }
+   ],
+   "not_adopted": [],
+   "kept": [
+    {
+     "repository": "sbom-tool/sbom-tools",
+     "lead": "sbom-tool/sbom-tools-action",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v0.2.0",
+      "released_at": "2026-08-01",
+      "pushed_at": "2026-09-24",
+      "archived": false,
+      "license": "MIT",
+      "stars": 244
+     },
+     "demonstrated_gap_excerpt": "The requirement calls for 'actual runtime inventory' and the layer's own open_gaps admit Syft's inventory evidence is a single local-host run against one SDK prefix with no whole-host/whole-runtime coverage check, and that 'Python and binary pins have no automated updater' beyond a report-only drif…",
+     "votes": {
+      "facts": {
+       "refuted": true,
+       "confidence": 0.9,
+       "reasoning_excerpt": "All cited identity/metadata evidence verified exactly via gh api and the live README. sbom-tool/sbom-tools: archived=false, license MIT, stars=244, pushed_at=2026-09-24T10:05:35Z, description matches verbatim; releases v0.2.0(2026-08-01)/v0.1.22(06-15)/v0.1.21(05-23)/v0.1.20(05-10)/v0.1.19(04-10) a…",
+       "refs": [
+        "https://github.com/sbom-tool/sbom-tools",
+        "https://github.com/sbom-tool/sbom-tools/releases",
+        "https://github.com/sbom-tool/sbom-tools/commits/main",
+        "https://github.com/sbom-tool/sbom-tools#readme",
+        "https://github.com/sbom-tool/sbom-tools-action",
+        "https://github.com/sbom-tool/sbom-tools-action/releases",
+        "https://github.com/sbom-tool/sbom-tools-action#readme",
+        "https://github.com/sbom-tool"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.85,
+       "reasoning_excerpt": "Some facts hold and are not the reason for refuting. The repository is MIT-licensed Rust, not archived, last pushed 2026-09-24, with v0.2.0 released 2026-08-01. The release ships linux-x86_64 and macos-aarch64 binaries, each with a Sigstore .bundle, plus in-toto provenance and its own SBOMs. So pla…",
+       "refs": [
+        "https://github.com/sbom-tool/sbom-tools",
+        "https://github.com/sbom-tool/sbom-tools/releases/tag/v0.2.0",
+        "https://github.com/sbom-tool/sbom-tools#readme",
+        "https://github.com/sbom-tool/sbom-tools/graphs/contributors",
+        "https://github.com/sbom-tool",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/.github/workflows/supply-chain.yml",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/actions/workflows/supply-chain.yml",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35799579095",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35823434891",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35909073492",
+        "https://github.com/interlynk-io/sbomqs",
+        "https://github.com/interlynk-io/sbomqs/releases/tag/v2.1.2",
+        "https://github.com/CycloneDX/cyclonedx-cli"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.88,
+       "reasoning_excerpt": "Refuted as framed. Upstream documents scoring supplied SBOMs and comparing their recorded components. Inference: a runtime dependency omitted from both inputs remains invisible, so these checks cannot establish the claimed whole-runtime completeness or automate missing pin updates. Semantic diffing…",
+       "refs": [
+        "https://github.com/sbom-tool/sbom-tools#diff",
+        "https://github.com/sbom-tool/sbom-tools#validate",
+        "https://github.com/sbom-tool/sbom-tools#quality"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 514844,
+     "cached_input_tokens": 432896,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 5111,
+     "reasoning_output_tokens": 3594
+    }
+   }
+  },
+  {
+   "layer_id": "code-navigation",
+   "catalog": "foundation",
+   "leads": [
+    "assets/img",
+    "docs/codeql-overview",
+    "github/codeql-action",
+    "run-llama/llama_index",
+    "sourcegraph/cody-vs"
+   ],
+   "dismissed": [
+    {
+     "repository": "assets/img",
+     "reason": "gh api repos/assets/img -> 404 Not Found; not a real GitHub repository (looks like a folder-path fragment mistaken for an owner/repo slug)."
+    },
+    {
+     "repository": "docs/codeql-overview",
+     "reason": "gh api repos/docs/codeql-overview -> 404 Not Found; not a real GitHub repository (looks like a docs-URL path mistaken for an owner/repo slug)."
+    },
+    {
+     "repository": "github/codeql-action",
+     "reason": "Real, maintained, active (MIT, pushed 2026-09-25, latest release codeql-bundle-v2.27.1 on 2026-09-22) but per its own README/topics it is a CI Action that runs CodeQL security scans and uploads SARIF to GitHub Code Scanning -- a security-vulnerability tool, not a source/reference retrieval or indexing tool; unrelated to the code-navigation requirement (already the separate codeql security-scanning skill's territory)."
+    },
+    {
+     "repository": "run-llama/llama_index",
+     "reason": "Real, maintained, very active (MIT, 52k stars, pushed 2026-09-25, latest release v0.14.25 on 2026-09-21) but its own README states its current focus is document parsing/extraction (LlamaParse) as a generic RAG/agent framework with no code-specific navigation product; adopting it for this requirement means building a custom indexing harness on a generic library rather than using an existing maintained implementation -- unrelated to the requirement."
+    },
+    {
+     "repository": "sourcegraph/cody-vs",
+     "reason": "\"Cody for Visual Studio\" is a GUI plugin for the Microsoft Visual Studio IDE; per Microsoft's own system requirements (learn.microsoft.com/en-us/visualstudio/releases/2022/system-requirements), Visual Studio supports only Windows/Windows Server -- no Linux or macOS build -- so it is infeasible on the linux-wsl2-x86_64 and macos-arm64 hosts; repo also has no detected OSS license (license: null) and is gated behind Sourcegraph's paid Cody plans."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "data-quality-orchestration",
+   "catalog": "us-equities",
+   "leads": [
+    "apache/airflow",
+    "argoproj/argo-workflows",
+    "evidentlyai/evidently",
+    "great-expectations/great_expectations",
+    "sodadata/soda-core",
+    "whylabs/whylogs"
+   ],
+   "dismissed": [
+    {
+     "repository": "argoproj/argo-workflows",
+     "reason": "Kubernetes-only workflow engine (every step scheduled as a k8s Pod via CRDs, per its own README, checked 2026-09-26); neither host (WSL2 workstation, macOS arm64 Macs) runs a Kubernetes cluster, so it's infeasible without adding a full k8s control plane that dagu's single binary makes unnecessary."
+    },
+    {
+     "repository": "whylabs/whylogs",
+     "reason": "Dormant: last push 2025-01-10 and latest release v1.6.4 dated 2024-12-03 (checked 2026-09-26) -- no activity in roughly 8-22 months, not a current candidate."
+    },
+    {
+     "repository": "fivetran/great_expectations",
+     "lead": "great-expectations/great_expectations",
+     "reason": "Given lead 'great_expectations/great_expectations' 404s as literally written; the canonical 'great-expectations/great_expectations' redirects via the GitHub API to fivetran/great_expectations (checked 2026-09-26), which is already in known_repositories and was already refuted in sweep_20260923 -- a duplicate, not a new lead."
+    }
+   ],
+   "not_adopted": [],
+   "kept": [
+    {
+     "repository": "apache/airflow",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "3.3.2",
+      "released_at": "2026-09-17T11:10:15Z",
+      "pushed_at": "2026-09-26T14:06:39Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 46985
+     },
+     "demonstrated_gap_excerpt": "Dagu (pin v2.16.6, already one release behind upstream v2.17.0 per this layer's open_gaps) is a dependency-free single Go binary chosen for owning/supervising a small number of bounded research-worker jobs locally. Airflow (3.3.2, released 2026-09-17) has a far larger ecosystem (900+ provider integ…",
+     "votes": {
+      "facts": {
+       "refuted": true,
+       "confidence": 0.75,
+       "reasoning_excerpt": "All cited GitHub facts check out exactly via gh api: archived=false, pushed_at=2026-09-26T14:06:39Z, license=Apache-2.0, stars=46985, description matches; latest release tag 3.3.2 published_at=2026-09-17T11:10:15Z -- every field matches upstream_now precisely. But the demonstrated_gap's central qua…",
+       "refs": [
+        "https://github.com/apache/airflow",
+        "https://github.com/apache/airflow/releases/tag/3.3.2",
+        "https://airflow.apache.org/docs/apache-airflow/stable/start.html",
+        "https://airflow.apache.org/docs/apache-airflow-providers/index.html",
+        "https://airflow.apache.org/",
+        "https://airflow.apache.org/registry/"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.75,
+       "reasoning_excerpt": "The proposal fails the fit test by its own account. (1) It names no gap against dagu for THIS requirement. The proposal itself concedes that none of Airflow's differentiators is something dagu lacks for supervising a few bounded research workers, and it shows no advantage over dagu in measured qual…",
+       "refs": [
+        "https://airflow.apache.org/docs/apache-airflow/stable/start.html",
+        "https://github.com/apache/airflow/blob/HEAD/README.md",
+        "https://github.com/apache/airflow/tree/HEAD/providers",
+        "https://github.com/dagucloud/dagu/releases/tag/v2.17.2"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": false,
+       "confidence": 0.85,
+       "reasoning_excerpt": "keep_but_compare survives, although the proposal understates current relevance. Airflow 3.3 adds retry-persistent task state with retention controls and an experimental DAG-result endpoint: plausible advantages for recoverable state and returned results, independent of warehouse ingestion. Its demo…",
+       "refs": [
+        "https://airflow.apache.org/blog/airflow-3.3.0/",
+        "https://github.com/apache/airflow",
+        "https://airflow.apache.org/docs/apache-airflow/stable/installation.html",
+        "https://airflow.apache.org/docs/apache-airflow/stable/installation/prerequisites.html"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "evidentlyai/evidently",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v0.7.23",
+      "released_at": "2026-09-11T09:01:51Z",
+      "pushed_at": "2026-09-11T09:03:28Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 7942
+     },
+     "demonstrated_gap_excerpt": "pandera (pin v0.33.1) validates a single dataframe batch against a declared schema (dtypes, ranges, nullability) but has no reference baseline and cannot detect that a batch which still satisfies the schema has statistically drifted -- e.g. a catalyst/corporate-action feed whose distribution shifts…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.9,
+       "reasoning_excerpt": "All cited GitHub facts verified exactly via gh api: archived=false, pushed_at=2026-09-11T09:03:28Z, license=Apache-2.0, stars=7942, description matches ('100+ metrics'); latest release tag v0.7.23 published_at=2026-09-11T09:01:51Z matches upstream_now exactly. The README confirms Reports/Test Suite…",
+       "refs": [
+        "https://github.com/evidentlyai/evidently",
+        "https://github.com/evidentlyai/evidently/releases/tag/v0.7.23",
+        "https://github.com/evidentlyai/evidently#readme"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.8,
+       "reasoning_excerpt": "The targeted_candidate label does not hold. (1) The gap is overstated. pandera's pin, v0.33.1, is the current latest release (2026-09-01), and its docs cover statistical hypothesis testing with built-in two-sample t-tests and custom scipy test/relationship functions. A two-sample drift check of a r…",
+       "refs": [
+        "https://github.com/unionai-oss/pandera/blob/HEAD/docs/source/hypothesis.md",
+        "https://github.com/unionai-oss/pandera/releases/tag/v0.33.1",
+        "https://github.com/evidentlyai/evidently/blob/HEAD/pyproject.toml",
+        "https://github.com/evidentlyai/evidently/blob/HEAD/src/evidently/telemetry.py",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/pull/249"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.98,
+       "reasoning_excerpt": "The proposed gap conflates dataset-distribution monitoring with worker recovery and failed-attempt telemetry. Evidently offers a feasible two-dataset drift report, but that does not establish process ownership, cancellation, complete returned output or recoverable worker state. [Drift documentation…",
+       "refs": [
+        "https://docs.evidentlyai.com/metrics/preset_data_drift",
+        "https://pandera.readthedocs.io/en/stable/hypothesis.html"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "sodadata/soda-core",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "v4.25.0",
+      "released_at": "2026-09-23T11:18:58Z",
+      "pushed_at": "2026-09-24T12:21:33Z",
+      "archived": false,
+      "license": "Elastic-2.0 (custom, non-OSI; GitHub detector: NOASSERTION)",
+      "stars": 2429
+     },
+     "demonstrated_gap_excerpt": "pandera only validates in-memory dataframes (pandas/polars/pyspark) a Python process already holds. Soda Core v4 validates declarative YAML 'data contracts' directly against live SQL sources (Postgres, Snowflake, BigQuery, Databricks, DuckDB) and is built to embed inside an orchestrator (its README…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.9,
+       "reasoning_excerpt": "All cited GitHub facts verified exactly via gh api: archived=false, pushed_at=2026-09-24T12:21:33Z, license detector NOASSERTION (license.name='Other'), stars=2429, description matches; latest release tag v4.25.0 published_at=2026-09-23T11:18:58Z matches upstream_now exactly. The LICENSE file text …",
+       "refs": [
+        "https://github.com/sodadata/soda-core",
+        "https://github.com/sodadata/soda-core/releases/tag/v4.25.0",
+        "https://github.com/sodadata/soda-core/blob/main/LICENSE",
+        "https://github.com/sodadata/soda-core#readme"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.9,
+       "reasoning_excerpt": "(1) The claimed capability gap is false for the pinned winner. pandera's Ibis backend (new in 0.25.0; the pin is v0.33.1) validates lazily against about 20 backends, including DuckDB, BigQuery, Snowflake and Databricks. The claim that SQL-source validation is 'a real capability pandera lacks entire…",
+       "refs": [
+        "https://github.com/unionai-oss/pandera/blob/HEAD/docs/source/ibis.md",
+        "https://github.com/unionai-oss/pandera/releases/tag/v0.33.1",
+        "https://github.com/sodadata/soda-core/blob/main/LICENSE",
+        "https://github.com/sodadata/soda-core/blob/v3/LICENSE",
+        "https://github.com/sodadata/soda-core/blob/main/README.md"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.99,
+       "reasoning_excerpt": "The claimed warehouse-access gap is false. Pandera has supported Ibis since 0.25.0, including database-backed tables; its optional backend introduced in 0.32.0 validates Ibis expressions without materializing tables. These capabilities predate the supplied 0.33.1 pin. [Pandera Ibis documentation](h…",
+       "refs": [
+        "https://pandera.readthedocs.io/en/stable/ibis.html",
+        "https://github.com/sodadata/soda-core/blob/main/LICENSE"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 728939,
+     "cached_input_tokens": 635264,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 8086,
+     "reasoning_output_tokens": 5428
+    }
+   }
+  },
+  {
+   "layer_id": "document-retrieval",
+   "catalog": "foundation",
+   "leads": [
+    "deepset-ai/haystack",
+    "grobidorg/grobid",
+    "layout-parser/layout-parser",
+    "run-llama/llama-parse-ts",
+    "unstructured-io/unstructured-js-client"
+   ],
+   "dismissed": [
+    {
+     "repository": "deepset-ai/haystack",
+     "reason": "General-purpose AI/agent orchestration framework (agents, routing, multi-agent RAG pipelines; v3.2.0 released 2026-09-24), not a document-ingestion/retrieve-original-body tool -- duplicates the already-known, unqualified LlamaIndex for this requirement with no ingestion-specific gap shown (gh api repos/deepset-ai/haystack, checked 2026-09-26: archived=false, pushed_at=2026-09-25, Apache-2.0, 26610 stars)."
+    },
+    {
+     "repository": "layout-parser/layout-parser",
+     "reason": "Dormant: latest release v0.3.4 (2022-04-06), no commits since 2024-08-15 (gh api repos/Layout-Parser/layout-parser, checked 2026-09-26) -- fails the 2025-2026 maintenance bar, and its niche (DL document-layout analysis) is already covered by the actively maintained 2026-09-23 sweep survivors MinerU/PaddleOCR/marker."
+    },
+    {
+     "repository": "run-llama/llama-parse-ts",
+     "reason": "Thin TypeScript client for LlamaParse/LlamaCloud's paid hosted OCR/parsing API -- needs a new LLAMA_CLOUD_API_KEY and uploads documents off-host, has no local parsing of its own, and sits in the same already-known/unqualified run-llama/llama_index ecosystem; no demonstrated gap justifies the new paid-SaaS credential (v2.16.0 released 2026-09-08; gh api repos/run-llama/llama-parse-ts, checked 2026-09-26: archived=false, MIT, 29 stars)."
+    },
+    {
+     "repository": "unstructured-io/unstructured-js-client",
+     "reason": "Thin TypeScript client for Unstructured's paid hosted Platform API (free tier capped at 1000 pages/14 days, then paid), requiring new credentials and off-host document upload with no local extraction of its own -- duplicates Unstructured-IO/unstructured, already refuted in the 2026-09-23 sweep (v0.32.0 released 2026-04-30; gh api repos/Unstructured-IO/unstructured-js-client, checked 2026-09-26: archived=false, MIT, 63 stars)."
+    }
+   ],
+   "not_adopted": [],
+   "kept": [
+    {
+     "repository": "grobidorg/grobid",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "0.9.1",
+      "released_at": "2026-08-04",
+      "pushed_at": "2026-09-22",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 5143
+     },
+     "demonstrated_gap_excerpt": "Winners (qmd/markitdown/poppler) do generic text/markdown extraction and lexical search but perform no scholarly- or citation-aware document structuring. GROBID parses PDFs into structured TEI/XML with header extraction, full-text body segmentation, and reference/citation-context resolution, report…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.93,
+       "reasoning_excerpt": "Verified via gh api and one docs fetch. grobidOrg/grobid exists (repo id 5797013); querying the old kermitt2/grobid path resolves to the identical repo, confirming a legitimate owner transfer to the grobidOrg org (canonical current URL). archived=false, license=Apache-2.0, stars=5143, pushed_at=202…",
+       "refs": [
+        "https://github.com/grobidOrg/grobid",
+        "https://github.com/kermitt2/grobid",
+        "https://github.com/grobidOrg/grobid/releases/latest",
+        "https://github.com/grobidOrg/grobid/releases",
+        "https://github.com/grobidOrg/grobid#readme",
+        "https://grobid.readthedocs.io/en/latest/"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.78,
+       "reasoning_excerpt": "The facts check out (gh api, 2026-09-26): Apache-2.0, release 0.9.1 on 2026-08-04, pushed 2026-09-22, not archived. The fit claim does not hold. (1) The gap it names is not this requirement's gap. Upstream says 'GROBID is designed for scholarly articles' and 'works best with documents that follow t…",
+       "refs": [
+        "https://github.com/grobidOrg/grobid",
+        "https://github.com/grobidOrg/grobid/releases/tag/0.9.1",
+        "https://github.com/grobidOrg/grobid#readme",
+        "https://github.com/grobidOrg/grobid/blob/master/doc/Frequently-asked-questions.md",
+        "https://github.com/grobidOrg/grobid/blob/master/doc/Grobid-docker.md",
+        "https://github.com/grobidOrg/grobid/blob/master/doc/Deep-Learning-models.md",
+        "https://github.com/grobidOrg/grobid/issues/954",
+        "https://github.com/opendatalab/MinerU#readme",
+        "https://github.com/docling-project/docling#readme",
+        "https://github.com/search?q=grobid+repo%3Aseathatflowsinourveins%2Fnative-agent-stack&type=code",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/us-equities/architecture/trading.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/us-equities/mover-v3/README.md"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": false,
+       "confidence": 0.86,
+       "reasoning_excerpt": "keep_but_compare survives. Citation-linked full-text structure and PDF coordinates provide a plausible source-grounding advantage over the supplied plain-text ingestion controls. Upstream reports approximately 0.87–0.90 reference-extraction F1 on scholarly datasets, explicitly using the optional de…",
+       "refs": [
+        "https://github.com/grobidOrg/grobid",
+        "https://github.com/grobidOrg/grobid/releases/tag/0.9.1",
+        "https://grobid.readthedocs.io/en/latest/Frequently-asked-questions/",
+        "https://grobid.readthedocs.io/en/latest/Introduction/",
+        "https://grobid.readthedocs.io/en/latest/Grobid-service/"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 433662,
+     "cached_input_tokens": 342784,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 5983,
+     "reasoning_output_tokens": 4148
+    }
+   }
+  },
+  {
+   "layer_id": "durable-memory",
+   "catalog": "foundation",
+   "leads": [
+    "chroma-core/chroma",
+    "milvus-io/milvus",
+    "qdrant/qdrant-helm"
+   ],
+   "dismissed": [
+    {
+     "repository": "chroma-core/chroma",
+     "reason": "Generic vector/embedding-store infra (Apache-2.0, active, pushed_at 2026-09-26, 'search infrastructure for AI'); the durable-memory winner ai-memory explicitly states 'No vector store to babysit' (SQLite+FTS5+markdown design), so Chroma replaces no real dependency and itself provides no decision/handoff/capture-deletion-recovery semantics -- unrelated to this layer's requirement."
+    },
+    {
+     "repository": "milvus-io/milvus",
+     "reason": "Distributed, Kubernetes-native ANN vector database for billion-scale similarity search (Apache-2.0, active, pushed_at 2026-09-26); ai-memory (the winner) is explicitly vector-store-free, so Milvus addresses no dependency of the winner and has no agent-memory capture/deletion/recovery semantics of its own -- unrelated to this layer's requirement and heavier infra (K8s-native, etcd/object-store deps) than the requirement needs."
+    },
+    {
+     "repository": "qdrant/qdrant-helm",
+     "reason": "Kubernetes Helm chart that deploys the Qdrant engine (README: 'run Qdrant in your Kubernetes cluster'; Apache-2.0, active), not a memory system; infeasible on these hosts (no k8s cluster) and, since ai-memory has no vector-store dependency to swap, it duplicates/extends the already-tracked qdrant/qdrant engine rather than addressing this layer's requirement."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "evaluation-experiments",
+   "catalog": "us-equities",
+   "leads": [
+    "evalplus/evalplus",
+    "evolvinglmms-lab/lmms-eval",
+    "open-compass/opencompass",
+    "openai/simple-evals"
+   ],
+   "dismissed": [
+    {
+     "repository": "evalplus/evalplus",
+     "reason": "Narrow code-generation-correctness benchmark (HumanEval+/MBPP+), not a research-process-supervision/telemetry tool for this requirement, and stale as a maintained candidate: no push since 2025-10-02 and no version-tagged release since v0.3.1 (2024-10-20) per gh api repos/evalplus/evalplus and its tags."
+    },
+    {
+     "repository": "evolvinglmms-lab/lmms-eval",
+     "reason": "Actively maintained (pushed 2026-09-24, v0.7.3 released 2026-08-28) but scoped to multimodal image/video/audio model benchmarking per its own README ('One-for-All Multimodal Evaluation Toolkit Across Text, Image, Video, and Audio Tasks'); no multimodal-evaluation need is established in this text/financial-research stack, so it is unrelated to the bounded-research/process-telemetry requirement."
+    },
+    {
+     "repository": "openai/simple-evals",
+     "reason": "Self-declared deprecated by OpenAI since July 2025 ('simple-evals will no longer be updated for new models or benchmark results ... We will not be actively maintaining this repository') and explicitly not intended as a comprehensive alternative (README points to openai/evals instead); dormant for this requirement (last commit 2026-04-22 was a minor flag addition, no GitHub Release exists)."
+    }
+   ],
+   "not_adopted": [],
+   "kept": [
+    {
+     "repository": "open-compass/opencompass",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "0.5.4",
+      "released_at": "2026-08-26T06:41:29Z",
+      "pushed_at": "2026-09-23T09:48:34Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 7474
+     },
+     "demonstrated_gap_excerpt": "None of the three current winners give a maintained, standardized multi-benchmark LLM comparison surface with process supervision: inspect-ai is a build-your-own-eval/agent-sandboxing framework, mlflow is experiment tracking with no benchmark content, and agent-retrieval-bench is one narrow retriev…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.95,
+       "reasoning_excerpt": "Every material fact checked against fresh primary sources and confirmed exact. gh api repos/open-compass/opencompass: archived=false, license=Apache-2.0, pushed_at=2026-09-23T09:48:34Z, stars=7474 -- matches the proposal's upstream_now and its cited api.github.com evidence verbatim, no rename. rele…",
+       "refs": [
+        "https://api.github.com/repos/open-compass/opencompass",
+        "https://github.com/open-compass/opencompass/releases/tag/0.5.4",
+        "https://github.com/open-compass/opencompass/commit/c49666653ca1",
+        "https://raw.githubusercontent.com/open-compass/opencompass/main/README.md",
+        "https://api.github.com/repos/open-compass/opencompass/contents/opencompass/configs/datasets",
+        "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai",
+        "https://api.github.com/repos/mlflow/mlflow",
+        "https://api.github.com/repos/eyuansu62/agent-retrieval-bench"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.86,
+       "reasoning_excerpt": "The keep_but_compare label does not hold for this layer's requirement. The requirement is bounded research workers with native identity, supervision of owned processes, scoped telemetry, retained failed attempts, recoverable state and no broker authority; the next action is one real research worker…",
+       "refs": [
+        "https://github.com/open-compass/opencompass",
+        "https://github.com/open-compass/opencompass/blob/main/README.md",
+        "https://github.com/open-compass/opencompass/blob/main/opencompass/tasks/openicl_eval_watch.py",
+        "https://github.com/open-compass/opencompass/blob/main/opencompass/tasks/openicl_infer_concurrent.py",
+        "https://github.com/open-compass/opencompass/blob/main/opencompass/models/claude_sdk_api.py",
+        "https://github.com/open-compass/opencompass/blob/main/opencompass/models/openai_api.py",
+        "https://github.com/open-compass/opencompass/blob/main/opencompass/cli/main.py",
+        "https://github.com/open-compass/opencompass/blob/main/opencompass/utils/datasets_info.py",
+        "https://github.com/open-compass/opencompass/blob/main/tools/analyze_repeat.py",
+        "https://github.com/UKGovernmentBEIS/inspect_ai/blob/main/docs/eval-sets.qmd",
+        "https://github.com/UKGovernmentBEIS/inspect_ai/blob/main/docs/handling-errors.qmd",
+        "https://github.com/UKGovernmentBEIS/inspect_evals"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.93,
+       "reasoning_excerpt": "Refuted for lack of a concrete gap on this requirement. OpenCompass has a recent release and Apache-2.0 licensing; those are positive signals. [Repository](https://github.com/open-compass/opencompass), [release](https://github.com/open-compass/opencompass/releases/tag/0.5.4). However, the cited eva…",
+       "refs": [
+        "https://github.com/open-compass/opencompass",
+        "https://github.com/open-compass/opencompass/releases/tag/0.5.4",
+        "https://github.com/open-compass/opencompass/blob/main/opencompass/tasks/openicl_eval_watch.py",
+        "https://github.com/open-compass/opencompass/blob/main/tools/analyze_repeat.py",
+        "https://github.com/UKGovernmentBEIS/inspect_evals",
+        "https://inspect.aisi.org.uk/eval-sets.html"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 432038,
+     "cached_input_tokens": 341760,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 5647,
+     "reasoning_output_tokens": 3688
+    }
+   }
+  },
+  {
+   "layer_id": "execution-broker",
+   "catalog": "us-equities",
+   "leads": [
+    "mementum/backtrader",
+    "quantconnect/lean",
+    "quantconnect/lean-cli"
+   ],
+   "dismissed": [
+    {
+     "repository": "mementum/backtrader",
+     "reason": "Already in this layer's known_repositories (exact match, not a new lead); also dormant — pushed_at 2024-08-19 (over 2 years stale) with no GitHub Releases published (tags only), failing the 2025-2026 maintenance bar (github.com/mementum/backtrader, checked 2026-09-26)."
+    },
+    {
+     "repository": "quantconnect/lean",
+     "reason": "Already in this layer's known_repositories (exact match) as the retained LEAN oracle engine; actively maintained (pushed_at 2026-09-25) but supplies no new information (github.com/quantconnect/lean, checked 2026-09-26)."
+    },
+    {
+     "repository": "quantconnect/lean-cli",
+     "reason": "Not in known_repositories, incl. after checking for the rstrip('.git') truncation bug, but unrelated to the requirement: it is QuantConnect's Docker/cloud project-scaffolding and deployment CLI wrapping the already-known LEAN engine (init/backtest/live-deploy/data-download orchestration), with no broker-specific execution, numeric-risk or reconciliation logic of its own (github.com/quantconnect/lean-cli, pushed_at 2026-09-04, latest release 1.0.229 on 2026-08-28, Apache-2.0, checked 2026-09-26)."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "git-github-automation",
+   "catalog": "foundation",
+   "leads": [
+    "k1low/gh-pr-reviews",
+    "kbrdn1/gwm-cli",
+    "peter-evans/create-pull-request"
+   ],
+   "dismissed": [],
+   "not_adopted": [],
+   "kept": [
+    {
+     "repository": "k1low/gh-pr-reviews",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "v0.14.0",
+      "released_at": "2026-09-02T00:57:16Z",
+      "pushed_at": "2026-09-23T08:13:29Z",
+      "archived": false,
+      "license": "MIT",
+      "stars": 19
+     },
+     "demonstrated_gap_excerpt": "None of the current winners (gh CLI, worktrunk, difftastic) triage PR review comments for resolution status. gh-pr-reviews is a `gh` extension that aggregates GraphQL review threads plus GitHub-Copilot review output -- including comments Copilot only lists in its review-summary body as 'suppressed'…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.92,
+       "reasoning_excerpt": "All cited facts verified via gh api and raw content reads on 2026-09-26. Repo metadata matches exactly: archived=false, license=MIT, stars=19, pushed_at=2026-09-23T08:13:29Z. releases/latest returns tag_name=v0.14.0, published_at=2026-09-02T00:57:16Z, and the releases list has exactly 22 tags -- bo…",
+       "refs": [
+        "https://github.com/k1LoW/gh-pr-reviews",
+        "https://api.github.com/repos/k1LoW/gh-pr-reviews/releases/latest",
+        "https://api.github.com/repos/k1LoW/gh-pr-reviews/releases",
+        "https://github.com/k1LoW/gh-pr-reviews/blob/main/README.md",
+        "https://github.com/k1LoW/gh-pr-reviews/blob/main/go.mod"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.8,
+       "reasoning_excerpt": "Refuted on fit. (1) The headline differentiator, Copilot 'suppressed comments', has no instance in this repository. A GraphQL read on 2026-09-26 of the last 60 PRs (#282-#344) found review authors chatgpt-codex-connector=1, github-advanced-security=3 and seathatflowsinourveins=1, and no copilot-pul…",
+       "refs": [
+        "https://github.com/k1LoW/gh-pr-reviews/blob/main/README.md",
+        "https://docs.github.com/en/copilot/concepts/agents/copilot-cli/about-copilot-cli",
+        "https://api.github.com/graphql (read 2026-09-26: seathatflowsinourveins/native-agent-stack pullRequests last:60, #282-#344, review authors: chatgpt-codex-connector=1, github-advanced-security=3, seathatflowsinourveins=1, no Copilot reviewer)",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/decisions/2026-09-23-bot-pr-dispatch.md",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/pull/109"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.96,
+       "reasoning_excerpt": "The claimed API-access gap does not hold. The extension parses suppressed findings from review-summary bodies; GitHub's REST reviews endpoint exposes those bodies, so a baseline restricted to reviewThreads omits available evidence. [Upstream](https://github.com/k1LoW/gh-pr-reviews), [GitHub API doc…",
+       "refs": [
+        "https://github.com/k1LoW/gh-pr-reviews",
+        "https://docs.github.com/en/rest/pulls/reviews"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "kbrdn1/gwm-cli",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v1.10.0",
+      "released_at": "2026-09-01T11:26:04Z",
+      "pushed_at": "2026-09-22T23:48:59Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 142
+     },
+     "demonstrated_gap_excerpt": "worktrunk (the current worktree winner) reports branch/CI/diff status and LLM-generated per-branch summaries (`wt list --full`, interactive picker with streaming CI/diff/PR previews) but its README and linked docs describe no detection of which coding-agent tool is actually running in each worktree…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.95,
+       "reasoning_excerpt": "All facts verified via gh api on 2026-09-26, including the finer-grained ones. Repo metadata matches exactly: archived=false, stars=142, pushed_at=2026-09-22T23:48:59Z. API license.spdx_id is indeed 'Apache-2.0' while a root contents listing shows both LICENSE-APACHE and LICENSE-MIT present -- the …",
+       "refs": [
+        "https://github.com/kbrdn1/gwm-cli",
+        "https://api.github.com/repos/kbrdn1/gwm-cli/releases/latest",
+        "https://github.com/kbrdn1/gwm-cli/commit/8e14fe7a",
+        "https://github.com/kbrdn1/gwm-cli/tree/dev",
+        "https://github.com/kbrdn1/gwm-cli/commit/b0752388",
+        "https://github.com/kbrdn1/gwm-cli/pull/683",
+        "https://github.com/kbrdn1/gwm-cli/blob/main/README.md",
+        "https://github.com/max-sixty/worktrunk/blob/main/README.md"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.85,
+       "reasoning_excerpt": "Refuted: the stated gap is false. The worktrunk README links 'Claude Code integration' (https://worktrunk.dev/claude-code/, titled 'Agent integration' and stamped v0.79.0, the pinned version). That page documents activity tracking in `wt list` (🤖 working / 💬 waiting) for Claude Code, Codex, OpenCod…",
+       "refs": [
+        "https://worktrunk.dev/claude-code/",
+        "https://github.com/max-sixty/worktrunk/blob/main/README.md",
+        "https://github.com/kbrdn1/gwm-cli/blob/HEAD/docs/2.tui/9.agent-sessions.md",
+        "https://github.com/kbrdn1/gwm-cli/blob/HEAD/README.md"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": false,
+       "confidence": 0.82,
+       "reasoning_excerpt": "A narrower concrete gap survives. Worktrunk already provides agent activity tracking, and its v0.79.0 documentation acknowledges stale markers after an agent is killed. [Worktrunk documentation](https://worktrunk.dev/claude-code/). gwm documents named-agent detection from local artifacts, dead-PID …",
+       "refs": [
+        "https://github.com/kbrdn1/gwm-cli",
+        "https://worktrunk.dev/claude-code/"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "peter-evans/create-pull-request",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v8.1.1",
+      "released_at": "2026-04-10T16:27:57Z",
+      "pushed_at": "2026-09-13T16:27:48Z",
+      "archived": false,
+      "license": "MIT",
+      "stars": 2850
+     },
+     "demonstrated_gap_excerpt": "This layer's own open_gaps records that 'No gh PR operation (create/review/merge) result is recorded. PR automation is therefore unestablished for every candidate' -- neither gh CLI, worktrunk nor difftastic packages a tested workspace-diff-to-PR flow, and this repository's own CI (catalog-freshnes…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.93,
+       "reasoning_excerpt": "All facts verified via gh api and a full local-repo grep on 2026-09-26. Repo metadata matches exactly: created_at=2019-07-16T10:53:23Z, pushed_at=2026-09-13T16:27:48Z, archived=false, license=MIT, stars=2850. releases/latest returns tag_name=v8.1.1, published_at=2026-04-10T16:27:57Z, matching exact…",
+       "refs": [
+        "https://github.com/peter-evans/create-pull-request",
+        "https://api.github.com/repos/peter-evans/create-pull-request/releases/latest",
+        "https://github.com/peter-evans/create-pull-request/commit/11e8dc7c",
+        "https://github.com/peter-evans/create-pull-request/blob/main/README.md",
+        "local:<checkout> (full-tree grep for create-pull-request|peter-evans, 0 hits; .github/workflows/ listing)"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.93,
+       "reasoning_excerpt": "Refuted: the claimed gap does not exist, and the 'no new credential' claim fails. (1) This repository already has a gh-based equivalent recorded as native_proven. The opt-in propose job in .github/workflows/catalog-freshness.yml commits drift evidence to automation/catalog-freshness and pushes with…",
+       "refs": [
+        "https://github.com/peter-evans/create-pull-request/blob/main/README.md",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/.github/workflows/catalog-freshness.yml",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/.github/workflows/saturation-tracking.yml",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/decisions/2026-09-23-bot-pr-dispatch.md",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35822476248",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/pull/109",
+        "https://api.github.com/repos/seathatflowsinourveins/native-agent-stack/actions/permissions/workflow",
+        "https://api.github.com/repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": false,
+       "confidence": 0.88,
+       "reasoning_excerpt": "The packaged workspace-change-to-PR lifecycle provides a concrete comparison target: branch updates, repeated PR updates, and closing obsolete changes are documented together. [Upstream](https://github.com/peter-evans/create-pull-request). The v8.1.1 release also documents dependency maintenance an…",
+       "refs": [
+        "https://github.com/peter-evans/create-pull-request",
+        "https://github.com/peter-evans/create-pull-request/releases/tag/v8.1.1",
+        "https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 602497,
+     "cached_input_tokens": 511360,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 7260,
+     "reasoning_output_tokens": 4967
+    }
+   }
+  },
+  {
+   "layer_id": "hosting-services",
+   "catalog": "foundation",
+   "leads": [
+    "88plug/k3d-gpu",
+    "abiosoft/colima",
+    "eknkc/ssr-benchmark",
+    "jakkaj/k3d-gpu",
+    "kludex/starlette",
+    "pallets/quart",
+    "sanic-org/sanic",
+    "tanrax/python-api-frameworks-benchmark"
+   ],
+   "dismissed": [
+    {
+     "repository": "88plug/k3d-gpu",
+     "reason": "Fork baking NVIDIA/k3s GPU passthrough into k3d for Kubernetes-scheduled GPU pods under a non-OSI FSL-1.1-ALv2 license (gh api: license NOASSERTION, README badge confirms FSL-1.1-ALv2); unrelated to hosting this layer's non-GPU FastAPI/Next.js/Postgres stack."
+    },
+    {
+     "repository": "jakkaj/k3d-gpu",
+     "reason": "Same GPU-Kubernetes category as 88plug/k3d-gpu and dormant since 2026-02-15's actual pushed_at of 2022-02-15 (1 star, no releases, no commits in ~4.5 years)."
+    },
+    {
+     "repository": "eknkc/ssr-benchmark",
+     "reason": "A JS SSR framework benchmarking harness, not installable hosting software; unlicensed (license=null) and dormant since pushed_at=2024-04-19."
+    },
+    {
+     "repository": "tanrax/python-api-frameworks-benchmark",
+     "reason": "A Python API-framework performance-comparison repo (FastAPI vs Litestar vs Django Ninja/Bolt/DRF), not a maintained software candidate; unlicensed (license=null), 11 stars."
+    }
+   ],
+   "not_adopted": [
+    {
+     "repository": "kludex/starlette",
+     "upstream_now": {
+      "latest_release": "1.7.0",
+      "released_at": "2026-09-23",
+      "stars": 12637,
+      "pushed_at": "2026-09-26",
+      "archived": false,
+      "license": "BSD-3-Clause",
+      "renamed_from": "encode/starlette"
+     },
+     "demonstrated_gap_excerpt": "None found against the winner: FastAPI's own pyproject.toml pins `starlette>=0.46.0` as a hard dependency, so this project already runs Starlette transitively inside FastAPI on every host where FastAPI is native_proven/accepted. Adopting Starlette directly would only drop FastAPI's Pydantic-based r…"
+    },
+    {
+     "repository": "pallets/quart",
+     "upstream_now": {
+      "latest_release": "0.23.1",
+      "released_at": "2026-09-12",
+      "stars": 3673,
+      "pushed_at": "2026-09-12",
+      "archived": false,
+      "license": "MIT"
+     },
+     "demonstrated_gap_excerpt": "None over the winner found: Quart offers a Flask-compatible async API (blueprints, extension compatibility) but, per its own README, ships without FastAPI's built-in Pydantic-based request/response validation or OpenAPI generation -- that requires the separate pgjones/quart-schema extension (confir…"
+    },
+    {
+     "repository": "sanic-org/sanic",
+     "upstream_now": {
+      "latest_release": "v25.12.1",
+      "released_at": "2026-05-31",
+      "stars": 18635,
+      "pushed_at": "2026-07-29",
+      "archived": false,
+      "license": "MIT"
+     },
+     "demonstrated_gap_excerpt": "None over the winner found: Sanic's README markets raw throughput ('Build fast. Run fast.') and includes a built-in multi-worker process manager, but has zero mentions of openapi/pydantic/typed request or response validation anywhere in its README, unlike the winner FastAPI. This project has no rec…"
+    }
+   ],
+   "kept": [
+    {
+     "repository": "abiosoft/colima",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v0.10.3",
+      "released_at": "2026-06-04",
+      "stars": 31002,
+      "pushed_at": "2026-09-23",
+      "archived": false,
+      "license": "MIT"
+     },
+     "demonstrated_gap_excerpt": "This layer's own platform_status marks every winner (fastapi, nextjs, postgresql) 'macos-arm64: untested', and open_gaps records 'No container lane (Docker/Compose, Podman/Quadlet, Dev Containers) has been run against this workload'. The layer already tracks Apple's own container runtime (component…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.92,
+       "reasoning_excerpt": "All cited facts verified against primary sources and matched exactly or within immaterial live-counter drift. gh api repos/abiosoft/colima: license=MIT, archived=false, pushed_at=2026-09-23 (exact match), full_name unchanged (not renamed); stars=31003 vs claimed 31002 (1-star drift, immaterial). gh…",
+       "refs": [
+        "https://github.com/abiosoft/colima",
+        "https://github.com/abiosoft/colima/releases/latest",
+        "https://github.com/abiosoft/colima#readme",
+        "https://github.com/abiosoft/colima/blob/main/docs/FAQ.md",
+        "https://github.com/apple/container",
+        "https://github.com/apple/container#readme"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.86,
+       "reasoning_excerpt": "Upstream facts hold (gh api 2026-09-26): MIT, archived=false, pushed_at 2026-09-23, latest release v0.10.3 published 2026-06-04. Its README says it supports Intel and Apple Silicon macOS and Linux, and its GPU 'AI Models' feature needs v0.10.0, Apple Silicon, macOS 13+ and the krunkit VM type. The …",
+       "refs": [
+        "https://github.com/abiosoft/colima",
+        "https://github.com/abiosoft/colima/releases/tag/v0.10.3",
+        "https://github.com/abiosoft/colima#readme",
+        "https://github.com/apple/container#readme",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/gap-wave3-20260923/hosting-services/container-build-start-resource-vs-native.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/gap-wave3-20260923/container-build-start-resource-vs-native/Containerfile.app",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/convergence-practice/container-storage/README.md",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/convergence-practice/container-storage/receipt.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/hosting-container-practice.md",
+        "https://github.com/podman-container-tools/podman#readme"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": false,
+       "confidence": 0.84,
+       "reasoning_excerpt": "The targeted_candidate label survives. Colima documents Apple Silicon support, MIT licensing, configurable VM resources and native package installation; its official documentation explicitly supports Docker Compose. These provide a concrete implementation for the packet’s unqualified macOS containe…",
+       "refs": [
+        "https://github.com/abiosoft/colima",
+        "https://colima.run/docs/runtimes/",
+        "https://github.com/abiosoft/colima/releases/tag/v0.10.3",
+        "https://github.com/apple/container#requirements",
+        "https://github.com/abiosoft/colima#ai-models-gpu-accelerated"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 452509,
+     "cached_input_tokens": 368896,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 5972,
+     "reasoning_output_tokens": 4349
+    }
+   }
+  },
+  {
+   "layer_id": "identity-provenance",
+   "catalog": "us-equities",
+   "leads": [
+    "pachyderm/pachyderm",
+    "treeverse/lakefs"
+   ],
+   "dismissed": [
+    {
+     "repository": "pachyderm/pachyderm",
+     "reason": "Dormant: no push since 2025-02-03T22:27:18Z (last commit 2025-01-09) and no release since v2.12.2 on 2025-01-15, ~19-20 months stale as of 2026-09-26 (not archived, but fails the sweep's 2025-2026-activity bar) despite an Apache-2.0 license and on-topic data-versioning/lineage scope (verified via gh api repos/pachyderm/pachyderm, /releases, /commits)."
+    },
+    {
+     "repository": "treeverse/lakefs",
+     "reason": "Already known, not a discovery lead: this exact slug is already listed in this layer's known_repositories (input file line with 'treeverse/lakefs'); also source-available under a custom Business Source License 1.1 (GitHub license field NOASSERTION; LICENSE text confirms BUSL-1.1 with an internal-use-only production grant), flagged by the sweep's OSI/clearly-usable-license selection principle even though it is actively maintained (pushed 2026-09-25, latest release v1.87.0 on 2026-09-22)."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "instructions-skills",
+   "catalog": "foundation",
+   "leads": [
+    "langchain-ai/langchain-skills",
+    "langchain-ai/skills-benchmarks",
+    "orchestra-research/ai-research-skills"
+   ],
+   "dismissed": [
+    {
+     "repository": "langchain-ai/langchain-skills",
+     "reason": "Actively maintained (MIT, gh api pushed_at 2026-09-25) but its skills are procedures for building LangChain/LangGraph/Deep-Agents applications -- a different capability than this layer's generic 'canonical rules for any task' requirement; LangGraph itself is tracked as a pinned component under this repo's separate agent-sdks/dispatch-frameworks catalog area (evidence/artifacts/sota-refresh-20260923/pins-tools/langgraph.json), not under instructions-skills, so this lead is out of scope for this layer."
+    },
+    {
+     "repository": "orchestra-research/ai-research-skills",
+     "reason": "Real installable 98-skill Claude Code plugin (MIT, 13,051 stars) but dormant: gh api commit history shows nothing merged to main since 2026-06-16 (v1.7.2), and duplicate open bug-fix PRs #77 (updated 2026-08-12) and #81/#82 (updated 2026-09-21) for a broken skill-uninstall path sit unmerged 1-3+ months; stars/forks reflect popularity, not current maintenance, per this layer's own selection principle."
+    }
+   ],
+   "not_adopted": [],
+   "kept": [
+    {
+     "repository": "langchain-ai/skills-benchmarks",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v0.1.0",
+      "released_at": "2026-03-09",
+      "pushed_at": "2026-09-21",
+      "archived": false,
+      "license": "MIT",
+      "stars": 117
+     },
+     "demonstrated_gap_excerpt": "None of the current winners (affaan-m/ECC, typesafe-ai/skills, openai/skills) can measure whether a skill's documentation design actually changes Claude Code's task adherence -- this layer's own open_gaps entry says exactly that ('No retained fixture measures skill-arm task performance ... the over…",
+     "votes": {
+      "facts": {
+       "refuted": true,
+       "confidence": 0.92,
+       "reasoning_excerpt": "Identity/metadata and all 5 cited evidence URLs verify exactly via gh api: MIT license, archived=false, created 2026-01-24, pushed_at=2026-09-21T17:24:16Z, stars=117, forks=10 all match; v0.1.0 is the sole release, published_at=2026-03-09T17:31:40Z; PR #159 merged_at=2026-08-18T20:47:25Z with the q…",
+       "refs": [
+        "https://github.com/langchain-ai/skills-benchmarks",
+        "https://github.com/langchain-ai/skills-benchmarks/releases/tag/v0.1.0",
+        "https://github.com/langchain-ai/skills-benchmarks/pull/159",
+        "https://github.com/langchain-ai/skills-benchmarks/pull/160",
+        "https://github.com/langchain-ai/skills-benchmarks/blob/main/README.md",
+        "https://github.com/langchain-ai/skills-benchmarks/blob/main/.env.example",
+        "https://github.com/langchain-ai/skills-benchmarks/tree/main",
+        "https://github.com/langchain-ai/skills-benchmarks/commits/main/README.md",
+        "https://github.com/langchain-ai/skills-benchmarks/tree/main/harbor_tasks",
+        "https://github.com/langchain-ai/skills-benchmarks/tree/main/skillbench_harbor"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.94,
+       "reasoning_excerpt": "Refuted on four independent grounds, each checked against a primary source.\n\n(1) No real gap. The claim that no winner or listed alternative supplies skill-arm adherence measurement is false.\n- The winner affaan-m/ECC ships skills/skill-comply at the layer's own pin dd6ee538. Its SKILL.md says it '…",
+       "refs": [
+        "https://github.com/langchain-ai/skills-benchmarks",
+        "https://github.com/langchain-ai/skills-benchmarks/blob/main/README.md",
+        "https://github.com/langchain-ai/skills-benchmarks/blob/main/CLAUDE.md",
+        "https://github.com/langchain-ai/skills-benchmarks/blob/main/.env.example",
+        "https://github.com/langchain-ai/skills-benchmarks/blob/main/pyproject.toml",
+        "https://github.com/langchain-ai/skills-benchmarks/blob/main/scripts/sweep.py",
+        "https://github.com/langchain-ai/skills-benchmarks/blob/main/scripts/patch_harbor.py",
+        "https://github.com/langchain-ai/skills-benchmarks/tree/main/tests",
+        "https://github.com/langchain-ai/skills-benchmarks/tree/main/treatments",
+        "https://github.com/langchain-ai/skills-benchmarks/pull/159",
+        "https://github.com/langchain-ai/skills-benchmarks/pull/160",
+        "https://github.com/affaan-m/ECC/tree/dd6ee538aee0/skills/skill-comply",
+        "https://github.com/affaan-m/ECC/blob/main/skills/skill-comply/SKILL.md",
+        "https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/secret-storage.md",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/adoption/skills/manifest.json"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.78,
+       "reasoning_excerpt": "The supplied missing-fixture gap is concrete; the incumbents have no supplied measured advantage. However, the proposed trial's credential assumptions are unverified. Upstream lists OPENAI_API_KEY, LANGSMITH_API_KEY and ANTHROPIC_API_KEY as requirements and describes every pytest invocation creatin…",
+       "refs": [
+        "https://github.com/langchain-ai/skills-benchmarks#requirements",
+        "https://github.com/langchain-ai/skills-benchmarks#results",
+        "https://github.com/langchain-ai/skills-benchmarks#treatments"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 470575,
+     "cached_input_tokens": 393344,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 4746,
+     "reasoning_output_tokens": 3185
+    }
+   }
+  },
+  {
+   "layer_id": "isolation",
+   "catalog": "foundation",
+   "leads": [
+    "google/nsjail",
+    "kata-containers/documentation",
+    "netblue30/firejail",
+    "wasmedge/wasmedge"
+   ],
+   "dismissed": [
+    {
+     "repository": "kata-containers/documentation",
+     "reason": "Archived Kata 1.x documentation repo (pushed_at 2021-05-05, latest release 1.13.0-alpha0 dated 2021-01-14); its own description redirects to kata-containers/kata-containers, which is already in known_repositories and was refuted in sweep_20260923 -- a dormant docs duplicate of an already-refuted known alternative, not software."
+    },
+    {
+     "repository": "wasmedge/wasmedge",
+     "reason": "Actively maintained (pushed_at 2026-09-26, Apache-2.0, latest release 0.17.1) but it is a WebAssembly language runtime that only sandboxes code compiled to Wasm; it cannot wrap arbitrary shell commands or the agent's own edits the way the current winners do -- unrelated to this layer's filesystem/network-enforcement requirement."
+    }
+   ],
+   "not_adopted": [],
+   "kept": [
+    {
+     "repository": "google/nsjail",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "3.6",
+      "released_at": "2026-03-18",
+      "pushed_at": "2026-08-27",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 4120
+     },
+     "demonstrated_gap_excerpt": "isolation.json's open_gaps record that sandbox-runtime has no resource-limit or hostile-workload qualification, and an unexplained ephemeral hidden mount on an overlapping denied read/write path (runtime-tools.json line 30). nsjail's README documents exactly the missing primitives as first-class fl…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.95,
+       "reasoning_excerpt": "All checkable facts confirmed via gh api against primary sources: repos/google/nsjail returns archived=false, pushed_at=2026-08-27, license=Apache-2.0, stars=4120, open_issues=43 (also matches the comparator figure cited inside the firejail proposal). releases/latest and the releases list confirm t…",
+       "refs": [
+        "https://github.com/google/nsjail",
+        "https://github.com/google/nsjail/releases/tag/3.6",
+        "https://github.com/google/nsjail#readme",
+        "https://github.com/google/nsjail/security-advisories"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.72,
+       "reasoning_excerpt": "The label targeted_candidate (a bounded trial now) does not hold. Maintenance and license are fine: not archived, master f100fd917c6d pushed 2026-08-27, release 3.6 on 2026-03-18, Apache-2.0. The fit fails for five reasons. (1) Wrong boundary class. The layer's next_action asks for 'one OCI/VM cand…",
+       "refs": [
+        "https://github.com/google/nsjail#readme",
+        "https://github.com/google/nsjail/releases/tag/3.6",
+        "https://github.com/google/nsjail/blob/master/cgroup2.cc",
+        "https://github.com/google/nsjail/blob/master/config.proto",
+        "https://github.com/anthropics/sandbox-runtime#readme",
+        "https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": false,
+       "confidence": 0.85,
+       "reasoning_excerpt": "The Linux-scoped targeted_candidate survives. NsJail documents direct-process execution, rlimits, cgroup controls and configurable seccomp; release 3.6 also includes read-only mount fixes and additional mount tests. These support a concrete trial against the supplied resource-enforcement gap. [READ…",
+       "refs": [
+        "https://github.com/google/nsjail",
+        "https://github.com/google/nsjail/releases/tag/3.6",
+        "https://github.com/google/nsjail/blob/3.6/cgroup2.cc",
+        "https://learn.microsoft.com/en-us/windows/wsl/compare-versions",
+        "https://github.com/anthropics/sandbox-runtime/issues/149"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "netblue30/firejail",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "0.9.80",
+      "released_at": "2026-03-14",
+      "pushed_at": "2026-09-20",
+      "archived": false,
+      "license": "GPL-2.0",
+      "stars": 7671
+     },
+     "demonstrated_gap_excerpt": "Same category as the nsjail proposal above (Linux namespaces, seccomp-bpf, Linux capabilities, and per its README 'integrated with Linux Control Groups'), with more community/maintenance signal (7671 stars, 527 open issues under active triage, pushed 2026-09-20, six days before this check, vs nsjai…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.95,
+       "reasoning_excerpt": "All checkable facts confirmed via gh api: repos/netblue30/firejail returns archived=false, pushed_at=2026-09-20 (six days before the 2026-09-26 check, matching the proposal's framing), license=GPL-2.0, stars=7671, open_issues=527. releases/latest and the releases list confirm tag 0.9.80, published_…",
+       "refs": [
+        "https://github.com/netblue30/firejail",
+        "https://github.com/netblue30/firejail/releases/tag/0.9.80",
+        "https://github.com/netblue30/firejail#readme",
+        "https://github.com/netblue30/firejail/security-advisories",
+        "https://github.com/netblue30/firejail/blob/master/src/man/firejail.1.in"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.85,
+       "reasoning_excerpt": "The label keep_but_compare is wrong; the correct label is not_adopted. (1) The proposal's core claim fails. It says firejail is a credible second implementation of the missing resource-limit capability through its 'cgroup integration'. Firejail's RELNOTES for 0.9.72 (2023-01-16) say 'modif: removed…",
+       "refs": [
+        "https://github.com/netblue30/firejail/blob/master/RELNOTES",
+        "https://github.com/netblue30/firejail/blob/master/src/man/firejail.1.in",
+        "https://github.com/netblue30/firejail/pull/7154",
+        "https://github.com/netblue30/firejail/releases/tag/0.9.80",
+        "https://github.com/netblue30/firejail/blob/master/SECURITY.md",
+        "https://github.com/advisories/GHSA-2q4h-h5jp-942w",
+        "https://github.com/netblue30/firejail#readme",
+        "https://github.com/anthropics/sandbox-runtime#readme"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.97,
+       "reasoning_excerpt": "Refuted as proposed. Its claimed maintenance advantage relies on stars and open-issue counts, which the selection rules exclude and which do not establish active triage. More substantively, the resource-equivalence argument relies on stale cgroup language: Firejail removed --cgroup= in 0.9.72, and …",
+       "refs": [
+        "https://github.com/netblue30/firejail",
+        "https://github.com/netblue30/firejail/releases/tag/0.9.72",
+        "https://github.com/netblue30/firejail/releases/tag/0.9.80",
+        "https://github.com/netblue30/firejail/blob/master/RELNOTES"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 613148,
+     "cached_input_tokens": 509696,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 7379,
+     "reasoning_output_tokens": 5312
+    }
+   }
+  },
+  {
+   "layer_id": "market-data-reference",
+   "catalog": "us-equities",
+   "leads": [
+    "finos/openmama",
+    "mypmc/marketstore",
+    "openmama/openmama",
+    "quantconnect/lean",
+    "questdb/questdb-trading-data-demo"
+   ],
+   "dismissed": [
+    {
+     "repository": "finos/openmama",
+     "reason": "Canonical repo finos/OpenMAMA (pushed 2026-09-18, latest release OpenMAMA-6.3.2 dated 2023-03-16, LGPL-2.1) is a live feed-transport messaging-middleware API needing proprietary backends (Tibco RV, Solace, etc.); it does not acquire/license historical US-equity reference data, so it is unrelated to the requirement, and it is a duplicate of the openmama/openmama lead (identical canonical repo)."
+    },
+    {
+     "repository": "openmama/openmama",
+     "reason": "GitHub API redirects this path to the identical canonical repository finos/OpenMAMA (same pushed_at, stars, license) -- duplicate of the finos/openmama lead, dismissed there for the same unrelated-to-requirement reason."
+    },
+    {
+     "repository": "mypmc/marketstore",
+     "reason": "Dormant: last push 2018-03-05T22:42:01Z, no GitHub releases (404 on /releases/latest), 2 stars -- unmaintained."
+    },
+    {
+     "repository": "quantconnect/lean",
+     "reason": "Actively maintained (pushed 2026-09-25, 21,787 stars, Apache-2.0) but it is an algorithmic backtest/execution engine, not a data-acquisition/reference source; this stack's own common rules already name it 'LEAN as comparison engine' for a separate layer, so adopting it here would duplicate a known, already-scoped component rather than address this requirement."
+    },
+    {
+     "repository": "questdb/questdb-trading-data-demo",
+     "reason": "Quickstart/demo repo confirmed via README (Jupyter notebooks piping sample US-equities and OKX data into QuestDB for Grafana/Pulse dashboards), not a maintained data-acquisition library; no releases (404), 9 stars; duplicates the QuestDB alternative already listed for this layer."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "mcp-surfaces",
+   "catalog": "foundation",
+   "leads": [
+    "modelcontextprotocol/modelcontextprotocol",
+    "modelcontextprotocol/python-sdk",
+    "modelcontextprotocol/servers",
+    "modelcontextprotocol/typescript-sdk"
+   ],
+   "dismissed": [
+    {
+     "repository": "modelcontextprotocol/modelcontextprotocol",
+     "reason": "Protocol specification + Mintlify documentation site (README: 'MCP specification, MCP protocol schema, Official MCP documentation'; homepage modelcontextprotocol.io) — not bridging/inspection/configuration software to adopt."
+    },
+    {
+     "repository": "modelcontextprotocol/python-sdk",
+     "reason": "Official SDK for authoring new MCP servers/clients in Python; its `mcp install`/`mcp dev` CLI only targets servers built with this SDK, a build-your-own-server library rather than a bridge/inspector/configurator for arbitrary existing MCP surfaces like mcporter/mcp-inspector."
+    },
+    {
+     "repository": "modelcontextprotocol/servers",
+     "reason": "Reference-implementation collection whose own README defers real server listings to the separate MCP Registry ('looking for a list of MCP servers... browse the MCP Registry'); a registry-style list this layer's next_action already excludes absent a concrete surface gap, the same pattern that sank awesome-mcp-servers and modelcontextprotocol/registry."
+    },
+    {
+     "repository": "modelcontextprotocol/typescript-sdk",
+     "reason": "Official SDK for authoring new MCP servers/clients in TypeScript/JS — a protocol-implementation library, not a bridge/inspector/configurator for already-existing MCP surfaces; same out-of-scope concern as python-sdk."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "native-clients",
+   "catalog": "foundation",
+   "leads": [
+    "anthropics/anthropic-sdk-go",
+    "dongri/openai-api-rs",
+    "jeremychone/rust-genai",
+    "yanceyofficial/rs-openai"
+   ],
+   "dismissed": [
+    {
+     "repository": "anthropics/anthropic-sdk-go",
+     "reason": "Raw API-key HTTP client library for Go (import anthropic; docs.anthropic.com API), no native login or resumable session -- unrelated to the native-clients requirement; verified not archived, MIT, latest v1.75.0 released 2026-09-22 via gh api repos/anthropics/anthropic-sdk-go and its releases/latest."
+    },
+    {
+     "repository": "dongri/openai-api-rs",
+     "reason": "Unofficial Rust wrapper around the OpenAI REST API requiring OPENAI_API_KEY/OPENROUTER_API_KEY env vars; a raw SDK, not a native-account CLI/session client, so unrelated to the requirement -- verified not archived, MIT, latest v10.0.1 released 2026-04-17 via gh api."
+    },
+    {
+     "repository": "jeremychone/rust-genai",
+     "reason": "Rust multi-provider chat-completion client library (Anthropic/OpenAI/Gemini/etc., API-key based) for building your own application, not a native-account client with resumable sessions -- unrelated to the requirement despite active maintenance; verified not archived, Apache-2.0, pushed 2026-09-26, no GitHub Releases object (versioned via crates.io/tags only) via gh api."
+    },
+    {
+     "repository": "yanceyofficial/rs-openai",
+     "reason": "Small (31-star) Rust binding to the OpenAI REST API requiring an API key; same SDK-tier mismatch with the native-clients requirement as the other three leads, and the lowest activity of the four -- verified not archived, MIT, latest tag v0.9.0, pushed 2026-09-02 via gh api."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "observability-hosting",
+   "catalog": "us-equities",
+   "leads": [
+    "bytecodealliance/wasmtime",
+    "firecracker-microvm/firecracker",
+    "google/gvisor",
+    "kata-containers/kata-containers",
+    "prometheus/prometheus",
+    "wasmerio/wasmer",
+    "yanghaku/wasmer-gpu-go"
+   ],
+   "dismissed": [
+    {
+     "repository": "prometheus/prometheus",
+     "reason": "Exact match already in this layer's known_repositories; adds no new evidence to the still-unresolved Loki/OTel-Collector/Prometheus telemetry-lane dispute recorded in open_gaps."
+    },
+    {
+     "repository": "firecracker-microvm/firecracker",
+     "reason": "Core mechanism is Linux KVM hardware virtualization (README: 'uses the Linux Kernel Virtual Machine (KVM)') with zero macOS support and no confirmed path to expose KVM inside the WSL2 host; built for multi-tenant cloud/serverless scale (AWS Lambda/Fargate), not a single-workstation bounded-worker use case -- feasibility isn't established on either named host."
+    },
+    {
+     "repository": "kata-containers/kata-containers",
+     "reason": "Same undemonstrated hardware-virtualization dependency as Firecracker (README requires Intel VT-x/AMD SVM/ARM Hyp plus a QEMU/Firecracker/Cloud-Hypervisor backend) and zero macOS support; a Kubernetes/CRI-node container runtime, heavier than this requirement needs, and duplicates Firecracker's already-dismissed core dependency."
+    },
+    {
+     "repository": "yanghaku/wasmer-gpu-go",
+     "reason": "Dormant personal fork (last pushed 2022-03-28, zero releases, 3 stars, 0 forks); narrow CUDA-only wasmer-go binding superseded by the maintained wasmerio/wasmer already proposed here."
+    }
+   ],
+   "not_adopted": [],
+   "kept": [
+    {
+     "repository": "bytecodealliance/wasmtime",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v49.0.1",
+      "released_at": "2026-09-24T19:22:18Z",
+      "pushed_at": "2026-09-26T01:30:32Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 18659
+     },
+     "demonstrated_gap_excerpt": "This layer has zero adopted winners for the process-supervision/sandboxing half of its requirement -- the 2026-09-23 sweep only disputed telemetry backends (Loki/Prometheus/OTel-Collector vs restic/sandbox-runtime) and never converged on how a research-worker process is actually confined so it cann…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.92,
+       "reasoning_excerpt": "gh api repos/bytecodealliance/wasmtime confirms archived=false, pushed_at=2026-09-26T01:30:32Z, license=Apache-2.0, stars=18659, topics include 'sandbox' -- exact match to the proposal's claims. /releases/latest and /releases/tags/v49.0.1 both confirm v49.0.1 is the current latest release, publishe…",
+       "refs": [
+        "https://github.com/bytecodealliance/wasmtime",
+        "https://github.com/bytecodealliance/wasmtime/releases/tag/v49.0.1",
+        "https://github.com/bytecodealliance/wasmtime#readme",
+        "https://docs.wasmtime.dev/security.html"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.9,
+       "reasoning_excerpt": "Refuted on fit and on its label. (1) The proposed trial cannot run this layer's actual worker. The research worker is blueprints/us-equities/workers/native_worker.py. It starts the native Codex CLI through CodexClient, and that native binary carries the native identity and usage. Gap-wave2 #8 recor…",
+       "refs": [
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/us-equities/workers/native_worker.py",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/8-research-worker-broker-authority.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/sota-refresh-20260923/obs-compare/observability-hosting-comparison.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json",
+        "https://github.com/anthropics/sandbox-runtime#readme",
+        "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+        "https://docs.python.org/3/library/intro.html#webassembly-platforms",
+        "https://github.com/bytecodealliance/wasmtime/releases/tag/v49.0.1"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.92,
+       "reasoning_excerpt": "The demonstrated-gap premise fails: the already-considered [sandbox-runtime](https://github.com/anthropics/sandbox-runtime) documents filesystem, network and IPC restrictions for native processes on Linux and macOS. This does not establish it as a measured winner, but contradicts the claimed absenc…",
+       "refs": [
+        "https://github.com/anthropics/sandbox-runtime",
+        "https://docs.wasmtime.dev/security.html",
+        "https://github.com/bytecodealliance/wasmtime"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "wasmerio/wasmer",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "v7.4.2",
+      "released_at": "2026-09-16T14:49:23Z",
+      "pushed_at": "2026-09-26T07:23:16Z",
+      "archived": false,
+      "license": "MIT",
+      "stars": 21092
+     },
+     "demonstrated_gap_excerpt": "Same unresolved sandboxing gap as wasmtime; wasmer is a credible alternative in the identical category. Its README markets it explicitly as 'Lightweight sandboxes for your apps and AI agents' with per-run capability flags (--volume for filesystem, --net for network, deny-by-default otherwise) and a…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.9,
+       "reasoning_excerpt": "gh api repos/wasmerio/wasmer confirms archived=false, pushed_at=2026-09-26T07:23:16Z, license=MIT, stars=21092, description '🚀 Fast and lightweight sandboxes for your apps and AI agents' -- matches the proposal's quote (it omits the leading rocket emoji, not a material difference). /releases/latest…",
+       "refs": [
+        "https://github.com/wasmerio/wasmer",
+        "https://github.com/wasmerio/wasmer/releases/tag/v7.4.2",
+        "https://github.com/wasmerio/wasmer#readme"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.88,
+       "reasoning_excerpt": "Refuted. It shares wasmtime's infeasibility and duplicates a known alternative. (1) The claimed edge, that 'the existing Python worker runs largely unmodified via python/python', fails for this worker. native_worker.py's job is to spawn the host's native Codex CLI through CodexClient. WASIX proc_sp…",
+       "refs": [
+        "https://wasix.org/docs/api-reference/wasix/proc_spawn",
+        "https://docs.python.org/3/library/intro.html#webassembly-platforms",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/us-equities/workers/native_worker.py",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/8-research-worker-broker-authority.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/sota-refresh-20260923/obs-compare/observability-hosting-comparison.json",
+        "https://github.com/anthropics/sandbox-runtime#readme",
+        "https://github.com/wasmerio/wasmer/releases/tag/v7.4.2"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.9,
+       "reasoning_excerpt": "The packaged interpreter does not establish compatibility with the actual worker. The [registry lists Python 3.13.20](https://wasmer.io/python/python), so interpreter obsolescence is unsupported; however, upstream explicitly requires [WASIX builds of native dependencies](https://wasmer.io/posts/dyn…",
+       "refs": [
+        "https://wasmer.io/python/python",
+        "https://wasmer.io/posts/dynamic-linking-in-wasm-wasix",
+        "https://github.com/wasmerio/wasmer",
+        "https://github.com/anthropics/sandbox-runtime"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "google/gvisor",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "release-20260921.0",
+      "released_at": "2026-09-23T23:19:22Z",
+      "pushed_at": "2026-09-26T04:45:44Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 19422
+     },
+     "demonstrated_gap_excerpt": "A different technique for the same unresolved gap: gVisor is a Google-maintained, actively released (2026-09-23) userspace 'application kernel' that intercepts Linux syscalls via ptrace/systrap (README: 'not a VM... runs as a normal process'), needing only Linux 5.6+ and Docker -- no hardware virtu…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.88,
+       "reasoning_excerpt": "gh api repos/google/gvisor confirms archived=false, pushed_at=2026-09-26T04:45:44Z, license=Apache-2.0, stars=19422 -- exact match. /releases/latest and /releases/tags/release-20260921.0 both confirm tag_name='release-20260921.0' (name 'gVisor 20260921.0') is the current latest release, published_a…",
+       "refs": [
+        "https://github.com/google/gvisor",
+        "https://github.com/google/gvisor/releases/tag/release-20260921.0",
+        "https://github.com/google/gvisor#readme",
+        "https://gvisor.dev/docs/architecture_guide/platforms/"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.8,
+       "reasoning_excerpt": "Refuted. gVisor is a credible Linux sandbox, but the proposal shows no evidence-backed gap for this requirement against the known alternative, and its overturn test does not discriminate. (1) Its advantage (confining unmodified workers with no WASM port) is argued only against the co-proposed wasmt…",
+       "refs": [
+        "https://gvisor.dev/docs/user_guide/networking/",
+        "https://github.com/google/gvisor#readme",
+        "https://github.com/google/gvisor/releases/tag/release-20260921.0",
+        "https://api.github.com/search/issues?q=repo:google/gvisor+WSL2",
+        "https://github.com/anthropics/sandbox-runtime#readme",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/sota-refresh-20260923/obs-compare/observability-hosting-comparison.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/8-research-worker-broker-authority.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/us-equities/workers/native_worker.py"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.94,
+       "reasoning_excerpt": "The proposal conflates host-kernel isolation with restricting application authority. gVisor's [security model](https://gvisor.dev/docs/architecture_guide/security/) permits access to mapped files and network connections, and explicitly delegates network policy and resource limits to external contro…",
+       "refs": [
+        "https://gvisor.dev/docs/architecture_guide/security/",
+        "https://gvisor.dev/docs/architecture_guide/platforms/",
+        "https://github.com/google/gvisor"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 724903,
+     "cached_input_tokens": 624768,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 7638,
+     "reasoning_output_tokens": 4981
+    }
+   }
+  },
+  {
+   "layer_id": "observation-inference",
+   "catalog": "foundation",
+   "leads": [
+    "fluent/fluent-bit",
+    "grafana/mimir",
+    "open-telemetry/opentelemetry-collector",
+    "openobserve/openobserve",
+    "victoriametrics/victorialogs",
+    "victoriametrics/victoriametrics"
+   ],
+   "dismissed": [
+    {
+     "repository": "grafana/mimir",
+     "reason": "Built for horizontally-scaled, multi-tenant HA long-term Prometheus storage across clusters (object-storage backend, multiple microservices even in 'monolithic' mode); more operational surface than this layer's single-host local pipeline needs, and the same 'better long-term Prometheus storage' niche is already covered by the VictoriaMetrics proposal with one static binary -- no incremental gap."
+    },
+    {
+     "repository": "open-telemetry/opentelemetry-collector",
+     "reason": "Core distribution only -- the adopted winner (opentelemetry-collector-contrib) already packages this core plus the additional receivers/processors/exporters actually in use, so this is a strict subset/duplicate of the current winner, not a new candidate."
+    }
+   ],
+   "not_adopted": [],
+   "kept": [
+    {
+     "repository": "fluent/fluent-bit",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v5.1.2",
+      "released_at": "2026-09-05T03:54:50Z",
+      "pushed_at": "2026-09-26T02:08:56Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 8123
+     },
+     "demonstrated_gap_excerpt": "The pinned pipeline component (opentelemetry-collector-contrib 0.161.0) is recorded 'conditional' on linux-wsl2-x86_64 and 'untested' on macos-arm64 in this layer's own platform_status. Fluent Bit is a single C binary shipped natively for Linux, BSD, OSX and Windows (per its own GitHub description)…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.9,
+       "reasoning_excerpt": "Verified live via gh api: archived=false, disabled=false, license=Apache-2.0, pushed_at=2026-09-26T02:08:56Z (exact match to claim), description text is a verbatim match to the proposal's quote, and topics include 'c' corroborating the C-binary claim. Stars=8124 vs claimed 8123 is 1-count live-coun…",
+       "refs": [
+        "https://github.com/fluent/fluent-bit",
+        "https://github.com/fluent/fluent-bit/releases/latest"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.86,
+       "reasoning_excerpt": "Refuted: no demonstrated gap, and the redaction-parity claim is unsupported. (1) The platform gap comes from misreading the status fields. On origin/main (5008c30c), the component matrix gives otelcol-contrib 0.161.0 derived_status 'accepted', e2e_state 'host_verified' on linux-wsl2-x86_64: 2 indep…",
+       "refs": [
+        "https://docs.fluentbit.io/manual/pipeline/processors",
+        "https://docs.fluentbit.io/manual/pipeline/processors/filters",
+        "https://github.com/fluent/fluent-bit/releases/tag/v5.1.2",
+        "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.161.0",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/observability/collector/collector.yaml#L69-L159",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/catalogs/landscape/component-evidence-matrix.json#L1772",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/catalogs/sota-convergence/manifest-20260923.json#L8794-L8829",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/observability/README.md#L40",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/catalogs/landscape/claude-independent-discovery.json#L3275"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.86,
+       "reasoning_excerpt": "The proposed advantage is not established. 'Untested' describes missing qualification, not an upstream platform limitation, and C versus Go does not demonstrate lower resource use for equivalent processing. Fluent Bit supports multiple signals, but its documentation distinguishes log filters from s…",
+       "refs": [
+        "https://github.com/fluent/fluent-bit",
+        "https://docs.fluentbit.io/manual/data-pipeline/processors"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "openobserve/openobserve",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v1.0.4",
+      "released_at": "2026-09-24T11:57:05Z",
+      "pushed_at": "2026-09-26T13:59:10Z",
+      "archived": false,
+      "license": "AGPL-3.0",
+      "stars": 22142
+     },
+     "demonstrated_gap_excerpt": "The current path is three separate systems (opentelemetry-collector-contrib pipeline, Prometheus store, Loki store) with three query surfaces and no built-in model-route observability, plus 'conditional'/'untested' platform status. OpenObserve is one self-hosted binary that can ingest OTLP logs+met…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.94,
+       "reasoning_excerpt": "Verified live via gh api: archived=false, disabled=false, license=AGPL-3.0, pushed_at=2026-09-26T13:59:10Z and stars=22142 both exact matches. The repository description literally contains 'logs, metrics, traces, RUM (web, android, ios), Session replay, pipelines, SLO and LLM observability' and 'si…",
+       "refs": [
+        "https://github.com/openobserve/openobserve",
+        "https://github.com/openobserve/openobserve/releases/latest"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.85,
+       "reasoning_excerpt": "Refuted: the core gap is false for this repository, and the redaction angle depends on non-AGPL features. (1) The stack does not have 'three query surfaces'. One Collector feeds Prometheus and Loki, and a single Grafana views both (README L44-51). The Grafana datasource template provisions promethe…",
+       "refs": [
+        "https://github.com/openobserve/openobserve/blob/main/README.md",
+        "https://openobserve.ai/downloads/",
+        "https://github.com/openobserve/openobserve/releases/tag/v1.0.4",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/observability/README.md#L19-L51",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/observability/backends/templates/ecosystem-grafana-datasources.yml.example#L5-L22",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/catalogs/landscape/claude-independent-discovery.json#L6580"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.85,
+       "reasoning_excerpt": "Consolidation is plausible, but the proposal confuses one collection pipeline with one backend and identifies no concrete native task or model-output question that consolidation resolves. Its comparison retains the collector; replaying already-filtered data cannot independently validate OpenObserve…",
+       "refs": [
+        "https://github.com/openobserve/openobserve",
+        "https://openobserve.ai/docs/integration/ai/llm-experiments/"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "victoriametrics/victorialogs",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v1.52.0",
+      "released_at": "2026-07-16T02:38:16Z",
+      "pushed_at": "2026-09-26T11:03:12Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 2317
+     },
+     "demonstrated_gap_excerpt": "The pinned log store (Loki 3.7.8) is recorded 'conditional' on linux-wsl2-x86_64 and 'untested' on macos-arm64. VictoriaLogs is a single static Go binary with confirmed darwin-arm64 and linux-amd64/arm64 release assets, speaks LogsQL, and lists 'loki' and 'grafana' among its own topics for API/dash…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.9,
+       "reasoning_excerpt": "Verified live via gh api: full_name, archived=false, disabled=false, license=Apache-2.0, pushed_at=2026-09-26T11:03:12Z all exact matches; topics include loki, grafana, opentelemetry and logging exactly as claimed. Stars=2318 vs claimed 2317 is 1-count live drift, immaterial. Latest release verifie…",
+       "refs": [
+        "https://github.com/VictoriaMetrics/VictoriaLogs",
+        "https://github.com/VictoriaMetrics/VictoriaLogs/releases/latest"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.8,
+       "reasoning_excerpt": "Refuted: no concrete, evidence-backed gap for this requirement. (1) The platform gap comes from misreading the status fields. On origin/main, Loki 3.7.8 is derived 'accepted' and 'host_verified' on linux-wsl2-x86_64, with 2 independently reviewed passes and 0 fails. Upstream ships loki-darwin-arm64…",
+       "refs": [
+        "https://docs.victoriametrics.com/victorialogs/faq/",
+        "https://github.com/grafana/loki/releases/tag/v3.7.8",
+        "https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.52.0",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/catalogs/landscape/component-evidence-matrix.json#L1864",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/observability/backends/pins.json#L21",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/observability/README.md#L108",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/observability/backends/templates/ecosystem-grafana-datasources.yml.example#L14-L16"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": false,
+       "confidence": 0.79,
+       "reasoning_excerpt": "Survives as a targeted comparison. Upstream specifically documents potential RAM/storage savings against Loki, providing a plausible comparative advantage beyond the untested-platform labels. [VictoriaLogs FAQ](https://docs.victoriametrics.com/victorialogs/faq/). The supplied native-release evidenc…",
+       "refs": [
+        "https://docs.victoriametrics.com/victorialogs/faq/",
+        "https://docs.victoriametrics.com/victorialogs/logql-to-logsql/",
+        "https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.52.0"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "victoriametrics/victoriametrics",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v1.152.0",
+      "released_at": "2026-09-14T10:36:37Z",
+      "pushed_at": "2026-09-25T19:56:06Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 17771
+     },
+     "demonstrated_gap_excerpt": "The pinned metrics store (Prometheus 3.14.0) is recorded 'conditional' on linux-wsl2-x86_64 and 'untested' on macos-arm64, and this layer's own upstream-drift table already shows the pin one release behind (upstream v3.15.0, released 2026-09-25). VictoriaMetrics is a single static Go binary with co…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.94,
+       "reasoning_excerpt": "Verified live via gh api: full_name, archived=false, disabled=false, license=Apache-2.0, pushed_at=2026-09-25T19:56:06Z and stars=17771 all exact matches; topics include prometheus, promql, otlp and tsdb exactly as claimed. Latest release verified as v1.152.0, published_at=2026-09-14T10:36:37Z exac…",
+       "refs": [
+        "https://github.com/VictoriaMetrics/VictoriaMetrics",
+        "https://github.com/VictoriaMetrics/VictoriaMetrics/releases/latest"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.87,
+       "reasoning_excerpt": "Refuted: this alternative is already known and recorded as not adopted, the proposal adds no new evidence, and the replacement would not leave the config unchanged. (1) catalogs/sota-convergence/README.md L52 records 'VictoriaMetrics not adopted (Prometheus-compatible peer)', and it has been discov…",
+       "refs": [
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/catalogs/sota-convergence/README.md#L52",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/catalogs/landscape/claude-independent-discovery.json#L9829",
+        "https://github.com/prometheus/prometheus/releases/tag/v3.14.0",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/observability/backends/pins.json#L10",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/observability/backends/templates/ecosystem-prometheus.yml.example#L4-L9",
+        "https://docs.victoriametrics.com/victoriametrics/vmalert/",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/catalogs/landscape/component-evidence-matrix.json#L1818",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5008c30cd667/observability/README.md#L19-L23",
+        "https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.152.0"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": false,
+       "confidence": 0.75,
+       "reasoning_excerpt": "Survives narrowly as a targeted comparison. Upstream reports Prometheus-relative resource savings, particularly at high cardinality, and documents a single-node deployment with the Prometheus query API. That supports a testable efficiency hypothesis, although workstation-scale savings remain unprov…",
+       "refs": [
+        "https://docs.victoriametrics.com/victoriametrics/",
+        "https://docs.victoriametrics.com/MetricsQL.html",
+        "https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.152.0"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 561823,
+     "cached_input_tokens": 467072,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 11070,
+     "reasoning_output_tokens": 8690
+    }
+   }
+  },
+  {
+   "layer_id": "portfolio-risk",
+   "catalog": "us-equities",
+   "leads": [
+    "auto-differentiation/quantlib-risks-py",
+    "lballabio/quantlib",
+    "mhallsmoore/qstrader",
+    "nautechsystems/nautilus_trader",
+    "quantales/pyquantlib"
+   ],
+   "dismissed": [
+    {
+     "repository": "auto-differentiation/quantlib-risks-py",
+     "reason": "Automatic-differentiation Greeks/risk for QuantLib derivatives pricing models, not portfolio-optimization or equity risk/accounting (outside this layer's scope terms); also dormant — no release or code commit since 2024-04-04 (only a single README-only push on 2026-04-02)."
+    },
+    {
+     "repository": "lballabio/quantlib",
+     "reason": "Official C++ derivatives/fixed-income pricing and term-structure library, actively maintained (v1.43 released 2026-07-14; pushed 2026-09-25; BSD-3-Clause) but unrelated to this layer's portfolio-optimization / performance-evaluation / equity-accounting requirement — a different problem category from the current winner (skfolio) and alternatives."
+    },
+    {
+     "repository": "mhallsmoore/qstrader",
+     "reason": "Dormant legacy backtesting/risk-manager framework (fixed-fraction position sizing, simple stop-loss) — no commit or release since v0.3.0 on 2024-06-30 (~2.25 years), superseded by the maintained portfolio-optimization winner/alternatives."
+    },
+    {
+     "repository": "nautechsystems/nautilus_trader",
+     "reason": "Duplicate: already listed verbatim in this layer's known_repositories and is itself the requirement's selected NautilusTrader execution destination (tracked at the execution layer), not a new portfolio-risk candidate."
+    },
+    {
+     "repository": "quantales/pyquantlib",
+     "reason": "Third-party pybind11 bindings for QuantLib (derivatives/fixed-income pricing; v0.9.0 released 2026-08-29, actively maintained, Linux x86_64/macOS-arm64 wheels) — same category mismatch as QuantLib itself, not a portfolio-optimization or equity-risk/accounting tool for this layer."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "quality-evaluation",
+   "catalog": "foundation",
+   "leads": [
+    "vibrantlabsai/ragas"
+   ],
+   "dismissed": [
+    {
+     "repository": "vibrantlabsai/ragas",
+     "reason": "Genuine upstream (formerly explodinggradients/ragas, GitHub-renamed to vibrantlabsai/ragas; Apache-2.0, 15.8k stars) but dormant for this requirement -- pushed_at 2026-02-24 and latest release v0.4.3 published 2026-01-13 (~7-8 months stale, no 2026 H2 activity) versus winners promptfoo and playwright-test both pushed 2026-09-26; also duplicates confident-ai/deepeval, an LLM-eval-metrics alternative already known to this layer and refuted in the 2026-09-23 sweep, with no new demonstrated gap over that or the current winners."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "research-factors-ml",
+   "catalog": "us-equities",
+   "leads": [
+    "ai4finance-foundation/finrl",
+    "cloudquant/backtrader",
+    "jialuechen/torchquant",
+    "mementum/backtrader",
+    "quantconnect/lean",
+    "quantopian/alphalens"
+   ],
+   "dismissed": [
+    {
+     "repository": "ai4finance-foundation/finrl",
+     "reason": "Exact match already in this layer's known_repositories (a deep-RL trading-agent framework, not a new discovery); archived=false, pushed_at 2026-09-26, latest release v0.3.8 (2026-03-20) confirmed via gh api."
+    },
+    {
+     "repository": "cloudquant/backtrader",
+     "reason": "A backtesting/execution engine (backtrader-API rewrite; PyPI back-trader-python/back-trader-cpp), not a factor/ML research library, and duplicates the lineage of the already-known mementum/backtrader; pushed_at 2026-09-21, release v1.4.0 (2026-09-19) confirmed via gh api."
+    },
+    {
+     "repository": "jialuechen/torchquant",
+     "reason": "Single-maintainer PyTorch differentiable derivatives/options-pricing and Greeks library, unrelated to equity factor/ML research; latest release v1.3.1 was 2024-10-10 and last push 2025-12-16 per gh api, with 1 contributor."
+    },
+    {
+     "repository": "mementum/backtrader",
+     "reason": "Exact match already in this layer's known_repositories, and a backtesting engine outside this layer's factor/ML scope; also dormant (pushed_at 2024-08-19, no GitHub Release object -- 404 on /releases/latest)."
+    },
+    {
+     "repository": "quantconnect/lean",
+     "reason": "Exact match already in this layer's known_repositories and the 'prior LEAN oracle' this layer's own requirement text already preserves; pushed_at 2026-09-25 confirmed, not a new lead."
+    },
+    {
+     "repository": "quantopian/alphalens",
+     "reason": "Duplicate of the already-known alternative stefan-jansen/alphalens-reloaded, the actively maintained continuation (release 0.4.5 on 2025-07-23, pushed_at 2025-12-15 per gh api); the quantopian original has had no release since v0.4.0 (2020-04-30) and last pushed 2024-02-12."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "scheduling-supervision",
+   "catalog": "foundation",
+   "leads": [
+    "flyteorg/flyte"
+   ],
+   "dismissed": [
+    {
+     "repository": "flyteorg/flyte",
+     "reason": "Kubernetes/Postgres-backed ML-pipeline-at-scale orchestrator (LF AI & Data Graduated project; topics confirm kubernetes, mlops, agentic, orchestration-engine; not archived, pushed 2026-09-25, Apache-2.0, latest v2.0.50/2026-09-24 and v1.16.9/2026-09-24) -- duplicates the already-tracked Dagster/Temporal/Restate distributed-orchestrator category with no new gap versus them, and its durable/visible-history execution needs cluster control-plane infra beyond this requirement's single-host local process scheduling that Dagu/systemd already satisfy."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "security-supply-chain",
+   "catalog": "us-equities",
+   "leads": [
+    "aboutcode-org/scancode-toolkit",
+    "awslabs/git-secrets",
+    "cdxgen/cdxgen",
+    "cyclonedx/cdxgen",
+    "microsoft/sbom-tool",
+    "yelp/detect-secrets"
+   ],
+   "dismissed": [
+    {
+     "repository": "awslabs/git-secrets",
+     "reason": "Dormant: pushed_at=2025-09-17T20:31:20Z (>12 months stale as of 2026-09-26), no GitHub Releases (404 on /releases/latest), newest tag only 1.3.0 — materially less maintained than winner gitleaks (v8.30.1 pin)."
+    },
+    {
+     "repository": "cyclonedx/cdxgen",
+     "reason": "Same repository as the cdxgen/cdxgen lead: gh api -i repos/cyclonedx/cdxgen returns HTTP 200 with full_name \"cdxgen/cdxgen\" (old org slug redirects to the renamed org) — proposed once under its current canonical name, not double-counted."
+    }
+   ],
+   "not_adopted": [],
+   "kept": [
+    {
+     "repository": "aboutcode-org/scancode-toolkit",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v32.5.0",
+      "released_at": "2026-01-15T23:39:20Z",
+      "pushed_at": "2026-09-18T19:14:08Z",
+      "archived": false,
+      "license": "Apache-2.0 (+ CC-BY-4.0 data); GitHub API misreports NOASSERTION, corrected via NOTICE file",
+      "stars": 2630
+     },
+     "demonstrated_gap_excerpt": "None of the three winners (grype, syft, gitleaks) do deep license/copyright/provenance text scanning. Syft only surfaces package-manifest declared license metadata; open_gaps already records that signature/provenance verification is missing for every installed supply-chain tool and that Syft/Grype …",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.97,
+       "reasoning_excerpt": "All cited facts verified via gh api and direct file reads: archived=false, pushed_at=2026-09-18T19:14:08Z, stars=2630 match exactly; GitHub license.spdx_id is literally NOASSERTION as claimed. Latest release v32.5.0 published_at=2026-01-15T23:39:20Z matches exactly. NOTICE file (fetched) literally …",
+       "refs": [
+        "https://api.github.com/repos/aboutcode-org/scancode-toolkit",
+        "https://api.github.com/repos/aboutcode-org/scancode-toolkit/releases/latest",
+        "https://github.com/aboutcode-org/scancode-toolkit/blob/main/NOTICE",
+        "https://github.com/aboutcode-org/scancode-toolkit#readme",
+        "https://pypi.org/pypi/scancode-toolkit/json"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.85,
+       "reasoning_excerpt": "The targeted_candidate label fails on gap, platform and comparison design. (1) The gap conflates two different kinds of provenance. ScanCode's 'provenance' means origin and copyright detection. The open_gaps item is cryptographic signature and provenance verification of the installed tools. The sta…",
+       "refs": [
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/us-equities/supply-chain/README.md",
+        "https://pypi.org/pypi/scancode-toolkit/json",
+        "https://pypi.org/pypi/typecode/json",
+        "https://pypi.org/pypi/extractcode/json",
+        "https://pypi.org/pypi/typecode-libmagic/json",
+        "https://pypi.org/pypi/extractcode-7z/json",
+        "https://pypi.org/pypi/extractcode-libarchive/json",
+        "https://pypi.org/pypi/scancode-toolkit-mini/json",
+        "https://api.github.com/repos/aboutcode-org/scancode-toolkit/contents/docs/source/getting-started/installation/install-scancode-from-release-archives.rst",
+        "https://api.github.com/repos/aboutcode-org/scancode-toolkit/readme"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.94,
+       "reasoning_excerpt": "Refuted as submitted. ScanCode documents substantive license/copyright detection, but that capability does not establish verification of installed tools’ signatures or build provenance. [ScanCode](https://github.com/aboutcode-org/scancode-toolkit). The claim that Syft only reads declared manifest l…",
+       "refs": [
+        "https://github.com/aboutcode-org/scancode-toolkit",
+        "https://oss.anchore.com/docs/reference/syft/configuration/",
+        "https://scancode-toolkit.readthedocs.io/en/stable/getting-started/installation/index.html",
+        "https://scancode-toolkit.readthedocs.io/en/latest/getting-started/installation/install-scancode-using-pip.html"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "cdxgen/cdxgen",
+     "proposed_label": "targeted_candidate",
+     "upstream_now": {
+      "latest_release": "v13.2.0",
+      "released_at": "2026-09-22T16:14:44Z",
+      "pushed_at": "2026-09-26T03:27:58Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 1077
+     },
+     "demonstrated_gap_excerpt": "open_gaps states verbatim that the Syft/Grype scans 'cover Python package metadata only' and miss 'bundled Rust/Cython or native shared libraries, host OS packages, IBKR-side software, or code outside the scanned venv.' cdxgen's own README documents exactly that coverage: native Rust support (Cargo…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.97,
+       "reasoning_excerpt": "All cited facts verified: gh api repos/cdxgen/cdxgen matches archived=false, pushed_at=2026-09-26T03:27:58Z, stars=1077, license=Apache-2.0 exactly. Latest release v13.2.0 published_at=2026-09-22T16:14:44Z matches exactly. Fetched README literally contains '- Rust (Cargo.lock)', '- Operations (OBOM…",
+       "refs": [
+        "https://api.github.com/repos/cdxgen/cdxgen",
+        "https://api.github.com/repos/cdxgen/cdxgen/releases/latest",
+        "https://api.github.com/repos/cyclonedx/cdxgen",
+        "https://github.com/cdxgen/cdxgen#readme"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.8,
+       "reasoning_excerpt": "The claimed point-for-point gap duplicates what the winner already does. At v1.52.0, Syft's internal/task/package_tasks.go runs these catalogers on directory scans: the Alpine apk DB, Debian dpkg DB and .deb archives, Rust cargo-auditable binaries and Cargo.lock, ELF package notes, PE packages, the…",
+       "refs": [
+        "https://github.com/anchore/syft/blob/v1.52.0/internal/task/package_tasks.go",
+        "https://api.github.com/repos/anchore/syft/readme",
+        "https://api.github.com/repos/anchore/syft/releases?per_page=4",
+        "https://api.github.com/repos/cdxgen/cdxgen",
+        "https://api.github.com/repos/cdxgen/cdxgen/readme",
+        "https://api.github.com/repos/cdxgen/cdxgen/contents/docs/BENCHMARKS.md",
+        "https://api.github.com/repos/cdxgen/cdxgen/contents/docs/PROJECT_TYPES.md",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/us-equities/supply-chain/README.md"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.97,
+       "reasoning_excerpt": "The proposed gap confuses receipt scope with scanner capability. Syft already documents Rust, APK/DPKG/RPM packages, filesystem/container scanning and signed SBOM attestations. [Syft](https://github.com/anchore/syft). Comparing additional Cargo/source/host scans against an earlier venv-only invento…",
+       "refs": [
+        "https://github.com/anchore/syft",
+        "https://github.com/cdxgen/cdxgen"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "microsoft/sbom-tool",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "v4.1.5",
+      "released_at": "2025-12-15T21:40:14Z",
+      "pushed_at": "2026-09-21T23:22:28Z",
+      "archived": false,
+      "license": "MIT",
+      "stars": 2076
+     },
+     "demonstrated_gap_excerpt": "No verified gap on this stack yet: like Syft, sbom-tool detects components from package manifests/lockfiles (via Microsoft's Component-Detection library) rather than scanning native/Rust/Cython binaries or host OS packages, so it does not clearly address the open_gaps item on non-Python coverage. I…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.97,
+       "reasoning_excerpt": "All cited facts verified via gh api: archived=false, pushed_at=2026-09-21T23:22:28Z, stars=2076, license=MIT match exactly. Latest release v4.1.5 published_at=2025-12-15T21:40:14Z matches exactly. Fetched README text is a near-verbatim match to the proposal's quote: it 'uses the Component Detection…",
+       "refs": [
+        "https://api.github.com/repos/microsoft/sbom-tool",
+        "https://api.github.com/repos/microsoft/sbom-tool/releases/latest",
+        "https://github.com/microsoft/sbom-tool#readme"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.75,
+       "reasoning_excerpt": "The proposal itself states there is no verified gap, and neither claimed differentiator survives against the winner. (1) SPDX 3.0 output is no longer an advantage. Syft PR #4269 'feat: SPDX 3' was merged 2026-06-22, and issue #4250 closed as completed. A compare of that merge commit with v1.52.0 re…",
+       "refs": [
+        "https://api.github.com/repos/microsoft/sbom-tool/releases/latest",
+        "https://api.github.com/repos/microsoft/sbom-tool/readme",
+        "https://github.com/microsoft/sbom-tool/blob/main/docs/sbom-tool-arguments.md",
+        "https://github.com/anchore/syft/pull/4269",
+        "https://github.com/anchore/syft/issues/4250",
+        "https://api.github.com/repos/anchore/syft/compare/9c321691d483...v1.52.0",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/blueprints/us-equities/supply-chain/README.md"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.95,
+       "reasoning_excerpt": "SPDX 3.0 output and ClearlyDefined license enrichment are documented distinctions, but the proposal identifies neither an SPDX 3.0 consumer nor an incorrect or missing license record relevant to this requirement. Its documented generation workflow hashes deliverables and detects build components; t…",
+       "refs": [
+        "https://github.com/microsoft/sbom-tool"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "yelp/detect-secrets",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "v1.5.0",
+      "released_at": "2024-05-06T18:05:06Z",
+      "pushed_at": "2026-04-02T17:10:40Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 4643
+     },
+     "demonstrated_gap_excerpt": "detect-secrets' plugin-based detectors plus its baseline/audit workflow (`detect-secrets scan` + `detect-secrets audit`) let a team interactively triage and allowlist existing matches, a workflow gitleaks' config-based allowlisting does not replicate as directly. However its formal tagged releases …",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.97,
+       "reasoning_excerpt": "All cited facts verified via gh api: archived=false, pushed_at=2026-04-02T17:10:40Z, stars=4643, license=Apache-2.0 match exactly. Latest tagged release is still v1.5.0 published_at=2024-05-06T18:05:06Z (confirmed via /releases/latest, no newer tag), matching the 'no newer tagged release as of 2026…",
+       "refs": [
+        "https://api.github.com/repos/Yelp/detect-secrets",
+        "https://api.github.com/repos/Yelp/detect-secrets/releases/latest",
+        "https://api.github.com/repos/Yelp/detect-secrets/commits",
+        "https://github.com/Yelp/detect-secrets#readme",
+        "https://api.github.com/repos/gitleaks/gitleaks/releases/latest"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.8,
+       "reasoning_excerpt": "The demonstrated gap is factually wrong about the winner. Gitleaks' README documents a baseline workflow ('Creating a baseline': --baseline-path, where 'report output ... will only contain new issues'). It also documents fingerprint-based .gitleaksignore and inline gitleaks:allow, so it is not limi…",
+       "refs": [
+        "https://api.github.com/repos/Yelp/detect-secrets",
+        "https://api.github.com/repos/Yelp/detect-secrets/releases/latest",
+        "https://api.github.com/repos/Yelp/detect-secrets/readme",
+        "https://api.github.com/repos/gitleaks/gitleaks/readme"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.92,
+       "reasoning_excerpt": "Gitleaks already supports report baselines and per-finding fingerprint suppression, so baseline-based allowlisting is not a missing capability. [Gitleaks](https://github.com/gitleaks/gitleaks). detect-secrets does offer distinct interactive labels and audit statistics, but no relevant triage bottle…",
+       "refs": [
+        "https://github.com/gitleaks/gitleaks",
+        "https://raw.githubusercontent.com/Yelp/detect-secrets/v1.5.0/README.md"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 476974,
+     "cached_input_tokens": 384640,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 8656,
+     "reasoning_output_tokens": 6087
+    }
+   }
+  },
+  {
+   "layer_id": "semantic-rag",
+   "catalog": "foundation",
+   "leads": [
+    "activeloopai/deeplake",
+    "igor-im/code-rag",
+    "jonnoc/coderag",
+    "kdegroup/coderag",
+    "milvus-io/milvus",
+    "weaviate/weaviate"
+   ],
+   "dismissed": [
+    {
+     "repository": "activeloopai/deeplake",
+     "reason": "General-purpose multi-modal AI data-lake/dataset-versioning platform ('serverless postgres with a multimodal datalake' for training data, per its README), not a code-RAG or embedding-service component; duplicates the niche of the already-unqualified LanceDB alternative with no code-retrieval-specific gap vs winner Qdrant; last push 2026-05-21, latest release v4.5.2 on 2026-02-11 (gh api repos/activeloopai/deeplake, checked 2026-09-26)."
+    },
+    {
+     "repository": "igor-im/code-rag",
+     "reason": "Single-commit CodeSearchNet benchmarking/evaluation harness built on pgvector (already an unqualified alternative); created and pushed once on 2026-02-27 with zero activity since, 1 star, no releases -- a dormant research script, not a maintained component (gh api repos/igor-im/code-rag, checked 2026-09-26)."
+    },
+    {
+     "repository": "jonnoc/coderag",
+     "reason": "Marketing-styled 'Enterprise Code Intelligence Platform' (Neo4j code-graph tool) dormant since its last push 2025-06-16 (~15 months ago), 28 stars, no releases -- no evidence of ongoing maintenance (gh api repos/jonnoc/coderag, checked 2026-09-26)."
+    },
+    {
+     "repository": "kdegroup/coderag",
+     "reason": "\"Source code for our EMNLP 2025 paper 'CodeRAG...'\" -- a fixed academic-benchmark reproduction package, not a maintained software library or service (no releases/versioning; README is a one-shot experiment runbook) (gh api + README, checked 2026-09-26)."
+    }
+   ],
+   "not_adopted": [],
+   "kept": [
+    {
+     "repository": "milvus-io/milvus",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "v3.0.2",
+      "released_at": "2026-09-20T09:36:27Z",
+      "pushed_at": "2026-09-26T03:53:34Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "stars": 46255
+     },
+     "demonstrated_gap_excerpt": "Milvus ships first-class NVIDIA GPU index types -- GPU_CAGRA, GPU_IVF_FLAT, GPU_IVF_PQ, GPU_BRUTE_FORCE, 'contributed by the Nvidia RAPIDS team' per its docs -- usable for both index build and query-time search on the primary host's RTX 4090; whether the current winner Qdrant's own GPU support cove…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.95,
+       "reasoning_excerpt": "All cited facts verified via primary sources. gh api repos/milvus-io/milvus confirms archived=false, license=Apache-2.0, stars=46255, pushed_at=2026-09-26T03:53:34Z, matching the proposal exactly; gh api repos/milvus-io/milvus/releases/latest confirms tag v3.0.2, published_at=2026-09-20T09:36:27Z, …",
+       "refs": [
+        "https://github.com/milvus-io/milvus",
+        "https://github.com/milvus-io/milvus/releases/tag/v3.0.2",
+        "https://milvus.io/docs/gpu_index.md"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.8,
+       "reasoning_excerpt": "The proposal's facts check out: the repo is active, Apache-2.0, and v3.0.2 was released 2026-09-20. The capability difference is real too. Qdrant's GPU support (v1.13.0+) covers indexing only: its docs expose only gpu.indexing and describe 'GPU-accelerated vector indexing'. Milvus has GPU indexes u…",
+       "refs": [
+        "https://milvus.io/docs/gpu_index.md",
+        "https://github.com/qdrant/landing_page/blob/HEAD/qdrant-landing/content/documentation/ops-configuration/running-with-GPU.md",
+        "https://github.com/qdrant/qdrant/releases/tag/v1.13.0",
+        "https://github.com/milvus-io/milvus/releases/tag/v3.0.2",
+        "https://github.com/milvus-io/milvus-lite#readme",
+        "https://github.com/milvus-io/milvus-lite/releases/tag/v3.2.1",
+        "https://github.com/giancarloerra/SocratiCode/blob/v1.14.0/README.md",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/blind-catalog-layer-findings-20260921.md",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/us-equities/decision-index.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/receipts/native-rag.json"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.9,
+       "reasoning_excerpt": "The GPU capability difference is real: Qdrant documents GPU index construction with CPU query serving, whereas Milvus supports GPU search. However, Milvus explicitly warns that GPU indexes may not reduce latency and need high request pressure or large query batches to maximize throughput. That does…",
+       "refs": [
+        "https://qdrant.tech/documentation/tutorials-operations/gpu-accelerated-hnsw-indexing/",
+        "https://milvus.io/docs/gpu_index.md",
+        "https://github.com/milvus-io/milvus-lite/blob/main/README.md"
+       ]
+      }
+     },
+     "survived": false
+    },
+    {
+     "repository": "weaviate/weaviate",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "v1.39.7",
+      "released_at": "2026-09-25T13:18:52Z",
+      "pushed_at": "2026-09-26T07:48:00Z",
+      "archived": false,
+      "license": "BSD-3-Clause outside /wl; proprietary \"Weaviate License\" (LICENSE_KEY-gated) inside /wl -- GitHub's detector returns NOASSERTION for the repo as a whole",
+      "stars": 16850
+     },
+     "demonstrated_gap_excerpt": "Weaviate has a first-class 'integrated vectorization' module system that can call an embedding provider -- including an OpenAI-API-compatible self-hosted endpoint, i.e. the winner vLLM -- directly from insert/query calls, plus native hybrid (BM25+vector) search as one query type; both could remove …",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.92,
+       "reasoning_excerpt": "All cited facts verified via primary sources. gh api repos/weaviate/weaviate confirms archived=false, stars=16850, license.spdx_id=NOASSERTION; pushed_at has advanced to 2026-09-26T14:42:36Z from the cited 07:48:00Z, an immaterial live-field drift on a repo pushed the same day, not a false claim. g…",
+       "refs": [
+        "https://github.com/weaviate/weaviate",
+        "https://github.com/weaviate/weaviate/releases/tag/v1.39.7",
+        "https://github.com/weaviate/weaviate/blob/main/LICENSE",
+        "https://github.com/weaviate/weaviate#readme",
+        "https://docs.weaviate.io/weaviate/model-providers/openai/embeddings"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.88,
+       "reasoning_excerpt": "The proposal's facts check out: the repo is active, v1.39.7 was released 2026-09-25, and GitHub reports the license as NOASSERTION. The claimed gap collapses against the winners' own documentation.\n(1) The winner pairing already does both things. SocratiCode, at the 1.14.0 pin and at HEAD, runs 'Hy…",
+       "refs": [
+        "https://github.com/weaviate/weaviate/blob/main/LICENSE",
+        "https://github.com/weaviate/weaviate/blob/main/wl/LICENSE-WEAVIATE",
+        "https://github.com/weaviate/weaviate/tree/v1.39.7/wl",
+        "https://github.com/weaviate/weaviate/releases/tag/v1.39.7",
+        "https://github.com/giancarloerra/SocratiCode/blob/v1.14.0/README.md",
+        "https://github.com/giancarloerra/SocratiCode#readme",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/receipts/native-rag.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/us-equities/decision-index.json"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.97,
+       "reasoning_excerpt": "The proposed gap largely duplicates existing capabilities. SocratiCode 1.14.0 already combines dense and BM25 retrieval through Qdrant in one round trip and integrates configurable embedding providers. No concrete project-owned glue code or lifecycle defect is identified that moving vectorization i…",
+       "refs": [
+        "https://github.com/giancarloerra/SocratiCode/blob/v1.14.0/README.md",
+        "https://docs.weaviate.io/weaviate/model-providers/openai/embeddings",
+        "https://github.com/weaviate/weaviate/blob/main/LICENSE"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 736959,
+     "cached_input_tokens": 630144,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 8413,
+     "reasoning_output_tokens": 6141
+    }
+   }
+  },
+  {
+   "layer_id": "storage-compute",
+   "catalog": "us-equities",
+   "leads": [
+    "timescale/docs",
+    "timescale/timescaledb"
+   ],
+   "dismissed": [
+    {
+     "repository": "timescale/docs",
+     "reason": "Documentation repository (description 'TigerData product documentation'; README confirms it is the Tiger Cloud/TigerData docs site) and archived=true (pushed_at 2026-04-20T12:45:27Z, no license) -- excluded as documentation and dormant, not a software candidate."
+    }
+   ],
+   "not_adopted": [],
+   "kept": [
+    {
+     "repository": "timescale/timescaledb",
+     "proposed_label": "keep_but_compare",
+     "upstream_now": {
+      "latest_release": "2.30.1",
+      "released_at": "2026-09-17T09:21:45Z",
+      "pushed_at": "2026-09-26T12:16:50Z",
+      "archived": false,
+      "license": "Apache-2.0 (core, outside tsl/) + Timescale License (source-available, non-OSI, inside tsl/); GitHub API reports repo-level license as Other/NOASSERTION due to the dual-license LICENSE file",
+      "stars": 23595
+     },
+     "demonstrated_gap_excerpt": "The winner DuckDB (v1.5.5, embedded/in-process OLAP engine) and this layer's already-tracked server alternatives ClickHouse and QuestDB (both 'conditional', same open gap) have no demonstrated way to enforce identity/corporate-action referential integrity at the database layer: DuckDB is single-pro…",
+     "votes": {
+      "facts": {
+       "refuted": false,
+       "confidence": 0.92,
+       "reasoning_excerpt": "All checkable cited facts verified against primary sources in this session. GitHub API repos/timescale/timescaledb: archived=false, fork=false, pushed_at=2026-09-26T12:16:50Z (exact), created_at=2017-03-07T20:03:41Z (matches), forks=1161 (exact), open_issues=409 (exact), topics include time-series-…",
+       "refs": [
+        "https://api.github.com/repos/timescale/timescaledb",
+        "https://api.github.com/repos/timescale/timescaledb/topics",
+        "https://api.github.com/repos/timescale/timescaledb/license",
+        "https://github.com/timescale/timescaledb/releases/tag/2.30.1",
+        "https://github.com/timescale/timescaledb/blob/main/LICENSE",
+        "https://github.com/timescale/timescaledb/tree/main/tsl",
+        "https://raw.githubusercontent.com/timescale/timescaledb/main/tsl/LICENSE-TIMESCALE",
+        "https://github.com/timescale/timescaledb/pull/10580",
+        "https://github.com/timescale/timescaledb/pull/10583",
+        "https://github.com/timescale/timescaledb/pull/10592",
+        "https://github.com/timescale/timescaledb/pull/10593"
+       ]
+      },
+      "fit_claude": {
+       "refuted": true,
+       "confidence": 0.72,
+       "reasoning_excerpt": "The metadata checks out. The repo is not archived, was pushed 2026-09-26, and released 2.30.1 on 2026-09-17. Its license is Apache-2.0 outside tsl/ and the Timescale License (TSL) inside it, and TSL section 2.1(a) allows internal use. The fit claim fails on five points:\n\n(1) The proposal misstates …",
+       "refs": [
+        "https://api.github.com/repos/timescale/timescaledb",
+        "https://github.com/timescale/timescaledb/releases/tag/2.30.1",
+        "https://github.com/timescale/timescaledb/blob/main/LICENSE",
+        "https://github.com/timescale/timescaledb/blob/main/tsl/LICENSE-TIMESCALE",
+        "https://github.com/timescale/timescaledb/tree/main/tsl/src",
+        "https://github.com/timescale/timescaledb/blob/main/CHANGELOG.md",
+        "https://github.com/timescale/timescaledb/pull/8336",
+        "https://github.com/timescale/timescaledb/pull/9324",
+        "https://github.com/timescale/timescaledb/pull/9378",
+        "https://github.com/timescale/timescaledb/pull/10281",
+        "https://www.tigerdata.com/docs/get-started/choose-your-path/timescaledb-editions",
+        "https://www.postgresql.org/docs/18/sql-createtable.html",
+        "https://github.com/duckdb/duckdb-web/blob/HEAD/docs/current/sql/constraints.md",
+        "https://github.com/duckdb/duckdb-web/blob/HEAD/docs/current/connect/concurrency.md",
+        "https://github.com/timescale/homebrew-tap/blob/HEAD/timescaledb.rb"
+       ]
+      },
+      "fit_gpt6": {
+       "refuted": true,
+       "confidence": 0.88,
+       "reasoning_excerpt": "Refuted as written: the claimed integrity advantage is not established. DuckDB already supports foreign keys, CHECK, NOT NULL and uniqueness constraints; embedded operation does not imply missing referential integrity. [DuckDB constraints](https://duckdb.org/docs/current/sql/constraints). It also s…",
+       "refs": [
+        "https://duckdb.org/docs/current/sql/constraints",
+        "https://duckdb.org/docs/current/connect/concurrency",
+        "https://www.postgresql.org/docs/18/ddl-constraints.html",
+        "https://github.com/timescale/timescaledb/releases"
+       ]
+      }
+     },
+     "survived": false
+    }
+   ],
+   "gpt6_fit_job": {
+    "exit": 0,
+    "status": "done",
+    "usage": {
+     "input_tokens": 618591,
+     "cached_input_tokens": 537088,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 8836,
+     "reasoning_output_tokens": 6870
+    }
+   }
+  },
+  {
+   "layer_id": "token-efficiency",
+   "catalog": "foundation",
+   "leads": [
+    "bowang-lab/vllm",
+    "flashinfer-ai/flashinfer",
+    "ggml-org/llama.cpp",
+    "infiniflow/ragflow",
+    "run-llama/llama_index",
+    "turboderp-org/exllamav3",
+    "vllm-project/vllm-metal",
+    "zilliztech/gptcache"
+   ],
+   "dismissed": [
+    {
+     "repository": "bowang-lab/vllm",
+     "reason": "Dormant fork of vllm-project/vllm: 0 stars, no releases/tags, last commit 2025-06-13 (gh api, checked 2026-09-26); even if active it is an inference-serving engine, unrelated to context-supply/token-usage accounting."
+    },
+    {
+     "repository": "flashinfer-ai/flashinfer",
+     "reason": "Actively maintained GPU attention/sampling-kernel library for LLM serving throughput (v0.7.0, released 2026-09-22); addresses inference speed, not context supply, recoverable originals, or provider-usage accounting."
+    },
+    {
+     "repository": "ggml-org/llama.cpp",
+     "reason": "Actively maintained local LLM inference/serving runtime (v0.5.0, released 2026-09-23); doesn't supply, compress, or account for agent task-context tokens -- unrelated to this requirement."
+    },
+    {
+     "repository": "infiniflow/ragflow",
+     "reason": "Actively maintained full RAG/agent platform (v0.27.2, released 2026-09-10) for document retrieval; addresses memory/retrieval, not context-compression or provider-usage measurement -- fits a memory/RAG layer, not token-efficiency."
+    },
+    {
+     "repository": "run-llama/llama_index",
+     "reason": "Actively maintained document/RAG framework (v0.14.25, released 2026-09-21); same retrieval-layer mismatch as ragflow, unrelated to context/usage-efficiency."
+    },
+    {
+     "repository": "turboderp-org/exllamav3",
+     "reason": "Actively maintained quantized local-inference library for consumer GPUs (v1.5.2, released 2026-09-26); a model-serving runtime, not a context-supply or usage-accounting tool."
+    },
+    {
+     "repository": "vllm-project/vllm-metal",
+     "reason": "Actively maintained vLLM Apple-Silicon/MLX hardware backend (v0.30.0, released 2026-09-23); addresses GPU-serving portability, not context-supply compression or provider-usage accounting."
+    }
+   ],
+   "not_adopted": [
+    {
+     "repository": "zilliztech/gptcache",
+     "upstream_now": {
+      "latest_release": "0.1.44",
+      "released_at": "2024-08-01",
+      "pushed_at": "2026-09-22",
+      "archived": false,
+      "license": "MIT",
+      "stars": 8205
+     },
+     "demonstrated_gap_excerpt": "None of the layer's winners (rtk, headroom, ccusage) or alternatives (context-mode, repomix, TOON) skip a repeated/semantically-similar provider call outright -- they compress or measure context, not avoid regenerating an answer. GPTCache's semantic cache targets the requirement's 'provider usage' …"
+    }
+   ],
+   "kept": []
+  },
+  {
+   "layer_id": "web-research",
+   "catalog": "foundation",
+   "leads": [
+    "alphaxiv/openresearch-cli",
+    "alxdr3k/tavily-cli",
+    "tavily-ai/skills"
+   ],
+   "dismissed": [
+    {
+     "repository": "alphaxiv/openresearch-cli",
+     "reason": "GitHub API returns HTTP 301 (checked 2026-09-26) redirecting repos/alphaxiv/openresearch-cli to repository id 1261663145, i.e. https://github.com/alphaXiv/OpenResearch — the exact repo already carried as this layer's 'openresearch' winner; duplicate of a winner (a former name), not a separate candidate."
+    },
+    {
+     "repository": "alxdr3k/tavily-cli",
+     "reason": "Unofficial personal reimplementation (owner alxdr3k, type User) of the layer's tavily-cli winner: created and pushed only on 2025-04-20, 0 stars/forks, no commits, tags or releases since v1.0.1 (2025-04-20T14:08:14Z) — https://github.com/alxdr3k/tavily-cli, checked 2026-09-26 — 17 months dormant and duplicates the already-known winner tavily-ai/tavily-cli with no advantage shown."
+    },
+    {
+     "repository": "tavily-ai/skills",
+     "reason": "Agent-skills/documentation bundle (SKILL.md files + install script, no dominant source language, zero GitHub releases; https://github.com/tavily-ai/skills, last push 2026-09-04, checked 2026-09-26) that only wraps the already-adopted tavily-cli winner's commands — not standalone retrieval software, so not a layer-software candidate (agent skills are adopted separately via adoption/skills/manifest.json)."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  },
+  {
+   "layer_id": "workers",
+   "catalog": "foundation",
+   "leads": [
+    "crewaiinc/crewai",
+    "microsoft/sico",
+    "openai/openai-agents-python"
+   ],
+   "dismissed": [
+    {
+     "repository": "crewaiinc/crewai",
+     "reason": "Generic Crews/Flows multi-agent app framework (MIT, pushed 2026-09-26, latest release 1.15.22/2026-09-16) duplicating the already-known LangGraph/Deep Agents/Microsoft Agent Framework class; its README shows no git-worktree edit-ownership or review-gated-merge mechanism and foregrounds a paid 'AMP Suite' cloud control plane instead, so no demonstrated gap vs. claude-code+worktrunk for bounded coding-task delegation."
+    },
+    {
+     "repository": "microsoft/sico",
+     "reason": "Enterprise BPO 'Digital Worker' platform (MIT, pushed 2026-09-24, latest release v0.5.0/2026-09-16, 270 stars) for GUI/Android-emulator sandbox business-process automation (customer support, black-box testing, data processing) with human-Operator production oversight; full README has zero git/pull-request/code-review-as-a-feature content, so it is unrelated to this layer's requirement of delegating bounded coding work with worktree-owned edits and review-gated integration."
+    },
+    {
+     "repository": "openai/openai-agents-python",
+     "reason": "OpenAI's general-purpose Agents/tools/handoffs SDK (MIT, pushed 2026-09-25, latest v0.22.3/2026-09-17) for building arbitrary multi-agent apps (voice, realtime, sandbox containers); duplicates the already-known generic-agent-framework class (LangGraph, Deep Agents, Microsoft Agent Framework, Codex-native workers) with no git-worktree owned-edit or review-gated-merge mechanism, so no demonstrated gap vs. claude-code+worktrunk for this requirement."
+    }
+   ],
+   "not_adopted": [],
+   "kept": []
+  }
+ ]
+}

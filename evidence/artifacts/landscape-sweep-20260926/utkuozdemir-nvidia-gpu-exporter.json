@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-utkuozdemir-nvidia-gpu-exporter",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+ "reviewed_commit": "97099b718f77660b3b276667319dacf4e07d107c",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "observation-inference"
+ ],
+ "claim": "Source and documentation review of utkuozdemir/nvidia_gpu_exporter at commit 97099b718f77660b3b276667319dacf4e07d107c (license MIT), read from README.md at that commit. Repository description: \"Nvidia GPU exporter for prometheus using nvidia-smi binary OR using NVML\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1559,
+  "pushed_at": "2026-09-26T01:08:59Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@97099b718f77660b3b276667319dacf4e07d107c",
+   "text": "Nvidia GPU exporter for Prometheus, using the `nvidia-smi` binary to gather metrics. Runs on Linux, Windows and macOS, on bare metal, in Docker or on Kubernetes."
+  },
+  {
+   "source": "README.md@97099b718f77660b3b276667319dacf4e07d107c",
+   "text": "> [!WARNING] > Heads up: this is a side project I maintain in my spare time. I might take a long time to look at issues or PRs, or not get to them at all. Sorry in advance, and thanks for understanding."
+  },
+  {
+   "source": "README.md@97099b718f77660b3b276667319dacf4e07d107c",
+   "text": "This is a simple exporter that uses the `nvidia-smi(.exe)` binary to collect, parse and export metrics. Since it only needs `nvidia-smi`, it also works on Windows - no Docker or Linux required."
+  }
+ ]
+}

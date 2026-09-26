@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-pypi-pypi-attestations",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/pypi/pypi-attestations",
+ "reviewed_commit": "0838c9fe75b77ef1ee9053cc73ef91454c11b453",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "security-supply-chain"
+ ],
+ "claim": "Source and documentation review of pypi/pypi-attestations at commit 0838c9fe75b77ef1ee9053cc73ef91454c11b453 (license Apache-2.0), read from README.md at that commit. Repository description: \"A library to convert between Sigstore Bundles and PEP 740 Attestation objects\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 16,
+  "pushed_at": "2026-09-16T04:15:24Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@0838c9fe75b77ef1ee9053cc73ef91454c11b453",
+   "text": "A library to generate and convert between Sigstore Bundles and [PEP 740] Attestation objects."
+  },
+  {
+   "source": "README.md@0838c9fe75b77ef1ee9053cc73ef91454c11b453",
+   "text": "> [!IMPORTANT] > This library is an implementation detail within the reference implementation > of [PEP 740]. Most users should not need to interact with it directly; > see the [PyPI documentation] for full details."
+  },
+  {
+   "source": "README.md@0838c9fe75b77ef1ee9053cc73ef91454c11b453",
+   "text": "Use these APIs to create a PEP 740-compliant `Attestation` object by signing a Python artifact (i.e: sdist or wheel files), and to verify an `Attestation` object against a Python artifact."
+  }
+ ]
+}

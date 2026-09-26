@@ -16,6 +16,17 @@
 // version that wrote the entry). The last two catch content-classifier fallback, which
 // re-runs a flagged request on an older model and continues the child there; the
 // family substring check alone accepts claude-opus-4-8 for a requested opus.
+// An attempt that returned nothing and whose journal key the runtime started again (a re-run
+// after a usage-limit pause) is listed under superseded_attempts with superseded_by, keeps its
+// issues and effort check, and its usage counts in by_resolved_model, whose `children` counter
+// counts attempts; `children` holds the final attempt of each call. Its usage-integrity failures
+// (usage_issues: an assistant message without provider usage or without a resolved model, or no
+// transcript at all) leave the run incomplete, because by_resolved_model cannot count that usage;
+// its other issues (no result, the <synthetic> usage-limit row) are expected of such an attempt.
+// web_search (per attempt and per run) counts WebSearch calls and the capped ones: a session makes at
+// most CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION WebSearch calls (default 200), counted across the main
+// conversation and every subagent, and a capped call returns a notice instead of results (tools-reference,
+// "Session search limit"). A capped call changes no usage and no exit code; callers decide what it means.
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { homedir } from 'node:os'
@@ -52,7 +63,31 @@ export function olderThan(model, expected) {
   return !got || !want || got.family !== want.family || compareParts(got.version, want.version) < 0
 }
 
-export function summarizeChild(started, result, meta, transcript) {
+// The capped-call notice opens the tool result's result section, after the "Web search results for query: ..."
+// header line (observed with client 2.1.283: "Web search was not performed: this session has used its web search
+// budget (200 of 200 WebSearch calls). ..."). Page text that merely quotes the notice is not a capped call.
+export const WEB_SEARCH_CAPPED = 'Web search was not performed'
+const WEB_SEARCH_HEADER = 'Web search results for query:'
+const resultText = (content) => typeof content === 'string' ? content : Array.isArray(content) ? content.map((b) => (b && typeof b.text === 'string' ? b.text : '')).join('\n') : ''
+export function webSearch(transcript) {
+  const calls = new Map()
+  const blocks = (row) => (row && row.message && Array.isArray(row.message.content) ? row.message.content : []).filter((b) => b && typeof b === 'object')
+  for (const row of transcript) for (const b of blocks(row)) if (b.type === 'tool_use' && b.name === 'WebSearch' && typeof b.id === 'string') calls.set(b.id, null)
+  const cappedAt = []
+  for (const row of transcript) for (const b of blocks(row)) {
+    if (b.type !== 'tool_result' || !calls.has(b.tool_use_id) || calls.get(b.tool_use_id) !== null) continue
+    const text = resultText(b.content)
+    const cut = text.indexOf('\n\n')
+    const body = text.startsWith(WEB_SEARCH_HEADER) && cut >= 0 ? text.slice(cut + 2) : text
+    const capped = body.startsWith(WEB_SEARCH_CAPPED)
+    calls.set(b.tool_use_id, capped)
+    if (capped) cappedAt.push(typeof row.timestamp === 'string' ? row.timestamp : null)
+  }
+  const times = cappedAt.filter(Boolean).sort()
+  return { calls: calls.size, capped: cappedAt.length, first_capped_at: times[0] ?? null }
+}
+
+export function summarizeChild(started, result, meta, transcript, transcriptFound = true) {
   const byId = new Map()
   const counted = (u) => u && typeof u === 'object' && COUNTERS.some((k) => typeof u[k] === 'number')
   const withoutUsage = new Set()
@@ -73,14 +108,19 @@ export function summarizeChild(started, result, meta, transcript) {
   const efforts = [...new Set(messages.map((r) => r.effort).filter(Boolean))]
   const requested = meta && typeof meta.model === 'string' && meta.model ? meta.model : null
   const issues = []
+  // Usage-integrity failures: provider usage that by_resolved_model cannot count or attribute. They are issues of any
+  // attempt, and a superseded attempt keeps them as usage_issues (summarizeRun).
+  const usageIssues = []
   if (!result) issues.push('no result entry in journal')
   else if (result.result === null || result.result === undefined) issues.push('null result')
   if (!meta) issues.push('missing meta.json')
-  if (!messages.length) issues.push('no assistant usage in transcript')
+  if (!transcriptFound) usageIssues.push('no transcript file (usage unknown)')
   const neverCounted = [...withoutUsage].filter((id) => !byId.has(id)).length
-  if (neverCounted) issues.push(neverCounted + ' assistant message(s) without provider usage')
+  if (neverCounted) usageIssues.push(neverCounted + ' assistant message(s) without provider usage')
   const unresolved = messages.filter((r) => !r.message.model).length
-  if (unresolved) issues.push(unresolved + ' assistant message(s) without a resolved model')
+  if (unresolved) usageIssues.push(unresolved + ' assistant message(s) without a resolved model')
+  if (!messages.length) issues.push('no assistant usage in transcript')
+  issues.push(...usageIssues)
   if (!requested) issues.push('model not requested explicitly (inherits the coordinator model)')
   else if (!resolved.length || resolved.some((m) => !m.toLowerCase().includes(requested.toLowerCase()))) issues.push('resolved model outside requested family: ' + (resolved.join(',') || '(none resolved)'))
   // Classifier fallback (model-config doc, "Automatic model fallback"): after a flagged request the
@@ -100,7 +140,7 @@ export function summarizeChild(started, result, meta, transcript) {
   return {
     agent_id: started.agentId, label: started.label ?? null, phase: started.phase ?? null,
     agent_type: meta ? meta.agentType ?? null : null,
-    requested_model: requested, resolved_models: resolved, efforts,
+    requested_model: requested, resolved_models: resolved, efforts, web_search: webSearch(transcript),
     requests: messages.length, usage, usage_by_model: usageByModel,
     // Provider-returned cache read on the first request: evidence that the shared
     // prefix was served from cache for this child. Zero is not proof of a miss policy.
@@ -108,7 +148,7 @@ export function summarizeChild(started, result, meta, transcript) {
     // Whole first prompt (system, tool definitions, injected instructions, packet):
     // the fixed cost of spawning this child before it does any work.
     first_request_prompt_tokens: messages.length ? ['input_tokens', 'cache_read_input_tokens', 'cache_creation_input_tokens'].reduce((n, k) => n + (messages[0].message.usage[k] || 0), 0) : null,
-    complete: issues.length === 0, issues,
+    complete: issues.length === 0, issues, ...(usageIssues.length ? { usage_issues: usageIssues } : {}),
   }
 }
 
@@ -117,31 +157,58 @@ export function summarizeRun(dir) {
   if (!existsSync(journalPath)) return { status: 'incomplete', reason: 'journal.jsonl not found in ' + dir, children: [] }
   const journal = lines(journalPath)
   const results = new Map(journal.filter((e) => e.type === 'result').map((e) => [e.agentId, e]))
-  const children = journal.filter((e) => e.type === 'started' && e.agentId).map((s) => {
+  const started = journal.filter((e) => e.type === 'started' && e.agentId)
+  // The runtime re-runs a call under the same journal key after a pause (observed on 2026-09-26: "Usage limit
+  // reached ... Workflow paused; waiting agents re-run shortly after the reset", then "Re-running 8 waiting
+  // agents"). An attempt with no result entry whose key started again later was superseded by that later attempt:
+  // it is listed in superseded_attempts, not among the children, and its usage still counts in by_resolved_model.
+  const supersededBy = new Map()
+  started.forEach((s, i) => {
+    if (results.has(s.agentId) || typeof s.key !== 'string' || !s.key) return
+    const later = started.slice(i + 1).find((t) => t.key === s.key)
+    if (later) supersededBy.set(s.agentId, later.agentId)
+  })
+  const attempts = started.map((s) => {
     const metaPath = join(dir, 'agent-' + s.agentId + '.meta.json')
     const logPath = join(dir, 'agent-' + s.agentId + '.jsonl')
     let meta = null
     try { meta = existsSync(metaPath) ? JSON.parse(readFileSync(metaPath, 'utf8')) : null } catch { meta = null }
-    return summarizeChild(s, results.get(s.agentId) || null, meta, existsSync(logPath) ? lines(logPath) : [])
+    const found = existsSync(logPath)
+    const child = summarizeChild(s, results.get(s.agentId) || null, meta, found ? lines(logPath) : [], found)
+    return supersededBy.has(s.agentId) ? { ...child, superseded_by: supersededBy.get(s.agentId) } : child
   })
+  const children = attempts.filter((c) => !c.superseded_by)
+  const superseded = attempts.filter((c) => c.superseded_by)
   const byModel = {}
-  for (const c of children) for (const [m, u] of Object.entries(c.usage_by_model)) {
+  for (const c of attempts) for (const [m, u] of Object.entries(c.usage_by_model)) {
     byModel[m] = byModel[m] || { children: 0, ...Object.fromEntries(COUNTERS.map((k) => [k, 0])) }
     byModel[m].children++
     for (const k of COUNTERS) byModel[m][k] += u[k]
   }
   const incomplete = children.filter((c) => !c.complete)
+  // A superseded attempt returned nothing by definition, but usage it holds that by_resolved_model cannot count
+  // (usage_issues) leaves the run's usage incomplete.
+  const uncounted = superseded.filter((c) => c.usage_issues)
+  const rerun = superseded.length ? '; ' + superseded.length + ' earlier attempt(s) that returned nothing were re-run under the same call key (superseded_attempts, whose usage by_resolved_model counts)' : ''
+  const gaps = [incomplete.length ? incomplete.length + ' child(ren) incomplete' : null,
+    uncounted.length ? uncounted.length + ' superseded attempt(s) with usage by_resolved_model cannot count (usage_issues)' : null].filter(Boolean)
   return {
-    status: !children.length ? 'incomplete' : incomplete.length ? 'incomplete' : 'complete',
-    reason: !children.length ? 'journal has no started children' : incomplete.length ? incomplete.length + ' child(ren) incomplete' : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result',
+    status: !children.length || gaps.length ? 'incomplete' : 'complete',
+    reason: (!children.length ? 'journal has no started children' : gaps.length ? gaps.join('; ') : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result') + rerun,
     multi_model_children: children.filter((c) => c.resolved_models.length > 1).map((c) => c.label || c.agent_id),
-    children, by_resolved_model: byModel,
+    // Over every attempt (children and superseded attempts), like by_resolved_model.
+    web_search: {
+      calls: attempts.reduce((n, c) => n + c.web_search.calls, 0),
+      capped: attempts.reduce((n, c) => n + c.web_search.capped, 0),
+      capped_children: attempts.filter((c) => c.web_search.capped).map((c) => c.label || c.agent_id),
+    },
+    children, ...(superseded.length ? { superseded_attempts: superseded } : {}), by_resolved_model: byModel,
   }
 }
 
-// Children whose resolved efforts are not exactly [required] (none recorded counts as a mismatch).
+// Children and superseded attempts whose resolved efforts are not exactly [required] (none recorded counts as a mismatch).
 export function effortMismatches(run, required) {
-  return run.children.filter((c) => c.efforts.length !== 1 || c.efforts[0] !== required).map((c) => ({ child: c.label || c.agent_id, efforts: c.efforts }))
+  return [...run.children, ...(run.superseded_attempts || [])].filter((c) => c.efforts.length !== 1 || c.efforts[0] !== required).map((c) => ({ child: c.label || c.agent_id, efforts: c.efforts, ...(c.superseded_by ? { superseded_by: c.superseded_by } : {}) }))
 }
 
 // Newest native Workflow transcript directory for a working directory. The projects
@@ -177,5 +244,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   const out = { transcript_dir: dir, ...summarizeRun(dir) }
   if (required) out.effort_mismatches = effortMismatches(out, required)
   console.log(JSON.stringify(out, null, 2))
-  process.exit(out.status === 'complete' && !(required && out.effort_mismatches.length) ? 0 : 1)
+  // exitCode, not process.exit(): process.exit() drops stdout writes still pending, and a pipe takes 64 KiB at once.
+  process.exitCode = out.status === 'complete' && !(required && out.effort_mismatches.length) ? 0 : 1
 }

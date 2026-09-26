@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-wboayue-rust-ibapi",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/wboayue/rust-ibapi",
+ "reviewed_commit": "be449c84efd1b52e4a296751d3d6edba2ca53552",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "execution-broker"
+ ],
+ "claim": "Source and documentation review of wboayue/rust-ibapi at commit be449c84efd1b52e4a296751d3d6edba2ca53552 (license MIT), read from README.md at that commit. Repository description: \"An implementation of the Interactive Brokers API for Rust\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 385,
+  "pushed_at": "2026-09-24T04:01:11Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@be449c84efd1b52e4a296751d3d6edba2ca53552",
+   "text": "This library provides a comprehensive Rust implementation of the Interactive Brokers [TWS API](https://ibkrcampus.com/campus/ibkr-api-page/twsapi-doc/), offering a robust and user-friendly interface for TWS and IB Gateway. Designed with performance and simplicity in mind, `ibapi` is a good fit for automated trading systems, market analysis, real-time data collection and portfolio management tools."
+  },
+  {
+   "source": "README.md@be449c84efd1b52e4a296751d3d6edba2ca53552",
+   "text": "With this fully featured API, you can retrieve account information, access real-time and historical market data, manage orders, perform market scans, and access news and Wall Street Horizons (WSH) event data."
+  },
+  {
+   "source": "README.md@be449c84efd1b52e4a296751d3d6edba2ca53552",
+   "text": "> **📚 Migrating?** See the [v3.x → v4.x guide](docs/migration-4.0.md) for the latest breaking changes, the [v2.x → v3.0 guide](docs/migration-3.0.md) for the `Subscription` shape and notification handling, or the [v1.x → v2.0 guide](MIGRATION.md) for the older transition."
+  }
+ ]
+}

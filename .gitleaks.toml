@@ -338,6 +338,28 @@ regexes = [
   '''^\s*"pin":\s*"(?:[0-9A-Za-z.+_-]+ @ )?[0-9a-f]{40}",?\s*$''',
 ]
 
+# 2026-09-26 (landscape-sweep-20260926): catalogs/sota-convergence/manifest-20260926.json names the rule
+# id "sourcegraph-access-token" once, in a secrets-credentials refuter's reasoning, so the rule's keyword
+# makes every 40-hex value in the file a candidate. The lane's own free-text commit ids were shortened to
+# 12 characters before the manifest was built. The only 40-hex values left are the 39 distinct git commit
+# ids of the 60 "pin" values that the generator copies from the catalog layer files, in free-form shapes
+# ("v0.44.0; source <id>", "<id> (blueprints/...)", "Apache Iceberg 1.11.0; PyIceberg 0.12.0; source <id>").
+# Exempted: that exact file, this rule only, and only a finding whose secret is exactly one of those
+# reviewed ids, pinned by value like the ai-memory fingerprints above. Any other 40-hex value in the file
+# stays detected, on a pin line or elsewhere: an unreviewed id, an uppercase variant, or a legacy
+# Sourcegraph token. So does an sgp_-prefixed token, and so do the same ids in any other file
+# (tests/test_gitleaks_config.py test_d3/test_d4).
+[[rules.allowlists]]
+description = "The reviewed git commit ids of the catalog pins in the 2026-09-26 SOTA manifest"
+condition = "AND"
+paths = [
+  '''^catalogs/sota-convergence/manifest-20260926\.json$''',
+]
+regexTarget = "secret"
+regexes = [
+  '''^(?:15969ed2471a177d938c889255d2f23f07e4742a|1973f6165bee212acf656ed2f9cb0af86d4f2a18|1b0a49d2792a9432a3aca3fcb617ce7a630d905e|1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335|264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc|26b251a451ce941d3d7a55e6487bcb7f16b5ad48|32792afe5b0183fce10532d3a023f5cfa8612d09|356dfa03278058b02df42124f243c2c345329dae|3c247d78c603fc13d274fda1aa26749e7c8c3710|42334f26d7025d905678f9075b079fc65f9beaf9|62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6|64285b9dd6c606804753235fe992bcf25b9856ee|6976e020b894f6a6777704df2b8c4458cb291ae9|6aa24fdef7e3c3f48b19482535693f5796f2b598|702f4814fe54fabff350d43cb753ae3e47c0c276|7a391566ac827e0d8c269b91f2415c16b0a32a84|7e7eefe28315f3de3aa4dc75cc8b6524f70829cb|8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe|918fa838d99eb3703fe9bc963891619608aa35b4|985ef30ad3ac774218c5ac516b4cb0aa2655730f|a2f4a21e22e5c266278271b6591c70dbc485aea8|abe44344c56cf4bfb5443e0debca7e39342f6e7a|be5f129326efe4864d666d263d249214bd9b4ed2|beccec0d0c451b7aa3e4530416ac431b3c035c69|bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d|c6fbd1c5932df2494ffa0020af5a9fbe80b82143|c840d6f626be7ba418da60aeb0f2080413562451|c99fcf71349e2df4a7a1033ee85ca2e9ced9abee|cc4cb3b7ba50ae250e621983c2779047fb16bb28|d8cdaa33fda8df955cc76ef58a280f68f4cd43fa|db52e28f4d9ded852ab3942cea316258ae4ef346|dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a|dd6ee538aee0f548d4a6b520118f875431fd749e|e620d8572a1e62c9ec07df8cbc8f5c432cd84325|e675ef30369f5ee9f68b04606080c519adf3be69|ec4dfc6953784dc45b79de3147530c89868c6e26|efa08fda9ec485d80292d0487a77939c087dedcc|f29d27def7ee0adb10e7e2fff080ba204054dd4b|f2e500144b0a6090d63723f94453b32717e5fd23)$''',
+]
+
 # Same named-field allowlist as generic-api-key above (source_head_pin and friends
 # also match the sourcegraph-access-token rule's 40-hex pattern in these files).
 [[rules.allowlists]]

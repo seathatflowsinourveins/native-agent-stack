@@ -89,8 +89,33 @@ def private_content(repo_root: Path = REPO_ROOT):
     return module.PRIVATE_CONTENT
 
 
+def ledger_module(repo_root: Path = REPO_ROOT):
+    """scripts/saturation_ledger.py of the checkout, for the ledger's own rules (refuted_by_absence, ref_resolver)."""
+    spec = importlib.util.spec_from_file_location("landscape_sweep_ledger", Path(repo_root) / "scripts" / "saturation_ledger.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def pointer_token(key) -> str:
     return str(key).replace("~", "~0").replace("/", "~1")
+
+
+def deviation_rounds(deviations: list, layer_ids) -> tuple[dict, list]:
+    """(layer_id -> [(round, item)], unmapped items) for per-worker items (effort deviations, capped WebSearch calls):
+    a worker label <role>:<layer>[:followup] belongs to that layer's round, and the completeness critic to every
+    layer. convert.py records each item as a retained failure of those layers; make_result.py checks that it did."""
+    by_layer, unmapped = {}, []
+    for item in deviations:
+        parts = str(item.get("child")).split(":")
+        if parts == ["critic"]:
+            for layer_id in layer_ids:
+                by_layer.setdefault(layer_id, []).append(("critic", item))
+        elif len(parts) >= 2 and parts[1] in layer_ids and parts[2:] in ([], ["followup"]):
+            by_layer.setdefault(parts[1], []).append(("followup" if parts[2:] else "first", item))
+        else:
+            unmapped.append(item)
+    return by_layer, unmapped
 
 
 def private_findings(value, patterns, pointer: str = "") -> list[tuple[str, str]]:

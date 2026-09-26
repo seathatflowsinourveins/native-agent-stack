@@ -26,7 +26,7 @@ the merged manifest, stay with the lane owners.
 | `templates.json`, `schemas/` | staged | The prompts, with `<<DATE>>`, `<<LAYER_COUNT>>` and `<<SKILLS_CHECKED_AT>>` open, and the strict return schemas. `probe.json` is for the one-call lane probe. |
 | `usage_record.py` | checkout | Runs the vendored `examples/claude-native/workflows/child-usage.mjs` over the run's transcripts and writes the sanitized usage record. |
 | `convert.py` | checkout | Converts the run record into `returns.json`, `lanes.json`, `layers.json` and `survivors.json`. |
-| `source_reviews.py` | checkout | Writes one upstream-provenance review per survivor (`gh api` only). |
+| `source_reviews.py` | checkout | Writes one upstream-provenance review per survivor (`gh api`; the public Hugging Face Hub API for a model repository). |
 | `make_result.py` | checkout | Assembles `RESULT.json` for `saturation_ledger.py --append`. |
 | `sweep_common.py` | checkout | Helpers shared by the checkout-run tools. |
 | `seeds-20260926.json` | checkout | The seeds the 2026-09-26 run gave its workers. It is a record, and an example of the `--seeds` format. |
@@ -49,7 +49,10 @@ Survival is two-family on fit. A proposal survives only when the facts refuter, 
 GPT-6 fit refuter all vote not refuted. Every refuter defaults to refuted, and `convert.py` reads a vote the same
 way: a missing vote, a vote whose `refuted` is not `false`, and a repository voted on twice with one refuting vote
 all count as refuted. When the follow-up round proposes a repository again, that round's proposal and all three of
-its votes replace the first round's; a vote missing from the follow-up is never taken from the first round.
+its votes replace the first round's; a vote missing from the follow-up is never taken from the first round. A
+proposal that no returned vote refutes, but that a missing vote refutes, is refuted by absence: `returns.json` marks
+the missing vote `{missing: true}`, the layer's `votes_note` names the proposal, and neither the ledger's known/new
+split nor the next sweep's `previous_sweep` (`not_adjudicated`) treats it as refuted on merit.
 
 Why the roles are split this way:
 
@@ -64,7 +67,11 @@ Every `agent()` call names its model and `effort: 'max'`, so no stage inherits t
 `returns.json` name the model and effort each Claude refuter was measured at (its own child in the usage record),
 not the requested ones. Without `--usage`, `convert.py` writes the requested alias and effort `null`.
 `usage_record.py` exits 1 when a child ran at another effort (`CLAUDE_CODE_EFFORT_LEVEL` would override every
-child), and `make_result.py` refuses such a record.
+child; a skill whose frontmatter sets `effort`, such as `property-based-testing` with `effort: low`, lowers the
+turns after it loads). `convert.py --usage` records each such worker as an `effort_deviation` retained failure of
+its layer (the critic's of every layer), and `make_result.py` refuses the record unless every one is recorded so in
+each of its layers. The same holds for a worker whose WebSearch call the session's cap refused (`web_search_capped`,
+under Coordination).
 
 The Sonnet wrappers only run three commands and return the raw result. `convert.py` checks each copy against the
 file Codex wrote.
@@ -97,10 +104,21 @@ provides it.
   For a completed sweep, `child_usage.status` must be `complete`. `workflow_run` must equal the last segment of
   `child_usage.transcript_dir`, which `usage_record.py` rewrites to
   `<session-transcripts>/subagents/workflows/<run id>`. `lost_workers` must list exactly the incomplete children.
-  `make_result.py` also needs `measurement.exit_code` 0 and every child measured at effort `max` alone.
+  When a Workflow pauses at a Claude usage limit, it re-runs its waiting agents after the reset under the same
+  journal key; `child-usage.mjs` lists each earlier attempt that returned nothing under `superseded_attempts`
+  (with `superseded_by`), not among the children, and still counts its usage in `by_resolved_model`. Usage such an
+  attempt holds that `by_resolved_model` cannot count (an assistant message without provider usage or without a
+  resolved model, or no transcript) is its `usage_issues` and makes the status `incomplete`.
+  `make_result.py` also needs every child and superseded attempt measured at effort `max` alone, or recorded as an
+  `effort_deviation` retained failure, and `measurement.exit_code` 0 (1 only for such recorded deviations). Every
+  child and attempt must also carry a measured `web_search`, and each one with a capped WebSearch call must be a
+  `web_search_capped` retained failure. Both are checked per worker and per layer: a `<role>:<layer>` worker's
+  failure in its own layer, the critic's in every layer of the record.
 - **Failures.** A failed part of the lane never leaves a clean layer. `convert.py` lists each layer's retained
   failures under `failures/<layer>` in `returns.json`: a lost round, a discovery family that did not return, a
-  missing vote, a lost critic, a critic-flagged layer beyond the follow-up cap, and a GPT-6 copy problem. It gives
+  missing vote, a lost critic, a critic-flagged layer beyond the follow-up cap, a GPT-6 copy problem, and (with
+  `--usage`) a worker measured at another effort than max (`effort_deviation`) or a worker with a WebSearch call
+  the session's cap refused (`web_search_capped`); the critic's belongs to every layer. It gives
   that layer the reopen entry `{"trigger": "retained_failure", "ref": "<returns_ref>#/failures/<layer>"}`, which
   resets the layer's clean count. `make_result.py` refuses a layer whose failures lack that entry.
 - **Returns.** In `returns.json`:
@@ -120,7 +138,12 @@ provides it.
 - **Source reviews.** Each survivor needs one registered source review whose `layers` names the layer.
   `source_reviews.py` names a review `<owner>-<repo>.json`, as the 2026-09-23 reviews are named. When two survivors
   share that name (`acme/a-b` and `acme-a/b`), each gets a suffix of 10 hex characters of the sha256 of its
-  `owner/repo`. A file that already reviews another repository is never overwritten.
+  `owner/repo`. A file that already reviews another repository is never overwritten. A model layer can keep a
+  Hugging Face model repository (the 2026-09-26 sweep kept one), which `gh` cannot read. Its review,
+  `hf-<namespace>-<name>.json`, pins the commit of the repository's default revision from the Hub's model-info
+  endpoint `/api/models/<repo_id>` (the endpoint `huggingface_hub`'s `HfApi.model_info` calls). It reads the model
+  card at that commit through the documented "Resolve a file" endpoint, anonymously, without the card's YAML
+  metadata block.
 - **Registration.** Every cited file is registered in `manifests/evidence.json`.
 
 ## Run it
@@ -190,6 +213,7 @@ Claude Code keeps the record there, as `tools/sota-convergence/transcript_audit.
 ```sh
 # 7. Usage (needs node): the vendored child-usage.mjs over the run's transcripts, sanitized.
 #    Exit 1: incomplete usage or a child not at effort max. The record is still written; make_result.py refuses it.
+#    Its summary also names the workers whose WebSearch calls the session cap refused (web_search.capped_children).
 python3 $H/usage_record.py --transcript-dir "$T" --out "$W/child-usage-$RUN.json"
 
 # 8. Convert. Exit 3: possible private content, redact first. Exit 4: a GPT-6 output the workflow used is not
@@ -232,7 +256,15 @@ Record a stopped run by hand, as recipe section 4 describes (`status: stopped`, 
 Read these fields of `convert.py`'s summary before appending:
 
 - **`retained_failures`** and **`reopened_layers`**: each layer's failures (`<round>:<cause>`), all of them reopened.
-  `degraded_discovery`, `critic_lost` and each vote's `notes` give the detail.
+  `degraded_discovery`, `critic_lost`, `effort_deviations` and each vote's `notes` give the detail.
+  `effort_deviations_unmapped` lists a worker at another effort whose label names no layer of this sweep;
+  `make_result.py` refuses the record until it is resolved.
+- **`web_search`**, **`web_search_capped`** and **`web_search_capped_unmapped`**: the run's WebSearch calls and
+  capped calls, the workers with a capped call (each a retained failure of its layer), and any capped worker whose
+  label names no layer of this sweep (`make_result.py` refuses the record until it is resolved). A capped worker
+  means the session reached its WebSearch cap; say so in a lane limit.
+- **`refuted_by_absence`**: per layer, the proposals refuted only because a vote did not return. Their layer's
+  `votes_note` names them; they are candidates for the missing vote in a later sweep or the verdict wave.
 - **`excluded_layers`**: every round of the layer was lost. Such a layer is left out of the record, so it neither
   counts nor resets.
 - **`lost`**: every lost round, first or follow-up, as `<layer>:<round>`. `sweep.js` returns a lost follow-up round
@@ -286,6 +318,21 @@ new run from the latest retained record, and say so when no record exists yet.
   runtime it was staged with, so a work directory staged before this gate existed has no gate.
 - **Resume.** `Workflow({scriptPath: "<W>/sweep.embedded.js", resumeFromRunId: "wf_..."})` replays the unchanged
   agent calls from the cache.
+- **WebSearch cap.** Claude Code allows one session at most `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` WebSearch
+  calls (default 200, from v2.1.212). The count covers the main conversation and every subagent, workflow children
+  included. A capped call returns a notice that tells the worker to go on without searching; nobody sees an error
+  ([tools reference, "Session search limit"](https://code.claude.com/docs/en/tools-reference#session-search-limit);
+  [environment variables](https://code.claude.com/docs/en/env-vars)). The lane's own budgets allow far more. Each
+  Claude discovery worker may make 12 searches (40 workers with the follow-up round: 480). Each facts and each fit
+  refuter may make 8 (80 workers: 640). A full sweep may therefore make 1,120 searches before the critic, and the
+  session's earlier searches count too. The 2026-09-26 sweep reached the cap at 04:10:13Z; after that no Claude
+  refuter, critic or follow-up discovery worker got a search result. Before a full sweep, start the coordinator
+  session with the variable set above the lane's sum plus the session's other searches (for example
+  `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION=1500`; the value can be raised but not turned off). `/clear` resets
+  the count, but not while a workflow is still running. `child-usage.mjs` counts each child's WebSearch calls and
+  capped calls (`web_search`) from the transcripts. `convert.py --usage` records every capped worker as a
+  `web_search_capped` retained failure of its layer; the critic's counts for every layer. `make_result.py` refuses a
+  record in which a capped worker is not recorded that way in each of its layers.
 
 ## Privacy and token practice
 
@@ -353,6 +400,22 @@ The deliberate changes:
   - `canon()` left owners whose names start with `http` (`httpie/cli`) uncanonical.
   - Two repositories could share one source-review file.
   - `make_result.py --reopen` replaced a layer's reopen entries instead of adding to them.
+- **Record review repairs (2026-09-26).** The review of the 2026-09-26 record found two more, each now covered by a
+  test:
+  - The lane's WebSearch budgets exceed the session's WebSearch cap, and nothing recorded a capped call. That run's
+    refutation phase, critic and follow-up round ran after the cap, and three layers still derived as clean.
+    `child-usage.mjs` now counts capped calls, and `convert.py` reopens each capped worker's layer.
+  - A proposal refuted only because the GPT-6 fit vote did not return counted downstream as refuted on merit: as
+    known in later sweeps and as `previous_sweep.refuted` in the next discovery input. The ledger now reads the
+    vote's missing marker.
+- **GPT-6 review repairs (2026-09-26).** A read-only GPT-6-Astra review of the record's checkout found two more,
+  each now covered by a regression test that failed before the repair:
+  - A superseded attempt's assistant message without provider usage left the run `complete`, although
+    `by_resolved_model` could not count it. `child-usage.mjs` now keeps such usage-integrity failures of superseded
+    attempts (`usage_issues`) and reports the run incomplete.
+  - `make_result.py` checked failure coverage over all layers at once, so one layer could lose its critic failure
+    and its reopen entry (and count as clean) while another layer's `critic` failure satisfied the check. Coverage
+    is now checked per worker and per layer.
 
 ## Tests
 

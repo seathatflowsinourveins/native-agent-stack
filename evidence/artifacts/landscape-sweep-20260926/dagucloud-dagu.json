@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-dagucloud-dagu",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/dagucloud/dagu",
+ "reviewed_commit": "1a76b62f62e632d5ed2371a89ab3df90da2e1da7",
+ "readme_path": "README.md",
+ "license": "GPL-3.0",
+ "layers": [
+  "scheduling-supervision"
+ ],
+ "claim": "Source and documentation review of dagucloud/dagu at commit 1a76b62f62e632d5ed2371a89ab3df90da2e1da7 (license GPL-3.0), read from README.md at that commit. Repository description: \"Self-hostable workflow orchestrator for teams whose main work isn't orchestration. Declarative YAML over your scripts, SSH commands, containers, etc; keep workflows separate from business logic. One binary, no database, runs on limited H/W resources. Alternative to Airflow / Cron / Job Scheduler.\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 4111,
+  "pushed_at": "2026-09-25T06:14:31Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@1a76b62f62e632d5ed2371a89ab3df90da2e1da7",
+   "text": "Dagu is a local-first workflow engine for operations and internal automation. It is open source and self-hostable: a single binary with a built-in Web UI, no external database or message broker, running on Linux, macOS, and Windows. Define [DAGs](https://en.wikipedia.org/wiki/Directed_acyclic_graph) in a declarative YAML format. It natively supports shell commands, Docker containers, Kubernetes Jobs, remote commands via SSH, and more through Dagu Actions."
+  },
+  {
+   "source": "README.md@1a76b62f62e632d5ed2371a89ab3df90da2e1da7",
+   "text": "Dagu turns existing scripts and runbooks into production workflows with scheduling, retries, human tasks, and run history. It runs where your data and credentials live: on-prem, air-gapped, edge, or cloud, and scales from a single node to a fleet of workers."
+  },
+  {
+   "source": "README.md@1a76b62f62e632d5ed2371a89ab3df90da2e1da7",
+   "text": "- Single binary installation. - Self-contained: no external DBMS or message broker required. - Runs on Linux, macOS, and Windows. - Declarative YAML format for defining DAGs. - Run existing shell commands, Docker containers, Kubernetes Jobs, and remote commands over SSH without modifications. - Compose reusable Sub-DAGs and run work in parallel with concurrency controls. - Schedule workflows with cron syntax, timezones, overlap policies, and catch-up windows. - Keep logs, run history, retries, n"
+  }
+ ]
+}

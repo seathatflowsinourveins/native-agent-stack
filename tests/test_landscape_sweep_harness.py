@@ -1,17 +1,19 @@
 """Synthetic-fixture tests for tools/sota-convergence/landscape-sweep (no network, no codex, no model calls).
 
-A fake `codex` (and a fake `gh`) early on PATH stands in for the real CLI; sweep.js runs under node with stubbed
-agent(), parallel() and pipeline() (skipped without node); convert.py's evidence is appended to a synthetic
-saturation ledger checkout with scripts/saturation_ledger.py itself. Optional: BASH32_BINARY (a real bash 3.2, as
-on macOS) and shellcheck.
+A fake `codex` (and a fake `gh`) early on PATH stands in for the real CLI, and a stubbed Hugging Face Hub fetch
+for source_reviews.py; sweep.js runs under node with stubbed agent(), parallel() and pipeline() (skipped without
+node); convert.py's evidence is appended to a synthetic saturation ledger checkout with scripts/saturation_ledger.py
+itself. Optional: BASH32_BINARY (a real bash 3.2, as on macOS) and shellcheck.
 """
 
 from __future__ import annotations
 
 import base64
+import contextlib
 import copy
 import hashlib
 import importlib.util
+import io
 import json
 import os
 import re
@@ -24,6 +26,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 HARNESS = ROOT / "tools" / "sota-convergence" / "landscape-sweep"
@@ -175,6 +178,18 @@ def healthy_result():
             "followups": [], "lost_first": []}
 
 
+def healthy_two_layers():
+    """healthy_result() plus an equally healthy us-equities layer beta: without a retained failure both are clean."""
+    res = healthy_result()
+    res["first"].append({"layer_id": "beta", "catalog": "us-equities", "round": "first", "followup_reason": None,
+                         "claude_discover": discovery("beta", [B1]), "gpt6_discover": gpt6_entry(discovery("beta", [B2])),
+                         "merged": [merged_row(B1, ["claude"]), merged_row(B2, ["gpt6"])], "dropped": [],
+                         "facts": votes("beta", "facts", {B1: True, B2: False}),
+                         "fit_claude": votes("beta", "fit", {B1: False, B2: True}),
+                         "fit_gpt6": gpt6_entry(votes("beta", "fit", {B1: False, B2: False}))})
+    return res
+
+
 def fail_gpt6_fit(res):
     """Every GPT-6 fit job failed (any non-limit failure: auth, a missing model, a timeout, a lossy wrapper)."""
     for entry in res["first"] + [e for e in res.get("followups") or [] if e]:
@@ -205,9 +220,11 @@ def scope_for(layers=(("foundation", "alpha"), ("us-equities", "beta"), ("founda
 def child_usage_raw(run_id, labels, status="complete", transcript_root="/home/example/.claude/projects/p/s"):
     children = [{"label": label, "requested_model": "sonnet" if label.startswith(("refute-facts", "gpt6-")) else "opus",
                  "resolved_models": ["claude-sonnet-5" if label.startswith(("refute-facts", "gpt6-")) else "claude-opus-5-5"],
-                 "efforts": ["max"], "complete": True} for label in labels]
+                 "efforts": ["max"], "web_search": {"calls": 0, "capped": 0, "first_capped_at": None},
+                 "complete": True} for label in labels]
     return json.dumps({"transcript_dir": f"{transcript_root}/subagents/workflows/{run_id}", "status": status,
-                       "reason": "fixture", "children": children}).encode("utf-8")
+                       "reason": "fixture", "web_search": {"calls": 0, "capped": 0, "capped_children": []},
+                       "children": children}).encode("utf-8")
 
 
 SYNTHETIC_LABELS = [f"{role}:{layer}" for layer in ("alpha", "beta") for role in
@@ -383,6 +400,32 @@ class BuildInputsTests(unittest.TestCase):
         self.assertEqual(len(alpha["open_gaps"][0]), 300)
         layers = json.loads((self.work / "layers.json").read_text())
         self.assertEqual([(x["catalog"], x["layer_id"]) for x in layers], [("foundation", "alpha"), ("us-equities", "beta")])
+
+    def test_a_proposal_refuted_by_absence_is_shown_as_not_adjudicated(self):
+        # o/r: facts and the Claude fit refuter returned not refuted, the GPT-6 fit vote never returned. o/m: facts
+        # refuted it on merit.
+        returns = "evidence/sw-1/returns.json"
+        write_json(self.repo / returns, {"votes": {"alpha": [
+            {"facts": {"role": "facts", "repository": "https://github.com/o/r", "refuted": False},
+             "fit": {"role": "fit", "repository": "https://github.com/o/r", "refuted": True,
+                     "claude": {"refuted": False}, "gpt6": {"missing": True}}},
+            {"facts": {"role": "facts", "repository": "https://github.com/o/m", "refuted": True},
+             "fit": {"role": "fit", "repository": "https://github.com/o/m", "refuted": True,
+                     "claude": {"refuted": False}, "gpt6": {"missing": True}}}]}})
+        ledger = json.loads((self.repo / "catalogs/saturation/ledger.json").read_text())
+
+        def entry(repo, index, facts):
+            return {"repo": repo, "facts": {"vote": facts, "ref": f"{returns}#/votes/alpha/{index}/facts"},
+                    "fit": {"vote": "refuted", "ref": f"{returns}#/votes/alpha/{index}/fit"}}
+        ledger["sweeps"][0]["layers"][0]["refuted"] = [entry("https://github.com/o/r", 0, "not_refuted"),
+                                                        entry("https://github.com/o/m", 1, "refuted")]
+        write_json(self.repo / "catalogs/saturation/ledger.json", ledger)
+        done = self.build()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        previous = json.loads((self.work / "inputs/alpha.json").read_text())["previous_sweep"]
+        self.assertEqual((previous["refuted"], previous["not_adjudicated"]),
+                         (["https://github.com/o/m"], ["https://github.com/o/r"]))
+        self.assertIn("not refuted on merit", previous["not_adjudicated_note"])
 
     def test_unknown_seed_layers_and_unfrozen_layers_are_refused(self):
         seeds = write_json(self.work / "seeds.json", {"zeta": ["x"]})
@@ -1024,6 +1067,18 @@ class ConvertTests(unittest.TestCase):
         b1 = out["returns"]["votes"]["beta"][0]
         self.assertEqual((b1["facts"]["repository"], b1["facts"]["refuted"]), (B1, True))
         self.assertIn("facts vote missing (counted as refuted)", b1["facts"]["notes"])
+        # Refuted by absence: B1 has only a missing facts vote against it; A3's facts vote refutes it on merit.
+        self.assertTrue(b1["facts"]["missing"])
+        self.assertNotIn("missing", a3["facts"])
+        self.assertEqual(out["summary"]["refuted_by_absence"], {"beta": ["o/beta-one"]})
+        self.assertNotIn("votes_note", layers["alpha"])
+        self.assertIn("1 of 2 proposals are refuted only because a vote did not return (facts;", layers["beta"]["votes_note"])
+        self.assertTrue(layers["beta"]["votes_note"].endswith("not adjudicated: o/beta-one."))
+        # Every GPT-6 fit vote missing: A1, A2 and A4 pass facts and the Claude fit refuter, so they are refuted by
+        # absence; A3 stays refuted on merit by facts.
+        failed = self.convert(fail_gpt6_fit(synthetic_result()))
+        self.assertEqual(failed["summary"]["refuted_by_absence"]["alpha"], ["o/alpha-two", "owner/alpha-one", "o/alpha-four"])
+        self.assertIn("(GPT-6 fit;", {x["layer_id"]: x for x in failed["layers"]}["alpha"]["votes_note"])
         self.assertEqual(out["survivors"], [{"layer_id": "alpha", "repository": canon(A1)},
                                             {"layer_id": "alpha", "repository": canon(A4)},
                                             {"layer_id": "beta", "repository": B2}])
@@ -1264,6 +1319,83 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual((vote["facts"]["model"], vote["facts"]["effort"], vote["fit"]["claude"]["effort"]),
                          ("sonnet", None, None))
 
+    def test_a_rerun_workers_vote_is_measured_by_the_attempt_that_returned(self):
+        # A record listing a re-run call's earlier attempt among its children (child-usage.mjs before
+        # superseded_attempts): the vote names the attempt that returned, and <synthetic> is never a model.
+        failed = {"label": "refute-fit:alpha", "agent_id": "x1", "requested_model": "opus",
+                  "resolved_models": ["claude-opus-5-5", "<synthetic>"], "efforts": ["max"], "complete": False}
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+        raw["children"].insert(0, failed)
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
+        models = convert.resolved_models(document)
+        self.assertEqual(models["refute-fit"], "claude-opus-5-5")
+        out = convert.convert(synthetic_result(), scope_for(), LANE, models, usage=document)
+        self.assertEqual(out["returns"]["votes"]["alpha"][0]["fit"]["claude"]["model"], "claude-opus-5-5")
+        # The current tool lists that attempt under superseded_attempts: never a vote's worker, still effort-checked.
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+        raw["superseded_attempts"] = [dict(failed, superseded_by="x2")]
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 0, "cmd", ROOT)
+        out = convert.convert(synthetic_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["returns"]["votes"]["alpha"][0]["fit"]["claude"]["model"], "claude-opus-5-5")
+        self.assertEqual(out["summary"]["effort_deviations"], [])
+
+    def test_a_worker_at_another_effort_is_a_retained_failure_of_its_layer(self):
+        # A skill whose frontmatter sets `effort: low` lowers the turns after it loads; child-usage.mjs measures it.
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+        for child in raw["children"]:
+            if child["label"] in ("discover:alpha", "refute-fit:beta:followup"):
+                child["efforts"] = ["max", "low"]
+        raw["superseded_attempts"] = [{"label": "refute-facts:alpha", "agent_id": "x1", "superseded_by": "x2",
+                                       "efforts": ["xhigh"], "complete": False}]
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
+        out = convert.convert(synthetic_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["effort_deviations"],
+                         ["discover:alpha", "refute-fit:beta:followup", "refute-facts:alpha"])
+        found = {layer_id: [(f["round"], f["child"], f["efforts"]) for f in failures if f["cause"] == "effort_deviation"]
+                 for layer_id, failures in out["returns"]["failures"].items()}
+        self.assertEqual(found["alpha"], [("first", "discover:alpha", ["max", "low"]),
+                                          ("first", "refute-facts:alpha", ["xhigh"])])
+        self.assertEqual(found["beta"], [("followup", "refute-fit:beta:followup", ["max", "low"])])
+        self.assertEqual(out["returns"]["votes"]["beta"][1]["fit"]["claude"]["effort"], "low+max")
+        # A deviation alone reopens a healthy layer; the critic's belongs to every layer; an unknown layer's is listed.
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS + ["refute-fit:zeta"]))
+        for child in raw["children"]:
+            if child["label"] in ("critic", "refute-fit:zeta"):
+                child["efforts"] = ["xhigh"]
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
+        out = convert.convert(healthy_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["retained_failures"], {"alpha": ["critic:effort_deviation"]})
+        self.assertEqual(out["summary"]["effort_deviations_unmapped"], ["refute-fit:zeta"])
+        self.assertEqual(out["layers"][0]["reopen"], [{"trigger": "retained_failure",
+                                                       "ref": "@RETURNS@#/failures/alpha"}])
+
+    def test_a_worker_with_a_capped_web_search_is_a_retained_failure_of_its_layer(self):
+        # The session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION): child-usage.mjs counts capped calls.
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS + ["refute-fit:zeta"]))
+        capped = {"refute-fit:beta:followup": 2, "refute-facts:alpha": 1, "refute-fit:zeta": 1}
+        for child in raw["children"]:
+            if child["label"] in capped:
+                child["web_search"] = {"calls": 3, "capped": capped[child["label"]],
+                                       "first_capped_at": "2026-10-26T04:10:13Z"}
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 0, "cmd", ROOT)
+        out = convert.convert(synthetic_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["web_search_capped"],
+                         ["refute-facts:alpha", "refute-fit:beta:followup", "refute-fit:zeta"])
+        self.assertEqual(out["summary"]["web_search_capped_unmapped"], ["refute-fit:zeta"])
+        found = {layer_id: [(f["round"], f["child"], f["capped"]) for f in failures if f["cause"] == "web_search_capped"]
+                 for layer_id, failures in out["returns"]["failures"].items()}
+        self.assertEqual(found, {"alpha": [("first", "refute-facts:alpha", 1)],
+                                 "beta": [("followup", "refute-fit:beta:followup", 2)]})
+        # A capped worker alone reopens a healthy layer, and the critic's cap counts for every layer.
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+        next(c for c in raw["children"] if c["label"] == "critic")["web_search"] = {
+            "calls": 2, "capped": 2, "first_capped_at": "2026-10-26T11:06:45Z"}
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 0, "cmd", ROOT)
+        out = convert.convert(healthy_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["retained_failures"], {"alpha": ["critic:web_search_capped"]})
+        self.assertEqual(out["layers"][0]["reopen"], [{"trigger": "retained_failure",
+                                                       "ref": "@RETURNS@#/failures/alpha"}])
+
     def cli(self, work, res, *extra, codex_files=True):
         run_file = write_json(work / "run.json", {"runId": "wf_fixture-1", "status": "completed", "result": res})
         write_json(work / "scope.json", scope_for())
@@ -1379,6 +1511,37 @@ class UsageRecordTests(unittest.TestCase):
             self.assertEqual(json.loads(done.stdout)["effort_mismatches"], drifted["effort_mismatches"])
             self.assertEqual(json.loads((work / "usage.json").read_text())["child_usage"]["status"], "complete")
 
+    @unittest.skipUnless(NODE, "node not installed")
+    def test_transcripts_arrive_whole_through_node_and_a_rerun_call_is_superseded(self):
+        # 300 children give child-usage.mjs more output than a pipe buffer (64 KiB), which process.exit() used to
+        # truncate; one call the runtime re-ran after a usage-limit pause keeps its earlier attempt as superseded.
+        transcripts = temp_dir(self) / "session" / "subagents" / "workflows" / "wf_fixture-5"
+        transcripts.mkdir(parents=True)
+        journal = [{"type": "started", "agentId": "r0", "label": "discover:layer-0", "phase": "Discover", "key": "v2:0"}]
+        for i in range(300):
+            journal += [{"type": "started", "agentId": f"b{i}", "label": f"discover:layer-{i}", "phase": "Discover",
+                         "key": f"v2:{i}"}, {"type": "result", "agentId": f"b{i}", "result": {"ok": True}}]
+        (transcripts / "journal.jsonl").write_text("".join(json.dumps(e) + "\n" for e in journal), encoding="utf-8")
+        zero = {"input_tokens": 0, "output_tokens": 0, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}
+        for agent in ["r0"] + [f"b{i}" for i in range(300)]:
+            rows = [{"type": "assistant", "effort": "max", "message": {"id": f"m-{agent}", "model": "claude-opus-5-5",
+                                                                       "usage": dict(zero, output_tokens=5)}}]
+            if agent == "r0":
+                rows.append({"type": "assistant", "isApiErrorMessage": True, "effort": "max",
+                             "message": {"id": "limit", "model": "<synthetic>", "usage": zero}})
+            (transcripts / f"agent-{agent}.meta.json").write_text(json.dumps({"model": "opus"}), encoding="utf-8")
+            (transcripts / f"agent-{agent}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+        out = temp_dir(self) / "usage.json"
+        done = run([sys.executable, HARNESS / "usage_record.py", "--transcript-dir", transcripts, "--out", out])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        usage = json.loads(out.read_text())["child_usage"]
+        self.assertGreater(len(json.dumps(usage, indent=2)), 65536)
+        self.assertEqual((usage["status"], len(usage["children"]), usage["transcript_dir"]),
+                         ("complete", 300, "<session-transcripts>/subagents/workflows/wf_fixture-5"))
+        self.assertEqual([(a["agent_id"], a["superseded_by"]) for a in usage["superseded_attempts"]], [("r0", "b0")])
+        self.assertEqual(usage["by_resolved_model"]["claude-opus-5-5"]["output_tokens"], 5 * 301)
+        self.assertEqual(json.loads(done.stdout)["superseded_attempts"], ["discover:layer-0"])
+
 
 LANE = "landscape-sweep-20261026"
 
@@ -1396,10 +1559,11 @@ class LedgerIntegrationTests(unittest.TestCase):
         self.scope = sl.scope_hashes(self.root)
         self.base = f"evidence/artifacts/{LANE}"
 
-    def evidence(self, res):
-        out = convert.convert(res, self.scope, LANE, convert.resolved_models(None))
+    def evidence(self, res, usage=None):
+        """Converted evidence; with `usage`, converted against that record (votes measured, efforts checked)."""
+        out = convert.convert(res, self.scope, LANE, convert.resolved_models(usage), usage=usage)
         write_json(self.root / self.base / "returns.json", out["returns"])
-        usage = usage_record.record(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS), 0, "cmd", ROOT)
+        usage = usage or usage_record.record(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS), 0, "cmd", ROOT)
         write_json(self.root / f"{self.base}-attempts/child-usage-wf_fixture-1.json", usage)
         sections = {"foundation": [], "trading": []}
         for layer in out["lanes"]["lanes"][0]["result"]["layers"]:
@@ -1518,11 +1682,122 @@ class LedgerIntegrationTests(unittest.TestCase):
             change(drifted)
             with self.assertRaisesRegex(ValueError, message):
                 self.result(out, reviews, usage=drifted)
+        # The WebSearch cap: every child needs a measured web_search, and a capped worker needs its retained failure.
+        unmeasured = copy.deepcopy(usage)
+        unmeasured["child_usage"]["status"] = "complete"
+        del unmeasured["child_usage"]["children"][0]["web_search"]
+        with self.assertRaisesRegex(ValueError, "without a measured web_search"):
+            self.result(out, reviews, usage=unmeasured)
+        capped = copy.deepcopy(usage)
+        capped["child_usage"]["status"] = "complete"
+        capped["child_usage"]["children"][0]["web_search"] = {"calls": 2, "capped": 1, "first_capped_at": None}
+        with self.assertRaisesRegex(ValueError, "no web_search_capped retained failure"):
+            self.result(out, reviews, usage=capped)
         # A layer with retained failures must keep its retained_failure reopen entry.
         stripped = copy.deepcopy(out["layers"])
         stripped[0]["reopen"] = []
         with self.assertRaisesRegex(ValueError, r"no retained_failure reopen entry.*alpha"):
             self.result(dict(out, layers=stripped), reviews)
+
+    def test_a_worker_at_another_effort_reopens_its_layer_and_the_record_appends(self):
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+        next(c for c in raw["children"] if c["label"] == "discover:alpha")["efforts"] = ["max", "low"]
+        raw["effort_mismatches"] = [{"child": "discover:alpha", "efforts": ["max", "low"]}]
+        out, reviews = self.evidence(healthy_result(),
+                                     usage=usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT))
+        result = self.result(out, reviews)
+        self.assertEqual(result["layers"][0]["reopen"], [
+            {"trigger": "retained_failure", "ref": f"{self.base}/returns.json#/failures/alpha"}])
+        ledger = sl.append(self.root, json.loads((self.root / sl.LEDGER).read_text()), result)
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        self.assertEqual({key[1]: value for key, value in sl.derive(ledger).items()}["alpha"]["count"], 0)
+        # Without its effort_deviation retained failure, the same usage record is refused.
+        returns = json.loads((self.root / self.base / "returns.json").read_text())
+        returns["failures"] = {}
+        with self.assertRaisesRegex(ValueError, "no effort_deviation retained failure"):
+            self.result(out, reviews, returns=returns)
+
+    def test_a_capped_web_search_reopens_every_layer_through_the_critic(self):
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+        next(c for c in raw["children"] if c["label"] == "critic")["web_search"] = {
+            "calls": 2, "capped": 2, "first_capped_at": "2026-10-26T11:06:45Z"}
+        out, reviews = self.evidence(healthy_result(),
+                                     usage=usage_record.record(json.dumps(raw).encode("utf-8"), 0, "cmd", ROOT))
+        result = self.result(out, reviews)
+        ledger = sl.append(self.root, json.loads((self.root / sl.LEDGER).read_text()), result)
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        # healthy_result's layer would be clean (count 1) without the capped critic.
+        self.assertEqual({key[1]: value for key, value in sl.derive(ledger).items()}["alpha"]["count"], 0)
+
+    def omission(self, raw, exit_code, drop):
+        """Converted evidence of healthy_two_layers() measured by `raw`, then `drop(returns, layers)` applied in memory
+        before make_result: the result, or the ValueError make_result raised."""
+        out, reviews = self.evidence(healthy_two_layers(),
+                                     usage=usage_record.record(json.dumps(raw).encode("utf-8"), exit_code, "cmd", ROOT))
+        returns = json.loads((self.root / self.base / "returns.json").read_text())
+        layers = copy.deepcopy(out["layers"])
+        drop(returns["failures"], {layer["layer_id"]: layer for layer in layers})
+        try:
+            return self.result(dict(out, layers=layers), reviews, returns=returns)
+        except ValueError as error:
+            return error
+
+    def test_failure_coverage_is_checked_per_worker_and_per_layer(self):
+        # GPT-6 review of the 2026-09-26 record: with token-efficiency's critic-cap failure and its reopen entry removed,
+        # make_result passed, because another layer's "critic" failure satisfied a check over all layers, and the
+        # layer derived a clean count of 1. Each worker's failure must be in each of its layers: the critic's in every
+        # layer of the record, a <role>:<layer> worker's in its own.
+        self.assertEqual({k: v["count"] for k, v in self.clean_counts(healthy_two_layers()).items()},
+                         {"alpha": 1, "beta": 1})
+        baseline = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+
+        def drop_only_failure(layer_id, cause):
+            def drop(failures, layers):
+                failures[layer_id] = [f for f in failures[layer_id] if f["cause"] != cause]
+                self.assertEqual(failures[layer_id], [])  # it was the layer's only retained failure
+                del failures[layer_id]
+                layers[layer_id]["reopen"] = []
+            return drop
+
+        capped = copy.deepcopy(baseline)
+        next(c for c in capped["children"] if c["label"] == "critic")["web_search"] = {
+            "calls": 2, "capped": 2, "first_capped_at": "2026-10-26T11:06:45Z"}
+        low = copy.deepcopy(baseline)
+        next(c for c in low["children"] if c["label"] == "critic")["efforts"] = ["max", "low"]
+        low["effort_mismatches"] = [{"child": "critic", "efforts": ["max", "low"]}]
+        worker = copy.deepcopy(baseline)
+        next(c for c in worker["children"] if c["label"] == "refute-fit:alpha")["web_search"] = {
+            "calls": 1, "capped": 1, "first_capped_at": "2026-10-26T11:06:45Z"}
+
+        def move_to_beta(failures, layers):  # alpha's worker failure recorded under beta instead
+            failures["beta"] = failures.pop("alpha")
+            layers["beta"]["reopen"], layers["alpha"]["reopen"] = [
+                {"trigger": "retained_failure", "ref": f"{self.base}/returns.json#/failures/beta"}], []
+
+        for name, raw, exit_code, drop, message in (
+                ("critic cap", capped, 0, drop_only_failure("beta", "web_search_capped"),
+                 r"no web_search_capped retained failure.*critic in beta"),
+                ("critic effort", low, 1, drop_only_failure("beta", "effort_deviation"),
+                 r"no effort_deviation retained failure.*critic in beta"),
+                ("worker in another layer", worker, 0, move_to_beta,
+                 r"no web_search_capped retained failure.*refute-fit:alpha in alpha")):
+            with self.subTest(name):
+                self.assertIsInstance(self.omission(raw, exit_code, lambda failures, layers: None), dict)
+                refused = self.omission(raw, exit_code, drop)
+                self.assertIsInstance(refused, ValueError, "make_result accepted a record whose layer lost its failure")
+                self.assertRegex(str(refused), message)
+
+    def test_refuted_by_absence_is_not_an_earlier_adjudication(self):
+        # beta's B1 is refuted only by its missing facts vote; alpha's A3 by its returned facts vote.
+        out, reviews = self.evidence(synthetic_result())
+        ledger = sl.append(self.root, json.loads((self.root / sl.LEDGER).read_text()), self.result(out, reviews))
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        layers = {layer["layer_id"]: layer for layer in ledger["sweeps"][-1]["layers"]}
+        self.assertIn("o/beta-one", layers["beta"]["votes_note"])
+        target_of = sl.ref_resolver(lambda path: sl.load_json(self.root, path))
+        self.assertEqual(sl.adjudicated_repos(layers["beta"], target_of), {sl.norm_repo(B2)})
+        self.assertEqual(sl.adjudicated_repos(layers["beta"]), {sl.norm_repo(B1), sl.norm_repo(B2)})
+        self.assertIn(sl.norm_repo(A3), sl.adjudicated_repos(layers["alpha"], target_of))
 
     def test_hand_written_reopen_entries_are_added_to_the_retained_failures(self):
         out, reviews = self.evidence(synthetic_result())
@@ -1608,6 +1883,83 @@ class SourceReviewTests(unittest.TestCase):
         for repository, path in written.items():
             review = json.loads((work / "reviews" / path).read_text())
             self.assertEqual((review["repository"], review["id"]), (repository, f"source-review-{path[:-5]}"))
+
+    def test_a_hugging_face_model_survivor_is_reviewed_at_its_hub_commit(self):
+        # The 2026-09-26 sweep kept a Hugging Face model repository in agents-models-workers, which gh cannot read.
+        # Its review reads the Hub's model-info endpoint for the default revision's commit and the model card at that
+        # commit; the card's YAML metadata block is not an excerpt. A dataset URL is no model repository.
+        source_reviews = load("source_reviews")
+        sha = "a" * 40
+        card = ("---\nlicense: apache-2.0\nlibrary_name: transformers\n---\n\n# Model 1.5\n\n"
+                + "A long enough paragraph about what the model does and how it was trained. " * 2)
+        answers = {"api/models/Org/Model-1.5": {"id": "Org/Model-1.5", "sha": sha, "cardData": {"license": "apache-2.0"},
+                                                "tags": ["license:apache-2.0"], "likes": 7, "gated": False,
+                                                "disabled": False, "lastModified": "2026-10-20T00:00:00.000Z"},
+                   f"Org/Model-1.5/resolve/{sha}/README.md": card}
+        requested = []
+
+        def hub_get(path, text=False):
+            requested.append(path)
+            if path not in answers:
+                raise source_reviews.HubError(f"GET {path}: HTTP Error 404: Not Found")
+            return answers[path]
+
+        work = temp_dir(self)
+        survivors = write_json(work / "survivors.json", [
+            {"layer_id": "agents-models-workers", "repository": "https://huggingface.co/Org/Model-1.5"},
+            {"layer_id": "agents-models-workers", "repository": "https://huggingface.co/datasets/org/data"}])
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.object(source_reviews, "hub_get", hub_get), contextlib.redirect_stdout(out), \
+                contextlib.redirect_stderr(err):
+            code = source_reviews.main(["--survivors", str(survivors), "--out", str(work / "reviews"), "--lane", LANE])
+        self.assertEqual(code, 1)
+        self.assertIn("https://huggingface.co/datasets/org/data", err.getvalue())
+        self.assertEqual(json.loads(out.getvalue()), [{"repository": "https://huggingface.co/Org/Model-1.5",
+                                                       "path": "hf-org-model-1-5.json",
+                                                       "layers": ["agents-models-workers"]}])
+        review = json.loads((work / "reviews/hf-org-model-1-5.json").read_text())
+        self.assertEqual((review["id"], review["reviewed_commit"], review["license"], review["readme_path"]),
+                         ("source-review-hf-org-model-1-5", sha, "apache-2.0", "README.md"))
+        self.assertEqual(review["documentation_excerpts"][0]["source"], f"README.md@{sha}")
+        self.assertNotIn("library_name", json.dumps(review["documentation_excerpts"]))
+        self.assertIn(f"Survived the {LANE} facts refuter and both fit refuters", review["claim"])
+        self.assertEqual(requested, ["api/models/Org/Model-1.5", f"Org/Model-1.5/resolve/{sha}/README.md"])
+
+    def test_hub_reviews_survive_truncated_responses_trailing_slashes_and_indented_card_metadata(self):
+        # Review repairs (2026-09-26): http.client.HTTPException is not an OSError, so a truncated Hub response
+        # escaped as a traceback; the same model with and without a trailing slash got two reviews; a card whose
+        # metadata block follows a blank line (huggingface_hub repocard.REGEX_YAML_BLOCK allows it) was excerpted.
+        source_reviews = load("source_reviews")
+        with mock.patch.object(source_reviews.urllib.request, "urlopen",
+                               side_effect=source_reviews.http.client.IncompleteRead(b"")):
+            with self.assertRaises(source_reviews.HubError):
+                source_reviews.hub_get("api/models/Org/M")
+        sha = "b" * 40
+        card = "\n---\nlicense: mit\nbase_model: some/model\n---\n\n" + "A long enough paragraph about the model itself. " * 3
+        answers = {"api/models/Org/M": {"id": "Org/M", "sha": sha, "cardData": {"license": "mit"}},
+                   f"Org/M/resolve/{sha}/README.md": card}
+        work = temp_dir(self)
+        survivors = write_json(work / "survivors.json", [
+            {"layer_id": "alpha", "repository": "https://huggingface.co/Org/M"},
+            {"layer_id": "beta", "repository": "https://huggingface.co/Org/M/"}])
+        out = io.StringIO()
+        with mock.patch.object(source_reviews, "hub_get", lambda path, text=False: answers[path]), \
+                contextlib.redirect_stdout(out):
+            code = source_reviews.main(["--survivors", str(survivors), "--out", str(work / "reviews"), "--lane", LANE])
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(out.getvalue()), [{"repository": "https://huggingface.co/Org/M",
+                                                       "path": "hf-org-m.json", "layers": ["alpha", "beta"]}])
+        excerpts = json.loads((work / "reviews/hf-org-m.json").read_text())["documentation_excerpts"]
+        self.assertTrue(excerpts and not any("base_model" in item["text"] for item in excerpts))
+        # make_result.py finds that review for a survivor recorded with the trailing slash, as the ledger compares.
+        usage = usage_record.record(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS), 0, "cmd", ROOT)
+        layer = {"catalog": "us-equities", "layer_id": "beta", "reopen": [],
+                 "survived": [{"repo": "https://huggingface.co/Org/M/"}]}
+        result = make_result.build_result(
+            layers=[layer], reviews=json.loads(out.getvalue()), usage=usage, manifest={"checked_at": "2026-10-26"},
+            sweep_id=LANE, lane=LANE, returns_ref=f"evidence/artifacts/{LANE}/returns.json", usage_ref="u.json",
+            manifest_ref="m.json", prompts_sha256=PROMPTS_SHA256_20260926, returns={"failures": {}})
+        self.assertEqual(result["layers"][0]["survived"][0]["source_review"], f"evidence/artifacts/{LANE}/hf-org-m.json")
 
 
 # --------------------------------------------------------------------------- sweep.js under node

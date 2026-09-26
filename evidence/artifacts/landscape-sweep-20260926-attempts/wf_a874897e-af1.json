@@ -1,0 +1,178 @@
+{
+ "schema_version": 1,
+ "id": "landscape-sweep-20260926-attempt-1",
+ "workflow_run": "wf_a874897e-af1",
+ "superseded_by": "wf_8397ada1-777",
+ "status": "stopped",
+ "started_at": "2026-09-26T02:07:52Z",
+ "stopped_at": "2026-09-26T02:22:04Z",
+ "stop_reason": "Stopped by the coordinator on the user's instruction to make the sweep SOTA-skill-aligned and incumbency-neutral; relaunched with revised templates as wf_8397ada1-777, whose journal starts at 02:23:21Z. Its two running GPT-6 jobs were terminated by literal process id. stopped_at is the run record's timestamp (status killed).",
+ "harness": "the 2026-09-26 scratchpad prototype of the landscape-sweep lane",
+ "prompts_sha256": "1b7844800af40911484591d738a86741fd4a68cbb58339bc8126418c4c6a8783",
+ "prompts_note": "sha256 of this run's staged templates (json.dumps(T, sort_keys=True, ensure_ascii=False)); wf_8397ada1-777 ran revised templates, 3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4.",
+ "worker_settings": {
+  "discovery": "Claude opus (resolved claude-opus-5-5), effort max",
+  "gpt6_discovery": "Claude sonnet wrapper (resolved claude-sonnet-5), effort max, running gpt-6-astra at effort max"
+ },
+ "discovery_returns": {
+  "claude": 0,
+  "gpt6": 3
+ },
+ "refuter_returns": 0,
+ "children_returned": [
+  "gpt6-discover:native-clients",
+  "gpt6-discover:instructions-skills",
+  "gpt6-discover:workers"
+ ],
+ "provider_usage": {
+  "source": "evidence/artifacts/landscape-sweep-20260926-attempts/child-usage-wf_a874897e-af1.json",
+  "children_started": 11,
+  "children_returned": 3,
+  "children_stopped_in_flight": 8,
+  "by_resolved_model": {
+   "claude-opus-5-5": {
+    "children": 6,
+    "input_tokens": 446,
+    "output_tokens": 279241,
+    "cache_read_input_tokens": 23124995,
+    "cache_creation_input_tokens": 825787
+   },
+   "claude-sonnet-5": {
+    "children": 5,
+    "input_tokens": 64,
+    "output_tokens": 49705,
+    "cache_read_input_tokens": 1246946,
+    "cache_creation_input_tokens": 417985
+   }
+  },
+  "web_search": {
+   "calls": 25,
+   "capped": 0,
+   "capped_children": []
+  },
+  "web_search_note": "WebSearch calls and capped calls measured from the transcripts (child-usage.mjs web_search). They count toward the coordinator session's WebSearch cap, which wf_8397ada1-777 reached at 04:10:13Z.",
+  "status": "incomplete",
+  "lower_bound": true,
+  "note": "Claude usage from the retained transcripts; the children stopped in flight end at the stop, so the figures are a lower bound."
+ },
+ "gpt6_jobs": {
+  "gpt6-discover-code-navigation": {
+   "status": "terminated at the stop (no exit, no usage reported)",
+   "started": "2026-09-26T02:18:32Z",
+   "finished": null,
+   "usage": null
+  },
+  "gpt6-discover-instructions-skills": {
+   "status": "finished, exit 0",
+   "started": "2026-09-26T02:08:30Z",
+   "finished": "2026-09-26T02:16:18Z",
+   "usage": {
+    "input_tokens": 1142627,
+    "cached_input_tokens": 1011840,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 13973,
+    "reasoning_output_tokens": 8131
+   }
+  },
+  "gpt6-discover-isolation": {
+   "status": "terminated at the stop (no exit, no usage reported)",
+   "started": "2026-09-26T02:16:21Z",
+   "finished": null,
+   "usage": null
+  },
+  "gpt6-discover-native-clients": {
+   "status": "finished, exit 0",
+   "started": "2026-09-26T02:08:49Z",
+   "finished": "2026-09-26T02:17:23Z",
+   "usage": {
+    "input_tokens": 1105464,
+    "cached_input_tokens": 1016832,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 15041,
+    "reasoning_output_tokens": 8851
+   }
+  },
+  "gpt6-discover-workers": {
+   "status": "finished, exit 0 on disk; the in-run wrapper returned exit 3 from the false usage-limit marker",
+   "started": "2026-09-26T02:08:45Z",
+   "finished": "2026-09-26T02:16:38Z",
+   "usage": {
+    "input_tokens": 1256422,
+    "cached_input_tokens": 1118976,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 12769,
+    "reasoning_output_tokens": 7427
+   }
+  }
+ },
+ "gpt6_usage_reported": {
+  "input_tokens": 3504513,
+  "cached_input_tokens": 3147648,
+  "cache_write_input_tokens": 0,
+  "output_tokens": 41783,
+  "reasoning_output_tokens": 24409,
+  "note": "Codex usage of the three finished jobs; the two terminated jobs reported none (lower bound). Never summed with Claude usage."
+ },
+ "layers": [
+  {
+   "layer_id": "native-clients",
+   "family": "gpt6",
+   "calls": {
+    "gpt6_web_search": 12,
+    "gpt6_web_fetch": 8,
+    "gpt6_gh_api": 40
+   },
+   "repositories": [
+    "https://github.com/anthropics/claude-agent-sdk-python",
+    "https://github.com/earendil-works/pi",
+    "https://github.com/aaif-goose/goose",
+    "https://github.com/google-gemini/gemini-cli",
+    "https://github.com/anomalyco/opencode"
+   ],
+   "reached_workflow": true
+  },
+  {
+   "layer_id": "instructions-skills",
+   "family": "gpt6",
+   "calls": {
+    "gpt6_web_search": 12,
+    "gpt6_web_fetch": 8,
+    "gpt6_gh_api": 40
+   },
+   "repositories": [
+    "https://github.com/tardigrde/agent-skill-eval",
+    "https://github.com/NVIDIA/SkillEvaluator",
+    "https://github.com/ml4t/skills",
+    "https://github.com/alpacahq/alpaca-skills",
+    "https://github.com/anthropics/skills",
+    "https://github.com/addyosmani/agent-skills"
+   ],
+   "reached_workflow": true
+  },
+  {
+   "layer_id": "workers",
+   "family": "gpt6",
+   "calls": {
+    "gpt6_web_search": 12,
+    "gpt6_web_fetch": 8,
+    "gpt6_gh_api": 33
+   },
+   "repositories": [
+    "https://github.com/gethamster/horde",
+    "https://github.com/constellation-works/orbit",
+    "https://github.com/Augani/agent-orchestrator",
+    "https://github.com/Dusttoo/orka",
+    "https://github.com/langchain-ai/langgraph",
+    "https://github.com/langchain-ai/langgraph-supervisor-py"
+   ],
+   "reached_workflow": false
+  }
+ ],
+ "incidents": [
+  "2026-09-26T02:17:04Z: the prototype runner's usage-limit check matched the phrase 'Usage limitation' in a README that gpt6-discover:workers cited, marked the job exit 3 and set the account marker. It was a false positive: the coordinator's incident log records no Codex usage-limit error then. The workflow treated that layer's GPT-6 discovery as failed. At about 02:18Z the check was narrowed to the usage-limit message on stderr, the marker was removed, and the job's exit file was set to 0 by hand (incident log)."
+ ],
+ "limitations": [
+  "No refuter evaluated these returns and nothing from this run is merged into manifest-20260926; the GPT-6 proposals listed here are dated inputs only.",
+  "No Claude discovery returned before the stop; the three returned children are GPT-6 discovery wrappers."
+ ]
+}
