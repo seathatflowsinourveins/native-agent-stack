@@ -82,6 +82,8 @@ A fresh `claude -p` session on Sonnet 5 listed these MCP servers as `connected` 
 
 ## Retained failures and gaps
 
+- **Correction (2026-09-26):** QMD's PASS in the Results table only confirmed that the quoted text exists in the document it retrieved. That document, `catalogs/us-equities/engines-strategies.md`, does not describe how a new machine pins a release. The catalog index covers only the us-equities collections, so `adoption/update.md` is out of its scope. The QMD row is a wrong-document retrieval for this question. See [the Codex run](../token-e2e-codex-20260926/README.md).
+
 - **Context Mode, attempt 1:** `ctx_execute_file` refused a file outside the session project root. Subagents inherit the parent session's project root.
 - **Serena, attempt 1:** it is bound to the session project (`--project-from-cwd`) and has no project switch in this context.
 - **Context Hub, attempt 1:** its registry has no Anthropic prompt-caching entry.

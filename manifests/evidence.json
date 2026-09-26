@@ -12370,8 +12370,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "61a13a67cdd6134693fa79368f23732671db62475f7e5ba034650d155b7d8f26",
-      "bytes": 27059
+      "sha256": "8330a40e2722fce38d431ffcda63537a072b7ee58d8b090ca2b99be0d8d68856",
+      "bytes": 27637
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -32854,9 +32854,19 @@
       "bytes": 4637
     },
     {
+      "path": "evidence/artifacts/token-e2e-codex-20260926/README.md",
+      "sha256": "b704e534d44cf2c68f5010e1a4fc3e924152c6735570ca447b943f8ade84ce3a",
+      "bytes": 5033
+    },
+    {
+      "path": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "sha256": "7157e0e668f61cbc6785c9d632d7123013fe85936f1e965018775762ca57b04f",
+      "bytes": 37297
+    },
+    {
       "path": "evidence/artifacts/token-e2e-ultracode-20260925/README.md",
-      "sha256": "7fa8f43808ecbbc1e412c306d21a532b24999def7edbd88ba2de91a5e9f98b58",
-      "bytes": 8997
+      "sha256": "560e7dfddd4151ec07b6adb03f8086f305a12ac1c26a1687ea4eb0f45cf44abd",
+      "bytes": 9472
     },
     {
       "path": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
