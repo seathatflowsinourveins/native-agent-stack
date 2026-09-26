@@ -1,0 +1,29 @@
+run_start_utc=2026-09-26T14:56:46Z
+bin_mcporter -> ~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/bin/mcporter
+bin_mcporter_version=0.14.1
+command_v_ps=/usr/bin/ps
+== before
+{"pid": 129979, "protocolVersion": 3, "startedAt": 1790366984036, "servers": [{"connected": true, "activeCalls": 0, "lastUsedAt": 1790366984477}, {"connected": true, "activeCalls": 0, "lastUsedAt": 1790366985598}]}
+pid 129979 cmdline: ~/.local/share/codex-ecosystem/tools/node-24.21.0/bin/node ~/.local/share/codex-ecosystem/tools/mcporter-0.13.13/lib/node_modules/mcporter/dist/cli.js daemon start --foreground 
+pid 129979 started: Fri Sep 25 16:09:42 2026 (host local time, UTC-4)
+children: 130014 130067 
+socket: ~/.mcporter/daemon/user.sock mtime=2026-09-25 16:09:44.042209224 -0400
+socraticode 9c518b2ee5c8 index/graph lock dirs held: 0
+assert: pid 129979 is the 0.13.13 daemon -> ok
+assert: activeCalls total 0 -> ok
+== stop
+$ mcporter daemon stop
+Daemon stopped (if it was running).
+stop_exit=0
+pid 129979 alive after stop: no
+former children alive: 
+socket present after stop: no
+== restart through production use
+$ mcporter --config <codex-ecosystem config/mcporter.json> call socraticode.codebase_health --no-oauth
+call_exit=0
+call_output_first_line: SocratiCode — Infrastructure Health Check:
+== after
+{"pid": 744797, "protocolVersion": 3, "startedAt": 1790434609080, "servers": [{"connected": true, "activeCalls": 0, "lastUsedAt": 1790434609643}]}
+new daemon pid 744797 cmdline: ~/.local/share/codex-ecosystem/tools/node-24.21.0/bin/node ~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/cli.js daemon start --foreground 
+mcporter daemon processes: 1
+run_end_utc=2026-09-26T14:56:52Z

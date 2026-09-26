@@ -153,6 +153,20 @@ code; the daemon protocol moves past 3; an advisory is published against 0.14.x;
 launcher without `ps` on its `PATH` has to run the daemon; an SDK release bundles
 `fast-uri` 3.1.8 or later (then re-qualify for the fix).
 
+**Correction (2026-09-26).** The cutover record was wrong on two points. It said that no
+daemon ran before the switch and that the next call started a 0.14.1 daemon. In fact the
+coordinator's own pre-switch baseline call, `mcporter list socraticode`, ran through 0.13.13
+in the same command as the relink and auto-started a 0.13.13 daemon on the production socket
+at 20:09:44Z. The earlier precondition check was therefore stale by the time of the switch.
+For about 18.8 h, 0.14.1 clients that went through the daemon reached that 0.13.13 daemon.
+Its two keep-alive servers show no use after 20:09:45Z. On 2026-09-26 at 14:56Z it was
+drained (0 active calls) and stopped with the native `mcporter daemon stop`. A production
+call then started a 0.14.1 daemon, confirmed from the process command line. The mixed-version
+daemon limitation still holds, because this retirement did not qualify mixed-version
+operation. Evidence:
+[`mcporter-0141-daemon-correction-20260926`](../../evidence/artifacts/mcporter-0141-daemon-correction-20260926/README.md)
+and the receipt's addendum.
+
 ### ai-memory 2.3.2 to 2.4.0, then 2.4.1
 
 **Decision.** 2.4.0 served `nativestack-memory.service` and all ai-memory hooks on this
@@ -240,6 +254,64 @@ unobserved and Codex cannot be checked before 2026-09-30); keep 1.14.0 indefinit
 
 **Overturn when.** A native Claude Code or Codex call errors on the log stream; a 1.15.x or
 1.16.0 changes the index format or profile schema; upstream reports a 1.15.0 regression.
+
+**Update (2026-09-26, mixed-version source review).** The deferral stands. The earliest
+cutover time is still 2026-10-01T11:01Z, the end of the 7-day cooldown. Codex can be checked
+again, so the only thing still gating the cutover is the coordinated restart.
+
+A source review at [v1.14.0](https://github.com/giancarloerra/SocratiCode/tree/v1.14.0)
+(`2218f251`) and [v1.15.0](https://github.com/giancarloerra/SocratiCode/tree/v1.15.0)
+(`f6191f07`) found the cross-process coordination code byte-identical between the two tags.
+This is a pinned source review, not native execution. It covers `lock.ts`, `watcher.ts`,
+`indexer.ts`, `graph-inputs.ts`, `graph-analysis.ts`, `code-graph.ts`,
+`symbol-graph-store.ts` and `startup.ts`.
+
+How coordination works:
+- **Locks.** They are `proper-lockfile` directories under `os.tmpdir()/socraticode-locks`
+  ([lock.ts:27](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/lock.ts#L27)).
+  A lock goes stale after 120 s, is refreshed every 30 s, and acquisition is not retried
+  ([lock.ts:30-33](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/lock.ts#L30-L33),
+  [:112](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/lock.ts#L112)).
+  Servers therefore coordinate only when they share a `TMPDIR`.
+- **Watcher.** Each project has exactly one watcher, whatever its version
+  ([watcher.ts:260-265](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/watcher.ts#L260-L265)).
+- **Writes.** Mixing versions steals no locks and duplicates no writes.
+
+What mixing versions does cause:
+- **Graph flip-flop.** The graph rebuild check is a strict inequality on the builder's
+  version
+  ([graph-inputs.ts:609](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/graph-inputs.ts#L609)).
+  Each version rebuilds a graph the other built, so alternating updates rebuild the graph
+  every time. 1.15.0 also marks a 1.14.0 graph as STALE
+  ([graph-analysis.ts:203-206](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/graph-analysis.ts#L203-L206)).
+- **Cleanup race.** At startup, cleanup of old symbol-graph generations is coordinated only
+  inside one process: `coordinateProject` is an in-memory promise chain
+  ([symbol-graph-store.ts:843-866](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/symbol-graph-store.ts#L843-L866),
+  [startup.ts:324-336](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/startup.ts#L324-L336)).
+  A server that starts while another is building may delete that build's staging
+  generation. This comes from reading the code and was not reproduced;
+  `codebase_graph_build` recovers from it.
+- **`codebase_stop`.** It SIGTERMs whichever process holds the index lock, even one that
+  belongs to another session
+  ([index-tools.ts:497-499](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/tools/index-tools.ts#L497-L499)).
+
+Host state on 2026-09-26: ten 1.14.0 servers had this checkout as their working directory.
+Eight were started by Claude Code and two by the mcporter daemon. That daemon was a leftover
+0.13.13; it has since been retired and replaced, as the mcporter section records.
+
+Cutover procedure, for use no earlier than 2026-10-01T11:01Z:
+1. Point every launcher at the 1.15.0 prefix with the same environment and no `TMPDIR`
+   override: the Claude Code MCP entry, `config/mcporter.json` and the Codex config.
+2. Close the 1.14.0 client sessions normally, and restart the mcporter daemon with
+   `mcporter daemon stop`. Avoid `kill -9`, which leaves locks held for 120 s, and don't use
+   `codebase_stop` to force the handover.
+3. End the watch-lock holder only when no `<projectId>-index.lock` or `<projectId>-graph.lock`
+   directory exists.
+4. Wait until no `<projectId>-*.lock` directory remains and no 1.14.0 server has this
+   checkout as its working directory.
+5. Start one 1.15.0 session. Check that the watch-lock PID runs from the 1.15.0 prefix and
+   that `codebase_graph_status` reports "Built by: v1.15.0".
+6. Start further sessions one at a time, and not while a graph lock is held.
 
 ## Held by the trading lane
 

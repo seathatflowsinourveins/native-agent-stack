@@ -142,5 +142,12 @@
       "sha256": "9812876512d979f15156e56a5f01a880f82d6727844ab241d7747af6b2111e3b",
       "byte_identical_to_run_copy": false
     }
+  ],
+  "addenda": [
+    {
+      "recorded_date_utc": "2026-09-26",
+      "note": "Correction: data.cutover.daemon_before ('none running') and data.cutover.post_switch ('next call started a 0.14.1 daemon'), and the same statements in evidence/artifacts/sota-refresh-20260925/mcporter/cutover.json, were wrong at the switch. On 2026-09-26 a read-only check found PID 129979 running tools/mcporter-0.13.13 `daemon start --foreground` on the production socket ~/.mcporter/daemon/user.sock, while bin/mcporter named 0.14.1. `mcporter daemon status --json` reported startedAt 1790366984036 ms (2026-09-25T20:09:44Z), and the socket mtime was 2026-09-25 16:09:44 -0400. Its two keep-alive socraticode 1.14.0 servers had activeCalls 0 and lastUsedAt 20:09:44Z and 20:09:45Z. The coordinator's session record attributes the daemon to its own pre-switch baseline `mcporter list socraticode` call through 0.13.13, issued at 20:09:43.395Z in the same command as the relink, after a 20:09:11Z precondition check that had found no daemon. That record is not retained. For about 18.8 h, 0.14.1 clients using the daemon therefore reached a 0.13.13 daemon (protocol 3 in both versions). Whether any call failed in that window was not measured. retire.txt (2026-09-26 14:56:46Z-14:56:52Z UTC) records the fix: after asserting the PID's 0.13.13 command line and activeCalls 0, the native `mcporter daemon stop` through 0.14.1 exited 0; the PID, its two children and the socket were then gone. A production `mcporter --config <config/mcporter.json> call socraticode.codebase_health --no-oauth` exited 0 and started PID 744797 running tools/mcporter-0.14.1 `daemon start --foreground`, the only mcporter daemon process. limitations[4] ('a mixed-version daemon cutover' not exercised) still holds: this was a retirement, not a qualification of mixed-version operation. Original fields are left as recorded.",
+      "evidence": "evidence/artifacts/mcporter-0141-daemon-correction-20260926/README.md"
+    }
   ]
 }
