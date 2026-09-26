@@ -4326,8 +4326,8 @@
     },
     {
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/README.md",
-      "sha256": "2f5db0af40827c091ba3f010e68f51d00413e7b42f6d94cfcf6ddb511aeb80fe",
-      "bytes": 17285
+      "sha256": "28ba9bf869b7f8882fda1f2e80a620fe5478aeb1d4f46b7bb8b7bfa862c2aae4",
+      "bytes": 17678
     },
     {
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py",
