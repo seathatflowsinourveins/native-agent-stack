@@ -272,6 +272,56 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260924.json", [])), 2,
                              f"pin lines outside the exact reviewed path must still be detected: {by_file}")
 
+    @staticmethod
+    def _reviewed_manifest_ids() -> list:
+        """The git commit ids that the 2026-09-26 manifest allowlist pins by value, read from .gitleaks.toml. This
+        file names the rule, so a 40-hex literal written here would itself be a finding."""
+        text = CONFIG_PATH.read_text(encoding="utf-8")
+        block = text[text.index("manifest-20260926\\.json"):]
+        return re.findall(r"[0-9a-f]{40}", block[:block.index("[[")])
+
+    def _free_form_manifest(self, target: Path, relative: str, ids: list, extra_rows: list) -> None:
+        """The 2026-09-26 manifest's shape: free-form catalog pins holding a git commit id, in a file whose lane
+        text names the rule id sourcegraph-access-token (the keyword that makes every 40-hex value a candidate)."""
+        path = target / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        pins = [f"v0.44.0; source {ids[0]}", f"{ids[1]} (blueprints/us-equities/adaptive-paper)",
+                f"Apache Iceberg 1.11.0; PyIceberg 0.12.0; source {ids[2]}", ids[3]]
+        rows = [{"id": f"c{i}", "pin": pin} for i, pin in enumerate(pins)]
+        rows += [{"reasoning": "the repository's gitleaks config has generic-api-key and sourcegraph-access-token"},
+                 *extra_rows]
+        path.write_text(json.dumps({"trading": rows}, indent=1))
+
+    def test_d3_reviewed_manifest_pin_ids_are_not_detected(self):
+        """The reviewed git commit ids in the 2026-09-26 manifest's free-form "pin" values are exempt."""
+        ids = self._reviewed_manifest_ids()
+        self.assertGreaterEqual(len(ids), 4, "the allowlist must pin the reviewed ids by value")
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._free_form_manifest(target, "catalogs/sota-convergence/manifest-20260926.json", ids, [])
+            findings = [f for f in self._scan(target) if f["RuleID"] == "sourcegraph-access-token"]
+            self.assertEqual(findings, [], "reviewed pin commit ids in the reviewed manifest must not be flagged")
+
+    def test_d4_unreviewed_values_and_other_paths_stay_detected(self):
+        """Only the reviewed ids in that exact file are exempt. An unreviewed 40-hex value (under another field, or
+        as free text in a pin), the uppercase form of a reviewed id, an sgp_-prefixed token, and the reviewed ids in
+        any other file are all still detected."""
+        ids = self._reviewed_manifest_ids()
+        extra = [{"token": HEX40}, {"pin": f"sourcegraph legacy access token {HEX40}"},
+                 {"pin": ids[0].upper()}, {"pin": f"sgp_{ids[0]}"}]
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._free_form_manifest(target, "catalogs/sota-convergence/manifest-20260926.json", ids, extra)
+            self._free_form_manifest(target, "catalogs/sota-convergence/manifest-20260925.json", ids, [])
+            by_file = {}
+            for f in self._scan(target):
+                if f["RuleID"] == "sourcegraph-access-token":
+                    by_file.setdefault(f["File"], []).append(f["StartLine"])
+            self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260926.json", [])), len(extra),
+                             f"every unreviewed value in the reviewed manifest must be detected: {by_file}")
+            self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260925.json", [])), 4,
+                             f"reviewed ids outside the exact reviewed path must be detected: {by_file}")
+
     # The 4 reviewed ai-memory rejection fingerprints (SHA-256 digests, not credentials) the
     # .gitleaks.toml entry pins by value.
     REVIEWED_FINGERPRINTS = ["ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db", "ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0", "125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1", "683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9"]
