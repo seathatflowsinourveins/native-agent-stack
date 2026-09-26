@@ -183,7 +183,10 @@ additional provider savings. Keep the native formula labels with both values.
 
 The foundation view refreshes fresh RTK/database/document/collection observations;
 it reads other counter scopes from the existing report and displays their source
-times. A newly delivered snapshot does not make an old persisted counter current.
+times. Its savings trend panel (changed after `v2026.09.26.2`) draws each native
+scope as its own series and never adds scopes together; a step whose newest row for
+a scope failed or is stale is a gap, and its legend carries no value. A newly
+delivered snapshot does not make an old persisted counter current.
 Unknown or failed sources never become zero, and a previous successful value does
 not silently replace a current failure. The source report retains its native raw
 outputs privately. Neither this dashboard nor TOON defines a universal lifetime
@@ -205,7 +208,11 @@ python3 observability/native-data/snapshot.py --config "$NATIVE_DATA_CONFIG" --p
 ```
 
 Use the supplied native user-service/timer examples with absolute paths resolved
-on that PC. The timer only observes selected data; it does not run research,
+on that PC. The adapter guide's [scheduled deployment](../observability/native-data/README.md#scheduled-deployment)
+(changed after `v2026.09.26.2`) names the private config and state paths, the unit
+placeholders, the `stale_after_seconds` choice and the native undo commands. Its
+`report_scopes` and `ai_memory.server_url` keys cover a token report with other
+scope labels and an ai-memory server on another port. The timer only observes selected data; it does not run research,
 inference, reindexing, session imports or broker orders. It also does not refresh
 the whole token ledger on each tick. Run the report's existing refresh command
 after meaningful efficiency work or when current full reporting is requested.

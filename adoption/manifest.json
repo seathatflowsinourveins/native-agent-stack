@@ -294,7 +294,8 @@
       "recipe_paths": [
         "observability/README.md",
         "observability/backends/README.md",
-        "observability/grand-dashboard/README.md"
+        "observability/grand-dashboard/README.md",
+        "observability/native-data/README.md"
       ]
     },
     {

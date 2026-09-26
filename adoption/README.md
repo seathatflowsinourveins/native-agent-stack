@@ -134,6 +134,11 @@ After the native observability services are accepted on the new host, install th
 using explicit checkout/config/data paths. Its native user timer refreshes public
 checkpoint metadata automatically while the Linux/WSL user manager runs. It does
 not transfer credentials or make another machine's historical results local E2E.
+Then deploy the [native data adapter](../observability/native-data/README.md#scheduled-deployment)
+on its user timer, so the token tools' own savings counters and the memory
+inventory reach Loki and the `native-foundation-data` dashboard, each scope as its
+own series (changed after `v2026.09.26.2`, whose `observability` profile does not
+list this recipe).
 The current [seventeen-requirement map](../blueprints/us-equities/convergence-program/coverage.md)
 and [program plan](../blueprints/us-equities/convergence-program/plan.json) identify
 the next concrete acceptance without reloading the entire repository catalog.
