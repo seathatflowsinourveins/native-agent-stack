@@ -13043,12 +13043,12 @@
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.json",
-      "sha256": "9a5b72041df5a2b837b8802ed0dff42eb1831cee3560518b3d00f15503ce6039",
+      "sha256": "eaaa6be136302bc1b3f6bff26e67ee39b75551a2ec9711c7fc4d1f584e188014",
       "bytes": 881249
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.md",
-      "sha256": "b830d33253d29b419a0623f1ee1b42cfa36efd2d3865ca47edeac44433dfd223",
+      "sha256": "ac750c91cf07b9fc2f0eec32e3afe77dd54cfe9f4dcc01e14abedc77848fd261",
       "bytes": 5990
     },
     {

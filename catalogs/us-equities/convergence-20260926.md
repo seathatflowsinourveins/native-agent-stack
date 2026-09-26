@@ -7,7 +7,7 @@ vote text, the per-layer packets and the paper sweep): [`evidence/artifacts/trad
 user's starred repositories (379 triaged), 8 awesome lists and per-layer candidate
 research. Each layer's Claude proposal was then challenged by a cross-family GPT-6 refutation. Every layer has a
 live-search vote, and 8 also have a cached-search vote. The candidate records use the trading candidate shape of
-[`manifest-20260926.json`](../sota-convergence/manifest-20260926.json) (sha256 `96419356fc76…`,
+[`manifest-20260926.json`](../sota-convergence/manifest-20260926.json) (sha256 `a72177d162f8…`,
 #357). The verdict wave reads both records.
 
 **What it is not.** Nothing here installs, promotes or re-pins a component. A disposition is an input to the

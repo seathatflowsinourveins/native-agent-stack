@@ -5,7 +5,7 @@
   "scope": "Trading-lane research convergence of 13 layers (12 catalog trading layers plus strategy-research) from the user's starred repositories, 8 awesome lists and per-layer candidate research, each layer proposal challenged by a cross-family GPT-6 refutation. Inclusion is not installation, E2E or superiority; no selection changes here. Inputs for the verdict wave alongside catalogs/sota-convergence/manifest-20260926.json.",
   "companion_record": {
     "path": "catalogs/sota-convergence/manifest-20260926.json",
-    "sha256": "96419356fc76839dd833836d3a60ccfdda0293d5d25a291b6512df90ec67db99",
+    "sha256": "a72177d162f84ba827028a7bff5ebc78ea9195c7a99ed2b411c75f7869b20e0e",
     "pull_request": 357,
     "relation": "The landscape sweep's manifest covers 11 of these layers (security-supply-chain as a foundation layer; strategy-research is trading-only). Candidates here use its trading candidate shape; the verdict wave takes both records as inputs."
   },
