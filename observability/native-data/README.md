@@ -132,7 +132,9 @@ latest attempt, not an accumulating transcript archive. A nonblocking file lock
 prevents overlapping collectors. Each command has a finite deadline and each
 stream a 1 MiB limit; an overflow retains a declared prefix, never claims a full
 output. Timeout/launch/nonzero/parse failures remain unknown. The report read is
-bounded to 16 MiB. The compact console result binds generation, snapshot bytes and
+bounded to 128 MiB, a consumer ceiling sized for the token report's embedded
+attachments (16 MiB in total, stored as base64 and as escaped text); a larger
+report stays unavailable and its rows unknown. The compact console result binds generation, snapshot bytes and
 SHA-256, payload SHA-256, row states and actual Loki HTTP status. Publishing
 requires HTTP 204; source failures still produce a snapshot, while publication
 failure exits 1 and invalid configuration exits 2. Keep the entire state directory

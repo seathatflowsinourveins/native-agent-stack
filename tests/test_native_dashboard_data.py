@@ -581,6 +581,51 @@ class NativeDataTests(unittest.TestCase):
             self.assertNotIn(directory, json.dumps(payload))
             self.assertNotIn("DO_NOT_PUBLISH", json.dumps(payload))
 
+    def test_report_limit_covers_the_token_reports_embedded_attachment_total(self):
+        # The token report embeds up to RETURNED_RESULTS_TOTAL_LIMIT attachment bytes as base64
+        # (4/3) and as JSON-escaped text (at most 6 bytes per byte). Its other sections are not
+        # bounded, so REPORT_LIMIT is a consumer ceiling above the attachments' worst case, not a
+        # producer maximum. A 16 MiB bound turned every report-derived row unknown on the
+        # workstation once returned results were attached.
+        spec = importlib.util.spec_from_file_location("token_manifest", ROOT / "tools/token-report/token_manifest.py")
+        tm = importlib.util.module_from_spec(spec); spec.loader.exec_module(tm)
+        embedded = tm.RETURNED_RESULTS_TOTAL_LIMIT * 4 // 3 + tm.RETURNED_RESULTS_TOTAL_LIMIT * 6
+        self.assertGreater(M.REPORT_LIMIT, embedded)
+
+    def collect_report(self, directory, text, now):
+        path = Path(directory)/"manifest.json"; path.write_text(text)
+        c = self.config(); del c["report_scopes"]  # self.report() uses the default labels
+        c = M.validate_config(c); c["project"] = directory; c["token_report"] = str(path)
+        class FakeRecorder:
+            records = []
+            def command(self, name, argv, cwd, env=None):
+                self.records.append({"completed_at": M.utc(time.time())})
+                return {"rtk-global": RTK, "rtk-project": None, "ai-memory": MEMORY, "qmd": QMD}[name]
+        recorder = FakeRecorder()
+        rows = M.collect(c, recorder, now)["rows"]
+        entities = {e for e, _ in M.REPORT_SCOPES.values()}
+        states = {r["state"] for r in rows if r["entity_id"] in entities}
+        source = next(r for r in recorder.records if r.get("id") == "token-report")
+        return path.stat().st_size, states, source["error"]
+
+    def test_report_beyond_the_attachment_total_still_projects_its_rows(self):
+        with tempfile.TemporaryDirectory() as directory:
+            now = time.time(); report = self.report(now)
+            report["additional_evidence"] = {"returned_results": {"records": [{"text": "x" * (17 * M.LIMIT)}]}}
+            size, states, error = self.collect_report(directory, json.dumps(report), now)
+            self.assertGreater(size, 16 * M.LIMIT)
+            self.assertEqual((states, error), ({"ok"}, None))
+
+    def test_report_ceiling_is_inclusive_and_a_larger_report_stays_unknown(self):
+        with tempfile.TemporaryDirectory() as directory:
+            now = time.time(); report = self.report(now); report["pad"] = ""
+            ceiling = len(json.dumps(report)) + 64
+            report["pad"] = "x" * 64
+            with patch.object(M, "REPORT_LIMIT", ceiling):
+                self.assertEqual(self.collect_report(directory, json.dumps(report), now), (ceiling, {"ok"}, None))
+                report["pad"] += "x"
+                self.assertEqual(self.collect_report(directory, json.dumps(report), now),
+                                 (ceiling + 1, {"unknown"}, "unavailable_or_invalid_report"))
 
 if __name__ == "__main__":
     unittest.main()
