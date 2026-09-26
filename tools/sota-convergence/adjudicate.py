@@ -104,7 +104,10 @@ SCRUB_KEEP = ("winner_keys", "why_selected", "winner_evidence_class", "winner_ev
               "challenger_preferred", "overturn_when", "overturn_protocol", "open_gaps", "sources_read", "limits")
 # Words that can name a lane in the kept prose. Only reported (index.json identity_mentions), never
 # redacted: a candidate can legitimately be called "codex" or "claude".
-IDENTITY_WORDS = re.compile(r"\b(claude|codex|anthropic|openai|opus|sonnet|haiku|gpt-[\w.-]+)\b", re.IGNORECASE)
+# The GPT-6 and Claude family names (astra, fable, mythos) as bare words too; gpt-6-sol, gpt-6-luna and
+# gpt-5.6-terra are caught by the gpt- form, since bare sol, luna and terra are ordinary words.
+IDENTITY_WORDS = re.compile(r"\b(claude|codex|anthropic|openai|opus|sonnet|haiku|fable|mythos|astra|gpt-[\w.-]+)\b",
+                            re.IGNORECASE)
 MIN_WHY = 60
 DEFAULT_TIMEOUT = 900.0
 INPUTS_DIR = "adjudication-inputs"
