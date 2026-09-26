@@ -13,7 +13,9 @@ evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-*.json:
                raw_output_sha256 (of the unsanitized stdout), measured_at_utc, note
   child_usage  the tool's output with transcript_dir rewritten to <session-transcripts>/subagents/workflows/<run id>
 The ledger needs child_usage.status "complete" for a completed sweep, reads workflow_run from the last segment of
-transcript_dir, and requires lost_workers to equal the incomplete children. Refuses to write (exit 3) when the
+transcript_dir, and requires lost_workers to equal the incomplete children. An attempt the runtime re-ran under the
+same call key (after a usage-limit pause) is under child_usage.superseded_attempts, not a lost child; its usage
+counts in by_resolved_model. Refuses to write (exit 3) when the
 sanitized record still matches a scripts/validate.py PRIVATE_CONTENT pattern. Exit 1, with the record still written
 (a stopped run keeps it as a lower bound), when the usage is incomplete, when child-usage.mjs exited non-zero, or
 when a child ran at another effort than --require-effort (effort_mismatches): every worker of this lane runs at
@@ -118,6 +120,8 @@ def main(argv=None) -> int:
     print(json.dumps({"out": str(args.out), "status": usage.get("status"), "exit_code": code,
                       "workflow_run": usage["transcript_dir"].rsplit("/", 1)[-1], "children": len(children),
                       "incomplete": [c.get("label") for c in children if isinstance(c, dict) and c.get("complete") is not True],
+                      "superseded_attempts": [c.get("label") for c in usage.get("superseded_attempts") or []
+                                              if isinstance(c, dict)],
                       "effort_mismatches": mismatches},
                      indent=1))
     return 0 if usage.get("status") == "complete" and code == 0 and not mismatches else 1

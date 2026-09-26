@@ -19,13 +19,15 @@ malformed vote counts as refuted and is noted. When a later round proposes a rep
 and all three of its votes replace the earlier round's; a vote missing from that round is never taken from an
 earlier one.
 Retained failures: a round that returned nothing, a discovery family that did not return, a missing vote, a lost
-completeness critic, a critic-flagged layer beyond the follow-up cap, and a GPT-6 copy problem are listed under
+completeness critic, a critic-flagged layer beyond the follow-up cap, a GPT-6 copy problem and (with --usage) a worker
+measured at another effort than max (effort_deviation; the critic's belongs to every layer) are listed under
 failures/<layer>, and the layer gets the reopen entry {trigger: retained_failure, ref: @RETURNS@#/failures/<layer>},
 so it never counts as a clean layer. A layer none of whose rounds returned is left out of layers.json
 (excluded_layers in the summary).
 Models and effort: each Claude vote names the resolved model and the effort its own worker ran at, from --usage
-(child-usage.mjs output); without it, the requested alias and effort null (not measured). The GPT-6 vote names the
-model and effort its job reported.
+(child-usage.mjs output; a call the runtime re-ran is measured by the attempt that returned, and the client-written
+<synthetic> rows name no model); without it, the requested alias and effort null (not measured). The GPT-6 vote
+names the model and effort its job reported.
 Privacy: work-dir, checkout and home paths become <work-dir>, <repo> and ~. Any string still matching
 scripts/validate.py PRIVATE_CONTENT is listed by pointer and kind (never its text), and the exit code is 3.
 Integrity: with --work-dir, every GPT-6 output is compared with the file Codex wrote (gpt6/<job>/last.json). Exit 4
@@ -53,6 +55,8 @@ MERGE_CAP = 8        # sweep.js MAX_PROPOSALS
 FOLLOWUP_CAP = 8     # sweep.js MAX_FOLLOWUPS
 FIT_RULE = "two-family: refuted when either the Claude or the GPT-6 fit refuter refuted"
 EXIT_PRIVATE, EXIT_COPY = 3, 4
+REQUIRED_EFFORT = "max"  # every agent() call of sweep.js names effort 'max'
+SYNTHETIC_MODEL = "<synthetic>"  # child-usage.mjs: the model of client-written rows, never a model that answered
 # Copy checks that mean the workflow's GPT-6 input is not exactly what Codex wrote (exit 4, and a retained failure).
 COPY_FAILURES = ("mismatch", "no_file", "file_unparseable", "file_only")
 VOTE_ROLES = (("facts", "facts"), ("fit_claude", "Claude fit"), ("fit_gpt6", "GPT-6 fit"))
@@ -93,31 +97,68 @@ def as_dict(value) -> dict:
 
 
 def resolved_models(usage: dict | None) -> dict:
-    """Role prefix -> resolved Claude model(s) from child-usage output; the requested alias without it."""
+    """Role prefix -> resolved Claude model(s) from child-usage output; the requested alias without it. The
+    client-written <synthetic> rows (an API error such as a usage-limit notice) name no model."""
     children = as_dict(as_dict(usage).get("child_usage")).get("children") or []
     out = {}
     for prefix, alias in ALIASES.items():
         found = sorted({model for child in children if isinstance(child, dict)
                         for model in (child.get("resolved_models") or [])
-                        if child.get("label") == prefix or str(child.get("label", "")).startswith(prefix + ":")})
+                        if model != SYNTHETIC_MODEL and (child.get("label") == prefix
+                                                         or str(child.get("label", "")).startswith(prefix + ":"))})
         out[prefix] = "+".join(found) if found else alias
     return out
 
 
 def usage_children(usage: dict | None) -> dict:
-    """Child label -> child of the child-usage output (the first child when a label repeats)."""
+    """Child label -> the child of the child-usage output that measured that worker. child-usage.mjs lists a re-run
+    call's earlier attempts under superseded_attempts; when a record still repeats a label among its children, the
+    first complete child is the attempt that returned, else the first child."""
     out = {}
     for child in as_dict(as_dict(usage).get("child_usage")).get("children") or []:
         if isinstance(child, dict) and isinstance(child.get("label"), str):
-            out.setdefault(child["label"], child)
+            label = child["label"]
+            if label not in out or (child.get("complete") is True and out[label].get("complete") is not True):
+                out[label] = child
     return out
+
+
+def effort_deviations(usage: dict | None) -> list:
+    """{child, efforts[, superseded_by]} for every child and superseded attempt of the usage record that did not run
+    at effort max alone (as child-usage.mjs --require-effort max reports them)."""
+    child_usage = as_dict(as_dict(usage).get("child_usage"))
+    out = []
+    for child in [*(child_usage.get("children") or []), *(child_usage.get("superseded_attempts") or [])]:
+        if isinstance(child, dict) and child.get("efforts") != [REQUIRED_EFFORT]:
+            item = {"child": child.get("label") or child.get("agent_id"), "efforts": child.get("efforts")}
+            if child.get("superseded_by"):
+                item["superseded_by"] = child["superseded_by"]
+            out.append(item)
+    return out
+
+
+def deviation_rounds(deviations: list, layer_ids) -> tuple[dict, list]:
+    """(layer_id -> [(round, deviation)], unmapped deviations): a worker label <role>:<layer>[:followup] belongs to
+    that layer's round, and the completeness critic to every layer."""
+    by_layer, unmapped = {}, []
+    for item in deviations:
+        parts = str(item.get("child")).split(":")
+        if parts == ["critic"]:
+            for layer_id in layer_ids:
+                by_layer.setdefault(layer_id, []).append(("critic", item))
+        elif len(parts) >= 2 and parts[1] in layer_ids and parts[2:] in ([], ["followup"]):
+            by_layer.setdefault(parts[1], []).append(("followup" if parts[2:] else "first", item))
+        else:
+            unmapped.append(item)
+    return by_layer, unmapped
 
 
 def measured(children: dict, label: str, fallback_model: str) -> tuple[str, str | None]:
     """(model, effort) of the Claude worker `label` as the usage record measured them; the role's model and effort
     None (not measured) when the record has no such child."""
     child = as_dict(children.get(label))
-    models = sorted({m for m in child.get("resolved_models") or [] if isinstance(m, str) and m})
+    models = sorted({m for m in child.get("resolved_models") or []
+                     if isinstance(m, str) and m and m != SYNTHETIC_MODEL})
     efforts = sorted({e for e in child.get("efforts") or [] if isinstance(e, str) and e})
     return ("+".join(models) if models else fallback_model), ("+".join(efforts) if efforts else None)
 
@@ -251,6 +292,10 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
     critic_lost = "critic" in res and not isinstance(res.get("critic"), dict)
     beyond_cap = {as_dict(item).get("layer_id"): item for item in
                   planned_followups(res.get("critic"), rounds_by_layer)[FOLLOWUP_CAP:]}
+    # A worker measured at another effort than max (a skill whose frontmatter sets `effort` lowers the turns after
+    # it loads) is a retained failure of its layer, like a lost vote: its return is kept and the layer is reopened.
+    deviations = effort_deviations(usage)
+    deviations_by_layer, deviations_unmapped = deviation_rounds(deviations, rounds_by_layer)
 
     excluded, degraded = [], []
     for layer_id, rounds in rounds_by_layer.items():
@@ -345,6 +390,10 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                              "reason": as_dict(beyond_cap[layer_id]).get("reason"),
                              "detail": f"the critic flagged this layer, but only the first {FOLLOWUP_CAP} flagged "
                                        "layers get a follow-up round"})
+        for rnd, item in deviations_by_layer.get(layer_id, []):
+            failures.append({"round": rnd, "cause": "effort_deviation", **item,
+                             "detail": f"the worker did not run at effort {REQUIRED_EFFORT} alone (child-usage.mjs "
+                                       f"--require-effort {REQUIRED_EFFORT}); its return is kept as returned"})
         for name, value in calls.items():
             calls_total[name] = calls_total.get(name, 0) + value
         merged = [final[repo_slug]["proposal"] for repo_slug in order]
@@ -441,6 +490,8 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
             "summary": {"lane": lane, "layers": len(ledger_layers), "proposals": len(proposals),
                         "survivors": len(survivors), "lost": lost, "excluded_layers": excluded,
                         "degraded_discovery": degraded, "critic_lost": critic_lost,
+                        "effort_deviations": [item["child"] for item in deviations],
+                        "effort_deviations_unmapped": [item["child"] for item in deviations_unmapped],
                         "retained_failures": failures_summary, "reopened_layers": sorted(failures_summary),
                         "calls": calls_total, "skills_usage": skills_usage, "gpt6_jobs": gpt6_usage["jobs"],
                         "gpt6_by_status": gpt6_usage["by_status"], "gpt6_copy_check": checks}}

@@ -17,8 +17,10 @@ optional {"<layer_id>": [{"trigger": ..., "ref": ...}]} of reopen entries (recip
 added to the retained_failure entries convert.py wrote, never replacing them.
 Computed fields (prev_sha256, the hashes, known, new) are left to --append. A stopped run is recorded by hand
 (recipe section 4). This tool refuses: usage that is not complete, a usage measurement whose child-usage.mjs exit
-code is not 0, a child that did not run at effort max only, and a layer whose retained failures (returns.json
-failures/<layer>) lack their retained_failure reopen entry. Paths are repository-relative and must exist.
+code is not 0 (1 is accepted only for effort mismatches that the returns cover), a child or superseded attempt that
+did not run at effort max only unless the returns list it as an effort_deviation retained failure (convert.py
+--usage), and a layer whose retained failures (returns.json failures/<layer>) lack their retained_failure reopen
+entry. Paths are repository-relative and must exist.
 """
 
 from __future__ import annotations
@@ -49,20 +51,31 @@ def substitute(value, returns_ref: str):
     return value
 
 
-def check_usage(usage: dict, usage_ref: str) -> dict:
-    """The usage record's child_usage, when it shows a complete run measured at effort max throughout."""
+def check_usage(usage: dict, usage_ref: str, returns: dict | None = None) -> dict:
+    """The usage record's child_usage, when it shows a complete run measured at effort max throughout, or whose
+    every worker measured at another effort is an effort_deviation retained failure in the returns (convert.py
+    --usage records one per worker, and its layer is reopened)."""
     child_usage = usage.get("child_usage") or {}
     if child_usage.get("status") != "complete":
         raise ValueError(f"{usage_ref}: child_usage.status is {child_usage.get('status')!r}; a completed sweep needs "
                          "complete usage (record a stopped run by hand, recipe section 4)")
+    attempts = [*(child_usage.get("children") or []), *(child_usage.get("superseded_attempts") or [])]
+    off = [child.get("label") or child.get("agent_id") for child in attempts
+           if isinstance(child, dict) and child.get("efforts") != [REQUIRED_EFFORT]]
+    listed = [item.get("child") if isinstance(item, dict) else item for item in child_usage.get("effort_mismatches") or []]
     exit_code = (usage.get("measurement") or {}).get("exit_code")
-    if exit_code != 0:
+    # child-usage.mjs exits 1 for incomplete usage or an effort mismatch; with complete usage only a mismatch is left.
+    if exit_code != 0 and not (exit_code == 1 and (off or listed)):
         raise ValueError(f"{usage_ref}: measurement.exit_code is {exit_code!r}; child-usage.mjs reported incomplete "
                          "usage or an effort mismatch")
-    if child_usage.get("effort_mismatches"):
-        raise ValueError(f"{usage_ref}: effort_mismatches {child_usage['effort_mismatches']}")
-    off = [child.get("label") for child in child_usage.get("children") or []
-           if isinstance(child, dict) and child.get("efforts") != [REQUIRED_EFFORT]]
+    covered = {failure.get("child") for items in ((returns or {}).get("failures") or {}).values()
+               for failure in (items if isinstance(items, list) else [])
+               if isinstance(failure, dict) and failure.get("cause") == "effort_deviation"}
+    uncovered = [item for item in listed if item not in covered]
+    if uncovered:
+        raise ValueError(f"{usage_ref}: effort_mismatches {uncovered} have no effort_deviation retained failure in the "
+                         "returns (convert.py --usage records one per worker)")
+    off = [label for label in off if label not in covered]
     if off:
         raise ValueError(f"{usage_ref}: children that did not run at effort {REQUIRED_EFFORT} only: {off}")
     return child_usage
@@ -71,7 +84,7 @@ def check_usage(usage: dict, usage_ref: str) -> dict:
 def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sweep_id: str, lane: str,
                  returns_ref: str, usage_ref: str, manifest_ref: str, prompts_sha256: str, reopen=None,
                  notes=(), returns: dict | None = None) -> dict:
-    child_usage = check_usage(usage, usage_ref)
+    child_usage = check_usage(usage, usage_ref, returns)
     transcript_dir = str(child_usage.get("transcript_dir") or "")
     run = transcript_dir.rstrip("/").rsplit("/", 1)[-1]
     if not run.startswith("wf_"):

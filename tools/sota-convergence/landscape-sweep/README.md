@@ -64,7 +64,9 @@ Every `agent()` call names its model and `effort: 'max'`, so no stage inherits t
 `returns.json` name the model and effort each Claude refuter was measured at (its own child in the usage record),
 not the requested ones. Without `--usage`, `convert.py` writes the requested alias and effort `null`.
 `usage_record.py` exits 1 when a child ran at another effort (`CLAUDE_CODE_EFFORT_LEVEL` would override every
-child), and `make_result.py` refuses such a record.
+child; a skill whose frontmatter sets `effort`, such as `property-based-testing` with `effort: low`, lowers the
+turns after it loads). `convert.py --usage` records each such worker as an `effort_deviation` retained failure of
+its layer (the critic's of every layer), and `make_result.py` refuses the record unless every one is recorded so.
 
 The Sonnet wrappers only run three commands and return the raw result. `convert.py` checks each copy against the
 file Codex wrote.
@@ -97,10 +99,15 @@ provides it.
   For a completed sweep, `child_usage.status` must be `complete`. `workflow_run` must equal the last segment of
   `child_usage.transcript_dir`, which `usage_record.py` rewrites to
   `<session-transcripts>/subagents/workflows/<run id>`. `lost_workers` must list exactly the incomplete children.
-  `make_result.py` also needs `measurement.exit_code` 0 and every child measured at effort `max` alone.
+  When a Workflow pauses at a Claude usage limit, it re-runs its waiting agents after the reset under the same
+  journal key; `child-usage.mjs` lists each earlier attempt that returned nothing under `superseded_attempts`
+  (with `superseded_by`), not among the children, and still counts its usage in `by_resolved_model`.
+  `make_result.py` also needs every child and superseded attempt measured at effort `max` alone, or recorded as an
+  `effort_deviation` retained failure, and `measurement.exit_code` 0 (1 only for such recorded deviations).
 - **Failures.** A failed part of the lane never leaves a clean layer. `convert.py` lists each layer's retained
   failures under `failures/<layer>` in `returns.json`: a lost round, a discovery family that did not return, a
-  missing vote, a lost critic, a critic-flagged layer beyond the follow-up cap, and a GPT-6 copy problem. It gives
+  missing vote, a lost critic, a critic-flagged layer beyond the follow-up cap, a GPT-6 copy problem, and (with
+  `--usage`) a worker measured at another effort than max (`effort_deviation`). It gives
   that layer the reopen entry `{"trigger": "retained_failure", "ref": "<returns_ref>#/failures/<layer>"}`, which
   resets the layer's clean count. `make_result.py` refuses a layer whose failures lack that entry.
 - **Returns.** In `returns.json`:
@@ -232,7 +239,9 @@ Record a stopped run by hand, as recipe section 4 describes (`status: stopped`, 
 Read these fields of `convert.py`'s summary before appending:
 
 - **`retained_failures`** and **`reopened_layers`**: each layer's failures (`<round>:<cause>`), all of them reopened.
-  `degraded_discovery`, `critic_lost` and each vote's `notes` give the detail.
+  `degraded_discovery`, `critic_lost`, `effort_deviations` and each vote's `notes` give the detail.
+  `effort_deviations_unmapped` lists a worker at another effort whose label names no layer of this sweep;
+  `make_result.py` refuses the record until it is resolved.
 - **`excluded_layers`**: every round of the layer was lost. Such a layer is left out of the record, so it neither
   counts nor resets.
 - **`lost`**: every lost round, first or follow-up, as `<layer>:<round>`. `sweep.js` returns a lost follow-up round

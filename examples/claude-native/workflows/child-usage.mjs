@@ -16,6 +16,10 @@
 // version that wrote the entry). The last two catch content-classifier fallback, which
 // re-runs a flagged request on an older model and continues the child there; the
 // family substring check alone accepts claude-opus-4-8 for a requested opus.
+// An attempt that returned nothing and whose journal key the runtime started again (a re-run
+// after a usage-limit pause) is listed under superseded_attempts with superseded_by, keeps its
+// issues and effort check, and its usage counts in by_resolved_model, whose `children` counter
+// counts attempts; `children` holds the final attempt of each call.
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { homedir } from 'node:os'
@@ -117,31 +121,46 @@ export function summarizeRun(dir) {
   if (!existsSync(journalPath)) return { status: 'incomplete', reason: 'journal.jsonl not found in ' + dir, children: [] }
   const journal = lines(journalPath)
   const results = new Map(journal.filter((e) => e.type === 'result').map((e) => [e.agentId, e]))
-  const children = journal.filter((e) => e.type === 'started' && e.agentId).map((s) => {
+  const started = journal.filter((e) => e.type === 'started' && e.agentId)
+  // The runtime re-runs a call under the same journal key after a pause (observed on 2026-09-26: "Usage limit
+  // reached ... Workflow paused; waiting agents re-run shortly after the reset", then "Re-running 8 waiting
+  // agents"). An attempt with no result entry whose key started again later was superseded by that later attempt:
+  // it is listed in superseded_attempts, not among the children, and its usage still counts in by_resolved_model.
+  const supersededBy = new Map()
+  started.forEach((s, i) => {
+    if (results.has(s.agentId) || typeof s.key !== 'string' || !s.key) return
+    const later = started.slice(i + 1).find((t) => t.key === s.key)
+    if (later) supersededBy.set(s.agentId, later.agentId)
+  })
+  const attempts = started.map((s) => {
     const metaPath = join(dir, 'agent-' + s.agentId + '.meta.json')
     const logPath = join(dir, 'agent-' + s.agentId + '.jsonl')
     let meta = null
     try { meta = existsSync(metaPath) ? JSON.parse(readFileSync(metaPath, 'utf8')) : null } catch { meta = null }
-    return summarizeChild(s, results.get(s.agentId) || null, meta, existsSync(logPath) ? lines(logPath) : [])
+    const child = summarizeChild(s, results.get(s.agentId) || null, meta, existsSync(logPath) ? lines(logPath) : [])
+    return supersededBy.has(s.agentId) ? { ...child, superseded_by: supersededBy.get(s.agentId) } : child
   })
+  const children = attempts.filter((c) => !c.superseded_by)
+  const superseded = attempts.filter((c) => c.superseded_by)
   const byModel = {}
-  for (const c of children) for (const [m, u] of Object.entries(c.usage_by_model)) {
+  for (const c of attempts) for (const [m, u] of Object.entries(c.usage_by_model)) {
     byModel[m] = byModel[m] || { children: 0, ...Object.fromEntries(COUNTERS.map((k) => [k, 0])) }
     byModel[m].children++
     for (const k of COUNTERS) byModel[m][k] += u[k]
   }
   const incomplete = children.filter((c) => !c.complete)
+  const rerun = superseded.length ? '; ' + superseded.length + ' earlier attempt(s) that returned nothing were re-run under the same call key (superseded_attempts, whose usage by_resolved_model counts)' : ''
   return {
     status: !children.length ? 'incomplete' : incomplete.length ? 'incomplete' : 'complete',
-    reason: !children.length ? 'journal has no started children' : incomplete.length ? incomplete.length + ' child(ren) incomplete' : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result',
+    reason: (!children.length ? 'journal has no started children' : incomplete.length ? incomplete.length + ' child(ren) incomplete' : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result') + rerun,
     multi_model_children: children.filter((c) => c.resolved_models.length > 1).map((c) => c.label || c.agent_id),
-    children, by_resolved_model: byModel,
+    children, ...(superseded.length ? { superseded_attempts: superseded } : {}), by_resolved_model: byModel,
   }
 }
 
-// Children whose resolved efforts are not exactly [required] (none recorded counts as a mismatch).
+// Children and superseded attempts whose resolved efforts are not exactly [required] (none recorded counts as a mismatch).
 export function effortMismatches(run, required) {
-  return run.children.filter((c) => c.efforts.length !== 1 || c.efforts[0] !== required).map((c) => ({ child: c.label || c.agent_id, efforts: c.efforts }))
+  return [...run.children, ...(run.superseded_attempts || [])].filter((c) => c.efforts.length !== 1 || c.efforts[0] !== required).map((c) => ({ child: c.label || c.agent_id, efforts: c.efforts, ...(c.superseded_by ? { superseded_by: c.superseded_by } : {}) }))
 }
 
 // Newest native Workflow transcript directory for a working directory. The projects
@@ -177,5 +196,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   const out = { transcript_dir: dir, ...summarizeRun(dir) }
   if (required) out.effort_mismatches = effortMismatches(out, required)
   console.log(JSON.stringify(out, null, 2))
-  process.exit(out.status === 'complete' && !(required && out.effort_mismatches.length) ? 0 : 1)
+  // exitCode, not process.exit(): process.exit() drops stdout writes still pending, and a pipe takes 64 KiB at once.
+  process.exitCode = out.status === 'complete' && !(required && out.effort_mismatches.length) ? 0 : 1
 }

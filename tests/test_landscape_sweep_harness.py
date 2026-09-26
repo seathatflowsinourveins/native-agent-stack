@@ -1264,6 +1264,56 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual((vote["facts"]["model"], vote["facts"]["effort"], vote["fit"]["claude"]["effort"]),
                          ("sonnet", None, None))
 
+    def test_a_rerun_workers_vote_is_measured_by_the_attempt_that_returned(self):
+        # A record listing a re-run call's earlier attempt among its children (child-usage.mjs before
+        # superseded_attempts): the vote names the attempt that returned, and <synthetic> is never a model.
+        failed = {"label": "refute-fit:alpha", "agent_id": "x1", "requested_model": "opus",
+                  "resolved_models": ["claude-opus-5-5", "<synthetic>"], "efforts": ["max"], "complete": False}
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+        raw["children"].insert(0, failed)
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
+        models = convert.resolved_models(document)
+        self.assertEqual(models["refute-fit"], "claude-opus-5-5")
+        out = convert.convert(synthetic_result(), scope_for(), LANE, models, usage=document)
+        self.assertEqual(out["returns"]["votes"]["alpha"][0]["fit"]["claude"]["model"], "claude-opus-5-5")
+        # The current tool lists that attempt under superseded_attempts: never a vote's worker, still effort-checked.
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+        raw["superseded_attempts"] = [dict(failed, superseded_by="x2")]
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 0, "cmd", ROOT)
+        out = convert.convert(synthetic_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["returns"]["votes"]["alpha"][0]["fit"]["claude"]["model"], "claude-opus-5-5")
+        self.assertEqual(out["summary"]["effort_deviations"], [])
+
+    def test_a_worker_at_another_effort_is_a_retained_failure_of_its_layer(self):
+        # A skill whose frontmatter sets `effort: low` lowers the turns after it loads; child-usage.mjs measures it.
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+        for child in raw["children"]:
+            if child["label"] in ("discover:alpha", "refute-fit:beta:followup"):
+                child["efforts"] = ["max", "low"]
+        raw["superseded_attempts"] = [{"label": "refute-facts:alpha", "agent_id": "x1", "superseded_by": "x2",
+                                       "efforts": ["xhigh"], "complete": False}]
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
+        out = convert.convert(synthetic_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["effort_deviations"],
+                         ["discover:alpha", "refute-fit:beta:followup", "refute-facts:alpha"])
+        found = {layer_id: [(f["round"], f["child"], f["efforts"]) for f in failures if f["cause"] == "effort_deviation"]
+                 for layer_id, failures in out["returns"]["failures"].items()}
+        self.assertEqual(found["alpha"], [("first", "discover:alpha", ["max", "low"]),
+                                          ("first", "refute-facts:alpha", ["xhigh"])])
+        self.assertEqual(found["beta"], [("followup", "refute-fit:beta:followup", ["max", "low"])])
+        self.assertEqual(out["returns"]["votes"]["beta"][1]["fit"]["claude"]["effort"], "low+max")
+        # A deviation alone reopens a healthy layer; the critic's belongs to every layer; an unknown layer's is listed.
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS + ["refute-fit:zeta"]))
+        for child in raw["children"]:
+            if child["label"] in ("critic", "refute-fit:zeta"):
+                child["efforts"] = ["xhigh"]
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
+        out = convert.convert(healthy_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["retained_failures"], {"alpha": ["critic:effort_deviation"]})
+        self.assertEqual(out["summary"]["effort_deviations_unmapped"], ["refute-fit:zeta"])
+        self.assertEqual(out["layers"][0]["reopen"], [{"trigger": "retained_failure",
+                                                       "ref": "@RETURNS@#/failures/alpha"}])
+
     def cli(self, work, res, *extra, codex_files=True):
         run_file = write_json(work / "run.json", {"runId": "wf_fixture-1", "status": "completed", "result": res})
         write_json(work / "scope.json", scope_for())
@@ -1379,6 +1429,37 @@ class UsageRecordTests(unittest.TestCase):
             self.assertEqual(json.loads(done.stdout)["effort_mismatches"], drifted["effort_mismatches"])
             self.assertEqual(json.loads((work / "usage.json").read_text())["child_usage"]["status"], "complete")
 
+    @unittest.skipUnless(NODE, "node not installed")
+    def test_transcripts_arrive_whole_through_node_and_a_rerun_call_is_superseded(self):
+        # 300 children give child-usage.mjs more output than a pipe buffer (64 KiB), which process.exit() used to
+        # truncate; one call the runtime re-ran after a usage-limit pause keeps its earlier attempt as superseded.
+        transcripts = temp_dir(self) / "session" / "subagents" / "workflows" / "wf_fixture-5"
+        transcripts.mkdir(parents=True)
+        journal = [{"type": "started", "agentId": "r0", "label": "discover:layer-0", "phase": "Discover", "key": "v2:0"}]
+        for i in range(300):
+            journal += [{"type": "started", "agentId": f"b{i}", "label": f"discover:layer-{i}", "phase": "Discover",
+                         "key": f"v2:{i}"}, {"type": "result", "agentId": f"b{i}", "result": {"ok": True}}]
+        (transcripts / "journal.jsonl").write_text("".join(json.dumps(e) + "\n" for e in journal), encoding="utf-8")
+        zero = {"input_tokens": 0, "output_tokens": 0, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}
+        for agent in ["r0"] + [f"b{i}" for i in range(300)]:
+            rows = [{"type": "assistant", "effort": "max", "message": {"id": f"m-{agent}", "model": "claude-opus-5-5",
+                                                                       "usage": dict(zero, output_tokens=5)}}]
+            if agent == "r0":
+                rows.append({"type": "assistant", "isApiErrorMessage": True, "effort": "max",
+                             "message": {"id": "limit", "model": "<synthetic>", "usage": zero}})
+            (transcripts / f"agent-{agent}.meta.json").write_text(json.dumps({"model": "opus"}), encoding="utf-8")
+            (transcripts / f"agent-{agent}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+        out = temp_dir(self) / "usage.json"
+        done = run([sys.executable, HARNESS / "usage_record.py", "--transcript-dir", transcripts, "--out", out])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        usage = json.loads(out.read_text())["child_usage"]
+        self.assertGreater(len(json.dumps(usage, indent=2)), 65536)
+        self.assertEqual((usage["status"], len(usage["children"]), usage["transcript_dir"]),
+                         ("complete", 300, "<session-transcripts>/subagents/workflows/wf_fixture-5"))
+        self.assertEqual([(a["agent_id"], a["superseded_by"]) for a in usage["superseded_attempts"]], [("r0", "b0")])
+        self.assertEqual(usage["by_resolved_model"]["claude-opus-5-5"]["output_tokens"], 5 * 301)
+        self.assertEqual(json.loads(done.stdout)["superseded_attempts"], ["discover:layer-0"])
+
 
 LANE = "landscape-sweep-20261026"
 
@@ -1396,10 +1477,11 @@ class LedgerIntegrationTests(unittest.TestCase):
         self.scope = sl.scope_hashes(self.root)
         self.base = f"evidence/artifacts/{LANE}"
 
-    def evidence(self, res):
-        out = convert.convert(res, self.scope, LANE, convert.resolved_models(None))
+    def evidence(self, res, usage=None):
+        """Converted evidence; with `usage`, converted against that record (votes measured, efforts checked)."""
+        out = convert.convert(res, self.scope, LANE, convert.resolved_models(usage), usage=usage)
         write_json(self.root / self.base / "returns.json", out["returns"])
-        usage = usage_record.record(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS), 0, "cmd", ROOT)
+        usage = usage or usage_record.record(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS), 0, "cmd", ROOT)
         write_json(self.root / f"{self.base}-attempts/child-usage-wf_fixture-1.json", usage)
         sections = {"foundation": [], "trading": []}
         for layer in out["lanes"]["lanes"][0]["result"]["layers"]:
@@ -1523,6 +1605,24 @@ class LedgerIntegrationTests(unittest.TestCase):
         stripped[0]["reopen"] = []
         with self.assertRaisesRegex(ValueError, r"no retained_failure reopen entry.*alpha"):
             self.result(dict(out, layers=stripped), reviews)
+
+    def test_a_worker_at_another_effort_reopens_its_layer_and_the_record_appends(self):
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+        next(c for c in raw["children"] if c["label"] == "discover:alpha")["efforts"] = ["max", "low"]
+        raw["effort_mismatches"] = [{"child": "discover:alpha", "efforts": ["max", "low"]}]
+        out, reviews = self.evidence(healthy_result(),
+                                     usage=usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT))
+        result = self.result(out, reviews)
+        self.assertEqual(result["layers"][0]["reopen"], [
+            {"trigger": "retained_failure", "ref": f"{self.base}/returns.json#/failures/alpha"}])
+        ledger = sl.append(self.root, json.loads((self.root / sl.LEDGER).read_text()), result)
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        self.assertEqual({key[1]: value for key, value in sl.derive(ledger).items()}["alpha"]["count"], 0)
+        # Without its effort_deviation retained failure, the same usage record is refused.
+        returns = json.loads((self.root / self.base / "returns.json").read_text())
+        returns["failures"] = {}
+        with self.assertRaisesRegex(ValueError, "no effort_deviation retained failure"):
+            self.result(out, reviews, returns=returns)
 
     def test_hand_written_reopen_entries_are_added_to_the_retained_failures(self):
         out, reviews = self.evidence(synthetic_result())
