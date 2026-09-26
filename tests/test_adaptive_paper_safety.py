@@ -952,6 +952,7 @@ class PerExecutionLedger(unittest.TestCase):
 
     def record(self, row, *, with_execution=True, status=None):
         return self.ledger.record_order("sell-1", "b-sell", status or row["status"], row["cum"], row["average"],
+                                        timestamp=row.get("at"),
                                         execution=row["execution"] if with_execution else None)
 
     def events(self, kind):
@@ -1028,6 +1029,200 @@ class PerExecutionLedger(unittest.TestCase):
                     self.assertEqual(self.ledger.positions(), {})
                 else:
                     self.assertEqual(self.ledger.positions()["APUS"].cost_basis_usd, D("162.95"))
+
+    def test_mixed_profit_gross_loss_is_exact_across_delivery_sequences(self):
+        # Review oracle: two shares at $100, sold at $110 and $90, realize
+        # zero net P&L but $10 gross loss. Gains must not refund the loss cap.
+        # Reference: QuantConnect/Lean 985ef30, SecurityPortfolioModel.cs
+        # (per-fill closing P&L) and TradeStatistics.cs (separate losing P&L).
+        from live_manifest import read_ledger
+
+        sequences = {
+            "stream_first": [(0, True), (1, True), (1, False)],
+            "rest_first": [(1, False), (0, True), (1, True)],
+            "duplicates": [(1, False), (1, True), (0, True), (0, True), (1, True), (1, False)],
+            "restart": [(1, False), (1, True), "restart", (0, True), "restart", (1, True)],
+        }
+        rows = [
+            {"cum": "1", "average": "110.00", "status": "partially_filled",
+             "execution": {"execution_id": "profit", "qty": "1", "price": "110.00"}},
+            {"cum": "2", "average": "100.00", "status": "filled",
+             "execution": {"execution_id": "loss", "qty": "1", "price": "90.00"}},
+        ]
+        limits = replace(self.limits, max_gross_loss_usd=D("5"), max_drawdown_usd=D("100"))
+        quote = s.Quote("APUS", "100.00", "100.01", self.now)
+        admission = dict(quote=quote, now=self.now, market_open=True,
+                         session_close=self.now + 3600, stop_file=self.root / "STOP")
+        for name, sequence in sequences.items():
+            with self.subTest(delivery=name):
+                self.ledger.close()
+                self.db = self.root / ("mixed-profit-" + name + ".sqlite3")
+                self.ledger = s.Ledger(self.db, limits)
+                self.ledger.start_trial(self.now)
+                self.ledger.reserve_intent("buy-1", "APUS", "buy", "2", "100.00", **admission)
+                self.ledger.record_order("buy-1", "b-buy", "filled", "2", "100.00",
+                                         execution={"execution_id": "basis", "qty": "2", "price": "100.00"})
+                self.ledger.reserve_intent("sell-1", "APUS", "sell", "2", "90.00", **admission)
+                self.ledger.reserve_intent("pending-buy", "APUS", "buy", "1", "100.00", **admission)
+                for observation in sequence:
+                    if observation == "restart":
+                        self.ledger.close()
+                        self.ledger = s.Ledger(self.db, limits)
+                    else:
+                        index, exact = observation
+                        self.record(rows[index], with_execution=exact)
+                state = self.ledger.accounting()
+                amounts = (state.cash_delta_usd, state.realized_pnl_usd,
+                           state.cumulative_realized_loss_usd, state.gross_loss_usd)
+                self.assertTrue(all(isinstance(value, D) for value in amounts))
+                self.assertEqual(amounts, (D("0.00"), D("0.00"), D("10.00"), D("10.00")))
+                self.assertEqual(self.ledger.positions(), {})
+                self.assertEqual(state.halted_reason, "gross_loss_cap_reached")
+                # Reopening and redelivering either source cannot add another loss
+                # or erase the corrected accounting/halt.
+                self.ledger.close()
+                self.ledger = s.Ledger(self.db, limits)
+                for row in rows + rows:
+                    self.assertFalse(self.record(row))
+                self.assertFalse(self.record(rows[-1], with_execution=False))
+                self.assertEqual(self.ledger.accounting(), state)
+                self.assertEqual(self.ledger.mark_to_market([], self.now), state)
+                self.assertEqual(self.ledger.halted_reason(), "gross_loss_cap_reached")
+                report = read_ledger(self.db)
+                self.assertEqual(D(report["realized_loss_usd"]), D("10.00"))
+                self.assertEqual(report["halted_reason"], "gross_loss_cap_reached")
+                with self.assertRaisesRegex(s.SafetyError, "^gross_loss_cap_reached$"):
+                    self.ledger.reserve_intent("blocked-buy", "APUS", "buy", "1", "100.00", **admission)
+                with self.assertRaisesRegex(s.SafetyError, "^gross_loss_cap_reached$"):
+                    self.ledger.validate_pending("pending-buy", **admission)
+                self.ledger.mark_not_sent("pending-buy", "test_finished")
+                for begin in (self.ledger.begin_next_trial, self.ledger.resume_held_trial):
+                    with self.assertRaisesRegex(s.SafetyError, "^next_trial_cannot_clear_risk_halt$"):
+                        begin(self.now + 1, "next-trial")
+
+    def test_mixed_profit_replay_preserves_basis_at_each_booking(self):
+        self.ledger.adopt_broker_snapshot(
+            {"positions": [{"symbol": "APUS", "qty": "3", "avg_entry_price": "100.00"}]}, self.now)
+        admission = dict(quote=s.Quote("APUS", "100.00", "100.01", self.now), now=self.now,
+                         market_open=True, session_close=self.now + 3600, stop_file=self.root / "STOP")
+        self.ledger.reserve_intent("sell-1", "APUS", "sell", "3", "90.00", **admission)
+        # The first two executions use the adopted $100 basis. A later buy
+        # changes only the third execution's basis to $110.
+        self.ledger.record_order("sell-1", "b-sell", "partially_filled", "2", "100.00")
+        self.ledger.reserve_intent("buy-1", "APUS", "buy", "1", "120.00", **admission)
+        self.ledger.record_order("buy-1", "b-buy", "filled", "1", "120.00",
+                                 execution={"execution_id": "new-basis", "qty": "1", "price": "120.00"})
+        self.ledger.record_order("sell-1", "b-sell", "filled", "3", "100.00")
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        rows = [
+            {"cum": "1", "average": "110.00", "status": "partially_filled",
+             "execution": {"execution_id": "profit", "qty": "1", "price": "110.00"}},
+            {"cum": "2", "average": "100.00", "status": "partially_filled",
+             "execution": {"execution_id": "loss", "qty": "1", "price": "90.00"}},
+            {"cum": "3", "average": "100.00", "status": "filled",
+             "execution": {"execution_id": "later-loss", "qty": "1", "price": "100.00"}},
+        ]
+        for row in reversed(rows):
+            self.record(row)
+        state = self.ledger.accounting()
+        # +$10, -$10, -$10, with one share still held at $110. Adopted
+        # holdings predate the cash ledger: $300 sales less the $120 buy.
+        self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd, state.cumulative_realized_loss_usd),
+                         (D("180.00"), D("-10.00"), D("20.00")))
+        position = self.ledger.positions()["APUS"]
+        self.assertEqual((position.qty, position.cost_basis_usd), (D("1"), D("110.00")))
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        for row in rows:
+            self.assertFalse(self.record(row))
+        self.assertEqual(self.ledger.accounting(), state)
+
+    def test_pre_fix_execution_accounting_marker_rederives_loss_once(self):
+        self.ledger.adopt_broker_snapshot(
+            {"positions": [{"symbol": "APUS", "qty": "2", "avg_entry_price": "100"}]}, self.now)
+        self.ledger.reserve_intent("sell-1", "APUS", "sell", "2", "90",
+                                   quote=s.Quote("APUS", "100", "100.01", self.now), now=self.now,
+                                   market_open=True, session_close=self.now + 3600, stop_file=self.root / "STOP")
+        rows = [
+            {"cum": "1", "average": "110", "status": "partially_filled",
+             "execution": {"execution_id": "profit", "qty": "1", "price": "110"}},
+            {"cum": "2", "average": "100", "status": "filled",
+             "execution": {"execution_id": "loss", "qty": "1", "price": "90"}},
+        ]
+        self.record(rows[-1], with_execution=False)
+        for row in rows:
+            self.record(row)
+        # Persist the pre-fix checkpoint with the old netted-loss result.
+        self.ledger.db.execute("DELETE FROM meta WHERE key LIKE 'execution_accounting:%'")
+        self.ledger.db.execute("INSERT INTO meta VALUES ('execution_accounting:sell-1', '2')")
+        self.ledger.db.execute("UPDATE meta SET value='0' WHERE key='realized_loss'")
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        reconciliations = len(self.events("execution_accounting_reconciled"))
+        self.record(rows[-1])
+        state = self.ledger.accounting()
+        self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd, state.cumulative_realized_loss_usd),
+                         (D("200"), D("0"), D("10")))
+        self.assertEqual(self.ledger.positions(), {})
+        self.assertEqual(len(self.events("execution_accounting_reconciled")), reconciliations + 1)
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        before = tuple(self.ledger.db.iterdump())
+        for row in rows + rows:
+            self.assertFalse(self.record(row))
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+        self.assertEqual(self.ledger.accounting(), state)
+
+
+    def test_uncovered_rest_booking_survives_another_orders_execution_replay(self):
+        self.ledger.close()
+        limits = replace(self.limits, max_gross_loss_usd=D("100"), max_drawdown_usd=D("100"))
+        self.db = self.root / "uncovered.sqlite3"
+        self.ledger = s.Ledger(self.db, limits)
+        self.ledger.start_trial(self.now)
+        self.ledger.adopt_broker_snapshot(
+            {"positions": [{"symbol": "APUS", "qty": "4", "avg_entry_price": "100"}]}, self.now)
+        admission = dict(now=self.now, market_open=True, session_close=self.now + 3600,
+                         stop_file=self.root / "STOP")
+        self.ledger.reserve_intent("X", "APUS", "sell", "2", "80",
+                                   quote=s.Quote("APUS", "130", "130.01", self.now), **admission)
+        for cid, side, qty, price in (("sell-1", "sell", "2", "90"), ("B", "buy", "1", "130")):
+            self.ledger.reserve_intent(cid, "APUS", side, qty, price,
+                                       quote=s.Quote("APUS", "130", "130.01", self.now), **admission)
+        # X is REST-only: a mixed +10/-20 pair is known only as 2 @ 95.
+        # Its provisional -10 realized / 10 loss must survive Y's replay (#355 review F4).
+        self.ledger.record_order("X", "b-X", "filled", "2", "95", timestamp=self.now + 10)
+        x_state = self.ledger.accounting()
+        self.assertEqual((x_state.cash_delta_usd, x_state.realized_pnl_usd, x_state.cumulative_realized_loss_usd),
+                         (D("190"), D("-10"), D("10")))
+        self.assertEqual(self.ledger.positions()["APUS"].qty, D("2"))
+        x_intent = next(i for i in self.ledger.intents() if i.client_id == "X")
+        x_bookings = [e for e in self.events("order_observed") if e["broker_id"] == "b-X"]
+        self.ledger.record_order("B", "b-B", "filled", "1", "130", timestamp=self.now + 2,
+                                 execution={"execution_id": "B", "qty": "1", "price": "130"})
+        rows = [
+            {"cum": "1", "average": "110", "status": "partially_filled", "at": self.now + 1,
+             "execution": {"execution_id": "A", "qty": "1", "price": "110"}},
+            {"cum": "2", "average": "100", "status": "filled", "at": self.now + 3,
+             "execution": {"execution_id": "C", "qty": "1", "price": "90"}},
+        ]
+        self.record(rows[-1], with_execution=False)
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, limits)
+        for row in reversed(rows):
+            self.record(row)
+        state = self.ledger.accounting()
+        self.assertEqual(next(i for i in self.ledger.intents() if i.client_id == "X"), x_intent)
+        self.assertEqual([e for e in self.events("order_observed") if e["broker_id"] == "b-X"], x_bookings)
+        # Subtract Y's oracle under observation-order replay: B (observed first) raises the basis to
+        # 330/3 = 110 before sell-1's A @ 110 (0) and C @ 90 (-20): 70 cash, -20 P&L, 20 loss, 1 @ 110.
+        # Execution-order replay (A before B) is a recorded follow-up, not this PR.
+        self.assertEqual((state.cash_delta_usd - D("70"), state.realized_pnl_usd + D("20"),
+                          state.cumulative_realized_loss_usd - D("20")), (D("190"), D("-10"), D("10")))
+        position = self.ledger.positions()["APUS"]
+        self.assertEqual((position.qty, position.cost_basis_usd), (D("1"), D("110")))
+
 
     def test_accounting_replay_quantity_mismatch_rolls_back_late_execution(self):
         self.reserve("buy-1", "buy", "29", "5.64")

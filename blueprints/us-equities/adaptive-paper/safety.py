@@ -978,26 +978,32 @@ class Ledger:
                     qty=qty, price=price, at=at)
         return True
 
-    def _executions_notional(self, client_id, low, high):
-        """The exact notional of the recorded executions that tile (low, high], or None
-        when they do not (an execution still missing or out of order)."""
+    def _execution_fills(self, client_id, low, high):
+        """Exact (quantity, notional) fills tiling (low, high], or None when
+        coverage is incomplete. Keep execution boundaries for gross-loss accounting."""
         rows = sorted((D(r["cum_qty"]), D(r["qty"]), D(r["price"])) for r in self.db.execute(
             "SELECT cum_qty, qty, price FROM executions WHERE client_id=?", (client_id,)))
-        total, previous = ZERO, low
+        fills, previous = [], low
         for cum, qty, price in rows:
             if cum <= low or cum > high:
                 continue
             if cum - qty != previous:
                 return None
-            total, previous = total + qty * price, cum
-        return total if previous == high else None
+            fills.append((qty, qty * price))
+            previous = cum
+        return fills if previous == high else None
+
+    def _executions_notional(self, client_id, low, high):
+        fills = self._execution_fills(client_id, low, high)
+        return sum((notional for _, notional in fills), ZERO) if fills is not None else None
 
     def _reconcile_execution_accounting(self, client_id, filled):
         """Replace provisional money once Alpaca's exact qty/price executions cover
         the observed quantity. Replay the durable booking journal so a late buy also
         corrects the basis of later sales; quantities and broker averages stay intact.
         Runs inside record_order's transaction, including across a process restart."""
-        key = "execution_accounting:" + client_id
+        # Versioned: a ledger replayed before per-execution booking re-derives once (#355 review F3).
+        key = "execution_accounting:v2:" + client_id
         if (not filled or self._get(key) == _canonical(filled)
                 or self._executions_notional(client_id, ZERO, filled) is None):
             return False
@@ -1022,19 +1028,22 @@ class Ledger:
             if not delta:
                 continue
             high = D(data["filled_qty"])
-            notional = self._executions_notional(row["client_id"], high - delta, high)
-            if notional is None:
-                notional = D(data["delta_notional"])
+            fills = self._execution_fills(row["client_id"], high - delta, high)
+            if fills is None:
+                fills = [(delta, D(data["delta_notional"]))]
             qty, cost = positions.get(row["symbol"], (ZERO, ZERO))
-            if row["side"] == "buy":
-                qty, cost, cash = qty + delta, cost + notional, cash - notional
-            else:
-                if delta > qty:
-                    raise SafetyError("accounting_replay_would_make_short_position")
-                basis = cost / qty * delta
-                pnl = notional - basis
-                qty, cost, cash = qty - delta, cost - basis, cash + notional
-                realized, loss = realized + pnl, loss + max(ZERO, -pnl)
+            # QuantConnect/Lean 985ef30: SecurityPortfolioModel.cs computes P&L
+            # per closing fill; TradeStatistics.cs accumulates losses separately.
+            for delta, notional in fills:
+                if row["side"] == "buy":
+                    qty, cost, cash = qty + delta, cost + notional, cash - notional
+                else:
+                    if delta > qty:
+                        raise SafetyError("accounting_replay_would_make_short_position")
+                    basis = cost / qty * delta
+                    pnl = notional - basis
+                    qty, cost, cash = qty - delta, cost - basis, cash + notional
+                    realized, loss = realized + pnl, loss + max(ZERO, -pnl)
             positions[row["symbol"]] = (qty, cost if qty else ZERO)
 
         changed = False
