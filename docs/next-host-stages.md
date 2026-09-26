@@ -84,6 +84,9 @@ and treat the projection as superseded guidance rather than looking for it to ha
 5. Record each component that ran with `python3 scripts/host_receipts.py record`
    (`--qualified-model` for any local runtime model you qualified there), then
    `python3 scripts/component_matrix.py --write` and `python3 scripts/new_host_grand_list.py --write`.
+   A `--stage use` receipt of a component that several catalog layers list names the layer(s) it
+   exercised with `--layer-ref <catalog>/<layer_id>`
+   ([contributing evidence](contributing-evidence.md), section 3 step 3; changed after `v2026.09.26`).
 6. North star on this host: the engine replay, then IBKR local acceptance and the adaptive paper
    broker trial as the gate ladder
    ([`catalogs/us-equities/gates-20260922.json`](../catalogs/us-equities/gates-20260922.json)) allows.
@@ -107,9 +110,11 @@ The 24 GB Mac is being replaced (see the upgrade table below). On the replacemen
    and registers the measured profile.
 3. `macos-arm64-foundation` profile; re-qualify any local model on MLX or llama.cpp Metal: a vLLM
    result on CUDA does not transfer. Record a qualified model with
-   `python3 scripts/host_receipts.py record ... --qualified-model '{"runtime": "mlx-lm", ...}'`.
-4. Record receipts as above. The first real macOS run is what moves the `macos-arm64` column of the
-   grand list off `untested`.
+   `python3 scripts/host_receipts.py record ... --qualified-model '{"runtime": "mlx-lm", ...}'`,
+   adding `--layer-ref` at `--stage use` when several layers list the runtime (changed after `v2026.09.26`).
+4. Record receipts as above, with `--layer-ref` where several layers list the component
+   (changed after `v2026.09.26`). The first real macOS run is what moves the `macos-arm64` column of
+   the grand list off `untested`.
 5. Run the RAM-fit matrix and the embedder and reranker comparisons listed as open items in
    [`foundation-alignment.json`](../evidence/artifacts/host-upgrade-20260924/foundation-alignment.json),
    as scratch processes, and hand the numbers to the foundation-lane owner.

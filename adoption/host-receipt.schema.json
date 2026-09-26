@@ -103,6 +103,8 @@
     },
     "layer_refs": {
       "type": "array",
+      "minItems": 1,
+      "description": "Optional, set by 'scripts/host_receipts.py record --layer-ref CATALOG/LAYER_ID' (repeatable): the catalogs/landscape/{foundation,us-equities}.json layers whose role the commands exercise. A receipt with layer_refs counts only for rows (winners and alternatives) in those layers; without them it binds to every layer its component_id wins and verifies an alternative only when that alternative's repository is catalogued in one layer (scripts/platform_status.py in_layer_scope). record requires it at stage use for a component catalogued in more than one layer.",
       "items": {
         "type": "object",
         "additionalProperties": false,

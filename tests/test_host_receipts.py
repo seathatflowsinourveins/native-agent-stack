@@ -2397,5 +2397,146 @@ class ReceiptAliasTableTests(unittest.TestCase):
             REPO_ROOT, hr.winner_stack_aliases(REPO_ROOT), hr.landscape_component_ids(REPO_ROOT)), [])
 
 
+class LayerRefsTests(unittest.TestCase):
+    """record --layer-ref writes layer_refs; a use receipt of a component several layers catalogue must name at least
+    one; validate checks the named layers; build_summary exposes the scope and which receipts are superseded."""
+
+    WIDGET = "https://github.com/example/widget"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_support_tree(self.root)
+        stack = json.loads((self.root / "manifests" / "stack.json").read_text(encoding="utf-8"))
+        stack["components"][0]["repository"] = self.WIDGET
+        (self.root / "manifests" / "stack.json").write_text(json.dumps(stack), encoding="utf-8")
+        # widget wins foundation/native-clients and is an alternative in foundation/workers.
+        (self.root / "catalogs" / "landscape" / "foundation.json").write_text(json.dumps({"layers": [
+            {"layer_id": "native-clients", "winners": [{"component_id": "widget", "repository": self.WIDGET,
+                                                        "pin": "1.0.0"}]},
+            {"layer_id": "workers", "alternatives": [{"name": "Widget workers", "repository": self.WIDGET + ".git"}]},
+            {"layer_id": "isolation", "winners": [], "alternatives": []},
+        ]}), encoding="utf-8")
+
+    def _record(self, *extra: str, stage: str = "use") -> tuple[int, str]:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = _run_cli(["record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                                  "--platform-id", "linux-wsl2-x86_64", "--os", "linux", "--architecture", "x86_64",
+                                  "--component-id", "widget", "--stage", stage, "--evidence-class", "synthetic",
+                                  "--cmd", "echo hi", *extra])
+        return exit_code, buffer.getvalue()
+
+    def _validate(self) -> tuple[int, str]:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = hr.cmd_validate(argparse.Namespace(root=self.root))
+        return exit_code, buffer.getvalue()
+
+    def test_component_layers_join_winner_ids_and_repositories(self):
+        self.assertEqual(hr.component_layers(self.root, "widget"), ["foundation/native-clients", "foundation/workers"])
+        self.assertEqual(hr.component_layers(self.root, "unlisted"), [])
+
+    def test_a_scoped_use_receipt_is_written_and_validates(self):
+        exit_code, output = self._record("--layer-ref", "foundation/workers", "--layer-ref", "foundation/native-clients")
+        self.assertEqual(exit_code, 0, output)
+        receipt = json.loads((self.root / output.strip()).read_text(encoding="utf-8"))
+        self.assertEqual(receipt["layer_refs"], [{"catalog": "foundation", "layer_id": "workers"},
+                                                 {"catalog": "foundation", "layer_id": "native-clients"}])
+        self.assertEqual(self._validate()[0], 0, self._validate()[1])
+        entry = hr.build_summary(self.root)["components"]["widget"]["platforms"]["linux-wsl2-x86_64"]["receipts"][0]
+        self.assertEqual(entry["layer_scope"], ["foundation/native-clients", "foundation/workers"])
+        self.assertIsNone(entry["supersedes_path"])
+
+    def test_an_unscoped_use_receipt_of_a_multi_layer_component_is_refused_before_running(self):
+        exit_code, output = self._record("--cmd", "touch ran-anyway")
+        self.assertEqual(exit_code, 2)
+        self.assertIn("catalogued in 2 layers (foundation/native-clients, foundation/workers)", output)
+        self.assertFalse((self.root / "ran-anyway").exists())
+        self.assertFalse((self.root / "evidence" / "hosts" / "test-host-20260101").exists())
+
+    def test_an_unscoped_install_receipt_is_still_accepted(self):
+        exit_code, output = self._record(stage="install")
+        self.assertEqual(exit_code, 0, output)
+        self.assertNotIn("layer_refs", json.loads((self.root / output.strip()).read_text(encoding="utf-8")))
+
+    def test_bad_layer_refs_are_refused(self):
+        for refs, message in ((["foundation/isolation"], "names no layer that catalogues 'widget'"),
+                              (["workers"], "must be CATALOG/LAYER_ID"),
+                              (["foundation/workers", "foundation/workers"], "is given twice")):
+            with self.subTest(refs=refs):
+                exit_code, output = self._record(*[arg for ref in refs for arg in ("--layer-ref", ref)])
+                self.assertEqual(exit_code, 2)
+                self.assertIn(message, output)
+
+    def test_validate_rejects_unknown_and_repeated_layers(self):
+        exit_code, output = self._record("--layer-ref", "foundation/workers")
+        self.assertEqual(exit_code, 0, output)
+        path = self.root / output.strip()
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        receipt["layer_refs"] = [{"catalog": "foundation", "layer_id": "workers"},
+                                 {"catalog": "foundation", "layer_id": "workers"},
+                                 {"catalog": "us-equities", "layer_id": "no-such-layer"}]
+        path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+        hr.register_file(self.root, output.strip())
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1)
+        self.assertIn("layer_refs names 'foundation/workers' more than once", output)
+        self.assertIn("layer_refs names 'us-equities/no-such-layer', which is not a layer", output)
+        receipt["layer_refs"] = []
+        path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+        hr.register_file(self.root, str(path.relative_to(self.root)))
+        self.assertIn("must have at least 1 item", self._validate()[1])
+
+    def test_receipt_layer_scope_never_widens_a_malformed_scope(self):
+        self.assertIsNone(hr.receipt_layer_scope({}))
+        self.assertEqual(hr.receipt_layer_scope({"layer_refs": "foundation/workers"}), [])
+        self.assertEqual(hr.receipt_layer_scope({"layer_refs": [{"catalog": "foundation"}, 3]}), [])
+
+    def test_superseded_receipts_leave_the_reviewed_stage_list(self):
+        exit_code, output = self._record("--layer-ref", "foundation/workers")
+        self.assertEqual(exit_code, 0, output)
+        first = output.strip()
+        exit_code, output = self._record("--layer-ref", "foundation/workers", "--supersedes", Path(first).stem)
+        self.assertEqual(exit_code, 0, output)
+        second = output.strip()
+        entries = {entry["path"]: entry for entry in
+                   hr.build_summary(self.root)["components"]["widget"]["platforms"]["linux-wsl2-x86_64"]["receipts"]}
+        self.assertEqual(entries[second]["supersedes_path"], first)
+        self.assertIsNone(entries[first]["supersedes_path"])
+        self.assertEqual(hr.superseded_paths(entries.values()), {first})
+
+    def test_validate_rejects_a_forked_supersede_chain(self):
+        # PR #321 verification: A-2 and A-3 both superseding A passed validate, and A-2's agree then outlived
+        # A-3's needs_changes. record cannot write a fork (it names the latest generation); validate now refuses one.
+        exit_code, output = self._record("--layer-ref", "foundation/workers")
+        self.assertEqual(exit_code, 0, output)
+        exit_code, output = self._record("--layer-ref", "foundation/workers", "--supersedes", Path(output.strip()).stem)
+        self.assertEqual(exit_code, 0, output)
+        second = self.root / output.strip()
+        self.assertEqual(self._validate()[0], 0, self._validate()[1])
+        fork = json.loads(second.read_text(encoding="utf-8"))
+        fork["id"] = fork["id"][:-2] + "-3"
+        forked = second.with_name(second.name.replace("-2.json", "-3.json"))
+        forked.write_text(json.dumps(fork, indent=2) + "\n", encoding="utf-8")
+        hr.register_file(self.root, forked.relative_to(self.root).as_posix())
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1)
+        self.assertEqual(output.count("a supersede chain must stay linear"), 2, output)
+        # The linear repair: A-3 supersedes A-2 instead.
+        fork["supersedes"] = fork["id"][:-2] + "-2"
+        forked.write_text(json.dumps(fork, indent=2) + "\n", encoding="utf-8")
+        hr.register_file(self.root, forked.relative_to(self.root).as_posix())
+        self.assertEqual(self._validate()[0], 0, self._validate()[1])
+
+    def test_layer_refs_name_the_catalogs_the_matrix_joins(self):
+        from scripts import component_matrix
+        self.assertIs(component_matrix.LANDSCAPE_FILES, hr.LANDSCAPE_CATALOGS)
+        layers = hr.landscape_layers(REPO_ROOT)
+        self.assertIn("foundation/workers", layers)
+        self.assertIn("us-equities/agents-models-workers", layers)
+
+
 if __name__ == "__main__":
     unittest.main()

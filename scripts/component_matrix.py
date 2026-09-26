@@ -46,10 +46,8 @@ SCOPE = (
     "and the gap crosswalk (open executable_now gaps per layer, when present). It never selects "
     "a winner or records a receipt; it is a read-only join of evidence recorded elsewhere."
 )
-LANDSCAPE_FILES = {
-    "foundation": "catalogs/landscape/foundation.json",
-    "us-equities": "catalogs/landscape/us-equities.json",
-}
+# The same two catalogs a receipt's layer_refs may name.
+LANDSCAPE_FILES = host_receipts.LANDSCAPE_CATALOGS
 DECISIONS_FILE = "catalogs/foundation/decisions.json"
 GAP_CROSSWALK_FILE = "catalogs/landscape/gap-crosswalk-92bb279.json"
 STACK_FILE = "manifests/stack.json"
@@ -258,17 +256,18 @@ def platform_alias_receipts(receipts_summary: dict, winner: dict, alias_ids, pla
 
 
 def build_winner(winner: dict, decisions: dict[str, list[dict]], receipts_summary: dict,
-                 status_context: platform_evidence.StatusContext, alias_ids: tuple[str, ...] = ()):
+                 status_context: platform_evidence.StatusContext, alias_ids: tuple[str, ...] = (), layer=None):
     """Per-platform catalog status, the status the evidence derives (scripts/platform_status.py),
     receipt counts and e2e_state. ``host_verified`` means the derived status is ``accepted``
     on the strength of a host receipt; otherwise e2e_state is the declared catalog status.
-    ``alias_receipts`` lists receipts recorded under a stack alias of the winner; never counted."""
+    ``alias_receipts`` lists receipts recorded under a stack alias of the winner; never counted.
+    ``layer`` (``"<catalog>/<layer_id>"``) is the row, which a receipt with ``layer_refs`` must name."""
     component_id = winner.get("component_id")
     platforms: dict[str, dict] = {}
     violations: list[str] = []
     for platform_key in sorted(PLATFORM_KEYS):
         catalog_status = (winner.get("platform_status") or {}).get(platform_key, "untested")
-        derived = platform_evidence.platform_status(platform_key, winner, status_context)
+        derived = platform_evidence.platform_status(platform_key, winner, status_context, layer=layer)
         host_verified = derived.status == "accepted" and any(
             ref.startswith("evidence/hosts/") for ref in derived.receipt_refs)
         platforms[platform_key] = {
@@ -281,7 +280,8 @@ def build_winner(winner: dict, decisions: dict[str, list[dict]], receipts_summar
             "alias_receipts": platform_alias_receipts(receipts_summary, winner, alias_ids, platform_key),
         }
         if platform_key in ENFORCED_PLATFORMS:
-            error = platform_evidence.declared_status_error(platform_key, catalog_status, winner, status_context)
+            error = platform_evidence.declared_status_error(platform_key, catalog_status, winner, status_context,
+                                                            layer=layer)
             if error:
                 violations.append(error)
     built = {
@@ -295,39 +295,59 @@ def build_winner(winner: dict, decisions: dict[str, list[dict]], receipts_summar
     return built, violations
 
 
-def build_alternative(alternative: dict, repo_to_component: dict[str, str], receipts_summary: dict) -> dict:
+def build_alternative(alternative: dict, repo_to_component: dict[str, str], receipts_summary: dict,
+                      layer=None, catalogued_layers=()) -> dict:
+    """An alternative is ``host_verified`` when a receipt of the component sharing its repository is an
+    independently reviewed native_proven pass at a use stage that speaks for this row: current
+    (platform_status.non_current_paths: not superseded at its version, not on a forked chain), and (platform_status.in_layer_scope) either naming ``layer`` in its
+    ``layer_refs`` or unscoped while the repository is catalogued in at most one layer (``catalogued_layers``). A repository in
+    several layers can play a different role in each (Codex: native-clients and agent-sdks winner, workers
+    alternative), so an unscoped receipt there verifies none of its alternatives, and ``layer_scope_needed``
+    marks a row that a receipt naming this layer would verify."""
     repository = alternative.get("repository")
     normalized = host_receipts.normalize_repository(repository)
     component_id = repo_to_component.get(normalized) if normalized is not None else None
     e2e_state = "not_run"
+    scope_needed = False
     if isinstance(component_id, str):
         component_bucket = receipts_summary.get("components", {}).get(component_id)
         if component_bucket:
             # Only a reviewed use-stage pass verifies an alternative on a host, as it alone supports accepted for
             # a winner (platform_status.ACCEPTING_STAGES; #164 review, item 2); an install-only pass is recorded.
-            any_reviewed = any(
-                platform_evidence.ACCEPTING_STAGES.intersection(
-                    (platform_bucket or {}).get("independently_reviewed_native_proven_pass_stages") or ())
-                for platform_bucket in component_bucket.get("platforms", {}).values()
-            )
-            e2e_state = "host_verified" if any_reviewed else "receipts_recorded"
-    return {
+            unambiguous = len(set(catalogued_layers or ())) <= 1
+            superseded = platform_evidence.non_current_paths(receipts_summary, component_id)
+            reviewed_use = [entry for platform_bucket in component_bucket.get("platforms", {}).values()
+                            for entry in (platform_bucket or {}).get("receipts") or []
+                            if isinstance(entry, dict) and entry.get("independently_reviewed_native_proven_pass")
+                            and entry.get("stage") in platform_evidence.ACCEPTING_STAGES
+                            and entry.get("path") not in superseded]
+            verified = any(platform_evidence.in_layer_scope(entry, layer, unscoped=unambiguous)
+                           for entry in reviewed_use)
+            scope_needed = not verified and any(platform_evidence.in_layer_scope(entry, layer, unscoped=True)
+                                                for entry in reviewed_use)
+            e2e_state = "host_verified" if verified else "receipts_recorded"
+    built = {
         "name": alternative.get("name"),
         "repository": repository,
         "disposition": alternative.get("disposition"),
         "evidence_class": alternative.get("evidence_class"),
         "e2e_state": e2e_state,
     }
+    if scope_needed:
+        built["layer_scope_needed"] = True
+    return built
 
 
 def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[dict]],
               gap_counts: dict[tuple[str, str], int], receipts_summary: dict,
               repo_to_component: dict[str, str], open_gap_counts: dict[tuple[str, str], int] | None = None,
               status_context: platform_evidence.StatusContext | None = None,
-              winner_aliases: dict[str, tuple[str, ...]] | None = None):
+              winner_aliases: dict[str, tuple[str, ...]] | None = None,
+              repo_layers: dict[str, set[str]] | None = None):
     if status_context is None:
         status_context = platform_evidence.load_context(root)
     layer_id = layer.get("layer_id")
+    layer_key = f"{catalog}/{layer_id}"
     independent_review = classify_independent_review(layer)
     adjudication_ref = find_adjudication_ref(root, catalog, layer_id, layer)
 
@@ -335,13 +355,14 @@ def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[d
     flip_violations: list[str] = []
     for winner in layer.get("winners", []) or []:
         built, violations = build_winner(winner, decisions, receipts_summary, status_context,
-                                         (winner_aliases or {}).get(winner.get("component_id"), ()))
+                                         (winner_aliases or {}).get(winner.get("component_id"), ()), layer_key)
         winners.append(built)
         flip_violations.extend(f"{catalog}/{layer_id} winner {built['component_id']!r}: {violation}"
                                for violation in violations)
 
     alternatives = [
-        build_alternative(alternative, repo_to_component, receipts_summary)
+        build_alternative(alternative, repo_to_component, receipts_summary, layer_key,
+                          (repo_layers or {}).get(host_receipts.normalize_repository(alternative.get("repository")), ()))
         for alternative in layer.get("alternatives", []) or []
     ]
 
@@ -376,6 +397,10 @@ def build_document(root: Path):
 
     landscape_docs = {catalog: load_optional(root, relative) for catalog, relative in LANDSCAPE_FILES.items()}
     winner_aliases = alias_ids_by_winner(stack_doc, landscape_docs.values())
+    repo_layers = host_receipts.repository_layers({
+        f"{catalog}/{layer['layer_id']}": layer for catalog, document in landscape_docs.items()
+        for layer in (document or {}).get("layers", []) or []
+        if isinstance(layer, dict) and isinstance(layer.get("layer_id"), str)})
 
     rows: list[dict] = []
     flip_violations: list[str] = []
@@ -387,7 +412,7 @@ def build_document(root: Path):
                 continue
             row, row_flip_violations = build_row(
                 root, catalog, layer, decisions, gap_counts, receipts_summary, repo_to_component, open_gap_counts,
-                status_context, winner_aliases,
+                status_context, winner_aliases, repo_layers,
             )
             rows.append(row)
             flip_violations.extend(row_flip_violations)
@@ -600,6 +625,14 @@ def render_markdown(document: dict) -> str:
         "`disagree`/`needs_changes` review. A `native_proven` `use`/`install` fail that is the latest receipt for "
         "its host and stage blocks `accepted` until that host records a later pass. `conditional` needs a "
         "pin-bound, non-`synthetic` pass from a declared second physical machine with no standing dissent. "
+        "A receipt superseded at the same component version, or on a forked supersede chain, supports no "
+        "status, though a superseded `native_proven` fail still blocks "
+        "until a later current native pass at the same pin, platform, stage and layer; a receipt with "
+        "`layer_refs` counts only in the layers it names; and a host receipt cited in a winner's "
+        "`evidence_refs` counts only through this receipt route, never as a registered artifact. An alternative (JSON only) is `host_verified` on such a reviewed `use` "
+        "pass of the component sharing its repository, which must name the alternative's layer in "
+        "`layer_refs` when that repository is catalogued in more than one layer (`layer_scope_needed` marks "
+        "an alternative an unscoped pass would otherwise verify). "
         "Never edit `platform_status` in the landscape files to make this page "
         "pass; add the underlying host receipt instead, following "
         "[`docs/contributing-evidence.md`](contributing-evidence.md).",

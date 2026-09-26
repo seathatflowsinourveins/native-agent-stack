@@ -467,6 +467,73 @@ def landscape_component_ids(root: Path) -> set[str]:
             if isinstance(winner.get("component_id"), str)}
 
 
+# The catalogs whose layers a receipt's ``layer_refs`` may name: the two scripts/component_matrix.py joins. A
+# receipt with ``layer_refs`` is evidence only for rows (winners and alternatives) in the layers it names, since a
+# component catalogued in several layers can play a different role in each (Codex is a native-clients and agent-sdks
+# winner but a workers alternative, whose owned writing child a read-only exec never exercises). A receipt without
+# them is scoped by the rule in scripts/platform_status.py in_layer_scope.
+LANDSCAPE_CATALOGS = {
+    "foundation": "catalogs/landscape/foundation.json",
+    "us-equities": "catalogs/landscape/us-equities.json",
+}
+
+
+def landscape_layers(root: Path) -> dict[str, dict]:
+    """``"<catalog>/<layer_id>"`` -> that layer object, for every layer of ``LANDSCAPE_CATALOGS`` with a string
+    ``layer_id``; a missing or unreadable catalog contributes none."""
+    layers: dict[str, dict] = {}
+    for catalog, relative in LANDSCAPE_CATALOGS.items():
+        try:
+            document = load_json(root, relative)
+        except (OSError, UnicodeError, ValueError, InvalidDecisionIndex):
+            continue
+        for layer in document.get("layers", []) if isinstance(document, dict) else []:
+            if isinstance(layer, dict) and isinstance(layer.get("layer_id"), str):
+                layers[f"{catalog}/{layer['layer_id']}"] = layer
+    return layers
+
+
+def repository_layers(layers: dict[str, dict]) -> dict[str, set[str]]:
+    """Pure: normalized repository -> the layer keys whose ``winners[]`` or ``alternatives[]`` list it."""
+    by_repository: dict[str, set[str]] = {}
+    for key, layer in layers.items():
+        for role in ("winners", "alternatives"):
+            for entry in layer.get(role) or []:
+                repository = normalize_repository(entry.get("repository")) if isinstance(entry, dict) else None
+                if repository is not None:
+                    by_repository.setdefault(repository, set()).add(key)
+    return by_repository
+
+
+def component_layers(root: Path, component_id: str) -> list[str]:
+    """The sorted layer keys that catalogue ``component_id``: a layer with a winner of that id, or with a winner or
+    alternative sharing a repository with it (its ``manifests/stack.json`` entry or a winner of that id)."""
+    layers = landscape_layers(root)
+    repositories = {normalize_repository(component.get("repository")) for component in stack_components(root)
+                    if component.get("id") == component_id}
+    keys = set()
+    for key, layer in layers.items():
+        for winner in layer.get("winners") or []:
+            if isinstance(winner, dict) and winner.get("component_id") == component_id:
+                keys.add(key)
+                repositories.add(normalize_repository(winner.get("repository")))
+    repositories.discard(None)
+    by_repository = repository_layers(layers)
+    for repository in repositories:
+        keys.update(by_repository.get(repository, ()))
+    return sorted(keys)
+
+
+def receipt_layer_scope(receipt: dict) -> list[str] | None:
+    """The ``"<catalog>/<layer_id>"`` keys a receipt's ``layer_refs`` names, or ``None`` for an unscoped receipt. A
+    malformed ``layer_refs`` yields only its well-formed keys (possibly none), so it never widens the scope."""
+    if "layer_refs" not in receipt:
+        return None
+    refs = receipt.get("layer_refs") if isinstance(receipt.get("layer_refs"), list) else []
+    return sorted({f"{ref['catalog']}/{ref['layer_id']}" for ref in refs if isinstance(ref, dict)
+                   and isinstance(ref.get("catalog"), str) and isinstance(ref.get("layer_id"), str)})
+
+
 def winner_pins(root: Path, component_id: str) -> set[str]:
     """Every landscape winner pin recorded for ``component_id`` (one per selecting layer)."""
     return {winner["pin"].strip() for winner in landscape_winners(root)
@@ -704,6 +771,34 @@ def stack_commands_for_record(root: Path, component_id: str,
     return [], f"no plain-string commands found for component {searched} in manifests/stack.json; pass --cmd"
 
 
+def layer_refs_for_record(root: Path, component_id: str, stage: str,
+                          raw_refs: list[str]) -> tuple[list[dict], str | None]:
+    """``record --layer-ref``: the ``layer_refs`` objects for ``raw_refs`` (each ``CATALOG/LAYER_ID``, a layer that
+    catalogues the component, no repeats), else ``([], message)``. A ``use`` receipt of a component catalogued in
+    more than one layer must name at least one: its commands exercise a role, and which layer's role is not
+    derivable from the command text (an install check shows only that the binary resolves, in every layer alike)."""
+    catalogued = component_layers(root, component_id)
+    refs: list[dict] = []
+    seen: set[str] = set()
+    for raw in raw_refs or []:
+        catalog, _, layer_id = raw.strip().partition("/")
+        key = f"{catalog}/{layer_id}"
+        if not catalog or not layer_id:
+            return [], f"--layer-ref {raw!r} must be CATALOG/LAYER_ID (for example foundation/workers)"
+        if key in seen:
+            return [], f"--layer-ref {key!r} is given twice"
+        if key not in catalogued:
+            return [], (f"--layer-ref {key!r} names no layer that catalogues {component_id!r}; its layers: "
+                        f"{', '.join(catalogued) or 'none'}")
+        seen.add(key)
+        refs.append({"catalog": catalog, "layer_id": layer_id})
+    if stage == "use" and not refs and len(catalogued) > 1:
+        return [], (f"{component_id!r} is catalogued in {len(catalogued)} layers ({', '.join(catalogued)}); a use "
+                    "receipt must name the layer(s) whose role its commands exercise with --layer-ref "
+                    "CATALOG/LAYER_ID (repeatable), and counts only for those rows")
+    return refs, None
+
+
 def existing_review_summary(path: Path) -> str:
     """``kind:verdict`` for each review already in the receipt at ``path``, joined by ', ',
     so a refused overwrite names exactly what it would have erased (2026-09-25: a same-day
@@ -857,6 +952,10 @@ def cmd_record(args: argparse.Namespace) -> int:
         print("error: --stage use records the component doing its job, but every command here is only a help or "
               "version call; pass a functional --cmd, or record these as --stage install")
         return 2
+    layer_refs, problem = layer_refs_for_record(root, args.component_id, args.stage, args.layer_ref)
+    if problem:
+        print(f"error: {problem}")
+        return 2
 
     catalog_revision = git_head(root)
     observed_at = utc_now()
@@ -962,6 +1061,8 @@ def cmd_record(args: argparse.Namespace) -> int:
              "reviewer": dict(recorded_by)},
         ],
     }
+    if layer_refs:
+        receipt["layer_refs"] = layer_refs
     if qualified_models:
         receipt["qualified_models"] = qualified_models
     if args.hardware_profile_ref:
@@ -1141,12 +1242,26 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
                                        errors: list[str], known_platforms: set[str],
                                        known_stack_ids: set[str], known_landscape_ids: set[str],
                                        known_files: dict[str, dict],
-                                       known_platform_profiles: dict[str, dict[str, str]] | None = None) -> None:
+                                       known_platform_profiles: dict[str, dict[str, str]] | None = None,
+                                       known_layers=None) -> None:
     label = path.relative_to(root).as_posix()
     if not isinstance(receipt, dict):
         return
     if known_platform_profiles is None:
         known_platform_profiles = {}
+
+    # layer_refs scopes the receipt to the rows of the layers it names, so each must be a layer of the catalogs
+    # component_matrix.py joins, named once (record also checks that the layer catalogues the component).
+    if isinstance(receipt.get("layer_refs"), list):
+        if known_layers is None:
+            known_layers = set(landscape_layers(root))
+        keys = [f"{ref.get('catalog')}/{ref.get('layer_id')}" for ref in receipt["layer_refs"] if isinstance(ref, dict)]
+        for key in sorted(set(keys)):
+            if keys.count(key) > 1:
+                errors.append(f"{label}: layer_refs names {key!r} more than once")
+            if key not in known_layers:
+                errors.append(f"{label}: layer_refs names {key!r}, which is not a layer of "
+                              f"{', '.join(sorted(LANDSCAPE_CATALOGS.values()))}")
 
     host = receipt.get("host") if isinstance(receipt.get("host"), dict) else {}
     platform_id = host.get("platform_id")
@@ -1464,6 +1579,17 @@ def receipt_alias_table_errors(root: Path, aliases: dict[str, tuple[str, ...]], 
     return errors
 
 
+def fork_errors(supersede_links: dict[tuple, list[str]]) -> list[str]:
+    """Errors for a forked supersede chain: two receipts naming the same ``supersedes`` id (``supersede_links``
+    maps (host directory, superseded id) to the receipts naming it). ``record --supersedes`` names the latest
+    generation only, so a chain stays linear and its last generation alone speaks for it; with a fork, which
+    branch is the latest is ambiguous, and the summaries withhold acceptance from it (``non_current_paths``)."""
+    return [f"{label}: supersedes {superseded!r}, which {', '.join(other for other in labels if other != label)} "
+            "also supersedes; a supersede chain must stay linear (supersede the latest generation)"
+            for (_host, superseded), labels in sorted(supersede_links.items()) if len(labels) > 1
+            for label in sorted(labels)]
+
+
 def cmd_validate(args: argparse.Namespace) -> int:
     root = repo_root(args.root)
     known_platforms = platform_ids(root)
@@ -1471,6 +1597,7 @@ def cmd_validate(args: argparse.Namespace) -> int:
     known_stack_ids = stack_component_ids(root)
     known_landscape_ids = landscape_component_ids(root)
     known_files = evidence_files(root)
+    known_layers = set(landscape_layers(root))
     aliases = winner_stack_aliases(root)
     grandfathered = getattr(args, "grandfathered_alias_receipts", None)
     if grandfathered is None:
@@ -1479,6 +1606,7 @@ def cmd_validate(args: argparse.Namespace) -> int:
     errors: list[str] = []
     count = 0
     recorded_ids: dict[str, object] = {}
+    supersede_links: dict[tuple, list[str]] = {}
     for host_dir_name, path in _iter_receipt_files(root):
         count += 1
         label = path.relative_to(root).as_posix()
@@ -1488,12 +1616,15 @@ def cmd_validate(args: argparse.Namespace) -> int:
             errors.append(f"{label}: invalid JSON ({type(error).__name__})")
             continue
         recorded_ids[label] = receipt.get("component_id") if isinstance(receipt, dict) else None
+        if isinstance(receipt, dict) and isinstance(receipt.get("supersedes"), str):
+            supersede_links.setdefault((host_dir_name, receipt["supersedes"]), []).append(label)
         validate_receipt_shape(root, receipt, label, errors)
         validate_receipt_cross_references(
             root, host_dir_name, path, receipt, errors,
             known_platforms, known_stack_ids, known_landscape_ids, known_files,
-            known_platform_profiles,
+            known_platform_profiles, known_layers,
         )
+    errors.extend(fork_errors(supersede_links))
     errors.extend(alias_receipt_errors(root, recorded_ids, aliases, grandfathered))
     errors.extend(receipt_alias_table_errors(root, aliases, landscape_component_ids(root)))
 
@@ -1553,6 +1684,89 @@ def review_state(receipt: dict) -> str:
     return "agree" if "agree" in verdicts else "none"
 
 
+def recorded_version(receipt) -> str | None:
+    """The receipt's own ``tool_versions[component_id]``, or ``None``."""
+    if not isinstance(receipt, dict):
+        return None
+    versions = receipt.get("tool_versions") if isinstance(receipt.get("tool_versions"), dict) else {}
+    version = versions.get(receipt.get("component_id"))
+    return version if isinstance(version, str) else None
+
+
+def supersede_link(root: Path, receipt: dict) -> str | None:
+    """The repository-relative path ``receipt``'s ``supersedes`` names, when the receipt is shape-valid and the link
+    names the same host, component and stage (the chain ``record --supersedes`` writes and ``validate`` checks),
+    else ``None``: a malformed or mismatched link links nothing."""
+    supersedes = receipt.get("supersedes")
+    match = ID_PATTERN.fullmatch(supersedes) if isinstance(supersedes, str) else None
+    host = receipt.get("host") if isinstance(receipt.get("host"), dict) else {}
+    if (match is None or match.group("host_id") != host.get("host_id")
+            or match.group("component_id") != receipt.get("component_id")
+            or match.group("stage") != receipt.get("stage")):
+        return None
+    shape_errors: list[str] = []
+    validate_receipt_shape(root, receipt, "supersedes", shape_errors)
+    return None if shape_errors else f"evidence/hosts/{match.group('host_id')}/{receipt_filename_stem(supersedes)}.json"
+
+
+def same_version_ancestor(path: str, links: dict, receipts: dict) -> str | None:
+    """The receipt ``path`` retires: its nearest ancestor along the supersede ``links`` (path -> linked path) that
+    records the same component version (``pin_matches`` on ``recorded_version``; ``receipts`` maps path -> parsed
+    receipt), else ``None``. A re-record at another version retires nothing, being a record of a different
+    version (pin binding decides which counts); since ``record --supersedes`` must name the latest generation,
+    a later run at the first version still retires the earlier one through the other version's generation
+    (v1 <- v2 <- v1: the third retires the first), and each same-version generation retires the one before it."""
+    version = recorded_version(receipts.get(path))
+    seen = {path}
+    current = links.get(path)
+    while isinstance(current, str) and current not in seen and current in receipts:
+        if pin_matches(version, recorded_version(receipts[current])):
+            return current
+        seen.add(current)
+        current = links.get(current)
+    return None
+
+
+def reviewed_native_pass(entry: dict) -> bool:
+    """``build_summary``'s ``independently_reviewed_native_proven_pass`` from an entry's own fields: a
+    shape-valid ``native_proven`` pass at a named stage, independently reviewed (``review_state`` ``agree``), on a
+    declared second physical machine whose os/architecture match the platform profile."""
+    return bool(entry.get("result") == "pass" and entry.get("review_state") == "agree"
+                and entry.get("evidence_class") == "native_proven" and isinstance(entry.get("stage"), str)
+                and entry.get("second_physical_machine") is True and entry.get("platform_identity_ok")
+                and entry.get("shape_ok"))
+
+
+def superseded_paths(entries) -> set[str]:
+    """The paths the given ``build_summary`` receipt entries supersede (their ``supersedes_path``). Derived from
+    the entries present, so a caller that filters them (scripts/verdict_review_gate.py keeps base-trusted
+    receipts only) recomputes it: a successor it drops no longer retires its predecessor."""
+    return {entry["supersedes_path"] for entry in entries
+            if isinstance(entry, dict) and isinstance(entry.get("supersedes_path"), str)}
+
+
+def non_current_paths(entries) -> set[str]:
+    """The paths among ``build_summary`` receipt entries that are no acceptance evidence: every receipt a present
+    successor retires (``superseded_paths``), and every receipt of a forked chain from the fork on (a receipt
+    whose ``supersedes`` link two present receipts both name, whatever their versions, their successors and so
+    on), since which branch is the latest is ambiguous. ``validate`` rejects a fork; this keeps one that reaches
+    a summary anyway from counting. Derived from the entries present, like ``superseded_paths``. A failure among
+    them still blocks (scripts/platform_status.py)."""
+    entries = [entry for entry in entries if isinstance(entry, dict) and isinstance(entry.get("path"), str)]
+    children: dict[str, list[str]] = {}
+    for entry in entries:
+        if isinstance(entry.get("supersedes_link"), str):
+            children.setdefault(entry["supersedes_link"], []).append(entry["path"])
+    ambiguous: set[str] = set()
+    pending = [child for successors in children.values() if len(successors) > 1 for child in successors]
+    while pending:
+        path = pending.pop()
+        if path not in ambiguous:
+            ambiguous.add(path)
+            pending.extend(children.get(path, ()))
+    return superseded_paths(entries) | ambiguous
+
+
 def build_summary(root: Path) -> dict:
     """Aggregate every recorded host receipt by component x platform.
 
@@ -1576,14 +1790,31 @@ def build_summary(root: Path) -> dict:
     cross-reference checks (catalog_revision presence, evidence.json
     registration, id/path coherence): CI runs ``host_receipts.py validate``
     as a separate, earlier gate for that.
+
+    Each entry also carries ``layer_scope`` (``receipt_layer_scope``: the layers its ``layer_refs``
+    names, or ``None`` when unscoped), ``supersedes_link`` (``supersede_link``: the receipt its ``supersedes``
+    validly names) and ``supersedes_path`` (``same_version_ancestor``: the receipt it retires, the nearest one
+    up that chain at the same component version, else ``None``). ``non_current_paths`` over a
+    component's entries is then the set of receipts a present successor retires, plus a forked
+    chain from the fork on: they stay in the counts above but never enter
+    ``independently_reviewed_native_proven_pass_stages``, and ``scripts/platform_status.py`` gives
+    them no weight as acceptance evidence (an agreed earlier generation cannot outlive a dissented
+    successor). A superseded failure still blocks until a later native pass clears it.
     """
     platform_profiles = platform_profile_map(root)
-    components: dict[str, dict] = {}
+    parsed: list[tuple[Path, dict]] = []
     for _host_dir_name, path in _iter_receipt_files(root):
         try:
             receipt = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
         except (OSError, UnicodeError, ValueError, InvalidDecisionIndex):
             continue
+        if isinstance(receipt, dict):
+            parsed.append((path, receipt))
+    by_path = {path.relative_to(root).as_posix(): receipt for path, receipt in parsed}
+    links = {relative: supersede_link(root, receipt) for relative, receipt in by_path.items()}
+    successors = {relative: same_version_ancestor(relative, links, by_path) for relative in by_path}
+    components: dict[str, dict] = {}
+    for path, receipt in parsed:
         component_id = receipt.get("component_id")
         host = receipt.get("host") if isinstance(receipt.get("host"), dict) else {}
         platform_id = host.get("platform_id")
@@ -1598,7 +1829,7 @@ def build_summary(root: Path) -> dict:
             platform_id, {
                 "stages": {}, "latest_observed_at_utc": None, "independently_reviewed_passes": 0,
                 "independently_reviewed_fails": 0, "dissented": 0,
-                "independently_reviewed_native_proven_pass_stages": set(), "receipts": [],
+                "independently_reviewed_native_proven_pass_stages": [], "receipts": [],
             },
         )
         stage_counts = platform_bucket["stages"].setdefault(
@@ -1625,7 +1856,7 @@ def build_summary(root: Path) -> dict:
         component_version = tool_versions.get(component_id)
         qualified_models = [entry for entry in (receipt.get("qualified_models") or [])
                             if isinstance(entry, dict)] if not shape_errors else []
-        platform_bucket["receipts"].append({
+        entry = {
             "path": relative,
             "host_id": host.get("host_id") if isinstance(host.get("host_id"), str) else None,
             "stage": stage,
@@ -1638,22 +1869,26 @@ def build_summary(root: Path) -> dict:
             "platform_identity_ok": platform_identity_ok,
             "shape_ok": not shape_errors,
             "qualified_models": qualified_models,
-        })
+            "layer_scope": receipt_layer_scope(receipt),
+            "supersedes_path": successors.get(relative),
+            "supersedes_link": links.get(relative),
+        }
+        entry["independently_reviewed_native_proven_pass"] = reviewed_native_pass(entry)
+        platform_bucket["receipts"].append(entry)
         if state == "dissent":
             platform_bucket["dissented"] += 1
         if result == "fail" and independently_reviewed:
             platform_bucket["independently_reviewed_fails"] += 1
         if result == "pass" and independently_reviewed:
             platform_bucket["independently_reviewed_passes"] += 1
-            if evidence_class == "native_proven" and isinstance(stage, str):
-                if second_physical_machine and platform_identity_ok and not shape_errors:
-                    platform_bucket["independently_reviewed_native_proven_pass_stages"].add(stage)
 
     for component_bucket in components.values():
+        non_current = non_current_paths(entry for platform_bucket in component_bucket["platforms"].values()
+                                        for entry in platform_bucket["receipts"])
         for platform_bucket in component_bucket["platforms"].values():
-            platform_bucket["independently_reviewed_native_proven_pass_stages"] = sorted(
-                platform_bucket["independently_reviewed_native_proven_pass_stages"]
-            )
+            platform_bucket["independently_reviewed_native_proven_pass_stages"] = sorted({
+                entry["stage"] for entry in platform_bucket["receipts"]
+                if entry["independently_reviewed_native_proven_pass"] and entry["path"] not in non_current})
             platform_bucket["receipts"].sort(key=lambda entry: entry["path"])
 
     return {"generated_at_utc": utc_now(), "components": components}
@@ -1731,6 +1966,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--from-stack-commands", action="store_true",
         help="run the component's plain-string manifests/stack.json commands; for a landscape winner with no "
              "stack entry of its own, those of the one stack id sharing its repository")
+    record_parser.add_argument(
+        "--layer-ref", action="append", default=[], metavar="CATALOG/LAYER_ID",
+        help="A catalogs/landscape layer whose role these commands exercise (repeatable); the receipt then counts "
+             "only for rows in the named layers. Required at --stage use for a component catalogued in several "
+             "layers")
     record_parser.add_argument("--claim", default=None)
     record_parser.add_argument("--limitation", action="append", default=[])
     record_parser.add_argument("--evidence-class", required=True, choices=sorted(EVIDENCE_CLASSES))
