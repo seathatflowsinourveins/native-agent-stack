@@ -714,6 +714,7 @@ class AlpacaExecutionClient(ExecutionClient):
                 average = prior["averages"].get(cum, (notional / cum).quantize(Decimal("0.000001")))
                 result = sink_observation({"client_order_id": cid, "id": prior["id"], "status": status,
                     "filled_qty": str(cum), "filled_avg_price": str(average), "updated_at_ns": stamp,
+                    "event_at_ns": stamp,  # Alpaca FILL transaction_time, the execution's own time.
                     "event": "fill" if status == "filled" else "partial_fill",
                     "execution_id": execution["trade_id"], "event_qty": str(execution["qty"]),
                     "event_price": str(execution["price"])})

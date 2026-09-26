@@ -63,7 +63,12 @@ def execution_from_observation(row):
     values = [row.get(key) for key in ("execution_id", "event_qty", "event_price")]
     if any(value in (None, "") for value in values):
         return None
-    return {"execution_id": str(values[0]), "qty": str(values[1]), "price": str(values[2])}
+    execution = {"execution_id": str(values[0]), "qty": str(values[1]), "price": str(values[2])}
+    # trade_updates.timestamp and FILL transaction_time describe the execution,
+    # independently of the order's updated_at. Keep the native nanoseconds.
+    if row.get("event_at_ns") is not None:
+        execution["timestamp_ns"] = row["event_at_ns"]
+    return execution
 
 
 def _canonical(value):
@@ -423,8 +428,12 @@ class Ledger:
                 CREATE TABLE IF NOT EXISTS trials(trial_id TEXT PRIMARY KEY, started_at REAL NOT NULL);
                 CREATE TABLE IF NOT EXISTS executions(client_id TEXT NOT NULL REFERENCES intents(client_id),
                     cum_qty TEXT NOT NULL, qty TEXT NOT NULL, price TEXT NOT NULL, execution_id TEXT NOT NULL,
-                    at REAL, PRIMARY KEY(client_id, cum_qty));
+                    at REAL, at_ns INTEGER, PRIMARY KEY(client_id, cum_qty));
             """)
+            # Old ledgers retain their best known seconds; new observations can
+            # preserve Alpaca's full per-execution timestamp without float loss.
+            if "at_ns" not in {r["name"] for r in self.db.execute("PRAGMA table_info(executions)")}:
+                self.db.execute("ALTER TABLE executions ADD COLUMN at_ns INTEGER")
             frozen = self.limits.frozen_json()
             with self._transaction():
                 previous = self._get("limits")
@@ -951,7 +960,7 @@ class Ledger:
                         evidence_required="submission_http_refusal_then_client_id_404", **extra)
             return True
 
-    def _record_execution(self, old, cum_qty, execution_id, qty, price, at):
+    def _record_execution(self, old, cum_qty, execution_id, qty, price, at, at_ns):
         """Durably record one broker execution of ``old`` (the cumulative quantity after
         it is its key, as for FILL activities). A repeat of a recorded execution is a
         no-op; the same key or id with other values, an overlap, or a price beyond the
@@ -972,56 +981,55 @@ class Ledger:
                 raise SafetyError("execution_overlap_requires_reconciliation")
         if (old.side == "buy" and price > old.limit_price) or (old.side == "sell" and price < old.limit_price):
             raise SafetyError("incremental_fill_violates_limit")
-        self.db.execute("INSERT INTO executions VALUES (?,?,?,?,?,?)",
-                        (old.client_id, key, _canonical(qty), _canonical(price), execution_id, at))
+        self.db.execute("INSERT INTO executions(client_id,cum_qty,qty,price,execution_id,at,at_ns) "
+                        "VALUES (?,?,?,?,?,?,?)",
+                        (old.client_id, key, _canonical(qty), _canonical(price), execution_id, at, at_ns))
         self._event("execution_recorded", old.client_id, execution_id=execution_id, cum_qty=cum_qty,
-                    qty=qty, price=price, at=at)
+                    qty=qty, price=price, at=at, at_ns=at_ns)
         return True
 
     def _execution_fills(self, client_id, low, high):
-        """Exact (quantity, notional) fills tiling (low, high], or None when
-        coverage is incomplete. Keep execution boundaries for gross-loss accounting."""
-        rows = sorted((D(r["cum_qty"]), D(r["qty"]), D(r["price"])) for r in self.db.execute(
-            "SELECT cum_qty, qty, price FROM executions WHERE client_id=?", (client_id,)))
+        """Exact (quantity, notional, time, cumulative quantity) fills tiling
+        (low, high], or None when coverage is incomplete."""
+        rows = sorted((D(r["cum_qty"]), D(r["qty"]), D(r["price"]),
+                       D(r["at_ns"]) if r["at_ns"] is not None else
+                       D(str(r["at"])) * 1_000_000_000 if r["at"] is not None else None)
+                      for r in self.db.execute(
+            "SELECT cum_qty, qty, price, at, at_ns FROM executions WHERE client_id=?", (client_id,)))
         fills, previous = [], low
-        for cum, qty, price in rows:
+        for cum, qty, price, at in rows:
             if cum <= low or cum > high:
                 continue
             if cum - qty != previous:
                 return None
-            fills.append((qty, qty * price))
+            fills.append((qty, qty * price, at, cum))
             previous = cum
         return fills if previous == high else None
 
     def _executions_notional(self, client_id, low, high):
         fills = self._execution_fills(client_id, low, high)
-        return sum((notional for _, notional in fills), ZERO) if fills is not None else None
+        return sum((notional for _, notional, _, _ in fills), ZERO) if fills is not None else None
 
     def _reconcile_execution_accounting(self, client_id, filled):
         """Replace provisional money once Alpaca's exact qty/price executions cover
-        the observed quantity. Replay the durable booking journal so a late buy also
-        corrects the basis of later sales; quantities and broker averages stay intact.
+        the observed quantity. Replay covered fills in execution order per symbol,
+        so a late buy corrects the basis of later sales. Untimed executions and
+        uncovered provisional bookings retain their journal positions.
         Runs inside record_order's transaction, including across a process restart."""
-        key = "execution_accounting:" + client_id
+        # Re-derive once even if the earlier observation-order replay completed.
+        key = "execution_accounting:v2:" + client_id
         if (not filled or self._get(key) == _canonical(filled)
                 or self._executions_notional(client_id, ZERO, filled) is None):
             return False
         self._set(key, _canonical(filled))
-        bookings = [json.loads(row[0]) for row in self.db.execute(
-            "SELECT payload FROM events WHERE kind='order_observed' AND client_id=?", (client_id,))]
-        if not any(D(row["delta_qty"]) and row.get("booking") != "executions" for row in bookings):
-            return False
-
-        positions = {}
-        cash = realized = loss = ZERO
+        journal, timed = [], {}
         for row in self.db.execute(
-                "SELECT e.kind,e.client_id,e.payload,i.symbol,i.side FROM events e "
+                "SELECT e.id,e.kind,e.client_id,e.payload,i.symbol,i.side FROM events e "
                 "LEFT JOIN intents i ON i.client_id=e.client_id "
                 "WHERE e.kind IN ('order_observed','position_adopted') ORDER BY e.id"):
             data = json.loads(row["payload"])
             if row["kind"] == "position_adopted":
-                qty = D(data["qty"])
-                positions[data["symbol"]] = (qty, qty * D(data["avg_price"]))
+                journal.append((row, data, None))
                 continue
             delta = D(data["delta_qty"])
             if not delta:
@@ -1029,20 +1037,39 @@ class Ledger:
             high = D(data["filled_qty"])
             fills = self._execution_fills(row["client_id"], high - delta, high)
             if fills is None:
-                fills = [(delta, D(data["delta_notional"]))]
+                fills = [(delta, D(data["delta_notional"]), None, high)]
+            for delta, notional, at, cum in fills:
+                fill = (at, row["id"], cum, row, delta, notional)
+                journal.append((row, data, fill))
+                if at is not None:
+                    timed.setdefault(row["symbol"], []).append(fill)
+
+        # Sort only the timed execution slots for each symbol. Adoption and
+        # uncovered bookings remain at their event positions; they have no
+        # execution chronology we can infer. Event id, then cum_qty, break ties.
+        ordered = {symbol: iter(sorted(fills, key=lambda fill: fill[:3])) for symbol, fills in timed.items()}
+        positions = {}
+        cash = realized = loss = ZERO
+        for row, data, fill in journal:
+            if fill is None:
+                qty = D(data["qty"])
+                positions[data["symbol"]] = (qty, qty * D(data["avg_price"]))
+                continue
+            if fill[0] is not None:
+                fill = next(ordered[row["symbol"]])
+            _, _, _, row, delta, notional = fill
             qty, cost = positions.get(row["symbol"], (ZERO, ZERO))
             # QuantConnect/Lean 985ef30: SecurityPortfolioModel.cs computes P&L
             # per closing fill; TradeStatistics.cs accumulates losses separately.
-            for delta, notional in fills:
-                if row["side"] == "buy":
-                    qty, cost, cash = qty + delta, cost + notional, cash - notional
-                else:
-                    if delta > qty:
-                        raise SafetyError("accounting_replay_would_make_short_position")
-                    basis = cost / qty * delta
-                    pnl = notional - basis
-                    qty, cost, cash = qty - delta, cost - basis, cash + notional
-                    realized, loss = realized + pnl, loss + max(ZERO, -pnl)
+            if row["side"] == "buy":
+                qty, cost, cash = qty + delta, cost + notional, cash - notional
+            else:
+                if delta > qty:
+                    raise SafetyError("accounting_replay_would_make_short_position")
+                basis = cost / qty * delta
+                pnl = notional - basis
+                qty, cost, cash = qty - delta, cost - basis, cash + notional
+                realized, loss = realized + pnl, loss + max(ZERO, -pnl)
             positions[row["symbol"]] = (qty, cost if qty else ZERO)
 
         changed = False
@@ -1078,6 +1105,7 @@ class Ledger:
         filled = decimal(cumulative_qty, zero=True)
         average = decimal(average_price) if filled else None
         at = instant(timestamp) if timestamp is not None else None
+        execution_at, execution_at_ns = at, None
         if execution is not None:
             if (not isinstance(execution, dict) or type(execution.get("execution_id")) is not str
                     or not EXECUTION_ID.fullmatch(execution["execution_id"])):
@@ -1085,6 +1113,11 @@ class Ledger:
             execution_qty, execution_price = decimal(execution.get("qty")), decimal(execution.get("price"))
             if execution_qty > filled:
                 raise SafetyError("execution_exceeds_cumulative_quantity")
+            execution_at_ns = execution.get("timestamp_ns")
+            if execution_at_ns is not None:
+                if type(execution_at_ns) is not int or not 0 < execution_at_ns <= 2**63 - 1:
+                    raise SafetyError("invalid_execution_timestamp")
+                execution_at = execution_at_ns / 1_000_000_000
         with self._transaction():
             row = self.db.execute("SELECT * FROM intents WHERE client_id=?", (client_id,)).fetchone()
             if row is None:
@@ -1101,7 +1134,8 @@ class Ledger:
             reconciled = False
             if execution is not None:
                 # Recorded even when a REST read already advanced the cumulative quantity.
-                self._record_execution(old, filled, execution["execution_id"], execution_qty, execution_price, at)
+                self._record_execution(old, filled, execution["execution_id"], execution_qty, execution_price,
+                                       execution_at, execution_at_ns)
                 if filled <= old.filled_qty:
                     reconciled = self._reconcile_execution_accounting(client_id, old.filled_qty)
                     if reconciled:

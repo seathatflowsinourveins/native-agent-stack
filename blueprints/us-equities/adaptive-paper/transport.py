@@ -43,7 +43,7 @@ ACTIVITY_ID = re.compile(r"[0-9]{1,32}::([0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0
 ACTIVITY_PAGE_SIZE = 100
 # trade_updates events that carry one execution's own qty, price and execution_id.
 EXECUTION_EVENTS = frozenset({"fill", "partial_fill"})
-EXECUTION_FIELDS = ("event", "execution_id", "event_qty", "event_price")
+EXECUTION_FIELDS = ("event", "execution_id", "event_qty", "event_price", "event_at_ns")
 # The pre-submission boundary (blueprints/us-equities/order-contract). Loaded by
 # path at import, so a missing or broken contract fails transport import closed.
 ORDER_CONTRACT_PATH = Path(__file__).resolve().parent.parent / "order-contract" / "order_contract.py"
@@ -1290,6 +1290,10 @@ class AlpacaPaperTransport:
                                         ("event_qty", "qty"), ("event_price", "price")):
                         if payload.get(source) is not None:
                             order[key] = str(payload[source])
+                    # Alpaca documents this as the individual fill time, distinct
+                    # from order.updated_at (docs/websocket-streaming#common-events).
+                    if order.get("event") in EXECUTION_EVENTS and payload.get("timestamp") is not None:
+                        order["event_at_ns"] = timestamp_ns(payload["timestamp"])
                     self._stream_seen.add(order["client_order_id"])
                     self._pending_stream.pop(order["client_order_id"], None)
                     order = await self._observe(order)

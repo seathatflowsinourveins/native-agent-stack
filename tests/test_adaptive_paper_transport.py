@@ -847,6 +847,30 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("execution_id", self.port._observed["trial-1"])
         self.assertEqual(self.port.health["reasons"], [])
 
+    async def test_stream_execution_carries_its_own_timestamp_to_the_ledger(self):
+        from safety import execution_from_observation
+
+        self.port._on_order = lambda row: None
+        # Alpaca's trade_updates timestamp describes this execution; the nested
+        # order.updated_at can be later (docs/websocket-streaming, Common Events).
+        for event in ("partial_fill", "fill"):
+            self.port._enqueue("order", {"event": event, "execution_id": event, "qty": "1", "price": "100",
+                "timestamp": "2026-09-21T15:00:01.000000001Z",
+                "order": order(client_order_id=event, qty="2" if event == "partial_fill" else "1",
+                               filled_qty="1", filled_avg_price="100",
+                               status="partially_filled" if event == "partial_fill" else "filled",
+                               updated_at="2026-09-21T15:00:02Z")})
+        await self._drain()
+        self.assertEqual(len(self.observations), 2)
+        for row in self.observations:
+            with self.subTest(event=row["event"]):
+                execution = execution_from_observation(row)
+                self.assertEqual(execution.get("timestamp_ns"), t.timestamp_ns("2026-09-21T15:00:01.000000001Z"))
+                self.assertEqual(row["updated_at_ns"], t.timestamp_ns("2026-09-21T15:00:02Z"))
+                self.assertEqual((execution["execution_id"], execution["qty"], execution["price"]),
+                                 (row["event"], "1", "100"))
+        self.assertEqual(self.port.health["reasons"], [])
+
     def fill_activity(self, cum, qty, price="5.61", *, index=0, order_id=ID, **changes):
         row = {"activity_type": "FILL", "id": "20260924150021%03d::%s" % (index, __import__("uuid").uuid4()),
                "cum_qty": str(cum), "leaves_qty": "0", "order_id": order_id, "order_status": "partially_filled",
