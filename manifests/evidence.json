@@ -9917,8 +9917,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "6c94bd6d4eaefeab854b76f715dba5b7efdb13678a950ebf740a4e66a1e13312",
-      "bytes": 16994
+      "sha256": "33e862565fd0450b92445cda381465c9da88dc742d936c938f4ced2fa3037639",
+      "bytes": 23391
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -10092,8 +10092,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "1534ffde0c013ee2761f381ce3130d5aefb02709c3ce1696041d1621f9bb5010",
-      "bytes": 67221
+      "sha256": "0e65bfc4589526cd480663e6aaff919532e4fc09a254268cb9653ae6be36d8fd",
+      "bytes": 69777
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -10369,6 +10369,11 @@
       "path": "docs/decisions/2026-09-24-secret-storage.md",
       "sha256": "fce32c03fe3dde94c76ea874e5e2327409f73eca65b51ce1297382416a350137",
       "bytes": 14083
+    },
+    {
+      "path": "docs/decisions/2026-09-25-live-go-authorship-control.md",
+      "sha256": "6aa74ccf8d79a7802ba1d603765aff2958f393c9243be18309d90881818db5f5",
+      "bytes": 11864
     },
     {
       "path": "docs/direct-results.md",
@@ -31122,8 +31127,8 @@
     },
     {
       "path": "scripts/trading_gates.py",
-      "sha256": "06aadfbca9ee50371aac6e620fcda087f5843508afb3b81124b053673875a152",
-      "bytes": 24948
+      "sha256": "9781ed54be63cef127a9bb2e99f9e0b24d0aea09b048cde5402f8a151bcde70f",
+      "bytes": 34570
     },
     {
       "path": "scripts/validate.py",
@@ -31802,8 +31807,8 @@
     },
     {
       "path": "tests/test_trading_gates.py",
-      "sha256": "10b1ce5b0cec4d3e68d792c83a9ad2b4fcbb70863305b0496961650deb34214f",
-      "bytes": 35512
+      "sha256": "36d822afc6da90a0976f15b36a01706a3ba1512c2ca870e8f563ece629e52d70",
+      "bytes": 64398
     },
     {
       "path": "tests/test_trading_gates_bindings.py",

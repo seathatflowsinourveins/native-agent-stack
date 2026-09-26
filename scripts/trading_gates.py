@@ -19,9 +19,31 @@ contents) and ``all_of`` (every listed
 ``equals``/``array_contains_id``/``greater_than``/``source_matches``
 sub-condition holds against the same receipt; no nesting and no ``exists``).
 
+Evidence class ``user_decision`` records that the user's own decision
+established a gate. It is valid only for a gate owned by ``user-decision`` whose
+flip_condition is null; every other evidence class keeps its earlier rules.
+
+Authorship: the document's top-level ``authorship`` object maps a gate id to a
+detached SSH signature control {method "ssh-keygen -Y verify", signature_path,
+allowed_signers_path, principal, namespace, note}. Only a gate owned by
+``user-decision`` with a null flip_condition may have one. Such a gate holds
+only when its receipt is non-empty and ``ssh-keygen -Y verify -f
+<allowed_signers_path> -I <principal> -n <namespace> -s <signature_path>``
+accepts the receipt's exact bytes. It fails closed: an absent or empty receipt,
+signature or allowed_signers file, a path that resolves outside the tree or not
+at all (a symlink loop), no ssh-keygen, a timeout or any non-zero exit means the
+gate does not hold, so it cannot count as established. The ``live-go`` gate must
+have a control, and once recorded ``established`` it must carry evidence class
+``user_decision``. The checker only verifies; it never creates a key, a
+signature, an allowed_signers entry or a receipt.
+
 Rung readiness is arithmetic: a rung is ready when every ``required`` gate of
-that rung and of every earlier rung is ``established``. Exit status 1 on any
-validation error or on an established gate whose evidence is missing or false.
+that rung and of every earlier rung is ``established`` and its condition holds
+now. An established gate whose receipt is missing or fails its condition (or,
+for a gate with an authorship control, whose signature does not verify) is
+listed in ``blocking`` and keeps its rung and every later rung not ready. Exit
+status 1 on any validation error or on an established gate whose evidence is
+missing or false.
 
 Source bindings are report-only. For a gate named in ``SOURCE_BINDINGS``, the
 sha256 values its receipt records for the source files it ran are compared with
@@ -36,14 +58,16 @@ import argparse
 import hashlib
 import json
 import re
+import shutil
+import subprocess
 import sys
 from decimal import Decimal, InvalidOperation
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 GATES = "catalogs/us-equities/gates-20260922.json"
 STATUSES = {"established", "blocked", "not_established", "paid_entitlement", "user_decision"}
 OWNERS = {"this-effort", "peer:sota-workflow-resolution", "user-decision"}
-EVIDENCE = {"native_proven", "local_integration", "synthetic", "source_review", "none"}
+EVIDENCE = {"native_proven", "local_integration", "synthetic", "source_review", "user_decision", "none"}
 CONDITIONS = {"exists", "equals", "array_contains_id", "greater_than", "source_matches", "all_of"}
 # Sub-conditions an all_of may list: conditions judged against one parsed receipt.
 COMPOUND_MEMBERS = {"equals", "array_contains_id", "greater_than", "source_matches"}
@@ -56,6 +80,14 @@ LAYERS = {
 }
 GATE_FIELDS = {"id", "rung", "layer", "title", "status", "owner", "evidence_class", "required",
                "receipt_path", "flip_condition", "note"}
+# The explicit live go never counts on presence alone: the catalog must name
+# its authorship control, and it holds only when that signature verifies.
+LIVE_GO = "live-go"
+AUTHORSHIP_METHOD = "ssh-keygen -Y verify"
+AUTHORSHIP_FIELDS = {"method", "signature_path", "allowed_signers_path", "principal", "namespace", "note"}
+# A signer principal or signature namespace: one printable token that cannot read as an option.
+SIGNER_TOKEN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._@+-]{0,127}")
+SSH_KEYGEN_TIMEOUT_SECONDS = 30
 
 
 class GateError(Exception):
@@ -127,9 +159,15 @@ def source_matches_holds(root: Path, document, condition: dict) -> tuple[bool, s
     if not (isinstance(recorded_sha, str) and SHA256_HEX.fullmatch(recorded_sha)):
         return False, f"source_matches: {condition['sha256_pointer']} is not a lowercase sha256 hex digest"
     try:
-        resolved = (root / source_path).resolve()
+        resolved = (root / source_path).resolve(strict=True)
+    except FileNotFoundError:
+        return False, f"source_matches: source file missing: {source_path}"
+    except (OSError, RuntimeError):
+        # A symlink loop: Python 3.12 and earlier raise RuntimeError, 3.13+ OSError.
+        return False, f"source_matches: {source_path} cannot be resolved (a symlink loop or an unreadable path)"
+    try:
         resolved.relative_to(root.resolve())
-    except (OSError, ValueError):
+    except ValueError:
         return False, f"source_matches: {source_path} resolves outside the tree"
     if not resolved.is_file():
         return False, f"source_matches: source file missing: {source_path}"
@@ -182,7 +220,74 @@ def pointer_condition_holds(root: Path, document, condition: dict) -> tuple[bool
     return False, "unknown condition"
 
 
-def condition_holds(root: Path, gate: dict) -> tuple[bool, str]:
+def authorship_holds(root: Path, gate: dict, control: dict) -> tuple[bool, str]:
+    """Fail closed: the gate's receipt counts only when ``ssh-keygen -Y verify``
+    accepts a detached SSH signature over its exact bytes, made in the named
+    namespace by a key that the in-tree allowed_signers file lists for the named
+    principal. An absent, empty, out-of-tree or unresolvable file (a symlink
+    loop), no ssh-keygen, a timeout or a non-zero exit is a refusal."""
+    base = root.resolve()
+    files: dict[str, Path] = {}
+    for label, relative in (("receipt", gate["receipt_path"]),
+                            ("allowed_signers file", control["allowed_signers_path"]),
+                            ("signature", control["signature_path"])):
+        try:
+            resolved = (root / relative).resolve(strict=True)
+        except FileNotFoundError:
+            return False, f"authorship: {label} missing: {relative}"
+        except (OSError, RuntimeError):
+            # A symlink loop: Python 3.12 and earlier raise RuntimeError, 3.13+ OSError.
+            return False, f"authorship: {label} {relative} cannot be resolved (a symlink loop or an unreadable path)"
+        try:
+            inside = resolved.relative_to(base)
+        except ValueError:
+            return False, f"authorship: {label} {relative} resolves outside the tree"
+        if not resolved.is_file():
+            return False, f"authorship: {label} missing: {relative}"
+        if resolved.stat().st_size == 0:
+            return False, f"authorship: {label} empty: {relative}"
+        files[label] = inside
+    keygen = shutil.which("ssh-keygen")
+    if keygen is None:
+        return False, "authorship: ssh-keygen not found, so the signature cannot be verified"
+    # Tree-relative paths with the tree as working directory keep host paths
+    # out of ssh-keygen's messages; the "./" prefix keeps a path from reading as an option.
+    command = [keygen, "-Y", "verify", "-f", f"./{files['allowed_signers file'].as_posix()}",
+               "-I", control["principal"], "-n", control["namespace"], "-s", f"./{files['signature'].as_posix()}"]
+    try:
+        completed = subprocess.run(command, input=(base / files["receipt"]).read_bytes(), capture_output=True,
+                                   cwd=base, timeout=SSH_KEYGEN_TIMEOUT_SECONDS, check=False)
+    except (OSError, subprocess.SubprocessError) as error:
+        return False, f"authorship: ssh-keygen -Y verify did not complete: {error.__class__.__name__}"
+    lines: list[str] = []
+    for stream in (completed.stdout, completed.stderr):
+        text = stream.decode("utf-8", "replace")
+        if str(base) != "/":
+            text = text.replace(str(base), ".")
+        lines.extend(line.strip() for line in text.splitlines() if line.strip())
+    said = "; ".join(lines)[:300]
+    if completed.returncode != 0:
+        return False, (f"authorship: {control['signature_path']} does not verify for principal "
+                       f"{control['principal']} in namespace {control['namespace']} against "
+                       f"{control['allowed_signers_path']} (ssh-keygen exit {completed.returncode}: {said})")
+    return True, f"authorship: {said or 'ssh-keygen -Y verify exit 0'}"
+
+
+def condition_holds(root: Path, gate: dict, authorship: dict | None = None) -> tuple[bool, str]:
+    """The gate's receipt satisfies its flip condition and, when the gate has an
+    authorship control, its detached signature verifies. live-go never holds on
+    presence alone, even for a caller that passes no control."""
+    holds, detail = receipt_holds(root, gate)
+    if not holds:
+        return holds, detail
+    if authorship is not None:
+        return authorship_holds(root, gate, authorship)
+    if gate["id"] == LIVE_GO:
+        return False, "authorship: no control named in the catalog; live-go never counts on presence alone"
+    return holds, detail
+
+
+def receipt_holds(root: Path, gate: dict) -> tuple[bool, str]:
     receipt = root / gate["receipt_path"]
     if not receipt.is_file():
         return False, "receipt missing"
@@ -398,17 +503,60 @@ def validate_document(document: dict) -> list[dict]:
                 validate_pointer_condition(gate["id"], condition, CONDITIONS - {"all_of"})
         if gate["status"] == "established":
             require(gate["evidence_class"] != "none", f"{gate['id']}: an established gate needs an evidence class")
+        if gate["evidence_class"] == "user_decision":
+            require(gate["owner"] == "user-decision" and condition is None,
+                    f"{gate['id']}: evidence_class user_decision is valid only for a gate owned by user-decision "
+                    "with a null flip_condition")
+    validate_authorship(document, gates)
     return gates
+
+
+def validate_authorship(document: dict, gates: list[dict]) -> None:
+    controls = document.get("authorship", {})
+    require(isinstance(controls, dict), "authorship must be an object keyed by gate id")
+    by_id = {gate["id"]: gate for gate in gates}
+    for gate_id, control in controls.items():
+        gate = by_id.get(gate_id)
+        require(gate is not None, f"authorship names an unknown gate: {gate_id!r}")
+        require(gate["owner"] == "user-decision" and gate["flip_condition"] is None,
+                f"{gate_id}: an authorship control is valid only for a gate owned by user-decision "
+                "with a null flip_condition")
+        require(isinstance(control, dict) and set(control) == AUTHORSHIP_FIELDS,
+                f"{gate_id}: authorship fields must be exactly {sorted(AUTHORSHIP_FIELDS)}")
+        require(control["method"] == AUTHORSHIP_METHOD, f"{gate_id}: authorship.method must be {AUTHORSHIP_METHOD!r}")
+        for key in ("signature_path", "allowed_signers_path"):
+            require(in_tree_path(control[key]), f"{gate_id}: authorship.{key} must be a relative in-tree path")
+        paths = {str(PurePosixPath(path)) for path in
+                 (gate["receipt_path"], control["signature_path"], control["allowed_signers_path"])}
+        require(len(paths) == 3, f"{gate_id}: the receipt, signature and allowed_signers file must be three different paths")
+        for key in ("principal", "namespace"):
+            require(isinstance(control[key], str) and SIGNER_TOKEN.fullmatch(control[key]) is not None,
+                    f"{gate_id}: authorship.{key} must be one token of letters, digits and . _ @ + - "
+                    "that starts with a letter or digit")
+        require(isinstance(control["note"], str), f"{gate_id}: authorship.note must be a string")
+        if gate["status"] == "established":
+            require(gate["evidence_class"] == "user_decision",
+                    f"{gate_id}: an established gate with an authorship control needs evidence_class user_decision")
+    if LIVE_GO in by_id:
+        require(LIVE_GO in controls,
+                f"{LIVE_GO}: the catalog must name its authorship control; live-go never counts on presence alone")
 
 
 def check(root: Path, path: Path) -> dict:
     document = load_json(path)
     gates = validate_document(document)
+    controls = document.get("authorship", {})
     errors: list[str] = []
     flip_candidates: list[dict] = []
     rows: list[dict] = []
+    authorship: dict[str, dict] = {}
+    holding: set[str] = set()
     for gate in gates:
-        holds, detail = condition_holds(root, gate)
+        holds, detail = condition_holds(root, gate, controls.get(gate["id"]))
+        if holds:
+            holding.add(gate["id"])
+        if gate["id"] in controls:
+            authorship[gate["id"]] = {"verified": holds, "detail": detail}
         row = {"id": gate["id"], "rung": gate["rung"], "status": gate["status"], "required": gate["required"],
                "owner": gate["owner"], "evidence_class": gate["evidence_class"], "receipt_path": gate["receipt_path"],
                "condition_holds": holds, "detail": detail}
@@ -422,7 +570,11 @@ def check(root: Path, path: Path) -> dict:
     rungs = document["rungs"]
     for index, rung in enumerate(rungs):
         scope = set(rungs[: index + 1])
-        pending = [g["id"] for g in gates if g["required"] and g["rung"] in scope and g["status"] != "established"]
+        # A required gate counts only when it is recorded established AND its
+        # condition holds now: an established gate whose receipt is missing or
+        # fails (or whose signature does not verify) keeps blocking.
+        pending = [g["id"] for g in gates if g["required"] and g["rung"] in scope
+                   and not (g["status"] == "established" and g["id"] in holding)]
         ready[rung] = not pending
         blocking[rung] = pending
     counts: dict[str, dict[str, int]] = {}
@@ -443,11 +595,13 @@ def check(root: Path, path: Path) -> dict:
         "rung_ready": ready,
         "blocking": blocking,
         "flip_candidates": flip_candidates,
+        "authorship": authorship,
         "errors": errors,
         "warnings": warnings,
         "source_bindings": source_bindings,
         "rows": rows,
-        "scope": "Arithmetic over recorded receipts; no reviewer or model opinion; nothing is flipped by this checker.",
+        "scope": ("Arithmetic over recorded receipts plus ssh-keygen -Y verify for gates with an authorship "
+                  "control; no reviewer or model opinion; nothing is flipped or written by this checker."),
     }
 
 
@@ -466,7 +620,9 @@ def main(argv=None) -> int:
     if args.json:
         print(json.dumps(result, indent=2, sort_keys=True))
     else:
-        print(json.dumps({key: result[key] for key in ("status", "gates", "counts", "rung_ready", "blocking", "flip_candidates", "errors", "warnings", "source_bindings")}, indent=2, sort_keys=True))
+        print(json.dumps({key: result[key] for key in ("status", "gates", "counts", "rung_ready", "blocking", "flip_candidates",
+                                                      "authorship", "errors", "warnings", "source_bindings")},
+                         indent=2, sort_keys=True))
     return 0 if result["status"] == "passed" else 1
 
 
