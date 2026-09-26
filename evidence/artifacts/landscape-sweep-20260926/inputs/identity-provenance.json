@@ -1,0 +1,110 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "identity-provenance",
+ "title": "Identity, provenance and lineage",
+ "requirement": "Acquire licensed, source-identifiable US-equity observations; preserve feed, timestamps, identity and corporate actions; produce exact reproducible analytical snapshots and reject data whose historical availability or eligibility is unknown.",
+ "research_status": "comparison_required",
+ "next_action": "Freeze the intended universe/history and rights; obtain auditable delisting, ticker-reuse, action/currency and publication-revision evidence before accepting an as-known research dataset.",
+ "requirement_sha256": "470a282980e83bf48422965f735db212330fe93bc511cd48149830d494029184",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "data-dvc",
+   "repository": "https://github.com/treeverse/dvc",
+   "pin": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
+   "evidence_class": "source_review",
+   "platform_status": {
+    "linux-wsl2-x86_64": "not_established",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "cosign",
+   "repository": "https://github.com/sigstore/cosign",
+   "disposition": "out_of_scope"
+  },
+  {
+   "name": "data-kafka",
+   "repository": "https://github.com/apache/kafka",
+   "disposition": "conditional"
+  },
+  {
+   "name": "foundation-socraticode",
+   "repository": "https://github.com/giancarloerra/SocratiCode",
+   "disposition": "out_of_scope"
+  },
+  {
+   "name": "data-arcticdb",
+   "repository": "https://github.com/man-group/ArcticDB",
+   "disposition": "conditional"
+  },
+  {
+   "name": "data-mlflow",
+   "repository": "https://github.com/mlflow/mlflow",
+   "disposition": "overlap"
+  },
+  {
+   "name": "data-iceberg",
+   "repository": "https://github.com/apache/iceberg",
+   "disposition": "conditional"
+  },
+  {
+   "name": "data-openlineage",
+   "repository": "https://github.com/OpenLineage/OpenLineage",
+   "disposition": "conditional"
+  }
+ ],
+ "components_vs_upstream_20260926": [],
+ "open_gaps": [
+  "DVC has source-review support only: no retained native add, restore and reproduction run demonstrates this repository's equity snapshot contract.",
+  "No candidate evidence establishes the complete requirement: licensed acquisition, permanent security identity, historical universe eligibility, corporate-action completeness and original publication/revision availability remain separate obligations.",
+  "The identity-readiness receipt demonstrates bounded observation-time selection and quarantine through project-local adapters. It does not qualify DVC or another candidate as the executing implementation.",
+  "Content identity, signer identity, storage commit time and code-index freshness cannot substitute for original historical information availability.",
+  "No executed comparison measures snapshot restoration fidelity, correction retention, lineage completeness, recovery, concurrency, storage cost or latency across the candidate stores."
+ ],
+ "overturn_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/MarquezProject/marquez",
+   "https://github.com/fivetran/great_expectations",
+   "https://github.com/delta-io/delta",
+   "https://github.com/projectnessie/nessie"
+  ]
+ },
+ "known_repositories": [
+  "alpacahq/alpaca-py",
+  "apache/iceber",
+  "apache/kafka",
+  "blackfalcondata-org/delisted-stocks-lis",
+  "clickhouse/clickhouse",
+  "databento/databento-python",
+  "delta-io/delta",
+  "dgunning/edgartools",
+  "duckdb/duckdb",
+  "fivetran/great_expectations",
+  "fja05680/sp500",
+  "gerrymanoim/exchange_calendars",
+  "giancarloerra/socraticode",
+  "https://www.quantconnect.com/data/quantconnect-us-equity-security-master (dataset, not a github repository)",
+  "jadchaar/sec-edgar-downloader",
+  "man-group/arcticdb",
+  "marquezproject/marquez",
+  "massive-com/client-python",
+  "mlflow/mlflow",
+  "openbb-finance/openbb",
+  "openlineage/openlineage",
+  "pandas-dev/pandas",
+  "pola-rs/polars",
+  "projectnessie/nessie",
+  "questdb/questdb",
+  "ranaroussi/yfinance",
+  "sigstore/cosign",
+  "treeverse/dvc",
+  "treeverse/lakefs",
+  "unionai-oss/pandera"
+ ],
+ "seeded_candidates_20260926": []
+}

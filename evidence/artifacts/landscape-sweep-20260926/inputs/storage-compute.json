@@ -1,0 +1,120 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "storage-compute",
+ "title": "Storage and compute",
+ "requirement": "Acquire licensed, source-identifiable US-equity observations; preserve feed, timestamps, identity and corporate actions; produce exact reproducible analytical snapshots and reject data whose historical availability or eligibility is unknown.",
+ "research_status": "comparison_required",
+ "next_action": "Freeze the intended universe/history and rights; obtain auditable delisting, ticker-reuse, action/currency and publication-revision evidence before accepting an as-known research dataset.",
+ "requirement_sha256": "470a282980e83bf48422965f735db212330fe93bc511cd48149830d494029184",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "data-duckdb",
+   "repository": "https://github.com/duckdb/duckdb",
+   "pin": "v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "data-dlt",
+   "repository": "https://github.com/dlt-hub/dlt",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "data-iceberg",
+   "repository": "https://github.com/apache/iceberg",
+   "disposition": "conditional"
+  },
+  {
+   "name": "ray-serve",
+   "repository": "https://github.com/ray-project/ray",
+   "disposition": "conditional"
+  },
+  {
+   "name": "QuestDB",
+   "repository": "https://github.com/questdb/questdb",
+   "disposition": "conditional"
+  },
+  {
+   "name": "ClickHouse",
+   "repository": "https://github.com/ClickHouse/ClickHouse",
+   "disposition": "conditional"
+  },
+  {
+   "name": "data-arrow",
+   "repository": "https://github.com/apache/arrow",
+   "disposition": "overlap"
+  },
+  {
+   "name": "Pandera",
+   "repository": "https://github.com/unionai-oss/pandera",
+   "disposition": "conditional"
+  },
+  {
+   "name": "foundation-toon",
+   "repository": "https://github.com/toon-format/toon",
+   "disposition": "out_of_scope"
+  },
+  {
+   "name": "data-feast",
+   "repository": "https://github.com/feast-dev/feast",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "bytebase/dbhub",
+   "repository": "https://github.com/bytebase/dbhub",
+   "disposition": "unqualified"
+  }
+ ],
+ "components_vs_upstream_20260926": [],
+ "open_gaps": [
+  "DuckDB's retained runs cover a bundled LEAN historical simulation (6 order events) and artificial SEC-shaped fixtures. Neither is licensed US-equity market-data ingestion.",
+  "The live SEC acquisition failed with http_403 (financial-data receipt: parquet_datasets 0, source_payloads 0, ready_financial_packets 0). No live DuckDB/Parquet financial dataset exists in the evidence I read.",
+  "No evidence I read shows the store rejecting data whose historical availability or eligibility is unknown. The financial-data receipt records historical_point_in_time_reconstruction false.",
+  "No throughput, concurrency or multi-writer measurement exists for DuckDB or any server or lake alternative (QuestDB, ClickHouse, Iceberg).",
+  "The Pandera promotion gate has retained fail-closed outputs only on synthetic 4-row CSV fixtures, run on 2026-09-22. According to blueprints/us-equities/data/README.md lines 119-124, no production bars/universe ingest produces a real snapshot yet."
+ ],
+ "overturn_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/duckdb/ducklake",
+   "https://github.com/fivetran/great_expectations",
+   "https://github.com/xtdb/xtdb"
+  ]
+ },
+ "known_repositories": [
+  "alpacahq/alpaca-py",
+  "apache/arrow",
+  "apache/iceber",
+  "bytebase/dbhub",
+  "clickhouse/clickhouse",
+  "databento/databento-python",
+  "dgunning/edgartools",
+  "dlt-hub/dl",
+  "duckdb/duckdb",
+  "duckdb/ducklake",
+  "feast-dev/feas",
+  "fivetran/great_expectations",
+  "gerrymanoim/exchange_calendars",
+  "jadchaar/sec-edgar-downloader",
+  "massive-com/client-python",
+  "openbb-finance/openbb",
+  "pandas-dev/pandas",
+  "pola-rs/polars",
+  "questdb/questdb",
+  "ranaroussi/yfinance",
+  "ray-project/ray",
+  "toon-format/toon",
+  "treeverse/dvc",
+  "treeverse/lakefs",
+  "unionai-oss/pandera",
+  "xtdb/xtdb"
+ ],
+ "seeded_candidates_20260926": []
+}

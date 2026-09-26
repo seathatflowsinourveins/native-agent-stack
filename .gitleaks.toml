@@ -327,11 +327,15 @@ id = "sourcegraph-access-token"
 # this rule only, and only a whole anchored "pin" line whose value is a 40-hex id with an optional
 # "<version> @ " prefix; any other field holding a 40-hex value in the same file is still detected
 # (tests/test_gitleaks_config.py test_d/test_d2).
+# 2026-09-26: the landscape-sweep-20260926 record retains the run's layer input for code-navigation exactly
+# as read (inputs/SHA256SUMS). It names Sourcegraph (the SCIP index) and holds the same catalog "pin" lines,
+# so the same anchored pin-line exemption covers that one file too (test_d5).
 [[rules.allowlists]]
 description = "Git commit ids under the \"pin\" field of the dated SOTA manifest"
 condition = "AND"
 paths = [
   '''^catalogs/sota-convergence/manifest-20260923\.json$''',
+  '''^evidence/artifacts/landscape-sweep-20260926/inputs/code-navigation\.json$''',
 ]
 regexTarget = "line"
 regexes = [

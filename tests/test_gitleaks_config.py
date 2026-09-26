@@ -272,6 +272,23 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260924.json", [])), 2,
                              f"pin lines outside the exact reviewed path must still be detected: {by_file}")
 
+    def test_d5_retained_sweep_input_pin_lines_only(self):
+        """The retained code-navigation layer input: its "pin" lines are exempt, another 40-hex field in it
+        is still detected, and so are the same pin lines in a sibling input file."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            base = "evidence/artifacts/landscape-sweep-20260926/inputs/"
+            self._manifest_fixture(target, base + "code-navigation.json", {"token": HEX40})
+            self._manifest_fixture(target, base + "semantic-rag.json", {})
+            by_file = {}
+            for f in self._scan(target):
+                if f["RuleID"] == "sourcegraph-access-token":
+                    by_file.setdefault(f["File"], []).append(f["StartLine"])
+            self.assertEqual(len(by_file.get(base + "code-navigation.json", [])), 1,
+                             f"only the non-pin token line may be detected in the retained input: {by_file}")
+            self.assertEqual(len(by_file.get(base + "semantic-rag.json", [])), 2,
+                             f"pin lines in any other input file must still be detected: {by_file}")
+
     @staticmethod
     def _reviewed_manifest_ids() -> list:
         """The git commit ids that the 2026-09-26 manifest allowlist pins by value, read from .gitleaks.toml. This

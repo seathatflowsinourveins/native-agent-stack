@@ -1,0 +1,107 @@
+{
+ "catalog": "foundation",
+ "layer_id": "mcp-surfaces",
+ "title": "MCP servers and client surfaces",
+ "requirement": "Bridge, inspect and configure Model Context Protocol servers and client surfaces without adopting an unexamined registry entry.",
+ "research_status": "on_requirement_change",
+ "next_action": "Review a specific MCP registry entry, such as punkpeye/awesome-mcp-servers, only against a concrete surface gap; do not adopt a new server from a registry listing alone.",
+ "requirement_sha256": "772dbba88018c58887ad2e7b5335a4658cb4b3237653ea19cfaff774738c754f",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "mcporter",
+   "repository": "https://github.com/openclaw/mcporter",
+   "pin": "0.13.13",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "mcp-inspector",
+   "repository": "https://github.com/modelcontextprotocol/inspector",
+   "pin": "2.7.0",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Awesome MCP servers registry",
+   "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+   "disposition": "out_of_scope"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "mcp-inspector",
+   "repository": "https://github.com/modelcontextprotocol/inspector",
+   "pin": "2.7.0",
+   "upstream": {
+    "latest": "2.8.0",
+    "released_at": "2026-09-23",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 10960,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "mcporter",
+   "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
+   "pin": "0.13.13",
+   "upstream": {
+    "latest": "v0.14.1",
+    "released_at": "2026-09-24",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 5028,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "The retained native runs are from 2026-09-19 (mcporter daemon recovery, restart-receipt.json line 5) and 2026-09-20 (mcporter bridge calls in current-session-observation-20260920.json; Inspector call in token-native-retained-functional-20260920.json, a retrospective publication). None was repeated. ",
+  "mcporter is pinned at 0.13.13 while upstream is v0.14.0 (packet pin_behind_upstream true). v0.14.0 is untested, which does not mean it failed.",
+  "saturation-audit.json lines 5023-5042 give not_established for mcporter's persistence, restart, cleanup and recovery lifecycle stages. The bridge recovery in restart-receipt.json was manual (automatic_recovery false). The shared daemon is not an owned disposable service.",
+  "The mcporter retained_operation_ids (fresh-static-graph, fresh-static-callees, fresh-memory-status, fresh-socraticode-status) appear only as IDs in saturation-audit.json. No public receipt I read defines their commands or results.",
+  "The Inspector evidence covers only a stdio arithmetic call ('42 computed'). It does not certify the full client plugin, hooks, project-file scope or desktop connection (saturation-audit.json line 4844). Recipe Inspector calls such as tools/list against other servers did not appear in the receipts I "
+ ],
+ "overturn_when": "A concrete MCP surface gap needs a new server, and a reviewed registry entry passes the same bridge/inspection acceptance as mcporter/mcp-inspector.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/MCPJam/inspector",
+   "https://github.com/microsoft/mcp-gateway",
+   "https://github.com/docker/mcp-registry",
+   "https://github.com/modelcontextprotocol/registry"
+  ]
+ },
+ "known_repositories": [
+  "askalf/truecopy",
+  "bytebase/dbhub",
+  "docker/mcp-registry",
+  "mcpjam/inspector",
+  "microsoft/mcp-gateway",
+  "modelcontextprotocol/inspector",
+  "modelcontextprotocol/registry",
+  "nexting-ai/nextin",
+  "openclaw/mcporter",
+  "punkpeye/awesome-mcp-servers"
+ ],
+ "seeded_candidates_20260926": [
+  "openclaw/mcporter v0.14.1 (2026-09-24; generated-client hardening)"
+ ]
+}

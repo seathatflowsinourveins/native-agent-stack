@@ -1,0 +1,398 @@
+{
+ "catalog": "foundation",
+ "layer_id": "observation-inference",
+ "title": "Observation and optional inference",
+ "requirement": "Observe real native usage/service outcomes through one privacy-filtered local pipeline and qualify any optional model route on its actual workload.",
+ "research_status": "on_requirement_change",
+ "next_action": "Reconcile one real task across native counters and telemetry; qualify any new model route on actual output, privacy, latency and recovery without duplicate capture.",
+ "requirement_sha256": "3a68575079a1c43b718c4eb417317c5cb336dab6848e12b4f36df30fe10a154c",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "opentelemetry-collector-contrib",
+   "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+   "pin": "0.161.0",
+   "evidence_class": "synthetic",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "prometheus",
+   "repository": "https://github.com/prometheus/prometheus",
+   "pin": "3.14.0",
+   "evidence_class": "synthetic",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "loki",
+   "repository": "https://github.com/grafana/loki",
+   "pin": "3.7.8",
+   "evidence_class": "synthetic",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Grafana",
+   "repository": "https://github.com/grafana/grafana",
+   "disposition": "overlap"
+  },
+  {
+   "name": "Alertmanager",
+   "repository": "https://github.com/prometheus/alertmanager",
+   "disposition": "conditional"
+  },
+  {
+   "name": "ntfy",
+   "repository": "https://github.com/binwiederhier/ntfy",
+   "disposition": "conditional"
+  },
+  {
+   "name": "llama.cpp optional local inference",
+   "repository": "https://github.com/ggml-org/llama.cpp",
+   "disposition": "conditional"
+  },
+  {
+   "name": "AgentsView",
+   "repository": "https://github.com/kenn-io/agentsview",
+   "disposition": "conditional"
+  },
+  {
+   "name": "otel-tui",
+   "repository": "https://github.com/ymtdzzz/otel-tui",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Claude HUD",
+   "repository": "https://github.com/jarrodwatts/claude-hud",
+   "disposition": "overlap"
+  },
+  {
+   "name": "Phoenix",
+   "repository": "https://github.com/Arize-ai/phoenix",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "OpenLIT",
+   "repository": "https://github.com/openlit/openlit",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "SGLang",
+   "repository": "https://github.com/sgl-project/sglang",
+   "disposition": "unqualified"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "agentsview",
+   "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+   "pin": "0.43.0",
+   "upstream": {
+    "latest": "v0.44.0",
+    "released_at": "2026-09-21",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 5995,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "alertmanager",
+   "repository": "https://github.com/prometheus/alertmanager",
+   "pin": "0.34.1",
+   "upstream": {
+    "latest": "v0.34.1",
+    "released_at": "2026-09-17",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 8628,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "ccusage",
+   "repository": "https://github.com/ccusage/ccusage",
+   "pin": "20.0.24",
+   "upstream": {
+    "latest": "v20.0.24",
+    "released_at": "2026-09-21",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 18743,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "claude-code",
+   "repository": "https://github.com/anthropics/claude-code",
+   "pin": "2.1.278",
+   "upstream": {
+    "latest": "v2.1.283",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 148105,
+    "license": null,
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "claude-hud",
+   "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+   "pin": "0.8.0",
+   "upstream": {
+    "latest": "v0.8.0",
+    "released_at": "2026-08-18",
+    "prerelease": false,
+    "pushed_at": "2026-09-19",
+    "stars": 28169,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "grafana",
+   "repository": "https://github.com/grafana/grafana",
+   "pin": "13.2.2",
+   "upstream": {
+    "latest": "v13.2.2",
+    "released_at": "2026-09-15",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 76911,
+    "license": "AGPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "huggingface-hub-native",
+   "repository": "https://github.com/huggingface/huggingface_hub",
+   "pin": "1.32.0",
+   "upstream": {
+    "latest": "v2.0.0",
+    "released_at": "2026-09-24",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 3935,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "llama-cpp",
+   "repository": "https://github.com/ggml-org/llama.cpp",
+   "pin": "b11057 (0.4.1-dev)",
+   "upstream": {
+    "latest": "v0.5.0",
+    "released_at": "2026-09-23",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 129523,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "loki",
+   "repository": "https://github.com/grafana/loki",
+   "pin": "3.7.8",
+   "upstream": {
+    "latest": "v3.7.8",
+    "released_at": "2026-09-17",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 28946,
+    "license": "AGPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "ntfy",
+   "repository": "https://github.com/binwiederhier/ntfy",
+   "pin": "2.28.0",
+   "upstream": {
+    "latest": "v2.28.0",
+    "released_at": "2026-08-27",
+    "prerelease": false,
+    "pushed_at": "2026-09-23",
+    "stars": 34434,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "omniroute",
+   "repository": "https://github.com/diegosouzapw/OmniRoute",
+   "pin": "3.8.50",
+   "upstream": {
+    "latest": "v3.8.50",
+    "released_at": "2026-08-26",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 70212,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "opentelemetry-collector-contrib",
+   "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+   "pin": "0.161.0",
+   "upstream": {
+    "latest": "v0.161.0",
+    "released_at": "2026-09-15",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 4953,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "otel-tui",
+   "repository": "https://github.com/ymtdzzz/otel-tui",
+   "pin": "0.7.5",
+   "upstream": {
+    "latest": "v0.7.5",
+    "released_at": "2026-09-12",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "stars": 1091,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "prometheus",
+   "repository": "https://github.com/prometheus/prometheus",
+   "pin": "3.14.0",
+   "upstream": {
+    "latest": "v3.15.0",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 66227,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "vllm",
+   "repository": "https://github.com/vllm-project/vllm",
+   "pin": "0.30.0",
+   "upstream": {
+    "latest": "v0.30.0",
+    "released_at": "2026-09-22",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 92684,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "The privacy-filter evidence is one synthetic canary reviewed by a reviewer (observability/receipt.json lines 313-329). The repository has no script that re-runs it, and it covers only tested fields and trusted instrumentation, not arbitrary-content DLP (line 24).",
+  "No script or test in the repository re-runs the native usage reconciliation end to end. It exists only as retained commands in docs/native-telemetry-resolution.md lines 22-30 and observability/backends/telemetry-resolution-20260921.json lines 207-211 and 269-306.",
+  "Scheduled-service and reboot persistence are not qualified (decisions.json line 2036). check_persistence.py covers one user-service restart only.",
+  "Missing task attribution: the Prometheus counters before the task already held another Claude process's usage, so only the after-snapshot match per category is established (native-telemetry-resolution.md lines 47-49; telemetry-resolution-20260921.json line 344).",
+  "The SDK receipt lane has no automatic spool expiry and no loss/recovery acceptance under a full disk or an extended outage (observability/receipt.json line 258)."
+ ],
+ "overturn_when": "A required trace, evaluation or supported model/hardware workload is unanswerable by the current path, and one alternative passes privacy, fidelity, latency/cost and recovery comparisons without duplicate capture.",
+ "sweep_20260923": {
+  "survived": [
+   "https://github.com/grafana/tempo"
+  ],
+  "refuted": [
+   "https://github.com/data-privacy-stack/presidio",
+   "https://github.com/vectordotdev/vector"
+  ]
+ },
+ "known_repositories": [
+  "arize-ai/phoenix",
+  "binwiederhier/ntfy",
+  "data-privacy-stack/presidio",
+  "ggml-org/llama.cpp",
+  "grafana/grafana",
+  "grafana/lok",
+  "grafana/tempo",
+  "graykode/abtop",
+  "https://huggingface.co/nvidia/nvidia-nemotron-3.5-lightning-30b-a3b-nvfp4",
+  "jarrodwatts/claude-hud",
+  "kenn-io/agentsview",
+  "open-telemetry/opentelemetry-collector-contrib",
+  "openlit/openl",
+  "prometheus/alertmanager",
+  "prometheus/prometheus",
+  "sgl-project/sglan",
+  "vectordotdev/vector",
+  "ymtdzzz/otel-tu"
+ ],
+ "seeded_candidates_20260926": [
+  "openllmetry (coordinator P2)",
+  "helicone (coordinator P3 watch)",
+  "open-telemetry/semantic-conventions-genai (GenAI semantic conventions moved here from open-telemetry/semantic-conventions, whose docs/gen-ai/README.md at 094950f2 is a 'Moved' notice; HEAD e57c543b, Apache-2.0, no releases; coordinator P3 watch, corrected 2026-09-26)",
+  "NVIDIA/TensorRT-LLM v1.3.0rc28 (coordinator P3 watch; Ada relevance low)",
+  "ggml-org/llama.cpp v0.5.0 (2026-09-23; = b11146 already running; catalog pin b11057)",
+  "turboderp-org/exllamav3 v1.5.1 (2026-09-20; pinned-arena CPU offload; published 4090 numbers)",
+  "sgl-project/sglang v0.5.20",
+  "ollama/ollama v0.34.4"
+ ]
+}

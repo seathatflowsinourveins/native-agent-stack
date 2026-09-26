@@ -1,0 +1,172 @@
+{
+ "catalog": "foundation",
+ "layer_id": "document-retrieval",
+ "title": "Documents and ingestion",
+ "requirement": "Find source-grounded Markdown/document content with controlled ingestion and retrieve the original body before relying on a result.",
+ "research_status": "comparison_required",
+ "next_action": "Seal a representative document corpus and relevance judgments; repeat randomized lexical/hybrid retrieval plus selected difficult-layout ingestion before changing defaults.",
+ "requirement_sha256": "9c18aa39fc1403f5dcff25d059ec77637d2a95df4c45faa6fc253cdacbf53a76",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "qmd",
+   "repository": "https://github.com/tobi/qmd",
+   "pin": "2.8.3",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "markitdown",
+   "repository": "https://github.com/microsoft/markitdown",
+   "pin": "0.1.7",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "poppler",
+   "repository": "https://github.com/tsdgeos/poppler_mirror",
+   "pin": "26.09.0",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Context Hub",
+   "repository": "https://github.com/andrewyng/context-hub",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Docling",
+   "repository": "https://github.com/docling-project/docling",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "LlamaIndex",
+   "repository": "https://github.com/run-llama/llama_index",
+   "disposition": "unqualified"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "context-hub",
+   "repository": "https://github.com/andrewyng/context-hub",
+   "pin": "0.1.4",
+   "upstream": {
+    "latest": "v0.1.4",
+    "released_at": "2026-04-27",
+    "prerelease": false,
+    "pushed_at": "2026-05-31",
+    "stars": 13983,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "markitdown",
+   "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
+   "pin": "0.1.8",
+   "upstream": {
+    "latest": "v0.1.8",
+    "released_at": "2026-09-21",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "stars": 187046,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "poppler",
+   "repository": "https://github.com/tsdgeos/poppler_mirror",
+   "pin": "26.09.0",
+   "upstream": {
+    "latest": null,
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": "2026-09-13",
+    "stars": 61,
+    "license": "GPL-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  },
+  {
+   "id": "qmd",
+   "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+   "pin": "2.8.3",
+   "upstream": {
+    "latest": "v2.8.3",
+    "released_at": "2026-08-16",
+    "prerelease": false,
+    "pushed_at": "2026-09-09",
+    "stars": 30039,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "The QMD four-mode comparison used one ordered run and an expanded index without a complete corpus seal; repeated warm/cold latency and representative corpus recall remain unestablished.",
+  "The earlier scoped benchmark's eight top-three successes and four misses are separate from the later expanded-index diagnostic.",
+  "Two exact QMD source-body retrievals do not establish arbitrary query recall or automatic index freshness.",
+  "Poppler acceptance covers designed born-digital Latin pages with explicit table geometry and local exact-phrase retrieval. OCR, inferred layouts, arbitrary filings and semantic questions remain unqualified.",
+  "MarkItDown optional PDF/Office extras are not established by the selected HTML conversion."
+ ],
+ "overturn_when": "A sealed representative corpus/query set shows useful quality gains with acceptable repeated end-to-end latency, or layout/OCR failures justify a separately qualified parser.",
+ "sweep_20260923": {
+  "survived": [
+   "https://github.com/datalab-to/marker",
+   "https://github.com/opendatalab/MinerU",
+   "https://github.com/PaddlePaddle/PaddleOCR"
+  ],
+  "refuted": [
+   "https://github.com/Unstructured-IO/unstructured",
+   "https://github.com/allenai/olmocr",
+   "https://github.com/datalab-to/chandra"
+  ]
+ },
+ "known_repositories": [
+  "allenai/olmocr",
+  "andrewyng/context-hub",
+  "datalab-to/chandra",
+  "datalab-to/marker",
+  "docling-project/doclin",
+  "https://huggingface.co/kalm-embedding/kalm-reranker-v1-nano-r2",
+  "https://huggingface.co/qwen/qwen3-vl-reranker-2b",
+  "https://huggingface.co/zeroentropy/zerank-2",
+  "microsoft/markitdown",
+  "opendatalab/mineru",
+  "paddlepaddle/paddleocr",
+  "run-llama/llama_index",
+  "tobi/qmd",
+  "tsdgeos/poppler_mirror",
+  "unstructured-io/unstructured",
+  "upstash/context7"
+ ],
+ "seeded_candidates_20260926": [
+  "ColPali / vidore-benchmark (coordinator P1 trial)",
+  "kotaemon (coordinator P3 watch)",
+  "microsoft/markitdown v0.1.8 (already stack pin)"
+ ]
+}

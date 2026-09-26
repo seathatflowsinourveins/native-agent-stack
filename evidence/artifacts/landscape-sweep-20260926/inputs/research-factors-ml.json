@@ -1,0 +1,201 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "research-factors-ml",
+ "title": "Research, factors and ML",
+ "requirement": "Use the selected NautilusTrader destination with broker-specific execution boundaries, deterministic numeric risk and reproducible equity accounting; preserve the prior LEAN oracle and qualify any strategy with causal data, costs and independent reconciliation.",
+ "research_status": "comparison_required",
+ "next_action": "Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.",
+ "requirement_sha256": "05654fcd99ad74800f9912a667b3e6ec90af3014531c71fea9511dbba1bd72fd",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "skfolio",
+   "repository": "https://github.com/skfolio/skfolio",
+   "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "data-edgartools",
+   "repository": "https://github.com/dgunning/edgartools",
+   "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "foundation-qmd",
+   "repository": "https://github.com/tobi/qmd",
+   "disposition": "conditional"
+  },
+  {
+   "name": "data-arcticdb",
+   "repository": "https://github.com/man-group/ArcticDB",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "data-sktime",
+   "repository": "https://github.com/sktime/sktime",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "alphalens-reloaded",
+   "repository": "https://github.com/stefan-jansen/alphalens-reloaded",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "chronos",
+   "repository": "https://github.com/amazon-science/chronos-forecasting",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "data-tsfresh",
+   "repository": "https://github.com/blue-yonder/tsfresh",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "deerflow",
+   "repository": "https://github.com/bytedance/deer-flow",
+   "disposition": "conditional"
+  },
+  {
+   "name": "vllm",
+   "repository": "https://github.com/vllm-project/vllm",
+   "disposition": "conditional"
+  },
+  {
+   "name": "foundation-haystack",
+   "repository": "https://github.com/deepset-ai/haystack",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "data-river",
+   "repository": "https://github.com/online-ml/river",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "data-statsforecast",
+   "repository": "https://github.com/Nixtla/statsforecast",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "foundation-docling",
+   "repository": "https://github.com/docling-project/docling",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "arch",
+   "repository": "https://github.com/bashtage/arch",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "ray-serve",
+   "repository": "https://github.com/ray-project/ray",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "timesfm",
+   "repository": "https://github.com/google-research/timesfm",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "foundation-markitdown",
+   "repository": "https://github.com/microsoft/markitdown",
+   "disposition": "overlap"
+  },
+  {
+   "name": "statsmodels",
+   "repository": "https://github.com/statsmodels/statsmodels",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "foundation-sentence-transformers",
+   "repository": "https://github.com/huggingface/sentence-transformers",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "scikit-learn",
+   "repository": "https://github.com/scikit-learn/scikit-learn",
+   "disposition": "overlap"
+  },
+  {
+   "name": "Qlib",
+   "repository": "https://github.com/microsoft/qlib",
+   "disposition": "unqualified"
+  }
+ ],
+ "components_vs_upstream_20260926": [],
+ "open_gaps": [
+  "The skfolio receipt covers a selected ETF sample (SPY, QQQ, IWM), not a point-in-time equity universe. Labels are raw-price, not total-return, and each candidate has only 11 complete reserved episodes. It records no alpha, P&L, fill, dividend or cash reconciliation, and no new LEAN or Nautilus engin",
+  "WalkForward purge and embargo default to zero (packet card limitation). The 6-row gap plus the interval assertions does not establish independent samples, and development labels can cross fold boundaries.",
+  "The chronology audit fields and the catalyst temporal gate are produced by project-local wrappers (evaluate.py, catalyst.py), not by the upstream libraries. The upstream native part is the WalkForward split, the get_filings index acquisition and document parsing.",
+  "The EdgarTools acquisition is a bounded 5-header sample from one day (2020-03-02). It does not establish a historical as-known filing corpus, dissemination lag or a catalyst strategy.",
+  "A retained broad-universe chronological study is layer-relevant research validation but credits no layer candidate. evidence/receipts/broad-universe-research-20260921.json lists component_ids alpaca-py, duckdb, claude-code and codex; its README 'Result: no signal is established' says all 15 signal x"
+ ],
+ "overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+ "sweep_20260923": {
+  "survived": [
+   "https://github.com/lightgbm-org/LightGBM",
+   "https://github.com/microsoft/RD-Agent"
+  ],
+  "refuted": [
+   "https://github.com/ICT-FinD-Lab/alphagen"
+  ]
+ },
+ "known_repositories": [
+  "ai4finance-foundation/finrl",
+  "alpacahq/alpaca-py",
+  "amazon-science/chronos-forecastin",
+  "anthropics/financial-services",
+  "bashtage/arch",
+  "blue-yonder/tsfresh",
+  "bytedance/deer-flow",
+  "deepset-ai/haystack",
+  "dgunning/edgartools",
+  "docling-project/doclin",
+  "gnzsnz/ib-gateway-docker",
+  "google-research/timesfm",
+  "huggingface/sentence-transformers",
+  "ib-api-reloaded/ib_async",
+  "ict-find-lab/alphagen",
+  "jerbouma/financetoolk",
+  "kernc/backtesting.py",
+  "lightgbm-org/lightgbm",
+  "lumiwealth/lumibo",
+  "man-group/arcticdb",
+  "mementum/backtrader",
+  "microsoft/markitdown",
+  "microsoft/qlib",
+  "microsoft/rd-agen",
+  "nautechsystems/nautilus_trader",
+  "nixtla/statsforecas",
+  "online-ml/river",
+  "polakowo/vectorb",
+  "pyportfolio/pyportfolioop",
+  "quantconnect/lean",
+  "quantconnect/lean.brokerages.alpaca",
+  "ray-project/ray",
+  "scikit-learn/scikit-learn",
+  "shiyu-coder/kronos",
+  "skfolio/skfolio",
+  "sktime/sktime",
+  "statsmodels/statsmodels",
+  "stefan-jansen/alphalens-reloaded",
+  "stefan-jansen/machine-learning-for-tradin",
+  "stefan-jansen/zipline-reloaded",
+  "tauricresearch/tradingagents",
+  "tobi/qmd",
+  "tradermonty/claude-trading-skills",
+  "vllm-project/vllm"
+ ],
+ "seeded_candidates_20260926": [
+  "skfolio v1.3.4: trading lane (e7, 2026-09-26) keeps pin 1.2.9 \u2014 our code paths use MeanRisk variance, HRP, WalkForward, prices_to_returns; the 1.3.2-1.3.4 fixes (sample-weight carry-over, EVaR) do not reach them; the frozen research-evaluation study is bound to 1.2.9 WalkForward source sha256"
+ ]
+}

@@ -1,0 +1,201 @@
+{
+ "catalog": "foundation",
+ "layer_id": "git-github-automation",
+ "title": "Git practice and GitHub automation",
+ "requirement": "Own Git worktrees, GitHub review/PR automation and structural diffs for changed code.",
+ "research_status": "on_requirement_change",
+ "next_action": "Qualify gh CLI's own lifecycle evidence and a changed codex-for-claude review-bridge version before extending acceptance beyond worktrunk, gh and difftastic.",
+ "requirement_sha256": "430b1de3110ad4f3f7dcc4b20426393d6c67c57427dcbc56472b8081e8f9cab1",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "worktrunk",
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "pin": "0.79.0",
+   "evidence_class": "source_review",
+   "platform_status": {
+    "linux-wsl2-x86_64": "not_established",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "candidate:cli-cli",
+   "repository": "https://github.com/cli/cli",
+   "pin": "unpinned",
+   "evidence_class": "source_review",
+   "platform_status": {
+    "linux-wsl2-x86_64": "not_established",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "difftastic",
+   "repository": "https://github.com/Wilfred/difftastic",
+   "pin": "0.71.0",
+   "evidence_class": "source_review",
+   "platform_status": {
+    "linux-wsl2-x86_64": "not_established",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Codex for Claude review bridge",
+   "repository": "https://github.com/openai/codex-plugin-cc",
+   "disposition": "conditional"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "codex",
+   "repository": "https://github.com/openai/codex",
+   "pin": "0.155.1",
+   "upstream": {
+    "latest": "rust-v0.157.0",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 126487,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "codex-for-claude",
+   "repository": "https://github.com/openai/codex-plugin-cc/tree/v1.0.6",
+   "pin": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+   "upstream": {
+    "latest": "v1.0.6",
+    "released_at": "2026-07-08",
+    "prerelease": false,
+    "pushed_at": "2026-07-08",
+    "stars": 33593,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "difftastic",
+   "repository": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+   "pin": "0.71.0",
+   "upstream": {
+    "latest": "0.71.0",
+    "released_at": "2026-09-18",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "stars": 25934,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "playwright-test",
+   "repository": "https://github.com/microsoft/playwright",
+   "pin": "1.63.0",
+   "upstream": {
+    "latest": "v1.63.0",
+    "released_at": "2026-09-04",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 96680,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "promptfoo",
+   "repository": "https://github.com/promptfoo/promptfoo",
+   "pin": "0.123.1",
+   "upstream": {
+    "latest": "0.123.1",
+    "released_at": "2026-09-18",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 25461,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "shellcheck",
+   "repository": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0",
+   "pin": "0.11.0",
+   "upstream": {
+    "latest": "v0.11.0",
+    "released_at": "2025-08-04",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "stars": 40088,
+    "license": "GPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "worktrunk",
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "pin": "0.79.0",
+   "upstream": {
+    "latest": "v0.79.0",
+    "released_at": "2026-09-21",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 8413,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "gh CLI has no manifests/stack.json inventory entry and no lifecycle stage (decisions.json lines 2971-2982). The only gh-attributed dated result is `gh attestation verify` exit 0 on 2026-09-20 (docs/github-automation.md lines 128-132). The ruleset GET (lines 180-183) is undated. The 2026-09-22 compar",
+  "No gh PR operation (create/review/merge) result is recorded. PR automation is therefore unestablished for every candidate. The gh-aw agentic workflow candidate is public preview and not activated (docs/github-automation.md lines 138-157).",
+  "The catalog lifecycle for codex-for-claude is stale. saturation-audit.json lines 2240 and 2256-2261 and decisions.json lines 2973 and 2997 still say the outer delegation is unexercised / partial_acceptance, but evidence/receipts/foundation-rd-20260921.json records a successful outer foreground revie",
+  "c3's outer review evidence is one foreground review of a local branch diff covering three files. Workflow background polling, same-workspace concurrency, the earlier aborted attempt's cause and Codex usage/model/effort remain unqualified (native-review.json lines 111-114 and 136-142).",
+  "No new execution was run to freeze this layer (decisions.json line 2970). Winner evidence is dated 2026-09-20/21 and was not recertified on the current host (saturation-audit.json current_host_recertified_by_this_audit false for worktrunk and difftastic)."
+ ],
+ "overturn_when": "A concrete cross-repository or multi-host Git/GitHub workflow needs capabilities beyond gh/worktrunk/difftastic, and a challenger passes a matched comparison.",
+ "sweep_20260923": {
+  "survived": [
+   "https://github.com/anthropics/claude-code-action"
+  ],
+  "refuted": [
+   "https://github.com/The-PR-Agent/pr-agent",
+   "https://github.com/jj-vcs/jj",
+   "https://github.com/openai/codex-action",
+   "https://github.com/reviewdog/reviewdog"
+  ]
+ },
+ "known_repositories": [
+  "anthropics/claude-code-action",
+  "cli/cl",
+  "jj-vcs/jj",
+  "max-sixty/worktrunk",
+  "openai/codex-action",
+  "openai/codex-plugin-cc",
+  "reviewdog/reviewdo",
+  "the-pr-agent/pr-agen",
+  "wilfred/difftastic"
+ ],
+ "seeded_candidates_20260926": []
+}

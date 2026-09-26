@@ -1,0 +1,239 @@
+{
+ "catalog": "foundation",
+ "layer_id": "token-efficiency",
+ "title": "Context and usage efficiency",
+ "requirement": "Supply useful task context with recoverable originals and measure artifact reductions separately from provider usage.",
+ "research_status": "comparison_required",
+ "next_action": "Repeat a matched task at equal quality with original-context recovery; include failed attempts and separate complete provider use from cache subsets and artifact estimates.",
+ "requirement_sha256": "550781682cd15dad5061ce74f8335fb3ecaf8234b25772a88a11c104e8099a6e",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "rtk",
+   "repository": "https://github.com/rtk-ai/rtk",
+   "pin": "0.49.0",
+   "evidence_class": "synthetic",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "headroom",
+   "repository": "https://github.com/headroomlabs-ai/headroom",
+   "pin": "0.37.0",
+   "evidence_class": "synthetic",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "ccusage",
+   "repository": "https://github.com/ccusage/ccusage",
+   "pin": "20.0.24",
+   "evidence_class": "synthetic",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Context Mode",
+   "repository": "https://github.com/mksglu/context-mode",
+   "disposition": "measured_tradeoff"
+  },
+  {
+   "name": "Repomix",
+   "repository": "https://github.com/yamadashy/repomix",
+   "disposition": "conditional"
+  },
+  {
+   "name": "TOON",
+   "repository": "https://github.com/toon-format/toon",
+   "disposition": "measured_tradeoff"
+  },
+  {
+   "name": "Claude Token Efficient",
+   "repository": "https://github.com/drona23/claude-token-efficient",
+   "disposition": "overlap"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "ccusage",
+   "repository": "https://github.com/ccusage/ccusage",
+   "pin": "20.0.24",
+   "upstream": {
+    "latest": "v20.0.24",
+    "released_at": "2026-09-21",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 18743,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "context-mode",
+   "repository": "https://github.com/mksglu/context-mode",
+   "pin": "1.0.169",
+   "upstream": {
+    "latest": "v1.0.169",
+    "released_at": "2026-06-29",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 24069,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "headroom",
+   "repository": "https://github.com/headroomlabs-ai/headroom",
+   "pin": "0.37.0",
+   "upstream": {
+    "latest": "v0.39.0",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 73816,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "jcodemunch-mcp",
+   "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+   "pin": "1.108.319",
+   "upstream": {
+    "latest": "v1.108.319",
+    "released_at": "2026-09-16",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 2714,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "qmd",
+   "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+   "pin": "2.8.3",
+   "upstream": {
+    "latest": "v2.8.3",
+    "released_at": "2026-08-16",
+    "prerelease": false,
+    "pushed_at": "2026-09-09",
+    "stars": 30039,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "repomix",
+   "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+   "pin": "1.18.1",
+   "upstream": {
+    "latest": "v1.18.1",
+    "released_at": "2026-09-21",
+    "prerelease": false,
+    "pushed_at": "2026-09-23",
+    "stars": 28494,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "rtk",
+   "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+   "pin": "0.50.0",
+   "upstream": {
+    "latest": "v0.50.0",
+    "released_at": "2026-09-24",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 81724,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "toon",
+   "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+   "pin": "4.1.1",
+   "upstream": {
+    "latest": "v4.1.1",
+    "released_at": "2026-08-05",
+    "prerelease": false,
+    "pushed_at": "2026-09-03",
+    "stars": 25426,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "No matched baseline exists for the current native tasks. Exact whole-PC or lifetime provider savings for any winner are unmeasured (docs/full-stack-convergence.md lines 37 and 147-150).",
+  "Headroom's recovery evidence comes from owned synthetic fixtures. Automatic interception of agent traffic is not configured, and its native ledger returned zero calls, so its native-use benefit in real sessions is not established.",
+  "The RTK foundation gateway/lite previews failed required semantic checks. CLI acceptance does not repair them (catalogs/foundation/decisions.json line 1166).",
+  "ccusage has an accepted use stage only. Missing attempt and child coverage blocks any whole-workflow efficiency claim (catalogs/foundation/decisions.json line 1336).",
+  "The Context Mode paired results are one fixed-order pair per client with uncontrolled cache state. A causal effect in either direction is not established."
+ ],
+ "overturn_when": "A frozen task/artifact and repeated controlled comparison improves answer correctness or retrieval completeness while reducing complete provider use or latency, with successful raw-input recovery.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/BerriAI/litellm",
+   "https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor",
+   "https://github.com/microsoft/LLMLingua",
+   "https://github.com/coderamp-labs/gitingest"
+  ]
+ },
+ "known_repositories": [
+  "berriai/litellm",
+  "ccusage/ccusage",
+  "coderamp-labs/gitinges",
+  "drona23/claude-token-efficien",
+  "headroomlabs-ai/headroom",
+  "maciek-roboblog/claude-code-usage-monitor",
+  "microsoft/llmlingua",
+  "mksglu/context-mode",
+  "rtk-ai/rtk",
+  "toon-format/toon",
+  "yamadashy/repomix"
+ ],
+ "seeded_candidates_20260926": [
+  "rtk-ai/rtk v0.50.0 (stack pin; winner pin 0.49.0)",
+  "headroomlabs-ai/headroom v0.39.0 (qualified by coordinator, #307)",
+  "yamadashy/repomix v1.18.1 (security fix GHSA-4p5g-gh74-q524)",
+  "mksglu/context-mode v1.0.169",
+  "jgravelle/jcodemunch-mcp"
+ ]
+}
