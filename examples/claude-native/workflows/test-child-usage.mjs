@@ -2,7 +2,7 @@
 // OFFLINE check of child-usage.mjs against SYNTHETIC transcript rows (no provider
 // call, not native evidence). Real runs are checked by passing their directory;
 // stored receipts from real runs are bound to the documentation by test-usage-receipts.mjs.
-import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel } from './child-usage.mjs'
+import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel, webSearch } from './child-usage.mjs'
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -52,6 +52,25 @@ expect('fallback: an opus model name that cannot be compared fails closed', has(
 expect('fallback: model names parse to family and version, ignoring date and [1m] suffixes', JSON.stringify([modelGeneration('claude-opus-5-5'), modelGeneration('claude-opus-5'), modelGeneration('claude-haiku-4-5-20251001'), modelGeneration('claude-opus-5-5[1m]'), modelGeneration('claude-3-opus-20240229')]) === JSON.stringify([{ family: 'opus', version: [5, 5] }, { family: 'opus', version: [5] }, { family: 'haiku', version: [4, 5] }, { family: 'opus', version: [5, 5] }, null]))
 expect('fallback: the opus version table matches the documented boundaries', JSON.stringify(['2.1.153', '2.1.154', '2.1.218', '2.1.219', '2.1.279', '2.1.280', '2.1.281'].map((v) => expectedModel('opus', v))) === JSON.stringify([null, 'claude-opus-4-8', 'claude-opus-4-8', 'claude-opus-5', 'claude-opus-5', 'claude-opus-5-5', 'claude-opus-5-5']) && expectedModel('sonnet', '2.1.281') === null && expectedModel('opus', undefined) === null)
 
+// WebSearch session cap (tools-reference, "Session search limit"): a capped call returns a notice right after the
+// result header instead of results; page text that quotes the notice is not a capped call.
+const search = (id, ts) => ({ type: 'assistant', timestamp: ts, effort: 'max', message: { id: 'ws-' + id, model: 'claude-opus-5-5', usage: { input_tokens: 1, output_tokens: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 }, content: [{ type: 'tool_use', id, name: 'WebSearch', input: { query: 'q ' + id } }] } })
+const answer = (id, content, ts) => ({ type: 'user', timestamp: ts, message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: id, content }] } })
+const header = (id) => 'Web search results for query: "q ' + id + '"\n\n'
+const cappedText = 'Web search was not performed: this session has used its web search budget (200 of 200 WebSearch calls). Continue with the information already gathered instead of issuing more searches.'
+const searchRows = [
+  search('t1', '2026-09-26T04:08:00Z'), answer('t1', header('t1') + 'Links: [{"title":"x","url":"https://example.com"}]', '2026-09-26T04:08:01Z'),
+  search('t2', '2026-09-26T04:12:00Z'), answer('t2', [{ type: 'text', text: header('t2') + cappedText }], '2026-09-26T04:12:01Z'),
+  search('t3', '2026-09-26T04:10:13Z'), answer('t3', header('t3') + cappedText, '2026-09-26T04:10:13Z'),
+  search('t4', '2026-09-26T04:11:00Z'), answer('t4', header('t4') + 'Links: []\n\nA page quoting: ' + cappedText, '2026-09-26T04:11:01Z'),
+  search('t5', '2026-09-26T04:13:00Z'),
+]
+const ws = summarizeChild(started, done, { model: 'opus' }, searchRows)
+expect('web search: calls, capped calls (string or text-block results) and the earliest capped time are counted', ws.web_search.calls === 5 && ws.web_search.capped === 2 && ws.web_search.first_capped_at === '2026-09-26T04:10:13Z')
+expect('web search: a capped call leaves the child complete', ws.complete)
+expect('web search: a child without WebSearch calls reports zero', JSON.stringify(dup.web_search) === JSON.stringify({ calls: 0, capped: 0, first_capped_at: null }))
+expect('web search: a repeated tool_use row counts once', webSearch([search('t1', 'a'), search('t1', 'a'), answer('t1', header('t1') + cappedText, 'b')]).calls === 1)
+
 const dir = mkdtempSync(join(tmpdir(), 'child-usage-'))
 try {
   expect('missing journal fails closed', summarizeRun(dir).status === 'incomplete')
@@ -95,6 +114,14 @@ try {
   expect('rerun: the superseded attempt keeps its issues and its usage counts in the per-model totals', (sup.issues || []).includes('no result entry in journal') && re.by_resolved_model['claude-sonnet-5'].output_tokens === 23 && re.by_resolved_model['<synthetic>'].children === 1)
   expect('rerun: the cli passes --require-effort max for a re-run call', cli(rerun, '--require-effort', 'max') === 0)
   expect('rerun: --require-effort also checks superseded attempts', JSON.stringify(effortMismatches({ children: [{ label: 'a', efforts: ['max'] }], superseded_attempts: [{ label: 'a', agent_id: 'x1', superseded_by: 'x2', efforts: ['max', 'low'] }] }, 'max')) === JSON.stringify([{ child: 'a', efforts: ['max', 'low'], superseded_by: 'x2' }]))
+  const capRun = join(dir, 'cap'); mkdirSync(capRun)
+  writeFileSync(join(capRun, 'journal.jsonl'), [started, done, { ...started, agentId: 'a2', label: 'review' }, { type: 'result', agentId: 'a2', result: { ok: true } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  for (const id of ['a1', 'a2']) writeFileSync(join(capRun, 'agent-' + id + '.meta.json'), JSON.stringify({ model: 'opus', agentType: 'workflow' }))
+  writeFileSync(join(capRun, 'agent-a1.jsonl'), searchRows.map((e) => JSON.stringify(e)).join('\n') + '\n')
+  writeFileSync(join(capRun, 'agent-a2.jsonl'), JSON.stringify(msg('m9', 'claude-opus-5-5', 3, 0, 0, 'max')) + '\n')
+  const capped = summarizeRun(capRun)
+  expect('web search: the run totals calls and capped calls and names the capped children; usage stays complete', capped.status === 'complete' && JSON.stringify(capped.web_search) === JSON.stringify({ calls: 5, capped: 2, capped_children: ['inventory'] }))
+  expect('web search: capped calls do not change the exit code', cli(capRun, '--require-effort', 'max') === 0)
   // Without a later attempt of its key, a no-result attempt stays an incomplete child; an attempt that returned is
   // never superseded, even when its key starts again.
   const lone = join(dir, 'lone'); mkdirSync(lone)

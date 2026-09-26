@@ -59,6 +59,14 @@ earlier sweep already put through both refuters. `new` lists the rest. A proposa
 run never adjudicated stays `new`; an entry it did record carries both votes bound to evidence, so
 it is known. `known` and `new` are reported, not counted: the clean count never reads them.
 
+A vote that did not return counts as refuted, so its proposal is listed under `refuted`. When no
+returned vote refutes that proposal, it is **refuted by absence**: the vote objects that its refs
+point to mark the missing vote `{missing: true}` (for a two-family fit vote, the missing family
+member). `--check` and `--append` do not count such a proposal as an earlier adjudication, so a later
+sweep that proposes it again lists it as `new`. The landscape-sweep harness also names these
+proposals in the layer's `votes_note`, and its `build_inputs.py` shows them to the next discovery
+round as `not_adjudicated`, not as `refuted`.
+
 The sha256 values use canonical JSON: sorted keys, no whitespace, UTF-8. The first record chains
 to `{schema_version, policy}`, so changing `policy` also breaks the chain.
 

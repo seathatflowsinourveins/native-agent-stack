@@ -20,10 +20,17 @@ and all three of its votes replace the earlier round's; a vote missing from that
 earlier one.
 Retained failures: a round that returned nothing, a discovery family that did not return, a missing vote, a lost
 completeness critic, a critic-flagged layer beyond the follow-up cap, a GPT-6 copy problem and (with --usage) a worker
-measured at another effort than max (effort_deviation; the critic's belongs to every layer) are listed under
-failures/<layer>, and the layer gets the reopen entry {trigger: retained_failure, ref: @RETURNS@#/failures/<layer>},
-so it never counts as a clean layer. A layer none of whose rounds returned is left out of layers.json
-(excluded_layers in the summary).
+measured at another effort than max (effort_deviation) or a worker with a WebSearch call the session's cap refused
+(web_search_capped: Claude Code allows CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION WebSearch calls per session, default
+200, across the coordinator and every subagent, and a capped call returns a notice telling the worker to go on
+without searching) are listed under failures/<layer>; the critic's effort_deviation or web_search_capped belongs to
+every layer. The layer gets the reopen entry {trigger: retained_failure, ref: @RETURNS@#/failures/<layer>}, so it
+never counts as a clean layer. A layer none of whose rounds returned is left out of layers.json (excluded_layers in
+the summary).
+Refuted by absence: a proposal that no returned vote refutes, but that is refuted because a vote did not return
+(the vote object, or a fit family member, is {missing: true}), is listed under refuted like any refuted proposal, and
+its layer's votes_note names it. saturation_ledger.py (refuted_by_absence) and build_inputs.py read the missing marker
+and do not treat such a proposal as adjudicated.
 Models and effort: each Claude vote names the resolved model and the effort its own worker ran at, from --usage
 (child-usage.mjs output; a call the runtime re-ran is measured by the attempt that returned, and the client-written
 <synthetic> rows name no model); without it, the requested alias and effort null (not measured). The GPT-6 vote
@@ -137,9 +144,26 @@ def effort_deviations(usage: dict | None) -> list:
     return out
 
 
+def web_search_capped(usage: dict | None) -> list:
+    """{child, capped, calls, first_capped_at[, superseded_by]} for every child and superseded attempt of the usage
+    record with a WebSearch call that the session's cap refused (child-usage.mjs web_search.capped)."""
+    child_usage = as_dict(as_dict(usage).get("child_usage"))
+    out = []
+    for child in [*(child_usage.get("children") or []), *(child_usage.get("superseded_attempts") or [])]:
+        search = as_dict(as_dict(child).get("web_search"))
+        if isinstance(search.get("capped"), int) and search["capped"] > 0:
+            item = {"child": child.get("label") or child.get("agent_id"), "capped": search["capped"],
+                    "calls": search.get("calls"), "first_capped_at": search.get("first_capped_at")}
+            if child.get("superseded_by"):
+                item["superseded_by"] = child["superseded_by"]
+            out.append(item)
+    return out
+
+
 def deviation_rounds(deviations: list, layer_ids) -> tuple[dict, list]:
-    """(layer_id -> [(round, deviation)], unmapped deviations): a worker label <role>:<layer>[:followup] belongs to
-    that layer's round, and the completeness critic to every layer."""
+    """(layer_id -> [(round, item)], unmapped items) for per-worker items (effort deviations, capped WebSearch calls):
+    a worker label <role>:<layer>[:followup] belongs to that layer's round, and the completeness critic to every
+    layer."""
     by_layer, unmapped = {}, []
     for item in deviations:
         parts = str(item.get("child")).split(":")
@@ -296,8 +320,13 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
     # it loads) is a retained failure of its layer, like a lost vote: its return is kept and the layer is reopened.
     deviations = effort_deviations(usage)
     deviations_by_layer, deviations_unmapped = deviation_rounds(deviations, rounds_by_layer)
+    # A worker whose WebSearch call the session's cap refused went on without searching (the notice tells it to), so
+    # its layer's lane ran without a capability the prompts grant: a retained failure, like an effort deviation.
+    capped = web_search_capped(usage)
+    capped_by_layer, capped_unmapped = deviation_rounds(capped, rounds_by_layer)
 
     excluded, degraded = [], []
+    refuted_by_absence = {}
     for layer_id, rounds in rounds_by_layer.items():
         catalog = rounds[0]["catalog"]
         key = f"{catalog}/{layer_id}"
@@ -394,6 +423,11 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
             failures.append({"round": rnd, "cause": "effort_deviation", **item,
                              "detail": f"the worker did not run at effort {REQUIRED_EFFORT} alone (child-usage.mjs "
                                        f"--require-effort {REQUIRED_EFFORT}); its return is kept as returned"})
+        for rnd, item in capped_by_layer.get(layer_id, []):
+            failures.append({"round": rnd, "cause": "web_search_capped", **item,
+                             "detail": "the session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION) refused "
+                                       "this worker's WebSearch calls counted here, and the notice told it to go on "
+                                       "without searching; its return is kept as returned"})
         for name, value in calls.items():
             calls_total[name] = calls_total.get(name, 0) + value
         merged = [final[repo_slug]["proposal"] for repo_slug in order]
@@ -406,6 +440,7 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
         returns["raw"][layer_id] = raw
         returns["votes"][layer_id] = []
         survived, refuted, new_candidates = [], [], []
+        absent = []  # (repository slug, roles whose missing vote alone refutes it)
         for index, repo_slug in enumerate(order):
             row = final[repo_slug]
             rnd, p = row["round"], row["proposal"]
@@ -436,6 +471,8 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                        "gpt6": {"model": gpt6_model, "effort": gpt6_effort,
                                 **({k: gv.get(k) for k in vote_fields} if gv else {"missing": True}),
                                 "skills_used": row["skills"]["fit_gpt6"]}}
+            if not fv:
+                facts_obj["missing"] = True
             if notes:
                 facts_obj["notes"] = notes
                 fit_obj["notes"] = notes
@@ -446,6 +483,10 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                      "fit": {"vote": "refuted" if fit_refuted else "not_refuted", "ref": f"@RETURNS@#/{ref}/fit"}}
             survives = not facts_refuted and not fit_refuted
             (survived if survives else refuted).append(entry)
+            # Refuted by absence: no returned vote refutes it; only a vote that did not return does (it counts as
+            # refuted). Such a proposal is not refuted on merit (saturation_ledger.py refuted_by_absence).
+            if not survives and not ((facts_refuted and fv) or (claude_refuted and cv) or (gpt6_refuted and gv)):
+                absent.append((repo_slug, [role for role, _ in VOTE_ROLES if not row[role]]))
             if survives:
                 survivors.append({"layer_id": layer_id, "repository": repository})
             new_candidates.append({"repository": repository, "source": f"{lane}: {p.get('source', '')}"[:600],
@@ -473,8 +514,15 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
             reopen.append({"trigger": "retained_failure", "ref": f"@RETURNS@#/failures/{pointer_token(layer_id)}"})
         lane_layers.append({"layer_id": layer_id, "selected": [], "alternatives_keep_but_compare": [],
                             "new_candidates": new_candidates})
-        ledger_layers.append({"catalog": catalog, "layer_id": layer_id, "votes": "retained",
-                              "discovery_ref": f"@RETURNS@#/discovery/{pointer_token(layer_id)}",
+        ledger_layer = {"catalog": catalog, "layer_id": layer_id, "votes": "retained"}
+        if absent:
+            refuted_by_absence[layer_id] = [repo_slug for repo_slug, _ in absent]
+            roles = sorted({dict(VOTE_ROLES)[role] for _, missing_roles in absent for role in missing_roles})
+            ledger_layer["votes_note"] = (
+                f"{len(absent)} of {len(proposed)} proposals are refuted only because a vote did not return "
+                f"({', '.join(roles)}; the vote is {{missing: true}} in the returns): no returned vote refutes them, "
+                f"so they are not refuted on merit and not adjudicated: {', '.join(r for r, _ in absent)}.")
+        ledger_layers.append({**ledger_layer, "discovery_ref": f"@RETURNS@#/discovery/{pointer_token(layer_id)}",
                               "calls": calls or None, "proposed": proposed, "survived": survived, "refuted": refuted,
                               "reopen": reopen})
     returns["skills_usage"] = skills_usage
@@ -492,6 +540,10 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                         "degraded_discovery": degraded, "critic_lost": critic_lost,
                         "effort_deviations": [item["child"] for item in deviations],
                         "effort_deviations_unmapped": [item["child"] for item in deviations_unmapped],
+                        "web_search": as_dict(as_dict(usage).get("child_usage")).get("web_search"),
+                        "web_search_capped": [item["child"] for item in capped],
+                        "web_search_capped_unmapped": [item["child"] for item in capped_unmapped],
+                        "refuted_by_absence": refuted_by_absence,
                         "retained_failures": failures_summary, "reopened_layers": sorted(failures_summary),
                         "calls": calls_total, "skills_usage": skills_usage, "gpt6_jobs": gpt6_usage["jobs"],
                         "gpt6_by_status": gpt6_usage["by_status"], "gpt6_copy_check": checks}}

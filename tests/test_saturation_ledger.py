@@ -571,6 +571,38 @@ class IntegrityTests(FixtureCase):
         ledger = sl.append(self.root, ledger, result("fx-3", "2026-10-15"))
         self.assertEqual(ledger["sweeps"][2]["layers"][0]["known"], [SURV, REF])
 
+    def test_a_proposal_refuted_by_absence_stays_new_in_a_later_sweep(self):
+        # REF's fit vote refutes only because its GPT-6 member never returned ({missing: true}), so fx-1 did not
+        # adjudicate it: fx-2 lists it as new, and fx-2's own merit refutation makes it known for fx-3.
+        returns = json.loads((self.root / RETURNS).read_text(encoding="utf-8"))
+        returns["votes"]["ref"]["fit"].update(claude={"refuted": False}, gpt6={"missing": True})
+        write(self.root, RETURNS, returns)
+        register(self.root)
+        ledger = self.appended(result(), result("fx-2", "2026-10-08"), result("fx-3", "2026-10-15"))
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        alpha = [record["layers"][0] for record in ledger["sweeps"]]
+        self.assertEqual([(layer["known"], layer["new"]) for layer in alpha[1:]], [([SURV], [REF]), ([SURV, REF], [])])
+
+    def test_refutes_on_merit_reads_the_missing_marker(self):
+        self.assertIsNone(sl.refutes_on_merit({"refuted": False}))
+        self.assertTrue(sl.refutes_on_merit({"refuted": True}))
+        self.assertFalse(sl.refutes_on_merit({"refuted": True, "missing": True}))
+        self.assertFalse(sl.refutes_on_merit({"refuted": True, "claude": {"refuted": False}, "gpt6": {"missing": True}}))
+        self.assertTrue(sl.refutes_on_merit({"refuted": True, "claude": {"refuted": True}, "gpt6": {"missing": True}}))
+        self.assertTrue(sl.refutes_on_merit({"refuted": True, "claude": {"missing": True}, "gpt6": {"refuted": True}}))
+        # A returned vote without refuted: false refutes (the refuters' default), so it is a merit refutation.
+        self.assertTrue(sl.refutes_on_merit({"refuted": True, "claude": {"refuted": None}, "gpt6": {"missing": True}}))
+        documents = {"r.json": {"v": [{"refuted": False}, {"refuted": True, "missing": True}, {"refuted": True}]}}
+        target_of = sl.ref_resolver(documents.__getitem__)
+        absent = {"repo": "x", "facts": {"vote": "not_refuted", "ref": "r.json#/v/0"},
+                  "fit": {"vote": "refuted", "ref": "r.json#/v/1"}}
+        self.assertTrue(sl.refuted_by_absence(absent, target_of))
+        merit = dict(absent, facts={"vote": "refuted", "ref": "r.json#/v/2"})
+        self.assertFalse(sl.refuted_by_absence(merit, target_of))
+        unresolved = dict(absent, fit={"vote": "refuted", "ref": "r.json#/v/9"})
+        self.assertFalse(sl.refuted_by_absence(unresolved, target_of))
+        self.assertFalse(sl.refuted_by_absence({"repo": "x", "lens_votes": []}, target_of))
+
     def test_not_retained_votes_need_a_note(self):
         missing_note = result()
         missing_note["layers"][1]["votes"] = "not_retained"

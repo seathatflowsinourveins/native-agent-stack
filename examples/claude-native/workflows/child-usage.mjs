@@ -20,6 +20,10 @@
 // after a usage-limit pause) is listed under superseded_attempts with superseded_by, keeps its
 // issues and effort check, and its usage counts in by_resolved_model, whose `children` counter
 // counts attempts; `children` holds the final attempt of each call.
+// web_search (per attempt and per run) counts WebSearch calls and the capped ones: a session makes at
+// most CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION WebSearch calls (default 200), counted across the main
+// conversation and every subagent, and a capped call returns a notice instead of results (tools-reference,
+// "Session search limit"). A capped call changes no usage and no exit code; callers decide what it means.
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { homedir } from 'node:os'
@@ -54,6 +58,30 @@ export function expectedModel(alias, clientVersion) {
 export function olderThan(model, expected) {
   const got = modelGeneration(model), want = modelGeneration(expected)
   return !got || !want || got.family !== want.family || compareParts(got.version, want.version) < 0
+}
+
+// The capped-call notice opens the tool result's result section, after the "Web search results for query: ..."
+// header line (observed with client 2.1.283: "Web search was not performed: this session has used its web search
+// budget (200 of 200 WebSearch calls). ..."). Page text that merely quotes the notice is not a capped call.
+export const WEB_SEARCH_CAPPED = 'Web search was not performed'
+const WEB_SEARCH_HEADER = 'Web search results for query:'
+const resultText = (content) => typeof content === 'string' ? content : Array.isArray(content) ? content.map((b) => (b && typeof b.text === 'string' ? b.text : '')).join('\n') : ''
+export function webSearch(transcript) {
+  const calls = new Map()
+  const blocks = (row) => (row && row.message && Array.isArray(row.message.content) ? row.message.content : []).filter((b) => b && typeof b === 'object')
+  for (const row of transcript) for (const b of blocks(row)) if (b.type === 'tool_use' && b.name === 'WebSearch' && typeof b.id === 'string') calls.set(b.id, null)
+  const cappedAt = []
+  for (const row of transcript) for (const b of blocks(row)) {
+    if (b.type !== 'tool_result' || !calls.has(b.tool_use_id) || calls.get(b.tool_use_id) !== null) continue
+    const text = resultText(b.content)
+    const cut = text.indexOf('\n\n')
+    const body = text.startsWith(WEB_SEARCH_HEADER) && cut >= 0 ? text.slice(cut + 2) : text
+    const capped = body.startsWith(WEB_SEARCH_CAPPED)
+    calls.set(b.tool_use_id, capped)
+    if (capped) cappedAt.push(typeof row.timestamp === 'string' ? row.timestamp : null)
+  }
+  const times = cappedAt.filter(Boolean).sort()
+  return { calls: calls.size, capped: cappedAt.length, first_capped_at: times[0] ?? null }
 }
 
 export function summarizeChild(started, result, meta, transcript) {
@@ -104,7 +132,7 @@ export function summarizeChild(started, result, meta, transcript) {
   return {
     agent_id: started.agentId, label: started.label ?? null, phase: started.phase ?? null,
     agent_type: meta ? meta.agentType ?? null : null,
-    requested_model: requested, resolved_models: resolved, efforts,
+    requested_model: requested, resolved_models: resolved, efforts, web_search: webSearch(transcript),
     requests: messages.length, usage, usage_by_model: usageByModel,
     // Provider-returned cache read on the first request: evidence that the shared
     // prefix was served from cache for this child. Zero is not proof of a miss policy.
@@ -154,6 +182,12 @@ export function summarizeRun(dir) {
     status: !children.length ? 'incomplete' : incomplete.length ? 'incomplete' : 'complete',
     reason: (!children.length ? 'journal has no started children' : incomplete.length ? incomplete.length + ' child(ren) incomplete' : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result') + rerun,
     multi_model_children: children.filter((c) => c.resolved_models.length > 1).map((c) => c.label || c.agent_id),
+    // Over every attempt (children and superseded attempts), like by_resolved_model.
+    web_search: {
+      calls: attempts.reduce((n, c) => n + c.web_search.calls, 0),
+      capped: attempts.reduce((n, c) => n + c.web_search.capped, 0),
+      capped_children: attempts.filter((c) => c.web_search.capped).map((c) => c.label || c.agent_id),
+    },
     children, ...(superseded.length ? { superseded_attempts: superseded } : {}), by_resolved_model: byModel,
   }
 }

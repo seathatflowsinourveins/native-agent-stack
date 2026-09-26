@@ -208,9 +208,11 @@ def scope_for(layers=(("foundation", "alpha"), ("us-equities", "beta"), ("founda
 def child_usage_raw(run_id, labels, status="complete", transcript_root="/home/example/.claude/projects/p/s"):
     children = [{"label": label, "requested_model": "sonnet" if label.startswith(("refute-facts", "gpt6-")) else "opus",
                  "resolved_models": ["claude-sonnet-5" if label.startswith(("refute-facts", "gpt6-")) else "claude-opus-5-5"],
-                 "efforts": ["max"], "complete": True} for label in labels]
+                 "efforts": ["max"], "web_search": {"calls": 0, "capped": 0, "first_capped_at": None},
+                 "complete": True} for label in labels]
     return json.dumps({"transcript_dir": f"{transcript_root}/subagents/workflows/{run_id}", "status": status,
-                       "reason": "fixture", "children": children}).encode("utf-8")
+                       "reason": "fixture", "web_search": {"calls": 0, "capped": 0, "capped_children": []},
+                       "children": children}).encode("utf-8")
 
 
 SYNTHETIC_LABELS = [f"{role}:{layer}" for layer in ("alpha", "beta") for role in
@@ -386,6 +388,32 @@ class BuildInputsTests(unittest.TestCase):
         self.assertEqual(len(alpha["open_gaps"][0]), 300)
         layers = json.loads((self.work / "layers.json").read_text())
         self.assertEqual([(x["catalog"], x["layer_id"]) for x in layers], [("foundation", "alpha"), ("us-equities", "beta")])
+
+    def test_a_proposal_refuted_by_absence_is_shown_as_not_adjudicated(self):
+        # o/r: facts and the Claude fit refuter returned not refuted, the GPT-6 fit vote never returned. o/m: facts
+        # refuted it on merit.
+        returns = "evidence/sw-1/returns.json"
+        write_json(self.repo / returns, {"votes": {"alpha": [
+            {"facts": {"role": "facts", "repository": "https://github.com/o/r", "refuted": False},
+             "fit": {"role": "fit", "repository": "https://github.com/o/r", "refuted": True,
+                     "claude": {"refuted": False}, "gpt6": {"missing": True}}},
+            {"facts": {"role": "facts", "repository": "https://github.com/o/m", "refuted": True},
+             "fit": {"role": "fit", "repository": "https://github.com/o/m", "refuted": True,
+                     "claude": {"refuted": False}, "gpt6": {"missing": True}}}]}})
+        ledger = json.loads((self.repo / "catalogs/saturation/ledger.json").read_text())
+
+        def entry(repo, index, facts):
+            return {"repo": repo, "facts": {"vote": facts, "ref": f"{returns}#/votes/alpha/{index}/facts"},
+                    "fit": {"vote": "refuted", "ref": f"{returns}#/votes/alpha/{index}/fit"}}
+        ledger["sweeps"][0]["layers"][0]["refuted"] = [entry("https://github.com/o/r", 0, "not_refuted"),
+                                                        entry("https://github.com/o/m", 1, "refuted")]
+        write_json(self.repo / "catalogs/saturation/ledger.json", ledger)
+        done = self.build()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        previous = json.loads((self.work / "inputs/alpha.json").read_text())["previous_sweep"]
+        self.assertEqual((previous["refuted"], previous["not_adjudicated"]),
+                         (["https://github.com/o/m"], ["https://github.com/o/r"]))
+        self.assertIn("not refuted on merit", previous["not_adjudicated_note"])
 
     def test_unknown_seed_layers_and_unfrozen_layers_are_refused(self):
         seeds = write_json(self.work / "seeds.json", {"zeta": ["x"]})
@@ -1027,6 +1055,18 @@ class ConvertTests(unittest.TestCase):
         b1 = out["returns"]["votes"]["beta"][0]
         self.assertEqual((b1["facts"]["repository"], b1["facts"]["refuted"]), (B1, True))
         self.assertIn("facts vote missing (counted as refuted)", b1["facts"]["notes"])
+        # Refuted by absence: B1 has only a missing facts vote against it; A3's facts vote refutes it on merit.
+        self.assertTrue(b1["facts"]["missing"])
+        self.assertNotIn("missing", a3["facts"])
+        self.assertEqual(out["summary"]["refuted_by_absence"], {"beta": ["o/beta-one"]})
+        self.assertNotIn("votes_note", layers["alpha"])
+        self.assertIn("1 of 2 proposals are refuted only because a vote did not return (facts;", layers["beta"]["votes_note"])
+        self.assertTrue(layers["beta"]["votes_note"].endswith("not adjudicated: o/beta-one."))
+        # Every GPT-6 fit vote missing: A1, A2 and A4 pass facts and the Claude fit refuter, so they are refuted by
+        # absence; A3 stays refuted on merit by facts.
+        failed = self.convert(fail_gpt6_fit(synthetic_result()))
+        self.assertEqual(failed["summary"]["refuted_by_absence"]["alpha"], ["o/alpha-two", "owner/alpha-one", "o/alpha-four"])
+        self.assertIn("(GPT-6 fit;", {x["layer_id"]: x for x in failed["layers"]}["alpha"]["votes_note"])
         self.assertEqual(out["survivors"], [{"layer_id": "alpha", "repository": canon(A1)},
                                             {"layer_id": "alpha", "repository": canon(A4)},
                                             {"layer_id": "beta", "repository": B2}])
@@ -1317,6 +1357,33 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(out["layers"][0]["reopen"], [{"trigger": "retained_failure",
                                                        "ref": "@RETURNS@#/failures/alpha"}])
 
+    def test_a_worker_with_a_capped_web_search_is_a_retained_failure_of_its_layer(self):
+        # The session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION): child-usage.mjs counts capped calls.
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS + ["refute-fit:zeta"]))
+        capped = {"refute-fit:beta:followup": 2, "refute-facts:alpha": 1, "refute-fit:zeta": 1}
+        for child in raw["children"]:
+            if child["label"] in capped:
+                child["web_search"] = {"calls": 3, "capped": capped[child["label"]],
+                                       "first_capped_at": "2026-10-26T04:10:13Z"}
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 0, "cmd", ROOT)
+        out = convert.convert(synthetic_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["web_search_capped"],
+                         ["refute-facts:alpha", "refute-fit:beta:followup", "refute-fit:zeta"])
+        self.assertEqual(out["summary"]["web_search_capped_unmapped"], ["refute-fit:zeta"])
+        found = {layer_id: [(f["round"], f["child"], f["capped"]) for f in failures if f["cause"] == "web_search_capped"]
+                 for layer_id, failures in out["returns"]["failures"].items()}
+        self.assertEqual(found, {"alpha": [("first", "refute-facts:alpha", 1)],
+                                 "beta": [("followup", "refute-fit:beta:followup", 2)]})
+        # A capped worker alone reopens a healthy layer, and the critic's cap counts for every layer.
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+        next(c for c in raw["children"] if c["label"] == "critic")["web_search"] = {
+            "calls": 2, "capped": 2, "first_capped_at": "2026-10-26T11:06:45Z"}
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 0, "cmd", ROOT)
+        out = convert.convert(healthy_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["retained_failures"], {"alpha": ["critic:web_search_capped"]})
+        self.assertEqual(out["layers"][0]["reopen"], [{"trigger": "retained_failure",
+                                                       "ref": "@RETURNS@#/failures/alpha"}])
+
     def cli(self, work, res, *extra, codex_files=True):
         run_file = write_json(work / "run.json", {"runId": "wf_fixture-1", "status": "completed", "result": res})
         write_json(work / "scope.json", scope_for())
@@ -1603,6 +1670,17 @@ class LedgerIntegrationTests(unittest.TestCase):
             change(drifted)
             with self.assertRaisesRegex(ValueError, message):
                 self.result(out, reviews, usage=drifted)
+        # The WebSearch cap: every child needs a measured web_search, and a capped worker needs its retained failure.
+        unmeasured = copy.deepcopy(usage)
+        unmeasured["child_usage"]["status"] = "complete"
+        del unmeasured["child_usage"]["children"][0]["web_search"]
+        with self.assertRaisesRegex(ValueError, "without a measured web_search"):
+            self.result(out, reviews, usage=unmeasured)
+        capped = copy.deepcopy(usage)
+        capped["child_usage"]["status"] = "complete"
+        capped["child_usage"]["children"][0]["web_search"] = {"calls": 2, "capped": 1, "first_capped_at": None}
+        with self.assertRaisesRegex(ValueError, "no web_search_capped retained failure"):
+            self.result(out, reviews, usage=capped)
         # A layer with retained failures must keep its retained_failure reopen entry.
         stripped = copy.deepcopy(out["layers"])
         stripped[0]["reopen"] = []
@@ -1626,6 +1704,30 @@ class LedgerIntegrationTests(unittest.TestCase):
         returns["failures"] = {}
         with self.assertRaisesRegex(ValueError, "no effort_deviation retained failure"):
             self.result(out, reviews, returns=returns)
+
+    def test_a_capped_web_search_reopens_every_layer_through_the_critic(self):
+        raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+        next(c for c in raw["children"] if c["label"] == "critic")["web_search"] = {
+            "calls": 2, "capped": 2, "first_capped_at": "2026-10-26T11:06:45Z"}
+        out, reviews = self.evidence(healthy_result(),
+                                     usage=usage_record.record(json.dumps(raw).encode("utf-8"), 0, "cmd", ROOT))
+        result = self.result(out, reviews)
+        ledger = sl.append(self.root, json.loads((self.root / sl.LEDGER).read_text()), result)
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        # healthy_result's layer would be clean (count 1) without the capped critic.
+        self.assertEqual({key[1]: value for key, value in sl.derive(ledger).items()}["alpha"]["count"], 0)
+
+    def test_refuted_by_absence_is_not_an_earlier_adjudication(self):
+        # beta's B1 is refuted only by its missing facts vote; alpha's A3 by its returned facts vote.
+        out, reviews = self.evidence(synthetic_result())
+        ledger = sl.append(self.root, json.loads((self.root / sl.LEDGER).read_text()), self.result(out, reviews))
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        layers = {layer["layer_id"]: layer for layer in ledger["sweeps"][-1]["layers"]}
+        self.assertIn("o/beta-one", layers["beta"]["votes_note"])
+        target_of = sl.ref_resolver(lambda path: sl.load_json(self.root, path))
+        self.assertEqual(sl.adjudicated_repos(layers["beta"], target_of), {sl.norm_repo(B2)})
+        self.assertEqual(sl.adjudicated_repos(layers["beta"]), {sl.norm_repo(B1), sl.norm_repo(B2)})
+        self.assertIn(sl.norm_repo(A3), sl.adjudicated_repos(layers["alpha"], target_of))
 
     def test_hand_written_reopen_entries_are_added_to_the_retained_failures(self):
         out, reviews = self.evidence(synthetic_result())

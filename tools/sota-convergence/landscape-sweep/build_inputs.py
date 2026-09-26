@@ -14,6 +14,10 @@ and <work-dir>/layers.json ([{catalog, layer_id, title, input}] in catalog order
 
 --seeds is an optional JSON object {"<layer_id>": ["candidate or note", ...]}: candidates other sessions asked this
 sweep to assess, shown to the discovery workers as seeded_candidates. An unknown layer id is an error.
+
+previous_sweep holds that sweep's survived and refuted repositories. A proposal it refuted only because a vote did
+not return (saturation_ledger.py refuted_by_absence: no returned vote refutes it) is listed under not_adjudicated
+instead, with not_adjudicated_note, so the next discovery round does not read it as refuted on merit.
 """
 
 from __future__ import annotations
@@ -25,9 +29,11 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from sweep_common import MANIFEST_SECTION, REPO_ROOT, load_json, slug, work_dir, write_json  # noqa: E402
+from sweep_common import MANIFEST_SECTION, REPO_ROOT, ledger_module, load_json, slug, work_dir, write_json  # noqa: E402
 
 CATALOG_FILES = (("foundation", "foundation.json"), ("us-equities", "us-equities.json"))
+NOT_ADJUDICATED_NOTE = ("refuted in that sweep only because a vote did not return (a missing vote counts as refuted); "
+                        "no returned vote refuted these, so they were not refuted on merit")
 COMPONENT_FIELDS = ("id", "repository", "pin", "upstream", "pin_behind_upstream", "pin_comparison")
 
 
@@ -54,16 +60,22 @@ def check_seeds(seeds, layer_ids) -> dict:
 
 
 def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshness: dict, baseline: dict | None,
-                       ledger: dict, seeds=None) -> list[dict]:
-    """One input object per landscape layer, in catalog order; raises on a layer missing from the frozen scope."""
+                       ledger: dict, seeds=None, absent=None) -> list[dict]:
+    """One input object per landscape layer, in catalog order; raises on a layer missing from the frozen scope.
+    ``absent(entry)`` says whether a refuted ledger entry is refuted by absence (main() passes the ledger's
+    refuted_by_absence over this checkout's retained returns); without it every refuted entry stays refuted."""
     research = {(row["catalog"], row["layer_id"]): row for row in research_state.get("layers") or []}
     previous_sweep = last_completed(ledger)
     previous = {}
     for layer in (previous_sweep or {}).get("layers") or []:
+        refuted = [entry for entry in layer.get("refuted") or []]
+        not_adjudicated = [entry["repo"] for entry in refuted if absent is not None and absent(entry)]
         previous[(layer.get("catalog"), layer.get("layer_id"))] = {
             "sweep_id": previous_sweep.get("sweep_id"),
             "survived": [entry["repo"] for entry in layer.get("survived") or []],
-            "refuted": [entry["repo"] for entry in layer.get("refuted") or []]}
+            "refuted": [entry["repo"] for entry in refuted if entry["repo"] not in not_adjudicated],
+            **({"not_adjudicated": not_adjudicated, "not_adjudicated_note": NOT_ADJUDICATED_NOTE}
+               if not_adjudicated else {})}
     all_ids = [layer["layer_id"] for catalog, _ in CATALOG_FILES for layer in catalogs[catalog]["layers"]]
     duplicates = sorted({layer_id for layer_id in all_ids if all_ids.count(layer_id) > 1})
     if duplicates:
@@ -130,11 +142,16 @@ def main(argv=None) -> int:
         if baseline_path is None and last_completed(ledger) and last_completed(ledger).get("manifest_ref"):
             baseline_path = repo / last_completed(ledger)["manifest_ref"]
         catalogs = {catalog: load_json(repo / "catalogs" / "landscape" / name) for catalog, name in CATALOG_FILES}
+        led = ledger_module(REPO_ROOT)  # the ledger's rules from this checkout, applied to --repo-root's files
+        documents = {}
+        target_of = led.ref_resolver(lambda path: documents[path] if path in documents
+                                     else documents.setdefault(path, led.load_json(repo, path)))
         inputs = build_layer_inputs(
             catalogs, load_json(repo / "catalogs" / "landscape" / "research-state.json"),
             load_json(args.scope or work / "scope.json"), load_json(args.freshness_manifest),
             load_json(baseline_path) if baseline_path else None, ledger,
-            load_json(args.seeds) if args.seeds else None)
+            load_json(args.seeds) if args.seeds else None,
+            absent=lambda entry: led.refuted_by_absence(entry, target_of))
     except (ValueError, OSError, KeyError) as error:
         print(f"build_inputs.py: {error}", file=sys.stderr)
         return 2

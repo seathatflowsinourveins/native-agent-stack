@@ -19,8 +19,10 @@ Computed fields (prev_sha256, the hashes, known, new) are left to --append. A st
 (recipe section 4). This tool refuses: usage that is not complete, a usage measurement whose child-usage.mjs exit
 code is not 0 (1 is accepted only for effort mismatches that the returns cover), a child or superseded attempt that
 did not run at effort max only unless the returns list it as an effort_deviation retained failure (convert.py
---usage), and a layer whose retained failures (returns.json failures/<layer>) lack their retained_failure reopen
-entry. Paths are repository-relative and must exist.
+--usage), a child or superseded attempt without a measured web_search (child-usage.mjs before the WebSearch count), a
+worker with a capped WebSearch call that the returns do not list as a web_search_capped retained failure, and a layer
+whose retained failures (returns.json failures/<layer>) lack their retained_failure reopen entry. Paths are
+repository-relative and must exist.
 """
 
 from __future__ import annotations
@@ -84,6 +86,22 @@ def check_usage(usage: dict, usage_ref: str, returns: dict | None = None) -> dic
     off = [label for label in off if label not in covered]
     if off:
         raise ValueError(f"{usage_ref}: children that did not run at effort {REQUIRED_EFFORT} only: {off}")
+    # The session's WebSearch cap: a worker it refused went on without searching, so its layer must be reopened.
+    unmeasured = [child.get("label") or child.get("agent_id") for child in attempts if isinstance(child, dict)
+                  and not (isinstance((child.get("web_search") or {}).get("calls"), int)
+                           and isinstance((child.get("web_search") or {}).get("capped"), int))]
+    if unmeasured:
+        raise ValueError(f"{usage_ref}: children without a measured web_search (re-measure with this checkout's "
+                         f"child-usage.mjs): {unmeasured[:5]}{' ...' if len(unmeasured) > 5 else ''}")
+    capped = [child.get("label") or child.get("agent_id") for child in attempts
+              if isinstance(child, dict) and child["web_search"]["capped"] > 0]
+    capped_covered = {failure.get("child") for items in ((returns or {}).get("failures") or {}).values()
+                      for failure in (items if isinstance(items, list) else [])
+                      if isinstance(failure, dict) and failure.get("cause") == "web_search_capped"}
+    uncapped = [label for label in capped if label not in capped_covered]
+    if uncapped:
+        raise ValueError(f"{usage_ref}: workers with capped WebSearch calls have no web_search_capped retained "
+                         f"failure in the returns (convert.py --usage records one per worker): {uncapped}")
     return child_usage
 
 

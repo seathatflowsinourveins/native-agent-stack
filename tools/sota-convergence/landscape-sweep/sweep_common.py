@@ -89,6 +89,14 @@ def private_content(repo_root: Path = REPO_ROOT):
     return module.PRIVATE_CONTENT
 
 
+def ledger_module(repo_root: Path = REPO_ROOT):
+    """scripts/saturation_ledger.py of the checkout, for the ledger's own rules (refuted_by_absence, ref_resolver)."""
+    spec = importlib.util.spec_from_file_location("landscape_sweep_ledger", Path(repo_root) / "scripts" / "saturation_ledger.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def pointer_token(key) -> str:
     return str(key).replace("~", "~0").replace("/", "~1")
 

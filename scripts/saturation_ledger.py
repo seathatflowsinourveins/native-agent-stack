@@ -17,6 +17,9 @@ Derived per layer, never stored:
   platform-profile hash;
 - a stopped sweep neither counts nor resets; a survivor, a reopen entry, a changed requirement or
   platform-profile hash, or a sweep without retained returns resets the count to 0, durably;
+- a refuted proposal that no returned vote refutes (a vote that did not return counts as refuted, and
+  the retained vote object marks it ``{missing: true}``) is **refuted by absence**: it is not an
+  earlier adjudication, so a later sweep that proposes it again counts it as new;
 - a current ``pin_moved``/``stale`` receipt flag or an archived/renamed/relicensed selection is a
   *current* trigger: it holds the count at 0 only while it stands, because the report reads it
   from today's files and the weekly workflow never writes the ledger. It becomes a durable reset
@@ -230,10 +233,55 @@ def baseline_repositories(section: str, layer_row: dict, lane: str) -> set:
     return repos
 
 
-def adjudicated_repos(layer: dict) -> set:
-    """Repositories an earlier sweep already put through both refuters for this layer."""
+def refutes_on_merit(target) -> bool | None:
+    """Whether a retained vote object refutes on a returned vote. None when it does not refute (or is not a vote
+    object). True when a returned vote refutes: a two-family fit object's member ({claude, gpt6}) that is not
+    {missing: true} and does not say refuted: false (a returned vote refutes unless it says false), or a single
+    vote object without the missing marker. False when it refutes only because a vote did not return: the
+    landscape-sweep harness writes {missing: true} for a vote that never came back and counts it as refuted."""
+    if not isinstance(target, dict) or target.get("refuted") is not True:
+        return None
+    members = [target[key] for key in ("claude", "gpt6") if isinstance(target.get(key), dict)]
+    if members:
+        return any(not member.get("missing") and member.get("refuted") is not False for member in members)
+    return not target.get("missing")
+
+
+def refuted_by_absence(entry: dict, target_of) -> bool:
+    """A refuted outcome that no returned vote refutes: each of its refuting votes refutes only because a vote did
+    not return (refutes_on_merit False). ``target_of(ref)`` resolves a ``path#/pointer`` ref. Lens votes, and a vote
+    whose ref does not resolve, count as adjudicated (False)."""
+    if not isinstance(entry, dict) or "lens_votes" in entry:
+        return False
+    verdicts = []
+    for role in ROLES:
+        vote = entry.get(role)
+        if not isinstance(vote, dict) or vote.get("vote") != "refuted":
+            continue
+        try:
+            verdicts.append(refutes_on_merit(target_of(vote.get("ref"))))
+        except (LedgerError, TypeError, ValueError):
+            return False
+    return bool(verdicts) and all(verdict is False for verdict in verdicts)
+
+
+def ref_resolver(document_of):
+    """A ``target_of(ref)`` for refuted_by_absence over ``document_of(path)`` (a loader that may cache)."""
+    def target_of(ref):
+        if not isinstance(ref, str):
+            raise LedgerError(f"vote ref must be a string: {ref!r}")
+        path, _, pointer = ref.partition("#")
+        return resolve_pointer(document_of(path), pointer)
+    return target_of
+
+
+def adjudicated_repos(layer: dict, target_of=None) -> set:
+    """Repositories an earlier sweep already put through both refuters for this layer. With ``target_of`` (a ref
+    resolver), a refuted entry that is refuted_by_absence is left out: no returned vote judged it, so it stays new
+    in later sweeps."""
     return {norm_repo(entry["repo"]) for field in ("survived", "refuted") for entry in layer.get(field) or []
-            if isinstance(entry, dict) and isinstance(entry.get("repo"), str)}
+            if isinstance(entry, dict) and isinstance(entry.get("repo"), str)
+            and not (field == "refuted" and target_of is not None and refuted_by_absence(entry, target_of))}
 
 
 def split_known(proposed: list, baseline: set, earlier: set) -> tuple[list, list]:
@@ -530,7 +578,7 @@ class Checker:
                 self.error(f"{layer_label}: duplicate layer {key}")
             seen.add(key)
             self.check_layer(sweep, layer, layer_label, manifest, lane, proposals_so_far.get(key, set()))
-            proposals_so_far.setdefault(key, set()).update(adjudicated_repos(layer))
+            proposals_so_far.setdefault(key, set()).update(adjudicated_repos(layer, ref_resolver(self.document)))
 
     def check_lost_workers(self, sweep: dict, usage, label: str) -> None:
         """lost_workers is exactly the usage output's incomplete children: each listed label never
@@ -1044,9 +1092,13 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
             raise LedgerError(f"returns_ref {record['returns_ref']} does not exist")
     manifest = load_json(root, record["manifest_ref"]) if record.get("manifest_ref") else None
     earlier: dict = {}
+    documents: dict = {}
+    target_of = ref_resolver(lambda path: documents[path] if path in documents
+                             else documents.setdefault(path, load_json(root, path)))
     for sweep in ledger.get("sweeps") or []:
         for layer in sweep.get("layers") or []:
-            earlier.setdefault((layer.get("catalog"), layer.get("layer_id")), set()).update(adjudicated_repos(layer))
+            earlier.setdefault((layer.get("catalog"), layer.get("layer_id")), set()).update(
+                adjudicated_repos(layer, target_of))
     layers = []
     for layer in record.get("layers") or []:
         for field in COMPUTED_LAYER_FIELDS:
