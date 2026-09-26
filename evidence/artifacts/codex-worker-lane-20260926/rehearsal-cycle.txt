@@ -1,0 +1,105 @@
+# dry run, apply, second apply, rollback twice on a scratch Codex home holding copies of this host's
+# config.toml, AGENTS.md and RTK.md (no auth.json); driver scripts/cycle.sh.txt
+== sha256 before
+a673f0b4e63f81b602399a1705a744b26d36aa118d9ddcb7980b1d9bd98650f3  config.toml
+a8056071fa5d094cfa920a18e5fa972e0c711f4a0552b94a4a81a47b15458b38  AGENTS.md
+== dry run
+DRY RUN: nothing under the Codex home is written.
+Codex worker lane for CODEX_HOME=$SCRATCH/pd/sbx5[redacted]
+preconditions:
+  [ok] codex version: codex-cli 0.157.1 (pin 0.157.1)
+  [ok] context-mode start.mjs: ~/.local/share/codex-ecosystem/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs: sha256 0324441841b2 (expected 0324441841b2)
+  [ok] node: ~/.local/share/codex-ecosystem/bin/node
+  [ok] HOST_PATH: ~/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
+  [ok] config.toml: $SCRATCH/pd/sbx5[redacted]config.toml present
+  [ok] features.daemon_auto_start: false
+  [ok] AGENTS.override.md: none with text
+  [ok] AGENTS.md block: markers intact or absent
+  [ok] stack-worker profile: absent; will be created
+  [ok] codex processes: none
+config.toml, through codex app-server config/batchWrite (expectedVersion from config/read):
+  set  mcp_servers.context-mode: absent -> {args, command, default_tools_approval_mode, env, startup_timeout_sec}
+  set  plugins."context-mode@context-mode".mcp_servers.context-mode.enabled: absent -> false
+  keep mcp_servers.headroom.env.HEADROOM_OFFLINE: "1"
+  set  mcp_servers.headroom.env.HF_HUB_OFFLINE: absent -> "1"
+  set  mcp_servers.headroom.env.TRANSFORMERS_OFFLINE: absent -> "1"
+  keep mcp_servers.headroom.env.DO_NOT_TRACK: "1"
+AGENTS.md: writes the managed block (sha256 a8056071fa5d094cfa920a18e5fa972e0c711f4a0552b94a4a81a47b15458b38 -> a0a1eab353a8c40bb96cf59bcdbc53a7ddeece20f7bebe1c7e2d6afbca65ab4e)
+stack-worker.config.toml: create
+  HOST STEP (not scripted; Codex's writer cannot edit a project config): in ~/code/native-agent-stack/.codex/config.toml, back the file up
+  privately, then delete each of these tables, from its header line to the line before the next header:
+    line 18: [plugins."context-mode@context-mode".mcp_servers.context-mode]
+    line 21: [mcp_servers.context-mode]
+    line 27: [mcp_servers.context-mode.env]
+  Read back from that project's root: `codex mcp get context-mode --json` shows "cwd": null and the
+  user-scope command, and `codex mcp list --json` lists exactly one context-mode.
+rehearsal on private copies:
+  scratch Codex home, network namespace off (bwrap)
+  config/batchWrite: ok, version sha256:9587dc73c77c... -> sha256:603b57e3f39e...
+  keys outside the lane's own: unchanged (config/read, before and after)
+  config.toml diff:
+    @@ -17,2 +17,5 @@
+     enabled = true
+    +
+    +[plugins."context-mode@context-mode".mcp_servers.context-mode]
+    +enabled = false
+
+    @@ -145,2 +148,15 @@
+     HEADROOM_OFFLINE = "1"
+    +HF_HUB_OFFLINE = "1"
+    +TRANSFORMERS_OFFLINE = "1"
+    +
+    +[mcp_servers.context-mode]
+    +command = "~/.local/share/codex-ecosystem/bin/node"
+    +args = ["~/.local/share/codex-ecosystem/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"]
+    +startup_timeout_sec = 60
+    +default_tools_approval_mode = "approve"
+    +
+    +[mcp_servers.context-mode.env]
+    +RTK_TELEMETRY_DISABLED = "1"
+    +PATH = "~/.local/share/codex-ecosystem/bin:~/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib"
+    +CONTEXT_MODE_PLATFORM = "codex"
+
+  codex mcp get context-mode: command ~/.local/share/codex-ecosystem/bin/node, cwd None, env keys ['CONTEXT_MODE_PLATFORM', 'PATH', 'RTK_TELEMETRY_DISABLED']
+  prompt input: {'top_rule': 1, 'rtk_exceptions': 1, 'prefix_rule': 1, 'no_spawn_unless_asked': False, 'proactive_delegation': True}
+  prompt input -p stack-worker: {'top_rule': 1, 'rtk_exceptions': 1, 'prefix_rule': 1, 'no_spawn_unless_asked': True, 'proactive_delegation': False}
+  -p stack-worker servers: {"ai-memory": {"enabled_tools": ["memory_query", "memory_read_page", "memory_recent", "memory_status", "memory_briefing"], "disabled_tools": null}, "context-mode": {"enabled_tools": null, "disabled_tools": ["ctx_upgrade", "ctx_purge"]}, "headroom": {"enabled_tools": ["headroom_compress", "headroom_retrieve", "headroom_stats"], "disabled_tools": null}, "socraticode": {"enabled_tools": ["codebase_search", "codebase_status", "codebase_list_projects", "codebase_health"], "disabled_tools": null}}
+result: rehearsal passed. Apply in a quiet window (no codex process) with:
+  python3 tools/adoption/apply_codex_lane.py --apply --codex-home $SCRATCH/pd/sbx5[redacted] --expect-config-sha256 a673f0b4e63f81b602399a1705a744b26d36aa118d9ddcb7980b1d9bd98650f3 --expect-agents-sha256 a8056071fa5d094cfa920a18e5fa972e0c711f4a0552b94a4a81a47b15458b38
+workers then start with: codex exec -p stack-worker -m gpt-6-astra -c 'model_reasoning_effort="max"' -c 'web_search="live"' -s <sandbox> ... < /dev/null
+rc=0
+== apply without hashes
+AGENTS.md: writes the managed block (sha256 a8056071fa5d094cfa920a18e5fa972e0c711f4a0552b94a4a81a47b15458b38 -> a0a1eab353a8c40bb96cf59bcdbc53a7ddeece20f7bebe1c7e2d6afbca65ab4e)
+stack-worker.config.toml: create
+refused: nothing written
+rc=2
+== apply
+run record: $SCRATCH/pd/sbx5/state/codex-lane/20260926T225344Z-sc9wih67/record.json
+to undo: python3 tools/adoption/apply_codex_lane.py --rollback $SCRATCH/pd/sbx5/state/codex-lane/20260926T225344Z-sc9wih67 --codex-home $SCRATCH/pd/sbx5[redacted]
+config.toml: written and read back
+AGENTS.md: written and read back
+stack-worker.config.toml: in place
+applied. Prove it: python3 tools/adoption/prove_codex_lane.py (add --live for the worker runs)
+workers start with: codex exec -p stack-worker -m gpt-6-astra -c 'model_reasoning_effort="max"' -c 'web_search="live"' -s <sandbox> ... < /dev/null
+rc=0
+== second apply
+already in place: nothing to do
+rc=0
+== files after apply
+-rw------- 3179 AGENTS.md
+-rw------- 7094 config.toml
+-rw------- 2748 stack-worker.config.toml
+== rollback
+profile: removed
+agents: restored from the backup
+config: 4 keys restored
+rc=0
+== sha256 after rollback
+a673f0b4e63f81b602399a1705a744b26d36aa118d9ddcb7980b1d9bd98650f3  config.toml
+a8056071fa5d094cfa920a18e5fa972e0c711f4a0552b94a4a81a47b15458b38  AGENTS.md
+ls: cannot access 'stack-worker.config.toml': No such file or directory
+== rollback again
+profile: already absent
+agents: already as before
+config: already as before
+rc=0
