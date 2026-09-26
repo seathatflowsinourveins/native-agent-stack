@@ -3412,13 +3412,13 @@
     },
     {
       "path": ".github/workflows/native-offhost-app-state.yml",
-      "sha256": "76a49ffe92288eb5e5c337523797770e2474b23c6e0b58a4fc5e80a5ce7acd70",
-      "bytes": 9025
+      "sha256": "6ee7179ed42fcae2a5e45eb1b597f1926f9576112c836c6db2db7c99d8147d8c",
+      "bytes": 9437
     },
     {
       "path": ".github/workflows/native-offhost-restore.yml",
-      "sha256": "91ecb7bdc3bcc139e9b2574c1bbe164ada48c9e31971a4920f4d41d37fcedf03",
-      "bytes": 6310
+      "sha256": "b74a83686367f7d63112c7ab4fec84d7b60fbfe2f448a0a1b040b3081da39fb2",
+      "bytes": 6512
     },
     {
       "path": ".github/workflows/native-service-reboot.yml",
@@ -3427,8 +3427,8 @@
     },
     {
       "path": ".github/workflows/native-token-e2e.yml",
-      "sha256": "d98bbefddb1bed7f0d282ffc08195bef52f8dab4772d1caf8ec6c0bad149b75f",
-      "bytes": 1689
+      "sha256": "fb06cf92b2397f074db62961109883f12f5acf530d7e324382e1dce84e3b4adf",
+      "bytes": 1891
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
@@ -4828,8 +4828,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/README.md",
-      "sha256": "49b4704fa43f0fc067196fcc9e565fd9a165b964701dd95897f493346398fc4e",
-      "bytes": 8538
+      "sha256": "2b04bdc290fe4da7e1a39e21a1075efd216acceef41cedeb8760e1a5746ede3e",
+      "bytes": 8842
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/memory-oracle.json",
@@ -4843,7 +4843,7 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/plan.json",
-      "sha256": "d8afd7d5d1400ef7c7af0f2b56e33e4e9d0c17333c4edc1a4b678d8182457449",
+      "sha256": "bad9afe84fd00789ebcba1918a7b3b8f8e7eaf080a62984d6b75cde86356f993",
       "bytes": 7146
     },
     {
@@ -4863,8 +4863,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/README.md",
-      "sha256": "9b99ef4765d2d12689b5f8e29f54c043c52c73106fe205a8c198641c7bfa6780",
-      "bytes": 9573
+      "sha256": "e94a58714f14ce97f913054cc1fb2c3ec3939088efd17403c8a1062a9bf05feb",
+      "bytes": 9850
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/attempt-1/hosted-plan.json",
@@ -4903,8 +4903,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
-      "sha256": "3d7bc154189b906b4af8473d23b046b29ffd7f545d80f6f52fa293fcfcce786d",
-      "bytes": 5850
+      "sha256": "b7c32da9fbe2b654db7ad81e711f4397038771dcac584d45f7b06e66d8710603",
+      "bytes": 6176
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/input.json",
@@ -13467,6 +13467,11 @@
       "bytes": 18351
     },
     {
+      "path": "docs/decisions/2026-09-26-token-workflow-hardening.md",
+      "sha256": "524f0542b684f225b95d4999a694a2b82b798a97cb7e78f84f87800894bab6b1",
+      "bytes": 16124
+    },
+    {
       "path": "docs/decisions/2026-09-26-workstation-tool-refresh.md",
       "sha256": "e9bf99f9905121292e1c6a96b8b59e12127ddd1f74b9ab8240cb8497e8c19443",
       "bytes": 8203
@@ -13553,8 +13558,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "6393d0317406b909393e61a7ba7b19f74f266aed04201ed233800fc99d08c257",
-      "bytes": 27915
+      "sha256": "7f3b9b06d54c7772459b0c7f2ea3c7cf8827ed5f7392900117cd702aab5ed9fa",
+      "bytes": 28919
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -13593,8 +13598,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "54454cfed2aa62e70805eec6c21d556f871790e6cefbbbcb071d351c69cb8189",
-      "bytes": 84076
+      "sha256": "ad977be82ab623269b814fc7e9e76dbbea5edddffc68e12fbc4be409f7501d17",
+      "bytes": 85068
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -34882,6 +34887,51 @@
       "bytes": 147636
     },
     {
+      "path": "evidence/artifacts/token-workflow-hardening-20260926/README.md",
+      "sha256": "9a7cffe2d1b60650995a8de94507b8b7aa38e373b69e547728d937f300677a31",
+      "bytes": 12122
+    },
+    {
+      "path": "evidence/artifacts/token-workflow-hardening-20260926/actions-latest.json",
+      "sha256": "18e4876d3499c9a0a1504e37ae5b4f87e9ef452930b32d9aa48c75473406047d",
+      "bytes": 12815
+    },
+    {
+      "path": "evidence/artifacts/token-workflow-hardening-20260926/actions_latest.py",
+      "sha256": "5e60acce9647c4a74be1480b99804580f53a886430dad4a55a2ab73e854622bf",
+      "bytes": 2425
+    },
+    {
+      "path": "evidence/artifacts/token-workflow-hardening-20260926/controls.json",
+      "sha256": "5955dfaefed36b762b676544acab67685d1708db1ff3f7922fe19a109ee149c5",
+      "bytes": 286295
+    },
+    {
+      "path": "evidence/artifacts/token-workflow-hardening-20260926/controls_driver.py",
+      "sha256": "486af8d7b55ab91efdeb6d607597566e570ae33f6e95cc4fa340ac7458bc242c",
+      "bytes": 11878
+    },
+    {
+      "path": "evidence/artifacts/token-workflow-hardening-20260926/final-harness-run-1.receipt.json",
+      "sha256": "ccc125365240468704c09263b62627760bdc78d6431128e39a6b13ec07b173b4",
+      "bytes": 135973
+    },
+    {
+      "path": "evidence/artifacts/token-workflow-hardening-20260926/final-harness-run-2.receipt.json",
+      "sha256": "c89cee287c63801b687e123bc8cb091b4a444f8271c9b5ec14619fd239fb779b",
+      "bytes": 135992
+    },
+    {
+      "path": "evidence/artifacts/token-workflow-hardening-20260926/mutation_check.py",
+      "sha256": "ddf8eb6e04a29b321eb59bb5abaa15f8c2e49b0b76e58eeacba0297b2a99f471",
+      "bytes": 1913
+    },
+    {
+      "path": "evidence/artifacts/token-workflow-hardening-20260926/runs.json",
+      "sha256": "cbe9ce7543884ffa8a9dd2bd451140828987a0c01ee55e736a0146372f58323c",
+      "bytes": 21888
+    },
+    {
       "path": "evidence/artifacts/ultracode-token-routing-20260921/audit-verifier-wf_d0d741b1-9c6.json",
       "sha256": "5e86863b7f6b6c94ec21c712de3f505f95b8a7b02a54ab693b5281e85dbe4fe5",
       "bytes": 25523
@@ -36767,6 +36817,11 @@
       "bytes": 549
     },
     {
+      "path": "fixtures/ast_grep_shell_calls.py",
+      "sha256": "771a9150dc8ebc65f8612beb5940490222e0e83148fcf19cdbfaa2b673800cdb",
+      "bytes": 709
+    },
+    {
       "path": "fixtures/before.py",
       "sha256": "6724464b3eb5cc16b761ca03ef2c278c28d1e8cd4af7788b449beda3b205fb60",
       "bytes": 48
@@ -36795,6 +36850,11 @@
       "path": "fixtures/headroom-records.json",
       "sha256": "fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448",
       "bytes": 2969
+    },
+    {
+      "path": "fixtures/markitdown-multi-element.html",
+      "sha256": "0c18c5ed5a130ce5f346f4ece8a5afb11685e698d6496051e6164696fabb625a",
+      "bytes": 1231
     },
     {
       "path": "fixtures/native-gap-prompt.txt",
@@ -37203,8 +37263,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "142120505edbb52646b84782a560d5daf773e28a7ef908eff13193a93cd94fe5",
-      "bytes": 51330
+      "sha256": "3021918c18544962e36aa90a8e572c7adb715104be85ab0788e2f4a966f11e6c",
+      "bytes": 65428
     },
     {
       "path": "scripts/path_safety.py",
@@ -37838,8 +37898,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "67a69f2ed3f24d37747e662be6c5c6c4d9562aef2d6177a9f17cf77f07736b9e",
-      "bytes": 38990
+      "sha256": "c77ffb13f272a030877063eb991cb1dfa2020f2b1825a4a52c2c1ef6af8b68e9",
+      "bytes": 54089
     },
     {
       "path": "tests/test_native_worker_fixture.py",
@@ -38058,8 +38118,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "2116b699a2e9de5ad97b47978c773be12a657e6d852957eba8ab0c35e24fba3a",
-      "bytes": 58320
+      "sha256": "8f920495cb3cfeb48e9ac5ee77fcda46641884cc0a116935e5110b17f066a9ab",
+      "bytes": 62438
     },
     {
       "path": "tests/test_workflow_security.py",
