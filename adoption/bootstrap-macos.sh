@@ -339,14 +339,24 @@ else
 fi
 stage_dir="$(mktemp -d "$ecosystem_root/staging.XXXXXXXX")"
 
+verify_sha256() {
+  # Prefer macOS's native checker when available; Linux also supports the
+  # GNU coreutils fallback. Both consume checksum lines on standard input.
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 --check --status
+  else
+    sha256sum --check --status
+  fi
+}
+
 fetch() {
   local url="$1" checksum="$2" destination="$3"
-  if [[ -f "$destination" ]] && printf '%s  %s\n' "$checksum" "$destination" | shasum -a 256 --check --status; then
+  if [[ -f "$destination" ]] && printf '%s  %s\n' "$checksum" "$destination" | verify_sha256; then
     return
   fi
   curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \
     "$url" --output "$destination.partial"
-  printf '%s  %s\n' "$checksum" "$destination.partial" | shasum -a 256 --check --status || {
+  printf '%s  %s\n' "$checksum" "$destination.partial" | verify_sha256 || {
     printf 'Checksum mismatch: %s\n' "$url" >&2; exit 1
   }
   mv -- "$destination.partial" "$destination"
@@ -1104,20 +1114,56 @@ install_native() {
 # Linux path); all three were added here 2026-09-26 for the macOS
 # headroom/markitdown (uv-tool), serena (uv-tool-from-git) and rtk pins.
 # tests/test_adoption_bootstrap_macos.py asserts the two install functions
-# stay byte-identical to the Linux ones and the reminder's text check matches
+# and their checksum/download helpers stay byte-identical to the Linux ones
+# and the reminder's text check matches
 # the Linux reminder's line for line, and runs all three under a real bash
 # 3.2: they use no mapfile, associative array or ${var,,}.
+# install_uv_tool was re-ported on 2026-09-26 after bootstrap-linux.sh's
+# (#334) started downloading and sha256-verifying a wheel url (headroom's
+# darwin arm64 wheel here) before uv runs. The shared fetch() and
+# verify_sha256() helpers prefer `shasum -a 256`, with a GNU sha256sum
+# fallback on Linux; both exit 1 on a mismatch before uv runs. jq is a
+# checked prerequisite and cache_dir is this script's download directory.
 install_uv_tool() {
   # $3 (always given: install_pin below passes the pin's "package" field,
   # falling back to its own "id" in the jq expression itself) is the actual
   # installable spec when it differs from the component id -- e.g.
   # headroom's PyPI distribution is "headroom-ai[mcp]", not "headroom".
-  # Every existing uv-tool pin has no "package" field and keeps installing
-  # "$id==$version" exactly as before.
-  local id="$1" version="$2" package="$3"
+  # $4 and $5 are the pin's url and sha256. A wheel url (headroom) is
+  # consumed: fetch downloads that wheel and verifies its sha256 (exit 1 on
+  # a mismatch, before uv runs), and uv installs the local file as the
+  # direct reference "<package> @ file://<wheel>", which keeps the extras and
+  # which uv refuses when the wheel's filename names another distribution. A
+  # direct reference carries no ==version, so the filename's version must
+  # equal the pin's first. The wheel's own dependencies still resolve from
+  # uv's index, and uv's receipt records the wheel's path under downloads/.
+  # An sdist url (markitdown, tavily-cli) is not consumed: uv resolves
+  # "$package==$version" from its index, and that sha256 remains the
+  # cross-check its install_note describes.
+  local id="$1" version="$2" package="$3" url="$4" sha256="$5"
   command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
+  local spec="${package}==${version}"
+  if [[ "$url" == *.whl ]]; then
+    # {distribution}-{version}(-{build tag})?-{python}-{abi}-{platform}.whl;
+    # neither the escaped distribution name nor the version contains "-".
+    local wheel_file="${url##*/}" wheel_version wheel_uri
+    wheel_version="${wheel_file#*-}"
+    wheel_version="${wheel_version%%-*}"
+    [[ "$wheel_version" == "$version" ]] || {
+      printf 'Refusing to install %s %s: its pinned wheel %s is version %s.\n' \
+        "$id" "$version" "$wheel_file" "$wheel_version" >&2
+      exit 1
+    }
+    fetch "$url" "$sha256" "$cache_dir/$wheel_file"
+    # PEP 508 reads a URI after "@", so the wheel is named by a file:// URL
+    # with each path segment percent-encoded (jq's @uri). As a bare path, a
+    # "#" in ECO_INSTALL_ROOT would start a fragment and a " ;" a marker, and
+    # uv would refuse the install.
+    wheel_uri="file://$(jq -rn --arg path "$cache_dir/$wheel_file" '$path | split("/") | map(@uri) | join("/")')"
+    spec="${package} @ ${wheel_uri}"
+  fi
   UV_TOOL_DIR="$ecosystem_root/python-tools" UV_TOOL_BIN_DIR="$bin_dir" \
-    uv tool install --python 3.13 "${package}==${version}"
+    uv tool install --python 3.13 "$spec"
 }
 
 # Installs a uv tool pinned to an exact upstream git commit instead of a
@@ -1232,7 +1278,7 @@ install_pin() {
     *-tarball) install_single_binary_tarball "$id" "$version" "$url" "$sha256" ;;
     *-npm) install_npm "$id" "$version" "$url" "$sha256" "$ignore_scripts" ;;
     *-native) install_native "$id" "$version" "$url" "$sha256" "$(jq -r '.bin // .id' <<<"$entry")" ;;
-    *-uv-tool) install_uv_tool "$id" "$version" "$(jq -r '.package // .id' <<<"$entry")" ;;
+    *-uv-tool) install_uv_tool "$id" "$version" "$(jq -r '.package // .id' <<<"$entry")" "$url" "$sha256" ;;
     *-uv-tool-from-git) install_uv_tool_from_git "$id" "$version" "$url" "$commit" "$(jq -r '.package // .id' <<<"$entry")" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
   esac

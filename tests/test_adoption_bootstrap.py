@@ -749,7 +749,7 @@ def run_install_pin(test: unittest.TestCase, tmp_path: Path, pin: dict, served: 
     harness = tmp_path / "install-pin-harness.sh"
     harness.write_text(
         "set -Eeuo pipefail\n"
-        + shell_functions(SCRIPT_PATH.read_text(), "fetch", "npm_package_name", "install_npm",
+        + shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "npm_package_name", "install_npm",
                           "install_uv_tool", "install_pin")
         + f"pins_path={shlex.quote(str(pins_path))}\n"
         + f"ecosystem_root={shlex.quote(str(eco))}\n"
@@ -1089,7 +1089,7 @@ class NativeInstallFloorTests(unittest.TestCase):
         harness = tmp_path / "install-native-floor-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_native", "install_pin")
+            + shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_native", "install_pin")
             + f"pins_path={shlex.quote(str(pins_path))}\n"
             + f"bin_dir={shlex.quote(str(bin_dir))}\n"
             + f"cache_dir={shlex.quote(str(eco / 'downloads'))}\n"
@@ -1280,7 +1280,7 @@ class RtkConfigReminderTests(unittest.TestCase):
         harness = tmp_path / "rtk-reminder-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_single_binary_tarball",
+            + shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_single_binary_tarball",
                               "rtk_config_reminder", "install_pin")
             + f"pins_path={shlex.quote(str(pins_path))}\n"
             + f"ecosystem_root={shlex.quote(str(eco))}\n"

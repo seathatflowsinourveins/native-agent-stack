@@ -211,12 +211,13 @@ Every SHA-256 below was read from the publisher on 2026-09-22, or on 2026-09-26
 for the eight rows from `rtk` down — a checksum file, a `.sha256` sidecar, a
 registry or PyPI digest, or (where the publisher ships none) the GitHub release
 asset `digest` plus an independent re-hash of the downloaded asset. `headroom`,
-`markitdown` and `serena` are not archives this script extracts: uv installs them
-from PyPI or the pinned commit. `headroom`'s row is the wheel uv installs on Apple
-Silicon; `markitdown`'s is its platform-independent sdist, while uv installs its
-`py3-none-any` wheel (that wheel's sha256 is in the pin's `install_note`); `serena`'s
-is the commit uv builds. uv checks neither the `headroom` nor the `markitdown` sha256;
-both are cross-checks. None was
+`markitdown` and `serena` are not archives this script extracts: uv installs them.
+`headroom`'s row is the wheel uv installs on Apple Silicon, and the script downloads
+that wheel, verifies the row's sha256 with `shasum -a 256` (exit 1 before uv runs on a
+mismatch) and hands uv the local file; `markitdown`'s is its platform-independent sdist,
+while uv resolves its `py3-none-any` wheel from PyPI (that wheel's sha256 is in the pin's
+`install_note`) and checks neither hash, so both are cross-checks; `serena`'s is the
+commit uv builds. None was
 guessed, and none was produced on a Mac: reading a publisher checksum is
 `source_review`/independent observation, not an installation receipt. The
 machine-readable copy with each `checksum_source` and `checksum_ref` is
@@ -264,8 +265,17 @@ functions `adoption/bootstrap-macos.sh` copies verbatim from `adoption/bootstrap
 `headroom` pins its `macosx_11_0_arm64` wheel: headroom-ai 0.37.0 publishes compiled abi3
 wheels per platform plus a maturin (Rust) sdist that would need a local Rust build, and this
 is its only arm64-compatible macOS wheel. `markitdown` pins the same platform-independent
-sdist as the Linux pin. uv resolves both from PyPI and does not check either sha256, which
-the pins record as cross-checks. `headroom` is registered at Codex/Claude user scope with
+sdist as the Linux pin. `adoption/bootstrap-macos.sh` changed after `v2026.09.26` to carry
+the Linux `install_uv_tool` from #334 and its byte-identical download/checksum helpers.
+It consumes a wheel `url`: `fetch()` downloads headroom's wheel into
+`$ECO_INSTALL_ROOT/downloads/`, verifies its sha256 through `verify_sha256()` (preferring
+`shasum -a 256`, with GNU `sha256sum` as the Linux fallback) and exits 1 before uv runs on a mismatch; a wheel whose filename names
+another version is refused before any download, and uv installs
+`'headroom-ai[mcp] @ file://<percent-encoded wheel path>'`, keeping the `[mcp]` extra; the
+wheel's own dependencies still resolve from uv's index. uv resolves `markitdown==0.1.8` from
+PyPI and does not check its sdist sha256, which the pin records as a cross-check. No Mac has
+run either install; `tests/test_adoption_bootstrap_macos.py` runs the wheel path with a `uv`
+shim under a real bash 3.2. `headroom` is registered at Codex/Claude user scope with
 `HEADROOM_OFFLINE=1` and `DO_NOT_TRACK=1` (the addendum in
 [`docs/decisions/2026-09-25-codex-mcp-scope.md`](../../docs/decisions/2026-09-25-codex-mcp-scope.md)).
 `serena` has no PyPI release of its declared `2.0.0.dev0`, so, as on Linux, it pins the
@@ -391,7 +401,7 @@ requires all four `[hooks] exclude_commands` entries from
 exactly once, instead of the tag's original two, and it also asks the installed
 `rtk hook check` whether rtk honours that file. `adoption/pins-linux-x86_64.json`
 changed after `v2026.09.26` in its rtk and headroom `install_note` text only.
-The Linux script's `install_npm` and `install_uv_tool` changed after `v2026.09.26` as well: its `install_npm` now reads the socraticode pin's `ignore_scripts: true` and passes `--ignore-scripts`, as this page's script already does (the tag's Linux script ignores that field, so there npm runs every install script in socraticode's dependency tree), and its `install_uv_tool` now downloads, sha256-verifies and installs headroom's pinned wheel instead of resolving `headroom-ai[mcp]==0.37.0` from the index; headroom has no macOS pin.
+The Linux script's `install_npm` and `install_uv_tool` changed after `v2026.09.26` as well: its `install_npm` now reads the socraticode pin's `ignore_scripts: true` and passes `--ignore-scripts`, as this page's script already does (the tag's Linux script ignores that field, so there npm runs every install script in socraticode's dependency tree), and its `install_uv_tool` now downloads, sha256-verifies and installs headroom's pinned wheel instead of resolving `headroom-ai[mcp]==0.37.0` from the index. This page's script carries that same `install_uv_tool` for its own headroom pin, whose `macosx_11_0_arm64` wheel it downloads and verifies the same way (both added after `v2026.09.26`; the pins paragraph above).
 The script and both claude-code pins (2.1.281, which fixes a recursive `rm` of
 command-substitution output running unprompted in auto and bypass mode)
 changed after `v2026.09.24.1`: at that tag the pins are 2.1.280 and the script

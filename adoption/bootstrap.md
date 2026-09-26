@@ -175,7 +175,10 @@ GitHub-hosted macOS runner; see
    `markitdown` and `serena` at their Linux versions, taking the "macOS pins" column from
    6 of 14 to all 14 for `token-efficiency` and from 5 of 7 to all 7 for `foundation-cpu`
    ([the profile table](README.md#choose-a-small-starting-profile)), and the macOS script
-   gained the Linux script's `uv-tool` and `uv-tool-from-git` kinds, copied verbatim, and,
+   gained the Linux script's `uv-tool` and `uv-tool-from-git` kinds and shared checksum/download
+   helpers, copied verbatim (`adoption/bootstrap-macos.sh` changed after `v2026.09.26`, so its
+   `install_uv_tool` downloads headroom's `macosx_11_0_arm64` wheel, verifies its sha256 with
+   `shasum -a 256` before uv runs and installs that file, as the Linux one above does), and,
    after installing rtk, prints a reminder unless `~/Library/Application Support/rtk/config.toml`,
    the only config file rtk 0.50.0 reads on macOS (it ignores `XDG_CONFIG_HOME` there;
    `evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt`), holds step

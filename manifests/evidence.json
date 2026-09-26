@@ -3479,18 +3479,18 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "eb68717b4bf3f95bdfbba40c12a342d939ba4388dca7fd1584e7c90d9d423135",
-      "bytes": 38451
+      "sha256": "ac864f755739e3d229ced367b8edeac2c1cf7d0d4ea8aff7060b29e2e8e4703e",
+      "bytes": 38718
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "2f2e37beac2d01944e3f69637091958c6165ab7f951a7dd4428639ae49a345a4",
-      "bytes": 77000
+      "sha256": "c3c51b4acb98af320f71e558311ac38638c917cc6ea3841149bdac68c325d5b5",
+      "bytes": 79451
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "3bb40ff9d7384098fda57e652c661491215566bfd8463d1b4da8035344ed2500",
-      "bytes": 36666
+      "sha256": "b971a04054aef72604c7fa11aff65cd6861691097aca61ecf2619fe37a7eacf7",
+      "bytes": 36954
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3594,8 +3594,8 @@
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "0e054b52786cc970ae111ac026fea72523b2842a14d48037aff8edd05b39e3ef",
-      "bytes": 38445
+      "sha256": "7bd12ba2f0cc5cf06c59de3b4418a6e640ce26292613ee1fd2309403b04dd3f7",
+      "bytes": 39075
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -3604,8 +3604,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "0eeb8d59ba7cd3dc457ade8ec6b3c554f987fdaab9459abcea8b3d1e72c16446",
-      "bytes": 51542
+      "sha256": "1e8d64a35da17af80b73b3039fc576011c8333c1d4d61ae84d099110ac8e2ee2",
+      "bytes": 52630
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -27910,8 +27910,8 @@
     },
     {
       "path": "evidence/artifacts/macos-token-pins-20260926/README.md",
-      "sha256": "3627ddb2b314ccff35e8c4ae45bab9709b85aa253fdf364f38bcd1d5b38efce2",
-      "bytes": 32813
+      "sha256": "0f607a0202545fe25deca5d9cff8f90900ba59079b107d0ec133c57dfa8bf1df",
+      "bytes": 35374
     },
     {
       "path": "evidence/artifacts/macos-token-pins-20260926/digest-check-attempt0.txt",
@@ -35570,13 +35570,13 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "56269a04d7a3eeba66a348b83786481933d0e170e96f5ae4a6979ecff2ec094f",
-      "bytes": 91094
+      "sha256": "833aeb535c4c4d052eb2adb3946c88260d0a97e1dde1ec996173256750623046",
+      "bytes": 91145
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "e4c57b42ace8882ac548e72515c11ccd7ccdf8d3cb5a8ea0ad0c10831ef20eec",
-      "bytes": 211199
+      "sha256": "19b7641bd456471aca375c0d05954c5607b08a4ea36df1023d4210b7a75855f8",
+      "bytes": 223948
     },
     {
       "path": "tests/test_adoption_contract.py",

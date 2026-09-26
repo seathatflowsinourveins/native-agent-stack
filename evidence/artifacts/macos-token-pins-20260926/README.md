@@ -173,8 +173,47 @@ control uses the network the rtk check uses.
   scratch bare repository succeeds and `git cat-file -e` accepts it, its `pyproject.toml`
   declares `serena-agent` 2.0.0.dev0, and PyPI answers 404 for that version.
 
-uv does not check the headroom or markitdown sha256 when it installs them; the pins
-record them as cross-checks, as the Linux pins do.
+When these runs were made, neither bootstrap checked the headroom or markitdown sha256 at
+install time; uv resolved both from PyPI and the pins recorded the hashes as cross-checks.
+`adoption/bootstrap-macos.sh` changed after `v2026.09.26`: following the Linux #334 change,
+this branch ported `install_uv_tool` verbatim, so both bootstraps now download headroom's pinned wheel (here the
+`macosx_11_0_arm64` one), verify its sha256 before uv runs (`shasum -a 256` on macOS) and
+install that file; markitdown's sdist sha256 stays a cross-check. That port is covered by
+`tests/test_adoption_bootstrap_macos.py` with a `uv` shim under bash 3.2, not by these runs.
+
+The reference implementation is `adoption/bootstrap-linux.sh` at `38221784` (PR #334).
+Its installer body is preserved; both scripts now share byte-identical `fetch()` and
+`verify_sha256()` helpers. The latter prefers the native macOS checker, with GNU
+`sha256sum` as the Linux fallback. The command contract comes from
+[Perl's shasum reference](https://perldoc.perl.org/5.40.5/shasum); the local wheel plus
+extras uses [uv's package-source syntax](https://docs.astral.sh/uv/pip/packages/).
+The installed `search-first`, `find-skills`, `diagnosing-bugs` and
+`verification-before-completion` instructions were reviewed; the existing Linux
+implementation and checksum tools cover this bounded port without a new dependency.
+The original installer-only parity test passed before this follow-up. Extending it to
+the download/checksum helpers failed on the differing `fetch()` bodies and missing
+`verify_sha256()`, establishing a regression control for the shared-helper requirement.
+
+The follow-up local integration run used the supplied CI Python, lint environment and
+real Bash 3.2.57 binary on Linux. The command was `python -m unittest
+tests.test_adoption_bootstrap tests.test_adoption_bootstrap_macos
+tests.test_adoption_docs_consistency`, with `BASH32_BINARY` set to that binary and the
+lint environment prepended to `PATH`. It returned exit 0 with no skips:
+
+```text
+Ran 267 tests in 59.187s
+
+OK
+```
+
+Both bootstrap scripts also passed separate `bash -n` checks and a joint `shellcheck`
+run (exit 0, empty output); the macOS script additionally passed Bash 3.2.57's `-n`.
+The shared version-report parity test passed separately. Direct byte comparisons
+confirmed both installers and both helpers match across platforms, and
+`install_uv_tool` still matches the Linux body at `38221784`. These are local
+integration and structural checks, not a native macOS installation or upstream
+acceptance run; the checksum-selection fixture delegates its GNU-command shim to
+real `shasum` and does not claim native GNU coverage for that fixture.
 
 ## rtk's config file on macOS
 

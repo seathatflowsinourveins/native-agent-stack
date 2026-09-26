@@ -13,11 +13,13 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+import urllib.parse
 
 ROOT = Path(__file__).resolve().parents[1]
 PINS_PATH = ROOT / "adoption/pins-macos-arm64.json"
@@ -199,6 +201,21 @@ class PinsSchemaTests(unittest.TestCase):
             self.assertRegex(tool["sha256"], SHA256_HEX,
                              f"{tool['id']} sha256 is not 64 lowercase hex chars")
 
+    def test_a_uv_tool_wheel_url_names_the_pinned_version(self):
+        # The shared install_uv_tool refuses a wheel whose filename names another version
+        # (UvToolWheelPinUnderRealBash32Tests); mirrors tests/test_adoption_bootstrap.py's Linux check.
+        for tool in self.pins["tools"]:
+            if tool["kind"] == "uv-tool" and tool["url"].endswith(".whl"):
+                self.assertEqual(tool["url"].rsplit("/", 1)[1].split("-")[1], tool["version"], tool["id"])
+
+    def test_a_uv_tool_url_is_a_plain_wheel_or_sdist_file(self):
+        # install_uv_tool downloads and verifies a url ending in .whl and treats any other as an sdist
+        # cross-check, so a wheel url carrying a ?query or #sha256= fragment would silently fall back to
+        # an unverified index install; mirrors tests/test_adoption_bootstrap.py's Linux check.
+        for tool in self.pins["tools"]:
+            if tool["kind"] == "uv-tool":
+                self.assertRegex(tool["url"], r"\Ahttps://[^?#\s]+\.(?:whl|tar\.gz)\Z", tool["id"])
+
     def test_checksum_source_uses_the_declared_vocabulary(self):
         for tool in self.pins["tools"]:
             self.assertIn(tool["checksum_source"], VALID_CHECKSUM_SOURCES,
@@ -307,7 +324,7 @@ class TokenEfficiencyPinPortabilityTests(unittest.TestCase):
     # Copied verbatim from bootstrap-linux.sh; PortedFunctionsUnderRealBash32Tests
     # runs these copies (and rtk_config_reminder, whose config check alone is
     # shared with the Linux reminder) under bash 3.2.
-    PORTED_FUNCTIONS = ("install_uv_tool", "install_uv_tool_from_git")
+    PORTED_FUNCTIONS = ("fetch", "verify_sha256", "install_uv_tool", "install_uv_tool_from_git")
 
     def setUp(self):
         self.pins = load(PINS_PATH)
@@ -349,7 +366,12 @@ class TokenEfficiencyPinPortabilityTests(unittest.TestCase):
         # PyPI also publishes a maturin sdist (evidence/artifacts/macos-token-pins-20260926/
         # digest-check-run1.txt), so the note must not claim there is no platform-independent artifact.
         self.assertNotIn("no platform-independent artifact", tool["install_note"] + self.pins["source"])
-        self.assertIn("does not check this sha256", tool["install_note"])
+        # 2026-09-26: install_uv_tool (re-ported from bootstrap-linux.sh after #334) now downloads this
+        # wheel and verifies this sha256 before uv runs, so the note must say so and no longer call the
+        # hash an unchecked cross-check (UvToolWheelPinUnderRealBash32Tests runs that path).
+        self.assertIn("verifies this sha256 with `shasum -a 256`, exiting 1 before uv runs", tool["install_note"])
+        self.assertNotIn("does not check this sha256", tool["install_note"])
+        self.assertIn("does not check this sha256", self.by_id["markitdown"]["install_note"])
 
     def test_markitdown_is_the_identical_platform_independent_artifact_as_linux(self):
         tool = self.by_id["markitdown"]
@@ -596,9 +618,12 @@ class ScriptStructureTests(unittest.TestCase):
 
     def test_script_uses_macos_native_tools_only(self):
         self.assertIn("shasum -a 256 --check --status", self.text)
+        # The byte-identical checksum helper has a GNU fallback for Linux;
+        # shasum is a required macOS prerequisite, so that branch is not used.
+        native_code = self.text.replace(_shell_functions(self.text, "verify_sha256"), "")
         # Comments may name the Linux tool they replace; only executable lines
         # are checked for a command a stock Mac does not ship.
-        code = "\n".join(line for line in self.text.splitlines()
+        code = "\n".join(line for line in native_code.splitlines()
                          if not line.lstrip().startswith("#"))
         for absent in ("sha256sum", "flock", "dpkg-query", "apt-get", "mapfile"):
             self.assertNotIn(absent, code, f"{absent} is not available on a stock Mac")
@@ -1002,6 +1027,19 @@ class TokenEfficiencyPlanTests(unittest.TestCase):
                 _assert_full_plan(self, result, profile_id)
                 self.assertFalse(list((Path(tmp) / "eco").glob("tools/*/*")), "plan mode must not install anything")
 
+    def test_the_headroom_plan_line_names_the_wheel_install_uv_tool_verifies(self):
+        # install_uv_tool downloads and sha256-checks exactly this url's file, so the plan line names the
+        # darwin arm64 wheel and its sha256; plan mode itself downloads nothing (no wheel in the cache).
+        headroom = next(tool for tool in load(PINS_PATH)["tools"] if tool["id"] == "headroom")
+        wheel = headroom["url"].rsplit("/", 1)[1]
+        self.assertTrue(wheel.endswith("-macosx_11_0_arm64.whl"), wheel)
+        with tempfile.TemporaryDirectory() as tmp:
+            result = _plan_run("bash", "token-efficiency", Path(tmp))
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertRegex(result.stdout, rf"(?m)^plan headroom\s+0\.37\.0\s+uv-tool\s+{re.escape(wheel)} "
+                                            rf"sha256={headroom['sha256']}$")
+            self.assertFalse(list((Path(tmp) / "eco").glob("downloads/*.whl")), "plan mode must not download")
+
     def test_a_uv_tool_from_git_pin_without_a_40_hex_commit_is_refused(self):
         def short_commit(pins):
             serena = next(tool for tool in pins["tools"] if tool["id"] == "serena")
@@ -1153,6 +1191,40 @@ class PortedFunctionsUnderRealBash32Tests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         return result, config
 
+    def test_checksum_helper_prefers_shasum_and_has_a_linux_fallback(self):
+        # Isolate PATH to exercise both branches even on a Linux test host.
+        # The GNU-command shim delegates to real shasum so this also runs on
+        # stock macOS; it checks argv/selection and real bytes, not GNU itself.
+        shasum = shutil.which("shasum")
+        self.assertIsNotNone(shasum, "shasum is a macOS bootstrap prerequisite")
+        payload = b"fixture wheel bytes\n"
+        for checker in ("shasum", "sha256sum"):
+            for valid in (True, False):
+                with self.subTest(checker=checker, valid=valid), tempfile.TemporaryDirectory() as tmp:
+                    directory = Path(tmp)
+                    wheel, calls = directory / "fixture.whl", directory / "calls"
+                    wheel.write_bytes(payload if valid else b"corrupt wheel\n")
+                    shim = directory / "bin"
+                    shim.mkdir()
+                    (shim / checker).write_text(
+                        '#!/bin/sh\nprintf "%s\\n" "$@" > ' + shlex.quote(str(calls)) + "\n"
+                        + "exec " + shlex.quote(shasum)
+                        + (" -a 256" if checker == "sha256sum" else "") + ' "$@"\n')
+                    (shim / checker).chmod(0o755)
+                    if checker == "shasum":
+                        (shim / "sha256sum").write_text("#!/bin/sh\nexit 97\n")
+                        (shim / "sha256sum").chmod(0o755)
+                    body = ("set -Eeuo pipefail\n"
+                            + _shell_functions(SCRIPT_PATH.read_text(), "verify_sha256")
+                            + "verify_sha256\n")
+                    result = subprocess.run(
+                        [BASH32, "-c", body], input=f"{hashlib.sha256(payload).hexdigest()}  {wheel}\n",
+                        text=True, capture_output=True, timeout=10,
+                        env={"HOME": str(directory), "PATH": str(shim)})
+                    self.assertEqual(result.returncode, 0 if valid else 1, result.stderr)
+                    expected = (["-a", "256"] if checker == "shasum" else []) + ["--check", "--status"]
+                    self.assertEqual(calls.read_text().splitlines(), expected)
+
     def test_a_missing_config_gets_the_recipes_four_entries_and_is_not_created(self):
         with tempfile.TemporaryDirectory() as tmp:
             result, config = self._reminder(Path(tmp))
@@ -1198,7 +1270,7 @@ class PortedFunctionsUnderRealBash32Tests(unittest.TestCase):
         shim.mkdir()
         (shim / "curl").write_text("#!/bin/sh\necho 'curl must not run: the cached archive verifies' >&2\nexit 97\n")
         (shim / "curl").chmod(0o755)
-        body = (_shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_single_binary_tarball",
+        body = (_shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_single_binary_tarball",
                                  "rtk_config_reminder", "install_pin")
                 + f"pins_path={json.dumps(str(pins_path))}\necosystem_root={json.dumps(str(eco))}\n"
                 + f"bin_dir={json.dumps(str(eco / 'bin'))}\ncache_dir={json.dumps(str(cache))}\n"
@@ -1255,9 +1327,14 @@ class PortedFunctionsUnderRealBash32Tests(unittest.TestCase):
                                 env={"HOME": str(home), "PATH": environment_path})
         return result, (calls.read_text() if calls.exists() else ""), eco, bin_dir
 
-    def test_install_uv_tool_installs_the_pins_package_spec_into_the_ecosystem_dirs(self):
+    def test_install_uv_tool_installs_an_sdist_pins_package_spec_into_the_ecosystem_dirs(self):
+        # An sdist url is not consumed (install_pin always passes the url and sha256): uv resolves
+        # "<package>==<version>" from its index. PATH has no curl, so a download attempt would fail;
+        # UvToolWheelPinUnderRealBash32Tests covers the wheel url path.
+        call = ("install_uv_tool headroom 0.37.0 'headroom-ai[mcp]' "
+                f"https://files.pythonhosted.org/packages/headroom_ai-0.37.0.tar.gz {'0' * 64}")
         with tempfile.TemporaryDirectory() as tmp:
-            result, calls, eco, bin_dir = self._uv(Path(tmp), "install_uv_tool headroom 0.37.0 'headroom-ai[mcp]'")
+            result, calls, eco, bin_dir = self._uv(Path(tmp), call)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(calls, f"{eco}/python-tools|{bin_dir}|tool install --python 3.13 headroom-ai[mcp]==0.37.0\n")
 
@@ -1281,6 +1358,122 @@ class PortedFunctionsUnderRealBash32Tests(unittest.TestCase):
     def test_token_efficiency_plan_runs_clean_under_real_bash_32(self):
         with tempfile.TemporaryDirectory() as tmp:
             _assert_full_plan(self, _plan_run(BASH32, "token-efficiency", Path(tmp)), "token-efficiency")
+
+
+@unittest.skipUnless(BASH32, "no real bash 3.2 binary reachable (set BASH32_BINARY, or run on a real Mac)")
+class UvToolWheelPinUnderRealBash32Tests(unittest.TestCase):
+    """2026-09-26: install_uv_tool is re-ported verbatim from bootstrap-linux.sh after #334, so a
+    uv-tool pin whose url is a wheel (headroom's macosx_11_0_arm64 one) is downloaded, checked against
+    its sha256 by the shared fetch()/verify_sha256() helpers (`shasum -a 256` when available,
+    otherwise GNU sha256sum)
+    before uv runs, and installed as `<package> @ file://<wheel>` with each path segment
+    percent-encoded. Mirrors tests/test_adoption_bootstrap.py's UvToolWheelPinTests, but runs the
+    macOS script's own fetch, install_uv_tool and install_pin under a real bash 3.2 on the shipped
+    macOS pin, with only its sha256 swapped for the served fixture's. A `curl` shim logs each URL and
+    writes the fixture bytes; a `uv` shim records its environment and argv. local_integration: the
+    shims prove the argv and the ordering, not uv's handling of it, and no Mac ran anything."""
+
+    WHEEL = b"fixture wheel bytes\n"
+    _bash32 = PortedFunctionsUnderRealBash32Tests._bash32
+    # Each character a bare-path direct reference misreads, plus a literal "%" and a non-ASCII letter.
+    AWKWARD_ROOT = "eco #1 ;%é"
+
+    def _run(self, pin_id="headroom", eco_name="eco", **changes):
+        shipped = next(tool for tool in load(PINS_PATH)["tools"] if tool["id"] == pin_id)
+        pin = {**shipped, "sha256": hashlib.sha256(self.WHEEL).hexdigest(), **changes}
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        tmp_path = Path(tmp.name)
+        eco = tmp_path / eco_name
+        for directory in ("downloads", "bin"):
+            (eco / directory).mkdir(parents=True)
+        (tmp_path / "served").write_bytes(self.WHEEL)
+        logs = {name: tmp_path / f"{name}.log" for name in ("curl", "uv")}
+        shim = tmp_path / "shim"
+        shim.mkdir()
+        (shim / "curl").write_text(
+            "#!/bin/sh\n"
+            'out=""; prev=""\n'
+            'for arg in "$@"; do\n'
+            '  if [ "$prev" = "--output" ]; then out="$arg"; fi\n'
+            f'  case "$arg" in https://*) printf "%s\\n" "$arg" >> {shlex.quote(str(logs["curl"]))} ;; esac\n'
+            '  prev="$arg"\n'
+            "done\n"
+            f'cp {shlex.quote(str(tmp_path / "served"))} "$out"\n')
+        (shim / "uv").write_text(
+            '#!/bin/sh\nprintf "%s\\n" "UV_TOOL_DIR=$UV_TOOL_DIR" "UV_TOOL_BIN_DIR=$UV_TOOL_BIN_DIR" "$@" "<end>" '
+            f'>> {shlex.quote(str(logs["uv"]))}\n')
+        for tool in shim.iterdir():
+            tool.chmod(0o755)
+        pins_path = tmp_path / "pins.json"
+        pins_path.write_text(json.dumps({"tools": [pin]}))
+        body = (_shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_uv_tool", "install_pin")
+                + f"pins_path={shlex.quote(str(pins_path))}\n"
+                + f"ecosystem_root={shlex.quote(str(eco))}\n"
+                + f"bin_dir={shlex.quote(str(eco / 'bin'))}\n"
+                + f"cache_dir={shlex.quote(str(eco / 'downloads'))}\n"
+                + "plan_mode=0\ninstalled_pin_ids=()\n"
+                + f"install_pin {shlex.quote(pin['id'])}\n")
+        result = self._bash32(tmp_path, body, path_prefix=str(shim))
+        urls = logs["curl"].read_text().splitlines() if logs["curl"].exists() else []
+        text = logs["uv"].read_text() if logs["uv"].exists() else ""
+        uv_calls = [record.splitlines() for record in text.split("<end>\n") if record]
+        return pin, result, urls, uv_calls, eco
+
+    def uv_argv(self, eco: Path, spec: str) -> list:
+        return [f"UV_TOOL_DIR={eco}/python-tools", f"UV_TOOL_BIN_DIR={eco}/bin",
+                "tool", "install", "--python", "3.13", spec]
+
+    def assert_uv_installs_the_wheel_file(self, uv_calls: list, eco: Path, package: str, wheel: Path):
+        """One uv call whose spec is `<package> @ file://<url path>`: URI-safe characters and %XX
+        escapes only, decoding back to the downloaded wheel's path."""
+        self.assertEqual(len(uv_calls), 1, uv_calls)
+        spec = uv_calls[0][-1]
+        self.assertEqual(uv_calls[0], self.uv_argv(eco, spec))
+        name, separator, uri = spec.partition(" @ file://")
+        self.assertEqual((name, separator), (package, " @ file://"), spec)
+        self.assertRegex(uri, r"\A/[A-Za-z0-9._~!*'()/%-]+\Z")
+        self.assertEqual(urllib.parse.unquote(uri), str(wheel))
+
+    def test_the_darwin_arm64_wheel_pin_installs_the_verified_wheel_with_its_extras(self):
+        pin, result, urls, uv_calls, eco = self._run()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue(pin["url"].endswith("-macosx_11_0_arm64.whl") and pin["package"] == "headroom-ai[mcp]", pin)
+        wheel = eco / "downloads" / pin["url"].rsplit("/", 1)[1]
+        self.assertEqual(urls, [pin["url"]])
+        self.assertEqual(wheel.read_bytes(), self.WHEEL)
+        self.assert_uv_installs_the_wheel_file(uv_calls, eco, pin["package"], wheel)
+        self.assertIn(f"Installed headroom {pin['version']} (uv-tool)", result.stdout)
+
+    def test_an_install_root_with_uri_delimiters_is_percent_encoded_in_the_file_url(self):
+        pin, result, urls, uv_calls, eco = self._run(eco_name=self.AWKWARD_ROOT)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        wheel = eco / "downloads" / pin["url"].rsplit("/", 1)[1]
+        self.assertEqual(wheel.read_bytes(), self.WHEEL)
+        self.assert_uv_installs_the_wheel_file(uv_calls, eco, pin["package"], wheel)
+        self.assertIn("/eco%20%231%20%3B%25%C3%A9/downloads/", uv_calls[0][-1])
+
+    def test_a_wheel_that_fails_its_sha256_is_refused_before_uv_runs(self):
+        pin, result, urls, uv_calls, eco = self._run(sha256="0" * 64)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn(f"Checksum mismatch: {pin['url']}", result.stderr)
+        self.assertEqual(urls, [pin["url"]])
+        self.assertEqual(uv_calls, [], "uv must never be handed an unverified wheel")
+        self.assertFalse((eco / "downloads" / pin["url"].rsplit("/", 1)[1]).exists())
+        self.assertNotIn("Installed headroom", result.stdout)
+
+    def test_a_wheel_named_for_another_version_is_refused_before_any_download(self):
+        pin, result, urls, uv_calls, eco = self._run(version="0.0.0")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Refusing to install headroom 0.0.0: its pinned wheel", result.stderr)
+        self.assertEqual((urls, uv_calls), ([], []))
+
+    def test_the_markitdown_sdist_pin_is_still_resolved_from_the_index_by_name_and_version(self):
+        pin, result, urls, uv_calls, eco = self._run("markitdown")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue(pin["url"].endswith(".tar.gz"), pin["url"])
+        self.assertEqual(urls, [])
+        self.assertEqual(uv_calls, [self.uv_argv(eco, f"markitdown=={pin['version']}")])
 
 
 def _shell_functions(text: str, *names: str) -> str:
@@ -1479,7 +1672,7 @@ class NativeInstallFloorTests(unittest.TestCase):
         harness = tmp_path / "install-native-floor-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + _shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_native", "install_pin")
+            + _shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_native", "install_pin")
             + f"pins_path={json.dumps(str(pins_path))}\n"
             + f"bin_dir={json.dumps(str(eco / 'bin'))}\n"
             + f"cache_dir={json.dumps(str(eco / 'downloads'))}\n"
@@ -1579,7 +1772,7 @@ class EmbeddingModelInstallTests(unittest.TestCase):
         harness = tmp_path / "install-embed-model-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + _shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_embed_model")
+            + _shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_embed_model")
             + f'pins_path={json.dumps(str(pins_path))}\n'
             + f'ecosystem_root={json.dumps(str(eco_root))}\n'
             + "plan_mode=0\n"
@@ -1676,7 +1869,7 @@ class EmbeddingModelInstallTests(unittest.TestCase):
             harness = tmp_path / "harness.sh"
             harness.write_text(
                 "set -Eeuo pipefail\n"
-                + _shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_embed_model")
+                + _shell_functions(SCRIPT_PATH.read_text(), "verify_sha256", "fetch", "install_embed_model")
                 + f'pins_path={json.dumps(str(pins_path))}\n'
                 + f'ecosystem_root={json.dumps(str(eco_root))}\n'
                 + "plan_mode=1\n"
@@ -3334,7 +3527,8 @@ class CIEmbedModelCacheOrderTests(unittest.TestCase):
         text = SCRIPT_PATH.read_text()
         fetch_body = re.search(r"(?ms)^fetch\(\) \{\n.*?^\}\n", text)
         self.assertIsNotNone(fetch_body, "fetch() not found")
-        self.assertIn('shasum -a 256 --check --status', fetch_body.group(0))
+        self.assertIn('verify_sha256', fetch_body.group(0))
+        self.assertIn('shasum -a 256 --check --status', _shell_functions(text, "verify_sha256"))
         self.assertIn("install_embed_model", text)
 
 

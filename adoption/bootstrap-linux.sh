@@ -209,14 +209,24 @@ cleanup() {
 }
 trap cleanup EXIT
 
+verify_sha256() {
+  # Prefer macOS's native checker when available; Linux also supports the
+  # GNU coreutils fallback. Both consume checksum lines on standard input.
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 --check --status
+  else
+    sha256sum --check --status
+  fi
+}
+
 fetch() {
   local url="$1" checksum="$2" destination="$3"
-  if [[ -f "$destination" ]] && printf '%s  %s\n' "$checksum" "$destination" | sha256sum --check --status; then
+  if [[ -f "$destination" ]] && printf '%s  %s\n' "$checksum" "$destination" | verify_sha256; then
     return
   fi
   curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \
     "$url" --output "$destination.partial"
-  printf '%s  %s\n' "$checksum" "$destination.partial" | sha256sum --check --status || {
+  printf '%s  %s\n' "$checksum" "$destination.partial" | verify_sha256 || {
     printf 'Checksum mismatch: %s\n' "$url" >&2; exit 1
   }
   mv -- "$destination.partial" "$destination"
