@@ -61,8 +61,8 @@ class HoldoutStore:
     def history(self):
         return self.live.history
 
-    def put(self, req, complete, pages, vintage, attempt=0, error=None):
-        self.live.put(req, complete, pages, vintage, attempt=attempt, error=error)
+    def put(self, req, complete, pages, vintage, attempt=0, error=None, elapsed_seconds=None):
+        self.live.put(req, complete, pages, vintage, attempt=attempt, error=error, elapsed_seconds=elapsed_seconds)
         self._index(self.live, req)
 
     def write(self, directory) -> str:

@@ -5,6 +5,7 @@ The loop, the plan and the records are evaluation code; only transport.get (stud
 """
 from __future__ import annotations
 
+import time
 from datetime import datetime, timezone
 
 from core.identity import check_asof
@@ -15,8 +16,12 @@ def utc_now() -> str:
 
 
 def _fetch(req, transports, store, vintage, attempt):
+    # CPython 3.13.15 Lib/timeit.py: retain the elapsed interval through the final operation's completion.
+    started = time.perf_counter()
     res = transports[req["api"]].get(req["endpoint"], req["params"])
-    store.put(req, res["complete"], res["pages"], vintage, attempt=attempt, error=res["error"])
+    elapsed = time.perf_counter() - started
+    store.put(req, res["complete"], res["pages"], vintage, attempt=attempt, error=res["error"],
+              elapsed_seconds=elapsed)
 
 
 def to_fixpoint(planner, transports, store, fetch_date: str, clock=utc_now, max_rounds: int = 10_000) -> int:

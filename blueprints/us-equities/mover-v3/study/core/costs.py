@@ -101,11 +101,16 @@ class FeeSchemaError(ValueError):
 # Release 34-49928: 'the settlement date also should be used as the charge date for all covered sales that a covered
 # exchange reports to NSCC'), and the FINRA TAF applies to the transaction (trade) date. The settlement cycle is the
 # one in force on the trade date: T+3 before 2017-09-05, T+2 from 2017-09-05 (SEC statement 2017-163), T+1 from
-# 2024-05-28 (SEC press release 2023-29: the compliance date). A settlement day is a session of the calendar that is
-# not a Federal Reserve holiday on which the exchange opens (Columbus Day and Veterans Day, as the Federal Reserve
-# observes them), since no settlement occurs on a bank holiday.
+# 2024-05-28 (SEC press release 2023-29: the compliance date). Settlement eligibility is separate from trading:
+# the pinned XNYS sessions plus the sourced settlement-open exchange closures below, excluding Federal Reserve
+# holidays on which the exchange opens (Columbus Day and Veterans Day, as the Federal Reserve observes them).
 T2_FIRST_TRADE = "2017-09-05"
 T1_FIRST_TRADE = "2024-05-28"
+# Nasdaq confirms clearing remained open on these exchange closures in the study's calendar range:
+# https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2018-99 (December 3 trades settle December 5, T+2)
+# https://classic.nasdaqtrader.com/TraderNews.aspx?id=ECA2024-632 (January 8 trades settle January 9, T+1).
+# Other exchange closures retain the conservative exclusion unless a primary source establishes settlement.
+SETTLEMENT_OPEN_EXCHANGE_CLOSED = frozenset({"2018-12-05", "2025-01-09"})
 
 
 def settlement_cycle(trade_session: str) -> int:
@@ -130,19 +135,28 @@ def bank_only_holidays(year: int) -> frozenset:
     return frozenset(out)
 
 
+def is_settlement_day(cal, day: str) -> bool:
+    """Settlement eligibility, including sourced exchange-only closures; the caller bounds the calendar range."""
+    return (cal.is_session(day) or day in SETTLEMENT_OPEN_EXCHANGE_CLOSED) \
+        and day not in bank_only_holidays(int(day[:4]))
+
+
 def settlement_date(cal, trade_session: str):
     """The settlement date of a regular-way sale on trade_session: the k-th settlement day after it (k =
     settlement_cycle); None when trade_session is not a session or the calendar ends first."""
+    from datetime import date, timedelta
     if not cal.is_session(trade_session):
         return None
-    k, d = settlement_cycle(trade_session), trade_session
+    k, d = settlement_cycle(trade_session), date.fromisoformat(trade_session)
+    # Calendar-day advancement with a separate eligibility predicate follows QuantLib v1.39 Calendar::advance
+    # (Days): https://github.com/lballabio/QuantLib/blob/v1.39/ql/time/calendar.cpp.
     while k:
-        d = cal.offset(d, 1)
-        if d is None:
+        if d.isoformat() >= cal.days[-1]:
             return None
-        if d not in bank_only_holidays(int(d[:4])):
+        d += timedelta(days=1)
+        if is_settlement_day(cal, d.isoformat()):
             k -= 1
-    return d
+    return d.isoformat()
 
 
 def _fee_rows(base: dict, kind: str) -> list:
@@ -178,8 +192,8 @@ class Fees:
     open end), and every amendment line conforms to run_discipline.amendment_format (core.amendments).
 
     Review round 15, fee-date item: a sale on trade session d pays the SEC row that governs its charge date,
-    settlement_date(cal, d), and the TAF row that governs d itself (cost_model.fee_charge_dates). cal is the session
-    calendar the settlement days come from (the amended calendar at a run)."""
+    settlement_date(cal, d), and the TAF row that governs d itself (cost_model.fee_charge_dates). cal is the amended
+    trading calendar; is_settlement_day also admits the sourced settlement-open exchange closures."""
 
     def __init__(self, base: dict, amendments: list[dict] = (), freeze_session: str | None = None, *, cal):
         """freeze_session, when given, refuses an amendment line whose first date precedes it (review round 9, F5);

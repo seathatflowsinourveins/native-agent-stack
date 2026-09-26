@@ -4,6 +4,10 @@ enumerations and a rename-day re-fetch merged per (symbol, session), N0 and the 
 counts with the extension decision, the read of the carried items only, and the not-read label after the deadline.
 Every number is synthetic; no network call."""
 import json
+import os
+import signal
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -658,6 +662,92 @@ class RetrySnapshot(unittest.TestCase):
         self.assertEqual(holdout.sealed_refs(ctx), [("collect-collect-001", "c" * 64), ("count-count-002", "a" * 64)])
 
 
+class CollectionSealRecovery(unittest.TestCase):
+    """The boundary before N05: a real hard kill after sealing must preserve the first collection vintage."""
+
+    def _collect(self, ctx, last, accrual, root, m, now):
+        # Only the signed Git reach observation is supplied; collection, transport, seal and logs are real.
+        with mock.patch.object(logs, "line_reach", return_value=[("signed", now - 60)]):
+            return holdout.collect(ctx, "collect-001", last, accrual, root, transports(m), now,
+                                   clock=lambda: synth.iso_us(now)[:19] + "Z")
+
+    def _killed_collection(self, tmp, *, child=False):
+        cal = synth.calendar()
+        last = "2020-06-02"
+        now = cal.close(last) + 3600
+        auth = auth_rec("collect-001", "collect", "granted")
+        repo, root = Path(tmp) / "repo", Path(tmp) / "snap"
+        FR.write(repo / RUN_LOG, "")
+        FR.write(repo / ACCESS_LOG, json.dumps(auth) + "\n")
+        ctx = {"repo": repo, "cal": cal, "freeze_session": "2020-06-01", "run_log": [], "access_log": [auth],
+               "main_tip_time": now - 60, "commit": "c", "tree": "t", "protocol_sha256": "a" * 64,
+               "runtime_lock_sha256": "r"}
+        m = synth.FakeMarket(cal)
+        m.assets = [{"symbol": "AAA", "status": "active", "class": "us_equity"}]
+        real_write = Store.write
+
+        def kill_after_seal(store, *args, **kwargs):
+            real_write(store, *args, **kwargs)
+            os.kill(os.getpid(), signal.SIGKILL)     # no finally block or completion can run
+
+        if child:
+            with mock.patch.object(Store, "write", kill_after_seal):
+                self._collect(ctx, last, [], root, m, now)
+            self.fail("collection did not reach the hard kill")
+        # Like tests.test_fetch's transport child, use a fresh interpreter: the full suite may have threads.
+        result = subprocess.run(
+            [sys.executable, "-c", "import sys; from tests.test_holdout import CollectionSealRecovery; "
+             "CollectionSealRecovery()._killed_collection(sys.argv[1], child=True)", str(tmp)],
+            cwd=Path(__file__).resolve().parents[1], capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, -signal.SIGKILL, result.stderr)
+        directory = root / "collect-collect-001"
+        self.assertGreater(len(Store.read(directory).req), 0)
+        self.assertEqual(logs.read_lines(repo / RUN_LOG), [])
+        self.assertEqual(gate.sequence(logs.read_lines(repo / ACCESS_LOG))["open"], "collect-001")
+        return ctx, last, root, m, now, directory
+
+    @staticmethod
+    def _bytes(directory):
+        return {str(p.relative_to(directory)): p.read_bytes() for p in directory.rglob("*") if p.is_file()}
+
+    def test_retry_after_sealing_makes_no_requests_and_preserves_snapshot_bytes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            ctx, last, root, m, now, directory = self._killed_collection(tmp)
+            before = self._bytes(directory)
+            first_sha = sha256_file(directory / "ledger.jsonl")
+            m.assets = [{"symbol": "CHANGED", "status": "active", "class": "us_equity"}]
+            out = self._collect(ctx, last, [], root, m, now + 86400)
+            self.assertEqual(len(m.calls), 0, "retry fetched after the first snapshot was sealed")
+            self.assertEqual(self._bytes(directory), before)
+            self.assertEqual(out["snapshot_sha256"], first_sha)
+            line = logs.read_lines(ctx["repo"] / RUN_LOG)[-1]
+            self.assertEqual(line["utc_start"], synth.iso_us(now)[:19] + "Z")
+            self.assertEqual(line["completion"]["snapshot_sha256"], first_sha)
+            self.assertIsNone(gate.sequence(logs.read_lines(ctx["repo"] / ACCESS_LOG))["open"])
+
+    def test_collection_seal_recovery_rejects_changed_authorization_or_batch_inputs(self):
+        for changed in ("authorization", "sessions", "accrual", "study_tree", "protocol"):
+            with self.subTest(changed=changed), tempfile.TemporaryDirectory() as tmp:
+                ctx, last, root, m, now, directory = self._killed_collection(tmp)
+                before = self._bytes(directory)
+                accrual = []
+                if changed == "authorization":
+                    ctx["access_log"][0]["code_revision"] = "other-authorization"
+                elif changed == "sessions":
+                    last = "2020-06-03"
+                elif changed == "accrual":
+                    accrual = [{"symbol": "AAA", "session": last, "order_id": "changed", "strategy": "paper"}]
+                elif changed == "study_tree":
+                    ctx["tree"] = "other-tree"
+                else:
+                    ctx["protocol_sha256"] = "b" * 64
+                with self.assertRaisesRegex(holdout.HoldoutRefused, "identity|authorization|binding"):
+                    self._collect(ctx, last, accrual, root, m, now + 2 * 86400)
+                self.assertEqual(m.calls, [])
+                self.assertEqual(self._bytes(directory), before)
+                self.assertEqual(logs.read_lines(ctx["repo"] / RUN_LOG), [])
+
+
 class StaleBase(unittest.TestCase):
     def test_a_per_event_request_fetched_before_its_data_end_is_fetched_again(self):
         """Review round 14, F1: the count fetches per-event bars and prints at the close of the window's last session;
@@ -734,6 +824,97 @@ class TerminalRecords(unittest.TestCase):
     dedup keep the first count's. At e7529b47 the read reused the first count's enumeration_fetch_date as the only
     corporate-action end date, so a merger or split effective after it (inside the extension blocks or the terminal
     search windows through last + 5) was never fetched for the read and a merger exit booked terminal-zero."""
+
+    def _exhausted_terminal_trade(self, action_type):
+        """N02 failure case: the enumeration predates the action; one exhausted request is below 1%."""
+        from core import costs, driver
+        from core.evaluate import void_rate
+        from tests.test_costs import FEES
+        from tests.test_trades import CELLS, book, make_event, resolve
+        cal, t = synth.calendar(), "2020-06-01"
+        enum_date, terminal_date = "2020-05-29", "2020-06-19"
+        action_day = cal.offset(t, 3)
+        m = synth.FakeMarket(cal)
+        m.assets = [{"symbol": "MOVR", "status": "active", "class": "us_equity"}]
+        if action_type == "cash_merger":
+            m.actions = [{"type": "cash_merger", "acquiree_symbol": "MOVR", "acquirer_symbol": "BIG",
+                          "effective_date": action_day, "rate": 12.0}]
+        else:
+            m.actions = [{"type": "spin_off", "source_symbol": "MOVR", "new_symbol": "SPUN",
+                          "ex_date": action_day, "source_rate": 1, "new_rate": 0.5}]
+        route = m.route
+
+        def dated_actions(path, params):
+            if path == "/v1/corporate-actions" and params["end"] == enum_date:
+                return {"corporate_actions": {}}
+            return route(path, params)
+
+        m.route = dated_actions
+        m.fail = [(lambda path, p: path == "/v1/corporate-actions" and p["end"] == terminal_date,
+                   "timeout", 100)]
+        reqs = plan.assets_requests() + [plan.corporate_actions_request("2016-01-01", enum_date),
+                                         plan.terminal_actions_request(terminal_date)]
+        for day in cal.range("2020-04-01", enum_date):
+            reqs.extend(plan.screen_requests(cal, day, ["MOVR"]))
+        live = Store()
+        driver.stage_fetch(lambda store: reqs, transports(m), live, terminal_date,
+                           clock=lambda: terminal_date + "T21:00:00Z")
+        key = plan.terminal_actions_request(terminal_date)["key"]
+        self.assertEqual((live.status(key), live.state[key]["attempt"]), ("incomplete", 1))
+        self.assertGreater(sum(st["status"] == "complete" for st in live.state.values()), 100)
+        rate = void_rate(live.incomplete_by_kind())
+        self.assertLess(rate["rate"], 0.01)
+        self.assertFalse(rate["void"])
+        self.assertEqual(holdout.enumeration([live])["actions"], [])
+
+        ev = make_event(cal, t)
+        quotes = [book(cal, cal.offset(t, 1), "09:35")]
+        if action_type == "cash_merger":
+            quotes.append(book(cal, action_day, "15:59", 11.9, 11.95))
+        else:
+            ev["raw"], ev["split"], ev["all"] = synth.series(
+                cal, cal.offset(t, -60), cal.offset(t, 12), lambda day: 10.0, cash_at={action_day: 1.0})
+            quotes.append(book(cal, cal.offset(t, 5), "15:55", 10.0, 10.02))
+        ctx = {"cal": cal, "fees": costs.Fees(FEES, cal=cal), "cells": CELLS}
+        store = holdout.HoldoutStore([], live, cal)
+        try:
+            spec = holdout._spec_factory(ctx, "2020-01-02", "2020-12-31", frozenset(), frozenset(),
+                                         ("H1-D-b_lane-low",), terminal_date)(store)
+            tr = resolve(ev, "b_lane", spec.ctx("read"), store, {"MOVR": quotes})
+        except holdout.HoldoutRefused:
+            return
+        self.assertEqual(tr["status"], "void",
+                         f"exhausted terminal_actions booked {tr.get('exit')} with cash={tr.get('cash')}")
+
+    def test_exhausted_terminal_merger_request_below_one_percent_refuses_booking(self):
+        self._exhausted_terminal_trade("cash_merger")
+
+    def test_exhausted_terminal_spin_off_request_below_one_percent_refuses_booking(self):
+        self._exhausted_terminal_trade("spin_off")
+
+    def test_terminal_planning_waits_for_the_single_refetch(self):
+        from core import driver
+        cal = synth.calendar()
+        terminal_date = "2020-06-19"
+        m = synth.FakeMarket(cal)
+        m.assets = [{"symbol": "MOVR", "status": "active", "class": "us_equity"}]
+        m.fail = [(lambda path, p: path == "/v1/corporate-actions" and p["end"] == terminal_date,
+                   "timeout", 4)]
+        live = Store()
+        store = holdout.HoldoutStore([], live, cal)
+        spec_for = holdout._spec_factory({"cal": cal, "fees": None, "cells": {}}, "2020-06-01", "2020-06-05",
+                                         frozenset(), frozenset(), ("H3-a",), terminal_date)
+        key = plan.terminal_actions_request(terminal_date)["key"]
+
+        def complete_spec(st):
+            self.assertEqual(st.status(key), "complete", "trade planning used unknown terminal actions")
+            return spec_for(st)
+
+        result = driver.stage_fetch(holdout._planner(complete_spec, "plan", "2020-05-29", terminal_date),
+                                    transports(m), store, terminal_date, clock=lambda: terminal_date + "T21:00:00Z")
+        self.assertEqual(result["refetched"], 1)
+        self.assertEqual((live.status(key), live.state[key]["attempt"]), ("complete", 1))
+        self.assertEqual(spec_for(store).terminal_actions, [])       # a complete empty response is valid
 
     def test_the_plan_and_the_spec_carry_the_actions_own_terminal_records(self):
         from core import plan as P
