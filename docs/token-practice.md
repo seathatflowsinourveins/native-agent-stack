@@ -230,14 +230,16 @@ credential file. `--json` prints one object; `--gate PERCENT` exits 3 when a
 window's `used_percent` reaches PERCENT, `rateLimitReachedType` is set or
 `ordinaryUsageAllowed` is false, and 2 when no snapshot arrives. On
 nativestack-5975wx-20260925 after the 2026-09-26 switch to 0.157.1, the
-coordinator's reads returned `used_percent` 61 to 63 of a 10,080-minute (weekly)
-window resetting 2026-10-03T01:28Z on plan `prolite`, and started no app-server
-daemon; one read of the hardened probe at 14:28Z returned 63, a single `codex`
-bucket, in 0.77 s. The [host receipt](../evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--codex--install--20260926.json)
+coordinator reported reads of `used_percent` 61 to 63 of a 10,080-minute (weekly)
+window resetting 2026-10-03T01:28Z on plan `prolite`, with no app-server daemon
+started. These are unretained observations: no committed receipt or artifact holds
+their output, and a sanitized `--json` read is still to be recorded from a
+published checkout that contains the script. The [host receipt](../evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--codex--install--20260926.json)
 records 0.157.1 on PATH, `daemon_auto_start` false and no daemon process or package
-at 14:34Z. The percentage is the backend's whole-account figure, not a token count:
-every session and host signed in to the account draws on it, so the difference
-between two reads does not price one task, and it is never added to a token counter.
+at 14:34Z, but not the quota read. The percentage is the backend's whole-account
+figure, not a token count: every session and host signed in to the account draws
+on it, so the difference between two reads does not price one task, and it is
+never added to a token counter.
 
 The user decided on 2026-09-26 to spend the GPT-6 weekly quota now, in priority
 order, and to be told when the limit is hit so they can reset it. While it lasts:
