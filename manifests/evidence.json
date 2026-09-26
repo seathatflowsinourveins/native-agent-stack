@@ -3555,13 +3555,13 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "131a5385467308c90dd25aaa52be381858a0231ec5b9a3995270a8e3a823ff61",
-      "bytes": 35461
+      "sha256": "002312220e4ebe1c920a0d1a2230100498983d4165440ce73e8d09c667f91807",
+      "bytes": 48474
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "512d3f6485ce0c6e5da29baea947a40d9882203f4586c13818da9c8560e5e4f7",
-      "bytes": 8559
+      "sha256": "df20fa985805b6aa68ddb1d0e3c932c4d0903ec9abb7f293414039fe6b7f99b2",
+      "bytes": 8621
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -3595,8 +3595,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "e2aa6552f2c6c4a084a2420bd860d1a00b6cd88c16621d5b05d9522118fefb4e",
-      "bytes": 19179
+      "sha256": "26046b3cd41cb06df3157c678994ce1cbd7528818f8618b2f8fd20dedf82935e",
+      "bytes": 19209
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -6646,8 +6646,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
-      "sha256": "677485cd57c195519cc6a3ed81f2eab30c8f70c41b981c152d28fe8b6b044f05",
-      "bytes": 7930
+      "sha256": "013aa43f686b413287b5058c9a04689029b7d8421ae306cd7c6beb23eb0c5060",
+      "bytes": 7960
     },
     {
       "path": "blueprints/native-skill-practice/cases.json",
@@ -10526,8 +10526,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "a88c50a9bd15d1a0e3a5557d79c41fd20f34c1fb7785f4183347e895222f2820",
-      "bytes": 26123
+      "sha256": "33719ea14b01bf8aa745557e44f47d8cc6d222facf7cfe09d6f9ac4b531a986c",
+      "bytes": 31964
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -28315,6 +28315,21 @@
       "bytes": 248046
     },
     {
+      "path": "evidence/artifacts/skills-agents-layer-20260926/README.md",
+      "sha256": "dc170a49e01f35c5ab30af6f51108c8a29559294467353d156b3c626e71829f3",
+      "bytes": 8407
+    },
+    {
+      "path": "evidence/artifacts/skills-agents-layer-20260926/delta.json",
+      "sha256": "784b5d8f26917f3ab7c284e3ba87720f932129e79357712f71dca424ad92b1df",
+      "bytes": 154314
+    },
+    {
+      "path": "evidence/artifacts/skills-agents-layer-20260926/scanner_compare.py",
+      "sha256": "f13012eb98e033bc044e6d614b90c1bd0f71c4b2abb2a08b78f45a43df3a99bd",
+      "bytes": 6747
+    },
+    {
       "path": "evidence/artifacts/skills-trial-20260925/nativestack-5975wx-20260925.json",
       "sha256": "0f3d4e68227108db70730487a65991c71bad01544147962263b3b996f722e2f2",
       "bytes": 11280
@@ -32651,8 +32666,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "33f8c515a15ad9a3888f0f61d5646e8db3aa0fdaa678da82f90237d0c77e79bb",
-      "bytes": 21259
+      "sha256": "adf89cd8d0846c273164201f06bb7a6ea4b80b6bea6158048a060b28eb559246",
+      "bytes": 25989
     },
     {
       "path": "scripts/trading_gates.py",
@@ -33111,8 +33126,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "75338a4d8c4e2eb72ee49ba0e6340551f255918b745b746f3cdc12a8fd3e5272",
-      "bytes": 24818
+      "sha256": "9061737b6c3ea67e338339788931df462c770624af862360ad687a24f0c3285c",
+      "bytes": 34960
     },
     {
       "path": "tests/test_install_skills.py",
@@ -33386,8 +33401,8 @@
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "64a9070d12f30b735de3f793d0238697f8a67ba5f3c199d2545a2e665c5c422f",
-      "bytes": 34447
+      "sha256": "8fae4657d770bdf6788025d3c8078372209d329e7791c57ce31409c12cb86585",
+      "bytes": 39455
     },
     {
       "path": "tests/test_sota_convergence.py",
