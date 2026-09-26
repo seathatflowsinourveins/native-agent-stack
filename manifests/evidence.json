@@ -13043,8 +13043,8 @@
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.json",
-      "sha256": "d701676e332bb6ba437ae685f4a3270e15273745faf92a395317ccd29295fc85",
-      "bytes": 882438
+      "sha256": "be9d041fa74121ac5cad552c48d2bf15623f060c6b9f5d3f03ce391c20388950",
+      "bytes": 881503
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.md",
@@ -34648,8 +34648,8 @@
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/packets/agents-models-workers.json",
-      "sha256": "2dfb087f7c27304dd5373d3c669c46d44b8ab477c9d4cbc6fb601ab20a6e33db",
-      "bytes": 54490
+      "sha256": "236c724670d1a99d2f4f7fd5387e809ec9ebc272900ff5cd3f07ab1f6a6839fa",
+      "bytes": 52823
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/packets/backtesting-engine.json",
