@@ -132,7 +132,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 
 ## What a winner means
 
-A winner is the layer's recorded choice from its lane verdict, shown with its evidence class. It is not a claim that the component is the best in its field. The Decision column is the layer ledger's decision (`keep_but_compare` 17, `retain` 14, `adjust` 1 across 32 layers); a `keep_but_compare` row keeps its incumbent while the comparison the row names is still owed. Each winner's recorded basis, its `why_selected` text and its `evidence_refs`, is carried in the JSON form of this list and in the layer ledgers, together with the layer's limitations and open gaps.
+A winner is the layer's recorded choice from its lane verdict, shown with its evidence class. It is not a claim that the component is the best in its field. The Decision column is the layer ledger's decision (`keep_but_compare` 17, `retain` 14, `adjust` 1 across 32 layers); a `keep_but_compare` row keeps its incumbent while the comparison the row names is still owed. The JSON form of this list carries each winner's recorded basis, its `why_selected` text and its `evidence_refs`, and only counts of each layer's open gaps; the limitations and the open-gap text are in the layer ledgers.
 
 ## How to update this page
 
