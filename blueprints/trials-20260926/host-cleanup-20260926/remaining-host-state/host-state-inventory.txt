@@ -1,0 +1,74 @@
+# Remaining host state of the 2026-09-26 P1 trial batch, 2026-09-26T10:04:36Z (times UTC)
+## Outside the session scratch directory
+### Hugging Face cache (first pass's unpinned-device ColPali runs and slice build)
+directory	5975039476	born 2026-09-24T03:33:22Z	modified 2026-09-26T02:43:55Z	~/.cache/huggingface
+directory	5962852003	born 2026-09-26T02:43:55Z	modified 2026-09-26T02:43:55Z	~/.cache/huggingface/hub
+directory	113471575	born 2026-09-26T02:43:55Z	modified 2026-09-26T02:44:36Z	~/.cache/huggingface/hub/models--vidore--colpali-v1.3
+directory	5849380428	born 2026-09-26T02:43:55Z	modified 2026-09-26T02:44:15Z	~/.cache/huggingface/hub/models--vidore--colpaligemma-3b-pt-448-base
+directory	0	born 2026-09-26T02:43:55Z	modified 2026-09-26T02:43:55Z	~/.cache/huggingface/hub/.locks
+directory	0	born 2026-09-26T02:43:55Z	modified 2026-09-26T02:44:36Z	~/.cache/huggingface/hub/.locks/models--vidore--colpali-v1.3
+directory	0	born 2026-09-26T02:43:55Z	modified 2026-09-26T02:43:55Z	~/.cache/huggingface/hub/.locks/models--vidore--colpaligemma-3b-pt-448-base
+directory	10907450	born 2026-09-26T02:14:42Z	modified 2026-09-26T02:14:42Z	~/.cache/huggingface/datasets
+regular empty file	0	born 2026-09-26T02:14:42Z	modified 2026-09-26T03:16:39Z	~/.cache/huggingface/datasets/_home_<user>_.cache_huggingface_datasets_local-tabfquad-subset_default_0.0.0_151538e80d111958.lock
+directory	10907450	born 2026-09-26T02:14:42Z	modified 2026-09-26T02:14:42Z	~/.cache/huggingface/datasets/local-tabfquad-subset
+regular file	197286	born 2026-09-26T02:43:55Z	modified 2026-09-26T02:44:36Z	~/.cache/huggingface/xet/logs/xet_20260925T224355622-0400_3896841.log
+lines of that hf_xet log naming vidore: 4
+$ hf cache ls
+id	size	last_accessed	last_modified	refs
+model/vidore/colpali-v1.3	113.5M	7 hours ago	7 hours ago	['main']
+model/vidore/colpaligemma-3b-pt-448-base	5.8G	7 hours ago	7 hours ago	['main']
+
+Found 2 repo(s) for a total of 2 revision(s) and 6.0G on disk.
+### mteb, MIRIX and pgserver
+directory	0	born 2026-09-26T01:29:06Z	modified 2026-09-26T01:29:06Z	~/.cache/mteb
+directory	344628	born 2026-09-26T01:30:29Z	modified 2026-09-26T03:04:34Z	~/.mirix
+regular file	484	born 2026-09-26T01:31:30Z	modified 2026-09-26T01:49:46Z	~/.mirix/config
+regular file	303104	born 2026-09-26T01:40:11Z	modified 2026-09-26T01:40:14Z	~/.mirix/sqlite.db
+regular file	32768	born 2026-09-26T03:04:34Z	modified 2026-09-26T03:04:35Z	~/.mirix/sqlite.db-shm
+regular file	8272	born 2026-09-26T03:04:34Z	modified 2026-09-26T03:04:35Z	~/.mirix/sqlite.db-wal
+directory	0	born 2026-09-26T01:30:29Z	modified 2026-09-26T01:30:29Z	~/.mirix/tmp
+directory	0	born 2026-09-26T01:29:36Z	modified 2026-09-26T01:29:37Z	/run/user/<uid>/python_PostgresServer
+regular empty file	0	born 2026-09-26T01:29:36Z	modified 2026-09-26T01:29:36Z	/run/user/<uid>/python_PostgresServer/.lockfile
+directory	0	born 2026-09-26T01:29:37Z	modified 2026-09-26T03:37:40Z	/run/user/<uid>/python_PostgresServer/2dcf3c6d23
+### ByteRover upstream test-suite residue in /tmp (entries of this user)
+prefix	entries	apparent bytes	first born	last born
+brv-consolidate-test-*	112	11668	2026-09-26T01:35:17Z	2026-09-26T03:07:51Z
+brv-synthesize-test-*	115	36252	2026-09-26T01:35:17Z	2026-09-26T03:07:52Z
+brv-undo-test-*	103	884	2026-09-26T01:35:17Z	2026-09-26T03:07:51Z
+brv-prune-test-*	96	6548	2026-09-26T01:35:17Z	2026-09-26T03:07:51Z
+brv-path-test-*	12	128	2026-09-26T01:35:26Z	2026-09-26T03:08:04Z
+brv-projdir-test-*	12	0	2026-09-26T01:35:26Z	2026-09-26T03:08:04Z
+migrate-fm-*	44	4712	2026-09-26T01:35:24Z	2026-09-26T03:08:01Z
+folder-pack-executor-*	4	0	2026-09-26T01:35:18Z	2026-09-26T03:07:52Z
+prefixed directories in total: 498
+directory	0	born 2026-09-26T01:35:04Z	modified 2026-09-26T01:35:04Z	/tmp/brv-test-blobs
+directory	0	born 2026-09-26T01:35:04Z	modified 2026-09-26T01:35:04Z	/tmp/brv-test-storage
+directory	418222	born 2026-09-26T01:35:08Z	modified 2026-09-26T03:07:40Z	/tmp/byterover-tool-outputs
+files in /tmp/byterover-tool-outputs: 22
+births of the prefixed directories per minute (one cluster per upstream suite run):
+    123 2026-09-26T01:35Z
+    108 2026-09-26T01:45Z
+     17 2026-09-26T01:46Z
+    125 2026-09-26T03:04Z
+    108 2026-09-26T03:07Z
+     17 2026-09-26T03:08Z
+## Inside the session scratch directory
+### First-pass trees deleted by the first polish pass (expected absent)
+absent				<scratch>/trial-colpali
+absent				<scratch>/trial-mirix
+absent				<scratch>/trial-byterover
+absent				<scratch>/exec
+### Trees that remain
+directory	193239378	born 2026-09-26T03:58:03Z	modified 2026-09-26T06:51:15Z	<scratch>/trials-2
+directory	117860321	born 2026-09-26T01:18:32Z	modified 2026-09-26T01:59:09Z	<scratch>/wt-trials
+directory	33951472	born 2026-09-26T06:33:47Z	modified 2026-09-26T10:04:26Z	<scratch>/trials-pol
+directory	135766227	born 2026-09-26T03:56:16Z	modified 2026-09-26T05:35:50Z	<scratch>/wt-trials2
+git worktree branch of <scratch>/wt-trials: claude/p1-trials-mirix-byterover-colpali-20260926
+uncommitted entries in <scratch>/wt-trials: 11
+### Other session scratch directories under the same root (names withheld)
+      2 session scratch dir, mtime 2026-09-24
+     10 session scratch dir, mtime 2026-09-25
+## Trial processes and ports
+no MIRIX, ByteRover, pgserver or vidore-benchmark process
+ports 18531, 18000, 18533 and 7700 closed
+brv not on PATH

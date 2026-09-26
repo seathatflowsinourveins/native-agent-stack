@@ -1,0 +1,29 @@
+{
+  "clientCwd": "<scratch>/trial-byterover/brv-project",
+  "content": "What is the rate limiter policy?",
+  "createdAt": 1790386775777,
+  "id": "tsk-<uuid>",
+  "logId": "qry-1790386775778",
+  "model": "qwen3.8-27b-local",
+  "projectPath": "<scratch>/trial-byterover/brv-project",
+  "provider": "openai-compatible",
+  "reasoningContents": [
+    {
+      "content": "",
+      "isThinking": true,
+      "timestamp": 1790386775807
+    }
+  ],
+  "schemaVersion": 1,
+  "taskId": "<uuid>",
+  "type": "query",
+  "worktreeRoot": "<scratch>/trial-byterover/brv-project",
+  "completedAt": 1790386794798,
+  "error": {
+    "code": "TASK_ERROR",
+    "message": "request (11192 tokens) exceeds the available context size (8192 tokens), try increasing it",
+    "name": "TaskError"
+  },
+  "startedAt": 1790386775786,
+  "status": "error"
+}

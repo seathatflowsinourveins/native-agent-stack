@@ -1,0 +1,124 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0 -- <scratch>/trial-mirix/venv/bin/python
+cachedir: .pytest_cache
+rootdir: <scratch>/trial-mirix/mirix-src
+configfile: pytest.ini (WARNING: ignoring pytest config in pyproject.toml!)
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 16 items
+
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users ERROR [  6%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users_embedding ERROR [ 12%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_excludes_user3_without_matching_scope ERROR [ 18%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_excludes_user3_without_matching_scope_embedding ERROR [ 25%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_client3_retrieves_only_user3 ERROR [ 31%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_client3_retrieves_only_user3_embedding ERROR [ 37%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_different_org_no_cross_contamination ERROR [ 43%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_different_org_no_cross_contamination_embedding ERROR [ 50%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_memory_types ERROR [ 56%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_specific_memory_type ERROR [ 62%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_specific_memory_type_embedding ERROR [ 68%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_additional_filter_tags ERROR [ 75%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_bm25 ERROR [ 81%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_embedding ERROR [ 87%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_response_includes_metadata ERROR [ 93%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_each_result_includes_user_id ERROR [100%]
+
+==================================== ERRORS ====================================
+_ ERROR at setup of TestSearchAllUsers.test_search_all_users_with_client_id_retrieves_both_users _
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+_ ERROR at setup of TestSearchAllUsers.test_search_all_users_with_client_id_retrieves_both_users_embedding _
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+_ ERROR at setup of TestSearchAllUsers.test_search_excludes_user3_without_matching_scope _
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+_ ERROR at setup of TestSearchAllUsers.test_search_excludes_user3_without_matching_scope_embedding _
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+_ ERROR at setup of TestSearchAllUsers.test_search_with_client3_retrieves_only_user3 _
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+_ ERROR at setup of TestSearchAllUsers.test_search_with_client3_retrieves_only_user3_embedding _
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+_ ERROR at setup of TestSearchAllUsers.test_search_different_org_no_cross_contamination _
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+_ ERROR at setup of TestSearchAllUsers.test_search_different_org_no_cross_contamination_embedding _
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+______ ERROR at setup of TestSearchAllUsers.test_search_all_memory_types _______
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+____ ERROR at setup of TestSearchAllUsers.test_search_specific_memory_type _____
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+_ ERROR at setup of TestSearchAllUsers.test_search_specific_memory_type_embedding _
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+_ ERROR at setup of TestSearchAllUsers.test_search_with_additional_filter_tags _
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+__________ ERROR at setup of TestSearchAllUsers.test_search_with_bm25 __________
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+_______ ERROR at setup of TestSearchAllUsers.test_search_with_embedding ________
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+_____ ERROR at setup of TestSearchAllUsers.test_response_includes_metadata _____
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+____ ERROR at setup of TestSearchAllUsers.test_each_result_includes_user_id ____
+tests/test_search_all_users.py:216: in client1
+    client.initialize_meta_agent(
+E   TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+=============================== warnings summary ===============================
+mirix/orm/base.py:19
+  <scratch>/trial-mirix/mirix-src/mirix/orm/base.py:19: SADeprecationWarning: The declarative_mixin decorator was used only by the now removed mypy plugin so it has no longer any use and can be safely removed. (deprecated since: 2.1)
+    @declarative_mixin
+
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users
+  <scratch>/trial-mirix/venv/lib/python3.11/site-packages/_pytest/fixtures.py:1313: PytestRemovedIn10Warning: Class-scoped fixture defined as instance method is deprecated.
+  Instance attributes set in this fixture will NOT be visible to test methods,
+  as each test gets a new instance while the fixture runs only once per class.
+  Use @classmethod decorator and set attributes on cls instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#class-scoped-fixture-as-instance-method
+    fixturefunc = resolve_fixture_function(fixturedef, request)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users_embedding - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_excludes_user3_without_matching_scope - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_excludes_user3_without_matching_scope_embedding - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_client3_retrieves_only_user3 - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_client3_retrieves_only_user3_embedding - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_different_org_no_cross_contamination - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_different_org_no_cross_contamination_embedding - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_memory_types - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_specific_memory_type - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_specific_memory_type_embedding - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_additional_filter_tags - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_bm25 - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_embedding - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_response_includes_metadata - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_each_result_includes_user_id - TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'
+======================== 4 warnings, 16 errors in 0.42s ========================

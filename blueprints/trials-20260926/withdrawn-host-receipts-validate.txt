@@ -1,0 +1,12 @@
+# $ python3 scripts/host_receipts.py validate --root <copy>
+# <copy> = a temporary copy of the working tree at 9c1669c7ee474fd995988166e8e0a006fe85c44d (published origin/main) with the eight withdrawn receipts put back into evidence/hosts/nativestack-5975wx-20260925/ and registered in manifests/evidence.json; git objects read from the repository's object store (GIT_DIR), read-only
+Host receipt validation failed (8 error(s) across 146 receipt(s)):
+- evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--byterover-cli--install--20260926.json: component_id 'byterover-cli' is not a known manifests/stack.json or landscape winners component id
+- evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--byterover-cli--use--20260926.json: component_id 'byterover-cli' is not a known manifests/stack.json or landscape winners component id
+- evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--colpali-engine--install--20260926.json: component_id 'colpali-engine' is not a known manifests/stack.json or landscape winners component id
+- evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--colpali-engine--use--20260926.json: component_id 'colpali-engine' is not a known manifests/stack.json or landscape winners component id
+- evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--mirix--install--20260926.json: component_id 'mirix' is not a known manifests/stack.json or landscape winners component id
+- evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--mirix--use--20260926.json: component_id 'mirix' is not a known manifests/stack.json or landscape winners component id
+- evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vidore-benchmark--install--20260926.json: component_id 'vidore-benchmark' is not a known manifests/stack.json or landscape winners component id
+- evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vidore-benchmark--use--20260926.json: component_id 'vidore-benchmark' is not a known manifests/stack.json or landscape winners component id
+# exit=1

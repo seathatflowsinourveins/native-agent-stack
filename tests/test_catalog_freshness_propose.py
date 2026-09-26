@@ -28,6 +28,7 @@ against the committed YAML bytes, without a YAML dependency.
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -662,6 +663,15 @@ def _init_scratch_git(path: Path) -> None:
     git_env = ["-c", "user.email=scratch@example.invalid", "-c", "user.name=scratch"]
     subprocess.run(["git", "init", "-q"], cwd=path, check=True)
     subprocess.run(["git", *git_env, "add", "-A"], cwd=path, check=True)
+    # `add -A` skips files that match .gitignore, but the source checkout tracks some of
+    # them on purpose (force-added evidence such as *.jsonl excerpts). Track those too so
+    # the copy matches a clone: scripts/validate.py rejects a hash-listed file that is
+    # ignored and untracked, because a commit would leave it out.
+    tracked = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True, check=True).stdout
+    present = [name for name in (os.fsdecode(item) for item in tracked.split(b"\0") if item)
+               if (path / name).is_file() and not (path / name).is_symlink()]
+    subprocess.run(["git", *git_env, "add", "--force", "--pathspec-from-file=-", "--pathspec-file-nul"],
+                   cwd=path, check=True, input=b"\0".join(os.fsencode(name) for name in present))
     subprocess.run(["git", *git_env, "commit", "-q", "-m", "scratch snapshot"], cwd=path, check=True)
 
 

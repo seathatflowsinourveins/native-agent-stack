@@ -1,0 +1,9 @@
+<scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix/lib
+└─┬ byterover-cli@3.16.1
+  ├── @campfirein/brv-transport-client@1.1.0 invalid: "github:campfirein/brv-transport-client#1.1.0" from node_modules/byterover-cli
+  ├── @oclif/core@4.14.0
+  ├─┬ @oclif/plugin-help@6.3.0
+  │ └── @oclif/core@4.14.0 deduped
+  └─┬ @oclif/plugin-update@4.8.0
+    └── @oclif/core@4.14.0 deduped
+

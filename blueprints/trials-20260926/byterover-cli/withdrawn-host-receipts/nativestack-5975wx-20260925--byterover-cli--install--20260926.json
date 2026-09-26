@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--byterover-cli--install--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "c09dd6dfc68d2e17ed79aca436f6beaa6927a78d",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "byterover-cli",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v brv) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && brv --version",
+      "exit": 0,
+      "duration_s": 1.196,
+      "output_sha256": "d540b96fc7a92dc165e928ffad1a113375799fed6ba8b124ba4eaab55342e66a",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/brv -> ~/.local/share/codex-ecosystem/tools/byterover-cli-3.16.1/lib/node_modules/byterover-cli/bin/run.js\nbyterover-cli/3.16.1 wsl-x64 node-v24.21.0\n"
+    },
+    {
+      "cmd": "v=$(npm view byterover-cli@3.16.1 dist.integrity) && echo \"npm_dist_integrity=$v\" && test \"$v\" = \"sha512-uI6zETcy5QO6H29/sdn4BKGWzJl658sjHWxcpO+LHYcmxQj1mAmmi9lluqQZYoXXrnrbp+an8NYhjd5MKmDTcw==\" && echo \"INTEGRITY MATCHES PINNED VALUE\"",
+      "exit": 0,
+      "duration_s": 0.423,
+      "output_sha256": "055bd2c56c8ab1cdc280fc6410d38f19d64b5e75d69abd8ccac1491dbb239f5f",
+      "output_excerpt": "npm_dist_integrity=sha512-uI6zETcy5QO6H29/sdn4BKGWzJl658sjHWxcpO+LHYcmxQj1mAmmi9lluqQZYoXXrnrbp+an8NYhjd5MKmDTcw==\nINTEGRITY MATCHES PINNED VALUE\n"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && git clone --branch v3.16.1 --depth 1 https://github.com/campfirein/byterover-cli.git \"$d/src\" >/dev/null 2>&1 && cd \"$d/src\" && test \"$(git rev-parse HEAD)\" = \"1f4609c18ca735810860b3ba9178cae2dd8a67b0\" && DO_NOT_TRACK=1 npm ci --no-audit --no-fund >/dev/null 2>&1 && DO_NOT_TRACK=1 npm test >\"$d/test.log\" 2>&1; ec=$?; tail -6 \"$d/test.log\"; rm -rf \"$d\"; exit $ec",
+      "exit": 0,
+      "duration_s": 205.566,
+      "output_sha256": "c97c25b9ba85fba02c10fd34846032e8aa4cd7c336982998ec9e54dcbc65dc84",
+      "output_excerpt": "    \u2714 calls toast.error with no action for an unknown error code\n\n\n  8340 passing (49s)\n  16 pending\n\n"
+    }
+  ],
+  "tool_versions": {
+    "byterover-cli": "3.16.1"
+  },
+  "observed_at_utc": "2026-09-26T03:04:41Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), 3 command(s) were run for component 'byterover-cli' at stage 'install'; overall result pass.",
+  "limitations": [
+    "Recorded receipt covers only the listed commands; it does not establish full component functional acceptance beyond what these commands exercise.",
+    "The third command clones the pinned tag fresh and runs the project's own npm ci && npm test; it needs network access and took roughly 30-90s in our dry runs depending on host load, so pass --timeout 300 (or higher) to host_receipts.py record, well above its 120s default, or the command may be killed before mocha finishes.",
+    "npm's allowScripts gate blocks a few dependencies' postinstall scripts (esbuild, protobufjs, tesseract.js, @google/genai) during both this and the global CLI install; this did not affect --version or the test suite, neither of which needs a local build (the npm-published package ships a prebuilt dist/)."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T03:04:41Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

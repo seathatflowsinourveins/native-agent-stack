@@ -1,0 +1,133 @@
+2026-09-26T04:53:27Z mode=plan
+2026-09-26T04:53:27Z == assertions
+byterover-cli/3.16.1 wsl-x64 node-v24.21.0
+2026-09-26T04:53:28Z pid 2657580: python scripts/start_server.py --port 18531 --log-level info  (cwd <scratch>/trial-mirix/mirix-src)
+2026-09-26T04:53:28Z pid 2823903: python scripts/start_server.py --port 18000 --log-level info  (cwd <scratch>/trial-mirix/mirix-src)
+2026-09-26T04:53:28Z pid 2853428: python scripts/start_server.py --port 18533 --log-level info  (cwd <scratch>/trial-mirix/mirix-main-src)
+2026-09-26T04:53:28Z all literal targets asserted
+2026-09-26T04:53:28Z == before
+d 4096 2026-09-25T21:26 ~/.local/share/codex-ecosystem/tools/byterover-cli-3.16.1/bin
+l 44 2026-09-25T21:26 ~/.local/share/codex-ecosystem/tools/byterover-cli-3.16.1/bin/brv
+l 75 2026-09-25T21:26 ~/.local/share/codex-ecosystem/bin/brv
+d 4096 2026-09-25T21:29 ~/.config/brv
+f 354 2026-09-25T21:29 ~/.config/brv/providers.json
+d 4096 2026-09-25T23:53 ~/.local/share/brv
+f 32 2026-09-25T21:29 ~/.local/share/brv/.provider-keys
+f 13 2026-09-25T23:53 ~/.local/share/brv/heartbeat
+d 4096 2026-09-25T23:08 ~/.local/share/brv/logs
+f 27083 2026-09-25T21:44 ~/.local/share/brv/logs/server-2026-09-26T01-29-19.log
+f 12490 2026-09-25T23:53 ~/.local/share/brv/logs/server-2026-09-26T03-08-26.log
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects
+d 4096 2026-09-25T21:38 ~/.local/share/brv/projects/52e46795de4162a3
+f 71 2026-09-25T21:38 ~/.local/share/brv/projects/52e46795de4162a3/vc-git-config.json
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/64fd91e6d536f82e
+f 73 2026-09-25T23:08 ~/.local/share/brv/projects/64fd91e6d536f82e/vc-git-config.json
+d 4096 2026-09-25T21:41 ~/.local/share/brv/projects/ac63c0da15696a56
+f 73 2026-09-25T21:41 ~/.local/share/brv/projects/ac63c0da15696a56/vc-git-config.json
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/c2ba8907221864d0
+f 73 2026-09-25T23:08 ~/.local/share/brv/projects/c2ba8907221864d0/vc-git-config.json
+d 4096 2026-09-25T21:31 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project
+d 4096 2026-09-25T21:29 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/blobs
+f 208 2026-09-25T21:29 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/config.json
+d 4096 2026-09-25T21:30 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/curate-log
+f 602 2026-09-25T21:30 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/curate-log/cur-1790386195164.json
+d 4096 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/keystore
+d 4096 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/keystore/message
+d 4096 2026-09-25T21:30 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/keystore/message/task-curate-<uuid>
+d 4096 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/keystore/message/task-query-<uuid>
+d 4096 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/keystore/session
+d 4096 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/keystore/signals
+d 4096 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/keystore/signals/auth
+f 188 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/keystore/signals/auth/notes.md.json
+d 4096 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/query-log
+f 784 2026-09-25T21:31 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/query-log/qry-1790386302635.json
+f 784 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/query-log/qry-1790386760359.json
+f 339 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/query-log/qry-1790386775778.json
+d 4096 2026-09-25T21:29 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/sessions
+f 192 2026-09-25T21:29 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/sessions/active.json
+f 393 2026-09-25T21:29 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/sessions/session-2026-09-26T01-29-55-agent-se.json
+d 4096 2026-09-25T21:30 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/task-history
+f 6593 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/task-history/_index.jsonl
+f 1808 2026-09-25T21:30 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/task-history/_index.jsonl.bak
+d 4096 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/task-history/data
+f 1286 2026-09-25T21:30 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/task-history/data/tsk-<uuid>.json
+f 1271 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/task-history/data/tsk-<uuid>.json
+f 1261 2026-09-25T21:31 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/task-history/data/tsk-<uuid>.json
+f 956 2026-09-25T21:31 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/task-history/data/tsk-<uuid>.json
+f 1261 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/task-history/data/tsk-<uuid>.json
+f 1153 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/task-history/data/tsk-<uuid>.json
+f 1004 2026-09-25T21:39 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--brv-project/task-history/data/tsk-<uuid>.json
+d 4096 2026-09-25T21:34 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--byterover-cli-src
+f 214 2026-09-25T21:35 ~/.local/share/brv/projects/<scratch-escaped>--trial-byterover--byterover-cli-src/config.json
+d 4096 2026-09-25T21:41 ~/.local/share/brv/projects/tmp--tmp.5l9iLqZR33
+d 4096 2026-09-25T21:41 ~/.local/share/brv/projects/tmp--tmp.5l9iLqZR33/blobs
+f 99 2026-09-25T21:41 ~/.local/share/brv/projects/tmp--tmp.5l9iLqZR33/config.json
+d 4096 2026-09-25T21:41 ~/.local/share/brv/projects/tmp--tmp.5l9iLqZR33/keystore
+d 4096 2026-09-25T21:41 ~/.local/share/brv/projects/tmp--tmp.5l9iLqZR33/sessions
+f 192 2026-09-25T21:41 ~/.local/share/brv/projects/tmp--tmp.5l9iLqZR33/sessions/active.json
+f 284 2026-09-25T21:41 ~/.local/share/brv/projects/tmp--tmp.5l9iLqZR33/sessions/session-2026-09-26T01-41-23-agent-se.json
+d 4096 2026-09-25T21:41 ~/.local/share/brv/projects/tmp--tmp.5l9iLqZR33/task-history
+f 1352 2026-09-25T21:41 ~/.local/share/brv/projects/tmp--tmp.5l9iLqZR33/task-history/_index.jsonl
+d 4096 2026-09-25T21:41 ~/.local/share/brv/projects/tmp--tmp.5l9iLqZR33/task-history/data
+f 906 2026-09-25T21:41 ~/.local/share/brv/projects/tmp--tmp.5l9iLqZR33/task-history/data/tsk-<uuid>.json
+f 677 2026-09-25T21:41 ~/.local/share/brv/projects/tmp--tmp.5l9iLqZR33/task-history/data/tsk-<uuid>.json
+d 4096 2026-09-25T21:45 ~/.local/share/brv/projects/tmp--tmp.8FZ49FwMRV--src
+f 103 2026-09-25T21:45 ~/.local/share/brv/projects/tmp--tmp.8FZ49FwMRV--src/config.json
+d 4096 2026-09-25T23:07 ~/.local/share/brv/projects/tmp--tmp.G5ehiKUHw1--src
+f 103 2026-09-25T23:07 ~/.local/share/brv/projects/tmp--tmp.G5ehiKUHw1--src/config.json
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.KG4LxF3R5k
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.KG4LxF3R5k/blobs
+f 99 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.KG4LxF3R5k/config.json
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.KG4LxF3R5k/keystore
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.KG4LxF3R5k/sessions
+f 191 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.KG4LxF3R5k/sessions/active.json
+f 284 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.KG4LxF3R5k/sessions/session-2026-09-26T03-08-51-agent-se.json
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.KG4LxF3R5k/task-history
+f 1352 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.KG4LxF3R5k/task-history/_index.jsonl
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.KG4LxF3R5k/task-history/data
+f 677 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.KG4LxF3R5k/task-history/data/tsk-<uuid>.json
+f 906 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.KG4LxF3R5k/task-history/data/tsk-<uuid>.json
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.p7ZefFx0ao
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.p7ZefFx0ao/blobs
+f 99 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.p7ZefFx0ao/config.json
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.p7ZefFx0ao/keystore
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.p7ZefFx0ao/sessions
+f 191 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.p7ZefFx0ao/sessions/active.json
+f 284 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.p7ZefFx0ao/sessions/session-2026-09-26T03-08-37-agent-se.json
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.p7ZefFx0ao/task-history
+f 1352 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.p7ZefFx0ao/task-history/_index.jsonl
+d 4096 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.p7ZefFx0ao/task-history/data
+f 906 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.p7ZefFx0ao/task-history/data/tsk-<uuid>.json
+f 677 2026-09-25T23:08 ~/.local/share/brv/projects/tmp--tmp.p7ZefFx0ao/task-history/data/tsk-<uuid>.json
+d 4096 2026-09-25T23:03 ~/.local/share/brv/projects/tmp--tmp.zveJzidAZZ--src
+f 103 2026-09-25T23:04 ~/.local/share/brv/projects/tmp--tmp.zveJzidAZZ--src/config.json
+d 4096 2026-09-25T21:46 ~/.local/share/brv/projects/tmp--undo-wiring-1nBZV4
+d 4096 2026-09-25T21:46 ~/.local/share/brv/projects/tmp--undo-wiring-1nBZV4/keystore
+d 4096 2026-09-25T23:04 ~/.local/share/brv/projects/tmp--undo-wiring-eVSspE
+d 4096 2026-09-25T23:04 ~/.local/share/brv/projects/tmp--undo-wiring-eVSspE/keystore
+d 4096 2026-09-25T23:07 ~/.local/share/brv/projects/tmp--undo-wiring-f509rB
+d 4096 2026-09-25T23:07 ~/.local/share/brv/projects/tmp--undo-wiring-f509rB/keystore
+d 4096 2026-09-25T21:35 ~/.local/share/brv/projects/tmp--undo-wiring-oU2k7U
+d 4096 2026-09-25T21:35 ~/.local/share/brv/projects/tmp--undo-wiring-oU2k7U/keystore
+f 170 2026-09-25T21:29 ~/.local/share/brv/provider-credentials
+f 1460 2026-09-25T23:08 ~/.local/share/brv/registry.json
+d 4096 2026-09-25T21:29 ~/.local/state/brv
+d 4096 2026-09-25T21:29 ~/.local/state/brv/logs
+d 4096 2026-09-25T21:26 ~/.cache/brv
+f 0 2026-09-25T21:26 ~/.cache/brv/autoupdate
+f 397 2026-09-25T22:41 ~/.cache/brv/autoupdate.log
+f 0 2026-09-26T00:26 ~/.cache/brv/lastrun
+f 55 2026-09-25T23:08 ~/.config/configstore/update-notifier-byterover-cli.json
+d 4096 2026-09-25T23:08 ~/.config/configstore
+f 55 2026-09-25T23:08 ~/.config/configstore/update-notifier-byterover-cli.json
+l 112 2026-09-25T22:57 /tmp/nas-mirix-trial
+l 114 2026-09-25T22:57 /tmp/nas-colpali-trial
+581M	~/.local/share/codex-ecosystem/tools/byterover-cli-3.16.1
+8.0K	~/.config/brv
+444K	~/.local/share/brv
+8.0K	~/.local/state/brv
+8.0K	~/.cache/brv
+2657580   12121 python scripts/start_server.py --port 18531 --log-level info
+2823903   11165 python scripts/start_server.py --port 18000 --log-level info
+2853428   11026 python scripts/start_server.py --port 18533 --log-level info
+2026-09-26T04:53:29Z plan only; nothing changed

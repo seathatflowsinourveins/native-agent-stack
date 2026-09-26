@@ -1,0 +1,1 @@
+{"output": "<scratch>/trials-2/brv-repro/20-search-positive.stdout", "expected": {"total": 1, "path": "auth/notes.md", "text": "fixed-window rate limiter"}, "observed": {"success": true, "status": "completed", "totalFound": 1, "paths": ["auth/notes.md"]}, "pass": true, "failures": []}

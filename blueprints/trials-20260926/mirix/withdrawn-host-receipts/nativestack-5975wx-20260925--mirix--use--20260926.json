@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--mirix--use--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "c09dd6dfc68d2e17ed79aca436f6beaa6927a78d",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "mirix",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "bash -c 'cd /tmp/nas-mirix-trial && VIRTUAL_ENV=\"$PWD/venv-main\" PATH=\"$VIRTUAL_ENV/bin:$PATH\" MIRIX_API_URL=http://127.0.0.1:18533 python quickstart_add_retrieve_async.py config/mirix_main_local_bm25.yaml'  # requires MIRIX_API_KEY from the awaited gen_key_main.py wrapper (upstream's own samples/generate_demo_api_key.py is broken on main, finding F4)",
+      "exit": 0,
+      "duration_s": 3.004,
+      "output_sha256": "1b01ee64973d696ab1fe0057ea65759649acb6a4ab6ca2f5ab3ef1d5ad46602e",
+      "output_excerpt": "2026-09-25 23:07:52 - Mirix - INFO - Logging to: console (level: INFO)\nINIT_RESULT: \"created_by_id='demo-client-id' last_updated_by_id='demo-client-id' created_at=datetime.datetime(2026, 9, 26, 1, 51, 32, 321195, tzinfo=TzInfo(0)) updated_at=datetime.datetime(2026, 9, 26, 3, 7, 54, 34701, tzinfo=TzInfo(0)) id='agent-[redacted]' name='meta_memory_agent' tool_rules=[] message_ids=['message-[redacted"
+    }
+  ],
+  "tool_versions": {
+    "mirix": "main@8cb06a62bbb7c478beb33dd4f2815696a72df482 (NOT a release tag; informational secondary pin, fetched 2026-09-25, used only because it fixes the v0.1.6 defect in the receipt above)"
+  },
+  "observed_at_utc": "2026-09-26T03:07:51Z",
+  "result": "pass",
+  "claim": "Positive control for the sibling v0.1.6 receipt: with the identical local llama.cpp+vLLM backends, pointed at MIRIX main instead of v0.1.6, topic extraction succeeds and the meta-agent issues a real, well-formed trigger_memory_update tool call, and its semantic_memory_agent sub-agent produces a correct structured memory object purely from the local model's own output -- proving the local model and this host's setup are sound. The actual database write (semantic_memory_insert) then fails with the SAME underlying defect as finding F2 (embedding_model() never forwards embedding_model, always targets a hardcoded text-embedding-ada-002), reproduced deterministically twice (initial attempt and its own step_count:1 retry). Net result: partial -- local-model LLM orchestration works once the v0.1.6 schema bug is fixed; persistence does not.",
+  "limitations": [
+    "main is not a release tag and is not proposed for adoption on that basis; cited only as evidence that the v0.1.6 defect is version-specific and already understood/fixed upstream, not as evidence MIRIX is ready to adopt.",
+    "Reaching even this partial result required three further undocumented workarounds beyond config changes: async/await added to the client calls and to the demo-key helper script, and a plain-string message-content shape instead of the list-of-parts shape shown in upstream's own README (findings F3/F4/F5 in results-20260926.json).",
+    "Whether episodic_memory_insert (a sibling sub-agent write that may not need an embedding) succeeds was not conclusively observed before this trial's time budget closed."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T03:07:51Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

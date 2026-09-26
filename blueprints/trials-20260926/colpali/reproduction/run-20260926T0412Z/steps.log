@@ -1,0 +1,8 @@
+2026-09-26T04:12:02Z start; workspace is a fresh mktemp directory; nproc=48
+2026-09-26T04:12:03Z installed set equals requirements-lock.txt
+2026-09-26T04:12:36Z resolved main: adapter=b5c6dd62125326e6f0b540c1f7b36e901cdc0a11 base=30ab955d073de4a91dc5a288e8c97226647e3e5a
+2026-09-26T04:12:38Z colpali: load before: 22.44 9.57 9.29
+2026-09-26T04:21:27Z colpali: exit=0; load after: 28.18 23.09 15.93
+2026-09-26T04:21:27Z dummy: load before: 28.18 23.09 15.93
+2026-09-26T04:21:34Z dummy: exit=0; load after: 26.09 22.74 15.85
+2026-09-26T04:21:34Z done: colpali_exit=0 dummy_exit=0

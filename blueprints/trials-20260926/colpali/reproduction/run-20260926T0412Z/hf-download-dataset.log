@@ -1,0 +1,8 @@
+Fetching 3 files:   0%|          | 0/3 [00:00<?, ?it/s]Downloading 'README.md' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/datasets--vidore--tabfquad_test_subsampled/blobs/ee17635d9626c73fa3cee716ac07bf8773ee7010.incomplete'
+Downloading 'data/test-00000-of-00001.parquet' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/datasets--vidore--tabfquad_test_subsampled/blobs/cd52a0b2fe16463606b3c18d02ad1e8b6c62dcbaf516a34f108a8dacc2ceb2eb.incomplete'
+Downloading '.gitattributes' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/datasets--vidore--tabfquad_test_subsampled/blobs/28df5f900b358436f0267334b3e3e9af33f917ba.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/datasets--vidore--tabfquad_test_subsampled/blobs/ee17635d9626c73fa3cee716ac07bf8773ee7010
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/datasets--vidore--tabfquad_test_subsampled/blobs/28df5f900b358436f0267334b3e3e9af33f917ba
+Fetching 3 files:  33%|███▎      | 1/3 [00:00<00:00,  7.83it/s]Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/datasets--vidore--tabfquad_test_subsampled/blobs/cd52a0b2fe16463606b3c18d02ad1e8b6c62dcbaf516a34f108a8dacc2ceb2eb
+Fetching 3 files: 100%|██████████| 3/3 [00:01<00:00,  2.15it/s]Fetching 3 files: 100%|██████████| 3/3 [00:01<00:00,  2.15it/s]
+/tmp/tmp.ZtWUzYFdCO/hf/hub/datasets--vidore--tabfquad_test_subsampled/snapshots/16c8e633612fbda7400bfcbbc31d61a7534f580f

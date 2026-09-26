@@ -1,0 +1,5 @@
+[2026-09-26T01:26:47.524Z] starting `brv update --autoupdate` from ~/.local/share/codex-ecosystem/bin/brv --version
+waiting until 2026-09-26T02:26:47.522Z to update
+time to update
+byterover-cli: Updating CLI... not updatable
+tidyUpdatePluginClientCache: failed to list ~/.local/share/brv/client: ENOENT: no such file or directory, scandir '~/.local/share/brv/client'

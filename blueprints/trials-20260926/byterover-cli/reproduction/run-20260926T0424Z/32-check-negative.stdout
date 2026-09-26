@@ -1,0 +1,1 @@
+{"output": "<scratch>/trials-2/brv-repro/22-search-negative.stdout", "expected": {"total": 0, "path": null, "text": null}, "observed": {"success": true, "status": "completed", "totalFound": 0, "paths": []}, "pass": true, "failures": []}

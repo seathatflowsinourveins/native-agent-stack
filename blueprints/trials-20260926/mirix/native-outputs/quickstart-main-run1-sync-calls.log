@@ -1,0 +1,7 @@
+2026-09-25 21:50:56 - Mirix - INFO - Logging to: console (level: INFO)
+INIT_RESULT: "<coroutine object MirixClient.initialize_meta_agent at 0x7db14be650e0>"
+ADD_RESULT: "<coroutine object MirixClient.add at 0x7db14be8cca0>"
+RETRIEVE_RESULT: "<coroutine object MirixClient.retrieve_with_conversation at 0x7db14be655a0>"
+sys:1: RuntimeWarning: coroutine 'MirixClient.initialize_meta_agent' was never awaited
+sys:1: RuntimeWarning: coroutine 'MirixClient.add' was never awaited
+sys:1: RuntimeWarning: coroutine 'MirixClient.retrieve_with_conversation' was never awaited

@@ -1,0 +1,40 @@
+Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]Downloading '2_Normalize/config.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/128866345ee114a2bff71c4cceaafd5429b24ef6.incomplete'
+Downloading '1_Dense/config.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/bc101c56b445de2d3cf39556ae4973d4423b059e.incomplete'
+Downloading '1_Dense/model.safetensors' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/103e53d5b7215c5f6a924c2c788635400a468c77fbd027158fbd6520a3a5c2e1.incomplete'
+Downloading '.gitattributes' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/52373fe24473b1aa44333d318f578ae6bf04b49b.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/128866345ee114a2bff71c4cceaafd5429b24ef6
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/bc101c56b445de2d3cf39556ae4973d4423b059e
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/52373fe24473b1aa44333d318f578ae6bf04b49b
+Downloading 'README.md' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/4355d17d3eea58974dd41bfdc96a618fe4ba336e.incomplete'
+Downloading 'adapter_config.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/41000fc2a6c9926f7147925222d844f05fa6c74c.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/4355d17d3eea58974dd41bfdc96a618fe4ba336e
+Downloading '3_MultiVectorMask/config.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/563f8ecfcaabd72b805310fcc757c992a3de6ff8.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/41000fc2a6c9926f7147925222d844f05fa6c74c
+Downloading 'adapter_model.safetensors' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/1f2fb23f46e0f545ee309449f02f9a31236a36dc76da24b9f8e6a8dd4fda66f3.incomplete'
+Downloading 'chat_template.jinja' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/ef3827a5fcbf4097817a4bf4777fe82690160fcd.incomplete'
+Downloading 'git_hash.txt' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/f2bd20adda78eff9919e0d1ec44485a8c6f56d29.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/563f8ecfcaabd72b805310fcc757c992a3de6ff8
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/ef3827a5fcbf4097817a4bf4777fe82690160fcd
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/f2bd20adda78eff9919e0d1ec44485a8c6f56d29
+Fetching 19 files:  42%|████▏     | 8/19 [00:00<00:00, 41.68it/s]Downloading 'config_sentence_transformers.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/2c48744789040ccb8a5628f7ebe0a09363af6524.incomplete'
+Downloading 'modules.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/a036f5b804e5ab3cae4fcdcc624c42ca85026535.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/2c48744789040ccb8a5628f7ebe0a09363af6524
+Downloading 'results.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/2157570497bada4079268820314ca5c3d9213ba0.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/a036f5b804e5ab3cae4fcdcc624c42ca85026535
+Downloading 'preprocessor_config.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/0576012cdbe13b75a5ac00c48d519d17e2b8aab9.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/2157570497bada4079268820314ca5c3d9213ba0
+Downloading 'special_tokens_map.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/f48cea75e45286da1529fb88a24e851bc1a3c882.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/0576012cdbe13b75a5ac00c48d519d17e2b8aab9
+Downloading 'tokenizer.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/1ff84f53c290d0348c4e206da6094ef781cf8c0e482fec8b268a996b32257cfd.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/f48cea75e45286da1529fb88a24e851bc1a3c882
+Downloading 'sentence_bert_config.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/d68df57424682db5eaa5263dc0643c97e662dabe.incomplete'
+Downloading 'tokenizer_config.json' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/c710a0b6f969fcbb33738a947c61b76ef6c635bd.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/c710a0b6f969fcbb33738a947c61b76ef6c635bd
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/d68df57424682db5eaa5263dc0643c97e662dabe
+Downloading 'training_config.yml' to '/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/2b4bfb6424bb5e7f1b9e63d992d09d15043c3631.incomplete'
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/2b4bfb6424bb5e7f1b9e63d992d09d15043c3631
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/103e53d5b7215c5f6a924c2c788635400a468c77fbd027158fbd6520a3a5c2e1
+Fetching 19 files:  89%|████████▉ | 17/19 [00:00<00:00, 21.08it/s]Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/1ff84f53c290d0348c4e206da6094ef781cf8c0e482fec8b268a996b32257cfd
+Download complete. Moving file to /tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/blobs/1f2fb23f46e0f545ee309449f02f9a31236a36dc76da24b9f8e6a8dd4fda66f3
+Fetching 19 files: 100%|██████████| 19/19 [00:03<00:00,  5.18it/s]
+/tmp/tmp.ZtWUzYFdCO/hf/hub/models--vidore--colpali-v1.3/snapshots/b5c6dd62125326e6f0b540c1f7b36e901cdc0a11

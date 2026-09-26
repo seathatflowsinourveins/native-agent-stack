@@ -1,0 +1,305 @@
+{
+  "schema_version": 2,
+  "trial": "mirix",
+  "trial_date": "2026-09-26",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "note": "The first pass ran 2026-09-26 01:22Z-03:37Z. Two sibling trials shared the host, and the host llama.cpp service (single slot) restarted once at 02:15Z, so every local-model latency here includes queueing and is not a benchmark."
+  },
+  "component": {
+    "trial_component_id": "mirix",
+    "repository": "https://github.com/Mirix-AI/MIRIX",
+    "description": "Multi-agent memory system: six memory stores (core, episodic, semantic, procedural, resource, knowledge vault), each written by an LLM-driven sub-agent under a meta agent, behind a FastAPI REST server on PostgreSQL + pgvector with a thin REST client.",
+    "paper": "arXiv:2507.07957",
+    "license": {
+      "fact": "Apache-2.0",
+      "evidence": [
+        "source-review.json#license-file",
+        "source-review.json#license-field"
+      ]
+    }
+  },
+  "pins": {
+    "primary": {
+      "ref": "v0.1.6",
+      "commit": "0f3fbdb5e085ccceb6254e2a4a128a8957dac55a",
+      "why": "latest tag with a GitHub release; full server and client"
+    },
+    "secondary": {
+      "ref": "main",
+      "commit": "8cb06a62bbb7c478beb33dd4f2815696a72df482",
+      "why": "used only to test whether main fixes the v0.1.6 failure; still the main tip on 2026-09-26T04:58Z"
+    },
+    "pypi": {
+      "package": "mirix",
+      "version": "0.1.7",
+      "wheel_sha256": "ead9e0ecd33218164a319749281d3bb3d5de677e5ab1afad6ccaa3910139af45",
+      "sdist_sha256": "d6650d24d28fb110244daa873b11215c480c80ae2e4e0d7c65ab9c37e227b5a5",
+      "content": "REST client only (no server or memory engine): the wheel's summary is 'Mirix Client - Lightweight Python client for Mirix server' and its 62 files hold only the client, helpers and schemas subpackages (native-outputs/pypi-mirix-0.1.7-wheel-contents.txt); no git tag named v0.1.7 exists"
+    },
+    "verification": "../provenance/run-20260926T045856Z/verify-pins.log: fresh tag clone rev-parse for v0.1.6, fetch-by-id for the main commit, PyPI-reported and downloaded sha256 for both 0.1.7 files; all matched"
+  },
+  "setup": {
+    "local_backends": {
+      "chat": "host llama.cpp OpenAI-compatible server on 127.0.0.1:18232, model alias qwen3.8-27b-local (read-only inference)",
+      "embedding": "host vLLM OpenAI-compatible server on 127.0.0.1:18231, nvidia/Nemotron-3-Embed-1B-BF16 (read-only inference)",
+      "database": "private PostgreSQL 16.2 + pgvector 0.6.2 through the pgserver PyPI package (no Docker, no sudo), Unix socket under the session runtime directory; databases mirix, mirix_tests, mirix_main; versions read from the v0.1.6 venv before its deletion (native-outputs/pgserver-bundled-versions.txt: pgserver 0.1.4's bundled postgres --version 16.2, the cluster's PG_VERSION 16, the vector extension's default_version 0.6.2; the venv's pgvector 0.5.0 is the Python client binding)"
+    },
+    "install": "git clone --branch v0.1.6 --depth 1; uv venv (Python 3.11.16); uv pip install -r requirements.txt; uv pip install pgserver; uv pip install -e . --no-deps. main: full clone at 8cb06a62, second venv, uv pip install -r requirements.txt (native-outputs/install-main-8cb06a62.log). The v0.1.6 install console output was not retained.",
+    "server": "python scripts/start_server.py --port 18531 (v0.1.6), --port 18000 (v0.1.6, test re-run), --port 18533 (main; needs a postgresql+asyncpg:// MIRIX_PG_URI)"
+  },
+  "checks": [
+    {
+      "id": "upstream-suite-v0.1.6",
+      "evidence_class": "upstream_test",
+      "command": "python -m pytest -v (tests/README.md), pinned tag, fresh mirix_tests database, no MIRIX_API_KEY, Redis off",
+      "exit_code": 1,
+      "result": "193 collected: 1 failed, 88 passed, 88 skipped, 5 warnings, 16 errors in 55.55s",
+      "detail": {
+        "failed": "tests/test_queue.py::TestQueuePerformance::test_concurrent_enqueue: assert 57 == 100 (concurrent enqueue count on a loaded host)",
+        "skipped": "88 tests gated on GEMINI_API_KEY or MIRIX_REDIS_ENABLED; neither was configured",
+        "errors_without_key": "all 16 tests in tests/test_search_all_users.py: 'ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.'"
+      },
+      "retained": [
+        "native-outputs/pytest-v0.1.6-full.log"
+      ]
+    },
+    {
+      "id": "upstream-suite-v0.1.6-search-rerun",
+      "evidence_class": "upstream_test",
+      "command": "python -m pytest -v tests/test_search_all_users.py with MIRIX_API_KEY and MIRIX_API_URL set, fresh server (port 18000) and database",
+      "exit_code": 1,
+      "result": "4 warnings, 16 errors in 0.42s: 'TypeError: MirixClient.initialize_meta_agent() got an unexpected keyword argument 'config_path'' for all 16 (F6)",
+      "retained": [
+        "native-outputs/pytest-v0.1.6-test_search_all_users-rerun.log",
+        "native-outputs/server-v0.1.6-port18000-tests.log"
+      ]
+    },
+    {
+      "id": "quickstart-v0.1.6-embeddings-on",
+      "evidence_class": "local_integration",
+      "command": "python quickstart_add_retrieve.py config/mirix_local.yaml (self-written wrapper over the README Option B calls; build_embeddings_for_memory: true)",
+      "exit_code": 1,
+      "result": "initialize_meta_agent returned HTTP 400: 'Embedding model validation failed: ... The model `text-embedding-ada-002` does not exist.' (F2)",
+      "retained": [
+        "native-outputs/quickstart-v0.1.6-attempt1-embeddings-on.log",
+        "local-integration/quickstart_add_retrieve.py",
+        "local-integration/config-mirix_local.yaml"
+      ]
+    },
+    {
+      "id": "quickstart-v0.1.6-bm25",
+      "evidence_class": "local_integration",
+      "command": "python quickstart_add_retrieve.py config/mirix_local_bm25.yaml (build_embeddings_for_memory: false)",
+      "exit_code": 0,
+      "result": "HTTP level only: initialize 200, add 200 'queued', retrieve 200 with every total_count 0. Server side the queued write failed: topic extraction and every agent-step attempt raised the F1 ValidationError until 'Retries exhausted' (add 01:37:15Z, terminal failure 01:47:42Z). No memory was written.",
+      "retained": [
+        "native-outputs/quickstart-v0.1.6-attempt2-bm25.log",
+        "native-outputs/server-v0.1.6-port18531.log",
+        "local-integration/config-mirix_local_bm25.yaml"
+      ]
+    },
+    {
+      "id": "bounded-check-v0.1.6",
+      "evidence_class": "local_integration",
+      "command": "timeout 300 sh check_v016_bounded_poll.sh (self-written: add one message, poll retrieve for up to 280 s, exit 0 only if any memory type reports total_count > 0)",
+      "exit_code": 1,
+      "result": "The first poll hit the client's 60 s read timeout. Server side: F1 at 02:08Z for this add, then a 503 'Loading model' final error when the host llama.cpp service restarted at 02:15Z. No memory was written.",
+      "retained": [
+        "native-outputs/check-v0.1.6-bounded-poll.log",
+        "local-integration/check_v016_bounded_poll.sh",
+        "native-outputs/server-v0.1.6-port18531.log"
+      ]
+    },
+    {
+      "id": "skipped-use-dry-run-v0.1.6",
+      "evidence_class": "skipped_receipt_spec",
+      "command": "the first pass's recorder dry run of the v0.1.6 use spec (quickstart + bounded check)",
+      "exit_code": "dry-run hint [0, 1]; console output not retained",
+      "result": "Skipped by the recorder because a command failed. Server log: add at 03:18Z, F1 at every attempt, 'Retries exhausted' at 03:35Z. No memory was written.",
+      "retained": [
+        "skipped-receipt-specs.json",
+        "native-outputs/server-v0.1.6-port18531.log"
+      ]
+    },
+    {
+      "id": "skipped-suite-dry-run-v0.1.6",
+      "evidence_class": "skipped_receipt_spec",
+      "command": "the first pass's recorder dry run of the pinned-tag pytest spec",
+      "exit_code": "dry-run hint [1]; console output not retained",
+      "result": "Skipped by the recorder because the suite exits 1 (1 failed, 16 errors). The same command's retained run is check upstream-suite-v0.1.6.",
+      "retained": [
+        "skipped-receipt-specs.json",
+        "native-outputs/pytest-v0.1.6-full.log"
+      ]
+    },
+    {
+      "id": "quickstart-main-sync-calls",
+      "evidence_class": "local_integration",
+      "command": "python quickstart_add_retrieve.py config/mirix_main_local_bm25.yaml against main (the README quick start call shape, no await)",
+      "exit_code": "not retained",
+      "result": "Every client call returned an un-awaited coroutine; no request was made (F3).",
+      "retained": [
+        "native-outputs/quickstart-main-run1-sync-calls.log"
+      ]
+    },
+    {
+      "id": "quickstart-main-list-content",
+      "evidence_class": "local_integration",
+      "command": "python quickstart_add_retrieve_async.py config/mirix_main_local_bm25.yaml with the README content shape (list of {type: text} parts)",
+      "exit_code": 1,
+      "result": "POST /memory/add returned 500; server: TypeError can only concatenate str (not \"dict\") to str (F5). Four such 500 responses are in the server log.",
+      "retained": [
+        "native-outputs/quickstart-main-run2-list-content.log",
+        "native-outputs/server-main-8cb06a62-port18533.log",
+        "local-integration/quickstart_add_retrieve_async.py",
+        "local-integration/gen_key_main.py"
+      ]
+    },
+    {
+      "id": "quickstart-main-string-content",
+      "evidence_class": "local_integration",
+      "command": "the same wrapper with plain-string content (the endpoint's other documented shape)",
+      "exit_code": 0,
+      "result": "HTTP 200 throughout. Server side on main: topic extraction succeeded (01:53:22Z) and the meta agent issued trigger_memory_update for episodic and semantic memory (01:56:13Z); semantic_memory_insert then failed with NotFoundError 'text-embedding-ada-002 does not exist' (02:03:47Z, F2). The first pass's recorder run of the same command (03:07Z) repeated this and also shows episodic_memory_insert failing with the same NotFoundError (03:15Z, 03:18Z). No memory row was persisted.",
+      "retained": [
+        "native-outputs/quickstart-main-run3-string-content.log",
+        "native-outputs/server-main-8cb06a62-port18533.log",
+        "local-integration/config-mirix_main_local_bm25.yaml"
+      ]
+    },
+    {
+      "id": "pypi-install-instruction",
+      "evidence_class": "registry_observation",
+      "command": "PyPI JSON and simple API queries (see the file)",
+      "exit_code": 0,
+      "result": "mirix 0.1.7's description says `pip install mirix-client`; the mirix-client project is registered with no files and no versions, so that command installs nothing (F7).",
+      "retained": [
+        "native-outputs/pypi-mirix-client-check.txt"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "affects": "v0.1.6 (not main@8cb06a62)",
+      "summary": "PromptTokensDetails.audio_tokens is a non-Optional int, so every llama.cpp completion (which sends usage.prompt_tokens_details.audio_tokens: null) fails validation; topic extraction and every memory-agent step fail against a llama.cpp backend.",
+      "evidence": [
+        "native-outputs/server-v0.1.6-port18531.log",
+        "source-review.json#F1-v0.1.6-schema",
+        "source-review.json#F1-main-schema"
+      ]
+    },
+    {
+      "id": "F2",
+      "affects": "v0.1.6 and main@8cb06a62",
+      "summary": "embedding_model() builds the llama_index OpenAIEmbedding without config.embedding_model, so an OpenAI-compatible embedding server is asked for text-embedding-ada-002; build_embeddings_for_memory: false skips the init check but not the semantic and episodic memory inserts.",
+      "evidence": [
+        "native-outputs/quickstart-v0.1.6-attempt1-embeddings-on.log",
+        "native-outputs/server-main-8cb06a62-port18533.log",
+        "source-review.json#F2-v0.1.6-embedding",
+        "source-review.json#F2-main-embedding"
+      ]
+    },
+    {
+      "id": "F3",
+      "affects": "main@8cb06a62",
+      "summary": "The README quick start calls the client's async methods without await; run as written it only creates coroutines. samples/run_client.py at main awaits them and is not affected (the first pass said otherwise).",
+      "evidence": [
+        "native-outputs/quickstart-main-run1-sync-calls.log",
+        "source-review.json#F3-main-readme",
+        "source-review.json#F3-main-client-init",
+        "source-review.json#F3-main-sample-awaits"
+      ]
+    },
+    {
+      "id": "F4",
+      "affects": "main@8cb06a62",
+      "summary": "samples/generate_demo_api_key.py calls OrganizationManager/ClientManager methods without await; they are async at main. The first pass's as-shipped run output was not retained, so this rests on source review; the awaited copy (local-integration/gen_key_main.py) produced the key the main runs used.",
+      "evidence": [
+        "source-review.json#F4-main-demo-key",
+        "source-review.json#F4-main-org-manager",
+        "source-review.json#F4-main-client-manager"
+      ]
+    },
+    {
+      "id": "F5",
+      "affects": "main@8cb06a62 (not v0.1.6)",
+      "summary": "add_memory concatenates a string prefix with each dict part of list content, so the README's list-of-parts message shape returns 500. v0.1.6 extends list content as-is, so this is a regression after the tag.",
+      "evidence": [
+        "native-outputs/quickstart-main-run2-list-content.log",
+        "source-review.json#F5-main-add-memory",
+        "source-review.json#F5-v0.1.6-add-memory"
+      ]
+    },
+    {
+      "id": "F6",
+      "affects": "v0.1.6",
+      "summary": "tests/test_search_all_users.py passes config_path= to initialize_meta_agent, which has no such parameter in the same release.",
+      "evidence": [
+        "native-outputs/pytest-v0.1.6-test_search_all_users-rerun.log",
+        "source-review.json#F6-v0.1.6-test",
+        "source-review.json#F6-v0.1.6-client"
+      ]
+    },
+    {
+      "id": "F7",
+      "affects": "PyPI mirix 0.1.7",
+      "summary": "The package description says `pip install mirix-client`; that PyPI project has no files.",
+      "evidence": [
+        "native-outputs/pypi-mirix-client-check.txt"
+      ]
+    },
+    {
+      "id": "F8",
+      "affects": "v0.1.6",
+      "summary": "tests/README.md describes two test files (18 + 4 tests); the tag ships 14 test_*.py files and pytest collected 193 tests.",
+      "evidence": [
+        "source-review.json#F8-v0.1.6-tests-readme",
+        "native-outputs/pytest-v0.1.6-full.log"
+      ]
+    }
+  ],
+  "blocked": [
+    {
+      "item": "Upstream LongMemEval-S / MemoryAgentBench evaluation (evals/mab/run_mab_longmem_eval.sh)",
+      "reason": "Exists only on main. Its documented prerequisite is an OpenAI API key, and its only profile (evals/configs/mab.yaml) targets api.openai.com for chat, topic extraction and embeddings with build_embeddings_for_memory: true. No cloud key is used on this host. Pointed at local endpoints, its memory writes would hit F2, which the main runs above already show.",
+      "evidence": [
+        "source-review.json#evals-main-prereqs",
+        "source-review.json#evals-main-mab-profile"
+      ]
+    },
+    {
+      "item": "A persisted memory through the documented add/retrieve path against local endpoints",
+      "reason": "F1 at v0.1.6; F2 (and F5 for the README content shape) at main.",
+      "evidence": [
+        "checks quickstart-v0.1.6-bm25, bounded-check-v0.1.6, quickstart-main-string-content"
+      ]
+    }
+  ],
+  "not_evaluated": [
+    "Cloud LLM or embedding backends (not used on this host).",
+    "The full test suite on main (the first pass's --collect-only count was not retained, so no count is stated).",
+    "Redis-dependent tests and the desktop-agent branch."
+  ],
+  "withdrawn_host_receipts": {
+    "files": [
+      "withdrawn-host-receipts/nativestack-5975wx-20260925--mirix--install--20260926.json",
+      "withdrawn-host-receipts/nativestack-5975wx-20260925--mirix--use--20260926.json"
+    ],
+    "why": "scripts/host_receipts.py validate rejects a receipt whose component_id is neither a manifests/stack.json component nor a landscape winner (docs/contributing-evidence.md, section 3 step 3), and 'mirix' is neither. The use receipt also recorded result 'pass' from the HTTP-level exit code of a self-written wrapper while its own claim says the memory write failed. See ../README.md."
+  },
+  "host_state": "The trial's three MIRIX servers were still running at the start of the port and were stopped. Still on the host: ~/.mirix (344,628 bytes, MIRIX's default mirix_dir) and pgserver's runtime directory /run/user/<uid>/python_PostgresServer (a lock file and an empty socket directory). The first pass's trial-mirix scratch tree (985 MB, including the 85 MB PostgreSQL data directory) was deleted by the first polish pass. See ../README.md#host-state.",
+  "verdict": {
+    "measured": "No memory was persisted through MIRIX's documented add/retrieve path against this host's local OpenAI-compatible endpoints at either pin. v0.1.6: F1 fails every local chat completion; with embeddings on, F2 fails agent initialization. main@8cb06a62: F1 is fixed and the local model produced a well-formed topic, tool call and memory object, but the semantic and episodic inserts fail on F2; the README quick start also hits F3 and F5. The pinned tag's own suite: 88 passed, 1 failed, 88 skipped, 16 errors (F6 once the API key is set).",
+    "blockers": [
+      "F1 (v0.1.6)",
+      "F2 (both pins)",
+      "F5 and F3 (main quick start)",
+      "upstream eval harness requires a cloud key and is main-only"
+    ],
+    "layer_decision": "Not made here. The foundation durable-memory layer's verdict is re-recorded by its own verdict wave (tools/sota-convergence/record_verdicts.py); this trial supplies measured results and blockers only.",
+    "retrial_trigger": "A MIRIX release that forwards embedding_model for OpenAI-compatible embedding endpoints (F2) and parses a null audio_tokens (F1, fixed on main), then the same local-endpoint add/retrieve check plus the upstream LongMemEval-S harness against local endpoints."
+  }
+}

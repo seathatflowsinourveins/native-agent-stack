@@ -1,0 +1,20 @@
+2026-09-26T04:54:32Z start; workspace is a fresh mktemp directory
+2026-09-26T04:54:34Z 01-npm-pack: exit=0: npm pack byterover-cli@3.16.1 --pack-destination /tmp/tmp.T8iyPxI4X6/pack
+2026-09-26T04:56:16Z 03-npm-install: exit=0: npm install --global --no-audit --no-fund --prefix /tmp/tmp.T8iyPxI4X6/prefix /tmp/tmp.T8iyPxI4X6/pack/byterover-cli-3.16.1.tgz
+2026-09-26T04:56:17Z 04-version: exit=0: /tmp/tmp.T8iyPxI4X6/prefix/bin/brv --version
+2026-09-26T04:56:19Z 10-vc-init: exit=0: /tmp/tmp.T8iyPxI4X6/prefix/bin/brv vc init
+2026-09-26T04:56:20Z 11-vc-add: exit=0: /tmp/tmp.T8iyPxI4X6/prefix/bin/brv vc add .
+2026-09-26T04:56:22Z 12-vc-config-name: exit=0: /tmp/tmp.T8iyPxI4X6/prefix/bin/brv vc config user.name trial-check
+2026-09-26T04:56:23Z 13-vc-config-email: exit=0: /tmp/tmp.T8iyPxI4X6/prefix/bin/brv vc config user.email trial-check@example.invalid
+2026-09-26T04:56:24Z 14-vc-commit: exit=0: /tmp/tmp.T8iyPxI4X6/prefix/bin/brv vc commit -m Add auth and billing notes
+2026-09-26T04:56:25Z 15-vc-log: exit=0: /tmp/tmp.T8iyPxI4X6/prefix/bin/brv vc log
+2026-09-26T04:56:26Z 16-status: exit=0: /tmp/tmp.T8iyPxI4X6/prefix/bin/brv status --format json
+2026-09-26T04:56:28Z 20-search-positive: exit=0: /tmp/tmp.T8iyPxI4X6/prefix/bin/brv search rate limiter --format json
+2026-09-26T04:56:30Z 21-search-second-positive: exit=0: /tmp/tmp.T8iyPxI4X6/prefix/bin/brv search invoices --format json
+2026-09-26T04:56:31Z 22-search-negative: exit=0: /tmp/tmp.T8iyPxI4X6/prefix/bin/brv search zzznonexistentxyz123 --format json
+2026-09-26T04:56:31Z 30-check-positive: checker exit=0 (intended 0)
+2026-09-26T04:56:31Z 31-check-second-positive: checker exit=0 (intended 0)
+2026-09-26T04:56:31Z 32-check-negative: checker exit=0 (intended 0)
+2026-09-26T04:56:31Z 33-check-wrong-path-must-fail: checker exit=1 (intended 1)
+2026-09-26T04:56:31Z 34-check-wrong-count-must-fail: checker exit=1 (intended 1)
+2026-09-26T04:56:31Z done: every check matched its intended outcome: yes

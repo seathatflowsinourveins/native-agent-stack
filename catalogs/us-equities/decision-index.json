@@ -395,14 +395,14 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 871,
+    "repositories": 875,
     "public_star_repositories": 357,
-    "beyond_public_stars": 514,
-    "references": 2041,
+    "beyond_public_stars": 518,
+    "references": 2045,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 69,
-      "legacy_candidate": 30,
+      "legacy_candidate": 34,
       "public_star": 357,
       "research_supplement": 581,
       "star_review": 357
@@ -4320,6 +4320,22 @@
           "pointer": "/candidates/44",
           "decision": "discovery_only",
           "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/campfirein/byterover-cli",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/31",
+          "decision": "No adoption decision recorded by the trial; the foundation durable-memory verdict wave decides. Re-trial with a local model served with enough context for the observed request totals: curate then query, checked through the JSON with a deliberately wrong expectation. Evidence: blueprints/trials-20260926/byterover-cli/."
         }
       ]
     },
@@ -9834,6 +9850,38 @@
       ]
     },
     {
+      "repository": "https://github.com/illuin-tech/colpali",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/32",
+          "decision": "No adoption decision recorded by the trial; the foundation document-retrieval verdict wave decides. Next trial: colqwen2.5-v0.2 on the same slice and control through the vidore-benchmark 5.0.0 Python API (VisionRetriever with ColQwen2_5) and through the upstream-recommended Sentence Transformers v6 MultiVectorEncoder or MTEB ViDoRe path. Evidence: blueprints/trials-20260926/colpali/."
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/illuin-tech/vidore-benchmark",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/33",
+          "decision": "No adoption decision recorded by the trial; the foundation document-retrieval and quality-evaluation verdict waves decide. Evidence: blueprints/trials-20260926/colpali/."
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/imbad0202/academic-research-skills",
       "aliases": [],
       "public_star": true,
@@ -13008,6 +13056,22 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/mirix-ai/mirix",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/30",
+          "decision": "No adoption decision recorded by the trial; the foundation durable-memory verdict wave decides. Re-trial when a release forwards embedding_model for OpenAI-compatible endpoints and parses a null audio_tokens: rerun the local-endpoint add/retrieve check and the upstream LongMemEval-S harness against local endpoints. Evidence: blueprints/trials-20260926/mirix/."
         }
       ]
     },

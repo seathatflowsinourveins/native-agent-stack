@@ -1,0 +1,18 @@
+09/26/2026 12:21:33 AM - INFO - vidore_benchmark.utils.logging_utils:22 - Logging level set to info
+09/26/2026 12:21:33 AM - INFO - vidore_benchmark.cli.main:93 - Logging level set to `info`
+Evaluating dataset(s):   0%|          | 0/1 [00:00<?, ?it/s]
+---------------------------
+/tmp/tmp.ZtWUzYFdCO/slice
+
+Map:   0%|          | 0/12 [00:00<?, ? examples/s][AMap: 100%|██████████| 12/12 [00:00<00:00, 2211.02 examples/s]
+
+Dataloader pre-batching for queries:   0%|          | 0/1 [00:00<?, ?it/s][A
+                                                                          [A
+Dataloader pre-batching for passages:   0%|          | 0/1 [00:00<?, ?it/s][A
+Dataloader pre-batching for passages: 100%|██████████| 1/1 [00:00<00:00,  7.48it/s][ADataloader pre-batching for passages: 100%|██████████| 1/1 [00:00<00:00,  7.46it/s]
+09/26/2026 12:21:33 AM - INFO - root:69 - 
+
+09/26/2026 12:21:33 AM - INFO - vidore_benchmark.cli.main:196 - ViDoRe Benchmark results for "/tmp/tmp.ZtWUzYFdCO/slice" saved to `/tmp/tmp.ZtWUzYFdCO/out-dummy/dummy_vision_retriever/_tmp_tmp.ZtWUzYFdCO_slice_metrics.json`
+Evaluating dataset(s): 100%|██████████| 1/1 [00:00<00:00,  4.20it/s]Evaluating dataset(s): 100%|██████████| 1/1 [00:00<00:00,  4.20it/s]
+nDCG@5 on /tmp/tmp.ZtWUzYFdCO/slice: 0.19678
+ViDoRe Benchmark results saved to `/tmp/tmp.ZtWUzYFdCO/out-dummy/dummy_vision_retriever_metrics.json`

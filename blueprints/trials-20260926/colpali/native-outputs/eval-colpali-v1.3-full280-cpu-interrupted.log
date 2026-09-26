@@ -1,0 +1,219 @@
++ SCRATCH=<scratch>/trial-colpali
++ export HF_HOME=<scratch>/trial-colpali/hf-cache
++ HF_HOME=<scratch>/trial-colpali/hf-cache
++ export HF_HUB_DISABLE_TELEMETRY=1
++ HF_HUB_DISABLE_TELEMETRY=1
++ export DO_NOT_TRACK=1
++ DO_NOT_TRACK=1
++ export TOKENIZERS_PARALLELISM=false
++ TOKENIZERS_PARALLELISM=false
++ export CUDA_VISIBLE_DEVICES=
++ CUDA_VISIBLE_DEVICES=
++ export MCP_AUTO_OPEN_ENABLED=false
++ MCP_AUTO_OPEN_ENABLED=false
++ cd <scratch>/trial-colpali
++ <scratch>/trial-colpali/.venv-combined/bin/vidore-benchmark evaluate-retriever --model-class colpali --model-name vidore/colpali-v1.3 --dataset-name vidore/tabfquad_test_subsampled --dataset-format qa --split test --batch-query 4 --batch-passage 4 --batch-score 4 --output-dir <scratch>/trial-colpali/outputs
+Fetching 2 files:   0%|          | 0/2 [00:00<?, ?it/s]Fetching 2 files: 100%|██████████| 2/2 [00:00<00:00, 1408.90it/s]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  6.18it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00, 11.64it/s]
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.52, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+Evaluating dataset(s):   0%|          | 0/1 [00:00<?, ?it/s]
+---------------------------
+vidore/tabfquad_test_subsampled
+
+Generating test split:   0%|          | 0/280 [00:00<?, ? examples/s][A
+Generating test split: 100%|██████████| 280/280 [00:00<00:00, 2250.84 examples/s][AGenerating test split: 100%|██████████| 280/280 [00:00<00:00, 2242.64 examples/s]
+
+Map:   0%|          | 0/280 [00:00<?, ? examples/s][AMap: 100%|██████████| 280/280 [00:00<00:00, 2981.38 examples/s]
+
+Dataloader pre-batching for queries:   0%|          | 0/7 [00:00<?, ?it/s][A
+
+Forward pass queries...:   0%|          | 0/10 [00:00<?, ?it/s][A[A
+
+Forward pass queries...:  10%|█         | 1/10 [00:05<00:52,  5.84s/it][A[A
+
+Forward pass queries...:  20%|██        | 2/10 [00:11<00:45,  5.63s/it][A[A
+
+Forward pass queries...:  30%|███       | 3/10 [00:17<00:40,  5.77s/it][A[A
+
+Forward pass queries...:  40%|████      | 4/10 [00:21<00:31,  5.29s/it][A[A
+
+Forward pass queries...:  50%|█████     | 5/10 [00:26<00:25,  5.19s/it][A[A
+
+Forward pass queries...:  60%|██████    | 6/10 [00:31<00:19,  4.87s/it][A[A
+
+Forward pass queries...:  70%|███████   | 7/10 [00:36<00:15,  5.05s/it][A[A
+
+Forward pass queries...:  80%|████████  | 8/10 [00:41<00:10,  5.10s/it][A[A
+
+Forward pass queries...:  90%|█████████ | 9/10 [00:46<00:04,  4.90s/it][A[A
+
+Forward pass queries...: 100%|██████████| 10/10 [00:51<00:00,  4.99s/it][A[A
+
+                                                                        [A[A
+Dataloader pre-batching for queries:  14%|█▍        | 1/7 [00:51<05:08, 51.37s/it][A
+
+Forward pass queries...:   0%|          | 0/10 [00:00<?, ?it/s][A[A
+
+Forward pass queries...:  10%|█         | 1/10 [00:05<00:48,  5.39s/it][A[A
+
+Forward pass queries...:  20%|██        | 2/10 [00:11<00:47,  5.90s/it][A[A
+
+Forward pass queries...:  30%|███       | 3/10 [00:16<00:39,  5.64s/it][A[A
+
+Forward pass queries...:  40%|████      | 4/10 [00:21<00:31,  5.17s/it][A[A
+
+Forward pass queries...:  50%|█████     | 5/10 [00:26<00:26,  5.21s/it][A[A
+
+Forward pass queries...:  60%|██████    | 6/10 [00:32<00:20,  5.25s/it][A[A
+
+Forward pass queries...:  70%|███████   | 7/10 [00:36<00:15,  5.11s/it][A[A
+
+Forward pass queries...:  80%|████████  | 8/10 [00:41<00:10,  5.10s/it][A[A
+
+Forward pass queries...:  90%|█████████ | 9/10 [00:46<00:05,  5.02s/it][A[A
+
+Forward pass queries...: 100%|██████████| 10/10 [00:52<00:00,  5.08s/it][A[A
+
+                                                                        [A[A
+Dataloader pre-batching for queries:  29%|██▊       | 2/7 [01:43<04:18, 51.75s/it][A
+
+Forward pass queries...:   0%|          | 0/10 [00:00<?, ?it/s][A[A
+
+Forward pass queries...:  10%|█         | 1/10 [00:05<00:49,  5.47s/it][A[A
+
+Forward pass queries...:  20%|██        | 2/10 [00:10<00:43,  5.46s/it][A[A
+
+Forward pass queries...:  30%|███       | 3/10 [00:16<00:37,  5.34s/it][A[A
+
+Forward pass queries...:  40%|████      | 4/10 [00:21<00:31,  5.28s/it][A[A
+
+Forward pass queries...:  50%|█████     | 5/10 [00:25<00:25,  5.03s/it][A[A
+
+Forward pass queries...:  60%|██████    | 6/10 [00:30<00:19,  4.96s/it][A[A
+
+Forward pass queries...:  70%|███████   | 7/10 [00:35<00:14,  4.98s/it][A[A
+
+Forward pass queries...:  80%|████████  | 8/10 [00:40<00:09,  4.81s/it][A[A
+
+Forward pass queries...:  90%|█████████ | 9/10 [00:46<00:05,  5.26s/it][A[A
+
+Forward pass queries...: 100%|██████████| 10/10 [00:50<00:00,  4.76s/it][A[A
+
+                                                                        [A[A
+Dataloader pre-batching for queries:  43%|████▎     | 3/7 [02:33<03:23, 50.99s/it][A
+
+Forward pass queries...:   0%|          | 0/10 [00:00<?, ?it/s][A[A
+
+Forward pass queries...:  10%|█         | 1/10 [00:04<00:38,  4.33s/it][A[A
+
+Forward pass queries...:  20%|██        | 2/10 [00:08<00:36,  4.52s/it][A[A
+
+Forward pass queries...:  30%|███       | 3/10 [00:12<00:29,  4.25s/it][A[A
+
+Forward pass queries...:  40%|████      | 4/10 [00:16<00:24,  4.08s/it][A[A
+
+Forward pass queries...:  50%|█████     | 5/10 [00:20<00:19,  3.91s/it][A[A
+
+Forward pass queries...:  60%|██████    | 6/10 [00:25<00:17,  4.45s/it][A[A
+
+Forward pass queries...:  70%|███████   | 7/10 [00:28<00:11,  3.86s/it][A[A
+
+Forward pass queries...:  80%|████████  | 8/10 [00:32<00:07,  3.85s/it][A[A
+
+Forward pass queries...:  90%|█████████ | 9/10 [00:37<00:04,  4.19s/it][A[A
+
+Forward pass queries...: 100%|██████████| 10/10 [00:42<00:00,  4.43s/it][A[A
+
+                                                                        [A[A
+Dataloader pre-batching for queries:  57%|█████▋    | 4/7 [03:15<02:22, 47.53s/it][A
+
+Forward pass queries...:   0%|          | 0/10 [00:00<?, ?it/s][A[A
+
+Forward pass queries...:  10%|█         | 1/10 [00:03<00:34,  3.79s/it][A[A
+
+Forward pass queries...:  20%|██        | 2/10 [00:08<00:33,  4.13s/it][A[A
+
+Forward pass queries...:  30%|███       | 3/10 [00:11<00:27,  3.98s/it][A[A
+
+Forward pass queries...:  40%|████      | 4/10 [00:16<00:24,  4.15s/it][A[A
+
+Forward pass queries...:  50%|█████     | 5/10 [00:20<00:20,  4.17s/it][A[A
+
+Forward pass queries...:  60%|██████    | 6/10 [00:23<00:15,  3.84s/it][A[A
+
+Forward pass queries...:  70%|███████   | 7/10 [00:27<00:11,  3.86s/it][A[A
+
+Forward pass queries...:  80%|████████  | 8/10 [00:30<00:07,  3.68s/it][A[A
+
+Forward pass queries...:  90%|█████████ | 9/10 [00:34<00:03,  3.73s/it][A[A
+
+Forward pass queries...: 100%|██████████| 10/10 [00:38<00:00,  3.62s/it][A[A
+
+                                                                        [A[A
+Dataloader pre-batching for queries:  71%|███████▏  | 5/7 [03:53<01:28, 44.15s/it][A
+
+Forward pass queries...:   0%|          | 0/10 [00:00<?, ?it/s][A[A
+
+Forward pass queries...:  10%|█         | 1/10 [00:03<00:34,  3.80s/it][A[A
+
+Forward pass queries...:  20%|██        | 2/10 [00:07<00:31,  3.96s/it][A[A
+
+Forward pass queries...:  30%|███       | 3/10 [00:12<00:28,  4.11s/it][A[A
+
+Forward pass queries...:  40%|████      | 4/10 [00:17<00:26,  4.41s/it][A[A
+
+Forward pass queries...:  50%|█████     | 5/10 [00:21<00:21,  4.35s/it][A[A
+
+Forward pass queries...:  60%|██████    | 6/10 [00:24<00:16,  4.05s/it][A[A
+
+Forward pass queries...:  70%|███████   | 7/10 [00:30<00:13,  4.60s/it][A[A
+
+Forward pass queries...:  80%|████████  | 8/10 [00:33<00:08,  4.08s/it][A[A
+
+Forward pass queries...:  90%|█████████ | 9/10 [00:38<00:04,  4.23s/it][A[A
+
+Forward pass queries...: 100%|██████████| 10/10 [00:41<00:00,  4.13s/it][A[A
+
+                                                                        [A[A
+Dataloader pre-batching for queries:  86%|████████▌ | 6/7 [04:35<00:43, 43.39s/it][A
+
+Forward pass queries...:   0%|          | 0/10 [00:00<?, ?it/s][A[A
+
+Forward pass queries...:  10%|█         | 1/10 [00:05<00:49,  5.48s/it][A[A
+
+Forward pass queries...:  20%|██        | 2/10 [00:09<00:37,  4.69s/it][A[A
+
+Forward pass queries...:  30%|███       | 3/10 [00:14<00:32,  4.69s/it][A[A
+
+Forward pass queries...:  40%|████      | 4/10 [00:18<00:26,  4.38s/it][A[A
+
+Forward pass queries...:  50%|█████     | 5/10 [00:22<00:21,  4.36s/it][A[A
+
+Forward pass queries...:  60%|██████    | 6/10 [00:26<00:17,  4.31s/it][A[A
+
+Forward pass queries...:  70%|███████   | 7/10 [00:31<00:13,  4.38s/it][A[A
+
+Forward pass queries...:  80%|████████  | 8/10 [00:35<00:08,  4.48s/it][A[A
+
+Forward pass queries...:  90%|█████████ | 9/10 [00:40<00:04,  4.50s/it][A[A
+
+Forward pass queries...: 100%|██████████| 10/10 [00:44<00:00,  4.35s/it][A[A
+
+                                                                        [A[A
+Dataloader pre-batching for queries: 100%|██████████| 7/7 [05:20<00:00, 43.76s/it][A
+                                                                                  [A
+Dataloader pre-batching for passages:   0%|          | 0/7 [00:00<?, ?it/s][A
+
+Forward pass documents...:   0%|          | 0/10 [00:00<?, ?it/s][A[A
+
+Forward pass documents...:  10%|█         | 1/10 [02:42<24:22, 162.54s/it][A[A
+
+Forward pass documents...:  20%|██        | 2/10 [05:59<24:22, 182.83s/it][A[A
+
+Forward pass documents...:  30%|███       | 3/10 [09:47<23:43, 203.37s/it][A[A
+
+Forward pass documents...:  40%|████      | 4/10 [13:24<20:52, 208.82s/it][A[A
+
+Forward pass documents...:  50%|█████     | 5/10 [17:11<17:57, 215.46s/it][A[A
+
+Forward pass documents...:  60%|██████    | 6/10 [21:14<14:58, 224.56s/it][A[A

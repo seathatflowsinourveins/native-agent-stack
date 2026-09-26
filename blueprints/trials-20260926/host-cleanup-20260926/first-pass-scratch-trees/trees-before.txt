@@ -1,0 +1,140 @@
+# First-pass scratch trees before deletion (2026-09-26T06:37:31Z): apparent bytes (du -sb) and allocated size (du -sh)
+31053661034	30G	<scratch>/trial-colpali
+985386322	1.1G	<scratch>/trial-mirix
+19121145	19M	<scratch>/trial-byterover
+54849	72K	<scratch>/exec
+# Top-level entries of each (names, types, apparent bytes)
+regular file	20458	<scratch>/trial-colpali/README.md
+regular file	4539	<scratch>/trial-colpali/candidate_row.json
+regular file	37139	<scratch>/trial-colpali/colpali-README.md
+regular file	8681	<scratch>/trial-colpali/colpali-v1.3-card.md
+regular file	7101	<scratch>/trial-colpali/colqwen25-v02-hfapi.json
+regular file	7560	<scratch>/trial-colpali/colqwen25-v02-modelcard.md
+regular file	45147	<scratch>/trial-colpali/colqwen25-v02-results.json
+regular file	4677	<scratch>/trial-colpali/eval-colpali-v1.3-tabfquad-SMALL.log
+regular file	11568	<scratch>/trial-colpali/eval-colpali-v1.3-tabfquad.log
+regular file	22015	<scratch>/trial-colpali/eval-colqwen2-v1.0-tabfquad-combined.log
+regular file	9743	<scratch>/trial-colpali/eval-colqwen2-v1.0-tabfquad-combined2.log
+regular file	9798	<scratch>/trial-colpali/eval-colqwen2-v1.0-tabfquad-combined3.log
+regular file	11195	<scratch>/trial-colpali/eval-colqwen2-v1.0-tabfquad-combined4.log
+regular file	11079	<scratch>/trial-colpali/eval-colqwen2-v1.0-tabfquad-combined5.log
+regular file	7228	<scratch>/trial-colpali/eval-colqwen2-v1.0-tabfquad.log
+regular file	2777	<scratch>/trial-colpali/eval-dummy-control-tabfquad-SMALL.log
+regular file	3132	<scratch>/trial-colpali/eval-dummy-control-tabfquad.log
+directory	15063586133	<scratch>/trial-colpali/hf-cache
+regular file	214	<scratch>/trial-colpali/hf-download-base-main.log
+regular file	352	<scratch>/trial-colpali/hf-download-base.log
+regular file	351	<scratch>/trial-colpali/hf-download-colpali-adapter.log
+regular file	366	<scratch>/trial-colpali/hf-download-colpali-base.log
+regular file	227	<scratch>/trial-colpali/hf-download-dataset-main.log
+regular file	365	<scratch>/trial-colpali/hf-download-dataset.log
+regular file	352	<scratch>/trial-colpali/hf-download-model-main.log
+regular file	567	<scratch>/trial-colpali/hf-download-model.log
+regular file	897	<scratch>/trial-colpali/install-colpali-vidore.log
+regular file	3312	<scratch>/trial-colpali/install-combined.log
+regular file	3202	<scratch>/trial-colpali/install-mteb-colpali.log
+regular file	380	<scratch>/trial-colpali/install-transformers-pin.log
+regular file	2712	<scratch>/trial-colpali/install-vidore.log
+directory	1818327	<scratch>/trial-colpali/local-tabfquad-subset
+regular file	9258	<scratch>/trial-colpali/mteb-README.md
+regular file	9582	<scratch>/trial-colpali/mteb-colpali-models.py
+regular file	32627	<scratch>/trial-colpali/mteb-colqwen-models.py
+regular file	1259402	<scratch>/trial-colpali/mteb-pypi.json
+directory	5178	<scratch>/trial-colpali/outputs-control
+directory	7235	<scratch>/trial-colpali/outputs-control-small
+directory	6935	<scratch>/trial-colpali/outputs-small
+regular file	20963	<scratch>/trial-colpali/results-20260926.json
+regular file	717	<scratch>/trial-colpali/run_eval.sh
+regular file	693	<scratch>/trial-colpali/run_eval_colpali.sh
+regular file	700	<scratch>/trial-colpali/run_eval_colpali_small.sh
+regular file	695	<scratch>/trial-colpali/run_eval_combined.sh
+regular file	643	<scratch>/trial-colpali/run_eval_dummy.sh
+regular file	650	<scratch>/trial-colpali/run_eval_dummy_small.sh
+regular file	120	<scratch>/trial-colpali/venv-combined-create.log
+regular file	116	<scratch>/trial-colpali/venv-vidore-create.log
+regular file	15341	<scratch>/trial-colpali/vidore-bench-README.md
+directory	5677082612	<scratch>/trial-colpali/.venv
+directory	7547057446	<scratch>/trial-colpali/.venv-combined
+directory	6330727222	<scratch>/trial-colpali/.venv-vidore
+regular file	8223	<scratch>/trial-mirix/README-main.md
+regular file	6209	<scratch>/trial-mirix/README-v016.md
+directory	4724	<scratch>/trial-mirix/config
+regular file	34540	<scratch>/trial-mirix/contents-main.json
+regular file	24941	<scratch>/trial-mirix/contents-v016.json
+regular file	2769	<scratch>/trial-mirix/evals-configs.json
+regular file	3927	<scratch>/trial-mirix/evals-lastcommit.json
+regular file	9262	<scratch>/trial-mirix/evals-main.json
+regular file	1034	<scratch>/trial-mirix/evals_0201c.yaml
+regular file	703	<scratch>/trial-mirix/evals_README.md
+regular file	1086	<scratch>/trial-mirix/evals_openrouter_template.yaml
+regular file	5769	<scratch>/trial-mirix/evals_run_mab.sh
+regular file	2321	<scratch>/trial-mirix/gen_key_main.py
+regular file	101	<scratch>/trial-mirix/gh-issue-search.json
+regular file	101	<scratch>/trial-mirix/gh-issue-search2.json
+regular file	24473	<scratch>/trial-mirix/gh-releases.json
+regular file	2818	<scratch>/trial-mirix/gh-tags.json
+regular file	4904	<scratch>/trial-mirix/install-main.log
+regular file	732	<scratch>/trial-mirix/llamacpp_probe.json
+regular file	959048	<scratch>/trial-mirix/main-head.json
+regular file	4054	<scratch>/trial-mirix/main_chat_completion_response.py
+regular file	106270	<scratch>/trial-mirix/mirix-0.1.7-py3-none-any.whl
+regular file	84263	<scratch>/trial-mirix/mirix-0.1.7.tar.gz
+directory	44073557	<scratch>/trial-mirix/mirix-main-src
+directory	14041946	<scratch>/trial-mirix/mirix-src
+directory	85453825	<scratch>/trial-mirix/pgdata
+regular file	182179	<scratch>/trial-mirix/pgserver.json
+regular file	24	<scratch>/trial-mirix/pypi-mirix-client.json
+regular file	17550	<scratch>/trial-mirix/pypi-mirix.json
+regular file	11589	<scratch>/trial-mirix/pytest_search_all_users.log
+regular file	67656	<scratch>/trial-mirix/pytest_v016_full.log
+regular file	1693	<scratch>/trial-mirix/quickstart_add_retrieve.py
+regular file	2539	<scratch>/trial-mirix/quickstart_add_retrieve_async.py
+regular file	567	<scratch>/trial-mirix/quickstart_main_run1.log
+regular file	4622	<scratch>/trial-mirix/quickstart_main_run2.log
+regular file	2663	<scratch>/trial-mirix/quickstart_main_run3.log
+regular file	1883	<scratch>/trial-mirix/quickstart_run1.log
+regular file	2680	<scratch>/trial-mirix/quickstart_run2.log
+regular file	1682	<scratch>/trial-mirix/receipt_check_main_use.sh
+regular file	6435	<scratch>/trial-mirix/receipt_check_v016_use.log
+regular file	1974	<scratch>/trial-mirix/receipt_check_v016_use.sh
+directory	0	<scratch>/trial-mirix/sdist-extract
+regular file	327003	<scratch>/trial-mirix/server-main.log
+regular file	2752	<scratch>/trial-mirix/server-tests.log
+regular file	55308	<scratch>/trial-mirix/server.log
+regular file	16764	<scratch>/trial-mirix/tests-v016.json
+regular file	2195	<scratch>/trial-mirix/v016_conftest.py
+regular file	9120	<scratch>/trial-mirix/v016_docker-compose.yml
+regular file	1437	<scratch>/trial-mirix/v016_init.sql
+regular file	1044	<scratch>/trial-mirix/v016_pytest.ini
+regular file	738	<scratch>/trial-mirix/v016_requirements.txt
+regular file	11278	<scratch>/trial-mirix/v016_settings.py
+regular file	3924	<scratch>/trial-mirix/v016_start_server.py
+directory	694141967	<scratch>/trial-mirix/venv
+directory	656832321	<scratch>/trial-mirix/venv-main
+regular file	44014	<scratch>/trial-mirix/vllm_probe.json
+directory	0	<scratch>/trial-mirix/.uv-tool-bin
+directory	0	<scratch>/trial-mirix/.uv-tool-dir
+regular file	21715	<scratch>/trial-byterover/AGENTS-upstream.md
+regular file	8411	<scratch>/trial-byterover/CONTRIBUTING-upstream.md
+regular file	15902	<scratch>/trial-byterover/README-upstream.md
+directory	2034	<scratch>/trial-byterover/brv-project
+regular file	18510260	<scratch>/trial-byterover/byterover-cli-3.16.1.tgz
+regular file	1187	<scratch>/trial-byterover/connect-local-llm.sh
+regular empty file	0	<scratch>/trial-byterover/curate-err.log
+regular file	400	<scratch>/trial-byterover/curate-out.json
+regular file	625	<scratch>/trial-byterover/llamacpp-models.json
+regular file	1509	<scratch>/trial-byterover/npm-ci.log
+regular file	1231	<scratch>/trial-byterover/npm-install.log
+regular file	554800	<scratch>/trial-byterover/npm-test.log
+regular empty file	0	<scratch>/trial-byterover/query-err.log
+regular file	624	<scratch>/trial-byterover/query-out.json
+regular file	1098	<scratch>/trial-byterover/sanitize-check.sh
+regular file	382	<scratch>/trial-byterover/testsuite-receipt-cmd.sh
+regular file	118	<scratch>/trial-byterover/testsuite-receipt-dryrun.log
+regular file	849	<scratch>/trial-byterover/use-receipt-cmd.sh
+regular file	10095	<scratch>/exec/candidate_rows_parsed.json
+regular file	10050	<scratch>/exec/candidate_rows_raw.json
+regular file	7497	<scratch>/exec/colpali_use_dryrun.log
+regular file	1521	<scratch>/exec/colpali_use_dryrun.sh
+regular file	4526	<scratch>/exec/run_spec.py
+regular file	21160	<scratch>/exec/specs_raw.json

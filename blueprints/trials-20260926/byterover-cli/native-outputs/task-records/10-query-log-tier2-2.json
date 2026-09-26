@@ -1,0 +1,19 @@
+{
+  "id": "qry-1790386760359",
+  "matchedDocs": [],
+  "query": "How is authentication implemented?",
+  "startedAt": 1790386760358,
+  "status": "completed",
+  "taskId": "<uuid>",
+  "completedAt": 1790386760380,
+  "response": "**Summary**: No matching knowledge found for \"How is authentication implemented?\".\n\n**Details**: The topic does not appear to be covered in the context tree. This could mean the topic hasn't been curated yet.\n\n**Sources**: None\n\n**Gaps**: Try rephrasing your query with different terms, or use /curate to add knowledge about this topic.\n\n---\nSource: ByteRover Knowledge Base",
+  "searchMetadata": {
+    "resultCount": 0,
+    "topScore": 0,
+    "totalFound": 0
+  },
+  "tier": 2,
+  "timing": {
+    "durationMs": 10
+  }
+}

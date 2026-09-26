@@ -1,0 +1,133 @@
+2026-09-26 03:08:26.093 [Daemon] Starting daemon...
+2026-09-26 03:08:26.325 [Daemon] Selected port 57645
+2026-09-26 03:08:26.325 [Daemon] Instance acquired (PID: 319922, port: 57645)
+2026-09-26 03:08:26.336 [Daemon] Web UI server started on port 7700
+2026-09-26 03:08:26.336 [Daemon] Heartbeat started
+2026-09-26 03:08:26.337 [Daemon] Daemon resilience installed
+2026-09-26 03:08:26.340 [Daemon] Agent idle timeout policy started
+2026-09-26 03:08:26.639 [Daemon] Feature handlers registered
+2026-09-26 03:08:26.639 [Daemon] Auth state polling started
+2026-09-26 03:08:26.639 [Daemon] Idle timeout policy started
+2026-09-26 03:08:26.643 [Daemon] Transport server started on port 57645
+2026-09-26 03:08:26.643 [Daemon] Daemon fully started (PID: 319922, port: 57645)
+2026-09-26 03:08:26.805 [Transport] Client connected: Qyb3zik5Y5nv7oqcAAAA
+2026-09-26 03:08:26.808 [Transport] Client registered: Qyb3zik5Y5nv7oqcAAAA (type=cli, project=/tmp/tmp.p7ZefFx0ao)
+2026-09-26 03:08:26.820 [Transport] Client disconnected: Qyb3zik5Y5nv7oqcAAAA
+2026-09-26 03:08:26.942 [Transport] Client connected: 4NvxCbkwOGLrQTg8AAAB
+2026-09-26 03:08:26.944 [Transport] Client registered: 4NvxCbkwOGLrQTg8AAAB (type=cli, project=/tmp/tmp.p7ZefFx0ao)
+2026-09-26 03:08:26.967 [Transport] Client disconnected: 4NvxCbkwOGLrQTg8AAAB
+2026-09-26 03:08:28.729 [Transport] Client connected: 3aaDf2ZH2D4l7WpsAAAC
+2026-09-26 03:08:28.733 [Transport] Client registered: 3aaDf2ZH2D4l7WpsAAAC (type=cli, project=/tmp/tmp.p7ZefFx0ao)
+2026-09-26 03:08:28.818 [Transport] Client disconnected: 3aaDf2ZH2D4l7WpsAAAC
+2026-09-26 03:08:30.523 [Transport] Client connected: 6cnAPvhNlpm5lspKAAAD
+2026-09-26 03:08:30.529 [Transport] Client registered: 6cnAPvhNlpm5lspKAAAD (type=cli, project=/tmp/tmp.p7ZefFx0ao)
+2026-09-26 03:08:30.535 [Transport] Client disconnected: 6cnAPvhNlpm5lspKAAAD
+2026-09-26 03:08:32.315 [Transport] Client connected: Bh-oAnfx6_BNLQu-AAAE
+2026-09-26 03:08:32.318 [Transport] Client registered: Bh-oAnfx6_BNLQu-AAAE (type=cli, project=/tmp/tmp.p7ZefFx0ao)
+2026-09-26 03:08:32.325 [Transport] Client disconnected: Bh-oAnfx6_BNLQu-AAAE
+2026-09-26 03:08:34.242 [Transport] Client connected: Hg8f7zdQwzZlajMWAAAF
+2026-09-26 03:08:34.242 [Transport] Client registered: Hg8f7zdQwzZlajMWAAAF (type=cli, project=/tmp/tmp.p7ZefFx0ao)
+2026-09-26 03:08:34.286 [Transport] Client disconnected: Hg8f7zdQwzZlajMWAAAF
+2026-09-26 03:08:36.164 [Transport] Client connected: a5oHUetK1tzlCmhDAAAG
+2026-09-26 03:08:36.167 [Transport] Client registered: a5oHUetK1tzlCmhDAAAG (type=cli, project=/tmp/tmp.p7ZefFx0ao)
+2026-09-26 03:08:36.171 [Transport] Task accepted: <uuid> (type=search, client=a5oHUetK1tzlCmhDAAAG)
+2026-09-26 03:08:36.181 [task-history] audit /tmp/tmp.p7ZefFx0ao — 0 live entries, 0 data files. ok.
+2026-09-26 03:08:37.494 [Transport] Client connected: EOASjGR9QdI47qnxAAAH
+2026-09-26T03:08:37.495Z [agent-process:/tmp/tmp.p7ZefFx0ao] Connected to daemon (clientId=EOASjGR9QdI47qnxAAAH)
+2026-09-26 03:08:37.503 [Daemon] Loaded project state: /tmp/tmp.p7ZefFx0ao (config=yes, sessions=0)
+2026-09-26T03:08:37.506Z [agent-process:/tmp/tmp.p7ZefFx0ao] Initial config loaded from state server
+2026-09-26T03:08:37.507Z [agent-process:/tmp/tmp.p7ZefFx0ao] Provider: openai-compatible, Model: qwen3.8-27b-local
+2026-09-26T03:08:37.542Z [agent-process:/tmp/tmp.p7ZefFx0ao] CipherAgent started (session=agent-session-<uuid>, resume=false)
+2026-09-26 03:08:37.544 [Transport] Agent registered: EOASjGR9QdI47qnxAAAH, project=/tmp/tmp.p7ZefFx0ao
+2026-09-26T03:08:37.546Z [agent-process:/tmp/tmp.p7ZefFx0ao] Ready — listening for tasks
+2026-09-26 03:08:37.546 [Daemon] Agent forked for: /tmp/tmp.p7ZefFx0ao (pid=323583, pool: 1/10)
+2026-09-26T03:08:37.547Z [agent-process:/tmp/tmp.p7ZefFx0ao] task:execute received taskId=<uuid> type=search activeTaskCount=1
+2026-09-26T03:08:37.554Z [agent-process:/tmp/tmp.p7ZefFx0ao] task:started taskId=<uuid> type=search
+2026-09-26T03:08:37.593Z [agent-process:/tmp/tmp.p7ZefFx0ao] task:completed taskId=<uuid>
+2026-09-26 03:08:37.594 [Transport] Task completed: <uuid>
+2026-09-26 03:08:37.598 [Transport] Client disconnected: a5oHUetK1tzlCmhDAAAG
+2026-09-26 03:08:37.599 [Daemon] Agent marked idle: /tmp/tmp.p7ZefFx0ao
+2026-09-26 03:08:39.468 [Transport] Client connected: FW1gxpKk7SlLdSCrAAAI
+2026-09-26 03:08:39.471 [Transport] Client registered: FW1gxpKk7SlLdSCrAAAI (type=cli, project=/tmp/tmp.p7ZefFx0ao)
+2026-09-26 03:08:39.475 [Transport] Task accepted: <uuid> (type=search, client=FW1gxpKk7SlLdSCrAAAI)
+2026-09-26T03:08:39.479Z [agent-process:/tmp/tmp.p7ZefFx0ao] task:execute received taskId=<uuid> type=search activeTaskCount=1
+2026-09-26T03:08:39.489Z [agent-process:/tmp/tmp.p7ZefFx0ao] task:started taskId=<uuid> type=search
+2026-09-26T03:08:39.491Z [agent-process:/tmp/tmp.p7ZefFx0ao] task:completed taskId=<uuid>
+2026-09-26 03:08:39.491 [Transport] Task completed: <uuid>
+2026-09-26 03:08:39.494 [Transport] Client disconnected: FW1gxpKk7SlLdSCrAAAI
+2026-09-26 03:08:39.494 [Daemon] Agent marked idle: /tmp/tmp.p7ZefFx0ao
+2026-09-26 03:08:41.471 [Transport] Client connected: U2a_4R85C7btp__CAAAJ
+2026-09-26 03:08:41.475 [Transport] Client registered: U2a_4R85C7btp__CAAAJ (type=cli, project=/tmp/tmp.KG4LxF3R5k)
+2026-09-26 03:08:41.482 [Transport] Client disconnected: U2a_4R85C7btp__CAAAJ
+2026-09-26 03:08:41.608 [Transport] Client connected: 2Hm27_znB87O4_VPAAAK
+2026-09-26 03:08:41.609 [Transport] Client registered: 2Hm27_znB87O4_VPAAAK (type=cli, project=/tmp/tmp.KG4LxF3R5k)
+2026-09-26 03:08:41.619 [Transport] Client disconnected: 2Hm27_znB87O4_VPAAAK
+2026-09-26 03:08:43.544 [Transport] Client connected: qXDsK5x2kVPBth08AAAL
+2026-09-26 03:08:43.546 [Transport] Client registered: qXDsK5x2kVPBth08AAAL (type=cli, project=/tmp/tmp.KG4LxF3R5k)
+2026-09-26 03:08:43.572 [Transport] Client disconnected: qXDsK5x2kVPBth08AAAL
+2026-09-26 03:08:45.337 [Transport] Client connected: sQMsnHn-eMsZihnJAAAM
+2026-09-26 03:08:45.340 [Transport] Client registered: sQMsnHn-eMsZihnJAAAM (type=cli, project=/tmp/tmp.KG4LxF3R5k)
+2026-09-26 03:08:45.349 [Transport] Client disconnected: sQMsnHn-eMsZihnJAAAM
+2026-09-26 03:08:47.030 [Transport] Client connected: DcLTR3Q6H_pE3XlbAAAN
+2026-09-26 03:08:47.033 [Transport] Client registered: DcLTR3Q6H_pE3XlbAAAN (type=cli, project=/tmp/tmp.KG4LxF3R5k)
+2026-09-26 03:08:47.038 [Transport] Client disconnected: DcLTR3Q6H_pE3XlbAAAN
+2026-09-26 03:08:48.741 [Transport] Client connected: uJ1wo-_MlRAdPBksAAAO
+2026-09-26 03:08:48.743 [Transport] Client registered: uJ1wo-_MlRAdPBksAAAO (type=cli, project=/tmp/tmp.KG4LxF3R5k)
+2026-09-26 03:08:48.773 [Transport] Client disconnected: uJ1wo-_MlRAdPBksAAAO
+2026-09-26 03:08:50.399 [Transport] Client connected: 6x8uCvdvzgYV6CrwAAAP
+2026-09-26 03:08:50.401 [Transport] Client registered: 6x8uCvdvzgYV6CrwAAAP (type=cli, project=/tmp/tmp.KG4LxF3R5k)
+2026-09-26 03:08:50.404 [Transport] Task accepted: <uuid> (type=search, client=6x8uCvdvzgYV6CrwAAAP)
+2026-09-26 03:08:50.407 [task-history] audit /tmp/tmp.KG4LxF3R5k — 0 live entries, 0 data files. ok.
+2026-09-26 03:08:51.429 [Transport] Client connected: tpUMU3nUwNxTbDXgAAAQ
+2026-09-26T03:08:51.431Z [agent-process:/tmp/tmp.KG4LxF3R5k] Connected to daemon (clientId=tpUMU3nUwNxTbDXgAAAQ)
+2026-09-26 03:08:51.443 [Daemon] Loaded project state: /tmp/tmp.KG4LxF3R5k (config=yes, sessions=0)
+2026-09-26T03:08:51.447Z [agent-process:/tmp/tmp.KG4LxF3R5k] Initial config loaded from state server
+2026-09-26T03:08:51.447Z [agent-process:/tmp/tmp.KG4LxF3R5k] Provider: openai-compatible, Model: qwen3.8-27b-local
+2026-09-26T03:08:51.474Z [agent-process:/tmp/tmp.KG4LxF3R5k] CipherAgent started (session=agent-session-<uuid>, resume=false)
+2026-09-26 03:08:51.476 [Transport] Agent registered: tpUMU3nUwNxTbDXgAAAQ, project=/tmp/tmp.KG4LxF3R5k
+2026-09-26T03:08:51.478Z [agent-process:/tmp/tmp.KG4LxF3R5k] Ready — listening for tasks
+2026-09-26 03:08:51.478 [Daemon] Agent forked for: /tmp/tmp.KG4LxF3R5k (pid=327141, pool: 2/10)
+2026-09-26T03:08:51.479Z [agent-process:/tmp/tmp.KG4LxF3R5k] task:execute received taskId=<uuid> type=search activeTaskCount=1
+2026-09-26T03:08:51.485Z [agent-process:/tmp/tmp.KG4LxF3R5k] task:started taskId=<uuid> type=search
+2026-09-26T03:08:51.526Z [agent-process:/tmp/tmp.KG4LxF3R5k] task:completed taskId=<uuid>
+2026-09-26 03:08:51.528 [Transport] Task completed: <uuid>
+2026-09-26 03:08:51.534 [Transport] Client disconnected: 6x8uCvdvzgYV6CrwAAAP
+2026-09-26 03:08:51.535 [Daemon] Agent marked idle: /tmp/tmp.KG4LxF3R5k
+2026-09-26 03:08:53.576 [Transport] Client connected: 0lTDIazOYh2365UDAAAR
+2026-09-26 03:08:53.578 [Transport] Client registered: 0lTDIazOYh2365UDAAAR (type=cli, project=/tmp/tmp.KG4LxF3R5k)
+2026-09-26 03:08:53.581 [Transport] Task accepted: <uuid> (type=search, client=0lTDIazOYh2365UDAAAR)
+2026-09-26T03:08:53.586Z [agent-process:/tmp/tmp.KG4LxF3R5k] task:execute received taskId=<uuid> type=search activeTaskCount=1
+2026-09-26T03:08:53.589Z [agent-process:/tmp/tmp.KG4LxF3R5k] task:started taskId=<uuid> type=search
+2026-09-26T03:08:53.591Z [agent-process:/tmp/tmp.KG4LxF3R5k] task:completed taskId=<uuid>
+2026-09-26 03:08:53.592 [Transport] Task completed: <uuid>
+2026-09-26 03:08:53.594 [Transport] Client disconnected: 0lTDIazOYh2365UDAAAR
+2026-09-26 03:08:53.594 [Daemon] Agent marked idle: /tmp/tmp.KG4LxF3R5k
+2026-09-26 03:23:46.565 [Daemon] Agent idle timeout (900000ms): /tmp/tmp.p7ZefFx0ao
+2026-09-26 03:23:46.572 [Daemon] Dream not eligible (Not enough activity (0 < 3 curations)), killing idle agent: /tmp/tmp.p7ZefFx0ao
+2026-09-26 03:23:46.572 [Daemon] Agent socket disconnected, removing from pool: /tmp/tmp.p7ZefFx0ao (pid=323583)
+2026-09-26T03:23:46.574Z [agent-process:/tmp/tmp.p7ZefFx0ao] Shutting down...
+2026-09-26T03:23:46.574Z [agent-process:/tmp/tmp.p7ZefFx0ao] post-work drain (0ms): drained=0 abandoned=0
+2026-09-26T03:23:46.878Z [agent-process:/tmp/tmp.p7ZefFx0ao] Transport socket DISCONNECTED reason=io client disconnect activeTaskCount=0
+2026-09-26T03:23:46.878Z [agent-process:/tmp/tmp.p7ZefFx0ao] Shutdown complete
+2026-09-26 03:23:46.879 [Transport] Client disconnected: EOASjGR9QdI47qnxAAAH
+2026-09-26 03:23:46.880 [Transport] Agent disconnected! project=/tmp/tmp.p7ZefFx0ao
+2026-09-26 03:23:46.922 [Daemon] Agent process exited: /tmp/tmp.p7ZefFx0ao (pid=323583, code=0)
+2026-09-26 03:23:56.569 [Daemon] Agent idle timeout (900000ms): /tmp/tmp.KG4LxF3R5k
+2026-09-26 03:23:56.570 [Daemon] Dream not eligible (Not enough activity (0 < 3 curations)), killing idle agent: /tmp/tmp.KG4LxF3R5k
+2026-09-26 03:23:56.570 [Daemon] Agent socket disconnected, removing from pool: /tmp/tmp.KG4LxF3R5k (pid=327141)
+2026-09-26T03:23:56.571Z [agent-process:/tmp/tmp.KG4LxF3R5k] Shutting down...
+2026-09-26T03:23:56.571Z [agent-process:/tmp/tmp.KG4LxF3R5k] post-work drain (0ms): drained=0 abandoned=0
+2026-09-26T03:23:56.875Z [agent-process:/tmp/tmp.KG4LxF3R5k] Transport socket DISCONNECTED reason=io client disconnect activeTaskCount=0
+2026-09-26 03:23:56.875 [Transport] Client disconnected: tpUMU3nUwNxTbDXgAAAQ
+2026-09-26 03:23:56.875 [Transport] Agent disconnected! project=/tmp/tmp.KG4LxF3R5k
+2026-09-26T03:23:56.876Z [agent-process:/tmp/tmp.KG4LxF3R5k] Shutdown complete
+2026-09-26 03:23:56.911 [Daemon] Agent process exited: /tmp/tmp.KG4LxF3R5k (pid=327141, code=0)
+2026-09-26 03:53:56.877 [Daemon] Idle for 1800s with no clients
+2026-09-26 03:53:56.877 [Daemon] Idle timeout reached — initiating shutdown
+2026-09-26 03:53:56.879 [Daemon] Shutdown initiated
+2026-09-26 03:53:56.879 [Daemon] Idle timeout policy stopped
+2026-09-26 03:53:56.879 [Daemon] Agent idle timeout policy stopped
+2026-09-26 03:53:56.880 [Daemon] Daemon resilience uninstalled
+2026-09-26 03:53:56.880 [Daemon] Heartbeat stopped
+2026-09-26 03:53:56.880 [Daemon] Agent pool shut down
+2026-09-26 03:53:56.887 [Daemon] Shutdown complete

@@ -1,0 +1,8 @@
+2026-09-26T06:38:13Z mode=plan
+2026-09-26T06:38:13Z == assertions
+2026-09-26T06:38:17Z ok <scratch>/trial-colpali: real directory, not in use, 31053661034 apparent bytes
+2026-09-26T06:38:20Z ok <scratch>/trial-mirix: real directory, not in use, 985386322 apparent bytes
+2026-09-26T06:38:23Z ok <scratch>/trial-byterover: real directory, not in use, 19121145 apparent bytes
+2026-09-26T06:38:26Z ok <scratch>/exec: real directory, not in use, 54849 apparent bytes
+2026-09-26T06:38:26Z all literal targets asserted
+2026-09-26T06:38:26Z plan only; nothing changed

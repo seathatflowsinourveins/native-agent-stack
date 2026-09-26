@@ -1,0 +1,335 @@
+{
+  "schema_version": 2,
+  "trial": "byterover-cli",
+  "trial_date": "2026-09-26",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "note": "First pass 2026-09-26 01:22Z-03:54Z (install, upstream suite, provider connect, curate/query, receipts); self-contained reproductions at 04:24Z and 04:54Z; host cleanup at 04:53Z; cross-family repair round 10:58Z-11:35Z (current reproduction at 11:31Z; cleanup-scope probes at 11:10Z for the 0454Z version and 11:33Z for the current one; credential probe at 11:16Z). Node v24.21.0, npm 11.19.0."
+  },
+  "component": {
+    "trial_component_id": "byterover-cli",
+    "repository": "https://github.com/campfirein/byterover-cli",
+    "description": "ByteRover CLI (brv), formerly Cipher: a Node/TypeScript CLI that keeps a per-project 'context tree' of curated knowledge for coding agents, with a git-like version-control layer (brv vc, isomorphic-git), BM25 search, an LLM agent loop (curate/query) over 20 selectable providers, a background daemon, an MCP server and an optional paid cloud backend.",
+    "license": {
+      "fact": "Elastic License 2.0 (ELv2); package.json declares Elastic-2.0. Its Limitations section forbids providing the software to third parties as a hosted or managed service, circumventing license-key functionality, and removing licensing notices.",
+      "evidence": [
+        "source-review.json#license-file",
+        "source-review.json#license-field"
+      ]
+    }
+  },
+  "pins": {
+    "npm": {
+      "package": "byterover-cli",
+      "version": "3.16.1",
+      "dist_integrity": "sha512-uI6zETcy5QO6H29/sdn4BKGWzJl658sjHWxcpO+LHYcmxQj1mAmmi9lluqQZYoXXrnrbp+an8NYhjd5MKmDTcw==",
+      "dist_shasum": "dfb0b176dd93c0cfd2a751a233275eee51d28678"
+    },
+    "git": {
+      "tag": "v3.16.1",
+      "commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0"
+    },
+    "verification": "../provenance/run-20260926T045856Z/verify-pins.log (tag clone rev-parse; npm dist.integrity and dist.shasum) and each reproduction run's 00-npm-view.stdout / 02-tarball-integrity.stdout (sha512 of the downloaded tarball equals the pinned integrity)",
+    "resolved_in_reproduction": {
+      "@oclif/core": "4.14.0",
+      "@oclif/plugin-update": "4.8.0",
+      "@oclif/plugin-help": "6.3.0",
+      "@campfirein/brv-transport-client": "1.1.0 (bundled in the tarball, package.json bundleDependencies)",
+      "note": "A global tarball install resolves package.json's ranges; the tag's package-lock.json (@oclif/core 4.5.4, @oclif/plugin-update 4.7.19) is not used. Source: reproduction/run-20260926T1131Z/05-npm-ls.stdout."
+    }
+  },
+  "checks": [
+    {
+      "id": "upstream-suite-at-tag",
+      "evidence_class": "upstream_test",
+      "command": "git clone --branch v3.16.1 --depth 1 ...; npm ci --no-audit --no-fund; npm test (= mocha --forbid-only \"test/**/*.test.ts\")",
+      "exit_code": 0,
+      "result": "8340 passing, 16 pending, 0 failing; reproduced once more from a fresh mktemp clone under /bin/sh (8340 passing, 16 pending, exit 0).",
+      "retained": [
+        "native-outputs/npm-ci-tag-v3.16.1.log",
+        "native-outputs/npm-test-tag-v3.16.1-excerpt.log",
+        "native-outputs/npm-test-self-contained-rerun.log",
+        "local-integration/testsuite-self-contained-cmd.sh"
+      ],
+      "note": "The published log is an excerpt (header, all 16 pending tests with context, summary); the omitted ranges are marked in place and the full log's sha256 is in retained-outputs.json. The suite registered its temporary directories (tmp--undo-wiring-*, tmp--tmp.*--src) as projects in the host's ByteRover data directory; the cleanup removed them. Each run also left about 125 directories under os.tmpdir() (/tmp here) that the tests create and never remove, and the fixed /tmp/brv-test-blobs, /tmp/brv-test-storage and /tmp/byterover-tool-outputs. The four runs on this host (the first pass's two and the receipt recorder's dry run and recorded run) left 501 entries, which are still on the host (finding B5, ../README.md#host-state)."
+    },
+    {
+      "id": "offline-store-retrieve",
+      "evidence_class": "upstream_native_operation + local_integration",
+      "command": "sh reproduction/reproduce-vc-search.sh <out>: pinned npm release into a mktemp prefix; npm ls of the installed @oclif/core, @oclif/plugin-update and transport client; brv vc init/add/config/commit of two notes; brv status; brv search 'rate limiter' / 'invoices' / 'zzznonexistentxyz123' --format json; reproduction/check_search.py on each output; autoupdate-hook-idle check; stop of only the recorded daemon and its descendants",
+      "exit_code": 0,
+      "result": "Both positive searches returned exactly one result with the expected path and excerpt (auth/notes.md score 0.76, billing/notes.md score 0.66); the negative search returned totalFound 0; every search JSON had success true and status completed. The two deliberately wrong expectations (wrong path, wrong count) failed the same checker. brv status reported authStatus not_logged_in: no account, LLM or network model endpoint was used.",
+      "runs": {
+        "reproduction/run-20260926T1131Z": "current script, run by reproduction/run-with-host-observation.sh in the host PID namespace: same search results; the autoupdate hook never ran; the script recorded its daemon (process group and session equal to its pid) and the agent the daemon forked, sent SIGTERM to the daemon only, and both were gone after 5.41 s; the host ByteRover paths were absent before and after; the dedicated TMPDIR kept only node-compile-cache, Node's default compile-cache directory, which npm 11 enables at startup (source-review.json#npm-compile-cache). No process list was read.",
+        "reproduction/run-20260926T0454Z": "earlier script version (kept in that folder): every ByteRover config/data/state/cache directory in the workspace, autoupdate disabled; same search results; its cleanup ran brv restart, which is host-wide (finding B6, brv_restart_in_earlier_runs). Its separate before/after check found no ByteRover path on the host and no ByteRover process afterwards (host-state-observation.txt).",
+        "reproduction/run-20260926T0424Z": "earliest script version (kept in that folder): same results, but it left XDG_CACHE_HOME at the host default, so each brv call touched ~/.cache/brv/lastrun; its cleanup also ran brv restart"
+      },
+      "retained": [
+        "reproduction/run-20260926T1131Z/",
+        "reproduction/run-20260926T0454Z/",
+        "reproduction/run-20260926T0424Z/",
+        "reproduction/reproduce-vc-search.sh",
+        "reproduction/owned_processes.py",
+        "reproduction/check_search.py",
+        "reproduction/run-with-host-observation.sh"
+      ]
+    },
+    {
+      "id": "cleanup-scope-probe",
+      "evidence_class": "local_integration",
+      "command": "sh reproduction/restart-scope-probe.sh <script-dir> <out> for the run-20260926T0454Z script and for the current script, each as PID 1's child in a new user and PID namespace with its own /proc, next to four decoy sleepers whose only link to ByteRover is one argument (.../worker.js control, .../bin/brv, .../brv-server.js, .../agent-process.js)",
+      "exit_code": 0,
+      "result": "0454Z version: brv restart killed the three pattern decoys with SIGKILL (wait status 137) and spared the control. Current version: all four decoys still running afterwards; the recorded daemon got SIGTERM and it and its agent were gone in 5.41 s. Both passed every search check, and neither left a process in the namespace.",
+      "retained": [
+        "reproduction/restart-scope-probe-20260926/",
+        "reproduction/restart-scope-probe.sh"
+      ]
+    },
+    {
+      "id": "owned-processes-check",
+      "evidence_class": "local_integration",
+      "command": "python3 reproduction/owned_processes_check.py (fake processes only)",
+      "exit_code": 0,
+      "result": "All five expectations written before the run held: graceful stop (SIGTERM to the daemon only), SIGKILL after 10 s for processes that ignore SIGTERM, a daemon file naming a foreign process refused, an unreadable file refused, a reused pid left alone.",
+      "retained": [
+        "native-outputs/owned-processes-check-20260926T110019Z.txt",
+        "reproduction/owned_processes_check.py"
+      ]
+    },
+    {
+      "id": "credential-argv-probe",
+      "evidence_class": "local_integration",
+      "command": "python3 local-integration/credential-argv-probe.py local-integration/connect-local-llm-safe.sh (random dummy value, loopback listener started by the probe; nothing sent to port 18232)",
+      "exit_code": 0,
+      "result": "First-pass header form (curl -H \"Authorization: Bearer $KEY\"): header delivered, value in curl's command line. Safe form: header delivered from standard input, value in no command line or environment of the three inspected processes, exit 0, http_code=200.",
+      "retained": [
+        "native-outputs/credential-argv-probe-20260926T111651Z.txt",
+        "local-integration/credential-argv-probe.py",
+        "local-integration/connect-local-llm-safe.sh"
+      ]
+    },
+    {
+      "id": "local-llm-curate",
+      "evidence_class": "upstream_native_operation",
+      "command": "brv providers connect openai-compatible --base-url http://127.0.0.1:18232/v1 --api-key <from the host key file> --model qwen3.8-27b-local --format json (local-integration/connect-local-llm.sh); then brv curate \"Auth uses a fixed-window rate limiter ...\" -f src/auth.ts --format json",
+      "exit_code": "0 (process); the JSON reports success false",
+      "result": "The connected local provider received the request and returned 'request (12351 tokens) exceeds the available context size (8192 tokens), try increasing it'; ByteRover's task record shows status error with provider openai-compatible and model qwen3.8-27b-local. Nothing was curated (curate log: no operations).",
+      "retained": [
+        "native-outputs/curate-context-error.ndjson",
+        "native-outputs/task-records/01-curate-context-error.json",
+        "native-outputs/task-records/08-curate-log.json",
+        "local-integration/connect-local-llm.sh"
+      ],
+      "recipe_note": "local-integration/connect-local-llm.sh is unsafe as run: it put the key in curl's -H argument and in brv providers connect --api-key, where every local user can read it through /proc/<pid>/cmdline or ps. The published copy is marked so; the safe form is local-integration/connect-local-llm-safe.sh (credential-argv-probe check)."
+    },
+    {
+      "id": "local-llm-query",
+      "evidence_class": "upstream_native_operation",
+      "command": "brv query \"How is authentication implemented?\" --format json; after brv vc commit of a note, the same query and brv query \"What is the rate limiter policy?\" --format json",
+      "exit_code": "0 (process)",
+      "result": "The first phrasing was answered by the LLM-free tier-2 path with no matched documents (12 ms, then 10 ms after the commit). The second escalated to the local LLM and failed: 'request (11192 tokens) exceeds the available context size (8192 tokens)'.",
+      "retained": [
+        "native-outputs/query-tier2-no-match.json",
+        "native-outputs/task-records/02-query-tier2-before-commit.json",
+        "native-outputs/task-records/06-query-tier2-after-commit.json",
+        "native-outputs/task-records/07-query-context-error.json",
+        "native-outputs/task-records/09-query-log-tier2-1.json",
+        "native-outputs/task-records/10-query-log-tier2-2.json",
+        "native-outputs/task-records/11-query-log-context-error.json"
+      ]
+    },
+    {
+      "id": "host-llm-context",
+      "evidence_class": "host_service_observation",
+      "command": "read-only GET http://127.0.0.1:18232/v1/models",
+      "exit_code": 0,
+      "result": "qwen3.8-27b-local, n_ctx 8192 (the service's setting), n_ctx_train 262144.",
+      "retained": [
+        "native-outputs/llamacpp-v1-models.json"
+      ]
+    },
+    {
+      "id": "first-pass-searches",
+      "evidence_class": "upstream_native_operation",
+      "command": "first pass: brv search before any commit, after committing auth/notes.md, and for a nonexistent term",
+      "exit_code": 0,
+      "result": "'Context tree is empty' before the commit; one result (auth/notes.md, score 0.68) after it; totalFound 0 for the nonexistent term (ByteRover's own task records).",
+      "retained": [
+        "native-outputs/task-records/03-search-empty-tree.json",
+        "native-outputs/task-records/04-search-rate-limiter.json",
+        "native-outputs/task-records/05-search-nonexistent.json",
+        "native-outputs/daemon-log-0129Z.log"
+      ]
+    },
+    {
+      "id": "background-autoupdate",
+      "evidence_class": "upstream_native_operation",
+      "command": "any brv command without BRV_DISABLE_AUTOUPDATE (the first pass's first call was brv --version)",
+      "exit_code": null,
+      "result": "The bundled @oclif/plugin-update init hook spawned a detached 'brv update --autoupdate' at 01:26:47Z; it waited until 02:26:47Z and reported 'not updatable'. Whether it contacted the network was not measured.",
+      "retained": [
+        "native-outputs/oclif-autoupdate.log",
+        "source-review.json#oclif-autoupdate-hook",
+        "source-review.json#autoupdate-config"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "B1",
+      "summary": "Process exit codes of brv search, curate and query do not report task failure: a failed task is reported only in the JSON (success false, status error). A check must read the JSON fields; the first pass's claim that search's exit code reflects success was wrong.",
+      "evidence": [
+        "source-review.json#search-task-semantics",
+        "source-review.json#curate-task-error-exit",
+        "native-outputs/curate-context-error.ndjson"
+      ]
+    },
+    {
+      "id": "B2",
+      "summary": "The observed LLM request totals (12,351 tokens for curate, 11,192 for query) exceeded the host llama.cpp context of 8192. They are totals for these requests on this project and model, not a fixed baseline: the system prompt includes variable project context (working directory, git state, file tree, .brv structure).",
+      "evidence": [
+        "native-outputs/task-records/01-curate-context-error.json",
+        "native-outputs/task-records/07-query-context-error.json",
+        "source-review.json#prompt-environment-context"
+      ]
+    },
+    {
+      "id": "B3",
+      "summary": "By default the CLI spawns a background self-update process (oclif plugin-update, S3 release host, 1-day debounce) and touches its cache directory on every command; BRV_DISABLE_AUTOUPDATE=1 turns the hook off. NO_UPDATE_NOTIFIER does not cover it.",
+      "evidence": [
+        "native-outputs/oclif-autoupdate.log",
+        "source-review.json#oclif-autoupdate-hook",
+        "source-review.json#oclif-cache-dir"
+      ]
+    },
+    {
+      "id": "B4",
+      "summary": "Persistent state lives in four XDG locations (config, data including an AES-256-GCM encrypted provider keychain, state/logs, cache) plus update-notifier's configstore file; the upstream test suite also writes temporary projects into the real data directory.",
+      "evidence": [
+        "source-review.json#xdg-config-path",
+        "source-review.json#xdg-data-path",
+        "source-review.json#xdg-logs-path",
+        "source-review.json#provider-keychain",
+        "../host-cleanup-20260926/cleanup-plan.log"
+      ]
+    },
+    {
+      "id": "B5",
+      "summary": "The upstream unit suite at the tag leaves its temporary directories behind. Tests such as consolidate.test.ts create <os.tmpdir()>/brv-*-test-* directories before each test, and their afterEach only restores the stubs; other tests use the fixed paths /tmp/brv-test-blobs and /tmp/brv-test-storage, and the tool-output processor writes to <os.tmpdir()>/byterover-tool-outputs. Each run on this host left about 125 directories; four runs left 498 plus the three fixed directories.",
+      "evidence": [
+        "source-review.json#suite-tmpdir-consolidate",
+        "source-review.json#suite-tmpdir-synthesize",
+        "source-review.json#suite-tmpdir-undo",
+        "source-review.json#suite-tmpdir-prune",
+        "source-review.json#suite-tmpdir-path",
+        "source-review.json#suite-tmpdir-projdir",
+        "source-review.json#suite-tmpdir-migrate-fm",
+        "source-review.json#suite-tmpdir-folder-pack",
+        "source-review.json#suite-fixed-tmp-paths",
+        "source-review.json#tool-output-temp-dir",
+        "../host-cleanup-20260926/remaining-host-state/host-state-inventory.txt"
+      ]
+    },
+    {
+      "id": "B6",
+      "summary": "brv restart stops processes host-wide. On Linux it reads the command line of every process in /proc and sends SIGKILL to each one containing bin/brv, byterover-cli/bin/run.js, brv-server.js or agent-process.js, sparing only itself and its ancestors, whatever the other process's install, data directory or session. Redirecting the data directory changes only which daemon gets the SIGTERM. The cleanup-scope probe shows it killing three decoys that shared nothing with the trial but one argument.",
+      "evidence": [
+        "source-review.json#restart-description",
+        "#restart-patterns",
+        "#restart-cli-patterns",
+        "#restart-proc-scan-kill",
+        "#restart-exclusions",
+        "#restart-phases",
+        "reproduction/restart-scope-probe-20260926/"
+      ]
+    },
+    {
+      "id": "B7",
+      "summary": "A provider key enters ByteRover 3.16.1 only as an argument or at a prompt: brv providers connect --api-key (a process argument); the CLI wizard, whose openai-compatible key prompt is a plain input prompt that echoes the key (other providers get a masked prompt); or the web UI's provider flow, whose key field is a password field, openai-compatible included. There is no stdin, file or environment option.",
+      "evidence": [
+        "source-review.json#connect-api-key-flag",
+        "#connect-masked-prompt",
+        "#connect-optional-key-prompt",
+        "#connect-openai-compatible-prompt",
+        "#webui-password-field",
+        "#webui-openai-compatible-base-url",
+        "#webui-base-url-then-key",
+        "#webui-key-step-optional"
+      ]
+    }
+  ],
+  "not_evaluated": [
+    {
+      "item": "LLM-mediated store and retrieve (brv curate / LLM-escalated brv query) end to end",
+      "reason": "Every attempt's request exceeded the host llama.cpp context of 8192 tokens (12,351 and 11,192 observed). Raising the context means reconfiguring the shared host service, which this trial may not do; no cloud provider is used on this host. The provider connection itself worked: the requests reached the local server."
+    },
+    {
+      "item": "Published benchmark numbers (README: LoCoMo 96.1%, LongMemEval-S 92.8%)",
+      "reason": "The repository ships no runnable harness for them; at the tag only the README and paper/ mention either benchmark.",
+      "evidence": [
+        "source-review.json#readme-benchmark-claims"
+      ]
+    },
+    {
+      "item": "brv swarm",
+      "reason": "Needs brv swarm onboard, documented only as an interactive wizard; not exercised (the first pass's swarm status output was not retained)."
+    },
+    {
+      "item": "ByteRover Cloud (login, push/pull, vc remotes, hosted LLM, spaces)",
+      "reason": "Requires a ByteRover account; not exercised."
+    },
+    {
+      "item": "Outbound network traffic",
+      "reason": "Not measured. Source review lists the update paths (oclif autoupdate, update-notifier); the first pass's statement that nothing phones home was a source search, not an observation."
+    },
+    {
+      "item": "brv mcp and brv webui",
+      "reason": "Not invoked; no Claude Code or Codex client configuration was changed. Each daemon the first pass started (01:29Z and 03:08Z) also started ByteRover's web UI server on port 7700 and stopped it with the daemon (daemon logs)."
+    },
+    {
+      "item": "The safe connection recipe against the host llama.cpp service",
+      "reason": "Its curl step was checked only with a dummy value against a loopback listener (credential-argv-probe); its ByteRover step, key entry in the web UI's password field, rests on source review."
+    }
+  ],
+  "withdrawn_host_receipts": {
+    "files": [
+      "withdrawn-host-receipts/nativestack-5975wx-20260925--byterover-cli--install--20260926.json",
+      "withdrawn-host-receipts/nativestack-5975wx-20260925--byterover-cli--use--20260926.json"
+    ],
+    "why": "scripts/host_receipts.py validate rejects component_id 'byterover-cli' (neither a manifests/stack.json component nor a landscape winner). The install receipt's first command resolved the host install that the cleanup removed; the use receipt discarded brv's output and grepped for '\"totalFound\":1', which also matches 10 and any path. The reproduction runs replace it."
+  },
+  "host_state": "The first pass left the npm install, its bin symlink and ByteRover's config, data (including the encrypted provider keychain), state and cache directories plus update-notifier's file on the host. All were removed on 2026-09-26 04:53Z with ByteRover's own lifecycle commands (providers disconnect, logout, restart) and npm uninstall; see ../host-cleanup-20260926/. Still on the host: the unchanged upstream suite's temporary directories in /tmp, 498 prefixed directories plus /tmp/brv-test-blobs, /tmp/brv-test-storage and /tmp/byterover-tool-outputs from four suite runs (finding B5). The first pass's trial-byterover scratch tree was deleted by the first polish pass. See ../README.md#host-state. That cleanup's brv restart scanned every process in this distribution, not just this install's (finding B6, brv_restart_in_earlier_runs).",
+  "verdict": {
+    "measured": "The offline store/retrieve path works without an LLM or account: brv vc commits notes into the context tree and brv search finds them by BM25 with exact path and excerpt, returns nothing for an absent term, and a checker that reads the JSON rejects deliberately wrong expectations. The upstream suite at the tag passes (8340 passing, 16 pending, 0 failing). The LLM path (curate, escalated query) was not evaluated end to end on this host: the observed request totals, 12,351 and 11,192 tokens, exceeded the host llama.cpp context of 8192.",
+    "facts": [
+      "Licence: Elastic License 2.0 (source-available terms with the hosted-service and license-key limitations quoted above).",
+      "Exit codes do not report task failure; the JSON does.",
+      "Background autoupdate is on by default (BRV_DISABLE_AUTOUPDATE=1 disables it).",
+      "The upstream unit suite leaves about 125 directories in os.tmpdir() per run (finding B5).",
+      "brv restart sends SIGKILL to matching ByteRover processes host-wide, not just its own install's (finding B6).",
+      "A provider key goes in only as an argument or at a prompt; the CLI's openai-compatible prompt is unmasked and the web UI's field is masked (finding B7)."
+    ],
+    "blockers": [
+      "LLM path needs more context than the host's shared llama.cpp service provides (or a cloud provider)",
+      "published benchmark numbers have no runnable harness in the repository"
+    ],
+    "layer_decision": "Not made here. The foundation durable-memory layer is re-recorded by its own verdict wave (tools/sota-convergence/record_verdicts.py); this trial supplies measured results, facts and blockers only.",
+    "retrial_trigger": "A local OpenAI-compatible model served with enough context for the observed request totals (for example a separate llama.cpp or vLLM instance), then curate followed by query with a JSON-reading check and a deliberately wrong expectation."
+  },
+  "brv_restart_in_earlier_runs": {
+    "invocations_utc": {
+      "2026-09-26T04:26:07Z": "run-20260926T0424Z cleanup (the run's mktemp install and data directory)",
+      "2026-09-26T04:53:45Z/04:53:53Z": "host cleanup (the first pass's host install, default data directory)",
+      "2026-09-26T04:56:31Z": "run-20260926T0454Z cleanup (the run's mktemp install and data directory)"
+    },
+    "could_affect": "SIGKILL to any process of the same user in this WSL distribution whose command line contained bin/brv, byterover-cli/bin/run.js, brv-server.js or agent-process.js: every other ByteRover CLI, TUI or MCP client, daemon or agent, whatever its install or data directory, and any unrelated program with such an argument. The SIGTERM went to each command's own daemon.",
+    "records": [
+      "Both first-pass daemons had ended before: the 01:29Z daemon on a SIGTERM at 01:44:20Z whose sender is not recorded, the 03:08Z daemon on its idle timeout at 03:53:56Z (native-outputs/daemon-log-*.log).",
+      "The default data directory listed at 04:53:41Z held no daemon log or heartbeat newer than 03:53Z: no daemon using it ran between 03:53:56Z and 04:53:41Z (../host-cleanup-20260926/cleanup-apply.log).",
+      "The host cleanup's process listings at 04:53:28Z and 04:53:41Z show no brv-server, agent-process or autoupdate process; they did not look for ByteRover clients or unrelated programs with a matching argument.",
+      "No process listing exists for 04:26Z or 04:56Z; the check after the 0454Z run (04:56:43Z) found no ByteRover process, which a killed process would also give."
+    ],
+    "conclusion": "Whether another session's process was hit cannot be ruled out. Nothing retained covers ByteRover clients at any of the three times, daemons with another data directory at 04:26Z or 04:56Z, or unrelated programs with a matching argument; a brv restart by the first pass around 01:44Z cannot be excluded either. The current reproduction does not call brv restart."
+  }
+}

@@ -755,6 +755,174 @@
         "https://github.com/open-telemetry/semantic-conventions-genai/blob/e57c543b4889619eb2a05702471937db5119165d/docs/gen-ai/README.md",
         "https://github.com/open-telemetry/semantic-conventions/blob/094950f2ccfb17c68d11aecc03937111dd22ca77/docs/gen-ai/README.md"
       ]
+    },
+    {
+      "repository": "Mirix-AI/MIRIX",
+      "url": "https://github.com/Mirix-AI/MIRIX",
+      "version": "v0.1.6 (latest tag; its GitHub release is marked pre-release); main@8cb06a62bbb7c478beb33dd4f2815696a72df482 tested as a secondary pin; PyPI mirix 0.1.7 is the REST client only",
+      "reviewed_commit": "0f3fbdb5e085ccceb6254e2a4a128a8957dac55a",
+      "license": "Apache-2.0",
+      "status": "TRIALLED 2026-09-26 on nativestack-5975wx-20260925 against local llama.cpp chat and vLLM embedding endpoints: no memory was persisted through the documented add/retrieve path at v0.1.6 (F1: a null usage.prompt_tokens_details.audio_tokens fails validation on every local completion) or at main@8cb06a62 (F2: embedding_model is not forwarded, so the semantic and episodic inserts request text-embedding-ada-002; the README quick start also hits F3 and F5). Upstream suite at the tag: 88 passed, 1 failed, 88 skipped, 16 errors (F6 once the API key is set). The upstream LongMemEval-S harness is main-only and needs a cloud key; not run.",
+      "decision": "No adoption decision recorded by the trial; the foundation durable-memory verdict wave decides. Re-trial when a release forwards embedding_model for OpenAI-compatible endpoints and parses a null audio_tokens: rerun the local-endpoint add/retrieve check and the upstream LongMemEval-S harness against local endpoints. Evidence: blueprints/trials-20260926/mirix/.",
+      "priority": "P1",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "durable-memory"
+        }
+      ],
+      "component_id": "mirix",
+      "native_evidence": "blueprints/trials-20260926/mirix/results-20260926.json",
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T05:21:19Z",
+        "method": "gh api repos/Mirix-AI/MIRIX; gh api repos/Mirix-AI/MIRIX/releases",
+        "license_spdx_id": "Apache-2.0",
+        "stargazers_count": 3447,
+        "pushed_at": "2026-09-12T02:55:29Z",
+        "archived": false,
+        "latest_release": null,
+        "latest_tag": {
+          "tag_name": "v0.1.6",
+          "prerelease": true,
+          "published_at": "2025-12-25T18:44:14Z"
+        }
+      },
+      "sources": [
+        "https://github.com/Mirix-AI/MIRIX/blob/0f3fbdb5e085ccceb6254e2a4a128a8957dac55a/README.md",
+        "https://github.com/Mirix-AI/MIRIX/blob/0f3fbdb5e085ccceb6254e2a4a128a8957dac55a/mirix/schemas/openai/chat_completion_response.py",
+        "https://github.com/Mirix-AI/MIRIX/blob/0f3fbdb5e085ccceb6254e2a4a128a8957dac55a/mirix/embeddings.py",
+        "https://github.com/Mirix-AI/MIRIX/blob/0f3fbdb5e085ccceb6254e2a4a128a8957dac55a/tests/test_search_all_users.py",
+        "https://github.com/Mirix-AI/MIRIX/blob/8cb06a62bbb7c478beb33dd4f2815696a72df482/mirix/embeddings.py",
+        "https://github.com/Mirix-AI/MIRIX/blob/8cb06a62bbb7c478beb33dd4f2815696a72df482/mirix/server/rest_api.py",
+        "https://github.com/Mirix-AI/MIRIX/blob/8cb06a62bbb7c478beb33dd4f2815696a72df482/evals/mab/run_mab_longmem_eval.sh",
+        "https://github.com/Mirix-AI/MIRIX/releases/tag/v0.1.6",
+        "https://pypi.org/project/mirix/0.1.7/",
+        "https://arxiv.org/abs/2507.07957"
+      ]
+    },
+    {
+      "repository": "campfirein/byterover-cli",
+      "url": "https://github.com/campfirein/byterover-cli",
+      "version": "3.16.1 (npm; tag v3.16.1)",
+      "reviewed_commit": "1f4609c18ca735810860b3ba9178cae2dd8a67b0",
+      "license": "Elastic-2.0 (Elastic License 2.0: no hosted or managed service for third parties, no license-key circumvention; GitHub reports NOASSERTION)",
+      "status": "TRIALLED 2026-09-26 on nativestack-5975wx-20260925: the offline store/retrieve path (brv vc into the context tree, BM25 brv search) works without an LLM or account and passed positive, negative and deliberately-wrong controls in a self-contained reproduction; the upstream suite at the tag passed (8340 passing, 16 pending, 0 failing). The LLM path (curate, escalated query) was not evaluated end to end on this host: the observed request totals, 12,351 and 11,192 tokens, exceeded the host llama.cpp context of 8192. Exit codes do not report task failure (the JSON does), and a background autoupdate is on by default. `brv restart` sends SIGKILL to matching ByteRover processes host-wide, not just its own install's, and a provider key goes in only as an argument or at a prompt (the CLI's openai-compatible prompt is unmasked; the web UI's field is masked).",
+      "decision": "No adoption decision recorded by the trial; the foundation durable-memory verdict wave decides. Re-trial with a local model served with enough context for the observed request totals: curate then query, checked through the JSON with a deliberately wrong expectation. Evidence: blueprints/trials-20260926/byterover-cli/.",
+      "priority": "P1",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "durable-memory"
+        }
+      ],
+      "component_id": "byterover-cli",
+      "native_evidence": "blueprints/trials-20260926/byterover-cli/results-20260926.json",
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T05:21:19Z",
+        "method": "gh api repos/campfirein/byterover-cli; gh api repos/campfirein/byterover-cli/releases/latest",
+        "license_spdx_id": "NOASSERTION",
+        "stargazers_count": 4966,
+        "pushed_at": "2026-06-25T17:00:57Z",
+        "archived": false,
+        "latest_release": {
+          "tag_name": "v3.16.1",
+          "published_at": "2026-05-27T09:12:27Z"
+        }
+      },
+      "sources": [
+        "https://github.com/campfirein/byterover-cli/blob/1f4609c18ca735810860b3ba9178cae2dd8a67b0/README.md",
+        "https://github.com/campfirein/byterover-cli/blob/1f4609c18ca735810860b3ba9178cae2dd8a67b0/LICENSE",
+        "https://github.com/campfirein/byterover-cli/blob/1f4609c18ca735810860b3ba9178cae2dd8a67b0/package.json",
+        "https://github.com/campfirein/byterover-cli/blob/1f4609c18ca735810860b3ba9178cae2dd8a67b0/src/oclif/commands/search.ts",
+        "https://github.com/campfirein/byterover-cli/blob/1f4609c18ca735810860b3ba9178cae2dd8a67b0/src/agent/infra/system-prompt/contributors/environment-contributor.ts",
+        "https://github.com/campfirein/byterover-cli/releases/tag/v3.16.1",
+        "https://www.npmjs.com/package/byterover-cli/v/3.16.1"
+      ]
+    },
+    {
+      "repository": "illuin-tech/colpali",
+      "url": "https://github.com/illuin-tech/colpali",
+      "version": "colpali-engine 0.3.13 (tag v0.3.13; installed through vidore-benchmark[colpali-engine]==5.0.0; PyPI latest 0.3.18 does not co-install with vidore-benchmark 5.0.0)",
+      "reviewed_commit": "174055b00d4a36f672c6f915f2bdd0002e4fc9ee",
+      "license": "MIT (code); weights follow their base models: vidore/colpali-v1.3 is an adapter on a PaliGemma base (Gemma licence), and the colqwen2.5 chain is rooted in Qwen/Qwen2.5-VL-3B-Instruct (qwen-research)",
+      "status": "TRIALLED 2026-09-26 on nativestack-5975wx-20260925, on CPU by intent (three first-pass runs without a device pin were GPU-indicated): vidore/colpali-v1.3 scored nDCG@5 0.89682 (recall@3 1.0) against 0.19678 (recall@3 0.25) for the built-in random control on a 12-image vidore/tabfquad_test_subsampled slice through the unchanged vidore-benchmark 5.0.0 CLI, reproduced self-contained on CPU. vidore/colqwen2.5-v0.2 was not evaluated: the 5.0.0 CLI registers no ColQwen2.5 retriever, the documented 5.0.0 Python API path (VisionRetriever) was not tried, and at the pinned Hub revision its processor fails to load under transformers 4.53.1 and 4.57.6, the ends of colpali-engine 0.3.13's range (a Hub chat-template file those versions resolve to None); it loads at the pre-template revision. Upstream marks colpali-engine deprecated for new projects in favour of Sentence Transformers v6 MultiVectorEncoder.",
+      "decision": "No adoption decision recorded by the trial; the foundation document-retrieval verdict wave decides. Next trial: colqwen2.5-v0.2 on the same slice and control through the vidore-benchmark 5.0.0 Python API (VisionRetriever with ColQwen2_5) and through the upstream-recommended Sentence Transformers v6 MultiVectorEncoder or MTEB ViDoRe path. Evidence: blueprints/trials-20260926/colpali/.",
+      "priority": "P1",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "document-retrieval"
+        }
+      ],
+      "component_id": "colpali-engine",
+      "native_evidence": "blueprints/trials-20260926/colpali/results-20260926.json",
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T05:21:19Z",
+        "method": "gh api repos/illuin-tech/colpali; gh api repos/illuin-tech/colpali/releases/latest",
+        "license_spdx_id": "MIT",
+        "stargazers_count": 2817,
+        "pushed_at": "2026-09-21T23:54:12Z",
+        "archived": false,
+        "latest_release": {
+          "tag_name": "v0.3.18",
+          "published_at": "2026-08-22T14:09:38Z"
+        }
+      },
+      "sources": [
+        "https://github.com/illuin-tech/colpali/blob/174055b00d4a36f672c6f915f2bdd0002e4fc9ee/pyproject.toml",
+        "https://github.com/illuin-tech/colpali/blob/174055b00d4a36f672c6f915f2bdd0002e4fc9ee/colpali_engine/models/__init__.py",
+        "https://github.com/illuin-tech/colpali/blob/97487f8871ff4d5d2284411fe61bdcd2cfe99894/README.md",
+        "https://pypi.org/project/colpali-engine/0.3.13/",
+        "https://huggingface.co/vidore/colpali-v1.3/tree/b5c6dd62125326e6f0b540c1f7b36e901cdc0a11",
+        "https://huggingface.co/vidore/colqwen2.5-v0.2/tree/dcbe8d9cede518bce830488364ba0e40c873645b"
+      ]
+    },
+    {
+      "repository": "illuin-tech/vidore-benchmark",
+      "url": "https://github.com/illuin-tech/vidore-benchmark",
+      "version": "5.0.0 (tag v5.0.0)",
+      "reviewed_commit": "d167f9ce6be840c5d887aa5cb1c01d2060485c93",
+      "license": "MIT",
+      "status": "TRIALLED 2026-09-26 as the evaluation harness of the ColPali trial: its evaluate-retriever CLI ran vidore/colpali-v1.3 and the built-in dummy_vision_retriever control end to end on CPU (nDCG@5 0.89682 against 0.19678 on a 12-image TabFQuAD slice, reproduced self-contained). 5.0.0's CLI registers no ColQwen2.5 retriever (the Python API it documents for other retrievers was not tried), resolves device 'auto' to cuda:0 whenever CUDA is visible, and cannot co-install with colpali-engine 0.3.18; its main branch moved single-model evaluation to MTEB.",
+      "decision": "No adoption decision recorded by the trial; the foundation document-retrieval and quality-evaluation verdict waves decide. Evidence: blueprints/trials-20260926/colpali/.",
+      "priority": "P1",
+      "audit_batch": "sota-gap-audit-20260926",
+      "layers": [
+        {
+          "catalog": "foundation",
+          "layer_id": "document-retrieval"
+        },
+        {
+          "catalog": "foundation",
+          "layer_id": "quality-evaluation"
+        }
+      ],
+      "component_id": "vidore-benchmark",
+      "native_evidence": "blueprints/trials-20260926/colpali/results-20260926.json",
+      "upstream_facts": {
+        "checked_at_utc": "2026-09-26T05:21:19Z",
+        "method": "gh api repos/illuin-tech/vidore-benchmark; gh api repos/illuin-tech/vidore-benchmark/releases/latest",
+        "license_spdx_id": "MIT",
+        "stargazers_count": 279,
+        "pushed_at": "2026-03-25T16:38:18Z",
+        "archived": false,
+        "latest_release": {
+          "tag_name": "v5.0.0",
+          "published_at": "2025-02-19T10:02:05Z"
+        }
+      },
+      "sources": [
+        "https://github.com/illuin-tech/vidore-benchmark/blob/d167f9ce6be840c5d887aa5cb1c01d2060485c93/pyproject.toml",
+        "https://github.com/illuin-tech/vidore-benchmark/blob/d167f9ce6be840c5d887aa5cb1c01d2060485c93/README.md",
+        "https://github.com/illuin-tech/vidore-benchmark/blob/d167f9ce6be840c5d887aa5cb1c01d2060485c93/src/vidore_benchmark/utils/torch_utils.py",
+        "https://github.com/illuin-tech/vidore-benchmark/blob/d167f9ce6be840c5d887aa5cb1c01d2060485c93/src/vidore_benchmark/retrievers/colqwen2_retriever.py",
+        "https://github.com/illuin-tech/vidore-benchmark/blob/a70f23af8bb3b33efe8a4a6c6c15a6e2d978035e/README.md",
+        "https://pypi.org/project/vidore-benchmark/5.0.0/",
+        "https://huggingface.co/datasets/vidore/tabfquad_test_subsampled/tree/16c8e633612fbda7400bfcbbc31d61a7534f580f"
+      ]
     }
   ]
 }

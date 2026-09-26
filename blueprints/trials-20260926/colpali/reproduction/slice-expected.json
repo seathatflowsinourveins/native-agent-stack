@@ -1,0 +1,72 @@
+{
+  "description": "Fingerprint of the 12-row slice the original 2026-09-26 ColPali runs evaluated (retained from the private trial input before its scratch directory was removed). Hashes only: the upstream rows carry an image_filename field with the dataset author's own home-directory path, so the rows themselves are not republished.",
+  "source_dataset": "vidore/tabfquad_test_subsampled",
+  "source_revision": "16c8e633612fbda7400bfcbbc31d61a7534f580f",
+  "split": "test",
+  "rows": 12,
+  "distinct_images": 12,
+  "parquet_bytes": 1818327,
+  "parquet_sha256": "ffa3892f97343d98b0d1b44757ad58a8d594e1da7700e96311307424b6d2a080",
+  "row_fingerprints": [
+    {
+      "row": 0,
+      "query_sha256": "60378e47dc7644cc8a7840742a51bb9835d69513741180e450ef3492d5f1aa6a",
+      "image_sha256": "1aac9278bef4d5d706e90407ba096a2a50d8e854f0e3d07f23c8f0bea44c7d7e"
+    },
+    {
+      "row": 1,
+      "query_sha256": "f7f9d43b06b9fd48dda126de361399535391df7d1fe95bffcc0faaaa57ad794a",
+      "image_sha256": "b3a99832ace4ee1b658870d77e2f59289ff617a767b9fe672694f8f7177cd1f7"
+    },
+    {
+      "row": 2,
+      "query_sha256": "f4938ab3a12aab7904e215225a81485af2d7456685f821ed674e783364c9f7ff",
+      "image_sha256": "fa8fdaa7c3403b171f8652ac2949163104d83a3a905cc92cd4f52b333256352f"
+    },
+    {
+      "row": 3,
+      "query_sha256": "eb475ab60b774923a3a0a29f4e4583635452299ec6ada51bd52824bd344f75a3",
+      "image_sha256": "1cd118fb5b0d5bf11ec2ae59174f0ecd1b8790152363a14663ec4b5af1aebe64"
+    },
+    {
+      "row": 4,
+      "query_sha256": "f7f53732e95b8e73265ffe63ac4fe015ddeb46c08b73156e06d92af84f6ad47b",
+      "image_sha256": "a1f0012778ad80f275f635d775ecf3e89b858fecc7e44a7d6f543a52f53250ca"
+    },
+    {
+      "row": 5,
+      "query_sha256": "00d2a72cecfc3cb84db359a5957cd68246dc9a1798284324acab8e0dd51b4d43",
+      "image_sha256": "cc7da88d987ca7b9fdd33ecf34c511c72bb2736cf1e6fcdb4704647f53454c53"
+    },
+    {
+      "row": 6,
+      "query_sha256": "d7d44a0db5b4d3251d54bba9c5db79ae7cf31d0a681dab05f242d3018add7ae8",
+      "image_sha256": "bb8c5b9fa3d1513796d51999976a2a5a5990e54573edc10f8046dd8e7d4b89a1"
+    },
+    {
+      "row": 7,
+      "query_sha256": "09a4eff9ac62ec9115356d76fa2ae057ea15d8d9778175c4492ec0306ce7ff38",
+      "image_sha256": "ce58660a9e608f57f956ff8dc7bb5ab5e2e5d7bc3488d1b94ca8d92062ad1777"
+    },
+    {
+      "row": 8,
+      "query_sha256": "7b35ff230d1223ad65289c4511aaca3ce13aebc6261b173345309f11488659db",
+      "image_sha256": "a1cb521afdfa0c47cc2d7d4c54911174928b3b147072e4676ac48be5cfab2de5"
+    },
+    {
+      "row": 9,
+      "query_sha256": "d6534c51cb1c7c06a2df466c08d07c855c884d9631570adfda93af207fbc2f53",
+      "image_sha256": "ee4221019ded21654d7bcc8d1f08dc766f7b3562ee34849b9ceca9654cb3b3a6"
+    },
+    {
+      "row": 10,
+      "query_sha256": "51602b3937d0ef0b3102a314a5a63b178fa02c2069ddf902e1eb143a863fa0f9",
+      "image_sha256": "560766993d874e0c54065736ab08bb29bb684b5a4b74328fac8750ee71c2f554"
+    },
+    {
+      "row": 11,
+      "query_sha256": "d4d9383470915b867cc249a51c83653266ffe683d53bfb06a2443d098b42fc00",
+      "image_sha256": "43c9ba94deb084a7954e00a57779d192d99e5dd41484f856a11609d22597c0b8"
+    }
+  ]
+}
