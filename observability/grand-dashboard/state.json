@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-25T22:46:00Z",
+  "recorded_at_utc": "2026-09-26T12:19:40Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -78,23 +78,23 @@
     {
       "kind": "gate",
       "id": "memory-lifecycle-v2",
-      "title": "Memory lifecycle v2 (ai-memory 2.3.2 and 2.4.0)",
-      "state": "89 of 89 checks pass on each build / real-time TTL / 4-project scope / restart durability / store migration not exercised",
-      "evidence_ref": "blueprints/memory-lifecycle-v2/results-20260925.json"
+      "title": "Memory lifecycle v2 (ai-memory 2.3.2 / 2.4.0 / 2.4.1)",
+      "state": "local integration 82+19 checks pass on 3 builds / upstream all-targets suites pass at 3 tags / swept pages unreadable / gate stays open",
+      "evidence_ref": "blueprints/memory-lifecycle-v2/results-20260926.json"
     },
     {
       "kind": "gate",
       "id": "retrieval-quality-v2",
       "title": "Held-out document retrieval quality",
-      "state": "QMD hybrid selected over QMD lexical search / nDCG10 0.714 vs 0.223 / 95 pct CI 0.367 to 0.618 / 30 sealed queries / BM25 baseline pending",
-      "evidence_ref": "blueprints/retrieval-quality-v2/results-20260925.json"
+      "state": "QMD hybrid selected over QMD lexical search / repaired rerun nDCG10 0.728 vs 0.223 / 95 pct CI 0.381 to 0.633 / 30 sealed queries / BM25 baseline pending",
+      "evidence_ref": "blueprints/retrieval-quality-v2/results-20260926T024558Z.json"
     },
     {
       "kind": "gate",
       "id": "token-efficiency-wiring",
       "title": "Token-efficiency wiring for every session",
-      "state": "fresh-worktree coverage complete / Codex MCP at user scope / 4 host tools ahead of pins / 7 without Linux pins / bootstrap pending",
-      "evidence_ref": "docs/decisions/2026-09-25-codex-mcp-scope.md"
+      "state": "fresh-worktree coverage complete / Codex MCP at user scope / 12 of 14 versions match pins / 2 unchecked (npm metadata) / probes fail closed",
+      "evidence_ref": "evidence/artifacts/token-coverage-20260926/README.md"
     },
     {
       "kind": "gate",
