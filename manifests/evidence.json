@@ -11985,8 +11985,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-ai-memory-2-4-0-release-review.md",
-      "sha256": "028e60a43f9492dc030ef8c1c713ada1cf7a4cbfb46278c4a695a4e19ef2f088",
-      "bytes": 17995
+      "sha256": "613ee93763cafa25dce96b8578a2c349aff8f46e33ce9cfc441841faff1af07d",
+      "bytes": 18032
     },
     {
       "path": "docs/decisions/2026-09-25-codex-mcp-scope.md",
@@ -12000,8 +12000,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
-      "sha256": "017b3389bbcffb1bf1798bcacf4506cfa1b14eeb00e878fa7b8334e03e73d34b",
-      "bytes": 32582
+      "sha256": "e2db3b75e9ada6acbb3983f37c6fe44dd7f75741479ec026666dd0beeba266ef",
+      "bytes": 32621
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
@@ -12400,8 +12400,13 @@
     },
     {
       "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md",
-      "sha256": "ff0f3793a6ad61e6add9805ee2bc45e70922e7daf101ccc4410c3952f5c24204",
-      "bytes": 3137
+      "sha256": "b4f2d6890794c5aa1c19aa14f7b6f28882d985c8ca6494367553de6be5a96b62",
+      "bytes": 3682
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/capture-attempt1-repro.txt",
+      "sha256": "2196f6e95b6ea2aee75544399f425d71b68190f9e68260923598c46d8eb45d14",
+      "bytes": 571
     },
     {
       "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/capture-attempt1-untrusted-dir.txt",
@@ -12412,6 +12417,11 @@
       "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/capture.txt",
       "sha256": "663966756428553d35a222e5886b61246c8eecf27db00ae7e0ee10e6252ebf61",
       "bytes": 631
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/codex-hook-events.txt",
+      "sha256": "a349159cd672da6a800a7fb81eb6e93afa9460a894c6f874c0aa69576065b88f",
+      "bytes": 238
     },
     {
       "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/codex-stderr-hook-lines.txt",
@@ -34005,8 +34015,8 @@
     },
     {
       "path": "evidence/receipts/ai-memory-241-qualification-20260925.json",
-      "sha256": "ba3016758e9c0353afd651d051e473b76e4a81ba886e1fdb0172db16dce39b5f",
-      "bytes": 13672
+      "sha256": "4e839b4383fc89514811774c23a5c660f33a764aadfad6f6885684c6eb1fa5ae",
+      "bytes": 13984
     },
     {
       "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
