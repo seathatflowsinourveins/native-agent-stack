@@ -86,6 +86,14 @@ def quiet(function, *args):
     return code, err.getvalue()
 
 
+
+class IdentityWordsTests(unittest.TestCase):
+    def test_family_names_are_reported(self):
+        # Model families the verdict wave now uses: GPT-6 (astra, sol, luna) and Claude (fable, mythos).
+        found = adjudicate.identity_mentions({"reasoning": "Per GPT-6-Astra and gpt-6-sol, astra agrees; Fable and "
+                                                           "mythos wrote this; gpt-5.6-terra; a solution on terra firma"})
+        self.assertEqual(found, ["astra", "fable", "gpt-5.6-terra", "gpt-6-astra", "gpt-6-sol", "mythos"])
+
 class AdjudicateFixture(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
