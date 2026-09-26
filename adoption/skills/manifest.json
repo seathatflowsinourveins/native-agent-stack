@@ -734,35 +734,9 @@
         "checked_at": "2026-09-26"
       },
       "status": "trial",
-      "gap": "AGENTS.md (160 lines, 11,708 bytes) loads into every Claude and Codex session and every worker that keeps project instructions, and changed in 28 commits from 2026-09-12 to 2026-09-26; six of its paragraphs are dated wave chronology. No installed procedure covers context load, a single source of truth or pruning when agents edit AGENTS.md, CLAUDE.md or skill files.",
+      "gap": "AGENTS.md (160 lines, 11,708 bytes) loads into every Claude and Codex session and every worker that keeps project instructions, and changed in 28 commits from 2026-09-12 to 2026-09-26; six of its paragraphs are dated wave chronology. No installed procedure covers context load, a single source of truth or pruning when agents edit AGENTS.md or CLAUDE.md. Skill authoring stays with anthropic-skills:skill-creator and Codex .system/skill-creator; the description also triggers on skill edits, a trial confound, so only AGENTS.md and CLAUDE.md uses count toward this gap.",
       "claude_listing": "on",
       "codex_enabled": true,
-      "added": "2026-09-26"
-    },
-    {
-      "name": "skill-security",
-      "source": "superagent-ai/skills",
-      "url": "https://github.com/superagent-ai/skills/tree/0da315b873ed141025fa601ed6e0ebe0c878d5af/skills/skill-security",
-      "ref": "0da315b873ed141025fa601ed6e0ebe0c878d5af",
-      "path": "skills/skill-security",
-      "tree_sha": "a91ee8c244f2ec44c7e8bae425065d6f2ee469e8",
-      "skill_md_sha256": "c94c32a0cc6c6b41b18e827becce47b80089256888585c39211d5d34fa80dd4f",
-      "skill_md_bytes": 7790,
-      "description_chars": 659,
-      "upstream_disable_model_invocation": false,
-      "license": "MIT",
-      "official": false,
-      "audits": {
-        "gen_agent_trust_hub": "Pass",
-        "socket": "Pass",
-        "snyk": "Warn",
-        "url": "https://skills.sh/superagent-ai/skills/skill-security",
-        "checked_at": "2026-09-26"
-      },
-      "status": "trial",
-      "gap": "Selection rule 3 reads only the three skills.sh audits; on 2026-09-26 the audit API rated agentic-actions-auditor's Socket result critical (1 alert) while its page shows Warn, which the rule admits. No local content scan precedes a pin. Its offline scanner flagged 5 of 5 synthetic malicious fixtures at high or critical (getsentry skill-scanner: 3 of 5).",
-      "claude_listing": "name-only",
-      "codex_enabled": false,
       "added": "2026-09-26"
     }
   ],
@@ -853,10 +827,16 @@
       "overturn": "The repository adds that domain."
     },
     {
+      "skills": "skill-security",
+      "source": "superagent-ai/skills",
+      "reason": "Deferred after review (2026-09-26): its file discovery follows symlinks with no containment check (scripts/analyzers.py discover() and read_text() at 0da315b), so a skill that links to a readable file outside itself makes the scanner read that file as the skill's own and print a matching line of up to 120 characters; the m7 fixture confirmed both under an open() trace, with no symlink finding. A scanner for untrusted skills that can print a credential file into the transcript fails the credential rule. It led on the fixtures (at least one high or critical finding on 6 of 7 against 4 of 7), but its own default verdict was DO NOT INSTALL only for m1, REVIEW MANUALLY for five, and LIKELY SAFE (score 0) for instruction-only memory poisoning (m6).",
+      "overturn": "An upstream pin, or an enforced wrapper, that rejects symlinks resolving outside the target before reading, shown on the m7 fixture under the open() trace; then delta.json proposal P9 decides the trial slot."
+    },
+    {
       "skills": "skill-scanner",
       "source": "getsentry/skills",
-      "reason": "Same capability as skill-security. On five synthetic malicious fixtures (2026-09-26) its scanner flagged 3 of 5 at high or critical against skill-security's 5 of 5, missing environment-variable harvesting and instruction-only memory poisoning.",
-      "overturn": "A frozen fixture set on which it outperforms skill-security, or skill-security goes unused while skill-scanner would have fired."
+      "reason": "Same capability as skill-security (deferred above) and the same out-of-target read: on the m7 symlink fixture (2026-09-26) it reported the outside symlink as critical but still read the file behind it and printed a line of it. It returned at least one high or critical finding on 4 of 7 synthetic malicious fixtures (skill-security 6 of 7), missing the settings.json permission grant in m2 and the environment-variable harvesting in m3; neither scanner flags instruction-only memory poisoning (m6).",
+      "overturn": "An upstream pin that reports and does not read through symlinks resolving outside the target (m7 under the open() trace in delta.json), then a frozen fixture set on which it matches or beats the other scanner."
     },
     {
       "skills": "agents-md, claude-settings-audit, gha-security-review",

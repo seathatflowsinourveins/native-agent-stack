@@ -288,7 +288,7 @@ Per [the acceptance-evidence policy](../acceptance-evidence-policy.md#identify-w
   invocations in the preceding 30 days, and record the result as a manifest update plus a
   follow-up decision record.
 
-## Addendum 2026-09-26: three trial additions, corrected counts, on-disk tree check
+## Addendum 2026-09-26: two trial additions, one deferral, corrected counts, on-disk tree check
 
 Evidence: [`evidence/artifacts/skills-agents-layer-20260926/`](../../evidence/artifacts/skills-agents-layer-20260926/README.md)
 (`delta.json` holds every source, commit, audit reading and count cited here).
@@ -305,15 +305,34 @@ Fail, no duplicate, no conflict, one winner per capability):
 | Name | Source @ ref | Status | Listing | Codex | Gap |
 | --- | --- | --- | --- | --- | --- |
 | variant-analysis | trailofbits/skills@0cc1c73 | trial | on | no | Post-merge review keeps finding siblings of fixed defects (#314 widened #291's rtk blob exclusion and closed a blind-packet leak the #269 filter missed); `fp-check` verifies one finding and says it is not for hunting. |
-| writing-for-agents | mattpocock/skills@c55ee46 | trial | on | yes | `AGENTS.md` (160 lines, 11,708 bytes) loads into every session and each worker that keeps project instructions, and changed in 28 commits from 2026-09-12 to 2026-09-26; no procedure covers context load, a single source of truth or pruning. |
-| skill-security | superagent-ai/skills@0da315b | trial | name-only | no | Rule 3 reads only third-party audits, and the page label can understate the audit API (`agentic-actions-auditor`: Socket `critical`, 1 alert, shown as Warn); no local content scan precedes a pin. |
+| writing-for-agents | mattpocock/skills@c55ee46 | trial | on | yes | `AGENTS.md` (160 lines, 11,708 bytes) loads into every session and each worker that keeps project instructions, and changed in 28 commits from 2026-09-12 to 2026-09-26; no procedure covers context load, a single source of truth or pruning in `AGENTS.md` or `CLAUDE.md`. |
 
-`skill-security` won its capability over `getsentry/skills` `skill-scanner` on a measured,
-synthetic comparison: 5 of 5 malicious fixtures flagged at high or critical against 3 of 5, with
-the same count (4 of 26) of high flags on the installed pinned skills. The fixtures are authored
-for this check and are a small diagnostic, not a universal ranking. Each addition's prune window
-starts at its own install on each host (the lock's `installedAt`), so none is a prune candidate at
-the 2026-10-25 review.
+`writing-for-agents` also triggers on creating or editing skills, which the synced
+`anthropic-skills:skill-creator` and Codex's `.system/skill-creator` own (rules 4 and 6). It is
+admitted only for `AGENTS.md` and `CLAUDE.md`, which no skill-creator file mentions; the upstream
+description cannot be split by pin, so the shared trigger is a trial confound, and at the review
+only its uses on `AGENTS.md` or `CLAUDE.md` count toward its gap. Codex stays enabled because
+`AGENTS.md` is Codex's own instruction file. Each addition's prune window starts at its own install
+on each host (the lock's `installedAt`), so neither is a prune candidate at the 2026-10-25 review.
+
+**Deferred: a local content scan before a pin.** `superagent-ai/skills` `skill-security` (0da315b)
+was added in this branch's first round for the gap that rule 3 reads only third-party audits (the
+audit API rated `agentic-actions-auditor`'s Socket result `critical`, 1 alert, while its page shows
+Warn). Review removed it before any install. Its file discovery follows symlinks with no containment
+check: on a synthetic fixture whose `references/example.md` links to a file outside the skill, an
+`open()` trace showed it read that file, listed it as the skill's own and printed a line of it, with
+no symlink finding. A scanner for untrusted skills that can print a readable credential file into
+the transcript fails the credential rule. `getsentry/skills` `skill-scanner`, the alternative,
+reports the outside symlink as critical but reads and prints through it too. On seven synthetic
+malicious fixtures `skill-security` returned at least one high or critical finding on 6 and
+`skill-scanner` on 4; the first round's "5 of 5 at high or critical" counted per-finding severities,
+while `skill-security`'s own default verdict was DO NOT INSTALL only for the fixture combining an
+instruction override, credential reads and a piped remote script, and REVIEW MANUALLY for the others
+it flagged. Neither deterministic scanner flags instruction-only memory poisoning: the first round's
+memory-poisoning fixture was caught through its `settings.json` permission-grant clause, and without
+that clause both return nothing. The fixtures are authored for this check and are a small
+diagnostic, not a universal ranking. The gap stays open until an upstream pin, or an enforced
+wrapper, rejects symlinks that resolve outside the target (proposal P9 in `delta.json`).
 
 **Corrected counts.** `budget.description_chars_method` now states the one method (Unicode code
 points of the PyYAML-parsed description, whitespace stripped): 23 of the 26 recorded values already
@@ -335,4 +354,5 @@ The status script now recomputes each canonical folder's git tree from disk and 
 `semgrep-rule-creator` or re-scope the `semgrep` gap (the pinned `semgrep` skill routes custom rules
 to it, and neither the `semgrep` nor the `codeql` CLI is installed on this host); record raw audit
 API risks beside page labels in rule 3; a version-matched EdgarTools skill pin; `backtest-expert`
-on a frozen research task.
+on a frozen research task; a local scanner that passes the symlink fixture (P9); attribute each
+`writing-for-agents` use to the file it served (P10).
