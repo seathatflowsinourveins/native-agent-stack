@@ -55,7 +55,7 @@
    },
    {
     "name": "rqalpha",
-    "reason": "license — actively maintained (independently confirmed pushed_at 2026-09-24T06:01:45Z, 6,796 stars) but its actual LICENSE file, which I read directly (not just PyPI's classifier, which misleadingly reads 'Apache-2.0'), restricts commercial individual use and prohibits ALL use whatsoever by a legal entity/organization without Ricequant's written authorization (contact public@ricequant.com; verified Chinese-language license text: non-commercial use follows Apache-2.0, any organizational use requires separate authorization). A real adoption blocker for this stack regardless of technical fit."
+    "reason": "license — actively maintained (independently confirmed pushed_at 2026-09-24T06:01:45Z, 6,796 stars) but its actual LICENSE file, which I read directly (not just PyPI's classifier, which misleadingly reads 'Apache-2.0'), restricts commercial individual use and prohibits ALL use whatsoever by a legal entity/organization without Ricequant's written authorization (contact <email>; verified Chinese-language license text: non-commercial use follows Apache-2.0, any organizational use requires separate authorization). A real adoption blocker for this stack regardless of technical fit."
    },
    {
     "name": "Hikyuu",

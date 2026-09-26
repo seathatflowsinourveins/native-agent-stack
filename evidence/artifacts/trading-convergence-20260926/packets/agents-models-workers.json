@@ -159,13 +159,10 @@
   },
   {
    "name": "winner foundation-ai-memory: host memory records same-day switch to 2.4.1",
-   "claim": "This host's own memory index (workstation-sota-refresh-20260925 entry) records switching to ai-memory 2.4.1 the same day upstream published it.",
+   "claim": "<redacted: this check cites private host memory>",
    "verdict": "supported",
-   "note": "The user's MEMORY.md contains the line: \"[Workstation SOTA refresh 2026-09-25] -- rtk/markitdown/mcporter/ai-memory 2.4.1 switched (#291, #307); socraticode deferred >=10-01; ...\", matching the claim verbatim. manifests/stack.json's freshness note independently corroborates a 2.4.1 cutover on this host, though it dates the concrete WSL2 cutover to \"since 2026-09-26\" rather than 2026-09-25 -- a same-session/near-midnight-UTC nuance worth flagging, but the cited memory entry itself says what the claim says it says.",
-   "sources": [
-    "<private-memory> (workstation-sota-refresh-20260925 line, given verbatim in this session's system context)",
-    "manifests/stack.json (id=ai-memory, freshness field)"
-   ]
+   "note": "<redacted: this check cites private host memory>",
+   "sources": []
   },
   {
    "name": "winner foundation-socraticode: release freshness",
@@ -180,12 +177,10 @@
   },
   {
    "name": "winner foundation-socraticode: deliberate deferral",
-   "claim": "This host's memory (2026-09-25) records a deliberate decision to defer any new SocratiCode release until on/after 2026-10-01.",
+   "claim": "<redacted: this check cites private host memory>",
    "verdict": "supported",
-   "note": "MEMORY.md's workstation-sota-refresh-20260925 entry reads \"...socraticode deferred >=10-01; dagu held; ...\", matching the claim verbatim.",
-   "sources": [
-    "<private-memory> (workstation-sota-refresh-20260925 line)"
-   ]
+   "note": "<redacted: this check cites private host memory>",
+   "sources": []
   },
   {
    "name": "C1 Codex: official first-party SDK, used as this repo's worker",

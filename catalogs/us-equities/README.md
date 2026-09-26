@@ -35,7 +35,7 @@ repository records are registered in the decision index.
 
 The [September 26 trading research convergence](convergence-20260926.md) records 13 trading layers researched
 from the starred repositories, 8 awesome lists and per-layer candidate research. Each layer's proposal was
-challenged by a GPT-6 cross-family refutation with live search, and every vote quote is checked verbatim against
+challenged by a GPT-6 cross-family refutation with live search, and every vote quote is an exact span of
 the [retained vote texts](../../evidence/artifacts/trading-convergence-20260926/README.md). It is an input to
 the verdict wave next to [`manifest-20260926.json`](../sota-convergence/manifest-20260926.json); it selects
 nothing.

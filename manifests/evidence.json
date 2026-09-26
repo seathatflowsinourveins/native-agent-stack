@@ -12973,8 +12973,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "94f2eba417d719cdaafb97a3e3950886dd94b0d0ff01621ed8a1e25697ca1f8b",
-      "bytes": 17552
+      "sha256": "538b2f869b0ac9136e408d38cf4a0907c266121a747823ef08b69302f5a27cfc",
+      "bytes": 17544
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -13043,13 +13043,13 @@
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.json",
-      "sha256": "eaaa6be136302bc1b3f6bff26e67ee39b75551a2ec9711c7fc4d1f584e188014",
-      "bytes": 881249
+      "sha256": "d701676e332bb6ba437ae685f4a3270e15273745faf92a395317ccd29295fc85",
+      "bytes": 882438
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.md",
-      "sha256": "ac750c91cf07b9fc2f0eec32e3afe77dd54cfe9f4dcc01e14abedc77848fd261",
-      "bytes": 5990
+      "sha256": "fe8793fbd6b45629d8c5094cd13e764f9a881f5543d493d517f08e0b54de939c",
+      "bytes": 6343
     },
     {
       "path": "catalogs/us-equities/convergence-program/foundation.json",
@@ -34538,8 +34538,8 @@
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/README.md",
-      "sha256": "a973cbc47274143f7c307fe3bc28a3607013e042f1889316d2514dcd1a8b09c4",
-      "bytes": 1397
+      "sha256": "c01655f10961d888d66fbe0b65090a308c5542919742718cf46b31d22766d2d8",
+      "bytes": 1583
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/agents-models-workers--gpt-6-cached.md",
@@ -34648,13 +34648,13 @@
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/packets/agents-models-workers.json",
-      "sha256": "caffb4e02270428fd6132f073d5e62fc017775c665b9bc67a9c1f8c0aee6697d",
-      "bytes": 55472
+      "sha256": "2dfb087f7c27304dd5373d3c669c46d44b8ab477c9d4cbc6fb601ab20a6e33db",
+      "bytes": 54490
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/packets/backtesting-engine.json",
-      "sha256": "fb2e29654a9698c47b6d33037599f503037f6904ecefcc1377e99ca3cfcc0abc",
-      "bytes": 56743
+      "sha256": "80156cbbe487d8b8f0a6a392c05af11da9898de485a6b3219790740a9955bca8",
+      "bytes": 56730
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/packets/data-quality-orchestration.json",
@@ -34698,8 +34698,8 @@
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/packets/security-supply-chain.json",
-      "sha256": "13d979f9e87f0ff99be096a0ef024540ce19ae6bf3126e0c2458879fa4562437",
-      "bytes": 70342
+      "sha256": "198fb14949e857e7a95ab2a4de65be4fe812937711abd3d845489b0dec50e218",
+      "bytes": 70328
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/packets/storage-compute.json",

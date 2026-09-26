@@ -13,7 +13,7 @@ live-search vote, and 8 also have a cached-search vote. The candidate records us
 **What it is not.** Nothing here installs, promotes or re-pins a component. A disposition is an input to the
 verdict wave, not a selection. Each GPT-6 vote is one refutation attempt, not a panel.
 
-**Rule.** survives=false when any kept vote refutes the label or claim; true when at least one kept GPT-6 vote addresses it and none refutes; null (disposition *_unverified) when no kept GPT-6 vote addresses it. Dispositions follow manifest-20260923's vocabulary.
+**Rule.** survives=false when any kept vote has position refutes, meaning the vote says the label is wrong (for a rejection, that it should not have been rejected). A vote with position corrects fixes a fact or a claim but leaves the label standing and does not change survival. survives=true when at least one kept GPT-6 vote addresses it and none refutes; null (disposition *_unverified) when no kept GPT-6 vote addresses it. Dispositions follow manifest-20260923's vocabulary.
 
 | Layer | GPT-6 live | GPT-6 cached | Winners disputed | Candidates (survive / refuted / unverified) | Missed candidates | Corrections |
 |---|---|---|---|---|---|---|
@@ -31,7 +31,7 @@ verdict wave, not a selection. Each GPT-6 vote is one refutation attempt, not a 
 | storage-compute | needs_changes | — | none | 6 / 2 / 5 | 5 | 14 |
 | strategy-research | needs_changes | needs_changes | none | 13 / 2 / 0 | 5 | 24 |
 
-Totals: 95 candidates survive, 40 are refuted and 47 are unverified (no kept GPT-6 vote addressed them). Votes kept: 716; no vote was dropped by the verbatim-quote check.
+Totals: 95 candidates survive, 40 are refuted and 47 are unverified (no kept GPT-6 vote addressed them). Votes kept: 716; each quote is an exact span of the retained vote text (dropped: 0 not found, 0 split by sanitization).
 
 ## Corrections that touch the paper lane
 
@@ -44,7 +44,8 @@ Totals: 95 candidates survive, 40 are refuted and 47 are unverified (no kept GPT
   unchanged because `evaluate.py` pins 1.2.9, so it needs its own frozen experiment.
 - **strategy-research.** A live GPT-6 paper sweep (25 verified papers) found that the Mover v3 protocol
   describes ABJK 2022's sample as "large, liquid names". The coordinator re-verified from the manuscripts that
-  ABJK keeps common stocks above $1 and that LPS 2019 excludes microcaps. The correction is in Mover v3 round 18.
+  ABJK keeps common stocks above $1 and that LPS 2019 excludes microcaps. A text-only correction is proposed in Mover v3
+  round 18 (#360, under review).
   The two-sided test is unchanged.
 
 ## Critic gaps
@@ -54,7 +55,7 @@ Totals: 95 candidates survive, 40 are refuted and 47 are unverified (no kept GPT
 - **identity-provenance concurrency benchmark exercised ArcticDB outside its staged-write API**: open: rerun the Arctic arm with stage() and finalize_staged_data() before treating DVC's concurrency edge as settled
 - **OpenBao never compared with HashiCorp Vault**: open: record the comparison (BUSL-1.1 licence is the expected discriminator)
 - **trace backend (Tempo) evidence filed under a foundation layer only**: open: foundation-lane item; no trading row changes
-- **academic papers were not a deliberate discovery modality**: done for strategy-research: a live GPT-6 paper sweep returned 25 verified papers (evidence/artifacts/trading-convergence-20260926/papers-strategy.md). Its one direct protocol contradiction, the ABJK 2022 sample description, was re-verified against the manuscripts and is corrected in Mover v3 round 18. research-factors-ml has no paper pass yet.
+- **academic papers were not a deliberate discovery modality**: done for strategy-research: a live GPT-6 paper sweep returned 25 verified papers (evidence/artifacts/trading-convergence-20260926/papers-strategy.md). Its one direct protocol contradiction, the ABJK 2022 sample description, was re-verified against the manuscripts; a text-only correction is proposed in Mover v3 round 18 (PR #360, under review). research-factors-ml has no paper pass yet.
 - **workflow relay truncated three proposal payloads**: limitation: truncated fields are marked in the proposals; the mapper read full packets from files
 
 ## Limitations
