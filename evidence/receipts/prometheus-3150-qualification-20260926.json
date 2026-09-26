@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "id": "prometheus-3150-qualification-20260926",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-26T05:34:17Z",
+  "component_ids": [
+    "prometheus"
+  ],
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, Prometheus 3.15.0 was qualified against the running 3.14.0 and then switched into production. The release asset prometheus-3.15.0.linux-amd64.tar.gz (111,651,578 bytes) hashed to sha256 2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0, equal to the GitHub API asset digest and to the release's sha256sums.txt (sha256sum --check --strict: OK); the repository's unchanged observability/backends/install.py, run from a scratch copy beside a one-entry pins.json, verified it again and extracted it into a new tools/ecosystem-prometheus-3.15.0 prefix that is byte-identical to the archive, and prometheus and promtool report 3.15.0 at revision 5241a27fe3c6983549fccc32f6e65917408c63cd, the v3.15.0 tag commit. promtool 3.14.0 and 3.15.0 both passed check config and check rules (14 rules) on the live files. On copies of the live TSDB (115,828,843 bytes, 11 blocks plus WAL) with the live config minus `alerting`, 3.14.0 and 3.15.0 ran side by side on scratch loopback ports: each was ready in about 1 s, scraped the same seven live targets (all up), loaded 2 rule groups and 14 rules with health ok, reloaded on SIGHUP, logged no ERROR line and returned the same 7-series, 511-sample `up` query_range over the six hours before the copy (sha256 22d1cb61... in both). After 3.15.0 stopped, 3.14.0 opened the TSDB 3.15.0 had written, was ready in about 1 s, returned the same history and read the 5 self-scrape samples 3.15.0 had written. tests/test_observability_backends_alerts.py, now reading its promtool and amtool paths from observability/backends/pins.json, ran 18 tests OK with promtool 3.15.0. The unit observability/backends/configure.py renders with the 3.15.0 pin and the host's saved port overrides differs from the live unit only in the ExecStart prefix; that unit was installed, passed `systemd-analyze --user verify`, and ecosystem-prometheus.service was restarted at 2026-09-26T04:56:49Z. /-/ready answered 0.86 s after the restart call; buildinfo reads 3.15.0 at 5241a27f; the seven targets are up; 14 rules evaluate with health ok; the six-hour `up` history before the switch (7 series, 511 samples) hashes the same before and after; and the journal since the restart has no ERROR line. bin/prometheus and bin/promtool name the 3.15.0 prefix. At a read-back at 05:17:53Z the unit had NRestarts 0, the two alerts that fired before the switch (for endpoints this host does not run) were firing again with their original Alertmanager startsAt, and ntfy had no new message since 04:55Z.",
+  "limitations": [
+    "Not independently reviewed: the qualification, the switch and this receipt come from one worker session (Claude Opus 5.5); the refresh coordinator owns the independent-review round, and no cross-family review ran.",
+    "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the observation-inference winner pin prometheus 3.14.0 from the sealed 2026-09-22 layer-verdict packets. Receipts at 3.15.0 stay unbound until a new verdict wave re-records the layer.",
+    "Linux x86_64 only, one host. The pin lives in observability/backends/pins.json (linux-amd64); adoption/pins-linux-x86_64.json and adoption/pins-macos-arm64.json have no Prometheus entry. Nothing here is macOS evidence.",
+    "The rehearsal ran each arm for about 75 s plus a 20 s rollback start on a TSDB copied with cp while the live server wrote. No head block was compacted in that window, so a rollback after 3.15.0 has written its own compacted blocks is untested; the float chunk encoding stays XOR by default at v3.15.0 (stage/source-checks.txt), which is the source-level basis for expecting such blocks to stay readable.",
+    "Release notes were read from the release body; upstream tests were not run on this host. The PromQL changes and fixes can move rule results in edge cases; the host's 14 rules kept health ok and the same firing set.",
+    "No signature was verified: the release publishes checksums only, and the v3.15.0 tag is PGP-signed but GitHub reports it unverified (bad_email) and the signature was not checked locally.",
+    "The switch restarted the service: scrapes pause for about a second, and rules with `for` re-enter pending before their restored firing state; the read-back found the pre-switch firing set restored without a new notification.",
+    "Not aligned here: catalogs/us-equities/agents-operations.json and .md still name Prometheus v3.14.0 (trading-catalog alignment, as #310 did for ai-memory); observability/README.md describes the 2026-09-19 acceptance at 3.14.0; docs/stack.md is a 2026-09-19 snapshot."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; production paths under ~/.local/share/codex-ecosystem"
+  },
+  "data": {
+    "observed_at_utc": "2026-09-26",
+    "previous_version": "3.14.0",
+    "version": "3.15.0",
+    "switched": true,
+    "release": "https://github.com/prometheus/prometheus/releases/tag/v3.15.0",
+    "tag_commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+    "asset": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz",
+    "asset_sha256": "2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0",
+    "checksum_source": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/sha256sums.txt (sha256 023cab1e6b275ee1b8f5f64215a01d74bbb1b19c45183b7296ced4aa4532707b)",
+    "binary_sha256": {
+      "prometheus": "dac83d1d1007961de3b9ba624942c9af0c192ee3df262ac47ef390bcade71c65",
+      "promtool": "c736d55d3ccd959fe48329965fb5cb671d45585a9483954766448035100ff75c"
+    },
+    "install": "unchanged observability/backends/install.py (sha256 d87c47cfe1e728f3ca8b3eb5e3fa7031f553407b0ea9c649965c4fdaa6a3e8e6) from a scratch copy with a one-entry pins.json, --tools-root ~/.local/share/codex-ecosystem/tools",
+    "rehearsal": {
+      "arm A 3.14.0": "ready 1.04 s",
+      "arm B 3.15.0": "ready 1.02 s",
+      "rollback 3.14.0 on B's data": "ready 1.02 s",
+      "historical_up_6h": "7 series, 511 samples, identical in A, B and rollback"
+    },
+    "cutover": {
+      "restart_utc": "2026-09-26T04:56:49Z",
+      "ready_after_restart_s": 0.86,
+      "main_pid_changed": true,
+      "unit": "ExecStart prefix tools/ecosystem-prometheus-3.14.0 -> tools/ecosystem-prometheus-3.15.0 (configure.py render)",
+      "bin_links": "bin/prometheus and bin/promtool -> tools/ecosystem-prometheus-3.15.0"
+    },
+    "rollback": "put the 3.14.0 prefix back in the unit's ExecStart, systemctl --user daemon-reload, systemctl --user restart ecosystem-prometheus.service, relink bin/prometheus and bin/promtool to tools/ecosystem-prometheus-3.14.0 (kept)",
+    "overturn_when": "3.15.0 misbehaves on this host's rules or TSDB (for example a compaction or WAL error), a 3.15.x patch fixes a defect that matters here, or a verdict wave selects another metric store",
+    "artifacts": "evidence/artifacts/sota-refresh-20260926/prometheus/"
+  },
+  "provenance": [
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/cutover/readback.txt",
+      "sha256": "d87d419a92c7a3a813d341613713bd188838ae27f9781c223e1bafbd6a4501be",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/cutover/stack-commands.out",
+      "sha256": "2e549bd03bf9c6fc2031083d5b099d73cb3034f9d26799ff397b360aa21aed0f",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/cutover/switch-run.log",
+      "sha256": "3c292346f7e4898ee031c6098c6e614195f867bc052c6e6041f3bce301275172",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/cutover/switch.json",
+      "sha256": "4fbd9bd340b4639c3a276ceaa164b5d8ddf3b32fe12ee0feba5e2d4523cda20f",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/cutover/unit-diff.txt",
+      "sha256": "f0f110556dade798a6f8869c3af7b69e991e8c8c258bff3d03c3f3a7269ac793",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/rehearsal/raw-outputs.json",
+      "sha256": "ed3ad038d91b95f611bf185621296497d4089b0d215b846acb8ba1f90ffccc66",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/rehearsal/rehearsal.json",
+      "sha256": "679ebb604e70947966eca4ec59703dd4aa22d23656eb1a470716a1e5f038475b",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/rehearse.py",
+      "sha256": "298f3da94cf02d10baa0d8ed09a74bb9ddccbbb8124f2bcc69a3d55308527c2a",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/results.json",
+      "sha256": "2c2b5aa6501580864978da24e8c3a41a8a4e778620f0add6725ae7775ac88d72",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/checksum-check.txt",
+      "sha256": "3bc95a203024478409d7c8be5cb71aae1a7130cb8b7a8163cea046a379eaa4b4",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/install.log",
+      "sha256": "77484e385619ab4e622df5e10ffee373bba67123bb3f2d9b7b9415ae261b25f9",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/installation.json",
+      "sha256": "c1064e882dd7194cf07e6e75f6b3fcba46d08945809fce26d53996a8a233e6ba",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/installer-pins.json",
+      "sha256": "4574eb2527821c1d44b1a6b7555ae993c287175d418f36f9a7a08bf41de491f6",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/source-checks.txt",
+      "sha256": "f5f4baeb84ce5e3f99cb1dac7b94737585b2d85045661b741427ff1300763ec3",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/tag-v3.15.0.json",
+      "sha256": "ba8bb0e91b79ce32a6c8ad4db55840f683f2181fa20c62889f5f1cdf9601e6d7",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/versions.txt",
+      "sha256": "88c244e8bbd6dd1f1f87e6bd5f52aea47c6d95b68d16d3c66ef1a9ee9c20e6ea",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/switch.py",
+      "sha256": "ded427ca8854e439377917f11e88a6de78cf269069b7187afea883ee05f9b0b6",
+      "byte_identical_to_run_copy": true
+    }
+  ]
+}
