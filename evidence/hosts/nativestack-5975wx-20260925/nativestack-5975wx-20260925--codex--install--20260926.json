@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--codex--install--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "ca8e37f136ee26bf97b3b6c087ecea4d2306c3be",
+  "recorded_by": {
+    "identity_sha256": "1acdb6c10d2024f9f9d290019d4bb0894f1f115068419f1e575c32f8bf2925f7",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "codex",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "codex --version",
+      "exit": 0,
+      "duration_s": 0.048,
+      "output_sha256": "a2af91afbeed67d4d94d7ae88f4f7864866bb5923ab435c0955d779a3e8161f1",
+      "output_excerpt": "codex-cli 0.157.1\n"
+    },
+    {
+      "cmd": "codex features list | grep '^daemon_auto_start '",
+      "exit": 0,
+      "duration_s": 0.08,
+      "output_sha256": "555578eecff6ae64bb32d613d219ee11de348eb09de6d83f9d8b274cd936946c",
+      "output_excerpt": "daemon_auto_start                        stable             false\n"
+    },
+    {
+      "cmd": "n=$(ls -l /proc/[0-9]*/exe 2>/dev/null | grep -cF \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon/\"); echo \"processes running from CODEX_HOME/packages/app-server-daemon: $n\"; [ \"$n\" = 0 ]",
+      "exit": 0,
+      "duration_s": 0.007,
+      "output_sha256": "cb306b5a3a15fd55c01e06f4dd8b27cfc387905b11cabf0d8ca21de0b197141d",
+      "output_excerpt": "processes running from CODEX_HOME/packages/app-server-daemon: 0\n"
+    },
+    {
+      "cmd": "if test -e \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon\"; then echo \"CODEX_HOME/packages/app-server-daemon: present\"; false; else echo \"CODEX_HOME/packages/app-server-daemon: absent\"; fi",
+      "exit": 0,
+      "duration_s": 0.001,
+      "output_sha256": "469f136f5bb890a54412af27f2af1e31f3f597a1184fbd7d58f99089aed249cf",
+      "output_excerpt": "CODEX_HOME/packages/app-server-daemon: absent\n"
+    }
+  ],
+  "tool_versions": {
+    "codex": "0.157.1"
+  },
+  "observed_at_utc": "2026-09-26T14:34:12Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), after the coordinator switched Codex from 0.155.1 to 0.157.1 on 2026-09-26 with the data.switch commands of the qualification receipt codex-01571-qualification-20260926, the codex on PATH reports codex-cli 0.157.1; the daemon_auto_start feature, which the qualification found keeps a first interactive 0.157.x launch from installing and starting the self-updating app-server daemon, reads stable false; no process runs from CODEX_HOME/packages/app-server-daemon; and that directory is absent. Readiness only: a version call, a feature read and two absence checks are not functional acceptance. All four commands exit 0.",
+  "limitations": [
+    "Install stage: a version call, a feature-flag read and two absence checks show the switched build is on PATH with automatic background-server start off. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "Unbound by design: recorded with --component-version 0.157.1 --allow-unbound-version, because at this catalog_revision the codex winner pins in catalogs/landscape (native-clients, agent-sdks) still name 0.155.1, which the qualification receipt leaves to a verdict wave. Until those pins move, this receipt counts toward no status.",
+    "No codex exec or model turn ran for this receipt; the coordinator's post-switch gpt-6-astra exec probe is not part of it.",
+    "The account quota read (python3 -B scripts/codex_quota.py --json) is not part of this receipt: that script is not on origin/main at this catalog_revision, and every command here runs from the published checkout the receipt names.",
+    "The process and package checks read /proc and CODEX_HOME once, at recording time. That a later interactive launch starts no background server rests on the feature flag and the qualification's sandbox probe (evidence/artifacts/sota-refresh-20260926/codex/results/daemon.json), not on this receipt.",
+    "Recorded from a Claude Code session in a clean detached git worktree of this repository at origin/main ca8e37f1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T14:34:12Z",
+      "reviewer": {
+        "identity_sha256": "1acdb6c10d2024f9f9d290019d4bb0894f1f115068419f1e575c32f8bf2925f7",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "headless independent review 2026-09-26 (#348)",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T15:49:39Z",
+      "reviewer": {
+        "identity_sha256": "3830c889bac9eff7d5c66d0731e7d07e55155cc6f9b36c3ad6d7c34f7b3d3ee5",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

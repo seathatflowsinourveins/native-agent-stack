@@ -4,7 +4,7 @@
   build_args.py --work-dir W --sweep-id landscape-sweep-YYYYMMDD --date YYYY-MM-DD
                 [--layers id,id,... | --due-report report.json] [--smoke LAYER_ID]
                 [--stars PATH | --no-stars] [--gpt6-model gpt-6-astra] [--slots 3] [--lock-dir DIR]
-                [--skills-checked-at YYYY-MM-DD] [--no-embed] [--force]
+                [--quota-stop-percent PERCENT] [--skills-checked-at YYYY-MM-DD] [--no-embed] [--force]
 
 Needs <work-dir>/layers.json and <work-dir>/inputs/ from build_inputs.py. Writes into the work dir:
   templates.json         the repository templates with <<DATE>>, <<LAYER_COUNT>> and <<SKILLS_CHECKED_AT>> filled
@@ -12,13 +12,15 @@ Needs <work-dir>/layers.json and <work-dir>/inputs/ from build_inputs.py. Writes
   prompts_sha256.txt     sha256 of json.dumps(templates, sort_keys=True, ensure_ascii=False): the record's
                          prompts_sha256
   schemas/               discover, votes and critic (the workers' strict return schemas) and probe
-  codex_call.sh, codex_job.py, make_prompt.py
+  codex_call.sh, codex_job.py, make_prompt.py, codex_quota.py
                          the GPT-6 runtime the wrapper agents call, copied so a checkout change mid-run cannot
-                         alter a running sweep
+                         alter a running sweep (codex_quota.py is the checkout's scripts/codex_quota.py, the quota
+                         probe codex_job.py runs when codex.quota_stop_percent is set)
   prompts/gpt6-discover-<layer>.txt, prompts/gpt6-probe.txt
                          the first-round GPT-6 discovery prompts and a one-call lane probe
   staged.json            provenance (harness commit and file hashes, skills, prompts_sha256) and the GPT-6 settings
-                         codex_job.py reads (model, slots, lock dir)
+                         codex_job.py reads (model, slots, lock dir, and quota_stop_percent only when
+                         --quota-stop-percent is given: the quota gate is off by default)
   args.json              the Workflow args: {S, stars, sweep_id, T, schemas, layers: [{layer_id, catalog}], test?}
   sweep.embedded.js      sweep.js with its one `const A = args` line replaced by those args, launched as
                          Workflow({scriptPath: "<work-dir>/sweep.embedded.js"}) with no args, so the ~12 KB of
@@ -47,6 +49,7 @@ import make_prompt  # noqa: E402
 from sweep_common import REPO_ROOT, load_json, prompts_sha256, sha256_bytes, work_dir, write_json  # noqa: E402
 
 RUNTIME = ("codex_call.sh", "codex_job.py", "make_prompt.py")
+QUOTA_PROBE = REPO_ROOT / "scripts" / "codex_quota.py"  # staged beside codex_job.py as codex_quota.py
 SCHEMAS = ("discover", "votes", "critic", "probe")
 SKILLS_MANIFEST = "adoption/skills/manifest.json"
 # Every skill the templates name, in the order of the "Skills (...)" paragraph of templates.json "common". A test
@@ -144,7 +147,7 @@ def git_state(repo_root: Path) -> dict:
 
 def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: bool, stars, gpt6_model: str,
           slots: int, lock_dir, skills_checked_at: str | None, embed_script: bool, force: bool,
-          repo_root: Path = REPO_ROOT) -> dict:
+          repo_root: Path = REPO_ROOT, quota_stop_percent: float | None = None) -> dict:
     jobs = [path.name for path in (work / "gpt6").glob("*") if path.is_dir()] if (work / "gpt6").is_dir() else []
     if jobs and not force:
         raise ValueError(f"{work}/gpt6 already holds {len(jobs)} job(s) from an earlier run; move gpt6/ and prompts/ "
@@ -167,6 +170,7 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
         (work / name).mkdir(exist_ok=True)
     for name in RUNTIME:
         shutil.copy2(HERE / name, work / name)
+    shutil.copy2(QUOTA_PROBE, work / QUOTA_PROBE.name)
     write_json(work / "templates.json", frozen)
     for name, schema in schemas.items():
         write_json(work / "schemas" / f"{name}.json", schema)
@@ -186,11 +190,15 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
     codex = {"model": gpt6_model, "effort": "max", "slots": slots}
     if lock_dir:
         codex["lock_dir"] = str(Path(lock_dir).expanduser().resolve())
+    if quota_stop_percent is not None:
+        codex["quota_stop_percent"] = quota_stop_percent
     harness_files = sorted([*RUNTIME, "sweep.js", "templates.json", *(f"schemas/{name}.json" for name in SCHEMAS)])
     staged = {"schema_version": 1, "kind": "landscape_sweep_staging", "sweep_id": sweep_id, "date": run_date,
               "test": test, "layers": [layer["layer_id"] for layer in selected], "prompts_sha256": digest,
               "harness": {"path": "tools/sota-convergence/landscape-sweep", **git_state(repo_root),
-                          "files": {name: sha256_bytes((HERE / name).read_bytes()) for name in harness_files}},
+                          "files": {name: sha256_bytes((HERE / name).read_bytes()) for name in harness_files},
+                          "quota_probe": {"path": "scripts/codex_quota.py",
+                                          "sha256": sha256_bytes(QUOTA_PROBE.read_bytes())}},
               "skills": {"manifest": SKILLS_MANIFEST, "checked_at": manifest.get("checked_at"),
                          "named": list(TEMPLATE_SKILLS),
                          "codex_enabled": [name for name in TEMPLATE_SKILLS if pinned[name].get("codex_enabled")]},
@@ -221,6 +229,9 @@ def main(argv=None) -> int:
     parser.add_argument("--gpt6-model", default="gpt-6-astra")
     parser.add_argument("--slots", type=int, default=3, help="concurrent codex jobs per lock dir (default 3)")
     parser.add_argument("--lock-dir", help="semaphore directory; share one across sweeps that run at the same time")
+    parser.add_argument("--quota-stop-percent", type=float, metavar="PERCENT",
+                        help="refuse each GPT-6 job like a usage limit once the Codex account's used_percent reaches "
+                             "PERCENT (scripts/codex_quota.py --gate); off by default")
     parser.add_argument("--skills-checked-at", help=f"override {SKILLS_MANIFEST} checked_at (reproduce a past run)")
     parser.add_argument("--no-embed", action="store_true")
     parser.add_argument("--force", action="store_true")
@@ -233,6 +244,8 @@ def main(argv=None) -> int:
             raise ValueError(f"--sweep-id must match {SWEEP_ID.pattern}")
         if args.slots < 1:
             raise ValueError("--slots must be at least 1")
+        if args.quota_stop_percent is not None and not 0 < args.quota_stop_percent <= 100:
+            raise ValueError("--quota-stop-percent must be above 0 and at most 100")
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", args.gpt6_model):
             raise ValueError("--gpt6-model is not a model name")
         if args.skills_checked_at:
@@ -249,7 +262,7 @@ def main(argv=None) -> int:
         summary = stage(work, sweep_id=args.sweep_id, run_date=args.date, selected=selected, test=bool(args.smoke),
                         stars=stars_path, gpt6_model=args.gpt6_model, slots=args.slots, lock_dir=args.lock_dir,
                         skills_checked_at=args.skills_checked_at, embed_script=not args.no_embed, force=args.force,
-                        repo_root=args.repo_root.resolve())
+                        repo_root=args.repo_root.resolve(), quota_stop_percent=args.quota_stop_percent)
     except (ValueError, OSError, KeyError) as error:
         print(f"build_args.py: {error}", file=sys.stderr)
         return 2

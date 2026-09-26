@@ -6,7 +6,7 @@
   codex_call.sh [--work-dir DIR] result <job-id>              one JSON line: status, exit, started, finished,
                                                               usage, usage_status, output_text, stderr_tail,
                                                               limit, limit_marker, model, effort, codex_version,
-                                                              inputs, attempts
+                                                              inputs, attempts, quota
 
 `start` detaches one job and returns at once. The job waits for a semaphore slot (an fcntl lock on
 <lock dir>/slot-<n>, held by the runner and by codex itself, so a killed runner never frees a slot early), then runs
@@ -30,6 +30,16 @@ stdout (openai/codex rust-v0.155.1, codex-rs/exec/src/exec_events.rs and event_p
 only when no turn completed, an ERROR/Error line on stderr. Model content (item.* events: messages, web results,
 cited pages) never counts: on 2026-09-26 a grep of the whole event stream matched a cited README's "Usage
 limitation" and set the marker falsely.
+
+Quota gate (optional; off unless staged.json codex.quota_stop_percent is set, a number above 0 and at most 100):
+after a job gets its slot and before codex starts, the runner runs `codex_quota.py --json --gate <percent>` (the
+copy build_args.py staged beside this file, else the checkout's scripts/codex_quota.py), which reads the account's
+usage snapshot through `codex app-server` (account/rateLimits/read) and exits 3 when a window's used_percent reaches
+the percent, rateLimitReachedType is set or ordinaryUsageAllowed is false. Exit 3 is refused like a usage limit: the
+job ends with exit 3 before codex starts, and <work-dir>/LIMIT (when absent) and the job's stderr.txt get the
+reason, so the coordinator can tell the user to reset. Every probe is recorded in <job>/quota.json (`result` gives
+its summary as `quota`); a probe that fails (no codex, timeout after codex.quota_timeout_s, default 30 s, an error
+answer, a missing script) is recorded and never blocks the job.
 
 A job is bound to its inputs: <job>/inputs.json holds the sha256 of its prompt and schema, the model and the effort.
 A job whose attempt finished with exit 0 for the same inputs is not rerun ("already done"). Any other earlier
@@ -63,7 +73,10 @@ HERE = Path(__file__).resolve().parent
 STAGED = "staged.json"
 DEFAULT_MODEL = "gpt-6-astra"
 EFFORT = "max"
-DEFAULTS = {"slots": 3, "timeout_s": 3000.0, "wait_poll_s": 10.0, "slot_poll_s": 5.0, "kill_grace_s": 10.0}
+DEFAULTS = {"slots": 3, "timeout_s": 3000.0, "wait_poll_s": 10.0, "slot_poll_s": 5.0, "kill_grace_s": 10.0,
+            "quota_timeout_s": 30.0}
+QUOTA_SCRIPT = "codex_quota.py"
+QUOTA_BACKSTOP_S = 30.0  # beyond the probe's own deadline, for a probe that itself hangs
 LIMIT_PHRASE = re.compile(r"hit your usage limit", re.IGNORECASE)
 # Codex's own error lines: "ERROR: ...", "Error: ..." (eprintln) or a tracing record "<timestamp> ERROR <target>: ...".
 STDERR_ERROR_LINE = re.compile(r"^(?:\S+\s+)?(?:ERROR|Error)\b")
@@ -73,7 +86,7 @@ JOB_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
 MODEL_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
 # Everything one attempt writes; an earlier attempt's files move together to attempts/<n>/.
 ATTEMPT_FILES = ("events.jsonl", "stderr.txt", "last.json", "started", "finished", "exit", "slot", "model",
-                 "codex_version", "done", "prompt.txt", "schema.json", "inputs.json", "runner.log")
+                 "codex_version", "done", "prompt.txt", "schema.json", "inputs.json", "runner.log", "quota.json")
 EXIT_LIMIT, EXIT_TIMEOUT, EXIT_NO_CODEX, EXIT_REFUSED = 3, 124, 127, 2
 
 
@@ -125,6 +138,12 @@ def settings(base: Path) -> dict:
     out["model"] = str(staged.get("model") or DEFAULT_MODEL)
     if not MODEL_NAME.fullmatch(out["model"]):
         raise UsageError(f"codex.model {out['model']!r} is not a model name")
+    stop = staged.get("quota_stop_percent")
+    if stop is not None and (isinstance(stop, bool) or not isinstance(stop, (int, float)) or not 0 < stop <= 100):
+        raise UsageError(f"codex.quota_stop_percent {stop!r} must be a number above 0 and at most 100 (or absent)")
+    out["quota_stop_percent"] = None if stop is None else float(stop)
+    if not 0 < out["quota_timeout_s"] <= 600:
+        raise UsageError("codex.quota_timeout_s must be above 0 and at most 600")
     return out
 
 
@@ -302,6 +321,9 @@ def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
         if changed:
             retire(directory)  # a refused start must not leave another claim's output as this job's result
         print(f"LIMIT marker present; refusing to start {job}")
+        reason = limit_reason(base)
+        if reason:
+            print(f"LIMIT: {reason}")
         return EXIT_LIMIT
     directory.mkdir(parents=True, exist_ok=True)
     lock_fd = open_lock(directory / "job.lock")
@@ -367,6 +389,81 @@ def codex_version(codex: str) -> str | None:
     return lines[0].strip() if done.returncode == 0 and lines else None
 
 
+def quota_script(script_dir: Path = HERE) -> Path | None:
+    """The copy build_args.py staged beside this file; in the checkout (no staged.json here), scripts/codex_quota.py."""
+    staged = script_dir / QUOTA_SCRIPT
+    if staged.is_file():
+        return staged
+    if (script_dir / STAGED).is_file() or len(script_dir.parents) <= 2:
+        return None  # a staged runner uses only its own frozen copy
+    checkout = script_dir.parents[2] / "scripts" / QUOTA_SCRIPT
+    return checkout if checkout.is_file() else None
+
+
+def quota_gate(base: Path, directory: Path, config: dict) -> str | None:
+    """Run the quota probe with --gate and record it in <job>/quota.json; the reason when the gate is reached, else
+    None. A failed probe is recorded and never blocks the job."""
+    percent = config["quota_stop_percent"]
+    record = {"checked_at": utc_now(), "stop_percent": percent, "status": "probe_failed", "exit": None,
+              "report": None}
+    script = quota_script()
+    if script is None:
+        record["error"] = f"{QUOTA_SCRIPT} is neither beside the runner nor in the checkout's scripts/"
+    else:
+        try:
+            done = subprocess.run([sys.executable, "-B", str(script), "--json", "--gate", repr(float(percent)),
+                                   "--timeout", repr(float(config['quota_timeout_s']))],
+                                  cwd=str(base / "empty"), stdin=subprocess.DEVNULL, capture_output=True, text=True,
+                                  timeout=config["quota_timeout_s"] + QUOTA_BACKSTOP_S, env=codex_env(), check=False)
+            lines = (done.stdout or "").strip().splitlines()
+            try:
+                report = json.loads(lines[-1]) if lines else None
+            except ValueError:
+                report = None
+            record.update(exit=done.returncode, report=report if isinstance(report, dict) else None)
+            if done.returncode in (0, 3) and record["report"] is not None:
+                record["status"] = "gate" if done.returncode == 3 else "ok"
+            else:
+                error = (record["report"] or {}).get("error")
+                record["error"] = (f"{error.get('stage')}: {error.get('message')}" if isinstance(error, dict)
+                                   else (done.stderr or "").strip()[-400:] or f"exit {done.returncode}")
+        except subprocess.TimeoutExpired:
+            record["error"] = f"the quota probe did not finish within {config['quota_timeout_s'] + QUOTA_BACKSTOP_S:g} s"
+        except (OSError, subprocess.SubprocessError) as error:
+            record["error"] = f"the quota probe could not run ({type(error).__name__})"
+    write_atomic(directory / "quota.json", json.dumps(record, sort_keys=True) + "\n")
+    if record["status"] != "gate":
+        return None
+    reasons = ((record["report"] or {}).get("gate") or {}).get("reasons") or []
+    return "; ".join(str(reason) for reason in reasons) or "the quota gate was reached"
+
+
+def quota_summary(directory: Path) -> dict | None:
+    record = read_json(directory / "quota.json")
+    if not isinstance(record, dict):
+        return None
+    report = record.get("report") if isinstance(record.get("report"), dict) else {}
+    return {"status": record.get("status"), "stop_percent": record.get("stop_percent"),
+            "checked_at": record.get("checked_at"), "used_percent": report.get("used_percent"),
+            "resets_at_utc": report.get("resets_at_utc"),
+            "reasons": (report.get("gate") or {}).get("reasons") if isinstance(report.get("gate"), dict) else None,
+            "error": record.get("error")}
+
+
+def mark_limit(base: Path, text: str) -> None:
+    """Create <work-dir>/LIMIT holding text; an existing marker (another job's reason, a real limit) is kept."""
+    try:
+        fd = os.open(base / "LIMIT", os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+    except FileExistsError:
+        return
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+        handle.write(text + "\n")
+
+
+def limit_reason(base: Path) -> str:
+    return " ".join((read(base / "LIMIT") or "").split())[:400]
+
+
 def group_alive(pgid: int) -> bool:
     try:
         os.killpg(pgid, 0)
@@ -408,9 +505,21 @@ def run(base: Path, job: str) -> int:
             return 0
     slot_fd, slot = acquire_slot(base, config)
     if slot_fd is None or (base / "LIMIT").exists():
-        write_atomic(directory / "stderr.txt", "LIMIT marker present; the job did not start\n")
+        reason = limit_reason(base)
+        write_atomic(directory / "stderr.txt", "LIMIT marker present; the job did not start"
+                     + (f" ({reason})" if reason else "") + "\n")
         finish(directory, EXIT_LIMIT)
         return EXIT_LIMIT
+    if config["quota_stop_percent"] is not None:
+        (base / "empty").mkdir(exist_ok=True)
+        reason = quota_gate(base, directory, config)
+        if reason is not None:
+            text = (f"quota gate: {reason}; codex.quota_stop_percent {config['quota_stop_percent']:g}; checked "
+                    f"{utc_now()} before {job} started")
+            mark_limit(base, text)
+            write_atomic(directory / "stderr.txt", text + "\n")
+            finish(directory, EXIT_LIMIT)
+            return EXIT_LIMIT
     write_atomic(directory / "started", utc_now() + "\n")
     write_atomic(directory / "slot", f"{slot}\n")
     write_atomic(directory / "model", config["model"] + "\n")
@@ -490,6 +599,7 @@ def result(base: Path, job: str) -> dict:
     out["inputs"] = read_json(directory / "inputs.json")
     out["attempts"] = [attempt_summary(path) for path in sorted(
         (p for p in (directory / "attempts").glob("*") if p.name.isdigit()), key=lambda p: int(p.name))]
+    out["quota"] = quota_summary(directory)
     return out
 
 

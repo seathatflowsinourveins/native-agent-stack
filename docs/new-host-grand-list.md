@@ -54,7 +54,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 
 | Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Agent SDKs and runtime workers | retain | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 12 / 14 |
+| Agent SDKs and runtime workers | retain | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.157.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 12 / 14 |
 | CI and supply chain | retain | `zizmor` | 1.30.1 | native_proven | host_verified | untested | — | 9 / 14 |
 |  |  | `syft` | 1.52.0 | native_proven | host_verified | untested | — |  |
 |  |  | `candidate:actions-attest` | unpinned | native_proven | accepted | untested | — |  |
@@ -77,7 +77,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | host_verified, bootstrap 0.14.1 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation, token-efficiency | 12 / 14 |
 |  |  | `mcp-inspector` | 2.7.0 | native_proven | host_verified | untested | — |  |
 | Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.281 | untested, bootstrap 2.1.281 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 9 / 14 |
-|  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency |  |
+|  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.157.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency |  |
 | Observation and optional inference | keep_but_compare | `opentelemetry-collector-contrib` | 0.161.0 | synthetic | host_verified | untested | observability | 8 / 11 |
 |  |  | `prometheus` | 3.14.0 | synthetic | host_verified | untested | observability |  |
 |  |  | `loki` | 3.7.8 | synthetic | host_verified | untested | observability |  |

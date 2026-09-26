@@ -324,7 +324,7 @@ At `v2026.09.26` macOS has no rtk pin, and that script prints no reminder.
 `socraticode` is installed with `--ignore-scripts` (the pin's own
 `ignore_scripts: true` field, read by the script's `install_npm`), the same
 convention [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions)
-documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.25.2`,
+documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.157.1 on Linux; the macOS pin stays 0.155.1). It changed after `v2026.09.25.2`,
 adding the identical entry there too (same version,
 url, sha256 and `--ignore-scripts`), completing the token-efficiency profile's Linux pin
 coverage alongside new `repomix`, `toon`, `headroom`, `ccusage` and `serena`

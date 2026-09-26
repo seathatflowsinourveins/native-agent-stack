@@ -259,6 +259,8 @@ class PinsSchemaTests(unittest.TestCase):
     MAC_PIN_LAGS_LINUX = {
         "ai-memory": ("2.3.2", "2.4.1", "evidence/receipts/ai-memory-241-qualification-20260925.json"),
         "mcporter": ("0.13.13", "0.14.1", "evidence/receipts/mcporter-0141-qualification-20260925.json"),
+        # Linux switched 2026-09-26; the Mac keeps 0.155.1 until its own qualification (the receipt's limitation).
+        "codex": ("0.155.1", "0.157.1", "evidence/receipts/codex-01571-qualification-20260926.json"),
     }
 
     def test_shared_components_keep_the_linux_pinned_version(self):

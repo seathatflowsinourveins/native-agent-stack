@@ -450,8 +450,12 @@ class BuildArgsTests(unittest.TestCase):
         for name in build_args.RUNTIME:
             self.assertEqual((work / name).read_bytes(), (HARNESS / name).read_bytes())
         self.assertTrue(os.stat(work / "codex_call.sh").st_mode & stat.S_IXUSR)
+        probe = (ROOT / "scripts" / "codex_quota.py").read_bytes()
+        self.assertEqual((work / "codex_quota.py").read_bytes(), probe)
         staged = json.loads((work / "staged.json").read_text())
-        self.assertEqual(staged["codex"], {"model": "gpt-6-astra", "effort": "max", "slots": 3})
+        self.assertEqual(staged["codex"], {"model": "gpt-6-astra", "effort": "max", "slots": 3})  # no quota gate
+        self.assertEqual(staged["harness"]["quota_probe"], {"path": "scripts/codex_quota.py",
+                                                            "sha256": hashlib.sha256(probe).hexdigest()})
         self.assertEqual(staged["prompts_sha256"], summary["prompts_sha256"])
         self.assertEqual(staged["harness"]["files"]["sweep.js"],
                          hashlib.sha256((HARNESS / "sweep.js").read_bytes()).hexdigest())
@@ -522,6 +526,19 @@ FAKE_CODEX = """#!{python}
 import json, os, sys, time
 if sys.argv[1:] == ["--version"]:
     print("codex-cli 0.0.0-fixture")
+    sys.exit(0)
+if sys.argv[1:] == ["-c", 'sandbox_mode="read-only"', "app-server"]:  # the quota probe: initialize, initialized, account/rateLimits/read
+    quota = json.load(open(os.environ["FAKE_CODEX_CONFIG"])).get("quota") or {{}}
+    if quota.get("log"):
+        with open(quota["log"], "a") as log:
+            log.write("probe\\n")
+    for line in sys.stdin:
+        msg = json.loads(line)
+        if msg.get("method") == "initialize":
+            print(json.dumps({{"id": msg["id"], "result": {{"userAgent": "fixture"}}}}), flush=True)
+        elif msg.get("method") == "account/rateLimits/read":
+            key = "error" if "error" in quota else "result"
+            print(json.dumps({{"id": msg["id"], key: quota.get(key)}}), flush=True)
     sys.exit(0)
 config = json.load(open(os.environ["FAKE_CODEX_CONFIG"]))
 stdin, null = os.fstat(0), os.stat(os.devnull)
@@ -815,6 +832,122 @@ class RunnerTests(RunnerCase):
             self.assertEqual(codex_job.limit_error(directory), expected, (stderr, events))
 
 
+def quota_answer(used, reached=None):
+    """An account/rateLimits/read result (openai/codex app-server-protocol v2 GetAccountRateLimitsResponse)."""
+    snapshot = {"limitId": "codex", "limitName": None, "normalModelSlug": None,
+                "primary": {"usedPercent": used, "windowDurationMins": 10080, "resetsAt": 1790990880},
+                "secondary": None, "credits": None, "individualLimit": None, "spendControlReached": None,
+                "planType": "prolite", "rateLimitReachedType": reached}
+    return {"ordinaryUsageAllowed": True, "rateLimits": snapshot, "rateLimitsByLimitId": {"codex": snapshot},
+            "rateLimitResetCredits": {"availableCount": 1, "credits": None}, "accountId": "acct-fixture"}
+
+
+class QuotaGateTests(RunnerCase):
+    def test_the_gate_is_off_by_default(self):
+        probes = self.bin / "probes.log"
+        result = self.job("gpt6-probe", last=LAST, events=[COMPLETED],
+                          quota={"log": str(probes), "result": quota_answer(99)})
+        self.assertEqual((result["exit"], result["limit_marker"], result["quota"]), (0, False, None))
+        self.assertFalse(probes.exists())
+
+    def test_below_the_stop_percent_the_job_runs_and_the_probe_is_recorded(self):
+        self.settings({"quota_stop_percent": 95})
+        probes = self.bin / "probes.log"
+        result = self.job("gpt6-probe", last=LAST, events=[COMPLETED],
+                          quota={"log": str(probes), "result": quota_answer(63)})
+        self.assertEqual((result["exit"], result["limit_marker"]), (0, False))
+        self.assertEqual(probes.read_text().count("probe"), 1)
+        self.assertEqual({k: result["quota"][k] for k in ("status", "stop_percent", "used_percent", "resets_at_utc")},
+                         {"status": "ok", "stop_percent": 95.0, "used_percent": 63,
+                          "resets_at_utc": "2026-10-03T01:28Z"})
+        self.assertTrue((self.bin / "record.json").exists())  # codex exec ran
+        self.assertNotIn("acct-fixture", (self.work / "gpt6" / "gpt6-probe" / "quota.json").read_text())
+
+    def test_the_stop_percent_keeps_its_precision(self):
+        # GPT-6 review of #348: '{:g}' turned 95.00001 into 95 and refused a snapshot at exactly 95.
+        self.settings({"quota_stop_percent": 95.00001})
+        result = self.job("gpt6-precise", last=LAST, events=[COMPLETED], quota={"result": quota_answer(95)})
+        self.assertEqual((result["exit"], result["limit_marker"]), (0, False))
+        self.assertEqual(result["quota"]["status"], "ok")
+
+    def test_reaching_the_stop_percent_refuses_like_a_usage_limit(self):
+        self.settings({"quota_stop_percent": 95})
+        result = self.job("gpt6-fit-alpha", last=LAST, events=[COMPLETED], quota={"result": quota_answer(96)})
+        self.assertEqual((result["exit"], result["limit"], result["limit_marker"], result["started"]),
+                         (3, False, True, None))
+        self.assertFalse((self.bin / "record.json").exists())  # codex exec never started
+        limit = (self.work / "LIMIT").read_text()
+        self.assertTrue(limit.startswith("quota gate: primary window 96% used >= 95% (window 10080 min, resets "
+                                         "2026-10-03T01:28Z); codex.quota_stop_percent 95; checked "), limit)
+        self.assertIn("before gpt6-fit-alpha started", limit)
+        self.assertIn("quota gate: primary window 96%", result["stderr_tail"])
+        self.assertEqual((result["quota"]["status"], result["quota"]["reasons"][0][:30]),
+                         ("gate", "primary window 96% used >= 95%"))
+        refused = self.call("start", "gpt6-fit-beta", self.prompt, self.schema)
+        self.assertEqual(refused.returncode, 3)
+        self.assertEqual(refused.stdout.splitlines()[0], "LIMIT marker present; refusing to start gpt6-fit-beta")
+        self.assertTrue(refused.stdout.splitlines()[1].startswith("LIMIT: quota gate: primary window 96%"))
+        # After the user's reset the coordinator removes LIMIT; the job runs and the refused attempt stays counted.
+        (self.work / "LIMIT").unlink()
+        rerun = self.job("gpt6-fit-alpha", last=LAST, events=[COMPLETED], quota={"result": quota_answer(4)})
+        self.assertEqual((rerun["exit"], rerun["quota"]["used_percent"]), (0, 4))
+        self.assertEqual([(a["attempt"], a["exit"], a["usage_status"]) for a in rerun["attempts"]],
+                         [(1, 3, "unavailable")])
+        kept = json.loads((self.work / "gpt6" / "gpt6-fit-alpha" / "attempts" / "1" / "quota.json").read_text())
+        self.assertEqual(kept["status"], "gate")
+
+    def test_a_limit_flag_reaches_the_gate_below_the_percent(self):
+        self.settings({"quota_stop_percent": 95})
+        result = self.job("gpt6-flagged", quota={"result": quota_answer(10, reached="rate_limit_reached")})
+        self.assertEqual(result["exit"], 3)
+        self.assertIn("rateLimitReachedType rate_limit_reached", (self.work / "LIMIT").read_text())
+
+    def test_an_existing_marker_keeps_its_reason(self):
+        self.settings({"quota_stop_percent": 95})
+        codex_job.mark_limit(self.work, "first reason")
+        codex_job.mark_limit(self.work, "second reason")
+        self.assertEqual((self.work / "LIMIT").read_text(), "first reason\n")
+
+    def test_a_failed_probe_is_recorded_and_never_blocks_the_job(self):
+        self.settings({"quota_stop_percent": 95, "quota_timeout_s": 5})
+        error = {"code": -32600, "message": "codex account authentication required to read rate limits"}
+        result = self.job("gpt6-probe", last=LAST, events=[COMPLETED], quota={"error": error})
+        self.assertEqual((result["exit"], result["limit_marker"]), (0, False))
+        self.assertEqual(result["quota"]["status"], "probe_failed")
+        # The server's text is never recorded (backend errors can carry account ids).
+        self.assertEqual(result["quota"]["error"], "account/rateLimits/read: the server answered with an error")
+        self.assertNotIn(error["message"], (self.work / "gpt6" / "gpt6-probe" / "quota.json").read_text())
+        self.assertTrue((self.bin / "record.json").exists())
+
+    def test_a_missing_probe_is_recorded_and_never_blocks_the_job(self):
+        staged = temp_dir(self)
+        write_json(staged / "staged.json", {"codex": {}})
+        self.assertIsNone(codex_job.quota_script(staged))  # a staged runner never reaches into another checkout
+        (staged / "codex_quota.py").write_text("", encoding="utf-8")
+        self.assertEqual(codex_job.quota_script(staged), staged / "codex_quota.py")
+        self.assertEqual(codex_job.quota_script(HARNESS), ROOT / "scripts" / "codex_quota.py")
+        directory = self.work / "gpt6" / "unit"
+        directory.mkdir(parents=True)
+        (self.work / "empty").mkdir(exist_ok=True)
+        config = {"quota_stop_percent": 95.0, "quota_timeout_s": 5.0}
+        original = codex_job.quota_script
+        codex_job.quota_script = lambda: None
+        self.addCleanup(setattr, codex_job, "quota_script", original)
+        self.assertIsNone(codex_job.quota_gate(self.work, directory, config))
+        record = json.loads((directory / "quota.json").read_text())
+        self.assertEqual(record["status"], "probe_failed")
+        self.assertIn("codex_quota.py", record["error"])
+
+    def test_bad_stop_percents_are_refused_before_anything_changes(self):
+        for bad in (0, 101, "95", True):
+            with self.subTest(bad):
+                self.settings({"quota_stop_percent": bad})
+                done = self.call("start", "gpt6-x", self.prompt, self.schema)
+                self.assertEqual(done.returncode, 2)
+                self.assertIn("quota_stop_percent", done.stderr)
+                self.assertFalse((self.work / "gpt6" / "gpt6-x").exists())
+
+
 class ShellTests(RunnerCase):
     def test_bash_syntax(self):
         done = run(["bash", "-n", HARNESS / "codex_call.sh"])
@@ -845,6 +978,25 @@ class ShellTests(RunnerCase):
         self.assertFalse((self.work / "gpt6").exists())
         prompt = run([sys.executable, work / "make_prompt.py", "discover", work / "inputs/alpha.json"], env=env)
         self.assertEqual(prompt.stdout, (work / "prompts/gpt6-discover-alpha.txt").read_text())
+
+    def test_staged_quota_gate_uses_the_staged_probe(self):
+        work = stage_work(self, ("alpha",))
+        self.assertEqual(build(work, "--quota-stop-percent", "90").returncode, 0)
+        staged = json.loads((work / "staged.json").read_text())
+        self.assertEqual(staged["codex"]["quota_stop_percent"], 90.0)
+        write_json(work / "staged.json", {**staged, "codex": {**staged["codex"], "wait_poll_s": 0.05,
+                                                             "slot_poll_s": 0.05}})
+        self.fake(last=LAST, quota={"result": quota_answer(91)})
+        started = run(["bash", work / "codex_call.sh", "start", "gpt6-probe", work / "prompts/gpt6-probe.txt",
+                       work / "schemas/probe.json"], env=self.env)
+        self.assertEqual(started.returncode, 0, started.stderr)
+        run(["bash", work / "codex_call.sh", "wait", "gpt6-probe", "20"], env=self.env)
+        self.assertEqual((work / "gpt6/gpt6-probe/exit").read_text().strip(), "3")
+        self.assertIn("primary window 91% used >= 90%", (work / "LIMIT").read_text())
+        for bad in ("0", "100.5", "nan"):
+            done = build(stage_work(self, ("alpha",)), "--quota-stop-percent", bad)
+            self.assertEqual(done.returncode, 2, bad)
+            self.assertIn("--quota-stop-percent", done.stderr)
 
 
 # --------------------------------------------------------------------------- convert
