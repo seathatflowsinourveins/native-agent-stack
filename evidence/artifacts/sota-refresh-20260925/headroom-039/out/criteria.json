@@ -1,0 +1,36 @@
+{
+ "0.39.0": {
+  "tools_exact": true,
+  "A_hash_sha256_24": true,
+  "B_hash_sha256_24": true,
+  "A_retrieve_byte_exact": true,
+  "B_retrieve_byte_exact": true,
+  "B_compressed_lt_original": true,
+  "B_transforms_not_empty_or_noop": true,
+  "A_compressed_le_original": true,
+  "A_no_router_search": true,
+  "A_timestamps_verbatim": true,
+  "A_nsr_anomaly_in_compressed": true,
+  "unknown_hash_content_not_found": true,
+  "stats_compressions_2": true,
+  "A_row_lines_verbatim(extra)": true,
+  "ALL_REFUTER_CRITERIA": true
+ },
+ "0.37.0": {
+  "tools_exact": true,
+  "A_hash_sha256_24": true,
+  "B_hash_sha256_24": true,
+  "A_retrieve_byte_exact": true,
+  "B_retrieve_byte_exact": true,
+  "B_compressed_lt_original": true,
+  "B_transforms_not_empty_or_noop": true,
+  "A_compressed_le_original": true,
+  "A_no_router_search": false,
+  "A_timestamps_verbatim": true,
+  "A_nsr_anomaly_in_compressed": true,
+  "unknown_hash_content_not_found": true,
+  "stats_compressions_2": true,
+  "A_row_lines_verbatim(extra)": true,
+  "ALL_REFUTER_CRITERIA": false
+ }
+}

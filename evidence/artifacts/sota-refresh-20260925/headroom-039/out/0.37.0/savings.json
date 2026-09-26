@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "path": "<scratchpad>/sota-refresh/impl-wave2/headroom/ws-0.37.0/savings_events.jsonl",
+  "top_model": "unknown",
+  "lifetime": {
+    "tokens_saved": 41163,
+    "tokens_before": 55884,
+    "cost_usd": 0.123489,
+    "calls": 2,
+    "savings_percent": 73.7
+  },
+  "windows": {
+    "today": {
+      "tokens_saved": 41163,
+      "tokens_before": 55884,
+      "cost_usd": 0.123489,
+      "calls": 2,
+      "savings_percent": 73.7
+    },
+    "last_7_days": {
+      "tokens_saved": 41163,
+      "tokens_before": 55884,
+      "cost_usd": 0.123489,
+      "calls": 2,
+      "savings_percent": 73.7
+    },
+    "last_30_days": {
+      "tokens_saved": 41163,
+      "tokens_before": 55884,
+      "cost_usd": 0.123489,
+      "calls": 2,
+      "savings_percent": 73.7
+    }
+  },
+  "by_model": [
+    {
+      "model": "unknown",
+      "tokens_saved": 41163,
+      "tokens_before": 55884,
+      "cost_usd": 0.123489,
+      "calls": 2,
+      "savings_percent": 73.7
+    }
+  ],
+  "by_client": [
+    {
+      "client": "mcp",
+      "tokens_saved": 41163,
+      "tokens_before": 55884,
+      "cost_usd": 0.123489,
+      "calls": 2,
+      "savings_percent": 73.7
+    }
+  ]
+}
