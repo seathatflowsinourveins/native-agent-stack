@@ -3330,8 +3330,13 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "cfdc1cf9bad1fa20e37547656a5e509ffd62cb08dec993f6722f1328f1fad828",
-      "bytes": 9336
+      "sha256": "d1cab283114c18e009752d9489851ef733f7ac0fedaa4981426724005aeacfef",
+      "bytes": 9814
+    },
+    {
+      "path": ".github/osv-scanner.toml",
+      "sha256": "cb64a3a59045cdd10e91c6d0f27cda8943ed2450f549ef9b0989748d895db40e",
+      "bytes": 1893
     },
     {
       "path": ".github/pull_request_template.md",
@@ -9710,6 +9715,171 @@
       "bytes": 9980
     },
     {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/README.md",
+      "sha256": "a3577615445282f3c613a1179e0caa0811584908deb0743b5fd35169cc6f559c",
+      "bytes": 19404
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/fixture_port.py",
+      "sha256": "d92cf90ce59f79dde1a7d5471a8a476d6105a2fee039992887010ee5a0b0c98e",
+      "bytes": 74784
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.in",
+      "sha256": "31f8feeaa574268e12516e27875da873a940143e692091ded15503c8aa4c5d52",
+      "bytes": 21
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
+      "sha256": "9c7fe3619134c402d5f35ba788be621ffd186139d590a435d468e4e5565c7031",
+      "bytes": 823
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.in",
+      "sha256": "7041c4745c8cbe98987ef3611eba953b4f69b6dcd11a7a588410f2eca2081a05",
+      "bytes": 15
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+      "sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
+      "bytes": 439372
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/mapping-manifest.json",
+      "sha256": "6b36b4f8babcfa5d3cb0c58fef22dc3be04699e80c75eba13342c76bdcc06af6",
+      "bytes": 26376
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/hook-probe.json",
+      "sha256": "7cdd4f0c8cb243b7178b6a856bafa5e11e974abcf20fad9a64ae289057202d2d",
+      "bytes": 65837
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/hook_probe.py",
+      "sha256": "91d03a38a7438d77edd6791508e745dea0e13825ad9ffeb0f7144e0a8304209e",
+      "bytes": 16906
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/mechanism-probe.json",
+      "sha256": "319cc4abbe5a5c6a755ab2d2cd01b039b6f6afd1ef0aa3b852698b70b44a48f7",
+      "bytes": 23310
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/mechanism_probe.py",
+      "sha256": "ffe5df9291d273f5a1e823dd1fd64ce44e5770be06b1b8eafffff0ace876b846",
+      "bytes": 11730
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/orchestration-smoke.json",
+      "sha256": "8df7f698ee7d4a40b9a2abd9d05a91bbc9e9109706dbe8d054bb8314a39eb51b",
+      "bytes": 21099
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/orchestration_smoke.py",
+      "sha256": "7a9e29ab69a62a63827e96efd61bf10d2899a72224d66546bef5ac4ff19fcb48",
+      "bytes": 12116
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.json",
+      "sha256": "969314969dfcb42e1d214f040c7d19330336164417e3dd98f30041e96508030e",
+      "bytes": 38677
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.post-hoc-01.json",
+      "sha256": "cb62d14f84efd4632e7e9ea4ca78d5fa243e44164486300d7f6c12b16c0bda1e",
+      "bytes": 38632
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.post-hoc-02.json",
+      "sha256": "6effb429ffe191274baaec3dcce4eb4a588a4e459f5dde5a1a8680d46001f8a8",
+      "bytes": 38749
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/run.json",
+      "sha256": "ec323d07937d6456a6277bf57882314be004b495d83a197e2b4cff238f086aee",
+      "bytes": 67020
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/verdict.json",
+      "sha256": "4e06649bd789e1b0cc0b0427b2f3219e9cb7ccb8d112174ad4c6184d5f0dbb75",
+      "bytes": 9786
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/verdict.post-hoc-01.json",
+      "sha256": "83904e29e85791709deb70cbe2ba0a381a06d541f23ea00119854365fe455754",
+      "bytes": 9594
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/verdict.post-hoc-02.json",
+      "sha256": "cd05f6278098afee2435784fb2acb5473e2aa51464ca20928695386c97a6da38",
+      "bytes": 9706
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/fixture_port.py",
+      "sha256": "c9ae66ac5b7956e1a9ddf8e5e7bf372a5a21ac14e3e58cea662b34b55b2aff4f",
+      "bytes": 62415
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.in",
+      "sha256": "48230e98996fb0662bf5fe38cc14cb7cd1c7c69d9440836cd9ae08386a4734f8",
+      "bytes": 22
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock",
+      "sha256": "e168a18f30b48e50d024b19fd1f734b90dc4cef70627d70e637431fe7505c791",
+      "bytes": 20202
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/mapping-manifest.json",
+      "sha256": "5d7368b726614988c8e9b0f5eaaceddc2d3a925986d2612ae87b0a372f7d7a3a",
+      "bytes": 23729
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/probes/mechanism-probe.json",
+      "sha256": "a7f0f5ebab7eb3056b310b70248529e84e8e8e3004904f2be2d72833467f935e",
+      "bytes": 14227
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/probes/mechanism_probe.py",
+      "sha256": "88ffef9d0dd7c427b36f8e9d483ab519bdbb265c6ea7580bea7f139f99643a46",
+      "bytes": 8543
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/probes/orchestration-smoke.json",
+      "sha256": "73f12707b72c476b006e04a45fa02d3d5b24219b98aae8ad4aa809ff74391020",
+      "bytes": 7883
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/probes/orchestration_smoke.py",
+      "sha256": "5df5e9d8c854d51d30044c27d32fbf52acd104d4d081391047016d526ee21eec",
+      "bytes": 9363
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/receipt.json",
+      "sha256": "fbd24c9ba92f2555317b230239e4bd2f09099e2874804a7c750a078da8ee1c65",
+      "bytes": 35099
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/run.json",
+      "sha256": "04eb6a5b0cbdb12dcff76f52dd52e2621a38270adf94ce407741da64287cbfae",
+      "bytes": 27147
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/verdict.json",
+      "sha256": "10d3146bb467adab2a1a79d4861498187eba84ca7f683e090e1309a4d7215ca7",
+      "bytes": 9509
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/preregistration.json",
+      "sha256": "73ea82e9007d92e1b00feb86ba190d5fb8842b7d14962c651b0caf74b8522b38",
+      "bytes": 78464
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json",
+      "sha256": "bbd300c17bb88b88700899999c1aba4a63ec65c4d63afc186d42a88639bf42e4",
+      "bytes": 21477
+    },
+    {
       "path": "blueprints/us-equities/engine/README.md",
       "sha256": "88a864d60160423a99722b0e300c71f9d7585549513b09aabc020e9c8b0e54cb",
       "bytes": 8070
@@ -11591,8 +11761,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "4be57ac60209955367de3b29e4adf719f75b4315e928457f9a08ab703859dc20",
-      "bytes": 120998
+      "sha256": "a963922d73a08547e82faeee3d1ced74cac2907e26dcf1849983c8f70e3a25e9",
+      "bytes": 121428
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -35288,6 +35458,11 @@
       "path": "tools/sota-convergence/README.md",
       "sha256": "44c3a359f42f42e9a790e9f900185a9f3475a7a295d86c3416b426f9131781f6",
       "bytes": 177541
+    },
+    {
+      "path": "tools/sota-convergence/blind_checkout.py",
+      "sha256": "9b7bb8df9009f608bfca6f581885af727501e63bdbeb1c9a4d7330115e8711d7",
+      "bytes": 55554
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
