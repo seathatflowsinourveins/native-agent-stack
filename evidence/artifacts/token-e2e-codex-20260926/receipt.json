@@ -119,12 +119,12 @@
    "answer_excerpt": "[answer.json](<scratch>/cx/work/codebase-memory/answer.json) \u2014 Ten direct callers across twelve call sites, with names, files, and line numbers.",
    "notes_excerpt": "Trace missed three callers; the same server's search recovered them. All native responses were preserved, and project deletion was confirmed. The checker validates every call site against the baseline; caller names outside host_receipts.py rely on native symbol metadata. No token-savings claim is made.",
    "commands": [
-    "index_repository(mode=\"full\", repo_path=\"<scratch>/e2e-codex-root\", name=\"e2e-codex-root-codebase-memory-642a1b80\")",
-    "search_graph(project=\"e2e-codex-root-codebase-memory-642a1b80\", name_pattern=\"^register_file$\")",
-    "trace_path(project=\"e2e-codex-root-codebase-memory-642a1b80\", function_name=\"e2e-codex-root-codebase-memory-642a1b80.scripts.host_receipts.register_file\", direction=\"inbound\", depth=1, include_tests=true, edge_types=[\"CALLS\"])",
-    "search_code(project=\"e2e-codex-root-codebase-memory-642a1b80\", pattern=\"register_file\", file_pattern=\"*.py\", mode=\"compact\")",
-    "search_code(project=\"e2e-codex-root-codebase-memory-642a1b80\", pattern=\"register_file\", file_pattern=\"*.py\", mode=\"full\")",
-    "delete_project(project=\"e2e-codex-root-codebase-memory-642a1b80\")"
+    "index_repository(mode=\"full\", repo_path=\"<scratch>/e2e-codex-root\", name=\"e2e-codex-root-codebase-memory-<session>\")",
+    "search_graph(project=\"e2e-codex-root-codebase-memory-<session>\", name_pattern=\"^register_file$\")",
+    "trace_path(project=\"e2e-codex-root-codebase-memory-<session>\", function_name=\"e2e-codex-root-codebase-memory-<session>.scripts.host_receipts.register_file\", direction=\"inbound\", depth=1, include_tests=true, edge_types=[\"CALLS\"])",
+    "search_code(project=\"e2e-codex-root-codebase-memory-<session>\", pattern=\"register_file\", file_pattern=\"*.py\", mode=\"compact\")",
+    "search_code(project=\"e2e-codex-root-codebase-memory-<session>\", pattern=\"register_file\", file_pattern=\"*.py\", mode=\"full\")",
+    "delete_project(project=\"e2e-codex-root-codebase-memory-<session>\")"
    ],
    "upstream_stats_reported": "{\"index_repository\":{\"nodes\":149573,\"edges\":251110,\"not_indexed_files_count\":48,\"parse_partial_count\":12,\"parse_unusable_count\":0},\"trace_path\":{\"callers_total\":7},\"search_code\":{\"total_grep_matches\":19,\"total_results\":16,\"elapsed_ms\":271,\"dedup_ratio\":\"1.2x\"}}",
    "codex_usage": {
@@ -355,7 +355,7 @@
     "qmd.get({\"file\":\"us-equities-catalog/source-followup.md\",\"fromLine\":1,\"maxLines\":80,\"lineNumbers\":true})",
     "qmd.get({\"file\":\"us-equities-foundation/catalyst-dataset/README.md\",\"fromLine\":166,\"maxLines\":40,\"lineNumbers\":true})"
    ],
-   "upstream_stats_reported": "QMD Index Status:\n  Total documents: 121\n  Needs embedding: 121\n  Vector index: no\n  Collections: 2\n    - us-equities-catalog: ~/code/native-agent-stack-live/catalogs/us-equities (22 docs)\n    - us-equities-foundation: ~/code/native-agent-stack-live/blueprints/us-equities (99 docs)",
+   "upstream_stats_reported": "QMD Index Status:\n  Total documents: 121\n  Needs embedding: 121\n  Vector index: no\n  Collections: 2\n    - us-equities-catalog: <live-clone>/catalogs/us-equities (22 docs)\n    - us-equities-foundation: <live-clone>/blueprints/us-equities (99 docs)",
    "codex_usage": {
     "input_tokens": 342880,
     "cached_input_tokens": 298368,
@@ -363,7 +363,7 @@
     "reasoning_output_tokens": 5659
    },
    "exact_comparison": null,
-   "verdict_note": "Not answerable from this index: the catalog index covers only the us-equities-catalog and us-equities-foundation collections (121 documents, BM25 only), while the release re-pin step lives in adoption/update.md, which is not indexed."
+   "verdict_note": "Not answerable from this index: the catalog index covers only the us-equities-catalog and us-equities-foundation collections (121 documents at attempt 1 and 122 at attempt 2 as the live index grew; BM25 only), while the release re-pin step lives in adoption/update.md, which is not indexed."
   },
   {
    "tool": "qmd",
@@ -380,7 +380,7 @@
     "mcp__qmd__query({\"searches\":[{\"type\":\"lex\",\"query\":\"re-pin release\"}],\"collections\":[\"us-equities-catalog\",\"us-equities-foundation\"],\"intent\":\"Find the catalog document and exact step telling a new machine how to pin a release tag.\",\"limit\":5,\"rerank\":false})",
     "mcp__qmd__get({\"file\":\"#c4e39f\",\"fromLine\":1,\"maxLines\":18,\"lineNumbers\":true})"
    ],
-   "upstream_stats_reported": "QMD Index Status:\n  Total documents: 122\n  Needs embedding: 122\n  Vector index: no\n  Collections: 2\n    - us-equities-foundation: ~/code/native-agent-stack-live/blueprints/us-equities (100 docs)\n    - us-equities-catalog: ~/code/native-agent-stack-live/catalogs/us-equities (22 docs)",
+   "upstream_stats_reported": "QMD Index Status:\n  Total documents: 122\n  Needs embedding: 122\n  Vector index: no\n  Collections: 2\n    - us-equities-foundation: <live-clone>/blueprints/us-equities (100 docs)\n    - us-equities-catalog: <live-clone>/catalogs/us-equities (22 docs)",
    "codex_usage": {
     "input_tokens": 671363,
     "cached_input_tokens": 605696,
@@ -388,7 +388,7 @@
     "reasoning_output_tokens": 9810
    },
    "exact_comparison": null,
-   "verdict_note": "Not answerable from this index: the catalog index covers only the us-equities-catalog and us-equities-foundation collections (121 documents, BM25 only), while the release re-pin step lives in adoption/update.md, which is not indexed."
+   "verdict_note": "Not answerable from this index: the catalog index covers only the us-equities-catalog and us-equities-foundation collections (121 documents at attempt 1 and 122 at attempt 2 as the live index grew; BM25 only), while the release re-pin step lives in adoption/update.md, which is not indexed."
   },
   {
    "tool": "repomix",
@@ -502,11 +502,11 @@
    "answer_excerpt": "A request is trusted only if author_association == \"OWNER\", user.type == \"User\", performed_via_github_app is present and null, and user.login matches the resolved repository owner case-insensitively. Missing or failed checks reject trust. Labels, titles, body text, and requesting-host values do not grant trust.",
    "notes_excerpt": "Source: scripts/host_requests.py:221-239, retrieved without reindexing. tool.txt preserves the complete MCP response as JSON. Baseline contents never entered context. The synthetic check matches the retrieved function against the baseline and verifies trust conditions; owner resolution is stubbed. This is local verification, not upstream acceptance.",
    "commands": [
-    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1\ntimeout 10s mkdir -p <scratch>/cx/work/socraticode </dev/null\ntimeout 10s cat ~/code/native-agent-stack-live/scripts/host_requests.py ~/code/native-agent-stack-live/recipes/host-request-lane.md </dev/null > <scratch>/cx/work/socrat",
-    "socraticode.codebase_status({\"projectPath\":\"~/code/native-agent-stack-live\"})",
-    "socraticode.codebase_search({\"projectPath\":\"~/code/native-agent-stack-live\",\"query\":\"How does the host request lane decide whether a GitHub request is trusted? author_association user.type\",\"fileFilter\":\"scripts/host_requests.py\",\"limit\":3})"
+    "export MCP_AUTO_OPEN_ENABLED=false HEADROOM_OFFLINE=1 DO_NOT_TRACK=1\ntimeout 10s mkdir -p <scratch>/cx/work/socraticode </dev/null\ntimeout 10s cat <live-clone>/scripts/host_requests.py <live-clone>/recipes/host-request-lane.md </dev/null > <scratch>/cx/work/socraticode/base.txt",
+    "socraticode.codebase_status({\"projectPath\":\"<live-clone>\"})",
+    "socraticode.codebase_search({\"projectPath\":\"<live-clone>\",\"query\":\"How does the host request lane decide whether a GitHub request is trusted? author_association user.type\",\"fileFilter\":\"scripts/host_requests.py\",\"limit\":3})"
    ],
-   "upstream_stats_reported": "Project: ~/code/native-agent-stack-live\nCollection: codebase_9c518b2ee5c8\nStatus: green\nIndexed chunks: 72282\n\nFile watcher: active (watched by another process)\n\nCode graph: 1032 files, 409 edges\n  Last built: 197s ago",
+   "upstream_stats_reported": "Project: <live-clone>\nCollection: codebase_<collection>\nStatus: green\nIndexed chunks: 72282\n\nFile watcher: active (watched by another process)\n\nCode graph: 1032 files, 409 edges\n  Last built: 197s ago",
    "codex_usage": {
     "input_tokens": 194846,
     "cached_input_tokens": 161152,
@@ -622,8 +622,8 @@
   "context-hub (attempt 1): Content gap: chub's stripe/api and related entries do not state the idempotency header name or retention that the upstream page states.",
   "jcodemunch (attempt 1): Not available to Codex in a fresh worktree: the session's tool list had no jcodemunch tools on both attempts. jCodeMunch is project-scoped by #240, so only the main checkout's project config registers it for Codex.",
   "jcodemunch (attempt 2): Not available to Codex in a fresh worktree: the session's tool list had no jcodemunch tools on both attempts. jCodeMunch is project-scoped by #240, so only the main checkout's project config registers it for Codex.",
-  "qmd (attempt 1): Not answerable from this index: the catalog index covers only the us-equities-catalog and us-equities-foundation collections (121 documents, BM25 only), while the release re-pin step lives in adoption/update.md, which is not indexed.",
-  "qmd (attempt 2): Not answerable from this index: the catalog index covers only the us-equities-catalog and us-equities-foundation collections (121 documents, BM25 only), while the release re-pin step lives in adoption/update.md, which is not indexed.",
+  "qmd (attempt 1): Not answerable from this index: the catalog index covers only the us-equities-catalog and us-equities-foundation collections (121 documents at attempt 1 and 122 at attempt 2 as the live index grew; BM25 only), while the release re-pin step lives in adoption/update.md, which is not indexed.",
+  "qmd (attempt 2): Not answerable from this index: the catalog index covers only the us-equities-catalog and us-equities-foundation collections (121 documents at attempt 1 and 122 at attempt 2 as the live index grew; BM25 only), while the release re-pin step lives in adoption/update.md, which is not indexed.",
   "repomix (attempt 1): Lossy for this task: --compress dropped the declaration of status_body while keeping a reference to it, so the declaration list differs from the source's top-level definitions."
  ]
 }
