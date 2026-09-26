@@ -7,7 +7,7 @@ All listeners bind to `127.0.0.1`; Alertmanager cluster gossip is disabled.
 
 | Component | Pinned release | Local endpoint | Persistent state |
 |---|---|---|---|
-| Prometheus | 3.14.0 | `http://127.0.0.1:19090` | TSDB, seven-day / 512 MiB retention |
+| Prometheus | 3.15.0 | `http://127.0.0.1:19090` | TSDB, seven-day / 512 MiB retention |
 | Loki | 3.7.8 | `http://127.0.0.1:13100` | TSDB v13, filesystem chunks, WAL, 72-hour retention |
 | Grafana OSS | 13.2.2 | `http://127.0.0.1:13000` | SQLite settings, provisioned dashboard and data sources |
 | Alertmanager | 0.34.1 | `http://127.0.0.1:19093` | Silences and notification history, 72-hour retention |
@@ -90,7 +90,7 @@ records fresh-session reads and denied administrative access.
 Validate the native configurations before starting services:
 
 ```bash
-"$STACK_TOOLS_ROOT/ecosystem-prometheus-3.14.0/promtool" check config \
+"$STACK_TOOLS_ROOT/ecosystem-prometheus-3.15.0/promtool" check config \
   "$STACK_CONFIG_ROOT/ecosystem-prometheus.yml"
 "$STACK_TOOLS_ROOT/ecosystem-loki-3.7.8/loki-linux-amd64" \
   -config.file="$STACK_CONFIG_ROOT/ecosystem-loki.yml" -verify-config=true
@@ -106,6 +106,33 @@ host, enable system-level lingering, or establish high availability. Stop only
 these units with `systemctl --user stop ecosystem-{prometheus,loki,grafana,alertmanager,ntfy}.service`;
 retain their data when upgrading or rolling back. Back up stopped stores before
 trying a downgrade that may change their schema.
+
+## Upgrading one backend on an existing host
+
+`install.py` installs every entry of `pins.json` and refuses any prefix that
+already exists, so on a host that already runs the stack it stops at the first
+unchanged component. To add one new version, run the unchanged installer from a
+scratch copy whose `pins.json` holds only that entry; it still checks the
+archive against the pin and the publisher's checksum file. Then render the units
+with `configure.py` into a scratch root (the saved `port-overrides.json` or
+`--port-overrides`), substitute the live roots, and compare with the live unit:
+only the `ExecStart` prefix may differ. Install that unit, verify it, restart
+only that service and read it back; keep the previous prefix for rollback.
+
+```bash
+systemd-analyze --user verify "$HOME/.config/systemd/user/ecosystem-prometheus.service"
+systemctl --user daemon-reload
+systemctl --user restart ecosystem-prometheus.service
+curl --fail --silent http://127.0.0.1:19090/-/ready
+"$STACK_TOOLS_ROOT/ecosystem-prometheus-3.15.0/promtool" query instant http://127.0.0.1:19090 up
+```
+
+Rollback is the previous unit (its `ExecStart` names the old prefix), the same
+reload and restart, and the `bin/` links moved back. The WSL workstation moved
+Prometheus from 3.14.0 to 3.15.0 this way on 2026-09-26, after a side-by-side
+rehearsal on copies of its TSDB in which 3.14.0 also reopened the data 3.15.0
+had written ([receipt](../../evidence/receipts/prometheus-3150-qualification-20260926.json)).
+That is one host and one TSDB format generation, not a general downgrade promise.
 
 ## Data flow and dashboard
 
@@ -200,7 +227,7 @@ production availability guarantee.
 
 ## Primary references
 
-- [Prometheus 3.14.0 release](https://github.com/prometheus/prometheus/releases/tag/v3.14.0) and [storage semantics](https://prometheus.io/docs/prometheus/latest/storage/).
+- [Prometheus 3.15.0 release](https://github.com/prometheus/prometheus/releases/tag/v3.15.0) and [storage semantics](https://prometheus.io/docs/prometheus/latest/storage/).
 - [Loki 3.7.8 release](https://github.com/grafana/loki/releases/tag/v3.7.8), [OpenTelemetry ingestion](https://grafana.com/docs/loki/latest/send-data/otel/), and [retention](https://grafana.com/docs/loki/latest/operations/storage/retention/).
 - [Grafana OSS 13.2.2 binaries and checksums](https://grafana.com/grafana/download/13.2.2?edition=oss&platform=linux) and [native provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/).
 - [Alertmanager 0.34.1 release](https://github.com/prometheus/alertmanager/releases/tag/v0.34.1) and [webhook configuration](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config).

@@ -593,24 +593,26 @@
     {
       "id": "mcp-inspector",
       "repository": "https://github.com/modelcontextprotocol/inspector",
-      "version": "2.7.0",
-      "license": "MIT",
+      "version": "2.8.0",
+      "license": "Apache-2.0 AND MIT (2.8.0 LICENSE: MIT-to-Apache-2.0 relicensing transition; documentation CC-BY-4.0)",
       "profile": "supporting",
       "role": "Upstream direct stdio tool inspection/calls",
       "commands": [
-        "npx @modelcontextprotocol/inspector@2.7.0 --help"
+        "npx @modelcontextprotocol/inspector@2.8.0 --help"
       ],
       "evidence_ids": [
         "component-history",
         "token-practice-coverage-20260920",
         "token-native-retained-functional-20260920",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "mcp-inspector-280-qualification-20260926"
       ],
       "upstream_sources": [
-        "https://github.com/modelcontextprotocol/inspector"
+        "https://github.com/modelcontextprotocol/inspector",
+        "https://github.com/modelcontextprotocol/inspector/releases/tag/2.8.0"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "freshness": "2.8.0 serves bin/mcp-inspector on the NativeStack WSL2 host since 2026-09-26, after a matched comparison against 2.7.0: 15 of 15 gated steps on both, including 10 CLI calls over stdio and streamable HTTP to a scratch QMD server, with identical outputs once per-run paths and markers are normalized. 2.8.0 closes the fail-open DANGEROUSLY_OMIT_AUTH parse (PR #2390): with 'false', '0' or 'yes', 2.7.0 served the web API without its token and 2.8.0 answered 401 (measured). 2.7.0 is kept for rollback. The landscape winner pin stays 2.7.0 until a new verdict wave.",
       "command_scope": "Direct upstream Inspector stdio call proved arithmetic execution; full plugin hooks and current desktop scope are separate."
     },
     {
@@ -1108,7 +1110,7 @@
     {
       "id": "prometheus",
       "repository": "https://github.com/prometheus/prometheus",
-      "version": "3.14.0",
+      "version": "3.15.0",
       "license": "Apache-2.0",
       "profile": "observability",
       "role": "Native operational metric storage and alert evaluation",
@@ -1133,13 +1135,15 @@
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "portable-claude-native-qualification-20260921"
+        "portable-claude-native-qualification-20260921",
+        "prometheus-3150-qualification-20260926"
       ],
-      "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+      "source_pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
       "upstream_sources": [
-        "https://github.com/prometheus/prometheus"
+        "https://github.com/prometheus/prometheus",
+        "https://github.com/prometheus/prometheus/releases/tag/v3.15.0"
       ],
-      "freshness": "Pinned official release verified on2026-09-19; not an automatic latest-update policy."
+      "freshness": "3.15.0 serves ecosystem-prometheus.service on the NativeStack WSL2 host since 2026-09-26, after a side-by-side rehearsal against 3.14.0 on copies of the live TSDB (identical targets, rules and a 6-hour historical query) and a rollback check (3.14.0 opened the TSDB 3.15.0 wrote). Official release archive, sha256 checked against the release sha256sums.txt. 3.14.0 is kept for rollback. The landscape winner pin stays 3.14.0 until a new verdict wave."
     },
     {
       "id": "loki",
