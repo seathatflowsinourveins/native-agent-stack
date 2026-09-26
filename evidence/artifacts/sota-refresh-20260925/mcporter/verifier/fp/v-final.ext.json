@@ -1,0 +1,94 @@
+{
+ "bin_entries": 57,
+ "bin_max_lstat_mtime_utc": "2026-09-25T15:33:33Z",
+ "bin_mcporter": {
+  "lstat_mtime_ns": 1790220292031069417,
+  "target": "~/.local/share/codex-ecosystem/tools/mcporter-0.13.13/bin/mcporter"
+ },
+ "bin_table_sha256": "9271e20c856c9df0cd57a55ae5ee641db76a6a4c11963bfdca97335f1db0976a",
+ "hook_config_mtimes_utc": {
+  "~/.claude/plugins/installed_plugins.json": "2026-09-24T03:38:20Z",
+  "~/.claude/settings.json": "2026-09-25T19:01:59Z",
+  "~/.claude/settings.local.json": null,
+  "~/.codex/config.toml": "2026-09-25T19:04:38Z",
+  "~/.codex/hooks.json": "2026-09-24T03:42:37Z",
+  "~/.local/share/codex-ecosystem/config/mcporter.json": "2026-09-24T03:49:13Z",
+  "~/.local/share/codex-ecosystem/installed-versions.txt": "2026-09-24T03:56:58Z",
+  "~/code/native-agent-stack/.claude/settings.json": "2026-09-25T14:14:59Z"
+ },
+ "service_start": {
+  "dagu-equities.service": {
+   "ActiveEnterTimestamp": "Fri 2026-09-25 02:57:16 EDT",
+   "ExecMainStartTimestamp": "Fri 2026-09-25 02:57:16 EDT",
+   "MainPID": "2692217",
+   "NRestarts": "0"
+  },
+  "dbus.service": {
+   "ActiveEnterTimestamp": "Thu 2026-09-24 08:42:47 EDT",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 08:42:47 EDT",
+   "MainPID": "1630416",
+   "NRestarts": "0"
+  },
+  "ecosystem-alertmanager.service": {
+   "ActiveEnterTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "MainPID": "456",
+   "NRestarts": "0"
+  },
+  "ecosystem-grafana.service": {
+   "ActiveEnterTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "MainPID": "457",
+   "NRestarts": "0"
+  },
+  "ecosystem-loki.service": {
+   "ActiveEnterTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "MainPID": "458",
+   "NRestarts": "0"
+  },
+  "ecosystem-ntfy.service": {
+   "ActiveEnterTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "MainPID": "459",
+   "NRestarts": "0"
+  },
+  "ecosystem-otelcol.service": {
+   "ActiveEnterTimestamp": "Fri 2026-09-25 04:44:59 EDT",
+   "ExecMainStartTimestamp": "Fri 2026-09-25 04:44:59 EDT",
+   "MainPID": "3729895",
+   "NRestarts": "0"
+  },
+  "ecosystem-prometheus.service": {
+   "ActiveEnterTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "MainPID": "461",
+   "NRestarts": "0"
+  },
+  "native-stack-embeddings.service": {
+   "ActiveEnterTimestamp": "Fri 2026-09-25 11:52:14 EDT",
+   "ExecMainStartTimestamp": "Fri 2026-09-25 11:52:14 EDT",
+   "MainPID": "1387970",
+   "NRestarts": "0"
+  },
+  "native-stack-qdrant.service": {
+   "ActiveEnterTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "MainPID": "463",
+   "NRestarts": "0"
+  },
+  "nativestack-generation.service": {
+   "ActiveEnterTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "MainPID": "464",
+   "NRestarts": "0"
+  },
+  "nativestack-memory.service": {
+   "ActiveEnterTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "MainPID": "465",
+   "NRestarts": "0"
+  }
+ },
+ "systemd_user_dir_max_mtime_utc": "2026-09-25T18:33:13Z"
+}

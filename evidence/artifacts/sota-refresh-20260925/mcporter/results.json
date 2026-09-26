@@ -1,0 +1,1629 @@
+{
+ "schema_version": 1,
+ "id": "sota-refresh-20260925-mcporter",
+ "unit": "mcporter",
+ "host": "nativestack-5975wx-20260925",
+ "date_utc": "2026-09-25",
+ "baseline_version": "0.13.13",
+ "candidate_version": "0.14.1",
+ "upstream": {
+  "repository": "https://github.com/openclaw/mcporter",
+  "release": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1",
+  "tag_commit": "93e0916cafe2d624b94271e31b75ca681a016514",
+  "published_at": "2026-09-24T13:16:08Z",
+  "tarball": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz",
+  "tarball_sha256": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2",
+  "tarball_integrity": "sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ==",
+  "tarball_bytes": 464028,
+  "provenance": "SLSA v1 from .github/workflows/release.yml at refs/tags/v0.14.1, commit 93e0916cafe2d624b94271e31b75ca681a016514, run 36004499308, GitHub-hosted runner"
+ },
+ "roles": {
+  "implementer": "Qualification unit of the 2026-09-25 SOTA-refresh workflow: installed the candidate into a new prefix and ran every step below for both arms without touching production.",
+  "verifier": "A separate agent that re-ran the implementer's steps with its own probe code, checked integrity independently and returned the verdict and defects below.",
+  "coordinator": "The coordinating session that performed the production switch and the post-switch checks (coordinator observations, exported as the aggregate facts in cutover.json).",
+  "writing_worker": "The session that assembled this directory; it performed only the read-only production read-back in out/readback.out."
+ },
+ "sanitization": "Session scratch paths are replaced by $IMPL (the unit's scratch directory) and <scratchpad>; the home directory by ~ and the account name by <user>; the GitHub-hosted runner's build path in upstream npm metadata by <github-runner-home>; UUID-shaped identifiers by <uuid:first-8-hex>. Session identifiers, tokens, probe nonces, page text and config values are not present. Files marked byte_identical_to_run_copy are the exact bytes that ran or were written; for the others run_copy_sha256 is the digest of the unsanitized run copy, which stays in session scratch.",
+ "arms": {
+  "x": "candidate 0.14.1",
+  "y": "baseline 0.13.13",
+  "y-attempt1": "baseline 0.13.13, superseded harness (context-mode receipt TMPDIR on a read-only path)",
+  "verifier vf/vs": "0.14.1 re-run in fresh namespaces",
+  "verifier pa/pb": "0.14.1 / 0.13.13 with no ps on the daemon's PATH"
+ },
+ "renamed_files": {
+  "note": "Published under non-manifest names so they do not join the repository's scanned dependency manifests (OSV-Scanner inventory, Dependabot); bytes unchanged (byte_identical_to_run_copy true).",
+  "stage/package.evidence.json": "stage/package.json of the scratch staging install",
+  "stage/package-lock.evidence.json": "stage/package-lock.json of the scratch staging install"
+ },
+ "files": [
+  {
+   "path": "accept.py",
+   "sha256": "7465585d5d7218929061e455392d87b4deb5d0c94e328e25bffcd759d549c3be",
+   "bytes": 29107,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/accept.py"
+  },
+  {
+   "path": "compare.py",
+   "sha256": "c9828b4cab09212b52dba46fa084f43405c77e4df214e773570cc91a56a5401f",
+   "bytes": 4019,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/compare.py"
+  },
+  {
+   "path": "emit_steps.py",
+   "sha256": "0e544016abb8667e009b370577910eb9f41d43369127af81df9cfa83c7516192",
+   "bytes": 5581,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/emit_steps.py"
+  },
+  {
+   "path": "fingerprint.py",
+   "sha256": "ca20ef5430a326543bcb5804f15aed63a57bf4b4221e5aa4aa24f62af1b6f9f8",
+   "bytes": 6087,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/fingerprint.py"
+  },
+  {
+   "path": "fpdiff.py",
+   "sha256": "2698114c681de749a5af36f7b57f8ba15f54ee495de3947f58d460eef66e5691",
+   "bytes": 1039,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/fpdiff.py"
+  },
+  {
+   "path": "results-x.json",
+   "sha256": "482930b8859afb3e7a93847cd24e682b28925f241a779cc7b253f96483606b67",
+   "bytes": 38157,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results-x.json"
+  },
+  {
+   "path": "results-y.json",
+   "sha256": "70c7d7c8b6a5165e815a12db4f35b307b0dacd967ffc9bf4475bc05b08155bd5",
+   "bytes": 38206,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results-y.json"
+  },
+  {
+   "path": "results-y-attempt1.json",
+   "sha256": "1de264f7dc79c35132f62a7d047c340460a6960a523c6eef4d3fb45766474d32",
+   "bytes": 37697,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results-y-attempt1.json"
+  },
+  {
+   "path": "steps-for-result.json",
+   "sha256": "9cf2cf586e554899b77aa1bca033d7a7fe252d0bd8cf06dfbb3159cd31b634ad",
+   "bytes": 32250,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/steps-for-result.json"
+  },
+  {
+   "path": "compare.json",
+   "sha256": "a483e6fc57ee723d781cc2e64038c4a4d9a65c221bace164c0f95619f1a16b89",
+   "bytes": 5491,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/compare.json"
+  },
+  {
+   "path": "normalized-diff.txt",
+   "sha256": "d787839abd1e53659fa85e07eb8becd8a243289ace743ec83e8caaa7ac0854ae",
+   "bytes": 725,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/normalized-diff.txt"
+  },
+  {
+   "path": "scratch-config-x.sanitized.json",
+   "sha256": "0bc234b3178b0277464842e513e49e346603fdd04844adee6dbf624194e8bb89",
+   "bytes": 2732,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/scratch-config-x.sanitized.json"
+  },
+  {
+   "path": "scratch-config-y.sanitized.json",
+   "sha256": "9e2cda00062c17412eed8313e7a57a4accbf7b671c1a5694a8595fb4ec2da55b",
+   "bytes": 2732,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/scratch-config-y.sanitized.json"
+  },
+  {
+   "path": "out/run-x.log",
+   "sha256": "3dcf328c9dc66b4a9ac8a4ca737c480598b6f72f68c3cd063a768849068f91a8",
+   "bytes": 2613,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/run-x.log"
+  },
+  {
+   "path": "out/run-y.log",
+   "sha256": "27fba477cd85a1c43e74a44de62b50bdbb548095eeb5e766ddf5c8353e12a605",
+   "bytes": 2602,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/run-y.log"
+  },
+  {
+   "path": "out/run-y-attempt1.log",
+   "sha256": "de7e1ea26dfd1de8ab25d9b5cefad8f8eb18f48a999e77a77cbbfcc0e83cbd03",
+   "bytes": 2543,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/run-y-attempt1.log"
+  },
+  {
+   "path": "out/fp-after-x.log",
+   "sha256": "e7f03088cd287024a7820be06bbeaa8df630676c0935070fd2686e76ba4d6cc5",
+   "bytes": 1065,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/fp-after-x.log"
+  },
+  {
+   "path": "out/fp-after-y.log",
+   "sha256": "d23f4ead335be594e44e32679fec3cd665438e63691dea701211dda33be9b4d2",
+   "bytes": 1065,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/fp-after-y.log"
+  },
+  {
+   "path": "out/fp-final.log",
+   "sha256": "a320cc1f5b49809e1cf2aae8188d4018a777172855dd7b477cd7c324801c3ad7",
+   "bytes": 1063,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/fp-final.log"
+  },
+  {
+   "path": "out/fp-diff.txt",
+   "sha256": "f8190053a940ed52cf985b8b03e9e5bd8d9283cd9754712788d52d7d248dbcaa",
+   "bytes": 5178,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/fp-diff.txt"
+  },
+  {
+   "path": "fp/after-x.json",
+   "sha256": "33bdafa7e38786f7d8d7bce6e50432d02b996d995272cec27692a0399d90befa",
+   "bytes": 5484,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/fp/after-x.json"
+  },
+  {
+   "path": "fp/after-y-attempt1.json",
+   "sha256": "fa78c08453a66c84a021747a7a5f821363c45f5506a103a63f3e7ad279d77143",
+   "bytes": 5493,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/fp/after-y-attempt1.json"
+  },
+  {
+   "path": "fp/after-y.json",
+   "sha256": "1c94cb7de486235df7c7dde13bcf2f054939c615b63cf0d2d701dcccf0096b61",
+   "bytes": 5484,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/fp/after-y.json"
+  },
+  {
+   "path": "fp/before.json",
+   "sha256": "b48e03059503d2c68460f2187cf4153855e06ab5f8fa541231ba5669aca1702b",
+   "bytes": 5478,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/fp/before.json"
+  },
+  {
+   "path": "fp/final.json",
+   "sha256": "08ff1f557b3f6d61f066cb409696f11222806f00adfeefe588e0983e9a18794c",
+   "bytes": 5482,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/fp/final.json"
+  },
+  {
+   "path": "verify/checksums-v0.14.1.txt",
+   "sha256": "9a32d073672a275327e4b7446f82b403db5da3fd44e8c274300298e99064c777",
+   "bytes": 373,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/checksums-v0.14.1.txt"
+  },
+  {
+   "path": "verify/fetched_at.txt",
+   "sha256": "aeab71c2738d9a88dbf186b80e16b0d1ce4e6cf26676f8e9e89f2f04de971cd0",
+   "bytes": 21,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/fetched_at.txt"
+  },
+  {
+   "path": "verify/gh-release-v0.14.1.json",
+   "sha256": "f3d566a51dc994f5952ba8e13794c99e98e77ad0bb203e79a35e8c6403070d72",
+   "bytes": 10433,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/gh-release-v0.14.1.json"
+  },
+  {
+   "path": "verify/integrity-compare.txt",
+   "sha256": "99945aa9743da57e6e2b9b35fc9954e03d3c5bf7c13c8598cbd6b9c1b3a8b536",
+   "bytes": 1170,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/integrity-compare.txt"
+  },
+  {
+   "path": "verify/install_started_at.txt",
+   "sha256": "eafbe2896ee53d35f472c1d5b1bd7fdb9d0e2c0d1f4645b52eb9c8779195698d",
+   "bytes": 21,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/install_started_at.txt"
+  },
+  {
+   "path": "verify/npm-install.log",
+   "sha256": "d2c482f2be6a770ae29f10f46bca08ee7fd31dced46c97cc4ec2b4178a1e0e3a",
+   "bytes": 25,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/npm-install.log"
+  },
+  {
+   "path": "verify/npm-ls-0.13.13.txt",
+   "sha256": "689a0ba431747e5a745f0b5a7d30316fb26eb3bae5bb494e243364a450b3a2ab",
+   "bytes": 2961,
+   "byte_identical_to_run_copy": false,
+   "run_copy": "$IMPL/verify/npm-ls-0.13.13.txt",
+   "run_copy_sha256": "f84a3c2c2e00a3ffeab9afe87bd93ec8722073c61bffa16f2ce5fe9ff0694e1a"
+  },
+  {
+   "path": "verify/npm-ls-0.14.1.txt",
+   "sha256": "b48758aae687a8653d7c73c811c976a9329a9ac4af36e3ef7d4d75fcbc5b8cb8",
+   "bytes": 2959,
+   "byte_identical_to_run_copy": false,
+   "run_copy": "$IMPL/verify/npm-ls-0.14.1.txt",
+   "run_copy_sha256": "0423c8c5f25957056b897e1e5c1dfbcb8af2794637d9412ddda0cc6df8624d4e"
+  },
+  {
+   "path": "verify/provenance-mcporter-0.14.1.txt",
+   "sha256": "38e794586ec27f2f78b43f35c949ccd62e94dddb4e2320db2f27b2c447eda922",
+   "bytes": 973,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/provenance-mcporter-0.14.1.txt"
+  },
+  {
+   "path": "verify/registry-0.14.1.json",
+   "sha256": "5a88e48562ae314102bfad1b16cd27849a1fc1939265468cfcea189c43e4761e",
+   "bytes": 4468,
+   "byte_identical_to_run_copy": false,
+   "run_copy": "$IMPL/verify/registry-0.14.1.json",
+   "run_copy_sha256": "031ebce31a39f87e11279157adc524f3f0ce4435579b820be573ef55dd7c87f5"
+  },
+  {
+   "path": "verify/bin-link-before.txt",
+   "sha256": "54f9f581064d76168a09abbd325cf006d81eaafb8ff847b9747afab9926587c6",
+   "bytes": 67,
+   "byte_identical_to_run_copy": false,
+   "run_copy": "$IMPL/verify/bin-link-before.txt",
+   "run_copy_sha256": "afa017557f61a74c0cf383ca324345e9b1b1a9c499a499328b7fffc90c65923c"
+  },
+  {
+   "path": "verify/gh.err",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/gh.err"
+  },
+  {
+   "path": "stage/package.evidence.json",
+   "sha256": "b98bd6ac5329299f4df5f30d1de2490e5c2cb43c1308f5c8c21f04e694176fcf",
+   "bytes": 100,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/stage/package.json"
+  },
+  {
+   "path": "stage/package-lock.evidence.json",
+   "sha256": "dcb1aba4869171f48ead9ef5429ccf5ea61b66099ca9f5f8afdef4af5c9f7c62",
+   "bytes": 26677,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/stage/package-lock.json"
+  },
+  {
+   "path": "stage/install.log",
+   "sha256": "524aa6f967adcc9f2dc758dccb09630b298d7830d613c3b59d355958e3508b1f",
+   "bytes": 25,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/stage/install.log"
+  },
+  {
+   "path": "stage/audit-signatures.txt",
+   "sha256": "5d87568bf472ee68df3e9ec1a3f9f32cdf4e5d425327ac1b2d09913fe0e62cf8",
+   "bytes": 178,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/stage/audit-signatures.txt"
+  },
+  {
+   "path": "stage/audit-signatures.err",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/stage/audit-signatures.err"
+  },
+  {
+   "path": "verifier/fingerprint.py",
+   "sha256": "c6679e72cfeb499ea613eeb0faac3ed695e27d0e4a1f17423dd0628f2ec560ff",
+   "bytes": 8353,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/fingerprint.py"
+  },
+  {
+   "path": "verifier/fp/v-after.ext.json",
+   "sha256": "866e571e00bdbc5c80ced58122a690ea8885610a527f96084a90ce773ff95d9d",
+   "bytes": 3306,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/fp/v-after.ext.json"
+  },
+  {
+   "path": "verifier/fp/v-after.json",
+   "sha256": "63dd9881d5c60d13f5cf1398f814dc1f7c6c4edbae8471a8ed3ed41cffbd1fea",
+   "bytes": 5484,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/fp/v-after.json"
+  },
+  {
+   "path": "verifier/fp/v-before.ext.json",
+   "sha256": "866e571e00bdbc5c80ced58122a690ea8885610a527f96084a90ce773ff95d9d",
+   "bytes": 3306,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/fp/v-before.ext.json"
+  },
+  {
+   "path": "verifier/fp/v-before.json",
+   "sha256": "2882ff57f68ad55ed778bbb7c808d6a47631572180371cea134afa3690fcebe9",
+   "bytes": 5485,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/fp/v-before.json"
+  },
+  {
+   "path": "verifier/fp/v-final.ext.json",
+   "sha256": "866e571e00bdbc5c80ced58122a690ea8885610a527f96084a90ce773ff95d9d",
+   "bytes": 3306,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/fp/v-final.ext.json"
+  },
+  {
+   "path": "verifier/fp/v-final.json",
+   "sha256": "f0f55368defc422e6383ded9d43e5a753ac248847da1adc1c7afaaf916c9dd30",
+   "bytes": 5484,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/fp/v-final.json"
+  },
+  {
+   "path": "verifier/fp/v-mid.ext.json",
+   "sha256": "866e571e00bdbc5c80ced58122a690ea8885610a527f96084a90ce773ff95d9d",
+   "bytes": 3306,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/fp/v-mid.ext.json"
+  },
+  {
+   "path": "verifier/fp/v-mid.json",
+   "sha256": "0433a2f0a8091f6af432c19713590fc1861b828467d0c1650232e8b17082aa4e",
+   "bytes": 5482,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/fp/v-mid.json"
+  },
+  {
+   "path": "verifier/integrity/attestations.json",
+   "sha256": "81bbe8dac67da694a62437f3f3ba42ca27337c58a581a3599e142d00e440f414",
+   "bytes": 14907,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/integrity/attestations.json"
+  },
+  {
+   "path": "verifier/integrity/checksums.txt",
+   "sha256": "9a32d073672a275327e4b7446f82b403db5da3fd44e8c274300298e99064c777",
+   "bytes": 373,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/integrity/checksums.txt"
+  },
+  {
+   "path": "verifier/integrity/deps-binding.json",
+   "sha256": "f01339c769236d6474d630b3138acb4b34a624d8d239c4296968f2307b6a1f20",
+   "bytes": 6830,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/integrity/deps-binding.json"
+  },
+  {
+   "path": "verifier/integrity/diff-r.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/integrity/diff-r.txt"
+  },
+  {
+   "path": "verifier/integrity/fetched_at.txt",
+   "sha256": "9a763410728c3a2f1fb9e4283b1a902504c695dacd019dc3d7eea865f8e7d5d0",
+   "bytes": 21,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/integrity/fetched_at.txt"
+  },
+  {
+   "path": "verifier/integrity/gh-release.json",
+   "sha256": "a0c14aa480918db73b5e69205a2a7c96991db73b73c7af77d06a71bd4dbe0503",
+   "bytes": 12301,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/integrity/gh-release.json"
+  },
+  {
+   "path": "verifier/integrity/installed-deps.json",
+   "sha256": "5af2f26395aa9df8c00b1fef4002265b211cc50765b92f77691b3b0b22580e7f",
+   "bytes": 1601,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/integrity/installed-deps.json"
+  },
+  {
+   "path": "verifier/integrity/integrity-verifier.json",
+   "sha256": "83d9ab368c9d4d0c3fa7b6457241cd66fcf668d114676079a28f25fdee0fef13",
+   "bytes": 814,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/integrity/integrity-verifier.json"
+  },
+  {
+   "path": "verifier/integrity/registry-0.14.1.json",
+   "sha256": "5a88e48562ae314102bfad1b16cd27849a1fc1939265468cfcea189c43e4761e",
+   "bytes": 4468,
+   "byte_identical_to_run_copy": false,
+   "run_copy": "$IMPL/verifier/integrity/registry-0.14.1.json",
+   "run_copy_sha256": "031ebce31a39f87e11279157adc524f3f0ce4435579b820be573ef55dd7c87f5"
+  },
+  {
+   "path": "verifier/integrity/sigs/msg.txt",
+   "sha256": "3442e59e9792a51070824c031707ab44f23c0127294762fa0fefaac8c206fd26",
+   "bytes": 105,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/integrity/sigs/msg.txt"
+  },
+  {
+   "path": "verifier/integrity/sigs-result.json",
+   "sha256": "21f173e653991ab9d3d0558c721062743328cfbdfa7816587f5142b331129696",
+   "bytes": 46,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/integrity/sigs-result.json"
+  },
+  {
+   "path": "verifier/privbase-created.txt",
+   "sha256": "24a9a3ef6efc2a793f0bf5f5f5647cbce2813628d24bf70c713ec3c33e440eac",
+   "bytes": 41,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/privbase-created.txt"
+  },
+  {
+   "path": "verifier/run-pa.log",
+   "sha256": "b567b2ca3d348bfbf07ff0d00d10bc97e589665bcddd3cb6a2825e09fa684347",
+   "bytes": 810,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/run-pa.log"
+  },
+  {
+   "path": "verifier/run-pb.log",
+   "sha256": "7ba368b6226442d55489bed3eb7627b646e2f86654d670dc5cfabffdf0aa1df9",
+   "bytes": 712,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/run-pb.log"
+  },
+  {
+   "path": "verifier/run-vf.log",
+   "sha256": "56ee1689cd60d5c95154b22c3cdf6668fde5eab2aa1ce1630d1905ae03d2df90",
+   "bytes": 2593,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/run-vf.log"
+  },
+  {
+   "path": "verifier/run-vs.log",
+   "sha256": "469f5ac0a9dad779d252be6cb960d0291ee697fdbbbb5ae2c20b6f3381e73f99",
+   "bytes": 860,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/run-vs.log"
+  },
+  {
+   "path": "verifier/vaccept.py",
+   "sha256": "6c65ec54a36b107feeb6dd37ff8ec4938ed94110b18e1f09f30c3b5852779fce",
+   "bytes": 28746,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/vaccept.py"
+  },
+  {
+   "path": "verifier/vfpdiff.py",
+   "sha256": "21a7f85a8e44ad1fe2fd9c1b1c6ad19ccf5faeba49ac8be3aaaeb86e0ab383e0",
+   "bytes": 2847,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/vfpdiff.py"
+  },
+  {
+   "path": "verifier/vresults-pa.json",
+   "sha256": "b6d57483c00963c4a36d6cbd8cd369aa65f0a922ca1c4b6a1628d0ef59a35ca1",
+   "bytes": 3779,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/vresults-pa.json"
+  },
+  {
+   "path": "verifier/vresults-pb.json",
+   "sha256": "8b78751ae0700d62f2254b378536dc0f5c92509ea261449aeb0383a9c1c718af",
+   "bytes": 2338,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/vresults-pb.json"
+  },
+  {
+   "path": "verifier/vresults-vf.json",
+   "sha256": "c56f2c9d4d5bf26c39e14b4cb6df80b80ed92f4bc05c9ff09afc6fc6dcb0013b",
+   "bytes": 28921,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/vresults-vf.json"
+  },
+  {
+   "path": "verifier/vresults-vs.json",
+   "sha256": "3465994e47441f38c8250da4f5e755204636a5c496053715ca7b5f873b810726",
+   "bytes": 6305,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verifier/vresults-vs.json"
+  },
+  {
+   "path": "out/raw-outputs.json",
+   "sha256": "ff54fe3399ad9eb1abbac842f0faa22ba756ad14bc67fb2629efe7d95f8b4932",
+   "bytes": 252450,
+   "byte_identical_to_run_copy": false,
+   "run_copy": "bundle of 204 files (60 distinct contents) under $IMPL/raw/x, $IMPL/raw/y, $IMPL/raw/y-attempt1"
+  },
+  {
+   "path": "verifier/raw-outputs.json",
+   "sha256": "94588ea8a8368775be55c280b61530db004ec3c25ca410277d58922fba570c1d",
+   "bytes": 53597,
+   "byte_identical_to_run_copy": false,
+   "run_copy": "bundle of 84 files (34 distinct contents) under $IMPL/verifier/raw/vf, $IMPL/verifier/raw/vs, $IMPL/verifier/raw/pa, $IMPL/verifier/raw/pb"
+  },
+  {
+   "path": "out/readback.out",
+   "sha256": "46d728a6218c204b528394abd96edf052de593f7899a654668edd05eee391f36",
+   "bytes": 490,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "<writing-worker-scratch>/mcporter-readback.out"
+  }
+ ],
+ "not_published": [
+  {
+   "run_copy": "$IMPL/verify/mcporter-0.14.1.tgz",
+   "sha256": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2",
+   "bytes": 464028,
+   "reason": "Upstream npm tarball https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz (sha256 matches the pin); fetch it from the registry."
+  },
+  {
+   "run_copy": "$IMPL/verify/registry-abbrev.json",
+   "sha256": "b0a387ab64d1d0d2eafd9b11ca6ff35daae1ca96a62384e7c40e2d8a24bbdad7",
+   "bytes": 76862,
+   "reason": "Upstream abbreviated npm packument for mcporter (all versions); the 0.14.1 fields it was compared on are in verify/integrity-compare.txt and verify/registry-0.14.1.json."
+  },
+  {
+   "run_copy": "$IMPL/stage/audit-signatures.json",
+   "sha256": "9904e8eabca8292e311fc8b9f629a3c1d47107fd9f20d695d606c96b967bb048",
+   "bytes": 236428,
+   "reason": "`npm audit signatures --json --include-attestations` output: Sigstore bundles for 13 packages (236 KB). Its result is stage/audit-signatures.txt; mcporter's own provenance is in verify/provenance-mcporter-0.14.1.txt and verifier/integrity/attestations.json."
+  },
+  {
+   "run_copy": "$IMPL/verifier/integrity/sigs/keys.json",
+   "sha256": "faf23d8753d5bb79df250f10391ac89b63ecf7743e48487a544a99c847f9c8df",
+   "bytes": 580,
+   "reason": "The npm registry's public signing keys as fetched from https://registry.npmjs.org/-/npm/v1/keys; gitleaks' generic-api-key rule flags this JSON form. Fetch them from that URL."
+  },
+  {
+   "run_copy": "$IMPL/verifier/integrity/sigs/key-SHA256_DhQ8wR5APBvFHLF_+Tc+AYvPOdTpcIDqOhxsBHRwC7U.pem",
+   "sha256": "ab18a3e11ef0c213b7bf7794647580e71d52badd4c4566a43f1d539384bb78b3",
+   "bytes": 178,
+   "reason": "The same two npm registry public signing keys in PEM form, as the verifier wrote them for openssl from https://registry.npmjs.org/-/npm/v1/keys; the repository's .gitignore excludes *.pem, so they are not committed. The openssl verification result is verifier/integrity/sigs-result.json."
+  },
+  {
+   "run_copy": "$IMPL/verifier/integrity/sigs/key-SHA256_jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA.pem",
+   "sha256": "6565ff065634c66d41985976c72afb78ac8433c4131dc652d0d9ed62d13d1a5a",
+   "bytes": 178,
+   "reason": "The same two npm registry public signing keys in PEM form, as the verifier wrote them for openssl from https://registry.npmjs.org/-/npm/v1/keys; the repository's .gitignore excludes *.pem, so they are not committed. The openssl verification result is verifier/integrity/sigs-result.json."
+  },
+  {
+   "run_copy": "$IMPL/verifier/integrity/sigs/sig.der",
+   "sha256": "755d28f1c6bdf68e950d0250c1398713fbe6f9358b08fbf5e57a67b66db8e9f5",
+   "bytes": 71,
+   "reason": "Binary DER signature over verifier/integrity/sigs/msg.txt; the publication scan accepts UTF-8 text only. The openssl verification result is verifier/integrity/sigs-result.json."
+  },
+  {
+   "run_copy": "$IMPL/snap-7783682f/.snapshot-rev",
+   "sha256": "3c431eaf7c6836e0c015cfb8577b96f7fe07c9643737ee713a2d366314f6bb38",
+   "bytes": 41,
+   "reason": "Marker of the git-archive snapshot of this repository at 7783682f that the receipts ran from; the snapshot itself is repository content."
+  }
+ ],
+ "integrity": {
+  "artifact": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz (464028 bytes, downloaded 2026-09-25T18:43Z into the scratchpad, verified, then installed from that file)",
+  "expected": "sha256 8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2 (GitHub release v0.14.1 asset digest and release checksums.txt); integrity sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ== and shasum 8dbc86c05013e4dfbfdc155555202a36a3936015 (npm registry version document and abbreviated packument, fetched fresh)",
+  "actual": "computed sha256 8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2, sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ==, sha1 8dbc86c05013e4dfbfdc155555202a36a3936015 (ALL_MATCH True, also equal to the research-recorded values). Cryptographic check before the real install: `npm audit signatures` on a scratch registry install of mcporter@0.14.1 (scratch cache) reported 41 packages with verified registry signatures and 13 with verified attestations, invalid [] and missing []. Those 13 include mcporter@0.14.1, whose SLSA v1 provenance subject sha512 ffaa6f32...2c75 equals the tarball integrity, built by .github/workflows/release.yml at refs/tags/v0.14.1, commit 93e0916cafe2d624b94271e31b75ca681a016514, on a GitHub-hosted runner in run 36004499308. The installed package files are byte-identical to the verified tarball (diff -r).",
+  "source": "registry.npmjs.org/mcporter/0.14.1 and /mcporter (dist.integrity, dist.shasum, dist.signatures, dist.attestations); api.github.com repos/openclaw/mcporter/releases/tags/v0.14.1 (asset digest); github.com/openclaw/mcporter/releases/download/v0.14.1/checksums.txt; npm audit signatures (npm 11.19.0) against the registry's keys and the Sigstore provenance bundle",
+  "verified": true
+ },
+ "steps": [
+  {
+   "name": "integrity-hash-compare",
+   "arm": "candidate 0.14.1 artifact",
+   "command": "curl registry.npmjs.org/mcporter/0.14.1 + /mcporter (abbrev) + gh api releases/tags/v0.14.1 + release checksums.txt + tarball; sha256/sha512/sha1 compare",
+   "exit": 0,
+   "output_excerpt": "computed sha256 8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2 | computed sha512 SRI sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ== | dist.integrity == computed: True | dist.shasum == computed sha1: True | abbreviated packument integrity == computed: True | asset digest sha256:8e489864d7118863f516d0d22ca1d43b862 ...  == computed: True | ALL_MATCH True",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "verify/integrity-compare.txt"
+  },
+  {
+   "name": "integrity-npm-audit-signatures",
+   "arm": "candidate 0.14.1 artifact (scratch staging install from registry)",
+   "command": "npm install --ignore-scripts mcporter@0.14.1 (scratch prefix, scratch cache); npm audit signatures [--json --include-attestations]",
+   "exit": 0,
+   "output_excerpt": "audited 41 packages in 1s 41 packages have verified registry signatures 13 packages have verified attestations (use --json --include-attestations to view attestation details) | workflow https://github.com/openclaw/mcporter .github/workflows/release.yml refs/tags/v0.14.1 resolvedDependencies [('git+https://github.com/openclaw/mcporter@refs/tags/v0.14.1', {'gitCommit': '93e0916ca ... actions/runs/36004499308/attempts/1",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "stage/audit-signatures.txt"
+  },
+  {
+   "name": "install-new-prefix",
+   "arm": "candidate 0.14.1",
+   "command": "npm install --global --no-audit --no-fund --prefix ~/.local/share/codex-ecosystem/tools/mcporter-0.14.1 <verified mcporter-0.14.1.tgz> (scratch npm cache; prefix absent beforehand; bin symlink not touched)",
+   "exit": 0,
+   "output_excerpt": "added 41 packages in 4s",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "verify/npm-install.log"
+  },
+  {
+   "name": "install-npm-ls-tree",
+   "arm": "candidate 0.14.1 vs baseline 0.13.13 prefix",
+   "command": "npm ls --global --all --prefix tools/mcporter-0.14.1 ; same for tools/mcporter-0.13.13 ; diff",
+   "exit": 0,
+   "output_excerpt": "0.14.1: mcporter@0.14.1, @modelcontextprotocol/client@2.1.0, @modelcontextprotocol/core@2.1.0, @modelcontextprotocol/server@2.1.0, @modelcontextprotocol/core@2.1.0 deduped, commander@15.0.0, string-width@8.3.0, rolldown@1.2.9, zod@4.6.5 | diff vs 0.13.13: rolldown 1.2.8->1.2.9, @oxc-project/types 0.149.0->0.150.0, string-width 8.2.2->8.3.0; all else identical",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "verify/npm-ls-0.14.1.txt"
+  },
+  {
+   "name": "install-version-and-bin-link",
+   "arm": "candidate 0.14.1",
+   "command": "tools/mcporter-0.14.1/bin/mcporter --version ; readlink ~/.local/share/codex-ecosystem/bin/mcporter before/after ; diff -r tarball package vs installed",
+   "exit": 0,
+   "output_excerpt": "0.14.1 | bin link unchanged: ~/.local/share/codex-ecosystem/tools/mcporter-0.13.13/bin/mcporter | installed package files identical to verified tarball",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "verify/bin-link-before.txt"
+  },
+  {
+   "name": "R-context-mode-use-1 (retained failed attempt 1)",
+   "arm": "y (0.13.13) attempt 1, superseded harness",
+   "command": "receipt ...--context-mode--use--20260925-2.json commands[1], verbatim, run with TMPDIR=<arm-private ~/.local/state dir> (attempt-1 harness; read-only inside the receipt sandbox)",
+   "exit": 1,
+   "output_excerpt": "mcporter exit 1; ctx_execute_file printed: [context-mode] uncaughtException: EROFS: read-only file system, open '~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/y/tmp/cm-fs-preload-3683154.js' host-computed from the checkout: 5 3e0f391db878cd7 ... rver left in the writable temp dir:",
+   "pass": false,
+   "observed_by": "implementer",
+   "output_file": "results-y-attempt1.json"
+  },
+  {
+   "name": "S1-command-v",
+   "arm": "x (0.14.1)",
+   "command": "command -v mcporter",
+   "exit": 0,
+   "output_excerpt": "~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/bin/mcporter",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/01-S1-command-v.out)"
+  },
+  {
+   "name": "R-mcporter-install-0",
+   "arm": "x (0.14.1)",
+   "command": "receipt evidence/hosts/nativestack-5975wx-20260925/...--mcporter--install--20260925.json commands[0], verbatim",
+   "exit": 0,
+   "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/bin/mcporter -> ~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/cli.js bootstrap pin (adopt ... p verified-versions record: 0.13.13",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/02-R-mcporter-install-0.out)"
+  },
+  {
+   "name": "R-mcporter-install-1",
+   "arm": "x (0.14.1)",
+   "command": "receipt ...--mcporter--install--20260925.json commands[1] (mcporter --version), verbatim",
+   "exit": 0,
+   "output_excerpt": "0.14.1",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/03-R-mcporter-install-1.out)"
+  },
+  {
+   "name": "R-socraticode-use-0",
+   "arm": "x (0.14.1)",
+   "command": "receipt ...--socraticode--use--20260925-2.json commands[0] with C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" -> C=\"$SCRATCH_CFG\"",
+   "exit": 0,
+   "output_excerpt": "mcporter 0.14.1 server socraticode status ok transport STDIO ~/.local/share/codex-ecosystem/bin/node ~/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist ... ['1.14.0'] | winner pins ['1.14.0']",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/04-R-socraticode-use-0.out)"
+  },
+  {
+   "name": "R-socraticode-use-1",
+   "arm": "x (0.14.1)",
+   "command": "receipt ...--socraticode--use--20260925-2.json commands[1] with C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" -> C=\"$SCRATCH_CFG\"",
+   "exit": 0,
+   "output_excerpt": "[OK] External Qdrant (http://127.0.0.1:26333): Reachable [OK] LM Studio: Reachable at http://127.0.0.1:18231/v1 [OK] Embedding model (nvidia/Nemotron-3-Embed-1B-BF16): Loaded Project: ~/code ... otron-3-Embed-1B-BF16 owned_by vllm",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/05-R-socraticode-use-1.out)"
+  },
+  {
+   "name": "R-socraticode-use-2",
+   "arm": "x (0.14.1)",
+   "command": "receipt ...--socraticode--use--20260925-2.json commands[2] with C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" -> C=\"$SCRATCH_CFG\"",
+   "exit": 0,
+   "output_excerpt": "8 results; oracle ranks {'catalogs/us-equities/gates-20260922.json': 1, 'scripts/trading_gates.py': 2} 1 catalogs/us-equities/gates-20260922.json:1-31 0.6250 2 scripts/trading_gates.py:1-38  ... de--use--20260925.json:55-57 0.3333",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/06-R-socraticode-use-2.out)"
+  },
+  {
+   "name": "R-socraticode-use-3",
+   "arm": "x (0.14.1)",
+   "command": "receipt ...--socraticode--use--20260925-2.json commands[3] with C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" -> C=\"$SCRATCH_CFG\"",
+   "exit": 0,
+   "output_excerpt": "control (unrelated query): 8 results; oracle ranks {'catalogs/us-equities/gates-20260922.json': None, 'scripts/trading_gates.py': None} (both must be absent) 1 observability/grand-dashboard/ ... board/passwordless.json:1-66 0.5000",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/07-R-socraticode-use-3.out)"
+  },
+  {
+   "name": "S3-ctx_doctor",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_doctor --args '{}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "context-mode doctor [OK] Runtimes: 4/11 (36%) — javascript, shell, python, perl [WARN] Performance: NORMAL — install Bun for 3-5x speed boost [OK] Storage sessions: ~/.local/state/native-age ... hs to verify [OK] Version: v1.0.169",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/08-S3-ctx_doctor.out)"
+  },
+  {
+   "name": "S4-list-ai-memory",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" list ai-memory --json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{ \"mode\": \"server\", \"name\": \"ai-memory\", \"status\": \"ok\", \"durationMs\": 67, \"instructions\": \"Long-term memory for the current project.\\n\\n**Choose project scope from the MCP client's identity ... ll\", \"defaultValue\": null } ] } ] }",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/09-S4-list-ai-memory.out)"
+  },
+  {
+   "name": "S4-list-jcodemunch",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" list jcodemunch --json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{ \"mode\": \"server\", \"name\": \"jcodemunch\", \"status\": \"ok\", \"durationMs\": 452, \"instructions\": \"This repo can be indexed by jcodemunch. Its whole tool catalog sits behind a 3-verb front door.  ...  \"placeholder\": \"<model>\" } ] } ] }",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/10-S4-list-jcodemunch.out)"
+  },
+  {
+   "name": "S5-token-report-oneoff",
+   "arm": "x (0.14.1)",
+   "command": "mcporter call --stdio \"$(command -v jcodemunch-mcp)\" --env CODE_INDEX_PATH=$SCRATCH_CODE_INDEX --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{ \"session_tokens_saved\": 0, \"session_calls\": 0, \"session_duration_s\": 0.1, \"session_response_tokens\": 0, \"total_tokens_saved\": 0, \"total_tokens_saved_basis\": { \"generation\": 2, \"first_gener ... : 125 }, \"estimator\": \"bytes/4\" } }",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/11-S5-token-report-oneoff.out)"
+  },
+  {
+   "name": "R-jcodemunch-use-0",
+   "arm": "x (0.14.1)",
+   "command": "receipt ...--jcodemunch-mcp--use--20260925-2.json commands[0] with CODE_INDEX_PATH=$HOME/.code-index -> arm-private copy",
+   "exit": 0,
+   "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp -> ~/.local/share/codex-ecosystem/python-tools/jcodemunch-mcp/bin/jcodemunch-mcp jcodemunch-mcp 1.108.319 stack ['1.108.319'] winn ... ndexed', '2026-09-23', 'loadable')]",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/12-R-jcodemunch-use-0.out)"
+  },
+  {
+   "name": "R-jcodemunch-use-1",
+   "arm": "x (0.14.1)",
+   "command": "receipt ...--jcodemunch-mcp--use--20260925-2.json commands[1] with CODE_INDEX_PATH=$HOME/.code-index -> arm-private copy",
+   "exit": 0,
+   "output_excerpt": "search_symbols greeting -> fixtures/after.py::greeting#function fixtures/before.py::greeting#function get_symbol_source fixtures/after.py::greeting#function lines 1 - 2 freshness fresh def g ... res/after.py in this checkout: True",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/13-R-jcodemunch-use-1.out)"
+  },
+  {
+   "name": "R-context-mode-use-0",
+   "arm": "x (0.14.1)",
+   "command": "receipt ...--context-mode--use--20260925-2.json commands[0], verbatim (TMPDIR=scratchpad dir)",
+   "exit": 0,
+   "output_excerpt": "plugin.json context-mode 1.0.169 | installed_plugins.json entry for this path: version 1.0.169 gitCommitSha 6f0cc6841c687e754059f36714a11233fda1a02b | equals the recipes/README.md reviewed - ... nt stack ['1.0.169'] winner pins []",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/14-R-context-mode-use-0.out)"
+  },
+  {
+   "name": "R-context-mode-use-1",
+   "arm": "x (0.14.1)",
+   "command": "receipt ...--context-mode--use--20260925-2.json commands[1], verbatim (TMPDIR=scratchpad dir)",
+   "exit": 0,
+   "output_excerpt": "mcporter exit 0; ctx_execute_file printed: 5 3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c host-computed from the checkout: 5 3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc ... ts-pid-N.json asserted: exact match",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/15-R-context-mode-use-1.out)"
+  },
+  {
+   "name": "R-context-mode-use-tmp-clean",
+   "arm": "x (0.14.1)",
+   "command": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"entries_left_in_receipt_tmpdir\": []}",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results-x.json"
+  },
+  {
+   "name": "S6a-daemon-status-check",
+   "arm": "x (0.14.1)",
+   "command": "mcporter daemon status --json | python3 -c 'import json,os,sys;d=json.load(sys.stdin);c=open(\"/proc/%d/cmdline\"%d[\"pid\"]).read().replace(chr(0),\" \");ok=d[\"protocolVersion\"]==3 and d[\"socketPath\"].startswith(os.environ[\"MCPORTER_DAEMON_DIR\"]) and \"/tools/mcport ... rvers\"]));sys.exit(0 if ok else 1)'",
+   "exit": 0,
+   "output_excerpt": "[('<uuid:7231d6b0>', 1), ('<uuid:b6d8c55e>', 1)]",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/17-S6a-daemon-status-check.out)"
+  },
+  {
+   "name": "S6b-repeat-socraticode-health",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" call socraticode.codebase_health --args '{}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "SocratiCode — Infrastructure Health Check: Qdrant mode: external Qdrant endpoint: http://127.0.0.1:26333 [OK] External Qdrant (http://127.0.0.1:26333): Reachable Embedding provider: lmstudio ... t required for the vector database.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/18-S6b-repeat-socraticode-health.out)"
+  },
+  {
+   "name": "S6c-daemon-status-recheck",
+   "arm": "x (0.14.1)",
+   "command": "mcporter daemon status --json | python3 -c 'import json,os,sys;d=json.load(sys.stdin);c=open(\"/proc/%d/cmdline\"%d[\"pid\"]).read().replace(chr(0),\" \");ok=d[\"protocolVersion\"]==3 and d[\"socketPath\"].startswith(os.environ[\"MCPORTER_DAEMON_DIR\"]) and \"/tools/mcport ... rvers\"]));sys.exit(0 if ok else 1)'",
+   "exit": 0,
+   "output_excerpt": "[('<uuid:7231d6b0>', 1), ('<uuid:b6d8c55e>', 1)]",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/19-S6c-daemon-status-recheck.out)"
+  },
+  {
+   "name": "S6d-daemon-ownership",
+   "arm": "x (0.14.1)",
+   "command": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"status_pid\": 3732858, \"status_socket_is_arm_socket\": true, \"protocolVersion\": 3, \"metadata_pid\": 3732858, \"kernel_socket_owner_pids\": [3732858], \"cmdline_is_arm_prefix_daemon\": true, \"cwd_is_arm_snapshot\": true, \"owned\": true}",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results-x.json"
+  },
+  {
+   "name": "A1-ctx_execute_file-project-read",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute_file --args '{\"path\": \"~/code/native-agent-stack/AGENTS.md\", \"language\": \"python\", \"code\": \"import hashlib\\nb=FILE_CONTENT.encode()\\nprint(\\\"BYTES=%d SHA256=%s\\\" % (len(b), hashlib.sha256(b).hexdigest()))\"}' --output json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{ \"content\": [ { \"type\": \"text\", \"text\": \"path=~/code/native-agent-stack/AGENTS.md\\n```python\\nimport hashlib\\nb=FILE_CONTENT.encode()\\nprint(\\\"BYTES=%d SHA256=%s\\\" % (len(b), hashlib.sha256 ... 06ee5ef5b92b355e1a6d0f5305\\n\" } ] }",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/21-A1-ctx_execute_file-project-read.out)"
+  },
+  {
+   "name": "A2-ctx_execute-42",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\":\"javascript\",\"code\":\"console.log(6*7)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript console.log(6*7) ``` 42",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/22-A2-ctx_execute-42.out)"
+  },
+  {
+   "name": "A3-probe-persistence-and-ppid-chain",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth (x2)",
+   "exit": 0,
+   "output_excerpt": "```javascript console.log(\"PPID=\"+process.ppid) ``` PPID=3733179 ```javascript console.log(\"PPID=\"+process.ppid) ``` PPID=3733179",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/23-A3-probe-persistence-and-ppid-chain.out)"
+  },
+  {
+   "name": "A4-ai-memory-status",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" call ai-memory.memory_status --args '{\"workspace\":\"local\",\"project\":\"native-agent-stack\"}' --output json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{ \"counts\": { \"pages_latest\": 31, \"pages_all\": 35, \"sessions\": 32, \"observations\": 71552 } }",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/24-A4-ai-memory-status.out)"
+  },
+  {
+   "name": "B1a-daemon-stop-retires-daemon-and-server",
+   "arm": "x (0.14.1)",
+   "command": "mcporter daemon stop",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/25-B1a-daemon-stop-retires-daemon-and-server.out)"
+  },
+  {
+   "name": "B1b-next-probe-relaunches",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript console.log(\"PPID=\"+process.ppid) ``` PPID=3735598",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/26-B1b-next-probe-relaunches.out)"
+  },
+  {
+   "name": "B1c-daemon-restart",
+   "arm": "x (0.14.1)",
+   "command": "mcporter daemon restart",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running). Single-user daemon started.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/27-B1c-daemon-restart.out)"
+  },
+  {
+   "name": "B1d-probe-after-restart",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript console.log(\"PPID=\"+process.ppid) ``` PPID=3735983",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/28-B1d-probe-after-restart.out)"
+  },
+  {
+   "name": "B2a-probe-refuses-after-daemon-sigkill",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 1,
+   "output_excerpt": "[stderr] [mcporter] Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched. Error: Previous daemon exited unexpected ... orter/dist/daemon/client.js:128:26)",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/29-B2a-probe-refuses-after-daemon-sigkill.out)"
+  },
+  {
+   "name": "B2b-retire-orphans-and-archive-metadata",
+   "arm": "x (0.14.1)",
+   "command": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"descendants_alive_after_kill\": [], \"terminated_with_TERM\": true, \"escalated_to_KILL\": [], \"all_gone\": true, \"metadata_archived\": true}",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results-x.json"
+  },
+  {
+   "name": "B2c-deliberate-daemon-start",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" daemon start",
+   "exit": 0,
+   "output_excerpt": "Single-user daemon started.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/31-B2c-deliberate-daemon-start.out)"
+  },
+  {
+   "name": "B2d-list-context-mode-brief",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" list context-mode --brief --no-oauth",
+   "exit": 0,
+   "output_excerpt": "context-mode function ctx_execute(language: \"javascript\" | \"typescript\" | \"python\" | \"shell\" | \"ruby\" | \"go\" | \"rust\" | \"php\" | \"perl\" | \"r\" | \"elixir\" | \"csharp\", code: string, timeout?: nu ... text-mode/1.0.169/server.bundle.mjs",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/32-B2d-list-context-mode-brief.out)"
+  },
+  {
+   "name": "B2e-bridge-recovered",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\":\"python\",\"code\":\"print(\\\"bridge-recovered\\\")\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```python print(\"bridge-recovered\") ``` bridge-recovered",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/33-B2e-bridge-recovered.out)"
+  },
+  {
+   "name": "B3a-stop-and-hold-lock",
+   "arm": "x (0.14.1)",
+   "command": "mcporter daemon stop; mv user.json* aside; sleep 95 & lock=<holder pid, time>",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/34-B3a-stop-and-hold-lock.out)"
+  },
+  {
+   "name": "B3b-probe-while-lock-held-fails",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 1,
+   "output_excerpt": "[stderr] [mcporter] Daemon startup is taking longer than usual; Chrome relay discovery can take up to 30 seconds. [mcporter] MCPorter daemon did not become ready within 45 seconds. Run 'mcpo ... orter/dist/daemon/client.js:128:26)",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/35-B3b-probe-while-lock-held-fails.out)"
+  },
+  {
+   "name": "B3c-probe-after-holder-exit-recovers",
+   "arm": "x (0.14.1)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript console.log(\"PPID=\"+process.ppid) ``` PPID=3754312",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/36-B3c-probe-after-holder-exit-recovers.out)"
+  },
+  {
+   "name": "F-daemon-stop-no-leftovers",
+   "arm": "x (0.14.1)",
+   "command": "mcporter daemon stop",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/x/37-F-daemon-stop-no-leftovers.out)"
+  },
+  {
+   "name": "S1-command-v",
+   "arm": "y (0.13.13)",
+   "command": "command -v mcporter",
+   "exit": 0,
+   "output_excerpt": "~/.local/share/codex-ecosystem/tools/mcporter-0.13.13/bin/mcporter",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/01-S1-command-v.out)"
+  },
+  {
+   "name": "R-mcporter-install-0",
+   "arm": "y (0.13.13)",
+   "command": "receipt evidence/hosts/nativestack-5975wx-20260925/...--mcporter--install--20260925.json commands[0], verbatim",
+   "exit": 0,
+   "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/tools/mcporter-0.13.13/bin/mcporter -> ~/.local/share/codex-ecosystem/tools/mcporter-0.13.13/lib/node_modules/mcporter/dist/cli.js bootstrap pin (ado ... p verified-versions record: 0.13.13",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/02-R-mcporter-install-0.out)"
+  },
+  {
+   "name": "R-mcporter-install-1",
+   "arm": "y (0.13.13)",
+   "command": "receipt ...--mcporter--install--20260925.json commands[1] (mcporter --version), verbatim",
+   "exit": 0,
+   "output_excerpt": "0.13.13",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/03-R-mcporter-install-1.out)"
+  },
+  {
+   "name": "R-socraticode-use-0",
+   "arm": "y (0.13.13)",
+   "command": "receipt ...--socraticode--use--20260925-2.json commands[0] with C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" -> C=\"$SCRATCH_CFG\"",
+   "exit": 0,
+   "output_excerpt": "mcporter 0.13.13 server socraticode status ok transport STDIO ~/.local/share/codex-ecosystem/bin/node ~/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dis ... ['1.14.0'] | winner pins ['1.14.0']",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/04-R-socraticode-use-0.out)"
+  },
+  {
+   "name": "R-socraticode-use-1",
+   "arm": "y (0.13.13)",
+   "command": "receipt ...--socraticode--use--20260925-2.json commands[1] with C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" -> C=\"$SCRATCH_CFG\"",
+   "exit": 0,
+   "output_excerpt": "[OK] External Qdrant (http://127.0.0.1:26333): Reachable [OK] LM Studio: Reachable at http://127.0.0.1:18231/v1 [OK] Embedding model (nvidia/Nemotron-3-Embed-1B-BF16): Loaded Project: ~/code ... otron-3-Embed-1B-BF16 owned_by vllm",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/05-R-socraticode-use-1.out)"
+  },
+  {
+   "name": "R-socraticode-use-2",
+   "arm": "y (0.13.13)",
+   "command": "receipt ...--socraticode--use--20260925-2.json commands[2] with C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" -> C=\"$SCRATCH_CFG\"",
+   "exit": 0,
+   "output_excerpt": "8 results; oracle ranks {'catalogs/us-equities/gates-20260922.json': 1, 'scripts/trading_gates.py': 2} 1 catalogs/us-equities/gates-20260922.json:1-31 0.6250 2 scripts/trading_gates.py:1-38  ... de--use--20260925.json:55-57 0.3333",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/06-R-socraticode-use-2.out)"
+  },
+  {
+   "name": "R-socraticode-use-3",
+   "arm": "y (0.13.13)",
+   "command": "receipt ...--socraticode--use--20260925-2.json commands[3] with C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" -> C=\"$SCRATCH_CFG\"",
+   "exit": 0,
+   "output_excerpt": "control (unrelated query): 8 results; oracle ranks {'catalogs/us-equities/gates-20260922.json': None, 'scripts/trading_gates.py': None} (both must be absent) 1 observability/grand-dashboard/ ... board/passwordless.json:1-66 0.5000",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/07-R-socraticode-use-3.out)"
+  },
+  {
+   "name": "S3-ctx_doctor",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_doctor --args '{}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "context-mode doctor [OK] Runtimes: 4/11 (36%) — javascript, shell, python, perl [WARN] Performance: NORMAL — install Bun for 3-5x speed boost [OK] Storage sessions: ~/.local/state/native-age ... hs to verify [OK] Version: v1.0.169",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/08-S3-ctx_doctor.out)"
+  },
+  {
+   "name": "S4-list-ai-memory",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" list ai-memory --json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{ \"mode\": \"server\", \"name\": \"ai-memory\", \"status\": \"ok\", \"durationMs\": 64, \"instructions\": \"Long-term memory for the current project.\\n\\n**Choose project scope from the MCP client's identity ... ll\", \"defaultValue\": null } ] } ] }",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/09-S4-list-ai-memory.out)"
+  },
+  {
+   "name": "S4-list-jcodemunch",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" list jcodemunch --json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{ \"mode\": \"server\", \"name\": \"jcodemunch\", \"status\": \"ok\", \"durationMs\": 488, \"instructions\": \"This repo can be indexed by jcodemunch. Its whole tool catalog sits behind a 3-verb front door.  ...  \"placeholder\": \"<model>\" } ] } ] }",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/10-S4-list-jcodemunch.out)"
+  },
+  {
+   "name": "S5-token-report-oneoff",
+   "arm": "y (0.13.13)",
+   "command": "mcporter call --stdio \"$(command -v jcodemunch-mcp)\" --env CODE_INDEX_PATH=$SCRATCH_CODE_INDEX --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{ \"session_tokens_saved\": 0, \"session_calls\": 0, \"session_duration_s\": 0.1, \"session_response_tokens\": 0, \"total_tokens_saved\": 0, \"total_tokens_saved_basis\": { \"generation\": 2, \"first_gener ... : 125 }, \"estimator\": \"bytes/4\" } }",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/11-S5-token-report-oneoff.out)"
+  },
+  {
+   "name": "R-jcodemunch-use-0",
+   "arm": "y (0.13.13)",
+   "command": "receipt ...--jcodemunch-mcp--use--20260925-2.json commands[0] with CODE_INDEX_PATH=$HOME/.code-index -> arm-private copy",
+   "exit": 0,
+   "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp -> ~/.local/share/codex-ecosystem/python-tools/jcodemunch-mcp/bin/jcodemunch-mcp jcodemunch-mcp 1.108.319 stack ['1.108.319'] winn ... ndexed', '2026-09-23', 'loadable')]",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/12-R-jcodemunch-use-0.out)"
+  },
+  {
+   "name": "R-jcodemunch-use-1",
+   "arm": "y (0.13.13)",
+   "command": "receipt ...--jcodemunch-mcp--use--20260925-2.json commands[1] with CODE_INDEX_PATH=$HOME/.code-index -> arm-private copy",
+   "exit": 0,
+   "output_excerpt": "search_symbols greeting -> fixtures/after.py::greeting#function fixtures/before.py::greeting#function get_symbol_source fixtures/after.py::greeting#function lines 1 - 2 freshness fresh def g ... res/after.py in this checkout: True",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/13-R-jcodemunch-use-1.out)"
+  },
+  {
+   "name": "R-context-mode-use-0",
+   "arm": "y (0.13.13)",
+   "command": "receipt ...--context-mode--use--20260925-2.json commands[0], verbatim (TMPDIR=scratchpad dir)",
+   "exit": 0,
+   "output_excerpt": "plugin.json context-mode 1.0.169 | installed_plugins.json entry for this path: version 1.0.169 gitCommitSha 6f0cc6841c687e754059f36714a11233fda1a02b | equals the recipes/README.md reviewed - ... nt stack ['1.0.169'] winner pins []",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/14-R-context-mode-use-0.out)"
+  },
+  {
+   "name": "R-context-mode-use-1",
+   "arm": "y (0.13.13)",
+   "command": "receipt ...--context-mode--use--20260925-2.json commands[1], verbatim (TMPDIR=scratchpad dir)",
+   "exit": 0,
+   "output_excerpt": "mcporter exit 0; ctx_execute_file printed: 5 3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c host-computed from the checkout: 5 3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc ... ts-pid-N.json asserted: exact match",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/15-R-context-mode-use-1.out)"
+  },
+  {
+   "name": "R-context-mode-use-tmp-clean",
+   "arm": "y (0.13.13)",
+   "command": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"entries_left_in_receipt_tmpdir\": []}",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results-y.json"
+  },
+  {
+   "name": "S6a-daemon-status-check",
+   "arm": "y (0.13.13)",
+   "command": "mcporter daemon status --json | python3 -c 'import json,os,sys;d=json.load(sys.stdin);c=open(\"/proc/%d/cmdline\"%d[\"pid\"]).read().replace(chr(0),\" \");ok=d[\"protocolVersion\"]==3 and d[\"socketPath\"].startswith(os.environ[\"MCPORTER_DAEMON_DIR\"]) and \"/tools/mcport ... rvers\"]));sys.exit(0 if ok else 1)'",
+   "exit": 0,
+   "output_excerpt": "[('<uuid:fbb85b1b>', 1), ('<uuid:37ff6264>', 1)]",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/17-S6a-daemon-status-check.out)"
+  },
+  {
+   "name": "S6b-repeat-socraticode-health",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" call socraticode.codebase_health --args '{}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "SocratiCode — Infrastructure Health Check: Qdrant mode: external Qdrant endpoint: http://127.0.0.1:26333 [OK] External Qdrant (http://127.0.0.1:26333): Reachable Embedding provider: lmstudio ... t required for the vector database.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/18-S6b-repeat-socraticode-health.out)"
+  },
+  {
+   "name": "S6c-daemon-status-recheck",
+   "arm": "y (0.13.13)",
+   "command": "mcporter daemon status --json | python3 -c 'import json,os,sys;d=json.load(sys.stdin);c=open(\"/proc/%d/cmdline\"%d[\"pid\"]).read().replace(chr(0),\" \");ok=d[\"protocolVersion\"]==3 and d[\"socketPath\"].startswith(os.environ[\"MCPORTER_DAEMON_DIR\"]) and \"/tools/mcport ... rvers\"]));sys.exit(0 if ok else 1)'",
+   "exit": 0,
+   "output_excerpt": "[('<uuid:fbb85b1b>', 1), ('<uuid:37ff6264>', 1)]",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/19-S6c-daemon-status-recheck.out)"
+  },
+  {
+   "name": "S6d-daemon-ownership",
+   "arm": "y (0.13.13)",
+   "command": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"status_pid\": 3715156, \"status_socket_is_arm_socket\": true, \"protocolVersion\": 3, \"metadata_pid\": 3715156, \"kernel_socket_owner_pids\": [3715156], \"cmdline_is_arm_prefix_daemon\": true, \"cwd_is_arm_snapshot\": true, \"owned\": true}",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results-y.json"
+  },
+  {
+   "name": "A1-ctx_execute_file-project-read",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute_file --args '{\"path\": \"~/code/native-agent-stack/AGENTS.md\", \"language\": \"python\", \"code\": \"import hashlib\\nb=FILE_CONTENT.encode()\\nprint(\\\"BYTES=%d SHA256=%s\\\" % (len(b), hashlib.sha256(b).hexdigest()))\"}' --output json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{ \"content\": [ { \"type\": \"text\", \"text\": \"path=~/code/native-agent-stack/AGENTS.md\\n```python\\nimport hashlib\\nb=FILE_CONTENT.encode()\\nprint(\\\"BYTES=%d SHA256=%s\\\" % (len(b), hashlib.sha256 ... 06ee5ef5b92b355e1a6d0f5305\\n\" } ] }",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/21-A1-ctx_execute_file-project-read.out)"
+  },
+  {
+   "name": "A2-ctx_execute-42",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\":\"javascript\",\"code\":\"console.log(6*7)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript console.log(6*7) ``` 42",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/22-A2-ctx_execute-42.out)"
+  },
+  {
+   "name": "A3-probe-persistence-and-ppid-chain",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth (x2)",
+   "exit": 0,
+   "output_excerpt": "```javascript console.log(\"PPID=\"+process.ppid) ``` PPID=3715858 ```javascript console.log(\"PPID=\"+process.ppid) ``` PPID=3715858",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/23-A3-probe-persistence-and-ppid-chain.out)"
+  },
+  {
+   "name": "A4-ai-memory-status",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" call ai-memory.memory_status --args '{\"workspace\":\"local\",\"project\":\"native-agent-stack\"}' --output json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{ \"counts\": { \"pages_latest\": 31, \"pages_all\": 35, \"sessions\": 32, \"observations\": 71438 } }",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/24-A4-ai-memory-status.out)"
+  },
+  {
+   "name": "B1a-daemon-stop-retires-daemon-and-server",
+   "arm": "y (0.13.13)",
+   "command": "mcporter daemon stop",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/25-B1a-daemon-stop-retires-daemon-and-server.out)"
+  },
+  {
+   "name": "B1b-next-probe-relaunches",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript console.log(\"PPID=\"+process.ppid) ``` PPID=3717687",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/26-B1b-next-probe-relaunches.out)"
+  },
+  {
+   "name": "B1c-daemon-restart",
+   "arm": "y (0.13.13)",
+   "command": "mcporter daemon restart",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running). Single-user daemon started.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/27-B1c-daemon-restart.out)"
+  },
+  {
+   "name": "B1d-probe-after-restart",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript console.log(\"PPID=\"+process.ppid) ``` PPID=3717905",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/28-B1d-probe-after-restart.out)"
+  },
+  {
+   "name": "B2a-probe-refuses-after-daemon-sigkill",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 1,
+   "output_excerpt": "[stderr] [mcporter] Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched. Error: Previous daemon exited unexpected ... orter/dist/daemon/client.js:128:26)",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/29-B2a-probe-refuses-after-daemon-sigkill.out)"
+  },
+  {
+   "name": "B2b-retire-orphans-and-archive-metadata",
+   "arm": "y (0.13.13)",
+   "command": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"descendants_alive_after_kill\": [], \"terminated_with_TERM\": true, \"escalated_to_KILL\": [], \"all_gone\": true, \"metadata_archived\": true}",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results-y.json"
+  },
+  {
+   "name": "B2c-deliberate-daemon-start",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" daemon start",
+   "exit": 0,
+   "output_excerpt": "Single-user daemon started.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/31-B2c-deliberate-daemon-start.out)"
+  },
+  {
+   "name": "B2d-list-context-mode-brief",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" list context-mode --brief --no-oauth",
+   "exit": 0,
+   "output_excerpt": "context-mode function ctx_execute(language: \"javascript\" | \"typescript\" | \"python\" | \"shell\" | \"ruby\" | \"go\" | \"rust\" | \"php\" | \"perl\" | \"r\" | \"elixir\" | \"csharp\", code: string, timeout?: nu ... text-mode/1.0.169/server.bundle.mjs",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/32-B2d-list-context-mode-brief.out)"
+  },
+  {
+   "name": "B2e-bridge-recovered",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\":\"python\",\"code\":\"print(\\\"bridge-recovered\\\")\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```python print(\"bridge-recovered\") ``` bridge-recovered",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/33-B2e-bridge-recovered.out)"
+  },
+  {
+   "name": "B3a-stop-and-hold-lock",
+   "arm": "y (0.13.13)",
+   "command": "mcporter daemon stop; mv user.json* aside; sleep 95 & lock=<holder pid, time>",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/34-B3a-stop-and-hold-lock.out)"
+  },
+  {
+   "name": "B3b-probe-while-lock-held-fails",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 1,
+   "output_excerpt": "[stderr] [mcporter] Daemon startup is taking longer than usual; Chrome relay discovery can take up to 30 seconds. [mcporter] MCPorter daemon did not become ready within 45 seconds. Run 'mcpo ... orter/dist/daemon/client.js:128:26)",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/35-B3b-probe-while-lock-held-fails.out)"
+  },
+  {
+   "name": "B3c-probe-after-holder-exit-recovers",
+   "arm": "y (0.13.13)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript console.log(\"PPID=\"+process.ppid) ``` PPID=3732605",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/36-B3c-probe-after-holder-exit-recovers.out)"
+  },
+  {
+   "name": "F-daemon-stop-no-leftovers",
+   "arm": "y (0.13.13)",
+   "command": "mcporter daemon stop",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/raw-outputs.json (raw/y/37-F-daemon-stop-no-leftovers.out)"
+  },
+  {
+   "name": "M0-minimal-path-resolution",
+   "arm": "verifier pa (0.14.1, no ps on the daemon's PATH)",
+   "command": "command -v mcporter; command -v ps; mcporter --version",
+   "exit": 0,
+   "output_excerpt": "~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/bin/mcporter\nps: not on PATH\n0.14.1",
+   "pass": true,
+   "observed_by": "verifier",
+   "output_file": "verifier/vresults-pa.json"
+  },
+  {
+   "name": "M1-keepalive-probe-without-ps-on-PATH",
+   "arm": "verifier pa (0.14.1, no ps on the daemon's PATH)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 1,
+   "output_excerpt": "\n[stderr] [mcporter] Transport ownership could not be verified; inspect it before recovery.\nError: Transport ownership could not be verified; inspect it before recovery.\n    at DaemonClient.sendRequest (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:206:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async DaemonClient.invoke (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:134:20) {\n  code: 'transport_retirement_failed'\n}",
+   "pass": false,
+   "observed_by": "verifier",
+   "output_file": "verifier/vresults-pa.json"
+  },
+  {
+   "name": "M2-daemon-ownership",
+   "arm": "verifier pa (0.14.1, no ps on the daemon's PATH)",
+   "command": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"status_pid\": 4060462, \"status_socket_is_arm_socket\": true, \"protocolVersion\": 3, \"metadata_pid\": 4060462, \"kernel_socket_owner_pids\": [4060462], \"cmdline_is_arm_prefix_daemon\": true, \"cwd_is_arm_snapshot\": true, \"owned\": true}",
+   "pass": true,
+   "observed_by": "verifier",
+   "output_file": "verifier/vresults-pa.json"
+  },
+  {
+   "name": "M3-daemon-stop-no-leftovers",
+   "arm": "verifier pa (0.14.1, no ps on the daemon's PATH)",
+   "command": "mcporter daemon stop",
+   "exit": 1,
+   "output_excerpt": "\n[stderr] [mcporter] Retirement is unverified; inspect the previous transport before stopping this owner.\nError: Retirement is unverified; inspect the previous transport before stopping this owner.\n    at DaemonClient.sendRequest (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:206:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async DaemonClient.stop (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/ ... js:44:9)\n    at async runCli (file:",
+   "pass": false,
+   "observed_by": "verifier",
+   "output_file": "verifier/vresults-pa.json"
+  },
+  {
+   "name": "M0-minimal-path-resolution",
+   "arm": "verifier pb (0.13.13, no ps on the daemon's PATH)",
+   "command": "command -v mcporter; command -v ps; mcporter --version",
+   "exit": 0,
+   "output_excerpt": "~/.local/share/codex-ecosystem/tools/mcporter-0.13.13/bin/mcporter\nps: not on PATH\n0.13.13",
+   "pass": true,
+   "observed_by": "verifier",
+   "output_file": "verifier/vresults-pb.json"
+  },
+  {
+   "name": "M1-keepalive-probe-without-ps-on-PATH",
+   "arm": "verifier pb (0.13.13, no ps on the daemon's PATH)",
+   "command": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=4062622",
+   "pass": true,
+   "observed_by": "verifier",
+   "output_file": "verifier/vresults-pb.json"
+  },
+  {
+   "name": "M2-daemon-ownership",
+   "arm": "verifier pb (0.13.13, no ps on the daemon's PATH)",
+   "command": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"status_pid\": 4062579, \"status_socket_is_arm_socket\": true, \"protocolVersion\": 3, \"metadata_pid\": 4062579, \"kernel_socket_owner_pids\": [4062579], \"cmdline_is_arm_prefix_daemon\": true, \"cwd_is_arm_snapshot\": true, \"owned\": true}",
+   "pass": true,
+   "observed_by": "verifier",
+   "output_file": "verifier/vresults-pb.json"
+  },
+  {
+   "name": "M3-daemon-stop-no-leftovers",
+   "arm": "verifier pb (0.13.13, no ps on the daemon's PATH)",
+   "command": "mcporter daemon stop",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).",
+   "pass": true,
+   "observed_by": "verifier",
+   "output_file": "verifier/vresults-pb.json"
+  },
+  {
+   "name": "cutover: precondition",
+   "arm": "production (cutover)",
+   "command": "coordinator window; see cutover.json",
+   "exit": null,
+   "output_excerpt": "No mcporter daemon was running before the switch, so there was no 0.13.13 daemon host to drain or stop.",
+   "pass": true,
+   "observed_by": "coordinator",
+   "output_file": "cutover.json"
+  },
+  {
+   "name": "cutover: switch the binary",
+   "arm": "production (cutover)",
+   "command": "coordinator window; see cutover.json",
+   "exit": null,
+   "output_excerpt": "bin/mcporter relinked to tools/mcporter-0.14.1/bin/mcporter, the prefix installed from the verified tarball during qualification.",
+   "pass": true,
+   "observed_by": "coordinator",
+   "output_file": "cutover.json",
+   "at_utc": "about 2026-09-25T20:12Z"
+  },
+  {
+   "name": "cutover: post-switch use",
+   "arm": "production (cutover)",
+   "command": "coordinator window; see cutover.json",
+   "exit": null,
+   "output_excerpt": "`mcporter --config ~/.local/share/codex-ecosystem/config/mcporter.json list socraticode --brief --no-oauth` listed 26 tools; `mcporter call socraticode.codebase_health` printed the health check with Qdrant reachable; the next call started a 0.14.1 daemon.",
+   "pass": true,
+   "observed_by": "coordinator",
+   "output_file": "cutover.json"
+  },
+  {
+   "name": "read-back of the switched state",
+   "arm": "production",
+   "command": "read-only: readlink, --version, installed-versions.txt record, command -v ps, sha256sum of the prefix package.json",
+   "exit": 0,
+   "output_excerpt": "bin/mcporter -> tools/mcporter-0.14.1/bin/mcporter; '0.14.1'; 0.13.13 prefix present for rollback; installed-versions.txt mcporter record 0.14.1; ps at /usr/bin/ps.",
+   "pass": true,
+   "observed_by": "writing_worker",
+   "output_file": "out/readback.out"
+  }
+ ],
+ "differences": [
+  "No acceptance regression. The same 37-step acceptance passed 37/37 on 0.14.1 and 37/37 on 0.13.13, with identical per-step outcomes and exit codes: 0 outcome mismatches and 0 steps that fail only on the candidate. B2a and B3b are expected non-zero exits in both arms.",
+  "Resolved dependency trees (npm ls; the package ships no shrinkwrap): the 0.14.1 prefix differs from the 0.13.13 prefix only in rolldown 1.2.8->1.2.9 (with @oxc-project/types 0.149.0->0.150.0) and string-width 8.2.2->8.3.0. string-width comes in transitively through ora, and the review did not predict it. @modelcontextprotocol/client, server and core 2.1.0 (without upstream's lockfile patch), zod 4.6.5 and commander 15.0.0 are identical. So the dependency set npm installs still differs from the patched-SDK lockfile that upstream CI tests, as it already did for 0.13.13.",
+  "Outputs, after normalizing run-level noise (pids, durations, arm path, sanitized ids): 63 of 68 raw stdout/stderr files are byte-identical across arms. The other 5 differ only in durationMs, one pid, the order of two tied-score (0.4500) socraticode results at ranks 3 and 4, and ai-memory observations growing 71438->71552 between arms because live-session hooks keep writing. `list context-mode --brief` lists the same 11 tools with identical signatures; only the footer latency and the arm's scratch path differ.",
+  "Recovery semantics are identical. After a daemon SIGKILL both versions refuse with 'Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched.' Both recover the same deliberate way: archive user.json, then daemon start prints 'Single-user daemon started.' and the next call prints bridge-recovered. With a held user.json.lock both fail with 'MCPorter daemon did not become ready within 45 seconds' and recover without a manual step once the holder exits. Per the source diff, 0.14.1's fs-json lock files add a random UUID third line, but the lock-recoverability check is byte-identical, and both versions honored a two-line lock held by a live pid.",
+  "Retained harness failure, not a version effect: attempt 1 of the baseline failed R-context-mode-use-1 with EROFS writing the context-mode preload. The harness had exported an arm-private TMPDIR that is read-only inside that receipt's own bwrap sandbox. Pointing that receipt's TMPDIR at a scratchpad directory, which sits on the sandbox's private tmpfs, fixed it, and the corrected harness then passed on both versions.",
+  "Measured by the verifier, not by the acceptance: with no `ps` on the daemon's PATH, 0.14.1 fails a keep-alive call ('Transport ownership could not be verified', exit 1) and `mcporter daemon stop` refuses ('Retirement is unverified', exit 1), while 0.13.13 passes both (verifier arms pa and pb). 0.14.1's process inventory runs `ps` from PATH where 0.13.13 ran /bin/ps."
+ ],
+ "production_untouched_during_qualification": "Read-only fingerprints were taken by fingerprint.py at 18:48:43Z (before, after the prefix install), 18:57:51Z (after baseline attempt 1), 19:00:49Z (after baseline), 19:02:48Z (after the candidate and its verified cleanup) and 19:05:12Z (final, after scratch removal).\n\nUnchanged across 18:48:43Z to 19:02:48Z:\n- ~/.local/share/codex-ecosystem/bin/mcporter -> tools/mcporter-0.13.13/bin/mcporter.\n- The installed-versions.txt mcporter record (0.13.13).\n- The sha256 of the host config/mcporter.json.\n- The ~/.mcporter listing. credentials.json and daemon/user.key names, sizes and mtimes are unchanged; neither file was ever opened. No user.sock listener existed before or after, so no shared daemon was running and none was contacted, stopped or signalled.\n- Live clone HEAD 7783682f and main checkout 720e294b, each with an unchanged porcelain-status hash. Receipts ran from a git-archive snapshot and git status used --no-optional-locks.\n- The hashes of ~/.claude/plugins/installed_plugins.json and of the codex context-mode 1.0.169 plugin directory and stats.json. The host start.mjs, which self-heals ~/.claude files, was never launched.\n- The user-service unit/state hash (12 running services; nothing restarted or stopped).\n- points_count of all 9 Qdrant collections (e.g. codebase_9c518b2ee5c8 68666, socraticode_metadata 4).\n- Every Qdrant data-write REST counter: points upsert 16974, points delete 941, collection create 6, collection delete 2, payload index 10.\n\nOnly read counters moved. Collection GETs, points retrieve and scroll grew, and points/query went +6, which matches the 3 runs x 2 receipt searches.\n\nThe only write-class movement in that window was snapshot create/delete, +5 each, all before 18:57:51Z. Neither the socraticode 1.14.0 dist nor either mcporter dist has a snapshot call site, and snapshots do not change collection data.\n\nAfter 19:02:48Z none of this unit's processes existed, as verified by the harness and a /proc cwd scan. Between that fingerprint and the final one, the live clone moved to dcd6f0cf and PUT points +14 / delete +2 appeared, i.e. production watchers re-indexing. Final points counts still equal the before counts.\n\nThe scratch socraticode ran with SOCRATICODE_WATCHER=off and SOCRATICODE_AUTO_RESUME=off, and its private lock dirs stayed empty, so no index or watch lock was taken. The scratch context-mode ran inside bwrap with a read-only root and only arm-private state writable. jcodemunch used a private copy of ~/.code-index.\n\nai-memory received only list, a tools listing, and memory_status, which is a reader-path status read per the server source. The GPU servers received only the socraticode health/status probes, one embedding request per search query, and one /v1/models GET per run.",
+ "switch": {
+  "method": "Symlink switch by the coordinator (cutover.json): bin/mcporter to the qualification prefix tools/mcporter-0.14.1; no daemon was running, so none had to be drained.",
+  "planned_procedure": "This was not performed; production was not switched.\n\nAdoption, after this result is recorded as an independently reviewed use-stage host receipt with scripts/host_receipts.py, as docs/decisions/2026-09-24-accepted-needs-use-stage.md requires:\n1. Update the pin records and run the repository validation command:\n   - manifests/stack.json: mcporter -> 0.14.1. Also fix its command to `mcporter --config \"${MCPORTER_CONFIG}\" list socraticode --brief --no-oauth`, because the targetless `list --brief` form fails on both versions.\n   - adoption/pins-linux-x86_64.json: url https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz, sha256 8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2, and an install_note citing integrity sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ==.\n   - The recipes/README.md table and the catalogs/landscape mcporter winner pin.\n2. Cut the daemon over deliberately. Protocol 3 is shared, so an old daemon host keeps serving new clients, and mixed clientInfo spawns duplicate keep-alive children.\n   - Run `mcporter daemon status --json` on the shared ~/.mcporter namespace.\n   - If a 0.13.13 host is running, wait until every server shows activeCalls 0, then run `mcporter daemon stop`.\n3. Run `ln -sfn ~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/bin/mcporter ~/.local/share/codex-ecosystem/bin/mcporter` and set the mcporter record in ~/.local/share/codex-ecosystem/installed-versions.txt to 0.14.1.\n4. Verify `mcporter --version` prints 0.14.1. Re-run the retained mcporter install receipt and socraticode use receipt against the host config; the next keep-alive call launches a 0.14.1 daemon.\n5. The macOS arm64 lane (same tarball) needs its own host acceptance.",
+  "rollback": "Now, before any switch, nothing needs undoing: the pin, bin/mcporter, the host config and the shared daemon were never touched. The unused prefix tools/mcporter-0.14.1 was left in place under the never-delete rule; it can be removed later by an explicit decision.\n\nAfter an adoption:\n1. Run `ln -sfn ~/.local/share/codex-ecosystem/tools/mcporter-0.13.13/bin/mcporter ~/.local/share/codex-ecosystem/bin/mcporter`. The 0.13.13 prefix and ~/.local/share/codex-ecosystem/downloads/mcporter-0.13.13.tgz (sha256 ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d) are retained.\n2. Drain the running 0.14.1 daemon: poll `mcporter daemon status --json` until every server shows activeCalls 0, then run `mcporter daemon stop`. The next call relaunches a 0.13.13 host.\n3. Revert manifests/stack.json, adoption/pins-linux-x86_64.json, recipes/README.md, the catalogs/landscape winner pin and the installed-versions.txt mcporter record.\n\nThere is no config or state migration to reverse: the config only gains optional fields, and the daemon protocol is 3 in both versions."
+ },
+ "verifier": {
+  "verdict": "agree",
+  "production_touched": false,
+  "defects": [
+   {
+    "claim": "The acceptance cannot detect the known ps-from-PATH change from the research. So 'Recovery semantics are identical' and 'No acceptance regression' hold only when ps is on the daemon's PATH. I measured it: when the daemon's PATH has no ps, 0.14.1 cannot connect a keep-alive server, and `mcporter daemon stop` refuses to stop it. 0.13.13 does both normally. The switch and rollback procedures depend on `mcporter daemon stop` and never check that ps resolves.",
+    "evidence": "Verifier arms pa (0.14.1) and pb (0.13.13). Each ran in its own private MCPORTER_DAEMON_DIR with PATH = <prefix>/bin plus a directory holding only node and bwrap, so `command -v ps` printed 'ps: not on PATH'.\n- pa M1 (context-mode.ctx_execute probe) exited 1 with 'Transport ownership could not be verified; inspect it before recovery.' and code transport_retirement_failed.\n- pa M3 `mcporter daemon stop` exited 1 with 'Retirement is unverified; inspect the previous transport before stopping this owner.' The harness then had to send TERM to the owned daemon pid 4060462 and its two sandbox children.\n- pb M1 exited 0 (PPID=4062622), and pb M3 `daemon stop` exited 0.\n- Source: in dist/daemon/process-retirement.js:157, 0.14.1 calls exec('ps') where 0.13.13 calls exec('/bin/ps'). broker.js:190 calls ownedProcessTree on every connect.\n- This host is not affected today: grep counts for mcporter are 0 in ~/.claude/settings.json, ~/.codex/config.toml, ~/.codex/hooks.json, ~/.config/systemd/user and crontab.\n- Fix: record this as a measured difference in the receipt's limitations (not as 'untested'). Add a switch precondition that ps must resolve on the PATH of every environment that launches the mcporter daemon. Note in the rollback plan that a 0.14.1 daemon started without ps must be retired by signal, because `daemon stop` fails.",
+    "severity": "material"
+   },
+   {
+    "claim": "receipt_draft.claim says the fingerprints over the run window 'showed no Qdrant data-write requests'. But the fingerprint's own write-class snapshot counters rose by 5 creates and 5 deletes inside that window. The claim should say so and name the other unit responsible.",
+    "evidence": "- fp-diff.txt, before (18:48:43Z) to after-y-attempt1 (18:57:51Z): POST /snapshots went 5 to 10 and DELETE /snapshots/{name} went 5 to 10.\n- PUT points (16974) and points/delete (941) were unchanged through after-x (19:02:48Z).\n- Attribution, now backed by evidence: impl/socraticode/snap_restore.sh creates, downloads and deletes one snapshot per production collection (5 COLS), and impl/socraticode/snap-restore2.out records 'start 2026-09-25T18:48:58Z' and 'end 2026-09-25T18:49:17Z'.\n- Suggested wording: no point upsert/delete and no collection create/delete/index requests; snapshot create/delete +5 each, from the socraticode unit's snapshot copy at 18:48:58-18:49:17Z.",
+    "severity": "minor"
+   },
+   {
+    "claim": "production_untouched_proof has no before/after fingerprint for the hook and config files. ~/.claude/settings.json and ~/.codex/config.toml were modified inside or just after the run window, so the evidence that hook commands are unchanged rests on design and timing, not on a fingerprint.",
+    "evidence": "- Verifier stat at 19:18:22Z: ~/.claude/settings.json mtime 19:01:59Z; ~/.codex/config.toml mtime 19:04:38Z.\n- At 19:01:59Z the x arm was inside its lock-hold wait (B3b ended 19:01:56Z, B3c at 19:02:47Z), when only `sleep 95` and the harness were alive. The x arm ended at 19:02:48Z.\n- context-mode ran under bwrap with --ro-bind / /, and start.mjs was never launched.\n- The verifier re-ran the same step set from 19:18:22Z to 19:36:03Z, and both mtimes stayed unchanged (fp/v-before.ext.json vs fp/v-final.ext.json).\n- No Claude or Codex process started after 18:40Z is still alive, so the writer cannot be identified. This unit is an implausible source, but the evidence does not rule it out.",
+    "severity": "minor"
+   },
+   {
+    "claim": "Some pass criteria are looser or more order-dependent than the claim wording suggests. The recorded outputs still support the claims.",
+    "evidence": "- S6a requires at least 2 daemon servers, so it passes only if S3 (the first context-mode keep-alive call) runs before it. The verifier's first re-run left S3 out; S6a and S6c then exited 1 with a single connection [('<uuid:1d336070>', 1)]. The ordered re-run (socraticode, then ctx_doctor, then S6) passed with 2 connections that stayed identical across S6b.\n- B3b passes on any non-zero exit (accept.py:523). The '45 seconds' reason is not asserted, although it appears in the x, y and verifier outputs.\n- S3 passes even though ctx_doctor prints '[FAIL] Hooks config' (the scratch CODEX_HOME has no hooks.json). This is identical in both arms.\n- B2's orphan-TERM path does nothing: descendants_alive_after_kill was [] in x, y and the verifier run. The implementer disclosed this.",
+    "severity": "minor"
+   }
+  ],
+  "reproduced": [
+   "Integrity: I fetched the npm registry version document, the GitHub release v0.14.1 and checksums.txt fresh. The retained tarball is 464028 bytes, with sha256 8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2, sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ== and sha1 8dbc86c05013e4dfbfdc155555202a36a3936015. These equal dist.integrity, dist.shasum, the release asset digest and the checksums.txt entry.",
+   "Installed prefix: lib/node_modules/mcporter is byte-identical to the extracted tarball (diff -r rc 0, 679 files).",
+   "Dependencies: all 40 installed packages are byte-identical to their registry tarballs. Each download's sha512 equals the registry dist.integrity, which equals the implementer's audited staging lockfile (0 mismatches, 13,429,200 bytes checked).",
+   "npm registry ECDSA signatures over name@version:integrity verified with openssl against registry.npmjs.org/-/npm/v1/keys: 41 of 41.",
+   "Provenance: the SLSA subject sha512 equals the tarball's. Built by release.yml at refs/tags/v0.14.1, commit 93e0916cafe2d624b94271e31b75ca681a016514, run 36004499308, on a GitHub-hosted runner. The implementer's audit JSON lists mcporter 0.14.1 among the 13 verified attestations, with invalid [] and missing [].",
+   "Order: verification finished before the install. Tarball 18:43:24Z, compare 18:43:37Z, audit 18:44:03Z, prefix birth time 18:44:28Z.",
+   "Candidate re-run (0.14.1) in a fresh 0700 namespace, from a fresh copy of the snap-7783682f snapshot, with a scratch config derived independently from the host config. After path mapping it equals the implementer's x config.",
+   "S1 and R-mcporter-install-1: resolves to the prefix and prints 0.14.1.",
+   "R-socraticode-use-0 to 3: 'mcporter 0.14.1'; status ok for socraticode 1.14.0; three [OK] lines and Status: green; '8 results; oracle ranks {gates-20260922.json: 1, trading_gates.py: 2}'; control query 8 results with both ranks None.",
+   "S4: ai-memory 23 tools and jcodemunch 6 tools. The tool-name hashes 939a4dd79b673477 and 29e73d84931c972a equal those of both implementer arms.",
+   "S5 printed session_calls. R-jcodemunch-use-0/1 gave list_repos count 1 and 'equals those lines ... True'. R-context-mode-use-1 printed 'asserted: exact match', and its temp dir was left clean.",
+   "S3 ctx_doctor exited 0. The ordered S6a-d re-run showed protocolVersion 3, 2 connections unchanged across the repeated codebase_health call, and the daemon cmdline under tools/mcporter-0.14.1 and owned by this namespace.",
+   "A1 printed BYTES=10844 SHA256=9b56cee5d4b2a98a2bd6b2a84fdbd272b035f006ee5ef5b92b355e1a6d0f5305. A2 printed 42. A3 printed the same PPID twice, and the chain runs bwrap to the daemon.",
+   "B1a-d: daemon and server retired, socket and metadata removed. The next probe relaunched with new pids, then daemon restart.",
+   "B2a-e: after SIGKILL the probe exited 1 with the exact 'Previous daemon exited unexpectedly ... No replacement was launched.' text. Deliberate start printed 'Single-user daemon started.', the brief listing showed 11 tools, and the next call printed bridge-recovered.",
+   "B3a-c: with the startup lock held, the probe exited 1 with 'did not become ready within 45 seconds' (45.3 s). After the holder exited on its own (95.1 s), the probe exited 0. F: daemon stop exited 0 and nothing was left over.",
+   "Production, verifier checks from 19:18:22Z to 19:36:03Z plus implementer fingerprints:\n- 12 of 12 running user services have unchanged ActiveEnterTimestamp and MainPID with NRestarts 0; all started before 15:53Z.\n- bin/mcporter still points to tools/mcporter-0.13.13, and the bin directory's newest mtime is 15:33:33Z.\n- The installed-versions record is 0.13.13, and the host config sha256 is unchanged.\n- The ~/.mcporter names, sizes and mtimes are unchanged, and no user.sock listener exists.\n- The main checkout is at 720e294b and clean. The production ~/.code-index was untouched during the jcodemunch calls. No npm writes landed in ~/.npm during 18:40-19:10Z."
+  ],
+  "notes": "**Verdict:** I agree. Every value in receipt_draft.claim appears in the implementer's recorded outputs, and I reproduced the candidate-arm steps behind them myself. Integrity of tools/mcporter-0.14.1 is confirmed end to end: the verified tarball, all 40 dependencies bound to registry tarballs, 41 of 41 registry signatures checked with openssl, and the provenance subject. I did not re-verify the Sigstore bundle signature myself (no cosign on this host); the implementer's npm audit covers it.\n\n**Material finding (defect 1):** the acceptance is blind to the ps-from-PATH change. With ps missing from the daemon's PATH, 0.14.1 cannot connect a keep-alive server, and `mcporter daemon stop` refuses to stop the daemon. 0.13.13 works. No launcher on this host is affected, but the receipt, the switch preconditions and the rollback notes must carry it.\n\n**My S6 retry:** my first S6a/S6c failure was a step-order artifact in my own re-run. I recorded it and ran the steps once more in the implementer's order, and they passed.\n\n**Qdrant writes during my window (+307 upserts, +12 deletes, codebase_9c518b2ee5c8 68666 to 68712):** these came after another actor's live-clone checkout at 19:18:46Z (reflog). After my processes had exited, the next checkout (to 5b6014eb) was followed by +320 more upserts, which shows production watchers re-index after every checkout. My scratch socraticode ran with the watcher and auto-resume off. Its lock dir stayed empty, and in lock.js acquireIdentityLock writes a lock file that persists, so it never took an index lock. Points counts at the implementer's final fingerprint equal their before counts.\n\n**My load on production:**\n- Qdrant: 2 search queries plus status and health reads.\n- Embedding server: 2 embedding requests plus health probes.\n- ai-memory: a tools listing only.\n- Network: npm registry and GitHub metadata and tarballs only (GitHub API once, unauthenticated).\n- No GPU-heavy work. Nothing was installed, switched or restarted.\n\n**Cleanup:** my private dirs ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/{vf,vs,pa,pb} were enumerated, the set was asserted exactly, and each was removed by literal path. The mcporter/ base directory, which I created and which was empty, was removed too. The parent now holds only ai-memory, dagu and socraticode. No verifier processes or sockets remain.\n\n**Evidence** is in <scratchpad>/sota-refresh/impl/mcporter/verifier/:\n- vaccept.py, vfpdiff.py and fingerprint.py (extended with service start times, a bin table and stat-only hook mtimes)\n- vresults-{vf,vs,pa,pb}.json with raw/ and run-*.log\n- fp/v-{before,mid,after,final}(.ext).json\n- integrity/ (integrity-verifier.json, deps-binding.json, sigs-result.json, attestations.json, fresh registry and GitHub metadata)"
+ },
+ "unverified": [
+  "Unchanged upstream tests at v0.14.1 (corepack pnpm install --frozen-lockfile, pnpm check, pnpm test) were not run. They would pull the full dev dependency set and exercise upstream daemon tests on a shared host, so this unit has no unchanged-upstream-test evidence.",
+  "The behaviour of 0.14.1 with the host config itself is untested: SOCRATICODE_WATCHER=auto with startup auto-resume, context-mode start.mjs, and the serena and headroom keep-alive servers. It was excluded because it would write to production Qdrant and to ~/.claude.",
+  "Mixed-version daemon cutover, the shared ~/.mcporter namespace under 0.14.1, and daemon process retirement with `ps` resolved from a minimal PATH were not tested.",
+  "The SIGSTOP-unresponsive-daemon, scoped-registration-cleanup and changed-process-root lifecycle stages were not rerun. The manual orphan-TERM path in B2 was vacuous, because no transport survived the daemon SIGKILL.",
+  "The refuter's report that the SDK validator bundles fast-uri 3.1.0 with open advisories, present in both versions, was not independently re-checked.",
+  "The macOS arm64 lane was not evaluated. The tarball is identical, but that host needs its own acceptance.",
+  "The Qdrant snapshot create/delete activity (+5 each) and the post-run upserts are attributed to other actors from timing and code search: no snapshot call sites exist in socraticode or mcporter, and the counters were unchanged at the post-run fingerprint. Qdrant telemetry does not identify clients, so this is not a per-client observation.",
+  "That memory_status wrote nothing to the ai-memory store rests on the server source (a reader-path status read). The store could not be fingerprinted meaningfully, because live session hooks write to it continuously.",
+  "OAuth flows were untested (all calls used --no-oauth). So were the emit-ts/generate-cli output changes, --persist, --tail-log and the chrome-devtools preload changes."
+ ]
+}

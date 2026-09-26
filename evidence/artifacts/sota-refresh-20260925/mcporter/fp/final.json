@@ -1,0 +1,170 @@
+{
+ "at_utc": "2026-09-25T19:05:12Z",
+ "bin_mcporter_link": "~/.local/share/codex-ecosystem/tools/mcporter-0.13.13/bin/mcporter",
+ "claude_installed_plugins_json": {
+  "mode": "0o644",
+  "mtime_ns": 1790221100614563223,
+  "sha256": "2bbfe7c45d9625726ef5b7cbc8bfab2940b7282560f6a11413f9bbfc517342b9",
+  "size": 1201
+ },
+ "codex_context_mode_plugin_dir_listing_sha256": "f12fd1ba9ec898f45fff6ed77f8a04e190381317e43ccc91fdc92dd99d184174",
+ "codex_context_mode_plugin_stats_json": {
+  "mode": "0o644",
+  "mtime_ns": 1790221836542600733,
+  "sha256": "3611c42615a3d51041d82656e290a37024051b15454f42f5b4297f357538197a",
+  "size": 142
+ },
+ "installed_versions_mcporter": "0.13.13",
+ "label": "final",
+ "live_clone": {
+  "head": "dcd6f0cf01ee67417946f70c02c068f1c2f1b654",
+  "status_lines": 0,
+  "status_porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+ },
+ "main_checkout": {
+  "head": "720e294b5c10211d8f75a939bc478af734279d74",
+  "status_lines": 0,
+  "status_porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+ },
+ "mcporter_config_sha256": "0c4ff1ef4b8a39fa3bf408fb19bd31975719649151b2280047c56aed3ea4faeb",
+ "mcporter_home_listing": {
+  "credentials.json": {
+   "mode": "0o600",
+   "mtime_ns": 1790315936718858275,
+   "size": 104
+  },
+  "daemon": {
+   "mode": "0o700",
+   "mtime_ns": 1790351072249783340,
+   "size": 4096
+  },
+  "daemon/user.key": {
+   "mode": "0o600",
+   "mtime_ns": 1790221089411653169,
+   "size": 32
+  }
+ },
+ "mcporter_socket_listeners": [],
+ "qdrant": {
+  "9c518b2ee5c8_symgraph_file": {
+   "config_sha256": "12706bec74c17e0a2cc4a79246df39934a8ce75ea3b5202a68befc26b5450726",
+   "payload_schema": [],
+   "points_count": 902,
+   "status": "green"
+  },
+  "9c518b2ee5c8_symgraph_index": {
+   "config_sha256": "12706bec74c17e0a2cc4a79246df39934a8ce75ea3b5202a68befc26b5450726",
+   "payload_schema": [],
+   "points_count": 268,
+   "status": "green"
+  },
+  "9c518b2ee5c8_symgraph_meta": {
+   "config_sha256": "12706bec74c17e0a2cc4a79246df39934a8ce75ea3b5202a68befc26b5450726",
+   "payload_schema": [],
+   "points_count": 1,
+   "status": "green"
+  },
+  "b053c4b010f2_symgraph_file": {
+   "config_sha256": "12706bec74c17e0a2cc4a79246df39934a8ce75ea3b5202a68befc26b5450726",
+   "payload_schema": [],
+   "points_count": 4,
+   "status": "green"
+  },
+  "b053c4b010f2_symgraph_index": {
+   "config_sha256": "12706bec74c17e0a2cc4a79246df39934a8ce75ea3b5202a68befc26b5450726",
+   "payload_schema": [],
+   "points_count": 1,
+   "status": "green"
+  },
+  "b053c4b010f2_symgraph_meta": {
+   "config_sha256": "12706bec74c17e0a2cc4a79246df39934a8ce75ea3b5202a68befc26b5450726",
+   "payload_schema": [],
+   "points_count": 1,
+   "status": "green"
+  },
+  "codebase_9c518b2ee5c8": {
+   "config_sha256": "b81f640656a3ddd728cf8a7ff45ffdb3bb6bc0a480ea14304b89cfa289b809d2",
+   "payload_schema": [
+    "contentHash",
+    "filePath",
+    "language",
+    "relativePath"
+   ],
+   "points_count": 68666,
+   "status": "green"
+  },
+  "codebase_b053c4b010f2": {
+   "config_sha256": "b81f640656a3ddd728cf8a7ff45ffdb3bb6bc0a480ea14304b89cfa289b809d2",
+   "payload_schema": [
+    "contentHash",
+    "filePath",
+    "language",
+    "relativePath"
+   ],
+   "points_count": 8,
+   "status": "green"
+  },
+  "socraticode_metadata": {
+   "config_sha256": "12706bec74c17e0a2cc4a79246df39934a8ce75ea3b5202a68befc26b5450726",
+   "payload_schema": [
+    "collectionName"
+   ],
+   "points_count": 4,
+   "status": "green"
+  }
+ },
+ "qdrant_rest_counts": {
+  "DELETE /collections/{collection_name}": 2,
+  "DELETE /collections/{collection_name}/snapshots/{snapshot_name}": 10,
+  "GET /": 20,
+  "GET /collections": 158,
+  "GET /collections/{collection_name}": 273,
+  "GET /collections/{collection_name}/snapshots": 38,
+  "GET /collections/{collection_name}/snapshots/{snapshot_name}": 10,
+  "GET /healthz": 4683,
+  "GET /metrics": 9288,
+  "GET /readyz": 6,
+  "GET /telemetry": 5,
+  "POST /collections/{collection_name}/points": 15020,
+  "POST /collections/{collection_name}/points/count": 1,
+  "POST /collections/{collection_name}/points/delete": 943,
+  "POST /collections/{collection_name}/points/query": 49,
+  "POST /collections/{collection_name}/points/scroll": 1054,
+  "POST /collections/{collection_name}/points/search": 3,
+  "POST /collections/{collection_name}/snapshots": 10,
+  "PUT /collections/{collection_name}": 6,
+  "PUT /collections/{collection_name}/index": 10,
+  "PUT /collections/{collection_name}/points": 16988
+ },
+ "qdrant_write_endpoint_counts": {
+  "DELETE /collections/{collection_name}": 2,
+  "DELETE /collections/{collection_name}/snapshots/{snapshot_name}": 10,
+  "POST /collections/{collection_name}/points/delete": 943,
+  "POST /collections/{collection_name}/snapshots": 10,
+  "PUT /collections/{collection_name}": 6,
+  "PUT /collections/{collection_name}/index": 10,
+  "PUT /collections/{collection_name}/points": 16988
+ },
+ "tools_mcporter_prefixes": [
+  "mcporter-0.13.13",
+  "mcporter-0.14.1"
+ ],
+ "user_services": {
+  "count": 22,
+  "running": [
+   "dagu-equities.service",
+   "dbus.service",
+   "ecosystem-alertmanager.service",
+   "ecosystem-grafana.service",
+   "ecosystem-loki.service",
+   "ecosystem-ntfy.service",
+   "ecosystem-otelcol.service",
+   "ecosystem-prometheus.service",
+   "native-stack-embeddings.service",
+   "native-stack-qdrant.service",
+   "nativestack-generation.service",
+   "nativestack-memory.service"
+  ],
+  "sha256": "c38ee6dbf727d19490abfe0b1125d117372048e9c464ffa902b183cf3c326b39"
+ }
+}

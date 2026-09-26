@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "id": "mcporter-0141-qualification-20260925",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-26T00:58:33Z",
+  "component_ids": [
+    "mcporter"
+  ],
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-25, mcporter 0.14.1 was qualified against the installed 0.13.13 and then switched into production. The npm tarball https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz (464,028 bytes) had sha256 8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2, equal to the GitHub release v0.14.1 asset digest and checksums.txt, and integrity sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ==, equal to npm dist.integrity; npm audit signatures reported 41 packages with verified registry signatures and 13 with verified attestations, including mcporter@0.14.1's SLSA provenance from release.yml at refs/tags/v0.14.1, commit 93e0916cafe2d624b94271e31b75ca681a016514. It was installed from that verified file into a new tools/mcporter-0.14.1 prefix. The same 37-step acceptance, run in isolated MCPORTER_DAEMON_DIR namespaces with a scratch config against the live Qdrant, embedding and ai-memory services, passed 37/37 on 0.14.1 and 37/37 on the matched 0.13.13 baseline with identical per-step outcomes and exit codes. It covered the retained mcporter install receipt and the socraticode, jcodemunch-mcp and context-mode use receipts; ctx_doctor; list ai-memory (23 tools) and list jcodemunch (6 tools); the token-report one-off stdio call; daemon status with protocolVersion 3; ctx_execute_file and ctx_execute; keep-alive persistence; ai-memory memory_status; daemon stop, relaunch and restart; the SIGKILL refusal ('Previous daemon exited unexpectedly ... No replacement was launched.') and deliberate recovery ('Single-user daemon started.', bridge-recovered); and a held startup lock failing with 'did not become ready within 45 seconds' and recovering after the holder exited. The resolved dependency trees differ only in rolldown 1.2.8 -> 1.2.9 (@oxc-project/types 0.149.0 -> 0.150.0) and string-width 8.2.2 -> 8.3.0. An independent verifier re-ran the candidate arm, bound all 40 installed dependencies to their registry tarballs, verified 41 of 41 registry signatures with openssl and agreed; it also measured that with no ps on the daemon's PATH 0.14.1 fails a keep-alive call and `mcporter daemon stop` while 0.13.13 passes both. With no daemon running, the coordinator relinked bin/mcporter to tools/mcporter-0.14.1/bin/mcporter at about 20:12Z; with the host config, `list socraticode --brief --no-oauth` listed 26 tools, `call socraticode.codebase_health` printed the health check with Qdrant reachable, and the next call started a 0.14.1 daemon. A read-only read-back at 20:54:04Z found bin/mcporter on tools/mcporter-0.14.1, `mcporter --version` 0.14.1 and the installed-versions.txt mcporter record 0.14.1.",
+  "limitations": [
+    "0.14.x runs `ps` from PATH (0.13.13 ran /bin/ps). The verifier measured that when the daemon's PATH has no ps, 0.14.1 cannot connect a keep-alive server ('Transport ownership could not be verified') and `mcporter daemon stop` refuses ('Retirement is unverified'), while 0.13.13 does both; the 37-step acceptance ran with ps on PATH and cannot detect this. It works on this host because the daemon inherits the launching shell's PATH and no systemd unit, crontab or client hook launches mcporter. Any unit, agent or container that launches the daemon needs ps on its PATH, and a 0.14.1 daemon started without it must be retired by signal.",
+    "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the mcp-surfaces winner pin mcporter 0.13.13 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 0.14.1 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
+    "Linux x86_64 only: adoption/pins-macos-arm64.json keeps mcporter 0.13.13 and is unchanged. The npm tarball is platform-independent, but a Mac needs its own acceptance; nothing here is macOS evidence.",
+    "The qualification ran with a scratch config (serena and headroom dropped; SOCRATICODE_WATCHER=off and SOCRATICODE_AUTO_RESUME=off), context-mode's server bundle inside bwrap with arm-private state and jcodemunch with a private copy of ~/.code-index, from a git-archive snapshot of the repository at 7783682f. The host config itself was exercised only by the coordinator's post-switch list and codebase_health calls.",
+    "Not exercised: a mixed-version daemon cutover (no daemon was running at the switch), the shared ~/.mcporter namespace under load, the unresponsive-daemon (SIGSTOP), scoped-registration-cleanup and changed-process-root lifecycle stages, OAuth (every call used --no-oauth), emit-ts/generate-cli, --persist, --tail-log and the Chrome relay. In the SIGKILL stage no transport outlived the daemon, so the manual orphan-TERM step had nothing to act on.",
+    "Local integration evidence, not the unchanged upstream suite: `pnpm check` and `pnpm test` at v0.14.1 were not run on this host; upstream CI on the tag commit is research-reported. One run per arm on the final harness, plus a retained baseline attempt that failed from a harness TMPDIR artifact; timings and the order of tied search results are run-level values.",
+    "The sha256 pin covers mcporter's own tarball only: npm resolves the dependency ranges at install time and the package ships no shrinkwrap, so a later install can differ from the qualified tree (verify/npm-ls-0.14.1.txt). The fast-uri 3.1.0 copy bundled in @modelcontextprotocol/client 2.1.0, on the output-schema validation path, has open advisories in both 0.13.13 and 0.14.1; it was not re-verified here, and no SDK release ships a fixed bundle.",
+    "Production hook and config files were not fingerprinted before and after the qualification; ~/.claude/settings.json and ~/.codex/config.toml changed during or just after the window; the writer was not identified, and nothing ties the change to this unit. The Qdrant snapshot create and delete counters rose by 5 each in the window, from the socraticode unit's snapshot copy; point upserts and deletes did not move until after the run."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; production paths under ~/.local/share/codex-ecosystem"
+  },
+  "data": {
+    "observed_at_utc": "2026-09-25",
+    "previous_version": "0.13.13",
+    "version": "0.14.1",
+    "release": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1",
+    "tag_commit": "93e0916cafe2d624b94271e31b75ca681a016514",
+    "tarball": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz",
+    "tarball_sha256": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2",
+    "tarball_integrity": "sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ==",
+    "install": "npm install --global --no-audit --no-fund --prefix ~/.local/share/codex-ecosystem/tools/mcporter-0.14.1 <verified mcporter-0.14.1.tgz>",
+    "acceptance_scripts": {
+      "accept.py": "7465585d5d7218929061e455392d87b4deb5d0c94e328e25bffcd759d549c3be",
+      "compare.py": "c9828b4cab09212b52dba46fa084f43405c77e4df214e773570cc91a56a5401f",
+      "fingerprint.py": "ca20ef5430a326543bcb5804f15aed63a57bf4b4221e5aa4aa24f62af1b6f9f8",
+      "verifier/vaccept.py": "6c65ec54a36b107feeb6dd37ff8ec4938ed94110b18e1f09f30c3b5852779fce"
+    },
+    "steps_passed": {
+      "0.14.1 (arm x)": "37/37",
+      "0.13.13 (arm y)": "37/37",
+      "0.13.13 attempt 1": "failed R-context-mode-use-1 (harness TMPDIR on a read-only path)",
+      "verifier pa, 0.14.1 without ps on the daemon's PATH": "M1 and M3 exit 1",
+      "verifier pb, 0.13.13 without ps on the daemon's PATH": "M1 and M3 exit 0"
+    },
+    "cutover": {
+      "relinked_utc": "about 2026-09-25T20:12Z",
+      "daemon_before": "none running",
+      "post_switch": "list socraticode --brief --no-oauth: 26 tools; call socraticode.codebase_health: health check with Qdrant reachable; next call started a 0.14.1 daemon"
+    },
+    "stack_command_fix": "manifests/stack.json command `mcporter --config \"${MCPORTER_CONFIG}\" list socraticode --brief --no-oauth`, the form recipes/README.md already uses; the implementer found the targetless `list --brief --no-oauth` form failing on both versions (results.json switch.planned_procedure)",
+    "rollback": "drain and stop the 0.14.1 daemon; relink ~/.local/share/codex-ecosystem/bin/mcporter to tools/mcporter-0.13.13/bin/mcporter; set the installed-versions.txt mcporter record to 0.13.13",
+    "independent_review": "verdict agree, production_touched false, 1 material defect (the ps-on-PATH difference, now a limitation) and 3 minor (artifact results.json verifier section)",
+    "artifacts": "evidence/artifacts/sota-refresh-20260925/mcporter/"
+  },
+  "provenance": [
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/accept.py",
+      "sha256": "7465585d5d7218929061e455392d87b4deb5d0c94e328e25bffcd759d549c3be",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/compare.py",
+      "sha256": "c9828b4cab09212b52dba46fa084f43405c77e4df214e773570cc91a56a5401f",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/fingerprint.py",
+      "sha256": "ca20ef5430a326543bcb5804f15aed63a57bf4b4221e5aa4aa24f62af1b6f9f8",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vaccept.py",
+      "sha256": "6c65ec54a36b107feeb6dd37ff8ec4938ed94110b18e1f09f30c3b5852779fce",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-x.json",
+      "sha256": "482930b8859afb3e7a93847cd24e682b28925f241a779cc7b253f96483606b67",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results-y.json",
+      "sha256": "70c7d7c8b6a5165e815a12db4f35b307b0dacd967ffc9bf4475bc05b08155bd5",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/compare.json",
+      "sha256": "a483e6fc57ee723d781cc2e64038c4a4d9a65c221bace164c0f95619f1a16b89",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/integrity-compare.txt",
+      "sha256": "99945aa9743da57e6e2b9b35fc9954e03d3c5bf7c13c8598cbd6b9c1b3a8b536",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verify/provenance-mcporter-0.14.1.txt",
+      "sha256": "38e794586ec27f2f78b43f35c949ccd62e94dddb4e2320db2f27b2c447eda922",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/stage/audit-signatures.txt",
+      "sha256": "5d87568bf472ee68df3e9ec1a3f9f32cdf4e5d425327ac1b2d09913fe0e62cf8",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/integrity/integrity-verifier.json",
+      "sha256": "83d9ab368c9d4d0c3fa7b6457241cd66fcf668d114676079a28f25fdee0fef13",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-pa.json",
+      "sha256": "b6d57483c00963c4a36d6cbd8cd369aa65f0a922ca1c4b6a1628d0ef59a35ca1",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/verifier/vresults-pb.json",
+      "sha256": "8b78751ae0700d62f2254b378536dc0f5c92509ea261449aeb0383a9c1c718af",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/raw-outputs.json",
+      "sha256": "ff54fe3399ad9eb1abbac842f0faa22ba756ad14bc67fb2629efe7d95f8b4932",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/cutover.json",
+      "sha256": "329bf9cc65d9446219c71ed41c45ac898953c230f8e22a64f524e31454d2a3d0",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/out/readback.out",
+      "sha256": "46d728a6218c204b528394abd96edf052de593f7899a654668edd05eee391f36",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results.json",
+      "sha256": "9812876512d979f15156e56a5f01a880f82d6727844ab241d7747af6b2111e3b",
+      "byte_identical_to_run_copy": false
+    }
+  ]
+}

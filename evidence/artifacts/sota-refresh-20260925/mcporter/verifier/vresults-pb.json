@@ -1,0 +1,73 @@
+{
+ "arm": "pb",
+ "version": "0.13.13",
+ "started_at": "2026-09-25T19:31:04Z",
+ "snapshot_rev": "7783682fe6c9f10675d930b021f125028f21d8f1",
+ "scratch_config_equals_implementer_x_after_path_mapping": true,
+ "cleanup": {
+  "final_stop_exit": 0,
+  "terminated_in_cleanup": [],
+  "alive_after_cleanup": [],
+  "arm_daemons_after_cleanup": [],
+  "listeners_under_daemon_dir_after_cleanup": []
+ },
+ "ended_at": "2026-09-25T19:31:05Z",
+ "steps": [
+  {
+   "name": "M0-minimal-path-resolution",
+   "arm": "pb (0.13.13)",
+   "cmd": "command -v mcporter; command -v ps; mcporter --version",
+   "exit": 0,
+   "output_excerpt": "~/.local/share/codex-ecosystem/tools/mcporter-0.13.13/bin/mcporter\nps: not on PATH\n0.13.13",
+   "pass": true,
+   "wall_s": 0.1,
+   "at_utc": "2026-09-25T19:31:04Z"
+  },
+  {
+   "name": "M1-keepalive-probe-without-ps-on-PATH",
+   "arm": "pb (0.13.13)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=4062622",
+   "pass": true,
+   "wall_s": 0.9,
+   "at_utc": "2026-09-25T19:31:05Z",
+   "ppid": 4062622
+  },
+  {
+   "name": "M2-daemon-ownership",
+   "arm": "pb (0.13.13)",
+   "cmd": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"status_pid\": 4062579, \"status_socket_is_arm_socket\": true, \"protocolVersion\": 3, \"metadata_pid\": 4062579, \"kernel_socket_owner_pids\": [4062579], \"cmdline_is_arm_prefix_daemon\": true, \"cwd_is_arm_snapshot\": true, \"owned\": true}",
+   "pass": true,
+   "wall_s": 0.0,
+   "at_utc": "2026-09-25T19:31:05Z",
+   "ownership": {
+    "status_pid": 4062579,
+    "status_socket_is_arm_socket": true,
+    "protocolVersion": 3,
+    "metadata_pid": 4062579,
+    "kernel_socket_owner_pids": [
+     4062579
+    ],
+    "cmdline_is_arm_prefix_daemon": true,
+    "cwd_is_arm_snapshot": true,
+    "owned": true
+   }
+  },
+  {
+   "name": "M3-daemon-stop-no-leftovers",
+   "arm": "pb (0.13.13)",
+   "cmd": "mcporter daemon stop",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).",
+   "pass": true,
+   "wall_s": 0.3,
+   "at_utc": "2026-09-25T19:31:05Z",
+   "tracked_processes": 3,
+   "leftover_tracked": []
+  }
+ ],
+ "passed": true
+}

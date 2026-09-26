@@ -1,0 +1,23 @@
+### 06-R-socraticode-use-2.out
+    @@ -4,2 +4,2 @@
+    -3 tests/test_trading_gates.py:488-529 0.4500
+    -4 docs/grand-catalog-handbook.md:332-361 0.4500
+    +3 docs/grand-catalog-handbook.md:332-361 0.4500
+    +4 tests/test_trading_gates.py:488-529 0.4500
+### 09-S4-list-ai-memory.out
+    @@ -5 +5 @@
+    -  "durationMs": 64,
+    +  "durationMs": 67,
+### 10-S4-list-jcodemunch.out
+    @@ -5 +5 @@
+    -  "durationMs": 488,
+    +  "durationMs": 452,
+### 11-S5-token-report-oneoff.out
+    @@ -91 +91 @@
+    -    "this_pid": 3716355,
+    +    "this_pid": 3733865,
+### 24-A4-ai-memory-status.out
+    @@ -6 +6 @@
+    -    "observations": 71438
+    +    "observations": 71552
+files identical after normalization: 63; differing: 5

@@ -1,0 +1,424 @@
+{
+ "summary": {
+  "x_version": "0.14.1",
+  "y_version": "0.13.13",
+  "x_passed": true,
+  "y_passed": true,
+  "x_steps": 37,
+  "y_steps": 37,
+  "x_failed": [],
+  "y_failed": [],
+  "outcome_mismatches": [],
+  "fail_only_on_candidate": [],
+  "fail_only_on_baseline": [],
+  "checks": {
+   "S4-list-ai-memory tool names equal": true,
+   "S4-list-ai-memory tool count x/y": [
+    23,
+    23
+   ],
+   "S4-list-jcodemunch tool names equal": true,
+   "S4-list-jcodemunch tool count x/y": [
+    6,
+    6
+   ],
+   "B2d brief tool names equal": true,
+   "B2d brief tool count x/y": [
+    11,
+    11
+   ],
+   "B2d brief output sha256 equal": false,
+   "A4 memory_status top-level keys equal": true,
+   "A4 keys": [
+    "counts"
+   ],
+   "socraticode health [..] lines equal": true,
+   "socraticode health lines": [
+    "[OK] External Qdrant (http://127.0.0.1:26333): Reachable",
+    "[OK] LM Studio: Reachable at http://127.0.0.1:18231/v1",
+    "[OK] Embedding model (nvidia/Nemotron-3-Embed-1B-BF16): Loaded"
+   ],
+   "R-socraticode-use-2 oracle ranks x|y": [
+    "{'catalogs/us-equities/gates-20260922.json': 1, 'scripts/trading_gates.py': 2}",
+    "{'catalogs/us-equities/gates-20260922.json': 1, 'scripts/trading_gates.py': 2}"
+   ],
+   "R-socraticode-use-3 oracle ranks x|y": [
+    "{'catalogs/us-equities/gates-20260922.json': None, 'scripts/trading_gates.py': None}",
+    "{'catalogs/us-equities/gates-20260922.json': None, 'scripts/trading_gates.py': None}"
+   ],
+   "B3b-probe-while-lock-held-fails wall_s x/y": [
+    45.3,
+    45.3
+   ],
+   "B3c-probe-after-holder-exit-recovers wall_s x/y": [
+    0.9,
+    0.9
+   ],
+   "B2a-probe-refuses-after-daemon-sigkill wall_s x/y": [
+    0.2,
+    0.2
+   ],
+   "A3 ppid chain x": [
+    "3733179:MainThread",
+    "3733178:bwrap",
+    "3732858:MainThread"
+   ],
+   "A3 ppid chain y": [
+    "3715858:MainThread",
+    "3715857:bwrap",
+    "3715156:MainThread"
+   ]
+  },
+  "x_cleanup": {
+   "final_stop_exit": 0,
+   "terminated_in_cleanup": [],
+   "alive_after_cleanup": [],
+   "arm_daemons_after_cleanup": [],
+   "listeners_under_daemon_dir_after_cleanup": []
+  },
+  "y_cleanup": {
+   "final_stop_exit": 0,
+   "terminated_in_cleanup": [],
+   "alive_after_cleanup": [],
+   "arm_daemons_after_cleanup": [],
+   "listeners_under_daemon_dir_after_cleanup": []
+  },
+  "x_exception": null,
+  "y_exception": null
+ },
+ "rows": [
+  [
+   "S1-command-v",
+   true,
+   true,
+   0,
+   0,
+   0.0,
+   0.0
+  ],
+  [
+   "R-mcporter-install-0",
+   true,
+   true,
+   0,
+   0,
+   0.1,
+   0.1
+  ],
+  [
+   "R-mcporter-install-1",
+   true,
+   true,
+   0,
+   0,
+   0.1,
+   0.1
+  ],
+  [
+   "R-socraticode-use-0",
+   true,
+   true,
+   0,
+   0,
+   1.1,
+   1.1
+  ],
+  [
+   "R-socraticode-use-1",
+   true,
+   true,
+   0,
+   0,
+   0.8,
+   0.8
+  ],
+  [
+   "R-socraticode-use-2",
+   true,
+   true,
+   0,
+   0,
+   0.4,
+   0.4
+  ],
+  [
+   "R-socraticode-use-3",
+   true,
+   true,
+   0,
+   0,
+   0.4,
+   0.4
+  ],
+  [
+   "S3-ctx_doctor",
+   true,
+   true,
+   0,
+   0,
+   0.6,
+   0.6
+  ],
+  [
+   "S4-list-ai-memory",
+   true,
+   true,
+   0,
+   0,
+   0.4,
+   0.4
+  ],
+  [
+   "S4-list-jcodemunch",
+   true,
+   true,
+   0,
+   0,
+   1.0,
+   1.0
+  ],
+  [
+   "S5-token-report-oneoff",
+   true,
+   true,
+   0,
+   0,
+   1.0,
+   1.0
+  ],
+  [
+   "R-jcodemunch-use-0",
+   true,
+   true,
+   0,
+   0,
+   1.5,
+   1.4
+  ],
+  [
+   "R-jcodemunch-use-1",
+   true,
+   true,
+   0,
+   0,
+   2.2,
+   2.2
+  ],
+  [
+   "R-context-mode-use-0",
+   true,
+   true,
+   0,
+   0,
+   0.1,
+   0.1
+  ],
+  [
+   "R-context-mode-use-1",
+   true,
+   true,
+   0,
+   0,
+   0.7,
+   0.7
+  ],
+  [
+   "R-context-mode-use-tmp-clean",
+   true,
+   true,
+   0,
+   0,
+   0.0,
+   0.0
+  ],
+  [
+   "S6a-daemon-status-check",
+   true,
+   true,
+   0,
+   0,
+   0.2,
+   0.2
+  ],
+  [
+   "S6b-repeat-socraticode-health",
+   true,
+   true,
+   0,
+   0,
+   0.3,
+   0.3
+  ],
+  [
+   "S6c-daemon-status-recheck",
+   true,
+   true,
+   0,
+   0,
+   0.2,
+   0.2
+  ],
+  [
+   "S6d-daemon-ownership",
+   true,
+   true,
+   0,
+   0,
+   0.0,
+   0.0
+  ],
+  [
+   "A1-ctx_execute_file-project-read",
+   true,
+   true,
+   0,
+   0,
+   0.3,
+   0.3
+  ],
+  [
+   "A2-ctx_execute-42",
+   true,
+   true,
+   0,
+   0,
+   0.3,
+   0.3
+  ],
+  [
+   "A3-probe-persistence-and-ppid-chain",
+   true,
+   true,
+   0,
+   0,
+   0.7,
+   0.7
+  ],
+  [
+   "A4-ai-memory-status",
+   true,
+   true,
+   0,
+   0,
+   0.4,
+   0.4
+  ],
+  [
+   "B1a-daemon-stop-retires-daemon-and-server",
+   true,
+   true,
+   0,
+   0,
+   0.5,
+   0.5
+  ],
+  [
+   "B1b-next-probe-relaunches",
+   true,
+   true,
+   0,
+   0,
+   0.8,
+   0.8
+  ],
+  [
+   "B1c-daemon-restart",
+   true,
+   true,
+   0,
+   0,
+   0.6,
+   0.7
+  ],
+  [
+   "B1d-probe-after-restart",
+   true,
+   true,
+   0,
+   0,
+   0.6,
+   0.6
+  ],
+  [
+   "B2a-probe-refuses-after-daemon-sigkill",
+   true,
+   true,
+   1,
+   1,
+   0.2,
+   0.2
+  ],
+  [
+   "B2b-retire-orphans-and-archive-metadata",
+   true,
+   true,
+   0,
+   0,
+   0.0,
+   0.0
+  ],
+  [
+   "B2c-deliberate-daemon-start",
+   true,
+   true,
+   0,
+   0,
+   0.5,
+   0.5
+  ],
+  [
+   "B2d-list-context-mode-brief",
+   true,
+   true,
+   0,
+   0,
+   0.6,
+   0.6
+  ],
+  [
+   "B2e-bridge-recovered",
+   true,
+   true,
+   0,
+   0,
+   0.3,
+   0.3
+  ],
+  [
+   "B3a-stop-and-hold-lock",
+   true,
+   true,
+   0,
+   0,
+   0.4,
+   0.4
+  ],
+  [
+   "B3b-probe-while-lock-held-fails",
+   true,
+   true,
+   1,
+   1,
+   45.3,
+   45.3
+  ],
+  [
+   "B3c-probe-after-holder-exit-recovers",
+   true,
+   true,
+   0,
+   0,
+   0.9,
+   0.9
+  ],
+  [
+   "F-daemon-stop-no-leftovers",
+   true,
+   true,
+   0,
+   0,
+   0.4,
+   0.4
+  ]
+ ]
+}
