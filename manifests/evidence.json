@@ -3337,8 +3337,8 @@
   "files": [
     {
       "path": ".claude/settings.json",
-      "sha256": "25559e35def1f1d1846dee28375113c6ff5e6ddb547ee592f39397578948081c",
-      "bytes": 1496
+      "sha256": "42a632653140e9aa9b19bccfca0597688748684d8453836f01ff0d5aadab5c48",
+      "bytes": 1552
     },
     {
       "path": ".gitattributes",
@@ -3496,6 +3496,11 @@
       "bytes": 17270
     },
     {
+      "path": "adoption/agents/claude/blind-adjudicator.md",
+      "sha256": "ef8d07f15b7c219f1b5ada705cf185146088fd013974b5ca51c1d29fdeee9fc4",
+      "bytes": 2892
+    },
+    {
       "path": "adoption/bootstrap-linux.sh",
       "sha256": "45e0badf2951a47a843c902272b34f57faa1106f655532101cfdfd1074d6ce75",
       "bytes": 38949
@@ -3507,8 +3512,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "63bb89bb401db0e584e987c4dce7d65016c7caf15ced258c9519b952fae2b2b0",
-      "bytes": 37807
+      "sha256": "5aa0b377740d0bf69691aad6f586321f5f5c37506398831e72ffcc32d58dd8b5",
+      "bytes": 38040
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -37117,6 +37122,11 @@
       "bytes": 6143
     },
     {
+      "path": "examples/claude-native/agents/blind-adjudicator.md",
+      "sha256": "ef8d07f15b7c219f1b5ada705cf185146088fd013974b5ca51c1d29fdeee9fc4",
+      "bytes": 2892
+    },
+    {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
       "sha256": "3aa5e3f0aac4b43f7196cb46aee3ce1ef06e795ae93ba2a925ea53ac62f5e256",
       "bytes": 2456
@@ -38007,6 +38017,11 @@
       "bytes": 94796
     },
     {
+      "path": "tests/test_adjudicate.py",
+      "sha256": "daf7ecccf2bca035416a41ebfe984e9bcb8a8e579a69edabbd847b5c352ec752",
+      "bytes": 124081
+    },
+    {
       "path": "tests/test_adoption_bootstrap.py",
       "sha256": "938cc58061739a239f944a5668336d1cf6d96276f460a7faf437ce85bd1e3942",
       "bytes": 93507
@@ -38308,8 +38323,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "a3627474dba59cc30c18213ed7c05f5cd07460af2a1e0d8aae3e89bfce2c1f52",
-      "bytes": 146161
+      "sha256": "0b5d0b94d14aad9db95a31f2f7bd015515fb26f2abe74a60254dbdd6244a8808",
+      "bytes": 146176
     },
     {
       "path": "tests/test_layer_verdicts.py",
@@ -38697,6 +38712,16 @@
       "bytes": 177541
     },
     {
+      "path": "tools/sota-convergence/adjudicate.py",
+      "sha256": "58fd1870007d59c8f2b8a46dec434ecb6363607fc4dbd78962496085757cc8d2",
+      "bytes": 108209
+    },
+    {
+      "path": "tools/sota-convergence/adjudication-prompt.md",
+      "sha256": "f82b527d179cc60ed985d9266d74071f936e4fa73f29c680a3d3f7635516004e",
+      "bytes": 5071
+    },
+    {
       "path": "tools/sota-convergence/blind_checkout.py",
       "sha256": "0e5a9ba4c8f852b7a552cdda746d7c2aded9879a8a7eee34baa315659141b484",
       "bytes": 55626
@@ -38733,8 +38758,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "faff06be226f0cc2106ee0e087ed399f22befd6ed440c059773114d8d5774032",
-      "bytes": 33527
+      "sha256": "3e059eb203d373f36e0fa035e372cf494b40d94cfe786caf2eaa2863065546f8",
+      "bytes": 34645
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
@@ -38753,8 +38778,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
-      "sha256": "9b9c46eeb0fe68d4f320f66534cb16d60f11d8e03135ce8d4f274bed96a839e9",
-      "bytes": 29957
+      "sha256": "0a3603ad32aaa4f930beabfe088ff295e3ff31cfecd25adbcc5e542322867e99",
+      "bytes": 30208
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
@@ -38820,6 +38845,11 @@
       "path": "tools/sota-convergence/landscape-sweep/usage_record.py",
       "sha256": "de2377990fa015fe8666b8ebb9176968c5600a3f3f2c85c2a9f927c0af7d1cae",
       "bytes": 8214
+    },
+    {
+      "path": "tools/sota-convergence/lane-provenance.json",
+      "sha256": "ca747c9808c723822c5ef970967ff885d33b2834f37bc5ff5ff07301ec7f2176",
+      "bytes": 8231
     },
     {
       "path": "tools/sota-convergence/reconciliations-20260922.json",
