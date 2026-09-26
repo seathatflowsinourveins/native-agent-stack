@@ -1,0 +1,877 @@
+{
+ "layer_id": "identity-provenance",
+ "proposal": {
+  "layer_id": "identity-provenance",
+  "proposal": "add_candidates",
+  "summary": "DVC (treeverse/dvc 3.67.1) keeps its win on the narrow claim it actually earns — versioned snapshot/restore — and the evidence for that claim got stronger, not weaker, since the 2026-09-22 gates file was written. The repo's own gap-wave-2 work (2026-09-23, evidence_class native_proven -> local_integration, 5 rounds of Codex+independent-Opus adversarial fixing) ran a real 4-way store comparison (baseline hash-manifest, DVC, PyIceberg 0.12.0, ArcticDB v6.26.0) on a materialized fixture: DVC and the baseline are the only arms that keep exact per-file sha256 (Iceberg/ArcticDB rewrite source files into their own formats, \"not_supported by design\"); under two concurrent writers, baseline/DVC/Iceberg lost 0 rows every time, but ArcticDB silently lost 50-150 of every 100-300 rows across repeated rounds -- confirming, by measurement rather than by license text alone, its own installed docstring's \"concurrent writers to a single symbol are not supported\" limitation. That, plus BSL-1.1 (source-available, forbids resale as a hosted \"Database Service\") and ~18x DVC's storage footprint on the same fixture, is a decisive strike against the researcher's ArcticDB pick. Iceberg is a genuine, verified trade-off (native time-travel, auto-retry concurrency safety, faster reads) but not a proven win -- it fails the byte-identical-snapshot bar the layer's requirement names, and needs an added catalog service; it stays \"conditional,\" not promoted. Two of the layer's own seven listed open gaps are already closed by evidence layers.json/the 2026-09-22 adjudication have not caught up to: gap 4 (\"no executed comparison measures... across the candidate stores\") is settled by the comparison above, and gap 5/6 (\"OpenLineage event persistence... and MLflow run-to-dataset bindings, remain unqualified\") is settled by a 2026-09-23 local_integration run where openlineage-python 1.53.0 persisted schema-valid, tamper-detecting lineage events and mlflow 3.16.1 bound them to logged datasets -- directly contradicting both the researcher's own \"UNEXECUTED\"/\"no receipt... wired\" framing and the 2026-09-22 A/B adjudication that excluded OpenLineage from the winner set on exactly that (now outdated) basis. I therefore recommend adding OpenLineage+MLflow as a qualified lineage-persistence pairing (not displacing DVC, which was never meant to do this job). Separately, the catalog's own critic already flags foundation-socraticode as mis-tagged into this layer (it is a code-retrieval index, not a security-identity/provenance tool) -- a clean \"demote, don't keep by default\" finding I second. What remains a genuine, unclosed open_gap is the compound identity/corporate-action/licensing half of the requirement: the 235 ticker-collision and pre-2020-delisting gates are still not_established, and the repository's own 2026-09-23/09-26 sweeps already found and refuted every free OSS candidate they tried (BlackFalconData delisted-stocks-list, fja05680/sp500, stale Nasdaq Data Link). I independently WebFetched OpenFIGI's own API docs today and confirmed it is current-state mapping only (figi/ticker/name/exchCode/securityType fields; no listing/delisting date, no ticker-history, no active/inactive flag) -- it cannot resolve the 235 collisions, which need historical validity windows, not a permanent identifier. PermID's only Python client is 5.5 years stale and its coverage of this specific need is unverified, not confirmed. The only recorded viable closers (Databento, Sharadar -- explicitly not yet individually refuted by the 2026-09-23 sweep, QuantConnect Security Master/AlgoSeek, QuantRocket usstock) are all paid and explicitly gated as a user-decision, outside this read-only task's scope.",
+  "winner_status": [
+   {
+    "component_id": "data-dvc",
+    "status": "earns_it",
+    "note": "Restore claim is now native_proven with real rigor: an initial literal test failure (2 git-tracked .gitignore files not restored by `dvc checkout` alone) was caught and fixed in fix-round-3 (git checkout for git-tracked files + dvc checkout for DVC-tracked files restores the full 16-file tree; a 1-byte tamper is caught by diff/dvc status and repaired by `dvc checkout --force`). The 2026-09-23 four-store comparison additionally shows DVC tied for best on lineage-native-field count (4/6, tied with Iceberg) and zero-loss concurrency (tied with baseline and Iceberg), and uniquely (with baseline) preserving exact per-file sha256, which Iceberg/ArcticDB structurally cannot. DVC is markedly slower (368-504ms vs Iceberg's 17-149ms) but that figure includes CLI subprocess overhead per the receipt's own limits, not an apples-to-apples in-process comparison. None of this closes the layer's separate identity/corporate-action/licensing obligations, which DVC was never positioned to address.",
+    "sources": [
+     "evidence/artifacts/gap-resolution-20260922/identity-provenance/dvc-arm-restore-compare.json",
+     "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/0-dvc-repro-restore-contract.json",
+     "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/4-four-store-comparison.json"
+    ]
+   },
+   {
+    "component_id": "foundation-socraticode",
+    "status": "unverified",
+    "note": "Tagged as a co-default in this layer by the broader catalog (catalogs/sota-convergence/manifest-20260923.json, sota-convergence/README.md table row 'Identity & provenance | dvc 3.67.1 . socraticode 1.14.0'), but NOT listed among this layer's winners in layers.json, and the project's own critic already recorded 'review_status: demotion_proposed' with the exact reasoning I'd give: 'SocratiCode is a code-retrieval index, not a security-identity or provenance tool, so no native_proven default addresses the layer's purpose. It stays default in the foundation code-retrieval layer.' No evidence anywhere ties it to data identity, provenance or corporate-action semantics. Recommend it be dropped from this layer's roster entirely (keep it only under agents-models-workers/foundation code-retrieval, where it already is a winner)."
+   }
+  ],
+  "challengers": [
+   {
+    "name": "OpenLineage (openlineage-python)",
+    "url": "https://github.com/OpenLineage/OpenLineage",
+    "why_better": "Was excluded from this layer's winner set by the 2026-09-22 A/B adjudication specifically because its native_workflow was 'Prospective and UNEXECUTED' and 'only builds a Dataset object... no transport or network emission' (adjudication file + catalogs/us-equities/data-research.json lines 819-859). One day later the repo's own gap-wave-2 run reverses that characterization: openlineage-python 1.53.0's FileTransport actually persisted START/COMPLETE RunEvents for a real materialize+select run, with a custom dataset-version facet equal to the manifest's snapshot_sha256/per-file sha256 and knowledge-cutoff/horizon facets consistent across events; a fresh process read them back with 0 problems, all 4 events validated against the official OpenLineage 2-0-2 core RunEvent schema, and all 5 planted-defect detector controls (tampered facet, removed output, removed input, renamed output, malformed schema) were correctly flagged -- after 4 adversarial fix rounds (2x Codex, 1x independent Opus, 1x Codex again) that caught and corrected real measurement bugs along the way. This directly closes the exact text of the layer's own listed gap ('OpenLineage event persistence and consistent version/cutoff facets... remain unqualified'), which layers.json has not yet been updated to reflect.",
+    "evidence_level": "native_execution (repo's own 'local_integration' tier: package actually installed under uv and run in a network-isolated venv against a real fixture, not merely read; scope is a synthetic 2-run fixture, not production acquisition data)",
+    "trial_plan": "Already run: bash blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_lineage_mlflow.sh (pin openlineage-python==1.53.0); output evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/5-openlineage-mlflow-bindings.json, outcome settled. Next bounded step to promote from 'conditional' to an adopted lineage role: point the same emit+readback pair at the real Alpaca/EdgarTools acquisition adapters (blueprints/us-equities/authenticated-data, blueprints/us-equities/catalyst-provenance) instead of the synthetic nanosecond-replay fixture. Pass criterion: a fresh-process readback reproduces every event/facet with 0 problems (as already shown) AND the event's version facet equals the real acquisition receipt's own recorded snapshot hash bit-for-bit. Overturn condition: if the live acquisition adapters have no stable hashable snapshot to bind to, or if cross-run querying later requires a real lineage backend rather than a local ndjson file -- note the obvious backend, Marquez, was independently re-examined in this same 2026-09-23 sweep and refuted (formal releases stalled at 0.50.0 since 2024-10-24; its cited endorsement quote was not found on the fetched page), so it should get its own bounded trial before being assumed as the default persistence layer.",
+    "paper_lane_impact": "none -- research/data-lineage tooling; does not touch engines run, paper acts passed, or paper fills",
+    "sources": [
+     "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/5-openlineage-mlflow-bindings.json",
+     "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/README.md",
+     "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-identity-provenance-20260922.json",
+     "gh api repos/OpenLineage/OpenLineage -> stars 2675/2669, pushed_at 2026-09-23T..Z (repo self-report matches catalog pin), license Apache-2.0",
+     "https://pypi.org/pypi/openlineage-python/json -> version 1.53.0"
+    ]
+   },
+   {
+    "name": "MLflow",
+    "url": "https://github.com/mlflow/mlflow",
+    "why_better": "The researcher's own packet said 'no receipt in the repository shows it wired to an actual dataset yet.' The repo's 2026-09-23 gap-wave-2 run refutes that as of today: mlflow 3.16.1 on a local SQLite tracking store logged both a materialize run and a select run via mlflow.log_input, and the bindings (names, digests, sources, plus custom file_sha256/snapshot_sha256/openlineage.run_id tags) were read back through MlflowClient/get_run and matched the manifest exactly, in a fresh process. This closes the exact text of the layer's own listed gap ('...MLflow run-to-dataset bindings, remain unqualified'). One real, useful finding surfaced along the way: MLflow's dataset 'digest' field is capped at 36 characters, so this project's 64-char sha256 cannot be the digest itself and must instead ride in a dataset-input tag -- a concrete integration detail any future adopter needs, not a cosmetic note.",
+    "evidence_level": "native_execution (repo's own 'local_integration' tier: package actually installed and run against a real fixture with two logged runs; scope is one materialize run + one select run on synthetic data, not a production experiment corpus)",
+    "trial_plan": "Already run: same run_lineage_mlflow.sh invocation (pin mlflow==3.16.1), output in the same 5-openlineage-mlflow-bindings.json receipt (C5.3/C5.4 criteria, outcome settled). Next bounded step: bind a real skfolio/EdgarTools research run (this layer's neighboring research-factors-ml winners) to its consumed dataset via the same log_input pattern, and confirm the OpenLineage run-id tag written by this layer's adapter matches the emitted OpenLineage event for the same acquisition. Pass criterion: MlflowClient.get_run().inputs.dataset_inputs for a real research run reads back the same acquisition-receipt hash used elsewhere in the pipeline. Overturn condition: if a real multi-dataset research run needs more than the 36-character digest MLflow supports natively (already known to require the tag workaround), or if MLflow's own dataset-lineage UI/query surface proves unnecessary overhead versus just reading the OpenLineage ndjson file directly for this project's bounded scale.",
+    "paper_lane_impact": "none -- experiment/dataset tracking; does not touch engines run, paper acts passed, or paper fills",
+    "sources": [
+     "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/5-openlineage-mlflow-bindings.json",
+     "gh api repos/mlflow/mlflow -> stars 28142/28106, pushed_at 2026-09-23, license Apache-2.0",
+     "https://pypi.org/pypi/mlflow/json -> version 3.16.1"
+    ]
+   }
+  ],
+  "rejected": [
+   {
+    "name": "ArcticDB (man-group/ArcticDB)",
+    "reason": "refuted: the 2026-09-23 four-store comparison measured ArcticDB silently losing appends its own writers reported as successful under two concurrent writers to one symbol -- 50/100 rows at n=10 and 130-150/300 at n=30, repeatably across multiple rounds -- matching its own installed docstring's documented limitation ('concurrent writers to a single symbol are not supported'). Compounded by license (Business Source License 1.1: source-available, not OSI-approved, forbids resale as a hosted 'Database Service', converts to Apache-2.0 only 2 years after each release) and ~18x DVC's storage footprint on the identical fixture (225,536 vs 10,887 bytes)."
+   },
+   {
+    "name": "Marquez",
+    "reason": "refuted (already independently re-examined and refuted by this repository's own 2026-09-23 landscape sweep, disposition refuted_targeted_candidate): formal releases stalled at 0.50.0 since 2024-10-24 despite continued commits; the endorsement quote cited in its favor ('adopt OpenLineage and run Marquez') was not found on the fetched page, which instead describes the project as 'primarily Spark-oriented'; OpenLineage's own FileTransport already persists and validates events locally without adding this service."
+   },
+   {
+    "name": "Great Expectations (fivetran/great_expectations)",
+    "reason": "refuted (repository's own 2026-09-23 sweep, disposition refuted_targeted_candidate): the layer's actual obligation is a data/identity eligibility decision (security identity, availability, corporate-action completeness), not a schema-validation format; the project's validate_source already rejects and quarantines ineligible records, and GX's connector list omits DuckDB and Polars, which the incumbent Pandera already supports on this stack."
+   },
+   {
+    "name": "Delta Lake (delta-io/delta)",
+    "reason": "refuted (repository's own 2026-09-23 sweep, disposition refuted_keep_but_compare): this is the Spark/JVM connector, off the project's DuckDB/Parquet path; the catalog already holds delta-rs (Rust, no Spark) for the same table format, and Delta's time-travel is capped at 30 days by default (7 days after VACUUM), which the promoting claim did not account for."
+   },
+   {
+    "name": "Delta Sharing (delta-io/delta-sharing)",
+    "reason": "off-requirement: solves cross-organization access-controlled dataset distribution, a different problem from this project's intra-project snapshot/versioning/corporate-action requirement; its cited claim that lineage is carried in the protocol itself could not be confirmed in the fetched README (adversarial check verdict: unverifiable)."
+   },
+   {
+    "name": "OpenFIGI",
+    "reason": "off-requirement, verified today: WebFetched the official API documentation directly -- the mapping response is current-state only (figi, ticker, name, exchCode, securityType, compositeFIGI, etc.); no listing/delisting date, ticker-change-history or active/inactive status field exists in any documented endpoint. It cannot resolve the layer's 235 dated ticker collisions, which need historical validity windows, not a permanent-but-timeless identifier. (FIGI's own permanence guarantee -- 'once issued... will not change' -- describes identifier stability, not historical security coverage.)"
+   },
+   {
+    "name": "PermID (LSEG Open PermID)",
+    "reason": "unmaintained: the only Python client (OpenPermID 0.5 on PyPI) has not shipped since 2021-03-05 (~5.5 years); adopting it today means calling the REST API directly with no maintained client, and its ability to resolve the specific 235 dated ticker collisions is unverified either way (not checked here, and not established by the researcher's own packet)."
+   },
+   {
+    "name": "backtest-bias (Finance-broski)",
+    "reason": "metadata only: repository existence, license and push recency were checked via gh api (12 stars, MIT, pushed 2026-09-14), but the actual survivorship-detection code and its bias-benchmark methodology were never read, and no independent adopter was found."
+   },
+   {
+    "name": "pit-adjuster (holdout-labs)",
+    "reason": "metadata only: 0 stars, created and last pushed within a 3-week window (2026-08-18 to 2026-09-08) alongside two same-day sibling repos from the same single author (falsification-ledger, ashare-data-immunity) with no independent adopters found; the point-in-time adjustment code itself was never read."
+   },
+   {
+    "name": "Shingou signal log (shingou-io/shingou-signal-log)",
+    "reason": "metadata only: 0 stars, no LICENSE file (default all-rights-reserved), and domain-specific to crypto-news sentiment buckets rather than equity bars or corporate-action revisions; only GitHub metadata was checked, not the hash-chain verifier's actual code."
+   },
+   {
+    "name": "OpenPM (arXiv 2608.09988)",
+    "reason": "off-requirement: a methodology paper for point-in-time evaluation of LLM portfolio-management agents on synthetic five-minute data, not an adoptable component for this layer, and no code repository was found; the authors themselves caveat their results as upper bounds on one frozen window, not validated alpha."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "winner-dvc-pin-match",
+   "claim": "data-dvc pin (3.67.1, released 2026-03-31) matches upstream exactly",
+   "verdict": "supported",
+   "note": "gh api repos/treeverse/dvc/releases/latest returns tag 3.67.1, published_at 2026-03-31T05:06:44Z; PyPI dvc/json returns version 3.67.1, upload_time 2026-03-31T05:07:27. Exact match to the catalog pin and to the candidate's cited figures.",
+   "sources": [
+    "gh api repos/treeverse/dvc/releases/latest",
+    "https://pypi.org/pypi/dvc/json"
+   ]
+  },
+  {
+   "name": "winner-dvc-org-transfer",
+   "claim": "github.com/treeverse/dvc is the correct, current repo; iterative/dvc resolves to it after a Nov 2025 lakeFS acquisition of DVC from Iterative.ai",
+   "verdict": "supported",
+   "note": "gh api repos/iterative/dvc returns full_name 'treeverse/dvc' (live redirect, confirmed today). Independent WebSearch (lakefs.io, dvc.org, PR Newswire, Dealroom, citybiz -- not just the repo's own citation) confirms lakeFS announced on 2025-11-18 it acquired the DVC open-source project from Iterative.ai.",
+   "sources": [
+    "gh api repos/iterative/dvc",
+    "gh api repos/treeverse/dvc",
+    "https://www.prnewswire.com/news-releases/lakefs-acquires-dvc-uniting-data-version-control-pioneers-to-accelerate-ai-ready-data-302618339.html",
+    "https://lakefs.io/blog/celebration-shared-vision-lakefs-dvc/",
+    "https://dvc.org/blog/dvc-joins-lakefs-your-questions-answered/"
+   ]
+  },
+  {
+   "name": "winner-dvc-independent-apache2",
+   "claim": "DVC remains open source (Apache-2.0) and independently developed, not folded into lakeFS",
+   "verdict": "supported",
+   "note": "gh api confirms license Apache-2.0, archived:false, fork:false for treeverse/dvc. Independent press coverage states DVC stays an independent tool for individual/small-team use while lakeFS targets enterprise scale, with no licensing change announced.",
+   "sources": [
+    "gh api repos/treeverse/dvc",
+    "WebSearch: lakeFS/DVC acquisition coverage (lakefs.io, dvc.org, prnewswire.com)"
+   ]
+  },
+  {
+   "name": "winner-dvc-release-cadence-flag",
+   "claim": "No new tagged DVC release in ~6 months post-acquisition despite continued commit activity",
+   "verdict": "supported",
+   "note": "Checked the 5 most recent releases: 3.67.1 (2026-03-31), 3.67.0 (2026-03-14), 3.66.1 (2026-01-08), 3.66.0 (2026-01-06), 3.65.0 (2025-12-22) -- no release since 2026-03-31 (~5.9 months before 2026-09-26). pushed_at is 2026-09-21, so commit activity continues. Under the task's 12-month threshold this does not (yet) count as unmaintained by either signal, but the release-cadence slowdown is real and worth flagging.",
+   "sources": [
+    "gh api \"repos/treeverse/dvc/releases?per_page=5\"",
+    "gh api repos/treeverse/dvc"
+   ]
+  },
+  {
+   "name": "winner-dvc-restore-evidence",
+   "claim": "A small-fixture native restore test already exists in this repo's own evidence (byte-identical restore of 4 files)",
+   "verdict": "supported",
+   "note": "Opened evidence/artifacts/gap-resolution-20260922/identity-provenance/dvc-arm-restore-compare.json directly: DVC 3.67.1 'dvc checkout' restored all 4 files (source.json, observations.parquet, universe.parquet, snapshot.json) byte-identical after deletion, evidence_class native_proven, reconfirmed by a 2026-09-23 coordinator_rerun (dvc_arm_diff_exit=0). settles_gap is explicitly only 'partially' (small synthetic fixture, no remote, no run-time baseline comparison). A related, stricter test in evidence/artifacts/gap-wave2-20260923/.../0-dvc-repro-restore-contract.json initially failed its full-tree restore criterion (git_restore_diff_exit=1, because dvc checkout does not restore git-tracked .gitignore files) and only reached outcome:'settled' after a documented 'fix round 3' correctly separated DVC-tracked outs from git-tracked files; all 5 corrected criteria then passed. The restore capability itself holds up; the original test criterion, not DVC, was flawed.",
+   "sources": [
+    "evidence/artifacts/gap-resolution-20260922/identity-provenance/dvc-arm-restore-compare.json (read directly)",
+    "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/0-dvc-repro-restore-contract.json (read directly)"
+   ]
+  },
+  {
+   "name": "dvc-existence-license-stars",
+   "claim": "treeverse/dvc: archived false, Apache-2.0, pushed 2026-09-21, 15885 stars",
+   "verdict": "supported",
+   "note": "gh api repos/treeverse/dvc returns archived:false, fork:false, license Apache-2.0, pushed_at 2026-09-21T18:46:11Z, stargazers_count 15885 -- exact match.",
+   "sources": [
+    "gh api repos/treeverse/dvc"
+   ]
+  },
+  {
+   "name": "dvc-capability-versioning",
+   "claim": "Content-addressed, git-like add/push/checkout versioning for datasets/models aimed at reproducible snapshots",
+   "verdict": "supported",
+   "note": "Directly consistent with the primary restore evidence opened above, which records real dvc init/add/checkout mechanics end to end, and with DVC's documented Apache-2.0, git-integrated design.",
+   "sources": [
+    "evidence/artifacts/gap-resolution-20260922/identity-provenance/dvc-arm-restore-compare.json",
+    "gh api repos/treeverse/dvc"
+   ]
+  },
+  {
+   "name": "dvc-no-identity-semantics",
+   "claim": "DVC's file/artifact model has no native concept of security identity, corporate actions, or licensed-data eligibility",
+   "verdict": "supported",
+   "note": "Confirmed by the repo's own layer file: catalogs/landscape/us-equities.json's identity-provenance layer still lists 'dated security identity (235 ticker collisions, no listing/delisting dates)' as an open gate 'no repository closes,' explicitly grouping dvc with arcticdb/iceberg/openlineage/mlflow as tools that do not close it.",
+   "sources": [
+    "catalogs/sota-convergence/README.md:62",
+    "catalogs/us-equities/gates-20260922.json:140-151"
+   ]
+  },
+  {
+   "name": "iceberg-existence-stars",
+   "claim": "apache/iceberg: 9276 stars, pushed today, ASF governance",
+   "verdict": "supported",
+   "note": "gh api repos/apache/iceberg returns stargazers_count 9276, pushed_at 2026-09-26T10:09:04Z, license Apache-2.0, archived:false -- exact match. Repo lives under the 'apache' GitHub org, consistent with ASF governance.",
+   "sources": [
+    "gh api repos/apache/iceberg"
+   ]
+  },
+  {
+   "name": "iceberg-version-date",
+   "claim": "apache-iceberg-1.11.0 (2026-05-20); pyiceberg 0.12.0 (2026-09-01)",
+   "verdict": "supported",
+   "note": "gh api releases/latest returns tag apache-iceberg-1.11.0, published_at 2026-05-20T08:47:57Z. PyPI pyiceberg/json returns version 0.12.0, upload_time 2026-09-01T17:27:57 -- exact match both.",
+   "sources": [
+    "gh api repos/apache/iceberg/releases/latest",
+    "https://pypi.org/pypi/pyiceberg/json"
+   ]
+  },
+  {
+   "name": "iceberg-time-travel-capability",
+   "claim": "Table format with native snapshot IDs, branches/tags and time-travel reads over Parquet-family files",
+   "verdict": "supported",
+   "note": "Opened the official Apache Iceberg docs page directly (iceberg.apache.org/docs/latest/branching/); it has a dedicated 'Branching and Tagging' section with 'Historical Tags' and 'Audit Branch' use cases for snapshot-based, point-in-time access -- confirms the capability as described.",
+   "sources": [
+    "https://iceberg.apache.org/docs/latest/branching/"
+   ]
+  },
+  {
+   "name": "iceberg-source-review-only",
+   "claim": "PyIceberg has never been run against this project's own fixture; stays source_review only",
+   "verdict": "supported",
+   "note": "No PyIceberg receipt or native-execution evidence artifact was found under evidence/ or blueprints/ in this checkout; catalogs/us-equities/coverage.json:2308 lists it only as a coverage/metadata entry, consistent with the claim.",
+   "sources": [
+    "catalogs/us-equities/coverage.json:2308"
+   ]
+  },
+  {
+   "name": "arcticdb-existence-stars",
+   "claim": "man-group/ArcticDB: 2523 stars, pushed today, license NOASSERTION at GitHub API level",
+   "verdict": "supported",
+   "note": "gh api repos/man-group/ArcticDB returns stargazers_count 2523, pushed_at 2026-09-26T09:19:28Z, license.spdx_id 'NOASSERTION', archived:false -- exact match.",
+   "sources": [
+    "gh api repos/man-group/ArcticDB"
+   ]
+  },
+  {
+   "name": "arcticdb-license-bsl-text",
+   "claim": "License is Business Source License 1.1: forbids offering as a hosted 'Database Service', converts to Apache-2.0 two years after each version's release",
+   "verdict": "supported",
+   "note": "Read the full LICENSE.txt directly from GitHub: 'Business Source License 1.1', Licensor 'Man Group Operations Limited', 'you may not use the Licensed Work for a Database Service', 'Change Date: ...two years as of the release date... Change License: Apache License, version 2.0.' PyPI license field independently reads 'Business Source License 1.1 (See LICENSE.txt)'.",
+   "sources": [
+    "gh api repos/man-group/ArcticDB/contents/LICENSE.txt",
+    "https://pypi.org/pypi/arcticdb/json"
+   ]
+  },
+  {
+   "name": "arcticdb-version-date",
+   "claim": "Latest version v6.26.0, released 2026-09-14",
+   "verdict": "supported",
+   "note": "gh api releases/latest returns tag v6.26.0, published_at 2026-09-14T08:40:30Z; PyPI arcticdb/json returns version 6.26.0, upload_time 2026-09-14T08:37:53 -- exact match.",
+   "sources": [
+    "gh api repos/man-group/ArcticDB/releases/latest",
+    "https://pypi.org/pypi/arcticdb/json"
+   ]
+  },
+  {
+   "name": "arcticdb-catalog-omission-claim",
+   "claim": "The existing catalog record for ArcticDB does not mention BSL either (candidate's stated 'important correction to carry forward')",
+   "verdict": "refuted",
+   "note": "False. Grepping the checkout found extensive, repeated, PRE-EXISTING BSL documentation for ArcticDB: catalogs/us-equities/authenticated-data-review.md:28 ('Current code uses Business Source License 1.1...'), authenticated-data-review.json:213, data-research.json:322/340 ('BSL-1.1; deployment-specific Additional Use Grant/commercial terms'), data-research.md:129, and catalogs/landscape/claude-independent-discovery.json:5372 ('MATERIAL CAVEAT: Business Source License 1.1, not open source under the OSI definition'). catalogs/sota-convergence/layer-verdicts-20260922.json:6148/7193 already flag the exact same NOASSERTION-vs-BSL discrepancy the candidate presents as new. data-research.json is itself a listed evidence_ref for this very identity-provenance layer. The candidate's underlying license fact is accurate; its claim of correcting an omission is not -- the omission does not exist.",
+   "sources": [
+    "catalogs/us-equities/authenticated-data-review.md:28",
+    "catalogs/us-equities/authenticated-data-review.json:213",
+    "catalogs/us-equities/data-research.json:322,340",
+    "catalogs/us-equities/data-research.md:129",
+    "catalogs/landscape/claude-independent-discovery.json:5372",
+    "catalogs/sota-convergence/layer-verdicts-20260922.json:6148,7193"
+   ]
+  },
+  {
+   "name": "arcticdb-capability-versioned-store",
+   "claim": "Versioned DataFrame/time-series datastore built for tick/bar data with library-level snapshotting",
+   "verdict": "supported",
+   "note": "GitHub description confirms 'high performance, serverless DataFrame database built for the Python Data Science ecosystem.' The repo's own prior, separately source-reviewed catalog record documents the exact mechanism: 'ArcticDB versions data automatically on every write, enabling point-in-time queries... Reads take an as_of= argument to rewind to any prior version.'",
+   "sources": [
+    "gh api repos/man-group/ArcticDB",
+    "catalogs/landscape/claude-independent-discovery.json:5372"
+   ]
+  },
+  {
+   "name": "lance-org-transfer",
+   "claim": "lancedb org still exists/live; lance-format org now holds the lance repo itself",
+   "verdict": "supported",
+   "note": "gh api repos/lance-format/lance: stars 7116 (claim said 7115, negligible live-counter drift), pushed_at 2026-09-26T07:36:20Z, Apache-2.0. gh api repos/lancedb/lance redirects to the identical full_name 'lance-format/lance', confirming the repo now lives under lance-format. gh api orgs/lancedb confirms that org still exists and is live (updated_at 2026-09-24).",
+   "sources": [
+    "gh api repos/lance-format/lance",
+    "gh api repos/lancedb/lance",
+    "gh api orgs/lancedb",
+    "gh api orgs/lance-format"
+   ]
+  },
+  {
+   "name": "lance-org-description",
+   "claim": "lance-format org description: 'The Open Lakehouse Format for Multimodal AI'",
+   "verdict": "supported",
+   "note": "gh api orgs/lance-format returns that description verbatim; created_at 2025-11-10.",
+   "sources": [
+    "gh api orgs/lance-format"
+   ]
+  },
+  {
+   "name": "lance-version-date",
+   "claim": "Latest v12.0.0, released 2026-09-17; pylance 12.0.0 on PyPI",
+   "verdict": "supported",
+   "note": "gh api releases/latest returns tag v12.0.0, published_at 2026-09-17T16:25:11Z; PyPI pylance/json returns version 12.0.0, upload_time 2026-09-17T16:41:26 -- exact match.",
+   "sources": [
+    "gh api repos/lance-format/lance/releases/latest",
+    "https://pypi.org/pypi/pylance/json"
+   ]
+  },
+  {
+   "name": "lance-capability-compat-list",
+   "claim": "Columnar Parquet-successor with native data versioning, readable from Pandas/DuckDB/Polars/PyArrow/PyTorch",
+   "verdict": "supported",
+   "note": "Fetched the README directly: confirms 'Zero-copy versioning: Automatic versioning with ACID transactions, time travel, tags, and branches,' and explicitly lists integrations 'Pandas, DuckDB, Polars, PyArrow, Ray, Spark, and more.' PyTorch appears only in marketing/subtitle text, not in the detailed integrations list -- a minor precision overstatement, not a substantive error.",
+   "sources": [
+    "https://github.com/lance-format/lance (README, fetched directly)"
+   ]
+  },
+  {
+   "name": "delta-sharing-existence-stars",
+   "claim": "delta-io/delta-sharing: 959 stars, pushed 2026-09-01, Apache-2.0",
+   "verdict": "supported",
+   "note": "gh api repos/delta-io/delta-sharing returns stargazers_count 959, pushed_at 2026-09-01T20:02:52Z, license Apache-2.0, archived:false -- exact match.",
+   "sources": [
+    "gh api repos/delta-io/delta-sharing"
+   ]
+  },
+  {
+   "name": "delta-sharing-version-match",
+   "claim": "PyPI delta-sharing 1.4.2 matches GitHub tag py-v1.4.2",
+   "verdict": "supported",
+   "note": "gh api releases/latest returns tag py-v1.4.2, published_at 2026-08-12T04:09:28Z; PyPI delta-sharing/json returns version 1.4.2, upload_time 2026-08-10T20:13:27 -- version numbers match; the ~2-day gap is normal release-process ordering, not a discrepancy.",
+   "sources": [
+    "gh api repos/delta-io/delta-sharing/releases/latest",
+    "https://pypi.org/pypi/delta-sharing/json"
+   ]
+  },
+  {
+   "name": "delta-sharing-lf-governance",
+   "claim": "Linux Foundation open protocol for cross-org dataset sharing without copying data",
+   "verdict": "supported",
+   "note": "The delta-sharing README itself (fetched directly) does not restate LF governance, but Delta Lake/delta-io is independently confirmed via the Foundation's own project page and press releases as an LF AI & Data Foundation project (contributed 2019, formal LF AI & Data incubation project as of a 2024 contribution). README text independently confirms: 'an open protocol for secure real-time exchange of large datasets, which enables organizations to share data in real time regardless of which computing platforms they use.'",
+   "sources": [
+    "https://github.com/delta-io/delta-sharing (README, fetched)",
+    "https://lfaidata.foundation/projects/delta-lake/",
+    "https://www.linuxfoundation.org/press/press-release/the-delta-lake-project-turns-to-linux-foundation-to-become-the-open-standard-for-data-lakes"
+   ]
+  },
+  {
+   "name": "delta-sharing-lineage-in-protocol",
+   "claim": "Lineage is carried in the Delta Sharing protocol",
+   "verdict": "unverifiable",
+   "note": "The fetched README contains no statement about lineage being carried within the protocol specification or implementation; this specific sub-claim is not supported by the primary source I opened.",
+   "sources": [
+    "https://github.com/delta-io/delta-sharing (README, fetched)"
+   ]
+  },
+  {
+   "name": "openlineage-existence-stars",
+   "claim": "OpenLineage/OpenLineage: 2675 stars, pushed today, Apache-2.0",
+   "verdict": "supported",
+   "note": "gh api repos/OpenLineage/OpenLineage returns stargazers_count 2675, pushed_at 2026-09-26T14:36:00Z, license Apache-2.0, archived:false -- exact match.",
+   "sources": [
+    "gh api repos/OpenLineage/OpenLineage"
+   ]
+  },
+  {
+   "name": "openlineage-version-match",
+   "claim": "openlineage-python 1.53.0 on PyPI matches the GitHub release exactly",
+   "verdict": "supported",
+   "note": "gh api releases/latest returns tag 1.53.0, published_at 2026-09-01T16:54:44Z; PyPI openlineage-python/json returns version 1.53.0, upload_time 2026-09-01T13:32:33 -- exact match.",
+   "sources": [
+    "gh api repos/OpenLineage/OpenLineage/releases/latest",
+    "https://pypi.org/pypi/openlineage-python/json"
+   ]
+  },
+  {
+   "name": "openlineage-financial-adoption",
+   "claim": "Adoption reported concentrated in financial services (2026)",
+   "verdict": "unverifiable",
+   "note": "An independent WebSearch surfaces the identical sentence, but only from low-authority market-report/SEO-style sites (e.g. thebusinessresearchcompany.com, dataintelo.com), not from OpenLineage's own project or a reputable industry survey. The same search's only concrete named adopters were Northwestern Mutual (financial) and BMW Group (automotive) plus IBM watsonx.data/AWS MWAA integrations -- a mixed set that does not itself establish 'concentrated in financial services.' I do not treat SEO/market-report content-mill sites as primary sources.",
+   "sources": [
+    "WebSearch: 'OpenLineage adoption financial services 2026 data lineage market data provenance' (no single authoritative primary source found)"
+   ]
+  },
+  {
+   "name": "openlineage-not-a-store",
+   "claim": "A wire format/emitter, not a store; needs pairing with a persistence layer",
+   "verdict": "supported",
+   "note": "Consistent with OpenLineage's own scope as a spec/client-library project (no built-in persisted event store in its own repo). Matches the repo's own separately-conducted prior research grouping openlineage among tools that don't close the identity-provenance gate alone.",
+   "sources": [
+    "gh api repos/OpenLineage/OpenLineage (repo scope)",
+    "catalogs/sota-convergence/README.md:62"
+   ]
+  },
+  {
+   "name": "marquez-existence-stars",
+   "claim": "MarquezProject/marquez: 2281 stars, Apache-2.0, not archived",
+   "verdict": "supported",
+   "note": "gh api repos/MarquezProject/marquez returns stargazers_count 2281, pushed_at 2026-09-15T15:58:13Z, license Apache-2.0, archived:false -- matches (the repo's own prior manifest recorded 2282 a few days earlier; 1-star drift, immaterial).",
+   "sources": [
+    "gh api repos/MarquezProject/marquez"
+   ]
+  },
+  {
+   "name": "marquez-release-stall",
+   "claim": "Formal release cadence stalled almost 2 years (0.50.0, 2024-10-24) despite continued commits",
+   "verdict": "supported",
+   "note": "gh api releases/latest confirms tag 0.50.0, published_at 2024-10-24T08:23:00Z -- ~23 months before 2026-09-26, which does trigger the task's 12-month release-recency flag on a strict reading. However, gh api commits shows real activity within 12 months (a commit dated 2026-04-12, ~5.5 months old) plus pushed_at 2026-09-15 (11 days old), so the project is not abandoned by commit/push activity, only by formal tagged-release cadence. Both facts are flagged rather than collapsed into one label.",
+   "sources": [
+    "gh api repos/MarquezProject/marquez/releases/latest",
+    "gh api \"repos/MarquezProject/marquez/commits?per_page=3\"",
+    "gh api repos/MarquezProject/marquez"
+   ]
+  },
+  {
+   "name": "marquez-untested-capability",
+   "claim": "Would let this layer reconstruct exactly which source/timestamp/version fed a given equity snapshot",
+   "verdict": "unverifiable",
+   "note": "Consistent with Marquez's documented role as an OpenLineage-consuming metadata/lineage service, but no native_execution evidence exists in this checkout of Marquez actually ingesting this project's events -- the candidate itself frames the 'emit real events, then query them back' comparison as unexecuted, and no Marquez-related receipt was found under evidence/.",
+   "sources": [
+    "gh api repos/MarquezProject/marquez",
+    "absence check: no marquez receipt found under evidence/"
+   ]
+  },
+  {
+   "name": "mlflow-existence-stars",
+   "claim": "mlflow/mlflow: 28142 stars, pushed today, Apache-2.0",
+   "verdict": "supported",
+   "note": "gh api repos/mlflow/mlflow returns stargazers_count 28142, pushed_at 2026-09-26T11:00:30Z, license Apache-2.0, archived:false -- exact match.",
+   "sources": [
+    "gh api repos/mlflow/mlflow"
+   ]
+  },
+  {
+   "name": "mlflow-version-match",
+   "claim": "Latest v3.16.1, released 2026-09-17",
+   "verdict": "supported",
+   "note": "gh api releases/latest returns tag v3.16.1, published_at 2026-09-17T02:40:08Z; PyPI mlflow/json returns version 3.16.1, upload_time 2026-09-16T23:14:16 -- version matches, dates within normal tag/upload ordering.",
+   "sources": [
+    "gh api repos/mlflow/mlflow/releases/latest",
+    "https://pypi.org/pypi/mlflow/json"
+   ]
+  },
+  {
+   "name": "mlflow-data-api-claim",
+   "claim": "mlflow.data logging binds a run to the exact dataset/version consumed",
+   "verdict": "unverifiable",
+   "note": "Attempted to open the official MLflow tracking/data-api docs page directly; the fetch returned no extractable content. I have not confirmed this specific claim against a primary source that loaded successfully, so per the adversarial default I do not mark it supported despite it being a widely-cited MLflow feature from general knowledge.",
+   "sources": [
+    "https://mlflow.org/docs/latest/tracking/data-api.html (fetch attempted, returned empty)"
+   ]
+  },
+  {
+   "name": "mlflow-scope-claim",
+   "claim": "An ML-experiment tracker, not a source-identity or corporate-action tool",
+   "verdict": "supported",
+   "note": "Consistent with MLflow's project scope as described in its own repo/PyPI metadata (an experiment-tracking platform); no evidence in this checkout shows it wired to source-identity/eligibility logic.",
+   "sources": [
+    "gh api repos/mlflow/mlflow"
+   ]
+  },
+  {
+   "name": "ge-org-transfer-confirmed",
+   "claim": "great-expectations/great_expectations now resolves to fivetran/great_expectations, same repo id, fork:false (genuine org transfer)",
+   "verdict": "supported",
+   "note": "Independently queried both repos/fivetran/great_expectations and repos/great-expectations/great_expectations; both return identical id 103071520 and full_name 'fivetran/great_expectations', fork:false, archived:false -- confirms a genuine org transfer, not a fork.",
+   "sources": [
+    "gh api repos/fivetran/great_expectations",
+    "gh api repos/great-expectations/great_expectations"
+   ]
+  },
+  {
+   "name": "ge-stars-pushed",
+   "claim": "11844 stars, pushed 2026-09-25T19:16:55Z",
+   "verdict": "supported",
+   "note": "gh api repos/fivetran/great_expectations returns stargazers_count 11844, pushed_at 2026-09-25T19:16:55Z -- exact match to the candidate's cited figures.",
+   "sources": [
+    "gh api repos/fivetran/great_expectations"
+   ]
+  },
+  {
+   "name": "ge-pypi-ahead-of-tag",
+   "claim": "PyPI shows a newer patch (1.23.2, 2026-09-25) than the latest tagged GitHub Release (1.23.1, 2026-09-18)",
+   "verdict": "supported",
+   "note": "gh api releases/latest returns tag 1.23.1, published_at 2026-09-18T15:21:41Z. PyPI great-expectations/json returns version 1.23.2, upload_time 2026-09-25T18:48:25 -- confirms PyPI genuinely ships a newer patch than the latest tagged GitHub Release, exactly as claimed.",
+   "sources": [
+    "gh api repos/fivetran/great_expectations/releases/latest",
+    "https://pypi.org/pypi/great-expectations/json"
+   ]
+  },
+  {
+   "name": "ge-capability-audit-trail",
+   "claim": "Persisted, queryable validation-result store ('data docs') vs. Pandera's in-process exceptions",
+   "verdict": "unverifiable",
+   "note": "Not independently re-verified against GX source/docs in this pass. The claim matches the repository's own prior, separately source-reviewed catalog entry (catalogs/sota-convergence/manifest-20260923.json, ~lines 11455-11490) essentially verbatim, including its adversarial_verification votes (one lens refuting on grounds GX's connector list omits DuckDB/Polars, which I did not re-check myself).",
+   "sources": [
+    "catalogs/sota-convergence/manifest-20260923.json (Great Expectations section, read directly, ~lines 11455-11490)"
+   ]
+  },
+  {
+   "name": "openfigi-300m-securities",
+   "claim": "300+ million unique securities mapped, most asset classes",
+   "verdict": "supported",
+   "note": "The official docs page (openfigi.com/api/documentation, fetched directly) does not state a coverage number, but OpenFIGI's own 'insights' announcements and the OMG press release independently confirm: 'FIGI have been created for more than 300 million unique securities, representing most asset classes of the financial markets.'",
+   "sources": [
+    "https://www.openfigi.com/insights/all/2022/1/11/bloomberg-and-kaiko-issue-first-financial-instrument-global-identifiers-for-crypto-assets",
+    "https://www.omg.org/news/releases/pr2021/01-20-21.htm"
+   ]
+  },
+  {
+   "name": "openfigi-rate-limits-claim",
+   "claim": "No daily/weekly/monthly limits on a free key",
+   "verdict": "unverifiable",
+   "note": "The official docs page (fetched directly) states only request-rate limits -- '25 Per Minute' without a key, '25 Per 6 Seconds' with one -- and says nothing about daily/weekly/monthly caps in either direction. The specific 'no daily/weekly/monthly limits' framing is not confirmed (nor contradicted) by the primary source I opened.",
+   "sources": [
+    "https://www.openfigi.com/api/documentation (fetched directly)"
+   ]
+  },
+  {
+   "name": "openfigi-bloomberg-kaiko-omg",
+   "claim": "FIGI issued by Bloomberg L.P. and Kaiko as Certified Providers under the auspice of OMG (and X9)",
+   "verdict": "supported",
+   "note": "Independently confirmed via omg.org's own press release and an OpenFIGI insights post: Bloomberg L.P. is 'the Registration Authority and Certified Provider,' Kaiko is 'approved as Certified Provider of FIGI for crypto assets... under the auspices of the Object Management Group (OMG).' The ASC X9 co-governance detail was not independently confirmed in the sources I opened.",
+   "sources": [
+    "https://www.omg.org/news/releases/pr2021/01-20-21.htm",
+    "https://www.openfigi.com/insights/all/2022/1/11/bloomberg-and-kaiko-issue-first-financial-instrument-global-identifiers-for-crypto-assets"
+   ]
+  },
+  {
+   "name": "openfigi-235-collisions-citation",
+   "claim": "235 asset-master ticker collisions is this layer's own gate",
+   "verdict": "supported",
+   "note": "The figure 235 is real and consistent across independent repo files: catalogs/us-equities/gates-20260922.json:140 (gate title), blueprints/us-equities/broad-universe/receipt.json:89 ('symbol_collisions': 235), blueprints/us-equities/alpaca-history-fixture/protocol.json:98/190. Accurately cites this project's own internal gate; whether OpenFIGI actually resolves it remains untested, exactly as the candidate itself discloses. Note also: the repo's own prior research (manifest-20260923.json:17258) already lists 'WRDS/OpenFIGI' as previously-considered-but-unadopted, so OpenFIGI was not entirely undiscovered before this candidate submission.",
+   "sources": [
+    "catalogs/us-equities/gates-20260922.json:140",
+    "blueprints/us-equities/broad-universe/receipt.json:89",
+    "catalogs/sota-convergence/manifest-20260923.json:17258"
+   ]
+  },
+  {
+   "name": "openfigi-no-official-sdk",
+   "claim": "No official GitHub client SDK exists; only third-party wrappers (talsan/openfigi, jwergieluk/openfigi)",
+   "verdict": "unverifiable",
+   "note": "A GitHub search found both cited third-party wrappers plus many more, but also an official-looking 'OpenFIGI/api-examples' repo (226 stars) under an 'OpenFIGI' GitHub org -- examples, not necessarily a packaged client SDK, so this does not clearly refute the claim. Separately, a PyPI package literally named 'openfigi' exists (v0.0.9) but its very low version number suggests an unofficial community package, not a Bloomberg-published release; I could not confirm its maintainer identity. Net: the 'no official SDK' framing is plausible but not cleanly confirmed or refuted by what I checked.",
+   "sources": [
+    "gh api \"search/repositories?q=openfigi+in:name\"",
+    "https://pypi.org/pypi/openfigi/json (v0.0.9, maintainer not verified)"
+   ]
+  },
+  {
+   "name": "permid-apis-description",
+   "claim": "Free Record Matching and Entity Search REST APIs resolve name/ticker/RIC to a stable PermID, covering organizations, instruments, quotes and funds",
+   "verdict": "supported",
+   "note": "Independently confirmed via developers.lseg.com pages: 'Open PermID is publicly available for free,' 'Entity Search API supports organizations, equity instruments and quotes,' 'Record Matching API allows you to match your own entity Person, Organization, Instrument, and Quote records with LSEG PermIDs' (CSV upload, up to 1000 records). 'Funds' coverage specifically was not confirmed in what I read (organizations/instruments/quotes were). Direct WebFetch of permid.org itself returned only a cookie notice, so the developers.lseg.com pages are the actual primary source used here.",
+   "sources": [
+    "https://developers.lseg.com/en/api-catalog/open-perm-id/permid-entity-search",
+    "https://developers.lseg.com/en/api-catalog/open-perm-id/permid-record-matching-restful-api"
+   ]
+  },
+  {
+   "name": "permid-client-stale",
+   "claim": "OpenPermID Python client on PyPI has not shipped since 2021-03-05 (~5.5 years); flagged unmaintained",
+   "verdict": "supported",
+   "note": "PyPI OpenPermID/json returns version 0.5, upload_time 2021-03-05T03:42:39 -- confirms the exact date, and the resulting ~5.6-year staleness is well past the task's 12-month threshold. The client package is unmaintained by that measure even if LSEG's own hosted API/portal may be current.",
+   "sources": [
+    "https://pypi.org/pypi/OpenPermID/json"
+   ]
+  },
+  {
+   "name": "backtest-bias-existence",
+   "claim": "Finance-broski/backtest-bias: 12 stars, created 2026-07-09, pushed 2026-09-14, MIT",
+   "verdict": "supported",
+   "note": "gh api repos/Finance-broski/backtest-bias returns stargazers_count 12, created_at 2026-07-09T07:44:25Z, pushed_at 2026-09-14T12:23:58Z, license MIT, archived:false -- exact match.",
+   "sources": [
+    "gh api repos/Finance-broski/backtest-bias"
+   ]
+  },
+  {
+   "name": "backtest-bias-description-quote",
+   "claim": "Repo description: 'Checks whether your backtest data is lying to you: survivorship detection and CI integrity gates for financial price panels'",
+   "verdict": "supported",
+   "note": "Confirmed verbatim via the repo's description field.",
+   "sources": [
+    "gh api repos/Finance-broski/backtest-bias --jq .description"
+   ]
+  },
+  {
+   "name": "backtest-bias-no-release-claim",
+   "claim": "'2026-09-14 (last push; no tagged release found)'",
+   "verdict": "refuted",
+   "note": "False. gh api shows 5 releases exist for this repo, with the latest tagged v0.3.0 published 2026-09-05 -- before the claimed 'last push' date, meaning a real tagged release was available to find. This directly contradicts the 'no tagged release found' framing.",
+   "sources": [
+    "gh api \"repos/Finance-broski/backtest-bias/releases\" (length=5)",
+    "gh api \"repos/Finance-broski/backtest-bias/releases/latest\" (tag v0.3.0, published_at 2026-09-05T17:58:56Z)"
+   ]
+  },
+  {
+   "name": "pit-adjuster-existence-cluster",
+   "claim": "holdout-labs/pit-adjuster: 0 stars, created 2026-08-18, pushed 2026-09-08; part of a same-day single-author cluster with falsification-ledger and ashare-data-immunity",
+   "verdict": "supported",
+   "note": "gh api confirms pit-adjuster (0 stars, created_at 2026-08-18T13:42:04Z, pushed_at 2026-09-08T14:24:25Z, MIT). Independently confirmed the cluster: falsification-ledger (1 star, created_at 2026-08-18T13:42:47Z) and ashare-data-immunity (0 stars, created_at 2026-08-18T13:45:24Z) were created under the same org within 3 minutes of pit-adjuster on the same day -- strongly corroborates the 'one person's tool portfolio' framing.",
+   "sources": [
+    "gh api repos/holdout-labs/pit-adjuster",
+    "gh api repos/holdout-labs/falsification-ledger",
+    "gh api repos/holdout-labs/ashare-data-immunity"
+   ]
+  },
+  {
+   "name": "pit-adjuster-no-release-claim",
+   "claim": "'2026-09-08 (last push; no tagged release found)'",
+   "verdict": "refuted",
+   "note": "False. gh api shows 1 release exists: tag v0.1.2, published_at 2026-09-03T13:08:52Z. Notably, the sibling repo falsification-ledger also has exactly 1 release, tag v0.1.2, published_at 2026-09-03T13:08:56Z -- 4 seconds after pit-adjuster's -- which independently reinforces the single-author/automated-batch pattern even more strongly than the candidate claimed, while directly contradicting its 'no tagged release found' sub-claim.",
+   "sources": [
+    "gh api \"repos/holdout-labs/pit-adjuster/releases\" (length=1)",
+    "gh api repos/holdout-labs/pit-adjuster/releases/latest (tag v0.1.2, 2026-09-03T13:08:52Z)",
+    "gh api repos/holdout-labs/falsification-ledger/releases/latest (tag v0.1.2, 2026-09-03T13:08:56Z)"
+   ]
+  },
+  {
+   "name": "pit-adjuster-capability",
+   "claim": "Point-in-time fixed-basis back-adjustment with corporate-action factor chain and convention-drift detection",
+   "verdict": "unverifiable",
+   "note": "Not read in this pass; evidence_level stays metadata, as the candidate itself discloses. I did not open source/README content for this repo.",
+   "sources": []
+  },
+  {
+   "name": "shingou-redirect-confirmed",
+   "claim": "auriontech/shingou-signal-log resolves to shingou-io/shingou-signal-log; no LICENSE file",
+   "verdict": "supported",
+   "note": "gh api repos/auriontech/shingou-signal-log returns full_name 'shingou-io/shingou-signal-log' (live redirect), license:null confirmed (no LICENSE file). Also noted: the 'shingou-io' org was itself only created 2026-08-02, after the repo's own created_at of 2026-07-04 -- meaning the repo was transferred into this org sometime after creation, consistent with the redirect finding.",
+   "sources": [
+    "gh api repos/auriontech/shingou-signal-log",
+    "gh api repos/shingou-io/shingou-signal-log",
+    "gh api orgs/shingou-io"
+   ]
+  },
+  {
+   "name": "shingou-most-recent-push",
+   "claim": "Pushed today (2026-09-26), the single most recently active repo in this candidate set",
+   "verdict": "supported",
+   "note": "pushed_at 2026-09-26T15:01:00Z is later than every other repo I checked in this set on the same day: OpenLineage 14:36:00Z, MLflow 11:00:30Z, Iceberg 10:09:04Z, ArcticDB 09:19:28Z, Lance 07:36:20Z -- the claim holds up against independent checks across the whole candidate set.",
+   "sources": [
+    "gh api repos/shingou-io/shingou-signal-log",
+    "gh api repos/OpenLineage/OpenLineage",
+    "gh api repos/mlflow/mlflow",
+    "gh api repos/apache/iceberg",
+    "gh api repos/man-group/ArcticDB",
+    "gh api repos/lance-format/lance"
+   ]
+  },
+  {
+   "name": "shingou-no-release-claim",
+   "claim": "'2026-09-26 (last push; no tagged release found)'",
+   "verdict": "supported",
+   "note": "gh api confirms 0 releases exist for shingou-io/shingou-signal-log -- unlike the backtest-bias and pit-adjuster 'no release' claims (both refuted above), this one is accurate.",
+   "sources": [
+    "gh api \"repos/shingou-io/shingou-signal-log/releases\" (length=0)"
+   ]
+  },
+  {
+   "name": "shingou-description-mechanism",
+   "claim": "Append-only SHA-256 hash-commitment log for point-in-time sentiment buckets, with a one-command verifier",
+   "verdict": "supported",
+   "note": "Repo description and README (fetched directly) confirm the mechanism in detail: one committed line per (symbol, interval, bucket) with a SHA-256 hex hash of a documented canonical string, described as letting a consumer verify published history was never rewritten.",
+   "sources": [
+    "gh api repos/shingou-io/shingou-signal-log --jq .description",
+    "gh api repos/shingou-io/shingou-signal-log/readme"
+   ]
+  },
+  {
+   "name": "shingou-integrations-distinct",
+   "claim": "The awesome-list actually cited the wrong repo (shingou-integrations, exchange-bot plugin glue), distinct from the real hash-chain ledger",
+   "verdict": "supported",
+   "note": "gh api confirms shingou-io/shingou-integrations exists as a separate repo with its own description, verbatim: 'Free, open-source Shingou sentiment integrations for trading platforms and bot frameworks -- Freqtrade, Jesse, more coming,' and an earlier pushed_at (2026-08-02) -- consistent with being a distinct, unrelated repo from shingou-signal-log.",
+   "sources": [
+    "gh api repos/shingou-io/shingou-integrations --jq .description"
+   ]
+  },
+  {
+   "name": "openpm-paper-exists",
+   "claim": "Paper exists at arxiv.org/abs/2608.09988, submitted 2026-08-06, ~10 authors including a Rutgers (Metaxas) affiliation",
+   "verdict": "supported",
+   "note": "Opened the arxiv abstract page directly. Confirms title 'OpenPM: Auditable Point-in-Time Evaluation for LLM Portfolio-Management Agents,' 10 authors including Dimitris N. Metaxas, submission date 2026-08-06, and an abstract about evaluating LLM portfolio-management agents over S&P 500 five-minute data with enforced risk constraints and audit artifacts.",
+   "sources": [
+    "https://arxiv.org/abs/2608.09988"
+   ]
+  },
+  {
+   "name": "openpm-limitation-quote",
+   "claim": "Authors state results are 'upper bounds on a single frozen window without market impact, not validated alpha'",
+   "verdict": "supported",
+   "note": "Confirmed as an actual quoted sentence present on the fetched abstract page.",
+   "sources": [
+    "https://arxiv.org/abs/2608.09988"
+   ]
+  },
+  {
+   "name": "openpm-no-code-repo",
+   "claim": "No code repository was found; not adoptable as a dependency today",
+   "verdict": "supported",
+   "note": "My own fetch of the abstract page likewise surfaced no code-repository link or release.",
+   "sources": [
+    "https://arxiv.org/abs/2608.09988"
+   ]
+  },
+  {
+   "name": "openpm-specific-quote-unverified",
+   "claim": "Verbatim framing 'every record visible to the agent must be available at the decision time'",
+   "verdict": "unverifiable",
+   "note": "My fetch confirmed the paper's general point-in-time/audit-artifact framing but did not surface this exact quoted phrase; I did not load the full PDF to check verbatim wording, only the abstract page.",
+   "sources": [
+    "https://arxiv.org/abs/2608.09988 (abstract page only; full text not fetched)"
+   ]
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "DVC (treeverse/dvc)",
+   "url": "https://github.com/treeverse/dvc",
+   "modalities": [
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Current catalog winner for this layer; pin matches upstream exactly. The only material change since the pin is organizational (Iterative.ai -> lakeFS stewardship), not technical -- confirmed the repository URL treeverse/dvc is correct and current, not a catalog error: iterative/dvc now resolves to it. DVC's file/artifact model has no native concept of security identity, corporate actions, or licensed-data eligibility; it only versions whatever files are handed to it, so it stays a partial answer to the layer's requirement even where it is the right tool."
+  },
+  {
+   "name": "Apache Iceberg / PyIceberg",
+   "url": "https://github.com/apache/iceberg",
+   "modalities": [
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The strongest already-catalogued challenger to DVC's file-based snapshot model for a tabular equity dataset, because time-travel is a native table-catalog feature. The existing 2026-09-23 sweep already probed this territory via Nessie and Delta Lake (both refuted as redundant with Iceberg on this non-Spark stack); PyIceberg itself has never been run against this project's own fixture, so it stays source_review only, not a demonstrated win."
+  },
+  {
+   "name": "ArcticDB",
+   "url": "https://github.com/man-group/ArcticDB",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Directly relevant to the layer's 'version/cutoff facets' gap for equity bars, and a plausible table-native alternative to DVC. Important correction to carry forward: this project's LICENSE.txt is Business Source License 1.1 -- it forbids offering ArcticDB as a hosted 'Database Service' to third parties and only converts to a permissive license two years after each version's release. GitHub's own license.spdx_id field reports 'NOASSERTION', which understates this; the existing catalog record for ArcticDB does not mention BSL either. Any adoption decision needs to weigh that restriction explicitly."
+  },
+  {
+   "name": "Lance (pylance / lance-format)",
+   "url": "https://github.com/lance-format/lance",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The best fit in this whole set for the layer's explicit 'version/cutoff facets' gap language, because versioning is native to the file format rather than a side-car tool layered on top of Parquet, and it drops directly under the stack's existing DuckDB/Parquet path. It versions bytes, not securities, so it still needs this project's own identity/corporate-action logic on top, exactly as DVC does today."
+  },
+  {
+   "name": "Delta Sharing",
+   "url": "https://github.com/delta-io/delta-sharing",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Solves a different sub-problem than DVC: cross-organization distribution of a licensed, versioned dataset with enforced access control, not intra-project snapshot/restore. Useful only if this project needs to hand off or receive an equity dataset under access control; it does not itself establish security identity or corporate-action completeness. Distinct from delta-io/delta (the Spark table format the existing sweep already refuted as redundant with Iceberg) -- Delta Sharing is a sharing protocol, not a competing table format, so that refutation does not carry over."
+  },
+  {
+   "name": "OpenLineage",
+   "url": "https://github.com/OpenLineage/OpenLineage",
+   "modalities": [
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "A wire format/emitter, not a store -- it defines events but does not itself answer 'what fed this snapshot.' Confirmed active today (pushed 2026-09-26), pin unchanged and current. Needs pairing with a persistence layer (Marquez, or a project-local sink) to actually close the layer's lineage-reconstruction gap #6; alone it produces events and closes none of the requirement by itself."
+  },
+  {
+   "name": "Marquez",
+   "url": "https://github.com/MarquezProject/marquez",
+   "modalities": [
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The leading open persistence store for OpenLineage events and the most direct existing-OSS answer to gap #6, but its formal release cadence has stalled almost 2 years (0.50.0, 2024-10-24) despite continued commits (pushed 2026-09-15) -- reconfirmed today unchanged from the 2026-09-23 sweep. Already source-reviewed and adversarially checked there; the concrete overturn test (emit real events from this project's own ingestion adapters for one acquisition day, then query them back) remains unexecuted."
+  },
+  {
+   "name": "MLflow",
+   "url": "https://github.com/mlflow/mlflow",
+   "modalities": [
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Strong for binding a research run to the dataset version it consumed, helping 'reproducible analytical snapshots,' but it is an ML-experiment tracker, not a source-identity or corporate-action tool -- it does not acquire, license-check, or validate equity data itself. Already a catalog conditional; no receipt in the repository shows it wired to an actual dataset yet."
+  },
+  {
+   "name": "Great Expectations",
+   "url": "https://github.com/fivetran/great_expectations",
+   "modalities": [
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The strongest known direct competitor to the catalog's Pandera pick for this layer's 'reject data whose eligibility is unknown' clause, because it persists a queryable rejection/audit record rather than raising an in-process exception. Already source-reviewed and adversarially checked in the 2026-09-23 sweep (survives=false only for lack of a head-to-head trial against Pandera, and because its connector list omits DuckDB/Polars, which Pandera already supports); I reconfirm the org transfer and that gap are both still current."
+  },
+  {
+   "name": "OpenFIGI",
+   "url": "https://www.openfigi.com/api/documentation",
+   "modalities": [
+    "docs",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Best primary-source fit for the layer's 'permanent security identity' half of the requirement, which the current winner (DVC) does not address at all. Free, open, run by Bloomberg under a public-standards body, and not a GitHub-shaped project -- exactly the kind of find the task's 'beyond stars and awesome lists' instruction is asking for. Whether its coverage actually includes listing/delisting dates that resolve the specific 235 collisions is unverified; only running that check would move this past source_review. No official GitHub client SDK exists (only third-party wrappers such as talsan/openfigi and jwergieluk/openfigi were found)."
+  },
+  {
+   "name": "PermID (LSEG Open PermID)",
+   "url": "https://permid.org/",
+   "modalities": [
+    "docs",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Directly on point for identity and a genuine independent second source to cross-check against OpenFIGI -- the kind of convergence check this layer's requirement wants. Flagged unmaintained at the package level: the official OpenPermID Python client on PyPI has not shipped since 2021-03-05 (5.5 years), even though LSEG's hosted developer portal for the underlying API reads as current in 2026; using it today would mean calling the REST API directly rather than relying on that stale client package."
+  },
+  {
+   "name": "backtest-bias (Finance-broski)",
+   "url": "https://github.com/Finance-broski/backtest-bias",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Directly on point for the requirement's survivorship/eligibility-rejection clause and the layer's own open pre-2020-delisting gate. I only re-verified repo existence, license, stars and push recency via gh api; I have not read its detection code or benchmark methodology, so this stays at evidence_level metadata pending an actual source read of its bias-benchmark implementation."
+  },
+  {
+   "name": "pit-adjuster (holdout-labs)",
+   "url": "https://github.com/holdout-labs/pit-adjuster",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Directly names 'corporate-action factor chains' and point-in-time back-adjustment -- exactly the requirement's 'preserve... corporate actions' clause and squarely inside this layer's open gaps. But it, falsification-ledger, and ashare-data-immunity were all created by the same holdout-labs account on the same day (2026-08-18) with 0-1 stars each and no independent adopters found in this check -- treat as one person's tool portfolio, not independently validated OSS, until an outside adopter is shown. I only checked GitHub metadata, not the adjustment code itself."
+  },
+  {
+   "name": "Shingou signal log (shingou-io/shingou-signal-log)",
+   "url": "https://github.com/shingou-io/shingou-signal-log",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The clearest working instance in this candidate set of the layer's own language: 'immutable capture and cutoff rejection.' It is crypto-news-specific and tiny (0 stars, no license), but the mechanism -- commit a hash of each point-in-time bucket to a public append-only log at publish time, verify later that nothing was rewritten -- is a genuinely different, more concrete pattern than DVC's git-style file versioning, and directly transferable to equity bars or corporate-action revisions. The awesome-list input actually cited the wrong repo (shingou-io/shingou-integrations, which is only exchange-bot plugin glue); the real hash-chain verifier lives at shingou-io/shingou-signal-log and, notably, ships with no LICENSE file, which anyone reusing the pattern should flag before copying code."
+  },
+  {
+   "name": "OpenPM: Auditable Point-in-Time Evaluation for LLM Portfolio-Management Agents",
+   "url": "https://arxiv.org/abs/2608.09988",
+   "modalities": [
+    "paper",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The strongest 2026-dated, genuinely 'beyond stars and awesome lists' find for this layer: a methodology, not an installable component, but the closest primary source to a worked reference implementation of the requirement's central clause (reject data unavailable at decision time; produce an auditable, reproducible record). No code repository was found in the fetched content, so it cannot be adopted as a dependency today; it is evidence for how to design this project's own point-in-time gate and audit-artifact schema, not a library to install. Submitted 2026-08-06 (arXiv id 2608.09988), 10 authors with a visible Rutgers (Metaxas) affiliation."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/identity-provenance--gpt-6-live.md"
+  }
+ ]
+}

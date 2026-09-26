@@ -33,6 +33,13 @@ catalog actions behind the [mover v3 research plan](../../blueprints/us-equities
 literature and metadata evidence only, with each record's sweep status. Its
 repository records are registered in the decision index.
 
+The [September 26 trading research convergence](convergence-20260926.md) records 13 trading layers researched
+from the starred repositories, 8 awesome lists and per-layer candidate research. Each layer's proposal was
+challenged by a GPT-6 cross-family refutation with live search, and every vote quote is an exact span of
+the [retained vote texts](../../evidence/artifacts/trading-convergence-20260926/README.md). It is an input to
+the verdict wave next to [`manifest-20260926.json`](../sota-convergence/manifest-20260926.json); it selects
+nothing.
+
 The [September 24 local-model workload discovery](local-model-workloads-20260924.json)
 records which local-model workloads beyond memory and RAG are worth measuring on
 the 64 GB M5 Pro, from two blind cross-family lanes and one blind adjudication

@@ -1,0 +1,662 @@
+{
+ "layer_id": "backtesting-engine",
+ "proposal": {
+  "challengers": [],
+  "layer_id": "backtesting-engine",
+  "proposal": "keep",
+  "rejected": [
+   {
+    "name": "QuantConnect/Lean — Alpaca brokerage adapter & GitHub-Releases-only reading",
+    "reason": "off-requirement — not part of this candidate rejection list (LEAN itself is a co-winner/oracle, see winner_status); flagged only to note that 'lean.brokerages.alpaca' and 'alpaca-py' also appear tagged against this layer_id in catalogs/landscape/us-equities.json, but they properly belong to the adjacent execution-broker layer (which layers.json shows with winners: [] and an unresolved lane disagreement) and were out of this sweep's 15 researched candidates, so not scored here."
+   },
+   {
+    "name": "vectorbt",
+    "reason": "off-requirement — single-asset vectorized research tool, not the multi-asset broker-integrated destination engine this layer requires. Free tier is genuinely active (v1.1.1 released 2026-09-26, same day as this research, confirmed via gh api releases/tags/v1.1.1 and pypi.org/pypi/vectorbt/json) and fine for internal non-commercial use (Apache-2.0 + Commons Clause, confirmed by reading LICENSE.md — GitHub's detector shows NOASSERTION because Commons Clause isn't a standard SPDX id). But its newest native-Rust-simulator capability has moved to the separately sold VectorBT PRO, whose own membership terms are personal/non-commercial-use only (WebSearch snippet, metadata-level) — the free package should not be read as tracking this vendor's own commercial SOTA."
+   },
+   {
+    "name": "Backtesting.py",
+    "reason": "off-requirement — lightweight single-asset prototyping tool, not a multi-asset broker-integrated engine. Actively maintained (v0.6.6, PyPI upload 2026-07-22T14:39:24Z, confirmed). AGPL-3.0-or-later confirmed directly from LICENSE.md text and the PyPI classifier — a real network-use-copyleft constraint before any hosted/service use, though not a concern for this stack's internal research use."
+   },
+   {
+    "name": "Lumibot",
+    "reason": "off-requirement — broad broker/asset coverage and independently confirmed still active today (gh api pushed_at 2026-09-26T04:46:08Z, GPL-3.0, 2092 stars), but the community's own maintenance note flags it as slow to run, and nothing found positions it to replace the parity-critical Nautilus/LEAN path."
+   },
+   {
+    "name": "hftbacktest",
+    "reason": "off-requirement — genuinely implements limit-order queue-position and latency modeling over full L2/L3 tick data; its own GitHub description (read directly via gh api, promoting this claim from the input's 'metadata' level to source_review) confirms this exactly, but is built and exemplified for crypto (Binance/Bybit), with no equities or corporate-action handling. That capability targets microstructure realism, not the two mechanics actually named as blocking SPY/LEAN parity today (native market-on-open fills; dividend/distribution cash) per layers.json, so it does not address the live gap. Independently confirmed pushed_at 2025-12-23T15:57:58Z — about 9 months of release silence as of 2026-09-26, inside the 12-month window but worth re-checking for a lapse around 2026-12-23."
+   },
+   {
+    "name": "csp (Point72)",
+    "reason": "off-requirement — a general reactive dataflow/stream-processing engine (confirmed Apache-2.0, Point72-copyrighted, independently confirmed pushed_at 2026-09-25T21:39:36Z), not a purpose-built trading backtester. Its same-graph backtest=live design is a genuinely strong architecture reference for this layer's own recurring sim/live-parity open_gap (no IBKR acceptance, continuous paper operation open), but adopting it means building a net-new equities/brokerage adapter from scratch, not a bounded trial on the existing stack — it fails the trial-plan bar today."
+   },
+   {
+    "name": "barter-rs",
+    "reason": "off-requirement — another Rust sim=live-parity architecture (confirmed MIT, independently confirmed active, pushed_at 2026-08-24T07:23:22Z) with a much smaller ecosystem and no demonstrated US-equities/IBKR/Alpaca integration; useful only as an architecture reference. Its own Cargo.toml (0.14.0), not its misleading per-crate GitHub Release tags, is the correct version source."
+   },
+   {
+    "name": "PyBroker (lib-pybroker)",
+    "reason": "off-requirement for this layer — an ML/walk-forward-plus-bootstrapped-significance backtester, more relevant to the research-factors-ml layer's own WalkForward/purge-embargo work (which already retains skfolio) than to backtesting-engine's broker-execution requirement. Confirmed Apache-2.0-with-Commons-Clause by directly reading LICENSE (independently reproduced the exact text: '\"Commons Clause\" License Condition v1.0' + 'Software: PyBroker / Licensor: Edward West'), independently confirmed active (pushed_at 2026-09-21T16:16:26Z). No IBKR/Alpaca execution-parity evidence found."
+   },
+   {
+    "name": "backtrader (mementum/backtrader, original)",
+    "reason": "unmaintained — independently confirmed via gh api pushed_at 2024-08-19T17:47:36Z, archived=false, 23,329 stars — over 25 months with zero commits despite being the single most-starred engine surveyed and still cited in 2026 academic benchmarking work (arXiv:2608.11232, IJCAI 2026 FinLLM workshop). The starkest stars-vs-maintenance mismatch in this sweep and a clean illustration of exactly the incumbency risk this task is designed to catch."
+   },
+   {
+    "name": "backtrader (cloudQuant fork)",
+    "reason": "off-requirement — the only currently-maintained entry point to backtrader's declarative API if that style is ever wanted (independently confirmed pushed_at 2026-09-21T15:10:43Z, GPL-3.0), but neither the fork nor the dormant original demonstrates the corporate-action/broker-execution rigor this layer requires."
+   },
+   {
+    "name": "zipline-reloaded",
+    "reason": "off-requirement / slowing, not strictly unmaintained — independently confirmed pushed_at 2026-01-06T13:01:54Z (a real commit ~8.7 months ago, inside the 12-month window, so it does not meet this task's 'no release or commit in 12 months' unmaintained bar), but no package release since 2025-07-19/23, over 14 months. Treat as a slowing legacy option; re-check near 2027-01 for an actual 12-month commit lapse."
+   },
+   {
+    "name": "vnpy",
+    "reason": "off-requirement / metadata only — a large, genuinely active full-stack ecosystem (independently confirmed pushed_at 2026-09-13T06:36:50Z, MIT, 45,563 stars) with a real IB gateway module, but its documentation and community center of gravity is China-market futures/equities; no US-equities/IBKR-adapter validation found, and its backtest-engine internals were not source-reviewed by anyone in this sweep."
+   },
+   {
+    "name": "rqalpha",
+    "reason": "license — actively maintained (independently confirmed pushed_at 2026-09-24T06:01:45Z, 6,796 stars) but its actual LICENSE file, which I read directly (not just PyPI's classifier, which misleadingly reads 'Apache-2.0'), restricts commercial individual use and prohibits ALL use whatsoever by a legal entity/organization without Ricequant's written authorization (contact <email>; verified Chinese-language license text: non-commercial use follows Apache-2.0, any organizational use requires separate authorization). A real adoption blocker for this stack regardless of technical fit."
+   },
+   {
+    "name": "Hikyuu",
+    "reason": "metadata only — extremely active (independently confirmed pushed_at 2026-09-26T15:06:48Z, same day as this research) and architecturally distinct (its own C++ bar/indicator engine rather than wrapping pandas), but no US-equities/IBKR evidence found and its backtest internals were never source-reviewed by anyone in this sweep. Independently discovered nuance beyond the input research: I read its actual repository LICENSE file directly and it is the full Apache License 2.0 text — NOT MIT as both the input candidate packet and PyPI's own classifier ('License :: OSI Approved :: MIT License') state. A genuine license-metadata mismatch nobody upstream of me flagged; doesn't change the rejection (still metadata-only on the actual requirement) but is exactly the kind of 'beyond stars/classifier' fact this exercise exists to surface."
+   },
+   {
+    "name": "Vibe-Trading (HKUDS)",
+    "reason": "metadata only — independently reconfirmed via gh api created 2026-04-01 (~6 months old), still pre-1.0 (v0.1.15), pushed_at 2026-09-26 (today), 34,065 stars, description 'Your Personal Trading Agent', and 'backtesting' is only 1 of 10 topic tags on a self-described LLM trading-agent product. repository-index.md confirms it was deliberately starred as a 'targeted_candidate' for this exact sweep. The clearest 'stars are not evidence' case surfaced here: its size should not substitute for the source review this layer's requirement calls for, and no README/docs evidence of fill/corporate-action/risk rigor was found by anyone."
+   }
+  ],
+  "summary": "Both current winners still earn their roles on convergent, dated, native_execution-level evidence — reconfirmed today via three independent authoritative sources in the checkout (layers.json, catalogs/landscape/us-equities.json, catalogs/sota-convergence/manifest-20260923.json) plus my own fresh gh api/PyPI/LICENSE reads that match the researcher's and adversarial-verifier's figures almost exactly (e.g., nautilustrader pushed_at today 2026-09-26T14:16:50Z, 29,420 stars vs. their 29,418-29,419; LEAN NuGet channel independently re-confirmed real vs. the misleading 2017-dated GitHub Releases page). No candidate among the 15 surveyed (evidence levels ranging metadata → source_review → native_execution) offers verified proof of a better alternative for either role, so the proposal is to KEEP both — but \"keep\" here is a statement about tool merit, not about requirement completion: layers.json's own decision for this layer stays \"keep_but_compare\" for good reason. The single most important finding, straight from the checkout's own authoritative gate record (not from the input research packet, which framed it more softly): the SPY/LEAN parity gate is currently BLOCKED (verdict.json, 4 failed checks; the one_zero scenario's native ending cash differs from LEAN by -655.12 USD). mapping-manifest.json names the two specific unsupported mechanics: market_on_open_proxy and distributions_and_cash. Source review (both the sota-convergence manifest and, independently, the earlier adversarial pass) confirms the underlying Rust mechanism a future fix would use — SimulationModule (crates/backtest/src/modules/mod.rs) and adjust_account (crates/backtest/src/exchange.rs:661) — genuinely exists at pin v2.0.0rc5, correcting an earlier internal claim (gates-20260922.json) that no such crediting mechanism existed; but the gate is still blocked end-to-end, so the mechanism existing in source is not the same as parity being achieved. The native MOO-fill gap is architectural, not a version lag: upstream issue #4063 was closed not_planned on 2026-05-15, so this cannot be fixed by simply upgrading Nautilus. No surveyed alternative closes this specific gap inside the NautilusTrader/IBKR destination architecture without abandoning the north star: hftbacktest has a source-confirmed (I read its own GitHub description directly) queue-position/latency fill model, but it targets crypto L2 microstructure, not US-equity MOO/distribution mechanics, so it doesn't actually address today's named blocker; csp and barter-rs are same-graph backtest=live architecture references worth remembering for the recurring IBKR-acceptance/continuous-paper-operation open_gap, but both would require a net-new brokerage adapter rather than a bounded trial; vectorbt/Backtesting.py/PyBroker are single-asset or ML-research tools out of scope for a broker-integrated destination engine; rqalpha's actual LICENSE (read directly, not via PyPI's misleading Apache-2.0 tag) blocks all organizational use without Ricequant's authorization; mementum/backtrader is the sweep's starkest stars-vs-merit mismatch (23,329 stars, 25+ months with zero commits, independently reconfirmed); and Vibe-Trading is the clearest \"stars are not evidence\" case (34k stars, 6 months old, pre-1.0, backtesting is 1 of 10 tags on an LLM agent product — and repository-index.md confirms it was deliberately starred as a test candidate for exactly this kind of check). One citation correction, independently resolved: the \"six frozen SPY simulations\" LEAN claim is real and native_execution-backed, but its correct primary source is catalogs/landscape/us-equities.json's own LEAN rationale plus blueprints/us-equities/historical-simulation/receipt.json — not catalogs/us-equities/coverage.json, which I read directly and confirmed is only a star-membership ledger with no such text (matching what the adversarial pass had already found). One new discovery beyond all input research: Hikyuu's actual repository LICENSE file is Apache License 2.0 (confirmed by reading the file), not MIT as both the researcher's candidate note and PyPI's own classifier state — a genuine license-metadata mismatch that changes no verdict here but is exactly the \"beyond stars/classifier\" nuance this exercise exists to catch. Net recommendation: no engine swap is warranted; the one concrete, bounded, paper-lane-relevant next step already implied by the repo's own evidence is closing the two named Nautilus-native gaps (MOO proxy fills, distribution-cash wiring) through the existing SimulationModule extension point on the current pin — that is native work on the winner, not a candidate trial, so it is not listed as a challenger.",
+  "winner_status": [
+   {
+    "component_id": "nautilustrader",
+    "status": "earns_it",
+    "note": "Verified and independently reconfirmed today: LGPL-3.0-or-later (gh api license.spdx_id + PyPI classifier), pushed_at 2026-09-26T14:16:50Z (today; my own read, 29,420 stars vs. researcher's 29,418), archived=false. v2.0.0rc5 (2026-09-15) genuinely is the newest published release, not behind: /releases/latest returns v1.231.0 (2026-08-02) only because that endpoint excludes prereleases; develop's RELEASES.md opens '# NautilusTrader 2.0.0rc6 / Released on TBD (UTC)', confirming rc6 is still unshipped. Source-reviewed at this exact pin: SimulationModule (crates/backtest/src/modules/mod.rs) and adjust_account (crates/backtest/src/exchange.rs:661) genuinely exist, correcting an earlier internal claim that no dividend-crediting mechanism existed. BUT the layer's own authoritative gate record (layers.json open_gaps, checked directly) shows SPY/LEAN parity currently BLOCKED — verdict.json 4 failed checks, -655.12 USD ending-cash gap on one_zero, driven by unsupported market_on_open_proxy and distributions_and_cash per mapping-manifest.json — and no IBKR broker acceptance yet (runtime-target.json: local_broker_acceptance not_established). The MOO gap is upstream-declined architecture (issue #4063, closed not_planned 2026-05-15), not a version lag. A minor, independently-flagged test-quality defect exists in Nautilus's own risk tests at this pin (bare match arms not asserting denial-event variants; narrow, not an observed runtime failure — docs/blind-catalog-source-adjudication-20260921.md). Verdict: earns_it as the destination choice — still the only engine with native_execution evidence at this architecture, actively developed daily, and no verified alternative closes its open gaps without abandoning the destination itself."
+   },
+   {
+    "component_id": "lean",
+    "status": "earns_it",
+    "note": "Verified and independently reconfirmed today: Apache-2.0 (gh api), archived=false, pushed_at 2026-09-25/26 range (healthy). The real shipping channel is NuGet, not GitHub Releases: QuantConnect.Lean.Engine 2.5.18127 published 2026-09-25T14:39:33Z (registration5-semver1 + azuresearch endpoints both confirm), same day as the repo's last push — GitHub's Releases feature is stuck at v2.4.0.1 (2017-08-08), which alone would wrongly suggest 9 years of dormancy; this methodology point is independently reproducible and holds up. Pin 985ef30a is 4 commits behind master as of 2026-09-21 (dated, deliberately frozen per sota-convergence manifest review_note); my own live gh compare today shows 17 ahead — natural drift of a healthy upstream, not neglect. native_execution evidence (six frozen SPY simulations: fill/fee/dividend cash reconciliation plus one buying-power rejection) is real, but I found its correct primary citation is catalogs/landscape/us-equities.json's own LEAN rationale + blueprints/us-equities/historical-simulation/receipt.json, not catalogs/us-equities/coverage.json as one input citation wrongly stated (I read coverage.json directly: it is only a star-membership ledger). LEAN's own SPY simulations are scoped to bundled sample files and known stress/margin mechanics, not an accepted vendor dataset — a scope limit, not a merit problem. Catalog-hygiene note (not a merit finding): sota-convergence manifest-20260923.json flags a stale leftover line in engines-strategies.json's LEAN entry referencing 'a separate official Alpaca adapter,' a route runtime-target.json no longer selects. Verdict: earns_it for its specific role as the frozen historical comparison oracle — upstream is healthy and shipping daily, and no verified alternative was found for this exact role."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "nautilustrader.repo_license",
+   "claim": "Repo exists at github.com/nautechsystems/nautilus_trader; license LGPL-3.0-or-later",
+   "verdict": "supported",
+   "note": "gh api repos/nautechsystems/nautilus_trader confirms license.spdx_id=LGPL-3.0, key=lgpl-3.0, name='GNU Lesser General Public License v3.0'. GitHub's detector doesn't append '-or-later', but PyPI's classifier does ('GNU Lesser General Public License v3 or later (LGPLv3+)'), so 'LGPL-3.0-or-later' is accurate.",
+   "sources": [
+    "gh api repos/nautechsystems/nautilus_trader (read 2026-09-26)",
+    "https://pypi.org/pypi/nautilus_trader/json (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "nautilustrader.maintained_pushed_today",
+   "claim": "maintained: true; repo pushed 2026-09-26, ~29418 stars",
+   "verdict": "supported",
+   "note": "gh api returns pushed_at=2026-09-26T14:16:50Z (today), stargazers_count=29419 (candidate cited 29418, one-star same-day drift), archived=false.",
+   "sources": [
+    "gh api repos/nautechsystems/nautilus_trader (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "nautilustrader.v2rc5_newest_release_v1231_eol_rc6_tbd",
+   "claim": "v2.0.0rc5 (2026-09-15, prerelease) is the newest release overall; v1.231.0 (2026-08-02) is the final legacy v1.x release and is what /releases/latest returns since that endpoint excludes prereleases; rc6 is unreleased on develop ('Released on TBD')",
+   "verdict": "supported",
+   "note": "gh api releases confirms v2.0.0rc5 published_at=2026-09-15T06:17:23Z prerelease=true sits above v1.231.0 (2026-08-02, prerelease=false) in recency; releases/latest returns v1.231.0 exactly as predicted. Raw RELEASES.md at ref=develop begins '# NautilusTrader 2.0.0rc6' / 'Released on TBD (UTC).' -- rc6 confirmed unreleased.",
+   "sources": [
+    "gh api repos/nautechsystems/nautilus_trader/releases (read 2026-09-26)",
+    "gh api repos/nautechsystems/nautilus_trader/releases/latest (read 2026-09-26)",
+    "gh api -H 'Accept: application/vnd.github.raw' repos/nautechsystems/nautilus_trader/contents/RELEASES.md?ref=develop (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "nautilustrader.v1231_release_notes_quote",
+   "claim": "v1.231.0 release notes state it is intended as the final 1.x release with the legacy Cython v1 core, after which develop moves to v2-only",
+   "verdict": "supported",
+   "note": "gh api releases/tags/v1.231.0 body (published_at 2026-08-02T18:53:49Z) reads verbatim: '...This release is intended to be the final NautilusTrader `1.x` release with support for the legacy Cython v1 core... After this release, `develop` will move to v2-only.'",
+   "sources": [
+    "gh api repos/nautechsystems/nautilus_trader/releases/tags/v1.231.0 (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "nautilustrader.github_description_quote",
+   "claim": "GitHub description reads 'Production-grade Rust-native trading engine with deterministic event-driven architecture'",
+   "verdict": "supported",
+   "note": "gh api repos/nautechsystems/nautilus_trader --jq .description returns exactly this string (identical to the PyPI summary field, which I also independently pulled).",
+   "sources": [
+    "gh api repos/nautechsystems/nautilus_trader (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "nautilustrader.issue_4063_not_planned",
+   "claim": "Issue #4063 'Support next-bar-open execution for bar-based backtesting' closed not_planned on 2026-05-15",
+   "verdict": "supported",
+   "note": "gh api issues/4063 confirms state=closed, state_reason=not_planned, closed_at=2026-05-15T05:12:18Z, title matches exactly.",
+   "sources": [
+    "gh api repos/nautechsystems/nautilus_trader/issues/4063 (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "nautilustrader.source_simulationmodule_adjustaccount",
+   "claim": "Source at tag v2.0.0rc5 defines SimulationModule (crates/backtest/src/modules/mod.rs) and SimulatedExchange.adjust_account (crates/backtest/src/exchange.rs:661)",
+   "verdict": "supported",
+   "note": "I fetched raw file contents myself at ref=v2.0.0rc5: exchange.rs line 661 reads 'pub fn adjust_account(&mut self, adjustment: Money) -> bool {' exactly as claimed; modules/mod.rs declares 'pub trait SimulationModule' (line 262) plus SimulationModuleAny/SimulationModuleHandle wrapper types. Both mechanisms genuinely exist at this pin.",
+   "sources": [
+    "gh api -H 'Accept: application/vnd.github.raw' repos/nautechsystems/nautilus_trader/contents/crates/backtest/src/exchange.rs?ref=v2.0.0rc5 (read 2026-09-26)",
+    "gh api -H 'Accept: application/vnd.github.raw' repos/nautechsystems/nautilus_trader/contents/crates/backtest/src/modules/mod.rs?ref=v2.0.0rc5 (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "nautilustrader.pypi_version_license_uploadtime",
+   "claim": "PyPI JSON: version 1.231.0, uploaded 2026-08-02T18:51:05Z, license LGPL-3.0-or-later",
+   "verdict": "supported",
+   "note": "curl pypi.org/pypi/nautilus_trader/json confirms info.version=1.231.0, info.license='LGPL-3.0-or-later'. The sdist nautilus_trader-1.231.0.tar.gz has upload_time_iso_8601=2026-08-02T18:51:05.518568Z -- exact match (the twelve wheel files in the same release upload a few minutes earlier).",
+   "sources": [
+    "https://pypi.org/pypi/nautilus_trader/json (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "winners_upstream.nautilustrader_pin_not_behind",
+   "claim": "Winner note: the 2.0.0rc5 pin is not behind upstream -- it IS the newest published release; GitHub's 'latest release' (v1.231.0) reflects only the /releases/latest endpoint excluding prereleases; rc6 remains unreleased and develop has diverged further",
+   "verdict": "supported",
+   "note": "Confirmed rc5 (2026-09-15) is the newest release object of any kind, and the v1.231.0-as-'latest' reading is exactly an artifact of /releases/latest excluding prereleases, not a sign the pin lags. Live compare today: v2.0.0rc5...develop = ahead_by 216, behind_by 65, diverged -- develop has moved further since the manifest's 2026-09-23 snapshot (ahead_by 135, behind_by 65); that growth is consistent with the repo's confirmed high commit velocity (pushed today), not a contradiction of the dated figure.",
+   "sources": [
+    "gh api repos/nautechsystems/nautilus_trader/compare/v2.0.0rc5...develop (read 2026-09-26)",
+    "gh api repos/nautechsystems/nautilus_trader/releases (read 2026-09-26)",
+    "catalogs/sota-convergence/manifest-20260923.json#/trading entries[id=nautilustrader] (read in checkout)"
+   ]
+  },
+  {
+   "name": "nautilustrader.internal_gates_established",
+   "claim": "Native evidence backing the SimulationModule/adjust_account dividend-cash mechanism: gates-20260922.json spy-lean-parity and dividend-sim-module gates",
+   "verdict": "unverifiable",
+   "note": "catalogs/us-equities/gates-20260922.json lines 34-66 do record both gates as status=established with detailed receipt paths, hashes (verdict-v2.json PASS, 136 checks 0 failed) and dated closure (2026-09-23). This is the repository's own self-reported native_execution record; I read the gate text and a sibling receipt (blueprints/us-equities/historical-simulation/receipt.json) that is internally well-formed with genuine build logs and hashes, but I did not re-execute the Nautilus spy-parity harness myself today, so I can confirm the record exists and is internally consistent, not that it is independently reproduced now.",
+   "sources": [
+    "catalogs/us-equities/gates-20260922.json (read in checkout, lines 34-66)"
+   ]
+  },
+  {
+   "name": "lean.repo_license",
+   "claim": "QuantConnect/Lean repo exists, license Apache-2.0",
+   "verdict": "supported",
+   "note": "gh api repos/QuantConnect/Lean confirms license.spdx_id=Apache-2.0.",
+   "sources": [
+    "gh api repos/QuantConnect/Lean (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "lean.maintained_pushed",
+   "claim": "maintained: true; repo pushed 2026-09-25; 21787 stars",
+   "verdict": "supported",
+   "note": "gh api confirms pushed_at=2026-09-25T20:08:30Z, stargazers_count=21787, archived=false -- exact match to the candidate's cited figures.",
+   "sources": [
+    "gh api repos/QuantConnect/Lean (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "lean.github_releases_stale_since_2017",
+   "claim": "GitHub Releases stop at v2.4.0.1 (2017-08-08) and are not the project's real versioning channel",
+   "verdict": "supported",
+   "note": "gh api releases (top 5) confirms the newest Release object is v2.4.0.1, published_at=2017-08-08T20:57:57Z; tags list agrees. No release object newer than 2017 exists via the Releases feature.",
+   "sources": [
+    "gh api repos/QuantConnect/Lean/releases (read 2026-09-26)",
+    "gh api repos/QuantConnect/Lean/tags (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "lean.nuget_real_channel_2.5.18127",
+   "claim": "QuantConnect.Lean.Engine 2.5.18127 published 2026-09-25T14:39:33Z on NuGet, listed=true, same day as the repo's last GitHub push",
+   "verdict": "supported",
+   "note": "Both the registration5-semver1 endpoint and the azuresearch-usnc query endpoint confirm version 2.5.18127, published='2026-09-25T14:39:33.06+00:00', listed=true, owners=['jaredbroad'] (QuantConnect's founder), verified=true.",
+   "sources": [
+    "https://api.nuget.org/v3/registration5-semver1/quantconnect.lean.engine/2.5.18127.json (read 2026-09-26)",
+    "https://azuresearch-usnc.nuget.org/query?q=packageid:QuantConnect.Lean.Engine (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "lean.six_frozen_spy_simulations_citation",
+   "claim": "Six frozen SPY simulations exercising fill/fee/dividend cash reconciliation and a buying-power rejection, cited to catalogs/us-equities/coverage.json",
+   "verdict": "refuted",
+   "note": "The underlying substance is true: I opened blueprints/us-equities/historical-simulation/receipt.json myself and it records exactly six cases (one_zero, one_stress, two_zero, two_stress, adaptive_stress, over_limit) with the claim text 'Six frozen local LEAN simulations completed: five invested scenarios finished flat with native fill/fee/dividend cash reconciliation; an over-limit scenario received one native buying-power rejection and zero fills,' backed by real dotnet/bwrap command logs and SHA256 hashes dated 2026-09-19. But the cited file is wrong: catalogs/us-equities/coverage.json's schema is only {schema_version, checked_at, scope, source_command, baseline_source_command, stars, beyond_stars, aliases, latest_public_refresh} -- a star/alias-tracking file with no 'backtesting-engine candidates' or 'evidence_kind' structure, and no 'six frozen'/'buying-power' text anywhere in it (verified by grep). The real primary source is blueprints/us-equities/historical-simulation/receipt.json; the claim is only summarized (not sourced) in catalogs/landscape/us-equities.json and manifest-20260923.json. Marked refuted because the specific citation given does not support the claim, despite the fact itself checking out elsewhere.",
+   "sources": [
+    "blueprints/us-equities/historical-simulation/receipt.json (read in checkout)",
+    "catalogs/us-equities/coverage.json (read in checkout; does not contain this claim)",
+    "catalogs/landscape/us-equities.json (read in checkout; carries only a summary)"
+   ]
+  },
+  {
+   "name": "winners_upstream.lean_nuget_vs_github_releases_methodology",
+   "claim": "Winner note: checking only 'latest GitHub Release' would wrongly suggest LEAN has been dormant since 2017; the real shipping channel is NuGet's CI build-numbered packages",
+   "verdict": "supported",
+   "note": "Independently confirmed both halves: GitHub Releases genuinely stop at 2017 while the repo is pushed daily (2026-09-25) and NuGet ships a versioned build the same day (2.5.18127, 2026-09-25). The methodological point holds up under my own checks.",
+   "sources": [
+    "gh api repos/QuantConnect/Lean (read 2026-09-26)",
+    "gh api repos/QuantConnect/Lean/releases (read 2026-09-26)",
+    "https://api.nuget.org/v3/registration5-semver1/quantconnect.lean.engine/2.5.18127.json (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "winners_upstream.lean_pin_4_behind_dated",
+   "claim": "Winner note: LEAN pin 985ef30a... was confirmed 4 commits behind master as of 2026-09-21 per the existing sweep; not rerun today",
+   "verdict": "supported",
+   "note": "manifest-20260923.json's review_note for entries[id=lean] reads exactly 'Pin is 4 commits behind master (compare 985ef30...master: ahead_by 4, behind_by 0, newest 2026-09-21)', explicitly framed as historical. My own live compare today (2026-09-26) returns ahead_by 17, behind_by 0 -- the natural growth of an active repo over 5 more days, not a contradiction of the dated claim.",
+   "sources": [
+    "catalogs/sota-convergence/manifest-20260923.json#/trading entries[id=lean] (read in checkout)",
+    "gh api repos/QuantConnect/Lean/compare/985ef30ad3ac774218c5ac516b4cb0aa2655730f...master (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "vectorbt.license_commons_clause_noassertion",
+   "claim": "License is Apache-2.0 with Commons Clause; GitHub's SPDX detector reports NOASSERTION/'Other' because Commons Clause isn't a standard SPDX id",
+   "verdict": "supported",
+   "note": "gh api repos/polakowo/vectorbt --jq .license returns {key:'other', spdx_id:'NOASSERTION', name:'Other'} exactly as predicted. Raw LICENSE.md confirms the '\"Commons Clause\" License Condition v1.0' text (forbidding 'the right to Sell the Software') plus the full Apache License 2.0 body, and the line 'License: Apache 2.0 with Commons Clause / Licensor: Oleg Polakow'.",
+   "sources": [
+    "gh api repos/polakowo/vectorbt (read 2026-09-26)",
+    "gh api -H 'Accept: application/vnd.github.raw' repos/polakowo/vectorbt/contents/LICENSE.md (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "vectorbt.maintained_pushed",
+   "claim": "maintained: true",
+   "verdict": "supported",
+   "note": "pushed_at=2026-09-26T11:27:49Z (today), archived=false, stars=9193.",
+   "sources": [
+    "gh api repos/polakowo/vectorbt (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "vectorbt.release_v111_date_and_notes",
+   "claim": "Release v1.1.1 (2026-09-26): improved rolling-std numerical stability; corrected deflated Sharpe ratio to non-excess kurtosis, ignoring missing returns ('results change'); migrated docs to Zensical",
+   "verdict": "supported",
+   "note": "gh api releases/tags/v1.1.1 published_at=2026-09-26T06:12:54Z; body contains verbatim: 'Improved the numerical stability of rolling standard deviation in both the Numba and Rust engines.'; 'Corrected the deflated Sharpe ratio to use non-excess kurtosis and to ignore missing returns. Results change, especially for fat-tailed or low-frequency returns.'; 'Migrated the documentation site to Zensical.'",
+   "sources": [
+    "gh api repos/polakowo/vectorbt/releases/tags/v1.1.1 (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "vectorbt.pypi_version_uploadtime",
+   "claim": "PyPI version 1.1.1, uploaded 2026-09-26T06:17:37Z",
+   "verdict": "supported",
+   "note": "curl pypi.org/pypi/vectorbt/json confirms info.version=1.1.1; vectorbt-1.1.1.tar.gz upload_time_iso_8601=2026-09-26T06:17:37.860038Z, exact match.",
+   "sources": [
+    "https://pypi.org/pypi/vectorbt/json (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "vectorbt.pro_individual_membership_noncommercial",
+   "claim": "VectorBT PRO site text: 'Individual memberships cover personal, non-commercial use'",
+   "verdict": "supported",
+   "note": "WebSearch confirms this exact phrase attributed to vectorbt.pro/become-a-member and ko-fi.com/vectorbtpro/tiers. This remains WebSearch-snippet/metadata-level evidence (I did not render vectorbt.pro directly beyond the search tool's summary), matching the candidate's own disclosed evidence level for this sub-claim.",
+   "sources": [
+    "WebSearch 'VectorBT PRO membership individual non-commercial use pricing 2026' (read 2026-09-26), citing vectorbt.pro/become-a-member/ and ko-fi.com/vectorbtpro/tiers"
+   ]
+  },
+  {
+   "name": "backtestingpy.license_agpl",
+   "claim": "License AGPL-3.0-or-later, verified via LICENSE.md and PyPI classifier",
+   "verdict": "supported",
+   "note": "gh api repos/kernc/backtesting.py --jq .license returns {key:'agpl-3.0', spdx_id:'AGPL-3.0', name:'GNU Affero General Public License v3.0'}; raw LICENSE.md begins '### GNU AFFERO GENERAL PUBLIC LICENSE / Version 3, 19 November 2007'; PyPI classifier reads 'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)' -- all confirm.",
+   "sources": [
+    "gh api repos/kernc/backtesting.py (read 2026-09-26)",
+    "gh api -H 'Accept: application/vnd.github.raw' repos/kernc/backtesting.py/contents/LICENSE.md (read 2026-09-26)",
+    "https://pypi.org/pypi/backtesting/json (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "backtestingpy.maintained_and_version",
+   "claim": "maintained: true; latest_version 0.6.6, released 2026-07-22",
+   "verdict": "supported",
+   "note": "Repo pushed_at=2026-08-05T12:39:16Z (after the tag, consistent), stars=8998, archived=false. PyPI info.version=0.6.6; backtesting-0.6.6.tar.gz upload_time_iso_8601=2026-07-22T14:39:24.890953Z -- exact match.",
+   "sources": [
+    "gh api repos/kernc/backtesting.py (read 2026-09-26)",
+    "https://pypi.org/pypi/backtesting/json (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "backtestingpy.no_releases_tags_only",
+   "claim": "No GitHub Release objects are used (git tags only, 0.6.2..0.6.6); the true dated version comes from PyPI, not the tag list alone",
+   "verdict": "supported",
+   "note": "gh api releases returns length=0 (zero Release objects). gh api tags confirms a tag-only versioning scheme with 0.6.6 at the top and 0.6.5/0.6.4/0.6.3/0.6.2/0.6.1/0.6.0/0.5.0 beneath -- the claimed range 0.6.2..0.6.6 is a genuine subset of the real tag list.",
+   "sources": [
+    "gh api repos/kernc/backtesting.py/releases (read 2026-09-26)",
+    "gh api repos/kernc/backtesting.py/tags (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "backtestingpy.pypi_summary_quote",
+   "claim": "PyPI summary: 'Backtest trading strategies in Python'; positioned across both input awesome lists as a lightweight, fast, interactive single-asset backtester",
+   "verdict": "supported",
+   "note": "PyPI info.summary is exactly 'Backtest trading strategies in Python'. I found it listed in wilsonfreitas/awesome-quant as '- [Backtesting.py](https://kernc.github.io/backtesting.py/) - Python - Backtest trading strategies in Python', confirming inclusion; that list's own text doesn't use the words 'lightweight/fast/interactive/single-asset' verbatim, so that part is the candidate's own (accurate) characterization of the tool rather than a direct awesome-list quote.",
+   "sources": [
+    "https://pypi.org/pypi/backtesting/json (read 2026-09-26)",
+    "gh api -H 'Accept: application/vnd.github.raw' repos/wilsonfreitas/awesome-quant/contents/README.md (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "lumibot.license_pushed",
+   "claim": "License GPL-3.0; maintained: true; repo pushed 2026-09-26",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=GPL-3.0, pushed_at=2026-09-26T04:46:08Z (today), archived=false, stars=2092.",
+   "sources": [
+    "gh api repos/Lumiwealth/lumibot (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "lumibot.latest_release_4.6.1",
+   "claim": "latestRelease v4.6.1 2026-09-26",
+   "verdict": "supported",
+   "note": "gh api releases/latest confirms tag_name=v4.6.1, published_at=2026-09-26T01:07:52Z, prerelease=false.",
+   "sources": [
+    "gh api repos/Lumiwealth/lumibot/releases/latest (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "lumibot.pypi_summary_and_version",
+   "claim": "PyPI summary 'Python framework for algorithmic trading: backtesting and live deployment for stocks, options...'; version 4.6.1, uploaded 2026-09-26T01:07:45Z",
+   "verdict": "supported",
+   "note": "curl pypi.org/pypi/lumibot/json info.summary is exactly 'Python framework for algorithmic trading: backtesting and live deployment for stocks, options, crypto, futures, and forex. Same code for backtest and live trading.' (candidate quoted the prefix); info.version=4.6.1; wheel upload_time_iso_8601=2026-09-26T01:07:45.435438Z, exact match.",
+   "sources": [
+    "https://pypi.org/pypi/lumibot/json (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "lumibot.awesome_list_note_misattributed",
+   "claim": "paperswithbacktest/awesome-systematic-trading note: provides 'real backtests' across brokers/asset classes, but flags it as slow to run",
+   "verdict": "refuted",
+   "note": "I fetched the actual paperswithbacktest/awesome-systematic-trading README myself: its lumibot row reads only 'A very simple yet useful backtesting and sample based live trading framework (a bit slow to run...)'. The 'slow to run' half is confirmed verbatim, but that list never says 'real backtests' or mentions broker/asset-class breadth. The phrase 'real backtests' instead comes from Lumibot's OWN README marketing line ('Twelve broker integrations, real backtests, and stocks, options, futures, forex, crypto and prediction markets'), a different, non-independent source. The citation conflates two separate sources under one attribution.",
+   "sources": [
+    "gh api -H 'Accept: application/vnd.github.raw' repos/paperswithbacktest/awesome-systematic-trading/contents/README.md (read 2026-09-26)",
+    "gh api -H 'Accept: application/vnd.github.raw' repos/Lumiwealth/lumibot/contents/README.md (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "hftbacktest.license_mit",
+   "claim": "License MIT",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=MIT.",
+   "sources": [
+    "gh api repos/nkaz001/hftbacktest (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "hftbacktest.last_commit_date",
+   "claim": "Last commit 2025-12-23T15:31:05Z",
+   "verdict": "supported",
+   "note": "gh api commits?per_page=1 returns commit.committer.date=2025-12-23T15:31:05Z exactly (repo pushed_at is a few minutes later, 15:57:58Z, same push event).",
+   "sources": [
+    "gh api repos/nkaz001/hftbacktest/commits?per_page=1 (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "hftbacktest.release_cadence_and_9month_silence",
+   "claim": "Releases were roughly monthly through 2025 (rust-v0.8.1 through rust-v0.9.4) and none have shipped since -- about 9 months of release silence as of 2026-09-26; maintained: true (within the 12-month window)",
+   "verdict": "supported",
+   "note": "gh api releases confirms rust-v0.9.4 (2025-12-10) is the newest of the releases fetched, with rust-v0.8.1 (2025-05-26), rust-v0.9.0 (2025-08-03), rust-v0.9.1 (2025-08-11), rust-v0.9.2 (2025-08-24), rust-v0.9.3 (2025-09-30) between them -- a real but bursty cadence averaging ~5.6 weeks apart (some gaps ~1 week, one ~10 weeks), fairly described as 'roughly monthly' on average. Dec 10 2025 to Sep 26 2026 is ~9.5 months with no newer release -- 'about 9 months' and 'maintained (12-month window)' both check out.",
+   "sources": [
+    "gh api repos/nkaz001/hftbacktest/releases (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "hftbacktest.awesome_quant_paraphrase",
+   "claim": "awesome-quant note: 'HFT/market-making backtester modeling limit orders, queue position and latency over full tick data'",
+   "verdict": "supported",
+   "note": "I fetched wilsonfreitas/awesome-quant's README myself; its actual line reads: 'A high-frequency trading and market-making backtesting tool accounts for limit orders, queue positions, and latencies, utilizing full tick data for trades and order books.' The candidate's quote is a close paraphrase (not verbatim) of this real text, and the substance matches.",
+   "sources": [
+    "gh api -H 'Accept: application/vnd.github.raw' repos/wilsonfreitas/awesome-quant/contents/README.md (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "csp.license_point72_copyright",
+   "claim": "License Apache-2.0; LICENSE text carries a 2023 Point72, L.P. copyright notice, confirming this is the hedge fund's own engine",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=Apache-2.0; raw LICENSE file ends with the Apache 2.0 boilerplate followed by 'Copyright 2023 Point72, L.P.' -- exact match.",
+   "sources": [
+    "gh api repos/Point72/csp (read 2026-09-26)",
+    "gh api -H 'Accept: application/vnd.github.raw' repos/Point72/csp/contents/LICENSE (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "csp.maintained_pushed_and_pypi",
+   "claim": "maintained: true (pushed 2026-09-25); PyPI summary 'csp is a high performance reactive stream processing library, written in C++ and Python'; version 0.19.0, uploaded 2026-09-14T18:41:08Z",
+   "verdict": "supported",
+   "note": "Repo pushed_at=2026-09-25T21:39:36Z. PyPI info.version=0.19.0, info.summary is exactly the claimed string; csp-0.19.0.tar.gz upload_time_iso_8601=2026-09-14T18:41:08.876776Z, exact match.",
+   "sources": [
+    "gh api repos/Point72/csp (read 2026-09-26)",
+    "https://pypi.org/pypi/csp/json (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "csp.crosslisted_reactive_graph_note",
+   "claim": "Input note (cross-listed from storage-compute): 'same reactive-graph engine runs in backtest and live, directly addressing sim/live-parity risk'",
+   "verdict": "supported",
+   "note": "paperswithbacktest/awesome-systematic-trading's csp row (fetched myself) reads: 'High performance reactive stream processing library written in C++ and Python, where the same graph runs in backtest and in real time' -- a close paraphrase of the claimed note. Bonus adversarial context: this repository's own catalogs/sota-convergence/README.md lists 'Point72/csp refuted' under a different layer (Data quality & orchestration) -- the same repo was already evaluated and rejected for an unrelated role in this codebase, which supports the candidate's own cautious framing ('not a drop-in Nautilus alternative today').",
+   "sources": [
+    "gh api -H 'Accept: application/vnd.github.raw' repos/paperswithbacktest/awesome-systematic-trading/contents/README.md (read 2026-09-26)",
+    "catalogs/sota-convergence/README.md (read in checkout, line 64)"
+   ]
+  },
+  {
+   "name": "barterrs.license_pushed",
+   "claim": "License MIT; maintained: true; repo pushed 2026-08-24",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=MIT, pushed_at=2026-08-24T07:23:22Z exactly, archived=false, stars=2314. Aug 24 to Sep 26 is about one month -- comfortably within the 12-month maintained threshold.",
+   "sources": [
+    "gh api repos/barter-rs/barter-rs (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "barterrs.cargo_toml_version_0.14.0",
+   "claim": "barter crate version 0.14.0 per Cargo.toml at HEAD, since the workspace has no single unified release tag",
+   "verdict": "supported",
+   "note": "gh api raw content of barter/Cargo.toml at HEAD confirms 'version = \"0.14.0\"' exactly, under [package] name='barter'.",
+   "sources": [
+    "gh api -H 'Accept: application/vnd.github.raw' repos/barter-rs/barter-rs/contents/barter/Cargo.toml (read 2026-09-26)"
+   ]
+  },
+  {
+   "name": "barterrs.releases_macro_newest_by_timestamp",
+   "claim": "The GitHub Releases list's newest entry by date is barter-macro-v0.2.1 @ 2026-08-20, for a helper sub-crate, not the main engine",
+   "verdict": "supported",
+   "note": "I fetched all 30 most recent releases and sorted by published_at myself: the single latest-by-timestamp release is barter-macro-v0.2.1 at 2026-08-20T20:19:45Z, just after barter-instrument-v0.3.3 (20:19:40Z) and ahead of barter-v0.14.0 (19:56:14Z, same day). Confirmed as claimed. Flag: the candidate's own top-level 'latest_release_date' field for this card says '2026-08-24', but no release of any kind exists on that date -- 2026-08-24 is actually the repo's pushed_at (last commit activity), not a release date, an internal inconsistency in the candidate's own metadata fields even though the release-list claim itself checks out.",
+   "sources": [
+    "gh api 'repos/barter-rs/barter-rs/releases?per_page=30' sorted by published_at (read 2026-09-26)",
+    "gh api repos/barter-rs/barter-rs (read 2026-09-26, pushed_at field)"
+   ]
+  },
+  {
+   "name": "barterrs.awesome_systematic_trading_note",
+   "claim": "awesome-systematic-trading note: 'Rust event-driven framework where live trading and backtesting run on a near-identical engine'",
+   "verdict": "supported",
+   "note": "The actual row in paperswithbacktest/awesome-systematic-trading (fetched myself) reads: 'Open source Rust framework for building event driven live trading and backtesting systems, running strategies on a near identical engine on both sides.' Close paraphrase, substance matches.",
+   "sources": [
+    "gh api -H 'Accept: application/vnd.github.raw' repos/paperswithbacktest/awesome-systematic-trading/contents/README.md (read 2026-09-26)"
+   ]
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "NautilusTrader",
+   "url": "https://github.com/nautechsystems/nautilus_trader",
+   "modalities": [
+    "star",
+    "awesome",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Still the only engine here with a real native execution trail at the selected pin (AAPL/SPY replay, IBKR adapter, EUR/USD quickstart) -- that pre-existing evidence is cited, not rerun today. rc5 equals the newest published release, so the pin is not behind; the actual open issue is architectural (upstream declined native MOO fills) rather than a version lag, and 2.0 GA is still unshipped (rc6 TBD, 135 commits ahead of rc5 as of 2026-09-23). Repo pushed today (2026-09-26), so upstream activity is not in question."
+  },
+  {
+   "name": "QuantConnect/Lean",
+   "url": "https://github.com/QuantConnect/Lean",
+   "modalities": [
+    "star",
+    "awesome",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Correctly retained as the frozen comparison oracle rather than the runtime -- freezing the pin is the point, so upstream drift is not itself a reason to bump it. The real finding here is methodological: checking only 'latest GitHub Release' would wrongly suggest LEAN has been dormant since 2017; the actual shipping channel is NuGet's CI build-numbered packages, which cut a new version essentially every push day. Independent confirmation the pin isn't 'behind' in any way that matters: catalogs/sota-convergence/manifest-20260923.json already recorded the pin as 4 commits behind master on 2026-09-21 (deliberate, not a gap)."
+  },
+  {
+   "name": "vectorbt",
+   "url": "https://github.com/polakowo/vectorbt",
+   "modalities": [
+    "star",
+    "awesome",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Free vectorbt is genuinely actively maintained -- a real fix-level release landed the same day as this research, not just a version bump -- and is fine to keep for internal, non-commercial vectorized research under Commons Clause. The important 'beyond stars' nuance: the newest vectorized-backtesting capability (native Rust simulators etc.) has moved to the paid VectorBT PRO membership, which itself is personal/non-commercial-use only, so the free GitHub package should not be assumed to track current commercial-grade SOTA for this vendor's own lineage."
+  },
+  {
+   "name": "Backtesting.py",
+   "url": "https://github.com/kernc/backtesting.py",
+   "modalities": [
+    "star",
+    "awesome",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Confirmed AGPL-3.0 (network-use copyleft) via the actual license text -- a real constraint to flag before any hosted/service use, though it is not a concern for internal research. Remains a lightweight single-asset prototyping tool rather than a multi-asset, broker-integrated engine, so it is correctly kept only as a fast-iteration alternative, not a Nautilus/LEAN replacement."
+  },
+  {
+   "name": "Lumibot",
+   "url": "https://github.com/Lumiwealth/lumibot",
+   "modalities": [
+    "star",
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Still very active (release cut the same day as this research, on both GitHub and PyPI) and covers broad broker/asset coverage, but the community's own maintenance-list note about slow backtest runtime stands unaddressed by anything I found today. Reasonable lighter-weight alternative; not positioned to replace Nautilus/LEAN on the parity-critical path."
+  },
+  {
+   "name": "hftbacktest",
+   "url": "https://github.com/nkaz001/hftbacktest",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The single best-targeted closer in this set for a gap the current winner explicitly has open: Nautilus's own AAPL diagnostic uses synthetic close fills with unlimited modeled depth, exactly what hftbacktest's queue-position/latency model addresses. But it is crypto/L2-microstructure-oriented, not built around US-equity corporate actions or IBKR/Alpaca brokerage semantics, and its release cadence has gone quiet for ~9 months (still within the 12-month maintained window, but worth re-checking around 2026-12-23 for a lapse). Worth a scoped fill-model comparison, not a wholesale swap."
+  },
+  {
+   "name": "csp (Point72)",
+   "url": "https://github.com/Point72/csp",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Not purpose-built as a trading backtester -- it is a general reactive dataflow engine that Point72 also uses that way, with real production pedigree at a major quant fund. Its single-graph backtest=live design is the strongest architectural answer in this set to the sim/live-parity gap that recurs across this stack's own open_gaps (IBKR broker acceptance not established, continuous paper operation open). Would need a from-scratch equities/brokerage adapter layer built on top; not a drop-in Nautilus alternative today."
+  },
+  {
+   "name": "barter-rs",
+   "url": "https://github.com/barter-rs/barter-rs",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Another Rust sim=live-parity architecture pursuing the same design philosophy Nautilus itself is built on, but with a much smaller community/ecosystem and no demonstrated US-equities/IBKR/Alpaca integration. Useful only as an architecture reference for how a smaller team structures backtest/live parity, not a near-term engine candidate. Note for anyone citing its version: the workspace's per-crate release tags are misleading; read Cargo.toml directly."
+  },
+  {
+   "name": "PyBroker (lib-pybroker)",
+   "url": "https://github.com/edtechre/pybroker",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The walk-forward-plus-bootstrapped-significance angle is directly relevant to this stack's own skfolio WalkForward work in research-factors-ml (same purge/embargo concern noted there). Commons Clause blocks reselling it as a hosted service but is fine for internal use -- this corrects the sota-convergence manifest's flatter 'license NOASSERTION' read, which under-described what the license actually says. No IBKR/Alpaca execution-parity evidence found."
+  },
+  {
+   "name": "backtrader (cloudQuant fork of mementum/backtrader)",
+   "url": "https://github.com/cloudQuant/backtrader",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The clearest stars-vs-maintenance mismatch in this whole sweep: the single most-starred engine surveyed (23.3k) and still cited in 2026 research, yet its own repository has taken no commits for over two years. If backtrader's declarative API is ever wanted, the cloudQuant fork is the only currently-maintained entry point today. Neither the original nor the fork has demonstrated the corporate-action/broker-execution rigor this layer's requirement calls for."
+  },
+  {
+   "name": "zipline-reloaded",
+   "url": "https://github.com/stefan-jansen/zipline-reloaded",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Sits on the borderline the task asked me to flag: a commit within the 12-month window keeps it technically 'maintained,' but no package release in over a year means it is not evolving the way the currently active candidates in this set are. Treat as a slowing legacy option rather than an actively developed SOTA path; re-check near 2027-01 for a 12-month commit lapse."
+  },
+  {
+   "name": "vnpy",
+   "url": "https://github.com/vnpy/vnpy",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Largest, longest-running full-stack ecosystem surveyed, with a real IB gateway module and confirmed active maintenance (pushed 2026-09-13, release 2026-05-14), but its documentation and community center of gravity is China-market futures/equities tooling. Would need real US-equities/IBKR-adapter validation on this stack before treating it as more than a breadth reference; I have not source-reviewed its backtest-engine internals."
+  },
+  {
+   "name": "rqalpha",
+   "url": "https://github.com/ricequant/rqalpha",
+   "modalities": [
+    "star",
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Actively maintained, but the organizational-use restriction -- verified from the repository's own LICENSE file, not just the PyPI license tag -- is a real adoption blocker for any organization (this stack included) without contacting Ricequant directly. This is exactly the kind of gap a stars/PyPI-classifier-only view would miss; PyPI's 'Apache-2.0' tag materially understates the actual terms."
+  },
+  {
+   "name": "Hikyuu",
+   "url": "https://github.com/fasiondog/hikyuu",
+   "modalities": [
+    "star",
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Extremely actively maintained -- pushed the same day as this research (2026-09-26) -- and genuinely distinct in building its own C++ bar/indicator engine rather than wrapping pandas, which is a real architectural difference worth a closer technical look. No US-equities/IBKR-specific evidence found; the MIT license is the cleanest of the alternatives checked here."
+  },
+  {
+   "name": "Vibe-Trading (HKUDS)",
+   "url": "https://github.com/HKUDS/Vibe-Trading",
+   "modalities": [
+    "star",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The clearest 'stars are not evidence' case surfaced by this sweep: given as a starred-repo input specifically for its backtesting topic tag, but it is ~6 months old, still pre-1.0, and self-positioned as an LLM trading *agent* product with backtesting as one tag among many rather than a documented fill/corporate-action/risk-accounting model. I found no README or docs evidence, only repo metadata, of the execution rigor this layer's requirement actually calls for -- its size should not substitute for the source review this layer needs before any adoption discussion."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-cached",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/backtesting-engine--gpt-6-cached.md"
+  },
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/backtesting-engine--gpt-6-live.md"
+  }
+ ]
+}

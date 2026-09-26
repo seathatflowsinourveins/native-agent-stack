@@ -1,0 +1,699 @@
+{
+ "layer_id": "portfolio-risk",
+ "proposal": {
+  "layer_id": "portfolio-risk",
+  "proposal": "challenge",
+  "summary": "Portfolio-risk's only winner with native execution evidence remains skfolio, but the pinned artifact (1.2.9, WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee, accepted 2026-09-19 per blueprints/us-equities/research-evaluation/receipt.json) is verified stale: upstream shipped six releases in the seven days to 2026-09-26 (v1.3.0 through v1.4.0 -- a live PyPI check run today confirms 1.4.0 is still current, nothing newer has shipped), and I independently re-fetched all six GitHub release bodies via gh api. Two are named correctness fixes to value_at_risk (integer tail sizes, v1.3.3) and EVaR (log-sum-exp numerical stability, v1.3.4) -- exactly the \"deterministic numeric risk\" measures this layer exists to supply -- plus a new GeodesicShrinkageCovariance estimator (v1.3.0) and a multi-period sample-weight fix (v1.3.2). However, I also read the pinned commit's own _walk_forward.py source directly: it imports only sklearn.model_selection, sklearn.utils, skfolio.typing and skfolio.utils.tools -- never skfolio.measures or skfolio.moments -- so none of the six fixes touch the code path this repo has actually accepted. The staleness is real and dated but prospective: it matters once (still fully untested) skfolio optimizers or risk estimators run natively here, which remains an open gap either way. No competing library earns a verified advantage over skfolio for the accepted role. Riskfolio-Lib's \"lacks a walk-forward/CV harness\" knock was independently refuted here (its own readthedocs course page teaches Walk Forward, Cross-Validation and Combinatorial Purged CV, confirmed by a direct fetch), but it still ships no GitHub Releases object, hasn't tagged in ~4 months, and isn't sklearn-Pipeline/GridSearchCV-native. PyPortfolioOpt, cvxportfolio (GPL-3.0, 14-month-stale tag), fortitudo.tech (GPL-3.0), riskparityportfolio (PyPI 0.6.0 has no matching git tag -- verified provenance gap, latest tag is only v0.5.1), OptimalPortfolios and factorlasso (real, current, but single-maintainer-concentrated -- OptimalPortfolios' own pyproject.toml confirms it depends on both qis and factorlasso from the same author) all stay source-review-only with zero native execution in this repo. Two capability-additive, lower-confidence finds deserve a bounded trial rather than displacement: pyhrp offers a second, independently-authored HRP/Schur-complement implementation (real tests, coverage, MIT) to numerically cross-check skfolio's own HierarchicalRiskParity output -- exactly the \"independent reconciliation\" this layer's language asks for and nothing currently supplies; riskkit-quant is the only candidate in the whole set whose stated purpose is pre-trade position-sizing/stop enforcement (confirmed via its own repo description and 13 real test files), directly on point for this layer's most-repeated gap, though at 3 stars/single-maintainer/no third-party adoption it needs its own proof first. No candidate reviewed, including skfolio at any version, closes the layer's core gap: a verified connection from portfolio/risk-measure output to NautilusTrader's deterministic pre-trade enforcement or broker reconciliation. That gap is unchanged by this wave and stays open.",
+  "winner_status": [
+   {
+    "component_id": "skfolio",
+    "status": "stale",
+    "note": "Pinned at 1.2.9 (WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee, accepted 2026-09-19) but verified superseded upstream by 6 releases in 7 days through v1.4.0 (2026-09-26; a live PyPI check today confirms v1.4.0 is still current). Two of the six are named correctness fixes to value_at_risk (v1.3.3, integer tail sizes) and EVaR (v1.3.4, log-sum-exp stability) -- this layer's own 'deterministic numeric risk' measures. All 6 release bodies independently re-verified via gh api against github.com/skfolio/skfolio/releases (v1.3.0 GeodesicShrinkageCovariance; v1.3.1 plot-crash fix + drops direct joblib dep; v1.3.2 multi-period sample-weight fix; v1.3.3 VaR fix; v1.3.4 EVaR fix; v1.4.0 plot_composition_treemap). A direct source read of the pinned commit shows _walk_forward.py imports only sklearn.model_selection/sklearn.utils and skfolio.typing/skfolio.utils.tools -- never skfolio.measures or skfolio.moments -- so the already-accepted WalkForward receipt (12 focused tests, 214 full-suite tests, 20 dev folds + 1 reserved period) is unaffected by any of the 6 fixes; staleness risk is prospective, mattering only once skfolio's optimizers or risk estimators (currently 0 native evidence either way) are actually run. No alternative library shows a verified advantage over skfolio for the accepted model-selection role. Recommend a pin refresh to 1.4.0, via the bounded trial below, before any further native acceptance extends into skfolio's risk-measure code paths."
+   }
+  ],
+  "challengers": [
+   {
+    "name": "skfolio (upstream v1.4.0, pin refresh of the incumbent)",
+    "url": "https://github.com/skfolio/skfolio",
+    "why_better": "Verified via gh api against all 6 GitHub Releases published between the current 1.2.9 pin (2026-09-19) and today (2026-09-26): v1.3.0 adds a GeodesicShrinkageCovariance estimator; v1.3.1 fixes a plotting crash and drops a direct joblib dependency; v1.3.2 preserves sample weights across multi-period portfolio updates; v1.3.3 makes value_at_risk consistent at integer tail sizes (correctness fix); v1.3.4 computes EVaR in numerically stable log-sum-exp form (correctness fix); v1.4.0 adds plot_composition_treemap. A live PyPI check today confirms 1.4.0 is still current -- nothing has shipped since. The two correctness fixes bear directly on this layer's 'deterministic numeric risk' requirement.",
+    "evidence_level": "source_review",
+    "trial_plan": "Reinstall skfolio==1.4.0 (tag v1.4.0) into the existing isolated venv recipe (blueprints/us-equities/research-evaluation/requirements.lock, regenerated with --require-hashes for 1.4.0). Rerun the unchanged evaluate.py --lean-source ... --out ... command, tests/test_research_evaluation.py (must still return 12 passed) and the full suite under the recorded SDK interpreter (must still return 214 passed, 0 skipped). Confirm plan_sha256, the 21 selections, the 6605 ledger records and all_training_exits_before_evaluation_cutoff=true reproduce unchanged -- expected to be a clean no-op since the WalkForward import graph excludes measures/moments. Then add one new bounded check outside the existing receipt: call skfolio.measures.value_at_risk and skfolio.measures.evar on the same frozen reserved-period returns sample under 1.2.9 and 1.4.0, and confirm the 1.4.0 values match a scipy/hand-computed reference at an integer tail-size boundary where 1.2.9 is expected to diverge. Pass = existing suite unchanged plus new VaR/EVaR values match the reference. Overturn = any existing test regresses, or the WalkForward source-hash comparison behavior changes.",
+    "paper_lane_impact": "none -- skfolio produces research-only portfolio/risk artifacts upstream of Nautilus; this layer's own catalog already states 'optimization and risk estimates are not pre-trade enforcement,' and no skfolio output is wired to the deterministic adaptive-paper engine, so a pin refresh cannot move engines-run/paper-acts-passed/paper-fills counts by itself.",
+    "sources": [
+     "https://github.com/skfolio/skfolio/releases/tag/v1.3.0",
+     "https://github.com/skfolio/skfolio/releases/tag/v1.3.1",
+     "https://github.com/skfolio/skfolio/releases/tag/v1.3.2",
+     "https://github.com/skfolio/skfolio/releases/tag/v1.3.3",
+     "https://github.com/skfolio/skfolio/releases/tag/v1.3.4",
+     "https://github.com/skfolio/skfolio/releases/tag/v1.4.0",
+     "https://pypi.org/pypi/skfolio/json",
+     "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/model_selection/_walk_forward.py"
+    ]
+   },
+   {
+    "name": "pyhrp",
+    "url": "https://github.com/tschm/pyhrp",
+    "why_better": "Independent, from-paper reimplementation of Hierarchical Risk Parity (Lopez de Prado) plus Cotton's Schur-complement extension, with its own real test suite and published coverage report -- confirmed via gh api src/pyhrp/__init__.py exports hrp(), schur_hrp(), risk_parity(), build_tree(); tests/ contains real pytest content; MIT license; last pushed 2026-09-18. Not a general replacement for skfolio, but the only candidate offering a second, independently-authored implementation of the exact HRP method skfolio's own HierarchicalRiskParity estimator implements -- the 'independent reconciliation' this layer's requirement language calls for, which no reviewed candidate currently supplies for any risk-estimator output.",
+    "evidence_level": "source_review",
+    "trial_plan": "Install pyhrp==2.3.3 (PyPI, confirmed current) alongside the existing skfolio environment. On the same frozen SPY/QQQ/IWM reserved-2021Q1 return sample already used by the accepted research-evaluation receipt, compute weights from pyhrp.hrp() and from skfolio.optimization.HierarchicalRiskParity().fit() with matching linkage (ward) and distance settings. Pass = weights agree within a small numeric tolerance (e.g. 1e-6 relative), confirming both implementations compute the same method correctly. Overturn = a material weight disagreement not explained by a documented parameter difference, flagging a defect worth investigating in one of the two before either is trusted for risk allocation.",
+    "paper_lane_impact": "none -- a cross-check between two research libraries' HRP output, with no connection to Nautilus, the adaptive-paper engine, or any placed order.",
+    "sources": [
+     "https://github.com/tschm/pyhrp",
+     "https://pypi.org/pypi/pyhrp/json",
+     "https://github.com/tschm/pyhrp/blob/main/src/pyhrp/__init__.py"
+    ]
+   },
+   {
+    "name": "riskkit-quant (riskkit)",
+    "url": "https://github.com/HasibVortex369/riskkit",
+    "why_better": "The only candidate in the full researched set whose stated purpose is pre-trade position-sizing/drawdown/stop enforcement rather than portfolio construction. Verified directly via gh api the repository's own description reads 'A framework-agnostic risk-management toolkit for systematic traders: position sizing, drawdown control, stops, correlation limits, and a pre-trade validator' -- matching this layer's own repeatedly-flagged gap ('optimization and risk estimates are not pre-trade enforcement... no connection to NautilusTrader's deterministic numeric risk'). Confirmed real, not vaporware: 13 test files including test_validator.py, test_sizing.py and test_stops.py; PyPI requires_dist shows zero required runtime dependencies (only optional extras); MIT license; 30 commits, last pushed 2026-07-02.",
+    "evidence_level": "source_review",
+    "trial_plan": "Install riskkit-quant==0.4.2 from PyPI in isolation and run its own native test suite first (pass = its 13 test files pass unmodified, establishing it does what its README claims on its own terms). If that passes, build a small synthetic order stream shaped like the adaptive-paper engine's own order/fill records (not a live Nautilus wire-up) and run it through riskkit's validator/position-sizing API against the paper-e2e-20260921 receipt's already-recorded trades. Pass = the validator runs deterministically over that fixture and its accept/reject decisions are inspectable and reproducible. Overturn = its own test suite fails on install, or its validator's decisions cannot be explained/reproduced deterministically -- either would disqualify it from ever sitting near pre-trade enforcement.",
+    "paper_lane_impact": "none in this bounded trial (it only reads a synthetic/replayed fixture); a later real integration into the adaptive-paper engine's pre-trade path, only if this trial passes, is what could eventually move paper-acts-passed by adding a rejection path -- a distinct, larger step this review does not authorize.",
+    "sources": [
+     "https://github.com/HasibVortex369/riskkit",
+     "https://pypi.org/pypi/riskkit-quant/json"
+    ]
+   }
+  ],
+  "rejected": [
+   {
+    "name": "Riskfolio-Lib",
+    "reason": "No verified advantage over skfolio's accepted role: ships no GitHub Releases object (empty array, confirmed via gh api) so its pins cannot be release-audited the way this repo's practice requires; last tagged PyPI version is ~4 months stale (7.3.0, 2026-05-31) versus skfolio's same-day release; not sklearn-Pipeline/GridSearchCV-native. Its 'lacks a walk-forward/CV harness' criticism was independently refuted here (its readthedocs course page teaches Walk Forward, Cross-Validation and Combinatorial Purged CV) but that only neutralizes an argument against it, not establishes it is better. Star count (4,516 vs 2,435) is popularity, not evidence, per this task's own rule."
+   },
+   {
+    "name": "PyPortfolioOpt",
+    "reason": "Off-requirement for the accepted model-selection role: no sklearn Pipeline/GridSearchCV-native CV machinery, slower release cadence (last tag 2026-02-26) than skfolio. The existing catalog already scopes it correctly as a smaller allocation module for when skfolio's orchestration isn't needed; nothing found here overturns that scoping."
+   },
+   {
+    "name": "cvxportfolio",
+    "reason": "GPL-3.0 (more restrictive than skfolio's BSD-3-Clause); tagged release stale 14+ months (1.5.1, 2025-07-06) despite continued commits; no native execution evidence in this repo; already recorded in-catalog as source_review/not_individually_reviewed."
+   },
+   {
+    "name": "empyrical-reloaded",
+    "reason": "Off-requirement (performance metrics, not optimization/risk estimation) and already flagged unmaintained_signal in catalogs/sota-convergence/manifest-20260923.json (122 stars, no commit since 2025-12-12, default-branch head over 12 months old)."
+   },
+   {
+    "name": "quantstats",
+    "reason": "Off-requirement for this layer's winner slot (tearsheet/reporting analytics, not portfolio optimization or risk estimation); already separately tracked in-catalog as the distinct performance-evaluation-layer default with review_status keep_but_compare and zero executing receipts, confirmed unchanged via a direct read of catalogs/sota-convergence/manifest-20260923.json."
+   },
+   {
+    "name": "fincore",
+    "reason": "Off-requirement (empyrical/pyfolio/alphalens-successor reporting library); 5 stars, brand-new breaking 0.5.0 redesign with no accumulated third-party adoption evidence; not independently re-verified in this pass."
+   },
+   {
+    "name": "jquantstats",
+    "reason": "Off-requirement (position-level reporting analytics, a quantstats successor); small community (45 stars); not independently re-verified in this pass beyond the prior researcher's source_review."
+   },
+   {
+    "name": "ffn",
+    "reason": "Off-requirement (return/drawdown helper-function library, narrower than a full reporting layer); best positioned as a lightweight cross-check for the separate performance-evaluation scope term, not this layer's optimization/risk-estimation winner slot."
+   },
+   {
+    "name": "pyfolio-reloaded",
+    "reason": "Off-requirement (tearsheet reporting) and trending toward unmaintained: no commit in ~9.4 months (last push 2025-12-15), approaching this task's 12-month bar; same maintainer (stefan-jansen) as the already-unmaintained-flagged empyrical-reloaded, a concentration risk."
+   },
+   {
+    "name": "fortitudo.tech",
+    "reason": "GPL-3.0 (restrictive). Genuinely distinct Entropy-Pooling/CVaR methodology confirmed real via gh api, but no native execution or comparison evidence establishes it closes a gap skfolio's own distributionally-robust-CVaR support does not already address; smallest actively-releasing community (310 stars, not itself evidence)."
+   },
+   {
+    "name": "riskparityportfolio (riskparity.py)",
+    "reason": "Verified provenance gap: PyPI ships 0.6.0 but the latest git tag is only v0.5.1 (confirmed via gh api tags), so the exact source commit behind the installed artifact cannot be identified -- conflicts with this repo's pin-by-commit practice. No native execution evidence."
+   },
+   {
+    "name": "OptimalPortfolios",
+    "reason": "Metadata-plus-source-review only, no native execution or independent adoption evidence; single-maintainer concentration confirmed via its own pyproject.toml (depends on qis>=5.31.0 and factorlasso, both same author), stacking three single-maintainer packages. Currency (pushed the same day as this review) is real but not itself evidence of quality."
+   },
+   {
+    "name": "factorlasso",
+    "reason": "Off-requirement for this layer: a factor/covariance-estimation input consumed by portfolio-optimization tools, not a portfolio-optimizer or risk-measure engine itself -- better scoped to the sibling research-factors-ml layer. Its Journal of Statistical Software submission and in-repo replication package (papers/jss_2026/) were confirmed real via gh api -- the strongest evidence trail of any candidate reviewed -- but 'submitted' is not yet 'peer-reviewed/accepted,' and its license is GPL-3.0."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "scope-and-methodology",
+   "claim": "\"Top 8 candidates by fit\" — which 8 of the 15 supplied candidates were adversarially verified in this pass.",
+   "verdict": "unverifiable",
+   "note": "No numeric fit score is given per candidate, only free-text 'fit' paragraphs, so ranking is a judgment call, not an externally checkable fact. I verified the winner (skfolio, pin note) plus these 8 candidates, chosen for direct relevance to portfolio construction/risk-methodology/pre-trade enforcement over pure reporting/tearsheet or narrow single-method tools: skfolio, Riskfolio-Lib, PyPortfolioOpt, cvxportfolio, fortitudo.tech, riskparity.py (riskparityportfolio), OptimalPortfolios, riskkit (riskkit-quant). Not independently re-verified in this pass: quantstats, fincore, jquantstats, ffn, pyfolio-reloaded, pyhrp, factorlasso — any claim below that references one of these (e.g. OptimalPortfolios vs. quantstats same-day-push comparison) is flagged unverifiable rather than assumed true.",
+   "sources": []
+  },
+  {
+   "name": "skfolio-repo-package-exists",
+   "claim": "skfolio repo/package exists at github.com/skfolio/skfolio and pypi.org/project/skfolio; license BSD-3-Clause; latest v1.4.0 released 2026-09-26; maintained (not archived, pushed within 12 months).",
+   "verdict": "supported",
+   "note": "gh api repos/skfolio/skfolio (2026-09-26): license.spdx_id=BSD-3-Clause, stars=2435 (matches candidate/winner-note claim of 2,435 exactly), pushed_at=2026-09-26T14:35:38Z, archived=false. PyPI JSON: version=1.4.0, upload_time=2026-09-26T10:51:50Z, license text BSD-3-Clause. GitHub release v1.4.0 published_at=2026-09-26T10:51:38Z. All match the candidate's and winner-note's stated license/version/date/maintenance fields exactly.",
+   "sources": [
+    "https://github.com/skfolio/skfolio",
+    "https://api.github.com/repos/skfolio/skfolio",
+    "https://pypi.org/pypi/skfolio/json",
+    "https://github.com/skfolio/skfolio/releases/tag/v1.4.0"
+   ]
+  },
+  {
+   "name": "skfolio-pin-commit-v1.2.9",
+   "claim": "Winner note: pinned at 1.2.9, source commit c99fcf71349e2df4a7a1033ee85ca2e9ced9abee; v1.2.9 itself was released 2026-09-19.",
+   "verdict": "supported",
+   "note": "gh api repos/skfolio/skfolio/commits/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee returns exactly the v1.2.9 release commit ('v1.2.9 [skip ci], Automatically generated by python-semantic-release', authored 2026-09-19T14:45:29Z). The v1.2.9 GitHub Release itself shows published_at=2026-09-19T14:45:39Z. Commit hash and date both confirmed directly.",
+   "sources": [
+    "https://github.com/skfolio/skfolio/commit/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+    "https://github.com/skfolio/skfolio/releases/tag/v1.2.9"
+   ]
+  },
+  {
+   "name": "skfolio-v1.3.0-geodesic",
+   "claim": "v1.3.0 (2026-09-20) added a GeodesicShrinkageCovariance estimator to the moments module.",
+   "verdict": "supported",
+   "note": "GitHub release v1.3.0 body reads verbatim: '## v1.3.0 (2026-09-20) ### Features - **moments**: Add GeodesicShrinkageCovariance estimator (#259)'. published_at=2026-09-20T10:12:14Z. Exact match to both candidate and winner-note claims.",
+   "sources": [
+    "https://github.com/skfolio/skfolio/releases/tag/v1.3.0"
+   ]
+  },
+  {
+   "name": "skfolio-v1.3.1-plotcrash-joblib",
+   "claim": "v1.3.1 (2026-09-23) fixed a crash plotting ratio measures on surfaces and dropped a direct joblib dependency.",
+   "verdict": "supported",
+   "note": "GitHub release v1.3.1 body: 'Bug Fixes - **population**: Prevent crash when plotting ratio measures on surfaces (#330)' and 'Build System: Add deptry checks and remove direct joblib dependency (#320)'. published_at=2026-09-23T21:11:13Z. Matches winner-note wording exactly.",
+   "sources": [
+    "https://github.com/skfolio/skfolio/releases/tag/v1.3.1"
+   ]
+  },
+  {
+   "name": "skfolio-v1.3.2-sample-weights",
+   "claim": "v1.3.2 (2026-09-24) preserved sample weights across multi-period portfolio updates.",
+   "verdict": "supported",
+   "note": "GitHub release v1.3.2 body: 'Bug Fixes - **portfolio**: Preserve sample weights across multi-period updates (#338)'. published_at=2026-09-24T21:49:04Z. Matches exactly.",
+   "sources": [
+    "https://github.com/skfolio/skfolio/releases/tag/v1.3.2"
+   ]
+  },
+  {
+   "name": "skfolio-v1.3.3-var-integer-tail",
+   "claim": "v1.3.3 (2026-09-25) made value_at_risk consistent at integer tail sizes.",
+   "verdict": "supported",
+   "note": "GitHub release v1.3.3 body: 'Bug Fixes - **measures**: Make value_at_risk consistent at integer tail sizes (#343)'. published_at=2026-09-25T11:21:38Z. Confirms both the candidate's and winner-note's claim, including that this is a VaR correctness fix (the exact kind of 'deterministic numeric risk' bug the candidate flags as relevant to this layer).",
+   "sources": [
+    "https://github.com/skfolio/skfolio/releases/tag/v1.3.3"
+   ]
+  },
+  {
+   "name": "skfolio-v1.3.4-evar-logsumexp",
+   "claim": "v1.3.4 (2026-09-25) made EVaR numerically stable via log-sum-exp.",
+   "verdict": "supported",
+   "note": "GitHub release v1.3.4 body: 'Bug Fixes - **measures**: Compute evar in stable log-sum-exp form (#359)'. published_at=2026-09-25T15:37:36Z. Matches exactly.",
+   "sources": [
+    "https://github.com/skfolio/skfolio/releases/tag/v1.3.4"
+   ]
+  },
+  {
+   "name": "skfolio-v1.4.0-treemap",
+   "claim": "v1.4.0 (2026-09-26) added plot_composition_treemap.",
+   "verdict": "supported",
+   "note": "GitHub release v1.4.0 body: 'Features - **portfolio**: Add plot_composition_treemap (#248)'. published_at=2026-09-26T10:51:38Z. Matches exactly.",
+   "sources": [
+    "https://github.com/skfolio/skfolio/releases/tag/v1.4.0"
+   ]
+  },
+  {
+   "name": "skfolio-six-releases-seven-days",
+   "claim": "6 releases (v1.3.0 through v1.4.0) shipped in the 7 days between the 1.2.9 pin (2026-09-19) and this review (2026-09-26), two of them correctness fixes to VaR/EVaR — the fastest cadence of any candidate reviewed.",
+   "verdict": "supported",
+   "note": "Directly counted from GitHub Releases: v1.3.0 (09-20), v1.3.1 (09-23), v1.3.2 (09-24), v1.3.3 (09-25), v1.3.4 (09-25), v1.4.0 (09-26) = 6 releases; v1.2.9 dated 09-19, review dated 09-26 = 7 days. Two of the six (v1.3.3, v1.3.4) are VaR/EVaR correctness fixes, confirmed above. Among the other 7 candidates I independently checked, none shipped more than 1 tagged release in that same window (Riskfolio-Lib: 0 GitHub releases at all; PyPortfolioOpt: last release 2026-02-26; cvxportfolio: last release 2025-07-06; fortitudo.tech: last release 2026-08-20; riskparity.py: PyPI stale since 2024, latest git tag v0.5.1 undated in this window; OptimalPortfolios: 1 release, v7.8.0 on 2026-09-23), so the 'fastest cadence' claim holds against everything I checked. I did not independently re-verify release cadence for the 7 candidates outside my selected 8 (quantstats, fincore, jquantstats, ffn, pyfolio-reloaded, pyhrp, factorlasso), so the claim's 'any candidate reviewed' scope is confirmed only against the 8 I checked.",
+   "sources": [
+    "https://github.com/skfolio/skfolio/releases"
+   ]
+  },
+  {
+   "name": "skfolio-sklearn-api-capability",
+   "claim": "Unified scikit-learn-compatible API (Pipeline/GridSearchCV/cross-validation) spanning mean-risk, robust/Bayesian, hierarchical-clustering (HRP/HERC) and ensemble allocation, per its own docs and arXiv:2507.04176.",
+   "verdict": "supported",
+   "note": "skfolio's own README.rst (main branch) explicitly lists all elements: 'Bayesian approaches ... distributionally robust optimization ... hierarchical clustering, ensemble methods' (intro), 'Compatible with all sklearn methods (GridSearchCV, RandomizedSearchCV)', code examples importing sklearn's GridSearchCV and Pipeline, and an 'Available models' list including 'Distributionally Robust CVaR' (mean-risk/robust), 'Hierarchical Risk Parity' and 'Hierarchical Equal Risk Contribution' (HRP/HERC), and 'Ensemble Methods: Stacking Optimization'. All named capabilities are directly present in the current README, independent of the arXiv paper.",
+   "sources": [
+    "https://raw.githubusercontent.com/skfolio/skfolio/main/README.rst",
+    "https://github.com/skfolio/skfolio"
+   ]
+  },
+  {
+   "name": "skfolio-arxiv-paper",
+   "claim": "arXiv:2507.04176, 'skfolio: Portfolio Optimization in Python', describes the library.",
+   "verdict": "supported",
+   "note": "arxiv.org/abs/2507.04176 abstract page title reads exactly 'skfolio: Portfolio Optimization in Python', authored by Carlo Nicolini, Matteo Manzi, Hugo Delatte. Abstract confirms a scikit-learn 'fit-predict-transform paradigm' library covering mean-variance and clustering-based methods, consistent with the claim.",
+   "sources": [
+    "https://arxiv.org/abs/2507.04176"
+   ]
+  },
+  {
+   "name": "riskfoliolib-repo-package-exists",
+   "claim": "Riskfolio-Lib repo/package exists at github.com/dcajasn/Riskfolio-Lib and pypi.org/project/riskfolio-lib; license BSD-3-Clause; latest 7.3.0 (2026-05-31); maintained (4,516 stars, pushed 2026-09-24).",
+   "verdict": "supported",
+   "note": "gh api repos/dcajasn/Riskfolio-Lib: license.spdx_id=BSD-3-Clause, stars=4516 (exact match to candidate's '4,516'), pushed_at=2026-09-24T05:23:00Z, archived=false. PyPI JSON: version=7.3.0, upload_time=2026-05-31T07:11:19Z, license text 'BSD (3-clause)'. All fields match the candidate's stated license/version/date/maintenance exactly.",
+   "sources": [
+    "https://github.com/dcajasn/Riskfolio-Lib",
+    "https://api.github.com/repos/dcajasn/Riskfolio-Lib",
+    "https://pypi.org/pypi/riskfolio-lib/json"
+   ]
+  },
+  {
+   "name": "riskfoliolib-no-github-releases",
+   "claim": "No GitHub Releases object exists for this repo (release history lives on PyPI/CHANGELOG only).",
+   "verdict": "supported",
+   "note": "gh api repos/dcajasn/Riskfolio-Lib/releases returns an empty array (length 0); repos/dcajasn/Riskfolio-Lib/releases/latest returns HTTP 404 'Not Found'. Confirms directly.",
+   "sources": [
+    "https://api.github.com/repos/dcajasn/Riskfolio-Lib/releases"
+   ]
+  },
+  {
+   "name": "riskfoliolib-26-risk-measures-location",
+   "claim": "Docs at riskfolio-lib.readthedocs.io's 'course' page claim support for 26 convex risk measures.",
+   "verdict": "refuted",
+   "note": "I fetched the course page directly (riskfolio-lib.readthedocs.io/en/latest/course/course.html, HTTP 200) and full-text-scanned it: it lists risk-measure categories (OWA, Risk Parity, Worst Case, etc.) but never states a numeric count anywhere near 'risk'/'measure'. The '26 convex risk measures' figure is real, but it lives on the project's GitHub README.md (raw.githubusercontent.com/dcajasn/Riskfolio-Lib/master/README.md, line 50: 'Mean Risk and Logarithmic Mean Risk (Kelly Criterion) Portfolio Optimization with 26 convex risk measures:'), not on the readthedocs course page as specifically claimed. Underlying fact true; cited source location is wrong.",
+   "sources": [
+    "https://riskfolio-lib.readthedocs.io/en/latest/course/course.html",
+    "https://raw.githubusercontent.com/dcajasn/Riskfolio-Lib/master/README.md"
+   ]
+  },
+  {
+   "name": "riskfoliolib-stars-comparison",
+   "claim": "4,516 GitHub stars vs. skfolio's 2,435 (gh api, 2026-09-26).",
+   "verdict": "supported",
+   "note": "Directly confirmed via gh api on both repos today: dcajasn/Riskfolio-Lib stars=4516; skfolio/skfolio stars=2435. Both numbers match exactly.",
+   "sources": [
+    "https://api.github.com/repos/dcajasn/Riskfolio-Lib",
+    "https://api.github.com/repos/skfolio/skfolio"
+   ]
+  },
+  {
+   "name": "riskfoliolib-awesome-list-convergence",
+   "claim": "Appeared as a candidate in 6 of the distinct awesome-list inputs supplied for this task.",
+   "verdict": "unverifiable",
+   "note": "This refers to a separate researcher's private set of input awesome-lists, which is not attached to or reproducible from this repository checkout or any public primary source I can open. Cannot be confirmed or refuted independently.",
+   "sources": []
+  },
+  {
+   "name": "riskfoliolib-pypi-staleness",
+   "claim": "PyPI riskfolio-lib 7.3.0 uploaded 2026-05-31; repo pushed 2026-09-24, so development continues although no new version has been tagged in roughly 4 months.",
+   "verdict": "supported",
+   "note": "PyPI upload_time=2026-05-31T07:11:19Z confirmed; gh api pushed_at=2026-09-24T05:23:00Z confirmed. 2026-05-31 to 2026-09-24 is just under 4 months, consistent with 'roughly 4 months'. No GitHub Release or PyPI upload has occurred since 7.3.0 as of 2026-09-26.",
+   "sources": [
+    "https://pypi.org/pypi/riskfolio-lib/json",
+    "https://api.github.com/repos/dcajasn/Riskfolio-Lib"
+   ]
+  },
+  {
+   "name": "riskfoliolib-walkforward-cv-harness-claim",
+   "claim": "Fit-note: Riskfolio-Lib 'is not scikit-learn-Pipeline/GridSearchCV-compatible, so it lacks a built-in walk-forward/cross-validation harness.'",
+   "verdict": "refuted",
+   "note": "The 'not sklearn-Pipeline/GridSearchCV-compatible' half is plausible (no README/docs mention of BaseEstimator/Pipeline/GridSearchCV integration, unlike skfolio's README which documents this explicitly). But the consequence — 'lacks a built-in walk-forward/cross-validation harness' — is directly contradicted by the library's own docs: the readthedocs course page has a dedicated 'Backtesting of Portfolio Optimization Strategies' section listing 'The Walk Forward Method (Rolling and Expanding Window)', 'The Cross-Validation Method', and 'The Combinatorial Purged Cross-Validation Method' as taught, implemented topics. Riskfolio-Lib does ship walk-forward/CV functionality, just not through sklearn's specific Pipeline/GridSearchCV machinery.",
+   "sources": [
+    "https://riskfolio-lib.readthedocs.io/en/latest/course/course.html"
+   ]
+  },
+  {
+   "name": "pypfo-repo-package-exists",
+   "claim": "PyPortfolioOpt repo/package exists; license MIT; latest 1.6.0 (2026-02-26); maintained (6,053 stars, pushed 2026-07-07).",
+   "verdict": "supported",
+   "note": "gh api repos/PyPortfolio/PyPortfolioOpt: license.spdx_id=MIT, stars=6053 (exact match), pushed_at=2026-07-07T21:18:14Z, archived=false. PyPI JSON: version=1.6.0, upload_time=2026-02-26T23:29:39Z, license MIT. All fields match exactly.",
+   "sources": [
+    "https://github.com/PyPortfolio/PyPortfolioOpt",
+    "https://api.github.com/repos/PyPortfolio/PyPortfolioOpt",
+    "https://pypi.org/pypi/PyPortfolioOpt/json"
+   ]
+  },
+  {
+   "name": "pypfo-org-transfer",
+   "claim": "Transferred from robertmartin8/PyPortfolioOpt to the PyPortfolio org; gh api on both URLs resolves to the identical full_name, confirming a genuine org transfer, not a fork split.",
+   "verdict": "supported",
+   "note": "gh api repos/robertmartin8/PyPortfolioOpt and gh api repos/PyPortfolio/PyPortfolioOpt both return full_name='PyPortfolio/PyPortfolioOpt', with fork=false and no parent field on the PyPortfolio copy — GitHub's standard redirect behavior for a renamed/transferred repo, not a fork.",
+   "sources": [
+    "https://api.github.com/repos/robertmartin8/PyPortfolioOpt",
+    "https://api.github.com/repos/PyPortfolio/PyPortfolioOpt"
+   ]
+  },
+  {
+   "name": "pypfo-description-quote",
+   "claim": "GitHub description: 'Financial portfolio optimization in python, including classical efficient frontier, Black-Litterman, Hierarchical Risk Parity.'",
+   "verdict": "supported",
+   "note": "gh api repos/PyPortfolio/PyPortfolioOpt --jq .description returns this exact string verbatim.",
+   "sources": [
+    "https://api.github.com/repos/PyPortfolio/PyPortfolioOpt"
+   ]
+  },
+  {
+   "name": "pypfo-pypi-github-release-match",
+   "claim": "PyPI pyportfolioopt 1.6.0 uploaded 2026-02-26T23:29:39, matching the GitHub v1.6.0 release published 2026-02-26T23:25:46.",
+   "verdict": "supported",
+   "note": "PyPI JSON upload_time_iso_8601 for version 1.6.0 = 2026-02-26T23:29:39.493214Z, exact match to the second. GitHub release v1.6.0 published_at = 2026-02-26T23:25:46Z, exact match. The two events are ~4 minutes apart (release tag, then PyPI publish), consistent with a single release process.",
+   "sources": [
+    "https://pypi.org/pypi/PyPortfolioOpt/json",
+    "https://github.com/PyPortfolio/PyPortfolioOpt/releases/tag/v1.6.0"
+   ]
+  },
+  {
+   "name": "cvxp-repo-package-exists",
+   "claim": "cvxportfolio repo/package exists; license GPL-3.0; latest 1.5.1 (2025-07-06); maintained (repo pushed 2026-04-27, though no release since 2025-07-06).",
+   "verdict": "supported",
+   "note": "gh api repos/cvxgrp/cvxportfolio: license.spdx_id=GPL-3.0, stars=1291, pushed_at=2026-04-27T14:11:17Z, archived=false. PyPI JSON: version=1.5.1, upload_time=2025-07-06T16:06:02Z, license text 'GPLv3'. Repo push is within 12 months (not unmaintained by that rule) even though the release itself is 14+ months stale, exactly as the candidate frames it.",
+   "sources": [
+    "https://github.com/cvxgrp/cvxportfolio",
+    "https://api.github.com/repos/cvxgrp/cvxportfolio",
+    "https://pypi.org/pypi/cvxportfolio/json"
+   ]
+  },
+  {
+   "name": "cvxp-description-paper-attribution",
+   "claim": "GitHub description 'Portfolio optimization and back-testing'; implements Boyd, Busseti, Diamond, Kahn, Koh, Nystrup & Speth, 'Multi-Period Trading via Convex Optimization' (Foundations and Trends in Optimization, 2017).",
+   "verdict": "supported",
+   "note": "GitHub description matches verbatim ('Portfolio optimization and back-testing.'). cvxportfolio's own README.rst bibtex entry for 'boyd2017multi' cites the correct journal/year/volume/pages but lists only 6 authors, omitting Koh ('Boyd, Stephen and Busseti, Enzo and Diamond, Steven and Kahn, Ron and Nystrup, Peter and Speth, Jan'). I checked the actual paper's author list independently via Stephen Boyd's own Stanford paper page, which states the full 7-author byline 'S. Boyd, E. Busseti, S. Diamond, R. Kahn, K. Koh, P. Nystrup, and J. Speth' — confirming Kwangmoo Koh is a genuine 7th co-author distinct from Ronald Kahn, matching the candidate's claim exactly. (The repo's own README bibtex is simply incomplete on this point.)",
+   "sources": [
+    "https://api.github.com/repos/cvxgrp/cvxportfolio",
+    "https://raw.githubusercontent.com/cvxgrp/cvxportfolio/master/README.rst",
+    "https://web.stanford.edu/~boyd/papers/cvx_portfolio.html"
+   ]
+  },
+  {
+   "name": "cvxp-pypi-version-count",
+   "claim": "Full PyPI release history (fetched 2026-09-26, all 47 published versions) shows 1.5.1 (2025-07-06) is still latest.",
+   "verdict": "refuted",
+   "note": "Fetched https://pypi.org/pypi/cvxportfolio/json directly on 2026-09-26 and counted len(releases): 51 distinct version keys, all with ≥1 non-yanked file (0 empty/yanked entries). The current-latest part (1.5.1, 2025-07-06) is correct, but the specific count '47 published versions' is wrong — the real count is 51.",
+   "sources": [
+    "https://pypi.org/pypi/cvxportfolio/json"
+   ]
+  },
+  {
+   "name": "fort-repo-package-exists",
+   "claim": "fortitudo.tech repo/package exists; license GPL-3.0-or-later; latest 1.2.5 (2026-08-20); maintained (310 stars, pushed 2026-08-20).",
+   "verdict": "supported",
+   "note": "gh api repos/fortitudo-tech/fortitudo.tech: stars=310, pushed_at=2026-08-20T07:58:46Z, archived=false, GitHub's license detector reports spdx_id 'GPL-3.0' (its generic/short label). PyPI JSON: version=1.2.5, upload_time=2026-08-20T07:59:19Z, and PyPI's own classifier license field is literally 'GPL-3.0-or-later', matching the candidate's stated license exactly (GitHub's shorter auto-detected label is a lower-precision restatement of the same fact, not a contradiction).",
+   "sources": [
+    "https://github.com/fortitudo-tech/fortitudo.tech",
+    "https://api.github.com/repos/fortitudo-tech/fortitudo.tech",
+    "https://api.github.com/repos/fortitudo-tech/fortitudo.tech/license",
+    "https://pypi.org/pypi/fortitudo-tech/json"
+   ]
+  },
+  {
+   "name": "fort-description-quote",
+   "claim": "GitHub description: 'Entropy Pooling views and stress testing combined with Conditional Value-at-Risk (CVaR) portfolio optimization in Python.'",
+   "verdict": "supported",
+   "note": "gh api repos/fortitudo-tech/fortitudo.tech --jq .description returns this exact string verbatim.",
+   "sources": [
+    "https://api.github.com/repos/fortitudo-tech/fortitudo.tech"
+   ]
+  },
+  {
+   "name": "fort-pypi-one-second-timing",
+   "claim": "PyPI fortitudo-tech 1.2.5 uploaded 2026-08-20T07:59:19, one second after the repo's pushed_at (2026-08-20T07:58:46), indicating the push was the release commit itself.",
+   "verdict": "refuted",
+   "note": "Both timestamps confirmed independently (pushed_at=2026-08-20T07:58:46Z via gh api; PyPI upload_time=2026-08-20T07:59:19.488632Z), but the gap between them is 33 seconds, not 'one second'. The broader inference (push and PyPI release are the same event, close in time) is directionally reasonable, but the specific '1 second' figure is numerically wrong by 33x.",
+   "sources": [
+    "https://api.github.com/repos/fortitudo-tech/fortitudo.tech",
+    "https://pypi.org/pypi/fortitudo-tech/json"
+   ]
+  },
+  {
+   "name": "fort-anomalous-tag",
+   "claim": "The GitHub tags listing returned an anomalous top entry (v1.11.12) that does not match the PyPI-confirmed 1.2.5.",
+   "verdict": "supported",
+   "note": "gh api repos/fortitudo-tech/fortitudo.tech/tags confirms v1.11.12 is indeed the first (most-recently-created) tag in the list, ahead of v1.2.5, v1.2.4, etc. — a genuinely anomalous ordering. Its underlying commit (4c4fd44) is dated 2025-10-10, over 11 months before the current review, and its message ('v1.11.12 (#121)... Development requirements update... README updates... Poetry updates...') reads like a routine maintenance/tooling commit rather than a real functional release — consistent with the candidate's characterization of an unresolved versioning-scheme artifact.",
+   "sources": [
+    "https://api.github.com/repos/fortitudo-tech/fortitudo.tech/tags",
+    "https://api.github.com/repos/fortitudo-tech/fortitudo.tech/commits/4c4fd44263b605287dfd111514d96e1f2029f1dd"
+   ]
+  },
+  {
+   "name": "rpp-repo-package-exists",
+   "claim": "riskparity.py (riskparityportfolio) repo/package exists; license MIT; PyPI 0.6.0 uploaded 2024-05-26 (over two years before this review); repo commits as recently as 2026-08-31.",
+   "verdict": "supported",
+   "note": "gh api repos/convexfi/riskparity.py: license.spdx_id=MIT, stars=325, pushed_at=2026-08-31T13:51:54Z, archived=false. PyPI JSON: version=0.6.0, upload_time=2024-05-26T09:58:36Z, license MIT. 2024-05-26 to 2026-09-26 is ~2 years 4 months, consistent with 'over two years'. Repo itself is actively maintained (pushed within days of this review) even though the PyPI package is stale.",
+   "sources": [
+    "https://github.com/convexfi/riskparity.py",
+    "https://api.github.com/repos/convexfi/riskparity.py",
+    "https://pypi.org/pypi/riskparityportfolio/json"
+   ]
+  },
+  {
+   "name": "rpp-citations",
+   "claim": "README implements Spinu (2013, SSRN 2297383) convex risk parity, Griveau-Billion et al. (2013, arXiv:1311.4057) and Choi & Chen (2022) cyclical methods, and Feng & Palomar (2015, IEEE Trans. Signal Processing) successive convex approximation.",
+   "verdict": "supported",
+   "note": "raw.githubusercontent.com/convexfi/riskparity.py/main/README.md confirms all four citations verbatim, with matching links/DOIs: 'Spinu (2013)' -> dx.doi.org/10.2139/ssrn.2297383; 'Griveau-Billion et al. (2013)' -> arxiv.org/pdf/1311.4057.pdf; 'Choi & Chen (2022)' -> emerald.com/.../10.1108/JDQS-12-2021-0031; 'Feng & Palomar (2015)' -> doi.org/10.1109/TSP.2015.2452219 (IEEE Trans. Signal Processing). The References section restates all four with full author/journal detail matching exactly.",
+   "sources": [
+    "https://raw.githubusercontent.com/convexfi/riskparity.py/main/README.md"
+   ]
+  },
+  {
+   "name": "rpp-pypi-tag-mismatch",
+   "claim": "PyPI riskparityportfolio 0.6.0 uploaded 2024-05-26; the repo's most recent visible git tag is v0.5.1, a numbering gap not resolved from the API alone.",
+   "verdict": "supported",
+   "note": "PyPI upload_time for 0.6.0 confirmed as 2024-05-26T09:58:36Z. gh api repos/convexfi/riskparity.py/tags lists v0.5.1 as the top (most recent) tag, with no v0.6.0 or v0.6.x tag present anywhere in the tag list. Confirms the PyPI-vs-git version mismatch exactly as claimed.",
+   "sources": [
+    "https://pypi.org/pypi/riskparityportfolio/json",
+    "https://api.github.com/repos/convexfi/riskparity.py/tags"
+   ]
+  },
+  {
+   "name": "op-repo-package-exists",
+   "claim": "OptimalPortfolios repo/package exists; license MIT; latest 7.8.0 uploaded 2026-09-23; repo pushed 2026-09-26 (the day of this review); status badge 'Stable'.",
+   "verdict": "supported",
+   "note": "gh api repos/ArturSepp/OptimalPortfolios: license.spdx_id=MIT, stars=95, pushed_at=2026-09-26T13:43:10Z, archived=false. PyPI JSON: version=7.8.0, upload_time=2026-09-23T04:25:16Z. README.md line 25 literally reads '**Status:** Stable'. All fields match exactly.",
+   "sources": [
+    "https://github.com/ArturSepp/OptimalPortfolios",
+    "https://api.github.com/repos/ArturSepp/OptimalPortfolios",
+    "https://pypi.org/pypi/optimalportfolios/json"
+   ]
+  },
+  {
+   "name": "op-readme-quote",
+   "claim": "README: 'Production multi-asset portfolio construction and rolling backtesting in Python -- from point-in-time covariance and alpha estimation through constrained optimisation, rebalancing, transaction costs, and reporting.'",
+   "verdict": "supported",
+   "note": "raw.githubusercontent.com/ArturSepp/OptimalPortfolios/main/README.md lines 21-23 contain this exact sentence verbatim (bolded in the source).",
+   "sources": [
+    "https://raw.githubusercontent.com/ArturSepp/OptimalPortfolios/main/README.md"
+   ]
+  },
+  {
+   "name": "op-same-day-commit-activity",
+   "claim": "One of only three candidates reviewed (with skfolio and quantstats) with commit activity on the review date itself (2026-09-26).",
+   "verdict": "unverifiable",
+   "note": "Confirmed independently for 2 of the 3 named: OptimalPortfolios pushed_at=2026-09-26T13:43:10Z and skfolio pushed_at=2026-09-26T14:35:38Z, both same-day. quantstats was not in my selected top-8 and I did not independently re-fetch its live gh api/PyPI status in this session, so I cannot confirm or deny the 'only three' completeness of this claim, nor the quantstats data point specifically, from a primary source I opened myself.",
+   "sources": [
+    "https://api.github.com/repos/ArturSepp/OptimalPortfolios",
+    "https://api.github.com/repos/skfolio/skfolio"
+   ]
+  },
+  {
+   "name": "op-qis-dependency-single-maintainer",
+   "claim": "Depends on the same author's separate 'qis' package for analytics/holdings simulation, so adopting it pulls in a second single-maintainer dependency; single-maintainer (Artur Sepp).",
+   "verdict": "supported",
+   "note": "README.md line 15 confirms: 'Analytics and holdings simulation use qis (github.com/ArturSepp/QuantInvestStrats)'. gh api repos/ArturSepp/OptimalPortfolios/contributors shows 4 contributors, but ArturSepp holds 309 of 345 total contributions (~90%); the other three (tschm 33, miohtama 2, ZhengGong-hub 1) are minor. 'Single-maintainer' is a fair characterization of a ~90%-dominant sole maintainer, though not literally the only contributor. CITATION.cff exists in the repo, consistent with the candidate's 'author's own docs/CITATION.cff' framing.",
+   "sources": [
+    "https://raw.githubusercontent.com/ArturSepp/OptimalPortfolios/main/README.md",
+    "https://api.github.com/repos/ArturSepp/OptimalPortfolios/contributors",
+    "https://api.github.com/repos/ArturSepp/OptimalPortfolios/contents/CITATION.cff"
+   ]
+  },
+  {
+   "name": "riskkit-repo-package-exists",
+   "claim": "riskkit repo exists at github.com/HasibVortex369/riskkit; PyPI package name is riskkit-quant (not riskkit); license MIT; latest 0.4.2 (2026-07-02); 3 GitHub stars; apparent single maintainer.",
+   "verdict": "supported",
+   "note": "gh api repos/HasibVortex369/riskkit: license.spdx_id=MIT, stars=3 (exact match), pushed_at=2026-07-02T09:08:14Z, archived=false. PyPI JSON for 'riskkit-quant': version=0.4.2, upload_time=2026-07-02T09:08:41Z, license MIT (there is no PyPI project literally named 'riskkit', confirming the name-mismatch claim). gh api repos/HasibVortex369/riskkit/contributors returns exactly 1 contributor (HasibVortex369), confirming 'apparent single maintainer'.",
+   "sources": [
+    "https://github.com/HasibVortex369/riskkit",
+    "https://api.github.com/repos/HasibVortex369/riskkit",
+    "https://pypi.org/pypi/riskkit-quant/json",
+    "https://api.github.com/repos/HasibVortex369/riskkit/contributors"
+   ]
+  },
+  {
+   "name": "riskkit-readme-quote-adapters",
+   "claim": "README: 'A framework-agnostic risk-management toolkit for systematic traders... Drop them into backtesting.py, vectorbt, backtrader, freqtrade, or your own loop.'",
+   "verdict": "supported",
+   "note": "raw.githubusercontent.com/HasibVortex369/riskkit/main/README.md line 10 and lines 21-23 contain both quoted phrases verbatim. Repo tree (git/trees recursive listing) shows dedicated adapter modules only for 3 of the 4 named frameworks — src/riskkit/adapters/backtesting.py, freqtrade.py, vectorbt.py — with no backtrader.py; the repo's own ROADMAP.md correspondingly lists 'First-class adapters for backtesting.py, freqtrade, and vectorbt' (backtrader mentioned in README prose only, without a dedicated adapter module).",
+   "sources": [
+    "https://raw.githubusercontent.com/HasibVortex369/riskkit/main/README.md",
+    "https://api.github.com/repos/HasibVortex369/riskkit/git/trees/main?recursive=true"
+   ]
+  },
+  {
+   "name": "riskkit-zero-runtime-deps-badge",
+   "claim": "Zero-runtime-dependency claim matches the repo's own 'runtime deps: 0' badge.",
+   "verdict": "supported",
+   "note": "README.md line 8 contains the badge markup '![Dependencies](https://img.shields.io/badge/runtime%20deps-0-brightgreen.svg)' and line 37 states 'Zero runtime dependencies. Python 3.9+.' verbatim. Confirmed exactly.",
+   "sources": [
+    "https://raw.githubusercontent.com/HasibVortex369/riskkit/main/README.md"
+   ]
+  },
+  {
+   "name": "riskkit-pypi-same-second-timing",
+   "claim": "PyPI riskkit-quant 0.4.2 uploaded 2026-07-02T09:08:41.307391Z, matching repo pushed_at (2026-07-02T09:08:14) within the same second.",
+   "verdict": "refuted",
+   "note": "Both timestamps confirmed independently (pushed_at=2026-07-02T09:08:14Z via gh api; PyPI upload_time=2026-07-02T09:08:41.307391Z via PyPI JSON), but the gap is 27 seconds, not 'within the same second'. Same-minute and clearly-linked-to-the-same-CI-run is a fair characterization; 'within the same second' is numerically wrong.",
+   "sources": [
+    "https://api.github.com/repos/HasibVortex369/riskkit",
+    "https://pypi.org/pypi/riskkit-quant/json"
+   ]
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "skfolio",
+   "url": "https://github.com/skfolio/skfolio",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search",
+    "paper",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Current pinned winner. On merit, not incumbency, it stays a strong fit: its sklearn-native CV/Pipeline design is the only candidate here purpose-built against the leakage/overfitting risk the layer's existing WalkForward receipt already exercises. But the 1.2.9 pin is now 6 releases/7 days behind upstream, and two of those releases are correctness fixes to VaR and EVaR -- exactly the 'deterministic numeric risk' measures this layer exists to supply -- so the pinned version likely carries now-fixed risk-measure bugs. No skfolio optimizer or risk estimator (only WalkForward) has retained execution evidence in this repo, and like every candidate below, it has no connection to NautilusTrader broker reconciliation or pre-trade enforcement."
+  },
+  {
+   "name": "Riskfolio-Lib",
+   "url": "https://github.com/dcajasn/Riskfolio-Lib",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The most-converged alternative to skfolio across every awesome list reviewed, and larger/older by stars and history. Its edge is raw breadth of risk measures and allocation models. Its gap vs. skfolio is architectural, not a feature count: it is not scikit-learn-Pipeline/GridSearchCV-compatible, so it lacks a built-in walk-forward/cross-validation harness -- the exact machinery this layer's only retained receipt (WalkForward) currently exercises. No GitHub Releases object exists for this repo (release history lives on PyPI/CHANGELOG only) and I could not retrieve CHANGELOG.md at the expected path to confirm 7.3.0's exact contents."
+  },
+  {
+   "name": "PyPortfolioOpt",
+   "url": "https://github.com/PyPortfolio/PyPortfolioOpt",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The most broadly cited classical baseline across the supplied awesome lists (5 separate list entries) and the largest community here (6,053 stars). Implements the efficient-frontier/Black-Litterman/HRP toolkit most other libraries in this set position themselves against. Release cadence is slower than skfolio/Riskfolio-Lib/quantstats (last version bump ~7 months ago) though commits continued through 2026-07-07, so it is maintained but not fast-moving."
+  },
+  {
+   "name": "cvxportfolio",
+   "url": "https://github.com/cvxgrp/cvxportfolio",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search",
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The only reviewed candidate whose core design is a realistic, transaction-cost- and market-impact-aware multi-period backtest simulator, mapping more directly onto the layer's 'reproducible equity accounting' language than pure optimizers like skfolio/Riskfolio-Lib. Local catalog (sota-convergence manifest, 2026-09-23) already carries it as 'not_individually_reviewed'/conditional with an empty evidence array; this is the first individual review. Under the strict 'no release or commit in 12 months' rule it stays out of the unmaintained flag only because of ongoing commits -- the release itself is stale. GPL-3.0 is also the most restrictive license among reviewed candidates."
+  },
+  {
+   "name": "quantstats",
+   "url": "https://github.com/ranaroussi/quantstats",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Still the fastest-moving, most-starred reporting/tearsheet library reviewed, updated today. The repository's own critic (manifest-20260923.json) already flagged that no accepted receipt executes it -- an rg search over blueprints/evidence/manifests turns up only verdict packets and README mentions, no run -- and that gap is unchanged as of this review; quantstats' currency is not in question, its use in this stack is."
+  },
+  {
+   "name": "fincore",
+   "url": "https://github.com/cloudQuant/fincore",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The most substantive ground-up rebuild found for the empyrical+pyfolio+alphalens niche, with cash-flow-aware performance and capacity/round-trip analysis quantstats does not claim. Very new (5 stars) with a breaking 0.5.0 redesign, so no accumulated third-party adoption evidence exists yet -- capability claims rest on the project's own README (source_review), not independent usage."
+  },
+  {
+   "name": "jquantstats",
+   "url": "https://github.com/Jebel-Quant/jquantstats",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search",
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Directly targets a capability gap quantstats cannot fill by design (position-level, not just return-series, analytics) while staying a conceptual drop-in successor. Small community (45 stars) vs. quantstats' 7,658, so adoption evidence is thin, but the engineering (polars-native, typed, CI/coverage/OpenSSF-scorecard badges) is more current than quantstats' own tooling."
+  },
+  {
+   "name": "ffn",
+   "url": "https://github.com/pmorissette/ffn",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Already named in the local catalog's own critic note (manifest-20260923.json) as 'the more current independent path' vs. empyrical-reloaded for cross-checking risk/performance metrics -- a judgment this review's fresher dates (2026-09-25 push) continue to support. Narrower in scope than quantstats/fincore (return/drawdown/stat helper functions, not full tearsheets or position accounting), so it fits best as a lightweight cross-check, not a primary reporting layer."
+  },
+  {
+   "name": "fortitudo.tech",
+   "url": "https://github.com/fortitudo-tech/fortitudo.tech",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The only reviewed library offering Entropy Pooling combined with CVaR optimization -- a genuinely different risk-modeling approach (scenario/stress-based, not historical-sample) from the mean-variance/HRP/risk-parity families dominating the rest of this set. Smallest community (310 stars) among actively-releasing candidates. The GitHub tags listing returned an anomalous top entry (v1.11.12) that does not match the PyPI-confirmed 1.2.5; flagged as an unresolved versioning-scheme artifact rather than silently reconciled."
+  },
+  {
+   "name": "riskparity.py (riskparityportfolio)",
+   "url": "https://github.com/convexfi/riskparity.py",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search",
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Purpose-built, academically-grounded risk-parity solver rather than a general optimization suite. The PyPI-vs-git mismatch is a concrete adoption risk: pip installing riskparityportfolio today does not get the 2026 commits, so this stack would need an install-from-source policy to use current code. Fit for a narrow risk-parity role only."
+  },
+  {
+   "name": "pyfolio-reloaded",
+   "url": "https://github.com/stefan-jansen/pyfolio-reloaded",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Still the most-adopted maintained continuation of the pyfolio tearsheet API and license (Apache-2.0). It is the slowest-moving of the actively-maintained candidates reviewed (no commit in over 9 months), trending toward but not yet past the 12-month unmaintained line; quantstats/fincore/jquantstats are all meaningfully more current for the same reporting niche. A fresher fork (quantrocket-llc/pyfolio, pushed 2026-09-17 per gh api) exists but reads as a platform-specific packaging fork rather than an independently distributed library."
+  },
+  {
+   "name": "pyhrp",
+   "url": "https://github.com/tschm/pyhrp",
+   "modalities": [
+    "github_search",
+    "pypi",
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "A focused, single-purpose, actively-maintained HRP/Schur-complement implementation positioned around interpretability ('explicit, inspectable tree') rather than breadth -- a genuine beyond-the-inputs find, not a re-surfacing of a supplied list entry. Complements rather than replaces skfolio/Riskfolio-Lib's built-in HRP variants; worth a direct numerical cross-check against skfolio's HierarchicalRiskParity estimator since both implement the same de Prado method. Small (55 stars), no independent third-party adoption evidence found."
+  },
+  {
+   "name": "OptimalPortfolios",
+   "url": "https://github.com/ArturSepp/OptimalPortfolios",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "A single-maintainer (Artur Sepp) but extremely current, end-to-end pipeline explicitly covering rolling/point-in-time estimation through transaction costs and reporting -- closer to a full research pipeline than a pure optimizer library, relevant to the layer's 'reproducible equity accounting' language. Depends on the same author's separate 'qis' package for analytics/holdings simulation, so adopting it pulls in a second single-maintainer dependency. No independent citation or third-party benchmarking found beyond the author's own docs/CITATION.cff."
+  },
+  {
+   "name": "factorlasso",
+   "url": "https://github.com/ArturSepp/factorlasso",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search",
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The only candidate here with a citable, dated (2026) manuscript under peer review specifically describing its method plus reproducible replication material shipped in-repo -- the strongest evidence trail of any candidate for a specific numerical method (sparse factor/covariance estimation feeding risk models). Narrower scope than a full portfolio-optimization library: it estimates factor models/covariances that other tools (OptimalPortfolios, skfolio, Riskfolio-Lib) would consume as an input, not a replacement for portfolio construction."
+  },
+  {
+   "name": "riskkit (riskkit-quant)",
+   "url": "https://github.com/HasibVortex369/riskkit",
+   "modalities": [
+    "awesome",
+    "pypi",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The only candidate in this whole set whose stated purpose is pre-trade position-sizing/stop/exposure enforcement with ready-made backtester adapters -- directly on point for this layer's own flagged gap ('optimization and risk estimates are not pre-trade enforcement... no connection... to NautilusTrader's deterministic numeric risk'). No Nautilus adapter exists; the listed adapters are backtesting.py/vectorbt/backtrader/freqtrade. Evidence maturity is the lowest here: 3 GitHub stars, an apparent single maintainer, no third-party usage or citation found -- claims above are read directly from the project's own README/badges, not corroborated externally."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/portfolio-risk--gpt-6-live.md"
+  }
+ ]
+}
