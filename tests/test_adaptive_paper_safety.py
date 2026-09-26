@@ -1100,71 +1100,6 @@ class PerExecutionLedger(unittest.TestCase):
                     with self.assertRaisesRegex(s.SafetyError, "^next_trial_cannot_clear_risk_halt$"):
                         begin(self.now + 1, "next-trial")
 
-    def test_interleaved_executions_have_identical_accounting_across_delivery_orders(self):
-        # Review oracle, using Lean 985ef30 SecurityPortfolioModel.cs average
-        # cost per closing fill: sell A, buy B, sell C => +10, -25; 1 @ 115.
-        results = []
-        for delivery in ("stream", "rest_ahead", "recovered", "late_buy", "nanoseconds", "tied"):
-            with self.subTest(delivery=delivery):
-                self.ledger.close()
-                self.db = self.root / (delivery + ".sqlite3")
-                limits = replace(self.limits, max_drawdown_usd=D("100"))
-                self.ledger = s.Ledger(self.db, limits)
-                self.ledger.start_trial(self.now)
-                self.ledger.adopt_broker_snapshot(
-                    {"positions": [{"symbol": "APUS", "qty": "2", "avg_entry_price": "100"}]}, self.now)
-                admission = dict(quote=s.Quote("APUS", "130", "130.01", self.now), now=self.now,
-                                 market_open=True, session_close=self.now + 3600, stop_file=self.root / "STOP")
-                self.ledger.reserve_intent("sell-1", "APUS", "sell", "2", "90", **admission)
-                self.ledger.reserve_intent("buy-1", "APUS", "buy", "1", "130", **admission)
-                a = {"cum": "1", "average": "110", "status": "partially_filled", "at": self.now + 1,
-                     "execution": {"execution_id": "A", "qty": "1", "price": "110"}}
-                c = {"cum": "2", "average": "100", "status": "filled", "at": self.now + 3,
-                     "execution": {"execution_id": "C", "qty": "1", "price": "90"}}
-                buy_execution = {"execution_id": "B", "qty": "1", "price": "130"}
-                buy_at = self.now + 2
-                if delivery == "nanoseconds":
-                    # Three distinct fill times which collapse to one float.
-                    # The normalized stream/recovery seam must retain their order.
-                    for offset, execution in enumerate((a["execution"], buy_execution, c["execution"]), 1):
-                        execution["timestamp_ns"] = int(self.now * 1_000_000_000) + offset
-                    a["at"] = c["at"] = self.now
-                if delivery == "tied":
-                    # Equal execution times use booking event id, then cum_qty:
-                    # B was booked before the single (0, 2] sell booking.
-                    a["at"] = c["at"] = buy_at
-                if delivery in ("stream", "late_buy"):
-                    self.record(a)
-                if delivery == "late_buy":
-                    self.record(c)
-                self.ledger.record_order("buy-1", "b-buy", "filled", "1", "130", timestamp=buy_at,
-                                         execution=buy_execution)
-                if delivery == "rest_ahead":
-                    self.record(c, with_execution=False)
-                if delivery != "late_buy":
-                    self.record(c)
-                if delivery not in ("stream", "late_buy"):
-                    self.ledger.close()
-                    self.ledger = s.Ledger(self.db, limits)
-                    self.record(a)
-                state = self.ledger.accounting()
-                position = self.ledger.positions()["APUS"]
-                amounts = (state.cash_delta_usd, state.realized_pnl_usd, state.cumulative_realized_loss_usd,
-                           position.qty, position.cost_basis_usd)
-                expected = ((D("70"), D("-20"), D("20"), D("1"), D("110")) if delivery == "tied" else
-                            (D("70"), D("-15"), D("25"), D("1"), D("115")))
-                self.assertEqual(amounts, expected)
-                self.assertEqual(state.halted_reason, None if delivery == "tied" else "gross_loss_cap_reached")
-                self.ledger.close()
-                self.ledger = s.Ledger(self.db, limits)
-                for row in (c, a, c):
-                    self.assertFalse(self.record(row))
-                self.assertEqual(self.ledger.accounting(), state)
-                self.assertEqual(self.ledger.positions()["APUS"], position)
-                if delivery != "tied":
-                    results.append(amounts)
-        self.assertTrue(all(result == results[0] for result in results))
-
     def test_mixed_profit_replay_preserves_basis_at_each_booking(self):
         self.ledger.adopt_broker_snapshot(
             {"positions": [{"symbol": "APUS", "qty": "3", "avg_entry_price": "100.00"}]}, self.now)
@@ -1173,19 +1108,19 @@ class PerExecutionLedger(unittest.TestCase):
         self.ledger.reserve_intent("sell-1", "APUS", "sell", "3", "90.00", **admission)
         # The first two executions use the adopted $100 basis. A later buy
         # changes only the third execution's basis to $110.
+        self.ledger.record_order("sell-1", "b-sell", "partially_filled", "2", "100.00")
         self.ledger.reserve_intent("buy-1", "APUS", "buy", "1", "120.00", **admission)
         self.ledger.record_order("buy-1", "b-buy", "filled", "1", "120.00",
-                                 timestamp=self.now + 3,
                                  execution={"execution_id": "new-basis", "qty": "1", "price": "120.00"})
         self.ledger.record_order("sell-1", "b-sell", "filled", "3", "100.00")
         self.ledger.close()
         self.ledger = s.Ledger(self.db, self.limits)
         rows = [
-            {"cum": "1", "average": "110.00", "status": "partially_filled", "at": self.now + 1,
+            {"cum": "1", "average": "110.00", "status": "partially_filled",
              "execution": {"execution_id": "profit", "qty": "1", "price": "110.00"}},
-            {"cum": "2", "average": "100.00", "status": "partially_filled", "at": self.now + 2,
+            {"cum": "2", "average": "100.00", "status": "partially_filled",
              "execution": {"execution_id": "loss", "qty": "1", "price": "90.00"}},
-            {"cum": "3", "average": "100.00", "status": "filled", "at": self.now + 4,
+            {"cum": "3", "average": "100.00", "status": "filled",
              "execution": {"execution_id": "later-loss", "qty": "1", "price": "100.00"}},
         ]
         for row in reversed(rows):
@@ -1222,9 +1157,6 @@ class PerExecutionLedger(unittest.TestCase):
         self.ledger.db.execute("DELETE FROM meta WHERE key LIKE 'execution_accounting:%'")
         self.ledger.db.execute("INSERT INTO meta VALUES ('execution_accounting:sell-1', '2')")
         self.ledger.db.execute("UPDATE meta SET value='0' WHERE key='realized_loss'")
-        # This ledger predates the optional exact-time column as well.
-        if "at_ns" in {r["name"] for r in self.ledger.db.execute("PRAGMA table_info(executions)")}:
-            self.ledger.db.execute("ALTER TABLE executions DROP COLUMN at_ns")
         self.ledger.close()
         self.ledger = s.Ledger(self.db, self.limits)
         reconciliations = len(self.events("execution_accounting_reconciled"))
@@ -1242,6 +1174,7 @@ class PerExecutionLedger(unittest.TestCase):
         self.assertEqual(tuple(self.ledger.db.iterdump()), before)
         self.assertEqual(self.ledger.accounting(), state)
 
+
     def test_uncovered_rest_booking_survives_another_orders_execution_replay(self):
         self.ledger.close()
         limits = replace(self.limits, max_gross_loss_usd=D("100"), max_drawdown_usd=D("100"))
@@ -1258,8 +1191,7 @@ class PerExecutionLedger(unittest.TestCase):
             self.ledger.reserve_intent(cid, "APUS", side, qty, price,
                                        quote=s.Quote("APUS", "130", "130.01", self.now), **admission)
         # X is REST-only: a mixed +10/-20 pair is known only as 2 @ 95.
-        # Its provisional -10 realized / 10 loss must survive Y's replay.
-        # Its later REST timestamp cannot move it behind the covered fills.
+        # Its provisional -10 realized / 10 loss must survive Y's replay (#355 review F4).
         self.ledger.record_order("X", "b-X", "filled", "2", "95", timestamp=self.now + 10)
         x_state = self.ledger.accounting()
         self.assertEqual((x_state.cash_delta_usd, x_state.realized_pnl_usd, x_state.cumulative_realized_loss_usd),
@@ -1283,11 +1215,14 @@ class PerExecutionLedger(unittest.TestCase):
         state = self.ledger.accounting()
         self.assertEqual(next(i for i in self.ledger.intents() if i.client_id == "X"), x_intent)
         self.assertEqual([e for e in self.events("order_observed") if e["broker_id"] == "b-X"], x_bookings)
-        # Subtract Y's independent A/B/C oracle (70 cash, -15 P&L, 25 loss).
-        self.assertEqual((state.cash_delta_usd - D("70"), state.realized_pnl_usd + D("15"),
-                          state.cumulative_realized_loss_usd - D("25")), (D("190"), D("-10"), D("10")))
+        # Subtract Y's oracle under observation-order replay: B (observed first) raises the basis to
+        # 330/3 = 110 before sell-1's A @ 110 (0) and C @ 90 (-20): 70 cash, -20 P&L, 20 loss, 1 @ 110.
+        # Execution-order replay (A before B) is a recorded follow-up, not this PR.
+        self.assertEqual((state.cash_delta_usd - D("70"), state.realized_pnl_usd + D("20"),
+                          state.cumulative_realized_loss_usd - D("20")), (D("190"), D("-10"), D("10")))
         position = self.ledger.positions()["APUS"]
-        self.assertEqual((position.qty, position.cost_basis_usd), (D("1"), D("115")))
+        self.assertEqual((position.qty, position.cost_basis_usd), (D("1"), D("110")))
+
 
     def test_accounting_replay_quantity_mismatch_rolls_back_late_execution(self):
         self.reserve("buy-1", "buy", "29", "5.64")

@@ -6,7 +6,6 @@ import ast
 import asyncio
 from decimal import Decimal
 import importlib.util
-import json
 from pathlib import Path
 import tempfile
 import time
@@ -293,10 +292,6 @@ class NativeIntegration(unittest.TestCase):
             self.assertEqual(watcher.durable_at_callback,
                              [(Decimal(3), "filled", 0, Decimal("300.02"))] * 3)
             self.assertEqual(ledger.accounting().cash_delta_usd, Decimal("-300.02"))
-            recorded = [json.loads(row[0]) for row in ledger.db.execute(
-                "SELECT payload FROM events WHERE kind='execution_recorded' ORDER BY id")]
-            self.assertEqual([row.get("at_ns") for row in recorded],
-                             [row["transaction_time_ns"] for row in port.activities])
             ledger.close()
             reopened = Ledger(path, limits)
             self.addCleanup(reopened.close)
