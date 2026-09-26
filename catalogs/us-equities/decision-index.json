@@ -395,14 +395,14 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 861,
+    "repositories": 871,
     "public_star_repositories": 357,
-    "beyond_public_stars": 504,
-    "references": 2031,
+    "beyond_public_stars": 514,
+    "references": 2041,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 69,
-      "legacy_candidate": 20,
+      "legacy_candidate": 30,
       "public_star": 357,
       "research_supplement": 581,
       "star_review": 357
@@ -4573,6 +4573,22 @@
       ]
     },
     {
+      "repository": "https://github.com/cinnamon/kotaemon",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/27",
+          "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Watch as a foundation/document-retrieval candidate (open-source RAG UI for chatting with a document corpus); no current requirement for a document-chat UI layer, so this is not registered for the next sweep. Metadata-level registration only: no install attempted, no model-requirements review performed."
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/citrolabs/ego-lite",
       "aliases": [],
       "public_star": true,
@@ -6943,6 +6959,22 @@
       ]
     },
     {
+      "repository": "https://github.com/eleutherai/lm-evaluation-harness",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/24",
+          "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Register as both a us-equities/evaluation-experiments and a foundation/quality-evaluation candidate (few-shot LM evaluation harness; the task named both layers) for the next landscape-sweep discovery step; a facts and fit refuter still gate any survival. Metadata-level registration only: no install attempted, no model-requirements review performed."
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/embeddings-benchmark/mteb",
       "aliases": [],
       "public_star": false,
@@ -7602,6 +7634,22 @@
           "id": "data-great-expectations",
           "decision": "alternative",
           "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/flagopen/flagembedding",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/23",
+          "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Register as a foundation/semantic-rag candidate (BGE-M3: unified dense/sparse/multi-vector embeddings, 100+ languages, 8192-token input) for the next landscape-sweep discovery step; a facts and fit refuter still gate any survival. Metadata-level registration only: no install attempted, no model-requirements review performed."
         }
       ]
     },
@@ -9128,6 +9176,22 @@
           "pointer": "/candidates/173",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/helicone/helicone",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/28",
+          "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Watch as a foundation/observation-inference candidate (hosted/self-hostable LLM observability gateway: logging, cost, sessions, evaluation); the current native-only observation stack (Grafana/Dagu/otel-tui) has no defined gap this would close, so this is not registered for the next sweep. Metadata-level registration only: no install attempted, no model-requirements review performed."
         }
       ]
     },
@@ -11138,6 +11202,22 @@
       ]
     },
     {
+      "repository": "https://github.com/langchain-ai/langmem",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/20",
+          "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog (candidates.json, saturation ledger, landscape/research-state). Register as a foundation/durable-memory candidate for the next landscape-sweep discovery step; a facts and fit refuter still gate any survival. Metadata-level registration only: no install attempted, no model-requirements review performed."
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/langchain-ai/open-swe",
       "aliases": [],
       "public_star": true,
@@ -11482,6 +11562,22 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/lightonai/pylate",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/22",
+          "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Register as a foundation/semantic-rag candidate (late-interaction/ColBERT-style dense retrieval training and inference) for the next landscape-sweep discovery step; a facts and fit refuter still gate any survival. Metadata-level registration only: no install attempted, no model-requirements review performed."
         }
       ]
     },
@@ -14162,6 +14258,22 @@
       ]
     },
     {
+      "repository": "https://github.com/nvidia/tensorrt-llm",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/26",
+          "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Watch only: catalogs/landscape/foundation.json has no dedicated local-inference layer, so this is filed under foundation/semantic-rag as the closest established layer, the same layer the 2026-09-23 sweep used for ollama/ollama and huggingface/text-embeddings-inference (local inference/embedding serving). The host already runs vLLM (:18231) and llama.cpp (:18232) for local inference; this is a comparison candidate only, not a next-sweep commitment. Metadata-level registration only: no install attempted, no model-requirements review performed."
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/nyldn/claude-octopus",
       "aliases": [],
       "public_star": true,
@@ -14644,6 +14756,22 @@
           "path": "manifests/stack.json",
           "pointer": "/components/36",
           "id": "opentelemetry-collector-contrib"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/open-telemetry/semantic-conventions-genai",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/29",
+          "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Watch as a foundation/observation-inference candidate (the maintained OpenTelemetry GenAI semantic-conventions schema, status Development at the pin, that openllmetry/Helicone-style tracing implements against). The GenAI conventions moved here from open-telemetry/semantic-conventions: at 094950f2ccfb17c68d11aecc03937111dd22ca77 that repository's docs/gen-ai pages are 'Moved' notices and its model/gen-ai keeps only deprecated YAML, so this maintained repository, not open-telemetry/semantic-conventions, is the registered candidate. No current requirement to adopt a schema/spec repository as a running component, so this is not registered for the next sweep. Metadata-level registration only: no install attempted, no model-requirements review performed."
         }
       ]
     },
@@ -15489,6 +15617,22 @@
           "pointer": "/candidates/7",
           "decision": "conditional_read_only_repository_due_diligence",
           "review_level": "selected_primary_files"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/osu-nlp-group/hipporag",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/21",
+          "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Register as a foundation/semantic-rag candidate (multi-hop graph RAG: knowledge graph plus personalized PageRank over LLM-extracted triples) for the next landscape-sweep discovery step; a facts and fit refuter still gate any survival. Metadata-level registration only: no install attempted, no model-requirements review performed."
         }
       ]
     },
@@ -20870,6 +21014,22 @@
           "path": "manifests/candidates.json",
           "pointer": "/candidates/4",
           "decision": "Conditional framework for building a connected document/code/session knowledge graph; native plugins exist, but this is not a lightweight default memory addition."
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/traceloop/openllmetry",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "legacy_candidate"
+      ],
+      "references": [
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/25",
+          "decision": "2026-09-26 SOTA-gap audit confirmed this repository absent from every catalog. Register as a foundation/observation-inference candidate (OpenTelemetry-based GenAI tracing/observability SDK) for the next landscape-sweep discovery step; a facts and fit refuter still gate any survival. Metadata-level registration only: no install attempted, no model-requirements review performed."
         }
       ]
     },
