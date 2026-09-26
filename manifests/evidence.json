@@ -13370,8 +13370,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
-      "sha256": "00e3b3a7bded7abe108388059284eec629c6b736bd678227d830ae994a0801a9",
-      "bytes": 38755
+      "sha256": "92bb2e195afec927d3332ddf0d7d02f522d7fd934a1454af2f477cd903c77b2b",
+      "bytes": 39025
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
