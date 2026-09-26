@@ -12,8 +12,8 @@
 <lock dir>/slot-<n>, held by the runner and by codex itself, so a killed runner never frees a slot early), then runs
 this, in the empty directory <work-dir>/empty, bounded to 3000 s (exit 124 on timeout):
 
-  codex --search exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra \
-    -c model_reasoning_effort="max" --output-schema <job>/schema.json -o <job>/last.json --json "<prompt>" </dev/null
+  codex exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra \
+    -c model_reasoning_effort="max" -c web_search="live" --output-schema <job>/schema.json -o <job>/last.json --json "<prompt>" </dev/null
 
 --ignore-user-config keeps the host's Codex config out of the lane, the sandbox is read-only, stdin is /dev/null
 (background `codex exec` otherwise waits on stdin), and the effort is max. Never ultra: ultra lets Codex delegate to
@@ -289,8 +289,10 @@ def archive_attempt(directory: Path) -> int | None:
 
 
 def codex_argv(codex: str, directory: Path, model: str, prompt: str) -> list[str]:
-    return [codex, "--search", "exec", "--ignore-user-config", "--skip-git-repo-check", "-s", "read-only",
-            "-m", model, "-c", f'model_reasoning_effort="{EFFORT}"',
+    # Live web search: `--search` before exec (and no flag) sends external_web_access false, a cached index;
+    # only web_search="live" sends true (evidence/artifacts/sota-refresh-20260926/codex/results/websearch-*.json).
+    return [codex, "exec", "--ignore-user-config", "--skip-git-repo-check", "-s", "read-only",
+            "-m", model, "-c", f'model_reasoning_effort="{EFFORT}"', "-c", 'web_search="live"',
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json", prompt]
 
 

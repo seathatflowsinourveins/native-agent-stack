@@ -5,7 +5,8 @@
   "workflowSizeGuideline": "unrestricted",
   "env": {
     "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
-    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
+    "CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION": "1500"
   },
   "permissions": {
     "deny": [

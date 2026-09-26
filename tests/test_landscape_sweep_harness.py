@@ -675,8 +675,8 @@ class RunnerTests(RunnerCase):
         result = self.job("gpt6-probe", last=LAST, events=[{"type": "thread.started", "thread_id": "fixture"}, COMPLETED])
         directory = self.work / "gpt6" / "gpt6-probe"
         self.assertEqual(self.record()["argv"], [
-            "--search", "exec", "--ignore-user-config", "--skip-git-repo-check", "-s", "read-only",
-            "-m", "gpt-6-astra", "-c", 'model_reasoning_effort="max"',
+            "exec", "--ignore-user-config", "--skip-git-repo-check", "-s", "read-only",
+            "-m", "gpt-6-astra", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"',
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json",
             "Reply in JSON."])  # the prompt without its trailing newline, as "$(cat prompt.txt)" gave it
         self.assertEqual(self.record()["cwd"], str(self.work / "empty"))

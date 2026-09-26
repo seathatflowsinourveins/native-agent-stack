@@ -288,6 +288,17 @@ new run from the latest retained record, and say so when no record exists yet.
 
 ## Coordination
 
+- **Live web search (2026-09-26).** Every GPT-6 job runs with `-c web_search="live"`. `--search` before `exec`
+  (the form this harness used through its first run) and passing no flag both send `external_web_access: false`, so
+  search reads a cached index; only `web_search="live"` sends true. The evidence is the #332 qualification artifacts
+  `evidence/artifacts/sota-refresh-20260926/codex/results/websearch-*.json`, cases W1 to W3. The 2026-09-26 run's
+  GPT-6 lanes ran cached, and its record states that as a lane limitation.
+- **Claude WebSearch budget (2026-09-26).** Claude Code caps WebSearch per session with
+  `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION`, which the installed binary reads at session start (default 200).
+  Workflow agents share their parent session's budget. The 2026-09-26 run used all 200 at 04:10Z, and later Claude
+  workers searched nothing. The repository's `.claude/settings.json` now sets 1500, which covers a full run's
+  budgets (about 1,120 searches). A session started before the change keeps its old cap, so start a fresh
+  session, or headless `claude -p` lanes, for a sweep.
 - **Codex quota.** The Codex account and its quota are shared with every session and host signed in to it. The
   semaphore (3 slots by default, `--slots`) bounds only the jobs of runs that share its lock directory. That
   directory is `<W>/locks` by default; pass the same `--lock-dir` to sweeps that run at the same time. Interactive
