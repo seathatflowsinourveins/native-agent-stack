@@ -19,9 +19,12 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-24.04
-    # Was 5 minutes with a fetch-depth: 1 checkout; raised to cover the added full-history
+    # Was 5 minutes with a fetch-depth: 1 checkout; raised to 10 to cover the added full-history
     # clone (the secret-scan job's comment below records ~34s locally for the same clone).
-    timeout-minutes: 10
+    # Raised to 20 on 2026-09-26: the unittest step alone ran 534s in run 36265075411, main's
+    # job took 598s in run 36263674462, and runs 36265075411, 36265091632 and 36269293122
+    # exceeded the 10-minute limit ("exceeded the maximum execution time of 10m0s").
+    timeout-minutes: 20
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
