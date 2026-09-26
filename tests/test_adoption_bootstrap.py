@@ -1175,8 +1175,9 @@ class RtkConfigReminderTests(unittest.TestCase):
     so a command that merely mentions "show", "branch" or a colon as an ordinary argument
     (`git commit -m "update branch docs"`, `git push origin branch`, `git diff main branch`) is no
     longer wrongly excluded, while a `--git-dir`/`--work-tree` form (`git --git-dir /r/.git
-    show HEAD:x`, `git --work-tree /w branch -a`) is now excluded instead of missed. The reminder now says to replace, not add, the
-    existing `exclude_commands` line, and fires on a duplicate key too: a duplicate is invalid TOML
+    show HEAD:x`, `git --work-tree /w branch -a`) is now excluded instead of missed. The reminder says
+    to replace the whole `exclude_commands` value inside the existing table, adding the key or table
+    only when missing, and fires on a duplicate key too: a duplicate is invalid TOML
     and rtk silently loads defaults (`Config::load().unwrap_or_default()`, src/core/config.rs:278-281).
     Retained verification of these patterns on the pinned binary (the one extracted from the upstream
     rtk-ai/rtk v0.50.0 release asset) is a raw capture in
@@ -1225,9 +1226,11 @@ class RtkConfigReminderTests(unittest.TestCase):
 
     @classmethod
     def expected_reminder(cls, config) -> str:
-        return (f"Reminder: for the Claude hook, replace any existing exclude_commands line in "
-                f"{config} with [hooks] exclude_commands = {cls.EXCLUDE_ITEMS} "
-                "(a duplicate key is invalid TOML and rtk silently loads defaults; "
+        return (f"Reminder: for the Claude hook, in {config}, inside the existing [hooks] table "
+                'replace the whole exclude_commands value (from "exclude_commands =" through its closing "]"), '
+                "or add the key if the table lacks it. Add the [hooks] header line only when the file "
+                f"has no [hooks] table. Use: exclude_commands = {cls.EXCLUDE_ITEMS} "
+                "(a duplicate key or table is invalid TOML and rtk silently loads defaults; "
                 "recipes/README.md#native-context-mode-and-hooks); this script does not write it.")
 
     @staticmethod
@@ -1322,6 +1325,40 @@ class RtkConfigReminderTests(unittest.TestCase):
             self.assertEqual(self.reminders(result.stdout), [])
             self.assertEqual(config.read_text(), self.CONFIGURED)
 
+    def test_printed_assignment_preserves_valid_toml_for_each_edit_case(self):
+        # TOML 1.0.0 #table forbids duplicate tables; use the actual printed assignment
+        # and the recipe's values, with a trailing table to catch insertion in the wrong table.
+        cases = {
+            "single-line value": ('[hooks]\nexclude_commands = ["old"]\n', 'exclude_commands = ["old"]'),
+            "multiline value": ('[hooks]\nexclude_commands = [\n  "old",\n]\n',
+                                'exclude_commands = [\n  "old",\n]'),
+            "missing key": ("[hooks]\n", None),
+            "missing table": ("", None),
+        }
+        for name, (hooks, old_value) in cases.items():
+            with self.subTest(config=name), tempfile.TemporaryDirectory() as tmp:
+                original = hooks + "[tracking]\nhistory_days = 30\n"
+                config = Path(tmp) / "home/.config/rtk/config.toml"
+                config.parent.mkdir(parents=True)
+                config.write_text(original)
+                result, _home = self._run(Path(tmp))
+                reminder, = self.reminders(result.stdout)
+                self.assertEqual(reminder, self.expected_reminder(config))
+                match = re.search(r"Use: (exclude_commands = \[.*\]) \(a duplicate", reminder)
+                self.assertIsNotNone(match, reminder)
+                assignment = match.group(1)
+                if old_value is not None:
+                    edited = original.replace(old_value, assignment, 1)
+                elif hooks:
+                    edited = original.replace("[hooks]\n", f"[hooks]\n{assignment}\n", 1)
+                else:
+                    edited = original + f"[hooks]\n{assignment}\n"
+                parsed = tomllib.loads(edited)
+                self.assertEqual(parsed["hooks"], tomllib.loads(self.CONFIGURED)["hooks"])
+                self.assertEqual(parsed["tracking"], {"history_days": 30})
+                self.assertEqual(edited.count("[hooks]"), 1)
+                self.assertEqual(config.read_text(), original, "the reminder must never write the config")
+
     def test_a_config_without_the_key_is_reminded_and_left_unchanged(self):
         for text in ("[hooks]\n", '[hooks]\nexclude_commands = ["diff"]\n', "# exclude_commands\n",
                      # a config that still has only the pre-widen recommendation is now incomplete too.
@@ -1380,7 +1417,7 @@ class RtkConfigReminderTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             xdg = Path(tmp) / "xdg"
             result, _home = self._run(Path(tmp), xdg_config_home=xdg)
-            self.assertIn(f"replace any existing exclude_commands line in {xdg}/rtk/config.toml with",
+            self.assertIn(f"in {xdg}/rtk/config.toml, inside the existing [hooks] table",
                           self.reminders(result.stdout)[0])
             (xdg / "rtk").mkdir(parents=True)
             (xdg / "rtk/config.toml").write_text(self.CONFIGURED)

@@ -18,6 +18,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 import urllib.parse
 
@@ -1063,8 +1064,10 @@ def _recipe_rtk_block() -> str:
 def _expected_rtk_reminder(config: Path) -> str:
     """The macOS rtk_config_reminder's whole output for `config`, built from the recipe's block."""
     entries = [line.strip().rstrip(",") for line in _recipe_rtk_block().splitlines()[2:-1]]
-    return (f"Reminder: for the Claude hook, replace any existing exclude_commands line in {config} "
-            f"with [hooks] exclude_commands = [{', '.join(entries)}] (a duplicate key is invalid TOML "
+    return (f"Reminder: for the Claude hook, in {config}, inside the existing [hooks] table "
+            'replace the whole exclude_commands value (from "exclude_commands =" through its closing "]"), '
+            "or add the key if the table lacks it. Add the [hooks] header line only when the file "
+            f"has no [hooks] table. Use: exclude_commands = [{', '.join(entries)}] (a duplicate key or table is invalid TOML "
             "and rtk silently loads defaults; recipes/README.md#native-context-mode-and-hooks); "
             "this script does not write it.\n")
 
@@ -1100,6 +1103,39 @@ class RtkConfigPathTests(unittest.TestCase):
     bash 3.2. local_integration: no rtk or Mac ran here, and HOME is a temporary directory."""
 
     BASHES = ("bash", *([BASH32] if BASH32 else []))
+
+    def test_printed_assignment_preserves_valid_toml_for_each_edit_case(self):
+        # TOML 1.0.0 #table forbids duplicate tables. Exercise the printed assignment
+        # under both interpreters, preserving the recipe's values and an unrelated table.
+        cases = {
+            "single-line value": ('[hooks]\nexclude_commands = ["old"]\n', 'exclude_commands = ["old"]'),
+            "multiline value": ('[hooks]\nexclude_commands = [\n  "old",\n]\n',
+                                'exclude_commands = [\n  "old",\n]'),
+            "missing key": ("[hooks]\n", None),
+            "missing table": ("", None),
+        }
+        for bash in self.BASHES:
+            for name, (hooks, old_value) in cases.items():
+                with self.subTest(bash=bash, config=name), tempfile.TemporaryDirectory() as tmp:
+                    original = hooks + "[tracking]\nhistory_days = 30\n"
+                    config = Path(tmp) / FAKE_HOME / MAC_RTK_CONFIG
+                    result = _run_rtk_reminder(bash, Path(tmp), {f"{FAKE_HOME}/{MAC_RTK_CONFIG}": original})
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(result.stdout, _expected_rtk_reminder(config))
+                    match = re.search(r"Use: (exclude_commands = \[.*\]) \(a duplicate", result.stdout)
+                    self.assertIsNotNone(match, result.stdout)
+                    assignment = match.group(1)
+                    if old_value is not None:
+                        edited = original.replace(old_value, assignment, 1)
+                    elif hooks:
+                        edited = original.replace("[hooks]\n", f"[hooks]\n{assignment}\n", 1)
+                    else:
+                        edited = original + f"[hooks]\n{assignment}\n"
+                    parsed = tomllib.loads(edited)
+                    self.assertEqual(parsed["hooks"], tomllib.loads(_recipe_rtk_block())["hooks"])
+                    self.assertEqual(parsed["tracking"], {"history_days": 30})
+                    self.assertEqual(edited.count("[hooks]"), 1)
+                    self.assertEqual(config.read_text(), original, "the reminder must never write the config")
 
     def test_the_recipe_block_at_the_linux_or_xdg_path_still_gets_the_reminder(self):
         block = _recipe_rtk_block()

@@ -3479,13 +3479,13 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "ac864f755739e3d229ced367b8edeac2c1cf7d0d4ea8aff7060b29e2e8e4703e",
-      "bytes": 38718
+      "sha256": "45e0badf2951a47a843c902272b34f57faa1106f655532101cfdfd1074d6ce75",
+      "bytes": 38949
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "c3c51b4acb98af320f71e558311ac38638c917cc6ea3841149bdac68c325d5b5",
-      "bytes": 79451
+      "sha256": "6202815923dc34ca6d9b3c1ed7043640be0bba9280b4df9d828f1ad0abe7e26d",
+      "bytes": 79682
     },
     {
       "path": "adoption/bootstrap.md",
@@ -35570,13 +35570,13 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "833aeb535c4c4d052eb2adb3946c88260d0a97e1dde1ec996173256750623046",
-      "bytes": 91145
+      "sha256": "938cc58061739a239f944a5668336d1cf6d96276f460a7faf437ce85bd1e3942",
+      "bytes": 93507
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "19b7641bd456471aca375c0d05954c5607b08a4ea36df1023d4210b7a75855f8",
-      "bytes": 223948
+      "sha256": "195532912908592be1fe150fd73840e0a969e72248b5ce6ee2bfeadf15b75871",
+      "bytes": 226378
     },
     {
       "path": "tests/test_adoption_contract.py",
