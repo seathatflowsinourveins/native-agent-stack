@@ -278,9 +278,13 @@ How coordination works:
 - **Watcher.** Within one lock directory, the `watch` lock admits one watcher per project
   at a time, whatever its version
   ([watcher.ts:260-265](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/watcher.ts#L260-L265)).
-- **Writes.** Index and graph writes that go through the `index` and `graph` locks queue
-  behind each other within one lock directory. The protocol is the same in both versions, so
-  a version difference alone lets no lock be taken over. Startup generation cleanup is not
+- **Writes.** Index and graph writes that go through the `index` and `graph` locks exclude
+  each other within one lock directory. An operation that cannot take the lock does not
+  queue: an index run logs "Another process is already indexing this project, skipping" and
+  returns
+  ([indexer.ts:1052-1062](https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/src/services/indexer.ts#L1052-L1062)).
+  The protocol is the same in both versions, so a version difference alone lets no lock be
+  taken over. Startup generation cleanup is not
   covered by these locks; see the cleanup race below.
 
 What mixing versions does cause:
