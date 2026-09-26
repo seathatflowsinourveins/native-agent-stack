@@ -1,0 +1,1223 @@
+{
+ "schema_version": 1,
+ "kind": "alpaca_platform_landscape",
+ "observed_at_utc": "2026-09-26",
+ "question": "Is there only nautilus_trader and LEAN? What do other Alpaca users use for SOTA practice, historical data end to end?",
+ "method": {
+  "tavily_research": {
+   "command": "tvly research run --model pro --json --citation-format numbered",
+   "cli": "tavily-cli 0.1.8",
+   "request_id": "uuid-sha256:810355bc30e79707",
+   "status": "completed",
+   "response_time_s": 291.57,
+   "sources": 32,
+   "credential": "TAVILY_API_KEY from the Linux kernel user keyring via kernel_keyring.py exec (memory only, no file)"
+  },
+  "workflow": {
+   "run": "wf_9dec7824-293",
+   "roles": {
+    "research:alpaca-official": "claude-opus-5-5 max",
+    "research:alpaca-github": "claude-opus-5-5 max",
+    "research:alpaca-gpt6": "gpt-6-astra max (codex --search exec, read-only)",
+    "evaluate:alpaca-landscape": "claude-opus-5-5 max",
+    "refute-facts:alpaca-landscape": "claude-sonnet-5 max"
+   },
+   "gpt6_usage": {
+    "exit": 0,
+    "usage": {
+     "input_tokens": 2866303,
+     "cached_input_tokens": 2681216,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 20190,
+     "reasoning_output_tokens": 6769
+    }
+   },
+   "subagent_tokens": 1039116
+  },
+  "rules": "primary sources only; merit not incumbency; installed skills used where useful (search-first, verification-before-completion recorded)"
+ },
+ "evaluation": {
+  "ranked": [
+   {
+    "name": "NautilusTrader 2.0.0rc5 (current destination)",
+    "repository": "https://github.com/nautechsystems/nautilus_trader",
+    "verdict": "keep_but_compare",
+    "why": "Its verified execution-simulation building blocks are the strongest in the set. They include a FillModel with prob_fill_on_limit/prob_slippage, a LatencyModel with separate insert and update latencies, and L1-L3 matching (https://github.com/nautechsystems/nautilus_trader/blob/e7a6e6189c061d9a5b571d27191e90e6b59edef8/crates/execution/src/models/fill.rs ; .../latency.rs). Repo gates established on it:\n- spy-lean-parity one_zero PASS: 136 checks, 0 failed\n- dividend-sim-module\n- native Alpaca paper fault behaviour\n(catalogs/us-equities/runtime-target.json and gates-20260922.json at origin/main 9c1669c7). The corrected 2026-09-25 hftbacktest cross-check agrees with it within tolerance (blueprints/us-equities/sim-engine-crosscheck/README.md). LGPL-3.0; Rust core with Python; Linux and macOS ARM64 per https://nautilustrader.io/docs/latest/getting_started/installation/.\n\nWeak points:\n- No upstream Alpaca adapter. RFC #3374 has been open since 2026-01-01, and adapter PR #3375 was closed unmerged the same day; the maintainer cited project capacity (https://github.com/nautechsystems/nautilus_trader/pull/3375).\n- Corporate-action support is still an open request (https://github.com/nautechsystems/nautilus_trader/issues/3307).\n- rc5 is a prerelease with the IBKR stock-order blocker #4983.",
+    "versus_current": "This is the current destination. Compared with LEAN, it has better fill, latency and queue modelling and native Python/Rust portability with no paid gates. It is worse on packaged equity data (no security master; corporate actions open upstream) and has no official Alpaca adapter, so the in-repo alpaca-py adapter stays load-bearing.",
+    "trial": "No platform trial. Its open risk sits inside the existing protocol: extend compare.py from one_zero to the blocked one_stress, two_zero, two_stress, adaptive_stress and over_limit cases (backtesting-engine open_gaps, catalogs/landscape/us-equities.json). Pass = PASS inside tolerances.json with zero unexplained cash residue."
+   },
+   {
+    "name": "LEAN / QuantConnect + Lean.Brokerages.Alpaca + lean-cli (retained oracle; Alpaca brokerage conditional)",
+    "repository": "https://github.com/QuantConnect/Lean ; https://github.com/QuantConnect/Lean.Brokerages.Alpaca ; https://github.com/QuantConnect/lean-cli",
+    "verdict": "keep_but_compare",
+    "why": "The only engine with an official, maintained Alpaca brokerage, live-data handler and history provider (plugin head e623e796, pushed 2026-09-25; Alpaca partnership post https://alpaca.markets/blog/elevate-your-trading-with-the-new-alpaca-and-quantconnect-integration/). It is exposed through lean-cli: backtest --data-provider-historical Alpaca and --alpaca-environment [live|paper] (https://github.com/QuantConnect/lean-cli/blob/20e58aa65c3c504a6a585e1d4eb1b2e56b233c48/README.md lines 171, 243).\n\nIt has the deepest documented equity-data semantics when paired with QuantConnect's US Equity Security Master: January 1998 onward, about 27,500 US equities, with splits, dividends, mergers, IPOs and delistings (https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/quantconnect/us-equity-security-master).\n\nGates verified in source and docs:\n- CLI use requires membership in 'an organization on a paid tier'. Locally the Alpaca provider serves raw data only; adjusted data needs the Security Master (https://www.quantconnect.com/docs/v2/lean-cli/live-trading/brokerages/alpaca).\n- Every Initialize/SetJob path calls ValidateSubscription() for product 347. It posts machine name, user name, domain, OS and NIC IP/MAC to modules/license/read and shuts down on failure (https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/e623e7963c6319455b9057a9c6f9c272e7453d37/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.cs lines 179, 1421-1543; DataQueueHandler.cs line 81).\n- The repo vendors a prebuilt Alpaca.Markets.dll and has no LICENSE file; the README declares Apache-2.0.\n- In backtests, Alpaca-model orders get no slippage and market orders fill 'immediately and completely' (README lines 209-215 at the same commit).",
+    "versus_current": "Better than Nautilus on packaged security-master semantics and upstream Alpaca support. Worse on cost (paid tier plus separately priced datasets), host-identity upload, a vendored binary and naive default fills. It keeps the frozen-oracle role (LEAN 985ef30). The Alpaca brokerage stays conditional, as blueprints/us-equities/engine/resolution-receipt.json already records ('Initialize calls ValidateSubscription').",
+    "trial": "Only if the user approves a QuantConnect paid-tier organization and the ValidateSubscription host-identity upload:\n(1) lean backtest --data-provider-historical Alpaca over the spy-parity one_zero window, compared bar for bar with the retained alpaca-py SIP raw bars. Pass = 0 OHLCV mismatches.\n(2) lean live deploy --brokerage Alpaca --alpaca-environment paper: one SPY long-to-flat round trip, with the in-repo engine stopped (one owned writer), scored on the alpaca-paper-smoke contract. Pass = filled, flat, cash reconciled, completed-trial recovery with 0 duplicate writes, and an independent alpaca-py observation that agrees."
+   },
+   {
+    "name": "alpaca-py 0.44.0 + in-repo Alpaca adapter (current Alpaca path)",
+    "repository": "https://github.com/alpacahq/alpaca-py",
+    "verdict": "keep_but_compare",
+    "why": "The official SDK. v0.44.0 (2026-08-11) is both the pin and the latest release (https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0). Bars offer raw/split/dividend/all adjustment, asof symbol mapping and the SIP feed, and corporate actions have their own endpoint (https://docs.alpaca.markets/reference/stockbars ; https://docs.alpaca.markets/us/reference/corporateactions-1).\n\nIt carries this repo's qualified paper lifecycle. alpaca-paper-smoke, adaptive-paper-broker-trial and native-fault-behaviour are established, and 180 order actions per minute over five windows ran with 0 HTTP 429 at the observed 200/min limit (catalogs/us-equities/gates-20260922.json; runtime-target.json).\n\nLimits:\n- History starts in 2016, there is no historical security type, and delisted coverage is unmeasured (blueprints/us-equities/alpaca-history-fixture/README.md).\n- Paper trading does not simulate market impact, latency slippage, queue position or dividends, and 'when orders are eligible to be filled, they will receive partial fills for a random size 10%' of the time (https://docs.alpaca.markets/us/docs/paper-trading, updated 2026-07-07).",
+    "versus_current": "This is the current path. The Python alternatives reviewed wrap this same SDK: Lumibot (verified here at v4.6.1), plus ml4t-live, roboquant.py, Vibe-Trading, QuantDinger and AlpacaTradingAgent (per the pinned source in the GitHub return). None of them adds broker capability; they change simulation and data semantics only. The 10% random partial fills and missing impact apply to every Alpaca-paper route below.",
+    "trial": "Already frozen and waiting only for keys: alpaca-history-fixture-v1-20260925 (1,236 Form 25-NSE rows for 2016-2019, 235 collisions, LOGC/TEN/BTX/CBIO, 130 owed rows). Preregistered pass bars:\n- pre-2020-delisting: at least 95% of rows each year with price paths that stop within 10 sessions of the filing\n- dated-security-identity: unresolved_collisions == 0 (predicted to fail, because the API has no security type)"
+   },
+   {
+    "name": "QuantRocket (Zipline + Moonshot, bundled US stock data)",
+    "repository": "https://www.quantrocket.com ; open parts https://github.com/quantrocket-llc/quantrocket-client , https://github.com/quantrocket-llc/moonshot , https://github.com/quantrocket-llc/zipline",
+    "verdict": "keep_but_compare",
+    "why": "The only Alpaca-listed platform (https://alpaca.markets/integrations) that bundles survivorship-free history: 'Survivorship-bias-free 1-minute US stock data is included with the software, with history back to 2007' (https://www.quantrocket.com/alpaca). Its data library lists US Stock Prices from 2007 to present, end-of-day and 1-minute, delisted stocks included, split- and dividend-adjusted, vendor QuantRocket, 'included with software license' (https://www.quantrocket.com/data/). Its docs say 'You can connect to one or more paper Alpaca accounts and one or more live Alpaca accounts' (https://www.quantrocket.com/docs/). It is active: quantrocket-client tag 2.12.0.0 was committed 2026-09-16, newer than the 2.11 the GPT-6 return reported (https://github.com/quantrocket-llc/quantrocket-client/tags).\n\nBlocking facts:\n- The free plan has only sample data (2007-2011 US prices) and 'No live or paper trading' (https://www.quantrocket.com/pricing/).\n- The docs say 'paper trading requires that the live account limit has previously been validated. Thus before paper trading it is first necessary to connect your live account at least once' (https://www.quantrocket.com/docs/). This repo's paper-only, no-live-key policy forbids that.\n- It is proprietary. Zipline commissions and slippage are off by default and Moonshot is vectorized (QuantRocket docs as cited by two returns; not re-fetched here, the page was truncated).",
+    "versus_current": "Better than alpaca-py/Alpaca history on depth (2007 vs 2016) and on explicit delisted coverage, which are exactly the two open gates, pre-2020-delisting and dated-security-identity. Worse than Nautilus on execution realism. Its Alpaca paper route is unusable here, so its value is a licensed data arm, not a platform switch. The catalog knows only moonshot, as 'IBKR-based' discovery.",
+    "trial": "Trigger: after the Alpaca fixture receipt, and only if an identity gate stays open and the user approves one month-to-month license. Load usstock daily/minute data and its securities master for 2016-2019 and score them with the unchanged alpaca-history-fixture-v1-20260925 fixtures and rules. Pass:\n- at least 95% of the 1,236 delisting rows each year with price paths that stop within 10 sessions of the filing\n- unresolved_collisions == 0 across the 235 collisions, with dated tenures and security type\n- all four reused tickers pass\nResearch and backtest use only (the license account limit does not apply to historical data); no QuantRocket paper trading. An optional free pre-check is possible on the 2007-2011 sample bundle, but it cannot test the 2016-2019 gate years."
+   },
+   {
+    "name": "ml4t-backtest 0.1.12 + ml4t-live 0.1.2 + ml4t-data 0.2.0",
+    "repository": "https://github.com/ml4t/backtest ; https://github.com/ml4t/live ; https://github.com/ml4t/data",
+    "verdict": "targeted_candidate",
+    "why": "MIT; all three pushed 2026-09-24/25. They are written almost entirely by stefan-jansen, who also maintains zipline-reloaded: 178 commits on backtest (https://api.github.com/repos/ml4t/backtest/contributors).\n\nml4t-backtest is event-driven, with same-bar or next-bar fills and quote-aware execution. It ships a 'lean' preset: 'Match the frozen LEAN daily US-equity protocol (next-session open, integer shares)'. Its generated real-strategy audit reports 17/17 required pairs passing, including LEAN 18001 on a US equity panel with 'fills equal at declared field precision; 4,027 valuations within $0.01'; that protocol runs without costs (https://github.com/ml4t/backtest/blob/672804b36915742fe18af9cd09b44e9839d39d6f/README.md lines 145-157, 308-335).\n\nml4t-live runs strategies against IBKR or Alpaca with SafeBroker limits and a shadow-to-paper path. Its Alpaca execution adapter is 'stable-supported' while the Alpaca feed is experimental opt-in; state files are 0600; it supports Python 3.12-3.14 on Linux, macOS and Windows (https://github.com/ml4t/live/blob/43fc66f4a56a3861d4c3e05efcf3e9ab06be4461/README.md lines 7-15, 65-75).\n\nRisks: created November 2025, pre-1.0, 22-50 stars, effectively one maintainer. There is no survivorship tooling, and dividend-cash handling is unverified.",
+    "versus_current": "It could be a cheap, Python-native third engine for the daily-bar LEAN parity oracle, with volume-participation partial fills and market impact that Nautilus gets only by configuration. It has no order-book, queue or latency model, so it cannot replace Nautilus for intraday realism, and it is far less proven than LEAN or Nautilus. The catalog records only ml4t/backtest, as discovery_only.",
+    "trial": "Now, at no cost: replay the frozen spy-parity one_zero inputs with BacktestConfig.from_preset('lean'), through a thin runner that writes a compare.py-schema receipt. Score it with blueprints/us-equities/engine-nautilus/spy-parity/compare.py against the LEAN 985ef30 oracle (receipt sha256 06ec0656...).\nPass = PASS with every check inside tolerances.json, zero unattributed failures and zero unexplained cash residue (fills 323.58/291.69, dividends 428.64, end cash 90734.080).\nOnly after a PASS: one SPY long-to-flat round trip through ml4t-live's Alpaca adapter, with paper keys from the existing 0600 store and the in-repo engine stopped, scored on the alpaca-paper-smoke contract."
+   },
+   {
+    "name": "Lumibot 4.6.1 (Lumiwealth)",
+    "repository": "https://github.com/Lumiwealth/lumibot",
+    "verdict": "targeted_candidate",
+    "why": "The most Alpaca-native maintained open framework:\n- a native Alpaca broker on alpaca-py TradingClient with a paper flag and PARTIALLY_FILLED events (https://github.com/Lumiwealth/lumibot/blob/v4.6.1/lumibot/brokers/alpaca.py lines 450-452, 1797-1805)\n- AlpacaBacktesting on the user's own Alpaca history, which accepts only a paper account and only day or minute bars (https://github.com/Lumiwealth/lumibot/blob/v4.6.1/lumibot/backtesting/alpaca_backtesting.py lines 248, 335)\n- Databento, ThetaData, Polygon and pandas sources\nAlpaca's own 2026-07-23 tutorial uses it to go from backtest to paper (https://alpaca.markets/learn/how-i-use-ai-to-research-and-test-trading-ideas-with-alpaca). v4.6.1 was released 2026-09-26.\n\nThe license conflict the catalog holds it on is resolved: LICENSE, setup.py license='GPL-3.0' and PyPI 4.6.1 all say GPL-3.0 (https://pypi.org/pypi/lumibot/4.6.1/json).\n\nRealism is weak:\n- Orders 'fill at the open of the bar that starts at the current time'.\n- Slippage is one absolute amount per order.\n- There is no latency or volume model.\n- AlpacaBacktesting offers only split-adjusted or fully adjusted prices; auto_adjust defaults to 'all' (line 1304).\n- An explicit config stops three trading days early unless full_window=True (https://github.com/Lumiwealth/lumibot/blob/v4.6.1/docsrc/backtesting.alpaca.rst lines 51-55, 115-129).",
+    "versus_current": "Better developer path than Nautilus plus the in-repo adapter: one strategy class runs from backtest to Alpaca paper. Worse on fill realism. Its adjusted-price default conflicts with the raw-bars-plus-separate-actions policy, and it is GPL-3.0 copyleft. It is the alternative the backtesting-engine overturn_protocol names.",
+    "trial": "Now, at no cost:\n(a) Replay the frozen spy-parity one_zero inputs through Lumibot pandas backtesting, with raw bars and the frozen dividend events, scored by compare.py against the LEAN 985ef30 oracle. Pass = PASS inside tolerances.json, zero unattributed failures, zero unexplained cash residue.\n(b) One SPY long-to-flat round trip via its Alpaca broker with PAPER=True, paper keys from the existing 0600 store and the in-repo engine stopped. Pass = the alpaca-paper-smoke contract (filled, flat, cash reconciled, 0 duplicate writes on recovery, independent alpaca-py observation agrees).\nAdoption beyond that still needs the adaptive_practice overturning comparison."
+   },
+   {
+    "name": "hftbacktest 2.4.4 (current sim cross-check)",
+    "repository": "https://github.com/nkaz001/hftbacktest",
+    "verdict": "keep_but_compare",
+    "why": "Explicit queue-position, partial-fill exchange and feed/order latency models (https://hftbacktest.readthedocs.io/en/latest/order_fill.html); MIT. The corrected 2026-09-25 cross-check agrees with Nautilus within sim-capacity's 20%/2x thresholds: fill-rate gap 0.30-0.36%, median time-to-fill 1.16-1.59x (blueprints/us-equities/sim-engine-crosscheck/README.md). GitHub code search for 'alpaca' returns 0, there is no US-equity corporate-action or universe pipeline, and the repo has not been pushed since 2025-12-23 (https://api.github.com/repos/nkaz001/hftbacktest).",
+    "versus_current": "Complements Nautilus on microstructure; replaces nothing. The landscape backtesting-engine row still calls it out_of_scope, which is stale against its cross-check use.",
+    "trial": "No new trial. Keep the determinism, isolation and NBBO-oracle checks mandatory on every re-run, and re-review if upstream is still inactive on 2026-12-23."
+   },
+   {
+    "name": "zipline-reloaded 3.1.1",
+    "repository": "https://github.com/stefan-jansen/zipline-reloaded",
+    "verdict": "keep_but_compare",
+    "why": "Its SQLite adjustment reader/writer covers splits, mergers and dividends, and VolumeShareSlippage caps filled bar volume (catalogs/us-equities/architecture/trading.json entry 5). Apache-2.0. It has no Alpaca route: pylivetrader was last pushed 2022-10-04 (https://api.github.com/repos/alpacahq/pylivetrader). Its last release was 3.1.1 on 2025-07-23 and its last push 2026-01-06, while the maintainer's recent work is in ml4t (https://api.github.com/repos/stefan-jansen/zipline-reloaded).",
+    "versus_current": "A reference for equity data semantics, not an execution path; it adds nothing over LEAN's oracle for this north star.",
+    "trial": "None. Reopen only if the ml4t trial fails and a Pipeline-style factor workflow is required."
+   },
+   {
+    "name": "vectorbt 1.1.0 (open-source)",
+    "repository": "https://github.com/polakowo/vectorbt",
+    "verdict": "keep_but_compare",
+    "why": "AlpacaData pulls Alpaca bars through alpaca-py with adjustment and feed selection (https://github.com/polakowo/vectorbt/blob/61db68ac3e9ec0ca1e6b95688acec2e9b2764e1a/vectorbt/data/custom.py lines 768-917). It simulates fees, slippage and partial sizing in vectorized form, and is active (v1.1.0 2026-07-05, pushed 2026-09-25). It has no broker, paper path or event-driven order state. License: Apache-2.0 with Commons Clause (https://github.com/polakowo/vectorbt/blob/61db68ac3e9ec0ca1e6b95688acec2e9b2764e1a/LICENSE.md).",
+    "versus_current": "Useful only for parameter sweeps (speed unmeasured here); every selected signal still needs Nautilus/LEAN accounting and the Alpaca paper path. The catalog role 'optional_research_sweeps_not_order_authority' stands.",
+    "trial": "None until a frozen sweep protocol exists."
+   },
+   {
+    "name": "Microsoft Qlib 0.9.7",
+    "repository": "https://github.com/microsoft/qlib",
+    "verdict": "keep_but_compare",
+    "why": "Its PIT storage tracks publication dates and revision chains for fundamentals (catalogs/us-equities/architecture/trading.json entry 7). MIT; pushed 2026-09-22, but the last release is v0.9.7 from 2025-08-15 (https://api.github.com/repos/microsoft/qlib). The bundled workflow is China CSI300 with China-style costs (catalogs/landscape/us-equities.json research-factors-ml), and there is no Alpaca connector.",
+    "versus_current": "A research framework for after a defensible US PIT dataset exists; it contributes nothing to historical simulation or paper today. 'Conditional' stands.",
+    "trial": "None until the identity or pit-news-filings gates are established."
+   },
+   {
+    "name": "Alpaca MCP Server v2.3.2 (+ alpaca-skills, Alpaca CLI)",
+    "repository": "https://github.com/alpacahq/alpaca-mcp-server",
+    "verdict": "keep_but_compare",
+    "why": "Official; MIT; v2.3.2 released 2026-09-15. v2 is 'a complete rewrite built with FastMCP and OpenAPI'. ALPACA_PAPER_TRADE defaults to true, and the README warns 'This package does not configure remote MCP authentication' (https://github.com/alpacahq/alpaca-mcp-server/blob/a82ad1ccb740609abc99e10376e42d8e9c1037a1/README.md lines 21, 118, 245). There is no simulator; Alpaca's MCP 'backtest' tutorial is agent-written code over fetched data (https://alpaca.markets/learn/how-to-build-backtest-bollinger-bands-strategy-with-alpaca-mcp-server).",
+    "versus_current": "Research and agent access only. Models stay out of numeric, risk and order state here, so it can never replace the deterministic paper writer. The existing 'conditional_separately_scoped_broker_access' stands.",
+    "trial": "None for this north star. If used for research, run read-only toolsets on paper keys over local stdio."
+   },
+   {
+    "name": "Blueshift (QuantInsti)",
+    "repository": "https://blueshift.quantinsti.com ; https://github.com/QuantInsti/blueshift-developer-kit",
+    "verdict": "not_adopted",
+    "why": "A hosted-only engine and Alpaca partner (https://alpaca.markets/integrations); Alpaca paper is listed on a (c) 2021 docs page (https://blueshift.quantinsti.com/docs/concepts/). Its US data is minute-level from July 2008 for 'a liquidity filtered universe of top 1000 stocks and ETFs', recomputed quarterly. Backtests fill at as-traded prices, and 'Traded volumes per order are capped at 2% available volume at that bar' (https://blueshift.quantinsti.com/docs/datasets/). Delisting coverage is not documented; the survivorship-bias sentence on that page is about Crypto. Nothing is exportable.",
+    "versus_current": "Better default volume-capped fills than LEAN's Alpaca defaults. Cloud-only, closed and limited to the top 1000, so it cannot run the frozen-fixture gates or local receipts.",
+    "trial": "None. Reopen if a local engine or a delisted-inclusive export appears."
+   },
+   {
+    "name": "PyBroker 2.0.1",
+    "repository": "https://github.com/edtechre/pybroker",
+    "verdict": "not_adopted",
+    "why": "Offers Alpaca data sources via alpaca-py, walk-forward windows, bootstrap metrics, and slippage models that can cut fill quantity (https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/src/pybroker/slippage.py). Active: v2.0.1 on 2026-08-28. It has no paper or broker path, and its license is Apache-2.0 with Commons Clause (https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/LICENSE).",
+    "versus_current": "Overlaps skfolio's natively executed WalkForward (selected) and vectorbt sweeps under the same non-OSI licence; no gain on data E2E or paper.",
+    "trial": "None."
+   },
+   {
+    "name": "FinRL-X (FinRL-Trading) / FinRL",
+    "repository": "https://github.com/AI4Finance-Foundation/FinRL-Trading ; https://github.com/AI4Finance-Foundation/FinRL",
+    "verdict": "not_adopted",
+    "why": "FinRL-X's AlpacaManager calls the REST API with raw requests and defaults to paper-api (https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/trading/alpaca_manager.py). Classic FinRL still imports alpaca_trade_api (https://github.com/AI4Finance-Foundation/FinRL/blob/3a0ab5cf3ddf0b59d25f7fd7e435811a18838c6c/finrl/meta/paper_trading/alpaca.py), whose repo is archived (https://github.com/alpacahq/alpaca-trade-api-python). It models costs only at portfolio level and has no order-lifecycle model.",
+    "versus_current": "Weaker than Nautilus/LEAN on every simulation criterion and bypasses the official SDK. The catalog's 2026-09-19 'reject_current_execution_path_retain_research_reference' stands.",
+    "trial": "None."
+   },
+   {
+    "name": "roboquant.py 1.1.0 / roboquant (Kotlin) 3.0.0",
+    "repository": "https://github.com/neurallayer/roboquant.py ; https://github.com/neurallayer/roboquant",
+    "verdict": "not_adopted",
+    "why": "Both have Alpaca brokers for live and paper and Alpaca historic feeds that default to fully adjusted prices (https://github.com/neurallayer/roboquant.py/blob/81d1620a5ebd7715277bb40ae0be6b96c314f77c/roboquant/brokers/alpaca.py ; https://github.com/neurallayer/roboquant/blob/c82664a8476683c74d50b7f82b65fd5ec5bdda7e/roboquant-alpaca/src/org/roboquant/alpaca/AlpacaBroker.kt). SimBroker fills at a chosen bar price with percentage slippage and no partial-fill or latency model. The Python port has 24 stars and last released 2025-03-02; the other is Kotlin/JVM.",
+    "versus_current": "Same Alpaca reach as Lumibot/ml4t-live with weaker simulation and less maintenance evidence.",
+    "trial": "None."
+   },
+   {
+    "name": "Wealth-Lab 9 + Alpaca extension",
+    "repository": "https://www.wealth-lab.com/extension/detail/Alpaca",
+    "verdict": "not_adopted",
+    "why": "Maintained: the Alpaca extension provides historical and streaming data plus paper trading, with WL9 Build 1 dated 2026-08-03 (https://www.wealth-lab.com/extension/detail/Alpaca). But the system requirements are 'Windows OS; Win 11 recommended', and 'Mac users need a Windows emulator like Parallels, VMWare Fusion, or similar' (https://www.wealth-lab.com/Software/Download).",
+    "versus_current": "Fails the Linux/macOS portability requirement outright and is closed C#/.NET.",
+    "trial": "None."
+   },
+   {
+    "name": "Zipline Trader",
+    "repository": "https://github.com/shlomiku/zipline-trader",
+    "verdict": "not_adopted",
+    "why": "A Zipline fork with an Alpaca bundle and an ALPACABroker for the paper endpoint (https://zipline-trader.readthedocs.io/en/latest/going-live.html). Last release 1.6.1 on 2021-03-21, last push 2023-12-25 (https://api.github.com/repos/shlomiku/zipline-trader).",
+    "versus_current": "Dormant, with Python 3.6-era install guidance; offers no advantage over the current path.",
+    "trial": "None."
+   },
+   {
+    "name": "Backtrader + alpaca-backtrader-api",
+    "repository": "https://github.com/alpacahq/alpaca-backtrader-api ; https://github.com/mementum/backtrader",
+    "verdict": "not_adopted",
+    "why": "AlpacaStore imports the archived alpaca_trade_api (https://github.com/alpacahq/alpaca-backtrader-api/blob/475bb54b8b16506092eb97df5a7cb1d05f0b86be/alpaca_backtrader_api/alpacastore.py); the adapter's last release was v0.15.0 on 2022-01-02. Backtrader (GPL-3.0) was last pushed 2024-08-19 and has no GitHub releases (https://api.github.com/repos/mementum/backtrader).",
+    "versus_current": "A legacy route; the catalog's overlap/excluded dispositions stand.",
+    "trial": "None."
+   },
+   {
+    "name": "Vibe-Trading (HKUDS)",
+    "repository": "https://github.com/HKUDS/Vibe-Trading",
+    "verdict": "not_adopted",
+    "why": "MIT; v0.1.15 on 2026-09-09. It has an alpaca-py connector with paper-trade and read-only profiles (https://github.com/HKUDS/Vibe-Trading/blob/5e9ffd1a73e71b4a1be45c5b5e330b6877fee849/agent/src/trading/connectors/alpaca/sdk.py), but none of its 40+ backtest loaders is for Alpaca (https://github.com/HKUDS/Vibe-Trading/tree/5e9ffd1a73e71b4a1be45c5b5e330b6877fee849/agent/backtest/loaders). It is an LLM agent platform.",
+    "versus_current": "Adds agent orchestration, not simulation or paper capability. LLM-driven orders conflict with the deterministic order/risk rule.",
+    "trial": "None for the engine role."
+   },
+   {
+    "name": "QuantDinger",
+    "repository": "https://github.com/OpenByteInc/QuantDinger",
+    "verdict": "not_adopted",
+    "why": "Its alpaca-py client supports paper and live accounts, but the module README lists 'No stop or stop-limit orders yet' and 'No historical bar fetching helpers' (https://github.com/OpenByteInc/QuantDinger/blob/7da255c1e754daf939e1c58066ca2e44eb701b43/backend_api_python/app/services/alpaca_trading/README.md lines 145-146). Licensing is split: backend Apache-2.0, frontend source-available.",
+    "versus_current": "Narrower Alpaca order support than the current adapter and no Alpaca historical path.",
+    "trial": "None."
+   },
+   {
+    "name": "AlgoBulls (Phoenix / pyalgotrading)",
+    "repository": "https://github.com/algobulls/pyalgotrading ; https://app.algobulls.com",
+    "verdict": "not_adopted",
+    "why": "Alpaca partner (https://alpaca.markets/integrations). Strategies run on AlgoBulls servers. Its help pages say backtest and paper use AlgoBulls' own Virtual Broker, not an Alpaca paper account (https://help.algobulls.com/broker/alpaca.html; search snippet, not fetched). No survivorship, corporate-action or fill model is documented.",
+    "versus_current": "No reproducible local pipeline and no Alpaca-paper qualification route.",
+    "trial": "None."
+   },
+   {
+    "name": "Composer (by SoFi)",
+    "repository": "https://www.composer.trade",
+    "verdict": "not_adopted",
+    "why": "A no-code builder running on Alpaca's Broker API (https://alpaca.markets/blog/composer-partners-with-alpaca-broker-api/). It trades through Composer-held accounts rather than the user's Trading API paper account, and its backtest data lineage is undocumented.",
+    "versus_current": "Cannot use the user's Alpaca paper account or produce reproducible receipts.",
+    "trial": "None."
+   },
+   {
+    "name": "TradingView (Alpaca broker integration)",
+    "repository": "https://www.tradingview.com/broker/Alpaca/",
+    "verdict": "not_adopted",
+    "why": "Charting plus manual order entry through Alpaca (https://alpaca.markets/learn/trade-with-alpaca-on-tradingview, updated 2024-11-12). The Pine tester is hosted, with no exportable point-in-time pipeline, and automatic Pine-to-Alpaca execution is not documented.",
+    "versus_current": "A discretionary front end, not a simulation or deterministic paper lane.",
+    "trial": "None."
+   },
+   {
+    "name": "Tradetron",
+    "repository": "https://tradetron.tech/brokers",
+    "verdict": "not_adopted",
+    "why": "A no-code builder and strategy marketplace listed by Alpaca (https://alpaca.markets/integrations ; https://alpaca.markets/blog/tradingview-oco-tradetron/). No documentation of historical data, fill model or paper semantics was found.",
+    "versus_current": "No evaluable historical-simulation contract.",
+    "trial": "None."
+   },
+   {
+    "name": "Blankly",
+    "repository": "https://github.com/blankly-finance/blankly",
+    "verdict": "not_adopted",
+    "why": "LGPL-3.0. Last push 2024-12-30; latest GitHub release v1.18.0-beta from 2022-06-15 (https://api.github.com/repos/blankly-finance/blankly). It depends on the archived alpaca-trade-api, and its engineering notes assume infinite resting liquidity and exact current-price fills (https://github.com/blankly-finance/blankly/blob/main/blankly/BACKTESTING_ENGINEERING.md).",
+    "versus_current": "Dormant and weaker on realism.",
+    "trial": "None."
+   },
+   {
+    "name": "LiuAlgoTrader",
+    "repository": "https://github.com/amor71/LiuAlgoTrader",
+    "verdict": "not_adopted",
+    "why": "MIT, with an Alpaca Learn series (https://alpaca.markets/learn/liualgotrader1), but the last release v0.4.35 is from 2023-01-08 and the last push 2023-08-13 (https://api.github.com/repos/amor71/LiuAlgoTrader).",
+    "versus_current": "Dormant.",
+    "trial": "None."
+   },
+   {
+    "name": "pylivetrader",
+    "repository": "https://github.com/alpacahq/pylivetrader",
+    "verdict": "not_adopted",
+    "why": "Alpaca's Zipline-API live runtime. Last release v0.7.1 on 2022-04-11, last push 2022-10-04 (https://api.github.com/repos/alpacahq/pylivetrader).",
+    "versus_current": "Dormant.",
+    "trial": "None."
+   },
+   {
+    "name": "AlpacaTradingAgent (TradingAgents fork)",
+    "repository": "https://github.com/huygiatrng/AlpacaTradingAgent",
+    "verdict": "not_adopted",
+    "why": "A single-author fork whose LLM agents place orders directly through TradingClient(paper=use_paper) (https://github.com/huygiatrng/AlpacaTradingAgent/blob/524cd77ea532b7ff0920b070769b9b416ae5caad/tradingagents/dataflows/alpaca_utils.py lines 196-197). No backtest engine, no releases.",
+    "versus_current": "Violates the rule that models stay out of order and risk state; upstream TradingAgents is already 'unqualified' in the catalog.",
+    "trial": "None."
+   },
+   {
+    "name": "StockSharp",
+    "repository": "https://github.com/StockSharp/StockSharp",
+    "verdict": "not_adopted",
+    "why": "Its solution references ../Connectors/Alpaca/Alpaca.csproj, which is outside the public repository (per the GitHub return), so the Alpaca connector cannot be source-reviewed.",
+    "versus_current": "Unverifiable Alpaca path; C# like LEAN but without LEAN's oracle evidence.",
+    "trial": "None."
+   },
+   {
+    "name": "trade-frame",
+    "repository": "https://github.com/rburkholder/trade-frame",
+    "verdict": "not_adopted",
+    "why": "C++ with lib/TFAlpaca, but LICENSE.txt says it 'may not be used nor distributed without proper license agreement' (per the GitHub return).",
+    "versus_current": "The licence blocks use.",
+    "trial": "None."
+   }
+  ],
+  "catalog_gaps": [
+   "QuantRocket was never evaluated as an Alpaca platform. The only record is quantrocket-llc/moonshot, discovery_only and described as 'IBKR-based' (evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json). Its docs support one or more paper and live Alpaca accounts, and its data library lists 1-minute US prices from 2007 including delisted stocks (https://www.quantrocket.com/docs/ , https://www.quantrocket.com/data/). Record also that its paper trading requires connecting a live account first, which the paper-only policy forbids.",
+   "Licensed data sources for the two open identity gates were never scored on the frozen alpaca-history-fixture rows:\n- QuantRocket usstock with its securities master\n- QuantConnect US Equity Security Master (January 1998 onward, about 27,500 equities, splits/dividends/mergers/IPOs/delistings; https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/quantconnect/us-equity-security-master) with AlgoSeek bars\n- Sharadar ('Active and delisted coverage extends back to the 90s'; 14 tables including a securities master and corporate actions; https://sharadar.com/)\nThe dated-security-identity note in catalogs/us-equities/gates-20260922.json still names Databento as the only path. The 2026-09-23 SOTA manifest refuted only the stale Nasdaq Data Link client, not the Sharadar dataset.",
+   "ml4t is effectively unevaluated. Only ml4t/backtest appears, as discovery_only (catalogs/landscape/claude-independent-discovery.json, 2026-09-22). ml4t/live, ml4t/data, the 'lean' preset and the 17/17 real-strategy parity audit against LEAN 18001 were never reviewed (https://github.com/ml4t/backtest/blob/672804b36915742fe18af9cd09b44e9839d39d6f/README.md).",
+   "Lumibot evidence is stale and self-contradictory. catalogs/us-equities/architecture/trading.json (2026-09-19, v4.5.91) holds it on 'LICENSE GPL-3.0; setup.py declares MIT', but at v4.6.1 setup.py, LICENSE and PyPI all say GPL-3.0 (https://pypi.org/pypi/lumibot/4.6.1/json). The backtesting-engine layer also lists it twice: 'conditional' among the candidates, and 'unqualified' with no evidence_refs among the alternatives.",
+   "The LEAN Alpaca brokerage 'conditional' row in catalogs/landscape/us-equities.json omits verified gates:\n- CLI use requires a paid-tier organization (https://www.quantconnect.com/docs/v2/lean-cli/live-trading/brokerages/alpaca).\n- Every initialization posts machine name, user name, OS and NIC IP/MAC to QuantConnect's license API for product 347 (AlpacaBrokerage.cs lines 1421-1543 at e623e796).\n- A prebuilt Alpaca.Markets.dll is vendored, and there is no LICENSE file (README-only Apache-2.0).\n- In backtests, Alpaca-model orders get no slippage and market orders fill immediately and completely.\n- Locally, the Alpaca provider serves raw data only.\nblueprints/us-equities/engine/resolution-receipt.json already records the subscription call; the landscape row does not.",
+   "hftbacktest is marked out_of_scope in the backtesting-engine alternatives, based on unverified packet text, while blueprints/us-equities/sim-engine-crosscheck uses it as the accepted 2026-09-25 cross-check. No row records that upstream has not been pushed since 2025-12-23 (https://api.github.com/repos/nkaz001/hftbacktest).",
+   "Alpaca's integration partners have no dated dispositions: Blueshift, Wealth-Lab, AlgoBulls, Composer, Tradetron and TradingView (https://alpaca.markets/integrations), plus Zipline Trader (shlomiku). All are not_adopted here, for these reasons:\n- Blueshift: cloud-only, top-1000 universe\n- Wealth-Lab: Windows-only\n- AlgoBulls: paper runs on its own virtual broker\n- Composer: Broker-API accounts\n- Zipline Trader: dormant since 2021\nRecording the reasons prevents repeat research.",
+   "Community Nautilus Alpaca adapters were never compared with the in-repo adapter. afrojuju1/nautilus_trader has a Rust crates/adapters/alpaca crate (151 paths, last push 2026-07-07, 0 stars), which the open RFC https://github.com/nautechsystems/nautilus_trader/issues/3374 references. It is not an adoption candidate, but it is a design reference for the 27 local lifecycle cases."
+  ],
+  "recommendation": "No. NautilusTrader and LEAN are not the only options. Alpaca users mostly use:\n- QuantConnect/LEAN with the official Alpaca plugin (Alpaca's own partner)\n- Lumibot (featured in Alpaca's 2026-07-23 tutorial)\n- QuantRocket (paid, with bundled survivorship-free data)\n- hosted and no-code tools: Composer, Tradetron, TradingView, AlgoBulls, Blueshift, Wealth-Lab\n- hand-written alpaca-py code with vectorbt or PyBroker research\n- agent layers: Alpaca's MCP server, Vibe-Trading\n\nAlpaca's integrations page and tutorials show how broad the ecosystem is; they do not show a measured state-of-the-art winner.\n\nOn merit for this north star, nothing reviewed overturns the current pairing: NautilusTrader as destination, LEAN as frozen oracle, alpaca-py for paper.\n\nThe remaining end-to-end gap is data, not the engine. None of the Alpaca-integrated open frameworks ships a survivorship-free universe, delisting history or dated security identity; only licensed datasets do (QuantRocket usstock, QuantConnect Security Master with AlgoSeek, Sharadar, Databento).\n\nThe two platforms that bundle data both carry gates the returns missed or left open:\n- **LEAN:** its local Alpaca path needs a paid-tier QuantConnect organization and uploads host identity on every initialization.\n- **QuantRocket:** paper trading needs a live account to be validated first, which the paper-only policy forbids.\n\nRecommended order:\n1. Run the frozen alpaca-history-fixture once paper keys are stored (the user's 2026-09-25 decision).\n2. Now, at no cost, run the two targeted trials on the frozen SPY one_zero case scored by compare.py: ml4t-backtest's 'lean' preset first, then Lumibot 4.6.1. After a PASS only, each gets one SPY paper round trip on the alpaca-paper-smoke contract, with one owned writer.\n3. If either identity gate stays open, ask the user to pick one licensed data arm by cost and score it on the same frozen fixture. Buying QuantConnect's paid tier or a QuantRocket license is a user decision.\n4. Record the catalog corrections in catalog_gaps.\n\nAdoption beyond a trial still requires the adaptive_practice overturning comparison.\n\nEvidence and scope:\n- Primary-source review only: gh api metadata and source at the cited commits, official docs fetched 2026-09-26, and this repository at origin/main 9c1669c7.\n- Nothing was installed or run, and no performance was measured.\n- Items marked as search snippet, 'per the GitHub return', or 'cited by two returns' were not re-fetched.\n- Conflicts among the returns, resolved here:\n  - QuantRocket's latest release is 2.12.0.0 (2026-09-16), not 2.11.\n  - Lumibot's license is GPL-3.0 everywhere at 4.6.1.\n  - The LEAN Alpaca plugin has no LICENSE file, but its README declares Apache-2.0.\n  - Blueshift's survivorship caveat applies to its crypto dataset.\n- The supply-chain points (vendored DLL, archived SDK, Commons Clause, copyleft) were checked by hand; the supply-chain-risk-auditor skill was not run.\n- Raw scratch outputs, which are not evidence of record: <scratch> Tavily was not used. The key arrived in plain text in the request, so regenerate it at Tavily and store it as a 0600 provider file (docs/secret-storage.md) before any workflow uses it.",
+  "skills_used": [
+   "search-first",
+   "verification-before-completion"
+  ]
+ },
+ "facts_check": "# Answer to the user's question\n\n**No — NautilusTrader and LEAN are far from the only options.** Verified live against `gh api`, PyPI, and Alpaca's/QuantConnect's own docs (not just re-trusting the three returns), the real landscape for an Alpaca-paper, historical-E2E Python/Rust workflow is:\n\n- **LEAN + Lean.Brokerages.Alpaca** — deepest *official* integration, but its Alpaca backtest defaults to zero slippage and full immediate fills unless you override the models, and its richest historical data (Security Master/AlgoSeek) lives in paid QuantConnect Cloud datasets.\n- **Lumibot** — single codebase from backtest to Alpaca paper via one flag; confirmed **GPL-3.0 throughout** (see Finding 1 below — a \"GPL vs MIT\" discrepancy claimed in one return does not exist).\n- **ml4t-data / ml4t-backtest / ml4t-live** — newest (Nov 2025) and, on the evidence, the most technically rigorous pure-Python stack: volume-participation partial fills, market impact, next-bar-open semantics, a frozen LEAN-parity preset, shadow→paper→live staging. MIT. But pre-1.0 with 22–50 GitHub stars — real, but unproven at scale.\n- **QuantRocket** — proprietary, self-hosted, Docker on Linux/macOS; bundles a vendor claim of survivorship-bias-free 1-min US data since 2007; supports multiple paper *and* live Alpaca accounts natively.\n- **Alpaca's own official agent layer** — `alpacahq/alpaca-mcp-server` (MIT, paper-by-default, very active), `alpaca-skills`, `alpaca/cli`. Not a backtester.\n- **vectorbt / PyBroker** — Alpaca as a *data source only* (no paper/live path), and both are Apache-2.0-plus-Commons-Clause (not OSI open source).\n- **NautilusTrader**: confirmed **zero** Alpaca code upstream. RFC #3374 has been open since 2026-01-01 (8 comments, still unresolved); PR #3375 was opened and closed *unmerged the same day* — maintainer cited lack of capacity. Getting Alpaca into Nautilus today means a custom/community adapter (like this repo's own).\n- Alpaca's own **integrations directory lists exactly 17 partners** (confirmed live, 2026-09-26): Alexa, AlgoBulls, Algorum, Arcade Trader, Blueshift, Breaking Equity, Composer, Passiv, PredictNow.ai, QuantRocket, Slack, Streak, Tradetron, TradingView, Trellis, Wealth-Lab, Zapier. That's the actual \"full landscape\" of *official* integrations; beyond it sits a long tail of independent OSS frameworks with their own Alpaca connectors (Lumibot, ml4t, vectorbt, PyBroker, roboquant, backtrader's now-frozen bridge, pylivetrader, FinRL, and several AI-agent frameworks).\n- Your pinned `alpaca-py==0.44.0` is confirmed current — it is the actual latest release (2026-08-11).\n\n**Tavily key:** not used. The string pasted in the request is a live-looking API key. Per this repo's `docs/secret-storage.md` and the standing rule to never read/print/copy a credential value, I did not paste it into any command. It wasn't needed either — `gh api` + official docs covered every check below. Recommend rotating it at the provider and storing the replacement as a 0600 per-provider file outside any worktree.\n\n# Facts-refuter results (role requested by the workflow)\n\n**Method:** pulled live GitHub metadata (license, stars, `pushed_at`, archived, default branch) and latest-release tag/date for all **44** distinct repos named across the three returns; cross-checked PyPI JSON wherever GitHub Releases were silent or a discrepancy was alleged; re-fetched cited files/line-ranges and re-ran `gh api search/code` for every \"0 hits\" exclusion claim; fetched Alpaca's and QuantConnect's live docs directly (`docs.alpaca.markets`, `alpaca.markets/integrations`, `quantrocket.com`, `wealth-lab.com`). ~100 `gh api` calls + ~10 PyPI/doc fetches, all live on 2026-09-26.\n\n## Confirmed false / misleading\n\n**1. [gpt6 blob] Lumibot license — FALSE.**\nClaimed: *\"current dev LICENSE is GPL-3.0, while inspected PyPI metadata says MIT... The v4.6.1 artifact license could not be fetched.\"*\nFact: I fetched it. PyPI JSON for `lumibot` **4.6.1** (the exact version in question) reports `license: \"GPL-3.0\"` with classifier `License :: OSI Approved :: GNU General Public License v3 (GPLv3)`, uploaded 2026‑09‑26T01:07:45Z. The `dev`-branch `LICENSE` file is literal GPLv3 text; GitHub's SPDX detection also says GPL-3.0. No MIT appears anywhere in current metadata — the claimed discrepancy doesn't exist.\nEvidence: https://pypi.org/pypi/lumibot/json · https://github.com/Lumiwealth/lumibot/blob/dev/LICENSE\n\n**2. [official blob] QuantRocket client \"Active\" via tag 2.12.0.0 — misleading, not false.**\nClaimed: *\"Active: client tag 2.12.0.0 committed 2026-09-16... The client has 32 stars.\"*\nFact: the tag and date are real (commit `add411b1`, 2026‑09‑16T20:14:08Z, \"fix for requests 2.34.x\") — but it sits on a separate `2.12dev` branch. The repo's actual **default branch** (`master`, what a plain clone/`pip install` checks out) hasn't moved since **2024‑11‑06T14:46:38Z** — 22 months stale as of this check. \"Active\" is true only for the unmerged dev branch.\nEvidence: https://github.com/quantrocket-llc/quantrocket-client/commits/master · https://github.com/quantrocket-llc/quantrocket-client/branches\n\nThat is the complete list of confirmed errors. Everything else specific and checkable that I tested held up — including several places the three returns *appear* to disagree with each other.\n\n## Apparent disagreements that are not errors (different valid sources)\n- **zipline-reloaded 3.1.1 date**: official/github say 2025‑07‑23 (GitHub Release `published_at` — confirmed); gpt6 says 2025‑07‑19 (PyPI `upload_time` — also confirmed; PyPI got the wheel 4 days before the GitHub Release was published).\n- **blankly \"latest release\"**: github blob's `v1.18.0-beta`/2022‑06‑15 is the true latest *GitHub Release* (confirmed, none newer exists); gpt6's `1.18.25b0`/2023‑07‑23 is the true latest *PyPI* upload (confirmed). The maintainer kept publishing to PyPI for ~13 months after the last GitHub Release.\n- **hftbacktest \"Python 2.4.4 / 2025-12-10\"**: confirmed as the real current PyPI version — even though GitHub's own Release list tops out at `py-v2.1.1` (2024‑11‑24) for Python; 2025‑12‑10 is when the *Rust* crate (`rust-v0.9.4`) was tagged. Python and Rust release independently in this repo.\n- **backtrader \"master head commit 2023-04-19\"** (gpt6): confirmed exactly right — commit `b853d7c9`, \"Version 1.9.78.123\". The `pushed_at` value used by official/github (2024‑08‑19) reflects a push to a *different* branch; master itself hasn't moved since April 2023. (Bonus: gpt6's \"GPL-3.0-**or-later**\" is also the more precise SPDX id — the LICENSE text literally contains \"or any later version,\" which GitHub's own generic \"GPL-3.0\" tag elides.)\n- **alpaca-backtrader-api \"dormant since 2022-01-02\"**: confirmed true by direct commit inspection — master's HEAD really is `475bb54b`, 2022‑01‑02. `pushed_at` shows 2026‑06‑23, but that's a push to a non-default branch (the repo has a dozen `pyup-scheduled-update-*`/`dependabot` branches), not master.\n- **QuantRocket platform \"2.11.0 (2025-01-28)\"**: confirmed directly on QuantRocket's own changelog as the real latest platform release. The separate `quantrocket-client` GitHub package uses an independent version series (now 2.12.0.0) — the two numbers are for different components, not a contradiction.\n\n## Central, decision-critical claims independently re-confirmed\n- NautilusTrader `develop`: 18 adapter crates, **no Alpaca** (directory listing matches exactly); code search for \"alpaca\" = 0 hits. Issue #3374 open since 2026‑01‑01 (8 comments); PR #3375 opened/closed unmerged the same day. LGPL-3.0; v1.231.0 stable (2026‑08‑02); v2.0.0rc5 prerelease (2026‑09‑15) — exact matches. Its `FillModel`/`ProbabilisticFillState`/`LatencyModel` code citations check out at the exact cited line numbers.\n- Lean.Brokerages.Alpaca: no LICENSE file (confirmed null), 18 stars, created 2024‑06‑07. README's exact lines: \"Orders through Alpaca do not experience slippage in backtests\" / \"We fill market orders immediately and completely in backtests\" and the required QC Security-Master/AlgoSeek/Coarse-Universe datasets — verbatim matches.\n- LEAN: Apache-2.0, 21,781 stars, and its only-ever GitHub Release genuinely is v2.4.0.1 from 2017‑08‑08 (ships continuously off master since).\n- Alpaca's paper-simulator rules — quoted near-identically by all three returns — are verbatim-accurate against the live doc (updatedAt 2026‑07‑07): no market impact, information leakage, latency slippage, queue position, price improvement, regulatory fees, or dividends; Borrow Fees \"⛔️ (Coming Soon!)\"; orders \"filled only when they become marketable\"; size \"not checked against the NBBO quantities\"; random partial fills \"10% of the time.\" This applies identically underneath every platform above.\n- Spot-checked code claims all confirmed as described: alpaca-mcp-server's `ALPACA_PAPER_TRADE` defaults `\"true\"`; ml4t-live's `paper: bool = True`; AlpacaTradingAgent's `paper=use_paper` (default `True`); FinRL's `paper_trading/alpaca.py` still does `import alpaca_trade_api as tradeapi` (the archived SDK); QuantDinger's README literally says \"No stop or stop-limit orders yet\" / \"No historical bar fetching helpers\"; Vibe-Trading's Alpaca connector file exists (37KB); roboquant.py's `tests/samples/alpaca_*.py` + `tests/integration/test_alpaca.py` all exist; StockSharp's Alpaca connector really is outside the public repo (`../Connectors/Alpaca/Alpaca.csproj`); Wealth-Lab's extension page shows the exact claimed dates/pricing/data limits.\n\n## Not a finding, just a calibration note\nStar counts drift by a handful between the three returns and my live check (e.g., LEAN 21,781 vs. gpt6's 21,779; TradingAgents 108,649 vs. 108,642 in the exclusion note) — normal growth over the hours between passes, not errors.\n\n## Not independently re-verified\nTradingView Learn-article publish/update dates (2023‑10‑19 / 2024‑11‑12) — the live page didn't expose them in a machine-checkable way in this pass; treat as unverified, consistent with how the source itself already flagged it.\n\n**skills_used:** none formally invoked via the Skill tool — verification was done directly (search-first / verification-before-completion in practice): every claim above traces to a `gh api` response, a PyPI JSON response, or a live doc/page fetch captured in this session, not to the returns themselves.",
+ "returns": {
+  "official": {
+   "platforms": [
+    {
+     "name": "QuantConnect LEAN + Lean.Brokerages.Alpaca (QuantConnect Cloud or local LEAN CLI)",
+     "repository": "https://github.com/QuantConnect/Lean ; https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
+     "kind": "Open-source event-driven engine (C#/.NET; Python or C# algorithms) plus hosted QuantConnect Cloud; official Alpaca brokerage plugin maintained by QuantConnect",
+     "alpaca_support": "Official partnership in both directions. Alpaca runs a dedicated QuantConnect page and a launch blog post. QC docs list US equities, equity options, index options and crypto on Alpaca cash or margin accounts, paper (the default) and live, with TIF Day or GTC (options always Day). The plugin repo (created 2024-06-07) deploys from QC Cloud or runs local live trading through LEAN CLI. In code, AlpacaBrokerageModel whitelists these order types: equity Market/Limit/StopMarket/StopLimit/TrailingStop/MOO/MOC; option and index-option Market/Limit/ComboMarket/ComboLimit (2-4 legs); crypto Market/Limit/StopLimit. It allows outside-hours orders only as Day limit orders and uses AlpacaFeeModel.",
+     "historical_data_e2e": "Strongest inside QC Cloud, where backtests use QuantConnect-hosted datasets. This pass did not re-check their survivorship and corporate-action properties. Live data can come from the free QuantConnect feed, the Alpaca feed, or both. How much history the Alpaca provider gives for warm-up depends on the user's Alpaca data plan (search snippet). Local LEAN needs data downloaded or licensed separately. Whether LEAN CLI can use Alpaca as a historical backtest provider was not checked; the plugin ships an alpaca.json CLI module manifest. QC docs say live orders are adjusted automatically on stock splits.",
+     "backtest_realism": "Alpaca-specific rules in the code: order-type, TIF and extended-hours validation, and the Alpaca fee model. Fills and slippage use LEAN's generic pluggable models (not re-checked here). No Alpaca-specific latency, queue-position or partial-fill model was found.",
+     "paper_path": "Mature. The same algorithm deploys to an Alpaca paper account from QC Cloud or local LEAN CLI. QC also has its own separate QuantConnect Paper Trading simulator. Fills on Alpaca paper follow Alpaca's paper rules (see notes).",
+     "license": "LEAN is Apache-2.0. GitHub detects no license file in Lean.Brokerages.Alpaca (spdx none); confirm the license before vendoring it.",
+     "latest_release": null,
+     "released_at": null,
+     "stars": 21781,
+     "maintenance": "Active: LEAN and the plugin were both pushed 2026-09-25. LEAN has no current GitHub releases (the last is v2.4.0.1 from 2017-08-08) and ships continuously from master. The plugin has 18 stars.",
+     "evidence": [
+      "https://alpaca.markets/quantconnect - Alpaca's dedicated 'Alpaca & QuantConnect' page (indexed in https://alpaca.markets/llms.txt)",
+      "https://alpaca.markets/blog/elevate-your-trading-with-the-new-alpaca-and-quantconnect-integration/ - Alpaca launch blog (llms.txt index)",
+      "https://alpaca.markets/learn/algo-trading-landscape - Alpaca (2020-09-23) says QuantConnect is 'integrated with Alpaca API'",
+      "https://www.quantconnect.com/docs/v2/cloud-platform/live-trading/brokerages/alpaca - fetched: asset classes, cash/margin, paper as default plus live, TIF Day/GTC, QuantConnect vs Alpaca live data providers, extended hours only for Day limit orders, orders auto-adjusted on splits",
+      "https://www.quantconnect.com/docs/v2/cloud-platform/datasets/alpaca - (search snippet) Alpaca-provider history for history requests and warm-up depends on the Alpaca data plan",
+      "https://www.quantconnect.com/docs/v2/cloud-platform/live-trading/brokerages/quantconnect-paper-trading - (search snippet) QC's own simulated paper brokerage",
+      "https://github.com/QuantConnect/Lean/blob/HEAD/Common/Brokerages/AlpacaBrokerageModel.cs - gh api: order-type sets per security type, GetFeeModel returns AlpacaFeeModel, combo orders limited to 2-4 legs, outside-hours orders must be Limit with Day TIF",
+      "https://github.com/QuantConnect/Lean.Brokerages.Alpaca - gh api 2026-09-26 UTC: created 2024-06-07, pushed 2026-09-25, 18 stars, no license detected; README covers LEAN CLI local live trading and the QC and/or Alpaca live data feed",
+      "https://github.com/QuantConnect/Lean - gh api: 21781 stars, Apache-2.0, pushed 2026-09-25, last GitHub release v2.4.0.1 (2017-08-08)"
+     ]
+    },
+    {
+     "name": "QuantRocket (Zipline + Moonshot)",
+     "repository": "https://github.com/quantrocket-llc (open components moonshot and quantrocket-client; the core platform is licensed Docker software)",
+     "kind": "Commercial, self-hosted Python platform for research, backtesting and live trading (JupyterLab), deployed with Docker: Docker Desktop on macOS and Windows, native Docker on Linux. It bundles Zipline (event-driven, can trade live), Moonshot (vectorized pandas backtester), data collectors and an order blotter.",
+     "alpaca_support": "Listed as a partner on Alpaca's integrations page. The usage guide supports: one or more paper plus one or more live Alpaca accounts; loading Alpaca's securities master before paper or live trading; real-time Alpaca trades, quotes or minute aggregates on the IEX or SIP feed per API key; a daily Alpaca easy-to-borrow (ETB) dataset (history from 2019-03-01) for short-sale limits; and all Alpaca order statuses, including PartiallyFilled, DoneForDay and Replaced. It does not support Alpaca bracket orders.",
+     "historical_data_e2e": "The most complete packaged historical pipeline in the Alpaca ecosystem. The vendor says survivorship-bias-free 1-minute US stock data back to 2007 is included with the software (vendor claim; the free plan has sample data only, per search snippet). Sharadar and EDI datasets are priced separately. Alpaca supplies real-time data and execution, not the historical data. The fetched text does not document how corporate actions are adjusted.",
+     "backtest_realism": "Moonshot is vectorized, with turnover-based commissions (e.g. USStockFixedCommission), fixed one-way SLIPPAGE_BPS and pluggable slippage classes (e.g. IBKRBorrowFees); Alpaca ETB data can limit short positions. Zipline is event-driven; its commission and slippage models are off by default and must be set in initialize(). No latency or queue-position model is documented.",
+     "paper_path": "Alpaca paper is supported natively: set the API key with --paper. Zipline strategies trade paper or live on Alpaca minute aggregates, which the docs recommend. Caveat: the license section says paper trading needs the live account limit to have been validated first; whether that applies to Alpaca-only users is not confirmed.",
+     "license": "Proprietary licensed software: Non-Professional or Professional license, with a free evaluation tier (search snippet). moonshot and quantrocket-client are Apache-2.0.",
+     "latest_release": "quantrocket-client 2.12.0.0",
+     "released_at": "2026-09-16T20:14:08Z",
+     "stars": 280,
+     "maintenance": "Active: client tag 2.12.0.0 committed 2026-09-16; moonshot pushed 2026-09-22. The star count is moonshot's; the client has 32.",
+     "evidence": [
+      "https://alpaca.markets/integrations - fetched: QuantRocket listed ('Research and trade automated strategies with this professional-grade platform.')",
+      "https://www.quantrocket.com/alpaca - fetched: 'Survivorship-bias-free 1-minute US stock data is included with the software, with history back to 2007'; Zipline and Moonshot; Zipline deployed live",
+      "https://www.quantrocket.com/docs/ - fetched: 'You can connect to one or more paper Alpaca accounts and one or more live Alpaca accounts'; collect the securities master before paper or live; IEX/SIP feeds; ETB data from 2019-03-01; 'Alpaca's bracket orders are not currently supported'; Moonshot SLIPPAGE_BPS; Zipline 'Commissions and slippage are disabled by default'; Docker Desktop on macOS/Windows and Docker on Linux",
+      "https://www.quantrocket.com/pricing/ ; https://www.quantrocket.com/terms/ - (search snippets) free plan with sample data; Non-Professional and Professional licenses; account_limit in the license profile",
+      "https://www.quantrocket.com/pricing/data/sharadar/ ; https://www.quantrocket.com/pricing/data/edi/ - separately priced datasets (search result titles)",
+      "https://github.com/quantrocket-llc/quantrocket-client - gh api: tag 2.12.0.0 committed 2026-09-16, Apache-2.0, 32 stars",
+      "https://github.com/quantrocket-llc/moonshot - gh api: 280 stars, Apache-2.0, pushed 2026-09-22"
+     ]
+    },
+    {
+     "name": "Lumibot (Lumiwealth)",
+     "repository": "https://github.com/Lumiwealth/lumibot",
+     "kind": "Open-source Python framework for backtesting and live trading; one strategy class runs in backtest, paper and live; self-hosted",
+     "alpaca_support": "Alpaca documents it: an Alpaca Learn article (2026-07-23) says Lumibot is 'already structured to connect directly with Alpaca's APIs and paper trading environment'. It has a native Alpaca broker (ALPACA_IS_PAPER, API key/secret or OAuth token) and an AlpacaBacktesting data source for stocks, ETFs, crypto and US equity options, including option chains and option fills.",
+     "historical_data_e2e": "Data sources are pluggable. The Alpaca source uses the user's own Alpaca history (a paper account is required) and caches it so reruns download nothing. Other sources: Databento, ThetaData, Polygon, Yahoo, IBKR REST, Alpha Vantage, CCXT and pandas. AlpacaBacktesting only accepts day or minute timesteps. The fetched Alpaca backtesting doc does not cover survivorship-free universes or corporate-action handling.",
+     "backtest_realism": "Bar-based simulation. Bars are labelled by start time (at 10:00 the newest 5-minute bar is the 09:55 bar), and orders fill at the open of the bar that starts at the current time. Option fills are modelled. No latency, queue or partial-fill model is documented. The project logged an investigation of an Alpaca options-backtesting regression dated 2026-09-23, so this area is under active change.",
+     "paper_path": "Direct: set ALPACA_IS_PAPER=true and run the same strategy code. Alpaca's own 2026 tutorial uses the backtest, then Alpaca paper, then live flow.",
+     "license": "GPL-3.0",
+     "latest_release": "v4.6.1",
+     "released_at": "2026-09-26T01:07:52Z",
+     "stars": 2090,
+     "maintenance": "Very active: pushed 2026-09-26 with frequent releases. The repo catalog disposition is still 'conditional'.",
+     "evidence": [
+      "https://alpaca.markets/learn/how-i-use-ai-to-research-and-test-trading-ideas-with-alpaca - fetched (2026-07-23): Lumibot 'already structured to connect directly with Alpaca's APIs and paper trading environment'; AlpacaBacktesting 'only accepts timestep=\"day\" or timestep=\"minute\"'",
+      "https://github.com/Lumiwealth/lumibot/blob/HEAD/docsrc/backtesting.alpaca.rst - gh api: uses 'historical data that comes with your own Alpaca account'; 'a paper account is required for backtests'; stocks/ETFs/crypto/US equity options; cache; bars labelled by start time; orders 'fill at the open of the bar that starts at the current time'",
+      "https://github.com/Lumiwealth/lumibot/tree/HEAD/lumibot/backtesting - gh api: alpaca, databento, thetadata, polygon, yahoo, interactive_brokers_rest, alpha_vantage, ccxt, pandas, polymarket and routed data sources",
+      "https://github.com/Lumiwealth/lumibot/blob/HEAD/docsrc/brokers.alpaca.rst - Alpaca broker doc; gh code search finds the ALPACA_IS_PAPER flag in lumibot/credentials.py",
+      "https://github.com/Lumiwealth/lumibot/blob/HEAD/docs/investigations/2026-09-23_alpaca-options-backtesting-and-ibkr-4592-window-regression.md - active Alpaca options-backtesting regression work (gh code search hit)",
+      "https://github.com/Lumiwealth/lumibot - gh api: 2090 stars, GPL-3.0, v4.6.1 released 2026-09-26T01:07:52Z"
+     ]
+    },
+    {
+     "name": "Blueshift (QuantInsti)",
+     "repository": "closed platform (https://blueshift.quantinsti.com); public repo: https://github.com/QuantInsti/blueshift-developer-kit",
+     "kind": "Cloud-hosted platform for research, backtesting and live trading, with Python and no-code visual interfaces; no self-hosted engine found",
+     "alpaca_support": "Partner on Alpaca's integrations page, with an Alpaca blog post 'Blueshift Integration with Alpaca'. Blueshift docs list 'Alpaca (live and paper)' with trade and data streaming (the docs page is (c) 2021). The current product page lists Alpaca Securities LLC as the live broker for US equities; the only other broker is Spring by ICICI Direct for NSE.",
+     "historical_data_e2e": "Built-in 'curated, bias-free and fully-adjusted datasets' for US equities (vendor claim). The fetched pages do not document the vendor, bar frequency or survivorship method. Data stays in the cloud; no export path was found.",
+     "backtest_realism": "Not documented in the fetched pages; fill, slippage and commission models are unverified.",
+     "paper_path": "Alpaca paper is listed in the docs (page dated 2021). Whether the current UI still offers it was not re-checked.",
+     "license": "Proprietary SaaS ('Try for FREE'; pricing not disclosed). The developer kit is NOASSERTION; the demo-strategies repo has no license.",
+     "latest_release": null,
+     "released_at": null,
+     "stars": null,
+     "maintenance": "The product is active (2026 product page), but the docs page is dated (c) 2021. The developer kit was pushed 2026-03-19 (7 stars). The demo-strategies repo has 179 stars and was pushed 2025-09-26.",
+     "evidence": [
+      "https://alpaca.markets/integrations - fetched: Blueshift listed ('Write trading strategies on this web-based backtesting app.')",
+      "https://alpaca.markets/blog/blueshift-backtest/ - Alpaca blog 'Backtesting to Live Trading in One Place Finally! Blueshift Integration with Alpaca'",
+      "https://blueshift.quantinsti.com/docs/concepts/ - fetched: 'Both trade and data streaming - FXCM (live and paper), Alpaca (live and paper)'; page (c) 2021",
+      "https://www.quantinsti.com/blueshift - fetched: live brokers 'Alpaca Securities LLC' (US Equities) and 'Spring by ICICI Direct'; 'Built-in curated, bias-free and fully-adjusted datasets'; 'Cloud Based'; Python and No-Code; 'Try for FREE'",
+      "https://github.com/QuantInsti/blueshift-developer-kit - gh api: 7 stars, NOASSERTION, pushed 2026-03-19",
+      "https://github.com/QuantInsti/blueshift-demo-strategies - gh api: 179 stars, no license, pushed 2025-09-26"
+     ]
+    },
+    {
+     "name": "vectorbt (open-source)",
+     "repository": "https://github.com/polakowo/vectorbt",
+     "kind": "Open-source vectorized library for backtesting and research (Python with NumPy, Numba and pandas)",
+     "alpaca_support": "Data only: vbt.AlpacaData ('`Data` for data coming from `alpaca-py`'), plus an Alpaca Learn article 'Introduction to Backtesting with VectorBT' (2022-01-13). The open-source package has no Alpaca broker, order or paper adapter.",
+     "historical_data_e2e": "Downloads and updates Alpaca bars through alpaca-py. The user or the data source must handle universe construction, survivorship and corporate actions.",
+     "backtest_realism": "Vectorized, bar-level portfolio simulation; fee and slippage parameters were not re-checked in this pass. There is no Alpaca-linked simulation of order lifecycle, latency, queue position or partial fills.",
+     "paper_path": "None built in; signals must be sent to Alpaca paper with alpaca-py or another executor.",
+     "license": "Apache-2.0 with Commons Clause (per LICENSE.md; GitHub reports NOASSERTION). Not OSI open source: it forbids selling products or services whose value comes from the software.",
+     "latest_release": "v1.1.0",
+     "released_at": "2026-07-05T17:17:14Z",
+     "stars": 9183,
+     "maintenance": "Active: pushed 2026-09-25; v1.1.0 released 2026-07-05.",
+     "evidence": [
+      "https://alpaca.markets/learn/introduction-to-backtesting-with-vectorbt - Alpaca Learn (2022-01-13), listed on https://alpaca.markets/learn/tag/backtesting (fetched)",
+      "https://github.com/polakowo/vectorbt/blob/HEAD/vectorbt/data/custom.py - gh api: class AlpacaData at line 768, '`Data` for data coming from `alpaca-py`', download() and update() examples",
+      "https://github.com/polakowo/vectorbt/blob/HEAD/LICENSE.md - gh api: 'License: Apache 2.0 with Commons Clause'",
+      "https://github.com/polakowo/vectorbt - gh api: 9183 stars, v1.1.0 released 2026-07-05, pushed 2026-09-25"
+     ]
+    },
+    {
+     "name": "Zipline via Alpaca pylivetrader (zipline-reloaded engine)",
+     "repository": "https://github.com/alpacahq/pylivetrader ; https://github.com/stefan-jansen/zipline-reloaded",
+     "kind": "Live-trading runtime written by Alpaca that is compatible with the Zipline API. zipline-reloaded is the maintained community fork of the Zipline event-driven backtester.",
+     "alpaca_support": "Alpaca's own 2020 landscape article names 'pylivetrader to run algorithms from Quantopian with Alpaca'. Today the maintained route from Zipline to live Alpaca is QuantRocket's Zipline, not pylivetrader.",
+     "historical_data_e2e": "Not checked beyond repository metadata. Zipline backtests run on data bundles the user ingests; these repos provide no Alpaca bundle or survivorship-free source that was found.",
+     "backtest_realism": "Zipline is event-driven with pluggable commission and slippage models (QuantRocket's docs note they are off by default). No latency or queue model.",
+     "paper_path": "Only through pylivetrader, which has been unmaintained since 2022 (last release 2022-04-11) and is not a viable paper route today.",
+     "license": "Apache-2.0 (both)",
+     "latest_release": "pylivetrader v0.7.1",
+     "released_at": "2022-04-11T19:44:56Z",
+     "stars": 685,
+     "maintenance": "pylivetrader is dormant (last push 2022-10-04). zipline-reloaded has 1943 stars, released 3.1.1 on 2025-07-23 and was pushed 2026-01-06 (slow release cadence).",
+     "evidence": [
+      "https://alpaca.markets/learn/algo-trading-landscape - fetched (2020-09-23): 'pylivetrader to run algorithms from Quantopian with Alpaca'",
+      "https://github.com/alpacahq/pylivetrader - gh api: 685 stars, Apache-2.0, v0.7.1 released 2022-04-11, last push 2022-10-04",
+      "https://github.com/stefan-jansen/zipline-reloaded - gh api: 1943 stars, Apache-2.0, 3.1.1 released 2025-07-23, pushed 2026-01-06",
+      "https://www.quantrocket.com/docs/ - Zipline 'Commissions and slippage are disabled by default'; QuantRocket runs Zipline live on Alpaca"
+     ]
+    },
+    {
+     "name": "Backtrader + alpaca-backtrader-api",
+     "repository": "https://github.com/alpacahq/alpaca-backtrader-api ; https://github.com/mementum/backtrader",
+     "kind": "Event-driven Python backtester plus a store, broker and data-feed adapter written by Alpaca",
+     "alpaca_support": "Adapter written by Alpaca, with an Alpaca Learn article 'Alpaca & Backtrader: Tools of the Trade (Part 1)' (2020-08-20). Alpaca's 2020 landscape article says: 'Users can run live trading with Alpaca!'.",
+     "historical_data_e2e": "The adapter feeds Alpaca market data into Backtrader; its code has not changed since 2022-01-02. No survivorship or corporate-action pipeline was verified.",
+     "backtest_realism": "Backtrader's simulated broker with commission and slippage schemes (not re-checked here). No latency or queue model.",
+     "paper_path": "Only the old adapter route, unchanged since 2022-01-02 and long before the alpaca-py 0.44 line; not a maintained paper route.",
+     "license": "Adapter Apache-2.0; Backtrader GPL-3.0",
+     "latest_release": "alpaca-backtrader-api v0.15.0",
+     "released_at": "2022-01-02T21:31:15Z",
+     "stars": 701,
+     "maintenance": "Dormant. The adapter's last default-branch commit was 2022-01-02. Backtrader (23320 stars) was last pushed 2024-08-19 and publishes no GitHub releases.",
+     "evidence": [
+      "https://alpaca.markets/learn/backtrader-01 - Alpaca Learn (2020-08-20), listed on the fetched backtesting tag page",
+      "https://alpaca.markets/learn/algo-trading-landscape - fetched: Backtrader 'Users can run live trading with Alpaca!'",
+      "https://github.com/alpacahq/alpaca-backtrader-api - gh api: 701 stars, Apache-2.0, v0.15.0 released 2022-01-02, last default-branch commit 2022-01-02 ('fix-usage-of-exchange-calendars')",
+      "https://github.com/mementum/backtrader - gh api: 23320 stars, GPL-3.0, pushed 2024-08-19, no GitHub releases"
+     ]
+    },
+    {
+     "name": "LiuAlgoTrader",
+     "repository": "https://github.com/amor71/LiuAlgoTrader",
+     "kind": "Open-source Python framework for trading, backtesting and optimization, built as multiple producer and consumer processes; runs on a laptop or a multi-core Linux server",
+     "alpaca_support": "Alpaca Learn has a series on it: Part I, Part II, internals and performance tuning, optimization, and portfolio management. Its docs say it supports Alpaca APIs for trading plus data loading and streaming, Gemini for crypto and Polygon.io for data (search snippet).",
+     "historical_data_e2e": "Loads Alpaca or Polygon data for US equities and crypto (search snippet). Survivorship and corporate-action handling are not documented in the sources retrieved.",
+     "backtest_realism": "Not checked in this pass.",
+     "paper_path": "Its trader app 'runs algorithmic trading using the Alpaca Markets APIs' (search snippet). Paper use was not checked separately, and the project is dormant.",
+     "license": "MIT",
+     "latest_release": "v0.4.35",
+     "released_at": "2023-01-08T18:07:29Z",
+     "stars": 912,
+     "maintenance": "Dormant: last push 2023-08-13.",
+     "evidence": [
+      "https://alpaca.markets/learn/liualgotrader1 ; https://alpaca.markets/learn/liualgotrader-part2 ; https://alpaca.markets/learn/liualgotrader-optimization ; https://alpaca.markets/learn/how-to-manage-a-portfolio-with-liu - Alpaca Learn series (search results)",
+      "https://liualgotrader.readthedocs.io/en/latest/ - (search snippet) Alpaca trading, data and streaming, Gemini, Polygon.io; US equities and crypto; laptop or multi-core Linux server",
+      "https://github.com/amor71/LiuAlgoTrader - gh api: 912 stars, MIT, v0.4.35 released 2023-01-08, last push 2023-08-13"
+     ]
+    },
+    {
+     "name": "WealthLab (Wealth-Lab 8/9) + Alpaca extension",
+     "repository": "closed (https://www.wealth-lab.com/extension/detail/Alpaca)",
+     "kind": "Commercial Windows desktop platform for backtesting and automated trading (.NET), with a paid Alpaca broker and data extension",
+     "alpaca_support": "Partner on Alpaca's integrations page. The extension 'Connects to Alpaca brokerage, and includes historical and streaming data'. It supports paper trading, option data and trading (since Build 25), and a Strategy Monitor fed by streaming bars built on the server.",
+     "historical_data_e2e": "Uses Alpaca history. Per the extension page, Alpaca returns no intraday data before 2016, native intraday bar sizes are limited to 1, 5, 10, 15 and 30 minutes, and live accounts without a paid data subscription get delayed history. Survivorship and corporate-action handling are not documented.",
+     "backtest_realism": "WealthLab's backtester was not re-checked in this pass.",
+     "paper_path": "Supports paper and live Alpaca accounts. Live-account users on the free IEX data must enter both sets of keys.",
+     "license": "Proprietary. The Alpaca extension costs $49.95 for a lifetime licence or is included in Premium, and every extension needs a WealthLab subscription (14-day trial).",
+     "latest_release": "Alpaca extension for Wealth-Lab 9, Build 1",
+     "released_at": "2026-08-03",
+     "stars": null,
+     "maintenance": "Active: the extension's first WL9 release is listed as 8/3/2026. Runs only on Windows 10/11 64-bit; macOS needs Parallels or a VM and there is no Linux version (search snippet). This fails the repo's Linux/macOS portability requirement.",
+     "evidence": [
+      "https://alpaca.markets/integrations - fetched: Wealth-Lab listed ('Innovative backtesting software that covers all markets with automated trading features.')",
+      "https://www.wealth-lab.com/extension/detail/Alpaca - fetched: broker plus historical and streaming data; Paper Trading; option support (Build 25); 'Alpaca does not return intraday data before 2016'; intraday sizes 1/5/10/15/30 minutes; delayed history without a subscription; '$49.95 / Lifetime OR included in Premium subscription'; 'all Extensions require a Wealth-Lab Subscription'; WL9 Build 1 dated 8/3/2026",
+      "https://www.wealth-lab.com/Support/Faq ; https://www.wealth-lab.com/Discussion/Computer-Specifications-8732 - (search snippet) Windows 10/11 64-bit; Mac users need Parallels or VMware"
+     ]
+    },
+    {
+     "name": "AlgoBulls (Phoenix, pyalgotrading SDK)",
+     "repository": "closed platform; SDK https://github.com/algobulls/pyalgotrading",
+     "kind": "Hosted algo-trading platform (web and Android) with a Python SDK; strategies run on AlgoBulls' servers",
+     "alpaca_support": "Partner on Alpaca's integrations page ('Live Trading, Paper Trading, Backtesting, Strategy Customizations'), with Alpaca Learn articles on AlgoBulls Phoenix. AlgoBulls' help pages say Alpaca connects by OAuth, historical and live Alpaca data are available, and strategies can run on NASDAQ and NYSE (search snippet).",
+     "historical_data_e2e": "Backtests run inside the platform on Alpaca historical data (search snippet). No documentation on survivorship or corporate actions was found.",
+     "backtest_realism": "Backtests and paper trading use the AlgoBulls Virtual Broker with configurable starting funds (search snippet). Fill and slippage models are not documented in the sources retrieved.",
+     "paper_path": "Paper trading runs on AlgoBulls' own Virtual Broker, not on an Alpaca paper account. Live trading uses Alpaca via OAuth.",
+     "license": "Proprietary platform; pyalgotrading SDK is MIT",
+     "latest_release": null,
+     "released_at": null,
+     "stars": 301,
+     "maintenance": "SDK pushed 2026-02-04; the platform's help pages are live.",
+     "evidence": [
+      "https://alpaca.markets/integrations - fetched: AlgoBulls listed ('Make use of powerful features like Live Trading, Paper Trading, Backtesting, Strategy Customizations.')",
+      "https://alpaca.markets/learn/exploring-trading-strategies-with-algobulls-phoenix ; https://alpaca.markets/learn/validating-and-configuring-your-trading-strategy-with-phoenix - Alpaca Learn (search results)",
+      "https://help.algobulls.com/broker/alpaca.html ; https://app.algobulls.com/help/article/alpaca - (search snippets) OAuth connection, Alpaca historical and live data, NASDAQ/NYSE, 'Backtesting, Paper Trading, or Live Trading without altering a single line of code', AlgoBulls Virtual Broker for backtest and paper",
+      "https://github.com/algobulls/pyalgotrading - gh api: 301 stars, MIT, pushed 2026-02-04"
+     ]
+    },
+    {
+     "name": "TradingView (Alpaca broker integration)",
+     "repository": "closed (https://www.tradingview.com/broker/Alpaca/)",
+     "kind": "Commercial web and desktop charting platform with a Pine Script strategy tester and a built-in broker panel",
+     "alpaca_support": "Alpaca Connect/OAuth partner with its own Alpaca pages. Stocks, ETFs, options and crypto can be traded from TradingView charts through Alpaca. Alpaca's guide (2023-10-19, updated 2024-11-12) says the integration 'combines Alpaca's real-time market data and TradingView's advanced charts'.",
+     "historical_data_e2e": "Backtests are Pine Script runs hosted by TradingView. No exportable point-in-time historical pipeline and no corporate-action or survivorship controls were verified.",
+     "backtest_realism": "The Pine strategy tester's fill assumptions were not checked in this pass.",
+     "paper_path": "Manual trading from the chart or panel on the connected Alpaca account. Search snippets say both live and paper Alpaca accounts can connect, but the fetched Alpaca guide does not say so (unverified). TradingView's own 'Paper Trading' is a separate simulator. Automatic execution of Pine strategies into Alpaca was not confirmed.",
+     "license": "Proprietary SaaS",
+     "latest_release": null,
+     "released_at": null,
+     "stars": null,
+     "maintenance": "Integration is active: the Alpaca guide was updated 2024-11-12 and TradingView is listed on Alpaca's 2026 site.",
+     "evidence": [
+      "https://alpaca.markets/integrations - fetched: TradingView listed ('Connect with TradingView and unlock advanced charting to trade commission-free.')",
+      "https://alpaca.markets/tradingview - Alpaca TradingView page (llms.txt summary: trade from TradingView charts)",
+      "https://alpaca.markets/learn/trade-with-alpaca-on-tradingview - fetched: 2023-10-19, updated 2024-11-12; says nothing on connecting paper accounts or automatic Pine execution",
+      "https://www.tradingview.com/broker/Alpaca/ - (search snippet) live and paper Alpaca accounts supported; not confirmed by a fetch",
+      "https://alpaca.markets/learn/how-to-trade-options-on-tradingview-with-alpaca-trading-api-account - options on TradingView through Alpaca (search result)"
+     ]
+    },
+    {
+     "name": "Alpaca MCP Server (official)",
+     "repository": "https://github.com/alpacahq/alpaca-mcp-server",
+     "kind": "Alpaca's own Model Context Protocol server, giving LLM agents tools for trading, market data and corporate actions; not a backtest engine",
+     "alpaca_support": "First-party: Alpaca docs have a 'Trading MCP Server' page, and an Alpaca Learn article 'How To Build and Backtest a Bollinger Bands Strategy Using Alpaca's MCP Server' (2026-04-06).",
+     "historical_data_e2e": "Serves historical bars, quotes and trades for stocks, crypto and options, plus corporate-action announcements, but has no simulator. Any 'backtest' is code an agent writes over the fetched data.",
+     "backtest_realism": "None: no fill, slippage or latency simulation.",
+     "paper_path": "Paper by default: ALPACA_PAPER_TRADE defaults to true; set it to false for live.",
+     "license": "MIT",
+     "latest_release": "v2.3.2",
+     "released_at": "2026-09-15T14:13:25Z",
+     "stars": 993,
+     "maintenance": "Very active: pushed 2026-09-25. It fits only this repo's research and agent lane; numeric, risk and order state must stay in deterministic code.",
+     "evidence": [
+      "https://docs.alpaca.markets/us/docs/alpaca-mcp-server.md - 'Trading MCP Server' (in the fetched docs index https://docs.alpaca.markets/llms.txt)",
+      "https://github.com/alpacahq/alpaca-mcp-server - gh api: 993 stars, MIT, v2.3.2 released 2026-09-15, pushed 2026-09-25; README: ALPACA_PAPER_TRADE defaults to true, corporate-actions tool, historical data",
+      "https://alpaca.markets/learn/how-to-build-backtest-bollinger-bands-strategy-with-alpaca-mcp-server - Alpaca Learn (2026-04-06), on the fetched backtesting tag page"
+     ]
+    },
+    {
+     "name": "alpaca-py + hand-written backtests (Alpaca Learn reference pattern)",
+     "repository": "https://github.com/alpacahq/alpaca-py",
+     "kind": "Alpaca's official Python SDK (Trading, Market Data and Broker APIs), used with backtests the user writes in pandas; no engine",
+     "alpaca_support": "First-party SDK, listed in Alpaca's 'SDKs and Tools' docs (updated 2026-08-06). Alpaca's recent backtesting tutorials are built around its own APIs rather than a named engine: mean reversion (2026-06-04), ridge-regression workflow (2026-07-09), 0DTE options (2025-08-26) and options backtesting (2024-02-07).",
+     "historical_data_e2e": "Raw inputs only: historical stock bars, quotes, trades and auctions; option bars and trades; news; and a corporate-actions endpoint plus a corporate-actions SSE stream. The user must build point-in-time universes, survivorship control and an adjustment policy.",
+     "backtest_realism": "Whatever the author implements; Alpaca provides no simulator.",
+     "paper_path": "Native: paper keys and endpoint, with the same API spec as live (Alpaca paper doc).",
+     "license": "Apache-2.0 (from the installed 0.44.0 wheel metadata)",
+     "latest_release": null,
+     "released_at": null,
+     "stars": null,
+     "maintenance": "Official and current. This repo pins 0.44.0; the latest upstream release and star count were not re-queried because the gh budget was used up.",
+     "evidence": [
+      "https://docs.alpaca.markets/us/docs/sdks-and-tools.md - fetched (updatedAt 2026-08-06): official SDKs; community Rust SDKs apca/apcacli and alpaca-rust",
+      "https://docs.alpaca.markets/us/docs/paper-trading.md - fetched (updatedAt 2026-07-07): 'The API spec is the same between the paper trading and live accounts'",
+      "https://docs.alpaca.markets/llms.txt - fetched docs index: historical stock bars/quotes/trades/auctions, option bars/trades, news, Corporate actions endpoint and Corporate Actions SSE",
+      "https://alpaca.markets/learn/tag/backtesting - fetched: backtesting tutorials from 2024-2026 built on Alpaca's Trading API and MCP server",
+      "https://github.com/alpacahq/alpaca-py - License: Apache-2.0 per the METADATA of the installed alpaca-py 0.44.0 wheel"
+     ]
+    },
+    {
+     "name": "Composer (Composer by SoFi)",
+     "repository": "closed (https://www.composer.trade/)",
+     "kind": "Retail no-code and AI strategy builder ('symphonies') with hosted backtests and automated execution in Composer brokerage accounts",
+     "alpaca_support": "Partner on Alpaca's integrations page. Alpaca's blog covers 'Composer Launches Automated Trading Platform with Alpaca Broker API' and has a case study. Composer's help pages say it has clearing agreements with Alpaca Securities and Apex Clearing (search snippet).",
+     "historical_data_e2e": "Hosted backtests only. The sources retrieved do not show data lineage, survivorship handling or adjustments.",
+     "backtest_realism": "Not documented in the sources retrieved.",
+     "paper_path": "No Alpaca paper route was verified. Composer is built on Alpaca's Broker API, so trades go through Composer-held accounts rather than the user's own Trading API account (inferred from the Broker API partnership).",
+     "license": "Proprietary",
+     "latest_release": null,
+     "released_at": null,
+     "stars": null,
+     "maintenance": "Active; the site is now branded 'Composer by SoFi' (search result title).",
+     "evidence": [
+      "https://alpaca.markets/integrations - fetched: Composer listed ('Create hedge fund-like dynamic strategies with a no-code visual editor.')",
+      "https://alpaca.markets/blog/composer-partners-with-alpaca-broker-api/ - Alpaca blog: Composer's automated trading platform runs on Alpaca Broker API (llms.txt index)",
+      "https://alpaca.markets/blog/how-composer-is-redefining-algorithmic-trading-with-their-no-code-platform/ - Alpaca case study",
+      "https://help.composer.trade/article/107-depositing-funds - (search snippet) clearing agreements with Alpaca Securities and Apex Clearing",
+      "https://www.composer.trade/ - (search result title) 'Composer by SoFi'"
+     ]
+    },
+    {
+     "name": "Tradetron",
+     "repository": "closed (https://tradetron.tech/brokers)",
+     "kind": "No-code strategy builder and strategy marketplace (US markets through Alpaca, plus Indian brokers)",
+     "alpaca_support": "Partner on Alpaca's integrations page, with an Alpaca blog post 'TradingView OCO & Tradetron Launch'. Tradetron's broker page lists Alpaca for US stocks and crypto (search snippet).",
+     "historical_data_e2e": "Not documented in the sources retrieved.",
+     "backtest_realism": "Not documented in the sources retrieved.",
+     "paper_path": "Deploys strategies to a connected Alpaca account (search snippet); how paper trading works was not verified.",
+     "license": "Proprietary",
+     "latest_release": null,
+     "released_at": null,
+     "stars": null,
+     "maintenance": "The broker page appears in 2026 search results; the Alpaca launch post has no date in the retrieved index.",
+     "evidence": [
+      "https://alpaca.markets/integrations - fetched: Tradetron listed ('Build algo strategies without coding and allow others to subscribe your algos.')",
+      "https://alpaca.markets/blog/tradingview-oco-tradetron/ - Alpaca blog 'TradingView OCO & Tradetron Launch' (llms.txt index)",
+      "https://tradetron.tech/brokers - (search snippet) Alpaca integration for US stocks and crypto"
+     ]
+    }
+   ],
+   "notes": "Scope: only the official Alpaca ecosystem, researched 2026-09-26 UTC.\n\nDirect answer: No, NautilusTrader and LEAN are not the only options. Alpaca's integrations page (https://alpaca.markets/integrations) lists 17 partners, and its Learn articles and blog document more. Judged on merit for the north star (end-to-end historical US-equities simulation, then Alpaca paper, on Linux and macOS, maintained code), three stand out:\n1. QuantConnect LEAN + Lean.Brokerages.Alpaca. The deepest official integration, and AlpacaBrokerageModel encodes Alpaca's order-type, fee and extended-hours rules. Its best historical data lives in QC Cloud.\n2. QuantRocket. The only self-hosted platform here that bundles historical data (vendor claim: survivorship-bias-free 1-minute US data from 2007). It supports several paper and live Alpaca accounts and runs in Docker on Linux and macOS. It is proprietary and licensed against an account limit.\n3. Lumibot. A maintained open-source route with Alpaca-data backtests (including options) and Alpaca paper through one flag, featured by Alpaca in July 2026. It is GPL-3.0, fills at the bar open, and documents no survivorship or corporate-action pipeline.\n\nThe rest fit less well:\n- Blueshift is closed and cloud-only.\n- vectorbt is a data-only research library under the Commons Clause.\n- The Backtrader adapter, pylivetrader and LiuAlgoTrader have been dormant since 2022-2023.\n- WealthLab runs only on Windows.\n- Composer, Tradetron, AlgoBulls and TradingView offered no reproducible local historical pipeline in the sources retrieved.\n- Alpaca's own backtesting content from 2024-2026 uses hand-written alpaca-py code and AI workflows (MCP server, Lumibot), not a named engine.\n\nNautilusTrader: none of the Alpaca listings found include it, and upstream has no Alpaca adapter. crates/adapters on the develop branch contains architect_ax, betfair, binance, blockchain, bybit, coinbase, databento, deribit, derive, dydx, hyperliquid, interactive_brokers, kraken, lighter, okx, polymarket, sandbox and tardis (https://github.com/nautechsystems/nautilus_trader/tree/develop/crates/adapters). GitHub code search for 'alpaca' in the repo returned 0 hits (default-branch index). This matches the runtime target's custom Python Alpaca adapter.\n\nAlpaca paper rules apply to every paper route above (https://docs.alpaca.markets/us/docs/paper-trading.md, updatedAt 2026-07-07):\n- Not simulated: dividends, market impact, information leakage, slippage from latency, queue position, price improvement and regulatory fees. Borrow fees are marked 'coming soon'.\n- Orders fill only once they are marketable.\n- Order size is not checked against NBBO size.\n- Partial fills of a random size happen 10% of the time.\nNo platform in this set documents latency or queue-position modelling in backtests.\n\nLicense and supply-chain flags:\n- GitHub detects no license in Lean.Brokerages.Alpaca.\n- vectorbt is Apache-2.0 plus the Commons Clause.\n- Lumibot and Backtrader are GPL-3.0.\n- QuantRocket, Blueshift, WealthLab, TradingView, Composer, Tradetron and the AlgoBulls platform are proprietary.\n\nLeft out because of the 15-platform cap, or because they have no backtest or paper engine or no current evidence:\n- Streak, Slack, Passiv, Zapier, Alexa, Arcade Trader, PredictNow.ai, Trellis, Breaking Equity and Algorum (all on https://alpaca.markets/integrations).\n- TradersPost and SignalStack, which appeared in Alpaca Connect search results as bridges from alerts to orders (source page not pinned).\n- Alpaca's docs also list the community Rust SDKs apca/apcacli and alpaca-rust (https://docs.alpaca.markets/us/docs/sdks-and-tools.md). These are SDKs, not engines.\n\nEvidence level: review of documentation, blog posts and GitHub metadata only. No platform was installed or run, and no performance was measured. Items tagged '(search snippet)' come from search-result summaries, not direct fetches, and need a fetch before being cited as accepted. Budget used: 15/15 web searches, 15/15 fetches and 40/40 gh api calls, plus local reads of the catalog and runtime target on origin/main and one read of installed wheel metadata. Existing catalog dispositions for Lumibot, vectorbt, Backtrader, Zipline and the LEAN Alpaca brokerage were not changed.\n\nTavily: not used. The API key was pasted in plaintext in the user request. The repository rules forbid copying credential values into commands, and scripts/credential_status.py lists no Tavily store. The key should be regenerated at Tavily (docs/secret-storage.md: 'Regenerate the key at the provider, which invalidates the old one.'), and the new one stored as a 0600 per-provider file before any workflow uses it.",
+   "skills_used": [
+    "search-first",
+    "verification-before-completion"
+   ]
+  },
+  "github": {
+   "platforms": [
+    {
+     "name": "LEAN (QuantConnect) + Lean.Brokerages.Alpaca plugin + lean-cli",
+     "repository": "https://github.com/QuantConnect/Lean",
+     "kind": "Event-driven engine (C# core, C#/Python algorithms) with an Alpaca brokerage, live-data and history-provider plugin maintained by QuantConnect",
+     "alpaca_support": "Verified in code. The plugin contains AlpacaBrokerage (orders and streaming), DataQueueHandler and DataQueueUniverse (live data), HistoryProvider (on the Alpaca.Markets C# SDK, with SIP-restriction handling), SymbolMapper, and a factory with an alpaca-paper-trading switch. Order types cover Equity, Equity Options, Index Options and Crypto, including MOO/MOC and combo orders. lean-cli exposes Alpaca in backtest, data download, optimize and research (--data-provider-historical), and in live deploy and cloud live deploy (--brokerage and --data-provider-live), with --alpaca-environment live|paper. Alpaca's 2024-08-15 blog says the partnership includes open-sourcing and maintaining the LEAN-Alpaca plugin.",
+     "historical_data_e2e": "Best documented end-to-end path of all candidates, but split across two sources. (1) 'lean data download' and 'lean backtest --data-provider-historical Alpaca' pull Alpaca history into LEAN locally; a lean-cli test downloads AAPL hourly equity trade bars with --alpaca-environment paper. (2) The plugin README lists the datasets local deployment needs: QuantConnect's US Equities Security Master, AlgoSeek US Equities and US Coarse Universe. Corporate-action mapping and universe data therefore come from QuantConnect datasets, not the Alpaca feed. Survivorship-aware research depends on QuantConnect data licensing.",
+     "backtest_realism": "The engine has pluggable slippage and fill models; for example, VolumeShareSlippageModel ships in C# and Python with example algorithms. However, the Alpaca brokerage model's documented backtest defaults are no slippage and immediate, complete market-order fills, so realistic results require overriding the models explicitly. No latency model was verified in this run.",
+     "paper_path": "Native. Locally: 'lean live deploy' with --brokerage Alpaca --alpaca-environment paper (Docker engine image). In the cloud: 'lean cloud live deploy'. Both are documented in the pinned lean-cli README.",
+     "license": "LEAN is Apache-2.0. The Alpaca plugin repository has no LICENSE file (GitHub licenseInfo is null) and ships a prebuilt Alpaca.Markets.dll.",
+     "latest_release": null,
+     "released_at": null,
+     "stars": 21781,
+     "maintenance": "Very active. LEAN master b1337938 and plugin master e623e796 were both committed on 2026-09-25; lean-cli master is 20e58aa6. LEAN's last GitHub release is v2.4.0.1 (2017-08-08); it ships continuously from master and Docker images. The plugin has no releases and 18 stars.",
+     "evidence": [
+      "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/e623e7963c6319455b9057a9c6f9c272e7453d37/QuantConnect.AlpacaBrokerage/AlpacaBrokerageFactory.cs#L45-L76 : factory reads 'alpaca-paper-trading' and selects the paper environment",
+      "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/e623e7963c6319455b9057a9c6f9c272e7453d37/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.HistoryProvider.cs#L18-L32 : history provider on the Alpaca.Markets SDK, with SIP restriction handling ('subscription does not permit querying recent sip data', L356)",
+      "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/tree/e623e7963c6319455b9057a9c6f9c272e7453d37 : tree lists AlpacaBrokerage.cs, DataQueueHandler, DataQueueUniverse, HistoryProvider, SymbolMapper, StreamingClientWrapper, and tests for contingent orders, history provider and data queue; also vendored Alpaca.Markets.dll/.pdb; no LICENSE file",
+      "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/e623e7963c6319455b9057a9c6f9c272e7453d37/README.md#L136-L158 : order-type/asset-class table (Equity, Equity Options, Index Options, Crypto; MarketOnOpen/MarketOnClose; combo orders); datasets for local deployment are US Equities Security Master, AlgoSeek US Equities and US Coarse Universe",
+      "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/e623e7963c6319455b9057a9c6f9c272e7453d37/README.md#L209-L215 : 'Orders through Alpaca do not experience slippage in backtests'; 'We fill market orders immediately and completely in backtests'",
+      "https://github.com/QuantConnect/lean-cli/blob/20e58aa65c3c504a6a585e1d4eb1b2e56b233c48/README.md#L171 : 'lean backtest --data-provider-historical' includes Alpaca; --alpaca-environment [live|paper] at L243; same provider option in 'lean data download' (L957), 'lean optimize' and 'lean research'",
+      "https://github.com/QuantConnect/lean-cli/blob/20e58aa65c3c504a6a585e1d4eb1b2e56b233c48/README.md#L1420-L1532 : 'lean live deploy' supports the Alpaca brokerage and data provider with --alpaca-environment; 'lean cloud live deploy' does the same at L422-L553",
+      "https://github.com/QuantConnect/lean-cli/blob/20e58aa65c3c504a6a585e1d4eb1b2e56b233c48/tests/commands/data/test_download.py#L244-L255 : 'lean data download --data-provider-historical Alpaca --security-type Equity --ticker AAPL --resolution Hour --alpaca-environment paper'",
+      "https://github.com/QuantConnect/Lean/blob/b1337938bacbdcdf7327ba4c6a10ffa89ffac403/Common/Orders/Slippage/VolumeShareSlippageModel.cs : volume-share slippage model (plus Algorithm.CSharp/VolumeShareSlippageModelAlgorithm.cs example)",
+      "https://alpaca.markets/blog/elevate-your-trading-with-the-new-alpaca-and-quantconnect-integration/ : 2024-08-15, the partnership 'includes the open-sourcing and maintenance of the LEAN-Alpaca plugin'; trades run in 'Alpaca paper or live trading environments'",
+      "https://api.github.com/repos/QuantConnect/Lean : Apache-2.0, 21,781 stars, pushed 2026-09-25; latest GitHub release v2.4.0.1 dated 2017-08-08",
+      "https://api.github.com/repos/QuantConnect/Lean.Brokerages.Alpaca : license null, 18 stars, pushed 2026-09-25, no releases"
+     ]
+    },
+    {
+     "name": "NautilusTrader",
+     "repository": "https://github.com/nautechsystems/nautilus_trader",
+     "kind": "Event-driven engine, Rust core with a Python API (the selected destination)",
+     "alpaca_support": "No upstream support. The develop branch (e7a6e618, 2026-09-26) has no file path containing 'alpaca'. Upstream adapters are architect_ax, betfair, binance, blockchain, bybit, coinbase, databento, deribit, derive, dydx, hyperliquid, interactive_brokers, kraken, lighter, okx, polymarket, sandbox and tardis. RFC #3374 ('Alpaca Markets Integration') has been open since 2026-01-01. PR #3375 was closed unmerged the same day; the maintainer said the project lacks capacity to support the integration. Unofficial Alpaca adapters exist only in community forks (martinrehfeld develop-alpaca, afrojuju1 develop) and in thecatblake/kryor-trade-engine.",
+     "historical_data_e2e": "No Alpaca data client upstream. US-equity history comes through the Databento adapter or custom loaders. Corporate-action and survivorship handling were not assessed in this run.",
+     "backtest_realism": "Strongest simulation building blocks verified in this set: a FillModel trait with ProbabilisticFillState (prob_fill_on_limit, prob_slippage), a LatencyModel with separate insert and update latencies, and a dedicated matching engine in crates/execution.",
+     "paper_path": "Alpaca paper is only possible through a custom or community adapter, such as this repository's own Python adapter. Upstream paper paths go through IBKR and the other supported venues.",
+     "license": "LGPL-3.0",
+     "latest_release": "v1.231.0 (stable); v2.0.0rc5 (prerelease)",
+     "released_at": "2026-08-02 (v1.231.0); 2026-09-15 (v2.0.0rc5)",
+     "stars": 29413,
+     "maintenance": "Very active: develop branch pushed 2026-09-26.",
+     "evidence": [
+      "https://github.com/nautechsystems/nautilus_trader/tree/e7a6e6189c061d9a5b571d27191e90e6b59edef8/crates/adapters : 18 adapter crates, none for Alpaca; the recursive tree of develop (4,998 files) has no path matching 'alpaca'",
+      "https://github.com/nautechsystems/nautilus_trader/issues/3374 : '[RFC] Alpaca Markets Integration', OPEN since 2026-01-01, 8 comments; last comment 2026-05-08 describes paper testing in the fork afrojuju1/nautilus_trader",
+      "https://github.com/nautechsystems/nautilus_trader/pull/3375 : 'Alpaca adapter' closed unmerged on 2026-01-01; maintainer: 'At the moment, we don't have the capacity to assess or consider supporting this integration'",
+      "https://github.com/nautechsystems/nautilus_trader/issues/4463 : 'Alpaca API', closed 2026-07-14; its body references examples/live/alpaca testers that do not exist in upstream develop",
+      "https://github.com/nautechsystems/nautilus_trader/blob/e7a6e6189c061d9a5b571d27191e90e6b59edef8/crates/execution/src/models/fill.rs#L48 : FillModel trait; ProbabilisticFillState with prob_fill_on_limit and prob_slippage at L166-L168",
+      "https://github.com/nautechsystems/nautilus_trader/blob/e7a6e6189c061d9a5b571d27191e90e6b59edef8/crates/execution/src/models/latency.rs#L27-L32 : LatencyModel trait with get_insert_latency and get_update_latency",
+      "https://github.com/thecatblake/kryor-trade-engine : GitHub code search 'nautilus_trader alpaca TradingClient language:Python' returned only 3 files, all in this repo (src/kryor/adapters/alpaca/providers.py, execution.py, scripts/run_paper_trade.py)",
+      "https://api.github.com/repos/nautechsystems/nautilus_trader : LGPL-3.0, primary language Rust, 29,413 stars; latest release v1.231.0 (2026-08-02), newest prerelease v2.0.0rc5 (2026-09-15)"
+     ]
+    },
+    {
+     "name": "Lumibot",
+     "repository": "https://github.com/Lumiwealth/lumibot",
+     "kind": "Python strategy framework: event-driven backtesting plus paper/live broker execution, built around Alpaca (also supports IBKR, Tradier, Schwab and others)",
+     "alpaca_support": "Verified in code; the most Alpaca-native open-source framework found. The Alpaca broker class builds an alpaca-py TradingClient (API keys or OAuth) with paper=... and forwards partially_filled order events. AlpacaData is the live data source (Adjustment.ALL or RAW). AlpacaBacktesting runs backtests on alpaca-py's stock, option and crypto historical clients. There are 14 Alpaca-named test modules, including broker smoke API tests. Alpaca's own 2026-07-23 Learn article uses Lumibot as its backtest-to-paper framework.",
+     "historical_data_e2e": "Yes, end to end inside one framework: Alpaca bars are fetched with auto_adjust mapping to adjustment='all' (otherwise 'split'). AlpacaBacktesting only accepts paper-account credentials, and Alpaca's article notes it only supports timestep 'day' or 'minute'. Other backtest data sources include Polygon, ThetaData, Databento (pandas/polars), IBKR REST, Yahoo, Alpha Vantage and CCXT. Split and dividend accounting have dedicated tests. No survivorship-free universe or delisting handling was verified.",
+     "backtest_realism": "Moderate. TradingSlippage applies an absolute per-order price amount; the backtesting broker processes partially filled orders and applies per-strategy slippage. No latency or volume-participation model was verified.",
+     "paper_path": "Native. The same strategy code runs on paper via 'lumibot run my-bot --paper' or an Alpaca config with PAPER=True.",
+     "license": "GPL-3.0 (copyleft; affects redistribution of derived code)",
+     "latest_release": "v4.6.1",
+     "released_at": "2026-09-26",
+     "stars": 2090,
+     "maintenance": "Very active: dev branch commit 2dfdda10 on 2026-09-26; frequent releases.",
+     "evidence": [
+      "https://github.com/Lumiwealth/lumibot/blob/2dfdda100cdc34e5acb46a7f13e8208a35aede72/lumibot/brokers/alpaca.py#L219 : class Alpaca(Broker); L443-L452 build TradingClient(api_key, api_secret, paper=self.is_paper) or oauth_token with paper",
+      "https://github.com/Lumiwealth/lumibot/blob/2dfdda100cdc34e5acb46a7f13e8208a35aede72/lumibot/brokers/alpaca.py#L1797-L1805 : partially_filled status dispatched as PARTIALLY_FILLED_ORDER with filled quantity",
+      "https://github.com/Lumiwealth/lumibot/blob/2dfdda100cdc34e5acb46a7f13e8208a35aede72/lumibot/backtesting/alpaca_backtesting.py#L12-L42 : alpaca-py Stock/Option/Crypto historical clients; class AlpacaBacktesting(DataSourceBacktesting); L248 'Backtesting is restricted to paper accounts'; L1304 adjustment='all' if auto_adjust else 'split'",
+      "https://github.com/Lumiwealth/lumibot/blob/2dfdda100cdc34e5acb46a7f13e8208a35aede72/lumibot/data_sources/alpaca_data.py#L47 : class AlpacaData(DataSource); L858 Adjustment.ALL if auto_adjust else Adjustment.RAW",
+      "https://github.com/Lumiwealth/lumibot/blob/2dfdda100cdc34e5acb46a7f13e8208a35aede72/lumibot/backtesting/backtesting_broker.py#L1063 : _process_partially_filled_order in backtests; L4001 per-strategy slippage amount",
+      "https://github.com/Lumiwealth/lumibot/blob/2dfdda100cdc34e5acb46a7f13e8208a35aede72/lumibot/entities/trading_slippage.py#L4-L12 : TradingSlippage is an absolute per-order slippage amount applied to backtest fill prices",
+      "https://github.com/Lumiwealth/lumibot/tree/2dfdda100cdc34e5acb46a7f13e8208a35aede72/lumibot/backtesting : backtest sources for alpaca, polygon, thetadata, databento (pandas/polars), interactive_brokers_rest, yahoo, alpha_vantage, ccxt, polymarket; tests include test_alpaca_backtesting.py, test_alpaca_broker_smoke_apitest.py, test_split_adjustment.py, test_stock_split_accounting.py, backtest/test_dividends.py",
+      "https://github.com/Lumiwealth/lumibot/blob/2dfdda100cdc34e5acb46a7f13e8208a35aede72/README.md#L28 : 'lumibot run my-bot --paper'; L90 broker execution list: Alpaca, IBKR, Tradier, Schwab, Tradovate, TopstepX, Bitunix, Polymarket, selected CCXT",
+      "https://alpaca.markets/learn/how-i-use-ai-to-research-and-test-trading-ideas-with-alpaca : Alpaca Learn, 2026-07-23; Lumibot moves strategies 'from backtesting into paper trading'; 'AlpacaBacktesting only accepts timestep=\"day\" or timestep=\"minute\"'",
+      "https://api.github.com/repos/Lumiwealth/lumibot : GPL-3.0, 2,090 stars; release v4.6.1 on 2026-09-26"
+     ]
+    },
+    {
+     "name": "ML4T libraries (ml4t-data + ml4t-backtest + ml4t-live)",
+     "repository": "https://github.com/ml4t/live",
+     "kind": "Python stack covering research data, an event-driven backtester, and a shadow/paper/live runtime",
+     "alpaca_support": "Verified in code across all three repos. ml4t-data has an Alpaca provider (feed defaults to iex, optional sip; adjustment defaults to raw, optional split, dividend or all). ml4t-live has an AlpacaBroker on alpaca-py's TradingClient with paper=True as the default and explicit partial-fill handling, an AlpacaDataFeed on the stock and crypto data streams, an examples/alpaca_paper_equity.py script, and unit and integration tests.",
+     "historical_data_e2e": "Alpaca bars come through ml4t-data with an explicit adjustment choice, and the repo includes corporate-action examples (corporate_actions_demo.py, dividend checks, reverse-split fixes). Survivorship and delisting handling were not verified.",
+     "backtest_realism": "Strongest of the Python engines checked. Documented execution semantics: next-bar-open fills by default, with same-bar close and MOC options. Volume participation limits cap the executable quantity per bar, which produces partial fills. There is a market-impact module and commission/slippage settings with spread conventions. Presets mimic the VectorBT, Backtrader and Zipline protocols and a 'frozen LEAN daily US-equity protocol' for parity checks. No order-latency model was verified.",
+     "paper_path": "Native. ml4t-live runs lifecycle-v1 strategies against Alpaca or IBKR with SafeBroker limits, following a staged path from shadow mode to paper to live.",
+     "license": "MIT (all three repos)",
+     "latest_release": "ml4t-live v0.1.2 (ml4t-backtest v0.1.12 on 2026-09-24; ml4t-data v0.2.0 on 2026-09-25)",
+     "released_at": "2026-09-11",
+     "stars": 22,
+     "maintenance": "Active but very new. All three repos were pushed on 2026-09-24/25 and are pre-1.0. Adoption is low: live 22, backtest 28, data 50 stars.",
+     "evidence": [
+      "https://github.com/ml4t/data/blob/885bc1103f430fd75aac3d1b3fef798e1cbaa80c/src/ml4t/data/providers/alpaca.py#L32-L46 : feed defaults to 'iex', 'sip' is the consolidated tape; adjustment defaults to 'raw' (not split- or dividend-adjusted), with 'split', 'dividend' and 'all' optional",
+      "https://github.com/ml4t/data/tree/885bc1103f430fd75aac3d1b3fef798e1cbaa80c/examples : corporate_actions_demo.py, check_all_dividends.py, test_reverse_split_fixes.py",
+      "https://github.com/ml4t/backtest/blob/672804b36915742fe18af9cd09b44e9839d39d6f/docs/user-guide/execution-semantics.md#L13 : orders submitted in on_data() fill at the next bar's open; same-bar close and MOC variants at L30",
+      "https://github.com/ml4t/backtest/blob/672804b36915742fe18af9cd09b44e9839d39d6f/src/ml4t/backtest/execution/limits.py#L1-L23 : 'Volume participation limits for realistic execution' computing executable quantity from bar volume; execution/impact.py exists alongside",
+      "https://github.com/ml4t/backtest/blob/672804b36915742fe18af9cd09b44e9839d39d6f/README.md#L144-L153 : presets 'vectorbt', 'backtrader', 'zipline' and a frozen LEAN daily US-equity protocol; L234-L257 slippage_rate, stop_slippage_rate, SlippageType.SPREAD, SpreadConvention",
+      "https://github.com/ml4t/live/blob/43fc66f4a56a3861d4c3e05efcf3e9ab06be4461/src/ml4t/live/brokers/alpaca.py#L21-L70 : AlpacaBroker on alpaca.trading.client.TradingClient, 'paper: bool = True  # Paper trading by default'; PARTIALLY_FILLED handling at L480 and L802-L805",
+      "https://github.com/ml4t/live/blob/43fc66f4a56a3861d4c3e05efcf3e9ab06be4461/src/ml4t/live/feeds/alpaca_feed.py#L31-L57 : AlpacaDataFeed on StockDataStream and CryptoDataStream",
+      "https://github.com/ml4t/live/blob/43fc66f4a56a3861d4c3e05efcf3e9ab06be4461/README.md#L7-L15 : runs strategies against Interactive Brokers or Alpaca with SafeBroker limits; staged shadow-to-paper-to-live path; supports Python 3.12-3.14 on Linux, macOS and Windows",
+      "https://api.github.com/repos/ml4t/live : MIT, 22 stars, v0.1.2 on 2026-09-11 (ml4t/backtest 28 stars, v0.1.12; ml4t/data 50 stars, v0.2.0)"
+     ]
+    },
+    {
+     "name": "vectorbt (open-source)",
+     "repository": "https://github.com/polakowo/vectorbt",
+     "kind": "Vectorized research/backtesting engine (pandas/NumPy/Numba, with an optional Rust engine)",
+     "alpaca_support": "Data only, verified in code: the AlpacaData class uses alpaca-py's stock and crypto historical clients and exposes adjustment (default 'all') and feed (iex/otc/sip) parameters. The open-source tree has no broker or paper-trading module.",
+     "historical_data_e2e": "Alpaca bars feed straight into vectorized backtests within one library, with selectable adjustment. No universe or survivorship tooling was verified.",
+     "backtest_realism": "Bar-level vectorized fills. The portfolio order model exposes an allow_partial flag (found by code search in vectorbt/portfolio enums.py, base.py and nb.py). No order-book, queue or latency model was found. The README cites walk-forward optimization.",
+     "paper_path": "None in open-source vectorbt. It needs a separate execution layer, such as alpaca-py or Lumibot.",
+     "license": "Apache 2.0 with Commons Clause (not OSI open source; forbids selling the software)",
+     "latest_release": "v1.1.0",
+     "released_at": "2026-07-05",
+     "stars": 9183,
+     "maintenance": "Active: master 61db68ac pushed 2026-09-25.",
+     "evidence": [
+      "https://github.com/polakowo/vectorbt/blob/61db68ac3e9ec0ca1e6b95688acec2e9b2764e1a/vectorbt/data/custom.py#L768-L917 : class AlpacaData, '`Data` for data coming from `alpaca-py`'; adjustment default 'all' (raw/split/dividend/all, L824-L849); feed 'iex', 'otc' or 'sip' (L853-L854); Stock/CryptoHistoricalDataClient (L859-L861)",
+      "https://github.com/polakowo/vectorbt/blob/61db68ac3e9ec0ca1e6b95688acec2e9b2764e1a/LICENSE.md#L1-L11 : Commons Clause License Condition v1.0; 'License: Apache 2.0 with Commons Clause'",
+      "https://github.com/polakowo/vectorbt/blob/61db68ac3e9ec0ca1e6b95688acec2e9b2764e1a/README.md#L65-L73 : vectorized backtesting on pandas/NumPy/Numba; 'Optional Rust engine'; walk-forward optimization",
+      "https://github.com/polakowo/vectorbt/blob/61db68ac3e9ec0ca1e6b95688acec2e9b2764e1a/vectorbt/portfolio/enums.py : allow_partial order field (code search 'allow_partial' also hits portfolio/base.py, nb.py, dispatch.py, logs.py)",
+      "https://api.github.com/repos/polakowo/vectorbt : license NOASSERTION, 9,183 stars; release v1.1.0 on 2026-07-05"
+     ]
+    },
+    {
+     "name": "PyBroker",
+     "repository": "https://github.com/edtechre/pybroker",
+     "kind": "ML-oriented backtesting framework (NumPy/Numba) with walk-forward analysis and bootstrapped metrics",
+     "alpaca_support": "Data only, verified in code: Alpaca(DataSource) and AlpacaCrypto(DataSource) use alpaca-py's stock and crypto historical clients with the Adjustment enum. The README example runs Strategy(Alpaca(...)) with a 1-minute walk-forward.",
+     "historical_data_e2e": "Alpaca (also Yahoo Finance, AKShare or custom sources) feeds cached data into walk-forward backtests, with selectable adjustment. No survivorship or delisting handling was verified.",
+     "backtest_realism": "Slippage models: Fixed, Volatility and Volume (VolumeSlippageModel). Any model may reduce the share quantity to simulate a partial fill. No latency model was verified.",
+     "paper_path": "None (research and backtesting only).",
+     "license": "Apache 2.0 with Commons Clause",
+     "latest_release": "v2.0.1",
+     "released_at": "2026-08-28",
+     "stars": 3546,
+     "maintenance": "Active: release on 2026-08-28, pushed 2026-09-21.",
+     "evidence": [
+      "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/src/pybroker/data.py#L378-L452 : class Alpaca(DataSource) and class AlpacaCrypto(DataSource); alpaca-py stock/crypto historical imports and Adjustment at L15-L21",
+      "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/src/pybroker/slippage.py#L101-L122 : SlippageModel; 'The returned share quantity may be reduced to simulate a partial' fill; FixedSlippageModel L171, VolatilitySlippageModel L221, VolumeSlippageModel L315",
+      "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/README.md#L22-L27 : NumPy/Numba engine; historical data from Alpaca, Yahoo Finance, AKShare; walkforward analysis; bootstrapped metrics; L99-L100 Strategy(Alpaca(...))",
+      "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/LICENSE#L1-L9 : Commons Clause License Condition v1.0 applied to PyBroker; README badge 'Apache 2.0 with Commons Clause'",
+      "https://api.github.com/repos/edtechre/pybroker : 3,546 stars; release v2.0.1 on 2026-08-28"
+     ]
+    },
+    {
+     "name": "roboquant.py",
+     "repository": "https://github.com/neurallayer/roboquant.py",
+     "kind": "Python event-driven backtest and live-trading framework",
+     "alpaca_support": "Verified in code: AlpacaBroker(LiveBroker) on alpaca-py's TradingClient ('for live and paper trading'); AlpacaLiveFeed (iex/sip/crypto/option); AlpacaHistoricStockFeed and AlpacaHistoricCryptoFeed. Samples include paper trading, forward testing and recording, plus an Alpaca integration test.",
+     "historical_data_e2e": "AlpacaHistoricStockFeed defaults to Adjustment.ALL with a selectable feed, and a sample records data to file. No survivorship handling was verified.",
+     "backtest_realism": "Basic: SimBroker fills at a chosen bar price (OPEN/CLOSE/HIGH/LOW) with percentage slippage (default 0). No partial-fill or latency model was verified.",
+     "paper_path": "Native: AlpacaBroker with paper keys (tests/samples/alpaca_papertrade.py).",
+     "license": "Apache-2.0",
+     "latest_release": "v1.1.0",
+     "released_at": "2025-03-02",
+     "stars": 24,
+     "maintenance": "Code is active (main 81d1620a pushed 2026-09-25), but the last release was 2025-03-02 and adoption is small.",
+     "evidence": [
+      "https://github.com/neurallayer/roboquant.py/blob/81d1620a5ebd7715277bb40ae0be6b96c314f77c/roboquant/brokers/alpaca.py#L4-L22 : alpaca.trading.client.TradingClient; 'Broker implementation for live and paper trading using the Alpaca trading API'",
+      "https://github.com/neurallayer/roboquant.py/blob/81d1620a5ebd7715277bb40ae0be6b96c314f77c/roboquant/feeds/alpaca.py#L61-L230 : AlpacaLiveFeed (market iex/sip/crypto/option), AlpacaHistoricStockFeed with 'adjustment: Adjustment = Adjustment.ALL' and feed, AlpacaHistoricCryptoFeed",
+      "https://github.com/neurallayer/roboquant.py/blob/81d1620a5ebd7715277bb40ae0be6b96c314f77c/roboquant/brokers/simbroker.py#L19-L42 : SimBroker price_type OPEN/CLOSE/HIGH/LOW and percentage slippage defaulting to 0",
+      "https://github.com/neurallayer/roboquant.py/tree/81d1620a5ebd7715277bb40ae0be6b96c314f77c/tests : samples alpaca_papertrade.py, alpaca_forwardtest_bars.py, alpaca_forwardtest_trades.py, alpaca_record.py; integration/test_alpaca.py",
+      "https://github.com/neurallayer/roboquant.py/blob/81d1620a5ebd7715277bb40ae0be6b96c314f77c/README.md#L31-L58 : feeds include Alpaca; integrations with IBKR and Alpaca; Apache 2.0",
+      "https://api.github.com/repos/neurallayer/roboquant.py : Apache-2.0, 24 stars; latest release v1.1.0 on 2025-03-02; pushed 2026-09-25"
+     ]
+    },
+    {
+     "name": "roboquant (Kotlin/JVM)",
+     "repository": "https://github.com/neurallayer/roboquant",
+     "kind": "JVM (Kotlin) event-driven backtest and live-trading framework with a separate Alpaca module",
+     "alpaca_support": "Verified in code: the roboquant-alpaca module has AlpacaBroker ('Alpaca live- and paper-trading accounts'), AlpacaHistoricFeed, AlpacaLiveFeed, AlpacaMarketNewsLiveFeed and AlpacaOrderPlacer, built on the net.jacobpeterson Alpaca OpenAPI client, with *TestIT integration tests.",
+     "historical_data_e2e": "The Alpaca historic feed defaults to StockAdjustment.ALL. No survivorship handling was verified.",
+     "backtest_realism": "SimBroker applies directional percentage slippage plus a fee model. No partial-fill or latency model was verified.",
+     "paper_path": "Native: AlpacaBroker with paper-account keys.",
+     "license": "Apache-2.0",
+     "latest_release": "v3.0.0",
+     "released_at": "2026-01-02",
+     "stars": 463,
+     "maintenance": "Active: main c82664a8 committed 2026-09-18. JVM rather than the Python/Rust lanes.",
+     "evidence": [
+      "https://github.com/neurallayer/roboquant/blob/c82664a8476683c74d50b7f82b65fd5ec5bdda7e/roboquant-alpaca/src/org/roboquant/alpaca/AlpacaBroker.kt#L34-L42 : 'Broker implementation for Alpaca. This implementation allows using the Alpaca live- and paper-trading accounts'",
+      "https://github.com/neurallayer/roboquant/blob/c82664a8476683c74d50b7f82b65fd5ec5bdda7e/roboquant-alpaca/src/org/roboquant/alpaca/AlpacaHistoricFeed.kt#L22-L152 : net.jacobpeterson.alpaca.openapi.marketdata StockAdjustment; 'adjustment: StockAdjustment = StockAdjustment.ALL'",
+      "https://github.com/neurallayer/roboquant/blob/c82664a8476683c74d50b7f82b65fd5ec5bdda7e/roboquant/src/org/roboquant/brokers/SimBroker.kt#L35-L91 : slippage (0.001 = 0.1%) applied as buy-higher/sell-lower price correction; fee calculation",
+      "https://github.com/neurallayer/roboquant/tree/c82664a8476683c74d50b7f82b65fd5ec5bdda7e/roboquant-alpaca : AlpacaLiveFeed, AlpacaMarketNewsLiveFeed, AlpacaOrderPlacer; tests AlpacaBrokerTestIT, AlpacaHistoricFeedTestIT, AlpacaLiveFeedTestIT",
+      "https://api.github.com/repos/neurallayer/roboquant : Apache-2.0, Kotlin, 463 stars; release v3.0.0 on 2026-01-02"
+     ]
+    },
+    {
+     "name": "FinRL-X (FinRL-Trading) with FinRL",
+     "repository": "https://github.com/AI4Finance-Foundation/FinRL-Trading",
+     "kind": "AI/deep-reinforcement-learning research platforms with Alpaca paper execution",
+     "alpaca_support": "Verified in code. FinRL-X's AlpacaManager (multi-account) calls the REST API with raw 'requests' rather than the SDK, and defaults to the paper-api base URL. Original FinRL has an AlpacaProcessor on alpaca-py's StockHistoricalDataClient, but its PaperTradingAlpaca still imports the archived alpaca_trade_api SDK.",
+     "historical_data_e2e": "FinRL's AlpacaProcessor downloads bars into its DRL environment pipeline. Corporate-action and survivorship handling were not verified.",
+     "backtest_realism": "Low: gym-style environments with proportional transaction costs (buy_cost_pct/sell_cost_pct). No fill, slippage or latency models were found.",
+     "paper_path": "FinRL-X: Alpaca paper through AlpacaManager (README 'Paper trade with Alpaca', with pre-trade risk checks). FinRL: PaperTradingAlpaca on the deprecated SDK.",
+     "license": "FinRL-X Apache-2.0; FinRL MIT",
+     "latest_release": "FinRL-X v1.0.0 (FinRL v0.3.8 on 2026-03-20)",
+     "released_at": "2026-03-25",
+     "stars": 3752,
+     "maintenance": "Active: FinRL-X pushed 2026-09-18; FinRL pushed 2026-09-23 (16,402 stars).",
+     "evidence": [
+      "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/trading/alpaca_manager.py#L19-L75 : 'import requests'; AlpacaAccount base_url 'https://paper-api.alpaca.markets'; is_paper(); class AlpacaManager",
+      "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/README.md#L36-L136 : FinRL-X succeeds FinRL (arXiv 2603.21330); 'Execution | Live/paper trading | Alpaca multi-account integration with pre-trade risk checks'; 'Paper trade with Alpaca'",
+      "https://github.com/AI4Finance-Foundation/FinRL/blob/3a0ab5cf3ddf0b59d25f7fd7e435811a18838c6c/finrl/meta/data_processors/processor_alpaca.py#L12-L20 : StockHistoricalDataClient, StockBarsRequest; class AlpacaProcessor",
+      "https://github.com/AI4Finance-Foundation/FinRL/blob/3a0ab5cf3ddf0b59d25f7fd7e435811a18838c6c/finrl/meta/paper_trading/alpaca.py#L9-L19 : 'import alpaca_trade_api as tradeapi'; class PaperTradingAlpaca",
+      "https://github.com/AI4Finance-Foundation/FinRL/blob/3a0ab5cf3ddf0b59d25f7fd7e435811a18838c6c/finrl/meta/env_stock_trading/env_stocktrading.py : buy_cost_pct proportional transaction costs (code search hit)",
+      "https://api.github.com/repos/AI4Finance-Foundation/FinRL-Trading : Apache-2.0, 3,752 stars, v1.0.0 on 2026-03-25; https://api.github.com/repos/AI4Finance-Foundation/FinRL : MIT, 16,402 stars, v0.3.8 on 2026-03-20"
+     ]
+    },
+    {
+     "name": "Alpaca MCP Server (official) + alpaca-skills + Alpaca CLI",
+     "repository": "https://github.com/alpacahq/alpaca-mcp-server",
+     "kind": "Official agent-integration layer (MCP server); not a backtest engine",
+     "alpaca_support": "Official. Version 2 is a complete rewrite on FastMCP generated from Alpaca's OpenAPI specs for trading and market data. Toolsets include stock-data (bars, quotes, trades, snapshots, screeners) and corporate actions, and can be filtered server-side with ALPACA_TOOLSETS. The repo has security middleware plus prompt-injection and trust-boundary tests. Alpaca also publishes official companions: alpaca-skills (agent SKILL.md files) and an Alpaca CLI.",
+     "historical_data_e2e": "Exposes historical bars and corporate-action endpoints to an agent. There is no dataset management or backtesting.",
+     "backtest_realism": "Not applicable (no simulator).",
+     "paper_path": "ALPACA_PAPER_TRADE defaults to true (paper-api.alpaca.markets), and there is a paper integration test. The README warns that the package has no remote MCP authentication and must not be exposed publicly with Alpaca keys.",
+     "license": "MIT (alpaca-skills and the CLI are Apache-2.0)",
+     "latest_release": "v2.3.2",
+     "released_at": "2026-09-15",
+     "stars": 993,
+     "maintenance": "Active: main a82ad1cc pushed 2026-09-25; alpaca-skills pushed 2026-09-08; CLI pushed 2026-09-12.",
+     "evidence": [
+      "https://github.com/alpacahq/alpaca-mcp-server/blob/a82ad1ccb740609abc99e10376e42d8e9c1037a1/README.md#L21 : 'Alpaca MCP Server v2 ... complete rewrite built with FastMCP and OpenAPI'",
+      "https://github.com/alpacahq/alpaca-mcp-server/blob/a82ad1ccb740609abc99e10376e42d8e9c1037a1/README.md#L245-L286 : ALPACA_PAPER_TRADE default 'true'; ALPACA_TOOLSETS; stock-data toolset 'Stock bars, quotes, trades, snapshots, screeners'",
+      "https://github.com/alpacahq/alpaca-mcp-server/blob/a82ad1ccb740609abc99e10376e42d8e9c1037a1/README.md#L118-L122 : package does not configure remote MCP authentication; do not expose it publicly with Alpaca keys",
+      "https://github.com/alpacahq/alpaca-mcp-server/blob/a82ad1ccb740609abc99e10376e42d8e9c1037a1/src/alpaca_mcp_server/server.py#L117-L118 : paper selected from ALPACA_PAPER_TRADE (default true); toolsets.py L61-L104 corporate_actions endpoints and 'corporate-actions' toolset",
+      "https://github.com/alpacahq/alpaca-mcp-server/tree/a82ad1ccb740609abc99e10376e42d8e9c1037a1/src/alpaca_mcp_server : specs/trading-api.json, specs/market-data-api.json, security.py, tool_registry.py; tests/test_paper_integration.py, test_prompt_injection_envelope.py, test_trust_boundary_middleware.py; Helm chart",
+      "https://github.com/alpacahq/alpaca-skills : official 'Agent skills for Alpaca's Trading API and Broker API', Apache-2.0, pushed 2026-09-08; https://github.com/alpacahq/cli : official 'CLI for Trading API', Apache-2.0, pushed 2026-09-12",
+      "https://api.github.com/repos/alpacahq/alpaca-mcp-server : MIT, 993 stars; release v2.3.2 on 2026-09-15"
+     ]
+    },
+    {
+     "name": "Vibe-Trading (HKUDS)",
+     "repository": "https://github.com/HKUDS/Vibe-Trading",
+     "kind": "LLM trading-agent platform with per-market backtest engines and broker connectors",
+     "alpaca_support": "Verified in code. The connector uses official alpaca-py: TradingClient for account, position and order reads, StockHistoricalDataClient for quotes and bars, plus order placement and cancellation. Paper and live are separated structurally by host and key pair. Profiles: Alpaca Paper (read-only), Paper Trade, Live read-only and Live; feed iex or sip. Tests are test_alpaca_*.",
+     "historical_data_e2e": "Alpaca is not a backtest data source here. The loaders in agent/backtest/loaders cover yfinance/Yahoo, Tiingo, FMP, Finnhub, Stooq, Alpha Vantage, AKShare, Tushare, CCXT and others, with no Alpaca loader.",
+     "backtest_realism": "Per-market engines (for example agent/backtest/engines/global_equity.py); fill and slippage details were not verified in this run.",
+     "paper_path": "Alpaca paper order placement through the paper trade profile; live order placement is mandate-gated.",
+     "license": "MIT",
+     "latest_release": "v0.1.15",
+     "released_at": "2026-09-09",
+     "stars": 34044,
+     "maintenance": "Very active: main 5e9ffd1a pushed 2026-09-25.",
+     "evidence": [
+      "https://github.com/HKUDS/Vibe-Trading/blob/5e9ffd1a73e71b4a1be45c5b5e330b6877fee849/agent/src/trading/connectors/alpaca/sdk.py#L1-L18 : 'Alpaca connector via the official alpaca-py SDK'; account/positions/orders via TradingClient, quote/bars via StockHistoricalDataClient, order placement and cancel; paper vs live is structural (host + key pair)",
+      "https://github.com/HKUDS/Vibe-Trading/blob/5e9ffd1a73e71b4a1be45c5b5e330b6877fee849/agent/src/trading/connectors/alpaca/profiles.py#L17-L64 : 'alpaca-paper-sdk' read profile, 'Alpaca Live · alpaca-py Read-Only', 'Alpaca Paper · alpaca-py Trade', live profile; feed 'iex'",
+      "https://github.com/HKUDS/Vibe-Trading/tree/5e9ffd1a73e71b4a1be45c5b5e330b6877fee849/agent/backtest/loaders : backtest loaders (yfinance, yahoo, tiingo, fmp, finnhub, stooq, alphavantage, akshare, tushare, ccxt, ...), none for Alpaca",
+      "https://github.com/HKUDS/Vibe-Trading/blob/5e9ffd1a73e71b4a1be45c5b5e330b6877fee849/README.md#L220 : 2026-06-02 connectors (Tiger/Longbridge/Alpaca/OKX/Binance/Futu) expose read-only account/positions/orders/quote/history 'plus paper-account order placement', with mandate-gated order placement",
+      "https://api.github.com/repos/HKUDS/Vibe-Trading : MIT, 34,044 stars; release v0.1.15 on 2026-09-09"
+     ]
+    },
+    {
+     "name": "QuantDinger",
+     "repository": "https://github.com/OpenByteInc/QuantDinger",
+     "kind": "Self-hosted AI trading OS (research, strategy code, backtest, paper/live, monitoring); Python backend",
+     "alpaca_support": "Verified in code, execution only. AlpacaClient on alpaca-py supports US stocks, ETFs and crypto on paper and live accounts (paper flag). It also has an Alpaca route, activity reconciliation and ownership modules, and tests. The module's own README lists as missing: stop and stop-limit orders, and historical bar fetching helpers.",
+     "historical_data_e2e": "Not through Alpaca: the Alpaca module has no historical bar helpers, so backtests use other data_sources adapters.",
+     "backtest_realism": "Not verified in this run.",
+     "paper_path": "Paper or live is chosen per saved broker account (PK* keys go to paper-api). Agent trading is paper-only by default.",
+     "license": "Backend Apache-2.0. The web frontend and mobile clients use separate source-available licenses, and trademarks are governed separately.",
+     "latest_release": "v5.4.4",
+     "released_at": "2026-09-25",
+     "stars": 12178,
+     "maintenance": "Very active: main 7da255c1 pushed 2026-09-25.",
+     "evidence": [
+      "https://github.com/OpenByteInc/QuantDinger/blob/7da255c1e754daf939e1c58066ca2e44eb701b43/backend_api_python/app/services/alpaca_trading/client.py#L4-L5 : 'Uses alpaca-py SDK'; 'Supports US stocks, ETFs, and crypto on both paper and live accounts'; paper flag L171, L226",
+      "https://github.com/OpenByteInc/QuantDinger/blob/7da255c1e754daf939e1c58066ca2e44eb701b43/backend_api_python/app/services/alpaca_trading/README.md#L145-L146 : 'No stop or stop-limit orders yet'; 'No historical bar fetching helpers'",
+      "https://github.com/OpenByteInc/QuantDinger/tree/7da255c1e754daf939e1c58066ca2e44eb701b43/backend_api_python : app/routes/alpaca.py, live_trading/alpaca_activity_reconciliation.py, alpaca_ownership.py, migration 20260722_alpaca_broker_activities.sql, tests test_alpaca_*",
+      "https://github.com/OpenByteInc/QuantDinger/blob/7da255c1e754daf939e1c58066ca2e44eb701b43/README.md#L668-L680 : backend Apache-2.0; frontend and mobile under their own source-available licenses; trademarks separate. L369: agent trading paper-only by default; L386: IBKR and Alpaca workflows",
+      "https://api.github.com/repos/OpenByteInc/QuantDinger : Apache-2.0, 12,178 stars; release v5.4.4 on 2026-09-25"
+     ]
+    },
+    {
+     "name": "AlpacaTradingAgent (fork of TradingAgents)",
+     "repository": "https://github.com/huygiatrng/AlpacaTradingAgent",
+     "kind": "Multi-agent LLM trading framework with Alpaca data and execution",
+     "alpaca_support": "Verified in code: alpaca_utils uses alpaca-py's stock and crypto historical clients (DataFeed.IEX default) and TradingClient(paper=use_paper), with paper defaulting to true. Upstream TauricResearch/TradingAgents has no Alpaca code (code search returned total_count 0).",
+     "historical_data_e2e": "Alpaca bars and quotes serve as agent context only; no backtest engine was verified.",
+     "backtest_realism": "Not applicable / not verified.",
+     "paper_path": "Agent decisions become direct TradingClient paper orders.",
+     "license": "Apache-2.0",
+     "latest_release": null,
+     "released_at": null,
+     "stars": 271,
+     "maintenance": "Single fork repository, no releases; pushed 2026-09-05. Upstream TradingAgents (108,642 stars, v0.5.1 on 2026-09-24) is maintained but has no Alpaca integration.",
+     "evidence": [
+      "https://github.com/huygiatrng/AlpacaTradingAgent/blob/524cd77ea532b7ff0920b070769b9b416ae5caad/tradingagents/dataflows/alpaca_utils.py#L9-L12 : alpaca-py StockHistoricalDataClient/CryptoHistoricalDataClient, DataFeed; L196-L197 'return TradingClient(api_key, api_secret, paper=use_paper)' with default 'True'",
+      "https://github.com/huygiatrng/AlpacaTradingAgent/blob/524cd77ea532b7ff0920b070769b9b416ae5caad/README.md#L1-L23 : 'independent enhanced version built upon the original TradingAgents framework'; paper and live trading",
+      "https://github.com/TauricResearch/TradingAgents : GitHub code search 'alpaca repo:TauricResearch/TradingAgents' returned total_count 0 (main 35543d02)",
+      "https://api.github.com/repos/huygiatrng/AlpacaTradingAgent : Apache-2.0, 271 stars, no releases, pushed 2026-09-05"
+     ]
+    },
+    {
+     "name": "Backtrader + alpaca-backtrader-api (legacy)",
+     "repository": "https://github.com/alpacahq/alpaca-backtrader-api",
+     "kind": "Legacy event-driven engine plus Alpaca's store/broker bridge",
+     "alpaca_support": "Verified in code but legacy: AlpacaStore imports alpaca_trade_api, an SDK whose repository is archived (last release v3.2.0, 2024-01-12). It has a paper parameter and an iex data_feed default.",
+     "historical_data_e2e": "Only through the deprecated SDK; not a viable path for new work.",
+     "backtest_realism": "Not assessed.",
+     "paper_path": "paper=True via AlpacaStore, on the archived SDK.",
+     "license": "Bridge Apache-2.0; backtrader GPL-3.0",
+     "latest_release": "v0.15.0",
+     "released_at": "2022-01-02",
+     "stars": 701,
+     "maintenance": "Stale. The bridge's master head commit is dated 2022-01-02 (last push 2026-06-23 without newer commits on master); backtrader's master head commit is dated 2023-04-19 and it has no GitHub releases.",
+     "evidence": [
+      "https://github.com/alpacahq/alpaca-backtrader-api/blob/475bb54b8b16506092eb97df5a7cb1d05f0b86be/alpaca_backtrader_api/alpacastore.py#L16-L18 : 'import alpaca_trade_api as tradeapi' (REST, TimeFrame, Stream); paper parameter L192-L210; data_feed='iex' L119",
+      "https://api.github.com/repos/alpacahq/alpaca-trade-api-python : archived true; last release v3.2.0 on 2024-01-12",
+      "https://github.com/alpacahq/alpaca-backtrader-api/releases/tag/v0.15.0 : latest release 2022-01-02; master head commit 475bb54b dated 2022-01-02",
+      "https://github.com/mementum/backtrader/commit/b853d7c90b6721476eb5a5ea3135224e33db1f14 : backtrader master head committed 2023-04-19; GPL-3.0; 23,320 stars",
+      "https://alpaca.markets/learn/algo-trading-landscape : Alpaca's 2020-09-23 landscape article lists Backtrader as supporting live trading with Alpaca (historical context only)"
+     ]
+    }
+   ],
+   "notes": "Short answer: no, NautilusTrader and LEAN are not the only options. The code check found these Alpaca paths:\n- LEAN has an official Alpaca plugin.\n- NautilusTrader has no upstream Alpaca adapter.\n- Lumibot is the most Alpaca-native end-to-end framework.\n- The ML4T libraries (ml4t-data, ml4t-backtest, ml4t-live) are a new MIT stack with the strongest Python execution realism.\n- vectorbt and PyBroker use Alpaca for data only, under Commons Clause.\n- roboquant (Python and Kotlin) and FinRL-X also connect to Alpaca.\n- Agent layers: the official alpaca-mcp-server, Vibe-Trading, QuantDinger and AlpacaTradingAgent.\n- backtrader's Alpaca bridge is legacy.\n\nStars are context only.\n\n**Assessment against the north star (judgement, not measured):**\n- NautilusTrader: no engine checked here has stronger verified simulation building blocks (fill and latency models). But Alpaca support needs a custom or community adapter; the maintainer declined PR #3375 for capacity reasons, and RFC #3374 is open.\n- LEAN: the only engine with a maintained, official Alpaca brokerage, live data and historical provider. `lean data download` / `lean backtest --data-provider-historical Alpaca` works end to end. Its documented Alpaca backtest defaults are no slippage and full immediate fills, and corporate actions and universes come from QuantConnect datasets.\n- Best candidates for the runtime-target's overturn comparison (same frozen data and risk contract):\n  - Lumibot: same code from backtest to Alpaca paper; used in Alpaca's own 2026-07-23 article; GPL-3.0. Weaknesses: absolute-amount slippage only, and AlpacaBacktesting supports day or minute bars only.\n  - ml4t-backtest/ml4t-live: volume-participation partial fills, market impact, next-bar-open semantics, parity presets including a LEAN protocol, shadow-to-paper-to-live staging. Weakness: pre-1.0 with low adoption.\n- vectorbt and PyBroker: research accelerators only (no paper path).\n- None of the Alpaca-native frameworks showed survivorship-free universe or delisting handling in code.\n\n**Alpaca-side facts:**\n- The historical bars endpoint (https://docs.alpaca.markets/us/reference/stockbars) offers:\n  - adjustment: raw, split, dividend, spin-off or all; default raw.\n  - asof: default is the current day; used to link symbol renames.\n  - feed: iex, otc, sip or boats; default sip.\n- The FAQ (https://docs.alpaca.markets/us/docs/market-data-faq) says SIP historical queries need end at least 15 minutes old without a subscription. It does not document history depth or delisted-symbol coverage, so survivorship-free universes need another source (for example QuantConnect's security master in LEAN).\n- Corporate actions have their own endpoint (https://docs.alpaca.markets/us/reference/corporateactions-1).\n- Alpaca's integrations page (https://alpaca.markets/integrations) lists only commercial or hosted platforms: TradingView, Streak, QuantRocket, Blueshift, Tradetron, Arcade Trader, AlgoBulls, Trellis, Breaking Equity, Composer, Algorum, Wealth-Lab, Passiv, PredictNow.ai, Slack, Zapier and Alexa. None were evaluated in code.\n- Alpaca's official agent tooling is alpaca-mcp-server v2, alpaca-skills, the Alpaca CLI and alpacahq/agentic.\n\n**Checked and excluded:**\n- StockSharp (10,802 stars): the README lists Alpaca, but StockSharp.slnx references ../Connectors/Alpaca/Alpaca.csproj, which is outside the public repository (the public tree only has an Alpaca logo), so it cannot be verified.\n- rburkholder/trade-frame (C++): has lib/TFAlpaca for real-time data and orders, but LICENSE.txt says it 'may not be used nor distributed without proper license agreement'.\n- Code search for 'alpaca' returned total_count 0 in stefan-jansen/zipline-reloaded (last commit 2025-11-13), microsoft/qlib, nkaz001/hftbacktest (the sim cross-check; last push 2025-12-23), barter-rs/barter-rs, coding-kitties/investing-algorithm-framework and TauricResearch/TradingAgents.\n- Stale by metadata: blankly (last push 2024-12-30, latest release v1.18.0-beta from 2022), LiuAlgoTrader (2023-08-13), alpacahq/alpaca-zipline (2022-10-23).\n- Broad code search: alpaca-py TradingClient in brokers/ paths hit 21 files across 20 small personal repos; the deprecated SDK hit 10. Neither surfaced a framework-grade engine.\n- tradermonty/claude-trading-skills (2,889 stars) uses Alpaca MCP and adapters (87 code hits); it is an agent-skills collection, not an engine.\n\n**Method and evidence class:**\n- Evidence is metadata plus pinned source review only. Nothing was installed, run natively, or paper-traded. Performance and portability were not benchmarked; verified OS support is limited to ml4t-live (Linux, macOS, Windows) and LEAN via Docker images.\n- Budgets used: 56 of 60 gh api calls, 3 of 10 web searches, 7 of 10 fetches.\n- Default-branch heads were rechecked unchanged before citing README line numbers.\n- Supply-chain points (archived SDK use in FinRL and backtrader, the vendored Alpaca.Markets.dll in the LEAN plugin, Commons Clause, copyleft) were checked by hand; the supply-chain-risk-auditor skill was not run.\n- The pasted Tavily key was not used or copied into any command, per AGENTS.md and docs/secret-storage.md. It appeared in plain text in the request, so rotating it and storing it as a 0600 provider file is advisable if Tavily is wanted.\n- Raw API outputs are local scratch, not evidence of record: <scratch> (meta.json, tree_*.json, blobs/, calls.log).",
+   "skills_used": [
+    "search-first",
+    "verification-before-completion"
+   ]
+  },
+  "gpt6": {
+   "platforms": [
+    {
+     "name": "LEAN / QuantConnect",
+     "repository": "https://github.com/QuantConnect/Lean",
+     "kind": "Open-source event-driven C# engine with Python strategies; optional commercial cloud. Linux deployment and ARM64 library environments are documented, with fewer packaged libraries on ARM64. [Engine](https://github.com/QuantConnect/Lean), [ARM64](https://www.quantconnect.com/docs/v2/lean-cli/projects/libraries/third-party-libraries).",
+     "alpaca_support": "First-party brokerage integration with documented local and cloud Alpaca-paper deployment. [Adapter](https://github.com/QuantConnect/Lean.Brokerages.Alpaca).",
+     "historical_data_e2e": "Comprehensive when paired with the appropriate datasets: survivorship-free US-equity prices plus a security master covering splits, dividends, delistings and symbol changes. Local data licensing/downloads are separate from the engine license; universe datasets must also be supplied. [Prices](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/algoseek/us-equities), [Security master](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/quantconnect/us-equity-security-master).",
+     "backtest_realism": "Extensible fill, fee and slippage models, but Alpaca defaults fill market orders immediately and completely without slippage. Partial fills and execution-delay assumptions require deliberate modeling. [Defaults](https://www.quantconnect.com/docs/v2/cloud-platform/live-trading/brokerages/alpaca).",
+     "paper_path": "Select the Alpaca brokerage and Paper environment. QuantConnect's own paper simulator is a different route. The documented CLI requires a paid organization. [Deployment](https://www.quantconnect.com/docs/v2/lean-cli/live-trading/brokerages/alpaca).",
+     "license": "Apache-2.0 engine; cloud services and datasets have separate terms. [Engine license](https://github.com/QuantConnect/Lean), [Data licensing](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/quantconnect/us-equity-security-master).",
+     "latest_release": "v2.4.0.1 — legacy GitHub release label, not the current engine build",
+     "released_at": null,
+     "stars": 21779,
+     "maintenance": "Repository API reports a 2026-09-25 push. The legacy GitHub release label should not determine the deployment version; qualify a specific current commit/image. [Metadata](https://api.github.com/repos/QuantConnect/Lean), [Releases](https://github.com/QuantConnect/Lean/releases).",
+     "evidence": [
+      "Exact star count and repository activity: [GitHub API](https://api.github.com/repos/QuantConnect/Lean).",
+      "Assessment: strongest documented open-source foundation here for comprehensive equity-data semantics and an existing Alpaca connection, subject to data licensing and realistic simulation configuration."
+     ]
+    },
+    {
+     "name": "LumiBot",
+     "repository": "https://github.com/Lumiwealth/lumibot",
+     "kind": "Integrated Python research, backtesting and broker framework. OS-independent packaging and maintainer macOS/M3 acceptance records support portability investigation; neither supplied host was tested. [Package](https://pypi.org/project/lumibot/), [Acceptance records](https://github.com/Lumiwealth/lumibot/blob/dev/docs/ACCEPTANCE_BACKTESTS.md).",
+     "alpaca_support": "Native Alpaca broker; current implementation uses alpaca-py and exposes paper configuration. [Broker documentation](https://lumibot.lumiwealth.com/brokers.alpaca.html), [Implementation](https://github.com/Lumiwealth/lumibot/blob/dev/lumibot/brokers/alpaca.py).",
+     "historical_data_e2e": "Alpaca historical download/cache/backtest path exists alongside other providers. Corporate-action handling is provider-specific; a complete historical universe, delisted coverage and point-in-time membership are not established for its Alpaca path. [Alpaca backtesting](https://lumibot.lumiwealth.com/backtesting.alpaca.html), [Architecture](https://github.com/Lumiwealth/lumibot/blob/dev/docs/BACKTESTING_ARCHITECTURE.md).",
+     "backtest_realism": "Bar-based execution and configurable slippage. Historical queue, latency and volume-constrained partial-fill fidelity remain unverified. Current docs default to completed history bars; disabling remove_incomplete_current_bar introduces lookahead. Explicit configuration still needs full_window=True to avoid ending three trading sessions early. [Backtesting semantics](https://lumibot.lumiwealth.com/backtesting.alpaca.html), [Slippage](https://lumibot.lumiwealth.com/entities.trading_slippage.html).",
+     "paper_path": "Run the strategy with the native Alpaca broker and PAPER=True. Documented integration merits independent paper qualification; it is not qualification evidence itself. [Paper configuration](https://lumibot.lumiwealth.com/brokers.alpaca.html).",
+     "license": "Unresolved version-specific discrepancy: current dev LICENSE is GPL-3.0, while inspected PyPI metadata says MIT. The v4.6.1 artifact license could not be fetched. [Repository license](https://github.com/Lumiwealth/lumibot/blob/dev/LICENSE), [Package metadata](https://pypi.org/project/lumibot/).",
+     "latest_release": "v4.6.1",
+     "released_at": "2026-09-26",
+     "stars": null,
+     "maintenance": "Recent releases include Alpaca backtest configuration fixes and IBKR fill/dividend fixes. Recheck behavior against the exact installed version because documentation and package metadata differ. [Releases](https://github.com/Lumiwealth/lumibot/releases).",
+     "evidence": [
+      "Release/date: [Release listing](https://github.com/Lumiwealth/lumibot/releases), [v4.6.1 change](https://github.com/Lumiwealth/lumibot/pull/1180).",
+      "Assessment: a prominent additional Python-to-Alpaca candidate; historical-universe coverage, simulation fixtures and artifact licensing remain adoption gates."
+     ]
+    },
+    {
+     "name": "NautilusTrader",
+     "repository": "https://github.com/nautechsystems/nautilus_trader",
+     "kind": "Open-source Rust engine with Python strategy/control interfaces. Current 2.x installation documentation explicitly supports Linux x86-64/ARM64 and macOS ARM64. [Architecture](https://github.com/nautechsystems/nautilus_trader), [Platforms](https://nautilustrader.io/docs/latest/getting_started/installation/).",
+     "alpaca_support": "No Alpaca adapter appears in the current official integration inventory. A separate alpaca-py process does not establish a Nautilus-native adapter. [Integrations](https://nautilustrader.io/docs/latest/integrations/).",
+     "historical_data_e2e": "Databento historical/DBN ingestion and catalog storage are documented. Its adapter does not map Databento corporate-action/reference schemas; corporate-action support remains an open feature request. A complete US-equity data/action/universe pipeline requires additional work. [Databento](https://nautilustrader.io/docs/latest/integrations/databento/), [Corporate-action issue](https://github.com/nautechsystems/nautilus_trader/issues/3307).",
+     "backtest_realism": "Detailed book matching, probabilistic slippage/fills, partial-fill models and command latency. Historical books remain immutable; liquidity consumption must be configured, and default L1 probabilistic slippage is zero. [Fill models](https://nautilustrader.io/docs/latest/concepts/backtesting/fill-models/), [Latency](https://nautilustrader.io/docs/latest/concepts/backtesting/execution-flow/).",
+     "paper_path": "Documented IBKR paper connection or internal sandbox; an Alpaca paper path needs its own adapter/integration qualification. [IBKR paper](https://nautilustrader.io/docs/latest/integrations/interactive_brokers/), [Integration inventory](https://nautilustrader.io/docs/latest/integrations/).",
+     "license": "LGPL-3.0. [License](https://github.com/nautechsystems/nautilus_trader).",
+     "latest_release": "v2.0.0rc5 — prerelease",
+     "released_at": "2026-09-15",
+     "stars": null,
+     "maintenance": "Current release-candidate development includes breaking changes. The 2.x documentation and 1.x Python APIs are not interchangeable. [Release notes](https://github.com/nautechsystems/nautilus_trader/releases), [Version guidance](https://nautilustrader.io/docs/latest/getting_started/installation/).",
+     "evidence": [
+      "Release/date: [Official releases](https://github.com/nautechsystems/nautilus_trader/releases).",
+      "Assessment: strong execution-simulation architecture and target-host fit; current selection does not establish complete equity-data handling or Alpaca E2E support."
+     ]
+    },
+    {
+     "name": "Backtrader + alpaca-backtrader-api",
+     "repository": "https://github.com/mementum/backtrader",
+     "kind": "Open-source Python backtester with batch/stepwise indicator evaluation and PyPy support. Packaging is OS-independent; contemporary Linux/macOS ARM64 dependency compatibility was not tested. [Engine](https://github.com/mementum/backtrader), [Package](https://pypi.org/project/backtrader/).",
+     "alpaca_support": "Separate adapter in Alpaca's GitHub organization, rather than a core Backtrader integration. [Adapter](https://github.com/alpacahq/alpaca-backtrader-api).",
+     "historical_data_e2e": "File/pandas feeds and Alpaca historical ingestion are documented. Complete corporate-action accounting and survivorship-free universe construction are not established by the adapter documentation. [Feeds and adapter](https://github.com/alpacahq/alpaca-backtrader-api).",
+     "backtest_realism": "Fixed/percentage slippage and optional volume fillers; the default broker ignores volume. Market orders normally fill at the next bar's open. Queue/network-latency fidelity is unverified. [Slippage](https://www.backtrader.com/docu/slippage/slippage/), [Volume fillers](https://www.backtrader.com/docu/filler/), [Execution](https://www.backtrader.com/docu/order-creation-execution/order-creation-execution/).",
+     "paper_path": "Adapter documents paper=True. Current operability needs requalification because it depends on the older alpaca-trade-api SDK. [Adapter](https://github.com/alpacahq/alpaca-backtrader-api).",
+     "license": "Backtrader GPL-3.0-or-later; Alpaca adapter Apache-2.0. [Engine](https://pypi.org/project/backtrader/), [Adapter](https://github.com/alpacahq/alpaca-backtrader-api).",
+     "latest_release": "Backtrader 1.9.78.123; adapter 0.15.0",
+     "released_at": "2023-04-19",
+     "stars": null,
+     "maintenance": "Engine package date is 2023-04-19; adapter package date is 2022-01-02. Its legacy SDK repository was archived on 2026-06-17. These are concrete migration considerations, not proof the adapter fails. [Engine package](https://pypi.org/project/backtrader/), [Adapter package](https://pypi.org/project/alpaca-backtrader-api/), [SDK archive](https://github.com/alpacahq/alpaca-trade-api-python).",
+     "evidence": [
+      "Alpaca itself documents this historical workflow: [Alpaca and Backtrader](https://alpaca.markets/learn/backtrader-01).",
+      "Assessment: particularly relevant for existing Backtrader strategies; weaker greenfield choice until adapter compatibility is demonstrated."
+     ]
+    },
+    {
+     "name": "zipline-reloaded",
+     "repository": "https://github.com/stefan-jansen/zipline-reloaded",
+     "kind": "Open-source Python/Cython equity research backtester. Published wheels cover Linux x86-64 and macOS ARM64. [Releases](https://github.com/stefan-jansen/zipline-reloaded/releases), [Wheels](https://pypi.org/project/zipline-reloaded/).",
+     "alpaca_support": "No upstream Alpaca execution adapter was verified. Zipline Trader is a separate fork whose integration cannot be attributed to zipline-reloaded. [Reloaded](https://github.com/stefan-jansen/zipline-reloaded), [Separate fork](https://github.com/shlomiku/zipline-trader).",
+     "historical_data_e2e": "Bundles combine prices, asset metadata and split/merger/dividend adjustments. Suitable source data must supply historical membership and delistings; the engine alone does not create survivorship-free data. [Bundles](https://zipline.ml4trading.io/bundles.html), [Data interfaces](https://zipline.ml4trading.io/api-reference.html).",
+     "backtest_realism": "VolumeShareSlippage constrains fills using bar volume and applies quadratic impact. Useful bar-level partial-fill/capacity modeling; queue and network-latency simulation were not established. [Slippage API](https://zipline.ml4trading.io/api-reference.html#zipline.finance.slippage.VolumeShareSlippage).",
+     "paper_path": "Requires a separately implemented or qualified execution runtime. [Project scope](https://github.com/stefan-jansen/zipline-reloaded).",
+     "license": "Apache-2.0. [Repository](https://github.com/stefan-jansen/zipline-reloaded).",
+     "latest_release": "3.1.1",
+     "released_at": "2025-07-19",
+     "stars": null,
+     "maintenance": "The observed release includes modern Python/NumPy/Cython compatibility work. [Releases](https://github.com/stefan-jansen/zipline-reloaded/releases).",
+     "evidence": [
+      "Version/date/platform artifacts: [Package metadata](https://pypi.org/project/zipline-reloaded/).",
+      "Assessment: substantive equity-research component; conditional E2E fit because execution and data sourcing remain separate."
+     ]
+    },
+    {
+     "name": "Zipline Trader",
+     "repository": "https://github.com/shlomiku/zipline-trader",
+     "kind": "Open-source Python Zipline fork with historical ingestion and brokerage execution. Documentation reports Linux installation tests, macOS difficulties and Docker support; ARM64 compatibility is unverified. [Installation](https://zipline-trader.readthedocs.io/en/latest/install.html).",
+     "alpaca_support": "Explicit ALPACABroker integration. [Broker instructions](https://zipline-trader.readthedocs.io/en/latest/going-live.html).",
+     "historical_data_e2e": "Alpaca/Alpha Vantage ingestion and custom bundles are documented. Corporate-action completeness and survivorship coverage of the Alpaca bundle remain unverified. [Alpaca ingestion](https://zipline-trader.readthedocs.io/en/latest/alpaca-bundle-ingestion.html), [Overview](https://zipline-trader.readthedocs.io/en/latest/).",
+     "backtest_realism": "Zipline-derived backtesting; current fill, slippage, partial-fill and latency behavior needs source-level and runtime qualification. [Project](https://github.com/shlomiku/zipline-trader).",
+     "paper_path": "Official instructions connect the ingested algorithm to Alpaca's paper endpoint. This establishes a documented legacy E2E path. [Paper endpoint](https://zipline-trader.readthedocs.io/en/latest/going-live.html).",
+     "license": "Apache-2.0. [Repository](https://github.com/shlomiku/zipline-trader).",
+     "latest_release": "1.6.1",
+     "released_at": "2021-03-21",
+     "stars": null,
+     "maintenance": "Observed package release is from 2021; installation guidance recommends Python 3.6 with old pandas/NumPy constraints. Modernization is an evaluation prerequisite. [Package](https://pypi.org/project/zipline-trader/), [Constraints](https://zipline-trader.readthedocs.io/en/latest/install.html).",
+     "evidence": [
+      "Assessment: a real additional Alpaca workflow, but documentation does not establish present-day compatibility or operational maturity."
+     ]
+    },
+    {
+     "name": "Blankly",
+     "repository": "https://github.com/blankly-finance/blankly",
+     "kind": "Open-source Python event-driven framework with historical data, simulation and brokerage abstractions. An OS-independent wheel is published; target-host dependency compatibility remains untested. [Project](https://github.com/blankly-finance/blankly), [Package](https://pypi.org/project/blankly/).",
+     "alpaca_support": "Native Alpaca abstraction documents history, streaming and paper support. [Supported integrations](https://github.com/blankly-finance/blankly).",
+     "historical_data_e2e": "Alpaca historical access and US-equity backtest examples exist. Complete corporate-action accounting, delisted coverage and point-in-time universes were not established. [Documentation](https://docs.blankly.finance/), [Example](https://docs.blankly.finance/getting-started/your-first-algorithm).",
+     "backtest_realism": "Engineering documentation assumes infinite resting liquidity and exact-current-price fills; slippage models are described as future work. Simulated sleeping can introduce delays, but capacity and volume-limited partial fills are not demonstrated. [Simulation assumptions](https://github.com/blankly-finance/blankly/blob/main/blankly/BACKTESTING_ENGINEERING.md).",
+     "paper_path": "Distinguish Blankly's local PaperTrade wrapper from Alpaca exchange-sandbox credentials; qualify the latter for this task. [Sandbox documentation](https://docs.blankly.finance/getting-started/sandbox_trading/).",
+     "license": "LGPL-3.0. [Repository](https://github.com/blankly-finance/blankly).",
+     "latest_release": "1.18.25b0",
+     "released_at": "2023-07-23",
+     "stars": null,
+     "maintenance": "Observed package release is a 2023 beta. Current setup still depends on alpaca-trade-api, whose upstream repository is archived. [Package](https://pypi.org/project/blankly/), [Dependencies](https://github.com/blankly-finance/blankly/blob/main/setup.py), [SDK](https://github.com/alpacahq/alpaca-trade-api-python).",
+     "evidence": [
+      "Assessment: include for landscape coverage; documented fill assumptions and SDK migration needs weaken advanced greenfield fit."
+     ]
+    },
+    {
+     "name": "FinRL-X / FinRL-Trading",
+     "repository": "https://github.com/AI4Finance-Foundation/FinRL-Trading",
+     "kind": "Open-source Python portfolio/ML workflow using a bt-based backtester. Linux/macOS setup is documented; macOS ARM64 dependencies and performance remain untested. [Architecture and setup](https://github.com/AI4Finance-Foundation/FinRL-Trading).",
+     "alpaca_support": "Integrated Alpaca portfolio rebalancing, multiple accounts and pre-trade checks are documented. [Execution layer](https://github.com/AI4Finance-Foundation/FinRL-Trading).",
+     "historical_data_e2e": "Yahoo/FMP/WRDS data pipeline and adjusted-price portfolio inputs. Complete corporate-action accounting, delistings and historical universe membership remain unqualified. [Data workflow](https://github.com/AI4Finance-Foundation/FinRL-Trading), [Backtest implementation](https://raw.githubusercontent.com/AI4Finance-Foundation/FinRL-Trading/main/src/backtest/backtest_engine.py).",
+     "backtest_realism": "Portfolio simulation supports transaction costs and optional volume/volatility cost modeling. Historical order lifecycle, partial fills, queues and transport latency were not established. [Implementation](https://raw.githubusercontent.com/AI4Finance-Foundation/FinRL-Trading/main/src/backtest/backtest_engine.py).",
+     "paper_path": "Explicit backtest and Alpaca-paper commands, dry-run preview and paper endpoint configuration. Published paper-performance results are upstream claims, not independent qualification. [Workflow](https://github.com/AI4Finance-Foundation/FinRL-Trading).",
+     "license": "Apache-2.0 for FinRL-X; classic FinRL is separately MIT-licensed. [FinRL-X](https://github.com/AI4Finance-Foundation/FinRL-Trading), [Classic FinRL](https://github.com/AI4Finance-Foundation/FinRL).",
+     "latest_release": null,
+     "released_at": null,
+     "stars": null,
+     "maintenance": "Classic FinRL now directs production-oriented users toward FinRL-X. A current versioned FinRL-X release was not established; upstream positioning is not a maturity verdict. [Project relationship](https://github.com/AI4Finance-Foundation/FinRL).",
+     "evidence": [
+      "Assessment: a relevant new E2E candidate beyond the catalog's classic FinRL entry; retain an unqualified disposition pending data and paper-lifecycle tests."
+     ]
+    },
+    {
+     "name": "Microsoft Qlib",
+     "repository": "https://github.com/microsoft/qlib",
+     "kind": "Open-source Python/Cython factor and ML research platform. Linux wheels and M1 dependency guidance exist; ARM64 setup can require LightGBM/OpenMP work. [Project](https://github.com/microsoft/qlib), [Package](https://pypi.org/project/pyqlib/).",
+     "alpaca_support": "No official Alpaca paper connector was verified in the inspected workflow. [Project scope](https://github.com/microsoft/qlib).",
+     "historical_data_e2e": "US-stock mode, adjusted prices, restoration factors, dated stock pools and custom ingestion are documented. The README says its official dataset is temporarily disabled and warns about imperfections in Yahoo-derived data. Dataset-specific survivorship qualification remains necessary. [Data model](https://qlib.readthedocs.io/en/latest/component/data.html), [Dataset status](https://github.com/microsoft/qlib).",
+     "backtest_realism": "Configurable execution prices, opening/closing fees, impact costs and volume limits. Queue/network-latency realism is unverified. [Exchange implementation](https://raw.githubusercontent.com/microsoft/qlib/main/qlib/backtest/exchange.py).",
+     "paper_path": "Export signals/models to a separately qualified execution runtime. This is an architectural recommendation, not an upstream Alpaca integration claim. [Strategy interfaces](https://qlib.readthedocs.io/en/latest/component/strategy.html).",
+     "license": "MIT. [Repository metadata](https://api.github.com/repos/microsoft/qlib).",
+     "latest_release": "0.9.7",
+     "released_at": "2025-08-15",
+     "stars": 48855,
+     "maintenance": "Repository API reports a 2026-09-22 push; package release and development documentation have different versions. [Metadata](https://api.github.com/repos/microsoft/qlib), [Releases](https://github.com/microsoft/qlib/releases).",
+     "evidence": [
+      "Release date: [Package metadata](https://pypi.org/project/pyqlib/). Exact stars: [GitHub API](https://api.github.com/repos/microsoft/qlib).",
+      "Assessment: conditional factor/ML research component; model sophistication does not establish data completeness or broker readiness."
+     ]
+    },
+    {
+     "name": "hftbacktest",
+     "repository": "https://github.com/nkaz001/hftbacktest",
+     "kind": "Open-source Rust microstructure simulator with Python/Numba strategies. Published Python wheels include Linux and macOS ARM64. [Project](https://github.com/nkaz001/hftbacktest), [Artifacts](https://pypi.org/project/hftbacktest/).",
+     "alpaca_support": "Official trading connectors list Binance Futures and Bybit; an Alpaca connector was not established. [Connector inventory](https://github.com/nkaz001/hftbacktest).",
+     "historical_data_e2e": "Consumes order-book and trade-tick data. US-equity data sourcing, corporate actions and historical universe construction remain outside the demonstrated workflow. [Input requirements](https://hftbacktest.readthedocs.io/en/latest/reference/initialization.html).",
+     "backtest_realism": "Feed/order latency, queue position and optional partial fills are explicit features. Replay cannot alter historical depth/trades, so market impact is excluded and liquidity-taking fills have limitations. [Fill assumptions](https://hftbacktest.readthedocs.io/en/latest/order_fill.html).",
+     "paper_path": "No verified Alpaca-paper route; use as a separate simulation cross-check with suitable depth data. [Project scope](https://github.com/nkaz001/hftbacktest).",
+     "license": "MIT. [Repository](https://github.com/nkaz001/hftbacktest).",
+     "latest_release": "Python 2.4.4",
+     "released_at": "2025-12-10",
+     "stars": null,
+     "maintenance": "Python and Rust have separate version sequences; the observed Rust release is 0.9.4. Qualify the exact package combination. [Releases](https://github.com/nkaz001/hftbacktest/releases), [Python package](https://pypi.org/project/hftbacktest/).",
+     "evidence": [
+      "Assessment: useful specialist cross-check on execution assumptions; not a complete Alpaca US-equities platform."
+     ]
+    },
+    {
+     "name": "vectorbt",
+     "repository": "https://github.com/polakowo/vectorbt",
+     "kind": "Source-available vectorized research/backtesting with Python/NumPy/Numba and an optional Rust engine. Rust support now also exists in the community edition; macOS ARM64 artifacts are published. [Releases](https://github.com/polakowo/vectorbt/releases), [Rust artifacts](https://pypi.org/project/vectorbt-rust/).",
+     "alpaca_support": "Native Alpaca historical-data integration using alpaca-py; brokerage execution requires the user's integration. [Datasource](https://vectorbt.dev/api/data/custom/), [Execution boundary](https://vectorbt.dev/getting-started/upgrade/).",
+     "historical_data_e2e": "AlpacaData exposes corporate-action adjustment choices. A complete security master, delisted universe and historical membership database were not established. [AlpacaData](https://vectorbt.dev/api/data/custom/#vectorbt.data.custom.AlpacaData.download_symbol).",
+     "backtest_realism": "Fees, proportional slippage, size limits, rejection probability and partial fills are configurable. These controls do not independently establish historical liquidity, queue or latency fidelity. [Order simulation](https://vectorbt.dev/api/portfolio/base/#vectorbt.portfolio.base.Portfolio.from_orders).",
+     "paper_path": "Build a separate Alpaca execution/OMS path. PRO's streaming and continuation features also leave broker integration with the user. [Product comparison](https://vectorbt.dev/getting-started/upgrade/).",
+     "license": "Community: Apache-2.0 plus Commons Clause. PRO: separate proprietary license with additional commercial-use restrictions. [Community license](https://github.com/polakowo/vectorbt/blob/master/LICENSE.md), [PRO license](https://vectorbt.pro/terms/software-license/).",
+     "latest_release": "1.1.0 — community edition",
+     "released_at": "2026-07-05",
+     "stars": null,
+     "maintenance": "Observed release adds contemporary Python/pandas support and improves Rust packaging/parity coverage. [Release notes](https://github.com/polakowo/vectorbt/releases).",
+     "evidence": [
+      "Version/date: [Package metadata](https://pypi.org/project/vectorbt/).",
+      "Assessment: strong parameter-research candidate; current Rust support updates older comparisons, while execution integration and licensing remain separate decisions."
+     ]
+    },
+    {
+     "name": "PyBroker",
+     "repository": "https://github.com/edtechre/pybroker",
+     "kind": "Source-available Python/Numba ML backtester with walk-forward training, bootstrap metrics, parallel computation and optimization. Mac/Linux/Windows support is documented; ARM64 installation was not tested. [Project](https://github.com/edtechre/pybroker).",
+     "alpaca_support": "Native historical-stock datasource. No current official Alpaca execution adapter was verified. [Datasource](https://www.pybroker.com/en/latest/reference/pybroker.data.html), [Execution discussion](https://github.com/edtechre/pybroker/discussions/16).",
+     "historical_data_e2e": "Alpaca adjustment selection, caching and dynamic symbol selection are available. Delisted-security completeness and point-in-time constituent data still require qualified inputs. [Data](https://www.pybroker.com/en/latest/reference/pybroker.data.html), [Universe selection](https://www.pybroker.com/en/latest/reference/pybroker.strategy.html).",
+     "backtest_realism": "Fixed-basis-point, ATR and volume-participation impact models; scheduled orders can receive reduced quantities. Stop/forced-exit paths ignore quantity reductions. Delays are bar-based; queue-level latency remains unverified. [Slippage](https://www.pybroker.com/en/latest/reference/pybroker.slippage.html), [Configuration](https://www.pybroker.com/en/latest/reference/pybroker.config.html).",
+     "paper_path": "A separate Alpaca runner is required unless a newer execution integration is independently established. [Maintainer answer](https://github.com/edtechre/pybroker/discussions/16), [Current scope](https://github.com/edtechre/pybroker).",
+     "license": "Apache-2.0 plus Commons Clause. [Actual license](https://raw.githubusercontent.com/edtechre/pybroker/master/LICENSE).",
+     "latest_release": "2.0.1",
+     "released_at": "2026-08-28",
+     "stars": null,
+     "maintenance": "Version 2 adds dynamic universes, multi-timeframe models, optimization and fill-time slippage features. [Release notes](https://github.com/edtechre/pybroker/releases).",
+     "evidence": [
+      "Version/date: [Package metadata](https://pypi.org/project/lib-pybroker/).",
+      "Assessment: useful additional Alpaca-data research candidate; it does not close the paper-execution part of the workflow."
+     ]
+    },
+    {
+     "name": "QuantRocket",
+     "repository": "No public platform-engine repository identified; [vendor](https://www.quantrocket.com/).",
+     "kind": "Commercial Python platform combining managed data services, vectorized Moonshot and event-driven Zipline. Docker deployment supports Linux and Apple Silicon. [Moonshot](https://www.quantrocket.com/docs/#moonshot), [Installation](https://www.quantrocket.com/installation/), [Apple Silicon](https://www.quantrocket.com/docs/software-update/).",
+     "alpaca_support": "Explicit Alpaca integration, paper credentials and multiple paper accounts. [Broker configuration](https://www.quantrocket.com/docs/#alpaca).",
+     "historical_data_e2e": "Strong integrated offering: US daily/minute history since 2007, delisted securities, split/dividend adjustments and point-in-time daily ticker symbols, connected to managed databases and Zipline bundles. [US data](https://www.quantrocket.com/docs/#us-stock).",
+     "backtest_realism": "Zipline supports volume-capped partial fills and quadratic volume-share impact. However, QuantRocket disables Zipline commissions and slippage by default. Queue and calibrated transport-latency simulation were not established. [Models](https://www.quantrocket.com/docs/api/#zipline.finance.slippage.SlippageModel), [Defaults](https://www.quantrocket.com/docs/#zipline-commissions-slippage).",
+     "paper_path": "Configure Alpaca paper credentials and deploy strategies through the documented trading workflow; operational conformance remains untested. [Alpaca workflow](https://www.quantrocket.com/alpaca), [Configuration](https://www.quantrocket.com/docs/#alpaca).",
+     "license": "Proprietary platform with separately licensed open-source components. Included data requires an active software license. [Terms](https://www.quantrocket.com/terms/).",
+     "latest_release": "2.11.0 — latest observed public release",
+     "released_at": "2025-01-28",
+     "stars": null,
+     "maintenance": "Public release notes document equity-related fee modeling and full Apple Silicon support. No newer release was established by the inspected changelog. [Changelog](https://www.quantrocket.com/docs/software-update/).",
+     "evidence": [
+      "Assessment: highest-priority commercial alternative for the stated Python-centric historical-equities-to-Alpaca-paper workflow, provided licensing and configured simulation assumptions are acceptable."
+     ]
+    },
+    {
+     "name": "Blueshift",
+     "repository": "https://github.com/QuantInsti/blueshift-developer-kit",
+     "kind": "Hosted Python event-driven platform; the linked repository contains developer tools/API stubs, not the platform engine. Browser access avoids local engine installation but does not establish native ARM64 portability. [Service](https://blueshift.quantinsti.com/), [Developer kit](https://github.com/QuantInsti/blueshift-developer-kit), [Engine](https://blueshift.quantinsti.com/api-docs/introduction.html).",
+     "alpaca_support": "Documented Alpaca paper trading and streaming trade/market-data events. [Integration concepts](https://blueshift.quantinsti.com/docs/concepts/).",
+     "historical_data_e2e": "Integrated minute history from July 2008 for a quarterly recomputed, liquidity-filtered top-1,000 stock/ETF universe. Corporate actions and historical membership are documented; unrestricted all-US/delisted coverage is not established. Executions use unadjusted prices while history queries return adjusted data. [Dataset semantics](https://blueshift.quantinsti.com/docs/datasets/).",
+     "backtest_realism": "US default volume-based slippage caps execution at 2% of bar volume. Partial-order handling is documented; latency metrics do not establish historical queue/latency simulation. [Data/fills](https://blueshift.quantinsti.com/docs/datasets/), [Order objects](https://blueshift.quantinsti.com/api-docs/objects.html), [Fixes](https://blueshift.quantinsti.com/api-docs/changelog.html).",
+     "paper_path": "Connect Alpaca paper through the hosted broker workflow. Distinguish it from Blueshift's internal simulation broker. [Broker modes](https://blueshift.quantinsti.com/docs/concepts/), [Simulation broker](https://blueshift.quantinsti.com/api-docs/changelog.html).",
+     "license": "Hosted service; free research/backtesting is documented. No open-source engine redistribution license was established. [Service documentation](https://blueshift.quantinsti.com/docs/), [Public kit scope](https://github.com/QuantInsti/blueshift-developer-kit).",
+     "latest_release": "4.0.0 — public changelog version",
+     "released_at": "2023-11-27",
+     "stars": null,
+     "maintenance": "The 4.0.0 changelog was updated 2025-05-01 and includes reconciliation, stale-data and partial-order fixes. Current deployed-service version was not independently inspected. [Changelog](https://blueshift.quantinsti.com/api-docs/changelog.html).",
+     "evidence": [
+      "Alpaca independently lists the integration: [Integration directory](https://alpaca.markets/integrations).",
+      "Assessment: credible hosted alternative for its documented liquid-equity universe; conditional for unrestricted US-equities research."
+     ]
+    },
+    {
+     "name": "Wealth-Lab",
+     "repository": "No public platform-engine repository identified; [vendor](https://www.wealth-lab.com/).",
+     "kind": "Commercial C#/.NET desktop research and trading platform. Windows is required; Mac use is directed through a Windows VM. This is a poor native Linux/macOS fit. [System requirements](https://www.wealth-lab.com/Software/Download).",
+     "alpaca_support": "Vendor extension provides historical/streaming data and automated Alpaca paper trading. [Alpaca extension](https://www.wealth-lab.com/extension/detail/Alpaca).",
+     "historical_data_e2e": "Wealth-Data supplies dynamic historical index constituents. Corporate-action and delisted-security fixes appear in release notes; coverage depends on the selected provider and dataset. [Data features](https://www.wealth-lab.com/Software/Features/Data), [Corporate-action fixes](https://www.wealth-lab.com/Software/ChangeLog).",
+     "backtest_realism": "Commission/slippage controls and granular intraday processing improve daily-bar order sequencing. Historical partial-fill, queue and latency simulation were not established; a broker PartialFilled status alone does not prove them. [Simulation changes](https://www.wealth-lab.com/Software/ChangeLog), [Transaction API](https://wealth-lab.com/Support/ApiReference/Transaction).",
+     "paper_path": "Use the Alpaca extension's paper account integration. Extension history includes a 2026-07-07 backend repair and a 2026-08-03 WL9 release. [Extension history](https://www.wealth-lab.com/extension/detail/Alpaca).",
+     "license": "Commercial subscription/lifetime licensing; Alpaca extension separately purchased or included in Premium. [Plans](https://www.wealth-lab.com/Software/SubscriptionPlans), [Extension](https://www.wealth-lab.com/extension/detail/Alpaca).",
+     "latest_release": "9 Build 9",
+     "released_at": "2026-09-19",
+     "stars": null,
+     "maintenance": "Current platform and broker-extension releases provide concrete maintenance evidence. Neither Windows-VM deployment nor Alpaca behavior was tested. [Platform changelog](https://www.wealth-lab.com/Software/ChangeLog), [Extension changelog](https://www.wealth-lab.com/extension/detail/Alpaca).",
+     "evidence": [
+      "Assessment: substantive additional E2E platform, but its Windows/C# deployment requirements materially reduce fit for the specified hosts and language preferences."
+     ]
+    }
+   ],
+   "notes": "As of 2026-09-26: no, NautilusTrader and LEAN are not the only serious choices. Research judgment: prioritize QuantRocket as an integrated commercial alternative, LumiBot as an additional Python/Alpaca candidate, and Blueshift when its hosted universe is sufficient. LEAN has particularly comprehensive documented equity-data semantics; Nautilus has detailed execution simulation but additional equity-data and Alpaca integration work. These judgments follow the cited capabilities, not incumbency or stars. Alpaca's directory establishes a broader integration ecosystem, not adoption percentages or a demonstrated SOTA winner. [Alpaca integrations](https://alpaca.markets/integrations).\n\nThe 15 entries distinguish complete documented workflows from components that require a separate execution path. Adjusted historical bars alone do not establish survivorship-free research: Alpaca exposes adjustment and symbol-as-of controls, while historical membership and complete delisted coverage need separate evidence. [Historical bars](https://docs.alpaca.markets/us/reference/stockbars).\n\nEvery Alpaca-paper connector inherits the broker simulator's limits: no market impact, latency slippage, queue-position modeling or dividends; order size is not constrained by displayed NBBO quantity; eligible orders receive random partial fills 10% of the time. The supplied Elite account's higher limits do not establish different simulation semantics. [Paper specification](https://docs.alpaca.markets/us/docs/paper-trading). Paper qualification should therefore assess operational behavior independently of historical performance.\n\nThis was primary-source, web-only research. No commands, installations, benchmarks, backtests or paper orders ran. Catalog dispositions were taken from the request because public file fetches failed. Current documentation was not assumed to match every tagged artifact. Release fields identify the latest observed named release in the stated channel; null means unverified or inapplicable. Only exact retrieved API star counts are populated; popularity did not determine fit. No comparative performance claim was established on either supplied host. search-first guided discovery and parallel source review. supply-chain-risk-auditor contributed scope/evidence rules only: its collector did not run, and dependency/advisory risk remains unassessed.",
+   "skills_used": [
+    "search-first",
+    "supply-chain-risk-auditor"
+   ]
+  }
+ },
+ "limitations": [
+  "Source and documentation review only: nothing was installed or run; verdicts are proposals for the trading lane's catalog rows and the verdict wave, not selections.",
+  "Tavily Research output is a third-party synthesis; claims used in the evaluation were re-checked against primary sources by the workflow's evaluator and facts refuter."
+ ]
+}

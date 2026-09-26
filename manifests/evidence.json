@@ -10880,6 +10880,21 @@
       "bytes": 7856
     },
     {
+      "path": "evidence/artifacts/alpaca-platform-landscape-20260926/README.md",
+      "sha256": "125ced15dbfc2c70ebea9acb1483067e34a818850ef3e10eee8e9aafa8c7bccb",
+      "bytes": 4349
+    },
+    {
+      "path": "evidence/artifacts/alpaca-platform-landscape-20260926/landscape.json",
+      "sha256": "27cf965dbc55df798ad30457ac4f0345a6412fa7e20971866c3b0e9c303f80a5",
+      "bytes": 181570
+    },
+    {
+      "path": "evidence/artifacts/alpaca-platform-landscape-20260926/tavily-research-pro.json",
+      "sha256": "ce37813de0fbbf22f80cc7340a337a8379b26d931a81bb24aa43ccecc38f8a2b",
+      "bytes": 24195
+    },
+    {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
       "sha256": "c1a6cad2d0b2dca4a1bb94a869e5b253b6d22c65905364e87af7e38ecd8383b2",
       "bytes": 534950
