@@ -14,12 +14,18 @@ credential files or secret variable names, reading or copying the whole
 Hugging Face home, tracing a shell while it sources a
 credential file, and dumping the environment after sourcing one. For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
-`pipe`, `read` and `dh_compute`, and a keyring read in inline interpreter
-code), checks the command that `kernel_keyring.py exec` or `tvly-keyring`
-starts with every rule above, and blocks that command when it names the
-injected variable or dumps the environment it inherits. It is not a
-security boundary. A process that imports a loader, or a renamed or
-obfuscated path, passes; see docs/secret-storage.md "Threat model" for the
+`pipe`, `read` and `dh_compute`, `keyctl list` or `rlist` on anything but an
+unambiguous keyring, and a keyring read in inline interpreter code), checks
+the command that `kernel_keyring.py exec` or `tvly-keyring` starts with every
+rule above, and blocks that command when it names the injected variable or
+dumps the environment it inherits, also behind a launcher's options
+(`stdbuf -o0`) or a launcher the guard does not model (`watch`, `flock`).
+A backslash-newline is joined first and every raw-text rule also reads the
+command after the shell's quote removal, so a name split by quotes, a
+backslash or a line continuation is still that name; redirection operands
+are never taken for arguments. It is not a security boundary. A process
+that imports a loader, a name assembled at run time, or a renamed or
+obfuscated path passes; see docs/secret-storage.md "Threat model" for the
 residual risk.
 
 The same file is installed for every session on a host as
@@ -97,11 +103,34 @@ READERS = {
 TRACERS = {"strace", "ltrace", "gdb", "bpftrace"}
 WRAPPERS = {"sudo", "doas", "command", "builtin", "exec", "nohup", "time", "nice", "stdbuf",
             "xargs", "setsid", "ionice", "chronic"}
+# Launcher options that take the next word as their value (getopt: a required argument, given
+# separately), per launcher, so strip_prefix skips both and reaches the command; a glued `-o0` or
+# `--output=L` is one word. From each tool's --help on 2026-09-26 (coreutils nice, stdbuf, timeout;
+# util-linux ionice; GNU time; GNU findutils 4.9.0 xargs, whose -e, -i, -l, --eof, --replace and
+# --max-lines take only a glued optional value, as `xargs --max-lines 1 echo` running `1` showed;
+# sudo, where a bare -h is --help; the doas(1) synopsis on man.openbsd.org; bash `help exec`).
+# Other options are boolean.
+WRAPPER_VALUE_FLAGS = {
+    "nice": {"-n", "--adjustment"},
+    "ionice": {"-c", "-n", "-p", "-P", "-u", "--class", "--classdata", "--pid", "--pgid", "--uid"},
+    "stdbuf": {"-i", "-o", "-e", "--input", "--output", "--error"},
+    "timeout": {"-s", "-k", "--signal", "--kill-after"},
+    "time": {"-f", "-o", "--format", "--output"},
+    "xargs": {"-a", "-d", "-E", "-I", "-L", "-n", "-P", "-s", "--arg-file", "--delimiter", "--max-args",
+              "--max-procs", "--max-chars", "--process-slot-var"},
+    "sudo": {"-C", "-D", "-g", "-p", "-R", "-r", "-T", "-t", "-U", "-u", "--close-from", "--chdir", "--group",
+             "--prompt", "--chroot", "--role", "--command-timeout", "--type", "--other-user", "--user"},
+    "doas": {"-a", "-C", "-u"},
+    "exec": {"-a"},
+}
 SHELLS = {"sh", "bash", "zsh", "dash", "ksh"}
 SOURCERS = {".", "source"}
 FIND_EXEC = {"-exec", "-execdir", "-ok", "-okdir"}
 COPIERS = {"cp", "scp", "rsync"}
-REDIRECT_OUT = re.compile(r"^\d*(?:>|>>|>\||&>|&>>)$")
+REDIRECT_OUT = re.compile(r"^\d*(?:>|>>|>\||&>|&>>|>&)$")
+# Every redirection operator as shlex (punctuation_chars) splits it: `2>&1` is `2`, `>&`, `1`, and
+# `<<-EOF` is `<<`, `-EOF`. The word after one is its file, descriptor or here-document delimiter.
+REDIRECTION = re.compile(r"^\d*(?:>>?|>\||&>>?|<<<?|<>|<&|>&|<)$")
 GIT_ARG_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace"}
 SEPARATORS = {";", "&&", "||", "|", "&", "(", ")", "|&", ";;"}
 PS_BSD_CLUSTER = re.compile(r"^[aAcfhjlmrsStTuvwxXLn]*e[aAcefhjlmrsStTuvwxXLn]*$")
@@ -123,15 +152,28 @@ ENV_NAME = re.compile(r"[A-Z_][A-Z0-9_]*")
 # three keys' payloads, which with a private key of 1 is the base key's own payload. `request`,
 # `request2` and `prequest2` print a key ID only.
 KEYCTL_PAYLOAD_COMMANDS = {"print", "pipe", "read", "dh_compute"}
+# `list` and `rlist` read their target with KEYCTL_READ and print it as key IDs, and "No attempt is
+# made to check that the specified keyring is a keyring" (keyctl(1)): act_keyctl_list and
+# act_keyctl_rlist call keyctl_read_alloc and print every four bytes as a signed integer, so on a
+# `user` key they print its payload (keyutils Git master, commit c076dff2, read 2026-09-26; `show`
+# reads a key only after checking that its type is keyring). They pass only on an unambiguous
+# keyring: a special keyring (@t @p @s @u @us @g, or -1 to -6) or a keyring by name (`%:name`,
+# `%keyring:name`). A serial, `%user:...` or @a (-7, the request_key authorisation key) can be a key.
+# keyctl takes the whole command name: its lookup skips any name longer than the word typed.
+KEYCTL_LIST_COMMANDS = {"list", "rlist"}
+KEYCTL_KEYRING_TARGETS = {"@t", "@p", "@s", "@u", "@us", "@g", "-1", "-2", "-3", "-4", "-5", "-6"}
+KEYCTL_KEYRING_NAMED = ("%:", "%keyring:")
 # Inline code that reads a payload: the operation's name, libkeyutils' and python-keyutils' readers,
 # this repository's keyring module, a raw keyctl system call (x86_64 250, aarch64 219) with
-# operation 11 (KEYCTL_READ), or keyctl(1) run as a subprocess. Checked only when the command runs an
+# operation 11 (KEYCTL_READ), or keyctl(1) run as a subprocess (`list` and `rlist` as on the command
+# line: unless their target is an unambiguous keyring). Checked only when the command runs an
 # interpreter (INTERPRETER), so a commit message or a code search that mentions KEYCTL_READ passes.
 KEYRING_READ_CODE = re.compile(
     r"\bKEYCTL_READ\b|\bkeyctl_read(?:_alloc)?\s*\(|\bkeyutils\s*\.\s*read_key\b"
     r"|\b(?:import|from)\s+(?:scripts\s*\.\s*)?kernel_keyring\b"
     r"|\bsyscall\s*\(\s*(?:[\w.]*c_u?(?:long|int)\s*\(\s*)?(?:250|219)\b[^;\n]{0,40}?\b11\b"
-    r"|\bkeyctl[\"',\s]+(?:print|pipe|read|dh_compute)\b")
+    r"|\bkeyctl[\"',\s]+(?:print|pipe|read|dh_compute)\b"
+    r"|\bkeyctl[\"',\s]+r?list\b(?![\"',\s]+(?:(?:@(?:us|[tpsug])|-[1-6])(?![\w-])|%(?:keyring)?:))")
 # Programs that run inline code, and launchers that start one (`uv run python -c ...`).
 INTERPRETER = re.compile(
     r"(?:python|pypy|perl|ruby|php|lua|tclsh)[0-9.]*|node|nodejs|deno|bun|luajit|Rscript|julia"
@@ -148,6 +190,11 @@ KEYRING_ENVIRONMENT_ACCESS = re.compile(
 JQ_ENVIRONMENT = re.compile(r"(?<![\w.$])env\b|\$ENV\b")
 SHELL_INDIRECTION = re.compile(r"\$\{!")
 ENVIRONMENT_PRINTERS = {"env", "printenv"}
+# Programs that a launcher the guard does not model (watch, flock, taskset, GNU time -f ...) may start
+# from among its arguments, so a keyring exec's command is also read from each of them onward. The
+# shell builtins that print variables count, since watch hands its arguments to `sh -c`.
+LAUNCHED_PROGRAMS = SHELLS | AWKS | JQS | ENVIRONMENT_PRINTERS | {"ps", "set", "export", "declare", "typeset",
+                                                                  "readonly", "local"}
 
 HINTS = {
     "secret_name_search": "search repository code with the Grep tool instead of a shell search for a "
@@ -187,16 +234,71 @@ def segments(tokens: list[str]) -> list[list[str]]:
     return result
 
 
+def redirection_width(words: list[str], index: int) -> int:
+    """How many words the redirection at words[index] takes (operator and target, with a descriptor
+    number before it and the `-` of `<<- EOF`), or 0 when it starts none. A digit before an operator is
+    read as its descriptor, since shlex splits `2>` and `2 >` alike."""
+    word = words[index]
+    if word.isdigit() and index + 1 < len(words) and REDIRECTION.match(words[index + 1]):
+        return 1 + redirection_width(words, index + 1)
+    if not REDIRECTION.match(word):
+        return 0
+    return 3 if word == "<<" and words[index + 1:index + 2] == ["-"] else 2
+
+
+def command_arguments(words: list[str]) -> list[str]:
+    """words[1:] without redirections, so a redirection's target (`tvly auth > --json` writes to a
+    file named --json) or a here-document delimiter is never taken for an argument."""
+    result, index = [], 1
+    while index < len(words):
+        width = redirection_width(words, index)
+        if width:
+            index += width
+        else:
+            result.append(words[index])
+            index += 1
+    return result
+
+
+def skip_wrapper_options(words: list[str], index: int, wrapper: str) -> int:
+    """Index of the first word after a launcher's own options, as getopt reads them: `--` ends them;
+    in a cluster of short options (`-iu`) the first that takes a value takes the rest of the cluster
+    (`-o0`) or, when it ends the cluster, the next word (`-o 0`, `nice -n 10`, `sudo -u root`)."""
+    value_flags = WRAPPER_VALUE_FLAGS.get(wrapper, set())
+    while index < len(words):
+        word = words[index]
+        if word == "--":
+            return index + 1
+        if not word.startswith("-") or word == "-":
+            return index
+        index += 1
+        if word.startswith("--"):
+            takes_next = word in value_flags
+        else:
+            letters = word[1:]
+            first = next((at for at, letter in enumerate(letters) if f"-{letter}" in value_flags), None)
+            takes_next = first == len(letters) - 1
+        if takes_next:
+            index += 1
+    return index
+
+
 def strip_prefix(words: list[str]) -> list[str]:
+    """The command itself: without assignments, output redirections before it (`> out cmd`), and
+    launchers with their options (timeout also with its duration). A leading input redirection stays,
+    for segment_reason's check of what is redirected in."""
     index = 0
     while index < len(words):
         word = words[index]
+        width = redirection_width(words, index)
         if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", word) or word == "$":
             index += 1
-        elif word in WRAPPERS:
-            index += 1
-        elif word == "timeout":
-            index += 2
+        elif width and REDIRECT_OUT.match(words[index + width - 2]):
+            index += width
+        elif word in WRAPPERS or word == "timeout":
+            index = skip_wrapper_options(words, index + 1, word)
+            if word == "timeout":
+                index += 1  # timeout's mandatory duration comes before the command
         else:
             break
     return words[index:]
@@ -244,8 +346,8 @@ def shell_parts(words: list[str]) -> tuple[bool, str | None]:
     return traces, inline
 
 
-def keyring_exec(words: list[str]) -> tuple[str | None, list[str], bool] | None:
-    """(injected variable, started command, variable spelled in the command) for a keyring exec.
+def keyring_exec(words: list[str]) -> tuple[str | None, list[str]] | None:
+    """(injected variable, started command) for a keyring exec.
 
     `kernel_keyring.py exec <name> <ENV_VAR> -- <command...>` is found at any position, so any path
     to the script and any launcher (python3 -I, uv run python, sudo ...) counts; the variable is None
@@ -259,11 +361,10 @@ def keyring_exec(words: list[str]) -> tuple[str | None, list[str], bool] | None:
                 return None  # kernel_keyring.py refuses to start anything without the separator
             separator = arguments.index("--")
             variable = arguments[separator - 1] if separator else None
-            return (variable if variable and ENV_NAME.fullmatch(variable) else None,
-                    arguments[separator + 1:], True)
+            return variable if variable and ENV_NAME.fullmatch(variable) else None, arguments[separator + 1:]
         if name in KEYRING_WRAPPERS and (position == 0 or program_of(words) in SHELLS):
             variable, target = KEYRING_WRAPPERS[name]
-            return variable, [target, *words[position + 1:]], False
+            return variable, [target, *words[position + 1:]]
     return None
 
 
@@ -423,36 +524,86 @@ def prints_helper_credential(words: list[str]) -> bool:
 
 def tvly_prints_key(words: list[str]) -> bool:
     """`tvly auth` without JSON output prints the key's first eight and last four characters
-    (tavily-cli 0.1.8 commands/auth.py); `tvly auth --json` and `tvly --json auth` print no key."""
-    positional = [w for w in words[1:] if not w.startswith("-")]
-    return program_of(words) == "tvly" and positional[:1] == ["auth"] \
-        and "--json" not in words[1:] and "--help" not in words[1:]
+    (tavily-cli 0.1.8 commands/auth.py); `tvly auth --json` and `tvly --json auth` print no key.
+    A redirection's target is no flag: `tvly auth > --json` prints the key into a file named --json."""
+    if program_of(words) != "tvly":
+        return False
+    arguments = command_arguments(words)
+    positional = [w for w in arguments if not w.startswith("-")]
+    return positional[:1] == ["auth"] and "--json" not in arguments and "--help" not in arguments
 
 
-def keyring_reason(command: str, words_list: list[list[str]]) -> str | None:
-    """Payload reads in inline code, and what a keyring exec's command does with the key it inherits."""
-    if any(INTERPRETER.fullmatch(program_of(words)) for words in words_list) and KEYRING_READ_CODE.search(command):
+def keyctl_reads_payload(words: list[str]) -> bool:
+    """keyctl(1) with a subcommand that prints a payload, or `list`/`rlist` whose target is not an
+    unambiguous keyring (KEYCTL_LIST_COMMANDS). keyctl has no options of its own before the command."""
+    arguments = command_arguments(words)
+    at = next((index for index, word in enumerate(arguments) if not word.startswith("-")), None)
+    if at is None:
+        return False
+    if arguments[at] in KEYCTL_PAYLOAD_COMMANDS:
+        return True
+    if arguments[at] in KEYCTL_LIST_COMMANDS and at + 1 < len(arguments):
+        target = arguments[at + 1]
+        return not (target in KEYCTL_KEYRING_TARGETS or target.startswith(KEYCTL_KEYRING_NAMED))
+    return False
+
+
+def launched_commands(words_list: list[list[str]]) -> list[list[str]]:
+    """Commands among the arguments of each segment, read from every word that names a program in
+    LAUNCHED_PROGRAMS or an interpreter onward and expanded like a command: how a launcher the guard
+    does not model (`watch -n 5 python3 -c ...`, `flock f sh -c ...`, `find -exec`) would run them."""
+    found = []
+    for words in words_list:
+        for position in range(1, len(words)):
+            program = program_of(words[position:position + 1])
+            if program in LAUNCHED_PROGRAMS or INTERPRETER.fullmatch(program):
+                found.extend(expand(shlex.join(words[position:])))
+    return found
+
+
+def unquoted(command: str) -> str:
+    """The command without the shell's quoting (quote characters and backslashes), so a name that
+    quotes or a backslash split, such as KK_DEMO_TO"KEN" or KK_DEMO_TO\\KEN, reads as the one word the
+    shell passes on. check() has already joined every backslash-newline."""
+    return re.sub(r"[\"'\\]", "", command)
+
+
+def mentions_injected_variable(text: str, variable: str) -> bool:
+    """Whether unquoted command text names an injected variable anywhere but in the <ENV_VAR> argument
+    of a `kernel_keyring.py exec <name> <ENV_VAR> --` (that argument is never a reference). Matching
+    the argument's own span, not subtracting a count, keeps any other mention, at any depth, visible."""
+    name = rf"(?<![A-Za-z0-9_]){re.escape(variable)}(?![A-Za-z0-9_])"
+    arguments = [match.span(1) for match in re.finditer(
+        rf"(?<![^\s/]){re.escape(KEYRING_SCRIPT)}\s+exec\s+[^\s;&|()<>]+\s+({name})\s+--(?=\s|$)", text)]
+    return any(not any(start <= match.start() < end for start, end in arguments)
+               for match in re.finditer(name, text))
+
+
+def keyring_reason(texts: tuple[str, str], words_list: list[list[str]]) -> str | None:
+    """Payload reads in inline code, and what a keyring exec's command does with the key it inherits.
+    `texts` is the command as written and unquoted(); every pattern reads both."""
+    def found(pattern: re.Pattern[str]) -> bool:
+        return any(pattern.search(text) for text in texts)
+
+    if any(INTERPRETER.fullmatch(program_of(words)) for words in words_list) and found(KEYRING_READ_CODE):
         return "keyring_payload_read"
     started = [parsed for parsed in map(keyring_exec, words_list) if parsed is not None]
-    # Each `kernel_keyring.py exec` spells its variable once; any further mention names it, whether
-    # in the started command, in code piped into it or in a here-document it reads.
-    for variable in {variable for variable, _command, _spelled in started if variable}:
-        spelled = sum(1 for other, _command, is_spelled in started if other == variable and is_spelled)
-        if len(re.findall(rf"(?<![A-Za-z0-9_]){re.escape(variable)}(?![A-Za-z0-9_])", command)) > spelled:
-            return "keyring_variable_reference"
-    for _variable, started_command, _spelled in started:
+    # Any mention of an injected variable except exec's own <ENV_VAR> argument names it: in the started
+    # command, in code piped into it or in a here-document it reads.
+    if any(mentions_injected_variable(texts[1], variable) for variable in {name for name, _ in started if name}):
+        return "keyring_variable_reference"
+    for _variable, started_command in started:
         inner = expand(shlex.join(started_command)) if started_command else []
-        # A dump in program position, or env or printenv as another program's argument, which is how a
-        # launcher the guard does not model (find -exec, stdbuf, watch ...) would run it.
-        if any(dumps_after_source(words) or any(program_of([word]) in ENVIRONMENT_PRINTERS for word in words[1:])
-               for words in inner):
+        # The started command, and the commands among its arguments that a launcher the guard does not
+        # model would run (launched_commands). The price: a one-word query `env` is blocked too.
+        inner += launched_commands(inner)
+        if any(dumps_after_source(words) for words in inner):
             return "environment_dump_in_keyring_exec"
         programs = {program_of(words) for words in inner}
         if (any(INTERPRETER.fullmatch(program) for program in programs) or programs & AWKS) \
-                and KEYRING_ENVIRONMENT_ACCESS.search(command):
+                and found(KEYRING_ENVIRONMENT_ACCESS):
             return "environment_dump_in_keyring_exec"
-        if (programs & JQS and JQ_ENVIRONMENT.search(command)) \
-                or (programs & SHELLS and SHELL_INDIRECTION.search(command)):
+        if (programs & JQS and found(JQ_ENVIRONMENT)) or (programs & SHELLS and found(SHELL_INDIRECTION)):
             return "environment_dump_in_keyring_exec"
     return None
 
@@ -463,7 +614,7 @@ def segment_reason(words: list[str]) -> str | None:
         return "environment_dump"
     if prints_helper_credential(words) or tvly_prints_key(words):
         return "native_token_print"
-    if program == "keyctl" and next((w for w in words[1:] if not w.startswith("-")), None) in KEYCTL_PAYLOAD_COMMANDS:
+    if program == "keyctl" and keyctl_reads_payload(words):
         return "keyring_payload_read"
     if program in TRACERS:
         return "process_trace"
@@ -485,22 +636,29 @@ def segment_reason(words: list[str]) -> str | None:
 
 
 def check(command: str) -> str | None:
-    for pattern, reason in STORE_PATHS:
-        if pattern.search(command):
-            return reason
-    if PROC_WORD.search(command) and re.search(r"\benviron\b", command):
-        return "process_environment"
-    if SECRET_EXPANSION.search(command) or SECRET_LOOKUP.search(command):
-        return "secret_variable_reference"
+    # The shell removes a backslash-newline before it splits words, so the rules read the joined command.
+    # Each text pattern also reads it without quoting: `sh -c 'echo $GH_TO''KEN'` hands the inner shell
+    # `echo $GH_TOKEN`. (Where quoting does end a name, as in `"$GH_TO"KEN`, that errs toward blocking.)
+    command = command.replace("\\\n", "")
+    texts = (command, unquoted(command))
+    for text in texts:
+        for pattern, reason in STORE_PATHS:
+            if pattern.search(text):
+                return reason
+        if PROC_WORD.search(text) and re.search(r"\benviron\b", text):
+            return "process_environment"
+        if SECRET_EXPANSION.search(text) or SECRET_LOOKUP.search(text):
+            return "secret_variable_reference"
     words_list = expand(command)
-    reason = keyring_reason(command, words_list)
+    reason = keyring_reason(texts, words_list)
     if reason:
         return reason
     if any(sources_credential_file(words) for words in words_list):
-        if "xtrace" in command or re.search(r"\bSHELLOPTS=", command) \
+        if any("xtrace" in text or re.search(r"\bSHELLOPTS=", text) for text in texts) \
                 or any(traces(words) for words in words_list):
             return "trace_while_sourcing"
-        if ENVIRONMENT_ACCESS.search(command) or any(dumps_after_source(words) for words in words_list):
+        if any(ENVIRONMENT_ACCESS.search(text) for text in texts) \
+                or any(dumps_after_source(words) for words in words_list):
             return "environment_dump_after_source"
     for words in words_list:
         reason = segment_reason(words)

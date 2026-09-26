@@ -539,39 +539,73 @@ to the keyring. It blocks, by reason code:
   payload, and `dh_compute`, which prints base ^ private (mod prime)
   computed from three keys' payloads; with a private key of 1 that is the
   base key's own payload (keyctl(1), keyutils Git as published on man7.org on
-  2026-08-04). `keyctl request`, `request2` and `prequest2` print only a key
-  ID and pass. The same reason covers a payload read in inline interpreter
+  2026-08-04). `keyctl list` and `rlist` read their target and print it as
+  key IDs without checking that it is a keyring ("No attempt is made to
+  check that the specified keyring is a keyring", keyctl(1)); on a `user` key
+  they print its payload as integers (`act_keyctl_list` and
+  `act_keyctl_rlist` in keyutils Git master, commit c076dff2, read
+  2026-09-26). They pass only on an unambiguous keyring: `@t`, `@p`, `@s`,
+  `@u`, `@us`, `@g` or `-1` to `-6`, or a keyring by name (`%:name`,
+  `%keyring:name`); a serial, `%user:...` or `@a` (the request_key
+  authorisation key) is blocked. `keyctl show` reads only keyrings and
+  passes, as do `request`, `request2` and `prequest2`, which print only a
+  key ID. keyctl accepts only the whole command name: its lookup skips every
+  name longer than the word typed, although keyctl(1) says a shortening
+  works. The same reason covers a payload read in inline interpreter
   code: `KEYCTL_READ`, `keyctl_read(`, `keyutils.read_key`, an import of
   `kernel_keyring`, a raw keyctl system call (250 on x86_64, 219 on
-  aarch64) with operation 11, or `keyctl print` run as a subprocess. That
+  aarch64) with operation 11, or `keyctl print` (or `list`/`rlist` on
+  anything but those keyrings) run as a subprocess. That
   check runs only when the command starts an interpreter, so a code search
   or a commit message that names `KEYCTL_READ` passes.
 - Every existing rule, applied to the command that `kernel_keyring.py exec`
   (any path to the script, any launcher such as `python3 -I` or
   `uv run python`) or `tvly-keyring` starts. `-- cat .env` is a
-  `dotenv_read`, `-- strace ...` a `process_trace`, and so on.
-- `keyring_variable_reference`: any mention of the injected variable beyond
-  the one that `exec` itself takes, whether in the started command, in code
-  piped into it or in a here-document. A variable outside the guard's secret
+  `dotenv_read`, `-- strace ...` a `process_trace`, and so on. A launcher's
+  own options are read as getopt reads them, from each tool's `--help`
+  (`stdbuf -o0`, `nice -n 5`, `timeout -s KILL 5`, `xargs -I {}`,
+  `sudo -iu root`), and an output redirection before a command
+  (`> out tvly auth`) does not hide it.
+- `keyring_variable_reference`: any mention of the injected variable except
+  the `<ENV_VAR>` argument of `exec` itself, whether in the started command,
+  in code piped into it or in a here-document. The guard exempts that
+  argument's own place in the command after quote removal, so an argument
+  split by quotes, a backslash or a line continuation (`KK_DEMO_TO"KEN"`)
+  cannot use up the exemption that a reference then hides behind. A variable outside the guard's secret
   names counts too. `TAVILY_API_KEY` is now one of those names, so
   `$TAVILY_API_KEY` anywhere is a `secret_variable_reference`.
 - `environment_dump_in_keyring_exec`: the started command dumps the
   environment it inherits: `env`, `printenv`, `set`, `export -p`,
-  `declare -p` or `ps e` (also inside `sh -c`); `env` or `printenv` as
-  another program's argument, which is how a launcher the guard does not
-  model (`find -exec`, `stdbuf`, `watch`) runs it; a shell's `${!...}`
+  `declare -p` or `ps e` (also inside `sh -c`); the same, or a shell, an
+  interpreter, awk or jq, as another program's argument, which the guard
+  reads as a command from there on, since that is how a launcher it does not
+  model (`find -exec`, `watch`, `flock`, `taskset`, GNU `time -f`) runs it;
+  a shell's `${!...}`
   indirection; or code that reads the whole environment (`os.environ`,
   `environb`, `getenv`, `process.env`, `Deno.env`, `%ENV`, a bare `ENV`,
   `$_ENV`, PowerShell's `env:`, awk's `ENVIRON`, jq's `env`, or a quoted
   `env`, `printenv`, `set` or `export` handed to a subprocess). The code
   check runs only when the started command runs an interpreter, awk or jq,
-  so a `tvly search` whose query mentions `os.environ` passes. A one-word
-  query `env` is blocked, the price of the argument rule.
+  so a `tvly search` whose query mentions `os.environ` passes. The price of
+  the argument rule: a one-word query `env` or `printenv` is blocked, and so
+  is `set`, `export`, `declare` or `typeset` as the command's last word
+  (`tvly search set --json` passes).
   `/proc/*/environ` stays a `process_environment` everywhere.
 - `native_token_print`: `tvly auth` without `--json`, which prints the key's
   first eight and last four characters (tavily-cli 0.1.8
-  `commands/auth.py`). `native_store_path`: `~/.tavily/config.json`, where
+  `commands/auth.py`). A redirection's target or a here-document delimiter
+  is not the flag: `tvly auth > --json` prints them into a file named
+  `--json`. `native_store_path`: `~/.tavily/config.json`, where
   `tvly login` and `tvly init` store a key or an OAuth token.
+
+Every text rule of the guard also reads the command after the shell's quote
+removal, with each backslash-newline joined first, so
+`sh -c 'echo $GH_TO''KEN'`, whose inner shell runs `echo $GH_TOKEN`, is a
+`secret_variable_reference`. A cross-family review the same day found the
+split exec argument, `stdbuf -o0` before an interpreter, `keyctl rlist` on
+a user key and `tvly auth > --json` passing the first version of these
+rules. Each was reproduced against that version before the fix and is now a
+regression case in `tests/test_secret_path_guard.py`.
 
 The documented `store`, `status`, `revoke` and `exec ... -- tvly ...` forms
 pass, and `tests/test_secret_path_guard.py` checks every keyring command in
@@ -579,9 +613,12 @@ the fenced blocks of this page, `recipes/tavily.md` and
 `adoption/tools/README.md`. These still pass, recorded in that test's
 `EXPECTED_PASS_THROUGH`: a shell or interpreter that `exec` starts and that
 reads its commands from a pipe or a script file; a copy of
-`kernel_keyring.py` under another name; and a keyctl system call whose
-number is held in a variable. The macOS `secret run NAME -- command` form
-is not unwrapped. A host runs the new rules only after its user-level copy
+`kernel_keyring.py` under another name; a keyctl system call whose
+number is held in a variable; a variable name that the started command
+assembles at run time; a launcher that takes its command as one string
+(`script -c`); and, outside a keyring exec, a reader behind a launcher the
+guard does not model (`watch -n 5 cat .env`). The macOS
+`secret run NAME -- command` form is not unwrapped. A host runs the new rules only after its user-level copy
 is replaced (`tools/adoption/install_claude_profile.py --only guard`, see
 [User-level guards](#user-level-guards-deployed-by-the-claude-profile)).
 
@@ -593,7 +630,7 @@ is replaced (`tools/adoption/install_claude_profile.py --only guard`, see
 | `scripts/git-hooks/pre-commit` (gitleaks on staged changes) | known secret shapes in a commit, before it is made | `--no-verify`; clones where `core.hooksPath` is not set; values with no recognizable shape |
 | CI gitleaks (`validate.yml`), GitHub secret scanning and push protection (public repo) | pushes and history that contain known provider patterns | anything not yet pushed; custom formats. This layer only reacts after the fact |
 | Project `.claude/settings.json` deny rules | Claude's Read/Edit tools on the listed paths (including both Hugging Face token files at their default location); `printenv`, `env`, `gh auth token`, `hf auth token`, `git credential fill`, `gh auth git-credential` | Python or other subprocesses that open the files themselves; forms that do not match the rule text; a moved `HF_HOME`; sessions started outside this repository |
-| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file or a secret variable **name**; redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one; for the kernel keyring ([Guard coverage](#guard-coverage-2026-09-26)), read a payload (`keyctl print`, `pipe`, `read`, `dh_compute`, or a keyring read in inline interpreter code), print part of the Tavily key (`tvly auth` without `--json`), or give `kernel_keyring.py exec` or `tvly-keyring` a command that breaks any rule above, names the injected variable or dumps the environment it inherits | a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, obfuscated or renamed paths, a script file that sources and traces on its own, a shell or interpreter started by `exec` that reads its commands from a pipe or a script file, a renamed copy of `kernel_keyring.py`, the macOS `secret run NAME -- command` form, and anything else that is not literal text in the command |
+| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file or a secret variable **name**; redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one; for the kernel keyring ([Guard coverage](#guard-coverage-2026-09-26)), read a payload (`keyctl print`, `pipe`, `read`, `dh_compute`, `list` or `rlist` on anything but an unambiguous keyring, or a keyring read in inline interpreter code), print part of the Tavily key (`tvly auth` without `--json`), or give `kernel_keyring.py exec` or `tvly-keyring` a command that breaks any rule above, names the injected variable or dumps the environment it inherits, also behind a launcher; each text rule also reads the command after quote removal | a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, obfuscated or renamed paths, a script file that sources and traces on its own, a shell or interpreter started by `exec` that reads its commands from a pipe or a script file, a renamed copy of `kernel_keyring.py`, a variable name assembled at run time, a launcher that takes its command as one string (`script -c`), the macOS `secret run NAME -- command` form, and anything else that is not literal text in the command |
 | Codex `[shell_environment_policy] inherit = "none"` | credential and broker variables in the launcher environment reaching Codex shells (measured, see below) | file reads. The setting controls which environment variables a Codex shell inherits, not which files it can open. A Codex shell can still `cat` a store file. The file-level mitigations are the store's location outside every workspace and the Codex sandbox; Codex 0.155.1 has no documented per-path read deny |
 
 In plain terms: an agent running as your user in `bypassPermissions` mode can
