@@ -70,6 +70,121 @@ processors:
           - set(attributes["cached_token_count"], attributes["usage"]["total"]["cachedInputTokens"]) where attributes["usage"] != nil and attributes["usage"]["total"] != nil
           - set(attributes["reasoning_token_count"], attributes["usage"]["total"]["reasoningOutputTokens"]) where attributes["usage"] != nil and attributes["usage"]["total"] != nil
           - set(attributes["total_token_count"], attributes["usage"]["total"]["totalTokens"]) where attributes["usage"] != nil and attributes["usage"]["total"] != nil
+  # Invoke-rate names for the logs pipelines (README "Tool, MCP, skill and subagent invoke rates"). With
+  # OTEL_LOG_TOOL_DETAILS=1 Claude Code adds tool_parameters, a JSON string that holds whole Bash commands next to the
+  # MCP server/tool, skill and subagent names. Only the MCP names and the subagent type are copied out, plus whether a
+  # Bash command starts with rtk. Names that Claude Code or Codex write from their own registries (MCP server and tool,
+  # an activated skill, the client) must be a short identifier or they become "other". A value the model types into a
+  # tool call is never exported as written: agent types keep only the built-in agents Claude Code documents and become
+  # "custom" otherwise, and the Skill tool's skill_name, workflow names and Codex agent paths are not exported.
+  # Derived values must be in their enumeration. Content keys are deleted here and again by the transform/privacy
+  # allowlist. error_mode silent: a failed parse never writes its input to the Collector log; the record flows on
+  # without names and carries tool_details="unparsed".
+  transform/tool_names:
+    error_mode: silent
+    log_statements:
+      - context: log
+        statements:
+          # Derived keys are owned here: a client or file cannot supply them.
+          - delete_matching_keys(attributes, "^(tool_family|actor|shell_rtk|tool_details|client)$")
+      - context: log
+        conditions:
+          - attributes["event.name"] == "ecosystem.sdk_receipt"
+        statements:
+          # SDK receipts carry none of these names; the shared allowlist must not let a receipt file add them.
+          - delete_matching_keys(attributes, "^(mcp_server\\.name|mcp_tool\\.name|skill\\.name|invocation_trigger|subagent_type|agent\\.name|agent_type|total_tool_uses|workflow\\.run_id|originator|kind|state|sender_thread_id|receiver_thread_id)$")
+      - context: log
+        statements:
+          # First-party Codex desktop clients are named "Codex <App>" (codex-rs login default_client.rs
+          # is_first_party_originator); they become codex_<app>. Any other originator keeps its text for the name check.
+          - replace_pattern(attributes["originator"], "^Codex ([A-Za-z]{1,32})$", "codex_$$1") where IsString(attributes["originator"])
+          - set(attributes["originator"], ToLowerCase(attributes["originator"])) where IsString(attributes["originator"])
+      - context: log
+        conditions:
+          - attributes["event.name"] == "tool_result"
+          - attributes["event.name"] == "tool_decision"
+        statements:
+          - set(cache["parameters"], ParseJSON(attributes["tool_parameters"])) where IsString(attributes["tool_parameters"])
+          - set(attributes["tool_details"], "unparsed") where attributes["tool_parameters"] != nil and not IsMap(cache["parameters"])
+          - set(attributes["mcp_server.name"], cache["parameters"]["mcp_server_name"]) where IsString(cache["parameters"]["mcp_server_name"])
+          - set(attributes["mcp_tool.name"], cache["parameters"]["mcp_tool_name"]) where IsString(cache["parameters"]["mcp_tool_name"])
+          - set(attributes["subagent_type"], cache["parameters"]["subagent_type"]) where IsString(cache["parameters"]["subagent_type"])
+          - set(attributes["shell_rtk"], "true") where IsString(cache["parameters"]["bash_command"]) and IsMatch(cache["parameters"]["bash_command"], "^(.*/)?rtk$")
+          - set(attributes["shell_rtk"], "false") where IsString(cache["parameters"]["bash_command"]) and not IsMatch(cache["parameters"]["bash_command"], "^(.*/)?rtk$")
+          - set(attributes["tool_family"], "other")
+          - set(attributes["tool_family"], "shell") where attributes["tool_name"] == "Bash" or attributes["tool_name"] == "PowerShell"
+          - set(attributes["tool_family"], "read") where IsMatch(attributes["tool_name"], "^(Read|Grep|Glob|LS|NotebookRead)$")
+          - set(attributes["tool_family"], "edit") where IsMatch(attributes["tool_name"], "^(Edit|MultiEdit|Write|NotebookEdit)$")
+          - set(attributes["tool_family"], "mcp") where attributes["tool_name"] == "mcp_tool"
+          - set(attributes["tool_family"], "skill") where attributes["tool_name"] == "Skill"
+          - set(attributes["tool_family"], "toolsearch") where attributes["tool_name"] == "ToolSearch"
+          - set(attributes["tool_family"], "web") where attributes["tool_name"] == "WebFetch" or attributes["tool_name"] == "WebSearch"
+          - set(attributes["tool_family"], "agent") where IsMatch(attributes["tool_name"], "^(Agent|Task|Workflow)$")
+          # Workflow children carry workflow.run_id; Agent-tool subagents have no marker on tool events (span-only agent_id).
+          - set(attributes["actor"], "main_or_subagent")
+          - set(attributes["actor"], "workflow") where attributes["workflow.run_id"] != nil
+          - set(attributes["client"], resource.attributes["service.name"])
+      - context: log
+        conditions:
+          - attributes["event.name"] == "api_request"
+          - attributes["event.name"] == "assistant_response"
+        statements:
+          - set(attributes["actor"], "auxiliary")
+          - set(attributes["actor"], "main") where IsMatch(attributes["query_source"], "^(repl_main_thread|sdk)")
+          - set(attributes["actor"], "subagent") where IsMatch(attributes["query_source"], "^agent:")
+          - set(attributes["actor"], "workflow") where attributes["workflow.run_id"] != nil
+      - context: log
+        conditions:
+          - attributes["event.name"] == "codex.tool_result"
+          - attributes["event.name"] == "codex.tool_decision"
+        statements:
+          - set(attributes["mcp_server.name"], attributes["mcp_server"]) where IsString(attributes["mcp_server"]) and attributes["mcp_server"] != ""
+          - set(attributes["mcp_tool.name"], attributes["tool_name"]) where IsMatch(attributes["tool_namespace"], "^mcp__")
+          - set(cache["arguments"], ParseJSON(attributes["arguments"])) where attributes["tool_namespace"] == "functions" and attributes["tool_name"] == "exec_command" and IsString(attributes["arguments"])
+          - set(attributes["shell_rtk"], "true") where IsString(cache["arguments"]["cmd"]) and IsMatch(cache["arguments"]["cmd"], "^\\s*(\\S*/)?rtk(\\s|$)")
+          - set(attributes["shell_rtk"], "false") where IsString(cache["arguments"]["cmd"]) and not IsMatch(cache["arguments"]["cmd"], "^\\s*(\\S*/)?rtk(\\s|$)")
+          - set(attributes["tool_family"], "other")
+          - set(attributes["tool_family"], "shell") where IsMatch(attributes["tool_name"], "^(exec_command|write_stdin|shell|shell_command|local_shell)$")
+          - set(attributes["tool_family"], "read") where IsMatch(attributes["tool_name"], "^(read_file|list_dir|grep_files|view_image)$")
+          - set(attributes["tool_family"], "edit") where attributes["tool_name"] == "apply_patch"
+          - set(attributes["tool_family"], "web") where attributes["tool_namespace"] == "web" or attributes["tool_name"] == "web_search"
+          - set(attributes["tool_family"], "toolsearch") where attributes["tool_name"] == "tool_search"
+          - set(attributes["tool_family"], "agent") where attributes["tool_namespace"] == "collaboration" or IsMatch(attributes["tool_name"], "^(spawn_agent|send_input|send_message|followup_task|wait_agent|close_agent|resume_agent|list_agents|interrupt_agent)$")
+          # Code mode wraps nested calls, which Codex also records as tool results: count the wrapper separately.
+          - set(attributes["tool_family"], "code_mode") where attributes["tool_namespace"] == "functions" and IsMatch(attributes["tool_name"], "^(exec|wait)$")
+          - set(attributes["tool_family"], "mcp") where IsMatch(attributes["tool_namespace"], "^mcp__")
+          # agent_name is /root or /root/<task name the model chose>: only main or subagent leaves the Collector.
+          - set(attributes["actor"], "main") where attributes["agent_name"] == "/root"
+          - set(attributes["actor"], "subagent") where attributes["agent_name"] != nil and attributes["agent_name"] != "/root"
+          # Every app-server front-end exports service.name codex-app-server; the thread's originator names the client.
+          - set(attributes["client"], resource.attributes["service.name"])
+          - set(attributes["client"], attributes["originator"]) where resource.attributes["service.name"] == "codex-app-server" and IsString(attributes["originator"]) and attributes["originator"] != ""
+      - context: log
+        statements:
+          - delete_matching_keys(attributes, "^(tool_parameters|tool_input|arguments|output|content|error)$")
+          # Registry names: a short identifier, and no run of 24+ letters/digits (the shape of a key or token).
+          - set(attributes["mcp_server.name"], "other") where attributes["mcp_server.name"] != nil and (not IsMatch(attributes["mcp_server.name"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$") or IsMatch(attributes["mcp_server.name"], "[A-Za-z0-9]{24}"))
+          - set(attributes["mcp_tool.name"], "other") where attributes["mcp_tool.name"] != nil and (not IsMatch(attributes["mcp_tool.name"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$") or IsMatch(attributes["mcp_tool.name"], "[A-Za-z0-9]{24}"))
+          - set(attributes["skill.name"], "other") where attributes["skill.name"] != nil and (not IsMatch(attributes["skill.name"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$") or IsMatch(attributes["skill.name"], "[A-Za-z0-9]{24}"))
+          - set(attributes["originator"], "other") where attributes["originator"] != nil and (not IsMatch(attributes["originator"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$") or IsMatch(attributes["originator"], "[A-Za-z0-9]{24}"))
+          - set(attributes["client"], "other") where attributes["client"] != nil and (not IsMatch(attributes["client"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$") or IsMatch(attributes["client"], "[A-Za-z0-9]{24}"))
+          # Agent types: the built-in agents of the Claude Code subagent docs plus the workflow child; any other value is
+          # custom, as Claude Code itself reports user-defined agents when OTEL_LOG_TOOL_DETAILS is off.
+          - set(attributes["subagent_type"], "custom") where attributes["subagent_type"] != nil and not ContainsValue(["general-purpose", "Explore", "Plan", "claude", "statusline-setup", "claude-code-guide", "workflow-subagent", "custom"], attributes["subagent_type"])
+          - set(attributes["agent.name"], "custom") where attributes["agent.name"] != nil and not ContainsValue(["general-purpose", "Explore", "Plan", "claude", "statusline-setup", "claude-code-guide", "workflow-subagent", "custom"], attributes["agent.name"])
+          - set(attributes["agent_type"], "custom") where attributes["agent_type"] != nil and not ContainsValue(["general-purpose", "Explore", "Plan", "claude", "statusline-setup", "claude-code-guide", "workflow-subagent", "custom"], attributes["agent_type"])
+          # Enumerations and ids: anything else is deleted.
+          - delete_key(attributes, "tool_family") where attributes["tool_family"] != nil and not IsMatch(attributes["tool_family"], "^(shell|read|edit|mcp|skill|toolsearch|web|agent|code_mode|other)$")
+          - delete_key(attributes, "actor") where attributes["actor"] != nil and not IsMatch(attributes["actor"], "^(main|subagent|workflow|main_or_subagent|auxiliary)$")
+          - delete_key(attributes, "shell_rtk") where attributes["shell_rtk"] != nil and not IsMatch(attributes["shell_rtk"], "^(true|false)$")
+          - delete_key(attributes, "tool_details") where attributes["tool_details"] != nil and attributes["tool_details"] != "unparsed"
+          - delete_key(attributes, "invocation_trigger") where attributes["invocation_trigger"] != nil and not IsMatch(attributes["invocation_trigger"], "^(user-slash|claude-proactive|nested-skill)$")
+          - delete_key(attributes, "kind") where attributes["kind"] != nil and not IsMatch(attributes["kind"], "^(spawn|message|followup|result)$")
+          - delete_key(attributes, "state") where attributes["state"] != nil and not IsMatch(attributes["state"], "^(send|receive)$")
+          - delete_key(attributes, "workflow.run_id") where attributes["workflow.run_id"] != nil and not IsMatch(attributes["workflow.run_id"], "^wf_[A-Za-z0-9_-]{1,32}$")
+          - delete_key(attributes, "sender_thread_id") where attributes["sender_thread_id"] != nil and not IsMatch(attributes["sender_thread_id"], "^[0-9A-Fa-f-]{36}$")
+          - delete_key(attributes, "receiver_thread_id") where attributes["receiver_thread_id"] != nil and not IsMatch(attributes["receiver_thread_id"], "^[0-9A-Fa-f-]{36}$")
+          - delete_key(attributes, "total_tool_uses") where attributes["total_tool_uses"] != nil and not IsMatch(attributes["total_tool_uses"], "^[0-9]{1,9}$")
   transform/privacy:
     error_mode: propagate
     log_statements:
@@ -88,7 +203,7 @@ processors:
           - set(severity_text, "")
           - set(event_name, "")
           - set(body, "[content omitted]")
-          - keep_keys(attributes, ["receipt_id", "observation_id", "usage_status", "event.name", "event.kind", "event.timestamp", "event.sequence", "session.id", "conversation.id", "thread.id", "turn.id", "model", "model_name", "provider_name", "tool_name", "success", "decision", "duration_ms", "duration", "status_code", "http.response.status_code", "error.type", "input_tokens", "output_tokens", "cached_input_tokens", "cache_read_tokens", "cache_creation_tokens", "input_token_count", "output_token_count", "cached_input_token_count", "cached_token_count", "cache_write_token_count", "reasoning_token_count", "tool_token_count", "tool_result_seq", "tool_namespace", "status", "reasoning_effort", "model_reasoning_effort", "service_tier", "app.version", "query_source", "effort", "error_type", "reasoning_output_token_count", "total_token_count", "cache_read_input_tokens", "cache_creation_input_tokens", "attempt", "ecosystem.task.id", "ecosystem.client.scope"])
+          - keep_keys(attributes, ["receipt_id", "observation_id", "usage_status", "event.name", "event.kind", "event.timestamp", "event.sequence", "session.id", "conversation.id", "thread.id", "turn.id", "model", "model_name", "provider_name", "tool_name", "success", "decision", "duration_ms", "duration", "status_code", "http.response.status_code", "error.type", "input_tokens", "output_tokens", "cached_input_tokens", "cache_read_tokens", "cache_creation_tokens", "input_token_count", "output_token_count", "cached_input_token_count", "cached_token_count", "cache_write_token_count", "reasoning_token_count", "tool_token_count", "tool_result_seq", "tool_namespace", "status", "reasoning_effort", "model_reasoning_effort", "service_tier", "app.version", "query_source", "effort", "error_type", "reasoning_output_token_count", "total_token_count", "cache_read_input_tokens", "cache_creation_input_tokens", "attempt", "ecosystem.task.id", "ecosystem.client.scope", "tool_family", "actor", "shell_rtk", "tool_details", "client", "mcp_server.name", "mcp_tool.name", "skill.name", "invocation_trigger", "subagent_type", "agent.name", "agent_type", "total_tool_uses", "workflow.run_id", "originator", "kind", "state", "sender_thread_id", "receiver_thread_id"])
     metric_statements:
       - context: resource
         statements:
@@ -167,7 +282,7 @@ service:
   pipelines:
     logs:
       receivers: [otlp]
-      processors: [memory_limiter, transform/privacy, batch]
+      processors: [memory_limiter, transform/tool_names, transform/privacy, batch]
       exporters: [otlphttp/loki, file/events]
     metrics:
       receivers: [otlp]
@@ -179,7 +294,7 @@ service:
       exporters: [prometheus]
     logs/sdk_receipts:
       receivers: [file_log/sdk_receipts]
-      processors: [memory_limiter, transform/sdk_receipt, transform/privacy, batch]
+      processors: [memory_limiter, transform/sdk_receipt, transform/tool_names, transform/privacy, batch]
       exporters: [otlphttp/loki, file/events]
     metrics/host:
       receivers: [host_metrics]

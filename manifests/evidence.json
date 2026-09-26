@@ -3507,8 +3507,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "a0722efe82eb0158db43ca9d754ee7f190a42e4c161b451e58dd3bc8231b0a72",
-      "bytes": 38108
+      "sha256": "1475889723dd56733e2f2eebc55cf9bdf6e678ff7aaa55b24ba65882a1d87d2b",
+      "bytes": 38327
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3622,8 +3622,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "1e0a17091bd62543b95dda9afab62ae79866658bb9fa25b77b1315eaafb29a5d",
-      "bytes": 53178
+      "sha256": "51cba1b466c6043b64ef8b5f1f28506906ad651cf66394f12b631124e91936b2",
+      "bytes": 53400
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3667,8 +3667,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "b8fdee5bdadb17c5f01f1b2df1c5c754f85c57f12b6deb5491ecb0592c1508d1",
-      "bytes": 8695
+      "sha256": "8966ca48b57955bc437ac83b22ee290a638ba220fcfde6c1ac9e0f09d3fbb712",
+      "bytes": 8691
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -13527,6 +13527,11 @@
       "bytes": 16124
     },
     {
+      "path": "docs/decisions/2026-09-26-tool-invoke-rates.md",
+      "sha256": "4dc064bb55a8c9aa71e05a818bcd806fff6e19bb4979109518ad521ef077f0ca",
+      "bytes": 11795
+    },
+    {
       "path": "docs/decisions/2026-09-26-workstation-tool-refresh.md",
       "sha256": "e9bf99f9905121292e1c6a96b8b59e12127ddd1f74b9ab8240cb8497e8c19443",
       "bytes": 8203
@@ -13823,8 +13828,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "11dfaa16f96f2cda2d82ce647b6da762270267781a3416a985b523bb18eab8f6",
-      "bytes": 59042
+      "sha256": "ce12751e580c65e564a4a8cae03c9be6b763bb239e138538fa69b3c0d03c8876",
+      "bytes": 61589
     },
     {
       "path": "docs/stack.md",
@@ -37438,8 +37443,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "1c2a3becc592aaaa38dcbb2f37663850703ab75ffe6c3fb6c78e86622632839e",
-      "bytes": 24197
+      "sha256": "cc394e24445dc7d194aaa7d2593d8b02dc5db2f89ee3c3bed3c7f26b934b7262",
+      "bytes": 25028
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -37488,8 +37493,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-dashboard.json.example",
-      "sha256": "5239e1f0d1700eee4ce60d6b9a50dd1dc49e347e9f71d21bec800e523f5b8127",
-      "bytes": 16719
+      "sha256": "0625f7bb931d9c38da782caf2252867d8c6060c592fff8371c49fbd766c8b6d6",
+      "bytes": 39129
     },
     {
       "path": "observability/backends/templates/ecosystem-grafana-dashboards.yml.example",
@@ -37533,13 +37538,13 @@
     },
     {
       "path": "observability/collector/README.md",
-      "sha256": "d370dd0ac31a3bf00296f03d0813318e2fb729731a0b84bc1a527280172a7f5b",
-      "bytes": 14402
+      "sha256": "7df58026aae4f50ce8d930a4315f4679931523f9aceda74ffab3d7c7db28834b",
+      "bytes": 19687
     },
     {
       "path": "observability/collector/claude-settings.json.example",
-      "sha256": "65f26b5fb516dc4e21cf8361b8021c2700e9dd883b76690a2de5531a34754020",
-      "bytes": 775
+      "sha256": "999c727fdd05c698c14182665bb1ea8d0964927785728797b12bfcbdb72391df",
+      "bytes": 771
     },
     {
       "path": "observability/collector/codex-identity-launcher.sh.example",
@@ -37553,8 +37558,8 @@
     },
     {
       "path": "observability/collector/collector.yaml",
-      "sha256": "7308ec8f33a3fb339e20f309b699477ee454a2da9d0398099e9c50b6c23dd7e6",
-      "bytes": 9316
+      "sha256": "ff229df907411215341a578ff58a4d27783084e2c84248ed9f77454813b89ea8",
+      "bytes": 22426
     },
     {
       "path": "observability/collector/ecosystem-otelcol.service.example",
@@ -38505,6 +38510,11 @@
       "path": "tests/test_observability_backends_alerts.py",
       "sha256": "944fb543cbb1ba5025a4d1df2a4ffd84a3323f3f67b591bb83a8bdd796fc1a0e",
       "bytes": 16142
+    },
+    {
+      "path": "tests/test_observability_tool_names.py",
+      "sha256": "70a5d0d4dd3187a4265a0a5c2db4a090c3f40806985c029d261d4a33bbc328e2",
+      "bytes": 24129
     },
     {
       "path": "tests/test_observability_writer_identity.py",
