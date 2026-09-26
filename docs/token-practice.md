@@ -228,13 +228,10 @@ protocol, the same at rust-v0.155.1 and rust-v0.157.1): one short `codex app-ser
 over stdio in an empty directory, with no model turn, session transcript or
 credential file. `--json` prints one object; `--gate PERCENT` exits 3 when a
 window's `used_percent` reaches PERCENT, `rateLimitReachedType` is set or
-`ordinaryUsageAllowed` is false, and 2 when no snapshot arrives. On
-nativestack-5975wx-20260925 after the 2026-09-26 switch to 0.157.1, the
-coordinator reported reads of `used_percent` 61 to 63 of a 10,080-minute (weekly)
-window resetting 2026-10-03T01:28Z on plan `prolite`, with no app-server daemon
-started. These are unretained observations: no committed receipt or artifact holds
-their output, and a sanitized `--json` read is still to be recorded from a
-published checkout that contains the script. The [host receipt](../evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--codex--install--20260926.json)
+`ordinaryUsageAllowed` is false, and 2 when no snapshot arrives. It prints no
+server error text, since backend errors can carry account identifiers. This page
+quotes no quota figure: read the current one with the probe, and cite a figure only
+from a retained, sanitized `--json` read. The [host receipt](../evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--codex--install--20260926.json)
 records 0.157.1 on PATH, `daemon_auto_start` false and no daemon process or package
 at 14:34Z, but not the quota read. The percentage is the backend's whole-account
 figure, not a token count: every session and host signed in to the account draws

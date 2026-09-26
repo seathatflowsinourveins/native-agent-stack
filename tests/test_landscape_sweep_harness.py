@@ -863,6 +863,13 @@ class QuotaGateTests(RunnerCase):
         self.assertTrue((self.bin / "record.json").exists())  # codex exec ran
         self.assertNotIn("acct-fixture", (self.work / "gpt6" / "gpt6-probe" / "quota.json").read_text())
 
+    def test_the_stop_percent_keeps_its_precision(self):
+        # GPT-6 review of #348: '{:g}' turned 95.00001 into 95 and refused a snapshot at exactly 95.
+        self.settings({"quota_stop_percent": 95.00001})
+        result = self.job("gpt6-precise", last=LAST, events=[COMPLETED], quota={"result": quota_answer(95)})
+        self.assertEqual((result["exit"], result["limit_marker"]), (0, False))
+        self.assertEqual(result["quota"]["status"], "ok")
+
     def test_reaching_the_stop_percent_refuses_like_a_usage_limit(self):
         self.settings({"quota_stop_percent": 95})
         result = self.job("gpt6-fit-alpha", last=LAST, events=[COMPLETED], quota={"result": quota_answer(96)})
@@ -907,7 +914,9 @@ class QuotaGateTests(RunnerCase):
         result = self.job("gpt6-probe", last=LAST, events=[COMPLETED], quota={"error": error})
         self.assertEqual((result["exit"], result["limit_marker"]), (0, False))
         self.assertEqual(result["quota"]["status"], "probe_failed")
-        self.assertEqual(result["quota"]["error"], "account/rateLimits/read: " + error["message"])
+        # The server's text is never recorded (backend errors can carry account ids).
+        self.assertEqual(result["quota"]["error"], "account/rateLimits/read: the server answered with an error")
+        self.assertNotIn(error["message"], (self.work / "gpt6" / "gpt6-probe" / "quota.json").read_text())
         self.assertTrue((self.bin / "record.json").exists())
 
     def test_a_missing_probe_is_recorded_and_never_blocks_the_job(self):

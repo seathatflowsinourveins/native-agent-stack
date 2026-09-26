@@ -148,8 +148,13 @@ class AppServer:
                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=subprocess.DEVNULL, cwd=cwd, env=env, bufsize=0,
                                         start_new_session=True)
-        self.selector = selectors.DefaultSelector()
-        self.selector.register(self.process.stdout, selectors.EVENT_READ)
+        try:
+            self.selector = selectors.DefaultSelector()
+            self.selector.register(self.process.stdout, selectors.EVENT_READ)
+        except BaseException:
+            self.selector = None
+            self.close()  # never leave the server or its pipes behind when setup fails
+            raise
         self.buffer, self.total = b"", 0
 
     def send(self, message: dict, stage: str) -> None:
@@ -205,10 +210,10 @@ class AppServer:
                 continue
             error = message.get("error")
             if error is not None:
+                # The server's own message text is never echoed: backend errors can carry account ids.
                 if isinstance(error, dict):
-                    raise ProbeError(method, str(error.get("message") or "error answer without a message"),
-                                     number(error.get("code")))
-                raise ProbeError(method, "error answer: " + json.dumps(error)[:MESSAGE_CHARS])
+                    raise ProbeError(method, "the server answered with an error", number(error.get("code")))
+                raise ProbeError(method, "the server answered with a malformed error")
             result = message.get("result")
             if not isinstance(result, dict):
                 raise ProbeError(method, "the answer's result is not an object")
@@ -237,7 +242,8 @@ class AppServer:
                 time.sleep(0.05)
         if self.process.poll() is None:
             self.process.wait()
-        self.selector.close()
+        if self.selector is not None:
+            self.selector.close()
         self.process.stdout.close()
 
 

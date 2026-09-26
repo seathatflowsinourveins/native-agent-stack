@@ -411,8 +411,8 @@ def quota_gate(base: Path, directory: Path, config: dict) -> str | None:
         record["error"] = f"{QUOTA_SCRIPT} is neither beside the runner nor in the checkout's scripts/"
     else:
         try:
-            done = subprocess.run([sys.executable, "-B", str(script), "--json", "--gate", f"{percent:g}",
-                                   "--timeout", f"{config['quota_timeout_s']:g}"],
+            done = subprocess.run([sys.executable, "-B", str(script), "--json", "--gate", repr(float(percent)),
+                                   "--timeout", repr(float(config['quota_timeout_s']))],
                                   cwd=str(base / "empty"), stdin=subprocess.DEVNULL, capture_output=True, text=True,
                                   timeout=config["quota_timeout_s"] + QUOTA_BACKSTOP_S, env=codex_env(), check=False)
             lines = (done.stdout or "").strip().splitlines()
@@ -427,8 +427,10 @@ def quota_gate(base: Path, directory: Path, config: dict) -> str | None:
                 error = (record["report"] or {}).get("error")
                 record["error"] = (f"{error.get('stage')}: {error.get('message')}" if isinstance(error, dict)
                                    else (done.stderr or "").strip()[-400:] or f"exit {done.returncode}")
+        except subprocess.TimeoutExpired:
+            record["error"] = f"the quota probe did not finish within {config['quota_timeout_s'] + QUOTA_BACKSTOP_S:g} s"
         except (OSError, subprocess.SubprocessError) as error:
-            record["error"] = str(error)[:400]
+            record["error"] = f"the quota probe could not run ({type(error).__name__})"
     write_atomic(directory / "quota.json", json.dumps(record, sort_keys=True) + "\n")
     if record["status"] != "gate":
         return None

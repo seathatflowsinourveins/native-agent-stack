@@ -248,19 +248,47 @@ class GateTests(QuotaProbeCase):
 
 class FailureTests(QuotaProbeCase):
     def test_error_answers(self):
-        for error in ({"code": -32600, "message": "codex account authentication required to read rate limits"},
-                      {"code": -32603, "message": "failed to fetch codex rate limits: no snapshots returned",
-                       "data": {"detail": "fixture"}}):
+        # GPT-6 review of #348: backend errors can carry account ids, so no server text is ever echoed.
+        for error in ({"code": -32600, "message": "codex account authentication required (account acct_SENSITIVE1)"},
+                      {"code": -32603, "message": "failed to fetch rate limits for acct_SENSITIVE2",
+                       "data": {"detail": "acct_SENSITIVE3"}}):
             with self.subTest(error["code"]):
                 self.fake(error=error)
-                code, out = self.probe_json("--gate", "95")
-                self.assertEqual(code, 2)
+                done = self.probe("--json", "--gate", "95")
+                self.assertEqual(done.returncode, 2)
+                out = json.loads(done.stdout.splitlines()[0])
                 self.assertEqual(out["error"], {"stage": "account/rateLimits/read", "code": error["code"],
-                                                "message": error["message"]})
+                                                "message": "the server answered with an error"})
+                self.assertNotIn("SENSITIVE", done.stdout + done.stderr)
                 self.assertNotIn("used_percent", out)
                 self.assertFalse(process_alive(self.record()["pid"]))
-        self.fake(error={"code": -32600, "message": "x" * 5000})
-        self.assertEqual(len(self.probe_json()[1]["error"]["message"]), codex_quota.MESSAGE_CHARS)
+        self.fake(error="acct_SENSITIVE4 as a bare string")
+        done = self.probe("--json")
+        self.assertEqual(json.loads(done.stdout.splitlines()[0])["error"]["message"],
+                         "the server answered with a malformed error")
+        self.assertNotIn("SENSITIVE", done.stdout + done.stderr)
+
+    def test_a_setup_failure_after_the_server_starts_leaves_nothing_running(self):
+        # GPT-6 review of #348: an EMFILE from the selector left the child and its pipes behind.
+        import errno
+        from unittest import mock
+        self.fake()
+        created, real = [], subprocess.Popen
+
+        def spy(*args, **kwargs):
+            created.append(real(*args, **kwargs))
+            return created[-1]
+
+        with mock.patch.dict(os.environ, {"FAKE_QUOTA_CONFIG": str(self.config_path)}), \
+                mock.patch.object(codex_quota.subprocess, "Popen", side_effect=spy), \
+                mock.patch.object(codex_quota.selectors, "DefaultSelector",
+                                  side_effect=OSError(errno.EMFILE, "Too many open files")):
+            with self.assertRaises(OSError):
+                codex_quota.AppServer(str(self.bin / "codex"), str(self.bin))
+        self.assertEqual(len(created), 1)
+        self.assertIsNotNone(created[0].poll())  # stopped and reaped
+        self.assertTrue(created[0].stdin.closed and created[0].stdout.closed)
+        self.assertFalse(process_alive(created[0].pid))
 
     def test_a_server_that_never_answers_is_stopped_with_its_process_group(self):
         # It ignores SIGTERM and EOF and leaves a child that ignores SIGTERM too: only the group KILL ends both.
