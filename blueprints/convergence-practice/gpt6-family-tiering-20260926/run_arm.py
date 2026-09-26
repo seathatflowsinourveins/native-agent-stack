@@ -1,0 +1,860 @@
+#!/usr/bin/env python3
+"""Run one frozen GPT-6 family arm over the frozen 8-K batches with `codex exec`.
+
+Standard library only (Python 3.11 or newer). An arm is one Codex model and one reasoning effort. Every arm sends
+the same batches of the same filings in the same order: the frozen li26 acquisition, verified with li26's own
+load_inputs, cut greedily in accession order into batches of at most 15 filings whose prompt stays under
+110,000 bytes. The layout's SHA-256 is frozen in plan.json. Each batch is one call:
+
+  codex exec --ignore-user-config --skip-git-repo-check -s read-only -m <model> \
+    -c model_reasoning_effort="<effort>" --output-schema <schema> -o <reply> --json "<prompt>" </dev/null
+
+It runs in an empty directory outside every repository, without --search. At most three calls run at once. Each
+call first takes one of the host's Codex slots, an fcntl.flock on <lock dir>/slot-1 to slot-3. These are the
+locks the landscape-sweep runner takes, so this arm and every other Codex job on the host together stay within
+the three-slot pool. codex inherits the slot lock and the arm's run lock, so a killed runner never frees them
+while its codex still runs.
+
+A failed call is recorded, and its batch runs once more. A batch that fails twice is recorded as failed and never
+runs again. A usage-limit event stops the arm: Codex's own `error` or `turn.failed` event saying "hit your usage
+limit" (model content and stderr never count). Calls already running finish and are recorded, no new call
+starts, a LIMIT note is written to the state directory and the run exits 3. That call is account state, not a
+batch failure. After the reset, and after the coordinator removes the note, the next run sends that batch again
+without using its retry. SIGINT or SIGTERM stops the running calls, records them as interrupted (not counted)
+and exits 5.
+
+Everything a run writes stays in the private state directory, with 0700 directories and 0600 files: Codex
+events, stderr, replies and per-call records. Nothing is written to the repository. analyze.py reads it.
+"""
+from __future__ import annotations
+
+import argparse
+from collections import deque
+import errno
+import fcntl
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import signal
+import stat
+import subprocess
+import sys
+import threading
+import time
+
+HERE = Path(__file__).resolve().parent
+REPO = HERE.parents[2]
+PLAN = HERE / "plan.json"
+PROMPT = HERE / "prompt.txt"
+SCHEMA = HERE / "response.schema.json"
+LI26 = REPO / "blueprints/convergence-practice/local-inference-latest-20260926"
+DEFAULT_STATE_DIR = Path.home() / ".local/state/native-agent-stack/gpt6-family-tiering-20260926"
+COUNT_MARKER, FILINGS_MARKER = "@@FILING_COUNT@@", "@@FILINGS@@"
+OPEN_TAG, CLOSE_TAG = "<<<FILING", "<<<END FILING"
+ARMS = (("A0", "gpt-6-astra", "max"), ("A1", "gpt-6-astra", "medium"), ("S0", "gpt-6-sol", "max"),
+        ("S1", "gpt-6-sol", "medium"), ("L0", "gpt-6-luna", "max"), ("L1", "gpt-6-luna", "medium"))
+CODEX_VERSION = "codex-cli 0.157.1"
+# The frozen argv after the codex binary; <...> are filled per call. No --search, never ultra.
+CODEX_ARGV = ("exec", "--ignore-user-config", "--skip-git-repo-check", "-s", "read-only", "-m", "<model>",
+              "-c", 'model_reasoning_effort="<effort>"', "--output-schema", "<schema>", "-o", "<reply>", "--json",
+              "<prompt>")
+FROZEN_BATCHING = {"max_filings": 15, "max_prompt_bytes": 110000}
+FROZEN_CALLS = {"max_concurrent": 3, "slots": 3, "retries_per_batch": 1, "timeout_seconds": 3000,
+                "slot_poll_seconds": 5, "kill_grace_seconds": 10}
+FROZEN_RULE = {"noninferiority_margin": -0.02, "json_valid_min": 0.98}
+FROZEN_BOOTSTRAP = {"resamples": 10000, "seed": 20260926, "alpha": 0.05}
+LIMIT_PHRASE = re.compile(r"hit your usage limit", re.IGNORECASE)
+USAGE_KEYS = ("input_tokens", "cached_input_tokens", "cache_write_input_tokens", "output_tokens",
+              "reasoning_output_tokens")
+CORE_USAGE_KEYS = ("input_tokens", "cached_input_tokens", "output_tokens")
+MAX_REPLY_BYTES = 1024 * 1024
+ATTEMPT_DIR = re.compile(r"attempt-([1-9][0-9]*)")
+EXIT_DONE, EXIT_ERROR, EXIT_REFUSED, EXIT_LIMIT, EXIT_INTERRUPTED = 0, 1, 2, 3, 5
+
+_SPEC = importlib.util.spec_from_file_location("gt26_li26_eval_arm", LI26 / "eval_arm.py")
+li26 = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(li26)
+path_safety = li26.path_safety
+
+
+def sha256_bytes(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def relative(path):
+    return Path(path).resolve().relative_to(REPO).as_posix()
+
+
+def load_plan(path=PLAN):
+    """The checked plan and the SHA-256 of its bytes."""
+    raw = Path(path).read_bytes()
+    plan = json.loads(raw)
+    check_plan(plan)
+    return plan, sha256_bytes(raw)
+
+
+def check_plan(plan):
+    """The frozen arms, command, batching, call limits and rule this runner was written for."""
+    if plan.get("status") != "preregistered" or plan.get("frozen_before_any_call") is not True:
+        raise ValueError("preregistered frozen plan required")
+    arms = tuple((arm.get("id"), arm.get("model"), arm.get("effort")) for arm in plan["arms"])
+    roles = [arm.get("role") for arm in plan["arms"]]
+    if arms != ARMS or roles != ["control"] + ["candidate"] * (len(ARMS) - 1):
+        raise ValueError("frozen arm list changed")
+    for section, frozen in ((plan["batching"], FROZEN_BATCHING), (plan["calls"], FROZEN_CALLS),
+                            (plan["decision_rule"]["bootstrap"], FROZEN_BOOTSTRAP)):
+        for key, value in frozen.items():
+            if type(section.get(key)) is not type(value) or section[key] != value:
+                raise ValueError(f"frozen value changed: {key}")
+    rule = plan["decision_rule"]
+    if any(rule.get(key) != value for key, value in FROZEN_RULE.items()):
+        raise ValueError("frozen decision rule changed")
+    codex = plan["codex"]
+    if codex.get("version") != CODEX_VERSION or tuple(codex.get("argv_after_binary") or ()) != CODEX_ARGV:
+        raise ValueError("frozen codex command changed")
+    if type(plan["batching"].get("batches")) is not int or not 1 <= plan["batching"]["batches"] <= 999:
+        raise ValueError("frozen batch count required")
+
+
+def verify_frozen(plan):
+    """Every frozen script, dependency, the prompt and the schema match their recorded SHA-256."""
+    frozen = plan["frozen_inputs"]
+    required = {relative(HERE / name) for name in ("run_arm.py", "analyze.py", "prompt.txt", "response.schema.json")}
+    required |= {relative(LI26 / "eval_arm.py"), relative(LI26 / "analyze.py"), "scripts/path_safety.py"}
+    if not required <= frozen.keys():
+        raise ValueError("frozen inputs must list the scripts, their li26 dependencies, the prompt and the schema")
+    for name, expected in frozen.items():
+        path = path_safety.refuse_untrusted_symlinks(REPO / name, "frozen input symlink refused")
+        if li26.digest(path) != expected:
+            raise ValueError(f"frozen input changed: {name}")
+    if li26.digest(PROMPT) != plan["prompt_sha256"] or li26.digest(SCHEMA) != plan["schema_sha256"]:
+        raise ValueError("prompt or schema hash mismatch")
+
+
+def arm_by_id(plan, arm_id):
+    for arm in plan["arms"]:
+        if arm["id"] == arm_id:
+            return arm
+    raise ValueError(f"unknown arm {arm_id}")
+
+
+def prompt_template(plan):
+    raw = PROMPT.read_bytes()
+    if sha256_bytes(raw) != plan["prompt_sha256"]:
+        raise ValueError("prompt template changed")
+    template = raw.decode("utf-8")
+    if (template.count(COUNT_MARKER) != 1 or template.count(FILINGS_MARKER) != 1
+            or template.index(COUNT_MARKER) > template.index(FILINGS_MARKER)):
+        raise ValueError("prompt template markers changed")
+    return template
+
+
+def load_rows(plan, acquisition):
+    """The eligible filings in frozen (accession) order, verified by li26's own load_inputs."""
+    acquisition = path_safety.refuse_untrusted_symlinks(Path(acquisition), "acquisition symlink refused")
+    rows = li26.load_inputs(acquisition, plan["task"]["inputs_sha256"])
+    if len(rows) != plan["task"]["eligible_filings"]:
+        raise ValueError("eligible filing count differs from the plan")
+    return rows
+
+
+def filing_block(row):
+    accession = row["accession"]
+    return f'{OPEN_TAG} accession="{accession}">>>\n{row["input"]}\n{CLOSE_TAG} accession="{accession}">>>'
+
+
+def build_prompt(template, rows):
+    head, rest = template.split(COUNT_MARKER)
+    middle, tail = rest.split(FILINGS_MARKER)
+    return head + str(len(rows)) + middle + "\n\n".join(filing_block(row) for row in rows) + tail
+
+
+def prompt_bytes(template, rows):
+    return len(build_prompt(template, rows).encode("utf-8"))
+
+
+def plan_batches(template, rows, max_filings, max_prompt_bytes):
+    """Greedy batches in input order: a filing joins the current batch while the batch then holds at most
+    `max_filings` filings and its prompt stays under `max_prompt_bytes` UTF-8 bytes; otherwise it starts the
+    next batch. A filing whose prompt alone reaches the bound, or whose text holds a delimiter or a NUL character
+    (which no argument can carry), is refused."""
+    for row in rows:
+        if OPEN_TAG in row["input"] or CLOSE_TAG in row["input"] or "\x00" in row["input"]:
+            raise ValueError(f"filing {row['accession']} contains a batch delimiter or a NUL character")
+    batches, current = [], []
+    for row in rows:
+        candidate = current + [row]
+        if len(candidate) <= max_filings and prompt_bytes(template, candidate) < max_prompt_bytes:
+            current = candidate
+            continue
+        if not current or prompt_bytes(template, [row]) >= max_prompt_bytes:
+            raise ValueError(f"filing {row['accession']} alone reaches the prompt bound")
+        batches.append(current)
+        current = [row]
+    if current:
+        batches.append(current)
+    return batches
+
+
+def layout(batches):
+    return [[row["accession"] for row in batch] for batch in batches]
+
+
+def layout_sha256(batches):
+    return sha256_bytes(json.dumps(layout(batches), separators=(",", ":")).encode())
+
+
+def layout_summary(template, batches):
+    """Public-safe aggregates of a layout: counts, sizes and its hash, never filing text."""
+    sizes = [prompt_bytes(template, batch) for batch in batches]
+    return {"batches": len(batches), "filings": sum(len(batch) for batch in batches),
+            "layout_sha256": layout_sha256(batches),
+            "filings_per_batch": {"min": min(map(len, batches)), "max": max(map(len, batches))},
+            "prompt_bytes": {"min": min(sizes), "max": max(sizes), "total": sum(sizes)}}
+
+
+def frozen_batches(plan, template, rows):
+    batching = plan["batching"]
+    batches = plan_batches(template, rows, batching["max_filings"], batching["max_prompt_bytes"])
+    if len(batches) != batching["batches"] or layout_sha256(batches) != batching["layout_sha256"]:
+        raise ValueError("batch layout differs from the frozen layout")
+    return batches
+
+
+def batch_id(index):
+    return f"b{index + 1:03d}"
+
+
+# --------------------------------------------------------------------------- replies, events and outcomes
+
+def _envelope(text):
+    """The reply's filing entries when it is exactly {"filings": [{"accession": str, "items": ...}, ...]}."""
+    try:
+        value = json.loads(text, object_pairs_hook=li26._unique_keys)
+    except ValueError:
+        return None
+    if not isinstance(value, dict) or set(value) != {"filings"} or not isinstance(value["filings"], list):
+        return None
+    entries = value["filings"]
+    if any(not isinstance(entry, dict) or set(entry) != {"accession", "items"}
+           or not isinstance(entry["accession"], str) for entry in entries):
+        return None
+    return entries
+
+
+def parse_reply(content, accessions):
+    """(reply status, {accession: (sorted codes or None, filing status)}, unexpected entry count).
+
+    The reply status is valid, fenced_valid (one markdown fence around a valid reply) or invalid. A filing is
+    valid only when the reply is, its accession has exactly one entry and that entry's items pass li26's own
+    per-filing rule (unique strings matching [1-9].[0-9]{2}); otherwise it is invalid and predicts nothing.
+    """
+    status, entries = "invalid", None
+    if isinstance(content, str):
+        text = content.strip()
+        entries = _envelope(text)
+        if entries is not None:
+            status = "valid"
+        else:
+            fenced = li26.FENCE.fullmatch(text)
+            if fenced:
+                entries = _envelope(fenced[1].strip())
+                status = "fenced_valid" if entries is not None else "invalid"
+    per_filing = {accession: (None, "invalid") for accession in accessions}
+    if entries is None:
+        return status, per_filing, 0
+    grouped, unexpected = {}, 0
+    for entry in entries:
+        grouped.setdefault(entry["accession"], []).append(entry["items"])
+    for accession, lists in grouped.items():
+        if accession not in per_filing:
+            unexpected += len(lists)
+        elif len(lists) == 1:
+            items = li26._strict_items(json.dumps({"items": lists[0]}))
+            if items is not None:
+                per_filing[accession] = (items, status)
+    return status, per_filing, unexpected
+
+
+def reply_text(path):
+    """The reply Codex wrote with -o: None when missing or empty, "" (invalid) when oversized or not UTF-8."""
+    try:
+        with open(path, "rb") as stream:
+            raw = stream.read(MAX_REPLY_BYTES + 1)
+    except FileNotFoundError:
+        return None
+    if not raw.strip():
+        return None
+    if len(raw) > MAX_REPLY_BYTES:
+        return ""
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return ""
+
+
+def reply_status(path, accessions):
+    text = reply_text(path)
+    return "missing" if text is None else parse_reply(text, accessions)[0]
+
+
+def read_events(path):
+    """The JSON objects Codex printed with --json, one per line; other lines are ignored."""
+    try:
+        raw = Path(path).read_bytes()
+    except FileNotFoundError:
+        return []
+    events = []
+    for line in raw.decode("utf-8", "replace").splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if isinstance(event, dict):
+            events.append(event)
+    return events
+
+
+def turn_usage(events):
+    """Summed `turn.completed` usage, or None when Codex reported none (no turn completed)."""
+    usage, reported = {}, False
+    for event in events:
+        if event.get("type") == "turn.completed" and isinstance(event.get("usage"), dict):
+            reported = True
+            for key in USAGE_KEYS:
+                value = event["usage"].get(key)
+                if isinstance(value, int) and not isinstance(value, bool):
+                    usage[key] = usage.get(key, 0) + value
+    return usage if reported else None
+
+
+def limit_message(events):
+    """Codex's own usage-limit message: only `error` and `turn.failed` events count, never item.* content."""
+    for event in events:
+        if event.get("type") == "error":
+            message = event.get("message")
+        elif event.get("type") == "turn.failed" and isinstance(event.get("error"), dict):
+            message = event["error"].get("message")
+        else:
+            continue
+        if isinstance(message, str) and LIMIT_PHRASE.search(message):
+            return message
+    return None
+
+
+def classify(events, exit_code, timed_out, interrupted, status):
+    """(outcome, reason). Outcomes: ok, failed (counts toward the batch's retry), limit, interrupted."""
+    if limit_message(events) is not None:
+        return "limit", "usage_limit"
+    if interrupted:
+        return "interrupted", "interrupted"
+    if timed_out:
+        return "failed", "timeout"
+    if exit_code != 0:
+        return "failed", "exit"
+    types = {event.get("type") for event in events}
+    if "turn.failed" in types:
+        return "failed", "turn_failed"
+    if "turn.completed" not in types:
+        return "failed", "no_turn_completed"
+    if status == "missing":
+        return "failed", "reply_missing"
+    if status == "invalid":
+        return "failed", "reply_invalid"
+    return "ok", None
+
+
+def event_counts(events):
+    types = [event.get("type") for event in events]
+    return {"turn_completed": types.count("turn.completed"), "turn_failed": types.count("turn.failed"),
+            "error_events": types.count("error")}
+
+
+def call_record(arm, index, batch, number, prompt, events, reply_path, **measured):
+    accessions = [row["accession"] for row in batch]
+    status = reply_status(reply_path, accessions)
+    outcome, reason = classify(events, measured.get("exit_code"), measured.get("timed_out", False),
+                               measured.get("interrupted", False), status)
+    if measured.pop("launch_error", False):
+        outcome, reason = "failed", "launch_error"
+    usage = turn_usage(events)
+    return {"schema_version": 1, "arm": arm["id"], "model": arm["model"], "effort": arm["effort"],
+            "batch": batch_id(index), "attempt": number, "accessions": accessions,
+            "prompt_sha256": sha256_bytes(prompt.encode("utf-8")), "prompt_bytes": len(prompt.encode("utf-8")),
+            "exit_code": None, "timed_out": False, "interrupted": False, "wall_seconds": None, "slot": None,
+            "slot_wait_seconds": None, "started_utc": None, "finished_utc": None, **measured,
+            **event_counts(events), "limit": outcome == "limit",
+            "usage": usage, "usage_status": "reported" if usage is not None else "unavailable",
+            "reply_status": status, "outcome": outcome, "reason": reason, "no_document_text": True}
+
+
+def attempt_dirs(batch_dir):
+    """The attempt directories of one batch, in attempt-number order, with their numbers."""
+    found = []
+    if Path(batch_dir).is_dir():
+        for child in Path(batch_dir).iterdir():
+            match = ATTEMPT_DIR.fullmatch(child.name)
+            if match and child.is_dir() and not child.is_symlink():
+                found.append((int(match[1]), child))
+    return sorted(found)
+
+
+def attempt_record(arm, index, batch, number, attempt_dir, template):
+    """The attempt's call.json, or, when the runner died before writing one, its abandoned record.
+
+    An abandoned attempt is a failed call that counts toward the batch's retry (or a limit call when Codex's
+    events show the usage limit), with whatever usage its events report.
+    """
+    try:
+        record = json.loads((Path(attempt_dir) / "call.json").read_bytes())
+        if isinstance(record, dict):
+            return record
+    except (OSError, ValueError):
+        pass
+    events = read_events(Path(attempt_dir) / "events.jsonl")
+    record = call_record(arm, index, batch, number, build_prompt(template, batch), events,
+                         Path(attempt_dir) / "reply.json", exit_code=None)
+    if record["outcome"] != "limit":
+        record["outcome"], record["reason"] = "failed", "abandoned"
+    return record
+
+
+def batch_state(records, retries):
+    """completed (an ok call), failed (more failed calls than retries) or pending."""
+    if any(record.get("outcome") == "ok" for record in records):
+        return "completed"
+    failures = sum(record.get("outcome") == "failed" for record in records)
+    return "failed" if failures > retries else "pending"
+
+
+# --------------------------------------------------------------------------- host resources
+
+def try_lock(fd):
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return True
+    except OSError as error:
+        if error.errno in (errno.EAGAIN, errno.EACCES, errno.EWOULDBLOCK):
+            return False
+        raise
+
+
+def open_lock(path, mode=0o644):
+    return os.open(path, os.O_RDWR | os.O_CREAT, mode)
+
+
+def lock_held(path):
+    """True while some process holds the lock file (a runner or a codex it started)."""
+    if not Path(path).exists():
+        return False
+    fd = open_lock(path)
+    try:
+        if try_lock(fd):
+            fcntl.flock(fd, fcntl.LOCK_UN)
+            return False
+        return True
+    finally:
+        os.close(fd)
+
+
+def acquire_slot(lock_dir, slots, poll_seconds, stop):
+    """(fd, slot number) of the first free host slot, waiting while all are taken; (None, None) once stopped."""
+    while not stop.is_set():
+        for number in range(1, slots + 1):
+            fd = open_lock(Path(lock_dir) / f"slot-{number}")
+            if try_lock(fd):
+                return fd, number
+            os.close(fd)
+        stop.wait(poll_seconds)
+    return None, None
+
+
+def checked_lock_dir(lock_dir):
+    """The host's existing slot directory; never created here, so a mistyped path cannot start a private pool."""
+    path = path_safety.refuse_untrusted_symlinks(Path(lock_dir), "lock directory symlink refused")
+    if not path.is_dir():
+        raise ValueError(f"lock directory {path} does not exist; pass the host's Codex slot directory")
+    return path
+
+
+def inside_repository(path):
+    for candidate in (Path(path), *Path(path).parents):
+        if (candidate / ".git").exists():
+            return candidate
+    return None
+
+
+def private_dir(path):
+    """An owner-only (0700) directory of this user, created if missing; symlinks and wider modes are refused."""
+    path = path_safety.refuse_untrusted_symlinks(Path(path).expanduser(), "state symlink refused")
+    if not path.exists():
+        try:
+            path.mkdir(mode=0o700, parents=True)
+        except FileExistsError:  # another arm's run created it first; the checks below still apply
+            pass
+    info = path.lstat()
+    if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid() or info.st_mode & 0o077:
+        raise ValueError(f"{path} must be a directory of this user with mode 0700")
+    return path
+
+
+def write_private(path, data, replace=False):
+    """Write a 0600 file: exclusively, or atomically through a temporary file when `replace` is set."""
+    path = Path(path)
+    target = path.with_name(f".{path.name}.tmp") if replace else path
+    flags = os.O_WRONLY | os.O_CREAT | (os.O_TRUNC if replace else os.O_EXCL)
+    fd = os.open(target, flags, 0o600)
+    with os.fdopen(fd, "wb") as stream:
+        os.fchmod(stream.fileno(), 0o600)
+        stream.write(data)
+    if replace:
+        os.replace(target, path)
+
+
+def append_private(path, line):
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
+    with os.fdopen(fd, "ab") as stream:
+        stream.write((json.dumps(line, sort_keys=True) + "\n").encode())
+
+
+def codex_env():
+    """The caller's environment without Rust tracing settings, which could log model content to stderr."""
+    return {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
+
+
+def codex_version(codex):
+    try:
+        done = subprocess.run([codex, "--version"], stdin=subprocess.DEVNULL, capture_output=True, text=True,
+                              timeout=60, check=False, env=codex_env())
+    except (OSError, subprocess.SubprocessError):
+        return None
+    lines = (done.stdout or "").strip().splitlines()
+    return lines[0].strip() if done.returncode == 0 and lines else None
+
+
+def codex_argv(codex, model, effort, schema, reply, prompt):
+    values = {"<model>": model, 'model_reasoning_effort="<effort>"': f'model_reasoning_effort="{effort}"',
+              "<schema>": str(schema), "<reply>": str(reply), "<prompt>": prompt}
+    return [str(codex), *(values.get(part, part) for part in CODEX_ARGV)]
+
+
+def group_alive(pgid):
+    try:
+        os.killpg(pgid, 0)
+        return True
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+
+
+def stop_group(process, grace_seconds):
+    """TERM the call's process group, then KILL what is left after the grace period."""
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    end = time.monotonic() + grace_seconds
+    while time.monotonic() < end:
+        if process.poll() is not None and not group_alive(process.pid):
+            return
+        time.sleep(0.05)
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    process.wait()
+
+
+def identity(plan, plan_sha256, arm, batches, version):
+    """What every call of an arm must share; a later run of the arm must match it exactly."""
+    return {"schema_version": 1, "arm": arm["id"], "model": arm["model"], "effort": arm["effort"],
+            "plan_sha256": plan_sha256, "prompt_sha256": plan["prompt_sha256"],
+            "schema_sha256": plan["schema_sha256"], "inputs_sha256": plan["task"]["inputs_sha256"],
+            "layout_sha256": layout_sha256(batches), "batches": len(batches), "codex_version": version}
+
+
+# --------------------------------------------------------------------------- one arm
+
+class ArmRun:
+    """The pending batches of one arm through at most `max_concurrent` workers sharing the host's slots."""
+
+    def __init__(self, *, plan, arm, batches, template, codex, state_dir, arm_dir, empty_dir, lock_dir,
+                 schema_path, run_lock_fd, poll_seconds, timeout_seconds, grace_seconds):
+        self.plan, self.arm, self.batches, self.template, self.codex = plan, arm, batches, template, codex
+        self.state_dir, self.arm_dir, self.empty_dir, self.lock_dir = state_dir, arm_dir, empty_dir, lock_dir
+        self.schema_path, self.run_lock_fd = schema_path, run_lock_fd
+        self.poll_seconds, self.timeout_seconds, self.grace_seconds = poll_seconds, timeout_seconds, grace_seconds
+        self.retries = plan["calls"]["retries_per_batch"]
+        self.stop, self.interrupted, self.limited = threading.Event(), threading.Event(), threading.Event()
+        self.mutex = threading.Lock()
+        self.queue = deque()
+        self.calls = 0
+        self.errors = []
+
+    def batch_dir(self, index):
+        return self.arm_dir / "batches" / batch_id(index)
+
+    def records(self, index):
+        return [attempt_record(self.arm, index, self.batches[index], number, path, self.template)
+                for number, path in attempt_dirs(self.batch_dir(index))]
+
+    def finalize_abandoned(self):
+        """Give every attempt a runner left without call.json (it held the run lock, so nothing runs it now)."""
+        for index, batch in enumerate(self.batches):
+            for number, path in attempt_dirs(self.batch_dir(index)):
+                if not (path / "call.json").exists():
+                    record = attempt_record(self.arm, index, batch, number, path, self.template)
+                    write_private(path / "call.json", (json.dumps(record, indent=2, sort_keys=True) + "\n").encode(),
+                                  replace=True)
+
+    def states(self):
+        return [batch_state(self.records(index), self.retries) for index in range(len(self.batches))]
+
+    def interrupt(self, *_):
+        self.interrupted.set()
+        self.stop.set()
+
+    def run(self):
+        self.queue.extend(index for index, state in enumerate(self.states()) if state == "pending")
+        workers = [threading.Thread(target=self.worker, name=f"gt26-{self.arm['id']}-{n}", daemon=True)
+                   for n in range(min(self.plan["calls"]["max_concurrent"], len(self.queue)))]
+        for worker in workers:
+            worker.start()
+        for worker in workers:
+            while worker.is_alive():
+                worker.join(0.2)
+
+    def worker(self):
+        try:
+            while not self.stop.is_set():
+                with self.mutex:
+                    if not self.queue:
+                        return
+                    index = self.queue.popleft()
+                outcome = self.call(index)
+                if outcome == "failed" and not self.stop.is_set():
+                    if batch_state(self.records(index), self.retries) == "pending":
+                        with self.mutex:
+                            self.queue.append(index)
+        except Exception as error:  # a runner defect must stop the arm visibly, never drop a batch silently
+            with self.mutex:
+                self.errors.append(f"{type(error).__name__}: {error}")
+            self.stop.set()
+
+    def call(self, index):
+        """One codex call for one batch in its own attempt directory; its outcome, or None if it never started."""
+        batch = self.batches[index]
+        waited = time.monotonic()
+        slot_fd, slot = acquire_slot(self.lock_dir, self.plan["calls"]["slots"], self.poll_seconds, self.stop)
+        if slot_fd is None:
+            return None
+        try:
+            if (self.state_dir / "LIMIT").exists():  # another arm's run met the shared limit meanwhile
+                self.limited.set()
+                self.stop.set()
+                return None
+            slot_wait = time.monotonic() - waited
+            with self.mutex:
+                batch_dir = self.batch_dir(index)
+                batch_dir.mkdir(mode=0o700, exist_ok=True)
+                number = 1 + max((n for n, _ in attempt_dirs(batch_dir)), default=0)
+                attempt = batch_dir / f"attempt-{number}"
+                attempt.mkdir(mode=0o700)
+                self.calls += 1
+            prompt = build_prompt(self.template, batch)
+            reply = attempt / "reply.json"
+            argv = codex_argv(self.codex, self.arm["model"], self.arm["effort"], self.schema_path, reply, prompt)
+            measured = {"slot": slot, "slot_wait_seconds": round(slot_wait, 3), "started_utc": li26.now_utc(),
+                        "exit_code": None, "timed_out": False, "interrupted": False}
+            started = time.monotonic()
+            events_fd = os.open(attempt / "events.jsonl", os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            stderr_fd = os.open(attempt / "stderr.txt", os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            try:
+                try:
+                    process = subprocess.Popen(argv, cwd=self.empty_dir, stdin=subprocess.DEVNULL, stdout=events_fd,
+                                               stderr=stderr_fd, pass_fds=(slot_fd, self.run_lock_fd),
+                                               start_new_session=True, env=codex_env())
+                except (OSError, ValueError) as error:
+                    os.write(stderr_fd, f"launch failed: {type(error).__name__}\n".encode())
+                    process = None
+                    measured["launch_error"] = True
+                deadline = started + self.timeout_seconds
+                while process is not None:
+                    try:
+                        measured["exit_code"] = process.wait(timeout=0.2)
+                        break
+                    except subprocess.TimeoutExpired:
+                        if self.interrupted.is_set():
+                            measured["interrupted"] = True
+                        elif time.monotonic() >= deadline:
+                            measured["timed_out"] = True
+                        else:
+                            continue
+                        stop_group(process, self.grace_seconds)
+                        measured["exit_code"] = process.returncode
+                        break
+            finally:
+                os.close(events_fd)
+                os.close(stderr_fd)
+            measured["wall_seconds"] = round(time.monotonic() - started, 3)
+            measured["finished_utc"] = li26.now_utc()
+            if reply.exists():
+                os.chmod(reply, 0o600)
+        finally:
+            os.close(slot_fd)
+        events = read_events(attempt / "events.jsonl")
+        record = call_record(self.arm, index, batch, number, prompt, events, reply, **measured)
+        write_private(attempt / "call.json", (json.dumps(record, indent=2, sort_keys=True) + "\n").encode(),
+                      replace=True)
+        if record["outcome"] == "limit":
+            self.note_limit(index, number, limit_message(events))
+        return record["outcome"]
+
+    def note_limit(self, index, number, message):
+        note = {"arm": self.arm["id"], "model": self.arm["model"], "effort": self.arm["effort"],
+                "batch": batch_id(index), "attempt": number, "observed_utc": li26.now_utc(),
+                "codex_message": (message or "")[:500],
+                "next_step": "Tell the user the shared Codex usage limit was reached. After the reset, remove this "
+                             "file and run the same arm again; its finished batches are kept."}
+        with self.mutex:
+            try:
+                write_private(self.state_dir / "LIMIT", (json.dumps(note, indent=2, sort_keys=True) + "\n").encode())
+            except FileExistsError:
+                pass
+        self.limited.set()
+        self.stop.set()
+
+
+def run_arm(plan_path, arm_id, acquisition, state_dir, lock_dir, *, codex=None, poll_seconds=None,
+            timeout_seconds=None, grace_seconds=None, on_start=None, out=None):
+    """Run the arm's pending batches; the exit code (0 done, 3 usage limit, 5 interrupted, 1 runner error).
+
+    `codex`, `poll_seconds`, `timeout_seconds` and `grace_seconds` exist for the offline tests; the command line
+    always uses the codex on PATH and the plan's frozen values. `on_start` receives the ArmRun before any call
+    (the command line installs its signal handlers there).
+    """
+    out = out or sys.stdout
+    plan, plan_sha256 = load_plan(plan_path)
+    verify_frozen(plan)
+    arm = arm_by_id(plan, arm_id)
+    template = prompt_template(plan)
+    rows = load_rows(plan, acquisition)
+    batches = frozen_batches(plan, template, rows)
+    lock_dir = checked_lock_dir(lock_dir)
+    codex = codex or shutil.which("codex")
+    if codex is None:
+        raise ValueError("codex is not on PATH")
+    version = codex_version(codex)
+    if version != plan["codex"]["version"]:
+        raise ValueError(f"codex reports {version!r}; the plan is frozen for {plan['codex']['version']!r}")
+    state_dir = private_dir(state_dir)
+    if (state_dir / "LIMIT").exists():
+        print(json.dumps({"arm": arm_id, "status": "limit_note_present", "exit": EXIT_LIMIT}), file=out)
+        return EXIT_LIMIT
+    empty_dir = private_dir(state_dir / "empty")
+    if any(empty_dir.iterdir()) or inside_repository(empty_dir) is not None:
+        raise ValueError(f"{empty_dir} must be empty and outside every repository")
+    arm_dir = private_dir(private_dir(state_dir / "arms") / arm_id)
+    private_dir(arm_dir / "batches")
+    run_lock_fd = open_lock(arm_dir / "run.lock", 0o600)
+    try:
+        if not try_lock(run_lock_fd):
+            raise ValueError(f"arm {arm_id} is already running (or its codex still runs)")
+        expected = identity(plan, plan_sha256, arm, batches, version)
+        identity_path = arm_dir / "identity.json"
+        if identity_path.exists():
+            if json.loads(identity_path.read_bytes()) != expected:
+                raise ValueError(f"arm {arm_id} started under a different plan, prompt, schema, inputs, layout or "
+                                 "Codex version; that needs a new plan")
+        else:
+            write_private(identity_path, (json.dumps(expected, indent=2, sort_keys=True) + "\n").encode())
+        schema_path = arm_dir / "schema.json"
+        if not schema_path.exists():
+            write_private(schema_path, SCHEMA.read_bytes())
+        if li26.digest(schema_path) != plan["schema_sha256"]:
+            raise ValueError("the arm's schema copy differs from the frozen schema")
+        runner = ArmRun(plan=plan, arm=arm, batches=batches, template=template, codex=codex, state_dir=state_dir,
+                        arm_dir=arm_dir, empty_dir=empty_dir, lock_dir=lock_dir, schema_path=schema_path,
+                        run_lock_fd=run_lock_fd,
+                        poll_seconds=plan["calls"]["slot_poll_seconds"] if poll_seconds is None else poll_seconds,
+                        timeout_seconds=(plan["calls"]["timeout_seconds"] if timeout_seconds is None
+                                         else timeout_seconds),
+                        grace_seconds=plan["calls"]["kill_grace_seconds"] if grace_seconds is None else grace_seconds)
+        runner.finalize_abandoned()
+        if on_start is not None:
+            on_start(runner)
+        started_utc, started = li26.now_utc(), time.monotonic()
+        runner.run()
+        states = runner.states()
+        if runner.errors:
+            status, code = "runner_error", EXIT_ERROR
+        elif runner.limited.is_set():
+            status, code = "limit_stopped", EXIT_LIMIT
+        elif runner.interrupted.is_set():
+            status, code = "interrupted", EXIT_INTERRUPTED
+        elif "pending" in states:
+            status, code = "runner_error", EXIT_ERROR
+        else:
+            status, code = "complete", EXIT_DONE
+        summary = {"arm": arm_id, "status": status, "exit": code, "calls": runner.calls,
+                   "batches": {state: states.count(state) for state in ("completed", "failed", "pending")}}
+        append_private(arm_dir / "runs.jsonl", {**summary, "started_utc": started_utc,
+                                                  "finished_utc": li26.now_utc(),
+                                                  "elapsed_seconds": round(time.monotonic() - started, 3),
+                                                  "codex_version": version, "errors": runner.errors})
+        print(json.dumps(summary, sort_keys=True), file=out)
+        return code
+    finally:
+        os.close(run_lock_fd)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    commands = parser.add_subparsers(dest="command", required=True)
+    frozen = commands.add_parser("verify-frozen", help="check every frozen hash and the plan's frozen values")
+    frozen.add_argument("--plan", type=Path, default=PLAN)
+    shape = commands.add_parser("layout", help="verify the inputs and print the batch layout's public aggregates")
+    shape.add_argument("--plan", type=Path, default=PLAN)
+    shape.add_argument("--acquisition", type=Path, required=True)
+    run = commands.add_parser("run", help="run one arm's pending batches")
+    run.add_argument("--plan", type=Path, default=PLAN)
+    run.add_argument("--arm", required=True, choices=[arm_id for arm_id, _, _ in ARMS])
+    run.add_argument("--acquisition", type=Path, required=True)
+    run.add_argument("--lock-dir", type=Path, required=True, help="the host's Codex slot directory (slot-1..slot-3)")
+    run.add_argument("--state-dir", type=Path, default=DEFAULT_STATE_DIR)
+    args = parser.parse_args(argv)
+    try:
+        if args.command == "verify-frozen":
+            plan, _ = load_plan(args.plan)
+            verify_frozen(plan)
+            print("frozen inputs verified")
+            return EXIT_DONE
+        if args.command == "layout":
+            plan, _ = load_plan(args.plan)
+            template = prompt_template(plan)
+            rows = load_rows(plan, args.acquisition)
+            batching = plan["batching"]
+            batches = plan_batches(template, rows, batching["max_filings"], batching["max_prompt_bytes"])
+            summary = layout_summary(template, batches)
+            summary["matches_plan"] = (summary["batches"] == batching["batches"]
+                                       and summary["layout_sha256"] == batching["layout_sha256"])
+            print(json.dumps(summary, sort_keys=True))
+            return EXIT_DONE if summary["matches_plan"] else EXIT_ERROR
+
+        def install(runner):
+            signal.signal(signal.SIGTERM, runner.interrupt)
+            signal.signal(signal.SIGINT, runner.interrupt)
+
+        return run_arm(args.plan, args.arm, args.acquisition, args.state_dir, args.lock_dir, on_start=install)
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print(f"run_arm: {error}", file=sys.stderr)
+        return EXIT_REFUSED
+
+
+if __name__ == "__main__":
+    sys.exit(main())

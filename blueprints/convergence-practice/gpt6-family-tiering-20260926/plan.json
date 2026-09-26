@@ -1,0 +1,296 @@
+{
+  "schema_version": 1,
+  "kind": "frozen_gpt6_family_tiering_plan",
+  "status": "preregistered",
+  "frozen_before_any_call": true,
+  "preregistered_on": "2026-09-26",
+  "source_base": "771f25f824a7851a6cb46ebcfa2922b54cb88d9e",
+  "scope_source": "Coordinator task of 2026-09-26, which reports the user's request to maximize use of the GPT-6 family cleanly, with the token-save practice as the base layer. This plan records that scope and runs nothing; it does not itself establish approval to spend the shared allowance.",
+  "question": "For a mechanical, deterministically scored extraction stage, which GPT-6 family member and reasoning effort matches gpt-6-astra at max effort (today's default for every GPT-6 step) at lower token cost, so that mechanical stages can route to it and the shared weekly allowance does more work?",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform": "WSL2 Ubuntu 24.04.5 x86_64",
+    "codex_slot_pool": "Three fcntl.flock slots (slot-1 to slot-3) in the host's shared Codex lock directory, which the landscape-sweep runner (tools/sota-convergence/landscape-sweep/codex_job.py) also takes. run_arm.py receives that directory as --lock-dir and never creates it, so a mistyped path is refused instead of starting a private pool.",
+    "observation_scope": "Read-only facts seen while planning. Each run checks the Codex version, the inputs and the layout again and relies on nothing here."
+  },
+  "codex": {
+    "version": "codex-cli 0.157.1",
+    "source": {
+      "repository": "https://github.com/openai/codex",
+      "tag": "rust-v0.157.1",
+      "commit": "36650394c5b38c2990ccf2a3457165ca3e9d9726",
+      "qualification": "evidence/receipts/codex-01571-qualification-20260926.json"
+    },
+    "argv_after_binary": [
+      "exec",
+      "--ignore-user-config",
+      "--skip-git-repo-check",
+      "-s",
+      "read-only",
+      "-m",
+      "<model>",
+      "-c",
+      "model_reasoning_effort=\"<effort>\"",
+      "--output-schema",
+      "<schema>",
+      "-o",
+      "<reply>",
+      "--json",
+      "<prompt>"
+    ],
+    "stdin": "/dev/null",
+    "working_directory": "<state dir>/empty: an empty 0700 directory outside every repository, so no AGENTS.md or project file reaches the call",
+    "environment": "The caller's environment without RUST_LOG* variables, so Codex's stderr carries only its default error-level diagnostics. CODEX_HOME and the native sign-in are left as they are; --ignore-user-config keeps the host's config.toml out of every call.",
+    "schema": "response.schema.json, copied once per arm into the arm's state directory and hash-checked. Codex 0.157.1 sends --output-schema as a strict json_schema text format named codex_output_schema (evidence/artifacts/sota-refresh-20260926/codex/out/provider-requests.json, requests to a loopback fake provider).",
+    "never": [
+      "ultra effort (it lets Codex delegate to sub-agents, which breaks a one-model arm)",
+      "--search or any web_search override",
+      "an interactive codex launch",
+      "--dangerously-bypass-approvals-and-sandbox"
+    ],
+    "catalog_observation": {
+      "source": "codex debug models --bundled on 2026-09-26: the catalog shipped inside the codex-cli 0.157.1 binary, printed without a refresh or provider request",
+      "models": {
+        "gpt-6-astra": {
+          "supported_efforts": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max",
+            "ultra"
+          ],
+          "default_effort": "low",
+          "default_service_tier": null,
+          "service_tiers": [
+            "priority: 2x speed, increased usage"
+          ]
+        },
+        "gpt-6-sol": {
+          "supported_efforts": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max",
+            "ultra"
+          ],
+          "default_effort": "medium",
+          "default_service_tier": "priority",
+          "service_tiers": [
+            "priority: 1.5x speed"
+          ]
+        },
+        "gpt-6-luna": {
+          "supported_efforts": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ],
+          "default_effort": "medium",
+          "default_service_tier": "priority",
+          "service_tiers": [
+            "priority: 1.5x speed"
+          ]
+        }
+      },
+      "context_window_tokens": 272000,
+      "note": "The bundled catalog is the binary's own list, not the provider's live catalog. Every arm's model and effort are listed there. Under --ignore-user-config each model runs at its catalog default service tier: gpt-6-sol and gpt-6-luna default to priority, and gpt-6-astra lists no default. The frozen command does not override the tier, so wall time compares arms at their defaults."
+    },
+    "json_events": {
+      "usage": "The usage object of turn.completed, summed over a call's turn.completed events: input_tokens, cached_input_tokens, cache_write_input_tokens, output_tokens and reasoning_output_tokens.",
+      "subset_rule": "input_tokens includes cached_input_tokens, and output_tokens includes reasoning_output_tokens (docs/token-practice.md: 'Codex total is input plus output; cached input and reasoning are subsets'; the qualification receipt's fake-provider turn reported input 11, cached 3, output 7 and reasoning 2). analyze.py checks the rule on every call and makes the result inconclusive if any call breaks it.",
+      "usage_limit": "Codex reports the account limit as an error event and a turn.failed event on stdout, whose message contains 'hit your usage limit', and exits 1 (the qualification receipt's fake-provider case). Only these two event types count. Model content (item.* events) and stderr never count: codex_job.py records that on 2026-09-26 a grep of a whole event stream matched a cited README and falsely stopped the sweep."
+    }
+  },
+  "arms": [
+    {
+      "id": "A0",
+      "role": "control",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "why": "Today's default for every GPT-6 step on this host."
+    },
+    {
+      "id": "A1",
+      "role": "candidate",
+      "model": "gpt-6-astra",
+      "effort": "medium",
+      "why": "The same model with less reasoning: isolates the effort."
+    },
+    {
+      "id": "S0",
+      "role": "candidate",
+      "model": "gpt-6-sol",
+      "effort": "max",
+      "why": "The catalog's workhorse model at maximum effort."
+    },
+    {
+      "id": "S1",
+      "role": "candidate",
+      "model": "gpt-6-sol",
+      "effort": "medium",
+      "why": "The workhorse model at its catalog default effort."
+    },
+    {
+      "id": "L0",
+      "role": "candidate",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "why": "The catalog's fast and affordable model at maximum effort."
+    },
+    {
+      "id": "L1",
+      "role": "candidate",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "why": "The fast and affordable model at its catalog default effort."
+    }
+  ],
+  "not_arms": [
+    {
+      "what": "ultra effort, for any model",
+      "reason": "Never: ultra lets Codex delegate to sub-agents, which breaks a one-model arm."
+    },
+    {
+      "what": "low, high and xhigh efforts",
+      "reason": "Not requested. Six arms bracket each model at max and medium; a routable medium arm makes the efforts between the two unnecessary for this question."
+    },
+    {
+      "what": "gpt-5.6 models and the other catalog entries",
+      "reason": "Out of scope: the question is routing within the GPT-6 family."
+    }
+  ],
+  "task": {
+    "id": "sec-8k-item-extraction-20200302-batched",
+    "description": "Predict the Form 8-K item codes each filing of a batch declares, from the text of its primary document.",
+    "reuses": "blueprints/convergence-practice/local-inference-latest-20260926 (li26): its cohort, header labels, exclusions, normalized inputs and scoring functions, unchanged.",
+    "acquisition": {
+      "run_id": "acq-20260926",
+      "location": "sec/acq-20260926 under li26's private state directory, passed as --acquisition",
+      "verification": "li26 eval_arm.load_inputs: the SHA-256 of inputs.jsonl, a complete manifest naming that hash, and unique accessions in sorted order. li26's own verify-inputs reported 'verified 360 eligible filings' on 2026-09-26 while this plan was written."
+    },
+    "inputs_sha256": "2a5c8c9bd1650bc20a3e7364defef2d725904f6eb1ef509a511a49526a32bfe0",
+    "eligible_filings": 360,
+    "labels": "li26's labels: the filer-declared header ITEMS of each accession. They are not hand-checked or frontier-model labels.",
+    "input": "li26's input for each filing, unchanged: the primary document with the whole SEC header removed, HTML reduced to text, whitespace normalized, and text over 16,000 characters cut to its first 12,000 and last 4,000.",
+    "privacy": "SEC filings are public, so sending them to the provider is permitted. Replies, events and per-call records stay in the private state directory. Filing text never enters the repository, and the decision file holds aggregates only."
+  },
+  "batching": {
+    "order": "The frozen input order: accession order, as li26's load_inputs requires.",
+    "max_filings": 15,
+    "max_prompt_bytes": 110000,
+    "rule": "Greedy and order-preserving: a filing joins the current batch while the batch then holds at most 15 filings and its whole prompt stays under 110,000 UTF-8 bytes; otherwise it starts the next batch. A filing whose prompt alone reaches the bound, or whose text contains a batch delimiter or a NUL character (no argument can carry one), is refused before any call.",
+    "prompt": "prompt.txt with @@FILING_COUNT@@ replaced by the batch size and @@FILINGS@@ by the batch's filings, each written as <<<FILING accession=\"...\">>>, its text, <<<END FILING accession=\"...\">>>, separated by blank lines.",
+    "argv_bound": "Each prompt is one argument; Linux caps one argument at 131,072 bytes.",
+    "same_for_every_arm": true,
+    "batches": 25,
+    "layout_sha256": "1db33e0f5f9c6328eab7c691e69c175b6084bedfe16a96e81fecacf33cf10d15",
+    "layout_hash_input": "SHA-256 of the compact JSON list of each batch's accession list, in batch order",
+    "observed_on_frozen_inputs": {
+      "computed": "run_arm.py layout on the verified acquisition, 2026-09-26, before any call",
+      "filings": 360,
+      "batches_by_size": {
+        "15": 23,
+        "14": 1,
+        "1": 1
+      },
+      "prompt_bytes": {
+        "min": 12088,
+        "max": 106870,
+        "total": 2016724
+      }
+    }
+  },
+  "calls": {
+    "max_concurrent": 3,
+    "slots": 3,
+    "slot_rule": "Before its call, each worker takes the first free slot lock (slot-1 to slot-3) in the host's lock directory, polling every 5 s while all are held. codex inherits the slot lock and the arm's run lock, so a killed runner frees neither while its codex still runs.",
+    "retries_per_batch": 1,
+    "timeout_seconds": 3000,
+    "slot_poll_seconds": 5,
+    "kill_grace_seconds": 10,
+    "call_outcomes": {
+      "ok": "Exit 0, a completed turn, no turn.failed event, and a reply file whose whole text, or one markdown fence around it, parses as the response envelope.",
+      "failed": "Timeout, non-zero exit, a turn.failed event, no completed turn, no reply, a reply that is not the envelope, a launch error, or an attempt that a dead runner left unfinished (abandoned). It counts toward the batch's retry.",
+      "limit": "A usage-limit error or turn.failed event. The arm stops: running calls finish and are recorded, no call starts, the LIMIT note is written and the run exits 3. This is account state, not a batch failure: after the reset the batch runs again without using its retry.",
+      "interrupted": "SIGINT or SIGTERM stopped the call (TERM to its process group, KILL after 10 s). Not counted; the run exits 5 and a later run sends the batch again."
+    },
+    "batch_states": "completed: an ok call. failed: two failed calls; the batch never runs again and its filings stay in every denominator as invalid. pending: anything else; a later run of the same arm continues it.",
+    "resume": "A later run of the same arm keeps every recorded attempt, finalizes attempts a dead runner left behind, and continues only pending batches. A run whose plan, prompt, schema, inputs, layout or Codex version differs from the arm's first run is refused.",
+    "limit_note": "<state dir>/LIMIT (JSON: arm, batch, attempt, time and Codex's message). While it exists, every run exits 3 without a call, and an arm already running (another arm's run may have written it) starts no further call and exits 3. The coordinator tells the user, and removes it after the reset.",
+    "exit_codes": {
+      "0": "the arm has no pending batch",
+      "1": "runner error",
+      "2": "refused before any call: a changed frozen hash, plan value, input or layout, another Codex version, an unsafe state directory, a missing lock directory, a run already in progress, or a run that differs from the arm's first run",
+      "3": "usage limit",
+      "5": "interrupted"
+    }
+  },
+  "metrics": {
+    "per_filing": "li26's functions: precision tp/(tp+fp), 0 when nothing valid is predicted; recall tp/(tp+fn); F1 2tp/(2tp+fp+fn); exact match when the predicted set equals the declared set.",
+    "micro_f1": "2*sum(tp)/(2*sum(tp)+sum(fp)+sum(fn)) over all 360 filings, with li26's micro_f1.",
+    "macro_f1": "li26's macro_f1: the mean per-code F1 over codes declared by at least 5 filings.",
+    "json_valid_rate": "Share of the 360 filings whose batch's final reply is exactly the response envelope (no fence, no duplicate keys), whose accession has exactly one entry, and whose items pass li26's per-filing rule (unique strings matching [1-9].[0-9]{2}). A fenced reply is scored for F1 but is not JSON-valid. Filings of failed or pending batches are invalid and predict nothing.",
+    "tokens": "Per arm, the totals and the means per filing (total / 360) over every call, including failed, retried, limit and interrupted calls: input, cached input, uncached input (input - cached), cache-write input, output (which includes reasoning), reasoning, visible output (output - reasoning) and billed tokens.",
+    "billed_tokens": "Uncached input plus output. The task's 'output plus reasoning' is Codex's output_tokens, which already includes reasoning_output_tokens; adding reasoning again would count it twice. Cached input is reported separately and not billed here. cache_write_input_tokens is reported and not added.",
+    "wall_time": "Per call, from launch to exit, excluding the wait for a slot (recorded separately); per arm the median over ok calls, the total over all calls, that total per filing, the slot wait and the summed run time.",
+    "failures": "Calls by outcome, retried, failed and pending batches, unexpected entries and every record inconsistency."
+  },
+  "decision_rule": {
+    "text": "An arm is routable for mechanical 8-K item extraction when (1) the paired bootstrap (10,000 resamples, seed 20260926) 95% lower bound of micro-F1(arm) - micro-F1(A0) is at least -0.02, (2) its JSON-valid rate is at least 0.98, and (3) every one of its batches completed. Among routable arms whose every call reported usage (a call ended by the usage limit counts with the usage it reports), the recommendation is the arm with the lowest mean billed tokens per filing: uncached input plus output, where Codex's output already includes reasoning. Ties go to the lower median wall time of the arm's ok calls, then to plan order. A0 is itself a candidate; if it is selected, the default stays. Cached input, reasoning and quota percentages are reported separately, and quota percentages never enter the rule.",
+    "noninferiority_margin": -0.02,
+    "json_valid_min": 0.98,
+    "bootstrap": {
+      "resamples": 10000,
+      "seed": 20260926,
+      "alpha": 0.05,
+      "method": "li26's paired_bootstrap, unchanged: filings in accession order; each resample is random.Random(20260926).choices over the filing indices, applied to both arms, and micro-F1 is recomputed for each.",
+      "lower_bound": "Nearest-rank 2.5th percentile: the 250th smallest of the 10,000 differences."
+    },
+    "every_batch_completed": "The arm has no pending and no failed batch, and its record has no inconsistency: attempt numbers, identities, prompt hashes, usage re-read from the events, and reply status all agree.",
+    "control_validity": "If A0 has not run, the outcome is inconclusive_control_not_evaluated. While any A0 batch is pending, it is inconclusive_control_incomplete. If A0 has a failed batch, a record inconsistency or a JSON-valid rate below 0.98, it is inconclusive_control_invalid. No routing changes in any of these cases.",
+    "subset_guard": "If any call reports cached input above input, or reasoning above output, the billed-token definition does not hold; the outcome is inconclusive_usage_subset_rule_violated.",
+    "outcomes": {
+      "route_mechanical_extraction": "A candidate is selected: route mechanical extraction stages to its model and effort.",
+      "keep_default": "A0 is selected: the default stays.",
+      "no_ranked_arm": "No routable arm has complete usage: the default stays.",
+      "inconclusive_control_not_evaluated": "See control_validity.",
+      "inconclusive_control_incomplete": "See control_validity.",
+      "inconclusive_control_invalid": "See control_validity.",
+      "inconclusive_usage_subset_rule_violated": "See subset_guard."
+    },
+    "final": "The decision file marks final true only when all six arms are complete (no pending batch)."
+  },
+  "quota_context": {
+    "caveat": "Percentages of the shared weekly Codex allowance read before and after an arm are context only. Other sessions share the account, so a percentage change is not attributable to one arm, and it never enters the rule.",
+    "input": "Optional: analyze.py --quota-context FILE, where FILE is {\"source\": ..., \"readings\": [{\"arm\", \"window\", \"before_percent\", \"after_percent\", \"before_utc\", \"after_utc\"}]} as the coordinator read them."
+  },
+  "failure_rule": "Retain every call: ok, failed, limit, interrupted and abandoned. A failed batch runs once more and never again. A limit or interrupted call never counts as a batch failure; its batch runs again after the reset or restart. No re-run of a completed or failed batch, and no changed model, effort, prompt, schema, batching or command. Changing any frozen value needs a new plan.",
+  "state_dir": "~/.local/state/native-agent-stack/gpt6-family-tiering-20260926/: 0700 directories and 0600 files. It holds empty/, LIMIT when present, and arms/<arm>/ with identity.json, schema.json, runs.jsonl and batches/<batch>/attempt-<n>/ (events.jsonl, stderr.txt, reply.json, call.json).",
+  "planning_estimate": "Not a measurement. The 25 prompts of one arm total 2,016,724 bytes, which at about 4 bytes per token is roughly 0.5 million input tokens per arm before Codex's own instructions, which are sent with every call. Reasoning at max effort adds output. Six arms therefore spend a few million tokens of the shared allowance.",
+  "claims_excluded": [
+    "general or cross-task model quality",
+    "frontier parity, or accuracy against hand-checked labels",
+    "any stage other than mechanical extraction with a deterministic scorer",
+    "catalyst, incentive or trading-signal value of item codes",
+    "historical point-in-time availability",
+    "provider cost in money, or a percentage of the weekly allowance attributable to one arm",
+    "token savings of a whole task or workflow",
+    "stability over time, other days, other batch sizes or other Codex versions",
+    "isolated latency: calls share a host, an account and provider load, and sol and luna run at their priority default tier"
+  ],
+  "prompt_sha256": "1861b55a72932fc9a94eee727f9bba20b84f4f543d2b04125c4778b5ad785ce7",
+  "schema_sha256": "e8aaebf24a89d487e146bce23a66ceb528cc7dd47d77bfaa0330ac372094d301",
+  "frozen_inputs": {
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py": "165c37fabc6f58e61cd64c109ba30370a037bc245152dca7b8ecd0ad5c473101",
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/analyze.py": "779e9b6e2dec2de1a37fd1136e9954175ffb73bc9e0f995ff16939505b1d8817",
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/prompt.txt": "1861b55a72932fc9a94eee727f9bba20b84f4f543d2b04125c4778b5ad785ce7",
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/response.schema.json": "e8aaebf24a89d487e146bce23a66ceb528cc7dd47d77bfaa0330ac372094d301",
+    "blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py": "1af22fd1bd1c99091f8de214d8bd74625717d782905563ad652a77da237e6bdc",
+    "blueprints/convergence-practice/local-inference-latest-20260926/analyze.py": "cebc1561c0353d0b6c63008b14c05cbf655c7c69cb275d261a4172a24958c3be",
+    "scripts/path_safety.py": "228edf3968176c04c557078c59502b2d90141e000e1acf2917e87cc67316e703"
+  }
+}
