@@ -13370,8 +13370,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
-      "sha256": "89a5567b801ac445ca6d056dd56436c21b19289a4983d7cae76fabd2a9db7c1d",
-      "bytes": 32429
+      "sha256": "ff98f065a6f0d937005bc7759cdec5853d241bb33e573c10b6da20bc3f6948ff",
+      "bytes": 37650
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
@@ -29429,6 +29429,21 @@
       "bytes": 15432
     },
     {
+      "path": "evidence/artifacts/mcporter-0141-daemon-correction-20260926/README.md",
+      "sha256": "3b0d50234a2909b853cde1c00ec202dd3dbac376c913af529e572be4cf3dcf47",
+      "bytes": 4148
+    },
+    {
+      "path": "evidence/artifacts/mcporter-0141-daemon-correction-20260926/retire.sh",
+      "sha256": "8816dae7b6ff186b4927c0039ee02cd690e63ccfc07e26d8a8e52157c4de25c8",
+      "bytes": 3587
+    },
+    {
+      "path": "evidence/artifacts/mcporter-0141-daemon-correction-20260926/retire.txt",
+      "sha256": "29aa587fe671e3dfe1e1e9c7c09dfa635c365e3536a77fa87fd9b4c77388f7e4",
+      "bytes": 1712
+    },
+    {
       "path": "evidence/artifacts/memory-landscape-20260921/catalog-memory-guide.png",
       "sha256": "bca87e44e3375122ac2078115a82d5c69fd574335ca0408394a46cfaeb5c5ab7",
       "bytes": 125442
@@ -35680,8 +35695,8 @@
     },
     {
       "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
-      "sha256": "3161038aa1fb8dcd5c3cf6d05249d69ea0066c8c38120787f5cd54fa5fc059ba",
-      "bytes": 12907
+      "sha256": "71228f159b824092c9e45e1f32565e3c62f19d73197a169e36440a135d89eed4",
+      "bytes": 14890
     },
     {
       "path": "evidence/receipts/memory-landscape-20260921.json",
