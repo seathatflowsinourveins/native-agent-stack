@@ -4,8 +4,10 @@
 continuing the [2026-09-25 refresh](2026-09-25-workstation-sota-refresh.md) with the same rule:
 a newer release replaces an accepted version only after a clean install into a fresh prefix
 passes a discriminating acceptance on this host, matched against the installed version. A
-release being newer is not evidence. The refresh coordinator owns the independent review of
-this round; none has run yet.
+release being newer is not evidence. A review round of the refresh coordinator (Claude Opus
+and GPT-6 Astra reviewers) reported two findings: the Codex rollback ignored the background
+server that 0.157.x starts, and the Prometheus switch script did not gate the link change on
+its checks. Both are repaired below; the repair has not been re-reviewed.
 
 **Scope:** MCP Inspector, Prometheus and the Codex CLI on this host. The landscape winner pins
 in `catalogs/landscape/foundation.json` do not change (they come from the sealed 2026-09-22
@@ -55,6 +57,16 @@ live TSDB, 3.14.0 and 3.15.0 side by side gave the same targets, rules and six-h
 and 3.14.0 reopened the data 3.15.0 wrote. After the switch the history before the restart
 read back identical, and the firing alerts were restored without a new notification.
 
+**Procedure.** The cutover script (`switch.py`, kept as run) logged its verify, reload and
+restart exit codes and its post-switch comparisons but repointed the `bin/` links regardless;
+here all of them had passed first. Its replacement `switch_gated.py` moves the links only after
+every gate passes and otherwise restores the previous unit, with `reset-failed` before the
+restart because a crash-looping server exhausts the unit's start limit. On a scratch unit with
+the live unit's restart settings it switched to 3.15.0 and back, and restored 3.14.0 without
+moving the links when `daemon-reload` failed, when it silently did not reload, when the new
+server could not start, and when the restarted server still reported 3.14.0. It has not run
+against the production unit.
+
 **Alternatives.** Keep 3.14.0 (no defect of it is known to affect this host, but the TSDB
 fixes cover data-loss paths on the head and WAL); wait for 3.15.1 (no patch release existed
 at switch time).
@@ -67,7 +79,9 @@ A rollback after 3.15.0 has compacted its own blocks is untested.
 
 **Decision.** 0.157.1 is installed in `tools/codex-0.157.1` and qualified without a model
 call; `bin/codex` stays on 0.155.1 while the sweep's GPT-6 lanes run. The receipt holds the
-switch, probe and rollback commands for the coordinator. Pins move only after the switch.
+switch, probe and rollback commands for the coordinator: the switch turns the background
+server's automatic start off before any interactive 0.157.1 launch, and the rollback stops
+such a server and its updater loop before relinking. Pins move only after the switch.
 
 **Evidence.** [Release rust-v0.157.1](https://github.com/openai/codex/releases/tag/rust-v0.157.1)
 (tag commit `36650394`). Every flag the sweep lanes use is present and `codex exec --help` is
@@ -81,12 +95,23 @@ migration) still served a 0.155.1 exec turn.
 version: the search requests carried `external_web_access: false`, the same as without the
 flag, while `-c web_search="live"` sent `true`. The GPT-6 lanes have searched in cached mode.
 
+**Background server.** 0.157.0 turned on automatic startup of a local app-server for
+interactive launches. In the sandbox, a plain 0.157.1 launch copied its 391 MB package into
+`~/.codex/packages/app-server-daemon` and started the server and an updater loop from that
+copy, outside the pinned prefix; both outlived the session, and a 0.155.1 session started
+afterwards connected to that server. `codex app-server daemon stop` left the updater loop
+running. By source, that loop fetches and runs `https://chatgpt.com/codex/install.sh` five
+minutes after start and then hourly, to move the copy to the latest release. `--no-daemon`, or `codex features disable
+daemon_auto_start`, prevented the copy and both processes, and 0.155.1 accepts the resulting
+`config.toml`. `codex exec`, which the lanes use, never starts the server.
+
 **Alternatives.** Switch now (would change the binary under a running sweep and migrate the
 shared `~/.codex` mid-run); skip 0.156.x/0.157.x (0.156.1 adds GPT-6 Sol and Luna to the
 model catalog, and the exec contract the lanes depend on is unchanged).
 
 **Overturn when.** The post-switch live GPT-6 probe fails or differs from 0.155.1, a later
-stable release changes exec events or lane flags, or an advisory lands against 0.157.1.
+stable release changes exec events, lane flags or the background server's start or update
+defaults, or an advisory lands against 0.157.1.
 
 ## Limits
 
