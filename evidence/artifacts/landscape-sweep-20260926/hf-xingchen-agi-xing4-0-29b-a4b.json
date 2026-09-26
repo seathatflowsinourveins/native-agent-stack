@@ -1,0 +1,35 @@
+{
+ "schema_version": 1,
+ "id": "source-review-hf-xingchen-agi-xing4-0-29b-a4b",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://huggingface.co/XingChen-AGI/Xing4.0-29B-A4B",
+ "reviewed_commit": "baae3c3e813cad5f888f1f485cfff659c89076c5",
+ "readme_path": "README.md",
+ "license": "apache-2.0",
+ "layers": [
+  "agents-models-workers"
+ ],
+ "claim": "Source and documentation review of the Hugging Face model repository XingChen-AGI/Xing4.0-29B-A4B at commit baae3c3e813cad5f888f1f485cfff659c89076c5 (license apache-2.0, as its model card declares it), read from README.md at that commit. Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "likes": 1715,
+  "last_modified": "2026-09-18T09:49:55.000Z",
+  "gated": false,
+  "disabled": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@baae3c3e813cad5f888f1f485cfff659c89076c5",
+   "text": "> [!Note] > This repository provides the model weights and configuration files for Xing4.0-29B-A4B in Hugging Face Transformers format, compatible with Transformers, vLLM, SGLang, KTransformers, and other mainstream inference frameworks."
+  },
+  {
+   "source": "README.md@baae3c3e813cad5f888f1f485cfff659c89076c5",
+   "text": "**Xing4.0-29B-A4B** is a next-generation large language model in the Xing series (formerly [TeleChat](https://github.com/Tele-AI/TeleChat3)), developed by China Telecom Artificial Intelligence Technology Co., Ltd. With 29B total parameters and only 4B activated per token, it natively supports a 256K context length, extensible to 512K. It is the first model of this scale trained entirely on the Ascend NPU platform with the MindSpore framework, and deeply optimized for complex engineering tasks."
+  },
+  {
+   "source": "README.md@baae3c3e813cad5f888f1f485cfff659c89076c5",
+   "text": "For more information, please refer to our [GitHub repository](https://github.com/XingChen-AGI/Xing4.0-29B-A4B)."
+  }
+ ]
+}

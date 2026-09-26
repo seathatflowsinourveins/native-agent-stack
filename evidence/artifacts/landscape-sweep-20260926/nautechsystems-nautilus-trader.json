@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-nautechsystems-nautilus-trader",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/nautechsystems/nautilus_trader",
+ "reviewed_commit": "cd417b801942c9753f70024be11f078d940ccf99",
+ "readme_path": "README.md",
+ "license": "LGPL-3.0",
+ "layers": [
+  "execution-broker"
+ ],
+ "claim": "Source and documentation review of nautechsystems/nautilus_trader at commit cd417b801942c9753f70024be11f078d940ccf99 (license LGPL-3.0), read from README.md at that commit. Repository description: \"Production-grade Rust-native trading engine with deterministic event-driven architecture\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 29418,
+  "pushed_at": "2026-09-26T13:37:43Z",
+  "archived": false,
+  "default_branch": "develop"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@cd417b801942c9753f70024be11f078d940ccf99",
+   "text": "# <img src=\"https://github.com/nautechsystems/nautilus_trader/raw/develop/assets/nautilus-trader-logo.png\" alt=\"NautilusTrader\" width=\"500\">"
+  },
+  {
+   "source": "README.md@cd417b801942c9753f70024be11f078d940ccf99",
+   "text": "- **Docs**: <https://nautilustrader.io/docs/> - **Website**: <https://nautilustrader.io> - **Support**: [support@nautilustrader.io](mailto:support@nautilustrader.io)"
+  },
+  {
+   "source": "README.md@cd417b801942c9753f70024be11f078d940ccf99",
+   "text": "NautilusTrader is an open-source, production-grade, Rust-native engine for multi-asset, multi-venue trading systems."
+  }
+ ]
+}

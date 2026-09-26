@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-microsoft-pg-durable",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/microsoft/pg_durable",
+ "reviewed_commit": "8dac680b135961be9ad6b4d3a6272e96ce9cee24",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "scheduling-supervision"
+ ],
+ "claim": "Source and documentation review of microsoft/pg_durable at commit 8dac680b135961be9ad6b4d3a6272e96ce9cee24 (license NOASSERTION), read from README.md at that commit. Repository description: \"PostgreSQL in-database durable execution\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 2824,
+  "pushed_at": "2026-09-25T15:40:58Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@8dac680b135961be9ad6b4d3a6272e96ce9cee24",
+   "text": "[Website](https://microsoft.github.io/pg_durable/) · [Docs](docs/) · [Quick Example](#quick-example) · [GitHub](https://github.com/microsoft/pg_durable)"
+  },
+  {
+   "source": "README.md@8dac680b135961be9ad6b4d3a6272e96ce9cee24",
+   "text": "Long-running, fault-tolerant SQL functions for teams that already keep their state in Postgres and want to stop stitching together cron jobs, workers, queues, and status tables to make background work reliable. Define the workflow in SQL, let pg_durable checkpoint each step, and resume after crashes, restarts, or failed steps."
+  },
+  {
+   "source": "README.md@8dac680b135961be9ad6b4d3a6272e96ce9cee24",
+   "text": "Durable execution is now a standard industry pattern, and pg_durable brings it inside Postgres with no extra service infrastructure required. Part of our mission to bring compute close to data."
+  }
+ ]
+}

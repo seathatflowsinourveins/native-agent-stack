@@ -1,0 +1,198 @@
+{
+ "schema_version": 1,
+ "measurement": {
+  "tool": "native-agent-stack examples/claude-native/workflows/child-usage.mjs",
+  "tool_commit": "23b2ab06587c982ae9d783494f2bd80e6fff2ead",
+  "tool_sha256": "71509f66e151fc5adcf48251ba9677127881928a77ed37b2ec3f884af2199480",
+  "command": "node examples/claude-native/workflows/child-usage.mjs <session-transcripts>/subagents/workflows/wf_1753e674-5dc --require-effort max",
+  "exit_code": 0,
+  "raw_output_sha256": "a6c2a4bcbdfc348c8b94cdb76cd73a19db3f7b6b9e47781179e94764aebbb381",
+  "measured_at_utc": "2026-09-26T13:48:10Z",
+  "note": "Per-request provider usage of the Claude workflow children, from the retained native transcripts (message ids counted once). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and gpt6_usage); the two counters are never summed."
+ },
+ "child_usage": {
+  "transcript_dir": "<session-transcripts>/subagents/workflows/wf_1753e674-5dc",
+  "status": "complete",
+  "reason": "every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result",
+  "multi_model_children": [],
+  "children": [
+   {
+    "agent_id": "ae34f5e5307f59c7d",
+    "label": "discover:mcp-surfaces",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 66,
+    "usage": {
+     "input_tokens": 132,
+     "output_tokens": 82020,
+     "cache_read_input_tokens": 7971959,
+     "cache_creation_input_tokens": 210016
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 132,
+      "output_tokens": 82020,
+      "cache_read_input_tokens": 7971959,
+      "cache_creation_input_tokens": 210016
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 39459,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a0eda3936268f15c8",
+    "label": "gpt6-discover:mcp-surfaces",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 16973,
+     "cache_read_input_tokens": 137726,
+     "cache_creation_input_tokens": 102368
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 16973,
+      "cache_read_input_tokens": 137726,
+      "cache_creation_input_tokens": 102368
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 41105,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a9197d58469a48150",
+    "label": "refute-facts:mcp-surfaces",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 18,
+    "usage": {
+     "input_tokens": 36,
+     "output_tokens": 45813,
+     "cache_read_input_tokens": 1805908,
+     "cache_creation_input_tokens": 152903
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 36,
+      "output_tokens": 45813,
+      "cache_read_input_tokens": 1805908,
+      "cache_creation_input_tokens": 152903
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 51106,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "adce515354835e09d",
+    "label": "refute-fit:mcp-surfaces",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 52,
+    "usage": {
+     "input_tokens": 104,
+     "output_tokens": 68597,
+     "cache_read_input_tokens": 7469971,
+     "cache_creation_input_tokens": 218523
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 104,
+      "output_tokens": 68597,
+      "cache_read_input_tokens": 7469971,
+      "cache_creation_input_tokens": 218523
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 48286,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a0e9208e529c61932",
+    "label": "gpt6-refute-fit:mcp-surfaces",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 20105,
+     "cache_read_input_tokens": 381458,
+     "cache_creation_input_tokens": 116709
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 20105,
+      "cache_read_input_tokens": 381458,
+      "cache_creation_input_tokens": 116709
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50576,
+    "complete": true,
+    "issues": []
+   }
+  ],
+  "by_resolved_model": {
+   "claude-opus-5-5": {
+    "children": 2,
+    "input_tokens": 236,
+    "output_tokens": 150617,
+    "cache_read_input_tokens": 15441930,
+    "cache_creation_input_tokens": 428539
+   },
+   "claude-sonnet-5": {
+    "children": 3,
+    "input_tokens": 62,
+    "output_tokens": 82891,
+    "cache_read_input_tokens": 2325092,
+    "cache_creation_input_tokens": 371980
+   }
+  },
+  "effort_mismatches": []
+ }
+}

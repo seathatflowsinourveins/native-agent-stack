@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-shiyu-coder-kronos",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/shiyu-coder/Kronos",
+ "reviewed_commit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of shiyu-coder/Kronos at commit 67b630e67f6a18c9e9be918d9b4337c960db1e9a (license MIT), read from README.md at that commit. Repository description: \"Kronos: A Foundation Model for the Language of Financial Markets\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 39465,
+  "pushed_at": "2026-04-13T12:38:49Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+   "text": "> Kronos is the **first open-source foundation model** for financial candlesticks (K-lines), > trained on data from over **45 global exchanges**."
+  },
+  {
+   "source": "README.md@67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+   "text": "## 📰 News * 🚩 **[2025.11.10]** Kronos has been accpeted by AAAI 2026. * 🚩 **[2025.08.17]** We have released the scripts for fine-tuning! Check them out to adapt Kronos to your own tasks. * 🚩 **[2025.08.02]** Our paper is now available on [arXiv](https://arxiv.org/abs/2508.02739)!"
+  },
+  {
+   "source": "README.md@67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+   "text": "**Kronos** is a family of decoder-only foundation models, pre-trained specifically for the \"language\" of financial markets—K-line sequences. Unlike general-purpose TSFMs, Kronos is designed to handle the unique, high-noise characteristics of financial data. It leverages a novel two-stage framework: 1. A specialized tokenizer first quantizes continuous, multi-dimensional K-line data (OHLCV) into **hierarchical discrete tokens**. 2. A large, autoregressive Transformer is then pre-trained on these "
+  }
+ ]
+}

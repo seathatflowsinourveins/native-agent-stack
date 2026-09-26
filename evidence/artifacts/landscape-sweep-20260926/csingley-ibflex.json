@@ -1,0 +1,35 @@
+{
+ "schema_version": 1,
+ "id": "source-review-csingley-ibflex",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/csingley/ibflex",
+ "reviewed_commit": "dad9fd3c1edf133c4a4394cdc3c57bae82d466a3",
+ "readme_path": "README.rst",
+ "license": "MIT",
+ "layers": [
+  "execution-broker",
+  "portfolio-risk"
+ ],
+ "claim": "Source and documentation review of csingley/ibflex at commit dad9fd3c1edf133c4a4394cdc3c57bae82d466a3 (license MIT), read from README.rst at that commit. Repository description: \"Python parser for Interactive Brokers Flex XML statements\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 119,
+  "pushed_at": "2026-09-08T06:29:51Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.rst@dad9fd3c1edf133c4a4394cdc3c57bae82d466a3",
+   "text": "========================================================= Python parser for Interactive Brokers Flex XML statements ========================================================="
+  },
+  {
+   "source": "README.rst@dad9fd3c1edf133c4a4394cdc3c57bae82d466a3",
+   "text": "``ibflex`` is a Python library for converting brokerage statement data in Interactive Brokers' Flex XML format into standard Python data structures, so it can be conveniently processed and analyzed with Python scripts."
+  },
+  {
+   "source": "README.rst@dad9fd3c1edf133c4a4394cdc3c57bae82d466a3",
+   "text": "*N.B. This module has nothing to do with programmatic trading. It's about reading brokerage reports.*"
+  }
+ ]
+}

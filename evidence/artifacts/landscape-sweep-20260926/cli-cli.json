@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-cli-cli",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/cli/cli",
+ "reviewed_commit": "9b031151a825bda919203c5202876a725d637368",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "security-supply-chain"
+ ],
+ "claim": "Source and documentation review of cli/cli at commit 9b031151a825bda919203c5202876a725d637368 (license MIT), read from README.md at that commit. Repository description: \"GitHub’s official command line tool\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 46414,
+  "pushed_at": "2026-09-25T07:51:36Z",
+  "archived": false,
+  "default_branch": "trunk"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@9b031151a825bda919203c5202876a725d637368",
+   "text": "GitHub CLI, or the gh CLI, is GitHub on the command line. It brings pull requests, issues, and other GitHub concepts to the terminal next to where you are already working with `git` and your code."
+  },
+  {
+   "source": "README.md@9b031151a825bda919203c5202876a725d637368",
+   "text": "> [!IMPORTANT] > GitHub CLI's PGP signing key rotation for Linux package repositories is effective September 5, 2026; users experiencing package installation or update problems can find solutions in the [public announcement](https://github.com/cli/cli/issues/13118)."
+  },
+  {
+   "source": "README.md@9b031151a825bda919203c5202876a725d637368",
+   "text": "GitHub CLI is supported for users on GitHub.com, GitHub Enterprise Cloud, and [supported GitHub Enterprise Server versions](https://docs.github.com/en/enterprise-server/admin/all-releases), with support for macOS, Windows, and Linux."
+  }
+ ]
+}

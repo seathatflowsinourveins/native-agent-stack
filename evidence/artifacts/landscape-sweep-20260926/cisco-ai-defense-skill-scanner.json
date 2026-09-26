@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-cisco-ai-defense-skill-scanner",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/cisco-ai-defense/skill-scanner",
+ "reviewed_commit": "4f8bec3437dd9af8dc024b63fdaf23422f3a148e",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "instructions-skills"
+ ],
+ "claim": "Source and documentation review of cisco-ai-defense/skill-scanner at commit 4f8bec3437dd9af8dc024b63fdaf23422f3a148e (license NOASSERTION), read from README.md at that commit. Repository description: \"Security Scanner for Agent Skills\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 2555,
+  "pushed_at": "2026-09-26T05:03:39Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@4f8bec3437dd9af8dc024b63fdaf23422f3a148e",
+   "text": "A best-effort security scanner for AI Agent Skills that detects prompt injection, data exfiltration, and malicious code patterns. It combines **pattern-based detection** (YAML + YARA-X), **AST and dataflow analysis**, an optional **LLM-as-a-judge**, and a bounded **CEL decision layer** over typed detector facts."
+  },
+  {
+   "source": "README.md@4f8bec3437dd9af8dc024b63fdaf23422f3a148e",
+   "text": "> **Important:** This scanner provides best-effort detection, not comprehensive or complete coverage. A scan that returns no findings does not guarantee that a skill is free of all threats. See [Scope and Limitations](#scope-and-limitations) below."
+  },
+  {
+   "source": "README.md@4f8bec3437dd9af8dc024b63fdaf23422f3a148e",
+   "text": "Supports [OpenAI Codex Skills](https://openai.github.io/codex/) and [Cursor Agent Skills](https://docs.cursor.com/context/rules) formats following the [Agent Skills specification](https://agentskills.io). With `--lenient`, also scans non-standard formats such as Claude Code `.claude/commands/*.md` and flat markdown skill repos."
+  }
+ ]
+}

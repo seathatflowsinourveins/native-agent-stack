@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-gnzsnz-ib-gateway-docker",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+ "reviewed_commit": "8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "execution-broker"
+ ],
+ "claim": "Source and documentation review of gnzsnz/ib-gateway-docker at commit 8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10 (license MIT), read from README.md at that commit. Repository description: \"Docker image with IB Gateway/TWS and IBC\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1255,
+  "pushed_at": "2026-09-25T12:15:46Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+   "text": "A docker image to run Interactive Brokers Gateway and TWS without any human interaction on a docker container"
+  },
+  {
+   "source": "README.md@8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+   "text": "- [IB Gateway](https://www.interactivebrokers.com/en/index.php?f=16457) ([stable](https://www.interactivebrokers.com/en/trading/ibgateway-stable.php) or [latest](https://www.interactivebrokers.com/en/trading/ibgateway-latest.php)) - Trader Workstation [TWS](https://www.interactivebrokers.com/en/trading/tws-offline-installers.php) ([stable](https://www.interactivebrokers.com/en/trading/tws-offline-stable.php) or [latest](https://www.interactivebrokers.com/en/trading/tws-offline-latest.php)), from"
+  },
+  {
+   "source": "README.md@8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+   "text": "Images are provided for [IB gateway][1] and [TWS][2]. With the following tags:"
+  }
+ ]
+}

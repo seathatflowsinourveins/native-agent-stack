@@ -1,0 +1,406 @@
+{
+ "schema_version": 1,
+ "measurement": {
+  "tool": "native-agent-stack examples/claude-native/workflows/child-usage.mjs",
+  "tool_commit": "23b2ab06587c982ae9d783494f2bd80e6fff2ead",
+  "tool_sha256": "71509f66e151fc5adcf48251ba9677127881928a77ed37b2ec3f884af2199480",
+  "command": "node examples/claude-native/workflows/child-usage.mjs <session-transcripts>/subagents/workflows/wf_a874897e-af1 --require-effort max",
+  "exit_code": 1,
+  "raw_output_sha256": "4db0cc92dab7536932f07fb6495e80db0bfc8eb99bf20fe2380d73755afde789",
+  "measured_at_utc": "2026-09-26T13:48:10Z",
+  "note": "Per-request provider usage of the Claude workflow children, from the retained native transcripts (message ids counted once). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and gpt6_usage); the two counters are never summed."
+ },
+ "child_usage": {
+  "transcript_dir": "<session-transcripts>/subagents/workflows/wf_a874897e-af1",
+  "status": "incomplete",
+  "reason": "8 child(ren) incomplete",
+  "multi_model_children": [],
+  "children": [
+   {
+    "agent_id": "a0268b0d93ae32758",
+    "label": "discover:native-clients",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 56,
+    "usage": {
+     "input_tokens": 112,
+     "output_tokens": 68848,
+     "cache_read_input_tokens": 5559606,
+     "cache_creation_input_tokens": 193423
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 112,
+      "output_tokens": 68848,
+      "cache_read_input_tokens": 5559606,
+      "cache_creation_input_tokens": 193423
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 39513,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "aabbf0e6951a2d79d",
+    "label": "gpt6-discover:native-clients",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 19717,
+     "cache_read_input_tokens": 463034,
+     "cache_creation_input_tokens": 102944
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 19717,
+      "cache_read_input_tokens": 463034,
+      "cache_creation_input_tokens": 102944
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 41085,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a4acbde61d83084cd",
+    "label": "gpt6-discover:instructions-skills",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 8787,
+     "cache_read_input_tokens": 303854,
+     "cache_creation_input_tokens": 113904
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 8787,
+      "cache_read_input_tokens": 303854,
+      "cache_creation_input_tokens": 113904
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 41095,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a2ab6d8fdbb45c8d7",
+    "label": "gpt6-discover:workers",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 10406,
+     "cache_read_input_tokens": 163746,
+     "cache_creation_input_tokens": 88073
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 10406,
+      "cache_read_input_tokens": 163746,
+      "cache_creation_input_tokens": 88073
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 41075,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a5e19e17928e0d58b",
+    "label": "gpt6-discover:isolation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 6794,
+     "cache_read_input_tokens": 111008,
+     "cache_creation_input_tokens": 82948
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 6794,
+      "cache_read_input_tokens": 111008,
+      "cache_creation_input_tokens": 82948
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 41080,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "add07d26cf6e41fdc",
+    "label": "discover:instructions-skills",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 34,
+    "usage": {
+     "input_tokens": 68,
+     "output_tokens": 65007,
+     "cache_read_input_tokens": 3447978,
+     "cache_creation_input_tokens": 159418
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 68,
+      "output_tokens": 65007,
+      "cache_read_input_tokens": 3447978,
+      "cache_creation_input_tokens": 159418
+     }
+    },
+    "first_request_cache_read": 17343,
+    "first_request_prompt_tokens": 39517,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "a8c74e1bb77f6905e",
+    "label": "discover:workers",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 57,
+    "usage": {
+     "input_tokens": 114,
+     "output_tokens": 63229,
+     "cache_read_input_tokens": 7324652,
+     "cache_creation_input_tokens": 189286
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 114,
+      "output_tokens": 63229,
+      "cache_read_input_tokens": 7324652,
+      "cache_creation_input_tokens": 189286
+     }
+    },
+    "first_request_cache_read": 17343,
+    "first_request_prompt_tokens": 39509,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "a5c3996412f12b129",
+    "label": "discover:isolation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 51,
+    "usage": {
+     "input_tokens": 102,
+     "output_tokens": 56251,
+     "cache_read_input_tokens": 5169096,
+     "cache_creation_input_tokens": 157936
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 102,
+      "output_tokens": 56251,
+      "cache_read_input_tokens": 5169096,
+      "cache_creation_input_tokens": 157936
+     }
+    },
+    "first_request_cache_read": 17343,
+    "first_request_prompt_tokens": 39511,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "ad5800ecd79dc8fb9",
+    "label": "discover:code-navigation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 21,
+    "usage": {
+     "input_tokens": 42,
+     "output_tokens": 24008,
+     "cache_read_input_tokens": 1474440,
+     "cache_creation_input_tokens": 95034
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 42,
+      "output_tokens": 24008,
+      "cache_read_input_tokens": 1474440,
+      "cache_creation_input_tokens": 95034
+     }
+    },
+    "first_request_cache_read": 17343,
+    "first_request_prompt_tokens": 39515,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "ad92de9db87ef78ac",
+    "label": "gpt6-discover:code-navigation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 4001,
+     "cache_read_input_tokens": 205304,
+     "cache_creation_input_tokens": 30116
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 4001,
+      "cache_read_input_tokens": 205304,
+      "cache_creation_input_tokens": 30116
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 41090,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "a3b7d2ac091b93577",
+    "label": "discover:document-retrieval",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 1898,
+     "cache_read_input_tokens": 149223,
+     "cache_creation_input_tokens": 30690
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 8,
+      "output_tokens": 1898,
+      "cache_read_input_tokens": 149223,
+      "cache_creation_input_tokens": 30690
+     }
+    },
+    "first_request_cache_read": 17343,
+    "first_request_prompt_tokens": 39517,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   }
+  ],
+  "by_resolved_model": {
+   "claude-opus-5-5": {
+    "children": 6,
+    "input_tokens": 446,
+    "output_tokens": 279241,
+    "cache_read_input_tokens": 23124995,
+    "cache_creation_input_tokens": 825787
+   },
+   "claude-sonnet-5": {
+    "children": 5,
+    "input_tokens": 64,
+    "output_tokens": 49705,
+    "cache_read_input_tokens": 1246946,
+    "cache_creation_input_tokens": 417985
+   }
+  },
+  "effort_mismatches": []
+ }
+}

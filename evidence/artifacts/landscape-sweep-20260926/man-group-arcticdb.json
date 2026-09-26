@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-man-group-arcticdb",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/man-group/ArcticDB",
+ "reviewed_commit": "7d30a6eefe709e5379f1dd7f38b03074750cf1be",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "market-data-reference"
+ ],
+ "claim": "Source and documentation review of man-group/ArcticDB at commit 7d30a6eefe709e5379f1dd7f38b03074750cf1be (license NOASSERTION), read from README.md at that commit. Repository description: \"ArcticDB is a high performance, serverless DataFrame database built for the Python Data Science ecosystem.\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 2523,
+  "pushed_at": "2026-09-26T09:19:28Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@7d30a6eefe709e5379f1dd7f38b03074750cf1be",
+   "text": "--- <p align=\"center\"> :earth_americas: <a href=\"http://arcticdb.io\">ArcticDB Website</a> | 📘 <a href=\"https://docs.arcticdb.com\">ArcticDB Docs</a> | 📰: <a href=\"https://medium.com/arcticdb\">ArcticDB Blog</a> | :mega: <a href=\"https://www.man.com/man-group-brings-powerful-dataframe-database-product-arcticdb-to-market-with-bloomberg\">Press Release</a> | :mega: <a href=\"https://www.bloomberg.com/company/press/man-group-brings-powerful-dataframe-database-product-arcticdb-to-market-with-bloomberg/\">"
+  },
+  {
+   "source": "README.md@7d30a6eefe709e5379f1dd7f38b03074750cf1be",
+   "text": "**ArcticDB** is a high performance, serverless **DataFrame database** built for the Python Data Science ecosystem. Launched in March 2023, it is the successor to [Arctic](https://github.com/man-group/arctic)."
+  },
+  {
+   "source": "README.md@7d30a6eefe709e5379f1dd7f38b03074750cf1be",
+   "text": "Use of ArcticDB in production (including business or commercial environments) or for a Database Service requires a paid for license from ArcticDB Limited . Please contact info@arcticdb.io for further details."
+  }
+ ]
+}

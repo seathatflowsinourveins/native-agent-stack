@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-boostsecurityio-poutine",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/boostsecurityio/poutine",
+ "reviewed_commit": "bd4c1f86fe8cfe61b456f1ea2b2106ce0cac51d6",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "ci-supply-chain"
+ ],
+ "claim": "Source and documentation review of boostsecurityio/poutine at commit bd4c1f86fe8cfe61b456f1ea2b2106ce0cac51d6 (license Apache-2.0), read from README.md at that commit. Repository description: \"poutine, a supply chain vulnerability scanner for build pipelines\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 521,
+  "pushed_at": "2026-07-09T18:40:29Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@bd4c1f86fe8cfe61b456f1ea2b2106ce0cac51d6",
+   "text": "Created by [BoostSecurity.io](https://boostsecurity.io), `poutine` is a security scanner that detects misconfigurations and vulnerabilities in the build pipelines of a repository. It supports parsing CI workflows from GitHub Actions and Gitlab CI/CD. When given an access token with read-level access, `poutine` can analyze all the repositories of an organization to quickly gain insights into the security posture of the organization's software supply chain."
+  },
+  {
+   "source": "README.md@bd4c1f86fe8cfe61b456f1ea2b2106ce0cac51d6",
+   "text": "See the [documentation](docs/content/en/rules) for a list of rules currently supported by `poutine`."
+  },
+  {
+   "source": "README.md@bd4c1f86fe8cfe61b456f1ea2b2106ce0cac51d6",
+   "text": "In French, the word \"poutine\", when not referring to the [dish](https://en.wikipedia.org/wiki/Poutine), can be used to mean \"messy\". Inspired by the complexity and intertwined dependencies of modern open-source projects, `poutine` reflects both a nod to our Montreal roots and the often messy, complex nature of securing software supply chains."
+  }
+ ]
+}

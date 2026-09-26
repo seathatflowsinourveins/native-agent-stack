@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-ataraxy-labs-sem",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/Ataraxy-Labs/sem",
+ "reviewed_commit": "3c96de84d9f21c617b66258c4d101797d1144531",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "git-github-automation"
+ ],
+ "claim": "Source and documentation review of Ataraxy-Labs/sem at commit 3c96de84d9f21c617b66258c4d101797d1144531 (license Apache-2.0), read from README.md at that commit. Repository description: \"Semantic version control => entity-level diffs, blame, and impact analysis on top of git. 28 languages via tree-sitter. Built for coding agents.\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 3362,
+  "pushed_at": "2026-09-25T22:31:22Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@3c96de84d9f21c617b66258c4d101797d1144531",
+   "text": "> **Part of the [Ataraxy Labs](https://ataraxy-labs.com) stack**: agent-native infrastructure for software development. See also: [weave](https://ataraxy-labs.com/weave) (entity-level git merge driver) · [inspect](https://github.com/Ataraxy-Labs/inspect) (semantic code review) · [opensessions](https://github.com/Ataraxy-Labs/opensessions) (tmux sidebar for coding agents). > > Read the manifesto: https://ataraxy-labs.com/#thesis · Essays: https://ataraxy-labs.com/blogs · LLMs: https://ataraxy-lab"
+  },
+  {
+   "source": "README.md@3c96de84d9f21c617b66258c4d101797d1144531",
+   "text": "sem is a semantic version control tool that works on top of Git. It parses your code with tree-sitter, extracts every function, class, and method as an entity, and diffs at the entity level instead of lines. This means you see \"function `blahh` was modified\" instead of \"lines x-y changed.\""
+  },
+  {
+   "source": "README.md@3c96de84d9f21c617b66258c4d101797d1144531",
+   "text": "Cloud-backed queries are opt-in per repo: logging in does not upload a repo or send a query. See the [cloud consent flow](docs/cloud-consent.html) for the public/private repo states, preview screen, local audit log, and forget controls."
+  }
+ ]
+}

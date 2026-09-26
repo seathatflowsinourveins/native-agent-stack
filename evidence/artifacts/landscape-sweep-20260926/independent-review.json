@@ -1,0 +1,51 @@
+{
+ "schema_version": 1,
+ "id": "landscape-sweep-20260926-independent-review",
+ "kind": "independent_review",
+ "reviewer": "a separate headless Claude Code session (claude -p, model opus) with read-only tools (Read, Grep, Glob, Bash; Edit, Write, Agent and Workflow disallowed)",
+ "reviewed": "commits d89265a7 and 3a47b331, and the first versions of the gitleaks allowlist and of this record (both replaced on this branch by the repaired versions)",
+ "review_round": "one review and one repair round; no second review",
+ "verdict": "needs_changes",
+ "checks_reported": 43,
+ "findings": [
+  {
+   "severity": "low",
+   "file": "tools/sota-convergence/landscape-sweep/source_reviews.py",
+   "claim": "hub_get catches only URLError, OSError and ValueError. http.client.HTTPException subclasses raised by getresponse() or response.read() (IncompleteRead, BadStatusLine) are not HubError or GhError. main() catches only (GhError, KeyError, ValueError) and writes files after the loop, so one truncated Hub response aborts the whole run with a traceback and writes no reviews, including the GitHub ones. The docstring promises the repository is 'reported and skipped'.",
+   "disposition": "repaired in 41f53cb1: hub_get also catches http.client.HTTPException"
+  },
+  {
+   "severity": "low",
+   "file": ".gitleaks.toml",
+   "claim": "The allowlist is rule-, path- and line-scoped, but it ignores the value. A pin line holding any bare 40-hex value is exempt: uppercase (not a git commit id), or free text such as 'sourcegraph legacy access token <hex>'. That is exactly the sourcegraph-access-token rule's bare [a-fA-F0-9]{40} alternative, the legacy token shape. Only underscore forms (sgp_...) stay caught. The 2026-09-23 entry required one lowercase 40-hex id, and the ai-memory entry pins values. This one could require \\b[0-9a-f]{40}\\b or pin the 60 reviewed ids.",
+   "disposition": "repaired in 9522b5cf: the allowlist pins the 39 reviewed commit ids by value (secret target) instead of a pin-line shape, so any other 40-hex value, an uppercase variant or an sgp_ token stays detected (test_d3/test_d4)"
+  },
+  {
+   "severity": "low",
+   "file": "tools/sota-convergence/landscape-sweep/source_reviews.py",
+   "claim": "by_repo is keyed by slug(), which for a Hugging Face URL returns the whole lowercased URL. HUB_MODEL accepts both https://huggingface.co/Org/M and .../Org/M/. If two layers keep the same model with and without the trailing slash, the tool writes two hash-suffixed reviews and exits 0, instead of one review whose layers names both. GitHub URLs are normalized by slug().",
+   "disposition": "repaired in 41f53cb1: survivors are grouped by repository_key (hf:<namespace>/<name>), and make_result.py matches reviews without trailing slashes"
+  },
+  {
+   "severity": "low",
+   "file": "tools/sota-convergence/landscape-sweep/source_reviews.py",
+   "claim": "The YAML front-matter strip requires the card to start with '---'. Upstream huggingface_hub repocard.REGEX_YAML_BLOCK allows leading whitespace (^\\s*---) and requires the closing '---' to end its line. A card with a leading newline keeps its metadata block, which is then excerpted, contrary to the docstring.",
+   "disposition": "repaired in 41f53cb1: the card metadata block is stripped with huggingface_hub's repocard.REGEX_YAML_BLOCK"
+  },
+  {
+   "severity": "low",
+   "file": "evidence/artifacts/landscape-sweep-20260926/README.md",
+   "claim": "The retained files do not support several timing observations. 'At 13:52Z they were still looping' appears in no retained file. The limit-3 times '04:15Z' (re-sign-in), '04:17Z to 05:35Z' (fit queue) and 'about 03:57Z' (runner change) appear only in the limit text copied into lanes.json and the manifest. The 8 never-started fit jobs have no started or finished times in returns.json. Only the 03:47-03:55Z interval is backed by job timestamps.",
+   "disposition": "repaired in the record: gpt6-jobs.json keeps the job timeline, the stuck-runner observation and the cited incident-log entries; lane limit 3 names its sources"
+  },
+  {
+   "severity": "low",
+   "file": "evidence/artifacts/landscape-sweep-20260926/README.md",
+   "claim": "Limit 4 says that of '46 seeds that name a repository' no worker proposed 11, but the count is GitHub-only without saying so. The agents-models-workers seed names Hugging Face model repositories. One of them, Qwen/Qwen3.8-27B, was proposed by no worker, including the capped 'dropped' lists, yet it is not among the 11. The README elsewhere treats hf: model repositories as repositories. The name-to-repository mapping behind '46' is not retained, so the count cannot be reproduced.",
+   "disposition": "repaired in the record: lane limit 4 counts the 50 seeds that name a GitHub or Hugging Face repository and lists Qwen/Qwen3.8-27B among the 12 no worker proposed"
+  }
+ ],
+ "limitations": [
+  "Same model family as the recorder; the Codex cross-family review was not run because another session's GPT-6 jobs were using the shared Codex account at the time."
+ ]
+}

@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-ibcalpha-ibc",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/IbcAlpha/IBC",
+ "reviewed_commit": "fc6d917d56715ebf79a39a10b5d77fd7b701d992",
+ "readme_path": "README.md",
+ "license": "GPL-3.0",
+ "layers": [
+  "execution-broker"
+ ],
+ "claim": "Source and documentation review of IbcAlpha/IBC at commit fc6d917d56715ebf79a39a10b5d77fd7b701d992 (license GPL-3.0), read from README.md at that commit. Repository description: \"Automation of Interactive Brokers TWS. You can download the latest release here: https://github.com/ibcalpha/ibc/releases/latest\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1603,
+  "pushed_at": "2026-09-01T00:46:31Z",
+  "archived": true,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@fc6d917d56715ebf79a39a10b5d77fd7b701d992",
+   "text": ">**This project has been retired, as of 1 September 2026. By 'retired', I mean that there will be no further development of IBC, other than completing work in progress at that date and fixing any significant newly reported bugs.** > >**Nor will IBC be actively supported on this repository.**"
+  },
+  {
+   "source": "README.md@fc6d917d56715ebf79a39a10b5d77fd7b701d992",
+   "text": ">See [Discussion 347](https://github.com/IbcAlpha/IBC/discussions/347) for the >reasons for this. If you have any queries regarding this, or you need to report new >bugs, please post them on the [IBC User Group](https://groups.io/g/ibcalpha). Please >do not submit requests for further enhancements to the User Group."
+  },
+  {
+   "source": "README.md@fc6d917d56715ebf79a39a10b5d77fd7b701d992",
+   "text": ">This project repository has been archived. All the repository data is preserved intact, >but it is read-only: so no new issues, pull requests, discussions or comments can be >added."
+  }
+ ]
+}
