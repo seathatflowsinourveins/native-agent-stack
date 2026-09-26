@@ -3235,6 +3235,66 @@
         "independent_review: an independent reviewer subagent checked this receipt against the retained raw files (recomputed the reported counts, re-hashed the model file, compared production's before/after flags) and re-ran no gate; that review produced every correction listed above."
       ],
       "path": "evidence/receipts/vllm-030-switch-laptop-20260926.json"
+    },
+    {
+      "id": "codex-01571-qualification-20260926",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, Codex CLI 0.157.1 was installed beside 0.155.1 and qualified but not switched: bin/codex still names tools/codex-0.155.1, because the landscape-sweep GPT-6 lanes and other sessions use it. The npm wrapper @openai/codex@0.157.1 (4,904 bytes, sha256 813e2a944f4474b7e1826d9ce8bf696ad8d80c68f43f7a7067beec51fa8f5b73) and its platform package @openai/codex@0.157.1-linux-x64 (150,336,017 bytes, sha256 7f12677740f439fe4884c7031d9d703e571cecf5ea9fa3a05abd1bbccc2162a8) matched npm dist.integrity; `npm audit signatures` verified both registry signatures and both attestations, whose SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.157.1, commit 36650394c5b38c2990ccf2a3457165ca3e9d9726; and the native binary in the platform package (sha256 3e2584f3...) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the API digest. The verified wrapper was installed into a new tools/codex-0.157.1 prefix whose files are byte-identical to both tarballs. In a bwrap sandbox with a private loopback-only network, a read-only root and a fresh scratch CODEX_HOME per case (no credential read, ~/.codex untouched), `codex --version` printed codex-cli 0.157.1 (baseline: 0.155.1), `codex exec --help` was byte-identical between the versions and `codex --help` differed only by the new --no-daemon flag. Against a loopback fake Responses provider set only through -c overrides, the landscape-sweep lane's argv (top-level --search, then exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra -c model_reasoning_effort=\"max\" --output-schema -o --json, stdin /dev/null) behaved the same on both versions: a success turn emitted thread.started, turn.started, item.completed and turn.completed with usage input 11, cached 3, output 7 and reasoning 2, wrote the -o file, and sent reasoning effort max and a json_schema text format equal to the --output-schema file; a 429 usage_limit_reached answer ended with exit 1 and an error event plus a turn.failed event whose message says 'You\u2019ve hit your usage limit. Try again later.', which the sweep's limit rule detects. With the fake provider marked as supporting standalone web search, `codex --search exec` sent external_web_access false to the search endpoint on both versions, the same as no flag, and only `codex exec -c web_search=\"live\"` sent true; 0.157.1 reported the literal-URL open as action open_page with results, where 0.155.1 reported it as other without results. A scratch CODEX_HOME that 0.157.1 had migrated (state_5.sqlite 55 to 57 migrations, thread_history_1.sqlite 6 to 7) still served a 0.155.1 exec turn. At the two tags, the exec --json event schema differs only by an optional web_search `results` field and exec/src/cli.rs is identical. A later probe in the same kind of sandbox (results/daemon.json) covered the background server that 0.157.0 starts for eligible interactive sessions: a plain interactive 0.157.1 launch copied its 391,126,382-byte package into CODEX_HOME/packages/app-server-daemon and started the app-server and its updater loop from that copy, and both outlived the TUI; a plain 0.155.1 launch while that server ran connected to it; `codex app-server daemon stop` stopped the server but not the updater loop, which SIGTERM ended; and --no-daemon, or `codex features disable daemon_auto_start`, prevented the copy and both processes, while 0.155.1 read the resulting config.toml in an exec turn and started its TUI with it. The switch commands therefore turn automatic start off before any interactive 0.157.1 launch, and the rollback stops such a server and its updater loop before relinking.",
+      "limitations": [
+        "Reviewed once: a review round of the refresh coordinator (Claude Opus and GPT-6 Astra reviewers) reported that the rollback relinked bin/codex only and the switch checked only for 0.155.1 processes, so a background server started by 0.157.x would outlive a rollback; this revision repairs it (daemon_probe.py, results/daemon.json, stage/daemon-source-checks.txt and corrected switch and rollback commands). The repair itself has not been re-reviewed, and the qualification and this receipt still come from one worker family (Claude Opus 5.5).",
+        "Staged, not switched, and no live model call ran on 0.157.1: a live call would either copy the ChatGPT credential into an isolated CODEX_HOME (not allowed; docs/secret-storage.md) or run the newer binary against the shared ~/.codex while the sweep runs 0.155.1. GPT-6 turns through 0.157.1 are unmeasured until the coordinator's post-switch probe (results.json switch_commands_for_the_coordinator).",
+        "The fake provider is a stand-in. It exercises request construction, SSE parsing, event emission, -o, the 429 mapping and the web-search extension's settings; it does not exercise the OpenAI provider, ChatGPT authentication, the real usage-limit payload (which named a reset time on 2026-09-24 and 2026-09-26), streamed deltas, reasoning items, sandboxed tool execution, compaction or long multi-turn sessions.",
+        "The --search result was measured with a custom provider marked supports_standalone_web_search. That the OpenAI provider behaves the same rests on source reading (the same web-search extension and mode resolution; stage/source-checks.txt), not on a live measurement, and exec --json does not expose the effective mode (openai/codex issue #35415, open). It is a pre-existing 0.155.1 behaviour, not a regression.",
+        "The count of 32 openPage and 6 search actions in the sweep lane gpt6-discover-workers comes from that lane's private local Codex session file, read for action counts only and not published.",
+        "The rollback state probe is one exec turn in a scratch home; resume, the Codex desktop app and a TUI session on a migrated ~/.codex were not tried.",
+        "The background-server probe ran only in the sandbox: fresh homes, no sign-in, no network beyond loopback, and under a minute of server life per case. The updater's self-update is source reading, not measurement: at rust-v0.157.1 it is on by default and, five minutes after start and then every 60 minutes, fetches https://chatgpt.com/codex/install.sh and runs it to install the latest release into the daemon's package copy (stage/daemon-source-checks.txt), so a server started on this host would leave the integrity-checked prefix without a pin change.",
+        "No pin moves: adoption/pins-linux-x86_64.json, adoption/pins-macos-arm64.json and manifests/stack.json keep codex 0.155.1, and catalogs/landscape/foundation.json keeps the native-clients and agent-sdks winner pins at 0.155.1; this receipt is unbound until a switch and a verdict wave. catalogs/landscape/upstream-snapshot.json now lists codex in newer_stable_release_review_queue.",
+        "Upstream tests (cargo test) were not run on this host, and both tags are unsigned. The rust-v0.157.1 release body says its highlights could not be generated; its five commits after rust-v0.157.0 were read from the compare API (all Windows console and daemon-launch fixes).",
+        "Linux x86_64 only, one host; nothing here is macOS evidence."
+      ],
+      "path": "evidence/receipts/codex-01571-qualification-20260926.json"
+    },
+    {
+      "id": "mcp-inspector-280-qualification-20260926",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "mcp-inspector"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, MCP Inspector 2.8.0 was qualified against the installed 2.7.0 and then switched into production. The npm tarball https://registry.npmjs.org/@modelcontextprotocol/inspector/-/inspector-2.8.0.tgz (1,206,059 bytes, sha256 4db39519d276b99fe650f1032a3256cb704648cc611e598a38e178b1ba8a7cbf) had integrity sha512-zn0A8fIrPDge36vId0XMpj0FL0FChIGQvAvV/+iRTvUYkSzTSIALHjhZyLIgKTzBPnzrxDJnfRbrPcElUcXR6Q==, equal to npm dist.integrity; `npm audit signatures` on a scratch install reported 190 packages with verified registry signatures and 34 with verified attestations, including the package's SLSA provenance from .github/workflows/main.yml at refs/tags/2.8.0, commit 1e31c78fbf81a989e8eb47021c6281d7876ad7fd. It was installed from that verified file into a new tools/mcp-inspector-2.8.0 prefix; npm 11 skipped the package's postinstall, which exits at once for a package under node_modules. In a bwrap sandbox with a private loopback-only network, a read-only root, /mnt hidden and MCP_AUTO_OPEN_ENABLED=false, the same 15 gated steps passed on 2.8.0 and on 2.7.0 with identical exit codes and, once per-run paths and markers were normalized, identical outputs: over stdio against a scratch QMD 2.8.3 index, tools/list (get, multi_get, query, status), tools/call query (one hit), an unknown tool (exit 5, tool_not_found), resources/list, prompts/list and tools/list --strict; over streamable HTTP to `qmd mcp --http`, tools/list and tools/call with the default and the auto protocol era. With a scratch API token and DANGEROUSLY_OMIT_AUTH set to false, 0 or yes, the 2.7.0 web server printed 'Auth: disabled (DANGEROUSLY_OMIT_AUTH)' and answered GET /api/config with 200 without a token and with a wrong one, while 2.8.0 answered 401 in both cases and 200 with the right token; both disabled the gate for true and kept it when the variable was unset, and no start printed 'Opening browser'. With no Inspector process running and nothing but bin/mcp-inspector naming the 2.7.0 prefix, bin/mcp-inspector was relinked to tools/mcp-inspector-2.8.0 at 2026-09-26T04:51:23Z; through the PATH entry, `npm ls` read 2.8.0 and the stdio tools/list, tools/call and unknown-tool checks passed.",
+      "limitations": [
+        "Not independently reviewed: the qualification, the switch and this receipt come from one worker session (Claude Opus 5.5); the refresh coordinator owns the independent-review round, and no cross-family review ran.",
+        "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the mcp-surfaces winner pin mcp-inspector 2.7.0 from the sealed 2026-09-22 layer-verdict packets. Host receipts at 2.8.0 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
+        "Linux x86_64 only, one host. Neither adoption/pins-linux-x86_64.json nor adoption/pins-macos-arm64.json has an mcp-inspector entry (it is installed by its recipe row), so no pin file changed; nothing here is macOS evidence.",
+        "Local integration evidence with synthetic fixtures: the upstream suite (npm run local:gate) was not run on this host. The HTTP arm used a scratch QMD server without OAuth; SSE, OAuth, remote servers, the web UI pages, the MCP Apps sandbox and the TUI were not exercised. Web mode ran only as the explicit `--web` auth probe inside the sandbox; `mcp-inspector --version` and a bare `mcp-inspector` were never run.",
+        "The measured auth difference does not change this host's live exposure: no client configuration here sets DANGEROUSLY_OMIT_AUTH, and agents run the Inspector in --cli mode. It matters when someone sets the variable to a false-looking value to keep the token gate on.",
+        "The integrity pin covers the Inspector tarball only; npm resolves dependency ranges at install time and the package ships no shrinkwrap. The installed tree differs from the 2.7.0 prefix in rolldown and its binding (1.2.10 to 1.2.11), bundle-name, string-width, undici (8.11.0 to 8.11.2) and vite (8.3.0 to 8.3.1); stage/dependency-diff.txt.",
+        "2.8.0 changes the package's license statement: package.json says 'SEE LICENSE IN LICENSE' (2.7.0: MIT) and the new LICENSE describes a relicensing transition from MIT to Apache-2.0, with documentation under CC-BY-4.0. manifests/stack.json records that text; no legal review was done.",
+        "Attempt 0 failed in the harness before any Inspector call (the sandbox hid the harness path) and is recorded in results.json; attempt 1 is one run per arm, so durations are run-level values."
+      ],
+      "path": "evidence/receipts/mcp-inspector-280-qualification-20260926.json"
+    },
+    {
+      "id": "prometheus-3150-qualification-20260926",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "prometheus"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, Prometheus 3.15.0 was qualified against the running 3.14.0 and then switched into production. The release asset prometheus-3.15.0.linux-amd64.tar.gz (111,651,578 bytes) hashed to sha256 2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0, equal to the GitHub API asset digest and to the release's sha256sums.txt (sha256sum --check --strict: OK); the repository's unchanged observability/backends/install.py, run from a scratch copy beside a one-entry pins.json, verified it again and extracted it into a new tools/ecosystem-prometheus-3.15.0 prefix that is byte-identical to the archive, and prometheus and promtool report 3.15.0 at revision 5241a27fe3c6983549fccc32f6e65917408c63cd, the v3.15.0 tag commit. promtool 3.14.0 and 3.15.0 both passed check config and check rules (14 rules) on the live files. On copies of the live TSDB (115,828,843 bytes, 11 blocks plus WAL) with the live config minus `alerting`, 3.14.0 and 3.15.0 ran side by side on scratch loopback ports: each was ready in about 1 s, scraped the same seven live targets (all up), loaded 2 rule groups and 14 rules with health ok, reloaded on SIGHUP, logged no ERROR line and returned the same 7-series, 511-sample `up` query_range over the six hours before the copy (sha256 22d1cb61... in both). After 3.15.0 stopped, 3.14.0 opened the TSDB 3.15.0 had written, was ready in about 1 s, returned the same history and read the 5 self-scrape samples 3.15.0 had written. tests/test_observability_backends_alerts.py, now reading its promtool and amtool paths from observability/backends/pins.json, ran 18 tests OK with promtool 3.15.0. The unit observability/backends/configure.py renders with the 3.15.0 pin and the host's saved port overrides differs from the live unit only in the ExecStart prefix; that unit was installed, passed `systemd-analyze --user verify`, and ecosystem-prometheus.service was restarted at 2026-09-26T04:56:49Z. /-/ready answered 0.86 s after the restart call; buildinfo reads 3.15.0 at 5241a27f; the seven targets are up; 14 rules evaluate with health ok; the six-hour `up` history before the switch (7 series, 511 samples) hashes the same before and after; and the journal since the restart has no ERROR line. bin/prometheus and bin/promtool name the 3.15.0 prefix. At a read-back at 05:17:53Z the unit had NRestarts 0, the two alerts that fired before the switch (for endpoints this host does not run) were firing again with their original Alertmanager startsAt, and ntfy had no new message since 04:55Z. The cutover ran switch.py, which logged its verify, daemon-reload and restart exit codes and its post-switch comparisons without making the link change depend on them; in this run every one of them passed before the links moved (cutover/switch.json). Its replacement switch_gated.py moves the links only after every gate passes and otherwise restores the previous unit. On a scratch unit with the live unit's restart settings (gate-rehearsal/results.json, 2026-09-26T10:03:07Z to 2026-09-26T10:08:11Z) it switched 3.14.0 to 3.15.0 and back, refused a wrong running version without changing anything, and restored 3.14.0 without moving the links when daemon-reload failed, when daemon-reload silently did not reload, when the new server could not start (after its crash loop hit the start limit), and when the restarted server still reported 3.14.0.",
+      "limitations": [
+        "Reviewed once: a review round of the refresh coordinator (Claude Opus and GPT-6 Astra reviewers) reported that switch.py repointed the bin links whatever its verify, daemon-reload, restart and post-switch checks said; this revision repairs it (switch_gated.py and its failure-injection rehearsal gate-rehearsal/). The repair itself has not been re-reviewed, and the qualification and this receipt still come from one worker family (Claude Opus 5.5).",
+        "switch_gated.py has not switched the production unit. It was rehearsed only on a scratch unit (fresh TSDB, one self-scrape target, two rules, five-second scrape and evaluation intervals, a 20 s settle instead of 45 s, a six-hour history holding one sample at the 300 s step), with faults injected by a systemctl shim and two fake prefixes that answer --version as 3.15.0; the production cutover ran switch.py.",
+        "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the observation-inference winner pin prometheus 3.14.0 from the sealed 2026-09-22 layer-verdict packets. Receipts at 3.15.0 stay unbound until a new verdict wave re-records the layer.",
+        "Linux x86_64 only, one host. The pin lives in observability/backends/pins.json (linux-amd64); adoption/pins-linux-x86_64.json and adoption/pins-macos-arm64.json have no Prometheus entry. Nothing here is macOS evidence.",
+        "The rehearsal ran each arm for about 75 s plus a 20 s rollback start on a TSDB copied with cp while the live server wrote. No head block was compacted in that window, so a rollback after 3.15.0 has written its own compacted blocks is untested; the float chunk encoding stays XOR by default at v3.15.0 (stage/source-checks.txt), which is the source-level basis for expecting such blocks to stay readable.",
+        "Release notes were read from the release body; upstream tests were not run on this host. The PromQL changes and fixes can move rule results in edge cases; the host's 14 rules kept health ok and the same firing set.",
+        "No signature was verified: the release publishes checksums only, and the v3.15.0 tag is PGP-signed but GitHub reports it unverified (bad_email) and the signature was not checked locally.",
+        "The switch restarted the service: scrapes pause for about a second, and rules with `for` re-enter pending before their restored firing state; the read-back found the pre-switch firing set restored without a new notification.",
+        "Not aligned here: catalogs/us-equities/agents-operations.json and .md still name Prometheus v3.14.0 (trading-catalog alignment, as #310 did for ai-memory); observability/README.md describes the 2026-09-19 acceptance at 3.14.0; docs/stack.md is a 2026-09-19 snapshot."
+      ],
+      "path": "evidence/receipts/prometheus-3150-qualification-20260926.json"
     }
   ],
   "files": [
@@ -7741,8 +7801,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "759560688ee2344247e92fe7b4d72db4de7d2ec868e9fb9c9668453e71265210",
-      "bytes": 481248
+      "sha256": "ba31bcec29590f53c3a389dde5f66bb8a1c4df2fe72bbf9f09b8576f6431222d",
+      "bytes": 481666
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -11046,8 +11106,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "2c02c97b082ad834df0db09757313dbbc85ad2185c750031f787740da5224809",
-      "bytes": 248548
+      "sha256": "84896aa579671af3e96889a6fba5af500bed6371bd6c90a7a727fc3cd9e87a06",
+      "bytes": 248920
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -11558,6 +11618,11 @@
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
       "sha256": "d03879a2770c49ee26daafad0784c74c69837af7a5de91c7e511791a94c6c196",
       "bytes": 18351
+    },
+    {
+      "path": "docs/decisions/2026-09-26-workstation-tool-refresh.md",
+      "sha256": "e9bf99f9905121292e1c6a96b8b59e12127ddd1f74b9ab8240cb8497e8c19443",
+      "bytes": 8203
     },
     {
       "path": "docs/direct-results.md",
@@ -31430,6 +31495,371 @@
       "bytes": 15509
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/accept_codex.py",
+      "sha256": "fa6a249a84f9d011eb6e0de7bc0de589b4ff02bdfff5e81756f9edb62ff45797",
+      "bytes": 7832
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/accept_codex_ws.py",
+      "sha256": "a8cbf8bee3c3cbc59a09e63db2c3dcd9351599ffbcd1117ae7a1269979bda899",
+      "bytes": 6572
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/daemon_probe.py",
+      "sha256": "9462d7aefe71aef07fabcd6eb728f2c3fc14fb47b08404a3d5e1e5eeb03ca664",
+      "bytes": 17966
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/fake_responses.py",
+      "sha256": "c2ef316539b49678ad6b7d68decdf25c0c547b73b8b5b0ba67818785df993fa4",
+      "bytes": 3487
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/fake_websearch.py",
+      "sha256": "050df77e50628a02c72058327ec8aad278069854845cf9fbcc4c68285df2d995",
+      "bytes": 4135
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/help/0.155.1/exec-help.out",
+      "sha256": "0e82cfde0122715250e93dc65866caa956b2ac5b9d0b20ec4ad4f9e81486509e",
+      "bytes": 4031
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/help/0.155.1/help.out",
+      "sha256": "46fd93b594f161a1ad45e8f4b2a55f5fa0015b4a52fdc1b35262d456cd3b142b",
+      "bytes": 5668
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/help/0.155.1/version.out",
+      "sha256": "556478dd38e6185a3ceef8e5237286acd48d89da460cdbbc054ce7230b0caced",
+      "bytes": 18
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/help/0.157.1/exec-help.out",
+      "sha256": "0e82cfde0122715250e93dc65866caa956b2ac5b9d0b20ec4ad4f9e81486509e",
+      "bytes": 4031
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/help/0.157.1/help.out",
+      "sha256": "75c90681ba095160666d9884d1eccce391be95c80da27641a3c8e1481bb02fac",
+      "bytes": 5769
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/help/0.157.1/version.out",
+      "sha256": "a2af91afbeed67d4d94d7ae88f4f7864866bb5923ab435c0955d779a3e8161f1",
+      "bytes": 18
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/out/daemon-raw-outputs.json",
+      "sha256": "1db90997fe21aad6faff9d3bfb7f8c0f8215aa5606e2a1d1e69dc9051466791a",
+      "bytes": 12541
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/out/provider-requests.json",
+      "sha256": "bb5fd7f5451def665d33ad795d38bf7f8658d9aa496ff92690c2f79cde8f56b4",
+      "bytes": 76881
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/out/raw-outputs.json",
+      "sha256": "56a9a9683c5afec31d3087477b1122a910ea14ff4c00edcace06beaaa0a7f350",
+      "bytes": 24725
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/results.json",
+      "sha256": "c4e3ae97b0ac7e212ae63942508db55847fd3099cf925a97f514e7ec83fa2499",
+      "bytes": 32295
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/results/daemon.json",
+      "sha256": "e1fd466e20b71dea55509158ea277e39d0903b011e0db4f5a59bdceb5c8c643d",
+      "bytes": 21376
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/results/exec-0.155.1.json",
+      "sha256": "79955cb374ef79206d5274449bffd53c460a50da9c4659cb19dd072b3d5d7a1c",
+      "bytes": 9052
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/results/exec-0.157.1.json",
+      "sha256": "f6336d3e2d5ba6fd0c4c1df1c5734047b540664b251cc2e7fb6d40de874c1b2c",
+      "bytes": 9052
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/results/rollback.json",
+      "sha256": "42976ee77d4ebd58478e6c3ce47454e44cb81cdd06f7bd22365f966b76181f15",
+      "bytes": 2324
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/results/websearch-0.155.1.json",
+      "sha256": "2bd686f33223a45dfb80069d63dc98942e85a809e95a35eea8fa52e68291f1f6",
+      "bytes": 9722
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/results/websearch-0.157.1.json",
+      "sha256": "36a48627a7e9afe5e69d1f805d73f60e3b14ca49f88bb010762a32492e13d876",
+      "bytes": 10634
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/rollback_probe.py",
+      "sha256": "a3457c620649093840eeed7a77ed0e3a8dc48726a251cddb463ec6c3ef191b65",
+      "bytes": 3210
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/sandbox.sh",
+      "sha256": "6b020b3c62a2f3f4a7b42e2025fcf6cedfe4958863b828603dcbdbe15f4ae5be",
+      "bytes": 743
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/sandbox_daemon.sh",
+      "sha256": "8a86ddbc3e08162d887c94466f1a92490dad4b145dca3e248bef0bc54bd23185",
+      "bytes": 1535
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/stage/audit-signatures.txt",
+      "sha256": "3c2cc035d4df25ba3fa6193ec985197886b734011b82101e8701a4f00f21ab54",
+      "bytes": 175
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/stage/binary-crosscheck.txt",
+      "sha256": "00b0baa8172c1c7f7ea811df39821adff13370bc1d152a660094a5a0c94c6ae9",
+      "bytes": 751
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/stage/daemon-source-checks.txt",
+      "sha256": "6a025304594074a88f30e4cbca3daebd17dbdb667b1c08d7ae6f96f02bc76c17",
+      "bytes": 10232
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/stage/install.log",
+      "sha256": "f6b3015540a8faaeab0d34bc590d69ab23310b3000fe44bf48780dbb883292f1",
+      "bytes": 24
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/stage/integrity.txt",
+      "sha256": "2b6f55113ccb6055d0f3ba4b129d62c84d9e38ed02cfc7415f156be5e35284f9",
+      "bytes": 998
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/stage/provenance-codex-0.157.1.txt",
+      "sha256": "2896b2d4af4b69fef2aa229d0a911f2c226a6d74130ca962cd10347680ae5e96",
+      "bytes": 784
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/stage/source-checks.txt",
+      "sha256": "9e957225703f96b0758a27e8be58bb46773b8e5734dcb2e1004525bf7908ffb7",
+      "bytes": 3710
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/accept_inspector.py",
+      "sha256": "9dfc48832a2b11b1e70378b10e5e46d917d59abc0ceabb0ef8c9c3c3d9604d48",
+      "bytes": 13091
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/compare.json",
+      "sha256": "961fcfafc3abc0607ef034147ced3ea49285342832f77f7828543bcf7b003b27",
+      "bytes": 9799
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/compare_inspector.py",
+      "sha256": "6ccd29b29c898a531cf2579ad92a1024811951f189d1d70cdf0a0bc35f2a2dd4",
+      "bytes": 2033
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/cutover/postswitch.out",
+      "sha256": "832f3632fd94c60093816b155036c8524e65c3ef9676fefb04f2ac92325637e9",
+      "bytes": 553
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/cutover/relink.txt",
+      "sha256": "bdb0302e3ec77802df6fb0a399acb1f1c4a1f06d7d0fc415fea49af90d558753",
+      "bytes": 373
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/out/raw-outputs.json",
+      "sha256": "a6b979fde4f21e33e0aedb8b6fe1be62dbfacb17ace95679a6ebf2642d76fc93",
+      "bytes": 72665
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/postswitch.sh",
+      "sha256": "c923a294fe9a03de9d39982750ccfa5d436704d0164caa12dcf7bf40c586aaa4",
+      "bytes": 2965
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/results-2.7.0.json",
+      "sha256": "5a714fb0a682f891498761c236af57611fbe6e11540f041daa41728a11c1faf0",
+      "bytes": 12664
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/results-2.8.0.json",
+      "sha256": "19465652ca9d86f093d90eba09a736b587b9e4f9d26a2166deb0d7a6290ce8c3",
+      "bytes": 12611
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/results.json",
+      "sha256": "206366d47938dfa62d5910152bb8ca7a4bc823e3ba14c95d28ddb159cf8bd521",
+      "bytes": 9939
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/sandbox.sh",
+      "sha256": "d1a07d45ea45951dc3a08ecac561c8422b8a944b10b6771158a9a1a24e3df975",
+      "bytes": 976
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/audit-signatures.txt",
+      "sha256": "ada2be77b6048ba7d07552777263c0720955a87ca2fd8b13bad6d0854389d231",
+      "bytes": 180
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/auth-parse-source.txt",
+      "sha256": "85d5db812dc3529048bbb5b5b3ecde53c9be470e0c2a79a91749d3f10e875f20",
+      "bytes": 587
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/cli-help-2.8.0.txt",
+      "sha256": "81f3fd43a00a972e6d101ff89f06c1341fb31968f446e376ee0dd649b400d48c",
+      "bytes": 7477
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/dependency-diff.txt",
+      "sha256": "f77cb5284a8acda767be471d6d4ffbbf12d6f83fe23eb312174ad0a48278d732",
+      "bytes": 414
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/install.log",
+      "sha256": "064c5cf1b2d73c1e302c6900abf66491ddfdd7df0c4515a9c1564341fb9235ed",
+      "bytes": 807
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/integrity.txt",
+      "sha256": "3eb1ff737021a4a6e64f4b33321e1cb2f2ba7d9263fd3c98d0d9841a76788c31",
+      "bytes": 1066
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/launcher-help-2.8.0.txt",
+      "sha256": "ea8832479aa8b75eab31697b607a515179e5c0c9f39a48151d1be8b924bfcb00",
+      "bytes": 317
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/package-diff.txt",
+      "sha256": "60a2628a42178b9d1205678accdc27cd18f29f737eb75703f00a9ff9ce326f52",
+      "bytes": 959
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/provenance-inspector-2.8.0.txt",
+      "sha256": "5cf15487d2c1b52272315e43508b7edf6a27e105fbb4732f6b8aff0d12e59f09",
+      "bytes": 1008
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/cutover/readback.txt",
+      "sha256": "d87d419a92c7a3a813d341613713bd188838ae27f9781c223e1bafbd6a4501be",
+      "bytes": 1179
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/cutover/stack-commands.out",
+      "sha256": "2e549bd03bf9c6fc2031083d5b099d73cb3034f9d26799ff397b360aa21aed0f",
+      "bytes": 968
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/cutover/switch-run.log",
+      "sha256": "3c292346f7e4898ee031c6098c6e614195f867bc052c6e6041f3bce301275172",
+      "bytes": 2534
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/cutover/switch.json",
+      "sha256": "4fbd9bd340b4639c3a276ceaa164b5d8ddf3b32fe12ee0feba5e2d4523cda20f",
+      "bytes": 5706
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/cutover/unit-diff.txt",
+      "sha256": "f0f110556dade798a6f8869c3af7b69e991e8c8c258bff3d03c3f3a7269ac793",
+      "bytes": 1050
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/gate-rehearsal/raw-outputs.json",
+      "sha256": "4c84843e68e46502343a7cedec3d4631aa97e94a55c8b8f285b5075e896d2512",
+      "bytes": 96845
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/gate-rehearsal/results.json",
+      "sha256": "8249ff7cd0c838c433a894d81790c88ac5184e6bb49a51fd7aca2f72b1afdc6f",
+      "bytes": 33784
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/gate-rehearsal/switch-records.json",
+      "sha256": "8a5d46383a7289a70da9ab75cd1907aae29fcdd3ad981dd181459d13a7edfbb0",
+      "bytes": 59787
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/gate_rehearsal.py",
+      "sha256": "7c1cbab82208fd750e3c40b5b51028e46650b3bb77b08a39336b247cdae5eac8",
+      "bytes": 14391
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/rehearsal/raw-outputs.json",
+      "sha256": "ed3ad038d91b95f611bf185621296497d4089b0d215b846acb8ba1f90ffccc66",
+      "bytes": 36094
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/rehearsal/rehearsal.json",
+      "sha256": "679ebb604e70947966eca4ec59703dd4aa22d23656eb1a470716a1e5f038475b",
+      "bytes": 15834
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/rehearse.py",
+      "sha256": "298f3da94cf02d10baa0d8ed09a74bb9ddccbbb8124f2bcc69a3d55308527c2a",
+      "bytes": 10757
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/results.json",
+      "sha256": "2c2b5aa6501580864978da24e8c3a41a8a4e778620f0add6725ae7775ac88d72",
+      "bytes": 12797
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/checksum-check.txt",
+      "sha256": "3bc95a203024478409d7c8be5cb71aae1a7130cb8b7a8163cea046a379eaa4b4",
+      "bytes": 1244
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/install.log",
+      "sha256": "77484e385619ab4e622df5e10ffee373bba67123bb3f2d9b7b9415ae261b25f9",
+      "bytes": 41
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/installation.json",
+      "sha256": "c1064e882dd7194cf07e6e75f6b3fcba46d08945809fce26d53996a8a233e6ba",
+      "bytes": 721
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/installer-pins.json",
+      "sha256": "4574eb2527821c1d44b1a6b7555ae993c287175d418f36f9a7a08bf41de491f6",
+      "bytes": 651
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/source-checks.txt",
+      "sha256": "f5f4baeb84ce5e3f99cb1dac7b94737585b2d85045661b741427ff1300763ec3",
+      "bytes": 718
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/tag-v3.15.0.json",
+      "sha256": "ba8bb0e91b79ce32a6c8ad4db55840f683f2181fa20c62889f5f1cdf9601e6d7",
+      "bytes": 2216
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/stage/versions.txt",
+      "sha256": "88c244e8bbd6dd1f1f87e6bd5f52aea47c6d95b68d16d3c66ef1a9ee9c20e6ea",
+      "bytes": 1160
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/switch.py",
+      "sha256": "ded427ca8854e439377917f11e88a6de78cf269069b7187afea883ee05f9b0b6",
+      "bytes": 7473
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/prometheus/switch_gated.py",
+      "sha256": "a4c8298b090c8635fc01aa2c6b472a9cf83e6645044d74b827782c1ab5746d56",
+      "bytes": 17731
+    },
+    {
       "path": "evidence/artifacts/source-review-20260923/afrojuju1-nautilus_trader.json",
       "sha256": "76327812cf9c997eea46093a1dad1597cf66cf949d39fcb18b6fe736f857c99e",
       "bytes": 2989
@@ -32855,6 +33285,11 @@
       "bytes": 2818
     },
     {
+      "path": "evidence/receipts/codex-01571-qualification-20260926.json",
+      "sha256": "c7af647e0c518413c2e5532f6538b3a83125423ff72ba596264fee7be3408eb7",
+      "bytes": 21813
+    },
+    {
       "path": "evidence/receipts/codex-desktop-live-20260920.json",
       "sha256": "4333ca2c8b4f78caee98f9e38ae624104e6cbd410134a9f103153d47d5c97551",
       "bytes": 12905
@@ -32968,6 +33403,11 @@
       "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
       "sha256": "d9a1a3484c229f7d530009143672ef1ee6756dafff8ad72aeca1dba86cef3b2f",
       "bytes": 18417
+    },
+    {
+      "path": "evidence/receipts/mcp-inspector-280-qualification-20260926.json",
+      "sha256": "f2d8fdc6179b535c515aa96c47650db5d6556f931daef9a4dfec23f45b73bb81",
+      "bytes": 11753
     },
     {
       "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
@@ -33233,6 +33673,11 @@
       "path": "evidence/receipts/pre-2020-delisting-coverage.json",
       "sha256": "26b96da55760463aefc53bc400d41681019a20976e24756cd451646ed1094a69",
       "bytes": 1276550
+    },
+    {
+      "path": "evidence/receipts/prometheus-3150-qualification-20260926.json",
+      "sha256": "8687b8fd444c6673ab03f28e02d9599d64030a8c1438e2280d6e8c56b6548452",
+      "bytes": 17112
     },
     {
       "path": "evidence/receipts/rtk-050-qualification-20260925.json",
@@ -33591,8 +34036,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "e1bc2ef472b6126975a420304a5d94a5100d02ab5b2af6d615c07fd1ec9aa2f9",
-      "bytes": 89639
+      "sha256": "7dce7f5e842c5b4c34f9ce01964c0b9b2d90d61cd35363f6d2e2dfa29b37fea0",
+      "bytes": 90821
     },
     {
       "path": "observability/README.md",
@@ -33601,8 +34046,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "076a8608b1f97acd5c07fab68b839c62884daffd87ad4914f79340650eaa09f1",
-      "bytes": 19700
+      "sha256": "d56f2dbaff653907c9ae63ba2a6329337b32f7a38f6d2b4dae87d76c6ab5effc",
+      "bytes": 22150
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -33631,7 +34076,7 @@
     },
     {
       "path": "observability/backends/pins.json",
-      "sha256": "157094d54f6511414376958d1560854987cac3abf5cd15d19d2cf3367258932d",
+      "sha256": "8a230843fdcfbe228ac4d8568739ff82d0b98ddc9ca7d0d4b1ba5f6fe6d4aefe",
       "bytes": 3040
     },
     {
@@ -33851,8 +34296,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "4467a91605c1eb271153b779b1382cf27b3cf4e4a37239f3943bf2c4ee481d67",
-      "bytes": 75298
+      "sha256": "65e469ed68e4cce41bf5ba81c816b78b60895d1b3b53320636ebab77134eef85",
+      "bytes": 76601
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -34591,8 +35036,8 @@
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
-      "sha256": "5ef5f7b4ed58773c090401c9472162222b623a2973012560cae577d7a8f854a6",
-      "bytes": 13446
+      "sha256": "e0aaa5ec9d4962e86e8d5ba083046c978d6cb9020609ed49d1d2aa16ebef10ec",
+      "bytes": 13822
     },
     {
       "path": "tests/test_offhost_app_state.py",

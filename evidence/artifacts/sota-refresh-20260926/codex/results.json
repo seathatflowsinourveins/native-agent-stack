@@ -1,0 +1,720 @@
+{
+  "schema_version": 1,
+  "id": "codex-01571-qualification-20260926",
+  "unit": "codex",
+  "host": "nativestack-5975wx-20260925",
+  "date_utc": "2026-09-26",
+  "baseline_version": "0.155.1",
+  "candidate_version": "0.157.1",
+  "decision": "staged, not switched: bin/codex stays on 0.155.1 because the landscape-sweep GPT-6 lanes and other sessions run it; the coordinator switches after the sweep with the commands below",
+  "upstream": {
+    "release": "https://github.com/openai/codex/releases/tag/rust-v0.157.1",
+    "published_at": "2026-09-26T01:02:31Z",
+    "tag_commit": "36650394c5b38c2990ccf2a3457165ca3e9d9726",
+    "baseline_tag_commit": "be2951ea34f0d295ed0becf97079f92fa5f6950e",
+    "tags_signed": "no (GitHub: verified false, reason unsigned, both tags)",
+    "release_notes_read": {
+      "rust-v0.156.0": "exec-relevant: #46319 preserves web search actions and results in exec JSON output; #46088 adds --no-daemon; sandbox isolation fixes (#44639, #45984, #46500); the rest is TUI, Windows sandbox and app-server work",
+      "rust-v0.156.1": "#47405 adds GPT-6 Sol and GPT-6 Luna to the model catalog",
+      "rust-v0.157.0": "#47179 enables automatic background-server startup for eligible interactive sessions; GPT-6 Sol/Luna with Bedrock support; network policy enforced across redirects (#47389, #47407); no exec --json event change",
+      "rust-v0.157.1": "five commits after rust-v0.157.0, all Windows console or daemon-launch fixes (#48138, #48157, #48238, #48272); the release body says its highlights could not be generated"
+    },
+    "exec_json_schema_change": "stage/source-checks.txt: exec_events.rs adds only an optional `results` field to the web_search item; the ThreadEvent type names (thread.started, turn.started, turn.completed, turn.failed, item.started, item.updated, item.completed, error) and the turn.completed usage are unchanged; exec/src/cli.rs is identical at both tags"
+  },
+  "integrity": {
+    "wrapper": {
+      "tarball": "https://registry.npmjs.org/@openai/codex/-/codex-0.157.1.tgz",
+      "bytes": 4904,
+      "sha256": "813e2a944f4474b7e1826d9ce8bf696ad8d80c68f43f7a7067beec51fa8f5b73",
+      "integrity": "sha512-qJ/UZ0bmYP+/Umav1L9WpmtMYeA6q1+4r4qILSYOKQZhP7WRdjyTQWz3O0dTImZ9RT7AazZa85D87xRDHogcHw=="
+    },
+    "linux_x64": {
+      "tarball": "https://registry.npmjs.org/@openai/codex/-/codex-0.157.1-linux-x64.tgz",
+      "bytes": 150336017,
+      "sha256": "7f12677740f439fe4884c7031d9d703e571cecf5ea9fa3a05abd1bbccc2162a8",
+      "integrity": "sha512-Eac8XlC0nCXSeUjDU9l8yLJ6P9evv1mO+AnvILoNwlegBC7B3AVXqJ05QcMhQX7RcJ3Lk2618ykCb2X2ui8VAQ=="
+    },
+    "checks": [
+      "openssl sha512 of both downloaded tarballs equals npm dist.integrity (stage/integrity.txt; the 0.155.1 pair re-checked too)",
+      "npm audit signatures on a scratch install: 2 packages with verified registry signatures and 2 with verified attestations, invalid [] and missing [] (stage/audit-signatures.txt)",
+      "SLSA provenance of both packages: .github/workflows/rust-release.yml at refs/tags/rust-v0.157.1, commit 36650394..., run 36202003947 attempt 2; subjects equal the two integrities (stage/provenance-codex-0.157.1.txt)",
+      "the native binary in the npm linux-x64 package (sha256 3e2584f3...) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the API digest e98c1e8e... (stage/binary-crosscheck.txt)",
+      "installed wrapper and platform package files byte-identical to the verified tarballs (diff -r)"
+    ],
+    "complete_package_asset": "codex-package-x86_64-unknown-linux-musl.tar.gz, release asset digest sha256:0e211868c9fd73cb49ad35ac675b5eafdf6b9f453df8a493df980c59a590fe5f (read from the release metadata, not downloaded)"
+  },
+  "install": {
+    "command": "npm install --global --no-audit --no-fund --prefix ~/.local/share/codex-ecosystem/tools/codex-0.157.1 <verified codex-0.157.1.tgz>",
+    "result": "added 2 packages (the wrapper and @openai/codex-linux-x64 = npm:@openai/codex@0.157.1-linux-x64); the production bin/codex link was not touched"
+  },
+  "harness": {
+    "scripts": {
+      "accept_codex.py": "fa6a249a84f9d011eb6e0de7bc0de589b4ff02bdfff5e81756f9edb62ff45797",
+      "accept_codex_ws.py": "a8cbf8bee3c3cbc59a09e63db2c3dcd9351599ffbcd1117ae7a1269979bda899",
+      "fake_responses.py": "c2ef316539b49678ad6b7d68decdf25c0c547b73b8b5b0ba67818785df993fa4",
+      "fake_websearch.py": "050df77e50628a02c72058327ec8aad278069854845cf9fbcc4c68285df2d995",
+      "rollback_probe.py": "a3457c620649093840eeed7a77ed0e3a8dc48726a251cddb463ec6c3ef191b65",
+      "sandbox.sh": "6b020b3c62a2f3f4a7b42e2025fcf6cedfe4958863b828603dcbdbe15f4ae5be",
+      "daemon_probe.py": "9462d7aefe71aef07fabcd6eb728f2c3fc14fb47b08404a3d5e1e5eeb03ca664",
+      "sandbox_daemon.sh": "8a86ddbc3e08162d887c94466f1a92490dad4b145dca3e248bef0bc54bd23185"
+    },
+    "isolation": "sandbox.sh: bwrap with a private network namespace (loopback only: no request could reach a real provider or the internet), / read-only, /mnt hidden, and a fresh scratch CODEX_HOME per case, so no run read the ChatGPT credential or touched ~/.codex (auth, state databases, sessions)",
+    "provider": "a loopback fake Responses provider configured only through -c overrides (model_provider=fakeprov, wire_api=responses, retries 0); no credential or API key variable was set",
+    "lane_argv": "the landscape-sweep lane's argv from tools/sota-convergence/landscape-sweep/codex_job.py codex_argv (branch claude/landscape-sweep-harness-20260926): codex --search exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra -c model_reasoning_effort=\"max\" --output-schema <schema> -o <last.json> --json <prompt>, stdin /dev/null"
+  },
+  "checks": {
+    "version": {
+      "0.155.1": "codex-cli 0.155.1",
+      "0.157.1": "codex-cli 0.157.1"
+    },
+    "help": "codex exec --help is byte-identical between the versions; codex --help differs only by the new --no-daemon flag; every flag the lane uses is present in both (help/)",
+    "exec_fake_provider": {
+      "0.155.1": {
+        "K1-search-ok": {
+          "exit": 0,
+          "event_types": [
+            "thread.started",
+            "turn.started",
+            "item.completed",
+            "turn.completed"
+          ],
+          "turn_completed_usage": [
+            {
+              "input_tokens": 11,
+              "cached_input_tokens": 3,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 7,
+              "reasoning_output_tokens": 2
+            }
+          ],
+          "sweep_limit_rule_fires": false,
+          "last_message_file": "{\"ok\": true, \"probe\": \"codex-exec-fake-provider\"}",
+          "error_messages": [],
+          "turn_failed_errors": []
+        },
+        "K2-no-search-ok": {
+          "exit": 0,
+          "event_types": [
+            "thread.started",
+            "turn.started",
+            "item.completed",
+            "turn.completed"
+          ],
+          "turn_completed_usage": [
+            {
+              "input_tokens": 11,
+              "cached_input_tokens": 3,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 7,
+              "reasoning_output_tokens": 2
+            }
+          ],
+          "sweep_limit_rule_fires": false,
+          "last_message_file": "{\"ok\": true, \"probe\": \"codex-exec-fake-provider\"}",
+          "error_messages": [],
+          "turn_failed_errors": []
+        },
+        "K3-config-live-ok": {
+          "exit": 0,
+          "event_types": [
+            "thread.started",
+            "turn.started",
+            "item.completed",
+            "turn.completed"
+          ],
+          "turn_completed_usage": [
+            {
+              "input_tokens": 11,
+              "cached_input_tokens": 3,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 7,
+              "reasoning_output_tokens": 2
+            }
+          ],
+          "sweep_limit_rule_fires": false,
+          "last_message_file": "{\"ok\": true, \"probe\": \"codex-exec-fake-provider\"}",
+          "error_messages": [],
+          "turn_failed_errors": []
+        },
+        "K4-search-limit": {
+          "exit": 1,
+          "event_types": [
+            "thread.started",
+            "turn.started",
+            "error",
+            "turn.failed"
+          ],
+          "turn_completed_usage": [],
+          "sweep_limit_rule_fires": true,
+          "last_message_file": null,
+          "error_messages": [
+            "You’ve hit your usage limit. Try again later."
+          ],
+          "turn_failed_errors": [
+            {
+              "message": "You’ve hit your usage limit. Try again later."
+            }
+          ]
+        }
+      },
+      "0.157.1": {
+        "K1-search-ok": {
+          "exit": 0,
+          "event_types": [
+            "thread.started",
+            "turn.started",
+            "item.completed",
+            "turn.completed"
+          ],
+          "turn_completed_usage": [
+            {
+              "input_tokens": 11,
+              "cached_input_tokens": 3,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 7,
+              "reasoning_output_tokens": 2
+            }
+          ],
+          "sweep_limit_rule_fires": false,
+          "last_message_file": "{\"ok\": true, \"probe\": \"codex-exec-fake-provider\"}",
+          "error_messages": [],
+          "turn_failed_errors": []
+        },
+        "K2-no-search-ok": {
+          "exit": 0,
+          "event_types": [
+            "thread.started",
+            "turn.started",
+            "item.completed",
+            "turn.completed"
+          ],
+          "turn_completed_usage": [
+            {
+              "input_tokens": 11,
+              "cached_input_tokens": 3,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 7,
+              "reasoning_output_tokens": 2
+            }
+          ],
+          "sweep_limit_rule_fires": false,
+          "last_message_file": "{\"ok\": true, \"probe\": \"codex-exec-fake-provider\"}",
+          "error_messages": [],
+          "turn_failed_errors": []
+        },
+        "K3-config-live-ok": {
+          "exit": 0,
+          "event_types": [
+            "thread.started",
+            "turn.started",
+            "item.completed",
+            "turn.completed"
+          ],
+          "turn_completed_usage": [
+            {
+              "input_tokens": 11,
+              "cached_input_tokens": 3,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 7,
+              "reasoning_output_tokens": 2
+            }
+          ],
+          "sweep_limit_rule_fires": false,
+          "last_message_file": "{\"ok\": true, \"probe\": \"codex-exec-fake-provider\"}",
+          "error_messages": [],
+          "turn_failed_errors": []
+        },
+        "K4-search-limit": {
+          "exit": 1,
+          "event_types": [
+            "thread.started",
+            "turn.started",
+            "error",
+            "turn.failed"
+          ],
+          "turn_completed_usage": [],
+          "sweep_limit_rule_fires": true,
+          "last_message_file": null,
+          "error_messages": [
+            "You’ve hit your usage limit. Try again later."
+          ],
+          "turn_failed_errors": [
+            {
+              "message": "You’ve hit your usage limit. Try again later."
+            }
+          ]
+        }
+      }
+    },
+    "exec_request": "both versions sent the same request shape to /v1/responses: model gpt-6-astra, reasoning {effort: max, context: all_turns}, text.format json_schema with the exact --output-schema file content, tools in an additional_tools input item (Responses Lite header), stream true (out/provider-requests.json)",
+    "limit_path": "a 429 usage_limit_reached answer produced exit 1 and the events error + turn.failed with message \"You’ve hit your usage limit. Try again later.\" (typographic apostrophe) on both versions; the sweep's limit rule (codex_job.py limit_error) fires on both",
+    "websearch_forwarding": {
+      "0.155.1": {
+        "W1-search-flag": {
+          "search_requests": 2,
+          "external_web_access": [
+            false,
+            false
+          ],
+          "web_search_items": [
+            {
+              "action": "search",
+              "query": "codex fake query",
+              "has_results": false,
+              "results": null
+            },
+            {
+              "action": "other",
+              "query": "https://example.com/docs",
+              "has_results": false,
+              "results": null
+            }
+          ]
+        },
+        "W2-no-flag": {
+          "search_requests": 2,
+          "external_web_access": [
+            false,
+            false
+          ],
+          "web_search_items": [
+            {
+              "action": "search",
+              "query": "codex fake query",
+              "has_results": false,
+              "results": null
+            },
+            {
+              "action": "other",
+              "query": "https://example.com/docs",
+              "has_results": false,
+              "results": null
+            }
+          ]
+        },
+        "W3-config-live": {
+          "search_requests": 2,
+          "external_web_access": [
+            true,
+            true
+          ],
+          "web_search_items": [
+            {
+              "action": "search",
+              "query": "codex fake query",
+              "has_results": false,
+              "results": null
+            },
+            {
+              "action": "other",
+              "query": "https://example.com/docs",
+              "has_results": false,
+              "results": null
+            }
+          ]
+        }
+      },
+      "0.157.1": {
+        "W1-search-flag": {
+          "search_requests": 2,
+          "external_web_access": [
+            false,
+            false
+          ],
+          "web_search_items": [
+            {
+              "action": "search",
+              "query": "codex fake query",
+              "has_results": true,
+              "results": [
+                {
+                  "type": "page",
+                  "url": "https://example.com/docs",
+                  "title": "Fake docs"
+                }
+              ]
+            },
+            {
+              "action": "open_page",
+              "query": "https://example.com/docs",
+              "has_results": true,
+              "results": [
+                {
+                  "type": "page",
+                  "url": "https://example.com/docs",
+                  "title": "Fake docs"
+                }
+              ]
+            }
+          ]
+        },
+        "W2-no-flag": {
+          "search_requests": 2,
+          "external_web_access": [
+            false,
+            false
+          ],
+          "web_search_items": [
+            {
+              "action": "search",
+              "query": "codex fake query",
+              "has_results": true,
+              "results": [
+                {
+                  "type": "page",
+                  "url": "https://example.com/docs",
+                  "title": "Fake docs"
+                }
+              ]
+            },
+            {
+              "action": "open_page",
+              "query": "https://example.com/docs",
+              "has_results": true,
+              "results": [
+                {
+                  "type": "page",
+                  "url": "https://example.com/docs",
+                  "title": "Fake docs"
+                }
+              ]
+            }
+          ]
+        },
+        "W3-config-live": {
+          "search_requests": 2,
+          "external_web_access": [
+            true,
+            true
+          ],
+          "web_search_items": [
+            {
+              "action": "search",
+              "query": "codex fake query",
+              "has_results": true,
+              "results": [
+                {
+                  "type": "page",
+                  "url": "https://example.com/docs",
+                  "title": "Fake docs"
+                }
+              ]
+            },
+            {
+              "action": "open_page",
+              "query": "https://example.com/docs",
+              "has_results": true,
+              "results": [
+                {
+                  "type": "page",
+                  "url": "https://example.com/docs",
+                  "title": "Fake docs"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "rollback_state_probe": [
+      {
+        "step": "M1-old",
+        "binary": "~/.local/share/codex-ecosystem/tools/codex-0.155.1/bin/codex",
+        "exit": 0,
+        "event_types": [
+          "thread.started",
+          "turn.started",
+          "item.completed",
+          "turn.completed"
+        ],
+        "stderr_tail": "Reading additional input from stdin...\n",
+        "migrations_after": {
+          "goals_1.sqlite": [
+            2,
+            2
+          ],
+          "logs_2.sqlite": [
+            2,
+            2
+          ],
+          "memories_1.sqlite": [
+            2,
+            2
+          ],
+          "queue_1.sqlite": [
+            2,
+            2
+          ],
+          "state_5.sqlite": [
+            55,
+            55
+          ],
+          "thread_history_1.sqlite": [
+            6,
+            6
+          ]
+        }
+      },
+      {
+        "step": "M2-new",
+        "binary": "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex",
+        "exit": 0,
+        "event_types": [
+          "thread.started",
+          "turn.started",
+          "item.completed",
+          "turn.completed"
+        ],
+        "stderr_tail": "Reading additional input from stdin...\n",
+        "migrations_after": {
+          "goals_1.sqlite": [
+            2,
+            2
+          ],
+          "logs_2.sqlite": [
+            2,
+            2
+          ],
+          "memories_1.sqlite": [
+            2,
+            2
+          ],
+          "queue_1.sqlite": [
+            2,
+            2
+          ],
+          "state_5.sqlite": [
+            57,
+            57
+          ],
+          "thread_history_1.sqlite": [
+            7,
+            7
+          ]
+        }
+      },
+      {
+        "step": "M3-old-on-migrated",
+        "binary": "~/.local/share/codex-ecosystem/tools/codex-0.155.1/bin/codex",
+        "exit": 0,
+        "event_types": [
+          "thread.started",
+          "turn.started",
+          "item.completed",
+          "turn.completed"
+        ],
+        "stderr_tail": "Reading additional input from stdin...\n",
+        "migrations_after": {
+          "goals_1.sqlite": [
+            2,
+            2
+          ],
+          "logs_2.sqlite": [
+            2,
+            2
+          ],
+          "memories_1.sqlite": [
+            2,
+            2
+          ],
+          "queue_1.sqlite": [
+            2,
+            2
+          ],
+          "state_5.sqlite": [
+            57,
+            57
+          ],
+          "thread_history_1.sqlite": [
+            7,
+            7
+          ]
+        }
+      }
+    ],
+    "background_server_probe": {
+      "window_utc": [
+        "2026-09-26T09:50:43Z",
+        "2026-09-26T09:53:22Z"
+      ],
+      "isolation": "sandbox_daemon.sh: sandbox.sh plus an empty /run/user (no host session bus or systemd user manager), a scratch XDG_RUNTIME_DIR and a private PID namespace, so a detached server ends with the sandbox; no network beyond loopback, fresh CODEX_HOME per case, no sign-in",
+      "T1_plain_launch_0.157.1": {
+        "screen_starts_with": "Installing daemon from CLI version 0.157.1 into <arm>/home-T1/packages/app-server-daemon..",
+        "processes_after_the_tui_stopped": [
+          [
+            "app-server",
+            "--listen",
+            "unix://",
+            "--managed-daemon"
+          ],
+          [
+            "app-server",
+            "daemon",
+            "pid-update-loop"
+          ]
+        ],
+        "package_copy": {
+          "releases": [
+            "0.157.1-x86_64-unknown-linux-musl"
+          ],
+          "auto_update_version": "0.157.1-x86_64-unknown-linux-musl",
+          "bytes": 391126382
+        },
+        "tui_peer_on_control_socket_runs_from": [
+          "codex-0.157.1"
+        ],
+        "CHECK": "2",
+        "PACKAGE": "present"
+      },
+      "T3_plain_launch_0.155.1_while_that_server_runs": {
+        "peer_of_the_server_connection_runs_from": [
+          "codex-0.155.1"
+        ],
+        "server_socket_descriptors": [
+          4,
+          5
+        ]
+      },
+      "T4_daemon_stop_0.157.1": {
+        "status": "stopped",
+        "still_running": [
+          [
+            "app-server",
+            "daemon",
+            "pid-update-loop"
+          ]
+        ],
+        "CHECK": "1"
+      },
+      "T5_TERM_LOOP": {
+        "output": "TERM 436 <arm>/home-T1/packages/app-server-daemon/releases/0.157.1-x86_64-unknown-linux-musl/bin/codex",
+        "CHECK": "0"
+      },
+      "T6_no_daemon_launch_0.157.1": {
+        "CHECK": "0",
+        "PACKAGE": "absent",
+        "daemon_stop_when_none_runs": [
+          0,
+          "notRunning"
+        ],
+        "daemon_version_when_none_runs_exit": 1,
+        "features_list_default": [
+          "daemon_auto_start                        stable             true"
+        ]
+      },
+      "T7_features_disable_then_plain_launch_0.157.1": {
+        "disable_output": "Disabled feature `daemon_auto_start` in config.toml.",
+        "config_toml_after": "# synthetic pre-existing settings: this comment, the top-level key and the [features] entry must stay\nmodel_reasoning_effort = \"high\"\n\n[features]\nhooks = true\ndaemon_auto_start = false\n",
+        "seeded_lines_kept_in_order": true,
+        "features_list": [
+          "daemon_auto_start                        stable             false"
+        ],
+        "CHECK": "0",
+        "PACKAGE": "absent"
+      },
+      "T8_0.155.1_on_that_config": {
+        "features_list_lines": [],
+        "exec_exit": 0,
+        "exec_events": [
+          "thread.started",
+          "turn.started",
+          "item.completed",
+          "turn.completed"
+        ],
+        "reasoning_effort_sent_from_config_toml": [
+          "high"
+        ]
+      },
+      "T9_plain_launch_0.155.1_on_that_config": {
+        "banner": "OpenAI Codex (v0.155.1)",
+        "screen_error_words": [],
+        "CHECK": "0"
+      }
+    }
+  },
+  "findings": {
+    "search_flag_not_forwarded_to_exec": "Measured on both 0.155.1 and 0.157.1: `codex --search exec ...` sends settings.external_web_access false to the search endpoint, the same as no flag, while `codex exec -c web_search=\"live\" ...` sends true. Source: the Exec branch of codex-rs/cli/src/main.rs forwards only the shared root options and -c overrides, and core config defaults the mode to cached (stage/source-checks.txt). The sweep's GPT-6 lanes therefore searched in cached mode; add -c web_search=\"live\" to codex_argv if live search is intended. Measured with a fake provider marked supports_standalone_web_search; the OpenAI provider uses the same extension and mode resolution (source reading, not a live-provider measurement).",
+    "exec_json_web_search_items": "0.157.1 reports an open of a literal URL as action type open_page and attaches `results`; 0.155.1 reported the same call as `other` without results. The lane rollout of gpt6-discover-workers (0.155.1) holds 32 openPage and 6 search web actions, which its exec --json stream reported as other and search. Consumers that count web_search actions see different types after the switch; codex_job.py ignores item.* content and is unaffected.",
+    "state_migration": "0.157.1 applies two new state_5.sqlite migrations (55 -> 57) and one thread_history_1.sqlite migration (6 -> 7) on first use; ~/.codex is at 55 and 6 now. In a scratch CODEX_HOME, 0.155.1 still completed an exec turn after 0.157.1 had migrated it (M3); the migrations stay applied.",
+    "background_server": "Measured in the sandbox (results/daemon.json): a plain interactive 0.157.1 launch printed `Installing daemon from CLI version 0.157.1 into <home>/packages/app-server-daemon`, copied the 391,126,382-byte package there, and started `app-server --listen unix:// --managed-daemon` and `app-server daemon pid-update-loop` from that copy; both outlived the TUI. A plain 0.155.1 launch on the same home connected to that server: the process at the other end of the connection the server accepted runs the 0.155.1 binary. `codex app-server daemon stop` (0.157.1) stopped the server and left the updater loop running; SIGTERM ended it. `--no-daemon`, and `codex features disable daemon_auto_start` (which appended daemon_auto_start = false to the existing [features] table), each prevented the copy and both processes; 0.155.1 read that config.toml, applied its other settings in an exec turn and started its TUI. Source only, not measured (the sandbox had no network and each server lived under a minute): the updater is on by default and, five minutes after start and then every 60 minutes, fetches https://chatgpt.com/codex/install.sh and runs it to install the latest release into the daemon's package copy (stage/daemon-source-checks.txt). A server started on this host would therefore run outside the integrity-checked prefix and move to later releases without a pin change. `codex exec`, which the sweep lanes use, has no background-server code at either tag, and none of the 21 scratch homes of the first qualification (14 of them with exec-turn state) holds a packages directory."
+  },
+  "switch_commands_for_the_coordinator": [
+    "# 1. After the sweep: confirm no Codex 0.155.1 process runs (the bracketed pattern cannot match its own grep):",
+    "grep -l 'codex-0[.]155[.]1/' /proc/[0-9]*/cmdline 2>/dev/null; ls -l /proc/[0-9]*/exe 2>/dev/null | grep -c 'tools/codex-0[.]155[.]1/'   # expect no file names and 0",
+    "# 2. Before any interactive 0.157.1 launch, turn off the background server's automatic start in ~/.codex/config.toml with the staged binary; a plain `codex` launch (for example the pending /hooks trust step) otherwise starts a self-updating server from a package copy under ~/.codex (results/daemon.json T1, T7):",
+    "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex features disable daemon_auto_start   # Disabled feature `daemon_auto_start` in config.toml.",
+    "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex features list | grep '^daemon_auto_start '   # daemon_auto_start  stable  false",
+    "# 3. Switch the link atomically:",
+    "ln -sfn ~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex ~/.local/share/codex-ecosystem/bin/.codex.new && mv -T ~/.local/share/codex-ecosystem/bin/.codex.new ~/.local/share/codex-ecosystem/bin/codex",
+    "codex --version   # codex-cli 0.157.1",
+    "# 4. One live probe from an empty directory outside every repository (exec never starts the server; this first 0.157.1 run migrates ~/.codex state_5 55->57, thread_history_1 6->7):",
+    "codex exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra -c model_reasoning_effort=\"max\" --json 'Reply with the word PROBE-OK.' < /dev/null",
+    "# 5. No background server and no package copy; run these again after the first interactive launch:",
+    "ls -l /proc/[0-9]*/exe 2>/dev/null | grep -cF \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon/\"   # 0",
+    "test -e \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon\" && echo present || echo absent   # absent",
+    "# 6. Record the installed version:",
+    "sed -i '/^-- codex --$/{n;s/^codex-cli .*/codex-cli 0.157.1/}' ~/.local/share/codex-ecosystem/installed-versions.txt"
+  ],
+  "rollback_commands": [
+    "# 1. A server left running would keep serving 0.155.1's TUI after the relink (T3), and `daemon stop` leaves its updater loop running (T4); when the check prints more than 0, stop both and check again (T5):",
+    "ls -l /proc/[0-9]*/exe 2>/dev/null | grep -cF \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon/\"   # 0 when switch step 2 ran first",
+    "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex app-server daemon stop   # {\"status\":\"stopped\",...}, or {\"status\":\"notRunning\",...} when none runs (T6)",
+    "for p in /proc/[0-9]*; do case \"$(readlink \"$p/exe\" 2>/dev/null)\" in \"${CODEX_HOME:-$HOME/.codex}\"/packages/app-server-daemon/*) echo \"TERM ${p#/proc/} $(readlink \"$p/exe\")\"; kill -TERM \"${p#/proc/}\";; esac; done",
+    "ls -l /proc/[0-9]*/exe 2>/dev/null | grep -cF \"${CODEX_HOME:-$HOME/.codex}/packages/app-server-daemon/\"   # 0",
+    "# 2. Switch the link back and record it:",
+    "ln -sfn ~/.local/share/codex-ecosystem/tools/codex-0.155.1/bin/codex ~/.local/share/codex-ecosystem/bin/.codex.new && mv -T ~/.local/share/codex-ecosystem/bin/.codex.new ~/.local/share/codex-ecosystem/bin/codex",
+    "codex --version   # codex-cli 0.155.1",
+    "sed -i '/^-- codex --$/{n;s/^codex-cli .*/codex-cli 0.155.1/}' ~/.local/share/codex-ecosystem/installed-versions.txt",
+    "# The ~/.codex migrations stay applied (0.155.1 ran an exec turn on a migrated scratch home, M3). The daemon_auto_start = false line can stay: 0.155.1 read that config.toml in an exec turn (T8) and its TUI started with it (T9). A ~/.codex/packages/app-server-daemon copy is inert once no process runs from it; 0.155.1 manages only packages/standalone (stage/daemon-source-checks.txt)."
+  ],
+  "repository_followups_after_the_switch": [
+    "adoption/pins-linux-x86_64.json codex: url https://registry.npmjs.org/@openai/codex/-/codex-0.157.1.tgz, sha256 813e2a944f4474b7e1826d9ce8bf696ad8d80c68f43f7a7067beec51fa8f5b73, integrity above",
+    "manifests/stack.json codex version 0.157.1 and this receipt in evidence_ids; recipes/README.md codex row and the codex-package archive row (API digest above)",
+    "adoption/pins-macos-arm64.json keeps 0.155.1 until a Mac qualifies 0.157.1 with its darwin-arm64 platform dependency; tests/test_adoption_bootstrap_macos.py then needs a codex Mac-lag entry",
+    "with the pin move to 0.157.x, add daemon_auto_start = false under a [features] table in adoption/templates/codex.config.template.toml (the bootstrap's user-level ~/.codex/config.toml) and say so in the recipes/README.md codex row, so a new host's first interactive launch does not start a self-updating server outside the pinned prefix; 0.155.1 accepts that key (results/daemon.json T8, T9)"
+  ],
+  "not_published": [
+    "the npm tarballs, the GitHub asset and extracted trees (public at the URLs above)",
+    "full provider request bodies (they carry Codex's own base instructions); out/provider-requests.json keeps their shape, selected fields and sha256",
+    "the scratch CODEX_HOME directories (state databases, sessions)",
+    "the background-server probe's scratch homes (391 MB package copies, daemon state files) and its fake-provider request bodies; results/daemon.json keeps the measurements"
+  ],
+  "files": [
+    "accept_codex.py",
+    "accept_codex_ws.py",
+    "daemon_probe.py",
+    "fake_responses.py",
+    "fake_websearch.py",
+    "help/0.155.1/exec-help.out",
+    "help/0.155.1/help.out",
+    "help/0.155.1/version.out",
+    "help/0.157.1/exec-help.out",
+    "help/0.157.1/help.out",
+    "help/0.157.1/version.out",
+    "out/daemon-raw-outputs.json",
+    "out/provider-requests.json",
+    "out/raw-outputs.json",
+    "results/daemon.json",
+    "results/exec-0.155.1.json",
+    "results/exec-0.157.1.json",
+    "results/rollback.json",
+    "results/websearch-0.155.1.json",
+    "results/websearch-0.157.1.json",
+    "rollback_probe.py",
+    "sandbox.sh",
+    "sandbox_daemon.sh",
+    "stage/audit-signatures.txt",
+    "stage/binary-crosscheck.txt",
+    "stage/daemon-source-checks.txt",
+    "stage/install.log",
+    "stage/integrity.txt",
+    "stage/provenance-codex-0.157.1.txt",
+    "stage/source-checks.txt"
+  ],
+  "revisions": [
+    {
+      "date_utc": "2026-09-26",
+      "change": "repair round after review: the switch commands now turn off daemon_auto_start before any interactive 0.157.1 launch and check that no background server or package copy exists; the rollback commands stop a server and its updater loop before relinking; background_server_probe and the background_server finding added from daemon_probe.py. The first qualification's run outputs are unchanged."
+    }
+  ]
+}

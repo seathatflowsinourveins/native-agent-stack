@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "id": "mcp-inspector-280-qualification-20260926",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-26T05:34:17Z",
+  "component_ids": [
+    "mcp-inspector"
+  ],
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, MCP Inspector 2.8.0 was qualified against the installed 2.7.0 and then switched into production. The npm tarball https://registry.npmjs.org/@modelcontextprotocol/inspector/-/inspector-2.8.0.tgz (1,206,059 bytes, sha256 4db39519d276b99fe650f1032a3256cb704648cc611e598a38e178b1ba8a7cbf) had integrity sha512-zn0A8fIrPDge36vId0XMpj0FL0FChIGQvAvV/+iRTvUYkSzTSIALHjhZyLIgKTzBPnzrxDJnfRbrPcElUcXR6Q==, equal to npm dist.integrity; `npm audit signatures` on a scratch install reported 190 packages with verified registry signatures and 34 with verified attestations, including the package's SLSA provenance from .github/workflows/main.yml at refs/tags/2.8.0, commit 1e31c78fbf81a989e8eb47021c6281d7876ad7fd. It was installed from that verified file into a new tools/mcp-inspector-2.8.0 prefix; npm 11 skipped the package's postinstall, which exits at once for a package under node_modules. In a bwrap sandbox with a private loopback-only network, a read-only root, /mnt hidden and MCP_AUTO_OPEN_ENABLED=false, the same 15 gated steps passed on 2.8.0 and on 2.7.0 with identical exit codes and, once per-run paths and markers were normalized, identical outputs: over stdio against a scratch QMD 2.8.3 index, tools/list (get, multi_get, query, status), tools/call query (one hit), an unknown tool (exit 5, tool_not_found), resources/list, prompts/list and tools/list --strict; over streamable HTTP to `qmd mcp --http`, tools/list and tools/call with the default and the auto protocol era. With a scratch API token and DANGEROUSLY_OMIT_AUTH set to false, 0 or yes, the 2.7.0 web server printed 'Auth: disabled (DANGEROUSLY_OMIT_AUTH)' and answered GET /api/config with 200 without a token and with a wrong one, while 2.8.0 answered 401 in both cases and 200 with the right token; both disabled the gate for true and kept it when the variable was unset, and no start printed 'Opening browser'. With no Inspector process running and nothing but bin/mcp-inspector naming the 2.7.0 prefix, bin/mcp-inspector was relinked to tools/mcp-inspector-2.8.0 at 2026-09-26T04:51:23Z; through the PATH entry, `npm ls` read 2.8.0 and the stdio tools/list, tools/call and unknown-tool checks passed.",
+  "limitations": [
+    "Not independently reviewed: the qualification, the switch and this receipt come from one worker session (Claude Opus 5.5); the refresh coordinator owns the independent-review round, and no cross-family review ran.",
+    "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the mcp-surfaces winner pin mcp-inspector 2.7.0 from the sealed 2026-09-22 layer-verdict packets. Host receipts at 2.8.0 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
+    "Linux x86_64 only, one host. Neither adoption/pins-linux-x86_64.json nor adoption/pins-macos-arm64.json has an mcp-inspector entry (it is installed by its recipe row), so no pin file changed; nothing here is macOS evidence.",
+    "Local integration evidence with synthetic fixtures: the upstream suite (npm run local:gate) was not run on this host. The HTTP arm used a scratch QMD server without OAuth; SSE, OAuth, remote servers, the web UI pages, the MCP Apps sandbox and the TUI were not exercised. Web mode ran only as the explicit `--web` auth probe inside the sandbox; `mcp-inspector --version` and a bare `mcp-inspector` were never run.",
+    "The measured auth difference does not change this host's live exposure: no client configuration here sets DANGEROUSLY_OMIT_AUTH, and agents run the Inspector in --cli mode. It matters when someone sets the variable to a false-looking value to keep the token gate on.",
+    "The integrity pin covers the Inspector tarball only; npm resolves dependency ranges at install time and the package ships no shrinkwrap. The installed tree differs from the 2.7.0 prefix in rolldown and its binding (1.2.10 to 1.2.11), bundle-name, string-width, undici (8.11.0 to 8.11.2) and vite (8.3.0 to 8.3.1); stage/dependency-diff.txt.",
+    "2.8.0 changes the package's license statement: package.json says 'SEE LICENSE IN LICENSE' (2.7.0: MIT) and the new LICENSE describes a relicensing transition from MIT to Apache-2.0, with documentation under CC-BY-4.0. manifests/stack.json records that text; no legal review was done.",
+    "Attempt 0 failed in the harness before any Inspector call (the sandbox hid the harness path) and is recorded in results.json; attempt 1 is one run per arm, so durations are run-level values."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; production paths under ~/.local/share/codex-ecosystem"
+  },
+  "data": {
+    "observed_at_utc": "2026-09-26",
+    "previous_version": "2.7.0",
+    "version": "2.8.0",
+    "switched": true,
+    "release": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.8.0",
+    "tag_commit": "1e31c78fbf81a989e8eb47021c6281d7876ad7fd",
+    "tarball": "https://registry.npmjs.org/@modelcontextprotocol/inspector/-/inspector-2.8.0.tgz",
+    "tarball_sha256": "4db39519d276b99fe650f1032a3256cb704648cc611e598a38e178b1ba8a7cbf",
+    "tarball_integrity": "sha512-zn0A8fIrPDge36vId0XMpj0FL0FChIGQvAvV/+iRTvUYkSzTSIALHjhZyLIgKTzBPnzrxDJnfRbrPcElUcXR6Q==",
+    "security_fix": "https://github.com/modelcontextprotocol/inspector/pull/2390 (merged 2026-09-16T17:32:37Z, closes #2331)",
+    "install": "npm install --global --no-audit --no-fund --prefix ~/.local/share/codex-ecosystem/tools/mcp-inspector-2.8.0 <verified inspector-2.8.0.tgz>",
+    "steps_passed": {
+      "2.8.0": "15/15 gated",
+      "2.7.0": "15/15 gated",
+      "attempt 0": "harness error before any Inspector call"
+    },
+    "web_auth_gate": {
+      "2.7.0": {
+        "unset": "on",
+        "false": "off",
+        "0": "off",
+        "yes": "off",
+        "true": "off"
+      },
+      "2.8.0": {
+        "unset": "on",
+        "false": "on",
+        "0": "on",
+        "yes": "on",
+        "true": "off"
+      }
+    },
+    "cutover": {
+      "relinked_utc": "2026-09-26T04:51:23Z",
+      "running_inspectors_before": "none",
+      "post_switch": "postswitch.sh through the PATH entry: npm ls 2.8.0, tools/list, tools/call query and unknown tool exit 5, ALL CHECKS PASSED"
+    },
+    "rollback": "relink ~/.local/share/codex-ecosystem/bin/mcp-inspector to tools/mcp-inspector-2.7.0/bin/mcp-inspector (the Inspector keeps no store that 2.8.0 migrates)",
+    "overturn_when": "a 2.8.x or later release regresses a CLI call the recipes use (tools/list, tools/call, --stored-auth-only), an advisory is published against 2.8.0, or a verdict wave selects another inspector",
+    "artifacts": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/"
+  },
+  "provenance": [
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/accept_inspector.py",
+      "sha256": "9dfc48832a2b11b1e70378b10e5e46d917d59abc0ceabb0ef8c9c3c3d9604d48",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/compare.json",
+      "sha256": "961fcfafc3abc0607ef034147ced3ea49285342832f77f7828543bcf7b003b27",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/compare_inspector.py",
+      "sha256": "6ccd29b29c898a531cf2579ad92a1024811951f189d1d70cdf0a0bc35f2a2dd4",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/cutover/postswitch.out",
+      "sha256": "832f3632fd94c60093816b155036c8524e65c3ef9676fefb04f2ac92325637e9",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/cutover/relink.txt",
+      "sha256": "bdb0302e3ec77802df6fb0a399acb1f1c4a1f06d7d0fc415fea49af90d558753",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/out/raw-outputs.json",
+      "sha256": "a6b979fde4f21e33e0aedb8b6fe1be62dbfacb17ace95679a6ebf2642d76fc93",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/postswitch.sh",
+      "sha256": "c923a294fe9a03de9d39982750ccfa5d436704d0164caa12dcf7bf40c586aaa4",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/results-2.7.0.json",
+      "sha256": "5a714fb0a682f891498761c236af57611fbe6e11540f041daa41728a11c1faf0",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/results-2.8.0.json",
+      "sha256": "19465652ca9d86f093d90eba09a736b587b9e4f9d26a2166deb0d7a6290ce8c3",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/results.json",
+      "sha256": "206366d47938dfa62d5910152bb8ca7a4bc823e3ba14c95d28ddb159cf8bd521",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/sandbox.sh",
+      "sha256": "d1a07d45ea45951dc3a08ecac561c8422b8a944b10b6771158a9a1a24e3df975",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/audit-signatures.txt",
+      "sha256": "ada2be77b6048ba7d07552777263c0720955a87ca2fd8b13bad6d0854389d231",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/auth-parse-source.txt",
+      "sha256": "85d5db812dc3529048bbb5b5b3ecde53c9be470e0c2a79a91749d3f10e875f20",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/cli-help-2.8.0.txt",
+      "sha256": "81f3fd43a00a972e6d101ff89f06c1341fb31968f446e376ee0dd649b400d48c",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/dependency-diff.txt",
+      "sha256": "f77cb5284a8acda767be471d6d4ffbbf12d6f83fe23eb312174ad0a48278d732",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/install.log",
+      "sha256": "064c5cf1b2d73c1e302c6900abf66491ddfdd7df0c4515a9c1564341fb9235ed",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/integrity.txt",
+      "sha256": "3eb1ff737021a4a6e64f4b33321e1cb2f2ba7d9263fd3c98d0d9841a76788c31",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/launcher-help-2.8.0.txt",
+      "sha256": "ea8832479aa8b75eab31697b607a515179e5c0c9f39a48151d1be8b924bfcb00",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/package-diff.txt",
+      "sha256": "60a2628a42178b9d1205678accdc27cd18f29f737eb75703f00a9ff9ce326f52",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/provenance-inspector-2.8.0.txt",
+      "sha256": "5cf15487d2c1b52272315e43508b7edf6a27e105fbb4732f6b8aff0d12e59f09",
+      "byte_identical_to_run_copy": false
+    }
+  ]
+}

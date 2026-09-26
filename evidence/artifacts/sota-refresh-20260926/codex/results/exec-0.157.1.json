@@ -1,0 +1,317 @@
+{
+  "codex": "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex",
+  "cases": [
+    {
+      "case": "K1-search-ok",
+      "argv": [
+        "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex",
+        "--search",
+        "exec",
+        "--ignore-user-config",
+        "--skip-git-repo-check",
+        "-s",
+        "read-only",
+        "-m",
+        "gpt-6-astra",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "model_provider=\"fakeprov\"",
+        "-c",
+        "model_providers.fakeprov.name=\"fake\"",
+        "-c",
+        "model_providers.fakeprov.base_url=\"http://127.0.0.1:18090/v1\"",
+        "-c",
+        "model_providers.fakeprov.wire_api=\"responses\"",
+        "-c",
+        "model_providers.fakeprov.request_max_retries=0",
+        "-c",
+        "model_providers.fakeprov.stream_max_retries=0",
+        "--output-schema",
+        "<arm>/K1-search-ok/schema.json",
+        "-o",
+        "<arm>/K1-search-ok/last.json",
+        "--json",
+        "Return the JSON object that the output schema requires."
+      ],
+      "exit": 0,
+      "duration_s": 6.02,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 11,
+          "cached_input_tokens": 3,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 7,
+          "reasoning_output_tokens": 2
+        }
+      ],
+      "turn_failed_errors": [],
+      "error_messages": [],
+      "stderr_tail": "Reading additional input from stdin...\n",
+      "last_message_file": "{\"ok\": true, \"probe\": \"codex-exec-fake-provider\"}",
+      "sweep_limit_rule_fires": false,
+      "provider_requests": [
+        [
+          "POST",
+          "/v1/responses"
+        ]
+      ],
+      "request": {
+        "model": "gpt-6-astra",
+        "reasoning": {
+          "effort": "max",
+          "context": "all_turns"
+        },
+        "text_format_type": "json_schema",
+        "text_format_schema_equal": true,
+        "text_format_strict": true,
+        "tool_types": [],
+        "web_search_tools": [],
+        "stream": true
+      },
+      "events_sha256": "5b0ca0cad507197f323d7389c6c7e2724bbe874b0a86f25f734c98c6b3bca166"
+    },
+    {
+      "case": "K2-no-search-ok",
+      "argv": [
+        "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex",
+        "exec",
+        "--ignore-user-config",
+        "--skip-git-repo-check",
+        "-s",
+        "read-only",
+        "-m",
+        "gpt-6-astra",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "model_provider=\"fakeprov\"",
+        "-c",
+        "model_providers.fakeprov.name=\"fake\"",
+        "-c",
+        "model_providers.fakeprov.base_url=\"http://127.0.0.1:18090/v1\"",
+        "-c",
+        "model_providers.fakeprov.wire_api=\"responses\"",
+        "-c",
+        "model_providers.fakeprov.request_max_retries=0",
+        "-c",
+        "model_providers.fakeprov.stream_max_retries=0",
+        "--output-schema",
+        "<arm>/K2-no-search-ok/schema.json",
+        "-o",
+        "<arm>/K2-no-search-ok/last.json",
+        "--json",
+        "Return the JSON object that the output schema requires."
+      ],
+      "exit": 0,
+      "duration_s": 5.58,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 11,
+          "cached_input_tokens": 3,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 7,
+          "reasoning_output_tokens": 2
+        }
+      ],
+      "turn_failed_errors": [],
+      "error_messages": [],
+      "stderr_tail": "Reading additional input from stdin...\n",
+      "last_message_file": "{\"ok\": true, \"probe\": \"codex-exec-fake-provider\"}",
+      "sweep_limit_rule_fires": false,
+      "provider_requests": [
+        [
+          "POST",
+          "/v1/responses"
+        ]
+      ],
+      "request": {
+        "model": "gpt-6-astra",
+        "reasoning": {
+          "effort": "max",
+          "context": "all_turns"
+        },
+        "text_format_type": "json_schema",
+        "text_format_schema_equal": true,
+        "text_format_strict": true,
+        "tool_types": [],
+        "web_search_tools": [],
+        "stream": true
+      },
+      "events_sha256": "4c3af89bdbc1bf86ffe91da0b1ec699c53b97dfe38416275ba5b2931ad0cc2bf"
+    },
+    {
+      "case": "K3-config-live-ok",
+      "argv": [
+        "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex",
+        "exec",
+        "--ignore-user-config",
+        "--skip-git-repo-check",
+        "-s",
+        "read-only",
+        "-m",
+        "gpt-6-astra",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "model_provider=\"fakeprov\"",
+        "-c",
+        "model_providers.fakeprov.name=\"fake\"",
+        "-c",
+        "model_providers.fakeprov.base_url=\"http://127.0.0.1:18090/v1\"",
+        "-c",
+        "model_providers.fakeprov.wire_api=\"responses\"",
+        "-c",
+        "model_providers.fakeprov.request_max_retries=0",
+        "-c",
+        "model_providers.fakeprov.stream_max_retries=0",
+        "-c",
+        "web_search=\"live\"",
+        "--output-schema",
+        "<arm>/K3-config-live-ok/schema.json",
+        "-o",
+        "<arm>/K3-config-live-ok/last.json",
+        "--json",
+        "Return the JSON object that the output schema requires."
+      ],
+      "exit": 0,
+      "duration_s": 5.53,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "item_types": [
+        "agent_message"
+      ],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 11,
+          "cached_input_tokens": 3,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 7,
+          "reasoning_output_tokens": 2
+        }
+      ],
+      "turn_failed_errors": [],
+      "error_messages": [],
+      "stderr_tail": "Reading additional input from stdin...\n",
+      "last_message_file": "{\"ok\": true, \"probe\": \"codex-exec-fake-provider\"}",
+      "sweep_limit_rule_fires": false,
+      "provider_requests": [
+        [
+          "POST",
+          "/v1/responses"
+        ]
+      ],
+      "request": {
+        "model": "gpt-6-astra",
+        "reasoning": {
+          "effort": "max",
+          "context": "all_turns"
+        },
+        "text_format_type": "json_schema",
+        "text_format_schema_equal": true,
+        "text_format_strict": true,
+        "tool_types": [],
+        "web_search_tools": [],
+        "stream": true
+      },
+      "events_sha256": "d395ee20d996f96ab15a35ba02a6a70ab2830358d5a8e51bc7d2b9ee87e9746c"
+    },
+    {
+      "case": "K4-search-limit",
+      "argv": [
+        "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex",
+        "--search",
+        "exec",
+        "--ignore-user-config",
+        "--skip-git-repo-check",
+        "-s",
+        "read-only",
+        "-m",
+        "gpt-6-astra",
+        "-c",
+        "model_reasoning_effort=\"max\"",
+        "-c",
+        "model_provider=\"fakeprov\"",
+        "-c",
+        "model_providers.fakeprov.name=\"fake\"",
+        "-c",
+        "model_providers.fakeprov.base_url=\"http://127.0.0.1:18090/v1\"",
+        "-c",
+        "model_providers.fakeprov.wire_api=\"responses\"",
+        "-c",
+        "model_providers.fakeprov.request_max_retries=0",
+        "-c",
+        "model_providers.fakeprov.stream_max_retries=0",
+        "--output-schema",
+        "<arm>/K4-search-limit/schema.json",
+        "-o",
+        "<arm>/K4-search-limit/last.json",
+        "--json",
+        "Return the JSON object that the output schema requires."
+      ],
+      "exit": 1,
+      "duration_s": 0.52,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "error",
+        "turn.failed"
+      ],
+      "item_types": [],
+      "turn_completed_usage": [],
+      "turn_failed_errors": [
+        {
+          "message": "You’ve hit your usage limit. Try again later."
+        }
+      ],
+      "error_messages": [
+        "You’ve hit your usage limit. Try again later."
+      ],
+      "stderr_tail": "Reading additional input from stdin...\n",
+      "last_message_file": null,
+      "sweep_limit_rule_fires": true,
+      "provider_requests": [
+        [
+          "POST",
+          "/v1/responses"
+        ]
+      ],
+      "request": {
+        "model": "gpt-6-astra",
+        "reasoning": {
+          "effort": "max",
+          "context": "all_turns"
+        },
+        "text_format_type": "json_schema",
+        "text_format_schema_equal": true,
+        "text_format_strict": true,
+        "tool_types": [],
+        "web_search_tools": [],
+        "stream": true
+      },
+      "events_sha256": "a7d3cf5f85c5fa2b69a32975fd6b1dcfecd7f86af6518114074a16a881a83631"
+    }
+  ]
+}

@@ -26,9 +26,13 @@ CONFIGURE = ROOT / "observability/backends/configure.py"
 
 # Documented installed-binary layout (observability/backends/README.md):
 # $HOME/.local/share/codex-ecosystem/tools/ecosystem-<name>-<pinned-version>/<binary>
+# The pinned version comes from observability/backends/pins.json, the file install.py and configure.py read,
+# so a pin move runs the new binaries here instead of the retained rollback prefix.
 _TOOLS_ROOT = Path.home() / ".local/share/codex-ecosystem/tools"
-PROMTOOL = _TOOLS_ROOT / "ecosystem-prometheus-3.14.0/promtool"
-AMTOOL = _TOOLS_ROOT / "ecosystem-alertmanager-0.34.1/amtool"
+_PINNED = {item["id"]: item["version"]
+           for item in json.loads((ROOT / "observability/backends/pins.json").read_text())["components"]}
+PROMTOOL = _TOOLS_ROOT / f"ecosystem-prometheus-{_PINNED['prometheus']}/promtool"
+AMTOOL = _TOOLS_ROOT / f"ecosystem-alertmanager-{_PINNED['alertmanager']}/amtool"
 
 EXPECTED_ALERTS = {
     "EquitiesOrderStateDivergence",

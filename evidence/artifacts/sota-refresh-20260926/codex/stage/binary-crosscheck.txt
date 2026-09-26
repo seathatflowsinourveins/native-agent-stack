@@ -1,0 +1,4 @@
+npm @openai/codex@0.157.1-linux-x64 vendor/x86_64-unknown-linux-musl/bin/codex sha256: 3e2584f3f3829a43a0495011a1cecb2facbe64a2403e2b682351fd9c2983f970
+GitHub rust-v0.157.1 asset codex-x86_64-unknown-linux-musl.tar.gz sha256 e98c1e8e028e8137fa2d2415c82ec58e7b3701a627e3554aace5b3ca31454af2 (API digest sha256:e98c1e8e028e8137fa2d2415c82ec58e7b3701a627e3554aace5b3ca31454af2); its codex-x86_64-unknown-linux-musl sha256: 3e2584f3f3829a43a0495011a1cecb2facbe64a2403e2b682351fd9c2983f970
+installed tools/codex-0.157.1 .../codex-linux-x64/vendor/x86_64-unknown-linux-musl/bin/codex sha256: 3e2584f3f3829a43a0495011a1cecb2facbe64a2403e2b682351fd9c2983f970
+installed wrapper and platform package files byte-identical to the verified tarballs (diff -r): yes

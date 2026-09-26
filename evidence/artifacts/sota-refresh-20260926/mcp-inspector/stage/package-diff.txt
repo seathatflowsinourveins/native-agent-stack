@@ -1,0 +1,15 @@
+Only in 2.8.0: LICENSE
+Files 2.7.0/README.md and 2.8.0/README.md differ
+Files 2.7.0/clients/cli/build/index.js and 2.8.0/clients/cli/build/index.js differ
+Files 2.7.0/clients/tui/build/index.js and 2.8.0/clients/tui/build/index.js differ
+Files 2.7.0/clients/web/build/index.js and 2.8.0/clients/web/build/index.js differ
+Only in 2.8.0/clients/web/dist/assets: index-9ZWu1ACP.js
+Only in 2.7.0/clients/web/dist/assets: index-DZkZ6KYt.js
+Only in 2.8.0/clients/web/dist/assets: prism-light-CGBvpchP.js
+Only in 2.7.0/clients/web/dist/assets: prism-light-CoQfbOXL.js
+Files 2.7.0/clients/web/dist/index.html and 2.8.0/clients/web/dist/index.html differ
+Files 2.7.0/package.json and 2.8.0/package.json differ
+
+launcher clients/launcher/build/index.js sha256:
+21ca6e6e031713e5ae040ecf71f8fd0b0ef9a4ece4131fd03d3b01aeae5415f4  2.7.0 clients/launcher/build/index.js
+21ca6e6e031713e5ae040ecf71f8fd0b0ef9a4ece4131fd03d3b01aeae5415f4  2.8.0 clients/launcher/build/index.js

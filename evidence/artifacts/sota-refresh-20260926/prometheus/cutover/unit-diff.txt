@@ -1,0 +1,9 @@
+
+unit render check (observability/backends/configure.py with the 3.15.0 pin and the host's saved port overrides, live roots substituted):
+12c12
+< ExecStart=~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus --config.file=~/.config/ecosystem-observability/ecosystem-prometheus.yml --storage.tsdb.path=~/.local/share/codex-ecosystem/observability/ecosystem-prometheus --storage.tsdb.retention.time=7d --storage.tsdb.retention.size=512MB --web.listen-address=127.0.0.1:19090
+---
+> ExecStart=~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus --config.file=~/.config/ecosystem-observability/ecosystem-prometheus.yml --storage.tsdb.path=~/.local/share/codex-ecosystem/observability/ecosystem-prometheus --storage.tsdb.retention.time=7d --storage.tsdb.retention.size=512MB --web.listen-address=127.0.0.1:19090
+(the only difference is the ExecStart prefix; the loki, grafana, alertmanager and ntfy units rendered byte-identical to the live units)
+
+live unit after the switch equals the expected render: yes
