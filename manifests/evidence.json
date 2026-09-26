@@ -3314,6 +3314,24 @@
         "At run time the installed guard hook did not inspect commands started by kernel_keyring.py exec. The keyring rules were added after the runs, in the change that records this receipt."
       ],
       "path": "evidence/receipts/tavily-research-qualification-20260926.json"
+    },
+    {
+      "id": "local-inference-c2-serving-switch-20260926",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "llama-cpp"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, the production generation unit nativestack-generation.service (llama.cpp b11146 serving unsloth/Qwen3.8-27B-GGUF UD-Q4_K_M at revision 4ca7207) was switched by a systemd --user drop-in from the C0 serving profile (36 of 65 layers on the GPU) to the li26 C2 profile (--gpu-layers 99 --n-cpu-ffn 20 --spec-type draft-mtp --spec-draft-n-max 3), after the preregistered li26 comparison selected C2 in its final decision (change_serving_profile). On the frozen 360-filing 8-K item-extraction task, C2 predicted the same item sets as the C0 control on every filing (micro-F1 0.9909 for both; paired bootstrap bounds 0.0), every reply was valid JSON, and its median decode was 26.28 tokens/s against C0's 5.25, with no memory or deadline failure. M (MiMo-V2.6-Distill-Qwen-9B Q8_0) was faster still but failed non-inferiority (lower bound -0.0560). After the switch, the unit answered /health 200 in about 6 s and the bounded structured check returned 42. Read-only rechecks, the llama-cpp install host receipt at 11:26Z and the use host receipt at 12:41Z, found the drop-in in effect, the served file at its pinned SHA-256 and the decision reproducible in memory from the retained state.",
+      "limitations": [
+        "Native execution on this host, one run per arm, under the frozen protocol: greedy decoding with thinking disabled, about 17 output tokens per filing, and labels taken from the filer-declared header ITEMS. Production keeps its own sampling and reasoning defaults, so C2's decode gain and its MTP draft acceptance (4,735 of 4,737 drafted tokens) are not established for production's sampled or thinking requests. No production-workload measurement followed the switch.",
+        "Speed and memory are this host's, under its load at the time: a shared WSL2 desktop with the Windows-side GPU applications closed for every window. Those closes went by image name, with a forced second pass, rather than by PID as the plan's README says, and further applications outside its list were closed before window 3 under the user approval that the coordinator recorded. This is not an isolated benchmark, and run-to-run variance is unmeasured.",
+        "C2's measured peak whole-device use was 20,314 MiB (minimum 3,829 MiB free) with those applications closed, and after the switch the device showed 20,256 MiB used and 3,887 MiB free. Production has no free-memory guard like the windows' 3,072 MiB reserve, so Windows-side GPU applications reopened later can exhaust device memory. The rollback in data.rollback restores the pre-switch C0 profile.",
+        "The rollback was not exercised after the switch. The base unit file (C0, 36 GPU layers) and the model file are unchanged.",
+        "The switch and its immediate checks come from the coordinator's dated operations log; the commands' raw output is not retained in the repository. The read-only rechecks are in the two llama-cpp host receipts of 2026-09-26, which carry only self reviews. The use receipt was re-recorded at 12:41Z because its unpublished first recording (11:26Z) ran analyze.py --out into a temporary directory inside the checkout; the new one re-derives the decision in memory and writes no file. The catalog pin for llama-cpp stays b11057 (0.4.1-dev) in manifests/stack.json and catalogs/sota-convergence, and this receipt does not rebind it.",
+        "The experiment record retains the failed and refused attempts: the acquisition's first attempt (state_dir_must_be_owner_only, refused before any SEC request) and C2's admission refusal in window 2 (17,366 MiB free against 17,535 MiB required).",
+        "The claim is limited to this host and task. It establishes no frontier parity, hand-checked accuracy, catalyst or trading value, long-context or thinking-mode quality, isolated throughput or saving, and B and X have no result."
+      ],
+      "path": "evidence/receipts/local-inference-c2-serving-switch-20260926.json"
     }
   ],
   "files": [
@@ -4420,8 +4438,8 @@
     },
     {
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/README.md",
-      "sha256": "28ba9bf869b7f8882fda1f2e80a620fe5478aeb1d4f46b7bb8b7bfa862c2aae4",
-      "bytes": 17678
+      "sha256": "dac3aaec727dc59f853fd7440fd45e3ecefbf13eb81ade4caa54a37a6178b68a",
+      "bytes": 21221
     },
     {
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py",
@@ -4440,8 +4458,8 @@
     },
     {
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
-      "sha256": "21e78164701c9c6df0f7c3934c016867607b3829066694536c2360084c94aa3c",
-      "bytes": 12576
+      "sha256": "0dcc14a53f1fd3fb07770a95d03305883fde3b8abfff64c9b405f6d5e1455de1",
+      "bytes": 25918
     },
     {
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/plan.json",
@@ -4452,6 +4470,61 @@
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/prompt.txt",
       "sha256": "faf9273a6807e982154667a8654ec2cff637cf57c8d85c34093e615876ae1d58",
       "bytes": 2485
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/acquisition-summary.json",
+      "sha256": "c775d341ea2b0750cd368386b373e3639197ae0819d69131d7a9d3f5a09c68fa",
+      "bytes": 1470
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/decision.json",
+      "sha256": "672be297908b9832b77949d2c8e15b3972f3acc4fbd12c92cef717f61d05d3e4",
+      "bytes": 8303
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/results.md",
+      "sha256": "0f42a99d031e72d4c7e31d240b734936d68b776a982b968a7ec483401274b294",
+      "bytes": 16012
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T050938Z/C0/window.json",
+      "sha256": "7a515078bdd51fabd0d68e61abbf760fd81be3bcf522e58652184197384c8ceb",
+      "bytes": 493
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T050938Z/window-summary.json",
+      "sha256": "d4c735636386148534bceb7c3229aaeefbfa77f5ad896a124eeee17c241812dd",
+      "bytes": 540
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/C1/window.json",
+      "sha256": "64fa973e429a681d6a8a682aa202cafc308cd6770928da3a0fdf0a34acaa716d",
+      "bytes": 493
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/C2/window.json",
+      "sha256": "56a16e8969b4cd5c13b61ebc1cd293651950a4fb6e9055b0a89c3e21e5a2ceee",
+      "bytes": 486
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/M/window.json",
+      "sha256": "897889130228e3d816e1802c0bc769a7d1f453700261d3b5c5ceea9925247a07",
+      "bytes": 493
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/window-summary.json",
+      "sha256": "5a515ada7314832152740eba8512fc58abd06262a12dfa6adac38310770e5ce2",
+      "bytes": 545
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T102638Z/C2/window.json",
+      "sha256": "fa7f3ad77f2dd706f2969d5a942401c1e97d3fdfa816c24cfff731f48b2de436",
+      "bytes": 493
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T102638Z/window-summary.json",
+      "sha256": "4f212c49f30e6c8a74e7b96864d5937c50aad4fd6f1e701123e8ffcc64122b6a",
+      "bytes": 540
     },
     {
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/window.sh",
@@ -11425,8 +11498,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "aa8fe9692474494010d29008a864b8d1550a94f4a3c84750c3c46b9ed4353386",
-      "bytes": 189656
+      "sha256": "e5a35eb40f2c8fd49d601b4be29c4e64f71b7c0104a9e342904789b02ca36587",
+      "bytes": 189662
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -33494,6 +33567,21 @@
       "bytes": 15227
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--llama-cpp--install--20260926-2.json",
+      "sha256": "9ea17dc6daefddf8d9feb27cf5771d83228849c91b6a9f47993355d4a2c4b2f5",
+      "bytes": 5655
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--llama-cpp--install--20260926.json",
+      "sha256": "450d604281ea6e6bd04b636cf01233ea3c9d33bf9aa40fc729b4a7a5d62ed646",
+      "bytes": 5183
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--llama-cpp--use--20260926.json",
+      "sha256": "fcd2ad1e768ed4b7b89a599be84e35bfbf469a8e8eb72f58bda2d0c67520ad9f",
+      "bytes": 12231
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--loki--install--20260925.json",
       "sha256": "615cbccba9513bacaf67c8a9870aae1b3393314adaa5656d8b1a64090cafe8ce",
       "bytes": 6617
@@ -34132,6 +34220,11 @@
       "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
       "sha256": "0d32534357501c011298420c07161c59940929cabd00a9b71d5d7817126f88c9",
       "bytes": 17126
+    },
+    {
+      "path": "evidence/receipts/local-inference-c2-serving-switch-20260926.json",
+      "sha256": "84153b7486e2cd9b970d0cb017bcb73b12930158efb2e793e323a6347f09d3e3",
+      "bytes": 14360
     },
     {
       "path": "evidence/receipts/mac-memory-patch-20260920.json",
@@ -34800,8 +34893,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "cbbc6ce14823e6114fdf43ef7c34e759e1d5fb758097c131ed077d7a168aeb1d",
-      "bytes": 90871
+      "sha256": "9407c6f30086311a612ab7afe55ede679b5b8441eddad7ba76767da82867daee",
+      "bytes": 92411
     },
     {
       "path": "observability/README.md",
@@ -35710,8 +35803,8 @@
     },
     {
       "path": "tests/test_local_inference_latest_20260926.py",
-      "sha256": "03c425f7de2455028fe277f51e1c962a3ff7da868eb55dd045b6ff49f035c426",
-      "bytes": 70472
+      "sha256": "de493d86ef8944dbf5f31c5792a2f112752c02a505c22f89332322e72dabfce6",
+      "bytes": 74274
     },
     {
       "path": "tests/test_memory_lifecycle.py",
