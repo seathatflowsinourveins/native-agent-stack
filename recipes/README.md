@@ -270,6 +270,51 @@ ai-memory install-hooks --agent codex --server-url http://127.0.0.1:49374 \
 
 Replace `http://127.0.0.1:49374` with the URL the host's own ai-memory server binds; a copied port can send hooks to another host's or distro's store (on the NativeStack WSL2 workstation the service binds `127.0.0.1:49474`, and 49374 is another distro's default there). These hook installers are global additions gated by the project marker. They preserve a shared capture mode; back up the affected files and inspect the generated merge. Codex uses its selected `CODEX_HOME/hooks.json`; Claude uses its native settings. Review exact Codex hook definitions via `/hooks` afterward. Upstream can disable Claude prompt capture here; Codex prompt capture has no corresponding disable flag at this pin. Bounded sanitized observations and heuristic handoffs still have storage/prompt overhead. Do not describe this profile as zero capture.
 
+### Worktrees and the capture marker
+
+This section changed after `v2026.09.26.2`, which has no `.worktreeinclude`. The marker
+stays untracked (`/.ai-memory.toml` is in `.gitignore`): it is one host's opt-in, and a
+tracked copy would enroll every clone, CI checkout and blind lane on any host whose
+hooks run in allowlist mode. ai-memory 2.4.1 finds it by walking up from the
+session's cwd toward `$HOME`, and outside `$HOME` the walk stops at the checkout's own
+root ([`docs/marker-file.md`](https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/marker-file.md)).
+A worktree below the enrolled checkout, such as Claude Code's default
+`.claude/worktrees/<name>`, is therefore captured through the checkout's marker, and a
+worker worktree a script creates outside `$HOME`, such as a session scratchpad under
+`/tmp`, is not. The tracked [`.worktreeinclude`](../.worktreeinclude) names only the
+marker. Claude Code reads it for every worktree it creates with git, and Worktrunk's
+`wt step copy-ignored` reads it in the source worktree (the primary one by default); both
+copy a listed file only when the source has it and ignores it, so an unenrolled clone
+copies nothing.
+
+Enrolling does more than capture. At SessionStart, ai-memory's hook also fetches the
+project's pending handoff and injects it into the new session's context, and that fetch
+consumes it (ai-memory 2.4.1 `hook.rs`: "the GET is destructive"), so a worker session
+in an enrolled worktree can take a handoff meant for your next session, and it starts
+with shared memory context. Enroll only a lane that should have both, one lane at a
+time. An independent-review lane, like a blind lane, must stay unenrolled: create it with
+plain `git worktree add` outside the enrolled checkout, not through Claude Code (which
+copies the marker into every worktree it creates with git; one under `.claude/worktrees/`
+is enrolled through the walk anyway), and do not run the copy below in it. To enroll a
+worker worktree created with `git worktree add`, run from anywhere:
+
+```sh
+wt -C "$WORKTREE" step copy-ignored --require-include   # copies .ai-memory.toml only; reruns write nothing
+printf '{"cwd":"%s"}' "$WORKTREE" | ai-memory --data-dir "$AI_MEMORY_DATA_DIR" hook \
+  --event pre-tool-use --agent codex --server-url http://127.0.0.1:49374 --check-capture
+# expect "capture_mode":"allowlist","marker_present":true,"admits_capture":true
+```
+
+`$AI_MEMORY_DATA_DIR` is the `--data-dir` in the installed hook commands (`CODEX_HOME/hooks.json`).
+The check reads that directory's `capture-mode` file, and a directory without one answers
+`denylist`, which admits every repository whether or not a marker is found, so all three
+values matter. `--require-include` copies nothing when the primary checkout has no
+`.worktreeinclude`; without that file Worktrunk would copy every ignored file, host-only
+`.codex/` included. `--check-capture` evaluates the capture policy without spooling or
+contacting the server. Blind lanes (`tools/sota-convergence/blind_checkout.py`) use plain
+`git worktree add` and stay unenrolled; keep them outside the enrolled checkout so that no
+walk reaches its marker.
+
 ### Upgrading an existing store
 
 Migrations are forward-only: 2.4.0 applies V65 and V66 when `serve` opens a 2.3.2 store, 2.4.1 adds V67 (`managed_run_session_link`), and an older binary then refuses the store with `memory database schema is newer than this ai-memory build`. The automatic pre-migration archive covers only the 1.x to 2.0 upgrade, so a 2.x store gets none. Order matters. Re-running [`adoption/bootstrap-linux.sh`](../adoption/bootstrap-linux.sh) repoints `bin/ai-memory` as soon as it installs the new archive, and the service runs through that link, so on a host with an existing store, stop the service and take the at-rest copy below before any bootstrap re-run, including the one [`adoption/update.md`](../adoption/update.md) step 1 asks for after a pin change. The NativeStack WSL2 cutovers (2.3.2 to 2.4.0 on 2026-09-25, 2.4.0 to 2.4.1 on 2026-09-26) used this order: install the verified archive into a new versioned prefix such as `tools/ai-memory-2.4.1`; announce the window to live sessions; stop the service and wait until `pgrep -a -x ai-memory` (not `pgrep -f`, which can match the waiting shell itself) and `fuser` on `db/memory.sqlite` print nothing; copy `db`, `wiki`, `config.toml` and `capture-mode` to a private 0700 directory (`config.toml` holds `auth.token_pepper`); repoint `bin/ai-memory`; run the two `install-hooks` commands above with the new binary and the host's own server URL (NativeStack used `--server-url http://127.0.0.1:49474 --capture-mode allowlist`, plus `--no-capture-prompts` for Claude Code), first without `--apply` as a preview, and check that each file's diff against the installer's `.bak-<unix-ts>` copy changes only the binary path; start the service. Then check `ai-memory --version` and serverInfo, `/healthz` (200 on 2.4.x, 404 on 2.3.2), `ai-memory status --json`, a known page's body and one real client session's new observations. Codex skips changed hooks until they are trusted, so review them in Codex `/hooks`; it captures nothing before that. Rollback is the cold copy, a relink to the previous prefix and a re-run of `install-hooks` with that binary (or the installer's `.bak` hook files, which also revert any unrelated later edits); never start an older binary on the migrated store. Evidence: [`ai-memory-240-qualification-20260925.json`](../evidence/receipts/ai-memory-240-qualification-20260925.json) and [`ai-memory-241-qualification-20260925.json`](../evidence/receipts/ai-memory-241-qualification-20260925.json).

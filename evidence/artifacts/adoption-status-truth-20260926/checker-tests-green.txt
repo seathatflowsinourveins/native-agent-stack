@@ -1,0 +1,10 @@
+test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) ... ok
+test_a_hooks_file_codex_parses_runs_its_trusted_hooks (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_parses_runs_its_trusted_hooks) ... ok
+test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) ... ok
+test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) ... ok
+test_codex_runs_an_ai_memory_hook_only_when_enabled_and_trusted (tests.test_adoption_status.ClientWiringTests.test_codex_runs_an_ai_memory_hook_only_when_enabled_and_trusted) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.164s
+
+OK

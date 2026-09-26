@@ -1,0 +1,791 @@
+test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) ... 
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='repeated top-level hooks (duplicate field `hooks`)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='repeated event (duplicate field `Stop`)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='repeated group field (duplicate field `matcher`)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='repeated handler field (duplicate field `command`)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='repeated type tag (duplicate field `type`)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='both commandWindows spellings (duplicate field `commandWindows`)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='NaN in an unknown handler field (expected value)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='Infinity in an unknown group field (expected value)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='lone surrogate in the command (unexpected end of hex escape)') ... ERROR
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='lone surrogate in an unknown handler field') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='lone surrogate in an unknown group key') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='lone surrogate in the matcher') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='128 nested arrays inside a handler (recursion limit exceeded)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='timeout 2^64 (invalid type: map, expected u64)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='timeout 5.0 (invalid type: map, expected u64)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='type tag as a variant index (expected variant identifier)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='MCP input whose last duplicate is null (not representable as TOML)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='group array with an element left over (trailing characters)') ... FAIL
+  test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='timeout 2^63 (no answer)') ... FAIL
+test_a_hooks_file_codex_parses_runs_its_trusted_hooks (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_parses_runs_its_trusted_hooks) ... 
+  test_a_hooks_file_codex_parses_runs_its_trusted_hooks (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_parses_runs_its_trusted_hooks) (label='group as an array') ... FAIL
+  test_a_hooks_file_codex_parses_runs_its_trusted_hooks (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_parses_runs_its_trusted_hooks) (label='handler as an array') ... FAIL
+  test_a_hooks_file_codex_parses_runs_its_trusted_hooks (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_parses_runs_its_trusted_hooks) (label='file and events as arrays') ... FAIL
+test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) ... 
+  test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) (matcher='(?=x)') ... FAIL
+  test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) (matcher='(a)\\1') ... FAIL
+  test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) (matcher='(?>a)') ... FAIL
+  test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) (matcher='a\\Z') ... FAIL
+  test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) (matcher='(?#note)Bash') ... FAIL
+  test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) (matcher='(?i)bash') ... FAIL
+test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) ... 
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='(?#note)Bash') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='(?a)Bash') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\0Bash') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='(B)?(?(1)ash|x)') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\N{LATIN SMALL LETTER A}') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='(?=a)') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a\\Z') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a{,2}') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a{') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='[\\b]') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a**') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='^*') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\b*') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a\\z') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\p{L}') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='(?<n>a)') ... FAIL
+$SCRATCH/wt-u5/scripts/adoption_status.py:451: FutureWarning: Possible set difference at position 2
+  re.compile(matcher)
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='[a--b]') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\x{41}') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='(?i)bash') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a{2}') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='}') ... FAIL
+$SCRATCH/wt-u5/scripts/adoption_status.py:451: FutureWarning: Possible nested set at position 1
+  re.compile(matcher)
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='[[:alpha:]]') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\x41') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\/') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a*+') ... FAIL
+  test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='[]a]') ... FAIL
+test_codex_runs_an_ai_memory_hook_only_when_enabled_and_trusted (tests.test_adoption_status.ClientWiringTests.test_codex_runs_an_ai_memory_hook_only_when_enabled_and_trusted) ... 
+  test_codex_runs_an_ai_memory_hook_only_when_enabled_and_trusted (tests.test_adoption_status.ClientWiringTests.test_codex_runs_an_ai_memory_hook_only_when_enabled_and_trusted) (state='\n[hooks.state."$TEST_HOME/.codex/hooks.json:sessi') ... FAIL
+
+======================================================================
+ERROR: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='lone surrogate in the command (unexpected end of hex escape)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1489, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    result = self.wiring()
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1230, in wiring
+    result = client_wiring(self.root, self.env if env is None else env)
+  File "$SCRATCH/wt-u5/scripts/adoption_status.py", line 664, in client_wiring
+    "codex": codex_wiring(Path(codex_home or f"{home}/.codex"), key_root)}
+             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$SCRATCH/wt-u5/scripts/adoption_status.py", line 602, in codex_wiring
+    trusted_ai_memory_hook_events(hooks, config, key_root or str(codex_dir))
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$SCRATCH/wt-u5/scripts/adoption_status.py", line 576, in trusted_ai_memory_hook_events
+    return len({event for key, (event, digest, ai_memory) in codex_hook_hashes(f"{key_root}/hooks.json", events).items()
+                                                             ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$SCRATCH/wt-u5/scripts/adoption_status.py", line 549, in codex_hook_hashes
+    event, "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+                                      ~~~~~~~~~~~~~~~~^^^^^^^^^
+UnicodeEncodeError: 'utf-8' codec can't encode character '\ud800' in position 212: surrogates not allowed
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='repeated top-level hooks (duplicate field `hooks`)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 7) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 7)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='repeated event (duplicate field `Stop`)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (6, 6) != (None, None)
+
+First differing element 0:
+6
+None
+
+- (6, 6)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='repeated group field (duplicate field `matcher`)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 7) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 7)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='repeated handler field (duplicate field `command`)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 7) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 7)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='repeated type tag (duplicate field `type`)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 7) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 7)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='both commandWindows spellings (duplicate field `commandWindows`)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 0) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 0)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='NaN in an unknown handler field (expected value)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 7) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 7)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='Infinity in an unknown group field (expected value)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 7) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 7)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='lone surrogate in an unknown handler field')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 7) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 7)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='lone surrogate in an unknown group key')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 7) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 7)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='lone surrogate in the matcher')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 7) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 7)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='128 nested arrays inside a handler (recursion limit exceeded)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 7) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 7)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='timeout 2^64 (invalid type: map, expected u64)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 6) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 6)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='timeout 5.0 (invalid type: map, expected u64)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 0) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 0)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='type tag as a variant index (expected variant identifier)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (6, 0) != (None, None)
+
+First differing element 0:
+6
+None
+
+- (6, 0)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='MCP input whose last duplicate is null (not representable as TOML)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 0) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 0)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='group array with an element left over (trailing characters)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (6, 0) != (None, None)
+
+First differing element 0:
+6
+None
+
+- (6, 0)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does) (label='timeout 2^63 (no answer)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1490, in test_a_hooks_file_codex_fails_to_parse_reports_null_as_a_malformed_file_does
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (None, None))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 6) != (None, None)
+
+First differing element 0:
+7
+None
+
+- (7, 6)
++ (None, None)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_parses_runs_its_trusted_hooks (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_parses_runs_its_trusted_hooks) (label='group as an array')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1505, in test_a_hooks_file_codex_parses_runs_its_trusted_hooks
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (7, 7))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (6, 0) != (7, 7)
+
+First differing element 0:
+6
+7
+
+- (6, 0)
++ (7, 7)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_parses_runs_its_trusted_hooks (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_parses_runs_its_trusted_hooks) (label='handler as an array')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1505, in test_a_hooks_file_codex_parses_runs_its_trusted_hooks
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (7, 7))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (6, 0) != (7, 7)
+
+First differing element 0:
+6
+7
+
+- (6, 0)
++ (7, 7)
+
+======================================================================
+FAIL: test_a_hooks_file_codex_parses_runs_its_trusted_hooks (tests.test_adoption_status.ClientWiringTests.test_a_hooks_file_codex_parses_runs_its_trusted_hooks) (label='file and events as arrays')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1505, in test_a_hooks_file_codex_parses_runs_its_trusted_hooks
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (7, 7))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (None, None) != (7, 7)
+
+First differing element 0:
+None
+7
+
+- (None, None)
++ (7, 7)
+
+======================================================================
+FAIL: test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) (matcher='(?=x)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1526, in test_a_group_whose_matcher_codex_cannot_load_is_skipped
+    self.assertEqual(result["codex"]["ai_memory_hook_events_trusted"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     None if loads is None else 7 if loads else 6)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 6 != None
+
+======================================================================
+FAIL: test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) (matcher='(a)\\1')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1526, in test_a_group_whose_matcher_codex_cannot_load_is_skipped
+    self.assertEqual(result["codex"]["ai_memory_hook_events_trusted"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     None if loads is None else 7 if loads else 6)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 6 != None
+
+======================================================================
+FAIL: test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) (matcher='(?>a)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1526, in test_a_group_whose_matcher_codex_cannot_load_is_skipped
+    self.assertEqual(result["codex"]["ai_memory_hook_events_trusted"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     None if loads is None else 7 if loads else 6)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 6 != None
+
+======================================================================
+FAIL: test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) (matcher='a\\Z')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1526, in test_a_group_whose_matcher_codex_cannot_load_is_skipped
+    self.assertEqual(result["codex"]["ai_memory_hook_events_trusted"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     None if loads is None else 7 if loads else 6)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 6 != None
+
+======================================================================
+FAIL: test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) (matcher='(?#note)Bash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1526, in test_a_group_whose_matcher_codex_cannot_load_is_skipped
+    self.assertEqual(result["codex"]["ai_memory_hook_events_trusted"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     None if loads is None else 7 if loads else 6)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 7 != None
+
+======================================================================
+FAIL: test_a_group_whose_matcher_codex_cannot_load_is_skipped (tests.test_adoption_status.ClientWiringTests.test_a_group_whose_matcher_codex_cannot_load_is_skipped) (matcher='(?i)bash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1526, in test_a_group_whose_matcher_codex_cannot_load_is_skipped
+    self.assertEqual(result["codex"]["ai_memory_hook_events_trusted"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     None if loads is None else 7 if loads else 6)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 7 != None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='(?#note)Bash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='(?a)Bash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\0Bash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='(B)?(?(1)ash|x)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\N{LATIN SMALL LETTER A}')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='(?=a)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a\\Z')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a{,2}')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a{')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='[\\b]')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a**')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='^*')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\b*')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a\\z')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\p{L}')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='(?<n>a)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='[a--b]')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\x{41}')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='(?i)bash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a{2}')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='}')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='[[:alpha:]]')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\x41')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='\\/')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='a*+')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_matcher_verdicts_equal_codexs_or_are_left_undecided (tests.test_adoption_status.ClientWiringTests.test_matcher_verdicts_equal_codexs_or_are_left_undecided) (matcher='[]a]')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1542, in test_matcher_verdicts_equal_codexs_or_are_left_undecided
+    self.assertIs(adoption_status.codex_matcher_loads(matcher), expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not None
+
+======================================================================
+FAIL: test_codex_runs_an_ai_memory_hook_only_when_enabled_and_trusted (tests.test_adoption_status.ClientWiringTests.test_codex_runs_an_ai_memory_hook_only_when_enabled_and_trusted) (state='\n[hooks.state."$TEST_HOME/.codex/hooks.json:sessi')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$SCRATCH/wt-u5/tests/test_adoption_status.py", line 1433, in test_codex_runs_an_ai_memory_hook_only_when_enabled_and_trusted
+    self.assertEqual((result["codex"]["ai_memory_hook_events"],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      result["codex"]["ai_memory_hook_events_trusted"]), (7, expected))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 7) != (7, 6)
+
+First differing element 1:
+7
+6
+
+- (7, 7)
+?     ^
+
++ (7, 6)
+?     ^
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.185s
+
+FAILED (failures=54, errors=1)

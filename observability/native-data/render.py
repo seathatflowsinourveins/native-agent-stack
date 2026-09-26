@@ -144,7 +144,11 @@ def dashboard():
         'sum by (type) (ecosystem_claude_code_token_usage_tokens_total)', source='ecosystem-prometheus',
         description='Only native exported samples in the selected range. This Prometheus counter has been '
                     'observed to undercount actual usage against the Loki api_request panels below (about half '
-                    'the total on a measured day); the cause is open. Cross-check against the cache-read '
+                    'the total on a measured day). The cause is identified (token-stack audit gap G1, '
+                    '2026-09-26): concurrent Claude Code processes export the same cumulative series, because the '
+                    'collector labels every one instance="unscoped" and OTEL_METRICS_INCLUDE_SESSION_ID is false, '
+                    'so each series holds whichever process wrote last and a raw sum drops the rest. '
+                    'Cross-check against the cache-read '
                     'Loki panel below (id 15): for the completed 2026-09-24 EDT day it reconciled with '
                     'transcript-based counters (ccusage) within about 1% once query_source=agent_summary was '
                     'excluded. The other three query_source-split panels (input, output, cache-creation tokens) '
@@ -173,7 +177,8 @@ def dashboard():
                         'the range total only when the query step equals $__interval; verify that in Grafana '
                         'before reading it as a total.',
             options={'legend': {'displayMode': 'table', 'placement': 'bottom', 'calcs': ['sum']}})
-    add(19, 'Claude provider telemetry · effort split (Prometheus; known to undercount)', 'timeseries', 0, 104, 12, 8,
+    add(19, 'Claude provider telemetry · effort split (Prometheus; overcounts while sessions overlap)', 'timeseries',
+        0, 104, 12, 8,
         'sum by (effort) (increase(ecosystem_claude_code_token_usage_tokens_total[$__rate_interval]))',
         source='ecosystem-prometheus',
         description='Per-interval increase, split by effort level (the metrics pipeline keeps the "effort" '
@@ -181,8 +186,11 @@ def dashboard():
                     'than a raw sum of the cumulative counter because the collector expires stale series '
                     '(deltatocumulative max_stale 1h) and sets no metric_expiration, so exposed series appear and '
                     'disappear with session activity; a plain sum by (effort) of the raw counter follows series '
-                    'lifetimes, not token use. Subject to the same undercount as the typed-counters panel; read it '
-                    'for effort-level shape over the selected range, not an absolute total.')
+                    'lifetimes, not token use. The series collision behind the typed-counters panel\'s undercount '
+                    '(G1) makes increase() overcount instead: each drop from one process\'s cumulative value to '
+                    'another\'s reads as a counter reset, so while sessions overlap the increase can exceed actual '
+                    'usage many times over. Read it for effort-level shape only, never as a total, until G1 is '
+                    'fixed.')
     return dict(uid='native-foundation-data', title='Native foundation · memory, retrieval and savings',
                 schemaVersion=39, version=4, editable=False, preload=True, timezone='browser', refresh='30s',
                 time={'from': 'now-6h', 'to': 'now'}, tags=['ecosystem', 'native', 'memory', 'tokens'],

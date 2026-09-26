@@ -142,8 +142,10 @@ from a later release or a default-branch clone. The command runs none of the
 selected tools. It parses the client files named below whole and in-process, emits no
 value from them, and opens no credential store (`~/.claude.json`,
 `~/.claude/.credentials.json`, `~/.codex/auth.json`). It prints command presence plus
-`client_wiring`: booleans, two hook-event counts, `null` for a file it could not read
-or parse, and the computed `complete`.
+`client_wiring`: booleans, three hook-event counts, `null` for a file it could not read
+or parse (the Codex hook counts also for a `hooks.json` that Codex's own parse rejects,
+and the trusted count for an ai-memory hook whose matcher it cannot evaluate; see
+below), and the computed `complete`.
 
 Add `--pinned-versions` to also report, per profile, whether each component's
 installed version matches its platform pin (`adoption/pins-<os>-<arch>.json`). It runs
@@ -154,11 +156,17 @@ killed once the probe exits, when the check is interrupted (Ctrl-C, SIGTERM or
 SIGHUP; a signal the check started with ignored, as under `nohup`, stays ignored,
 as it does for the bootstrap), and when the pin's time bound expires (TERM, then KILL
 2 s later); a probe that exits nonzero never counts as a match, whatever it printed.
-Components without a pin entry for the platform are reported unchecked. This flag is
-new after `v2026.09.25.1` as well, and its probe handling changed after `v2026.09.26`:
+Components without a pin entry for the platform are reported unchecked. Each profile
+also gets `pinned_versions_summary`, its matched, mismatched and unchecked component
+ids, and the report gets a top-level `pinned_versions_match`: `false` when any checked
+component differs from its pin, `null` when none could be checked. A mismatch changes
+neither `status` nor the exit code, which stay the prerequisite result. This flag is
+new after `v2026.09.25.1` as well. Its probe handling changed after `v2026.09.26`:
 that release's copy counts a probe's output whatever its exit status and, on timeout,
-kills only the probe itself. Run the check from a fresh worktree, not only from the main
-checkout, to confirm that worktree workers inherit the wiring.
+kills only the probe itself. The summary and `pinned_versions_match` changed after
+`v2026.09.26.2`: that release reports a mismatch only inside each component's row. Run
+the check from a fresh worktree, not only from the main checkout, to confirm that
+worktree workers inherit the wiring.
 
 The `token-efficiency` profile in [the adoption manifest](../adoption/manifest.json)
 is the selected set. It holds the context-and-usage layer's current choice (RTK,
@@ -176,14 +184,44 @@ clients. `client_wiring` checks three places:
   (optional since 2026-09-25: those servers now live at Codex user scope, so a fresh
   worktree inherits them; see
   [the Codex MCP scope decision](decisions/2026-09-25-codex-mcp-scope.md));
-- `codex`, the Codex home: `AGENTS.md` references `RTK.md` (RTK 0.49.0 gives Codex
-  instructions, not a hook); Context Mode is enabled and installed; `config.toml`
-  names the same three servers; hooks are on (`hooks_feature_enabled`); and the
-  number of `hooks.json` events that run ai-memory. Codex 0.155.1 ships its hooks
-  feature stable and on by default, and the recipe's `codex features enable hooks`
-  writes `[features] hooks = true`. Setting `hooks = false`, or the legacy
-  `codex_hooks = false` without a `hooks` key, turns off `hooks.json` and Context
-  Mode's bundled hooks together, so the count is then zero.
+- `codex`, the Codex home: the global instructions Codex loads contain `RTK.md`'s
+  text inline (`rtk_instructions`; RTK 0.49.0 gives Codex instructions, not a hook);
+  Context Mode is enabled and installed; `config.toml` names the same three servers;
+  hooks are on (`hooks_feature_enabled`); the number of `hooks.json` events that run
+  ai-memory; and how many of those events have an ai-memory hook Codex actually runs
+  (`ai_memory_hook_events_trusted`). Codex reads `AGENTS.override.md` when it has
+  text, else `AGENTS.md`, and passes the file to the model verbatim: it expands no
+  `@RTK.md` reference
+  ([`codex-rs/codex-home/src/instructions/mod.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-home/src/instructions/mod.rs),
+  the same order at `rust-v0.155.1`). So the pointer `rtk init -g --codex` writes does
+  not count, and neither does an inline copy that no longer matches `RTK.md`; the
+  comparison ignores whitespace and RTK's `<!-- rtk-owned: ... -->` line. To make it
+  true, replace the `@…/RTK.md` line in the file Codex reads with `RTK.md`'s own text,
+  and do it again whenever an RTK update changes `RTK.md`; `codex debug prompt-input`
+  then shows that text in the model's input. Codex runs a
+  `hooks.json` hook only when it is enabled and trusted: the user `config.toml`'s
+  `[hooks.state."<hooks.json path>:<event>:<group>:<handler>"]` `trusted_hash` equals the
+  hook's current hash. The check computes that hash as `codex-rs/hooks` does at
+  `rust-v0.155.1` and `rust-v0.157.1` and compares it in-process; six hashes that Codex
+  0.157.1's own app-server `hooks/list` returned are known answers in
+  `tests/test_adoption_status.py` (a local integration check, not an upstream test). A
+  hook edited after it was trusted, or trusted under another `CODEX_HOME` spelling
+  (Codex canonicalizes a set `CODEX_HOME`), counts as untrusted until `/hooks` trusts
+  it again. Codex loads no hook at all from a `hooks.json` its serde parse rejects: a
+  repeated field, `NaN`, a lone surrogate escape where it parses text, a number a
+  field cannot hold, nesting past serde_json's recursion limit, or a hook it cannot
+  hash (0.157.1's hook discovery then stops answering). The check follows that parse
+  and reports both Codex counts `null` for such a file. Codex also skips a group whose
+  matcher Rust's regex crate cannot compile; the check decides a matcher only when it
+  uses constructs Python's `re` and that crate parse alike, and otherwise reports the
+  trusted count `null` for an ai-memory hook behind it. Codex 0.157.1's own
+  `hooks/list` agreed with the check on 64 `hooks.json` shapes, 126 matchers and 12 trust states
+  ([retained comparison](../evidence/artifacts/adoption-status-truth-20260926/README.md)).
+  Codex 0.155.1 ships its hooks feature
+  stable and on by default, and the recipe's `codex features enable hooks` writes
+  `[features] hooks = true`. Setting `hooks = false`, or the legacy `codex_hooks =
+  false` without a `hooks` key, turns off `hooks.json` and Context Mode's bundled hooks
+  together, so both counts are then zero.
 
 The practice is applied on a host when all of these hold:
 
@@ -194,12 +232,19 @@ The practice is applied on a host when all of these hold:
   `prerequisites_missing` with exit 2. Neither includes `client_wiring`;
 - `client_wiring.complete` is `true`. It computes the wiring rule: every file parsed,
   every `claude`, `project` and `codex` boolean is `true` (each Codex server named in
-  the user or the project `config.toml`), and both hook counts are above zero;
-- each selected tool reports its pinned version. This command checks presence on
-  `PATH` only and does not establish the pins. For the tools a bootstrap installs,
-  `installed-versions.txt` from [bootstrap step 2](../adoption/bootstrap.md) runs each
-  pin's declared `version_probe` (Claude Code's pin is a floor); for the rest, compare
-  each recipe's version command with the `manifests/stack.json` version.
+  the user or the project `config.toml`), both hook counts are above zero, and every
+  Codex event that runs ai-memory runs it trusted (`ai_memory_hook_events_trusted`
+  equals `ai_memory_hook_events`). The rule changed after `v2026.09.26.2`: that
+  release's check accepts a bare `@RTK.md` reference and counts hooks whatever their
+  trust, so it reports `complete: true` for a Codex that sees no RTK instructions and
+  runs no ai-memory hook;
+- each selected tool reports its pinned version. Without `--pinned-versions` this
+  command checks presence on `PATH` only; with it, `pinned_versions_match` must be
+  `true` (Claude Code's pin is a floor). For the tools a bootstrap installs,
+  `installed-versions.txt` from [bootstrap step 2](../adoption/bootstrap.md) runs the
+  same `version_probe`; for the components it leaves unchecked (`npm-metadata` pins,
+  no pin), compare each recipe's version command with the `manifests/stack.json`
+  version.
 
 The other rows of the [machine list](token-efficiency-stack.json) are not in the
 profile, so this check treats them as optional: a host without them still follows
@@ -211,9 +256,12 @@ context-and-usage current choice. AgentsView, Claude HUD and otel-tui are viewer
 OmniRoute is an optional runtime. The Collector, Prometheus, Loki and Grafana rows
 belong to the `observability` profile.
 
-The check reports configuration, not activation. Plugin revisions, hook and project
-trust, Claude MCP registrations (`/mcp`), MCP server startup and one useful call per
-tool remain each client's own checks. A host records its JSON as its own evidence
+The check reports configuration, not activation. Apart from the Codex ai-memory hook
+trust above, plugin revisions and Context Mode's bundled hooks (Codex `/hooks`, or the
+app-server's `hooks/list`), project trust, Claude MCP registrations (`/mcp`), MCP
+server startup and one useful call per tool remain each client's own checks. For the
+instructions a Codex session actually receives, `codex debug prompt-input` renders the
+model-visible input without a model call. A host records its JSON as its own evidence
 through a PR ([contributing host evidence](contributing-evidence.md)); another
 host's result, the reference host's included, is not its acceptance.
 
@@ -226,6 +274,15 @@ On the workstation, 16 Sonnet 5 workflow subagents each used one tool on real wo
 - Context Mode, jCodeMunch, Serena, SocratiCode and ai-memory as native MCP;
 - Headroom as MCP through MCPorter;
 - QMD, Repomix, TOON, ast-grep, codebase-memory-mcp, Context Hub, MarkItDown, agentsview and otel-tui as CLIs.
+
+These 16 are not the `token-efficiency` profile, whose 14 `component_ids` the
+[coverage check](#coverage-check) tests. Ten of them are profile rows: RTK, Context
+Mode, Serena, SocratiCode, ai-memory, Headroom, QMD, Repomix, TOON and MarkItDown. The
+other six are the optional rows named there: jCodeMunch, ast-grep, codebase-memory-mcp,
+Context Hub, agentsview and otel-tui. The profile's remaining four are the two native
+clients, ccusage (not run here) and MCPorter (here only as Headroom's bridge).
+`tests/test_adoption_status.py` checks this split against the receipt's tool list, so
+a profile change has to restate it.
 
 Three passed only on a second attempt, each after a real binding constraint:
 - Context Mode reads only under the session project root;
