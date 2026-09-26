@@ -202,6 +202,16 @@ KEYRING_BLOCKED = {
     "keyctl rlist 123456789": "keyring_payload_read",
     "keyctl list 123456789": "keyring_payload_read",
     "keyctl rlist @a": "keyring_payload_read",
+    # GPT-6 re-check of 74508203: a key id before a redirection was read as its descriptor.
+    "keyctl rlist 123456789 </dev/null": "keyring_payload_read",
+    "keyctl list -4": "keyring_payload_read",
+    "keyctl list %keyring:native-agent-stack": "keyring_payload_read",
+    "keyctl list": "keyring_payload_read",
+    "keyctl list @u": "keyring_payload_read",
+    "keyctl rlist @u 2>/dev/null": "keyring_payload_read",
+    "keyctl list %:native-agent-stack": "keyring_payload_read",
+    # The same re-check: quote removal merged "$KK_DEMO_TOKEN"x into another name.
+    "python3 scripts/kernel_keyring.py exec kk_demo KK_DEMO_TOKEN -- sh -c 'echo \"$KK_DEMO_TOKEN\"x'": "keyring_variable_reference",
     "keyctl rlist 2>/dev/null %user:native-agent-stack:tavily_api_key": "keyring_payload_read",
     "sudo keyctl rlist 123456789": "keyring_payload_read",
     "python3 -c 'import subprocess; subprocess.run([\"keyctl\", \"rlist\", \"123\"])'": "keyring_payload_read",
@@ -303,6 +313,8 @@ KEYRING_BLOCKED = {
     f"{EXEC} cat /proc/self/environ": "process_environment",
     # tvly auth without JSON output prints the key's first eight and last four characters.
     "tvly auth": "native_token_print",
+    # A named-descriptor redirection is not the --json flag (GPT-6 re-check of 74508203).
+    "tvly-keyring {fd}>--json auth": "native_token_print",
     "~/.local/bin/tvly auth > /tmp/auth.txt": "native_token_print",
     f"{EXEC} tvly auth": "native_token_print",
     "tvly-keyring auth": "native_token_print",
@@ -378,6 +390,9 @@ ALLOWED = [
     "tvly-keyring search \"<query>\" --json",
     "tvly-keyring research run \"<question>\" --model pro --json",
     "tvly-keyring auth --json",
+    "tvly --json auth",
+    # A query word that names a builtin, followed by long options, is data (re-check false block).
+    "tvly-keyring search \"export\" --depth basic --max-results 5 --json",
     # A URL whose last path segment is env or printenv is an argument, not a launched program.
     "tvly-keyring extract \"https://www.gnu.org/software/coreutils/env\" --json",
     "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly extract https://man7.org/linux/man-pages/man1/printenv.1.html/printenv --json",
@@ -390,13 +405,6 @@ ALLOWED = [
     "keyctl request2 user native-agent-stack:tavily_api_key callout-info",
     # keyctl list and rlist on an unambiguous keyring (special ID, -1 to -6, or a keyring by name), and
     # without a target (a usage error that reads nothing).
-    "keyctl list @u",
-    "keyctl rlist @s",
-    "keyctl list -4",
-    "keyctl rlist @u 2>/dev/null",
-    "keyctl list %:native-agent-stack",
-    "keyctl list %keyring:native-agent-stack",
-    "keyctl list",
     "python3 -c 'import subprocess; subprocess.run([\"keyctl\", \"list\", \"@u\"])'",
     # The documented exec inside a shell, eval or env, twice, with a quoted or split-quoted argument, and
     # behind launchers: exec's own argument, parsed more than once, is still exempt.

@@ -544,10 +544,11 @@ to the keyring. It blocks, by reason code:
   check that the specified keyring is a keyring", keyctl(1)); on a `user` key
   they print its payload as integers (`act_keyctl_list` and
   `act_keyctl_rlist` in keyutils Git master, commit c076dff2, read
-  2026-09-26). They pass only on an unambiguous keyring: `@t`, `@p`, `@s`,
-  `@u`, `@us`, `@g` or `-1` to `-6`, or a keyring by name (`%:name`,
-  `%keyring:name`); a serial, `%user:...` or `@a` (the request_key
-  authorisation key) is blocked. `keyctl show` reads only keyrings and
+  2026-09-26). Both are blocked whatever the target: a first version allowed
+  them on keyring targets, and a re-check found that a key serial written
+  before a redirection (`keyctl rlist 123456789 </dev/null`) was read as the
+  redirection's descriptor and passed. `kernel_keyring.py status` answers
+  whether the key is present. `keyctl show` reads only keyrings and
   passes, as do `request`, `request2` and `prequest2`, which print only a
   key ID. keyctl accepts only the whole command name: its lookup skips every
   name longer than the word typed, although keyctl(1) says a shortening
@@ -605,7 +606,14 @@ removal, with each backslash-newline joined first, so
 split exec argument, `stdbuf -o0` before an interpreter, `keyctl rlist` on
 a user key and `tvly auth > --json` passing the first version of these
 rules. Each was reproduced against that version before the fix and is now a
-regression case in `tests/test_secret_path_guard.py`.
+regression case in `tests/test_secret_path_guard.py`. A GPT-6 re-check of the
+repair found four more, each reproduced and fixed the same day:
+`"$KK_DEMO_TOKEN"x`, which quote removal had merged into another name (both the
+written and the unquoted text are now read); a key serial before a redirection
+(list and rlist are now blocked outright); bash's named descriptor
+(`tvly auth {fd}>--json`, now parsed as a redirection); and a false block of a
+search query `export` followed by `--max-results` (declare/export flags are now
+short options only).
 
 The documented `store`, `status`, `revoke` and `exec ... -- tvly ...` forms
 pass, and `tests/test_secret_path_guard.py` checks every keyring command in

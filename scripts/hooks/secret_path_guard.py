@@ -239,7 +239,9 @@ def redirection_width(words: list[str], index: int) -> int:
     number before it and the `-` of `<<- EOF`), or 0 when it starts none. A digit before an operator is
     read as its descriptor, since shlex splits `2>` and `2 >` alike."""
     word = words[index]
-    if word.isdigit() and index + 1 < len(words) and REDIRECTION.match(words[index + 1]):
+    # A descriptor before the operator: a number, or bash's named form `{varname}` (`{fd}>file`).
+    if (word.isdigit() or re.fullmatch(r"\{[A-Za-z_][A-Za-z0-9_]*\}", word)) and index + 1 < len(words) \
+            and REDIRECTION.match(words[index + 1]):
         return 1 + redirection_width(words, index + 1)
     if not REDIRECTION.match(word):
         return 0
@@ -484,7 +486,7 @@ def dumps_after_source(words: list[str]) -> bool:
     if is_environment_dump(words):
         return True
     return program in {"declare", "typeset", "export", "readonly", "local"} and any(
-        w.startswith("-") and set(w[1:]) & set("px") for w in words[1:])
+        w.startswith("-") and not w.startswith("--") and set(w[1:]) & set("px") for w in words[1:])
 
 
 def sources_credential_file(words: list[str]) -> bool:
@@ -529,8 +531,11 @@ def tvly_prints_key(words: list[str]) -> bool:
     if program_of(words) != "tvly":
         return False
     arguments = command_arguments(words)
-    positional = [w for w in arguments if not w.startswith("-")]
-    return positional[:1] == ["auth"] and "--json" not in arguments and "--help" not in arguments
+    # Redirection-shaped words (`{fd}>--json`, `3>x`) are never the subcommand.
+    positional = [w for w in arguments if not w.startswith("-") and not re.search(r"[<>]", w)]
+    if positional[:1] != ["auth"]:
+        return False
+    return "--json" not in arguments and "--help" not in arguments
 
 
 def keyctl_reads_payload(words: list[str]) -> bool:
@@ -542,10 +547,10 @@ def keyctl_reads_payload(words: list[str]) -> bool:
         return False
     if arguments[at] in KEYCTL_PAYLOAD_COMMANDS:
         return True
-    if arguments[at] in KEYCTL_LIST_COMMANDS and at + 1 < len(arguments):
-        target = arguments[at + 1]
-        return not (target in KEYCTL_KEYRING_TARGETS or target.startswith(KEYCTL_KEYRING_NAMED))
-    return False
+    # list and rlist print any key's payload as integers when the target is not a keyring. Target parsing
+    # (descriptor digits, redirections) proved bypassable in review, and `kernel_keyring.py status`
+    # answers presence, so both are blocked whatever the target.
+    return arguments[at] in KEYCTL_LIST_COMMANDS
 
 
 def launched_commands(words_list: list[list[str]]) -> list[list[str]]:
@@ -575,8 +580,11 @@ def mentions_injected_variable(text: str, variable: str) -> bool:
     of a `kernel_keyring.py exec <name> <ENV_VAR> --` (that argument is never a reference). Matching
     the argument's own span, not subtracting a count, keeps any other mention, at any depth, visible."""
     name = rf"(?<![A-Za-z0-9_]){re.escape(variable)}(?![A-Za-z0-9_])"
+    # The written text may quote the script path and each argument (`"$SP/kernel_keyring.py" exec n "V" --`).
+    q = "[\"']?"
     arguments = [match.span(1) for match in re.finditer(
-        rf"(?<![^\s/]){re.escape(KEYRING_SCRIPT)}\s+exec\s+[^\s;&|()<>]+\s+({name})\s+--(?=\s|$)", text)]
+        rf"(?<![^\s/\"']){re.escape(KEYRING_SCRIPT)}{q}\s+exec\s+{q}[^\s;&|()<>\"']+{q}\s+{q}({name}){q}\s+--(?=\s|$)",
+        text)]
     return any(not any(start <= match.start() < end for start, end in arguments)
                for match in re.finditer(name, text))
 
@@ -592,7 +600,9 @@ def keyring_reason(texts: tuple[str, str], words_list: list[list[str]]) -> str |
     started = [parsed for parsed in map(keyring_exec, words_list) if parsed is not None]
     # Any mention of an injected variable except exec's own <ENV_VAR> argument names it: in the started
     # command, in code piped into it or in a here-document it reads.
-    if any(mentions_injected_variable(texts[1], variable) for variable in {name for name, _ in started if name}):
+    # Both texts: unquoted() joins KK_DEMO_TO"KEN" into the name, but also merges "$KK_DEMO_TOKEN"x into another one.
+    if any(mentions_injected_variable(text, variable)
+           for text in texts for variable in {name for name, _ in started if name}):
         return "keyring_variable_reference"
     for _variable, started_command in started:
         inner = expand(shlex.join(started_command)) if started_command else []
