@@ -1910,6 +1910,7 @@
       ],
       "evidence_ids": [
         "native-tavily-cli-20260920",
+        "tavily-research-qualification-20260926",
         "native-tavily-session-20260920",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921"
