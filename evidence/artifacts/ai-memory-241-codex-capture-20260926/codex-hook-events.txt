@@ -1,0 +1,8 @@
+# ~/.codex/hooks.json at the probe: event -> commands (ai-memory on 2.4.1 / ai-memory other prefix / non-ai-memory)
+SessionStart	1	0	0
+UserPromptSubmit	1	0	0
+PreToolUse	1	0	0
+PostToolUse	1	0	0
+PreCompact	1	0	0
+Stop	1	0	0
+SessionEnd	1	0	0

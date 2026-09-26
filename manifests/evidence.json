@@ -13428,8 +13428,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-ai-memory-2-4-0-release-review.md",
-      "sha256": "8c705db0a4c61d7dfb7493d1ef1cca690719a0b79b2d69dd5d636422dba58c43",
-      "bytes": 17752
+      "sha256": "613ee93763cafa25dce96b8578a2c349aff8f46e33ce9cfc441841faff1af07d",
+      "bytes": 18032
     },
     {
       "path": "docs/decisions/2026-09-25-codex-mcp-scope.md",
@@ -13443,8 +13443,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
-      "sha256": "89a5567b801ac445ca6d056dd56436c21b19289a4983d7cae76fabd2a9db7c1d",
-      "bytes": 32429
+      "sha256": "127a49a9980d02a01a3b917a4b9302fbd8a8c63442ab622cf37669f4df66ed54",
+      "bytes": 32620
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
@@ -13840,6 +13840,41 @@
       "path": "docs/upstream-maintenance-pilot.md",
       "sha256": "4b3410eed8701056b412c65938aac3a453e4d72a2fb70ee59313170433c970de",
       "bytes": 7856
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md",
+      "sha256": "abeb87a13e2851e37d94cedae01f66f50560a96ea2af41b157a867f75816ff2c",
+      "bytes": 3713
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/capture-attempt1-repro.txt",
+      "sha256": "2196f6e95b6ea2aee75544399f425d71b68190f9e68260923598c46d8eb45d14",
+      "bytes": 571
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/capture-attempt1-untrusted-dir.txt",
+      "sha256": "2775c1390d050773c457af82826d41a00a2ec459e500259a811e16ca53f57cbb",
+      "bytes": 450
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/capture.txt",
+      "sha256": "663966756428553d35a222e5886b61246c8eecf27db00ae7e0ee10e6252ebf61",
+      "bytes": 631
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/codex-hook-events.txt",
+      "sha256": "a349159cd672da6a800a7fb81eb6e93afa9460a894c6f874c0aa69576065b88f",
+      "bytes": 238
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/codex-stderr-hook-lines.txt",
+      "sha256": "f0ca94f5b3fc46ac0d25d5be5429f80046e17cb6b30a1d9c0792b43176859a78",
+      "bytes": 474
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/codex_capture_count.py",
+      "sha256": "0ab020d17171b4c51a31aa19a9349ec51cdd1afd8a7b732ee47d03df0a3ecd79",
+      "bytes": 1244
     },
     {
       "path": "evidence/artifacts/alpaca-platform-landscape-20260926/README.md",
@@ -35588,8 +35623,8 @@
     },
     {
       "path": "evidence/receipts/ai-memory-241-qualification-20260925.json",
-      "sha256": "6662b134659528ff6ae3ce5c424a3312c85aee75463b361860ad716506b74a62",
-      "bytes": 12208
+      "sha256": "b65978418ac704d54a1697daa3a527ee928894ec1749b25f883a28595f38a886",
+      "bytes": 14056
     },
     {
       "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
