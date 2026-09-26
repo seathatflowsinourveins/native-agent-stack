@@ -9,6 +9,7 @@ placeholder rendering and `claude mcp add` argument order are tested as data.
 
 import io
 import json
+import re
 import string
 import subprocess
 import sys
@@ -621,7 +622,9 @@ class PortableTopRuleTests(unittest.TestCase):
     `/advisor`. The file loads into every session and every child that reads CLAUDE.md, so the
     procedure replaced text instead of adding to it: the file stays within 5% of the 881 words
     (`wc -w`) it had before. docs/harness-defaults.md#upstream-verification-and-compounding-learning
-    holds the long form."""
+    holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
+    `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares
+    its own anti-pattern log."""
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
     BASELINE_WORDS = 881  # wc -w of the template at dde28cc2, before the procedure
@@ -643,6 +646,8 @@ class PortableTopRuleTests(unittest.TestCase):
         "same turn",
         "anti-pattern log",
     )
+    # A relative path such as docs/harness-defaults.md; one that exists here is absent from other projects.
+    RELATIVE_PATH = re.compile(r"[\w.-]+(?:/[\w.-]+)+")
 
     @staticmethod
     def top_rule(text: str) -> str:
@@ -659,6 +664,8 @@ class PortableTopRuleTests(unittest.TestCase):
     def errors(cls, text: str) -> list[str]:
         rule = cls.top_rule(text)
         errors = [f"the top rule lacks {phrase!r}" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]
+        errors += [f"the top rule names this repository's {path}, which other projects lack"
+                   for path in dict.fromkeys(cls.RELATIVE_PATH.findall(rule)) if (ROOT / path).exists()]
         words = len(text.split())  # the same whitespace-separated count as `wc -w`
         if words > cls.ceiling():
             errors.append(f"{words} words, over {cls.ceiling()} ({cls.BASELINE_WORDS} + 5%)")
@@ -667,9 +674,10 @@ class PortableTopRuleTests(unittest.TestCase):
     def test_the_template_states_the_procedure_within_the_word_budget(self):
         self.assertEqual(self.errors(self.TEMPLATE.read_text(encoding="utf-8")), [])
 
-    def test_the_check_rejects_a_missing_step_and_a_padded_template(self):
+    def test_the_check_rejects_a_missing_step_a_repository_path_and_a_padded_template(self):
         text = self.TEMPLATE.read_text(encoding="utf-8")
         self.assertEqual(len(self.errors(text.replace("upstream citation", "citation"))), 1)
+        self.assertEqual(len(self.errors(text.replace("same turn", "same turn (docs/harness-defaults.md)"))), 1)
         padded = text + " word" * max(1, self.ceiling() + 1 - len(text.split()))
         self.assertEqual(len(self.errors(padded)), 1)
         self.assertEqual(len(self.errors("# Native engineering defaults\n\nNo rule.\n")), len(self.PROCEDURE_PHRASES))

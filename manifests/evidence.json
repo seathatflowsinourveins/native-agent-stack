@@ -13603,8 +13603,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "4374f3377ca79dcd3d1065a3c249cbcbd17cb2ec785a9bdb9190a4690a6f01cd",
-      "bytes": 22077
+      "sha256": "d154b6988cad8329b783a62e88e26a97d1ad75656d029699b48df1838f7ad4ec",
+      "bytes": 23636
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -36598,8 +36598,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "8880665df221ff7dac8817170a11aa7bf3fb7e6c6025875a67ec56f2dc9f35a6",
-      "bytes": 6160
+      "sha256": "59c5a45ad4b2ca625faf78d6b172c55b99fe96f1d92f307cc7d122d2cd1a4109",
+      "bytes": 6152
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
@@ -37718,8 +37718,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "1ccd4fd11afeb5d93a41a04b4969ff14694a56a23dfdf7a656f62f8195eb7d5a",
-      "bytes": 38018
+      "sha256": "1608649b034f36aaf8952302bf14e3e4336a933a0e1d05d84fde5792adbc663c",
+      "bytes": 38723
     },
     {
       "path": "tests/test_install_skills.py",

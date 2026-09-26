@@ -6,7 +6,7 @@
 2. Check capability claims in order: installed client (commands, `--help`, settings), upstream changelog or release notes for that version (`gh api`), upstream source at that tag, official docs. An absence claim needs at least the first two, else write "not found in X, Y".
 3. Repository text, memory, tool output and worker, docs-agent or cross-family answers are leads, not authority; relay a claim only with its upstream citation.
 4. Apply the token practice below in every lane.
-5. When a claim or action proves wrong, record the correction and its verification path the same turn, in memory and the anti-pattern log (`docs/harness-defaults.md`).
+5. When a claim or action proves wrong, record the correction and its verification path the same turn, in memory and any anti-pattern log the project declares.
 
 ## Core rule
 

@@ -732,8 +732,11 @@ class UpstreamVerificationSectionTests(unittest.TestCase):
         errors = []
         if cls.cells(rows[0]) != cls.COLUMNS:
             errors.append(f"header {cls.cells(rows[0])} is not {cls.COLUMNS}")
-        if not all(re.fullmatch(r":?-{3,}:?", cell) for cell in cls.cells(rows[1])):
-            errors.append("the second table line is not a delimiter row")
+        # GFM 0.29-gfm, 4.10 Tables: "The header row must match the delimiter row in the number of
+        # cells. If not, a table will not be recognized".
+        delimiter = cls.cells(rows[1])
+        if len(delimiter) != len(cls.COLUMNS) or not all(re.fullmatch(r":?-{3,}:?", cell) for cell in delimiter):
+            errors.append(f"the second table line is not a delimiter row of {len(cls.COLUMNS)} cells")
         for number, line in enumerate(rows[2:], 1):
             cells = cls.cells(line)
             if len(cells) != len(cls.COLUMNS) or not all(cells):
@@ -756,13 +759,14 @@ class UpstreamVerificationSectionTests(unittest.TestCase):
         link = f"docs/harness-defaults.md#{anchor}"
         self.assertTrue(link in (ROOT / "AGENTS.md").read_text(encoding="utf-8"), f"AGENTS.md does not link {link}")
 
-    def test_the_check_rejects_a_renamed_column_an_undated_row_and_an_empty_cell(self):
+    def test_the_check_rejects_a_renamed_column_an_undated_row_an_empty_cell_and_a_short_delimiter_row(self):
         good = ("## Upstream\n\n### Anti-pattern log\n\n"
                 "| Date | Anti-pattern | What happened | Rule or check that prevents it | Where enforced |\n"
                 "| --- | --- | --- | --- | --- |\n| 2026-09-26 | a | b `x \\| y` | c | d |\n\n## Next\n")
         self.assertEqual(self.log_errors(good), [])
         for mutant in (good.replace("| Where enforced |", "| Enforced |"), good.replace("| 2026-09-26 |", "| 2026-09-31 |"),
-                       good.replace("| c |", "|  |"), good.replace("### Anti-pattern log", "### Lessons")):
+                       good.replace("| c |", "|  |"), good.replace("### Anti-pattern log", "### Lessons"),
+                       good.replace("| --- | --- | --- | --- | --- |", "| --- | --- | --- | --- |")):
             with self.subTest(mutant=mutant):
                 self.assertEqual(len(self.log_errors(mutant)), 1)
 
