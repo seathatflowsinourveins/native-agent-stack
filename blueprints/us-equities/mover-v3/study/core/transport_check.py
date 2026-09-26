@@ -133,16 +133,36 @@ def reproduction_from_sealed(planner, store, changed_paths: list, fetch_prefix: 
 
 def seal_live_samples(store, transports, seed, holdout_stores, live_root, clock=None) -> dict:
     """{label: sha256} of each snapshot's sealed live sample. A label whose sample is already sealed under live_root
-    (a run killed after sealing it) is read, never fetched again, so a sample is drawn at most once."""
+    (a run killed after sealing it) is validated and recovered only for the same source and seeded requests,
+    never fetched again, so a sample is drawn at most once."""
     from pathlib import Path
-    from core.canon import sha256_bytes
+    from core.canon import sha256_bytes, sha256_file
+    from core.store import SealError, Store
     shas = {}
     for label, st in [("stage", store), *holdout_stores]:
         d = Path(live_root) / label
+        # Bind the source's requests and sealed attempts (raw-page digests, not parsed outcomes), as collect's
+        # base_snapshots bind its inputs. Follow core.holdout.collect's recovery pattern at 803bc351.
+        source = {"binding": st.binding, "requests": st.request_records(), "attempts": {
+            key: [{**attempt, "pages": [sha256_bytes(raw) for raw in attempt["pages"]]}
+                  for attempt in st.history.get(key, []) + [st.state[key]]] for key in sorted(st.req)}}
+        identity = {"label": label, "seed": seed, "source_sha256": sha256_bytes(dumps(source).encode("utf-8")),
+                    "requests": sorted(record(r) for _, reqs in live_sample(st, seed=seed) for r in reqs)}
         if (d / "ledger.jsonl").exists():
-            shas[label] = sha256_bytes((d / "ledger.jsonl").read_bytes())
+            sha = sha256_file(d / "ledger.jsonl")
+            try:
+                live = Store.read(d, sha)
+            except (OSError, ValueError, KeyError, EOFError) as exc:
+                raise SealError("live sample snapshot is invalid or partially written") from exc
+            if live.binding != {"identity": identity}:
+                raise SealError("live sample snapshot binding differs from the source or seeded requests")
+            if live.request_records() != identity["requests"] or set(live.state) != set(live.req):
+                raise SealError("live sample snapshot is partially written: requests or completion stamps differ")
+            shas[label] = sha
+        elif (d / "pages").exists():
+            raise SealError("live sample snapshot is partially written: cannot overwrite or fetch it again")
         else:
-            shas[label] = fetch_live(st, transports, seed=seed, clock=clock).write(d)
+            shas[label] = fetch_live(st, transports, seed=seed, clock=clock).write(d, binding={"identity": identity})
     return shas
 
 
