@@ -13188,13 +13188,13 @@
     },
     {
       "path": "catalogs/us-equities/models.json",
-      "sha256": "9dfe1501414acea4b61103294ca38e76e3555dcfc12b22f3c34e0339d253f56b",
-      "bytes": 33132
+      "sha256": "1d27c65593ab6dc8a0d13de36f5a51298c9ff34afcbaf00b5627731367207f38",
+      "bytes": 35274
     },
     {
       "path": "catalogs/us-equities/models.md",
-      "sha256": "798b07a2703bb53cc253caa5b2a460fb75ed3b81ea9ebce7ecf24ef33671ad76",
-      "bytes": 21253
+      "sha256": "b853774576c18967be27d6addf0d349effc9d884c8b90043a1e7f1ee7ab58101",
+      "bytes": 23085
     },
     {
       "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
