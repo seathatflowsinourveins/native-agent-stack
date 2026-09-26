@@ -3314,6 +3314,24 @@
         "At run time the installed guard hook did not inspect commands started by kernel_keyring.py exec. The keyring rules were added after the runs, in the change that records this receipt."
       ],
       "path": "evidence/receipts/tavily-research-qualification-20260926.json"
+    },
+    {
+      "id": "local-inference-c2-serving-switch-20260926",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "llama-cpp"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, the production generation unit nativestack-generation.service (llama.cpp b11146 serving unsloth/Qwen3.8-27B-GGUF UD-Q4_K_M at revision 4ca7207) was switched by a systemd --user drop-in from the C0 serving profile (36 of 65 layers on the GPU) to the li26 C2 profile (--gpu-layers 99 --n-cpu-ffn 20 --spec-type draft-mtp --spec-draft-n-max 3), after the preregistered li26 comparison selected C2 in its final decision (change_serving_profile). On the frozen 360-filing 8-K item-extraction task, C2 predicted the same item sets as the C0 control on every filing (micro-F1 0.9909 for both; paired bootstrap bounds 0.0), every reply was valid JSON, and its median decode was 26.28 tokens/s against C0's 5.25, with no memory or deadline failure. M (MiMo-V2.6-Distill-Qwen-9B Q8_0) was faster still but failed non-inferiority (lower bound -0.0560). After the switch, the unit answered /health 200 in about 6 s and the bounded structured check returned 42. Read-only rechecks, the llama-cpp install host receipt at 11:26Z and the use host receipt at 12:41Z, found the drop-in in effect, the served file at its pinned SHA-256 and the decision reproducible in memory from the retained state.",
+      "limitations": [
+        "Native execution on this host, one run per arm, under the frozen protocol: greedy decoding with thinking disabled, about 17 output tokens per filing, and labels taken from the filer-declared header ITEMS. Production keeps its own sampling and reasoning defaults, so C2's decode gain and its MTP draft acceptance (4,735 of 4,737 drafted tokens) are not established for production's sampled or thinking requests. No production-workload measurement followed the switch.",
+        "Speed and memory are this host's, under its load at the time: a shared WSL2 desktop with the Windows-side GPU applications closed for every window. Those closes went by image name, with a forced second pass, rather than by PID as the plan's README says, and further applications outside its list were closed before window 3 under the user approval that the coordinator recorded. This is not an isolated benchmark, and run-to-run variance is unmeasured.",
+        "C2's measured peak whole-device use was 20,314 MiB (minimum 3,829 MiB free) with those applications closed, and after the switch the device showed 20,256 MiB used and 3,887 MiB free. Production has no free-memory guard like the windows' 3,072 MiB reserve, so Windows-side GPU applications reopened later can exhaust device memory. The rollback in data.rollback restores the pre-switch C0 profile.",
+        "The rollback was not exercised after the switch. The base unit file (C0, 36 GPU layers) and the model file are unchanged.",
+        "The switch and its immediate checks come from the coordinator's dated operations log; the commands' raw output is not retained in the repository. The read-only rechecks are in the two llama-cpp host receipts of 2026-09-26, which carry only self reviews. The use receipt was re-recorded at 12:41Z because its unpublished first recording (11:26Z) ran analyze.py --out into a temporary directory inside the checkout; the new one re-derives the decision in memory and writes no file. The catalog pin for llama-cpp stays b11057 (0.4.1-dev) in manifests/stack.json and catalogs/sota-convergence, and this receipt does not rebind it.",
+        "The experiment record retains the failed and refused attempts: the acquisition's first attempt (state_dir_must_be_owner_only, refused before any SEC request) and C2's admission refusal in window 2 (17,366 MiB free against 17,535 MiB required).",
+        "The claim is limited to this host and task. It establishes no frontier parity, hand-checked accuracy, catalyst or trading value, long-context or thinking-mode quality, isolated throughput or saving, and B and X have no result."
+      ],
+      "path": "evidence/receipts/local-inference-c2-serving-switch-20260926.json"
     }
   ],
   "files": [
@@ -3489,8 +3507,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "b971a04054aef72604c7fa11aff65cd6861691097aca61ecf2619fe37a7eacf7",
-      "bytes": 36954
+      "sha256": "eb9764daa19251d4b66cce2139322b73caeb352680ea42fc4452c5eef46f5155",
+      "bytes": 37421
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3554,8 +3572,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "fa8313792673f2c1e3acd3e0703f11e28954b0fb00c00e64528ab34b75ed03f6",
-      "bytes": 19226
+      "sha256": "5a89c624516d9983c5da629636555bbc0fa469895bd01235ee8ff6147ea076f1",
+      "bytes": 19228
     },
     {
       "path": "adoption/paired/README.md",
@@ -3589,8 +3607,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "af8a2486915d911ea2430150e57278e54d53715bf43d2316d8e40e86760ed339",
-      "bytes": 27217
+      "sha256": "44bd9043de79925e7abb0859fbbb600b85d568c856002d54f0bab2b886f47964",
+      "bytes": 28145
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -3599,13 +3617,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "bf38d3820a86c37c762ba81ca58b61402ac2b7b41319dd0592569ecdc04d11a1",
-      "bytes": 14890
+      "sha256": "235d9284a3c47b6c8abf18347c4143897ee518b80e7adef592781d3c0b6d15cb",
+      "bytes": 15132
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "1e8d64a35da17af80b73b3039fc576011c8333c1d4d61ae84d099110ac8e2ee2",
-      "bytes": 52630
+      "sha256": "f66a0663b2d0090c428e433c990c4fb7d336f0c44cf485f43b365c78523ab519",
+      "bytes": 52724
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3654,8 +3672,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "1044688dd6c1d4f82441edc349b60d6b1d182d30e6cea8bd5fc9f06b119f7146",
-      "bytes": 8414
+      "sha256": "3381b01c3b89238ac41e90f5547b9aac6f32580c20f5d470d33e3b2f5245b892",
+      "bytes": 8779
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
@@ -4420,8 +4438,8 @@
     },
     {
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/README.md",
-      "sha256": "28ba9bf869b7f8882fda1f2e80a620fe5478aeb1d4f46b7bb8b7bfa862c2aae4",
-      "bytes": 17678
+      "sha256": "dac3aaec727dc59f853fd7440fd45e3ecefbf13eb81ade4caa54a37a6178b68a",
+      "bytes": 21221
     },
     {
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py",
@@ -4440,8 +4458,8 @@
     },
     {
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
-      "sha256": "21e78164701c9c6df0f7c3934c016867607b3829066694536c2360084c94aa3c",
-      "bytes": 12576
+      "sha256": "0dcc14a53f1fd3fb07770a95d03305883fde3b8abfff64c9b405f6d5e1455de1",
+      "bytes": 25918
     },
     {
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/plan.json",
@@ -4452,6 +4470,61 @@
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/prompt.txt",
       "sha256": "faf9273a6807e982154667a8654ec2cff637cf57c8d85c34093e615876ae1d58",
       "bytes": 2485
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/acquisition-summary.json",
+      "sha256": "c775d341ea2b0750cd368386b373e3639197ae0819d69131d7a9d3f5a09c68fa",
+      "bytes": 1470
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/decision.json",
+      "sha256": "672be297908b9832b77949d2c8e15b3972f3acc4fbd12c92cef717f61d05d3e4",
+      "bytes": 8303
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/results.md",
+      "sha256": "0f42a99d031e72d4c7e31d240b734936d68b776a982b968a7ec483401274b294",
+      "bytes": 16012
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T050938Z/C0/window.json",
+      "sha256": "7a515078bdd51fabd0d68e61abbf760fd81be3bcf522e58652184197384c8ceb",
+      "bytes": 493
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T050938Z/window-summary.json",
+      "sha256": "d4c735636386148534bceb7c3229aaeefbfa77f5ad896a124eeee17c241812dd",
+      "bytes": 540
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/C1/window.json",
+      "sha256": "64fa973e429a681d6a8a682aa202cafc308cd6770928da3a0fdf0a34acaa716d",
+      "bytes": 493
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/C2/window.json",
+      "sha256": "56a16e8969b4cd5c13b61ebc1cd293651950a4fb6e9055b0a89c3e21e5a2ceee",
+      "bytes": 486
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/M/window.json",
+      "sha256": "897889130228e3d816e1802c0bc769a7d1f453700261d3b5c5ceea9925247a07",
+      "bytes": 493
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T093317Z/window-summary.json",
+      "sha256": "5a515ada7314832152740eba8512fc58abd06262a12dfa6adac38310770e5ce2",
+      "bytes": 545
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T102638Z/C2/window.json",
+      "sha256": "fa7f3ad77f2dd706f2969d5a942401c1e97d3fdfa816c24cfff731f48b2de436",
+      "bytes": 493
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/results/runs/w-20260926T102638Z/window-summary.json",
+      "sha256": "4f212c49f30e6c8a74e7b96864d5937c50aad4fd6f1e701123e8ffcc64122b6a",
+      "bytes": 540
     },
     {
       "path": "blueprints/convergence-practice/local-inference-latest-20260926/window.sh",
@@ -8020,8 +8093,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "659415aa9b276a6abf6d24d2243cc1f17c13dcc8d5af26863bfea85f9daa7c55",
-      "bytes": 481964
+      "sha256": "f42a01d9c69faa348a057485bd6805a6677d1c66d66257557ebbb23fafeb7480",
+      "bytes": 482163
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -12795,8 +12868,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "aa8fe9692474494010d29008a864b8d1550a94f4a3c84750c3c46b9ed4353386",
-      "bytes": 189656
+      "sha256": "675416e13d771bb65e154dfad33d8b5d10d708c418c517e3b84618f651a02471",
+      "bytes": 189662
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -12850,7 +12923,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "bfef40d5740506a491e4d41307fe521ae7bc5609b6342ed3db6b7779e3ed2d3b",
+      "sha256": "b082dd8a05519d0cc435cd7720061adce858cdfadfdcb629794c5adca8e34bb6",
       "bytes": 287241
     },
     {
@@ -12860,8 +12933,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "84896aa579671af3e96889a6fba5af500bed6371bd6c90a7a727fc3cd9e87a06",
-      "bytes": 248920
+      "sha256": "ac3d848af06ea8b8c22889a86e8d68806036fbfb4be64ee27396540a5f7b2540",
+      "bytes": 248908
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -13295,7 +13368,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "3b6ebfa70b9412483c0325eb4584eab275dcf081b3e1eec19722517b40cbb534",
+      "sha256": "819ab53a4d29d4b881ec15674b5ecfa7f716b1e8bce3a27d83140956cfe36bb9",
       "bytes": 19505
     },
     {
@@ -13355,8 +13428,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-ai-memory-2-4-0-release-review.md",
-      "sha256": "8c705db0a4c61d7dfb7493d1ef1cca690719a0b79b2d69dd5d636422dba58c43",
-      "bytes": 17752
+      "sha256": "613ee93763cafa25dce96b8578a2c349aff8f46e33ce9cfc441841faff1af07d",
+      "bytes": 18032
     },
     {
       "path": "docs/decisions/2026-09-25-codex-mcp-scope.md",
@@ -13370,8 +13443,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
-      "sha256": "89a5567b801ac445ca6d056dd56436c21b19289a4983d7cae76fabd2a9db7c1d",
-      "bytes": 32429
+      "sha256": "ecc1967ff6ad96b4e1cdfb3871e46d49b800ccb7338e114749ca3486e1f1b061",
+      "bytes": 39216
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
@@ -13635,7 +13708,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "9002f6945abe186c8c23c3d129a15aeedfbce4d0d42d1a0a77d2d0a2fa0757be",
+      "sha256": "02b6bef1a26d5844194892419c79628a8de1da6d37d39782ed8e5e9e22465a8d",
       "bytes": 18181
     },
     {
@@ -13750,8 +13823,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "9b8d76e48198f100f139777c5dbc4c4b23241011f29659d6b0f00b53d23d0b1e",
-      "bytes": 22882
+      "sha256": "a53e98e55f48857bd2ddceef429ad64de2d77443c1e68dbcf72899171befd506",
+      "bytes": 25061
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -13767,6 +13840,41 @@
       "path": "docs/upstream-maintenance-pilot.md",
       "sha256": "4b3410eed8701056b412c65938aac3a453e4d72a2fb70ee59313170433c970de",
       "bytes": 7856
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md",
+      "sha256": "abeb87a13e2851e37d94cedae01f66f50560a96ea2af41b157a867f75816ff2c",
+      "bytes": 3713
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/capture-attempt1-repro.txt",
+      "sha256": "2196f6e95b6ea2aee75544399f425d71b68190f9e68260923598c46d8eb45d14",
+      "bytes": 571
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/capture-attempt1-untrusted-dir.txt",
+      "sha256": "2775c1390d050773c457af82826d41a00a2ec459e500259a811e16ca53f57cbb",
+      "bytes": 450
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/capture.txt",
+      "sha256": "663966756428553d35a222e5886b61246c8eecf27db00ae7e0ee10e6252ebf61",
+      "bytes": 631
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/codex-hook-events.txt",
+      "sha256": "a349159cd672da6a800a7fb81eb6e93afa9460a894c6f874c0aa69576065b88f",
+      "bytes": 238
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/codex-stderr-hook-lines.txt",
+      "sha256": "f0ca94f5b3fc46ac0d25d5be5429f80046e17cb6b30a1d9c0792b43176859a78",
+      "bytes": 474
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/codex_capture_count.py",
+      "sha256": "0ab020d17171b4c51a31aa19a9349ec51cdd1afd8a7b732ee47d03df0a3ecd79",
+      "bytes": 1244
     },
     {
       "path": "evidence/artifacts/alpaca-platform-landscape-20260926/README.md",
@@ -29429,6 +29537,21 @@
       "bytes": 15432
     },
     {
+      "path": "evidence/artifacts/mcporter-0141-daemon-correction-20260926/README.md",
+      "sha256": "2ef9832eb15ffe263db8ae778afe5f8922bf8779d1757b75528bdd1471e5fdb4",
+      "bytes": 4287
+    },
+    {
+      "path": "evidence/artifacts/mcporter-0141-daemon-correction-20260926/retire.sh",
+      "sha256": "8816dae7b6ff186b4927c0039ee02cd690e63ccfc07e26d8a8e52157c4de25c8",
+      "bytes": 3587
+    },
+    {
+      "path": "evidence/artifacts/mcporter-0141-daemon-correction-20260926/retire.txt",
+      "sha256": "29aa587fe671e3dfe1e1e9c7c09dfa635c365e3536a77fa87fd9b4c77388f7e4",
+      "bytes": 1712
+    },
+    {
       "path": "evidence/artifacts/memory-landscape-20260921/catalog-memory-guide.png",
       "sha256": "bca87e44e3375122ac2078115a82d5c69fd574335ca0408394a46cfaeb5c5ab7",
       "bytes": 125442
@@ -34799,6 +34922,11 @@
       "bytes": 4863
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--codex--install--20260926.json",
+      "sha256": "2829d03e51ab4f05edf682cfa566f148c861033c0887a016289422a560dcd8dc",
+      "bytes": 5596
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--codex--use--20260926-2.json",
       "sha256": "c9a04acd41b9882d304804835aa9ced6f125e2b2eacdf724f875178b08280bf8",
       "bytes": 9637
@@ -35022,6 +35150,21 @@
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--lean--use--20260926.json",
       "sha256": "0b58279a495963abb7e0516daab20fcd0d1f4bb8c892f962be9e7914180a599d",
       "bytes": 15227
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--llama-cpp--install--20260926-2.json",
+      "sha256": "9ea17dc6daefddf8d9feb27cf5771d83228849c91b6a9f47993355d4a2c4b2f5",
+      "bytes": 5655
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--llama-cpp--install--20260926.json",
+      "sha256": "450d604281ea6e6bd04b636cf01233ea3c9d33bf9aa40fc729b4a7a5d62ed646",
+      "bytes": 5183
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--llama-cpp--use--20260926.json",
+      "sha256": "fcd2ad1e768ed4b7b89a599be84e35bfbf469a8e8eb72f58bda2d0c67520ad9f",
+      "bytes": 12231
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--loki--install--20260925.json",
@@ -35500,8 +35643,8 @@
     },
     {
       "path": "evidence/receipts/ai-memory-241-qualification-20260925.json",
-      "sha256": "6662b134659528ff6ae3ce5c424a3312c85aee75463b361860ad716506b74a62",
-      "bytes": 12208
+      "sha256": "b65978418ac704d54a1697daa3a527ee928894ec1749b25f883a28595f38a886",
+      "bytes": 14056
     },
     {
       "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
@@ -35664,6 +35807,11 @@
       "bytes": 17126
     },
     {
+      "path": "evidence/receipts/local-inference-c2-serving-switch-20260926.json",
+      "sha256": "84153b7486e2cd9b970d0cb017bcb73b12930158efb2e793e323a6347f09d3e3",
+      "bytes": 14360
+    },
+    {
       "path": "evidence/receipts/mac-memory-patch-20260920.json",
       "sha256": "b8d09fda1ad56976d57d938af0eb7076223c79e39b2261ef4521413b15d8a0f1",
       "bytes": 893
@@ -35680,8 +35828,8 @@
     },
     {
       "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
-      "sha256": "3161038aa1fb8dcd5c3cf6d05249d69ea0066c8c38120787f5cd54fa5fc059ba",
-      "bytes": 12907
+      "sha256": "5379b1e326d99eeb09a72b88fa447c6020e76211b3d918ac96d8daa09241ce32",
+      "bytes": 15000
     },
     {
       "path": "evidence/receipts/memory-landscape-20260921.json",
@@ -36330,8 +36478,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "cbbc6ce14823e6114fdf43ef7c34e759e1d5fb758097c131ed077d7a168aeb1d",
-      "bytes": 90871
+      "sha256": "ab454fc3b55d4f564908b879b115501a07eb08ac5cb015c8b31c1d6fccf14a02",
+      "bytes": 93046
     },
     {
       "path": "observability/README.md",
@@ -36590,8 +36738,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "7030b83e97da90886e7eca8226f3f100cb53495cdb2ca0a50da8aa92ec87b22e",
-      "bytes": 79558
+      "sha256": "14dac62233e0bda280e93105c276fd0465cd51af22e5ca9b6edf831ab82df197",
+      "bytes": 80258
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -36647,6 +36795,11 @@
       "path": "scripts/catalog_decisions.py",
       "sha256": "004a08b524c92a9ba3280f361f063ab9079797da0066998ab730149a220d8729",
       "bytes": 13797
+    },
+    {
+      "path": "scripts/codex_quota.py",
+      "sha256": "5466e62e4352982c1e90f2abd77700aea972055dd0851ee8552a492f302da20b",
+      "bytes": 16390
     },
     {
       "path": "scripts/component_matrix.py",
@@ -36945,8 +37098,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "195532912908592be1fe150fd73840e0a969e72248b5ce6ee2bfeadf15b75871",
-      "bytes": 226378
+      "sha256": "9aedd5a48d69e16c25df7db48e9b2ce1c35b282a420fbf70db11a715a9a9776b",
+      "bytes": 226595
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -37057,6 +37210,11 @@
       "path": "tests/test_claude_repository_evidence.py",
       "sha256": "bc84e4527cbbd894ad524981ee5c90230552a42cb53e7088699ee9a0d2730093",
       "bytes": 11326
+    },
+    {
+      "path": "tests/test_codex_quota.py",
+      "sha256": "c8b3f1a4841201eabc5f9f6b2fa4d75e0cd33373b2e9f96d5ea142d6bde5fbc4",
+      "bytes": 17722
     },
     {
       "path": "tests/test_component_matrix.py",
@@ -37225,8 +37383,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "3ab2dbd4f09066dbd89b893e5cd21cbdbf6d931f3a6afaaf0d7ca2831ab6a5ee",
-      "bytes": 108855
+      "sha256": "c66c1cd1d11e3015581fdc9273f6ac2770b2e156f16db6d05633e82beb0c503b",
+      "bytes": 119027
     },
     {
       "path": "tests/test_layer_verdicts.py",
@@ -37245,8 +37403,8 @@
     },
     {
       "path": "tests/test_local_inference_latest_20260926.py",
-      "sha256": "03c425f7de2455028fe277f51e1c962a3ff7da868eb55dd045b6ff49f035c426",
-      "bytes": 70472
+      "sha256": "de493d86ef8944dbf5f31c5792a2f112752c02a505c22f89332322e72dabfce6",
+      "bytes": 74274
     },
     {
       "path": "tests/test_memory_lifecycle.py",
@@ -37645,13 +37803,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "947bb721e5e30e41547ee920a97fb51b71c7f95d9bc8e4d5ecca67d62b862b8a",
-      "bytes": 25540
+      "sha256": "0c94ad4ebe54e9692cc19364866baa6243d3664527764f2b55259b6c6ccba37b",
+      "bytes": 27045
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "a2c4452d0f77869ab1fc5407dfbfb17b10cb4905977afcd17a4b3e561d65b508",
-      "bytes": 15893
+      "sha256": "c9d68dfc93e59a994d41e0c9df717fd2fc5e8f934ef7c3da5719b700e98f3f4a",
+      "bytes": 17188
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
@@ -37665,8 +37823,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
-      "sha256": "4782d003ff38aef1864283ef084eabe0378908f9b5a7a0d53a4ab8f0aa38eaaa",
-      "bytes": 23487
+      "sha256": "9b9c46eeb0fe68d4f320f66534cb16d60f11d8e03135ce8d4f274bed96a839e9",
+      "bytes": 29957
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",

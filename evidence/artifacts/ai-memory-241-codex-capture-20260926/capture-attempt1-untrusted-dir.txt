@@ -1,0 +1,11 @@
+probe_start_utc=2026-09-26T14:45:48Z
+codex=codex-cli 0.157.1
+ai_memory=ai-memory 2.4.1
+codex_hook_commands_on_2.4.1=7
+codex_hook_commands_on_other_ai_memory_prefix=0
+$ codex exec -s read-only -m gpt-6-astra "Run the shell command: echo codex-capture-probe-20260926b. Then reply with only its output." < /dev/null
+codex_exit=1
+codex_final_line=
+store schema V67
+codex sessions with observations since probe start: 0
+probe_end_utc=2026-09-26T14:45:51Z

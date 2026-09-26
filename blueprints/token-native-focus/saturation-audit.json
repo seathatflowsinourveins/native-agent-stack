@@ -1908,7 +1908,7 @@
     {
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.155.1",
+      "version": "0.157.1",
       "profile": "core",
       "role": "Native subscription coding client",
       "installation_assessment": "native installation/operation recorded in scoped public receipt",
@@ -2083,6 +2083,11 @@
           {
             "id": "portable-claude-native-qualification-20260921",
             "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "codex-01571-qualification-20260926",
+            "path": "evidence/receipts/codex-01571-qualification-20260926.json",
             "kind": "native_cli_e2e"
           }
         ],

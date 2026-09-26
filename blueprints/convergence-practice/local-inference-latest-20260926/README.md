@@ -294,3 +294,66 @@ estimate, protects other GPU users.
 Offline checks use synthetic fixtures and stand-ins only. The co-filer label check
 runs EdgarTools only when the catalyst SDK is installed:
 `uv run --no-project --with jsonschema --with pyyaml python -m unittest tests.test_local_inference_latest_20260926 -v`.
+
+## Results, recorded 2026-09-26
+
+Everything above this section is the frozen preregistration, unchanged. Its
+statements that nothing has been measured and that no result exists describe
+the state before the runs. The runs are now recorded in
+[`results/results.md`](results/results.md).
+
+**Evidence class.** Native execution on `nativestack-5975wx-20260925`, one run
+per arm, under the frozen protocol. Speed and memory numbers are this host's,
+under its load at the time, with the Windows-side GPU applications closed for
+each window. They are not isolated benchmarks.
+
+**Decision** (`final: true`): **C2 is selected, with outcome
+`change_serving_profile`.**
+
+| Arm | Micro-F1 | JSON-valid | Median decode tokens/s | Bootstrap lower bound | Outcome |
+|---|---|---|---|---|---|
+| C0 | 0.9909 | 1.000 | 5.25 | – | control |
+| C1 | 0.9909 | 1.000 | 8.40 | 0.0 | passed, not selected |
+| C2 | 0.9909 | 1.000 | 26.28 | 0.0 | **selected** |
+| M | 0.9670 | 1.000 | 80.16 | −0.0560 | `retain_control` |
+
+- **C1 and C2.** Both predicted the same item sets as C0 on all 360 filings,
+  with no memory or deadline failure. C2 is the faster of the two.
+- **M.** M was the fastest arm but failed criterion (1). Its bootstrap lower
+  bound of −0.0560 is below the −0.02 margin.
+- **B and X** were not run: both are `runtime_unsupported` on b11146, as
+  planned.
+
+**Failed and refused attempts.** Both are kept in the record:
+
+- The acquisition's first attempt was refused (`state_dir_must_be_owner_only`)
+  before any SEC request.
+- C2 was refused admission in window 2 (17,366 MiB free against 17,535 MiB
+  needed). It completed in window 3.
+
+**Production.** The coordinator moved production to C2 at 11:05:40Z with a
+systemd `--user` drop-in, `li26-c2-serving-profile.conf`. The drop-in changes
+four options: `--gpu-layers` from 36 to 99, plus `--n-cpu-ffn 20`,
+`--spec-type draft-mtp` and `--spec-draft-n-max 3`. This is the drop-in path
+that the Rollback section above anticipated, and rollback is as described there.
+
+**Deviations from step 3.**
+
+- Window 1's Windows-side applications were closed by image name, with a forced
+  second pass, not by PID.
+- Before window 3, applications outside step 3's list were closed, under the
+  user approval that the coordinator recorded.
+
+**Limits of the result.** The C2 gain is established only for greedy,
+non-thinking replies of about 17 tokens, not for production's own requests.
+C2 left at least 3,829 MiB of the device free, and production has no
+free-memory guard of its own.
+
+| File | Role |
+|---|---|
+| [`results/results.md`](results/results.md) | Per-arm table, bootstrap bounds, decision, why M failed, what was not run, and the operations record |
+| [`results/decision.json`](results/decision.json) | The frozen `analyze.py` output, copied unchanged; a rerun reproduces it byte for byte |
+| [`results/acquisition-summary.json`](results/acquisition-summary.json), [`results/runs/`](results/runs/) | The acquisition summary, the window summaries and the per-arm window records, copied unchanged |
+| [`experiment.json`](experiment.json) | The observed convergence record (`adopt_within_scope`, qualified by run `li26-c2-w3`) |
+| [`local-inference-c2-serving-switch-20260926.json`](../../../evidence/receipts/local-inference-c2-serving-switch-20260926.json) | The production switch, its post-switch checks and the rollback |
+| [`evidence/hosts/nativestack-5975wx-20260925/`](../../../evidence/hosts/nativestack-5975wx-20260925/) | The llama-cpp `install` and `use` host receipts of 2026-09-26 |

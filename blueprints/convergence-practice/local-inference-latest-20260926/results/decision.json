@@ -1,0 +1,297 @@
+{
+  "arms": [
+    {
+      "arm": "C1",
+      "bootstrap": {
+        "lower": 0.0,
+        "point": 0.0,
+        "resamples": 10000,
+        "seed": 20260926,
+        "upper": 0.0
+      },
+      "criteria": {
+        "faster_median_decode": true,
+        "json_valid_rate": true,
+        "no_memory_or_deadline_failure": true,
+        "noninferior_micro_f1": true
+      },
+      "outcome": "change_serving_profile",
+      "summary": {
+        "cold_load_seconds": 3.662,
+        "context_overflow_count": 0,
+        "exact_match_rate": 0.975,
+        "failure_free": true,
+        "failures": [],
+        "fenced_valid_rate": 0.0,
+        "json_valid_rate": 1.0,
+        "macro_codes": [
+          "1.01",
+          "2.01",
+          "2.02",
+          "2.03",
+          "3.02",
+          "3.03",
+          "5.02",
+          "5.03",
+          "5.07",
+          "7.01",
+          "8.01",
+          "9.01"
+        ],
+        "macro_f1": 0.9867324300529757,
+        "mean_f1": 0.9923532948532948,
+        "mean_precision": 0.9949074074074075,
+        "mean_recall": 0.9937037037037038,
+        "median_decode_tokens_per_second": 8.399207819578912,
+        "median_ttft_ms": 4491.7665,
+        "memory_samples": 2574,
+        "micro_f1": 0.9909208819714657,
+        "min_device_free_mib": 4060,
+        "n": 360,
+        "not_attempted_count": 0,
+        "peak_device_used_mib": 20083,
+        "per_code_f1": {
+          "1.01": 0.98989898989899,
+          "2.01": 1.0,
+          "2.02": 1.0,
+          "2.03": 1.0,
+          "3.02": 0.9696969696969697,
+          "3.03": 0.9411764705882353,
+          "5.02": 1.0,
+          "5.03": 0.9696969696969697,
+          "5.07": 1.0,
+          "7.01": 0.9947089947089947,
+          "8.01": 0.9828571428571429,
+          "9.01": 0.9927536231884058
+        },
+        "segment_cold_load_seconds": [
+          3.662
+        ],
+        "segments": 1,
+        "state": "completed"
+      }
+    },
+    {
+      "arm": "C2",
+      "bootstrap": {
+        "lower": 0.0,
+        "point": 0.0,
+        "resamples": 10000,
+        "seed": 20260926,
+        "upper": 0.0
+      },
+      "criteria": {
+        "faster_median_decode": true,
+        "json_valid_rate": true,
+        "no_memory_or_deadline_failure": true,
+        "noninferior_micro_f1": true
+      },
+      "outcome": "change_serving_profile",
+      "summary": {
+        "cold_load_seconds": 3.135,
+        "context_overflow_count": 0,
+        "exact_match_rate": 0.975,
+        "failure_free": true,
+        "failures": [],
+        "fenced_valid_rate": 0.0,
+        "json_valid_rate": 1.0,
+        "macro_codes": [
+          "1.01",
+          "2.01",
+          "2.02",
+          "2.03",
+          "3.02",
+          "3.03",
+          "5.02",
+          "5.03",
+          "5.07",
+          "7.01",
+          "8.01",
+          "9.01"
+        ],
+        "macro_f1": 0.9867324300529757,
+        "mean_f1": 0.9923532948532948,
+        "mean_precision": 0.9949074074074075,
+        "mean_recall": 0.9937037037037038,
+        "median_decode_tokens_per_second": 26.277730578025125,
+        "median_ttft_ms": 4355.1849999999995,
+        "memory_samples": 2019,
+        "micro_f1": 0.9909208819714657,
+        "min_device_free_mib": 3829,
+        "n": 360,
+        "not_attempted_count": 0,
+        "peak_device_used_mib": 20314,
+        "per_code_f1": {
+          "1.01": 0.98989898989899,
+          "2.01": 1.0,
+          "2.02": 1.0,
+          "2.03": 1.0,
+          "3.02": 0.9696969696969697,
+          "3.03": 0.9411764705882353,
+          "5.02": 1.0,
+          "5.03": 0.9696969696969697,
+          "5.07": 1.0,
+          "7.01": 0.9947089947089947,
+          "8.01": 0.9828571428571429,
+          "9.01": 0.9927536231884058
+        },
+        "segment_cold_load_seconds": [
+          3.135
+        ],
+        "segments": 1,
+        "state": "completed"
+      }
+    },
+    {
+      "arm": "M",
+      "bootstrap": {
+        "lower": -0.056031699733520623,
+        "point": -0.023957730764350038,
+        "resamples": 10000,
+        "seed": 20260926,
+        "upper": -0.004941175018209121
+      },
+      "criteria": {
+        "faster_median_decode": true,
+        "json_valid_rate": true,
+        "no_memory_or_deadline_failure": true,
+        "noninferior_micro_f1": false
+      },
+      "outcome": "retain_control",
+      "summary": {
+        "cold_load_seconds": 12.335,
+        "context_overflow_count": 0,
+        "exact_match_rate": 0.9472222222222222,
+        "failure_free": true,
+        "failures": [],
+        "fenced_valid_rate": 0.0,
+        "json_valid_rate": 1.0,
+        "macro_codes": [
+          "1.01",
+          "2.01",
+          "2.02",
+          "2.03",
+          "3.02",
+          "3.03",
+          "5.02",
+          "5.03",
+          "5.07",
+          "7.01",
+          "8.01",
+          "9.01"
+        ],
+        "macro_f1": 0.9512146136417251,
+        "mean_f1": 0.9809758568091902,
+        "mean_precision": 0.9805376344086022,
+        "mean_recall": 0.988611111111111,
+        "median_decode_tokens_per_second": 80.15834552185243,
+        "median_ttft_ms": 434.3885,
+        "memory_samples": 250,
+        "micro_f1": 0.9669631512071156,
+        "min_device_free_mib": 8522,
+        "n": 360,
+        "not_attempted_count": 0,
+        "peak_device_used_mib": 15621,
+        "per_code_f1": {
+          "1.01": 0.9702970297029703,
+          "2.01": 0.88,
+          "2.02": 1.0,
+          "2.03": 0.8571428571428571,
+          "3.02": 0.9411764705882353,
+          "3.03": 0.8888888888888888,
+          "5.02": 0.9940828402366864,
+          "5.03": 0.9696969696969697,
+          "5.07": 0.967741935483871,
+          "7.01": 0.9894736842105263,
+          "8.01": 0.9651162790697675,
+          "9.01": 0.9909584086799277
+        },
+        "segment_cold_load_seconds": [
+          12.335
+        ],
+        "segments": 1,
+        "state": "completed"
+      }
+    }
+  ],
+  "arms_incomplete": [],
+  "arms_not_run": [
+    {
+      "arm": "B",
+      "not_started": []
+    },
+    {
+      "arm": "X",
+      "not_started": []
+    }
+  ],
+  "control": {
+    "arm": "C0",
+    "summary": {
+      "cold_load_seconds": 3.95,
+      "context_overflow_count": 0,
+      "exact_match_rate": 0.975,
+      "failure_free": true,
+      "failures": [],
+      "fenced_valid_rate": 0.0,
+      "json_valid_rate": 1.0,
+      "macro_codes": [
+        "1.01",
+        "2.01",
+        "2.02",
+        "2.03",
+        "3.02",
+        "3.03",
+        "5.02",
+        "5.03",
+        "5.07",
+        "7.01",
+        "8.01",
+        "9.01"
+      ],
+      "macro_f1": 0.9867324300529757,
+      "mean_f1": 0.9923532948532948,
+      "mean_precision": 0.9949074074074075,
+      "mean_recall": 0.9937037037037038,
+      "median_decode_tokens_per_second": 5.2459673938087885,
+      "median_ttft_ms": 11378.002499999999,
+      "memory_samples": 5850,
+      "micro_f1": 0.9909208819714657,
+      "min_device_free_mib": 7798,
+      "n": 360,
+      "not_attempted_count": 0,
+      "peak_device_used_mib": 16345,
+      "per_code_f1": {
+        "1.01": 0.98989898989899,
+        "2.01": 1.0,
+        "2.02": 1.0,
+        "2.03": 1.0,
+        "3.02": 0.9696969696969697,
+        "3.03": 0.9411764705882353,
+        "5.02": 1.0,
+        "5.03": 0.9696969696969697,
+        "5.07": 1.0,
+        "7.01": 0.9947089947089947,
+        "8.01": 0.9828571428571429,
+        "9.01": 0.9927536231884058
+      },
+      "segment_cold_load_seconds": [
+        3.95
+      ],
+      "segments": 1,
+      "state": "completed"
+    }
+  },
+  "final": true,
+  "inputs_sha256": "2a5c8c9bd1650bc20a3e7364defef2d725904f6eb1ef509a511a49526a32bfe0",
+  "kind": "local_inference_latest_decision",
+  "n_filings": 360,
+  "no_document_text": true,
+  "plan_sha256": "b90db46f20624895089cee5bbce27b0c8df2f3c783b1873cea5920a0f8e18b95",
+  "rule": "An arm replaces C0 as the production generation model only if (1) the paired bootstrap (10,000 resamples, seed 20260926) 95% lower bound of micro-F1(arm) - micro-F1(C0) is at least -0.02, (2) its median decode tokens/s exceeds C0's, (3) its JSON-valid rate is at least 0.98, and (4) it had no memory or deadline failure. Inference speed alone does not pass. C1 or C2 passing means keep the model and change only the serving profile.",
+  "schema_version": 1,
+  "selected": {
+    "arm": "C2",
+    "outcome": "change_serving_profile"
+  }
+}

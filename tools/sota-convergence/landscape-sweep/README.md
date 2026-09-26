@@ -21,6 +21,7 @@ the merged manifest, stay with the lane owners.
 | `build_args.py` | checkout | Stages a run into the work directory: frozen dated templates, schemas, the GPT-6 runtime, first-round GPT-6 prompts, `staged.json`, `prompts_sha256.txt`, the compact `args.json` and `sweep.embedded.js`. |
 | `sweep.js` | Workflow | The lane itself (`const A = args`; its header documents the args object). |
 | `codex_call.sh`, `codex_job.py` | staged | The GPT-6 job runner the wrapper agents call (`start`, `wait`, `result`). |
+| `codex_quota.py` | staged | A copy of the checkout's `scripts/codex_quota.py`, the account quota probe the runner's optional quota gate runs. |
 | `make_prompt.py` | staged | Composes a GPT-6 prompt from the frozen templates. |
 | `templates.json`, `schemas/` | staged | The prompts, with `<<DATE>>`, `<<LAYER_COUNT>>` and `<<SKILLS_CHECKED_AT>>` open, and the strict return schemas. `probe.json` is for the one-call lane probe. |
 | `usage_record.py` | checkout | Runs the vendored `examples/claude-native/workflows/child-usage.mjs` over the run's transcripts and writes the sanitized usage record. |
@@ -272,6 +273,17 @@ new run from the latest retained record, and say so when no record exists yet.
   attempt moves unchanged to `gpt6/<job>/attempts/<n>/` and stays in `result` and `gpt6_usage`. A finished job
   returns "already done" only for the same inputs (prompt and schema sha256, model, effort), so a resumed Workflow
   whose regenerated prompt differs gets a fresh GPT-6 vote, never a cached one for another claim.
+- **Quota gate (optional).** `build_args.py --quota-stop-percent 95` writes `codex.quota_stop_percent` into
+  `staged.json`; without it the gate is off. With it, each job, after it gets its slot and before codex starts,
+  runs the staged `codex_quota.py --json --gate 95`. That reads the account's usage snapshot through the native
+  `codex app-server` method `account/rateLimits/read` (no model turn, no transcript, no credential file) and
+  reports the gate when a window's `used_percent` reaches the percent, `rateLimitReachedType` is set or
+  `ordinaryUsageAllowed` is false. The job then ends with exit 3 before codex starts, and `<W>/LIMIT` (when absent)
+  and the job's `stderr.txt` name the reason, the used percent and the reset time: stop and tell the user, as for
+  a usage limit. Every probe is kept in `gpt6/<job>/quota.json`, and `result` summarizes it as `quota`. A probe that
+  fails (no snapshot within `codex.quota_timeout_s`, default 30 s, an error answer or a missing script) is recorded
+  there and never blocks the job; the usage-limit rule above still catches a real limit. A running sweep keeps the
+  runtime it was staged with, so a work directory staged before this gate existed has no gate.
 - **Resume.** `Workflow({scriptPath: "<W>/sweep.embedded.js", resumeFromRunId: "wf_..."})` replays the unchanged
   agent calls from the cache.
 
@@ -350,7 +362,8 @@ python3 -m unittest tests.test_landscape_sweep_harness -v
 
 The suite uses synthetic fixtures and makes no network or model calls:
 
-- A fake `codex` and a fake `gh` sit early on PATH.
+- A fake `codex` and a fake `gh` sit early on PATH; the fake `codex app-server` answers the quota probe.
+  `tests/test_codex_quota.py` covers the probe itself against a stricter protocol fake.
 - `sweep.js` runs under node with stubbed `agent`, `parallel` and `pipeline`.
 - The converted evidence is appended to a synthetic ledger checkout with `saturation_ledger.py` itself.
 
