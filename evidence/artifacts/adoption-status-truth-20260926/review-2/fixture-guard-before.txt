@@ -1,0 +1,19 @@
+fixture under test: as-reviewed/host_scripts_fixture.sh sha256 72145b3ba28da68f
+=== G1 WORK_DIR already exists and holds a file
+fixture exit 1; first lines:
+  === S1 --apply without a reviewed --target (origin/main can move after the dry run)
+  --- dry run: apply.sh --main $WORK/s1/primary 
+EXPECT G1 the existing directory's file survives: NOT MET
+=== G2 the caller's GIT_CONFIG_GLOBAL
+fixture exit 1; first lines:
+  === S1 --apply without a reviewed --target (origin/main can move after the dry run)
+  --- dry run: apply.sh --main $WORK/s1/primary 
+caller's user.email now: fixture@example.invalid
+EXPECT G2 the caller's configuration file is unchanged: NOT MET
+=== G3 the caller's GIT_DIR
+fixture exit 1; first lines:
+  === S1 --apply without a reviewed --target (origin/main can move after the dry run)
+  fatal: 'origin' does not appear to be a git repository
+caller's commits now: 7, core.bare: false
+EXPECT G3 the caller's repository is unchanged: NOT MET
+=== summary: 3 expectation(s) not met

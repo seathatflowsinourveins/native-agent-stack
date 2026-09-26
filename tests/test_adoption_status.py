@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import shutil
 from shutil import which as native_which
 import signal
@@ -1403,9 +1404,12 @@ class ClientWiringTests(unittest.TestCase):
                 self.assertIs(result["complete"], expected is True)
 
     def test_a_non_blank_agents_override_replaces_agents_md(self):
-        # codex-rs/codex-home/src/instructions/mod.rs: AGENTS.override.md first, AGENTS.md only when it is blank.
+        # codex-rs/codex-home/src/instructions/mod.rs (rust-v0.157.1): AGENTS.override.md first, AGENTS.md only when
+        # the override is blank under Rust's str::trim. That strips Unicode White_Space only, so an override holding
+        # U+001C, which Python's str.strip() also strips, is still the text Codex sends in place of AGENTS.md.
         self.wire()
         for override, expected in ((f"# {PRIVATE}: override without RTK\n", False), (" \n\t\n", True),
+                                   (" 　\n", True), ("\x1c\n", False), ("\n\x1c\x1d\x1e\x1f \n", False),
                                    (AGENTS_INLINE, True), (b"\xff\xfe# override\n", None)):
             with self.subTest(override=override[:20]):
                 self.write(".codex/AGENTS.override.md", override)
@@ -1694,6 +1698,36 @@ class TokenEfficiencyProfileTests(unittest.TestCase):
                                             "agentsview", "otel-tui"})
         self.assertLessEqual(tools - selected, self.OPTIONAL)
         self.assertEqual(selected - tools, {"codex", "claude-code", "ccusage", "mcporter"})
+
+
+class RetainedEvidenceTests(unittest.TestCase):
+    """What the checker's Codex model was compared against stays in every clone of the repository."""
+
+    README = REPO / "evidence/artifacts/adoption-status-truth-20260926/README.md"
+
+    def test_every_file_the_evidence_readme_links_is_registered_and_not_ignored(self):
+        # scripts/validate.py enumerates files through Git, which leaves ignored files out, so an evidence file that
+        # .gitignore matches (the oracle outputs under "*.jsonl") passes it on the host that wrote the file and is
+        # missing from every clone.
+        git = native_which("git")
+        if git is None or subprocess.run([git, "-C", str(REPO), "rev-parse", "--git-dir"], capture_output=True,
+                                         stdin=subprocess.DEVNULL).returncode != 0:
+            self.skipTest("needs the repository's Git checkout")
+        manifest = json.loads((REPO / "manifests/evidence.json").read_text(encoding="utf-8"))
+        registered = {entry["path"] for entry in manifest["files"]}
+        targets = set()
+        for link in re.findall(r"\]\(([^)\s#]+)[^)]*\)", self.README.read_text(encoding="utf-8")):
+            path = (self.README.parent / link).resolve()
+            if "://" not in link and not path.is_dir():
+                targets.add(path.relative_to(REPO).as_posix())
+        self.assertGreater(len(targets), 10)
+        for target in sorted(targets):
+            with self.subTest(target=target):
+                self.assertTrue((REPO / target).is_file(), "linked file is missing")
+                self.assertTrue(target in registered, "not registered in manifests/evidence.json")
+                ignored = subprocess.run([git, "-C", str(REPO), "check-ignore", "-q", target], capture_output=True,
+                                         stdin=subprocess.DEVNULL)
+                self.assertEqual(ignored.returncode, 1, "matched by .gitignore, so no clone has it")
 
 
 if __name__ == "__main__":

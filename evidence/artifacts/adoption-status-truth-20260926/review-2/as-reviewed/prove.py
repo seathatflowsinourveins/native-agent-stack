@@ -27,12 +27,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import queue
 import re
 import shlex
-import signal
 import subprocess
-import threading
 import time
 import urllib.parse
 import urllib.request
@@ -111,52 +108,20 @@ def prompt_input_rtk() -> bool:
     return bool(body) and body in norm("\n".join(texts))
 
 
-def stop_app_server(process: subprocess.Popen, grace: float = 15.0) -> None:
-    """End an app-server started in its own session, every wait bounded: close its input (it exits at the end of
-    its input), then SIGTERM and SIGKILL to its process group (the TERM/KILL steps of codex_oracle.py)."""
-    try:
-        process.stdin.close()
-    except OSError:
-        pass
-    for sig, wait in ((None, grace), (signal.SIGTERM, 3), (signal.SIGKILL, 10)):
-        try:
-            if sig is not None:
-                os.killpg(process.pid, sig)
-            process.wait(timeout=wait)
-            return
-        except ProcessLookupError:
-            return
-        except subprocess.TimeoutExpired:
-            continue
-
-
-def codex_hooks_list(cwd: Path, timeout: float = 90.0) -> list[dict]:
-    """hooks/list from Codex's own app-server; returns the hook entries for ``cwd``. RuntimeError when it answers
-    with an error, closes its output or gives no answer to a request in ``timeout`` seconds: its output is read by a
-    thread into a queue with a deadline (as codex_oracle.py reads it), so a silent app-server cannot block here."""
+def codex_hooks_list(cwd: Path) -> list[dict]:
+    """hooks/list from Codex's own app-server; returns the hook entries for ``cwd``."""
     env = dict(os.environ, RUST_LOG="error")
     process = subprocess.Popen(["codex", "app-server"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                stderr=subprocess.DEVNULL, cwd="/", env=env, text=True, start_new_session=True)
-    lines: queue.Queue = queue.Queue()
-
-    def read():
-        for line in process.stdout:
-            lines.put(line)
-        lines.put("")  # end of output
-
-    threading.Thread(target=read, daemon=True).start()
 
     def send(message):
         process.stdin.write(json.dumps(message) + "\n")
         process.stdin.flush()
 
     def response(request_id):
-        deadline = time.monotonic() + timeout
-        while True:
-            try:
-                line = lines.get(timeout=max(0.0, deadline - time.monotonic()))
-            except queue.Empty:
-                raise RuntimeError(f"codex app-server gave no answer within {timeout:.0f} s") from None
+        deadline = time.monotonic() + 90
+        while time.monotonic() < deadline:
+            line = process.stdout.readline()
             if not line:
                 raise RuntimeError("codex app-server closed its output")
             try:
@@ -167,6 +132,7 @@ def codex_hooks_list(cwd: Path, timeout: float = 90.0) -> list[dict]:
                 if "error" in message:
                     raise RuntimeError(f"app-server error: {message['error'].get('message')}")
                 return message["result"]
+        raise RuntimeError("codex app-server timed out")
 
     try:
         send({"id": 1, "method": "initialize",
@@ -176,7 +142,12 @@ def codex_hooks_list(cwd: Path, timeout: float = 90.0) -> list[dict]:
         send({"id": 2, "method": "hooks/list", "params": {"cwds": [str(cwd)]}})
         listed = response(2)
     finally:
-        stop_app_server(process)
+        try:
+            process.stdin.close()
+            process.wait(timeout=15)
+        except (OSError, subprocess.TimeoutExpired):
+            os.killpg(process.pid, 15)
+            process.wait()
     return [hook for entry in listed["data"] for hook in entry.get("hooks", [])]
 
 
@@ -300,34 +271,23 @@ def main() -> int:
               f"no native blocker observed; checker complete: {wiring.get('complete')}")
     pins = {tool["id"]: tool for tool in json.loads((checkout / "adoption/pins-linux-x86_64.json").read_text())["tools"]}
     observed = {"codex": version_of(["codex", "--version"]), "claude-code": version_of(["claude", "--version"])}
-    # Only an observed --version can confirm or contradict the checker, and only an observed mismatch can show one
-    # surfacing: an unavailable version, or a host where nothing differs from its pin, leaves the check UNTESTED.
-    unobserved = sorted(name for name, version in observed.items() if version is None or not pins.get(name))
     expected_mismatch = set()
     for name, version in observed.items():
-        if name in unobserved:
-            continue
-        pin = pins[name]
+        pin = pins.get(name, {})
         floor = (pin.get("version_probe") or {}).get("match") == "minimum"
+        if version is None or not pin:
+            continue
         if not (at_least(version, pin["version"]) if floor else version == pin["version"]):
             expected_mismatch.add(name)
     profile = next((item for item in (report or {}).get("profiles", []) if item["id"] == "token-efficiency"), {})
     summary = profile.get("pinned_versions_summary") or {}
-    top = report.get("pinned_versions_match") if report else None
-    reported = set(summary.get("mismatched", [])) & (set(observed) - set(unobserved))
-    contradicted = reported != expected_mismatch or (bool(summary.get("mismatched")) and top is not False)
-    if not fixed or contradicted:
-        surfaced = False
-    elif unobserved or not expected_mismatch:
-        surfaced = None
-    else:
-        surfaced = True
+    reported = set(summary.get("mismatched", [])) & set(observed)
+    surfaced = fixed and reported == expected_mismatch and (
+        report.get("pinned_versions_match") is False if summary.get("mismatched") else True)
     check("G9 a pin mismatch surfaces at the top", surfaced,
           f"--version: codex {observed['codex']} (pin {pins.get('codex', {}).get('version')}), claude "
           f"{observed['claude-code']} (floor {pins.get('claude-code', {}).get('version')}); checker mismatched "
-          f"{sorted(summary.get('mismatched', []))}, pinned_versions_match {top}"
-          + (f"; no --version observation for {', '.join(unobserved)}" if unobserved else "")
-          + ("; no observed mismatch to surface" if surfaced is None and not unobserved else ""))
+          f"{sorted(summary.get('mismatched', []))}, pinned_versions_match {report.get('pinned_versions_match') if report else None}")
 
     # G13: stack.json pin, render.py text, profile reconciliation.
     stack = {row["id"]: row for row in json.loads((checkout / "manifests/stack.json").read_text())["components"]}

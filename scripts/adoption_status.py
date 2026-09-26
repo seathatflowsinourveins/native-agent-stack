@@ -424,10 +424,12 @@ def instruction_text(text: str) -> str:
 
 def codex_instructions(codex_dir: Path) -> str | None:
     """The global instructions Codex gives the model: AGENTS.override.md when it has non-blank text, else AGENTS.md
-    ("" when neither has any). None when either file is unreadable here, since Codex may still read it."""
+    ("" when neither has any). None when either file is unreadable here, since Codex may still read it. Blank is
+    decided as Codex decides it, with Rust's str::trim (codex-home/src/instructions/mod.rs at rust-v0.157.1):
+    U+001C to U+001F, which Python's str.strip() also removes, make an override Codex sends."""
     for name in CODEX_INSTRUCTION_FILES:
         text = read_client_file(codex_dir / name, "text")
-        if text is None or text.strip():
+        if text is None or text.strip(RUST_WHITESPACE):
             return text
     return ""
 

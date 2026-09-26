@@ -391,12 +391,9 @@ def main() -> int:
         sys.path.insert(0, str(Path(args.repo).resolve() / "scripts"))
         import adoption_status  # noqa: E402
     base = Path(args.base).resolve()
-    if base.exists() and (not base.is_dir() or any(base.iterdir())):  # fresh() deletes its case directories
-        parser.error("--base must be a new or empty directory: the oracle deletes and recreates the case "
-                     "directories it makes there, and nothing else")
     base.mkdir(parents=True, exist_ok=True)
     print(json.dumps({"codex_version": subprocess.run(["codex", "--version"], capture_output=True, text=True,
-                                                      stdin=subprocess.DEVNULL, timeout=60).stdout.strip(),
+                                                      stdin=subprocess.DEVNULL).stdout.strip(),
                       "checker": None if adoption_status is None else "scripts/adoption_status.py of --repo"}))
     if args.mode == "parse":
         only = None if not args.cases else {int(item) for item in args.cases.split(",")}

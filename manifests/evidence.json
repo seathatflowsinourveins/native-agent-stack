@@ -3452,8 +3452,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "3b0ae3a6a80ee6fb098c5726079183d53ef996f2bb8ba2cd329a263ef260ebe1",
-      "bytes": 2549
+      "sha256": "3f55d8d68f28a1d62601703794d6dd93698c9b86e26d1d6744684298a3c49cec",
+      "bytes": 2813
     },
     {
       "path": ".gitleaks.toml",
@@ -13843,8 +13843,8 @@
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/README.md",
-      "sha256": "407b6fbc813cfccbbaec8472fb4713b5faae82ae81b4b55c03a599d34ec0a71c",
-      "bytes": 8235
+      "sha256": "939525c93e5aa328834e9f4bd0f482bf2f0c041d9add35c2ddabc8b2bb04b5a3",
+      "bytes": 13851
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/builder-runs/prove-live-clone.txt",
@@ -13877,14 +13877,29 @@
       "bytes": 2324
     },
     {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/codex-matcher-oracle.jsonl",
+      "sha256": "8261692f64d4da8a913f3b25dfd61ed3db7b71a3973f7a2e0d395cce3ee0ed78",
+      "bytes": 9569
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/codex-parse-oracle.jsonl",
+      "sha256": "f4c54d8c2a27991129e202f3eabc63e7428805d8c30d0708dbd335874d048ea8",
+      "bytes": 18809
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/codex-trust-oracle.jsonl",
+      "sha256": "2e3907e3b3053d90e845eeb28ecb658f6b72886d306baf99c17699082fc1c899",
+      "bytes": 3265
+    },
+    {
       "path": "evidence/artifacts/adoption-status-truth-20260926/codex_known_answers.py",
-      "sha256": "1c531380bb65cb547f2aa5987511d4b78df21ec78516d8c8e8062332046dad9c",
-      "bytes": 3219
+      "sha256": "c26df826420c7bde80f6eff272138a89199625895d9b7a2eaf4558437dc65593",
+      "bytes": 2832
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/codex_oracle.py",
-      "sha256": "ce04513ce0ada13bd098428aba35ef8a68d7b0b25fdeed1274420ecdc64e0dea",
-      "bytes": 25176
+      "sha256": "59f7801755cb29514d3a2f5dd5fd1d54077c5de333fd6e3a978c3207eb9a31c2",
+      "bytes": 25473
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/g1-observation.json",
@@ -13913,8 +13928,8 @@
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/host-scripts/host_scripts_fixture.sh",
-      "sha256": "72145b3ba28da68ff3f971a743d72012ea032cdaa81adee0bef6d7602d8e081c",
-      "bytes": 8400
+      "sha256": "2c030252f65139c928075996ff94ac1aa76b18e6de56dd17f1c625d629a81b2b",
+      "bytes": 9575
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/host-scripts/prove-harness-fixed.txt",
@@ -13928,8 +13943,8 @@
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/host-scripts/prove.py",
-      "sha256": "438b02a28372a87ba90b4c191747454ec071642915a2b1cdf3343dd9d824d721",
-      "bytes": 20275
+      "sha256": "95afa1af79d8eb3f8394e1dd37a1755e2603c1c0f997c1d24d20a2358595f44c",
+      "bytes": 22138
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/host-scripts/prove.sh",
@@ -13975,6 +13990,71 @@
       "path": "evidence/artifacts/adoption-status-truth-20260926/host_trust.py",
       "sha256": "cc5915fdccfafffc1c5969e4f2a653ef153f0d089b77224cd64eeab070072dfd",
       "bytes": 3267
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/as-reviewed/codex_known_answers.py",
+      "sha256": "1c531380bb65cb547f2aa5987511d4b78df21ec78516d8c8e8062332046dad9c",
+      "bytes": 3219
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/as-reviewed/codex_oracle.py",
+      "sha256": "ce04513ce0ada13bd098428aba35ef8a68d7b0b25fdeed1274420ecdc64e0dea",
+      "bytes": 25176
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/as-reviewed/host_scripts_fixture.sh",
+      "sha256": "72145b3ba28da68ff3f971a743d72012ea032cdaa81adee0bef6d7602d8e081c",
+      "bytes": 8400
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/as-reviewed/prove.py",
+      "sha256": "438b02a28372a87ba90b4c191747454ec071642915a2b1cdf3343dd9d824d721",
+      "bytes": 20275
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/checker-tests-after.txt",
+      "sha256": "1d025711e62cb93f27ea1868443bac2f7a1f9502e9d78ad7070a34e1fbc3d69b",
+      "bytes": 606
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/checker-tests-before.txt",
+      "sha256": "55981c1d7db2141ecd5a44d912c5cdf2a64f986953e9e7b0e5178b2263fb54c8",
+      "bytes": 2969
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/fixture-fixed.txt",
+      "sha256": "a9060dfe5d161ec9492124e490dae028b4d1a247e364529fda9c8e62a4ce34dd",
+      "bytes": 11298
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/fixture-guard-after.txt",
+      "sha256": "7c83ed968eeb57543698c16a9c38f6a93621529b9e1a4a536ed4ea8274411961",
+      "bytes": 952
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/fixture-guard-before.txt",
+      "sha256": "89f057fcfc10d38c49fd56ab0bc90d1b647a6425f74430ae38f4313cb00da322",
+      "bytes": 1001
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/fixture_guard_check.sh",
+      "sha256": "d331fa2f55a8a0d731c4944b1b7389f7606072cfa3f9f7a497bf56b17e133e7a",
+      "bytes": 3395
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/harness-after.txt",
+      "sha256": "cc0c82945efbd9dd58ab88ca6fae231d0da5ae2152298105d0822c6a9f3f59da",
+      "bytes": 2590
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/harness-before.txt",
+      "sha256": "6de5be7afd33f99ca3cf938bbeb7fbebaf5ea571f81289c4d80e326fdfa49af0",
+      "bytes": 2302
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/review2_harness.py",
+      "sha256": "64f456a287bb687a361a281b94cf4b20e76a6b1168a65cd0c11dddeec7407ede",
+      "bytes": 12379
     },
     {
       "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md",
@@ -36918,8 +36998,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "60db943c8435f4ae2db23f3bb6c5563ad42cbfd0746ab7c53ebc7a08bc48e888",
-      "bytes": 69290
+      "sha256": "4486e17d0337c29b9b31d8c047b885d50c40a0a2370eb7ccf26cf7869599d763",
+      "bytes": 69517
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -37253,8 +37333,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "ce556b9d40947c34aa8699ccbf798d765de98c564fc1bb6a669868273b19ed08",
-      "bytes": 105695
+      "sha256": "9e2708c131b670e3360ea392fff7d75600a3a399787c25f14634c8226b61de2b",
+      "bytes": 107988
     },
     {
       "path": "tests/test_adoption_version_probes.py",

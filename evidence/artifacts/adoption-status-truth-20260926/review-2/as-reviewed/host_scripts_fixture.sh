@@ -6,29 +6,12 @@
 #
 #   host_scripts_fixture.sh SCRIPT_DIR WORK_DIR     # SCRIPT_DIR holds apply.sh and rollback.sh
 #
-# WORK_DIR must not exist yet: the fixture creates it and works only inside it, so it never deletes or reuses a
-# directory it did not create. Git sees only that sandbox, as git's own t/test-lib.sh (v2.43.0) arranges: every
-# inherited GIT_* variable is unset (a caller's GIT_DIR or GIT_CONFIG_GLOBAL would aim the fixture's commits or its
-# `git config --global` at the caller's repository or configuration), with no system configuration or attributes,
-# no repository discovery above WORK_DIR, and HOME inside WORK_DIR.
-#
 # Each scenario prints its commands' exit codes and the lines that decide it, then "EXPECT ... : ok|NOT MET" for
-# what the fixed scripts must do. Exit 0 only when every expectation is met; 2 on a usage error.
+# what the fixed scripts must do. Exit 0 only when every expectation is met.
 set -uo pipefail
-if [ "$#" -ne 2 ] || [ -z "$1" ] || [ -z "$2" ]; then
-  echo "usage: host_scripts_fixture.sh SCRIPT_DIR WORK_DIR   (WORK_DIR must not exist yet)" >&2
-  exit 2
-fi
-scripts="$(cd "$1" && pwd -P)" || { echo "no such SCRIPT_DIR: $1" >&2; exit 2; }
+scripts="$(cd "$1" && pwd -P)"
 work="$2"
-if [ -e "$work" ] || [ -L "$work" ]; then
-  echo "refusing: WORK_DIR $work exists; pass a path the fixture can create, e.g. \"\$(mktemp -d)/fx\"" >&2
-  exit 2
-fi
-mkdir -- "$work" || { echo "cannot create WORK_DIR $work" >&2; exit 2; }  # no -p: it fails if the path appeared
-work="$(cd "$work" && pwd -P)"
-while IFS= read -r name; do unset "$name"; done < <(compgen -e | grep '^GIT_')
-export GIT_CONFIG_NOSYSTEM=1 GIT_ATTR_NOSYSTEM=1 GIT_CEILING_DIRECTORIES="$work/.."
+rm -rf "$work"; mkdir -p "$work"; work="$(cd "$work" && pwd -P)"
 unmet=0
 expect() {  # expect "description" condition...
   local what="$1"; shift
@@ -36,7 +19,7 @@ expect() {  # expect "description" condition...
 }
 aimem="$(dirname "$(command -v ai-memory)")"
 export HOME="$work/fakehome" XDG_STATE_HOME="$work/fakehome/.local/state"
-unset AI_MEMORY_DATA_DIR XDG_DATA_HOME XDG_CONFIG_HOME XDG_CACHE_HOME CODEX_HOME
+unset AI_MEMORY_DATA_DIR XDG_DATA_HOME XDG_CONFIG_HOME CODEX_HOME
 mkdir -p "$HOME/.codex" "$work/aimem-allow" "$work/aimem-deny"
 echo allowlist > "$work/aimem-allow/capture-mode"   # the installed hook's data dir: allowlist mode
 hook_cmd() { printf '%s/ai-memory --data-dir %s hook --event %s --agent codex --server-url http://127.0.0.1:9' "$aimem" "$1" "$2"; }
