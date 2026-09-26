@@ -5,8 +5,8 @@
   "host_id": "nativestack-5975wx-20260925",
   "checked_commit": "fee2d6d818c796c379270c42c278b9d9fca33d7e",
   "observed_utc": {
-    "osv_scans": "2026-09-26T10:13:16Z to 2026-09-26T10:17:33Z",
-    "unittest_runs": "2026-09-26T10:12:52Z to 2026-09-26T10:42:58Z"
+    "osv_scans": "2026-09-26T10:13:16Z to 2026-09-26T11:07:10Z",
+    "unittest_runs": "2026-09-26T10:12:52Z to 2026-09-26T11:06:44Z"
   },
   "scope": "Review round 1 (independent reviewer, 2026-09-26) found two repository unit tests that the trial's new files fail. Both need a registration in a repository file outside this directory, and simulating them showed a third: manifests/evidence.json hashes the lockfile inventory. This record reproduces the failures, gives the exact entries and records the OSV-Scanner result that the lock registration exposes. No engine ran. No port, manifest, lock, receipt, verdict, run record, scorer or tolerance sheet changed, and nothing was re-scored.",
   "evidence_class": "Local integration checks on this host: the repository's own unit tests and the security-scan.yml OSV-Scanner command. The registered state was applied only in a scratch git worktree. It is a simulation of the coordinator's change, not the state of this branch, and not a CI run.",
@@ -202,6 +202,18 @@
         "config": "unchanged plus [[IgnoredVulns]] for GHSA-8mgp-746c-j5xp and GHSA-h35f-9h28-mq5c",
         "exit_code": 0,
         "result": "No issues found; the two ids and their aliases (3 vulnerabilities) filtered"
+      },
+      {
+        "inputs": "a scratch merge of origin/main e372369d with 4e1b5c38, the commit that added this file, with every registration applied (47 lockfiles)",
+        "config": "with the two ignores",
+        "exit_code": 0,
+        "result": "No issues found; the two ids and their aliases filtered"
+      },
+      {
+        "inputs": "4e1b5c38 with every registration applied (47 lockfiles), scratch worktree",
+        "config": "with the two ignores, each reason citing this file",
+        "exit_code": 0,
+        "result": "No issues found; tests.test_osv_lockfile_coverage (8 tests) passed with that config"
       }
     ],
     "advisories": [
@@ -324,6 +336,39 @@
         "exit_code": 0,
         "summary_line": "Ran 5805 tests in 467.574s; OK (skipped=667)",
         "validate_py": "scripts/validate.py passed in the same tree: status passed, 6049 hashed files, 154 receipts"
+      },
+      {
+        "tree": "4e1b5c38, the commit that added this file, with every registration applied in a scratch worktree",
+        "started_utc": "2026-09-26T10:46:57Z",
+        "finished_utc": "2026-09-26T10:56:28Z",
+        "wall_seconds": 571,
+        "ran": 5805,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 648,
+        "exit_code": 1,
+        "summary_line": "Ran 5805 tests in 567.996s; FAILED (failures=1, skipped=648)",
+        "failing": [
+          {
+            "test": "tests.test_pre_commit_gate.PreCommitGateTests.test_blocks_synthetic_key_and_passes_clean_commit",
+            "cause": "host contention, not this branch: 'gitleaks: another scan holds the per-user lock; retry after it finishes'",
+            "rerun": "tests.test_pre_commit_gate passed at 10:56:43Z (3 tests)"
+          }
+        ],
+        "validate_py": "scripts/validate.py passed in the same tree: status passed, 6049 hashed files"
+      },
+      {
+        "tree": "a scratch merge of origin/main e372369d with 4e1b5c38, every registration applied, like the merge a pull request check tests",
+        "started_utc": "2026-09-26T10:56:48Z",
+        "finished_utc": "2026-09-26T11:06:44Z",
+        "wall_seconds": 596,
+        "ran": 6041,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 651,
+        "exit_code": 0,
+        "summary_line": "Ran 6041 tests in 591.758s; OK (skipped=651)",
+        "validate_py": "scripts/validate.py passed in the same tree: status passed, 6323 hashed files"
       }
     ]
   },

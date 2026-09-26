@@ -262,7 +262,10 @@ receipt, verdict, scorer or tolerance sheet changed.
   scratch worktree, one test failed: it runs `scripts/validate.py`, which reported the inventory
   hash mismatch. With the `manifests/evidence.json`
   update as well, the 5805 tests ran with no failure (667 skipped) and `scripts/validate.py`
-  passed. These runs simulate the coordinator's change; they are not the state of this branch.
+  passed. After this section was first committed (4e1b5c38), a scratch merge with origin/main
+  (e372369d) plus every registration ran 6041 tests with no failure (651 skipped), and the OSV
+  command exited 0. These runs simulate the coordinator's change; they are not the state of
+  this branch.
 
 ## Files
 
