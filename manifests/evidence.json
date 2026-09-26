@@ -33136,8 +33136,8 @@
     },
     {
       "path": "tests/test_local_inference_latest_20260926.py",
-      "sha256": "563acc4b9fb9f9c586b147b2325d8e3f75064163f8e17f4d7da088bf76f040df",
-      "bytes": 70444
+      "sha256": "03c425f7de2455028fe277f51e1c962a3ff7da868eb55dd045b6ff49f035c426",
+      "bytes": 70472
     },
     {
       "path": "tests/test_memory_lifecycle.py",
