@@ -54,7 +54,7 @@
       "vidore/colpaligemma-3b-pt-448-base": "30ab955d073de4a91dc5a288e8c97226647e3e5a",
       "vidore/tabfquad_test_subsampled (dataset)": "16c8e633612fbda7400bfcbbc31d61a7534f580f"
     },
-    "environment": "reproduction/requirements-lock.txt (torch 2.8.0, transformers 4.53.1, sentence-transformers 3.4.1, datasets 5.0.1, peft 0.17.1, ...); the reproduction checks that the installed set equals the lock file",
+    "environment": "reproduction/environment-record.json preserves all 94 original pins, hash lists (the original had no --hash options), original SHA-256/size and 20 known advisories (1 Critical, 15 High, 4 Medium), sourced from the retained OSV-Scanner output. The current CPU reproduction requires --accept-known-advisories, regenerates the identical lock in a temporary directory and compares the installed set with that recorded environment.",
     "verification": "../provenance/run-20260926T045856Z/verify-pins.log (tag clone rev-parse, PyPI-reported and downloaded sha256, Hub revision lookups)"
   },
   "dataset": {
@@ -117,7 +117,7 @@
     {
       "id": "colqwen-processor-probe",
       "evidence_class": "local_integration",
-      "command": "CUDA_VISIBLE_DEVICES= HF_HOME=<fresh dir> HOME=<fresh dir> <first pass's .venv-combined>/bin/python local-integration/colqwen_processor_probe.py (transformers 4.53.1, huggingface_hub 0.36.2, colpali-engine 0.3.13, vidore-benchmark 5.0.0, torch 2.8.0; the venv's installed set equalled reproduction/requirements-lock.txt)",
+      "command": "CUDA_VISIBLE_DEVICES= HF_HOME=<fresh dir> HOME=<fresh dir> <first pass's .venv-combined>/bin/python local-integration/colqwen_processor_probe.py (transformers 4.53.1, huggingface_hub 0.36.2, colpali-engine 0.3.13, vidore-benchmark 5.0.0, torch 2.8.0; the venv's installed set equalled the pins now preserved in reproduction/environment-record.json)",
       "exit_code": 0,
       "result": "All five expectations written into the probe before the run held (0 mismatches). A: transformers' list_repo_templates returns ['sentence_transformers.jinja'] for vidore/colqwen2-v1.0 main, suffix kept. B: ColQwen2Processor.from_pretrained('vidore/colqwen2-v1.0') at main raises 'TypeError: expected str, bytes or os.PathLike object, not NoneType' at transformers/processing_utils.py:993, as in attempt 6. C: it loads at 83a0134c, the last revision without additional_chat_templates/. D: ColQwen2_5_Processor at the pinned vidore/colqwen2.5-v0.2 revision dcbe8d9c raises the same TypeError. E: it loads at 6f6fcdfd, the last colqwen2.5-v0.2 revision without the template, and has process_images, process_queries and score. Only processor and tokenizer files were downloaded, into the fresh private HF_HOME.",
       "retained": [
@@ -154,7 +154,7 @@
     {
       "id": "colpali-slice-cpu-reproduction",
       "evidence_class": "upstream_native_operation + local_integration",
-      "command": "sh reproduction/reproduce-cpu.sh <out>: fresh mktemp venv from requirements-lock.txt (installed set checked equal), CUDA_VISIBLE_DEVICES='' checked (torch.cuda.is_available() False), pinned Hub revisions into a private HF_HOME, slice rebuilt byte-identically, then evaluate-retriever offline for colpali and for dummy_vision_retriever under /usr/bin/time -v",
+      "command": "Historical as-run: sh reproduce-cpu.sh <out>, fresh mktemp venv from the exact pins now preserved in reproduction/environment-record.json (installed set checked equal), CUDA_VISIBLE_DEVICES='' checked (torch.cuda.is_available() False), pinned Hub revisions into a private HF_HOME, slice rebuilt byte-identically, then evaluate-retriever offline for colpali and for dummy_vision_retriever under /usr/bin/time -v. The current reproduction/reproduce-cpu.sh supersedes that source and requires --accept-known-advisories; it has not rerun these model operations.",
       "exit_code": 0,
       "result": {
         "colpali-v1.3": {
@@ -183,7 +183,7 @@
         "reproduction/reproduce-cpu.sh",
         "reproduction/build_slice.py",
         "reproduction/slice-expected.json",
-        "reproduction/requirements-lock.txt"
+        "reproduction/environment-record.json"
       ]
     },
     {
@@ -224,6 +224,19 @@
       "retained": [
         "native-outputs/hf-license-chain.txt",
         "source-review.json#readme-model-table"
+      ]
+    },
+    {
+      "id": "lock-regeneration-repair",
+      "evidence_class": "local_integration",
+      "command": "sh reproduction/lock_regeneration_check.sh",
+      "exit_code": 0,
+      "result": "Exact original 1834-byte lock and SHA-256 reproduced only after opt-in; all advisory IDs surfaced; tamper and Git-tree refusal verified; synthetic uv verifies installed-set equality/mismatch and cleanup. No model execution or package install.",
+      "retained": [
+        "reproduction/environment-record.json",
+        "reproduction/regenerate_lock.py",
+        "reproduction/lock_regeneration_check.sh",
+        "native-outputs/lock-regeneration-check-20260926-final.txt"
       ]
     }
   ],

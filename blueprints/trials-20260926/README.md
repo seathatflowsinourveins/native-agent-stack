@@ -28,6 +28,16 @@ lines, and the retained files themselves. This folder's own
 [`retained-outputs.json`](retained-outputs.json) covers the pin checks and the
 host cleanup.
 
+ColPali's historical dependency environment is now retained as an
+[environment record](colpali/reproduction/environment-record.json), with all
+94 pins, the original SHA-256 and 20 known advisories. Its reproduction requires
+explicit advisory acceptance and regenerates an identical lock only in a
+temporary directory. MIRIX's retained
+[key helper](mirix/local-integration/gen_key_main.py) writes a caller-chosen
+0600 file; the as-run helper printed the key to the terminal and is not retained.
+[Repair sources and scope](security-repair-sources.md) distinguish the new local
+checks from the historical native runs.
+
 ## Evidence classes
 
 `upstream_test`, `upstream_native_operation`, `local_integration`,
@@ -109,10 +119,12 @@ After the cleanup, a self-contained ByteRover reproduction ran with every
 ByteRover path redirected into its workspace; the host paths above were absent
 before and after it
 ([`byterover-cli/reproduction/run-20260926T0454Z/host-state-observation.txt`](byterover-cli/reproduction/run-20260926T0454Z/host-state-observation.txt)).
-That run also ended with `brv restart`. The current reproduction
+That run also ended with `brv restart`. The next reproduction
 ([`byterover-cli/reproduction/run-20260926T1131Z/`](byterover-cli/reproduction/run-20260926T1131Z/))
 stops only the daemon and agent it recorded, and the host paths were again absent
-before and after it.
+before and after it. Its script ignored a failed process recording; the fixed copy
+in `byterover-cli/reproduction/fixed/` stops instead and keeps its workspace for
+recovery ([`byterover-cli/README.md#review-fixes`](byterover-cli/README.md#review-fixes)).
 
 ### Removed by the first polish pass (2026-09-26 06:39Z, [`first-pass-scratch-trees/`](host-cleanup-20260926/first-pass-scratch-trees/))
 
@@ -167,6 +179,8 @@ In this session's scratch directory (`<scratch>`), these remain:
 | `<scratch>/wt-trials` | 117,860,321 bytes | The first pass's git worktree (branch `claude/p1-trials-mirix-byterover-colpali-20260926`, 11 uncommitted entries), the unmerged work this change supersedes | `git worktree remove --force` and deletion of the branch. That is the coordinator's call, because these passes may not run git worktree commands |
 | `<scratch>/trials-2` | 193,239,378 bytes | The port's working tree: private originals of its retained outputs, reproduction staging and pinned source checkouts | `rm -r` of the literal directory once this change is merged; nothing removes it automatically |
 | `<scratch>/trials-pol` | 33,951,472 bytes | The polish passes' working tree: private originals of their outputs, the probe's private `HF_HOME`, and the regenerated source reviews | the same |
+| `<scratch>/trials-gpt6` | 816,213,279 bytes (measured by the review-fix round at 12:35Z) | The first GPT-6 repair round's working tree: private originals of its outputs (`run-20260926T1131Z`, the probe variants, the credential and owned-processes checks), its npm cache, pinned source checkouts, and lint and test environments | the same |
+| `<scratch>/fix-v2` | 19,012,683 bytes (at 12:53Z) | The review-fix round's working tree: private originals of its outputs, its publish scripts, scratch mutants of the fixed scripts, its test-suite logs, an OSV-Scanner 2.6.0 report on the historical ColPali environment now recorded in `colpali/reproduction/environment-record.json`, and the pinned `byterover-cli-3.16.1.tgz` that `ownership_failure_check.py` takes | the same |
 | `<scratch>/wt-trials2` | 135,766,227 bytes | This change's worktree | after integration |
 
 Shared caches keep entries the trials downloaded (`~/.npm`, `~/.cache/uv`). They

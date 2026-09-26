@@ -5,7 +5,7 @@
   "host": {
     "host_id": "nativestack-5975wx-20260925",
     "platform_id": "linux-wsl2-x86_64",
-    "note": "First pass 2026-09-26 01:22Z-03:54Z (install, upstream suite, provider connect, curate/query, receipts); self-contained reproductions at 04:24Z and 04:54Z; host cleanup at 04:53Z; cross-family repair round 10:58Z-11:35Z (current reproduction at 11:31Z; cleanup-scope probes at 11:10Z for the 0454Z version and 11:33Z for the current one; credential probe at 11:16Z). Node v24.21.0, npm 11.19.0."
+    "note": "First pass 2026-09-26 01:22Z-03:54Z (install, upstream suite, provider connect, curate/query, receipts); self-contained reproductions at 04:24Z and 04:54Z; host cleanup at 04:53Z; cross-family repair round 10:58Z-11:35Z (current reproduction at 11:31Z; cleanup-scope probes at 11:10Z for the 0454Z version and 11:33Z for the current one; credential probe at 11:16Z); review-fix round 12:16Z-12:28Z (fixed copies in local-integration/fixed/ and reproduction/fixed/, their checks against both versions, and the fixed reproduction in the cleanup-scope probe at 12:26Z). Node v24.21.0, npm 11.19.0."
   },
   "component": {
     "trial_component_id": "byterover-cli",
@@ -61,9 +61,10 @@
       "exit_code": 0,
       "result": "Both positive searches returned exactly one result with the expected path and excerpt (auth/notes.md score 0.76, billing/notes.md score 0.66); the negative search returned totalFound 0; every search JSON had success true and status completed. The two deliberately wrong expectations (wrong path, wrong count) failed the same checker. brv status reported authStatus not_logged_in: no account, LLM or network model endpoint was used.",
       "runs": {
-        "reproduction/run-20260926T1131Z": "current script, run by reproduction/run-with-host-observation.sh in the host PID namespace: same search results; the autoupdate hook never ran; the script recorded its daemon (process group and session equal to its pid) and the agent the daemon forked, sent SIGTERM to the daemon only, and both were gone after 5.41 s; the host ByteRover paths were absent before and after; the dedicated TMPDIR kept only node-compile-cache, Node's default compile-cache directory, which npm 11 enables at startup (source-review.json#npm-compile-cache). No process list was read.",
+        "reproduction/run-20260926T1131Z": "the script version kept at reproduction/reproduce-vc-search.sh (superseded by reproduction/fixed/), run by reproduction/run-with-host-observation.sh in the host PID namespace: same search results; the autoupdate hook never ran; the script recorded its daemon (process group and session equal to its pid) and the agent the daemon forked, sent SIGTERM to the daemon only, and both were gone after 5.41 s; the host ByteRover paths were absent before and after; the dedicated TMPDIR kept only node-compile-cache, Node's default compile-cache directory, which npm 11 enables at startup (source-review.json#npm-compile-cache). No process list was read.",
         "reproduction/run-20260926T0454Z": "earlier script version (kept in that folder): every ByteRover config/data/state/cache directory in the workspace, autoupdate disabled; same search results; its cleanup ran brv restart, which is host-wide (finding B6, brv_restart_in_earlier_runs). Its separate before/after check found no ByteRover path on the host and no ByteRover process afterwards (host-state-observation.txt).",
-        "reproduction/run-20260926T0424Z": "earliest script version (kept in that folder): same results, but it left XDG_CACHE_HOME at the host default, so each brv call touched ~/.cache/brv/lastrun; its cleanup also ran brv restart"
+        "reproduction/run-20260926T0424Z": "earliest script version (kept in that folder): same results, but it left XDG_CACHE_HOME at the host default, so each brv call touched ~/.cache/brv/lastrun; its cleanup also ran brv restart",
+        "reproduction/restart-scope-probe-20260926/fixed": "fixed script (reproduction/fixed/reproduce-vc-search.sh), run by the cleanup-scope probe in a new user and PID namespace, 2026-09-26T12:26Z-12:27Z: its pidfd preflight passed; every search check matched its intended outcome; the autoupdate hook never ran; it recorded its daemon and the agent the daemon forked, sent SIGTERM to the daemon only, and both were gone after 5.41 s. Only its steps log, preflight, recording and stop outputs are retained."
       },
       "retained": [
         "reproduction/run-20260926T1131Z/",
@@ -72,15 +73,18 @@
         "reproduction/reproduce-vc-search.sh",
         "reproduction/owned_processes.py",
         "reproduction/check_search.py",
-        "reproduction/run-with-host-observation.sh"
-      ]
+        "reproduction/run-with-host-observation.sh",
+        "reproduction/fixed/",
+        "reproduction/restart-scope-probe-20260926/fixed/"
+      ],
+      "script_versions": "Use reproduction/fixed/reproduce-vc-search.sh. reproduction/reproduce-vc-search.sh is the version run-20260926T1131Z and the probe's current variant ran, kept byte-identical because their records cite its hash; it ignored a failed process recording (check ownership-failure-check)."
     },
     {
       "id": "cleanup-scope-probe",
       "evidence_class": "local_integration",
-      "command": "sh reproduction/restart-scope-probe.sh <script-dir> <out> for the run-20260926T0454Z script and for the current script, each as PID 1's child in a new user and PID namespace with its own /proc, next to four decoy sleepers whose only link to ByteRover is one argument (.../worker.js control, .../bin/brv, .../brv-server.js, .../agent-process.js)",
+      "command": "sh reproduction/restart-scope-probe.sh <script-dir> <out> for the run-20260926T0454Z script, the run-20260926T1131Z script (reproduction/) and the fixed script (reproduction/fixed/), each as PID 1's child in a new user and PID namespace with its own /proc, next to four decoy sleepers whose only link to ByteRover is one argument (.../worker.js control, .../bin/brv, .../brv-server.js, .../agent-process.js)",
       "exit_code": 0,
-      "result": "0454Z version: brv restart killed the three pattern decoys with SIGKILL (wait status 137) and spared the control. Current version: all four decoys still running afterwards; the recorded daemon got SIGTERM and it and its agent were gone in 5.41 s. Both passed every search check, and neither left a process in the namespace.",
+      "result": "0454Z version: brv restart killed the three pattern decoys with SIGKILL (wait status 137) and spared the control. run-20260926T1131Z version: all four decoys still running afterwards; the recorded daemon got SIGTERM and it and its agent were gone in 5.41 s. Fixed version (12:26Z): all four decoys still running afterwards; its pidfd preflight passed; the recorded daemon got SIGTERM and it and its agent were gone in 5.41 s. All three passed every search check, and none left a process in the namespace.",
       "retained": [
         "reproduction/restart-scope-probe-20260926/",
         "reproduction/restart-scope-probe.sh"
@@ -107,6 +111,46 @@
         "native-outputs/credential-argv-probe-20260926T111651Z.txt",
         "local-integration/credential-argv-probe.py",
         "local-integration/connect-local-llm-safe.sh"
+      ],
+      "superseded_by": "credential-argv-probe-inherited-export"
+    },
+    {
+      "id": "owned-processes-pidfd-check",
+      "evidence_class": "local_integration",
+      "command": "python3 reproduction/fixed/owned_processes_check.py [reproduction/owned_processes.py] (fake processes only)",
+      "exit_code": "1 against reproduction/owned_processes.py; 0 against reproduction/fixed/owned_processes.py",
+      "result": "Nine expectations written before the run: the five of owned-processes-check, preflight exit 0, and three interpreters without usable pidfds (os.pidfd_open deleted, os.pidfd_open raising ENOSYS, signal.pidfd_send_signal deleted), each next to a live sleeper recorded with its real start time. reproduction/owned_processes.py, the helper run-20260926T1131Z used, held the first five; it has no preflight, and with os.pidfd_open deleted or raising ENOSYS its stop checked the start time and then sent SIGTERM by raw pid, stopping the sleeper. reproduction/fixed/owned_processes.py held all nine: without usable pidfds, stop sent nothing and exited 1 and preflight exited 1.",
+      "retained": [
+        "native-outputs/owned-processes-check-20260926T121929Z-as-run.txt",
+        "native-outputs/owned-processes-check-20260926T121949Z-fixed.txt",
+        "reproduction/fixed/owned_processes_check.py",
+        "reproduction/fixed/owned_processes.py"
+      ]
+    },
+    {
+      "id": "ownership-failure-check",
+      "evidence_class": "local_integration",
+      "command": "python3 reproduction/fixed/ownership_failure_check.py <script-dir> <byterover-cli-3.16.1.tgz> reproduction/run-20260926T1131Z, for reproduction/ and reproduction/fixed/ (stub npm and brv, a fake daemon, a new user and PID namespace; no ByteRover code, no network)",
+      "exit_code": "1 against reproduction/ (the run-20260926T1131Z script); 0 against reproduction/fixed/",
+      "result": "Four cases with expectations written before the run. Both versions stopped an owned daemon with SIGTERM, exited 0 and removed the workspace. When owned_processes.py record refused the daemon named by daemon.json, and when no daemon.json appeared, the run-20260926T1131Z script exited 0, removed its workspace and left the daemon running without a signal; without os.pidfd_open its cleanup stopped the daemon by raw pid. The fixed script stopped after brv vc init when record failed, exited 4 in both ownership cases, kept the workspace (with its daemon.json when there was one) and sent the unrecorded daemon no signal; without os.pidfd_open it exited 1 before the daemon started.",
+      "retained": [
+        "native-outputs/ownership-failure-check-20260926T122516Z-as-run.txt",
+        "native-outputs/ownership-failure-check-20260926T122520Z-fixed.txt",
+        "reproduction/fixed/ownership_failure_check.py",
+        "reproduction/fixed/reproduce-vc-search.sh"
+      ]
+    },
+    {
+      "id": "credential-argv-probe-inherited-export",
+      "evidence_class": "local_integration",
+      "command": "python3 local-integration/fixed/credential-argv-probe.py <safe script>, for local-integration/connect-local-llm-safe.sh and local-integration/fixed/connect-local-llm-safe.sh (random dummy value, loopback listener started by the probe; nothing sent to port 18232)",
+      "exit_code": "1 against local-integration/connect-local-llm-safe.sh; 0 against the fixed copy",
+      "result": "Five forms: the first-pass header form, the safe form, the safe form with KEY exported by the caller under sh and under bash, and the safe form under bash with allexport exported through SHELLOPTS. The first safe form held the first two; in the other three the value was in a client process's environment, because KEY=\"\" keeps an inherited export attribute and allexport exports KEY on assignment. The fixed copy (set +a, unset KEY before reading) held all five: the value was in no command line or environment, exit 0, http_code=200.",
+      "retained": [
+        "native-outputs/credential-argv-probe-20260926T121653Z-as-run.txt",
+        "native-outputs/credential-argv-probe-20260926T121709Z-fixed.txt",
+        "local-integration/fixed/credential-argv-probe.py",
+        "local-integration/fixed/connect-local-llm-safe.sh"
       ]
     },
     {
@@ -121,7 +165,7 @@
         "native-outputs/task-records/08-curate-log.json",
         "local-integration/connect-local-llm.sh"
       ],
-      "recipe_note": "local-integration/connect-local-llm.sh is unsafe as run: it put the key in curl's -H argument and in brv providers connect --api-key, where every local user can read it through /proc/<pid>/cmdline or ps. The published copy is marked so; the safe form is local-integration/connect-local-llm-safe.sh (credential-argv-probe check)."
+      "recipe_note": "local-integration/connect-local-llm.sh is unsafe as run: it put the key in curl's -H argument and in brv providers connect --api-key, where every local user can read it through /proc/<pid>/cmdline or ps. The published copy is marked so; the safe form is local-integration/fixed/connect-local-llm-safe.sh (credential-argv-probe-inherited-export). The first safe form, local-integration/connect-local-llm-safe.sh, let a KEY export inherited from the caller carry the key into curl's environment."
     },
     {
       "id": "local-llm-query",
@@ -289,7 +333,7 @@
     },
     {
       "item": "The safe connection recipe against the host llama.cpp service",
-      "reason": "Its curl step was checked only with a dummy value against a loopback listener (credential-argv-probe); its ByteRover step, key entry in the web UI's password field, rests on source review."
+      "reason": "Its curl step was checked only with a dummy value against a loopback listener (credential-argv-probe, and for the fixed copy credential-argv-probe-inherited-export); its ByteRover step, key entry in the web UI's password field, rests on source review."
     }
   ],
   "withdrawn_host_receipts": {

@@ -153,8 +153,7 @@
       "retained": [
         "native-outputs/quickstart-main-run2-list-content.log",
         "native-outputs/server-main-8cb06a62-port18533.log",
-        "local-integration/quickstart_add_retrieve_async.py",
-        "local-integration/gen_key_main.py"
+        "local-integration/quickstart_add_retrieve_async.py"
       ]
     },
     {
@@ -177,6 +176,18 @@
       "result": "mirix 0.1.7's description says `pip install mirix-client`; the mirix-client project is registered with no files and no versions, so that command installs nothing (F7).",
       "retained": [
         "native-outputs/pypi-mirix-client-check.txt"
+      ]
+    },
+    {
+      "id": "key-helper-file-output-repair",
+      "evidence_class": "local_integration",
+      "command": "python local-integration/gen_key_main_check.py",
+      "exit_code": 0,
+      "result": "19/19 dummy-only expectations: private 0600 file, no key in output, no overwrite/symlink following, and suppression of a key-bearing exception with incomplete-file cleanup. No MIRIX server call.",
+      "retained": [
+        "local-integration/gen_key_main.py",
+        "local-integration/gen_key_main_check.py",
+        "native-outputs/gen-key-main-check-20260926.txt"
       ]
     }
   ],
@@ -216,7 +227,7 @@
     {
       "id": "F4",
       "affects": "main@8cb06a62",
-      "summary": "samples/generate_demo_api_key.py calls OrganizationManager/ClientManager methods without await; they are async at main. The first pass's as-shipped run output was not retained, so this rests on source review; the awaited copy (local-integration/gen_key_main.py) produced the key the main runs used.",
+      "summary": "samples/generate_demo_api_key.py calls OrganizationManager/ClientManager methods without await; they are async at main. The first pass's as-shipped run output was not retained, so this rests on source review. The as-run awaited helper issued the key used by the main runs but printed it to the terminal and is not retained. local-integration/gen_key_main.py is the fixed successor: it writes only to a caller-chosen new 0600 file and was checked with dummy modules, not used for the historical server runs.",
       "evidence": [
         "source-review.json#F4-main-demo-key",
         "source-review.json#F4-main-org-manager",

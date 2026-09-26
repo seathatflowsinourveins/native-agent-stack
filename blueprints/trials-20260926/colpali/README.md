@@ -38,11 +38,33 @@ evaluation to MTEB (`source-review.json#colpali-deprecation`, `#vidore-main-mteb
 | `colpali-engine` (PyPI latest at the trial, not co-installable) | `0.3.18`, wheel `9f04fa89…9d4` | same |
 | `vidore-benchmark` | `5.0.0` = tag `v5.0.0` = `d167f9ce6be840c5d887aa5cb1c01d2060485c93`, wheel `ad2b2141…a7b6`, sdist `cb3d1a68…b80c` | same |
 | Hub | `vidore/colpali-v1.3` `b5c6dd62…0a11`; `vidore/colpaligemma-3b-pt-448-base` `30ab955d…5e5a`; dataset `vidore/tabfquad_test_subsampled` `16c8e633…580f` | Hub revision API |
-| Environment | [`reproduction/requirements-lock.txt`](reproduction/requirements-lock.txt) (torch 2.8.0, transformers 4.53.1, sentence-transformers 3.4.1, datasets 5.0.1) | the reproduction checks the installed set equals it |
+| Environment | [`reproduction/environment-record.json`](reproduction/environment-record.json) (94 exact pins, including torch 2.8.0 and transformers 4.53.1; original bytes and SHA-256; known advisories) | explicit opt-in regenerates an identical temporary lock; the reproduction compares the installed set with that recorded environment |
 
 Pin checks: [`../provenance/run-20260926T045856Z/verify-pins.log`](../provenance/run-20260926T045856Z/verify-pins.log).
 The first pass's candidate row carried `174055b0…` without saying what it was;
 it is the `v0.3.13` tag commit of `illuin-tech/colpali`.
+
+The historical environment has **20 known advisories: 1 critical, 15 high and
+4 medium**, recorded from the retained
+[OSV-Scanner output](native-outputs/osv-scanner-requirements-lock-20260926T130641Z.txt).
+The lock and installed freeze are no longer shipped as installable files. The
+environment record preserves every original requirement, version and hash list
+(the original had no `--hash` values), plus its 1834-byte size and SHA-256.
+No OSV ignore was added. The recorded fixes do not fit colpali-engine 0.3.13's
+dependency bounds (`source-review.json#colpali-engine-deps`).
+
+The current [CPU reproduction script](reproduction/reproduce-cpu.sh) requires
+`sh reproduction/reproduce-cpu.sh --accept-known-advisories <output-dir>`.
+[Regeneration](reproduction/regenerate_lock.py) prints the advisory IDs, refuses
+without the flag, and creates the lock only in a new private temporary directory
+outside Git work trees. The CPU script removes its workspace on exit. A direct
+regeneration caller must remove the returned lock's temporary directory after use.
+The [retained check output](native-outputs/lock-regeneration-check-20260926-final.txt)
+proves byte identity with the original Git blob, refusal without opt-in, and
+cleanup. Synthetic uv checks exercise both outcomes of the installed-environment
+comparison without installing packages or running a model. The current script
+supersedes the historical as-run script; the metrics below remain historical.
+Repair sources and scope: [source note](../security-repair-sources.md).
 
 ## Results
 

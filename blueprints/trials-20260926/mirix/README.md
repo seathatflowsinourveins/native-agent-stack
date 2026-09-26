@@ -118,9 +118,10 @@ Each finding is backed by retained native output and by pinned source lines
    listed it as affected.
 4. **F4 (main).** `samples/generate_demo_api_key.py` calls async manager
    methods without `await`. The as-shipped run's output was not retained, so
-   this rests on source review; the awaited copy
-   ([`gen_key_main.py`](local-integration/gen_key_main.py)) issued the key the
-   main runs used.
+   this rests on source review. The as-run awaited helper issued the key the
+   main runs used, but printed the key to the terminal and is not retained.
+   The retained [`gen_key_main.py`](local-integration/gen_key_main.py) is the
+   repaired version described below; it was not used for those historical runs.
 5. **F5 (main; not v0.1.6).** `add_memory` concatenates a string with each dict
    part of list content, so the README's own message shape returns 500. v0.1.6
    extends list content unchanged, so this is a regression after the tag.
@@ -130,6 +131,30 @@ Each finding is backed by retained native output and by pinned source lines
    nothing.
 8. **F8 (v0.1.6).** `tests/README.md` describes two test files (18 + 4 tests);
    the tag ships 14 `test_*.py` files and pytest collects 193 tests.
+
+## Key helper repair
+
+The as-run awaited helper printed the generated API key to the terminal
+(`py/clear-text-logging-sensitive-data`) and is not retained. Its historical
+size and hash remain in [`retained-outputs.json`](retained-outputs.json).
+The fixed [`local-integration/gen_key_main.py`](local-integration/gen_key_main.py)
+keeps the awaited calls to MIRIX at `8cb06a62`, requires `--key-file PATH`, and
+writes the key only to a new file with mode **0600**. Existing files and symlinks
+are refused. It never prints or logs the key, suppresses upstream exception
+details, and removes an incomplete file on failure.
+
+Usage with a separate checkout of the pinned MIRIX source:
+
+```sh
+python local-integration/gen_key_main.py --mirix-src <pinned-mirix-checkout> --key-file <new-private-file>
+```
+
+The [dummy-only integration check](local-integration/gen_key_main_check.py)
+passed [19 expectations](native-outputs/gen-key-main-check-20260926.txt), including
+file permissions, no key in either output stream, refusal to overwrite, and
+an upstream exception containing the dummy key. These are synthetic checks of
+the fixed helper, not a new MIRIX server run. See the
+[repair source note](../security-repair-sources.md) for upstream references.
 
 ## Blocked and not evaluated
 

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "description": "Sanitized copies of the ByteRover CLI trial's native outputs (including ByteRover's own task and query records, daemon logs and oclif autoupdate log, copied from its host data and cache directories before the trial cleanup removed them), the self-written glue, and the self-contained reproduction runs with the exact script version each run used.",
-  "sanitization_policy": "Private originals are not published; their name, byte count and sha256 are recorded here. They were in this session's scratch directory (the first pass's trees, which the first polish pass deleted on 2026-09-26 at 06:39Z (../host-cleanup-20260926/first-pass-scratch-trees/), or the port's and polish passes' own trees (trials-2, trials-pol), which remain (../README.md#host-state)) or, for ByteRover's own task records, logs and autoupdate log, in its host XDG data and cache directories, which the port's cleanup removed (../host-cleanup-20260926/). Published copies replace the session scratch path with <scratch>, the home directory with ~, the user name with <user> (also inside underscore-encoded paths), UUID-shaped identifiers with <uuid>, and credential values with <redacted>; excerpts mark every omitted line range in place. Files marked verbatim are byte-for-byte copies. Each published copy passed scripts/validate.py PRIVATE_CONTENT and a credential-shape check.",
+  "sanitization_policy": "Private originals are not published; their name, byte count and sha256 are recorded here. They were in this session's scratch directory (the first pass's trees, which the first polish pass deleted on 2026-09-26 at 06:39Z (../host-cleanup-20260926/first-pass-scratch-trees/), or the port's, polish passes' and review-fix rounds' own trees (trials-2, trials-pol, trials-gpt6, fix-v2), which remain (../README.md#host-state)) or, for ByteRover's own task records, logs and autoupdate log, in its host XDG data and cache directories, which the port's cleanup removed (../host-cleanup-20260926/). Published copies replace the session scratch path with <scratch>, the home directory with ~, the user name with <user> (also inside underscore-encoded paths), UUID-shaped identifiers with <uuid>, and credential values with <redacted>; excerpts mark every omitted line range in place. Files marked verbatim are byte-for-byte copies. Each published copy passed scripts/validate.py PRIVATE_CONTENT and a credential-shape check.",
   "outputs": [
     {
       "path": "native-outputs/npm-install-global-3.16.1.log",
@@ -559,7 +559,7 @@
     {
       "path": "local-integration/connect-local-llm.sh",
       "evidence_class": "local_integration_source",
-      "what": "UNSAFE AS RUN. Self-written script that read the local llama.cpp key into a shell variable and then put it into two process argument lists: curl's -H value and `brv providers connect --api-key`. Any local user can read those through /proc/<pid>/cmdline or ps while the commands run; redacting the saved output does not undo that. The published copy carries a warning block after the shebang; its commands are unchanged. The credential location is not published. Safe form: connect-local-llm-safe.sh.",
+      "what": "UNSAFE AS RUN. Self-written script that read the local llama.cpp key into a shell variable and then put it into two process argument lists: curl's -H value and `brv providers connect --api-key`. Any local user can read those through /proc/<pid>/cmdline or ps while the commands run; redacting the saved output does not undo that. The published copy carries a warning block after the shebang; its commands are unchanged. The credential location is not published. Safe form: fixed/connect-local-llm-safe.sh.",
       "command": null,
       "exit_code": null,
       "observed": null,
@@ -569,8 +569,8 @@
         "sha256": "83b7e528688de4e019414b2079b40ec3a5c9e65fb483779c4a0a6b1f9550cbff"
       },
       "published": {
-        "bytes": 1858,
-        "sha256": "01307bb8a238546d22813ce60883251647f9cc710eb6bd157c50af77ca869ad6"
+        "bytes": 2076,
+        "sha256": "0917197eaf8580286b36c68eeec7643e20ee5e00207627a9784979d0320831f0"
       },
       "excerpt_lines": null,
       "verbatim": false,
@@ -1780,7 +1780,7 @@
     {
       "path": "reproduction/reproduce-vc-search.sh",
       "evidence_class": "local_integration_source",
-      "what": "Current self-contained reproduction of the offline store/retrieve path: pinned npm install into a mktemp prefix after an integrity check, every ByteRover config/data/state/cache directory redirected into the workspace (BRV_*_DIR overrides unset), background autoupdate disabled and checked idle, installed dependency versions recorded (npm ls), `brv vc` commits and `brv search` queries, checks with check_search.py including two deliberately wrong expectations, then a stop of only the processes owned_processes.py recorded (the daemon named by the workspace's own daemon.json and its descendants) and removal of the workspace. It no longer calls `brv restart`. run-20260926T1131Z and the probe's current variant executed this exact version. Our glue around the upstream CLI.",
+      "what": "Self-contained reproduction of the offline store/retrieve path: pinned npm install into a mktemp prefix after an integrity check, every ByteRover config/data/state/cache directory redirected into the workspace (BRV_*_DIR overrides unset), background autoupdate disabled and checked idle, installed dependency versions recorded (npm ls), `brv vc` commits and `brv search` queries, checks with check_search.py including two deliberately wrong expectations, then a stop of only the processes owned_processes.py recorded (the daemon named by the workspace's own daemon.json and its descendants) and removal of the workspace. It no longer calls `brv restart`. run-20260926T1131Z and the probe's current variant executed this exact version, which is kept byte-identical because their records cite its hash. Superseded by reproduction/fixed/reproduce-vc-search.sh: this version ignored a failed process recording after each command and in its cleanup, so with no ledger its cleanup signalled nothing, removed the workspace and could exit 0 while the daemon kept running (native-outputs/ownership-failure-check-20260926T122516Z-as-run.txt). Our glue around the upstream CLI.",
       "command": null,
       "exit_code": null,
       "observed": null,
@@ -1820,7 +1820,7 @@
     {
       "path": "native-outputs/owned-processes-check-20260926T110019Z.txt",
       "evidence_class": "local_integration",
-      "what": "Output of reproduction/owned_processes_check.py (sha256 42e90ec48c75b8d06beeca4aa85672703c39dbf5d3754d7673bd53add0f3fc91) against owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3): five cases with fake processes (graceful stop, SIGKILL fallback after 10 s, foreign daemon file, unreadable daemon file, reused pid), each expectation written before the run; all held.",
+      "what": "Output of reproduction/owned_processes_check.py (sha256 42e90ec48c75b8d06beeca4aa85672703c39dbf5d3754d7673bd53add0f3fc91) against owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3): five cases with fake processes (graceful stop, SIGKILL fallback after 10 s, foreign daemon file, unreadable daemon file, reused pid), each expectation written before the run; all held. It did not cover a host without usable pidfds; owned-processes-check-20260926T121929Z-as-run.txt does.",
       "command": null,
       "exit_code": null,
       "observed": "2026-09-26T11:00:19Z",
@@ -1840,7 +1840,7 @@
     {
       "path": "native-outputs/credential-argv-probe-20260926T111651Z.txt",
       "evidence_class": "local_integration",
-      "what": "Output of local-integration/credential-argv-probe.py (sha256 9bcb436009e4ae32e7d5be3e023c610cfba3055ad879239bf3761dad4b08363a) against connect-local-llm-safe.sh (sha256 5b2c54943172b988155f2db9992bc870f7eaf490f20a4ab00e3fb8c5f11eae5f) with a random dummy value and a loopback listener started by the probe (nothing sent to port 18232): the first-pass header form put the value in curl's command line; the safe form delivered the same header with the value in none of the three inspected processes' command lines or environments, exit 0, http_code=200.",
+      "what": "Output of local-integration/credential-argv-probe.py (sha256 9bcb436009e4ae32e7d5be3e023c610cfba3055ad879239bf3761dad4b08363a) against connect-local-llm-safe.sh (sha256 5b2c54943172b988155f2db9992bc870f7eaf490f20a4ab00e3fb8c5f11eae5f) with a random dummy value and a loopback listener started by the probe (nothing sent to port 18232): the first-pass header form put the value in curl's command line; the safe form delivered the same header with the value in none of the three inspected processes' command lines or environments, exit 0, http_code=200. It did not cover a caller that exported KEY; credential-argv-probe-20260926T121653Z-as-run.txt does.",
       "command": null,
       "exit_code": null,
       "observed": "2026-09-26T11:16:51Z",
@@ -1860,7 +1860,7 @@
     {
       "path": "reproduction/owned_processes.py",
       "evidence_class": "local_integration_source",
-      "what": "Records the daemon named by the reproduction's own daemon.json (an argument must be a brv-server.js under the workspace prefix) and that daemon's descendants, each with pid, start time, process group and session, without listing /proc; on exit sends SIGTERM to the recorded daemon and SIGKILL after 10 s to any recorded process still running, each through a pidfd checked against the recorded start time. Replaces `brv restart`. Our glue.",
+      "what": "Records the daemon named by the reproduction's own daemon.json (an argument must be a brv-server.js under the workspace prefix) and that daemon's descendants, each with pid, start time, process group and session, without listing /proc; on exit sends SIGTERM to the recorded daemon and SIGKILL after 10 s to any recorded process still running, each through a pidfd checked against the recorded start time, or, when pidfd_open is missing or fails, by raw pid after that check. Replaces `brv restart`. Kept byte-identical: run-20260926T1131Z, the probe's current variant and owned-processes-check-20260926T110019Z.txt ran it. Superseded by reproduction/fixed/owned_processes.py, because a pid reused between the check and os.kill() would receive the signal (native-outputs/owned-processes-check-20260926T121929Z-as-run.txt). Our glue.",
       "command": null,
       "exit_code": null,
       "observed": null,
@@ -1880,7 +1880,7 @@
     {
       "path": "reproduction/owned_processes_check.py",
       "evidence_class": "local_integration_source",
-      "what": "Five-case check of owned_processes.py against fake processes it starts itself (graceful stop, SIGKILL fallback, foreign daemon file, unreadable daemon file, reused pid), expectations written before the run. Our glue.",
+      "what": "Five-case check of owned_processes.py against fake processes it starts itself (graceful stop, SIGKILL fallback, foreign daemon file, unreadable daemon file, reused pid), expectations written before the run. Kept byte-identical as the version behind owned-processes-check-20260926T110019Z.txt; the extended copy is reproduction/fixed/owned_processes_check.py. Our glue.",
       "command": null,
       "exit_code": null,
       "observed": null,
@@ -1940,7 +1940,7 @@
     {
       "path": "local-integration/connect-local-llm-safe.sh",
       "evidence_class": "local_integration_source",
-      "what": "Safe form of connect-local-llm.sh: reads the key with the shell's read builtin and gives curl the Authorization header on standard input (-H @-), so the key reaches no argument list or environment; prints the ByteRover web UI steps for the provider key (a masked password field), because ByteRover 3.16.1 has no stdin, file or environment option for it. Checked by credential-argv-probe.py with a dummy value; not run against the host llama.cpp service. Our glue.",
+      "what": "First safe form of connect-local-llm.sh, kept byte-identical as the version credential-argv-probe-20260926T111651Z.txt checked; superseded by local-integration/fixed/connect-local-llm-safe.sh, because its KEY=\"\" keeps an export attribute inherited from the caller and, under bash, an allexport option exported through SHELLOPTS exports KEY; in both cases the key reached curl's environment (native-outputs/credential-argv-probe-20260926T121653Z-as-run.txt). As written, it reads the key with the shell's read builtin and gives curl the Authorization header on standard input (-H @-), so the key reaches no argument list, and no environment unless the caller exported KEY or allexport; prints the ByteRover web UI steps for the provider key (a masked password field), because ByteRover 3.16.1 has no stdin, file or environment option for it. Checked by credential-argv-probe.py with a dummy value; not run against the host llama.cpp service. Our glue.",
       "command": null,
       "exit_code": null,
       "observed": null,
@@ -1960,7 +1960,7 @@
     {
       "path": "local-integration/credential-argv-probe.py",
       "evidence_class": "local_integration_source",
-      "what": "Compares the first-pass header form with connect-local-llm-safe.sh using a random dummy value and a loopback listener the probe starts itself: records whether the header arrives and whether the value appears in any client process's command line or environment. Our glue.",
+      "what": "Compares the first-pass header form with connect-local-llm-safe.sh using a random dummy value and a loopback listener the probe starts itself: records whether the header arrives and whether the value appears in any client process's command line or environment. Kept byte-identical as the version behind credential-argv-probe-20260926T111651Z.txt; the extended copy is local-integration/fixed/credential-argv-probe.py. Our glue.",
       "command": null,
       "exit_code": null,
       "observed": null,
@@ -2765,6 +2765,371 @@
       "excerpt_lines": null,
       "verbatim": true,
       "sanitization": []
+    },
+    {
+      "path": "local-integration/fixed/connect-local-llm-safe.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Fixed copy of local-integration/connect-local-llm-safe.sh: turns allexport off (set +a) and unsets KEY before reading the key, because KEY=\"\" keeps an export attribute inherited from the caller and read then put the key into curl's environment. Otherwise the same: the read builtin loads the key, curl gets the Authorization header on standard input (-H @-), and the ByteRover web UI steps are printed for the provider key. Checked with a dummy value by local-integration/fixed/credential-argv-probe.py; not run against the host llama.cpp service. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "connect-local-llm-safe.sh",
+        "bytes": 4574,
+        "sha256": "7b7d8b043132cb31aa71e0255053ca781c6d4821d983543f8defc7a2d53fcc36"
+      },
+      "published": {
+        "bytes": 4574,
+        "sha256": "7b7d8b043132cb31aa71e0255053ca781c6d4821d983543f8defc7a2d53fcc36"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "local-integration/fixed/credential-argv-probe.py",
+      "evidence_class": "local_integration_source",
+      "what": "Extended copy of local-integration/credential-argv-probe.py: the first-pass header form and the safe form as before, plus the safe form under a caller that exported KEY (sh and bash) and under bash with allexport exported through SHELLOPTS; the same dummy value, loopback listener and expectation for every safe form. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "credential-argv-probe.py",
+        "bytes": 7845,
+        "sha256": "016b6f34e8043fbf6792199ee318eb1ea110e239bb18be60f715ced0b06287f3"
+      },
+      "published": {
+        "bytes": 7845,
+        "sha256": "016b6f34e8043fbf6792199ee318eb1ea110e239bb18be60f715ced0b06287f3"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/fixed/reproduce-vc-search.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Fixed copy of reproduction/reproduce-vc-search.sh: runs owned_processes.py preflight before anything is installed and stops with exit 1 without working pidfd support; stops at once with exit 4 when a process recording fails; at exit, fails when ownership was not established (a recording failed, or brv vc init ran and no daemon was ever recorded) and then keeps the workspace for recovery (exit 4; exit 3 when a recorded process outlived the stop). Everything else is unchanged. Ran end to end in reproduction/restart-scope-probe-20260926/fixed/ and against stubs in native-outputs/ownership-failure-check-20260926T122520Z-fixed.txt. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "reproduce-vc-search.sh",
+        "bytes": 11787,
+        "sha256": "fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39"
+      },
+      "published": {
+        "bytes": 11787,
+        "sha256": "fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/fixed/owned_processes.py",
+      "evidence_class": "local_integration_source",
+      "what": "Fixed copy of reproduction/owned_processes.py: no raw-pid fallback; every signal goes through a pidfd opened before the start-time check; preflight exits 1, and stop refuses (exit 1, nothing signalled), unless os.pidfd_open and signal.pidfd_send_signal exist and work (a pidfd for its own process and signal 0). record is unchanged. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "owned_processes.py",
+        "bytes": 10680,
+        "sha256": "f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631"
+      },
+      "published": {
+        "bytes": 10680,
+        "sha256": "f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/fixed/owned_processes_check.py",
+      "evidence_class": "local_integration_source",
+      "what": "Extended copy of reproduction/owned_processes_check.py: the original five cases, a working-preflight case, and three cases in which the helper runs without usable pidfds (os.pidfd_open deleted, os.pidfd_open raising ENOSYS, signal.pidfd_send_signal deleted) next to a live sleeper recorded with its real start time. Takes the helper under test as an optional argument. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "owned_processes_check.py",
+        "bytes": 11162,
+        "sha256": "e89ea78a7b6272fd1457a8b3873fa3286a889aed12b242defc215dbc67408ac0"
+      },
+      "published": {
+        "bytes": 11162,
+        "sha256": "e89ea78a7b6272fd1457a8b3873fa3286a889aed12b242defc215dbc67408ac0"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/fixed/check_search.py",
+      "evidence_class": "local_integration_source",
+      "what": "Byte-identical copy of reproduction/check_search.py, which reproduction/fixed/reproduce-vc-search.sh calls from its own directory.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "check_search.py",
+        "bytes": 3144,
+        "sha256": "bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534"
+      },
+      "published": {
+        "bytes": 3144,
+        "sha256": "bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/fixed/ownership_failure_check.py",
+      "evidence_class": "local_integration_source",
+      "what": "Runs a reproduce-vc-search.sh version with stub npm and brv commands and a fake daemon of its own, inside a new user and PID namespace, in four cases (an owned daemon, a daemon file that record refuses, no daemon file, no os.pidfd_open), with the expectations written before the run. No ByteRover code runs and nothing goes over the network: the real pinned tarball is copied for the script's integrity check, and the stub replays run-20260926T1131Z's search outputs. Our glue.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": {
+        "name": "ownership_failure_check.py",
+        "bytes": 11642,
+        "sha256": "6d23646bb5b80253300870f580bb5725ca97dc291be7e411727bdc8fa9671607"
+      },
+      "published": {
+        "bytes": 11642,
+        "sha256": "6d23646bb5b80253300870f580bb5725ca97dc291be7e411727bdc8fa9671607"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/credential-argv-probe-20260926T121653Z-as-run.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of local-integration/fixed/credential-argv-probe.py (sha256 016b6f34e8043fbf6792199ee318eb1ea110e239bb18be60f715ced0b06287f3) against the first safe form, local-integration/connect-local-llm-safe.sh (sha256 5b2c54943172b988155f2db9992bc870f7eaf490f20a4ab00e3fb8c5f11eae5f), with a random dummy value and a loopback listener started by the probe; nothing was sent to port 18232. The first-pass form and the plain safe form held as before. With KEY exported by the caller (under sh and under bash) and with allexport exported through SHELLOPTS (bash), the value was in a client process's environment: 3 of 5 expectations failed. This is the failing-first control for the fix.",
+      "command": "python3 local-integration/fixed/credential-argv-probe.py local-integration/connect-local-llm-safe.sh",
+      "exit_code": 1,
+      "observed": "2026-09-26T12:16:53Z",
+      "private_original": {
+        "name": "credential-argv-probe-20260926T121653Z-as-run.stdout",
+        "bytes": 1356,
+        "sha256": "184a5643df8f27a683f309416c92c59574b8f7d8ddc57edc12779e8c95d74002"
+      },
+      "published": {
+        "bytes": 1356,
+        "sha256": "184a5643df8f27a683f309416c92c59574b8f7d8ddc57edc12779e8c95d74002"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/credential-argv-probe-20260926T121709Z-fixed.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of local-integration/fixed/credential-argv-probe.py (sha256 016b6f34e8043fbf6792199ee318eb1ea110e239bb18be60f715ced0b06287f3) against the fixed copy, local-integration/fixed/connect-local-llm-safe.sh (sha256 7b7d8b043132cb31aa71e0255053ca781c6d4821d983543f8defc7a2d53fcc36), with a random dummy value and a loopback listener started by the probe; nothing was sent to port 18232. All five expectations held: in every safe form the header arrived, the value was in no command line or environment of the inspected processes, the script exited 0 and printed http_code=200.",
+      "command": "python3 local-integration/fixed/credential-argv-probe.py local-integration/fixed/connect-local-llm-safe.sh",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:17:09Z",
+      "private_original": {
+        "name": "credential-argv-probe-20260926T121709Z-fixed.stdout",
+        "bytes": 1355,
+        "sha256": "52817a3c108e6b7dca673f9e398b51f480b451fbb6a8423a4952bcb271281178"
+      },
+      "published": {
+        "bytes": 1355,
+        "sha256": "52817a3c108e6b7dca673f9e398b51f480b451fbb6a8423a4952bcb271281178"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/owned-processes-check-20260926T121929Z-as-run.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/fixed/owned_processes_check.py (sha256 e89ea78a7b6272fd1457a8b3873fa3286a889aed12b242defc215dbc67408ac0) against reproduction/owned_processes.py, the helper run-20260926T1131Z used (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3), with fake processes only. The original five cases held. It has no preflight (exit 2). With os.pidfd_open deleted or raising ENOSYS, stop checked the start time and then sent SIGTERM by raw pid, which stopped the recorded sleeper; with signal.pidfd_send_signal deleted it crashed before signalling. 4 of 9 expectations failed. This is the failing-first control for the fix.",
+      "command": "python3 reproduction/fixed/owned_processes_check.py reproduction/owned_processes.py",
+      "exit_code": 1,
+      "observed": "2026-09-26T12:19:29Z",
+      "private_original": {
+        "name": "owned-processes-check-20260926T121929Z-as-run.stdout",
+        "bytes": 1527,
+        "sha256": "aa93a46619d63158ff4b255ea9a2cdec756e479e40a5dffdd878bad159b012b5"
+      },
+      "published": {
+        "bytes": 1527,
+        "sha256": "aa93a46619d63158ff4b255ea9a2cdec756e479e40a5dffdd878bad159b012b5"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/owned-processes-check-20260926T121949Z-fixed.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/fixed/owned_processes_check.py (sha256 e89ea78a7b6272fd1457a8b3873fa3286a889aed12b242defc215dbc67408ac0) against the fixed helper, reproduction/fixed/owned_processes.py (sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631), with fake processes only. All nine expectations held. In the three cases without usable pidfds, stop sent no signal and exited 1, the sleeper kept running, and preflight exited 1; on this host preflight exited 0.",
+      "command": "python3 reproduction/fixed/owned_processes_check.py",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:19:49Z",
+      "private_original": {
+        "name": "owned-processes-check-20260926T121949Z-fixed.stdout",
+        "bytes": 1502,
+        "sha256": "447681841c85c9ebd597a52e682c2a1da98e60200f641d7a5a451652723cc3a5"
+      },
+      "published": {
+        "bytes": 1502,
+        "sha256": "447681841c85c9ebd597a52e682c2a1da98e60200f641d7a5a451652723cc3a5"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/ownership-failure-check-20260926T122516Z-as-run.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/fixed/ownership_failure_check.py (sha256 6d23646bb5b80253300870f580bb5725ca97dc291be7e411727bdc8fa9671607) against reproduction/reproduce-vc-search.sh (sha256 619117c73d5b01c528218eaf882d5e0626be1ce1caca42ec6256e3f570ed2799) with its owned_processes.py (sha256 e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3), the version run-20260926T1131Z ran, with stub npm and brv commands and a fake daemon inside a new user and PID namespace; no ByteRover code ran and nothing went over the network. An owned daemon was stopped with SIGTERM and the script exited 0. When record refused the daemon named by daemon.json, and when no daemon.json appeared, the script still exited 0, removed its workspace and left the daemon running without a signal. Without os.pidfd_open it ran, and its cleanup stopped the daemon by raw pid (SIGTERM). 3 of 4 expectations failed. This is the failing-first control for the fix.",
+      "command": "python3 reproduction/fixed/ownership_failure_check.py reproduction <byterover-cli-3.16.1.tgz from npm pack, sha512 equal to the pin> reproduction/run-20260926T1131Z",
+      "exit_code": 1,
+      "observed": "2026-09-26T12:25:16Z",
+      "private_original": {
+        "name": "ownership-failure-check-20260926T122516Z-as-run.stdout",
+        "bytes": 1566,
+        "sha256": "45919dbe5e8a85f31fb5542ab17a7f6556058f926c05072f61e37541692699ff"
+      },
+      "published": {
+        "bytes": 1566,
+        "sha256": "45919dbe5e8a85f31fb5542ab17a7f6556058f926c05072f61e37541692699ff"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/ownership-failure-check-20260926T122520Z-fixed.txt",
+      "evidence_class": "local_integration",
+      "what": "Output of reproduction/fixed/ownership_failure_check.py (sha256 6d23646bb5b80253300870f580bb5725ca97dc291be7e411727bdc8fa9671607) against reproduction/fixed/ (reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39, owned_processes.py sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631), with stub npm and brv commands and a fake daemon inside a new user and PID namespace; no ByteRover code ran and nothing went over the network. All four expectations held: an owned daemon was stopped with SIGTERM, exit 0, workspace removed; when record refused the daemon file, the script stopped after brv vc init and exited 4, keeping the workspace with its daemon.json and sending the daemon no signal; with no daemon file it exited 4 after the searches, kept the workspace and sent no signal; without os.pidfd_open it exited 1 before the daemon started.",
+      "command": "python3 reproduction/fixed/ownership_failure_check.py reproduction/fixed <byterover-cli-3.16.1.tgz from npm pack, sha512 equal to the pin> reproduction/run-20260926T1131Z",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:25:20Z",
+      "private_original": {
+        "name": "ownership-failure-check-20260926T122520Z-fixed.stdout",
+        "bytes": 2226,
+        "sha256": "8eadb5ee1b34de2e0cb410d154a7edad8cf92646384365e90fb8038347ecd751"
+      },
+      "published": {
+        "bytes": 2226,
+        "sha256": "8eadb5ee1b34de2e0cb410d154a7edad8cf92646384365e90fb8038347ecd751"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/fixed/probe.log",
+      "evidence_class": "local_integration",
+      "what": "Probe of the fixed script (reproduction/fixed/reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39, owned_processes.py sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631, check_search.py sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T12:26Z-12:27Z, with TMPDIR and npm_config_cache pointed into the session scratch directory (the cache a copy of the earlier runs' npm cache). Real ByteRover 3.16.1 on the offline path; no LLM, no port 18232.",
+      "command": "sh reproduction/restart-scope-probe.sh reproduction/fixed <out>",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:27:52Z",
+      "private_original": {
+        "name": "probe.log",
+        "bytes": 1280,
+        "sha256": "525e6c5c10a4d3d3fd11f0b14c3e7da10dbf9978814b2eafc9e6c552b5feb647"
+      },
+      "published": {
+        "bytes": 1280,
+        "sha256": "525e6c5c10a4d3d3fd11f0b14c3e7da10dbf9978814b2eafc9e6c552b5feb647"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/fixed/run-00-pidfd-preflight.stdout",
+      "evidence_class": "local_integration",
+      "what": "Probe of the fixed script (reproduction/fixed/reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39, owned_processes.py sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631, check_search.py sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T12:26Z-12:27Z, with TMPDIR and npm_config_cache pointed into the session scratch directory (the cache a copy of the earlier runs' npm cache). Real ByteRover 3.16.1 on the offline path; no LLM, no port 18232.",
+      "command": "sh reproduction/restart-scope-probe.sh reproduction/fixed <out>",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:27:52Z",
+      "private_original": {
+        "name": "00-pidfd-preflight.stdout",
+        "bytes": 81,
+        "sha256": "38ba697e03f57483794b7f581e5d94ca89e537799c057e3e9715c00d964f1d96"
+      },
+      "published": {
+        "bytes": 81,
+        "sha256": "38ba697e03f57483794b7f581e5d94ca89e537799c057e3e9715c00d964f1d96"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/fixed/run-80-owned-processes.stdout",
+      "evidence_class": "local_integration",
+      "what": "Probe of the fixed script (reproduction/fixed/reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39, owned_processes.py sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631, check_search.py sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T12:26Z-12:27Z, with TMPDIR and npm_config_cache pointed into the session scratch directory (the cache a copy of the earlier runs' npm cache). Real ByteRover 3.16.1 on the offline path; no LLM, no port 18232.",
+      "command": "sh reproduction/restart-scope-probe.sh reproduction/fixed <out>",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:27:52Z",
+      "private_original": {
+        "name": "80-owned-processes.stdout",
+        "bytes": 307,
+        "sha256": "09adc72a403be4df91a6a6a6ddd42f171c253efe88c364745d382a0ac3ff43b4"
+      },
+      "published": {
+        "bytes": 307,
+        "sha256": "09adc72a403be4df91a6a6a6ddd42f171c253efe88c364745d382a0ac3ff43b4"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/fixed/run-90-stop.stdout",
+      "evidence_class": "local_integration",
+      "what": "Probe of the fixed script (reproduction/fixed/reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39, owned_processes.py sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631, check_search.py sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T12:26Z-12:27Z, with TMPDIR and npm_config_cache pointed into the session scratch directory (the cache a copy of the earlier runs' npm cache). Real ByteRover 3.16.1 on the offline path; no LLM, no port 18232.",
+      "command": "sh reproduction/restart-scope-probe.sh reproduction/fixed <out>",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:27:52Z",
+      "private_original": {
+        "name": "90-stop.stdout",
+        "bytes": 285,
+        "sha256": "2459820dea28a8cfbca7ddcaa9d547c0b0e6ccbc5b2141b831e672819c8df879"
+      },
+      "published": {
+        "bytes": 285,
+        "sha256": "2459820dea28a8cfbca7ddcaa9d547c0b0e6ccbc5b2141b831e672819c8df879"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/restart-scope-probe-20260926/fixed/run-steps.log",
+      "evidence_class": "local_integration",
+      "what": "Probe of the fixed script (reproduction/fixed/reproduce-vc-search.sh sha256 fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39, owned_processes.py sha256 f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631, check_search.py sha256 bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534) by reproduction/restart-scope-probe.sh (sha256 1a5eaca2e22453d7688058094e78c4d976d68e1d0f5ee7edb3bc7f48cadbee26) inside a new user and PID namespace with its own /proc, next to the same four decoys, 2026-09-26T12:26Z-12:27Z, with TMPDIR and npm_config_cache pointed into the session scratch directory (the cache a copy of the earlier runs' npm cache). Real ByteRover 3.16.1 on the offline path; no LLM, no port 18232.",
+      "command": "sh reproduction/restart-scope-probe.sh reproduction/fixed <out>",
+      "exit_code": 0,
+      "observed": "2026-09-26T12:27:52Z",
+      "private_original": {
+        "name": "steps.log",
+        "bytes": 4320,
+        "sha256": "1b88247aa6960803b99d1cbaee9c2bd3d9d18572f2b93637ebeae4d03c52a0ca"
+      },
+      "published": {
+        "bytes": 2864,
+        "sha256": "f8d9e4da87369d1140f363b85cd7a1859c31520247dc87839ea5daa75cefb929"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "session scratch path",
+          "replacements": 16
+        }
+      ]
     }
   ]
 }

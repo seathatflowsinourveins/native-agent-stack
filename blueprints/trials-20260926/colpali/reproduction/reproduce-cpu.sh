@@ -1,10 +1,10 @@
 #!/bin/sh
 # Self-contained CPU reproduction of the ColPali trial's primary run and its random control.
 #
-# Usage: sh reproduce-cpu.sh <output-dir>
+# Usage: sh reproduce-cpu.sh --accept-known-advisories <output-dir>
 #
 # Creates a fresh mktemp workspace (removed on exit), installs the exact environment that
-# produced the original result (requirements-lock.txt: vidore-benchmark 5.0.0,
+# produced the original result (environment-record.json: vidore-benchmark 5.0.0,
 # colpali-engine 0.3.13, torch 2.8.0, transformers 4.53.1, ...), downloads the pinned model
 # and dataset revisions into a private HF_HOME, rebuilds the 12-row slice (build_slice.py,
 # checked against slice-expected.json), then runs the unchanged upstream
@@ -12,10 +12,19 @@
 # vidore/colpali-v1.3 and for the built-in dummy_vision_retriever control, offline, under
 # /usr/bin/time -v. Only <output-dir> receives files. Nothing is written to the shared
 # Hugging Face cache. The script is local integration glue; the metrics are the CLI's own.
+# The historical environment has known advisories. Regeneration prints their IDs and
+# refuses without explicit opt-in. This version supersedes the script used in the
+# historical run; see ../../security-repair-sources.md for sources and check scope.
 set -u
 
 here=$(cd "$(dirname "$0")" && pwd)
-out=${1:?usage: sh reproduce-cpu.sh <output-dir>}
+if [ "${1-}" != "--accept-known-advisories" ]; then
+  python3 "$here/regenerate_lock.py"
+  echo "usage: sh reproduce-cpu.sh --accept-known-advisories <output-dir>" >&2
+  exit 2
+fi
+shift
+out=${1:?usage: sh reproduce-cpu.sh --accept-known-advisories <output-dir>}
 mkdir -p "$out"
 out=$(cd "$out" && pwd)
 work=$(mktemp -d)
@@ -34,10 +43,15 @@ log() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*" >> "$out/steps.lo
 fail() { log "FAIL: $*"; exit 1; }
 
 log "start; workspace is a fresh mktemp directory; nproc=$(nproc)"
+lock=$(TMPDIR="$work" python3 "$here/regenerate_lock.py" --accept-known-advisories 2> "$out/lock-regeneration.log")
+lock_status=$?
+cat "$out/lock-regeneration.log" >&2
+[ "$lock_status" -eq 0 ] || fail "lock regeneration (exit $lock_status)"
+log "temporary lock regenerated from environment-record.json with the original sha256"
 uv venv --python 3.11.16 "$work/venv" > "$out/venv.log" 2>&1 || fail "uv venv"
-uv pip install --python "$work/venv/bin/python" -r "$here/requirements-lock.txt" > "$out/install.log" 2>&1 || fail "uv pip install"
+uv pip install --python "$work/venv/bin/python" -r "$lock" > "$out/install.log" 2>&1 || fail "uv pip install"
 uv pip freeze --python "$work/venv/bin/python" > "$out/installed-freeze.txt" 2>/dev/null || fail "uv pip freeze"
-if cmp -s "$out/installed-freeze.txt" "$here/requirements-lock.txt"; then log "installed set equals requirements-lock.txt"; else fail "installed set differs from requirements-lock.txt"; fi
+if cmp -s "$out/installed-freeze.txt" "$lock"; then log "installed set equals environment-record.json"; else fail "installed set differs from environment-record.json"; fi
 
 "$work/venv/bin/python" -c 'import torch; print("torch", torch.__version__, "cuda_available", torch.cuda.is_available(), "num_threads", torch.get_num_threads())' > "$out/device-check.txt" 2>&1 || fail "device check"
 grep -q "cuda_available False" "$out/device-check.txt" || fail "CUDA is visible; refusing to run"

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "description": "Sanitized copies of the ColPali/ViDoRe trial's native outputs, its self-written wrappers, and the self-contained CPU reproduction run. Log timestamps inside files are host local time (UTC-4) unless marked Z.",
+  "description": "Sanitized historical ColPali/ViDoRe native outputs, environment data and local integration source/checks. Current repairs and synthetic checks are distinguished from the historical model runs; removed installable files are recorded only as provenance.",
   "sanitization_policy": "Private originals are not published; their name, byte count and sha256 are recorded here. They were in this session's scratch directory: the first pass's trees, which the first polish pass deleted on 2026-09-26 at 06:39Z (../host-cleanup-20260926/first-pass-scratch-trees/), or the port's and polish passes' own trees (trials-2, trials-pol), which remain (../README.md#host-state). Published copies replace the session scratch path with <scratch>, the home directory with ~, the user name with <user> (also inside underscore-encoded paths), UUID-shaped identifiers with <uuid>, and credential values with <redacted>; excerpts mark every omitted line range in place. Files marked verbatim are byte-for-byte copies. Each published copy passed scripts/validate.py PRIVATE_CONTENT and a credential-shape check.",
   "outputs": [
     {
@@ -996,26 +996,6 @@
       "sanitization": []
     },
     {
-      "path": "reproduction/run-20260926T0412Z/installed-freeze.txt",
-      "evidence_class": "upstream_native_operation",
-      "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
-      "command": null,
-      "exit_code": null,
-      "observed": "2026-09-26T04:21:34Z",
-      "private_original": {
-        "name": "installed-freeze.txt",
-        "bytes": 1834,
-        "sha256": "0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9"
-      },
-      "published": {
-        "bytes": 1834,
-        "sha256": "0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9"
-      },
-      "excerpt_lines": null,
-      "verbatim": false,
-      "sanitization": []
-    },
-    {
       "path": "reproduction/run-20260926T0412Z/device-check.txt",
       "evidence_class": "local_integration",
       "what": "Output of reproduction/reproduce-cpu.sh (self-contained CPU reproduction, 2026-09-26T04:12Z-04:21Z).",
@@ -1398,7 +1378,7 @@
     {
       "path": "native-outputs/colqwen-processor-probe-20260926T0634Z.ndjson",
       "evidence_class": "local_integration",
-      "what": "Output (one JSON object per line) of local-integration/colqwen_processor_probe.py, 2026-09-26T06:34:23Z-06:34:37Z, CPU (CUDA_VISIBLE_DEVICES=''), fresh private HF_HOME and HOME, no Hub token, in the first pass's .venv-combined, whose installed set equalled reproduction/requirements-lock.txt (the same 94 pins; transformers 4.53.1, huggingface_hub 0.36.2, colpali-engine 0.3.13, vidore-benchmark 5.0.0, torch 2.8.0). All five pre-stated expectations held: A list_repo_templates returns ['sentence_transformers.jinja'] (suffix kept) for vidore/colqwen2-v1.0 main; B ColQwen2Processor.from_pretrained at main raises 'TypeError: expected str, bytes or os.PathLike object, not NoneType' at transformers/processing_utils.py:993, as in attempt 6; C it loads at 83a0134c, the last revision without additional_chat_templates/; D ColQwen2_5_Processor at the pinned vidore/colqwen2.5-v0.2 revision dcbe8d9c raises the same TypeError; E it loads at 6f6fcdfd (the last colqwen2.5-v0.2 revision without the template) and has process_images, process_queries and score.",
+      "what": "Output (one JSON object per line) of local-integration/colqwen_processor_probe.py, 2026-09-26T06:34:23Z-06:34:37Z, CPU (CUDA_VISIBLE_DEVICES=''), fresh private HF_HOME and HOME, no Hub token, in the first pass's .venv-combined, whose installed set equalled the 94 pins now preserved in reproduction/environment-record.json ( transformers 4.53.1, huggingface_hub 0.36.2, colpali-engine 0.3.13, vidore-benchmark 5.0.0, torch 2.8.0). All five pre-stated expectations held: A list_repo_templates returns ['sentence_transformers.jinja'] (suffix kept) for vidore/colqwen2-v1.0 main; B ColQwen2Processor.from_pretrained at main raises 'TypeError: expected str, bytes or os.PathLike object, not NoneType' at transformers/processing_utils.py:993, as in attempt 6; C it loads at 83a0134c, the last revision without additional_chat_templates/; D ColQwen2_5_Processor at the pinned vidore/colqwen2.5-v0.2 revision dcbe8d9c raises the same TypeError; E it loads at 6f6fcdfd (the last colqwen2.5-v0.2 revision without the template) and has process_images, process_queries and score.",
       "command": "CUDA_VISIBLE_DEVICES= HF_HOME=<fresh dir> HOME=<fresh dir> <.venv-combined>/bin/python colqwen_processor_probe.py",
       "exit_code": 0,
       "observed": "2026-09-26T06:34:37Z",
@@ -1478,7 +1458,7 @@
     {
       "path": "reproduction/reproduce-cpu.sh",
       "evidence_class": "local_integration_source",
-      "what": "Self-contained CPU reproduction: fresh mktemp venv installed from requirements-lock.txt with the installed set checked equal to it, CUDA_VISIBLE_DEVICES='' checked through torch, pinned Hub revisions into a private HF_HOME, the slice rebuilt and checked byte-identical, then the unchanged evaluate-retriever CLI for colpali and for the dummy control under /usr/bin/time -v, and removal of the workspace. run-20260926T0412Z executed this exact version (the file is older than the run and unchanged since). Our glue around the upstream CLI.",
+      "what": "Current CPU reproduction glue. Requires explicit advisory acceptance, regenerates the original environment record into a private temporary workspace, compares uv pip freeze with that exact recorded set and removes the workspace on exit. It supersedes the as-run script whose hash remains in private_original. The historical model run did not execute these repaired bytes; only synthetic checks of this version ran.",
       "command": null,
       "exit_code": null,
       "observed": null,
@@ -1488,11 +1468,11 @@
         "sha256": "6f353e4056c80a351262fd758f7d16c39c580b4da1b28366bf180c64516012d7"
       },
       "published": {
-        "bytes": 4450,
-        "sha256": "6f353e4056c80a351262fd758f7d16c39c580b4da1b28366bf180c64516012d7"
+        "bytes": 5229,
+        "sha256": "35a07ba345f43878f6b61824a6cb6cb0f61b4f1c116e8ad592c1f369a2a9f4b8"
       },
       "excerpt_lines": null,
-      "verbatim": true,
+      "verbatim": false,
       "sanitization": []
     },
     {
@@ -1536,24 +1516,124 @@
       "sanitization": []
     },
     {
-      "path": "reproduction/requirements-lock.txt",
+      "path": "reproduction/environment-record.json",
       "evidence_class": "local_integration_source",
-      "what": "The 94 pinned packages (torch 2.8.0, transformers 4.53.1, colpali-engine 0.3.13, vidore-benchmark 5.0.0, ...) that reproduce-cpu.sh installs and then checks the installed set against: the installed set of the first pass's .venv-combined, where the original slice runs executed (the first polish pass's freeze of that venv before its deletion matched these pins). Input to our reproduction.",
+      "what": "Exact data record of the 94 historical pins, all hash lists, original lock/freeze size and SHA-256, and the 20 known advisories with their retained scanner source. Replaces both removed installable files.",
       "command": null,
       "exit_code": null,
       "observed": null,
-      "private_original": {
-        "name": "requirements-lock.txt",
-        "bytes": 1834,
-        "sha256": "0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9"
-      },
+      "private_original": null,
       "published": {
-        "bytes": 1834,
-        "sha256": "0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9"
+        "bytes": 25051,
+        "sha256": "c1939781e6a0f0f67136fb1bf292f69800e543fadb0461a71b42b812ea83fff8"
       },
       "excerpt_lines": null,
       "verbatim": true,
       "sanitization": []
+    },
+    {
+      "path": "reproduction/regenerate_lock.py",
+      "evidence_class": "local_integration_source",
+      "what": "Standard-library glue implementing opt-in regeneration, structured-pin and byte checks, private temporary directories and Git-work-tree refusal. Sources: ../security-repair-sources.md.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": null,
+      "published": {
+        "bytes": 4639,
+        "sha256": "24d9cac3898f25af15b9d6afefe0c221effd4608e596322167cc3a0a3f0a66b1"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "reproduction/lock_regeneration_check.sh",
+      "evidence_class": "local_integration_source",
+      "what": "Local checker of actual regeneration and CPU-script refusal/comparison/cleanup. Uses the original Git blob and synthetic uv; no package installation or model run.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": null,
+      "published": {
+        "bytes": 5766,
+        "sha256": "cb8654e34aa556752047cb8e7ba5e66110b23afc57ed700f5b61f8ea390ab606"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/osv-scanner-requirements-lock-20260926T130641Z.txt",
+      "evidence_class": "upstream_native_operation",
+      "what": "Retained sanitized OSV-Scanner 2.6.0 table output for the historical environment: 20 advisories, including 1 Critical and 15 High. The environment record identifies the scanner and JSON-source digest; no new scan is claimed.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T13:06:41Z",
+      "private_original": null,
+      "published": {
+        "bytes": 5174,
+        "sha256": "d55531ec0c3a1961fea664001c40b61189a83e2f6cf24ede7565735fdd3fc3f8"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "previous worker sanitized temporary paths; private scan bytes not reread"
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/lock-regeneration-check-20260926T131542Z.txt",
+      "evidence_class": "local_integration",
+      "what": "Earlier worker draft check, retained as historical output only. Its fixed/reproduce-cpu.sh and --into commands described a superseded draft, not current entry points. Its environment-record hash differs from the current record. See the final check for current source acceptance.",
+      "command": null,
+      "exit_code": null,
+      "observed": "2026-09-26T13:15:42Z",
+      "private_original": null,
+      "published": {
+        "bytes": 7380,
+        "sha256": "854f6fe4e37928bf21cdd04430355501b979408e37cc94e38c37d074d5a26544"
+      },
+      "excerpt_lines": null,
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "previous worker sanitized temporary paths; superseded historical draft output"
+        }
+      ]
+    },
+    {
+      "path": "native-outputs/lock-regeneration-check-20260926-final.txt",
+      "evidence_class": "local_integration",
+      "what": "Actual returned final checker output: original and regenerated locks are byte-identical (1834 bytes, original SHA-256); advisory IDs printed, refusal without opt-in, record tamper detection and workspace cleanup. Synthetic uv checks both outcomes of the installed-set comparison, without installing packages or executing a model.",
+      "command": "sh reproduction/lock_regeneration_check.sh",
+      "exit_code": 0,
+      "observed": "2026-09-26T14:02:04.727098+00:00",
+      "private_original": null,
+      "published": {
+        "bytes": 5028,
+        "sha256": "c5ffe177fa28b894fc604b6e380b87d4d4ca5740a1b71254c8b53d938c0bda5f"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    }
+  ],
+  "removed_artifacts": [
+    {
+      "historical_name": "reproduction/run-20260926T0412Z/installed-freeze.txt",
+      "bytes": 1834,
+      "sha256": "0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9",
+      "status": "Removed from the published tree; exact bytes preserved as data, not an installable lock.",
+      "replacement": "reproduction/environment-record.json"
+    },
+    {
+      "historical_name": "reproduction/requirements-lock.txt",
+      "bytes": 1834,
+      "sha256": "0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9",
+      "status": "Removed from the published tree; exact bytes preserved as data, not an installable lock.",
+      "replacement": "reproduction/environment-record.json"
     }
   ]
 }

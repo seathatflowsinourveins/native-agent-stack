@@ -8025,13 +8025,13 @@
     },
     {
       "path": "blueprints/trials-20260926/README.md",
-      "sha256": "156bd43d6ab38a02e252be518444e57db1896ba8fe2db16ebc586eb4feda4eff",
-      "bytes": 18803
+      "sha256": "3c63b60362ef79568d972ff5a6fbf72743be39ea79820310364451469e914f03",
+      "bytes": 20422
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/README.md",
-      "sha256": "5abaf590bf408ec374513b21bed51dfed8e64299974d4b39570b2a40c8779a30",
-      "bytes": 19854
+      "sha256": "1a6f5134e5b89dee59f06b6890d4b01aad370a1d8511e5afb5253d776ffaf0e8",
+      "bytes": 26367
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/local-integration/connect-local-llm-safe.sh",
@@ -8040,13 +8040,23 @@
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/local-integration/connect-local-llm.sh",
-      "sha256": "01307bb8a238546d22813ce60883251647f9cc710eb6bd157c50af77ca869ad6",
-      "bytes": 1858
+      "sha256": "0917197eaf8580286b36c68eeec7643e20ee5e00207627a9784979d0320831f0",
+      "bytes": 2076
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/local-integration/credential-argv-probe.py",
       "sha256": "9bcb436009e4ae32e7d5be3e023c610cfba3055ad879239bf3761dad4b08363a",
       "bytes": 6065
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/local-integration/fixed/connect-local-llm-safe.sh",
+      "sha256": "7b7d8b043132cb31aa71e0255053ca781c6d4821d983543f8defc7a2d53fcc36",
+      "bytes": 4574
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/local-integration/fixed/credential-argv-probe.py",
+      "sha256": "016b6f34e8043fbf6792199ee318eb1ea110e239bb18be60f715ced0b06287f3",
+      "bytes": 7845
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/local-integration/testsuite-self-contained-cmd.sh",
@@ -8062,6 +8072,16 @@
       "path": "blueprints/trials-20260926/byterover-cli/native-outputs/credential-argv-probe-20260926T111651Z.txt",
       "sha256": "9a2a8b03bd66f1acaca17a495514969e2332f0944d7c6a82c584032ff63b9c7c",
       "bytes": 504
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/credential-argv-probe-20260926T121653Z-as-run.txt",
+      "sha256": "184a5643df8f27a683f309416c92c59574b8f7d8ddc57edc12779e8c95d74002",
+      "bytes": 1356
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/credential-argv-probe-20260926T121709Z-fixed.txt",
+      "sha256": "52817a3c108e6b7dca673f9e398b51f480b451fbb6a8423a4952bcb271281178",
+      "bytes": 1355
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/native-outputs/curate-context-error.ndjson",
@@ -8112,6 +8132,26 @@
       "path": "blueprints/trials-20260926/byterover-cli/native-outputs/owned-processes-check-20260926T110019Z.txt",
       "sha256": "622a3afd97b25ea9af67cfe34e13b22fc6323b18c591847c8697ed3cdcebbbc6",
       "bytes": 1023
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/owned-processes-check-20260926T121929Z-as-run.txt",
+      "sha256": "aa93a46619d63158ff4b255ea9a2cdec756e479e40a5dffdd878bad159b012b5",
+      "bytes": 1527
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/owned-processes-check-20260926T121949Z-fixed.txt",
+      "sha256": "447681841c85c9ebd597a52e682c2a1da98e60200f641d7a5a451652723cc3a5",
+      "bytes": 1502
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/ownership-failure-check-20260926T122516Z-as-run.txt",
+      "sha256": "45919dbe5e8a85f31fb5542ab17a7f6556058f926c05072f61e37541692699ff",
+      "bytes": 1566
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/native-outputs/ownership-failure-check-20260926T122520Z-fixed.txt",
+      "sha256": "8eadb5ee1b34de2e0cb410d154a7edad8cf92646384365e90fb8038347ecd751",
+      "bytes": 2226
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/native-outputs/query-tier2-no-match.json",
@@ -8179,6 +8219,31 @@
       "bytes": 3144
     },
     {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/fixed/check_search.py",
+      "sha256": "bda617f40436271a3b6eac7237a94f0db9604b81ee55452031aee5566c838534",
+      "bytes": 3144
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/fixed/owned_processes.py",
+      "sha256": "f3654fa0d959bbe8ce5d69a80d4e54fd4a26504c9b87fca345923a58f77de631",
+      "bytes": 10680
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/fixed/owned_processes_check.py",
+      "sha256": "e89ea78a7b6272fd1457a8b3873fa3286a889aed12b242defc215dbc67408ac0",
+      "bytes": 11162
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/fixed/ownership_failure_check.py",
+      "sha256": "6d23646bb5b80253300870f580bb5725ca97dc291be7e411727bdc8fa9671607",
+      "bytes": 11642
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/fixed/reproduce-vc-search.sh",
+      "sha256": "fcf0f149792e0fe3326360a33cda810b7706a951a56b95791262e081926a6e39",
+      "bytes": 11787
+    },
+    {
       "path": "blueprints/trials-20260926/byterover-cli/reproduction/owned_processes.py",
       "sha256": "e377308e17aefae19b39849ba069d2786d4dcc6b5ee5da417b67c66206122bc3",
       "bytes": 8323
@@ -8227,6 +8292,31 @@
       "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/current/run-steps.log",
       "sha256": "44256313f3b79650ecde52b412621fa057e57ea0cd66f62e9989235f77906092",
       "bytes": 2847
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/fixed/probe.log",
+      "sha256": "525e6c5c10a4d3d3fd11f0b14c3e7da10dbf9978814b2eafc9e6c552b5feb647",
+      "bytes": 1280
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/fixed/run-00-pidfd-preflight.stdout",
+      "sha256": "38ba697e03f57483794b7f581e5d94ca89e537799c057e3e9715c00d964f1d96",
+      "bytes": 81
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/fixed/run-80-owned-processes.stdout",
+      "sha256": "09adc72a403be4df91a6a6a6ddd42f171c253efe88c364745d382a0ac3ff43b4",
+      "bytes": 307
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/fixed/run-90-stop.stdout",
+      "sha256": "2459820dea28a8cfbca7ddcaa9d547c0b0e6ccbc5b2141b831e672819c8df879",
+      "bytes": 285
+    },
+    {
+      "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe-20260926/fixed/run-steps.log",
+      "sha256": "f8d9e4da87369d1140f363b85cd7a1859c31520247dc87839ea5daa75cefb929",
+      "bytes": 2864
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/reproduction/restart-scope-probe.sh",
@@ -8640,13 +8730,13 @@
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/results-20260926.json",
-      "sha256": "6e7de5222a7c95ce367c2bae34770a0c82654b84ffdf99b5f31e0c1778b8298f",
-      "bytes": 25687
+      "sha256": "ec7b11e218a2f8019f6babc24a2c29ca78114aa06507e4671285580ca455a399",
+      "bytes": 31569
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/retained-outputs.json",
-      "sha256": "66baba1c27f98ba55c014f3a4315f6e2b327b95e59016f4f5a354f23551e3c36",
-      "bytes": 134405
+      "sha256": "c2b15f44ff8610bb171cdedfa50831ff959333c7fe21d1ed5d9a77d2acaf4683",
+      "bytes": 159717
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/source-review.json",
@@ -8665,8 +8755,8 @@
     },
     {
       "path": "blueprints/trials-20260926/colpali/README.md",
-      "sha256": "1a06d62a038c4da3e56b6cd868c97681a4c9549f32028e9bf463c10884a086b3",
-      "bytes": 15298
+      "sha256": "1bab87f5e83f528680e6e0ecd27e4e2f2cb886cdc77c089cb6c43b568df5dd20",
+      "bytes": 16943
     },
     {
       "path": "blueprints/trials-20260926/colpali/local-integration/colqwen_processor_probe.py",
@@ -8849,6 +8939,16 @@
       "bytes": 2712
     },
     {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/lock-regeneration-check-20260926-final.txt",
+      "sha256": "c5ffe177fa28b894fc604b6e380b87d4d4ca5740a1b71254c8b53d938c0bda5f",
+      "bytes": 5028
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/lock-regeneration-check-20260926T131542Z.txt",
+      "sha256": "854f6fe4e37928bf21cdd04430355501b979408e37cc94e38c37d074d5a26544",
+      "bytes": 7380
+    },
+    {
       "path": "blueprints/trials-20260926/colpali/native-outputs/metrics-colpali-v1.3-slice12-unpinned-device-0314Z.json",
       "sha256": "331c251c6388efc2862b69af074a521d7e510b2b5a1d412ebcf95a4831c56a2a",
       "bytes": 2282
@@ -8862,6 +8962,11 @@
       "path": "blueprints/trials-20260926/colpali/native-outputs/metrics-dummy-slice12-0314Z.json",
       "sha256": "18ac9333960c0ea0080106138908bc57ce96d020a4a70252b8c9d00a64a3897d",
       "bytes": 2382
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/native-outputs/osv-scanner-requirements-lock-20260926T130641Z.txt",
+      "sha256": "d55531ec0c3a1961fea664001c40b61189a83e2f6cf24ede7565735fdd3fc3f8",
+      "bytes": 5174
     },
     {
       "path": "blueprints/trials-20260926/colpali/native-outputs/recorder-dryrun-slice12-unpinned-device.log",
@@ -8884,14 +8989,24 @@
       "bytes": 2681
     },
     {
-      "path": "blueprints/trials-20260926/colpali/reproduction/reproduce-cpu.sh",
-      "sha256": "6f353e4056c80a351262fd758f7d16c39c580b4da1b28366bf180c64516012d7",
-      "bytes": 4450
+      "path": "blueprints/trials-20260926/colpali/reproduction/environment-record.json",
+      "sha256": "c1939781e6a0f0f67136fb1bf292f69800e543fadb0461a71b42b812ea83fff8",
+      "bytes": 25051
     },
     {
-      "path": "blueprints/trials-20260926/colpali/reproduction/requirements-lock.txt",
-      "sha256": "0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9",
-      "bytes": 1834
+      "path": "blueprints/trials-20260926/colpali/reproduction/lock_regeneration_check.sh",
+      "sha256": "cb8654e34aa556752047cb8e7ba5e66110b23afc57ed700f5b61f8ea390ab606",
+      "bytes": 5766
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/regenerate_lock.py",
+      "sha256": "24d9cac3898f25af15b9d6afefe0c221effd4608e596322167cc3a0a3f0a66b1",
+      "bytes": 4639
+    },
+    {
+      "path": "blueprints/trials-20260926/colpali/reproduction/reproduce-cpu.sh",
+      "sha256": "35a07ba345f43878f6b61824a6cb6cb0f61b4f1c116e8ad592c1f369a2a9f4b8",
+      "bytes": 5229
     },
     {
       "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/colpali.log",
@@ -8949,11 +9064,6 @@
       "bytes": 2239
     },
     {
-      "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/installed-freeze.txt",
-      "sha256": "0eafa4e618aa234903b76ea3a529f1ed07ef4874e1f7502b34188c80cea166f9",
-      "bytes": 1834
-    },
-    {
       "path": "blueprints/trials-20260926/colpali/reproduction/run-20260926T0412Z/slice-build.log",
       "sha256": "3bff7410b4ab30015abfce542617022711182fbe19a583ed64bf401ce8668d00",
       "bytes": 351
@@ -8980,13 +9090,13 @@
     },
     {
       "path": "blueprints/trials-20260926/colpali/results-20260926.json",
-      "sha256": "ef09354c08cdd814ebf45cb8ce2151a1636600931341f00fe2235dc4b22c8051",
-      "bytes": 24046
+      "sha256": "9d99885c2a347368578fc6f137ee6a8594bb3a52a5e0363abb9edf9cb9cd77b2",
+      "bytes": 25184
     },
     {
       "path": "blueprints/trials-20260926/colpali/retained-outputs.json",
-      "sha256": "5bd5fa005cfce2321e649b9737cb62011d9909b00409f8bbd7680941107f98bf",
-      "bytes": 64966
+      "sha256": "01fb3952d06ab53aca057f9dd81649b7f6b63ae3f2eed7cfe75de957dd0924df",
+      "bytes": 68434
     },
     {
       "path": "blueprints/trials-20260926/colpali/source-review.json",
@@ -9080,8 +9190,8 @@
     },
     {
       "path": "blueprints/trials-20260926/mirix/README.md",
-      "sha256": "3c053cab050a7cf3633b8b444d7f74dc23b1499076ec7805cde415b7cb0817e5",
-      "bytes": 13402
+      "sha256": "95b13eb5dad8d4617b413e4c0cf7cd2a05970be023ea903e1ba467c334b007b8",
+      "bytes": 14809
     },
     {
       "path": "blueprints/trials-20260926/mirix/local-integration/check_main_bounded_poll.sh",
@@ -9110,8 +9220,13 @@
     },
     {
       "path": "blueprints/trials-20260926/mirix/local-integration/gen_key_main.py",
-      "sha256": "a46418ef09a7f4c70737a648289d1f965ceb4e592be690a7ba690d3080f706be",
-      "bytes": 2321
+      "sha256": "447f4260309984b6f6f54adb00cb9721c9b1d0f6868c6d921fefea824ca399d2",
+      "bytes": 4459
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/local-integration/gen_key_main_check.py",
+      "sha256": "485e57714d162efc6d6c40933228f89eeb0a537f29b219a79bf5b585a6c162c5",
+      "bytes": 8078
     },
     {
       "path": "blueprints/trials-20260926/mirix/local-integration/quickstart_add_retrieve.py",
@@ -9127,6 +9242,11 @@
       "path": "blueprints/trials-20260926/mirix/native-outputs/check-v0.1.6-bounded-poll.log",
       "sha256": "43112e373aea06147e73735ef9f39f122174892aa46e740f23ea4f70afd72693",
       "bytes": 4909
+    },
+    {
+      "path": "blueprints/trials-20260926/mirix/native-outputs/gen-key-main-check-20260926.txt",
+      "sha256": "430a230399ad2fd8c1c0963d8968359616be6a00827e3496148a03820f0c1cbb",
+      "bytes": 896
     },
     {
       "path": "blueprints/trials-20260926/mirix/native-outputs/install-main-8cb06a62.log",
@@ -9200,13 +9320,13 @@
     },
     {
       "path": "blueprints/trials-20260926/mirix/results-20260926.json",
-      "sha256": "52d93c65932db468ea8438354f505a8ee5169b6e291e76b603619beb078dd332",
-      "bytes": 18102
+      "sha256": "54500a5121cc7f67a616277c2caa28813a21238f935e290a2502cbf02378c498",
+      "bytes": 18852
     },
     {
       "path": "blueprints/trials-20260926/mirix/retained-outputs.json",
-      "sha256": "8f4a714f1c026b6cd79b949a25c72bcd36f17e551cc9e36b07aaa7b4be9c9091",
-      "bytes": 27953
+      "sha256": "b0606249022734c1d490153bdf0cb3bbc739d287324dc666b4d56ae0e2c8ba83",
+      "bytes": 29625
     },
     {
       "path": "blueprints/trials-20260926/mirix/skipped-receipt-specs.json",
@@ -9262,6 +9382,11 @@
       "path": "blueprints/trials-20260926/retained-outputs.json",
       "sha256": "7e71bb48af87214467f4aa8f414624e135dda9dd8b09760f02f2de859a61b2a1",
       "bytes": 23800
+    },
+    {
+      "path": "blueprints/trials-20260926/security-repair-sources.md",
+      "sha256": "487b926e13453efeb0796532fc3bb14e3b93aab273b6b1bc5cb80d794826c84c",
+      "bytes": 5106
     },
     {
       "path": "blueprints/trials-20260926/withdrawn-host-receipts-validate.txt",
@@ -36047,11 +36172,6 @@
       "path": "manifests/candidates.json",
       "sha256": "58832b3c13b6b7c5f85a1ddbdaec7305b6d05273f8cebef35b4b8bfd4f8bca9e",
       "bytes": 54594
-    },
-    {
-      "path": "manifests/evidence.json",
-      "sha256": "82c0e698ec0622ad9ecd50c304979248c1a90adea92e4952958a34c081a8abca",
-      "bytes": 1807573
     },
     {
       "path": "manifests/landscape.json",

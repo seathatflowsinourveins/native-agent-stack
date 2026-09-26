@@ -368,7 +368,7 @@
     {
       "path": "local-integration/gen_key_main.py",
       "evidence_class": "local_integration_source",
-      "what": "Self-written copy of upstream samples/generate_demo_api_key.py with its calls awaited (F4). It prints a demo key for the private ephemeral server when run; no key is published.",
+      "what": "Fixed awaited adaptation of upstream samples/generate_demo_api_key.py at 8cb06a62. Writes only to a caller-chosen new 0600 file, refuses existing files/symlinks, and prints no key or upstream exception details. The as-run version printed the key to the terminal and is not retained. private_original describes that historical source only; published describes this repaired successor, checked with dummy modules rather than a MIRIX server.",
       "command": null,
       "exit_code": null,
       "observed": null,
@@ -378,12 +378,13 @@
         "sha256": "a46418ef09a7f4c70737a648289d1f965ceb4e592be690a7ba690d3080f706be"
       },
       "published": {
-        "bytes": 2321,
-        "sha256": "a46418ef09a7f4c70737a648289d1f965ceb4e592be690a7ba690d3080f706be"
+        "bytes": 4459,
+        "sha256": "447f4260309984b6f6f54adb00cb9721c9b1d0f6868c6d921fefea824ca399d2"
       },
       "excerpt_lines": null,
       "verbatim": false,
-      "sanitization": []
+      "sanitization": [],
+      "as_run_status": "Unsafe source not retained; historical size/hash only."
     },
     {
       "path": "local-integration/check_v016_bounded_poll.sh",
@@ -656,6 +657,38 @@
       },
       "excerpt_lines": null,
       "verbatim": false,
+      "sanitization": []
+    },
+    {
+      "path": "local-integration/gen_key_main_check.py",
+      "evidence_class": "local_integration_source",
+      "what": "Synthetic integration checker using stub MIRIX modules and dummy key values only; success, 0600 permissions under permissive/restrictive umasks, existing file/symlink refusal, missing flag, and key-bearing exception suppression.",
+      "command": null,
+      "exit_code": null,
+      "observed": null,
+      "private_original": null,
+      "published": {
+        "bytes": 8078,
+        "sha256": "485e57714d162efc6d6c40933228f89eeb0a537f29b219a79bf5b585a6c162c5"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
+      "sanitization": []
+    },
+    {
+      "path": "native-outputs/gen-key-main-check-20260926.txt",
+      "evidence_class": "local_integration",
+      "what": "Actual returned output: all 19 expectations passed against the fixed helper. No real key or MIRIX service used.",
+      "command": "python local-integration/gen_key_main_check.py",
+      "exit_code": 0,
+      "observed": "2026-09-26T14:02:05.336701+00:00",
+      "private_original": null,
+      "published": {
+        "bytes": 896,
+        "sha256": "430a230399ad2fd8c1c0963d8968359616be6a00827e3496148a03820f0c1cbb"
+      },
+      "excerpt_lines": null,
+      "verbatim": true,
       "sanitization": []
     }
   ]
