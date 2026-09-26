@@ -1,0 +1,140 @@
+# Drafted, not run: no host has loaded, started or enabled this unit (the
+# coordinator deploys it after review; this repository's worktree that
+# authored it made no host changes). @REPOSITORY@ is this repository's
+# checkout path and @REPORT_CONFIG@ is the private token-report
+# configuration path created by `token_manifest.py init-config` (see
+# tools/token-report/README.md, "Create one explicit configuration and
+# refresh"); both must be substituted before installing this unit, matching
+# this repository's existing placeholder convention
+# (adoption/templates/systemd/codex-broker-reaper.service's @REPOSITORY@;
+# observability/native-data/native-data.service.example's @PRIVATE_CONFIG@
+# for the same kind of per-user `--config` value). This unit references no
+# systemd specifier (such as the %h just named as an example); the only %/$
+# text in any directive is the %%/$$ escaping inside ExecCondition= below,
+# which exists solely to survive systemd's own specifier/variable expansion
+# of the unit file and is explained in that directive's own comment. (Other
+# %/$ characters below, such as the "$REPORT_TOOLS" shell variable quoted
+# just below, appear only in comment prose, never in a directive systemd
+# itself parses.)
+#
+# The configuration this points at must give `--rtk`, `--headroom` and, if
+# set, "toon" their absolute installed paths (for example
+# "$REPORT_TOOLS/rtk-0.50.0/rtk" and
+# "$REPORT_TOOLS/headroom-0.37.0/bin/headroom" at `init-config` time, or
+# edited directly into an existing config's "rtk", "headroom" and "toon"
+# keys). `initialize_config` (tools/token-report/token_manifest.py) stores
+# those fields verbatim -- unlike jcodemunch/mcporter, which it resolves
+# once with `shutil.which()` at init time -- so a bare name, such as the
+# README's interactive-shell example (`--rtk rtk --headroom headroom`),
+# only resolves through that shell's own exported PATH and would fail under
+# a systemd --user manager's own minimal PATH. There is no `--toon` flag at
+# all: set an absolute "toon" path directly in an existing config's JSON.
+#
+# The same restricted PATH applies beyond --rtk/--headroom/toon. ExecStart=
+# below pins /usr/bin/python3 directly, so that interpreter itself must be
+# 3.11 or later (tools/token-report/README.md's own "Python 3.11+ is
+# required"). When this configuration also selects jcodemunch/mcporter
+# capture or sets "toon": mcporter is a `#!/usr/bin/env node` script
+# requiring Node >=24 per its own package.json; the optional toon
+# executable (tools/token-report/README.md, "Exact artifact comparisons")
+# is also a `#!/usr/bin/env node` script -- its own package.json sets no
+# engines.node floor, but its bin/toon.mjs still needs a working node to
+# run that same kind of shebang. `initialize_config`'s `shutil.which()`
+# resolves the configured --mcporter value to an absolute path once, at
+# `init-config` time, but running that absolute path -- or toon's own
+# absolute path -- still re-resolves `node` through `env` against *this
+# service's own* PATH, not the shell `init-config` ran in. Confirm a
+# qualifying `node` already resolves under `systemctl --user
+# show-environment` before installing; with "toon" configured, a `node`
+# missing from this unit's PATH fails *every* scheduled run (an issue
+# makes `refresh` exit nonzero), not just one capture among several. If
+# needed, prepend a qualifying `node`'s directory to the manager's own
+# full PATH (read it first with `systemctl --user show-environment`) in an
+# explicit Environment=PATH=... line -- replacing the whole PATH instead
+# of prepending to it would also change what any other bare-name command
+# in this unit resolves to (ExecCondition= below calls /bin/date by
+# absolute path for exactly this reason, so it is unaffected either way).
+# A separate, absolute "node" key set directly in config.json (parallel to
+# "rtk"/"headroom"/"toon") only covers this reporter's own internal
+# tokenizer-count invocation used while comparing toon output; it does not
+# change what toon's own `env node` shebang above resolves at run time.
+#
+# No HEADROOM_WORKSPACE_DIR redirect: this refresh only ever calls
+# `headroom savings --json` (no `--reset`), and the installed headroom-ai
+# 0.37.0 source shows that whole call path is read-only. `cli/savings.py`'s
+# `savings()` command calls only `savings_ledger.aggregate_savings()`, which
+# calls `_read_events()`; the ledger-compaction helper `_maybe_compact()` is
+# reachable only from the separate write path, `append_event()`
+# (savings_ledger.py:184), which this refresh never calls. The Click group
+# callback that runs before every subcommand (`cli/main.py`) also only
+# reads: `settings_store.load()` is a fail-open `path.read_text()` with no
+# write branch (settings_store.py:852-861), and `apply_to_environ()` only
+# edits this process's own in-memory `os.environ`. With no
+# HEADROOM_WORKSPACE_DIR override, both of those reads
+# (`~/.headroom/settings.json` and `~/.headroom/savings_events.jsonl`, the
+# latter via `paths.savings_events_path()`) resolve to the real, shared
+# `~/.headroom` state -- which is what this refresh's dashboard row is
+# supposed to reflect in the first place. No `RuntimeDirectory=` is declared
+# either, because nothing left in this unit references a `%t`-rooted path
+# for systemd to create or clean up.
+#
+# The three Headroom variables below guard the one call in that same group
+# callback that is not a pure read: `maybe_check_async()`, an opt-out
+# background update-check network probe (`update_check.py`). Verified
+# against the installed source:
+#   - `update_check.py:57-70` -- `is_update_check_enabled()` is "Disabled by
+#     HEADROOM_UPDATE_CHECK=off, offline mode (HEADROOM_OFFLINE), stateless
+#     mode ... or any CI environment"; both HEADROOM_UPDATE_CHECK=off and
+#     HEADROOM_OFFLINE=1 are set here for defense in depth, so
+#     `maybe_check_async()` returns before any network call or cache write.
+#   - `telemetry/beacon.py:11,84` -- the telemetry beacon separately honors
+#     DO_NOT_TRACK=1 (`dnt = os.environ.get("DO_NOT_TRACK", ...)`).
+# This mirrors the guard already recorded for the interactive `headroom`
+# launcher (a separate change) without touching that launcher or ~/.headroom
+# itself.
+#
+# ExecCondition enforces the Sat/Sun 05:00-09:00 quiet window at the moment
+# this service actually runs, not only at schedule-authoring time: `man
+# systemd.timer` on this host documents that a calendar timer which elapses
+# while the system is sleeping "will not be acted on immediately, but once
+# the system is later resumed it will catch up and process all timers that
+# triggered while the system was sleeping" -- this is unconditional on
+# calendar timers and separate from Persistent= (see the paired .timer's own
+# comments), so a resume can still start a run inside the window. `/bin/date
+# +%%u%%H` prints the ISO weekday (6=Saturday, 7=Sunday) concatenated with
+# the 24h hour, so e.g. Saturday 06:30 prints "606". It is called by its
+# absolute path -- like /bin/sh itself above -- so this guard resolves
+# regardless of this unit's own PATH (see the Node/mcporter/toon PATH
+# discussion above): a bare `date` this guard could not find would silently
+# fail the window open instead of closed, since `$(date ...)` then expands
+# to an empty string and a `case` with no matching pattern exits 0, not 1.
+# `$$(...)` and `%%` escape systemd's own `$`/`%` expansion inside this unit
+# file (systemd.service(5), "To pass a literal dollar sign, use $$";
+# systemd.unit(5) specifier table, "%%" -> "Use %% in place of %"). Exit
+# code 1 makes systemd skip ExecStart for this run without marking the unit
+# failed (systemd.service(5) ExecCondition=: "when an ExecCondition=
+# command exits with exit code 1 through 254 ... the remaining commands are
+# skipped and the unit is not marked as failed"). Verified for this repo on
+# 2026-09-25: for all 168 (weekday, hour) combinations the pattern skips
+# exactly Sat/Sun 05:00-08:59 and runs everywhere else, and the guard's
+# result is unchanged when this unit's own PATH cannot resolve any bare
+# command name (see tests/test_token_report_refresh_units.py).
+#
+# This unit has no [Install] section: it is triggered only by
+# token-report-refresh.timer, matching this repository's existing
+# timer-triggered oneshot convention (adoption/templates/systemd/
+# codex-broker-reaper.service and observability/native-data/
+# native-data.service.example + its paired .timer.example).
+[Unit]
+Description=Refresh the portable native token-report lifetime manifest
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=true
+TimeoutStartSec=900
+ExecCondition=/bin/sh -c 'case "$$(/bin/date +%%u%%H)" in 60[5-8]|70[5-8]) exit 1;; esac'
+Environment=HEADROOM_UPDATE_CHECK=off
+Environment=HEADROOM_OFFLINE=1
+Environment=DO_NOT_TRACK=1
+ExecStart=/usr/bin/python3 @REPOSITORY@/tools/token-report/token_manifest.py refresh --config @REPORT_CONFIG@

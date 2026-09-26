@@ -81,6 +81,101 @@ The initializer therefore uses the upstream default `.code-index` root. It does
 not modify that root's configuration. Using its `counter` tool surface keeps six
 resident MCP tools; changing the surface is separate from this reporter.
 
+## Optional scheduled refresh
+
+The reporter itself still installs no scheduler (see the top of this page); a
+separate, opt-in pair of drafted systemd `--user` templates can call `refresh`
+on a schedule instead of by hand:
+[`token-report-refresh.service`](../../adoption/templates/systemd/token-report-refresh.service)
+and [`.timer`](../../adoption/templates/systemd/token-report-refresh.timer). Like
+this repository's other drafted units
+(`adoption/templates/systemd/codex-broker-reaper.{service,timer}`), no host has
+loaded, started or enabled either one; the coordinator installs them after
+review, substituting `@REPOSITORY@` (this checkout's path) and
+`@REPORT_CONFIG@` (the `--config` path from "Create one explicit configuration
+and refresh" above) first.
+
+Before installing, give that configuration's `"rtk"`, `"headroom"` and, if
+set, `"toon"` keys absolute installed paths (for example by passing
+`--rtk "$REPORT_TOOLS/rtk-0.50.0/rtk" --headroom "$REPORT_TOOLS/headroom-0.37.0/bin/headroom"`
+at `init-config` time, or by editing an existing config.json directly).
+`initialize_config` stores those fields verbatim, unlike `jcodemunch`/
+`mcporter`, which it resolves once with `shutil.which()` at init time, so a
+bare name such as this page's own interactive-shell example
+(`--rtk rtk --headroom headroom`) only resolves through that shell's exported
+`PATH` and would fail under a systemd `--user` manager's own minimal `PATH`.
+There is no `--toon` flag at `init-config` time (see "Exact artifact
+comparisons" below): give it an absolute path the same way, directly in an
+existing config.json.
+
+Two more prerequisites apply to whatever actually *runs* this service, not
+just the shell used to install it. `ExecStart=` pins `/usr/bin/python3`
+directly, so that exact interpreter must itself satisfy "Python 3.11+ is
+required" above, regardless of any other `python3` a shell's `PATH` might
+resolve. Node is different: `mcporter` and the optional `toon` executable
+(see "Exact artifact comparisons" below) are each a `#!/usr/bin/env node`
+script, and while `initialize_config` resolves the configured `--mcporter`
+value to an absolute path once with `shutil.which()` at `init-config` time
+-- there is no matching `--toon` flag, so give `"toon"` an absolute path
+directly in an existing config.json instead, the same way as `"rtk"`/
+`"headroom"` above -- running either resolved absolute path still makes
+`env` re-resolve `node` through *the executing process's own* `PATH`, not
+the shell `init-config` ran in. When this configuration selects
+jcodemunch/mcporter capture or sets `"toon"`, confirm a qualifying `node`
+already resolves under `systemctl --user show-environment` before
+installing (`mcporter`'s own `package.json` requires `>=24`; the installed
+`@toon-format/cli` sets no `engines.node` floor of its own, but its
+`bin/toon.mjs` still needs a working `node` to run that same kind of
+shebang). A `node` exported only by an interactive shell's `nvm`/`fnm`
+rc-file init, or otherwise missing from the manager's typically minimal
+`PATH`, makes just that one capture report an issue: the refresh itself
+still completes and the reporter exits nonzero, but with `"toon"`
+configured specifically, that means *every* scheduled run hits this and
+exits nonzero, since `refresh` treats any issue as a failed run. If needed,
+prepend a qualifying `node`'s directory to the manager's own full `PATH` --
+read the existing value first with `systemctl --user show-environment` --
+in an explicit `Environment=PATH=...` line on the installed unit;
+*replacing* the whole `PATH` instead of prepending to it would also change
+what any other bare-name command in the unit resolves to (the unit's
+`ExecCondition=` calls `/bin/date` by absolute path for exactly this
+reason, so it is unaffected either way). Setting an absolute `"node"` key
+directly in config.json (parallel to `"rtk"`/`"headroom"`/`"toon"`) only
+covers this reporter's own internal tokenizer-count invocation used while
+comparing `toon` output; it does not change what `"toon"`'s own `env node`
+shebang above resolves at run time.
+
+The timer's four fixed local times a day (03:15, 10:15, 16:15, 22:15) never
+land inside the Sat/Sun 05:00-09:00 quiet window on any on-schedule fire
+(checked with `systemd-analyze calendar`), and `systemd-analyze --user verify`
+passes on both files. A calendar timer can still catch up on a missed tick
+immediately after the host resumes from sleep, per `man systemd.timer`. When
+that resume lands on a Saturday or Sunday between 05:00 and 09:00, the
+service's own `ExecCondition=` re-checks the real clock at run time and skips
+that one run instead of executing it, without marking the unit failed; a
+Monday-Friday resume in that same clock window is not a quiet window and
+still runs the refresh normally. See both unit files' own comments for the
+exact verified source lines and command output this rests on. The service
+sets `HEADROOM_UPDATE_CHECK=off`, `HEADROOM_OFFLINE=1`
+and `DO_NOT_TRACK=1` so a scheduled run's one Headroom call
+(`headroom savings --json`) never makes a network call; that call is
+otherwise a pure read against the shared `~/.headroom` state (no
+`HEADROOM_WORKSPACE_DIR` redirect is needed or set), which is what the
+dashboard row for it is supposed to reflect.
+
+Installing the timer also means the [native dashboard adapter](../../observability/native-data/README.md)
+sees a fresh `refresh` only every few hours instead of on an unpredictable
+manual cadence. Its own `stale_after_seconds` (a key in that adapter's
+private config, schema in
+[`config.example.json`](../../observability/native-data/config.example.json),
+bounds 1-86400 enforced in `observability/native-data/snapshot.py`, default
+1800) is shorter than the timer's largest gap between two runs (7 hours =
+25200 seconds) and would otherwise mark the token-report row stale between
+ticks. Raise it to 28800 (8 hours) by hand in that private file when the
+timer is installed: comfortably above the 7-hour gap plus the service's
+`TimeoutStartSec=900` margin, while still catching a scheduler that has
+actually stopped well inside a day. This reporter does not read or write
+that adapter's config; nothing here changes it automatically.
+
 ## Optional Context Mode snapshots
 
 Add only the exact runtime stats roots you want to read:

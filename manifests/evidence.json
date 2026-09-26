@@ -32174,8 +32174,8 @@
     },
     {
       "path": "observability/native-data/render.py",
-      "sha256": "3e29ec76e51620a6d130f8dbe90f108b1429fd2b6d8ec5dfd1a9c83d4d2501e1",
-      "bytes": 11151
+      "sha256": "973afa3b840c7151245bd6219a0c1eb3f99e99cb7ea421671a66b3411aaf3820",
+      "bytes": 15024
     },
     {
       "path": "observability/native-data/snapshot.py",
@@ -32859,8 +32859,8 @@
     },
     {
       "path": "tests/test_native_dashboard_data.py",
-      "sha256": "656b44c32b1cf9ce59182ec2a37220b7942206274830ff5824b96c150c022e18",
-      "bytes": 20844
+      "sha256": "2626ca6f28a4ffd84dadabefb68f32ef48ab36d61a8683c51436b68501beee3f",
+      "bytes": 24707
     },
     {
       "path": "tests/test_native_faults_min.py",
@@ -33199,8 +33199,8 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "a3daadc82d2c100444c7fc65842bea033182e26b8819ba66a556e54aa3f41e71",
-      "bytes": 12436
+      "sha256": "78d24ac4c9ee810ba748e15ff90a65d5d88a70fa19ee356395d4542d60063aa8",
+      "bytes": 18650
     },
     {
       "path": "tools/token-report/config.example.json",
