@@ -6,6 +6,8 @@ The 2026-09-22 wave was produced by two ad hoc, host-path-hardcoded scripts;
 these four steps replace them with arguments, resumability and a checked-in
 default reconciliation file. No step here calls a model.
 
+The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its own harness in [`landscape-sweep/`](landscape-sweep/README.md).
+
 ## The five steps
 
 1. **`extract_layers.py`** -- deterministic, no-network. Reads

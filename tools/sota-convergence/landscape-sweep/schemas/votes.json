@@ -1,0 +1,62 @@
+{
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "layer_id",
+  "role",
+  "votes",
+  "skills_used"
+ ],
+ "properties": {
+  "layer_id": {
+   "type": "string"
+  },
+  "role": {
+   "type": "string",
+   "enum": [
+    "facts",
+    "fit"
+   ]
+  },
+  "votes": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "repository",
+     "refuted",
+     "confidence",
+     "reasoning",
+     "refs"
+    ],
+    "properties": {
+     "repository": {
+      "type": "string"
+     },
+     "refuted": {
+      "type": "boolean"
+     },
+     "confidence": {
+      "type": "number"
+     },
+     "reasoning": {
+      "type": "string"
+     },
+     "refs": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  },
+  "skills_used": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  }
+ }
+}
