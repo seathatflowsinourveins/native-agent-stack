@@ -35,7 +35,10 @@ cover. Each test below names the drift it stops:
   evidence, which quote that failure, are exempt);
 - every documented `gh attestation verify` of the catalog's own publication binds the commit
   (--source-digest), and bootstrap.md's release archive check also binds the tag (--source-ref)
-  and runs `gh release verify-asset`.
+  and runs `gh release verify-asset`;
+- docs/harness-defaults.md (the manifest's ``harness_defaults``) keeps the upstream-verification
+  section that AGENTS.md links to, and its anti-pattern log is a table with the five named columns
+  and a YYYY-MM-DD date in every row (added 2026-09-26, so a correction reaches later sessions).
 
 The markers name the release they were written against, so they stay true in every later
 checkout: at a newer release they are history, and a re-pin needs no documentation edit for
@@ -51,6 +54,7 @@ import json
 import re
 import subprocess
 import unittest
+from datetime import date
 from pathlib import Path
 
 from scripts import release_due as rd
@@ -697,6 +701,74 @@ class CatalogAttestationBindingTests(unittest.TestCase):
         bound = unbound.replace("publish-catalog.yml\n", "publish-catalog.yml \\\n  --source-digest <c>\n")
         self.assertEqual(self.errors(bound, "ok"), [])
         self.assertEqual(self.errors("gh attestation verify -R rhysd/actionlint actionlint.tar.gz\n", "ok"), [])
+
+
+class UpstreamVerificationSectionTests(unittest.TestCase):
+    """The harness defaults carry the long form of the top rule's upstream-verification procedure
+    and a dated anti-pattern log, and the always-loaded AGENTS.md points to that section. Each log
+    row records the date, the anti-pattern, what happened, the rule or check that prevents it and
+    where that is enforced, so a mistake corrected in one session is not repeated in the next."""
+
+    PAGE = ROOT / "docs/harness-defaults.md"
+    SECTION = "Upstream verification and compounding learning"
+    COLUMNS = ["Date", "Anti-pattern", "What happened", "Rule or check that prevents it", "Where enforced"]
+
+    @staticmethod
+    def cells(line: str) -> list[str]:
+        """A table row's cells: split on pipes, except a pipe escaped as ``\\|`` inside a cell."""
+        row = line.strip()
+        row = row[1:] if row.startswith("|") else row
+        row = row[:-1] if row.endswith("|") and not row.endswith("\\|") else row
+        return [cell.strip() for cell in re.split(r"(?<!\\)\|", row)]
+
+    @classmethod
+    def log_errors(cls, text: str) -> list[str]:
+        section = next((block for block in sections(text) if block.startswith("### Anti-pattern log")), None)
+        if section is None:
+            return ["no '### Anti-pattern log' section"]
+        rows = [line for line in section.splitlines() if line.startswith("|")]
+        if len(rows) < 3:
+            return ["the anti-pattern log has no table rows"]
+        errors = []
+        if cls.cells(rows[0]) != cls.COLUMNS:
+            errors.append(f"header {cls.cells(rows[0])} is not {cls.COLUMNS}")
+        # GFM 0.29-gfm, 4.10 Tables: "The header row must match the delimiter row in the number of
+        # cells. If not, a table will not be recognized".
+        delimiter = cls.cells(rows[1])
+        if len(delimiter) != len(cls.COLUMNS) or not all(re.fullmatch(r":?-{3,}:?", cell) for cell in delimiter):
+            errors.append(f"the second table line is not a delimiter row of {len(cls.COLUMNS)} cells")
+        for number, line in enumerate(rows[2:], 1):
+            cells = cls.cells(line)
+            if len(cells) != len(cls.COLUMNS) or not all(cells):
+                errors.append(f"row {number} has {len(cells)} cells or an empty cell")
+                continue
+            try:
+                valid = re.fullmatch(r"\d{4}-\d{2}-\d{2}", cells[0]) and date.fromisoformat(cells[0])
+            except ValueError:
+                valid = False
+            if not valid:
+                errors.append(f"row {number} date {cells[0]!r} is not a YYYY-MM-DD date")
+        return errors
+
+    def test_the_anti_pattern_log_has_the_columns_and_dated_rows(self):
+        self.assertEqual(self.log_errors(self.PAGE.read_text(encoding="utf-8")), [])
+
+    def test_agents_md_points_to_the_section(self):
+        anchor = github_slug(self.SECTION)
+        self.assertIn(anchor, anchors(self.PAGE))
+        link = f"docs/harness-defaults.md#{anchor}"
+        self.assertTrue(link in (ROOT / "AGENTS.md").read_text(encoding="utf-8"), f"AGENTS.md does not link {link}")
+
+    def test_the_check_rejects_a_renamed_column_an_undated_row_an_empty_cell_and_a_short_delimiter_row(self):
+        good = ("## Upstream\n\n### Anti-pattern log\n\n"
+                "| Date | Anti-pattern | What happened | Rule or check that prevents it | Where enforced |\n"
+                "| --- | --- | --- | --- | --- |\n| 2026-09-26 | a | b `x \\| y` | c | d |\n\n## Next\n")
+        self.assertEqual(self.log_errors(good), [])
+        for mutant in (good.replace("| Where enforced |", "| Enforced |"), good.replace("| 2026-09-26 |", "| 2026-09-31 |"),
+                       good.replace("| c |", "|  |"), good.replace("### Anti-pattern log", "### Lessons"),
+                       good.replace("| --- | --- | --- | --- | --- |", "| --- | --- | --- | --- |")):
+            with self.subTest(mutant=mutant):
+                self.assertEqual(len(self.log_errors(mutant)), 1)
 
 
 if __name__ == "__main__":

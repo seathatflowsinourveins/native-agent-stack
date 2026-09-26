@@ -3467,8 +3467,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "b4f98393428a07d3235e8ffd53b2ea0d71a1af53f1377de8f661ecbb6f27de3d",
-      "bytes": 11410
+      "sha256": "e59e22ba7dabcbcc53662ae4b14ebbe281e130e6590eb7bec602041dee186f19",
+      "bytes": 11636
     },
     {
       "path": "CLAUDE.md",
@@ -13603,8 +13603,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "18c33400e45bfc50dcf43ec83fc2aaf51b19948c814efd32e55e3ac9ca8d95c3",
-      "bytes": 9311
+      "sha256": "fae68dcf4cc8900efdb8f041041157d6bf45fca2ea3886007f1ff4349b34d411",
+      "bytes": 25771
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -36763,8 +36763,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "d6717582b1901b885d29f3be2fc090ed93510791e65095a9d7a5828885896e90",
-      "bytes": 6143
+      "sha256": "b97c5417023f3fd521b7cc5e81f3708d3ad020e3bcb55b493b0bfcd804fa5ca0",
+      "bytes": 6347
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
@@ -37273,8 +37273,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "a8a2ba24870d95d379c90bcd7f58dccdfa8bef6e26929c67ac8f3c08a5337c8f",
-      "bytes": 20427
+      "sha256": "804e597a8ca674dd0522c01d8985d9299ff6c7843a47f8207f8302418f005971",
+      "bytes": 20712
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -37883,8 +37883,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "9061737b6c3ea67e338339788931df462c770624af862360ad687a24f0c3285c",
-      "bytes": 34960
+      "sha256": "1608649b034f36aaf8952302bf14e3e4336a933a0e1d05d84fde5792adbc663c",
+      "bytes": 38723
     },
     {
       "path": "tests/test_install_skills.py",
