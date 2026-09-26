@@ -11,6 +11,27 @@ was compiled by Codex, persisted as a session page, retrieved through MCP and
 inspected in the official read-only wiki. This closes the disabled-consolidation
 gap in the [earlier rendered review](dashboard-rendered-acceptance.md).
 
+**Update 2026-09-26, GPT-6 models.** The `gpt-5.6-luna` configuration below is
+historical. With `llm_provider = "codex"`, ai-memory 2.3.2 and 2.4.0 send
+`temperature`, and gpt-6-luna, gpt-6-sol and gpt-6-astra reject it with
+`400 {"detail":"Unsupported parameter: temperature"}`. That was observed with a
+2.3.2 build on the WSL authoring laptop on 2026-09-26 (UTC). 2.4.0 ships the same
+three request files unchanged.
+Upstream [#852](https://github.com/akitaonrails/ai-memory/pull/852) (merge
+`f7ec2eda`, issue [#851](https://github.com/akitaonrails/ai-memory/issues/851))
+omits it for `gpt-6*`. The fix is in
+[v2.4.1](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1) and
+`release/2.5` (at `dde5806b` on 2026-09-26), but not in 2.3.2 or 2.4.0.
+
+A host on 2.4.1 can set a GPT-6 model directly. The laptop stays on 2.3.2 for
+its [#859](https://github.com/akitaonrails/ai-memory/pull/859) prefix backport,
+so it runs a local 2.3.2 build carrying both backports. Its three changed Rust
+files are byte-identical to `f7ec2eda`, and it has run `llm_model = "gpt-6-sol"`
+at medium effort since 2026-09-26 (UTC). That model choice is keep-but-compare:
+a restored-store evaluation of two sessions cannot separate sol from astra or
+luna. A larger comparison with repeated runs, blind page-quality review and
+per-call usage would settle it.
+
 ## Upstream setup and returned results
 
 Use the host's existing native Codex home and executable; do not copy its
