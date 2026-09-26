@@ -167,10 +167,39 @@ logs. Codex uses `ecosystem_codex_turn_token_usage_sum` grouped by `token_type`;
 Claude uses `ecosystem_claude_code_token_usage_tokens_total` grouped by `type`.
 The two panels preserve their different native schemas. Histogram bucket/count
 series are excluded. Collector scrapes use `honor_labels: true` to preserve the
-exported service identity. Native token counters are not
+exported service identity. Each Claude session and Codex process is its own
+series (`instance`), so the token panels show `rate()` per minute and range
+totals with `increase()`, summed over writers; writers without an identity
+(`instance="unscoped"`) are excluded and counted by the integrity panel
+(changed after `v2026.09.26.2`; see the
+[Collector writer identity](../collector/README.md#writer-identity-and-counter-integrity)).
+Native token counters are not
 provider invoices or estimates of tokens saved. A missing series is not zero
 usage, and cached tokens may be a subset of input tokens. An empty panel before
 a real client exports data is expected.
+
+Prometheus runs with `--enable-feature=created-timestamp-zero-ingestion,promql-extended-range-selectors`
+(changed after `v2026.09.26.2`). The first makes Prometheus negotiate the
+protobuf scrape format first and inject a zero sample at each counter's start
+timestamp, which the Collector exporter sends. A new per-process series
+otherwise loses its first sample from `increase()`. The second enables the
+experimental `increase(x[w] anchored)`: the difference between the sample at the
+start of the window (the latest one within the lookback) and the last sample in
+it, without extrapolation. Both are feature flags in Prometheus 3.15; on an
+existing host, render the unit, compare it and restart Prometheus as in
+[Upgrading one backend](#upgrading-one-backend-on-an-existing-host).
+The `native-telemetry-integrity` rules alert on repeated resets of one Claude
+counter series (a resumed session resets each of its series once, which stays
+silent), delta points the Collector dropped and token writers without an
+identity. The `collector-native` scrape job also drops the Codex histogram
+bucket series except `ecosystem_codex_turn_token_usage_bucket`
+(`metric_relabel_configs`; changed after `v2026.09.26.2`): every Codex process
+is its own series set, the buckets are read by no panel or rule, and the
+512MB size limit would otherwise delete the oldest data of every job sooner.
+Each histogram keeps its `_sum` and `_count`. An existing host gets the job
+from a rendered `ecosystem-prometheus.yml`, merged as the
+[writer-identity host recipe](../../evidence/artifacts/telemetry-writer-identity-20260926/host/)
+does, then a Prometheus restart.
 
 Prometheus alerts when a normal scrape remains down for two minutes. Four
 Collector HTTP probes expect 2xx from the local OmniRoute, FreeLLMAPI, and

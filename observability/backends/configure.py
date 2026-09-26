@@ -94,8 +94,10 @@ def main():
     env=a.config_root/'ecosystem-grafana.env'
     cfg=str(a.config_root.resolve()); data=str(a.data_root.resolve())
     def tool(name): return str(a.tools_root.resolve()/f'ecosystem-{name}-{versions[name]}')
+    # created-timestamp-zero-ingestion: a per-process counter's first sample counts toward increase() (the Collector
+    # exporter sends start timestamps); promql-extended-range-selectors: exact `increase(x[w] anchored)` windows.
     commands={
-      'prometheus': f'{tool("prometheus")}/prometheus --config.file={cfg}/ecosystem-prometheus.yml --storage.tsdb.path={data}/ecosystem-prometheus --storage.tsdb.retention.time=7d --storage.tsdb.retention.size=512MB --web.listen-address=127.0.0.1:19090',
+      'prometheus': f'{tool("prometheus")}/prometheus --config.file={cfg}/ecosystem-prometheus.yml --storage.tsdb.path={data}/ecosystem-prometheus --storage.tsdb.retention.time=7d --storage.tsdb.retention.size=512MB --web.listen-address=127.0.0.1:19090 --enable-feature=created-timestamp-zero-ingestion,promql-extended-range-selectors',
       'loki': f'{tool("loki")}/loki-linux-amd64 -config.file={cfg}/ecosystem-loki.yml',
       'alertmanager': f'{tool("alertmanager")}/alertmanager --config.file={cfg}/ecosystem-alertmanager.yml --storage.path={data}/ecosystem-alertmanager --data.retention=72h --web.listen-address=127.0.0.1:19093 --cluster.listen-address=',
       'grafana': f'{tool("grafana")}/bin/grafana server --homepath={tool("grafana")} --config={cfg}/ecosystem-grafana.ini',

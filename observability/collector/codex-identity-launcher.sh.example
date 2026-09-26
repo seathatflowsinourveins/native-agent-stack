@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Codex telemetry identity launcher. Local integration, not an upstream component.
+#
+# Codex exports no per-process attribute on its metrics (rust-v0.157.1: resource service.name, service.version,
+# env, os, os_version; data point tags auth_mode, session_source, originator, service_name, model, app.version).
+# Its opentelemetry_sdk 0.31 Resource::builder() reads OTEL_RESOURCE_ATTRIBUTES, so this launcher gives each
+# process a fresh service.instance.id and runs the real codex unchanged. Without one, concurrent Codex processes
+# share one delta stream in the Collector, whose delta_to_cumulative drops their points as out of order.
+#
+# An inherited id (from a shell, worker or parent codex that set one) is kept as a prefix: the process gets
+# <inherited>/<fresh>, so concurrent children of one parent stay separate writers. The entry is parsed the way the
+# SDK does (sdk/src/resource/env.rs at v0.31.0: split on commas, then on the first '=', key and value trimmed; the
+# last duplicate wins). The script is POSIX sh apart from its shebang, so macOS bash 3.2 runs it.
+# @CODEX_BIN@ is the absolute path of the real codex executable; see observability/collector/README.md for
+# installing a rendered copy in place of the codex link on PATH.
+set -eu
+id=""
+if [ -r /proc/sys/kernel/random/uuid ]; then
+  id="$(cat /proc/sys/kernel/random/uuid)"
+elif command -v uuidgen >/dev/null 2>&1; then
+  id="$(uuidgen | tr '[:upper:]' '[:lower:]')"
+fi
+[ -n "$id" ] || id="pid$$-$(date +%s)"  # exec keeps this PID for codex, so the pair is unique on the host
+inherited=""
+kept=""
+rest="${OTEL_RESOURCE_ATTRIBUTES:-}"
+while [ -n "$rest" ]; do
+  case "$rest" in
+    *,*) entry="${rest%%,*}"; rest="${rest#*,}" ;;
+    *) entry="$rest"; rest="" ;;
+  esac
+  key="${entry%%=*}"
+  key="${key#"${key%%[![:space:]]*}"}"
+  key="${key%"${key##*[![:space:]]}"}"
+  if [ "$key" = service.instance.id ] && [ "$entry" != "${entry#*=}" ]; then
+    value="${entry#*=}"
+    value="${value#"${value%%[![:space:]]*}"}"
+    inherited="${value%"${value##*[![:space:]]}"}"
+  elif [ -n "$entry" ]; then
+    kept="${kept:+$kept,}$entry"
+  fi
+done
+OTEL_RESOURCE_ATTRIBUTES="service.instance.id=${inherited:+$inherited/}${id}${kept:+,$kept}"
+export OTEL_RESOURCE_ATTRIBUTES
+exec '@CODEX_BIN@' "$@"
