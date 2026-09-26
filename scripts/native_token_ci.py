@@ -10,7 +10,12 @@ npm-installed tools) comes from PATH. Each fixture runs the pinned tool's own CL
 MCP commands (upstream native operations) and this repository's checks assert on what
 they return: local integration evidence of upstream native operations. The one
 upstream test is `rtk verify --require-all`, which runs the inline filter tests built
-into RTK's release binary.
+into RTK's release binary. Discriminating inputs make RTK, MarkItDown, ast-grep, Repomix
+and TOON each produce output that a passthrough or a plain-text tool would not (a compacted
+long git log, converted HTML elements, a multi-line structural match, bodies dropped by
+compression, a tabular encoding); each such check is also held against the baseline it must
+differ from (git's own log, the raw and the tag-stripped HTML, a line regex, the uncompressed
+pack, the JSON input).
 """
 
 from __future__ import annotations
@@ -18,6 +23,7 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import hashlib
+from html.parser import HTMLParser
 import json
 import os
 from pathlib import Path
@@ -70,13 +76,38 @@ SOURCE_FILES = ("scripts/native_token_ci.py", ".github/workflows/native-token-e2
                 "fixtures/before.py", "fixtures/after.py", "fixtures/greeting.html",
                 "fixtures/headroom-note.txt", "fixtures/headroom-records.json",
                 "fixtures/ccusage-synthetic-claude/projects/native-ci-synthetic-project/synthetic-session.jsonl",
-                "fixtures/ast_grep_calls.py")
+                "fixtures/ast_grep_calls.py", "fixtures/ast_grep_shell_calls.py",
+                "fixtures/markitdown-multi-element.html")
 # Frozen ast-grep input and outcome (1-based lines): the two real subprocess.run calls,
 # one written with a space before its argument list, versus a plain-text grep for the
 # call prefix, which finds the first call plus a comment and a string literal instead.
 AST_GREP_FIXTURE = "fixtures/ast_grep_calls.py"
 AST_GREP_CALL_LINES = [9, 13]
 AST_GREP_TEXT_LINES = [9, 16, 17]
+# A pattern no line-based search expresses: subprocess.run calls with a shell=True keyword argument
+# anywhere in their argument list. Frozen outcome as 1-based [start, end] lines: the one-line call
+# and the call spread over lines 12-16. The closest single-line regex instead finds the one-line
+# call, a comment and a string (lines 8, 24, 31) and misses the spread-out call.
+AST_GREP_SHELL_FIXTURE = "fixtures/ast_grep_shell_calls.py"
+AST_GREP_SHELL_PATTERN = "subprocess.run($$$, shell=True, $$$)"
+AST_GREP_SHELL_CALL_RANGES = [[8, 8], [12, 16]]
+AST_GREP_SHELL_TEXT_REGEX = r"subprocess\.run\(.*shell=True"
+AST_GREP_SHELL_TEXT_LINES = [8, 24, 31]
+# RTK 0.50.0's `git log` filter (src/cmds/git/git_cmd.rs, run_log and filter_log_output) prints one
+# `%h %s (%ar) <%an>` header per commit and at most three non-empty body lines, drops Signed-off-by
+# and Co-authored-by trailers, ends a longer body with `[+N lines omitted]`, and without -N shows the
+# ten newest commits. Each fixture commit has five body lines and both trailers.
+RTK_LOG_COMMITS = 12
+RTK_LOG_DEFAULT_LIMIT = 10
+# MarkItDown input with one of each element its HTML converter turns into Markdown, plus a script,
+# a style sheet and a comment whose text must not survive conversion. The markers are letters
+# only: markdownify escapes Markdown characters such as `_`, so `NATIVE_CI_X` leaked into a
+# paragraph came out as `NATIVE\_CI\_X` and a literal search missed it (a 2026-09-26 control).
+MARKITDOWN_MULTI_ELEMENT = "fixtures/markitdown-multi-element.html"
+MARKITDOWN_HIDDEN_TEXT = ("NativeCiScriptBody", "NativeCiStyleBody", "NativeCiHtmlComment")
+# TOON 4.1.1 (its encoder is bundled in the CLI, no runtime dependency) writes fixtures/records.json,
+# a uniform array of objects, as one tabular block: a header naming the length and fields, then rows.
+TOON_TABULAR_RECORDS = "items[2]{name,enabled,count}:\n  alpha,true,2\n  beta,false,3"
 # Headroom inputs. The records are a compact JSON array of objects, the input its SmartCrusher
 # compresses (upstream README: "SmartCrusher — universal JSON: arrays of dicts"). The note is
 # below compress()'s default min_tokens_to_compress (250), which Headroom stores unchanged.
@@ -212,6 +243,86 @@ def jcodemunch_index_file(repo: str) -> str:
     safe = [re.sub(r"-+", "-", re.sub(r"[^A-Za-z0-9._-]", "-", part)).strip("-") for part in parts]
     require(all(part not in {"", ".", ".."} for part in safe), "jcodemunch repo id has an empty part")
     return f"{safe[0]}-{safe[1]}.db"
+
+
+def rtk_log_message(number: int) -> str:
+    """Message of long-log fixture commit `number`: a subject, five body lines and two trailers."""
+    details = "".join(f"Detail {line} of change {number:03d}: public synthetic text.\n" for line in range(1, 6))
+    return (f"CI_LOG_{number:03d} synthetic change\n\n{details}\n"
+            "Signed-off-by: Native CI Fixture <ci@example.invalid>\n"
+            "Co-authored-by: Native CI Fixture <ci@example.invalid>\n")
+
+
+def rtk_compacted_log(output: str, newest: int, count: int) -> bool:
+    """`output` is exactly RTK's compact log of fixture commits newest, newest - 1, ... (`count` of
+    them): each commit's header, its first three body lines and `[+2 lines omitted]`, nothing else.
+    The abbreviated hash and the relative date are the only parts left open."""
+    blocks = [rf"[0-9a-f]{{7,40}} CI_LOG_{number:03d} synthetic change \([^()\n]+\) <Native CI Fixture>"
+              + "".join(rf"\n  Detail {line} of change {number:03d}: public synthetic text\." for line in (1, 2, 3))
+              + r"\n  \[\+2 lines omitted\]" for number in range(newest, newest - count, -1)]
+    return re.fullmatch("\n".join(blocks) + "\n", output) is not None
+
+
+def rtk_ledger_delta(before: dict, after: dict) -> dict[str, int]:
+    """Change in the `rtk gain --format json` summary counters between two readings."""
+    return {key: after["summary"][key] - before["summary"][key]
+            for key in ("total_commands", "total_input", "total_output", "total_saved")}
+
+
+def markdown_elements(text: str) -> dict[str, bool]:
+    """Which elements of MARKITDOWN_MULTI_ELEMENT `text` holds as Markdown. The bullet, emphasis and
+    code-block spellings that markdownify can emit are all accepted; HTML markup never is."""
+    lines = [item.rstrip() for item in text.splitlines()]
+
+    def line(pattern: str) -> bool:
+        return any(re.fullmatch(pattern, item) for item in lines)
+
+    def row(*cells: str) -> str:
+        return r"\|\s*" + r"\s*\|\s*".join(re.escape(cell) for cell in cells) + r"\s*\|"
+
+    fences = [index for index, item in enumerate(lines) if re.fullmatch(r"(?:```|~~~)\S*", item)]
+    code = ["rtk git log -20", "markitdown page.html"]
+    return {
+        "headings": line(r"# Release checklist") and line(r"## Pinned tools") and line(r"### Steps"),
+        "table": (line(row("Tool", "Version", "Check")) and line(r"\|(?:\s*:?-{3,}:?\s*\|){3}")
+                  and line(row("rtk", "0.50.0", "inline filter tests"))
+                  and line(row("markitdown", "0.1.8", "structure oracle"))
+                  and line(row("ast-grep", "0.45.3", "call-site oracle"))),
+        "ordered_list": (line(r"1\. Install into a fresh prefix") and line(r"2\. Run each fixture")
+                         and line(r"3\. Keep only sanitized output")),
+        "nested_list": (line(r"[*+-] Record every command") and line(r" {2,}[*+-] including failures")
+                        and line(r"[*+-] Never read account state")),
+        "link": "[upgrade guide](https://example.invalid/guide)" in text,
+        "emphasis": "**pinned**" in text and re.search(r"(?<![*_])[*_]scoped[*_](?![*_])", text) is not None,
+        "blockquote": line(r"> Evidence is not authority\."),
+        "code_block": ((len(fences) >= 2 and lines[fences[0] + 1:fences[1]] == code)
+                       or all(line(" {4}" + re.escape(item)) for item in code)),
+        "inline_code_and_entity": "Tom & Jerry use `--offline` mode." in text,
+        "image": "![Pipeline diagram](diagram.png)" in text,
+    }
+
+
+class _TextOnly(HTMLParser):
+    """Collects every text node of a document: the output of plain tag stripping."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parts: list[str] = []
+
+    def handle_data(self, data: str) -> None:
+        self.parts.append(data)
+
+
+def tag_stripped_text(html: str) -> str:
+    parser = _TextOnly()
+    parser.feed(html)
+    parser.close()
+    return "".join(parser.parts)
+
+
+def pack_file_texts(xml: str) -> dict[str, str]:
+    """Each packed file's text in a Repomix XML pack, keyed by its path."""
+    return {item.attrib.get("path"): item.text or "" for item in ET.fromstring(xml).findall(".//file")}
 
 
 class Run:
@@ -458,6 +569,48 @@ def rtk_fixture(run: Run) -> None:
     run.check("rtk-upstream-inline-filter-tests-pass", rtk_inline_tests_passed(verify))
 
 
+def rtk_long_log_fixture(run: Run) -> None:
+    """RTK's git log filter on a history long enough to differ from git's own output: every commit
+    compacted, a smaller output than raw git, the default ten-commit window, an exact proxy
+    passthrough, and a ledger saving recorded for the filtered call only."""
+    repo, messages = run.work / "git-long-fixture", run.work / "git-long-messages"
+    repo.mkdir()
+    messages.mkdir()
+    run.command("git-long-init", ["git", "init", "--quiet"], repo)
+    for key, value in (("user.name", "Native CI Fixture"), ("user.email", "ci@example.invalid")):
+        run.command(f"git-long-{key}", ["git", "config", key, value], repo)
+    for number in range(RTK_LOG_COMMITS):
+        message = messages / f"{number:03d}.txt"
+        message.write_text(rtk_log_message(number))
+        run.command(f"git-long-commit-{number:03d}", ["git", "commit", "--quiet", "--allow-empty",
+                                                     "--file", str(message)], repo)
+    tool, count, newest = run.tools["rtk"], f"-{RTK_LOG_COMMITS}", RTK_LOG_COMMITS - 1
+    raw = run.command("git-long-log-baseline", ["git", "log", count], repo)
+    before = json.loads(run.command("rtk-long-gain-before", [tool, "gain", "--format", "json"], repo))
+    compact = run.command("rtk-long-git-log", [tool, "git", "log", count], repo)
+    filtered = json.loads(run.command("rtk-long-gain-after-filter", [tool, "gain", "--format", "json"], repo))
+    proxied = run.command("rtk-long-proxy-git-log", [tool, "proxy", "git", "log", count], repo)
+    after = json.loads(run.command("rtk-long-gain-after-proxy", [tool, "gain", "--format", "json"], repo))
+    default = run.command("rtk-long-default-git-log", [tool, "git", "log"], repo)
+    saving, passthrough = rtk_ledger_delta(before, filtered), rtk_ledger_delta(filtered, after)
+    run.report["rtk_long_log"] = {"commits": RTK_LOG_COMMITS, "raw_bytes": len(raw.encode()),
+                                  "rtk_bytes": len(compact.encode()), "default_bytes": len(default.encode()),
+                                  "ledger_filter_delta": saving, "ledger_proxy_delta": passthrough}
+    run.flush()
+    run.check("rtk-long-log-compacts-every-commit", rtk_compacted_log(compact, newest, RTK_LOG_COMMITS))
+    run.check("rtk-long-log-raw-baseline-rejected-and-larger",
+              not rtk_compacted_log(raw, newest, RTK_LOG_COMMITS) and len(compact.encode()) < len(raw.encode()))
+    run.check("rtk-long-log-proxy-exact-stdout", proxied == raw)
+    run.check("rtk-long-log-ledger-records-the-filter-saving",
+              saving["total_commands"] == 1 and saving["total_saved"] > 0
+              and saving["total_saved"] == saving["total_input"] - saving["total_output"])
+    run.check("rtk-long-log-ledger-records-no-proxy-saving",
+              passthrough["total_commands"] == 1 and passthrough["total_saved"] == 0
+              and passthrough["total_input"] == passthrough["total_output"])
+    run.check("rtk-long-log-default-window-ten-newest-commits",
+              rtk_compacted_log(default, newest, RTK_LOG_DEFAULT_LIMIT))
+
+
 def qmd_fixture(run: Run) -> None:
     docs = run.work / "docs-fixture"
     docs.mkdir()
@@ -514,6 +667,13 @@ def repomix_fixture(run: Run) -> None:
     content = compressed.read_text()
     run.check("repomix-structural-output-only", all(name in content for name in originals)
               and "greeting" in content and "DO_NOT_PACK_CI_UNSELECTED" not in content)
+    # The check above also passes on an uncompressed pack: compression must keep each signature and
+    # drop the function body that the exact originals pack above still holds.
+    structure = pack_file_texts(content)
+    run.check("repomix-compress-keeps-signatures-drops-bodies",
+              set(structure) == set(originals)
+              and all("def greeting(name)" in text and "return" not in text for text in structure.values())
+              and all("return" in text for text in originals.values()))
     run.artifact("repomix-structure.xml", compressed)
 
 
@@ -526,6 +686,12 @@ def toon_fixture(run: Run) -> None:
     run.command("toon-strict-decode", [cli, str(encoded), "--decode", "--strict", "-o", str(recovered)])
     verify_json_roundtrip(source.read_text(), recovered.read_text())
     run.check("toon-exact-json-value-roundtrip", True)
+    # Any valid TOON encoding round-trips (another delimiter, or the expanded list form), while a copied
+    # JSON file decodes to a different value; the compact tabular block, smaller than the JSON, is the
+    # form TOON is used for.
+    tabular = encoded.read_text()
+    run.check("toon-tabular-encoding-smaller-than-json",
+              tabular.rstrip("\n") == TOON_TABULAR_RECORDS and len(tabular.encode()) < len(source.read_bytes()))
     malformed = run.work / "malformed.toon"
     malformed.write_text("items[2]{name,count}:\n  alpha,1\n")
     run.command("toon-rejects-truncated-array", [cli, str(malformed), "--decode", "--strict"], nonzero=True)
@@ -547,6 +713,29 @@ def markitdown_fixture(run: Run) -> None:
     run.command("markitdown-txt-passthrough", [binary, str(plain_source), "-o", str(passthrough)])
     run.check("markitdown-txt-passthrough-unchanged",
               passthrough.read_text().rstrip("\n") == plain_text.rstrip("\n"))
+
+
+def markitdown_multi_element_fixture(run: Run) -> None:
+    """MarkItDown's HTML converter on a page with one of each common element. Every element check
+    must hold on the converted Markdown and fail on the raw HTML and on its plain tag-stripped text."""
+    source = ROOT / MARKITDOWN_MULTI_ELEMENT
+    converted = run.work / "markitdown-multi-element.md"
+    run.command("markitdown-multi-element-html", [run.tools["markitdown"], str(source), "-o", str(converted)])
+    markdown, html = converted.read_text(), source.read_text()
+    stripped = tag_stripped_text(html)
+    found = markdown_elements(markdown)
+    baselines = {"raw_html": markdown_elements(html), "tag_stripped_text": markdown_elements(stripped)}
+    run.report["markitdown_multi_element"] = {"converted": found, **baselines}
+    run.flush()
+    run.check("markitdown-multi-element-structure-converted", all(found.values()))
+    # Searched with Markdown backslash escapes removed as well, so an escaped leak still counts.
+    unescaped = re.sub(r"\\(.)", r"\1", markdown)
+    run.check("markitdown-script-style-and-comment-text-dropped",
+              not any(text in candidate for text in MARKITDOWN_HIDDEN_TEXT for candidate in (markdown, unescaped)))
+    run.check("markitdown-element-checks-reject-raw-and-tag-stripped-html",
+              not any(value for baseline in baselines.values() for value in baseline.values())
+              and all(any(text in candidate for text in MARKITDOWN_HIDDEN_TEXT) for candidate in (html, stripped)))
+    run.artifact("markitdown-multi-element.md", converted)
 
 
 def ast_grep_fixture(run: Run) -> None:
@@ -573,6 +762,22 @@ def ast_grep_fixture(run: Run) -> None:
                       "--pattern", "zzz_native_ci_nonexistent_call($$$ARGS)", AST_GREP_FIXTURE,
                       "--json=compact"], cwd=ROOT, nonzero=True))
     run.check("ast-grep-negative-control-zero-matches", none == [])
+
+
+def ast_grep_shell_fixture(run: Run) -> None:
+    """A structural pattern no line-based search expresses: calls that pass a shell=True keyword
+    argument, one spread over five lines, against the closest single-line regex."""
+    matches = json.loads(run.command("ast-grep-shell-true-calls", [run.tools["ast-grep"], "run", "--lang",
+                         "python", "--pattern", AST_GREP_SHELL_PATTERN, AST_GREP_SHELL_FIXTURE,
+                         "--json=compact"], cwd=ROOT))
+    text = run.command("ast-grep-shell-text-baseline-grep", ["grep", "-n", "-E", AST_GREP_SHELL_TEXT_REGEX,
+                       AST_GREP_SHELL_FIXTURE], cwd=ROOT)
+    text_lines = [int(line.split(":", 1)[0]) for line in text.splitlines() if line]
+    # ast-grep's JSON range lines are 0-based.
+    ranges = sorted([match["range"]["start"]["line"] + 1, match["range"]["end"]["line"] + 1] for match in matches)
+    run.check("ast-grep-shell-true-calls-match-across-lines",
+              {match["file"] for match in matches} == {AST_GREP_SHELL_FIXTURE}
+              and ranges == AST_GREP_SHELL_CALL_RANGES and text_lines == AST_GREP_SHELL_TEXT_LINES)
 
 
 def ccusage_fixture(run: Run) -> None:
@@ -783,13 +988,15 @@ def main() -> int:
             components = {row["id"]: row for row in json.loads((ROOT / "manifests/stack.json").read_text())["components"]}
             for name, version in PINS.items():
                 require(components[name]["version"] == version, f"Manifest pin changed: {name}")
-            for name, fixture in (("rtk", rtk_fixture), ("qmd", qmd_fixture),
-                                  ("repomix", repomix_fixture), ("toon", toon_fixture),
-                                  ("markitdown", markitdown_fixture), ("ast-grep", ast_grep_fixture),
-                                  ("ccusage", ccusage_fixture),
-                                  ("codebase-memory-mcp", codebase_memory_mcp_fixture),
-                                  ("headroom", headroom_fixture),
-                                  ("jcodemunch-mcp", jcodemunch_mcp_fixture)):
+            # Built here, not at import, so a test's patch of a fixture function takes effect.
+            for name, fixtures in (("rtk", (rtk_fixture, rtk_long_log_fixture)), ("qmd", (qmd_fixture,)),
+                                   ("repomix", (repomix_fixture,)), ("toon", (toon_fixture,)),
+                                   ("markitdown", (markitdown_fixture, markitdown_multi_element_fixture)),
+                                   ("ast-grep", (ast_grep_fixture, ast_grep_shell_fixture)),
+                                   ("ccusage", (ccusage_fixture,)),
+                                   ("codebase-memory-mcp", (codebase_memory_mcp_fixture,)),
+                                   ("headroom", (headroom_fixture,)),
+                                   ("jcodemunch-mcp", (jcodemunch_mcp_fixture,))):
                 try:
                     binary = run.install(name) if args.install else shutil.which(name)
                     require(bool(binary), f"Missing native executable: {name}")
@@ -797,7 +1004,13 @@ def main() -> int:
                     version = run.command(f"version-{name}", [str(binary), "--version"])
                     require(re.search(rf"(?<![\d.]){re.escape(PINS[name])}(?![\d.])", version) is not None,
                             f"Installed {name} differs from its manifest pin")
-                    fixture(run)
+                    for fixture in fixtures:
+                        # Each fixture checks its own input, so one failure does not skip the next.
+                        try:
+                            fixture(run)
+                        except Exception as error:
+                            run.report["failures"].append({"component": name, "error": run.clean(str(error))})
+                            run.flush()
                 except Exception as error:
                     run.report["failures"].append({"component": name, "error": run.clean(str(error))})
                     run.flush()

@@ -8,12 +8,14 @@ The foundation wave's [acceptance receipt](../evidence/receipts/foundation-nativ
 
 | Need | Selected repositories and pins | Default scope / acceptance |
 | --- | --- | --- |
-| Durable decisions and continuity | [ai-memory 2.3.2](https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2) | One explicitly scoped shared store; fresh native hook events plus exact page retrieval and owned restore. Routine capture is not a complete transcript. |
+| Durable decisions and continuity | [ai-memory 2.4.1](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1) (macOS pin 2.3.2) | One explicitly scoped shared store; fresh native hook events plus exact page retrieval and owned restore. Routine capture is not a complete transcript. |
 | Find documentation | [QMD 2.8.3](https://github.com/tobi/qmd/releases/tag/v2.8.3) | Named BM25 index and selected Markdown collection; search then read the returned source. No embedding model is needed for this lane. |
-| Conceptual code search | [SocratiCode 1.14.0](https://github.com/giancarloerra/SocratiCode), [Qdrant 1.19.1](https://github.com/qdrant/qdrant/releases/tag/v1.19.1), [vLLM 0.25.0](https://github.com/vllm-project/vllm/releases/tag/v0.25.0) | One project, local embeddings and persistent vectors; exact returned source plus automatic add/change/delete observation. |
+| Conceptual code search | [SocratiCode 1.14.0](https://github.com/giancarloerra/SocratiCode), [Qdrant 1.19.1](https://github.com/qdrant/qdrant/releases/tag/v1.19.1), [vLLM 0.30.0](https://github.com/vllm-project/vllm/releases/tag/v0.30.0) | One project, local embeddings and persistent vectors; exact returned source plus automatic add/change/delete observation. |
 | Symbols and references | [Serena](https://github.com/oraios/serena/tree/c6fbd1c5932df2494ffa0020af5a9fbe80b82143) | Enable Python and TypeScript where used; test each actual extension/language. A Bash-only server does not establish Python/TypeScript support. |
-| Reduce selected tool context | [RTK](https://github.com/rtk-ai/rtk/releases/tag/v0.49.0), [Context Mode](https://github.com/mksglu/context-mode), [jCodeMunch](https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319), [Headroom](https://github.com/chopratejas/headroom) | Choose the smallest representation satisfying the task; preserve full output/recovery and signed comparisons. These do not automatically intercept every client call. |
+| Reduce selected tool context | [RTK](https://github.com/rtk-ai/rtk/releases/tag/v0.50.0), [Context Mode](https://github.com/mksglu/context-mode), [jCodeMunch](https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319), [Headroom](https://github.com/headroomlabs-ai/headroom) | Choose the smallest representation satisfying the task; preserve full output/recovery and signed comparisons. These do not automatically intercept every client call. |
 | Optional gateway | [OmniRoute 3.8.50](https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50) | Separate process-level route and scoped inference key. Local lifecycle can pass while provider acceptance remains unavailable. |
+
+The pins above are the component pins in [manifests/stack.json](../manifests/stack.json), re-checked 2026-09-26. The 2026-09-20 acceptance receipt predates three of them: it records ai-memory 2.3.2, and this table then named vLLM 0.25.0 and RTK 0.49.0. Each newer pin's qualification is in its component's `freshness` note. For ai-memory and RTK that note also records that the landscape winner pin keeps its verdict wave's version (2.3.2 and 0.49.0) until a new wave. Headroom's canonical upstream is `headroomlabs-ai/headroom`; `chopratejas/headroom` redirects there.
 
 Native client sign-ins, generation models, caching, compaction and existing project MCP remain the default. OmniRoute conversational memory is a separate optional injection store; it does not replace ai-memory or the code index. Do not chain competing gateways or activate every catalog alternative.
 
@@ -21,10 +23,10 @@ Native client sign-ins, generation models, caching, compaction and existing proj
 
 Use native Node 24, Python 3.13, uv, Git and the chosen release tools. Set absolute paths for `STACK_HOME`, `PROJECT_ROOT`, `PRIVATE_RUN_DIR` and `MCPORTER_CONFIG`; keep private logs/configuration outside Git. Read only the selected recipe. Shell variables do not expand inside JSON, TOML or systemd units.
 
-For release archives such as ai-memory, RTK and Qdrant, use the [upstream archive procedure](../recipes/README.md#official-release-archives), selecting the actual OS/architecture asset and checking its published digest. For example, discover ai-memory's assets with:
+For release archives such as ai-memory, RTK and Qdrant, use the [upstream archive procedure](../recipes/README.md#official-release-archives), selecting the actual OS/architecture asset and checking its published digest. For example, discover the assets of ai-memory's Linux pin with the command below; the macOS pin is v2.3.2 ([pins-macos-arm64.json](../adoption/pins-macos-arm64.json)).
 
 ```sh
-gh release view v2.3.2 --repo akitaonrails/ai-memory --json tagName,assets
+gh release view v2.4.1 --repo akitaonrails/ai-memory --json tagName,assets
 ```
 
 For npm/uv tools, retain versioned prefixes, package metadata and the installation output. The following is a clean, selected QMD install; it stops if the prefix already exists:
@@ -82,7 +84,7 @@ Reopen the same index and repeat an exact source lookup to test persistence. Zer
 
 ## Local semantic code search and exact symbols
 
-Use [local semantic setup](../recipes/README.md#local-semantic-code-search) and the [Qdrant](../examples/qdrant.yaml.example), [MCPorter](../examples/mcporter.json.example) and native client examples. The selected embedding model is [Nemotron-3-Embed-1B-BF16](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16), revision `c0c9fea93ea424587517f2c59e20db9f1d6bf615`, with 2048 dimensions. Model acquisition is an actual download; local vLLM needs a compatible GPU. Its 0.29.0 WSL startup failed with unavailable UVA in the recorded acceptance, so the working 0.25.0 remains a compatibility pin, not the newest release.
+Use [local semantic setup](../recipes/README.md#local-semantic-code-search) and the [Qdrant](../examples/qdrant.yaml.example), [MCPorter](../examples/mcporter.json.example) and native client examples. The selected embedding model is [Nemotron-3-Embed-1B-BF16](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16), revision `c0c9fea93ea424587517f2c59e20db9f1d6bf615`, with 2048 dimensions. Model acquisition is an actual download; local vLLM needs a compatible GPU. Its 0.29.0 WSL startup failed with unavailable UVA in the recorded acceptance. The pinned 0.30.0 carries the WSL pinned-memory fallback that 0.29.0 lacked; it has served the embeddings on the WSL2 RTX 4090 host since 2026-09-25, after an owned-instance qualification against 0.25.0 with identical embeddings and code-index results, and 0.25.0 is kept for rollback (the vLLM `freshness` note in [manifests/stack.json](../manifests/stack.json)).
 
 ```sh
 qdrant --config-path "$QDRANT_CONFIG" --disable-telemetry
