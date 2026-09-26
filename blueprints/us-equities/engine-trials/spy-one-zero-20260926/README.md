@@ -225,6 +225,45 @@ another machine.
 - **No paper step.** No broker client, adapter, endpoint or credential was constructed,
   configured, contacted or read.
 
+## Repository checks (review round 1)
+
+An independent review found two repository unit tests that these files fail. Each needs an
+entry in a repository file outside this directory; changing the files here instead would
+unbind frozen evidence. [`repository-checks.json`](repository-checks.json) gives the exact
+entries and the retained results. No engine ran for this round, and no port, manifest, lock,
+receipt, verdict, scorer or tolerance sheet changed.
+
+- **Label classification.** `tests/test_blind_checkout.py` requires every string under a
+  `decision` key in `blueprints/` to be classified. The 16 `mappings[*].decision` strings of the
+  two arm manifests state how each arm maps a mechanism. They are data, like the spy-parity
+  manifest's eight, so their sha256 values belong in `DATA_VALUE_SHA256` in
+  `tools/sota-convergence/blind_checkout.py`. The strings cannot change here, because
+  `compare.py` checks each manifest's sha256 against its receipts.
+- **OSV inventory.** `tests/test_osv_lockfile_coverage.py` requires the three tracked locks in
+  `.github/osv-scanner-lockfiles.json`, each with the `requirements.txt` parser. Once they are
+  listed, the required osv-scanner job scans them. The pinned OSV-Scanner 2.6.0 found nothing in
+  `ml4t.lock` or `build.lock`, and two advisories in `lumibot.lock`:
+  - nltk 3.10.3, GHSA-8mgp-746c-j5xp (high), with no patched release. google-adk and
+    llama-index-core require it; no trial code calls nltk.
+  - setuptools 80.10.2, GHSA-h35f-9h28-mq5c (moderate), fixed in 83.0.0. It affects building a
+    source distribution on macOS file systems. This environment was installed from wheels only,
+    and its one source build used setuptools 84.0.0.
+
+  The lock records the environment that ran, so it is not relocked after the run. The job
+  therefore needs time-boxed ignores for the two ids, or an explicit policy decision instead.
+  A scratch scan of the whole inventory with the three locks and the two ignores exited 0.
+- **Evidence hash.** `manifests/evidence.json` records the inventory's sha256 and byte count,
+  so listing the locks also needs that entry updated. The simulation found this third
+  registration: without it, `scripts/validate.py` reports a mismatch.
+- **Full suite.** On commit fee2d6d8 the CI-style suite ran 5805 tests with four failures: the
+  two above, and two host-contention failures that passed when rerun. One hit the per-user
+  gitleaks lock while another scan held it; the other was an exporter timing test under load.
+  With the classification entries, the inventory entries and the two ignores applied in a
+  scratch worktree, one test failed: it runs `scripts/validate.py`, which reported the inventory
+  hash mismatch. With the `manifests/evidence.json`
+  update as well, the 5805 tests ran with no failure (667 skipped) and `scripts/validate.py`
+  passed. These runs simulate the coordinator's change; they are not the state of this branch.
+
 ## Files
 
 | Path | What it is |
@@ -239,6 +278,8 @@ another machine.
 | `lumibot/receipt.post-hoc-01.json`, `lumibot/verdict.post-hoc-01.json` | post-hoc `before_starting_trading` (BLOCKED) |
 | `lumibot/receipt.post-hoc-02.json`, `lumibot/verdict.post-hoc-02.json` | post-hoc `before_market_opens` (FAIL) |
 | `lumibot/run.json` | pins, environment build, probes, findings, every attempt, scorer runs and private-output hashes |
+| `repository-checks.json` | review round 1: the two failing repository tests, the entries they need outside this directory, and the OSV-Scanner result for the three locks |
 
 These files are not yet registered in `manifests/evidence.json`. The coordinator registers them
-with sha256 and byte counts, as it registered the spy-parity files.
+with sha256 and byte counts, as it registered the spy-parity files. The entries listed in
+`repository-checks.json` also belong to that registration.
