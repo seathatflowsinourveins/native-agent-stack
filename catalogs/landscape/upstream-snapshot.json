@@ -43,8 +43,7 @@
       "agentsview",
       "vllm",
       "dagu",
-      "skfolio",
-      "codex"
+      "skfolio"
     ],
     "redirected_repository_identities": [
       {
@@ -53,7 +52,7 @@
         "canonical": "https://github.com/headroomlabs-ai/headroom"
       }
     ],
-    "recommendation": "Retain current qualified pins; review the five newer stable releases against actual capability gaps before upgrading. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
+    "recommendation": "Retain current qualified pins; review the four newer stable releases against actual capability gaps before upgrading. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
     "selected_component_api_commands": 249,
     "initial_star_delta_commands": 1,
     "complete_star_snapshot_commands": 7,
@@ -635,7 +634,7 @@
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
       "selected_repository_url": "https://github.com/openai/codex",
-      "selected_version": "0.155.1",
+      "selected_version": "0.157.1",
       "selected_source_pin": null,
       "checks": [
         {
@@ -695,7 +694,7 @@
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "version_only",
       "primary_repository": "https://github.com/openai/codex",
-      "release_relationship": "newer_stable_release_review_pending"
+      "release_relationship": "selected_version_matches_latest_stable"
     },
     {
       "component_id": "codex-for-claude",
